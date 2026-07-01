@@ -1,0 +1,161 @@
+=== CHUNK 2/9 | SET cb56ba3b-c2f4-4ee4-8fef-ebebbff590a6 | UUID 2fc1c299-5b6a-4cb9-8dd7-ce4dd36187c8 | START ===
+[Agent: Read this chunk fully. Verify the START and END UUID match and the sequence is in order. Echo "read 2/9, uuid verified" in chat. Then STOP and wait for the human; do not read or fetch the next chunk on your own.]
+
+ius:50%}
+  .geo{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .geo article{background:var(--surface);padding:22px}
+  .geo h3{font-size:1.02rem;font-weight:600;margin-bottom:9px;display:flex;align-items:center;gap:10px}
+  .geo h3 i{color:var(--red)}
+  .geo p{font-size:.9rem;color:var(--muted);line-height:1.62}
+  .prevnext{display:flex;justify-content:space-between;gap:12px;margin-top:var(--space-lg)}
+  .pn{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 16px;cursor:pointer;color:inherit;font:inherit;text-align:left;transition:background .18s var(--ease)}
+  .pn:hover{background:var(--surface2)}
+  .pn.next{text-align:right}
+  .pn .lbl{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .pn .nm{font-weight:600;margin-top:3px}
+  .pn:disabled{opacity:.35;cursor:default}
+  footer.app{position:sticky;bottom:0;margin:var(--space-xl) -52px 0;padding:14px clamp(16px,3.5vw,52px);
+    background:oklch(15% 0.02 264/.86);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;z-index:20}
+  footer.app .meta-txt{font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.04em;color:var(--faint)}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tool{display:inline-flex;align-items:center;gap:7px;font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:500;
+    background:var(--surface);color:var(--muted);border:1px solid var(--line);border-radius:9px;
+    padding:8px 12px;cursor:pointer;transition:background .16s var(--ease),color .16s var(--ease),border-color .16s var(--ease)}
+  .tool:hover{background:var(--surface2);color:var(--text);border-color:oklch(45% 0.02 264)}
+  .tool svg{width:15px;height:15px}
+  .tool.ok{background:oklch(64% 0.2 145/.16);color:var(--drs);border-color:oklch(64% 0.2 145/.45)}
+  .hint{color:var(--faint);font-family:"IBM Plex Mono",monospace;font-size:.68rem}
+  .save-wrap{display:inline-flex;align-items:center}
+  .save-link{display:inline-flex;align-items:center;gap:7px;font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;
+    background:var(--drs);color:oklch(18% 0.02 264);border:1px solid var(--drs);border-radius:9px;padding:8px 12px;
+    text-decoration:none;animation:fade .3s var(--ease)}
+  .save-link:hover{filter:brightness(1.08)}
+</style>
+
+
+<div class="wrap">
+  <div class="topbar">
+    <button class="brand" onclick="location.hash='#/'">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 17c4-1 6-9 10-9 3 0 4 3 8 2" stroke="white" stroke-width="2.4" stroke-linecap="round"></path><circle cx="6" cy="16.5" r="1.7" fill="white"></circle></svg></span>
+      <span class="t">F1 Racetracks<small>2026 Circuit Breakdowns</small></span>
+    </button>
+    <div class="nav-jump"><select id="jump" aria-label="Jump to circuit"><option value="">Jump to circuit…</option><option value="albert-park">R1 · Australian GP</option><option value="shanghai">R2 · Chinese GP</option><option value="suzuka">R3 · Japanese GP</option><option value="miami">R6 · Miami GP</option><option value="gilles-villeneuve">R7 · Canadian GP</option><option value="monaco">R8 · Monaco GP</option><option value="catalunya">R9 · Spanish GP</option><option value="red-bull-ring">R10 · Austrian GP</option><option value="silverstone">R11 · British GP</option><option value="spa">R12 · Belgian GP</option><option value="hungaroring">R13 · Hungarian GP</option><option value="zandvoort">R14 · Dutch GP</option><option value="monza">R15 · Italian GP</option><option value="madring">R16 · Spanish GP (Madrid)</option><option value="baku">R17 · Azerbaijan GP (soon)</option><option value="marina-bay">R18 · Singapore GP (soon)</option><option value="cota">R19 · United States GP (soon)</option><option value="mexico">R20 · Mexico City GP (soon)</option><option value="interlagos">R21 · São Paulo GP (soon)</option><option value="las-vegas">R22 · Las Vegas GP (soon)</option><option value="losail">R23 · Qatar GP (soon)</option><option value="yas-marina">R24 · Abu Dhabi GP (soon)</option></select></div>
+  </div>
+  <div id="app"><div class="view"><div class="home-h">
+    <p class="eyebrow">Circuit Breakdowns // 2026 FIA Formula 1 World Championship</p>
+    <h1>F1 Racetracks</h1>
+    <p class="sub">Home base for every round’s technical track report. Click a circuit to open its full breakdown: official map, lap profile with elevation, DRS and sectors, pit and tyre strategy, overtaking, and live weather. One app, 14 breakdowns built.</p>
+  </div>
+  <div class="legend">
+    <span class="lg"><span class="d" style="background:var(--done)"></span>Completed race</span>
+    <span class="lg"><span class="d" style="background:var(--active)"></span>Race weekend live</span>
+    <span class="lg"><span class="d" style="background:var(--line)"></span>Upcoming</span>
+    <span class="lg"><span class="badge b-report" style="padding:2px 6px"><span class="d" style="background:var(--done)"></span>Breakdown ready</span></span>
+  </div>
+  <div class="grid" id="grid"><button class="race"><span class="status-stripe ss-done"></span>
+      <div class="rd"><span>Round 01</span><span class="flag">🇦🇺</span></div>
+      <div class="gp">Australian GP</div><div class="circ">Albert Park Circuit</div>
+      <div class="foot"><span class="date">08 Mar 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-done"></span>
+      <div class="rd"><span>Round 02</span><span class="flag">🇨🇳</span></div>
+      <div class="gp">Chinese GP</div><div class="circ">Shanghai International Circuit</div>
+      <div class="foot"><span class="date">15 Mar 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-done"></span>
+      <div class="rd"><span>Round 03</span><span class="flag">🇯🇵</span></div>
+      <div class="gp">Japanese GP</div><div class="circ">Suzuka Circuit</div>
+      <div class="foot"><span class="date">29 Mar 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-done"></span>
+      <div class="rd"><span>Round 06</span><span class="flag">🇺🇸</span></div>
+      <div class="gp">Miami GP</div><div class="circ">Miami International Autodrome</div>
+      <div class="foot"><span class="date">03 May 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-done"></span>
+      <div class="rd"><span>Round 07</span><span class="flag">🇨🇦</span></div>
+      <div class="gp">Canadian GP</div><div class="circ">Circuit Gilles Villeneuve</div>
+      <div class="foot"><span class="date">24 May 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-done"></span>
+      <div class="rd"><span>Round 08</span><span class="flag">🇲🇨</span></div>
+      <div class="gp">Monaco GP</div><div class="circ">Circuit de Monaco</div>
+      <div class="foot"><span class="date">07 Jun 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-done"></span>
+      <div class="rd"><span>Round 09</span><span class="flag">🇪🇸</span></div>
+      <div class="gp">Spanish GP</div><div class="circ">Circuit de Barcelona-Catalunya</div>
+      <div class="foot"><span class="date">14 Jun 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-done"></span>
+      <div class="rd"><span>Round 10</span><span class="flag">🇦🇹</span></div>
+      <div class="gp">Austrian GP</div><div class="circ">Red Bull Ring</div>
+      <div class="foot"><span class="date">28 Jun 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-active"></span>
+      <div class="rd"><span>Round 11</span><span class="flag">🇬🇧</span></div>
+      <div class="gp">British GP</div><div class="circ">Silverstone Circuit</div>
+      <div class="foot"><span class="date">05 Jul 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 12</span><span class="flag">🇧🇪</span></div>
+      <div class="gp">Belgian GP</div><div class="circ">Circuit de Spa-Francorchamps</div>
+      <div class="foot"><span class="date">19 Jul 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 13</span><span class="flag">🇭🇺</span></div>
+      <div class="gp">Hungarian GP</div><div class="circ">Hungaroring</div>
+      <div class="foot"><span class="date">26 Jul 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 14</span><span class="flag">🇳🇱</span></div>
+      <div class="gp">Dutch GP</div><div class="circ">Circuit Zandvoort</div>
+      <div class="foot"><span class="date">23 Aug 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 15</span><span class="flag">🇮🇹</span></div>
+      <div class="gp">Italian GP</div><div class="circ">Autodromo Nazionale Monza</div>
+      <div class="foot"><span class="date">06 Sep 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race"><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 16</span><span class="flag">🇪🇸</span></div>
+      <div class="gp">Spanish GP (Madrid)</div><div class="circ">Madring</div>
+      <div class="foot"><span class="date">13 Sep 2026</span>
+      <span class="badge b-report"><span class="d" style="background:var(--done)"></span>Breakdown</span></div></button><button class="race" disabled=""><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 17</span><span class="flag">🇦🇿</span></div>
+      <div class="gp">Azerbaijan GP</div><div class="circ">Baku City Circuit</div>
+      <div class="foot"><span class="date">26 Sep 2026</span>
+      <span class="badge b-soon">Soon</span></div></button><button class="race" disabled=""><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 18</span><span class="flag">🇸🇬</span></div>
+      <div class="gp">Singapore GP</div><div class="circ">Marina Bay</div>
+      <div class="foot"><span class="date">11 Oct 2026</span>
+      <span class="badge b-soon">Soon</span></div></button><button class="race" disabled=""><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 19</span><span class="flag">🇺🇸</span></div>
+      <div class="gp">United States GP</div><div class="circ">Circuit of the Americas</div>
+      <div class="foot"><span class="date">25 Oct 2026</span>
+      <span class="badge b-soon">Soon</span></div></button><button class="race" disabled=""><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 20</span><span class="flag">🇲🇽</span></div>
+      <div class="gp">Mexico City GP</div><div class="circ">Hermanos Rodríguez</div>
+      <div class="foot"><span class="date">01 Nov 2026</span>
+      <span class="badge b-soon">Soon</span></div></button><button class="race" disabled=""><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 21</span><span class="flag">🇧🇷</span></div>
+      <div class="gp">São Paulo GP</div><div class="circ">Interlagos</div>
+      <div class="foot"><span class="date">08 Nov 2026</span>
+      <span class="badge b-soon">Soon</span></div></button><button class="race" disabled=""><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 22</span><span class="flag">🇺🇸</span></div>
+      <div class="gp">Las Vegas GP</div><div class="circ">Las Vegas Strip</div>
+      <div class="foot"><span class="date">21 Nov 2026</span>
+      <span class="badge b-soon">Soon</span></div></button><button class="race" disabled=""><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 23</span><span class="flag">🇶🇦</span></div>
+      <div class="gp">Qatar GP</div><div class="circ">Losail International</div>
+      <div class="foot"><span class="date">29 Nov 2026</span>
+      <span class="badge b-soon">Soon</span></div></button><button class="race" disabled=""><span class="status-stripe ss-pending"></span>
+      <div class="rd"><span>Round 24</span><span class="flag">🇦🇪</span></div>
+      <div class="gp">Abu Dhabi GP</div><div class="circ">Yas Marina</div>
+      <div class="foot"><span class="date">06 Dec 2026</span>
+      <span class="badge b-soon">Soon</span></div></button></div></div></div>
+  <footer class="app">
+    <span class="meta-txt" id="foot-meta">F1 Racetracks v4 · 14 breakdowns · 22 rounds</span>
+    <div class="toolbar">
+      <button class="tool" id="t-copy" title="Copy the full page source to your clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="clipboard-copy" class="lucide lucide-clipboard-copy"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path><path d="M16 4h2a2 2 0 0 1 2 2v4"></path><path d="M21 14H11"></path><path d="m15 10-4 4 4 4"></path></svg>Copy source</button>
+      <button class="tool" id="t-prep" title="Build a Save link you click to download the .html"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="download" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Prepare download</button>
+      <button class="tool" id="t-tab" title="Open the raw source in a new tab, then Cmd/Ctrl+S to save"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="external-link" class="lucide lucide-external-link"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>Open in new tab</button>
+      <button class="tool" id="t-data" title="Export the TRACKS data as JSON"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="braces" class="lucide lucide-braces"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"></path><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"></path></svg>Export data (.json)</button>
+      <span class="save-wrap" id="save-slot"></span>
+      <span class="tool" style="cursor:default"><span class="hint">or Right-click → Save As</span></span>
+    </div>
+  </footer>
+</div>
+
+
+
+[Agent: Confirm this END UUID matches the START UUID above. Report completeness of part 2/9 in chat, then PAUSE and wait for the human's go-ahead before any next chunk.]
+=== CHUNK 2/9 | SET cb56ba3b-c2f4-4ee4-8fef-ebebbff590a6 | UUID 2fc1c299-5b6a-4cb9-8dd7-ce4dd36187c8 | END ===

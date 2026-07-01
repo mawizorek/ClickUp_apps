@@ -1,0 +1,41 @@
+# File Chunker Index — f1-racetracks-app.html
+
+You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- Set UUID: cb56ba3b-c2f4-4ee4-8fef-ebebbff590a6
+- Source file: f1-racetracks-app.html
+- Chunk format: native (.html)
+- Mode: SELF-NAVIGATING (chunks hosted; you fetch each URL yourself on "proceed")
+- Base URL: https://mawizorek.github.io/ClickUp_apps/
+- Total chunks: 9
+- Total bytes (source): 125,658
+- Generated: 6/30/2026, 22:27:27
+- App: File Chunker v13 (2026-06-30)
+- Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
+- Per-fetch read cap: ~30 KB. Chunks over cap: 0.
+- ⚑ COMPLETENESS FLAG: 9 chunks (over 8). Total-context erosion may degrade comprehension across this many parts. Consider a tighter scope or a batched read.
+
+## READING DIRECTIVE — agent: obey exactly. This is a GATED, ONE-CHUNK-AT-A-TIME walk.
+1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
+2. When the human says "proceed", fetch the NEXT chunk in the manifest order below from its listed URL. Fetch exactly ONE chunk per "proceed".
+3. For that chunk: verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, uuid verified" in chat.
+4. After EACH chunk, STOP. Do NOT fetch, open, or read the next URL on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch the set. This pause between every chunk is mandatory.
+5. If any chunk's start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. Do NOT reconstruct or fill gaps from inference.
+6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
+7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
+
+## ORDERED MANIFEST (fetch in this exact order, one URL per "proceed")
+1/9 · f1-racetracks-app_part1_of_9.html · 18.5 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part1_of_9.html · uuid:bb9ed93b-e67e-4f35-ba7e-3dace2ce90af
+2/9 · f1-racetracks-app_part2_of_9.html · 16.8 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part2_of_9.html · uuid:2fc1c299-5b6a-4cb9-8dd7-ce4dd36187c8
+3/9 · f1-racetracks-app_part3_of_9.html · 14.8 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part3_of_9.html · uuid:be725870-e3e1-4687-b0c4-b1d25d31f4e6
+4/9 · f1-racetracks-app_part4_of_9.html · 14.3 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part4_of_9.html · uuid:4972ab2a-b6e6-425f-b62a-8b99c5ac8088
+5/9 · f1-racetracks-app_part5_of_9.html · 14.6 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part5_of_9.html · uuid:7e226dd4-46b7-4a59-88b9-5c631d8586f7
+6/9 · f1-racetracks-app_part6_of_9.html · 15.2 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part6_of_9.html · uuid:2ed6c1b3-b145-465f-a838-6dcf942b180e
+7/9 · f1-racetracks-app_part7_of_9.html · 14.3 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part7_of_9.html · uuid:35997182-ce39-45fc-b5c5-43138d2fb98b
+8/9 · f1-racetracks-app_part8_of_9.html · 15.9 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part8_of_9.html · uuid:5e5b08ba-7aad-4189-89bc-e1ee8d900643
+9/9 · f1-racetracks-app_part9_of_9.html · 3.7 KB · https://mawizorek.github.io/ClickUp_apps/f1-racetracks-app_part9_of_9.html · uuid:e42f9d3c-09f4-4262-bb8c-d2f956fee83c
+
+## FOOTER
+- Set UUID: cb56ba3b-c2f4-4ee4-8fef-ebebbff590a6   (must match header)
+- END OF INDEX
