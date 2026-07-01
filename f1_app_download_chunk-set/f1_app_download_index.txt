@@ -1,0 +1,38 @@
+# File Chunker Index — f1_app_download.html
+
+You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- Set UUID: c30d68e2-55fa-449c-a613-3a76bbd9fa64
+- Source file: f1_app_download.html
+- Chunk format: native (.html)
+- Mode: SELF-NAVIGATING (chunks hosted; you fetch each URL yourself on "proceed")
+- Base URL: https://mawizorek.github.io/ClickUp_apps/
+- Total chunks: 7
+- Total bytes (source): 122,493
+- Generated: 6/30/2026, 20:47:16
+- App: File Chunker v13 (2026-06-30)
+- Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
+- Per-fetch read cap: ~30 KB. Chunks over cap: 0.
+
+## READING DIRECTIVE — agent: obey exactly. This is a GATED, ONE-CHUNK-AT-A-TIME walk.
+1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
+2. When the human says "proceed", fetch the NEXT chunk in the manifest order below from its listed URL. Fetch exactly ONE chunk per "proceed".
+3. For that chunk: verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, uuid verified" in chat.
+4. After EACH chunk, STOP. Do NOT fetch, open, or read the next URL on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch the set. This pause between every chunk is mandatory.
+5. If any chunk's start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. Do NOT reconstruct or fill gaps from inference.
+6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
+7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
+
+## ORDERED MANIFEST (fetch in this exact order, one URL per "proceed")
+1/7 · f1_app_download_part1_of_7.html · 20.6 KB · https://mawizorek.github.io/ClickUp_apps/f1_app_download_part1_of_7.html · uuid:70d7def2-b78e-4e50-8627-87c5d6d29edb
+2/7 · f1_app_download_part2_of_7.html · 18.5 KB · https://mawizorek.github.io/ClickUp_apps/f1_app_download_part2_of_7.html · uuid:ebf2f157-332e-4925-adf4-82330efbcf93
+3/7 · f1_app_download_part3_of_7.html · 18.4 KB · https://mawizorek.github.io/ClickUp_apps/f1_app_download_part3_of_7.html · uuid:19b498bb-9226-4138-a18e-f90ba1ca9f5f
+4/7 · f1_app_download_part4_of_7.html · 19.5 KB · https://mawizorek.github.io/ClickUp_apps/f1_app_download_part4_of_7.html · uuid:3d42c8a2-b897-435d-87a6-269ba42ff330
+5/7 · f1_app_download_part5_of_7.html · 19.7 KB · https://mawizorek.github.io/ClickUp_apps/f1_app_download_part5_of_7.html · uuid:2e41a231-dc5c-48d5-b0a5-2d6ec3b2aee0
+6/7 · f1_app_download_part6_of_7.html · 17.0 KB · https://mawizorek.github.io/ClickUp_apps/f1_app_download_part6_of_7.html · uuid:1e5decc5-f1d7-49d5-8c89-5553e8e7cd44
+7/7 · f1_app_download_part7_of_7.html · 10.1 KB · https://mawizorek.github.io/ClickUp_apps/f1_app_download_part7_of_7.html · uuid:79eba5f8-d68b-4568-8e58-e256ab797b50
+
+## FOOTER
+- Set UUID: c30d68e2-55fa-449c-a613-3a76bbd9fa64   (must match header)
+- END OF INDEX
