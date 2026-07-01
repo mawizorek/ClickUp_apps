@@ -1,0 +1,39 @@
+# File Chunker Index — pdf-splitter-v1.1.html
+
+You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- Set UUID: 9b2f3245-a746-4675-b79c-90d109dff228
+- Source file: pdf-splitter-v1.1.html
+- Original source included in set: pdf-splitter-v1.1.html (unaltered, native format)
+- Chunk file extension: .txt
+- Encoding: base64 (each chunk payload is base64-encoded; markers stay plain text outside the blob)
+- Mode: SELF-NAVIGATING (chunks hosted; you fetch each URL yourself on "proceed")
+- Base URL: https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/
+- Total chunks: 6
+- Total bytes (source): 60,627
+- Generated: 7/1/2026, 17:58:22
+- App: File Chunker v16.2 (2026-07-01)
+- Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
+- Per-fetch read cap: ~30 KB. Chunks over cap: 0.
+
+## READING DIRECTIVE — agent: obey exactly. This is a GATED, ONE-CHUNK-AT-A-TIME walk.
+1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
+2. When the human says "proceed", fetch the NEXT chunk in the manifest order below from its listed URL. Fetch exactly ONE chunk per "proceed".
+3. For that chunk: DECODE the base64 payload FIRST (everything between the directive lines, after the "ENCODING: base64" line). THEN verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, decoded, uuid verified" in chat.
+4. After EACH chunk, STOP. Do NOT fetch, open, or read the next URL on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch the set. This pause between every chunk is mandatory.
+5. If a chunk fails to DECODE, or its start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. A decode failure is treated exactly like a UUID mismatch. Do NOT reconstruct or fill gaps from inference.
+6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
+7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
+
+## ORDERED MANIFEST (fetch in this exact order, one URL per "proceed")
+1/6 · pdf-splitter-v1.1_part1_of_6.txt · 16.5 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/pdf-splitter-v1.1_part1_of_6.txt · uuid:18e27f07-0a27-41d7-970a-cb3417e876fc
+2/6 · pdf-splitter-v1.1_part2_of_6.txt · 16.4 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/pdf-splitter-v1.1_part2_of_6.txt · uuid:e9cfe7a9-1070-42ae-ba9e-fc919acc5036
+3/6 · pdf-splitter-v1.1_part3_of_6.txt · 16.4 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/pdf-splitter-v1.1_part3_of_6.txt · uuid:6b152b38-0897-4097-a607-fba036cd21ff
+4/6 · pdf-splitter-v1.1_part4_of_6.txt · 14.8 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/pdf-splitter-v1.1_part4_of_6.txt · uuid:40fa6763-bbb4-420f-a327-8cecbf916b60
+5/6 · pdf-splitter-v1.1_part5_of_6.txt · 15.8 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/pdf-splitter-v1.1_part5_of_6.txt · uuid:759dfaea-004a-4b23-85c2-a8123337a83e
+6/6 · pdf-splitter-v1.1_part6_of_6.txt · 5.1 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/pdf-splitter-v1.1_part6_of_6.txt · uuid:b197a2e9-2997-4c97-90db-9c833b0b4d4a
+
+## FOOTER
+- Set UUID: 9b2f3245-a746-4675-b79c-90d109dff228 (must match header)
+- END OF INDEX
