@@ -1,0 +1,49 @@
+# File Chunker Index — budget-code-authority-builder-v5.html
+
+You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- Set UUID: 8c4de62c-c934-41bd-9497-75822250c624
+- Source file: budget-code-authority-builder-v5.html
+- Original source included in set: budget-code-authority-builder-v5.html (unaltered, native format)
+- Chunk file extension: .txt
+- Encoding: base64 (each chunk payload is base64-encoded; markers stay plain text outside the blob)
+- Mode: SELF-NAVIGATING (chunks hosted; you fetch each URL yourself on "proceed")
+- Base URL: https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/
+- Total chunks: 15
+- Total bytes (source): 227,562
+- Generated: 7/1/2026, 11:10:34
+- App: File Chunker v16.2 (2026-07-01)
+- Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
+- Per-fetch read cap: ~30 KB. Chunks over cap: 0.
+- ⚑ COMPLETENESS FLAG: 15 chunks (over 8). Note: base64 armor uses smaller raw slices, so a higher part count is expected and not itself a problem. Total-context erosion may still degrade comprehension across a long session. Consider a batched read.
+
+## READING DIRECTIVE — agent: obey exactly. This is a GATED, ONE-CHUNK-AT-A-TIME walk.
+1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
+2. When the human says "proceed", fetch the NEXT chunk in the manifest order below from its listed URL. Fetch exactly ONE chunk per "proceed".
+3. For that chunk: DECODE the base64 payload FIRST (everything between the directive lines, after the "ENCODING: base64" line). THEN verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, decoded, uuid verified" in chat.
+4. After EACH chunk, STOP. Do NOT fetch, open, or read the next URL on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch the set. This pause between every chunk is mandatory.
+5. If a chunk fails to DECODE, or its start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. A decode failure is treated exactly like a UUID mismatch. Do NOT reconstruct or fill gaps from inference.
+6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
+7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
+
+## ORDERED MANIFEST (fetch in this exact order, one URL per "proceed")
+1/15 · budget-code-authority-builder-v5_part01_of_15.txt · 21.8 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part01_of_15.txt · uuid:a3febce9-1de4-4d8e-a3ca-2aad5e99d064
+2/15 · budget-code-authority-builder-v5_part02_of_15.txt · 14.0 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part02_of_15.txt · uuid:cd0a2a09-fffc-485d-bb92-799cfe998b13
+3/15 · budget-code-authority-builder-v5_part03_of_15.txt · 22.8 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part03_of_15.txt · uuid:1844236d-80e9-479e-9080-3a390207a90e
+4/15 · budget-code-authority-builder-v5_part04_of_15.txt · 22.8 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part04_of_15.txt · uuid:c5e5c5d4-842b-4514-ab6f-9b44458f9ad7
+5/15 · budget-code-authority-builder-v5_part05_of_15.txt · 22.7 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part05_of_15.txt · uuid:a70ef4d4-36de-413d-8ba0-56fe65005c68
+6/15 · budget-code-authority-builder-v5_part06_of_15.txt · 22.4 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part06_of_15.txt · uuid:8f5bbd4a-156e-440b-923b-b459a1746878
+7/15 · budget-code-authority-builder-v5_part07_of_15.txt · 22.4 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part07_of_15.txt · uuid:bb0a5b81-9a1a-46f0-8e52-f33d5688c32b
+8/15 · budget-code-authority-builder-v5_part08_of_15.txt · 22.5 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part08_of_15.txt · uuid:f464c102-03c2-4d84-b53d-3e825f428bab
+9/15 · budget-code-authority-builder-v5_part09_of_15.txt · 22.4 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part09_of_15.txt · uuid:cbdd0c57-bae1-4c95-8476-4392b8602286
+10/15 · budget-code-authority-builder-v5_part10_of_15.txt · 22.5 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part10_of_15.txt · uuid:72336de7-d406-4bc1-a827-75069b03e083
+11/15 · budget-code-authority-builder-v5_part11_of_15.txt · 22.6 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part11_of_15.txt · uuid:4f485d34-d6ea-4899-a3fb-32fc1312f32e
+12/15 · budget-code-authority-builder-v5_part12_of_15.txt · 22.9 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part12_of_15.txt · uuid:d059546a-2755-4bf7-8fa0-449d3e2fbb84
+13/15 · budget-code-authority-builder-v5_part13_of_15.txt · 21.2 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part13_of_15.txt · uuid:fce3a26a-49b2-48ba-9237-54b12487c4cb
+14/15 · budget-code-authority-builder-v5_part14_of_15.txt · 20.5 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part14_of_15.txt · uuid:d77e2bf0-8777-48fd-9d86-8670ed30afa4
+15/15 · budget-code-authority-builder-v5_part15_of_15.txt · 9.1 KB · https://mawizorek.github.io/ClickUp_apps/budget-code-mapper/budget-code-authority-builder-v5_part15_of_15.txt · uuid:84645429-269c-40cc-927d-574dabdeb7bb
+
+## FOOTER
+- Set UUID: 8c4de62c-c934-41bd-9497-75822250c624 (must match header)
+- END OF INDEX
