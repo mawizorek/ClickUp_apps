@@ -1,0 +1,180 @@
+=== CHUNK 3/5 | SET 9c149e65-d03d-4e55-a65c-a07d742f2d0d | UUID 4ca36f9d-bb1f-4c23-a5f0-b862cacbe5f0 | START ===
+[Agent: Read this chunk fully. Verify the START and END UUID match and the sequence is in order. Echo "read 3/5, uuid verified" in chat. Then STOP and wait for the human; do not read or fetch the next chunk on your own.]
+
+ let currentFile = null;
+ let currentText = '';
+ let chunks = [];
+ let wrappedChunks = [];
+ let chunkUuids = [];
+ let setUuid = '';
+ let fileName = '';
+ let nativeExt = 'txt';
+ let hostBaseUrl = '';
+ let blobUrls = [];
+ let customDebounce = null;
+ let hostDebounce = null;
+ let sourceUrl = null;
+ let sourceTimer = null;
+
+ capLabel.textContent = '~' + Math.round(FETCH_CAP / 1000) + ' KB';
+
+ function uuid() {
+ if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+ const r = (Math.random() * 16) | 0;
+ const v = c === 'x' ? r : (r & 0x3) | 0x8;
+ return v.toString(16);
+ });
+ }
+
+ // Flat sequential numbering. Isolated so a future grouped/sectioned scheme is a small swap.
+ function seqTag(idx, total) { return `${idx + 1}/${total}`; }
+
+ function selfNav() { return hostBaseUrl.trim().length > 0; }
+ function joinUrl(base, name) {
+ const b = base.trim().replace(/\/+$/, '');
+ return `${b}/${name}`;
+ }
+ function chunkUrl(idx, total) {
+ return selfNav() ? joinUrl(hostBaseUrl, chunkFileName(idx, total)) : chunkFileName(idx, total);
+ }
+
+ function saveSettings() {
+ try {
+ localStorage.setItem(LS_KEY, JSON.stringify({
+ chunkSize: chunkSizeSelect.value,
+ customSize: customSizeInput.value,
+ splitMode: splitModeSelect.value,
+ markers: markersToggle.checked,
+ debug: debugToggle.checked,
+ hostBase: hostBaseInput.value
+ }));
+ } catch (e) {}
+ }
+ function loadSettings() {
+ let s = {};
+ try { s = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch (e) {}
+ if (s.chunkSize) chunkSizeSelect.value = s.chunkSize;
+ if (s.splitMode) splitModeSelect.value = s.splitMode;
+ if (typeof s.markers === 'boolean') markersToggle.checked = s.markers;
+ if (typeof s.debug === 'boolean') debugToggle.checked = s.debug;
+ if (typeof s.hostBase === 'string') { hostBaseInput.value = s.hostBase; hostBaseUrl = s.hostBase; }
+ const isCustom = chunkSizeSelect.value === 'custom';
+ customWrap.classList.toggle('hidden', !isCustom);
+ if (isCustom && s.customSize) { customSizeInput.value = s.customSize; validateCustom(false); }
+ const hints = { smart: 'Prefers clean breaks at double-newlines', line: 'Splits at nearest line break', hard: 'Cuts at exact byte count' };
+ splitInfo.textContent = hints[splitModeSelect.value];
+ debugBanner.classList.toggle('show', debugToggle.checked);
+ refreshModeUI();
+ }
+
+ function refreshModeUI() {
+ const nav = selfNav();
+ hostModeBadge.textContent = nav ? 'Self-navigating' : 'Manual paste';
+ hostModeBadge.className = 'host-mode ' + (nav ? 'auto' : 'manual');
+ modePill.textContent = (nav ? 'Self-Navigating Walk' : 'Gated Walk') + ' · 22 KB · native-format chunks';
+ renderWalkSteps(nav);
+ }
+ function renderWalkSteps(nav) {
+ walkTitle.textContent = nav ? 'The self-navigating gated walk' : 'The gated-walk workflow';
+ const manual = [
+ 'Click <strong>Download set</strong>. You get a folder: one small index (.txt) plus every chunk in its native format (chunk 1, chunk 2, …).',
+ 'Hand the <strong>index file only</strong> to a fresh agent. It reads the index, confirms it understands the rules, and stops.',
+ 'Send chunk 1. The agent reads it, verifies the sequence + UUID, confirms completeness in chat, then <strong>stops and waits</strong>.',
+ 'You say continue. It reads chunk 2, confirms, waits. One chunk per turn, always gated by you.',
+ 'After the final chunk the agent <strong>always pauses</strong>: reading every part is not permission to act. It waits for your explicit instructions before any rebuild or action.'
+ ];
+ const auto = [
+ 'Host the chunk files at your base URL, then click <strong>Download set</strong> (or <strong>Index only</strong>) to grab the matching index.',
+ 'Hand the <strong>index file (or its URL) only</strong> to a fresh agent. It reads the index, confirms it understands the rules, and stops. It now has every chunk\'s full URL.',
+ 'Say <strong>"proceed"</strong>. The agent fetches chunk 1 from its URL itself, verifies sequence + UUID, confirms completeness in chat, then <strong>stops and waits</strong>.',
+ 'Say "proceed" again for the next chunk. One fetch per "proceed", never reading ahead. Repeat through the set.',
+ 'After the final chunk the agent <strong>always pauses</strong>: reading every part is not permission to act. It waits for your explicit instructions before any rebuild or action.'
+ ];
+ const steps = nav ? auto : manual;
+ walkSteps.innerHTML = steps.map(s => `<li>${s}</li>`).join('');
+ }
+
+ dropZone.addEventListener('click', e => { if (e.target === replaceLink) return; fileInput.click(); });
+ replaceLink.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+ dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+ dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+ dropZone.addEventListener('drop', e => {
+ e.preventDefault(); dropZone.classList.remove('drag-over');
+ if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+ });
+ fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+ chunkSizeSelect.addEventListener('change', () => {
+ const isCustom = chunkSizeSelect.value === 'custom';
+ customWrap.classList.toggle('hidden', !isCustom);
+ if (isCustom) { setTimeout(() => customSizeInput.focus(), 0); validateCustom(false); }
+ saveSettings();
+ if (currentText) reChunk();
+ });
+ customSizeInput.addEventListener('input', () => {
+ validateCustom(false);
+ clearTimeout(customDebounce);
+ customDebounce = setTimeout(() => {
+ const v = parseInt(customSizeInput.value, 10);
+ if (!Number.isFinite(v) || v < MIN_CHUNK) return;
+ saveSettings();
+ if (currentText) reChunk();
+ }, 450);
+ });
+ customSizeInput.addEventListener('blur', () => {
+ clearTimeout(customDebounce);
+ let v = parseInt(customSizeInput.value, 10);
+ if (Number.isFinite(v)) { v = Math.max(MIN_CHUNK, Math.min(MAX_CHUNK, v)); customSizeInput.value = v; }
+ validateCustom(true);
+ saveSettings();
+ if (currentText && Number.isFinite(v)) reChunk();
+ });
+ splitModeSelect.addEventListener('change', () => {
+ const hints = { smart: 'Prefers clean breaks at double-newlines', line: 'Splits at nearest line break', hard: 'Cuts at exact byte count' };
+ splitInfo.textContent = hints[splitModeSelect.value];
+ saveSettings();
+ if (currentText) reChunk();
+ });
+ markersToggle.addEventListener('change', () => { saveSettings(); if (currentText) reChunk(); });
+ debugToggle.addEventListener('change', () => {
+ debugBanner.classList.toggle('show', debugToggle.checked);
+ saveSettings();
+ if (currentText) reChunk();
+ });
+ // Host base URL: only the index/manifest/prompts depend on it, so refresh derived outputs
+ // without re-splitting (keeps UUIDs stable).
+ hostBaseInput.addEventListener('input', () => {
+ hostBaseUrl = hostBaseInput.value;
+ refreshModeUI();
+ clearTimeout(hostDebounce);
+ hostDebounce = setTimeout(() => {
+ saveSettings();
+ if (currentText) refreshDerived();
+ }, 400);
+ });
+
+ function validateCustom(strict) {
+ const raw = customSizeInput.value.trim();
+ const v = parseInt(raw, 10);
+ if (raw === '') {
+ customSizeInput.classList.remove('invalid');
+ customHint.classList.remove('error');
+ customHint.textContent = 'bytes (5,000–200,000)';
+ return false;
+ }
+ if (!Number.isFinite(v) || v < MIN_CHUNK || v > MAX_CHUNK) {
+ customSizeInput.classList.add('invalid');
+ customHint.classList.add('error');
+ customHint.textContent = strict ? 'Out of range, clamped to 5,000–200,000' : `Enter ${MIN_CHUNK.toLocaleString()}–${MAX_CHUNK.toLocaleString()}`;
+ return false;
+ }
+ customSizeInput.classList.remove('invalid');
+ customHint.classList.remove('error');
+ customHint.textContent = `${v.toLocaleString()} bytes ≈ ${Math.round(v / 4 / 1000)}K tokens`;
+ return true;
+ }
+
+
+
+[Agent: Confirm this END UUID matches the START UUID above. Report completeness of part 3/5 in chat, then PAUSE and wait for the human's go-ahead before any next chunk.]
+=== CHUNK 3/5 | SET 9c149e65-d03d-4e55-a65c-a07d742f2d0d | UUID 4ca36f9d-bb1f-4c23-a5f0-b862cacbe5f0 | END ===

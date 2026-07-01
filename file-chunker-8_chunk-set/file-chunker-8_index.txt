@@ -1,0 +1,36 @@
+# File Chunker Index — file-chunker-8.html
+
+You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- Set UUID: 9c149e65-d03d-4e55-a65c-a07d742f2d0d
+- Source file: file-chunker-8.html
+- Chunk format: native (.html)
+- Mode: SELF-NAVIGATING (chunks hosted; you fetch each URL yourself on "proceed")
+- Base URL: https://mawizorek.github.io/ClickUp_apps/
+- Total chunks: 5
+- Total bytes (source): 60,208
+- Generated: 6/30/2026, 23:48:30
+- App: File Chunker v13 (2026-06-30)
+- Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
+- Per-fetch read cap: ~30 KB. Chunks over cap: 0.
+
+## READING DIRECTIVE — agent: obey exactly. This is a GATED, ONE-CHUNK-AT-A-TIME walk.
+1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
+2. When the human says "proceed", fetch the NEXT chunk in the manifest order below from its listed URL. Fetch exactly ONE chunk per "proceed".
+3. For that chunk: verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, uuid verified" in chat.
+4. After EACH chunk, STOP. Do NOT fetch, open, or read the next URL on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch the set. This pause between every chunk is mandatory.
+5. If any chunk's start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. Do NOT reconstruct or fill gaps from inference.
+6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
+7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
+
+## ORDERED MANIFEST (fetch in this exact order, one URL per "proceed")
+1/5 · file-chunker-8_part1_of_5.html · 15.5 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker-8_part1_of_5.html · uuid:38feb10e-db17-413d-996d-7141e4178c6a
+2/5 · file-chunker-8_part2_of_5.html · 15.5 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker-8_part2_of_5.html · uuid:74ac19ed-aa54-48ab-a183-080195242c77
+3/5 · file-chunker-8_part3_of_5.html · 8.2 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker-8_part3_of_5.html · uuid:4ca36f9d-bb1f-4c23-a5f0-b862cacbe5f0
+4/5 · file-chunker-8_part4_of_5.html · 15.5 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker-8_part4_of_5.html · uuid:19cadce3-6221-46ee-bbc2-551eef4fda46
+5/5 · file-chunker-8_part5_of_5.html · 7.0 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker-8_part5_of_5.html · uuid:1d4fa907-948e-4466-ab0d-6bfead4e21f9
+
+## FOOTER
+- Set UUID: 9c149e65-d03d-4e55-a65c-a07d742f2d0d   (must match header)
+- END OF INDEX

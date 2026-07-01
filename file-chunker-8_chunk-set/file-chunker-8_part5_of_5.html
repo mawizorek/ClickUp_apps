@@ -1,0 +1,125 @@
+=== CHUNK 5/5 | SET 9c149e65-d03d-4e55-a65c-a07d742f2d0d | UUID 1d4fa907-948e-4466-ab0d-6bfead4e21f9 | START ===
+[Agent: Read this chunk fully. Verify the START and END UUID match and the sequence is in order. Echo "read 5/5, uuid verified" in chat. Then STOP and wait for the human; do not read or fetch the next chunk on your own.]
+
+ const s1 = document.createElement('span'); s1.className = 'dbg-sep'; s1.textContent = 'of ' + totalBytes.toLocaleString();
+ dbg.appendChild(s1);
+ dbg.appendChild(mk('· lines', `${lineStart.toLocaleString()}–${lineEnd.toLocaleString()}`));
+ const s2 = document.createElement('span'); s2.className = 'dbg-sep'; s2.textContent = 'of ' + totalLines.toLocaleString();
+ dbg.appendChild(s2);
+ dbg.appendChild(mk('· wrapped', `${formatBytes(bytes)} / cap ${Math.round(FETCH_CAP/1000)}KB`));
+ card.appendChild(dbg);
+ }
+ const toggle = () => preview.classList.toggle('open');
+ headerEl.addEventListener('click', toggle);
+ expand.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+ card.appendChild(preview);
+ chunkList.appendChild(card);
+ });
+ }
+ function buildExportLinks() {
+ const total = chunks.length;
+ const indexContent = buildIndexContent(total);
+ const indexBlob = new Blob([indexContent], { type: 'text/plain' });
+ const indexUrl = URL.createObjectURL(indexBlob);
+ blobUrls.push(indexUrl);
+ downloadIndexLink.href = indexUrl;
+ downloadIndexLink.download = indexFileName();
+
+ if (typeof JSZip === 'undefined') { downloadAllLink.style.display = 'none'; return; }
+ downloadAllLink.style.display = '';
+ const zip = new JSZip();
+ wrappedChunks.forEach((wrapped, idx) => zip.file(chunkFileName(idx, total), wrapped));
+ zip.file(indexFileName(), indexContent);
+ const overCount = wrappedChunks.filter(readbackRisk).length;
+ const nav = selfNav();
+ const readme = [
+ 'File Chunker Set',
+ `Source: ${currentFile ? currentFile.name : fileName}`,
+ `Chunk format: native (.${nativeExt})`,
+ `Mode: ${nav ? 'self-navigating (hosted URLs)' : 'manual paste'}`,
+ nav ? `Base URL: ${hostBaseUrl.trim().replace(/\/+$/, '')}/` : null,
+ `Chunks: ${total}`,
+ `Set UUID: ${setUuid}`,
+ `Markers: ${markersToggle.checked ? 'yes' : 'no'}`,
+ `Chunk size: ${(getChunkSize() / 1024).toFixed(1)} KB`,
+ `Split mode: ${splitModeSelect.value}`,
+ `Per-fetch read cap: ~${Math.round(FETCH_CAP / 1000)} KB`,
+ `Chunks over read cap: ${overCount}${overCount > 0 ? ' (will truncate on AI readback)' : ''}`,
+ `Completeness flag: ${total > CHUNK_FLAG_LIMIT ? `TRIPPED (${total} chunks, over ${CHUNK_FLAG_LIMIT})` : `clear (${total} of max ${CHUNK_FLAG_LIMIT})`}`,
+ `Numbering: flat sequential (grouped/sectioned is a future option)`,
+ `App version: ${APP_VERSION} (${APP_DATE})`,
+ '',
+ nav ? 'SELF-NAVIGATING WORKFLOW:' : 'MANUAL GATED-WALK WORKFLOW:',
+ `1. ${nav ? `Host these chunk files at the base URL above, then hand ${indexFileName()} (or its URL) to a fresh agent.` : `Hand ${indexFileName()} (this set's index) to a fresh agent FIRST.`} It is self-instructing: it carries the reading rules, the ordered manifest, and the set UUID.`,
+ '2. The agent reads the index, confirms it understands the rules, and stops.',
+ nav
+ ? '3. Say "proceed". The agent fetches ONE chunk from its URL, verifies sequence + START/END UUID, confirms completeness in chat, then STOPS and waits.'
+ : '3. Send ONE chunk per turn, in manifest order. The agent reads it, verifies sequence + START/END UUID, confirms completeness in chat, then STOPS and waits.',
+ nav ? '4. Say "proceed" again for the next chunk. One fetch per "proceed", never reading ahead.' : '4. You say continue; it reads the next chunk. Repeat until the last part.',
+ '5. After the final chunk the agent ALWAYS pauses and waits for your explicit instructions. Reading every part is not permission to rebuild or act.'
+ ].filter(Boolean).join('\n');
+ zip.file('README.txt', readme);
+ zip.generateAsync({ type: 'blob' }).then(blob => {
+ const url = URL.createObjectURL(blob);
+ blobUrls.push(url);
+ downloadAllLink.href = url;
+ downloadAllLink.download = `${fileName || 'file'}_chunk-set.zip`;
+ });
+ }
+ function copyText(text) {
+ if (navigator.clipboard && navigator.clipboard.writeText) {
+ navigator.clipboard.writeText(text).then(showToast, () => fallbackCopy(text));
+ } else { fallbackCopy(text); }
+ }
+ function fallbackCopy(text) {
+ const ta = document.createElement('textarea');
+ ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+ document.body.appendChild(ta); ta.select();
+ try { document.execCommand('copy'); showToast(); } catch (e) {}
+ ta.remove();
+ }
+ let toastTimer = null;
+ function showToast() {
+ toast.classList.add('show');
+ clearTimeout(toastTimer);
+ toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+ }
+
+ // ---- Source recovery: THREE redundant paths (locked standard) ----
+ function buildFullSource() { return '<!DOCTYPE html>\n' + document.documentElement.outerHTML; }
+ copySourceBtn.addEventListener('click', () => {
+ const full = buildFullSource();
+ const done = () => {
+ copySourceBtn.classList.add('done');
+ copySourceBtn.textContent = '✓ Source copied';
+ sourceHint.textContent = 'Full HTML is on your clipboard. Paste into a blank .html file and save.';
+ setTimeout(() => { copySourceBtn.classList.remove('done'); copySourceBtn.textContent = '⧉ Copy source'; }, 2200);
+ };
+ if (navigator.clipboard && navigator.clipboard.writeText) {
+ navigator.clipboard.writeText(full).then(done, () => { fallbackCopy(full); done(); });
+ } else { fallbackCopy(full); done(); }
+ });
+ prepareSourceBtn.addEventListener('click', () => {
+ if (sourceUrl) { URL.revokeObjectURL(sourceUrl); sourceUrl = null; }
+ clearTimeout(sourceTimer);
+ const blob = new Blob([buildFullSource()], { type: 'text/html' });
+ sourceUrl = URL.createObjectURL(blob);
+ sourceSaveLink.href = sourceUrl;
+ sourceSaveLink.classList.add('ready');
+ sourceHint.textContent = 'Green link ready: click it, or right-click → Save Link As. (Expires in 90s.)';
+ sourceTimer = setTimeout(() => {
+ sourceSaveLink.classList.remove('ready');
+ sourceSaveLink.removeAttribute('href');
+ sourceHint.textContent = 'Copy source = full HTML straight to clipboard (most reliable). Prepare download = click the green link, or right-click → Save Link As.';
+ if (sourceUrl) { URL.revokeObjectURL(sourceUrl); sourceUrl = null; }
+ }, 90000);
+ });
+
+ loadSettings();
+})();
+</script>
+
+</div></cu-root><script type="importmap">{ "imports": {"./main.js":"./main-685af171a7.js","./common.js":"./common-4e0365a7b9.js","./startRecording.js":"./startRecording-86d3a2d8e4.js","./profiler.js":"./profiler-291e0a6e82.js","./rolldown-runtime.js":"./rolldown-runtime-2681143a8f.js"} }</script><script src="polyfills-G46XNRBD.js" type="module" crossorigin="anonymous"></script><script src="main-685af171a7.js" type="module" crossorigin="anonymous"></script><div class="design-ui-credit" aria-hidden="true" style="">💜 by ClickUp Brain</div></body></html>
+
+[Agent: Confirm this END UUID matches the START UUID above. Report completeness of part 5/5 in chat, then PAUSE and wait for the human's go-ahead before any next chunk.]
+=== CHUNK 5/5 | SET 9c149e65-d03d-4e55-a65c-a07d742f2d0d | UUID 1d4fa907-948e-4466-ab0d-6bfead4e21f9 | END ===
