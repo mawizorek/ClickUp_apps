@@ -1,5 +1,11 @@
 # PDF Splitter & Renamer
 
+### ▶︎ [**Launch the app →**](https://mawizorek.github.io/ClickUp_apps/pdf-splitter/)
+
+[![Launch](https://img.shields.io/badge/▶%20Launch%20PDF%20Splitter-Open%20in%20browser-1ea7a7?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/pdf-splitter/)
+
+> Opens the live app in your default browser (GitHub Pages). Nothing uploads; all processing is local.
+
 **Status:** Shipped v1.2 · **Live:** https://mawizorek.github.io/ClickUp_apps/pdf-splitter/ · **Source of truth:** [`index.html`](./index.html) on `main` (commit history = version history)
 
 A single self-contained, offline HTML app. Load ONE multi-page PDF, define how it splits into separate documents (page ranges + clean filenames + optional folder grouping) through a database-style portal editor, then export a ZIP of the renamed, split PDFs organized into folders. Everything runs client-side; nothing is uploaded anywhere.
@@ -18,6 +24,17 @@ A single self-contained, offline HTML app. Load ONE multi-page PDF, define how i
 - **Quick templates:** repeat a page N times, every/odd/even page, split into N equal chunks.
 - **Row tools:** drag-to-reorder (affects ZIP order), duplicate row.
 - **Export:** live file-tree preview → Export builds the ZIP → inline confirm card (file count + size) → download. `_export_report.txt` bundled by default (source, splits, warnings, timestamp).
+
+---
+
+## How to use it
+
+1. **[Launch the app](https://mawizorek.github.io/ClickUp_apps/pdf-splitter/)** (opens in your browser).
+2. Drop or select ONE PDF. The header folder name auto-fills from the filename.
+3. Define splits: click pages in the left grid, add rows manually, use **Templates**, or **Import .md** (see the Brain "PDF Split Markdown Packager" tool to generate that markdown from any document).
+4. Optionally assign folders per row and configure them in the **Folders** panel.
+5. Watch the live file-tree on the right. Fix any red badges (they block export).
+6. **Export ZIP** → confirm card → **Download**. On iOS Safari, long-press Download → "Download Linked File."
 
 ---
 
