@@ -14,7 +14,7 @@
     { "id": 18, "round": "R32", "day": "2026-07-01", "dayLabel": "Tue Jul 1", "home": "USA", "away": "Bosnia-Herz.", "hs": 2, "as": 0, "status": "ft", "winner": "home", "venue": "Kansas City", "feedsTo": 13 },
     { "id": 19, "round": "R32", "day": "2026-07-02", "dayLabel": "Thu Jul 2", "home": "Spain", "away": "Austria", "hs": null, "as": null, "status": "upcoming", "venue": "SoFi, LA", "time": "3:00 PM", "feedsTo": 13 },
     { "id": 20, "round": "R32", "day": "2026-07-02", "dayLabel": "Thu Jul 2", "home": "Portugal", "away": "Croatia", "hs": null, "as": null, "status": "upcoming", "venue": "Toronto", "time": "7:00 PM", "feedsTo": 14 },
-    { "id": 21, "round": "R32", "day": "2026-07-03", "dayLabel": "Fri Jul 3", "home": "Switzerland", "away": "Algeria", "hs": null, "as": null, "status": "upcoming", "venue": "Vancouver", "time": "TBD", "feedsTo": 15 },
+    { "id": 21, "round": "R32", "day": "2026-07-02", "dayLabel": "Thu Jul 2", "home": "Switzerland", "away": "Algeria", "hs": null, "as": null, "status": "upcoming", "venue": "BC Place, Vancouver", "time": "11:00 PM", "feedsTo": 15 },
     { "id": 22, "round": "R32", "day": "2026-07-03", "dayLabel": "Fri Jul 3", "home": "Argentina", "away": "Cape Verde", "hs": null, "as": null, "status": "upcoming", "venue": "TBD", "time": "TBD", "feedsTo": 16 },
     { "id": 23, "round": "R32", "day": "2026-07-03", "dayLabel": "Fri Jul 3", "home": "Australia", "away": "Egypt", "hs": null, "as": null, "status": "upcoming", "venue": "TBD", "time": "TBD", "feedsTo": 15 },
     { "id": 24, "round": "R32", "day": "2026-07-03", "dayLabel": "Fri Jul 3", "home": "Colombia", "away": "Ghana", "hs": null, "as": null, "status": "upcoming", "venue": "TBD", "time": "TBD", "feedsTo": 16 },
