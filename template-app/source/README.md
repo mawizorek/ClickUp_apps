@@ -1,20 +1,28 @@
-# Source Chunks
+# Semantic Source (template-app)
 
-This folder holds Brain's readable rendition of the app: a base64-armored chunk set produced by the File Chunker.
+This folder is the **editable source companion** for `template-app`.
 
-## Contents (after chunking)
+The shipped runtime still lives in `../index.html`, but the working source is split into small semantic files so Patch Penelope can update structure, logic, and team theming without editing the compiled runtime blob first.
 
-- `source_index.html` — the cold-agent entry point (gated-walk directive + ordered manifest)
-- `<app-slug>_partNN_of_NN.txt` — the ordered chunks (base64-encoded payloads, markers plain text)
-- `README.md` — this file
+## Files
 
-## How to populate
+- `source_index.md` — composition order, size guardrails, and rebuild notes
+- `01_structure.html` — canonical shell/layout with insertion markers
+- `02_base.css.txt` — shared layout + component styling
+- `03_theme_team.css.txt` — the team-specific visual system (current proof = Red Bull)
+- `04_app.js` — runtime behavior (GitHub API fetch, caching, rendering)
 
-1. Run the app's `index.html` through the File Chunker (base64 armor ON, repo mode ON).
-2. Export the zip.
-3. Drag only the `source/` folder contents into this directory via GitHub "Add files".
-4. The source index + chunks overwrite cleanly on each new version (stable filenames).
+## Why this exists
 
-## How Brain reads it
+This app is the proof-of-concept for a better source model than arbitrary byte chunks:
 
-A fresh agent is handed only `source_index.html`. It reads the index, confirms the rules, then walks the manifest one chunk at a time (auto-advance up to 5 per pass, hard stop on any error). After the final chunk: mandatory pause, no action without explicit human instruction.
+- the runtime remains a single-file app for GitHub Pages
+- the editable source becomes small, semantic, and reviewable
+- team-theme swaps become mostly a one-file operation
+
+## Guardrails
+
+1. Keep every source file comfortably under ~15 KB.
+2. Change the theme in `03_theme_team.css.txt` before touching other files.
+3. When structure or logic changes, regenerate `../index.html` by re-inlining the source files in the order listed in `source_index.md`.
+4. Preserve the app's dual role: working repo index + future app template.

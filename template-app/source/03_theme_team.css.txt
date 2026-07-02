@@ -1,0 +1,61 @@
+:root {
+  --accent: #ef233c;
+  --accent-strong: #c1121f;
+  --accent-2: #ffcc00;
+  --hero-bg: radial-gradient(circle at 18% 18%, rgba(255, 204, 0, 0.28), transparent 34%), radial-gradient(circle at 85% 12%, rgba(239, 35, 60, 0.22), transparent 22%), linear-gradient(135deg, rgba(13, 31, 72, 0.96), rgba(5, 13, 28, 0.98));
+  --hero-stripes: repeating-linear-gradient(116deg, rgba(255, 255, 255, 0.08) 0 14px, rgba(255, 255, 255, 0) 14px 58px);
+  --button-text: #fffaf0;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--hero-stripes);
+  opacity: 0.16;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.hero {
+  background: var(--hero-bg);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -18% -52% auto;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 204, 0, 0.18), transparent 62%);
+  pointer-events: none;
+}
+
+.hero .accent,
+.card code {
+  color: var(--accent-2);
+}
+
+.button-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: var(--button-text);
+  box-shadow: 0 16px 30px rgba(193, 18, 31, 0.28);
+}
+
+.button-secondary,
+.link-pill {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 204, 0, 0.35);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.link-pill.primary {
+  background: rgba(239, 35, 60, 0.12);
+  border-color: rgba(239, 35, 60, 0.3);
+}

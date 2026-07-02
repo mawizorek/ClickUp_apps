@@ -1,45 +1,47 @@
-# Apps Index (template-app)
-
-<!--
-  TEMPLATE SCAFFOLD + LIVE APP. This folder does double duty:
-  (1) the copy-me scaffold for every new app, and
-  (2) a real shipped app — the live index of everything in mawizorek/ClickUp_apps.
-
-  To start a new app: copy this folder, rename it to your app's kebab-case slug,
-  swap `template-app` for that slug in EVERY launch URL below, and replace the
-  content sections. The authoritative version of this standard lives in
-  Brain Reference → "Apps / HTML Artifacts" → New-App Documentation Standard.
-  If this template and that section ever drift, the reference doc wins.
-
-  NON-NEGOTIABLE: the ▶︎ Launch block below stays at the very top of every app
-  README and points at the CURRENT live version. Overwrite its URL each release.
--->
+# Apps Index Template (template-app)
 
 ### ▶︎ [**Launch the app →**](https://mawizorek.github.io/ClickUp_apps/template-app/)
 
-[![Launch](https://img.shields.io/badge/▶%20Launch%20Apps%20Index-Open%20in%20browser-1ea7a7?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/template-app/)
+[![Launch](https://img.shields.io/badge/▶%20Launch%20Apps%20Index-Open%20in%20browser-1d4ed8?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/template-app/)
 
 > Opens the live app in your default browser (GitHub Pages). Nothing uploads; all processing is local.
+>
 > GitHub renders README markdown statically, so the app can't run *inside* this page — the launch link is the supported "docs → running app" path.
 
-**Status:** Shipped v1 · **Live:** https://mawizorek.github.io/ClickUp_apps/template-app/ · **Source of truth:** [`index.html`](./index.html) on `main` (commit history = version history)
+**Status:** Shipped v2 · **Live:** https://mawizorek.github.io/ClickUp_apps/template-app/ · **Source of truth:** [`index.html`](./index.html) on `main` (commit history = version history)
 
 ---
 
 ## What it does
 
 - Serves a live, auto-generated index of every app folder in `mawizorek/ClickUp_apps`.
-- Pulls the folder list from the **GitHub API in real time** — nothing is hardcoded, so new apps appear automatically the moment their folder lands on `main`.
-- Each card links straight to that app's live GitHub Pages URL (and its repo folder).
-- Doubles as the copy-me scaffold/template for new apps.
+- Pulls the folder list from the GitHub API in real time, so new app folders appear automatically when they land on `main`.
+- Gives each app two shortcuts: the live GitHub Pages URL and the repo folder.
+- Acts as the reference retrofit for a **semantic source schema**: the runtime stays self-contained in `index.html`, while the editable source is split into small files under `source/`.
+- Proves theme isolation by moving the visual system into a single team-style source file and switching the current proof theme to an Oracle Red Bull Racing-inspired palette.
 
 ---
 
 ## How to use it
 
-1. **[Launch the app](https://mawizorek.github.io/ClickUp_apps/template-app/)** (opens in your browser).
-2. Browse the auto-generated card list; click any card to open that app's live page.
-3. To start a new app, copy this folder, rename it to your app's kebab-case slug, and swap `template-app` for that slug in every launch URL above.
+1. **[Launch the app](https://mawizorek.github.io/ClickUp_apps/template-app/)**.
+2. Browse the live card list and click **Open app** to jump straight to any app's GitHub Pages entry point.
+3. Click **Repo folder** on any card when you want the source folder instead of the live app.
+4. To start a new app from this template, copy the folder, rename it to your app slug, and then update the `source/` files first before regenerating `index.html`.
+5. To re-theme the template later (for example, back to McLaren), edit `source/03_theme_team.css.txt`, then re-inline it into `index.html`.
+
+---
+
+## Infrastructure
+
+| File | Role | Update frequency |
+|------|------|------------------|
+| `index.html` | Self-contained runtime app (the shipped GitHub Pages entry point) | Version bumps |
+| `source/01_structure.html` | Canonical shell/layout source | When structure changes |
+| `source/02_base.css.txt` | Layout + component styling rules | When the UI system changes |
+| `source/03_theme_team.css.txt` | Team-specific theme tokens and accents | When the theme changes |
+| `source/04_app.js` | App logic (GitHub API fetch, caching, rendering) | When behavior changes |
+| `source/source_index.md` | Human-readable composition order + guardrails | When schema rules change |
 
 ---
 
@@ -47,13 +49,21 @@
 
 Permanent record of the non-obvious technical decisions.
 
-### Self-contained, offline-first
+### Self-contained runtime, semantic editable source
 
-Single `index.html`, all CSS + JS inline. Works double-clicked from disk. `index.html` IS the app AND the folder's GitHub Pages entry point — never chunk it, never add a manifest.
+The live app still ships as a single self-contained `index.html`, so GitHub Pages and local-file usage stay simple. The editing surface is now split into a semantic companion source under `source/`, which keeps each file comfortably small and makes theme swaps isolated instead of forcing direct edits against the runtime file.
+
+### Theme isolation is intentional
+
+The current proof theme is Oracle Red Bull Racing-inspired, but the team identity now lives primarily in **one source file**: `source/03_theme_team.css.txt`. That means a future switch back to McLaren (or any other team) should mostly be a single-file CSS edit plus a regenerated inline bundle.
 
 ### Live, unhardcoded app list
 
-The index calls `https://api.github.com/repos/mawizorek/ClickUp_apps/contents?ref=main`, filters to directories, and skips `template-app` and `.github`. The folder list is therefore always current with no code edits. Names are prettified (kebab → Title Case) for display only; links use the raw folder name. The unauthenticated GitHub API allows ~60 requests/hour per IP, which is plenty for a personal index; if it ever rate-limits, the page shows the API error inline rather than failing silently.
+The app calls `https://api.github.com/repos/mawizorek/ClickUp_apps/contents?ref=main`, filters to directories, and turns them into cards automatically. If the GitHub API is unavailable, the app falls back to the last successful response cached in `localStorage` rather than failing silently.
+
+### This folder is both template and real app
+
+`template-app` is intentionally doing double duty: it remains the reference scaffold for future apps, but it is also a functioning repo index. Changes here should preserve both roles.
 
 ---
 
@@ -61,19 +71,21 @@ The index calls `https://api.github.com/repos/mawizorek/ClickUp_apps/contents?re
 
 Commit history on `main` is the authoritative changelog. Highlights:
 
-- **v1** — live GitHub-API-driven apps index + working launch link.
+- **v2** — semantic `source/` schema proof + isolated team theme + improved runtime UI for the live apps index.
+- **v1** — initial lightweight live GitHub-API-driven apps index scaffold.
 
 ---
 
 ## Related
 
-- **ClickUp task (APPS list):** volatile next-build brief + Current Version / Artifact History fields only. No historical notes.
-- **Revision History doc:** append-only per-version working notes; page 1 is the locked goals/constraints source of truth.
-- **Brain tools:** When Building Apps, HTML Artifact Regeneration.
+- **Repo root:** [mawizorek/ClickUp_apps](https://github.com/mawizorek/ClickUp_apps)
+- **Reference page:** [Apps / HTML Artifacts](https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-72233)
+- **Operating standard:** [GitHub MCP — Operating Standard](https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-73913)
 
 ---
 
 ## Roadmap
 
-- Optional: show last-updated date per app (from the GitHub commits API).
-- Optional: group apps by status (shipped / in-progress) via a small manifest.
+- Add optional per-app metadata badges (last update, status, or category) if a lightweight manifest becomes worth maintaining.
+- Add a tiny regenerate checklist so future edits to `source/` are even harder to drift from the shipped `index.html`.
+- Decide whether this semantic-source pattern should become the default for all sub-30KB apps, while over-cap apps continue to use chunked `/source/` renditions.
