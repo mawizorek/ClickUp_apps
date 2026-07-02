@@ -469,8 +469,9 @@
 <div class="app">
  <header>
  <h1>File Chunker for AI Review</h1>
- <p>Split a large file into ordered chunks, then ship one self-instructing index that walks a receiving agent through them. Repo / MCP mode emits an <code>_index.md</code> + a flat <code>&lt;app-slug&gt;/source/</code> chunk set for a ClickUp Brain agent to read straight out of the GitHub repo. Transport-safe base64 armor is available when a read path flattens markup. The gated one-chunk-at-a-time walk and the mandatory final pause hold in every mode.</p>
- <span class="mode-pill armored" id="modePill">Self-Navigating Walk · base64 armored</span>
+ <p>Split a large file into ordered chunks, then ship one self-instructing index that walks a receiving agent through them. Repo / MCP mode emits an <code>source_index.md</code> + a flat <code>&lt;app-slug&gt;/source/</code> chunk set for a ClickUp Brain agent to read straight out of the GitHub repo. Transport-safe base64 armor is available when a read path flattens markup. The gated one-chunk-at-a-time walk and the mandatory final pause hold in every mode.</p>
+   <span class="mode-pill armored" id="modePill">Self-Navigating Walk · base64 armored</span>
+<a id="repoLink" href="#" target="_blank" rel="noopener" style="display:none; margin-top:var(--space-sm); font-size:0.78rem; color:var(--repo); text-decoration:underline;">View on GitHub</a>
  </header>
  <div class="drop-zone" id="dropZone">
  <div class="drop-zone-default">
@@ -526,7 +527,7 @@
  <input type="checkbox" id="repoToggle">
  <label for="repoToggle">Repo / MCP mode (GitHub source-of-truth)</label>
  </div>
- <span class="toggle-sub" id="repoSub">Emits <code>_index.md</code> + a flat <code>&lt;app-slug&gt;/source/</code> chunk set with repo-relative manifest paths for a Brain agent to read via the GitHub MCP. Plaintext by default; the gated walk stays on.</span>
+ <span class="toggle-sub" id="repoSub">Emits <code>source_index.md</code> + a flat <code>&lt;app-slug&gt;/source/</code> chunk set with repo-relative manifest paths for a Brain agent to read via the GitHub MCP. Plaintext by default; the gated walk stays on.</span>
  </div>
  <div class="sep"></div>
  <div class="toggle-cell">
@@ -571,7 +572,7 @@
  <div class="setting-field">
  <label for="setTargetRepo">Target repo (owner/repo)</label>
  <input type="text" id="setTargetRepo" placeholder="mawizorek/ClickUp_apps">
- <span class="setting-hint">Feeds the <code>_index.md</code> Repo: header and the repo-relative manifest paths.</span>
+ <span class="setting-hint">Feeds the <code>source_index.md</code> Repo: header and the repo-relative manifest paths.</span>
  </div>
  <div class="setting-field">
  <label for="setBranch">Branch</label>
@@ -680,8 +681,8 @@
 <div class="copy-toast" id="toast">Copied to clipboard</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-const APP_VERSION = 'v17';
-const APP_DATE = '2026-07-01';
+const APP_VERSION = 'v18';
+const APP_DATE = '2026-07-02';
 const MIN_CHUNK = 5000;
 const MAX_CHUNK = 200000;
 const CHUNK_FLAG_LIMIT = 8; // > this many chunks trips the total-context completeness flag
@@ -969,6 +970,7 @@ const DEFAULTS = {
  if (typeof s.debug === 'boolean') debugToggle.checked = s.debug;
  if (typeof s.repo === 'boolean') repoToggle.checked = s.repo;
  if (typeof s.encode === 'boolean') encodeToggle.checked = s.encode;
+ else encodeToggle.checked = true; // v18: base64 default ON
  // Force .txt defaults ON. A returning user with no saved key must STAY on, so only override when
  // the key is explicitly present; otherwise keep the checked default.
  if (typeof s.forceTxt === 'boolean') forceTxtToggle.checked = s.forceTxt;
@@ -1100,7 +1102,7 @@ const DEFAULTS = {
  const repoSteps = [
  'Click <strong>Download set</strong>. The zip has <code>report.md</code> + a clean copy of the original at the root (local only), and the <strong><code>' + (repoSlug || '&lt;app-slug&gt;') + '/source/</code></strong> folder to upload.',
  'Drag <strong>only the <code>' + (repoSlug || '&lt;app-slug&gt;') + '/source/</code> folder</strong> into GitHub "Add files" on <code>' + targetRepo() + '</code>. GitHub materializes the path from the file paths.',
- 'Hand a fresh Brain agent <strong>only <code>' + (repoSlug || '&lt;app-slug&gt;') + '/source/_index.md</code></strong>. It reads the index, states the repo + chunk count, estimates the token budget, and says <strong>"ready to read chunk 1"</strong>.',
+ 'Hand a fresh Brain agent <strong>only <code>' + (repoSlug || '&lt;app-slug&gt;') + '/source/source_index.md</code></strong>. It reads the index, states the repo + chunk count, estimates the token budget, and says <strong>"ready to read chunk 1"</strong>.',
  `Say <strong>"proceed"</strong>. The agent fetches chunk 1 by its repo-relative path via the GitHub MCP, ${verifyVerb},${echoNote}, reports "read 1/N, uuid verified", then <strong>stops and waits</strong>. One chunk per "proceed".`,
  'After the final chunk the agent <strong>always pauses</strong>: all parts read is not permission to act. It waits for your explicit instructions before any rebuild or action.'
  ];
@@ -1423,7 +1425,7 @@ const DEFAULTS = {
  if (repoMode()) return `${repoSlug || 'app'}_part${pad(idx + 1, total)}_of_${total}.txt`;
  return `${fileName || 'file'}_part${pad(idx + 1, total)}_of_${total}.${chunkExt()}`;
  }
- function indexFileName() { return repoMode() ? '_index.md' : `${fileName || 'file'}_index.txt`; }
+function indexFileName() { return repoMode() ? 'source_index.html' : `${fileName || 'file'}_index.txt`; }
  function originalFileName() { return currentFile ? currentFile.name : `${fileName || 'file'}.${nativeExt}`; }
  function cleanOriginalRepoName() { return `${repoSlug || 'app'}-${APP_VERSION}.${nativeExt}`; }
  function setBaseName() { return `${fileName || 'file'}_${stamp()}`; }
@@ -1519,7 +1521,7 @@ const DEFAULTS = {
  return lines.join('\n');
  }
 
- // ===== Repo / MCP index (_index.md) — markdown, repo-relative paths, cold-agent entry point =====
+ // ===== Repo / MCP index (source_index.md) — markdown, repo-relative paths, cold-agent entry point =====
  function buildRepoIndexContent(total) {
  const generated = new Date().toLocaleString('en-US', { hour12: false });
  const sourceBytes = byteLen(currentText);
@@ -1528,7 +1530,7 @@ const DEFAULTS = {
  const L = [];
  L.push(`# File Chunker Index \u2014 ${repoSlug || 'app'} (${currentFile ? currentFile.name : (fileName || 'file')})`);
  L.push('');
- L.push('You (a fresh ClickUp Brain agent) have been handed ONLY this `_index.md`. It is the entry point and the rulebook for reading a chunked app source out of the GitHub repo via the GitHub MCP. Read it fully, run the token-budget check, confirm the repo and chunk count, say **"ready to read chunk 1"**, then STOP and wait. Content arrives one chunk at a time.');
+ L.push('You (a fresh ClickUp Brain agent) have been handed ONLY this `source_index.md`. It is the entry point and the rulebook for reading a chunked app source out of the GitHub repo via the GitHub MCP. Read it fully, run the token-budget check, confirm the repo and chunk count, say **"ready to read chunk 1"**, then STOP and wait. Content arrives one chunk at a time.');
  L.push('');
  L.push('## SET INTEGRITY HEADER');
  L.push(`- **Repo:** ${targetRepo()}`);
@@ -1614,7 +1616,7 @@ const DEFAULTS = {
  L.push('');
  L.push('## Upload');
  L.push('');
- L.push(`Drag only the \`${repoSlug || 'app'}/source/\` folder into GitHub "Add files" on \`${targetRepo()}\`. The repo already holds the app's \`index.html\`; this adds the \`source/\` sibling. \`report.md\` and the clean original at the zip root are LOCAL conveniences and are not uploaded. Feed a fresh agent only \`${repoSlug || 'app'}/source/_index.md\`.`);
+ L.push(`Drag only the \`${repoSlug || 'app'}/source/\` folder into GitHub "Add files" on \`${targetRepo()}\`. The repo already holds the app's \`index.html\`; this adds the \`source/\` sibling. \`report.md\` and the clean original at the zip root are LOCAL conveniences and are not uploaded. Feed a fresh agent only \`${repoSlug || 'app'}/source/source_index.md\`.`);
  return L.join('\n');
  }
 
@@ -1623,14 +1625,14 @@ const DEFAULTS = {
  const L = [];
  L.push(`# ${repoSlug || 'app'} \u2014 source chunk set`);
  L.push('');
- L.push(`Brain's readable rendition of \`${repoSlug || 'app'}/index.html\`, split into sub-${Math.round(fetchCap() / 1000)}KB chunks so the GitHub MCP can read each one whole. **Entry point: \`_index.md\`.** Hand a fresh agent that file only.`);
+ L.push(`Brain's readable rendition of \`${repoSlug || 'app'}/index.html\`, split into sub-${Math.round(fetchCap() / 1000)}KB chunks so the GitHub MCP can read each one whole. **Entry point: \`source_index.md\`.** Hand a fresh agent that file only.`);
  L.push('');
  L.push('## Contents');
- L.push(`- \`_index.md\` \u2014 the cold-agent entry point: repo header, gated-walk directive, ordered manifest.`);
+ L.push(`- \`source_index.md\` \u2014 the cold-agent entry point: repo header, gated-walk directive, ordered manifest.`);
  L.push(`- \`${repoSlug || 'app'}_partNN_of_${total}.txt\` \u2014 the ${total} ordered chunks. ${encoded() ? 'base64-encoded payloads.' : 'plaintext.'}`);
  L.push('');
  L.push('## How Brain reads it');
- L.push('Read `_index.md`, run the token-budget check, then walk the manifest one chunk per "proceed", fetching each by its repo-relative path via the GitHub MCP. Verify the per-chunk + set UUIDs and the `_of_' + total + '` count as the completeness tripwire. Mandatory pause after the last chunk: reading all parts is not permission to act.');
+ L.push('Read `source_index.md`, run the token-budget check, then walk the manifest one chunk per "proceed", fetching each by its repo-relative path via the GitHub MCP. Verify the per-chunk + set UUIDs and the `_of_' + total + '` count as the completeness tripwire. Mandatory pause after the last chunk: reading all parts is not permission to act.');
  L.push('');
  L.push(`Regenerate the whole \`source/\` set and drag-drop to replace on each new version. Stable filenames = clean overwrite. Set UUID: ${setUuid}. File Chunker ${APP_VERSION}.`);
  return L.join('\n');
@@ -1773,24 +1775,32 @@ const DEFAULTS = {
  blobUrls.push(indexUrl);
  downloadIndexLink.href = indexUrl;
  downloadIndexLink.download = indexFileName();
- downloadIndexLink.textContent = repo ? '\u2b07 Index only (_index.md)' : '\u2b07 Index only (.txt)';
+ downloadIndexLink.textContent = repo ? '\u2b07 Index only (source_index.md)' : '\u2b07 Index only (.txt)';
  if (typeof JSZip === 'undefined') { downloadAllLink.style.display = 'none'; return; }
  downloadAllLink.style.display = '';
  const zip = new JSZip();
  if (repo) {
- // v17 repo/MCP export layout. Root = LOCAL-only (report + clean original). Uploaded = <slug>/source/.
- zip.file('report.md', buildReportContent(total));
- zip.file(cleanOriginalRepoName(), currentText); // clean unaltered original, native ext (LOCAL)
- const src = `${repoSlug || 'app'}/source/`;
- zip.file(src + '_index.md', indexContent);
- zip.file(src + 'README.md', buildRepoReadme(total));
- wrappedChunks.forEach((wrapped, idx) => zip.file(src + chunkFileName(idx, total), wrapped));
- downloadNote.textContent = `Zip: report.md + clean original (LOCAL, root) + ${repoSlug || 'app'}/source/ (drag THIS folder into GitHub "Add files"). Right-click \u2192 "Download Linked File" if click doesn't work.`;
- } else {
- zip.file(originalFileName(), currentText);
- wrappedChunks.forEach((wrapped, idx) => zip.file(chunkFileName(idx, total), wrapped));
- zip.file(indexFileName(), indexContent);
- zip.file('README.txt', buildLegacyReadme(total));
+ 
+
+   const wrapper = `${repoSlug || 'app'}/`;
+zip.file(wrapper + `${APP_VERSION}-ChunkerReport.md`, buildReportContent(total));
+zip.file(wrapper + cleanOriginalRepoName(), currentText); // clean unaltered original, native ext (LOCAL)
+const src = wrapper + 'source/';
+zip.file(src + 'source_index.html', indexContent);
+zip.file(src + 'README.md', buildRepoReadme(total));
+wrappedChunks.forEach((wrapped, idx) => zip.file(src + chunkFileName(idx, total), wrapped));
+
+   
+downloadNote.textContent = `Zip: ${APP_VERSION}-ChunkerReport.md + clean original (root) + source/ (index + chunks + README). Right-click \u2192 "Download Linked File" if click doesn't work.`; } else {
+ 
+const wrapper = `${fileName || 'file'}/`;
+zip.file(wrapper + originalFileName(), currentText);
+zip.file(wrapper + `${APP_VERSION}-ChunkerReport.md`, buildReportContent(total));
+const src = wrapper + 'source/';
+wrappedChunks.forEach((wrapped, idx) => zip.file(src + chunkFileName(idx, total), wrapped));
+zip.file(src + indexFileName(), indexContent);
+zip.file(src + 'README.txt', buildLegacyReadme(total));
+   
  downloadNote.textContent = 'Set = original source + index + every chunk + README. Right-click \u2192 "Download Linked File" if click doesn\'t work.';
  }
  zip.generateAsync({ type: 'blob' }).then(blob => {
@@ -1923,6 +1933,17 @@ const DEFAULTS = {
  });
 
  loadSettings();
+ // v18: live repo link from config
+ (function initRepoLink() {
+   const link = document.getElementById('repoLink');
+   const slug = document.querySelector('meta[name="github-folder"]');
+   const folder = slug && slug.getAttribute('content');
+   if (folder && folder.trim()) {
+     link.href = `https://github.com/${targetRepo()}/tree/${branchName()}/${folder.trim()}`;
+     link.textContent = `\u{1F4C2} ${targetRepo()}/${folder.trim()}`;
+     link.style.display = 'inline-flex';
+   }
+ })();
 })();
 </script>
 
