@@ -1,0 +1,48 @@
+# File Chunker Index — f1-racetracks (index-7.html)
+
+You (a fresh ClickUp Brain agent) have been handed ONLY this `source_index.md`. It is the entry point and the rulebook for reading a chunked app source out of the GitHub repo via the GitHub MCP. Read it fully, run the token-budget check, confirm the repo and chunk count, say **"ready to read chunk 1"**, then STOP and wait. Content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- **Repo:** mawizorek/ClickUp_apps
+- **Branch:** main
+- **Source folder:** f1-racetracks/source/
+- **Set UUID:** b716b55a-de01-45b1-b7f4-12c266cdf21b
+- **Total chunks:** 9 (each named _partNN_of_9)
+- **Total bytes (source):** 125,661
+- **Total Character Count:** 124,851
+- **Chars-per-token ratio:** 4
+- **Est. tokens (whole set):** 31,213
+- **Token-budget threshold:** 28,000
+- **Encoding:** base64 (decode each payload before verifying)
+- **Source file:** index-7.html
+- **Generated:** 7/2/2026, 11:35:56
+- **App:** File Chunker v18 (2026-07-02)
+- **⛑ Completeness flag:** 9 chunks (over 8). Watch total-context erosion across a long session; consider a batched read.
+
+## READING DIRECTIVE — obey exactly. GATED, ONE-CHUNK-AT-A-TIME walk.
+0. **Token budget check FIRST.** Estimate the whole set: Total Character Count / chars-per-token = ~31,213 tokens. If that exceeds the token-budget threshold (28,000), STOP and tell the human the set is too large for a single automated walk (suggest a tighter scope or a batched read). Do not begin the walk.
+1. Read this index. Confirm you understand the rules, **state the repo (`mawizorek/ClickUp_apps`) and the chunk count (9)**, then say **"ready to read chunk 1"** and STOP. Do not fetch any chunk yet.
+2. When the human says **"proceed"**, fetch the NEXT chunk in the manifest below by its **repo-relative path** (resolve it against the Repo + Branch above) using the GitHub MCP. Fetch exactly ONE chunk per "proceed". These are repo paths, not URLs: do NOT use github.io or raw.githubusercontent.
+3. For that chunk: DECODE the base64 payload FIRST (after the "ENCODING: base64" line, between the directive lines), THEN verify its sequence tag (e.g. CHUNK 3/9) and that its START and END boundary UUID match. Report **"read N/9, decoded, uuid verified"** in chat.
+4. After EACH chunk, STOP. Do NOT fetch the next path on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch. This pause is mandatory.
+5. If a chunk fails to fetch, fails to DECODE, its START/END UUID do not match, or a sequence number is missing or out of order, STOP and report it. Do NOT reconstruct or fill gaps from inference. The `_of_9` count + the per-chunk and set UUIDs are the completeness tripwire: if any part is missing or clipped, it is detectable here.
+6. Confirm the set-level UUID in this header matches the footer before treating the read as complete.
+7. **AFTER THE FINAL CHUNK: mandatory pause.** All parts read is NOT permission to act. State that the full set was read with all UUIDs verified, then wait for explicit human instructions before any rebuild, edit, or summary.
+
+## ORDERED MANIFEST (fetch in this exact order, one repo-relative path per "proceed")
+
+| # | repo-relative path | covers | uuid |
+| --- | --- | --- | --- |
+| 1/9 | `f1-racetracks/source/f1-racetracks_part1_of_9.txt` | document head / opening markup (lines 1–232) | f440a746-3954-44a5-b305-96e7d932c7c5 |
+| 2/9 | `f1-racetracks/source/f1-racetracks_part2_of_9.txt` | JavaScript logic (lines 233–394) | fefa08c7-cec9-4770-8af1-99dd7ea7f98c |
+| 3/9 | `f1-racetracks/source/f1-racetracks_part3_of_9.txt` | HTML markup (lines 395–481) | 8b2bb46b-da36-4ca4-8488-5a8af9fbaf70 |
+| 4/9 | `f1-racetracks/source/f1-racetracks_part4_of_9.txt` | source text (lines 482–554) | d94c773b-8578-4cbb-b2e2-cbc1871f6752 |
+| 5/9 | `f1-racetracks/source/f1-racetracks_part5_of_9.txt` | source text (lines 555–627) | 7695d256-2778-4f31-8b84-1b7671440b55 |
+| 6/9 | `f1-racetracks/source/f1-racetracks_part6_of_9.txt` | source text (lines 628–700) | 8c81bbe3-98d7-42c1-82b3-4919990d5531 |
+| 7/9 | `f1-racetracks/source/f1-racetracks_part7_of_9.txt` | source text (lines 701–773) | f18293da-5074-493a-a9a7-157011617753 |
+| 8/9 | `f1-racetracks/source/f1-racetracks_part8_of_9.txt` | source text (lines 774–924) | c5a2e383-f5b0-44f4-9d34-e2f70d528c69 |
+| 9/9 | `f1-racetracks/source/f1-racetracks_part9_of_9.txt` | JavaScript logic (lines 925–1052) | f8020052-0dae-4bd9-ae2b-e5b42e1db10f |
+
+## FOOTER
+- **Set UUID:** b716b55a-de01-45b1-b7f4-12c266cdf21b (must match header)
+- END OF INDEX
