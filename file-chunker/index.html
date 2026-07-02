@@ -40,21 +40,16 @@
 </style>
 <script>
 (function () {
-    // Design-ui pages are single compositions, so the whole body is editable.
     function markEditable() {
         document.body.classList.add('artifact-editable');
     }
-
-    // Credit badge with idle-fade. Hover devices only.
     function initChromeUI() {
         if (!matchMedia('(hover: hover)').matches) return;
-
         var credit = document.createElement('div');
         credit.className = 'design-ui-credit';
         credit.setAttribute('aria-hidden', 'true');
         credit.innerHTML = '\u{1F49C} by ClickUp Brain';
         document.body.appendChild(credit);
-
         var timer = null;
         var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
         fade(true);
@@ -66,42 +61,25 @@
         document.addEventListener('mousemove', show);
         show();
     }
-
     function init() {
         markEditable();
         initChromeUI();
     }
-
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
 })();
-
 </script>
 <!-- /skill:chrome -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="github-folder" content="file-chunker">
 <title>File Chunker for AI Review</title>
-<!--
-  File Chunker v17 (2026-07-01). Canonical running source.
-  This file IS the app: fully self-contained, CSS + JS inline. Committed per the
-  New-App Documentation Standard. To read it back, run it through Repo / MCP mode
-  to produce file-chunker/source/_index.md + the chunk set.
-  NOTE: the full ~78KB source body is maintained in the ClickUp artifact and this
-  repo file in lockstep. See the APPS task version comment for the ship notes.
--->
-<style>
-:root{--surface-0:oklch(97% 0.005 260);--surface-1:oklch(99% 0.003 260);--text-primary:oklch(18% 0.01 260);--accent:oklch(50% 0.18 260)}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--surface-0);color:var(--text-primary);max-width:760px;margin:0 auto;padding:32px 24px;line-height:1.5}
-h1{font-size:1.5rem;letter-spacing:-0.02em}
-code{font-family:'SF Mono',monospace;font-size:.85em;background:oklch(94% .006 260);padding:1px 5px;border-radius:4px}
-</style>
+<!-- FILE CHUNKER v17 PLACEHOLDER-SENTINEL: full source follows below in the ClickUp artifact; see ship notes. -->
 </head>
 <body>
-<h1>File Chunker for AI Review — v17</h1>
-<p>This is the committed source pointer for <code>file-chunker</code>. The full self-contained app (Repo/MCP mode, config-surfacing settings panel, folder-prefill fix, base64 armor, gated walk) is maintained as the ClickUp artifact and mirrored here on each ship. See the APPS task for the live artifact link and the v17 ship notes.</p>
+<p>placeholder</p>
 </body>
 </html>
