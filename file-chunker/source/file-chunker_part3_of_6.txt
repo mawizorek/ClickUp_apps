@@ -1,0 +1,380 @@
+=== CHUNK 3/6 | SET 8a41a3e3-d66c-4693-b925-b1c5fed2cc82 | UUID e7b28f7e-ed47-44fc-b9a2-5d55fde46706 | START ===
+[Agent: Read this chunk fully. Verify the START and END UUID match and the sequence is in order. Echo "read 3/6, uuid verified" in chat. Then STOP and wait for the human; do not read or fetch the next chunk on your own.]
+
+ const statReadbackWrap = document.getElementById('statReadbackWrap');
+ const statReadback = document.getElementById('statReadback');
+ const flagBanner = document.getElementById('flagBanner');
+ const flagCount = document.getElementById('flagCount');
+ const flagBody = document.getElementById('flagBody');
+ const toast = document.getElementById('toast');
+ const copySourceBtn = document.getElementById('copySourceBtn');
+ const prepareSourceBtn = document.getElementById('prepareSourceBtn');
+ const sourceSaveLink = document.getElementById('sourceSaveLink');
+ const sourceHint = document.getElementById('sourceHint');
+ // Settings panel
+ const settingsPanel = document.getElementById('settingsPanel');
+ const setTargetRepo = document.getElementById('setTargetRepo');
+ const setBranch = document.getElementById('setBranch');
+ const setPagesBase = document.getElementById('setPagesBase');
+ const setFetchCap = document.getElementById('setFetchCap');
+ const setDefaultChunk = document.getElementById('setDefaultChunk');
+ const setTokenThreshold = document.getElementById('setTokenThreshold');
+ const setCharsPerToken = document.getElementById('setCharsPerToken');
+ const setBlobTimeout = document.getElementById('setBlobTimeout');
+ const settingsSaved = document.getElementById('settingsSaved');
+ const resetSettingsBtn = document.getElementById('resetSettingsBtn');
+
+ let cfg = Object.assign({}, DEFAULTS); // hydrated from localStorage on load
+ let currentFile = null;
+ let currentText = '';
+ let chunks = []; // RAW source slices (never encoded); encoding happens per-slice in wrapWithMarkers
+ let wrappedChunks = []; // transmitted form: markers + (encoded|raw) payload
+ let chunkUuids = [];
+ let setUuid = '';
+ let fileName = '';
+ let nativeExt = 'txt';
+ let hostBaseUrl = '';
+ let repoSlug = ''; // repo-mode app slug (folder). Detected per-file; NEVER persisted (folder-prefill fix).
+ let repoSlugSource = 'none'; // 'meta' | 'manual' | 'none'
+ let blobUrls = [];
+ let customDebounce = null;
+ let hostDebounce = null;
+ let sourceUrl = null;
+ let sourceTimer = null;
+ let savedFlashTimer = null;
+ let autoFilledBase = false; // true when the base URL was set by meta auto-detect (never overrides manual/saved)
+ let autoArmed = false; // true when encoding was auto-enabled by markup detection (a manual toggle clears it)
+
+ // ---- Config accessors (read the live cfg so a settings change takes effect immediately) ----
+ function fetchCap() { return cfg.fetchCap; }
+ function charsPerToken() { return cfg.charsPerToken > 0 ? cfg.charsPerToken : 4; }
+ function tokenThreshold() { return cfg.tokenThreshold; }
+ function blobTimeoutMs() { return Math.max(1, cfg.blobTimeout) * 1000; }
+ function targetRepo() { return (cfg.targetRepo || '').trim() || DEFAULTS.targetRepo; }
+ function branchName() { return (cfg.branch || '').trim() || DEFAULTS.branch; }
+ function repoOwner() { return targetRepo().split('/')[0] || 'mawizorek'; }
+ function repoName() { return targetRepo().split('/')[1] || 'ClickUp_apps'; }
+ function pagesBase() {
+ if (cfg.pagesBase && cfg.pagesBase.trim()) return cfg.pagesBase.trim().replace(/\/+$/, '') + '/';
+ return `https://${repoOwner()}.github.io/${repoName()}/`;
+ }
+ function refreshCapLabel() { capLabel.textContent = '~' + Math.round(fetchCap() / 1000) + ' KB'; }
+
+ function uuid() {
+ if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+ const r = (Math.random() * 16) | 0;
+ const v = c === 'x' ? r : (r & 0x3) | 0x8;
+ return v.toString(16);
+ });
+ }
+
+ // Single stamp helper for versioning/dating every export. YYYY-MM-DD-HHMM, 24h local.
+ function stamp() {
+ const d = new Date();
+ const p = n => String(n).padStart(2, '0');
+ return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+ }
+
+ // ---- Base64 armor (UTF-8 safe) ----
+ function b64Encode(str) {
+ const bytes = new TextEncoder().encode(str);
+ let bin = '';
+ const CH = 0x8000;
+ for (let i = 0; i < bytes.length; i += CH) {
+ bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+ }
+ return btoa(bin);
+ }
+ function wrap76(s) { return s.replace(/(.{76})/g, '$1\n'); } // MIME-style 76-col wrap; decoder strips it
+
+ // ---- Markup detection (tag-shaped, not naive "<") ----
+ function looksLikeMarkup(text, file) {
+ const name = ((file && file.name) || '').toLowerCase();
+ if (/\.(html?|xml|svg|xhtml)$/.test(name)) return true;
+ const tagRe = /<\/?[a-zA-Z][a-zA-Z0-9-]*(\s[^<>]*)?\/?>/;
+ return tagRe.test(text.slice(0, 4000)) || tagRe.test(text.slice(-4000));
+ }
+
+ // Content-based gate for meta detection. Run detection when the filename is html/htm OR the body
+ // actually carries a <meta ...> tag (covers HTML source saved as a .txt twin). DOMParser does the
+ // real extraction, so the chunker can't false-match its own detection code.
+ function metaDetectEligible(text, file) {
+ const name = ((file && file.name) || '').toLowerCase();
+ if (/\.html?$/.test(name)) return true;
+ return /<meta\s[^>]*>/i.test(text);
+ }
+ function detectGithubFolder(text, file) {
+ if (!metaDetectEligible(text, file)) return null;
+ let folder = null;
+ try {
+ const doc = new DOMParser().parseFromString(text, 'text/html');
+ const metas = doc.querySelectorAll('meta');
+ for (let i = 0; i < metas.length; i++) {
+ const n = (metas[i].getAttribute('name') || '').trim().toLowerCase();
+ if (n === 'github-folder') {
+ const c = (metas[i].getAttribute('content') || '').trim();
+ if (c) { folder = c; break; }
+ }
+ }
+ } catch (e) {
+ return null;
+ }
+ return folder;
+ }
+ function cleanSlug(folder) { return (folder || '').replace(/^\/+|\/+$/g, '').toLowerCase().replace(/\s+/g, '-'); }
+
+ // Legacy non-repo self-nav base-URL auto-fill (saved/manual wins). Repo-mode slug is handled separately.
+ function applyGithubFolder(folder) {
+ if (!folder) return;
+ const current = hostBaseInput.value.trim();
+ if (current && !autoFilledBase) return;
+ const clean = cleanSlug(folder);
+ if (!clean) return;
+ const url = pagesBase() + encodeURIComponent(clean) + '/';
+ hostBaseInput.value = url;
+ hostBaseUrl = url;
+ autoFilledBase = true;
+ hostDetectedText.textContent = 'Auto-filled base URL from <meta name="github-folder"> \u2192 ' + clean;
+ hostDetected.classList.add('show');
+ refreshModeUI();
+ saveSettings();
+ }
+
+ // v17 FOLDER-PREFILL FIX: the repo-mode app slug is derived FRESH from the dropped file's meta on
+ // every drop and is never persisted. Detected meta always wins; content is authoritative. If a drop
+ // carries no meta, a previously meta-derived slug is treated as STALE and cleared (an empty field must
+ // beat a wrong saved value), so a set can never silently point at another app's folder. A slug the user
+ // typed by hand ('manual') survives a no-meta drop.
+ function applyRepoSlugForFile(folder) {
+ if (folder) {
+ const clean = cleanSlug(folder);
+ if (clean) { setRepoSlug(clean, 'meta'); return; }
+ }
+ if (repoSlugSource === 'manual' && repoSlug) { refreshRepoUI(); return; }
+ setRepoSlug('', 'none');
+ }
+ function setRepoSlug(slug, source) {
+ repoSlug = slug || '';
+ repoSlugSource = source;
+ repoSlugInput.value = repoSlug;
+ refreshRepoUI();
+ }
+ function refreshRepoUI() {
+ const on = repoMode();
+ repoRow.classList.toggle('show', on);
+ hostRow.classList.toggle('hidden-mode', on);
+ if (repoSlugSource === 'meta') { slugSource.className = 'slug-source meta'; slugSource.textContent = 'from <meta>'; }
+ else if (repoSlugSource === 'manual') { slugSource.className = 'slug-source manual'; slugSource.textContent = 'manual'; }
+ else { slugSource.className = 'slug-source none'; slugSource.textContent = 'no slug'; }
+ const slug = repoSlug || '<app-slug>';
+ repoPathPreview.innerHTML = `Repo: <strong>${targetRepo()}</strong> (branch ${branchName()}) \u00b7 path: <strong>${slug}/source/</strong>` +
+ (on && !repoSlug ? ' \u2014 \u26a0 no slug detected; set one so the manifest points at the right folder.' : '');
+ }
+
+ // Flat sequential numbering. Isolated so a future grouped/sectioned scheme is a small swap.
+ function seqTag(idx, total) { return `${idx + 1}/${total}`; }
+ function repoMode() { return repoToggle.checked; }
+ function selfNav() { return !repoMode() && hostBaseUrl.trim().length > 0; }
+ function encoded() { return encodeToggle.checked; }
+ // Encoded payloads are base64 text; repo mode always uses .txt chunk files per the source-folder layout.
+ function effectiveTxt() { return repoMode() || forceTxtToggle.checked || encoded(); }
+ function chunkExt() { return effectiveTxt() ? 'txt' : nativeExt; }
+ function joinUrl(base, name) {
+ const b = base.trim().replace(/\/+$/, '');
+ return `${b}/${name}`;
+ }
+ // The manifest reference for a chunk: repo-relative path (repo mode), full URL (self-nav), or bare name.
+ function chunkRef(idx, total) {
+ if (repoMode()) return `${repoSlug || 'app'}/source/${chunkFileName(idx, total)}`;
+ return selfNav() ? joinUrl(hostBaseUrl, chunkFileName(idx, total)) : chunkFileName(idx, total);
+ }
+
+ // ---- Settings persistence ----
+ function saveSettings() {
+ try {
+ localStorage.setItem(LS_KEY, JSON.stringify({
+ chunkSize: chunkSizeSelect.value,
+ customSize: customSizeInput.value,
+ splitMode: splitModeSelect.value,
+ markers: markersToggle.checked,
+ debug: debugToggle.checked,
+ repo: repoToggle.checked,
+ encode: encodeToggle.checked,
+ forceTxt: forceTxtToggle.checked,
+ hostBase: hostBaseInput.value,
+ cfg: cfg
+ }));
+ } catch (e) {}
+ }
+ function loadSettings() {
+ let s = {};
+ try { s = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch (e) {}
+ // Config values: saved wins, DEFAULTS fill any absent key (never throw on a missing key).
+ cfg = Object.assign({}, DEFAULTS, (s.cfg && typeof s.cfg === 'object') ? s.cfg : {});
+ // Coerce numerics defensively so a corrupt value can't NaN the math.
+ ['fetchCap', 'defaultChunk', 'tokenThreshold', 'charsPerToken', 'blobTimeout'].forEach(k => {
+ const v = parseFloat(cfg[k]);
+ cfg[k] = Number.isFinite(v) ? v : DEFAULTS[k];
+ });
+ applyCfgToInputs();
+ applyDefaultChunkOption();
+ if (s.chunkSize) chunkSizeSelect.value = s.chunkSize;
+ if (s.splitMode) splitModeSelect.value = s.splitMode;
+ if (typeof s.markers === 'boolean') markersToggle.checked = s.markers;
+ if (typeof s.debug === 'boolean') debugToggle.checked = s.debug;
+ if (typeof s.repo === 'boolean') repoToggle.checked = s.repo;
+ if (typeof s.encode === 'boolean') encodeToggle.checked = s.encode;
+ // Force .txt defaults ON. A returning user with no saved key must STAY on, so only override when
+ // the key is explicitly present; otherwise keep the checked default.
+ if (typeof s.forceTxt === 'boolean') forceTxtToggle.checked = s.forceTxt;
+ else forceTxtToggle.checked = true;
+ if (typeof s.hostBase === 'string') { hostBaseInput.value = s.hostBase; hostBaseUrl = s.hostBase; }
+ const isCustom = chunkSizeSelect.value === 'custom';
+ customWrap.classList.toggle('hidden', !isCustom);
+ if (isCustom && s.customSize) { customSizeInput.value = s.customSize; validateCustom(false); }
+ const hints = { smart: 'Prefers clean breaks at double-newlines', line: 'Splits at nearest line break', hard: 'Cuts at exact byte count' };
+ splitInfo.textContent = hints[splitModeSelect.value];
+ debugBanner.classList.toggle('show', debugToggle.checked);
+ refreshCapLabel();
+ refreshEncodeUI();
+ refreshModeUI();
+ refreshRepoUI();
+ }
+
+ function applyCfgToInputs() {
+ setTargetRepo.value = cfg.targetRepo;
+ setBranch.value = cfg.branch;
+ setPagesBase.value = cfg.pagesBase;
+ setFetchCap.value = cfg.fetchCap;
+ setDefaultChunk.value = cfg.defaultChunk;
+ setTokenThreshold.value = cfg.tokenThreshold;
+ setCharsPerToken.value = cfg.charsPerToken;
+ setBlobTimeout.value = cfg.blobTimeout;
+ }
+ // Reflect the configured default chunk size into the first dropdown option.
+ function applyDefaultChunkOption() {
+ const opt = chunkSizeSelect.options[0];
+ if (!opt) return;
+ opt.value = String(cfg.defaultChunk);
+ opt.textContent = `${Math.round(cfg.defaultChunk / 1000)} KB (chunk-file target, AI-readback safe \u00b7 DEFAULT)`;
+ }
+ function readCfgFromInputs() {
+ cfg.targetRepo = setTargetRepo.value.trim() || DEFAULTS.targetRepo;
+ cfg.branch = setBranch.value.trim() || DEFAULTS.branch;
+ cfg.pagesBase = setPagesBase.value.trim();
+ cfg.fetchCap = clampNum(setFetchCap.value, 8000, 200000, DEFAULTS.fetchCap);
+ cfg.defaultChunk = clampNum(setDefaultChunk.value, MIN_CHUNK, MAX_CHUNK, DEFAULTS.defaultChunk);
+ cfg.tokenThreshold = clampNum(setTokenThreshold.value, 5000, 200000, DEFAULTS.tokenThreshold);
+ cfg.charsPerToken = clampNum(setCharsPerToken.value, 1, 12, DEFAULTS.charsPerToken);
+ cfg.blobTimeout = clampNum(setBlobTimeout.value, 10, 600, DEFAULTS.blobTimeout);
+ }
+ function clampNum(raw, lo, hi, fallback) {
+ const v = parseFloat(raw);
+ if (!Number.isFinite(v)) return fallback;
+ return Math.max(lo, Math.min(hi, v));
+ }
+ function flashSaved() {
+ settingsSaved.classList.add('show');
+ clearTimeout(savedFlashTimer);
+ savedFlashTimer = setTimeout(() => settingsSaved.classList.remove('show'), 1400);
+ }
+ function onSettingChange() {
+ readCfgFromInputs();
+ applyDefaultChunkOption();
+ refreshCapLabel();
+ refreshRepoUI();
+ saveSettings();
+ flashSaved();
+ if (currentText) reChunk();
+ }
+ [setTargetRepo, setBranch, setPagesBase, setFetchCap, setDefaultChunk, setTokenThreshold, setCharsPerToken, setBlobTimeout]
+ .forEach(el => el.addEventListener('change', onSettingChange));
+ resetSettingsBtn.addEventListener('click', () => {
+ cfg = Object.assign({}, DEFAULTS);
+ applyCfgToInputs();
+ applyDefaultChunkOption();
+ refreshCapLabel();
+ refreshRepoUI();
+ saveSettings();
+ flashSaved();
+ if (currentText) reChunk();
+ });
+
+ function refreshEncodeUI() {
+ const on = encoded();
+ encodeSub.classList.toggle('armor-on', on);
+ if (on) {
+ forceTxtToggle.checked = true;
+ forceTxtToggle.disabled = true;
+ forceTxtLabel.classList.add('locked');
+ forceTxtSub.textContent = 'Locked on: encoded chunks are base64 text, so native extensions are moot here.';
+ } else if (repoMode()) {
+ forceTxtToggle.checked = true;
+ forceTxtToggle.disabled = true;
+ forceTxtLabel.classList.add('locked');
+ forceTxtSub.textContent = 'Locked on: repo mode ships a .txt chunk set under <app-slug>/source/.';
+ } else {
+ forceTxtToggle.disabled = false;
+ forceTxtLabel.classList.remove('locked');
+ forceTxtSub.textContent = 'On: every chunk exports as .txt. Off: chunks keep the source\u2019s native extension. The index is always .txt / .md.';
+ }
+ }
+
+ function refreshModeUI() {
+ const repo = repoMode();
+ const nav = selfNav();
+ const arm = encoded();
+ repoSub.classList.toggle('repo-on', repo);
+ hostModeBadge.textContent = nav ? 'Self-navigating' : 'Manual paste';
+ hostModeBadge.className = 'host-mode ' + (nav ? 'auto' : 'manual');
+ let label;
+ if (repo) label = 'Repo / MCP walk';
+ else label = nav ? 'Self-Navigating Walk' : 'Gated Walk';
+ modePill.textContent = label + (arm ? ' \u00b7 base64 armored' : (repo ? ' \u00b7 plaintext' : ' \u00b7 native chunks'));
+ modePill.className = 'mode-pill' + (arm ? ' armored' : (repo ? ' repo' : ''));
+ renderWalkSteps(repo, nav, arm);
+ }
+ function renderWalkSteps(repo, nav, arm) {
+ walkTitle.textContent = repo ? 'The repo / MCP gated walk' : (nav ? 'The self-navigating gated walk' : 'The gated-walk workflow');
+ const verifyVerb = arm ? 'decode it first, then verify sequence + UUID' : 'verify the sequence + UUID';
+ const echoNote = arm ? ' echoing "read n/N, decoded, uuid verified"' : ' echoing "read n/N, uuid verified"';
+ const manual = [
+ 'Click <strong>Download set</strong>. You get a folder: the original source + one small index + every chunk (chunk 1, chunk 2, \u2026).',
+ 'Hand the <strong>index file only</strong> to a fresh agent. It reads the index, confirms it understands the rules, and stops.',
+ `Send chunk 1. The agent reads it, ${verifyVerb},${echoNote}, confirms completeness, then <strong>stops and waits</strong>.`,
+ 'You say continue. It reads chunk 2, confirms, waits. One chunk per turn, always gated by you.',
+ 'After the final chunk the agent <strong>always pauses</strong>: reading every part is not permission to act. It waits for your explicit instructions before any rebuild or action.'
+ ];
+ const auto = [
+ 'Host the chunk files at your base URL, then click <strong>Download set</strong> (or <strong>Index only</strong>) to grab the matching index.',
+ 'Hand the <strong>index file (or its URL) only</strong> to a fresh agent. It reads the index, confirms it understands the rules, and stops. It now has every chunk\'s full URL.',
+ `Say <strong>"proceed"</strong>. The agent fetches chunk 1 from its URL, ${verifyVerb},${echoNote}, confirms completeness, then <strong>stops and waits</strong>.`,
+ 'Say "proceed" again for the next chunk. One fetch per "proceed", never reading ahead. Repeat through the set.',
+ 'After the final chunk the agent <strong>always pauses</strong>: reading every part is not permission to act. It waits for your explicit instructions before any rebuild or action.'
+ ];
+ const repoSteps = [
+ 'Click <strong>Download set</strong>. The zip has <code>report.md</code> + a clean copy of the original at the root (local only), and the <strong><code>' + (repoSlug || '&lt;app-slug&gt;') + '/source/</code></strong> folder to upload.',
+ 'Drag <strong>only the <code>' + (repoSlug || '&lt;app-slug&gt;') + '/source/</code> folder</strong> into GitHub "Add files" on <code>' + targetRepo() + '</code>. GitHub materializes the path from the file paths.',
+ 'Hand a fresh Brain agent <strong>only <code>' + (repoSlug || '&lt;app-slug&gt;') + '/source/_index.md</code></strong>. It reads the index, states the repo + chunk count, estimates the token budget, and says <strong>"ready to read chunk 1"</strong>.',
+ `Say <strong>"proceed"</strong>. The agent fetches chunk 1 by its repo-relative path via the GitHub MCP, ${verifyVerb},${echoNote}, reports "read 1/N, uuid verified", then <strong>stops and waits</strong>. One chunk per "proceed".`,
+ 'After the final chunk the agent <strong>always pauses</strong>: all parts read is not permission to act. It waits for your explicit instructions before any rebuild or action.'
+ ];
+ const steps = repo ? repoSteps : (nav ? auto : manual);
+ walkSteps.innerHTML = steps.map(s => `<li>${s}</li>`).join('');
+ }
+
+ dropZone.addEventListener('click', e => { if (e.target === replaceLink) return; fileInput.click(); });
+ replaceLink.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+ dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+ dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+ dropZone.addEventListener('drop', e => {
+ e.preventDefault(); dropZone.classList.remove('drag-over');
+ if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+ });
+ fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+
+
+[Agent: Confirm this END UUID matches the START UUID above. Report completeness of part 3/6 in chat, then PAUSE and wait for the human's go-ahead before any next chunk.]
+=== CHUNK 3/6 | SET 8a41a3e3-d66c-4693-b925-b1c5fed2cc82 | UUID e7b28f7e-ed47-44fc-b9a2-5d55fde46706 | END ===
