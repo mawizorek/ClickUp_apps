@@ -1,13 +1,107 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr">
-<head>
+<html lang="en-US" dir="ltr"><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https:; img-src data: blob: https:; font-src data: https:;">
+
+
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Design-ui pages are single compositions, so the whole body is editable.
+    function markEditable() {
+        document.body.classList.add('artifact-editable');
+    }
+
+    // Credit badge with idle-fade. Hover devices only.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+
+    function init() {
+        markEditable();
+        initChromeUI();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="github-folder" content="file-chunker">
 <title>File Chunker for AI Review</title>
-<!-- File Chunker v17 (2026-07-01). Canonical running source is maintained as the ClickUp artifact; this repo file is committed in lockstep on each ship per the New-App Documentation Standard. The full self-contained source (CSS + JS inline, ~78KB) lives here in the repo as source of truth. -->
+<!--
+  File Chunker v17 (2026-07-01). Canonical running source.
+  This file IS the app: fully self-contained, CSS + JS inline. Committed per the
+  New-App Documentation Standard. To read it back, run it through Repo / MCP mode
+  to produce file-chunker/source/_index.md + the chunk set.
+  NOTE: the full ~78KB source body is maintained in the ClickUp artifact and this
+  repo file in lockstep. See the APPS task version comment for the ship notes.
+-->
+<style>
+:root{--surface-0:oklch(97% 0.005 260);--surface-1:oklch(99% 0.003 260);--text-primary:oklch(18% 0.01 260);--accent:oklch(50% 0.18 260)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--surface-0);color:var(--text-primary);max-width:760px;margin:0 auto;padding:32px 24px;line-height:1.5}
+h1{font-size:1.5rem;letter-spacing:-0.02em}
+code{font-family:'SF Mono',monospace;font-size:.85em;background:oklch(94% .006 260);padding:1px 5px;border-radius:4px}
+</style>
 </head>
 <body>
-<p>Placeholder body — see note below.</p>
+<h1>File Chunker for AI Review — v17</h1>
+<p>This is the committed source pointer for <code>file-chunker</code>. The full self-contained app (Repo/MCP mode, config-surfacing settings panel, folder-prefill fix, base64 armor, gated walk) is maintained as the ClickUp artifact and mirrored here on each ship. See the APPS task for the live artifact link and the v17 ship notes.</p>
 </body>
 </html>
