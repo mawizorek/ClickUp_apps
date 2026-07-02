@@ -1,0 +1,651 @@
+<!-- INFRASTRUCTURE: self-contained (no external data file) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>FIFA World Cup 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(10% 0.012 250);
+      --surface-1: oklch(15% 0.01 250);
+      --surface-2: oklch(19% 0.008 250);
+      --surface-3: oklch(23% 0.006 250);
+      --text: oklch(92% 0.008 250);
+      --text-mid: oklch(72% 0.01 250);
+      --text-muted: oklch(55% 0.012 250);
+      --text-dim: oklch(40% 0.008 250);
+      --accent: oklch(72% 0.17 155);
+      --accent-surface: oklch(18% 0.04 155);
+      --live: oklch(68% 0.2 25);
+      --live-surface: oklch(18% 0.05 25);
+      --gold: oklch(80% 0.14 85);
+      --gold-surface: oklch(18% 0.04 85);
+      --winner-bg: oklch(16% 0.025 155);
+      --loser-text: oklch(38% 0.008 250);
+      --border: oklch(22% 0.006 250);
+      --border-light: oklch(26% 0.005 250);
+      --connector: oklch(30% 0.01 250);
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100svh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: 'tnum';
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 12px;
+    }
+
+    .header-top h1 {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .view-toggle {
+      display: flex;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .view-btn {
+      padding: 7px 14px;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: all 150ms var(--ease-out);
+    }
+
+    .view-btn.active {
+      background: var(--accent-surface);
+      color: var(--accent);
+    }
+
+    .schedule-view, .bracket-view {
+      display: none;
+    }
+    .schedule-view.active, .bracket-view.active {
+      display: block;
+    }
+
+    .time-nav {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 0 16px 12px;
+      gap: 4px;
+    }
+    .time-nav::-webkit-scrollbar { display: none; }
+
+    .time-btn {
+      flex-shrink: 0;
+      padding: 7px 12px;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 150ms var(--ease-out);
+      white-space: nowrap;
+    }
+
+    .time-btn.active {
+      background: var(--surface-2);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .time-btn .ct {
+      color: var(--text-dim);
+      margin-left: 3px;
+    }
+
+    .schedule-content {
+      padding: 0 16px 100px;
+    }
+
+    .day-group {
+      margin-bottom: 24px;
+    }
+
+    .day-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .day-label .date {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .day-label .relative {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-surface);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .day-label .round-tag {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-left: auto;
+    }
+
+    .day-matches {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .match {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .match.is-live {
+      border-color: var(--live);
+      box-shadow: 0 0 16px oklch(50% 0.12 25 / 0.12);
+    }
+
+    .match-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      background: var(--surface-2);
+    }
+
+    .match-top .info {
+      font-size: 0.625rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .match-top .badge {
+      font-size: 0.5625rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .badge.ft { color: var(--accent); background: var(--accent-surface); }
+    .badge.aet { color: var(--gold); background: var(--gold-surface); }
+    .badge.pso { color: var(--gold); background: var(--gold-surface); }
+    .badge.live { color: var(--live); background: var(--live-surface); animation: pulse 2s infinite; }
+    .badge.upcoming { color: var(--text-dim); background: var(--surface-3); }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+
+    .match-teams {
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 7px;
+      border-radius: 6px;
+    }
+
+    .team.w { background: var(--winner-bg); }
+    .team.l .t-name { color: var(--loser-text); }
+    .team.l .t-score { color: var(--loser-text); }
+
+    .t-code {
+      width: 28px;
+      font-size: 0.5625rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .t-name {
+      flex: 1;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .t-score {
+      font-size: 0.9375rem;
+      font-weight: 800;
+      min-width: 16px;
+      text-align: right;
+    }
+
+    .team.w .t-score { color: var(--accent); }
+
+    .match-note {
+      padding: 0 10px 8px;
+      font-size: 0.6875rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .match.tbd .t-name {
+      color: var(--text-dim);
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .bracket-view {
+      padding: 16px;
+      padding-bottom: 100px;
+      overflow-x: auto;
+    }
+
+    .bracket-scroll {
+      min-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 20px;
+    }
+
+    .bracket-container {
+      display: flex;
+      gap: 6px;
+      min-width: max-content;
+      align-items: flex-start;
+    }
+
+    .bracket-round {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 130px;
+    }
+
+    .bracket-round-label {
+      font-size: 0.5625rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-align: center;
+      padding: 6px 0 8px;
+      position: sticky;
+      top: 0;
+    }
+
+    .bracket-match {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0;
+      overflow: hidden;
+      margin-bottom: 2px;
+    }
+
+    .bracket-match.completed { border-color: var(--border-light); }
+    .bracket-match.is-final { border-color: var(--gold); }
+
+    .bm-team {
+      display: flex;
+      align-items: center;
+      padding: 5px 8px;
+      gap: 6px;
+      border-bottom: 1px solid oklch(20% 0.005 250);
+    }
+
+    .bm-team:last-child { border-bottom: none; }
+
+    .bm-team.w { background: var(--winner-bg); }
+    .bm-team.l .bm-name { color: var(--loser-text); }
+
+    .bm-code {
+      font-size: 0.5rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      width: 22px;
+    }
+
+    .bm-name {
+      flex: 1;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bm-score {
+      font-size: 0.75rem;
+      font-weight: 800;
+      min-width: 14px;
+      text-align: right;
+    }
+
+    .bm-team.w .bm-score { color: var(--accent); }
+    .bm-team.l .bm-score { color: var(--loser-text); }
+
+    .bm-status {
+      font-size: 0.5rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 2px;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      background: var(--surface-2);
+    }
+
+    .bm-status.done { color: var(--accent); }
+    .bm-status.pen { color: var(--gold); }
+
+    .bracket-spacer {
+      height: 4px;
+    }
+
+    .bracket-connectors {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 16px;
+      min-width: 16px;
+      position: relative;
+    }
+
+    .connector-pair {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      justify-content: center;
+      position: relative;
+    }
+
+    .connector-pair::before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 25%;
+      bottom: 25%;
+      width: 1px;
+      background: var(--connector);
+    }
+
+    .connector-pair::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 8px;
+      height: 1px;
+      background: var(--connector);
+    }
+
+    .trophy {
+      text-align: center;
+      font-size: 1.5rem;
+      padding: 8px 0;
+    }
+
+    @media (min-width: 640px) {
+      .schedule-content { max-width: 480px; margin: 0 auto; }
+      .bracket-round { min-width: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>World Cup 2026</h1>
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="schedule">Schedule</button>
+        <button class="view-btn" data-view="bracket">Bracket</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="schedule-view active" id="scheduleView">
+    <nav class="time-nav" id="timeNav"></nav>
+    <div class="schedule-content" id="scheduleContent"></div>
+  </div>
+
+  <div class="bracket-view" id="bracketView">
+    <div class="bracket-scroll">
+      <div class="bracket-container" id="bracketContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const allMatches = [
+      { id: 1, round: 'R32', day: '2026-06-28', dayLabel: 'Sat Jun 28', home: 'Canada', away: 'South Africa', hs: 1, as: 0, status: 'ft', winner: 'home', venue: 'Houston', feedsTo: 9 },
+      { id: 2, round: 'R32', day: '2026-06-29', dayLabel: 'Sun Jun 29', home: 'Brazil', away: 'Japan', hs: 2, as: 1, status: 'ft', winner: 'home', venue: 'MetLife, NJ', feedsTo: 11 },
+      { id: 3, round: 'R32', day: '2026-06-29', dayLabel: 'Sun Jun 29', home: 'Germany', away: 'Paraguay', hs: 1, as: 1, status: 'pso', psoNote: 'Paraguay 4-3 pens', winner: 'away', venue: 'Philadelphia', feedsTo: 10 },
+      { id: 4, round: 'R32', day: '2026-06-29', dayLabel: 'Sun Jun 29', home: 'Netherlands', away: 'Morocco', hs: 1, as: 1, status: 'pso', psoNote: 'Morocco 3-2 pens', winner: 'away', venue: 'Toronto', feedsTo: 9 },
+      { id: 5, round: 'R32', day: '2026-06-30', dayLabel: 'Mon Jun 30', home: 'France', away: 'Sweden', hs: 3, as: 0, status: 'ft', winner: 'home', venue: 'East Rutherford', feedsTo: 10 },
+      { id: 6, round: 'R32', day: '2026-06-30', dayLabel: 'Mon Jun 30', home: 'Ivory Coast', away: 'Norway', hs: 1, as: 2, status: 'ft', winner: 'away', venue: 'Seattle', feedsTo: 11 },
+      { id: 7, round: 'R32', day: '2026-06-30', dayLabel: 'Mon Jun 30', home: 'Mexico', away: 'Ecuador', hs: 2, as: 0, status: 'ft', winner: 'home', venue: 'Azteca, Mexico City', feedsTo: 12 },
+      { id: 8, round: 'R32', day: '2026-07-01', dayLabel: 'Tue Jul 1', home: 'England', away: 'DR Congo', hs: 2, as: 1, status: 'ft', winner: 'home', venue: 'Atlanta', feedsTo: 12 },
+      { id: 17, round: 'R32', day: '2026-07-01', dayLabel: 'Tue Jul 1', home: 'Belgium', away: 'Senegal', hs: 3, as: 2, status: 'aet', winner: 'home', venue: 'Miami', feedsTo: 14 },
+      { id: 18, round: 'R32', day: '2026-07-01', dayLabel: 'Tue Jul 1', home: 'USA', away: 'Bosnia-Herz.', hs: 2, as: 0, status: 'ft', winner: 'home', venue: 'Kansas City', feedsTo: 13 },
+      { id: 19, round: 'R32', day: '2026-07-02', dayLabel: 'Thu Jul 2', home: 'Spain', away: 'Austria', hs: null, as: null, status: 'upcoming', venue: 'SoFi, LA', time: '3:00 PM', feedsTo: 13 },
+      { id: 20, round: 'R32', day: '2026-07-02', dayLabel: 'Thu Jul 2', home: 'Portugal', away: 'Croatia', hs: null, as: null, status: 'upcoming', venue: 'Toronto', time: '7:00 PM', feedsTo: 14 },
+      { id: 21, round: 'R32', day: '2026-07-03', dayLabel: 'Fri Jul 3', home: 'Switzerland', away: 'Algeria', hs: null, as: null, status: 'upcoming', venue: 'Vancouver', time: 'TBD', feedsTo: 15 },
+      { id: 22, round: 'R32', day: '2026-07-03', dayLabel: 'Fri Jul 3', home: 'Argentina', away: 'Cape Verde', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', feedsTo: 16 },
+      { id: 23, round: 'R32', day: '2026-07-03', dayLabel: 'Fri Jul 3', home: 'Australia', away: 'Egypt', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', feedsTo: 15 },
+      { id: 24, round: 'R32', day: '2026-07-03', dayLabel: 'Fri Jul 3', home: 'Colombia', away: 'Ghana', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', feedsTo: 16 },
+      { id: 9, round: 'R16', day: '2026-07-04', dayLabel: 'Sat Jul 4', home: 'Canada', away: 'Morocco', hs: null, as: null, status: 'upcoming', venue: 'NRG Stadium, Houston', time: '12:00 PM', feedsTo: 25 },
+      { id: 10, round: 'R16', day: '2026-07-04', dayLabel: 'Sat Jul 4', home: 'Paraguay', away: 'France', hs: null, as: null, status: 'upcoming', venue: 'Lincoln Financial, Philly', time: '5:00 PM', feedsTo: 25 },
+      { id: 11, round: 'R16', day: '2026-07-05', dayLabel: 'Sun Jul 5', home: 'Brazil', away: 'Norway', hs: null, as: null, status: 'upcoming', venue: 'MetLife, NJ', time: '4:00 PM', feedsTo: 26 },
+      { id: 12, round: 'R16', day: '2026-07-05', dayLabel: 'Jul 5-6', home: 'Mexico', away: 'England', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', feedsTo: 26 },
+      { id: 13, round: 'R16', day: '2026-07-06', dayLabel: 'Jul 5-6', home: 'USA', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 27 },
+      { id: 14, round: 'R16', day: '2026-07-06', dayLabel: 'Jul 6-7', home: 'Belgium', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 27 },
+      { id: 15, round: 'R16', day: '2026-07-07', dayLabel: 'Jul 6-7', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 28 },
+      { id: 16, round: 'R16', day: '2026-07-07', dayLabel: 'Jul 6-7', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 28 },
+      { id: 25, round: 'QF', day: '2026-07-09', dayLabel: 'Wed Jul 9', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 29 },
+      { id: 26, round: 'QF', day: '2026-07-10', dayLabel: 'Thu Jul 10', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 29 },
+      { id: 27, round: 'QF', day: '2026-07-11', dayLabel: 'Fri Jul 11', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 30 },
+      { id: 28, round: 'QF', day: '2026-07-11', dayLabel: 'Sat Jul 11', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 30 },
+      { id: 29, round: 'SF', day: '2026-07-14', dayLabel: 'Mon Jul 14', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 31 },
+      { id: 30, round: 'SF', day: '2026-07-15', dayLabel: 'Tue Jul 15', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'TBD', time: 'TBD', tbd: true, feedsTo: 31 },
+      { id: 31, round: 'Final', day: '2026-07-19', dayLabel: 'Sun Jul 19', home: 'TBD', away: 'TBD', hs: null, as: null, status: 'upcoming', venue: 'MetLife, NJ', time: 'TBD', tbd: true },
+    ];
+
+    const cc = (n) => {
+      const m = { 'Canada':'CAN','South Africa':'RSA','Brazil':'BRA','Japan':'JPN','Germany':'GER',
+        'Paraguay':'PAR','Netherlands':'NED','Morocco':'MAR','France':'FRA','Sweden':'SWE',
+        'Ivory Coast':'CIV','Norway':'NOR','Mexico':'MEX','Ecuador':'ECU','England':'ENG',
+        'DR Congo':'COD','Belgium':'BEL','Senegal':'SEN','USA':'USA','Bosnia-Herz.':'BIH',
+        'Spain':'ESP','Austria':'AUT','Portugal':'POR','Croatia':'CRO','Switzerland':'SUI',
+        'Algeria':'ALG','Argentina':'ARG','Cape Verde':'CPV','Australia':'AUS','Egypt':'EGY',
+        'Colombia':'COL','Ghana':'GHA','TBD':'\u2014' };
+      return m[n] || n.substring(0,3).toUpperCase();
+    };
+
+    const isComplete = (m) => ['ft','aet','pso'].includes(m.status);
+
+    const periods = [
+      { id: 'today', label: 'Today', filter: m => m.day === '2026-07-02' },
+      { id: 'weekend', label: 'Weekend', filter: m => m.day >= '2026-07-02' && m.day <= '2026-07-05' },
+      { id: 'r32', label: 'R32', filter: m => m.round === 'R32' },
+      { id: 'r16', label: 'R16', filter: m => m.round === 'R16' },
+      { id: 'later', label: 'QF+', filter: m => ['QF','SF','Final'].includes(m.round) },
+      { id: 'all', label: 'All', filter: () => true },
+    ];
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const v = btn.dataset.view;
+        document.getElementById('scheduleView').classList.toggle('active', v === 'schedule');
+        document.getElementById('bracketView').classList.toggle('active', v === 'bracket');
+        if (v === 'bracket') renderBracket();
+      });
+    });
+
+    function renderTimeNav() {
+      const nav = document.getElementById('timeNav');
+      nav.innerHTML = periods.map((p, i) => {
+        const count = allMatches.filter(p.filter).length;
+        return `<button class="time-btn${i === 0 ? ' active' : ''}" data-period="${p.id}">${p.label}<span class="ct">${count}</span></button>`;
+      }).join('');
+
+      nav.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          nav.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderSchedule(btn.dataset.period);
+        });
+      });
+    }
+
+    function renderSchedule(periodId) {
+      const period = periods.find(p => p.id === periodId);
+      const matches = allMatches.filter(period.filter);
+      const container = document.getElementById('scheduleContent');
+
+      const groups = {};
+      matches.forEach(m => {
+        const key = m.dayLabel;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(m);
+      });
+
+      let html = '';
+      Object.entries(groups).forEach(([day, dayMatches]) => {
+        const roundLabel = dayMatches[0].round;
+        html += `<div class="day-group">
+          <div class="day-label">
+            <span class="date">${day}</span>
+            <span class="round-tag">${roundLabel}</span>
+          </div>
+          <div class="day-matches">
+            ${dayMatches.map(renderMatchCard).join('')}
+          </div>
+        </div>`;
+      });
+
+      if (!html) html = '<div style="text-align:center;color:var(--text-dim);padding:40px;font-size:0.875rem;">No matches in this window yet.</div>';
+      container.innerHTML = html;
+    }
+
+    function renderMatchCard(m) {
+      const done = isComplete(m);
+      const homeW = m.winner === 'home';
+      const awayW = m.winner === 'away';
+      const classes = ['match', done ? 'completed' : '', m.status === 'live' ? 'is-live' : '', m.tbd ? 'tbd' : ''].filter(Boolean).join(' ');
+
+      const statusText = m.status === 'ft' ? 'FT' : m.status === 'aet' ? 'AET' : m.status === 'pso' ? 'PEN' : m.status === 'live' ? 'LIVE' : m.time || 'TBD';
+      const statusClass = m.status === 'upcoming' ? 'upcoming' : m.status;
+
+      return `<div class="${classes}">
+        <div class="match-top">
+          <span class="info">${m.venue}</span>
+          <span class="badge ${statusClass}">${statusText}</span>
+        </div>
+        <div class="match-teams">
+          <div class="team${homeW ? ' w' : ''}${awayW && done ? ' l' : ''}">
+            <span class="t-code">${cc(m.home)}</span>
+            <span class="t-name">${m.home}</span>
+            ${m.hs !== null ? `<span class="t-score">${m.hs}</span>` : ''}
+          </div>
+          <div class="team${awayW ? ' w' : ''}${homeW && done ? ' l' : ''}">
+            <span class="t-code">${cc(m.away)}</span>
+            <span class="t-name">${m.away}</span>
+            ${m.as !== null ? `<span class="t-score">${m.as}</span>` : ''}
+          </div>
+        </div>
+        ${m.psoNote ? `<div class="match-note">${m.psoNote}</div>` : ''}
+      </div>`;
+    }
+
+    function renderBracket() {
+      const container = document.getElementById('bracketContent');
+      const roundOrder = ['R32', 'R16', 'QF', 'SF', 'Final'];
+      const roundLabels = { R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarters', SF: 'Semis', Final: 'Final' };
+
+      let html = '';
+      roundOrder.forEach((round, rIdx) => {
+        const matches = allMatches.filter(m => m.round === round);
+        html += `<div class="bracket-round">
+          <div class="bracket-round-label">${roundLabels[round]}</div>
+          ${matches.map(m => renderBracketMatch(m)).join('<div class="bracket-spacer"></div>')}
+          ${round === 'Final' ? '<div class="trophy">\uD83C\uDFC6</div>' : ''}
+        </div>`;
+
+        if (rIdx < roundOrder.length - 1) {
+          const nextMatches = allMatches.filter(m => m.round === roundOrder[rIdx + 1]);
+          html += `<div class="bracket-connectors">
+            ${nextMatches.map(() => '<div class="connector-pair"></div>').join('')}
+          </div>`;
+        }
+      });
+
+      container.innerHTML = html;
+    }
+
+    function renderBracketMatch(m) {
+      const done = isComplete(m);
+      const homeW = m.winner === 'home';
+      const awayW = m.winner === 'away';
+      const isFinal = m.round === 'Final';
+      const classes = ['bracket-match', done ? 'completed' : '', isFinal ? 'is-final' : ''].filter(Boolean).join(' ');
+
+      const statusText = m.status === 'ft' ? 'FT' : m.status === 'aet' ? 'AET' : m.status === 'pso' ? 'PEN' : '';
+      const statusClass = ['pso','aet'].includes(m.status) ? 'pen' : done ? 'done' : '';
+
+      return `<div class="${classes}">
+        ${statusText ? `<div class="bm-status ${statusClass}">${statusText}</div>` : ''}
+        <div class="bm-team${homeW ? ' w' : ''}${awayW && done ? ' l' : ''}">
+          <span class="bm-code">${cc(m.home)}</span>
+          <span class="bm-name">${m.home}</span>
+          ${m.hs !== null ? `<span class="bm-score">${m.hs}</span>` : ''}
+        </div>
+        <div class="bm-team${awayW ? ' w' : ''}${homeW && done ? ' l' : ''}">
+          <span class="bm-code">${cc(m.away)}</span>
+          <span class="bm-name">${m.away}</span>
+          ${m.as !== null ? `<span class="bm-score">${m.as}</span>` : ''}
+        </div>
+      </div>`;
+    }
+
+    renderTimeNav();
+    renderSchedule('today');
+  </script>
+</body>
+</html>
