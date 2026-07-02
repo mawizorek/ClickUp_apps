@@ -1,85 +1,27 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr"><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https:; img-src data: blob: https:; font-src data: https:;">
-
-
-<!-- skill:chrome -->
-<style>
-/* Credit line — bottom-right */
-.design-ui-credit {
-  position: fixed;
-  bottom: 12px;
-  right: 12px;
-  font: 11px/1 system-ui, sans-serif;
-  color: rgba(128,128,128,0.5);
-  pointer-events: none;
-  z-index: 2147483647;
-  transition: opacity 0.4s ease;
-  user-select: none;
-  letter-spacing: 0.02em;
-}
-
-/* Hide chrome on touch devices */
-@media (hover: none) {
-  .design-ui-credit { display: none; }
-}
-
-/* Print fixes */
-@media print {
-  * {
-    transition: none !important;
-    animation: none !important;
-    box-shadow: none !important;
-  }
-  body {
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-  }
-  .design-ui-credit { display: none !important; }
-}
-
-</style>
-<script>
-(function () {
-    function markEditable() {
-        document.body.classList.add('artifact-editable');
-    }
-    function initChromeUI() {
-        if (!matchMedia('(hover: hover)').matches) return;
-        var credit = document.createElement('div');
-        credit.className = 'design-ui-credit';
-        credit.setAttribute('aria-hidden', 'true');
-        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
-        document.body.appendChild(credit);
-        var timer = null;
-        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
-        fade(true);
-        var show = function () {
-            fade(false);
-            clearTimeout(timer);
-            timer = setTimeout(function () { fade(true); }, 3000);
-        };
-        document.addEventListener('mousemove', show);
-        show();
-    }
-    function init() {
-        markEditable();
-        initChromeUI();
-    }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-})();
-</script>
-<!-- /skill:chrome -->
+<html lang="en-US" dir="ltr">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="github-folder" content="file-chunker">
 <title>File Chunker for AI Review</title>
-<!-- FILE CHUNKER v17 PLACEHOLDER-SENTINEL: full source follows below in the ClickUp artifact; see ship notes. -->
+<style>
+  :root{--bg:oklch(97% 0.005 260);--fg:oklch(18% 0.01 260);--muted:oklch(45% 0.01 260);--accent:oklch(50% 0.18 260);--card:oklch(99% 0.003 260);--border:oklch(88% 0.008 260)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;line-height:1.55}
+  main{max-width:56ch;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:40px 36px}
+  h1{font-size:1.4rem;letter-spacing:-0.02em;margin-bottom:12px}
+  p{color:var(--muted);font-size:0.95rem;margin-bottom:14px}
+  code{font-family:'SF Mono','Fira Code',monospace;font-size:0.85em;background:oklch(94% 0.006 260);padding:2px 6px;border-radius:5px;color:var(--fg)}
+  .tag{display:inline-block;font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);border:1px solid oklch(85% 0.06 260);background:oklch(92% 0.04 260);padding:3px 10px;border-radius:999px;margin-bottom:18px}
+</style>
 </head>
 <body>
-<p>placeholder</p>
+<main>
+  <span class="tag">Holding page</span>
+  <h1>File Chunker for AI Review</h1>
+  <p>This page is a temporary placeholder. The canonical <strong>v17</strong> build is being published to <code>file-chunker/index.html</code> shortly.</p>
+  <p>Once the upload lands, this page becomes the full self-contained app. See the ClickUp APPS task for the live artifact and ship notes.</p>
+</main>
 </body>
 </html>
