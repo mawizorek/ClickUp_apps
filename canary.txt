@@ -1,0 +1,7 @@
+PATCH_PENELOPE_CANARY_TXT_01
+Repo: mawizorek/ClickUp_apps
+Path: canary.txt
+Purpose: verify that Patch Penelope can read literal file body text from the repository.
+Created: 2026-07-02 01:50 America/New_York
+Unique marker: CANARY_READ_TEST_20260702_0150
+If you can quote this exact line, the repo body-read path is working.
