@@ -1,0 +1,341 @@
+<!-- INFRASTRUCTURE: self-contained repo index (no external data file) -->
+<!-- Reads live from GitHub API on every load -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClickUp Apps</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(10% 0.012 250);
+      --surface-1: oklch(16% 0.01 250);
+      --surface-2: oklch(21% 0.008 250);
+      --text: oklch(94% 0.006 250);
+      --text-mid: oklch(78% 0.008 250);
+      --text-muted: oklch(62% 0.01 250);
+      --text-dim: oklch(48% 0.008 250);
+      --accent: oklch(75% 0.18 155);
+      --accent-surface: oklch(20% 0.05 155);
+      --green: oklch(72% 0.16 155);
+      --red: oklch(65% 0.18 25);
+      --gold: oklch(80% 0.14 85);
+      --border: oklch(28% 0.006 250);
+      --border-light: oklch(32% 0.005 250);
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100svh;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: 'tnum';
+    }
+
+    header {
+      padding: 32px 20px 24px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      padding: 0 20px 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .stat {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat .num {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat .label {
+      font-size: 0.5625rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+    }
+
+    .apps-list {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .app-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 200ms var(--ease-out);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .app-card:hover {
+      border-color: var(--border-light);
+    }
+
+    .app-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .health-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .health-dot.live { background: var(--green); box-shadow: 0 0 6px oklch(72% 0.16 155 / 0.4); }
+    .health-dot.dead { background: var(--red); }
+    .health-dot.checking { background: var(--text-dim); animation: blink 1.5s infinite; }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .app-name {
+      font-size: 0.875rem;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .app-badges {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      font-size: 0.5625rem;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .badge.data { color: var(--accent); background: var(--accent-surface); border: 1px solid oklch(30% 0.06 155); }
+    .badge.size { color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border); }
+
+    .app-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+    }
+
+    .meta-item strong {
+      color: var(--text-mid);
+    }
+
+    .commit-msg {
+      font-size: 0.6875rem;
+      color: var(--text-dim);
+      font-style: italic;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    @media (min-width: 640px) {
+      header { padding: 48px 20px 32px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ClickUp Apps</h1>
+    <p>Live index of mawizorek/ClickUp_apps. Health, recency, and commit info pulled from GitHub on every load.</p>
+  </header>
+  <div class="stats-row" id="statsRow">
+    <div class="stat"><div class="num" id="appCount">-</div><div class="label">Apps</div></div>
+    <div class="stat"><div class="num" id="healthyCount">-</div><div class="label">Healthy</div></div>
+    <div class="stat"><div class="num" id="recentCount">-</div><div class="label">Updated (7d)</div></div>
+  </div>
+  <div class="apps-list" id="appsList">
+    <div class="loading">Loading apps from GitHub...</div>
+  </div>
+
+  <script>
+    const OWNER = 'mawizorek';
+    const REPO = 'ClickUp_apps';
+    const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
+    const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
+    const EXCLUDED = ['template-app', '.nojekyll', 'README.md', 'canary.txt'];
+
+    async function init() {
+      try {
+        // Get repo tree
+        const treeRes = await fetch(`${API_BASE}/contents/`);
+        const items = await treeRes.json();
+        const appFolders = items.filter(i => i.type === 'dir' && !EXCLUDED.includes(i.name));
+
+        // Get recent commits for recency
+        const commitsRes = await fetch(`${API_BASE}/commits?per_page=100`);
+        const commits = await commitsRes.json();
+
+        // Build app data
+        const apps = await Promise.all(appFolders.map(folder => buildAppData(folder, commits)));
+        apps.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+
+        renderApps(apps);
+        updateStats(apps);
+
+        // Health checks (async, update dots as results come in)
+        apps.forEach((app, i) => checkHealth(app, i));
+      } catch (e) {
+        document.getElementById('appsList').innerHTML = '<div class="loading">Could not reach GitHub API. Try refreshing.</div>';
+      }
+    }
+
+    async function buildAppData(folder, commits) {
+      const name = folder.name;
+      const pagesUrl = `${PAGES_BASE}/${name}/`;
+
+      // Find most recent commit touching this folder
+      const folderCommits = commits.filter(c =>
+        c.commit.message.toLowerCase().includes(name)
+      );
+      const lastCommit = folderCommits[0] || null;
+      const lastUpdated = lastCommit ? lastCommit.commit.author.date : null;
+      const lastMsg = lastCommit ? lastCommit.commit.message.split('\n')[0] : 'unknown';
+      const totalCommits = folderCommits.length;
+
+      // Check folder contents for data.json
+      let hasData = false;
+      let totalSize = 0;
+      try {
+        const contentsRes = await fetch(`${API_BASE}/contents/${name}`);
+        const contents = await contentsRes.json();
+        hasData = contents.some(f => f.name === 'data.json');
+        totalSize = contents.reduce((sum, f) => sum + (f.size || 0), 0);
+      } catch (e) {}
+
+      return { name, pagesUrl, lastUpdated, lastMsg, totalCommits, hasData, totalSize };
+    }
+
+    function renderApps(apps) {
+      const container = document.getElementById('appsList');
+      container.innerHTML = apps.map((app, i) => {
+        const timeStr = app.lastUpdated ? formatTime(app.lastUpdated) : 'unknown';
+        const sizeStr = formatSize(app.totalSize);
+        const displayName = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+        return `<a class="app-card" href="${app.pagesUrl}" target="_blank" rel="noopener">
+          <div class="app-top">
+            <div class="health-dot checking" id="health-${i}"></div>
+            <span class="app-name">${displayName}</span>
+            <div class="app-badges">
+              ${app.hasData ? '<span class="badge data">data.json</span>' : ''}
+              <span class="badge size">${sizeStr}</span>
+            </div>
+          </div>
+          <div class="app-meta">
+            <span class="meta-item"><strong>${timeStr}</strong></span>
+            <span class="meta-item">${app.totalCommits} commit${app.totalCommits !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="commit-msg">${escHtml(app.lastMsg)}</div>
+        </a>`;
+      }).join('');
+    }
+
+    async function checkHealth(app, idx) {
+      const dot = document.getElementById(`health-${idx}`);
+      try {
+        const res = await fetch(app.pagesUrl, { method: 'HEAD', mode: 'no-cors' });
+        // no-cors always returns opaque, so if it doesn't throw, assume live
+        dot.className = 'health-dot live';
+      } catch (e) {
+        dot.className = 'health-dot dead';
+      }
+    }
+
+    function updateStats(apps) {
+      document.getElementById('appCount').textContent = apps.length;
+      // Healthy count updates async, start with all as pending
+      document.getElementById('healthyCount').textContent = apps.length;
+      const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
+      const recent = apps.filter(a => a.lastUpdated && new Date(a.lastUpdated) > sevenDaysAgo).length;
+      document.getElementById('recentCount').textContent = recent;
+    }
+
+    function formatTime(isoStr) {
+      const d = new Date(isoStr);
+      const now = new Date();
+      const diffMs = now - d;
+      const diffHrs = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffHrs < 1) return 'just now';
+      if (diffHrs < 24) return `${diffHrs}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return `${bytes}B`;
+      if (bytes < 1048576) return `${Math.round(bytes / 1024)}KB`;
+      return `${(bytes / 1048576).toFixed(1)}MB`;
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    init();
+  </script>
+</body>
+</html>
