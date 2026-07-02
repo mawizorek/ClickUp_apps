@@ -2,13 +2,13 @@
 
 ### ▶︎ [**Launch the app →**](https://mawizorek.github.io/ClickUp_apps/template-app/)
 
-[![Launch](https://img.shields.io/badge/▶%20Launch%20Apps%20Index-Open%20in%20browser-1d4ed8?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/template-app/)
+[![Launch](https://img.shields.io/badge/▶%20Launch%20Apps%20Index-Open%20in%20browser-ff8000?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/template-app/)
 
 > Opens the live app in your default browser (GitHub Pages). Nothing uploads; all processing is local.
 >
 > GitHub renders README markdown statically, so the app can't run *inside* this page — the launch link is the supported "docs → running app" path.
 
-**Status:** Shipped v2 · **Live:** https://mawizorek.github.io/ClickUp_apps/template-app/ · **Source of truth:** [`index.html`](./index.html) on `main` (commit history = version history)
+**Status:** Shipped v3 · **Live:** https://mawizorek.github.io/ClickUp_apps/template-app/ · **Source of truth:** [`index.html`](./index.html) on `main` (commit history = version history)
 
 ---
 
@@ -18,7 +18,7 @@
 - Pulls the folder list from the GitHub API in real time, so new app folders appear automatically when they land on `main`.
 - Gives each app two shortcuts: the live GitHub Pages URL and the repo folder.
 - Acts as the reference retrofit for a **semantic source schema**: the runtime stays self-contained in `index.html`, while the editable source is split into small files under `source/`.
-- Proves theme isolation by moving the visual system into a single team-style source file and switching the current proof theme to an Oracle Red Bull Racing-inspired palette.
+- Proves theme isolation by keeping the visual system in a single team-style source file and restoring the current proof theme to a McLaren-inspired papaya palette.
 
 ---
 
@@ -28,7 +28,7 @@
 2. Browse the live card list and click **Open app** to jump straight to any app's GitHub Pages entry point.
 3. Click **Repo folder** on any card when you want the source folder instead of the live app.
 4. To start a new app from this template, copy the folder, rename it to your app slug, and then update the `source/` files first before regenerating `index.html`.
-5. To re-theme the template later (for example, back to McLaren), edit `source/03_theme_team.css.txt`, then re-inline it into `index.html`.
+5. To re-theme the template later, edit `source/03_theme_team.css.txt`, then re-inline it into `index.html`.
 
 ---
 
@@ -55,7 +55,7 @@ The live app still ships as a single self-contained `index.html`, so GitHub Page
 
 ### Theme isolation is intentional
 
-The current proof theme is Oracle Red Bull Racing-inspired, but the team identity now lives primarily in **one source file**: `source/03_theme_team.css.txt`. That means a future switch back to McLaren (or any other team) should mostly be a single-file CSS edit plus a regenerated inline bundle.
+The current proof theme is McLaren-inspired, and the team identity lives primarily in **one source file**: `source/03_theme_team.css.txt`. That means a future switch to another team should mostly be a single-file CSS edit plus a regenerated inline bundle.
 
 ### Live, unhardcoded app list
 
@@ -71,6 +71,7 @@ The app calls `https://api.github.com/repos/mawizorek/ClickUp_apps/contents?ref=
 
 Commit history on `main` is the authoritative changelog. Highlights:
 
+- **v3** — restored the McLaren papaya theme while preserving the semantic source schema and runtime behavior.
 - **v2** — semantic `source/` schema proof + isolated team theme + improved runtime UI for the live apps index.
 - **v1** — initial lightweight live GitHub-API-driven apps index scaffold.
 

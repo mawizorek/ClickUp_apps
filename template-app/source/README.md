@@ -9,7 +9,7 @@ The shipped runtime still lives in `../index.html`, but the working source is sp
 - `source_index.md` — composition order, size guardrails, and rebuild notes
 - `01_structure.html` — canonical shell/layout with insertion markers
 - `02_base.css.txt` — shared layout + component styling
-- `03_theme_team.css.txt` — the team-specific visual system (current proof = Red Bull)
+- `03_theme_team.css.txt` — the team-specific visual system (current proof = McLaren)
 - `04_app.js` — runtime behavior (GitHub API fetch, caching, rendering)
 
 ## Why this exists
