@@ -10,24 +10,24 @@
   <style>
     :root {
       --bg: oklch(10% 0.012 250);
-      --surface-1: oklch(15% 0.01 250);
-      --surface-2: oklch(19% 0.008 250);
-      --surface-3: oklch(23% 0.006 250);
-      --text: oklch(92% 0.008 250);
-      --text-mid: oklch(72% 0.01 250);
-      --text-muted: oklch(55% 0.012 250);
-      --text-dim: oklch(40% 0.008 250);
-      --accent: oklch(72% 0.17 155);
-      --accent-surface: oklch(18% 0.04 155);
-      --live: oklch(68% 0.2 25);
-      --live-surface: oklch(18% 0.05 25);
-      --gold: oklch(80% 0.14 85);
-      --gold-surface: oklch(18% 0.04 85);
-      --winner-bg: oklch(16% 0.025 155);
-      --loser-text: oklch(38% 0.008 250);
-      --border: oklch(22% 0.006 250);
-      --border-light: oklch(26% 0.005 250);
-      --connector: oklch(30% 0.01 250);
+      --surface-1: oklch(16% 0.01 250);
+      --surface-2: oklch(21% 0.008 250);
+      --surface-3: oklch(26% 0.006 250);
+      --text: oklch(94% 0.006 250);
+      --text-mid: oklch(78% 0.008 250);
+      --text-muted: oklch(62% 0.01 250);
+      --text-dim: oklch(48% 0.008 250);
+      --accent: oklch(75% 0.18 155);
+      --accent-surface: oklch(20% 0.05 155);
+      --live: oklch(70% 0.22 25);
+      --live-surface: oklch(20% 0.06 25);
+      --gold: oklch(82% 0.15 85);
+      --gold-surface: oklch(20% 0.05 85);
+      --winner-bg: oklch(18% 0.03 155);
+      --loser-text: oklch(42% 0.008 250);
+      --border: oklch(28% 0.006 250);
+      --border-light: oklch(32% 0.005 250);
+      --connector: oklch(35% 0.01 250);
       --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
@@ -66,16 +66,16 @@
 
     .view-toggle {
       display: flex;
-      background: var(--surface-1);
-      border: 1px solid var(--border);
+      background: var(--surface-2);
+      border: 1px solid var(--border-light);
       border-radius: 8px;
       overflow: hidden;
     }
 
     .view-btn {
-      padding: 7px 14px;
-      font-size: 0.6875rem;
-      font-weight: 600;
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
       color: var(--text-muted);
       background: none;
       border: none;
@@ -86,6 +86,8 @@
     .view-btn.active {
       background: var(--accent-surface);
       color: var(--accent);
+      border: 1px solid oklch(35% 0.08 155);
+      border-radius: 6px;
     }
 
     .schedule-view, .bracket-view {
@@ -100,33 +102,39 @@
       overflow-x: auto;
       scrollbar-width: none;
       padding: 0 16px 12px;
-      gap: 4px;
+      gap: 6px;
     }
     .time-nav::-webkit-scrollbar { display: none; }
 
     .time-btn {
       flex-shrink: 0;
-      padding: 7px 12px;
-      font-size: 0.6875rem;
+      padding: 8px 14px;
+      font-size: 0.75rem;
       font-weight: 600;
       color: var(--text-muted);
-      background: none;
-      border: 1px solid transparent;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
       border-radius: 6px;
       cursor: pointer;
       transition: all 150ms var(--ease-out);
       white-space: nowrap;
     }
 
+    .time-btn:hover {
+      border-color: var(--border-light);
+      color: var(--text-mid);
+    }
+
     .time-btn.active {
-      background: var(--surface-2);
-      border-color: var(--border);
+      background: var(--surface-3);
+      border-color: var(--text-muted);
       color: var(--text);
+      font-weight: 700;
     }
 
     .time-btn .ct {
       color: var(--text-dim);
-      margin-left: 3px;
+      margin-left: 4px;
     }
 
     .schedule-content {
@@ -152,16 +160,17 @@
 
     .day-label .relative {
       font-size: 0.6875rem;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--accent);
       background: var(--accent-surface);
-      padding: 2px 7px;
+      padding: 3px 8px;
       border-radius: 4px;
+      border: 1px solid oklch(30% 0.06 155);
     }
 
     .day-label .round-tag {
-      font-size: 0.6rem;
-      font-weight: 600;
+      font-size: 0.625rem;
+      font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--text-dim);
@@ -183,7 +192,7 @@
 
     .match.is-live {
       border-color: var(--live);
-      box-shadow: 0 0 16px oklch(50% 0.12 25 / 0.12);
+      box-shadow: 0 0 16px oklch(50% 0.12 25 / 0.15);
     }
 
     .match-top {
@@ -192,28 +201,29 @@
       justify-content: space-between;
       padding: 7px 10px;
       background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
     }
 
     .match-top .info {
-      font-size: 0.625rem;
+      font-size: 0.6875rem;
       font-weight: 500;
       color: var(--text-muted);
     }
 
     .match-top .badge {
-      font-size: 0.5625rem;
+      font-size: 0.625rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 3px 8px;
+      border-radius: 4px;
     }
 
-    .badge.ft { color: var(--accent); background: var(--accent-surface); }
-    .badge.aet { color: var(--gold); background: var(--gold-surface); }
-    .badge.pso { color: var(--gold); background: var(--gold-surface); }
-    .badge.live { color: var(--live); background: var(--live-surface); animation: pulse 2s infinite; }
-    .badge.upcoming { color: var(--text-dim); background: var(--surface-3); }
+    .badge.ft { color: var(--accent); background: var(--accent-surface); border: 1px solid oklch(30% 0.06 155); }
+    .badge.aet { color: var(--gold); background: var(--gold-surface); border: 1px solid oklch(30% 0.06 85); }
+    .badge.pso { color: var(--gold); background: var(--gold-surface); border: 1px solid oklch(30% 0.06 85); }
+    .badge.live { color: var(--live); background: var(--live-surface); border: 1px solid oklch(30% 0.08 25); animation: pulse 2s infinite; }
+    .badge.upcoming { color: var(--text-mid); background: var(--surface-3); border: 1px solid var(--border-light); }
 
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
 
@@ -238,7 +248,7 @@
 
     .t-code {
       width: 28px;
-      font-size: 0.5625rem;
+      font-size: 0.625rem;
       font-weight: 700;
       color: var(--text-muted);
       letter-spacing: 0.02em;
@@ -300,11 +310,11 @@
     }
 
     .bracket-round-label {
-      font-size: 0.5625rem;
+      font-size: 0.625rem;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--text-dim);
+      color: var(--text-muted);
       text-align: center;
       padding: 6px 0 8px;
       position: sticky;
@@ -321,14 +331,14 @@
     }
 
     .bracket-match.completed { border-color: var(--border-light); }
-    .bracket-match.is-final { border-color: var(--gold); }
+    .bracket-match.is-final { border-color: var(--gold); box-shadow: 0 0 8px oklch(70% 0.1 85 / 0.1); }
 
     .bm-team {
       display: flex;
       align-items: center;
       padding: 5px 8px;
       gap: 6px;
-      border-bottom: 1px solid oklch(20% 0.005 250);
+      border-bottom: 1px solid oklch(24% 0.005 250);
     }
 
     .bm-team:last-child { border-bottom: none; }
@@ -337,7 +347,7 @@
     .bm-team.l .bm-name { color: var(--loser-text); }
 
     .bm-code {
-      font-size: 0.5rem;
+      font-size: 0.5625rem;
       font-weight: 700;
       color: var(--text-dim);
       width: 22px;
@@ -363,7 +373,7 @@
     .bm-team.l .bm-score { color: var(--loser-text); }
 
     .bm-status {
-      font-size: 0.5rem;
+      font-size: 0.5625rem;
       font-weight: 700;
       text-align: center;
       padding: 2px;
@@ -430,14 +440,6 @@
       font-size: 0.875rem;
     }
 
-    .data-note {
-      text-align: center;
-      padding: 4px;
-      font-size: 0.5625rem;
-      color: var(--text-dim);
-      background: var(--surface-2);
-    }
-
     @media (min-width: 640px) {
       .schedule-content { max-width: 480px; margin: 0 auto; }
       .bracket-round { min-width: 150px; }
@@ -469,13 +471,12 @@
   </div>
 
   <script>
-    const APP_VERSION = 'v1.1';
+    const APP_VERSION = 'v1.2';
     const DATA_URL = './data.json';
     const CACHE_KEY = 'world-cup-bracket-data';
 
     let allMatches = [];
 
-    // Data loading: fetch data.json, cache in localStorage, fallback to cache
     async function loadData() {
       try {
         const res = await fetch(DATA_URL);
@@ -484,7 +485,6 @@
         localStorage.setItem(CACHE_KEY, JSON.stringify(json));
         return json;
       } catch (e) {
-        // Fallback to cache
         const cached = localStorage.getItem(CACHE_KEY);
         if (cached) return JSON.parse(cached);
         return null;
@@ -516,7 +516,6 @@
 
     const isComplete = (m) => ['ft','aet','pso'].includes(m.status);
 
-    // Determine today's date string for filtering
     const today = new Date().toISOString().slice(0, 10);
 
     const periods = [
