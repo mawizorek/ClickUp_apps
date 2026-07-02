@@ -2,63 +2,72 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClickUp Apps Index</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0d">
+<title>ClickUp Apps</title>
 <style>
 :root {
-  --bg: #0b0b0d; --bg2: #131317; --surface: #17171c; --surface2: #1d1d23;
-  --text: #f4f4f6; --muted: #9a9aa5; --papaya: #ff8000; --papaya-soft: #ff9d3c;
-  --blue: #47c7f5; --border: #2a2a31; --radius: 12px;
+  --bg: #0b0b0d; --surface: #161619; --surface-hi: #1e1e23;
+  --text: #f5f5f7; --muted: #8f8f99; --papaya: #ff8000; --papaya-hi: #ffa23c;
+  --blue: #4cc9f0; --border: #2b2b32; --radius: 14px;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
 body {
-  font-family: -apple-system, system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   background:
-    radial-gradient(900px 500px at 100% -10%, rgba(255,128,0,.18), transparent 60%),
-    radial-gradient(700px 400px at -10% 110%, rgba(71,199,245,.10), transparent 55%),
-    linear-gradient(180deg, var(--bg2), var(--bg));
+    radial-gradient(120% 60% at 100% 0%, rgba(255,128,0,.16), transparent 60%),
+    var(--bg);
   background-attachment: fixed;
-  color: var(--text); min-height: 100vh; padding: 2.25rem 1rem;
+  color: var(--text); min-height: 100vh;
+  padding: max(1.5rem, env(safe-area-inset-top)) 1.15rem calc(2rem + env(safe-area-inset-bottom));
 }
-.container { max-width: 720px; margin: 0 auto; }
-.brandbar { height: 4px; width: 100%; border-radius: 4px; margin-bottom: 1.5rem;
-  background: linear-gradient(90deg, var(--papaya) 0%, var(--papaya-soft) 55%, #2a2a31 55%, #2a2a31 100%); }
-h1 { font-size: 1.65rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .3rem;
-  display: flex; align-items: center; gap: .55rem; }
-h1 .chevrons { color: var(--papaya); font-weight: 900; letter-spacing: -.12em; }
-.subtitle { color: var(--muted); font-size: .85rem; margin-bottom: 1.75rem; }
-.subtitle a { color: var(--papaya-soft); text-decoration: none; }
-.subtitle a:hover { text-decoration: underline; }
-.grid { display: flex; flex-direction: column; gap: .8rem; }
+.wrap { max-width: 640px; margin: 0 auto; }
+.bar { height: 4px; border-radius: 4px; margin-bottom: 1.4rem;
+  background: linear-gradient(90deg, var(--papaya), var(--papaya-hi) 45%, transparent 45%),
+              linear-gradient(90deg, var(--border), var(--border)); }
+h1 { font-size: clamp(1.5rem, 6vw, 1.9rem); font-weight: 800; letter-spacing: -.02em;
+  line-height: 1.1; margin-bottom: .35rem; }
+h1 .mk { color: var(--papaya); }
+.sub { color: var(--muted); font-size: .85rem; line-height: 1.4; margin-bottom: 1.6rem; }
+.sub a { color: var(--papaya-hi); text-decoration: none; }
+.grid { display: flex; flex-direction: column; gap: .7rem; }
 .card {
-  position: relative; background: linear-gradient(180deg, var(--surface2), var(--surface));
-  border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 1.05rem 1.3rem; display: flex; align-items: center; justify-content: space-between;
-  text-decoration: none; color: inherit; overflow: hidden;
-  transition: border-color .18s, box-shadow .18s, transform .18s;
+  position: relative; display: flex; align-items: center; gap: .9rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem 1.15rem; min-height: 62px;
+  transition: border-color .18s, background .18s, transform .12s;
 }
-.card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-  background: var(--papaya); opacity: .55; transition: opacity .18s, width .18s; }
-.card:hover { border-color: var(--papaya); transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(255,128,0,.18); }
-.card:hover::before { opacity: 1; width: 5px; }
-.card-left { display: flex; flex-direction: column; gap: 3px; padding-left: .35rem; }
-.card-name { font-weight: 700; font-size: 1rem; }
-.card-meta { font-size: .74rem; color: var(--muted); }
-.card-meta a { color: var(--blue); text-decoration: none; }
-.card-arrow { font-size: 1.25rem; color: var(--papaya); font-weight: 800; }
-.loading { text-align: center; padding: 2rem; color: var(--muted); font-size: .9rem; }
-.error { color: #ff6b6b; }
-footer { margin-top: 2.25rem; font-size: .72rem; color: var(--muted); text-align: center; }
-footer a { color: var(--papaya-soft); text-decoration: none; }
+.card::before { content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px;
+  border-radius: 3px; background: var(--papaya); }
+.card:active { transform: scale(.985); background: var(--surface-hi); }
+@media (hover: hover) {
+  .card:hover { border-color: var(--papaya); background: var(--surface-hi); }
+}
+/* stretched link: whole card is tappable, no nested anchors */
+.card .go { position: absolute; inset: 0; z-index: 1; border-radius: var(--radius); }
+.info { flex: 1; min-width: 0; padding-left: .3rem; }
+.name { font-weight: 700; font-size: 1rem; letter-spacing: -.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meta { font-size: .76rem; color: var(--muted); margin-top: 2px; }
+.repo { position: relative; z-index: 2; color: var(--blue); text-decoration: none;
+  font-size: .76rem; padding: .35rem .6rem; border: 1px solid var(--border);
+  border-radius: 8px; white-space: nowrap; flex-shrink: 0; }
+.repo:active { background: var(--surface-hi); }
+.arrow { position: relative; z-index: 0; color: var(--papaya); font-size: 1.3rem;
+  font-weight: 800; flex-shrink: 0; }
+.state { text-align: center; padding: 2.5rem 1rem; color: var(--muted); font-size: .9rem; }
+.state.err { color: #ff6b6b; }
+footer { margin-top: 2rem; font-size: .72rem; color: var(--muted); text-align: center; }
+footer a { color: var(--papaya-hi); text-decoration: none; }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="brandbar"></div>
-  <h1><span class="chevrons">&gt;&gt;</span> ClickUp Apps</h1>
-  <p class="subtitle">Live index of <a href="https://github.com/mawizorek/ClickUp_apps">mawizorek/ClickUp_apps</a></p>
-  <div class="grid" id="grid"><div class="loading">Loading apps…</div></div>
+<div class="wrap">
+  <div class="bar"></div>
+  <h1><span class="mk">&gt;&gt;</span> ClickUp Apps</h1>
+  <p class="sub">Live index of <a href="https://github.com/mawizorek/ClickUp_apps">mawizorek/ClickUp_apps</a></p>
+  <div class="grid" id="grid"><div class="state">Loading apps…</div></div>
   <footer>Auto-generated from the GitHub API · <a href="https://github.com/mawizorek/ClickUp_apps">repo</a></footer>
 </div>
 <script>
@@ -67,6 +76,8 @@ const REPO = 'ClickUp_apps';
 const PAGES = `https://${OWNER}.github.io/${REPO}`;
 const SKIP = new Set(['template-app', '.github']);
 
+function esc(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
 async function load() {
   const grid = document.getElementById('grid');
   try {
@@ -74,21 +85,24 @@ async function load() {
     if (!res.ok) throw new Error(`GitHub API ${res.status}`);
     const items = await res.json();
     const apps = items.filter(i => i.type === 'dir' && !SKIP.has(i.name)).sort((a, b) => a.name.localeCompare(b.name));
-    if (!apps.length) { grid.innerHTML = '<div class="loading">No app folders found.</div>'; return; }
+    if (!apps.length) { grid.innerHTML = '<div class="state">No app folders found.</div>'; return; }
     grid.innerHTML = apps.map(app => {
-      const name = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      const pagesUrl = `${PAGES}/${app.name}/`;
-      const repoUrl = `https://github.com/${OWNER}/${REPO}/tree/main/${app.name}`;
-      return `<a class="card" href="${pagesUrl}">
-        <span class="card-left">
-          <span class="card-name">${name}</span>
-          <span class="card-meta">${app.name}/ · <a href="${repoUrl}" onclick="event.stopPropagation()">repo</a></span>
+      const slug = esc(app.name);
+      const name = esc(app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()));
+      const pagesUrl = `${PAGES}/${slug}/`;
+      const repoUrl = `https://github.com/${OWNER}/${REPO}/tree/main/${slug}`;
+      return `<div class="card">
+        <a class="go" href="${pagesUrl}" aria-label="Open ${name}"></a>
+        <span class="info">
+          <span class="name">${name}</span>
+          <span class="meta">${slug}/</span>
         </span>
-        <span class="card-arrow">→</span>
-      </a>`;
+        <a class="repo" href="${repoUrl}">repo</a>
+        <span class="arrow">→</span>
+      </div>`;
     }).join('');
   } catch (e) {
-    grid.innerHTML = `<div class="loading error">Failed to load: ${e.message}</div>`;
+    grid.innerHTML = `<div class="state err">Failed to load: ${esc(e.message)}</div>`;
   }
 }
 load();
