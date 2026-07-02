@@ -6,33 +6,60 @@
 <title>ClickUp Apps Index</title>
 <style>
 :root {
-  --bg: #f8f9fa; --surface: #fff; --text: #1a1a2e; --muted: #6c757d;
-  --accent: #4361ee; --border: #e9ecef; --radius: 10px;
+  --bg: #0b0b0d; --bg2: #131317; --surface: #17171c; --surface2: #1d1d23;
+  --text: #f4f4f6; --muted: #9a9aa5; --papaya: #ff8000; --papaya-soft: #ff9d3c;
+  --blue: #47c7f5; --border: #2a2a31; --radius: 12px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+body {
+  font-family: -apple-system, system-ui, sans-serif;
+  background:
+    radial-gradient(900px 500px at 100% -10%, rgba(255,128,0,.18), transparent 60%),
+    radial-gradient(700px 400px at -10% 110%, rgba(71,199,245,.10), transparent 55%),
+    linear-gradient(180deg, var(--bg2), var(--bg));
+  background-attachment: fixed;
+  color: var(--text); min-height: 100vh; padding: 2.25rem 1rem;
+}
 .container { max-width: 720px; margin: 0 auto; }
-h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: .25rem; }
-.subtitle { color: var(--muted); font-size: .85rem; margin-bottom: 1.5rem; }
-.grid { display: flex; flex-direction: column; gap: .75rem; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; transition: border-color .15s, box-shadow .15s; }
-.card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(67,97,238,.12); }
-.card-left { display: flex; flex-direction: column; gap: 2px; }
-.card-name { font-weight: 600; font-size: .95rem; }
-.card-meta { font-size: .75rem; color: var(--muted); }
-.card-arrow { font-size: 1.1rem; color: var(--muted); }
+.brandbar { height: 4px; width: 100%; border-radius: 4px; margin-bottom: 1.5rem;
+  background: linear-gradient(90deg, var(--papaya) 0%, var(--papaya-soft) 55%, #2a2a31 55%, #2a2a31 100%); }
+h1 { font-size: 1.65rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .3rem;
+  display: flex; align-items: center; gap: .55rem; }
+h1 .chevrons { color: var(--papaya); font-weight: 900; letter-spacing: -.12em; }
+.subtitle { color: var(--muted); font-size: .85rem; margin-bottom: 1.75rem; }
+.subtitle a { color: var(--papaya-soft); text-decoration: none; }
+.subtitle a:hover { text-decoration: underline; }
+.grid { display: flex; flex-direction: column; gap: .8rem; }
+.card {
+  position: relative; background: linear-gradient(180deg, var(--surface2), var(--surface));
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.05rem 1.3rem; display: flex; align-items: center; justify-content: space-between;
+  text-decoration: none; color: inherit; overflow: hidden;
+  transition: border-color .18s, box-shadow .18s, transform .18s;
+}
+.card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--papaya); opacity: .55; transition: opacity .18s, width .18s; }
+.card:hover { border-color: var(--papaya); transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(255,128,0,.18); }
+.card:hover::before { opacity: 1; width: 5px; }
+.card-left { display: flex; flex-direction: column; gap: 3px; padding-left: .35rem; }
+.card-name { font-weight: 700; font-size: 1rem; }
+.card-meta { font-size: .74rem; color: var(--muted); }
+.card-meta a { color: var(--blue); text-decoration: none; }
+.card-arrow { font-size: 1.25rem; color: var(--papaya); font-weight: 800; }
 .loading { text-align: center; padding: 2rem; color: var(--muted); font-size: .9rem; }
-.error { color: #dc3545; }
-footer { margin-top: 2rem; font-size: .72rem; color: var(--muted); text-align: center; }
-footer a { color: var(--accent); text-decoration: none; }
+.error { color: #ff6b6b; }
+footer { margin-top: 2.25rem; font-size: .72rem; color: var(--muted); text-align: center; }
+footer a { color: var(--papaya-soft); text-decoration: none; }
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>📱 ClickUp Apps</h1>
-  <p class="subtitle">Live index of <a href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener">mawizorek/ClickUp_apps</a></p>
+  <div class="brandbar"></div>
+  <h1><span class="chevrons">&gt;&gt;</span> ClickUp Apps</h1>
+  <p class="subtitle">Live index of <a href="https://github.com/mawizorek/ClickUp_apps">mawizorek/ClickUp_apps</a></p>
   <div class="grid" id="grid"><div class="loading">Loading apps…</div></div>
-  <footer>Auto-generated from the GitHub API · <a href="https://github.com/mawizorek/ClickUp_apps" target="_blank">repo</a></footer>
+  <footer>Auto-generated from the GitHub API · <a href="https://github.com/mawizorek/ClickUp_apps">repo</a></footer>
 </div>
 <script>
 const OWNER = 'mawizorek';
@@ -52,11 +79,11 @@ async function load() {
       const name = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
       const pagesUrl = `${PAGES}/${app.name}/`;
       const repoUrl = `https://github.com/${OWNER}/${REPO}/tree/main/${app.name}`;
-      return `<a class="card" href="${pagesUrl}" target="_blank" rel="noopener">
-        <div class="card-left">
+      return `<a class="card" href="${pagesUrl}">
+        <span class="card-left">
           <span class="card-name">${name}</span>
-          <span class="card-meta">${app.name}/ · <span onclick="event.preventDefault();event.stopPropagation();window.open('${repoUrl}','_blank')" style="cursor:pointer;text-decoration:underline;">repo</span></span>
-        </div>
+          <span class="card-meta">${app.name}/ · <a href="${repoUrl}" onclick="event.stopPropagation()">repo</a></span>
+        </span>
         <span class="card-arrow">→</span>
       </a>`;
     }).join('');
