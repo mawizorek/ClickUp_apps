@@ -1,28 +1,67 @@
-File Chunker Set
-Source: file-chunker-v16.2.html
-Original source file included: file-chunker-v16.2.html (unaltered, native format; renders directly if it is HTML)
-Chunk file extension: .txt
-Encoding: base64 (payload encoded; markers plain text; decode before verifying)
-Mode: self-navigating (hosted URLs)
-Base URL: https://mawizorek.github.io/ClickUp_apps/file-chunker/
-Chunks: 8
-Set UUID: 9d368754-21c3-4e3c-adc4-0ae41d51a366
-Markers: yes
-Chunk size (file target): 16.6 KB
-Split mode: smart
-Per-fetch read cap: ~30 KB
-Chunks over read cap: 0
-Completeness flag: clear (8 of max 8)
-Numbering: flat sequential (grouped/sectioned is a future option)
-App version: v16.2 (2026-07-01)
-Exported: 7/1/2026, 20:31:39
+# File Chunker for AI Review
 
-CONTENTS: this set contains the original source file (above), a .txt index, and every chunk. The original is the complete unaltered object; the chunks are for the gated AI walk.
+### ▶︎ [**Launch the app →**](https://mawizorek.github.io/ClickUp_apps/file-chunker/)
 
-SELF-NAVIGATING WORKFLOW:
-1. Host these chunk files at the base URL above, then hand file-chunker-v16.2_index.txt (or its URL) to a fresh agent. It is self-instructing: it carries the reading rules, the ordered manifest, and the set UUID.
-2. The agent reads the index, confirms it understands the rules, and stops.
-3. Say "proceed". The agent fetches ONE chunk from its URL, DECODES the base64 payload first, then verifies sequence + START/END UUID, confirms completeness in chat, then STOPS and waits.
-4. Say "proceed" again for the next chunk. One fetch per "proceed", never reading ahead.
-5. After the final chunk the agent ALWAYS pauses and waits for your explicit instructions. Reading every part is not permission to rebuild or act.
-DECODE NOTE: each chunk file has a plain-text "ENCODING: base64" line, then a base64 blob between the directive lines. Decode that blob (strip line breaks first) to recover the exact source bytes. A decode failure is treated exactly like a UUID mismatch: STOP and report.
+[![Launch](https://img.shields.io/badge/Launch-File_Chunker-blue?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/file-chunker/)
+
+**Status:** Shipped (v17) | **Source of truth:** this repo folder | **Live:** [GitHub Pages](https://mawizorek.github.io/ClickUp_apps/file-chunker/)
+
+---
+
+## What it does
+
+A single-file, offline HTML tool that splits a large file (HTML apps, scripts, transcripts, docs) into small, verifiable chunks an AI agent can read back reliably.
+
+Drop a file in, pick a chunk size/mode, and get a downloadable set: a self-instructing index + numbered chunk files + README, each chunk wrapped in tamper-evident markers so an agent can walk them one at a time without silently losing or corrupting content.
+
+**Why it exists:** a single long file read back through an agent silently truncates (~30KB per-fetch cap) and raw HTML/SVG gets tag-flattened on readback. Chunking + Base64 armor fixes both.
+
+---
+
+## How to use it
+
+1. Open the app (link above) or double-click the local `index.html`.
+2. Drop or select any file (HTML, scripts, transcripts, docs).
+3. Configure chunk size (default 22KB), split mode (smart/line/hard), and encoding (auto-arms Base64 on markup).
+4. Export: download a zip containing a self-instructing index, numbered chunks, README, report, and (optionally) the original source file.
+5. Hand the index to a fresh AI agent. It carries reading rules, manifest, and integrity UUIDs. The agent reads one chunk at a time, pausing for go-ahead.
+
+---
+
+## Architecture
+
+- **Single self-contained HTML file.** All CSS and JS inline. No backend, no uploads, no external dependencies beyond JSZip (CDN with offline fallback).
+- **Offline-first.** Works when double-clicked from a local filesystem.
+- **Two-layer UUID integrity:** each chunk carries its own START/END boundary UUID plus a shared set UUID for completeness checking.
+- **Base64 armor ("Encoded" mode):** base64-encodes each chunk's payload so raw HTML/SVG survives readback intact. Markers stay plain text outside the blob.
+- **Force-.txt toggle (default ON):** all chunks export as .txt regardless of source type, preventing OS rendering on open.
+- **Smart split:** respects function/class/section boundaries; falls back to line-break split when structure isn't detected.
+- **Config system:** app-level settings (GitHub folder, version, repo URL) stored in meta tags and a config object for export naming and linking.
+
+---
+
+## Version history
+
+- **v17** — zip export restructure (single wrapper folder, report rename, source_index rename, download link), GitHub repo link in config
+- **v16.2** — two-file source download (html + txt twin), export naming/dating standard, source preservation
+- **v16** — gated one-chunk-at-a-time walk, mandatory final pause, set configs
+- **v15** — self-instructing index with integrity header, reading directives, set UUID
+- **v14** — Base64 armor transport encoding
+- **v9** — standing footer trio (copy source, prepare download, right-click save)
+
+---
+
+## Related
+
+- **ClickUp task:** File Chunker for AI Review (APPS list)
+- **Revision History doc:** linked from the ClickUp task
+- **Brain tool:** Chunked Document Review (AI Toolkit)
+- **Repo:** [mawizorek/ClickUp_apps/file-chunker](https://github.com/mawizorek/ClickUp_apps/tree/main/file-chunker)
+
+---
+
+## Roadmap
+
+- v18: live repo link on the HTML UI, zip structure cleanup (single wrapper folder for header docs), report rename to `v{version}-ChunkerReport.md`, source index rename to `source_index.html`
+- Sectioned/grouped chunk numbering
+- Multi-file batch input
