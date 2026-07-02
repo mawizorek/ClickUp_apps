@@ -1,0 +1,41 @@
+# File Chunker Index — file-chunker-v16.2.html
+
+You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- Set UUID: 9d368754-21c3-4e3c-adc4-0ae41d51a366
+- Source file: file-chunker-v16.2.html
+- Original source included in set: file-chunker-v16.2.html (unaltered, native format)
+- Chunk file extension: .txt
+- Encoding: base64 (each chunk payload is base64-encoded; markers stay plain text outside the blob)
+- Mode: SELF-NAVIGATING (chunks hosted; you fetch each URL yourself on "proceed")
+- Base URL: https://mawizorek.github.io/ClickUp_apps/file-chunker/
+- Total chunks: 8
+- Total bytes (source): 78,524
+- Generated: 7/1/2026, 20:31:39
+- App: File Chunker v16.2 (2026-07-01)
+- Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
+- Per-fetch read cap: ~30 KB. Chunks over cap: 0.
+
+## READING DIRECTIVE — agent: obey exactly. This is a GATED, ONE-CHUNK-AT-A-TIME walk.
+1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
+2. When the human says "proceed", fetch the NEXT chunk in the manifest order below from its listed URL. Fetch exactly ONE chunk per "proceed".
+3. For that chunk: DECODE the base64 payload FIRST (everything between the directive lines, after the "ENCODING: base64" line). THEN verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, decoded, uuid verified" in chat.
+4. After EACH chunk, STOP. Do NOT fetch, open, or read the next URL on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch the set. This pause between every chunk is mandatory.
+5. If a chunk fails to DECODE, or its start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. A decode failure is treated exactly like a UUID mismatch. Do NOT reconstruct or fill gaps from inference.
+6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
+7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
+
+## ORDERED MANIFEST (fetch in this exact order, one URL per "proceed")
+1/8 · file-chunker-v16.2_part1_of_8.txt · 16.5 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v16.2_part1_of_8.txt · uuid:a833703c-29df-4f9b-864e-8be6926eeb02
+2/8 · file-chunker-v16.2_part2_of_8.txt · 13.7 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v16.2_part2_of_8.txt · uuid:19f56de1-86a4-43cd-b3a1-c712c204e1df
+3/8 · file-chunker-v16.2_part3_of_8.txt · 16.6 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v16.2_part3_of_8.txt · uuid:9d95ff4b-1a41-4464-95c6-77590a98562e
+4/8 · file-chunker-v16.2_part4_of_8.txt · 15.7 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v16.2_part4_of_8.txt · uuid:75d4703c-b96f-46ca-842b-b592f8296ce5
+5/8 · file-chunker-v16.2_part5_of_8.txt · 15.8 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v16.2_part5_of_8.txt · uuid:8530a626-ccaf-4c81-addf-78bf844321c1
+6/8 · file-chunker-v16.2_part6_of_8.txt · 11.2 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v16.2_part6_of_8.txt · uuid:c880ee25-4398-4908-a242-e4daa53f976c
+7/8 · file-chunker-v16.2_part7_of_8.txt · 15.8 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v16.2_part7_of_8.txt · uuid:993f2a30-f3a8-444f-a630-45cb5341e674
+8/8 · file-chunker-v16.2_part8_of_8.txt · 4.8 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v16.2_part8_of_8.txt · uuid:d4a6ab00-f793-4939-a607-fb64b17c42c6
+
+## FOOTER
+- Set UUID: 9d368754-21c3-4e3c-adc4-0ae41d51a366 (must match header)
+- END OF INDEX
