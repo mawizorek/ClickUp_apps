@@ -74,7 +74,8 @@ footer a { color: var(--papaya-hi); text-decoration: none; }
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES = `https://${OWNER}.github.io/${REPO}`;
-const SKIP = new Set(['template-app', '.github']);
+// Hidden from the index: scaffold + retired/legacy folders.
+const SKIP = new Set(['template-app', '.github', 'budget-code-authority-builder-v5_2026-07-01-1110']);
 
 function esc(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
