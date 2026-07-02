@@ -1,41 +1,37 @@
 # <App Name>
 
 <!--
-  GOLD-STANDARD APP README TEMPLATE.
-  Copy this whole folder to start a new app. Replace <App Name>, <app-folder>,
-  and every placeholder below. The authoritative version of this standard lives
-  in Brain Reference → "Apps / HTML Artifacts" → New-App Documentation Standard.
-  If this template and that section ever drift, the reference doc wins.
+  TEMPLATE: Replace <App Name>, <app-slug>, and every placeholder below.
+  The authoritative standard lives in Brain Reference → "Apps / HTML Artifacts"
+  → New-App Documentation Standard. If this template drifts, that doc wins.
 
-  NON-NEGOTIABLE: the ▶︎ Launch block below stays at the very top of every app
+  NON-NEGOTIABLE: the Launch block below stays at the very top of every app
   README and points at the CURRENT live version. Overwrite its URL each release.
 -->
 
-### ▶︎ [**Launch the app →**](https://mawizorek.github.io/ClickUp_apps/<app-folder>/)
+### ▶︎ [**Launch the app →**](https://mawizorek.github.io/ClickUp_apps/<app-slug>/)
 
-[![Launch](https://img.shields.io/badge/▶%20Launch%20<App%20Name>-Open%20in%20browser-1ea7a7?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/<app-folder>/)
+[![Launch](https://img.shields.io/badge/Launch-Open_in_browser-1ea7a7?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/<app-slug>/)
 
 > Opens the live app in your default browser (GitHub Pages). Nothing uploads; all processing is local.
 > GitHub renders README markdown statically, so the app can't run *inside* this page — the launch link is the supported "docs → running app" path.
 
-**Status:** <e.g. Shipped v1> · **Live:** https://mawizorek.github.io/ClickUp_apps/<app-folder>/ · **Source of truth:** [`index.html`](./index.html) on `main` (commit history = version history)
-
-<One-paragraph summary: what it does, how you use it (drop in X, get Y), the key constraint — offline, client-side, no backend, etc.>
+**Status:** Shipped v1 · **Live:** https://mawizorek.github.io/ClickUp_apps/<app-slug>/ · **Source of truth:** [`index.html`](./index.html) on `main` (commit history = version history)
 
 ---
 
 ## What it does
 
-- <Bullet per capability. Include interaction details: click X to get Y.>
-- <Note any export/download behaviors.>
+- [Feature 1]
+- [Feature 2]
 
 ---
 
 ## How to use it
 
-1. **[Launch the app](https://mawizorek.github.io/ClickUp_apps/<app-folder>/)** (opens in your browser).
-2. <Step.>
-3. <Step.>
+1. **[Launch the app](https://mawizorek.github.io/ClickUp_apps/<app-slug>/)** (opens in your browser).
+2. [Step]
+3. [Step]
 
 ---
 
@@ -49,15 +45,7 @@ Single `index.html`, all CSS + JS inline. Works double-clicked from disk. `index
 
 ### Library stack
 
-<List any CDN libs and the exact job each does. Call out non-obvious choices and anything that FAILED so it isn't re-attempted. Note the first-run CDN caching caveat if libs are external.>
-
-### Downloads (if the app emits files)
-
-Real same-origin `blob:` `<a download>`. Build a Blob → `URL.createObjectURL` → real anchor with `download`. Desktop: fire once. iOS Safari top-level: long-press → "Download Linked File" → Files › Downloads; keep `-webkit-touch-callout: default`. NEVER synthetic `.click()` in sandbox, `data:` URIs, `navigator.share({files})`, `window.open`, or a cross-origin file link (saves a 135-byte `.url` shortcut). See Brain Reference → Apps / HTML Artifacts → Mobile File Export for the full locked pattern.
-
-### <Other decisions>
-
-<Data model, layout rules, reactivity choke points, anything future sessions shouldn't re-learn.>
+- [e.g. JSZip via CDN, no other deps]
 
 ---
 
@@ -65,7 +53,7 @@ Real same-origin `blob:` `<a download>`. Build a Blob → `URL.createObjectURL` 
 
 Commit history on `main` is the authoritative changelog. Highlights:
 
-- **v1** — <one-line summary of the initial build>.
+- **v1** — Initial release.
 
 ---
 
@@ -73,10 +61,10 @@ Commit history on `main` is the authoritative changelog. Highlights:
 
 - **ClickUp task (APPS list):** volatile next-build brief + Current Version / Artifact History fields only. No historical notes.
 - **Revision History doc:** append-only per-version working notes; page 1 is the locked goals/constraints source of truth.
-- **Brain tools:** <any associated Triggered Tools>.
+- **Brain tools:** [e.g. Chunked Document Review]
 
 ---
 
 ## Roadmap
 
-- <Planned features / known improvements.>
+- [Next planned feature]
