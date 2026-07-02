@@ -1,42 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>App Name — template</title>
-  <!--
-    GOLD-STANDARD SELF-CONTAINED APP SKELETON.
-    Rules (authoritative copy: Brain Reference -> Apps / HTML Artifacts):
-      - Single self-contained index.html. All CSS + JS inline. Offline-first.
-      - Only external deps allowed: pinned CDN libs (PDF.js, pdf-lib, JSZip, etc.).
-      - This file IS the app AND the folder's GitHub Pages entry point. Never chunk it.
-      - Downloads: real same-origin blob <a download>. No synthetic .click() in sandbox,
-        no data: URIs, no cross-origin file links. iOS: long-press -> Download Linked File.
-      - Keep the in-app version badge current; it is authoritative over commit messages.
-  -->
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html {
-      /* Tint neutrals toward the app's accent hue; never pure #000/#fff. */
-      --bg: oklch(0.16 0.012 275);
-      --text: oklch(0.95 0.008 275);
-      --accent: oklch(0.72 0.15 195);
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text); background: var(--bg);
-    }
-    body { min-height: 100vh; display: grid; place-items: center; padding: 2rem; text-align: center; }
-    h1 { font-size: 1.4rem; font-weight: 650; }
-    p { color: oklch(0.7 0.012 275); margin-top: 0.5rem; font-size: 0.9rem; }
-    .ver { color: var(--accent); font-weight: 600; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClickUp Apps Index</title>
+<style>
+:root {
+  --bg: #f8f9fa; --surface: #fff; --text: #1a1a2e; --muted: #6c757d;
+  --accent: #4361ee; --border: #e9ecef; --radius: 10px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+.container { max-width: 720px; margin: 0 auto; }
+h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: .25rem; }
+.subtitle { color: var(--muted); font-size: .85rem; margin-bottom: 1.5rem; }
+.grid { display: flex; flex-direction: column; gap: .75rem; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; transition: border-color .15s, box-shadow .15s; }
+.card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(67,97,238,.12); }
+.card-left { display: flex; flex-direction: column; gap: 2px; }
+.card-name { font-weight: 600; font-size: .95rem; }
+.card-meta { font-size: .75rem; color: var(--muted); }
+.card-arrow { font-size: 1.1rem; color: var(--muted); }
+.loading { text-align: center; padding: 2rem; color: var(--muted); font-size: .9rem; }
+.error { color: #dc3545; }
+footer { margin-top: 2rem; font-size: .72rem; color: var(--muted); text-align: center; }
+footer a { color: var(--accent); text-decoration: none; }
+</style>
 </head>
 <body>
-  <main>
-    <h1>App Name <span class="ver">v1</span></h1>
-    <p>Replace this skeleton with the app. All logic inline below.</p>
-  </main>
-  <script>
-    // App logic goes here. Keep everything inline and offline-first.
-  </script>
+<div class="container">
+  <h1>📱 ClickUp Apps</h1>
+  <p class="subtitle">Live index of <a href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener">mawizorek/ClickUp_apps</a></p>
+  <div class="grid" id="grid"><div class="loading">Loading apps…</div></div>
+  <footer>Auto-generated from the GitHub API · <a href="https://github.com/mawizorek/ClickUp_apps" target="_blank">repo</a></footer>
+</div>
+<script>
+const OWNER = 'mawizorek';
+const REPO = 'ClickUp_apps';
+const PAGES = `https://${OWNER}.github.io/${REPO}`;
+const SKIP = new Set(['template-app', '.github']);
+
+async function load() {
+  const grid = document.getElementById('grid');
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents?ref=main`);
+    if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+    const items = await res.json();
+    const apps = items.filter(i => i.type === 'dir' && !SKIP.has(i.name)).sort((a, b) => a.name.localeCompare(b.name));
+    if (!apps.length) { grid.innerHTML = '<div class="loading">No app folders found.</div>'; return; }
+    grid.innerHTML = apps.map(app => {
+      const name = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const pagesUrl = `${PAGES}/${app.name}/`;
+      const repoUrl = `https://github.com/${OWNER}/${REPO}/tree/main/${app.name}`;
+      return `<a class="card" href="${pagesUrl}" target="_blank" rel="noopener">
+        <div class="card-left">
+          <span class="card-name">${name}</span>
+          <span class="card-meta">${app.name}/ · <span onclick="event.preventDefault();event.stopPropagation();window.open('${repoUrl}','_blank')" style="cursor:pointer;text-decoration:underline;">repo</span></span>
+        </div>
+        <span class="card-arrow">→</span>
+      </a>`;
+    }).join('');
+  } catch (e) {
+    grid.innerHTML = `<div class="loading error">Failed to load: ${e.message}</div>`;
+  }
+}
+load();
+</script>
 </body>
 </html>
