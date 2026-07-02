@@ -1,11 +1,11 @@
-const APP_VERSION = 'v2';
+const APP_VERSION = 'v3';
 const APP_DATE = '2026-07-02';
-const TEAM_THEME = 'Oracle Red Bull Racing';
+const TEAM_THEME = 'McLaren';
 const REPO_OWNER = 'mawizorek';
 const REPO_NAME = 'ClickUp_apps';
 const REPO_BRANCH = 'main';
 const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents?ref=${REPO_BRANCH}`;
-const CACHE_KEY = 'clickup_apps_index_cache_v2';
+const CACHE_KEY = 'clickup_apps_index_cache_v3';
 const HIDDEN_FOLDERS = new Set(['.github']);
 const SPECIAL_WORDS = new Map([
   ['ai', 'AI'],
@@ -162,7 +162,7 @@ async function fetchAppsFromGitHub() {
 
 async function loadApps({ forceRefresh = false } = {}) {
   refreshButtonEl.disabled = true;
-  setStatus(forceRefresh ? 'Refreshing live app list…' : 'Connecting to the GitHub API…', 'loading');
+  setStatus(forceRefresh ? 'Refreshing live app list…' : `Connecting to the ${TEAM_THEME} template…`, 'loading');
 
   try {
     const apps = await fetchAppsFromGitHub();

@@ -27,4 +27,4 @@ This is the canonical composition order for the `template-app` proof build.
 
 `03_theme_team.css.txt` is the primary team-identity file.
 
-If the app needs to switch from Red Bull back to McLaren later, start there first. The goal is for most team-specific visual changes to live in that one file.
+It now holds the McLaren papaya theme. Future team swaps should start here first so the rest of the app stays structurally stable.
