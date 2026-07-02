@@ -1,0 +1,47 @@
+# File Chunker Index — file-chunker-v17.html
+
+You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- Set UUID: e3d6c535-1f48-49e6-bfa3-558c42acdd4c
+- Source file: file-chunker-v17.html
+- Original source included in set: file-chunker-v17.html (unaltered, native format)
+- Chunk file extension: .txt
+- Encoding: base64 (each chunk payload is base64-encoded; markers stay plain text outside the blob)
+- Mode: SELF-NAVIGATING (chunks hosted; you fetch each URL yourself on "proceed")
+- Base URL: https://mawizorek.github.io/ClickUp_apps/file-chunker/
+- Total chunks: 10
+- Total bytes (source): 106,906
+- Total Character Count: 106,844
+- Est. tokens (chars / 4): 26,711 (token-budget threshold: 28,000)
+- Generated: 7/1/2026, 23:10:35
+- App: File Chunker v17 (2026-07-01)
+- Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
+- Per-fetch read cap: ~30 KB. Chunks over cap: 0.
+- ⛑ COMPLETENESS FLAG: 10 chunks (over 8). Note: base64 armor uses smaller raw slices, so a higher part count is expected and not itself a problem. Total-context erosion may still degrade comprehension across a long session. Consider a batched read.
+
+## READING DIRECTIVE — agent: obey exactly. This is a GATED, ONE-CHUNK-AT-A-TIME walk.
+0. TOKEN BUDGET CHECK FIRST: estimate the whole set in tokens (Total Character Count / chars-per-token above). If it exceeds the token-budget threshold, STOP and tell the human the set is too large for a single automated walk; suggest a tighter scope or a batched read. Do not begin.
+1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
+2. When the human says "proceed", fetch the NEXT chunk in the manifest order below from its listed URL. Fetch exactly ONE chunk per "proceed".
+3. For that chunk: DECODE the base64 payload FIRST (everything between the directive lines, after the "ENCODING: base64" line). THEN verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, decoded, uuid verified" in chat.
+4. After EACH chunk, STOP. Do NOT fetch, open, or read the next URL on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch the set. This pause between every chunk is mandatory.
+5. If a chunk fails to DECODE, or its start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. A decode failure is treated exactly like a UUID mismatch. Do NOT reconstruct or fill gaps from inference.
+6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
+7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
+
+## ORDERED MANIFEST (fetch in this exact order, one URL per "proceed")
+1/10 · file-chunker-v17_part01_of_10.txt · 16.5 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part01_of_10.txt · uuid:18f0fe00-a864-4872-8f75-2237f039c4fe
+2/10 · file-chunker-v17_part02_of_10.txt · 16.5 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part02_of_10.txt · uuid:618899a6-15eb-43b8-bcd1-9b29066eb467
+3/10 · file-chunker-v17_part03_of_10.txt · 16.5 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part03_of_10.txt · uuid:62731d98-38c8-45d6-9fa7-a8a10eb359cb
+4/10 · file-chunker-v17_part04_of_10.txt · 16.0 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part04_of_10.txt · uuid:dce2ec5e-ffdd-41ad-af5e-e9c8bd31b4e1
+5/10 · file-chunker-v17_part05_of_10.txt · 13.7 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part05_of_10.txt · uuid:d808c300-f52a-41be-bf3d-33d9038e6dc4
+6/10 · file-chunker-v17_part06_of_10.txt · 15.0 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part06_of_10.txt · uuid:d2a20d20-d107-472f-b2fe-ba5cc545ead2
+7/10 · file-chunker-v17_part07_of_10.txt · 12.9 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part07_of_10.txt · uuid:25bb4278-3435-4022-bfdc-fb0e84ffecec
+8/10 · file-chunker-v17_part08_of_10.txt · 16.3 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part08_of_10.txt · uuid:5b6cf127-52d8-45c7-adc6-33d346cacb6c
+9/10 · file-chunker-v17_part09_of_10.txt · 15.7 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part09_of_10.txt · uuid:fab348bc-dfa3-4fd7-b249-3676479af6fa
+10/10 · file-chunker-v17_part10_of_10.txt · 10.0 KB · https://mawizorek.github.io/ClickUp_apps/file-chunker/file-chunker-v17_part10_of_10.txt · uuid:55e72d58-1aa2-4410-ad66-89bdc934fbea
+
+## FOOTER
+- Set UUID: e3d6c535-1f48-49e6-bfa3-558c42acdd4c (must match header)
+- END OF INDEX
