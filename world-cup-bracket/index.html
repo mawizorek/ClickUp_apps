@@ -55,7 +55,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 16px 12px;
+      padding: 14px 16px 10px;
     }
 
     .header-top h1 {
@@ -88,6 +88,33 @@
       color: var(--accent);
       border: 1px solid oklch(35% 0.08 155);
       border-radius: 6px;
+    }
+
+    .updated-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 16px;
+      background: var(--surface-1);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .updated-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .updated-value {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .updated-value.fresh {
+      color: var(--accent);
     }
 
     .schedule-view, .bracket-view {
@@ -455,6 +482,10 @@
         <button class="view-btn" data-view="bracket">Bracket</button>
       </div>
     </div>
+    <div class="updated-bar">
+      <span class="updated-label">Data updated</span>
+      <span class="updated-value" id="updatedTime">loading...</span>
+    </div>
   </header>
 
   <div class="schedule-view active" id="scheduleView">
@@ -471,11 +502,49 @@
   </div>
 
   <script>
-    const APP_VERSION = 'v1.2';
+    const APP_VERSION = 'v1.3';
     const DATA_URL = './data.json';
     const CACHE_KEY = 'world-cup-bracket-data';
+    const REPO_OWNER = 'mawizorek';
+    const REPO_NAME = 'ClickUp_apps';
+    const DATA_PATH = 'world-cup-bracket/data.json';
 
     let allMatches = [];
+
+    // Fetch last commit date for data.json from GitHub API
+    async function fetchLastUpdated() {
+      const el = document.getElementById('updatedTime');
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits?path=${DATA_PATH}&per_page=1`);
+        if (!res.ok) throw new Error('API error');
+        const commits = await res.json();
+        if (commits.length > 0) {
+          const date = new Date(commits[0].commit.author.date);
+          const now = new Date();
+          const diffMs = now - date;
+          const diffMins = Math.floor(diffMs / 60000);
+          const diffHrs = Math.floor(diffMs / 3600000);
+          const diffDays = Math.floor(diffMs / 86400000);
+
+          let relativeStr;
+          if (diffMins < 2) relativeStr = 'just now';
+          else if (diffMins < 60) relativeStr = `${diffMins}m ago`;
+          else if (diffHrs < 24) relativeStr = `${diffHrs}h ago`;
+          else relativeStr = `${diffDays}d ago`;
+
+          const timeStr = date.toLocaleString('en-US', {
+            month: 'short', day: 'numeric',
+            hour: 'numeric', minute: '2-digit',
+            hour12: true
+          });
+
+          el.textContent = `${timeStr} (${relativeStr})`;
+          el.classList.toggle('fresh', diffHrs < 6);
+        }
+      } catch (e) {
+        el.textContent = 'unavailable';
+      }
+    }
 
     async function loadData() {
       try {
@@ -492,6 +561,7 @@
     }
 
     async function init() {
+      fetchLastUpdated();
       const data = await loadData();
       if (!data) {
         document.getElementById('scheduleContent').innerHTML = '<div class="loading-msg">Could not load match data. Open via GitHub Pages or ensure data.json is in the same folder.</div>';
