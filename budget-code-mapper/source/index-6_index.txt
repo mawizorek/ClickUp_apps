@@ -1,0 +1,56 @@
+# File Chunker Index — index-6.html
+
+You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
+
+## SET INTEGRITY HEADER
+- Set UUID: d3c832b8-8b6f-49b1-adda-222b706cf83d
+- Source file: index-6.html
+- Original source included in set: index-6.html (unaltered, native format)
+- Chunk file extension: .txt
+- Encoding: base64 (each chunk payload is base64-encoded; markers stay plain text outside the blob)
+- Mode: SELF-NAVIGATING (chunks hosted; you fetch each URL yourself on "proceed")
+- Base URL: https://mawizorek.github.io/ClickUp_apps/code-mapper/
+- Total chunks: 19
+- Total bytes (source): 227,563
+- Total Character Count: 226,118
+- Est. tokens (chars / 4): 56,530 (token-budget threshold: 28,000)
+- Generated: 7/2/2026, 11:30:37
+- App: File Chunker v18 (2026-07-02)
+- Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
+- Per-fetch read cap: ~30 KB. Chunks over cap: 0.
+- ⛑ COMPLETENESS FLAG: 19 chunks (over 8). Note: base64 armor uses smaller raw slices, so a higher part count is expected and not itself a problem. Total-context erosion may still degrade comprehension across a long session. Consider a batched read.
+
+## READING DIRECTIVE — agent: obey exactly. This is a GATED, ONE-CHUNK-AT-A-TIME walk.
+0. TOKEN BUDGET CHECK FIRST: estimate the whole set in tokens (Total Character Count / chars-per-token above). If it exceeds the token-budget threshold, STOP and tell the human the set is too large for a single automated walk; suggest a tighter scope or a batched read. Do not begin.
+1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
+2. When the human says "proceed", fetch the NEXT chunk in the manifest order below from its listed URL. Fetch exactly ONE chunk per "proceed".
+3. For that chunk: DECODE the base64 payload FIRST (everything between the directive lines, after the "ENCODING: base64" line). THEN verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, decoded, uuid verified" in chat.
+4. After EACH chunk, STOP. Do NOT fetch, open, or read the next URL on your own. Wait for the human to say "proceed" again. Never fetch ahead or batch-fetch the set. This pause between every chunk is mandatory.
+5. If a chunk fails to DECODE, or its start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. A decode failure is treated exactly like a UUID mismatch. Do NOT reconstruct or fill gaps from inference.
+6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
+7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
+
+## ORDERED MANIFEST (fetch in this exact order, one URL per "proceed")
+1/19 · index-6_part01_of_19.txt · 15.6 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part01_of_19.txt · uuid:48a4f8ce-735b-4b04-b3d1-c951efd0776b
+2/19 · index-6_part02_of_19.txt · 14.3 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part02_of_19.txt · uuid:c7f78e80-5f3b-4013-8760-0635cdd51357
+3/19 · index-6_part03_of_19.txt · 17.7 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part03_of_19.txt · uuid:2621c9c5-c360-45c3-b011-10b6c70f243f
+4/19 · index-6_part04_of_19.txt · 17.7 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part04_of_19.txt · uuid:cf357f05-ac05-4008-9520-aa01c1b2e22d
+5/19 · index-6_part05_of_19.txt · 17.8 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part05_of_19.txt · uuid:2e49fc1a-83b5-4a66-928f-26e2604ecc49
+6/19 · index-6_part06_of_19.txt · 14.7 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part06_of_19.txt · uuid:94ebf94d-4e75-4aeb-b013-2a2d0463d837
+7/19 · index-6_part07_of_19.txt · 17.5 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part07_of_19.txt · uuid:3303cd37-f08d-436b-b86a-901f9628eeb6
+8/19 · index-6_part08_of_19.txt · 17.5 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part08_of_19.txt · uuid:86312c8b-fe60-4b3c-b13c-7fccb92c761d
+9/19 · index-6_part09_of_19.txt · 17.4 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part09_of_19.txt · uuid:bfb50b05-de69-46ae-9279-4a0e65ed3aab
+10/19 · index-6_part10_of_19.txt · 11.0 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part10_of_19.txt · uuid:f3812c5d-86aa-42d8-bd7e-b4031dfe6d0f
+11/19 · index-6_part11_of_19.txt · 17.5 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part11_of_19.txt · uuid:2f596750-b393-4039-b6ec-7a42e7d47407
+12/19 · index-6_part12_of_19.txt · 17.5 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part12_of_19.txt · uuid:2954c734-392f-437b-9c4e-8892fb6451bc
+13/19 · index-6_part13_of_19.txt · 17.5 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part13_of_19.txt · uuid:fa60e8e4-7092-4eb0-a77c-7f6c13ceef5b
+14/19 · index-6_part14_of_19.txt · 17.5 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part14_of_19.txt · uuid:ce7851d6-f318-4050-a0d6-54eed143b37a
+15/19 · index-6_part15_of_19.txt · 14.9 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part15_of_19.txt · uuid:5eaa9927-e786-4648-b083-4fc952337b5d
+16/19 · index-6_part16_of_19.txt · 17.7 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part16_of_19.txt · uuid:3722ce72-2096-49a8-8781-d8c9d40e5bb7
+17/19 · index-6_part17_of_19.txt · 17.7 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part17_of_19.txt · uuid:abe264fd-4592-42eb-8fa0-a1471740e2ca
+18/19 · index-6_part18_of_19.txt · 17.5 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part18_of_19.txt · uuid:c84b60cc-cd7b-4b49-9c18-2bbf51a41c45
+19/19 · index-6_part19_of_19.txt · 16.7 KB · https://mawizorek.github.io/ClickUp_apps/code-mapper/index-6_part19_of_19.txt · uuid:31f57f3d-34e4-40af-a2f7-6279a88c1cb5
+
+## FOOTER
+- Set UUID: d3c832b8-8b6f-49b1-adda-222b706cf83d (must match header)
+- END OF INDEX
