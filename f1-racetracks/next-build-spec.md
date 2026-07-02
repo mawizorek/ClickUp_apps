@@ -1,77 +1,171 @@
-# f1-racetracks v5 — Build Spec
+# F1 Racetracks v5 — Build Spec
 
-**Cycle:** v4 → v5
-**Theme:** Mobile-first responsive pass. The app currently overflows and clips on phones. Fix the footer/action bar and make the entire screen scale cleanly to small viewports without horizontal overflow.
-
-> **Format note:** This is a DIRECTIONAL spec (observed symptoms + target behavior + acceptance criteria), NOT the surgical-diff format in `template-app/next-build-spec.md`. Reason: there is no `/source` chunk set for this app yet, so exact line-diffs could not be authored (the 126KB `index.html` clips silently at the ~30KB read cap). When the chunk set is generated, this can be upgraded to literal find/replace diffs.
-
-## Source location
-
-- **App source:** `f1-racetracks/index.html` (~126KB, single inline `<style>` block)
-- **Repo:** `mawizorek/ClickUp_apps` (branch `main`)
-- **Chunk set:** NOT YET GENERATED — Michael generates it when picking this up. Until then the render agent must read the full source via a local whole-file copy, NOT a single >30KB fetch.
-- **Encoding (once chunked):** base64 armored
+**Date:** 2026-07-02  
+**Source chunk set:** `f1-racetracks/source/_index.md` (v4 baseline)  
+**App task:** F1 Racetracks — circuit breakdown app (APPS list)  
+**Live (v4):** https://mawizorek.github.io/ClickUp_apps/f1-racetracks/
 
 ---
 
-## Observed problem (device: iPhone Safari, top-level, mawizorek.github.io)
+## CORE ARCHITECTURAL CHANGE: Data Separation
 
-Screenshot evidence, v4 on a phone:
+The single biggest change in v5: **extract the `TRACKS` data array out of `index.html` into a standalone `data.json` file** in the same folder.
 
-- **The footer/action bar overflows horizontally and clips off the left edge.** The action buttons — `Copy source`, `Prepare download`, `Open in new tab`, `Export data (.json)`, and the `Right-click → Save As` hint — are laid out in a fixed/wide row wider than the viewport. On mobile the row runs off-screen on the left; the last item reads as a clipped `r Right-click → Save As`. Buttons are not wrapping or stacking.
-- **The footer meta line** (`Racetracks v4 · 14 breakdowns · 22 rounds`) sits above the clipped button cluster and is also pinned to a desktop-width layout.
-- **General screen scale is desktop-first.** Content is readable but the chrome (footer especially) assumes a wide viewport. There is horizontal overflow somewhere in the footer subtree forcing the whole action bar off-canvas.
+### New file structure
 
----
+```
+f1-racetracks/
+  index.html      ← app engine (layout, render logic, styling). Rarely changes.
+  data.json       ← TRACKS array + race results + historic winners. Updated weekly.
+  README.md       ← (existing)
+  source/         ← (existing chunk set, rebuild after v5 ships)
+```
 
-## Target behavior (v5)
+### How it works
 
-### Footer / action bar (primary fix)
-1. **Never overflow the viewport horizontally.** The action bar must fit within `100vw` at 320px width and up.
-2. **Wrap or stack the action buttons on narrow screens.** Below ~600px, the button row switches to `flex-wrap: wrap` (or a vertical stack) so every button is fully visible and tappable. No button clipped or pushed off-screen.
-3. **Full-width, touch-sized buttons on mobile.** Each button ≥44px tall (iOS tap target), comfortably padded, full-width stacked or two-up wrapped.
-4. **The `Right-click → Save As` hint** is a desktop affordance. On mobile hide it under the breakpoint or reword to long-press guidance; never let it clip.
-5. **Footer meta line** wraps gracefully and centers on mobile.
+- On load, `index.html` does `fetch('./data.json')` (same-origin on GitHub Pages, no CORS, no auth).
+- Parsed JSON replaces what was the inline `TRACKS` constant.
+- **Offline fallback:** after a successful fetch, cache the JSON in `localStorage`. On fetch failure (offline, `file://`), fall back to cached data. If no cache exists, show a friendly "Load data.json or connect to the internet" message.
+- The app engine (`index.html`) only needs a new commit when features/layout change. Weekly data updates are just a `data.json` commit.
 
-### Whole-screen responsive scale (secondary)
-6. **Audit for the overflow source.** Find the fixed width / `min-width` / `white-space: nowrap` / non-wrapping flex row in the footer and kill it. `overflow-x: hidden` on the root only as a backstop, not the primary fix.
-7. **Fluid layout.** Cards, headers, the legend row, and content padding use fluid units (`%`, `clamp()`, `min()`) to scale 320px → desktop. Reduce outer padding on mobile.
-8. **`clamp()` on large headings** so they scale down instead of forcing width.
-9. **Safe areas.** Add `env(safe-area-inset-*)` padding to the footer.
+### data.json schema (top-level)
 
----
+```json
+{
+  "version": "2026-07-02",
+  "season": 2026,
+  "tracks": [ ...existing TRACKS array objects... ],
+  "raceResults": {
+    "australia": { "winner": "Antonelli", "team": "Ferrari", "p2": "Hamilton", "p2Team": "Ferrari", "p3": "Russell", "p3Team": "Mercedes", "pole": { "driver": "Antonelli", "time": "1:15.096", "gapToP2": "+0.217" }, "fastestLap": { "driver": "Norris", "time": "1:19.813", "lap": 52 } },
+    ...
+  },
+  "historicWinners": {
+    "australia": [ { "year": 2024, "driver": "Sainz", "team": "Ferrari" }, { "year": 2023, "driver": "Verstappen", "team": "Red Bull" }, ... ],
+    ...
+  }
+}
+```
 
-## Agent instructions
-
-1. Read the full `index.html` source (chunk set once generated, or a local whole-file copy — do NOT trust a single >30KB fetch).
-2. Locate the footer / action-bar markup and CSS. Confirm the REAL class names (footer container, button row, buttons, meta line, legend row) before editing — do not assume names.
-3. Eliminate the horizontal-overflow source in the footer subtree (target #6).
-4. Add a mobile breakpoint (`@media (max-width: 600px)`) to the inline `<style>` block: wrap/stack the buttons, full-width ≥44px, wrap the meta + legend rows, hide/reword the right-click hint, reduce container padding, add `env(safe-area-inset-bottom)`.
-5. Apply `clamp()` to large headings.
-6. Keep desktop layout unchanged above 600px — additive responsive CSS, not a desktop rewrite.
-7. Bump `APP_VERSION` to v5.
-8. Verify at 320/375/390px: zero horizontal scroll, every footer button visible + tappable, nothing clipped.
-9. Deliver the complete modified source as a ClickUp artifact. Do NOT commit (file >30KB); Michael uploads manually.
-
-### Do NOT
-- Rewrite the desktop layout or restyle the cards' visual design — scope is responsive fit + footer, not a redesign.
-- Add Print All / Download All buttons or synthetic-click downloads (repo download rules stand).
-- Commit if source could not be read whole.
+The `raceResults` and `historicWinners` keys are keyed by track slug (matching the existing `slug` field in each TRACKS object). Only tracks with `status: "done"` will have a `raceResults` entry. Every track gets a `historicWinners` entry (last ~10 years or whatever data is available).
 
 ---
 
-## Acceptance criteria
+## NEW FEATURE 1: Podium Graphic (completed races)
 
-- [ ] At 320px, 375px, 390px: zero horizontal scroll.
-- [ ] Every footer action button fully visible and tappable; none clipped off-edge.
-- [ ] Footer meta line and legend row wrap cleanly.
-- [ ] `Right-click → Save As` hint hidden or reworded for touch.
-- [ ] Headings scale down on mobile without forcing width.
-- [ ] Desktop layout unchanged above 600px.
-- [ ] `APP_VERSION` = v5.
+For any track with `status: "done"`, render a **podium block** near the top of the circuit view (after the header, before the lap profile).
+
+### Visual spec
+
+- Classic stepped podium shape: P1 center elevated highest, P2 left at medium height, P3 right at lowest.
+- Each podium step shows:
+  - Position badge (gold P1, silver P2, bronze P3)
+  - Driver surname (bold, white)
+  - Team name (smaller, colored with team's identity color)
+- The podium block itself uses subtle gradients or depth to sell the 3D "steps" look. Keep it in the dark telemetry aesthetic (no bright white surfaces).
+- Below the podium, a single line: race winner's full result context (e.g. "Won by +4.2s, led 48 of 57 laps") if available in the data.
+- Animate on view entry: steps slide up into place (staggered, fast, ease-out). No looping.
+
+### Data source
+
+`raceResults[slug]` from `data.json`. If no entry exists for a track, the podium block is simply not rendered.
 
 ---
 
-## Standing rule (applies to ALL apps)
+## NEW FEATURE 2: Pole Breakdown Panel
 
-**Every app in `mawizorek/ClickUp_apps` must be explicitly designed for clean mobile viewing AND desktop — mobile is a first-class target, not an afterthought.** Every build and build spec includes a responsive pass: no horizontal overflow at 320px, footers/action bars that wrap or stack, touch targets ≥44px, fluid layout via `clamp()`/`min()`/`%`, safe-area insets. Test every ship at phone width before calling it done. Also recorded in the Brain Reference Library (Apps / HTML Artifacts → Architecture).
+A new panel/card on completed circuit views showing qualifying/pole data.
+
+### Content
+
+- **Pole sitter** (driver name + team)
+- **Pole time** (formatted lap time)
+- **Gap to P2** (e.g. "+0.217s")
+- Optional: top 5 qualifying times as a compact mini-table if data is provided
+
+### Visual spec
+
+- Card-style panel in the existing layout grid (near the podium or in the stats row).
+- Accent color: sector-1 cyan or a dedicated qualifying purple.
+- Small "POLE POSITION" header label.
+
+### Data source
+
+`raceResults[slug].pole` from `data.json`.
+
+---
+
+## NEW FEATURE 3: Historic Winners Section
+
+A new section on EVERY circuit view (both done and pending) showing past race winners at that track.
+
+### Visual spec
+
+- **Low-fi timing-board aesthetic.** Think: monospace font, minimal decoration, like a printed timing sheet pinned to the garage wall.
+- Simple columnar layout: `YEAR | DRIVER | TEAM`
+- No colors per row (keep it deliberately plain/archival). Maybe a subtle alternating-row tint.
+- Header: "WINNERS" or "RACE HISTORY" in a stamped/stencil style.
+- Show the last 10 years (or however many entries exist). Most recent at top.
+- If the 2026 race is complete, it appears as the top row (connecting to the podium data above).
+
+### Placement
+
+- Below the main data panels, above the footer. A distinct section break.
+- On mobile, full-width single column.
+
+### Data source
+
+`historicWinners[slug]` from `data.json`.
+
+---
+
+## DATA PIPELINE (how data.json gets updated)
+
+This is NOT a runtime concern for the app, but documents the intended workflow:
+
+1. Michael updates race results in ClickUp (R1-R24 dropdown fields on the F1 Drivers list, Race Awards in comments on race tasks).
+2. Michael tells Brain to refresh the app data.
+3. Brain reads the ClickUp custom fields + race task comments, assembles the JSON, and commits `data.json` to `f1-racetracks/` via MCP.
+4. GitHub Pages serves the updated JSON within ~60s. The live app reflects the new data on next load.
+
+The app itself never calls ClickUp. ClickUp is the source of truth for data; GitHub Pages is the delivery layer.
+
+---
+
+## THINGS TO KEEP UNCHANGED
+
+- All existing v4 functionality: index grid, hash routing, lap profile chart, DRS zones, sector breakdown, pit data, tyre allocation, strategy, overtaking analysis, corner guide, live weather, map plates.
+- Dark telemetry aesthetic, color language (S1 cyan, S2 violet, S3 gold, DRS green, elevation amber, Ferrari-red accent).
+- Footer source-export trio (Copy source / Prepare download / Open in new tab) + Export data.
+- Responsive/mobile-first layout. All new features must work at 320px.
+- Offline-first philosophy (with the localStorage cache fallback described above).
+
+---
+
+## KNOWN SNAGS / EDGE CASES
+
+- **First load on `file://`:** fetch('./data.json') will fail due to CORS on local filesystem in some browsers. The localStorage fallback handles repeat offline use, but the very first open from a downloaded file won't have cached data. Consider: embed a minimal inline fallback dataset (just track metadata, no results) so the index grid always renders.
+- **Madring (inaugural circuit):** no historic winners, no 2026 result yet. Both sections should gracefully hide when data is empty.
+- **Sprint weekends:** the `raceResults` schema may need a `sprintWinner` field. Include it in the schema but don't require it for the render.
+
+---
+
+## RENDER AGENT INSTRUCTIONS
+
+1. Read the v4 source via the chunk set at `f1-racetracks/source/_index.md`.
+2. Extract the existing `TRACKS` array into the `data.json` schema above (keep all existing track data intact in the `tracks` key).
+3. Modify `index.html` to: remove the inline TRACKS array, add the `fetch('./data.json')` loader with localStorage cache, add the three new render components (podium, pole panel, historic winners section).
+4. Deliver the complete modified `index.html` as a ClickUp artifact.
+5. Separately deliver `data.json` (populated with the existing track data + placeholder structure for `raceResults` and `historicWinners` that will be filled by Brain on the first data refresh).
+6. Do NOT commit to the repo (files >30KB are uploaded manually by Michael).
+
+---
+
+## SUCCESS CRITERIA
+
+- App loads from GitHub Pages and fetches `data.json` successfully.
+- Index grid renders as before.
+- Completed circuit views show the podium graphic, pole panel, and historic winners.
+- Pending circuit views show historic winners only (no podium/pole since the race hasn't happened).
+- Offline: after one successful load, app works fully from localStorage cache.
+- All existing functionality preserved.
+- Mobile: all new features render cleanly at 320-390px.
