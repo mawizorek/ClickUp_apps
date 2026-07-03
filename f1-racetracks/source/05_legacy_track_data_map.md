@@ -1,38 +1,27 @@
 # F1 Racetracks — legacy track-data map
 
-This file maps the trusted 11-part plaintext source handoff into round/data regions while the semantic source companion is being promoted.
+This file maps the trusted plaintext source handoff into the parts that still need promotion.
 
 ## Current transition state
 
-- Shell, styles, and logic are now called out explicitly in named source files.
-- The **track data itself is still trusted from the plaintext handoff slices during this first semantic-source PR**.
-- Once this structure is validated, the next cleanup PR can promote the round data into named grouped source files and delete the legacy `index-7_partNN_of_11.txt` inputs.
+- Shell, styles, and logic have been split into named semantic source files.
+- **Rounds 10–24 are now promoted into grouped semantic data files.**
+- **Rounds 01–09 still rely on the trusted plaintext handoff slices during the transition.**
 
-## Legacy data chunk map
+## Remaining legacy data chunk map
 
-- `index-7_part03_of_11.txt` — footer close + script bootstrap + Albert Park start
+- `index-7_part03_of_11.txt` — Albert Park start + script bootstrap opening
 - `index-7_part04_of_11.txt` — Shanghai, Suzuka, Miami
 - `index-7_part05_of_11.txt` — Canada, Monaco, Catalunya
-- `index-7_part06_of_11.txt` — Red Bull Ring, Silverstone
-- `index-7_part07_of_11.txt` — Spa, Hungaroring
-- `index-7_part08_of_11.txt` — Zandvoort, Monza
-- `index-7_part09_of_11.txt` — Madring, remaining stubs, helpers, router, renderHome
 
-## Round grouping target for the next cleanup pass
+## Active grouped data files
 
-- `track_data_rounds_01_03`
-- `track_data_rounds_06_09`
-- `track_data_rounds_10_13`
-- `track_data_rounds_14_24`
+- `07_track_data_rounds_10_13.js`
+- `08_track_data_rounds_14_24.js`
 
-## Why this interim step exists
+## Next cleanup target
 
-The immediate goal of this PR is to stop treating the runtime monolith as the only readable surface and to establish named edit surfaces for:
+- `05_track_data_rounds_01_03.js`
+- `06_track_data_rounds_06_09.js`
 
-- head/shell
-- styles
-- bootstrap/home logic
-- track-view logic
-- profile/weather/export logic
-
-That is enough to make future navigation sane while keeping the already-trusted plaintext data handoff available during the transition.
+Once those are promoted, the remaining legacy plaintext dependency is gone and the old migration inputs can be removed.
