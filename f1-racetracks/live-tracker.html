@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F1 Racetracks — Live Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(16% 0.022 264);
+      --bg2: oklch(19% 0.024 264);
+      --surface: oklch(22% 0.024 264);
+      --surface2: oklch(26% 0.024 264);
+      --line: oklch(32% 0.02 264);
+      --text: oklch(96% 0.008 264);
+      --muted: oklch(70% 0.018 264);
+      --faint: oklch(54% 0.02 264);
+      --red: oklch(62% 0.23 25);
+      --green: oklch(70% 0.16 150);
+      --amber: oklch(80% 0.16 85);
+      --blue: oklch(72% 0.12 245);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(1100px 700px at 80% -10%, oklch(24% 0.05 25 / .3), transparent 60%),
+        radial-gradient(900px 600px at 5% 110%, oklch(24% 0.04 264 / .5), transparent 55%),
+        var(--bg);
+      padding: 20px clamp(18px, 3vw, 42px) 34px;
+    }
+    .wrap { max-width: 1240px; margin: 0 auto; }
+    .topbar, .row, .status-line, .session-meta, .link-row, .ticker-item { display: flex; }
+    .topbar, .status-line, .session-meta, .link-row { align-items: center; }
+    .topbar, .panel-head, .status-line { justify-content: space-between; }
+    .topbar {
+      gap: 14px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--red);
+      box-shadow: 0 6px 18px -6px oklch(62% 0.23 25 / .7);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .title { font-size: 1.08rem; font-weight: 700; letter-spacing: -0.015em; }
+    .title small {
+      display: block;
+      margin-top: 1px;
+      color: var(--faint);
+      font-size: .62rem;
+      font-family: "IBM Plex Mono", monospace;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      padding: 10px 13px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: .78rem;
+      font-family: "IBM Plex Mono", monospace;
+      transition: background .16s var(--ease), border-color .16s var(--ease), transform .16s var(--ease);
+    }
+    .btn:hover { background: var(--surface2); border-color: oklch(45% 0.02 264); transform: translateY(-1px); }
+    .eyebrow {
+      color: var(--red);
+      font-size: .72rem;
+      font-family: "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.3rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      max-width: 11ch;
+    }
+    .lead {
+      max-width: 72ch;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.6;
+    }
+    .hero {
+      margin-bottom: 24px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+    .panel {
+      background: linear-gradient(165deg, var(--bg2), var(--surface));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 30px 70px -45px oklch(0% 0 0 / .8), inset 0 1px 0 oklch(100% 0 0 / .04);
+    }
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      color: var(--faint);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .64rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+    .panel h2 {
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .68rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .badge.live { background: oklch(70% 0.16 150 / .16); color: var(--green); }
+    .badge.replay { background: oklch(72% 0.12 245 / .16); color: var(--blue); }
+    .badge.awaiting { background: oklch(80% 0.16 85 / .16); color: var(--amber); }
+    .badge.idle, .badge.error { background: oklch(62% 0.01 264 / .18); color: var(--muted); }
+    .status-copy {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .session-meta {
+      gap: 10px 20px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: .84rem;
+    }
+    .session-meta span, .link-row a {
+      font-family: "IBM Plex Mono", monospace;
+    }
+    .link-row {
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .link-row a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid oklch(100% 0 0 / .14);
+      padding-bottom: 2px;
+      font-size: .78rem;
+    }
+    .link-row a:hover { border-color: var(--red); }
+    .status-note {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      font-size: .8rem;
+      line-height: 1.55;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+    .table th {
+      text-align: left;
+      color: var(--faint);
+      font-family: "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: .11em;
+      font-size: .64rem;
+      padding: 0 0 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    .table td {
+      padding: 11px 0;
+      border-bottom: 1px solid oklch(32% 0.02 264 / .55);
+      vertical-align: middle;
+    }
+    .table tr:last-child td { border-bottom: none; }
+    .teambar {
+      width: 4px;
+      height: 28px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    .driver-cell strong { display: inline-block; min-width: 3ch; }
+    .driver-cell small, .muted {
+      color: var(--muted);
+    }
+    .mono {
+      font-family: "IBM Plex Mono", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .ticker-list {
+      display: grid;
+      gap: 10px;
+    }
+    .ticker-item {
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border: 1px solid oklch(32% 0.02 264 / .55);
+      border-radius: 12px;
+      background: oklch(18% 0.02 264 / .42);
+    }
+    .ticker-time {
+      min-width: 72px;
+      color: var(--faint);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .72rem;
+    }
+    .ticker-body {
+      display: grid;
+      gap: 4px;
+    }
+    .ticker-head {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .62rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .chip.flag { background: oklch(80% 0.16 85 / .16); color: var(--amber); }
+    .chip.safety { background: oklch(62% 0.23 25 / .16); color: var(--red); }
+    .chip.session { background: oklch(72% 0.12 245 / .16); color: var(--blue); }
+    .chip.other { background: oklch(62% 0.01 264 / .18); color: var(--muted); }
+    .empty {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: .92rem;
+    }
+    .foot {
+      margin-top: 16px;
+      color: var(--faint);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .74rem;
+    }
+    @media (max-width: 920px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      body { padding-inline: 16px; }
+      .topbar { margin-bottom: 20px; }
+      .panel { padding: 16px; }
+      .table th:nth-child(3), .table td:nth-child(3) { display: none; }
+      .ticker-item { padding: 10px; }
+      .ticker-time { min-width: 64px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a class="brand" href="./">
+        <span class="mark">F1</span>
+        <span class="title">F1 Racetracks<small>Live Tracker Slice</small></span>
+      </a>
+      <div class="top-actions">
+        <a class="btn" href="./">Open main app</a>
+        <a class="btn" href="https://openf1.org/docs/" target="_blank" rel="noopener">OpenF1 docs</a>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="eyebrow">Live session tracker · narrow v6 slice</div>
+      <h1>Track the latest F1 session without rewriting the main app.</h1>
+      <p class="lead">This is the first live-tracking feature for <strong>F1 Racetracks</strong>: a focused companion page that follows the latest OpenF1 session, maps it to the app’s circuits when possible, and surfaces session state, positions, and race-control context in one place.</p>
+    </section>
+
+    <div class="grid">
+      <div class="stack">
+        <section class="panel" id="session-panel">
+          <div class="panel-head">
+            <div>
+              <div class="tag">Live session state</div>
+              <h2 id="session-title">Loading latest session…</h2>
+            </div>
+            <span class="badge idle" id="session-badge">idle</span>
+          </div>
+          <p class="status-copy" id="session-copy">Checking OpenF1 for the latest session and mapping it back to F1 Racetracks…</p>
+          <div class="session-meta" id="session-meta"></div>
+          <div class="link-row" id="session-links"></div>
+          <p class="status-note" id="session-note">This companion keeps the existing v5 runtime safe while shipping live tracking now.</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="tag">Running order</div>
+              <h2>Latest positions</h2>
+            </div>
+            <div class="tag mono" id="positions-stamp">Waiting for data</div>
+          </div>
+          <div id="positions-shell">
+            <p class="empty">Loading the latest positions and interval data…</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="tag">Race control</div>
+              <h2>Latest messages</h2>
+            </div>
+            <div class="tag mono" id="control-stamp">Waiting for data</div>
+          </div>
+          <div id="control-shell">
+            <p class="empty">Loading the most recent race-control messages…</p>
+          </div>
+          <div class="foot" id="refresh-foot">Auto-refresh every 20s while live or replay data is available.</div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const REFRESH_MS = 20000;
+    const CIRCUIT_ALIASES = {
+      'albert-park': ['albert park', 'melbourne'],
+      shanghai: ['shanghai'],
+      suzuka: ['suzuka'],
+      miami: ['miami'],
+      'gilles-villeneuve': ['gilles villeneuve', 'montreal', 'canada'],
+      monaco: ['monaco'],
+      catalunya: ['barcelona', 'catalunya', 'circuit de barcelona-catalunya', 'spanish gp'],
+      'red-bull-ring': ['red bull ring', 'spielberg', 'austrian gp'],
+      silverstone: ['silverstone', 'british gp'],
+      spa: ['spa', 'spa-francorchamps', 'circuit de spa-francorchamps', 'belgian gp'],
+      hungaroring: ['hungaroring', 'hungary', 'hungarian gp'],
+      zandvoort: ['zandvoort', 'dutch gp'],
+      monza: ['monza', 'italian gp'],
+      madring: ['madring', 'madrid'],
+      baku: ['baku', 'azerbaijan'],
+      'marina-bay': ['marina bay', 'singapore'],
+      cota: ['cota', 'circuit of the americas', 'united states'],
+      mexico: ['mexico city', 'hermanos rodriguez', 'méxico'],
+      interlagos: ['interlagos', 'sao paulo', 'são paulo'],
+      'las-vegas': ['las vegas'],
+      losail: ['losail', 'qatar'],
+      'yas-marina': ['yas marina', 'abu dhabi']
+    };
+
+    const sessionTitle = document.getElementById('session-title');
+    const sessionBadge = document.getElementById('session-badge');
+    const sessionCopy = document.getElementById('session-copy');
+    const sessionMeta = document.getElementById('session-meta');
+    const sessionLinks = document.getElementById('session-links');
+    const sessionNote = document.getElementById('session-note');
+    const positionsShell = document.getElementById('positions-shell');
+    const controlShell = document.getElementById('control-shell');
+    const positionsStamp = document.getElementById('positions-stamp');
+    const controlStamp = document.getElementById('control-stamp');
+
+    let refreshHandle = null;
+
+    function normalize(value) {
+      return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+    }
+
+    function classifySessionState(session) {
+      const now = Date.now();
+      const start = session?.date_start ? new Date(session.date_start).getTime() : null;
+      const end = session?.date_end ? new Date(session.date_end).getTime() : null;
+      if (!session || !start) return 'idle';
+      if (start > now) return 'awaiting';
+      if (!end || end >= now) return 'live';
+      const hoursSinceEnd = (now - end) / 36e5;
+      if (hoursSinceEnd <= 48) return 'replay';
+      return 'idle';
+    }
+
+    function matchCircuitSlug(session) {
+      const haystack = [session?.circuit_short_name, session?.meeting_name, session?.country_name].map(normalize).join(' ');
+      for (const [slug, aliases] of Object.entries(CIRCUIT_ALIASES)) {
+        if (aliases.some(alias => haystack.includes(normalize(alias)))) return slug;
+      }
+      return null;
+    }
+
+    function badgeClass(state) {
+      if (state === 'live') return 'live';
+      if (state === 'replay') return 'replay';
+      if (state === 'awaiting') return 'awaiting';
+      return state === 'error' ? 'error' : 'idle';
+    }
+
+    function badgeLabel(state) {
+      if (state === 'live') return 'live';
+      if (state === 'replay') return 'replay';
+      if (state === 'awaiting') return 'awaiting';
+      return state === 'error' ? 'error' : 'idle';
+    }
+
+    function chipClass(category = '') {
+      const value = String(category).toLowerCase();
+      if (value.includes('flag')) return 'flag';
+      if (value.includes('safety')) return 'safety';
+      if (value.includes('session')) return 'session';
+      return 'other';
+    }
+
+    function formatLocal(dateString) {
+      if (!dateString) return '—';
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(date);
+    }
+
+    function formatShortTime(dateString) {
+      if (!dateString) return '—';
+      return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date(dateString));
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      return response.json();
+    }
+
+    function latestByDriver(rows) {
+      const map = new Map();
+      for (const row of rows || []) {
+        const key = row.driver_number;
+        if (!map.has(key) || String(row.date || '') > String(map.get(key).date || '')) map.set(key, row);
+      }
+      return map;
+    }
+
+    function intervalText(interval, gapToLeader, position) {
+      if (position === 1) return 'Leader';
+      if (interval == null && gapToLeader == null) return '—';
+      if (typeof interval === 'string') return interval;
+      if (typeof interval === 'number') return `+${interval.toFixed(3)}`;
+      if (typeof gapToLeader === 'number') return `+${gapToLeader.toFixed(3)}`;
+      return gapToLeader || '—';
+    }
+
+    function renderSession(session, state, slug, lastRefresh) {
+      sessionBadge.className = `badge ${badgeClass(state)}`;
+      sessionBadge.textContent = badgeLabel(state);
+
+      if (!session) {
+        sessionTitle.textContent = 'No current session found';
+        sessionCopy.textContent = 'OpenF1 did not return a latest session. This page will retry automatically.';
+        sessionMeta.innerHTML = '';
+        sessionLinks.innerHTML = '';
+        sessionNote.textContent = 'When OpenF1 returns session data again, the live tracker will wake up automatically.';
+        return;
+      }
+
+      sessionTitle.textContent = `${session.session_name || 'Latest session'} · ${session.circuit_short_name || session.meeting_name || 'Unknown circuit'}`;
+      const stateCopy = {
+        live: 'The latest OpenF1 session is live now. Positions and race-control messages are refreshing on a timer.',
+        replay: 'The latest session has ended recently, so this page is holding a replay-style view with recent timing context.',
+        awaiting: 'A matching session is scheduled but has not started yet. This page will flip into live mode automatically once data starts flowing.',
+        idle: 'The latest OpenF1 session is outside the current live/replay window, so this page is acting as a quiet monitoring surface.'
+      };
+      sessionCopy.textContent = stateCopy[state] || stateCopy.idle;
+      sessionMeta.innerHTML = `
+        <span>Meeting · ${session.meeting_name || '—'}</span>
+        <span>Start · ${formatLocal(session.date_start)}</span>
+        <span>End · ${formatLocal(session.date_end)}</span>
+        <span>Updated · ${formatShortTime(lastRefresh)}</span>
+      `;
+      sessionLinks.innerHTML = slug
+        ? `<a href="./#/` + slug + `">Open matched circuit page →</a><a href="https://api.openf1.org/v1/sessions?session_key=${session.session_key}" target="_blank" rel="noopener">Open raw session JSON →</a>`
+        : `<a href="https://api.openf1.org/v1/sessions?session_key=${session.session_key}" target="_blank" rel="noopener">Open raw session JSON →</a>`;
+      sessionNote.textContent = slug
+        ? `Matched this OpenF1 session to the F1 Racetracks circuit slug “${slug}”. This ships live tracking now without destabilizing the main v5 runtime.`
+        : 'This latest session did not map cleanly to a current F1 Racetracks circuit slug, so the tracker stays standalone until a cleaner integration pass.';
+    }
+
+    function renderPositions(drivers, positions, intervals, lastRefresh) {
+      const driverByNumber = new Map((drivers || []).map(driver => [driver.driver_number, driver]));
+      const latestPositions = latestByDriver(positions);
+      const latestIntervals = latestByDriver(intervals);
+      const rows = Array.from(latestPositions.values())
+        .sort((a, b) => (a.position || 999) - (b.position || 999))
+        .slice(0, 10)
+        .map(row => {
+          const driver = driverByNumber.get(row.driver_number) || {};
+          const interval = latestIntervals.get(row.driver_number) || {};
+          return {
+            position: row.position,
+            driverNumber: row.driver_number,
+            acronym: driver.name_acronym || driver.last_name || row.driver_number,
+            team: driver.team_name || 'Unknown team',
+            teamColour: `#${driver.team_colour || '7d8593'}`,
+            interval: intervalText(interval.interval, interval.gap_to_leader, row.position)
+          };
+        });
+
+      positionsStamp.textContent = `Updated ${formatShortTime(lastRefresh)}`;
+      if (!rows.length) {
+        positionsShell.innerHTML = '<p class="empty">No live position rows yet for this session.</p>';
+        return;
+      }
+
+      positionsShell.innerHTML = `
+        <table class="table">
+          <thead>
+            <tr><th>Pos</th><th>Driver</th><th>Team</th><th>Interval</th></tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => `
+              <tr>
+                <td class="mono">P${row.position}</td>
+                <td class="driver-cell"><span class="teambar" style="background:${row.teamColour}"></span><strong>${row.acronym}</strong> <small>#${row.driverNumber}</small></td>
+                <td class="muted">${row.team}</td>
+                <td class="mono">${row.interval}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderControl(messages, lastRefresh) {
+      controlStamp.textContent = `Updated ${formatShortTime(lastRefresh)}`;
+      const rows = (messages || [])
+        .slice()
+        .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+        .slice(0, 8);
+
+      if (!rows.length) {
+        controlShell.innerHTML = '<p class="empty">No recent race-control messages returned for this session.</p>';
+        return;
+      }
+
+      controlShell.innerHTML = `<div class="ticker-list">${rows.map(message => `
+        <div class="ticker-item">
+          <div class="ticker-time">${formatShortTime(message.date)}</div>
+          <div class="ticker-body">
+            <div class="ticker-head">
+              <span class="chip ${chipClass(message.category)}">${message.category || 'update'}</span>
+              ${message.flag ? `<span class="chip flag">${message.flag}</span>` : ''}
+              ${message.lap_number ? `<span class="tag mono">Lap ${message.lap_number}</span>` : ''}
+            </div>
+            <div>${message.message || 'No message text provided.'}</div>
+          </div>
+        </div>
+      `).join('')}</div>`;
+    }
+
+    async function refresh() {
+      const refreshedAt = new Date().toISOString();
+      try {
+        const sessions = await fetchJson('https://api.openf1.org/v1/sessions?session_key=latest');
+        const session = Array.isArray(sessions) ? sessions[0] : null;
+        const state = classifySessionState(session);
+        const slug = matchCircuitSlug(session);
+        renderSession(session, state, slug, refreshedAt);
+
+        if (!session?.session_key) {
+          positionsShell.innerHTML = '<p class="empty">No live timing session key is available yet.</p>';
+          controlShell.innerHTML = '<p class="empty">No race-control feed is available yet.</p>';
+          return;
+        }
+
+        const [drivers, positions, intervals, control] = await Promise.all([
+          fetchJson(`https://api.openf1.org/v1/drivers?session_key=${session.session_key}`),
+          fetchJson(`https://api.openf1.org/v1/position?session_key=${session.session_key}`),
+          fetchJson(`https://api.openf1.org/v1/intervals?session_key=${session.session_key}`),
+          fetchJson(`https://api.openf1.org/v1/race_control?session_key=${session.session_key}`)
+        ]);
+
+        renderPositions(drivers, positions, intervals, refreshedAt);
+        renderControl(control, refreshedAt);
+      } catch (error) {
+        sessionBadge.className = 'badge error';
+        sessionBadge.textContent = 'error';
+        sessionTitle.textContent = 'Live tracking is temporarily unavailable';
+        sessionCopy.textContent = 'The OpenF1 request failed. This page will keep retrying automatically.';
+        sessionMeta.innerHTML = '';
+        sessionLinks.innerHTML = '';
+        sessionNote.textContent = error.message || 'Unknown fetch error';
+        positionsShell.innerHTML = '<p class="empty">Position data could not be loaded right now.</p>';
+        controlShell.innerHTML = '<p class="empty">Race-control data could not be loaded right now.</p>';
+      }
+    }
+
+    refresh();
+    refreshHandle = window.setInterval(refresh, REFRESH_MS);
+    window.addEventListener('beforeunload', () => refreshHandle && clearInterval(refreshHandle));
+  </script>
+</body>
+</html>

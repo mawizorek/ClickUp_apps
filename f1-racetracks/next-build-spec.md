@@ -4,13 +4,13 @@
 
 - Runtime app: `f1-racetracks/index.html`
 - Runtime data: `f1-racetracks/data.json`
+- Live-tracking companion: `f1-racetracks/live-tracker.html`
 - Preferred edit surface: `f1-racetracks/source/`
 - Current live version: `v5`
 
 ## Scratch intake
 
-- Reserved for the next approved idea.
-- The previously discussed OpenF1 contextual live/replay layer was not started here and has been parked in `Futures` so this file is clear for the next scoped brief.
+- Reserved for the next approved idea after the current live-tracker slice is reviewed.
 
 ## Next build
 
@@ -18,14 +18,19 @@
 
 ## In review
 
-- _Empty._
+- First live-tracking slice shipped as a companion page in [PR #15](https://github.com/mawizorek/ClickUp_apps/pull/15)
+  - latest session state via OpenF1
+  - running order / interval table
+  - race-control message feed
+  - circuit-slug handoff back into the main app when a match exists
 
 ## Futures
 
-- OpenF1 contextual session layer:
-  - overlay live/replay-aware session context on supported rounds
-  - candidate surfaces: position tower, race control ticker, tyre strategy strip
-  - likely start with a narrow first slice instead of a full multi-panel live layer
+- Integrate the live tracker slice into the main circuit runtime once the first OpenF1 path is approved
+- Broaden live data surfaces after that first merge
+  - position tower inside the track page
+  - race control ticker in the main runtime
+  - tyre strategy strip
 - Split grouped source data files that are over the size budget
 - Add further season-analytics surfaces after the next build is chosen
 
