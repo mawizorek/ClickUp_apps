@@ -4,8 +4,10 @@
 
 ![Launch](https://img.shields.io/badge/Launch-F1_Racetracks-red?style=for-the-badge)
 
-**Status:** v4 shipped (v5 spec committed)  
-**Source of truth:** this repo folder  
+**Status:** v4 shipped · semantic source companion added · v5 spec committed
+
+**Source of truth:** this repo folder
+
 **ClickUp task:** F1 Racetracks — circuit breakdown app (APPS list)
 
 ---
@@ -16,12 +18,14 @@
 |------|------|------------------|
 | `index.html` | App engine (UI, routing, render logic, styling) | Version bumps only |
 | `data.json` | Living dataset (tracks, race results, historic winners, pole data) | Weekly / after each race via MCP |
-| `source/` | Brain-readable chunk set of index.html | Rebuilt after each engine version bump |
+| `source/` | Semantic source companion (head, shell, styles, data groups, view logic) | Maintained with engine changes |
 | `next-build-spec.md` | Current build spec for the next version | Overwritten each version cycle |
 
 **What "update the app" means here:**
+
 - Updating race results, standings, or track data → commit `data.json` only. No version bump.
 - Adding features, changing layout, fixing bugs → update `index.html` via the two-agent workflow. Version bump.
+- Editing the agent-readable source structure → update `source/` in the same PR as the related engine change when possible.
 
 > **Note:** v4 (current) is still a single-file app with data inline. v5 introduces the data separation. Once v5 ships, the above routing applies.
 
@@ -32,6 +36,7 @@
 A single self-contained HTML app holding every 2026 F1 circuit breakdown in one place. The index is the home screen (grid of all 24 rounds); each track is a hash-routed view inside the same app. One shared render engine + one data array, so a layout change applies to all circuits at once.
 
 **Per-circuit breakdown includes:**
+
 - Lap profile chart with elevation, DRS zones, sector splits
 - Tyre allocation + strategy analysis
 - Pit lane data (entry/exit, loss time, windows)
@@ -61,8 +66,9 @@ A single self-contained HTML app holding every 2026 F1 circuit breakdown in one 
 - **Routing:** `#/` = home (index grid). `#/<slug>` = circuit view. `renderHome()` / `renderTrack()` / `renderSoon()` driven by `router()` on `hashchange`.
 - **Data (v4):** inline `TRACKS` array is the single source of truth. Each entry has slug, round, gp, flag, date, status, report, plus full data block when report:true.
 - **Data (v5+):** `fetch('./data.json')` on load with localStorage offline cache. The TRACKS array + race results + historic winners live in the JSON file.
+- **Source companion:** `source/` now mirrors the runtime by concern — shell, styles, grouped track data, home/bootstrap logic, track-view/profile logic, and weather/footer-export logic. This is the preferred agent read/edit surface.
 - **Shared engine:** `buildProfile()` (lap-profile chart), `loadWeather()` (live Open-Meteo fetch), table + panel renderers. Change the engine once, every track updates.
-- **Maps:** official Wikimedia outline via `Special:FilePath/<file>`; `onerror` shows the filename for debugging.
+- **Maps:** official Wikimedia outline via `Special:FilePath/`; `onerror` shows the filename for debugging.
 - **No looping animation;** hover/interaction only.
 - **External deps:** Google Fonts, D3 (auto-injected), Lucide icons.
 
@@ -71,6 +77,7 @@ A single self-contained HTML app holding every 2026 F1 circuit breakdown in one 
 ## Version history
 
 - **v5** (in progress) — data separation (`data.json`), podium graphic, pole breakdown, historic winners section
+- **v4.1 source companion** — semantic source companion added under `source/` for reliable agent editing; runtime unchanged
 - **v4** — standalone offline-first build; footer source-export trio + Export data (.json), sandbox-safe
 - v3 — +4 circuits (Hungary, Netherlands, Italy, Spain/Madrid); 14 of 24 built
 - v2 — fixed four wrong Wikimedia map filenames
@@ -91,5 +98,5 @@ A single self-contained HTML app holding every 2026 F1 circuit breakdown in one 
 
 - Build remaining 8 circuit breakdowns (Baku → Abu Dhabi)
 - Persist last-viewed circuit (localStorage) + keyboard ←/→ between rounds
-- Optional: mini championship standings widget
-- Optional: track-record trend chart
+- Ship v5 data separation (`data.json`) and completed-race history blocks
+- Remove legacy plaintext migration chunks from `source/` once the semantic companion is fully trusted
