@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rock City Morning Plan!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --coral: oklch(72% 0.16 25);
+      --sky: oklch(82% 0.12 230);
+      --mint: oklch(85% 0.12 160);
+      --sunflower: oklch(88% 0.16 85);
+      --lavender: oklch(78% 0.1 290);
+      --cream: oklch(97% 0.008 85);
+      --warm-white: oklch(99% 0.004 85);
+      --text-dark: oklch(25% 0.015 250);
+      --text-mid: oklch(40% 0.01 250);
+      --red-usa: oklch(58% 0.2 25);
+      --blue-usa: oklch(45% 0.15 250);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 24px 16px;
+      background-image:
+        radial-gradient(circle at 15% 20%, oklch(92% 0.08 25 / 0.3) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, oklch(90% 0.08 230 / 0.3) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, oklch(94% 0.06 160 / 0.2) 0%, transparent 50%);
+    }
+
+    .page {
+      max-width: 520px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 32px 20px 24px;
+      background: var(--warm-white);
+      border-radius: 28px;
+      border: 3px dashed var(--coral);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '\1F1FA\1F1F8 \1F985 \1F1FA\1F1F8';
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+      letter-spacing: 8px;
+    }
+
+    .header .eyebrow {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--red-usa);
+      margin-top: 20px;
+      margin-bottom: 4px;
+    }
+
+    .header h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: clamp(28px, 7vw, 38px);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .header h1 span {
+      display: block;
+      color: var(--red-usa);
+      font-size: 0.65em;
+      margin-top: 4px;
+    }
+
+    .header .subtitle {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-mid);
+      line-height: 1.4;
+    }
+
+    .header .crew {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .crew-badge {
+      background: var(--sunflower);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .crew-badge.dog {
+      background: var(--mint);
+    }
+
+    .info-block {
+      background: var(--warm-white);
+      border-radius: 22px;
+      padding: 20px;
+      border: 2px solid oklch(90% 0.02 85);
+    }
+
+    .info-block h2 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-block h2 .emoji {
+      font-size: 22px;
+    }
+
+    .info-block p, .info-block li {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-mid);
+      font-weight: 500;
+    }
+
+    .info-block ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .info-block li::before {
+      content: '\2726 ';
+      color: var(--coral);
+      font-weight: 700;
+    }
+
+    .timeline {
+      background: linear-gradient(135deg, oklch(96% 0.04 230), oklch(97% 0.03 160));
+      border-radius: 22px;
+      padding: 20px;
+      border: 2px solid oklch(88% 0.06 230 / 0.5);
+    }
+
+    .timeline h2 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timeline-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .timeline-item .time {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue-usa);
+      background: oklch(95% 0.03 230);
+      border-radius: 10px;
+      padding: 4px 8px;
+      text-align: center;
+    }
+
+    .timeline-item .desc {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text-mid);
+      font-weight: 500;
+    }
+
+    .timeline-item .desc strong {
+      color: var(--text-dark);
+    }
+
+    .trooper-block {
+      background: linear-gradient(135deg, oklch(93% 0.06 160), oklch(95% 0.04 85));
+      border-radius: 22px;
+      padding: 20px;
+      border: 2px solid oklch(85% 0.08 160 / 0.5);
+    }
+
+    .trooper-block h2 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trooper-block p {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-mid);
+      font-weight: 500;
+    }
+
+    .trooper-block .verdict {
+      margin-top: 10px;
+      background: oklch(98% 0.01 160);
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: oklch(35% 0.12 160);
+      text-align: center;
+    }
+
+    .pack-bubble {
+      background: var(--warm-white);
+      border-radius: 22px;
+      padding: 18px 20px;
+      border: 2.5px dashed var(--lavender);
+      position: relative;
+    }
+
+    .pack-bubble::after {
+      content: '\1F45C';
+      position: absolute;
+      top: -10px;
+      right: 16px;
+      font-size: 20px;
+      background: var(--cream);
+      padding: 0 6px;
+    }
+
+    .pack-bubble h3 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--lavender);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .pack-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 16px;
+    }
+
+    .pack-item {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-mid);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pack-item::before {
+      content: '\2610';
+      font-size: 14px;
+      color: var(--lavender);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 12px;
+      color: var(--text-mid);
+      font-weight: 500;
+      line-height: 1.6;
+    }
+
+    .footer .big {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--red-usa);
+      margin-bottom: 4px;
+    }
+
+    .sparkle {
+      display: inline-block;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    @media (max-width: 400px) {
+      .pack-grid { grid-template-columns: 1fr; }
+      .crew { gap: 8px; }
+      .timeline-item { grid-template-columns: 64px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="eyebrow">Friday, July 3rd, 2026 &middot; "Red, White &amp; Wonder" Weekend</div>
+      <h1>WE'RE GOING TO<br>ROCK CITY!! <span>&#x1FAA8; a family morning adventure &#x1F33F;</span></h1>
+      <p class="subtitle">Atop Lookout Mountain, GA &middot; 4,100 ft Enchanted Trail &middot; See 7 States from Lover's Leap &middot; Live Music &middot; Bald Eagles &middot; Hot Dogs (for humans AND the theme)</p>
+      <div class="crew">
+        <span class="crew-badge">&#x1F468; Dad</span>
+        <span class="crew-badge">&#x1F469; Jen</span>
+        <span class="crew-badge">&#x1F9D4; Michael</span>
+        <span class="crew-badge dog">&#x1F415; Trooper</span>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <h2><span class="emoji">&#x23F0;</span> The Morning Game Plan</h2>
+      <div class="timeline-items">
+        <div class="timeline-item">
+          <div class="time">9:00 AM</div>
+          <div class="desc"><strong>Gates open!</strong> Special holiday hours. They normally open at 10, so we're getting the VIP early bird treatment today.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">9&ndash;9:30</div>
+          <div class="desc"><strong>Our target arrival.</strong> Beat the holiday crowds. It WILL get packed by late morning (July 4th weekend + Dog Days of Summer event = everyone and their literal dog).</div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">9 AM&ndash;4P</div>
+          <div class="desc"><strong>Matt Downer, the "Old Time Traveler"</strong> plays folk and bluegrass on his custom "See Rock City" banjo &#x1FA95; (yes that's real and yes it's amazing)</div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">ALL DAY</div>
+          <div class="desc"><strong>Freedom Soars &#x1F985;</strong> Live bald eagle encounters! This is the America 250 celebration, people!!</div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">ALL DAY</div>
+          <div class="desc"><strong>$2.50 hot dogs</strong> at Cliff Terrace and Caf&eacute; 7. Because it's Dog Days of Summer. Get it? &#x1F32D;</div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">EVENING</div>
+          <div class="desc"><strong>Fireworks views from Lover's Leap</strong> (if we decide to stay, park closes at 10:30pm!)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trooper-block">
+      <h2><span class="emoji">&#x1F43E;</span> The Trooper Report</h2>
+      <p><strong>YES, Trooper can come!</strong> Rock City is dog-friendly <em>365 days a year</em>. No size restrictions whatsoever. Any leashed pet is welcome on the Enchanted Trail. They're literally running their "Dog Days of Summer" event right now, so visiting dogs get <strong>free bandanas</strong>!!</p>
+      <p style="margin-top: 8px;"><strong>Big dog heads-up:</strong> Some of the rock passages and stairs are narrow / tight. He'll fit, but just be ready for a few squeeze moments. Bring water, he'll be working harder than us on those inclines.</p>
+      <p style="margin-top: 8px;"><strong>Rules:</strong> Leash max 8 feet. Poop bags mandatory (we got this). That's literally it.</p>
+      <div class="verdict"><span class="sparkle">&#x2705;</span> TROOPER IS CLEARED FOR ADVENTURE <span class="sparkle">&#x2705;</span></div>
+    </div>
+
+    <div class="info-block">
+      <h2><span class="emoji">&#x1F386;</span> Wait, Is It a Holiday?</h2>
+      <p>July 3rd isn't technically a federal holiday (that's the 4th), BUT Rock City is treating it like one! They're running their full <strong>"Red, White &amp; Wonder"</strong> celebration on BOTH July 3 and 4 this year for America's 250th anniversary. So we get the full festive experience today: live string music, the bald eagle show, patriotic vibes, extended hours (9am&ndash;10:30pm), the whole thing.</p>
+      <p style="margin-top: 8px;">TLDR: <strong>it's basically July 4th energy without the actual July 4th crowds.</strong> Smart move, team. &#x1F9E0;</p>
+    </div>
+
+    <div class="info-block">
+      <h2><span class="emoji">&#x1F4CD;</span> Quick Facts</h2>
+      <ul>
+        <li><strong>Address:</strong> 1400 Patten Rd, Lookout Mountain, GA 30750</li>
+        <li><strong>Cost:</strong> ~$21&ndash;27/adult online (up to $43 at the window, so maybe buy ahead!)</li>
+        <li><strong>Parking:</strong> Free, big lot</li>
+        <li><strong>Trail:</strong> 4,100 ft self-guided Enchanted Trail (rock formations, gardens, Swing-A-Long Bridge, Fairyland Caverns, the whole thing)</li>
+        <li><strong>Duration:</strong> Most people spend 2&ndash;3 hours</li>
+        <li><strong>Tickets:</strong> <a href="https://ticketing.seerockcity.com/events/2bec37f4-d33e-0e83-921d-a5fd6e3b47f4" style="color: var(--blue-usa); text-decoration: underline;">Buy online here</a> (seriously, do this, save $$$)</li>
+      </ul>
+    </div>
+
+    <div class="pack-bubble">
+      <h3>&#x2600;&#xFE0F; Don't Forget to Pack</h3>
+      <div class="pack-grid">
+        <span class="pack-item">Sunscreen</span>
+        <span class="pack-item">Dog water bottle</span>
+        <span class="pack-item">Dog dish</span>
+        <span class="pack-item">Leash (8ft max!)</span>
+        <span class="pack-item">Poop bags</span>
+        <span class="pack-item">Extra t-shirt</span>
+        <span class="pack-item">Good walking shoes</span>
+        <span class="pack-item">Socks</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="big">LET'S ROCK (CITY) &#x1F918;</div>
+      Made with excessive enthusiasm and zero chill.<br>
+      See you at 9 AM sharp. Don't be late. Trooper's counting on us.
+    </div>
+
+  </div>
+</body>
+</html>
