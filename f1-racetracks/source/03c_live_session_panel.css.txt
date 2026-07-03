@@ -1,0 +1,46 @@
+/* Main-app live session panel (v5+ live integration slice) */
+
+.live-session-card{border:1px solid oklch(72% 0.12 245/.28);background:linear-gradient(180deg,oklch(21% 0.03 252),oklch(18% 0.022 264));min-width:0}
+.live-session-shell{display:grid;gap:16px;min-width:0}
+.live-session-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.live-session-head h2{font-size:1.16rem;font-weight:700;letter-spacing:-0.02em}
+.live-state-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.live-state-badge.live{background:oklch(70% 0.16 150/.16);color:var(--done)}
+.live-state-badge.replay{background:oklch(72% 0.12 245/.16);color:oklch(72% 0.12 245)}
+.live-state-badge.awaiting{background:oklch(80% 0.16 85/.16);color:var(--active)}
+.live-session-copy{color:var(--muted);line-height:1.55}
+.live-session-meta{display:flex;gap:10px 18px;flex-wrap:wrap;color:var(--muted);font-size:.8rem}
+.live-session-meta span,.live-panel-link{font-family:"IBM Plex Mono",monospace}
+.live-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;min-width:0}
+.live-subpanel{border:1px solid var(--line);border-radius:14px;background:oklch(17% 0.018 264/.62);padding:14px;min-width:0}
+.live-subpanel h3{font-size:.94rem;font-weight:700;letter-spacing:-0.01em;margin-bottom:10px}
+.live-table{width:100%;border-collapse:collapse;font-size:.82rem;table-layout:fixed}
+.live-table th{text-align:left;padding:0 0 8px;border-bottom:1px solid var(--line);font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.live-table td{padding:9px 0;border-bottom:1px solid oklch(32% 0.02 264/.45);overflow-wrap:anywhere;vertical-align:top}
+.live-table tr:last-child td{border-bottom:none}
+.live-teambar{width:4px;height:24px;border-radius:999px;display:inline-block;margin-right:8px;vertical-align:middle}
+.live-driver strong{display:inline-block;min-width:3ch}
+.live-feed{display:grid;gap:10px}
+.live-feed-item{display:grid;gap:6px;padding:10px 0;border-bottom:1px solid oklch(32% 0.02 264/.45)}
+.live-feed-item:last-child{border-bottom:none}
+.live-feed-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.live-chip{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.live-chip.flag{background:oklch(80% 0.16 85/.16);color:var(--active)}
+.live-chip.safety{background:oklch(62% 0.23 25/.16);color:var(--red)}
+.live-chip.session{background:oklch(72% 0.12 245/.16);color:oklch(72% 0.12 245)}
+.live-chip.other{background:oklch(62% 0.01 264/.18);color:var(--muted)}
+.live-panel-link{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;border-bottom:1px solid oklch(100% 0 0/.14);padding-bottom:2px;font-size:.76rem;width:max-content}
+.live-panel-link:hover{border-color:var(--drs)}
+.live-panel-note{color:var(--faint);font-size:.76rem;line-height:1.55;font-family:"IBM Plex Mono",monospace}
+.live-empty{color:var(--muted);line-height:1.55;font-size:.86rem}
+
+@media (max-width:860px){
+  .live-panel-grid{grid-template-columns:1fr}
+}
+
+@media (max-width:720px){
+  .live-session-head{gap:10px}
+  .live-session-meta{gap:8px 14px}
+  .live-subpanel{padding:12px}
+  .live-table th:nth-child(3),.live-table td:nth-child(3){display:none}
+}
