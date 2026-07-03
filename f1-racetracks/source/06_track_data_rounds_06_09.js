@@ -1,4 +1,4 @@
-const TRACK_DATA_ROUNDS_06_09 = [
+window.TRACK_DATA_ROUNDS_06_09 = [
  {slug:'miami', round:6, gp:'Miami GP', flag:'🇺🇸', date:'03 May', status:'done', report:true,
  title:'Miami International Autodrome', loc:'Miami Gardens', cc:'US', length:'5.412', turns:19, laps:57, drsZones:3, elev:'~flat', topSpeed:'~340', record:'1:29.708 · VER \u201923',
  sub:'A purpose-built ribbon wrapped around the Hard Rock Stadium: three long straights for slipstreaming, a tight technical infield, and a flyover that adds the lap’s only real elevation.',

@@ -1,4 +1,4 @@
-const TRACK_DATA_ROUNDS_01_03 = [
+window.TRACK_DATA_ROUNDS_01_03 = [
  {slug:'albert-park', round:1, gp:'Australian GP', flag:'🇦🇺', date:'08 Mar', status:'done', report:true,
  title:'Albert Park Circuit', loc:'Melbourne', cc:'AU', length:'5.278', turns:14, laps:58, drsZones:4, elev:'~flat', topSpeed:'~330', record:'1:19.813 · LEC \u201924',
  sub:'F1’s traditional season-opener: a fast, flowing semi-street circuit around a Melbourne lake. Reprofiled in 2022 into a quicker, wider layout with a rare four DRS zones.',
