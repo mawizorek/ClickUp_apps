@@ -4,106 +4,74 @@
 
 ![Launch](https://img.shields.io/badge/Launch-F1_Racetracks-red?style=for-the-badge)
 
-**Status:** v5 live · properly demonolithized runtime structure · source surface synced and judged · main-app live session panel added · winners history backfilled through Monza
+**Status:** v5 live · main app + live tracker companion shipped · repo/task/source docs aligned in this close-out pass
 
 **Source of truth:** this repo folder
 
 ---
+
+## What it does
+
+F1 Racetracks is a browser app for the 2026 Formula 1 circuit breakdowns. It gives you a home grid of rounds, per-circuit detail views, completed-race panels, winners history, live weather, and an OpenF1-backed live-session slice inside the main app.
+
+It also ships a separate live-tracking companion page for broader session monitoring.
+
+## How to use it
+
+1. Open the main app and choose a round from the home grid or jump menu.
+2. Read the circuit profile, pit and tyre notes, overtaking notes, corner-by-corner table, and live weather on the circuit page.
+3. Use the standalone `live-tracker.html` companion when you want a broader live-session surface outside the main circuit view.
+4. Treat `data.json` as the canonical runtime data surface for schedule/result/history updates.
 
 ## Infrastructure
 
 | File | Role | Update frequency |
 |------|------|------------------|
 | `index.html` | Slim shipped Pages entrypoint that wires together the runtime modules | Rare structural changes only |
-| `data.json` | Runtime data manifest plus race-result, winners, and freshness metadata payload | Weekly / after each race via MCP |
+| `data.json` | Canonical runtime data payload for tracks, results, winners, and freshness metadata | Weekly / after each race via MCP |
 | `live-tracker.html` | Standalone OpenF1 live-session companion page | Iterated when the live layer expands |
-| `source/` | Canonical editable source surface for spot edits and future feature work | Primary edit surface |
-| `next-build-spec.md` | Forward-looking build queue only | Clear/reset until new work is queued |
-
-**What changed in the current runtime:**
-
-- completed-race podium block added to finished rounds
-- pole position card added for finished rounds when qualifying data exists
-- winners history section added to every circuit view
-- runtime data now lives in `data.json`
-- live tracking shipped as the first OpenF1 slice via `live-tracker.html`
-- the main app runtime is loaded from modular files in `/source`, with `index.html` reduced to a slim fireable entrypoint
-- matching circuit pages now show an integrated live session card with OpenF1 status, top running order, and race-control context
-
----
-
-## What it does
-
-A single browser app holding every 2026 F1 circuit breakdown in one place. The index is the home screen (grid of all 24 rounds); each track is a hash-routed view inside the same app. One shared render engine plus one externalized data payload, so layout changes stay in the synced `/source` surface and weekly/live upkeep stays in `data.json`.
-
-**Per-circuit breakdown includes:**
-
-- Lap profile chart with elevation, DRS zones, sector splits
-- Tyre allocation + strategy analysis
-- Pit lane data (entry/exit, loss time, windows)
-- Overtaking analysis (score, hotspots, historical %)
-- Corner guide (name, type, gear, speed)
-- Live weather (Open-Meteo, keyless, fetched on view)
-- Official Wikimedia circuit map
-- Podium graphic with P1 / P2 / P3 for completed races
-- Pole breakdown panel for rounds with qualifying data
-- Winners history board, backfilled through the current report-ready stretch from Silverstone to Monza
-- Integrated OpenF1 live session panel on matching circuit pages
-- Standalone live tracker companion page for the wider session view
-
----
-
-## How to use it
-
-- Open the app → index grid shows all tracked rounds
-- Click any enabled circuit card → full breakdown view
-- Completed rounds surface podium + qualifying context near the top
-- If OpenF1 has a current/recent matching session for the viewed circuit, the page shows a live session card with status, top running order, and recent race-control messages
-- Active and upcoming report-ready rounds can still show historical winners even before the race is run
-- Footer: Live tracker / Copy source / Prepare download / Open in new tab / Export data (.json)
-- For the wider session view, open [**Live Tracker**](https://mawizorek.github.io/ClickUp_apps/f1-racetracks/live-tracker.html)
-
----
+| `source/` | Canonical shell/style/logic edit surface for repo-managed spot edits | Primary edit surface |
+| `next-build-spec.md` | Forward-looking build brief and queue | Clear/reset between active builds |
 
 ## Architecture
 
-- **Aesthetic:** dark telemetry dashboard. Sectors S1 cyan / S2 violet / S3 gold, DRS green, elevation amber, Ferrari-red accent. Fonts: Space Grotesk + IBM Plex Mono.
-- **Routing:** `#/` = home (index grid). `#/slug` = circuit view. `renderHome()` / `renderTrack()` / `renderSoon()` driven by `router()` on `hashchange`.
-- **Runtime structure:** the app is not a giant monolithic runtime file. `index.html` is a slim entrypoint that loads runtime styles and JS directly from `/source` plus data from `data.json`.
-- **Spot-edit workflow:** use `/source` first. The runtime entrypoint is not the primary editing surface.
-- **Completed-race panels:** podium / pole / history all render from the `raceResults` and `historicWinners` objects in `data.json`.
-- **Live-tracking integration:** `13_live_session_panel.js` adds the first integrated OpenF1 slice inside the main circuit experience. `live-tracker.html` remains the standalone broader companion surface.
-- **Shared engine:** `buildProfile()` (lap-profile chart), `loadWeather()` (live Open-Meteo fetch), live session panel renderers, table + panel renderers. Change the engine once, every track updates.
-- **Maps:** official Wikimedia outline via `Special:FilePath/`; `onerror` shows the filename for debugging.
-- **No looping animation;** hover / entry motion only.
+### Runtime model
 
----
+- `index.html` is the shipped Pages runtime.
+- `data.json` is the authoritative runtime data surface.
+- `live-tracker.html` is a separate companion experience, not a replacement for the main app.
+
+### Source model
+
+- `source/` is the canonical repo-managed shell/style/logic companion for future edits.
+- The older grouped round-band source data files have been retired from `source/`; runtime data now lives in `data.json`.
+- Agents should start from `source/source_index.md` for shell/style/logic edits and from `data.json` for data changes.
+
+### Interaction / rendering notes
+
+- Hash routing drives the main app (`#/` for home, `#/slug` for circuit views).
+- The main circuit experience integrates the first live-session panel directly into matching race pages.
+- Shared helpers such as lap-profile rendering, weather loading, and footer export behavior keep the track views consistent.
+
+### Budget note
+
+- Semantic source files target ~10–12 KB and split at ~15 KB unless an exception is explicitly approved.
+- One documented exception remains in the close-out state: `source/10_track_views_and_profile.js` is still a merged view/profile module and should be the first split target on the next structural touch.
 
 ## Version history
 
-- **v5** — completed-race podium card, pole panel, winners history board, richer external data payload
-- **v5 structural cleanup** — source surface synced, runtime demonolithized into a slim entrypoint plus modular source files
-- **v5 live slice** — OpenF1 live tracker companion and matching-circuit live panel in the main app
-- **v5 safe split** — runtime pulled track data out of the monolith and into the external payload path
-- **v4.1 source scaffold** — initial semantic source scaffold added under `source/`
-- **v4** — standalone offline-first build; footer source-export trio + Export data (.json), sandbox-safe
-- v3 — +4 circuits (Hungary, Netherlands, Italy, Spain / Madrid); 14 of 24 built
-- v2 — fixed four wrong Wikimedia map filenames
-- v1 — initial single-file app: 10 circuit breakdowns, index + hash-routed track views
-
----
+- **v5** — integrated the live session panel into the main app, externalized runtime data into `data.json`, aligned the repo/source/task surfaces, and kept the standalone live tracker companion.
+- **v4** — shipped the full standalone circuit breakdown app as the stable pre-repo artifact baseline.
 
 ## Related
 
-- **ClickUp task:** F1 Racetracks — circuit breakdown app (APPS list)
-- **F1 Weekly Refresh guide:** Brain Reference Library > Formula 1
-- **Generator spec:** Circuit Breakdown Report — Brain Reference (Generator Tool)
-
----
+- ClickUp task: [F1 Racetracks — circuit breakdown app](https://app.clickup.com/t/86aj9wgx0)
+- Live tracker companion: [Open live tracker](https://mawizorek.github.io/ClickUp_apps/f1-racetracks/live-tracker.html)
+- Source index: [`source/source_index.md`](https://github.com/mawizorek/ClickUp_apps/blob/main/f1-racetracks/source/source_index.md)
+- Next build brief: [`next-build-spec.md`](https://github.com/mawizorek/ClickUp_apps/blob/main/f1-racetracks/next-build-spec.md)
 
 ## Roadmap
 
-- decide whether the next OpenF1 step expands the in-page live panel or graduates more of the companion tracker into the main circuit view
-- build the remaining 8 circuit breakdowns (Baku → Abu Dhabi)
-- persist last-viewed circuit + add keyboard left / right between rounds
-- split oversized grouped data source files under the 15 KB hard threshold
+- No active build is queued right now.
+- Future feature work belongs in `next-build-spec.md`.
+- The next structural cleanup target is splitting `source/10_track_views_and_profile.js` when that module is touched again.
