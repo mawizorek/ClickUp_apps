@@ -1,5 +1,9 @@
 {
   "version": "2026-07-03",
+  "last_updated": "2026-07-03T15:15:00-04:00",
+  "update_focus": "Historic winners backfill for the active report-ready run from Silverstone through Monza.",
+  "current_round_slug": "silverstone",
+  "last_completed_round_slug": "red-bull-ring",
   "season": 2026,
   "mode": "manifest",
   "track_source_files": [
@@ -224,11 +228,41 @@
     "red-bull-ring": [
       { "year": 2026, "driver": "George Russell", "team": "Mercedes" }
     ],
-    "silverstone": [],
-    "spa": [],
-    "hungaroring": [],
-    "zandvoort": [],
-    "monza": [],
+    "silverstone": [
+      { "year": 2025, "driver": "Lando Norris", "team": "McLaren" },
+      { "year": 2024, "driver": "Lewis Hamilton", "team": "Mercedes" },
+      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2022, "driver": "Carlos Sainz", "team": "Ferrari" },
+      { "year": 2021, "driver": "Lewis Hamilton", "team": "Mercedes" }
+    ],
+    "spa": [
+      { "year": 2025, "driver": "Oscar Piastri", "team": "McLaren" },
+      { "year": 2024, "driver": "Lewis Hamilton", "team": "Mercedes" },
+      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2022, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2021, "driver": "Max Verstappen", "team": "Red Bull" }
+    ],
+    "hungaroring": [
+      { "year": 2025, "driver": "Lando Norris", "team": "McLaren" },
+      { "year": 2024, "driver": "Oscar Piastri", "team": "McLaren" },
+      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2022, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2021, "driver": "Esteban Ocon", "team": "Alpine" }
+    ],
+    "zandvoort": [
+      { "year": 2025, "driver": "Oscar Piastri", "team": "McLaren" },
+      { "year": 2024, "driver": "Lando Norris", "team": "McLaren" },
+      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2022, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2021, "driver": "Max Verstappen", "team": "Red Bull" }
+    ],
+    "monza": [
+      { "year": 2025, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2024, "driver": "Charles Leclerc", "team": "Ferrari" },
+      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2022, "driver": "Max Verstappen", "team": "Red Bull" },
+      { "year": 2021, "driver": "Daniel Ricciardo", "team": "McLaren" }
+    ],
     "madring": [],
     "baku": [],
     "marina-bay": [],
