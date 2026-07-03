@@ -1,0 +1,13 @@
+{
+  "version": "2026-07-03",
+  "season": 2026,
+  "mode": "manifest",
+  "track_source_files": [
+    "./source/05_track_data_rounds_01_03.js",
+    "./source/06_track_data_rounds_06_09.js",
+    "./source/07_track_data_rounds_10_13.js",
+    "./source/08_track_data_rounds_14_24.js"
+  ],
+  "raceResults": {},
+  "historicWinners": {}
+}
