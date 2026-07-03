@@ -1,34 +1,30 @@
-# F1 Racetracks source surface
+# F1 Racetracks — semantic source companion
 
-This folder is the canonical editable source surface for `f1-racetracks`.
+This folder is the **preferred shell/style/logic source surface** for F1 Racetracks.
 
-## Read order
+The shipped app still runs from `../index.html`, and the canonical runtime data now lives in `../data.json`.
 
-1. `source_index.md`
-2. The specific source files named there
-3. `../next-build-spec.md` only if there is active future work queued
+## Current state
 
-## Current source shape
+- current live runtime target: **v5**
+- runtime architecture: `index.html` shell + `data.json` payload + `live-tracker.html` companion
+- `source/` now focuses on shell, styles, bootstrap, track views, weather/footer behavior, and the live session panel logic
+- the old grouped round-band source data files have been retired from this folder; runtime data belongs in `../data.json`
 
-- `01` / `04` define the slim runtime entrypoint shell
-- `02` / `03` / `03b` / `03c` define the runtime styling surface
-- `05`–`08` hold grouped track data
-- `09`–`11` hold the current v5 main-runtime logic surface
-- `13` holds the main-app live session integration slice
-- `12` remains the standalone live-tracker companion helper layer
+## Important rule
 
-## Budget watch
+Read **`source_index.md` first** before editing.
 
-- Target ~10–12 KB per source file.
-- Split at ~15 KB unless explicitly approved otherwise.
-- Current watch list:
-  - `06_track_data_rounds_06_09.js`
-  - `07_track_data_rounds_10_13.js`
-  - `08_track_data_rounds_14_24.js`
+## Documentation rule
 
-## Judgement
+When runtime structure, shell behavior, or live architecture changes, update the corresponding README / spec / runtime header comments in the same pass as the code change.
 
-- The current v5 app is wired to run from the source surface instead of a giant monolithic runtime file.
-- There is no remaining old-structure carryover blocking normal spot edits.
-- The main app and the live tracker now both have dedicated source surfaces.
-- Future main-app work should edit the relevant files here first, not reverse-engineer `index.html`.
+## Budget note
+
+- target ~10–12 KB per semantic source file
+- split at ~15 KB unless an exception is explicitly approved
+- current documented exception: `10_track_views_and_profile.js`
+
+## Goal
+
+Keep the runtime, source layout, and documentation surfaces aligned so future app work starts from the actual shell/style/logic source files plus `../data.json`, not from stale migration notes or guesswork over the monolith.
