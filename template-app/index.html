@@ -1,623 +1,242 @@
 <!DOCTYPE html>
-<!-- INFRASTRUCTURE: self-contained runtime app; editable semantic source lives in /source/ -->
-<!-- Theme changes should primarily happen in /source/03_theme_team.css.txt and then be re-inlined here. -->
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ClickUp Apps Index</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #0a1224;
-      --bg-soft: #101a34;
-      --panel: rgba(10, 19, 38, 0.9);
-      --panel-strong: rgba(15, 29, 58, 0.95);
-      --text: #edf3ff;
-      --muted: #b8c4de;
-      --line: rgba(255, 255, 255, 0.12);
-      --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-      --radius-xl: 28px;
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --transition: 180ms ease;
-      --success: #4ade80;
-      --warning: #fbbf24;
-      --danger: #fb7185;
-      --accent: #ff8000;
-      --accent-strong: #d96b00;
-      --accent-2: #4cc9f0;
-      --hero-bg: radial-gradient(circle at 16% 18%, rgba(255, 128, 0, 0.28), transparent 34%), radial-gradient(circle at 84% 12%, rgba(76, 201, 240, 0.18), transparent 24%), linear-gradient(135deg, rgba(19, 19, 23, 0.98), rgba(7, 7, 10, 0.99));
-      --hero-stripes: repeating-linear-gradient(116deg, rgba(255, 255, 255, 0.07) 0 14px, rgba(255, 255, 255, 0) 14px 58px);
-      --button-text: #fff7ef;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="github-folder" content="template-app">
+<title>Template Reference</title>
+<!-- INFRASTRUCTURE: self-contained (no external data file) -->
+<style>
+:root {
+  --bg: oklch(10% 0.015 260);
+  --surface: oklch(15% 0.012 260);
+  --surface-2: oklch(19% 0.01 260);
+  --text: oklch(93% 0.005 260);
+  --text-mid: oklch(76% 0.008 260);
+  --text-muted: oklch(58% 0.01 260);
+  --text-dim: oklch(44% 0.008 260);
+  --accent: oklch(72% 0.14 200);
+  --accent-soft: oklch(72% 0.14 200 / 0.1);
+  --green: oklch(72% 0.14 155);
+  --border: oklch(24% 0.008 260);
+  --code-bg: oklch(12% 0.01 260);
+  --radius: 10px;
+}
 
-    * { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
 
-    body {
-      min-height: 100vh;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.06), transparent 28%), var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
+.container {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 36px 16px 100px;
+}
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: var(--hero-stripes);
-      opacity: 0.16;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
+.badge-top {
+  display: inline-block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid oklch(35% 0.08 200);
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+h1 {
+  font-size: clamp(1.5rem, 5vw, 1.875rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
 
-    button {
-      font: inherit;
-      color: inherit;
-    }
+.subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
 
-    .shell {
-      position: relative;
-      z-index: 1;
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 24px 0 40px;
-    }
+section {
+  margin-bottom: 28px;
+}
 
-    .hero {
-      position: relative;
-      overflow: hidden;
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--line);
-      background: var(--hero-bg);
-      box-shadow: var(--shadow);
-      padding: clamp(24px, 5vw, 44px);
-    }
+h2 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: auto -18% -52% auto;
-      width: 340px;
-      height: 340px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 128, 0, 0.22), transparent 62%);
-      pointer-events: none;
-    }
+.folder-tree {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  font-size: 0.75rem;
+  line-height: 1.8;
+  color: var(--text-mid);
+  overflow-x: auto;
+}
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(6, 14, 28, 0.45);
-      color: var(--muted);
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
+.folder-tree .dir { color: var(--accent); font-weight: 600; }
+.folder-tree .file { color: var(--text-muted); }
+.folder-tree .note { color: var(--text-dim); font-style: italic; }
 
-    .hero h1 {
-      margin: 0;
-      max-width: 12ch;
-      font-size: clamp(2.3rem, 7vw, 4.9rem);
-      line-height: 0.95;
-      letter-spacing: -0.04em;
-    }
+.checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    .hero p {
-      max-width: 70ch;
-      margin: 16px 0 0;
-      color: var(--muted);
-      font-size: clamp(1rem, 2vw, 1.1rem);
-    }
+.checklist li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.8125rem;
+  color: var(--text-mid);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
 
-    .hero .accent,
-    .card code {
-      color: var(--accent-2);
-    }
+.checklist li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 22px;
-    }
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    .button,
-    .link-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 46px;
-      padding: 12px 18px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      transition: transform var(--transition), border-color var(--transition), background var(--transition), opacity var(--transition);
-      cursor: pointer;
-    }
+.link-card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  text-decoration: none;
+  color: var(--text-mid);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: border-color 150ms;
+}
 
-    .button:hover,
-    .link-pill:hover {
-      transform: translateY(-1px);
-    }
+.link-card:hover { border-color: var(--accent); }
+.link-card span { color: var(--text-dim); font-weight: 400; display: block; font-size: 0.6875rem; margin-top: 2px; }
 
-    .button-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: var(--button-text);
-      box-shadow: 0 16px 30px rgba(255, 128, 0, 0.28);
-    }
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: oklch(10% 0.015 260 / 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.625rem;
+  color: var(--text-dim);
+}
 
-    .button-secondary,
-    .link-pill {
-      border-color: rgba(255, 255, 255, 0.16);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-    }
+footer a { color: var(--text-muted); text-decoration: none; }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .stat {
-      padding: 16px 18px;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(5, 11, 24, 0.52);
-      backdrop-filter: blur(8px);
-    }
-
-    .stat-label {
-      font-size: 0.76rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-    }
-
-    .stat-value {
-      margin-top: 6px;
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-    }
-
-    .status-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 24px;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 44px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--muted);
-    }
-
-    .status-pill::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--warning);
-      box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.12);
-    }
-
-    .status-pill[data-tone="live"]::before { background: var(--success); box-shadow: 0 0 0 6px rgba(74, 222, 128, 0.12); }
-    .status-pill[data-tone="cached"]::before { background: var(--warning); }
-    .status-pill[data-tone="error"]::before { background: var(--danger); box-shadow: 0 0 0 6px rgba(251, 113, 133, 0.12); }
-
-    .section-title {
-      margin: 28px 0 0;
-      font-size: 1.15rem;
-      letter-spacing: -0.02em;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-top: 18px;
-    }
-
-    .card,
-    .notice {
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-      box-shadow: var(--shadow);
-      padding: 18px;
-    }
-
-    .card {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      min-height: 210px;
-      transition: transform var(--transition), border-color var(--transition), background var(--transition);
-    }
-
-    .card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 128, 0, 0.35);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .card h2 {
-      margin: 0;
-      font-size: 1.1rem;
-      letter-spacing: -0.02em;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--muted);
-      font-size: 0.74rem;
-      white-space: nowrap;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-    }
-
-    .card code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.85rem;
-    }
-
-    .card-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: auto;
-    }
-
-    .link-pill {
-      flex: 1 1 140px;
-    }
-
-    .link-pill.primary {
-      background: rgba(255, 128, 0, 0.14);
-      border-color: rgba(255, 128, 0, 0.32);
-    }
-
-    .notice {
-      color: var(--muted);
-    }
-
-    .notice strong {
-      color: var(--text);
-    }
-
-    .footer {
-      margin-top: 24px;
-      padding: 18px 0 4px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 18px;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    @media (max-width: 640px) {
-      .shell {
-        width: min(100% - 20px, 1180px);
-        padding: 16px 0 28px;
-      }
-
-      .hero,
-      .card,
-      .notice {
-        padding: 16px;
-      }
-
-      .card-actions .link-pill,
-      .actions .button {
-        flex: 1 1 100%;
-      }
-
-      .footer {
-        padding-bottom: calc(8px + env(safe-area-inset-bottom));
-      }
-    }
-  </style>
+@media (min-width: 640px) {
+  .container { max-width: 600px; padding: 48px 24px 100px; }
+}
+</style>
 </head>
 <body>
-  <main class="shell">
-    <section class="hero">
-      <div class="eyebrow">Template proof · semantic source schema</div>
-      <h1>ClickUp Apps <span class="accent">Grid</span></h1>
-      <p>
-        The runtime stays self-contained in <code>index.html</code>, while the editable source now lives as small semantic files in <code>/source/</code>.
-        This proof keeps the app-index behavior intact and restores the visual system to a McLaren-inspired papaya theme.
-      </p>
-      <div class="actions">
-        <a class="button button-primary" href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noreferrer">Open repo</a>
-        <button id="refresh-button" class="button button-secondary" type="button">Refresh app list</button>
-      </div>
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-label">Apps detected</div>
-          <div id="stat-total" class="stat-value">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Data source</div>
-          <div id="stat-source" class="stat-value">Loading</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Last refresh</div>
-          <div id="stat-refresh" class="stat-value">—</div>
-        </div>
-      </div>
-    </section>
+<div class="container">
+  <div class="badge-top">Reference template</div>
+  <h1>App Build Standard</h1>
+  <p class="subtitle">This folder is the scaffold every new app starts from. Copy it, rename it, build on it. Everything here defines the shape, docs, and workflow that all apps in this repo follow.</p>
 
-    <div class="status-row">
-      <div id="status-pill" class="status-pill" data-tone="loading" aria-live="polite">Connecting to the GitHub API…</div>
+  <section>
+    <h2>Required folder shape</h2>
+    <div class="folder-tree">
+      <span class="dir">your-app/</span><br>
+      ├── <span class="file">index.html</span> <span class="note">← the app itself + Pages entry point</span><br>
+      ├── <span class="file">README.md</span> <span class="note">← permanent docs, launch link, architecture</span><br>
+      ├── <span class="file">next-build-spec.md</span> <span class="note">← current build contract (overwritten each cycle)</span><br>
+      ├── <span class="file">data.json</span> <span class="note">← optional, for data-separated apps</span><br>
+      └── <span class="dir">source/</span> <span class="note">← chunk set for Brain readback (if app &gt; 30KB)</span>
     </div>
+  </section>
 
-    <h2 class="section-title">Live app shortcuts</h2>
-    <section id="app-list" class="grid" aria-live="polite">
-      <article class="notice">
-        <strong>Loading apps…</strong>
-        <p>Querying the root of <code>mawizorek/ClickUp_apps</code> and building cards from the current repo folders.</p>
-      </article>
-    </section>
+  <section>
+    <h2>README structure (every app)</h2>
+    <ul class="checklist">
+      <li>Title + launch button at the very top</li>
+      <li>Status line (Live / Source of truth)</li>
+      <li>What it does</li>
+      <li>How to use it</li>
+      <li>Infrastructure table (files + roles + update frequency)</li>
+      <li>Architecture (non-obvious technical decisions)</li>
+      <li>Version history (highlights, commit history is authoritative)</li>
+      <li>Related links (ClickUp task, revision history)</li>
+      <li>Roadmap</li>
+    </ul>
+  </section>
 
-    <footer class="footer">
-      <div>Theme proof: McLaren papaya · Runtime logic unchanged in purpose.</div>
-      <div class="footer-links">
-        <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app" target="_blank" rel="noreferrer">template-app repo folder</a>
-        <span id="footerVersion">v3 · 2026-07-02</span>
-      </div>
-    </footer>
-  </main>
+  <section>
+    <h2>Build workflow</h2>
+    <ul class="checklist">
+      <li><strong>Brainstorm Gate</strong> — 7 teams, all fired before any spec is written</li>
+      <li><strong>Session 1 (Spec Agent)</strong> — hash out changes, commit next-build-spec.md</li>
+      <li><strong>Session 2 (Render Agent)</strong> — reads spec, applies diffs, delivers artifact</li>
+      <li><strong>Pre-ship gates</strong> — Syntax Gate + Runtime/Sandbox Gate, both mandatory</li>
+      <li><strong>Ship</strong> — version comment, twin capture, field updates</li>
+    </ul>
+  </section>
 
-  <script>
-    const APP_VERSION = 'v3';
-    const APP_DATE = '2026-07-02';
-    const TEAM_THEME = 'McLaren';
-    const REPO_OWNER = 'mawizorek';
-    const REPO_NAME = 'ClickUp_apps';
-    const REPO_BRANCH = 'main';
-    const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents?ref=${REPO_BRANCH}`;
-    const CACHE_KEY = 'clickup_apps_index_cache_v3';
-    const HIDDEN_FOLDERS = new Set(['.github']);
-    const SPECIAL_WORDS = new Map([
-      ['ai', 'AI'],
-      ['ddr', 'DDR'],
-      ['f1', 'F1'],
-      ['pdf', 'PDF']
-    ]);
+  <section>
+    <h2>Quick links</h2>
+    <div class="links">
+      <a href="https://mawizorek.github.io/ClickUp_apps/app-dashboard/" class="link-card">
+        App Dashboard
+        <span>Live launcher for all repo apps</span>
+      </a>
+      <a href="https://github.com/mawizorek/ClickUp_apps" class="link-card">
+        GitHub Repo
+        <span>mawizorek/ClickUp_apps</span>
+      </a>
+      <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app" class="link-card">
+        This folder on GitHub
+        <span>template-app/ — the physical scaffold</span>
+      </a>
+    </div>
+  </section>
+</div>
 
-    const appListEl = document.getElementById('app-list');
-    const statusPillEl = document.getElementById('status-pill');
-    const statTotalEl = document.getElementById('stat-total');
-    const statSourceEl = document.getElementById('stat-source');
-    const statRefreshEl = document.getElementById('stat-refresh');
-    const footerVersionEl = document.getElementById('footerVersion');
-    const refreshButtonEl = document.getElementById('refresh-button');
-
-    footerVersionEl.textContent = `${APP_VERSION} · ${APP_DATE}`;
-
-    function titleFromSlug(slug) {
-      return slug
-        .split('-')
-        .filter(Boolean)
-        .map((segment) => {
-          const lower = segment.toLowerCase();
-          if (SPECIAL_WORDS.has(lower)) return SPECIAL_WORDS.get(lower);
-          return lower.charAt(0).toUpperCase() + lower.slice(1);
-        })
-        .join(' ');
-    }
-
-    function formatTimestamp(isoString) {
-      if (!isoString) return '—';
-      const date = new Date(isoString);
-      if (Number.isNaN(date.getTime())) return '—';
-      return date.toLocaleString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit'
-      });
-    }
-
-    function repoUrlFor(slug) {
-      return `https://github.com/${REPO_OWNER}/${REPO_NAME}/tree/${REPO_BRANCH}/${slug}`;
-    }
-
-    function liveUrlFor(slug) {
-      return `https://${REPO_OWNER}.github.io/${REPO_NAME}/${slug}/`;
-    }
-
-    function isAppDirectory(item) {
-      return item && item.type === 'dir' && !HIDDEN_FOLDERS.has(item.name);
-    }
-
-    function toAppRecord(item) {
-      const slug = item.name;
-      return {
-        slug,
-        title: titleFromSlug(slug),
-        liveUrl: liveUrlFor(slug),
-        repoUrl: repoUrlFor(slug),
-        isTemplate: slug === 'template-app'
-      };
-    }
-
-    function writeCache(payload) {
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
-      } catch (error) {
-        console.warn('Cache write failed', error);
-      }
-    }
-
-    function readCache() {
-      try {
-        const raw = localStorage.getItem(CACHE_KEY);
-        return raw ? JSON.parse(raw) : null;
-      } catch (error) {
-        console.warn('Cache read failed', error);
-        return null;
-      }
-    }
-
-    function setStatus(message, tone) {
-      statusPillEl.textContent = message;
-      statusPillEl.dataset.tone = tone;
-    }
-
-    function setStats(count, sourceLabel, fetchedAt) {
-      statTotalEl.textContent = String(count ?? '—');
-      statSourceEl.textContent = sourceLabel || '—';
-      statRefreshEl.textContent = formatTimestamp(fetchedAt);
-    }
-
-    function renderEmptyState(message, detail) {
-      appListEl.innerHTML = `
-        <article class="notice">
-          <strong>${message}</strong>
-          <p>${detail}</p>
-        </article>
-      `;
-    }
-
-    function renderApps(apps) {
-      if (!apps.length) {
-        renderEmptyState('No app folders found.', 'The repo root returned no app directories to display.');
-        return;
-      }
-
-      appListEl.innerHTML = apps
-        .map((app) => {
-          const badge = app.isTemplate ? 'Reference template' : 'Live shortcut';
-          const note = app.isTemplate
-            ? 'Primary reference app and schema proof. Theme is isolated in /source/03_theme_team.css.txt.'
-            : 'Auto-discovered from the repo root and linked directly to its GitHub Pages entry point.';
-
-          return `
-            <article class="card">
-              <div class="card-header">
-                <div>
-                  <h2>${app.title}</h2>
-                  <p><code>${app.slug}</code></p>
-                </div>
-                <span class="badge">${badge}</span>
-              </div>
-              <p>${note}</p>
-              <div class="card-actions">
-                <a class="link-pill primary" href="${app.liveUrl}" target="_blank" rel="noreferrer">Open app</a>
-                <a class="link-pill" href="${app.repoUrl}" target="_blank" rel="noreferrer">Repo folder</a>
-              </div>
-            </article>
-          `;
-        })
-        .join('');
-    }
-
-    async function fetchAppsFromGitHub() {
-      const response = await fetch(API_URL, {
-        headers: {
-          Accept: 'application/vnd.github+json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`GitHub API responded with ${response.status}`);
-      }
-
-      const items = await response.json();
-      return items
-        .filter(isAppDirectory)
-        .map(toAppRecord)
-        .sort((a, b) => a.title.localeCompare(b.title));
-    }
-
-    async function loadApps({ forceRefresh = false } = {}) {
-      refreshButtonEl.disabled = true;
-      setStatus(forceRefresh ? 'Refreshing live app list…' : `Connecting to the ${TEAM_THEME} template…`, 'loading');
-
-      try {
-        const apps = await fetchAppsFromGitHub();
-        const payload = {
-          apps,
-          fetchedAt: new Date().toISOString(),
-          source: 'live'
-        };
-
-        writeCache(payload);
-        renderApps(apps);
-        setStats(apps.length, 'Live API', payload.fetchedAt);
-        setStatus(`Loaded ${apps.length} app folders from the live GitHub API.`, 'live');
-      } catch (error) {
-        console.error(error);
-        const cached = readCache();
-
-        if (cached?.apps?.length) {
-          renderApps(cached.apps);
-          setStats(cached.apps.length, 'Cached', cached.fetchedAt);
-          setStatus('Live fetch failed — showing the last cached app list.', 'cached');
-        } else {
-          renderEmptyState(
-            'Could not load the app list.',
-            'GitHub may be rate-limiting, offline, or blocking the request. Open the repo directly, then try Refresh when you are back online.'
-          );
-          setStats('—', 'Unavailable', null);
-          setStatus('Could not reach the GitHub API and no cached list is available yet.', 'error');
-        }
-      } finally {
-        refreshButtonEl.disabled = false;
-      }
-    }
-
-    refreshButtonEl.addEventListener('click', () => loadApps({ forceRefresh: true }));
-    loadApps();
-  </script>
+<footer>
+  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app">template-app</a> · reference page · 2026-07-02
+</footer>
 </body>
 </html>
