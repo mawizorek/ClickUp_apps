@@ -7,8 +7,8 @@ The live app still ships from `../index.html`, but the source is no longer treat
 ## Current state
 
 - shell, styles, and logic are split into named semantic source files
-- grouped data files now exist for **all current rounds/stubs**
-- the old migration map is no longer needed once the legacy chunk-set files are removed
+- grouped data files now exist for all current rounds/stubs
+- `data.json` is now the runtime data entry point / manifest for the live app
 
 ## Important rule
 
@@ -16,4 +16,4 @@ Read **`source_index.md` first**.
 
 ## Goal
 
-Finish removing the runtime monolith and old chunk-set artifacts as the required source read path.
+Keep the runtime small and the data externalized while preserving the semantic source scaffold for future agent work.
