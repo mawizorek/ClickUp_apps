@@ -1,77 +1,40 @@
-# [App Name] v[N+1] — Build Spec (Surgical Diffs)
-
-**For the rendering agent.** Read the current source from `<app-slug>/source/` (base64-armored chunk set), then apply the diffs below. Ship as v[N+1].
+# <app-slug> — next build brief
 
 ## Source location
 
-- **Chunk index:** `<app-slug>/source/source_index.html`
-- **Repo:** `mawizorek/ClickUp_apps` (branch `main`)
-- **Commit (pinned):** `<paste commit SHA here for reliability>`
-- **Encoding:** base64 armored
-- **Total chunks:** [N]
-- **Total source bytes:** [X]
+- Runtime app: `<app-slug>/index.html`
+- Runtime data: `<app-slug>/data.json` _(if applicable)_
+- Preferred edit surface: `<app-slug>/source/`
+- Current live version: `v[N]`
 
-## What this version does (summary)
+## Scratch intake
 
-1. [Change 1]
-2. [Change 2]
-3. ...
+_Raw feature ideas, Michael's freeform notes, and unprocessed requests land here. Promote to Next build or Futures once scoped._
 
----
+- _Empty._
 
-## Diff 1: [Description]
+## Next build
 
-```javascript
-// FIND:
-[exact code to find]
-// REPLACE WITH:
-[exact replacement code]
-```
+_The active build target. Full spec: what to change, why, acceptance criteria, agent instructions. When this ships, clear it and promote the next item from Futures._
 
----
+- _Empty._
 
-## Diff 2: [Description]
+## In review
 
-```javascript
-// FIND:
-[exact code to find]
-// REPLACE WITH:
-[exact replacement code]
-```
+_Active PRs or iterations being tested/reviewed before merge._
 
----
+- _Empty._
 
-## [Additional diffs as needed...]
+## Futures
 
----
+_Queued features with enough detail for sequencing and cold-pickup. Promote to Next build when the current cycle ships._
 
-## Export / zip structure target (if applicable)
+- _Empty._ Queue the next feature idea only after a new scoped build is chosen.
 
-```
-app-slug-vN_YYYY-MM-DD-HHMM.zip
-└── app-slug/
-    ├── vN-Report.md
-    ├── app-slug-vN.html
-    └── source/
-        ├── chunks...
-        ├── README.md
-        └── source_index.html
-```
+## Known guardrails
 
----
+_Standing constraints for this app that every build must respect._
 
-## Agent instructions
-
-1. Read the chunk set from `<app-slug>/source/source_index.html`. Follow the gated walk (auto-advance up to 5 chunks per pass).
-2. After reading all chunks, apply the diffs above in order.
-3. Deliver the complete modified source as a ClickUp artifact (v[N+1]).
-4. Do NOT commit to the repo (file is >30KB). Michael uploads manually.
-5. Post the standard version comment on the app's task.
-
----
-
-## Known snags / notes for the render agent
-
-- [Any gotchas, transient failures, or context the render agent needs]
-- Base64 armor is mandatory for HTML source chunks (plaintext gets tag-flattened by fetch tools).
-- Prefer commit-pinned raw URLs over `main` branch URLs (transient CDN 404s on recent commits).
+- Spot edits should start from `/source`, not from `index.html`.
+- Keep semantic source files near the ~10–12 KB soft target and split at ~15 KB unless explicitly approved otherwise.
+- _(Add app-specific budget-watch files, architecture notes, or "do NOT" rules here.)_
