@@ -4,39 +4,9 @@
 
 ![Launch](https://img.shields.io/badge/Launch-F1_Racetracks-red?style=for-the-badge)
 
-**Status:** v5 live · externalized data payload + completed-race panels shipped
+**Status:** v5 live · externalized data payload active · winners history backfilled through Monza
 
-**Source of truth:** this repo folder  
-**ClickUp task:** [F1 Racetracks — circuit breakdown app](https://app.clickup.com/t/86aj9wgx0)
-
----
-
-## What it does
-
-A single self-contained HTML app holding every 2026 F1 circuit breakdown in one place. The index is the home screen; each track is a hash-routed view inside the same app. One shared render engine plus one externalized data payload means layout changes stay in `index.html` while circuit and results updates stay in `data.json`.
-
-**Per-circuit breakdown includes:**
-
-- Official circuit map
-- Lap profile chart with elevation, DRS zones, and sector splits
-- Tyre allocation + strategy analysis
-- Pit lane data
-- Overtaking analysis
-- Corner guide
-- Live weather
-- Completed-race podium panel
-- Pole breakdown panel
-- Winners history board
-
----
-
-## How to use it
-
-- Open the app → the index grid shows every tracked round
-- Tap a circuit card → open the full breakdown view
-- Completed rounds surface podium + qualifying context near the top
-- Winners history sits lower on every circuit view and updates from `data.json`
-- Footer actions let you copy source, prepare a download, open raw source, or export the resolved dataset
+**Source of truth:** this repo folder
 
 ---
 
@@ -44,57 +14,87 @@ A single self-contained HTML app holding every 2026 F1 circuit breakdown in one 
 
 | File | Role | Update frequency |
 |------|------|------------------|
-| `index.html` | Shipped runtime app (UI, routing, render logic, styling) | Version bumps + live polish passes |
-| `data.json` | Externalized runtime payload (track manifest, race results, winners data) | Weekly / after each race via MCP |
-| `source/01_runtime_head.html` | Runtime head / library / wrapper source | When runtime chrome changes |
-| `source/02_styles_foundation_and_layout.css.txt` | Layout, tokens, cards, chart foundations | When layout or responsive behavior changes |
-| `source/03_styles_panels_tables_footer.css.txt` | Panels, tables, footer toolbar, late UI rules | When panel/footer behavior changes |
-| `source/04_runtime_shell.html` | Header / footer shell markup | When runtime shell changes |
-| `source/05_track_data_rounds_01_03.js`–`08_track_data_rounds_14_24.js` | Grouped circuit data source files | When circuit content changes |
-| `source/09_app_bootstrap_and_home.js` | App boot, router, home screen logic | When boot / home behavior changes |
-| `source/10_track_views_and_profile.js` | Circuit-view rendering and lap profile logic | When track-view behavior changes |
-| `source/11_weather_and_footer_exports.js` | Weather fetch + footer export actions | When integrations / footer behavior change |
-| `source/source_index.md` | Canonical composition order + source guardrails | When source structure changes |
-| `next-build-spec.md` | Forward-looking build brief for the next real scope | Overwritten as needed |
+| `index.html` | App engine (UI, routing, render logic, styling) | Version bumps only |
+| `data.json` | Runtime data manifest plus race-result, winners, and freshness metadata payload | Weekly / after each race via MCP |
+| `source/` | Semantic source scaffold (shell, styles, grouped data, logic) | Maintained with engine changes |
+| `next-build-spec.md` | Current build spec for the next version | Overwritten each version cycle |
+
+**What changed in the current runtime:**
+
+- completed-race podium block added to finished rounds
+- pole position card added for finished rounds when qualifying data exists
+- winners history section added to every circuit view
+- runtime data now lives in `data.json` instead of the monolith
+- footer export saves the resolved app dataset, not only the track array
 
 ---
 
-## Architecture (critical infrastructure notes)
+## What it does
 
-- **Aesthetic:** dark telemetry dashboard. S1 cyan, S2 violet, S3 gold, DRS green, elevation amber, Ferrari-red accent. Fonts: Space Grotesk + IBM Plex Mono.
-- **Routing:** `#/` = home, `#/slug` = a specific circuit view.
-- **Runtime data load:** `index.html` fetches `data.json`, resolves the grouped track source files listed there, and caches the resolved payload in `localStorage` for offline fallback.
-- **Completed-race panels:** podium / pole / winners render from the `raceResults` and `historicWinners` objects in `data.json`.
-- **Source scaffold:** `source/` is the preferred human/agent edit surface. The live runtime is still `index.html`.
-- **Runtime self-declaration:** the runtime now explicitly declares its live URL, source URL, and infrastructure mode in top-of-file comments.
-- **Maps:** official Wikimedia outline via `Special:FilePath/`; `onerror` prints the missing filename for debugging.
-- **Mobile behavior:** active effort is to keep the mobile first-open experience clean and prevent horizontal drift / right-scroll on race pages.
+A single self-contained HTML app holding every 2026 F1 circuit breakdown in one place. The index is the home screen (grid of all 24 rounds); each track is a hash-routed view inside the same app. One shared render engine plus one externalized data payload, so layout changes stay in `index.html` and weekly/live upkeep stays in `data.json`.
+
+**Per-circuit breakdown includes:**
+
+- Lap profile chart with elevation, DRS zones, sector splits
+- Tyre allocation + strategy analysis
+- Pit lane data (entry/exit, loss time, windows)
+- Overtaking analysis (score, hotspots, historical %)
+- Corner guide (name, type, gear, speed)
+- Live weather (Open-Meteo, keyless, fetched on view)
+- Official Wikimedia circuit map
+- Podium graphic with P1 / P2 / P3 for completed races
+- Pole breakdown panel for rounds with qualifying data
+- Winners history board, now backfilled through the current report-ready stretch from Silverstone to Monza
+
+---
+
+## How to use it
+
+- Open the app → index grid shows all tracked rounds
+- Click any enabled circuit card → full breakdown view
+- Completed rounds surface podium + qualifying context near the top
+- Active and upcoming report-ready rounds can still show historical winners even before the race is run
+- Footer: Copy source / Prepare download / Open in new tab / Export data (.json)
+
+---
+
+## Architecture
+
+- **Aesthetic:** dark telemetry dashboard. Sectors S1 cyan / S2 violet / S3 gold, DRS green, elevation amber, Ferrari-red accent. Fonts: Space Grotesk + IBM Plex Mono.
+- **Routing:** `#/` = home (index grid). `#/slug` = circuit view. `renderHome()` / `renderTrack()` / `renderSoon()` driven by `router()` on `hashchange`.
+- **Runtime data load:** `index.html` fetches `data.json`, resolves the grouped track source files listed there, then caches the resolved payload in `localStorage` for offline fallback.
+- **Data upkeep model:** weekly/current-round maintenance should prefer `data.json` updates first. Use engine changes only when the UI or interaction model actually changes.
+- **Completed-race panels:** podium / pole / history all render from the `raceResults` and `historicWinners` objects in `data.json`.
+- **Source scaffold:** `source/` holds named shell/style/logic files and grouped data files so the app no longer depends on the runtime monolith as its only readable source surface.
+- **Shared engine:** `buildProfile()` (lap-profile chart), `loadWeather()` (live Open-Meteo fetch), table + panel renderers. Change the engine once, every track updates.
+- **Maps:** official Wikimedia outline via `Special:FilePath/`; `onerror` shows the filename for debugging.
+- **No looping animation;** hover / entry motion only.
 
 ---
 
 ## Version history
 
-- **v5** — externalized runtime data path, completed-race podium / pole / winners panels
-- **v4.1** — semantic source scaffold added under `source/`
-- **v4** — standalone offline-first build with footer source-export tools
-- **v3** — +4 circuits (Hungary, Netherlands, Italy, Spain / Madrid); 14 of 24 built
-- **v2** — fixed incorrect Wikimedia map filenames
-- **v1** — initial single-file app: 10 circuit breakdowns, index + hash-routed track views
+- **v5** — completed-race podium card, pole panel, winners history board, richer external data payload
+- **v5 safe split** — runtime pulled track data out of the monolith and into the external payload path
+- **v4.1 source scaffold** — semantic source scaffold added under `source/` for reliable agent editing; runtime unchanged
+- **v4** — standalone offline-first build; footer source-export trio + Export data (.json), sandbox-safe
+- v3 — +4 circuits (Hungary, Netherlands, Italy, Spain / Madrid); 14 of 24 built
+- v2 — fixed four wrong Wikimedia map filenames
+- v1 — initial single-file app: 10 circuit breakdowns, index + hash-routed track views
 
 ---
 
 ## Related
 
-- **ClickUp task:** [F1 Racetracks — circuit breakdown app](https://app.clickup.com/t/86aj9wgx0)
-- **Reference standard:** [Apps / HTML Artifacts](https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-72233)
-- **Repo operating guide:** [ClickUp Apps Repo — Operating Manual](https://app.clickup.com/36074068/docs/12cwjm-56313/12cwjm-74093)
-- **Formula 1 ops guide:** [F1 Weekly Refresh — Brain Operations Guide](https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-67313)
+- **ClickUp task:** F1 Racetracks — circuit breakdown app (APPS list)
+- **F1 Weekly Refresh guide:** Brain Reference Library > Formula 1
+- **Generator spec:** Circuit Breakdown Report — Brain Reference (Generator Tool)
 
 ---
 
 ## Roadmap
 
-- backfill deeper historic winners data into `data.json`
 - build the remaining 8 circuit breakdowns (Baku → Abu Dhabi)
-- persist last-viewed circuit + add keyboard left / right navigation
-- split oversized grouped data source files back under the ~15 KB hard threshold
+- persist last-viewed circuit + add keyboard left / right between rounds
+- split oversized grouped data source files under the 15 KB hard threshold
+- if live timing becomes the next major feature, start with a narrow current-round slice rather than a full OpenF1 overlay stack
