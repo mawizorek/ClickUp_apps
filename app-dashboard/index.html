@@ -25,6 +25,7 @@
   --red-glow: oklch(65% 0.18 25 / 0.3);
   --cyan: oklch(78% 0.12 200);
   --purple: oklch(72% 0.12 300);
+  --blue: oklch(72% 0.12 240);
   --border: oklch(24% 0.006 250);
   --border-hover: oklch(34% 0.008 250);
   --radius: 12px;
@@ -161,10 +162,10 @@ header h1 span {
   border-color: var(--accent);
 }
 
-.filter-chip.active[data-filter="live"] {
-  background: var(--green);
-  border-color: var(--green);
-  color: oklch(15% 0.01 155);
+.filter-chip.active[data-filter="dashboard"] {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: oklch(15% 0.01 240);
 }
 
 .filter-chip.active[data-filter="tool"] {
@@ -345,7 +346,7 @@ header h1 span {
 }
 
 .badge-data { color: var(--green); background: oklch(20% 0.04 155); border: 1px solid oklch(30% 0.06 155); }
-.badge-live { color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); }
+.badge-dashboard { color: var(--blue); background: oklch(20% 0.04 240); border: 1px solid oklch(30% 0.06 240); }
 .badge-tool { color: var(--purple); background: oklch(20% 0.04 300); border: 1px solid oklch(30% 0.06 300); }
 
 .app-meta {
@@ -472,7 +473,7 @@ footer a { color: var(--text-muted); text-decoration: none; }
   <!-- Filter chips -->
   <div class="filter-row" id="filterRow">
     <div class="filter-chip active" data-filter="all">All</div>
-    <div class="filter-chip" data-filter="live">⚡ Live</div>
+    <div class="filter-chip" data-filter="dashboard">📊 Dashboards</div>
     <div class="filter-chip" data-filter="tool">🛠 Tools</div>
   </div>
 
@@ -498,11 +499,11 @@ footer a { color: var(--text-muted); text-decoration: none; }
 </div>
 
 <footer>
-  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/app-dashboard">app-dashboard</a> &middot; v2.1 &middot; <span id="refreshTime">&mdash;</span>
+  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/app-dashboard">app-dashboard</a> &middot; v2.2 &middot; <span id="refreshTime">&mdash;</span>
 </footer>
 
 <script>
-const APP_VERSION = 'v2.1';
+const APP_VERSION = 'v2.2';
 const APP_DATE = '2026-07-02';
 
 // ─── Config ───────────────────────────────────────────────────
@@ -518,9 +519,10 @@ const FILTER_KEY = 'appDashboard_filter';
 const MAX_RECENT = 2;
 
 // App metadata: slug → { desc, category, badges }
+// Categories: 'dashboard' (view/explore data) | 'tool' (process/transform input)
 const APP_META = {
-  'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'live', badges: ['live'] },
-  'f1-racetracks': { desc: 'Interactive race circuit explorer with live data.', category: 'live', badges: ['data'] },
+  'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'dashboard', badges: ['dashboard'] },
+  'f1-racetracks': { desc: 'Interactive race circuit explorer with live data.', category: 'dashboard', badges: ['data'] },
   'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers.', category: 'tool', badges: ['tool'] },
   'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', category: 'tool', badges: ['data'] },
   'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', category: 'tool', badges: ['tool'] },
@@ -606,7 +608,7 @@ async function init(forceRefresh) {
   // Restore last-used filter
   try {
     const saved = localStorage.getItem(FILTER_KEY);
-    if (saved && ['all', 'live', 'tool'].includes(saved)) currentFilter = saved;
+    if (saved && ['all', 'dashboard', 'tool'].includes(saved)) currentFilter = saved;
   } catch (e) {}
 
   // Try cache first
@@ -704,7 +706,7 @@ function render(apps) {
     const badgeHtml = [
       app.hasData ? '<span class="badge badge-data">data.json</span>' : '',
       ...app.badges.map(b => {
-        if (b === 'live') return '<span class="badge badge-live">Live shortcut</span>';
+        if (b === 'dashboard') return '<span class="badge badge-dashboard">Dashboard</span>';
         if (b === 'data') return app.hasData ? '' : '<span class="badge badge-data">data.json</span>';
         if (b === 'tool') return '<span class="badge badge-tool">Tool</span>';
         return '';
