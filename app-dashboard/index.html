@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="github-folder" content="app-dashboard">
+<title>Apps</title>
+<style>
+/* INFRASTRUCTURE: self-contained (no external data file) */
+:root {
+  --bg: oklch(10% 0.012 250);
+  --surface-1: oklch(16% 0.01 250);
+  --surface-2: oklch(21% 0.008 250);
+  --surface-3: oklch(13% 0.008 250);
+  --text: oklch(94% 0.006 250);
+  --text-mid: oklch(78% 0.008 250);
+  --text-muted: oklch(62% 0.01 250);
+  --text-dim: oklch(48% 0.008 250);
+  --accent: oklch(75% 0.16 55);
+  --accent-soft: oklch(75% 0.16 55 / 0.12);
+  --accent-border: oklch(45% 0.10 55);
+  --green: oklch(72% 0.16 155);
+  --green-glow: oklch(72% 0.16 155 / 0.4);
+  --red: oklch(65% 0.18 25);
+  --cyan: oklch(78% 0.12 200);
+  --border: oklch(24% 0.006 250);
+  --border-hover: oklch(34% 0.008 250);
+  --radius: 12px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.container {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+header {
+  padding: 36px 0 20px;
+}
+
+header h1 {
+  font-size: clamp(1.6rem, 5vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+header h1 span {
+  color: var(--accent);
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  flex: 1;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.stat-card .value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-card .label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 100ms var(--ease), opacity 150ms;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent);
+  color: oklch(15% 0.01 55);
+}
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+}
+
+.app-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 100px;
+}
+
+.app-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: border-color 200ms var(--ease);
+}
+
+.app-card:hover { border-color: var(--border-hover); }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.health-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+.health-dot.dead { background: var(--red); }
+.health-dot.checking { background: var(--text-dim); animation: pulse 1.4s infinite; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.app-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+.app-slug {
+  font-size: 0.6875rem;
+  color: var(--cyan);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  margin-bottom: 8px;
+}
+
+.app-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.app-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.badge {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge-data { color: var(--green); background: oklch(20% 0.04 155); border: 1px solid oklch(30% 0.06 155); }
+.badge-ref { color: var(--cyan); background: oklch(20% 0.04 200); border: 1px solid oklch(30% 0.06 200); }
+.badge-live { color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); }
+
+.app-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.6875rem;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.app-meta strong { color: var(--text-muted); }
+
+.app-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.app-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 100ms var(--ease);
+}
+
+.app-btn:active { transform: scale(0.97); }
+
+.app-btn-open {
+  background: var(--accent);
+  color: oklch(15% 0.01 55);
+}
+
+.app-btn-repo {
+  background: var(--surface-2);
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.error-state {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--red);
+  font-size: 0.8125rem;
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  border: 1px solid oklch(30% 0.08 25);
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: oklch(10% 0.012 250 / 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.625rem;
+  color: var(--text-dim);
+}
+
+footer a { color: var(--text-muted); text-decoration: none; }
+
+@media (min-width: 640px) {
+  .container { max-width: 600px; padding: 0 24px; }
+  header { padding: 48px 0 28px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>ClickUp <span>Apps</span></h1>
+  </header>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="value" id="appCount">—</div>
+      <div class="label">Apps</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" id="healthyCount">—</div>
+      <div class="label">Healthy</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" id="recentCount">—</div>
+      <div class="label">Updated (7d)</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener" class="btn btn-primary">Open repo</a>
+    <button class="btn btn-secondary" id="refreshBtn">Refresh</button>
+  </div>
+
+  <div class="app-grid" id="appGrid">
+    <div class="loading-state">Loading apps...</div>
+  </div>
+</div>
+
+<footer>
+  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/app-dashboard">app-dashboard</a> · v1 · <span id="refreshTime">—</span>
+</footer>
+
+<script>
+const APP_VERSION = 'v1';
+const APP_DATE = '2026-07-02';
+
+// ─── Config ───────────────────────────────────────────────
+const OWNER = 'mawizorek';
+const REPO = 'ClickUp_apps';
+const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
+const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const EXCLUDED = ['template-app', 'app-dashboard', '.nojekyll', 'README.md', 'canary.txt'];
+
+// App metadata overrides (slug → description + badges)
+const APP_META = {
+  'world-cup-bracket': { desc: 'Auto-discovered from the repo root and linked directly to its GitHub Pages entry point.', badges: ['live'] },
+  'f1-racetracks': { desc: 'Interactive race circuit explorer with live data.', badges: ['data'] },
+  'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers.', badges: [] },
+  'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', badges: ['data'] },
+  'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', badges: [] },
+  'pdf-splitter': { desc: 'Extract and split PDF pages client-side.', badges: [] }
+};
+
+// ─── Main ─────────────────────────────────────────────────
+async function init() {
+  const grid = document.getElementById('appGrid');
+  try {
+    const [treeRes, commitsRes] = await Promise.all([
+      fetch(`${API_BASE}/contents/`),
+      fetch(`${API_BASE}/commits?per_page=100`)
+    ]);
+    const items = await treeRes.json();
+    const commits = await commitsRes.json();
+
+    const appFolders = items.filter(i => i.type === 'dir' && !EXCLUDED.includes(i.name));
+    const apps = await Promise.all(appFolders.map(f => buildApp(f, commits)));
+    apps.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
+
+    render(apps);
+    updateStats(apps);
+    apps.forEach((app, i) => checkHealth(app, i));
+
+    document.getElementById('refreshTime').
+      textContent = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  } catch (e) {
+    grid.innerHTML = '<div class="error-state">Could not reach GitHub API. Check your connection and refresh.</div>';
+  }
+}
+
+async function buildApp(folder, commits) {
+  const name = folder.name;
+  const pagesUrl = `${PAGES_BASE}/${name}/`;
+  const repoUrl = `https://github.com/${OWNER}/${REPO}/tree/main/${name}`;
+
+  const folderCommits = commits.filter(c =>
+    c.files ? c.files.some(f => f.filename.startsWith(name + '/')) :
+    c.commit.message.toLowerCase().includes(name)
+  );
+  const lastCommit = folderCommits[0] || null;
+  const lastUpdated = lastCommit ? lastCommit.commit.author.date : null;
+  const lastMsg = lastCommit ? lastCommit.commit.message.split('\n')[0] : null;
+  const commitCount = folderCommits.length;
+
+  let hasData = false;
+  try {
+    const res = await fetch(`${API_BASE}/contents/${name}`);
+    const contents = await res.json();
+    hasData = contents.some(f => f.name === 'data.json');
+  } catch (e) {}
+
+  const meta = APP_META[name] || {};
+  return { name, pagesUrl, repoUrl, lastUpdated, lastMsg, commitCount, hasData, desc: meta.desc || null, badges: meta.badges || [] };
+}
+
+function render(apps) {
+  const grid = document.getElementById('appGrid');
+  grid.innerHTML = apps.map((app, i) => {
+    const displayName = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : '—';
+    const badgeHtml = [
+      app.hasData ? '<span class="badge badge-data">data.json</span>' : '',
+      ...app.badges.map(b => `<span class="badge badge-${b}">${b === 'live' ? 'Live shortcut' : b === 'data' ? 'data.json' : b}</span>`)
+    ].filter(Boolean).join('');
+
+    return `
+      <div class="app-card">
+        <div class="app-header">
+          <div class="health-dot checking" id="health-${i}"></div>
+          <div class="app-name">${esc(displayName)}</div>
+        </div>
+        <div class="app-slug">${esc(app.name)}</div>
+        ${app.desc ? `<div class="app-desc">${esc(app.desc)}</div>` : ''}
+        ${badgeHtml ? `<div class="app-badges">${badgeHtml}</div>` : ''}
+        <div class="app-meta">
+          <span><strong>${timeStr}</strong></span>
+          <span>${app.commitCount} commit${app.commitCount !== 1 ? 's' : ''}</span>
+          ${app.lastMsg ? `<span style="flex-basis:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(app.lastMsg)}</span>` : ''}
+        </div>
+        <div class="app-actions">
+          <a href="${app.pagesUrl}" target="_blank" rel="noopener" class="app-btn app-btn-open">Open app</a>
+          <a href="${app.repoUrl}" target="_blank" rel="noopener" class="app-btn app-btn-repo">Repo folder</a>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function checkHealth(app, idx) {
+  const dot = document.getElementById(`health-${idx}`);
+  try {
+    await fetch(app.pagesUrl, { method: 'HEAD', mode: 'no-cors' });
+    dot.className = 'health-dot live';
+  } catch (e) {
+    dot.className = 'health-dot dead';
+  }
+}
+
+function updateStats(apps) {
+  document.getElementById('appCount').textContent = apps.length;
+  document.getElementById('healthyCount').textContent = apps.length; // updated async
+  const sevenDays = Date.now() - 7 * 86400000;
+  const recent = apps.filter(a => a.lastUpdated && new Date(a.lastUpdated) > sevenDays).length;
+  document.getElementById('recentCount').textContent = recent;
+}
+
+function relativeTime(iso) {
+  const ms = Date.now() - new Date(iso);
+  const hrs = Math.floor(ms / 3600000);
+  const days = Math.floor(ms / 86400000);
+  if (hrs < 1) return 'just now';
+  if (hrs < 24) return `${hrs}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── Init ─────────────────────────────────────────────────
+document.getElementById('refreshBtn').addEventListener('click', init);
+init();
+</script>
+</body>
+</html>
