@@ -1,24 +1,30 @@
-# F1 Racetracks — semantic source companion
+# F1 Racetracks source surface
 
-This folder is the **preferred agent-readable/editable source surface** for F1 Racetracks.
+This folder is the preferred editable source companion for `f1-racetracks`.
 
-The live app still ships from `../index.html`, but this folder is the canonical source layout for understanding and updating the app without relying on the monolithic runtime file alone.
+## Read order
 
-## Current state
+1. `source_index.md`
+2. The specific source files named there
+3. `../next-build-spec.md` for the current approved build brief
 
-- current live runtime target: **v5**
-- runtime architecture: `index.html` engine + `data.json` externalized payload
-- shell, styles, grouped data, and logic are split into named semantic source files
-- grouped data files are still the main budget risk and need a future split pass
+## Current source shape
 
-## Important rule
+- `01`–`04` runtime shell and styles
+- `05`–`08` grouped track data
+- `09`–`11` bootstrap, track views, weather/footer logic
 
-Read **`source_index.md` first** before editing.
+## Budget watch
 
-## Documentation rule
+- Target ~10–12 KB per source file.
+- Split at ~15 KB unless explicitly approved otherwise.
+- Current watch list:
+  - `06_track_data_rounds_06_09.js`
+  - `07_track_data_rounds_10_13.js`
+  - `08_track_data_rounds_14_24.js`
 
-When runtime structure, shell behavior, or live architecture changes, update the corresponding README / spec / runtime header comments in the same pass as the code change.
+## Notes
 
-## Goal
-
-Keep the runtime, source layout, and documentation surfaces aligned so future app work starts from the semantic source files, not from guesswork over the monolith.
+- Legacy migration-blocker language is retired.
+- `index.html` remains the shipped runtime artifact.
+- `data.json` remains the runtime data entry point for live content.
