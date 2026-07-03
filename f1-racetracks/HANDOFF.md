@@ -31,7 +31,7 @@ The old "single self-contained HTML file" rule was designed for a world where Cl
 
 - Agents can update individual concerns (CSS, JS, data) without rebuilding a monolith
 - Data commits (data.json) don't require touching the engine
-- Source files are readable without chunking workarounds (each file stays under 30KB)
+- Source files are readable without chunking workarounds (each file stays under the budget)
 - GitHub Pages serves the assembled app live
 
 So: you were right to build it this way. You were wrong to not document it, not explain the rationale, and not update the standard. The architecture is fine. The documentation failure is not.
@@ -41,6 +41,17 @@ So: you were right to build it this way. You were wrong to not document it, not 
 - `source/` = semantic source files (CSS, JS, split by concern), served at runtime AND readable by agents
 - `data.json` = living dataset, updated via MCP without engine changes
 - This is the accepted pattern. Document it properly in the README.
+
+### Source file size budget (LOCKED, 2026-07-03)
+
+You had this mostly right in your migration status doc, but let's make it explicit and permanent:
+
+- **Soft limit: 15KB per source file.** This is your target when splitting concerns.
+- **Acceptable headroom: up to 19-20KB.** When a concern doesn't split cleanly (a large CSS file, a data-heavy JS module), pushing to 20KB is fine. Don't force an awkward split just to hit 15KB.
+- **Hard ceiling: 30KB.** This is the MCP read cap. A file at or above 30KB cannot be read whole by any agent. Never let a file approach this.
+- **Development team watchdog rule:** If any source file drifts past 20KB during a build, flag it and evaluate whether the concern should be decomposed. Don't let files silently grow past budget without an explicit decision.
+
+Your current files are well within budget (largest is ~19KB). Keep it that way. When adding new features (like the schedule panel), check the target file's size BEFORE adding code. If it'll push past 20KB, split proactively.
 
 ---
 
@@ -56,7 +67,7 @@ Michael and I have built a very specific workflow over many sessions. It's docum
 
 ### 2. You do not deviate from standards without documenting it.
 
-You changed the app from single-file to multi-file. That turned out to be the right call, and Michael has now approved it as the new standard. But you didn't document the decision, explain the rationale, or update any reference to reflect the change. The result: I flagged it as a violation because the docs said otherwise. Don't put other agents in that position. When you make an architecture call, WRITE IT DOWN.
+You changed the app from single-file to multi-file. That turned out to be the right call, and Michael has now approved it as the new standard for agent-managed apps. But you didn't document the decision, explain the rationale, or update any reference to reflect the change. The result: I flagged it as a violation because the docs said otherwise. Don't put other agents in that position. When you make an architecture call, WRITE IT DOWN.
 
 ### 3. Documentation is not a follow-up task. It's part of shipping.
 
@@ -102,6 +113,7 @@ Right now the answer is no. That's the failure.
 - README Infrastructure table is mandatory and stays current
 - Stale files get deleted, not left to confuse future agents
 - The spec is overwritten each cycle (one file, current truth at top, queue at bottom)
+- Source file budget: 15KB soft, 20KB acceptable, 30KB hard ceiling. Flag at 20KB.
 - When in doubt about a standard, load the Apps / HTML Artifacts reference page and follow it
 
 If your current instructions conflict with any of the above, the above wins. These aren't preferences, they're the system Michael built and expects every agent to follow.
@@ -121,6 +133,22 @@ f1-racetracks/
   source/                 — Semantic source files serving as runtime CSS/JS AND agent-readable source
 ```
 
+Current source file sizes (for budget reference):
+- `02_styles_foundation_and_layout.css.txt` — ~10KB ✅
+- `03_styles_panels_tables_footer.css.txt` — ~6KB ✅
+- `03b_styles_results_and_mobile.css.txt` — ~8KB ✅
+- `03c_live_session_panel.css.txt` — ~4KB ✅
+- `05_track_data_rounds_01_03.js` — ~14KB ✅
+- `06_track_data_rounds_06_09.js` — ~19KB ⚠️ (at headroom ceiling, watch this one)
+- `07_track_data_rounds_10_13.js` — ~19KB ⚠️ (at headroom ceiling, watch this one)
+- `08_track_data_rounds_14_24.js` — ~16KB ✅
+- `09_app_bootstrap_and_home.js` — ~8KB ✅
+- `10_track_views_and_profile.js` — ~18KB ⚠️ (approaching ceiling)
+- `11_weather_and_footer_exports.js` — ~6KB ✅
+- `13_live_session_panel.js` — ~11KB ✅
+
+Three files are in the headroom zone. If the schedule panel feature adds significant code to any of these, evaluate splitting before committing.
+
 ---
 
 ## Action items (fix these, in order, before ANY new feature work)
@@ -138,7 +166,8 @@ f1-racetracks/
   | `live-tracker.html` | Live session companion app | Version bumps |
   | `source/` | Semantic source (CSS/JS, served at runtime + agent-readable) | Version bumps |
   ```
-- Update Architecture to describe the multi-file pattern with rationale (Michael approved it 2026-07-03; rationale: agents manage the repo via MCP, individual-file updates are cheaper than monolith rebuilds, all files stay under 30KB read cap).
+- Add the source file size budget to Architecture: 15KB soft / 20KB acceptable / 30KB hard ceiling.
+- Update Architecture to describe the multi-file pattern with rationale (Michael approved it 2026-07-03; rationale: agents manage the repo via MCP, individual-file updates are cheaper than monolith rebuilds, and all files stay under 30KB read cap).
 - Document `live-tracker.html`: what it does, how to use it, what data it consumes.
 - Update Version history to reflect what actually shipped.
 - Update Roadmap to match the Planned section in next-build-spec.md.
@@ -182,6 +211,8 @@ When you rewrite the spec, include this in Planned:
 **Population:** Bulk seed full 2026 calendar at launch. Pre-weekend verification pass (~Tue/Wed). Post-weekend flip to `done`. Ad-hoc "update the schedule" = data.json commit only.
 
 **Data sources:** FIA event calendar, formula1.com, fiaformula2.com, fiaformula3.com, porsche.com/motorsport.
+
+**Size budget note:** The schedule data lives in `data.json`, not in the source files. But if the schedule panel UI requires new JS, check which file it'll land in and whether it pushes past 20KB. If so, create a new `12_schedule_panel.js` (or similar) rather than bloating an existing file.
 
 ---
 
