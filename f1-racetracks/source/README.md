@@ -1,6 +1,6 @@
 # F1 Racetracks source surface
 
-This folder is the preferred editable source companion for `f1-racetracks`.
+This folder is the canonical editable source surface for `f1-racetracks`.
 
 ## Read order
 
@@ -10,11 +10,11 @@ This folder is the preferred editable source companion for `f1-racetracks`.
 
 ## Current source shape
 
-- `01`–`04` runtime shell and base styles
-- `03b` results/mobile delta styles synced from the shipped v5 app
-- `05`–`08` grouped track data
-- `09`–`11` current v5 runtime logic surface
-- `12` live-tracker companion helpers for the first OpenF1 slice
+- `01` / `04` define the slim runtime entrypoint shell
+- `02` / `03` / `03b` define the runtime styling surface
+- `05`–`08` hold grouped track data
+- `09`–`11` hold the current v5 main-runtime logic surface
+- `12` holds the first OpenF1 live-tracker companion helpers
 
 ## Budget watch
 
@@ -27,6 +27,6 @@ This folder is the preferred editable source companion for `f1-racetracks`.
 
 ## Judgement
 
-- The source surface is now synced to the current live v5 runtime structure.
-- There is no remaining old-structure carryover that other agents need to reconstruct before making normal spot edits.
-- Main-app edits should begin from these source files first; the live `index.html` should be treated as the shipped artifact, not the planning surface.
+- The current v5 app is now wired to run from the source surface instead of a giant monolithic runtime file.
+- There is no remaining old-structure carryover blocking normal spot edits.
+- Future main-app work should edit the relevant files here first, not reverse-engineer `index.html`.

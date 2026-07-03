@@ -18,15 +18,18 @@
 
 ## In review
 
-- _Empty._
+- Proper demonolithization pass in [PR #16](https://github.com/mawizorek/ClickUp_apps/pull/16)
+  - slim runtime entrypoint
+  - main app loading directly from source modules
+  - fully reset spec state after structural cleanup
 
 ## Futures
 
-- _Empty._ Queue the next idea here only when a new scoped build is actually chosen.
+- _Empty._ Queue the next feature idea only after this structural pass lands.
 
 ## Known guardrails
 
-- `index.html` is the shipped runtime artifact; normal edits should start from `/source`.
+- Spot edits should start from `/source`, not from `index.html`.
 - Keep semantic source files near the ~10–12 KB soft target and split at ~15 KB unless explicitly approved otherwise.
 - Current budget-watch files:
   - `source/06_track_data_rounds_06_09.js`

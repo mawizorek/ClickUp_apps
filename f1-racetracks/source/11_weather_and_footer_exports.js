@@ -1,4 +1,6 @@
-/* Weather + footer/export surface synced to the shipped v5 app. */
+/* Weather + footer/export surface synced to the shipped v5 app.
+   This file loads last in the modular runtime and boots the app.
+*/
 
 async function loadWeather(t) {
   const body = document.getElementById("wx-body");
@@ -171,3 +173,16 @@ document.getElementById("t-data").addEventListener("click", e => {
   flash(e.currentTarget, "Ready → click Save");
   setTimeout(() => URL.revokeObjectURL(u), 90000);
 });
+
+(async function boot() {
+  try {
+    await (window.runtimeStylesReady || Promise.resolve());
+    updateFooterMeta(null);
+    const data = await loadResolvedData();
+    applyData(data);
+    if (window.lucide) lucide.createIcons();
+  } catch (err) {
+    renderDataUnavailable(err);
+    if (window.lucide) lucide.createIcons();
+  }
+})();

@@ -1,9 +1,5 @@
 /* Runtime boot + home surface synced to the shipped v5 app.
-   Source assembly order for runtime rebuild:
-   ...TRACK_DATA_ROUNDS_01_03,
-   ...TRACK_DATA_ROUNDS_06_09,
-   ...TRACK_DATA_ROUNDS_10_13,
-   ...TRACK_DATA_ROUNDS_14_24
+   This file is now loaded directly by the slim runtime entrypoint.
 */
 
 const APP_VERSION = "v5";
@@ -133,7 +129,7 @@ function renderDataUnavailable(error) {
       </div>
       <div class="card empty-card">
         <div class="panel-b" style="padding:22px 4px">
-          <p class="note">Couldn’t load <code>data.json</code>. Keep the HTML beside <code>data.json</code> on the same origin, or open the hosted GitHub Pages version once to seed the offline cache.</p>
+          <p class="note">Couldn’t load <code>data.json</code>. Keep the runtime beside <code>data.json</code> on the same origin, or open the hosted GitHub Pages version once to seed the offline cache.</p>
         </div>
       </div>
     </div>
@@ -153,6 +149,9 @@ function router() {
 }
 
 window.addEventListener("hashchange", router);
+jump.addEventListener("change", () => {
+  if (jump.value) location.hash = "#/" + jump.value;
+});
 
 function renderHome() {
   const built = reportTracks.length;
@@ -194,19 +193,3 @@ function renderHome() {
     grid.appendChild(b);
   });
 }
-
-jump.addEventListener("change", () => {
-  if (jump.value) location.hash = "#/" + jump.value;
-});
-
-(async function boot() {
-  try {
-    updateFooterMeta(null);
-    const data = await loadResolvedData();
-    applyData(data);
-    if (window.lucide) lucide.createIcons();
-  } catch (err) {
-    renderDataUnavailable(err);
-    if (window.lucide) lucide.createIcons();
-  }
-})();
