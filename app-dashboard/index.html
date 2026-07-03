@@ -15,14 +15,16 @@
   --text: oklch(94% 0.006 250);
   --text-mid: oklch(78% 0.008 250);
   --text-muted: oklch(62% 0.01 250);
-  --text-dim: oklch(48% 0.008 250);
+  --text-dim: oklch(44% 0.008 250);
   --accent: oklch(75% 0.16 55);
   --accent-soft: oklch(75% 0.16 55 / 0.12);
   --accent-border: oklch(45% 0.10 55);
   --green: oklch(72% 0.16 155);
   --green-glow: oklch(72% 0.16 155 / 0.4);
   --red: oklch(65% 0.18 25);
+  --red-glow: oklch(65% 0.18 25 / 0.3);
   --cyan: oklch(78% 0.12 200);
+  --purple: oklch(72% 0.12 300);
   --border: oklch(24% 0.006 250);
   --border-hover: oklch(34% 0.008 250);
   --radius: 12px;
@@ -124,6 +126,99 @@ header h1 span {
   border: 1px solid var(--border);
 }
 
+/* Pinned reference section */
+.pinned-section {
+  margin-bottom: 20px;
+}
+
+.pinned-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.pinned-card {
+  background: var(--surface-1);
+  border: 1px solid oklch(35% 0.06 200);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 200ms var(--ease);
+}
+
+.pinned-card:hover { border-color: var(--cyan); }
+
+.pinned-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: oklch(20% 0.04 200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.pinned-info { flex: 1; min-width: 0; }
+
+.pinned-info .name {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pinned-info .desc {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pinned-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pinned-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 100ms var(--ease);
+}
+
+.pinned-btn:active { transform: scale(0.95); }
+
+.pinned-btn-open {
+  background: oklch(30% 0.06 200);
+  color: var(--cyan);
+}
+
+.pinned-btn-repo {
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+/* App grid */
+.section-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  margin-top: 4px;
+}
+
 .app-grid {
   display: flex;
   flex-direction: column;
@@ -156,7 +251,7 @@ header h1 span {
 }
 
 .health-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
-.health-dot.dead { background: var(--red); }
+.health-dot.dead { background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
 .health-dot.checking { background: var(--text-dim); animation: pulse 1.4s infinite; }
 
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
@@ -167,10 +262,21 @@ header h1 span {
   flex: 1;
 }
 
+.recent-indicator {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: oklch(20% 0.04 55);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .app-slug {
   font-size: 0.6875rem;
   color: var(--cyan);
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
   margin-bottom: 8px;
 }
 
@@ -198,8 +304,9 @@ header h1 span {
 }
 
 .badge-data { color: var(--green); background: oklch(20% 0.04 155); border: 1px solid oklch(30% 0.06 155); }
-.badge-ref { color: var(--cyan); background: oklch(20% 0.04 200); border: 1px solid oklch(30% 0.06 200); }
 .badge-live { color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); }
+.badge-tool { color: var(--purple); background: oklch(20% 0.04 300); border: 1px solid oklch(30% 0.06 300); }
+.badge-category { color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border); }
 
 .app-meta {
   display: flex;
@@ -258,6 +365,14 @@ header h1 span {
   border: 1px solid oklch(30% 0.08 25);
 }
 
+.cache-note {
+  text-align: center;
+  font-size: 0.625rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+  font-style: italic;
+}
+
 footer {
   position: fixed;
   bottom: 0;
@@ -289,15 +404,15 @@ footer a { color: var(--text-muted); text-decoration: none; }
 
   <div class="stats">
     <div class="stat-card">
-      <div class="value" id="appCount">—</div>
+      <div class="value" id="appCount">&mdash;</div>
       <div class="label">Apps</div>
     </div>
     <div class="stat-card">
-      <div class="value" id="healthyCount">—</div>
+      <div class="value" id="healthyCount">&mdash;</div>
       <div class="label">Healthy</div>
     </div>
     <div class="stat-card">
-      <div class="value" id="recentCount">—</div>
+      <div class="value" id="recentCount">&mdash;</div>
       <div class="label">Updated (7d)</div>
     </div>
   </div>
@@ -307,44 +422,117 @@ footer a { color: var(--text-muted); text-decoration: none; }
     <button class="btn btn-secondary" id="refreshBtn">Refresh</button>
   </div>
 
+  <!-- Pinned reference: template-app -->
+  <div class="pinned-section">
+    <div class="pinned-label">Reference</div>
+    <div class="pinned-card">
+      <div class="pinned-icon">📐</div>
+      <div class="pinned-info">
+        <div class="name">App Build Standard</div>
+        <div class="desc">Folder scaffold, README template, build workflow reference</div>
+      </div>
+      <div class="pinned-actions">
+        <a href="https://mawizorek.github.io/ClickUp_apps/template-app/" target="_blank" rel="noopener" class="pinned-btn pinned-btn-open">Open</a>
+        <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app" target="_blank" rel="noopener" class="pinned-btn pinned-btn-repo">Repo</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" id="gridLabel">Apps</div>
   <div class="app-grid" id="appGrid">
     <div class="loading-state">Loading apps...</div>
   </div>
 </div>
 
 <footer>
-  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/app-dashboard">app-dashboard</a> · v1 · <span id="refreshTime">—</span>
+  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/app-dashboard">app-dashboard</a> &middot; v2 &middot; <span id="refreshTime">&mdash;</span>
 </footer>
 
 <script>
-const APP_VERSION = 'v1';
+const APP_VERSION = 'v2';
 const APP_DATE = '2026-07-02';
 
-// ─── Config ───────────────────────────────────────────────
+// ─── Config ───────────────────────────────────────────────────
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const EXCLUDED = ['template-app', 'app-dashboard', '.nojekyll', 'README.md', 'canary.txt'];
+const CACHE_KEY = 'appDashboard_cache';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const RECENT_KEY = 'appDashboard_recent';
+const MAX_RECENT = 2;
 
-// App metadata overrides (slug → description + badges)
+// App metadata: slug → { desc, category, badges }
 const APP_META = {
-  'world-cup-bracket': { desc: 'Auto-discovered from the repo root and linked directly to its GitHub Pages entry point.', badges: ['live'] },
-  'f1-racetracks': { desc: 'Interactive race circuit explorer with live data.', badges: ['data'] },
-  'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers.', badges: [] },
-  'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', badges: ['data'] },
-  'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', badges: [] },
-  'pdf-splitter': { desc: 'Extract and split PDF pages client-side.', badges: [] }
+  'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'live', badges: ['live'] },
+  'f1-racetracks': { desc: 'Interactive race circuit explorer with live data.', category: 'live', badges: ['data'] },
+  'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers.', category: 'tool', badges: ['tool'] },
+  'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', category: 'tool', badges: ['data'] },
+  'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', category: 'tool', badges: ['tool'] },
+  'pdf-splitter': { desc: 'Extract and split PDF pages client-side.', category: 'tool', badges: ['tool'] }
 };
 
-// ─── Main ─────────────────────────────────────────────────
-async function init() {
+// ─── Cache helpers ────────────────────────────────────────────
+function getCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Date.now() - parsed.ts > CACHE_TTL) return null;
+    return parsed.data;
+  } catch (e) { return null; }
+}
+
+function setCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+  } catch (e) {}
+}
+
+// ─── Recent (last-visited) helpers ────────────────────────────
+function getRecent() {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+  } catch (e) { return []; }
+}
+
+function logVisit(slug) {
+  try {
+    let recent = getRecent().filter(s => s !== slug);
+    recent.unshift(slug);
+    recent = recent.slice(0, MAX_RECENT);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+  } catch (e) {}
+}
+
+// ─── Main ─────────────────────────────────────────────────────
+async function init(forceRefresh) {
   const grid = document.getElementById('appGrid');
+  let fromCache = false;
+
+  // Try cache first (unless force refresh)
+  if (!forceRefresh) {
+    const cached = getCache();
+    if (cached) {
+      renderFromData(cached);
+      fromCache = true;
+      // Still refresh health in background
+      cached.forEach((app, i) => checkHealth(app, i));
+      return;
+    }
+  }
+
+  grid.innerHTML = '<div class="loading-state">Loading apps...</div>';
+
   try {
     const [treeRes, commitsRes] = await Promise.all([
       fetch(`${API_BASE}/contents/`),
       fetch(`${API_BASE}/commits?per_page=100`)
     ]);
+
+    if (!treeRes.ok || !commitsRes.ok) throw new Error('API error');
+
     const items = await treeRes.json();
     const commits = await commitsRes.json();
 
@@ -352,15 +540,30 @@ async function init() {
     const apps = await Promise.all(appFolders.map(f => buildApp(f, commits)));
     apps.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
 
-    render(apps);
-    updateStats(apps);
+    setCache(apps);
+    renderFromData(apps);
     apps.forEach((app, i) => checkHealth(app, i));
-
-    document.getElementById('refreshTime').
-      textContent = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   } catch (e) {
+    // Try stale cache as fallback
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        renderFromData(parsed.data);
+        grid.insertAdjacentHTML('beforeend', '<div class="cache-note">Showing cached data (offline or rate limited)</div>');
+        parsed.data.forEach((app, i) => checkHealth(app, i));
+        return;
+      }
+    } catch (e2) {}
     grid.innerHTML = '<div class="error-state">Could not reach GitHub API. Check your connection and refresh.</div>';
   }
+}
+
+function renderFromData(apps) {
+  render(apps);
+  updateStats(apps);
+  document.getElementById('refreshTime').textContent =
+    new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
 async function buildApp(folder, commits) {
@@ -369,7 +572,6 @@ async function buildApp(folder, commits) {
   const repoUrl = `https://github.com/${OWNER}/${REPO}/tree/main/${name}`;
 
   const folderCommits = commits.filter(c =>
-    c.files ? c.files.some(f => f.filename.startsWith(name + '/')) :
     c.commit.message.toLowerCase().includes(name)
   );
   const lastCommit = folderCommits[0] || null;
@@ -380,22 +582,34 @@ async function buildApp(folder, commits) {
   let hasData = false;
   try {
     const res = await fetch(`${API_BASE}/contents/${name}`);
-    const contents = await res.json();
-    hasData = contents.some(f => f.name === 'data.json');
+    if (res.ok) {
+      const contents = await res.json();
+      hasData = contents.some(f => f.name === 'data.json');
+    }
   } catch (e) {}
 
   const meta = APP_META[name] || {};
-  return { name, pagesUrl, repoUrl, lastUpdated, lastMsg, commitCount, hasData, desc: meta.desc || null, badges: meta.badges || [] };
+  return { name, pagesUrl, repoUrl, lastUpdated, lastMsg, commitCount, hasData, desc: meta.desc || null, category: meta.category || null, badges: meta.badges || [] };
 }
 
 function render(apps) {
   const grid = document.getElementById('appGrid');
+  const recent = getRecent();
+
   grid.innerHTML = apps.map((app, i) => {
     const displayName = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : '—';
+    const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : '\u2014';
+    const isRecent = recent.includes(app.name);
+
     const badgeHtml = [
       app.hasData ? '<span class="badge badge-data">data.json</span>' : '',
-      ...app.badges.map(b => `<span class="badge badge-${b}">${b === 'live' ? 'Live shortcut' : b === 'data' ? 'data.json' : b}</span>`)
+      ...app.badges.map(b => {
+        if (b === 'live') return '<span class="badge badge-live">Live shortcut</span>';
+        if (b === 'data') return app.hasData ? '' : '<span class="badge badge-data">data.json</span>';
+        if (b === 'tool') return '<span class="badge badge-tool">Tool</span>';
+        return `<span class="badge badge-category">${esc(b)}</span>`;
+      }),
+      app.category ? `<span class="badge badge-category">${esc(app.category)}</span>` : ''
     ].filter(Boolean).join('');
 
     return `
@@ -403,6 +617,7 @@ function render(apps) {
         <div class="app-header">
           <div class="health-dot checking" id="health-${i}"></div>
           <div class="app-name">${esc(displayName)}</div>
+          ${isRecent ? '<span class="recent-indicator">Recent</span>' : ''}
         </div>
         <div class="app-slug">${esc(app.name)}</div>
         ${app.desc ? `<div class="app-desc">${esc(app.desc)}</div>` : ''}
@@ -413,7 +628,7 @@ function render(apps) {
           ${app.lastMsg ? `<span style="flex-basis:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(app.lastMsg)}</span>` : ''}
         </div>
         <div class="app-actions">
-          <a href="${app.pagesUrl}" target="_blank" rel="noopener" class="app-btn app-btn-open">Open app</a>
+          <a href="${app.pagesUrl}" target="_blank" rel="noopener" class="app-btn app-btn-open" onclick="logVisit('${app.name}')">Open app</a>
           <a href="${app.repoUrl}" target="_blank" rel="noopener" class="app-btn app-btn-repo">Repo folder</a>
         </div>
       </div>
@@ -423,17 +638,33 @@ function render(apps) {
 
 async function checkHealth(app, idx) {
   const dot = document.getElementById(`health-${idx}`);
+  if (!dot) return;
   try {
-    await fetch(app.pagesUrl, { method: 'HEAD', mode: 'no-cors' });
-    dot.className = 'health-dot live';
+    const res = await fetch(app.pagesUrl, { method: 'GET', mode: 'cors', cache: 'no-store' });
+    dot.className = res.ok ? 'health-dot live' : 'health-dot dead';
+    updateHealthCount();
   } catch (e) {
     dot.className = 'health-dot dead';
+    updateHealthCount();
+  }
+}
+
+function updateHealthCount() {
+  const dots = document.querySelectorAll('.health-dot');
+  let healthy = 0;
+  let resolved = 0;
+  dots.forEach(d => {
+    if (d.classList.contains('live')) { healthy++; resolved++; }
+    else if (d.classList.contains('dead')) { resolved++; }
+  });
+  if (resolved === dots.length && dots.length > 0) {
+    document.getElementById('healthyCount').textContent = healthy;
   }
 }
 
 function updateStats(apps) {
   document.getElementById('appCount').textContent = apps.length;
-  document.getElementById('healthyCount').textContent = apps.length; // updated async
+  document.getElementById('healthyCount').textContent = '\u2026'; // updating async
   const sevenDays = Date.now() - 7 * 86400000;
   const recent = apps.filter(a => a.lastUpdated && new Date(a.lastUpdated) > sevenDays).length;
   document.getElementById('recentCount').textContent = recent;
@@ -451,9 +682,9 @@ function relativeTime(iso) {
 
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ─── Init ─────────────────────────────────────────────────
-document.getElementById('refreshBtn').addEventListener('click', init);
-init();
+// ─── Init ─────────────────────────────────────────────────────
+document.getElementById('refreshBtn').addEventListener('click', () => init(true));
+init(false);
 </script>
 </body>
 </html>
