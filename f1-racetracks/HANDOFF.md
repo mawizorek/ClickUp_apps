@@ -23,6 +23,72 @@ If I had built what you built, the README would have been updated in the same se
 
 ---
 
+## Workflow alignment (read this carefully)
+
+Michael and I have built a very specific workflow over many sessions. It's documented in the Brain Reference Library and the Apps / HTML Artifacts reference page. You are clearly not following it, and the result is exactly this mess. Here's how the workflow actually works:
+
+### 1. The repo is the source of truth. Not tasks. Not docs. Not chat.
+
+- **Feature requests go in `next-build-spec.md` under a "Planned (future pushes)" section.** Never in task comments, never in task descriptions, never in loose docs. The spec IS the feature queue.
+- **Architecture decisions go in the README.** Not in your working memory, not in a migration-status file that nobody checks.
+- **The ClickUp task is a pointer and a next-build brief.** It is NOT where history accumulates or architecture gets documented.
+
+### 2. You do not deviate from standards without asking.
+
+The standard says `index.html` is a single self-contained file, offline-first, double-click and it runs. You changed that to a multi-file runtime architecture. That might be the right call! But you don't get to make that call silently. You surface the tradeoff, explain the rationale, and get Michael's sign-off. Then you document the deviation in the README Architecture section so the next agent understands WHY.
+
+Building something that contradicts a locked standard and not even mentioning it is the fastest way to create confusion downstream.
+
+### 3. Documentation is not a follow-up task. It's part of shipping.
+
+The workflow phases are: **brainstorm → document → test/review → build/commit.** Notice "document" comes BEFORE build, and the commit includes doc updates. If you find yourself with shipped code and no docs, you skipped a phase. Go back.
+
+Specifically, every commit that touches this app should ask:
+- Does the README still describe what exists? If not, update it.
+- Does the spec still describe the next build? If not, update it.
+- Is there a new file? Document it in the Infrastructure table.
+- Did architecture change? Update the Architecture section.
+
+### 4. The spec file has a specific structure. Follow it.
+
+```
+# app-name vN — Build Spec        ← active build at the top
+[full spec: source location, problem, target, agent instructions, acceptance criteria]
+
+---
+## Planned (future pushes)         ← feature queue at the bottom
+### vN+1: Feature Name
+[enough detail for sequencing and cold-pickup]
+### vN+2: Feature Name
+[etc.]
+```
+
+When the active build ships, the top item from Planned gets promoted to the active section (overwriting the old build). The filename NEVER changes: it's always `next-build-spec.md`, version lives in the header.
+
+### 5. Brainstorm before building.
+
+On new features, architecture changes, or anything non-trivial: don't just execute. Pause. Surface tradeoffs. Push back if something doesn't make sense. Propose alternatives. The seven-team brainstorm gate (Red, Creative, Professionalism, Development, Scope, Ecosystem, Handoff) exists for a reason. You don't need to run all seven every time, but you DO need to think before you build.
+
+### 6. Cold-pickup is the north star.
+
+Every decision you make about documentation should answer one question: "If a fresh agent with zero context reads this repo folder, can they understand the app, its architecture, its current state, and what to work on next?"
+
+Right now the answer is no. That's the failure.
+
+### 7. Update your working preferences to include:
+
+- Feature requests → `next-build-spec.md` Planned section, never tasks
+- Docs update with every code commit, same session
+- Never deviate from locked standards without surfacing the tradeoff and getting approval
+- README Infrastructure table is mandatory and stays current
+- Stale files get deleted, not left to confuse future agents
+- The spec is overwritten each cycle (one file, current truth at top, queue at bottom)
+- When in doubt about a standard, load the Apps / HTML Artifacts reference page and follow it
+
+If your current instructions conflict with any of the above, the above wins. These aren't preferences, they're the system Michael built and expects every agent to follow.
+
+---
+
 ## Current repo state (what you left behind)
 
 ```
