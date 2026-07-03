@@ -18,14 +18,11 @@
 
 ## In review
 
-- Main-app live session integration in [PR #17](https://github.com/mawizorek/ClickUp_apps/pull/17)
-  - matching-circuit OpenF1 session card inside the main app
-  - top running order + race-control context in circuit view
-  - no duplicate app versions on `main`; one canonical `f1-racetracks/` app folder
+- _Empty._
 
 ## Futures
 
-- _Empty._ Queue the next feature idea only after this live-integration pass lands.
+- _Empty._ Queue the next feature idea only after a new scoped build is chosen.
 
 ## Known guardrails
 
