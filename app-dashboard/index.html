@@ -499,11 +499,11 @@ footer a { color: var(--text-muted); text-decoration: none; }
 </div>
 
 <footer>
-  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/app-dashboard">app-dashboard</a> &middot; v2.2 &middot; <span id="refreshTime">&mdash;</span>
+  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/app-dashboard">app-dashboard</a> &middot; v2.3 &middot; <span id="refreshTime">&mdash;</span>
 </footer>
 
 <script>
-const APP_VERSION = 'v2.2';
+const APP_VERSION = 'v2.3';
 const APP_DATE = '2026-07-02';
 
 // ─── Config ───────────────────────────────────────────────────
@@ -512,7 +512,9 @@ const REPO = 'ClickUp_apps';
 const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const EXCLUDED = ['template-app', 'app-dashboard', '.nojekyll', 'README.md', 'canary.txt'];
-const CACHE_KEY = 'appDashboard_cache';
+
+// Cache is versioned: bumping APP_VERSION auto-invalidates stale data
+const CACHE_KEY = `appDashboard_cache_${APP_VERSION}`;
 const CACHE_TTL = 5 * 60 * 1000;
 const RECENT_KEY = 'appDashboard_recent';
 const FILTER_KEY = 'appDashboard_filter';
@@ -550,6 +552,18 @@ function setCache(data) {
   } catch (e) {}
 }
 
+// Clean up old versioned cache keys
+function pruneOldCaches() {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('appDashboard_cache_') && key !== CACHE_KEY) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch (e) {}
+}
+
 // ─── Recent (last-visited) helpers ────────────────────────────
 function getRecent() {
   try {
@@ -571,12 +585,10 @@ function applyFilter(filter) {
   currentFilter = filter;
   try { localStorage.setItem(FILTER_KEY, filter); } catch (e) {}
 
-  // Update chip active states
   document.querySelectorAll('.filter-chip').forEach(chip => {
     chip.classList.toggle('active', chip.dataset.filter === filter);
   });
 
-  // Show/hide cards
   const cards = document.querySelectorAll('.app-card[data-category]');
   let visible = 0;
   cards.forEach(card => {
@@ -585,7 +597,6 @@ function applyFilter(filter) {
     if (show) visible++;
   });
 
-  // Empty state
   let emptyEl = document.getElementById('emptyFilter');
   if (visible === 0 && cards.length > 0) {
     if (!emptyEl) {
@@ -604,6 +615,7 @@ function applyFilter(filter) {
 // ─── Main ─────────────────────────────────────────────────────
 async function init(forceRefresh) {
   const grid = document.getElementById('appGrid');
+  pruneOldCaches();
 
   // Restore last-used filter
   try {
@@ -644,16 +656,20 @@ async function init(forceRefresh) {
     renderFromData(apps);
     apps.forEach((app, i) => checkHealth(app, i));
   } catch (e) {
-    // Stale cache fallback
+    // Stale cache fallback (any version)
     try {
-      const raw = localStorage.getItem(CACHE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        allApps = parsed.data;
-        renderFromData(parsed.data);
-        grid.insertAdjacentHTML('beforeend', '<div class="cache-note">Showing cached data (offline or rate limited)</div>');
-        parsed.data.forEach((app, i) => checkHealth(app, i));
-        return;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('appDashboard_cache_')) {
+          const parsed = JSON.parse(localStorage.getItem(key));
+          if (parsed && parsed.data) {
+            allApps = parsed.data;
+            renderFromData(parsed.data);
+            grid.insertAdjacentHTML('beforeend', '<div class="cache-note">Showing cached data (offline or rate limited)</div>');
+            parsed.data.forEach((app, idx) => checkHealth(app, idx));
+            return;
+          }
+        }
       }
     } catch (e2) {}
     grid.innerHTML = '<div class="error-state">Could not reach GitHub API. Check your connection and refresh.</div>';
