@@ -13,6 +13,7 @@ This folder is the preferred editable source companion for `f1-racetracks`.
 - `01`–`04` runtime shell and styles
 - `05`–`08` grouped track data
 - `09`–`11` bootstrap, track views, weather/footer logic
+- `12` live-tracker companion helpers for the first OpenF1 slice
 
 ## Budget watch
 
@@ -23,8 +24,9 @@ This folder is the preferred editable source companion for `f1-racetracks`.
   - `07_track_data_rounds_10_13.js`
   - `08_track_data_rounds_14_24.js`
 
-## Notes
+## Important state note
 
-- Legacy migration-blocker language is retired.
 - `index.html` remains the shipped runtime artifact.
 - `data.json` remains the runtime data entry point for live content.
+- The source scaffold still needs a fuller sync pass against the shipped v5 runtime so future main-app feature work can move faster and more safely.
+- `12_live_tracker_companion.js` is the first step in that direction: OpenF1 logic now has a dedicated source surface instead of living only in a one-off page.
