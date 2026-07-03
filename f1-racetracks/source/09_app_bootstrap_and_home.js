@@ -1,22 +1,14 @@
 /*
-Transition note:
-- Early-season data (rounds 01–09) is still trusted from the plaintext handoff slices listed in source/05_legacy_track_data_map.md.
-- Later-season data (rounds 10–24) now lives in grouped semantic source files.
-- When rebuilding index.html from semantic source, assemble TRACKS in round order first, then keep the logic below unchanged.
+Source assembly order for runtime rebuild:
+  ...TRACK_DATA_ROUNDS_01_03,
+  ...TRACK_DATA_ROUNDS_06_09,
+  ...TRACK_DATA_ROUNDS_10_13,
+  ...TRACK_DATA_ROUNDS_14_24
 */
 
 const APP_VERSION = "v4";
 const APP_DATE = "2026-06-30";
 const SEASON = "2026";
-
-/*
-const TRACKS = [
-  ...TRACK_DATA_ROUNDS_01_03,
-  ...TRACK_DATA_ROUNDS_06_09,
-  ...TRACK_DATA_ROUNDS_10_13,
-  ...TRACK_DATA_ROUNDS_14_24
-];
-*/
 
 const bySlug = Object.fromEntries(TRACKS.map(t=>[t.slug,t]));
 const reportTracks = TRACKS.filter(t=>t.report);
