@@ -23,6 +23,27 @@ If I had built what you built, the README would have been updated in the same se
 
 ---
 
+## Architecture decision (RESOLVED by Michael, 2026-07-03)
+
+**The multi-file structure is accepted as the new standard for agent-managed apps.**
+
+The old "single self-contained HTML file" rule was designed for a world where ClickUp artifacts were the delivery mechanism and right-click Save As was the backup. Now that the repo is the source of truth and agents manage it via MCP, the multi-file structure is the better architecture:
+
+- Agents can update individual concerns (CSS, JS, data) without rebuilding a monolith
+- Data commits (data.json) don't require touching the engine
+- Source files are readable without chunking workarounds (each file stays under 30KB)
+- GitHub Pages serves the assembled app live
+
+So: you were right to build it this way. You were wrong to not document it, not explain the rationale, and not update the standard. The architecture is fine. The documentation failure is not.
+
+**What this means for this app going forward:**
+- `index.html` = lightweight runtime shell (loads source files + data)
+- `source/` = semantic source files (CSS, JS, split by concern), served at runtime AND readable by agents
+- `data.json` = living dataset, updated via MCP without engine changes
+- This is the accepted pattern. Document it properly in the README.
+
+---
+
 ## Workflow alignment (read this carefully)
 
 Michael and I have built a very specific workflow over many sessions. It's documented in the Brain Reference Library and the Apps / HTML Artifacts reference page. You are clearly not following it, and the result is exactly this mess. Here's how the workflow actually works:
@@ -33,11 +54,9 @@ Michael and I have built a very specific workflow over many sessions. It's docum
 - **Architecture decisions go in the README.** Not in your working memory, not in a migration-status file that nobody checks.
 - **The ClickUp task is a pointer and a next-build brief.** It is NOT where history accumulates or architecture gets documented.
 
-### 2. You do not deviate from standards without asking.
+### 2. You do not deviate from standards without documenting it.
 
-The standard says `index.html` is a single self-contained file, offline-first, double-click and it runs. You changed that to a multi-file runtime architecture. That might be the right call! But you don't get to make that call silently. You surface the tradeoff, explain the rationale, and get Michael's sign-off. Then you document the deviation in the README Architecture section so the next agent understands WHY.
-
-Building something that contradicts a locked standard and not even mentioning it is the fastest way to create confusion downstream.
+You changed the app from single-file to multi-file. That turned out to be the right call, and Michael has now approved it as the new standard. But you didn't document the decision, explain the rationale, or update any reference to reflect the change. The result: I flagged it as a violation because the docs said otherwise. Don't put other agents in that position. When you make an architecture call, WRITE IT DOWN.
 
 ### 3. Documentation is not a follow-up task. It's part of shipping.
 
@@ -79,7 +98,7 @@ Right now the answer is no. That's the failure.
 
 - Feature requests → `next-build-spec.md` Planned section, never tasks
 - Docs update with every code commit, same session
-- Never deviate from locked standards without surfacing the tradeoff and getting approval
+- Architecture decisions get documented in README with rationale
 - README Infrastructure table is mandatory and stays current
 - Stale files get deleted, not left to confuse future agents
 - The spec is overwritten each cycle (one file, current truth at top, queue at bottom)
@@ -99,31 +118,14 @@ f1-racetracks/
   next-build-spec.md      — Still describes v5 responsive fix as the active build (stale)
   semantic-source-migration-status.md — Says "blocked" (wrong, migration is done)
   README.md               — Has a migration warning for something that's finished
-  source/                 — Doing double duty as runtime CSS AND agent-readable source
+  source/                 — Semantic source files serving as runtime CSS/JS AND agent-readable source
 ```
-
-## What the standard requires
-
-1. **`index.html` = the entire self-contained app.** CSS + JS inline, offline-first, double-click and it runs. Your 4KB loader violates this.
-2. **`source/` = Brain's readable rendition only.** Not a runtime dependency. You made it both without documenting why.
-3. **README must have:** Infrastructure table (❌ missing), accurate architecture (❌ wrong), current version history (❌ stale).
-4. **`next-build-spec.md`** must describe the NEXT build, not a completed one, plus Planned features.
-5. **No undocumented files.** `live-tracker.html` exists with zero explanation anywhere. That's unacceptable.
 
 ---
 
 ## Action items (fix these, in order, before ANY new feature work)
 
-### 1. Resolve the architecture question (ask Michael)
-
-You changed the app from single-file to multi-file without documenting the decision or getting explicit approval for the standard deviation. Two paths:
-
-- **A. Restore single-file:** rebuild `index.html` as a full inline app, keep `source/` as read-only.
-- **B. Adopt multi-file with documented rationale:** explain WHY in the README Architecture section. Note that this breaks offline `file://` use, which was a hard requirement.
-
-Don't guess. Ask Michael.
-
-### 2. Update README.md
+### 1. Update README.md
 
 - Remove the "⚠️ Migration note" (it's done, stop advertising it as in-progress).
 - Add the mandatory Infrastructure table:
@@ -134,14 +136,14 @@ Don't guess. Ask Michael.
   | `index.html` | App shell (runtime loader) | Version bumps only |
   | `data.json` | Living dataset (track data + schedule) | Weekly via MCP |
   | `live-tracker.html` | Live session companion app | Version bumps |
-  | `source/` | Semantic source (CSS/JS, fetched at runtime) | Version bumps |
+  | `source/` | Semantic source (CSS/JS, served at runtime + agent-readable) | Version bumps |
   ```
-- Update Architecture to describe what ACTUALLY exists now.
+- Update Architecture to describe the multi-file pattern with rationale (Michael approved it 2026-07-03; rationale: agents manage the repo via MCP, individual-file updates are cheaper than monolith rebuilds, all files stay under 30KB read cap).
 - Document `live-tracker.html`: what it does, how to use it, what data it consumes.
 - Update Version history to reflect what actually shipped.
 - Update Roadmap to match the Planned section in next-build-spec.md.
 
-### 3. Rewrite next-build-spec.md
+### 2. Rewrite next-build-spec.md
 
 - The v5 responsive fix content is stale. Determine what the actual next build target is.
 - Re-add the Planned section:
@@ -149,13 +151,13 @@ Don't guess. Ask Michael.
   - Any other queued features
 - The spec is the feature queue. Keep it current.
 
-### 4. Delete stale files
+### 3. Delete stale files
 
 - **`semantic-source-migration-status.md`** — Delete it. It's wrong and it's confusing.
 
-### 5. Update the ClickUp task
+### 4. Update the ClickUp task
 
-The task description still describes v4 single-file architecture. Fix it to match reality.
+The task description still describes v4 single-file architecture. Fix it to match the current multi-file reality.
 
 ---
 
