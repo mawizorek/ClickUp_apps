@@ -1,0 +1,33 @@
+<div class="wrap">
+  <div class="topbar">
+    <button class="brand" onclick="location.hash='#/'">
+      <span class="mark">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 17c4-1 6-9 10-9 3 0 4 3 8 2" stroke="white" stroke-width="2.4" stroke-linecap="round"></path><circle cx="6" cy="16.5" r="1.7" fill="white"></circle></svg>
+      </span>
+      <span class="t">F1 Racetracks<small>2026 Circuit Breakdowns</small></span>
+    </button>
+    <div class="nav-jump">
+      <select id="jump" aria-label="Jump to circuit">
+        <option value="">Jump to circuit…</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="app"></div>
+
+  <footer class="app">
+    <span class="meta-txt" id="foot-meta">F1 Racetracks v4 · 14 breakdowns · 24 rounds</span>
+    <div class="toolbar">
+      <button class="tool" id="t-copy" title="Copy the full page source to your clipboard">Copy source</button>
+      <button class="tool" id="t-prep" title="Build a Save link you click to download the .html">Prepare download</button>
+      <button class="tool" id="t-tab" title="Open the raw source in a new tab, then Cmd/Ctrl+S to save">Open in new tab</button>
+      <button class="tool" id="t-data" title="Export the TRACKS data as JSON">Export data (.json)</button>
+      <span class="save-wrap" id="save-slot"></span>
+      <span class="tool" style="cursor:default"><span class="hint">or Right-click → Save As</span></span>
+    </div>
+  </footer>
+</div>
+    </div>
+  </cu-root>
+</body>
+</html>
