@@ -4,32 +4,22 @@ This folder is now the **preferred agent-readable/editable source surface** for 
 
 The live app still ships from `../index.html`, but the source is no longer treated as a single opaque monolith for day-to-day work.
 
-## Why this exists
+## What changed in this PR
 
-The runtime artifact is ~125 KB and too large to trust through monolithic read paths. This companion splits the app into named files by concern so future edits are:
+- named shell/head/style files added
+- core JS logic split into readable surfaces
+- legacy plaintext handoff slices mapped explicitly for the remaining data promotion work
 
-- easier to inspect
-- easier to reason about
-- easier to diff in PRs
-- less likely to silently truncate in agent tooling
+## Current transition state
 
-## Current structure
-
-- runtime shell: `01_runtime_head.html`, `04_runtime_shell.html`
-- styles: `02_*`, `03_*`
-- data groups: `05_*` through `08_*`
-- logic: `09_*` through `11_*`
-- manifest / rebuild order: `source_index.md`
+- `../index.html` = shipped runtime artifact
+- `source/` = semantic scaffold + preferred logic edit surface
+- legacy `index-7_partNN_of_11.txt` files = trusted data-source migration inputs until the next cleanup PR promotes them into grouped source files
 
 ## Important rule
 
-For source work, read **`source_index.md` first**.
+Read **`source_index.md` first**.
 
-## Runtime vs source
+## Goal
 
-- `../index.html` = shipped runtime artifact
-- `source/` = canonical edit surface for the next wave of agent work
-
-## Legacy note
-
-The older `index-7_partNN_of_11.txt` plaintext chunks are retained temporarily as migration inputs. They are no longer the preferred structure.
+Make future edits possible without having to depend on the 125 KB runtime monolith as the only reliable source read path.
