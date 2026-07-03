@@ -6,15 +6,16 @@ The live app still ships from `../index.html`, but the source is no longer treat
 
 ## What changed in this PR
 
-- named shell/head/style files added
-- core JS logic split into readable surfaces
-- legacy plaintext handoff slices mapped explicitly for the remaining data promotion work
+- grouped data files added for rounds **10–24**
+- shell, style, and logic split from the prior PR kept in place
+- the remaining plaintext dependency is now limited to rounds **01–09** only
 
 ## Current transition state
 
 - `../index.html` = shipped runtime artifact
-- `source/` = semantic scaffold + preferred logic edit surface
-- legacy `index-7_partNN_of_11.txt` files = trusted data-source migration inputs until the next cleanup PR promotes them into grouped source files
+- `source/` = semantic scaffold + preferred edit surface
+- grouped round data now exists for later-season tracks and stubs
+- only the early-season data still depends on the trusted plaintext handoff map
 
 ## Important rule
 
@@ -22,4 +23,4 @@ Read **`source_index.md` first**.
 
 ## Goal
 
-Make future edits possible without having to depend on the 125 KB runtime monolith as the only reliable source read path.
+Finish removing the runtime monolith as the only reliable source read path, one reviewable pass at a time.

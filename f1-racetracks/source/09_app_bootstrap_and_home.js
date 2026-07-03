@@ -1,6 +1,7 @@
 /*
 Transition note:
-- The runtime v4 TRACKS array is still trusted from the plaintext handoff slices listed in source/05_legacy_track_data_map.md.
+- Early-season data (rounds 01–09) is still trusted from the plaintext handoff slices listed in source/05_legacy_track_data_map.md.
+- Later-season data (rounds 10–24) now lives in grouped semantic source files.
 - When rebuilding index.html from semantic source, assemble TRACKS in round order first, then keep the logic below unchanged.
 */
 
@@ -10,11 +11,10 @@ const SEASON = "2026";
 
 /*
 const TRACKS = [
-  // Transition assembly target:
-  // ...track_data_rounds_01_03
-  // ...track_data_rounds_06_09
-  // ...track_data_rounds_10_13
-  // ...track_data_rounds_14_24
+  ...TRACK_DATA_ROUNDS_01_03,
+  ...TRACK_DATA_ROUNDS_06_09,
+  ...TRACK_DATA_ROUNDS_10_13,
+  ...TRACK_DATA_ROUNDS_14_24
 ];
 */
 
