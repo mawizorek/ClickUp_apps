@@ -4,20 +4,22 @@
  "sessions_logged": 2,
  "last_updated": "2026-07-04",
  "tools": {
-  "memory-edit-guard": 3,
-  "stale-context-reload": 6,
-  "commit-pre-flight": 15,
-  "link-provenance": 7,
-  "multi-edit-batch-gate": 3,
-  "secrets-pii-guard": 15,
-  "source-size-budget-enforcer": 15,
-  "roster-scan-planner": 2,
-  "agent-invocation-gate": 1,
-  "intent-check": 2,
-  "recon-renata": 0,
-  "workshop-wes": 0,
-  "scout-sage": 0,
-  "closing-clio": 2,
-  "handoff-hana": 0
+ "memory-edit-guard": 3,
+ "stale-context-reload": 6,
+ "commit-pre-flight": 13,
+ "link-provenance": 7,
+ "multi-edit-batch-gate": 3,
+ "secrets-pii-guard": 13,
+ "source-size-budget-enforcer": 13,
+ "roster-scan-planner": 2,
+ "agent-invocation-gate": 1,
+ "intent-check": 2,
+ "repo-renata": 0,
+ "workshop-wes": 0,
+ "scout-sage": 0,
+ "closing-clio": 2,
+ "handoff-hana": 1,
+ "foldin-frank": 1
+ }
  }
 }
