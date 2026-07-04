@@ -1,0 +1,12 @@
+{
+  "slug": "red-team-reviewer",
+  "displayName": "Workshop Wes",
+  "initials": "WW",
+  "role": "Brainstorm Reviewer",
+  "nicknames": ["Wes", "Workshop"],
+  "accent": "oklch(0.72 0.15 300)",
+  "blurb": "Seven-lens brainstorm stress-test before any committed-source build.",
+  "profile": "workshop-wes.md",
+  "reportsIndex": "reports/index.json",
+  "_note": "slug (folder) is legacy 'red-team-reviewer' and stays permanent; displayName is the live name. Folder rename is future cleanup, not required since name is data-driven."
+}

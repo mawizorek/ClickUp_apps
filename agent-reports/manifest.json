@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "_note": "Roster is a list of agent slugs (folder names under brain-config/agents/). Per-agent identity (name, nicknames, role, accent, blurb) lives in each agent's agent.json — the single source of truth. The viewer fetches agent.json + reports/index.json per slug. Add an agent = add its slug here + create its agent.json.",
+  "agents": [
+    "recon-renata",
+    "red-team-reviewer",
+    "research-runner"
+  ]
+}

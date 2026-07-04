@@ -1,0 +1,12 @@
+{
+  "slug": "research-runner",
+  "displayName": "Scout Sage",
+  "initials": "SS",
+  "role": "Research Runner",
+  "nicknames": ["Sage", "Scout"],
+  "accent": "oklch(0.80 0.14 85)",
+  "blurb": "Multi-source research in its own context: structured findings, mandatory links, one recommendation.",
+  "profile": "scout-sage.md",
+  "reportsIndex": "reports/index.json",
+  "_note": "slug (folder) is legacy 'research-runner' and stays permanent; displayName is the live name."
+}
