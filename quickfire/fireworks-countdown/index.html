@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fireworks Countdown · July 4th</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: oklch(13% 0.025 265);
+    --text: oklch(96% 0.008 265);
+    --muted: oklch(66% 0.02 265);
+    --red: oklch(64% 0.2 25);
+    --gold: oklch(84% 0.14 85);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:radial-gradient(circle at 50% 125%, oklch(19% 0.045 265) 0%, var(--bg) 62%);
+    color:var(--text);
+    overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #sky{position:fixed;inset:0;z-index:0;}
+  .wrap{
+    position:relative;z-index:1;height:100%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:24px;pointer-events:none;
+  }
+  .kicker{
+    font-size:12px;letter-spacing:0.34em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:22px;font-weight:500;
+  }
+  .clock{
+    display:flex;gap:12px;align-items:flex-start;justify-content:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .unit{display:flex;flex-direction:column;align-items:center;min-width:78px;}
+  .num{
+    font-family:'Fraunces',serif;font-weight:800;
+    font-size:clamp(48px,14vw,96px);line-height:0.9;letter-spacing:-0.02em;
+    color:var(--text);font-optical-sizing:auto;
+  }
+  .lbl{font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--muted);margin-top:14px;}
+  .sep{font-size:clamp(40px,11vw,76px);font-weight:600;color:var(--muted);line-height:0.9;opacity:.35;}
+  .subtitle{margin-top:18px;font-size:13px;color:var(--muted);letter-spacing:0.02em;}
+  .title{
+    font-family:'Fraunces',serif;
+    font-size:clamp(26px,6vw,40px);font-weight:600;letter-spacing:-0.01em;color:var(--text);
+  }
+  .title .em{color:var(--red);}
+  .hint{margin-top:30px;font-size:12px;color:var(--muted);letter-spacing:0.02em;}
+  .finale{display:none;}
+  .finale .title{font-size:clamp(34px,9vw,64px);font-weight:800;}
+  .finale .title .em{color:var(--gold);}
+  body.done .clock,body.done .kicker,body.done .subtitle{display:none;}
+  body.done .finale{display:block;}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div class="wrap">
+  <div class="kicker">Fireworks begin in</div>
+  <div class="clock" id="clock">
+    <div class="unit"><span class="num" id="h">00</span><span class="lbl">hours</span></div>
+    <span class="sep">:</span>
+    <div class="unit"><span class="num" id="m">00</span><span class="lbl">min</span></div>
+    <span class="sep">:</span>
+    <div class="unit"><span class="num" id="s">00</span><span class="lbl">sec</span></div>
+  </div>
+  <div class="subtitle">Independence Day · 9:00 PM</div>
+  <div class="finale"><div class="title">Happy <span class="em">Fourth</span> of July</div></div>
+  <div class="hint">tap anywhere to launch one early</div>
+</div>
+<script>
+const cvs=document.getElementById('sky'),ctx=cvs.getContext('2d');
+let W,H;function size(){W=cvs.width=innerWidth*devicePixelRatio;H=cvs.height=innerHeight*devicePixelRatio;}
+size();addEventListener('resize',size);
+
+// Target: July 4th 9:00 PM local. Past that, roll to next year.
+function target(){
+  const n=new Date();let t=new Date(n.getFullYear(),6,4,21,0,0,0);
+  if(t-n<0)t=new Date(n.getFullYear()+1,6,4,21,0,0,0);
+  return t;
+}
+const T=target();
+const PALETTE=[[255,70,80],[90,155,255],[255,215,100],[255,255,255],[255,130,205]];
+let parts=[];
+function burst(x,y,col){
+  const n=72+Math.random()*44;
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,sp=(Math.random()*4+1.4)*devicePixelRatio;
+    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,col,size:(Math.random()*2+1)*devicePixelRatio});
+  }
+}
+function launch(){
+  const x=W*(0.18+Math.random()*0.64),y=H*(0.18+Math.random()*0.34);
+  burst(x,y,PALETTE[Math.floor(Math.random()*PALETTE.length)]);
+}
+addEventListener('pointerdown',launch);
+
+let last=0,auto=0,finale=false;
+function loop(ts){
+  const dt=Math.min(2,(ts-last)/16.7||1);last=ts;
+  ctx.globalCompositeOperation='source-over';
+  ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='lighter';
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i];
+    p.vy+=0.03*devicePixelRatio*dt;p.vx*=0.985;p.vy*=0.985;
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=0.009*dt;
+    if(p.life<=0){parts.splice(i,1);continue;}
+    ctx.globalAlpha=Math.max(0,p.life);
+    ctx.fillStyle=`rgb(${p.col[0]},${p.col[1]},${p.col[2]})`;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  if(finale){auto+=dt;if(auto>16){auto=0;launch();launch();}}
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+const H2=document.getElementById('h'),M2=document.getElementById('m'),S2=document.getElementById('s');
+function pad(n){return String(n).padStart(2,'0');}
+function tick(){
+  const diff=T-new Date();
+  if(diff<=0){
+    if(!finale){finale=true;document.body.classList.add('done');for(let i=0;i<6;i++)setTimeout(launch,i*240);}
+    return;
+  }
+  const s=Math.floor(diff/1000);
+  H2.textContent=pad(Math.floor(s/3600));
+  M2.textContent=pad(Math.floor(s%3600/60));
+  S2.textContent=pad(s%60);
+}
+tick();setInterval(tick,250);
+</script>
+</body>
+</html>
