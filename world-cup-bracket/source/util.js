@@ -12,6 +12,9 @@ const CODES = {
 };
 export const cc = (n) => CODES[n] || (n ? n.substring(0, 3).toUpperCase() : '\u2014');
 
+export const ROUND_ORDER = ['R32', 'R16', 'QF', 'SF', 'Final'];
+export const ROUND_FULL = { R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarterfinal', SF: 'Semifinal', Final: 'Final' };
+
 export const isComplete = (m) => ['ft', 'aet', 'pso'].includes(m.status);
 export const winnerName = (m) => m.winner === 'home' ? m.home : m.winner === 'away' ? m.away : null;
 export const rankOf = (name) => (name && S.rankings[name]) ? S.rankings[name] : null;
@@ -69,6 +72,28 @@ export function sideTeams(m, side) {
   return out;
 }
 
+// Road to here: a team's prior COMPLETED matches, earliest round first.
+// Excludes the match passed in (that's "this game", not history). Returns
+// [{ round, oppCode, scoreStr, won, note }]. Empty if no priors (e.g. R32).
+export function routeHistory(team, excludeId) {
+  const played = S.allMatches.filter(m =>
+    isComplete(m) && m.id !== excludeId && (m.home === team || m.away === team));
+  played.sort((a, b) => ROUND_ORDER.indexOf(a.round) - ROUND_ORDER.indexOf(b.round));
+  return played.map(m => {
+    const isHome = m.home === team;
+    const opp = isHome ? m.away : m.home;
+    const ts = isHome ? m.hs : m.as;
+    const os = isHome ? m.as : m.hs;
+    return {
+      round: m.round,
+      oppCode: cc(opp),
+      scoreStr: `${ts}-${os}`,
+      won: winnerName(m) === team,
+      note: m.psoNote || ''
+    };
+  });
+}
+
 // ---- kickoff time + countdown ----
 export function kickoffDate(m) {
   if (!m.time || m.time === 'TBD') return null;
@@ -94,15 +119,13 @@ export function fmtCountdown(target) {
 }
 
 // ---- odds estimate (heuristic, NOT real betting odds) ----
-// Maps FIFA rank -> a rough Elo-ish rating, then a logistic head-to-head split.
-// Deliberately simple + labeled "est" in the UI. For-fun only.
 export function oddsEstimate(a, b) {
   const ra = rankOf(a), rb = rankOf(b);
   if (!ra || !rb) return null;
-  const rate = (r) => 1500 - Math.log2(r) * 140; // rank 1 ~1500, rank 64 ~660
+  const rate = (r) => 1500 - Math.log2(r) * 140;
   const ea = rate(ra), eb = rate(rb);
   const pa = 1 / (1 + Math.pow(10, (eb - ea) / 400));
   let a1 = Math.round(pa * 100);
-  a1 = Math.max(8, Math.min(92, a1)); // never show a 0/100 blowout; football is football
+  a1 = Math.max(8, Math.min(92, a1));
   return { a: a1, b: 100 - a1 };
 }
