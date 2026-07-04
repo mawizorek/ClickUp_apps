@@ -1,35 +1,39 @@
-# f1-racetracks — next build brief
-
-## Source location
-- Runtime app: `f1-racetracks/index.html`
-- Runtime data: `f1-racetracks/data.json`
-- Live-tracking companion: `f1-racetracks/live-tracker.html`
-- Preferred shell/style/logic edit surface: `f1-racetracks/source/`
-- Current live version on `main`: `V1.6 main`
-- Current debug refresh gate on `main`: `V1.6b dbg1`
+# F1 Racetracks — next build spec
 
 ## Scratch intake
-- continue the current runtime exposure debugging until the live page visibly mounts the current-round card + Weekend Center
-- richer support-series schedule detail once the stronger Weekend Center pass is actually visible and judged
-- denser replay/event cadence if the first elevated playback still feels too thin
-- possible further absorption of live-tracker-only affordances into the main circuit page
+
+- standalone `live-tracker.html` still needs a stronger fail-soft fetch path
+- `source/10_track_views_and_profile.js` remains oversized and is the next clear split target
+- grouped round-data files `06` / `07` / `08` are still over the preferred working threshold and should be rebalanced
 
 ## Next build
-- _Empty._
+
+- split `source/10_track_views_and_profile.js` into stable submodules (track render, results/history, profile/helpers)
+- rebalance grouped round-data files so no round-data source file sits above the 15 KB working threshold unless explicitly approved
+- decide whether the companion live tracker should stay a separate surface or get structurally narrowed now that the main app owns more weekend context
 
 ## In review
-- active direct-to-main repair loop: current-round card + Weekend Center are written repo-side but still need visible confirmation on the live page
+
+- direct-to-main structural cleanup shipped on Sat Jul 4:
+  - retired `source/14_surface_rescue.js`
+  - retired `source/15_compact_polish.js`
+  - replaced them with permanent weekend modules:
+    - `14_weekend_state_and_data.js`
+    - `15_weekend_surface_render.js`
+    - `16_weekend_live_mode.js`
+    - `17_weekend_mount.js`
+    - `18_home_and_mobile_polish.js`
 
 ## Futures
-- split `source/11_weather_and_footer_exports.js` into dedicated Weekend Center / homepage current-round modules
-- move more timed session data out of seeded JS and into the canonical `data.json` structure
-- broaden support-series coverage where it materially improves the weekend-companion feel
-- enrich replay density with clearer phase changes and stronger event rhythm
-- decide how much of the standalone `live-tracker.html` should remain distinct versus being absorbed into the main app
+
+- move more seeded weekend timing and replay content into canonical runtime data instead of JS-held seeds
+- expand support-series schedule density only after the core F1 weekend surface is stable
+- decide whether the live companion should become thinner now that the main app owns the core race-weekend path
 
 ## Known guardrails
-- start shell/style/logic edits from `source/`, not from `index.html`
-- keep semantic source files near the ~10–12 KB planning target and split at ~15 KB unless an exception is explicitly approved
-- the grouped manifest source files remain required until the runtime data path is changed in a fully aligned pass
-- `source/10_track_views_and_profile.js` remains oversized
-- `source/11_weather_and_footer_exports.js` is the strongest budget-risk file after the current live-page repair loop and should be the first cleanup split target once the exposure issue is solved
+
+- start normal edits from `source/`, not from `index.html`
+- semantic source target stays ~10–12 KB soft / ~15 KB hard unless explicitly approved otherwise
+- 30 KB is an absolute redline / failure state, not a planning target
+- do not create new temp-fix source buckets like `surface_rescue` / `compact_polish`; add or split permanent concern-based modules instead
+- keep the visible footer build token useful during runtime verification so deploy refreshes are obvious from screenshots
