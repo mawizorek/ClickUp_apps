@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Reports</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html {
+    --bg:oklch(0.15 0.012 275); --surface-1:oklch(0.185 0.014 275); --surface-2:oklch(0.225 0.016 275);
+    --surface-3:oklch(0.27 0.018 275); --border:oklch(0.30 0.018 275); --border-soft:oklch(0.255 0.016 275);
+    --doc:oklch(0.215 0.006 265); --doc-2:oklch(0.25 0.007 265); --doc-rule:oklch(0.33 0.008 265); --doc-border:oklch(0.38 0.009 265);
+    --text:oklch(0.95 0.008 275); --text-dim:oklch(0.72 0.012 275); --text-faint:oklch(0.55 0.012 275);
+    --med:oklch(0.80 0.14 85); --med-bg:oklch(0.33 0.055 85); --low:oklch(0.72 0.06 250); --low-bg:oklch(0.31 0.03 250);
+    --done:oklch(0.80 0.15 155); --done-bg:oklch(0.31 0.06 155); --err:oklch(0.70 0.18 25);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; font-size:16px; color:var(--text); background:var(--bg); -webkit-font-smoothing:antialiased; font-optical-sizing:auto;
+  }
+  body { min-height:100vh; font-weight:350; line-height:1.6; letter-spacing:0.005em; }
+  h1,h2,h3 { text-wrap:balance; font-weight:650; letter-spacing:-0.01em; }
+  .wrap { max-width:840px; margin:0 auto; padding:1.5rem 1.1rem 4rem; }
+  code { font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+  button { font:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+  .topbar { display:flex; align-items:center; gap:0.7rem; margin-bottom:1.4rem; }
+  .back { display:inline-flex; align-items:center; gap:0.35rem; font-size:0.82rem; font-weight:550; color:var(--text-dim); padding:0.42rem 0.72rem 0.42rem 0.55rem; border-radius:8px; border:1px solid var(--border-soft); background:var(--surface-1); transition:all .18s cubic-bezier(.22,1,.36,1); }
+  .back:hover { color:var(--text); border-color:var(--border); }
+  .back i { width:15px; height:15px; }
+  .kicker { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.11em; color:var(--text-faint); font-weight:650; }
+  header.home h1 { font-size:1.95rem; margin:0.55rem 0 0.35rem; }
+  header.home .sub { font-size:0.9rem; color:var(--text-dim); max-width:52ch; }
+  .tabs { display:flex; gap:0.4rem; margin:1.5rem 0 1.6rem; padding:0.3rem; background:var(--surface-1); border:1px solid var(--border-soft); border-radius:12px; }
+  .tab { flex:1; text-align:center; padding:0.6rem; font-size:0.86rem; font-weight:600; color:var(--text-faint); border-radius:9px; transition:all .18s cubic-bezier(.22,1,.36,1); }
+  .tab.active { color:var(--text); background:var(--surface-3); }
+  .tab .n { font-variant-numeric:tabular-nums; color:var(--text-faint); font-weight:600; }
+  .tab.active .n { color:var(--text-dim); }
+  .grid { display:flex; flex-direction:column; gap:0.75rem; }
+  @media (min-width:640px){ .grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; } }
+  .acard { text-align:left; width:100%; background:var(--surface-1); border:1px solid var(--border-soft); border-radius:16px; padding:1.2rem 1.25rem 1.05rem; transition:all .2s cubic-bezier(.22,1,.36,1); display:flex; flex-direction:column; gap:1rem; position:relative; overflow:hidden; }
+  .acard::after { content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--ac); opacity:0.6; }
+  .acard:hover { border-color:var(--ac); transform:translateY(-2px); }
+  .acard:hover::after { opacity:1; }
+  .acard-top { display:flex; align-items:center; gap:0.85rem; }
+  .disc { width:48px; height:48px; border-radius:13px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:700; letter-spacing:-0.02em; color:var(--ac); background:color-mix(in oklch, var(--ac) 17%, var(--surface-2)); }
+  .acard-id .nm { font-size:1.05rem; font-weight:650; }
+  .acard-id .rl { font-size:0.78rem; color:var(--text-faint); margin-top:0.05rem; }
+  .acard .blurb { font-size:0.83rem; color:var(--text-dim); line-height:1.5; }
+  .acard-foot { display:flex; align-items:center; justify-content:space-between; gap:0.6rem; padding-top:0.9rem; border-top:1px solid var(--border-soft); }
+  .acard-foot .meta { font-size:0.77rem; color:var(--text-faint); font-variant-numeric:tabular-nums; }
+  .acard-foot .meta b { color:var(--text-dim); font-weight:650; }
+  .pill { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; padding:0.24rem 0.6rem; border-radius:999px; white-space:nowrap; }
+  .pill.adjust { color:var(--med); background:var(--med-bg); } .pill.solid { color:var(--done); background:var(--done-bg); } .pill.empty { color:var(--text-faint); background:var(--surface-2); }
+  .feed { display:flex; flex-direction:column; gap:0.6rem; }
+  .frow { width:100%; text-align:left; display:grid; grid-template-columns:auto 1fr auto; gap:0.2rem 0.85rem; align-items:center; background:var(--surface-1); border:1px solid var(--border-soft); border-radius:12px; padding:0.85rem 1rem; transition:all .18s cubic-bezier(.22,1,.36,1); }
+  .frow:hover { border-color:var(--ac); }
+  .frow .fdisc { width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:700; color:var(--ac); background:color-mix(in oklch, var(--ac) 16%, var(--surface-2)); }
+  .frow .fmid .ft { font-size:0.9rem; font-weight:600; } .frow .fmid .fs { font-size:0.76rem; color:var(--text-faint); margin-top:0.1rem; }
+  .frow .fwhen { font-size:0.74rem; color:var(--text-faint); text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .adetail-head { display:flex; align-items:center; gap:1rem; margin-bottom:1.3rem; }
+  .adetail-head .disc { width:52px; height:52px; border-radius:14px; font-size:1.25rem; }
+  .adetail-head h1 { font-size:1.5rem; } .adetail-head .rl { font-size:0.84rem; color:var(--text-faint); margin-top:0.15rem; }
+  .pager { margin-bottom:1.4rem; }
+  .pager-inner { display:flex; align-items:center; gap:0.6rem; background:var(--surface-1); border:1px solid var(--border-soft); border-radius:12px; padding:0.5rem 0.55rem; }
+  .pg-arrow { width:40px; height:40px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:var(--text-dim); background:var(--surface-2); border:1px solid var(--border-soft); transition:all .16s ease; flex-shrink:0; }
+  .pg-arrow:hover:not(:disabled) { color:var(--text); border-color:var(--ac); } .pg-arrow:disabled { opacity:0.3; cursor:not-allowed; } .pg-arrow i { width:18px; height:18px; }
+  .pg-center { flex:1; text-align:center; min-width:0; padding:0 0.3rem; }
+  .pg-center .pt { font-size:0.9rem; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .pg-center .pw { font-size:0.72rem; color:var(--text-faint); font-variant-numeric:tabular-nums; margin-top:0.12rem; }
+  .dots { display:flex; align-items:center; justify-content:center; gap:0.42rem; margin-top:0.7rem; }
+  .dots .d { width:7px; height:7px; border-radius:50%; background:var(--surface-3); transition:all .18s ease; }
+  .dots .d.on { background:var(--ac); transform:scale(1.25); } .dots .d.done { background:color-mix(in oklch, var(--done) 55%, var(--surface-3)); }
+  .allbtn { display:flex; align-items:center; justify-content:center; gap:0.45rem; width:100%; margin-top:0.85rem; padding:0.6rem; font-size:0.8rem; font-weight:600; color:var(--text-dim); background:transparent; border:1px solid var(--border-soft); border-radius:10px; transition:all .16s ease; }
+  .allbtn:hover { color:var(--text); border-color:var(--ac); } .allbtn i { width:15px; height:15px; }
+  .solo-label { text-align:center; font-size:0.78rem; color:var(--text-faint); font-variant-numeric:tabular-nums; padding:0.7rem; background:var(--surface-1); border:1px solid var(--border-soft); border-radius:12px; }
+  #repslot { animation:fade .3s cubic-bezier(.16,1,.3,1); }
+  .report-sheet { background:var(--doc); border:1px solid var(--doc-border); border-radius:6px; padding:1.6rem 1.5rem 1.3rem; max-width:680px; margin:0 auto; box-shadow:0 1px 0 var(--doc-rule) inset; }
+  @media (max-width:560px){ .report-sheet { padding:1.35rem 1.15rem 1.1rem; } }
+  .doc-mast { border-bottom:2px solid var(--doc-rule); padding-bottom:1rem; margin-bottom:1.15rem; }
+  .doc-tag { display:inline-flex; align-items:center; gap:0.4rem; font-size:0.64rem; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:var(--ac); margin-bottom:0.65rem; }
+  .doc-tag::before { content:""; width:6px; height:6px; border-radius:1px; background:var(--ac); transform:rotate(45deg); }
+  .doc-title { font-family:ui-serif,"Iowan Old Style",Georgia,"Times New Roman",serif; font-size:1.5rem; font-weight:600; line-height:1.2; }
+  .doc-byline { font-size:0.84rem; color:var(--text-dim); margin-top:0.35rem; font-weight:550; }
+  .doc-metaline { display:flex; flex-wrap:wrap; gap:0.35rem 1rem; margin-top:0.7rem; font-family:ui-monospace,Menlo,monospace; font-size:0.72rem; color:var(--text-faint); }
+  .doc-metaline .mk { color:var(--text-dim); }
+  .doc-verdict { padding:0.95rem 0 1.05rem; border-bottom:1px solid var(--doc-rule); }
+  .doc-verdict .g { display:flex; align-items:baseline; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.5rem; }
+  .doc-verdict .g b { font-size:1.05rem; font-weight:700; } .doc-verdict p { font-size:0.89rem; color:var(--text-dim); line-height:1.6; }
+  .tally { display:flex; gap:0.45rem; margin-top:0.85rem; flex-wrap:wrap; }
+  .chip { display:inline-flex; align-items:baseline; gap:0.35rem; font-size:0.76rem; font-weight:550; padding:0.32rem 0.6rem; border-radius:7px; background:var(--doc-2); color:var(--text-dim); }
+  .chip b { font-size:0.9rem; font-weight:700; font-variant-numeric:tabular-nums; } .chip.med b{color:var(--med);} .chip.low b{color:var(--low);} .chip.done b{color:var(--done);}
+  .doc-h { display:flex; align-items:baseline; justify-content:space-between; gap:0.75rem; font-size:0.78rem; font-weight:700; letter-spacing:0.03em; color:var(--text); text-transform:uppercase; padding-bottom:0.45rem; margin:1.6rem 0 0.2rem; border-bottom:1px solid var(--doc-rule); }
+  .doc-h .cnt { text-transform:none; letter-spacing:0; color:var(--text-faint); font-weight:600; font-variant-numeric:tabular-nums; }
+  .df { padding:0.9rem 0; border-bottom:1px solid var(--doc-rule); } .df:last-child { border-bottom:none; }
+  .df-top { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem; flex-wrap:wrap; }
+  .df-num { font-family:ui-monospace,Menlo,monospace; font-size:0.74rem; font-weight:700; color:var(--text-faint); }
+  .sev { font-size:0.64rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:0.16rem 0.48rem; border-radius:5px; }
+  .sev.med{color:var(--med);background:var(--med-bg);} .sev.low{color:var(--low);background:var(--low-bg);} .sev.resolved{color:var(--done);background:var(--done-bg);}
+  .df-cat { font-size:0.77rem; color:var(--text-faint); font-weight:550; }
+  .df-cat.fixed { margin-left:auto; color:var(--done); font-weight:600; display:inline-flex; align-items:center; gap:0.3rem; } .df-cat.fixed i{width:13px;height:13px;}
+  .df-body { font-size:0.89rem; line-height:1.58; } .df-body code,.df-fix code { font-size:0.86em; color:var(--ac); background:var(--doc-2); padding:0.03rem 0.3rem; border-radius:4px; }
+  .df-fix { margin-top:0.5rem; font-size:0.82rem; color:var(--text-dim); display:flex; gap:0.5rem; }
+  .df-fix .k { color:var(--text-faint); font-weight:700; text-transform:uppercase; font-size:0.64rem; letter-spacing:0.05em; padding-top:0.12rem; flex-shrink:0; }
+  .df-fix.done { color:var(--done); } .df-fix.done .k { color:var(--done); }
+  .dt { margin-top:0.4rem; }
+  .dt-row { display:grid; grid-template-columns:1fr auto; gap:0.1rem 0.75rem; padding:0.6rem 0; border-bottom:1px solid var(--doc-rule); } .dt-row:last-child { border-bottom:none; }
+  .dt-row .nm { font-family:ui-monospace,Menlo,monospace; font-size:0.83rem; font-weight:600; }
+  .dt-row .sz { font-size:0.82rem; color:var(--text-dim); font-variant-numeric:tabular-nums; text-align:right; }
+  .dt-row .rd { grid-column:1/-1; font-size:0.75rem; color:var(--text-faint); display:flex; align-items:center; gap:0.4rem; margin-top:0.1rem; } .dt-row.flag .rd { color:var(--med); }
+  .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; } .dot.ok{background:var(--done);} .dot.no{background:var(--err);} .dot.na{background:var(--text-faint);}
+  .dclean { margin-top:0.4rem; } .dclean .r { display:flex; align-items:flex-start; gap:0.55rem; font-size:0.86rem; color:var(--text-dim); padding:0.4rem 0; }
+  .dclean .r i { width:15px; height:15px; color:var(--done); flex-shrink:0; margin-top:0.15rem; } .dclean .r code { font-size:0.86em; color:var(--text); }
+  .dl { padding:0.8rem 0; border-bottom:1px solid var(--doc-rule); } .dl:last-child { border-bottom:none; }
+  .dl-top { display:flex; align-items:center; gap:0.5rem; } .dl-name { font-size:0.88rem; font-weight:650; }
+  .dl-stat { margin-left:auto; font-size:0.64rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; padding:0.16rem 0.46rem; border-radius:5px; }
+  .dl-stat.flag { color:var(--med); background:var(--med-bg); } .dl-stat.ok { color:var(--done); background:var(--done-bg); }
+  .dl-body { font-size:0.86rem; color:var(--text-dim); line-height:1.56; margin-top:0.45rem; }
+  .doc-callout { margin-top:1.15rem; padding:0.95rem 1.05rem; border:1px solid var(--med-bg); border-radius:8px; background:color-mix(in oklch, var(--med) 9%, var(--doc)); }
+  .doc-callout .ct { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--med); font-weight:700; } .doc-callout .cb { font-size:0.9rem; color:var(--text); margin-top:0.35rem; line-height:1.54; }
+  .doc-foot { margin-top:1.4rem; padding-top:0.9rem; border-top:2px solid var(--doc-rule); font-family:ui-monospace,Menlo,monospace; font-size:0.7rem; color:var(--text-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.4rem; }
+  dialog { border:1px solid var(--border); border-radius:16px; background:var(--surface-1); color:var(--text); padding:0; max-width:480px; width:92vw; box-shadow:0 30px 80px oklch(0 0 0 / .6); }
+  dialog::backdrop { background:oklch(0.1 0.01 275 / .7); }
+  .sheet-head { display:flex; align-items:center; justify-content:space-between; padding:1.1rem 1.25rem; border-bottom:1px solid var(--border-soft); } .sheet-head h3 { font-size:1rem; }
+  .sheet-head .x { color:var(--text-faint); padding:0.3rem; display:flex; } .sheet-head .x:hover{color:var(--text);} .sheet-head .x i{width:18px;height:18px;}
+  .sheet-body { padding:0.9rem; max-height:66vh; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem; }
+  .idxrow { width:100%; text-align:left; display:flex; align-items:center; gap:0.75rem; padding:0.8rem 0.9rem; background:var(--surface-2); border:1px solid var(--border-soft); border-radius:11px; transition:all .16s ease; }
+  .idxrow:hover { border-color:var(--ac); } .idxrow.current { border-color:var(--ac); background:color-mix(in oklch, var(--ac) 10%, var(--surface-2)); }
+  .idxrow .marker { width:9px; height:9px; border-radius:50%; background:var(--ac); flex-shrink:0; } .idxrow.past .marker { background:var(--text-faint); }
+  .idxrow .im { flex:1; } .idxrow .im .it { font-size:0.88rem; font-weight:600; display:flex; align-items:center; gap:0.4rem; }
+  .idxrow .im .iw { font-size:0.74rem; color:var(--text-faint); margin-top:0.08rem; font-variant-numeric:tabular-nums; } .idxrow .idelta { font-size:0.71rem; color:var(--text-faint); text-align:right; }
+  .latest-tag { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--ac); background:color-mix(in oklch, var(--ac) 15%, var(--surface-2)); padding:0.16rem 0.45rem; border-radius:5px; }
+  .state { text-align:center; padding:2.5rem 1.5rem; border:1.5px dashed var(--border); border-radius:14px; }
+  .state i { width:26px; height:26px; color:var(--text-faint); } .state .t { font-size:0.95rem; font-weight:600; color:var(--text-dim); margin-top:0.7rem; }
+  .state .s { font-size:0.82rem; color:var(--text-faint); margin-top:0.35rem; line-height:1.55; }
+  .state .retry { margin-top:1rem; padding:0.5rem 1rem; font-size:0.82rem; font-weight:600; color:var(--text); background:var(--surface-2); border:1px solid var(--border); border-radius:9px; }
+  .skel { height:1rem; border-radius:5px; background:linear-gradient(90deg,var(--doc-2),var(--doc-rule),var(--doc-2)); background-size:200% 100%; animation:sh 1.2s ease-in-out infinite; }
+  @keyframes sh { from{background-position:200% 0;} to{background-position:-200% 0;} }
+  .foot { margin-top:2.6rem; padding-top:1.1rem; border-top:1px solid var(--border-soft); font-size:0.76rem; color:var(--text-faint); line-height:1.6; }
+  @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  #app { animation:fade .32s cubic-bezier(.16,1,.3,1); }
+</style>
+</head>
+<body>
+  <div class="wrap"><div id="app"></div>
+    <div class="foot">Agent Reports · reads each agent's report history from <code>brain-config/agents/&lt;agent&gt;/reports/</code>. Agents emit report data as JSON; this viewer owns the rendering.</div>
+  </div>
+  <dialog id="histSheet"></dialog>
+<script>
+const RAW="https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main/";
+const MANIFEST=RAW+"agent-reports/manifest.json";
+const agIdxURL=id=>RAW+"brain-config/agents/"+id+"/reports/index.json";
+const repURL=(id,file)=>RAW+"brain-config/agents/"+id+"/reports/"+file;
+let AGENTS=[]; let VIEW={screen:'home',tab:'agents'}; let BOOT='loading';
+const byId=id=>AGENTS.find(a=>a.id===id);
+async function fetchJSON(u){ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error(r.status); return r.json(); }
+function rel(iso){ const d=new Date(iso),m=Math.round((Date.now()-d)/60000); if(m<1)return 'just now'; if(m<60)return m+'m ago'; const h=Math.round(m/60); if(h<24)return h+'h ago'; return Math.round(h/24)+'d ago'; }
+function fmt(iso){ const d=new Date(iso); return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+async function boot(){ BOOT='loading'; render();
+  try { const m=await fetchJSON(MANIFEST); AGENTS=m.agents;
+    await Promise.all(AGENTS.map(async a=>{ try{ const idx=await fetchJSON(agIdxURL(a.id)); a.reports=idx.reports||[]; }catch(e){ a.reports=[]; } }));
+    BOOT='ready'; }
+  catch(e){ BOOT='error'; }
+  render();
+}
+async function ensureReport(a,ri){ const e=a.reports[ri]; if(!e||e._loaded||e._loading)return; e._loading=true;
+  try{ const full=await fetchJSON(repURL(a.id,e.file)); Object.assign(e,full); e._loaded=true; }catch(err){ e._error=true; } e._loading=false;
+  if(VIEW.screen==='agent'&&VIEW.agent===a.id) render(); }
+function go(v){ VIEW={...VIEW,...v}; render(); window.scrollTo(0,0); }
+function render(){ const app=document.getElementById('app');
+  if(BOOT==='loading'){ app.innerHTML=`<div class="state"><div class="skel" style="width:180px;margin:0 auto"></div><div class="t">Loading agents…</div></div>`; return; }
+  if(BOOT==='error'){ app.innerHTML=`<div class="state"><i data-lucide="cloud-off"></i><div class="t">Couldn't reach the report data</div><div class="s">The report files may still be propagating. Give it a moment.</div><button class="retry" onclick="boot()">Retry</button></div>`; if(window.lucide)lucide.createIcons(); return; }
+  if(VIEW.screen==='home') app.innerHTML=Home();
+  else if(VIEW.screen==='agent') app.innerHTML=AgentDetail(byId(VIEW.agent));
+  if(window.lucide) lucide.createIcons();
+}
+function Home(){ const total=AGENTS.reduce((s,a)=>s+a.reports.length,0); const at=VIEW.tab==='agents';
+  return `<header class="home"><div class="kicker">Brain · Agent Registry</div><h1>Agent Reports</h1>
+    <div class="sub">Each agent files its reports here. Open an agent to read the latest, then page back through everything they've filed.</div></header>
+    <div class="tabs"><button class="tab ${at?'active':''}" onclick="go({tab:'agents'})">Agents <span class="n">${AGENTS.length}</span></button>
+      <button class="tab ${!at?'active':''}" onclick="go({tab:'feed'})">All Reports <span class="n">${total}</span></button></div>${at?AgentGrid():Feed()}`;
+}
+function AgentGrid(){ return `<div class="grid">${AGENTS.map(a=>{ const l=a.reports[0],n=a.reports.length;
+  const foot=l?`<span class="meta"><b>${n}</b> report${n>1?'s':''} · latest ${rel(l.ts)}</span><span class="pill ${l.verdictPill}">${l.pillText}</span>`:`<span class="meta">No reports filed</span><span class="pill empty">awaiting</span>`;
+  return `<button class="acard" style="--ac:${a.ac}" onclick="go({screen:'agent',agent:'${a.id}',ri:0})">
+    <div class="acard-top"><div class="disc">${a.initials}</div><div class="acard-id"><div class="nm">${a.name}</div><div class="rl">${a.role}</div></div></div>
+    <div class="blurb">${a.blurb}</div><div class="acard-foot">${foot}</div></button>`; }).join('')}</div>`; }
+function Feed(){ const all=AGENTS.flatMap(a=>a.reports.map((r,i)=>({...r,agent:a,idx:i}))).sort((x,y)=>new Date(y.ts)-new Date(x.ts));
+  if(!all.length) return `<div class="state"><i data-lucide="inbox"></i><div class="t">No reports filed yet</div></div>`;
+  return `<div class="feed">${all.map(r=>`<button class="frow" style="--ac:${r.agent.ac}" onclick="go({screen:'agent',agent:'${r.agent.id}',ri:${r.idx}})">
+    <div class="fdisc">${r.agent.initials}</div><div class="fmid"><div class="ft">${r.agent.name} · ${r.reportType}</div><div class="fs">${r.verdictWord} · ${r.target}</div></div>
+    <div class="fwhen">${rel(r.ts)}</div></button>`).join('')}</div>`; }
+function AgentDetail(a){ const head=`<div class="topbar"><button class="back" onclick="go({screen:'home'})"><i data-lucide="chevron-left"></i>Agents</button></div>
+    <div class="adetail-head"><div class="disc" style="--ac:${a.ac}">${a.initials}</div><div><h1>${a.name}</h1><div class="rl">${a.role}</div></div></div>`;
+  if(!a.reports.length) return head+`<div class="state"><i data-lucide="file-clock"></i><div class="t">No reports filed yet</div><div class="s">${a.name} hasn't run since reporting went live. Their report browser will populate here on first file.</div></div>`;
+  const ri=Math.min(VIEW.ri??0,a.reports.length-1),r=a.reports[ri],n=a.reports.length,newer=ri>0,older=ri<n-1;
+  let pager; if(n===1){ pager=`<div class="pager"><div class="solo-label">Only report on file · ${fmt(r.ts)}</div></div>`; }
+  else { pager=`<div class="pager"><div class="pager-inner">
+      <button class="pg-arrow" ${older?'':'disabled'} onclick="go({ri:${ri+1}})" aria-label="Older report"><i data-lucide="chevron-left"></i></button>
+      <div class="pg-center"><div class="pt">${ri===0?'Latest report':'Report '+(ri+1)+' of '+n}</div><div class="pw">${fmt(r.ts)}</div></div>
+      <button class="pg-arrow" ${newer?'':'disabled'} onclick="go({ri:${ri-1}})" aria-label="Newer report"><i data-lucide="chevron-right"></i></button></div>
+      <div class="dots">${a.reports.map((rr,i)=>`<span class="d ${i===ri?'on':(i<ri?'':'done')}"></span>`).join('')}</div>
+      <button class="allbtn" onclick="openHist('${a.id}',${ri})"><i data-lucide="list"></i>View all ${n} reports</button></div>`; }
+  let doc; if(r._loaded) doc=ReportDoc(a,r); else if(r._error) doc=`<div class="state"><i data-lucide="file-x"></i><div class="t">Couldn't load this report</div></div>`; else { ensureReport(a,ri); doc=LoadingDoc(a,r); }
+  return head+pager+`<div id="repslot">${doc}</div>`;
+}
+function LoadingDoc(a,r){ return `<div class="report-sheet"><div class="doc-mast"><div class="doc-tag">Report</div>
+    <div class="doc-title">${r.reportType}</div><div class="doc-byline">${a.name} · ${a.role}</div></div>
+    <div class="skel" style="width:100%;height:3.5rem;margin:1rem 0"></div><div class="skel" style="width:80%;margin:0.6rem 0"></div><div class="skel" style="width:90%;margin:0.6rem 0"></div></div>`; }
+function openHist(aid,cur){ const a=byId(aid),s=document.getElementById('histSheet');
+  s.innerHTML=`<div class="sheet-head"><h3>${a.name} · report history</h3><button class="x" onclick="document.getElementById('histSheet').close()"><i data-lucide="x"></i></button></div>
+    <div class="sheet-body">${a.reports.map((r,i)=>`<button class="idxrow ${i===cur?'current':(i===0?'':'past')}" style="--ac:${a.ac}" onclick="document.getElementById('histSheet').close(); go({screen:'agent',agent:'${a.id}',ri:${i}})">
+      <span class="marker"></span><div class="im"><div class="it">${r.reportType} ${i===0?'<span class="latest-tag">Latest</span>':''}</div><div class="iw">${fmt(r.ts)} · ${r.verdictWord}</div></div>
+      <div class="idelta">${r.delta||''}</div></button>`).join('')}</div>`;
+  s.showModal(); if(window.lucide) lucide.createIcons(); }
+function ReportDoc(a,r){ const mast=`<div class="doc-mast"><div class="doc-tag">Report</div><div class="doc-title">${r.reportType}</div>
+    <div class="doc-byline">${a.name} · ${a.role}</div>
+    <div class="doc-metaline"><span><span class="mk">Subject</span> ${r.target}</span><span><span class="mk">Filed</span> ${fmt(r.ts)}</span></div></div>`;
+  const verdict=`<div class="doc-verdict"><div class="g"><b>${r.verdictWord}</b><span class="pill ${r.verdictPill}">${r.pillText}</span></div>
+    <p>${r.summary}</p><div class="tally">${r.tally.map(t=>`<span class="chip ${t.c}"><b>${t.n}</b> ${t.l}</span>`).join('')}</div></div>`;
+  const body=r.type==='audit'?AuditDoc(r):r.type==='review'?ReviewDoc(r):'';
+  const foot=`<div class="doc-foot"><span>Filed by ${a.name}</span><span>report ${r.id}</span></div>`;
+  return `<div class="report-sheet">${mast}${verdict}${body}${foot}</div>`; }
+function AuditDoc(r){ return `<div class="doc-h">Findings <span class="cnt">${r.findings.length}</span></div>
+    ${r.findings.map(f=>`<div class="df"><div class="df-top"><span class="df-num">${f.num}</span><span class="sev ${f.sev}">${f.sev==='resolved'?'Fixed':f.sev==='med'?'Medium':'Low'}</span>
+      <span class="df-cat">${f.cat}</span>${f.fixed?'<span class="df-cat fixed"><i data-lucide="check-circle-2"></i>committed</span>':''}</div>
+      <div class="df-body">${f.body}</div><div class="df-fix ${f.fixed?'done':''}"><span class="k">${f.fixed?'Done':'Fix'}</span><span>${f.fix}</span></div></div>`).join('')}
+    <div class="doc-h">Size &amp; Rendition <span class="cnt">${r.apps.length} apps</span></div>
+    <div class="dt">${r.apps.map(p=>`<div class="dt-row ${p.flag?'flag':''}"><span class="nm">${p.name}</span><span class="sz">${p.size}</span><span class="rd"><span class="dot ${p.dot}"></span>${p.rd}</span></div>`).join('')}</div>
+    <div class="doc-h">Passed Clean <span class="cnt">${r.clean.length}</span></div>
+    <div class="dclean">${r.clean.map(c=>`<div class="r"><i data-lucide="check"></i><span>${c}</span></div>`).join('')}</div>`; }
+function ReviewDoc(r){ return `<div class="doc-h">Seven Lenses <span class="cnt">${r.lenses.filter(l=>l.status==='flag').length} flagged</span></div>
+    ${r.lenses.map(l=>`<div class="dl"><div class="dl-top"><span class="dl-name">${l.name}</span><span class="dl-stat ${l.status}">${l.status==='ok'?'Clean':'Flag'}</span></div>
+      ${l.status!=='ok'?`<div class="dl-body">${l.body}</div>`:''}</div>`).join('')}
+    <div class="doc-callout"><div class="ct">Highest-value change before building</div><div class="cb">${r.call}</div></div>`; }
+boot();
+</script>
+</body>
+</html>
