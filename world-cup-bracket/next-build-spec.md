@@ -1,115 +1,96 @@
 # World Cup 2026 Bracket — Next Build Spec
 
-**Version target:** v2.0 (engine change, `index.html` version bump)
-**Current shipped:** v1.3 (engine) + data.json (data-separated)
+**Version target:** v3.0 (engine change, `index.html` version bump)
+**Current shipped:** v2.1 (engine) + data.json (data-separated, includes `rankings` map)
 **Live:** https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/
 
 ## Handoff prompt (one line for the render agent)
 
 > Read `world-cup-bracket/next-build-spec.md` from `mawizorek/ClickUp_apps` (branch main). Follow its instructions exactly.
 
-## Source pins (HEAD commit `df4a3034` at spec time)
+## Source pins (HEAD commit `6c6c5f22` at spec time)
 
-- `index.html` blob SHA: `96e94927c009a8eaad76813375edfc752873d0a2` (21,986 bytes — UNDER 30KB, reads whole via raw URL, no chunk set needed)
-- `data.json` blob SHA: `b047379bd1483e92e2d9d20ce17e1fde1dfe0b6e`
-- `README.md` blob SHA: `83edd511ec5c3cf7cd2726dc7cca65154cf85216`
+- `index.html` blob SHA: `13c4bb55bcfbf8a1bdb3d00b4ceb7ac778a9bcca` (**30,453 bytes — OVER the ~30KB read cap**)
+- `data.json` blob SHA: `3095ba1456e642757d9611e3458cb6af57751ee3`
+- `README.md` blob SHA: `668260cec8feb3241374d638db3608b986739368`
 - Read source at: https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main/world-cup-bracket/index.html
 
-**⚠️ Re-fetch the LIVE index.html SHA immediately before committing** (Commit Pre-Flight): only data.json has changed since this pin, but confirm the blob SHA at write time or the overwrite bounces.
+**⚠️ 30KB READ-CAP TRIGGER (Source-Size Budget Enforcer):** the engine now exceeds the ~30KB single-fetch cap. A raw fetch may clip before the end. **This build should be the modular split** (thin `index.html` shell + `./source/*.js` modules per Apps/Artifacts multi-file standard) OR, at minimum, commit a `/source` chunk set so the engine stays readable. Do NOT keep growing the monolith. Confirm the split approach with Michael before writing if unsure.
+
+**⚠️ Re-fetch live blob SHAs immediately before committing** (Commit Pre-Flight).
 
 ---
 
 ## Context: current engine shape (what you're editing)
 
-- `const APP_VERSION = 'v1.3';` — top-of-script constant. **Bump to `'v2.0'`.**
-- `let allMatches = [];` — flat array of match objects loaded from data.json.
-- Each match: `{ id, round, day, dayLabel, home, away, hs, as, status, winner, venue, time, tbd, feedsTo, psoNote }`. `feedsTo` = the match id this winner advances into. Rounds: R32 → R16 → QF → SF → Final.
-- `const cc = (n) => {...}` — name→3-letter code map; returns em dash for `'TBD'`.
-- `const isComplete = (m) => ['ft','aet','pso'].includes(m.status);`
-- `function renderMatchCard(m)` — schedule-view card markup (NOT currently tappable).
-- `function renderBracketMatch(m)` — bracket-view match markup (NOT currently tappable).
-- Bracket connectors are cosmetic only (`.bracket-connectors`).
-- OKLCH dark theme, token vars in `:root`. Reuse existing tokens; the palette is locked.
+Shipped through v2.1. Relevant existing machinery you'll reuse (do NOT rebuild):
 
-No reverse (`fedBy`) lookup exists yet. That's the foundation for everything below.
-
----
-
-## Next build (v2.0)
-
-### 🟢 CORE — Potential matchups (the committed ask, ship this no matter what)
-
-Future-round slots currently render `TBD` (em dash). Replace with the live contenders computed from the bracket wiring.
-
-**Foundation (Dev-approved):** after `allMatches` loads, build a reverse map once:
-```js
-// invert feedsTo → which two matches feed each downstream match
-const fedBy = {};
-allMatches.forEach(m => { if (m.feedsTo) (fedBy[m.feedsTo] ||= []).push(m.id); });
-```
-
-**Resolver (DEPTH-1 ONLY in v1 — hard guardrail):** for a match whose `home` or `away` is `'TBD'`, look up its feeder matches via `fedBy[thisMatch.id]`. For the relevant feeder:
-- Feeder is complete → the real winner name should already be in the data on refresh; render normally.
-- Feeder is `upcoming` with two REAL teams → render a potential label: `"MAR/CAN winner"` (use `cc()` codes, not full names, to stay short).
-- Feeder is ITSELF unresolved (both its slots TBD) → **fall back to plain `TBD`. DO NOT recurse.** Rendering `"((A/B)/(C/D)) winner"` soup is an explicit non-goal for v1.
-
-**Styling:** potential labels get a distinct, muted treatment so they never read as broken placeholder text. Add a `.potential` class (use `--text-muted` / `--text-dim`, a subtle `vs winner of` affordance, italic is fine). Must be visually distinct from BOTH confirmed matchups and the old blank TBD. This is the Professionalism gate — if it looks like unfinished dev output, it failed.
-
-**Live-over-hardcoded:** resolution is computed at runtime from `fedBy` + `status`. Never hardcode a slot's contenders.
+- `const APP_VERSION = 'v2.1';` — **bump to `'v3.0'`.**
+- `allMatches` + `rankings` loaded from data.json. Match shape: `{ id, round, day, dayLabel, home, away, hs, as, status, winner, venue, time, tbd, feedsTo, psoNote }`. `rankings` = `{ "Team": FIFArank }`.
+- `fedBy` reverse map (feedsTo inverted) — already built at load.
+- `slotLabel(match, side)` — depth-1 potential resolver ("winner of MAR/CAN").
+- `pathIn(m)` — the two feeder matchups into a match.
+- `advancesToFace(m)` — who a winner goes on to face.
+- `kickoffDate(m)` / `fmtCountdown()` — ET-string → Date, live countdown. Reuse verbatim.
+- `rankOf(name)` — team → FIFA rank.
+- **Schedule view** already has the tap-to-expand drawer (venue, kickoff, countdown, path-in, advances-to-face).
+- **Bracket view** already has the path-highlight on team tap (`applyPathHighlight`). Michael confirmed he loves this — PRESERVE it.
+- `renderBracketMatch(m)` / `bmTeam(m, side)` — bracket markup. Currently a team tap triggers path-highlight; there is NO match-level detail panel in the bracket yet.
 
 ---
 
-### 🧪 CREATIVE TEST SET (Michael greenlit extra features to TRY — build them, flag them experimental; we keep what lands, cut what doesn't)
+## Next build (v3.0)
 
-Build all three. Keep each self-contained enough to cut cleanly if it doesn't earn its place. Label them in the version comment as experimental so we evaluate on-device.
+### 🟢 CORE — Bracket-tap detail panel (Michael's committed ask)
 
-**T1 — Tap-to-expand match card (schedule view).** Tapping any card toggles a detail drawer beneath it (accordion; one open at a time is fine). Contents by state:
-- Upcoming: full venue + city, kickoff time, and a **live countdown** to kickoff (compute from `day` + `time` at runtime; if `time` is TBD, show date only). Plus a **"Path in"** line naming the two feeder matchups.
-- Completed: `psoNote` if present, plus **"Advances to face → X"** computed by resolving `feedsTo` (the downstream match's other slot). If the next opponent isn't set yet, show the potential label from the CORE resolver.
-- Interaction: whole card is the tap target (min 44px), chevron affordance, smooth height transition. Respect `prefers-reduced-motion`.
+When a bracket match is tapped, surface a detail panel/sheet for THAT match. Michael's explicit list, every bracket slot (including future/TBD ones like the Final) must answer:
 
-**T2 — Bracket path highlight (bracket view).** Tap a team in any bracket match → walk its `feedsTo` chain forward and highlight every downstream slot that team could still reach; dim the rest of the bracket. Tap the same team again, tap empty space, or tap a different team to reset/reassign. This is the "whoa" feature — make the highlight satisfying (accent glow on the path, reduced opacity elsewhere). Completed-team paths that are already eliminated: don't highlight past their exit.
+1. **When** the game is played — date + kickoff time (e.g. "Sun Jul 19, 3:00 PM ET"). For future rounds this is already in data.json (dates/times/venues are FIFA-fixed). If the time is still TBD, show the date. Include the live **countdown** (reuse `kickoffDate`/`fmtCountdown`).
+2. **Where** — venue + city.
+3. **Possible matchups** — the contenders feeding this slot. Reuse `pathIn()` / `slotLabel()`. For a slot two+ rounds out this is the depth question (see guardrail): v3 may go **depth-N here** (a small contender pool) since the bracket is the natural place for it, BUT keep it legible. Decide in brainstorm: full pool vs "winner of (X/Y) vs winner of (W/Z)".
 
-**T3 — Countdown chip on today's upcoming cards.** A small live "kicks off in 2h 14m" chip on upcoming cards whose `day === today` (reuse the T1 countdown math; this is the at-a-glance version). Ticks via a single `setInterval`, cleaned up sanely. If it feels noisy next to T1, this is the first cut candidate.
+**Interaction:** must NOT clobber the beloved path-highlight. Two tap behaviors now coexist on a bracket match:
+   - Tapping a **team row** → path-highlight (existing, keep).
+   - Tapping the **match** (the card body / a dedicated affordance) → detail panel.
+   Resolve the gesture collision cleanly: options to weigh in brainstorm — (a) team-row tap = highlight, match-frame/chevron tap = detail; (b) a small info affordance per match; (c) long-press vs tap. Pick the one that stays obvious on mobile and doesn't make the highlight harder to trigger. Whatever the choice, both must remain one-tap-discoverable.
+
+**Example acceptance:** tap the Final → panel shows "Sun Jul 19, 3:00 PM ET · MetLife, NJ · winner of [SF1 contenders] vs winner of [SF2 contenders]" + countdown ("in 15d").
+
+### 🟡 OPTIONAL — Potential odds (nice-to-have, Michael said not necessary)
+
+If it earns its place: a lightweight win-likelihood hint per contender in the detail panel. **No live odds API** (offline-first + no keys). Derive a cheap heuristic from the existing `rankings` map (e.g. rank-gap → rough favorite tag, or a simple Elo-ish % from rank). Label it clearly as an **estimate/for-fun**, never as real sportsbook odds (Professionalism + honesty gate). Cut without hesitation if it feels gimmicky or clutters the panel. Ship CORE with or without this.
 
 ---
 
 ## Known guardrails (read before writing a line)
 
-- **Recursion cap:** CORE resolver is depth-1. No nested contender soup. Non-negotiable for v1.
-- **Mobile-first is a HARD requirement.** Test at 320–390px. `"Switzerland/Colombia winner"` is long — verify labels wrap/truncate cleanly, no horizontal overflow, touch targets ≥44px. The v1 F1 footer-clip lesson applies.
-- **Palette locked.** Reuse existing OKLCH `--` tokens. No new color system, no gradient text, no glassmorphism (Skill-Ban Guard territory).
-- **Data schema unchanged.** These are pure engine/render features computed from existing fields. Do NOT add fields to data.json. Do NOT touch data.json.
-- **Export-structure/filename constants** rule doesn't apply here (no export), but keep any new magic strings (class names, labels) as top consts near `APP_VERSION`.
-- **Offline-first preserved.** Don't break the existing fetch → localStorage cache → inline fallback chain. Countdown/timers must no-op gracefully if data is stale/cached.
-- **Don't clobber the README** with the app; update its status line + version history + roadmap (move T1–T3 out of Roadmap into Version history once shipped).
+- **30KB cap is the headline constraint.** Engine is already over. This build splits or adds `/source`. See the trigger box up top.
+- **Preserve the path-highlight.** It's the confirmed favorite. Do not regress its one-tap feel.
+- **Depth for the bracket panel:** allowed to exceed depth-1 for "possible matchups" HERE (bracket is the right surface), but cap it so it stays readable — no unbounded "((A/B)/(C/D))" soup. Propose the exact depth in brainstorm.
+- **Mobile-first HARD requirement.** Detail panel must work at 320–390px: no overflow, ≥44px targets, sheet/panel scrolls if long. The bracket view is horizontally scrollable — make sure the panel doesn't fight the scroll.
+- **Palette locked.** Reuse OKLCH `--` tokens. No gradient text, side-stripe borders, glassmorphism, pure #000/#fff (Skill-Ban Guard).
+- **Odds must be labeled an estimate.** Never present a hand-rolled heuristic as real odds.
+- **Data schema:** dates/times/venues already exist. Odds heuristic uses existing `rankings` — do NOT add per-match odds fields unless the brainstorm decides to, and if so document them.
+- **Offline-first preserved.** fetch → localStorage → inline fallback intact. Countdown no-ops on stale data.
+- **Don't clobber the README.** Update status line + version history + roadmap.
 
 ---
 
-## Agent instructions (what to do / what NOT to do)
+## Pre-build gate
 
-**DO:**
-1. Read the live `index.html` whole via the raw URL above (it's under 30KB).
-2. Apply CORE + T1–T3. Bump `APP_VERSION` to `'v2.0'`.
-3. Re-fetch the live `index.html` blob SHA, then commit the full modified file to `world-cup-bracket/index.html` on `main` via `githubmcp_create_or_update_file` (MCP is live; file stays under 30KB so direct commit is correct, no chunk set).
-4. Update `README.md`: status line → v2, add v2.0 to Version history, move the shipped items out of Roadmap. (README SHA pinned above; re-fetch before write.)
-5. Post-Build Verify: wait the Pages lag (~30–60s), fetch the live URL, confirm v2.0 is serving.
-6. Report back the standard trio: committed file link, commit link, live Pages URL — plus a one-line note on each experimental feature (T1/T2/T3) for the on-device evaluation.
-
-**DO NOT:**
-- Recurse the potential resolver past depth-1.
-- Touch `data.json` or add schema fields.
-- Introduce new color tokens or banned UI patterns.
-- Ship without a 320px mobile pass.
-- Leave any label that reads as broken placeholder text.
+This touches committed engine source, so it runs the **Brainstorm Gate (7 lenses)** before the spec is finalized into `Next build` proper — with three specific open questions to resolve:
+1. Modular split vs `/source` chunk set (30KB trigger).
+2. Gesture model for team-tap (highlight) vs match-tap (detail) coexistence.
+3. Contender-pool depth in the panel + whether odds ship in v3 or park to Futures.
 
 ---
 
 ## Futures (parked, not this build)
 
-- Full contender-POOL rendering (SF shows 4 possible, Final shows 8) — the depth-N version. Revisit only if depth-1 proves too thin.
+- Full contender-POOL rendering everywhere (depth-N in schedule too), if the bracket panel proves it's worth it.
 - Flag emoji / SVG flags per country.
 - Goal scorers / key moments in the tap drawer (needs new data fields).
+- Real odds feed (would need an API + key; out of scope for an offline-first static app).
 
 ## ⏳ Ephemeral
 
