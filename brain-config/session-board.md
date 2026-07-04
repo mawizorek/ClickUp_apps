@@ -30,7 +30,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-*(empty — no agents currently working in the repo)*
+### Brain · session: Council registry/manifest cleanup + audit · started 2026-07-04 11:30 ET
+
+**Working:** adding Fold-in Frank's row to `registry.json` + `council.md` (surgical, single-object add), reconciling 3 ClickUp docs (Toolkit index PROTECTED MIRROR, Tool Authoring Guidebook step 2), verifying the live viewer, then running Recon Renata + Closing Clio. Files touched: `registry.json`, `council.md`, `session-board.md`. NOT touching `index.html` (readback flattened its markup; won't rewrite blind).
+
+**Status:** active
 
 ---
 
