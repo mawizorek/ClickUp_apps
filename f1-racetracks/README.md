@@ -4,7 +4,7 @@
 
 ![Launch](https://img.shields.io/badge/Launch-F1_Racetracks-red?style=for-the-badge)
 
-**Status:** V1.5 PR22 live · runtime rescued · main-app Weekend Center + current round highlight shipped · live tracker companion active
+**Status:** V1.6 main live · upgraded main-app Weekend Center shipped · current-round highlight refined · live tracker companion still available as secondary surface
 
 **Source of truth:** this repo folder
 
@@ -14,16 +14,21 @@
 
 F1 Racetracks is a browser app for the 2026 Formula 1 circuit breakdowns. It gives you a home grid of rounds, per-circuit detail views, completed-race panels, winners history, live weather, and an OpenF1-backed live-session slice inside the main app.
 
-The current live build extends that direction by moving the race-weekend calendar/replay layer into the **main app itself** and adding a **homepage current-round highlight card** so the most relevant weekend is one tap away without disturbing the lower chronological list.
+The current live build pushes the race-weekend layer much harder into the **main app itself**:
+- a stronger **Weekend Center** on track pages with `Schedule`, `Live`, and `Replay` modes
+- a cleaner **homepage current-round highlight** that points straight into the relevant circuit page
+- seeded real session times for the active and near-term report-ready weekends
+- live-session state, next-session context, and race-control messaging surfaced directly on the main track page
 
-It also ships a separate live-tracking companion page for broader session monitoring.
+A separate live-tracking companion page still exists for broader monitoring, but the main app is now the primary weekend experience.
 
 ## How to use it
 
-1. Open the main app and choose a round from the home grid or jump menu.
-2. Read the circuit profile, pit and tyre notes, overtaking notes, corner-by-corner table, and live weather on the circuit page.
-3. Use the standalone `live-tracker.html` companion when you want a broader live-session surface outside the main circuit view.
-4. Treat `data.json` as the canonical runtime data surface for schedule/result/history updates.
+1. Open the main app and use the current-round card or the home grid to jump into a circuit.
+2. On a circuit page, use **Weekend Center** to move between `Schedule`, `Live`, and `Replay` where available.
+3. Read the circuit profile, pit and tyre notes, overtaking notes, corner-by-corner table, race history, and live weather on the same page.
+4. Use the standalone `live-tracker.html` companion only when you want a separate broader session-monitoring surface.
+5. Treat `data.json` as the canonical runtime data surface for result/history updates; schedule precision is currently a mix of seeded session-time data and existing weekend metadata.
 
 ## Infrastructure
 
@@ -41,31 +46,33 @@ It also ships a separate live-tracking companion page for broader session monito
 
 - `index.html` is the shipped Pages runtime.
 - `data.json` is the authoritative runtime data surface.
-- `live-tracker.html` is a separate companion experience, not a replacement for the main app.
+- `live-tracker.html` is now a secondary companion experience, not the preferred primary path for current-race usage.
 
 ### Source model
 
 - `source/` is the canonical repo-managed shell/style/logic companion for future edits.
-- The older grouped round-band source data files have **not** been fully retired yet; the current rescued runtime still depends on the grouped manifest source files listed in `data.json`.
+- The grouped manifest source files are still required because the rescued runtime continues to load them from `data.json`.
 - Agents should start from `source/source_index.md` for shell/style/logic edits and from `data.json` for data changes.
 
 ### Interaction / rendering notes
 
 - Hash routing drives the main app (`#/` for home, `#/slug` for circuit views).
-- The main circuit experience integrates a live-session panel directly into matching race pages.
-- V1.5 PR22 adds a **Weekend Center** layer to the main circuit flow and a **current-round highlight card** to the homepage.
-- Shared helpers such as lap-profile rendering, weather loading, footer export behavior, and the Weekend Center/home-highlight injection keep the track views consistent.
-- The live footer/build label now carries the shipped app version plus PR reference so the deployed page can be tracked during smaller iterative updates.
+- The main circuit experience now layers **Weekend Center** above the rest of the page for stronger weekend-first navigation.
+- `Schedule` uses seeded real session times where available and falls back to existing weekend metadata elsewhere.
+- `Live` attempts to pull the latest OpenF1 state, timing, and race-control feed directly into the track page.
+- `Replay` stays editorial / curated rather than pretending to be a full simulator.
+- The footer/build label carries the shipped app version plus the current build reference so live Pages states stay easy to track.
 
 ### Budget note
 
 - Semantic source files target ~10–12 KB and split at ~15 KB unless an exception is explicitly approved.
-- `source/10_track_views_and_profile.js` remains an existing oversized module.
-- `source/11_weather_and_footer_exports.js` is now also a budget-risk file after the Weekend Center/home-highlight pass and should be split on the next cleanup pass.
+- `source/10_track_views_and_profile.js` remains an oversized module.
+- `source/11_weather_and_footer_exports.js` is now the most obvious source-budget risk and should be split on the next cleanup pass into dedicated Weekend Center / current-round modules.
 
 ## Version history
 
-- **V1.5 PR22** — added the main-app Weekend Center, the homepage current-round highlight card, and the live footer/build labeling convention.
+- **V1.6 main** — upgraded the main-app Weekend Center with `Schedule | Live | Replay`, removed internal-facing public copy, seeded real current/near-term weekend times, and refined the homepage current-round experience.
+- **V1.5 PR22** — added the first main-app Weekend Center shell, the homepage current-round highlight card, and the visible build-label convention.
 - **v5** — integrated the live session panel into the main app, externalized runtime data into `data.json`, aligned the repo/source/task surfaces, and kept the standalone live tracker companion.
 - **v4** — shipped the full standalone circuit breakdown app as the stable pre-repo artifact baseline.
 
@@ -78,7 +85,7 @@ It also ships a separate live-tracking companion page for broader session monito
 
 ## Roadmap
 
-- seed explicit per-session timed schedule rows into `data.json`
-- enrich replay density once the first playback feel is judged
-- split the newly overweight source files after the Weekend Center branch stabilizes
-- continue the footer/build-label convention for future app iterations so live Pages states stay traceable
+- split `source/11_weather_and_footer_exports.js` into dedicated Weekend Center / homepage-current-round modules
+- seed explicit timed schedules for more report-ready rounds directly in `data.json`
+- enrich replay density once the first stronger main-app playback feel is judged
+- decide whether the remaining standalone live-tracker surface should stay broad or be partially absorbed into the main track page over time
