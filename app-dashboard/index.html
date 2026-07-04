@@ -3,525 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="github-folder" content="app-dashboard">
-<title>Apps</title>
+<title>ClickUp Apps</title>
 <style>
-/* INFRASTRUCTURE: self-contained (no external data file) */
-:root {
-  --bg: oklch(10% 0.012 250);
-  --surface-1: oklch(16% 0.01 250);
-  --surface-2: oklch(21% 0.008 250);
-  --surface-3: oklch(13% 0.008 250);
-  --text: oklch(94% 0.006 250);
-  --text-mid: oklch(78% 0.008 250);
-  --text-muted: oklch(62% 0.01 250);
-  --text-dim: oklch(44% 0.008 250);
-  --accent: oklch(75% 0.16 55);
-  --accent-soft: oklch(75% 0.16 55 / 0.12);
-  --accent-border: oklch(45% 0.10 55);
-  --green: oklch(72% 0.16 155);
-  --green-glow: oklch(72% 0.16 155 / 0.4);
-  --red: oklch(65% 0.18 25);
-  --red-glow: oklch(65% 0.18 25 / 0.3);
-  --cyan: oklch(78% 0.12 200);
-  --purple: oklch(72% 0.12 300);
-  --blue: oklch(72% 0.12 240);
-  --border: oklch(24% 0.006 250);
-  --border-hover: oklch(34% 0.008 250);
-  --radius: 12px;
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100svh;
-  -webkit-font-smoothing: antialiased;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-
-.container {
-  max-width: 540px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
-header {
-  padding: 36px 0 20px;
-}
-
-header h1 {
-  font-size: clamp(1.6rem, 5vw, 2rem);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  color: var(--text);
-}
-
-header h1 span {
-  color: var(--accent);
-}
-
-.stats {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  flex: 1;
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 10px;
-  text-align: center;
-}
-
-.stat-card .value {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1;
-}
-
-.stat-card .label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-top: 4px;
-}
-
-.actions {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.btn {
-  flex: 1;
-  padding: 12px 16px;
-  border-radius: var(--radius);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: transform 100ms var(--ease), opacity 150ms;
-}
-
-.btn:active { transform: scale(0.97); }
-
-.btn-primary {
-  background: var(--accent);
-  color: oklch(15% 0.01 55);
-}
-
-.btn-secondary {
-  background: var(--surface-2);
-  color: var(--text-mid);
-  border: 1px solid var(--border);
-}
-
-/* Filter chips */
-.filter-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.filter-row::-webkit-scrollbar { display: none; }
-
-.filter-chip {
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid var(--border);
-  background: var(--surface-1);
-  color: var(--text-muted);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 150ms var(--ease);
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.filter-chip:active { transform: scale(0.95); }
-
-.filter-chip.active {
-  background: var(--accent);
-  color: oklch(15% 0.01 55);
-  border-color: var(--accent);
-}
-
-.filter-chip.active[data-filter="dashboard"] {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: oklch(15% 0.01 240);
-}
-
-.filter-chip.active[data-filter="tool"] {
-  background: var(--purple);
-  border-color: var(--purple);
-  color: oklch(15% 0.01 300);
-}
-
-/* Pinned reference section */
-.pinned-section {
-  margin-bottom: 20px;
-}
-
-.pinned-label {
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-dim);
-  margin-bottom: 8px;
-}
-
-.pinned-card {
-  background: var(--surface-1);
-  border: 1px solid oklch(35% 0.06 200);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: border-color 200ms var(--ease);
-}
-
-.pinned-card:hover { border-color: var(--cyan); }
-
-.pinned-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: oklch(20% 0.04 200);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  flex-shrink: 0;
-}
-
-.pinned-info { flex: 1; min-width: 0; }
-
-.pinned-info .name {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.pinned-info .desc {
-  font-size: 0.6875rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pinned-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.pinned-btn {
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: transform 100ms var(--ease);
-}
-
-.pinned-btn:active { transform: scale(0.95); }
-
-.pinned-btn-open {
-  background: oklch(30% 0.06 200);
-  color: var(--cyan);
-}
-
-.pinned-btn-repo {
-  background: var(--surface-2);
-  color: var(--text-muted);
-}
-
-/* App grid */
-.app-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-bottom: 100px;
-}
-
-.app-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  transition: border-color 200ms var(--ease), opacity 200ms, transform 200ms var(--ease);
-}
-
-.app-card:hover { border-color: var(--border-hover); }
-
-.app-card.hidden {
-  display: none;
-}
-
-.app-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 4px;
-}
-
-.health-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.health-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
-.health-dot.dead { background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
-.health-dot.checking { background: var(--text-dim); animation: pulse 1.4s infinite; }
-
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-.app-name {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  flex: 1;
-}
-
-.recent-indicator {
-  font-size: 0.5625rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: oklch(20% 0.04 55);
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.app-slug {
-  font-size: 0.6875rem;
-  color: var(--cyan);
-  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
-  margin-bottom: 8px;
-}
-
-.app-desc {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  line-height: 1.4;
-  margin-bottom: 10px;
-}
-
-.app-badges {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-.badge {
-  font-size: 0.5625rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.badge-data { color: var(--green); background: oklch(20% 0.04 155); border: 1px solid oklch(30% 0.06 155); }
-.badge-dashboard { color: var(--blue); background: oklch(20% 0.04 240); border: 1px solid oklch(30% 0.06 240); }
-.badge-tool { color: var(--purple); background: oklch(20% 0.04 300); border: 1px solid oklch(30% 0.06 300); }
-
-.app-meta {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-size: 0.6875rem;
-  color: var(--text-dim);
-  margin-bottom: 10px;
-}
-
-.app-meta strong { color: var(--text-muted); }
-
-.app-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.app-btn {
-  flex: 1;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  transition: transform 100ms var(--ease);
-}
-
-.app-btn:active { transform: scale(0.97); }
-
-.app-btn-open {
-  background: var(--accent);
-  color: oklch(15% 0.01 55);
-}
-
-.app-btn-repo {
-  background: var(--surface-2);
-  color: var(--text-mid);
-  border: 1px solid var(--border);
-}
-
-.loading-state {
-  text-align: center;
-  padding: 48px 20px;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-.error-state {
-  text-align: center;
-  padding: 32px 20px;
-  color: var(--red);
-  font-size: 0.8125rem;
-  background: var(--surface-1);
-  border-radius: var(--radius);
-  border: 1px solid oklch(30% 0.08 25);
-}
-
-.cache-note {
-  text-align: center;
-  font-size: 0.625rem;
-  color: var(--text-dim);
-  margin-top: 8px;
-  font-style: italic;
-}
-
-.empty-filter {
-  text-align: center;
-  padding: 32px 20px;
-  color: var(--text-dim);
-  font-size: 0.8125rem;
-}
-
-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: oklch(10% 0.012 250 / 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
-  text-align: center;
-  font-size: 0.625rem;
-  color: var(--text-dim);
-}
-
-footer a { color: var(--text-muted); text-decoration: none; }
-
-@media (min-width: 640px) {
-  .container { max-width: 600px; padding: 0 24px; }
-  header { padding: 48px 0 28px; }
-}
+  :root {
+    --bg: oklch(10% 0.012 250); --surface-1: oklch(16% 0.01 250); --surface-2: oklch(21% 0.008 250);
+    --text: oklch(94% 0.006 250); --text-mid: oklch(78% 0.008 250); --text-muted: oklch(62% 0.01 250); --text-dim: oklch(44% 0.008 250);
+    --accent: oklch(75% 0.16 55); --green: oklch(72% 0.16 155); --green-glow: oklch(72% 0.16 155 / 0.4);
+    --red: oklch(65% 0.18 25); --red-glow: oklch(65% 0.18 25 / 0.3); --cyan: oklch(78% 0.12 200); --purple: oklch(72% 0.12 300); --blue: oklch(72% 0.12 240);
+    --brain: oklch(72% 0.14 260); --brain-soft: oklch(72% 0.14 260 / 0.12); --brain-border: oklch(45% 0.10 260);
+    --border: oklch(24% 0.006 250); --border-hover: oklch(34% 0.008 250); --radius: 12px; --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100svh; -webkit-font-smoothing: antialiased; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  .container { max-width: 540px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 36px 0 18px; }
+  header h1 { font-size: clamp(1.6rem, 5vw, 2rem); font-weight: 900; letter-spacing: -0.03em; }
+  header h1 span { color: var(--accent); }
+  .hub { background: linear-gradient(180deg, oklch(19% 0.02 260), var(--surface-1)); border: 1px solid var(--brain-border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden; }
+  .hub::before { content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--brain); }
+  .hub-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .hub-icon { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; background: var(--brain-soft); border: 1px solid var(--brain-border); }
+  .hub-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; }
+  .hub-sub { font-size: 0.6875rem; color: var(--text-muted); margin-top: 1px; }
+  .hub-badge { margin-left: auto; font-size: 0.5625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brain); background: var(--brain-soft); border: 1px solid var(--brain-border); padding: 3px 8px; border-radius: 100px; }
+  .hub-links { display: flex; flex-direction: column; gap: 8px; }
+  .hub-link { display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); text-decoration: none; color: var(--text); transition: border-color 150ms var(--ease), transform 100ms var(--ease); }
+  .hub-link:hover { border-color: var(--brain-border); } .hub-link:active { transform: scale(0.98); }
+  .hub-link .hl-ic { width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; background: color-mix(in oklch, var(--brain) 15%, var(--surface-2)); color: var(--brain); }
+  .hub-link .hl-body { flex: 1; min-width: 0; } .hub-link .hl-name { font-size: 0.8125rem; font-weight: 700; }
+  .hub-link .hl-desc { font-size: 0.6875rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hub-link .hl-arrow { width: 15px; height: 15px; color: var(--text-dim); flex-shrink: 0; }
+  .ref-slim { display: flex; align-items: center; gap: 10px; padding: 9px 14px; margin-bottom: 20px; border: 1px solid var(--border); border-radius: var(--radius); background: transparent; text-decoration: none; transition: border-color 150ms var(--ease); }
+  .ref-slim:hover { border-color: var(--border-hover); }
+  .ref-slim .rs-ic { font-size: 0.8rem; opacity: 0.7; } .ref-slim .rs-name { font-size: 0.75rem; font-weight: 600; color: var(--text-mid); } .ref-slim .rs-desc { font-size: 0.6875rem; color: var(--text-dim); } .ref-slim .rs-open { margin-left: auto; font-size: 0.6875rem; font-weight: 600; color: var(--text-muted); }
+  .stats { display: flex; gap: 10px; margin-bottom: 16px; }
+  .stat-card { flex: 1; background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 10px; text-align: center; }
+  .stat-card .value { font-size: 1.4rem; font-weight: 800; color: var(--accent); line-height: 1; }
+  .stat-card .label { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
+  .actions { display: flex; gap: 8px; margin-bottom: 16px; }
+  .btn { flex: 1; padding: 12px 16px; border-radius: var(--radius); font-size: 0.8125rem; font-weight: 700; text-align: center; text-decoration: none; border: none; cursor: pointer; transition: transform 100ms var(--ease), opacity 150ms; }
+  .btn:active { transform: scale(0.97); } .btn-primary { background: var(--accent); color: oklch(15% 0.01 55); } .btn-secondary { background: var(--surface-2); color: var(--text-mid); border: 1px solid var(--border); }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip { padding: 8px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 150ms var(--ease); user-select: none; -webkit-user-select: none; }
+  .filter-chip:active { transform: scale(0.95); } .filter-chip.active { background: var(--accent); color: oklch(15% 0.01 55); border-color: var(--accent); }
+  .filter-chip.active[data-filter="dashboard"] { background: var(--blue); border-color: var(--blue); color: oklch(15% 0.01 240); }
+  .filter-chip.active[data-filter="tool"] { background: var(--purple); border-color: var(--purple); color: oklch(15% 0.01 300); }
+  .app-grid { display: flex; flex-direction: column; gap: 10px; padding-bottom: 100px; }
+  .app-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; transition: border-color 200ms var(--ease); }
+  .app-card:hover { border-color: var(--border-hover); } .app-card.hidden { display: none; }
+  .app-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .health-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .health-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green-glow); } .health-dot.dead { background: var(--red); box-shadow: 0 0 6px var(--red-glow); } .health-dot.checking { background: var(--text-dim); animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .app-name { font-size: 0.9375rem; font-weight: 700; flex: 1; }
+  .recent-indicator { font-size: 0.5625rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: oklch(20% 0.04 55); color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+  .app-slug { font-size: 0.6875rem; color: var(--cyan); font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace; margin-bottom: 8px; }
+  .app-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px; }
+  .app-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .badge { font-size: 0.5625rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge-data { color: var(--green); background: oklch(20% 0.04 155); border: 1px solid oklch(30% 0.06 155); }
+  .badge-dashboard { color: var(--blue); background: oklch(20% 0.04 240); border: 1px solid oklch(30% 0.06 240); }
+  .badge-tool { color: var(--purple); background: oklch(20% 0.04 300); border: 1px solid oklch(30% 0.06 300); }
+  .app-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.6875rem; color: var(--text-dim); margin-bottom: 10px; }
+  .app-meta strong { color: var(--text-muted); }
+  .app-actions { display: flex; gap: 8px; }
+  .app-btn { flex: 1; padding: 10px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; text-align: center; text-decoration: none; transition: transform 100ms var(--ease); }
+  .app-btn:active { transform: scale(0.97); } .app-btn-open { background: var(--accent); color: oklch(15% 0.01 55); } .app-btn-repo { background: var(--surface-2); color: var(--text-mid); border: 1px solid var(--border); }
+  .loading-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 0.875rem; }
+  .cache-note { text-align: center; font-size: 0.625rem; color: var(--text-dim); margin-top: 8px; font-style: italic; }
+  .empty-filter { text-align: center; padding: 32px 20px; color: var(--text-dim); font-size: 0.8125rem; }
+  .section-label { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 8px; }
+  footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: oklch(10% 0.012 250 / 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); text-align: center; font-size: 0.625rem; color: var(--text-dim); }
+  footer a { color: var(--text-muted); text-decoration: none; }
+  @media (min-width: 640px) { .container { max-width: 600px; padding: 0 24px; } header { padding: 48px 0 24px; } }
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1>ClickUp <span>Apps</span></h1>
-  </header>
-
-  <div class="stats">
-    <div class="stat-card">
-      <div class="value" id="appCount">&mdash;</div>
-      <div class="label">Apps</div>
-    </div>
-    <div class="stat-card">
-      <div class="value" id="healthyCount">&mdash;</div>
-      <div class="label">Healthy</div>
-    </div>
-    <div class="stat-card">
-      <div class="value" id="recentCount">&mdash;</div>
-      <div class="label">Updated (7d)</div>
-    </div>
-  </div>
-
-  <div class="actions">
-    <a href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener" class="btn btn-primary">Open repo</a>
-    <button class="btn btn-secondary" id="refreshBtn">Refresh</button>
-  </div>
-
-  <!-- Filter chips -->
-  <div class="filter-row" id="filterRow">
-    <div class="filter-chip active" data-filter="all">All</div>
-    <div class="filter-chip" data-filter="dashboard">📊 Dashboards</div>
-    <div class="filter-chip" data-filter="tool">🛠 Tools</div>
-  </div>
-
-  <!-- Pinned reference: template-app -->
-  <div class="pinned-section" id="pinnedSection">
-    <div class="pinned-label">Reference</div>
-    <div class="pinned-card">
-      <div class="pinned-icon">📐</div>
-      <div class="pinned-info">
-        <div class="name">App Build Standard</div>
-        <div class="desc">Folder scaffold, README template, build workflow reference</div>
-      </div>
-      <div class="pinned-actions">
-        <a href="https://mawizorek.github.io/ClickUp_apps/template-app/" target="_blank" rel="noopener" class="pinned-btn pinned-btn-open">Open</a>
-        <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app" target="_blank" rel="noopener" class="pinned-btn pinned-btn-repo">Repo</a>
+  <div class="container">
+    <header><h1>ClickUp <span>Apps</span></h1></header>
+    <div class="hub">
+      <div class="hub-top"><div class="hub-icon">B</div>
+        <div><div class="hub-title">Brain Config</div><div class="hub-sub">AI Toolkit control center</div></div>
+        <div class="hub-badge">Hub</div></div>
+      <div class="hub-links">
+        <a class="hub-link" href="https://mawizorek.github.io/ClickUp_apps/brain-config/">
+          <div class="hl-ic">TR</div><div class="hl-body"><div class="hl-name">Tool Registry</div><div class="hl-desc">Hooks, gates and agents, live from the repo</div></div>
+          <i data-lucide="chevron-right" class="hl-arrow"></i></a>
+        <a class="hub-link" href="https://mawizorek.github.io/ClickUp_apps/agent-reports/">
+          <div class="hl-ic">AR</div><div class="hl-body"><div class="hl-name">Agent Reports</div><div class="hl-desc">Reporting feedback from every agent</div></div>
+          <i data-lucide="chevron-right" class="hl-arrow"></i></a>
       </div>
     </div>
+    <a class="ref-slim" href="https://mawizorek.github.io/ClickUp_apps/template-app/">
+      <span class="rs-ic">[T]</span><span class="rs-name">App Build Standard</span><span class="rs-desc">- scaffold and workflow reference</span><span class="rs-open">Open</span></a>
+    <div class="stats">
+      <div class="stat-card"><div class="value" id="appCount">-</div><div class="label">Apps</div></div>
+      <div class="stat-card"><div class="value" id="healthyCount">-</div><div class="label">Healthy</div></div>
+      <div class="stat-card"><div class="value" id="recentCount">-</div><div class="label">Updated (7d)</div></div>
+    </div>
+    <div class="actions">
+      <a class="btn btn-secondary" href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener">Open repo</a>
+      <button class="btn btn-primary" id="refreshBtn">Refresh</button>
+    </div>
+    <div class="filter-row" id="filterRow">
+      <div class="filter-chip active" data-filter="all">All</div>
+      <div class="filter-chip" data-filter="dashboard">Dashboards</div>
+      <div class="filter-chip" data-filter="tool">Tools</div>
+    </div>
+    <div class="section-label">Apps</div>
+    <div class="app-grid" id="appGrid"><div class="loading-state">Loading apps...</div></div>
   </div>
-
-  <div class="app-grid" id="appGrid">
-    <div class="loading-state">Loading apps...</div>
-  </div>
-</div>
-
-<footer>
-  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/app-dashboard">app-dashboard</a> &middot; v2.3 &middot; <span id="refreshTime">&mdash;</span>
-</footer>
-
+  <footer><span id="footerLine">app-dashboard v2.4 <span id="refreshTime">-</span></span></footer>
 <script>
-const APP_VERSION = 'v2.3';
-const APP_DATE = '2026-07-02';
-
-// ─── Config ───────────────────────────────────────────────────
+const APP_VERSION = 'v2.4';
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
-const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
-const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
-const EXCLUDED = ['template-app', 'app-dashboard', '.nojekyll', 'README.md', 'canary.txt'];
-
-// Cache is versioned: bumping APP_VERSION auto-invalidates stale data
-const CACHE_KEY = `appDashboard_cache_${APP_VERSION}`;
+const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
+const API_BASE = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
+const EXCLUDED = ['template-app', 'app-dashboard', 'brain-config', 'agent-reports', '.nojekyll', 'README.md', 'canary.txt'];
+const CACHE_KEY = 'appDashboard_cache_' + APP_VERSION;
 const CACHE_TTL = 5 * 60 * 1000;
 const RECENT_KEY = 'appDashboard_recent';
 const FILTER_KEY = 'appDashboard_filter';
 const MAX_RECENT = 2;
-
-// App metadata: slug → { desc, category, badges }
-// Categories: 'dashboard' (view/explore data) | 'tool' (process/transform input)
 const APP_META = {
   'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'dashboard', badges: ['dashboard'] },
   'f1-racetracks': { desc: 'Interactive race circuit explorer with live data.', category: 'dashboard', badges: ['data'] },
@@ -530,285 +135,125 @@ const APP_META = {
   'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', category: 'tool', badges: ['tool'] },
   'pdf-splitter': { desc: 'Extract and split PDF pages client-side.', category: 'tool', badges: ['tool'] }
 };
-
-// ─── State ───────────────────────────────────────────────────
 let currentFilter = 'all';
 let allApps = [];
-
-// ─── Cache helpers ────────────────────────────────────────────
-function getCache() {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (Date.now() - parsed.ts > CACHE_TTL) return null;
-    return parsed.data;
-  } catch (e) { return null; }
-}
-
-function setCache(data) {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
-  } catch (e) {}
-}
-
-// Clean up old versioned cache keys
-function pruneOldCaches() {
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('appDashboard_cache_') && key !== CACHE_KEY) {
-        localStorage.removeItem(key);
-      }
-    }
-  } catch (e) {}
-}
-
-// ─── Recent (last-visited) helpers ────────────────────────────
-function getRecent() {
-  try {
-    return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
-  } catch (e) { return []; }
-}
-
-function logVisit(slug) {
-  try {
-    let recent = getRecent().filter(s => s !== slug);
-    recent.unshift(slug);
-    recent = recent.slice(0, MAX_RECENT);
-    localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
-  } catch (e) {}
-}
-
-// ─── Filter helpers ───────────────────────────────────────────
+function getCache() { try { const raw = localStorage.getItem(CACHE_KEY); if (!raw) return null; const p = JSON.parse(raw); if (Date.now() - p.ts > CACHE_TTL) return null; return p.data; } catch (e) { return null; } }
+function setCache(data) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch (e) {} }
+function pruneOldCaches() { try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.indexOf('appDashboard_cache_') === 0 && k !== CACHE_KEY) localStorage.removeItem(k); } } catch (e) {} }
+function getRecent() { try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch (e) { return []; } }
+function logVisit(slug) { try { let r = getRecent().filter(function(s){ return s !== slug; }); r.unshift(slug); r = r.slice(0, MAX_RECENT); localStorage.setItem(RECENT_KEY, JSON.stringify(r)); } catch (e) {} }
 function applyFilter(filter) {
   currentFilter = filter;
   try { localStorage.setItem(FILTER_KEY, filter); } catch (e) {}
-
-  document.querySelectorAll('.filter-chip').forEach(chip => {
-    chip.classList.toggle('active', chip.dataset.filter === filter);
-  });
-
+  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.toggle('active', c.dataset.filter === filter); });
   const cards = document.querySelectorAll('.app-card[data-category]');
   let visible = 0;
-  cards.forEach(card => {
-    const show = filter === 'all' || card.dataset.category === filter;
-    card.classList.toggle('hidden', !show);
-    if (show) visible++;
-  });
-
+  cards.forEach(function(card){ const show = filter === 'all' || card.dataset.category === filter; card.classList.toggle('hidden', !show); if (show) visible++; });
   let emptyEl = document.getElementById('emptyFilter');
   if (visible === 0 && cards.length > 0) {
-    if (!emptyEl) {
-      emptyEl = document.createElement('div');
-      emptyEl.id = 'emptyFilter';
-      emptyEl.className = 'empty-filter';
-      document.getElementById('appGrid').appendChild(emptyEl);
-    }
-    emptyEl.textContent = `No ${filter} apps yet.`;
-    emptyEl.style.display = '';
-  } else if (emptyEl) {
-    emptyEl.style.display = 'none';
-  }
+    if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.id = 'emptyFilter'; emptyEl.className = 'empty-filter'; document.getElementById('appGrid').appendChild(emptyEl); }
+    emptyEl.textContent = 'No ' + filter + ' apps yet.'; emptyEl.style.display = '';
+  } else if (emptyEl) { emptyEl.style.display = 'none'; }
 }
-
-// ─── Main ─────────────────────────────────────────────────────
 async function init(forceRefresh) {
   const grid = document.getElementById('appGrid');
   pruneOldCaches();
-
-  // Restore last-used filter
-  try {
-    const saved = localStorage.getItem(FILTER_KEY);
-    if (saved && ['all', 'dashboard', 'tool'].includes(saved)) currentFilter = saved;
-  } catch (e) {}
-
-  // Try cache first
-  if (!forceRefresh) {
-    const cached = getCache();
-    if (cached) {
-      allApps = cached;
-      renderFromData(cached);
-      cached.forEach((app, i) => checkHealth(app, i));
-      return;
-    }
-  }
-
+  try { const saved = localStorage.getItem(FILTER_KEY); if (saved && ['all','dashboard','tool'].indexOf(saved) !== -1) currentFilter = saved; } catch (e) {}
+  if (!forceRefresh) { const cached = getCache(); if (cached) { allApps = cached; renderFromData(cached); cached.forEach(function(a,i){ checkHealth(a,i); }); return; } }
   grid.innerHTML = '<div class="loading-state">Loading apps...</div>';
-
   try {
-    const [treeRes, commitsRes] = await Promise.all([
-      fetch(`${API_BASE}/contents/`),
-      fetch(`${API_BASE}/commits?per_page=100`)
-    ]);
-
+    const results = await Promise.all([ fetch(API_BASE + '/contents/'), fetch(API_BASE + '/commits?per_page=100') ]);
+    const treeRes = results[0], commitsRes = results[1];
     if (!treeRes.ok || !commitsRes.ok) throw new Error('API error');
-
     const items = await treeRes.json();
     const commits = await commitsRes.json();
-
-    const appFolders = items.filter(i => i.type === 'dir' && !EXCLUDED.includes(i.name));
-    const apps = await Promise.all(appFolders.map(f => buildApp(f, commits)));
-    apps.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
-
-    allApps = apps;
-    setCache(apps);
-    renderFromData(apps);
-    apps.forEach((app, i) => checkHealth(app, i));
+    const appFolders = items.filter(function(i){ return i.type === 'dir' && EXCLUDED.indexOf(i.name) === -1; });
+    const apps = await Promise.all(appFolders.map(function(f){ return buildApp(f, commits); }));
+    apps.sort(function(a, b){ return new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0); });
+    allApps = apps; setCache(apps); renderFromData(apps); apps.forEach(function(a,i){ checkHealth(a,i); });
   } catch (e) {
-    // Stale cache fallback (any version)
     try {
       for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('appDashboard_cache_')) {
-          const parsed = JSON.parse(localStorage.getItem(key));
-          if (parsed && parsed.data) {
-            allApps = parsed.data;
-            renderFromData(parsed.data);
-            grid.insertAdjacentHTML('beforeend', '<div class="cache-note">Showing cached data (offline or rate limited)</div>');
-            parsed.data.forEach((app, idx) => checkHealth(app, idx));
-            return;
-          }
+        const k = localStorage.key(i);
+        if (k && k.indexOf('appDashboard_cache_') === 0) {
+          const p = JSON.parse(localStorage.getItem(k));
+          if (p && p.data) { allApps = p.data; renderFromData(p.data); grid.insertAdjacentHTML('beforeend', '<div class="cache-note">Showing cached data (offline or rate limited)</div>'); p.data.forEach(function(a,idx){ checkHealth(a,idx); }); return; }
         }
       }
     } catch (e2) {}
-    grid.innerHTML = '<div class="error-state">Could not reach GitHub API. Check your connection and refresh.</div>';
+    grid.innerHTML = '<div class="empty-filter">Could not reach GitHub API. Check your connection and refresh.</div>';
   }
 }
-
 function renderFromData(apps) {
-  render(apps);
-  updateStats(apps);
-  applyFilter(currentFilter);
-  document.getElementById('refreshTime').textContent =
-    new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  render(apps); updateStats(apps); applyFilter(currentFilter);
+  document.getElementById('refreshTime').textContent = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
-
 async function buildApp(folder, commits) {
   const name = folder.name;
-  const pagesUrl = `${PAGES_BASE}/${name}/`;
-  const repoUrl = `https://github.com/${OWNER}/${REPO}/tree/main/${name}`;
-
-  const folderCommits = commits.filter(c =>
-    c.commit.message.toLowerCase().includes(name)
-  );
+  const pagesUrl = PAGES_BASE + '/' + name + '/';
+  const repoUrl = 'https://github.com/' + OWNER + '/' + REPO + '/tree/main/' + name;
+  const folderCommits = commits.filter(function(c){ return c.commit.message.toLowerCase().indexOf(name) !== -1; });
   const lastCommit = folderCommits[0] || null;
   const lastUpdated = lastCommit ? lastCommit.commit.author.date : null;
   const lastMsg = lastCommit ? lastCommit.commit.message.split('\n')[0] : null;
   const commitCount = folderCommits.length;
-
   let hasData = false;
-  try {
-    const res = await fetch(`${API_BASE}/contents/${name}`);
-    if (res.ok) {
-      const contents = await res.json();
-      hasData = contents.some(f => f.name === 'data.json');
-    }
-  } catch (e) {}
-
+  try { const res = await fetch(API_BASE + '/contents/' + name); if (res.ok) { const c = await res.json(); hasData = c.some(function(f){ return f.name === 'data.json'; }); } } catch (e) {}
   const meta = APP_META[name] || {};
-  return { name, pagesUrl, repoUrl, lastUpdated, lastMsg, commitCount, hasData, desc: meta.desc || null, category: meta.category || 'tool', badges: meta.badges || [] };
+  return { name: name, pagesUrl: pagesUrl, repoUrl: repoUrl, lastUpdated: lastUpdated, lastMsg: lastMsg, commitCount: commitCount, hasData: hasData, desc: meta.desc || null, category: meta.category || 'tool', badges: meta.badges || [] };
 }
-
 function render(apps) {
   const grid = document.getElementById('appGrid');
   const recent = getRecent();
-
-  grid.innerHTML = apps.map((app, i) => {
-    const displayName = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : '\u2014';
-    const isRecent = recent.includes(app.name);
-
-    const badgeHtml = [
-      app.hasData ? '<span class="badge badge-data">data.json</span>' : '',
-      ...app.badges.map(b => {
-        if (b === 'dashboard') return '<span class="badge badge-dashboard">Dashboard</span>';
-        if (b === 'data') return app.hasData ? '' : '<span class="badge badge-data">data.json</span>';
-        if (b === 'tool') return '<span class="badge badge-tool">Tool</span>';
-        return '';
-      })
-    ].filter(Boolean).join('');
-
-    return `
-      <div class="app-card" data-category="${app.category}">
-        <div class="app-header">
-          <div class="health-dot checking" id="health-${i}"></div>
-          <div class="app-name">${esc(displayName)}</div>
-          ${isRecent ? '<span class="recent-indicator">Recent</span>' : ''}
-        </div>
-        <div class="app-slug">${esc(app.name)}</div>
-        ${app.desc ? `<div class="app-desc">${esc(app.desc)}</div>` : ''}
-        ${badgeHtml ? `<div class="app-badges">${badgeHtml}</div>` : ''}
-        <div class="app-meta">
-          <span><strong>${timeStr}</strong></span>
-          <span>${app.commitCount} commit${app.commitCount !== 1 ? 's' : ''}</span>
-          ${app.lastMsg ? `<span style="flex-basis:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(app.lastMsg)}</span>` : ''}
-        </div>
-        <div class="app-actions">
-          <a href="${app.pagesUrl}" target="_blank" rel="noopener" class="app-btn app-btn-open" onclick="logVisit('${app.name}')">Open app</a>
-          <a href="${app.repoUrl}" target="_blank" rel="noopener" class="app-btn app-btn-repo">Repo folder</a>
-        </div>
-      </div>
-    `;
+  grid.innerHTML = apps.map(function(app, i){
+    const displayName = app.name.replace(/-/g, ' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+    const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : '-';
+    const isRecent = recent.indexOf(app.name) !== -1;
+    let badgeHtml = '';
+    if (app.hasData) badgeHtml += '<span class="badge badge-data">data.json</span>';
+    app.badges.forEach(function(b){
+      if (b === 'dashboard') badgeHtml += '<span class="badge badge-dashboard">Dashboard</span>';
+      else if (b === 'data') { if (!app.hasData) badgeHtml += '<span class="badge badge-data">data.json</span>'; }
+      else if (b === 'tool') badgeHtml += '<span class="badge badge-tool">Tool</span>';
+    });
+    let h = '<div class="app-card" data-category="' + app.category + '">';
+    h += '<div class="app-header"><span class="health-dot checking" id="health-' + i + '"></span><span class="app-name">' + esc(displayName) + '</span>' + (isRecent ? '<span class="recent-indicator">Recent</span>' : '') + '</div>';
+    h += '<div class="app-slug">' + esc(app.name) + '/</div>';
+    if (app.desc) h += '<div class="app-desc">' + esc(app.desc) + '</div>';
+    if (badgeHtml) h += '<div class="app-badges">' + badgeHtml + '</div>';
+    h += '<div class="app-meta"><span>' + timeStr + '</span><span>' + app.commitCount + ' commit' + (app.commitCount !== 1 ? 's' : '') + '</span>' + (app.lastMsg ? '<span><strong>' + esc(app.lastMsg) + '</strong></span>' : '') + '</div>';
+    h += '<div class="app-actions"><a class="app-btn app-btn-open" href="' + app.pagesUrl + '" target="_blank" rel="noopener" onclick="logVisit(\'' + app.name + '\')">Open app</a><a class="app-btn app-btn-repo" href="' + app.repoUrl + '" target="_blank" rel="noopener">Repo folder</a></div>';
+    h += '</div>';
+    return h;
   }).join('');
 }
-
 async function checkHealth(app, idx) {
-  const dot = document.getElementById(`health-${idx}`);
+  const dot = document.getElementById('health-' + idx);
   if (!dot) return;
-  try {
-    const res = await fetch(app.pagesUrl, { method: 'GET', mode: 'cors', cache: 'no-store' });
-    dot.className = res.ok ? 'health-dot live' : 'health-dot dead';
-    updateHealthCount();
-  } catch (e) {
-    dot.className = 'health-dot dead';
-    updateHealthCount();
-  }
+  try { const res = await fetch(app.pagesUrl, { method: 'GET', mode: 'cors', cache: 'no-store' }); dot.className = res.ok ? 'health-dot live' : 'health-dot dead'; updateHealthCount(); }
+  catch (e) { dot.className = 'health-dot dead'; updateHealthCount(); }
 }
-
 function updateHealthCount() {
   const dots = document.querySelectorAll('.health-dot');
-  let healthy = 0;
-  let resolved = 0;
-  dots.forEach(d => {
-    if (d.classList.contains('live')) { healthy++; resolved++; }
-    else if (d.classList.contains('dead')) { resolved++; }
-  });
-  if (resolved === dots.length && dots.length > 0) {
-    document.getElementById('healthyCount').textContent = healthy;
-  }
+  let healthy = 0, resolved = 0;
+  dots.forEach(function(d){ if (d.classList.contains('live')) { healthy++; resolved++; } else if (d.classList.contains('dead')) { resolved++; } });
+  if (resolved === dots.length && dots.length > 0) document.getElementById('healthyCount').textContent = healthy;
 }
-
 function updateStats(apps) {
   document.getElementById('appCount').textContent = apps.length;
-  document.getElementById('healthyCount').textContent = '\u2026';
+  document.getElementById('healthyCount').textContent = '...';
   const sevenDays = Date.now() - 7 * 86400000;
-  const recent = apps.filter(a => a.lastUpdated && new Date(a.lastUpdated) > sevenDays).length;
-  document.getElementById('recentCount').textContent = recent;
+  document.getElementById('recentCount').textContent = apps.filter(function(a){ return a.lastUpdated && new Date(a.lastUpdated) > sevenDays; }).length;
 }
-
 function relativeTime(iso) {
-  const ms = Date.now() - new Date(iso);
-  const hrs = Math.floor(ms / 3600000);
-  const days = Math.floor(ms / 86400000);
-  if (hrs < 1) return 'just now';
-  if (hrs < 24) return `${hrs}h ago`;
-  if (days < 7) return `${days}d ago`;
+  const ms = Date.now() - new Date(iso), hrs = Math.floor(ms/3600000), days = Math.floor(ms/86400000);
+  if (hrs < 1) return 'just now'; if (hrs < 24) return hrs + 'h ago'; if (days < 7) return days + 'd ago';
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
-
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ─── Event listeners ───────────────────────────────────────────
-document.getElementById('refreshBtn').addEventListener('click', () => init(true));
-
-document.getElementById('filterRow').addEventListener('click', (e) => {
-  const chip = e.target.closest('.filter-chip');
-  if (!chip) return;
-  applyFilter(chip.dataset.filter);
-});
-
-// ─── Init ─────────────────────────────────────────────────────
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+document.getElementById('refreshBtn').addEventListener('click', function(){ init(true); });
+document.getElementById('filterRow').addEventListener('click', function(e){ const chip = e.target.closest('.filter-chip'); if (!chip) return; applyFilter(chip.dataset.filter); });
+if (window.lucide) lucide.createIcons();
 init(false);
 </script>
 </body>
