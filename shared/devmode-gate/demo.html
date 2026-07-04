@@ -12,12 +12,17 @@
 </style>
 </head>
 <body>
-<!-- The gate: first element in body. Real app sits underneath, fully built. -->
-<div data-devmode-gate data-key="1234" data-title="Dev mode - enter code"></div>
+<!-- Two-stage gate: reads as an 'in development' page; the Unlock button surfaces the keypad. -->
+<div data-devmode-gate
+     data-key="1234"
+     data-dev-title="In development"
+     data-dev-message="This page is still being built. Thanks for your patience \u2014 check back soon."
+     data-unlock-label="Unlock"
+     data-title="Enter code"></div>
 
 <div class="app">
   <h1>The real app</h1>
-  <p>This content is the fully-built app underneath the curtain. Enter <strong>1234</strong> on the keypad to reveal it.</p>
+  <p>This content is the fully-built app underneath the curtain. Hit <strong>Unlock</strong> on the landing, then enter <strong>1234</strong> on the keypad to reveal it.</p>
   <div class="card">A sample module. Nothing here is materially distinguishable until the smokescreen is dismissed.</div>
 </div>
 
