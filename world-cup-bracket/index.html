@@ -48,58 +48,15 @@
  padding-bottom: env(safe-area-inset-bottom);
  }
 
- header {
- position: sticky;
- top: 0;
- z-index: 20;
- background: var(--bg);
- border-bottom: 1px solid var(--border);
- }
-
- .header-top {
- display: flex;
- align-items: center;
- justify-content: space-between;
- padding: 14px 16px 10px;
- }
-
+ header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--border); }
+ .header-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; }
  .header-top h1 { font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; }
 
- .view-toggle {
- display: flex;
- background: var(--surface-2);
- border: 1px solid var(--border-light);
- border-radius: 8px;
- overflow: hidden;
- }
+ .view-toggle { display: flex; background: var(--surface-2); border: 1px solid var(--border-light); border-radius: 8px; overflow: hidden; }
+ .view-btn { padding: 8px 16px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); background: none; border: none; cursor: pointer; transition: all 150ms var(--ease-out); }
+ .view-btn.active { background: var(--accent-surface); color: var(--accent); border: 1px solid oklch(35% 0.08 155); border-radius: 6px; }
 
- .view-btn {
- padding: 8px 16px;
- font-size: 0.75rem;
- font-weight: 700;
- color: var(--text-muted);
- background: none;
- border: none;
- cursor: pointer;
- transition: all 150ms var(--ease-out);
- }
-
- .view-btn.active {
- background: var(--accent-surface);
- color: var(--accent);
- border: 1px solid oklch(35% 0.08 155);
- border-radius: 6px;
- }
-
- .updated-bar {
- display: flex;
- align-items: center;
- justify-content: space-between;
- padding: 6px 16px;
- background: var(--surface-1);
- border-bottom: 1px solid var(--border);
- }
-
+ .updated-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px; background: var(--surface-1); border-bottom: 1px solid var(--border); }
  .updated-label { font-size: 0.625rem; font-weight: 600; color: var(--text-dim); letter-spacing: 0.04em; text-transform: uppercase; }
  .updated-value { font-size: 0.6875rem; font-weight: 600; color: var(--text-muted); }
  .updated-value.fresh { color: var(--accent); }
@@ -107,77 +64,32 @@
  .schedule-view, .bracket-view { display: none; }
  .schedule-view.active, .bracket-view.active { display: block; }
 
- .time-nav {
- display: flex;
- overflow-x: auto;
- scrollbar-width: none;
- padding: 12px 16px;
- gap: 6px;
- }
+ .time-nav { display: flex; overflow-x: auto; scrollbar-width: none; padding: 12px 16px; gap: 6px; }
  .time-nav::-webkit-scrollbar { display: none; }
-
- .time-btn {
- flex-shrink: 0;
- padding: 8px 14px;
- font-size: 0.75rem;
- font-weight: 600;
- color: var(--text-muted);
- background: var(--surface-1);
- border: 1px solid var(--border);
- border-radius: 6px;
- cursor: pointer;
- transition: all 150ms var(--ease-out);
- white-space: nowrap;
- }
-
+ .time-btn { flex-shrink: 0; padding: 8px 14px; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 150ms var(--ease-out); white-space: nowrap; }
  .time-btn:hover { border-color: var(--border-light); color: var(--text-mid); }
  .time-btn.active { background: var(--surface-3); border-color: var(--text-muted); color: var(--text); font-weight: 700; }
  .time-btn .ct { color: var(--text-dim); margin-left: 4px; }
 
  .schedule-content { padding: 0 16px 100px; }
-
- @media (min-width: 640px) {
- .schedule-content { max-width: 480px; margin: 0 auto; }
- .bracket-round { min-width: 150px; }
- }
+ @media (min-width: 640px) { .schedule-content { max-width: 480px; margin: 0 auto; } .bracket-round { min-width: 150px; } }
 
  .day-group { margin-bottom: 24px; }
-
  .day-label { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
  .day-label .date { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
- .day-label .relative {
- font-size: 0.6875rem; font-weight: 700; color: var(--accent);
- background: var(--accent-surface); padding: 3px 8px; border-radius: 4px;
- border: 1px solid oklch(30% 0.06 155);
- }
- .day-label .round-tag {
- font-size: 0.625rem; font-weight: 700; letter-spacing: 0.06em;
- text-transform: uppercase; color: var(--text-dim); margin-left: auto;
- }
+ .day-label .relative { font-size: 0.6875rem; font-weight: 700; color: var(--accent); background: var(--accent-surface); padding: 3px 8px; border-radius: 4px; border: 1px solid oklch(30% 0.06 155); }
+ .day-label .round-tag { font-size: 0.625rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); margin-left: auto; }
 
  .day-matches { display: flex; flex-direction: column; gap: 8px; }
 
- .match {
- background: var(--surface-1);
- border: 1px solid var(--border);
- border-radius: 10px;
- overflow: hidden;
- cursor: pointer;
- transition: border-color 150ms var(--ease-out);
- }
+ .match { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 150ms var(--ease-out); }
  .match:hover { border-color: var(--border-light); }
  .match.is-live { border-color: var(--live); box-shadow: 0 0 16px oklch(50% 0.12 25 / 0.15); }
  .match.open { border-color: var(--text-muted); }
 
- .match-top {
- display: flex; align-items: center; justify-content: space-between;
- padding: 7px 10px; background: var(--surface-2); border-bottom: 1px solid var(--border);
- }
+ .match-top { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
  .match-top .info { font-size: 0.6875rem; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
- .match-top .badge {
- font-size: 0.625rem; font-weight: 700; letter-spacing: 0.05em;
- text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
- }
+ .match-top .badge { font-size: 0.625rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
 
  .badge.ft { color: var(--accent); background: var(--accent-surface); border: 1px solid oklch(30% 0.06 155); }
  .badge.aet { color: var(--gold); background: var(--gold-surface); border: 1px solid oklch(30% 0.06 85); }
@@ -187,13 +99,21 @@
 
  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
 
- .countdown-chip {
- font-size: 0.625rem; font-weight: 700; color: var(--accent);
- background: var(--accent-surface); border: 1px solid oklch(30% 0.06 155);
- padding: 2px 7px; border-radius: 4px; letter-spacing: 0.02em;
- }
+ .countdown-chip { font-size: 0.625rem; font-weight: 700; color: var(--accent); background: var(--accent-surface); border: 1px solid oklch(30% 0.06 155); padding: 2px 7px; border-radius: 4px; letter-spacing: 0.02em; }
+
+ /* condensed summary (completed, collapsed) */
+ .match-summary { display: none; align-items: center; gap: 8px; padding: 9px 10px; }
+ .match.completed .match-summary { display: flex; }
+ .match.completed.open .match-summary { display: none; }
+ .ms-winner { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
+ .ms-score { font-size: 0.8125rem; font-weight: 800; color: var(--accent); font-feature-settings: 'tnum'; }
+ .ms-loser { font-size: 0.8125rem; font-weight: 500; color: var(--text-dim); }
+ .ms-note { font-size: 0.625rem; font-weight: 600; color: var(--gold); margin-left: 2px; }
+ .ms-chevron { margin-left: auto; }
 
  .match-teams { padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+ .match.completed .match-teams { display: none; }
+ .match.completed.open .match-teams { display: flex; }
 
  .team { display: flex; align-items: center; gap: 8px; padding: 5px 7px; border-radius: 6px; min-height: 32px; }
  .team.w { background: var(--winner-bg); }
@@ -204,18 +124,16 @@
  .t-name { flex: 1; font-size: 0.8125rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
  .t-score { font-size: 0.9375rem; font-weight: 800; min-width: 16px; text-align: right; }
  .team.w .t-score { color: var(--accent); }
+ .t-rank { font-size: 0.6875rem; font-weight: 500; font-style: italic; color: var(--text-dim); min-width: 24px; text-align: right; }
 
  .t-name.potential { color: var(--text-muted); font-style: italic; font-weight: 500; }
  .t-name.potential .pfx { color: var(--text-dim); font-style: normal; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.04em; margin-right: 4px; }
 
  .match-note { padding: 0 10px 8px; font-size: 0.6875rem; color: var(--gold); font-weight: 500; }
-
+ .match.completed:not(.open) .match-note { display: none; }
  .match.tbd .t-name { color: var(--text-dim); font-style: italic; font-weight: 500; }
 
- .chevron {
- width: 14px; height: 14px; color: var(--text-dim);
- transition: transform 240ms var(--ease-out); flex-shrink: 0;
- }
+ .chevron { width: 14px; height: 14px; color: var(--text-dim); transition: transform 240ms var(--ease-out); flex-shrink: 0; }
  .match.open .chevron { transform: rotate(180deg); }
 
  .match-drawer { max-height: 0; overflow: hidden; transition: max-height 260ms var(--ease-out); }
@@ -232,16 +150,9 @@
  .bracket-scroll { min-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
  .bracket-container { display: flex; gap: 6px; min-width: max-content; align-items: flex-start; }
  .bracket-round { display: flex; flex-direction: column; gap: 4px; min-width: 130px; }
- .bracket-round-label {
- font-size: 0.625rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
- color: var(--text-muted); text-align: center; padding: 6px 0 8px; position: sticky; top: 0;
- }
+ .bracket-round-label { font-size: 0.625rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); text-align: center; padding: 6px 0 8px; position: sticky; top: 0; }
 
- .bracket-match {
- background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px;
- padding: 0; overflow: hidden; margin-bottom: 2px;
- transition: opacity 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out);
- }
+ .bracket-match { background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; padding: 0; overflow: hidden; margin-bottom: 2px; transition: opacity 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out); }
  .bracket-match.completed { border-color: var(--border-light); }
  .bracket-match.is-final { border-color: var(--gold); box-shadow: 0 0 8px oklch(70% 0.1 85 / 0.1); }
  .bracket-match.dim { opacity: 0.26; }
@@ -262,6 +173,12 @@
  .bm-status.done { color: var(--accent); }
  .bm-status.pen { color: var(--gold); }
 
+ /* tighter completed bracket rows so R32 doesn't run so long */
+ .bracket-match.completed .bm-status { display: none; }
+ .bracket-match.completed .bm-team { padding: 3px 8px; min-height: 22px; border-bottom-color: oklch(20% 0.004 250); }
+ .bracket-match.completed .bm-team.l { opacity: 0.5; }
+ .bracket-match.completed .bm-team.l .bm-name { font-size: 0.625rem; font-weight: 500; }
+
  .bracket-connectors { display: flex; flex-direction: column; justify-content: space-around; width: 16px; min-width: 16px; position: relative; }
  .connector-pair { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; position: relative; }
  .connector-pair::before { content: ''; position: absolute; right: 0; top: 25%; bottom: 25%; width: 1px; background: var(--connector); }
@@ -270,9 +187,7 @@
  .trophy { text-align: center; font-size: 1.5rem; padding: 8px 0; }
  .loading-msg { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 0.875rem; }
 
- @media (prefers-reduced-motion: reduce) {
- *, *::before, *::after { transition: none !important; animation: none !important; }
- }
+ @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
@@ -307,7 +222,7 @@
 <noscript><div class="loading-msg">This app needs JavaScript enabled.</div></noscript>
 
 <script>
- const APP_VERSION = 'v2.0.1';
+ const APP_VERSION = 'v2.1';
  const DATA_URL = './data.json';
  const CACHE_KEY = 'world-cup-bracket-data';
  const REPO_OWNER = 'mawizorek';
@@ -317,7 +232,8 @@
  const ET_UTC_OFFSET = 4; // EDT = UTC-4 during the tournament (July)
 
  let allMatches = [];
- const fedBy = {}; // downstream match id -> [feeder match ids]
+ let rankings = {};
+ const fedBy = {};
  let pickedTeam = null;
 
  // ---------- data ----------
@@ -367,6 +283,7 @@
  return;
  }
  allMatches = data.matches;
+ rankings = data.rankings || {};
  buildFedBy();
  setupViewToggle();
  renderTimeNav();
@@ -388,6 +305,7 @@
 
  const isComplete = (m) => ['ft','aet','pso'].includes(m.status);
  const winnerName = (m) => m.winner === 'home' ? m.home : m.winner === 'away' ? m.away : null;
+ const rankOf = (name) => (name && rankings[name]) ? rankings[name] : null;
  const today = new Date().toISOString().slice(0, 10);
 
  function buildFedBy() {
@@ -405,18 +323,16 @@
  const fm = byId(feederId);
  if (!fm) return { text: 'TBD', code: '\u2014', potential: false, tbd: true };
  if (isComplete(fm)) { const w = winnerName(fm); return { text: w, code: cc(w), potential: false }; }
- if (fm.home === 'TBD' || fm.away === 'TBD') return { text: 'TBD', code: '\u2014', potential: false, tbd: true }; // depth-1 stop
+ if (fm.home === 'TBD' || fm.away === 'TBD') return { text: 'TBD', code: '\u2014', potential: false, tbd: true };
  return { text: `${cc(fm.home)}/${cc(fm.away)}`, code: '', potential: true };
  }
 
- // The two feeder matchups going into a match (for the drawer "Path in").
  function pathIn(m) {
  const feeders = (fedBy[m.id] || []).map(byId).filter(Boolean);
  if (!feeders.length) return null;
  return feeders.map(fm => (fm.home === 'TBD' || fm.away === 'TBD') ? 'TBD' : `${cc(fm.home)} v ${cc(fm.away)}`).join('  \u00b7  ');
  }
 
- // Who the winner of a completed match goes on to face.
  function advancesToFace(m) {
  if (!m.feedsTo) return null;
  const dm = byId(m.feedsTo);
@@ -535,10 +451,31 @@
  const nameHtml = sl.potential
  ? `<span class="t-name potential"><span class="pfx">${POTENTIAL_PREFIX}</span>${sl.text}</span>`
  : `<span class="t-name">${sl.text}</span>`;
+ let right = '';
+ if (done && score !== null && score !== undefined) {
+ right = `<span class="t-score">${score}</span>`;
+ } else if (!done && !sl.potential && !sl.tbd) {
+ const r = rankOf(sl.text);
+ if (r) right = `<span class="t-rank">#${r}</span>`;
+ }
  return `<div class="team ${isW ? 'w' : ''} ${isL ? 'l' : ''}">`
  + `<span class="t-code">${sl.code || '\u2014'}</span>`
- + nameHtml
- + `${score !== null && score !== undefined ? `<span class="t-score">${score}</span>` : ''}</div>`;
+ + nameHtml + right + `</div>`;
+ }
+
+ function summaryLine(m) {
+ const w = winnerName(m);
+ const loserSide = m.winner === 'home' ? 'away' : 'home';
+ const l = m[loserSide];
+ const ws = m[m.winner === 'home' ? 'hs' : 'as'];
+ const ls = m[loserSide === 'home' ? 'hs' : 'as'];
+ const note = m.psoNote ? `<span class="ms-note">${m.psoNote}</span>` : '';
+ return `<div class="match-summary">`
+ + `<span class="ms-winner">${w}</span>`
+ + `<span class="ms-score">${ws}-${ls}</span>`
+ + `<span class="ms-loser">${l}</span>${note}`
+ + `<svg class="chevron ms-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`
+ + `</div>`;
  }
 
  function renderMatchCard(m) {
@@ -547,13 +484,13 @@
  const statusText = m.status === 'ft' ? 'FT' : m.status === 'aet' ? 'AET' : m.status === 'pso' ? 'PEN' : m.status === 'live' ? 'LIVE' : (m.time || 'TBD');
  const statusClass = m.status === 'upcoming' ? 'upcoming' : m.status;
 
- // T3: countdown chip on today's upcoming matches
  const ko = (!done && m.day === today) ? kickoffDate(m) : null;
  const chip = ko ? `<span class="countdown-chip" data-countdown="${ko.getTime()}">${fmtCountdown(ko)}</span>` : '';
 
  return `<div class="${classes}" data-id="${m.id}">`
  + `<div class="match-top"><span class="info">${m.venue}${chip}</span>`
  + `<span class="badge ${statusClass}">${statusText}</span></div>`
+ + `${done ? summaryLine(m) : ''}`
  + `<div class="match-teams">${teamRow(m, 'home')}${teamRow(m, 'away')}`
  + `<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin:2px auto 0"><path d="M6 9l6 6 6-6"/></svg>`
  + `</div>`
@@ -639,7 +576,6 @@
  + `</div>`;
  }
 
- // T2: tap a team, trace its route to the Final.
  function bindBracketTaps() {
  document.getElementById('bracketContent').querySelectorAll('.bm-team[data-team]').forEach(el => {
  el.addEventListener('click', (e) => {
