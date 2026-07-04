@@ -1,5 +1,5 @@
 // World Cup 2026 Bracket - entry point. Wires modules, loads data, boots views.
-import { S, DATA_URL, CACHE_KEY, REPO_OWNER, REPO_NAME, DATA_PATH } from './store.js';
+import { S, APP_VERSION, BUILD_PR, DATA_URL, CACHE_KEY, REPO_OWNER, REPO_NAME, DATA_PATH } from './store.js';
 import { buildFedBy, byId } from './util.js';
 import { renderTimeNav, renderSchedule } from './schedule.js';
 import { renderBracket, applyPathHighlight } from './bracket.js';
@@ -41,6 +41,11 @@ async function loadData() {
     if (cached) return JSON.parse(cached);
     return null;
   }
+}
+
+function renderFooter() {
+  const el = document.getElementById('appFooter');
+  if (el) el.textContent = `World Cup Bracket \u00b7 ${APP_VERSION} \u00b7 ${BUILD_PR}`;
 }
 
 function showBracketView() {
@@ -91,6 +96,7 @@ function startCountdownTicker() {
 }
 
 async function init() {
+  renderFooter();
   fetchLastUpdated();
   const data = await loadData();
   if (!data) {

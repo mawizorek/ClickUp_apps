@@ -1,4 +1,4 @@
-/* World Cup 2026 Bracket - base + schedule styles. Bracket + sheet live in bracket.css */
+/* World Cup 2026 Bracket - base + schedule styles. Bracket + sheet live in bracket.css / sheet.css */
 :root {
   --bg: oklch(10% 0.012 250);
   --surface-1: oklch(16% 0.01 250);
@@ -58,7 +58,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bo
 .time-btn.active { background: var(--surface-3); border-color: var(--text-muted); color: var(--text); font-weight: 700; }
 .time-btn .ct { color: var(--text-dim); margin-left: 4px; }
 
-.schedule-content { padding: 0 16px 100px; }
+.schedule-content { padding: 0 16px 40px; }
 @media (min-width: 640px) { .schedule-content { max-width: 480px; margin: 0 auto; } .bracket-round { min-width: 150px; } }
 
 .day-group { margin-bottom: 24px; }
@@ -90,7 +90,6 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bo
 
 .match-summary { display: none; align-items: center; gap: 8px; padding: 9px 10px; }
 .match.completed .match-summary { display: flex; }
-.match.completed.open .match-summary { display: none; }
 .ms-winner { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
 .ms-score { font-size: 0.8125rem; font-weight: 800; color: var(--accent); font-feature-settings: 'tnum'; }
 .ms-loser { font-size: 0.8125rem; font-weight: 500; color: var(--text-dim); }
@@ -98,8 +97,6 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bo
 .ms-chevron { margin-left: auto; }
 
 .match-teams { padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
-.match.completed .match-teams { display: none; }
-.match.completed.open .match-teams { display: flex; }
 
 .team { display: flex; align-items: center; gap: 8px; padding: 5px 7px; border-radius: 6px; min-height: 32px; }
 .team.w { background: var(--winner-bg); }
@@ -116,21 +113,13 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bo
 .t-name.potential .pfx { color: var(--text-dim); font-style: normal; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.04em; margin-right: 4px; }
 
 .match-note { padding: 0 10px 8px; font-size: 0.6875rem; color: var(--gold); font-weight: 500; }
-.match.completed:not(.open) .match-note { display: none; }
 .match.tbd .t-name { color: var(--text-dim); font-style: italic; font-weight: 500; }
 
-.chevron { width: 14px; height: 14px; color: var(--text-dim); transition: transform 240ms var(--ease-out); flex-shrink: 0; }
-.match.open .chevron { transform: rotate(180deg); }
-
-.match-drawer { max-height: 0; overflow: hidden; transition: max-height 260ms var(--ease-out); }
-.match.open .match-drawer { max-height: 300px; }
-.drawer-inner { padding: 10px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; background: var(--surface-1); }
-.drawer-row { display: flex; align-items: baseline; gap: 8px; font-size: 0.75rem; }
-.drawer-row .k { color: var(--text-dim); font-weight: 600; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; min-width: 92px; flex-shrink: 0; }
-.drawer-row .v { color: var(--text-mid); font-weight: 600; }
-.drawer-row .v.accent { color: var(--accent); }
-.drawer-row .v.gold { color: var(--gold); }
+.chevron { width: 14px; height: 14px; color: var(--text-dim); flex-shrink: 0; }
 
 .loading-msg { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 0.875rem; }
+
+/* version footer stamp */
+.app-footer { text-align: center; padding: 18px 16px calc(24px + env(safe-area-inset-bottom)); font-size: 0.625rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-dim); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
