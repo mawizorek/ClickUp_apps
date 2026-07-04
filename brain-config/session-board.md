@@ -30,11 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Patch Penelope · session stability-loop · started Sat Jul 4 08:59 AM ET (last update Sat Jul 4 09:01 AM ET)
-
-**Status:** active
-
-Working on direct F1 Racetracks runtime stability / deploy-refresh loop after the permanent source split. Touching `f1-racetracks/index.html`, live cache-bust/deploy markers, and any small repo files needed to make the live Pages surface catch up to the repo state.
+*(empty — no agents currently working in the repo)*
 
 ---
 
