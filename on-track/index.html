@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- INFRASTRUCTURE: engine + data.json (renders immediately from built-in data; data.json enhances when served) -->
 <!-- Data updates: commit data.json only. Engine updates: version bump this file. -->
+<!-- BRAND ASSETS: icon.png (512x512, apple-touch-icon + favicon) + og.png (1200x630, share/unfurl). Drop both into this folder. -->
 <html lang="en" data-theme="rb">
 <head>
 <meta charset="UTF-8">
@@ -14,12 +15,15 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/on-track/">
 <meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/on-track/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="On Track — What Motorsport Is On Right Now">
 <meta name="twitter:description" content="Live motorsport TV schedule. What's racing now, what's next, and where to watch.">
 <meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/on-track/og.png">
+<link rel="icon" type="image/png" href="icon.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>">
+<link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="On Track">
@@ -436,7 +440,7 @@ noscript { display: block; padding: 20px; text-align: center; color: var(--text-
   </footer>
 </div>
 <script>
-const APP_VERSION = 'v1.4';
+const APP_VERSION = 'v1.5';
 const APP_DATE = '2026-07-04';
 const APP_SLUG = 'on-track';
 const SERIES = {
@@ -493,7 +497,6 @@ const tzAbbrev = () => {
 const fmtTime = d => new Intl.DateTimeFormat('en-US', { timeZone: activeTZ(), hour: 'numeric', minute: '2-digit' }).format(d);
 const dayKey = d => new Intl.DateTimeFormat('en-CA', { timeZone: activeTZ(), year:'numeric', month:'2-digit', day:'2-digit' }).format(d);
 const dayShort = d => new Intl.DateTimeFormat('en-US', { timeZone: activeTZ(), weekday:'short', month:'short', day:'numeric' }).format(d);
-// TZ-independent label straight from a YYYY-MM-DD key (always matches the key's calendar day).
 const labelFromKey = k => new Intl.DateTimeFormat('en-US', { timeZone:'UTC', weekday:'long', month:'short', day:'numeric' }).format(new Date(k + 'T12:00:00Z'));
 const shortFromKey = k => new Intl.DateTimeFormat('en-US', { timeZone:'UTC', weekday:'short', month:'short', day:'numeric' }).format(new Date(k + 'T12:00:00Z'));
 const addDays = (k, n) => { const [y,m,d]=k.split('-').map(Number); const dt=new Date(Date.UTC(y,m-1,d)); dt.setUTCDate(dt.getUTCDate()+n); return dt.toISOString().slice(0,10); };
@@ -607,12 +610,9 @@ function renderSchedule() {
   const anyFilter = state.series.size || state.plats.size || state.q;
   $('#clrSeries').hidden = !state.series.size;
   $('#clrPlat').hidden = !state.plats.size;
-
-  // Which events are visible given the past toggle (past = fully ended).
   const visible = e => state.showPast || e._e > now;
   const dayMap = new Map();
   matched.forEach(e => { if (!visible(e)) return; const k = dayKey(e._s); if (!dayMap.has(k)) dayMap.set(k, []); dayMap.get(k).push(e); });
-
   const pastCount = matched.filter(e => e._e <= now).length;
   const pt = $('#pastToggle');
   if (pastCount) {
@@ -622,19 +622,14 @@ function renderSchedule() {
       ? 'Hide earlier <span class="cnt">(' + pastCount + ')</span>'
       : '↺ Show earlier <span class="cnt">(' + pastCount + ')</span>';
   } else { pt.hidden = true; }
-
   const upcomingCount = matched.filter(e => e._e > now).length;
   $('#resultNote').textContent = anyFilter
     ? (state.showPast ? matched.length + ' of ' + events.length + ' sessions' : upcomingCount + ' of ' + events.length + ' upcoming')
     : upcomingCount + ' upcoming sessions';
-
-  // Determine which day keys to render.
   let keys;
   if (anyFilter) {
-    // Filtered: only days that actually have matching (visible) events. No empty filler.
     keys = Array.from(dayMap.keys()).sort();
   } else {
-    // Default browse: a card for EVERY day across the loaded span (empty days included).
     const allK = events.map(e => dayKey(e._s));
     if (!allK.length) { keys = []; }
     else {
@@ -645,7 +640,6 @@ function renderSchedule() {
       if (start <= maxK) for (let k = start; k <= maxK; k = addDays(k, 1)) keys.push(k);
     }
   }
-
   const host = $('#schedule');
   if (!keys.length) {
     const noneUpcoming = !anyFilter && !upcomingCount && pastCount;
@@ -662,7 +656,6 @@ function renderSchedule() {
     });
     return;
   }
-
   host.innerHTML = keys.map(k => {
     const evs = (dayMap.get(k) || []);
     const isToday = k === todayK;
