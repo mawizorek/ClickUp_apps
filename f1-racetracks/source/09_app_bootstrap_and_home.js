@@ -148,6 +148,9 @@ function router() {
   else renderHome();
   jump.value = bySlug[slug] ? slug : "";
   window.scrollTo(0, 0);
+  if (typeof syncWeekendSurfaces === 'function') {
+    window.setTimeout(syncWeekendSurfaces, 0);
+  }
   if (window.lucide) lucide.createIcons();
   updateFooterMeta(slug && bySlug[slug] ? bySlug[slug] : null);
 }
