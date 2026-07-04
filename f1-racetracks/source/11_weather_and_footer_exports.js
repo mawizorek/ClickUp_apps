@@ -189,6 +189,161 @@ document.getElementById("t-data").addEventListener("click", e => {
   setTimeout(() => URL.revokeObjectURL(url), 90000);
 });
 
+const LIVE_REFRESH_MS = 20000;
+
+const WEEKEND_LIVE_CIRCUIT_ALIASES = {
+  'albert-park': ['albert park', 'melbourne'],
+  shanghai: ['shanghai'],
+  suzuka: ['suzuka'],
+  miami: ['miami'],
+  'gilles-villeneuve': ['gilles villeneuve', 'montreal', 'canada'],
+  monaco: ['monaco'],
+  catalunya: ['barcelona', 'catalunya', 'circuit de barcelona-catalunya', 'spanish gp'],
+  'red-bull-ring': ['red bull ring', 'spielberg', 'austrian gp'],
+  silverstone: ['silverstone', 'british gp'],
+  spa: ['spa', 'spa-francorchamps', 'circuit de spa-francorchamps', 'belgian gp'],
+  hungaroring: ['hungaroring', 'hungary', 'hungarian gp'],
+  zandvoort: ['zandvoort', 'dutch gp'],
+  monza: ['monza', 'italian gp'],
+  madring: ['madring', 'madrid'],
+  baku: ['baku', 'azerbaijan'],
+  'marina-bay': ['marina bay', 'singapore'],
+  cota: ['cota', 'circuit of the americas', 'united states'],
+  mexico: ['mexico city', 'hermanos rodriguez', 'méxico'],
+  interlagos: ['interlagos', 'sao paulo', 'são paulo'],
+  'las-vegas': ['las vegas'],
+  losail: ['losail', 'qatar'],
+  'yas-marina': ['yas marina', 'abu dhabi']
+};
+
+const SCHEDULE_SEEDS = {
+  silverstone: [
+    {
+      day: 'Fri',
+      date: '2026-07-03',
+      items: [
+        { series: 'F1', label: 'Practice 1', start: '2026-07-03T12:30:00+01:00', end: '2026-07-03T13:30:00+01:00' },
+        { series: 'F1', label: 'Sprint Qualifying', start: '2026-07-03T16:30:00+01:00', end: '2026-07-03T17:14:00+01:00' }
+      ]
+    },
+    {
+      day: 'Sat',
+      date: '2026-07-04',
+      items: [
+        { series: 'F1', label: 'Sprint', start: '2026-07-04T12:00:00+01:00', end: '2026-07-04T13:00:00+01:00' },
+        { series: 'F1', label: 'Qualifying', start: '2026-07-04T16:00:00+01:00', end: '2026-07-04T17:00:00+01:00' }
+      ]
+    },
+    {
+      day: 'Sun',
+      date: '2026-07-05',
+      items: [
+        { series: 'F1', label: 'Grand Prix', start: '2026-07-05T15:00:00+01:00', end: '2026-07-05T17:00:00+01:00' }
+      ]
+    }
+  ],
+  spa: [
+    {
+      day: 'Fri',
+      date: '2026-07-17',
+      items: [
+        { series: 'F1', label: 'Practice 1', start: '2026-07-17T13:30:00+02:00', end: '2026-07-17T14:30:00+02:00' },
+        { series: 'F1', label: 'Practice 2', start: '2026-07-17T17:00:00+02:00', end: '2026-07-17T18:00:00+02:00' }
+      ]
+    },
+    {
+      day: 'Sat',
+      date: '2026-07-18',
+      items: [
+        { series: 'F1', label: 'Practice 3', start: '2026-07-18T12:30:00+02:00', end: '2026-07-18T13:30:00+02:00' },
+        { series: 'F1', label: 'Qualifying', start: '2026-07-18T16:00:00+02:00', end: '2026-07-18T17:00:00+02:00' }
+      ]
+    },
+    {
+      day: 'Sun',
+      date: '2026-07-19',
+      items: [
+        { series: 'F1', label: 'Grand Prix', start: '2026-07-19T15:00:00+02:00', end: '2026-07-19T17:00:00+02:00' }
+      ]
+    }
+  ],
+  hungaroring: [
+    {
+      day: 'Fri',
+      date: '2026-07-24',
+      items: [
+        { series: 'F1', label: 'Practice 1', start: '2026-07-24T13:30:00+02:00', end: '2026-07-24T14:30:00+02:00' },
+        { series: 'F1', label: 'Practice 2', start: '2026-07-24T17:00:00+02:00', end: '2026-07-24T18:00:00+02:00' }
+      ]
+    },
+    {
+      day: 'Sat',
+      date: '2026-07-25',
+      items: [
+        { series: 'F1', label: 'Practice 3', start: '2026-07-25T12:30:00+02:00', end: '2026-07-25T13:30:00+02:00' },
+        { series: 'F1', label: 'Qualifying', start: '2026-07-25T16:00:00+02:00', end: '2026-07-25T17:00:00+02:00' }
+      ]
+    },
+    {
+      day: 'Sun',
+      date: '2026-07-26',
+      items: [
+        { series: 'F1', label: 'Grand Prix', start: '2026-07-26T15:00:00+02:00', end: '2026-07-26T17:00:00+02:00' }
+      ]
+    }
+  ],
+  zandvoort: [
+    {
+      day: 'Fri',
+      date: '2026-08-21',
+      items: [
+        { series: 'F1', label: 'Practice 1', start: '2026-08-21T10:30:00+02:00', end: '2026-08-21T11:30:00+02:00' },
+        { series: 'F1', label: 'Sprint Qualifying', start: '2026-08-21T14:30:00+02:00', end: '2026-08-21T15:14:00+02:00' }
+      ]
+    },
+    {
+      day: 'Sat',
+      date: '2026-08-22',
+      items: [
+        { series: 'F1', label: 'Sprint', start: '2026-08-22T10:00:00+02:00', end: '2026-08-22T11:00:00+02:00' },
+        { series: 'F1', label: 'Qualifying', start: '2026-08-22T14:00:00+02:00', end: '2026-08-22T15:00:00+02:00' }
+      ]
+    },
+    {
+      day: 'Sun',
+      date: '2026-08-23',
+      items: [
+        { series: 'F1', label: 'Grand Prix', start: '2026-08-23T13:00:00+02:00', end: '2026-08-23T15:00:00+02:00' }
+      ]
+    }
+  ],
+  monza: [
+    {
+      day: 'Fri',
+      date: '2026-09-04',
+      items: [
+        { series: 'F1', label: 'Practice 1', start: '2026-09-04T10:30:00+02:00', end: '2026-09-04T11:30:00+02:00' },
+        { series: 'F1', label: 'Practice 2', start: '2026-09-04T14:00:00+02:00', end: '2026-09-04T15:00:00+02:00' }
+      ]
+    },
+    {
+      day: 'Sat',
+      date: '2026-09-05',
+      items: [
+        { series: 'F1', label: 'Practice 3', start: '2026-09-05T10:30:00+02:00', end: '2026-09-05T11:30:00+02:00' },
+        { series: 'F1', label: 'Qualifying', start: '2026-09-05T14:00:00+02:00', end: '2026-09-05T15:00:00+02:00' }
+      ]
+    },
+    {
+      day: 'Sun',
+      date: '2026-09-06',
+      items: [
+        { series: 'F1', label: 'Grand Prix', start: '2026-09-06T13:00:00+02:00', end: '2026-09-06T15:00:00+02:00' }
+      ]
+    }
+  ]
+};
+
 const WEEKEND_REPLAY_DATA = {
   "albert-park": {
     sessionLabel: "Grand Prix replay",
@@ -256,7 +411,7 @@ function ensureWeekendState(slug) {
   return weekendEnhancementState[slug];
 }
 
-function clearWeekendReplayTimer(slug) {
+function clearWeekendTimer(slug) {
   const state = ensureWeekendState(slug);
   if (state.timer) {
     window.clearInterval(state.timer);
@@ -268,43 +423,125 @@ function trackSlugFromHash() {
   return (location.hash.replace(/^#\/?/, "") || "").trim();
 }
 
-function inferScheduleStatus(track, dateString) {
-  const today = new Date().toISOString().slice(0, 10);
-  if (track.status === "done") return "done";
-  if (track.status === "active") {
-    if (dateString === today) return "live";
-    return dateString < today ? "done" : "upcoming";
+function weekendNormalize(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function classifyWeekendSessionState(session) {
+  const now = Date.now();
+  const start = session?.date_start ? new Date(session.date_start).getTime() : null;
+  const end = session?.date_end ? new Date(session.date_end).getTime() : null;
+  if (!session || !start) return 'idle';
+  if (start > now) return 'awaiting';
+  if (!end || end >= now) return 'live';
+  return (now - end) / 36e5 <= 48 ? 'replay' : 'idle';
+}
+
+function matchWeekendCircuitSlug(session) {
+  const haystack = [session?.circuit_short_name, session?.meeting_name, session?.country_name]
+    .map(weekendNormalize)
+    .join(' ');
+  for (const [slug, aliases] of Object.entries(WEEKEND_LIVE_CIRCUIT_ALIASES)) {
+    if (aliases.some(alias => haystack.includes(weekendNormalize(alias)))) return slug;
   }
-  return dateString < today ? "done" : "upcoming";
+  return null;
+}
+
+async function fetchWeekendJson(url) {
+  const response = await fetch(url, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+  return response.json();
+}
+
+function latestWeekendByDriver(rows) {
+  const map = new Map();
+  for (const row of rows || []) {
+    const key = row.driver_number;
+    if (!map.has(key) || String(row.date || '') > String(map.get(key).date || '')) map.set(key, row);
+  }
+  return map;
+}
+
+function formatWeekendInterval(intervalRow, position) {
+  if (position === 1) return 'Leader';
+  if (!intervalRow) return '—';
+  if (typeof intervalRow.interval === 'string') return intervalRow.interval;
+  if (typeof intervalRow.interval === 'number') return `+${intervalRow.interval.toFixed(3)}`;
+  if (typeof intervalRow.gap_to_leader === 'number') return `+${intervalRow.gap_to_leader.toFixed(3)}`;
+  return intervalRow.gap_to_leader || '—';
+}
+
+function formatSeedTime(dateString) {
+  return new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' }).format(new Date(dateString));
+}
+
+function formatSessionStatus(start, end) {
+  const now = Date.now();
+  const startMs = new Date(start).getTime();
+  const endMs = new Date(end).getTime();
+  if (now >= endMs) return 'done';
+  if (now >= startMs && now < endMs) return 'live';
+  return 'upcoming';
 }
 
 function buildFallbackSchedule(track) {
   return (track.sessions || []).map(entry => {
-    const [dayLabelRaw, bodyRaw] = String(entry.sess || "").split("·");
-    const dayLabel = (dayLabelRaw || "Weekend").trim();
-    const body = (bodyRaw || "Session").trim();
-    const pieces = body.split("+").map(item => item.trim()).filter(Boolean);
+    const [dayLabelRaw, bodyRaw] = String(entry.sess || '').split('·');
+    const dayLabel = (dayLabelRaw || 'Weekend').trim();
+    const body = (bodyRaw || 'Session').trim();
+    const pieces = body.split('+').map(item => item.trim()).filter(Boolean);
     return {
       day: dayLabel,
       date: entry.date,
       items: pieces.map(label => ({
-        series: "F1",
+        series: 'F1',
         label,
-        time: "Time TBC",
+        time: 'Time pending',
         status: inferScheduleStatus(track, entry.date)
       }))
     };
   });
 }
 
+function inferScheduleStatus(track, dateString) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (track.status === 'done') return 'done';
+  if (track.status === 'active') {
+    if (dateString === today) return 'live';
+    return dateString < today ? 'done' : 'upcoming';
+  }
+  return dateString < today ? 'done' : 'upcoming';
+}
+
 function scheduleDataFor(track) {
+  if (SCHEDULE_SEEDS[track.slug]) {
+    return SCHEDULE_SEEDS[track.slug].map(group => ({
+      day: group.day,
+      date: group.date,
+      items: group.items.map(item => ({
+        series: item.series,
+        label: item.label,
+        time: formatSeedTime(item.start),
+        range: `${formatSeedTime(item.start)}–${formatSeedTime(item.end)}`,
+        status: formatSessionStatus(item.start, item.end),
+        start: item.start,
+        end: item.end
+      }))
+    }));
+  }
+
   if (Array.isArray(track.schedule) && track.schedule.length) {
     const grouped = {};
     track.schedule.forEach(item => {
-      const dateKey = item.datetime ? item.datetime.slice(0, 10) : "unknown";
+      const dateKey = item.datetime ? item.datetime.slice(0, 10) : 'unknown';
       if (!grouped[dateKey]) {
         grouped[dateKey] = {
-          day: new Date(item.datetime).toLocaleDateString("en-US", { weekday: "short" }),
+          day: new Date(item.datetime).toLocaleDateString('en-US', { weekday: 'short' }),
           date: dateKey,
           items: []
         };
@@ -312,12 +549,16 @@ function scheduleDataFor(track) {
       grouped[dateKey].items.push({
         series: item.series,
         label: item.session,
-        time: new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(new Date(item.datetime)),
-        status: item.status || "upcoming"
+        time: new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' }).format(new Date(item.datetime)),
+        range: new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' }).format(new Date(item.datetime)),
+        status: item.status || 'upcoming',
+        start: item.datetime,
+        end: item.datetime
       });
     });
     return Object.values(grouped);
   }
+
   return buildFallbackSchedule(track);
 }
 
@@ -325,11 +566,11 @@ function scheduleRowMarkup(item) {
   return `
     <div class="wc-session-row">
       <div class="wc-session-left">
-        <span class="wc-series wc-series-${String(item.series || "generic").toLowerCase()}">${esc(item.series || "F1")}</span>
+        <span class="wc-series wc-series-${String(item.series || 'generic').toLowerCase()}">${esc(item.series || 'F1')}</span>
         <span class="wc-session-name">${esc(item.label)}</span>
       </div>
       <div class="wc-session-right">
-        <span class="wc-session-time">${esc(item.time || "Time TBC")}</span>
+        <span class="wc-session-time">${esc(item.range || item.time || 'Time pending')}</span>
         <span class="wc-status wc-status-${item.status}">${esc(item.status)}</span>
       </div>
     </div>
@@ -340,38 +581,93 @@ function replayDataFor(track) {
   return WEEKEND_REPLAY_DATA[track.slug] || null;
 }
 
+function currentRoundTrack() {
+  return bySlug[appDataMeta.current_round_slug]
+    || TRACKS.find(track => track.status === 'active')
+    || bySlug[appDataMeta.last_completed_round_slug]
+    || reportTracks.find(track => track.status !== 'done')
+    || reportTracks[0]
+    || null;
+}
+
+function currentRoundSummary(track) {
+  const groups = scheduleDataFor(track);
+  const flat = groups.flatMap(group => group.items);
+  const liveNow = flat.find(item => item.status === 'live') || null;
+  const nextUp = flat.find(item => item.status === 'upcoming') || null;
+  if (liveNow) return { label: 'Live now', value: `${liveNow.label} · ${liveNow.time}` };
+  if (nextUp) return { label: 'Next up', value: `${nextUp.label} · ${nextUp.time}` };
+  if (track.status === 'done') return { label: 'Replay', value: 'Race weekend complete' };
+  return { label: 'Status', value: 'Weekend info loading' };
+}
+
+function renderHomeCurrentRaceCard(track) {
+  const summary = currentRoundSummary(track);
+  const statusLabel = track.status === 'active' ? 'Current round' : track.status === 'done' ? 'Latest completed round' : 'Next round';
+  return `
+    <section class="current-round-card" id="current-round-card">
+      <div class="crc-head">
+        <div>
+          <div class="tag">${statusLabel}</div>
+          <h2>${esc(track.gp)}</h2>
+        </div>
+        <div class="crc-badge crc-badge-${track.status}">${esc(track.status)}</div>
+      </div>
+      <div class="crc-grid">
+        <div class="wc-panel">
+          <div class="crc-label">Circuit</div>
+          <div class="crc-value">${esc(track.title)}</div>
+        </div>
+        <div class="wc-panel">
+          <div class="crc-label">Date</div>
+          <div class="crc-value">${esc(track.date)} ${SEASON}</div>
+        </div>
+        <div class="wc-panel">
+          <div class="crc-label">${esc(summary.label)}</div>
+          <div class="crc-value">${esc(summary.value)}</div>
+        </div>
+      </div>
+      <div class="crc-actions">
+        <a class="crc-primary" href="#/${track.slug}">Open ${esc(track.gp)} weekend →</a>
+        <a class="crc-link crc-secondary" href="#grid">Jump to full round grid ↓</a>
+      </div>
+    </section>
+  `;
+}
+
 function renderScheduleMode(track) {
   const groups = scheduleDataFor(track);
   const flat = groups.flatMap(group => group.items);
-  const liveNow = flat.find(item => item.status === "live") || null;
-  const nextUp = flat.find(item => item.status === "upcoming") || null;
+  const liveNow = flat.find(item => item.status === 'live') || null;
+  const nextUp = flat.find(item => item.status === 'upcoming') || null;
+  const lastResult = raceResults[track.slug] || null;
   return `
     <div class="wc-body-grid">
       <div class="wc-main">
         ${groups.map(group => `
-          <section class="wc-day-block">
+          <section class="wc-panel">
             <div class="wc-day-head">
               <strong>${esc(group.day)}</strong>
               <span>${esc(group.date)}</span>
             </div>
             <div class="wc-day-list">
-              ${group.items.map(scheduleRowMarkup).join("")}
+              ${group.items.map(scheduleRowMarkup).join('')}
             </div>
           </section>
-        `).join("")}
+        `).join('')}
       </div>
       <aside class="wc-rail">
         <div class="wc-rail-card">
           <div class="wc-rail-label">Live now</div>
-          <div class="wc-rail-value">${liveNow ? esc(liveNow.label) : "No session live right now"}</div>
+          <div class="wc-rail-value">${liveNow ? esc(`${liveNow.label} · ${liveNow.time}`) : 'No session live right now'}</div>
         </div>
         <div class="wc-rail-card">
           <div class="wc-rail-label">Next up</div>
-          <div class="wc-rail-value">${nextUp ? esc(nextUp.label) : "Weekend complete / awaiting next round"}</div>
+          <div class="wc-rail-value">${nextUp ? esc(`${nextUp.label} · ${nextUp.time}`) : 'Weekend complete / awaiting next round'}</div>
         </div>
         <div class="wc-rail-card">
-          <div class="wc-rail-label">Intent</div>
-          <div class="wc-rail-copy">This puts the calendar feel directly into the main app as you page across rounds.</div>
+          <div class="wc-rail-label">Fastest reference</div>
+          <div class="wc-rail-copy">${lastResult?.fastestLap ? esc(`${lastResult.fastestLap.driver} · ${lastResult.fastestLap.time}`) : 'Race result detail will appear here once the weekend is complete.'}</div>
         </div>
       </aside>
     </div>
@@ -380,11 +676,12 @@ function renderScheduleMode(track) {
 
 function renderReplayMode(track) {
   const replay = replayDataFor(track);
+  const result = raceResults[track.slug] || null;
   if (!replay) {
     return `
       <div class="wc-empty">
-        <strong>Replay coming next.</strong>
-        <p>This round is eligible for Weekend Center replay, but the editorial event stream has not been seeded yet.</p>
+        <strong>Replay timeline unavailable.</strong>
+        <p>This round does not have seeded replay beats yet.</p>
       </div>
     `;
   }
@@ -393,7 +690,7 @@ function renderReplayMode(track) {
   const beat = replay.beats[state.beat] || replay.beats[0];
   return `
     <div class="wc-replay-shell" data-slug="${track.slug}">
-      <div class="wc-replay-top">
+      <div class="wc-live-top">
         <div>
           <div class="wc-kicker">${esc(replay.sessionLabel)}</div>
           <h3>${esc(track.gp)} · ${esc(replay.sessionDate)}</h3>
@@ -414,23 +711,23 @@ function renderReplayMode(track) {
       <input class="wc-scrubber" type="range" min="0" max="${replay.beats.length - 1}" value="${state.beat}" data-action="scrub">
       <div class="wc-body-grid">
         <div class="wc-main">
-          <section class="wc-order-block">
+          <section class="wc-panel">
             <div class="wc-day-head"><strong>Running order snapshot</strong><span>${esc(beat.phase)}</span></div>
             <ol class="wc-order-list">
-              ${beat.order.map((row, index) => `<li><span class="wc-order-pos">${index + 1}.</span><span>${esc(row)}</span></li>`).join("")}
+              ${beat.order.map((row, index) => `<li><span class="wc-order-pos">${index + 1}.</span><span>${esc(row)}</span></li>`).join('')}
             </ol>
           </section>
         </div>
         <aside class="wc-rail">
           <div class="wc-rail-card">
-            <div class="wc-rail-label">Event feed</div>
+            <div class="wc-rail-label">Key moments</div>
             <div class="wc-feed">
-              ${beat.feed.map(item => `<div class="wc-feed-item">${esc(item)}</div>`).join("")}
+              ${beat.feed.map(item => `<div class="wc-feed-item">${esc(item)}</div>`).join('')}
             </div>
           </div>
           <div class="wc-rail-card">
-            <div class="wc-rail-label">Mode feel</div>
-            <div class="wc-rail-copy">Race-control / leaderboard playback first. Event rhythm beats deep stats in v1.</div>
+            <div class="wc-rail-label">Winner</div>
+            <div class="wc-rail-value">${result?.winner ? esc(result.winner) : 'Result pending'}</div>
           </div>
         </aside>
       </div>
@@ -438,70 +735,58 @@ function renderReplayMode(track) {
   `;
 }
 
-function defaultWeekendMode(track) {
-  const replay = replayDataFor(track);
-  if (track.status === "done" && replay) return "replay";
-  return "schedule";
-}
-
-function currentRoundTrack() {
-  return bySlug[appDataMeta.current_round_slug]
-    || TRACKS.find(track => track.status === "active")
-    || bySlug[appDataMeta.last_completed_round_slug]
-    || reportTracks.find(track => track.status !== "done")
-    || reportTracks[0]
-    || null;
-}
-
-function currentRoundSummary(track) {
-  const groups = scheduleDataFor(track);
-  const flat = groups.flatMap(group => group.items);
-  const liveNow = flat.find(item => item.status === "live") || null;
-  const nextUp = flat.find(item => item.status === "upcoming") || null;
-  if (liveNow) return { label: "Live now", value: liveNow.label };
-  if (nextUp) return { label: "Next up", value: nextUp.label };
-  if (track.status === "done") return { label: "Replay", value: "Weekend complete" };
-  return { label: "Status", value: "Weekend details loading" };
-}
-
-function renderHomeCurrentRaceCard(track) {
-  const statusLabel = track.status === "active" ? "Current round" : track.status === "done" ? "Latest completed round" : "Next round";
-  const summary = currentRoundSummary(track);
+function renderLiveMode(track) {
   return `
-    <section class="current-round-card" id="current-round-card">
-      <div class="crc-head">
-        <div>
-          <div class="tag">${statusLabel}</div>
-          <h2>${esc(track.gp)}</h2>
-        </div>
-        <div class="crc-badge crc-badge-${track.status}">${esc(track.status)}</div>
+    <div class="wc-live-grid">
+      <div class="wc-main">
+        <section class="wc-panel" id="wc-live-shell">
+          <div class="wc-empty">
+            <strong>Loading live weekend data…</strong>
+            <p>Checking the latest OpenF1 session for this circuit.</p>
+          </div>
+        </section>
       </div>
-      <p class="crc-copy">Jump straight into the track page for the race weekend that matters most right now. The chronological grid stays untouched below.</p>
-      <div class="crc-grid">
-        <div class="crc-card">
-          <div class="crc-label">Circuit</div>
-          <div class="crc-value">${esc(track.title)}</div>
+      <aside class="wc-rail">
+        <div class="wc-rail-card">
+          <div class="wc-rail-label">Weekend view</div>
+          <div class="wc-rail-copy">Live timing, next session, and race control sit directly on the circuit page now.</div>
         </div>
-        <div class="crc-card">
-          <div class="crc-label">Date</div>
-          <div class="crc-value">${esc(track.date)} ${SEASON}</div>
-        </div>
-        <div class="crc-card">
-          <div class="crc-label">${esc(summary.label)}</div>
-          <div class="crc-value">${esc(summary.value)}</div>
-        </div>
-      </div>
-      <div class="crc-actions">
-        <a class="crc-link" href="#/${track.slug}">Open current race page →</a>
-        <a class="crc-link is-muted" href="./live-tracker.html">Open live tracker companion →</a>
-      </div>
-    </section>
+      </aside>
+    </div>
+  `;
+}
+
+function defaultWeekendMode(track) {
+  if (track.slug === (currentRoundTrack() || {}).slug && track.status === 'active') return 'live';
+  if (track.status === 'done' && replayDataFor(track)) return 'replay';
+  return 'schedule';
+}
+
+function weekendTabsFor(track) {
+  const state = ensureWeekendState(track.slug);
+  const liveEnabled = track.slug === (currentRoundTrack() || {}).slug;
+  const replayEnabled = !!replayDataFor(track);
+  return `
+    <div class="wc-toggle" role="tablist" aria-label="Weekend Center mode">
+      <button class="wc-tab${state.mode === 'schedule' ? ' is-active' : ''}" data-mode="schedule">Schedule</button>
+      <button class="wc-tab${state.mode === 'live' ? ' is-active' : ''}" data-mode="live" ${liveEnabled ? '' : 'disabled'}>Live</button>
+      <button class="wc-tab${state.mode === 'replay' ? ' is-active' : ''}" data-mode="replay" ${replayEnabled ? '' : 'disabled'}>Replay</button>
+    </div>
   `;
 }
 
 function renderWeekendCenter(track) {
   const state = ensureWeekendState(track.slug);
   if (!state.mode) state.mode = defaultWeekendMode(track);
+  if (state.mode === 'live' && track.slug !== (currentRoundTrack() || {}).slug) state.mode = 'schedule';
+  if (state.mode === 'replay' && !replayDataFor(track)) state.mode = track.status === 'active' ? 'live' : 'schedule';
+
+  const body = state.mode === 'live'
+    ? renderLiveMode(track)
+    : state.mode === 'replay'
+      ? renderReplayMode(track)
+      : renderScheduleMode(track);
+
   return `
     <section class="card weekend-center" id="weekend-center" data-slug="${track.slug}">
       <div class="wc-head">
@@ -509,20 +794,154 @@ function renderWeekendCenter(track) {
           <div class="tag">Weekend Center</div>
           <h2>${esc(track.gp)} weekend</h2>
         </div>
-        <div class="wc-toggle" role="tablist" aria-label="Weekend Center mode">
-          <button class="wc-tab${state.mode === 'schedule' ? ' is-active' : ''}" data-mode="schedule">Schedule</button>
-          <button class="wc-tab${state.mode === 'replay' ? ' is-active' : ''}" data-mode="replay">Replay</button>
-        </div>
+        ${weekendTabsFor(track)}
       </div>
-      <div class="wc-body" id="weekend-center-body">
-        ${state.mode === 'replay' ? renderReplayMode(track) : renderScheduleMode(track)}
-      </div>
+      <div class="wc-body">${body}</div>
     </section>
   `;
 }
 
+async function hydrateLiveMode(track) {
+  const shell = document.getElementById('wc-live-shell');
+  if (!shell) return;
+
+  try {
+    const sessions = await fetchWeekendJson('https://api.openf1.org/v1/sessions?meeting_key=latest');
+    const matching = (sessions || []).filter(session => matchWeekendCircuitSlug(session) === track.slug);
+    const now = Date.now();
+    const current = matching.find(session => {
+      const start = new Date(session.date_start).getTime();
+      const end = new Date(session.date_end).getTime();
+      return start <= now && end >= now;
+    });
+    const next = matching.filter(session => new Date(session.date_start).getTime() > now)
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))[0] || null;
+    const latestCompleted = matching.filter(session => new Date(session.date_end).getTime() < now)
+      .sort((a, b) => new Date(b.date_end) - new Date(a.date_end))[0] || null;
+    const chosen = current || latestCompleted || next || matching[0] || null;
+
+    if (!chosen) {
+      shell.innerHTML = `
+        <div class="wc-empty">
+          <strong>No current Silverstone session feed.</strong>
+          <p>OpenF1 is not returning a matching session for this circuit right now.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const sessionState = classifyWeekendSessionState(chosen);
+    const [driversRes, positionsRes, intervalsRes, controlRes] = await Promise.allSettled([
+      fetchWeekendJson(`https://api.openf1.org/v1/drivers?session_key=${chosen.session_key}`),
+      fetchWeekendJson(`https://api.openf1.org/v1/position?session_key=${chosen.session_key}`),
+      fetchWeekendJson(`https://api.openf1.org/v1/intervals?session_key=${chosen.session_key}`),
+      fetchWeekendJson(`https://api.openf1.org/v1/race_control?session_key=${chosen.session_key}`)
+    ]);
+
+    const drivers = driversRes.status === 'fulfilled' ? driversRes.value : [];
+    const positions = positionsRes.status === 'fulfilled' ? positionsRes.value : [];
+    const intervals = intervalsRes.status === 'fulfilled' ? intervalsRes.value : [];
+    const messages = controlRes.status === 'fulfilled' ? controlRes.value : [];
+
+    const driverByNumber = new Map((drivers || []).map(driver => [driver.driver_number, driver]));
+    const latestPositions = Array.from(latestWeekendByDriver(positions).values())
+      .sort((a, b) => (a.position || 999) - (b.position || 999))
+      .slice(0, 8);
+    const latestIntervals = latestWeekendByDriver(intervals);
+    const recentMessages = (messages || []).slice().sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 6);
+
+    const nextLabel = next ? `${next.session_name} · ${new Intl.DateTimeFormat('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(next.date_start))}` : 'No further session published';
+
+    shell.innerHTML = `
+      <div class="wc-live-hero">
+        <div class="wc-live-top">
+          <div>
+            <div class="wc-kicker">Live session</div>
+            <h3>${esc(chosen.session_name)} · ${esc(chosen.circuit_short_name || chosen.meeting_name || track.title)}</h3>
+          </div>
+          <div class="live-state-badge ${sessionState}">${esc(sessionState)}</div>
+        </div>
+        <div class="wc-kpi-grid">
+          <div class="wc-live-kpi">
+            <div class="crc-label">Start</div>
+            <div class="wc-kpi-value">${liveFormatLocal(chosen.date_start)}</div>
+          </div>
+          <div class="wc-live-kpi">
+            <div class="crc-label">End</div>
+            <div class="wc-kpi-value">${liveFormatLocal(chosen.date_end)}</div>
+          </div>
+          <div class="wc-live-kpi">
+            <div class="crc-label">Next session</div>
+            <div class="wc-kpi-value">${esc(nextLabel)}</div>
+          </div>
+        </div>
+      </div>
+      <div class="wc-body-grid">
+        <div class="wc-main">
+          <section class="wc-panel">
+            <div class="wc-day-head"><strong>Running order</strong><span>${latestPositions.length ? `${latestPositions.length} drivers` : 'Timing pending'}</span></div>
+            ${latestPositions.length ? `
+              <table class="wc-live-table">
+                <thead><tr><th>Pos</th><th>Driver</th><th>Team</th><th>Interval</th></tr></thead>
+                <tbody>
+                  ${latestPositions.map(row => {
+                    const driver = driverByNumber.get(row.driver_number) || {};
+                    const teamColour = `#${driver.team_colour || '7d8593'}`;
+                    return `
+                      <tr>
+                        <td class="wc-live-time">P${row.position}</td>
+                        <td class="wc-live-driver"><span class="wc-live-teambar" style="background:${teamColour}"></span><strong>${driver.name_acronym || row.driver_number}</strong> <span class="wc-live-meta">#${row.driver_number}</span></td>
+                        <td>${esc(driver.team_name || 'Unknown team')}</td>
+                        <td class="wc-live-time">${formatWeekendInterval(latestIntervals.get(row.driver_number), row.position)}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            ` : `<div class="wc-live-empty">Timing rows aren’t published for this session yet.</div>`}
+          </section>
+        </div>
+        <aside class="wc-rail">
+          <div class="wc-rail-card">
+            <div class="wc-rail-label">Race control</div>
+            <div class="wc-feed">
+              ${recentMessages.length ? recentMessages.map(message => `
+                <div class="wc-feed-item">
+                  <div class="wc-live-top">
+                    <span class="wc-live-chip ${message.category ? liveChipClass(message.category) : 'other'}">${esc(message.category || 'update')}</span>
+                    ${message.flag ? `<span class="wc-live-chip flag">${esc(message.flag)}</span>` : ''}
+                    ${message.lap_number ? `<span class="wc-live-time">Lap ${message.lap_number}</span>` : ''}
+                  </div>
+                  <div>${esc(message.message || 'No message text provided.')}</div>
+                </div>
+              `).join('') : '<div class="wc-live-empty">No race-control messages are published for this session yet.</div>'}
+            </div>
+          </div>
+          <div class="wc-rail-card">
+            <div class="wc-rail-label">Extra surface</div>
+            <a class="wc-secondary-link" href="./live-tracker.html">Open standalone live tracker →</a>
+          </div>
+        </aside>
+      </div>
+    `;
+
+    const state = ensureWeekendState(track.slug);
+    if (state.mode === 'live') {
+      clearWeekendTimer(track.slug);
+      state.timer = window.setInterval(() => hydrateLiveMode(track), LIVE_REFRESH_MS);
+    }
+  } catch (error) {
+    shell.innerHTML = `
+      <div class="wc-empty">
+        <strong>Live feed unavailable.</strong>
+        <p>${esc(error.message || 'OpenF1 did not respond cleanly just now.')}</p>
+      </div>
+    `;
+  }
+}
+
 function stopReplay(track) {
-  clearWeekendReplayTimer(track.slug);
+  clearWeekendTimer(track.slug);
 }
 
 function replayTick(track) {
@@ -537,7 +956,7 @@ function startReplay(track) {
   const replay = replayDataFor(track);
   const state = ensureWeekendState(track.slug);
   if (!replay) return;
-  clearWeekendReplayTimer(track.slug);
+  clearWeekendTimer(track.slug);
   state.timer = window.setInterval(() => replayTick(track), Math.max(700, 1800 / state.speed));
 }
 
@@ -548,6 +967,8 @@ function mountWeekendCenter(slug) {
   const meta = view && view.querySelector('.meta');
   if (!view || !meta) return;
 
+  clearWeekendTimer(track.slug);
+
   const existing = document.getElementById('weekend-center');
   if (existing) existing.remove();
   meta.insertAdjacentHTML('afterend', renderWeekendCenter(track));
@@ -556,10 +977,10 @@ function mountWeekendCenter(slug) {
   if (!center) return;
   center.addEventListener('click', event => {
     const tab = event.target.closest('[data-mode]');
-    if (tab) {
+    if (tab && !tab.hasAttribute('disabled')) {
       const state = ensureWeekendState(track.slug);
       state.mode = tab.dataset.mode;
-      if (state.mode !== 'replay') stopReplay(track);
+      if (state.mode !== 'replay') clearWeekendTimer(track.slug);
       mountWeekendCenter(track.slug);
       return;
     }
@@ -570,16 +991,16 @@ function mountWeekendCenter(slug) {
       const replay = replayDataFor(track);
       if (!replay) return;
       if (action.dataset.action === 'prev') {
-        stopReplay(track);
+        clearWeekendTimer(track.slug);
         state.beat = Math.max(0, state.beat - 1);
       } else if (action.dataset.action === 'next') {
-        stopReplay(track);
+        clearWeekendTimer(track.slug);
         state.beat = Math.min(replay.beats.length - 1, state.beat + 1);
       } else if (action.dataset.action === 'play') {
         startReplay(track);
         return;
       } else if (action.dataset.action === 'pause') {
-        stopReplay(track);
+        clearWeekendTimer(track.slug);
       }
       mountWeekendCenter(track.slug);
       return;
@@ -589,7 +1010,7 @@ function mountWeekendCenter(slug) {
     if (speed) {
       const state = ensureWeekendState(track.slug);
       state.speed = Number(speed.dataset.speed || 1);
-      stopReplay(track);
+      clearWeekendTimer(track.slug);
       mountWeekendCenter(track.slug);
     }
   });
@@ -597,11 +1018,15 @@ function mountWeekendCenter(slug) {
   center.addEventListener('input', event => {
     if (event.target.matches('.wc-scrubber')) {
       const state = ensureWeekendState(track.slug);
-      stopReplay(track);
+      clearWeekendTimer(track.slug);
       state.beat = Number(event.target.value || 0);
       mountWeekendCenter(track.slug);
     }
   });
+
+  if (ensureWeekendState(track.slug).mode === 'live') {
+    hydrateLiveMode(track);
+  }
 }
 
 function mountHomeCurrentRaceCard() {
@@ -625,7 +1050,7 @@ function syncWeekendSurfaces() {
 }
 
 window.addEventListener('hashchange', () => {
-  Object.keys(weekendEnhancementState).forEach(clearWeekendReplayTimer);
+  Object.keys(weekendEnhancementState).forEach(clearWeekendTimer);
   window.setTimeout(syncWeekendSurfaces, 0);
 });
 
