@@ -4,7 +4,7 @@
 
 ![Launch](https://img.shields.io/badge/Launch-F1_Racetracks-red?style=for-the-badge)
 
-**Status:** v5 live · runtime rescued · live tracker companion shipped · Weekend Center + homepage current-round highlight in review on [PR #22](https://github.com/mawizorek/ClickUp_apps/pull/22)
+**Status:** V1.5 PR22 live · runtime rescued · main-app Weekend Center + current round highlight shipped · live tracker companion active
 
 **Source of truth:** this repo folder
 
@@ -14,7 +14,7 @@
 
 F1 Racetracks is a browser app for the 2026 Formula 1 circuit breakdowns. It gives you a home grid of rounds, per-circuit detail views, completed-race panels, winners history, live weather, and an OpenF1-backed live-session slice inside the main app.
 
-The current branch-in-review extends that direction by moving the race-weekend calendar/replay layer into the **main app itself** and adding a **homepage current-round highlight card** so the most relevant weekend is one tap away without disturbing the lower chronological list.
+The current live build extends that direction by moving the race-weekend calendar/replay layer into the **main app itself** and adding a **homepage current-round highlight card** so the most relevant weekend is one tap away without disturbing the lower chronological list.
 
 It also ships a separate live-tracking companion page for broader session monitoring.
 
@@ -52,18 +52,20 @@ It also ships a separate live-tracking companion page for broader session monito
 ### Interaction / rendering notes
 
 - Hash routing drives the main app (`#/` for home, `#/slug` for circuit views).
-- The main circuit experience already integrates the first live-session panel directly into matching race pages.
-- The current branch-in-review adds a **Weekend Center** layer to the main circuit flow and a **current-round highlight card** to the homepage.
-- Shared helpers such as lap-profile rendering, weather loading, footer export behavior, and the new Weekend Center/home-highlight injection keep the track views consistent.
+- The main circuit experience integrates a live-session panel directly into matching race pages.
+- V1.5 PR22 adds a **Weekend Center** layer to the main circuit flow and a **current-round highlight card** to the homepage.
+- Shared helpers such as lap-profile rendering, weather loading, footer export behavior, and the Weekend Center/home-highlight injection keep the track views consistent.
+- The live footer/build label now carries the shipped app version plus PR reference so the deployed page can be tracked during smaller iterative updates.
 
 ### Budget note
 
 - Semantic source files target ~10–12 KB and split at ~15 KB unless an exception is explicitly approved.
 - `source/10_track_views_and_profile.js` remains an existing oversized module.
-- `source/11_weather_and_footer_exports.js` is now also a budget-risk file in the Weekend Center branch and should be split on the next cleanup pass.
+- `source/11_weather_and_footer_exports.js` is now also a budget-risk file after the Weekend Center/home-highlight pass and should be split on the next cleanup pass.
 
 ## Version history
 
+- **V1.5 PR22** — added the main-app Weekend Center, the homepage current-round highlight card, and the live footer/build labeling convention.
 - **v5** — integrated the live session panel into the main app, externalized runtime data into `data.json`, aligned the repo/source/task surfaces, and kept the standalone live tracker companion.
 - **v4** — shipped the full standalone circuit breakdown app as the stable pre-repo artifact baseline.
 
@@ -76,7 +78,7 @@ It also ships a separate live-tracking companion page for broader session monito
 
 ## Roadmap
 
-- review / merge the main-app Weekend Center + homepage current-round highlight pass in [PR #22](https://github.com/mawizorek/ClickUp_apps/pull/22)
 - seed explicit per-session timed schedule rows into `data.json`
 - enrich replay density once the first playback feel is judged
 - split the newly overweight source files after the Weekend Center branch stabilizes
+- continue the footer/build-label convention for future app iterations so live Pages states stay traceable

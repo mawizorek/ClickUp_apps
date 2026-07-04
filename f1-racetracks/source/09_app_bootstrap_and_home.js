@@ -6,7 +6,7 @@
    ...TRACK_DATA_ROUNDS_14_24
  */
 
-const APP_VERSION = "v5";
+const APP_VERSION = "V1.5 PR22";
 const APP_DATE = "2026-07-03";
 const SEASON = "2026";
 const CACHE_KEY = "f1-racetracks-data-cache-v5";
@@ -138,7 +138,7 @@ function renderDataUnavailable(error) {
       </div>
     </div>
   `;
-  document.getElementById("foot-meta").textContent = "F1 Racetracks v5 · data unavailable";
+  document.getElementById("foot-meta").textContent = "F1 Racetracks V1.5 PR22 · data unavailable";
   console.error(error);
 }
 
