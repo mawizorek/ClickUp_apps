@@ -1,0 +1,4 @@
+# Repo-wide default: keep personal tools out of search engines.
+# Belt to the per-app <meta name="robots" content="noindex"> suspenders.
+User-agent: *
+Disallow: /

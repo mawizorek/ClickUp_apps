@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- =================================================================== -->
+<!--  STANDARD APP HEAD  ·  copy this whole block into every new app.      -->
+<!--  Tier 1 = mandatory, never trim. Tier 2 = default-on; trim ONLY if    -->
+<!--  header weight is a real problem on a tiny app (rare). Replace every   -->
+<!--  <app-slug> and "App Name" placeholder.                                -->
+<!-- =================================================================== -->
+
+<!-- ---- TIER 1 : MANDATORY ------------------------------------------- -->
+
+<!-- responsive + notch-safe (pairs with env(safe-area-inset-*) padding) -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- colors the browser / iOS status-bar chrome to match the app -->
+<meta name="theme-color" content="#0a0a0f">
+
+<!-- keep private tools out of search engines (robots.txt at root is the belt) -->
+<meta name="robots" content="noindex, nofollow">
+
+<!-- title + description: unfurlers & screen readers read these first -->
+<title>App Name</title>
+<meta name="description" content="One tight sentence describing what the app does.">
+
+<!-- Open Graph : iMessage / Slack / Discord link previews. og:image MUST be
+     an absolute URL to a real committed raster PNG (~1200x630). -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="App Name">
+<meta property="og:description" content="One tight sentence describing what the app does.">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/<app-slug>/">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/<app-slug>/og.png">
+
+<!-- Twitter/X card (Slack & Discord read these too) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="App Name">
+<meta name="twitter:description" content="One tight sentence describing what the app does.">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/<app-slug>/og.png">
+
+<!-- favicon: inline emoji SVG = zero committed file, works offline. Swap glyph. -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#129513;</text></svg>">
+
+<!-- ---- TIER 2 : DEFAULT-ON (trimmable only if header bloat is real) -- -->
+
+<!-- PWA install: add-to-home-screen with a real name + icon.
+     Needs manifest.webmanifest + icon.svg (or PNGs) in the app folder. -->
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="App">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+  /* Tier 2 accessibility polish -------------------------------------- */
+  :focus-visible { outline: 2px solid #5eb3e6; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================================== -->
+<!--  ACCESS GATE  ·  paste as the FIRST child of <body>.                -->
+<!--  Reads ./config.json { access, code, ...messages }.                 -->
+<!--    open  = app shows, gate removed.                                 -->
+<!--    gated = smokescreen cover; correct code lifts it for the session. -->
+<!--    down  = cover with no way through (hard kill switch).             -->
+<!--  Cosmetic soft-lock by design: source is public, no PII in apps.     -->
+<!-- ================================================================== -->
+<div id="access-gate" hidden style="position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#0a0a0f;padding:24px;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif">
+  <div style="max-width:340px;text-align:center;color:#e6e7ea">
+    <h1 id="gate-title" style="font-size:1.25rem;font-weight:800;margin:0 0 8px"></h1>
+    <p id="gate-msg" style="font-size:.9rem;color:#9aa0a8;line-height:1.5;margin:0 0 20px"></p>
+    <form id="gate-form" style="display:flex;gap:8px;justify-content:center">
+      <input id="gate-code" inputmode="numeric" autocomplete="off" aria-label="Access code" placeholder="code" style="flex:1;max-width:160px;padding:10px 12px;border-radius:8px;border:1px solid #2a2d34;background:#15171c;color:#e6e7ea;font-size:1rem">
+      <button type="submit" style="padding:10px 16px;border-radius:8px;border:none;background:#5eb3e6;color:#0a0a0f;font-weight:700;cursor:pointer">Enter</button>
+    </form>
+  </div>
+</div>
+
+<noscript style="display:block;padding:24px;text-align:center;font-family:system-ui;color:#333">
+  This app needs JavaScript enabled to run.
+</noscript>
+
+<!-- ...your app markup here... -->
+
+<script>
+(function () {
+  // Inline fallback so the gate still works on file:// or if config 404s.
+  var FALLBACK = { access: "gated", code: "0000",
+    coverTitle: "Under maintenance", coverMessage: "This app is being updated. Check back soon.",
+    downTitle: "Temporarily offline", downMessage: "This app is currently unavailable." };
+  var SS_KEY = "gate_ok";
+
+  function apply(cfg) {
+    var gate = document.getElementById("access-gate");
+    if (cfg.access === "open" || sessionStorage.getItem(SS_KEY) === "1") { gate.remove(); return; }
+    gate.hidden = false;
+    var form = document.getElementById("gate-form");
+    if (cfg.access === "down") {
+      document.getElementById("gate-title").textContent = cfg.downTitle || FALLBACK.downTitle;
+      document.getElementById("gate-msg").textContent = cfg.downMessage || FALLBACK.downMessage;
+      form.style.display = "none";
+      return;
+    }
+    document.getElementById("gate-title").textContent = cfg.coverTitle || FALLBACK.coverTitle;
+    document.getElementById("gate-msg").textContent = cfg.coverMessage || FALLBACK.coverMessage;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (document.getElementById("gate-code").value.trim() === String(cfg.code)) {
+        sessionStorage.setItem(SS_KEY, "1"); gate.remove();
+      } else {
+        var c = document.getElementById("gate-code"); c.value = ""; c.focus();
+      }
+    });
+    var el = document.getElementById("gate-code"); if (el) el.focus();
+  }
+
+  fetch("./config.json", { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+    .then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); })
+    .catch(function () {
+      var cached = null; try { cached = JSON.parse(localStorage.getItem("app_config")); } catch (e) {}
+      apply(cached || FALLBACK);
+    });
+})();
+</script>
+</body>
+</html>

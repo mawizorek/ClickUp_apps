@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0b10">
+<meta name="robots" content="noindex, nofollow">
+<title>Polish Standard Demo</title>
+<meta name="description" content="A living reference of the app-build polish standard, wired into its own head.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Polish Standard Demo">
+<meta property="og:description" content="A living reference of the app-build polish standard, wired into its own head.">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/polish-demo/">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/polish-demo/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Polish Standard Demo">
+<meta name="twitter:description" content="A living reference of the app-build polish standard.">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/polish-demo/og.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9989;</text></svg>">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Polish">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+  :root{
+    --bg:oklch(13% 0.02 265);--surface:oklch(18% 0.022 265);--surface-2:oklch(22% 0.024 265);
+    --line:oklch(30% 0.02 265);--text:oklch(94% 0.008 265);--mid:oklch(74% 0.02 265);
+    --dim:oklch(58% 0.02 265);--accent:oklch(72% 0.13 268);--ok:oklch(76% 0.15 155);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100svh;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+  .wrap{max-width:620px;margin:0 auto;padding:clamp(28px,6vw,56px) 18px 72px}
+  .kick{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  h1{font-size:clamp(1.7rem,6vw,2.4rem);font-weight:900;letter-spacing:-.03em;line-height:1.05;margin-bottom:14px}
+  .lede{font-size:.98rem;color:var(--mid);line-height:1.6;margin-bottom:8px}
+  .lede b{color:var(--text)}
+  h2{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:44px 0 16px}
+  .row{display:flex;gap:13px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .tick{flex-shrink:0;width:22px;height:22px;border-radius:6px;background:oklch(76% 0.15 155 / .16);color:var(--ok);display:grid;place-items:center;font-size:.8rem;margin-top:1px}
+  .rt b{font-size:.92rem;font-weight:650;display:block;margin-bottom:2px}
+  .rt span{font-size:.83rem;color:var(--mid);line-height:1.5}
+  .states{display:grid;gap:10px;margin-top:4px}
+  .st{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface)}
+  .st h3{font-size:.9rem;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+  .st code{font-family:ui-monospace,'SF Mono',monospace;font-size:.72rem;background:var(--surface-2);color:var(--accent);padding:2px 7px;border-radius:5px}
+  .st p{font-size:.83rem;color:var(--mid);line-height:1.5}
+  .live{margin-top:40px;border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--surface)}
+  .live h3{font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+  .live .grid{display:grid;grid-template-columns:auto 1fr;gap:9px 16px;font-size:.85rem}
+  .live .k{color:var(--dim)}.live .v{color:var(--text)}
+  .btn{margin-top:16px;width:100%;padding:12px;border:none;border-radius:10px;background:var(--accent);color:oklch(15% 0.02 265);font-weight:700;font-size:.9rem;cursor:pointer;transition:transform 140ms cubic-bezier(.2,.8,.2,1)}
+  .btn:active{transform:scale(.985)}
+  footer{margin-top:48px;text-align:center;font-size:.72rem;color:var(--dim)}
+  #gate{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:oklch(10% 0.02 265);padding:24px}
+  #gate .card{max-width:360px;width:100%;text-align:center}
+  #gate .ic{font-size:2.4rem;margin-bottom:14px}
+  #gate h1{font-size:1.35rem;font-weight:800;margin-bottom:8px;letter-spacing:-.02em}
+  #gate p{font-size:.92rem;color:var(--mid);line-height:1.55;margin-bottom:22px}
+  #gate form{display:flex;gap:9px;justify-content:center}
+  #gate input{flex:1;max-width:170px;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:1.05rem;text-align:center;letter-spacing:.2em}
+  #gate button{padding:12px 18px;border:none;border-radius:10px;background:var(--accent);color:oklch(15% 0.02 265);font-weight:700;cursor:pointer}
+  #gate.err input{border-color:oklch(64% 0.2 25);animation:sh .3s}
+  @keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+</style>
+</head>
+<body>
+
+<div id="gate" hidden>
+  <div class="card">
+    <div class="ic">&#128736;</div>
+    <h1 id="gt"></h1>
+    <p id="gm"></p>
+    <form id="gf">
+      <input id="gc" inputmode="numeric" autocomplete="off" aria-label="Access code" placeholder="code">
+      <button type="submit">Enter</button>
+    </form>
+  </div>
+</div>
+
+<noscript><div style="padding:24px;text-align:center">This app needs JavaScript enabled.</div></noscript>
+
+<main class="wrap">
+  <div class="kick">App Build Standard · v1</div>
+  <h1>The invisible polish every app now ships with.</h1>
+  <p class="lede">You're past the gate, which means the <b>3-state access layer</b> just worked. Everything below is baked into <b>this file's own head</b>, so the demo is a working example of the standard it documents.</p>
+
+  <h2>Tier 1 &middot; mandatory head</h2>
+  <div class="list">
+    <div class="row"><span class="tick">&#10003;</span><div class="rt"><b>theme-color</b><span>Browser and iOS chrome tint to match the app. Feels native instantly.</span></div></div>
+    <div class="row"><span class="tick">&#10003;</span><div class="rt"><b>Open Graph + Twitter cards</b><span>Rich link previews in iMessage, Slack, Discord. Absolute og:image URL required.</span></div></div>
+    <div class="row"><span class="tick">&#10003;</span><div class="rt"><b>Emoji-SVG favicon</b><span>Inline data URI. Zero committed file, works offline. Check your browser tab.</span></div></div>
+    <div class="row"><span class="tick">&#10003;</span><div class="rt"><b>noindex + description + lang</b><span>Out of Google, readable by unfurlers and screen readers.</span></div></div>
+    <div class="row"><span class="tick">&#10003;</span><div class="rt"><b>viewport-fit=cover</b><span>Pairs with safe-area padding so the notch and home bar never clip content.</span></div></div>
+  </div>
+
+  <h2>Tier 2 &middot; default-on, trimmable</h2>
+  <div class="list">
+    <div class="row"><span class="tick">&#10003;</span><div class="rt"><b>PWA install</b><span>Add-to-home-screen with a real name and icon via manifest. Try it from your browser menu.</span></div></div>
+    <div class="row"><span class="tick">&#10003;</span><div class="rt"><b>prefers-reduced-motion guard</b><span>Respects the OS accessibility setting. No motion sickness.</span></div></div>
+    <div class="row"><span class="tick">&#10003;</span><div class="rt"><b>focus-visible + noscript</b><span>Clean keyboard focus rings; a friendly message instead of a blank void.</span></div></div>
+  </div>
+
+  <h2>The 3-state access layer</h2>
+  <div class="states">
+    <div class="st"><h3>Open <code>access: open</code></h3><p>App shows to everyone with the link. Fully public.</p></div>
+    <div class="st"><h3>Gated <code>access: gated</code></h3><p>The smokescreen you just cleared. A per-app code lifts the cover for the session. Default posture.</p></div>
+    <div class="st"><h3>Down <code>access: down</code></h3><p>Cover with no way through. The hard kill switch: flip it, one-line commit, every copy goes dark.</p></div>
+  </div>
+
+  <div class="live">
+    <h3>Live runtime readout</h3>
+    <div class="grid">
+      <span class="k">Access state</span><span class="v" id="r-acc">&mdash;</span>
+      <span class="k">Config source</span><span class="v" id="r-src">&mdash;</span>
+      <span class="k">Viewport</span><span class="v" id="r-vp">&mdash;</span>
+      <span class="k">Standalone (installed)</span><span class="v" id="r-pwa">&mdash;</span>
+      <span class="k">Reduced motion</span><span class="v" id="r-rm">&mdash;</span>
+    </div>
+    <button class="btn" id="relock">Re-lock this session (test the gate again)</button>
+  </div>
+
+  <footer>polish-demo &middot; v1 &middot; 2026-07-04 &middot; flip config.json to change access anytime</footer>
+</main>
+
+<script>
+(function(){
+  var FALLBACK={access:"gated",code:"2026",coverTitle:"Heads up, this one's mid-build",coverMessage:"This app is being updated right now. Check back soon.",downTitle:"Temporarily offline",downMessage:"This app is currently unavailable."};
+  var SS="gate_ok",src="inline fallback";
+  function readout(cfg){
+    document.getElementById("r-acc").textContent=cfg.access;
+    document.getElementById("r-src").textContent=src;
+    document.getElementById("r-vp").textContent=window.innerWidth+"×"+window.innerHeight;
+    document.getElementById("r-pwa").textContent=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)?"yes":"no (browser tab)";
+    document.getElementById("r-rm").textContent=(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)?"on":"off";
+  }
+  function apply(cfg){
+    var g=document.getElementById("gate");
+    if(cfg.access==="open"||sessionStorage.getItem(SS)==="1"){g.remove();readout(cfg);return;}
+    g.hidden=false;var f=document.getElementById("gf");
+    if(cfg.access==="down"){document.getElementById("gt").textContent=cfg.downTitle||FALLBACK.downTitle;document.getElementById("gm").textContent=cfg.downMessage||FALLBACK.downMessage;f.style.display="none";return;}
+    document.getElementById("gt").textContent=cfg.coverTitle||FALLBACK.coverTitle;
+    document.getElementById("gm").textContent=cfg.coverMessage||FALLBACK.coverMessage;
+    var el=document.getElementById("gc");el.focus();
+    f.addEventListener("submit",function(e){e.preventDefault();
+      if(el.value.trim()===String(cfg.code)){sessionStorage.setItem(SS,"1");g.remove();readout(cfg);}
+      else{g.classList.add("err");el.value="";el.focus();setTimeout(function(){g.classList.remove("err");},350);}
+    });
+  }
+  document.getElementById("relock").addEventListener("click",function(){sessionStorage.removeItem(SS);location.reload();});
+  fetch("./config.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(cfg){src="config.json (live)";try{localStorage.setItem("app_config",JSON.stringify(cfg));}catch(e){}apply(cfg);})
+    .catch(function(){var c=null;try{c=JSON.parse(localStorage.getItem("app_config"));}catch(e){}if(c)src="localStorage cache";apply(c||FALLBACK);});
+})();
+</script>
+</body>
+</html>

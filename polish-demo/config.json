@@ -1,0 +1,9 @@
+{
+  "access": "gated",
+  "code": "2026",
+  "coverTitle": "Heads up, this one's mid-build",
+  "coverMessage": "This app is being updated right now. Check back soon.",
+  "downTitle": "Temporarily offline",
+  "downMessage": "This app is currently unavailable.",
+  "version": "2026-07-04"
+}
