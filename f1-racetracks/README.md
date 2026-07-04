@@ -4,7 +4,7 @@
 
 ![Launch](https://img.shields.io/badge/Launch-F1_Racetracks-red?style=for-the-badge)
 
-**Status:** v5 live · main app + live tracker companion shipped · repo/task/source docs aligned in this close-out pass
+**Status:** v5 live · runtime rescued · live tracker companion shipped · Weekend Center + homepage current-round highlight in review on [PR #22](https://github.com/mawizorek/ClickUp_apps/pull/22)
 
 **Source of truth:** this repo folder
 
@@ -13,6 +13,8 @@
 ## What it does
 
 F1 Racetracks is a browser app for the 2026 Formula 1 circuit breakdowns. It gives you a home grid of rounds, per-circuit detail views, completed-race panels, winners history, live weather, and an OpenF1-backed live-session slice inside the main app.
+
+The current branch-in-review extends that direction by moving the race-weekend calendar/replay layer into the **main app itself** and adding a **homepage current-round highlight card** so the most relevant weekend is one tap away without disturbing the lower chronological list.
 
 It also ships a separate live-tracking companion page for broader session monitoring.
 
@@ -44,19 +46,21 @@ It also ships a separate live-tracking companion page for broader session monito
 ### Source model
 
 - `source/` is the canonical repo-managed shell/style/logic companion for future edits.
-- The older grouped round-band source data files have been retired from `source/`; runtime data now lives in `data.json`.
+- The older grouped round-band source data files have **not** been fully retired yet; the current rescued runtime still depends on the grouped manifest source files listed in `data.json`.
 - Agents should start from `source/source_index.md` for shell/style/logic edits and from `data.json` for data changes.
 
 ### Interaction / rendering notes
 
 - Hash routing drives the main app (`#/` for home, `#/slug` for circuit views).
-- The main circuit experience integrates the first live-session panel directly into matching race pages.
-- Shared helpers such as lap-profile rendering, weather loading, and footer export behavior keep the track views consistent.
+- The main circuit experience already integrates the first live-session panel directly into matching race pages.
+- The current branch-in-review adds a **Weekend Center** layer to the main circuit flow and a **current-round highlight card** to the homepage.
+- Shared helpers such as lap-profile rendering, weather loading, footer export behavior, and the new Weekend Center/home-highlight injection keep the track views consistent.
 
 ### Budget note
 
 - Semantic source files target ~10–12 KB and split at ~15 KB unless an exception is explicitly approved.
-- One documented exception remains in the close-out state: `source/10_track_views_and_profile.js` is still a merged view/profile module and should be the first split target on the next structural touch.
+- `source/10_track_views_and_profile.js` remains an existing oversized module.
+- `source/11_weather_and_footer_exports.js` is now also a budget-risk file in the Weekend Center branch and should be split on the next cleanup pass.
 
 ## Version history
 
@@ -72,6 +76,7 @@ It also ships a separate live-tracking companion page for broader session monito
 
 ## Roadmap
 
-- No active build is queued right now.
-- Future feature work belongs in `next-build-spec.md`.
-- The next structural cleanup target is splitting `source/10_track_views_and_profile.js` when that module is touched again.
+- review / merge the main-app Weekend Center + homepage current-round highlight pass in [PR #22](https://github.com/mawizorek/ClickUp_apps/pull/22)
+- seed explicit per-session timed schedule rows into `data.json`
+- enrich replay density once the first playback feel is judged
+- split the newly overweight source files after the Weekend Center branch stabilizes
