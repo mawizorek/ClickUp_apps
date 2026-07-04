@@ -1,0 +1,31 @@
+{
+  "id": "2026-07-02-2140",
+  "type": "audit",
+  "reportType": "Repo Audit",
+  "ts": "2026-07-02T21:40:00-04:00",
+  "target": "mawizorek/ClickUp_apps @ main",
+  "verdictWord": "Needs attention",
+  "verdictPill": "adjust",
+  "pillText": "4 open",
+  "delta": "baseline",
+  "summary": ".nojekyll just locked in after the Pages stale-build incident. Two over-cap apps still lack renditions, file-chunker was corrupted mid-session, and two root stragglers are sitting in the tree.",
+  "tally": [
+    { "n": 1, "l": "high open", "c": "med" },
+    { "n": 3, "l": "medium open", "c": "low" }
+  ],
+  "findings": [
+    { "num": "01", "sev": "med", "cat": "Straggler", "body": "<code>repo-auditor.md</code> and <code>canary.txt</code> both present and don't belong.", "fix": "Remove both." },
+    { "num": "02", "sev": "med", "cat": "Size budget", "body": "<code>file-chunker</code> corrupted 4x this session via create_or_update_file. Read path clips at ~30KB.", "fix": "Byte-safe upload via UI only; never push over-cap source." },
+    { "num": "03", "sev": "med", "cat": "Size budget", "body": "app-dashboard and world-cup-bracket over soft cap without renditions.", "fix": "Generate /source sets." },
+    { "num": "04", "sev": "low", "cat": "Rendition naming", "body": "Chunk index naming inconsistent across apps.", "fix": "Adopt a single convention." }
+  ],
+  "apps": [
+    { "name": "file-chunker", "size": "107 KB", "dot": "no", "rd": "corrupted this session", "flag": true },
+    { "name": "app-dashboard", "size": "22.8 KB", "dot": "no", "rd": "over soft cap, no rendition", "flag": true },
+    { "name": "budget-code-mapper", "size": "222 KB", "dot": "ok", "rd": "19 / 19 chunks · healthy" }
+  ],
+  "clean": [
+    "<code>.nojekyll</code> newly locked at root",
+    "brain-config structure holding"
+  ]
+}

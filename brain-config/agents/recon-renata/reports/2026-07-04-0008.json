@@ -1,0 +1,41 @@
+{
+  "id": "2026-07-04-0008",
+  "type": "audit",
+  "reportType": "Repo Audit",
+  "ts": "2026-07-04T00:08:00-04:00",
+  "target": "mawizorek/ClickUp_apps @ main",
+  "verdictWord": "Structurally solid",
+  "verdictPill": "solid",
+  "pillText": "2 fixed live",
+  "delta": "2 fixed since last",
+  "summary": ".nojekyll present, brain-config complete, every app folder carries an index.html. The two medium straggler items are already knocked out. What remains is soft-cap and naming hygiene, nothing structural.",
+  "tally": [
+    { "n": 1, "l": "medium open", "c": "med" },
+    { "n": 3, "l": "low open", "c": "low" },
+    { "n": 2, "l": "resolved", "c": "done" }
+  ],
+  "findings": [
+    { "num": "01", "sev": "resolved", "cat": "Straggler", "fixed": true, "body": "<code>repo-auditor.md</code> lingered after the rename to <code>recon-renata.md</code>. Two profiles for one agent.", "fix": "Deleted on main. Commit <code>10357c9</code>." },
+    { "num": "02", "sev": "med", "cat": "Size budget", "body": "<code>app-dashboard</code> (22.8KB) and <code>world-cup-bracket</code> (21.5KB) are over the 15KB soft cap with no <code>/source</code> rendition. Neither reads back whole.", "fix": "Generate /source chunk sets, or trim under 15KB." },
+    { "num": "03", "sev": "resolved", "cat": "Straggler", "fixed": true, "body": "<code>canary.txt</code> at the repo root didn't belong.", "fix": "Removed. Commit <code>d91b23f</code>." },
+    { "num": "04", "sev": "low", "cat": "Rendition naming", "body": "Index files drift: <code>index-6_index.txt</code>, <code>source_index.txt</code>, <code>source_index.md</code>. Standard is <code>_index.md</code>.", "fix": "Normalize to the naming convention." },
+    { "num": "05", "sev": "low", "cat": "Rendition", "body": "<code>f1-racetracks/source</code> numbering jumps 11 to 13, no <code>12_</code>. Likely deliberate, worth a glance.", "fix": "Verify the chunk set is complete." },
+    { "num": "06", "sev": "low", "cat": "Commit format", "body": "f1-racetracks app commits carry no version number, plus 5 rapid debug commits in ~40 min: smells like an unresolved runtime bug.", "fix": "Version app commits; confirm f1 is stable." }
+  ],
+  "apps": [
+    { "name": "app-dashboard", "size": "22.8 KB", "dot": "no", "rd": "over soft cap, no rendition", "flag": true },
+    { "name": "world-cup-bracket", "size": "21.5 KB", "dot": "no", "rd": "over soft cap, no rendition", "flag": true },
+    { "name": "budget-code-mapper", "size": "222 KB", "dot": "ok", "rd": "19 / 19 chunks · healthy" },
+    { "name": "file-chunker", "size": "105 KB", "dot": "ok", "rd": "10 / 10 chunks · healthy" },
+    { "name": "pdf-splitter", "size": "full v1.1", "dot": "ok", "rd": "6 / 6 chunks · healthy" },
+    { "name": "f1-racetracks", "size": "4.2 KB", "dot": "ok", "rd": "modular · 2nd HTML in folder" },
+    { "name": "template-app", "size": "7.0 KB", "dot": "ok", "rd": "reference · clean" },
+    { "name": "markdown-viewer", "size": "2.4 KB", "dot": "na", "rd": "under cap · no rendition needed" }
+  ],
+  "clean": [
+    "<code>.nojekyll</code> present at repo root",
+    "<code>brain-config/</code> has hooks, agents, gates + CHANGELOG, README, open-thread",
+    "Every app folder is kebab-case with an index.html",
+    "budget-code-mapper, file-chunker, pdf-splitter chunk sets all complete"
+  ]
+}

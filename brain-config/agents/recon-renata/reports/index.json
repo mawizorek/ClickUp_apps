@@ -1,0 +1,28 @@
+{
+  "reports": [
+    {
+      "id": "2026-07-04-0008",
+      "file": "2026-07-04-0008.json",
+      "type": "audit",
+      "reportType": "Repo Audit",
+      "ts": "2026-07-04T00:08:00-04:00",
+      "target": "mawizorek/ClickUp_apps @ main",
+      "verdictWord": "Structurally solid",
+      "verdictPill": "solid",
+      "pillText": "2 fixed live",
+      "delta": "2 fixed since last"
+    },
+    {
+      "id": "2026-07-02-2140",
+      "file": "2026-07-02-2140.json",
+      "type": "audit",
+      "reportType": "Repo Audit",
+      "ts": "2026-07-02T21:40:00-04:00",
+      "target": "mawizorek/ClickUp_apps @ main",
+      "verdictWord": "Needs attention",
+      "verdictPill": "adjust",
+      "pillText": "4 open",
+      "delta": "baseline"
+    }
+  ]
+}
