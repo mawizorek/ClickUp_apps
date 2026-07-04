@@ -1,622 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brain Config Index</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="github-folder" content="brain-config">
+<title>Brain Config — The Council</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
- --bg: oklch(14% 0.01 260);
- --surface: oklch(18% 0.012 260);
- --surface-2: oklch(22% 0.012 260);
- --text: oklch(90% 0.008 260);
- --text-dim: oklch(62% 0.008 260);
- --accent: oklch(72% 0.14 260);
- --hook: oklch(70% 0.12 160);
- --gate: oklch(70% 0.12 45);
- --trigger: oklch(70% 0.12 290);
- --agent: oklch(70% 0.12 20);
- --standard: oklch(70% 0.12 200);
- --border: oklch(24% 0.015 260);
- --radius: 6px;
+:root{
+ --bg:oklch(15% 0.012 285);
+ --panel:oklch(19% 0.014 285);
+ --panel-2:oklch(23% 0.016 285);
+ --line:oklch(27% 0.018 285);
+ --ink:oklch(93% 0.008 285);
+ --ink-dim:oklch(66% 0.012 285);
+ --ink-faint:oklch(52% 0.012 285);
+ --lead:oklch(74% 0.15 300);
+ --radius:10px;
 }
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
- font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
- background: var(--bg);
- color: var(--text);
- line-height: 1.5;
- font-optical-sizing: auto;
- padding: 24px 16px;
- min-height: 100vh;
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+ font-family:'Instrument Sans',system-ui,sans-serif;
+ background:
+ radial-gradient(120% 80% at 100% 0%, oklch(19% 0.03 300 / 0.55), transparent 60%),
+ var(--bg);
+ background-attachment:fixed;
+ color:var(--ink);line-height:1.5;
+ padding:clamp(20px,5vw,56px) clamp(16px,4vw,32px);
+ min-height:100vh;font-optical-sizing:auto;
 }
+.wrap{max-width:1000px;margin:0 auto}
+header{margin-bottom:28px}
+.kicker{font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--lead);margin-bottom:10px}
+h1{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:700;letter-spacing:-.03em;line-height:1.05}
+.sub{color:var(--ink-dim);font-size:.9rem;margin-top:8px;max-width:64ch}
+.sub code{font-family:'JetBrains Mono',monospace;font-size:.82em;color:var(--ink)}
 
-.container { max-width: 900px; margin: 0 auto; }
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:26px 0 4px}
+.search{position:relative;flex:1 1 240px;min-width:200px}
+.search input{width:100%;padding:10px 14px 10px 38px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);color:var(--ink);font:inherit;font-size:.9rem;outline:none;transition:border-color .18s}
+.search input:focus{border-color:var(--lead)}
+.search input::placeholder{color:var(--ink-faint)}
+.search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-faint)}
 
-header { margin-bottom: 32px; }
-header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
-header p { color: var(--text-dim); font-size: 0.8125rem; }
+.toggles{display:flex;gap:8px;flex-wrap:wrap}
+.toggle{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;color:var(--ink-dim);background:var(--panel);border:1px solid var(--line);padding:8px 13px;border-radius:100px;cursor:pointer;user-select:none;transition:all .18s cubic-bezier(.16,1,.3,1)}
+.toggle:hover{background:var(--panel-2);color:var(--ink)}
+.toggle[aria-pressed="true"]{border-color:var(--lead);color:var(--ink);background:var(--panel-2)}
+.toggle .dot{width:8px;height:8px;border-radius:50%;background:var(--ink-faint);transition:background .18s}
+.toggle[aria-pressed="true"] .dot{background:var(--lead)}
 
-.view-toggle { display: flex; gap: 4px; margin-top: 12px; }
-.view-btn {
- font-size: 0.75rem; color: var(--text-dim); background: var(--surface);
- padding: 6px 14px; border-radius: 100px; border: 1px solid transparent;
- cursor: pointer; transition: all 150ms; font-family: inherit; font-weight: 600;
-}
-.view-btn:hover { background: var(--surface-2); }
-.view-btn.active { border-color: var(--accent); color: var(--text); background: var(--surface-2); }
-.view-btn[data-view="standard"].active { border-color: var(--standard); color: var(--standard); }
+.meta-row{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:14px;font-size:.72rem;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+.meta-row b{color:var(--ink-dim);font-weight:600}
+.ghost{font-family:inherit;font-size:.68rem;color:var(--ink-faint);background:none;border:1px solid var(--line);border-radius:6px;padding:3px 8px;cursor:pointer;transition:all .18s}
+.ghost:hover{border-color:var(--lead);color:var(--ink)}
 
-.search-wrap { margin-top: 12px; position: relative; }
-.search-wrap input {
- width: 100%; padding: 8px 12px 8px 32px;
- background: var(--surface); border: 1px solid var(--border);
- border-radius: var(--radius); color: var(--text);
- font-size: 0.8125rem; font-family: inherit; outline: none;
- transition: border-color 150ms;
-}
-.search-wrap input:focus { border-color: var(--accent); }
-.search-wrap input::placeholder { color: var(--text-dim); }
-.search-icon {
- position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
- width: 14px; height: 14px; color: var(--text-dim);
-}
+main{margin-top:34px;display:flex;flex-direction:column;gap:40px}
+.state{padding:56px 20px;text-align:center;color:var(--ink-dim);font-size:.9rem}
+.state.err{color:oklch(75% 0.13 25)}
+.state .big{font-size:1.05rem;color:var(--ink);font-weight:600;margin-bottom:6px}
 
-.controls { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+.block > .head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.block > .head h2{font-size:1.02rem;font-weight:700;letter-spacing:-.01em}
+.block > .head .desc{font-size:.78rem;color:var(--ink-faint);margin-left:auto;text-align:right;font-variant-numeric:tabular-nums}
 
-.pill {
- font-size: 0.75rem; color: var(--text-dim); background: var(--surface);
- padding: 5px 12px; border-radius: 100px; font-variant-numeric: tabular-nums;
- border: 1px solid transparent; cursor: pointer;
- transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1); user-select: none;
-}
-.pill:hover { background: var(--surface-2); }
-.pill.active { border-color: var(--pill-color, var(--accent)); background: var(--surface-2); color: var(--pill-color, var(--text)); }
-.pill strong { color: var(--text); font-weight: 600; }
-.pill.active strong { color: var(--pill-color, var(--text)); }
-.pill[data-filter="hooks"] { --pill-color: var(--hook); }
-.pill[data-filter="gates"] { --pill-color: var(--gate); }
-.pill[data-filter="prose"] { --pill-color: var(--hook); }
-.pill[data-filter="triggers"] { --pill-color: var(--trigger); }
-.pill[data-filter="agents"] { --pill-color: var(--agent); }
+/* team blocks */
+.team{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 20px 8px;margin-bottom:18px}
+.team .thead{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+.team .tname{font-size:1.06rem;font-weight:700;letter-spacing:-.01em}
+.team .tfires{font-size:.72rem;color:var(--ink-faint);margin-left:auto;text-align:right}
+.team .lead-chip{font-size:.66rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--lead);border:1px solid color-mix(in oklch, var(--lead) 45%, var(--line));border-radius:100px;padding:2px 8px}
+.team .tinvoke{font-size:.78rem;color:var(--ink-dim);margin:2px 0 14px;font-family:'JetBrains Mono',monospace}
+.roster{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:12px}
 
-.sort-group { display: flex; gap: 4px; margin-left: auto; }
-.sort-btn {
- font-size: 0.6875rem; color: var(--text-dim); background: none;
- border: 1px solid var(--border); border-radius: var(--radius);
- padding: 4px 8px; cursor: pointer; transition: all 150ms;
-}
-.sort-btn:hover { border-color: var(--accent); color: var(--text); }
-.sort-btn.active { border-color: var(--accent); color: var(--accent); }
+/* member + agent chips */
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:100px;padding:7px 13px 7px 10px;text-decoration:none;color:var(--ink);font-size:.82rem;font-weight:500;transition:all .16s cubic-bezier(.16,1,.3,1)}
+.chip:hover{border-color:color-mix(in oklch, var(--hue) 60%, var(--line));transform:translateY(-1px)}
+.chip .hue{width:9px;height:9px;border-radius:50%;background:var(--hue);flex:none}
+.chip .s>span{color:var(--ink-faint);font-weight:400}
 
-.status-bar {
- margin-top: 8px; font-size: 0.6875rem; color: var(--text-dim);
- display: flex; gap: 12px; align-items: center;
-}
-.cache-btn {
- font-size: 0.625rem; color: var(--text-dim); background: none;
- border: 1px solid var(--border); border-radius: 3px;
- padding: 2px 6px; cursor: pointer; transition: all 150ms;
-}
-.cache-btn:hover { border-color: var(--accent); color: var(--text); }
+/* seat groups (flat agent view) */
+.seat-group{margin-bottom:22px}
+.seat-group h3{font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:11px}
+.agent-list{display:flex;flex-direction:column;gap:1px;border-radius:var(--radius);overflow:hidden}
+.agent{display:grid;grid-template-columns:minmax(150px,1.1fr) 2fr auto;gap:6px 18px;align-items:baseline;background:var(--panel);padding:11px 15px;transition:background .16s}
+.agent:hover{background:var(--panel-2)}
+.agent .n{display:flex;align-items:center;gap:9px;font-weight:600;font-size:.86rem;white-space:nowrap}
+.agent .n .hue{width:9px;height:9px;border-radius:50%;background:var(--hue);flex:none}
+.agent .n a{color:var(--ink);text-decoration:none}
+.agent .n a:hover{color:var(--hue)}
+.agent .r{font-size:.79rem;color:var(--ink-dim)}
+.agent .tags{display:flex;gap:6px;justify-self:end;align-items:center;white-space:nowrap}
+.tag{font-size:.62rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:5px;color:var(--ink-dim);background:var(--panel-2);border:1px solid var(--line)}
+.tag.st-building{color:oklch(78% 0.12 80);background:oklch(30% 0.06 80 / .5)}
+.tag.st-dormant{color:oklch(74% 0.10 230);background:oklch(30% 0.05 230 / .5)}
+.tag.st-retired{color:var(--ink-faint);background:var(--panel-2)}
+.tag.ty{color:var(--ink-faint)}
 
-.no-results { display: none; padding: 24px; text-align: center; color: var(--text-dim); font-size: 0.8125rem; }
-.no-results.visible { display: block; }
+/* domain procedures */
+.proc{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:13px 16px;text-decoration:none;color:var(--ink);transition:all .16s;margin-bottom:8px}
+.proc:hover{border-color:var(--lead);background:var(--panel-2)}
+.proc .pn{font-weight:600;font-size:.9rem}
+.proc .pt{font-size:.76rem;color:var(--ink-dim);font-family:'JetBrains Mono',monospace}
+.proc .parrow{margin-left:auto;color:var(--ink-faint)}
+.proc .tag{margin-left:0}
 
-.loading { padding: 48px; text-align: center; color: var(--text-dim); font-size: 0.8125rem; }
-
-section { margin-bottom: 28px; }
-section h2 {
- font-size: 0.8125rem; font-weight: 600; text-transform: uppercase;
- letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 8px;
- padding-bottom: 6px; border-bottom: 1px solid var(--border);
- cursor: pointer; transition: color 150ms;
-}
-section h2:hover { color: var(--text); }
-.shelf-hooks h2 { color: var(--hook); border-color: var(--hook); }
-.shelf-gates h2 { color: var(--gate); border-color: var(--gate); }
-.shelf-triggers h2 { color: var(--trigger); border-color: var(--trigger); }
-.shelf-agents h2 { color: var(--agent); border-color: var(--agent); }
-section.hidden { display: none; }
-
-.tool-list { display: flex; flex-direction: column; gap: 1px; }
-
-.tool {
- display: grid; grid-template-columns: minmax(180px, 1fr) 2fr auto;
- gap: 8px 16px; padding: 8px 12px; background: var(--surface);
- border-radius: var(--radius); align-items: baseline;
- transition: background 150ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.tool:hover { background: var(--surface-2); }
-.tool.hidden { display: none; }
-
-.tool-name { font-size: 0.8125rem; font-weight: 600; white-space: nowrap; }
-.tool-name a { color: var(--accent); text-decoration: none; }
-.tool-name a:hover { text-decoration: underline; }
-.tool-name .no-profile { color: var(--text); }
-
-.tool-purpose { font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; }
-
-.tool-meta {
- font-size: 0.625rem; color: var(--text-dim); text-align: right;
- white-space: nowrap; font-variant-numeric: tabular-nums;
- display: flex; flex-direction: column; gap: 1px; align-items: flex-end;
-}
-.tool-meta .uses { color: var(--accent); font-weight: 600; }
-
-.badge {
- display: inline-block; font-size: 0.625rem; padding: 1px 5px;
- border-radius: 3px; font-weight: 600; text-transform: uppercase;
- letter-spacing: 0.04em; margin-left: 6px; vertical-align: middle;
-}
-.badge-halt { background: oklch(30% 0.08 20); color: oklch(75% 0.15 20); }
-.badge-warn { background: oklch(30% 0.08 80); color: oklch(75% 0.12 80); }
-.badge-silent { background: oklch(25% 0.01 260); color: var(--text-dim); }
-
-.nicknames { font-size: 0.6875rem; color: var(--text-dim); font-style: italic; margin-left: 4px; }
-
-/* Team Standard panel */
-#standard-view { display: none; }
-#standard-view.active { display: block; }
-#tools-view.hidden { display: none; }
-
-.standard-content {
- background: var(--surface); border: 1px solid var(--border);
- border-radius: var(--radius); padding: 24px; line-height: 1.7;
- font-size: 0.8125rem;
-}
-.standard-content h1 { font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; color: var(--standard); }
-.standard-content h2 { font-size: 0.9375rem; font-weight: 700; margin-top: 24px; margin-bottom: 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
-.standard-content h3 { font-size: 0.8125rem; font-weight: 600; margin-top: 16px; margin-bottom: 4px; }
-.standard-content p { margin-bottom: 8px; color: var(--text-dim); }
-.standard-content strong { color: var(--text); }
-.standard-content ul, .standard-content ol { margin-left: 16px; margin-bottom: 8px; color: var(--text-dim); }
-.standard-content li { margin-bottom: 4px; }
-.standard-content code { background: var(--surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.75rem; color: var(--accent); }
-.standard-content pre { background: var(--surface-2); padding: 12px; border-radius: var(--radius); overflow-x: auto; margin-bottom: 12px; }
-.standard-content pre code { background: none; padding: 0; }
-.standard-content table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 0.75rem; }
-.standard-content th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text); font-weight: 600; }
-.standard-content td { padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
-.standard-content hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-.standard-content blockquote { border-left: 3px solid var(--standard); padding-left: 12px; color: var(--text-dim); font-style: italic; margin-bottom: 8px; }
-.standard-meta { margin-top: 12px; font-size: 0.6875rem; color: var(--text-dim); display: flex; gap: 16px; align-items: center; }
-.standard-meta a { color: var(--accent); text-decoration: none; }
-.standard-meta a:hover { text-decoration: underline; }
-
-footer {
- margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border);
- font-size: 0.6875rem; color: var(--text-dim);
-}
-
-@media (max-width: 600px) {
- .tool { grid-template-columns: 1fr; gap: 2px; }
- .tool-meta { flex-direction: row; gap: 8px; align-items: baseline; }
- .controls { gap: 6px; }
- .sort-group { margin-left: 0; margin-top: 4px; width: 100%; }
- .standard-content { padding: 16px; }
+.hidden{display:none!important}
+.count-note{font-size:.7rem;color:var(--ink-faint);margin-top:2px}
+footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-size:.72rem;color:var(--ink-faint);line-height:1.7}
+footer code{font-family:'JetBrains Mono',monospace}
+@media(max-width:620px){
+ .agent{grid-template-columns:1fr;gap:3px}
+ .agent .tags{justify-self:start;margin-top:3px}
+ .block > .head .desc{display:none}
 }
 </style>
 </head>
 <body>
-<div class="container">
- <header>
-  <h1>Brain Config</h1>
-  <p>Tool registry for the AI Toolkit. Live from mawizorek/ClickUp_apps/brain-config/</p>
-  <div class="view-toggle">
-   <button class="view-btn active" data-view="tools">Tools</button>
-   <button class="view-btn" data-view="standard">📋 Team Standard</button>
-  </div>
- </header>
-
- <div id="tools-view">
-  <div class="search-wrap">
-   <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-   <input type="search" id="search" placeholder="Search tools...">
-  </div>
-
-  <div class="controls">
-   <span class="pill" data-filter="hooks"><strong id="count-hooks">0</strong> hooks</span>
-   <span class="pill" data-filter="gates"><strong id="count-gates">0</strong> gates</span>
-   <span class="pill" data-filter="prose"><strong id="count-prose">0</strong> prose</span>
-   <span class="pill" data-filter="triggers"><strong id="count-triggers">0</strong> triggers</span>
-   <span class="pill" data-filter="agents"><strong id="count-agents">0</strong> agents</span>
-   <div class="sort-group">
-    <button class="sort-btn active" data-sort="shelf">shelf</button>
-    <button class="sort-btn" data-sort="created">created</button>
-    <button class="sort-btn" data-sort="usage">usage</button>
-   </div>
-  </div>
-
-  <div class="status-bar">
-   <span id="total-count"></span>
-   <span id="sessions-logged"></span>
-   <span id="last-updated"></span>
-   <button class="cache-btn" id="clear-cache">clear cache</button>
-  </div>
-
-  <div id="content">
-   <div class="loading" id="loading">Loading from GitHub...</div>
-   <div class="no-results" id="no-results">No tools match that search.</div>
-  </div>
+<div class="wrap">
+<header>
+ <div class="kicker">Brain Config</div>
+ <h1>The Council &amp; the tool collection</h1>
+ <p class="sub">Every review voice, team, and domain refresh, generated from <code>registry.json</code>. Profiles are the source of truth; this reads the manifest. Conducted by Maestro Mira.</p>
+ <div class="toolbar">
+ <div class="search"><i data-lucide="search" width="16" height="16"></i><input id="q" type="text" placeholder="Search voices, roles, teams..." autocomplete="off"></div>
+ <div class="toggles">
+ <button class="toggle" id="view-toggle" aria-pressed="false"><i data-lucide="layout-grid" width="14" height="14"></i><span id="view-label">By team</span></button>
+ <button class="toggle" id="t-dormant" aria-pressed="false"><span class="dot"></span>Dormant</button>
+ <button class="toggle" id="t-retired" aria-pressed="false"><span class="dot"></span>Retired</button>
  </div>
-
- <div id="standard-view">
-  <div class="standard-content" id="standard-content">
-   <p style="color: var(--text-dim)">Loading team standard...</p>
-  </div>
-  <div class="standard-meta">
-   <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/team-standard.md" target="_blank">View on GitHub</a>
-   <a href="https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main/brain-config/team-standard.md" target="_blank">Raw</a>
-   <span id="standard-version"></span>
-  </div>
  </div>
-
- <footer>
-  Pulls live from GitHub API. Usage counts from usage-log.json. Canonical firing source: AI Toolkit index (ClickUp doc).
- </footer>
+ <div class="meta-row">
+ <span><b id="m-active">0</b> active</span>
+ <span><b id="m-teams">0</b> teams</span>
+ <span><b id="m-total">0</b> in collection</span>
+ <span id="m-gen"></span>
+ <button class="ghost" id="refresh">refresh</button>
+ </div>
+</header>
+<main id="main">
+ <div class="state" id="loading">Loading the registry...</div>
+</main>
+<footer>
+ Reads <code>brain-config/registry.json</code> live. Status filter hides <b>dormant</b> + <b>retired</b> by default. Hooks &amp; gates still live in <code>brain-config/hooks|gates/</code> and migrate into the registry next. Firing behavior is governed by the AI Toolkit index (ClickUp); this is the navigable projection.
+</footer>
 </div>
-
 <script>
-const OWNER = 'mawizorek';
-const REPO = 'ClickUp_apps';
-const BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
-const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main`;
-const BLOB = `https://github.com/${OWNER}/${REPO}/blob/main`;
-const CACHE_TTL = 300000; // 5 min
+const RAW='https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main/brain-config/registry.json';
+const BLOB='https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config';
+const TTL=300000;
+const SEAT_LABELS={lead:'Lead / Conductor',core:'Core Panel',depth:'Depth Pair',output:'Output Filter',workshop:'The Workshop',close:'Close Phase',research:'Research',audit:'Audit'};
+const SEAT_ORDER=['lead','core','depth','output','workshop','close','research','audit'];
+let DATA=null, view='team';
 
-const SHELVES = [
- { key: 'gates', folder: 'brain-config/gates', label: 'Gates (pre-checks, orchestration)', cssClass: 'shelf-gates' },
- { key: 'hooks', folder: 'brain-config/hooks', label: '\u{1F504} Hooks (deterministic, profiled in repo)', cssClass: 'shelf-hooks' },
- { key: 'agents', folder: 'brain-config/agents', label: '\u{1F9E0} Agents (autonomous workers)', cssClass: 'shelf-agents' }
-];
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 
-const PROSE_HOOKS = [
- { name: 'De-Slop Pass', purpose: 'Strip AI-sounding filler, hedging, and sign-offs from every response.' },
- { name: 'Source & ID Guard', purpose: 'Get facts right: verify IDs, don\'t fabricate, don\'t hallucinate URLs.' },
- { name: 'Date & Math Guard', purpose: 'Count from provided dates, double-check arithmetic, never trust date-from-memory.' },
- { name: 'Hygiene Sweep', purpose: 'Formatting consistency, no orphaned references, clean output.' },
- { name: 'Clarify First', purpose: 'When something is genuinely ambiguous, ask before guessing destructively.' },
- { name: 'Voice Match', purpose: 'Match Michael\'s register. Sharp coworker, not corporate. Subsumes retired Tone Dial.' },
- { name: 'Naming Canonicalizer', purpose: 'Use canonical names for workspace objects. No invented abbreviations.' },
- { name: 'Compression', purpose: 'Dense output. One sentence beats two. Fragment beats a sentence.' },
- { name: 'Steelman / Red Team', purpose: 'Challenge weak reasoning, push back on half-baked ideas.' }
-];
-
-const TRIGGERS = [
- { name: 'Session Open', purpose: 'First response: surface recent activity, load context, check open-thread.md.' },
- { name: 'Session Close', purpose: 'End of session: memory audit, session log, flag unfinished threads, usage log commit.' },
- { name: 'Scope Lock', purpose: 'Before implementing from docs: thorough pass, validate scope, clarify gaps.' },
- { name: 'When Coding', purpose: 'Coding router: review prefs, determine language/scope, load domain gate.' },
- { name: 'When Building Apps', purpose: 'App router: load Apps/HTML Artifacts reference, enforce conventions, check APPS list.' },
- { name: 'When Researching', purpose: 'Research router: multiple sources, structured findings, links mandatory.' },
- { name: 'When Documenting', purpose: 'Doc hygiene: load existing first, no duplicates, current truth at top.' },
- { name: 'When Planning / Scoping', purpose: 'Planning router: structure immediately, propose the system, estimate scope.' },
- { name: 'Chunked Document Review', purpose: 'Multi-part docs: verify markers, confirm each part, hold until all received.' },
- { name: 'Schema Linter', purpose: 'Validate record shape against domain schema (recipes, F1, URITP fields).' },
- { name: 'Revision Log Tracker', purpose: 'Track what changed across revisions of a document or spec.' },
- { name: 'HTML Artifact Regeneration', purpose: 'Regenerate an artifact from source when version drift detected.' },
- { name: 'Attachment Router', purpose: 'Any attached file: classify by type, route to type-specialist branch.' },
- { name: 'PDF Split Markdown Packager', purpose: 'Decide split points + titles, emit import-markdown for the PDF Splitter.' }
-];
-
-const BADGES = {
- 'secrets-pii-guard': 'halt', 'source-size-budget-enforcer': 'halt',
- 'skill-ban-guard': 'halt', 'commit-pre-flight': 'halt',
- 'memory-edit-guard': 'halt', 'task-dedup-gate': 'halt',
- 'post-build-verify': 'warn', 'artifact-ship-paperwork': 'warn',
- 'memory-write-relay': 'warn', 'stale-context-reload': 'silent',
- 'link-provenance': 'silent', 'multi-edit-batch-gate': 'silent'
-};
-
-const NICKNAMES = { 'recon-renata': 'Repo Renata, Review Renata' };
-
-let allTools = [];
-let usageData = {};
-let currentSort = 'shelf';
-let currentView = 'tools';
-
-function slugToName(slug) {
- return slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function extractPurpose(content) {
- const match = content.match(/\*\*Purpose:\*\*\s*(.+?)(?:\n|$)/);
- return match ? match[1].trim() : '';
-}
-
-function extractCreatedDate(content) {
- const match = content.match(/^- (\d{4}-\d{2}-\d{2}):/m);
- return match ? match[1] : null;
-}
-
-async function fetchJSON(url) {
- const cached = localStorage.getItem(url);
- if (cached) {
-  const { data, ts } = JSON.parse(cached);
-  if (Date.now() - ts < CACHE_TTL) return data;
- }
- const res = await fetch(url);
- if (!res.ok) return null;
- const data = await res.json();
- localStorage.setItem(url, JSON.stringify({ data, ts: Date.now() }));
+async function getRegistry(force){
+ const key='reg:'+RAW;
+ if(!force){try{const c=JSON.parse(localStorage.getItem(key)||'null');if(c&&Date.now()-c.ts<TTL)return c.data;}catch(e){}}
+ const res=await fetch(RAW,{cache:'no-store'});
+ if(!res.ok)throw new Error('fetch '+res.status);
+ const txt=await res.text();
+ let data;
+ try{data=JSON.parse(txt);}catch(e){throw new Error('registry.json is not valid JSON');}
+ if(!data||!Array.isArray(data.agents))throw new Error('registry.json missing agents');
+ try{localStorage.setItem(key,JSON.stringify({data,ts:Date.now()}));}catch(e){}
  return data;
 }
 
-async function fetchText(url) {
- const cached = localStorage.getItem('txt:' + url);
- if (cached) {
-  const { data, ts } = JSON.parse(cached);
-  if (Date.now() - ts < CACHE_TTL) return data;
- }
- const res = await fetch(url);
- if (!res.ok) return '';
- const data = await res.text();
- localStorage.setItem('txt:' + url, JSON.stringify({ data, ts: Date.now() }));
- return data;
+function shownStatuses(){
+ const s=new Set(['active','building']);
+ if(document.getElementById('t-dormant').getAttribute('aria-pressed')==='true')s.add('dormant');
+ if(document.getElementById('t-retired').getAttribute('aria-pressed')==='true')s.add('retired');
+ return s;
 }
+function q(){return document.getElementById('q').value.toLowerCase().trim();}
+function agentMatch(a,query){return !query||((a.name+' '+a.role+' '+a.seat+' '+(a.teams||[]).join(' ')).toLowerCase().includes(query));}
 
-function clearCache() {
- const keys = Object.keys(localStorage);
- keys.forEach(k => {
-  if (k.startsWith('https://') || k.startsWith('txt:')) localStorage.removeItem(k);
- });
- location.reload();
+function chip(a){
+ return `<a class="chip" href="${esc(a.profile?BLOB+'/'+a.profile:'#')}" style="--hue:${esc(a.accent||'var(--lead)')}" title="${esc(a.role)}"><span class="hue"></span><span class="s">${esc(a.name)}</span></a>`;
 }
+function statusTag(st){return st&&st!=='active'?`<span class="tag st-${esc(st)}">${esc(st)}</span>`:'';}
 
-// Lightweight markdown to HTML
-function renderMarkdown(md) {
- let html = md
-  .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-  .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-  .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-  .replace(/^---$/gm, '<hr>')
-  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  .replace(/`([^`]+)`/g, '<code>$1</code>')
-  .replace(/^- (.+)$/gm, '<li>$1</li>')
-  .replace(/^\| ?# ?\|/gm, '| # |');
-
- // Wrap consecutive <li> in <ul>
- html = html.replace(/((?:<li>.+<\/li>\n?)+)/g, '<ul>$1</ul>');
-
- // Simple table rendering
- const tableRegex = /^\|(.+)\|\n\|[-| :]+\|\n((?:\|.+\|\n?)+)/gm;
- html = html.replace(tableRegex, (match, headerRow, bodyRows) => {
-  const headers = headerRow.split('|').map(h => h.trim()).filter(Boolean);
-  const rows = bodyRows.trim().split('\n').map(row =>
-   row.split('|').map(c => c.trim()).filter(Boolean)
-  );
-  let table = '<table><thead><tr>';
-  headers.forEach(h => table += `<th>${h}</th>`);
-  table += '</tr></thead><tbody>';
-  rows.forEach(row => {
-   table += '<tr>';
-   row.forEach(cell => table += `<td>${cell}</td>`);
-   table += '</tr>';
-  });
-  table += '</tbody></table>';
-  return table;
- });
-
- // Paragraphs: wrap loose lines
- html = html.split('\n').map(line => {
-  if (!line.trim()) return '';
-  if (line.startsWith('<')) return line;
-  return `<p>${line}</p>`;
- }).join('\n');
-
- return html;
-}
-
-async function loadTeamStandard() {
- const md = await fetchText(`${RAW}/brain-config/team-standard.md`);
- if (!md) {
-  document.getElementById('standard-content').innerHTML = '<p>Failed to load team standard.</p>';
-  return;
- }
- document.getElementById('standard-content').innerHTML = renderMarkdown(md);
- // Extract version line
- const vMatch = md.match(/\*\*Version:\*\*\s*(.+)/);
- if (vMatch) document.getElementById('standard-version').textContent = vMatch[1];
-}
-
-function switchView(view) {
- currentView = view;
- document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
- document.getElementById('tools-view').classList.toggle('hidden', view !== 'tools');
- document.getElementById('standard-view').classList.toggle('active', view === 'standard');
- if (view === 'standard') loadTeamStandard();
-}
-
-async function loadUsageLog() {
- const text = await fetchText(`${RAW}/brain-config/usage-log.json`);
- if (!text) return;
- try {
-  const log = JSON.parse(text);
-  usageData = log.tools || {};
-  const sessEl = document.getElementById('sessions-logged');
-  const updEl = document.getElementById('last-updated');
-  if (log.sessions_logged > 0) sessEl.textContent = `${log.sessions_logged} sessions`;
-  if (log.last_updated) updEl.textContent = `last: ${log.last_updated}`;
- } catch(e) {}
-}
-
-async function loadShelf(shelf) {
- const listing = await fetchJSON(`${BASE}/contents/${shelf.folder}?ref=main`);
- if (!listing || !Array.isArray(listing)) return [];
-
- const mdFiles = listing.filter(f => f.name.endsWith('.md') && f.name !== 'README.md');
- const tools = [];
-
- for (const file of mdFiles) {
-  const slug = file.name.replace('.md', '');
-  const content = await fetchText(`${RAW}/${shelf.folder}/${file.name}`);
-  const purpose = extractPurpose(content);
-  const created = extractCreatedDate(content);
-  tools.push({
-   slug, name: slugToName(slug), purpose,
-   shelf: shelf.key, url: `${BLOB}/${shelf.folder}/${file.name}`,
-   created, uses: usageData[slug] || 0,
-   badge: BADGES[slug] || null,
-   nicknames: NICKNAMES[slug] || null
-  });
- }
- return tools;
-}
-
-function renderTool(tool) {
- const badge = tool.badge ? `<span class="badge badge-${tool.badge}">${tool.badge}</span>` : '';
- const nicks = tool.nicknames ? `<span class="nicknames">${tool.nicknames}</span>` : '';
- const nameHtml = tool.url
-  ? `<span class="tool-name"><a href="${tool.url}" target="_blank">${tool.name}</a>${badge}${nicks}</span>`
-  : `<span class="tool-name"><span class="no-profile">${tool.name}</span></span>`;
- const usesHtml = tool.uses > 0 ? `<span class="uses">${tool.uses}</span>` : '';
- const dateHtml = tool.created ? `<span>${tool.created}</span>` : '';
- const searchData = `${tool.name} ${tool.purpose} ${tool.nicknames || ''}`.toLowerCase();
-
- return `<div class="tool" data-search="${searchData}" data-shelf="${tool.shelf}">
-  ${nameHtml}
-  <span class="tool-purpose">${tool.purpose}</span>
-  <span class="tool-meta">${usesHtml}${dateHtml}</span>
+function agentRow(a){
+ const href=a.profile?BLOB+'/'+a.profile:'#';
+ return `<div class="agent" data-s="${esc(a.status)}">
+ <div class="n" style="--hue:${esc(a.accent||'var(--lead)')}"><span class="hue"></span><a href="${esc(href)}">${esc(a.name)}</a></div>
+ <div class="r">${esc(a.role)}</div>
+ <div class="tags"><span class="tag ty">${esc(a.type)}</span>${statusTag(a.status)}</div>
  </div>`;
 }
 
-function renderSection(label, cssClass, shelfKey, tools) {
- if (tools.length === 0) return '';
- return `<section class="${cssClass}" data-shelf="${shelfKey}">
-  <h2>${label}</h2>
-  <div class="tool-list">${tools.map(renderTool).join('')}</div>
- </section>`;
-}
+function render(){
+ if(!DATA)return;
+ const query=q(), allow=shownStatuses(), byId=Object.fromEntries(DATA.agents.map(a=>[a.slug,a]));
+ const visible=a=>allow.has(a.status)&&agentMatch(a,query);
+ let html='';
 
-function getSortedTools() {
- if (currentSort === 'created') {
-  return [...allTools].sort((a, b) => (b.created || '').localeCompare(a.created || ''));
+ if(view==='team'){
+ html+='<div class="block"><div class="head"><h2>Teams</h2><span class="desc">standing review bodies</span></div>';
+ (DATA.teams||[]).forEach(t=>{
+ const mems=(t.members||[]).map(s=>byId[s]).filter(a=>a&&visible(a));
+ const lead=t.lead?byId[t.lead]:null;
+ const leadOk=lead&&visible(lead);
+ if(!mems.length&&!leadOk&&query)return;
+ html+=`<div class="team">
+ <div class="thead"><span class="tname">${esc(t.name)}</span>${leadOk?`<span class="lead-chip">${esc(lead.name)} conducts</span>`:''}<span class="tfires">${esc(t.fires||'')}</span></div>
+ <div class="tinvoke">${esc(t.invocation||'')}</div>
+ <div class="roster">${mems.map(chip).join('')||'<span class="count-note">no members match</span>'}</div>
+ </div>`;
+ });
+ html+='</div>';
+
+ const procs=(DATA.domain_procedures||[]).filter(p=>allow.has(p.status)&&(!query||(p.name+' '+(p.trigger||'')).toLowerCase().includes(query)));
+ if(procs.length){
+ html+='<div class="block"><div class="head"><h2>Domain refreshes</h2><span class="desc">triggers that load a domain doc</span></div>';
+ procs.forEach(p=>{html+=`<a class="proc" href="${esc(p.doc||'#')}">
+ <span class="pn">${esc(p.name)}</span>${statusTag(p.status)}
+ <span class="pt">${esc(p.trigger||'')}</span>
+ <span class="parrow"><i data-lucide="arrow-up-right" width="15" height="15"></i></span></a>`;});
+ html+='</div>';
  }
- if (currentSort === 'usage') {
-  return [...allTools].sort((a, b) => b.uses - a.uses);
+ }else{
+ html+='<div class="block"><div class="head"><h2>All voices</h2><span class="desc">grouped by seat</span></div>';
+ const groups={};
+ DATA.agents.filter(visible).forEach(a=>{(groups[a.seat]=groups[a.seat]||[]).push(a);});
+ const seats=Object.keys(groups).sort((x,y)=>SEAT_ORDER.indexOf(x)-SEAT_ORDER.indexOf(y));
+ if(!seats.length)html+='<div class="state">No voices match.</div>';
+ seats.forEach(seat=>{
+ html+=`<div class="seat-group"><h3>${esc(SEAT_LABELS[seat]||seat)}</h3><div class="agent-list">${groups[seat].map(agentRow).join('')}</div></div>`;
+ });
+ html+='</div>';
  }
- return allTools;
+ document.getElementById('main').innerHTML=html||'<div class="state">Nothing matches that search.</div>';
+ if(window.lucide)lucide.createIcons();
 }
 
-function renderAll() {
- const content = document.getElementById('content');
- const sorted = getSortedTools();
- let html = '';
+function updateMeta(){
+ const a=DATA.agents;
+ document.getElementById('m-active').textContent=a.filter(x=>x.status==='active').length;
+ document.getElementById('m-teams').textContent=(DATA.teams||[]).length;
+ document.getElementById('m-total').textContent=a.length+(DATA.domain_procedures||[]).length;
+ document.getElementById('m-gen').textContent=DATA.generated?('generated '+DATA.generated):'';
+}
 
- if (currentSort !== 'shelf') {
-  const label = currentSort === 'created' ? 'All tools (newest first)' : 'All tools (most used first)';
-  html = `<section data-shelf="all"><h2>${label}</h2><div class="tool-list">${sorted.map(renderTool).join('')}</div></section>`;
- } else {
-  for (const shelf of SHELVES) {
-   html += renderSection(shelf.label, shelf.cssClass, shelf.key, sorted.filter(t => t.shelf === shelf.key));
-  }
-  const proseTools = PROSE_HOOKS.map(t => ({ ...t, slug: '', shelf: 'prose', url: null, created: null, uses: 0, badge: null, nicknames: null }));
-  html += renderSection('\u{1F504} Hooks (prose-only, no repo profile)', 'shelf-hooks', 'prose', proseTools);
-  const triggerTools = TRIGGERS.map(t => ({ ...t, slug: '', shelf: 'triggers', url: null, created: null, uses: 0, badge: null, nicknames: null }));
-  html += renderSection('\u{1F3AF} Triggers (contextual, fire when signal matches)', 'shelf-triggers', 'triggers', triggerTools);
+async function boot(force){
+ document.getElementById('main').innerHTML='<div class="state" id="loading">Loading the registry...</div>';
+ try{
+ DATA=await getRegistry(force);
+ updateMeta();
+ render();
+ }catch(e){
+ document.getElementById('main').innerHTML=`<div class="state err"><div class="big">Couldn't load the registry</div>${esc(e.message)}. The manifest may be mid-commit (Pages lag ~60s) or the network hiccuped. <br><br><button class="ghost" onclick="boot(true)">try again</button></div>`;
  }
-
- content.innerHTML = html;
- bindHeadings();
- applyFilters();
 }
 
-function updateCounts() {
- const hooks = allTools.filter(t => t.shelf === 'hooks').length;
- const gates = allTools.filter(t => t.shelf === 'gates').length;
- const agents = allTools.filter(t => t.shelf === 'agents').length;
- document.getElementById('count-hooks').textContent = hooks;
- document.getElementById('count-gates').textContent = gates;
- document.getElementById('count-prose').textContent = PROSE_HOOKS.length;
- document.getElementById('count-triggers').textContent = TRIGGERS.length;
- document.getElementById('count-agents').textContent = agents;
- document.getElementById('total-count').textContent = `${hooks + gates + agents + PROSE_HOOKS.length + TRIGGERS.length} total`;
-}
-
-function getActiveFilters() {
- return [...document.querySelectorAll('.pill.active')].map(p => p.dataset.filter);
-}
-
-function applyFilters() {
- const active = getActiveFilters();
- const query = document.getElementById('search').value.toLowerCase().trim();
- const sections = document.querySelectorAll('#content section');
- let visibleCount = 0;
-
- sections.forEach(s => {
-  const shelfMatch = active.length === 0 || active.includes(s.dataset.shelf) || s.dataset.shelf === 'all';
-  const tools = s.querySelectorAll('.tool');
-  let sectionHasVisible = false;
-
-  tools.forEach(tool => {
-   const searchData = tool.dataset.search || '';
-   const toolShelf = tool.dataset.shelf;
-   const textMatch = !query || searchData.includes(query);
-   const filterMatch = shelfMatch || (active.length > 0 && active.includes(toolShelf));
-   const visible = filterMatch && textMatch;
-   tool.classList.toggle('hidden', !visible);
-   if (visible) { sectionHasVisible = true; visibleCount++; }
-  });
-
-  s.classList.toggle('hidden', !sectionHasVisible);
- });
-
- document.getElementById('no-results').classList.toggle('visible', visibleCount === 0);
-}
-
-function bindHeadings() {
- document.querySelectorAll('#content section h2').forEach(h2 => {
-  h2.addEventListener('click', () => {
-   const shelf = h2.closest('section').dataset.shelf;
-   const pill = document.querySelector(`.pill[data-filter="${shelf}"]`);
-   if (pill) { pill.classList.toggle('active'); applyFilters(); }
-  });
- });
-}
-
-async function init() {
- await loadUsageLog();
-
- for (const shelf of SHELVES) {
-  const tools = await loadShelf(shelf);
-  allTools.push(...tools);
- }
-
- document.getElementById('loading').style.display = 'none';
- updateCounts();
- renderAll();
-
- // Pill filters
- document.querySelectorAll('.pill').forEach(pill => {
-  pill.addEventListener('click', () => { pill.classList.toggle('active'); applyFilters(); });
- });
-
- // Search
- document.getElementById('search').addEventListener('input', applyFilters);
-
- // Sort buttons
- document.querySelectorAll('.sort-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-   currentSort = btn.dataset.sort;
-   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-   btn.classList.add('active');
-   renderAll();
-  });
- });
-
- // View toggle
- document.querySelectorAll('.view-btn').forEach(btn => {
-  btn.addEventListener('click', () => switchView(btn.dataset.view));
- });
-
- // Clear cache
- document.getElementById('clear-cache').addEventListener('click', clearCache);
-}
-
-init();
+document.getElementById('q').addEventListener('input',()=>{if(DATA)render();});
+document.getElementById('t-dormant').addEventListener('click',e=>{const b=e.currentTarget;b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true');if(DATA)render();});
+document.getElementById('t-retired').addEventListener('click',e=>{const b=e.currentTarget;b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true');if(DATA)render();});
+document.getElementById('view-toggle').addEventListener('click',e=>{view=view==='team'?'seat':'team';document.getElementById('view-label').textContent=view==='team'?'By team':'By seat';e.currentTarget.setAttribute('aria-pressed',view==='seat');if(DATA)render();});
+document.getElementById('refresh').addEventListener('click',()=>boot(true));
+if(window.lucide)lucide.createIcons();
+boot(false);
 </script>
 </body>
 </html>
