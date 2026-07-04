@@ -71,19 +71,25 @@ header p { color: var(--text-dim); font-size: 0.8125rem; }
 .pill[data-filter="triggers"] { --pill-color: var(--trigger); }
 .pill[data-filter="agents"] { --pill-color: var(--agent); }
 
-.sort-toggle {
+.sort-group { display: flex; gap: 4px; margin-left: auto; }
+.sort-btn {
   font-size: 0.6875rem; color: var(--text-dim); background: none;
   border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 4px 8px; cursor: pointer; margin-left: auto;
-  transition: all 150ms;
+  padding: 4px 8px; cursor: pointer; transition: all 150ms;
 }
-.sort-toggle:hover { border-color: var(--accent); color: var(--text); }
-.sort-toggle.active { border-color: var(--accent); color: var(--accent); }
+.sort-btn:hover { border-color: var(--accent); color: var(--text); }
+.sort-btn.active { border-color: var(--accent); color: var(--accent); }
 
 .status-bar {
   margin-top: 8px; font-size: 0.6875rem; color: var(--text-dim);
-  display: flex; gap: 12px;
+  display: flex; gap: 12px; align-items: center;
 }
+.cache-btn {
+  font-size: 0.625rem; color: var(--text-dim); background: none;
+  border: 1px solid var(--border); border-radius: 3px;
+  padding: 2px 6px; cursor: pointer; transition: all 150ms;
+}
+.cache-btn:hover { border-color: var(--accent); color: var(--text); }
 
 .no-results { display: none; padding: 24px; text-align: center; color: var(--text-dim); font-size: 0.8125rem; }
 .no-results.visible { display: block; }
@@ -149,6 +155,7 @@ footer {
   .tool { grid-template-columns: 1fr; gap: 2px; }
   .tool-meta { flex-direction: row; gap: 8px; align-items: baseline; }
   .controls { gap: 6px; }
+  .sort-group { margin-left: 0; margin-top: 4px; width: 100%; }
 }
 </style>
 </head>
@@ -167,12 +174,17 @@ footer {
       <span class="pill" data-filter="prose"><strong id="count-prose">0</strong> prose</span>
       <span class="pill" data-filter="triggers"><strong id="count-triggers">0</strong> triggers</span>
       <span class="pill" data-filter="agents"><strong id="count-agents">0</strong> agents</span>
-      <button class="sort-toggle" id="sort-date">sort: created</button>
+      <div class="sort-group">
+        <button class="sort-btn" data-sort="shelf">shelf</button>
+        <button class="sort-btn" data-sort="created">created</button>
+        <button class="sort-btn" data-sort="usage">usage</button>
+      </div>
     </div>
     <div class="status-bar">
       <span id="total-count"></span>
       <span id="sessions-logged"></span>
       <span id="last-updated"></span>
+      <button class="cache-btn" id="clear-cache" title="Clear localStorage cache and reload fresh from GitHub">clear cache</button>
     </div>
   </header>
 
@@ -191,6 +203,7 @@ const REPO = 'ClickUp_apps';
 const BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main`;
 const BLOB = `https://github.com/${OWNER}/${REPO}/blob/main`;
+const CACHE_TTL = 300000; // 5 min
 
 const SHELVES = [
   { key: 'gates', folder: 'brain-config/gates', label: 'Gates (pre-checks, orchestration)', cssClass: 'shelf-gates' },
@@ -212,7 +225,7 @@ const PROSE_HOOKS = [
 
 const TRIGGERS = [
   { name: 'Session Open', purpose: 'First response: surface recent activity, load context, check open-thread.md.' },
-  { name: 'Session Close', purpose: 'End of session: memory audit, session log, flag unfinished threads.' },
+  { name: 'Session Close', purpose: 'End of session: memory audit, session log, flag unfinished threads, usage log commit.' },
   { name: 'Scope Lock', purpose: 'Before implementing from docs: thorough pass, validate scope, clarify gaps.' },
   { name: 'When Coding', purpose: 'Coding router: review prefs, determine language/scope, load domain gate.' },
   { name: 'When Building Apps', purpose: 'App router: load Apps/HTML Artifacts reference, enforce conventions, check APPS list.' },
@@ -236,13 +249,11 @@ const BADGES = {
   'link-provenance': 'silent', 'multi-edit-batch-gate': 'silent'
 };
 
-const NICKNAMES = {
-  'recon-renata': 'Repo Renata, Review Renata'
-};
+const NICKNAMES = { 'recon-renata': 'Repo Renata, Review Renata' };
 
 let allTools = [];
 let usageData = {};
-let sortByDate = false;
+let currentSort = 'shelf';
 
 function slugToName(slug) {
   return slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -262,7 +273,7 @@ async function fetchJSON(url) {
   const cached = localStorage.getItem(url);
   if (cached) {
     const { data, ts } = JSON.parse(cached);
-    if (Date.now() - ts < 300000) return data; // 5min TTL
+    if (Date.now() - ts < CACHE_TTL) return data;
   }
   const res = await fetch(url);
   if (!res.ok) return null;
@@ -275,13 +286,21 @@ async function fetchText(url) {
   const cached = localStorage.getItem('txt:' + url);
   if (cached) {
     const { data, ts } = JSON.parse(cached);
-    if (Date.now() - ts < 300000) return data;
+    if (Date.now() - ts < CACHE_TTL) return data;
   }
   const res = await fetch(url);
   if (!res.ok) return '';
   const data = await res.text();
   localStorage.setItem('txt:' + url, JSON.stringify({ data, ts: Date.now() }));
   return data;
+}
+
+function clearCache() {
+  const keys = Object.keys(localStorage);
+  keys.forEach(k => {
+    if (k.startsWith('https://') || k.startsWith('txt:')) localStorage.removeItem(k);
+  });
+  location.reload();
 }
 
 async function loadUsageLog() {
@@ -292,7 +311,7 @@ async function loadUsageLog() {
     usageData = log.tools || {};
     const sessEl = document.getElementById('sessions-logged');
     const updEl = document.getElementById('last-updated');
-    if (log.sessions_logged > 0) sessEl.textContent = `${log.sessions_logged} sessions logged`;
+    if (log.sessions_logged > 0) sessEl.textContent = `${log.sessions_logged} sessions`;
     if (log.last_updated) updEl.textContent = `last: ${log.last_updated}`;
   } catch(e) {}
 }
@@ -326,7 +345,7 @@ function renderTool(tool) {
   const nameHtml = tool.url
     ? `<a href="${tool.url}">${tool.name}</a>${badge}${nicks}`
     : `<span class="no-profile">${tool.name}</span>`;
-  const usesHtml = tool.uses > 0 ? `<span class="uses">${tool.uses}x</span>` : '';
+  const usesHtml = tool.uses > 0 ? `<span class="uses">${tool.uses}</span>` : '';
   const dateHtml = tool.created ? `<span>${tool.created}</span>` : '';
   const searchData = `${tool.name} ${tool.purpose} ${tool.nicknames || ''}`.toLowerCase();
 
@@ -337,34 +356,40 @@ function renderTool(tool) {
   </div>`;
 }
 
-function renderSection(shelf, tools) {
+function renderSection(label, cssClass, shelfKey, tools) {
   if (tools.length === 0) return '';
-  return `<section class="${shelf.cssClass}" data-shelf="${shelf.key}">
-    <h2>${shelf.label}</h2>
+  return `<section class="${cssClass}" data-shelf="${shelfKey}">
+    <h2>${label}</h2>
     <div class="tool-list">${tools.map(renderTool).join('')}</div>
   </section>`;
 }
 
+function getSortedTools() {
+  if (currentSort === 'created') {
+    return [...allTools].sort((a, b) => (b.created || '').localeCompare(a.created || ''));
+  }
+  if (currentSort === 'usage') {
+    return [...allTools].sort((a, b) => b.uses - a.uses);
+  }
+  return allTools;
+}
+
 function renderAll() {
   const content = document.getElementById('content');
+  const sorted = getSortedTools();
   let html = '';
 
-  const sorted = sortByDate
-    ? [...allTools].sort((a, b) => (b.created || '').localeCompare(a.created || ''))
-    : allTools;
-
-  if (sortByDate) {
-    html = `<section class="shelf-hooks" data-shelf="all"><h2>All tools (newest first)</h2><div class="tool-list">${sorted.map(renderTool).join('')}</div></section>`;
+  if (currentSort !== 'shelf') {
+    const label = currentSort === 'created' ? 'All tools (newest first)' : 'All tools (most used first)';
+    html = `<section class="shelf-hooks" data-shelf="all"><h2>${label}</h2><div class="tool-list">${sorted.map(renderTool).join('')}</div></section>`;
   } else {
     for (const shelf of SHELVES) {
-      html += renderSection(shelf, sorted.filter(t => t.shelf === shelf.key));
+      html += renderSection(shelf.label, shelf.cssClass, shelf.key, sorted.filter(t => t.shelf === shelf.key));
     }
-    // Prose hooks
     const proseTools = PROSE_HOOKS.map(t => ({ ...t, slug: '', shelf: 'prose', url: null, created: null, uses: 0, badge: null, nicknames: null }));
-    html += `<section class="shelf-hooks" data-shelf="prose"><h2>\u{1F504} Hooks (prose-only, no repo profile)</h2><div class="tool-list">${proseTools.map(renderTool).join('')}</div></section>`;
-    // Triggers
+    html += renderSection('\u{1F504} Hooks (prose-only, no repo profile)', 'shelf-hooks', 'prose', proseTools);
     const triggerTools = TRIGGERS.map(t => ({ ...t, slug: '', shelf: 'triggers', url: null, created: null, uses: 0, badge: null, nicknames: null }));
-    html += `<section class="shelf-triggers" data-shelf="triggers"><h2>\u{1F3AF} Triggers (contextual, fire when signal matches)</h2><div class="tool-list">${triggerTools.map(renderTool).join('')}</div></section>`;
+    html += renderSection('\u{1F3AF} Triggers (contextual, fire when signal matches)', 'shelf-triggers', 'triggers', triggerTools);
   }
 
   content.innerHTML = html;
@@ -445,14 +470,18 @@ async function init() {
   // Search
   document.getElementById('search').addEventListener('input', applyFilters);
 
-  // Sort toggle
-  const sortBtn = document.getElementById('sort-date');
-  sortBtn.addEventListener('click', () => {
-    sortByDate = !sortByDate;
-    sortBtn.classList.toggle('active', sortByDate);
-    sortBtn.textContent = sortByDate ? 'sort: shelf' : 'sort: created';
-    renderAll();
+  // Sort buttons
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentSort = btn.dataset.sort;
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAll();
+    });
   });
+
+  // Clear cache
+  document.getElementById('clear-cache').addEventListener('click', clearCache);
 }
 
 init();
