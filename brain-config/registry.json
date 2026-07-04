@@ -1,11 +1,61 @@
 {
  "generated": "2026-07-04",
- "source": "Bootstrap manifest, hand-authored from brain-config/agents/*.md front-matter. GOING FORWARD: regenerate from profile front-matter whenever a profile changes (no CI yet, so an agent regenerates it; Scribe Sana + Closing Clio verify at session close). Front-matter is canonical; this file is a generated artifact.",
+ "schemaVersion": 3,
+ "source": "Generated manifest. Content is canonical in git: agent profiles in brain-config/agents/*.md (+ agent.json identity), hook profiles in brain-config/hooks/, gate profiles in brain-config/gates/. Hooks/triggers with no repo profile are prose-canonical in the ClickUp AI Toolkit index. This file + the brain-config viewer are PROJECTIONS. Regenerate when a profile changes; Scribe Sana + Closing Clio verify at session close.",
  "schema": {
- "agent": "slug | name | type(hook|trigger|subagent|gate) | status(active|building|dormant|retired) | seat | teams[] | role | profile",
- "team": "slug | name | invocation | fires | lead | members[] (agent slugs; many-to-many)",
- "domain_procedure": "slug | name | type(trigger) | status | trigger | doc(url to ClickUp domain doc)"
+ "tool": "slug | name | kind(hook|trigger|gate) | status | summary | profile(repo path or null)",
+ "agent": "slug | name | type(subagent|gate) | status(active|building|dormant|retired) | seat | teams[] | role | profile | accent | hasReports",
+ "team": "slug | name | invocation | fires | lead | members[]",
+ "domain_procedure": "slug | name | type(trigger) | status | trigger | doc"
  },
+ "hooks": [
+ { "slug": "de-slop", "name": "De-Slop Pass", "kind": "hook", "status": "active", "summary": "Strips AI filler and hedging from final wording.", "profile": null },
+ { "slug": "source-id-guard", "name": "Source & ID Guard", "kind": "hook", "status": "active", "summary": "Verifies sources and IDs before they are stated.", "profile": null },
+ { "slug": "date-math-guard", "name": "Date & Math Guard", "kind": "hook", "status": "active", "summary": "Checks dates, weekday math, and arithmetic.", "profile": null },
+ { "slug": "hygiene-sweep", "name": "Hygiene Sweep", "kind": "hook", "status": "active", "summary": "Final formatting and consistency pass.", "profile": null },
+ { "slug": "clarify-first", "name": "Clarify First", "kind": "hook", "status": "active", "summary": "Asks before guessing when a key detail is missing.", "profile": null },
+ { "slug": "voice-match", "name": "Voice Match", "kind": "hook", "status": "active", "summary": "Matches Michael's register; subsumes Tone Dial.", "profile": null },
+ { "slug": "naming-canonicalizer", "name": "Naming Canonicalizer", "kind": "hook", "status": "active", "summary": "Normalizes names to their canonical form.", "profile": null },
+ { "slug": "compression", "name": "Compression", "kind": "hook", "status": "active", "summary": "Tightens verbose output without losing signal.", "profile": null },
+ { "slug": "steelman-red-team", "name": "Steelman / Red Team", "kind": "hook", "status": "active", "summary": "Argues the strongest opposing case before committing.", "profile": null },
+ { "slug": "model-fit-advisor", "name": "Model Fit Advisor", "kind": "hook", "status": "active", "summary": "Flags when a different model would serve the turn better.", "profile": null },
+ { "slug": "question-block", "name": "Question Block", "kind": "hook", "status": "active", "summary": "Formats follow-up questions as a copy-pastable block.", "profile": null },
+ { "slug": "when-updating", "name": "When Updating Existing Work", "kind": "hook", "status": "active", "summary": "Loads full context and history before modifying anything.", "profile": null },
+ { "slug": "triggered-tool-router", "name": "Triggered Tool Router", "kind": "hook", "status": "active", "summary": "Three-question gate routing to Update / Document / Build.", "profile": null },
+ { "slug": "secrets-pii-guard", "name": "Secrets / PII Guard", "kind": "hook", "status": "active", "summary": "Halts any repo write carrying keys, tokens, or PII.", "profile": "hooks/secrets-pii-guard.md" },
+ { "slug": "source-size-budget-enforcer", "name": "Source-Size Budget Enforcer", "kind": "hook", "status": "active", "summary": "Measures file size vs budget; flags or routes to a split.", "profile": "hooks/source-size-budget-enforcer.md" },
+ { "slug": "skill-ban-guard", "name": "Skill-Ban Guard", "kind": "hook", "status": "active", "summary": "Byte-scans committed UI for the active skill's hard bans.", "profile": "hooks/skill-ban-guard.md" },
+ { "slug": "post-build-verify", "name": "Post-Build Verify", "kind": "hook", "status": "active", "summary": "Fetches the live URL after a Pages commit to confirm it flipped.", "profile": "hooks/post-build-verify.md" },
+ { "slug": "stale-context-reload", "name": "Stale Context Reload", "kind": "hook", "status": "active", "summary": "Re-fetches a file before editing if the read is stale.", "profile": "hooks/stale-context-reload.md" },
+ { "slug": "commit-pre-flight", "name": "Commit Pre-Flight", "kind": "hook", "status": "active", "summary": "Pre-commit checklist: SHA, branch, .nojekyll, message, size.", "profile": "hooks/commit-pre-flight.md" },
+ { "slug": "task-dedup-gate", "name": "Task Dedup Gate", "kind": "hook", "status": "active", "summary": "Three-step search before creating any task.", "profile": "hooks/task-dedup-gate.md" },
+ { "slug": "artifact-ship-paperwork", "name": "Artifact Ship Paperwork", "kind": "hook", "status": "active", "summary": "Post-commit paperwork: task desc, version comment, indexes.", "profile": "hooks/artifact-ship-paperwork.md" },
+ { "slug": "link-provenance", "name": "Link Provenance", "kind": "hook", "status": "active", "summary": "Verifies a ClickUp URL's source before emitting it.", "profile": "hooks/link-provenance.md" },
+ { "slug": "multi-edit-batch-gate", "name": "Multi-Edit Batch Gate", "kind": "hook", "status": "active", "summary": "Plans and batches 3+ edits to one file to avoid cascade fails.", "profile": "hooks/multi-edit-batch-gate.md" },
+ { "slug": "memory-edit-guard", "name": "Memory Edit Guard", "kind": "hook", "status": "active", "summary": "Pre-write gate validating any memory edit.", "profile": "hooks/memory-edit-guard.md" },
+ { "slug": "memory-write-relay", "name": "Memory Write Relay", "kind": "hook", "status": "active", "summary": "On a failed memory write, emits a copy-paste block and defers.", "profile": "hooks/memory-write-relay.md" }
+ ],
+ "triggers": [
+ { "slug": "session-open", "name": "Session Open", "kind": "trigger", "status": "active", "summary": "First response of a session: surface activity, prime context.", "profile": null },
+ { "slug": "session-close", "name": "Session Close", "kind": "trigger", "status": "active", "summary": "Wind-down: flag threads, post memory audit + session log.", "profile": null },
+ { "slug": "scope-lock", "name": "Scope Lock", "kind": "trigger", "status": "active", "summary": "Related-docs pass and scope validation before implementing.", "profile": null },
+ { "slug": "when-coding", "name": "When Coding", "kind": "trigger", "status": "active", "summary": "Coding router: prefs, language, load the domain gate.", "profile": null },
+ { "slug": "chunked-doc-review", "name": "Chunked Document Review", "kind": "trigger", "status": "active", "summary": "Holds action until all parts of a multi-part doc arrive.", "profile": null },
+ { "slug": "when-building-apps", "name": "When Building Apps", "kind": "trigger", "status": "active", "summary": "App router: load Apps reference, check APPS list, enforce conventions.", "profile": null },
+ { "slug": "when-researching", "name": "When Researching", "kind": "trigger", "status": "active", "summary": "Research router: multi-source, links mandatory, one recommendation.", "profile": null },
+ { "slug": "when-documenting", "name": "When Documenting", "kind": "trigger", "status": "active", "summary": "Doc hygiene: load existing, no dupes, current-truth-first.", "profile": null },
+ { "slug": "when-planning", "name": "When Planning/Scoping", "kind": "trigger", "status": "active", "summary": "Planning router: structure, propose the system, estimate scope.", "profile": null },
+ { "slug": "schema-linter", "name": "Schema Linter", "kind": "trigger", "status": "active", "summary": "Validates record shape against the domain schema.", "profile": null },
+ { "slug": "revision-log-tracker", "name": "Revision Log Tracker", "kind": "trigger", "status": "active", "summary": "Keeps a running revision log on iterative work.", "profile": null },
+ { "slug": "html-artifact-regeneration", "name": "HTML Artifact Regeneration", "kind": "trigger", "status": "active", "summary": "Regenerates an artifact from its source on change.", "profile": null },
+ { "slug": "attachment-router", "name": "Attachment Router", "kind": "trigger", "status": "active", "summary": "Classifies any attached file and routes to a type branch.", "profile": null },
+ { "slug": "pdf-split-packager", "name": "PDF Split Markdown Packager", "kind": "trigger", "status": "active", "summary": "Emits splitter import-markdown for a document.", "profile": null },
+ { "slug": "memory-hygiene-review", "name": "Memory Hygiene Review", "kind": "trigger", "status": "active", "summary": "Periodically reconciles memory against the reference docs.", "profile": null }
+ ],
+ "gates": [
+ { "slug": "roster-scan-planner", "name": "Roster Scan Planner", "kind": "gate", "status": "active", "summary": "Outermost gate: reads all shelves, builds an execution plan. Absorbed by Maestro Mira.", "profile": "gates/roster-scan-planner.md" },
+ { "slug": "agent-invocation-gate", "name": "Agent Invocation Gate", "kind": "gate", "status": "active", "summary": "Disambiguates agent names from real-person mentions.", "profile": "gates/agent-invocation-gate.md" }
+ ],
  "agents": [
  { "slug": "maestro-mira", "name": "Maestro Mira", "type": "gate", "status": "active", "seat": "lead", "teams": ["council"], "role": "Council Conductor; Michael's primary touchpoint. Absorbs the Roster Scan Planner as step 1.", "profile": "agents/maestro-mira.md", "accent": "oklch(72% 0.15 300)" },
  { "slug": "mimic-mika", "name": "Mimic Mika", "type": "subagent", "status": "active", "seat": "core", "teams": ["council"], "role": "Multi-model role-play; channels how rival frontier models would each answer.", "profile": "agents/mimic-mika.md", "accent": "oklch(70% 0.14 200)" },
@@ -27,7 +77,7 @@
  { "slug": "handoff-hana", "name": "Handoff Hana", "type": "subagent", "status": "active", "seat": "close", "teams": [], "role": "Handoff packager; the next-session baton.", "profile": "agents/handoff-hana.md", "accent": "oklch(70% 0.12 20)" },
  { "slug": "closing-clio", "name": "Closing Clio", "type": "subagent", "status": "active", "seat": "close", "teams": [], "role": "Session-close auditor; inventory refs, log hurdles, reconcile docs + indexes, report health.", "profile": "agents/closing-clio.md", "accent": "oklch(70% 0.12 20)" },
  { "slug": "scout-sage", "name": "Scout Sage", "type": "subagent", "status": "active", "seat": "research", "teams": [], "role": "Research runner; multi-source sourced lookup with confidence + one recommendation.", "profile": "agents/scout-sage.md", "accent": "oklch(70% 0.12 20)" },
- { "slug": "recon-renata", "name": "Recon Renata", "type": "subagent", "status": "active", "seat": "audit", "teams": [], "role": "Repo auditor; audits mawizorek/ClickUp_apps vs the operating standard. Read-only.", "profile": "agents/recon-renata.md", "accent": "oklch(70% 0.12 20)" },
+ { "slug": "recon-renata", "name": "Recon Renata", "type": "subagent", "status": "active", "seat": "audit", "teams": [], "role": "Repo auditor; audits mawizorek/ClickUp_apps vs the operating standard. Read-only.", "profile": "agents/recon-renata.md", "accent": "oklch(0.74 0.14 195)", "hasReports": true },
  { "slug": "workshop-wes", "name": "Workshop Wes", "type": "subagent", "status": "retired", "seat": "workshop", "teams": [], "role": "RETIRED 2026-07-04. Decomposed into The Workshop (6 lenses) + Future Faye. Tombstone.", "profile": "agents/workshop-wes.md", "accent": "oklch(70% 0.13 45)" }
  ],
  "teams": [
