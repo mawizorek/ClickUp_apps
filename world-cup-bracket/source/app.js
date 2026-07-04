@@ -1,8 +1,9 @@
 // World Cup 2026 Bracket - entry point. Wires modules, loads data, boots views.
 import { S, DATA_URL, CACHE_KEY, REPO_OWNER, REPO_NAME, DATA_PATH } from './store.js';
-import { buildFedBy } from './util.js';
+import { buildFedBy, byId } from './util.js';
 import { renderTimeNav, renderSchedule } from './schedule.js';
-import { renderBracket, initSheet } from './bracket.js';
+import { renderBracket, applyPathHighlight } from './bracket.js';
+import { initSheet } from './sheet.js';
 
 async function fetchLastUpdated() {
   const el = document.getElementById('updatedTime');
@@ -42,6 +43,13 @@ async function loadData() {
   }
 }
 
+function showBracketView() {
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'bracket'));
+  document.getElementById('scheduleView').classList.remove('active');
+  document.getElementById('bracketView').classList.add('active');
+  renderBracket();
+}
+
 function setupViewToggle() {
   document.querySelectorAll('.view-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -55,10 +63,20 @@ function setupViewToggle() {
   });
 }
 
+// Trace-path arrow inside the sheet -> jump to bracket view + highlight that team.
+function setupTraceBridge() {
+  document.addEventListener('trace-team', (e) => {
+    const team = e.detail && e.detail.team;
+    if (!team) return;
+    showBracketView();
+    applyPathHighlight(team);
+  });
+}
+
 let tickerStarted = false;
 function startCountdownTicker() {
   if (tickerStarted) return; tickerStarted = true;
-  // Single global ticker updates every [data-countdown] element (chips, drawer, sheet).
+  // Single global ticker updates every [data-countdown] element (chips, sheet).
   setInterval(() => {
     document.querySelectorAll('[data-countdown]').forEach(el => {
       const target = new Date(+el.dataset.countdown);
@@ -83,7 +101,8 @@ async function init() {
   S.rankings = data.rankings || {};
   buildFedBy();
   setupViewToggle();
-  initSheet();
+  setupTraceBridge();
+  initSheet(byId);
   renderTimeNav();
   renderSchedule('today');
   startCountdownTicker();

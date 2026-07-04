@@ -1,6 +1,9 @@
 // World Cup 2026 Bracket - schedule view rendering.
+// Cards are compact; tapping one opens the SAME shared detail sheet the
+// bracket uses (no separate inline drawer). One popup, two entry points.
 import { S, POTENTIAL_PREFIX, today } from './store.js';
-import { cc, isComplete, winnerName, rankOf, slotLabel, pathIn, advancesToFace, kickoffDate, fmtCountdown } from './util.js';
+import { cc, isComplete, winnerName, rankOf, slotLabel, kickoffDate, fmtCountdown } from './util.js';
+import { openSheet } from './sheet.js';
 
 export const periods = [
   { id: 'today', label: 'Today', filter: m => m.day === today },
@@ -15,7 +18,7 @@ export const periods = [
   { id: 'all', label: 'All', filter: () => true },
 ];
 
-export function renderTimeNav(onSelect) {
+export function renderTimeNav() {
   const nav = document.getElementById('timeNav');
   nav.innerHTML = periods.map((p, i) => {
     const count = S.allMatches.filter(p.filter).length;
@@ -26,7 +29,6 @@ export function renderTimeNav(onSelect) {
       nav.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderSchedule(btn.dataset.period);
-      if (onSelect) onSelect();
     });
   });
 }
@@ -84,7 +86,7 @@ function summaryLine(m) {
     + `<span class="ms-winner">${w}</span>`
     + `<span class="ms-score">${ws}-${ls}</span>`
     + `<span class="ms-loser">${l}</span>${note}`
-    + `<svg class="chevron ms-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`
+    + `<svg class="chevron ms-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>`
     + `</div>`;
 }
 
@@ -97,44 +99,19 @@ function renderMatchCard(m) {
   const ko = (!done && m.day === today) ? kickoffDate(m) : null;
   const chip = ko ? `<span class="countdown-chip" data-countdown="${ko.getTime()}">${fmtCountdown(ko)}</span>` : '';
 
-  return `<div class="${classes}" data-id="${m.id}">`
+  return `<div class="${classes}" data-id="${m.id}" role="button" tabindex="0">`
     + `<div class="match-top"><span class="info">${m.venue}${chip}</span>`
     + `<span class="badge ${statusClass}">${statusText}</span></div>`
-    + `${done ? summaryLine(m) : ''}`
-    + `<div class="match-teams">${teamRow(m, 'home')}${teamRow(m, 'away')}`
-    + `<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin:2px auto 0"><path d="M6 9l6 6 6-6"/></svg>`
-    + `</div>`
-    + `${m.psoNote ? `<div class="match-note">${m.psoNote}</div>` : ''}`
-    + renderDrawer(m)
+    + `${done ? summaryLine(m) : `<div class="match-teams">${teamRow(m, 'home')}${teamRow(m, 'away')}`
+    + `<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin:2px auto 0"><path d="M9 6l6 6-6 6"/></svg></div>`}`
+    + `${m.psoNote && done ? `<div class="match-note">${m.psoNote}</div>` : ''}`
     + `</div>`;
-}
-
-function renderDrawer(m) {
-  const done = isComplete(m);
-  let rows = '';
-  rows += `<div class="drawer-row"><span class="k">Venue</span><span class="v">${m.venue || 'TBD'}</span></div>`;
-  if (m.time && m.time !== 'TBD') rows += `<div class="drawer-row"><span class="k">Kickoff</span><span class="v">${m.time}</span></div>`;
-
-  if (!done) {
-    const ko = kickoffDate(m);
-    if (ko) rows += `<div class="drawer-row"><span class="k">Starts</span><span class="v accent" data-countdown="${ko.getTime()}">${fmtCountdown(ko)}</span></div>`;
-    const pin = pathIn(m);
-    if (pin) rows += `<div class="drawer-row"><span class="k">Path in</span><span class="v">${pin}</span></div>`;
-  } else {
-    const face = advancesToFace(m);
-    const w = winnerName(m);
-    if (w) rows += `<div class="drawer-row"><span class="k">Advances</span><span class="v accent">${cc(w)} \u2192 ${face || 'TBD'}</span></div>`;
-    if (m.psoNote) rows += `<div class="drawer-row"><span class="k">Shootout</span><span class="v gold">${m.psoNote}</span></div>`;
-  }
-  return `<div class="match-drawer"><div class="drawer-inner">${rows}</div></div>`;
 }
 
 function bindCardTaps() {
   document.getElementById('scheduleContent').querySelectorAll('.match').forEach(card => {
-    card.addEventListener('click', () => {
-      const open = card.classList.contains('open');
-      document.querySelectorAll('.match.open').forEach(c => c.classList.remove('open'));
-      if (!open) card.classList.add('open');
-    });
+    const id = +card.dataset.id;
+    card.addEventListener('click', () => openSheet(id));
+    card.addEventListener('keydown', (e) => { if (e.key === 'Enter') openSheet(id); });
   });
 }
