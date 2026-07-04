@@ -19,20 +19,14 @@
   header { padding: 36px 0 18px; }
   header h1 { font-size: clamp(1.6rem, 5vw, 2rem); font-weight: 900; letter-spacing: -0.03em; }
   header h1 span { color: var(--accent); }
-  .hub { background: linear-gradient(180deg, oklch(19% 0.02 260), var(--surface-1)); border: 1px solid var(--brain-border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden; }
+  .hub { display: flex; align-items: center; gap: 13px; background: linear-gradient(180deg, oklch(19% 0.02 260), var(--surface-1)); border: 1px solid var(--brain-border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden; text-decoration: none; color: var(--text); transition: border-color 150ms var(--ease), transform 100ms var(--ease); }
   .hub::before { content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--brain); }
-  .hub-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-  .hub-icon { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; background: var(--brain-soft); border: 1px solid var(--brain-border); }
+  .hub:hover { border-color: var(--brain); } .hub:active { transform: scale(0.99); }
+  .hub-icon { width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; background: var(--brain-soft); border: 1px solid var(--brain-border); color: var(--brain); }
+  .hub-body { flex: 1; min-width: 0; }
   .hub-title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; }
-  .hub-sub { font-size: 0.6875rem; color: var(--text-muted); margin-top: 1px; }
-  .hub-badge { margin-left: auto; font-size: 0.5625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brain); background: var(--brain-soft); border: 1px solid var(--brain-border); padding: 3px 8px; border-radius: 100px; }
-  .hub-links { display: flex; flex-direction: column; gap: 8px; }
-  .hub-link { display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); text-decoration: none; color: var(--text); transition: border-color 150ms var(--ease), transform 100ms var(--ease); }
-  .hub-link:hover { border-color: var(--brain-border); } .hub-link:active { transform: scale(0.98); }
-  .hub-link .hl-ic { width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; background: color-mix(in oklch, var(--brain) 15%, var(--surface-2)); color: var(--brain); }
-  .hub-link .hl-body { flex: 1; min-width: 0; } .hub-link .hl-name { font-size: 0.8125rem; font-weight: 700; }
-  .hub-link .hl-desc { font-size: 0.6875rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .hub-link .hl-arrow { width: 15px; height: 15px; color: var(--text-dim); flex-shrink: 0; }
+  .hub-sub { font-size: 0.6875rem; color: var(--text-muted); margin-top: 2px; }
+  .hub-badge { font-size: 0.5625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brain); background: var(--brain-soft); border: 1px solid var(--brain-border); padding: 3px 8px; border-radius: 100px; flex-shrink: 0; }
   .ref-slim { display: flex; align-items: center; gap: 10px; padding: 9px 14px; margin-bottom: 20px; border: 1px solid var(--border); border-radius: var(--radius); background: transparent; text-decoration: none; transition: border-color 150ms var(--ease); }
   .ref-slim:hover { border-color: var(--border-hover); }
   .ref-slim .rs-ic { font-size: 0.8rem; opacity: 0.7; } .ref-slim .rs-name { font-size: 0.75rem; font-weight: 600; color: var(--text-mid); } .ref-slim .rs-desc { font-size: 0.6875rem; color: var(--text-dim); } .ref-slim .rs-open { margin-left: auto; font-size: 0.6875rem; font-weight: 600; color: var(--text-muted); }
@@ -82,19 +76,11 @@
 <body>
   <div class="container">
     <header><h1>ClickUp <span>Apps</span></h1></header>
-    <div class="hub">
-      <div class="hub-top"><div class="hub-icon">B</div>
-        <div><div class="hub-title">Brain Config</div><div class="hub-sub">AI Toolkit control center</div></div>
-        <div class="hub-badge">Hub</div></div>
-      <div class="hub-links">
-        <a class="hub-link" href="https://mawizorek.github.io/ClickUp_apps/brain-config/">
-          <div class="hl-ic">TR</div><div class="hl-body"><div class="hl-name">Tool Registry</div><div class="hl-desc">Hooks, gates and agents, live from the repo</div></div>
-          <i data-lucide="chevron-right" class="hl-arrow"></i></a>
-        <a class="hub-link" href="https://mawizorek.github.io/ClickUp_apps/agent-reports/">
-          <div class="hl-ic">AR</div><div class="hl-body"><div class="hl-name">Agent Reports</div><div class="hl-desc">Reporting feedback from every agent</div></div>
-          <i data-lucide="chevron-right" class="hl-arrow"></i></a>
-      </div>
-    </div>
+    <a class="hub" href="https://mawizorek.github.io/ClickUp_apps/brain-config/">
+      <div class="hub-icon">B</div>
+      <div class="hub-body"><div class="hub-title">Brain Config</div><div class="hub-sub">Tool registry: hooks, gates, and agents. Open an agent for its reports.</div></div>
+      <div class="hub-badge">Hub</div>
+    </a>
     <a class="ref-slim" href="https://mawizorek.github.io/ClickUp_apps/template-app/">
       <span class="rs-ic">[T]</span><span class="rs-name">App Build Standard</span><span class="rs-desc">- scaffold and workflow reference</span><span class="rs-open">Open</span></a>
     <div class="stats">
@@ -114,9 +100,9 @@
     <div class="section-label">Apps</div>
     <div class="app-grid" id="appGrid"><div class="loading-state">Loading apps...</div></div>
   </div>
-  <footer><span id="footerLine">app-dashboard v2.4 <span id="refreshTime">-</span></span></footer>
+  <footer><span id="footerLine">app-dashboard v2.5 <span id="refreshTime">-</span></span></footer>
 <script>
-const APP_VERSION = 'v2.4';
+const APP_VERSION = 'v2.5';
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
