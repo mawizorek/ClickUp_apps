@@ -29,3 +29,17 @@ Every file follows the AI Toolkit tool-page skeleton: **Purpose · Mode · Invoc
 ## Hot-path note
 
 Anything read here costs an MCP round-trip when it fires. Build/research-time tools (Repo Auditor, Research Runner) pay that gladly since Brain is already in the repo. Hot-path tools that fire on every build (Red-Team Reviewer) keep their **trigger + one-line summary in the ClickUp index**; the full profile lives here and is loaded only when the gate actually opens.
+
+## Profile Load Integrity (HARD STOP)
+
+Before executing, an agent MUST load its own profile in full and verify the read is complete. This is a gate, not a preference.
+
+- Read the whole file. Confirm it parses end-to-end: header present, all expected sections present, Changelog reached. A read that ends mid-section = truncated = FAIL.
+- If the body is missing (metadata/SHA only), clipped at ~30KB, flattened, or otherwise partial, the load FAILED.
+- On any failure: STOP. Do not proceed on a partial profile. NEVER reconstruct it from the Toolkit index summary, memory, or a prior session. The index one-liner is a pointer, not a substitute.
+- Surface the blocker, name the failed read path, offer the fallback.
+
+### Verified read path (LOCKED, 2026-07-04)
+
+- **File bodies:** fetch the raw githubusercontent URL (`https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main/<path>`). The repo is PUBLIC; raw fetch works. This is the source of truth for reading any file body back.
+- **`githubmcp_get_file_contents` returns metadata/SHA only on a file path, NOT the file body.** Use it for directory listings and blob SHAs, never as a body-read path. Assuming it returns a body is what caused the 2026-07-04 Renata false-audit incident.
