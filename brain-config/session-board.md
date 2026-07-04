@@ -1,6 +1,8 @@
 # Session Board
 
-**Live presence channel for agents working in `mawizorek/ClickUp_apps`.** This is a group chat between agents, not a log. It answers exactly one question: *who is in the repo right now, and what are they mid-edit on?*
+**Live presence channel for agents working in `mawizorek/ClickUp_apps`.**
+
+This is a group chat between agents, not a log. It answers exactly one question: *who is in the repo right now, and what are they mid-edit on?*
 
 This file is **empty by default.** When no agent is working, the Active section below is bare, and that is the correct resting state. Entries appear ONLY while an agent is actively touching the repo, and each agent deletes its own entry the moment its session closes. If you're reading this and Active is empty, nobody's in here, the coast is clear.
 
@@ -13,8 +15,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 **Read this file immediately before any git-touching operation, and update your own entry immediately after.** This is a pre-write step in the same slot as Commit Pre-Flight, not a session-open check. Move quickly in and out: fetch, read, post/refresh your line, get back to work. Minimize the window where your presence info is stale.
 
 1. **Before you write anything to the repo:** pull this file fresh and scan Active. If another agent's entry claims a file you're about to touch, hold off, coordinate, or work elsewhere until their entry clears. Advisory, not a hard lock: it tells you when a collision is likely so you can avoid it.
+
 2. **When you start work:** add ONE entry for your session under Active. Be genuinely descriptive, what you're doing and why, which files/areas you expect to touch, anything another agent should know before editing near you. A future agent should understand your intent, not just your filenames.
+
 3. **As your work evolves:** edit your own single entry in place so it reflects what you're touching now. Don't append new blocks, don't leave a trail, keep it to your one current line of active work.
+
 4. **When your session closes:** DELETE your entry. This is not optional. A stale presence line makes other agents dodge files nobody's actually on, and it turns this channel into exactly the running log it must never become. Empty is the goal state.
 
 **Collision reality:** even with the board, two writes racing the same branch can throw a non-fast-forward. Expected. Fetch a fresh blob SHA right before each write and accept last-writer-wins. The board reduces overlap; it doesn't eliminate it.
@@ -25,18 +30,18 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-*(empty — no agents currently working in the repo)*
+### Patch Penelope · session stability-loop · started Sat Jul 4 08:59 AM ET (last update Sat Jul 4 09:01 AM ET)
+
+**Status:** active
+
+Working on direct F1 Racetracks runtime stability / deploy-refresh loop after the permanent source split. Touching `f1-racetracks/index.html`, live cache-bust/deploy markers, and any small repo files needed to make the live Pages surface catch up to the repo state.
 
 ---
 
 ## Entry format (copy when you start; delete when you close)
 
 ```markdown
-### <AgentName> · session <id> · started <date time EDT> (last update <time>)
-
-<A few sentences: what you're working on and why, which files/areas you're
-touching, anything another agent should know before editing near you.
-Be descriptive, this is a conversation, not a status code.>
+###  · session  · started  (last update )
 
 **Status:** active | paused | wrapping up
 ```
