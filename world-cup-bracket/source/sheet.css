@@ -1,0 +1,45 @@
+/* World Cup 2026 Bracket - shared detail sheet (used by schedule + bracket). */
+.sheet-scrim { position: fixed; inset: 0; z-index: 40; background: oklch(5% 0.01 250 / 0.6); opacity: 0; pointer-events: none; transition: opacity 220ms var(--ease-out); }
+.sheet-scrim.open { opacity: 1; pointer-events: auto; }
+.detail-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--surface-1); border-top: 1px solid var(--border-light); border-radius: 16px 16px 0 0; padding: 8px 18px calc(22px + env(safe-area-inset-bottom)); transform: translateY(101%); transition: transform 300ms var(--ease-out); max-height: 82svh; overflow-y: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 -8px 40px oklch(5% 0.01 250 / 0.5); }
+.detail-sheet.open { transform: translateY(0); }
+.sheet-grip { width: 36px; height: 4px; border-radius: 2px; background: var(--border-light); margin: 6px auto 12px; }
+.sheet-round { font-size: 0.625rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.sheet-title { font-size: 1.0625rem; font-weight: 800; letter-spacing: -0.02em; margin: 2px 0 14px; }
+.sheet-row { display: flex; align-items: baseline; gap: 10px; padding: 7px 0; border-top: 1px solid var(--border); font-size: 0.8125rem; }
+.sheet-row .k { color: var(--text-dim); font-weight: 700; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; min-width: 78px; flex-shrink: 0; }
+.sheet-row .v { color: var(--text-mid); font-weight: 600; }
+.sheet-row .v.accent { color: var(--accent); }
+.sheet-row .v .cd { color: var(--accent); }
+
+.sheet-matchup { margin-top: 12px; }
+.sheet-side { padding: 8px 0; border-top: 1px solid var(--border); }
+.sheet-side-label { font-size: 0.6875rem; font-weight: 700; color: var(--text-mid); display: flex; align-items: center; gap: 6px; }
+.sheet-side-label .sd { font-size: 0.5625rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.sheet-teams { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.chip { font-size: 0.6875rem; font-weight: 600; color: var(--text); background: var(--surface-3); border: 1px solid var(--border-light); border-radius: 999px; padding: 3px 5px 3px 9px; display: inline-flex; align-items: center; gap: 5px; }
+.chip .rk { font-size: 0.5625rem; font-style: italic; color: var(--text-dim); }
+.chip-trace { border: none; background: var(--accent-surface); color: var(--accent); width: 18px; height: 18px; border-radius: 50%; font-size: 0.6875rem; font-weight: 800; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.chip-trace:hover, .chip-trace:focus-visible { background: oklch(28% 0.07 155); }
+
+/* Road to here */
+.sheet-road { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+.road-head { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 8px; }
+.road-team { margin-bottom: 10px; }
+.road-team-name { font-size: 0.625rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+.road-row { display: flex; align-items: baseline; gap: 8px; font-size: 0.75rem; padding: 2px 0; }
+.road-row .road-rd { font-size: 0.5625rem; font-weight: 700; color: var(--text-dim); min-width: 30px; }
+.road-row .road-res { font-weight: 600; color: var(--text-mid); }
+.road-row.won .road-res { color: var(--accent); }
+.road-row.lost .road-res { color: var(--loser-text); }
+.road-row .road-note { font-size: 0.625rem; color: var(--gold); }
+
+/* Win estimate */
+.odds { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+.odds-head { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.odds-tag { font-size: 0.5rem; font-weight: 700; color: var(--gold); background: var(--gold-surface); border: 1px solid oklch(30% 0.06 85); border-radius: 3px; padding: 1px 5px; letter-spacing: 0.04em; }
+.odds-bar { display: flex; height: 26px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+.odds-seg { display: flex; align-items: center; padding: 0 8px; font-size: 0.6875rem; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.odds-seg.a { background: var(--accent-surface); color: var(--accent); justify-content: flex-start; }
+.odds-seg.b { background: var(--surface-3); color: var(--text-mid); justify-content: flex-end; }
+.sheet-note { font-size: 0.6875rem; color: var(--text-dim); margin-top: 10px; font-style: italic; }
