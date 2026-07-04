@@ -2,419 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brain Config — Toolkit Hub</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:oklch(15% 0.014 285);
-  --panel:oklch(18.5% 0.016 285);
-  --panel-2:oklch(22.5% 0.018 285);
-  --line:oklch(27% 0.02 285);
-  --line-soft:oklch(24% 0.018 285);
-  --ink:oklch(94% 0.008 285);
-  --ink-dim:oklch(68% 0.014 285);
-  --ink-faint:oklch(54% 0.014 285);
-  --lead:oklch(76% 0.15 300);
-  --hook:oklch(74% 0.12 205);
-  --trigger:oklch(78% 0.13 85);
-  --gate:oklch(72% 0.16 48);
-  --agent:oklch(74% 0.13 300);
-  --radius:11px;
-  --eo:cubic-bezier(0.16,1,0.3,1);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{
-  font-family:'Instrument Sans',system-ui,sans-serif;
-  font-weight:380;
-  background:
-    radial-gradient(130% 90% at 100% -10%, oklch(21% 0.04 300 / 0.5), transparent 55%),
-    radial-gradient(100% 70% at 0% 110%, oklch(20% 0.03 205 / 0.35), transparent 60%),
-    var(--bg);
-  background-attachment:fixed;
-  color:var(--ink);line-height:1.55;letter-spacing:.01em;
-  padding:clamp(20px,4vw,52px) clamp(15px,4vw,34px) 80px;
-  min-height:100vh;font-optical-sizing:auto;
-}
-.wrap{max-width:1040px;margin:0 auto}
-a{color:inherit}
-h1,h2,h3{text-wrap:balance}
-
-.kicker{font-size:.7rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--lead);margin-bottom:9px}
-h1{font-size:clamp(1.65rem,3.6vw,2.35rem);font-weight:700;letter-spacing:-.032em;line-height:1.03}
-.lede{color:var(--ink-dim);font-size:.92rem;margin-top:10px;max-width:68ch;text-wrap:pretty}
-.lede code{font-family:'JetBrains Mono',monospace;font-size:.82em;color:var(--ink)}
-
-.views{display:inline-flex;gap:3px;margin:26px 0 4px;background:var(--panel);border:1px solid var(--line);border-radius:100px;padding:4px}
-.views button{font:inherit;font-size:.82rem;font-weight:600;color:var(--ink-faint);background:none;border:none;padding:8px 18px;border-radius:100px;cursor:pointer;transition:color .18s var(--eo),background .18s var(--eo);display:inline-flex;align-items:center;gap:7px}
-.views button:hover{color:var(--ink)}
-.views button[aria-selected="true"]{color:var(--bg);background:var(--lead)}
-.views .vcount{font-size:.72rem;font-variant-numeric:tabular-nums;opacity:.75}
-
-.toolbar{display:flex;flex-wrap:wrap;gap:11px 14px;align-items:center;margin:24px 0 6px}
-.search{position:relative;flex:1 1 250px;min-width:190px}
-.search input{width:100%;padding:11px 14px 11px 40px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);color:var(--ink);font:inherit;font-size:.9rem;outline:none;transition:border-color .18s}
-.search input:focus-visible{border-color:var(--lead);box-shadow:0 0 0 3px oklch(76% 0.15 300 / .25)}
-.search input::placeholder{color:var(--ink-faint)}
-.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--ink-faint);fill:none;stroke-width:2}
-.sortsel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);color:var(--ink-dim);font:inherit;font-size:.82rem;padding:10px 12px;cursor:pointer;outline:none}
-.sortsel:focus-visible{border-color:var(--lead)}
-
-.chips{display:flex;gap:7px;flex-wrap:wrap}
-.chip{font:inherit;font-size:.8rem;font-weight:500;color:var(--ink-dim);background:var(--panel);border:1px solid var(--line);padding:7px 13px;border-radius:100px;cursor:pointer;user-select:none;transition:all .16s var(--eo);display:inline-flex;align-items:center;gap:7px}
-.chip:hover{background:var(--panel-2);color:var(--ink)}
-.chip[aria-pressed="true"]{color:var(--ink);border-color:color-mix(in oklch,var(--tone,var(--lead)) 55%,var(--line));background:color-mix(in oklch,var(--tone,var(--lead)) 12%,var(--panel))}
-.chip .k{width:8px;height:8px;border-radius:50%;background:var(--tone,var(--ink-faint))}
-.chip .n{font-variant-numeric:tabular-nums;color:var(--ink-faint);font-size:.74rem}
-
-.metarow{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-top:14px;font-size:.72rem;color:var(--ink-faint);font-variant-numeric:tabular-nums}
-.metarow b{color:var(--ink-dim);font-weight:600}
-.toggles{display:flex;gap:7px;margin-left:auto}
-.tg{font:inherit;font-size:.72rem;color:var(--ink-faint);background:none;border:1px solid var(--line-soft);border-radius:6px;padding:4px 9px;cursor:pointer;transition:all .16s}
-.tg:hover{color:var(--ink-dim);border-color:var(--line)}
-.tg[aria-pressed="true"]{color:var(--ink);border-color:var(--lead);background:color-mix(in oklch,var(--lead) 12%,transparent)}
-
-main{margin-top:28px}
-.group{margin-bottom:28px}
-.ghead{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:0 3px}
-.ghead .gk{width:9px;height:9px;border-radius:50%;background:var(--tone,var(--ink-faint))}
-.ghead h2{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
-.ghead .gc{font-size:.72rem;color:var(--ink-faint);font-variant-numeric:tabular-nums}
-.ghead .gd{font-size:.74rem;color:var(--ink-faint);margin-left:auto;text-align:right;display:none}
-@media(min-width:640px){.ghead .gd{display:block}}
-
-.rows{display:flex;flex-direction:column;border:1px solid var(--line-soft);border-radius:var(--radius);overflow:hidden;background:var(--panel)}
-.row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px 15px;align-items:center;padding:13px 16px;border-top:1px solid var(--line-soft);transition:background .15s}
-.row:first-child{border-top:none}
-.row:hover{background:var(--panel-2)}
-.row .lead-cell{display:flex;align-items:center;gap:11px;min-width:0}
-.row .k{width:9px;height:9px;border-radius:50%;background:var(--tone);flex:none;box-shadow:0 0 0 3px color-mix(in oklch,var(--tone) 18%,transparent)}
-.row .name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row .name a{text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
-.row .name a:hover{border-color:color-mix(in oklch,var(--tone) 60%,transparent)}
-.row .desc{grid-column:2;font-size:.8rem;color:var(--ink-dim);min-width:0}
-.row .meta{display:flex;align-items:center;gap:7px;justify-self:end;white-space:nowrap}
-@media(max-width:640px){
-  .row{grid-template-columns:1fr;gap:6px}
-  .row .meta{justify-self:start;flex-wrap:wrap}
-  .row .desc{grid-column:1}
-}
-
-.pill{font-size:.62rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:5px;color:var(--tone);background:color-mix(in oklch,var(--tone) 14%,transparent);border:1px solid color-mix(in oklch,var(--tone) 30%,transparent)}
-.st{font-size:.62rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:5px}
-.st-building{color:var(--trigger);background:color-mix(in oklch,var(--trigger) 15%,transparent)}
-.st-dormant{color:oklch(74% 0.10 230);background:oklch(74% 0.10 230 / .14)}
-.st-retired{color:var(--ink-faint);background:var(--panel-2);text-decoration:line-through}
-.team{font-size:.64rem;font-weight:600;padding:3px 9px;border-radius:100px;color:var(--tt,var(--ink-dim));background:color-mix(in oklch,var(--tt,var(--ink-faint)) 13%,transparent);border:1px solid color-mix(in oklch,var(--tt,var(--ink-faint)) 26%,transparent)}
-.rep{font:inherit;font-size:.7rem;font-weight:600;color:var(--lead);background:color-mix(in oklch,var(--lead) 12%,transparent);border:1px solid color-mix(in oklch,var(--lead) 32%,transparent);border-radius:6px;padding:4px 9px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s}
-.rep:hover{background:color-mix(in oklch,var(--lead) 22%,transparent)}
-.rep svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
-.ext{width:14px;height:14px;stroke:var(--ink-faint);fill:none;stroke-width:2;transition:stroke .15s}
-a:hover .ext{stroke:var(--ink)}
-
-.mira-intro{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:28px}
-.mira-intro .tag{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--lead);margin-bottom:12px}
-.mira-intro .tag .k{width:9px;height:9px;border-radius:50%;background:var(--lead)}
-.mira-intro h2{font-size:1.2rem;font-weight:700;letter-spacing:-.02em;margin-bottom:7px}
-.mira-intro p{font-size:.88rem;color:var(--ink-dim);max-width:72ch;text-wrap:pretty}
-.principles{list-style:none;margin-top:18px;display:grid;gap:10px}
-.principles li{font-size:.84rem;color:var(--ink-dim);padding-left:20px;position:relative;text-wrap:pretty}
-.principles li::before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--lead)}
-.principles b{color:var(--ink);font-weight:600}
-.mira-links{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
-.mlink{font-size:.76rem;font-family:'JetBrains Mono',monospace;color:var(--ink-dim);text-decoration:none;border:1px solid var(--line);border-radius:7px;padding:6px 11px;display:inline-flex;align-items:center;gap:7px;transition:all .15s}
-.mlink:hover{border-color:var(--lead);color:var(--ink)}
-
-.seat{margin-bottom:24px}
-.seat > h3{font-size:.76rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:2px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
-.seat > h3 .when{font-size:.7rem;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink-faint)}
-.seat .voices{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:9px;margin-top:12px}
-.voice{display:flex;gap:11px;align-items:flex-start;background:var(--panel);border:1px solid var(--line-soft);border-radius:10px;padding:12px 13px;text-decoration:none;transition:border-color .15s,background .15s,transform .15s var(--eo)}
-.voice:hover{border-color:color-mix(in oklch,var(--tone) 55%,var(--line));background:var(--panel-2);transform:translateY(-1px)}
-.voice .av{width:30px;height:30px;border-radius:8px;flex:none;display:grid;place-items:center;font-size:.7rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--tone);background:color-mix(in oklch,var(--tone) 16%,transparent);border:1px solid color-mix(in oklch,var(--tone) 34%,transparent)}
-.voice .vb{min-width:0}
-.voice .vn{font-size:.84rem;font-weight:600;color:var(--ink)}
-.voice .vr{font-size:.75rem;color:var(--ink-dim);margin-top:2px;line-height:1.42}
-
-.rp-agent{margin-bottom:26px}
-.rp-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.rp-head .av{width:38px;height:38px;border-radius:10px;flex:none;display:grid;place-items:center;font-size:.8rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--tone);background:color-mix(in oklch,var(--tone) 16%,transparent);border:1px solid color-mix(in oklch,var(--tone) 34%,transparent)}
-.rp-head .rn{font-size:1rem;font-weight:700}
-.rp-head .rr{font-size:.78rem;color:var(--ink-faint)}
-.report{background:var(--panel);border:1px solid var(--line-soft);border-radius:12px;padding:16px 17px;margin-bottom:10px;transition:border-color .15s}
-.report:hover{border-color:var(--line)}
-.report .rtop{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:9px}
-.report .rtype{font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-dim)}
-.report .rts{font-size:.74rem;color:var(--ink-faint);font-family:'JetBrains Mono',monospace}
-.report .verdict{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:600}
-.vp{font-size:.62rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:100px}
-.vp-solid{color:oklch(80% 0.13 150);background:oklch(80% 0.13 150 / .14)}
-.vp-adjust{color:var(--trigger);background:color-mix(in oklch,var(--trigger) 16%,transparent)}
-.vp-halt{color:oklch(72% 0.17 25);background:oklch(72% 0.17 25 / .15)}
-.report .rsum{font-size:.84rem;color:var(--ink-dim);line-height:1.6;text-wrap:pretty}
-.report .rtally{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.tw{font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:6px;color:var(--ink-dim);background:var(--panel-2);border:1px solid var(--line-soft)}
-.tw b{color:var(--ink);font-variant-numeric:tabular-nums}
-.tw.med{color:var(--trigger)}
-.tw.done{color:oklch(80% 0.12 150)}
-.rp-target{font-size:.74rem;color:var(--ink-faint);font-family:'JetBrains Mono',monospace;margin-bottom:11px}
-.rp-back{font:inherit;font-size:.74rem;color:var(--ink-dim);background:none;border:1px solid var(--line);border-radius:7px;padding:6px 12px;cursor:pointer;transition:all .15s}
-.rp-back:hover{border-color:var(--lead);color:var(--ink)}
-
-.state{padding:52px 20px;text-align:center;color:var(--ink-dim);border:1px dashed var(--line);border-radius:var(--radius);background:var(--panel)}
-.state .big{font-size:1rem;color:var(--ink);font-weight:600;margin-bottom:6px}
-.state.err{border-color:color-mix(in oklch,oklch(72% 0.17 25) 40%,var(--line));color:oklch(78% 0.12 25)}
-.state button{font:inherit;margin-top:14px;font-size:.8rem;color:var(--ink);background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 16px;cursor:pointer}
-.state button:hover{border-color:var(--lead)}
-.skeleton{height:52px;border-radius:8px;background:linear-gradient(90deg,var(--panel) 0%,var(--panel-2) 50%,var(--panel) 100%);background-size:200% 100%;animation:sh 1.3s ease-in-out infinite;margin-bottom:8px;border:1px solid var(--line-soft)}
-@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line-soft);font-size:.72rem;color:var(--ink-faint);line-height:1.8;max-width:80ch;text-wrap:pretty}
-footer code{font-family:'JetBrains Mono',monospace}
-footer b{color:var(--ink-dim);font-weight:600}
-.hidden{display:none!important}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brain Config Index</title>
+<!-- INFRASTRUCTURE: multi-file (thin shell + source/ modules fetched at runtime) -->
+<!-- Engine updates: version-bump this shell + source/app.js. GitHub Pages-hosted; not offline file:// capable. -->
+<link rel="stylesheet" href="source/styles.css">
 </head>
 <body>
-<div class="wrap">
+<div class="container">
   <header>
-    <div class="kicker">Brain Config</div>
-    <h1>The Toolkit Hub</h1>
-    <p class="lede">Every hook, trigger, gate, and agent in one comprehensive read, sortable, filterable, searchable. Generated from <code>registry.json</code>; profiles in git are the source of truth. Agents carry a detail layer: team assignment and their report history.</p>
-  </header>
-
-  <div class="views" role="tablist" id="views">
-    <button role="tab" data-view="index" aria-selected="true">Index <span class="vcount" id="vc-index"></span></button>
-    <button role="tab" data-view="mira">Mira</button>
-    <button role="tab" data-view="reports">Reports</button>
-  </div>
-
-  <section id="view-index">
-    <div class="toolbar">
-      <label class="search">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="q" type="search" placeholder="Search tools by name or what they do..." autocomplete="off">
-      </label>
-      <select class="sortsel" id="sort" aria-label="Sort by">
-        <option value="shelf">Group by shelf</option>
-        <option value="name">Sort A–Z</option>
-        <option value="status">Sort by status</option>
-      </select>
+    <h1>Brain Config</h1>
+    <p>Tool registry for the AI Toolkit. Live from mawizorek/ClickUp_apps/brain-config/</p>
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Search tools, purpose, nicknames\u2026" autocomplete="off">
     </div>
-    <div class="chips" id="shelf-chips"></div>
-    <div class="metarow">
-      <span><b id="m-shown">0</b> shown</span>
-      <span><b id="m-total">0</b> tools total</span>
-      <span id="m-gen"></span>
-      <div class="toggles">
-        <button class="tg" id="tg-dormant" aria-pressed="false">Dormant</button>
-        <button class="tg" id="tg-retired" aria-pressed="false">Retired</button>
+    <div class="controls">
+      <span class="pill" data-filter="hooks"><strong id="count-hooks">0</strong> hooks</span>
+      <span class="pill" data-filter="gates"><strong id="count-gates">0</strong> gates</span>
+      <span class="pill" data-filter="prose"><strong id="count-prose">0</strong> prose</span>
+      <span class="pill" data-filter="triggers"><strong id="count-triggers">0</strong> triggers</span>
+      <span class="pill" data-filter="agents"><strong id="count-agents">0</strong> agents</span>
+      <div class="sort-group">
+        <button class="sort-btn active" data-sort="shelf">shelf</button>
+        <button class="sort-btn" data-sort="created">created</button>
+        <button class="sort-btn" data-sort="usage">usage</button>
       </div>
     </div>
-    <main id="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></main>
-  </section>
-
-  <section id="view-mira" class="hidden"><main id="mira"></main></section>
-  <section id="view-reports" class="hidden"><main id="reports"></main></section>
-
+    <div class="status-bar">
+      <span id="total-count">0 total</span>
+      <span id="sessions-logged"></span>
+      <span id="last-updated"></span>
+      <button id="clear-cache" class="cache-btn">clear cache</button>
+    </div>
+  </header>
+  <div id="loading" class="loading">Loading from GitHub\u2026</div>
+  <div id="content"></div>
+  <div id="no-results" class="no-results">No tools match that search.</div>
   <footer>
-    Reads <code>registry.json</code> + per-agent <code>agents/&lt;slug&gt;/reports/</code> live. Firing behavior is governed by the AI Toolkit index in ClickUp; this is the navigable projection. The <b>Mira</b> tab holds the Council orchestration; agent cards link to their profile and reports.
+    Pulls live from GitHub API. Usage counts from usage-log.json. Canonical firing source: AI Toolkit index (ClickUp doc).
   </footer>
 </div>
-
-<script>
-const REG='registry.json';
-const BLOB='https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/';
-const AG='agents/';
-const KIND={hook:{label:'Hooks',tone:'var(--hook)',blurb:'Deterministic, fire on trigger'},trigger:{label:'Triggers',tone:'var(--trigger)',blurb:'Contextual context-loads'},gate:{label:'Gates',tone:'var(--gate)',blurb:'Pass / route decisions'},agent:{label:'Agents',tone:'var(--agent)',blurb:'Workers with reports + detail layer'}};
-const KIND_ORDER=['hook','trigger','gate','agent'];
-const ST_ORDER={active:0,building:1,dormant:2,retired:3};
-const SEATS=[
-  {id:'lead',label:'Conductor',when:'presides every substantive turn'},
-  {id:'core',label:'Core Panel',when:'every substantive turn — divergence engine'},
-  {id:'depth',label:'Depth Pair',when:'technical / domain / unfamiliar turns'},
-  {id:'output',label:'Output Filter',when:'reviews the draft, does not seed it'},
-  {id:'build',label:'Build Gate',when:'fires first at brainstorm-open'},
-  {id:'workshop',label:'The Workshop',when:'repo edits, specs, structural work'},
-  {id:'close',label:'Close Phase',when:'wind-down / big-decision stretches'},
-  {id:'research',label:'Research',when:'called on demand'},
-  {id:'audit',label:'Audit',when:'called on demand / session close'}
-];
-const TEAM_TONE={council:'var(--lead)',workshop:'var(--trigger)'};
-let DATA=null, tools=[], state={view:'index',shelf:'all',q:'',sort:'shelf',dormant:false,retired:false,focusAgent:null};
-const repCache={};
-
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const initials=n=>n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-const toneFor=t=>t.isAgent?(t.accent||KIND.agent.tone):KIND[t.kind].tone;
-const teamName=s=>(DATA.teams.find(x=>x.slug===s)||{}).name||s;
-
-async function boot(){
-  try{
-    const r=await fetch(REG,{cache:'no-store'});
-    if(!r.ok)throw new Error('registry '+r.status);
-    DATA=await r.json();
-    tools=[
-      ...(DATA.hooks||[]).map(x=>({...x,kind:'hook'})),
-      ...(DATA.triggers||[]).map(x=>({...x,kind:'trigger'})),
-      ...(DATA.gates||[]).map(x=>({...x,kind:'gate'})),
-      ...(DATA.agents||[]).map(x=>({...x,kind:(x.type==='gate'?'gate':'agent'),isAgent:true,desc:x.role}))
-    ];
-    buildChips();
-    document.getElementById('m-total').textContent=tools.length;
-    document.getElementById('vc-index').textContent=tools.length;
-    document.getElementById('m-gen').textContent=DATA.generated?('generated '+DATA.generated):'';
-    render();
-  }catch(e){
-    document.getElementById('list').innerHTML=`<div class="state err"><div class="big">Couldn't load the registry</div>${esc(e.message)}. Pages may be mid-build (~60s lag) or the network hiccuped.<br><button onclick="boot()">Try again</button></div>`;
-  }
-}
-
-function statusAllowed(s){return s==='active'||s==='building'||(s==='dormant'&&state.dormant)||(s==='retired'&&state.retired);}
-
-function buildChips(){
-  const counts={all:0}; KIND_ORDER.forEach(k=>counts[k]=0);
-  tools.forEach(t=>{counts.all++;counts[t.kind]++;});
-  const chips=[['all','All',null,'var(--lead)'],...KIND_ORDER.map(k=>[k,KIND[k].label,k,KIND[k].tone])];
-  document.getElementById('shelf-chips').innerHTML=chips.map(([id,label,k,tone])=>
-    `<button class="chip" data-shelf="${id}" style="--tone:${tone}" aria-pressed="${state.shelf===id}">${k?'<span class="k"></span>':''}${label}<span class="n">${counts[id]}</span></button>`).join('');
-  document.querySelectorAll('#shelf-chips .chip').forEach(c=>c.onclick=()=>{state.shelf=c.dataset.shelf;syncChips();render();});
-}
-function syncChips(){document.querySelectorAll('#shelf-chips .chip').forEach(c=>c.setAttribute('aria-pressed',state.shelf===c.dataset.shelf));}
-
-function visible(){
-  const q=state.q.toLowerCase().trim();
-  return tools.filter(t=>{
-    if(state.shelf!=='all'&&t.kind!==state.shelf)return false;
-    if(!statusAllowed(t.status))return false;
-    if(q){const hay=(t.name+' '+(t.desc||t.summary||'')+' '+t.kind+' '+((t.teams||[]).join(' '))).toLowerCase();if(!hay.includes(q))return false;}
-    return true;
-  });
-}
-
-function rowHTML(t){
-  const tone=toneFor(t);
-  const link=t.profile?BLOB+t.profile:null;
-  const nameHTML=link?`<a href="${esc(link)}" target="_blank" rel="noopener">${esc(t.name)}</a>`:esc(t.name);
-  const teamTags=(t.teams||[]).map(tm=>`<span class="team" style="--tt:${TEAM_TONE[tm]||'var(--ink-faint)'}">${esc(teamName(tm))}</span>`).join('');
-  const rep=t.hasReports?`<button class="rep" data-rep="${esc(t.slug)}"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Reports</button>`:'';
-  const ext=link?`<a href="${esc(link)}" target="_blank" rel="noopener" title="Open profile"><svg class="ext" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a>`:'';
-  const st=t.status!=='active'?`<span class="st st-${t.status}">${esc(t.status)}</span>`:'';
-  return `<div class="row" style="--tone:${tone}">
-    <div class="lead-cell"><span class="k"></span><span class="name">${nameHTML}</span></div>
-    <div class="desc">${esc(t.desc||t.summary||'')}</div>
-    <div class="meta"><span class="pill" style="--tone:${KIND[t.kind].tone}">${t.kind}</span>${st}${teamTags}${rep}${ext}</div>
-  </div>`;
-}
-
-function render(){
-  if(state.view!=='index')return;
-  const list=document.getElementById('list'), items=visible();
-  document.getElementById('m-shown').textContent=items.length;
-  if(!items.length){list.innerHTML=`<div class="state"><div class="big">Nothing matches</div>Try a different search or clear the shelf filter.</div>`;return;}
-  let html='';
-  if(state.sort==='shelf'){
-    KIND_ORDER.forEach(k=>{
-      const g=items.filter(t=>t.kind===k);if(!g.length)return;
-      g.sort((a,b)=>a.name.localeCompare(b.name));
-      html+=`<div class="group"><div class="ghead" style="--tone:${KIND[k].tone}"><span class="gk"></span><h2>${KIND[k].label}</h2><span class="gc">${g.length}</span><span class="gd">${KIND[k].blurb}</span></div><div class="rows">${g.map(rowHTML).join('')}</div></div>`;
-    });
-  }else{
-    const sorted=[...items].sort((a,b)=> state.sort==='status'
-      ? (ST_ORDER[a.status]-ST_ORDER[b.status])||a.name.localeCompare(b.name)
-      : a.name.localeCompare(b.name));
-    html=`<div class="group"><div class="rows">${sorted.map(rowHTML).join('')}</div></div>`;
-  }
-  list.innerHTML=html;
-  list.querySelectorAll('[data-rep]').forEach(b=>b.onclick=()=>{state.focusAgent=b.dataset.rep;switchView('reports');});
-}
-
-function renderMira(){
-  const el=document.getElementById('mira');
-  const lead=(DATA.agents||[]).find(a=>a.slug==='maestro-mira');
-  let html=`<div class="mira-intro">
-    <div class="tag"><span class="k"></span>The Conductor</div>
-    <h2>${esc(lead?lead.name:'Maestro Mira')}</h2>
-    <p>${esc(lead?lead.role:'')} The Council convenes on substantive turns; trivial turns convene no one. Mira emits an anchor line to Michael before convening, then seats the voices the moment calls for.</p>
-    <ul class="principles">
-      <li><b>Anchor line first</b>, then convene. Protects the first-token connection.</li>
-      <li><b>Blind in, weight none above another.</b> Read reasoning traces, not votes.</li>
-      <li><b>Correct substance freely; preserve Michael's voice; surface roads not taken.</b></li>
-      <li><b>Bounded loop:</b> max two passes; terminate when no substantive disagreement remains.</li>
-    </ul>
-    <div class="mira-links">
-      <a class="mlink" href="${BLOB}agents/maestro-mira.md" target="_blank" rel="noopener">agents/maestro-mira.md</a>
-      <a class="mlink" href="${BLOB}council.md" target="_blank" rel="noopener">council.md</a>
-      <a class="mlink" href="${BLOB}registry.json" target="_blank" rel="noopener">registry.json</a>
-    </div>
-  </div>`;
-  SEATS.forEach(s=>{
-    const voices=(DATA.agents||[]).filter(a=>a.seat===s.id&&a.status!=='retired');
-    if(!voices.length)return;
-    html+=`<div class="seat"><h3>${esc(s.label)} <span class="when">${esc(s.when)}</span></h3><div class="voices">`;
-    voices.forEach(a=>{
-      html+=`<a class="voice" style="--tone:${a.accent||'var(--agent)'}" href="${BLOB}${a.profile}" target="_blank" rel="noopener"><span class="av">${esc(initials(a.name))}</span><span class="vb"><span class="vn">${esc(a.name)}</span><span class="vr">${esc(a.role)}</span></span></a>`;
-    });
-    html+=`</div></div>`;
-  });
-  el.innerHTML=html;
-}
-
-async function loadReports(a){
-  if(repCache[a.slug])return repCache[a.slug];
-  try{
-    const r=await fetch(`${AG}${a.slug}/reports/index.json`,{cache:'no-store'});
-    if(!r.ok)throw 0;
-    const j=await r.json();repCache[a.slug]=j.reports||[];return repCache[a.slug];
-  }catch(e){repCache[a.slug]=[];return [];}
-}
-function reportCard(rp){
-  const pill=rp.verdictPill||'solid';
-  return `<div class="report"><div class="rtop">
-    <span class="rtype">${esc(rp.reportType||rp.type||'Report')}</span>
-    <span class="rts">${esc((rp.ts||'').replace('T',' ').slice(0,16))}</span>
-    <span class="verdict"><span class="vp vp-${esc(pill)}">${esc(rp.verdictWord||pill)}</span>${rp.pillText?`<span style="color:var(--ink-faint);font-weight:500">${esc(rp.pillText)}</span>`:''}</span>
-  </div>${rp.target?`<div class="rp-target">${esc(rp.target)}</div>`:''}${rp.summary?`<div class="rsum">${esc(rp.summary)}</div>`:''}${(rp.tally||[]).length?`<div class="rtally">${rp.tally.map(t=>`<span class="tw ${esc(t.c||'')}"><b>${esc(t.n)}</b> ${esc(t.l)}</span>`).join('')}</div>`:''}</div>`;
-}
-async function renderReports(){
-  const el=document.getElementById('reports');
-  let agents=(DATA.agents||[]).filter(a=>a.hasReports);
-  if(state.focusAgent)agents=agents.filter(a=>a.slug===state.focusAgent);
-  if(!agents.length){el.innerHTML=`<div class="state"><div class="big">No reports yet</div>Agents log reports to <code>agents/&lt;slug&gt;/reports/</code>. None are published for this filter.</div>`;return;}
-  el.innerHTML='<div class="skeleton"></div><div class="skeleton"></div>';
-  let html='';
-  if(state.focusAgent)html+=`<div class="metarow" style="margin:0 0 18px"><button class="rp-back" id="rp-back">← All reports</button></div>`;
-  for(const a of agents){
-    const reps=await loadReports(a);
-    html+=`<div class="rp-agent"><div class="rp-head" style="--tone:${a.accent||'var(--agent)'}"><span class="av">${esc(initials(a.name))}</span><div><div class="rn">${esc(a.name)}</div><div class="rr">${esc(a.role)}</div></div></div>`;
-    html+= reps.length? reps.map(reportCard).join('') : `<div class="state">No published reports for ${esc(a.name)} yet.</div>`;
-    html+=`</div>`;
-  }
-  el.innerHTML=html;
-  const back=document.getElementById('rp-back');
-  if(back)back.onclick=()=>{state.focusAgent=null;renderReports();};
-}
-
-function switchView(v){
-  state.view=v;
-  document.querySelectorAll('#views button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));
-  document.getElementById('view-index').classList.toggle('hidden',v!=='index');
-  document.getElementById('view-mira').classList.toggle('hidden',v!=='mira');
-  document.getElementById('view-reports').classList.toggle('hidden',v!=='reports');
-  if(v==='index')render();
-  if(v==='mira')renderMira();
-  if(v==='reports')renderReports();
-}
-
-document.querySelectorAll('#views button').forEach(b=>b.onclick=()=>{if(b.dataset.view!=='reports')state.focusAgent=null;switchView(b.dataset.view);});
-document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value;render();});
-document.getElementById('sort').addEventListener('change',e=>{state.sort=e.target.value;render();});
-document.getElementById('tg-dormant').onclick=e=>{state.dormant=!state.dormant;e.currentTarget.setAttribute('aria-pressed',state.dormant);render();};
-document.getElementById('tg-retired').onclick=e=>{state.retired=!state.retired;e.currentTarget.setAttribute('aria-pressed',state.retired);render();};
-boot();
-</script>
+<script src="source/data.js"></script>
+<script src="source/app.js"></script>
 </body>
 </html>
