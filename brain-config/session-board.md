@@ -25,20 +25,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session 0704a · started 2026-07-04 ~01:45 EDT (last update 02:19 EDT)
-
-Working with Michael on **agent-structure hardening** in `brain-config/`. Everything below is on `main` and already committed:
-
-- **`agents/workshop-wes.md`** — rewrote with a front-matter identity block (`slug` / `display_name` / `nicknames` / `role` / `accent`). The `slug` is now the permanent identity and equals the filename; renames change `display_name` only. This is the new naming standard for every agent profile, so if you're creating or renaming an agent, follow this pattern and read the Tool Authoring Guidebook first.
-- **Deleted orphans `agents/red-rhett.md` and `agents/repo-renata.md`** — superseded by `workshop-wes.md` and `recon-renata.md`. If you hold a pointer to either old file, update it. Live files are `workshop-wes.md` and `recon-renata.md`.
-- **`open-thread.md`** — appended a migration item flagging every surface that still hand-copies agent names (Toolkit doc roster, `index.html` NICKNAMES map, per-agent report folders) so they can be repointed to read from profile headers.
-- **`session-board.md`** — created and now iterating on this very file.
-
-Also edited two ClickUp docs (outside the repo, not git): the AI Toolkit index (roster + trigger table repointed to the correct current agent slugs) and the Tool Authoring Guidebook (added the immutable-slug naming rule + the session-board coordination rule).
-
-**Heads-up:** `brain-config/index.html` is 37KB, over the ~30KB read/write cap. It still has a hard-coded NICKNAMES map and a stale `repo-renata.md` pointer, but I did NOT touch it, it needs a UI upload or blob-SHA path. Leave it alone unless you're equipped for the over-cap write.
-
-**Status:** wrapping up. This entry gets deleted when the session closes.
+*(empty — no agents currently working in the repo)*
 
 ---
 
