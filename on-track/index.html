@@ -58,10 +58,10 @@
   --text-3:    oklch(0.56 0.025 264);
   --accent:    oklch(0.57 0.23 26);
   --accent-ink: oklch(0.99 0.01 26);
-  --live:      oklch(0.60 0.18 145);
+  --live:      oklch(0.55 0.16 145);
   --live-ink:  oklch(0.99 0.02 145);
-  --hero-grad-a: oklch(0.29 0.08 264);
-  --hero-grad-b: oklch(0.22 0.055 264);
+  --hero-grad-a: oklch(0.945 0.028 264);
+  --hero-grad-b: oklch(0.885 0.04 264);
   --shadow: 0 10px 30px -18px oklch(0.4 0.04 264 / 0.35);
   color-scheme: light;
 }
@@ -79,6 +79,12 @@
   --s-f2:      oklch(0.66 0.15 285);
   --s-f3:      oklch(0.72 0.11 300);
   --s-supercars: oklch(0.70 0.15 45);
+  --s-moto2:   oklch(0.68 0.16 38);
+  --s-moto3:   oklch(0.75 0.13 70);
+  --s-motoamerica: oklch(0.62 0.21 10);
+  --s-mxgp:    oklch(0.69 0.18 150);
+  --s-bsb:     oklch(0.60 0.16 258);
+  --s-speedway: oklch(0.66 0.16 332);
   --s-default: oklch(0.68 0.03 264);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --maxw: 1080px;
@@ -95,6 +101,7 @@ body {
   min-height: 100vh;
   padding-bottom: env(safe-area-inset-bottom);
   -webkit-font-smoothing: antialiased;
+  transition: background .3s var(--ease), color .3s var(--ease);
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
@@ -135,11 +142,12 @@ body {
   background: linear-gradient(135deg, var(--hero-grad-a), var(--hero-grad-b));
   border: 1px solid var(--border-soft); border-radius: 18px;
   padding: clamp(20px, 4vw, 30px); margin-bottom: 22px; box-shadow: var(--shadow);
+  transition: background .3s var(--ease);
 }
 .hero::before {
   content: ""; position: absolute; inset: 0;
   background:
-    repeating-linear-gradient(135deg, transparent 0 22px, oklch(1 0 0 / 0.018) 22px 44px);
+    repeating-linear-gradient(135deg, transparent 0 22px, color-mix(in oklch, var(--text) 2.5%, transparent) 22px 44px);
   pointer-events: none;
 }
 .hero-eyebrow {
@@ -152,14 +160,14 @@ body {
   box-shadow: 0 0 0 0 var(--live); animation: pulse 2s infinite;
 }
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 oklch(0.72 0.20 145 / 0.6); }
-  70% { box-shadow: 0 0 0 12px oklch(0.72 0.20 145 / 0); }
-  100% { box-shadow: 0 0 0 0 oklch(0.72 0.20 145 / 0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--live) 60%, transparent); }
+  70% { box-shadow: 0 0 0 12px color-mix(in oklch, var(--live) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--live) 0%, transparent); }
 }
 .hero-live-list { display: flex; flex-direction: column; gap: 12px; position: relative; }
 .live-card {
   display: flex; align-items: flex-start; gap: 14px;
-  background: oklch(1 0 0 / 0.05); border: 1px solid var(--border);
+  background: color-mix(in oklch, var(--text) 5%, transparent); border: 1px solid var(--border);
   border-radius: 14px; padding: 16px 16px 16px 14px;
 }
 .live-card .sbar { width: 4px; align-self: stretch; border-radius: 4px; background: var(--sc, var(--s-default)); flex: none; }
@@ -187,8 +195,8 @@ body {
 .next-info { flex: 1; min-width: 220px; }
 .next-info .live-title { font-size: clamp(1.05rem, 3.6vw, 1.35rem); }
 .controls { margin-bottom: 18px; display: flex; flex-direction: column; gap: 14px; }
-.search-row { display: flex; gap: 10px; align-items: center; }
-.search { flex: 1; position: relative; }
+.search-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.search { flex: 1; position: relative; min-width: 200px; }
 .search input {
   width: 100%; background: var(--surface-1); border: 1px solid var(--border);
   color: var(--text); font-size: 0.95rem; font-family: inherit;
@@ -196,7 +204,7 @@ body {
 }
 .search input::placeholder { color: var(--text-3); }
 .search input:focus { outline: none; border-color: var(--accent); }
-.search input:focus-visible { outline: 3px solid oklch(0.63 0.23 26 / 0.4); outline-offset: 1px; }
+.search input:focus-visible { outline: 3px solid color-mix(in oklch, var(--accent) 40%, transparent); outline-offset: 1px; }
 .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-3); }
 .tz-toggle {
   display: inline-flex; background: var(--surface-1); border: 1px solid var(--border);
@@ -209,6 +217,20 @@ body {
 }
 .tz-toggle button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 .tz-toggle button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.jump {
+  position: relative; flex: none;
+}
+.jump select {
+  appearance: none; -webkit-appearance: none;
+  background: var(--surface-1); border: 1px solid var(--border); color: var(--text-2);
+  font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.02em;
+  padding: 10px 32px 10px 34px; border-radius: 11px; cursor: pointer; max-width: 200px;
+  transition: border-color .2s var(--ease);
+}
+.jump select:hover { border-color: var(--accent); }
+.jump select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.jump .cal { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 0.85rem; }
+.jump .chev { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-3); }
 .filter-group { display: flex; flex-direction: column; gap: 8px; }
 .filter-label {
   font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
@@ -248,7 +270,7 @@ body {
 .pasttoggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .pasttoggle .cnt { color: var(--text-3); font-variant-numeric: tabular-nums; }
 .pasttoggle[aria-expanded="true"] { border-color: var(--accent); color: var(--text); }
-.day-group { margin-bottom: 26px; }
+.day-group { margin-bottom: 26px; scroll-margin-top: 8px; }
 .day-group.past-group { opacity: 0.82; }
 .day-head {
   position: sticky; top: 0; z-index: 5;
@@ -336,6 +358,7 @@ footer {
   .evt-plats { grid-area: plats; justify-content: flex-start; padding-left: 80px; }
   .clock { display: none; }
   .day-head .cnt { display: none; }
+  .jump select { max-width: 100%; }
 }
 noscript { display: block; padding: 20px; text-align: center; color: var(--text-2); }
 </style>
@@ -363,6 +386,11 @@ noscript { display: block; padding: 20px; text-align: center; color: var(--text-
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input type="search" id="search" placeholder="Search series, track, or session…" autocomplete="off" aria-label="Search the schedule">
       </label>
+      <div class="jump">
+        <span class="cal">📅</span>
+        <select id="jumpDate" aria-label="Jump to date"></select>
+        <span class="chev">▾</span>
+      </div>
       <div class="tz-toggle" role="group" aria-label="Timezone">
         <button id="tzET" aria-pressed="true">ET</button>
         <button id="tzLocal" aria-pressed="false">My time</button>
@@ -402,47 +430,69 @@ noscript { display: block; padding: 20px; text-align: center; color: var(--text-
   </footer>
 </div>
 <script>
-const APP_VERSION = 'v1.2';
+const APP_VERSION = 'v1.3';
 const APP_DATE = '2026-07-04';
 const APP_SLUG = 'on-track';
 const SERIES = {
-  'F1':        { label: 'Formula 1',      color: 'var(--s-f1)' },
-  'F2':        { label: 'Formula 2',      color: 'var(--s-f2)' },
-  'F3':        { label: 'Formula 3',      color: 'var(--s-f3)' },
-  'NASCAR':    { label: 'NASCAR',         color: 'var(--s-nascar)' },
-  'IndyCar':   { label: 'IndyCar',        color: 'var(--s-indycar)' },
-  'MotoGP':    { label: 'MotoGP',         color: 'var(--s-motogp)' },
-  'IMSA':      { label: 'IMSA',           color: 'var(--s-imsa)' },
-  'WEC':       { label: 'WEC',            color: 'var(--s-wec)' },
-  'NHRA':      { label: 'NHRA',           color: 'var(--s-nhra)' },
-  'Formula E': { label: 'Formula E',      color: 'var(--s-formulae)' },
-  'WSBK':      { label: 'World Superbike',color: 'var(--s-wsbk)' },
-  'SMX':       { label: 'Supercross/SMX', color: 'var(--s-smx)' },
-  'Supercars': { label: 'Supercars',      color: 'var(--s-supercars)' }
+  'F1':          { label: 'Formula 1',      color: 'var(--s-f1)' },
+  'F2':          { label: 'Formula 2',      color: 'var(--s-f2)' },
+  'F3':          { label: 'Formula 3',      color: 'var(--s-f3)' },
+  'NASCAR':      { label: 'NASCAR',         color: 'var(--s-nascar)' },
+  'IndyCar':     { label: 'IndyCar',        color: 'var(--s-indycar)' },
+  'MotoGP':      { label: 'MotoGP',         color: 'var(--s-motogp)' },
+  'Moto2':       { label: 'Moto2',          color: 'var(--s-moto2)' },
+  'Moto3':       { label: 'Moto3',          color: 'var(--s-moto3)' },
+  'IMSA':        { label: 'IMSA',           color: 'var(--s-imsa)' },
+  'WEC':         { label: 'WEC',            color: 'var(--s-wec)' },
+  'NHRA':        { label: 'NHRA',           color: 'var(--s-nhra)' },
+  'Formula E':   { label: 'Formula E',      color: 'var(--s-formulae)' },
+  'WSBK':        { label: 'World Superbike',color: 'var(--s-wsbk)' },
+  'MotoAmerica': { label: 'MotoAmerica',    color: 'var(--s-motoamerica)' },
+  'MXGP':        { label: 'MXGP',           color: 'var(--s-mxgp)' },
+  'BSB':         { label: 'British Superbike', color: 'var(--s-bsb)' },
+  'Speedway':    { label: 'FIM Speedway',   color: 'var(--s-speedway)' },
+  'SMX':         { label: 'Supercross/SMX', color: 'var(--s-smx)' },
+  'Supercars':   { label: 'Supercars',      color: 'var(--s-supercars)' }
 };
 const seriesColor = s => (SERIES[s] && SERIES[s].color) || 'var(--s-default)';
 const FALLBACK_DATA = {
   version: '2026-07-04',
   events: [
-    { series:'F1',      kind:'Practice',   title:'British Grand Prix', detail:'Silverstone', start:'2026-07-03T07:30:00-04:00', end:'2026-07-03T08:30:00-04:00', platforms:['ESPN2'] },
-    { series:'F1',      kind:'Sprint Qual',title:'British Grand Prix', detail:'Silverstone', start:'2026-07-03T11:30:00-04:00', end:'2026-07-03T12:15:00-04:00', platforms:['ESPNU'] },
+    { series:'F1',      kind:'Practice',   title:'British Grand Prix', detail:'Silverstone', start:'2026-07-03T07:30:00-04:00', end:'2026-07-03T08:30:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Sprint Qual',title:'British Grand Prix', detail:'Silverstone', start:'2026-07-03T11:30:00-04:00', end:'2026-07-03T12:15:00-04:00', platforms:['Apple TV'] },
     { series:'IndyCar', kind:'Practice',   title:'Indy NXT', detail:'Mid-Ohio', start:'2026-07-03T14:00:00-04:00', end:'2026-07-03T15:00:00-04:00', platforms:['FS2'] },
     { series:'IndyCar', kind:'Practice',   title:'Honda Indy 200', detail:'Mid-Ohio', start:'2026-07-03T15:00:00-04:00', end:'2026-07-03T16:00:00-04:00', platforms:['FS2'] },
     { series:'NASCAR',  kind:'Race',       title:'ARCA Ashley Furniture 150', detail:'Chicagoland', start:'2026-07-03T20:00:00-04:00', end:'2026-07-03T22:00:00-04:00', platforms:['FS1'] },
-    { series:'F1',      kind:'Sprint',     title:'British GP Sprint', detail:'Silverstone', start:'2026-07-04T06:00:00-04:00', end:'2026-07-04T07:00:00-04:00', platforms:['ESPN'] },
-    { series:'MotoGP',  kind:'Sprint',     title:'German GP Sprint', detail:'Sachsenring', start:'2026-07-04T09:00:00-04:00', end:'2026-07-04T09:45:00-04:00', platforms:['TNT Sports'] },
+    { series:'F1',      kind:'Sprint',     title:'British GP Sprint', detail:'Silverstone', start:'2026-07-04T06:00:00-04:00', end:'2026-07-04T07:00:00-04:00', platforms:['Apple TV'] },
     { series:'IndyCar', kind:'Qualifying', title:'Indy NXT', detail:'Mid-Ohio', start:'2026-07-04T09:00:00-04:00', end:'2026-07-04T10:00:00-04:00', platforms:['FS1'] },
     { series:'IndyCar', kind:'Practice',   title:'Honda Indy 200', detail:'Mid-Ohio', start:'2026-07-04T10:00:00-04:00', end:'2026-07-04T11:00:00-04:00', platforms:['FS1'] },
-    { series:'F1',      kind:'Qualifying', title:'British Grand Prix', detail:'Silverstone', start:'2026-07-04T10:00:00-04:00', end:'2026-07-04T11:00:00-04:00', platforms:['ESPN'] },
-    { series:'IndyCar', kind:'Race',       title:'Indy NXT Race', detail:'Mid-Ohio', start:'2026-07-04T13:00:00-04:00', end:'2026-07-04T14:00:00-04:00', platforms:['FS1'] },
+    { series:'F1',      kind:'Qualifying', title:'British Grand Prix', detail:'Silverstone', start:'2026-07-04T10:00:00-04:00', end:'2026-07-04T11:00:00-04:00', platforms:['Apple TV'] },
+    { series:'IndyCar', kind:'Race',       title:'Indy NXT Race 1', detail:'Mid-Ohio', start:'2026-07-04T13:00:00-04:00', end:'2026-07-04T14:00:00-04:00', platforms:['FS1'] },
     { series:'IndyCar', kind:'Qualifying', title:'Honda Indy 200', detail:'Mid-Ohio', start:'2026-07-04T14:30:00-04:00', end:'2026-07-04T15:30:00-04:00', platforms:['FS1'] },
     { series:'NASCAR',  kind:'Race',       title:'Cuervo 300', detail:'Chicagoland, O\u2019Reilly Series', start:'2026-07-04T17:30:00-04:00', end:'2026-07-04T20:00:00-04:00', platforms:['The CW'] },
-    { series:'MotoGP',  kind:'Race',       title:'German Grand Prix', detail:'Sachsenring', start:'2026-07-05T08:00:00-04:00', end:'2026-07-05T09:30:00-04:00', platforms:['TNT Sports'] },
     { series:'IndyCar', kind:'Warm-up',    title:'Honda Indy 200', detail:'Mid-Ohio', start:'2026-07-05T09:00:00-04:00', end:'2026-07-05T09:30:00-04:00', platforms:['FS1'] },
-    { series:'F1',      kind:'Race',       title:'British Grand Prix', detail:'Silverstone', start:'2026-07-05T10:00:00-04:00', end:'2026-07-05T12:00:00-04:00', platforms:['ESPN'] },
+    { series:'F1',      kind:'Race',       title:'British Grand Prix', detail:'Silverstone', start:'2026-07-05T10:00:00-04:00', end:'2026-07-05T12:00:00-04:00', platforms:['Apple TV'] },
     { series:'IndyCar', kind:'Race',       title:'Indy NXT Race 2', detail:'Mid-Ohio', start:'2026-07-05T10:00:00-04:00', end:'2026-07-05T11:00:00-04:00', platforms:['FS1'] },
     { series:'IndyCar', kind:'Race',       title:'Honda Indy 200', detail:'Mid-Ohio, green 12:52', start:'2026-07-05T12:30:00-04:00', end:'2026-07-05T15:00:00-04:00', platforms:['Fox','Fubo'] },
-    { series:'NASCAR',  kind:'Race',       title:'eero 400', detail:'Chicagoland, Cup Series', start:'2026-07-05T18:00:00-04:00', end:'2026-07-05T21:00:00-04:00', platforms:['TNT Sports','HBO Max'] }
+    { series:'NASCAR',  kind:'Race',       title:'eero 400', detail:'Chicagoland, Cup Series', start:'2026-07-05T18:00:00-04:00', end:'2026-07-05T21:00:00-04:00', platforms:['TNT Sports','HBO Max'] },
+    { series:'MotoGP',  kind:'Sprint',     title:'German GP Sprint', detail:'Sachsenring', start:'2026-07-11T08:55:00-04:00', end:'2026-07-11T09:35:00-04:00', platforms:['FS1'] },
+    { series:'MotoGP',  kind:'Race',       title:'German Grand Prix', detail:'Sachsenring', start:'2026-07-12T07:30:00-04:00', end:'2026-07-12T09:00:00-04:00', platforms:['FS1'] },
+    { series:'WEC',     kind:'Race',       title:'6 Hours of Sao Paulo', detail:'Interlagos', start:'2026-07-12T10:30:00-04:00', end:'2026-07-12T16:30:00-04:00', platforms:['truTV','HBO Max'] },
+    { series:'IMSA',    kind:'Race',       title:'Chevrolet Grand Prix', detail:'Mid-Ohio', start:'2026-07-12T14:00:00-04:00', end:'2026-07-12T17:00:00-04:00', platforms:['Peacock'] },
+    { series:'NASCAR',  kind:'Race',       title:'Quaker State 400', detail:'EchoPark Speedway, Atlanta', start:'2026-07-12T19:00:00-04:00', end:'2026-07-12T22:00:00-04:00', platforms:['TNT Sports','HBO Max'] },
+    { series:'F1',      kind:'Practice',   title:'Belgian Grand Prix', detail:'Spa-Francorchamps', start:'2026-07-17T07:30:00-04:00', end:'2026-07-17T08:30:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Practice',   title:'Belgian Grand Prix', detail:'Spa-Francorchamps', start:'2026-07-17T11:00:00-04:00', end:'2026-07-17T12:00:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Practice',   title:'Belgian Grand Prix', detail:'Spa-Francorchamps', start:'2026-07-18T06:30:00-04:00', end:'2026-07-18T07:30:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Qualifying', title:'Belgian Grand Prix', detail:'Spa-Francorchamps', start:'2026-07-18T10:00:00-04:00', end:'2026-07-18T11:00:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Race',       title:'Belgian Grand Prix', detail:'Spa-Francorchamps', start:'2026-07-19T09:00:00-04:00', end:'2026-07-19T11:00:00-04:00', platforms:['Apple TV'] },
+    { series:'IndyCar', kind:'Race',       title:'Music City Grand Prix', detail:'Nashville Superspeedway', start:'2026-07-19T17:30:00-04:00', end:'2026-07-19T20:00:00-04:00', platforms:['Fox','Fubo'] },
+    { series:'NASCAR',  kind:'Race',       title:'Window World 450', detail:'North Wilkesboro', start:'2026-07-19T19:00:00-04:00', end:'2026-07-19T22:00:00-04:00', platforms:['TNT Sports','HBO Max'] },
+    { series:'F1',      kind:'Practice',   title:'Hungarian Grand Prix', detail:'Hungaroring, Budapest', start:'2026-07-24T07:30:00-04:00', end:'2026-07-24T08:30:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Practice',   title:'Hungarian Grand Prix', detail:'Hungaroring, Budapest', start:'2026-07-24T11:00:00-04:00', end:'2026-07-24T12:00:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Practice',   title:'Hungarian Grand Prix', detail:'Hungaroring, Budapest', start:'2026-07-25T06:30:00-04:00', end:'2026-07-25T07:30:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Qualifying', title:'Hungarian Grand Prix', detail:'Hungaroring, Budapest', start:'2026-07-25T10:00:00-04:00', end:'2026-07-25T11:00:00-04:00', platforms:['Apple TV'] },
+    { series:'F1',      kind:'Race',       title:'Hungarian Grand Prix', detail:'Hungaroring, Budapest', start:'2026-07-26T09:00:00-04:00', end:'2026-07-26T11:00:00-04:00', platforms:['Apple TV'] },
+    { series:'NASCAR',  kind:'Race',       title:'Brickyard 400', detail:'Indianapolis, Cup Series', start:'2026-07-26T14:00:00-04:00', end:'2026-07-26T17:00:00-04:00', platforms:['NBC'] }
   ]
 };
 let DATA = FALLBACK_DATA;
@@ -468,6 +518,7 @@ const tzAbbrev = () => {
 const fmtTime = d => new Intl.DateTimeFormat('en-US', { timeZone: activeTZ(), hour: 'numeric', minute: '2-digit' }).format(d);
 const dayKey = d => new Intl.DateTimeFormat('en-CA', { timeZone: activeTZ(), year:'numeric', month:'2-digit', day:'2-digit' }).format(d);
 const dayLabel = d => new Intl.DateTimeFormat('en-US', { timeZone: activeTZ(), weekday:'long', month:'short', day:'numeric' }).format(d);
+const dayShort = d => new Intl.DateTimeFormat('en-US', { timeZone: activeTZ(), weekday:'short', month:'short', day:'numeric' }).format(d);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function hydrate() {
   events = (DATA.events || []).map((e, i) => {
@@ -511,7 +562,7 @@ function renderHero() {
         '<div class="next-info" style="--sc:' + seriesColor(next.series) + '">' +
           '<div class="evt-series" style="margin-bottom:4px">' + esc((SERIES[next.series]||{}).label||next.series) + ' · ' + esc(next.kind) + '</div>' +
           '<div class="live-title">' + esc(next.title) + '</div>' +
-          '<div class="live-meta">' + (next.detail ? esc(next.detail) + ' · ' : '') + fmtTime(next._s) + ' ' + tzAbbrev() + '</div>' +
+          '<div class="live-meta">' + (next.detail ? esc(next.detail) + ' · ' : '') + dayShort(next._s) + ' ' + fmtTime(next._s) + ' ' + tzAbbrev() + '</div>' +
           '<div class="live-badges">' + next.platforms.map(p => '<span class="plat-badge">' + esc(p) + '</span>').join('') + '</div>' +
         '</div>' +
       '</div>';
@@ -519,7 +570,7 @@ function renderHero() {
   }
   const last = events.slice().reverse().find(e => e._e <= now);
   hero.innerHTML =
-    '<div class="hero-eyebrow">That\'s a wrap this week</div>' +
+    '<div class="hero-eyebrow">That\'s a wrap</div>' +
     '<div class="live-title">No sessions live right now.</div>' +
     '<div class="live-meta" style="margin-top:8px">' +
       (last ? 'Last on air: ' + esc(last.title) + ' · ' + esc((SERIES[last.series]||{}).label||last.series) : 'Check back when the next race weekend loads.') +
@@ -545,6 +596,17 @@ function buildChips() {
     c.addEventListener('click', () => toggleSet(state.series, c.dataset.series, 'ontrack_series', c)));
   $('#platChips').querySelectorAll('.chip').forEach(c =>
     c.addEventListener('click', () => toggleSet(state.plats, c.dataset.plat, 'ontrack_plats', c)));
+}
+function buildJump() {
+  const todayK = dayKey(new Date());
+  const days = Array.from(new Set(events.map(e => dayKey(e._s))));
+  const sel = $('#jumpDate');
+  sel.innerHTML = '<option value="">Jump to date…</option>' + days.map(k => {
+    const first = events.find(e => dayKey(e._s) === k);
+    const n = events.filter(e => dayKey(e._s) === k).length;
+    const tag = k === todayK ? ' · Today' : (k < todayK ? ' · past' : '');
+    return '<option value="' + k + '">' + esc(dayShort(first._s)) + tag + ' (' + n + ')</option>';
+  }).join('');
 }
 function toggleSet(set, val, key, el) {
   set.has(val) ? set.delete(val) : set.add(val);
@@ -580,14 +642,14 @@ function renderSchedule() {
   } else { pt.hidden = true; }
   $('#resultNote').textContent = anyFilter
     ? shown.length + ' of ' + events.length + ' sessions'
-    : (state.showPast ? matched.length + ' sessions this weekend' : current.length + ' left this weekend');
+    : (state.showPast ? matched.length + ' sessions loaded' : current.length + ' upcoming sessions');
   const host = $('#schedule');
   if (!shown.length) {
     const noneUpcoming = !anyFilter && !current.length && past.length;
     host.innerHTML =
       '<div class="empty"><div class="big">🏁</div>' +
       (noneUpcoming
-        ? '<h3>Nothing left on the schedule</h3><p>Every session this weekend has run. Peek at what already aired.</p><button id="resetF">↺ Show earlier sessions</button>'
+        ? '<h3>Nothing left on the schedule</h3><p>Every loaded session has run. Peek at what already aired.</p><button id="resetF">↺ Show earlier sessions</button>'
         : '<h3>Nothing matches those filters</h3><p>Try loosening the series or platform selection.</p><button id="resetF">Clear all filters</button>') +
       '</div>';
     $('#resetF').addEventListener('click', () => {
@@ -608,7 +670,7 @@ function renderSchedule() {
     const k = entry[0], evs = entry[1];
     const isToday = k === todayK;
     const isEarlier = k < todayK;
-    return '<section class="day-group' + (isEarlier ? ' past-group' : '') + '">' +
+    return '<section class="day-group' + (isEarlier ? ' past-group' : '') + '" id="day-' + k + '">' +
       '<div class="day-head">' +
         '<h2>' + esc(dayLabel(evs[0]._s)) + '</h2>' +
         (isToday ? '<span class="today">Today</span>' : (isEarlier ? '<span class="earlier">Earlier</span>' : '')) +
@@ -630,6 +692,15 @@ function renderSchedule() {
       }).join('') +
     '</section>';
   }).join('');
+}
+function jumpTo(k) {
+  if (!k) return;
+  const todayK = dayKey(new Date());
+  if (k < todayK && !state.showPast) { state.showPast = true; renderSchedule(); }
+  requestAnimationFrame(() => {
+    const el = document.getElementById('day-' + k);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
 function tick() {
   const now = new Date();
@@ -660,12 +731,13 @@ function wire() {
     state.tz = tz; localStorage.setItem('ontrack_tz', tz);
     $('#tzET').setAttribute('aria-pressed', tz === 'ET');
     $('#tzLocal').setAttribute('aria-pressed', tz === 'local');
-    renderHero(); renderSchedule(); tick();
+    buildJump(); renderHero(); renderSchedule(); tick();
   };
   $('#tzET').addEventListener('click', () => setTZ('ET'));
   $('#tzLocal').addEventListener('click', () => setTZ('local'));
   $('#tzET').setAttribute('aria-pressed', state.tz === 'ET');
   $('#tzLocal').setAttribute('aria-pressed', state.tz === 'local');
+  $('#jumpDate').addEventListener('change', ev => { const k = ev.target.value; jumpTo(k); ev.target.value = ''; });
   $('#pastToggle').addEventListener('click', () => { state.showPast = !state.showPast; renderSchedule(); });
   let deb;
   $('#search').addEventListener('input', ev => {
@@ -711,6 +783,7 @@ function boot() {
   hydrate();
   applyTheme();
   buildChips();
+  buildJump();
   render();
   wire();
   $('#verLine').textContent = 'On Track ' + APP_VERSION;
@@ -732,7 +805,7 @@ function boot() {
         if (json && Array.isArray(json.events)) {
           DATA = json;
           try { localStorage.setItem('ontrack_data', JSON.stringify(json)); } catch (e) {}
-          hydrate(); buildChips(); render();
+          hydrate(); buildChips(); buildJump(); render();
           $('#dataStamp').textContent = ' · listings ' + (DATA.version || APP_DATE);
         }
       })
