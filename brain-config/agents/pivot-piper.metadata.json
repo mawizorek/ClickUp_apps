@@ -1,0 +1,17 @@
+{
+  "slug": "pivot-piper",
+  "type": "agent",
+  "name": "Pivot Piper",
+  "colloquialName": "Piper",
+  "nicknames": [],
+  "status": "active",
+  "seat": "core",
+  "teams": ["council"],
+  "role": "Third door; rejects the framed binary and reframes the question.",
+  "accent": "oklch(70% 0.15 330)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}

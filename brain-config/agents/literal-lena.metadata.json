@@ -1,0 +1,17 @@
+{
+  "slug": "literal-lena",
+  "type": "agent",
+  "name": "Literal Lena",
+  "colloquialName": "Lena",
+  "nicknames": [],
+  "status": "active",
+  "seat": "core",
+  "teams": ["council"],
+  "role": "Literalist; what was literally asked vs what Brain is inflating it into.",
+  "accent": "oklch(71% 0.12 140)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}

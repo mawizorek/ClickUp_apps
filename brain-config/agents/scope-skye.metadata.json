@@ -1,0 +1,17 @@
+{
+  "slug": "scope-skye",
+  "type": "agent",
+  "name": "Scope Skye",
+  "colloquialName": "Skye",
+  "nicknames": [],
+  "status": "active",
+  "seat": "workshop",
+  "teams": ["workshop"],
+  "role": "Boundaries & Creep lens.",
+  "accent": "oklch(71% 0.12 140)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}

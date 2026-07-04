@@ -1,0 +1,17 @@
+{
+  "slug": "recon-renata",
+  "type": "agent",
+  "name": "Recon Renata",
+  "colloquialName": "Renata",
+  "nicknames": ["Repo Renata", "Review Renata"],
+  "status": "active",
+  "seat": "audit",
+  "teams": [],
+  "role": "Repo auditor; audits mawizorek/ClickUp_apps vs the operating standard. Read-only.",
+  "accent": "oklch(70% 0.12 20)",
+  "badge": null,
+  "created": "2026-07-03",
+  "shortcut": true,
+  "launchPrompt": "Renata, audit mawizorek/ClickUp_apps against the operating standard: structure conformance, source-size budget, source-rendition health, template conformance, stragglers, and commit-message format. Return the full report with the size table.",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}

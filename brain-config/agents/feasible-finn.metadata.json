@@ -1,0 +1,17 @@
+{
+  "slug": "feasible-finn",
+  "type": "agent",
+  "name": "Feasible Finn",
+  "colloquialName": "Finn",
+  "nicknames": [],
+  "status": "active",
+  "seat": "workshop",
+  "teams": ["workshop"],
+  "role": "Implementation & Feasibility lens.",
+  "accent": "oklch(68% 0.13 170)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}

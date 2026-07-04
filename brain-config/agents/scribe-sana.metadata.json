@@ -1,0 +1,17 @@
+{
+  "slug": "scribe-sana",
+  "type": "agent",
+  "name": "Scribe Sana",
+  "colloquialName": "Sana",
+  "nicknames": [],
+  "status": "active",
+  "seat": "close",
+  "teams": [],
+  "role": "Documentation logger; logs where the permanent record needs updating as work happens.",
+  "accent": "oklch(70% 0.10 120)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false }
+}

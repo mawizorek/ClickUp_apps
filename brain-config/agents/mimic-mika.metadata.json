@@ -1,0 +1,17 @@
+{
+  "slug": "mimic-mika",
+  "type": "agent",
+  "name": "Mimic Mika",
+  "colloquialName": "Mika",
+  "nicknames": [],
+  "status": "active",
+  "seat": "core",
+  "teams": ["council"],
+  "role": "Multi-model role-play; channels how rival frontier models would each answer.",
+  "accent": "oklch(70% 0.14 200)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}

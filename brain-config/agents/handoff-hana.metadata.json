@@ -1,0 +1,17 @@
+{
+  "slug": "handoff-hana",
+  "type": "agent",
+  "name": "Handoff Hana",
+  "colloquialName": "Hana",
+  "nicknames": ["Handoff"],
+  "status": "active",
+  "seat": "close",
+  "teams": [],
+  "role": "Handoff packager; the next-session baton.",
+  "accent": "oklch(70% 0.12 20)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false }
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "clever-cleo",
+  "type": "agent",
+  "name": "Clever Cleo",
+  "colloquialName": "Cleo",
+  "nicknames": [],
+  "status": "active",
+  "seat": "workshop",
+  "teams": ["workshop"],
+  "role": "Elegance & Alternative lens.",
+  "accent": "oklch(72% 0.14 200)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}

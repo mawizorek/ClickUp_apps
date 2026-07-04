@@ -1,0 +1,17 @@
+{
+  "slug": "eco-enzo",
+  "type": "agent",
+  "name": "Eco Enzo",
+  "colloquialName": "Enzo",
+  "nicknames": [],
+  "status": "active",
+  "seat": "workshop",
+  "teams": ["workshop"],
+  "role": "Integration & Side Effects lens.",
+  "accent": "oklch(66% 0.14 260)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}

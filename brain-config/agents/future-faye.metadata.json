@@ -1,0 +1,17 @@
+{
+  "slug": "future-faye",
+  "type": "agent",
+  "name": "Future Faye",
+  "colloquialName": "Faye",
+  "nicknames": [],
+  "status": "active",
+  "seat": "output",
+  "teams": ["council"],
+  "role": "Future-self; reviews the draft assuming handoff at this exact step. (Was Wes's Handoff lens.)",
+  "accent": "oklch(68% 0.13 170)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}

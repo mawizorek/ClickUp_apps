@@ -1,0 +1,17 @@
+{
+  "slug": "counter-cole",
+  "type": "agent",
+  "name": "Counter Cole",
+  "colloquialName": "Cole",
+  "nicknames": [],
+  "status": "active",
+  "seat": "core",
+  "teams": ["council"],
+  "role": "Contrarian; strongest case against Brain's leaning.",
+  "accent": "oklch(64% 0.17 25)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}

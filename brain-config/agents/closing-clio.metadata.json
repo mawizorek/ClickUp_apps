@@ -1,0 +1,17 @@
+{
+  "slug": "closing-clio",
+  "type": "agent",
+  "name": "Closing Clio",
+  "colloquialName": "Clio",
+  "nicknames": ["Close", "Recap"],
+  "status": "active",
+  "seat": "close",
+  "teams": [],
+  "role": "Session-close auditor; inventory refs, log hurdles, reconcile docs + indexes, report health.",
+  "accent": "oklch(70% 0.12 20)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false }
+}

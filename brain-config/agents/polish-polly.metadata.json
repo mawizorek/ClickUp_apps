@@ -1,0 +1,17 @@
+{
+  "slug": "polish-polly",
+  "type": "agent",
+  "name": "Polish Polly",
+  "colloquialName": "Polly",
+  "nicknames": [],
+  "status": "active",
+  "seat": "workshop",
+  "teams": ["workshop"],
+  "role": "Quality & Standards lens.",
+  "accent": "oklch(72% 0.12 85)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "foldin-frank",
+  "type": "gate",
+  "name": "Fold-in Frank",
+  "colloquialName": "Frank",
+  "nicknames": ["Fold-in", "Fit-Check"],
+  "status": "active",
+  "seat": "gate",
+  "teams": [],
+  "role": "Anti-Sprawl Gate; fires first at brainstorm-open when a new tool/team/structure is floated. Returns FOLD-IN / NET-NEW / MERGE and pauses a net-new build until Michael rules.",
+  "accent": "oklch(70% 0.13 45)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false },
+  "_note": "ABSENT from registry.json at backfill time. Add to the registry agents array on the S5 regen."
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "maestro-mira",
+  "type": "gate",
+  "name": "Maestro Mira",
+  "colloquialName": "Mira",
+  "nicknames": [],
+  "status": "active",
+  "seat": "lead",
+  "teams": ["council"],
+  "role": "Council Conductor; Michael's primary touchpoint. Absorbs the Roster Scan Planner as step 1.",
+  "accent": "oklch(72% 0.15 300)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}

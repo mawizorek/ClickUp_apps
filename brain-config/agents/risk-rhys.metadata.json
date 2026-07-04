@@ -1,0 +1,17 @@
+{
+  "slug": "risk-rhys",
+  "type": "agent",
+  "name": "Risk Rhys",
+  "colloquialName": "Rhys",
+  "nicknames": [],
+  "status": "active",
+  "seat": "workshop",
+  "teams": ["workshop"],
+  "role": "Risk & Failure lens.",
+  "accent": "oklch(64% 0.17 25)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}

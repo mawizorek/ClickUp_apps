@@ -1,0 +1,17 @@
+{
+  "slug": "cautious-cass",
+  "type": "agent",
+  "name": "Cautious Cass",
+  "colloquialName": "Cass",
+  "nicknames": [],
+  "status": "active",
+  "seat": "core",
+  "teams": ["council"],
+  "role": "Overconfidence check; safest reply + where confidence outruns evidence.",
+  "accent": "oklch(72% 0.13 85)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "novice-nia",
+  "type": "agent",
+  "name": "Novice Nia",
+  "colloquialName": "Nia",
+  "nicknames": [],
+  "status": "active",
+  "seat": "depth",
+  "teams": ["council"],
+  "role": "Naive questioner; beginner questions that expose foundational errors. Bound to Domain Dara.",
+  "accent": "oklch(78% 0.12 110)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}

@@ -1,0 +1,17 @@
+{
+  "slug": "domain-dara",
+  "type": "agent",
+  "name": "Domain Dara",
+  "colloquialName": "Dara",
+  "nicknames": [],
+  "status": "active",
+  "seat": "depth",
+  "teams": ["council"],
+  "role": "Domain expert; the outside specialist the question needs. Bound to Novice Nia.",
+  "accent": "oklch(66% 0.14 260)",
+  "badge": null,
+  "created": null,
+  "shortcut": false,
+  "launchPrompt": "",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}
