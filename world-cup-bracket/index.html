@@ -4,10 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0a0e12">
-<meta name="description" content="FIFA World Cup 2026 knockout bracket & schedule tracker.">
+<title>World Cup 2026 Bracket</title>
+<meta name="description" content="Live FIFA World Cup 2026 knockout bracket & schedule tracker \u2014 results, matchups, and each team's path to the Final.">
 <meta name="robots" content="noindex, nofollow">
-<title>FIFA World Cup 2026</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9917;</text></svg>">
+
+<!-- Open Graph (link preview when shared) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="World Cup 2026 Bracket">
+<meta property="og:description" content="Live knockout bracket & schedule tracker \u2014 results, matchups, and each team's path to the Final.">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter / Slack / Discord card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="World Cup 2026 Bracket">
+<meta name="twitter:description" content="Live knockout bracket & schedule tracker \u2014 results, matchups, and each team's path to the Final.">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/og-image.png">
+
+<!-- PWA install -->
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WC 2026">
+<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="icon" href="./icon.svg">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,6 +39,15 @@
 <link rel="stylesheet" href="./source/styles.css">
 <link rel="stylesheet" href="./source/bracket.css">
 <link rel="stylesheet" href="./source/sheet.css">
+<style>
+  /* access gate (cosmetic private-share cover) */
+  #access-gate { position: fixed; inset: 0; z-index: 100; background: var(--bg, #0a0e12); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; }
+  #access-gate h2 { font-size: 1.25rem; font-weight: 800; color: #f0f3f5; letter-spacing: -0.02em; }
+  #access-gate p { font-size: 0.875rem; color: #9aa3ab; max-width: 300px; }
+  #gate-form { display: flex; gap: 8px; }
+  #gate-code { width: 130px; padding: 11px 14px; font-size: 1rem; text-align: center; letter-spacing: 0.2em; border-radius: 8px; border: 1px solid #2b3138; background: #16191d; color: #f0f3f5; }
+  #gate-form button { padding: 11px 18px; font-size: 0.875rem; font-weight: 700; border: none; border-radius: 8px; background: oklch(75% 0.18 155); color: #05100a; cursor: pointer; }
+</style>
 </head>
 <body>
 <header>
@@ -51,7 +83,51 @@
 <div class="sheet-scrim" id="sheetScrim"></div>
 <div class="detail-sheet" id="detailSheet" role="dialog" aria-modal="true" aria-hidden="true"></div>
 
-<noscript><div class="loading-msg">This app needs JavaScript enabled.</div></noscript>
+<!-- access gate cover (shown by the script below when gated) -->
+<div id="access-gate" hidden>
+  <h2 id="gate-title">World Cup 2026</h2>
+  <p id="gate-msg">Enter the family code to view the bracket.</p>
+  <form id="gate-form">
+    <input id="gate-code" type="text" inputmode="numeric" autocomplete="off" aria-label="Access code" placeholder="code">
+    <button type="submit">Enter</button>
+  </form>
+</div>
+
+<noscript><div class="loading-msg">This app needs JavaScript enabled to run.</div></noscript>
+
+<script>
+(function () {
+  // Cosmetic private-share cover. Not security \u2014 keeps casual eyes out; data is public soccer results only.
+  var FALLBACK = { access: "gated", code: "2026",
+    coverTitle: "World Cup 2026", coverMessage: "Enter the family code to view the bracket.",
+    downTitle: "Temporarily offline", downMessage: "This app is currently unavailable." };
+  var SS_KEY = "gate_ok";
+  function apply(cfg) {
+    var gate = document.getElementById("access-gate");
+    if (cfg.access === "open" || sessionStorage.getItem(SS_KEY) === "1") { gate.remove(); return; }
+    gate.hidden = false;
+    var form = document.getElementById("gate-form");
+    if (cfg.access === "down") {
+      document.getElementById("gate-title").textContent = cfg.downTitle || FALLBACK.downTitle;
+      document.getElementById("gate-msg").textContent = cfg.downMessage || FALLBACK.downMessage;
+      form.style.display = "none"; return;
+    }
+    document.getElementById("gate-title").textContent = cfg.coverTitle || FALLBACK.coverTitle;
+    document.getElementById("gate-msg").textContent = cfg.coverMessage || FALLBACK.coverMessage;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (document.getElementById("gate-code").value.trim() === String(cfg.code)) {
+        sessionStorage.setItem(SS_KEY, "1"); gate.remove();
+      } else { var c = document.getElementById("gate-code"); c.value = ""; c.focus(); }
+    });
+    var el = document.getElementById("gate-code"); if (el) el.focus();
+  }
+  fetch("./config.json", { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+    .then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); })
+    .catch(function () { var cached = null; try { cached = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(cached || FALLBACK); });
+})();
+</script>
 
 <script type="module" src="./source/app.js"></script>
 </body>

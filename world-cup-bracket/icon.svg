@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="World Cup 2026">
+  <rect width="512" height="512" rx="96" fill="#0a0e12"/>
+  <g fill="none" stroke="#4fd99b" stroke-width="14" stroke-linejoin="round">
+    <circle cx="256" cy="256" r="150"/>
+    <polygon points="256,196 312,237 291,303 221,303 200,237"/>
+    <path d="M256,196 V121 M312,237 L383,213 M291,303 L334,363 M221,303 L178,363 M200,237 L129,213"/>
+  </g>
+</svg>
