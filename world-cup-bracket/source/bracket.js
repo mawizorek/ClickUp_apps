@@ -6,6 +6,7 @@ import { cc, isComplete, winnerName, byId, slotLabel, ROUND_ORDER } from './util
 import { openSheet } from './sheet.js';
 
 const ROUND_LABELS = { R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarters', SF: 'Semis', Final: 'Final' };
+let resetBound = false;
 
 export function renderBracket() {
   const container = document.getElementById('bracketContent');
@@ -22,6 +23,7 @@ export function renderBracket() {
   });
   container.innerHTML = html;
   bindBracketTaps();
+  bindReset();
   if (S.pickedTeam) applyPathHighlight(S.pickedTeam);
 }
 
@@ -34,7 +36,6 @@ function bmTeam(m, side) {
   const traceable = sl.text && sl.text !== 'TBD' && !sl.potential;
   const nameHtml = sl.potential ? `<span class="bm-name potential">${sl.text}</span>` : `<span class="bm-name">${sl.text}</span>`;
   const scoreHtml = (score !== null && score !== undefined) ? `<span class="bm-score">${score}</span>` : '';
-  // Right-side trace arrow = one-tap path highlight for this team.
   const trace = traceable ? `<button class="bm-trace" data-team="${sl.text}" aria-label="Trace ${sl.text}'s path">\u2197</button>` : '';
   return `<div class="bm-team ${isW ? 'w' : ''} ${isL ? 'l' : ''}">`
     + `<span class="bm-code">${sl.code || '\u2014'}</span>`
@@ -72,6 +73,18 @@ function bindBracketTaps() {
       if (S.pickedTeam === team) clearPathHighlight();
       else { S.pickedTeam = team; applyPathHighlight(team); }
     });
+  });
+}
+
+// Tap empty bracket space (not a card, not a trace arrow) -> deselect all.
+// Bound once on the scrollable bracket view; restored in v4.1 (regressed in v4).
+function bindReset() {
+  if (resetBound) return; resetBound = true;
+  const view = document.getElementById('bracketView');
+  view.addEventListener('click', (e) => {
+    if (!S.pickedTeam) return;
+    if (e.target.closest('.bracket-match') || e.target.closest('.bm-trace')) return;
+    clearPathHighlight();
   });
 }
 
