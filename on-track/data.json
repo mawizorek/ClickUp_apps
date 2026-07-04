@@ -1,0 +1,24 @@
+{
+  "version": "2026-07-04",
+  "events": [
+    { "series": "F1", "kind": "Practice", "title": "British Grand Prix", "detail": "Silverstone", "start": "2026-07-03T07:30:00-04:00", "end": "2026-07-03T08:30:00-04:00", "platforms": ["ESPN2"] },
+    { "series": "F1", "kind": "Sprint Qual", "title": "British Grand Prix", "detail": "Silverstone", "start": "2026-07-03T11:30:00-04:00", "end": "2026-07-03T12:15:00-04:00", "platforms": ["ESPNU"] },
+    { "series": "IndyCar", "kind": "Practice", "title": "Indy NXT", "detail": "Mid-Ohio", "start": "2026-07-03T14:00:00-04:00", "end": "2026-07-03T15:00:00-04:00", "platforms": ["FS2"] },
+    { "series": "IndyCar", "kind": "Practice", "title": "Honda Indy 200", "detail": "Mid-Ohio", "start": "2026-07-03T15:00:00-04:00", "end": "2026-07-03T16:00:00-04:00", "platforms": ["FS2"] },
+    { "series": "NASCAR", "kind": "Race", "title": "ARCA Ashley Furniture 150", "detail": "Chicagoland", "start": "2026-07-03T20:00:00-04:00", "end": "2026-07-03T22:00:00-04:00", "platforms": ["FS1"] },
+    { "series": "F1", "kind": "Sprint", "title": "British GP Sprint", "detail": "Silverstone", "start": "2026-07-04T06:00:00-04:00", "end": "2026-07-04T07:00:00-04:00", "platforms": ["ESPN"] },
+    { "series": "MotoGP", "kind": "Sprint", "title": "German GP Sprint", "detail": "Sachsenring", "start": "2026-07-04T09:00:00-04:00", "end": "2026-07-04T09:45:00-04:00", "platforms": ["TNT Sports"] },
+    { "series": "IndyCar", "kind": "Qualifying", "title": "Indy NXT", "detail": "Mid-Ohio", "start": "2026-07-04T09:00:00-04:00", "end": "2026-07-04T10:00:00-04:00", "platforms": ["FS1"] },
+    { "series": "IndyCar", "kind": "Practice", "title": "Honda Indy 200", "detail": "Mid-Ohio", "start": "2026-07-04T10:00:00-04:00", "end": "2026-07-04T11:00:00-04:00", "platforms": ["FS1"] },
+    { "series": "F1", "kind": "Qualifying", "title": "British Grand Prix", "detail": "Silverstone", "start": "2026-07-04T10:00:00-04:00", "end": "2026-07-04T11:00:00-04:00", "platforms": ["ESPN"] },
+    { "series": "IndyCar", "kind": "Race", "title": "Indy NXT Race", "detail": "Mid-Ohio", "start": "2026-07-04T13:00:00-04:00", "end": "2026-07-04T14:00:00-04:00", "platforms": ["FS1"] },
+    { "series": "IndyCar", "kind": "Qualifying", "title": "Honda Indy 200", "detail": "Mid-Ohio", "start": "2026-07-04T14:30:00-04:00", "end": "2026-07-04T15:30:00-04:00", "platforms": ["FS1"] },
+    { "series": "NASCAR", "kind": "Race", "title": "Cuervo 300", "detail": "Chicagoland, O\u2019Reilly Series", "start": "2026-07-04T17:30:00-04:00", "end": "2026-07-04T20:00:00-04:00", "platforms": ["The CW"] },
+    { "series": "MotoGP", "kind": "Race", "title": "German Grand Prix", "detail": "Sachsenring", "start": "2026-07-05T08:00:00-04:00", "end": "2026-07-05T09:30:00-04:00", "platforms": ["TNT Sports"] },
+    { "series": "IndyCar", "kind": "Warm-up", "title": "Honda Indy 200", "detail": "Mid-Ohio", "start": "2026-07-05T09:00:00-04:00", "end": "2026-07-05T09:30:00-04:00", "platforms": ["FS1"] },
+    { "series": "F1", "kind": "Race", "title": "British Grand Prix", "detail": "Silverstone", "start": "2026-07-05T10:00:00-04:00", "end": "2026-07-05T12:00:00-04:00", "platforms": ["ESPN"] },
+    { "series": "IndyCar", "kind": "Race", "title": "Indy NXT Race 2", "detail": "Mid-Ohio", "start": "2026-07-05T10:00:00-04:00", "end": "2026-07-05T11:00:00-04:00", "platforms": ["FS1"] },
+    { "series": "IndyCar", "kind": "Race", "title": "Honda Indy 200", "detail": "Mid-Ohio, green 12:52", "start": "2026-07-05T12:30:00-04:00", "end": "2026-07-05T15:00:00-04:00", "platforms": ["Fox", "Fubo"] },
+    { "series": "NASCAR", "kind": "Race", "title": "eero 400", "detail": "Chicagoland, Cup Series", "start": "2026-07-05T18:00:00-04:00", "end": "2026-07-05T21:00:00-04:00", "platforms": ["TNT Sports", "HBO Max"] }
+  ]
+}
