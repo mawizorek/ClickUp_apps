@@ -1,7 +1,6 @@
-<!DOCTYPE html>
 <!--
   F1 Racetracks
-  Version: v5
+  Version: V1.5 PR22 dbg2 rescue
   Live: https://mawizorek.github.io/ClickUp_apps/f1-racetracks/
   Source: https://github.com/mawizorek/ClickUp_apps/tree/main/f1-racetracks
   INFRASTRUCTURE: slim runtime entrypoint + externalized data.json + direct source modules in /source
@@ -30,7 +29,6 @@
       './source/03b_styles_results_and_mobile.css.txt',
       './source/03c_live_session_panel.css.txt'
     ];
-
     window.runtimeStylesReady = Promise.all(
       RUNTIME_STYLE_SOURCES.map(async (path) => {
         const res = await fetch(path, { cache: 'no-store' });
@@ -62,7 +60,7 @@
     <div id="app"></div>
 
     <footer class="app">
-      <span class="meta-txt" id="foot-meta">F1 Racetracks v5 · loading data…</span>
+      <span class="meta-txt" id="foot-meta">F1 Racetracks V1.5 PR22 dbg2 rescue · loading data…</span>
       <div class="toolbar">
         <a class="tool" href="./live-tracker.html">Live tracker</a>
         <button class="tool" id="t-copy" title="Copy the full page source to your clipboard">Copy source</button>
@@ -83,5 +81,6 @@
   <script src="./source/10_track_views_and_profile.js"></script>
   <script src="./source/13_live_session_panel.js"></script>
   <script src="./source/11_weather_and_footer_exports.js"></script>
+  <script src="./source/14_surface_rescue.js"></script>
 </body>
 </html>
