@@ -1,11 +1,12 @@
 /* Compact polish pass for V1.7c.
    Syncs the home card with the race-page schedule language,
-   fixes footer label repetition, and tightens podium mobile typography.
+   fixes footer label repetition, hard-binds the home CTA,
+   and tightens podium mobile typography.
 */
 
 (function () {
-  const BUILD_LABEL = 'V1.7c polish';
-  const STYLE_ID = 'pp-v17c-polish-style';
+  const BUILD_LABEL = 'V1.7d polish';
+  const STYLE_ID = 'pp-v17d-polish-style';
 
   const SILVERSTONE_LOCAL_SEED = [
     { day: 'Fri', label: 'Sprint Qualifying', start: '2026-07-03T16:30:00+01:00', end: '2026-07-03T17:14:00+01:00' },
@@ -85,21 +86,22 @@
     style.id = STYLE_ID;
     style.textContent = `
       .current-round-card{padding:14px 16px 14px !important;gap:10px !important}
-      .current-round-card .pp-home-tag{display:none !important}
-      .current-round-card .pp-home-kicker{align-items:flex-start !important;gap:8px !important}
-      .current-round-card .pp-home-flag{font-size:.62rem !important;letter-spacing:.08em}
-      .current-round-card .pp-home-title{gap:2px !important}
-      .current-round-card .pp-home-title h2{font-size:1.16rem !important;line-height:1.04 !important}
+      .current-round-card .pp-home-tag,.current-round-card .pp-home-summary{display:none !important}
+      .current-round-card .pp-home-kicker{align-items:center !important;gap:8px !important}
+      .current-round-card .pp-home-title{gap:1px !important}
+      .current-round-card .pp-home-title h2{font-size:1.14rem !important;line-height:1.04 !important}
       .current-round-card .pp-home-sub{display:none !important}
-      .current-round-card .pp-home-summary{display:none !important}
+      .current-round-card .pp-home-flag{font-size:.56rem !important;letter-spacing:.08em;padding:0 0 0 10px !important;gap:6px !important;line-height:1.2 !important}
+      .current-round-card .pp-home-flag::before{width:7px !important;height:7px !important}
       .current-round-card .pp-home-cta{margin-top:4px !important}
       .current-round-card .pp-button{padding:9px 12px !important;font-size:.68rem !important}
       .pp-home-schedule{display:grid;gap:8px;margin-top:2px}
+      .pp-home-day{font-family:"IBM Plex Mono",monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);opacity:.9;margin-top:2px}
+      .pp-home-day:first-child{margin-top:0}
       .pp-home-session{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid oklch(32% 0.02 264 /.45)}
-      .pp-home-session:first-child{border-top:none}
+      .pp-home-session.is-live{padding-left:10px;border-left:2px solid var(--done);background:linear-gradient(90deg,oklch(64% 0.2 145 /.08),transparent 55%)}
       .pp-home-session-name{font-size:.92rem;line-height:1.25;color:var(--text);flex:1 1 auto}
       .pp-home-session-time{font-family:"IBM Plex Mono",monospace;font-size:.82rem;color:var(--muted);white-space:nowrap;flex:0 0 auto}
-      .pp-home-session-day{color:var(--faint)}
       .weekend-center .pp-local-note,.weekend-center .pp-schedule-summary{display:none !important}
       .weekend-center .pp-schedule-list{gap:10px !important}
       .weekend-center .pp-session-group{gap:0 !important}
@@ -116,7 +118,7 @@
       .tnote{font-size:.84rem !important;line-height:1.45 !important}
       @media (max-width:720px){
         .current-round-card{padding:12px 14px 12px !important}
-        .current-round-card .pp-home-title h2{font-size:1.02rem !important}
+        .current-round-card .pp-home-title h2{font-size:1rem !important}
         .current-round-card .pp-home-cta{display:flex !important;gap:8px !important}
         .current-round-card .pp-button{width:auto !important;flex:1 1 0 !important}
         .pp-home-schedule{gap:6px}
@@ -132,10 +134,10 @@
         .tbl th:nth-child(4),.tbl td:nth-child(4){width:17% !important}
         .tbl th:nth-child(5),.tbl td:nth-child(5){width:37% !important}
         .podium-steps{gap:10px !important;align-items:flex-end !important}
-        .podium-step{padding:14px 10px 12px !important}
+        .podium-step{padding:14px 10px 12px !important;min-width:0 !important}
         .step-driver{font-size:.88rem !important;line-height:1.08 !important}
         .step-team{font-size:.68rem !important;line-height:1.2 !important}
-        .step-pos{font-size:.54rem !important;line-height:1.12 !important;letter-spacing:.04em !important;overflow-wrap:anywhere !important;word-break:break-word !important;max-width:8ch !important;margin-inline:auto !important}
+        .step-pos{display:none !important}
       }
     `;
     document.head.appendChild(style);
@@ -171,6 +173,10 @@
     if (!card || !track || track.slug !== 'silverstone') return;
     const flag = track.status === 'active' ? 'Live' : 'Focus';
     const rows = homeScheduleRows(track);
+    const groups = rows.reduce(function (acc, item) {
+      (acc[item.day] = acc[item.day] || []).push(item);
+      return acc;
+    }, {});
     card.innerHTML = `
       <div class="pp-home-kicker">
         <div class="pp-home-title">
@@ -179,20 +185,43 @@
         <span class="pp-home-flag">${esc(flag)}</span>
       </div>
       <div class="pp-home-schedule">
-        ${rows.map(function (item) {
+        ${Object.keys(groups).map(function (day) {
           return `
-            <div class="pp-home-session">
-              <div class="pp-home-session-name"><span class="pp-home-session-day">${esc(item.day)}</span> · ${esc(item.label)}</div>
-              <div class="pp-home-session-time">${esc(localTime(item.start))}–${esc(localTime(item.end))}</div>
-            </div>
+            <div class="pp-home-day">${esc(day)}</div>
+            ${groups[day].map(function (item) {
+              return `
+                <div class="pp-home-session ${item.status === 'live' ? 'is-live' : ''}">
+                  <div class="pp-home-session-name">${esc(item.label)}</div>
+                  <div class="pp-home-session-time">${esc(localTime(item.start))}–${esc(localTime(item.end))}</div>
+                </div>
+              `;
+            }).join('')}
           `;
         }).join('')}
       </div>
       <div class="pp-home-cta">
-        <a class="pp-button primary" href="#/${esc(track.slug)}">Open Weekend Center →</a>
+        <button class="pp-button primary" type="button" data-open-weekend="${esc(track.slug)}">Open Weekend Center →</button>
         <a class="pp-button" href="./live-tracker.html">Live tracker</a>
       </div>
     `;
+  }
+
+  function bindHomeCard() {
+    const trigger = document.querySelector('[data-open-weekend]');
+    if (!trigger || trigger.__ppBound) return;
+    trigger.__ppBound = true;
+    trigger.addEventListener('click', function () {
+      const slug = trigger.getAttribute('data-open-weekend');
+      const nextHash = '#/' + slug;
+      if (location.hash === nextHash) {
+        if (typeof router === 'function') router();
+        return;
+      }
+      location.hash = nextHash;
+      window.setTimeout(function () {
+        if (typeof router === 'function') router();
+      }, 0);
+    });
   }
 
   function rewriteScheduleRows() {
@@ -209,6 +238,7 @@
     injectStyle();
     wrapFooterUpdater();
     rewriteHomeCard();
+    bindHomeCard();
     rewriteScheduleRows();
   }
 
