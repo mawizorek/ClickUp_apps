@@ -1,0 +1,43 @@
+{
+  "_note": "Template tool. Copy the block for your tool type out of _defaults into <slug>.metadata.json and fill it in. See ../metadata-schema.md for field meanings. Do not edit this template as a live record.",
+  "_defaults": {
+    "agent": {
+      "slug": "",
+      "type": "agent",
+      "name": "",
+      "colloquialName": "",
+      "nicknames": [],
+      "status": "building",
+      "seat": "",
+      "teams": [],
+      "role": "",
+      "accent": "oklch(70% 0.12 20)",
+      "badge": null,
+      "created": "",
+      "shortcut": false,
+      "launchPrompt": "",
+      "toggles": {
+        "hasWriteAccess": false,
+        "firesAtSessionClose": false,
+        "councilMember": false
+      }
+    },
+    "hook": {
+      "slug": "",
+      "type": "hook",
+      "name": "",
+      "status": "active",
+      "badge": null,
+      "created": "",
+      "shortcut": false
+    },
+    "trigger": {
+      "slug": "",
+      "type": "trigger",
+      "name": "",
+      "status": "active",
+      "purpose": "",
+      "shortcut": false
+    }
+  }
+}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dev-Mode Gate demo</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:oklch(14% 0.01 260);color:oklch(90% 0.008 260);margin:0;padding:40px 20px;}
+  .app{max-width:560px;margin:0 auto;}
+  h1{font-size:1.5rem;}
+  .card{background:oklch(18% 0.012 260);border:1px solid oklch(24% 0.015 260);border-radius:10px;padding:18px;margin-top:16px;}
+</style>
+</head>
+<body>
+<!-- The gate: first element in body. Real app sits underneath, fully built. -->
+<div data-devmode-gate data-key="1234" data-title="Dev mode - enter code"></div>
+
+<div class="app">
+  <h1>The real app</h1>
+  <p>This content is the fully-built app underneath the curtain. Enter <strong>1234</strong> on the keypad to reveal it.</p>
+  <div class="card">A sample module. Nothing here is materially distinguishable until the smokescreen is dismissed.</div>
+</div>
+
+<script src="./devmode-gate.js"></script>
+</body>
+</html>
