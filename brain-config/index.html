@@ -32,151 +32,123 @@ body {
   min-height: 100vh;
 }
 
-.container {
-  max-width: 900px;
-  margin: 0 auto;
+.container { max-width: 900px; margin: 0 auto; }
+
+header { margin-bottom: 32px; }
+header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+header p { color: var(--text-dim); font-size: 0.8125rem; }
+
+.search-wrap { margin-top: 12px; position: relative; }
+.search-wrap input {
+  width: 100%; padding: 8px 12px 8px 32px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text);
+  font-size: 0.8125rem; font-family: inherit; outline: none;
+  transition: border-color 150ms;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+.search-wrap input::placeholder { color: var(--text-dim); }
+.search-icon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; color: var(--text-dim);
 }
 
-header {
-  margin-bottom: 32px;
+.controls { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+
+.pill {
+  font-size: 0.75rem; color: var(--text-dim); background: var(--surface);
+  padding: 5px 12px; border-radius: 100px; font-variant-numeric: tabular-nums;
+  border: 1px solid transparent; cursor: pointer;
+  transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1); user-select: none;
+}
+.pill:hover { background: var(--surface-2); }
+.pill.active { border-color: var(--pill-color, var(--accent)); background: var(--surface-2); color: var(--pill-color, var(--text)); }
+.pill strong { color: var(--text); font-weight: 600; }
+.pill.active strong { color: var(--pill-color, var(--text)); }
+.pill[data-filter="hooks"] { --pill-color: var(--hook); }
+.pill[data-filter="gates"] { --pill-color: var(--gate); }
+.pill[data-filter="prose"] { --pill-color: var(--hook); }
+.pill[data-filter="triggers"] { --pill-color: var(--trigger); }
+.pill[data-filter="agents"] { --pill-color: var(--agent); }
+
+.sort-toggle {
+  font-size: 0.6875rem; color: var(--text-dim); background: none;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 4px 8px; cursor: pointer; margin-left: auto;
+  transition: all 150ms;
+}
+.sort-toggle:hover { border-color: var(--accent); color: var(--text); }
+.sort-toggle.active { border-color: var(--accent); color: var(--accent); }
+
+.status-bar {
+  margin-top: 8px; font-size: 0.6875rem; color: var(--text-dim);
+  display: flex; gap: 12px;
 }
 
-header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 4px;
-}
+.no-results { display: none; padding: 24px; text-align: center; color: var(--text-dim); font-size: 0.8125rem; }
+.no-results.visible { display: block; }
 
-header p {
-  color: var(--text-dim);
-  font-size: 0.8125rem;
-}
+.loading { padding: 48px; text-align: center; color: var(--text-dim); font-size: 0.8125rem; }
 
-.stats {
-  display: flex;
-  gap: 16px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.stat {
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  background: var(--surface);
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-variant-numeric: tabular-nums;
-}
-
-.stat strong {
-  color: var(--text);
-  font-weight: 600;
-}
-
-section {
-  margin-bottom: 28px;
-}
-
+section { margin-bottom: 28px; }
 section h2 {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-dim);
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
+  font-size: 0.8125rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 8px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: color 150ms;
 }
-
+section h2:hover { color: var(--text); }
 .shelf-hooks h2 { color: var(--hook); border-color: var(--hook); }
 .shelf-gates h2 { color: var(--gate); border-color: var(--gate); }
 .shelf-triggers h2 { color: var(--trigger); border-color: var(--trigger); }
 .shelf-agents h2 { color: var(--agent); border-color: var(--agent); }
+section.hidden { display: none; }
 
-.tool-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
+.tool-list { display: flex; flex-direction: column; gap: 1px; }
 
 .tool {
-  display: grid;
-  grid-template-columns: minmax(180px, 1fr) 2fr;
-  gap: 8px 16px;
-  padding: 8px 12px;
-  background: var(--surface);
-  border-radius: var(--radius);
-  align-items: baseline;
+  display: grid; grid-template-columns: minmax(180px, 1fr) 2fr auto;
+  gap: 8px 16px; padding: 8px 12px; background: var(--surface);
+  border-radius: var(--radius); align-items: baseline;
   transition: background 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
+.tool:hover { background: var(--surface-2); }
+.tool.hidden { display: none; }
 
-.tool:hover {
-  background: var(--surface-2);
-}
+.tool-name { font-size: 0.8125rem; font-weight: 600; white-space: nowrap; }
+.tool-name a { color: var(--accent); text-decoration: none; }
+.tool-name a:hover { text-decoration: underline; }
+.tool-name .no-profile { color: var(--text); }
 
-.tool-name {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
+.tool-purpose { font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; }
 
-.tool-name a {
-  color: var(--accent);
-  text-decoration: none;
+.tool-meta {
+  font-size: 0.625rem; color: var(--text-dim); text-align: right;
+  white-space: nowrap; font-variant-numeric: tabular-nums;
+  display: flex; flex-direction: column; gap: 1px; align-items: flex-end;
 }
-
-.tool-name a:hover {
-  text-decoration: underline;
-}
-
-.tool-name .no-profile {
-  color: var(--text);
-}
-
-.tool-purpose {
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  line-height: 1.4;
-}
+.tool-meta .uses { color: var(--accent); font-weight: 600; }
 
 .badge {
-  display: inline-block;
-  font-size: 0.625rem;
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-left: 6px;
-  vertical-align: middle;
+  display: inline-block; font-size: 0.625rem; padding: 1px 5px;
+  border-radius: 3px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; margin-left: 6px; vertical-align: middle;
 }
-
 .badge-halt { background: oklch(30% 0.08 20); color: oklch(75% 0.15 20); }
 .badge-warn { background: oklch(30% 0.08 80); color: oklch(75% 0.12 80); }
 .badge-silent { background: oklch(25% 0.01 260); color: var(--text-dim); }
 
-.nicknames {
-  font-size: 0.6875rem;
-  color: var(--text-dim);
-  font-style: italic;
-  margin-left: 4px;
-}
+.nicknames { font-size: 0.6875rem; color: var(--text-dim); font-style: italic; margin-left: 4px; }
 
 footer {
-  margin-top: 40px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  font-size: 0.6875rem;
-  color: var(--text-dim);
+  margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border);
+  font-size: 0.6875rem; color: var(--text-dim);
 }
 
 @media (max-width: 600px) {
-  .tool {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-  .stats { gap: 8px; }
+  .tool { grid-template-columns: 1fr; gap: 2px; }
+  .tool-meta { flex-direction: row; gap: 8px; align-items: baseline; }
+  .controls { gap: 6px; }
 }
 </style>
 </head>
@@ -184,239 +156,306 @@ footer {
 <div class="container">
   <header>
     <h1>Brain Config</h1>
-    <p>Tool registry for the AI Toolkit. Canonical source: AI Toolkit index (ClickUp doc). This page is the visual companion.</p>
-    <div class="stats">
-      <span class="stat"><strong>12</strong> hooks</span>
-      <span class="stat"><strong>2</strong> gates</span>
-      <span class="stat"><strong>9</strong> prose hooks</span>
-      <span class="stat"><strong>14</strong> triggers</span>
-      <span class="stat"><strong>5</strong> agents</span>
-      <span class="stat"><strong>42</strong> total</span>
+    <p>Tool registry for the AI Toolkit. Live from <code>mawizorek/ClickUp_apps/brain-config/</code></p>
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search" placeholder="Search tools..." autocomplete="off">
+    </div>
+    <div class="controls">
+      <span class="pill" data-filter="hooks"><strong id="count-hooks">0</strong> hooks</span>
+      <span class="pill" data-filter="gates"><strong id="count-gates">0</strong> gates</span>
+      <span class="pill" data-filter="prose"><strong id="count-prose">0</strong> prose</span>
+      <span class="pill" data-filter="triggers"><strong id="count-triggers">0</strong> triggers</span>
+      <span class="pill" data-filter="agents"><strong id="count-agents">0</strong> agents</span>
+      <button class="sort-toggle" id="sort-date">sort: created</button>
+    </div>
+    <div class="status-bar">
+      <span id="total-count"></span>
+      <span id="sessions-logged"></span>
+      <span id="last-updated"></span>
     </div>
   </header>
 
-  <section class="shelf-gates">
-    <h2>Gates (pre-checks, orchestration)</h2>
-    <div class="tool-list">
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/gates/roster-scan-planner.md">Roster Scan Planner</a></div>
-        <div class="tool-purpose">Outermost gate. Reads full roster, builds execution plan, catches conflicts before firing anything.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/gates/agent-invocation-gate.md">Agent Invocation Gate</a></div>
-        <div class="tool-purpose">Disambiguates agent names from real-person mentions. Name + intent = fire; name in narrative = skip.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="shelf-hooks">
-    <h2>🔄 Hooks (deterministic, profiled in repo)</h2>
-    <div class="tool-list">
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/secrets-pii-guard.md">Secrets / PII Guard</a><span class="badge badge-halt">halt</span></div>
-        <div class="tool-purpose">Scan outgoing content for keys, tokens, passwords, personal data. Halt on hit.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/source-size-budget-enforcer.md">Source-Size Budget Enforcer</a><span class="badge badge-halt">halt</span></div>
-        <div class="tool-purpose">Measure file size vs budget (10-12KB / 15KB soft / 30KB hard). Flag or halt + route to split.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/skill-ban-guard.md">Skill-Ban Guard</a><span class="badge badge-halt">halt</span></div>
-        <div class="tool-purpose">Byte-level scan for active skill's hard bans (DESIGN-UI: gradient text, side-stripes, glassmorphism, #000/#fff).</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/commit-pre-flight.md">Commit Pre-Flight</a><span class="badge badge-halt">halt</span></div>
-        <div class="tool-purpose">Meta-checklist before any commit: SHA, PR collisions, .nojekyll, message format, branch, large file gate.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/memory-edit-guard.md">Memory Edit Guard</a><span class="badge badge-halt">halt</span></div>
-        <div class="tool-purpose">Pre-write gate for memory: token budget, PROTECTED content, firing-reliability test, pointer integrity, drift check.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/task-dedup-gate.md">Task Dedup Gate</a><span class="badge badge-halt">halt</span></div>
-        <div class="tool-purpose">3-step search before creating any task. Exact match = halt; near match = warn.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/post-build-verify.md">Post-Build Verify</a><span class="badge badge-warn">warn</span></div>
-        <div class="tool-purpose">After Pages commit: fetch live URL, confirm new version is serving. Flag if stale.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/artifact-ship-paperwork.md">Artifact Ship Paperwork</a><span class="badge badge-warn">warn</span></div>
-        <div class="tool-purpose">Post-commit checklist: APPS task, version comment, quickfire index, source rendition check.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/stale-context-reload.md">Stale Context Reload</a><span class="badge badge-silent">silent</span></div>
-        <div class="tool-purpose">If the last read of a file is >~10 messages back, re-fetch before editing.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/link-provenance.md">Link Provenance</a><span class="badge badge-silent">silent</span></div>
-        <div class="tool-purpose">Verify every ClickUp URL came from a tool result this session. Omit stale links silently.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/multi-edit-batch-gate.md">Multi-Edit Batch Gate</a><span class="badge badge-silent">silent</span></div>
-        <div class="tool-purpose">When 3+ edits target same file: plan sequence, fresh read, order bottom-up, batch atomically.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/hooks/memory-write-relay.md">Memory Write Relay</a><span class="badge badge-warn">warn</span></div>
-        <div class="tool-purpose">On failed memory write: flag once, emit copy-paste block, mark pending, batch at checkpoint.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="shelf-hooks">
-    <h2>🔄 Hooks (prose-only, no repo profile)</h2>
-    <div class="tool-list">
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">De-Slop Pass</span></div>
-        <div class="tool-purpose">Strip AI-sounding filler, hedging, and sign-offs from every response.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Source &amp; ID Guard</span></div>
-        <div class="tool-purpose">Get facts right: verify IDs, don't fabricate, don't hallucinate URLs.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Date &amp; Math Guard</span></div>
-        <div class="tool-purpose">Count from provided dates, double-check arithmetic, never trust date-from-memory.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Hygiene Sweep</span></div>
-        <div class="tool-purpose">Formatting consistency, no orphaned references, clean output.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Clarify First</span></div>
-        <div class="tool-purpose">When something is genuinely ambiguous, ask before guessing destructively.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Voice Match</span></div>
-        <div class="tool-purpose">Match Michael's register. Sharp coworker, not corporate. Subsumes retired Tone Dial.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Naming Canonicalizer</span></div>
-        <div class="tool-purpose">Use canonical names for workspace objects. No invented abbreviations.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Compression</span></div>
-        <div class="tool-purpose">Dense output. One sentence beats two. Fragment beats a sentence.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Steelman / Red Team</span></div>
-        <div class="tool-purpose">Challenge weak reasoning, push back on half-baked ideas.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Model Fit Advisor</span></div>
-        <div class="tool-purpose">Surface model suitability on first reply; resurface on degradation.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Question Block</span></div>
-        <div class="tool-purpose">Format follow-up questions as a copy-pastable block with inline options.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">When Updating Existing Work</span></div>
-        <div class="tool-purpose">Before modifying anything: load all context, check history, never contradict silently.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Triggered Tool Router</span></div>
-        <div class="tool-purpose">3-question gate: (1) existing? → When Updating. (2) persistent? → When Documenting. (3) HTML? → When Building Apps.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="shelf-triggers">
-    <h2>🎯 Triggers (contextual, fire when signal matches)</h2>
-    <div class="tool-list">
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Session Open</span></div>
-        <div class="tool-purpose">First response: surface recent activity, load context, check open-thread.md.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Session Close</span></div>
-        <div class="tool-purpose">End of session: memory audit, session log, flag unfinished threads.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Scope Lock</span></div>
-        <div class="tool-purpose">Before implementing from docs: thorough pass, validate scope, clarify gaps.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">When Coding</span></div>
-        <div class="tool-purpose">Coding router: review prefs, determine language/scope, load domain gate.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">When Building Apps</span></div>
-        <div class="tool-purpose">App router: load Apps/HTML Artifacts reference, enforce conventions, check APPS list.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">When Researching</span></div>
-        <div class="tool-purpose">Research router: multiple sources, structured findings, links mandatory.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">When Documenting</span></div>
-        <div class="tool-purpose">Doc hygiene: load existing first, no duplicates, current truth at top.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">When Planning / Scoping</span></div>
-        <div class="tool-purpose">Planning router: structure immediately, propose the system, estimate scope.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Chunked Document Review</span></div>
-        <div class="tool-purpose">Multi-part docs: verify markers, confirm each part, hold until all received.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Schema Linter</span></div>
-        <div class="tool-purpose">Validate record shape against domain schema (recipes, F1, URITP fields).</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Revision Log Tracker</span></div>
-        <div class="tool-purpose">Track what changed across revisions of a document or spec.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">HTML Artifact Regeneration</span></div>
-        <div class="tool-purpose">Regenerate an artifact from source when version drift detected.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Attachment Router</span></div>
-        <div class="tool-purpose">Any attached file: classify by type → route to type-specialist branch.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">PDF Split Markdown Packager</span></div>
-        <div class="tool-purpose">Decide split points + titles, emit import-markdown for the PDF Splitter.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Memory Hygiene Review</span></div>
-        <div class="tool-purpose">Periodically reconcile memory against docs: migrate, fix stale, verify pointers.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="shelf-agents">
-    <h2>🧠 Agents (autonomous workers, return summaries)</h2>
-    <div class="tool-list">
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/agents/recon-renata.md">Recon Renata</a><span class="nicknames">Repo Renata, Review Renata</span></div>
-        <div class="tool-purpose">Repo auditor. Checks structure, sizes, template conformance, stragglers. Read-only report.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/agents/red-team-reviewer.md">Red-Team Reviewer</a></div>
-        <div class="tool-purpose">Seven-lens brainstorm gate (Red, Creative, Professionalism, Dev, Scope, Ecosystem, Handoff). Pre-build.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/agents/research-runner.md">Research Runner</a></div>
-        <div class="tool-purpose">Multi-source research in its own context. Structured findings + mandatory links + recommendation.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Process &amp; Reference Auditor</span></div>
-        <div class="tool-purpose">Post-build: inventory references, log hurdles, reconcile docs, propose library additions.</div>
-      </div>
-      <div class="tool">
-        <div class="tool-name"><span class="no-profile">Handoff Packager</span></div>
-        <div class="tool-purpose">Package handoff: source-of-truth docs + session log + open threads for next agent/session.</div>
-      </div>
-    </div>
-  </section>
+  <div class="loading" id="loading">Loading from GitHub...</div>
+  <div class="no-results" id="no-results">No tools match that search.</div>
+  <div id="content"></div>
 
   <footer>
-    <p>Canonical source: AI Toolkit index (ClickUp). This file: visual companion at <code>brain-config/index.html</code>. Update when tools are added or retired.</p>
-    <p style="margin-top: 4px;">Last updated: 2026-07-03</p>
+    <p>Pulls live from GitHub API. Usage counts from <code>usage-log.json</code>. Canonical firing source: AI Toolkit index (ClickUp doc).</p>
   </footer>
 </div>
+
+<script>
+const OWNER = 'mawizorek';
+const REPO = 'ClickUp_apps';
+const BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main`;
+const BLOB = `https://github.com/${OWNER}/${REPO}/blob/main`;
+
+const SHELVES = [
+  { key: 'gates', folder: 'brain-config/gates', label: 'Gates (pre-checks, orchestration)', cssClass: 'shelf-gates' },
+  { key: 'hooks', folder: 'brain-config/hooks', label: '\u{1F504} Hooks (deterministic, profiled in repo)', cssClass: 'shelf-hooks' },
+  { key: 'agents', folder: 'brain-config/agents', label: '\u{1F9E0} Agents (autonomous workers)', cssClass: 'shelf-agents' }
+];
+
+const PROSE_HOOKS = [
+  { name: 'De-Slop Pass', purpose: 'Strip AI-sounding filler, hedging, and sign-offs from every response.' },
+  { name: 'Source & ID Guard', purpose: 'Get facts right: verify IDs, don\'t fabricate, don\'t hallucinate URLs.' },
+  { name: 'Date & Math Guard', purpose: 'Count from provided dates, double-check arithmetic, never trust date-from-memory.' },
+  { name: 'Hygiene Sweep', purpose: 'Formatting consistency, no orphaned references, clean output.' },
+  { name: 'Clarify First', purpose: 'When something is genuinely ambiguous, ask before guessing destructively.' },
+  { name: 'Voice Match', purpose: 'Match Michael\'s register. Sharp coworker, not corporate. Subsumes retired Tone Dial.' },
+  { name: 'Naming Canonicalizer', purpose: 'Use canonical names for workspace objects. No invented abbreviations.' },
+  { name: 'Compression', purpose: 'Dense output. One sentence beats two. Fragment beats a sentence.' },
+  { name: 'Steelman / Red Team', purpose: 'Challenge weak reasoning, push back on half-baked ideas.' }
+];
+
+const TRIGGERS = [
+  { name: 'Session Open', purpose: 'First response: surface recent activity, load context, check open-thread.md.' },
+  { name: 'Session Close', purpose: 'End of session: memory audit, session log, flag unfinished threads.' },
+  { name: 'Scope Lock', purpose: 'Before implementing from docs: thorough pass, validate scope, clarify gaps.' },
+  { name: 'When Coding', purpose: 'Coding router: review prefs, determine language/scope, load domain gate.' },
+  { name: 'When Building Apps', purpose: 'App router: load Apps/HTML Artifacts reference, enforce conventions, check APPS list.' },
+  { name: 'When Researching', purpose: 'Research router: multiple sources, structured findings, links mandatory.' },
+  { name: 'When Documenting', purpose: 'Doc hygiene: load existing first, no duplicates, current truth at top.' },
+  { name: 'When Planning / Scoping', purpose: 'Planning router: structure immediately, propose the system, estimate scope.' },
+  { name: 'Chunked Document Review', purpose: 'Multi-part docs: verify markers, confirm each part, hold until all received.' },
+  { name: 'Schema Linter', purpose: 'Validate record shape against domain schema (recipes, F1, URITP fields).' },
+  { name: 'Revision Log Tracker', purpose: 'Track what changed across revisions of a document or spec.' },
+  { name: 'HTML Artifact Regeneration', purpose: 'Regenerate an artifact from source when version drift detected.' },
+  { name: 'Attachment Router', purpose: 'Any attached file: classify by type, route to type-specialist branch.' },
+  { name: 'PDF Split Markdown Packager', purpose: 'Decide split points + titles, emit import-markdown for the PDF Splitter.' }
+];
+
+const BADGES = {
+  'secrets-pii-guard': 'halt', 'source-size-budget-enforcer': 'halt',
+  'skill-ban-guard': 'halt', 'commit-pre-flight': 'halt',
+  'memory-edit-guard': 'halt', 'task-dedup-gate': 'halt',
+  'post-build-verify': 'warn', 'artifact-ship-paperwork': 'warn',
+  'memory-write-relay': 'warn', 'stale-context-reload': 'silent',
+  'link-provenance': 'silent', 'multi-edit-batch-gate': 'silent'
+};
+
+const NICKNAMES = {
+  'recon-renata': 'Repo Renata, Review Renata'
+};
+
+let allTools = [];
+let usageData = {};
+let sortByDate = false;
+
+function slugToName(slug) {
+  return slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function extractPurpose(content) {
+  const match = content.match(/\*\*Purpose:\*\*\s*(.+?)(?:\n|$)/);
+  return match ? match[1].trim() : '';
+}
+
+function extractCreatedDate(content) {
+  const match = content.match(/^- (\d{4}-\d{2}-\d{2}):/m);
+  return match ? match[1] : null;
+}
+
+async function fetchJSON(url) {
+  const cached = localStorage.getItem(url);
+  if (cached) {
+    const { data, ts } = JSON.parse(cached);
+    if (Date.now() - ts < 300000) return data; // 5min TTL
+  }
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  localStorage.setItem(url, JSON.stringify({ data, ts: Date.now() }));
+  return data;
+}
+
+async function fetchText(url) {
+  const cached = localStorage.getItem('txt:' + url);
+  if (cached) {
+    const { data, ts } = JSON.parse(cached);
+    if (Date.now() - ts < 300000) return data;
+  }
+  const res = await fetch(url);
+  if (!res.ok) return '';
+  const data = await res.text();
+  localStorage.setItem('txt:' + url, JSON.stringify({ data, ts: Date.now() }));
+  return data;
+}
+
+async function loadUsageLog() {
+  const text = await fetchText(`${RAW}/brain-config/usage-log.json`);
+  if (!text) return;
+  try {
+    const log = JSON.parse(text);
+    usageData = log.tools || {};
+    const sessEl = document.getElementById('sessions-logged');
+    const updEl = document.getElementById('last-updated');
+    if (log.sessions_logged > 0) sessEl.textContent = `${log.sessions_logged} sessions logged`;
+    if (log.last_updated) updEl.textContent = `last: ${log.last_updated}`;
+  } catch(e) {}
+}
+
+async function loadShelf(shelf) {
+  const listing = await fetchJSON(`${BASE}/contents/${shelf.folder}?ref=main`);
+  if (!listing || !Array.isArray(listing)) return [];
+
+  const mdFiles = listing.filter(f => f.name.endsWith('.md') && f.name !== 'README.md');
+  const tools = [];
+
+  for (const file of mdFiles) {
+    const slug = file.name.replace('.md', '');
+    const content = await fetchText(`${RAW}/${shelf.folder}/${file.name}`);
+    const purpose = extractPurpose(content);
+    const created = extractCreatedDate(content);
+    tools.push({
+      slug, name: slugToName(slug), purpose,
+      shelf: shelf.key, url: `${BLOB}/${shelf.folder}/${file.name}`,
+      created, uses: usageData[slug] || 0,
+      badge: BADGES[slug] || null,
+      nicknames: NICKNAMES[slug] || null
+    });
+  }
+  return tools;
+}
+
+function renderTool(tool) {
+  const badge = tool.badge ? `<span class="badge badge-${tool.badge}">${tool.badge}</span>` : '';
+  const nicks = tool.nicknames ? `<span class="nicknames">${tool.nicknames}</span>` : '';
+  const nameHtml = tool.url
+    ? `<a href="${tool.url}">${tool.name}</a>${badge}${nicks}`
+    : `<span class="no-profile">${tool.name}</span>`;
+  const usesHtml = tool.uses > 0 ? `<span class="uses">${tool.uses}x</span>` : '';
+  const dateHtml = tool.created ? `<span>${tool.created}</span>` : '';
+  const searchData = `${tool.name} ${tool.purpose} ${tool.nicknames || ''}`.toLowerCase();
+
+  return `<div class="tool" data-search="${searchData}" data-shelf="${tool.shelf}" data-created="${tool.created || ''}" data-uses="${tool.uses}">
+    <div class="tool-name">${nameHtml}</div>
+    <div class="tool-purpose">${tool.purpose}</div>
+    <div class="tool-meta">${usesHtml}${dateHtml}</div>
+  </div>`;
+}
+
+function renderSection(shelf, tools) {
+  if (tools.length === 0) return '';
+  return `<section class="${shelf.cssClass}" data-shelf="${shelf.key}">
+    <h2>${shelf.label}</h2>
+    <div class="tool-list">${tools.map(renderTool).join('')}</div>
+  </section>`;
+}
+
+function renderAll() {
+  const content = document.getElementById('content');
+  let html = '';
+
+  const sorted = sortByDate
+    ? [...allTools].sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+    : allTools;
+
+  if (sortByDate) {
+    html = `<section class="shelf-hooks" data-shelf="all"><h2>All tools (newest first)</h2><div class="tool-list">${sorted.map(renderTool).join('')}</div></section>`;
+  } else {
+    for (const shelf of SHELVES) {
+      html += renderSection(shelf, sorted.filter(t => t.shelf === shelf.key));
+    }
+    // Prose hooks
+    const proseTools = PROSE_HOOKS.map(t => ({ ...t, slug: '', shelf: 'prose', url: null, created: null, uses: 0, badge: null, nicknames: null }));
+    html += `<section class="shelf-hooks" data-shelf="prose"><h2>\u{1F504} Hooks (prose-only, no repo profile)</h2><div class="tool-list">${proseTools.map(renderTool).join('')}</div></section>`;
+    // Triggers
+    const triggerTools = TRIGGERS.map(t => ({ ...t, slug: '', shelf: 'triggers', url: null, created: null, uses: 0, badge: null, nicknames: null }));
+    html += `<section class="shelf-triggers" data-shelf="triggers"><h2>\u{1F3AF} Triggers (contextual, fire when signal matches)</h2><div class="tool-list">${triggerTools.map(renderTool).join('')}</div></section>`;
+  }
+
+  content.innerHTML = html;
+  bindHeadings();
+  applyFilters();
+}
+
+function updateCounts() {
+  const hooks = allTools.filter(t => t.shelf === 'hooks').length;
+  const gates = allTools.filter(t => t.shelf === 'gates').length;
+  const agents = allTools.filter(t => t.shelf === 'agents').length;
+  document.getElementById('count-hooks').textContent = hooks;
+  document.getElementById('count-gates').textContent = gates;
+  document.getElementById('count-prose').textContent = PROSE_HOOKS.length;
+  document.getElementById('count-triggers').textContent = TRIGGERS.length;
+  document.getElementById('count-agents').textContent = agents;
+  document.getElementById('total-count').textContent = `${hooks + gates + agents + PROSE_HOOKS.length + TRIGGERS.length} total`;
+}
+
+function getActiveFilters() {
+  return [...document.querySelectorAll('.pill.active')].map(p => p.dataset.filter);
+}
+
+function applyFilters() {
+  const active = getActiveFilters();
+  const query = document.getElementById('search').value.toLowerCase().trim();
+  const sections = document.querySelectorAll('#content section');
+  let visibleCount = 0;
+
+  sections.forEach(s => {
+    const shelfMatch = active.length === 0 || active.includes(s.dataset.shelf) || s.dataset.shelf === 'all';
+    const tools = s.querySelectorAll('.tool');
+    let sectionHasVisible = false;
+
+    tools.forEach(tool => {
+      const searchData = tool.dataset.search || '';
+      const toolShelf = tool.dataset.shelf;
+      const textMatch = !query || searchData.includes(query);
+      const filterMatch = shelfMatch || (active.length > 0 && active.includes(toolShelf));
+      const visible = filterMatch && textMatch;
+      tool.classList.toggle('hidden', !visible);
+      if (visible) { sectionHasVisible = true; visibleCount++; }
+    });
+
+    s.classList.toggle('hidden', !sectionHasVisible);
+  });
+
+  document.getElementById('no-results').classList.toggle('visible', visibleCount === 0);
+}
+
+function bindHeadings() {
+  document.querySelectorAll('#content section h2').forEach(h2 => {
+    h2.addEventListener('click', () => {
+      const shelf = h2.closest('section').dataset.shelf;
+      const pill = document.querySelector(`.pill[data-filter="${shelf}"]`);
+      if (pill) { pill.classList.toggle('active'); applyFilters(); }
+    });
+  });
+}
+
+async function init() {
+  await loadUsageLog();
+
+  for (const shelf of SHELVES) {
+    const tools = await loadShelf(shelf);
+    allTools.push(...tools);
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  updateCounts();
+  renderAll();
+
+  // Pill filters
+  document.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => { pill.classList.toggle('active'); applyFilters(); });
+  });
+
+  // Search
+  document.getElementById('search').addEventListener('input', applyFilters);
+
+  // Sort toggle
+  const sortBtn = document.getElementById('sort-date');
+  sortBtn.addEventListener('click', () => {
+    sortByDate = !sortByDate;
+    sortBtn.classList.toggle('active', sortByDate);
+    sortBtn.textContent = sortByDate ? 'sort: shelf' : 'sort: created';
+    renderAll();
+  });
+}
+
+init();
+</script>
 </body>
 </html>

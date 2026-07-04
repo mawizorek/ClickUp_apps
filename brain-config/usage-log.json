@@ -1,0 +1,7 @@
+{
+  "_schema": "v1",
+  "_note": "Updated at session close. Each key is the tool filename (without .md). Value is cumulative fire count.",
+  "sessions_logged": 0,
+  "last_updated": null,
+  "tools": {}
+}
