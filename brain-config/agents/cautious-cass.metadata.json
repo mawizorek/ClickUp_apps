@@ -12,6 +12,6 @@
   "badge": null,
   "created": null,
   "shortcut": false,
-  "launchPrompt": "",
+  "launchPrompt": "Cass, where's this overconfident?",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
 }

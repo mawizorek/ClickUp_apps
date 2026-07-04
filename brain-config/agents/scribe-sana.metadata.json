@@ -12,6 +12,6 @@
   "badge": null,
   "created": null,
   "shortcut": false,
-  "launchPrompt": "",
+  "launchPrompt": "Sana, log the doc debt.",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false }
 }

@@ -12,6 +12,6 @@
   "badge": null,
   "created": null,
   "shortcut": false,
-  "launchPrompt": "",
+  "launchPrompt": "Lena, check the literal scope.",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
 }

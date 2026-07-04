@@ -12,6 +12,6 @@
   "badge": null,
   "created": null,
   "shortcut": false,
-  "launchPrompt": "",
+  "launchPrompt": "Finn, is this buildable?",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
 }

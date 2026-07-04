@@ -12,6 +12,6 @@
   "badge": null,
   "created": null,
   "shortcut": false,
-  "launchPrompt": "",
+  "launchPrompt": "Piper, what's the pivot here?",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
 }

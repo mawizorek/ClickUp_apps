@@ -12,6 +12,6 @@
   "badge": null,
   "created": null,
   "shortcut": false,
-  "launchPrompt": "",
+  "launchPrompt": "Cleo, give me the clever angle.",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
 }

@@ -1,4 +1,4 @@
-/* Brain Config Index — agent detail module (Segment 2b).
+/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch button).
    Self-wiring: owns #agent/<slug> routing + the detail/edit view.
    Deliberately kept OUT of app.js so the Run-me launcher engine stays untouched.
    Loaded by the shell after data.js + app.js. IIFE-scoped: no globals leak,
@@ -11,12 +11,18 @@
       metadata.json sidecar, fetched via the raw.githubusercontent path.
    3. Exposes editable fields (colloquialName, nicknames, launchPrompt, badge,
       status, teams, accent, and the open-ended toggles{} bag) and live-generates
-      a commit-ready metadata.json block with canonical key order + a copy button. */
+      a commit-ready metadata.json block with canonical key order + a copy button.
+   4. Bottom of the page: a "Launch this agent" button (ALL agents, not just the
+      Run-me shortcut set) — copies the current launch prompt and opens Brain. */
 (function () {
   'use strict';
 
   var RAW = 'https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main';
   var AGENTS_DIR = 'brain-config/agents';
+
+  // Launch target: reuse app.js's BRAIN_MAX_URL (same global scope, classic scripts),
+  // fall back to the ClickUp home if app.js ever stops exporting it.
+  var LAUNCH_TARGET = (typeof BRAIN_MAX_URL !== 'undefined' && BRAIN_MAX_URL) ? BRAIN_MAX_URL : 'https://app.clickup.com/home';
 
   // Canonical key order -> minimal, clean diff when the block is pasted back.
   var KEY_ORDER = ['slug', 'type', 'name', 'colloquialName', 'nicknames', 'status',
@@ -74,6 +80,11 @@
       '.ad-copy:hover{background:var(--accent);color:var(--bg);}',
       '.ad-json textarea{width:100%;min-height:300px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.75rem;line-height:1.55;padding:12px;outline:none;resize:vertical;tab-size:2;}',
       '.ad-json textarea:focus{border-color:var(--accent);}',
+      '.ad-launch-wrap{margin-top:26px;padding-top:22px;border-top:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap;}',
+      '.ad-launch-btn{display:inline-flex;align-items:center;gap:7px;font-size:.8125rem;font-weight:700;color:var(--bg);background:var(--accent);border:1px solid var(--accent);border-radius:100px;padding:10px 20px;cursor:pointer;text-decoration:none;transition:all 150ms cubic-bezier(.16,1,.3,1);}',
+      '.ad-launch-btn:hover{filter:brightness(1.08);}',
+      '.ad-launch-btn:active{transform:scale(.97);}',
+      '.ad-launch-note{font-size:.6875rem;color:var(--text-dim);line-height:1.4;max-width:42ch;}',
       '.ad-loading{padding:40px 4px;color:var(--text-dim);font-size:.8125rem;}',
       '.ad-error{padding:32px 4px;color:oklch(72% 0.14 25);font-size:.8125rem;line-height:1.5;}',
       '.ad-error code{background:var(--surface-2);padding:1px 5px;border-radius:3px;}',
@@ -121,6 +132,11 @@
         var ok = document.execCommand('copy'); document.body.removeChild(ta); return ok;
       } catch (e2) { return false; }
     }
+  }
+
+  function notify(msg) {
+    if (typeof showToast === 'function') { showToast(msg); return; }
+    // detail.js may load without app.js's toast; fail quiet.
   }
 
   // ---------- agent card links -> #agent/<slug> ----------
@@ -178,6 +194,7 @@
     var togHtml = togKeys.length
       ? togKeys.map(function (k) { return toggleRow(k, toggles[k]); }).join('')
       : '<div class="ad-empty">No toggles yet. Add one below — open-ended bag, no schema change.</div>';
+    var who = data.colloquialName || data.name || slug;
 
     p.innerHTML =
       '<a class="ad-back" href="#">\u2190 All tools</a>' +
@@ -196,13 +213,15 @@
       '<div class="ad-field"><label for="ad-accent">Accent <span class="hint">oklch token</span></label>' +
       '<div class="ad-accent-row"><span class="ad-swatch" id="ad-accent-sw" style="background:' + esc(data.accent || 'var(--agent)') + '"></span>' +
       '<input type="text" id="ad-accent" value="' + esc(data.accent || '') + '" spellcheck="false"></div></div>' +
-      fieldArea('ad-launch', 'Launch prompt', data.launchPrompt || '', 'copied when the Run-me button fires') +
+      fieldArea('ad-launch', 'Launch prompt', data.launchPrompt || '', 'copied when you launch this agent') +
       '<div class="ad-toggles"><h3>Toggles</h3><div id="ad-toglist">' + togHtml + '</div>' +
       '<div class="ad-addtoggle"><input type="text" id="ad-togkey" placeholder="newToggleKey" spellcheck="false"><button type="button" id="ad-togadd">Add toggle</button></div></div>' +
       '</div>' +
       '<div class="ad-json"><div class="ad-json-head"><span class="path">writes to <code>' + AGENTS_DIR + '/' + esc(slug) + '.metadata.json</code></span>' +
       '<button type="button" class="ad-copy" id="ad-copy">Copy block</button></div>' +
-      '<textarea id="ad-jsonout" readonly spellcheck="false"></textarea></div>';
+      '<textarea id="ad-jsonout" readonly spellcheck="false"></textarea></div>' +
+      '<div class="ad-launch-wrap"><a class="ad-launch-btn" id="ad-launch-btn" href="' + esc(LAUNCH_TARGET) + '" target="_blank" rel="noopener">\u25B6 Launch this agent</a>' +
+      '<span class="ad-launch-note">Copies the launch prompt and opens Brain in a new tab. Paste, and you\u2019re talking to ' + esc(who) + '.</span></div>';
 
     var work = JSON.parse(JSON.stringify(data));
 
@@ -259,6 +278,14 @@
       var label = btn.textContent;
       btn.textContent = ok ? 'Copied' : 'Copy failed';
       setTimeout(function () { btn.textContent = label; }, 1600);
+    });
+    document.getElementById('ad-launch-btn').addEventListener('click', async function () {
+      var text = document.getElementById('ad-launch').value;
+      var ok = text ? await copyText(text) : false;
+      notify(ok
+        ? 'Prompt copied → opening Brain. Paste, and you\u2019re talking to ' + who + '.'
+        : 'Opening Brain — copy the prompt above manually before you switch.');
+      // The anchor's default action opens LAUNCH_TARGET in a new tab.
     });
 
     regen();

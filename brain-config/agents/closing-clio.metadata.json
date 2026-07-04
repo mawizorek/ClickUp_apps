@@ -11,7 +11,7 @@
   "accent": "oklch(70% 0.12 20)",
   "badge": null,
   "created": null,
-  "shortcut": false,
-  "launchPrompt": "",
+  "shortcut": true,
+  "launchPrompt": "Clio, close out the session.",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false }
 }

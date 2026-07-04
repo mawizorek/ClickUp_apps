@@ -11,7 +11,7 @@
   "accent": "oklch(72% 0.15 300)",
   "badge": null,
   "created": null,
-  "shortcut": false,
-  "launchPrompt": "",
+  "shortcut": true,
+  "launchPrompt": "Mira, convene the council on this.",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
 }

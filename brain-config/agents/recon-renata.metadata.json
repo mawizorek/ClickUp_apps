@@ -12,6 +12,6 @@
   "badge": null,
   "created": "2026-07-03",
   "shortcut": true,
-  "launchPrompt": "Renata, audit mawizorek/ClickUp_apps against the operating standard: structure conformance, source-size budget, source-rendition health, template conformance, stragglers, and commit-message format. Return the full report with the size table.",
+  "launchPrompt": "Renata, audit the repo.",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
 }

@@ -12,6 +12,6 @@
   "badge": null,
   "created": null,
   "shortcut": false,
-  "launchPrompt": "",
+  "launchPrompt": "Mika, how would the other models play this?",
   "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
 }
