@@ -4,7 +4,7 @@
 
 [![Launch](https://img.shields.io/badge/Launch-World%20Cup%20Bracket-brightgreen?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/)
 
-**Status:** Live (v4.0) | **Source of truth:** this repo folder
+**Status:** Live (v4.1) | **Source of truth:** this repo folder
 
 ---
 
@@ -13,47 +13,48 @@
 Mobile-first interactive World Cup 2026 bracket tracker with two views that share one detail popup:
 
 - **Schedule view:** Match cards grouped by date with time filters. Completed matches show a compact result line; upcoming matches show each team's FIFA rank. **Tap any card** to open the shared detail sheet.
-- **Bracket view:** Horizontal tournament tree, R32 through Final. **Tap any match card** for the same detail sheet. **Tap a team's \u2197 arrow** (right side of its row) to trace its path to the Final \u2014 the rest of the bracket dims.
+- **Bracket view:** Horizontal tournament tree, R32 through Final. **Tap any match card** for the same detail sheet. **Tap a team's \u2197 arrow** to trace its path to the Final (rest of the bracket dims). **Tap empty space to clear** the highlight.
 
-**Shared detail sheet** (one component, served from both views) shows: when + where + live countdown, final score / who advanced (completed), the teams that can still reach the slot (future), a **"road to here"** trail of each team's prior-round results, and a for-fun win estimate. Concrete teams in the sheet carry a \u2197 that jumps to the bracket and highlights their path.
+**Shared detail sheet** shows when + where + live countdown, final score / who advanced, the teams that can still reach a future slot, a "road to here" trail of each team's prior results, and a for-fun win estimate.
+
+A small **version footer** (`vX.X \u00b7 PR#NN`) sits at the bottom so you can always tell which build you're looking at.
 
 ## How to use it
 
-Tap any card (either view) for details. In the bracket, tap a team's \u2197 for the path highlight. Inside the sheet, a team's \u2197 jumps to the bracket and traces them. To update results/schedule, edit `data.json` only.
+Tap any card (either view) for details. In the bracket, tap a team's \u2197 for the path highlight, tap empty space to clear it. Inside the sheet, a team's \u2197 jumps to the bracket and traces them. To update results/schedule, edit `data.json` only.
 
 ## Infrastructure
 
 | File | Role | Update frequency |
 |------|------|------------------|
-| `index.html` | Thin shell: head + skeleton, links CSS, boots the ES module | Rarely |
-| `source/styles.css` | Base + schedule styles | Style changes |
+| `index.html` | Thin shell: head + skeleton + footer, links CSS, boots the ES module | Rarely |
+| `source/styles.css` | Base + schedule + footer styles | Style changes |
 | `source/bracket.css` | Bracket view styles | Style changes |
 | `source/sheet.css` | Shared detail-sheet + road-trail styles | Style changes |
-| `source/store.js` | Shared constants + runtime state (`S`) | Rarely |
+| `source/store.js` | Shared constants (incl. `APP_VERSION`, `BUILD_PR`) + runtime state | Version bumps |
 | `source/util.js` | Codes, resolvers, countdown, route history, odds | Logic changes |
-| `source/sheet.js` | The ONE shared detail popup (both views) | Sheet feature changes |
+| `source/sheet.js` | The ONE shared detail popup (both views) | Sheet changes |
 | `source/schedule.js` | Schedule view rendering | Schedule changes |
-| `source/bracket.js` | Bracket render + path highlight | Bracket changes |
-| `source/app.js` | Entry: data load, view toggle, trace bridge, ticker | Rarely |
+| `source/bracket.js` | Bracket render + path highlight + deselect | Bracket changes |
+| `source/app.js` | Entry: data load, view toggle, trace bridge, footer, ticker | Rarely |
 | `data.json` | Living dataset (matches, results, schedule, `rankings`) | After each match day via MCP |
 
-**Multi-file ES-module architecture.** Every source file is kept under ~12KB. Pages-hosted; not for `file://` (module CORS) \u2014 use the live URL.
+**Multi-file ES-module architecture.** Every source file under ~12KB. Pages-hosted; not for `file://` (module CORS).
 
 ## Architecture
 
-- **One popup, two entry points.** `sheet.js` renders the single detail sheet; both `schedule.js` and `bracket.js` call `openSheet(id)`. Never rebuilt per-view. This is the professionalism/standardization spine of v4.
-- **Delivery model (v4):** card tap = detail sheet (the default); path highlight = a dedicated \u2197 arrow on the right of each team row. The old \u24d8 badge is gone (it was in the way). Path highlight stays first-class (one tap on the bracket).
-- **Decoupling:** the sheet asks for a path trace via a `trace-team` CustomEvent; `app.js` catches it, switches to bracket view, and highlights \u2014 so `sheet.js` never imports `bracket.js` (no circular dep).
-- **Road to here:** `routeHistory(team)` returns a team's prior completed matches (round + opponent + score), rendered as a compact trail. Kept minimal so the sheet stays clean.
-- **Potential matchups:** `feedsTo` inverted into `fedBy`; TBD slots resolve to "winner of X/Y". The sheet expands the contender pool per side.
-- **Odds heuristic:** rank \u2192 rough Elo-ish rating \u2192 logistic split, clamped 8-92%. Labeled EST / for-fun. Not real odds.
-- **Countdowns:** ET-string kickoff parsed against EDT (UTC-4); one 30s interval updates all `[data-countdown]`.
+- **Version footer** reads `APP_VERSION` + `BUILD_PR` from `store.js`, rendered on load. Bump both when shipping; `BUILD_PR` is set to the merged PR number so the running build is always identifiable at a glance.
+- **One popup, two entry points.** `sheet.js` renders the single detail sheet; both views call `openSheet(id)`.
+- **Delivery model:** card tap = detail sheet; path highlight = \u2197 arrow per team; **empty-space tap clears the highlight** (restored in v4.1 after a v4 refactor dropped it). The `bindReset` listener sits on `#bracketView` and ignores taps on cards / arrows.
+- **Decoupling:** the sheet requests a path trace via a `trace-team` CustomEvent; `app.js` catches it and drives the bracket view + highlight.
+- **Road to here / potential matchups / odds / countdowns:** see v3-v4 notes below; unchanged.
 - OKLCH dark theme, `prefers-reduced-motion` guard, palette locked.
 
 ## Version history
 
-- **v4.0** (2026-07-04): Unified detail sheet across both views (extracted to `sheet.js`). Flipped delivery: card tap = details, \u2197 arrow = path highlight, \u24d8 removed. Added "road to here" trail (prior-round results per team). Schedule cards now open the shared sheet instead of an inline drawer.
-- **v3.0** (2026-07-04): Modular ES-module split (fixed the 30KB monolith). Bracket-tap detail sheet + \u24d8 affordance.
+- **v4.1** (2026-07-04): Version footer stamp (`vX.X \u00b7 PR#NN`). Restored tap-empty-space-to-deselect on the bracket path highlight (regressed in v4's refactor).
+- **v4.0** (2026-07-04): Unified detail sheet across both views (`sheet.js`). Flipped delivery: card tap = details, \u2197 = path highlight, \u24d8 removed. Added "road to here" trail.
+- **v3.0** (2026-07-04): Modular ES-module split (fixed the 30KB monolith). Bracket-tap detail sheet.
 - **v2.1** (2026-07-04): Condensed completed cards, FIFA ranks, tighter bracket rows.
 - **v2.0** (2026-07-04): Potential matchups, tap drawers, path highlight, countdown chips, QF/SF/Final schedule.
 - **v1** (2026-07-02): Initial dual-view build.
