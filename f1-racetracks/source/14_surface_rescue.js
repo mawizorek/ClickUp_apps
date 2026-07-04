@@ -3,7 +3,7 @@
 */
 
 (function () {
-  const RESCUE_TOKEN = 'dbg2 rescue';
+  const RESCUE_TOKEN = 'dbg3 lexical';
   const RESCUE_CARD_ID = 'current-round-card-rescue';
   const RESCUE_CENTER_ID = 'weekend-center-rescue';
 
@@ -11,14 +11,36 @@
     return String(value ?? '').replace(/[&<>]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[char]));
   }
 
+  function readBySlug() {
+    if (typeof bySlug !== 'undefined' && bySlug) return bySlug;
+    if (window.bySlug) return window.bySlug;
+    return {};
+  }
+
+  function readTracks() {
+    if (typeof TRACKS !== 'undefined' && Array.isArray(TRACKS)) return TRACKS;
+    if (Array.isArray(window.TRACKS)) return window.TRACKS;
+    return [];
+  }
+
+  function readAppMeta() {
+    if (typeof appDataMeta !== 'undefined' && appDataMeta) return appDataMeta;
+    if (window.appDataMeta) return window.appDataMeta;
+    return {};
+  }
+
+  function readSeason() {
+    if (typeof SEASON !== 'undefined') return SEASON;
+    if (window.SEASON) return window.SEASON;
+    return '';
+  }
+
   function currentTrack() {
-    if (window.bySlug && window.appDataMeta && window.appDataMeta.current_round_slug && window.bySlug[window.appDataMeta.current_round_slug]) {
-      return window.bySlug[window.appDataMeta.current_round_slug];
-    }
-    if (Array.isArray(window.TRACKS)) {
-      return window.TRACKS.find((track) => track.status === 'active') || window.TRACKS.find((track) => track.report) || null;
-    }
-    return null;
+    const map = readBySlug();
+    const meta = readAppMeta();
+    if (meta.current_round_slug && map[meta.current_round_slug]) return map[meta.current_round_slug];
+    const tracks = readTracks();
+    return tracks.find((track) => track.status === 'active') || tracks.find((track) => track.report) || null;
   }
 
   function simpleSessions(track) {
@@ -41,6 +63,10 @@
     if (!foot) return;
     const original = foot.textContent || '';
     if (original.includes(RESCUE_TOKEN)) return;
+    if (original.includes('dbg2 rescue')) {
+      foot.textContent = original.replace('dbg2 rescue', RESCUE_TOKEN);
+      return;
+    }
     if (original.includes('dbg1')) {
       foot.textContent = original.replace('dbg1', RESCUE_TOKEN);
       return;
@@ -82,7 +108,7 @@
       <p class="crc-copy">Rescue mount active: the current-race shortcut is now being forced into the real home render so the newest front-end layer is visible again.</p>
       <div class="crc-grid">
         <div class="wc-panel"><div class="crc-label">Circuit</div><div class="crc-value">${rescueEsc(track.title || '—')}</div></div>
-        <div class="wc-panel"><div class="crc-label">Date</div><div class="crc-value">${rescueEsc(track.date || '—')} ${rescueEsc(window.SEASON || '')}</div></div>
+        <div class="wc-panel"><div class="crc-label">Date</div><div class="crc-value">${rescueEsc(track.date || '—')} ${rescueEsc(readSeason())}</div></div>
         <div class="wc-panel"><div class="crc-label">Status</div><div class="crc-value">${rescueEsc(track.status || 'active')}</div></div>
       </div>
       <div class="crc-actions"><a class="crc-primary" href="#/${rescueEsc(track.slug || '')}">Open weekend center →</a></div>
@@ -95,7 +121,7 @@
     const view = document.querySelector('.view');
     if (!meta || !view || document.getElementById(RESCUE_CENTER_ID)) return;
     const slug = (location.hash.replace(/^#\/?/, '') || '').trim();
-    const track = window.bySlug && window.bySlug[slug];
+    const track = readBySlug()[slug];
     if (!track || !track.report) return;
     const sessionRows = simpleSessions(track).map((session) => `
       <div class="wc-session-row">
