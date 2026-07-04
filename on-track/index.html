@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- INFRASTRUCTURE: engine + data.json (renders immediately from built-in data; data.json enhances when served) -->
 <!-- Data updates: commit data.json only. Engine updates: version bump this file. -->
-<!-- BRAND ASSETS: icon.png (512x512, apple-touch-icon + favicon) + og.png (1200x630, share/unfurl). Drop both into this folder. -->
+<!-- BRAND ASSETS (TEMP NAMES): icon = IMG_4698.png, banner = IMG_4689.png. TODO: rename to icon.png / og.png + downsize (see next-build-spec.md). -->
 <html lang="en" data-theme="rb">
 <head>
 <meta charset="UTF-8">
@@ -14,16 +14,16 @@
 <meta property="og:description" content="Live motorsport TV schedule. What's racing now, what's next, and where to watch it.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/on-track/">
-<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/on-track/og.png">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/on-track/IMG_4689.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="On Track — What Motorsport Is On Right Now">
 <meta name="twitter:description" content="Live motorsport TV schedule. What's racing now, what's next, and where to watch.">
-<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/on-track/og.png">
-<link rel="icon" type="image/png" href="icon.png">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/on-track/IMG_4689.png">
+<link rel="icon" type="image/png" href="IMG_4698.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>">
-<link rel="apple-touch-icon" href="icon.png">
+<link rel="apple-touch-icon" href="IMG_4698.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="On Track">
@@ -440,7 +440,7 @@ noscript { display: block; padding: 20px; text-align: center; color: var(--text-
   </footer>
 </div>
 <script>
-const APP_VERSION = 'v1.5';
+const APP_VERSION = 'v1.6';
 const APP_DATE = '2026-07-04';
 const APP_SLUG = 'on-track';
 const SERIES = {
