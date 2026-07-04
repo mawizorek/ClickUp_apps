@@ -30,11 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session: Brain Config hub rebuild · started 2026-07-04 12:10 ET
-
-**Working:** rebuilding the hub as the comprehensive flat tool list (hooks + triggers + gates + agents inline, sortable/filterable/searchable). Extending `registry.json` to v2 (adds hooks[], triggers[], gates[]). Rebuilding `brain-config/index.html` fresh (NOT str_replace, readback flattens it). Adding a Mira orchestration view + a reports fold-in view. Redirecting `agent-reports/index.html` into the hub. Files: `registry.json`, `brain-config/index.html`, `agent-reports/index.html`.
-
-**Status:** active
+*(empty — no agents currently working in the repo)*
 
 ---
 
