@@ -135,301 +135,93 @@ function freshSourceURL(mime) {
 }
 
 const copyBtn = document.getElementById("t-copy");
-if (copyBtn) {
-  copyBtn.addEventListener("click", async e => {
-    const src = buildSource();
-    try {
-      await navigator.clipboard.writeText(src);
-      flash(e.currentTarget, "Source copied");
-    } catch (_) {
-      const ta = document.createElement("textarea");
-      ta.value = src;
-      ta.style.position = "fixed";
-      ta.style.top = "-9999px";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      let ok = false;
-      try {
-        ok = document.execCommand("copy");
-      } catch (__){ }
-      ta.remove();
-      flash(e.currentTarget, ok ? "Source copied" : "Copy failed");
-    }
-  });
-}
+if (copyBtn) copyBtn.addEventListener("click", async e => {
+  const src = buildSource();
+  try {
+    await navigator.clipboard.writeText(src);
+    flash(e.currentTarget, "Source copied");
+  } catch (_) {
+    const ta = document.createElement("textarea");
+    ta.value = src;
+    ta.style.position = "fixed";
+    ta.style.top = "-9999px";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (__){ }
+    ta.remove();
+    flash(e.currentTarget, ok ? "Source copied" : "Copy failed");
+  }
+});
 
 const prepBtn = document.getElementById("t-prep");
-if (prepBtn) {
-  prepBtn.addEventListener("click", e => {
-    const slot = document.getElementById("save-slot");
-    if (!slot) return;
-    slot.innerHTML = "";
-    const a = document.createElement("a");
-    a.href = freshSourceURL("text/html");
-    a.download = "f1-racetracks-app.html";
-    a.className = "save-link";
-    a.textContent = "⤓ Save f1-racetracks-app.html";
-    slot.appendChild(a);
-    flash(e.currentTarget, "Ready → click Save");
-  });
-}
+if (prepBtn) prepBtn.addEventListener("click", e => {
+  const slot = document.getElementById("save-slot");
+  if (!slot) return;
+  slot.innerHTML = "";
+  const a = document.createElement("a");
+  a.href = freshSourceURL("text/html");
+  a.download = "f1-racetracks-app.html";
+  a.className = "save-link";
+  a.textContent = "⤓ Save f1-racetracks-app.html";
+  slot.appendChild(a);
+  flash(e.currentTarget, "Ready → click Save");
+});
 
 const tabBtn = document.getElementById("t-tab");
-if (tabBtn) {
-  tabBtn.addEventListener("click", e => {
-    const w = window.open(freshSourceURL("text/plain"), "_blank");
-    flash(e.currentTarget, w ? "Opened" : "Popup blocked");
-  });
-}
+if (tabBtn) tabBtn.addEventListener("click", e => {
+  const w = window.open(freshSourceURL("text/plain"), "_blank");
+  flash(e.currentTarget, w ? "Opened" : "Popup blocked");
+});
 
 const dataBtn = document.getElementById("t-data");
-if (dataBtn) {
-  dataBtn.addEventListener("click", e => {
-    const slot = document.getElementById("save-slot");
-    if (!slot) return;
-    slot.innerHTML = "";
-    const a = document.createElement("a");
-    const data = JSON.stringify(currentDataExport(), null, 2);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    a.href = url;
-    a.download = "f1-racetracks-data.json";
-    a.className = "save-link";
-    a.textContent = "⤓ Save f1-racetracks-data.json";
-    slot.appendChild(a);
-    flash(e.currentTarget, "Ready → click Save");
-    setTimeout(() => URL.revokeObjectURL(url), 90000);
-  });
-}
-
-const LIVE_REFRESH_MS = 20000;
-
-const WEEKEND_LIVE_CIRCUIT_ALIASES = {
-  'albert-park': ['albert park', 'melbourne'],
-  shanghai: ['shanghai'],
-  suzuka: ['suzuka'],
-  miami: ['miami'],
-  'gilles-villeneuve': ['gilles villeneuve', 'montreal', 'canada'],
-  monaco: ['monaco'],
-  catalunya: ['barcelona', 'catalunya', 'circuit de barcelona-catalunya', 'spanish gp'],
-  'red-bull-ring': ['red bull ring', 'spielberg', 'austrian gp'],
-  silverstone: ['silverstone', 'british gp'],
-  spa: ['spa', 'spa-francorchamps', 'circuit de spa-francorchamps', 'belgian gp'],
-  hungaroring: ['hungaroring', 'hungary', 'hungarian gp'],
-  zandvoort: ['zandvoort', 'dutch gp'],
-  monza: ['monza', 'italian gp'],
-  madring: ['madring', 'madrid'],
-  baku: ['baku', 'azerbaijan'],
-  'marina-bay': ['marina bay', 'singapore'],
-  cota: ['cota', 'circuit of the americas', 'united states'],
-  mexico: ['mexico city', 'hermanos rodriguez', 'méxico'],
-  interlagos: ['interlagos', 'sao paulo', 'são paulo'],
-  'las-vegas': ['las vegas'],
-  losail: ['losail', 'qatar'],
-  'yas-marina': ['yas marina', 'abu dhabi']
-};
+if (dataBtn) dataBtn.addEventListener("click", e => {
+  const slot = document.getElementById("save-slot");
+  if (!slot) return;
+  slot.innerHTML = "";
+  const a = document.createElement("a");
+  const data = JSON.stringify(currentDataExport(), null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = "f1-racetracks-data.json";
+  a.className = "save-link";
+  a.textContent = "⤓ Save f1-racetracks-data.json";
+  slot.appendChild(a);
+  flash(e.currentTarget, "Ready → click Save");
+  setTimeout(() => URL.revokeObjectURL(url), 90000);
+});
 
 const SCHEDULE_SEEDS = {
   silverstone: [
     { day: 'Fri', date: '2026-07-03', items: [
-      { series: 'F1', label: 'Practice 1', start: '2026-07-03T12:30:00+01:00', end: '2026-07-03T13:30:00+01:00' },
-      { series: 'F1', label: 'Sprint Qualifying', start: '2026-07-03T16:30:00+01:00', end: '2026-07-03T17:14:00+01:00' }
+      { series: 'F1', label: 'Practice 1', range: '12:30–13:30', status: 'done' },
+      { series: 'F1', label: 'Sprint Qualifying', range: '16:30–17:14', status: 'done' }
     ]},
     { day: 'Sat', date: '2026-07-04', items: [
-      { series: 'F1', label: 'Sprint', start: '2026-07-04T12:00:00+01:00', end: '2026-07-04T13:00:00+01:00' },
-      { series: 'F1', label: 'Qualifying', start: '2026-07-04T16:00:00+01:00', end: '2026-07-04T17:00:00+01:00' }
+      { series: 'F1', label: 'Sprint', range: '12:00–13:00', status: 'live' },
+      { series: 'F1', label: 'Qualifying', range: '16:00–17:00', status: 'upcoming' }
     ]},
     { day: 'Sun', date: '2026-07-05', items: [
-      { series: 'F1', label: 'Grand Prix', start: '2026-07-05T15:00:00+01:00', end: '2026-07-05T17:00:00+01:00' }
+      { series: 'F1', label: 'Grand Prix', range: '15:00–17:00', status: 'upcoming' }
     ]}
   ]
 };
 
-const WEEKEND_REPLAY_DATA = {
-  "albert-park": {
-    sessionLabel: "Grand Prix replay",
-    sessionDate: "Sun Mar 8",
-    beats: [
-      { clock: "Lights out", lap: "Lap 1 / 58", phase: "Race start", order: ["RUS", "PIA", "HAM", "NOR", "VER"], feed: ["Russell converts pole cleanly", "Piastri hangs onto P2 through Turn 3"] },
-      { clock: "00:18:40", lap: "Lap 14 / 58", phase: "Opening stint", order: ["RUS", "NOR", "HAM", "VER", "LEC"], feed: ["Verstappen clears Hamilton on DRS run to Turn 11", "Medium tyres stabilise after early graining"] },
-      { clock: "00:41:10", lap: "Lap 30 / 58", phase: "Pit cycle", order: ["RUS", "VER", "NOR", "LEC", "ANT"], feed: ["Undercut window opens for the leaders", "Antonelli gains clean air in the second phase"] },
-      { clock: "01:05:35", lap: "Lap 43 / 58", phase: "Fastest lap phase", order: ["RUS", "ANT", "LEC", "VER", "NOR"], feed: ["Verstappen sets fastest lap", "Antonelli locks in the Mercedes 1–2 picture"] },
-      { clock: "01:27:12", lap: "Chequered flag", phase: "Finish", order: ["RUS", "ANT", "LEC", "VER", "NOR"], feed: ["Mercedes opens 2026 with a 1–2", "Russell wins the season opener"] }
-    ]
-  }
-};
-
-const weekendEnhancementState = {};
-
-function ensureWeekendState(slug) {
-  if (!weekendEnhancementState[slug]) {
-    weekendEnhancementState[slug] = { mode: null, beat: 0, speed: 1, timer: null };
-  }
-  return weekendEnhancementState[slug];
-}
-
-function clearWeekendTimer(slug) {
-  const state = ensureWeekendState(slug);
-  if (state.timer) {
-    window.clearInterval(state.timer);
-    state.timer = null;
-  }
-}
-
-function trackSlugFromHash() {
-  return (location.hash.replace(/^#\/?/, "") || "").trim();
-}
-
-function weekendNormalize(value) {
-  return String(value || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
-}
-
-function classifyWeekendSessionState(session) {
-  const now = Date.now();
-  const start = session?.date_start ? new Date(session.date_start).getTime() : null;
-  const end = session?.date_end ? new Date(session.date_end).getTime() : null;
-  if (!session || !start) return 'idle';
-  if (start > now) return 'awaiting';
-  if (!end || end >= now) return 'live';
-  return (now - end) / 36e5 <= 48 ? 'replay' : 'idle';
-}
-
-function matchWeekendCircuitSlug(session) {
-  const haystack = [session?.circuit_short_name, session?.meeting_name, session?.country_name]
-    .map(weekendNormalize)
-    .join(' ');
-  for (const [slug, aliases] of Object.entries(WEEKEND_LIVE_CIRCUIT_ALIASES)) {
-    if (aliases.some(alias => haystack.includes(weekendNormalize(alias)))) return slug;
-  }
-  return null;
-}
-
-async function fetchWeekendJson(url) {
-  const response = await fetch(url, { cache: 'no-store' });
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-  return response.json();
-}
-
-function latestWeekendByDriver(rows) {
-  const map = new Map();
-  for (const row of rows || []) {
-    const key = row.driver_number;
-    if (!map.has(key) || String(row.date || '') > String(map.get(key).date || '')) map.set(key, row);
-  }
-  return map;
-}
-
-function formatWeekendInterval(intervalRow, position) {
-  if (position === 1) return 'Leader';
-  if (!intervalRow) return '—';
-  if (typeof intervalRow.interval === 'string') return intervalRow.interval;
-  if (typeof intervalRow.interval === 'number') return `+${intervalRow.interval.toFixed(3)}`;
-  if (typeof intervalRow.gap_to_leader === 'number') return `+${intervalRow.gap_to_leader.toFixed(3)}`;
-  return intervalRow.gap_to_leader || '—';
-}
-
-function liveFormatLocal(dateString) {
-  if (!dateString) return '—';
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(date);
-}
-
-function liveChipClass(category = '') {
-  const value = String(category).toLowerCase();
-  if (value.includes('flag')) return 'flag';
-  if (value.includes('safety')) return 'safety';
-  if (value.includes('session')) return 'session';
-  return 'other';
-}
-
-function formatSeedTime(dateString) {
-  return new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' }).format(new Date(dateString));
-}
-
-function formatSessionStatus(start, end) {
-  const now = Date.now();
-  const startMs = new Date(start).getTime();
-  const endMs = new Date(end).getTime();
-  if (now >= endMs) return 'done';
-  if (now >= startMs && now < endMs) return 'live';
-  return 'upcoming';
-}
-
-function buildFallbackSchedule(track) {
-  return (track.sessions || []).map(entry => {
-    const [dayLabelRaw, bodyRaw] = String(entry.sess || '').split('·');
-    const dayLabel = (dayLabelRaw || 'Weekend').trim();
-    const body = (bodyRaw || 'Session').trim();
-    const pieces = body.split('+').map(item => item.trim()).filter(Boolean);
-    return {
-      day: dayLabel,
-      date: entry.date,
-      items: pieces.map(label => ({
-        series: 'F1',
-        label,
-        time: 'Time pending',
-        status: inferScheduleStatus(track, entry.date)
-      }))
-    };
-  });
-}
-
-function inferScheduleStatus(track, dateString) {
-  const today = new Date().toISOString().slice(0, 10);
-  if (track.status === 'done') return 'done';
-  if (track.status === 'active') {
-    if (dateString === today) return 'live';
-    return dateString < today ? 'done' : 'upcoming';
-  }
-  return dateString < today ? 'done' : 'upcoming';
+function currentRoundTrack() {
+  return bySlug[appDataMeta.current_round_slug] || TRACKS.find(track => track.status === 'active') || reportTracks[0] || null;
 }
 
 function scheduleDataFor(track) {
-  if (SCHEDULE_SEEDS[track.slug]) {
-    return SCHEDULE_SEEDS[track.slug].map(group => ({
-      day: group.day,
-      date: group.date,
-      items: group.items.map(item => ({
-        series: item.series,
-        label: item.label,
-        time: formatSeedTime(item.start),
-        range: `${formatSeedTime(item.start)}–${formatSeedTime(item.end)}`,
-        status: formatSessionStatus(item.start, item.end),
-        start: item.start,
-        end: item.end
-      }))
-    }));
-  }
-
-  return buildFallbackSchedule(track);
-}
-
-function scheduleRowMarkup(item) {
-  return `
-    <div class="wc-session-row">
-      <div class="wc-session-left">
-        <span class="wc-series wc-series-${String(item.series || 'generic').toLowerCase()}">${esc(item.series || 'F1')}</span>
-        <span class="wc-session-name">${esc(item.label)}</span>
-      </div>
-      <div class="wc-session-right">
-        <span class="wc-session-time">${esc(item.range || item.time || 'Time pending')}</span>
-        <span class="wc-status wc-status-${item.status}">${esc(item.status)}</span>
-      </div>
-    </div>
-  `;
-}
-
-function currentRoundTrack() {
-  return TRACKS.find(track => track.status === 'active') || reportTracks[0] || null;
+  return SCHEDULE_SEEDS[track.slug] || [];
 }
 
 function renderHomeCurrentRaceCard(track) {
+  const groups = scheduleDataFor(track);
+  const sessions = groups.flatMap(group => group.items);
+  const liveNow = sessions.find(session => session.status === 'live');
+  const nextUp = sessions.find(session => session.status === 'upcoming');
   return `
     <section class="current-round-card" id="current-round-card">
       <div class="crc-head">
@@ -439,34 +231,36 @@ function renderHomeCurrentRaceCard(track) {
         </div>
         <div class="crc-badge crc-badge-${track.status}">${esc(track.status)}</div>
       </div>
+      <p class="crc-meta">${esc(track.title)} · ${esc(track.date)} ${SEASON}</p>
       <div class="crc-grid">
-        <div class="wc-panel"><div class="crc-label">Circuit</div><div class="crc-value">${esc(track.title)}</div></div>
-        <div class="wc-panel"><div class="crc-label">Date</div><div class="crc-value">${esc(track.date)} ${SEASON}</div></div>
+        <div class="wc-panel"><div class="crc-label">Live now</div><div class="crc-value">${esc(liveNow ? liveNow.label : 'No session live')}</div></div>
+        <div class="wc-panel"><div class="crc-label">Next up</div><div class="crc-value">${esc(nextUp ? nextUp.label : 'Weekend complete')}</div></div>
       </div>
-      <div class="crc-actions"><a class="crc-primary" href="#/${track.slug}">Open ${esc(track.gp)} weekend →</a></div>
+      <div class="crc-actions"><a class="crc-primary" href="#/${track.slug}">Open weekend center →</a></div>
     </section>
   `;
 }
 
-function renderScheduleMode(track) {
-  const groups = scheduleDataFor(track);
+function scheduleRowMarkup(item) {
   return `
-    <div class="wc-body-grid">
-      <div class="wc-main">
-        ${groups.map(group => `
-          <section class="wc-panel">
-            <div class="wc-day-head"><strong>${esc(group.day)}</strong><span>${esc(group.date)}</span></div>
-            <div class="wc-day-list">${group.items.map(scheduleRowMarkup).join('')}</div>
-          </section>
-        `).join('')}
+    <div class="wc-session-row">
+      <div class="wc-session-left">
+        <span class="wc-series wc-series-f1">${esc(item.series)}</span>
+        <span class="wc-session-name">${esc(item.label)}</span>
+      </div>
+      <div class="wc-session-right">
+        <span class="wc-session-time">${esc(item.range)}</span>
+        <span class="wc-status wc-status-${item.status}">${esc(item.status)}</span>
       </div>
     </div>
   `;
 }
 
 function renderWeekendCenter(track) {
+  const groups = scheduleDataFor(track);
+  if (!groups.length) return '';
   return `
-    <section class="card weekend-center" id="weekend-center" data-slug="${track.slug}">
+    <section class="card weekend-center" id="weekend-center">
       <div class="wc-head">
         <div>
           <div class="tag">Weekend Center</div>
@@ -474,7 +268,16 @@ function renderWeekendCenter(track) {
         </div>
         <div class="wc-toggle"><button class="wc-tab is-active">Schedule</button></div>
       </div>
-      <div class="wc-body">${renderScheduleMode(track)}</div>
+      <div class="wc-body-grid">
+        <div class="wc-main">
+          ${groups.map(group => `
+            <section class="wc-panel">
+              <div class="wc-day-head"><strong>${esc(group.day)}</strong><span>${esc(group.date)}</span></div>
+              <div class="wc-day-list">${group.items.map(scheduleRowMarkup).join('')}</div>
+            </section>
+          `).join('')}
+        </div>
+      </div>
     </section>
   `;
 }
