@@ -286,14 +286,14 @@
  </div>
  <div class="updated-bar">
  <span class="updated-label">Data updated</span>
- <span class="updated-value" id="updatedTime">loading\u2026</span>
+ <span class="updated-value" id="updatedTime">loading&#8230;</span>
  </div>
 </header>
 
 <div class="schedule-view active" id="scheduleView">
  <div class="time-nav" id="timeNav"></div>
  <div class="schedule-content" id="scheduleContent">
- <div class="loading-msg">Loading match data\u2026</div>
+ <div class="loading-msg">Loading match data&#8230;</div>
  </div>
 </div>
 
@@ -307,7 +307,7 @@
 <noscript><div class="loading-msg">This app needs JavaScript enabled.</div></noscript>
 
 <script>
- const APP_VERSION = 'v2.0';
+ const APP_VERSION = 'v2.0.1';
  const DATA_URL = './data.json';
  const CACHE_KEY = 'world-cup-bracket-data';
  const REPO_OWNER = 'mawizorek';
@@ -396,7 +396,7 @@
  }
  const byId = (id) => allMatches.find(x => x.id === id);
 
- // CORE: resolve one slot to a display label. Depth-1 only \u2014 never recurse.
+ // CORE: resolve one slot to a display label. Depth-1 only, never recurse.
  function slotLabel(match, side) {
  const name = match[side];
  if (name && name !== 'TBD') return { text: name, code: cc(name), potential: false };
@@ -409,7 +409,7 @@
  return { text: `${cc(fm.home)}/${cc(fm.away)}`, code: '', potential: true };
  }
 
- // The two feeder matchups going into a match (for the drawer \"Path in\").
+ // The two feeder matchups going into a match (for the drawer "Path in").
  function pathIn(m) {
  const feeders = (fedBy[m.id] || []).map(byId).filter(Boolean);
  if (!feeders.length) return null;
@@ -456,8 +456,7 @@
  if (tickerStarted) return; tickerStarted = true;
  setInterval(() => {
  document.querySelectorAll('[data-countdown]').forEach(el => {
- const target = new Date(+el.dataset.countdown);
- el.textContent = fmtCountdown(target);
+ el.textContent = fmtCountdown(new Date(+el.dataset.countdown));
  });
  }, 30000);
  }
@@ -621,7 +620,7 @@
  const sl = slotLabel(m, side);
  const score = m[side === 'home' ? 'hs' : 'as'];
  const tappable = sl.text && sl.text !== 'TBD' && !sl.potential;
- const nameHtml = sl.potential ? `<span class="bm-name potential">${sl.text} w</span>` : `<span class="bm-name">${sl.text}</span>`;
+ const nameHtml = sl.potential ? `<span class="bm-name potential">${sl.text}</span>` : `<span class="bm-name">${sl.text}</span>`;
  return `<div class="bm-team ${isW ? 'w' : ''} ${isL ? 'l' : ''}" ${tappable ? `data-team="${sl.text}"` : ''}>`
  + `<span class="bm-code">${sl.code || '\u2014'}</span>`
  + nameHtml
@@ -653,7 +652,6 @@
  }
 
  function buildPathSet(team) {
- // start at the team's earliest match, walk feedsTo forward while still alive
  const startMatches = allMatches.filter(m => (m.home === team || m.away === team));
  const path = new Set();
  startMatches.forEach(sm => {
@@ -683,7 +681,6 @@
  document.querySelectorAll('.bm-team').forEach(el => el.classList.remove('picked'));
  }
 
- // tap empty bracket space to reset
  document.getElementById('bracketView').addEventListener('click', (e) => {
  if (pickedTeam && !e.target.closest('.bm-team[data-team]')) clearPathHighlight();
  });
