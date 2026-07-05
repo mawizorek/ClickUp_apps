@@ -27,9 +27,10 @@ The naive question + the expert answer, on purpose. They compound.
 ### Build gate — fires FIRST when new structure is floated (brainstorm-open, ahead of the Workshop and drafting)
 - Fold-in Frank → `agents/foldin-frank.md` (anti-sprawl gate: "does this already exist?" before design energy is spent. Verdict: FOLD-IN / NET-NEW / MERGE; pauses a net-new build until Michael rules. Overlaps intentionally with Eco Enzo — Frank checks whether a thing should be built at all, Enzo checks the side-effects of one already built.)
 
-### The Workshop — repo edits, specs, structural work (6 lenses, seated inline w/ Core)
+### The Workshop — repo edits, specs, structural work (seated inline w/ Core)
 Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now lives in Future Faye.
-- Risk Rhys → `agents/risk-rhys.md` (Risk & Failure)
+- Risk Rhys → `agents/risk-rhys.md` (Risk & Failure — theorizes failure modes on the spec, pre-commit)
+- Breaker Beckett → `agents/breaker-beckett.md` (Adversarial Tester — empirically attacks the actual artifact; standing on ANY concrete testable thing, including post-build on the live artifact. The hands-on counterpart to Rhys's on-paper pre-mortem.)
 - Clever Cleo → `agents/clever-cleo.md` (Elegance & Alternative)
 - Polish Polly → `agents/polish-polly.md` (Quality & Standards)
 - Feasible Finn → `agents/feasible-finn.md` (Implementation & Feasibility)
@@ -60,11 +61,13 @@ Full charter: `agents/maestro-mira.md`. In brief:
 ## Notes
 
 - **Documentation vs Handoff are distinct jobs.** Scribe Sana updates the permanent record (inward/backward: "what should the docs now say?"). Hana packages the next-session baton (outward/forward: "what does the successor need in hand?"). Durable work → the record; live next-session work → the baton.
+- **Rhys vs Beckett are distinct jobs.** Rhys reasons about failure modes on the spec/design, pre-commit, calm theorist. Beckett gets his hands on the actual artifact and tries to break it — including post-build on the live thing. Theory vs. empirical attack; both seated on Workshop turns.
 - **Existing agents not on the Council** (Scout Sage, Recon Renata, Closing Clio) remain their own tools; Mira can call them but they aren't standing council seats. Closing Clio verifies at session close that Fold-in Frank fired early (backstop, not a seat).
 
 ---
 
 ## Changelog
 
+- 2026-07-05 — seated **Breaker Beckett** in The Workshop (adversarial tester; standing on any concrete testable artifact, incl. post-build). Bounded against Risk Rhys (theory vs. empirical attack). NET-NEW per Fold-in Frank. registry.json + profiles updated in lockstep.
 - 2026-07-04 (manifest catch-up) — added Fold-in Frank (build gate, fires at brainstorm-open) to the seating map; replaced the retired Workshop Wes line with The Workshop (6 lenses); refreshed the Close phase to the canonical Scribe Sana. registry.json + this page now agree with the canonical profiles.
 - 2026-07-04 — created. Cast: Maestro Mira (lead) + Core 5 + Depth Pair + Future Faye, orchestrating existing Wes / Hana / Auditor. Designed in-session, Wes-approved (GO after 3 integration fixes: Mira absorbs Roster Scan Planner, Core fires on substantive turns only, anchor-line-before-convene).
