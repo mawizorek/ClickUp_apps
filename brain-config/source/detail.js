@@ -1,38 +1,45 @@
-/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch button).
-   Self-wiring: owns #agent/<slug> routing + the detail/edit view.
-   Deliberately kept OUT of app.js so the Run-me launcher engine stays untouched.
-   Loaded by the shell after data.js + app.js. IIFE-scoped: no globals leak,
-   no collision with app.js's top-level consts (RAW, BASE, etc.).
+/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch button + v3.2 row enrichment).
+   Self-wiring: owns #agent/<slug> routing, the detail/edit view, AND seamless agent-row
+   enrichment in the index. Deliberately kept OUT of app.js so the Run-me launcher engine
+   stays untouched. Loaded by the shell after data.js + app.js. IIFE-scoped: no globals leak.
 
    What it does:
-   1. Rewrites every agent card's name link to #agent/<slug> (MutationObserver,
-      so it survives app.js re-renders on sort changes).
-   2. Routes #agent/<slug> -> a detail view built from that agent's
-      metadata.json sidecar, fetched via the raw.githubusercontent path.
-   3. Exposes editable fields (colloquialName, nicknames, launchPrompt, badge,
-      status, teams, accent, and the open-ended toggles{} bag) and live-generates
-      a commit-ready metadata.json block with canonical key order + a copy button.
-   4. Bottom of the page: a "Launch this agent" button (ALL agents, not just the
-      Run-me shortcut set) — copies the current launch prompt and opens Brain. */
+   1. Rewrites every agent card's name link to #agent/<slug> (MutationObserver-driven,
+      survives app.js re-renders on sort changes).
+   2. Enriches agent rows: app.js reads `**Purpose:**` inline-bold which agent profiles
+      don't use (they carry a `## Purpose` heading + a `role` in the sidecar), so agent
+      rows render with an EMPTY purpose cell and look sparse next to hooks. This pass fills
+      each agent row's purpose from its metadata.json `role` (+ badge if present), making
+      agents seamless with the rest of the index. Zero app.js edits.
+   3. Routes #agent/<slug> -> a detail view built from the sidecar (raw.githubusercontent path).
+   4. Editable fields + live commit-ready metadata.json block with a copy button.
+   5. Bottom of the detail page: a "Launch this agent" button (ALL agents) that copies the
+      current launch prompt and opens Brain. */
 (function () {
   'use strict';
 
   var RAW = 'https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main';
   var AGENTS_DIR = 'brain-config/agents';
 
-  // Launch target: reuse app.js's BRAIN_MAX_URL (same global scope, classic scripts),
-  // fall back to the ClickUp home if app.js ever stops exporting it.
   var LAUNCH_TARGET = (typeof BRAIN_MAX_URL !== 'undefined' && BRAIN_MAX_URL) ? BRAIN_MAX_URL : 'https://app.clickup.com/home';
 
-  // Canonical key order -> minimal, clean diff when the block is pasted back.
   var KEY_ORDER = ['slug', 'type', 'name', 'colloquialName', 'nicknames', 'status',
     'seat', 'teams', 'role', 'accent', 'badge', 'created', 'shortcut', 'launchPrompt', 'toggles'];
 
-  var BADGE_OPTS = ['', 'halt', 'warn', 'silent'];        // '' => null
+  var BADGE_OPTS = ['', 'halt', 'warn', 'silent'];
   var BADGE_LABELS = ['(none)', 'halt', 'warn', 'silent'];
   var STATUS_OPTS = ['active', 'building', 'dormant', 'retired'];
 
-  // ---------- scoped styles (reuse the shell's oklch tokens) ----------
+  // sidecar cache shared by row-enrichment + detail view (one fetch per agent per load)
+  var sidecarCache = {};
+  function getSidecar(slug) {
+    if (sidecarCache[slug]) return sidecarCache[slug];
+    sidecarCache[slug] = fetch(RAW + '/' + AGENTS_DIR + '/' + slug + '.metadata.json', { cache: 'force-cache' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    return sidecarCache[slug];
+  }
+
+  // ---------- scoped styles ----------
   function injectStyles() {
     if (document.getElementById('agentdetail-styles')) return;
     var css = [
@@ -114,7 +121,6 @@
   function arr(v) { return Array.isArray(v) ? v : []; }
   function splitList(s) { return String(s).split(',').map(function (x) { return x.trim(); }).filter(Boolean); }
 
-  // Order the sidecar by KEY_ORDER (unknown keys appended) then pretty-print.
   function buildJSON(data) {
     var out = {};
     KEY_ORDER.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(data, k)) out[k] = data[k]; });
@@ -134,17 +140,13 @@
     }
   }
 
-  function notify(msg) {
-    if (typeof showToast === 'function') { showToast(msg); return; }
-    // detail.js may load without app.js's toast; fail quiet.
-  }
+  function notify(msg) { if (typeof showToast === 'function') showToast(msg); }
 
-  // ---------- agent card links -> #agent/<slug> ----------
+  // ---------- agent card links -> #agent/<slug> + row enrichment ----------
   function rewriteLinks() {
     var content = document.getElementById('content');
     if (!content) return;
-    var anchors = content.querySelectorAll('section[data-shelf="agents"] .tool-name a:not([data-agentlink])');
-    anchors.forEach(function (a) {
+    content.querySelectorAll('section[data-shelf="agents"] .tool-name a:not([data-agentlink])').forEach(function (a) {
       var m = (a.getAttribute('href') || '').match(/\/agents\/([^\/]+)\.md/);
       if (!m) { a.setAttribute('data-agentlink', 'skip'); return; }
       a.setAttribute('data-agentlink', m[1]);
@@ -154,11 +156,42 @@
     });
   }
 
+  // Fill empty agent-row purpose from the sidecar `role`, add badge parity with hooks.
+  function enrichRows() {
+    var content = document.getElementById('content');
+    if (!content) return;
+    content.querySelectorAll('section[data-shelf="agents"] .tool:not([data-enriched])').forEach(function (row) {
+      var a = row.querySelector('.tool-name a[data-agentlink]');
+      var slug = a ? a.getAttribute('data-agentlink') : null;
+      if (!slug || slug === 'skip') { row.setAttribute('data-enriched', 'skip'); return; }
+      row.setAttribute('data-enriched', '1');
+      var purposeCell = row.querySelector('.tool-purpose');
+      if (purposeCell && purposeCell.textContent.trim()) return; // app.js already filled it
+      getSidecar(slug).then(function (data) {
+        if (purposeCell && data.role) {
+          purposeCell.textContent = data.role;
+          row.dataset.search = (row.dataset.search || '') + ' ' + String(data.role).toLowerCase();
+        }
+        if (data.badge) {
+          var nameCell = row.querySelector('.tool-name');
+          if (nameCell && !nameCell.querySelector('.badge')) {
+            var b = document.createElement('span');
+            b.className = 'badge badge-' + data.badge;
+            b.textContent = data.badge;
+            nameCell.appendChild(b);
+          }
+        }
+      }).catch(function () { /* leave the row as-is on failure */ });
+    });
+  }
+
+  function refreshIndex() { rewriteLinks(); enrichRows(); }
+
   function observeContent() {
     var content = document.getElementById('content');
     if (!content) { setTimeout(observeContent, 120); return; }
-    rewriteLinks();
-    new MutationObserver(function () { rewriteLinks(); }).observe(content, { childList: true, subtree: true });
+    refreshIndex();
+    new MutationObserver(function () { refreshIndex(); }).observe(content, { childList: true, subtree: true });
   }
 
   // ---------- field builders ----------
@@ -186,7 +219,7 @@
       '<button type="button" class="rm">remove</button></div>';
   }
 
-  // ---------- render ----------
+  // ---------- render detail ----------
   function renderDetail(slug, data) {
     var p = ensurePanel();
     var toggles = (data.toggles && typeof data.toggles === 'object') ? data.toggles : {};
@@ -285,7 +318,6 @@
       notify(ok
         ? 'Prompt copied → opening Brain. Paste, and you\u2019re talking to ' + who + '.'
         : 'Opening Brain — copy the prompt above manually before you switch.');
-      // The anchor's default action opens LAUNCH_TARGET in a new tab.
     });
 
     regen();
@@ -299,9 +331,7 @@
     document.body.classList.add('detail-open');
     window.scrollTo(0, 0);
     try {
-      var res = await fetch(RAW + '/' + AGENTS_DIR + '/' + slug + '.metadata.json', { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      var data = await res.json();
+      var data = await getSidecar(slug);
       renderDetail(slug, data);
     } catch (e) {
       p.innerHTML = '<a class="ad-back" href="#">\u2190 All tools</a>' +
