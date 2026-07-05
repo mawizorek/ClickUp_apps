@@ -108,6 +108,33 @@ body {
 @media (hover: hover) { .themebtn:hover { border-color: var(--accent); } }
 .themebtn:active { transform: scale(0.94); }
 .themebtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.settings-wrap { position: relative; display: inline-flex; }
+.settingsbtn {
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2);
+  width: 40px; height: 40px; border-radius: 10px; cursor: pointer;
+  display: grid; place-items: center; transition: border-color .2s var(--ease), color .2s var(--ease), transform .1s var(--ease);
+}
+@media (hover: hover) { .settingsbtn:hover { border-color: var(--accent); color: var(--text); } }
+.settingsbtn:active { transform: scale(0.94); }
+.settingsbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.settingsbtn[aria-expanded="true"] { border-color: var(--accent); color: var(--text); }
+.settings-pop {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 40;
+  width: max-content; max-width: min(300px, calc(100vw - 28px));
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 13px;
+  box-shadow: var(--shadow); padding: 14px; display: flex; flex-direction: column; gap: 12px;
+}
+.settings-pop[hidden] { display: none; }
+.set-title {
+  font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.7rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3);
+}
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.set-lb { font-size: 0.88rem; font-weight: 600; color: var(--text-2); }
+.set-note {
+  font-size: 0.78rem; line-height: 1.55; color: var(--text-3); margin: 0;
+  border-top: 1px solid var(--border-soft); padding-top: 11px;
+}
 .hero {
   position: relative; overflow: hidden;
   background: linear-gradient(135deg, var(--hero-grad-a), var(--hero-grad-b));
