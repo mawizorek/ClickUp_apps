@@ -2,7 +2,7 @@
 // Cards are compact; tapping one opens the SAME shared detail sheet the
 // bracket uses (no separate inline drawer). One popup, two entry points.
 import { S, POTENTIAL_PREFIX, today } from './store.js';
-import { cc, isComplete, winnerName, rankOf, slotLabel, kickoffDate, fmtCountdown } from './util.js';
+import { cc, isComplete, winnerName, rankOf, slotLabel, kickoffDate, fmtCountdown, ROUND_FULL } from './util.js';
 import { openSheet } from './sheet.js';
 
 // The soonest day (>= today, ET) that still has an unplayed match. This is the
@@ -66,7 +66,8 @@ export function renderSchedule(periodId) {
 
   let html = '';
   Object.entries(groups).forEach(([day, dayMatches]) => {
-    const roundLabel = dayMatches[0].round;
+    // Spell out the round above the cards it references (Quarterfinal, Semifinal, etc).
+    const roundLabel = ROUND_FULL[dayMatches[0].round] || dayMatches[0].round;
     const rel = relLabel(dayMatches[0].day);
     html += `<div class="day-group"><div class="day-label">`
       + `<span class="date">${day}</span>`
