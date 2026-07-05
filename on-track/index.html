@@ -138,7 +138,7 @@ body {
   width: 40px; height: 40px; border-radius: 10px; cursor: pointer; font-size: 1.1rem;
   display: grid; place-items: center; transition: border-color .2s var(--ease), transform .1s var(--ease);
 }
-.themebtn:hover { border-color: var(--accent); }
+@media (hover: hover) { .themebtn:hover { border-color: var(--accent); } }
 .themebtn:active { transform: scale(0.94); }
 .themebtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .hero {
@@ -231,7 +231,7 @@ body {
   padding: 10px 32px 10px 34px; border-radius: 11px; cursor: pointer; max-width: 200px;
   transition: border-color .2s var(--ease);
 }
-.jump select:hover { border-color: var(--accent); }
+@media (hover: hover) { .jump select:hover { border-color: var(--accent); } }
 .jump select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .jump .cal { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 0.85rem; }
 .jump .chev { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-3); }
@@ -241,7 +241,29 @@ body {
   color: var(--text-3); display: flex; align-items: center; gap: 8px;
 }
 .filter-label .clr { color: var(--accent); cursor: pointer; text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 0.72rem; }
-.filter-label .clr:hover { text-decoration: underline; }
+@media (hover: hover) { .filter-label .clr:hover { text-decoration: underline; } }
+/* v1.7 collapsible filter sections */
+.fsection { border: 1px solid var(--border-soft); border-radius: 12px; background: color-mix(in oklch, var(--surface-1) 60%, transparent); overflow: hidden; }
+.fsection + .fsection { margin-top: 9px; }
+.fhead {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  background: none; border: none; cursor: pointer; padding: 12px 13px;
+  color: var(--text-2); text-align: left; font: inherit;
+}
+.fhead .lb { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.fhead .count {
+  font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.6rem;
+  background: var(--accent); color: var(--accent-ink); padding: 2px 7px; border-radius: 999px;
+  min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; line-height: 1.4;
+}
+.fhead .count.zero { background: var(--surface-3); color: var(--text-3); }
+.fhead .chev { margin-left: auto; color: var(--text-3); transition: transform .28s var(--ease); font-size: 0.8rem; }
+.fsection[data-open="true"] .chev { transform: rotate(180deg); }
+.fhead:focus-visible { outline: 3px solid var(--accent); outline-offset: -2px; }
+.fbody { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .32s var(--ease); }
+.fsection[data-open="true"] .fbody { grid-template-rows: 1fr; }
+.fbody > .fbody-inner { overflow: hidden; min-height: 0; }
+.fbody .pad { padding: 0 13px 13px; display: flex; flex-direction: column; gap: 8px; }
 .chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .chip {
   border: 1px solid var(--border); background: var(--surface-1); color: var(--text-2);
@@ -256,7 +278,7 @@ body {
   border-color: var(--cc, var(--accent)); color: var(--text);
   background: color-mix(in oklch, var(--cc, var(--accent)) 18%, var(--surface-1));
 }
-.chip:hover { border-color: var(--cc, var(--accent)); }
+@media (hover: hover) { .chip:hover { border-color: var(--cc, var(--accent)); } }
 .chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .chip.plat[aria-pressed="true"] { background: var(--surface-3); border-color: var(--accent); }
 .result-row {
@@ -270,7 +292,7 @@ body {
   padding: 7px 12px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
   transition: border-color .18s var(--ease), color .18s var(--ease);
 }
-.pasttoggle:hover { border-color: var(--accent); color: var(--text); }
+@media (hover: hover) { .pasttoggle:hover { border-color: var(--accent); color: var(--text); } }
 .pasttoggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .pasttoggle .cnt { color: var(--text-3); font-variant-numeric: tabular-nums; }
 .pasttoggle[aria-expanded="true"] { border-color: var(--accent); color: var(--text); }
@@ -358,7 +380,7 @@ footer {
   padding: 7px 12px; border-radius: 8px; cursor: pointer; text-decoration: none;
   transition: border-color .18s var(--ease); display: inline-flex; align-items: center; gap: 6px;
 }
-.foot-src button:hover, .foot-src a:hover { border-color: var(--accent); }
+@media (hover: hover) { .foot-src button:hover, .foot-src a:hover { border-color: var(--accent); } }
 .foot-src a[data-save] { display: none; border-color: var(--live); color: var(--live); }
 .foot-note { margin-top: 12px; line-height: 1.6; }
 .foot-note a { color: var(--text-2); }
@@ -406,14 +428,28 @@ noscript { display: block; padding: 20px; text-align: center; color: var(--text-
         <button id="tzLocal" aria-pressed="false">My time</button>
       </div>
     </div>
-    <div class="filter-group">
-      <div class="filter-label">Series <span class="clr" id="clrSeries" hidden>clear</span></div>
-      <div class="chips" id="seriesChips"></div>
-    </div>
-    <div class="filter-group">
-      <div class="filter-label">Where to watch <span class="clr" id="clrPlat" hidden>clear</span></div>
-      <div class="chips" id="platChips"></div>
-    </div>
+    <section class="fsection" id="secSeries" data-open="false">
+      <button class="fhead" id="headSeries" aria-expanded="false" aria-controls="bodySeries">
+        <span class="lb">Series</span>
+        <span class="count zero" id="countSeries">0</span>
+        <span class="chev">▾</span>
+      </button>
+      <div class="fbody" id="bodySeries" role="region" aria-labelledby="headSeries"><div class="fbody-inner"><div class="pad">
+        <div class="filter-label"><span class="clr" id="clrSeries" hidden>clear</span></div>
+        <div class="chips" id="seriesChips"></div>
+      </div></div></div>
+    </section>
+    <section class="fsection" id="secWatch" data-open="false">
+      <button class="fhead" id="headWatch" aria-expanded="false" aria-controls="bodyWatch">
+        <span class="lb">Where to watch</span>
+        <span class="count zero" id="countWatch">0</span>
+        <span class="chev">▾</span>
+      </button>
+      <div class="fbody" id="bodyWatch" role="region" aria-labelledby="headWatch"><div class="fbody-inner"><div class="pad">
+        <div class="filter-label"><span class="clr" id="clrPlat" hidden>clear</span></div>
+        <div class="chips" id="platChips"></div>
+      </div></div></div>
+    </section>
   </div>
   <div class="result-row">
     <div class="result-note" id="resultNote"></div>
@@ -428,7 +464,7 @@ noscript { display: block; padding: 20px; text-align: center; color: var(--text-
       </div>
       <div class="foot-src">
         <button id="copySrc">⧉ Copy source</button>
-        <button id="prepDl">⤓ Prepare download</button>
+        <button id="prepDl">⤳ Prepare download</button>
         <a id="saveLink" data-save download="on-track.html">↓ Save file</a>
         <button id="openTab">↗ Open in new tab</button>
       </div>
@@ -440,8 +476,8 @@ noscript { display: block; padding: 20px; text-align: center; color: var(--text-
   </footer>
 </div>
 <script>
-const APP_VERSION = 'v1.6';
-const APP_DATE = '2026-07-04';
+const APP_VERSION = 'v1.7';
+const APP_DATE = '2026-07-05';
 const APP_SLUG = 'on-track';
 const SERIES = {
   'F1':          { label: 'Formula 1',      color: 'var(--s-f1)' },
@@ -577,6 +613,7 @@ function buildChips() {
     c.addEventListener('click', () => toggleSet(state.series, c.dataset.series, 'ontrack_series', c)));
   $('#platChips').querySelectorAll('.chip').forEach(c =>
     c.addEventListener('click', () => toggleSet(state.plats, c.dataset.plat, 'ontrack_plats', c)));
+  updateFilterCounts();
 }
 function buildJump() {
   const todayK = dayKey(new Date());
@@ -588,10 +625,41 @@ function buildJump() {
     return '<option value="' + k + '">' + esc(shortFromKey(k)) + tag + ' (' + n + ')</option>';
   }).join('');
 }
+function updateFilterCounts() {
+  const cs = state.series.size, cp = state.plats.size;
+  const bs = $('#countSeries'), bp = $('#countWatch');
+  if (bs) { bs.textContent = cs; bs.classList.toggle('zero', cs === 0); }
+  if (bp) { bp.textContent = cp; bp.classList.toggle('zero', cp === 0); }
+}
+function setSection(sec, open, persist) {
+  sec.setAttribute('data-open', open);
+  const head = sec.querySelector('.fhead');
+  if (head) head.setAttribute('aria-expanded', open);
+  const body = sec.querySelector('.fbody');
+  if (body) body.setAttribute('aria-hidden', String(!open));
+  if (persist) {
+    const key = sec.id === 'secSeries' ? 'ontrack_sec_series' : 'ontrack_sec_watch';
+    localStorage.setItem(key, open);
+  }
+}
+function toggleSection(sec) {
+  setSection(sec, sec.getAttribute('data-open') !== 'true', true);
+}
+function sectionInit() {
+  const mobile = window.matchMedia('(max-width: 620px)').matches;
+  [['secSeries','ontrack_sec_series'],['secWatch','ontrack_sec_watch']].forEach(([id, key]) => {
+    const sec = document.getElementById(id);
+    if (!sec) return;
+    const saved = localStorage.getItem(key);
+    const open = saved === null ? !mobile : saved === 'true';
+    setSection(sec, open, false);
+  });
+}
 function toggleSet(set, val, key, el) {
   set.has(val) ? set.delete(val) : set.add(val);
   el.setAttribute('aria-pressed', set.has(val));
   localStorage.setItem(key, JSON.stringify(Array.from(set)));
+  updateFilterCounts();
   renderSchedule();
 }
 function passesFilter(e) {
@@ -620,7 +688,7 @@ function renderSchedule() {
     pt.setAttribute('aria-expanded', state.showPast);
     pt.innerHTML = state.showPast
       ? 'Hide earlier <span class="cnt">(' + pastCount + ')</span>'
-      : '↺ Show earlier <span class="cnt">(' + pastCount + ')</span>';
+      : '► Show earlier <span class="cnt">(' + pastCount + ')</span>';
   } else { pt.hidden = true; }
   const upcomingCount = matched.filter(e => e._e > now).length;
   $('#resultNote').textContent = anyFilter
@@ -646,7 +714,7 @@ function renderSchedule() {
     host.innerHTML =
       '<div class="empty"><div class="big">🏁</div>' +
       (noneUpcoming
-        ? '<h3>Nothing left on the schedule</h3><p>Every loaded session has run. Peek at what already aired.</p><button id="resetF">↺ Show earlier sessions</button>'
+        ? '<h3>Nothing left on the schedule</h3><p>Every loaded session has run. Peek at what already aired.</p><button id="resetF">► Show earlier sessions</button>'
         : '<h3>Nothing matches those filters</h3><p>Try loosening the series or platform selection.</p><button id="resetF">Clear all filters</button>') +
       '</div>';
     $('#resetF').addEventListener('click', () => {
@@ -730,6 +798,8 @@ function wire() {
   $('#tzLocal').addEventListener('click', () => setTZ('local'));
   $('#tzET').setAttribute('aria-pressed', state.tz === 'ET');
   $('#tzLocal').setAttribute('aria-pressed', state.tz === 'local');
+  $('#headSeries').addEventListener('click', () => toggleSection($('#secSeries')));
+  $('#headWatch').addEventListener('click', () => toggleSection($('#secWatch')));
   $('#jumpDate').addEventListener('change', ev => { const k = ev.target.value; jumpTo(k); ev.target.value = ''; });
   $('#pastToggle').addEventListener('click', () => { state.showPast = !state.showPast; renderSchedule(); });
   let deb;
@@ -777,6 +847,7 @@ function boot() {
   applyTheme();
   buildChips();
   buildJump();
+  sectionInit();
   render();
   wire();
   $('#verLine').textContent = 'On Track ' + APP_VERSION;
