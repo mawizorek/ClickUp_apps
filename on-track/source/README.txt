@@ -4,18 +4,18 @@ Original source file included: index.html 2.txt (unaltered, native format; rende
 Chunk file extension: .txt
 Encoding: base64 (payload encoded; markers plain text; decode before verifying)
 Mode: manual paste
-Chunks: 3
-Set UUID: f4e95b7f-1ff3-4e96-91c7-da016fbaf357
+Chunks: 7
+Set UUID: 748e4539-5ad5-43d0-8e20-f900868b07df
 Markers: yes
-Chunk size (file target): 21.5 KB
+Chunk size (file target): 9.8 KB
 Split mode: smart
 Per-fetch read cap: ~30 KB
 Chunks over read cap: 0
 Total Character Count: 41,491
-Completeness flag: clear (3 of max 8)
+Completeness flag: clear (7 of max 8)
 Numbering: flat sequential (grouped/sectioned is a future option)
 App version: v18 (2026-07-02)
-Exported: 7/5/2026, 09:39:58
+Exported: 7/5/2026, 11:44:54
 
 CONTENTS: this set contains the original source file (above), a .txt index, and every chunk. The original is the complete unaltered object; the chunks are for the gated AI walk.
 

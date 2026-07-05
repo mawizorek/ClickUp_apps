@@ -3,17 +3,17 @@
 You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
 
 ## SET INTEGRITY HEADER
-- Set UUID: f4e95b7f-1ff3-4e96-91c7-da016fbaf357
+- Set UUID: 748e4539-5ad5-43d0-8e20-f900868b07df
 - Source file: index.html 2.txt
 - Original source included in set: index.html 2.txt (unaltered, native format)
 - Chunk file extension: .txt
 - Encoding: base64 (each chunk payload is base64-encoded; markers stay plain text outside the blob)
 - Mode: MANUAL (the human pastes/sends each chunk to you in turn)
-- Total chunks: 3
+- Total chunks: 7
 - Total bytes (source): 41,547
 - Total Character Count: 41,491
 - Est. tokens (chars / 4): 10,373 (token-budget threshold: 28,000)
-- Generated: 7/5/2026, 09:39:58
+- Generated: 7/5/2026, 11:44:54
 - App: File Chunker v18 (2026-07-02)
 - Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
 - Per-fetch read cap: ~30 KB. Chunks over cap: 0.
@@ -29,10 +29,14 @@ You (the agent) have been handed THIS index file only. It is the entry point and
 7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
 
 ## ORDERED MANIFEST (feed in this exact order, one per turn)
-1/3 · index.html 2_part1_of_3.txt · 21.4 KB · index.html 2_part1_of_3.txt · uuid:b944bcec-71c1-4d08-b998-6bf0fb7d046b
-2/3 · index.html 2_part2_of_3.txt · 21.5 KB · index.html 2_part2_of_3.txt · uuid:ece391a5-5336-40f7-9d9d-6debe8c1060b
-3/3 · index.html 2_part3_of_3.txt · 14.4 KB · index.html 2_part3_of_3.txt · uuid:885fda4f-0c0c-4bf1-b2b6-979971c1a569
+1/7 · index.html 2_part1_of_7.txt · 9.5 KB · index.html 2_part1_of_7.txt · uuid:09c6e408-6354-4b8e-8bc3-5824fac1aa31
+2/7 · index.html 2_part2_of_7.txt · 9.5 KB · index.html 2_part2_of_7.txt · uuid:ae769a16-300b-4c17-bbb5-f7d39af772aa
+3/7 · index.html 2_part3_of_7.txt · 9.5 KB · index.html 2_part3_of_7.txt · uuid:613978d1-7291-4ce5-9268-18bef0a16cd0
+4/7 · index.html 2_part4_of_7.txt · 9.6 KB · index.html 2_part4_of_7.txt · uuid:135dfb4d-d61a-4820-91cd-448929e6b25c
+5/7 · index.html 2_part5_of_7.txt · 9.6 KB · index.html 2_part5_of_7.txt · uuid:db73f6f9-16f3-4e9e-b1e2-efe1fc47d8af
+6/7 · index.html 2_part6_of_7.txt · 9.6 KB · index.html 2_part6_of_7.txt · uuid:90301542-7209-4987-b5ac-7cce86ced137
+7/7 · index.html 2_part7_of_7.txt · 3.1 KB · index.html 2_part7_of_7.txt · uuid:ac87179c-b662-4890-9136-0f7beed97fb2
 
 ## FOOTER
-- Set UUID: f4e95b7f-1ff3-4e96-91c7-da016fbaf357 (must match header)
+- Set UUID: 748e4539-5ad5-43d0-8e20-f900868b07df (must match header)
 - END OF INDEX
