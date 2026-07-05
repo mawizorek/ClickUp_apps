@@ -7,11 +7,11 @@
 This is a rule, not a suggestion. Before adding ANY instruction to an executor agent (Routine Ricky or any future executor), you MUST route the detail to its correct home instead of the agent:
 
 - If it is **procedure** (what/how the work is done) → it goes in the routine's runbook `routines/<name>.md`. NOT the agent.
-- If it is a **shared rule across refreshes** (verify-first, merge, never shrink coverage) → it goes in the Data-Refresh Discipline below. NOT the agent.
+- If it is a **shared rule across refreshes** (verify-first, merge, never shrink coverage, platform honesty) → it goes in the Data-Refresh Discipline below. NOT the agent.
 - If it is **timing** → it goes in `schedule.md`. NOT the agent.
 - Only **executor mechanics** (wake logic, idempotency, catch-up, commit+stamp, reporting shape, fail-loud, the data-only rail) may live in the agent profile.
 
-**The test:** if any other agent could be dropped in as the executor and would need this same instruction, it is NOT an agent-level detail — it belongs in one of the files above so everyone inherits it. Making the executor “smarter” is almost always a sign the detail is in the wrong place. Keep executors dumb on purpose; their reliability is the product.
+**The test:** if any other agent could be dropped in as the executor and would need this same instruction, it is NOT an agent-level detail — it belongs in one of the files above so everyone inherits it. Making the executor “smarter” is almost always a sign the detail is in the wrong place. Keep executors dumb on purpose; their reliability is the product. (An executor writing procedure into its own profile is exactly this failure — relocate it here.)
 
 ## The contract
 
@@ -26,10 +26,19 @@ This is a rule, not a suggestion. Before adding ANY instruction to an executor a
 This is process, not executor behavior — it lives here so ANY agent running ANY refresh routine does the right thing. A “refresh” is a **verify-and-merge**, never a blank-slate rebuild:
 
 1. **Read the current data file first.** It is the baseline you extend and correct, not something you overwrite from scratch.
-2. **Verify existing entries, don't just trust them.** Double/triple-check that each existing event's time, channel, and status are still accurate — times shift, sessions get added to a weekend, events get canceled or rain-delayed. The primary job is keeping what's there ACCURATE, second is scraping in new entries that belong.
+2. **Verify existing entries, don't just trust them.** Double/triple-check that each existing entry's time, platform, and status are still accurate — times shift, sessions get added, events get canceled or delayed. The primary job is keeping what's there ACCURATE; second is scraping in new entries that belong.
 3. **Merge, don't replace.** Add newly-found entries, correct changed ones, drop only what has truly aged out of the window.
-4. **Never shrink coverage silently.** A category/series represented last run must not vanish this run. If you can't find its data, KEEP the prior entries and flag the gap in the report — deleting coverage is a STOP-and-flag event, not a quiet outcome.
-5. **Notable changes are worth surfacing.** If an event materially shifted (rain delay, moved session, cancellation), note it in the run report. Rendering a “was X → now Y” callout in the UI requires an engine field + render support → that is a BUILD task, out of routine scope; flag it, don't attempt it in a data refresh. (Expected to be rare.)
+4. **Never shrink coverage silently.** A category/series represented last run must not vanish this run. If you can't find its data, KEEP the prior entries and flag the gap — deleting coverage is a STOP-and-flag event, not a quiet outcome.
+5. **Confirmed event > complete metadata. Do NOT omit a confirmed event just because platform or exact time is missing:**
+    - **Event date confirmed** (official/reliable source) → eligible for inclusion, even if platform or exact time is still open.
+    - **Exact time confirmed** → use normal `start`/`end`.
+    - **Time still TBD** (event too far out) → include it honestly with a TBD-style handling pattern in the existing schema. NEVER invent or guess an exact time.
+6. **Platform honesty — `Stream` vs `Unknown` are distinct and NOT interchangeable:**
+    - **`Stream`** = a confirmed streaming-only / direct-to-consumer source exists, but no traditional TV channel should be named.
+    - **`Unknown`** = the event is confirmed but no reliable viewing platform has been verified yet.
+    - Never collapse one into the other, and never invent a channel to fill an `Unknown`.
+7. **Schema stability.** Prefer working within the current schema; do NOT change it unless absolutely necessary. If a confirmed-date / TBD-time (or platform-`Unknown`) entry genuinely can't be represented cleanly, that's the SMALLEST-possible schema/engine change — STOP, flag it as a build task (engine work, out of routine scope), and describe it. Never expand the schema inside a data refresh.
+8. **Notable changes are worth surfacing.** If an entry materially shifted (delay, moved session, cancellation), note it in the run report. Rendering a “was X → now Y” callout in the UI needs an engine field + render support → that's a BUILD task, out of routine scope; flag it, don't attempt it in a data refresh. (Rare.)
 
 Runbooks may add domain specifics on top of this, but this discipline is the floor for all of them.
 
@@ -50,6 +59,7 @@ report-to:  <where the run report goes>
 - Target is not a data file.
 - A required value can't be verified.
 - Coverage would shrink vs the current file.
+- The schema would need to change.
 - <routine-specific tripwires>
 
 ## Report format
@@ -77,4 +87,4 @@ Zero agent changes. If adding a routine requires editing the executor, the frame
 
 ## Executor
 
-**Routine Ricky** — `brain-config/agents/routine-ricky.md`. Deliberately minimal: scheduled hands, not a brain. He holds executor mechanics only (when to wake, idempotency, commit+stamp, report, fail-loud). All refresh *procedure* lives in this folder, not in him. Before editing him, run the **Editing an executor agent** check above.
+**Routine Ricky** — the live ClickUp Super Agent is the source of truth for his behavior; the repo profile `brain-config/agents/routine-ricky.md` is a non-canonical reference. Deliberately minimal: scheduled hands, not a brain. He holds executor mechanics only (when to wake, idempotency, commit+stamp, report, fail-loud). All refresh *procedure* lives in this folder, not in him. Before editing him, run the **Editing an executor agent** check above.
