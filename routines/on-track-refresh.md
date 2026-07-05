@@ -1,6 +1,5 @@
 # On Track Refresh
 
-schedule:   0 9 * * 4   # Thursday 09:00 America/New_York, weekly
 goal:       on-track/data.json holds the current week + next ~4 weeks of real US motorsport TV listings, verified and honest.
 target:     on-track/data.json
 report-to:  #A.I. Prompts (thread: On Track refreshes)
