@@ -1,4 +1,4 @@
-// On Track — app shell: filter toggles, event binding, self-contained export, bootstrap.
+// On Track — app shell: filter toggles, settings popover, event binding, bootstrap.
 // Loaded AFTER render.js (shared global scope: uses state/$/render fns defined there).
 function toggleSet(set, val, key, el) {
   set.has(val) ? set.delete(val) : set.add(val);
@@ -54,35 +54,55 @@ function syncFilterAction() {
       : '<span class="fa-lb">Select all ' + label + '</span>';
   });
 }
-// Rebuild a fully self-contained copy by re-inlining every external source file at runtime,
-// so exported/downloaded copies still work standalone even though the served app is multi-file.
-// The current DATA is inlined too, so an offline copy renders the exact listings it was saved with.
-function buildSelfContained() {
-  const bust = '?v=' + Date.now();
-  return Promise.all([
-    fetch('./index.html' + bust).then(r => r.text()),
-    fetch('./source/styles.css' + bust).then(r => r.text()),
-    fetch('./source/render.js' + bust).then(r => r.text()),
-    fetch('./source/app.js' + bust).then(r => r.text())
-  ]).then(function (parts) {
-    const html = parts[0], css = parts[1], rjs = parts[2], ajs = parts[3];
-    const dataScript = '<script>window.__ONTRACK_DATA__=' + JSON.stringify(DATA) + ';<\/script>';
-    return html
-      .replace('<link rel="stylesheet" href="./source/styles.css">', '<style>\n' + css + '\n</style>')
-      .replace('<script src="./source/render.js" defer><\/script>', dataScript + '\n<script>\n' + rjs + '\n<\/script>')
-      .replace('<script src="./source/app.js" defer><\/script>', '<script>\n' + ajs + '\n<\/script>');
+// Settings popover: a gear in the masthead that houses the timezone toggle (relocated
+// out of the controls row) plus an honest note about how the app updates. The tz-toggle
+// node is MOVED (not rebuilt), so its ET/My-time listeners wired in wire() survive intact.
+function buildSettings() {
+  const tools = document.querySelector('.mast-tools');
+  if (!tools || document.getElementById('settingsWrap')) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'settings-wrap';
+  wrap.id = 'settingsWrap';
+  const btn = document.createElement('button');
+  btn.id = 'settingsBtn';
+  btn.className = 'settingsbtn';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Settings');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
+  const pop = document.createElement('div');
+  pop.className = 'settings-pop';
+  pop.id = 'settingsPop';
+  pop.hidden = true;
+  pop.innerHTML =
+    '<div class="set-title">Settings</div>' +
+    '<div class="set-row"><span class="set-lb">Time zone</span><span id="tzSlot"></span></div>' +
+    '<p class="set-note">Countdowns and “on now” update live every second. Listings are refreshed weekly and verified per race weekend, so broadcast times can change last-minute.</p>';
+  wrap.appendChild(btn);
+  wrap.appendChild(pop);
+  tools.appendChild(wrap);
+  const tz = document.querySelector('.tz-toggle');
+  const slot = pop.querySelector('#tzSlot');
+  if (tz && slot) slot.appendChild(tz);
+  const close = () => { pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+  btn.addEventListener('click', ev => {
+    ev.stopPropagation();
+    const open = pop.hidden;
+    pop.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
   });
+  pop.addEventListener('click', ev => ev.stopPropagation());
+  document.addEventListener('click', ev => { if (!wrap.contains(ev.target)) close(); });
+  document.addEventListener('keydown', ev => { if (ev.key === 'Escape') close(); });
 }
-function exportSelfContained(onOk, onFail) {
-  buildSelfContained().then(onOk).catch(onFail);
-}
-function fallbackCopy(text, done) {
-  const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
-  ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
-}
-function flash(sel, txt) {
-  const el = $(sel); const o = el.textContent; el.textContent = txt;
-  setTimeout(() => { el.textContent = o; }, 1500);
+// Footer cleanup: remove the source-download buttons (git hosting is the reliable source
+// of truth now) and the prose note (its content moved into Settings). The compact build
+// stamp (#verLine / #dataStamp) stays as the cache-check readout.
+function cleanupFooter() {
+  const src = document.querySelector('.foot-src');
+  if (src) src.remove();
+  const note = document.querySelector('.foot-note');
+  if (note) note.remove();
 }
 function wire() {
   $('#themeBtn').addEventListener('click', () => {
@@ -114,28 +134,6 @@ function wire() {
   $('#clrPlat').addEventListener('click', () => {
     state.plats.clear(); localStorage.removeItem('ontrack_plats'); buildChips(); renderSchedule();
   });
-  $('#copySrc').addEventListener('click', () => {
-    exportSelfContained(full => {
-      const done = () => flash('#copySrc', '✓ Copied');
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(full).then(done).catch(() => fallbackCopy(full, done));
-      } else { fallbackCopy(full, done); }
-    }, () => flash('#copySrc', 'Failed — retry'));
-  });
-  $('#prepDl').addEventListener('click', () => {
-    exportSelfContained(full => {
-      const url = URL.createObjectURL(new Blob([full], { type: 'text/html' }));
-      const a = $('#saveLink'); a.href = url; a.download = APP_SLUG + '-' + APP_VERSION + '.html';
-      a.style.display = 'inline-flex'; flash('#prepDl', 'Ready →');
-      setTimeout(() => URL.revokeObjectURL(url), 90000);
-    }, () => flash('#prepDl', 'Failed — retry'));
-  });
-  $('#openTab').addEventListener('click', () => {
-    exportSelfContained(full => {
-      const url = URL.createObjectURL(new Blob([full], { type: 'text/plain' }));
-      window.open(url, '_blank'); setTimeout(() => URL.revokeObjectURL(url), 90000);
-    }, () => flash('#openTab', 'Failed — retry'));
-  });
 }
 function render() { renderHero(); renderSchedule(); }
 function boot() {
@@ -147,9 +145,10 @@ function boot() {
   buildFilterAction();
   render();
   wire();
-  $('#verLine').textContent = 'On Track ' + APP_VERSION;
-  $('#dataStamp').textContent = ' · listings ' + (DATA.version || APP_DATE);
-  $('#feedBy').textContent = 'Engine ' + APP_VERSION + ' · ' + APP_DATE + '.';
+  buildSettings();
+  cleanupFooter();
+  const vl = $('#verLine'); if (vl) vl.textContent = 'On Track ' + APP_VERSION;
+  const ds = $('#dataStamp'); if (ds) ds.textContent = ' · listings ' + (DATA.version || APP_DATE);
   tick();
   setInterval(tick, 1000);
 }
@@ -171,7 +170,7 @@ function boot() {
           DATA = json;
           try { localStorage.setItem('ontrack_data', JSON.stringify(json)); } catch (e) {}
           hydrate(); buildChips(); buildJump(); buildFilterAction(); render();
-          $('#dataStamp').textContent = ' · listings ' + (DATA.version || APP_DATE);
+          const ds = $('#dataStamp'); if (ds) ds.textContent = ' · listings ' + (DATA.version || APP_DATE);
         }
       })
       .catch(() => {});
