@@ -1,0 +1,17 @@
+{
+ "slug": "breaker-beckett",
+ "type": "agent",
+ "name": "Breaker Beckett",
+ "colloquialName": "Beckett",
+ "nicknames": ["Breaker", "Break-It"],
+ "status": "active",
+ "seat": "workshop",
+ "teams": ["workshop"],
+ "role": "Adversarial Tester — breaks the built thing to surface bugs, flaws, and edge failures.",
+ "accent": "oklch(63% 0.20 10)",
+ "badge": null,
+ "created": "2026-07-04",
+ "shortcut": false,
+ "launchPrompt": "Beckett, break it.",
+ "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}
