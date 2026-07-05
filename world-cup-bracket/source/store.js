@@ -1,7 +1,7 @@
 // World Cup 2026 Bracket - shared constants + runtime state.
 // This is the single source of shared mutable state; all modules import S.
-export const APP_VERSION = 'v5.0';
-export const BUILD_PR = 'PR#29'; // updated to the merged PR before ship; shown in footer
+export const APP_VERSION = 'v5.1';
+export const BUILD_PR = 'PR#30'; // updated to the merged PR before ship; shown in footer
 export const DATA_URL = './data.json';
 export const CACHE_KEY = 'world-cup-bracket-data';
 export const REPO_OWNER = 'mawizorek';
@@ -28,5 +28,7 @@ export const S = {
   picks: [],        // ordered list of selected team names (index -> palette color)
 };
 
-// Today's date (YYYY-MM-DD), computed once at load. Runtime, not hardcoded.
-export const today = new Date().toISOString().slice(0, 10);
+// Today's date (YYYY-MM-DD) in EASTERN time, computed once at load.
+// Was toISOString() (UTC), which after ~8pm ET rolled the app's "today" to
+// tomorrow and mislabeled next-day games as Today. en-CA gives ISO format.
+export const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
