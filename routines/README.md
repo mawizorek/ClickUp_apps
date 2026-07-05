@@ -2,6 +2,17 @@
 
 **The core idea: separate the WHAT from the WHO from the WHEN.** A routine is a repeatable job whose *procedure* lives as a runbook file here. Any agent could execute it by reading the file and following it literally. **Routine Ricky** is simply the agent we put on the clock. The *schedule* lives in `schedule.md`, never in the runbook. Change a procedure = edit the runbook. Change a cadence = edit `schedule.md` (or just tell Ricky). Change the executor = swap the agent. Three concerns, three homes, none entangled.
 
+## Editing an executor agent — REQUIRED CHECK (do this before every executor edit)
+
+This is a rule, not a suggestion. Before adding ANY instruction to an executor agent (Routine Ricky or any future executor), you MUST route the detail to its correct home instead of the agent:
+
+- If it is **procedure** (what/how the work is done) → it goes in the routine's runbook `routines/<name>.md`. NOT the agent.
+- If it is a **shared rule across refreshes** (verify-first, merge, never shrink coverage) → it goes in the Data-Refresh Discipline below. NOT the agent.
+- If it is **timing** → it goes in `schedule.md`. NOT the agent.
+- Only **executor mechanics** (wake logic, idempotency, catch-up, commit+stamp, reporting shape, fail-loud, the data-only rail) may live in the agent profile.
+
+**The test:** if any other agent could be dropped in as the executor and would need this same instruction, it is NOT an agent-level detail — it belongs in one of the files above so everyone inherits it. Making the executor “smarter” is almost always a sign the detail is in the wrong place. Keep executors dumb on purpose; their reliability is the product.
+
 ## The contract
 
 - **Runbooks are the source of truth for the procedure** (the WHAT), and must be SELF-SUFFICIENT — any agent reads the runbook and knows exactly what to do, without inheriting behavior from a specific executor. Never put procedure in the agent; if it describes what/how the work is done, it lives here.
@@ -66,4 +77,4 @@ Zero agent changes. If adding a routine requires editing the executor, the frame
 
 ## Executor
 
-**Routine Ricky** — `brain-config/agents/routine-ricky.md`. Deliberately minimal: scheduled hands, not a brain. He holds executor mechanics only (when to wake, idempotency, commit+stamp, report, fail-loud). All refresh *procedure* lives in this folder, not in him.
+**Routine Ricky** — `brain-config/agents/routine-ricky.md`. Deliberately minimal: scheduled hands, not a brain. He holds executor mechanics only (when to wake, idempotency, commit+stamp, report, fail-loud). All refresh *procedure* lives in this folder, not in him. Before editing him, run the **Editing an executor agent** check above.
