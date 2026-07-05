@@ -1,6 +1,5 @@
 # F1 Refresh
 
-schedule:   0 10 * * 1   # Monday 10:00 America/New_York, weekly
 goal:       f1-racetracks/data.json reflects current F1 season standings/results/next-race state per the app's existing schema.
 target:     f1-racetracks/data.json
 report-to:  #A.I. Prompts (thread: F1 refreshes)
