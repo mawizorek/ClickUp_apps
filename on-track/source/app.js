@@ -54,9 +54,10 @@ function syncFilterAction() {
       : '<span class="fa-lb">Select all ' + label + '</span>';
   });
 }
-// Settings popover: a gear in the masthead that houses the timezone toggle (relocated
-// out of the controls row) plus an honest note about how the app updates. The tz-toggle
-// node is MOVED (not rebuilt), so its ET/My-time listeners wired in wire() survive intact.
+// Settings popover: a gear in the masthead housing app chrome — the theme (light/dark)
+// toggle and the timezone toggle, plus an honest note about how the app updates. Both
+// control nodes are MOVED (not rebuilt) into the drawer, so the listeners wired in wire()
+// survive intact. This gear + light-mode toggle is the standard chrome home going forward.
 function buildSettings() {
   const tools = document.querySelector('.mast-tools');
   if (!tools || document.getElementById('settingsWrap')) return;
@@ -76,14 +77,18 @@ function buildSettings() {
   pop.hidden = true;
   pop.innerHTML =
     '<div class="set-title">Settings</div>' +
+    '<div class="set-row"><span class="set-lb">Theme</span><span id="themeSlot"></span></div>' +
     '<div class="set-row"><span class="set-lb">Time zone</span><span id="tzSlot"></span></div>' +
     '<p class="set-note">Countdowns and “on now” update live every second. Listings are refreshed weekly and verified per race weekend, so broadcast times can change last-minute.</p>';
   wrap.appendChild(btn);
   wrap.appendChild(pop);
   tools.appendChild(wrap);
+  const theme = document.getElementById('themeBtn');
+  const themeSlot = pop.querySelector('#themeSlot');
+  if (theme && themeSlot) themeSlot.appendChild(theme);
   const tz = document.querySelector('.tz-toggle');
-  const slot = pop.querySelector('#tzSlot');
-  if (tz && slot) slot.appendChild(tz);
+  const tzSlot = pop.querySelector('#tzSlot');
+  if (tz && tzSlot) tzSlot.appendChild(tz);
   const close = () => { pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
   btn.addEventListener('click', ev => {
     ev.stopPropagation();
