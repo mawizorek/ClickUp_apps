@@ -34,11 +34,28 @@ Wrap each of these existing rules in a `@media (hover: hover) { ... }` block (th
 
 Leave `:active`, `:focus-visible`, and `[aria-pressed="true"]` rules untouched — they are correct. Bump `APP_VERSION` to `v1.7` and `APP_DATE`.
 
+### 📱 Collapsible filter sections (mobile density fix) — APPROVED (Michael picked Option 1, 2026-07-05)
+
+**Problem:** front page stacks hero + search + date/tz + ~18 series chips + 15 platform chips before any schedule content — roughly two screens of scroll on a phone before the first race. Michael wants the scroll wall gone WITHOUT losing button accessibility (every chip one tap away) or clarity of scope (what's active must stay visible). Options 2 (bottom sheet) and 3 (swipe rows) were rendered and rejected in favor of this.
+
+**Approved pattern:** wrap SERIES and WHERE TO WATCH each in a collapsible section. Collapsed by default on mobile; the header shows the group label + a live count badge of active filters in that group + a chevron. Tapping the header expands the chip cloud in place (no navigation, no modal). All existing chip markup/behavior lives unchanged inside the expanded body.
+
+**Design reference:** the approved interactive render is the Option 1 phone in the density-options artifact (built this session). Match its structure and motion. Key details from the render:
+
+- Section shell: `1px solid var(--border-soft)` rounded container, subtle tinted fill (`oklch(0.21 0.045 264 / .5)`), `margin-bottom` ~9px between the two sections.
+- Header (`<button>`, full-width, keyboard-focusable): uppercase group label in `--text-3`, then a count badge, then a chevron pushed right with `margin-left:auto`.
+- **Count badge:** `--accent` bg / `--accent-ink` text when count > 0; muted `--surface-3` / `--text-3` when 0. Shows the integer count of pressed chips in that group. Updates live on every chip toggle AND on `clear`.
+- **Chevron:** rotates 180deg on open, `transition: transform .28s var(--ease-out)`.
+- **Expand/collapse motion:** animate via `grid-template-rows: 0fr → 1fr` (the least-bad height animation per design laws — do NOT animate `height`), `.32s var(--ease-out)`; inner wrapper `overflow:hidden; min-height:0`. Respect `prefers-reduced-motion` (instant, no transition).
+- State attribute: `data-open="true|false"` on the section drives both the chevron rotation and the row expansion.
+
+**Responsive rule:** collapsed-by-default is a MOBILE behavior. On desktop (pointer / wider viewport) the sections may render expanded by default — the scroll wall isn't a problem there and the current always-open layout is fine. Gate the default-collapsed state behind a mobile media query (or `hover: none` / max-width ~620px to match the existing mobile breakpoint) so desktop keeps its current feel. Persist open/closed state per section in `localStorage` (e.g. `ontrack_sec_series`, `ontrack_sec_watch`) so a user's manual expand/collapse sticks across reloads.
+
+**Accessibility:** header is a real `<button>` with `aria-expanded` reflecting `data-open`; `aria-controls` pointing at the body id; body gets `aria-hidden` when collapsed. Keep the existing `clear` affordance working and have it drive the count badge to 0.
+
+**Guardrails / non-goals:** do NOT change chip visuals, chip tap behavior, the `clear` action, or filter logic. Do NOT hide chips behind a swipe or a modal (that was Options 3 and 2, both rejected). The collapsed header + count is the ONLY new scope. This is an engine change → version bump.
+
 ## Futures
-
-### 📱 Mobile front-page density (collapsible filter sections) — UNDER DISCUSSION
-
-Front page has grown dense: hero + search + date/tz + 20 series chips + 15 platform chips stack before any actual schedule content (~2 screens of scroll on a phone). Michael is happy with button accessibility + clarity of scope and does NOT want to move far from the current model. Leading candidate: make SERIES and WHERE TO WATCH collapsible sections (collapsed by default on mobile) with an active-filter count badge on the collapsed header, so every chip stays one tap away and scope stays legible while the scroll wall disappears. Alternatives considered: bottom-sheet filter panel, single-row horizontal-scroll chip rows. Pending Michael's pick before it promotes to Next build.
 
 ### 🧹 Brand-asset cleanup (soft, not urgent)
 
