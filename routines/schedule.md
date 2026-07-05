@@ -11,8 +11,8 @@ The `last-run` column is Ricky's memory. He reads it every wake to decide what's
 | Routine file           | Cadence             | Window / notes                                  | last-run (ET) |
 |------------------------|---------------------|-------------------------------------------------|---------------|
 | `on-track-refresh.md`  | Every **Wednesday** | weekly motorsports TV refresh                   | 2026-07-04 23:37 |
-| `f1-refresh.md`        | Every **Thu, Fri, Sat, Sun** | race-weekend days | 2026-07-05 03:07 |
-| `world-cup-refresh.md` | **~4x/day**         | ONLY through **2026-07-19**, then inactive      | 2026-07-05 03:08 |
+| `f1-refresh.md`        | Every **Thu, Fri, Sat, Sun** | race-weekend days                        | 2026-07-05 06:07 |
+| `world-cup-refresh.md` | **~4x/day**         | ONLY through **2026-07-19**, then inactive      | never         |
 
 ## Wake windows (agent timer, America/New_York)
 
