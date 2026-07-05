@@ -112,7 +112,7 @@ async function init() {
   setupTraceBridge();
   initSheet(byId);
   renderTimeNav();
-  renderSchedule('today');
+  renderSchedule('next');
   startCountdownTicker();
 }
 
