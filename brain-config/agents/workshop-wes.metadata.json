@@ -3,15 +3,18 @@
   "type": "agent",
   "name": "Workshop Wes",
   "colloquialName": "Wes",
+  "initials": "WW",
   "nicknames": [],
   "status": "retired",
   "seat": "workshop",
   "teams": [],
   "role": "RETIRED 2026-07-04. Decomposed into The Workshop (6 lenses) + Future Faye. Tombstone.",
+  "blurb": "Seven-lens brainstorm stress-test before any committed-source build. (Retired; historical reports only.)",
   "accent": "oklch(70% 0.13 45)",
   "badge": null,
   "created": null,
   "shortcut": false,
   "launchPrompt": "",
-  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+  "reportsIndex": "reports/index.json",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false, "makesReports": false }
 }

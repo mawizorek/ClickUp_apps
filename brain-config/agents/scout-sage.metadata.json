@@ -3,15 +3,18 @@
   "type": "agent",
   "name": "Scout Sage",
   "colloquialName": "Sage",
+  "initials": "SS",
   "nicknames": ["Scout"],
   "status": "active",
   "seat": "research",
   "teams": [],
   "role": "Research runner; multi-source sourced lookup with confidence + one recommendation.",
+  "blurb": "Multi-source research in its own context: structured findings, mandatory links, one recommendation.",
   "accent": "oklch(70% 0.12 20)",
   "badge": null,
   "created": null,
   "shortcut": true,
   "launchPrompt": "Sage, research [topic].",
-  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+  "reportsIndex": "reports/index.json",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false, "makesReports": true }
 }

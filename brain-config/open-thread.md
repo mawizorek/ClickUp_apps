@@ -7,48 +7,41 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 ## Three-Shelf Reconciliation
 **Added:** 2026-07-03
 
-AI Toolkit index has stale two-shelf scaffolding that doesn't match the three-shelf model (🔄 Hooks / 🎯 Triggers / 🧠 Subagents):
+AI Toolkit index (ClickUp doc) has stale two-shelf scaffolding that doesn't match the three-shelf model (Hooks / Triggers / Subagents):
 
-- Subpages still named "🔄 Every-Run Tools" + "🎯 Triggered Tools" (rename to match)
+- Subpages still named "Every-Run Tools" + "Triggered Tools" (rename to match)
 - "Activation state" section still uses two-shelf language (rewrite)
 
-Reconcile naming + content next session.
+Reconcile naming + content on the next Toolkit-doc pass.
 
 ---
 
 ## Agent-Name Single-Source-of-Truth Migration
-**Added:** 2026-07-04
+**Added:** 2026-07-04 · **Updated:** 2026-07-04 (v3.3)
 
-Agent name is now defined ONCE, in each profile's front-matter identity block (`slug` / `display_name` / `nicknames`), starting with `workshop-wes.md`. The `slug` is immutable = filename; renames change `display_name` only. See the Tool Authoring Guidebook for the rule.
+Goal: profile header + metadata sidecar = the one source of truth for an agent's name; every surface reads from it, nothing hand-copies it.
 
-Every surface below still HAND-COPIES agent names and should be re-pointed to read from the profile header. Until then they drift on rename (this is what left the red-rhett / repo-renata orphans):
+**RESOLVED in v3.3:**
+- ~~Three fighting identity files (`.metadata.json` sidecar vs `<slug>/agent.json` vs `.md` front-matter).~~ Ruling: **sidecar wins.** `agent.json` folded into each sidecar (kept `initials` + `blurb` + `reportsIndex`) and deleted.
+- ~~Report folders keyed by legacy slugs (`research-runner`, `red-team-reviewer`).~~ Renamed to current slugs (`scout-sage`, `workshop-wes`). Everything now keys off one slug.
 
-- **(a) ClickUp AI Toolkit doc** -- Subagent roster + Quick-Scan trigger table hard-code display names + nicknames, and the roster still points at the now-deleted `brain-config/agents/repo-renata.md` (should be `recon-renata.md` / "Recon Renata"). STALE POINTER -- fix on next Toolkit-doc pass.
-- **(b) brain-config/index.html** -- NOTE (2026-07-04): the old hard-coded `NICKNAMES` map + stale `repo-renata.md` pointer now live in `source/data.js` + `source/app.js` (viewer was split; the shell is ~2KB, no longer 37KB and no longer over-cap). Ideal fix unchanged: drop the hard-coded map and read `slug`/`display_name`/`nicknames` from each profile's front-matter (or the metadata sidecar) at load time.
-- **(c) Report manifests** -- reports live at `brain-config/agents/<slug>/reports/index.json`, keyed by the FOLDER slug (there is no top-level `agent-reports/manifest.json`). The report folder names are themselves hard-coded identity and have already drifted: folders `red-team-reviewer/` and `research-runner/` no longer match their current profile slugs (`workshop-wes`, `scout-sage`). Reconcile folder slugs to profile slugs, or add a slug alias map read from the header.
-
-Goal: profile header = the one source of truth for an agent's name; every surface reads from it, nothing copies it.
+**STILL OPEN:**
+- **(a) ClickUp AI Toolkit doc** — Subagent roster + Quick-Scan trigger table hard-code display names + nicknames, and the roster still points at the deleted `repo-auditor.md`/old paths. Fix on the next Toolkit-doc pass.
+- **(b) Viewer NICKNAMES map** — `source/data.js` still carries a hard-coded `NICKNAMES` map. Ideal fix: drop it and read `nicknames` from each sidecar at load time (the viewer already fetches them). Now easy since all 22 sidecars carry identity.
 
 ---
 
-## Thin Agent Profiles Need a Tightening Pass
-**Added:** 2026-07-04
+## Report Schema Lock + Reports Tab Build
+**Added:** 2026-07-04 (v3.3)
 
-**What:** All 22 agents now carry a lightweight shorthand `launchPrompt` in their metadata sidecar (e.g. "Rhys, what breaks?", "Renata, audit the repo."). The design intent is that the SHORT prompt is only the invocation, and the agent's `.md` profile carries the actual operating instructions the shorthand resolves against. Renata's profile does this well (full audit checklist + output format). Several profiles are too thin for their shorthand to resolve against anything substantial.
+Prior art confirmed (Workshop Wes's 2026-07-04 seven-lens review): reports are **per-agent JSON**, NOT stored HTML. Viewer renders JSON -> formatted view on the fly; HTML is an on-demand export, never a second stored copy (avoids source-of-truth drift + the 30KB write-cap clip).
 
-**Why it matters:** when you launch "Rhys, what breaks?", Rhys needs a profile that defines his lens, the questions he asks, and his output shape, otherwise the shorthand is a name with no body behind it. Thin profile = weak/inconsistent agent behavior on invocation.
+**Locked design (A/A/A + fold, per Michael 2026-07-04):**
+- `makesReports` flag lives in the sidecar `toggles` bag. TRUE for seat audit/close/research: Renata, Clio, Hana, Sage. Empty `reports/index.json` seeded for all four.
+- Clicking an agent lands on **Reports first**, Settings second tab. Report-maker with no reports -> "No reports yet" empty state. Non-report-maker (lens) -> land straight on Settings, no Reports tab shown.
+- Report folder: `brain-config/agents/<slug>/reports/` with `index.json` (list metadata) + per-report `<ts>.json`.
 
-**How to do it:** bring each thin profile up to the Renata/Cass depth. Required sections: Purpose, The lens / the question(s), When seated, Output shape, Composes with / suppressed by, Personality, Changelog. Keep the sidecar as the structured control surface; the `.md` is the human narrative. Do NOT touch the sidecar's `launchPrompt` (already set).
-
-**Which profiles (flagged thin, workshop lenses especially):**
-- `risk-rhys.md` (role one-liner only)
-- `clever-cleo.md`
-- `polish-polly.md`
-- `feasible-finn.md`
-- `scope-skye.md`
-- `eco-enzo.md`
-- Re-check the core lenses (`counter-cole`, `literal-lena`, `mimic-mika`, `pivot-piper`, `domain-dara`, `novice-nia`, `future-faye`) for output-shape sections; Cass is the reference standard.
-
-**Affects:** agent invocation quality, and the future detail-page "Reports" tab (a thin profile with no output-shape section has nothing to describe what its report should contain). Also feeds the `makesReports` decision (parked): report-makers = seats audit/close/research; core/workshop lenses = no reports.
-
-**Effort:** one profile at a time, ~10-15 min each. Not blocking; agents function today, this raises the floor.
+**TO BUILD:**
+1. **Lock the report JSON schema** as a committed doc (`brain-config/report-schema.md`, sibling to `metadata-schema.md`). Shared envelope: `id, type, ts, target, verdictWord, verdictPill, pillText, delta, summary, tally[]`. Type-specific body: `findings[]` + `apps[]` + `clean[]` (audit), `lenses[]` + `call` (review), research shape TBD (question/confidence/sources[]).
+2. **Build the Reports tab.** Likely a NEW `source/reports.js` module (detail.js is ~26KB, near the 30KB cap — do NOT cram the tab + per-type renderers into it; mirror the detail.js-out-of-app.js split). Per-`type` renderer, tab switcher, on-demand HTML export.
+3. **detail.js:** add `initials` / `blurb` / `reportsIndex` to `KEY_ORDER` so the copy-block ordering stays clean for the reconciled sidecars (currently they append after `toggles`, cosmetic only).

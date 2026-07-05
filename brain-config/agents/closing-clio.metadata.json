@@ -3,15 +3,18 @@
   "type": "agent",
   "name": "Closing Clio",
   "colloquialName": "Clio",
+  "initials": "CC",
   "nicknames": ["Close", "Recap"],
   "status": "active",
   "seat": "close",
   "teams": [],
   "role": "Session-close auditor; inventory refs, log hurdles, reconcile docs + indexes, report health.",
+  "blurb": "Post-session audit: references loaded, hurdles hit, doc/index reconciliation, session health.",
   "accent": "oklch(70% 0.12 20)",
   "badge": null,
   "created": null,
   "shortcut": true,
   "launchPrompt": "Clio, close out the session.",
-  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false }
+  "reportsIndex": "reports/index.json",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false, "makesReports": true }
 }

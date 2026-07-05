@@ -1,0 +1,26 @@
+{
+  "id": "2026-07-04-0026",
+  "type": "review",
+  "reportType": "Seven-Lens Review",
+  "ts": "2026-07-04T00:26:00-04:00",
+  "target": "Agent Reports to repo ship",
+  "verdictWord": "Adjust, then go",
+  "verdictPill": "adjust",
+  "pillText": "go",
+  "delta": "ship review",
+  "summary": "The idea is sound. Store reports as data, not standalone HTML, and lock the schema before building. The viewer stays a lean shell and each report is a JSON file in its agent's folder, so the source is small, MCP-editable, and never hits the write cap.",
+  "tally": [
+    { "n": 3, "l": "flags", "c": "med" },
+    { "n": 4, "l": "clean", "c": "done" }
+  ],
+  "lenses": [
+    { "name": "Red", "status": "flag", "body": "A self-contained file with inlined data blows past ~30KB and risks the silent clip that corrupted file-chunker. Fix: separate data from viewer so the HTML stays small and commits clean." },
+    { "name": "Creative", "status": "ok", "body": "clean" },
+    { "name": "Professionalism", "status": "flag", "body": "Home copy was stale and the report view leaned on nested cards (messy on mobile). Fixed: refreshed home, reports render as a flat document surface." },
+    { "name": "Development", "status": "flag", "body": "Lock a report JSON schema (id, type, ts, target, verdict, summary, tally, plus findings/apps/clean for audits and lenses/call for reviews). One shape, every agent emits it." },
+    { "name": "Scope", "status": "ok", "body": "clean" },
+    { "name": "Ecosystem", "status": "ok", "body": "clean" },
+    { "name": "Handoff", "status": "ok", "body": "clean" }
+  ],
+  "call": "Ship the data-separated build: lean viewer in agent-reports/, reports as per-agent JSON under brain-config/agents/<slug>/reports/. Source stays small and editable, every future report is just a committed JSON file."
+}

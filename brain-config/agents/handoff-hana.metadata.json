@@ -3,15 +3,18 @@
   "type": "agent",
   "name": "Handoff Hana",
   "colloquialName": "Hana",
+  "initials": "HH",
   "nicknames": ["Handoff"],
   "status": "active",
   "seat": "close",
   "teams": [],
   "role": "Handoff packager; the next-session baton.",
+  "blurb": "Packages clean handoffs: source-of-truth links, open threads, pending decisions, warm-start prompt.",
   "accent": "oklch(70% 0.12 20)",
   "badge": null,
   "created": null,
   "shortcut": true,
   "launchPrompt": "Hana, package the handoff.",
-  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false }
+  "reportsIndex": "reports/index.json",
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false, "makesReports": true }
 }

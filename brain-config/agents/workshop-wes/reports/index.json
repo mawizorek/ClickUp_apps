@@ -1,0 +1,16 @@
+{
+  "reports": [
+    {
+      "id": "2026-07-04-0026",
+      "file": "2026-07-04-0026.json",
+      "type": "review",
+      "reportType": "Seven-Lens Review",
+      "ts": "2026-07-04T00:26:00-04:00",
+      "target": "Agent Reports to repo ship",
+      "verdictWord": "Adjust, then go",
+      "verdictPill": "adjust",
+      "pillText": "go",
+      "delta": "ship review"
+    }
+  ]
+}
