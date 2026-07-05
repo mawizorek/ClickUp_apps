@@ -10,7 +10,7 @@
 |------------------------|------------------------------|--------------------------------------------|------------------------------------|
 | `on-track-refresh.md`  | Every **Wednesday**          | weekly motorsports TV refresh              | `routines/last-run/on-track.txt`   |
 | `f1-refresh.md`        | Every **Thu, Fri, Sat, Sun** | race-weekend days                          | `routines/last-run/f1.txt`         |
-| `world-cup-refresh.md` | **~4x/day**                  | ONLY through **2026-07-19**, then inactive | `routines/last-run/world-cup.txt`  |
+| `world-cup-refresh.md` | **~3x/day**                  | ONLY through **2026-07-19**, then inactive | `routines/last-run/world-cup.txt`  |
 
 ## The last-run ledger (per-routine files — READ THIS)
 
@@ -20,7 +20,7 @@ Each routine's last-run timestamp lives in its OWN tiny file under `routines/las
 
 ## Wake windows (agent timer, America/New_York)
 
-- **Now through 2026-07-19 (World Cup window):** Ricky fires **4 times a day — 06:00, 15:00, 21:00, 03:00**. Back-loaded on purpose: mornings are dead for results, so after the 06:00 open the wakes cluster afternoon/evening/late-night when matches resolve.
+- **Now through 2026-07-19 (World Cup window):** Ricky fires **3 times a day — 06:00, 15:00, 21:00**. Back-loaded on purpose: matches resolve afternoon/evening ET, so the wakes are the morning-after sweep (06:00, catches everything from the night before), midday (15:00), and post-evening-matches (21:00). The old 03:00 wake was dropped 2026-07-05 as functionally identical to 06:00 — nothing resolves between 03:00 and 06:00, so both caught the same set.
 - **After 2026-07-19:** relax to **once daily at 06:00** — covers On Track (Wed) and F1 (Thu–Sun) via day-cadence + catch-up. Retune the agent timer down when the window closes.
 
 ## How Ricky decides what to run (all times America/New_York)
@@ -28,7 +28,7 @@ Each routine's last-run timestamp lives in its OWN tiny file under `routines/las
 On each wake, for every routine, read its `last-run` file and compare against its `Cadence`:
 
 - **Day-of-week cadence** ("every Wednesday", "Thu–Sun"): due once per matching day. Run only if the last-run file is not already today AND today matches. After success, write today + time to that routine's file.
-- **Interval / multi-wake cadence** ("~4x/day"): run if now is in-window and this wake-slot hasn't been run yet (last-run older than this slot). After success, write now.
+- **Interval / multi-wake cadence** ("~3x/day"): run if now is in-window and this wake-slot hasn't been run yet (last-run older than this slot). After success, write now.
 - **Idempotency (double-run guard):** a routine whose last-run is already in the current period is done — skip it, even on many wakes.
 - **Catch-up (missed-run guard):** if a due occurrence has passed and last-run is still older, it's overdue — run the latest missed occurrence once and flag it as catch-up. Don't replay every missed day.
 - **Nothing due / already current** → wake, check, do nothing, no report.
