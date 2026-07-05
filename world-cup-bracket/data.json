@@ -40,7 +40,7 @@
       "id": 1,
       "round": "R32",
       "day": "2026-06-28",
-      "dayLabel": "Sat Jun 28",
+      "dayLabel": "Sun Jun 28",
       "home": "Canada",
       "away": "South Africa",
       "hs": 1,
@@ -54,7 +54,7 @@
       "id": 2,
       "round": "R32",
       "day": "2026-06-29",
-      "dayLabel": "Sun Jun 29",
+      "dayLabel": "Mon Jun 29",
       "home": "Brazil",
       "away": "Japan",
       "hs": 2,
@@ -68,7 +68,7 @@
       "id": 3,
       "round": "R32",
       "day": "2026-06-29",
-      "dayLabel": "Sun Jun 29",
+      "dayLabel": "Mon Jun 29",
       "home": "Germany",
       "away": "Paraguay",
       "hs": 1,
@@ -83,7 +83,7 @@
       "id": 4,
       "round": "R32",
       "day": "2026-06-29",
-      "dayLabel": "Sun Jun 29",
+      "dayLabel": "Mon Jun 29",
       "home": "Netherlands",
       "away": "Morocco",
       "hs": 1,
@@ -98,7 +98,7 @@
       "id": 5,
       "round": "R32",
       "day": "2026-06-30",
-      "dayLabel": "Mon Jun 30",
+      "dayLabel": "Tue Jun 30",
       "home": "France",
       "away": "Sweden",
       "hs": 3,
@@ -112,7 +112,7 @@
       "id": 6,
       "round": "R32",
       "day": "2026-06-30",
-      "dayLabel": "Mon Jun 30",
+      "dayLabel": "Tue Jun 30",
       "home": "Ivory Coast",
       "away": "Norway",
       "hs": 1,
@@ -126,7 +126,7 @@
       "id": 7,
       "round": "R32",
       "day": "2026-06-30",
-      "dayLabel": "Mon Jun 30",
+      "dayLabel": "Tue Jun 30",
       "home": "Mexico",
       "away": "Ecuador",
       "hs": 2,
@@ -140,7 +140,7 @@
       "id": 8,
       "round": "R32",
       "day": "2026-07-01",
-      "dayLabel": "Tue Jul 1",
+      "dayLabel": "Wed Jul 1",
       "home": "England",
       "away": "DR Congo",
       "hs": 2,
@@ -154,7 +154,7 @@
       "id": 17,
       "round": "R32",
       "day": "2026-07-01",
-      "dayLabel": "Tue Jul 1",
+      "dayLabel": "Wed Jul 1",
       "home": "Belgium",
       "away": "Senegal",
       "hs": 3,
@@ -162,13 +162,13 @@
       "status": "aet",
       "winner": "home",
       "venue": "Miami",
-      "feedsTo": 13
+      "feedsTo": 14
     },
     {
       "id": 18,
       "round": "R32",
       "day": "2026-07-01",
-      "dayLabel": "Tue Jul 1",
+      "dayLabel": "Wed Jul 1",
       "home": "USA",
       "away": "Bosnia-Herz.",
       "hs": 2,
@@ -176,7 +176,7 @@
       "status": "ft",
       "winner": "home",
       "venue": "Kansas City",
-      "feedsTo": 13
+      "feedsTo": 14
     },
     {
       "id": 19,
@@ -190,7 +190,7 @@
       "status": "ft",
       "winner": "home",
       "venue": "SoFi, LA",
-      "feedsTo": 14
+      "feedsTo": 13
     },
     {
       "id": 20,
@@ -204,7 +204,7 @@
       "status": "ft",
       "winner": "home",
       "venue": "Toronto",
-      "feedsTo": 14
+      "feedsTo": 13
     },
     {
       "id": 21,
@@ -218,7 +218,7 @@
       "status": "ft",
       "winner": "home",
       "venue": "BC Place, Vancouver",
-      "feedsTo": 15
+      "feedsTo": 16
     },
     {
       "id": 22,
@@ -232,7 +232,7 @@
       "status": "aet",
       "winner": "home",
       "venue": "Miami",
-      "feedsTo": 16
+      "feedsTo": 15
     },
     {
       "id": 23,
@@ -303,7 +303,7 @@
       "status": "upcoming",
       "venue": "MetLife, NJ",
       "time": "4:00 PM ET",
-      "feedsTo": 26
+      "feedsTo": 27
     },
     {
       "id": 12,
@@ -317,48 +317,48 @@
       "status": "upcoming",
       "venue": "Estadio Azteca, Mexico City",
       "time": "8:00 PM ET",
-      "feedsTo": 26
+      "feedsTo": 27
     },
     {
       "id": 13,
       "round": "R16",
       "day": "2026-07-06",
       "dayLabel": "Mon Jul 6",
-      "home": "Belgium",
-      "away": "USA",
+      "home": "Portugal",
+      "away": "Spain",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "Mercedes-Benz Stadium, Atlanta",
-      "time": "6:00 PM ET",
-      "feedsTo": 27
+      "venue": "Dallas Stadium",
+      "time": "3:00 PM ET",
+      "feedsTo": 26
     },
     {
       "id": 14,
       "round": "R16",
       "day": "2026-07-06",
       "dayLabel": "Mon Jul 6",
-      "home": "Spain",
-      "away": "Portugal",
+      "home": "USA",
+      "away": "Belgium",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "SoFi Stadium, Los Angeles",
-      "time": "9:00 PM ET",
-      "feedsTo": 27
+      "venue": "Seattle Stadium",
+      "time": "8:00 PM ET",
+      "feedsTo": 26
     },
     {
       "id": 15,
       "round": "R16",
       "day": "2026-07-07",
       "dayLabel": "Tue Jul 7",
-      "home": "Switzerland",
+      "home": "Argentina",
       "away": "Egypt",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "BC Place, Vancouver",
-      "time": "5:00 PM ET",
+      "venue": "Atlanta Stadium",
+      "time": "12:00 PM ET",
       "feedsTo": 28
     },
     {
@@ -366,13 +366,13 @@
       "round": "R16",
       "day": "2026-07-07",
       "dayLabel": "Tue Jul 7",
-      "home": "Argentina",
+      "home": "Switzerland",
       "away": "Colombia",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "Hard Rock Stadium, Miami",
-      "time": "8:00 PM ET",
+      "venue": "BC Place, Vancouver",
+      "time": "4:00 PM ET",
       "feedsTo": 28
     },
     {
@@ -380,14 +380,13 @@
       "round": "QF",
       "day": "2026-07-09",
       "dayLabel": "Thu Jul 9",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "France",
+      "away": "Morocco",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "Gillette Stadium, Boston",
+      "venue": "Boston Stadium",
       "time": "4:00 PM ET",
-      "tbd": true,
       "feedsTo": 29
     },
     {
@@ -395,14 +394,13 @@
       "round": "QF",
       "day": "2026-07-10",
       "dayLabel": "Fri Jul 10",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Portugal/Spain",
+      "away": "USA/Belgium",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "SoFi Stadium, LA",
+      "venue": "Los Angeles Stadium",
       "time": "3:00 PM ET",
-      "tbd": true,
       "feedsTo": 29
     },
     {
@@ -410,14 +408,13 @@
       "round": "QF",
       "day": "2026-07-11",
       "dayLabel": "Sat Jul 11",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Brazil/Norway",
+      "away": "Mexico/England",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "Hard Rock Stadium, Miami",
+      "venue": "Miami Stadium",
       "time": "5:00 PM ET",
-      "tbd": true,
       "feedsTo": 30
     },
     {
@@ -425,14 +422,13 @@
       "round": "QF",
       "day": "2026-07-11",
       "dayLabel": "Sat Jul 11",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Argentina/Egypt",
+      "away": "Switzerland/Colombia",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "Arrowhead, Kansas City",
+      "venue": "Kansas City Stadium",
       "time": "9:00 PM ET",
-      "tbd": true,
       "feedsTo": 30
     },
     {
@@ -440,14 +436,13 @@
       "round": "SF",
       "day": "2026-07-14",
       "dayLabel": "Tue Jul 14",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Winner QF1",
+      "away": "Winner QF2",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "AT&T Stadium, Dallas",
-      "time": "TBD",
-      "tbd": true,
+      "venue": "Dallas Stadium",
+      "time": "3:00 PM ET",
       "feedsTo": 31
     },
     {
@@ -455,14 +450,13 @@
       "round": "SF",
       "day": "2026-07-15",
       "dayLabel": "Wed Jul 15",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Winner QF3",
+      "away": "Winner QF4",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "Mercedes-Benz, Atlanta",
-      "time": "TBD",
-      "tbd": true,
+      "venue": "Atlanta Stadium",
+      "time": "3:00 PM ET",
       "feedsTo": 31
     },
     {
@@ -470,14 +464,13 @@
       "round": "Final",
       "day": "2026-07-19",
       "dayLabel": "Sun Jul 19",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Winner SF1",
+      "away": "Winner SF2",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "MetLife, NJ",
-      "time": "3:00 PM ET",
-      "tbd": true
+      "venue": "New York New Jersey Stadium",
+      "time": "3:00 PM ET"
     }
   ]
 }
