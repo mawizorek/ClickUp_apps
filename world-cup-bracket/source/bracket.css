@@ -1,6 +1,19 @@
 /* World Cup 2026 Bracket - bracket view. (Sheet styles live in sheet.css.) */
 .bracket-view { padding: 16px; padding-bottom: 100px; overflow-x: auto; }
-.bracket-hint { font-size: 0.6875rem; color: var(--text-dim); text-align: center; padding-bottom: 12px; }
+.bracket-hint { font-size: 0.6875rem; color: var(--text-dim); text-align: center; padding-bottom: 8px; }
+
+/* multi-team legend chip row */
+.path-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 0 4px 12px; justify-content: center; }
+.path-legend[hidden] { display: none; }
+.legend-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 0.6875rem; font-weight: 700; color: var(--text); background: var(--surface-2); border: 1px solid var(--border-light); border-radius: 999px; padding: 3px 4px 3px 9px; }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 6px var(--c); }
+.legend-x { border: none; background: transparent; color: var(--text-dim); width: 18px; height: 18px; border-radius: 50%; font-size: 0.875rem; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.legend-x:hover, .legend-x:focus-visible { color: var(--text); background: var(--surface-3); }
+.legend-meet { font-size: 0.625rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.04em; padding: 0 4px; }
+.legend-clear { border: none; background: transparent; color: var(--text-muted); font-size: 0.6875rem; font-weight: 700; cursor: pointer; text-decoration: underline; }
+.legend-clear:hover { color: var(--text); }
+.legend-flash { font-size: 0.625rem; font-weight: 700; color: var(--gold); }
+
 .bracket-scroll { min-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
 .bracket-container { display: flex; gap: 6px; min-width: max-content; align-items: flex-start; }
 .bracket-round { display: flex; flex-direction: column; gap: 4px; min-width: 130px; }
@@ -10,8 +23,13 @@
 .bracket-match:hover { border-color: var(--border-light); }
 .bracket-match.completed { border-color: var(--border-light); }
 .bracket-match.is-final { border-color: var(--gold); box-shadow: 0 0 8px oklch(70% 0.1 85 / 0.1); }
-.bracket-match.dim { opacity: 0.26; }
-.bracket-match.on-path { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 14px oklch(70% 0.18 155 / 0.35); opacity: 1; }
+.bracket-match.dim { opacity: 0.24; }
+
+/* on-path uses the per-team color vars set inline by paths.js */
+.bracket-match.on-path { border-color: var(--path-line, var(--accent)); box-shadow: 0 0 0 1px var(--path-line, var(--accent)), 0 0 14px color-mix(in oklch, var(--path-line, var(--accent)) 40%, transparent); opacity: 1; }
+/* convergence: split border between the two colliding teams' colors + a marker */
+.bracket-match.converge { border-color: transparent; box-shadow: 0 0 0 1px var(--path-line), 0 0 0 3px var(--path-line-2), 0 0 16px color-mix(in oklch, var(--path-line) 45%, transparent); }
+.bracket-match.converge::after { content: '\2694'; position: absolute; top: 2px; right: 3px; font-size: 0.6875rem; opacity: 0.9; }
 
 .bm-team { display: flex; align-items: center; padding: 6px 6px 6px 8px; gap: 6px; border-bottom: 1px solid oklch(24% 0.005 250); min-height: 30px; }
 .bm-team:last-child { border-bottom: none; }
@@ -24,10 +42,10 @@
 .bm-team.w .bm-score { color: var(--accent); }
 .bm-team.l .bm-score { color: var(--loser-text); }
 
-/* right-side trace arrow = one-tap path highlight for this team */
-.bm-trace { flex-shrink: 0; border: none; background: transparent; color: var(--text-dim); width: 20px; height: 20px; border-radius: 5px; font-size: 0.75rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 150ms var(--ease-out); }
+/* right-side trace arrow = add/remove team from multi-path compare */
+.bm-trace { flex-shrink: 0; border: none; background: transparent; color: var(--text-dim); width: 20px; height: 20px; border-radius: 5px; font-size: 0.8125rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 150ms var(--ease-out); }
 .bm-trace:hover, .bm-trace:focus-visible { color: var(--accent); background: var(--accent-surface); }
-.bm-trace.picked { color: var(--accent); background: var(--accent-surface); }
+.bm-trace.picked { background: color-mix(in oklch, currentColor 18%, transparent); }
 
 .bm-status { font-size: 0.5625rem; font-weight: 700; text-align: center; padding: 2px; letter-spacing: 0.04em; color: var(--text-dim); background: var(--surface-2); }
 .bm-status.done { color: var(--accent); }

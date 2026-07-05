@@ -2,7 +2,8 @@
 import { S, APP_VERSION, BUILD_PR, DATA_URL, CACHE_KEY, REPO_OWNER, REPO_NAME, DATA_PATH } from './store.js';
 import { buildFedBy, byId } from './util.js';
 import { renderTimeNav, renderSchedule } from './schedule.js';
-import { renderBracket, applyPathHighlight } from './bracket.js';
+import { renderBracket } from './bracket.js';
+import { togglePick, applyPaths } from './paths.js';
 import { initSheet } from './sheet.js';
 
 async function fetchLastUpdated() {
@@ -68,20 +69,21 @@ function setupViewToggle() {
   });
 }
 
-// Trace-path arrow inside the sheet -> jump to bracket view + highlight that team.
+// Trace-path arrow inside the detail sheet -> jump to bracket, add that team
+// to the multi-select compare, and paint the paths.
 function setupTraceBridge() {
   document.addEventListener('trace-team', (e) => {
     const team = e.detail && e.detail.team;
     if (!team) return;
     showBracketView();
-    applyPathHighlight(team);
+    if (!S.picks.includes(team)) togglePick(team);
+    applyPaths();
   });
 }
 
 let tickerStarted = false;
 function startCountdownTicker() {
   if (tickerStarted) return; tickerStarted = true;
-  // Single global ticker updates every [data-countdown] element (chips, sheet).
   setInterval(() => {
     document.querySelectorAll('[data-countdown]').forEach(el => {
       const target = new Date(+el.dataset.countdown);

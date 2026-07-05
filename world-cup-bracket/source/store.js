@@ -1,7 +1,7 @@
 // World Cup 2026 Bracket - shared constants + runtime state.
 // This is the single source of shared mutable state; all modules import S.
-export const APP_VERSION = 'v4.3';
-export const BUILD_PR = 'PR#28'; // updated to the merged PR before ship; shown in footer
+export const APP_VERSION = 'v5.0';
+export const BUILD_PR = 'PR#29'; // updated to the merged PR before ship; shown in footer
 export const DATA_URL = './data.json';
 export const CACHE_KEY = 'world-cup-bracket-data';
 export const REPO_OWNER = 'mawizorek';
@@ -10,12 +10,22 @@ export const DATA_PATH = 'world-cup-bracket/data.json';
 export const POTENTIAL_PREFIX = 'winner of';
 export const ET_UTC_OFFSET = 4; // EDT = UTC-4 during the tournament (July)
 
+// Multi-team compare palette (OKLCH, colorblind-considerate, max 4).
+// Index 0 = the original mint accent so single-select looks unchanged.
+export const PATH_PALETTE = [
+  { name: 'mint',   line: 'oklch(75% 0.18 155)', surf: 'oklch(20% 0.05 155)' },
+  { name: 'amber',  line: 'oklch(80% 0.15 75)',  surf: 'oklch(22% 0.05 75)' },
+  { name: 'violet', line: 'oklch(72% 0.16 300)', surf: 'oklch(22% 0.06 300)' },
+  { name: 'cyan',   line: 'oklch(78% 0.13 220)', surf: 'oklch(22% 0.05 220)' },
+];
+export const MAX_PICKS = PATH_PALETTE.length;
+
 // Mutable shared store. Populated in app.js after data load.
 export const S = {
   allMatches: [],
   rankings: {},
   fedBy: {},        // downstream match id -> [feeder match ids]
-  pickedTeam: null, // active bracket path-highlight team
+  picks: [],        // ordered list of selected team names (index -> palette color)
 };
 
 // Today's date (YYYY-MM-DD), computed once at load. Runtime, not hardcoded.
