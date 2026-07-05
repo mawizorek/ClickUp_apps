@@ -18,7 +18,12 @@ The icon + share banner are live and working, but shipped under their raw mobile
 
 No rush: everything maps and renders as-is. This is polish, not a blocker.
 
+### 🔄 Changed-event UI callout (“was X → now Y”)
+
+When a refresh detects that an existing event materially shifted (rain delay, moved session, time change, cancellation), the UI should be able to surface that it changed — e.g. a small badge or strikethrough showing the old time/status next to the new. Requires: a data field on the event to carry the prior value + a change flag, and engine render support for it. This is why it's a BUILD item, not a routine: Routine Ricky is data-only and can't add fields or render logic. Expected to be rare, so low priority, but captured so a refresh agent that spots a shift has somewhere for it to eventually land. Until built, refresh agents just note the change in their run report.
+
 ## Known guardrails
 
 - Data updates = commit `data.json` only, no engine bump.
 - Brand asset refs live in the `index.html` head; keep the absolute Pages URL for og/twitter (relative paths don't unfurl).
+- Data refreshes verify-and-merge (never blank-slate rebuild) and never shrink series coverage — see `routines/README.md` Data-Refresh Discipline.
