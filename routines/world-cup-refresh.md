@@ -1,6 +1,5 @@
 # World Cup Refresh
 
-schedule:   0 10 * * 1   # Monday 10:00 America/New_York, weekly during the tournament window
 goal:       world-cup-bracket/data.json reflects the latest results/fixtures/bracket state per the app's existing schema.
 target:     world-cup-bracket/data.json
 report-to:  #A.I. Prompts (thread: World Cup refreshes)
@@ -17,7 +16,7 @@ report-to:  #A.I. Prompts (thread: World Cup refreshes)
 - Target is anything other than world-cup-bracket/data.json.
 - The current data.json schema is unclear or you'd have to invent fields → STOP, that's a build session.
 - A result/fixture can't be verified → don't guess, flag it.
-- Tournament is over / no upcoming fixtures → report "nothing to refresh" and make no commit.
+- No upcoming fixtures / past the window → report "nothing to refresh" and make no commit.
 
 ## Report format
 Commit link + live URL (https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/) + what changed (matches resolved, bracket advanced) + anything unverifiable.
