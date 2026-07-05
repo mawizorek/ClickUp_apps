@@ -10,20 +10,34 @@ The `last-run` column is Ricky's memory. He reads it every wake to decide what's
 |---|---|---|---|
 | `on-track-refresh.md` | Every **Wednesday** | weekly motorsports TV refresh | never |
 | `f1-refresh.md` | Every **Thu, Fri, Sat, Sun** | race-weekend days | never |
-| `world-cup-refresh.md` | **Every 2 hours** | ONLY through **2026-07-19**, then inactive | never |
+| `world-cup-refresh.md` | **~4x/day** | ONLY through **2026-07-19**, then inactive | never |
+
+## Wake windows (agent timer, America/New_York)
+
+- **Now through 2026-07-19 (World Cup window):** Ricky fires **4 times a day — 06:00, 12:00, 18:00, 03:00**. Deliberately front/back-loaded, not an even split: a morning open, midday + evening to catch match results, and a 03:00 sweep to catch anything late. World Cup is due at each of these; the `last-run` interval guard prevents double-runs.
+- **After 2026-07-19:** severely relax to **once daily at 06:00**. That comfortably covers On Track (Wed) and F1 (Thu–Sun) via day-cadence + catch-up. Retune the agent timer down when the window closes.
 
 ## How Ricky decides what to run (all times America/New_York)
 
-On each wake, for every routine, compute **“is there a due occurrence that hasn’t been run yet?”** using `cadence` + `last-run`:
+On each wake, for every routine, compute “is there a due occurrence that hasn’t been run yet?” using `cadence` + `last-run`:
 
-- **Day-of-week cadence** ("every Wednesday", "Thu–Sun"): the routine is due once per matching day. Run it **only if `last-run` is not already today** AND today matches. After success, set `last-run` to today's date + time.
-- **Interval cadence** ("every 2 hours"): run only if now is inside the window AND at least the interval has elapsed since `last-run`. After success, set `last-run` to now.
-- **Idempotency (the once-a-day guard):** because the run only fires when `last-run` isn't already in the current period, waking hourly can never double-run a daily routine. First qualifying wake runs it and stamps the date; every later wake that day sees `last-run == today` and skips.
-- **Catch-up (the missed-run guard):** if a matching day/occurrence has passed and `last-run` is still older than it, the routine is overdue — run it now and note in the report that it's a catch-up for the missed date. Example: F1 was due Tuesday, nobody woke, Ricky wakes Wednesday and sees `last-run` predates Tuesday → he runs the missed refresh and flags it. Catch-up runs the latest occurrence once; it does not replay every missed day.
-- **Nothing due / already current** → wake, check, do nothing, no report.
+- **Day-of-week cadence** ("every Wednesday", "Thu–Sun"): due once per matching day. Run only if `last-run` is not already today AND today matches. After success, set `last-run` to today + time.
+- **Interval / multi-wake cadence** ("~4x/day"): run if now is in-window and this wake-slot hasn't been run yet (guard on `last-run` being older than this slot). After success, set `last-run` to now.
+- **Idempotency (double-run guard):** a routine whose `last-run` is already in the current period is done — skip it, even on many wakes. Waking often is harmless.
+- **Catch-up (missed-run guard):** if a due occurrence has passed and `last-run` is still older, it's overdue — run the latest missed occurrence once and flag it as catch-up in the report. Don't replay every missed day.
+- **Nothing due / already current** → wake, check, do nothing, no report. (No-op wakes are cheap by design.)
+
+## Error posture (background-quiet)
+
+Ricky runs in the background and should feel invisible unless something's genuinely wrong:
+
+- **A failure in one routine never blocks the others.** Flag it, move on, run the rest of what's due.
+- **Best-effort + flag:** if part of a refresh is uncertain (a time/channel can't be verified), do the honest version (mark "Stream" / drop the row) and note it in the report rather than aborting the whole run.
+- **A failed/stopped run leaves `last-run` untouched** so it stays overdue and retries next wake (self-healing).
+- **DM Michael ONLY for a recurring or large problem** — e.g. the same routine fails 2+ wakes running, a schema looks broken, or repo writes are failing. One-off soft misses go in the routine's report thread, not a DM.
 
 ## Rules for the ledger
 
-- Ricky updates ONLY the `last-run` cell of a routine, and ONLY after that routine's run fully succeeds. A failed/stopped run leaves `last-run` untouched (so it stays overdue and gets retried next wake).
-- `last-run` format: `YYYY-MM-DD HH:MM`. Use `never` for a routine that has never successfully run.
-- Changing a cadence: tell Ricky conversationally OR edit the `Cadence` cell. Never reschedule by editing a runbook spec, never edit the agent.
+- Ricky updates ONLY the `last-run` cell of a routine, and ONLY after that routine's run fully succeeds.
+- `last-run` format: `YYYY-MM-DD HH:MM`. Use `never` if it has never successfully run.
+- Changing a cadence/window: tell Ricky conversationally OR edit the cell here. Never reschedule by editing a runbook spec, never edit the agent.
