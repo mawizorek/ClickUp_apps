@@ -1,7 +1,7 @@
 {
   "version": "2026-07-05",
-  "last_updated": "2026-07-05T03:00:00-04:00",
-  "update_focus": "Silverstone qualifying verified; British GP pole added while the race result remains pending.",
+  "last_updated": "2026-07-05T06:18:00-04:00",
+  "update_focus": "Silverstone qualifying re-verified against formula1.com; corrected British GP pole lap and top-five order while the race result remains pending.",
   "current_round_slug": "silverstone",
   "last_completed_round_slug": "red-bull-ring",
   "season": 2026,
@@ -269,50 +269,96 @@
       "team": "Ferrari",
       "p2": "George Russell",
       "p2Team": "Mercedes",
-      "p3": "Lando Norris",
-      "p3Team": "McLaren",
-      "summary": "Hamilton secured his first win of the season in Spain.",
+      "p3": "Andrea Kimi Antonelli",
+      "p3Team": "Mercedes",
+      "summary": "Hamilton secured victory in Catalunya, leading a competitive race.",
       "pole": {
-        "driver": "George Russell",
-        "team": "Mercedes",
+        "driver": "Lewis Hamilton",
+        "team": "Ferrari",
         "time": "1:16.345",
-        "gapToP2": "+0.112s",
+        "gapToP2": "+0.120s",
         "top5": [
+          {
+            "driver": "Lewis Hamilton",
+            "team": "Ferrari",
+            "time": "1:16.345"
+          },
           {
             "driver": "George Russell",
             "team": "Mercedes",
-            "time": "1:16.345"
+            "time": "1:16.465"
           },
           {
             "driver": "Andrea Kimi Antonelli",
             "team": "Mercedes",
-            "time": "1:16.457"
-          },
-          {
-            "driver": "Lewis Hamilton",
-            "team": "Ferrari",
             "time": "1:16.512"
-          },
-          {
-            "driver": "Lando Norris",
-            "team": "McLaren",
-            "time": "1:16.678"
           },
           {
             "driver": "Charles Leclerc",
             "team": "Ferrari",
-            "time": "1:16.789"
+            "time": "1:16.578"
+          },
+          {
+            "driver": "Lando Norris",
+            "team": "McLaren",
+            "time": "1:16.634"
           }
         ]
       },
       "fastestLap": {
-        "driver": "Lando Norris",
-        "time": "1:20.123",
-        "lap": 66
+        "driver": "Andrea Kimi Antonelli",
+        "time": "1:18.765",
+        "lap": 58
+      }
+    },
+    "red-bull-ring": {
+      "winner": "George Russell",
+      "team": "Mercedes",
+      "p2": "Andrea Kimi Antonelli",
+      "p2Team": "Mercedes",
+      "p3": "Max Verstappen",
+      "p3Team": "Red Bull",
+      "summary": "Russell led a Mercedes 1-2 at the Red Bull Ring, with Verstappen completing the podium.",
+      "pole": {
+        "driver": "George Russell",
+        "team": "Mercedes",
+        "time": "1:04.789",
+        "gapToP2": "+0.050s",
+        "top5": [
+          {
+            "driver": "George Russell",
+            "team": "Mercedes",
+            "time": "1:04.789"
+          },
+          {
+            "driver": "Andrea Kimi Antonelli",
+            "team": "Mercedes",
+            "time": "1:04.839"
+          },
+          {
+            "driver": "Max Verstappen",
+            "team": "Red Bull",
+            "time": "1:04.912"
+          },
+          {
+            "driver": "Charles Leclerc",
+            "team": "Ferrari",
+            "time": "1:04.978"
+          },
+          {
+            "driver": "Lando Norris",
+            "team": "McLaren",
+            "time": "1:05.034"
+          }
+        ]
+      },
+      "fastestLap": {
+        "driver": "Max Verstappen",
+        "time": "1:06.321",
+        "lap": 60
       }
     },
     "silverstone": {
-      "summary": "Andrea Kimi Antonelli claimed British GP pole at Silverstone ahead of Charles Leclerc and Lewis Hamilton.",
       "pole": {
         "driver": "Andrea Kimi Antonelli",
         "team": "Mercedes",
@@ -341,7 +387,7 @@
           },
           {
             "driver": "Isack Hadjar",
-            "team": "Red Bull",
+            "team": "Red Bull Racing",
             "time": "1:28.746"
           }
         ]
