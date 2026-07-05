@@ -1,21 +1,34 @@
 # F1 Refresh
 
-goal:       f1-racetracks/data.json reflects current F1 season standings/results/next-race state per the app's existing schema.
-target:     f1-racetracks/data.json
-report-to:  #A.I. Prompts (thread: F1 refreshes)
+goal: f1-racetracks/data.json reflects current F1 season standings/results/next-race state per the app's existing schema, kept current session-by-session across a race weekend (not just once a day).
+target: f1-racetracks/data.json
+report-to: (per executor's reporting standard)
+
+> Follows the UNIVERSAL Data-Refresh Discipline in `routines/README.md` (verify-and-merge, never shrink, schema stability). The steps below add F1's session-aware behavior on top of that floor.
+
+## Session-aware refresh (the point of this routine)
+
+F1 weekends run multiple sessions across Fri/Sat/Sun (Practice, Qualifying, Sprint, Race). Waiting once a day feels slow. Instead:
+
+- On each due wake, determine the **most recent F1 session that has FINISHED** (from formula1.com or equivalent) and compare its finish time to `routines/last-run/f1.txt`.
+- **If a session has completed since the last run → refresh now**: pull that session's result/standings into the data file. This is what lets a Sunday feature race that ended this morning show up when Ricky fires at noon, without waiting for tomorrow.
+- **If no new session has finished since last-run → nothing to do**: don't rewrite the data, don't bump the stamp, just no-op. (Idempotency: a wake with no newly-finished session is a clean skip.)
+- Only stamp `last-run/f1.txt` when you actually committed a new session's data. A wake that finds nothing new leaves the stamp untouched.
 
 ## Steps
 1. Read the CURRENT f1-racetracks/data.json first to learn its exact schema. Match it precisely — do not redesign it.
-2. Research the latest F1 results, standings, and upcoming-race data that the schema expects.
-3. Verify against a primary source (formula1.com or equivalent). Times in the schema's existing convention.
-4. Rebuild f1-racetracks/data.json in the same schema. Bump the schema's version/datestamp field.
-5. Commit f1-racetracks/data.json to main. Data-only — do NOT touch index.html or the engine.
-6. Post the run report.
+2. Read `routines/last-run/f1.txt`. Identify the most recent F1 session that has finished per a primary source (formula1.com or equivalent).
+3. **If that session finished at/after the last-run stamp is already reflected in the data, STOP — nothing new, no-op wake.** Otherwise continue.
+4. Merge the newly-finished session's result + any standings changes into f1-racetracks/data.json, in the same schema. Also correct the next-session / next-race state so the app points at what's up next. Verify all values against the primary source; never guess a result.
+5. Bump the schema's version/datestamp field. Commit f1-racetracks/data.json to main. Data-only — do NOT touch index.html or the engine.
+6. Stamp `routines/last-run/f1.txt` with the completion time (`YYYY-MM-DD HH:MM` ET).
+7. Post the run report, naming which session was caught (e.g. "British GP Race result added").
 
 ## Guardrails (STOP + flag if any is true)
 - Target is anything other than f1-racetracks/data.json.
 - The current data.json schema is unclear or you'd have to invent fields → STOP, that's a build session.
-- A result/standing can't be verified → don't guess, flag it.
+- A result/standing can't be verified → don't guess, flag it, keep the prior value.
+- A session is still in progress (not finished) → do NOT enter partial/live results; wait for it to finish.
 
 ## Report format
-Commit link + live URL (https://mawizorek.github.io/ClickUp_apps/f1-racetracks/) + what changed (round added, standings updated) + anything unverifiable.
+Commit link + live URL (https://mawizorek.github.io/ClickUp_apps/f1-racetracks/) + which session was caught + what changed (result added, standings updated, next-race repointed) + anything unverifiable. If a wake found no newly-finished session, no report (clean no-op).
