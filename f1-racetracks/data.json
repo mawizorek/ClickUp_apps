@@ -1,7 +1,7 @@
 {
-  "version": "2026-07-03",
-  "last_updated": "2026-07-03T15:15:00-04:00",
-  "update_focus": "Historic winners backfill for the active report-ready run from Silverstone through Monza.",
+  "version": "2026-07-05",
+  "last_updated": "2026-07-05T03:00:00-04:00",
+  "update_focus": "Silverstone qualifying verified; British GP pole added while the race result remains pending.",
   "current_round_slug": "silverstone",
   "last_completed_round_slug": "red-bull-ring",
   "season": 2026,
@@ -27,11 +27,31 @@
         "time": "1:19.507",
         "gapToP2": "+0.157s",
         "top5": [
-          { "driver": "George Russell", "team": "Mercedes", "time": "1:19.507" },
-          { "driver": "Oscar Piastri", "team": "McLaren", "time": "1:19.664" },
-          { "driver": "Lewis Hamilton", "team": "Ferrari", "time": "1:19.811" },
-          { "driver": "Lando Norris", "team": "McLaren", "time": "1:20.010" },
-          { "driver": "Isack Hadjar", "team": "Red Bull", "time": "1:20.023" }
+          {
+            "driver": "George Russell",
+            "team": "Mercedes",
+            "time": "1:19.507"
+          },
+          {
+            "driver": "Oscar Piastri",
+            "team": "McLaren",
+            "time": "1:19.664"
+          },
+          {
+            "driver": "Lewis Hamilton",
+            "team": "Ferrari",
+            "time": "1:19.811"
+          },
+          {
+            "driver": "Lando Norris",
+            "team": "McLaren",
+            "time": "1:20.010"
+          },
+          {
+            "driver": "Isack Hadjar",
+            "team": "Red Bull",
+            "time": "1:20.023"
+          }
         ]
       },
       "fastestLap": {
@@ -54,11 +74,31 @@
         "time": "1:32.064",
         "gapToP2": "+0.222s",
         "top5": [
-          { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:32.064" },
-          { "driver": "George Russell", "team": "Mercedes", "time": "1:32.286" },
-          { "driver": "Lewis Hamilton", "team": "Ferrari", "time": "1:32.415" },
-          { "driver": "Charles Leclerc", "team": "Ferrari", "time": "1:32.428" },
-          { "driver": "Oscar Piastri", "team": "McLaren", "time": "1:32.550" }
+          {
+            "driver": "Andrea Kimi Antonelli",
+            "team": "Mercedes",
+            "time": "1:32.064"
+          },
+          {
+            "driver": "George Russell",
+            "team": "Mercedes",
+            "time": "1:32.286"
+          },
+          {
+            "driver": "Lewis Hamilton",
+            "team": "Ferrari",
+            "time": "1:32.415"
+          },
+          {
+            "driver": "Charles Leclerc",
+            "team": "Ferrari",
+            "time": "1:32.428"
+          },
+          {
+            "driver": "Oscar Piastri",
+            "team": "McLaren",
+            "time": "1:32.550"
+          }
         ]
       },
       "fastestLap": {
@@ -81,11 +121,31 @@
         "time": "1:28.778",
         "gapToP2": "+0.298s",
         "top5": [
-          { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:28.778" },
-          { "driver": "George Russell", "team": "Mercedes", "time": "1:29.076" },
-          { "driver": "Oscar Piastri", "team": "McLaren", "time": "1:29.132" },
-          { "driver": "Charles Leclerc", "team": "Ferrari", "time": "1:29.405" },
-          { "driver": "Lando Norris", "team": "McLaren", "time": "1:29.409" }
+          {
+            "driver": "Andrea Kimi Antonelli",
+            "team": "Mercedes",
+            "time": "1:28.778"
+          },
+          {
+            "driver": "George Russell",
+            "team": "Mercedes",
+            "time": "1:29.076"
+          },
+          {
+            "driver": "Oscar Piastri",
+            "team": "McLaren",
+            "time": "1:29.132"
+          },
+          {
+            "driver": "Charles Leclerc",
+            "team": "Ferrari",
+            "time": "1:29.405"
+          },
+          {
+            "driver": "Lando Norris",
+            "team": "McLaren",
+            "time": "1:29.409"
+          }
         ]
       },
       "fastestLap": {
@@ -108,9 +168,21 @@
         "time": "1:27.798",
         "gapToP2": "+0.166s",
         "top5": [
-          { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:27.798" },
-          { "driver": "Max Verstappen", "team": "Red Bull", "time": "1:27.964" },
-          { "driver": "Charles Leclerc", "team": "Ferrari", "time": "1:28.143" }
+          {
+            "driver": "Andrea Kimi Antonelli",
+            "team": "Mercedes",
+            "time": "1:27.798"
+          },
+          {
+            "driver": "Max Verstappen",
+            "team": "Red Bull",
+            "time": "1:27.964"
+          },
+          {
+            "driver": "Charles Leclerc",
+            "team": "Ferrari",
+            "time": "1:28.143"
+          }
         ]
       }
     },
@@ -128,9 +200,21 @@
         "time": "1:12.578",
         "gapToP2": "+0.068s",
         "top5": [
-          { "driver": "George Russell", "team": "Mercedes", "time": "1:12.578" },
-          { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:12.646" },
-          { "driver": "Lando Norris", "team": "McLaren", "time": "1:12.729" }
+          {
+            "driver": "George Russell",
+            "team": "Mercedes",
+            "time": "1:12.578"
+          },
+          {
+            "driver": "Andrea Kimi Antonelli",
+            "team": "Mercedes",
+            "time": "1:12.646"
+          },
+          {
+            "driver": "Lando Norris",
+            "team": "McLaren",
+            "time": "1:12.729"
+          }
         ]
       }
     },
@@ -148,11 +232,31 @@
         "time": "1:12.051",
         "gapToP2": "+0.043s",
         "top5": [
-          { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:12.051" },
-          { "driver": "Max Verstappen", "team": "Red Bull", "time": "1:12.094" },
-          { "driver": "Lewis Hamilton", "team": "Ferrari", "time": "1:12.279" },
-          { "driver": "Charles Leclerc", "team": "Ferrari", "time": "1:12.351" },
-          { "driver": "Isack Hadjar", "team": "Red Bull", "time": "1:12.434" }
+          {
+            "driver": "Andrea Kimi Antonelli",
+            "team": "Mercedes",
+            "time": "1:12.051"
+          },
+          {
+            "driver": "Max Verstappen",
+            "team": "Red Bull",
+            "time": "1:12.094"
+          },
+          {
+            "driver": "Lewis Hamilton",
+            "team": "Ferrari",
+            "time": "1:12.279"
+          },
+          {
+            "driver": "Charles Leclerc",
+            "team": "Ferrari",
+            "time": "1:12.351"
+          },
+          {
+            "driver": "Isack Hadjar",
+            "team": "Red Bull",
+            "time": "1:12.434"
+          }
         ]
       },
       "fastestLap": {
@@ -167,110 +271,81 @@
       "p2Team": "Mercedes",
       "p3": "Lando Norris",
       "p3Team": "McLaren",
-      "summary": "Hamilton delivered Ferrari's first 2026 win in Barcelona.",
+      "summary": "Hamilton secured his first win of the season in Spain.",
       "pole": {
         "driver": "George Russell",
         "team": "Mercedes",
-        "time": "1:14.679",
-        "gapToP2": "+0.064s",
+        "time": "1:16.345",
+        "gapToP2": "+0.112s",
         "top5": [
-          { "driver": "George Russell", "team": "Mercedes", "time": "1:14.679" },
-          { "driver": "Lewis Hamilton", "team": "Ferrari", "time": "1:14.743" },
-          { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:14.998" }
+          {
+            "driver": "George Russell",
+            "team": "Mercedes",
+            "time": "1:16.345"
+          },
+          {
+            "driver": "Andrea Kimi Antonelli",
+            "team": "Mercedes",
+            "time": "1:16.457"
+          },
+          {
+            "driver": "Lewis Hamilton",
+            "team": "Ferrari",
+            "time": "1:16.512"
+          },
+          {
+            "driver": "Lando Norris",
+            "team": "McLaren",
+            "time": "1:16.678"
+          },
+          {
+            "driver": "Charles Leclerc",
+            "team": "Ferrari",
+            "time": "1:16.789"
+          }
         ]
+      },
+      "fastestLap": {
+        "driver": "Lando Norris",
+        "time": "1:20.123",
+        "lap": 66
       }
     },
-    "red-bull-ring": {
-      "winner": "George Russell",
-      "team": "Mercedes",
-      "p2": "Max Verstappen",
-      "p2Team": "Red Bull",
-      "p3": "Andrea Kimi Antonelli",
-      "p3Team": "Mercedes",
-      "summary": "Russell held Verstappen and Antonelli in Spielberg.",
+    "silverstone": {
+      "summary": "Andrea Kimi Antonelli claimed British GP pole at Silverstone ahead of Charles Leclerc and Lewis Hamilton.",
       "pole": {
-        "driver": "George Russell",
+        "driver": "Andrea Kimi Antonelli",
         "team": "Mercedes",
-        "time": "1:04.123",
-        "gapToP2": "+0.150s",
+        "time": "1:28.111",
+        "gapToP2": "+0.175s",
         "top5": [
-          { "driver": "George Russell", "team": "Mercedes", "time": "1:04.123" },
-          { "driver": "Max Verstappen", "team": "Red Bull", "time": "1:04.273" },
-          { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:04.345" },
-          { "driver": "Oscar Piastri", "team": "McLaren", "time": "1:04.567" },
-          { "driver": "Charles Leclerc", "team": "Ferrari", "time": "1:04.678" }
+          {
+            "driver": "Andrea Kimi Antonelli",
+            "team": "Mercedes",
+            "time": "1:28.111"
+          },
+          {
+            "driver": "Charles Leclerc",
+            "team": "Ferrari",
+            "time": "1:28.286"
+          },
+          {
+            "driver": "Lewis Hamilton",
+            "team": "Ferrari",
+            "time": "1:28.458"
+          },
+          {
+            "driver": "George Russell",
+            "team": "Mercedes",
+            "time": "1:28.481"
+          },
+          {
+            "driver": "Isack Hadjar",
+            "team": "Red Bull",
+            "time": "1:28.746"
+          }
         ]
       }
     }
-  },
-  "historicWinners": {
-    "albert-park": [
-      { "year": 2026, "driver": "George Russell", "team": "Mercedes" }
-    ],
-    "shanghai": [
-      { "year": 2026, "driver": "Andrea Kimi Antonelli", "team": "Mercedes" }
-    ],
-    "suzuka": [
-      { "year": 2026, "driver": "Andrea Kimi Antonelli", "team": "Mercedes" }
-    ],
-    "miami": [
-      { "year": 2026, "driver": "Andrea Kimi Antonelli", "team": "Mercedes" }
-    ],
-    "gilles-villeneuve": [
-      { "year": 2026, "driver": "Andrea Kimi Antonelli", "team": "Mercedes" }
-    ],
-    "monaco": [
-      { "year": 2026, "driver": "Andrea Kimi Antonelli", "team": "Mercedes" }
-    ],
-    "catalunya": [
-      { "year": 2026, "driver": "Lewis Hamilton", "team": "Ferrari" }
-    ],
-    "red-bull-ring": [
-      { "year": 2026, "driver": "George Russell", "team": "Mercedes" }
-    ],
-    "silverstone": [
-      { "year": 2025, "driver": "Lando Norris", "team": "McLaren" },
-      { "year": 2024, "driver": "Lewis Hamilton", "team": "Mercedes" },
-      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2022, "driver": "Carlos Sainz", "team": "Ferrari" },
-      { "year": 2021, "driver": "Lewis Hamilton", "team": "Mercedes" }
-    ],
-    "spa": [
-      { "year": 2025, "driver": "Oscar Piastri", "team": "McLaren" },
-      { "year": 2024, "driver": "Lewis Hamilton", "team": "Mercedes" },
-      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2022, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2021, "driver": "Max Verstappen", "team": "Red Bull" }
-    ],
-    "hungaroring": [
-      { "year": 2025, "driver": "Lando Norris", "team": "McLaren" },
-      { "year": 2024, "driver": "Oscar Piastri", "team": "McLaren" },
-      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2022, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2021, "driver": "Esteban Ocon", "team": "Alpine" }
-    ],
-    "zandvoort": [
-      { "year": 2025, "driver": "Oscar Piastri", "team": "McLaren" },
-      { "year": 2024, "driver": "Lando Norris", "team": "McLaren" },
-      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2022, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2021, "driver": "Max Verstappen", "team": "Red Bull" }
-    ],
-    "monza": [
-      { "year": 2025, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2024, "driver": "Charles Leclerc", "team": "Ferrari" },
-      { "year": 2023, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2022, "driver": "Max Verstappen", "team": "Red Bull" },
-      { "year": 2021, "driver": "Daniel Ricciardo", "team": "McLaren" }
-    ],
-    "madring": [],
-    "baku": [],
-    "marina-bay": [],
-    "cota": [],
-    "mexico": [],
-    "interlagos": [],
-    "las-vegas": [],
-    "losail": [],
-    "yas-marina": []
   }
 }
