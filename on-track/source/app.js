@@ -7,47 +7,52 @@ function toggleSet(set, val, key, el) {
   updateFilterCounts();
   renderSchedule();
 }
-// Master filter action: one full-width card button below both filter sections.
-// Shared slot — 'Select all' when nothing is active, flips to 'Clear filters' the
-// instant any series/platform chip is on. Injected (like the chips) so the HTML
-// shell stays untouched. syncFilterAction() keeps the label in lockstep with state
-// (called from renderSchedule, so it self-corrects no matter how filters change).
-function buildFilterAction() {
-  const anchor = document.getElementById('secWatch');
-  if (!anchor || document.getElementById('filterAction')) return;
+// Per-dropdown master action: ONE button lives inside EACH filter section, scoped to
+// just that section. Series body gets a Select-all-series / Clear-series button; the
+// Where-to-watch body gets its own for platforms. Shared slot per button: 'Select all X'
+// at rest, flips to 'Clear X' the instant any chip in that section is active. Injected
+// right after each chip group (siblings of #seriesChips / #platChips), so buildChips()
+// rebuilding the chip innerHTML never clobbers them. syncFilterAction() keeps both labels
+// in lockstep with state (called from renderSchedule, so they self-correct).
+function addFilterBtn(chipsId, setKey, btnId) {
+  const chips = document.getElementById(chipsId);
+  if (!chips || document.getElementById(btnId)) return;
   const btn = document.createElement('button');
-  btn.id = 'filterAction';
+  btn.id = btnId;
   btn.className = 'filter-action';
   btn.type = 'button';
-  anchor.insertAdjacentElement('afterend', btn);
+  chips.insertAdjacentElement('afterend', btn);
   btn.addEventListener('click', () => {
-    const anyOn = state.series.size || state.plats.size;
-    if (anyOn) {
-      state.series.clear();
-      state.plats.clear();
-      localStorage.removeItem('ontrack_series');
-      localStorage.removeItem('ontrack_plats');
+    const set = setKey === 'series' ? state.series : state.plats;
+    const store = setKey === 'series' ? 'ontrack_series' : 'ontrack_plats';
+    if (set.size) {
+      set.clear();
+      localStorage.removeItem(store);
     } else {
-      events.forEach(e => state.series.add(e.series));
-      events.forEach(e => e.platforms.forEach(p => state.plats.add(p)));
-      localStorage.setItem('ontrack_series', JSON.stringify(Array.from(state.series)));
-      localStorage.setItem('ontrack_plats', JSON.stringify(Array.from(state.plats)));
+      if (setKey === 'series') events.forEach(e => state.series.add(e.series));
+      else events.forEach(e => e.platforms.forEach(p => state.plats.add(p)));
+      localStorage.setItem(store, JSON.stringify(Array.from(set)));
     }
     buildChips();
     renderSchedule();
   });
+}
+function buildFilterAction() {
+  addFilterBtn('seriesChips', 'series', 'faSeries');
+  addFilterBtn('platChips', 'plats', 'faPlats');
   syncFilterAction();
 }
 function syncFilterAction() {
-  const btn = document.getElementById('filterAction');
-  if (!btn) return;
-  const total = state.series.size + state.plats.size;
-  const anyOn = total > 0;
-  btn.classList.toggle('is-clear', anyOn);
-  btn.setAttribute('aria-pressed', anyOn);
-  btn.innerHTML = anyOn
-    ? '<span class="fa-ic">✕</span><span class="fa-lb">Clear filters</span><span class="fa-ct">' + total + '</span>'
-    : '<span class="fa-ic">＋</span><span class="fa-lb">Select all</span>';
+  [['faSeries', state.series, 'series'], ['faPlats', state.plats, 'platforms']].forEach(function (row) {
+    const btn = document.getElementById(row[0]);
+    if (!btn) return;
+    const set = row[1], label = row[2], on = set.size > 0;
+    btn.classList.toggle('is-clear', on);
+    btn.setAttribute('aria-pressed', on);
+    btn.innerHTML = on
+      ? '<span class="fa-lb">Clear ' + label + '</span><span class="fa-ct">' + set.size + '</span>'
+      : '<span class="fa-lb">Select all ' + label + '</span>';
+  });
 }
 // Rebuild a fully self-contained copy by re-inlining every external source file at runtime,
 // so exported/downloaded copies still work standalone even though the served app is multi-file.
@@ -165,7 +170,7 @@ function boot() {
         if (json && Array.isArray(json.events)) {
           DATA = json;
           try { localStorage.setItem('ontrack_data', JSON.stringify(json)); } catch (e) {}
-          hydrate(); buildChips(); buildJump(); render();
+          hydrate(); buildChips(); buildJump(); buildFilterAction(); render();
           $('#dataStamp').textContent = ' · listings ' + (DATA.version || APP_DATE);
         }
       })
