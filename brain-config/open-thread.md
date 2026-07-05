@@ -22,26 +22,29 @@ Reconcile naming + content on the next Toolkit-doc pass.
 Goal: profile header + metadata sidecar = the one source of truth for an agent's name; every surface reads from it, nothing hand-copies it.
 
 **RESOLVED in v3.3:**
-- ~~Three fighting identity files (`.metadata.json` sidecar vs `<slug>/agent.json` vs `.md` front-matter).~~ Ruling: **sidecar wins.** `agent.json` folded into each sidecar (kept `initials` + `blurb` + `reportsIndex`) and deleted.
-- ~~Report folders keyed by legacy slugs (`research-runner`, `red-team-reviewer`).~~ Renamed to current slugs (`scout-sage`, `workshop-wes`). Everything now keys off one slug.
+- ~~Three fighting identity files.~~ Sidecar wins; `agent.json` folded in + deleted.
+- ~~Report folders keyed by legacy slugs.~~ Renamed to current slugs (`scout-sage`, `workshop-wes`).
 
 **STILL OPEN:**
-- **(a) ClickUp AI Toolkit doc** — Subagent roster + Quick-Scan trigger table hard-code display names + nicknames, and the roster still points at the deleted `repo-auditor.md`/old paths. Fix on the next Toolkit-doc pass.
+- **(a) ClickUp AI Toolkit doc** — Subagent roster + Quick-Scan trigger table hard-code display names + nicknames. Fix on the next Toolkit-doc pass.
 - **(b) Viewer NICKNAMES map** — `source/data.js` still carries a hard-coded `NICKNAMES` map. Ideal fix: drop it and read `nicknames` from each sidecar at load time (the viewer already fetches them). Now easy since all 22 sidecars carry identity.
 
 ---
 
-## Report Schema Lock + Reports Tab Build
-**Added:** 2026-07-04 (v3.3)
+## Report Schema + Reports Tab
+**Added:** 2026-07-04 (v3.3) · **RESOLVED:** 2026-07-04 (v3.4)
 
-Prior art confirmed (Workshop Wes's 2026-07-04 seven-lens review): reports are **per-agent JSON**, NOT stored HTML. Viewer renders JSON -> formatted view on the fly; HTML is an on-demand export, never a second stored copy (avoids source-of-truth drift + the 30KB write-cap clip).
+- ~~Lock the report JSON schema.~~ DONE: `brain-config/report-schema.md` (envelope + audit/review/research bodies).
+- ~~Build the Reports tab.~~ DONE: `source/reports.js` (list, per-type render, on-demand HTML export, empty state), loaded by the shell before `detail.js`.
+- ~~detail.js tab shell.~~ DONE: report-makers land on Reports first, Settings second; lenses land straight on Settings (no tab). `makesReports` gates it. `KEY_ORDER` extended with `initials`/`blurb`/`reportsIndex`.
 
-**Locked design (A/A/A + fold, per Michael 2026-07-04):**
-- `makesReports` flag lives in the sidecar `toggles` bag. TRUE for seat audit/close/research: Renata, Clio, Hana, Sage. Empty `reports/index.json` seeded for all four.
-- Clicking an agent lands on **Reports first**, Settings second tab. Report-maker with no reports -> "No reports yet" empty state. Non-report-maker (lens) -> land straight on Settings, no Reports tab shown.
-- Report folder: `brain-config/agents/<slug>/reports/` with `index.json` (list metadata) + per-report `<ts>.json`.
+**Follow-ups (not blocking):**
+- No `research`-type report exists yet; the renderer + schema are defined and ready for Scout Sage's first real report.
+- Consider a deep-link sub-route (`#agent/<slug>/report/<id>`) if sharing a single report becomes useful. Currently tabs switch in-place without a hash change.
 
-**TO BUILD:**
-1. **Lock the report JSON schema** as a committed doc (`brain-config/report-schema.md`, sibling to `metadata-schema.md`). Shared envelope: `id, type, ts, target, verdictWord, verdictPill, pillText, delta, summary, tally[]`. Type-specific body: `findings[]` + `apps[]` + `clean[]` (audit), `lenses[]` + `call` (review), research shape TBD (question/confidence/sources[]).
-2. **Build the Reports tab.** Likely a NEW `source/reports.js` module (detail.js is ~26KB, near the 30KB cap — do NOT cram the tab + per-type renderers into it; mirror the detail.js-out-of-app.js split). Per-`type` renderer, tab switcher, on-demand HTML export.
-3. **detail.js:** add `initials` / `blurb` / `reportsIndex` to `KEY_ORDER` so the copy-block ordering stays clean for the reconciled sidecars (currently they append after `toggles`, cosmetic only).
+---
+
+## Routine Ricky — promoted to Super Agent
+**Added:** 2026-07-04 (v3.4)
+
+Ricky was promoted to a live ClickUp Super Agent (created mid-session, hence not in the agent-search registry earlier). His git profile is PARKED at `agents/_archive/routine-ricky.md` with a strengthened banner: the Super Agent's preferences are now the source of truth; the archived file is a stale pre-promotion snapshot. To revive as a standalone git tool, review the live Super Agent's prefs FIRST and reconcile before reusing the name. The `routines/` subsystem is his live runtime data — never delete it. He is intentionally OUT of the viewer roster.

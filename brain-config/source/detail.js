@@ -1,20 +1,8 @@
-/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch button + v3.2 row enrichment).
-   Self-wiring: owns #agent/<slug> routing, the detail/edit view, AND seamless agent-row
-   enrichment in the index. Deliberately kept OUT of app.js so the Run-me launcher engine
-   stays untouched. Loaded by the shell after data.js + app.js. IIFE-scoped: no globals leak.
-
-   What it does:
-   1. Rewrites every agent card's name link to #agent/<slug> (MutationObserver-driven,
-      survives app.js re-renders on sort changes).
-   2. Enriches agent rows: app.js reads `**Purpose:**` inline-bold which agent profiles
-      don't use (they carry a `## Purpose` heading + a `role` in the sidecar), so agent
-      rows render with an EMPTY purpose cell and look sparse next to hooks. This pass fills
-      each agent row's purpose from its metadata.json `role` (+ badge if present), making
-      agents seamless with the rest of the index. Zero app.js edits.
-   3. Routes #agent/<slug> -> a detail view built from the sidecar (raw.githubusercontent path).
-   4. Editable fields + live commit-ready metadata.json block with a copy button.
-   5. Bottom of the detail page: a "Launch this agent" button (ALL agents) that copies the
-      current launch prompt and opens Brain. */
+/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch + v3.2 row enrichment + v3.4 tabs).
+   Self-wiring: owns #agent/<slug> routing, the detail view, agent-row enrichment,
+   and (for report-makers) a Reports|Settings tab shell that delegates the Reports
+   pane to source/reports.js. Kept OUT of app.js so the Run-me launcher stays untouched.
+   IIFE-scoped: no globals leak. Loaded after data.js + app.js + reports.js. */
 (function () {
   'use strict';
 
@@ -23,14 +11,13 @@
 
   var LAUNCH_TARGET = (typeof BRAIN_MAX_URL !== 'undefined' && BRAIN_MAX_URL) ? BRAIN_MAX_URL : 'https://app.clickup.com/home';
 
-  var KEY_ORDER = ['slug', 'type', 'name', 'colloquialName', 'nicknames', 'status',
-    'seat', 'teams', 'role', 'accent', 'badge', 'created', 'shortcut', 'launchPrompt', 'toggles'];
+  var KEY_ORDER = ['slug', 'type', 'name', 'colloquialName', 'initials', 'nicknames', 'status',
+    'seat', 'teams', 'role', 'blurb', 'accent', 'badge', 'created', 'shortcut', 'launchPrompt', 'reportsIndex', 'toggles'];
 
   var BADGE_OPTS = ['', 'halt', 'warn', 'silent'];
   var BADGE_LABELS = ['(none)', 'halt', 'warn', 'silent'];
   var STATUS_OPTS = ['active', 'building', 'dormant', 'retired'];
 
-  // sidecar cache shared by row-enrichment + detail view (one fetch per agent per load)
   var sidecarCache = {};
   function getSidecar(slug) {
     if (sidecarCache[slug]) return sidecarCache[slug];
@@ -39,7 +26,6 @@
     return sidecarCache[slug];
   }
 
-  // ---------- scoped styles ----------
   function injectStyles() {
     if (document.getElementById('agentdetail-styles')) return;
     var css = [
@@ -52,8 +38,12 @@
       '.ad-swatch{width:18px;height:18px;border-radius:5px;border:1px solid var(--border);flex:none;}',
       '.ad-head h2{font-size:1.375rem;font-weight:700;letter-spacing:-.02em;}',
       '.ad-sub{color:var(--text-dim);font-size:.8125rem;margin-bottom:3px;line-height:1.45;}',
-      '.ad-meta{color:var(--text-dim);font-size:.6875rem;margin-bottom:24px;font-variant-numeric:tabular-nums;}',
+      '.ad-meta{color:var(--text-dim);font-size:.6875rem;margin-bottom:20px;font-variant-numeric:tabular-nums;}',
       '.ad-meta code{color:var(--text);background:var(--surface-2);padding:1px 5px;border-radius:3px;}',
+      '.ad-tabs{display:flex;gap:2px;margin-bottom:22px;border-bottom:1px solid var(--border);}',
+      '.ad-tab{font-size:.8125rem;font-weight:600;color:var(--text-dim);background:none;border:none;border-bottom:2px solid transparent;padding:9px 15px;cursor:pointer;margin-bottom:-1px;transition:color 150ms,border-color 150ms;}',
+      '.ad-tab:hover{color:var(--text);}',
+      '.ad-tab.active{color:var(--accent);border-bottom-color:var(--accent);}',
       '.ad-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px 18px;margin-bottom:8px;}',
       '.ad-field{display:flex;flex-direction:column;gap:5px;}',
       '.ad-field.wide{grid-column:1/-1;}',
@@ -103,7 +93,6 @@
     document.head.appendChild(st);
   }
 
-  // ---------- panel ----------
   var panel;
   function ensurePanel() {
     if (panel) return panel;
@@ -116,7 +105,6 @@
     return panel;
   }
 
-  // ---------- helpers ----------
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function arr(v) { return Array.isArray(v) ? v : []; }
   function splitList(s) { return String(s).split(',').map(function (x) { return x.trim(); }).filter(Boolean); }
@@ -142,7 +130,6 @@
 
   function notify(msg) { if (typeof showToast === 'function') showToast(msg); }
 
-  // ---------- agent card links -> #agent/<slug> + row enrichment ----------
   function rewriteLinks() {
     var content = document.getElementById('content');
     if (!content) return;
@@ -156,7 +143,6 @@
     });
   }
 
-  // Fill empty agent-row purpose from the sidecar `role`, add badge parity with hooks.
   function enrichRows() {
     var content = document.getElementById('content');
     if (!content) return;
@@ -166,7 +152,7 @@
       if (!slug || slug === 'skip') { row.setAttribute('data-enriched', 'skip'); return; }
       row.setAttribute('data-enriched', '1');
       var purposeCell = row.querySelector('.tool-purpose');
-      if (purposeCell && purposeCell.textContent.trim()) return; // app.js already filled it
+      if (purposeCell && purposeCell.textContent.trim()) return;
       getSidecar(slug).then(function (data) {
         if (purposeCell && data.role) {
           purposeCell.textContent = data.role;
@@ -181,7 +167,7 @@
             nameCell.appendChild(b);
           }
         }
-      }).catch(function () { /* leave the row as-is on failure */ });
+      }).catch(function () {});
     });
   }
 
@@ -194,7 +180,6 @@
     new MutationObserver(function () { refreshIndex(); }).observe(content, { childList: true, subtree: true });
   }
 
-  // ---------- field builders ----------
   function fieldText(id, label, val, hint) {
     return '<div class="ad-field"><label for="' + id + '">' + label +
       (hint ? ' <span class="hint">' + hint + '</span>' : '') + '</label>' +
@@ -219,25 +204,14 @@
       '<button type="button" class="rm">remove</button></div>';
   }
 
-  // ---------- render detail ----------
-  function renderDetail(slug, data) {
-    var p = ensurePanel();
+  function settingsHtml(data) {
     var toggles = (data.toggles && typeof data.toggles === 'object') ? data.toggles : {};
     var togKeys = Object.keys(toggles);
     var togHtml = togKeys.length
       ? togKeys.map(function (k) { return toggleRow(k, toggles[k]); }).join('')
       : '<div class="ad-empty">No toggles yet. Add one below — open-ended bag, no schema change.</div>';
-    var who = data.colloquialName || data.name || slug;
-
-    p.innerHTML =
-      '<a class="ad-back" href="#">\u2190 All tools</a>' +
-      '<div class="ad-head"><span class="ad-swatch" id="ad-swatch" style="background:' + esc(data.accent || 'var(--agent)') + '"></span>' +
-      '<h2>' + esc(data.name || slug) + '</h2></div>' +
-      '<div class="ad-sub">' + esc(data.role || '') + '</div>' +
-      '<div class="ad-meta"><code>' + esc(slug) + '</code> &middot; type ' + esc(data.type || 'agent') +
-      ' &middot; seat ' + esc(data.seat || '—') + ' &middot; created ' + esc(data.created || '—') +
-      ' &middot; shortcut ' + (data.shortcut ? 'true' : 'false') + '</div>' +
-      '<div class="ad-grid">' +
+    var who = data.colloquialName || data.name || data.slug;
+    return '<div class="ad-grid">' +
       fieldText('ad-colloquial', 'Colloquial name', data.colloquialName || '') +
       fieldSelect('ad-status', 'Status', STATUS_OPTS, STATUS_OPTS, data.status || 'active') +
       fieldText('ad-nicknames', 'Nicknames', arr(data.nicknames).join(', '), 'comma-separated') +
@@ -250,12 +224,16 @@
       '<div class="ad-toggles"><h3>Toggles</h3><div id="ad-toglist">' + togHtml + '</div>' +
       '<div class="ad-addtoggle"><input type="text" id="ad-togkey" placeholder="newToggleKey" spellcheck="false"><button type="button" id="ad-togadd">Add toggle</button></div></div>' +
       '</div>' +
-      '<div class="ad-json"><div class="ad-json-head"><span class="path">writes to <code>' + AGENTS_DIR + '/' + esc(slug) + '.metadata.json</code></span>' +
+      '<div class="ad-json"><div class="ad-json-head"><span class="path">writes to <code>' + AGENTS_DIR + '/' + esc(data.slug) + '.metadata.json</code></span>' +
       '<button type="button" class="ad-copy" id="ad-copy">Copy block</button></div>' +
       '<textarea id="ad-jsonout" readonly spellcheck="false"></textarea></div>' +
       '<div class="ad-launch-wrap"><a class="ad-launch-btn" id="ad-launch-btn" href="' + esc(LAUNCH_TARGET) + '" target="_blank" rel="noopener">\u25B6 Launch this agent</a>' +
       '<span class="ad-launch-note">Copies the launch prompt and opens Brain in a new tab. Paste, and you\u2019re talking to ' + esc(who) + '.</span></div>';
+  }
 
+  function wireSettings(slug, data) {
+    var p = ensurePanel();
+    var who = data.colloquialName || data.name || slug;
     var work = JSON.parse(JSON.stringify(data));
 
     function regen() {
@@ -268,7 +246,8 @@
       var acc = document.getElementById('ad-accent').value.trim();
       work.accent = acc;
       document.getElementById('ad-accent-sw').style.background = acc || 'var(--agent)';
-      document.getElementById('ad-swatch').style.background = acc || 'var(--agent)';
+      var sw = document.getElementById('ad-swatch');
+      if (sw) sw.style.background = acc || 'var(--agent)';
       work.launchPrompt = document.getElementById('ad-launch').value;
       var tg = {};
       p.querySelectorAll('#ad-toglist .ad-toggle').forEach(function (row) {
@@ -321,6 +300,43 @@
     });
 
     regen();
+  }
+
+  function renderDetail(slug, data) {
+    var p = ensurePanel();
+    var makesReports = !!(data.toggles && data.toggles.makesReports) && !!window.AgentReports;
+    var chrome =
+      '<a class="ad-back" href="#">\u2190 All tools</a>' +
+      '<div class="ad-head"><span class="ad-swatch" id="ad-swatch" style="background:' + esc(data.accent || 'var(--agent)') + '"></span>' +
+      '<h2>' + esc(data.name || slug) + '</h2></div>' +
+      '<div class="ad-sub">' + esc(data.role || '') + '</div>' +
+      '<div class="ad-meta"><code>' + esc(slug) + '</code> &middot; type ' + esc(data.type || 'agent') +
+      ' &middot; seat ' + esc(data.seat || '—') + ' &middot; created ' + esc(data.created || '—') +
+      ' &middot; shortcut ' + (data.shortcut ? 'true' : 'false') + '</div>';
+
+    if (makesReports) {
+      p.innerHTML = chrome +
+        '<div class="ad-tabs"><button class="ad-tab active" data-tab="reports">Reports</button>' +
+        '<button class="ad-tab" data-tab="settings">Settings</button></div>' +
+        '<div class="ad-pane" id="ad-pane-reports"></div>' +
+        '<div class="ad-pane" id="ad-pane-settings" hidden>' + settingsHtml(data) + '</div>';
+      wireSettings(slug, data);
+      var tabs = p.querySelectorAll('.ad-tab');
+      tabs.forEach(function (t) {
+        t.addEventListener('click', function () {
+          tabs.forEach(function (x) { x.classList.remove('active'); });
+          t.classList.add('active');
+          var which = t.getAttribute('data-tab');
+          document.getElementById('ad-pane-reports').hidden = which !== 'reports';
+          document.getElementById('ad-pane-settings').hidden = which !== 'settings';
+        });
+      });
+      window.AgentReports.mount(document.getElementById('ad-pane-reports'), slug, data);
+    } else {
+      p.innerHTML = chrome + settingsHtml(data);
+      wireSettings(slug, data);
+    }
+
     document.body.classList.add('detail-open');
     window.scrollTo(0, 0);
   }

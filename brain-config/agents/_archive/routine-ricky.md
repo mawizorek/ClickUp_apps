@@ -1,8 +1,21 @@
-> **PARKED 2026-07-04.** Routine Ricky was promoted to a ClickUp **Super Agent** (his instructions now live in that agent's config, not this file). This profile is retained as the authoring source in case the Super Agent is ever closed and we want to revive Ricky as an on-demand, git-profiled routine agent. He is intentionally OUT of the active roster and the viewer while the Super Agent is live.
+> # ⚠️ SUPERSEDED BY A CLICKUP SUPER AGENT (2026-07-04)
 >
-> **Do NOT delete the `routines/` subsystem** (`routines/schedule.md`, runbooks, `data.json`): that is the Super Agent's live runtime data, unrelated to parking this identity file.
+> Routine Ricky is **no longer a git-profiled agent.** He was promoted to a live **ClickUp Super Agent**, and that Super Agent's configured preferences are now the **SINGLE SOURCE OF TRUTH** for his identity, instructions, cadence, and behavior. This file is a deactivated snapshot, parked out of the active roster and the viewer so the two can't drift or double-run.
 >
-> To revive: move this file back to `brain-config/agents/routine-ricky.md`, mint a `routine-ricky.metadata.json` sidecar (seat `executor`, `makesReports: false`, `shortcut: false`), and confirm the Super Agent is closed so the two don't double-run.
+> **This snapshot is almost certainly already stale.** It reflects Ricky as authored *before* promotion; the Super Agent may have been tuned since, and nothing syncs the two. Do NOT treat anything below as current truth.
+>
+> ## Before reviving this as a standalone git tool
+>
+> If the Super Agent is ever closed and you want an on-demand, git-profiled routine agent again, you MUST:
+> 1. **Open the live Super Agent's preferences FIRST and read them as the authority.** Reconcile every difference (role, rules, cadence, tools, report targets) into this file before trusting it.
+> 2. Do NOT call a revived agent "the same as" the Super Agent until that reconciliation is done. The names may match; the behavior may not. Assume divergence until proven otherwise.
+> 3. Only then move this file back to `brain-config/agents/routine-ricky.md` and mint a `routine-ricky.metadata.json` sidecar (seat `executor`, `makesReports: false`, `shortcut: false`).
+> 4. Confirm the Super Agent is actually closed so the two don't double-run the same routines.
+>
+> **Never delete the `routines/` subsystem** (`routines/schedule.md`, runbooks, `data.json`): that is live runtime data the Super Agent reads, unrelated to this parked identity file.
+>
+> ---
+> _Everything below is the pre-promotion authoring snapshot, retained for reference only._
 
 ---
 
