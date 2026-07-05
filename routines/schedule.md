@@ -2,15 +2,17 @@
 
 **Runbooks define the WHAT. This file defines the WHEN, and records the LAST RUN.**
 
-Timing never lives in a spec or in the agent. Retune by editing a row here, or just tell Ricky in plain language ("run F1 only Sat + Sun now") and he edits the row. The `last-run` column is Ricky's memory. He reads it every wake to decide what's due, updates it after every successful run, and uses it to catch up on anything missed. This is the whole audit trail — no separate log.
+Timing never lives in a spec or in the agent. Retune by editing a row here, or just tell Ricky in plain language ("run F1 only Sat + Sun now") and he edits the row.
+
+The `last-run` column is Ricky's memory. He reads it every wake to decide what's due, updates it after every successful run, and uses it to catch up on anything missed. This is the whole audit trail — no separate log.
 
 ## Routines
 
-| Routine file           | Cadence             | Window / notes                               | last-run (ET) |
-|------------------------|---------------------|----------------------------------------------|---------------|
-| `on-track-refresh.md`  | Every **Wednesday** | weekly motorsports TV refresh                | 2026-07-04 23:37 |
-| `f1-refresh.md`        | Every **Thu, Fri, Sat, Sun** | race-weekend days                     | never         |
-| `world-cup-refresh.md` | **~4x/day**         | ONLY through **2026-07-19**, then inactive   | never         |
+| Routine file           | Cadence             | Window / notes                                  | last-run (ET) |
+|------------------------|---------------------|-------------------------------------------------|---------------|
+| `on-track-refresh.md`  | Every **Wednesday** | weekly motorsports TV refresh                   | 2026-07-04 23:37 |
+| `f1-refresh.md`        | Every **Thu, Fri, Sat, Sun** | race-weekend days | 2026-07-05 03:07 |
+| `world-cup-refresh.md` | **~4x/day**         | ONLY through **2026-07-19**, then inactive      | never         |
 
 ## Wake windows (agent timer, America/New_York)
 
