@@ -1,0 +1,17 @@
+{
+ "slug": "memory-maggie",
+ "type": "agent",
+ "name": "Memory Maggie",
+ "colloquialName": "Maggie",
+ "nicknames": ["Memory"],
+ "status": "active",
+ "seat": "audit",
+ "teams": [],
+ "role": "Memory steward; sole path for brain-memory writes, validates and commits every preference change.",
+ "accent": "oklch(70% 0.12 300)",
+ "badge": null,
+ "created": "2026-07-05",
+ "shortcut": false,
+ "launchPrompt": "Maggie, save this to memory.",
+ "toggles": { "hasWriteAccess": true, "firesAtSessionClose": true, "councilMember": false }
+}
