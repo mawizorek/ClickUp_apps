@@ -1,8 +1,16 @@
-/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch + v3.2 row enrichment + v3.4 tabs).
+/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch + v3.2 rows + v3.4 tabs + v3.5 fixes).
    Self-wiring: owns #agent/<slug> routing, the detail view, agent-row enrichment,
-   and (for report-makers) a Reports|Settings tab shell that delegates the Reports
-   pane to source/reports.js. Kept OUT of app.js so the Run-me launcher stays untouched.
-   IIFE-scoped: no globals leak. Loaded after data.js + app.js + reports.js. */
+   default index ordering, and (for report-makers) a Reports|Settings tab shell that
+   delegates the Reports pane to source/reports.js. Kept OUT of app.js so the Run-me
+   launcher stays untouched. IIFE-scoped. Loaded after data.js + app.js + reports.js.
+
+   v3.5:
+   - CLICK FIX: a delegated click handler on #content opens the agent detail directly
+     (in-app webviews were not reliably firing hashchange on anchor taps). Falls back to
+     parsing the blob href if link-rewrite hasn't run yet. Non-agent links behave normally.
+   - Reports tag: report-makers get a "Reports" badge in the index row.
+   - Default sort (shelf view only): agents => reporters first, then most-used; hooks/gates
+     => badge severity (halt>warn>silent) then most-used. Idempotent, respects manual sorts. */
 (function () {
   'use strict';
 
@@ -17,6 +25,8 @@
   var BADGE_OPTS = ['', 'halt', 'warn', 'silent'];
   var BADGE_LABELS = ['(none)', 'halt', 'warn', 'silent'];
   var STATUS_OPTS = ['active', 'building', 'dormant', 'retired'];
+
+  var reordering = false;
 
   var sidecarCache = {};
   function getSidecar(slug) {
@@ -49,7 +59,7 @@
       '.ad-field.wide{grid-column:1/-1;}',
       '.ad-field label{font-size:.6875rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);font-weight:600;}',
       '.ad-field .hint{font-size:.625rem;color:var(--text-dim);text-transform:none;letter-spacing:0;font-weight:400;}',
-      '.ad-field input[type=text],.ad-field textarea,.ad-field select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font:inherit;font-size:.8125rem;padding:8px 10px;outline:none;transition:border-color 150ms;width:100%;}',
+      '.ad-field input[type=text],.ad-field textarea,.ad-field select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:16px;padding:8px 10px;outline:none;transition:border-color 150ms;width:100%;}',
       '.ad-field input[type=text]:focus,.ad-field textarea:focus,.ad-field select:focus{border-color:var(--accent);}',
       '.ad-field textarea{resize:vertical;min-height:76px;line-height:1.5;}',
       '.ad-accent-row{display:flex;align-items:center;gap:9px;}',
@@ -65,7 +75,7 @@
       '.ad-toggle .rm:hover{border-color:var(--agent);color:var(--text);}',
       '.ad-empty{color:var(--text-dim);font-size:.75rem;padding:4px 0 2px;}',
       '.ad-addtoggle{display:flex;gap:8px;margin-top:12px;align-items:center;}',
-      '.ad-addtoggle input[type=text]{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font:inherit;font-size:.75rem;padding:7px 10px;outline:none;}',
+      '.ad-addtoggle input[type=text]{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:16px;padding:7px 10px;outline:none;}',
       '.ad-addtoggle input[type=text]:focus{border-color:var(--accent);}',
       '.ad-addtoggle button{font-size:.6875rem;color:var(--accent);background:transparent;border:1px solid var(--accent);border-radius:100px;padding:7px 15px;cursor:pointer;transition:all 150ms;white-space:nowrap;}',
       '.ad-addtoggle button:hover{background:var(--accent);color:var(--bg);}',
@@ -130,6 +140,31 @@
 
   function notify(msg) { if (typeof showToast === 'function') showToast(msg); }
 
+  // slug from an anchor: prefer the rewritten hash, then data-attr, then the raw blob href.
+  function slugFromAnchor(a) {
+    if (!a) return null;
+    var dl = a.getAttribute('data-agentlink');
+    if (dl && dl !== 'skip') return dl;
+    var href = a.getAttribute('href') || '';
+    var m1 = href.match(/^#agent\/(.+)$/);
+    if (m1) return decodeURIComponent(m1[1]);
+    var m2 = href.match(/\/agents\/([^\/]+)\.md/);
+    if (m2) return m2[1];
+    return null;
+  }
+
+  // Delegated open: in-app webviews don't reliably fire hashchange on anchor taps,
+  // so we intercept the click and open the detail directly. Non-agent links pass through.
+  function onContentClick(e) {
+    var a = e.target.closest('a');
+    if (!a) return;
+    var slug = slugFromAnchor(a);
+    if (!slug) return; // hook/gate links -> let them open GitHub normally
+    e.preventDefault();
+    if (location.hash === '#agent/' + slug) showDetail(slug);
+    else location.hash = '#agent/' + slug; // also updates history; route() is the fallback path
+  }
+
   function rewriteLinks() {
     var content = document.getElementById('content');
     if (!content) return;
@@ -152,32 +187,84 @@
       if (!slug || slug === 'skip') { row.setAttribute('data-enriched', 'skip'); return; }
       row.setAttribute('data-enriched', '1');
       var purposeCell = row.querySelector('.tool-purpose');
-      if (purposeCell && purposeCell.textContent.trim()) return;
       getSidecar(slug).then(function (data) {
-        if (purposeCell && data.role) {
+        if (purposeCell && data.role && !purposeCell.textContent.trim()) {
           purposeCell.textContent = data.role;
           row.dataset.search = (row.dataset.search || '') + ' ' + String(data.role).toLowerCase();
         }
-        if (data.badge) {
-          var nameCell = row.querySelector('.tool-name');
-          if (nameCell && !nameCell.querySelector('.badge')) {
-            var b = document.createElement('span');
-            b.className = 'badge badge-' + data.badge;
-            b.textContent = data.badge;
-            nameCell.appendChild(b);
-          }
+        var nameCell = row.querySelector('.tool-name');
+        if (data.badge && nameCell && !nameCell.querySelector('.badge-' + data.badge)) {
+          var b = document.createElement('span');
+          b.className = 'badge badge-' + data.badge;
+          b.textContent = data.badge;
+          nameCell.appendChild(b);
         }
+        var reports = !!(data.toggles && data.toggles.makesReports);
+        row.dataset.reports = reports ? '1' : '0';
+        if (reports && nameCell && !nameCell.querySelector('.badge-reports')) {
+          var rb = document.createElement('span');
+          rb.className = 'badge badge-reports';
+          rb.textContent = 'Reports';
+          nameCell.appendChild(rb);
+        }
+        reorderDefault();
       }).catch(function () {});
     });
   }
 
-  function refreshIndex() { rewriteLinks(); enrichRows(); }
+  // ---------- default index ordering (shelf view only, idempotent) ----------
+  function usesOf(row) {
+    var u = row.querySelector('.tool-meta .uses');
+    if (!u) return 0;
+    var n = parseInt(String(u.textContent).replace(/[^0-9]/g, ''), 10);
+    return isNaN(n) ? 0 : n;
+  }
+  function sevOf(row) {
+    var b = row.querySelector('.tool-name .badge');
+    if (!b) return 0;
+    if (b.classList.contains('badge-halt')) return 3;
+    if (b.classList.contains('badge-warn')) return 2;
+    if (b.classList.contains('badge-silent')) return 1;
+    return 0;
+  }
+  function rankKey(shelf, row) {
+    if (shelf === 'agents') return (row.dataset.reports === '1' ? 1 : 0) * 1000000 + usesOf(row);
+    return sevOf(row) * 1000000 + usesOf(row); // hooks/gates: badge severity then usage
+  }
+  function reorderDefault() {
+    if (reordering) return;
+    var content = document.getElementById('content');
+    if (!content) return;
+    var active = document.querySelector('.sort-btn.active');
+    if (active && active.getAttribute('data-sort') !== 'shelf') return; // respect manual sort
+    content.querySelectorAll('section').forEach(function (sec) {
+      var shelf = sec.dataset.shelf;
+      if (shelf !== 'agents' && shelf !== 'hooks' && shelf !== 'gates') return;
+      var list = sec.querySelector('.tool-list');
+      if (!list) return;
+      var rows = [].slice.call(list.children).filter(function (n) { return n.classList && n.classList.contains('tool'); });
+      if (rows.length < 2) return;
+      var ranked = rows.map(function (row, i) { return { row: row, i: i, key: rankKey(shelf, row) }; });
+      ranked.sort(function (x, y) { return (y.key - x.key) || (x.i - y.i); });
+      var changed = ranked.some(function (r, idx) { return r.row !== rows[idx]; });
+      if (!changed) return;
+      reordering = true;
+      ranked.forEach(function (r) { list.appendChild(r.row); });
+      reordering = false;
+    });
+  }
+
+  function refreshIndex() { rewriteLinks(); enrichRows(); reorderDefault(); }
 
   function observeContent() {
     var content = document.getElementById('content');
     if (!content) { setTimeout(observeContent, 120); return; }
+    if (!content.dataset.adClickBound) {
+      content.addEventListener('click', onContentClick);
+      content.dataset.adClickBound = '1';
+    }
     refreshIndex();
-    new MutationObserver(function () { refreshIndex(); }).observe(content, { childList: true, subtree: true });
+    new MutationObserver(function () { if (reordering) return; refreshIndex(); }).observe(content, { childList: true, subtree: true });
   }
 
   function fieldText(id, label, val, hint) {
