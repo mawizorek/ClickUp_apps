@@ -1,97 +1,55 @@
 # World Cup 2026 Bracket — Next Build Spec
 
-**Version target:** v3.0 (engine change, `index.html` version bump)
-**Current shipped:** v2.1 (engine) + data.json (data-separated, includes `rankings` map)
+**Version target:** v5.0 (engine, bracket path system overhaul)
+**Current shipped:** v4.3 (arrows) + data.json
 **Live:** https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/
 
-## Handoff prompt (one line for the render agent)
+## Handoff prompt
 
 > Read `world-cup-bracket/next-build-spec.md` from `mawizorek/ClickUp_apps` (branch main). Follow its instructions exactly.
 
-## Source pins (HEAD commit `6c6c5f22` at spec time)
+---
 
-- `index.html` blob SHA: `13c4bb55bcfbf8a1bdb3d00b4ceb7ac778a9bcca` (**30,453 bytes — OVER the ~30KB read cap**)
-- `data.json` blob SHA: `3095ba1456e642757d9611e3458cb6af57751ee3`
-- `README.md` blob SHA: `668260cec8feb3241374d638db3608b986739368`
-- Read source at: https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main/world-cup-bracket/index.html
+## Scratch intake (Michael, 2026-07-04 eve, voice)
 
-**⚠️ 30KB READ-CAP TRIGGER (Source-Size Budget Enforcer):** the engine now exceeds the ~30KB single-fetch cap. A raw fetch may clip before the end. **This build should be the modular split** (thin `index.html` shell + `./source/*.js` modules per Apps/Artifacts multi-file standard) OR, at minimum, commit a `/source` chunk set so the engine stays readable. Do NOT keep growing the monolith. Confirm the split approach with Michael before writing if unsure.
-
-**⚠️ Re-fetch live blob SHAs immediately before committing** (Commit Pre-Flight).
+1. **[SHIPPED v-data]** Artifact: selecting the lower team lit BOTH R16 games in the USA/BEL–POR/ESP quarter. **Root cause found + fixed 2026-07-04:** R32→R16 `feedsTo` was cross-wired (Belgium→14 & Spain→13 while their names sat in 13 & 14), so `buildPathSet` found a team in two nodes and lit both. Fixed by flipping match 17 feedsTo→13 and match 19 feedsTo→14 (commit 7b8988a). **Guardrail for v5:** `buildPathSet` should ALSO be hardened so a future data mismatch can't resurface this — prefer walking the `feedsTo` graph over name-matching every node, or de-dupe start nodes to the earliest round a team appears. Add a dev-only consistency assert: every non-TBD R16+ home/away should equal a winner reachable via its feeders.
+2. **[SHIPPED v4.3]** Arrows: schedule chevron now points DOWN (expand/open); bracket trace arrow now forward → (was ↗, read as share/send).
+3. **[v5 CORE]** Multi-select paths: select 2+ teams at once to see how their paths line up / where they'd collide.
+4. **[v5 CORE]** Color the paths. Michael floated round-based colors (R32 red, R16 blue, ...) making a line as they pass through. See recommendation below — I'm proposing a change to this.
 
 ---
 
-## Context: current engine shape (what you're editing)
+## Brainstorm recommendation (Dev + Creative, for Michael's ruling)
 
-Shipped through v2.1. Relevant existing machinery you'll reuse (do NOT rebuild):
+**On coloring: recommend PER-TEAM colors, not per-round.** Round-based coloring is decorative but not functional for the stated goal ("see how paths line up"): every team traverses the same rounds, so two teams would share identical round-colors and you couldn't tell whose path is whose. The information Michael actually wants lives in **which team goes where** and **where two contenders' paths converge** (the round they'd knock each other out). So:
 
-- `const APP_VERSION = 'v2.1';` — **bump to `'v3.0'`.**
-- `allMatches` + `rankings` loaded from data.json. Match shape: `{ id, round, day, dayLabel, home, away, hs, as, status, winner, venue, time, tbd, feedsTo, psoNote }`. `rankings` = `{ "Team": FIFArank }`.
-- `fedBy` reverse map (feedsTo inverted) — already built at load.
-- `slotLabel(match, side)` — depth-1 potential resolver ("winner of MAR/CAN").
-- `pathIn(m)` — the two feeder matchups into a match.
-- `advancesToFace(m)` — who a winner goes on to face.
-- `kickoffDate(m)` / `fmtCountdown()` — ET-string → Date, live countdown. Reuse verbatim.
-- `rankOf(name)` — team → FIFA rank.
-- **Schedule view** already has the tap-to-expand drawer (venue, kickoff, countdown, path-in, advances-to-face).
-- **Bracket view** already has the path-highlight on team tap (`applyPathHighlight`). Michael confirmed he loves this — PRESERVE it.
-- `renderBracketMatch(m)` / `bmTeam(m, side)` — bracket markup. Currently a team tap triggers path-highlight; there is NO match-level detail panel in the bracket yet.
+- **Each selected team gets its own accent color** from a small, colorblind-considerate palette (e.g. mint/current, amber, violet, cyan — 4 max). Its path glows that color through every round it can reach.
+- **Convergence highlight (the payoff):** the match where two selected teams' paths first meet gets a special split/dual-color treatment + a small "collision" marker. THAT is the "how do they line up" answer — it shows the earliest round two teams could meet.
+- **Round tint as optional secondary:** if Michael still wants round cues, apply a subtle left-border tint per round column (R32…Final) as ambient context, NOT as the path color. Keep it low-contrast so it never competes with team colors.
 
----
+**On multi-select mechanics (Interaction-State standard applies in full):**
+- Tap a team's → to ADD it to the compare set (assigns next palette color). Tap its → again to REMOVE. Cap at 4 (legibility on mobile); at cap, adding nudges "clear one first" rather than silently dropping.
+- A small **legend chip row** (pinned under the bracket hint) shows each selected team in its color with an ✕ to remove; a **Clear all** affordance resets.
+- **Exit/reset:** tap empty space clears ALL (extends current single-select reset); per-chip ✕ removes one; same-arrow-tap toggles one off.
+- **Collision with card-tap:** unchanged — card body still opens the detail sheet, → still owns path trace. Multi-select just lets → accumulate.
+- Dim non-path matches only when ≥1 team selected; with multiple, a match on ANY selected team's path stays lit in that team's color(s).
 
-## Next build (v3.0)
-
-### 🟢 CORE — Bracket-tap detail panel (Michael's committed ask)
-
-When a bracket match is tapped, surface a detail panel/sheet for THAT match. Michael's explicit list, every bracket slot (including future/TBD ones like the Final) must answer:
-
-1. **When** the game is played — date + kickoff time (e.g. "Sun Jul 19, 3:00 PM ET"). For future rounds this is already in data.json (dates/times/venues are FIFA-fixed). If the time is still TBD, show the date. Include the live **countdown** (reuse `kickoffDate`/`fmtCountdown`).
-2. **Where** — venue + city.
-3. **Possible matchups** — the contenders feeding this slot. Reuse `pathIn()` / `slotLabel()`. For a slot two+ rounds out this is the depth question (see guardrail): v3 may go **depth-N here** (a small contender pool) since the bracket is the natural place for it, BUT keep it legible. Decide in brainstorm: full pool vs "winner of (X/Y) vs winner of (W/Z)".
-
-**Interaction:** must NOT clobber the beloved path-highlight. Two tap behaviors now coexist on a bracket match:
-   - Tapping a **team row** → path-highlight (existing, keep).
-   - Tapping the **match** (the card body / a dedicated affordance) → detail panel.
-   Resolve the gesture collision cleanly: options to weigh in brainstorm — (a) team-row tap = highlight, match-frame/chevron tap = detail; (b) a small info affordance per match; (c) long-press vs tap. Pick the one that stays obvious on mobile and doesn't make the highlight harder to trigger. Whatever the choice, both must remain one-tap-discoverable.
-
-**Example acceptance:** tap the Final → panel shows "Sun Jul 19, 3:00 PM ET · MetLife, NJ · winner of [SF1 contenders] vs winner of [SF2 contenders]" + countdown ("in 15d").
-
-### 🟡 OPTIONAL — Potential odds (nice-to-have, Michael said not necessary)
-
-If it earns its place: a lightweight win-likelihood hint per contender in the detail panel. **No live odds API** (offline-first + no keys). Derive a cheap heuristic from the existing `rankings` map (e.g. rank-gap → rough favorite tag, or a simple Elo-ish % from rank). Label it clearly as an **estimate/for-fun**, never as real sportsbook odds (Professionalism + honesty gate). Cut without hesitation if it feels gimmicky or clutters the panel. Ship CORE with or without this.
+**Open question for Michael (the one decision needed):** per-team colors + convergence (my rec) vs his original round-colors, or both (team colors primary + round tint ambient)? Everything else above I'll take as default-yes unless he redirects.
 
 ---
 
-## Known guardrails (read before writing a line)
+## Known guardrails
 
-- **30KB cap is the headline constraint.** Engine is already over. This build splits or adds `/source`. See the trigger box up top.
-- **Preserve the path-highlight.** It's the confirmed favorite. Do not regress its one-tap feel.
-- **Depth for the bracket panel:** allowed to exceed depth-1 for "possible matchups" HERE (bracket is the right surface), but cap it so it stays readable — no unbounded "((A/B)/(C/D))" soup. Propose the exact depth in brainstorm.
-- **Mobile-first HARD requirement.** Detail panel must work at 320–390px: no overflow, ≥44px targets, sheet/panel scrolls if long. The bracket view is horizontally scrollable — make sure the panel doesn't fight the scroll.
-- **Palette locked.** Reuse OKLCH `--` tokens. No gradient text, side-stripe borders, glassmorphism, pure #000/#fff (Skill-Ban Guard).
-- **Odds must be labeled an estimate.** Never present a hand-rolled heuristic as real odds.
-- **Data schema:** dates/times/venues already exist. Odds heuristic uses existing `rankings` — do NOT add per-match odds fields unless the brainstorm decides to, and if so document them.
-- **Offline-first preserved.** fetch → localStorage → inline fallback intact. Countdown no-ops on stale data.
-- **Don't clobber the README.** Update status line + version history + roadmap.
+- 30KB/12KB module budget: multi-select + color logic likely warrants a new `source/paths.js` (buildPathSet, multi-set state, color assignment) split out of `bracket.js`. Auto-split per the enforcer; keep each file <12KB.
+- Palette locked for base UI (OKLCH); the multi-team palette is an ADDITION of accent hues, still OKLCH, colorblind-considerate, no gradient text / glassmorphism.
+- Mobile-first: legend chips must wrap, ≥44px targets, no overflow at 320px. The bracket already h-scrolls — the off-screen-highlight sliver (a highlighted card scrolled partly off the right edge reads as a floating fragment) is a known cosmetic rough edge; consider a subtle scroll-to-fit or edge fade when a path is traced.
+- Interaction-State standard (Dev+Research owned): every new control (chips, ✕, clear-all, multi-add) needs entry/exit/rest/collision answered.
+- Data-schema unchanged; colors/convergence computed at runtime from `fedBy` + selection state.
 
----
+## Futures (parked)
 
-## Pre-build gate
-
-This touches committed engine source, so it runs the **Brainstorm Gate (7 lenses)** before the spec is finalized into `Next build` proper — with three specific open questions to resolve:
-1. Modular split vs `/source` chunk set (30KB trigger).
-2. Gesture model for team-tap (highlight) vs match-tap (detail) coexistence.
-3. Contender-pool depth in the panel + whether odds ship in v3 or park to Futures.
-
----
-
-## Futures (parked, not this build)
-
-- Full contender-POOL rendering everywhere (depth-N in schedule too), if the bracket panel proves it's worth it.
+- Round tint ambient layer (if not shipped in v5).
 - Flag emoji / SVG flags per country.
-- Goal scorers / key moments in the tap drawer (needs new data fields).
-- Real odds feed (would need an API + key; out of scope for an offline-first static app).
+- Goal scorers / key moments in the road-to-here trail (needs data fields).
 
-## ⏳ Ephemeral
-
-Tournament ends Sun Jul 19, 2026. This spec + app + refresh guide archive/retire after the Final.
+## ⏳ Ephemeral — tournament ends Sun Jul 19, 2026. Archive after the Final.
