@@ -2,12 +2,12 @@
  "version": "2026-07-04",
  "tournament": "FIFA World Cup 2026",
  "rankings": {
-  "Argentina": 1, "France": 2, "Spain": 3, "England": 4, "Brazil": 5, "Morocco": 6,
-  "Portugal": 7, "Netherlands": 8, "Germany": 9, "Mexico": 10, "Belgium": 11, "Colombia": 12,
-  "Croatia": 13, "USA": 14, "Japan": 16, "Switzerland": 17, "Senegal": 19, "Norway": 22,
-  "Austria": 23, "Australia": 25, "Egypt": 26, "Algeria": 27, "Ecuador": 29, "Ivory Coast": 30,
-  "Canada": 31, "Sweden": 36, "Paraguay": 37, "DR Congo": 46, "South Africa": 56,
-  "Bosnia-Herz.": 62, "Cape Verde": 64, "Ghana": 65
+ "Argentina": 1, "France": 2, "Spain": 3, "England": 4, "Brazil": 5, "Morocco": 6,
+ "Portugal": 7, "Netherlands": 8, "Germany": 9, "Mexico": 10, "Belgium": 11, "Colombia": 12,
+ "Croatia": 13, "USA": 14, "Japan": 16, "Switzerland": 17, "Senegal": 19, "Norway": 22,
+ "Austria": 23, "Australia": 25, "Egypt": 26, "Algeria": 27, "Ecuador": 29, "Ivory Coast": 30,
+ "Canada": 31, "Sweden": 36, "Paraguay": 37, "DR Congo": 46, "South Africa": 56,
+ "Bosnia-Herz.": 62, "Cape Verde": 64, "Ghana": 65
  },
  "matches": [
  { "id": 1, "round": "R32", "day": "2026-06-28", "dayLabel": "Sat Jun 28", "home": "Canada", "away": "South Africa", "hs": 1, "as": 0, "status": "ft", "winner": "home", "venue": "Houston", "feedsTo": 9 },
@@ -18,9 +18,9 @@
  { "id": 6, "round": "R32", "day": "2026-06-30", "dayLabel": "Mon Jun 30", "home": "Ivory Coast", "away": "Norway", "hs": 1, "as": 2, "status": "ft", "winner": "away", "venue": "Seattle", "feedsTo": 11 },
  { "id": 7, "round": "R32", "day": "2026-06-30", "dayLabel": "Mon Jun 30", "home": "Mexico", "away": "Ecuador", "hs": 2, "as": 0, "status": "ft", "winner": "home", "venue": "Azteca, Mexico City", "feedsTo": 12 },
  { "id": 8, "round": "R32", "day": "2026-07-01", "dayLabel": "Tue Jul 1", "home": "England", "away": "DR Congo", "hs": 2, "as": 1, "status": "ft", "winner": "home", "venue": "Atlanta", "feedsTo": 12 },
- { "id": 17, "round": "R32", "day": "2026-07-01", "dayLabel": "Tue Jul 1", "home": "Belgium", "away": "Senegal", "hs": 3, "as": 2, "status": "aet", "winner": "home", "venue": "Miami", "feedsTo": 14 },
+ { "id": 17, "round": "R32", "day": "2026-07-01", "dayLabel": "Tue Jul 1", "home": "Belgium", "away": "Senegal", "hs": 3, "as": 2, "status": "aet", "winner": "home", "venue": "Miami", "feedsTo": 13 },
  { "id": 18, "round": "R32", "day": "2026-07-01", "dayLabel": "Tue Jul 1", "home": "USA", "away": "Bosnia-Herz.", "hs": 2, "as": 0, "status": "ft", "winner": "home", "venue": "Kansas City", "feedsTo": 13 },
- { "id": 19, "round": "R32", "day": "2026-07-02", "dayLabel": "Thu Jul 2", "home": "Spain", "away": "Austria", "hs": 3, "as": 0, "status": "ft", "winner": "home", "venue": "SoFi, LA", "feedsTo": 13 },
+ { "id": 19, "round": "R32", "day": "2026-07-02", "dayLabel": "Thu Jul 2", "home": "Spain", "away": "Austria", "hs": 3, "as": 0, "status": "ft", "winner": "home", "venue": "SoFi, LA", "feedsTo": 14 },
  { "id": 20, "round": "R32", "day": "2026-07-02", "dayLabel": "Thu Jul 2", "home": "Portugal", "away": "Croatia", "hs": 2, "as": 1, "status": "ft", "winner": "home", "venue": "Toronto", "feedsTo": 14 },
  { "id": 21, "round": "R32", "day": "2026-07-02", "dayLabel": "Thu Jul 2", "home": "Switzerland", "away": "Algeria", "hs": 2, "as": 0, "status": "ft", "winner": "home", "venue": "BC Place, Vancouver", "feedsTo": 15 },
  { "id": 22, "round": "R32", "day": "2026-07-03", "dayLabel": "Fri Jul 3", "home": "Argentina", "away": "Cape Verde", "hs": 3, "as": 2, "status": "aet", "winner": "home", "venue": "Miami", "feedsTo": 16 },
