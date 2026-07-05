@@ -33,9 +33,12 @@ header { margin-bottom: 32px; }
 header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
 header p { color: var(--text-dim); font-size: 0.8125rem; }
 
+/* Search bar. STANDARD (locked v3.6): inputs are 16px min to stop iOS Safari
+   auto-zoom-on-focus, and every search field carries a clear (x) button.
+   Reuse this pattern for any future search bar. */
 .search-wrap { margin-top: 12px; position: relative; }
 .search-wrap input {
- width: 100%; padding: 10px 12px 10px 32px;
+ width: 100%; padding: 10px 38px 10px 32px;
  background: var(--surface); border: 1px solid var(--border);
  border-radius: var(--radius); color: var(--text);
  font-size: 16px; font-family: inherit; outline: none;
@@ -45,8 +48,17 @@ header p { color: var(--text-dim); font-size: 0.8125rem; }
 .search-wrap input::placeholder { color: var(--text-dim); }
 .search-icon {
  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
- width: 14px; height: 14px; color: var(--text-dim);
+ width: 14px; height: 14px; color: var(--text-dim); pointer-events: none;
 }
+#search-clear {
+ position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+ width: 22px; height: 22px; padding: 0; border: none; cursor: pointer;
+ border-radius: 50%; background: var(--surface-2); color: var(--text-dim);
+ font-size: 16px; line-height: 1; display: none; align-items: center;
+ justify-content: center; transition: color 150ms, background 150ms;
+}
+#search-clear.visible { display: flex; }
+#search-clear:hover { color: var(--text); background: var(--border); }
 
 .controls { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
 
@@ -115,6 +127,8 @@ section.hidden { display: none; }
 }
 .tool:hover { background: var(--surface-2); }
 .tool.hidden { display: none; }
+/* Agent rows are fully clickable (wired in detail.js). */
+section[data-shelf="agents"] .tool { cursor: pointer; }
 
 .tool-name { font-size: 0.8125rem; font-weight: 600; }
 .tool-name a { color: var(--accent); text-decoration: none; }

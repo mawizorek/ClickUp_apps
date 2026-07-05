@@ -1,16 +1,15 @@
-/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch + v3.2 rows + v3.4 tabs + v3.5 fixes).
+/* Brain Config Index — agent detail module (Segment 2b + v3.1 launch + v3.2 rows + v3.4 tabs + v3.5 fixes + v3.6).
    Self-wiring: owns #agent/<slug> routing, the detail view, agent-row enrichment,
-   default index ordering, and (for report-makers) a Reports|Settings tab shell that
-   delegates the Reports pane to source/reports.js. Kept OUT of app.js so the Run-me
-   launcher stays untouched. IIFE-scoped. Loaded after data.js + app.js + reports.js.
+   default index ordering, the search clear-x, and (for report-makers) a Reports|Settings
+   tab shell that delegates the Reports pane to source/reports.js. Kept OUT of app.js so the
+   Run-me launcher stays untouched. IIFE-scoped. Loaded after data.js + app.js + reports.js.
 
-   v3.5:
-   - CLICK FIX: a delegated click handler on #content opens the agent detail directly
-     (in-app webviews were not reliably firing hashchange on anchor taps). Falls back to
-     parsing the blob href if link-rewrite hasn't run yet. Non-agent links behave normally.
-   - Reports tag: report-makers get a "Reports" badge in the index row.
-   - Default sort (shelf view only): agents => reporters first, then most-used; hooks/gates
-     => badge severity (halt>warn>silent) then most-used. Idempotent, respects manual sorts. */
+   v3.6:
+   - CACHE FIX: sidecars now fetch with cache:'no-cache' (revalidate), not 'force-cache'.
+     force-cache served a stale sidecar forever, so an agent viewed before a flag was added
+     (e.g. Renata pre-makesReports) kept showing the old data: no Reports tab, no Reports badge.
+   - WHOLE-CARD CLICK: the entire agent row opens the detail, not just the blue name.
+   - SEARCH CLEAR-X: wires the #search-clear button (clear + refocus + re-filter via app.js). */
 (function () {
   'use strict';
 
@@ -31,7 +30,7 @@
   var sidecarCache = {};
   function getSidecar(slug) {
     if (sidecarCache[slug]) return sidecarCache[slug];
-    sidecarCache[slug] = fetch(RAW + '/' + AGENTS_DIR + '/' + slug + '.metadata.json', { cache: 'force-cache' })
+    sidecarCache[slug] = fetch(RAW + '/' + AGENTS_DIR + '/' + slug + '.metadata.json', { cache: 'no-cache' })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
     return sidecarCache[slug];
   }
@@ -140,7 +139,6 @@
 
   function notify(msg) { if (typeof showToast === 'function') showToast(msg); }
 
-  // slug from an anchor: prefer the rewritten hash, then data-attr, then the raw blob href.
   function slugFromAnchor(a) {
     if (!a) return null;
     var dl = a.getAttribute('data-agentlink');
@@ -153,16 +151,20 @@
     return null;
   }
 
-  // Delegated open: in-app webviews don't reliably fire hashchange on anchor taps,
-  // so we intercept the click and open the detail directly. Non-agent links pass through.
-  function onContentClick(e) {
-    var a = e.target.closest('a');
-    if (!a) return;
-    var slug = slugFromAnchor(a);
-    if (!slug) return; // hook/gate links -> let them open GitHub normally
-    e.preventDefault();
+  function openAgent(slug) {
     if (location.hash === '#agent/' + slug) showDetail(slug);
-    else location.hash = '#agent/' + slug; // also updates history; route() is the fallback path
+    else location.hash = '#agent/' + slug;
+  }
+
+  // Delegated open: the WHOLE agent card opens the detail. In-app/Safari webviews were
+  // unreliable firing hashchange on anchor taps and the card outside the link did nothing.
+  // Non-agent anchors (hook/gate GitHub links) keep their default behavior.
+  function onContentClick(e) {
+    var row = e.target.closest('section[data-shelf="agents"] .tool');
+    if (row) {
+      var slug = slugFromAnchor(row.querySelector('.tool-name a'));
+      if (slug) { e.preventDefault(); openAgent(slug); return; }
+    }
   }
 
   function rewriteLinks() {
@@ -212,7 +214,6 @@
     });
   }
 
-  // ---------- default index ordering (shelf view only, idempotent) ----------
   function usesOf(row) {
     var u = row.querySelector('.tool-meta .uses');
     if (!u) return 0;
@@ -220,7 +221,7 @@
     return isNaN(n) ? 0 : n;
   }
   function sevOf(row) {
-    var b = row.querySelector('.tool-name .badge');
+    var b = row.querySelector('.tool-name .badge-halt, .tool-name .badge-warn, .tool-name .badge-silent');
     if (!b) return 0;
     if (b.classList.contains('badge-halt')) return 3;
     if (b.classList.contains('badge-warn')) return 2;
@@ -229,14 +230,14 @@
   }
   function rankKey(shelf, row) {
     if (shelf === 'agents') return (row.dataset.reports === '1' ? 1 : 0) * 1000000 + usesOf(row);
-    return sevOf(row) * 1000000 + usesOf(row); // hooks/gates: badge severity then usage
+    return sevOf(row) * 1000000 + usesOf(row);
   }
   function reorderDefault() {
     if (reordering) return;
     var content = document.getElementById('content');
     if (!content) return;
     var active = document.querySelector('.sort-btn.active');
-    if (active && active.getAttribute('data-sort') !== 'shelf') return; // respect manual sort
+    if (active && active.getAttribute('data-sort') !== 'shelf') return;
     content.querySelectorAll('section').forEach(function (sec) {
       var shelf = sec.dataset.shelf;
       if (shelf !== 'agents' && shelf !== 'hooks' && shelf !== 'gates') return;
@@ -265,6 +266,22 @@
     }
     refreshIndex();
     new MutationObserver(function () { if (reordering) return; refreshIndex(); }).observe(content, { childList: true, subtree: true });
+  }
+
+  // ---------- search clear-x (wires the shell button; refilter via app.js's input listener) ----------
+  function wireSearchClear() {
+    var search = document.getElementById('search');
+    var clr = document.getElementById('search-clear');
+    if (!search || !clr) return;
+    function sync() { clr.classList.toggle('visible', !!search.value); }
+    search.addEventListener('input', sync);
+    clr.addEventListener('click', function () {
+      search.value = '';
+      search.dispatchEvent(new Event('input', { bubbles: true }));
+      search.focus();
+      sync();
+    });
+    sync();
   }
 
   function fieldText(id, label, val, hint) {
@@ -452,6 +469,7 @@
     injectStyles();
     ensurePanel();
     observeContent();
+    wireSearchClear();
     window.addEventListener('hashchange', route);
     route();
   }
