@@ -1,13 +1,12 @@
 // World Cup 2026 Bracket - schedule view rendering.
-// Cards are compact; tapping one opens the SAME shared detail sheet the
-// bracket uses (no separate inline drawer). One popup, two entry points.
+// Landing = Agenda (full chronological list of upcoming games). The pill row is
+// a SWAPPING filter (one active at a time, each renders a different card set) --
+// not additive. Agenda is the home/reset the others bootstrap back to.
 import { S, POTENTIAL_PREFIX, today } from './store.js';
 import { cc, isComplete, winnerName, rankOf, slotLabel, kickoffDate, fmtCountdown, ROUND_FULL } from './util.js';
 import { openSheet } from './sheet.js';
 
-// The soonest day (>= today, ET) that still has an unplayed match. This is the
-// "next running game" surface Michael wants front-and-center: today if games
-// remain, otherwise tomorrow (or the next match day). Falls back to today.
+// Soonest day (>= today, ET) with an unplayed match -- the "next running game".
 function nextMatchDay() {
   const days = S.allMatches
     .filter(m => !isComplete(m) && m.day >= today)
@@ -16,9 +15,6 @@ function nextMatchDay() {
   return days.length ? days[0] : today;
 }
 
-// Honest relative label for a day-group header: Today / Tomorrow / Yesterday,
-// else null (the weekday dayLabel already shows). Fixes the old bug where any
-// surfaced day wore a "Today" badge.
 function relLabel(day) {
   const d0 = new Date(today + 'T00:00:00');
   const d = new Date(day + 'T00:00:00');
@@ -29,7 +25,11 @@ function relLabel(day) {
   return null;
 }
 
+// SWAPPING filters. `home:true` marks the full-agenda reset button.
+// Agenda = every not-yet-played match, chronological. It's the default + the
+// view every other filter bootstraps back to.
 export const periods = [
+  { id: 'agenda', label: 'Agenda', home: true, filter: m => !isComplete(m) },
   { id: 'next', label: 'Next up', filter: m => m.day === nextMatchDay() },
   { id: 'weekend', label: 'This Week', filter: m => {
     const d = new Date(m.day); const now = new Date();
@@ -42,11 +42,15 @@ export const periods = [
   { id: 'all', label: 'All', filter: () => true },
 ];
 
+export const DEFAULT_PERIOD = 'agenda';
+
 export function renderTimeNav() {
   const nav = document.getElementById('timeNav');
-  nav.innerHTML = periods.map((p, i) => {
+  nav.innerHTML = periods.map((p) => {
     const count = S.allMatches.filter(p.filter).length;
-    return `<button class="time-btn${i === 0 ? ' active' : ''}" data-period="${p.id}">${p.label}<span class="ct">${count}</span></button>`;
+    const active = p.id === DEFAULT_PERIOD ? ' active' : '';
+    const home = p.home ? ' is-home' : '';
+    return `<button class="time-btn${active}${home}" data-period="${p.id}">${p.label}<span class="ct">${count}</span></button>`;
   }).join('');
   nav.querySelectorAll('.time-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -58,15 +62,19 @@ export function renderTimeNav() {
 }
 
 export function renderSchedule(periodId) {
-  const period = periods.find(p => p.id === periodId);
-  const matches = S.allMatches.filter(period.filter);
+  const period = periods.find(p => p.id === periodId) || periods[0];
+  // Chronological always: sort by day, then kickoff time, before grouping.
+  const matches = S.allMatches.filter(period.filter).slice().sort((a, b) => {
+    if (a.day !== b.day) return a.day < b.day ? -1 : 1;
+    const ka = kickoffDate(a), kb = kickoffDate(b);
+    return (ka ? ka.getTime() : 0) - (kb ? kb.getTime() : 0);
+  });
   const container = document.getElementById('scheduleContent');
   const groups = {};
   matches.forEach(m => { (groups[m.dayLabel] = groups[m.dayLabel] || []).push(m); });
 
   let html = '';
   Object.entries(groups).forEach(([day, dayMatches]) => {
-    // Spell out the round above the cards it references (Quarterfinal, Semifinal, etc).
     const roundLabel = ROUND_FULL[dayMatches[0].round] || dayMatches[0].round;
     const rel = relLabel(dayMatches[0].day);
     html += `<div class="day-group"><div class="day-label">`
