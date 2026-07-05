@@ -14,7 +14,7 @@ The `last-run` column is Ricky's memory. He reads it every wake to decide what's
 
 ## Wake windows (agent timer, America/New_York)
 
-- **Now through 2026-07-19 (World Cup window):** Ricky fires **4 times a day — 06:00, 12:00, 18:00, 03:00**. Deliberately front/back-loaded, not an even split: a morning open, midday + evening to catch match results, and a 03:00 sweep to catch anything late. World Cup is due at each of these; the `last-run` interval guard prevents double-runs.
+- **Now through 2026-07-19 (World Cup window):** Ricky fires **4 times a day — 06:00, 15:00, 21:00, 03:00**. Deliberately back-loaded: mornings are dead for motorsport/football results, so after the 06:00 open the wakes cluster in the afternoon/evening/late-night when matches actually resolve. World Cup is due at each; the `last-run` guard prevents double-runs.
 - **After 2026-07-19:** severely relax to **once daily at 06:00**. That comfortably covers On Track (Wed) and F1 (Thu–Sun) via day-cadence + catch-up. Retune the agent timer down when the window closes.
 
 ## How Ricky decides what to run (all times America/New_York)
