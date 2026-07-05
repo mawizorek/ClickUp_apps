@@ -7,6 +7,48 @@ function toggleSet(set, val, key, el) {
   updateFilterCounts();
   renderSchedule();
 }
+// Master filter action: one full-width card button below both filter sections.
+// Shared slot — 'Select all' when nothing is active, flips to 'Clear filters' the
+// instant any series/platform chip is on. Injected (like the chips) so the HTML
+// shell stays untouched. syncFilterAction() keeps the label in lockstep with state
+// (called from renderSchedule, so it self-corrects no matter how filters change).
+function buildFilterAction() {
+  const anchor = document.getElementById('secWatch');
+  if (!anchor || document.getElementById('filterAction')) return;
+  const btn = document.createElement('button');
+  btn.id = 'filterAction';
+  btn.className = 'filter-action';
+  btn.type = 'button';
+  anchor.insertAdjacentElement('afterend', btn);
+  btn.addEventListener('click', () => {
+    const anyOn = state.series.size || state.plats.size;
+    if (anyOn) {
+      state.series.clear();
+      state.plats.clear();
+      localStorage.removeItem('ontrack_series');
+      localStorage.removeItem('ontrack_plats');
+    } else {
+      events.forEach(e => state.series.add(e.series));
+      events.forEach(e => e.platforms.forEach(p => state.plats.add(p)));
+      localStorage.setItem('ontrack_series', JSON.stringify(Array.from(state.series)));
+      localStorage.setItem('ontrack_plats', JSON.stringify(Array.from(state.plats)));
+    }
+    buildChips();
+    renderSchedule();
+  });
+  syncFilterAction();
+}
+function syncFilterAction() {
+  const btn = document.getElementById('filterAction');
+  if (!btn) return;
+  const total = state.series.size + state.plats.size;
+  const anyOn = total > 0;
+  btn.classList.toggle('is-clear', anyOn);
+  btn.setAttribute('aria-pressed', anyOn);
+  btn.innerHTML = anyOn
+    ? '<span class="fa-ic">✕</span><span class="fa-lb">Clear filters</span><span class="fa-ct">' + total + '</span>'
+    : '<span class="fa-ic">＋</span><span class="fa-lb">Select all</span>';
+}
 // Rebuild a fully self-contained copy by re-inlining every external source file at runtime,
 // so exported/downloaded copies still work standalone even though the served app is multi-file.
 // The current DATA is inlined too, so an offline copy renders the exact listings it was saved with.
@@ -97,6 +139,7 @@ function boot() {
   buildChips();
   buildJump();
   sectionInit();
+  buildFilterAction();
   render();
   wire();
   $('#verLine').textContent = 'On Track ' + APP_VERSION;
