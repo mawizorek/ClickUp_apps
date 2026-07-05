@@ -1,7 +1,7 @@
 // World Cup 2026 Bracket - entry point. Wires modules, loads data, boots views.
 import { S, APP_VERSION, BUILD_PR, DATA_URL, CACHE_KEY, REPO_OWNER, REPO_NAME, DATA_PATH } from './store.js';
 import { buildFedBy, byId } from './util.js';
-import { renderTimeNav, renderSchedule } from './schedule.js';
+import { renderTimeNav, renderSchedule, DEFAULT_PERIOD } from './schedule.js';
 import { renderBracket } from './bracket.js';
 import { togglePick, applyPaths } from './paths.js';
 import { initSheet } from './sheet.js';
@@ -112,7 +112,7 @@ async function init() {
   setupTraceBridge();
   initSheet(byId);
   renderTimeNav();
-  renderSchedule('next');
+  renderSchedule(DEFAULT_PERIOD);
   startCountdownTicker();
 }
 
