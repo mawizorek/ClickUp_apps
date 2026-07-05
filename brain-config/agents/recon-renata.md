@@ -63,12 +63,18 @@ Read-only audit of the repo. Checks structure, sizes, template conformance, and 
 - Agent profiles in `brain-config/agents/`: do they follow the canonical anatomy in `_template.md` (shared spine + one archetype middle)?
 - Flag any profile missing required sections or the front-matter identity block.
 
-### 5. Stragglers
+### 5. TIDR Footer Standard
+- Every app must ship a footer build stamp in the format `v<build> · PR#<n>` (running version + shipping PR, no date), written by the app's loaded JS so a stale bundle reveals itself. Standard: `template-app/FOOTER-STANDARD.md` + `template-app/source/version.js`.
+- Flag any app whose footer is missing the stamp entirely (the common gap: apps built before the standard).
+- Flag any stamp that doesn't match the `v<build> · PR#<n>` format (e.g. a leftover date, or a hardcoded string not driven by loaded JS).
+- Cross-check the stamped `PR#` against the app's latest shipping PR where determinable; flag an obviously stale number.
+
+### 6. Stragglers
 - Files at repo root that don't belong (anything except `.nojekyll`, `README.md`, and app folders).
 - Empty folders.
 - Orphaned files (not referenced by any index or profile).
 
-### 6. Commit Message Format
+### 7. Commit Message Format
 - Scan last ~10 commits. Flag any that don't follow the canonical format.
 
 ---
@@ -88,11 +94,11 @@ Read-only audit of the repo. Checks structure, sizes, template conformance, and 
 |---|----------|----------|---------|----------------|
 
 ### Size Table
-| App | index.html | /source | Status |
-|-----|-----------|---------|--------|
+| App | index.html | /source | Footer stamp | Status |
+|-----|-----------|---------|--------------|--------|
 
 ### Conformance
-[Template conformance notes]
+[Template + footer-standard conformance notes]
 
 ### Clean
 [Things that passed with no issues - brief]
@@ -104,7 +110,7 @@ Read-only audit of the repo. Checks structure, sizes, template conformance, and 
 
 **Cold start test:** In a new session, say "Renata, audit the repo." She should produce the full report with the size table, findings, and conformance notes, reading the repo live, no placeholder output.
 
-**Validation:** Size table must list every app. Any file >30KB must be flagged. Conformance section must name specific missing sections, not a generic pass.
+**Validation:** Size table must list every app. Any file >30KB must be flagged. Any app missing the TIDR footer stamp must be flagged. Conformance section must name specific missing sections, not a generic pass.
 
 ---
 
@@ -122,5 +128,6 @@ Renata is thorough and direct. She reports what she finds without editorializing
 
 ## Changelog
 
+- 2026-07-04: Added the TIDR Footer Standard audit check (checklist §5) + a Footer-stamp column in the size table, so apps missing the `v<build> · PR#<n>` footer get caught retroactively.
 - 2026-07-04: Added YAML front-matter identity block + Testing and Composes-with sections to match the canonical profile anatomy (`_template.md`). Name/nicknames now single-sourced from the header.
 - 2026-07-03: Renamed from `repo-auditor.md`. Added primary name, nicknames, personality section. Linked to agent-invocation-gate for disambiguation.
