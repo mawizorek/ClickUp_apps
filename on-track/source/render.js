@@ -1,6 +1,6 @@
 // On Track — engine: constants, data model, date/format helpers, and all render/paint logic.
 // Loaded before app.js. Classic script (shared global scope with app.js).
-const APP_VERSION = 'v1.8';
+const APP_VERSION = 'v1.9';
 const APP_DATE = '2026-07-05';
 const APP_SLUG = 'on-track';
 const SERIES = {
@@ -195,6 +195,7 @@ function renderSchedule() {
   const anyFilter = state.series.size || state.plats.size || state.q;
   $('#clrSeries').hidden = !state.series.size;
   $('#clrPlat').hidden = !state.plats.size;
+  if (typeof syncFilterAction === 'function') syncFilterAction();
   const visible = e => state.showPast || e._e > now;
   const dayMap = new Map();
   matched.forEach(e => { if (!visible(e)) return; const k = dayKey(e._s); if (!dayMap.has(k)) dayMap.set(k, []); dayMap.get(k).push(e); });
