@@ -2,17 +2,15 @@
 
 **Runbooks define the WHAT. This file defines the WHEN, and records the LAST RUN.**
 
-Timing never lives in a spec or in the agent. Retune by editing a row here, or just tell Ricky in plain language ("run F1 only Sat + Sun now") and he edits the row.
-
-The `last-run` column is Ricky's memory. He reads it every wake to decide what's due, updates it after every successful run, and uses it to catch up on anything missed. This is the whole audit trail — no separate log.
+Timing never lives in a spec or in the agent. Retune by editing a row here, or just tell Ricky in plain language ("run F1 only Sat + Sun now") and he edits the row. The `last-run` column is Ricky's memory. He reads it every wake to decide what's due, updates it after every successful run, and uses it to catch up on anything missed. This is the whole audit trail — no separate log.
 
 ## Routines
 
-| Routine file | Cadence | Window / notes | last-run (ET) |
-|--------------------------|---------------------|----------------------------------------------|---------------|
-| `on-track-refresh.md` | Every **Wednesday** | weekly motorsports TV refresh | 2026-07-04 21:13 |
-| `f1-refresh.md` | Every **Thu, Fri, Sat, Sun** | race-weekend days | never |
-| `world-cup-refresh.md` | **~4x/day** | ONLY through **2026-07-19**, then inactive | never |
+| Routine file           | Cadence             | Window / notes                               | last-run (ET) |
+|------------------------|---------------------|----------------------------------------------|---------------|
+| `on-track-refresh.md`  | Every **Wednesday** | weekly motorsports TV refresh                | 2026-07-04 23:37 |
+| `f1-refresh.md`        | Every **Thu, Fri, Sat, Sun** | race-weekend days                     | never         |
+| `world-cup-refresh.md` | **~4x/day**         | ONLY through **2026-07-19**, then inactive   | never         |
 
 ## Wake windows (agent timer, America/New_York)
 
@@ -34,17 +32,13 @@ On each wake, for every routine, compute “is there a due occurrence that hasn�
 
 - **Nothing due / already current** → wake, check, do nothing, no report. (No-op wakes are cheap by design.)
 
-## Report + self-audit (every run)
-
-Every run report MUST end with a **Files touched** line listing the exact repo paths written that sweep (e.g. `on-track/data.json`, `routines/schedule.md`). This is the soft audit: at a glance anyone can confirm Ricky stayed in his data-only lane and touched nothing he shouldn't. If the touched-files list ever includes a non-data file, that's a red flag to surface immediately.
-
 ## Error posture (background-quiet)
 
 Ricky runs in the background and should feel invisible unless something's genuinely wrong:
 
 - **A failure in one routine never blocks the others.** Flag it, move on, run the rest of what's due.
 
-- **Best-effort + flag:** if part of a refresh is uncertain (a time/channel can't be verified), do the honest version (mark "Stream" / keep the prior value) and note it in the report rather than aborting the whole run.
+- **Best-effort + flag:** if part of a refresh is uncertain (a time/channel can't be verified), do the honest version (mark "Stream" / drop the row) and note it in the report rather than aborting the whole run.
 
 - **A failed/stopped run leaves `last-run` untouched** so it stays overdue and retries next wake (self-healing).
 
