@@ -137,15 +137,6 @@
       "platforms": ["FS1", "FOX One"]
     },
     {
-      "series": "F1",
-      "kind": "Race",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-07-05T10:00:00-04:00",
-      "end": "2026-07-05T12:00:00-04:00",
-      "platforms": ["Apple TV"]
-    },
-    {
       "series": "MXGP",
       "kind": "Race",
       "title": "MX2 Grand Prix of South Africa",
@@ -153,6 +144,15 @@
       "start": "2026-07-05T09:00:00-04:00",
       "end": "2026-07-05T10:00:00-04:00",
       "platforms": ["CBS Sports Network"]
+    },
+    {
+      "series": "F1",
+      "kind": "Race",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-07-05T10:00:00-04:00",
+      "end": "2026-07-05T12:00:00-04:00",
+      "platforms": ["Apple TV"]
     },
     {
       "series": "MXGP",
@@ -180,6 +180,60 @@
       "start": "2026-07-05T18:00:00-04:00",
       "end": "2026-07-05T21:30:00-04:00",
       "platforms": ["TNT", "HBO Max"]
+    },
+    {
+      "series": "Supercars",
+      "kind": "Race",
+      "title": "Townsville Race 1",
+      "detail": "Townsville, Queensland",
+      "start": "2026-07-09T02:15:00-04:00",
+      "end": "2026-07-09T04:15:00-04:00",
+      "platforms": ["RACER Network"]
+    },
+    {
+      "series": "Supercars",
+      "kind": "Race",
+      "title": "Townsville Race 2",
+      "detail": "Townsville, Queensland",
+      "start": "2026-07-10T01:00:00-04:00",
+      "end": "2026-07-10T03:00:00-04:00",
+      "platforms": ["RACER Network"]
+    },
+    {
+      "series": "Supercars",
+      "kind": "Race",
+      "title": "Townsville Race 3",
+      "detail": "Townsville, Queensland",
+      "start": "2026-07-11T10:00:00-04:00",
+      "end": "2026-07-11T11:30:00-04:00",
+      "platforms": ["RACER Network"]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Race",
+      "title": "Donington Park Race 1",
+      "detail": "Donington Park",
+      "start": "2026-07-11T10:00:00-04:00",
+      "end": "2026-07-11T12:00:00-04:00",
+      "platforms": ["RACER Network"]
+    },
+    {
+      "series": "FIM Speedway",
+      "kind": "Race",
+      "title": "Speedway GP of Sweden",
+      "detail": "Målilla",
+      "start": "2026-07-11T13:00:00-04:00",
+      "end": "2026-07-11T16:00:00-04:00",
+      "platforms": ["RACER Network"]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Race",
+      "title": "Donington Park Race 2",
+      "detail": "Donington Park",
+      "start": "2026-07-12T10:00:00-04:00",
+      "end": "2026-07-12T12:00:00-04:00",
+      "platforms": ["RACER Network"]
     },
     {
       "series": "WEC",
