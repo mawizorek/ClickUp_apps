@@ -1,7 +1,7 @@
 // World Cup 2026 Bracket - shared constants + runtime state.
 // This is the single source of shared mutable state; all modules import S.
-export const APP_VERSION = 'v5.3';
-export const BUILD_PR = 'PR#31'; // updated to the merged PR before ship; shown in footer
+export const APP_VERSION = 'v5.4';
+export const BUILD_PR = 'direct'; // small style tweak committed direct to main
 export const DATA_URL = './data.json';
 export const CACHE_KEY = 'world-cup-bracket-data';
 export const REPO_OWNER = 'mawizorek';
