@@ -17,12 +17,23 @@
 - Hard cap: 2000 tokens. If the edit would exceed, HALT.
 - Action on halt: propose a trim (identify lowest-priority content to condense or relocate) before retrying.
 - If content is valuable but won't fit: route to Extended Memory (https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-74153, 8K cap) or Brain Reference Library as appropriate.
+- **Budget is relieved by RELOCATION, never by weakening enforcement language (see 2b). When over budget, the first lever is Memory-First: push substance out to docs and keep the hard rule verbatim. Softening a must-fire rule to save tokens is NOT an acceptable trim.**
 
 ### 2. PROTECTED Content
 - Scan for any section marked `(PROTECTED)` or `(PROTECTED, do not trim)` in the current file.
 - If the edit removes, overwrites, or materially weakens a PROTECTED block: HALT.
 - Action on halt: surface the specific PROTECTED content being touched, explain what would be lost, ask Michael for explicit override.
 - Current PROTECTED sections: Tone & Style.
+
+### 2b. Enforcement-Language Preservation (LOCKED 2026-07-04)
+- **The governing principle: compression is SAFE for descriptive pointers, BANNED on enforcement language.** A memory rule's reliability is a function of its explicit, emphatic phrasing. Trimming the emphasis silently converts a hard rule into a soft preference a future agent will feel free to reinterpret.
+- **Enforcement language = protected from compression even when NOT inside a `(PROTECTED)` block.** Specifically, do NOT remove, soften, or "tighten away":
+  - Absolutes and emphatic qualifiers: `No exceptions`, `NEVER`, `ALWAYS`, `zero discretion`, `every response`, `MANDATORY`, `HALT`.
+  - Rationale clauses that encode the WHY of a must-fire rule (e.g. `Load cost < wrong-answer cost`) — they are the reason the rule survives, not filler.
+  - The scope of a rule: `check 1-2 levels up`, `audit siblings`, `repo next-build-spec.md NEVER task comments`. Shortening to a vibe ("check context first") deletes the procedure and keeps only the mood.
+- **What condensing IS allowed to touch:** descriptive prose, examples, redundant restatement of the SAME rule, and pointers whose full content lives in a doc. Rewording for density is fine ONLY if every absolute, NEVER, scope clause, and rationale survives byte-for-intent.
+- **Test before any condense of a rule line:** "Could an agent read the shortened version as optional / discretionary / narrower when the original was not?" If yes → HALT, keep the original phrasing.
+- The load-bearing sections most at risk (do not trim their teeth): the LOAD-THEN-THINK directive, Safety Rails, Autonomy, Workflow Defaults' NEVERs, Session Close MANDATORY.
 
 ### 3. Firing-Reliability Test
 - For any NEW content being added, apply the test: "Does this need to fire on every single response regardless of context?"
@@ -51,9 +62,9 @@
 
 ### 8. Extended Memory Routing
 - If content is being added that is:
-  - Too verbose for memory (would push toward/over budget)
-  - Valuable context but not must-fire-every-response
-  - Project-specific standing decisions or people/relationship context
+ - Too verbose for memory (would push toward/over budget)
+ - Valuable context but not must-fire-every-response
+ - Project-specific standing decisions or people/relationship context
 - Route to Extended Memory (https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-74153) instead. Propose the move with rationale.
 
 ---
@@ -69,7 +80,7 @@
 ## Composes with / overrides
 
 - **Memory Write Relay** (post-failure hook): Guard fires BEFORE the write. If Guard passes and the write still fails (system error, token miscalculation), Relay handles the aftermath. They are sequential, never competing.
-- **Memory Hygiene Review** (periodic trigger): Hygiene proposes edits; those edits still pass through this Guard before executing. Hygiene cannot bypass the Guard.
+- **Memory Hygiene Review** (periodic trigger): Hygiene proposes edits; those edits still pass through this Guard before executing. Hygiene cannot bypass the Guard. **Hygiene is explicitly bound by check 2b: an audit/condense pass may relocate substance and reword descriptive prose, but may NOT strip enforcement language to hit budget. If Hygiene reports "trimmed to save tokens," verify no absolute/NEVER/scope/rationale was lost.**
 - **Precedence:** This hook has HIGHEST priority among memory-touching operations. No other tool can skip it.
 
 ---
@@ -84,6 +95,10 @@
 **Proposed edit:** Condense Tone & Style to two lines to save tokens.
 **Guard result:** HALT. Tone & Style is marked PROTECTED. Cannot trim without explicit override from Michael.
 
+### Example 2b: Enforcement-language trim (the audit trap)
+**Proposed edit (from a Hygiene/condense pass):** Shorten the load rule from "before ANY response ... No exceptions ... Never compose from memory alone ... Load cost < wrong-answer cost" to "load the index before responding."
+**Guard result:** HALT (check 2b). The shortened form reads as discretionary ("before responding when relevant") and drops the rationale clause that keeps the rule alive. Budget must be relieved by relocating substance to docs, not by softening a must-fire directive. Keep original phrasing.
+
 ### Example 3: Misplaced content
 **Proposed edit:** Add detailed F1 race schedule data to memory.
 **Guard result:** WARN. Fails firing-reliability test (domain reference data, not must-fire-every-response). Route to the F1 reference page in Brain Reference Library. Memory gets at most a one-line pointer.
@@ -96,4 +111,5 @@
 
 ## Changelog
 
+- 2026-07-04: v2. Added check **2b Enforcement-Language Preservation** (compression safe for descriptive pointers, BANNED on absolutes/NEVERs/scope clauses/rationale, even outside PROTECTED blocks). Tied Token Budget relief to relocation-not-weakening. Bound Memory Hygiene Review to 2b so periodic audits can't silently strip a rule's teeth. Learned when a proposed condense of the load rule + Workflow Defaults would have softened must-fire directives into preferences.
 - 2026-07-03: Initial version. Authored during memory consolidation session.
