@@ -12,7 +12,7 @@
     },
     {
       "series": "MXGP",
-      "kind": "Race 2",
+      "kind": "MX2 Race 2",
       "title": "MXGP of South Africa",
       "detail": "Johannesburg",
       "start": "2026-07-05T09:00:00-04:00",
@@ -39,7 +39,7 @@
     },
     {
       "series": "MXGP",
-      "kind": "Race 2",
+      "kind": "MXGP Race 2",
       "title": "MXGP of South Africa",
       "detail": "Johannesburg",
       "start": "2026-07-05T10:00:00-04:00",
@@ -92,7 +92,7 @@
       "platforms": ["FS1"]
     },
     {
-      "series": "WorldSBK",
+      "series": "WSBK",
       "kind": "Race 1",
       "title": "Donington Park",
       "detail": "Donington Park",
@@ -164,7 +164,7 @@
       "platforms": ["Stream"]
     },
     {
-      "series": "WorldSBK",
+      "series": "WSBK",
       "kind": "Superpole Race",
       "title": "Donington Park",
       "detail": "Donington Park",
@@ -191,7 +191,7 @@
       "platforms": ["FS1"]
     },
     {
-      "series": "WorldSBK",
+      "series": "WSBK",
       "kind": "Race 2",
       "title": "Donington Park",
       "detail": "Donington Park",
@@ -552,7 +552,7 @@
     },
     {
       "series": "MXGP",
-      "kind": "Race 1",
+      "kind": "MX2 Race 1",
       "title": "MXGP of Flanders",
       "detail": "Lommel",
       "start": "2026-08-02T06:00:00-04:00",
@@ -561,7 +561,7 @@
     },
     {
       "series": "MXGP",
-      "kind": "Race 1",
+      "kind": "MXGP Race 1",
       "title": "MXGP of Flanders",
       "detail": "Lommel",
       "start": "2026-08-02T07:00:00-04:00",
@@ -579,7 +579,7 @@
     },
     {
       "series": "MXGP",
-      "kind": "Race 2",
+      "kind": "MX2 Race 2",
       "title": "MXGP of Flanders",
       "detail": "Lommel",
       "start": "2026-08-02T09:00:00-04:00",
@@ -588,7 +588,7 @@
     },
     {
       "series": "MXGP",
-      "kind": "Race 2",
+      "kind": "MXGP Race 2",
       "title": "MXGP of Flanders",
       "detail": "Lommel",
       "start": "2026-08-02T10:00:00-04:00",
