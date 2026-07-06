@@ -1,45 +1,45 @@
 /* v1 locked row layout preserved: every column fixed except the name field.
    Badges + folder control paint into reserved slots and never reflow the grid. */
 .row{
-  background:var(--surface-1); border:1px solid var(--border); border-radius:10px;
-  padding:0.85rem 1rem 0.9rem;
+  background:var(--surface-1); border:1px solid var(--border); border-radius:var(--r-md);
+  padding:0.75rem 0.85rem 0.8rem;
   display:grid;
   grid-template-columns:20px minmax(0,1fr) 132px auto 152px;
-  gap:0.85rem; align-items:start; transition:border-color .16s ease;
+  gap:0.8rem; align-items:start; transition:border-color .14s ease;
 }
 .row:hover{ border-color:var(--accent-dim); }
-.row .fdot{ width:10px; height:10px; border-radius:50%; margin-top:0.5rem; background:var(--f-unsort); }
+.row .fdot{ width:9px; height:9px; border-radius:2px; margin-top:0.5rem; background:var(--f-unsort); }
 
-.field{ display:flex; flex-direction:column; gap:0.3rem; min-width:0; }
-.field > label{ font-size:0.66rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-faint); font-weight:650; }
+.field{ display:flex; flex-direction:column; gap:0.28rem; min-width:0; }
+.field > label{ font-size:0.64rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-faint); font-weight:650; }
 .field input, .field select{
   font:inherit; font-size:0.86rem; background:var(--surface-2); border:1px solid var(--border);
-  color:var(--text); border-radius:7px; padding:0.5rem 0.6rem; min-width:0;
+  color:var(--text); border-radius:var(--r-sm); padding:0.48rem 0.58rem; min-width:0;
 }
-.field input:focus, .field select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklch, var(--accent) 20%, transparent); }
+.field input:focus, .field select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in oklch, var(--accent) 22%, transparent); }
 .field input.mono{ font-family:ui-monospace,"SF Mono",Menlo,monospace; }
 
 .row .name-field .clean{
-  font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:0.74rem;
+  font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:0.73rem;
   color:var(--accent-dim); margin-top:0.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .row .name-field .clean b{ color:var(--accent); font-weight:600; }
 .row .folder-field select{ width:100%; }
 
-.pages-group{ display:flex; gap:0.5rem; }
+.pages-group{ display:flex; gap:0.45rem; }
 .pages-group .field{ width:74px; }
 
 /* Fixed badge slot: reserved width keeps the grid locked in every badge state. */
-.row .meta{ display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem; width:152px; }
+.row .meta{ display:flex; flex-direction:column; align-items:flex-end; gap:0.45rem; width:152px; }
 .badge{
   display:inline-flex; align-items:center; gap:0.3rem; font-size:0.7rem; font-weight:600;
-  padding:0.24rem 0.55rem; border-radius:999px; max-width:100%; text-align:right; line-height:1.25;
+  padding:0.22rem 0.5rem; border-radius:var(--r-sm); max-width:100%; text-align:right; line-height:1.25;
 }
 .badge i{ width:12px; height:12px; flex-shrink:0; }
 .badge.ok{ background:color-mix(in oklch, var(--ok) 16%, transparent); color:var(--ok); }
 .badge.warn{ background:color-mix(in oklch, var(--warn) 16%, transparent); color:var(--warn); }
 .badge.err{ background:color-mix(in oklch, var(--err) 16%, transparent); color:var(--err); }
-.row .del{ background:transparent; color:var(--text-faint); padding:0.3rem; border-radius:6px; display:flex; }
+.row .del{ background:transparent; color:var(--text-faint); padding:0.3rem; border-radius:var(--r-sm); display:flex; }
 .row .del:hover{ background:color-mix(in oklch, var(--err) 14%, transparent); color:var(--err); }
 .row .del i{ width:15px; height:15px; }
 
@@ -56,15 +56,15 @@
 }
 
 .add-row{
-  width:100%; padding:0.7rem; font-size:0.85rem; font-weight:600; background:transparent; color:var(--accent);
-  border:1.5px dashed var(--border); display:flex; align-items:center; justify-content:center; gap:0.4rem; border-radius:10px;
+  width:100%; padding:0.65rem; font-size:0.84rem; font-weight:600; background:transparent; color:var(--accent);
+  border:1.5px dashed var(--border); display:flex; align-items:center; justify-content:center; gap:0.4rem; border-radius:var(--r-md);
 }
 .add-row:hover{ border-color:var(--accent); background:color-mix(in oklch, var(--accent) 8%, transparent); }
 .add-row.solid{ border-style:solid; }
 .add-row i{ width:16px; height:16px; }
 
-.empty-portal{ border:1.5px dashed var(--border); border-radius:10px; padding:2rem 1.5rem; text-align:center; }
+.empty-portal{ border:1.5px dashed var(--border); border-radius:var(--r-md); padding:1.6rem 1.3rem; text-align:center; }
 .empty-portal .t{ font-size:0.9rem; font-weight:600; color:var(--text-dim); }
 .empty-portal .s{ font-size:0.78rem; color:var(--text-faint); margin-top:0.3rem; line-height:1.5; }
-.empty-portal .auto{ margin-top:0.9rem; font-size:0.8rem; color:var(--accent); font-weight:550; display:inline-flex; align-items:center; gap:0.35rem; }
+.empty-portal .auto{ margin-top:0.8rem; font-size:0.8rem; color:var(--accent); font-weight:550; display:inline-flex; align-items:center; gap:0.35rem; }
 .empty-portal .auto i{ width:15px; height:15px; }
