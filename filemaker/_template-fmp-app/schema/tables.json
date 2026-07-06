@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "app": "<app-slug>",
+    "schemaVersion": "1.0",
+    "generated": "YYYY-MM-DD",
+    "description": "Self-describing FileMaker schema source. Designed to be rendered by a passive viewer skin: every field carries the metadata needed to color, sort, and frame it without the viewer knowing anything app-specific.",
+    "conventions": {
+      "pk": "PrimaryKey (UUID text) on every table",
+      "fk": "fk<Parent> prefix",
+      "calc": "calc_ prefix",
+      "global": "g_ prefix; gLIST_ reserved for value-list globals",
+      "audit": "CreationTimestamp, CreatedBy, ModificationTimestamp, ModifiedBy"
+    },
+    "keyTypes": ["pk", "fk", "calc", "global", "audit", "container", "plain"],
+    "roleColors": {
+      "singleton": "#7B3FA0",
+      "collateral": "#2E7D5B",
+      "servicing-parent": "#7B3FA0",
+      "ledger": "#B8860B",
+      "join": "#555",
+      "snapshot": "#C0392B",
+      "source": "#2E7D5B",
+      "taxonomy": "#555",
+      "party": "#2E7D5B",
+      "document": "#B8860B"
+    },
+    "statusLegend": {
+      "locked": "canonical, do not rename without a schema decision",
+      "pending": "planned, not yet built",
+      "under-review": "exists but a decision is open"
+    }
+  },
+  "tables": [
+    {
+      "name": "<TableName>",
+      "role": "servicing-parent",
+      "status": "locked",
+      "description": "<what this table is>",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key", "notes": "UUID primary key" },
+        { "name": "fk<Parent>", "type": "text-uuid", "keyType": "fk", "category": "key", "notes": "link to <Parent>" },
+        { "name": "<field>", "type": "text|number|date|timestamp|calc|container", "keyType": "plain", "category": "<group>", "notes": "" }
+      ]
+    }
+  ]
+}

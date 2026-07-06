@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "app": "<app-slug>",
+    "schemaVersion": "1.0",
+    "description": "Value lists. Rule: simple display-only labels live here; anything with metadata beyond the display value belongs in a real table (see docs/data-standards.md)."
+  },
+  "valueLists": [
+    {
+      "name": "<ListName>",
+      "source": "custom|field-based",
+      "status": "pending",
+      "values": []
+    }
+  ]
+}

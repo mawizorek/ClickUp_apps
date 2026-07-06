@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "app": "<app-slug>",
+    "schemaVersion": "1.0",
+    "description": "The relationship graph as data. Each edge: a foreign key on the child pointing at the parent's primary key. cardinality + status drive how the viewer frames the line."
+  },
+  "relationships": [
+    {
+      "from": { "table": "<ChildTable>", "field": "fk<Parent>" },
+      "to": { "table": "<ParentTable>", "field": "PrimaryKey" },
+      "cardinality": "many-to-one",
+      "status": "locked",
+      "notes": "<why this link exists>"
+    }
+  ]
+}
