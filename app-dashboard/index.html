@@ -2,561 +2,986 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#141518">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>ClickUp Apps</title>
-<meta name="description" content="Launcher for every app hosted in the ClickUp_apps repo.">
-<meta property="og:title" content="ClickUp Apps">
-<meta property="og:description" content="Launcher for every app hosted in the ClickUp_apps repo.">
-<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/app-dashboard/">
-<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/app-dashboard/og.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/app-dashboard/og.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%82%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<title>Apps</title>
 <style>
-:root{
-  --bg:oklch(11% 0.012 255); --surface-1:oklch(15% 0.01 255); --surface-2:oklch(19% 0.009 255); --surface-3:oklch(24% 0.008 255);
-  --text:oklch(95% 0.006 255); --text-mid:oklch(80% 0.008 255); --text-muted:oklch(64% 0.01 255); --text-dim:oklch(48% 0.009 255); --text-faint:oklch(38% 0.008 255);
-  --accent:oklch(76% 0.16 55); --accent-ink:oklch(18% 0.03 55);
-  --green:oklch(74% 0.16 155); --green-soft:oklch(26% 0.05 155); --green-glow:oklch(74% 0.16 155 / .5);
-  --red:oklch(66% 0.18 25); --red-glow:oklch(66% 0.18 25 / .45);
-  --cyan:oklch(80% 0.11 205);
-  --blue:oklch(72% 0.13 245); --blue-soft:oklch(26% 0.05 245);
-  --purple:oklch(74% 0.13 300); --purple-soft:oklch(26% 0.05 300);
-  --brain:oklch(74% 0.14 275); --brain-soft:oklch(24% 0.06 275); --brain-border:oklch(42% 0.09 275);
-  --hair:oklch(26% 0.006 255); --hair-soft:oklch(21% 0.006 255); --border-hover:oklch(36% 0.008 255);
-  --scrim:oklch(6% 0.01 255 / 0.66);
-  --r:11px; --r-sm:8px;
-  --e:cubic-bezier(0.22,1,0.36,1);
+/* INFRASTRUCTURE: self-contained (no external data file) */
+:root {
+  --bg: oklch(10% 0.012 250);
+  --surface-1: oklch(16% 0.01 250);
+  --surface-2: oklch(21% 0.008 250);
+  --surface-3: oklch(13% 0.008 250);
+  --text: oklch(94% 0.006 250);
+  --text-mid: oklch(78% 0.008 250);
+  --text-muted: oklch(62% 0.01 250);
+  --text-dim: oklch(44% 0.008 250);
+  --accent: oklch(75% 0.16 55);
+  --accent-soft: oklch(75% 0.16 55 / 0.12);
+  --accent-border: oklch(45% 0.10 55);
+  --on-accent: oklch(15% 0.01 55);
+  --green: oklch(72% 0.16 155);
+  --green-glow: oklch(72% 0.16 155 / 0.4);
+  --red: oklch(65% 0.18 25);
+  --red-glow: oklch(65% 0.18 25 / 0.3);
+  --cyan: oklch(78% 0.12 200);
+  --purple: oklch(72% 0.12 300);
+  --blue: oklch(72% 0.12 240);
+  --border: oklch(24% 0.006 250);
+  --border-hover: oklch(34% 0.008 250);
+  --radius: 12px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
-  background:var(--bg); color:var(--text); font-weight:400; -webkit-font-smoothing:antialiased;
-  letter-spacing:0.01em; min-height:100svh; display:flex; flex-direction:column;
-  padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+
+/* FileMaker window: same layout, purple skin */
+body[data-window="filemaker"] {
+  --accent: oklch(72% 0.14 300);
+  --accent-soft: oklch(72% 0.14 300 / 0.12);
+  --accent-border: oklch(45% 0.10 300);
+  --on-accent: oklch(18% 0.02 300);
 }
-body.locked{overflow:hidden}
-.wrap{width:100%; max-width:560px; margin:0 auto; padding:0 16px; flex:1 0 auto}
-::selection{background:var(--accent); color:var(--accent-ink)}
 
-/* masthead */
-header{padding:34px 0 14px}
-.masthead{display:flex; align-items:center; gap:12px}
-.masthead h1{font-size:clamp(1.5rem,5.5vw,1.85rem); font-weight:800; letter-spacing:-0.035em; flex:1; line-height:1}
-.masthead h1 span{color:var(--accent)}
-.mast-actions{display:flex; gap:8px; flex-shrink:0}
-.icon-btn{
-  width:38px; height:38px; display:flex; align-items:center; justify-content:center;
-  border-radius:var(--r-sm); background:var(--surface-2); border:1px solid var(--hair);
-  color:var(--text-mid); cursor:pointer; text-decoration:none; transition:border-color 150ms var(--e), color 150ms var(--e), transform 90ms var(--e);
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
-.icon-btn:hover{border-color:var(--border-hover); color:var(--text)}
-.icon-btn:active{transform:scale(0.92)}
-.icon-btn svg{width:17px; height:17px}
-.icon-btn.spinning svg{animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.status-line{margin-top:11px; font-size:0.75rem; color:var(--text-muted); font-variant-numeric:tabular-nums}
-.status-line b{color:var(--text-mid); font-weight:600}
-.demo-note{margin-top:6px; font-size:0.625rem; color:var(--text-faint); font-style:italic}
 
-/* pinned refs */
-.hub{
-  display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--text);
-  background:var(--surface-1); border:1px solid var(--brain-border); border-radius:var(--r);
-  padding:13px 14px; margin-top:18px; position:relative; overflow:hidden;
-  transition:border-color 150ms var(--e), transform 90ms var(--e);
+.container {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
-.hub:hover{border-color:var(--brain)} .hub:active{transform:scale(0.99)}
-.hub-ic{width:40px; height:40px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:1.05rem; font-weight:800; background:var(--brain-soft); border:1px solid var(--brain-border); color:var(--brain)}
-.hub-body{flex:1; min-width:0}
-.hub-title{font-size:0.95rem; font-weight:700; letter-spacing:-0.01em}
-.hub-sub{font-size:0.6875rem; color:var(--text-muted); margin-top:2px; line-height:1.35}
-.hub-badge{font-size:0.5625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:var(--brain); background:var(--brain-soft); border:1px solid var(--brain-border); padding:3px 9px; border-radius:100px; flex-shrink:0}
-.ref-slim{display:flex; align-items:center; gap:10px; text-decoration:none; margin-top:8px; padding:10px 14px; border:1px solid var(--hair-soft); border-radius:var(--r); transition:border-color 150ms var(--e)}
-.ref-slim:hover{border-color:var(--border-hover)}
-.ref-slim .rs-tag{font-size:0.625rem; font-weight:700; color:var(--purple); font-family:'SF Mono',ui-monospace,monospace}
-.ref-slim .rs-name{font-size:0.75rem; font-weight:600; color:var(--text-mid)}
-.ref-slim .rs-desc{font-size:0.6875rem; color:var(--text-faint); margin-left:auto; text-align:right}
 
-/* filters */
-.filter-row{display:flex; gap:7px; margin-top:22px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none}
-.filter-row::-webkit-scrollbar{display:none}
-.chip{padding:6px 13px; border-radius:100px; font-size:0.75rem; font-weight:600; white-space:nowrap; cursor:pointer; border:1px solid var(--hair); background:transparent; color:var(--text-muted); user-select:none; -webkit-user-select:none; transition:background 150ms var(--e), color 150ms var(--e), border-color 150ms var(--e), transform 90ms var(--e)}
-.chip:active{transform:scale(0.94)}
-.chip.on{background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700}
-.chip.on[data-filter="dashboard"]{background:var(--blue); border-color:var(--blue); color:oklch(16% 0.02 245)}
-.chip.on[data-filter="tool"]{background:var(--purple); border-color:var(--purple); color:oklch(16% 0.02 300)}
-
-.sec-label{font-size:0.625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-faint); margin:22px 0 2px}
-
-/* launcher list */
-.list{display:flex; flex-direction:column}
-.row{display:flex; align-items:center; gap:0; border-bottom:1px solid var(--hair-soft); transition:background 150ms var(--e)}
-.row:hover{background:var(--surface-1)}
-.row.hide{display:none}
-.tile-link{flex-shrink:0; padding:11px 13px 11px 2px; display:flex; transition:transform 90ms var(--e)}
-.tile-link:active{transform:scale(0.9)}
-.tile{
-  width:46px; height:46px; border-radius:12px; flex-shrink:0; position:relative;
-  display:flex; align-items:center; justify-content:center; overflow:visible;
-  font-size:0.85rem; font-weight:800; letter-spacing:-0.02em;
-  background:var(--surface-3); color:var(--text-mid); border:1px solid var(--hair);
+header {
+  padding: 36px 0 20px;
 }
-.tile.c-dashboard{background:var(--blue-soft); color:var(--blue); border-color:transparent}
-.tile.c-tool{background:var(--purple-soft); color:var(--purple); border-color:transparent}
-.tile.has-img{background:var(--surface-2); border-color:var(--hair)}
-.ticon{width:100%; height:100%; object-fit:cover; border-radius:12px; display:block}
-.tmono{display:flex; align-items:center; justify-content:center; width:100%; height:100%}
-.dot{position:absolute; right:-3px; bottom:-3px; width:12px; height:12px; border-radius:50%; border:2.5px solid var(--bg); background:var(--text-faint); z-index:1}
-.dot.live{background:var(--green); box-shadow:0 0 5px var(--green-glow)}
-.dot.dead{background:var(--red); box-shadow:0 0 5px var(--red-glow)}
-.dot.checking{background:var(--text-dim); animation:pulse 1.3s var(--e) infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
-.info{flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; padding:11px 6px 11px 0; background:none; border:none; text-align:left; cursor:pointer; font:inherit; color:inherit}
-.info:active .name{color:var(--accent)}
-.line1{display:flex; align-items:center; gap:7px; min-width:0}
-.name{font-size:0.9375rem; font-weight:650; letter-spacing:-0.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.tag{font-size:0.5rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; padding:2px 6px; border-radius:4px; flex-shrink:0}
-.tag-data{color:var(--green); background:var(--green-soft)}
-.tag-recent{color:var(--accent); background:oklch(24% 0.05 55)}
-.metaline{font-size:0.6875rem; color:var(--text-dim); font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.metaline .slug{color:var(--cyan); font-family:'SF Mono','Fira Code',ui-monospace,monospace; font-size:0.65rem}
-.sep{opacity:0.5; margin:0 2px}
-.chev{flex-shrink:0; align-self:stretch; width:44px; display:flex; align-items:center; justify-content:center; color:var(--text-faint); text-decoration:none; transition:color 150ms var(--e), background 150ms var(--e)}
-.chev:hover{color:var(--cyan); background:var(--surface-2)}
-.chev:active{color:var(--accent)}
-.chev svg{width:18px; height:18px}
 
-/* states */
-.state{text-align:center; padding:44px 20px; color:var(--text-muted); font-size:0.8125rem; line-height:1.5}
-.state.err{color:var(--red)}
-.skeleton{display:flex; flex-direction:column}
-.sk-row{display:flex; gap:13px; padding:12px 2px; border-bottom:1px solid var(--hair-soft); align-items:center}
-.sk-tile{width:46px; height:46px; border-radius:12px; flex-shrink:0; background:var(--surface-2)}
-.sk-body{flex:1}
-.sk-bar{height:10px; border-radius:5px; background:var(--surface-2); margin-bottom:8px}
-.sk-row,.sk-bar,.sk-tile{animation:shimmer 1.5s var(--e) infinite}
-@keyframes shimmer{0%,100%{opacity:0.5}50%{opacity:0.9}}
-
-footer{flex-shrink:0; text-align:center; padding:30px 16px calc(22px + env(safe-area-inset-bottom))}
-.stamp{font-size:0.5625rem; color:var(--text-faint); letter-spacing:0.04em; font-variant-numeric:tabular-nums}
-
-/* detail sheet */
-.scrim{position:fixed; inset:0; background:var(--scrim); opacity:0; pointer-events:none; transition:opacity 260ms var(--e); z-index:40}
-.scrim.show{opacity:1; pointer-events:auto}
-.sheet{
-  position:fixed; left:0; right:0; bottom:0; z-index:50;
-  max-width:560px; margin:0 auto;
-  background:var(--surface-1); border-top-left-radius:20px; border-top-right-radius:20px;
-  border-top:1px solid var(--hair); box-shadow:0 -18px 44px oklch(4% 0.01 255 / 0.5);
-  transform:translateY(101%); transition:transform 340ms var(--e);
-  max-height:88svh; display:flex; flex-direction:column;
-  padding-bottom:env(safe-area-inset-bottom);
+header h1 {
+  font-size: clamp(1.6rem, 5vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--text);
 }
-.sheet.show{transform:translateY(0)}
-.grip{width:38px; height:4px; border-radius:100px; background:var(--surface-3); margin:9px auto 2px; flex-shrink:0}
-.sheet-head{display:flex; align-items:center; gap:13px; padding:12px 18px 14px; border-bottom:1px solid var(--hair-soft); flex-shrink:0}
-.sheet-tile{width:52px; height:52px; border-radius:13px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.95rem; font-weight:800; overflow:hidden; background:var(--surface-3); color:var(--text-mid); border:1px solid var(--hair)}
-.sheet-tile.c-dashboard{background:var(--blue-soft); color:var(--blue); border-color:transparent}
-.sheet-tile.c-tool{background:var(--purple-soft); color:var(--purple); border-color:transparent}
-.sheet-tile img{width:100%; height:100%; object-fit:cover}
-.sheet-htext{flex:1; min-width:0}
-.sheet-name{font-size:1.15rem; font-weight:750; letter-spacing:-0.02em}
-.sheet-slug{font-size:0.7rem; color:var(--cyan); font-family:'SF Mono',ui-monospace,monospace; margin-top:2px}
-.sheet-close{width:32px; height:32px; flex-shrink:0; border-radius:100px; border:none; background:var(--surface-2); color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 150ms var(--e), color 150ms var(--e)}
-.sheet-close:hover{background:var(--surface-3); color:var(--text)}
-.sheet-close:active{transform:scale(0.9)}
-.sheet-close svg{width:16px; height:16px}
-.sheet-scroll{overflow-y:auto; -webkit-overflow-scrolling:touch; padding:16px 18px 20px}
-.sheet-desc{font-size:0.875rem; line-height:1.5; color:var(--text-mid)}
-.sheet-metrics{display:flex; gap:8px; margin-top:15px}
-.metric{flex:1; background:var(--surface-2); border-radius:10px; padding:11px 8px; text-align:center}
-.metric .v{font-size:1.05rem; font-weight:750; color:var(--text); font-variant-numeric:tabular-nums}
-.metric .v.ok{color:var(--green)} .metric .v.bad{color:var(--red)}
-.metric .k{font-size:0.5625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:var(--text-dim); margin-top:4px}
-.sheet-actions{display:flex; gap:9px; margin-top:15px}
-.sa{flex:1; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:13px; border-radius:11px; font-size:0.8125rem; font-weight:700; text-decoration:none; transition:transform 90ms var(--e), background 150ms var(--e), border-color 150ms var(--e)}
-.sa:active{transform:scale(0.97)}
-.sa svg{width:15px; height:15px}
-.sa-open{background:var(--accent); color:var(--accent-ink)}
-.sa-open:hover{background:oklch(80% 0.16 55)}
-.sa-repo{background:var(--surface-2); color:var(--text-mid); border:1px solid var(--hair)}
-.sa-repo:hover{border-color:var(--border-hover); color:var(--text)}
-.commits-label{font-size:0.625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.11em; color:var(--text-faint); margin:22px 0 4px}
-.commit{display:flex; gap:11px; padding:10px 0; border-bottom:1px solid var(--hair-soft)}
-.commit:last-child{border-bottom:none}
-.commit .rail{display:flex; flex-direction:column; align-items:center; padding-top:5px; flex-shrink:0}
-.commit .node{width:7px; height:7px; border-radius:50%; background:var(--accent)}
-.commit:not(:last-child) .rail::after{content:""; flex:1; width:1.5px; background:var(--hair); margin-top:4px}
-.commit .ctext{flex:1; min-width:0}
-.commit .cmsg{font-size:0.8125rem; line-height:1.4; color:var(--text-mid)}
-.commit .cwhen{font-size:0.625rem; color:var(--text-faint); margin-top:3px; font-variant-numeric:tabular-nums}
-.commits-empty{font-size:0.75rem; color:var(--text-dim); padding:8px 0}
 
-@media (min-width:640px){ .wrap{max-width:620px; padding:0 24px} header{padding:44px 0 16px} .sheet{max-width:620px} }
-@media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important} .sheet{transition:none} }
+header h1 span {
+  color: var(--accent);
+}
+
+/* Window toggle (additive) */
+.window-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.window-toggle button {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 150ms var(--ease);
+}
+
+.window-toggle button:active { transform: scale(0.97); }
+
+.window-toggle button[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  flex: 1;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.stat-card .value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-card .label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 100ms var(--ease), opacity 150ms;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+}
+
+/* Filter chips */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.filter-row::-webkit-scrollbar { display: none; }
+
+/* FileMaker window hides category filters (not applicable) */
+body[data-window="filemaker"] .filter-row { display: none; }
+
+.filter-chip {
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 150ms var(--ease);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.filter-chip:active { transform: scale(0.95); }
+
+.filter-chip.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.filter-chip.active[data-filter="dashboard"] {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: oklch(15% 0.01 240);
+}
+
+.filter-chip.active[data-filter="tool"] {
+  background: var(--purple);
+  border-color: var(--purple);
+  color: oklch(15% 0.01 300);
+}
+
+/* Pinned reference section */
+.pinned-section {
+  margin-bottom: 20px;
+}
+
+.pinned-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.pinned-card {
+  background: var(--surface-1);
+  border: 1px solid oklch(35% 0.06 200);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 200ms var(--ease);
+}
+
+.pinned-card:hover { border-color: var(--cyan); }
+
+.pinned-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: oklch(20% 0.04 200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.pinned-info { flex: 1; min-width: 0; }
+
+.pinned-info .name {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.pinned-info .desc {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pinned-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pinned-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 100ms var(--ease);
+}
+
+.pinned-btn:active { transform: scale(0.95); }
+
+.pinned-btn-open {
+  background: oklch(30% 0.06 200);
+  color: var(--cyan);
+}
+
+.pinned-btn-repo {
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+/* App grid */
+.app-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 100px;
+}
+
+.app-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: border-color 200ms var(--ease), opacity 200ms, transform 200ms var(--ease);
+}
+
+.app-card:hover { border-color: var(--border-hover); }
+
+.app-card.hidden {
+  display: none;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.health-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+.health-dot.dead { background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
+.health-dot.checking { background: var(--text-dim); animation: pulse 1.4s infinite; }
+.health-dot.doc { background: var(--accent); box-shadow: 0 0 6px var(--accent-soft); }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.app-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+.recent-indicator {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.app-slug {
+  font-size: 0.6875rem;
+  color: var(--cyan);
+  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  margin-bottom: 8px;
+}
+
+.app-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.app-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.badge {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge-data { color: var(--green); background: oklch(20% 0.04 155); border: 1px solid oklch(30% 0.06 155); }
+.badge-dashboard { color: var(--blue); background: oklch(20% 0.04 240); border: 1px solid oklch(30% 0.06 240); }
+.badge-tool { color: var(--purple); background: oklch(20% 0.04 300); border: 1px solid oklch(30% 0.06 300); }
+
+.app-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.6875rem;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.app-meta strong { color: var(--text-muted); }
+
+.app-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.app-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 100ms var(--ease);
+}
+
+.app-btn:active { transform: scale(0.97); }
+
+.app-btn-open {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.app-btn-repo {
+  background: var(--surface-2);
+  color: var(--text-mid);
+  border: 1px solid var(--border);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.error-state {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--red);
+  font-size: 0.8125rem;
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  border: 1px solid oklch(30% 0.08 25);
+}
+
+.cache-note {
+  text-align: center;
+  font-size: 0.625rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.empty-filter {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--text-dim);
+  font-size: 0.8125rem;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: oklch(10% 0.012 250 / 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.625rem;
+  color: var(--text-dim);
+}
+
+footer a { color: var(--text-muted); text-decoration: none; }
+
+@media (min-width: 640px) {
+  .container { max-width: 600px; padding: 0 24px; }
+  header { padding: 48px 0 28px; }
+}
 </style>
 </head>
-<body>
-<div class="wrap">
+<body data-window="clickup">
+<div class="container">
   <header>
-    <div class="masthead">
-      <h1>ClickUp <span>Apps</span></h1>
-      <div class="mast-actions">
-        <a class="icon-btn" id="repoLink" href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener" aria-label="Open repository">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-5"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
-        </a>
-        <button class="icon-btn" id="refreshBtn" aria-label="Refresh">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v5h-5"/></svg>
-        </button>
-      </div>
-    </div>
-    <p class="status-line" id="statusLine">Loading apps…</p>
-    <p class="demo-note" id="demoNote" style="display:none">Preview with sample data. Live build reads the repo.</p>
+    <h1 id="winTitle">ClickUp <span>Apps</span></h1>
   </header>
 
-  <a class="hub" href="https://mawizorek.github.io/ClickUp_apps/brain-config/" aria-label="Open Brain Config">
-    <span class="hub-ic">B</span>
-    <span class="hub-body">
-      <span class="hub-title">Brain Config</span>
-      <span class="hub-sub">Tool registry: hooks, gates, and agents. Open an agent for its reports.</span>
-    </span>
-    <span class="hub-badge">Hub</span>
-  </a>
-
-  <a class="ref-slim" href="https://mawizorek.github.io/ClickUp_apps/template-app/">
-    <span class="rs-tag">[T]</span>
-    <span class="rs-name">App Build Standard</span>
-    <span class="rs-desc">scaffold &amp; workflow reference</span>
-  </a>
-
-  <div class="filter-row" id="filterRow">
-    <button class="chip on" data-filter="all">All</button>
-    <button class="chip" data-filter="dashboard">Dashboards</button>
-    <button class="chip" data-filter="tool">Tools</button>
+  <div class="window-toggle" role="tablist">
+    <button data-window="clickup" role="tab" aria-selected="true" onclick="setWindow('clickup')">ClickUp Apps</button>
+    <button data-window="filemaker" role="tab" aria-selected="false" onclick="setWindow('filemaker')">FileMaker Apps</button>
   </div>
 
-  <p class="sec-label">Apps</p>
-  <div class="list" id="list">
-    <div class="skeleton">
-      <div class="sk-row"><div class="sk-tile"></div><div class="sk-body"><div class="sk-bar" style="width:45%"></div><div class="sk-bar" style="width:60%;height:8px"></div></div></div>
-      <div class="sk-row"><div class="sk-tile"></div><div class="sk-body"><div class="sk-bar" style="width:38%"></div><div class="sk-bar" style="width:55%;height:8px"></div></div></div>
-      <div class="sk-row"><div class="sk-tile"></div><div class="sk-body"><div class="sk-bar" style="width:50%"></div><div class="sk-bar" style="width:62%;height:8px"></div></div></div>
-    </div>
+  <div class="stats">
+    <div class="stat-card"><div class="value" id="appCount">&mdash;</div><div class="label">Apps</div></div>
+    <div class="stat-card"><div class="value" id="healthyCount">&mdash;</div><div class="label" id="healthLabel">Healthy</div></div>
+    <div class="stat-card"><div class="value" id="recentCount">&mdash;</div><div class="label">Updated (7d)</div></div>
+  </div>
+
+  <div class="actions">
+    <a class="btn btn-primary" id="openRepoBtn" href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener">Open repo</a>
+    <button class="btn btn-secondary" id="refreshBtn">Refresh</button>
+  </div>
+
+  <div class="filter-row" id="filterRow">
+    <div class="filter-chip active" data-filter="all">All</div>
+    <div class="filter-chip" data-filter="dashboard">📊 Dashboards</div>
+    <div class="filter-chip" data-filter="tool">🛠 Tools</div>
+  </div>
+
+  <div class="pinned-section" id="pinnedWrap"></div>
+
+  <div class="app-grid" id="appGrid">
+    <div class="loading-state">Loading apps...</div>
   </div>
 </div>
 
 <footer>
-  <span class="stamp">app-dashboard <span id="verStamp"></span> · <span id="refreshStamp">—</span></span>
+  <span id="footerText">app-dashboard · v2.4 · <span id="refreshTime">&mdash;</span></span>
 </footer>
 
-<!-- detail sheet -->
-<div class="scrim" id="scrim"></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetName" aria-hidden="true">
-  <div class="grip"></div>
-  <div class="sheet-head">
-    <span class="sheet-tile" id="sheetTile"></span>
-    <div class="sheet-htext">
-      <div class="sheet-name" id="sheetName"></div>
-      <div class="sheet-slug" id="sheetSlug"></div>
-    </div>
-    <button class="sheet-close" id="sheetClose" aria-label="Close">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-    </button>
-  </div>
-  <div class="sheet-scroll">
-    <p class="sheet-desc" id="sheetDesc"></p>
-    <div class="sheet-metrics">
-      <div class="metric"><div class="v" id="mHealth">—</div><div class="k">Status</div></div>
-      <div class="metric"><div class="v" id="mUpdated">—</div><div class="k">Updated</div></div>
-      <div class="metric"><div class="v" id="mCommits">—</div><div class="k">Commits</div></div>
-    </div>
-    <div class="sheet-actions">
-      <a class="sa sa-open" id="sheetOpen" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>Open app</a>
-      <a class="sa sa-repo" id="sheetRepo" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Open repo</a>
-    </div>
-    <div class="commits-label">Recent commits</div>
-    <div id="sheetCommits"></div>
-  </div>
-</div>
-
 <script>
-const APP_VERSION = 'v3.1';
+const APP_VERSION = 'v2.4';
+const APP_DATE = '2026-07-06';
+
+// ─── Config ──────────────────────────────
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
-const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
-const API_BASE = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
-const EXCLUDED = ['template-app','app-dashboard','brain-config','agent-reports','shared'];
-const CACHE_KEY = 'appDashboard_cache_' + APP_VERSION;
+const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
+const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const REPO_TREE = `https://github.com/${OWNER}/${REPO}/tree/main`;
+const EXCLUDED = ['template-app', 'app-dashboard', 'filemaker', '.nojekyll', 'README.md', 'canary.txt'];
+const FMP_EXCLUDED = ['_template-fmp-app', 'README.md'];
+
+// Cache is versioned: bumping APP_VERSION auto-invalidates stale data
+const CACHE_KEY = `appDashboard_cache_${APP_VERSION}`;
 const CACHE_TTL = 5 * 60 * 1000;
 const RECENT_KEY = 'appDashboard_recent';
 const FILTER_KEY = 'appDashboard_filter';
+const WINDOW_KEY = 'appDashboard_window';
 const MAX_RECENT = 2;
+
+// App metadata: slug → { desc, category, badges }
 const APP_META = {
   'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'dashboard', badges: ['dashboard'] },
-  'f1-racetracks': { desc: 'Interactive race circuit explorer with live circuit data, layouts, and session timing.', category: 'dashboard', badges: ['data'] },
-  'on-track': { desc: 'Live motorsport "what\'s on now" schedule across series, with a settings drawer and collapsible filters.', category: 'dashboard', badges: ['data'] },
-  'routines': { desc: 'Live schedule view of the automated repo refresh routines. Reads schedule.md, zero upkeep.', category: 'dashboard', badges: ['dashboard'] },
-  'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers and a markdown index.', category: 'tool', badges: ['tool'] },
+  'f1-racetracks': { desc: 'Interactive race circuit explorer with live data.', category: 'dashboard', badges: ['data'] },
+  'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers.', category: 'tool', badges: ['tool'] },
   'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', category: 'tool', badges: ['data'] },
   'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', category: 'tool', badges: ['tool'] },
-  'pdf-splitter': { desc: 'Extract and split PDF pages entirely client-side.', category: 'tool', badges: ['tool'] },
-  'polish-demo': { desc: 'Gated working example of the full app polish standard.', category: 'tool', badges: ['tool'] },
-  'quickfire': { desc: 'Quick vibe-to-repo artifact sketches.', category: 'tool', badges: ['tool'] }
+  'pdf-splitter': { desc: 'Extract and split PDF pages client-side.', category: 'tool', badges: ['tool'] }
 };
-// Sample data: only used when the GitHub API is unreachable (e.g. the ClickUp preview sandbox).
-const SAMPLE = [
-  { name:'on-track', hoursAgo:0.1, commitCount:12, commits:[['settings drawer + collapsible filters',0.1],['per-dropdown select-all / clear',6],['timezone toggle in settings',14],['live refresh note',26],['initial schedule engine',40]] },
-  { name:'f1-racetracks', hoursAgo:0.4, commitCount:37, commits:[['unify cache-bust build stamp across all source loads',0.4],['footer wrap fix at 320px',9],['data.json retrofit (v5)',30],['live-tracker companion',52],['v4 circuit explorer',96]] },
-  { name:'world-cup-bracket', hoursAgo:20, commitCount:14, commits:[['bump contrast + live updated badge (v1.3)',20],['today filter dynamic',28],['icon.png + manifest',44],['fix Switzerland vs Algeria date',50],['v1 bracket',120]] },
-  { name:'routines', hoursAgo:1, commitCount:8, commits:[['add passive live schedule viewer',1],['world-cup refresh runbook',40],['schedule ledger',60]] },
-  { name:'markdown-viewer', hoursAgo:52, commitCount:9, commits:[['v3 mobile-first reader',52],['drop-zone done-state',70],['v2 parser fix',110]] },
-  { name:'budget-code-mapper', hoursAgo:96, commitCount:22, commits:[['retrofit data.json split (v6)',96],['export wrapper (three-context)',130],['v5 authority builder',180]] },
-  { name:'file-chunker', hoursAgo:150, commitCount:41, commits:[['v16.2 source_index rename',150],['INDEX_FILENAME const',175],['zip README metadata',210]] },
-  { name:'pdf-splitter', hoursAgo:200, commitCount:6, commits:[['scaffold client-side page extract',200],['README',215]] },
-  { name:'polish-demo', hoursAgo:220, commitCount:4, commits:[['gated example of polish standard',220],['access gate config',235]] },
-  { name:'quickfire', hoursAgo:240, commitCount:3, commits:[['index + first sketch',240]] }
-];
+
+// ─── State ─────────────────────────────
 let currentFilter = 'all';
+let currentWindow = 'clickup';
 let allApps = [];
-let stat = { n: 0, live: '…', recent7: 0 };
-let usingSample = false;
-let lastFocus = null;
 
-function getCache(){ try{ const raw=localStorage.getItem(CACHE_KEY); if(!raw) return null; const p=JSON.parse(raw); if(Date.now()-p.ts>CACHE_TTL) return null; return p.data; }catch(e){ return null; } }
-function setCache(data){ try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),data})); }catch(e){} }
-function pruneOldCaches(){ try{ const kill=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf('appDashboard_cache_')===0&&k!==CACHE_KEY) kill.push(k); } kill.forEach(function(k){ localStorage.removeItem(k); }); }catch(e){} }
-function getRecent(){ try{ return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]'); }catch(e){ return []; } }
-function logVisit(slug){ try{ let r=getRecent().filter(function(s){return s!==slug;}); r.unshift(slug); r=r.slice(0,MAX_RECENT); localStorage.setItem(RECENT_KEY, JSON.stringify(r)); }catch(e){} }
+// ─── Cache helpers (ClickUp window) ─────────────
+function getCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Date.now() - parsed.ts > CACHE_TTL) return null;
+    return parsed.data;
+  } catch (e) { return null; }
+}
 
-function setStatus(){ document.getElementById('statusLine').innerHTML = '<b>'+stat.n+'</b> apps · <b>'+stat.live+'</b> live · <b>'+stat.recent7+'</b> updated this week'; }
+function setCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+  } catch (e) {}
+}
 
-function applyFilter(filter){
+function pruneOldCaches() {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('appDashboard_cache_') && key !== CACHE_KEY) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch (e) {}
+}
+
+// ─── Recent (last-visited) helpers ─────────────
+function getRecent() {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+  } catch (e) { return []; }
+}
+
+function logVisit(slug) {
+  try {
+    let recent = getRecent().filter(s => s !== slug);
+    recent.unshift(slug);
+    recent = recent.slice(0, MAX_RECENT);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+  } catch (e) {}
+}
+
+// ─── Filter helpers ──────────────────────
+function applyFilter(filter) {
   currentFilter = filter;
-  try{ localStorage.setItem(FILTER_KEY, filter); }catch(e){}
-  document.querySelectorAll('.chip').forEach(function(c){ c.classList.toggle('on', c.dataset.filter===filter); });
-  const rows = document.querySelectorAll('.row[data-category]');
-  let visible = 0;
-  rows.forEach(function(r){ const show = filter==='all' || r.dataset.category===filter; r.classList.toggle('hide', !show); if(show) visible++; });
-  let empty = document.getElementById('emptyFilter');
-  if(visible===0 && rows.length>0){
-    if(!empty){ empty=document.createElement('div'); empty.id='emptyFilter'; empty.className='state'; document.getElementById('list').appendChild(empty); }
-    empty.textContent = 'No ' + filter + ' apps yet.'; empty.style.display='';
-  } else if(empty){ empty.style.display='none'; }
-}
+  try { localStorage.setItem(FILTER_KEY, filter); } catch (e) {}
 
-function buildFromSample(){
-  usingSample = true;
-  const now = Date.now();
-  const apps = SAMPLE.map(function(s){
-    const meta = APP_META[s.name] || {};
-    return {
-      name:s.name, pagesUrl:PAGES_BASE+'/'+s.name+'/', repoUrl:'https://github.com/'+OWNER+'/'+REPO+'/tree/main/'+s.name,
-      iconUrl:PAGES_BASE+'/'+s.name+'/icon.png',
-      lastUpdated:new Date(now - s.hoursAgo*3600000).toISOString(), commitCount:s.commitCount,
-      commits:(s.commits||[]).map(function(c){ return { msg:c[0], date:new Date(now-c[1]*3600000).toISOString() }; }),
-      hasData:(meta.badges||[]).indexOf('data')!==-1 || s.name==='world-cup-bracket',
-      desc:meta.desc||null, category:meta.category||'tool', health:'live'
-    };
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.filter === filter);
   });
-  allApps = apps; renderFromData(apps);
-  apps.forEach(function(a,i){ const d=document.getElementById('health-'+i); if(d) d.className='dot live'; });
-  stat.live = apps.length; setStatus();
-  document.getElementById('demoNote').style.display='';
+
+  const cards = document.querySelectorAll('.app-card[data-category]');
+  let visible = 0;
+  cards.forEach(card => {
+    const show = filter === 'all' || card.dataset.category === filter;
+    card.classList.toggle('hidden', !show);
+    if (show) visible++;
+  });
+
+  let emptyEl = document.getElementById('emptyFilter');
+  if (visible === 0 && cards.length > 0) {
+    if (!emptyEl) {
+      emptyEl = document.createElement('div');
+      emptyEl.id = 'emptyFilter';
+      emptyEl.className = 'empty-filter';
+      document.getElementById('appGrid').appendChild(emptyEl);
+    }
+    emptyEl.textContent = `No ${filter} apps yet.`;
+    emptyEl.style.display = '';
+  } else if (emptyEl) {
+    emptyEl.style.display = 'none';
+  }
 }
 
-async function init(forceRefresh){
-  const list = document.getElementById('list');
+// ─── Window switching ───────────────────
+function applyWindowChrome(win) {
+  document.body.dataset.window = win;
+  document.querySelectorAll('.window-toggle button').forEach(b =>
+    b.setAttribute('aria-selected', b.dataset.window === win));
+  document.getElementById('winTitle').innerHTML =
+    win === 'clickup' ? 'ClickUp <span>Apps</span>' : 'FileMaker <span>Apps</span>';
+  document.getElementById('healthLabel').textContent = win === 'clickup' ? 'Healthy' : 'Docs';
+  document.getElementById('openRepoBtn').href =
+    win === 'clickup' ? `https://github.com/${OWNER}/${REPO}` : `${REPO_TREE}/filemaker`;
+  renderPinned(win);
+}
+
+function setWindow(win) {
+  if (win === currentWindow) return;
+  currentWindow = win;
+  try { localStorage.setItem(WINDOW_KEY, win); } catch (e) {}
+  applyWindowChrome(win);
+  document.getElementById('appGrid').innerHTML = '<div class="loading-state">Loading apps...</div>';
+  init(false);
+}
+
+function renderPinned(win) {
+  const wrap = document.getElementById('pinnedWrap');
+  if (win === 'clickup') {
+    wrap.innerHTML = `<div class="pinned-label">Reference</div>
+      <div class="pinned-card">
+        <div class="pinned-icon">📐</div>
+        <div class="pinned-info">
+          <div class="name">App Build Standard</div>
+          <div class="desc">Folder scaffold, README template, build workflow reference</div>
+        </div>
+        <div class="pinned-actions">
+          <a class="pinned-btn pinned-btn-open" href="${REPO_TREE}/template-app" target="_blank" rel="noopener">Open</a>
+          <a class="pinned-btn pinned-btn-repo" href="${REPO_TREE}/template-app" target="_blank" rel="noopener">Repo</a>
+        </div>
+      </div>`;
+  } else {
+    wrap.innerHTML = `<div class="pinned-label">Reference</div>
+      <div class="pinned-card">
+        <div class="pinned-icon">📐</div>
+        <div class="pinned-info">
+          <div class="name">FMP App Template</div>
+          <div class="desc">Standard 11-doc shape + schema JSON contract</div>
+        </div>
+        <div class="pinned-actions">
+          <a class="pinned-btn pinned-btn-open" href="${REPO_TREE}/filemaker/_template-fmp-app" target="_blank" rel="noopener">Open</a>
+          <a class="pinned-btn pinned-btn-repo" href="${REPO_TREE}/filemaker" target="_blank" rel="noopener">Repo</a>
+        </div>
+      </div>`;
+  }
+}
+
+// ─── Dispatcher ───────────────────────
+async function init(forceRefresh) {
+  if (currentWindow === 'filemaker') return initFileMaker();
+  return initClickUp(forceRefresh);
+}
+
+// ─── ClickUp window (original behavior, unchanged) ───
+async function initClickUp(forceRefresh) {
+  const grid = document.getElementById('appGrid');
   pruneOldCaches();
-  try{ const s=localStorage.getItem(FILTER_KEY); if(s && ['all','dashboard','tool'].indexOf(s)!==-1) currentFilter=s; }catch(e){}
-  if(!forceRefresh){ const cached=getCache(); if(cached){ allApps=cached; renderFromData(cached); cached.forEach(function(a,i){ checkHealth(a,i); }); return; } }
-  try{
-    const treeRes = await fetch(API_BASE + '/git/trees/main?recursive=1');
-    if(!treeRes.ok) throw new Error('tree');
-    const tree = (await treeRes.json()).tree || [];
-    const folders = []; const seen = {};
-    tree.forEach(function(t){ if(t.type==='tree' && t.path.indexOf('/')===-1 && EXCLUDED.indexOf(t.path)===-1 && !seen[t.path]){ seen[t.path]=1; folders.push(t.path); } });
-    const dataSet = {}, iconSet = {};
-    tree.forEach(function(t){ if(/\/data\.json$/.test(t.path)) dataSet[t.path.split('/')[0]]=1; if(/^[^/]+\/icon\.png$/.test(t.path)) iconSet[t.path.split('/')[0]]=1; });
-    const apps = await Promise.all(folders.map(function(n){ return buildApp(n, !!dataSet[n], !!iconSet[n]); }));
-    apps.sort(function(a,b){ return new Date(b.lastUpdated||0) - new Date(a.lastUpdated||0); });
-    allApps = apps; setCache(apps); renderFromData(apps); apps.forEach(function(a,i){ checkHealth(a,i); });
-  }catch(e){
-    try{
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i);
-        if(k && k.indexOf('appDashboard_cache_')===0){
-          const p=JSON.parse(localStorage.getItem(k));
-          if(p && p.data){ allApps=p.data; renderFromData(p.data); p.data.forEach(function(a,idx){ checkHealth(a,idx); }); return; }
+
+  try {
+    const saved = localStorage.getItem(FILTER_KEY);
+    if (saved && ['all', 'dashboard', 'tool'].includes(saved)) currentFilter = saved;
+  } catch (e) {}
+
+  if (!forceRefresh) {
+    const cached = getCache();
+    if (cached) {
+      allApps = cached;
+      renderFromData(cached);
+      cached.forEach((app, i) => checkHealth(app, i));
+      return;
+    }
+  }
+
+  grid.innerHTML = '<div class="loading-state">Loading apps...</div>';
+
+  try {
+    const [treeRes, commitsRes] = await Promise.all([
+      fetch(`${API_BASE}/contents/`),
+      fetch(`${API_BASE}/commits?per_page=100`)
+    ]);
+
+    if (!treeRes.ok || !commitsRes.ok) throw new Error('API error');
+
+    const items = await treeRes.json();
+    const commits = await commitsRes.json();
+
+    const appFolders = items.filter(i => i.type === 'dir' && !EXCLUDED.includes(i.name));
+    const apps = await Promise.all(appFolders.map(f => buildApp(f, commits)));
+    apps.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
+
+    allApps = apps;
+    setCache(apps);
+    renderFromData(apps);
+    apps.forEach((app, i) => checkHealth(app, i));
+  } catch (e) {
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('appDashboard_cache_')) {
+          const parsed = JSON.parse(localStorage.getItem(key));
+          if (parsed && parsed.data) {
+            allApps = parsed.data;
+            renderFromData(parsed.data);
+            grid.insertAdjacentHTML('beforeend', '<div class="cache-note">Showing cached data (offline or rate limited)</div>');
+            parsed.data.forEach((app, idx) => checkHealth(app, idx));
+            return;
+          }
         }
       }
-    }catch(e2){}
-    buildFromSample();
+    } catch (e2) {}
+    grid.innerHTML = '<div class="error-state">Could not reach GitHub API. Check your connection and refresh.</div>';
   }
 }
 
-async function buildApp(name, hasData, hasIcon){
-  const pagesUrl = PAGES_BASE + '/' + name + '/';
-  const repoUrl = 'https://github.com/' + OWNER + '/' + REPO + '/tree/main/' + name;
-  let lastUpdated=null, commitCount=0, commits=[];
-  try{
-    const r = await fetch(API_BASE + '/commits?per_page=100&path=' + encodeURIComponent(name));
-    if(r.ok){ const cs = await r.json(); if(Array.isArray(cs) && cs.length){
-      commitCount=cs.length; lastUpdated=cs[0].commit.author.date;
-      commits = cs.slice(0,12).map(function(c){ return { msg:c.commit.message.split('\n')[0], date:c.commit.author.date }; });
-    } }
-  }catch(e){}
+function renderFromData(apps) {
+  render(apps);
+  updateStats(apps);
+  applyFilter(currentFilter);
+  document.getElementById('refreshTime').textContent =
+    new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+async function buildApp(folder, commits) {
+  const name = folder.name;
+  const pagesUrl = `${PAGES_BASE}/${name}/`;
+  const repoUrl = `${REPO_TREE}/${name}`;
+
+  const folderCommits = commits.filter(c =>
+    c.commit.message.toLowerCase().includes(name)
+  );
+  const lastCommit = folderCommits[0] || null;
+  const lastUpdated = lastCommit ? lastCommit.commit.author.date : null;
+  const lastMsg = lastCommit ? lastCommit.commit.message.split('\n')[0] : null;
+  const commitCount = folderCommits.length;
+
+  let hasData = false;
+  try {
+    const res = await fetch(`${API_BASE}/contents/${name}`);
+    if (res.ok) {
+      const contents = await res.json();
+      hasData = contents.some(f => f.name === 'data.json');
+    }
+  } catch (e) {}
+
   const meta = APP_META[name] || {};
-  return { name:name, pagesUrl:pagesUrl, repoUrl:repoUrl, iconUrl:(hasIcon?pagesUrl+'icon.png':null), lastUpdated:lastUpdated, commitCount:commitCount, commits:commits, hasData:hasData, desc:meta.desc||null, category:meta.category||'tool', health:null };
+  return { name, pagesUrl, repoUrl, lastUpdated, lastMsg, commitCount, hasData, desc: meta.desc || null, category: meta.category || 'tool', badges: meta.badges || [] };
 }
 
-function displayName(name){ return name.replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
-function monogram(display){ const p=display.split(' ').filter(Boolean); let m=(p[0]||'?')[0]; if(p[1]) m+=p[1][0]; return m.toUpperCase(); }
-
-function renderFromData(apps){
-  render(apps); updateStats(apps); applyFilter(currentFilter);
-  document.getElementById('refreshStamp').textContent = new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-}
-
-function tileMarkup(app){
-  const mono = esc(monogram(displayName(app.name)));
-  if(app.iconUrl){
-    return '<img class="ticon" src="'+app.iconUrl+'" alt="" loading="lazy" onerror="this.remove();this.parentNode.classList.remove(\'has-img\');var m=this.parentNode.querySelector(\'.tmono\');if(m)m.style.display=\'flex\';">'
-         + '<span class="tmono" style="display:none">'+mono+'</span>';
-  }
-  return '<span class="tmono">'+mono+'</span>';
-}
-
-function render(apps){
-  const list = document.getElementById('list');
+function render(apps) {
+  const grid = document.getElementById('appGrid');
   const recent = getRecent();
-  const codeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>';
-  list.innerHTML = apps.map(function(app, i){
-    const display = displayName(app.name);
-    const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : null;
-    const isRecent = recent.indexOf(app.name)!==-1;
-    const cat = app.category;
-    let tags = '';
-    if(isRecent) tags += '<span class="tag tag-recent">Recent</span>';
-    if(app.hasData) tags += '<span class="tag tag-data">Data</span>';
-    let meta = '<span class="slug">'+esc(app.name)+'/</span>';
-    if(timeStr) meta += '<span class="sep">·</span>'+esc(timeStr);
-    let h = '<div class="row" data-category="'+cat+'">';
-    h +=   '<a class="tile-link" href="'+app.pagesUrl+'" data-slug="'+esc(app.name)+'" aria-label="Open '+esc(display)+'">';
-    h +=     '<span class="tile c-'+cat+(app.iconUrl?' has-img':'')+'">'+tileMarkup(app)+'<span class="dot checking" id="health-'+i+'"></span></span>';
-    h +=   '</a>';
-    h +=   '<button class="info" data-idx="'+i+'" aria-label="Details for '+esc(display)+'">';
-    h +=     '<span class="line1"><span class="name">'+esc(display)+'</span>'+tags+'</span>';
-    h +=     '<span class="metaline">'+meta+'</span>';
-    h +=   '</button>';
-    h +=   '<a class="chev" href="'+app.repoUrl+'" target="_blank" rel="noopener" aria-label="Open '+esc(display)+' repo folder">'+codeIcon+'</a>';
-    h += '</div>';
-    return h;
+
+  grid.innerHTML = apps.map((app, i) => {
+    const displayName = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : '\u2014';
+    const isRecent = recent.includes(app.name);
+
+    const badgeHtml = [
+      app.hasData ? '<span class="badge badge-data">data.json</span>' : '',
+      ...app.badges.map(b => {
+        if (b === 'dashboard') return '<span class="badge badge-dashboard">Dashboard</span>';
+        if (b === 'data') return app.hasData ? '' : '<span class="badge badge-data">data.json</span>';
+        if (b === 'tool') return '<span class="badge badge-tool">Tool</span>';
+        return '';
+      })
+    ].filter(Boolean).join('');
+
+    return `
+      <div class="app-card" data-category="${app.category}">
+        <div class="app-header">
+          <span class="health-dot checking" id="health-${i}"></span>
+          <span class="app-name">${esc(displayName)}</span>
+          ${isRecent ? '<span class="recent-indicator">Recent</span>' : ''}
+        </div>
+        <div class="app-slug">${esc(app.name)}</div>
+        ${app.desc ? `<div class="app-desc">${esc(app.desc)}</div>` : ''}
+        ${badgeHtml ? `<div class="app-badges">${badgeHtml}</div>` : ''}
+        <div class="app-meta">
+          <span><strong>${timeStr}</strong></span>
+          <span>${app.commitCount} commit${app.commitCount !== 1 ? 's' : ''}</span>
+        </div>
+        ${app.lastMsg ? `<div class="app-meta" style="font-style:italic">${esc(app.lastMsg)}</div>` : ''}
+        <div class="app-actions">
+          <a class="app-btn app-btn-open" href="${app.pagesUrl}" target="_blank" rel="noopener" onclick="logVisit('${app.name}')">Open app</a>
+          <a class="app-btn app-btn-repo" href="${app.repoUrl}" target="_blank" rel="noopener">Repo folder</a>
+        </div>
+      </div>`;
   }).join('');
-  list.querySelectorAll('.tile-link').forEach(function(a){ a.addEventListener('click', function(){ logVisit(a.dataset.slug); }); });
-  list.querySelectorAll('.info').forEach(function(b){ b.addEventListener('click', function(){ openSheet(parseInt(b.dataset.idx,10)); }); });
 }
 
-/* ---- detail sheet ---- */
-const scrim = document.getElementById('scrim');
-const sheet = document.getElementById('sheet');
-function openSheet(idx){
-  const app = allApps[idx]; if(!app) return;
-  const display = displayName(app.name);
-  lastFocus = document.activeElement;
-  const st = document.getElementById('sheetTile');
-  st.className = 'sheet-tile c-' + app.category;
-  st.innerHTML = app.iconUrl ? '<img src="'+app.iconUrl+'" alt="" onerror="this.remove();var p=this.parentNode;p.textContent=\''+esc(monogram(display))+'\';">' : esc(monogram(display));
-  document.getElementById('sheetName').textContent = display;
-  document.getElementById('sheetSlug').textContent = app.name + '/';
-  document.getElementById('sheetDesc').textContent = app.desc || 'No description on file yet.';
-  const dot = document.getElementById('health-'+idx);
-  const hv = document.getElementById('mHealth');
-  const state = app.health || (dot && dot.classList.contains('live') ? 'live' : dot && dot.classList.contains('dead') ? 'dead' : 'checking');
-  hv.textContent = state==='live' ? 'Live' : state==='dead' ? 'Down' : '…';
-  hv.className = 'v ' + (state==='live'?'ok':state==='dead'?'bad':'');
-  document.getElementById('mUpdated').textContent = app.lastUpdated ? relativeTime(app.lastUpdated) : '—';
-  document.getElementById('mCommits').textContent = app.commitCount ? (app.commitCount + (app.commitCount>=100?'+':'')) : '—';
-  const openBtn = document.getElementById('sheetOpen');
-  openBtn.href = app.pagesUrl; openBtn.onclick = function(){ logVisit(app.name); };
-  document.getElementById('sheetRepo').href = app.repoUrl;
-  renderCommits(app);
-  document.body.classList.add('locked');
-  scrim.classList.add('show');
-  sheet.classList.add('show');
-  sheet.setAttribute('aria-hidden','false');
-  document.getElementById('sheetClose').focus();
-}
-function renderCommits(app){
-  const wrap = document.getElementById('sheetCommits');
-  if(app.commits && app.commits.length){
-    wrap.innerHTML = app.commits.map(function(c){
-      return '<div class="commit"><div class="rail"><div class="node"></div></div><div class="ctext"><div class="cmsg">'+esc(c.msg)+'</div><div class="cwhen">'+esc(fullWhen(c.date))+'</div></div></div>';
-    }).join('');
-  } else if(app.commitCount){
-    wrap.innerHTML = '<div class="commits-empty">'+app.commitCount+' commits. Open the repo for the full history.</div>';
-  } else {
-    wrap.innerHTML = '<div class="commits-empty">No commit history loaded.</div>';
+async function checkHealth(app, idx) {
+  const dot = document.getElementById(`health-${idx}`);
+  if (!dot) return;
+  try {
+    const res = await fetch(app.pagesUrl, { method: 'GET', mode: 'cors', cache: 'no-store' });
+    dot.className = res.ok ? 'health-dot live' : 'health-dot dead';
+    updateHealthCount();
+  } catch (e) {
+    dot.className = 'health-dot dead';
+    updateHealthCount();
   }
 }
-function closeSheet(){
-  scrim.classList.remove('show');
-  sheet.classList.remove('show');
-  sheet.setAttribute('aria-hidden','true');
-  document.body.classList.remove('locked');
-  if(lastFocus && lastFocus.focus) lastFocus.focus();
-}
-scrim.addEventListener('click', closeSheet);
-document.getElementById('sheetClose').addEventListener('click', closeSheet);
-document.addEventListener('keydown', function(e){ if(e.key==='Escape' && sheet.classList.contains('show')) closeSheet(); });
-// swipe-down to dismiss
-(function(){
-  let y0=null;
-  sheet.addEventListener('touchstart', function(e){ if(sheet.querySelector('.sheet-scroll').scrollTop<=0) y0=e.touches[0].clientY; else y0=null; }, {passive:true});
-  sheet.addEventListener('touchmove', function(e){ if(y0===null) return; const dy=e.touches[0].clientY-y0; if(dy>0){ sheet.style.transform='translateY('+dy+'px)'; } }, {passive:true});
-  sheet.addEventListener('touchend', function(e){ if(y0===null) return; const dy=e.changedTouches[0].clientY-y0; sheet.style.transform=''; if(dy>90) closeSheet(); y0=null; }, {passive:true});
-})();
 
-async function checkHealth(app, idx){
-  const dot = document.getElementById('health-' + idx);
-  if(!dot) return;
-  try{ const res = await fetch(app.pagesUrl, { method:'GET', mode:'cors', cache:'no-store' }); const ok=res.ok; dot.className = ok ? 'dot live' : 'dot dead'; if(allApps[idx]) allApps[idx].health = ok?'live':'dead'; updateHealthCount(); }
-  catch(e){ dot.className = 'dot dead'; if(allApps[idx]) allApps[idx].health='dead'; updateHealthCount(); }
+function updateHealthCount() {
+  const dots = document.querySelectorAll('.health-dot');
+  let healthy = 0;
+  let resolved = 0;
+  dots.forEach(d => {
+    if (d.classList.contains('live')) { healthy++; resolved++; }
+    else if (d.classList.contains('dead')) { resolved++; }
+  });
+  if (resolved === dots.length && dots.length > 0) {
+    document.getElementById('healthyCount').textContent = healthy;
+  }
 }
-function updateHealthCount(){
-  if(usingSample) return;
-  const dots = document.querySelectorAll('.dot');
-  let healthy=0, resolved=0;
-  dots.forEach(function(d){ if(d.classList.contains('live')){ healthy++; resolved++; } else if(d.classList.contains('dead')){ resolved++; } });
-  if(resolved===dots.length && dots.length>0){ stat.live = healthy; setStatus(); }
-}
-function updateStats(apps){
-  const sevenDays = Date.now() - 7*86400000;
-  stat.n = apps.length;
-  stat.live = usingSample ? apps.length : '…';
-  stat.recent7 = apps.filter(function(a){ return a.lastUpdated && new Date(a.lastUpdated) > sevenDays; }).length;
-  setStatus();
-}
-function relativeTime(iso){
-  const ms = Date.now() - new Date(iso), hrs = Math.floor(ms/3600000), days = Math.floor(ms/86400000);
-  if(hrs < 1) return 'just now'; if(hrs < 24) return hrs + 'h ago'; if(days < 7) return days + 'd ago';
-  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-}
-function fullWhen(iso){ const d=new Date(iso); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' + relativeTime(iso); }
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;'); }
 
-document.getElementById('verStamp').textContent = APP_VERSION;
-const refreshBtn = document.getElementById('refreshBtn');
-refreshBtn.addEventListener('click', async function(){
-  if(refreshBtn.classList.contains('spinning')) return;
-  refreshBtn.classList.add('spinning');
-  await init(true);
-  setTimeout(function(){ refreshBtn.classList.remove('spinning'); }, 400);
+function updateStats(apps) {
+  document.getElementById('appCount').textContent = apps.length;
+  document.getElementById('healthyCount').textContent = '\u2026';
+  const sevenDays = Date.now() - 7 * 86400000;
+  const recent = apps.filter(a => a.lastUpdated && new Date(a.lastUpdated) > sevenDays).length;
+  document.getElementById('recentCount').textContent = recent;
+}
+
+// ─── FileMaker window (purple mirror, docs-only) ───
+async function initFileMaker() {
+  const grid = document.getElementById('appGrid');
+  grid.innerHTML = '<div class="loading-state">Loading FileMaker apps...</div>';
+  try {
+    const [treeRes, commitsRes] = await Promise.all([
+      fetch(`${API_BASE}/contents/filemaker`),
+      fetch(`${API_BASE}/commits?per_page=100`)
+    ]);
+    if (!treeRes.ok) throw new Error('API error');
+    const items = await treeRes.json();
+    const commits = commitsRes.ok ? await commitsRes.json() : [];
+    const folders = items.filter(i => i.type === 'dir' && !FMP_EXCLUDED.includes(i.name));
+    const apps = await Promise.all(folders.map(f => buildFmpApp(f, commits)));
+    apps.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
+    allApps = apps;
+    renderFmp(apps);
+    updateFmpStats(apps);
+    document.getElementById('refreshTime').textContent =
+      new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  } catch (e) {
+    grid.innerHTML = '<div class="error-state">Could not reach GitHub API. Refresh to retry.</div>';
+  }
+}
+
+async function buildFmpApp(folder, commits) {
+  const name = folder.name;
+  const repoUrl = `${REPO_TREE}/filemaker/${name}`;
+  const folderCommits = commits.filter(c => {
+    const m = c.commit.message.toLowerCase();
+    return m.includes(name) || m.includes('filemaker');
+  });
+  const lastCommit = folderCommits[0] || null;
+  const lastUpdated = lastCommit ? lastCommit.commit.author.date : null;
+  const lastMsg = lastCommit ? lastCommit.commit.message.split('\n')[0] : null;
+  const commitCount = folderCommits.length;
+
+  let docCount = 0, hasSchema = false;
+  try {
+    const r = await fetch(`${API_BASE}/contents/filemaker/${name}/docs`);
+    if (r.ok) { const d = await r.json(); if (Array.isArray(d)) docCount = d.filter(f => f.name.endsWith('.md')).length; }
+  } catch (e) {}
+  try {
+    const r = await fetch(`${API_BASE}/contents/filemaker/${name}/schema`);
+    if (r.ok) { const s = await r.json(); hasSchema = Array.isArray(s) && s.some(f => f.name === 'tables.json'); }
+  } catch (e) {}
+
+  return { name, repoUrl, lastUpdated, lastMsg, commitCount, docCount, hasSchema };
+}
+
+function renderFmp(apps) {
+  const grid = document.getElementById('appGrid');
+  grid.innerHTML = apps.map(app => {
+    const displayName = app.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : '\u2014';
+    const badgeHtml = [
+      app.hasSchema ? '<span class="badge badge-tool">Schema</span>' : '',
+      `<span class="badge badge-dashboard">${app.docCount} docs</span>`
+    ].filter(Boolean).join('');
+
+    return `
+      <div class="app-card">
+        <div class="app-header">
+          <span class="health-dot doc"></span>
+          <span class="app-name">${esc(displayName)}</span>
+        </div>
+        <div class="app-slug">filemaker/${esc(app.name)}</div>
+        ${badgeHtml ? `<div class="app-badges">${badgeHtml}</div>` : ''}
+        <div class="app-meta">
+          <span><strong>${timeStr}</strong></span>
+          <span>${app.commitCount} commit${app.commitCount !== 1 ? 's' : ''}</span>
+        </div>
+        ${app.lastMsg ? `<div class="app-meta" style="font-style:italic">${esc(app.lastMsg)}</div>` : ''}
+        <div class="app-actions">
+          <a class="app-btn app-btn-open" href="${app.repoUrl}" target="_blank" rel="noopener">View on repo &rsaquo;</a>
+        </div>
+      </div>`;
+  }).join('') || '<div class="empty-filter">No FileMaker apps documented yet.</div>';
+}
+
+function updateFmpStats(apps) {
+  document.getElementById('appCount').textContent = apps.length;
+  document.getElementById('healthyCount').textContent = apps.reduce((s, a) => s + a.docCount, 0);
+  const sevenDays = Date.now() - 7 * 86400000;
+  document.getElementById('recentCount').textContent = apps.filter(a => a.lastUpdated && new Date(a.lastUpdated) > sevenDays).length;
+}
+
+// ─── Shared helpers ────────────────────
+function relativeTime(iso) {
+  const ms = Date.now() - new Date(iso);
+  const hrs = Math.floor(ms / 3600000);
+  const days = Math.floor(ms / 86400000);
+  if (hrs < 1) return 'just now';
+  if (hrs < 24) return `${hrs}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── Event listeners ───────────────────
+document.getElementById('refreshBtn').addEventListener('click', () => init(true));
+
+document.getElementById('filterRow').addEventListener('click', (e) => {
+  const chip = e.target.closest('.filter-chip');
+  if (!chip) return;
+  applyFilter(chip.dataset.filter);
 });
-document.getElementById('filterRow').addEventListener('click', function(e){ const chip = e.target.closest('.chip'); if(!chip) return; applyFilter(chip.dataset.filter); });
+
+// ─── Init ──────────────────────────
+try {
+  const w = localStorage.getItem(WINDOW_KEY);
+  if (w === 'filemaker' || w === 'clickup') currentWindow = w;
+} catch (e) {}
+applyWindowChrome(currentWindow);
 init(false);
 </script>
 </body>
