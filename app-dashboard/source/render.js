@@ -1,10 +1,15 @@
 /* app-dashboard — render module. List rendering, tile/monogram markup, sample builder.
    Globals it relies on (from app.js): WIN, WINDOWS, allApps, getRecent, logVisit, relativeTime,
    updateStats, applyFilter, setStatus, esc, PAGES_BASE, OWNER, REPO; from data.js: APP_META, FM_META, SAMPLE, FM_SAMPLE;
-   from sheet.js: openSheet. All resolve at call time (this file only declares functions). */
+   from sheet.js: openSheet. All resolve at call time (this file only declares functions).
+
+   Display name resolution: app.label (from meta) wins over the auto-titlecased folder name.
+   Monogram resolution: app.mono (from meta) wins over the derived initials of the display label. */
 
 function displayName(name){ return name.replace(/^_/,'').replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
+function labelFor(app){ return app.label || displayName(app.name); }
 function monogram(display){ const p=display.split(' ').filter(Boolean); let m=(p[0]||'?')[0]; if(p[1]) m+=p[1][0]; return m.toUpperCase(); }
+function monoFor(app){ return app.mono || monogram(labelFor(app)); }
 
 function renderFromData(apps){
   render(apps); updateStats(apps);
@@ -13,7 +18,7 @@ function renderFromData(apps){
 }
 
 function tileMarkup(app){
-  const mono = esc(monogram(displayName(app.name)));
+  const mono = esc(monoFor(app));
   if(app.iconUrl){
     return '<img class="ticon" src="'+app.iconUrl+'" alt="" loading="lazy" onerror="this.remove();this.parentNode.classList.remove(\'has-img\');var m=this.parentNode.querySelector(\'.tmono\');if(m)m.style.display=\'flex\';">'
          + '<span class="tmono" style="display:none">'+mono+'</span>';
@@ -27,7 +32,7 @@ function render(apps){
   const health = WINDOWS[WIN].health;
   const chevIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
   list.innerHTML = apps.map(function(app, i){
-    const display = displayName(app.name);
+    const display = labelFor(app);
     const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : null;
     const isRecent = recent.indexOf(app.name)!==-1;
     const cat = app.category;
@@ -69,7 +74,8 @@ function buildFromSample(){
       lastUpdated:new Date(now - s.hoursAgo*3600000).toISOString(), commitCount:s.commitCount,
       commits:(s.commits||[]).map(function(c){ return { msg:c[0], date:new Date(now - c[1]*3600000).toISOString() }; }),
       hasData:(meta.badges||[]).indexOf('data')!==-1 || s.name==='world-cup-bracket',
-      desc:meta.desc||null, category:(WIN==='clickup'?(meta.category||'tool'):'fm'), health:(WIN==='clickup'?'live':'na')
+      desc:meta.desc||null, label:meta.label||null, mono:meta.mono||null,
+      category:(WIN==='clickup'?(meta.category||'tool'):'fm'), health:(WIN==='clickup'?'live':'na')
     };
   });
   allApps = apps; renderFromData(apps);
