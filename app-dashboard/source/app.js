@@ -1,7 +1,8 @@
 /* app-dashboard v4 — core engine + boot. Companion modules: data.js (metadata/samples),
-   render.js (list rendering), sheet.js (detail sheet). Load order: data → render → sheet → app. */
+   render.js (list rendering), sheet.js (detail sheet), settings.js (theme/drawer). Load order:
+   data → render → sheet → settings → app. */
 const APP_VERSION = 'v4';
-const APP_PR = '39'; // stamped with the PR number that shipped this build
+const APP_PR = '40'; // stamped with the PR number that shipped this build
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
