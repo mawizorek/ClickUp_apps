@@ -1,0 +1,12 @@
+{
+  "_meta": {
+    "app": "hml-llc",
+    "schemaVersion": "1.0",
+    "generated": "2026-07-06",
+    "description": "PENDING enumeration from the FileMaker file. Rule: display-only labels here; anything with metadata (e.g. transaction types with category + cash direction) belongs in Standard_Transactions."
+  },
+  "valueLists": [
+    { "name": "TransactionStatus", "source": "field-based", "status": "pending", "values": [], "notes": "Late / Paid / Outstanding-Due / Upcoming per the status pill design" },
+    { "name": "DeliveryType", "source": "custom", "status": "pending", "values": [], "notes": "mailing / wire / ACH" }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "_meta": {
+    "app": "hml-llc",
+    "schemaVersion": "1.0",
+    "generated": "2026-07-06",
+    "source": "Migrated from ClickUp: HML_LLC Design Constitution + 'Lock canonical schema and base tables' (HMLLC-2740).",
+    "description": "Self-describing FileMaker schema source for HML_LLC. Every field carries keyType + category so a passive viewer can color/sort/frame without app-specific logic.",
+    "conventions": {
+      "pk": "PrimaryKey (UUID text) on every table",
+      "fk": "fk<Parent> prefix",
+      "calc": "calc_ prefix",
+      "global": "g_ prefix; gLIST_ reserved for value-list globals",
+      "audit": "CreationTimestamp, CreatedBy, ModificationTimestamp, ModifiedBy"
+    },
+    "keyTypes": ["pk", "fk", "calc", "global", "audit", "container", "plain"],
+    "roleColors": {
+      "singleton": "#7B3FA0",
+      "collateral": "#2E7D5B",
+      "servicing-parent": "#7B3FA0",
+      "ledger": "#B8860B",
+      "join": "#555555",
+      "snapshot": "#C0392B",
+      "source": "#2E7D5B",
+      "taxonomy": "#555555",
+      "party": "#2E7D5B",
+      "document": "#B8860B"
+    },
+    "statusLegend": {
+      "locked": "canonical, do not rename without a schema decision",
+      "pending": "planned / decision open",
+      "under-review": "exists but a decision is open"
+    }
+  },
+  "tables": [
+    {
+      "name": "GLOBAL_USE_VARIABLES",
+      "role": "singleton",
+      "status": "locked",
+      "description": "The only one-record app-state / control table. Holds file setup values + session context globals.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "APP_TITLE", "type": "text", "keyType": "plain", "category": "setup" },
+        { "name": "APP_VERSION", "type": "text", "keyType": "plain", "category": "setup" },
+        { "name": "calc_FILEPATH", "type": "calc", "keyType": "calc", "category": "setup" },
+        { "name": "calc_FILENAME", "type": "calc", "keyType": "calc", "category": "setup" },
+        { "name": "calc_HOSTED_STATUS", "type": "calc", "keyType": "calc", "category": "setup" },
+        { "name": "calc_FILESIZE_MB", "type": "calc", "keyType": "calc", "category": "setup" },
+        { "name": "script_Stats_RecordCounts", "type": "text", "keyType": "plain", "category": "setup" },
+        { "name": "script_LastSaved", "type": "text", "keyType": "plain", "category": "setup" },
+        { "name": "g_fkCurrentProperty", "type": "text-uuid", "keyType": "global", "category": "context", "notes": "current property context" },
+        { "name": "g_fkCurrentLoan", "type": "text-uuid", "keyType": "global", "category": "context", "notes": "current loan context" },
+        { "name": "g_HubMode", "type": "text", "keyType": "global", "category": "context", "notes": "main hub/tab mode" }
+      ]
+    },
+    {
+      "name": "PropertySUMMARIES",
+      "role": "collateral",
+      "status": "locked",
+      "description": "Collateral / operating property table. NOT the financial parent — loan-servicing ownership lives on Loans.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "fkBorrower", "type": "text-uuid", "keyType": "fk", "category": "key", "status": "under-review", "notes": "FK ownership under re-eval" },
+        { "name": "fkDocuments", "type": "text-uuid", "keyType": "fk", "category": "key", "status": "under-review" },
+        { "name": "fkBalloonNote", "type": "text-uuid", "keyType": "fk", "category": "key", "status": "under-review" },
+        { "name": "fkPropertyStatus", "type": "text-uuid", "keyType": "fk", "category": "key", "status": "under-review" },
+        { "name": "<property identity + operating fields>", "type": "text", "keyType": "plain", "category": "identity", "status": "pending", "notes": "address/collateral identity fields — enumerate from FileMaker file" }
+      ]
+    },
+    {
+      "name": "Loans",
+      "role": "servicing-parent",
+      "status": "locked",
+      "description": "The real servicing parent. Loan terms + servicing status re-homed here off PropertySUMMARIES.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "fkProperty", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "fkBorrower", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "LoanNumber", "type": "text", "keyType": "plain", "category": "terms" },
+        { "name": "OriginationDate", "type": "date", "keyType": "plain", "category": "terms" },
+        { "name": "LoanAmount", "type": "number", "keyType": "plain", "category": "terms", "notes": "principal" },
+        { "name": "InterestRate", "type": "number", "keyType": "plain", "category": "terms" },
+        { "name": "OriginationPoints", "type": "number", "keyType": "plain", "category": "terms" },
+        { "name": "MaturationPoints", "type": "number", "keyType": "plain", "category": "terms" },
+        { "name": "MaturationTerm_inDays", "type": "number", "keyType": "plain", "category": "terms" },
+        { "name": "LoanTerm_inDays", "type": "number", "keyType": "plain", "category": "terms" },
+        { "name": "ServicingStatus", "type": "text", "keyType": "plain", "category": "status" },
+        { "name": "calc_<loan math>", "type": "calc", "keyType": "calc", "category": "calc", "status": "pending", "notes": "surviving loan math re-homed from PropertySUMMARIES / Account Calculations" }
+      ]
+    },
+    {
+      "name": "ExpectedTransactions",
+      "role": "ledger",
+      "status": "locked",
+      "description": "Expected/scheduled transactions. Parent is Loans (fkProperty removed once fkLoan established).",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "fkLoan", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "fkStandardTransaction", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "fkStatus", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "DueDate", "type": "date", "keyType": "plain", "category": "detail" },
+        { "name": "Amount", "type": "number", "keyType": "plain", "category": "detail", "notes": "normalized amount pattern (no dup AmountOriginal/OriginalAmount)" },
+        { "name": "Notes", "type": "text", "keyType": "plain", "category": "detail" },
+        { "name": "SortOrder", "type": "number", "keyType": "plain", "category": "detail" },
+        { "name": "calc_is_Late", "type": "calc", "keyType": "calc", "category": "calc" },
+        { "name": "calc_AmountPaid", "type": "calc", "keyType": "calc", "category": "calc" },
+        { "name": "calc_Remaining", "type": "calc", "keyType": "calc", "category": "calc" }
+      ]
+    },
+    {
+      "name": "AccountTransactions",
+      "role": "ledger",
+      "status": "locked",
+      "description": "Actual account transactions (the ledger). Parent is Loans.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "fkLoan", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "fkStandardTransaction", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "fkStatus", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "Date", "type": "date", "keyType": "plain", "category": "detail" },
+        { "name": "Amount", "type": "number", "keyType": "plain", "category": "detail" },
+        { "name": "Description", "type": "text", "keyType": "plain", "category": "detail" },
+        { "name": "Notes", "type": "text", "keyType": "plain", "category": "detail" },
+        { "name": "ExternalRef", "type": "text", "keyType": "plain", "category": "detail", "notes": "proper text/reference field, not a container" }
+      ]
+    },
+    {
+      "name": "PaymentApplications",
+      "role": "join",
+      "status": "locked",
+      "description": "Join table: applies account transactions against expected transactions. Kept lean.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "fkExpectedTransaction", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "fkAccountTransaction", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "AmountApplied", "type": "number", "keyType": "plain", "category": "detail" },
+        { "name": "AppliedTimestamp", "type": "timestamp", "keyType": "plain", "category": "detail" }
+      ]
+    },
+    {
+      "name": "Payoffs",
+      "role": "snapshot",
+      "status": "locked",
+      "description": "Frozen payoff snapshots. Numbers + payment-instruction snapshot are frozen so history can't be overwritten by later source edits.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "fkLoan", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "IsCurrent", "type": "number", "keyType": "plain", "category": "version", "notes": "current/version marker" },
+        { "name": "IssueDate", "type": "date", "keyType": "plain", "category": "detail" },
+        { "name": "AsOfDate", "type": "date", "keyType": "plain", "category": "detail" },
+        { "name": "FrozenPayoffAmount", "type": "number", "keyType": "plain", "category": "frozen", "notes": "frozen — never recomputed" },
+        { "name": "FrozenPaymentInstructions", "type": "text", "keyType": "plain", "category": "frozen", "notes": "snapshot of PaymentInstructions at issue" }
+      ]
+    },
+    {
+      "name": "PaymentInstructions",
+      "role": "source",
+      "status": "under-review",
+      "description": "Record-based payment instruction source (replaces the old fake-global table). Feeds payoffs.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "InstructionLabel", "type": "text", "keyType": "plain", "category": "detail" },
+        { "name": "PayeeText", "type": "text", "keyType": "plain", "category": "detail" },
+        { "name": "DeliveryType", "type": "text", "keyType": "plain", "category": "detail", "notes": "mailing/wire/ACH" },
+        { "name": "DeliveryDetailText", "type": "text", "keyType": "plain", "category": "detail" },
+        { "name": "SignatureReference", "type": "text", "keyType": "plain", "category": "detail", "status": "pending", "notes": "container vs document-module reference — decision open" },
+        { "name": "SortOrder", "type": "number", "keyType": "plain", "category": "detail" },
+        { "name": "IsActive", "type": "number", "keyType": "plain", "category": "detail" }
+      ]
+    },
+    {
+      "name": "Standard_Transactions",
+      "role": "taxonomy",
+      "status": "locked",
+      "description": "Metadata / taxonomy table for transaction types (not a glorified value list).",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
+        { "name": "Name", "type": "text", "keyType": "plain", "category": "detail" },
+        { "name": "DisplayName", "type": "text", "keyType": "plain", "category": "detail" },
+        { "name": "value_Category", "type": "text", "keyType": "plain", "category": "taxonomy" },
+        { "name": "value_CashDirection", "type": "text", "keyType": "plain", "category": "taxonomy" },
+        { "name": "value_AppliedToLayer", "type": "text", "keyType": "plain", "category": "taxonomy" },
+        { "name": "sort_order", "type": "number", "keyType": "plain", "category": "detail" },
+        { "name": "is_active", "type": "number", "keyType": "plain", "category": "detail" }
+      ]
+    },
+    {
+      "name": "Documents",
+      "role": "document",
+      "status": "pending",
+      "description": "Parked: one metadata/intake record per logical document. Rename DOCUMENTS -> Documents before any ExecuteSQL references.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
+        { "name": "fkProperty", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "fkLoan", "type": "text-uuid", "keyType": "fk", "category": "key" },
+        { "name": "fkCurrentVersion", "type": "text-uuid", "keyType": "fk", "category": "key", "notes": "if DocumentVersions survives v1" }
+      ]
+    },
+    {
+      "name": "Organizations",
+      "role": "party",
+      "status": "pending",
+      "description": "Parked: company/business/entity records (vs Borrowers if borrower-only scope wins). Rename CRM -> Organizations before ExecuteSQL.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "role": "party",
+      "status": "pending",
+      "description": "Parked: person records. Rename CONTACTS -> Contacts before ExecuteSQL.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" }
+      ]
+    }
+  ]
+}
