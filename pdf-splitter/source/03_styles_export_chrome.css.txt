@@ -1,13 +1,13 @@
 /* Export column, file tree, settings toggles, download, dialogs, settings drawer. */
 .exportcol{
-  border-left:1px solid var(--border); background:var(--surface-1);
-  padding:1.1rem 1.1rem; display:flex; flex-direction:column; gap:1rem; overflow-y:auto;
+ border-left:1px solid var(--border); background:var(--surface-1);
+ padding:1.1rem 1.1rem; display:flex; flex-direction:column; gap:1rem; overflow-y:auto;
 }
 .exportcol h2{ font-size:0.92rem; font-weight:650; }
 
 .status{
-  display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.85rem; border-radius:var(--r-md); font-size:0.84rem;
-  background:color-mix(in oklch, var(--accent) 10%, transparent); border:1px solid var(--accent-dim);
+ display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.85rem; border-radius:var(--r-md); font-size:0.84rem;
+ background:color-mix(in oklch, var(--accent) 10%, transparent); border:1px solid var(--accent-dim);
 }
 .status .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); flex-shrink:0; }
 .status.ready{ background:color-mix(in oklch, var(--ok) 10%, transparent); border-color:var(--ok); }
@@ -17,8 +17,8 @@
 .status b{ font-weight:650; }
 
 .tree{
-  background:var(--bg); border:1px solid var(--border); border-radius:var(--r-md); padding:0.8rem;
-  font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:0.78rem; line-height:1.7; overflow-x:auto;
+ background:var(--bg); border:1px solid var(--border); border-radius:var(--r-md); padding:0.8rem;
+ font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:0.78rem; line-height:1.7; overflow-x:auto;
 }
 .tree .folder{ color:var(--text); font-weight:600; display:flex; align-items:center; gap:0.4rem; }
 .tree .folder i{ width:14px; height:14px; }
@@ -38,31 +38,31 @@
 .setting .lbl{ font-size:0.82rem; }
 .setting .lbl .sub{ font-size:0.72rem; color:var(--text-faint); margin-top:0.1rem; }
 .toggle{
-  width:38px; height:22px; border-radius:999px; background:var(--surface-3); position:relative; cursor:pointer;
-  transition:background 0.18s ease; flex-shrink:0; border:1px solid var(--border);
+ width:38px; height:22px; border-radius:999px; background:var(--surface-3); position:relative; cursor:pointer;
+ transition:background 0.18s ease; flex-shrink:0; border:1px solid var(--border);
 }
 .toggle.on{ background:var(--accent-dim); border-color:var(--accent); }
 .toggle::after{
-  content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
-  background:var(--text); transition:transform 0.2s cubic-bezier(0.22,1,0.36,1);
+ content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
+ background:var(--text); transition:transform 0.2s cubic-bezier(0.22,1,0.36,1);
 }
 html[data-theme="light"] .toggle::after{ background:var(--surface-1); }
 .toggle.on::after{ transform:translateX(16px); background:var(--on-accent); }
 
 .export-btn{
-  margin-top:auto; padding:0.85rem; font-size:0.9rem; font-weight:650; border-radius:var(--r-md);
-  background:var(--accent); color:var(--on-accent);
-  display:flex; align-items:center; justify-content:center; gap:0.5rem; min-height:44px;
+ margin-top:auto; padding:0.85rem; font-size:0.9rem; font-weight:650; border-radius:var(--r-md);
+ background:var(--accent); color:var(--on-accent);
+ display:flex; align-items:center; justify-content:center; gap:0.5rem; min-height:44px;
 }
 .export-btn:hover:not(:disabled){ background:oklch(0.78 0.16 195); transform:translateY(-1px); box-shadow:0 6px 18px color-mix(in oklch, var(--accent) 30%, transparent); }
 .export-btn:disabled{ opacity:0.4; cursor:not-allowed; }
 .export-btn i{ width:18px; height:18px; }
 
 .dl-link{
-  margin-top:0.4rem; padding:0.85rem; font-size:0.9rem; font-weight:650;
-  background:var(--ok); color:var(--on-accent); border-radius:var(--r-md); min-height:44px;
-  display:none; align-items:center; justify-content:center; gap:0.5rem;
-  text-decoration:none; -webkit-touch-callout:default;
+ margin-top:0.4rem; padding:0.85rem; font-size:0.9rem; font-weight:650;
+ background:var(--ok); color:var(--on-accent); border-radius:var(--r-md); min-height:44px;
+ display:none; align-items:center; justify-content:center; gap:0.5rem;
+ text-decoration:none; -webkit-touch-callout:default;
 }
 .dl-link.show{ display:flex; }
 .dl-link i{ width:18px; height:18px; }
@@ -70,8 +70,8 @@ html[data-theme="light"] .toggle::after{ background:var(--surface-1); }
 .dl-hint.show{ display:block; }
 
 dialog{
-  border:1px solid var(--border); border-radius:var(--r-lg); background:var(--surface-1); color:var(--text); padding:0;
-  max-width:540px; width:92vw; box-shadow:var(--shadow);
+ border:1px solid var(--border); border-radius:var(--r-lg); background:var(--surface-1); color:var(--text); padding:0;
+ max-width:540px; width:92vw; box-shadow:var(--shadow);
 }
 dialog::backdrop{ background:oklch(0.1 0.01 275 / 0.62); }
 .modal-head{ display:flex; align-items:center; justify-content:space-between; padding:0.95rem 1.2rem; border-bottom:1px solid var(--border); }
@@ -81,17 +81,17 @@ dialog::backdrop{ background:oklch(0.1 0.01 275 / 0.62); }
 .modal-head .x i{ width:18px; height:18px; }
 .modal-body{ padding:1.2rem; }
 .modal-body textarea{
-  width:100%; height:280px; resize:vertical; font-family:ui-monospace,"SF Mono",Menlo,monospace;
-  font-size:0.82rem; line-height:1.65; background:var(--bg); border:1px solid var(--border); color:var(--text);
-  border-radius:var(--r-md); padding:0.85rem;
+ width:100%; height:280px; resize:vertical; font-family:ui-monospace,"SF Mono",Menlo,monospace;
+ font-size:0.82rem; line-height:1.65; background:var(--bg); border:1px solid var(--border); color:var(--text);
+ border-radius:var(--r-md); padding:0.85rem;
 }
 .modal-body textarea:focus{ outline:none; border-color:var(--accent); }
 .modal-note{ font-size:0.76rem; color:var(--text-faint); margin-top:0.7rem; line-height:1.5; }
 
 .folder-list{ display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem; }
 .folder-item{
-  display:flex; align-items:center; gap:0.7rem; padding:0.55rem 0.7rem; background:var(--surface-2);
-  border:1px solid var(--border); border-radius:var(--r-sm);
+ display:flex; align-items:center; gap:0.7rem; padding:0.55rem 0.7rem; background:var(--surface-2);
+ border:1px solid var(--border); border-radius:var(--r-sm);
 }
 .folder-item .fdot{ width:10px; height:10px; border-radius:2px; flex-shrink:0; }
 .folder-item input{ flex:1; font:inherit; font-size:0.85rem; background:transparent; border:none; color:var(--text); min-width:0; }
@@ -111,12 +111,26 @@ dialog::backdrop{ background:oklch(0.1 0.01 275 / 0.62); }
 
 .busy{ opacity:0.55; pointer-events:none; }
 
+/* --- iOS zoom prevention (mobile pre-build standard) --- */
+/* Kill the ~300ms double-tap zoom on every interactive control: fixes the jump
+ when tapping a page thumb, a toggle, or a button. Harmless on desktop. */
+button, a, summary, label, .pg-thumb, .toggle, .seg button, .drop,
+input, select, textarea{ touch-action: manipulation; }
 @media (max-width:820px){
-  .exportcol{ padding:1rem 0.9rem; }
+ /* Form controls held at >=16px stop iOS Safari's focus-zoom when you tap into
+ a field or open a dropdown. Scoped to mobile so desktop keeps tighter density.
+ Pinch-zoom stays fully intact (no user-scalable lock). */
+ .fname-row input,
+ .field input, .field select,
+ .modal-body textarea, .drawer-select, .folder-item input{ font-size:16px; }
+}
+
+@media (max-width:820px){
+ .exportcol{ padding:1rem 0.9rem; }
 }
 @media (prefers-reduced-motion: reduce){
-  *{ transition:none !important; animation:none !important; }
+ *{ transition:none !important; animation:none !important; }
 }
 @media print{
-  header, .pagesbar, .exportcol{ display:none; }
+ header, .pagesbar, .exportcol{ display:none; }
 }
