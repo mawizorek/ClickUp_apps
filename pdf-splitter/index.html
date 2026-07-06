@@ -1,1 +1,207 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PDF Splitter</title></head><body><h1>PDF Splitter</h1><p>Placeholder - full app pending migration.</p></body></html>
+<!--
+  PDF Splitter & Renamer
+  Version: v2 (modular)
+  Live: https://mawizorek.github.io/ClickUp_apps/pdf-splitter/
+  Source: https://github.com/mawizorek/ClickUp_apps/tree/main/pdf-splitter
+  INFRASTRUCTURE: slim runtime entrypoint. Styles fetched from source/*.css.txt; logic loaded
+  as ordered <script> modules from source/. No monolith. Bump BUILD_STAMP on every source deploy.
+  BOOT ORDER (load-bearing): state/helpers -> markdown+model -> rows -> tree/folders -> pdf/thumbs
+  -> export/download -> settings drawer -> init. init() runs last and wires everything.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#15171d">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Split one PDF into renamed, foldered documents and export a ZIP. Fully local, nothing uploads.">
+  <title>PDF Splitter &amp; Renamer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%82%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    html{background:#15171d}
+    body{opacity:0;transition:opacity .12s ease}
+    body.runtime-ready{opacity:1}
+    .boot-fail{display:none;position:fixed;inset:0;place-items:center;background:#15171d;color:#e6e7ea;font:15px/1.6 system-ui,sans-serif;padding:24px;text-align:center}
+    body.boot-failed .boot-fail{display:grid}
+  </style>
+  <script>
+    // Bump on every source/style deploy to guarantee fresh bytes past the Pages CDN.
+    const BUILD_STAMP = '20260705a';
+    const STYLE_SOURCES = [
+      './source/01_styles_base.css.txt',
+      './source/02_styles_rows.css.txt',
+      './source/03_styles_export_chrome.css.txt'
+    ];
+    Promise.all(STYLE_SOURCES.map(async (path) => {
+      const res = await fetch(path + '?v=' + BUILD_STAMP, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Failed to load ' + path);
+      const style = document.createElement('style');
+      style.dataset.source = path;
+      style.textContent = await res.text();
+      document.head.appendChild(style);
+    })).catch((err) => {
+      console.error('Style load failed', err);
+    }).finally(() => {
+      document.body.classList.add('runtime-ready');
+    });
+    // Apply persisted theme as early as possible (avoids flash).
+    try {
+      var savedTheme = localStorage.getItem('pdfsplitter.theme');
+      if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>PDF Splitter &amp; Renamer</h1>
+      <span class="ver">v2</span>
+      <span class="tag">split \u00b7 rename \u00b7 organize \u00b7 export</span>
+    </div>
+    <div class="head-actions">
+      <button class="btn" id="foldersBtn"><i data-lucide="folder-cog"></i> Folders</button>
+      <button class="btn" id="codeBtn"><i data-lucide="code"></i> Markdown</button>
+      <button class="btn" id="importBtn"><i data-lucide="download"></i> Import .md</button>
+      <input type="file" id="mdImport" accept=".md,.txt">
+      <button class="btn icon-btn" id="settingsBtn" aria-label="Settings" aria-expanded="false"><i data-lucide="settings"></i></button>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="pagesbar">
+      <div class="pagesbar-head">
+        <h3>Pages</h3>
+        <span class="pg-hint" id="pgCount">no PDF</span>
+      </div>
+      <div class="pg-grid" id="pgGrid"></div>
+      <p class="pg-hint" id="pgHint">Load a PDF to see its pages. Click a page for a single-page split; shift-click a second to make a range.</p>
+    </aside>
+
+    <main class="buildcol">
+      <div class="drop" id="drop">
+        <div class="ic"><i data-lucide="file-plus-2"></i></div>
+        <div class="drop-body">
+          <div class="t" id="dropTitle">Drop a PDF or click to load</div>
+          <div class="s" id="dropSub">One PDF in, one organized ZIP out. Nothing leaves your machine.</div>
+        </div>
+        <span class="replace">Replace</span>
+        <input type="file" id="pdfInput" accept=".pdf">
+      </div>
+
+      <div class="fname-card">
+        <label for="fnameInput">Session / Header Folder Name</label>
+        <div class="fname-row">
+          <input id="fnameInput" value="" placeholder="Auto-fills from the PDF filename" spellcheck="false">
+        </div>
+        <div class="fname-clean" id="fnameClean"><span class="lbl">ZIP root \u2192</span> export/</div>
+      </div>
+
+      <div class="portal">
+        <div class="portal-head">
+          <h2>Document Splits</h2>
+          <div class="tools">
+            <button class="btn" id="codeBtn2"><i data-lucide="file-code-2"></i> View source</button>
+          </div>
+        </div>
+        <div class="rows" id="rows"></div>
+        <button class="add-row" id="addRow"><i data-lucide="plus"></i> Add split</button>
+      </div>
+    </main>
+
+    <aside class="exportcol">
+      <h2>Export Set</h2>
+      <div class="status" id="statusBar">
+        <span class="dot"></span>
+        <div id="statusText">Load a PDF to begin.</div>
+      </div>
+      <div>
+        <h3 class="col-label">File structure</h3>
+        <div class="tree" id="tree"><div class="tree-empty">No PDF loaded yet.</div></div>
+      </div>
+      <div class="settings">
+        <h3>Export settings</h3>
+        <div class="setting">
+          <div class="lbl">Include unused pages<div class="sub">Auto-split leftover pages</div></div>
+          <div class="toggle" id="tgUnused" data-on="false"></div>
+        </div>
+        <div class="setting">
+          <div class="lbl">Allow page overlap<div class="sub">Let splits share pages</div></div>
+          <div class="toggle on" id="tgOverlap" data-on="true"></div>
+        </div>
+        <div class="setting">
+          <div class="lbl">Generate export report<div class="sub">_export_report.txt in ZIP</div></div>
+          <div class="toggle on" id="tgReport" data-on="true"></div>
+        </div>
+      </div>
+      <button class="export-btn" id="exportBtn" disabled><i data-lucide="package"></i> Export ZIP</button>
+      <a class="dl-link" id="dlLink" download><i data-lucide="download"></i> Download ZIP</a>
+      <div class="dl-hint" id="dlHint"></div>
+    </aside>
+  </div>
+
+  <dialog id="codeModal">
+    <div class="modal-head">
+      <h3>Markdown Source</h3>
+      <button class="x" id="codeClose"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <textarea spellcheck="false" id="mdArea"></textarea>
+      <p class="modal-note">This is the underlying source of truth. The portal rows read from and write to this. Edit directly if you prefer; changes sync back to the rows when you close. Cleaning and validation run against this on export.</p>
+    </div>
+  </dialog>
+
+  <dialog id="foldersModal">
+    <div class="modal-head">
+      <h3>Export Folders</h3>
+      <button class="x" id="foldersClose"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="setting drawer-topline">
+        <div class="lbl">Use folder structure<div class="sub">Off = flat ZIP, folder tags ignored</div></div>
+        <div class="toggle on" id="tgUseFolders" data-on="true"></div>
+      </div>
+      <div class="folder-list" id="folderList"></div>
+      <button class="add-row solid" id="addFolderBtn"><i data-lucide="plus"></i> Add folder</button>
+      <div class="setting drawer-botline">
+        <div class="lbl">Unassigned splits<div class="sub">Where splits with no folder land</div></div>
+        <select id="unassignedSel" class="drawer-select">
+          <option value="root">ZIP root</option>
+          <option value="Unsorted">Unsorted/ folder</option>
+        </select>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="settingsModal">
+    <div class="modal-head">
+      <h3>Settings</h3>
+      <button class="x" id="settingsClose"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="setting">
+        <div class="lbl">Theme<div class="sub">Light or dark surface</div></div>
+        <div class="seg" id="themeSeg">
+          <button data-theme-choice="light">Light</button>
+          <button data-theme-choice="dark">Dark</button>
+        </div>
+      </div>
+      <p class="modal-note">Everything runs locally in your browser. One PDF in, one organized ZIP out; no file ever uploads. Libraries load from CDN on first run, then the app works offline.</p>
+    </div>
+  </dialog>
+
+  <div class="boot-fail">Couldn't load the app modules. Check your connection and reload.</div>
+
+  <script src="./source/10_state_helpers.js?v=20260705a"></script>
+  <script src="./source/11_markdown_model.js?v=20260705a"></script>
+  <script src="./source/12_rows_render.js?v=20260705a"></script>
+  <script src="./source/13_tree_folders.js?v=20260705a"></script>
+  <script src="./source/14_pdf_thumbs.js?v=20260705a"></script>
+  <script src="./source/15_export_download.js?v=20260705a"></script>
+  <script src="./source/16_settings_drawer.js?v=20260705a"></script>
+  <script src="./source/17_init.js?v=20260705a"></script>
+</body>
+</html>
