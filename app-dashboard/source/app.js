@@ -1,6 +1,6 @@
 /* app-dashboard v4 — engine. Consumes source/data.js (APP_META, SAMPLE, FM_META, FM_SAMPLE). */
 const APP_VERSION = 'v4';
-const APP_PR = '__PR__'; // stamped with the PR number that shipped this build
+const APP_PR = '37'; // stamped with the PR number that shipped this build
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
