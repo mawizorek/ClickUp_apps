@@ -1,11 +1,11 @@
 /* v1 locked row layout preserved: every column fixed except the name field.
-   Badges + folder control paint into reserved slots and never reflow the grid. */
+ Badges + folder control paint into reserved slots and never reflow the grid. */
 .row{
-  background:var(--surface-1); border:1px solid var(--border); border-radius:var(--r-md);
-  padding:0.75rem 0.85rem 0.8rem;
-  display:grid;
-  grid-template-columns:20px minmax(0,1fr) 132px auto 152px;
-  gap:0.8rem; align-items:start; transition:border-color .14s ease;
+ background:var(--surface-1); border:1px solid var(--border); border-radius:var(--r-md);
+ padding:0.75rem 0.85rem 0.8rem;
+ display:grid;
+ grid-template-columns:20px minmax(0,1fr) 132px auto 152px;
+ gap:0.8rem; align-items:start; transition:border-color .14s ease;
 }
 .row:hover{ border-color:var(--accent-dim); }
 .row .fdot{ width:9px; height:9px; border-radius:2px; margin-top:0.5rem; background:var(--f-unsort); }
@@ -13,27 +13,38 @@
 .field{ display:flex; flex-direction:column; gap:0.28rem; min-width:0; }
 .field > label{ font-size:0.64rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-faint); font-weight:650; }
 .field input, .field select{
-  font:inherit; font-size:0.86rem; background:var(--surface-2); border:1px solid var(--border);
-  color:var(--text); border-radius:var(--r-sm); padding:0.48rem 0.58rem; min-width:0;
+ font:inherit; font-size:0.86rem; background:var(--surface-2); border:1px solid var(--border);
+ color:var(--text); border-radius:var(--r-sm); padding:0.48rem 0.58rem; min-width:0;
 }
 .field input:focus, .field select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in oklch, var(--accent) 22%, transparent); }
 .field input.mono{ font-family:ui-monospace,"SF Mono",Menlo,monospace; }
 
 .row .name-field .clean{
-  font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:0.73rem;
-  color:var(--accent-dim); margin-top:0.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+ font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:0.73rem;
+ color:var(--accent-dim); margin-top:0.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .row .name-field .clean b{ color:var(--accent); font-weight:600; }
 .row .folder-field select{ width:100%; }
 
-.pages-group{ display:flex; gap:0.45rem; }
+.pages-group{ display:flex; gap:0.45rem; align-items:flex-end; }
 .pages-group .field{ width:74px; }
+
+/* Visual page-picker trigger: sits after Start/End, opens the per-row thumbnail
+ picker. Lines up with the input row (align-self flex-end). >=44px on mobile. */
+.pick-btn{
+ flex:0 0 auto; align-self:flex-end; display:inline-flex; align-items:center; justify-content:center;
+ width:38px; height:38px; background:var(--surface-2); color:var(--text-dim);
+ border:1px solid var(--border); border-radius:var(--r-sm);
+ transition:background .12s ease, color .12s ease, border-color .12s ease;
+}
+.pick-btn:hover{ background:var(--surface-3); color:var(--accent); border-color:var(--accent-dim); }
+.pick-btn i{ width:16px; height:16px; }
 
 /* Fixed badge slot: reserved width keeps the grid locked in every badge state. */
 .row .meta{ display:flex; flex-direction:column; align-items:flex-end; gap:0.45rem; width:152px; }
 .badge{
-  display:inline-flex; align-items:center; gap:0.3rem; font-size:0.7rem; font-weight:600;
-  padding:0.22rem 0.5rem; border-radius:var(--r-sm); max-width:100%; text-align:right; line-height:1.25;
+ display:inline-flex; align-items:center; gap:0.3rem; font-size:0.7rem; font-weight:600;
+ padding:0.22rem 0.5rem; border-radius:var(--r-sm); max-width:100%; text-align:right; line-height:1.25;
 }
 .badge i{ width:12px; height:12px; flex-shrink:0; }
 .badge.ok{ background:color-mix(in oklch, var(--ok) 16%, transparent); color:var(--ok); }
@@ -48,16 +59,17 @@
 .row-note i{ width:12px; height:12px; flex-shrink:0; }
 
 @media (max-width:820px){
-  .row{ grid-template-columns:20px 1fr; }
-  .row .name-field, .row .folder-field, .row .pages-group, .row .meta{ grid-column:2; }
-  .row .meta{ flex-direction:row; align-items:center; justify-content:space-between; width:auto; }
-  .row .pages-group{ justify-content:flex-start; }
-  .row-note{ grid-column:1 / -1; }
+ .row{ grid-template-columns:20px 1fr; }
+ .row .name-field, .row .folder-field, .row .pages-group, .row .meta{ grid-column:2; }
+ .row .meta{ flex-direction:row; align-items:center; justify-content:space-between; width:auto; }
+ .row .pages-group{ justify-content:flex-start; }
+ .pick-btn{ width:44px; height:44px; }
+ .row-note{ grid-column:1 / -1; }
 }
 
 .add-row{
-  width:100%; padding:0.65rem; font-size:0.84rem; font-weight:600; background:transparent; color:var(--accent);
-  border:1.5px dashed var(--border); display:flex; align-items:center; justify-content:center; gap:0.4rem; border-radius:var(--r-md);
+ width:100%; padding:0.65rem; font-size:0.84rem; font-weight:600; background:transparent; color:var(--accent);
+ border:1.5px dashed var(--border); display:flex; align-items:center; justify-content:center; gap:0.4rem; border-radius:var(--r-md);
 }
 .add-row:hover{ border-color:var(--accent); background:color-mix(in oklch, var(--accent) 8%, transparent); }
 .add-row.solid{ border-style:solid; }
