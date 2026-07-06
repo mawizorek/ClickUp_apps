@@ -1,0 +1,154 @@
+=== CHUNK 3/4 | SET 7b293b3e-badc-4e0e-850b-40755b486605 | UUID e913f930-e004-4f96-9a5b-7a7764248c66 | START ===
+[Agent: Read this chunk fully. Verify the START and END UUID match and the sequence is in order. Echo "read 3/4, uuid verified" in chat. Then STOP and wait for the human; do not read or fetch the next chunk on your own.]
+
+<script>
+const APP_VERSION = 'v3';
+const OWNER = 'mawizorek';
+const REPO = 'ClickUp_apps';
+const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
+const API_BASE = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
+const EXCLUDED = ['template-app','app-dashboard','brain-config','agent-reports','shared'];
+const CACHE_KEY = 'appDashboard_cache_' + APP_VERSION;
+const CACHE_TTL = 5 * 60 * 1000;
+const RECENT_KEY = 'appDashboard_recent';
+const FILTER_KEY = 'appDashboard_filter';
+const MAX_RECENT = 2;
+const APP_META = {
+  'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'dashboard', badges: ['dashboard'] },
+  'f1-racetracks': { desc: 'Interactive race circuit explorer with live circuit data, layouts, and session timing.', category: 'dashboard', badges: ['data'] },
+  'on-track': { desc: 'Live motorsport "what\'s on now" schedule across series, with a settings drawer and collapsible filters.', category: 'dashboard', badges: ['data'] },
+  'routines': { desc: 'Live schedule view of the automated repo refresh routines. Reads schedule.md, zero upkeep.', category: 'dashboard', badges: ['dashboard'] },
+  'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers and a markdown index.', category: 'tool', badges: ['tool'] },
+  'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', category: 'tool', badges: ['data'] },
+  'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', category: 'tool', badges: ['tool'] },
+  'pdf-splitter': { desc: 'Extract and split PDF pages entirely client-side.', category: 'tool', badges: ['tool'] },
+  'polish-demo': { desc: 'Gated working example of the full app polish standard.', category: 'tool', badges: ['tool'] },
+  'quickfire': { desc: 'Quick vibe-to-repo artifact sketches.', category: 'tool', badges: ['tool'] }
+};
+// Sample data: only used when the GitHub API is unreachable (e.g. the ClickUp preview sandbox).
+const SAMPLE = [
+  { name:'on-track', hoursAgo:0.1, commitCount:12, commits:[['settings drawer + collapsible filters',0.1],['per-dropdown select-all / clear',6],['timezone toggle in settings',14],['live refresh note',26],['initial schedule engine',40]] },
+  { name:'f1-racetracks', hoursAgo:0.4, commitCount:37, commits:[['unify cache-bust build stamp across all source loads',0.4],['footer wrap fix at 320px',9],['data.json retrofit (v5)',30],['live-tracker companion',52],['v4 circuit explorer',96]] },
+  { name:'world-cup-bracket', hoursAgo:20, commitCount:14, commits:[['bump contrast + live updated badge (v1.3)',20],['today filter dynamic',28],['icon.png + manifest',44],['fix Switzerland vs Algeria date',50],['v1 bracket',120]] },
+  { name:'routines', hoursAgo:1, commitCount:8, commits:[['add passive live schedule viewer',1],['world-cup refresh runbook',40],['schedule ledger',60]] },
+  { name:'markdown-viewer', hoursAgo:52, commitCount:9, commits:[['v3 mobile-first reader',52],['drop-zone done-state',70],['v2 parser fix',110]] },
+  { name:'budget-code-mapper', hoursAgo:96, commitCount:22, commits:[['retrofit data.json split (v6)',96],['export wrapper (three-context)',130],['v5 authority builder',180]] },
+  { name:'file-chunker', hoursAgo:150, commitCount:41, commits:[['v16.2 source_index rename',150],['INDEX_FILENAME const',175],['zip README metadata',210]] },
+  { name:'pdf-splitter', hoursAgo:200, commitCount:6, commits:[['scaffold client-side page extract',200],['README',215]] },
+  { name:'polish-demo', hoursAgo:220, commitCount:4, commits:[['gated example of polish standard',220],['access gate config',235]] },
+  { name:'quickfire', hoursAgo:240, commitCount:3, commits:[['index + first sketch',240]] }
+];
+let currentFilter = 'all';
+let allApps = [];
+let stat = { n: 0, live: '…', recent7: 0 };
+let usingSample = false;
+let lastFocus = null;
+
+function getCache(){ try{ const raw=localStorage.getItem(CACHE_KEY); if(!raw) return null; const p=JSON.parse(raw); if(Date.now()-p.ts>CACHE_TTL) return null; return p.data; }catch(e){ return null; } }
+function setCache(data){ try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(),data})); }catch(e){} }
+function pruneOldCaches(){ try{ const kill=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf('appDashboard_cache_')===0&&k!==CACHE_KEY) kill.push(k); } kill.forEach(function(k){ localStorage.removeItem(k); }); }catch(e){} }
+function getRecent(){ try{ return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]'); }catch(e){ return []; } }
+function logVisit(slug){ try{ let r=getRecent().filter(function(s){return s!==slug;}); r.unshift(slug); r=r.slice(0,MAX_RECENT); localStorage.setItem(RECENT_KEY, JSON.stringify(r)); }catch(e){} }
+
+function setStatus(){ document.getElementById('statusLine').innerHTML = '<b>'+stat.n+'</b> apps · <b>'+stat.live+'</b> live · <b>'+stat.recent7+'</b> updated this week'; }
+
+function applyFilter(filter){
+  currentFilter = filter;
+  try{ localStorage.setItem(FILTER_KEY, filter); }catch(e){}
+  document.querySelectorAll('.chip').forEach(function(c){ c.classList.toggle('on', c.dataset.filter===filter); });
+  const rows = document.querySelectorAll('.row[data-category]');
+  let visible = 0;
+  rows.forEach(function(r){ const show = filter==='all' || r.dataset.category===filter; r.classList.toggle('hide', !show); if(show) visible++; });
+  let empty = document.getElementById('emptyFilter');
+  if(visible===0 && rows.length>0){
+    if(!empty){ empty=document.createElement('div'); empty.id='emptyFilter'; empty.className='state'; document.getElementById('list').appendChild(empty); }
+    empty.textContent = 'No ' + filter + ' apps yet.'; empty.style.display='';
+  } else if(empty){ empty.style.display='none'; }
+}
+
+function buildFromSample(){
+  usingSample = true;
+  const now = Date.now();
+  const apps = SAMPLE.map(function(s){
+    const meta = APP_META[s.name] || {};
+    return {
+      name:s.name, pagesUrl:PAGES_BASE+'/'+s.name+'/', repoUrl:'https://github.com/'+OWNER+'/'+REPO+'/tree/main/'+s.name,
+      iconUrl:PAGES_BASE+'/'+s.name+'/icon.png',
+      lastUpdated:new Date(now - s.hoursAgo*3600000).toISOString(), commitCount:s.commitCount,
+      commits:(s.commits||[]).map(function(c){ return { msg:c[0], date:new Date(now-c[1]*3600000).toISOString() }; }),
+      hasData:(meta.badges||[]).indexOf('data')!==-1 || s.name==='world-cup-bracket',
+      desc:meta.desc||null, category:meta.category||'tool', health:'live'
+    };
+  });
+  allApps = apps; renderFromData(apps);
+  apps.forEach(function(a,i){ const d=document.getElementById('health-'+i); if(d) d.className='dot live'; });
+  stat.live = apps.length; setStatus();
+  document.getElementById('demoNote').style.display='';
+}
+
+async function init(forceRefresh){
+  const list = document.getElementById('list');
+  pruneOldCaches();
+  try{ const s=localStorage.getItem(FILTER_KEY); if(s && ['all','dashboard','tool'].indexOf(s)!==-1) currentFilter=s; }catch(e){}
+  if(!forceRefresh){ const cached=getCache(); if(cached){ allApps=cached; renderFromData(cached); cached.forEach(function(a,i){ checkHealth(a,i); }); return; } }
+  try{
+    const treeRes = await fetch(API_BASE + '/git/trees/main?recursive=1');
+    if(!treeRes.ok) throw new Error('tree');
+    const tree = (await treeRes.json()).tree || [];
+    const folders = []; const seen = {};
+    tree.forEach(function(t){ if(t.type==='tree' && t.path.indexOf('/')===-1 && EXCLUDED.indexOf(t.path)===-1 && !seen[t.path]){ seen[t.path]=1; folders.push(t.path); } });
+    const dataSet = {}, iconSet = {};
+    tree.forEach(function(t){ if(/\/data\.json$/.test(t.path)) dataSet[t.path.split('/')[0]]=1; if(/^[^/]+\/icon\.png$/.test(t.path)) iconSet[t.path.split('/')[0]]=1; });
+    const apps = await Promise.all(folders.map(function(n){ return buildApp(n, !!dataSet[n], !!iconSet[n]); }));
+    apps.sort(function(a,b){ return new Date(b.lastUpdated||0) - new Date(a.lastUpdated||0); });
+    allApps = apps; setCache(apps); renderFromData(apps); apps.forEach(function(a,i){ checkHealth(a,i); });
+  }catch(e){
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k && k.indexOf('appDashboard_cache_')===0){
+          const p=JSON.parse(localStorage.getItem(k));
+          if(p && p.data){ allApps=p.data; renderFromData(p.data); p.data.forEach(function(a,idx){ checkHealth(a,idx); }); return; }
+        }
+      }
+    }catch(e2){}
+    buildFromSample();
+  }
+}
+
+async function buildApp(name, hasData, hasIcon){
+  const pagesUrl = PAGES_BASE + '/' + name + '/';
+  const repoUrl = 'https://github.com/' + OWNER + '/' + REPO + '/tree/main/' + name;
+  let lastUpdated=null, commitCount=0, commits=[];
+  try{
+    const r = await fetch(API_BASE + '/commits?per_page=100&path=' + encodeURIComponent(name));
+    if(r.ok){ const cs = await r.json(); if(Array.isArray(cs) && cs.length){
+      commitCount=cs.length; lastUpdated=cs[0].commit.author.date;
+      commits = cs.slice(0,12).map(function(c){ return { msg:c.commit.message.split('\n')[0], date:c.commit.author.date }; });
+    } }
+  }catch(e){}
+  const meta = APP_META[name] || {};
+  return { name:name, pagesUrl:pagesUrl, repoUrl:repoUrl, iconUrl:(hasIcon?pagesUrl+'icon.png':null), lastUpdated:lastUpdated, commitCount:commitCount, commits:commits, hasData:hasData, desc:meta.desc||null, category:meta.category||'tool', health:null };
+}
+
+function displayName(name){ return name.replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
+function monogram(display){ const p=display.split(' ').filter(Boolean); let m=(p[0]||'?')[0]; if(p[1]) m+=p[1][0]; return m.toUpperCase(); }
+
+function renderFromData(apps){
+  render(apps); updateStats(apps); applyFilter(currentFilter);
+  document.getElementById('refreshStamp').textContent = new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+function tileMarkup(app){
+  const mono = esc(monogram(displayName(app.name)));
+  if(app.iconUrl){
+    return '<img class="ticon" src="'+app.iconUrl+'" alt="" loading="lazy" onerror="this.remove();this.parentNode.classList.remove(\'has-img\');var m=this.parentNode.querySelector(\'.tmono\');if(m)m.style.display=\'flex\';">'
+         + '<span class="tmono" style="display:none">'+mono+'</span>';
+  }
+  return '<span class="tmono">'+mono+'</span>';
+}
+
+
+
+[Agent: Confirm this END UUID matches the START UUID above. Report completeness of part 3/4 in chat, then PAUSE and wait for the human's go-ahead before any next chunk.]
+=== CHUNK 3/4 | SET 7b293b3e-badc-4e0e-850b-40755b486605 | UUID e913f930-e004-4f96-9a5b-7a7764248c66 | END ===
