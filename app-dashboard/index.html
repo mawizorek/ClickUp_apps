@@ -125,10 +125,10 @@ header{padding:34px 0 14px}
 .metaline{font-size:0.6875rem; color:var(--text-dim); font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .metaline .slug{color:var(--cyan); font-family:'SF Mono','Fira Code',ui-monospace,monospace; font-size:0.65rem}
 .sep{opacity:0.5; margin:0 2px}
-.chev{flex-shrink:0; align-self:stretch; width:42px; display:flex; align-items:center; justify-content:center; color:var(--text-faint); text-decoration:none; transition:color 150ms var(--e), background 150ms var(--e)}
-.chev:hover{color:var(--text-mid); background:var(--surface-2)}
+.chev{flex-shrink:0; align-self:stretch; width:44px; display:flex; align-items:center; justify-content:center; color:var(--text-faint); text-decoration:none; transition:color 150ms var(--e), background 150ms var(--e)}
+.chev:hover{color:var(--cyan); background:var(--surface-2)}
 .chev:active{color:var(--accent)}
-.chev svg{width:19px; height:19px}
+.chev svg{width:18px; height:18px}
 
 /* states */
 .state{text-align:center; padding:44px 20px; color:var(--text-muted); font-size:0.8125rem; line-height:1.5}
@@ -276,7 +276,7 @@ footer{flex-shrink:0; text-align:center; padding:30px 16px calc(22px + env(safe-
     </div>
     <div class="sheet-actions">
       <a class="sa sa-open" id="sheetOpen" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>Open app</a>
-      <a class="sa sa-repo" id="sheetRepo" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-5"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Open repo</a>
+      <a class="sa sa-repo" id="sheetRepo" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Open repo</a>
     </div>
     <div class="commits-label">Recent commits</div>
     <div id="sheetCommits"></div>
@@ -284,7 +284,7 @@ footer{flex-shrink:0; text-align:center; padding:30px 16px calc(22px + env(safe-
 </div>
 
 <script>
-const APP_VERSION = 'v3';
+const APP_VERSION = 'v3.1';
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
@@ -433,7 +433,7 @@ function tileMarkup(app){
 function render(apps){
   const list = document.getElementById('list');
   const recent = getRecent();
-  const chevIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
+  const codeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>';
   list.innerHTML = apps.map(function(app, i){
     const display = displayName(app.name);
     const timeStr = app.lastUpdated ? relativeTime(app.lastUpdated) : null;
@@ -452,7 +452,7 @@ function render(apps){
     h +=     '<span class="line1"><span class="name">'+esc(display)+'</span>'+tags+'</span>';
     h +=     '<span class="metaline">'+meta+'</span>';
     h +=   '</button>';
-    h +=   '<a class="chev" href="'+app.repoUrl+'" target="_blank" rel="noopener" aria-label="Open '+esc(display)+' repo folder">'+chevIcon+'</a>';
+    h +=   '<a class="chev" href="'+app.repoUrl+'" target="_blank" rel="noopener" aria-label="Open '+esc(display)+' repo folder">'+codeIcon+'</a>';
     h += '</div>';
     return h;
   }).join('');
