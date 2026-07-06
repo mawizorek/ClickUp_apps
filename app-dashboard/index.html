@@ -289,7 +289,7 @@ const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
 const API_BASE = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
-const EXCLUDED = ['template-app','app-dashboard','brain-config','agent-reports'];
+const EXCLUDED = ['template-app','app-dashboard','brain-config','agent-reports','shared'];
 const CACHE_KEY = 'appDashboard_cache_' + APP_VERSION;
 const CACHE_TTL = 5 * 60 * 1000;
 const RECENT_KEY = 'appDashboard_recent';
@@ -298,19 +298,21 @@ const MAX_RECENT = 2;
 const APP_META = {
   'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'dashboard', badges: ['dashboard'] },
   'f1-racetracks': { desc: 'Interactive race circuit explorer with live circuit data, layouts, and session timing.', category: 'dashboard', badges: ['data'] },
+  'on-track': { desc: 'Live motorsport "what\'s on now" schedule across series, with a settings drawer and collapsible filters.', category: 'dashboard', badges: ['data'] },
+  'routines': { desc: 'Live schedule view of the automated repo refresh routines. Reads schedule.md, zero upkeep.', category: 'dashboard', badges: ['dashboard'] },
   'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers and a markdown index.', category: 'tool', badges: ['tool'] },
   'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', category: 'tool', badges: ['data'] },
   'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', category: 'tool', badges: ['tool'] },
   'pdf-splitter': { desc: 'Extract and split PDF pages entirely client-side.', category: 'tool', badges: ['tool'] },
   'polish-demo': { desc: 'Gated working example of the full app polish standard.', category: 'tool', badges: ['tool'] },
-  'quickfire': { desc: 'Quick vibe-to-repo artifact sketches.', category: 'tool', badges: ['tool'] },
-  'on-track': { desc: 'Live motorsport "what\'s on now" schedule across series, with a settings drawer and collapsible filters.', category: 'dashboard', badges: ['data'] }
+  'quickfire': { desc: 'Quick vibe-to-repo artifact sketches.', category: 'tool', badges: ['tool'] }
 };
 // Sample data: only used when the GitHub API is unreachable (e.g. the ClickUp preview sandbox).
 const SAMPLE = [
   { name:'on-track', hoursAgo:0.1, commitCount:12, commits:[['settings drawer + collapsible filters',0.1],['per-dropdown select-all / clear',6],['timezone toggle in settings',14],['live refresh note',26],['initial schedule engine',40]] },
   { name:'f1-racetracks', hoursAgo:0.4, commitCount:37, commits:[['unify cache-bust build stamp across all source loads',0.4],['footer wrap fix at 320px',9],['data.json retrofit (v5)',30],['live-tracker companion',52],['v4 circuit explorer',96]] },
   { name:'world-cup-bracket', hoursAgo:20, commitCount:14, commits:[['bump contrast + live updated badge (v1.3)',20],['today filter dynamic',28],['icon.png + manifest',44],['fix Switzerland vs Algeria date',50],['v1 bracket',120]] },
+  { name:'routines', hoursAgo:1, commitCount:8, commits:[['add passive live schedule viewer',1],['world-cup refresh runbook',40],['schedule ledger',60]] },
   { name:'markdown-viewer', hoursAgo:52, commitCount:9, commits:[['v3 mobile-first reader',52],['drop-zone done-state',70],['v2 parser fix',110]] },
   { name:'budget-code-mapper', hoursAgo:96, commitCount:22, commits:[['retrofit data.json split (v6)',96],['export wrapper (three-context)',130],['v5 authority builder',180]] },
   { name:'file-chunker', hoursAgo:150, commitCount:41, commits:[['v16.2 source_index rename',150],['INDEX_FILENAME const',175],['zip README metadata',210]] },
