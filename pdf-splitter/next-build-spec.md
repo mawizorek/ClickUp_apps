@@ -4,65 +4,58 @@
 
 ---
 
+## ⚠️ Source-readback hazard (READ FIRST)
+
+The agent read path (raw fetch) **flattens HTML that lives inside JS strings** — any `innerHTML = '<div ...>'` comes back with the tags stripped. Files that are SAFE to rewrite blind: pure-logic JS (`10`, `11`), CSS (`01`–`03`), and `17` (picker is authored with `createElement`, and its `init()` has no HTML strings). Files NOT safe to rewrite from a raw read (they carry markup-in-JS): **`12_rows_render.js`, `13_tree_folders.js`, `15_export_download.js`**. To edit those safely, get byte-accurate source (base64-armored chunk set or GitHub UI copy), do NOT reconstruct their template strings from a flattened read.
+
+---
+
 ## Scratch intake (raw, unscoped ideas)
 
-### Per-row page picker popup (PROPOSED 2026-07-05, awaiting greenlight)
+### Non-contiguous page sets — SHIPPED 2026-07-06
+Selection is now a page SET, not a single contiguous range. Tap in the per-row picker toggles a page in/out; 1-2-3-4-5 accumulates, and non-adjacent picks like `1-2,6-7` are valid and export as one PDF. Implementation (data-model change, backward compatible):
+- `10_state_helpers.js`: `parsePages` honors an optional `s.pages` array (sorted/deduped/validated) and falls back to contiguous `start`/`end` when absent. Added `compressRuns([1,2,6,7]) -> "1-2,6-7"`. `pageToken` emits the run token.
+- `11_markdown_model.js`: `parseMarkdown` accepts comma page lists (`page: 1-2,6-7`), sets `entry.pages` + min/max. Verdict label shows the run token for non-contiguous. `computeModel` sorts group pages.
+- `17_init.js`: picker tap = toggle set; Clear empties; readout shows the token.
+- Export (`15`) + `computeModel` already extract whatever page list the model provides — no export change needed (copyPages takes an arbitrary index list).
 
-Michael wants the visual page-selection power (currently only the big top/left global thumbnail grid) wired into each individual split row instead of one giant global collection. Tap a page-pick affordance on a row → popup thumbnail grid → tap a page to set that row's START, tap a second for a range → writes back to the row's START/END fields + markdown source of truth.
+**Known follow-ups from this build:**
+- **Tree tag cosmetic:** `13_tree_folders.js` `fileLine` still prints `p{first}-{last}`, so a non-contiguous file shows e.g. `p1-7` instead of `p1-2,6-7`. Export is correct; label is cosmetic. Fix needs byte-accurate `13` (see hazard note); swap tag to `"p" + PS.compressRuns(g.pages)`.
+- **Manual Start/End vs a set:** editing the row's Start/End should clear `s.pages` (collapse to contiguous). That lives in `12_rows_render.js` (unsafe-to-blind-edit); until then, a split that has a non-contiguous set is best edited via the picker. Low-severity edge.
+- **Range-fill convenience:** tapping every page for a big range is tedious on mobile. Consider a "tap A, then long-press B to fill A..B" gesture, or a range-mode toggle. Desktop global grid still has shift-range.
 
-"Best of both worlds": the popup surfaces allotment state (the desktop left-rail's "which pages aren't allotted yet" awareness) per-row — free pages normal, pages owned by THIS row = accent, pages owned by OTHER rows = dimmed + that split's folder-palette dot. Desktop keeps its left rail; the per-row picker is additive.
+### Unused-pages destination bug — QUEUED (needs clean 13 + 15)
+With "Include unused pages" ON and folders ON (single folder `organized` defined, Unassigned splits = `Unsorted/`), the auto-split leftover pages (`page_11.pdf` …) render/export at ZIP ROOT instead of honoring the unassigned destination. Expected: unused auto-split pages follow the same `unassignedDest` rule as unassigned splits (root vs `Unsorted/`).
+- Fix in `13_tree_folders.js` (tree preview) + `15_export_download.js` (actual ZIP placement): compute `unusedDir = (state.useFolders && state.unassignedDest === "Unsorted") ? "Unsorted" : ""` and place unused pages there in BOTH the tree and the ZIP.
+- BLOCKED on byte-accurate `13`/`15` source (markup-in-JS flattens on read).
 
-Proposed design calls (opinionated):
-- **Trigger:** explicit page-grid icon button inside each row (near START/END). Discoverable entry (Interaction-State Standard: entry must be obvious).
-- **Surface:** bottom sheet on mobile (thumb-reachable), centered `<dialog>` on desktop. Reuse existing `<dialog>` chrome (already sharp-cornered).
-- **Reuse existing thumbnail render path** (14_pdf_thumbs.js) — not rebuilding thumbs.
-- **Selection lifecycle:** tap one = single page (start=end); tap two = range; tap a selected page again = deselect; tap-outside / Esc / X = close. Full entry+exit per Interaction-State Standard.
-- **Overlap tie-in:** respect the existing "Allow page overlap" toggle — overlap off = other-row pages disabled in picker; overlap on = selectable but flagged.
-- **Writeback through the model** (11_markdown_model.js) so rows ↔ markdown never desync.
-- **v1 scope:** popup picker + allotment coloring + tap/range select + writeback + close paths, mobile sheet + desktop dialog. **Deferred to fast-follow:** opening a row's picker live-highlighting those pages in the desktop left rail.
+### Mobile global pages grid — CONFIRM INTENT
+The left `.pagesbar` (global "all pages" thumbnail grid) is currently `display:none` below 1180px, so on mobile it does NOT render at the top. Per-row picker now covers page selection on mobile. Michael asked to "collapse the initial all-pages thumbnails so they don't bog the top" — confirm whether he wants (a) keep it hidden on mobile (current), or (b) show it on mobile as a collapsed-by-default accordion ("Pages (39) ▸"). If (b): needs `index.html` DOM (collapsible host) + `01` CSS; index.html has heavy inline DOM (edit carefully).
 
-Requires reading 12_rows_render.js, 14_pdf_thumbs.js, 11_markdown_model.js before writing diffs.
+### Per-row page picker — SHIPPED 2026-07-05/06
+Grid icon per row opens a thumbnail picker (bottom sheet mobile / dialog desktop), allotment-colored (free / this split / another split + folder dot), overlap-toggle aware, writes back to row + markdown. Cells rebuilt as flex media+footer (no number/thumbnail overlap).
 
-### Done this cycle (shipped, not pending)
-- Mobile masthead collapsed to a compact icon bar (commit b9eab94).
-- iOS zoom prevention: `touch-action:manipulation` on controls + ≥16px mobile form fields (commit de977cc).
-- Nameless-split filename fallback ("untitled.pdf") — open question: auto-derive from page range instead. Awaiting Michael's call.
+### Done earlier this cycle
+- Mobile masthead collapsed to compact icon bar (commit b9eab94).
+- iOS zoom prevention (commit de977cc).
+- Nameless-split filename fallback ("untitled.pdf") — OPEN: auto-derive from page range instead? Awaiting Michael.
 
 ---
 
 ## Source location
 
-- **Chunk index:** `pdf-splitter/source/source_index.html`
+- **Chunk index:** `pdf-splitter/source/source_index.html` (NOTE: not yet generated; source is the plain module set in `source/`)
 - **Repo:** `mawizorek/ClickUp_apps` (branch `main`)
-- **Commit (pinned):** ` `
-- **Encoding:** base64 armored
-- **Total chunks:** [N]
-
-## What this version does (summary)
-
-1. [Change 1]
-2. ...
-
----
-
-## Diff 1: [Description]
-
-```javascript
-// FIND:
-[exact code to find]
-// REPLACE WITH:
-[exact replacement code]
-```
+- **Encoding:** plain modules (no base64 armor set exists yet for this app)
 
 ---
 
 ## Agent instructions
 
-1. Read the chunk set from `pdf-splitter/source/source_index.html`. Gated walk, auto-advance up to 5 chunks per pass.
-2. Apply the diffs above in order.
-3. Deliver the complete modified source as a ClickUp artifact (v[N+1]).
-4. Do NOT commit to the repo if file >30KB. Michael uploads manually.
-5. Post the standard version comment on the app's task.
+1. Read the module set from `pdf-splitter/source/`. Mind the source-readback hazard above.
+2. Apply changes per concern; each file its own commit.
+3. Verify the live Pages URL serves the new bytes (CSS is `cache:no-store`; JS modules cache harder — hard-refresh to confirm).
+4. Post the standard version comment on the app's APPS task.
 
 ---
 
