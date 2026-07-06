@@ -4,276 +4,139 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Apps Portal</title>
+<title>MAW Apps</title>
 <style>
 :root {
-  --bg: oklch(10% 0.012 250);
-  --surface-1: oklch(16% 0.01 250);
-  --surface-2: oklch(21% 0.008 250);
-  --text: oklch(94% 0.006 250);
-  --text-mid: oklch(78% 0.008 250);
-  --text-muted: oklch(62% 0.01 250);
-  --text-dim: oklch(48% 0.008 250);
-  --accent: oklch(75% 0.18 155);
-  --accent-surface: oklch(20% 0.05 155);
-  --fmp: oklch(70% 0.15 300);
-  --fmp-surface: oklch(22% 0.06 300);
-  --green: oklch(72% 0.16 155);
-  --red: oklch(65% 0.18 25);
-  --gold: oklch(80% 0.14 85);
-  --border: oklch(28% 0.006 250);
-  --border-light: oklch(32% 0.005 250);
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --bg: oklch(12% 0.015 250);
+  --surface: oklch(16% 0.012 250);
+  --line: oklch(25% 0.01 250);
+  --text: oklch(92% 0.01 250);
+  --muted: oklch(65% 0.01 250);
+  --accent: oklch(72% 0.16 25);
+  --accent-dim: oklch(72% 0.16 25 / 0.15);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  min-height: 100svh;
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'tnum';
+  min-height: 100vh;
+  padding: 48px 20px;
 }
-header { padding: 32px 20px 16px; max-width: 600px; margin: 0 auto; }
-header h1 { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 6px; }
-header p { font-size: 0.8125rem; color: var(--text-muted); line-height: 1.5; }
-.toggle {
-  max-width: 600px; margin: 0 auto; padding: 0 20px 16px;
-  display: flex; gap: 6px;
+.container {
+  max-width: 600px;
+  margin: 0 auto;
 }
-.toggle button {
-  flex: 1; padding: 10px 14px; border-radius: 10px;
-  border: 1px solid var(--border); background: var(--surface-1);
-  color: var(--text-muted); font-family: inherit; font-size: 0.8125rem;
-  font-weight: 700; cursor: pointer; transition: all 200ms var(--ease-out);
+header {
+  margin-bottom: 40px;
 }
-.toggle button[aria-selected="true"] { color: var(--text); border-color: var(--border-light); background: var(--surface-2); }
-.toggle button[data-mode="clickup"][aria-selected="true"] { box-shadow: inset 0 -2px 0 var(--accent); }
-.toggle button[data-mode="filemaker"][aria-selected="true"] { box-shadow: inset 0 -2px 0 var(--fmp); }
-.stats-row { display: flex; gap: 12px; padding: 0 20px 20px; max-width: 600px; margin: 0 auto; }
-.stat { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; flex: 1; text-align: center; }
-.stat .num { font-size: 1.25rem; font-weight: 800; color: var(--accent); }
-body[data-mode="filemaker"] .stat .num { color: var(--fmp); }
-.stat .label { font-size: 0.5625rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
-.apps-list { max-width: 600px; margin: 0 auto; padding: 0 20px 80px; display: flex; flex-direction: column; gap: 10px; }
-.app-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; transition: border-color 200ms var(--ease-out); text-decoration: none; color: inherit; }
-.app-card:hover { border-color: var(--border-light); }
-.app-top { display: flex; align-items: center; gap: 10px; }
-.health-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.health-dot.live { background: var(--green); box-shadow: 0 0 6px oklch(72% 0.16 155 / 0.4); }
-.health-dot.dead { background: var(--red); }
-.health-dot.checking { background: var(--text-dim); animation: blink 1.5s infinite; }
-.health-dot.doc { background: var(--fmp); box-shadow: 0 0 6px oklch(70% 0.15 300 / 0.4); }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.app-name { font-size: 0.875rem; font-weight: 700; flex: 1; }
-.app-badges { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
-.badge { font-size: 0.5625rem; font-weight: 700; padding: 3px 7px; border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
-.badge.data { color: var(--accent); background: var(--accent-surface); border: 1px solid oklch(30% 0.06 155); }
-.badge.fmp { color: var(--fmp); background: var(--fmp-surface); border: 1px solid oklch(32% 0.07 300); }
-.badge.size { color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border); }
-.chevron { color: var(--text-dim); font-size: 1rem; flex-shrink: 0; }
-.app-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.meta-item { font-size: 0.6875rem; color: var(--text-muted); }
-.meta-item strong { color: var(--text-mid); }
-.commit-msg { font-size: 0.6875rem; color: var(--text-dim); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 0.875rem; }
-@media (min-width: 640px) { header { padding: 48px 20px 24px; } }
+header h1 {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+header p {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.nav-section {
+  margin-bottom: 32px;
+}
+.nav-section h2 {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding-left: 16px;
+}
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 0.15s;
+}
+.nav-link:hover {
+  background: var(--accent-dim);
+}
+.nav-link-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+.nav-link-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.nav-link-arrow {
+  font-size: 18px;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.nav-link:hover .nav-link-arrow {
+  color: var(--accent);
+}
+.footer {
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
 </style>
 </head>
-<body data-mode="clickup">
-<header>
-  <h1 id="portalTitle">ClickUp Apps</h1>
-  <p id="portalSub">Live index of mawizorek/ClickUp_apps. Health, recency, and commit info pulled from GitHub on every load.</p>
-</header>
-<div class="toggle" role="tablist">
-  <button data-mode="clickup" role="tab" aria-selected="true" onclick="setMode('clickup')">ClickUp Apps</button>
-  <button data-mode="filemaker" role="tab" aria-selected="false" onclick="setMode('filemaker')">FileMaker Apps</button>
+<body>
+<div class="container">
+  <header>
+    <h1>MAW Apps</h1>
+    <p>Hosted apps and artifacts from the ClickUp_apps repo.</p>
+  </header>
+
+  <div class="nav-section">
+    <h2>Apps</h2>
+    <div class="nav-links">
+      <a class="nav-link" href="app-dashboard/">
+        <div>
+          <div class="nav-link-title">App Dashboard</div>
+          <div class="nav-link-desc">Full index of versioned apps with cards and status</div>
+        </div>
+        <div class="nav-link-arrow">&rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <h2>Quickfire</h2>
+    <div class="nav-links">
+      <a class="nav-link" href="quickfire/">
+        <div>
+          <div class="nav-link-title">Quickfire Artifacts</div>
+          <div class="nav-link-desc">One-shot standalone builds, no versioning overhead</div>
+        </div>
+        <div class="nav-link-arrow">&rarr;</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener">View on GitHub</a>
+  </div>
 </div>
-<div class="stats-row">
-  <div class="stat"><div class="num" id="stat1">-</div><div class="label" id="stat1l">Apps</div></div>
-  <div class="stat"><div class="num" id="stat2">-</div><div class="label" id="stat2l">Healthy</div></div>
-  <div class="stat"><div class="num" id="stat3">-</div><div class="label" id="stat3l">Updated (7d)</div></div>
-</div>
-<div class="apps-list" id="appsList"><div class="loading">Loading...</div></div>
-<script>
-const OWNER = 'mawizorek';
-const REPO = 'ClickUp_apps';
-const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
-const REPO_BASE = `https://github.com/${OWNER}/${REPO}/tree/main`;
-const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
-const CLICKUP_EXCLUDED = ['template-app', 'filemaker', '.nojekyll', 'README.md', 'canary.txt'];
-const FMP_EXCLUDED = ['_template-fmp-app', 'README.md'];
-
-let MODE = 'clickup';
-let commitsCache = null;
-
-async function getCommits() {
-  if (commitsCache) return commitsCache;
-  const res = await fetch(`${API_BASE}/commits?per_page=100`);
-  commitsCache = await res.json();
-  return commitsCache;
-}
-
-function setMode(mode) {
-  if (mode === MODE) return;
-  MODE = mode;
-  document.body.dataset.mode = mode;
-  document.querySelectorAll('.toggle button').forEach(b => b.setAttribute('aria-selected', b.dataset.mode === mode));
-  document.getElementById('portalTitle').textContent = mode === 'clickup' ? 'ClickUp Apps' : 'FileMaker Apps';
-  document.getElementById('portalSub').textContent = mode === 'clickup'
-    ? 'Live index of mawizorek/ClickUp_apps. Health, recency, and commit info pulled from GitHub on every load.'
-    : 'Documented FileMaker apps. Built in FileMaker, documented in the repo. Each row opens its source folder.';
-  document.getElementById('stat2l').textContent = mode === 'clickup' ? 'Healthy' : 'Docs';
-  init();
-}
-
-async function init() {
-  const list = document.getElementById('appsList');
-  list.innerHTML = '<div class="loading">Loading from GitHub...</div>';
-  try {
-    if (MODE === 'clickup') return initClickUp();
-    return initFileMaker();
-  } catch (e) {
-    list.innerHTML = '<div class="loading">Could not reach GitHub API. Try refreshing.</div>';
-  }
-}
-
-async function initClickUp() {
-  const treeRes = await fetch(`${API_BASE}/contents/`);
-  const items = await treeRes.json();
-  const folders = items.filter(i => i.type === 'dir' && !CLICKUP_EXCLUDED.includes(i.name));
-  const commits = await getCommits();
-  const apps = await Promise.all(folders.map(f => buildClickUpApp(f, commits)));
-  apps.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
-  renderClickUp(apps);
-  document.getElementById('stat1').textContent = apps.length;
-  document.getElementById('stat2').textContent = apps.length;
-  const wk = new Date(Date.now() - 7 * 86400000);
-  document.getElementById('stat3').textContent = apps.filter(a => a.lastUpdated && new Date(a.lastUpdated) > wk).length;
-  apps.forEach((app, i) => checkHealth(app, i));
-}
-
-async function buildClickUpApp(folder, commits) {
-  const name = folder.name;
-  const pagesUrl = `${PAGES_BASE}/${name}/`;
-  const fc = commits.filter(c => c.commit.message.toLowerCase().includes(name));
-  const lastCommit = fc[0] || null;
-  const lastUpdated = lastCommit ? lastCommit.commit.author.date : null;
-  const lastMsg = lastCommit ? lastCommit.commit.message.split('\n')[0] : 'unknown';
-  let hasData = false, totalSize = 0;
-  try {
-    const cr = await fetch(`${API_BASE}/contents/${name}`);
-    const contents = await cr.json();
-    hasData = contents.some(f => f.name === 'data.json');
-    totalSize = contents.reduce((s, f) => s + (f.size || 0), 0);
-  } catch (e) {}
-  return { name, pagesUrl, lastUpdated, lastMsg, totalCommits: fc.length, hasData, totalSize };
-}
-
-function renderClickUp(apps) {
-  document.getElementById('appsList').innerHTML = apps.map((app, i) => {
-    const t = app.lastUpdated ? formatTime(app.lastUpdated) : 'unknown';
-    const nm = titleCase(app.name);
-    return `<a class="app-card" href="${app.pagesUrl}" target="_blank" rel="noopener">
-      <div class="app-top">
-        <span class="health-dot checking" id="health-${i}"></span>
-        <span class="app-name">${nm}</span>
-        <span class="app-badges">
-          ${app.hasData ? '<span class="badge data">data.json</span>' : ''}
-          <span class="badge size">${formatSize(app.totalSize)}</span>
-        </span>
-      </div>
-      <div class="app-meta">
-        <span class="meta-item"><strong>${t}</strong></span>
-        <span class="meta-item">${app.totalCommits} commit${app.totalCommits !== 1 ? 's' : ''}</span>
-      </div>
-      <div class="commit-msg">${escHtml(app.lastMsg)}</div>
-    </a>`;
-  }).join('') || '<div class="loading">No apps found.</div>';
-}
-
-async function checkHealth(app, idx) {
-  const dot = document.getElementById(`health-${idx}`);
-  if (!dot) return;
-  try { await fetch(app.pagesUrl, { method: 'HEAD', mode: 'no-cors' }); dot.className = 'health-dot live'; }
-  catch (e) { dot.className = 'health-dot dead'; }
-}
-
-async function initFileMaker() {
-  const treeRes = await fetch(`${API_BASE}/contents/filemaker`);
-  const items = await treeRes.json();
-  const folders = items.filter(i => i.type === 'dir' && !FMP_EXCLUDED.includes(i.name));
-  const commits = await getCommits();
-  const apps = await Promise.all(folders.map(f => buildFmpApp(f, commits)));
-  apps.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
-  renderFileMaker(apps);
-  document.getElementById('stat1').textContent = apps.length;
-  document.getElementById('stat2').textContent = apps.reduce((s, a) => s + a.docCount, 0);
-  const wk = new Date(Date.now() - 7 * 86400000);
-  document.getElementById('stat3').textContent = apps.filter(a => a.lastUpdated && new Date(a.lastUpdated) > wk).length;
-}
-
-async function buildFmpApp(folder, commits) {
-  const name = folder.name;
-  const repoUrl = `${REPO_BASE}/filemaker/${name}`;
-  const fc = commits.filter(c => c.commit.message.toLowerCase().includes(name) || c.commit.message.toLowerCase().includes('filemaker'));
-  const lastCommit = fc[0] || null;
-  const lastUpdated = lastCommit ? lastCommit.commit.author.date : null;
-  const lastMsg = lastCommit ? lastCommit.commit.message.split('\n')[0] : 'unknown';
-  let docCount = 0, hasSchema = false;
-  try {
-    const cr = await fetch(`${API_BASE}/contents/filemaker/${name}/docs`);
-    const docs = await cr.json();
-    if (Array.isArray(docs)) docCount = docs.filter(f => f.name.endsWith('.md')).length;
-  } catch (e) {}
-  try {
-    const sr = await fetch(`${API_BASE}/contents/filemaker/${name}/schema`);
-    const sc = await sr.json();
-    hasSchema = Array.isArray(sc) && sc.some(f => f.name === 'tables.json');
-  } catch (e) {}
-  return { name, repoUrl, lastUpdated, lastMsg, totalCommits: fc.length, docCount, hasSchema };
-}
-
-function renderFileMaker(apps) {
-  document.getElementById('appsList').innerHTML = apps.map(app => {
-    const t = app.lastUpdated ? formatTime(app.lastUpdated) : 'unknown';
-    const nm = titleCase(app.name);
-    return `<a class="app-card" href="${app.repoUrl}" target="_blank" rel="noopener">
-      <div class="app-top">
-        <span class="health-dot doc"></span>
-        <span class="app-name">${nm}</span>
-        <span class="app-badges">
-          ${app.hasSchema ? '<span class="badge fmp">schema</span>' : ''}
-          <span class="badge size">${app.docCount} docs</span>
-          <span class="chevron">&rsaquo;</span>
-        </span>
-      </div>
-      <div class="app-meta">
-        <span class="meta-item"><strong>${t}</strong></span>
-        <span class="meta-item">view on repo</span>
-      </div>
-      <div class="commit-msg">${escHtml(app.lastMsg)}</div>
-    </a>`;
-  }).join('') || '<div class="loading">No FileMaker apps documented yet.</div>';
-}
-
-function formatTime(iso) {
-  const d = new Date(iso), now = new Date();
-  const h = Math.floor((now - d) / 3600000), dd = Math.floor((now - d) / 86400000);
-  if (h < 1) return 'just now';
-  if (h < 24) return `${h}h ago`;
-  if (dd < 7) return `${dd}d ago`;
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-function formatSize(b) {
-  if (b < 1024) return `${b}B`;
-  if (b < 1048576) return `${Math.round(b / 1024)}KB`;
-  return `${(b / 1048576).toFixed(1)}MB`;
-}
-function titleCase(s) { return s.replace(/-/g, ' ').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()); }
-function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-init();
-</script>
 </body>
 </html>
