@@ -1,7 +1,7 @@
 /* app-dashboard v4 — core engine + boot. Companion modules: data.js (metadata/samples),
    render.js (list rendering), sheet.js (detail sheet). Load order: data → render → sheet → app. */
 const APP_VERSION = 'v4';
-const APP_PR = '38'; // stamped with the PR number that shipped this build
+const APP_PR = '39'; // stamped with the PR number that shipped this build
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
@@ -128,7 +128,8 @@ async function buildApp(path, slug, hasData, hasIcon){
     name:slug, path:path, slugText:(WIN==='clickup'?slug:'filemaker/'+slug)+'/',
     pagesUrl:pagesUrl, repoUrl:repoUrl, iconUrl:(hasIcon?PAGES_BASE+'/'+slug+'/icon.png':null),
     lastUpdated:lastUpdated, commitCount:commitCount, commits:commits, hasData:hasData,
-    desc:meta.desc||null, category:(WIN==='clickup'?(meta.category||'tool'):'fm'), health:cfg.health?null:'na'
+    desc:meta.desc||null, label:meta.label||null, mono:meta.mono||null,
+    category:(WIN==='clickup'?(meta.category||'tool'):'fm'), health:cfg.health?null:'na'
   };
 }
 

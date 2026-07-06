@@ -1,15 +1,17 @@
-/* app-dashboard — data module. APP_META + SAMPLE (ClickUp window) and FM_META + FM_SAMPLE (FileMaker window). */
+/* app-dashboard — data module. APP_META + SAMPLE (ClickUp window) and FM_META + FM_SAMPLE (FileMaker window).
+   Optional per-entry `label` overrides the auto-titlecased folder name (for acronyms/casing the
+   titlecaser can't infer). Optional `mono` overrides the derived monogram. */
 
 // ClickUp window: slug -> metadata. Categories: 'dashboard' | 'tool'.
 const APP_META = {
   'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'dashboard', badges: ['dashboard'] },
-  'f1-racetracks': { desc: 'Interactive race circuit explorer with live circuit data, layouts, and session timing.', category: 'dashboard', badges: ['data'] },
+  'f1-racetracks': { label: 'F1 Racetracks', desc: 'Interactive race circuit explorer with live circuit data, layouts, and session timing.', category: 'dashboard', badges: ['data'] },
   'on-track': { desc: 'Live motorsport "what\'s on now" schedule across series, with a settings drawer and collapsible filters.', category: 'dashboard', badges: ['data'] },
   'routines': { desc: 'Live schedule view of the automated repo refresh routines. Reads schedule.md, zero upkeep.', category: 'dashboard', badges: ['dashboard'] },
   'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers and a markdown index.', category: 'tool', badges: ['tool'] },
   'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', category: 'tool', badges: ['data'] },
   'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', category: 'tool', badges: ['tool'] },
-  'pdf-splitter': { desc: 'Extract and split PDF pages entirely client-side.', category: 'tool', badges: ['tool'] },
+  'pdf-splitter': { label: 'PDF Splitter', desc: 'Extract and split PDF pages entirely client-side.', category: 'tool', badges: ['tool'] },
   'polish-demo': { desc: 'Gated working example of the full app polish standard.', category: 'tool', badges: ['tool'] },
   'quickfire': { desc: 'Quick vibe-to-repo artifact sketches.', category: 'tool', badges: ['tool'] }
 };
@@ -30,8 +32,8 @@ const SAMPLE = [
 
 // FileMaker window: folder under filemaker/ -> metadata. No Pages hosting, no health check.
 const FM_META = {
-  '_template-fmp-app': { desc: 'FileMaker app scaffold: schema JSON shape, the standard doc set, and the build workflow for new FMP solutions.' },
-  'hml-llc': { desc: 'HML_LLC pilot FileMaker solution — schema JSON plus the 11-doc build set.' }
+  '_template-fmp-app': { label: 'FMP App Template', mono: 'FM', desc: 'FileMaker app scaffold: schema JSON shape, the standard doc set, and the build workflow for new FMP solutions.' },
+  'hml-llc': { label: 'HML LLC', desc: 'HML_LLC pilot FileMaker solution — schema JSON plus the 11-doc build set.' }
 };
 
 // FileMaker offline sample.

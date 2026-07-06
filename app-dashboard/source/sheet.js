@@ -1,6 +1,6 @@
 /* app-dashboard — detail bottom-sheet module. Split from app.js to stay under the ~12KB gate.
    Relies on globals from app.js (allApps, WIN, WINDOWS, esc, relativeTime, fullWhen, logVisit)
-   and render.js (displayName, monogram). All referenced at event time, after every script has loaded. */
+   and render.js (labelFor, monoFor). All referenced at event time, after every script has loaded. */
 
 let lastFocus = null;
 const scrim = document.getElementById('scrim');
@@ -9,11 +9,12 @@ const sheet = document.getElementById('sheet');
 function openSheet(idx){
   const app = allApps[idx]; if(!app) return;
   const cfg = WINDOWS[WIN];
-  const display = displayName(app.name);
+  const display = labelFor(app);
+  const mono = monoFor(app);
   lastFocus = document.activeElement;
   const st = document.getElementById('sheetTile');
   st.className = 'sheet-tile c-' + app.category;
-  st.innerHTML = app.iconUrl ? '<img src="'+app.iconUrl+'" alt="" onerror="this.remove();var p=this.parentNode;p.textContent=\''+esc(monogram(display))+'\';">' : esc(monogram(display));
+  st.innerHTML = app.iconUrl ? '<img src="'+app.iconUrl+'" alt="" onerror="this.remove();var p=this.parentNode;p.textContent=\''+esc(mono)+'\';">' : esc(mono);
   document.getElementById('sheetName').textContent = display;
   document.getElementById('sheetSlug').textContent = app.slugText;
   document.getElementById('sheetDesc').textContent = app.desc || 'No description on file yet.';
