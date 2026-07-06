@@ -83,7 +83,9 @@
   .gear:hover { background: var(--sunk); }
 
   .tabs { display: flex; gap: var(--s1); border-bottom: 1px solid var(--line);
-          margin-bottom: var(--s6); overflow-x: auto; }
+          margin-bottom: var(--s6); overflow-x: auto; overflow-y: hidden;
+          scrollbar-width: none; -ms-overflow-style: none; }
+  .tabs::-webkit-scrollbar { display: none; }
   .tab {
     font: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer;
     background: none; border: none; color: var(--ink-faint);
