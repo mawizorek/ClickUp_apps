@@ -1,38 +1,50 @@
 /* Track-page rendering synced to the shipped v5 app.
-   Includes completed-race podium / pole / winners panels and the current
+   Includes completed-race classification / pole / winners panels and the current
    mobile-safe layout assumptions.
 */
 
 function renderPodium(result) {
   if (!result || !result.winner || !result.p2 || !result.p3) return "";
 
-  const steps = [
-    { label: "P2", cls: "p2", driver: result.p2, team: result.p2Team },
-    { label: "P1", cls: "p1", driver: result.winner, team: result.team },
-    { label: "P3", cls: "p3", driver: result.p3, team: result.p3Team }
+  const rows = [
+    { pos: "1", cls: "p1", driver: result.winner, team: result.team, gap: "WIN", gapCls: " win", gapLbl: "Result" },
+    { pos: "2", cls: "p2", driver: result.p2, team: result.p2Team, gap: result.p2Gap || "\u2014", gapCls: "", gapLbl: "Gap" },
+    { pos: "3", cls: "p3", driver: result.p3, team: result.p3Team, gap: result.p3Gap || "\u2014", gapCls: "", gapLbl: "Gap" }
   ];
 
+  const fl = result.fastestLap;
+  const flMeta = fl ? [fl.lap ? `Lap ${fl.lap}` : "", fl.team ? esc(fl.team) : ""].filter(Boolean).join(" \u00b7 ") : "";
+
   return `
-    <article class="card podium-card">
-      <div class="podium-top">
+    <article class="card classification-card">
+      <div class="cls-top">
         <div>
-          <div class="tag">Race podium</div>
-          <h2>Completed-race finish</h2>
+          <div class="tag">Race classification</div>
+          <h2>Finish \u00b7 Podium</h2>
         </div>
         <div class="tag">${esc(result.team || "")}</div>
       </div>
-      <div class="podium-steps">
-        ${steps.map(step => `
-          <div class="podium-step ${step.cls}">
-            <span class="step-badge">${step.label}</span>
-            <div class="step-driver">${esc(lastName(step.driver))}</div>
-            <div class="step-team" style="color:${teamTone(step.team)}">${esc(step.team)}</div>
-            <span class="step-pos">${esc(step.driver)}</span>
+      <div class="cls-rows">
+        ${rows.map(r => `
+          <div class="cls-row ${r.cls}">
+            <span class="cls-pos">${r.pos}</span>
+            <div class="cls-driver">
+              <span class="cls-last"><span class="team-dot" style="background:${teamTone(r.team)}"></span>${esc(lastName(r.driver))}</span>
+              <span class="cls-full">${esc(r.driver)} \u00b7 <span class="cls-team">${esc(r.team)}</span></span>
+            </div>
+            <div class="cls-gap${r.gapCls}"><span class="cls-gap-lbl">${r.gapLbl}</span>${esc(r.gap)}</div>
           </div>
         `).join("")}
       </div>
+      ${fl ? `
+        <div class="fl-strip">
+          <span class="fl-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polyline></svg>Fastest lap</span>
+          <span class="fl-driver">${esc(lastName(fl.driver))}</span>
+          <span class="fl-time">${esc(fl.time)}</span>
+          ${flMeta ? `<span class="fl-meta">${flMeta}</span>` : ""}
+        </div>
+      ` : ""}
       ${result.summary ? `<p class="race-summary">${esc(result.summary)}</p>` : ""}
-      ${result.fastestLap ? `<p class="fastest-lap">Fastest lap · <b>${esc(result.fastestLap.driver)}</b> · ${esc(result.fastestLap.time)}${result.fastestLap.lap ? ` · Lap ${result.fastestLap.lap}` : ""}</p>` : ""}
     </article>
   `;
 }
@@ -91,7 +103,7 @@ function renderHistory(slug) {
               <div class="driver">${esc(row.driver)}</div>
               <div class="team">${esc(row.team)}</div>
             </div>
-          `).join("") : '<div class="history-empty">Historic winners seed is ready in <code>data.json</code> — add more rows here without touching the UI.</div>'}
+          `).join("") : '<div class="history-empty">Historic winners seed is ready in <code>data.json</code> \u2014 add more rows here without touching the UI.</div>'}
         </div>
       </div>
     </section>
@@ -118,8 +130,8 @@ function renderTrack(t) {
 
   app.innerHTML = `
     <div class="view">
-      <div class="crumb"><a href="#/">F1 Racetracks</a><span class="sep">/</span>Round ${t.round} · ${esc(t.gp)}</div>
-      <p class="eyebrow">Circuit Breakdown <span>// Round ${String(t.round).padStart(2, "0")} · ${esc(t.gp)}${t.status === "active" ? " · live" : ""}</span></p>
+      <div class="crumb"><a href="#/">F1 Racetracks</a><span class="sep">/</span>Round ${t.round} \u00b7 ${esc(t.gp)}</div>
+      <p class="eyebrow">Circuit Breakdown <span>// Round ${String(t.round).padStart(2, "0")} \u00b7 ${esc(t.gp)}${t.status === "active" ? " \u00b7 live" : ""}</span></p>
       <h1 class="track">${esc(t.title)}</h1>
       <p class="sub">${esc(t.sub)}</p>
 
@@ -129,7 +141,7 @@ function renderTrack(t) {
         <div><dt>Turns</dt><dd>${t.turns}</dd></div>
         <div><dt>Race</dt><dd>${t.laps} <small>laps</small></dd></div>
         <div><dt>DRS zones</dt><dd>${t.drsZones}</dd></div>
-        <div><dt>Elevation</dt><dd>${aslLow}–${aslHigh} <small>m ASL</small></dd></div>
+        <div><dt>Elevation</dt><dd>${aslLow}\u2013${aslHigh} <small>m ASL</small></dd></div>
         <div><dt>Top speed</dt><dd>${esc(t.topSpeed)} <small>km/h</small></dd></div>
         <div><dt>Lap record</dt><dd>${esc(t.record)}</dd></div>
       </dl>
@@ -145,12 +157,12 @@ function renderTrack(t) {
       </div>
 
       <div class="card">
-        <div class="card-h"><span class="tag">Lap profile · elevation · DRS · sectors</span><span class="lap">Pole ref <b>${esc(t.poleRef)}</b></span></div>
+        <div class="card-h"><span class="tag">Lap profile \u00b7 elevation \u00b7 DRS \u00b7 sectors</span><span class="lap">Pole ref <b>${esc(t.poleRef)}</b></span></div>
         <svg class="profile" id="profile" viewBox="0 0 1000 330" role="img" aria-label="${esc(t.title)} lap profile"></svg>
         <div class="legend-row">
-          <span class="lr"><span class="ln"></span>Elevation, m ASL (${aslLow}–${aslHigh} m)</span>
+          <span class="lr"><span class="ln"></span>Elevation, m ASL (${aslLow}\u2013${aslHigh} m)</span>
           <span class="lr"><span class="sf"></span>S/F line ${aslSF} m</span>
-          <span class="lr"><span class="dia"></span>DRS detection → activation</span>
+          <span class="lr"><span class="dia"></span>DRS detection \u2192 activation</span>
           <span class="lr"><span class="sw" style="background:var(--s1)"></span>S1</span>
           <span class="lr"><span class="sw" style="background:var(--s2)"></span>S2</span>
           <span class="lr"><span class="sw" style="background:var(--s3)"></span>S3</span>
@@ -172,7 +184,7 @@ function renderTrack(t) {
             <div class="tyres">
               ${t.tyres.map((y, j) => `<div class="tyre" style="--c:${["oklch(85% 0.005 264)", "oklch(80% 0.16 95)", "var(--red)"][j]}"><span class="ring">${y[0]}</span><span><b>${y[1]}</b></span></div>`).join("")}
             </div>
-            <div class="kv"><span class="k">Allocation</span><span class="v">${esc(t.tyreAlloc.split(" · ")[0])}<small>${esc(t.tyreAlloc.split(" · ")[1] || "")}</small></span></div>
+            <div class="kv"><span class="k">Allocation</span><span class="v">${esc(t.tyreAlloc.split(" \u00b7 ")[0])}<small>${esc(t.tyreAlloc.split(" \u00b7 ")[1] || "")}</small></span></div>
             <div class="strat">${t.strat.map(s => `<div class="row"><span class="tg ${s[0]}">${esc(s[1])}</span><span class="seq">${esc(s[2])}</span></div>`).join("")}</div>
             <p class="note">${esc(t.stratNote)}</p>
           </div>
@@ -193,8 +205,8 @@ function renderTrack(t) {
       </div>
 
       <div class="wx">
-        <div class="wx-head"><h2><i data-lucide="cloud-sun"></i>Race-weekend forecast</h2><span class="wx-stamp" id="wx-stamp">Loading…</span></div>
-        <div id="wx-body"><div class="wx-loading">Fetching the latest ${esc(t.loc)} forecast…</div></div>
+        <div class="wx-head"><h2><i data-lucide="cloud-sun"></i>Race-weekend forecast</h2><span class="wx-stamp" id="wx-stamp">Loading\u2026</span></div>
+        <div id="wx-body"><div class="wx-loading">Fetching the latest ${esc(t.loc)} forecast\u2026</div></div>
       </div>
 
       <section class="block">
@@ -213,8 +225,8 @@ function renderTrack(t) {
       ${renderHistory(t.slug)}
 
       <div class="prevnext">
-        <button class="pn" ${prev ? "" : "disabled"} ${prev ? `onclick="location.hash='#/${prev.slug}'"` : ""}><div class="lbl">← Previous</div><div class="nm">${prev ? esc(prev.gp) : "—"}</div></button>
-        <button class="pn next" ${next ? "" : "disabled"} ${next ? `onclick="location.hash='#/${next.slug}'"` : ""}><div class="lbl">Next →</div><div class="nm">${next ? esc(next.gp) : "—"}</div></button>
+        <button class="pn" ${prev ? "" : "disabled"} ${prev ? `onclick="location.hash='#/${prev.slug}'"` : ""}><div class="lbl">\u2190 Previous</div><div class="nm">${prev ? esc(prev.gp) : "\u2014"}</div></button>
+        <button class="pn next" ${next ? "" : "disabled"} ${next ? `onclick="location.hash='#/${next.slug}'"` : ""}><div class="lbl">Next \u2192</div><div class="nm">${next ? esc(next.gp) : "\u2014"}</div></button>
       </div>
     </div>
   `;
@@ -225,7 +237,7 @@ function renderTrack(t) {
   t.sectors.forEach(s => {
     const c = document.createElement("div");
     c.className = "sb-col";
-    c.innerHTML = `<div class="top"><span class="pill" style="background:${SECCOL[s.k]}"></span><span class="name">${s.name}</span></div><div class="corners">${esc(s.corners)}</div><div class="time">${s.time}<small> s · approx</small></div><div class="char">${esc(s.char)}</div>`;
+    c.innerHTML = `<div class="top"><span class="pill" style="background:${SECCOL[s.k]}"></span><span class="name">${s.name}</span></div><div class="corners">${esc(s.corners)}</div><div class="time">${s.time}<small> s \u00b7 approx</small></div><div class="char">${esc(s.char)}</div>`;
     cols.appendChild(c);
   });
 
@@ -242,11 +254,11 @@ function renderTrack(t) {
 function renderSoon(t) {
   app.innerHTML = `
     <div class="view">
-      <div class="crumb"><a href="#/">F1 Racetracks</a><span class="sep">/</span>Round ${t.round} · ${esc(t.gp)}</div>
-      <p class="eyebrow">Circuit Breakdown <span>// Round ${String(t.round).padStart(2, "0")} · ${esc(t.gp)}</span></p>
+      <div class="crumb"><a href="#/">F1 Racetracks</a><span class="sep">/</span>Round ${t.round} \u00b7 ${esc(t.gp)}</div>
+      <p class="eyebrow">Circuit Breakdown <span>// Round ${String(t.round).padStart(2, "0")} \u00b7 ${esc(t.gp)}</span></p>
       <h1 class="track">${esc(t.title)}</h1>
-      <p class="sub">${esc(t.loc)}, ${t.cc} · ${t.date} ${SEASON}. Full breakdown not built yet. It’ll be generated ahead of the race weekend using the Circuit Breakdown generator.</p>
-      <div class="card loading-card"><div class="panel-b" style="padding:30px 4px"><p class="note">Coming soon. <a href="#/" style="color:var(--drs)">← Back to all circuits</a></p></div></div>
+      <p class="sub">${esc(t.loc)}, ${t.cc} \u00b7 ${t.date} ${SEASON}. Full breakdown not built yet. It\u2019ll be generated ahead of the race weekend using the Circuit Breakdown generator.</p>
+      <div class="card loading-card"><div class="panel-b" style="padding:30px 4px"><p class="note">Coming soon. <a href="#/" style="color:var(--drs)">\u2190 Back to all circuits</a></p></div></div>
       ${renderHistory(t.slug)}
     </div>
   `;
@@ -263,7 +275,7 @@ function buildProfile(t) {
   t.drs.forEach(z => {
     svg.appendChild(E("rect", { x: X(z.from), y: ET - 6, width: X(z.to) - X(z.from), height: (BARY + BARH) - (ET - 6), fill: "oklch(64% 0.2 145/.13)", stroke: "oklch(64% 0.2 145/.4)", "stroke-width": 1, rx: 3 }));
     const fl = E("text", { x: X(z.from) + 4, y: ET + 6, fill: "var(--drs)", "font-size": (t.drs.length > 3 ? 9.5 : 11), "font-weight": 600, "font-family": "IBM Plex Mono, monospace" });
-    fl.textContent = z.label + (t.drs.length > 3 ? "" : " ▸");
+    fl.textContent = z.label + (t.drs.length > 3 ? "" : " \u25b8");
     svg.appendChild(fl);
   });
 
@@ -283,7 +295,7 @@ function buildProfile(t) {
   const minP = Math.min(...vals), maxP = Math.max(...vals), sfVal = t.profile[0][1];
 
   const er = E("text", { x: 8, y: ET - 14, fill: "var(--muted)", "font-size": 10, "font-weight": 600, "font-family": "IBM Plex Mono, monospace" });
-  er.textContent = "ELEVATION · m ASL";
+  er.textContent = "ELEVATION \u00b7 m ASL";
   svg.appendChild(er);
 
   const yHi = Y(maxP);
