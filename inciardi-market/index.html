@@ -6,241 +6,199 @@
 <meta name="theme-color" content="#c65a3a">
 <meta name="robots" content="noindex, nofollow">
 <title>Inciardi Market</title>
-<meta name="description" content="Track and source Anastasia Inciardi mini prints on eBay: spot underpriced buys, know when to sell exclusives.">
+<meta name="description" content="Track and source Anastasia Inciardi mini prints on eBay: spot underpriced buys, value your stock, know the market.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖨️</text></svg>">
 <style>
   :root {
-    --bg:        oklch(97.5% 0.008 70);
-    --surface:   oklch(99.5% 0.004 70);
-    --sunk:      oklch(95% 0.01 70);
-    --ink:       oklch(26% 0.02 55);
-    --ink-soft:  oklch(46% 0.02 55);
-    --ink-faint: oklch(60% 0.016 55);
-    --line:      oklch(89% 0.012 65);
-    --line-soft: oklch(93% 0.008 65);
-    --accent:    oklch(56% 0.15 42);
-    --accent-ink:oklch(42% 0.14 42);
-    --accent-bg: oklch(94% 0.05 45);
-    --good:      oklch(54% 0.14 150);
-    --good-bg:   oklch(94% 0.05 150);
-    --warn:      oklch(58% 0.13 70);
-    --warn-bg:   oklch(95% 0.06 78);
-    --info:      oklch(52% 0.13 250);
-    --info-bg:   oklch(95% 0.045 250);
-    --plum:      oklch(50% 0.16 305);
-    --plum-bg:   oklch(95% 0.045 305);
-    --teal:      oklch(50% 0.11 200);
-    --teal-bg:   oklch(95% 0.04 200);
-    --gone:      oklch(58% 0.02 55);
-    --gone-bg:   oklch(93% 0.006 55);
-    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s12:48px;
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --radius: 12px;
+    --bg: oklch(97.5% 0.008 70); --surface: oklch(99.5% 0.004 70); --sunk: oklch(95% 0.01 70);
+    --ink: oklch(26% 0.02 55); --ink-soft: oklch(46% 0.02 55); --ink-faint: oklch(60% 0.016 55);
+    --line: oklch(89% 0.012 65); --line-soft: oklch(93% 0.008 65);
+    --accent: oklch(56% 0.15 42); --accent-ink: oklch(42% 0.14 42); --accent-bg: oklch(94% 0.05 45);
+    --good: oklch(54% 0.14 150); --good-bg: oklch(94% 0.05 150);
+    --warn: oklch(58% 0.13 70); --warn-bg: oklch(95% 0.06 78);
+    --info: oklch(52% 0.13 250); --info-bg: oklch(95% 0.045 250);
+    --plum: oklch(50% 0.16 305); --plum-bg: oklch(95% 0.045 305);
+    --teal: oklch(50% 0.11 200); --teal-bg: oklch(95% 0.04 200);
+    --gone: oklch(58% 0.02 55); --gone-bg: oklch(93% 0.006 55);
+    --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;--s12:48px;
+    --ease: cubic-bezier(0.22,1,0.36,1); --radius:12px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   }
   [data-theme="dark"] {
-    --bg:        oklch(18% 0.012 60);
-    --surface:   oklch(22% 0.013 60);
-    --sunk:      oklch(26% 0.014 60);
-    --ink:       oklch(93% 0.012 70);
-    --ink-soft:  oklch(76% 0.014 70);
-    --ink-faint: oklch(62% 0.014 70);
-    --line:      oklch(32% 0.014 60);
-    --line-soft: oklch(28% 0.012 60);
-    --accent:    oklch(66% 0.14 45);
-    --accent-ink:oklch(76% 0.13 48);
-    --accent-bg: oklch(32% 0.06 45);
-    --good:      oklch(72% 0.13 150); --good-bg: oklch(30% 0.06 150);
-    --warn:      oklch(74% 0.12 78);  --warn-bg: oklch(32% 0.06 78);
-    --info:      oklch(72% 0.11 250); --info-bg: oklch(30% 0.06 250);
-    --plum:      oklch(74% 0.13 305); --plum-bg: oklch(31% 0.07 305);
-    --teal:      oklch(72% 0.1 200);  --teal-bg: oklch(30% 0.05 200);
-    --gone:      oklch(60% 0.02 60);  --gone-bg: oklch(26% 0.008 60);
+    --bg: oklch(18% 0.012 60); --surface: oklch(22% 0.013 60); --sunk: oklch(26% 0.014 60);
+    --ink: oklch(93% 0.012 70); --ink-soft: oklch(76% 0.014 70); --ink-faint: oklch(62% 0.014 70);
+    --line: oklch(32% 0.014 60); --line-soft: oklch(28% 0.012 60);
+    --accent: oklch(66% 0.14 45); --accent-ink: oklch(76% 0.13 48); --accent-bg: oklch(32% 0.06 45);
+    --good: oklch(72% 0.13 150); --good-bg: oklch(30% 0.06 150);
+    --warn: oklch(74% 0.12 78); --warn-bg: oklch(32% 0.06 78);
+    --info: oklch(72% 0.11 250); --info-bg: oklch(30% 0.06 250);
+    --plum: oklch(74% 0.13 305); --plum-bg: oklch(31% 0.07 305);
+    --teal: oklch(72% 0.1 200); --teal-bg: oklch(30% 0.05 200);
+    --gone: oklch(60% 0.02 60); --gone-bg: oklch(26% 0.008 60);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg); color: var(--ink); line-height: 1.5;
-    font-optical-sizing: auto; -webkit-font-smoothing: antialiased;
-    padding-bottom: var(--s12);
-  }
+  body { background: var(--bg); color: var(--ink); line-height: 1.5; font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased; padding-bottom: var(--s12); }
   .wrap { max-width: 960px; margin: 0 auto; padding: 0 var(--s4); }
 
-  .masthead {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: var(--s6) 0 var(--s4);
-  }
+  .masthead { display: flex; align-items: center; justify-content: space-between; padding: var(--s6) 0 var(--s4); }
   .brand { display: flex; align-items: baseline; gap: var(--s2); }
   .brand h1 { font-size: 1.35rem; font-weight: 690; letter-spacing: -0.015em; }
   .brand .glyph { font-size: 1.2rem; }
-  .brand .tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
-                text-transform: uppercase; color: var(--ink-faint); }
-  .gear {
-    display: grid; place-items: center; width: 40px; height: 40px;
-    border-radius: 10px; border: 1px solid var(--line); background: var(--surface);
-    color: var(--ink-soft); cursor: pointer; font-size: 1.1rem;
-    transition: background 0.15s var(--ease);
-  }
+  .brand .tag { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-faint); }
+  .gear { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft); cursor: pointer;
+    font-size: 1.1rem; transition: background 0.15s var(--ease); }
   .gear:hover { background: var(--sunk); }
 
-  .tabs { display: flex; gap: var(--s1); border-bottom: 1px solid var(--line);
-          margin-bottom: var(--s6); overflow-x: auto; overflow-y: hidden;
-          scrollbar-width: none; -ms-overflow-style: none; }
+  .tabs { display: flex; gap: var(--s1); border-bottom: 1px solid var(--line); margin-bottom: var(--s6);
+    overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -ms-overflow-style: none; }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab {
-    font: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer;
-    background: none; border: none; color: var(--ink-faint);
-    padding: var(--s3) var(--s3); border-bottom: 2px solid transparent;
-    margin-bottom: -1px; white-space: nowrap; transition: color 0.15s var(--ease);
-  }
+  .tab { font: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer; background: none; border: none;
+    color: var(--ink-faint); padding: var(--s3) var(--s3); border-bottom: 2px solid transparent;
+    margin-bottom: -1px; white-space: nowrap; transition: color 0.15s var(--ease); }
   .tab:hover { color: var(--ink-soft); }
   .tab[aria-selected="true"] { color: var(--accent-ink); border-bottom-color: var(--accent); }
-  .tab .count { font-size: 0.72rem; font-variant-numeric: tabular-nums;
-                background: var(--sunk); color: var(--ink-faint);
-                padding: 0 6px; border-radius: 20px; margin-left: 4px; }
+  .tab .count { font-size: 0.72rem; font-variant-numeric: tabular-nums; background: var(--sunk);
+    color: var(--ink-faint); padding: 0 6px; border-radius: 20px; margin-left: 4px; }
   .tab[aria-selected="true"] .count { background: var(--accent-bg); color: var(--accent-ink); }
 
   .lead { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: var(--s5); max-width: 70ch; }
   .lead strong { color: var(--ink); font-weight: 620; }
 
   .paste { display: flex; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s6); }
-  .paste input { flex: 1 1 320px; min-width: 0; font: inherit; font-size: 0.9rem;
-    padding: var(--s3); background: var(--sunk); border: 1px solid var(--line);
-    border-radius: 8px; color: var(--ink); }
-  .paste input:focus-visible { outline: none; border-color: var(--accent); }
-  button.act { font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
-    padding: var(--s3) var(--s5); border-radius: 8px; border: 1px solid transparent;
-    background: var(--accent); color: oklch(99% 0.01 45);
+  .paste input, .stockform input, .stockform select { font: inherit; font-size: 0.9rem; padding: var(--s3);
+    background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; color: var(--ink); }
+  .paste input { flex: 1 1 320px; min-width: 0; }
+  .paste input:focus-visible, .stockform input:focus-visible, .stockform select:focus-visible { outline: none; border-color: var(--accent); }
+  button.act { font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: var(--s3) var(--s5);
+    border-radius: 8px; border: 1px solid transparent; background: var(--accent); color: oklch(99% 0.01 45);
     transition: background 0.15s var(--ease), transform 0.1s var(--ease); }
   button.act:hover { background: var(--accent-ink); }
   button.act:active { transform: translateY(1px); }
 
-  .deals { display: flex; flex-direction: column; gap: var(--s3); }
-  .deal {
-    display: grid; grid-template-columns: 52px 1fr auto; gap: var(--s4);
-    align-items: center; padding: var(--s4);
-    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-    transition: border-color 0.15s var(--ease);
-  }
+  .trends { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--s3); margin-bottom: var(--s6); }
+  .trend { padding: var(--s4); border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); }
+  .trend .k { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-faint); }
+  .trend .v { font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin-top: 2px; }
+  .trend .d { font-size: 0.78rem; color: var(--ink-soft); margin-top: var(--s1); }
+  .trend.up .v { color: var(--good); } .trend.down .v { color: var(--warn); } .trend.hot .v { color: var(--accent-ink); }
+
+  .deals, .sell, .stocklist { display: flex; flex-direction: column; gap: var(--s3); }
+  .deal { display: grid; grid-template-columns: 52px 1fr auto; gap: var(--s4); align-items: center; padding: var(--s4);
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); transition: border-color 0.15s var(--ease); }
   .deal:hover { border-color: var(--ink-faint); }
   .deal.hot { border-color: var(--good); background: var(--good-bg); }
-  .thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover;
-           background: var(--sunk); border: 1px solid var(--line-soft);
-           display: grid; place-items: center; font-size: 1.3rem; color: var(--ink-faint); }
+  .thumb { width: 52px; height: 52px; border-radius: 8px; background: var(--sunk); border: 1px solid var(--line-soft);
+    display: grid; place-items: center; font-size: 1.3rem; color: var(--ink-faint); }
   .d-body h3 { font-size: 0.98rem; font-weight: 600; line-height: 1.35; }
   .d-body h3 a { color: var(--ink); text-decoration: none; }
   .d-body h3 a:hover { color: var(--accent-ink); text-decoration: underline; }
-  .d-meta { font-size: 0.78rem; color: var(--ink-faint); margin-top: 2px;
-            display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; }
+  .d-meta { font-size: 0.78rem; color: var(--ink-faint); margin-top: 2px; display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; }
   .badges { display: flex; gap: var(--s1); flex-wrap: wrap; margin-top: var(--s2); }
-  .badge { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 6px;
-           letter-spacing: 0.01em; white-space: nowrap; }
-  .b-new{background:var(--info-bg);color:var(--info)}
-  .b-changed{background:var(--warn-bg);color:var(--warn)}
-  .b-live{background:var(--sunk);color:var(--ink-faint)}
-  .b-gone{background:var(--gone-bg);color:var(--gone)}
-  .b-underpriced{background:var(--good-bg);color:var(--good)}
-  .b-exclusive{background:var(--plum-bg);color:var(--plum)}
-  .b-pack-deal{background:var(--teal-bg);color:var(--teal)}
-  .b-auction{background:var(--warn-bg);color:var(--warn)}
-  .b-stale{background:var(--sunk);color:var(--ink-faint)}
-  .b-condition-note{background:var(--gone-bg);color:var(--gone)}
+  .badge { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 6px; letter-spacing: 0.01em; white-space: nowrap; }
+  .b-new{background:var(--info-bg);color:var(--info)} .b-changed{background:var(--warn-bg);color:var(--warn)}
+  .b-live{background:var(--sunk);color:var(--ink-faint)} .b-gone{background:var(--gone-bg);color:var(--gone)}
+  .b-underpriced{background:var(--good-bg);color:var(--good)} .b-exclusive{background:var(--plum-bg);color:var(--plum)}
+  .b-pack-deal{background:var(--teal-bg);color:var(--teal)} .b-auction{background:var(--warn-bg);color:var(--warn)}
+  .b-stale{background:var(--sunk);color:var(--ink-faint)} .b-condition-note{background:var(--gone-bg);color:var(--gone)}
+  .b-listed{background:var(--good-bg);color:var(--good)} .b-unlisted{background:var(--sunk);color:var(--ink-faint)}
   .d-price { text-align: right; white-space: nowrap; }
-  .landed { font-size: 1.15rem; font-weight: 680; font-variant-numeric: tabular-nums;
-            letter-spacing: -0.01em; }
+  .landed { font-size: 1.15rem; font-weight: 680; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
   .sub-price { font-size: 0.74rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
   .verdict { font-size: 0.78rem; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
-  .verdict.buy { color: var(--good); }
-  .verdict.watch { color: var(--warn); }
-  .verdict.pass { color: var(--ink-faint); }
+  .verdict.buy{color:var(--good)} .verdict.watch{color:var(--warn)} .verdict.pass{color:var(--ink-faint)}
+  .verdict.gain{color:var(--good)} .verdict.loss{color:var(--warn)}
 
-  .sell { display: flex; flex-direction: column; gap: var(--s3); }
-  .sell-row { display: grid; grid-template-columns: 1fr auto; gap: var(--s4);
-    align-items: center; padding: var(--s4); background: var(--surface);
-    border: 1px solid var(--line); border-radius: var(--radius); }
+  .sell-row { display: grid; grid-template-columns: 1fr auto; gap: var(--s4); align-items: center; padding: var(--s4);
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
   .spark { display: flex; align-items: flex-end; gap: 2px; height: 26px; margin-top: var(--s2); }
   .spark span { width: 5px; background: var(--accent); border-radius: 1px; opacity: 0.75; }
 
-  .note { font-size: 0.82rem; color: var(--ink-faint); background: var(--sunk);
-          border-radius: 10px; padding: var(--s3) var(--s4); margin-top: var(--s6);
-          display: flex; gap: var(--s2); }
+  .note { font-size: 0.82rem; color: var(--ink-faint); background: var(--sunk); border-radius: 10px;
+    padding: var(--s3) var(--s4); margin-top: var(--s6); display: flex; gap: var(--s2); }
   .note b { color: var(--ink-soft); font-weight: 620; }
 
   .cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s3); }
-  .cat-item { padding: var(--s4); background: var(--surface); border: 1px solid var(--line);
-              border-radius: 10px; }
+  .cat-item { padding: var(--s4); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+  .cat-item.unlisted { opacity: 0.72; }
   .cat-item .name { font-size: 0.92rem; font-weight: 620; }
-  .cat-item .stat { font-size: 0.76rem; color: var(--ink-faint); margin-top: var(--s1);
-                    font-variant-numeric: tabular-nums; }
+  .cat-item .stat { font-size: 0.76rem; color: var(--ink-faint); margin-top: var(--s1); font-variant-numeric: tabular-nums; }
   .cat-item .excl { display: inline-block; margin-top: var(--s2); }
+  .cat-head { display: flex; align-items: baseline; gap: var(--s2); margin: var(--s6) 0 var(--s3); }
+  .cat-head h2 { font-size: 0.82rem; font-weight: 680; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft); }
+  .cat-head .n { font-size: 0.74rem; color: var(--ink-faint); }
+
+  .machines { display: flex; flex-direction: column; gap: var(--s2); }
+  .machine { display: grid; grid-template-columns: auto 1fr auto; gap: var(--s3); align-items: center;
+    padding: var(--s3) var(--s4); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+  .machine .pin { font-size: 1.1rem; }
+  .machine .mname { font-size: 0.92rem; font-weight: 600; }
+  .machine .mloc { font-size: 0.78rem; color: var(--ink-faint); }
 
   .chips { display: flex; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s5); }
-  .chip { font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer;
-    padding: var(--s2) var(--s3); border-radius: 20px; border: 1px solid var(--line);
-    background: var(--surface); color: var(--ink-soft); transition: all 0.15s var(--ease); }
+  .chip { font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; padding: var(--s2) var(--s3);
+    border-radius: 20px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+    transition: all 0.15s var(--ease); }
   .chip:hover { border-color: var(--ink-faint); }
-  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent);
-    color: oklch(99% 0.01 45); }
+  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: oklch(99% 0.01 45); }
+
+  .stockform { display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; margin-bottom: var(--s6);
+    padding: var(--s4); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+  .stockform select { flex: 1 1 200px; } .stockform input { width: 110px; }
+  .portfolio { display: flex; gap: var(--s6); flex-wrap: wrap; margin-bottom: var(--s5); }
+  .portfolio .p { display: flex; flex-direction: column; }
+  .portfolio .p .n { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .portfolio .p .l { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); }
+  .rm { background: none; border: none; color: var(--ink-faint); cursor: pointer; font-size: 1.1rem; padding: 0 var(--s2); }
+  .rm:hover { color: var(--warn); }
 
   .empty { text-align: center; padding: var(--s12) var(--s4); color: var(--ink-faint); }
   .empty .big { font-size: 1.8rem; margin-bottom: var(--s2); }
   .empty h3 { font-size: 1rem; color: var(--ink-soft); font-weight: 600; margin-bottom: var(--s1); }
 
-  dialog.drawer { margin: 0 0 0 auto; height: 100vh; max-height: 100vh; width: min(360px, 90vw);
-    border: none; border-left: 1px solid var(--line); background: var(--surface);
-    color: var(--ink); padding: var(--s6); }
+  dialog.drawer { margin: 0 0 0 auto; height: 100vh; max-height: 100vh; width: min(360px, 90vw); border: none;
+    border-left: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: var(--s6); }
   dialog.drawer::backdrop { background: oklch(20% 0.02 60 / 0.4); }
   .drawer h2 { font-size: 1.1rem; font-weight: 680; margin-bottom: var(--s5); }
-  .field { display: flex; align-items: center; justify-content: space-between;
-    padding: var(--s3) 0; border-bottom: 1px solid var(--line-soft); }
+  .field { display: flex; align-items: center; justify-content: space-between; padding: var(--s3) 0; border-bottom: 1px solid var(--line-soft); }
   .field label { font-size: 0.9rem; font-weight: 550; }
   .field .desc { font-size: 0.76rem; color: var(--ink-faint); margin-top: 2px; }
-  .toggle { position: relative; width: 46px; height: 26px; border-radius: 20px;
-    background: var(--sunk); border: 1px solid var(--line); cursor: pointer; transition: background 0.2s var(--ease); }
-  .toggle::after { content:""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
-    border-radius: 50%; background: var(--surface); box-shadow: 0 1px 2px oklch(0% 0 0 / 0.2);
-    transition: transform 0.2s var(--ease); }
+  .toggle { position: relative; width: 46px; height: 26px; border-radius: 20px; background: var(--sunk);
+    border: 1px solid var(--line); cursor: pointer; transition: background 0.2s var(--ease); }
+  .toggle::after { content:""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--surface); box-shadow: 0 1px 2px oklch(0% 0 0 / 0.2); transition: transform 0.2s var(--ease); }
   .toggle[aria-pressed="true"] { background: var(--accent); }
   .toggle[aria-pressed="true"]::after { transform: translateX(20px); }
   .drawer-note { font-size: 0.8rem; color: var(--ink-faint); line-height: 1.55; margin-top: var(--s5); }
-  .drawer-close { position: absolute; top: var(--s4); right: var(--s4); background: none; border: none;
-    font-size: 1.3rem; color: var(--ink-faint); cursor: pointer; }
-  input.ep { width: 100%; font: inherit; font-size: 0.82rem; margin-top: var(--s2);
-    padding: var(--s2) var(--s3); background: var(--sunk); border: 1px solid var(--line);
-    border-radius: 8px; color: var(--ink); }
+  .drawer-close { position: absolute; top: var(--s4); right: var(--s4); background: none; border: none; font-size: 1.3rem; color: var(--ink-faint); cursor: pointer; }
+  input.ep { width: 100%; font: inherit; font-size: 0.82rem; margin-top: var(--s2); padding: var(--s2) var(--s3);
+    background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; color: var(--ink); }
   input.ep:focus-visible { outline: none; border-color: var(--accent); }
 
-  footer { max-width: 960px; margin: var(--s12) auto 0; padding: var(--s4) var(--s4) 0;
-    border-top: 1px solid var(--line-soft); font-size: 0.74rem; color: var(--ink-faint); }
+  footer { max-width: 960px; margin: var(--s12) auto 0; padding: var(--s4) var(--s4) 0; border-top: 1px solid var(--line-soft);
+    font-size: 0.74rem; color: var(--ink-faint); }
   footer code { font-family: ui-monospace, Menlo, monospace; }
 
-  .hide { display: none !important; }
-  @media (max-width: 560px) {
-    .deal { grid-template-columns: 44px 1fr; }
-    .d-price { grid-column: 2; text-align: left; }
-    .thumb { width: 44px; height: 44px; }
-  }
+  @media (max-width: 560px) { .deal { grid-template-columns: 44px 1fr; } .d-price { grid-column: 2; text-align: left; } .thumb { width: 44px; height: 44px; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="masthead">
-    <div class="brand">
-      <span class="glyph">🖨️</span>
-      <h1>Inciardi Market</h1>
-      <span class="tag" id="freshness">sample</span>
-    </div>
+    <div class="brand"><span class="glyph">🖨️</span><h1>Inciardi Market</h1><span class="tag" id="freshness">sample</span></div>
     <button class="gear" id="gear" aria-label="Settings" aria-expanded="false">⚙</button>
   </div>
-
   <nav class="tabs" role="tablist">
     <button class="tab" role="tab" data-tab="radar" aria-selected="true">Deal Radar <span class="count" id="c-radar">0</span></button>
     <button class="tab" role="tab" data-tab="sell" aria-selected="false">Sell Signal <span class="count" id="c-sell">0</span></button>
-    <button class="tab" role="tab" data-tab="all" aria-selected="false">All Listings <span class="count" id="c-all">0</span></button>
+    <button class="tab" role="tab" data-tab="stock" aria-selected="false">My Stock <span class="count" id="c-stock">0</span></button>
     <button class="tab" role="tab" data-tab="catalog" aria-selected="false">Catalog <span class="count" id="c-cat">0</span></button>
+    <button class="tab" role="tab" data-tab="machines" aria-selected="false">Machines <span class="count" id="c-mach">0</span></button>
+    <button class="tab" role="tab" data-tab="all" aria-selected="false">All <span class="count" id="c-all">0</span></button>
     <button class="tab" role="tab" data-tab="compare" aria-selected="false">Compare</button>
   </nav>
-
   <section id="panel"></section>
 </div>
 
@@ -256,259 +214,11 @@
     <div class="desc">Blank = bundled sample. Paste your Worker URL to go live.</div>
     <input class="ep" id="epInput" type="url" placeholder="https://inciardi-market.<you>.workers.dev/market" spellcheck="false" autocomplete="off">
   </div>
-  <p class="drawer-note">Refreshes when you reload or switch data source. Once the Cloudflare Worker is live it pulls eBay every 6 hours; until then this runs on bundled sample data. Baseline is retail price plus the active-listing spread. No sold-price history yet (eBay gates that behind partner access).</p>
+  <p class="drawer-note">Two data pipes. eBay prices come from the Cloudflare Worker (every 6h once live). The catalog + machine locations come from a session web-search refresh, so they update when re-run, not automatically. My Stock is stored on this device only. Baseline is retail plus the active-listing spread; no sold-price history yet.</p>
 </dialog>
 
-<footer class="wrap">Tracks Anastasia Inciardi mini prints on eBay · buy underpriced, sell exclusives · data via <code>market.json</code></footer>
+<footer class="wrap">Anastasia Inciardi mini prints · buy underpriced, value your stock, read the market · prices via <code>market.json</code>, catalog via <code>catalog.json</code></footer>
 
-<script>
-const FALLBACK = {"version":"2026-07-06T21:00:00Z","query":"inciardi mini print","source":"sample","baseline":{"retailDefault":14,"currency":"USD"},"listings":[
- {"itemId":"a","title":"Anastasia Inciardi Mini Print - NEGRONI","landed":9.5,"price":9.5,"shipping":0,"currency":"USD","condition":"New","buyingOptions":["FIXED_PRICE"],"url":"https://ebay.com/itm/156812754385","seller":"printfan_me","status":"new","firstSeen":"2026-07-06T21:00:00Z","print":{"name":"Negroni","exclusive":null,"matched":true},"flags":["underpriced"],"priceHistory":[{"t":"2026-07-06","landed":9.5}]},
- {"itemId":"b","title":"Inciardi Mini Print - NYC Exclusive Holiday Edition","landed":149,"price":149,"shipping":0,"currency":"USD","condition":"New","buyingOptions":["FIXED_PRICE","BEST_OFFER"],"url":"https://ebay.com/itm/900000103","seller":"collector_lot","status":"live","firstSeen":"2026-06-28T06:00:00Z","print":{"name":"Holiday Edition","exclusive":"holiday","matched":true},"flags":["exclusive"],"priceHistory":[{"t":"2026-06-28","landed":149}]},
- {"itemId":"c","title":"Inciardi Mini Print - LACMA set (7 lot)","landed":60,"price":60,"shipping":0,"currency":"USD","condition":"New","buyingOptions":["FIXED_PRICE"],"url":"https://ebay.com/itm/900000104","seller":"artdealer_nyc","status":"changed","firstSeen":"2026-07-01T06:00:00Z","print":{"name":"LACMA set","exclusive":"lacma","matched":true},"flags":["exclusive","pack-deal"],"priceHistory":[{"t":"2026-07-01","landed":75},{"t":"2026-07-04","landed":68},{"t":"2026-07-06","landed":60}]}
-]};
-
-const CATALOG_KNOWN = ["Negroni","Milk","Olive","Strawberry","Jam","Cornichon","Macaroni","Bird's Eye Chili","Clementine","Tinned Fish","Cheese #1","Cheese #2","Monet's Flowers","Grand Central","Holiday Edition","Mystery Pack"];
-
-let DATA = null;
-let state = { tab: "radar", filters: new Set() };
-
-const gear = document.getElementById("gear");
-const drawer = document.getElementById("drawer");
-const themeToggle = document.getElementById("themeToggle");
-const epInput = document.getElementById("epInput");
-
-initTheme();
-epInput.value = localStorage.getItem("inciardi_ep") || "";
-document.querySelectorAll(".tab").forEach(t =>
-  t.addEventListener("click", () => switchTab(t.dataset.tab)));
-gear.addEventListener("click", openDrawer);
-document.getElementById("drawerClose").addEventListener("click", () => drawer.close());
-drawer.addEventListener("click", (e) => { if (e.target === drawer) drawer.close(); });
-themeToggle.addEventListener("click", toggleTheme);
-epInput.addEventListener("change", () => { localStorage.setItem("inciardi_ep", epInput.value.trim()); load(); });
-
-load();
-
-async function load() {
-  const ep = (localStorage.getItem("inciardi_ep") || "").trim();
-  const src = ep || "./market.json";
-  try {
-    const res = await fetch(src, { headers: { Accept: "application/json" } });
-    if (!res.ok) throw new Error(res.status);
-    const d = await res.json();
-    if (d.error) throw new Error(d.error);
-    DATA = d;
-    localStorage.setItem("inciardi_cache", JSON.stringify(d));
-  } catch (e) {
-    const cached = localStorage.getItem("inciardi_cache");
-    DATA = cached ? JSON.parse(cached) : FALLBACK;
-  }
-  document.getElementById("freshness").textContent =
-    DATA.source === "ebay-browse" ? "live" : "sample";
-  render();
-}
-
-function baseline() { return (DATA.baseline && DATA.baseline.retailDefault) || 14; }
-function has(l, f) { return (l.flags || []).includes(f); }
-function isPack(l) { return has(l, "pack-deal"); }
-function isExclusive(l) { return l.print && l.print.exclusive; }
-
-function verdict(l) {
-  const b = baseline();
-  if (isExclusive(l)) {
-    if (l.landed <= 40) return { k: "buy", t: "under exclusive floor" };
-    if (l.landed <= 70) return { k: "watch", t: "fair for exclusive" };
-    return { k: "pass", t: "priced high" };
-  }
-  if (isPack(l)) {
-    const perPrint = l.landed / 5;
-    if (perPrint <= b * 0.7) return { k: "buy", t: "cheap per print" };
-    return { k: "watch", t: "pack, check count" };
-  }
-  const ratio = l.landed / b;
-  if (ratio <= 0.75) return { k: "buy", t: `${Math.round((1-ratio)*100)}% under retail` };
-  if (ratio <= 1.05) return { k: "watch", t: "around retail" };
-  return { k: "pass", t: `${Math.round((ratio-1)*100)}% over` };
-}
-
-function render() {
-  const live = DATA.listings.filter(l => l.status !== "gone");
-  const radar = live.filter(l => !isExclusive(l) && verdict(l).k !== "pass");
-  const sell = DATA.listings.filter(isExclusive);
-  document.getElementById("c-radar").textContent = radar.length;
-  document.getElementById("c-sell").textContent = sell.length;
-  document.getElementById("c-all").textContent = DATA.listings.length;
-  document.getElementById("c-cat").textContent = catalog().length;
-  ({ radar: renderRadar, sell: renderSell, all: renderAll, catalog: renderCatalog, compare: renderCompare }[state.tab])();
-}
-
-function switchTab(tab) {
-  state.tab = tab; state.filters.clear();
-  document.querySelectorAll(".tab").forEach(t =>
-    t.setAttribute("aria-selected", String(t.dataset.tab === tab)));
-  render();
-}
-
-const panel = document.getElementById("panel");
-
-function renderRadar() {
-  const live = DATA.listings.filter(l => l.status !== "gone" && !isExclusive(l));
-  const ranked = live.map(l => ({ l, v: verdict(l) }))
-    .filter(x => x.v.k !== "pass")
-    .sort((a, b) => rank(a.v.k) - rank(b.v.k) || a.l.landed - b.l.landed);
-  panel.innerHTML = `
-    <p class="lead"><strong>Buy side.</strong> Non-exclusive listings priced at or under retail (${money(baseline())}), best deals first. Packs judged on per-print value.</p>
-    <div class="deals">${ranked.map(x => dealCard(x.l, x.v)).join("") || emptyState("🔍","No deals right now","Nothing under retail in the current scan.")}</div>
-    ${newSince(live)}`;
-}
-
-function renderSell() {
-  const ex = DATA.listings.filter(isExclusive);
-  const active = ex.filter(l => l.status !== "gone");
-  const gone = ex.filter(l => l.status === "gone");
-  panel.innerHTML = `
-    <p class="lead"><strong>Sell side.</strong> Exclusives (NYC / LACMA / Grand Central / holiday) and what they're asking on the market right now. If you own one, this is your sell signal.</p>
-    <div class="sell">${active.map(sellRow).join("") || emptyState("💰","No exclusives listed","None of the collectible editions are on the market right now.")}</div>
-    ${gone.length ? `<div class="note"><span>👻</span><div><b>${gone.length} exclusive${gone.length>1?"s":""} vanished since last scan.</b> ${gone.map(g=>esc(g.print.name)).join(", ")} disappeared, likely sold. Rarity signal: if you hold one, the market's thin.</div></div>` : ""}`;
-}
-
-function renderAll() {
-  const allFlags = ["underpriced","exclusive","pack-deal","auction","stale","new","changed","gone"];
-  const active = state.filters.size
-    ? DATA.listings.filter(l => [...state.filters].every(f => has(l,f) || l.status===f))
-    : DATA.listings;
-  panel.innerHTML = `
-    <div class="chips">${allFlags.map(f =>
-      `<button class="chip" data-f="${f}" aria-pressed="${state.filters.has(f)}">${f.replace("-"," ")}</button>`).join("")}</div>
-    <div class="deals">${active.map(l => dealCard(l, verdict(l))).join("") || emptyState("∅","No matches","Loosen the filters.")}</div>`;
-  panel.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
-    const f = c.dataset.f;
-    state.filters.has(f) ? state.filters.delete(f) : state.filters.add(f);
-    renderAll();
-  }));
-}
-
-function catalog() {
-  const map = new Map();
-  DATA.listings.forEach(l => {
-    if (!l.print || !l.print.matched) return;
-    const k = l.print.name;
-    if (!map.has(k)) map.set(k, { name: k, exclusive: l.print.exclusive, count: 0, low: Infinity, high: 0 });
-    const e = map.get(k);
-    e.count++; e.low = Math.min(e.low, l.landed); e.high = Math.max(e.high, l.landed);
-  });
-  return [...map.values()].sort((a,b) => a.name.localeCompare(b.name));
-}
-
-function renderCatalog() {
-  const cat = catalog();
-  const unmatched = DATA.listings.filter(l => l.print && !l.print.matched).length;
-  panel.innerHTML = `
-    <p class="lead"><strong>The catalog.</strong> Prints that have surfaced on eBay so far, with their market range. Grows as new titles appear. This is the reference the scoring leans on, not your personal collection.</p>
-    <div class="cat-grid">${cat.map(c => `
-      <div class="cat-item">
-        <div class="name">${esc(c.name)}</div>
-        <div class="stat">${c.count} listing${c.count>1?"s":""} · ${money(c.low)}${c.high>c.low?"–"+money(c.high):""}</div>
-        ${c.exclusive ? `<span class="badge b-exclusive excl">${esc(c.exclusive)}</span>` : ""}
-      </div>`).join("")}</div>
-    ${unmatched ? `<div class="note"><span>🏷️</span><div><b>${unmatched} listing${unmatched>1?"s":""} couldn't be matched to a print.</b> Usually vague titles ("3 New Ones", "random assortment"). They're still tracked, just unscored against a specific print.</div></div>` : ""}`;
-}
-
-function renderCompare() {
-  panel.innerHTML = `
-    <p class="lead"><strong>Found a link?</strong> Paste an eBay listing URL and I'll place it against the market: how its price stacks up vs retail and vs comparable active listings.</p>
-    <div class="paste">
-      <input type="url" id="cmpUrl" placeholder="https://www.ebay.com/itm/..." spellcheck="false">
-      <button class="act" id="cmpBtn">Compare</button>
-    </div>
-    <div id="cmpOut">${emptyState("🔗","Nothing to compare yet","Paste a link above. Live lookup needs the Worker; until then this matches against the current dataset by item.")}</div>`;
-  document.getElementById("cmpBtn").addEventListener("click", runCompare);
-}
-
-function runCompare() {
-  const url = document.getElementById("cmpUrl").value.trim();
-  const out = document.getElementById("cmpOut");
-  if (!url) { out.innerHTML = emptyState("🔗","No URL","Paste an eBay listing link."); return; }
-  const idMatch = url.match(/itm\/(\d+)/);
-  const found = idMatch && DATA.listings.find(l => l.url.includes(idMatch[1]));
-  if (!found) {
-    out.innerHTML = `<div class="note"><span>⏳</span><div><b>Not in the current dataset.</b> Live single-URL lookup arrives with the Cloudflare Worker (it'll fetch that exact item from eBay's API). For now, Compare resolves links that are already in the scan.</div></div>`;
-    return;
-  }
-  out.innerHTML = `<div class="deals">${dealCard(found, verdict(found))}</div>`;
-}
-
-function dealCard(l, v) {
-  const b = baseline();
-  const dv = v || verdict(l);
-  const hot = dv.k === "buy" && !isExclusive(l);
-  return `
-    <div class="deal ${hot?"hot":""}">
-      <div class="thumb">🖨️</div>
-      <div class="d-body">
-        <h3><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)}</a></h3>
-        <div class="d-meta"><span>${l.print&&l.print.matched?esc(l.print.name):"unmatched"}</span>
-          <span>·</span><span>${esc(l.condition||"")}</span><span>·</span><span>${esc(l.seller||"?")}</span></div>
-        <div class="badges">
-          <span class="badge b-${l.status}">${l.status}</span>
-          ${(l.flags||[]).map(f=>`<span class="badge b-${f}">${f.replace("-"," ")}</span>`).join("")}
-        </div>
-      </div>
-      <div class="d-price">
-        <div class="landed">${money(l.landed)}</div>
-        <div class="sub-price">${l.shipping?money(l.price)+" + "+money(l.shipping)+" ship":"free ship"}</div>
-        <div class="verdict ${dv.k}">${dv.k==="buy"?"● ":""}${esc(dv.t)}</div>
-      </div>
-    </div>`;
-}
-
-function sellRow(l) {
-  const hist = (l.priceHistory||[]).map(h=>h.landed);
-  const max = Math.max(...hist, 1);
-  const bars = hist.map(h => `<span style="height:${Math.max(10,Math.round(h/max*26))}px"></span>`).join("");
-  const trend = hist.length>1 ? (hist[hist.length-1] < hist[0] ? "▼ dropping" : hist[hist.length-1] > hist[0] ? "▲ climbing" : "flat") : "";
-  return `
-    <div class="sell-row">
-      <div>
-        <h3 style="font-size:.98rem;font-weight:600"><a href="${esc(l.url)}" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:none">${esc(l.title)}</a></h3>
-        <div class="d-meta"><span class="badge b-exclusive">${esc(l.print.exclusive)}</span>
-          <span>${esc(l.seller||"?")}</span>${trend?`<span>· ${trend}</span>`:""}</div>
-        ${hist.length>1?`<div class="spark">${bars}</div>`:""}
-      </div>
-      <div class="d-price">
-        <div class="landed">${money(l.landed)}</div>
-        <div class="sub-price">vs ${money(baseline())} retail</div>
-        <div class="verdict buy">${Math.round(l.landed/baseline())}× retail</div>
-      </div>
-    </div>`;
-}
-
-function newSince(live) {
-  const fresh = live.filter(l => l.status === "new");
-  if (!fresh.length) return "";
-  return `<div class="note"><span>✨</span><div><b>${fresh.length} new since last scan.</b> Fresh to market: ${fresh.map(f=>esc(f.print&&f.print.matched?f.print.name:"a listing")).join(", ")}.</div></div>`;
-}
-
-function emptyState(big, h, p) {
-  return `<div class="empty"><div class="big">${big}</div><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`;
-}
-
-function openDrawer() { drawer.showModal(); gear.setAttribute("aria-expanded","true"); }
-drawer.addEventListener("close", () => gear.setAttribute("aria-expanded","false"));
-function initTheme() {
-  const saved = localStorage.getItem("inciardi_theme");
-  if (saved === "dark") { document.documentElement.dataset.theme = "dark"; themeToggle.setAttribute("aria-pressed","true"); }
-}
-function toggleTheme() {
-  const dark = document.documentElement.dataset.theme === "dark";
-  if (dark) { delete document.documentElement.dataset.theme; localStorage.setItem("inciardi_theme","light"); themeToggle.setAttribute("aria-pressed","false"); }
-  else { document.documentElement.dataset.theme = "dark"; localStorage.setItem("inciardi_theme","dark"); themeToggle.setAttribute("aria-pressed","true"); }
-}
-
-function rank(k){ return k==="buy"?0:k==="watch"?1:2; }
-function money(n){ return "$"+Number(n||0).toFixed(2); }
-function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-</script>
+<script src="./app.js" defer></script>
 </body>
 </html>
