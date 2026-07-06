@@ -1,9 +1,10 @@
 <!--
   F1 Racetracks
-  Version: V1.7e split
+  Version: V1.7f split
   Live: https://mawizorek.github.io/ClickUp_apps/f1-racetracks/
   Source: https://github.com/mawizorek/ClickUp_apps/tree/main/f1-racetracks
   INFRASTRUCTURE: slim runtime entrypoint + externalized data.json + direct source modules in /source
+  CACHE-BUST: bump BUILD_STAMP below AND the ?v= token on the module <script> tags on every source/style deploy.
 -->
 <html lang="en-US">
 <head>
@@ -23,6 +24,8 @@
     body.runtime-ready{opacity:1}
   </style>
   <script>
+    // Bump this one token on every source/style deploy to guarantee fresh bytes.
+    const BUILD_STAMP = '20260705a';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
@@ -32,7 +35,7 @@
 
     window.runtimeStylesReady = Promise.all(
       RUNTIME_STYLE_SOURCES.map(async (path) => {
-        const res = await fetch(path, { cache: 'no-store' });
+        const res = await fetch(path + '?v=' + BUILD_STAMP, { cache: 'no-store' });
         if (!res.ok) throw new Error(`Failed to load ${path}`);
         const style = document.createElement('style');
         style.dataset.source = path;
@@ -61,7 +64,7 @@
     <div id="app"></div>
 
     <footer class="app">
-      <span class="meta-txt" id="foot-meta">F1 Racetracks V1.7e split · loading data…</span>
+      <span class="meta-txt" id="foot-meta">F1 Racetracks V1.7f split · loading data…</span>
       <div class="toolbar">
         <a class="tool" href="./live-tracker.html">Live tracker</a>
         <button class="tool" id="t-copy" title="Copy the full page source to your clipboard">Copy source</button>
@@ -74,18 +77,18 @@
     </footer>
   </div>
 
-  <script src="./source/05_track_data_rounds_01_03.js"></script>
-  <script src="./source/06_track_data_rounds_06_09.js"></script>
-  <script src="./source/07_track_data_rounds_10_13.js"></script>
-  <script src="./source/08_track_data_rounds_14_24.js"></script>
-  <script src="./source/09_app_bootstrap_and_home.js"></script>
-  <script src="./source/10_track_views_and_profile.js"></script>
-  <script src="./source/13_live_session_panel.js"></script>
-  <script src="./source/11_weather_and_footer_exports.js"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260704e"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260704e"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260704e"></script>
-  <script src="./source/17_weekend_mount.js?v=20260704e"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260704e"></script>
+  <script src="./source/05_track_data_rounds_01_03.js?v=20260705a"></script>
+  <script src="./source/06_track_data_rounds_06_09.js?v=20260705a"></script>
+  <script src="./source/07_track_data_rounds_10_13.js?v=20260705a"></script>
+  <script src="./source/08_track_data_rounds_14_24.js?v=20260705a"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260705a"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260705a"></script>
+  <script src="./source/13_live_session_panel.js?v=20260705a"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260705a"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260705a"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260705a"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260705a"></script>
+  <script src="./source/17_weekend_mount.js?v=20260705a"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260705a"></script>
 </body>
 </html>
