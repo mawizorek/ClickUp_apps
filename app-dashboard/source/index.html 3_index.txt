@@ -3,17 +3,17 @@
 You (the agent) have been handed THIS index file only. It is the entry point and the rulebook for reviewing a chunked file. Read it fully, confirm you understand the gated walk below, then STOP and wait. The actual content arrives one chunk at a time.
 
 ## SET INTEGRITY HEADER
-- Set UUID: 7b293b3e-badc-4e0e-850b-40755b486605
+- Set UUID: 847878af-77f9-41a9-aeed-7e97f96014d3
 - Source file: index.html 3.txt
 - Original source included in set: index.html 3.txt (unaltered, native format)
 - Chunk file extension: .txt
-- Encoding: none (plain text)
+- Encoding: base64 (each chunk payload is base64-encoded; markers stay plain text outside the blob)
 - Mode: MANUAL (the human pastes/sends each chunk to you in turn)
-- Total chunks: 4
+- Total chunks: 6
 - Total bytes (source): 37,521
 - Total Character Count: 37,496
 - Est. tokens (chars / 4): 9,374 (token-budget threshold: 28,000)
-- Generated: 7/6/2026, 13:57:49
+- Generated: 7/6/2026, 14:03:43
 - App: File Chunker v18 (2026-07-02)
 - Numbering: flat sequential (N/TOTAL). Grouped/sectioned numbering is a known future option, not active.
 - Per-fetch read cap: ~30 KB. Chunks over cap: 0.
@@ -22,18 +22,20 @@ You (the agent) have been handed THIS index file only. It is the entry point and
 0. TOKEN BUDGET CHECK FIRST: estimate the whole set in tokens (Total Character Count / chars-per-token above). If it exceeds the token-budget threshold, STOP and tell the human the set is too large for a single automated walk; suggest a tighter scope or a batched read. Do not begin.
 1. Read this index first. Confirm in chat that you understand these rules and are ready. Then STOP and wait. Do not read or fetch any chunk yet.
 2. You will be sent ONE chunk at a time, in the manifest order below. Read only the chunk you were just given.
-3. For each chunk: verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, uuid verified" in chat.
+3. For each chunk: DECODE the base64 payload FIRST (everything between the directive lines, after the "ENCODING: base64" line). THEN verify its sequence tag (e.g. CHUNK 3/7) and that its START and END boundary UUID match. Echo "read N/TOTAL, decoded, uuid verified" in chat.
 4. After EACH chunk, STOP. Do not request, fetch, or infer the next chunk on your own. Wait for the human to explicitly say continue. This pause between every chunk is mandatory.
-5. If any chunk's start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. Do NOT reconstruct or fill gaps from inference.
+5. If a chunk fails to DECODE, or its start/end UUID do not match, or a sequence number is missing or out of order, STOP and report it. A decode failure is treated exactly like a UUID mismatch. Do NOT reconstruct or fill gaps from inference.
 6. Confirm the set-level UUID in this index header matches its footer before treating the read as complete.
 7. AFTER THE FINAL CHUNK: do NOT begin any rebuild, edit, summary, or action. Reading all parts is NOT permission to act. ALWAYS pause, state that the full set was read with all UUIDs verified, and wait for explicit human instructions on what to do next.
 
 ## ORDERED MANIFEST (feed in this exact order, one per turn)
-1/4 · index.html 3_part1_of_4.txt · 10.7 KB · index.html 3_part1_of_4.txt · uuid:06b49fe0-a59d-4e9b-8ab7-f08a25431b0d
-2/4 · index.html 3_part2_of_4.txt · 9.5 KB · index.html 3_part2_of_4.txt · uuid:03767127-f3a4-4f41-a3a8-d7d59a1dcb53
-3/4 · index.html 3_part3_of_4.txt · 10.7 KB · index.html 3_part3_of_4.txt · uuid:e913f930-e004-4f96-9a5b-7a7764248c66
-4/4 · index.html 3_part4_of_4.txt · 8.2 KB · index.html 3_part4_of_4.txt · uuid:913aa876-5c98-49f5-b46a-a8c8fa65de4d
+1/6 · index.html 3_part1_of_6.txt · 9.4 KB · index.html 3_part1_of_6.txt · uuid:05d1ee83-15db-4671-b542-e990fd9a3525
+2/6 · index.html 3_part2_of_6.txt · 11.4 KB · index.html 3_part2_of_6.txt · uuid:d6caf7b4-97d4-4630-92cd-0557249e3830
+3/6 · index.html 3_part3_of_6.txt · 7.2 KB · index.html 3_part3_of_6.txt · uuid:9e7729e8-65d2-439f-b7a9-0a36822bba4c
+4/6 · index.html 3_part4_of_6.txt · 9.7 KB · index.html 3_part4_of_6.txt · uuid:03d7dcff-75b2-402c-b26b-8378cfb078f0
+5/6 · index.html 3_part5_of_6.txt · 8.1 KB · index.html 3_part5_of_6.txt · uuid:c46d84c3-224d-45e8-87c0-2ec31ad882ad
+6/6 · index.html 3_part6_of_6.txt · 8.5 KB · index.html 3_part6_of_6.txt · uuid:e390bb23-f955-4ebb-a6b0-5b2a7d852d95
 
 ## FOOTER
-- Set UUID: 7b293b3e-badc-4e0e-850b-40755b486605 (must match header)
+- Set UUID: 847878af-77f9-41a9-aeed-7e97f96014d3 (must match header)
 - END OF INDEX
