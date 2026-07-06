@@ -9,8 +9,10 @@
     document.body.classList.add("busy");
     try {
       var buf = await file.arrayBuffer();
-      state.pdfBytes = buf.slice(0);
+      // Parse FIRST; only commit bytes/state once the parse succeeds, so a bad PDF
+      // can never leave stale pdfBytes paired with an old pageCount.
       var doc = await pdfjsLib.getDocument({ data: new Uint8Array(buf.slice(0)) }).promise;
+      state.pdfBytes = buf.slice(0);
       state.pdfjsDoc = doc; state.pageCount = doc.numPages; state.fileName = file.name; state.fileSize = file.size;
       if (!state.headerTouched) { state.headerFolder = stripExt(file.name); el("fnameInput").value = state.headerFolder; }
       state.gridAnchor = null; state.thumbsEnabled = state.pageCount <= THUMB_CAP;
