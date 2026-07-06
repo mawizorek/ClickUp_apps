@@ -1,0 +1,39 @@
+/* app-dashboard — theming + settings drawer. Light-theme token overrides live here (applied via
+   html[data-theme="light"], set pre-paint by the inline loader script + toggled by settings.js). */
+
+html[data-theme="light"]{
+  --bg:oklch(98% 0.004 255); --surface-1:oklch(100% 0 0); --surface-2:oklch(96.5% 0.004 255); --surface-3:oklch(93% 0.006 255);
+  --text:oklch(24% 0.01 255); --text-mid:oklch(40% 0.01 255); --text-muted:oklch(52% 0.01 255); --text-dim:oklch(62% 0.009 255); --text-faint:oklch(70% 0.008 255);
+  --accent:oklch(62% 0.17 55); --accent-ink:oklch(99% 0 0);
+  --green:oklch(56% 0.15 155); --green-soft:oklch(92% 0.06 155); --green-glow:oklch(56% 0.15 155 / .35);
+  --red:oklch(56% 0.19 25); --red-glow:oklch(56% 0.19 25 / .3);
+  --cyan:oklch(50% 0.11 205);
+  --blue:oklch(52% 0.15 245); --blue-soft:oklch(93% 0.05 245);
+  --purple:oklch(54% 0.16 300); --purple-soft:oklch(93% 0.05 300);
+  --brain:oklch(54% 0.16 275); --brain-soft:oklch(93% 0.05 275); --brain-border:oklch(80% 0.07 275);
+  --hair:oklch(88% 0.005 255); --hair-soft:oklch(92% 0.004 255); --border-hover:oklch(76% 0.007 255);
+  --scrim:oklch(30% 0.02 255 / 0.4);
+}
+/* FileMaker window in light mode: keep light ink on the darker purple accent */
+html[data-theme="light"] body.fm{--accent-ink:oklch(99% 0 0)}
+
+/* settings gear panel (solid surface, no glassmorphism per standard) */
+.settings-panel{
+  position:fixed; top:calc(env(safe-area-inset-top) + 58px); right:16px; z-index:60;
+  width:min(300px, calc(100vw - 32px));
+  background:var(--surface-1); border:1px solid var(--hair); border-radius:14px;
+  box-shadow:0 12px 32px oklch(4% 0.01 255 / 0.4);
+  padding:14px; opacity:0; transform:translateY(-6px) scale(0.98); pointer-events:none;
+  transition:opacity 160ms var(--e), transform 160ms var(--e);
+}
+.settings-panel.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
+.sp-row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.sp-label{font-size:0.8125rem; font-weight:700; color:var(--text-mid)}
+.theme-toggle{display:inline-flex; padding:3px; gap:2px; background:var(--surface-2); border:1px solid var(--hair); border-radius:100px}
+.th-seg{padding:6px 14px; border-radius:100px; border:none; background:transparent; color:var(--text-muted); font-size:0.75rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background 150ms var(--e), color 150ms var(--e), transform 90ms var(--e)}
+.th-seg:active{transform:scale(0.95)}
+.th-seg.on{background:var(--accent); color:var(--accent-ink)}
+.sp-note{margin-top:12px; font-size:0.6875rem; line-height:1.45; color:var(--text-faint)}
+.sp-note code{font-family:'SF Mono',ui-monospace,monospace; font-size:0.625rem; color:var(--cyan)}
+@media (min-width:640px){ .settings-panel{right:calc((100vw - 620px)/2 + 24px)} }
+@media (prefers-reduced-motion:reduce){ .settings-panel{transition:none} }
