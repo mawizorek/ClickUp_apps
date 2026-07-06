@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#121316">
+<meta name="robots" content="noindex, nofollow">
+<title>Routines</title>
+<meta name="description" content="Live schedule view of the automated repo routines.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%81%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:oklch(11% 0.012 265); --surface-1:oklch(15% 0.011 265); --surface-2:oklch(19% 0.01 265); --surface-3:oklch(24% 0.009 265);
+  --text:oklch(95% 0.006 265); --text-mid:oklch(80% 0.008 265); --text-muted:oklch(64% 0.01 265); --text-dim:oklch(48% 0.009 265); --text-faint:oklch(38% 0.008 265);
+  --accent:oklch(72% 0.15 285); --accent-ink:oklch(17% 0.03 285); --accent-soft:oklch(24% 0.06 285);
+  --green:oklch(74% 0.16 155); --green-soft:oklch(26% 0.05 155); --green-glow:oklch(74% 0.16 155 / .5);
+  --amber:oklch(80% 0.13 85); --amber-soft:oklch(26% 0.06 85);
+  --red:oklch(66% 0.18 25); --red-soft:oklch(26% 0.06 25);
+  --cyan:oklch(80% 0.11 205);
+  --hair:oklch(26% 0.006 265); --hair-soft:oklch(21% 0.006 265); --border-hover:oklch(36% 0.008 265);
+  --r:13px; --r-sm:9px;
+  --e:cubic-bezier(0.22,1,0.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg); color:var(--text); font-weight:400; -webkit-font-smoothing:antialiased;
+  letter-spacing:0.01em; min-height:100svh; display:flex; flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+}
+.wrap{width:100%; max-width:600px; margin:0 auto; padding:0 16px; flex:1 0 auto}
+::selection{background:var(--accent); color:var(--accent-ink)}
+
+header{padding:32px 0 6px}
+.masthead{display:flex; align-items:center; gap:12px}
+.title-wrap{flex:1; min-width:0}
+.masthead h1{font-size:clamp(1.5rem,5.5vw,1.9rem); font-weight:800; letter-spacing:-0.035em; line-height:1; display:flex; align-items:center; gap:9px}
+.masthead h1 .glyph{font-size:0.85em; filter:saturate(1.1)}
+.sub{font-size:0.75rem; color:var(--text-muted); margin-top:7px; line-height:1.4}
+.mast-actions{display:flex; gap:8px; flex-shrink:0}
+.icon-btn{width:38px; height:38px; display:flex; align-items:center; justify-content:center; border-radius:var(--r-sm); background:var(--surface-2); border:1px solid var(--hair); color:var(--text-mid); cursor:pointer; text-decoration:none; transition:border-color 150ms var(--e), color 150ms var(--e), transform 90ms var(--e)}
+.icon-btn:hover{border-color:var(--border-hover); color:var(--text)}
+.icon-btn:active{transform:scale(0.92)}
+.icon-btn svg{width:17px; height:17px}
+.icon-btn.spinning svg{animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.window-card{margin-top:18px; background:linear-gradient(160deg, var(--accent-soft), var(--surface-1) 70%); border:1px solid oklch(40% 0.08 285); border-radius:var(--r); padding:15px 16px; position:relative; overflow:hidden}
+.window-card::before{content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--accent)}
+.wc-label{font-size:0.5625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.11em; color:var(--accent); display:flex; align-items:center; gap:6px}
+.wc-dot{width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 6px oklch(72% 0.15 285 / .6); animation:beat 2.2s var(--e) infinite}
+@keyframes beat{0%,100%{opacity:1}50%{opacity:0.4}}
+.wc-line{font-size:0.9375rem; font-weight:600; color:var(--text); margin-top:7px; line-height:1.4}
+.wc-line b{color:var(--accent); font-weight:750}
+.wc-note{font-size:0.6875rem; color:var(--text-muted); margin-top:6px; line-height:1.45}
+
+.sec-label{font-size:0.625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-faint); margin:26px 0 10px}
+
+.routine{background:var(--surface-1); border:1px solid var(--hair-soft); border-radius:var(--r); padding:15px 16px; margin-bottom:11px; transition:border-color 150ms var(--e)}
+.routine:hover{border-color:var(--hair)}
+.routine.inactive{opacity:0.62}
+.r-top{display:flex; align-items:center; gap:11px}
+.r-status{width:9px; height:9px; border-radius:50%; flex-shrink:0}
+.r-status.due-soon{background:var(--amber); box-shadow:0 0 6px oklch(80% 0.13 85 / .5)}
+.r-status.recent{background:var(--green); box-shadow:0 0 6px var(--green-glow)}
+.r-status.idle{background:var(--text-faint)}
+.r-status.off{background:var(--red); box-shadow:0 0 6px oklch(66% 0.18 25 / .4)}
+.r-name{font-size:1rem; font-weight:700; letter-spacing:-0.015em; flex:1; min-width:0}
+.r-file{font-size:0.625rem; color:var(--cyan); font-family:'SF Mono','Fira Code',ui-monospace,monospace}
+.r-cadence-pill{font-size:0.625rem; font-weight:700; color:var(--accent); background:var(--accent-soft); padding:4px 10px; border-radius:100px; flex-shrink:0; white-space:nowrap}
+.r-cadence-pill.off{color:var(--red); background:var(--red-soft)}
+.r-meta{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px}
+.r-field{display:flex; flex-direction:column; gap:2px}
+.r-k{font-size:0.5625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:var(--text-faint)}
+.r-v{font-size:0.8125rem; color:var(--text-mid); font-variant-numeric:tabular-nums}
+.r-v.strong{color:var(--text); font-weight:600}
+.r-note{font-size:0.6875rem; color:var(--text-muted); margin-top:11px; padding-top:11px; border-top:1px solid var(--hair-soft); line-height:1.45}
+
+.days{display:flex; gap:4px; margin-top:12px}
+.day{flex:1; text-align:center; font-size:0.625rem; font-weight:700; padding:5px 0; border-radius:6px; background:var(--surface-2); color:var(--text-faint); letter-spacing:0.02em}
+.day.on{background:var(--accent-soft); color:var(--accent)}
+
+.state{text-align:center; padding:48px 20px; color:var(--text-muted); font-size:0.8125rem; line-height:1.55}
+.state.err{color:var(--red)}
+.skeleton .sk{height:96px; border-radius:var(--r); background:var(--surface-1); margin-bottom:11px; animation:shimmer 1.5s var(--e) infinite}
+@keyframes shimmer{0%,100%{opacity:0.55}50%{opacity:0.9}}
+
+footer{flex-shrink:0; text-align:center; padding:30px 16px calc(22px + env(safe-area-inset-bottom))}
+.stamp{font-size:0.5625rem; color:var(--text-faint); letter-spacing:0.04em; font-variant-numeric:tabular-nums}
+.demo-note{font-size:0.6875rem; color:var(--text-faint); font-style:italic; text-align:center; margin-top:6px}
+
+@media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="masthead">
+      <div class="title-wrap">
+        <h1><span class="glyph">🔁</span> Routines</h1>
+        <p class="sub" id="sub">Automated repo refreshes. This view reads the schedule live, nothing to update by hand.</p>
+      </div>
+      <div class="mast-actions">
+        <a class="icon-btn" href="https://github.com/mawizorek/ClickUp_apps/tree/main/routines" target="_blank" rel="noopener" aria-label="Open routines folder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-5"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
+        </a>
+        <button class="icon-btn" id="refreshBtn" aria-label="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v5h-5"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="windowSlot"></div>
+
+  <p class="sec-label">Scheduled routines</p>
+  <div id="list">
+    <div class="skeleton"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+  </div>
+</div>
+
+<footer>
+  <span class="stamp">routines-viewer <span id="verStamp"></span> · <span id="refreshStamp">—</span></span>
+  <p class="demo-note" id="demoNote" style="display:none">Preview with sample schedule. Live build reads routines/schedule.md.</p>
+</footer>
+
+<script>
+const APP_VERSION = 'v1';
+const RAW_BASE = 'https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main/routines/';
+const REPO_BASE = 'https://github.com/mawizorek/ClickUp_apps/blob/main/routines/';
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAY_KEYS = { sunday:0, monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6, sun:0, mon:1, tue:2, wed:3, thu:4, fri:5, sat:6 };
+
+// Fallback sample (used only if the raw schedule.md can't be fetched, e.g. the ClickUp preview sandbox).
+const SAMPLE_MD = "## Routines\n\n| Routine file | Cadence | Window / notes | last-run (ET) |\n|---|---|---|---|\n| `on-track-refresh.md` | Every **Wednesday** | weekly motorsports TV refresh | 2026-07-05 08:35 |\n| `f1-refresh.md` | Every **Thu, Fri, Sat, Sun** | race-weekend days | 2026-07-05 06:07 |\n| `world-cup-refresh.md` | **~4x/day** | ONLY through **2026-07-19**, then inactive | never |\n";
+const SAMPLE_WINDOW = "Now through 2026-07-19 (World Cup window): Ricky fires 4 times a day.";
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function stripMd(s){ return String(s).replace(/\*\*/g,'').replace(/`/g,'').trim(); }
+
+function niceName(file){
+  return file.replace(/\.md$/,'').replace(/-refresh$/,'').replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}) + ' refresh';
+}
+function parseDays(cadence){
+  const c = cadence.toLowerCase();
+  const on = new Array(7).fill(false);
+  let matched = false;
+  Object.keys(DAY_KEYS).forEach(function(k){
+    const re = new RegExp('\\b'+k+'\\b');
+    if(re.test(c)){ on[DAY_KEYS[k]] = true; matched = true; }
+  });
+  return matched ? on : null;
+}
+function isIntraday(cadence){ return /x\s*\/?\s*day|per day|hour|daily/i.test(cadence); }
+
+function parseLastRun(s){
+  const t = stripMd(s).toLowerCase();
+  if(t === 'never' || !t) return null;
+  const d = new Date(stripMd(s).replace(' ', 'T') + ':00');
+  return isNaN(d.getTime()) ? null : d;
+}
+function relTime(d){
+  if(!d) return 'never';
+  const ms = Date.now() - d.getTime(), hrs = Math.floor(ms/3600000), days = Math.floor(ms/86400000);
+  if(ms < 0) return 'scheduled';
+  if(hrs < 1) return 'just now';
+  if(hrs < 24) return hrs + 'h ago';
+  if(days < 7) return days + 'd ago';
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function isInactive(notes){
+  const m = notes.toLowerCase().match(/through\s+(\d{4}-\d{2}-\d{2})/);
+  if(m){ const end = new Date(m[1]+'T23:59:59'); return Date.now() > end.getTime(); }
+  return false;
+}
+
+function statusFor(routine){
+  if(routine.inactive) return { cls:'off', label:'Inactive' };
+  const now = new Date(); const todayIdx = now.getDay();
+  if(routine.days){
+    const dueToday = routine.days[todayIdx];
+    if(dueToday){
+      const lr = routine.lastRun;
+      const ranToday = lr && lr.toDateString() === now.toDateString();
+      return ranToday ? { cls:'recent', label:'Done today' } : { cls:'due-soon', label:'Due today' };
+    }
+    for(let i=1;i<=7;i++){ if(routine.days[(todayIdx+i)%7]) return { cls:'idle', label:'Next: '+DAYS[(todayIdx+i)%7] }; }
+  }
+  if(routine.intraday){
+    const lr = routine.lastRun;
+    if(lr && (Date.now()-lr.getTime()) < 6*3600000) return { cls:'recent', label:'Ran recently' };
+    return { cls:'due-soon', label:'Active cycle' };
+  }
+  return { cls:'idle', label:'Scheduled' };
+}
+
+function parseTable(md){
+  const lines = md.split('\n');
+  const rows = [];
+  let inTable = false;
+  for(let i=0;i<lines.length;i++){
+    const ln = lines[i];
+    if(/^\|.*routine file/i.test(ln)){ inTable = true; continue; }
+    if(inTable){
+      if(/^\|[\s:|-]+\|/.test(ln)) continue;
+      if(!/^\|/.test(ln)){ if(rows.length) break; else continue; }
+      const cells = ln.split('|').slice(1,-1).map(function(c){return c.trim();});
+      if(cells.length >= 4){
+        rows.push({ file:stripMd(cells[0]), cadence:cells[1], notes:stripMd(cells[2]), lastRunRaw:cells[3] });
+      }
+    }
+  }
+  return rows;
+}
+
+function renderWindow(){
+  const slot = document.getElementById('windowSlot');
+  slot.innerHTML =
+    '<div class="window-card">'+
+      '<div class="wc-label"><span class="wc-dot"></span>Current wake window</div>'+
+      '<div class="wc-line" id="wcLine"></div>'+
+      '<div class="wc-note" id="wcNote"></div>'+
+    '</div>';
+  const wcEnd = new Date('2026-07-19T23:59:59');
+  const inWindow = Date.now() <= wcEnd.getTime();
+  if(inWindow){
+    document.getElementById('wcLine').innerHTML = 'Ricky wakes <b>4×/day</b> — 06:00, 15:00, 21:00, 03:00 ET';
+    const days = Math.ceil((wcEnd.getTime()-Date.now())/86400000);
+    document.getElementById('wcNote').textContent = 'Back-loaded for afternoon/evening results during the World Cup window. Relaxes to once daily at 06:00 after Jul 19 (' + days + ' days left).';
+  } else {
+    document.getElementById('wcLine').innerHTML = 'Ricky wakes <b>once daily</b> at 06:00 ET';
+    document.getElementById('wcNote').textContent = 'World Cup window closed. Day-cadence + catch-up covers On Track (Wed) and F1 (Thu–Sun).';
+  }
+}
+
+function render(rows){
+  const list = document.getElementById('list');
+  if(!rows.length){ list.innerHTML = '<div class="state">No routines found in the schedule.</div>'; return; }
+  const routines = rows.map(function(r){
+    return {
+      file:r.file, name:niceName(r.file), cadence:stripMd(r.cadence), notes:r.notes,
+      days:parseDays(r.cadence), intraday:isIntraday(r.cadence), lastRun:parseLastRun(r.lastRunRaw),
+      inactive:isInactive(r.notes)
+    };
+  });
+  routines.sort(function(a,b){ return (a.inactive?1:0)-(b.inactive?1:0); });
+  list.innerHTML = routines.map(function(r){
+    const st = statusFor(r);
+    let daysHtml = '';
+    if(r.days){
+      daysHtml = '<div class="days">' + DAYS.map(function(d,idx){ return '<div class="day'+(r.days[idx]?' on':'')+'">'+d+'</div>'; }).join('') + '</div>';
+    }
+    return '<div class="routine'+(r.inactive?' inactive':'')+'">'+
+      '<div class="r-top">'+
+        '<span class="r-status '+st.cls+'"></span>'+
+        '<div style="flex:1;min-width:0"><div class="r-name">'+esc(r.name)+'</div>'+
+          '<a class="r-file" href="'+REPO_BASE+esc(r.file)+'" target="_blank" rel="noopener">'+esc(r.file)+'</a></div>'+
+        '<span class="r-cadence-pill'+(r.inactive?' off':'')+'">'+esc(st.label)+'</span>'+
+      '</div>'+
+      daysHtml+
+      '<div class="r-meta">'+
+        '<div class="r-field"><span class="r-k">Cadence</span><span class="r-v strong">'+esc(r.cadence)+'</span></div>'+
+        '<div class="r-field"><span class="r-k">Last run</span><span class="r-v">'+esc(relTime(r.lastRun))+(r.lastRun?' · '+r.lastRun.toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'')+'</span></div>'+
+      '</div>'+
+      (r.notes ? '<div class="r-note">'+esc(r.notes)+'</div>' : '')+
+    '</div>';
+  }).join('');
+}
+
+async function init(){
+  document.getElementById('verStamp').textContent = APP_VERSION;
+  document.getElementById('refreshStamp').textContent = new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  renderWindow();
+  try{
+    const res = await fetch(RAW_BASE + 'schedule.md', { cache:'no-store' });
+    if(!res.ok) throw new Error('fetch');
+    const md = await res.text();
+    render(parseTable(md));
+  }catch(e){
+    render(parseTable(SAMPLE_MD));
+    document.getElementById('demoNote').style.display = '';
+  }
+}
+
+const refreshBtn = document.getElementById('refreshBtn');
+refreshBtn.addEventListener('click', async function(){
+  if(refreshBtn.classList.contains('spinning')) return;
+  refreshBtn.classList.add('spinning');
+  await init();
+  setTimeout(function(){ refreshBtn.classList.remove('spinning'); }, 400);
+});
+init();
+</script>
+</body>
+</html>
