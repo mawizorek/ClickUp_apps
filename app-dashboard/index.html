@@ -522,11 +522,11 @@ footer a { color: var(--text-muted); text-decoration: none; }
 </div>
 
 <footer>
-  <span id="footerText">app-dashboard · v2.4 · <span id="refreshTime">&mdash;</span></span>
+  <span id="footerText">app-dashboard · v2.5 · <span id="refreshTime">&mdash;</span></span>
 </footer>
 
 <script>
-const APP_VERSION = 'v2.4';
+const APP_VERSION = 'v2.5';
 const APP_DATE = '2026-07-06';
 
 // ─── Config ──────────────────────────────
@@ -535,7 +535,8 @@ const REPO = 'ClickUp_apps';
 const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
 const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const REPO_TREE = `https://github.com/${OWNER}/${REPO}/tree/main`;
-const EXCLUDED = ['template-app', 'app-dashboard', 'filemaker', '.nojekyll', 'README.md', 'canary.txt'];
+// Infra + non-app folders never render as apps.
+const EXCLUDED = ['template-app', 'app-dashboard', 'filemaker', 'brain-config', 'quickfire', 'agent-reports', 'routines', 'shared', '.nojekyll', 'README.md', 'robots.txt', 'index.html', 'canary.txt'];
 const FMP_EXCLUDED = ['_template-fmp-app', 'README.md'];
 
 // Cache is versioned: bumping APP_VERSION auto-invalidates stale data
@@ -550,10 +551,12 @@ const MAX_RECENT = 2;
 const APP_META = {
   'world-cup-bracket': { desc: 'Live tournament bracket with match results and progression.', category: 'dashboard', badges: ['dashboard'] },
   'f1-racetracks': { desc: 'Interactive race circuit explorer with live data.', category: 'dashboard', badges: ['data'] },
+  'on-track': { desc: 'Live schedule tracker with filters, timezone, and refresh.', category: 'dashboard', badges: ['data'] },
   'file-chunker': { desc: 'Split large files into AI-readable chunks with verification headers.', category: 'tool', badges: ['tool'] },
   'budget-code-mapper': { desc: 'Budget code authority lookup and export tool.', category: 'tool', badges: ['data'] },
   'markdown-viewer': { desc: 'Mobile-first markdown reader. Drop a .md file, read it clean.', category: 'tool', badges: ['tool'] },
-  'pdf-splitter': { desc: 'Extract and split PDF pages client-side.', category: 'tool', badges: ['tool'] }
+  'pdf-splitter': { desc: 'Extract and split PDF pages client-side.', category: 'tool', badges: ['tool'] },
+  'polish-demo': { desc: 'Live gated example of the full app-polish + access standard.', category: 'tool', badges: ['tool'] }
 };
 
 // ─── State ─────────────────────────────
@@ -696,7 +699,7 @@ async function init(forceRefresh) {
   return initClickUp(forceRefresh);
 }
 
-// ─── ClickUp window (original behavior, unchanged) ───
+// ─── ClickUp window (original behavior) ─────────
 async function initClickUp(forceRefresh) {
   const grid = document.getElementById('appGrid');
   pruneOldCaches();
