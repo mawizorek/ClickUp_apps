@@ -46,10 +46,11 @@
 
   // Merge key = assigned folder + cleaned name. Same key unions pages into one file.
   // Two groups resolving to the same final path collide (hard error).
+  // Empty cleaned name falls back to "untitled" so we never emit a bare ".pdf".
   function computeModel() {
     var rowInfo = state.splits.map(function (s, i) {
       var pages = parsePages(s);
-      return { i: i, s: s, cn: cleanName(s.name), pages: pages,
+      return { i: i, s: s, cn: cleanName(s.name) || "untitled", pages: pages,
         blank: !((s.name || "").trim()) && pages.status === "empty" };
     });
     var groups = new Map();
