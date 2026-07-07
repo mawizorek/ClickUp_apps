@@ -1,0 +1,42 @@
+<!-- ============================================================
+     STANDARD APP FOOTER (LOCKED 2026-07-06)
+     Copy verbatim into every app. Swap the <app-name> + source links.
+     Rules:
+       - Minimal. Footer carries the STAMP; honest notes live in the Settings drawer, NOT here.
+       - Stamp is JS-written (never hardcoded) so a stale cache shows an OLD stamp.
+       - Stamp format: <App Name> v<N> · PR #<number>
+       - Optional: a Sources row of real out-links. No prose wall, no source-download buttons.
+     ============================================================ -->
+<footer class="app-footer">
+  <div class="foot-in">
+    <!-- Optional source out-links. Delete the row if the app has none. -->
+    <nav class="foot-sources" aria-label="Sources">
+      <!-- <a href="https://example.com" target="_blank" rel="noopener">Source ↗</a> -->
+    </nav>
+    <!-- Stamp: populated by JS on load. Never hardcode the text here. -->
+    <span class="foot-stamp" id="footStamp">—</span>
+  </div>
+</footer>
+
+<style>
+  .app-footer { margin-top: var(--s12, 48px); border-top: 1px solid var(--line, #e5e0d8); background: var(--surface, #fff); }
+  .app-footer .foot-in { max-width: 960px; margin: 0 auto; padding: var(--s4, 16px);
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s3, 12px);
+    flex-wrap: wrap; font-size: 0.74rem; color: var(--ink-faint, #8a857c); }
+  .app-footer .foot-sources { display: flex; gap: var(--s4, 16px); flex-wrap: wrap; }
+  .app-footer .foot-sources a { color: var(--ink-soft, #5a554d); text-decoration: none; }
+  .app-footer .foot-sources a:hover { color: var(--accent-ink, #b4552f); }
+  .app-footer .foot-stamp { font-variant-numeric: tabular-nums; margin-left: auto; }
+</style>
+
+<script>
+  // STANDARD STAMP — keep these two constants at the top of the app's main script.
+  // const APP_NAME = "<App Name>";
+  // const APP_VERSION = "v1";
+  // const APP_PR = 0; // merged PR number that shipped this version
+  // Call stampFooter() once on load (and after any data load).
+  function stampFooter() {
+    var el = document.getElementById("footStamp");
+    if (el) el.textContent = APP_NAME + " " + APP_VERSION + " \u00b7 PR #" + APP_PR;
+  }
+</script>
