@@ -1,7 +1,7 @@
 {
  "version": "2026-07-07",
- "last_updated": "2026-07-07T15:30:00-04:00",
- "update_focus": "Added cuTaskId anchor to each race result, keying every completed round to its F1 Races list task per the ClickUp Anchor Convention. No result data changed.",
+ "last_updated": "2026-07-07T15:33:00-04:00",
+ "update_focus": "CORRECTION: red-bull-ring (Austrian GP) result was wrong — it had Antonelli winning from pole. Verified across formula1.com/BBC/Wikipedia: Russell won from pole with fastest lap, P2 Verstappen, P3 Antonelli. Corrected winner/podium/summary/pole-sitter/fastestLap. NOTE: quali top5 times/order beyond the pole sitter were NOT independently re-verified this pass — confirm on next F1 refresh. Discovered while adding cuTaskId anchors; the correct data lived in the human-authored ClickUp 2026 field, which this record now matches.",
  "current_round_slug": "spa",
  "last_completed_round_slug": "silverstone",
  "season": 2026,
@@ -177,27 +177,26 @@
  },
  "red-bull-ring": {
  "cuTaskId": "86ae52gq6",
- "winner": "Andrea Kimi Antonelli",
+ "winner": "George Russell",
  "team": "Mercedes",
- "p2": "George Russell",
- "p2Team": "Mercedes",
- "p3": "Max Verstappen",
- "p3Team": "Red Bull",
- "summary": "Antonelli led Russell and Verstappen in Austria.",
+ "p2": "Max Verstappen",
+ "p2Team": "Red Bull",
+ "p3": "Andrea Kimi Antonelli",
+ "p3Team": "Mercedes",
+ "summary": "Russell converted pole into a composed win, holding off Verstappen by 1.6s; Antonelli completed the podium a few tenths back. Declared a heat-hazard race in the Spielberg heatwave. Russell's first win since the season opener, trimming Antonelli's title lead.",
  "pole": {
- "driver": "Andrea Kimi Antonelli",
+ "driver": "George Russell",
  "team": "Mercedes",
  "time": "1:04.312",
  "gapToP2": "+0.089s",
  "top5": [
- { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:04.312" },
- { "driver": "George Russell", "team": "Mercedes", "time": "1:04.401" },
- { "driver": "Max Verstappen", "team": "Red Bull", "time": "1:04.512" },
+ { "driver": "George Russell", "team": "Mercedes", "time": "1:04.312" },
+ { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:04.401" },
  { "driver": "Charles Leclerc", "team": "Ferrari", "time": "1:04.598" },
  { "driver": "Lando Norris", "team": "McLaren", "time": "1:04.701" }
  ]
  },
- "fastestLap": { "driver": "Andrea Kimi Antonelli", "time": "1:06.765", "lap": 71 }
+ "fastestLap": { "driver": "George Russell", "team": "Mercedes" }
  },
  "silverstone": {
  "cuTaskId": "86ae52gq7",
