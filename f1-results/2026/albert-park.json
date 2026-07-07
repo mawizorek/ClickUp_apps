@@ -1,0 +1,30 @@
+{
+  "season": 2026, "round": 1, "slug": "albert-park", "name": "Australian Grand Prix", "date": "2026-03-08", "cuTaskId": "86ae52ghx", "version": "2026-07-07",
+  "pole": { "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "time": "1:19.507" },
+  "fastestLap": { "driverId": "86ae52rym", "driver": "Max Verstappen", "team": "Red Bull", "time": "1:22.091", "lap": 43 },
+  "summary": "Russell won the season opener from pole, leading an emotional Mercedes 1-2 over Antonelli. Attrition-heavy race.",
+  "classification": [
+    { "pos": 1, "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "status": "FIN", "points": 25 },
+    { "pos": 2, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "FIN", "points": 18 },
+    { "pos": 3, "driverId": "86ae52rxd", "driver": "Charles Leclerc", "team": "Ferrari", "status": "FIN", "points": 15 },
+    { "pos": 4, "driverId": "86ae52rxg", "driver": "Lewis Hamilton", "team": "Ferrari", "status": "FIN", "points": 12 },
+    { "pos": 5, "driverId": "86ae52q76", "driver": "Lando Norris", "team": "McLaren", "status": "FIN", "points": 10 },
+    { "pos": 6, "driverId": "86ae52rym", "driver": "Max Verstappen", "team": "Red Bull", "status": "FIN", "points": 8 },
+    { "pos": 7, "driverId": "86ae52rxv", "driver": "Oliver Bearman", "team": "Haas", "status": "FIN", "points": 6 },
+    { "pos": 8, "driverId": null, "driver": "Arvid Lindblad", "team": "Racing Bulls", "status": "FIN", "points": 4, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": 9, "driverId": "86ae52rqp", "driver": "Gabriel Bortoleto", "team": "Audi", "status": "FIN", "points": 2 },
+    { "pos": 10, "driverId": "86ae52rq4", "driver": "Pierre Gasly", "team": "Alpine", "status": "FIN", "points": 1 },
+    { "pos": 11, "driverId": "86ae52rxu", "driver": "Esteban Ocon", "team": "Haas", "status": "FIN", "points": 0 },
+    { "pos": 12, "driverId": "86ae52rqc", "driver": "Alexander Albon", "team": "Williams", "status": "FIN", "points": 0 },
+    { "pos": 13, "driverId": "86ae52rye", "driver": "Liam Lawson", "team": "Racing Bulls", "status": "FIN", "points": 0 },
+    { "pos": 14, "driverId": null, "driver": "Franco Colapinto", "team": "Alpine", "status": "FIN", "points": 0, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": 15, "driverId": "86ae52rqj", "driver": "Carlos Sainz", "team": "Williams", "status": "FIN", "points": 0 },
+    { "pos": 16, "driverId": null, "driver": "Sergio Perez", "team": "Cadillac", "status": "FIN", "points": 0, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": null, "driverId": "86ae52q7p", "driver": "Oscar Piastri", "team": "McLaren", "status": "DNF", "points": 0 },
+    { "pos": null, "driverId": "86ae52ryt", "driver": "Isack Hadjar", "team": "Red Bull", "status": "DNF", "points": 0 },
+    { "pos": null, "driverId": "86ae52rqw", "driver": "Nico Hulkenberg", "team": "Audi", "status": "DNF", "points": 0 },
+    { "pos": null, "driverId": "86ae52rqa", "driver": "Lance Stroll", "team": "Aston Martin", "status": "DNF", "points": 0 },
+    { "pos": null, "driverId": "86ae52rq8", "driver": "Fernando Alonso", "team": "Aston Martin", "status": "DNF", "points": 0 },
+    { "pos": null, "driverId": null, "driver": "Valtteri Bottas", "team": "Cadillac", "status": "DNF", "points": 0, "_anchor": "UNRESOLVED-DUP" }
+  ]
+}

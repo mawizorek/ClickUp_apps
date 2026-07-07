@@ -1,0 +1,24 @@
+{
+  "season": 2026,
+  "version": "2026-07-07",
+  "last_updated": "2026-07-07T18:12:00-04:00",
+  "schema": "Per-round season store. Each round is its own file in this folder (canonical record for that LOCATION). This index lists round order + metadata + which rounds carry a sprint. Engine fetches the index, then loads round files. Ricky updates exactly ONE round file per weekend. Kept per-file well under the 30KB agent-readback cap so the store scales to 22 rounds + future times/telemetry without a monolith.",
+  "sprint_points_scale": [8, 7, 6, 5, 4, 3, 2, 1],
+  "race_points_scale": [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
+  "standings": "COMPUTED live (never stored): WDC = sum of race+sprint points per driverId across round files; WCC = sum per team.",
+  "provenance_verified": "Every finishing position + points re-verified vs formula1.com, FIA classification/championship-points PDFs, and RaceFans full-order tables (2026-07-07). Sprint points reconcile every driver's official season total to the exact figure. THREE store errors corrected vs the old f1-racetracks/data.json: Austria (Russell won, not Antonelli), Spain/Catalunya (Hamilton maiden Ferrari win; Antonelli DNF from P2), Monaco (P3 Gasly, penalties overturned on appeal; store had Hadjar).",
+  "open_flags": {
+    "UNRESOLVED-DUP": "Rows for Colapinto, Lindblad, Bottas, Perez carry driverId:null + _anchor:'UNRESOLVED-DUP'. Duplicate driver tasks exist in the F1 Drivers list (two Colapinto, two Bottas, two Lindblad; Perez single but in the newer ID block), so a 1:1 resolve isn't possible yet and IDs were NOT guessed (anchor convention: unresolved = STOP-and-flag). Dedup the list, confirm canonical IDs, then backfill. Likely-canonical originals in the established 86ae52* block: Colapinto 86ae52rq5, Bottas 86ae52rtd, Lindblad 86ae52ryh; Perez only 86aj1ra1z exists."
+  },
+  "rounds": [
+    { "round": 1, "slug": "albert-park", "name": "Australian Grand Prix", "date": "2026-03-08", "cuTaskId": "86ae52ghx", "sprint": false, "file": "./albert-park.json" },
+    { "round": 2, "slug": "shanghai", "name": "Chinese Grand Prix", "date": "2026-03-15", "cuTaskId": "86ae52gpp", "sprint": true, "file": "./shanghai.json" },
+    { "round": 3, "slug": "suzuka", "name": "Japanese Grand Prix", "date": "2026-03-29", "cuTaskId": "86ae52gpr", "sprint": false, "file": "./suzuka.json" },
+    { "round": 4, "slug": "miami", "name": "Miami Grand Prix", "date": "2026-05-03", "cuTaskId": "86ae52gq2", "sprint": true, "file": "./miami.json" },
+    { "round": 5, "slug": "gilles-villeneuve", "name": "Canadian Grand Prix", "date": "2026-05-24", "cuTaskId": "86ae52gq3", "sprint": true, "file": "./gilles-villeneuve.json" },
+    { "round": 6, "slug": "monaco", "name": "Monaco Grand Prix", "date": "2026-06-07", "cuTaskId": "86ae52gq4", "sprint": false, "file": "./monaco.json" },
+    { "round": 7, "slug": "catalunya", "name": "Barcelona-Catalunya Grand Prix", "date": "2026-06-14", "cuTaskId": "86ae52gq5", "sprint": false, "file": "./catalunya.json" },
+    { "round": 8, "slug": "red-bull-ring", "name": "Austrian Grand Prix", "date": "2026-06-28", "cuTaskId": "86ae52gq6", "sprint": false, "file": "./red-bull-ring.json" },
+    { "round": 9, "slug": "silverstone", "name": "British Grand Prix", "date": "2026-07-05", "cuTaskId": "86ae52gq7", "sprint": true, "file": "./silverstone.json" }
+  ]
+}
