@@ -1,45 +1,45 @@
 # F1 Refresh
 
-goal: f1-racetracks/data.json reflects current F1 season standings/results/next-race state per the app's existing schema, kept current session-by-session across a race weekend (not just once a day). Secondary: flag (never edit) when the ClickUp F1 space has fallen behind.
-target: f1-racetracks/data.json
-report-to: (per executor's reporting standard)
+goal: keep the F1 surfaces current — `f1-racetracks/data.json` (source of truth for the app) AND the ClickUp “F1 Races” list (event mirror for notifications/automations) — each in its own existing schema.
+target:
+  - `f1-racetracks/data.json` (primary data store)
+  - ClickUp list `4026829812583044279` “F1 Races” (event mirror; whitelisted task fields only, existing tasks only)
+report-to: #A.I. Prompts (thread: F1 refreshes)
 
-> Follows the UNIVERSAL Data-Refresh Discipline in `routines/README.md` (verify-and-merge, never shrink, schema stability). The steps below add F1's session-aware behavior on top of that floor.
+## Mapping (data → ClickUp)
 
-## Session-aware refresh (the point of this routine)
+Each `raceResults` entry in `data.json` carries a **`cuTaskId`** — the ID of that round's ClickUp task in the F1 Races list. This is the ONLY join key. Never match tasks by circuit name or slug. If a completed round has no `cuTaskId`, or the ID doesn't resolve to a task, STOP and flag — do not guess, do not create a task.
 
-F1 weekends run multiple sessions across Fri/Sat/Sun (Practice, Qualifying, Sprint, Race). Waiting once a day feels slow. Instead:
+**F1 IS NOT WORLD CUP — the mirror here is deliberately conservative.** In the World Cup list the task name/status is purely derived data, so the mirror owns it. In F1 Races the per-year result field is **human-authored and richer than `data.json`** (podium + pole + fastest lap + a multi-sentence “Notable” with battles, upgrades, conditions). ClickUp holds MORE than Git here, so the mirror must NEVER clobber it. (This exact divergence was proven on 2026-07-07: the Austrian GP result in `data.json` was wrong while the ClickUp 2026 field was right.)
 
-- On each due wake, determine the **most recent F1 session that has FINISHED** (from formula1.com or equivalent) and compare its finish time to `routines/last-run/f1.txt`.
-- **If a session has completed since the last run → refresh now**: pull that session's result/standings into the data file. This is what lets a Sunday feature race that ended this morning show up when Ricky fires at noon, without waiting for tomorrow.
-- **If no new session has finished since last-run → nothing to do**: don't rewrite the data, don't bump the stamp, just no-op. (Idempotency: a wake with no newly-finished session is a clean skip.)
-- Only stamp `last-run/f1.txt` when you actually committed a new session's data. A wake that finds nothing new leaves the stamp untouched.
+Whitelisted ClickUp task fields (nothing else may be written):
+- **Status** — flip to `complete` once the race has run. Safe/mechanical.
+- **Current-season result field** — the custom field NAMED FOR THE SEASON YEAR (2026 = id `83baa444-d7ac-48f9-92b1-55b194c1620a`, type `text`). **FILL-IF-BLANK ONLY** (see rules). Next season, target that year's field.
+
+Do NOT touch: task **Name** (static GP name), **due/start dates** (human-set race-weekend schedule), **Round**, **Circuit Name**, **Located**, or any prior-year field.
 
 ## Steps
-1. Read the CURRENT f1-racetracks/data.json first to learn its exact schema. Match it precisely — do not redesign it.
-2. Read `routines/last-run/f1.txt`. Identify the most recent F1 session that has finished per a primary source (formula1.com or equivalent).
-3. **If that session finished at/after the last-run stamp is already reflected in the data, STOP — nothing new, no-op wake.** Otherwise continue.
-4. Merge the newly-finished session's result + any standings changes into f1-racetracks/data.json, in the same schema. Also correct the next-session / next-race state so the app points at what's up next. Verify all values against the primary source; never guess a result.
-5. Bump the schema's version/datestamp field. Commit f1-racetracks/data.json to main. Data-only — do NOT touch index.html or the engine.
-6. Stamp `routines/last-run/f1.txt` with the completion time (`YYYY-MM-DD HH:MM` ET).
-7. **ClickUp-drift check (DETECT + FLAG ONLY — never edit ClickUp).** See below.
-8. Post the run report, naming which session was caught (e.g. "British GP Race result added").
-
-## ClickUp-drift check (Path A — flag, don't fix)
-
-After a successful data refresh, do a lightweight read-only comparison between the fresh result you just committed and the ClickUp F1 space, and RAISE A FLAG if it's behind. You do NOT edit ClickUp — you only notice and point. This stays fully inside the data-only rail (your only writes remain data.json + last-run).
-
-- **What to compare:** the session/result you just added vs. what the ClickUp F1 space reflects. Primary signal: the **F1 Races list** (list `901323758500`) task for the just-completed round still shows `active` / lacks the result, or standings in the F1 Drivers / Constructors lists are a round behind. The canonical procedure + all field IDs live in the **F1 Weekly Refresh — Brain Operations Guide** (`doc:12cwjm-67313`) — reference it to know WHAT would need updating, but do not perform those updates.
-- **If drift is detected:** include a clearly-labeled **⚠️ CLICKUP DRIFT** block in your run report naming exactly what's stale and what a human/Brain session would need to update (e.g. "F1 Races → British GP task still `active`, needs race classification + status→complete; Drivers standings a round behind"). Point at the Brain Ops guide as the how.
-- **If no drift:** say nothing about ClickUp (background-quiet).
-- **Hard rail:** detection is read-only. You never write to any ClickUp list, task, or field. This is a nudge to a human, not an edit. (Path B — auto-firing a ClickUp-writer agent — is a future build; for now the flag reaches Michael.)
+1. Read the CURRENT `f1-racetracks/data.json` first to learn its exact schema. Match it precisely — do not redesign it. **Preserve every `cuTaskId`** on rebuild; it is the mirror's join key.
+2. Research the latest F1 results, standings, and upcoming-race data that the schema expects.
+3. Verify against a primary source (formula1.com or equivalent). Times in the schema's existing convention. **Verify results before writing either surface** — the Austria incident was a wrong winner sitting unnoticed in the store.
+4. Rebuild `f1-racetracks/data.json` in the same schema. Bump the schema's version/datestamp field. Keep every `cuTaskId` intact.
+5. Commit `f1-racetracks/data.json` to main. Data-only — do NOT touch index.html or the engine.
+6. **Mirror to ClickUp (event layer).** For each completed round that changed this run, resolve its task via `cuTaskId` and update ONLY the whitelisted fields:
+   - **Status → `complete`** for a race that has run. Idempotent (skip if already complete).
+   - **Result field (fill-if-blank):** if the season-year field is EMPTY, write the result in the existing convention:
+     `Winner: <Last> (<Team>) | P2: <Last> (<Team>) | P3: <Last> (<Team>)`
+     newline `Pole: <Last> | Fastest Lap: <Last> | Notable: <summary>`
+     (Last names only, matching the existing entries.) If the field is NOT empty, DO NOT overwrite it.
+   - Never create, delete, move, or reparent tasks. Never touch dates or the GP name.
+7. Post the run report (both surfaces).
 
 ## Guardrails (STOP + flag if any is true)
-- Target is anything other than f1-racetracks/data.json (your only writes are data.json + routines/last-run/f1.txt).
+- Target is anything other than `f1-racetracks/data.json` or the named ClickUp F1 Races list.
+- You'd write app source/engine/structure, OR create/delete/move/reparent any ClickUp task, OR touch a non-whitelisted field (name, dates, Round, prior-year fields).
+- A completed round is missing its `cuTaskId`, or the ID doesn't resolve 1:1 to a task → STOP, flag (ClickUp writes are not git-revertible; never guess, never create).
+- **The season-year result field is already populated AND its content materially disagrees with `data.json` (different winner/podium)** → STOP and flag the conflict. Do NOT overwrite. A human-authored field winning a disagreement usually means `data.json` is the one that's wrong (see Austria 2026). Reconcile the store, don't flatten the notes.
+- A result/standing can't be verified → don't guess, flag it.
 - The current data.json schema is unclear or you'd have to invent fields → STOP, that's a build session.
-- A result/standing can't be verified → don't guess, flag it, keep the prior value.
-- A session is still in progress (not finished) → do NOT enter partial/live results; wait for it to finish.
-- Any step would require WRITING to ClickUp → STOP; the ClickUp-drift check is detect-and-flag only, never an edit.
 
 ## Report format
-Commit link + live URL (https://mawizorek.github.io/ClickUp_apps/f1-racetracks/) + which session was caught + what changed (result added, standings updated, next-race repointed) + a **⚠️ CLICKUP DRIFT** block if the ClickUp F1 space is behind (what's stale + pointer to the Brain Ops guide) + anything unverifiable. If a wake found no newly-finished session, no report (clean no-op).
+Commit link + live URL (https://mawizorek.github.io/ClickUp_apps/f1-racetracks/) + ClickUp tasks touched (count + which flipped to complete / which result fields were filled) + any fields SKIPPED because already populated + any STOP-flagged conflicts + what changed in the data + anything unverifiable.
