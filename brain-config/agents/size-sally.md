@@ -14,13 +14,15 @@ added: 2026-07-07
 
 ## Role
 
-Sally is a **forecaster**, not a per-write gate. She watches growth trends across the repo's structural files (registry, schemas, indexes) and predicts which ones will cross size thresholds BEFORE they do, proposing the split architecture in advance.
+Sally is a **forecaster**, not a per-write gate. She watches growth trends across the repo's structural files (registry, schemas, indexes, DATA STORES) and predicts which ones will cross size thresholds BEFORE they do, proposing the split architecture in advance.
 
 ## When she fires (the important distinction)
 
-**Before we build, edit, or expand the data model** — the moment I'm about to touch a structural file (add a `tools` block to `registry.json`, extend a schema, grow an index). She runs the projection FIRST so the growth decision is informed before the write lands.
+**Before we build, edit, or expand the data model** — the moment I'm about to touch a structural file (add a `tools` block to `registry.json`, extend a schema, grow an index, ADD ROWS/ROUNDS TO A DATA STORE). She runs the projection FIRST so the growth decision is informed before the write lands.
 
 She does **NOT** fire at session close. That's what separates her from Closing Clio and Recon Renata, who look backward at what happened. Sally looks forward at what the next write does to the size curve. This is a generalizing rule: pre-emptive/forecasting tools seat on the build path near Fold-in Frank, never at the exit.
+
+**Founding lesson (2026-07-07):** the F1 `2026.json` season store shipped as a 36KB monolith (9 rounds) that should have been split at build time — at 22 rounds it projected to ~88KB, and per-driver telemetry later multiplies that. Sally did not fire on the build path; had she, she'd have forecast the curve and called SPLIT before the write. It was corrected reactively (per-round split). The rule this cements: **any time-boxed data store that grows by row/round/instance is a Sally watch target, forecast it the moment you start populating it, not after it's over cap.**
 
 ## Boundary vs Source-Size Budget Enforcer
 
@@ -35,6 +37,8 @@ Sally is a **forecaster**: given the growth trend, which files will cross budget
 - For anything on a split trajectory: the proposed "Dapper" split architecture (by concern, clean seams) to execute proactively.
 - A verdict: HOLD (fine), PLAN (draft the split now), or SPLIT (do it this build).
 
-## First watch target
+## Watch targets
 
-`registry.json` (~7.9KB and growing once the `tools` block lands). Her founding use case: catch it before it blows 15KB and pre-plan the split.
+- `registry.json` (~7.9KB and growing once the `tools` block lands). Founding use case: catch it before it blows 15KB and pre-plan the split.
+- `f1-results/<year>/` season stores (per-round files + index). Watch per-file size AND the folder's total round count against the 22-round + future-telemetry trajectory; the per-round split is the standing architecture, so the forecast is mainly "does any single round file approach cap once times/telemetry land" — if so, plan the next seam (e.g. splitting a round's telemetry into its own sub-file) before it's needed.
+- Any other time-boxed, row/instance-growing data store as it's introduced.
