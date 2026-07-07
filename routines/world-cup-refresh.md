@@ -1,34 +1,42 @@
 # World Cup Refresh
 
-goal: world-cup-bracket/data.json reflects the latest results/fixtures/bracket state per the app's existing schema.
-target: world-cup-bracket/data.json
+goal: keep both World Cup surfaces current — `world-cup-bracket/data.json` (source of truth) AND the ClickUp “World Cup” list (thin event mirror for notifications/automations) — each in its own existing schema.
+target:
+  - `world-cup-bracket/data.json` (primary data store)
+  - ClickUp list `4026855117172647364` “World Cup” (event mirror; whitelisted task fields only, existing tasks only)
 report-to: #A.I. Prompts (thread: World Cup refreshes)
 
-## Ownership: the bracket skeleton is PRE-SEEDED (never created at refresh time)
-data.json permanently carries the FULL bracket skeleton, every round wired end to end:
-R32 -> R16 -> QF (ids 25-28) -> SF (ids 29-30) -> Final (id 31). Forward-round rows that
-aren't decided yet ship as TBD placeholders (home/away "TBD", null scores, status
-"upcoming", correct feedsTo) and STAY in the file until results land.
+## Mapping (data → ClickUp)
 
-The refresh FILLS existing rows in place. It does NOT create, delete, reorder, or
-re-seed forward-round rows, and it never strips TBD placeholders. The engine renders
-forward into these rows; if they vanish, QF+/Quarters/Semis/Final go blank (the
-"No matches" bug). Treat the skeleton as structural, not refresh output.
+Each match object in `data.json` carries a **`cuTaskId`** — the ID of its ClickUp task in the World Cup list. This is the ONLY join key. Never match tasks by name (names change as results land). If a match has no `cuTaskId`, or the ID doesn't resolve to a task, STOP and flag — do not guess and do not create a task.
+
+Whitelisted ClickUp task fields (nothing else may be written):
+- **Name** (task title)
+- **Status**
+- **Due date** (with time)
+- Custom fields (all type `short_text`): Home Team `7c3933ab-c91f-483e-b0fe-af759473c1ee`, Away Team `71cd20b9-e5bc-4298-88bd-154f67a7d4b3`, Hype Level `0e665e1f-48c7-434d-8ab7-e07c9f008dfc`
 
 ## Steps
-1. Read the CURRENT world-cup-bracket/data.json first to learn its exact schema AND confirm the full skeleton is present (R32, R16, QF 25-28, SF 29-30, Final 31). Match it precisely - do not redesign it.
+1. Read the CURRENT `world-cup-bracket/data.json` first to learn its exact schema. Match it precisely — do not redesign it. **Preserve every `cuTaskId`** on rebuild; it is the mirror's join key.
 2. Research the latest World Cup results, upcoming fixtures, and bracket progression the schema expects.
 3. Verify against a primary/reputable source. Kickoff times in the schema's existing convention.
-4. FILL existing rows in place: update results (hs/as/status/winner/psoNote), and as teams become known set home/away/venue/time + drop the tbd flag on the affected rows. Preserve every feedsTo value and keep all forward-round rows even while still TBD. Do NOT rebuild the file from scratch or regenerate the skeleton. Bump the schema's version/datestamp field.
-5. Commit world-cup-bracket/data.json to main. Data-only - do NOT touch index.html or the engine.
-6. Post the run report.
+4. Rebuild `world-cup-bracket/data.json` in the same schema. Bump the schema's version/datestamp field. Keep every `cuTaskId` intact.
+5. Commit `world-cup-bracket/data.json` to main. Data-only — do NOT touch index.html or the engine.
+6. **Mirror to ClickUp (event layer).** For each match that changed this run, resolve its task via `cuTaskId` and update ONLY the whitelisted fields:
+   - **Name:** upcoming → `Home vs Away (Round)`; completed → `Winner S-S Loser — Winner advances (Round)` (AET/PSO in parens, e.g. `Egypt 1-1 Australia (PSO 4-2) — Egypt advances (R32)`).
+   - **Status:** completed match → `complete`. Otherwise leave the status as-is.
+   - **Due date:** kickoff date + time (ET, `-04:00` offset) when known; leave prior value if still TBD.
+   - **Custom fields:** set Home Team / Away Team once teams are known; set/refresh Hype Level; never leave a literal `TBD` sitting in Hype Level on a resolved match.
+   Skip matches that didn't change (idempotent). NEVER create, delete, move, or reparent tasks or lists.
+7. Post the run report (both surfaces).
 
 ## Guardrails (STOP + flag if any is true)
-- Target is anything other than world-cup-bracket/data.json.
-- The current data.json schema is unclear or you'd have to invent fields -> STOP, that's a build session.
-- The forward-round skeleton (QF 25-28, SF 29-30, Final 31) is missing or partial -> STOP and re-seed the skeleton as TBD placeholders; that's a seed/build fix, not a routine refresh.
-- A result/fixture can't be verified -> don't guess, flag it.
-- No upcoming fixtures / past the window -> report "nothing to refresh" and make no commit.
+- Target is anything other than `world-cup-bracket/data.json` or the named ClickUp World Cup list.
+- You'd write app source/engine/structure (index.html, JS, CSS), OR create/delete/move/reparent any ClickUp task or list.
+- A match is missing its `cuTaskId`, or the ID doesn't resolve 1:1 to a task → STOP, flag (ClickUp writes are not git-revertible; never guess the mapping, never create).
+- The current data.json schema is unclear or you'd have to invent fields → STOP, that's a build session.
+- A result/fixture can't be verified → don't guess, flag it.
+- No upcoming fixtures / past the window → report “nothing to refresh” and make no commit or ClickUp write.
 
 ## Report format
-Commit link + live URL (https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/) + what changed (matches resolved, bracket advanced) + anything unverifiable.
+Commit link + live URL (https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/) + ClickUp tasks touched (count + notable renames/status flips) + what changed (matches resolved, bracket advanced) + anything unverifiable.
