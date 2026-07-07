@@ -4,6 +4,18 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
+## F1 Schema-Shift — pending items
+**Added:** 2026-07-07
+
+The results schema-shift shipped its data foundation this session: `f1-results/2026/` (per-round files + `index.json`), full 20-car verified order, race + sprint, provenance, computable standings. Spec: `f1-racetracks/next-build-spec.md`. Still open:
+
+- **(a) Driver-anchor dedup — BLOCKS the ClickUp mirror.** Rows for Colapinto, Lindblad, Bottas, Perez carry `driverId:null` + `_anchor:"UNRESOLVED-DUP"` in the round files. The F1 Drivers list has DUPLICATE tasks (two Colapinto, two Bottas, two Lindblad; Perez single but in the newer ID block), so a 1:1 resolve isn't possible and IDs were NOT guessed. ACTION: dedup the list (🗑️ + DUPLICATE label on the extras per posting hygiene), confirm canonical IDs, backfill the null anchors. Likely-canonical originals in the established 86ae52* block: Colapinto `86ae52rq5`, Bottas `86ae52rtd`, Lindblad `86ae52ryh`; Perez only `86aj1ra1z` exists.
+- **(b) f1-refresh mirror rework — time-sensitive (Ricky runs Thu–Sun).** `routines/f1-refresh.md` still targets the retired per-year ClickUp result dropdown. Post-shift the mirror must: keep slim writes (status-flip, dates, notifications), and its one data write becomes appending the frozen year-line to the new slim "Race History" text field, resolved by `cuTaskId`. Full order never touches ClickUp. Rework before the next race weekend or Ricky writes to a dead field.
+- **(c) ClickUp "Race History" field not yet created.** One slim year-labeled text field per track (frozen archive lens, fill-if-blank, prior years immutable). Retire the per-year result dropdowns once it's populated.
+- **(d) Builds 2–4 are aesthetic (pit-wall restyle) — do WITH Michael, not solo.** Championship points matrix + computed standings, driver-brief cell interaction, then propagate the sharp-corner/tabular restyle. Backend is done; these wait for a live design session.
+
+---
+
 ## Three-Shelf Reconciliation
 **Added:** 2026-07-03
 
@@ -40,7 +52,7 @@ Goal: profile header + metadata sidecar = the one source of truth for an agent's
 
 **Follow-ups (not blocking):**
 - No `research`-type report exists yet; the renderer + schema are defined and ready for Scout Sage's first real report.
-- Consider a deep-link sub-route (`#agent/<slug>/report/<id>`) if sharing a single report becomes useful. Currently tabs switch in-place without a hash change.
+- Consider a deep-link sub-route (`#agent/ /report/ `) if sharing a single report becomes useful. Currently tabs switch in-place without a hash change.
 
 ---
 
