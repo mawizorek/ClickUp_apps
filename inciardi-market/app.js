@@ -1,6 +1,7 @@
 /* Inciardi Market — engine. Reads market.json (eBay prices) + catalog.json (master + machines). */
 
 const BUILD = "v2.1";
+const PR = 48; // merged PR that shipped this version
 
 const MARKET_FALLBACK = { version: "sample", query: "inciardi mini print", source: "sample",
   baseline: { retailDefault: 14, currency: "USD" }, listings: [
@@ -57,7 +58,7 @@ function stampFooter() {
   if (pv) pv.textContent = `prices: ${live ? "live · eBay" : "sample data"}${MARKET.version && MARKET.version!=="sample" ? " · "+relTime(MARKET.version) : ""}`;
   if (pd) pd.className = "dot" + (live ? " live" : "");
   if (cv) cv.textContent = `catalog: ${(CATALOG.prints||[]).length} prints${CATALOG.refreshedAt && CATALOG.refreshedAt!=="sample" ? " · "+relTime(CATALOG.refreshedAt) : ""}`;
-  if (fb) fb.textContent = `${BUILD} · built ${new Date().toISOString().slice(0,10)}`;
+  if (fb) fb.textContent = `Inciardi Market ${BUILD} · PR #${PR}`;
 }
 
 /* ---- scoring ---- */
