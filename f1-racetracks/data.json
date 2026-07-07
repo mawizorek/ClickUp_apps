@@ -1,7 +1,7 @@
 {
  "version": "2026-07-07",
- "last_updated": "2026-07-07T15:33:00-04:00",
- "update_focus": "CORRECTION: red-bull-ring (Austrian GP) result was wrong — it had Antonelli winning from pole. Verified across formula1.com/BBC/Wikipedia: Russell won from pole with fastest lap, P2 Verstappen, P3 Antonelli. Corrected winner/podium/summary/pole-sitter/fastestLap. NOTE: quali top5 times/order beyond the pole sitter were NOT independently re-verified this pass — confirm on next F1 refresh. Discovered while adding cuTaskId anchors; the correct data lived in the human-authored ClickUp 2026 field, which this record now matches.",
+ "last_updated": "2026-07-07T15:53:00-04:00",
+ "update_focus": "CORRECTION #2: catalunya (Spanish GP) result was wrong — it had Antonelli winning a Mercedes 1-2. Verified across formula1.com/FIA/BBC/Sky: Hamilton won his maiden Ferrari GP, P2 Russell, P3 Norris; Antonelli RETIRED from P2 with ~4 laps left, ending his 5-race streak. Pole was Russell. Removed the impossible Antonelli lap-66 fastest lap and the unverified quali top5. This is the SECOND silent-drift error found while adding anchors (after Austria/red-bull-ring); both had erased Antonelli's streak ending. Verified-clean this pass: albert-park, shanghai, suzuka, miami, gilles-villeneuve, monaco winners+podia. Quali top5 detail beyond pole sitter NOT re-verified for corrected rounds.",
  "current_round_slug": "spa",
  "last_completed_round_slug": "silverstone",
  "season": 2026,
@@ -45,7 +45,7 @@
  "p2Team": "Mercedes",
  "p3": "Lewis Hamilton",
  "p3Team": "Ferrari",
- "summary": "Antonelli led Russell in a Mercedes 1-2 at Shanghai.",
+ "summary": "Antonelli led Russell in a Mercedes 1-2 at Shanghai for his maiden F1 win from pole.",
  "pole": {
  "driver": "Andrea Kimi Antonelli",
  "team": "Mercedes",
@@ -69,7 +69,7 @@
  "p2Team": "McLaren",
  "p3": "Charles Leclerc",
  "p3Team": "Ferrari",
- "summary": "Antonelli converted pole into his first Formula 1 win at Suzuka.",
+ "summary": "Antonelli took his second straight win at Suzuka (safety-car-aided) to become the youngest-ever championship leader.",
  "pole": {
  "driver": "Andrea Kimi Antonelli",
  "team": "Mercedes",
@@ -93,7 +93,7 @@
  "p2Team": "McLaren",
  "p3": "Oscar Piastri",
  "p3Team": "McLaren",
- "summary": "Antonelli beat Norris and Piastri in Miami.",
+ "summary": "Antonelli took his third win from three poles in Miami, beating Norris and Piastri.",
  "pole": {
  "driver": "Andrea Kimi Antonelli",
  "team": "Mercedes",
@@ -114,7 +114,7 @@
  "p2Team": "Ferrari",
  "p3": "Max Verstappen",
  "p3Team": "Red Bull",
- "summary": "Antonelli led Hamilton and Verstappen in Montreal.",
+ "summary": "Antonelli's fourth win in a row in Montreal after team-mate Russell (leading) retired with a reliability issue.",
  "pole": {
  "driver": "George Russell",
  "team": "Mercedes",
@@ -153,27 +153,17 @@
  },
  "catalunya": {
  "cuTaskId": "86ae52gq5",
- "winner": "Andrea Kimi Antonelli",
- "team": "Mercedes",
+ "winner": "Lewis Hamilton",
+ "team": "Ferrari",
  "p2": "George Russell",
  "p2Team": "Mercedes",
- "p3": "Charles Leclerc",
- "p3Team": "Ferrari",
- "summary": "Antonelli led a Mercedes 1-2 in Spain.",
+ "p3": "Lando Norris",
+ "p3Team": "McLaren",
+ "summary": "Hamilton's emotional maiden Ferrari win, a VSC-aided three-stop strategy from P2 on the grid, ahead of Russell and Norris. Championship leader Antonelli retired from P2 with ~4 laps to go (electrical shutdown), ending his five-race winning streak.",
  "pole": {
- "driver": "Andrea Kimi Antonelli",
- "team": "Mercedes",
- "time": "1:16.231",
- "gapToP2": "+0.112s",
- "top5": [
- { "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:16.231" },
- { "driver": "George Russell", "team": "Mercedes", "time": "1:16.343" },
- { "driver": "Charles Leclerc", "team": "Ferrari", "time": "1:16.512" },
- { "driver": "Lando Norris", "team": "McLaren", "time": "1:16.598" },
- { "driver": "Oscar Piastri", "team": "McLaren", "time": "1:16.701" }
- ]
- },
- "fastestLap": { "driver": "Andrea Kimi Antonelli", "time": "1:18.765", "lap": 66 }
+ "driver": "George Russell",
+ "team": "Mercedes"
+ }
  },
  "red-bull-ring": {
  "cuTaskId": "86ae52gq6",
