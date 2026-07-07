@@ -30,7 +30,7 @@ This is a rule, not a suggestion. Before adding ANY instruction to an executor a
 This is process, not executor behavior — it lives here so ANY agent running ANY refresh routine does the right thing. A “refresh” is a **verify-and-merge**, never a blank-slate rebuild:
 
 1. **Read the current data file first.** It is the baseline you extend and correct, not something you overwrite from scratch. Preserve any join keys (e.g. `cuTaskId`) that link records to other surfaces — they are structural glue, never drop them.
-2. **Verify existing entries, don't just trust them.** Double/triple-check that each existing entry's time, platform, and status are still accurate — times shift, sessions get added, events get canceled or delayed. The primary job is keeping what's there ACCURATE; second is scraping in new entries that belong.
+2. **Verify existing entries, don't just trust them.** Double/triple-check that each existing entry's time, platform, and status are still accurate — times shift, sessions get added, events get canceled or delayed. The primary job is keeping what's there ACCURATE; second is scraping in new entries that belong. (Two 2026 F1 results sat silently WRONG in the store until a verify pass caught them — trust nothing unverified.)
 3. **Merge, don't replace.** Add newly-found entries, correct changed ones, drop only what has truly aged out of the window.
 4. **Never shrink coverage silently.** A category/series represented last run must not vanish this run. If you can't find its data, KEEP the prior entries and flag the gap — deleting coverage is a STOP-and-flag event, not a quiet outcome.
 5. **Confirmed event > complete metadata. Do NOT omit a confirmed event just because platform or exact time is missing:**
@@ -42,7 +42,7 @@ This is process, not executor behavior — it lives here so ANY agent running AN
  - **`Unknown`** = the event is confirmed but no reliable viewing platform has been verified yet.
  - Never collapse one into the other, and never invent a channel to fill an `Unknown`.
 7. **Schema stability.** Prefer working within the current schema; do NOT change it unless absolutely necessary. If a confirmed-date / TBD-time (or platform-`Unknown`) entry genuinely can't be represented cleanly, that's the SMALLEST-possible schema/engine change — STOP, flag it as a build task (engine work, out of routine scope), and describe it. Never expand the schema inside a data refresh.
-8. **Mirror writes follow the source.** When a routine mirrors data to a second surface (e.g. ClickUp tasks), the repo data file is the source of truth and the mirror is derived. Only push whitelisted fields, only on records whose mapping key resolves 1:1, and reflect the same verify-and-merge outcome. A mapping that doesn't resolve is a STOP-and-flag, never a create.
+8. **Mirror writes follow the source.** When a routine mirrors data to a second surface (e.g. ClickUp tasks), the repo data file is the source of truth and the mirror is derived. Only push whitelisted fields, only on records whose mapping key resolves 1:1, and reflect the same verify-and-merge outcome. A mapping that doesn't resolve is a STOP-and-flag, never a create. NOTE: direction of truth can INVERT by time horizon — see the Anchor Convention in the Apps/Artifacts reference (live lens canonical in-season; a frozen archive lens canonical for closed periods, fill-if-blank + conflict-flag, never clobber).
 9. **Notable changes are worth surfacing.** If an entry materially shifted (delay, moved session, cancellation), note it in the run report. Rendering a “was X → now Y” callout in the UI needs an engine field + render support → that's a BUILD task, out of routine scope; flag it, don't attempt it in a data refresh. (Rare.)
 
 Runbooks may add domain specifics on top of this, but this discipline is the floor for all of them.
@@ -89,7 +89,7 @@ Zero agent changes. If adding a routine requires editing the executor, the frame
 | Routine | Target | Cadence (see schedule.md) |
 |---------|--------|---------------------------|
 | `on-track-refresh.md` | `on-track/data.json` | every Wednesday |
-| `f1-refresh.md` | `f1-racetracks/data.json` | Thu–Sun |
+| `f1-refresh.md` | `f1-racetracks/data.json` + ClickUp “F1 Races” list (mirror) | Thu–Sun |
 | `world-cup-refresh.md` | `world-cup-bracket/data.json` + ClickUp “World Cup” list (mirror) | every 2h, through 2026-07-19 |
 
 ## Executor
