@@ -6,14 +6,15 @@
   "tools": {
     "memory-edit-guard": 3,
     "stale-context-reload": 5,
-    "commit-pre-flight": 12,
+    "commit-pre-flight": 13,
     "link-provenance": 6,
     "multi-edit-batch-gate": 2,
-    "secrets-pii-guard": 12,
-    "source-size-budget-enforcer": 12,
+    "secrets-pii-guard": 13,
+    "source-size-budget-enforcer": 13,
     "skill-ban-guard": 4,
     "roster-scan-planner": 2,
     "agent-invocation-gate": 1,
+    "agent-name-collision-gate": 0,
     "intent-check": 3,
     "custom-field-gate": 1,
     "size-sally": 1,
@@ -21,6 +22,6 @@
     "workshop-wes": 0,
     "scout-sage": 0,
     "closing-clio": 1,
-    "handoff-hana": 0
+    "handoff-hana": 1
   }
 }
