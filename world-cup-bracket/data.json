@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-06",
+  "version": "2026-07-07",
   "tournament": "FIFA World Cup 2026",
   "rankings": {
     "Argentina": 1,
@@ -227,11 +227,11 @@
       "dayLabel": "Mon Jul 6",
       "home": "USA",
       "away": "Belgium",
-      "hs": null,
-      "as": null,
-      "status": "upcoming",
+      "hs": 1,
+      "as": 4,
+      "status": "ft",
+      "winner": "away",
       "venue": "Seattle Stadium",
-      "time": "8:00 PM PT",
       "feedsTo": 26
     },
     {
@@ -273,7 +273,7 @@
       "as": 2,
       "status": "aet",
       "winner": "home",
-      "venue": "Miami",
+      "venue": "Seattle Stadium",
       "feedsTo": 14
     },
     {
@@ -325,15 +325,43 @@
       "dayLabel": "Fri Jul 3",
       "home": "Argentina",
       "away": "Cape Verde",
-      "hs": 4,
-      "as": 0,
-      "status": "ft",
+      "hs": 3,
+      "as": 2,
+      "status": "aet",
       "winner": "home",
-      "venue": "Chicago",
+      "venue": "Miami Stadium",
       "feedsTo": 15
     },
     {
       "id": 22,
+      "round": "R32",
+      "day": "2026-07-03",
+      "dayLabel": "Fri Jul 3",
+      "home": "Switzerland",
+      "away": "Algeria",
+      "hs": 2,
+      "as": 0,
+      "status": "ft",
+      "winner": "home",
+      "venue": "BC Place, Vancouver",
+      "feedsTo": 16
+    },
+    {
+      "id": 23,
+      "round": "R32",
+      "day": "2026-07-03",
+      "dayLabel": "Fri Jul 3",
+      "home": "Colombia",
+      "away": "Ghana",
+      "hs": 1,
+      "as": 0,
+      "status": "ft",
+      "winner": "home",
+      "venue": "Kansas City Stadium",
+      "feedsTo": 16
+    },
+    {
+      "id": 24,
       "round": "R32",
       "day": "2026-07-03",
       "dayLabel": "Fri Jul 3",
@@ -342,38 +370,10 @@
       "hs": 1,
       "as": 1,
       "status": "pso",
-      "psoNote": "Egypt 5-4 pens",
+      "psoNote": "Egypt 4-2 pens",
       "winner": "home",
-      "venue": "Denver",
+      "venue": "Dallas Stadium",
       "feedsTo": 15
-    },
-    {
-      "id": 23,
-      "round": "R32",
-      "day": "2026-07-04",
-      "dayLabel": "Sat Jul 4",
-      "home": "Switzerland",
-      "away": "Algeria",
-      "hs": 2,
-      "as": 0,
-      "status": "ft",
-      "winner": "home",
-      "venue": "Vancouver",
-      "feedsTo": 16
-    },
-    {
-      "id": 24,
-      "round": "R32",
-      "day": "2026-07-04",
-      "dayLabel": "Sat Jul 4",
-      "home": "Colombia",
-      "away": "Ghana",
-      "hs": 1,
-      "as": 0,
-      "status": "ft",
-      "winner": "home",
-      "venue": "San Francisco",
-      "feedsTo": 16
     },
     {
       "id": 25,
@@ -385,8 +385,8 @@
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "TBD",
-      "time": "TBD",
+      "venue": "Boston Stadium",
+      "time": "4:00 PM ET",
       "feedsTo": 29
     },
     {
@@ -395,26 +395,26 @@
       "day": "2026-07-10",
       "dayLabel": "Fri Jul 10",
       "home": "Spain",
-      "away": "USA",
+      "away": "Belgium",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "Dallas Stadium",
-      "time": "3:00 PM CT",
+      "venue": "Los Angeles Stadium",
+      "time": "4:00 PM PT",
       "feedsTo": 29
     },
     {
       "id": 27,
       "round": "QF",
-      "day": "2026-07-10",
-      "dayLabel": "Fri Jul 10",
+      "day": "2026-07-11",
+      "dayLabel": "Sat Jul 11",
       "home": "Norway",
       "away": "England",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "MetLife, NJ",
-      "time": "8:00 PM ET",
+      "venue": "Miami Stadium",
+      "time": "5:00 PM ET",
       "feedsTo": 30
     },
     {
@@ -422,13 +422,13 @@
       "round": "QF",
       "day": "2026-07-11",
       "dayLabel": "Sat Jul 11",
-      "home": "Argentina",
-      "away": "Switzerland",
+      "home": "TBD",
+      "away": "TBD",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "Atlanta Stadium",
-      "time": "12:00 PM ET",
+      "venue": "Kansas City Stadium",
+      "time": "8:00 PM CT",
       "feedsTo": 30
     },
     {
@@ -441,7 +441,7 @@
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "NRG Stadium, Houston",
+      "venue": "Dallas Stadium",
       "time": "3:00 PM CT",
       "feedsTo": 31
     },
@@ -455,22 +455,22 @@
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "MetLife, NJ",
-      "time": "8:00 PM ET",
+      "venue": "Atlanta Stadium",
+      "time": "3:00 PM ET",
       "feedsTo": 31
     },
     {
       "id": 31,
       "round": "Final",
-      "day": "2026-07-18",
-      "dayLabel": "Sat Jul 18",
+      "day": "2026-07-19",
+      "dayLabel": "Sun Jul 19",
       "home": "TBD",
       "away": "TBD",
       "hs": null,
       "as": null,
       "status": "upcoming",
-      "venue": "SoFi, LA",
-      "time": "5:00 PM PT"
+      "venue": "New York New Jersey Stadium",
+      "time": "3:00 PM ET"
     }
   ]
 }
