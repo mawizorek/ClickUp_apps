@@ -30,7 +30,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-*(empty — no agents currently working in the repo)*
+### Brain · session F1 results schema-shift · started 2026-07-07 17:07 (last update 17:07)
+
+**Status:** active
+
+Executing the F1 results schema-shift build. Touching: `f1-racetracks/next-build-spec.md` (extending with schema-shift plan), then `f1-racetracks/source/10_track_views_and_profile.js` (splitting into submodules incl. new results-history render), new `f1-results/2026.json` (per-season store), `f1-racetracks/data.json`, and `routines/f1-refresh.md` (mirror rework). If you need any of these, coordinate before editing.
 
 ---
 
