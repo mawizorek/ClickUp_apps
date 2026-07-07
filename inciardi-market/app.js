@@ -1,5 +1,7 @@
 /* Inciardi Market — engine. Reads market.json (eBay prices) + catalog.json (master + machines). */
 
+const BUILD = "v2.1";
+
 const MARKET_FALLBACK = { version: "sample", query: "inciardi mini print", source: "sample",
   baseline: { retailDefault: 14, currency: "USD" }, listings: [
   { itemId:"a", title:"Anastasia Inciardi Mini Print - NEGRONI", landed:9.5, price:9.5, shipping:0, condition:"New", buyingOptions:["FIXED_PRICE"], url:"https://ebay.com/itm/156812754385", seller:"printfan_me", status:"new", firstSeen:"2026-07-06T21:00:00Z", print:{name:"Negroni",exclusive:null,matched:true}, flags:["underpriced"], priceHistory:[{t:"2026-07-06",landed:9.5}] },
@@ -35,6 +37,7 @@ async function load() {
   CATALOG = await grab("./catalog.json", "inciardi_cat", CATALOG_FALLBACK);
   $("freshness").textContent = MARKET.source === "ebay-browse" ? "live" : "sample";
   render();
+  stampFooter();
 }
 async function grab(src, key, fallback) {
   try {
@@ -45,6 +48,16 @@ async function grab(src, key, fallback) {
     localStorage.setItem(key, JSON.stringify(d));
     return d;
   } catch { const c = localStorage.getItem(key); return c ? JSON.parse(c) : fallback; }
+}
+
+/* ---- footer freshness stamps ---- */
+function stampFooter() {
+  const live = MARKET.source === "ebay-browse";
+  const pv = $("f-prices"), pd = $("f-price-dot"), cv = $("f-catalog"), fb = $("f-build");
+  if (pv) pv.textContent = `prices: ${live ? "live · eBay" : "sample data"}${MARKET.version && MARKET.version!=="sample" ? " · "+relTime(MARKET.version) : ""}`;
+  if (pd) pd.className = "dot" + (live ? " live" : "");
+  if (cv) cv.textContent = `catalog: ${(CATALOG.prints||[]).length} prints${CATALOG.refreshedAt && CATALOG.refreshedAt!=="sample" ? " · "+relTime(CATALOG.refreshedAt) : ""}`;
+  if (fb) fb.textContent = `${BUILD} · built ${new Date().toISOString().slice(0,10)}`;
 }
 
 /* ---- scoring ---- */
@@ -257,4 +270,5 @@ function toggleTheme(){ const d=document.documentElement.dataset.theme==="dark";
 function rank(k){ return k==="buy"?0:k==="watch"?1:2; }
 function money(n){ const v=Number(n||0); return (v<0?"-$":"$")+Math.abs(v).toFixed(2); }
 function fmtDate(s){ try { return new Date(s).toLocaleDateString(); } catch { return s; } }
+function relTime(s){ try { const d=(Date.now()-new Date(s))/1000; if(d<3600)return Math.max(1,Math.round(d/60))+"m ago"; if(d<86400)return Math.round(d/3600)+"h ago"; return Math.round(d/86400)+"d ago"; } catch { return s; } }
 function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }

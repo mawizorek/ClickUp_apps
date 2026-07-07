@@ -38,7 +38,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--ink); line-height: 1.5; font-optical-sizing: auto;
-    -webkit-font-smoothing: antialiased; padding-bottom: var(--s12); }
+    -webkit-font-smoothing: antialiased; padding-bottom: 0; }
   .wrap { max-width: 960px; margin: 0 auto; padding: 0 var(--s4); }
 
   .masthead { display: flex; align-items: center; justify-content: space-between; padding: var(--s6) 0 var(--s4); }
@@ -176,10 +176,26 @@
     background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; color: var(--ink); }
   input.ep:focus-visible { outline: none; border-color: var(--accent); }
 
-  footer { max-width: 960px; margin: var(--s12) auto 0; padding: var(--s4) var(--s4) 0; border-top: 1px solid var(--line-soft);
-    font-size: 0.74rem; color: var(--ink-faint); }
-  footer code { font-family: ui-monospace, Menlo, monospace; }
+  footer { margin-top: var(--s12); border-top: 1px solid var(--line); background: var(--surface); }
+  .foot-in { max-width: 960px; margin: 0 auto; padding: var(--s8) var(--s4) var(--s6);
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: var(--s6); }
+  .foot-brand { display: flex; align-items: center; gap: var(--s2); font-size: 0.95rem; font-weight: 660; }
+  .foot-desc { font-size: 0.8rem; color: var(--ink-faint); margin-top: var(--s2); max-width: 34ch; }
+  .foot-h { font-size: 0.68rem; font-weight: 660; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: var(--s3); }
+  .foot-row { display: flex; align-items: center; gap: var(--s2); font-size: 0.8rem; color: var(--ink-soft);
+    font-variant-numeric: tabular-nums; margin-bottom: var(--s2); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); flex: none; }
+  .dot.live { background: var(--good); box-shadow: 0 0 0 3px var(--good-bg); }
+  .dot.cat { background: var(--plum); }
+  .foot-col a { display: block; font-size: 0.8rem; color: var(--ink-soft); text-decoration: none; margin-bottom: var(--s2); }
+  .foot-col a:hover { color: var(--accent-ink); }
+  .foot-base { border-top: 1px solid var(--line-soft); }
+  .foot-base-in { max-width: 960px; margin: 0 auto; padding: var(--s3) var(--s4); display: flex;
+    justify-content: space-between; gap: var(--s3); flex-wrap: wrap; font-size: 0.72rem; color: var(--ink-faint); }
+  .foot-base-in code { font-family: ui-monospace, Menlo, monospace; }
 
+  @media (max-width: 640px) { .foot-in { grid-template-columns: 1fr 1fr; } .foot-col.brandcol { grid-column: 1 / -1; } }
   @media (max-width: 560px) { .deal { grid-template-columns: 44px 1fr; } .d-price { grid-column: 2; text-align: left; } .thumb { width: 44px; height: 44px; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -217,7 +233,29 @@
   <p class="drawer-note">Two data pipes. eBay prices come from the Cloudflare Worker (every 6h once live). The catalog + machine locations come from a session web-search refresh, so they update when re-run, not automatically. My Stock is stored on this device only. Baseline is retail plus the active-listing spread; no sold-price history yet.</p>
 </dialog>
 
-<footer class="wrap">Anastasia Inciardi mini prints · buy underpriced, value your stock, read the market · prices via <code>market.json</code>, catalog via <code>catalog.json</code></footer>
+<footer>
+  <div class="foot-in">
+    <div class="foot-col brandcol">
+      <div class="foot-brand"><span>🖨️</span> Inciardi Market</div>
+      <p class="foot-desc">Buy underpriced minis, value your stock, and read the exclusives market.</p>
+    </div>
+    <div class="foot-col">
+      <div class="foot-h">Data</div>
+      <div class="foot-row"><span class="dot" id="f-price-dot"></span><span id="f-prices">prices —</span></div>
+      <div class="foot-row"><span class="dot cat"></span><span id="f-catalog">catalog —</span></div>
+    </div>
+    <div class="foot-col">
+      <div class="foot-h">Sources</div>
+      <a href="https://inciardiprints.com" target="_blank" rel="noopener">Inciardi Prints ↗</a>
+      <a href="https://inciardiprints.com/pages/store-locator" target="_blank" rel="noopener">Machine map ↗</a>
+      <a href="https://www.ebay.com/sch/i.html?_nkw=inciardi+mini+print" target="_blank" rel="noopener">eBay search ↗</a>
+    </div>
+  </div>
+  <div class="foot-base"><div class="foot-base-in">
+    <span id="f-build">—</span>
+    <span>prices <code>market.json</code> · catalog <code>catalog.json</code></span>
+  </div></div>
+</footer>
 
 <script src="./app.js" defer></script>
 </body>
