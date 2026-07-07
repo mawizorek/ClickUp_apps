@@ -4,6 +4,10 @@
 > **Created:** 2026-07-07 by Brain, at end of a long session, at Michael's request.
 > **Note:** a separate `next-build-spec.md` already exists in this folder and was intentionally left untouched (couldn't be read back this session). Reconcile with it at the start of the build; do not blindly overwrite it.
 
+## ⚠️ DISCUSS BEFORE BUILDING (Michael, explicit)
+
+**Do NOT open the next session by jumping straight into building.** Michael wants to TALK THROUGH the approach first — the per-season JSON shape, the migration plan, the season-history render, and the ClickUp-history decision are all things to hash out WITH him before any code or spec is written. Open with the brainstorm conversation: surface options and trade-offs, get his direction, THEN build. Building-first is the wrong move here; the discussion is the point.
+
 ## The decision already made (locked, don't re-litigate)
 
 Michael's standing architectural call (now in the Apps/Artifacts reference, “Slim ClickUp / JSON-canonical data”):
@@ -39,5 +43,5 @@ Both errors erased the same storyline (Antonelli’s streak ending). Verified-cl
 
 1. Re-read this brief + the Apps/Artifacts reference (Anchor Convention + Slim-ClickUp principle + Data Separation Pattern).
 2. Reconcile with the existing `next-build-spec.md` in this folder.
-3. Run the Brainstorm Gate (all 7 lenses) on the JSON shape + migration + render + ClickUp-history decision.
-4. ONLY THEN write/overwrite `next-build-spec.md` and build.
+3. **Open a DISCUSSION with Michael** (per the note at the top) — run the Brainstorm Gate (all 7 lenses) on the JSON shape + migration + render + ClickUp-history decision AS A CONVERSATION, surfacing options and trade-offs, not as a prelude to immediately building.
+4. ONLY AFTER that discussion resolves direction: write/overwrite `next-build-spec.md` and build.
