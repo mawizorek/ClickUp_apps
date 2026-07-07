@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1c24">
+<meta name="robots" content="noindex, nofollow">
+<title>Prism \u2014 Data App Viewer</title>
+<meta name="description" content="Drop any JSON or Markdown file and view it clean: JSON becomes a human-readable table you can export to CSV or Excel. Runs entirely in your browser.">
+<meta property="og:title" content="Prism \u2014 Data App Viewer">
+<meta property="og:description" content="Drop a JSON or Markdown file, get the right view. JSON to readable tables + CSV/Excel export.">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/prism/">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/prism/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/prism/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%BA%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="prism.css">
+<style>
+  #access-gate{position:fixed;inset:0;z-index:9999;background:#1a1c24;color:#e7e8ee;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+  #access-gate .box{text-align:center;max-width:340px;padding:32px}
+  #access-gate h1{font-size:1.25rem;margin:0 0 8px}
+  #access-gate p{color:#9aa0b3;font-size:0.9rem;margin:0 0 20px}
+  #access-gate input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #34384a;background:#22252f;color:#e7e8ee;font-size:1rem;text-align:center;letter-spacing:0.2em}
+  #access-gate button{margin-top:12px;width:100%;padding:10px;border-radius:8px;border:none;background:#e8b84b;color:#1a1c24;font-weight:600;font-size:0.95rem;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="access-gate" hidden>
+  <div class="box">
+    <h1 id="gate-title">Under maintenance</h1>
+    <p id="gate-msg">This app is being updated. Check back soon.</p>
+    <form id="gate-form"><input id="gate-code" type="password" inputmode="numeric" autocomplete="off" aria-label="Access code" placeholder="code"><button type="submit">Enter</button></form>
+  </div>
+</div>
+<noscript>This app needs JavaScript enabled to run.</noscript>
+
+<header class="mast">
+  <div class="brand">
+    <span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 3 20h18L12 3Z" stroke="oklch(0.82 0.13 78)" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 3v17" stroke="oklch(0.75 0.13 300)" stroke-width="1.4"/><path d="M7 14h10" stroke="oklch(0.70 0.014 265)" stroke-width="1.2"/></svg></span>
+    <div><h1>Prism</h1><div class="tag">Data App Viewer</div></div>
+  </div>
+  <span class="lens-pill" id="lensPill"><span class="dot"></span><span id="lensLabel">JSON</span></span>
+  <div class="mast-actions">
+    <button class="icon-btn reset-btn" id="resetBtn" title="New file" aria-label="Load a new file"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 7h18M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7" stroke="currentColor"/></svg></button>
+    <button class="icon-btn" id="gearBtn" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="12" cy="12" r="3" stroke="currentColor"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke="currentColor"/></svg></button>
+  </div>
+</header>
+
+<main>
+  <section class="stage" id="stage">
+    <div class="drop" id="drop">
+      <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 16V4m0 0 4 4m-4-4L8 8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-linecap="round"/></svg></div>
+      <h2>Drop a file to refract it</h2>
+      <p>Prism reads the file, detects what it is, and shows the right lens. JSON turns into a human-readable table you can export. Markdown renders clean.</p>
+      <div class="exts"><span class="ext j">.json</span><span class="ext m">.md</span><span class="ext soon">.yaml</span><span class="ext soon">.csv</span><span class="ext soon">.xml</span></div>
+      <div class="drop-actions">
+        <button class="btn primary" id="pickBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="currentColor"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z" stroke="currentColor" stroke-linejoin="round"/></svg>Choose a file</button>
+        <input type="file" id="fileInput" accept=".json,.md,.markdown,.txt,application/json,text/markdown" hidden>
+      </div>
+      <div class="samples">No file handy? Try a sample: <a class="j" id="sampleJson">ClickUp-style JSON export</a> \u00b7 <a class="m" id="sampleMd">a Markdown doc</a></div>
+    </div>
+  </section>
+
+  <section class="viewer" id="viewer">
+    <div class="subbar">
+      <span class="fname" id="fname">file.json</span>
+      <span class="fmeta" id="fmeta"></span>
+      <div class="spacer"></div>
+      <div class="seg" id="viewSeg"></div>
+    </div>
+    <div class="work">
+      <aside class="side" id="side"><h3>Structure</h3><div id="stats"></div><div class="flags" id="flags"></div></aside>
+      <div class="content" id="content"></div>
+    </div>
+    <div class="exportbar" id="exportbar"></div>
+  </section>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <button class="icon-btn close" id="closeDrawer" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-linecap="round"/></svg></button>
+  <div><h2>Settings</h2></div>
+  <div class="row"><div><div class="k">Theme</div><div class="d">Persists on this device</div></div><div class="theme-seg" id="themeSeg"><button data-t="dark" class="active">Dark</button><button data-t="light">Light</button></div></div>
+  <div class="row"><div><div class="k">CSV delimiter</div><div class="d">Comma is standard; tab helps with messy data</div></div><div class="theme-seg" id="delimSeg"><button data-d="," class="active">Comma</button><button data-d="\t">Tab</button></div></div>
+  <div class="note">Prism runs entirely in your browser. Nothing you drop is uploaded anywhere.</div>
+</aside>
+
+<div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="toastMsg">Done</span></div>
+
+<script>
+(function () {
+  var FALLBACK = { access: "gated", code: "2026", coverTitle: "Under maintenance", coverMessage: "This app is being updated. Check back soon.", downTitle: "Temporarily offline", downMessage: "This app is currently unavailable." };
+  var SS_KEY = "gate_ok";
+  function apply(cfg) {
+    var gate = document.getElementById("access-gate");
+    if (cfg.access === "open" || sessionStorage.getItem(SS_KEY) === "1") { gate.remove(); return; }
+    gate.hidden = false;
+    var form = document.getElementById("gate-form");
+    if (cfg.access === "down") { document.getElementById("gate-title").textContent = cfg.downTitle || FALLBACK.downTitle; document.getElementById("gate-msg").textContent = cfg.downMessage || FALLBACK.downMessage; form.style.display = "none"; return; }
+    document.getElementById("gate-title").textContent = cfg.coverTitle || FALLBACK.coverTitle;
+    document.getElementById("gate-msg").textContent = cfg.coverMessage || FALLBACK.coverMessage;
+    form.addEventListener("submit", function (e) { e.preventDefault(); if (document.getElementById("gate-code").value.trim() === String(cfg.code)) { sessionStorage.setItem(SS_KEY, "1"); gate.remove(); } else { var c = document.getElementById("gate-code"); c.value = ""; c.focus(); } });
+    var el = document.getElementById("gate-code"); if (el) el.focus();
+  }
+  fetch("./config.json", { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); }).catch(function () { var cached = null; try { cached = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(cached || FALLBACK); });
+})();
+</script>
+<script src="prism.json.js"></script>
+<script src="prism.md.js"></script>
+<script src="prism.core.js"></script>
+</body>
+</html>
