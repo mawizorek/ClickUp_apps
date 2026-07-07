@@ -17,12 +17,12 @@
     { "pos": 11, "driverId": "86ae52rqw", "driver": "Nico Hulkenberg", "team": "Audi", "status": "FIN", "points": 0 },
     { "pos": 12, "driverId": "86ae52ryt", "driver": "Isack Hadjar", "team": "Red Bull", "status": "FIN", "points": 0 },
     { "pos": 13, "driverId": "86ae52rqp", "driver": "Gabriel Bortoleto", "team": "Audi", "status": "FIN", "points": 0 },
-    { "pos": 14, "driverId": null, "driver": "Arvid Lindblad", "team": "Racing Bulls", "status": "FIN", "points": 0, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": 14, "driverId": "86aj1ra31", "driver": "Arvid Lindblad", "team": "Racing Bulls", "status": "FIN", "points": 0 },
     { "pos": 15, "driverId": "86ae52rqj", "driver": "Carlos Sainz", "team": "Williams", "status": "FIN", "points": 0 },
-    { "pos": 16, "driverId": null, "driver": "Franco Colapinto", "team": "Alpine", "status": "FIN", "points": 0, "_anchor": "UNRESOLVED-DUP" },
-    { "pos": 17, "driverId": null, "driver": "Sergio Perez", "team": "Cadillac", "status": "FIN", "points": 0, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": 16, "driverId": "86aj1ra0h", "driver": "Franco Colapinto", "team": "Alpine", "status": "FIN", "points": 0 },
+    { "pos": 17, "driverId": "86aj1ra1z", "driver": "Sergio Perez", "team": "Cadillac", "status": "FIN", "points": 0 },
     { "pos": 18, "driverId": "86ae52rq8", "driver": "Fernando Alonso", "team": "Aston Martin", "status": "FIN", "points": 0 },
-    { "pos": 19, "driverId": null, "driver": "Valtteri Bottas", "team": "Cadillac", "status": "FIN", "points": 0, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": 19, "driverId": "86aj1ra1g", "driver": "Valtteri Bottas", "team": "Cadillac", "status": "FIN", "points": 0 },
     { "pos": 20, "driverId": "86ae52rqc", "driver": "Alexander Albon", "team": "Williams", "status": "FIN", "points": 0 }
   ]
 }
