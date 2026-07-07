@@ -30,9 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session course-engine-blueprint · started 2026-07-06 11:28pm ET (last update 11:28pm)
-
-**Status:** active — pushing `quickfire/course-engine/index.html` (Course Engine planning blueprint) + updating `quickfire/index.html`. Touching only `quickfire/`. No collisions expected.
+*(empty — no agents currently working in the repo)*
 
 ---
 
