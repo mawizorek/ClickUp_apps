@@ -5,32 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!--
   ============================================================================
-  BRAINCONFIG · TOOL INDEX
+  BRAINCONFIG · TOOL INDEX  (two modes, one toggle)
   ============================================================================
-  The navigable index of every tool Brain can call, and the safety nets that
-  fire before each one. This is the viewer layer (a projection); canonical
-  hook/gate definitions live in brain-config/hooks/ and brain-config/gates/.
+  MODE A — "Our AI Index": the tools WE authored (hooks, gates, subagents).
+           Custom, evolving, defined in brain-config/hooks|gates|agents/.
+  MODE B — "Platform Tools": the exhaustive, KNOWN native tool surface Brain
+           has access to across ClickUp + GitHub. Fixed capability set, kept
+           distinctly separate from our own tools.
 
-  Each tool: name, category, the hooks/gates that guard it (with count), a
-  short note, and cumulative call count (fed by Closing Clio -> usage-log.json;
-  0 until the tally lands). Add tools to the TOOLS array; add guard detail to
-  the GUARDS map. Search + coverage filter are client-side.
+  Toggle at top switches the entire context. Each mode is its own dataset.
+  Search + coverage filter apply within the active mode.
   ============================================================================
 -->
 <title>Tool Index · BrainConfig</title>
 <style>
-  :root{--canvas:#0b0b0d;--panel:#17181a;--row:#161719;--row-hi:#1f2023;--divider:#26272a;--ink:#e8e8ea;--ink-soft:#9a9ba0;--ink-faint:#6b6c72;--purple:#8b6df0;--green:#5aa46a;--amber:#c9a83f;font-synthesis:none;}
+  :root{--canvas:#0b0b0d;--panel:#17181a;--row:#161719;--row-hi:#1f2023;--divider:#26272a;--ink:#e8e8ea;--ink-soft:#9a9ba0;--ink-faint:#6b6c72;--purple:#8b6df0;--green:#5aa46a;--blue:#5b9ae8;font-synthesis:none;}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--canvas);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;padding:44px 20px 72px;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--canvas);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;padding:40px 20px 72px;}
   .wrap{max-width:840px;margin:0 auto;}
-  h1{font-size:1.5rem;font-weight:650;letter-spacing:-.02em;margin-bottom:4px;}
-  .sub{color:var(--ink-soft);font-size:.9375rem;margin-bottom:22px;}
+  /* Toggle */
+  .toggle{display:inline-flex;background:var(--panel);border:1px solid var(--divider);border-radius:11px;padding:4px;margin-bottom:22px;gap:2px;}
+  .toggle button{font:inherit;font-size:.875rem;font-weight:600;color:var(--ink-soft);background:transparent;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;transition:all .14s cubic-bezier(.22,1,.36,1);white-space:nowrap;}
+  .toggle button:hover{color:var(--ink);}
+  .toggle button.active{color:#fff;background:var(--purple);}
+  .toggle button[data-m="b"].active{background:var(--blue);}
+  h1{font-size:1.4rem;font-weight:650;letter-spacing:-.02em;margin-bottom:4px;}
+  .sub{color:var(--ink-soft);font-size:.9375rem;margin-bottom:20px;text-wrap:pretty;}
   .search{position:relative;margin-bottom:14px;}
   .search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-faint);}
   .search input{width:100%;font:inherit;font-size:.9375rem;color:var(--ink);background:var(--panel);border:1px solid var(--divider);border-radius:10px;padding:12px 14px 12px 40px;outline:none;transition:border-color .12s ease;}
   .search input:focus{border-color:var(--purple);}
   .search input::placeholder{color:var(--ink-faint);}
-  .bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:18px;}
+  .bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;}
   .bar .filters{display:flex;flex-wrap:wrap;gap:8px;}
   .bar button{font:inherit;font-size:.8125rem;font-weight:550;color:var(--ink-soft);background:var(--panel);border:1px solid var(--divider);border-radius:999px;padding:5px 13px;cursor:pointer;transition:all .12s ease;}
   .bar button:hover{color:var(--ink);border-color:#3a3b3f;}
@@ -44,50 +50,51 @@
   .tool summary::-webkit-details-marker{display:none;}
   .tool summary:hover{background:var(--row-hi);}
   .tool .nm{font-size:.9375rem;font-weight:550;font-family:ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:-.01em;}
-  .tool .nets{display:inline-flex;align-items:center;gap:5px;font-size:.6875rem;font-weight:650;padding:2px 8px;border-radius:999px;flex-shrink:0;}
-  .nets.has{background:color-mix(in srgb,var(--green) 20%,transparent);color:#7fc48c;}
-  .nets.none{background:#232326;color:var(--ink-faint);}
+  .tool .badge{display:inline-flex;align-items:center;gap:5px;font-size:.6875rem;font-weight:650;padding:2px 8px;border-radius:999px;flex-shrink:0;}
+  .badge.has{background:color-mix(in srgb,var(--green) 20%,transparent);color:#7fc48c;}
+  .badge.none{background:#232326;color:var(--ink-faint);}
+  .badge.kind{background:color-mix(in srgb,var(--purple) 20%,transparent);color:#b3a0f5;}
   .tool .calls{margin-left:auto;font-size:.75rem;color:var(--ink-faint);font-variant-numeric:tabular-nums;flex-shrink:0;}
   .tool .chev{color:var(--ink-faint);transition:transform .15s ease;flex-shrink:0;}
   .tool[open] .chev{transform:rotate(90deg);}
   .detail{padding:2px 16px 16px 44px;color:var(--ink-soft);font-size:.875rem;}
-  .detail .note{margin-bottom:12px;text-wrap:pretty;}
+  .detail .note{margin-bottom:10px;text-wrap:pretty;}
   .detail .guard{display:flex;gap:10px;padding:9px 12px;background:#131416;border:1px solid var(--divider);border-radius:8px;margin-top:8px;}
   .detail .guard .g-ico{color:var(--purple);flex-shrink:0;margin-top:1px;}
   .detail .guard .g-nm{font-weight:600;color:var(--ink);font-size:.8125rem;}
   .detail .guard .g-desc{font-size:.8125rem;color:var(--ink-soft);margin-top:2px;}
-  .detail .guard a{color:var(--purple);text-decoration:none;}
-  .detail .guard a:hover{text-decoration:underline;}
+  .detail .guard a,.detail .prof a{color:var(--purple);text-decoration:none;}
+  .detail .guard a:hover,.detail .prof a:hover{text-decoration:underline;}
   .detail .nocover{font-size:.8125rem;color:var(--ink-faint);font-style:italic;}
-  .empty{display:none;padding:48px 14px;text-align:center;color:var(--ink-faint);font-size:.9375rem;}
+  .empty{display:none;padding:44px 14px;text-align:center;color:var(--ink-faint);font-size:.9375rem;}
   @media(max-width:560px){body{padding:28px 12px 56px;}.tool .calls{display:none;}}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Tool Index</h1>
-    <p class="sub">Every tool Brain can call, and the safety nets that fire before each one. Expand a tool to read its guards and notes.</p>
+    <div class="toggle">
+      <button data-m="a" class="active">Our AI Index</button>
+      <button data-m="b">Platform Tools</button>
+    </div>
+    <h1 id="title"></h1>
+    <p class="sub" id="sub"></p>
     <div class="search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="q" type="text" placeholder="Search tools… (try: custom field)" autocomplete="off">
+      <input id="q" type="text" placeholder="Search tools…" autocomplete="off">
     </div>
     <div class="bar">
-      <div class="filters">
-        <button data-f="all" class="active">All</button>
-        <button data-f="guarded">Has safety net</button>
-        <button data-f="unguarded">No coverage</button>
-      </div>
+      <div class="filters" id="filters"></div>
       <span class="count" id="count"></span>
     </div>
     <div id="groups"></div>
     <div class="empty" id="empty">No tools match.</div>
   </div>
   <script>
-    // guard definitions (canonical content lives in brain-config/hooks|gates/)
+    // ===== Shared guard definitions (canonical content in brain-config/hooks|gates/) =====
     const GUARDS={
       'custom-field-gate':{nm:'Custom Field Gate',desc:'Write-once dropdown/label fields require an approved, visible option-list preview before creation.',href:'./hooks/custom-field-gate.md'},
       'task-dedup-gate':{nm:'Task Dedup Gate',desc:'3-step search before creating a task; HALT on exact match, WARN on near match.',href:'./hooks/task-dedup-gate.md'},
-      'commit-pre-flight':{nm:'Commit Pre-Flight',desc:'Blob SHA, PR collision, .nojekyll, message format, branch, size checks before any commit.',href:'./hooks/commit-pre-flight.md'},
+      'commit-pre-flight':{nm:'Commit Pre-Flight',desc:'SHA, PR collision, .nojekyll, message, branch, size checks before any commit.',href:'./hooks/commit-pre-flight.md'},
       'secrets-pii-guard':{nm:'Secrets / PII Guard',desc:'Scans outgoing content for keys, tokens, passwords, personal data; HALT on hit.',href:'./hooks/secrets-pii-guard.md'},
       'source-size-budget':{nm:'Source-Size Budget Enforcer',desc:'Keeps source under budget; auto-splits by concern past 12KB.',href:'./hooks/source-size-budget-enforcer.md'},
       'skill-ban-guard':{nm:'Skill-Ban Guard',desc:'Byte-level scan for the active skill\u2019s hard bans; HALT on hit.',href:'./hooks/skill-ban-guard.md'},
@@ -97,74 +104,133 @@
       'link-provenance':{nm:'Link Provenance',desc:'Verifies a ClickUp URL came from a live source before emitting it.',href:'./hooks/link-provenance.md'},
       'memory-edit-guard':{nm:'Memory Edit Guard',desc:'Validates token budget, protected content, pointer integrity before a memory write.',href:'./hooks/memory-edit-guard.md'},
       'artifact-ship':{nm:'Artifact Ship Paperwork',desc:'Updates APPS task, version comment, index after an app commit.',href:'./hooks/artifact-ship-paperwork.md'},
-      'size-sally':{nm:'Size Sally (forecaster)',desc:'Projects structural-file growth before build/edit/expand; proposes splits in advance.',href:'./agents/size-sally.md'}
+      'size-sally':{nm:'Size Sally',desc:'Projects structural-file growth before build/edit/expand; proposes splits in advance.',href:'./agents/size-sally.md'}
     };
-    // tool roster. calls = cumulative (0 until Clio tally lands).
-    const TOOLS=[
-      {n:'create_custom_field',c:'ClickUp',g:['custom-field-gate'],calls:0,note:'Creates a custom field. Dropdown/label option lists are write-once, hence the gate.'},
-      {n:'create_task',c:'ClickUp',g:['task-dedup-gate'],calls:0,note:'Creates a task. Dedup search runs first.'},
-      {n:'update_task',c:'ClickUp',g:['stale-context-reload'],calls:0,note:'Updates an existing task.'},
-      {n:'move_task_to_list',c:'ClickUp',g:[],calls:0,note:'Moves a task to another list.'},
-      {n:'add_task_to_list',c:'ClickUp',g:[],calls:0,note:'Adds a task to an additional list.'},
-      {n:'create_list',c:'ClickUp',g:[],calls:0,note:'Creates a list.'},
-      {n:'create_view',c:'ClickUp',g:[],calls:0,note:'Creates a view.'},
-      {n:'create_document',c:'ClickUp',g:[],calls:0,note:'Creates a doc.'},
-      {n:'update_document',c:'ClickUp',g:['stale-context-reload'],calls:0,note:'Updates a doc page.'},
-      {n:'create_document_page',c:'ClickUp',g:[],calls:0,note:'Adds a page to a doc.'},
-      {n:'post_comment',c:'ClickUp',g:['link-provenance'],calls:0,note:'Posts a comment. Confirm before sending.'},
-      {n:'create_reminder',c:'ClickUp',g:[],calls:0,note:'Creates a reminder.'},
-      {n:'track_time',c:'ClickUp',g:[],calls:0,note:'Logs time on a task.'},
-      {n:'create_new_agent',c:'ClickUp',g:[],calls:0,note:'Creates a Super Agent.'},
-      {n:'update_existing_agent',c:'ClickUp',g:[],calls:0,note:'Updates a Super Agent.'},
-      {n:'manage_personal_priorities',c:'ClickUp',g:[],calls:0,note:'Adds/moves/removes tasks in a lineup.'},
-      {n:'githubmcp_push_files',c:'GitHub',g:['commit-pre-flight','secrets-pii-guard','source-size-budget','skill-ban-guard','size-sally'],calls:0,note:'Multi-file commit. The most heavily guarded write path.'},
-      {n:'githubmcp_create_or_update_file',c:'GitHub',g:['commit-pre-flight','secrets-pii-guard','source-size-budget','skill-ban-guard'],calls:0,note:'Single-file commit (needs blob SHA to update).'},
-      {n:'githubmcp_create_pull_request',c:'GitHub',g:['commit-pre-flight'],calls:0,note:'Opens a PR.'},
-      {n:'githubmcp_merge_pull_request',c:'GitHub',g:['post-build-verify'],calls:0,note:'Merges a PR.'},
-      {n:'githubmcp_delete_file',c:'GitHub',g:['commit-pre-flight'],calls:0,note:'Deletes a file.'},
-      {n:'create_artifact',c:'Artifacts',g:['skill-ban-guard','source-size-budget'],calls:0,note:'Creates an HTML/SVG/etc artifact via a loaded skill.'},
-      {n:'read_memory',c:'Memory',g:[],calls:0,note:'Reads from the memory directory.'},
-      {n:'save_memory',c:'Memory',g:['memory-edit-guard'],calls:0,note:'Writes to /PREFERENCES.md. Guarded pre-write.'},
-      {n:'gmail_send_email',c:'Google',g:['secrets-pii-guard'],calls:0,note:'Sends an email. Confirm before sending.'},
-      {n:'gmail_create_draft',c:'Google',g:[],calls:0,note:'Creates an email draft.'},
-      {n:'create_google_calendar_event',c:'Google',g:[],calls:0,note:'Creates a calendar event.'},
-      {n:'search_workspace',c:'Retrieval',g:[],calls:0,note:'Semantic/keyword workspace search.'},
-      {n:'retrieve_tasks',c:'Retrieval',g:[],calls:0,note:'Structured task retrieval.'},
-      {n:'search_web',c:'Retrieval',g:[],calls:0,note:'Public web search.'}
+    // ===== MODE A: our authored tools (hooks / gates / subagents) =====
+    const OURS=[
+      {n:'Custom Field Gate',k:'Hook',cat:'Hooks',href:'./hooks/custom-field-gate.md',note:'Fires before create_custom_field. Write-once dropdown/label lists need an approved visible preview first.'},
+      {n:'Task Dedup Gate',k:'Hook',cat:'Hooks',href:'./hooks/task-dedup-gate.md',note:'3-step search before creating a task.'},
+      {n:'Commit Pre-Flight',k:'Hook',cat:'Hooks',href:'./hooks/commit-pre-flight.md',note:'Procedural checklist before any GitHub commit.'},
+      {n:'Secrets / PII Guard',k:'Hook',cat:'Hooks',href:'./hooks/secrets-pii-guard.md',note:'Repo-write scan for secrets and personal data.'},
+      {n:'Source-Size Budget Enforcer',k:'Hook',cat:'Hooks',href:'./hooks/source-size-budget-enforcer.md',note:'Keeps source under budget; auto-splits past 12KB.'},
+      {n:'Skill-Ban Guard',k:'Hook',cat:'Hooks',href:'./hooks/skill-ban-guard.md',note:'Byte-level scan for active-skill hard bans.'},
+      {n:'Post-Build Verify',k:'Hook',cat:'Hooks',href:'./hooks/post-build-verify.md',note:'Confirms the live URL serves the new build.'},
+      {n:'Stale Context Reload',k:'Hook',cat:'Hooks',href:'./hooks/stale-context-reload.md',note:'Re-fetches a file before editing if it went stale.'},
+      {n:'Multi-Edit Batch Gate',k:'Hook',cat:'Hooks',href:'./hooks/multi-edit-batch-gate.md',note:'Plans + orders 3+ edits to one file.'},
+      {n:'Link Provenance',k:'Hook',cat:'Hooks',href:'./hooks/link-provenance.md',note:'Verifies ClickUp URLs before emitting them.'},
+      {n:'Memory Edit Guard',k:'Hook',cat:'Hooks',href:'./hooks/memory-edit-guard.md',note:'Pre-write gate for any memory edit.'},
+      {n:'Memory Write Relay',k:'Hook',cat:'Hooks',href:'./hooks/memory-write-relay.md',note:'On a failed memory write: flag once, emit copy-paste block, mark pending.'},
+      {n:'Artifact Ship Paperwork',k:'Hook',cat:'Hooks',href:'./hooks/artifact-ship-paperwork.md',note:'Post-commit shipping paperwork for apps.'},
+      {n:'Intent Check',k:'Gate',cat:'Gates',href:'./gates/intent-check.md',note:'Clarifies ambiguous intent before acting.'},
+      {n:'Agent Invocation Gate',k:'Gate',cat:'Gates',href:'./gates/agent-invocation-gate.md',note:'Disambiguates agent names from real-person mentions.'},
+      {n:'Roster Scan Planner',k:'Gate',cat:'Gates',href:'./gates/roster-scan-planner.md',note:'Outermost gate: reads all shelves, builds an execution plan.'},
+      {n:'Size Sally',k:'Subagent',cat:'Subagents',href:'./agents/size-sally.md',note:'Data-model growth forecaster; fires before build/edit/expand, not at session close.'},
+      {n:'The Council',k:'Subagent',cat:'Subagents',href:'./council.md',note:'Standing review body (Maestro Mira presiding).'},
+      {n:'Breaker Beckett',k:'Subagent',cat:'Subagents',href:'./agents/breaker-beckett.md',note:'Adversarial tester; breaks the real artifact.'},
+      {n:'Fold-in Frank',k:'Subagent',cat:'Subagents',href:'./agents/foldin-frank.md',note:'Anti-sprawl gate; FOLD-IN / NET-NEW / MERGE verdict.'},
+      {n:'Scout Sage',k:'Subagent',cat:'Subagents',href:'./agents/scout-sage.md',note:'Multi-source research runner.'},
+      {n:'Closing Clio',k:'Subagent',cat:'Subagents',href:'./agents/closing-clio.md',note:'Session-close auditor; will feed cumulative call counts.'},
+      {n:'Memory Maggie',k:'Subagent',cat:'Subagents',href:'./agents/memory-maggie.md',note:'Sole owner of the memory file lifecycle.'},
+      {n:'Recon Renata',k:'Subagent',cat:'Subagents',href:'./agents/recon-renata.md',note:'Repo auditor vs the operating standard.'},
+      {n:'Handoff Hana',k:'Subagent',cat:'Subagents',href:'./agents/handoff-hana.md',note:'Packages clean session handoffs.'},
+      {n:'Scribe Sana',k:'Subagent',cat:'Subagents',href:'./agents/scribe-sana.md',note:'Documentation logger during builds.'}
     ];
-    const CATS=['ClickUp','GitHub','Artifacts','Memory','Google','Retrieval'];
-    const groups=document.getElementById('groups'),empty=document.getElementById('empty'),countEl=document.getElementById('count');
-    let qv='',fv='all';
+    // ===== MODE B: exhaustive native platform tools (ClickUp + GitHub) =====
+    const PLATFORM=[
+      {n:'create_custom_field',c:'ClickUp',g:['custom-field-gate'],calls:0,note:'Create a custom field. Dropdown/label options are write-once.'},
+      {n:'create_task',c:'ClickUp',g:['task-dedup-gate'],calls:0,note:'Create a task.'},
+      {n:'update_task',c:'ClickUp',g:['stale-context-reload'],calls:0,note:'Update an existing task.'},
+      {n:'move_task_to_list',c:'ClickUp',g:[],calls:0,note:'Move a task to another list.'},
+      {n:'add_task_to_list',c:'ClickUp',g:[],calls:0,note:'Add a task to an additional list.'},
+      {n:'create_list',c:'ClickUp',g:[],calls:0,note:'Create a list.'},
+      {n:'create_view',c:'ClickUp',g:[],calls:0,note:'Create a view.'},
+      {n:'create_document',c:'ClickUp',g:[],calls:0,note:'Create a doc.'},
+      {n:'create_document_page',c:'ClickUp',g:[],calls:0,note:'Add a page to a doc.'},
+      {n:'update_document',c:'ClickUp',g:['stale-context-reload'],calls:0,note:'Update a doc page.'},
+      {n:'post_comment',c:'ClickUp',g:['link-provenance'],calls:0,note:'Post a comment.'},
+      {n:'summarize_task',c:'ClickUp',g:[],calls:0,note:'Summarize a task.'},
+      {n:'create_reminder',c:'ClickUp',g:[],calls:0,note:'Create a reminder.'},
+      {n:'track_time',c:'ClickUp',g:[],calls:0,note:'Log time on a task.'},
+      {n:'load_custom_fields',c:'ClickUp',g:[],calls:0,note:'Load custom field definitions.'},
+      {n:'retrieve_activity',c:'ClickUp',g:[],calls:0,note:'Retrieve activity history.'},
+      {n:'retrieve_chat_messages',c:'ClickUp',g:[],calls:0,note:'Retrieve chat messages.'},
+      {n:'generate_project_update',c:'ClickUp',g:[],calls:0,note:'Generate a project update.'},
+      {n:'generate_stand_up',c:'ClickUp',g:[],calls:0,note:'Generate a stand-up.'},
+      {n:'create_new_agent',c:'ClickUp',g:[],calls:0,note:'Create a Super Agent.'},
+      {n:'update_existing_agent',c:'ClickUp',g:[],calls:0,note:'Update a Super Agent.'},
+      {n:'get_agent',c:'ClickUp',g:[],calls:0,note:'Read a Super Agent config.'},
+      {n:'search_agents',c:'ClickUp',g:[],calls:0,note:'Search Super Agents.'},
+      {n:'manage_personal_priorities',c:'ClickUp',g:[],calls:0,note:'Add/move/remove tasks in a lineup.'},
+      {n:'retrieve_personal_priorities',c:'ClickUp',g:[],calls:0,note:'Read a user\u2019s lineup.'},
+      {n:'retrieve_tasks',c:'ClickUp',g:[],calls:0,note:'Structured task retrieval.'},
+      {n:'search_workspace',c:'ClickUp',g:[],calls:0,note:'Semantic/keyword workspace search.'},
+      {n:'load_assets',c:'ClickUp',g:[],calls:0,note:'Load full asset/attachment detail.'},
+      {n:'read_memory',c:'ClickUp',g:[],calls:0,note:'Read from memory.'},
+      {n:'save_memory',c:'ClickUp',g:['memory-edit-guard'],calls:0,note:'Write to /PREFERENCES.md.'},
+      {n:'create_artifact',c:'ClickUp',g:['skill-ban-guard','source-size-budget'],calls:0,note:'Create an HTML/SVG artifact via a loaded skill.'},
+      {n:'githubmcp_push_files',c:'GitHub',g:['commit-pre-flight','secrets-pii-guard','source-size-budget','skill-ban-guard','size-sally'],calls:0,note:'Multi-file commit. Most heavily guarded write path.'},
+      {n:'githubmcp_create_or_update_file',c:'GitHub',g:['commit-pre-flight','secrets-pii-guard','source-size-budget','skill-ban-guard'],calls:0,note:'Single-file commit (needs blob SHA to update).'},
+      {n:'githubmcp_get_file_contents',c:'GitHub',g:[],calls:0,note:'Read a file or directory.'},
+      {n:'githubmcp_create_pull_request',c:'GitHub',g:['commit-pre-flight'],calls:0,note:'Open a PR.'},
+      {n:'githubmcp_merge_pull_request',c:'GitHub',g:['post-build-verify'],calls:0,note:'Merge a PR.'},
+      {n:'githubmcp_delete_file',c:'GitHub',g:['commit-pre-flight'],calls:0,note:'Delete a file.'},
+      {n:'githubmcp_create_branch',c:'GitHub',g:[],calls:0,note:'Create a branch.'},
+      {n:'githubmcp_list_branches',c:'GitHub',g:[],calls:0,note:'List branches.'},
+      {n:'githubmcp_list_commits',c:'GitHub',g:[],calls:0,note:'List commits.'},
+      {n:'githubmcp_get_commit',c:'GitHub',g:[],calls:0,note:'Read a commit.'},
+      {n:'githubmcp_list_pull_requests',c:'GitHub',g:[],calls:0,note:'List PRs.'},
+      {n:'githubmcp_pull_request_read',c:'GitHub',g:[],calls:0,note:'Read PR detail.'},
+      {n:'githubmcp_search_code',c:'GitHub',g:[],calls:0,note:'Search code.'},
+      {n:'githubmcp_search_repositories',c:'GitHub',g:[],calls:0,note:'Search repositories.'},
+      {n:'githubmcp_issue_write',c:'GitHub',g:[],calls:0,note:'Create or edit an issue.'},
+      {n:'githubmcp_list_issues',c:'GitHub',g:[],calls:0,note:'List issues.'}
+    ];
+    // ===== render engine =====
+    const groups=document.getElementById('groups'),empty=document.getElementById('empty'),countEl=document.getElementById('count'),
+          titleEl=document.getElementById('title'),subEl=document.getElementById('sub'),filtersEl=document.getElementById('filters');
+    let mode='a',qv='',fv='all';
+    const MODE={
+      a:{title:'Our AI Index',sub:'Tools we authored: hooks, gates, and subagents that fire during normal work. Custom and evolving.',cats:['Hooks','Gates','Subagents'],filters:[['all','All'],['Hook','Hooks'],['Gate','Gates'],['Subagent','Subagents']]},
+      b:{title:'Platform Tools',sub:'The exhaustive, known native tool surface Brain can call across ClickUp + GitHub. Fixed capability set, distinct from our own tools.',cats:['ClickUp','GitHub'],filters:[['all','All'],['guarded','Has safety net'],['unguarded','No coverage']]}
+    };
     function chev(){return '<span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>';}
+    function shield(){return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';}
+    function renderFilters(){filtersEl.innerHTML=MODE[mode].filters.map(([f,l],i)=>'<button data-f="'+f+'"'+(i===0?' class="active"':'')+'>'+l+'</button>').join('');filtersEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{filtersEl.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');fv=b.dataset.f;render();}));}
     function render(){
-      groups.innerHTML='';let total=0;
-      CATS.forEach(cat=>{
-        const items=TOOLS.filter(t=>t.c===cat).filter(t=>{
-          const hay=(t.n+' '+t.note+' '+t.g.map(g=>GUARDS[g]?GUARDS[g].nm:'').join(' ')).toLowerCase();
-          if(qv&&!hay.includes(qv))return false;
-          if(fv==='guarded'&&t.g.length===0)return false;
-          if(fv==='unguarded'&&t.g.length>0)return false;
-          return true;
+      titleEl.textContent=MODE[mode].title;subEl.textContent=MODE[mode].sub;
+      groups.innerHTML='';let total=0,all=0;
+      if(mode==='a'){
+        all=OURS.length;
+        MODE.a.cats.forEach(cat=>{
+          const items=OURS.filter(t=>t.cat===cat).filter(t=>{const hay=(t.n+' '+t.note+' '+t.k).toLowerCase();if(qv&&!hay.includes(qv))return false;if(fv!=='all'&&t.k!==fv)return false;return true;});
+          if(!items.length)return;total+=items.length;
+          const sec=document.createElement('div');sec.className='group';sec.innerHTML='<h2>'+cat+'</h2>';
+          const list=document.createElement('div');list.className='list';
+          items.forEach(t=>{const d=document.createElement('details');d.className='tool';
+            d.innerHTML='<summary><span class="nm">'+t.n+'</span><span class="badge kind">'+t.k+'</span>'+chev()+'</summary><div class="detail"><div class="note">'+t.note+'</div><div class="prof"><a href="'+t.href+'">Open profile →</a></div></div>';
+            list.appendChild(d);});
+          sec.appendChild(list);groups.appendChild(sec);
         });
-        if(!items.length)return;total+=items.length;
-        const sec=document.createElement('div');sec.className='group';
-        sec.innerHTML='<h2>'+cat+'</h2>';
-        const list=document.createElement('div');list.className='list';
-        items.forEach(t=>{
-          const has=t.g.length>0;
-          const d=document.createElement('details');d.className='tool';
-          let guards=has?t.g.map(id=>{const g=GUARDS[id];if(!g)return '';return '<div class="guard"><span class="g-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><div><div class="g-nm">'+g.nm+'</div><div class="g-desc">'+g.desc+' <a href="'+g.href+'">profile</a></div></div></div>';}).join(''):'<div class="nocover">No safety net yet. This tool runs unguarded.</div>';
-          d.innerHTML='<summary><span class="nm">'+t.n+'</span><span class="nets '+(has?'has':'none')+'">'+(has?t.g.length+' net'+(t.g.length>1?'s':''):'0 nets')+'</span><span class="calls">'+t.calls+' calls</span>'+chev()+'</summary><div class="detail"><div class="note">'+t.note+'</div>'+guards+'</div>';
-          list.appendChild(d);
+      }else{
+        all=PLATFORM.length;
+        MODE.b.cats.forEach(cat=>{
+          const items=PLATFORM.filter(t=>t.c===cat).filter(t=>{const hay=(t.n+' '+t.note+' '+t.g.map(g=>GUARDS[g]?GUARDS[g].nm:'').join(' ')).toLowerCase();if(qv&&!hay.includes(qv))return false;if(fv==='guarded'&&t.g.length===0)return false;if(fv==='unguarded'&&t.g.length>0)return false;return true;});
+          if(!items.length)return;total+=items.length;
+          const sec=document.createElement('div');sec.className='group';sec.innerHTML='<h2>'+cat+'</h2>';
+          const list=document.createElement('div');list.className='list';
+          items.forEach(t=>{const has=t.g.length>0;const d=document.createElement('details');d.className='tool';
+            const guards=has?t.g.map(id=>{const g=GUARDS[id];if(!g)return '';return '<div class="guard"><span class="g-ico">'+shield()+'</span><div><div class="g-nm">'+g.nm+'</div><div class="g-desc">'+g.desc+' <a href="'+g.href+'">profile</a></div></div></div>';}).join(''):'<div class="nocover">No safety net yet. This tool runs unguarded.</div>';
+            d.innerHTML='<summary><span class="nm">'+t.n+'</span><span class="badge '+(has?'has':'none')+'">'+(has?t.g.length+' net'+(t.g.length>1?'s':''):'0 nets')+'</span><span class="calls">'+t.calls+' calls</span>'+chev()+'</summary><div class="detail"><div class="note">'+t.note+'</div>'+guards+'</div>';
+            list.appendChild(d);});
+          sec.appendChild(list);groups.appendChild(sec);
         });
-        sec.appendChild(list);groups.appendChild(sec);
-      });
+      }
       empty.style.display=total?'none':'block';
-      countEl.textContent=total+' of '+TOOLS.length+' tools';
+      countEl.textContent=total+' of '+all+' tools';
     }
     document.getElementById('q').addEventListener('input',e=>{qv=e.target.value.trim().toLowerCase();render();});
-    document.querySelectorAll('.bar button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.bar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');fv=b.dataset.f;render();}));
-    render();
+    document.querySelectorAll('.toggle button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.toggle button').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.m;qv='';fv='all';document.getElementById('q').value='';renderFilters();render();}));
+    renderFilters();render();
   </script>
 </body>
 </html>
