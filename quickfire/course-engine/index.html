@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Engine — Blueprint</title>
+<style>
+  :root{
+    --bg:oklch(14% 0.02 265);--surface:oklch(18% 0.02 265);--surface2:oklch(22% 0.022 265);
+    --line:oklch(30% 0.02 265);--text:oklch(93% 0.012 265);--muted:oklch(68% 0.015 265);
+    --gold:oklch(78% 0.13 78);--gold-dim:oklch(78% 0.13 78 / 0.14);
+    --cool:oklch(72% 0.12 235);--cool-dim:oklch(72% 0.12 235 / 0.14);
+    --violet:oklch(74% 0.13 305);--green:oklch(76% 0.13 155);
+    --s1:6px;--s2:12px;--s3:20px;--s4:32px;--s5:52px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Newsreader',Georgia,serif;background:var(--bg);color:var(--text);
+    line-height:1.6;padding:var(--s5) var(--s3);font-size:17px;}
+  .wrap{max-width:760px;margin:0 auto;}
+  h1,h2,h3,h4{font-family:'Fraunces','Georgia',serif;line-height:1.1;letter-spacing:-0.015em;}
+  .kick{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--gold);margin-bottom:var(--s2);}
+  h1{font-size:clamp(2.1rem,6vw,3.2rem);font-weight:600;margin-bottom:var(--s2);}
+  h1 em{font-style:italic;color:var(--gold);}
+  .dek{color:var(--muted);font-size:1.15rem;max-width:58ch;margin-bottom:var(--s3);}
+  .dek b{color:var(--text);font-weight:500;}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;font-family:ui-monospace,monospace;font-size:11px;
+    letter-spacing:0.06em;text-transform:uppercase;margin-bottom:var(--s5);}
+  .tags span{padding:5px 11px;border-radius:100px;border:1px solid var(--line);color:var(--muted);}
+  .tags .hot{border-color:var(--gold);color:var(--gold);}
+  section{margin-bottom:var(--s5);}
+  .num{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--muted);display:block;margin-bottom:6px;}
+  h2{font-size:1.7rem;font-weight:600;margin-bottom:var(--s2);}
+  .lede{color:var(--muted);max-width:64ch;margin-bottom:var(--s3);}
+  .lede b{color:var(--text);font-weight:500;}
+  .split{display:grid;grid-template-columns:1fr auto 1fr;gap:var(--s2);align-items:stretch;margin-top:var(--s3);}
+  @media(max-width:640px){.split{grid-template-columns:1fr;}}
+  .pole{border:1px solid var(--line);border-radius:14px;padding:var(--s3);}
+  .pole.p{background:var(--gold-dim);border-color:var(--gold);}
+  .pole.d{background:var(--cool-dim);border-color:var(--cool);}
+  .pole .t{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;}
+  .p .t{color:var(--gold);}.d .t{color:var(--cool);}
+  .pole h4{font-size:1.15rem;font-weight:600;margin-bottom:6px;}
+  .pole p{font-size:0.95rem;color:var(--muted);}
+  .mid{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);}
+  .mid .a{font-size:1.6rem;}@media(max-width:640px){.mid .a{transform:rotate(90deg);}}
+  .mid small{font-family:ui-monospace,monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;}
+  .list{margin-top:var(--s4);}
+  .lh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-bottom:8px;border-bottom:2px solid var(--c);}
+  .lh h3{font-size:1.4rem;font-weight:600;}
+  .lh .chip{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
+    padding:3px 9px;border-radius:100px;background:var(--c);color:var(--bg);font-weight:700;}
+  .lh .role{margin-left:auto;font-style:italic;color:var(--muted);font-size:0.9rem;}
+  .curr{--c:var(--gold);}.deck{--c:var(--violet);}.sess{--c:var(--cool);}.asset{--c:var(--green);}
+  table{width:100%;border-collapse:collapse;margin-top:var(--s2);font-size:0.94rem;}
+  th{text-align:left;font-family:ui-monospace,monospace;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--muted);padding:0 12px 8px 0;border-bottom:1px solid var(--line);font-weight:400;}
+  td{padding:9px 12px 9px 0;border-bottom:1px solid var(--surface2);vertical-align:top;color:var(--muted);}
+  td:first-child{color:var(--text);font-family:'Fraunces',serif;font-weight:500;white-space:nowrap;}
+  td b{font-family:ui-monospace,monospace;font-size:11px;font-weight:500;padding:2px 7px;border-radius:5px;
+    background:var(--surface2);color:var(--text);white-space:nowrap;}
+  td.rel b{background:var(--gold-dim);color:var(--gold);}
+  .view{margin-top:var(--s2);font-size:0.9rem;color:var(--muted);display:flex;gap:10px;}
+  .view i{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--c);font-style:normal;white-space:nowrap;flex:0 0 auto;padding-top:2px;}
+  .chain{border:1px solid var(--line);border-radius:14px;padding:var(--s3);background:var(--surface);margin-top:var(--s3);}
+  .chain .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .chain .row:last-of-type{border-bottom:0;}
+  .node{font-family:'Fraunces',serif;font-weight:600;font-size:0.85rem;padding:5px 12px;border-radius:100px;color:var(--bg);white-space:nowrap;}
+  .n-c{background:var(--gold);}.n-d{background:var(--violet);}.n-s{background:var(--cool);}.n-a{background:var(--green);}.n-x{background:var(--muted);}
+  .lnk{font-style:italic;color:var(--muted);font-size:0.9rem;}
+  .chain p{margin-top:var(--s2);font-size:0.92rem;color:var(--muted);}
+  .chain p b{color:var(--text);font-weight:500;}
+  .track{display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;margin-top:var(--s3);}
+  .beat{flex:0 0 auto;min-width:78px;border:1px solid var(--line);border-radius:9px;padding:9px;text-align:center;}
+  .beat .n{font-family:ui-monospace,monospace;font-size:10px;color:var(--muted);}
+  .beat .x{font-size:0.8rem;margin-top:3px;}
+  .beat.anc{background:var(--cool-dim);border-color:var(--cool);}
+  .beat.anc .n,.beat.anc .x{color:var(--cool);}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);margin-top:var(--s3);}
+  @media(max-width:640px){.two{grid-template-columns:1fr;}}
+  .opt{border:1px solid var(--line);border-radius:12px;padding:var(--s3);}
+  .opt.pick{border-color:var(--gold);background:var(--gold-dim);}
+  .opt h4{font-size:1.05rem;font-weight:600;margin-bottom:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .opt .b{font-family:ui-monospace,monospace;font-size:9px;letter-spacing:0.06em;text-transform:uppercase;
+    padding:2px 7px;border-radius:100px;background:var(--gold);color:var(--bg);font-weight:700;}
+  .opt p{font-size:0.9rem;color:var(--muted);}.opt .c{margin-top:8px;font-style:italic;font-size:0.85rem;}
+  ol{list-style:none;counter-reset:s;margin-top:var(--s3);}
+  ol li{counter-increment:s;position:relative;padding:11px 0 11px 44px;border-bottom:1px solid var(--surface2);}
+  ol li::before{content:counter(s);position:absolute;left:0;top:10px;width:28px;height:28px;border-radius:50%;
+    background:var(--gold-dim);border:1px solid var(--gold);color:var(--gold);display:grid;place-items:center;
+    font-family:ui-monospace,monospace;font-size:0.8rem;}
+  ol b{font-family:'Fraunces',serif;font-weight:500;color:var(--text);}
+  ol span{display:block;color:var(--muted);font-size:0.92rem;margin-top:2px;}
+  .find{border:1px solid var(--gold);background:var(--gold-dim);border-radius:14px;padding:var(--s3);margin-top:var(--s3);}
+  .find .t{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+  .find ul{list-style:none;}
+  .find li{padding:7px 0;border-bottom:1px dashed var(--line);font-size:0.94rem;}
+  .find li:last-child{border-bottom:0;}.find li b{font-family:'Fraunces',serif;color:var(--text);}
+  footer{margin-top:var(--s5);padding-top:var(--s3);border-top:1px solid var(--line);
+    font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.04em;color:var(--muted);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kick">Course Engine · Planning Blueprint</div>
+  <h1>One vault, one setlist,<br><em>never rebuilt twice.</em></h1>
+  <p class="dek">A relational course system for Intro to Lighting, built so <b>curriculum is permanent</b> and <b>the schedule is disposable</b>. Re-point sessions each term; never recopy a lesson again.</p>
+  <div class="tags"><span class="hot">Folder: Course Engine</span><span>Space: URITP Courses</span><span>Prototype — nothing built yet</span></div>
+
+  <section>
+    <span class="num">01 · The core split</span>
+    <h2>Two clocks. Keep them apart.</h2>
+    <p class="lede">Every past headache came from mixing content that changes yearly with a schedule that reshuffles termly. Split them into separate records; let a join map one onto the other.</p>
+    <div class="split">
+      <div class="pole p"><div class="t">Permanent · rebuilt never</div><h4>Curriculum · Decks · Assets</h4><p>How you teach a topic, the Freeform board that carries it, the fixture photo inside. Notes accumulate here across every semester. A vault.</p></div>
+      <div class="mid"><div class="a">→</div><small>the join</small></div>
+      <div class="pole d"><div class="t">Disposable · rebuilt termly</div><h4>Sessions</h4><p>Dated slots for one semester. They point at the vault, don't contain it. Reshuffle freely; content underneath never moves. Clone last term and adjust.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="num">02 · The lists</span>
+    <h2>Four lists, each with a job.</h2>
+    <p class="lede">Types map straight to ClickUp. <b>Relationship</b> fields are the wiring; prose lives in linked Docs, not descriptions.</p>
+
+    <div class="list curr">
+      <div class="lh"><h3>Curriculum</h3><span class="chip">Permanent</span><span class="role">teachable units + accumulating notes</span></div>
+      <table><tr><th>Field</th><th>Type</th><th>Holds</th></tr>
+        <tr><td>Topic Type</td><td><b>Dropdown</b></td><td>Lecture · Lab · Skill · Assessment</td></tr>
+        <tr><td>Script Doc</td><td><b>URL / Doc</b></td><td>points to the Doc where "what I say" lives. Edit prose there.</td></tr>
+        <tr><td>Running Notes</td><td><b>Long text</b></td><td>after-class jots that pile up over years</td></tr>
+        <tr><td>Phase</td><td><b>Dropdown</b></td><td>Beginnings · Midterm · Advanced (your existing arc tag, kept)</td></tr>
+        <tr><td>On Decks</td><td class="rel"><b>Rel → Decks</b></td><td>which board(s) teach this</td></tr>
+        <tr><td>Appears In</td><td class="rel"><b>Rel → Assets</b></td><td>images/PDFs tied to this topic</td></tr>
+      </table>
+      <div class="view"><i>Default</i><span>List grouped by Topic Type — your master index of what you can teach.</span></div>
+    </div>
+
+    <div class="list deck">
+      <div class="lh"><h3>Decks</h3><span class="chip">Permanent</span><span class="role">Freeform boards, the reusable tracks</span></div>
+      <table><tr><th>Field</th><th>Type</th><th>Holds</th></tr>
+        <tr><td>Blank Version</td><td><b>Attach / URL</b></td><td>teach from + upload to Blackboard</td></tr>
+        <tr><td>Annotated Version</td><td><b>Attach / URL</b></td><td>post-class record, after you've drawn on it</td></tr>
+        <tr><td>Blackboard Status</td><td><b>Dropdown</b></td><td>new · uploaded · needs-update</td></tr>
+        <tr><td>Spans</td><td><b>Number</b></td><td>how many sessions it covers (1, 2, encore)</td></tr>
+        <tr><td>Teaches</td><td class="rel"><b>Rel → Curriculum</b></td><td>topics on this board (many-to-many)</td></tr>
+        <tr><td>Last Taught / Times Used</td><td><b>Date / Num</b></td><td>reuse tracking</td></tr>
+        <tr><td>Changelog</td><td><b>Long text</b></td><td>"added gel-swatch photo after wk3 flopped"</td></tr>
+      </table>
+      <div class="view"><i>Default</i><span>Gallery / Board. Boards are visual — sort by Last Taught to spot what's due a refresh.</span></div>
+    </div>
+
+    <div class="list sess">
+      <div class="lh"><h3>Sessions</h3><span class="chip">Disposable</span><span class="role">dated meetings, one set per term</span></div>
+      <table><tr><th>Field</th><th>Type</th><th>Holds</th></tr>
+        <tr><td>Date</td><td><b>Date</b></td><td>what the calendar reads</td></tr>
+        <tr><td>Seq</td><td><b>Number</b></td><td>order, independent of the calendar</td></tr>
+        <tr><td>Anchor Tag</td><td><b>Dropdown</b></td><td>pre-Hang · Hang week · Performance · pre-Midterm · Strike…</td></tr>
+        <tr><td>Cold Open</td><td><b>Text</b></td><td>the 90-second hook you forget every morning</td></tr>
+        <tr><td>Covers</td><td class="rel"><b>Rel → Curriculum</b></td><td>topics taught this session</td></tr>
+        <tr><td>Using Decks</td><td class="rel"><b>Rel → Decks</b></td><td>board(s) open in class</td></tr>
+        <tr><td>Prep / Blackboard</td><td><b>Checklist / Dropdown</b></td><td>print · build board · reserve; upload status</td></tr>
+        <tr><td>Semester</td><td><b>Dropdown</b></td><td>F26 · S27 — old terms archive, never deleted</td></tr>
+      </table>
+      <div class="view"><i>Default</i><span>Calendar day-to-day; Board grouped by Anchor Tag when planning a term — your draggable whiteboard, finally reusable.</span></div>
+    </div>
+
+    <div class="list asset">
+      <div class="lh"><h3>Assets</h3><span class="chip">Permanent</span><span class="role">one record per image / diagram / PDF</span></div>
+      <table><tr><th>Field</th><th>Type</th><th>Holds</th></tr>
+        <tr><td>File</td><td><b>Attachment</b></td><td>the image itself, stored once</td></tr>
+        <tr><td>Source</td><td><b>Text / URL</b></td><td>origin, credit, license</td></tr>
+        <tr><td>Kind</td><td><b>Dropdown</b></td><td>photo · diagram · plot · handout · scan</td></tr>
+        <tr><td>Used In</td><td class="rel"><b>Rel → Curriculum</b></td><td>every topic (later exam/assignment) it appears in</td></tr>
+      </table>
+      <div class="view"><i>Default</i><span>Gallery. The payoff: open any image, see everywhere it lives. Flags when an exam reuses a lecture image.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="num">03 · The wiring</span>
+    <h2>How the links run.</h2>
+    <p class="lede">Every arrow is a ClickUp Relationship field, bidirectional. Set one side, the other shows automatically.</p>
+    <div class="chain">
+      <div class="row"><span class="node n-s">Session</span><span class="lnk">covers →</span><span class="node n-c">Curriculum</span></div>
+      <div class="row"><span class="node n-s">Session</span><span class="lnk">uses →</span><span class="node n-d">Deck</span></div>
+      <div class="row"><span class="node n-d">Deck</span><span class="lnk">teaches →</span><span class="node n-c">Curriculum</span></div>
+      <div class="row"><span class="node n-a">Asset</span><span class="lnk">appears in →</span><span class="node n-c">Curriculum</span></div>
+      <div class="row"><span class="node n-c">Curriculum</span><span class="lnk">writes out to →</span><span class="node n-x">Script Doc</span></div>
+      <p>One sentence: a <b>Session</b> covers <b>Topics</b>, taught from <b>Decks</b>, which show <b>Assets</b>, while each Topic's prose lives in a <b>Doc</b>. A session with a topic that has no deck = a visible gap. That's your completeness check.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="num">04 · Sequence over calendar</span>
+    <h2>Plan against events, not dates.</h2>
+    <p class="lede">"Never the same number of days before a hang" was the whiteboard problem. So stop counting days: sessions carry <b>Seq</b> + <b>Anchor Tag</b>. Order and event-position stay put even when the calendar shifts.</p>
+    <div class="track">
+      <div class="beat"><div class="n">Seq 1</div><div class="x">Syllabus</div></div>
+      <div class="beat"><div class="n">Seq 2</div><div class="x">Qualities</div></div>
+      <div class="beat"><div class="n">Seq 3</div><div class="x">Fixtures</div></div>
+      <div class="beat anc"><div class="n">Anchor</div><div class="x">Hang P1</div></div>
+      <div class="beat"><div class="n">Seq 4</div><div class="x">Focus/tech</div></div>
+      <div class="beat anc"><div class="n">Anchor</div><div class="x">Perform</div></div>
+      <div class="beat"><div class="n">Seq 5</div><div class="x">Cue writing</div></div>
+      <div class="beat anc"><div class="n">Anchor</div><div class="x">Midterm</div></div>
+    </div>
+    <div class="two">
+      <div class="opt pick"><h4>Define Sequence <span class="b">Picked · v1</span></h4><p>Seq + Anchor Tag. Sessions sort by order; the tag says where in the arc each sits. Term shifts → re-group by anchor and drag. Zero fragile automation.</p><p class="c">Solves ~90% of the whiteboard pain, ships day one.</p></div>
+      <div class="opt"><h4>Auto-move dates</h4><p>Anchors as dated tasks; a formula computes each session date. Move the Hang date, numbers recompute.</p><p class="c">Catch: ClickUp formulas are display-only, can't write the real Date field without an Automation. Fragile. Deferred.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="num">05 · Getting content in</span>
+    <h2>Harvest, don't hand-key.</h2>
+    <p class="lede">The point is streamlining, so we mine existing lists instead of retyping. First target: <b>[124] LECTURE Layouts</b> (39 decks), the spine everything hangs on.</p>
+    <ol>
+      <li><b>Lift the decks.</b><span>Each top-level Lecture Layouts task → a Deck. Its topic subtasks → Curriculum records, linked via Teaches. De-dupes the two overlapping lists in one move.</span></li>
+      <li><b>Split logistics out.</b><span>"Reserve SPAC," "file paperwork," "submit evals" are NOT curriculum → route to the semester ENGL 124 TASKS list. Curriculum shrinks 76 → ~25-30 topics.</span></li>
+      <li><b>Seed Script Docs.</b><span>Prose in the ENGL 124 Notes pages links into each topic's Script Doc field. Written content leaves the monolithic doc.</span></li>
+      <li><b>Pull assets.</b><span>Images embedded in old pages become Asset records, linked to topics. They cross-reference instead of sitting inline.</span></li>
+      <li><b>Stamp one term of Sessions.</b><span>Only after the vault proves out. Empty dated slots, anchor-tagged, pointed at topics + decks. The clone-forward template for every future term.</span></li>
+    </ol>
+  </section>
+
+  <section>
+    <span class="num">06 · Pressure test — "Electrical Theory"</span>
+    <h2>What the real data surfaced.</h2>
+    <p class="lede">Ran one topic through the model against the live task. It held, and got sharper for the bruises.</p>
+    <div class="find">
+      <div class="t">Findings baked into the schema above</div>
+      <ul>
+        <li><b>PART 1 / PART 2 drift, live.</b> Same topic in two lists diverging — exactly what the split kills.</li>
+        <li><b>12 loose attachments</b> on one topic. Vindicates the Assets list hard.</li>
+        <li><b>Blank vs Annotated editions</b> were the miss. Decks now carry both, feeding Blackboard directly.</li>
+        <li><b>Three sequencing signals fought</b> (Phase, Layout Number, dependencies). Kept one: Seq + Anchor on Sessions, Phase on Curriculum. Killed the rest.</li>
+        <li><b>Granularity blessed:</b> Intensity + Electrical Theory = two topics sharing one deck. The join's whole point.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer><span>Course Engine v1 · PR #51</span><span>Blueprint only · nothing built in ClickUp yet</span></footer>
+</div>
+</body>
+</html>
