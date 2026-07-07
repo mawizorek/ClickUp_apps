@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  ============================================================================
+  BRAINCONFIG · TOOLS HUB (toggle shell)
+  ============================================================================
+  Thin wrapper that puts a toggle at the very top and frames the two indexes
+  BELOW it, without editing either one:
+    • Our AI Index   -> index.html      (the authored hooks/gates/subagents;
+                                          left exactly as built, byte-for-byte)
+    • Platform Tools -> tool-index.html (the blue native ClickUp + GitHub view)
+  Both underlying pages are untouched. This shell only owns the toggle bar.
+  ============================================================================
+-->
+<title>Tools · BrainConfig</title>
+<style>
+  :root{--canvas:#0b0b0d;--panel:#17181a;--divider:#26272a;--ink:#e8e8ea;--ink-soft:#9a9ba0;--purple:#8b6df0;--blue:#5b9ae8;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--canvas);color:var(--ink);display:flex;flex-direction:column;}
+  .toggle-bar{flex-shrink:0;display:flex;justify-content:center;padding:12px 16px;border-bottom:1px solid var(--divider);background:var(--canvas);}
+  .toggle{display:inline-flex;background:var(--panel);border:1px solid var(--divider);border-radius:11px;padding:4px;gap:2px;}
+  .toggle button{font:inherit;font-size:.875rem;font-weight:600;color:var(--ink-soft);background:transparent;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;transition:all .14s cubic-bezier(.22,1,.36,1);white-space:nowrap;}
+  .toggle button:hover{color:var(--ink);}
+  .toggle button.active{color:#fff;background:var(--purple);}
+  .toggle button[data-v="b"].active{background:var(--blue);}
+  .frame-wrap{flex:1;min-height:0;}
+  iframe{width:100%;height:100%;border:none;display:block;}
+</style>
+</head>
+<body>
+  <div class="toggle-bar">
+    <div class="toggle">
+      <button data-v="a" class="active">Our AI Index</button>
+      <button data-v="b">Platform Tools</button>
+    </div>
+  </div>
+  <div class="frame-wrap">
+    <iframe id="view" src="./index.html" title="tool index"></iframe>
+  </div>
+  <script>
+    const view=document.getElementById('view');
+    const SRC={a:'./index.html',b:'./tool-index.html'};
+    document.querySelectorAll('.toggle button').forEach(b=>b.addEventListener('click',()=>{
+      document.querySelectorAll('.toggle button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      view.src=SRC[b.dataset.v];
+    }));
+  </script>
+</body>
+</html>
