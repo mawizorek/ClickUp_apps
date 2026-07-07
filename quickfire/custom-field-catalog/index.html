@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  CUSTOM FIELD CATALOG · quickfire index
+  Stored index of custom-field artifacts (write-once audit trail).
+  Portal-row layout (NOT cards) for density. OnTrack-style filter tags:
+  filter by artifact type (dropdown preview / reference doc / checklist).
+  Add one <a class="entry"> per artifact; keep newest at top.
+-->
+<title>Custom Field Catalog</title>
+<style>
+  :root{--canvas:#0b0b0d;--panel:#17181a;--row:#161719;--row-hi:#1f2023;--divider:#26272a;--ink:#e8e8ea;--ink-soft:#9a9ba0;--ink-faint:#6b6c72;--purple:#8b6df0;--tag-drop:#3f5fd0;--tag-doc:#4a9850;--tag-check:#c9a83f;font-synthesis:none;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--canvas);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;padding:48px 20px 64px;}
+  .wrap{max-width:720px;margin:0 auto;}
+  h1{font-size:1.5rem;font-weight:650;letter-spacing:-.02em;margin-bottom:6px;}
+  .sub{color:var(--ink-soft);font-size:.9375rem;margin-bottom:24px;}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .filters button{font:inherit;font-size:.8125rem;font-weight:550;color:var(--ink-soft);background:var(--panel);border:1px solid var(--divider);border-radius:999px;padding:5px 13px;cursor:pointer;transition:all .12s ease;}
+  .filters button:hover{color:var(--ink);border-color:#3a3b3f;}
+  .filters button.active{color:#fff;background:var(--purple);border-color:var(--purple);}
+  .list{display:flex;flex-direction:column;border-top:1px solid var(--divider);}
+  .entry{display:flex;align-items:center;gap:14px;padding:13px 14px;border-bottom:1px solid var(--divider);text-decoration:none;color:inherit;background:var(--row);transition:background .1s ease;}
+  .entry:hover{background:var(--row-hi);}
+  .entry .tag{flex-shrink:0;font-size:.6875rem;font-weight:650;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:5px;min-width:82px;text-align:center;}
+  .tag.drop{background:color-mix(in srgb,var(--tag-drop) 22%,transparent);color:#9db4 f0;color:#a7bdf0;}
+  .tag.doc{background:color-mix(in srgb,var(--tag-doc) 22%,transparent);color:#8fd49a;}
+  .tag.check{background:color-mix(in srgb,var(--tag-check) 22%,transparent);color:#e0c86a;}
+  .entry .body{flex:1;min-width:0;}
+  .entry .title{font-size:.9375rem;font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .entry .meta{font-size:.75rem;color:var(--ink-faint);margin-top:2px;}
+  .entry .chev{color:var(--ink-faint);flex-shrink:0;}
+  .empty{display:none;padding:40px 14px;text-align:center;color:var(--ink-faint);font-size:.875rem;}
+  @media(max-width:520px){body{padding:32px 14px 48px;}.entry .tag{min-width:0;}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Custom Field Catalog</h1>
+    <p class="sub">Stored index of custom-field artifacts. Because dropdown &amp; label fields are write-once, each approved preview is kept here as the permanent build record.</p>
+    <div class="filters">
+      <button data-f="all" class="active">All</button>
+      <button data-f="drop">Dropdown preview</button>
+      <button data-f="doc">Reference doc</button>
+      <button data-f="check">Checklist</button>
+    </div>
+    <div class="list" id="list">
+      <a class="entry" data-type="drop" href="./production-department.html">
+        <span class="tag drop">Dropdown</span>
+        <span class="body"><span class="title">Production Department</span><span class="meta">9 options · URITP Production · approved 2026-07-07</span></span>
+        <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </a>
+    </div>
+    <div class="empty" id="empty">No artifacts with that tag yet.</div>
+  </div>
+  <script>
+    const btns=document.querySelectorAll('.filters button'),entries=document.querySelectorAll('.entry'),empty=document.getElementById('empty');
+    btns.forEach(b=>b.addEventListener('click',()=>{btns.forEach(x=>x.classList.remove('active'));b.classList.add('active');const f=b.dataset.f;let shown=0;entries.forEach(e=>{const on=f==='all'||e.dataset.type===f;e.style.display=on?'':'none';if(on)shown++;});empty.style.display=shown?'none':'block';}));
+  </script>
+</body>
+</html>
