@@ -1,0 +1,25 @@
+{
+  "season": 2026, "round": 7, "slug": "catalunya", "name": "Barcelona-Catalunya Grand Prix", "date": "2026-06-14", "cuTaskId": "86ae52gq5", "version": "2026-07-07",
+  "pole": { "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes" },
+  "summary": "Hamilton's emotional maiden Ferrari win via a VSC-aided three-stop, ending Mercedes' streak. Championship leader Antonelli retired from P2 with ~4 laps to go (electrical shutdown), ending his five-race winning run.",
+  "classification": [
+    { "pos": 1, "driverId": "86ae52rxg", "driver": "Lewis Hamilton", "team": "Ferrari", "status": "FIN", "points": 25 },
+    { "pos": 2, "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "status": "FIN", "points": 18 },
+    { "pos": 3, "driverId": "86ae52q76", "driver": "Lando Norris", "team": "McLaren", "status": "FIN", "points": 15 },
+    { "pos": 4, "driverId": "86ae52rym", "driver": "Max Verstappen", "team": "Red Bull", "status": "FIN", "points": 12 },
+    { "pos": 5, "driverId": "86ae52q7p", "driver": "Oscar Piastri", "team": "McLaren", "status": "FIN", "points": 10 },
+    { "pos": 6, "driverId": "86ae52ryt", "driver": "Isack Hadjar", "team": "Red Bull", "status": "FIN", "points": 8 },
+    { "pos": 7, "driverId": "86ae52rq4", "driver": "Pierre Gasly", "team": "Alpine", "status": "FIN", "points": 6 },
+    { "pos": 8, "driverId": "86ae52rye", "driver": "Liam Lawson", "team": "Racing Bulls", "status": "FIN", "points": 4 },
+    { "pos": 9, "driverId": null, "driver": "Arvid Lindblad", "team": "Racing Bulls", "status": "FIN", "points": 2, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": 10, "driverId": null, "driver": "Franco Colapinto", "team": "Alpine", "status": "FIN", "points": 1, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": 11, "driverId": "86ae52rqp", "driver": "Gabriel Bortoleto", "team": "Audi", "status": "FIN", "points": 0 },
+    { "pos": 12, "driverId": "86ae52rqj", "driver": "Carlos Sainz", "team": "Williams", "status": "FIN", "points": 0 },
+    { "pos": 13, "driverId": "86ae52rxu", "driver": "Esteban Ocon", "team": "Haas", "status": "FIN", "points": 0 },
+    { "pos": 14, "driverId": null, "driver": "Sergio Perez", "team": "Cadillac", "status": "FIN", "points": 0, "_anchor": "UNRESOLVED-DUP" },
+    { "pos": 15, "driverId": "86ae52rxd", "driver": "Charles Leclerc", "team": "Ferrari", "status": "FIN", "points": 0 },
+    { "pos": 16, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "DNF", "points": 0, "stewardNote": "Retired from P2 with ~4 laps to go (electrical shutdown), classified 16th." },
+    { "pos": 17, "driverId": "86ae52rxv", "driver": "Oliver Bearman", "team": "Haas", "status": "FIN", "points": 0 },
+    { "pos": 18, "driverId": "86ae52rqc", "driver": "Alexander Albon", "team": "Williams", "status": "FIN", "points": 0 }
+  ]
+}
