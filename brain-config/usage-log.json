@@ -1,23 +1,26 @@
 {
-  "_schema": "v1",
-  "_note": "Updated at session close. Each key is the tool filename (without .md). Value is cumulative fire count.",
-  "sessions_logged": 2,
-  "last_updated": "2026-07-08",
-  "tools": {
-    "memory-edit-guard": 3,
-    "stale-context-reload": 10,
-    "commit-pre-flight": 17,
-    "link-provenance": 12,
-    "multi-edit-batch-gate": 2,
-    "secrets-pii-guard": 17,
-    "source-size-budget-enforcer": 17,
-    "roster-scan-planner": 2,
-    "agent-invocation-gate": 1,
-    "intent-check": 3,
-    "repo-renata": 0,
-    "workshop-wes": 0,
-    "scout-sage": 0,
-    "closing-clio": 2,
-    "handoff-hana": 1
-  }
+ "_schema": "v1",
+ "_note": "Updated at session close. Each key is the tool filename (without .md). Value is cumulative fire count.",
+ "sessions_logged": 2,
+ "last_updated": "2026-07-08",
+ "tools": {
+ "memory-edit-guard": 3,
+ "stale-context-reload": 5,
+ "commit-pre-flight": 16,
+ "link-provenance": 6,
+ "multi-edit-batch-gate": 3,
+ "secrets-pii-guard": 16,
+ "source-size-budget-enforcer": 16,
+ "skill-ban-guard": 6,
+ "post-build-verify": 1,
+ "artifact-ship-paperwork": 1,
+ "roster-scan-planner": 2,
+ "agent-invocation-gate": 1,
+ "intent-check": 2,
+ "repo-renata": 0,
+ "workshop-wes": 0,
+ "scout-sage": 0,
+ "closing-clio": 1,
+ "handoff-hana": 0
+ }
 }
