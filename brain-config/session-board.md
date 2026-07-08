@@ -30,7 +30,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-*(empty — no agents currently working in the repo)*
+### Brain · app-dashboard retired filter · started 2026-07-07
+
+Adding the **Retired** status + "Show retired" toggle to the app-dashboard v4 launcher. ADDITIVE and scoped to `source/data.js` ONLY (metadata + a post-render augmentation IIFE + runtime-injected CSS). Deliberately NOT touching `index.html` / `render.js` / `app.js`: the read path flattens their inline HTML, so rewriting them risks a regression. Branch `dashboard-retired-filter`.
+
+**Status:** active
 
 ---
 
