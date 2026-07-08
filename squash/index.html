@@ -63,12 +63,12 @@
   .ctl.full { grid-column: 1 / -1; }
   label { font-size: 0.72rem; font-weight: 640; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
   .caprow { display: flex; gap: var(--s2); align-items: stretch; }
-  input[type=number], select {
+  input[type=number], input[type=text], select {
     font: inherit; font-size: 0.95rem; padding: var(--s3) var(--s4);
     background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; color: var(--ink);
     width: 100%; font-variant-numeric: tabular-nums;
   }
-  input[type=number]:focus-visible, select:focus-visible { outline: none; border-color: var(--accent); }
+  input:focus-visible, select:focus-visible { outline: none; border-color: var(--accent); }
   .unit { display: grid; place-items: center; padding: 0 var(--s4); background: var(--sunk);
     border: 1px solid var(--line); border-radius: 10px; color: var(--ink-faint); font-size: 0.85rem;
     font-family: ui-monospace, monospace; flex: none; }
@@ -106,6 +106,13 @@
   .verdict.ok { background: var(--accent-bg); color: var(--accent-ink); }
   .verdict.warn { background: var(--warn-bg); color: var(--warn); }
   .verdict b { font-weight: 700; }
+
+  .namer { margin-top: var(--s4); display: flex; flex-direction: column; gap: var(--s2); }
+  .namebox { display: flex; gap: var(--s2); align-items: stretch; }
+  .namebox input { flex: 1 1 auto; }
+  .ext { display: grid; place-items: center; padding: 0 var(--s4); background: var(--sunk);
+    border: 1px solid var(--line); border-radius: 10px; color: var(--accent-ink); font-size: 0.9rem;
+    font-family: ui-monospace, monospace; flex: none; font-weight: 620; }
 
   .dl { display: block; text-align: center; font-weight: 680; font-size: 0.98rem; text-decoration: none;
     margin-top: var(--s4); padding: var(--s4); border-radius: 12px; border: 1px solid var(--accent);
@@ -165,8 +172,8 @@
         <div class="unit">KB</div>
       </div>
       <div class="presets" id="presets">
-        <button class="preset" data-kb="100">icon 100</button>
-        <button class="preset" data-kb="300">og 300</button>
+        <button class="preset" data-kb="100" data-name="icon">icon 100</button>
+        <button class="preset" data-kb="300" data-name="og">og 300</button>
         <button class="preset" data-kb="500">500</button>
         <button class="preset" data-kb="1000">1 MB</button>
       </div>
@@ -198,6 +205,13 @@
       <div class="stat"><div class="k">Saved</div><div class="v" id="sSaved">—</div><div class="d" id="dSaved"></div></div>
     </div>
     <div class="verdict" id="verdict"></div>
+    <div class="namer">
+      <label for="fname">Output name</label>
+      <div class="namebox">
+        <input type="text" id="fname" placeholder="icon" autocomplete="off" spellcheck="false">
+        <div class="ext" id="ext">.png</div>
+      </div>
+    </div>
     <a class="dl" id="dl" download>Download</a>
   </div>
 
@@ -209,18 +223,22 @@
   </p>
 </div>
 
-<footer id="stamp">Squash v1</footer>
+<footer id="stamp">Squash v2</footer>
 
 <script>
 const $ = s => document.querySelector(s);
 const drop = $('#drop'), fileInput = $('#file'), go = $('#go');
 const capIn = $('#cap'), fmtIn = $('#fmt'), maxdimIn = $('#maxdim');
-let img = null, srcName = '', srcSize = 0;
+const fnameIn = $('#fname'), extEl = $('#ext'), dlEl = $('#dl');
+let img = null, srcName = '', srcSize = 0, lastBlobUrl = null, userTouchedName = false;
 
 const fmtBytes = b =>
   b < 1024 ? b + ' B' :
   b < 1048576 ? (b/1024).toFixed(b < 10240 ? 1 : 0) + ' KB' :
   (b/1048576).toFixed(2) + ' MB';
+
+const extFor = type => type === 'image/jpeg' ? 'jpg' : type.split('/')[1];
+const cleanName = s => (s || '').trim().replace(/\.[^.]+$/, '').replace(/[\/\\:*?"<>|]+/g, '').slice(0, 80);
 
 ['dragover','dragenter'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('over'); }));
 ['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('over'); }));
@@ -233,10 +251,14 @@ document.querySelectorAll('.preset').forEach(p => p.addEventListener('click', ()
   capIn.value = p.dataset.kb;
   document.querySelectorAll('.preset').forEach(x => x.classList.remove('on'));
   p.classList.add('on');
+  if (p.dataset.name && !userTouchedName){ fnameIn.value = p.dataset.name; syncDownload(); }
 }));
 
+fnameIn.addEventListener('input', () => { userTouchedName = true; syncDownload(); });
+fmtIn.addEventListener('change', () => { extEl.textContent = '.' + extFor(fmtIn.value); syncDownload(); });
+
 function loadFile(f){
-  srcName = f.name.replace(/\.[^.]+$/, '');
+  srcName = cleanName(f.name);
   srcSize = f.size;
   const url = URL.createObjectURL(f);
   const im = new Image();
@@ -264,7 +286,6 @@ function drawCanvas(scale){
   return c;
 }
 
-// median-cut palette quantization (real PNG byte reduction)
 function buildPalette(sample, maxDepth){
   const boxes = [];
   (function cut(px, depth){
@@ -371,11 +392,18 @@ async function squash(){
   go.disabled = false; go.textContent = 'Squash it';
 }
 
+function syncDownload(){
+  const ext = extFor(fmtIn.value);
+  extEl.textContent = '.' + ext;
+  const base = cleanName(fnameIn.value) || fnameIn.placeholder || 'image';
+  dlEl.download = base + '.' + ext;
+  if (lastBlobUrl) dlEl.href = lastBlobUrl;
+}
+
 function render(blob, dims, cap, type){
-  const url = URL.createObjectURL(blob);
-  const outImg = $('#out');
-  if (outImg.dataset.url) URL.revokeObjectURL(outImg.dataset.url);
-  outImg.src = url; outImg.dataset.url = url;
+  if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+  lastBlobUrl = URL.createObjectURL(blob);
+  $('#out').src = lastBlobUrl;
 
   $('#sBefore').textContent = fmtBytes(srcSize);
   $('#dBefore').textContent = img.naturalWidth + '×' + img.naturalHeight;
@@ -395,10 +423,9 @@ function render(blob, dims, cap, type){
     v.innerHTML = '<b>Floor reached.</b>&nbsp;Smallest here is ' + fmtBytes(blob.size) + '. Drop the max dimension to go lower.';
   }
 
-  const ext = type.split('/')[1];
-  const dl = $('#dl');
-  dl.href = url;
-  dl.download = srcName + '-' + Math.round(cap/1024) + 'kb.' + (ext==='jpeg'?'jpg':ext);
+  fnameIn.placeholder = srcName || 'image';
+  if (!userTouchedName && !fnameIn.value) fnameIn.value = srcName;
+  syncDownload();
   $('#result').classList.add('show');
 }
 
