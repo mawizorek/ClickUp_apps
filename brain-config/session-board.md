@@ -30,7 +30,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-*(empty — no agents currently working in the repo)*
+### Brain · session F1 standings revert + resegment · started 2026-07-07 21:45
+
+**Status:** active
+
+Reverting the oversized `f1-racetracks/standings.html` (38KB, over the 30KB cap) off main. Rebuilding it segmented (slim loader + source/standings modules under cap). Add-only to f1-racetracks; not touching index.html/data.json/live-tracker.html.
 
 ---
 
