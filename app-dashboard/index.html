@@ -14,12 +14,13 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/app-dashboard/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%82%EF%B8%8F%3C/text%3E%3C/svg%3E">
-<!-- INFRASTRUCTURE: modular. Slim loader + source/{styles,sheet,settings}.css + source/{data,render,sheet,settings,app}.js -->
+<!-- INFRASTRUCTURE: modular. Slim loader + source/{styles,sheet,settings,retired}.css + source/{data,render,sheet,settings,app}.js -->
 <!-- Each source file kept under the ~12KB gate. Engine version + PR live in app.js. Theme: settings gear, persisted to localStorage. -->
 <script>try{if(localStorage.getItem('appDashboard_theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
 <link rel="stylesheet" href="source/styles.css">
 <link rel="stylesheet" href="source/sheet.css">
 <link rel="stylesheet" href="source/settings.css">
+<link rel="stylesheet" href="source/retired.css">
 </head>
 <body>
 <div class="wrap">
@@ -73,6 +74,8 @@
     <button class="chip on" data-filter="all">All</button>
     <button class="chip" data-filter="dashboard">Dashboards</button>
     <button class="chip" data-filter="tool">Tools</button>
+    <span class="chip-sep"></span>
+    <button class="chip retired-chip" id="retiredToggle" aria-pressed="false">Show retired</button>
   </div>
 
   <p class="sec-label" id="secLabel">Apps</p>

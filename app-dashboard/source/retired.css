@@ -1,0 +1,12 @@
+/* app-dashboard — retired-status module. Loaded after styles.css so it leans on the same tokens.
+ Native filter: render.js emits data-status on each .row + a .tag-retired badge; app.js hides
+ data-status="retired" rows (via the existing .hide mechanism in applyFilter) unless the
+ #retiredToggle chip is on. No runtime DOM injection. */
+.chip-sep{width:1px;align-self:center;height:18px;background:var(--hair);flex-shrink:0;margin:0 4px}
+.chip.retired-chip{display:inline-flex;align-items:center;gap:7px}
+.chip.retired-chip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--text-faint);transition:background 150ms var(--e)}
+.chip.retired-chip.on{background:transparent;color:var(--red);border-color:var(--red)}
+.chip.retired-chip.on::before{background:var(--red)}
+.row[data-status="retired"]{opacity:0.5}
+.row[data-status="retired"]:hover{opacity:0.92}
+.tag-retired{color:var(--red);background:oklch(24% 0.05 25)}
