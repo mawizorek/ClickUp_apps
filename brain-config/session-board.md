@@ -30,11 +30,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · app-dashboard retired filter · started 2026-07-07
-
-Adding the **Retired** status + "Show retired" toggle to the app-dashboard v4 launcher. ADDITIVE and scoped to `source/data.js` ONLY (metadata + a post-render augmentation IIFE + runtime-injected CSS). Deliberately NOT touching `index.html` / `render.js` / `app.js`: the read path flattens their inline HTML, so rewriting them risks a regression. Branch `dashboard-retired-filter`.
+### Brain · session F1 standings lens · started 2026-07-07 21:38 (last update 21:38)
 
 **Status:** active
+
+Adding a NEW sibling file `f1-racetracks/standings.html` (championship points matrix lens). ADD-ONLY: not touching index.html, data.json, live-tracker.html, or source/. If you're in the f1-racetracks app engine, we won't collide, but heads up I'm adding one file to that folder.
 
 ---
 
