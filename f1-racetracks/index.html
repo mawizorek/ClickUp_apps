@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!--
+  F1 Racetracks / index.html
+  ROLE: Pure serving shell + router. Stores NO servable page of its own.
+  It resolves an incoming hash to the correct page and forwards.
+  Flip the default landing page by changing DEFAULT_PAGE (one line).
+
+  Routing:
+    #circuits          -> circuits.html          (circuit index)
+    #/<slug>           -> circuits.html#/<slug>   (preserves F1 Races deep links)
+    (anything else)    -> DEFAULT_PAGE            (standings, current default)
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>F1 &middot; loading</title>
+  <style>
+    html { background:#13161d; }
+    body {
+      margin:0; min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      font:500 14px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      color:#8b93a3; background:#13161d;
+    }
+    .r { opacity:.7; letter-spacing:.04em; }
+  </style>
+</head>
+<body>
+  <div class="r">routing&hellip;</div>
+  <script>
+    // Single source of truth for the landing page. Flip here to change default.
+    var DEFAULT_PAGE = 'standings.html';
+
+    (function () {
+      var h = location.hash || '';
+
+      // Circuit index request.
+      if (h === '#circuits' || h === '#/circuits') {
+        location.replace('circuits.html');
+        return;
+      }
+
+      // Circuit deep link: #/<slug> -> forward hash intact to the circuit app.
+      if (/^#\/.+/.test(h)) {
+        location.replace('circuits.html' + h);
+        return;
+      }
+
+      // Default landing.
+      location.replace(DEFAULT_PAGE);
+    })();
+  </script>
+  <noscript>
+    <p>Enable JavaScript, or go straight to
+      <a href="standings.html">standings</a> /
+      <a href="circuits.html">circuits</a>.</p>
+  </noscript>
+</body>
+</html>
