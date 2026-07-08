@@ -30,9 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session standings-nav · started 2026-07-08 00:49 ET (last update 00:49)
-
-**Status:** active — building the standings→circuits navigation. Adding a masthead lens switcher (Standings · Circuits + jump-to-round) and an in-panel "circuit guide" connector on the race brief. Touching `f1-racetracks/standings.html` (one added `<script>` line) and NEW `f1-racetracks/source/standings/nav.js` only. NOT touching data.js / matrix.js / trajectory.js / panel.js or circuits.html. Branch `standings-nav-connector`.
+*(empty — no agents currently working in the repo)*
 
 ---
 
