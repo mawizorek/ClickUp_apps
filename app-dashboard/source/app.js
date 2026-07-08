@@ -2,7 +2,7 @@
  render.js (list rendering), sheet.js (detail sheet), settings.js (theme/drawer). Load order:
  data → render → sheet → settings → app. */
 const APP_VERSION = 'v4';
-const APP_PR = '66'; // stamped with the PR number that shipped this build
+const APP_PR = '72'; // stamped with the PR number that shipped this build
 const OWNER = 'mawizorek';
 const REPO = 'ClickUp_apps';
 const PAGES_BASE = 'https://' + OWNER + '.github.io/' + REPO;
