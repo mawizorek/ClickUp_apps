@@ -1,9 +1,9 @@
 {
-  "access": "gated",
-  "code": "2026",
-  "coverTitle": "Under maintenance",
-  "coverMessage": "This app is being updated. Check back soon.",
-  "downTitle": "Temporarily offline",
-  "downMessage": "This app is currently unavailable.",
-  "version": "2026-07-07"
+ "access": "open",
+ "code": "2026",
+ "coverTitle": "Under maintenance",
+ "coverMessage": "This app is being updated. Check back soon.",
+ "downTitle": "Temporarily offline",
+ "downMessage": "This app is currently unavailable.",
+ "version": "2026-07-08"
 }
