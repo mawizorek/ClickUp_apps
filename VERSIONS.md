@@ -14,7 +14,7 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 
 | App (slug) | Current version | Status | Last PR / notes |
 | --- | --- | --- | --- |
-| `prism` | v1 | live | Data App Viewer (JSON + Markdown). Initial build PR #54. |
+| `prism` | v2 | live | Data App Viewer (JSON + Markdown). Mobile export bottom-sheet + real-tab CSV delimiter fix, `?v=` cache-bust tokens added (PR #78). Initial build PR #54. |
 | `app-dashboard` | v4 launcher + native Retired filter | live | Slim launcher: per-app icons, ClickUp/FileMaker toggle, Brain Config hub, detail sheet, settings gear. `index.html` = thin loader over `source/` modules. Native Retired filter (PR #72). PR #74 added `?v=` cache-busting to all source loads (browsers were serving stale app.js) and fixed the footer stamp to PR #72. **Bump the `?v=` token in index.html on every future source change.** |
 | `markdown-viewer` | — | retired | Superseded by `prism`. `status:'retired'` in app-dashboard; hidden by default behind the Show-retired toggle. README is a redirect/history stub. Do not develop. |
 | `file-chunker` | unverified (last known v16.2, 2026-07-01) | live | Verify against commit history before next PR. |
