@@ -35,6 +35,7 @@ _Queued features with enough detail for sequencing and cold-pickup. Promote to N
 
 _Standing constraints for this app that every build must respect._
 
+- **Index = pointer, not a store (LOCKED 2026-07-08).** `index.html` must stay a thin shell/router that references source pages; the instant a second servable page/view exists it becomes the dispatcher (real pages = their own named files, default landing = a one-line constant it can repoint without a rebuild). Never grow `index.html` into a multi-page store. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.
 - Spot edits should start from `/source`, not from `index.html`.
 - Keep semantic source files near the ~10–12 KB soft target and split at ~15 KB unless explicitly approved otherwise.
 - _(Add app-specific budget-watch files, architecture notes, or "do NOT" rules here.)_
