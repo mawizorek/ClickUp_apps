@@ -1,5 +1,10 @@
 # <app-slug> — next build brief
 
+> **☐ OPEN WORK ITEM — redesign `index.html` into a pointer, not content.**
+> Any agent opening this app: treat this as ACTIVE WORK, not a passive rule. Refactor `index.html` into a thin pointer/router that references source pages/modules instead of storing servable content. If it's already a pure shell, verify and check the box. **Check it off when done for this app** — then it clears.
+>
+> - [ ] `index.html` redesigned into a pointer/router (not a content store)
+
 ## Source location
 
 - Runtime app: `<app-slug>/index.html`
@@ -35,7 +40,7 @@ _Queued features with enough detail for sequencing and cold-pickup. Promote to N
 
 _Standing constraints for this app that every build must respect._
 
-- **Index = pointer, not a store (LOCKED 2026-07-08).** `index.html` must stay a thin shell/router that references source pages; the instant a second servable page/view exists it becomes the dispatcher (real pages = their own named files, default landing = a one-line constant it can repoint without a rebuild). Never grow `index.html` into a multi-page store. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.
 - Spot edits should start from `/source`, not from `index.html`.
 - Keep semantic source files near the ~10–12 KB soft target and split at ~15 KB unless explicitly approved otherwise.
+- Once the index-pointer work item above is checked off, keep it that way: `index.html` stays a thin shell/router, never grows back into a multi-page store. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.
 - _(Add app-specific budget-watch files, architecture notes, or "do NOT" rules here.)_

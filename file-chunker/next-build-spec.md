@@ -1,5 +1,11 @@
 # File Chunker — Next Build Spec
 
+> **☐ OPEN WORK ITEM — redesign `index.html` into a pointer, not content.**
+> Any agent opening this app: treat this as ACTIVE WORK, not a passive rule. Refactor `index.html` into a thin pointer/router that references source pages/modules instead of storing servable content. **Check it off when done for this app** — then it clears.
+> _Current state: `index.html` is a ~108KB monolith — a major offender. The base64 chunk set in `source/` is a readback aid, not the pointer split. High priority._
+>
+> - [ ] `index.html` redesigned into a pointer/router (not a content store)
+
 **Rolling canonical spec for the next File Chunker build.** Version-agnostic filename on purpose: this file is always "what's queued next," overwritten each build rather than renamed. (Same lesson the current build enforces: don't bake the version into the name.)
 
 - **Repo:** `mawizorek/ClickUp_apps` (branch `main`)
@@ -45,9 +51,3 @@ Two bugs, one root cause (values inlined instead of named once):
 ### Do NOT break (carry over from v18 verbatim)
 
 Gated one-chunk-at-a-time walk + mandatory final pause · two-layer UUID integrity · base64 armor (default ON in repo mode) · self-navigation · content-based `github-folder` auto-detect · three-path source recovery · localStorage settings + config panel · debug mode · >8-chunk flag · two-file source download · v18 additions (live GitHub header link, `<app-slug>/source/` zip structure, `v18-ChunkerReport.md`, `source_index.html`).
-
----
-
-## Index = pointer, not a store (LOCKED 2026-07-08, standing)
-
-`index.html` is an INDEX: a thin shell/router that references source pages, never a file that itself stores a full servable page. The moment this app has more than one servable page/view, `index.html` becomes the dispatcher that points at them (real pages live as their own named files; the default landing is a one-line constant it can repoint without a rebuild). Keep the shell well under the read cap and never grow `index.html` into a multi-page store. Mirror of the locked rule in the Apps / HTML Artifacts standard + GitHub MCP Operating Standard.
