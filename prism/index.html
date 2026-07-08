@@ -111,7 +111,7 @@
   fetch("./config.json", { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); }).catch(function () { var cached = null; try { cached = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(cached || FALLBACK); });
 })();
 </script>
-<script>document.getElementById("stamp").textContent = "Prism v2.2 \u00b7 PR #PENDING";</script>
+<script>document.getElementById("stamp").textContent = "Prism v2.2 \u00b7 PR #84";</script>
 <script src="prism.json.js?v=4"></script>
 <script src="prism.md.js?v=4"></script>
 <script src="prism.core.js?v=4"></script>
