@@ -30,9 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session prism-v2.2-buttonup · started 2026-07-07 23:56 (last update 23:56)
-
-**Status:** active — Prism button-up pass: unlock (config.json access open), add drawer version/PR stamp (index.html + prism.core.js + prism.css), Infrastructure table + v2.2 in README, bump ?v=4. Icon package (og.png/icon.png) generated for hand-upload. Touching all prism/ files except the lens JS.
+*(empty — no agents currently working in the repo)*
 
 ---
 
