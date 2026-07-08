@@ -1,7 +1,7 @@
 /* Inciardi Market — engine. Reads market.json (eBay prices) + catalog.json (master + machines). */
 
-const BUILD = "v4";
-const PR = 91; // merged PR that shipped this version
+const BUILD = "v5";
+const PR = 92; // merged PR that shipped this version
 
 const MARKET_FALLBACK = { version:"sample", source:"sample", baseline:{ retailDefault:14, currency:"USD" }, listings:[
   { itemId:"a", title:"Anastasia Inciardi Mini Print — Negroni", price:9.5, shipping:0, landed:9.5, condition:"New", buyingOptions:["FIXED_PRICE"], url:"https://www.ebay.com/itm/156812754385", image:null, seller:"printfan_me", status:"new", firstSeen:"2026-07-06", print:{name:"Negroni",exclusive:null,matched:true}, flags:["underpriced"], priceHistory:[{t:"2026-07-06",landed:9.5}] },
@@ -170,11 +170,11 @@ function renderStock(){
     const gain = (mkt && s.paid) ? mkt - s.paid : null;
     return `<div class="stockrow">
       <div class="thumb" style="background:${thumbBg(cat?cat.category:"mini")};color:${thumbInk(cat?cat.category:"mini")}">${initials(s.name)}</div>
-      <div><div style="font-weight:600;font-size:0.88rem">${esc(s.name)}</div>
+      <div><div style="font-weight:600;font-size:0.86rem">${esc(s.name)}</div>
         <div class="d-meta">${esc(s.condition||"—")}${s.paid?` <span class="sep">·</span> paid ${money(s.paid)}`:""}${excl?` <span class="sell-flag">sell signal</span>`:""}</div></div>
-      <div class="d-price"><div class="landed">${mkt?money(mkt):"—"}</div>
-        <div class="sub-price">${mkt?"market low":"not listed"}</div></div>
-      ${gain!==null?`<div class="delta ${gain>=0?"up":"down"}">${gain>=0?"+":""}${money(gain)}<span class="dsub">unreal.</span></div>`:`<div class="delta flat">—</div>`}
+      <div class="d-rail"><div class="landed">${mkt?money(mkt):"—"}</div>
+        <div class="sub-price">${mkt?"market low":"not listed"}</div>
+        ${gain!==null?`<div class="delta ${gain>=0?"up":"down"}">${gain>=0?"+":""}${money(gain)}</div>`:""}</div>
       <button class="rm" data-i="${i}" aria-label="Remove"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`;
   }).join("");
   panel.innerHTML = `<p class="section-lead">Prints you own, marked to the live eBay market. Stored on this device only. Exclusives flag a <b>sell signal</b> when the market runs hot.</p>
@@ -250,17 +250,16 @@ function dealCard(l, v){
       <div class="d-meta">${l.print&&l.print.matched?esc(l.print.name):"unmatched"} <span class="sep">·</span> ${esc(l.condition||"")} <span class="sep">·</span> ${esc(l.seller||"?")}</div>
       <div class="badges"><span class="badge b-${l.status}">${l.status}</span>${(l.flags||[]).map(f=>`<span class="badge b-${f}">${f.replace("-"," ")}</span>`).join("")}</div>
     </div>
-    <div class="d-price">
+    <div class="d-rail">
       <div class="landed">${money(l.landed)}</div>
       <div class="sub-price">${l.shipping?"+"+money(l.shipping)+" ship":"free ship"}</div>
+      <div class="railrow"><span class="delta ${d.cls}">${d.txt}</span><span class="rating ${RATING_CLASS[dv.k]}">${RATING_LABEL[dv.k]}</span></div>
     </div>
-    <div class="delta ${d.cls}">${d.txt}<span class="dsub">${d.sub}</span></div>
-    <div class="rating ${RATING_CLASS[dv.k]}">${RATING_LABEL[dv.k]}</div>
   </article>`;
 }
 function sellRow(l){
   const hist = (l.priceHistory||[]).map(h=>h.landed), max = Math.max(...hist, 1);
-  const bars = hist.map(h => `<span style="height:${Math.max(10, h/max*28)}px"></span>`).join("");
+  const bars = hist.map(h => `<span style="height:${Math.max(10, h/max*24)}px"></span>`).join("");
   const trend = hist.length>1 ? (hist[hist.length-1]<hist[0]?{c:"down",t:"▼ dropping"}:hist[hist.length-1]>hist[0]?{c:"up",t:"▲ climbing"}:{c:"",t:"flat"}) : null;
   return `<article class="sell-row">
     <div>
