@@ -30,7 +30,9 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-*(empty — no agents currently working in the repo)*
+### Brain · session 2026-07-07 night · started 22:57 (last update 22:57)
+
+**Status:** active — Prism v2: mobile export bottom-sheet + tab-delimiter fix. Adding `prism/prism.mobile.js` and editing `prism/index.html` (new script include + `?v=2` cache-bust tokens). NOT touching prism.css / prism.core.js / lens files. Will bump `VERSIONS.md` prism row on PR.
 
 ---
 
