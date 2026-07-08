@@ -2,51 +2,501 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0e12">
-<title>World Cup 2026 Bracket</title>
-<meta name="description" content="Live FIFA World Cup 2026 knockout bracket & schedule tracker \u2014 results, matchups, and each team's path to the Final.">
-<meta name="robots" content="noindex, nofollow">
-
-<!-- Open Graph (link preview when shared) -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="World Cup 2026 Bracket">
-<meta property="og:description" content="Live knockout bracket & schedule tracker \u2014 results, matchups, and each team's path to the Final.">
-<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/">
-<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-
-<!-- Twitter / Slack / Discord card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="World Cup 2026 Bracket">
-<meta name="twitter:description" content="Live knockout bracket & schedule tracker \u2014 results, matchups, and each team's path to the Final.">
-<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/og.png">
-
-<!-- PWA install -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FIFA World Cup 2026</title>
+<meta name="theme-color" content="#0a0d12">
+<meta name="description" content="FIFA World Cup 2026 — live bracket & schedule, kickoff times auto-shown in your local timezone.">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WC 2026">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.png">
-<link rel="icon" href="./icon.svg">
-
+<meta property="og:title" content="FIFA World Cup 2026">
+<meta property="og:description" content="Live bracket & schedule — kickoff times in your local zone.">
+<meta property="og:image" content="./og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- INFRASTRUCTURE: multi-file (thin shell + source/*.js ES modules + data.json). -->
-<!-- Engine change = version bump. Data change = commit data.json only. Each source file kept under 12KB. -->
-<link rel="stylesheet" href="./source/styles.css">
-<link rel="stylesheet" href="./source/bracket.css">
-<link rel="stylesheet" href="./source/sheet.css">
 <style>
-  /* access gate (cosmetic private-share cover) */
-  #access-gate { position: fixed; inset: 0; z-index: 100; background: var(--bg, #0a0e12); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; }
-  #access-gate h2 { font-size: 1.25rem; font-weight: 800; color: #f0f3f5; letter-spacing: -0.02em; }
-  #access-gate p { font-size: 0.875rem; color: #9aa3ab; max-width: 300px; }
-  #gate-form { display: flex; gap: 8px; }
-  #gate-code { width: 130px; padding: 11px 14px; font-size: 1rem; text-align: center; letter-spacing: 0.2em; border-radius: 8px; border: 1px solid #2b3138; background: #16191d; color: #f0f3f5; }
-  #gate-form button { padding: 11px 18px; font-size: 0.875rem; font-weight: 700; border: none; border-radius: 8px; background: oklch(75% 0.18 155); color: #05100a; cursor: pointer; }
+  :root {
+    --bg: oklch(10% 0.012 250);
+    --surface-1: oklch(16% 0.01 250);
+    --surface-2: oklch(21% 0.008 250);
+    --surface-3: oklch(26% 0.006 250);
+    --text: oklch(94% 0.006 250);
+    --text-mid: oklch(78% 0.008 250);
+    --text-muted: oklch(62% 0.01 250);
+    --text-dim: oklch(48% 0.008 250);
+    --accent: oklch(75% 0.18 155);
+    --accent-surface: oklch(20% 0.05 155);
+    --live: oklch(70% 0.22 25);
+    --live-surface: oklch(20% 0.06 25);
+    --gold: oklch(82% 0.15 85);
+    --gold-surface: oklch(20% 0.05 85);
+    --winner-bg: oklch(18% 0.03 155);
+    --loser-text: oklch(42% 0.008 250);
+    --border: oklch(28% 0.006 250);
+    --border-light: oklch(32% 0.005 250);
+    --connector: oklch(35% 0.01 250);
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100svh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'tnum';
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+  }
+
+  .header-top h1 {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .view-toggle {
+    display: flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .view-btn {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 150ms var(--ease-out);
+  }
+
+  .view-btn.active {
+    background: var(--accent-surface);
+    color: var(--accent);
+    border: 1px solid oklch(35% 0.08 155);
+    border-radius: 6px;
+  }
+
+  .updated-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px;
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .updated-label {
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .updated-value {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .updated-value.fresh {
+    color: var(--accent);
+  }
+
+  .tz-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-dim);
+  }
+
+  .tz-note .tz-dot { color: var(--accent); font-size: 0.75rem; line-height: 1; }
+  .tz-note .tz-abbr { color: var(--accent); font-weight: 700; }
+
+  .schedule-view, .bracket-view {
+    display: none;
+  }
+  .schedule-view.active, .bracket-view.active {
+    display: block;
+  }
+
+  .time-nav {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 12px 16px;
+    gap: 6px;
+  }
+  .time-nav::-webkit-scrollbar { display: none; }
+
+  .time-btn {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 150ms var(--ease-out);
+    white-space: nowrap;
+  }
+
+  .time-btn:hover {
+    border-color: var(--border-light);
+    color: var(--text-mid);
+  }
+
+  .time-btn.active {
+    background: var(--surface-3);
+    border-color: var(--text-muted);
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .time-btn .ct {
+    color: var(--text-dim);
+    margin-left: 4px;
+  }
+
+  .schedule-content {
+    padding: 0 16px 100px;
+  }
+
+  .day-group {
+    margin-bottom: 24px;
+  }
+
+  .day-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .day-label .date {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .day-label .relative {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-surface);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid oklch(30% 0.06 155);
+  }
+
+  .day-label .round-tag {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+
+  .day-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .match {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .match.is-live {
+    border-color: var(--live);
+    box-shadow: 0 0 16px oklch(50% 0.12 25 / 0.15);
+  }
+
+  .match-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .match-top .info {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .match-top .badge {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .badge.ft { color: var(--accent); background: var(--accent-surface); border: 1px solid oklch(30% 0.06 155); }
+  .badge.aet { color: var(--gold); background: var(--gold-surface); border: 1px solid oklch(30% 0.06 85); }
+  .badge.pso { color: var(--gold); background: var(--gold-surface); border: 1px solid oklch(30% 0.06 85); }
+  .badge.live { color: var(--live); background: var(--live-surface); border: 1px solid oklch(30% 0.08 25); animation: pulse 2s infinite; }
+  .badge.upcoming { color: var(--text-mid); background: var(--surface-3); border: 1px solid var(--border-light); }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+
+  .match-teams {
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 7px;
+    border-radius: 6px;
+  }
+
+  .team.w { background: var(--winner-bg); }
+  .team.l .t-name { color: var(--loser-text); }
+  .team.l .t-score { color: var(--loser-text); }
+
+  .t-code {
+    width: 28px;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .t-name {
+    flex: 1;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .t-score {
+    font-size: 0.9375rem;
+    font-weight: 800;
+    min-width: 16px;
+    text-align: right;
+  }
+
+  .team.w .t-score { color: var(--accent); }
+
+  .match-note {
+    padding: 0 10px 8px;
+    font-size: 0.6875rem;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .match.tbd .t-name {
+    color: var(--text-dim);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .bracket-view {
+    padding: 16px;
+    padding-bottom: 100px;
+    overflow-x: auto;
+  }
+
+  .bracket-scroll {
+    min-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 20px;
+  }
+
+  .bracket-container {
+    display: flex;
+    gap: 6px;
+    min-width: max-content;
+    align-items: flex-start;
+  }
+
+  .bracket-round {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 130px;
+  }
+
+  .bracket-round-label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 6px 0 8px;
+    position: sticky;
+    top: 0;
+  }
+
+  .bracket-match {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0;
+    overflow: hidden;
+    margin-bottom: 2px;
+  }
+
+  .bracket-match.completed { border-color: var(--border-light); }
+  .bracket-match.is-final { border-color: var(--gold); box-shadow: 0 0 8px oklch(70% 0.1 85 / 0.1); }
+
+  .bm-team {
+    display: flex;
+    align-items: center;
+    padding: 5px 8px;
+    gap: 6px;
+    border-bottom: 1px solid oklch(24% 0.005 250);
+  }
+
+  .bm-team:last-child { border-bottom: none; }
+
+  .bm-team.w { background: var(--winner-bg); }
+  .bm-team.l .bm-name { color: var(--loser-text); }
+
+  .bm-code {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    width: 22px;
+  }
+
+  .bm-name {
+    flex: 1;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bm-score {
+    font-size: 0.75rem;
+    font-weight: 800;
+    min-width: 14px;
+    text-align: right;
+  }
+
+  .bm-team.w .bm-score { color: var(--accent); }
+  .bm-team.l .bm-score { color: var(--loser-text); }
+
+  .bm-status {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 2px;
+    letter-spacing: 0.04em;
+    color: var(--text-dim);
+    background: var(--surface-2);
+  }
+
+  .bm-status.done { color: var(--accent); }
+  .bm-status.pen { color: var(--gold); }
+
+  .bracket-spacer {
+    height: 4px;
+  }
+
+  .bracket-connectors {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 16px;
+    min-width: 16px;
+    position: relative;
+  }
+
+  .connector-pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+    position: relative;
+  }
+
+  .connector-pair::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    bottom: 25%;
+    width: 1px;
+    background: var(--connector);
+  }
+
+  .connector-pair::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 8px;
+    height: 1px;
+    background: var(--connector);
+  }
+
+  .trophy {
+    text-align: center;
+    font-size: 1.5rem;
+    padding: 8px 0;
+  }
+
+  .loading-msg {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 640px) {
+    .schedule-content { max-width: 480px; margin: 0 auto; }
+    .bracket-round { min-width: 150px; }
+  }
 </style>
 </head>
 <body>
@@ -60,76 +510,300 @@
   </div>
   <div class="updated-bar">
     <span class="updated-label">Data updated</span>
-    <span class="updated-value" id="updatedTime">loading&#8230;</span>
+    <span class="updated-value" id="updatedTime">loading...</span>
   </div>
+  <div class="tz-note" id="tzNote"></div>
 </header>
 
-<div class="schedule-view active" id="scheduleView">
-  <div class="time-nav" id="timeNav"></div>
-  <div class="schedule-content" id="scheduleContent">
-    <div class="loading-msg">Loading match data&#8230;</div>
-  </div>
-</div>
-
-<div class="bracket-view" id="bracketView">
-  <div class="bracket-hint">Tap a match for details &middot; tap teams' &#8594; to compare up to 4 paths &middot; &#9876; marks where they collide</div>
-  <div class="path-legend" id="pathLegend" hidden></div>
-  <div class="bracket-scroll">
-    <div class="bracket-container" id="bracketContent"></div>
-  </div>
-</div>
-
-<footer class="app-footer" id="appFooter"></footer>
-
-<div class="sheet-scrim" id="sheetScrim"></div>
-<div class="detail-sheet" id="detailSheet" role="dialog" aria-modal="true" aria-hidden="true"></div>
-
-<!-- access gate cover (shown by the script below when gated) -->
-<div id="access-gate" hidden>
-  <h2 id="gate-title">World Cup 2026</h2>
-  <p id="gate-msg">Enter the family code to view the bracket.</p>
-  <form id="gate-form">
-    <input id="gate-code" type="text" inputmode="numeric" autocomplete="off" aria-label="Access code" placeholder="code">
-    <button type="submit">Enter</button>
-  </form>
-</div>
-
-<noscript><div class="loading-msg">This app needs JavaScript enabled to run.</div></noscript>
+<main>
+  <section class="schedule-view active" id="scheduleView">
+    <div class="time-nav" id="timeNav"></div>
+    <div class="schedule-content" id="scheduleContent">
+      <div class="loading-msg">Loading match data...</div>
+    </div>
+  </section>
+  <section class="bracket-view" id="bracketView">
+    <div class="bracket-scroll">
+      <div class="bracket-container" id="bracketContent">
+        <div class="loading-msg">Loading match data...</div>
+      </div>
+    </div>
+  </section>
+</main>
 
 <script>
-(function () {
-  // Cosmetic private-share cover. Not security \u2014 keeps casual eyes out; data is public soccer results only.
-  var FALLBACK = { access: "gated", code: "2026",
-    coverTitle: "World Cup 2026", coverMessage: "Enter the family code to view the bracket.",
-    downTitle: "Temporarily offline", downMessage: "This app is currently unavailable." };
-  var SS_KEY = "gate_ok";
-  function apply(cfg) {
-    var gate = document.getElementById("access-gate");
-    if (cfg.access === "open" || sessionStorage.getItem(SS_KEY) === "1") { gate.remove(); return; }
-    gate.hidden = false;
-    var form = document.getElementById("gate-form");
-    if (cfg.access === "down") {
-      document.getElementById("gate-title").textContent = cfg.downTitle || FALLBACK.downTitle;
-      document.getElementById("gate-msg").textContent = cfg.downMessage || FALLBACK.downMessage;
-      form.style.display = "none"; return;
-    }
-    document.getElementById("gate-title").textContent = cfg.coverTitle || FALLBACK.coverTitle;
-    document.getElementById("gate-msg").textContent = cfg.coverMessage || FALLBACK.coverMessage;
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (document.getElementById("gate-code").value.trim() === String(cfg.code)) {
-        sessionStorage.setItem(SS_KEY, "1"); gate.remove();
-      } else { var c = document.getElementById("gate-code"); c.value = ""; c.focus(); }
-    });
-    var el = document.getElementById("gate-code"); if (el) el.focus();
-  }
-  fetch("./config.json", { cache: "no-store" })
-    .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-    .then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); })
-    .catch(function () { var cached = null; try { cached = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(cached || FALLBACK); });
-})();
-</script>
+  const APP_VERSION = 'v1.4';
+  const DATA_URL = './data.json';
+  const CACHE_KEY = 'world-cup-bracket-data';
+  const REPO_OWNER = 'mawizorek';
+  const REPO_NAME = 'ClickUp_apps';
+  const DATA_PATH = 'world-cup-bracket/data.json';
 
-<script type="module" src="./source/app.js"></script>
+  // Match kickoff times in data.json are authored in US Eastern (ET).
+  // The whole tournament (Jun-Jul 2026) runs on EDT = UTC-04:00.
+  const SOURCE_TZ_OFFSET = '-04:00';
+  const VIEWER_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  let allMatches = [];
+
+  // Convert an ET kickoff ("H:MM AM/PM" on match.day) into the viewer's local time.
+  function localTime(m) {
+    if (!m.time || m.time === 'TBD') return 'TBD';
+    const t = m.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!t) return m.time;
+    let h = parseInt(t[1], 10);
+    const min = t[2];
+    const ap = t[3].toUpperCase();
+    if (ap === 'PM' && h !== 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    const iso = `${m.day}T${String(h).padStart(2, '0')}:${min}:00${SOURCE_TZ_OFFSET}`;
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return m.time;
+    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZoneName: 'short' });
+  }
+
+  function setTzNote() {
+    const el = document.getElementById('tzNote');
+    if (!el) return;
+    const abbr = (new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }).split(' ').pop()) || VIEWER_TZ;
+    el.innerHTML = `<span class="tz-dot">\u25F7</span> Kickoff times shown in your local zone \u00B7 <span class="tz-abbr">${abbr}</span>`;
+  }
+
+  // Fetch last commit date for data.json from GitHub API
+  async function fetchLastUpdated() {
+    const el = document.getElementById('updatedTime');
+    try {
+      const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits?path=${DATA_PATH}&per_page=1`);
+      if (!res.ok) throw new Error('API error');
+      const commits = await res.json();
+      if (commits.length > 0) {
+        const date = new Date(commits[0].commit.author.date);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHrs = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        let relativeStr;
+        if (diffMins < 2) relativeStr = 'just now';
+        else if (diffMins < 60) relativeStr = `${diffMins}m ago`;
+        else if (diffHrs < 24) relativeStr = `${diffHrs}h ago`;
+        else relativeStr = `${diffDays}d ago`;
+
+        const timeStr = date.toLocaleString('en-US', {
+          month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit',
+          hour12: true
+        });
+
+        el.textContent = `${timeStr} (${relativeStr})`;
+        el.classList.toggle('fresh', diffHrs < 6);
+      }
+    } catch (e) {
+      el.textContent = 'unavailable';
+    }
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch(DATA_URL);
+      if (!res.ok) throw new Error('Fetch failed');
+      const json = await res.json();
+      localStorage.setItem(CACHE_KEY, JSON.stringify(json));
+      return json;
+    } catch (e) {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) return JSON.parse(cached);
+      return null;
+    }
+  }
+
+  async function init() {
+    setTzNote();
+    fetchLastUpdated();
+    const data = await loadData();
+    if (!data) {
+      document.getElementById('scheduleContent').innerHTML = '<div class="loading-msg">Could not load match data. Open via GitHub Pages or ensure data.json is in the same folder.</div>';
+      return;
+    }
+    allMatches = data.matches;
+    setupViewToggle();
+    renderTimeNav();
+    renderSchedule('today');
+  }
+
+  const cc = (n) => {
+    const m = { 'Canada':'CAN','South Africa':'RSA','Brazil':'BRA','Japan':'JPN','Germany':'GER',
+      'Paraguay':'PAR','Netherlands':'NED','Morocco':'MAR','France':'FRA','Sweden':'SWE',
+      'Ivory Coast':'CIV','Norway':'NOR','Mexico':'MEX','Ecuador':'ECU','England':'ENG',
+      'DR Congo':'COD','Belgium':'BEL','Senegal':'SEN','USA':'USA','Bosnia-Herz.':'BIH',
+      'Spain':'ESP','Austria':'AUT','Portugal':'POR','Croatia':'CRO','Switzerland':'SUI',
+      'Algeria':'ALG','Argentina':'ARG','Cape Verde':'CPV','Australia':'AUS','Egypt':'EGY',
+      'Colombia':'COL','Ghana':'GHA','TBD':'\u2014' };
+    return m[n] || n.substring(0,3).toUpperCase();
+  };
+
+  const isComplete = (m) => ['ft','aet','pso'].includes(m.status);
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const periods = [
+    { id: 'today', label: 'Today', filter: m => m.day === today },
+    { id: 'weekend', label: 'This Week', filter: m => {
+      const d = new Date(m.day);
+      const now = new Date();
+      const weekEnd = new Date(now);
+      weekEnd.setDate(now.getDate() + (7 - now.getDay()));
+      return d >= new Date(today) && d <= weekEnd;
+    }},
+    { id: 'r32', label: 'R32', filter: m => m.round === 'R32' },
+    { id: 'r16', label: 'R16', filter: m => m.round === 'R16' },
+    { id: 'later', label: 'QF+', filter: m => ['QF','SF','Final'].includes(m.round) },
+    { id: 'all', label: 'All', filter: () => true },
+  ];
+
+  function setupViewToggle() {
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const v = btn.dataset.view;
+        document.getElementById('scheduleView').classList.toggle('active', v === 'schedule');
+        document.getElementById('bracketView').classList.toggle('active', v === 'bracket');
+        if (v === 'bracket') renderBracket();
+      });
+    });
+  }
+
+  function renderTimeNav() {
+    const nav = document.getElementById('timeNav');
+    nav.innerHTML = periods.map((p, i) => {
+      const count = allMatches.filter(p.filter).length;
+      return `<button class="time-btn${i === 0 ? ' active' : ''}" data-period="${p.id}">${p.label}<span class="ct">${count}</span></button>`;
+    }).join('');
+
+    nav.querySelectorAll('.time-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        nav.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderSchedule(btn.dataset.period);
+      });
+    });
+  }
+
+  function renderSchedule(periodId) {
+    const period = periods.find(p => p.id === periodId);
+    const matches = allMatches.filter(period.filter);
+    const container = document.getElementById('scheduleContent');
+
+    const groups = {};
+    matches.forEach(m => {
+      const key = m.dayLabel;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(m);
+    });
+
+    let html = '';
+    Object.entries(groups).forEach(([day, dayMatches]) => {
+      const roundLabel = dayMatches[0].round;
+      const isToday = dayMatches[0].day === today;
+      html += `<div class="day-group">
+        <div class="day-label">
+          <span class="date">${day}</span>
+          ${isToday ? '<span class="relative">Today</span>' : ''}
+          <span class="round-tag">${roundLabel}</span>
+        </div>
+        <div class="day-matches">
+          ${dayMatches.map(renderMatchCard).join('')}
+        </div>
+      </div>`;
+    });
+
+    if (!html) html = '<div class="loading-msg">No matches in this window.</div>';
+    container.innerHTML = html;
+  }
+
+  function renderMatchCard(m) {
+    const done = isComplete(m);
+    const homeW = m.winner === 'home';
+    const awayW = m.winner === 'away';
+    const classes = ['match', done ? 'completed' : '', m.status === 'live' ? 'is-live' : '', m.tbd ? 'tbd' : ''].filter(Boolean).join(' ');
+
+    const statusText = m.status === 'ft' ? 'FT' : m.status === 'aet' ? 'AET' : m.status === 'pso' ? 'PEN' : m.status === 'live' ? 'LIVE' : localTime(m);
+    const statusClass = m.status === 'upcoming' ? 'upcoming' : m.status;
+
+    return `<div class="${classes}">
+      <div class="match-top">
+        <span class="info">${m.venue}</span>
+        <span class="badge ${statusClass}">${statusText}</span>
+      </div>
+      <div class="match-teams">
+        <div class="team ${homeW ? 'w' : (awayW ? 'l' : '')}">
+          <span class="t-code">${cc(m.home)}</span>
+          <span class="t-name">${m.home}</span>
+          ${m.hs !== null ? `<span class="t-score">${m.hs}</span>` : ''}
+        </div>
+        <div class="team ${awayW ? 'w' : (homeW ? 'l' : '')}">
+          <span class="t-code">${cc(m.away)}</span>
+          <span class="t-name">${m.away}</span>
+          ${m.as !== null ? `<span class="t-score">${m.as}</span>` : ''}
+        </div>
+      </div>
+      ${m.psoNote ? `<div class="match-note">${m.psoNote}</div>` : ''}
+    </div>`;
+  }
+
+  function renderBracket() {
+    const container = document.getElementById('bracketContent');
+    const roundOrder = ['R32', 'R16', 'QF', 'SF', 'Final'];
+    const roundLabels = { R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarters', SF: 'Semis', Final: 'Final' };
+
+    let html = '';
+    roundOrder.forEach((round, rIdx) => {
+      const matches = allMatches.filter(m => m.round === round);
+      html += `<div class="bracket-round">
+        <div class="bracket-round-label">${roundLabels[round]}</div>
+        ${matches.map(m => renderBracketMatch(m)).join('<div class="bracket-spacer"></div>')}
+        ${round === 'Final' ? '<div class="trophy">\uD83C\uDFC6</div>' : ''}
+      </div>`;
+
+      if (rIdx < roundOrder.length - 1) {
+        const nextMatches = allMatches.filter(m => m.round === roundOrder[rIdx + 1]);
+        html += `<div class="bracket-connectors">
+          ${nextMatches.map(() => '<div class="connector-pair"></div>').join('')}
+        </div>`;
+      }
+    });
+
+    container.innerHTML = html;
+  }
+
+  function renderBracketMatch(m) {
+    const done = isComplete(m);
+    const homeW = m.winner === 'home';
+    const awayW = m.winner === 'away';
+    const isFinal = m.round === 'Final';
+    const classes = ['bracket-match', done ? 'completed' : '', isFinal ? 'is-final' : ''].filter(Boolean).join(' ');
+
+    const statusText = m.status === 'ft' ? 'FT' : m.status === 'aet' ? 'AET' : m.status === 'pso' ? 'PEN' : '';
+    const statusClass = ['pso','aet'].includes(m.status) ? 'pen' : done ? 'done' : '';
+
+    return `<div class="${classes}">
+      ${statusText ? `<div class="bm-status ${statusClass}">${statusText}</div>` : ''}
+      <div class="bm-team ${homeW ? 'w' : (awayW ? 'l' : '')}">
+        <span class="bm-code">${cc(m.home)}</span>
+        <span class="bm-name">${m.home}</span>
+        ${m.hs !== null ? `<span class="bm-score">${m.hs}</span>` : ''}
+      </div>
+      <div class="bm-team ${awayW ? 'w' : (homeW ? 'l' : '')}">
+        <span class="bm-code">${cc(m.away)}</span>
+        <span class="bm-name">${m.away}</span>
+        ${m.as !== null ? `<span class="bm-score">${m.as}</span>` : ''}
+      </div>
+    </div>`;
+  }
+
+  init();
+</script>
 </body>
 </html>
