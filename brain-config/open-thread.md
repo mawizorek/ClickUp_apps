@@ -4,6 +4,28 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
+## Prism v1 — beta test + hardening (NEVER shakedown-tested in the repo)
+**Added:** 2026-07-07
+
+Prism shipped v1 this session (`prism/`, live at https://mawizorek.github.io/ClickUp_apps/prism/, build PR #54) but we went straight from build to ship without a real beta test against actual files. It's the unified Data App Viewer: one shell, two lenses (JSON + Markdown), split-by-table default, single-record auto-pivot, flag panel, CSV/Excel export. NEXT SESSION: put it through real use before calling it done.
+
+**Beta-test pass (do with real files, not just the built-in samples):**
+- Drop actual ClickUp JSON backup exports (task lists, docs). Confirm flatten + split-by-table reads sanely on real nesting depth, and the flag panel catches the real irregularities (irregular schema, numbers-as-text, mixed types).
+- Drop real `.md` files (e.g. a Brain reference doc) through the Markdown lens; confirm tables/code/nested lists render.
+- Exercise every export: CSV (comma AND the tab delimiter), Excel `.xls`, Markdown-to-HTML. Open the outputs in Excel/Sheets and verify columns/rows survive.
+- Edge cases: giant file (perf), deeply nested JSON, arrays-of-arrays, empty file, invalid JSON (error state), a single-object file (pivot view).
+
+**Known open items carried from build:**
+- **(a) Tab CSV delimiter bug.** Passes a literal `\t` escape instead of a real tab char. Comma (default) is fine. Fix in the JSON lens export fn.
+- **(b) Excel export is `.xls` HTML-table, not true `.xlsx`.** Roadmap: SheetJS for real xlsx. Decide if worth it after beta.
+- **(c) og.png / icon.png binaries not dropped** via GitHub UI yet (referenced in head + manifest; unfurls/install degrade gracefully until added).
+- **(d) Big-file table perf** — no virtualization yet; flagged as a v2 item. See if beta actually stresses it.
+- **(e) App is gated** (`config.json`, code 2026). Flip to `open` if/when it should be shareable.
+
+**Cold-pickup pointers:** source `prism/` (modular: `index.html` loader + `prism.css` + `prism.core.js`/`prism.json.js`/`prism.md.js`). Ledger row: `VERSIONS.md` → `prism` = v1. ClickUp APPS task repurposed from Markdown Viewer (title now "Prism — Data App Viewer").
+
+---
+
 ## F1 Schema-Shift — pending items
 **Added:** 2026-07-07
 
