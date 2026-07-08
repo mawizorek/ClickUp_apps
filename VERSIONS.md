@@ -4,7 +4,7 @@
 
 ## Procedure (MANDATORY on every app PR)
 
-1. **Before opening a PR:** find the app's row below. Confirm the version/state you believe is current matches this ledger. If they disagree, STOP: re-read the real source (immutable commit-SHA path, not a branch URL) and reconcile. Do not build on a mismatch.
+1. **Before opening a PR:** find the app's row below. Confirm the version/state you believe is current matches this ledger. If they disagree, STOP: re-read the real source (immutable commit-SHA path, or the git blob API which returns base64 and does NOT flatten HTML, not a plain branch URL) and reconcile. Do not build on a mismatch.
 2. **Immediately after opening the PR:** update this app's row in the same session, bump the version, add the PR link, update the date. The ledger must never lag behind `main`.
 3. This is a two-sided check: step 1 catches a stale read going in, step 2 keeps the ledger honest coming out.
 
@@ -15,8 +15,8 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 | App (slug) | Current version | Status | Last PR / notes |
 | --- | --- | --- | --- |
 | `prism` | v1 | live | Data App Viewer (JSON + Markdown). Initial build PR #54. |
-| `app-dashboard` | v4 launcher + Retired filter | live | Slim launcher: per-app icons, ClickUp/FileMaker toggle, Brain Config hub, detail sheet, settings gear. `index.html` = thin loader over `source/` modules. Retired-status tag + "Show retired" toggle added PR #66 (additive, `source/data.js` only). Footer stamp still reads v4/PR#40 (version const lives in `app.js`, not safely editable via the flattening read path). |
-| `markdown-viewer` | — | retired | Superseded by `prism`. Marked `status:'retired'` in app-dashboard data.js (PR #66); hidden by default behind the Show-retired toggle. README is a redirect/history stub. Do not develop. |
+| `app-dashboard` | v4 launcher + native Retired filter | live | Slim launcher: per-app icons, ClickUp/FileMaker toggle, Brain Config hub, detail sheet, settings gear. `index.html` = thin loader over `source/` modules. Retired status is now a NATIVE filter dimension (PR #72): `data.js` metadata + `render.js` data-status/badge + `app.js` showRetired/applyFilter + `source/retired.css` + toggle chip in index.html. Replaced the PR #66 data.js DOM-injection graft. Read all files byte-exact via git blob API (base64, no HTML flattening). |
+| `markdown-viewer` | — | retired | Superseded by `prism`. `status:'retired'` in app-dashboard; hidden by default behind the Show-retired toggle. README is a redirect/history stub. Do not develop. |
 | `file-chunker` | unverified (last known v16.2, 2026-07-01) | live | Verify against commit history before next PR. |
 | `budget-code-mapper` | unverified (last known v6, design) | live | Verify before next PR. |
 | `f1-racetracks` | unverified (last known v4/v5) | live | Verify before next PR. |
