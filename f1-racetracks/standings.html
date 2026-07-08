@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<!-- INFRASTRUCTURE: slim loader shell. SEGMENTED app: styling in source/standings/*.css, logic in source/standings/*.js. Every file under the 12KB soft cap. Never inline this back into one file. -->
+<!-- DATA: modules fetch the canonical per-round store at ../f1-results/2026/. No data duplicated here. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#26262e">
+<title>2026 F1 Championship Matrix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="source/standings/base.css">
+<link rel="stylesheet" href="source/standings/panel.css">
+</head>
+<body>
+  <header class="mast">
+    <div>
+      <span class="eyebrow">FIA Formula 1 World Championship</span>
+      <h1>2026 Season <b>/</b> Points Matrix</h1>
+    </div>
+    <div class="leader-strip" id="leaderStrip"></div>
+  </header>
+
+  <div class="controls">
+    <div class="seg" role="tablist" aria-label="View">
+      <button role="tab" aria-selected="true" data-view="drivers">Drivers Matrix</button>
+      <button role="tab" aria-selected="false" data-view="constructors">Constructors</button>
+    </div>
+    <div class="legend" id="legend">
+      <span><i class="sw win">1</i> Win</span>
+      <span><i class="dot fl"></i> Fastest lap</span>
+      <span><i class="sw story"></i> Story</span>
+      <span><i class="sw mv"></i> Mover</span>
+    </div>
+  </div>
+
+  <div id="stage">
+    <div class="state"><span class="sp"></span><br>Loading the 2026 season…</div>
+  </div>
+
+  <footer>
+    <span>Standings computed live from race + sprint · a lens of the F1 Racetracks app</span>
+    <span>CHAMPIONSHIP MATRIX <span class="num" id="stamp">v1</span></span>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
+
+  <script src="source/standings/data.js"></script>
+  <script src="source/standings/matrix.js"></script>
+  <script src="source/standings/panel.js"></script>
+</body>
+</html>
