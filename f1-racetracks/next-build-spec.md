@@ -1,5 +1,10 @@
 # f1-racetracks — Circuit-Page Reskin Brief (pit-wall)
 
+> **☑ WORK ITEM — `index.html` is a pointer, not content (DONE for this app).**
+> Kept here as the standing pattern; already satisfied. Never grow `index.html` back into a servable page.
+>
+> - [x] `index.html` redesigned into a pointer/router — already a pure router shell (done, verified 2026-07-08)
+
 **Cycle:** post-schema-shift → circuit-page aesthetic pass
 **Theme:** Bring the OLD circuit pages (`circuits.html` + `live-tracker.html`) up to the new dark **pit-wall** look already shipped on the standings lens. This is the aesthetic reskin session, run **WITH Michael**, after the data/architecture work is done.
 
@@ -90,9 +95,3 @@ The circuit app is chunked into `f1-racetracks/source/` modules. The working und
 ## Standing rule (applies to ALL apps) — PRESERVED
 
 **Every app in `mawizorek/ClickUp_apps` must be explicitly designed for clean mobile viewing AND desktop — mobile is a first-class target, not an afterthought.** Every build and build spec includes a responsive pass: no horizontal overflow at 320px, footers/action bars that wrap or stack, touch targets ≥44px, fluid layout via `clamp()`/`min()`/`%`, safe-area insets. Test every ship at phone width before calling it done. Also recorded in the Brain Reference Library (Apps / HTML Artifacts → Architecture).
-
----
-
-## Index = pointer, not a store (LOCKED 2026-07-08, standing)
-
-`index.html` is an INDEX: a thin shell/router that references source pages, never a file that itself stores a full servable page. The moment this app has more than one servable page/view, `index.html` becomes the dispatcher that points at them (real pages live as their own named files; the default landing is a one-line constant it can repoint without a rebuild). Keep the shell well under the read cap and never grow `index.html` into a multi-page store. (This app already follows the rule via its router shell; kept here so every spec states it.) Mirror of the locked rule in the Apps / HTML Artifacts standard + GitHub MCP Operating Standard.

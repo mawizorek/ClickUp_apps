@@ -1,5 +1,10 @@
 # App Dashboard — Next Build Spec
 
+> **☐ OPEN WORK ITEM — redesign `index.html` into a pointer, not content.**
+> Any agent opening this app: treat this as ACTIVE WORK, not a passive rule. `index.html` is already a thin shell loading `source/*` (engine in `source/app.js`) — VERIFY it holds no servable page body of its own, then check the box. **Check it off when confirmed/done** — then it clears.
+>
+> - [ ] `index.html` verified/redesigned as a pointer/router (not a content store)
+
 **Current shipped:** v4 (modular split + FileMaker window + clean labels + settings drawer). Engine in `source/app.js`, styling in `source/{styles,sheet,settings}.css`, data in `source/data.js`.
 
 ---
@@ -44,4 +49,3 @@ FileMaker solutions carry real structure (schema JSON). The FileMaker window cou
 - **Load order is load-bearing:** `data → render → sheet → settings → app`. Only app.js boots.
 - **FileMaker window** never does health/Pages checks; ClickUp window always does.
 - **Theme:** dark default; light tokens in `settings.css` under `html[data-theme="light"]`; pre-paint applied by the inline loader script; persisted to `localStorage['appDashboard_theme']`.
-- **Index = pointer, not a store (LOCKED 2026-07-08).** `index.html` stays a thin shell/router that references source pages; the instant a second servable page/view exists it becomes the dispatcher (real pages = their own named files, default landing = a one-line constant). Never grow `index.html` into a multi-page store. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.
