@@ -1,0 +1,39 @@
+{
+ "season": 2026, "round": 9, "slug": "silverstone", "name": "British Grand Prix", "date": "2026-07-05", "cuTaskId": "86ae52gq7", "version": "2026-07-07",
+ "pole": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:28.111" },
+ "summary": "Leclerc won a chaotic race under the Safety Car, Ferrari's 250th F1 win, from Russell and Hamilton after leader Antonelli suffered a bodywork failure and finished out of the points. Antonelli's title lead cut to 25.",
+ "sprint": {
+ "classification": [
+ { "pos": 1, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "FIN", "points": 8 },
+ { "pos": 2, "driverId": "86ae52rxg", "driver": "Lewis Hamilton", "team": "Ferrari", "status": "FIN", "points": 7 },
+ { "pos": 3, "driverId": "86ae52q76", "driver": "Lando Norris", "team": "McLaren", "status": "FIN", "points": 6 },
+ { "pos": 4, "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "status": "FIN", "points": 5 },
+ { "pos": 5, "driverId": "86ae52ryt", "driver": "Isack Hadjar", "team": "Red Bull", "status": "FIN", "points": 4 },
+ { "pos": 6, "driverId": "86ae52rym", "driver": "Max Verstappen", "team": "Red Bull", "status": "FIN", "points": 3 },
+ { "pos": 7, "driverId": "86ae52q7p", "driver": "Oscar Piastri", "team": "McLaren", "status": "FIN", "points": 2 },
+ { "pos": 8, "driverId": "86ae52rye", "driver": "Liam Lawson", "team": "Racing Bulls", "status": "FIN", "points": 1, "stewardNote": "Classified P8 pending a post-race investigation noted at the time." }
+ ]
+ },
+ "classification": [
+ { "pos": 1, "driverId": "86ae52rxd", "driver": "Charles Leclerc", "team": "Ferrari", "status": "FIN", "points": 25 },
+ { "pos": 2, "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "status": "FIN", "points": 18 },
+ { "pos": 3, "driverId": "86ae52rxg", "driver": "Lewis Hamilton", "team": "Ferrari", "status": "FIN", "points": 15 },
+ { "pos": 4, "driverId": "86ae52q76", "driver": "Lando Norris", "team": "McLaren", "status": "FIN", "points": 12 },
+ { "pos": 5, "driverId": "86ae52ryt", "driver": "Isack Hadjar", "team": "Red Bull", "status": "FIN", "points": 10 },
+ { "pos": 6, "driverId": "86ae52rye", "driver": "Liam Lawson", "team": "Racing Bulls", "status": "FIN", "points": 8 },
+ { "pos": 7, "driverId": "86aj1ra31", "driver": "Arvid Lindblad", "team": "Racing Bulls", "status": "FIN", "points": 6 },
+ { "pos": 8, "driverId": "86ae52rqp", "driver": "Gabriel Bortoleto", "team": "Audi", "status": "FIN", "points": 4 },
+ { "pos": 9, "driverId": "86aj1ra0h", "driver": "Franco Colapinto", "team": "Alpine", "status": "FIN", "points": 2 },
+ { "pos": 10, "driverId": "86ae52rq4", "driver": "Pierre Gasly", "team": "Alpine", "status": "FIN", "points": 1 },
+ { "pos": 11, "driverId": "86ae52q7p", "driver": "Oscar Piastri", "team": "McLaren", "status": "FIN", "points": 0 },
+ { "pos": 12, "driverId": "86ae52rqj", "driver": "Carlos Sainz", "team": "Williams", "status": "FIN", "points": 0 },
+ { "pos": 13, "driverId": "86ae52rxv", "driver": "Oliver Bearman", "team": "Haas", "status": "FIN", "points": 0 },
+ { "pos": 14, "driverId": "86ae52rxu", "driver": "Esteban Ocon", "team": "Haas", "status": "FIN", "points": 0 },
+ { "pos": 15, "driverId": "86aj1ra1z", "driver": "Sergio Perez", "team": "Cadillac", "status": "FIN", "points": 0 },
+ { "pos": 16, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "FIN", "points": 0, "stewardNote": "Bodywork/front wheel-shield failure while leading dropped him to 16th, out of the points." },
+ { "pos": 17, "driverId": "86aj1ra1g", "driver": "Valtteri Bottas", "team": "Cadillac", "status": "FIN", "points": 0 },
+ { "pos": 18, "driverId": "86ae52rq8", "driver": "Fernando Alonso", "team": "Aston Martin", "status": "FIN", "points": 0 },
+ { "pos": 19, "driverId": "86ae52rqa", "driver": "Lance Stroll", "team": "Aston Martin", "status": "FIN", "points": 0 },
+ { "pos": 20, "driverId": "86ae52rym", "driver": "Max Verstappen", "team": "Red Bull", "status": "FIN", "points": 0, "stewardNote": "Off at Stowe brought out the late Safety Car; classified 20th." }
+ ]
+}
