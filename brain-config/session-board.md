@@ -30,11 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session F1 standings lens · started 2026-07-07 21:38 (last update 21:38)
-
-**Status:** active
-
-Adding a NEW sibling file `f1-racetracks/standings.html` (championship points matrix lens). ADD-ONLY: not touching index.html, data.json, live-tracker.html, or source/. If you're in the f1-racetracks app engine, we won't collide, but heads up I'm adding one file to that folder.
+*(empty — no agents currently working in the repo)*
 
 ---
 
