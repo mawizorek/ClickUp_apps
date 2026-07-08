@@ -17,10 +17,10 @@ The Budget Code Mapper's code data (families, categories, subcategories, fiscal-
 
 ```
 budget-code-mapper/
-  index.html      <- app engine (schema sandbox UI, mapping panel, export logic). Version-bumped only on feature changes.
-  data.json       <- budget code schema + authority mappings. Updated via MCP when codes change.
-  README.md       <- (existing)
-  source/         <- (existing chunk set, rebuild after v6 ships)
+ index.html <- app engine (schema sandbox UI, mapping panel, export logic). Version-bumped only on feature changes.
+ data.json <- budget code schema + authority mappings. Updated via MCP when codes change.
+ README.md <- (existing)
+ source/ <- (existing chunk set, rebuild after v6 ships)
 ```
 
 ### How it works
@@ -110,3 +110,9 @@ The data-separation retrofit makes the JSON round-trip native: the app's runtime
 - Offline: works fully from localStorage cache after first load.
 - Mobile: existing responsive behavior preserved.
 - Data file stays well under 30KB (budget code schema is compact).
+
+---
+
+## Index = pointer, not a store (LOCKED 2026-07-08, standing)
+
+`index.html` is an INDEX: a thin shell/router that references source pages, never a file that itself stores a full servable page. The moment this app has more than one servable page/view, `index.html` becomes the dispatcher that points at them (real pages live as their own named files; the default landing is a one-line constant it can repoint without a rebuild). Keep the shell well under the read cap and never grow `index.html` into a multi-page store. Mirror of the locked rule in the Apps / HTML Artifacts standard + GitHub MCP Operating Standard.

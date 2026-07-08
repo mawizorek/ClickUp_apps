@@ -45,3 +45,9 @@ Two bugs, one root cause (values inlined instead of named once):
 ### Do NOT break (carry over from v18 verbatim)
 
 Gated one-chunk-at-a-time walk + mandatory final pause · two-layer UUID integrity · base64 armor (default ON in repo mode) · self-navigation · content-based `github-folder` auto-detect · three-path source recovery · localStorage settings + config panel · debug mode · >8-chunk flag · two-file source download · v18 additions (live GitHub header link, `<app-slug>/source/` zip structure, `v18-ChunkerReport.md`, `source_index.html`).
+
+---
+
+## Index = pointer, not a store (LOCKED 2026-07-08, standing)
+
+`index.html` is an INDEX: a thin shell/router that references source pages, never a file that itself stores a full servable page. The moment this app has more than one servable page/view, `index.html` becomes the dispatcher that points at them (real pages live as their own named files; the default landing is a one-line constant it can repoint without a rebuild). Keep the shell well under the read cap and never grow `index.html` into a multi-page store. Mirror of the locked rule in the Apps / HTML Artifacts standard + GitHub MCP Operating Standard.

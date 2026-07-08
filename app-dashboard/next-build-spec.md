@@ -30,7 +30,7 @@ Captured from the v4 team review (Beckett / Professional / Creative). None urgen
 The status line shows **"N live"** instantly in sample/preview mode (sample fakes all-green), but real GitHub-API mode shows **"…"** until per-app health checks resolve. Same app, different truth depending on data source. Options: (a) hold sample mode at "…" too and resolve it the same way, or (b) label the preview count as sample-derived so it never reads as verified. Cosmetic, honesty-of-state issue.
 
 ### 2. Reduced-motion guard on swipe-to-dismiss (Beckett)
-The bottom-sheet swipe-down applies a live `translateY` transform during the drag with no `prefers-reduced-motion` branch. Our standard wants motion guarded. The CSS transition is already guarded; the JS drag transform is not. Low effort: skip/att enuate the drag-follow when reduced-motion is set.
+The bottom-sheet swipe-down applies a live `translateY` transform during the drag with no `prefers-reduced-motion` branch. Our standard wants motion guarded. The CSS transition is already guarded; the JS drag transform is not. Low effort: skip/attenuate the drag-follow when reduced-motion is set.
 
 ### 3. FileMaker window: schema stat instead of commit count (Creative)
 FileMaker solutions carry real structure (schema JSON). The FileMaker window could surface a **table/field count** parsed from each solution's schema JSON in place of (or alongside) the commit count, which is more meaningful for FMP work than commit velocity. Requires reading each `filemaker/<slug>/schema*.json` and a small parse. Nice-to-have, not core.
@@ -44,3 +44,4 @@ FileMaker solutions carry real structure (schema JSON). The FileMaker window cou
 - **Load order is load-bearing:** `data → render → sheet → settings → app`. Only app.js boots.
 - **FileMaker window** never does health/Pages checks; ClickUp window always does.
 - **Theme:** dark default; light tokens in `settings.css` under `html[data-theme="light"]`; pre-paint applied by the inline loader script; persisted to `localStorage['appDashboard_theme']`.
+- **Index = pointer, not a store (LOCKED 2026-07-08).** `index.html` stays a thin shell/router that references source pages; the instant a second servable page/view exists it becomes the dispatcher (real pages = their own named files, default landing = a one-line constant). Never grow `index.html` into a multi-page store. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.

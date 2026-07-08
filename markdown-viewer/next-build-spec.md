@@ -46,3 +46,9 @@
 
 - Base64 armor is mandatory for HTML source chunks (plaintext gets tag-flattened).
 - Prefer commit-pinned raw URLs over `main` branch URLs (transient CDN 404s on recent commits).
+
+---
+
+## Index = pointer, not a store (LOCKED 2026-07-08, standing)
+
+`index.html` is an INDEX: a thin shell/router that references source pages, never a file that itself stores a full servable page. The moment this app has more than one servable page/view, `index.html` becomes the dispatcher that points at them (real pages live as their own named files; the default landing is a one-line constant it can repoint without a rebuild). Keep the shell well under the read cap and never grow `index.html` into a multi-page store. Mirror of the locked rule in the Apps / HTML Artifacts standard + GitHub MCP Operating Standard.

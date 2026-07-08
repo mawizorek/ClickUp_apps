@@ -34,3 +34,4 @@ When a refresh detects that an existing event materially shifted (rain delay, mo
 - The self-contained export in `app.js` (`buildSelfContained`) must keep re-inlining every source file + current `DATA`; if you add a new `source/*` file, add it to that inliner or downloads break.
 - Brand asset refs live in the `index.html` head; keep the absolute Pages URL for og/twitter (relative paths don't unfurl).
 - Data refreshes verify-and-merge (never blank-slate rebuild) and never shrink series coverage — see `routines/README.md` Data-Refresh Discipline.
+- **Index = pointer, not a store (LOCKED 2026-07-08).** `index.html` stays a thin shell/router that references source pages; the instant a second servable page/view exists it becomes the dispatcher (real pages = their own named files, default landing = a one-line constant). Never grow `index.html` into a multi-page store. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.
