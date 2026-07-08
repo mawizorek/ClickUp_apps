@@ -1,7 +1,7 @@
 /* Inciardi Market — engine. Reads market.json (eBay prices) + catalog.json (master + machines). */
 
-const BUILD = "v3";
-const PR = 89; // merged PR that shipped this version
+const BUILD = "v4";
+const PR = 91; // merged PR that shipped this version
 
 const MARKET_FALLBACK = { version:"sample", source:"sample", baseline:{ retailDefault:14, currency:"USD" }, listings:[
   { itemId:"a", title:"Anastasia Inciardi Mini Print — Negroni", price:9.5, shipping:0, landed:9.5, condition:"New", buyingOptions:["FIXED_PRICE"], url:"https://www.ebay.com/itm/156812754385", image:null, seller:"printfan_me", status:"new", firstSeen:"2026-07-06", print:{name:"Negroni",exclusive:null,matched:true}, flags:["underpriced"], priceHistory:[{t:"2026-07-06",landed:9.5}] },
@@ -12,6 +12,8 @@ const CATALOG_FALLBACK = { refreshedAt:"sample", machineCount:120, prints:[{name
 
 const CAT_LABELS = { mini:"Minis", pack:"Packs", "big-riso":"Big Risographs", linocut:"Linocuts", exclusive:"Exclusives" };
 const EXCL_LABEL = { nyc:"NYC", lacma:"LACMA", holiday:"Holiday", "grand central":"Grand Central", "richard-scarry":"Richard Scarry" };
+const RATING_LABEL = { buy:"BUY", watch:"HOLD", pass:"PASS" };
+const RATING_CLASS = { buy:"buy", watch:"hold", pass:"pass" };
 const THUMB_HUE = { mini:72, pack:205, exclusive:305, "big-riso":150, linocut:40 };
 
 // inline SVG icons (no external icon dependency)
@@ -48,7 +50,7 @@ async function load() {
   const ep = (localStorage.getItem("inciardi_ep") || "").trim();
   MARKET = await grab(ep || "./market.json", "inciardi_mkt", MARKET_FALLBACK);
   CATALOG = await grab("./catalog.json", "inciardi_cat", CATALOG_FALLBACK);
-  renderStatus(); renderPulse(); renderCounts(); render(); stampFooter();
+  renderStatus(); renderBoard(); renderCounts(); render(); stampFooter();
 }
 async function grab(src, key, fallback) {
   try {
@@ -79,6 +81,14 @@ function verdict(l){
   if (r <= 1.05) return { k:"watch", t:"around retail" };
   return { k:"pass", t:`${Math.round((r-1)*100)}% over` };
 }
+// Delta vs retail, framed like a ticker change. Cheaper-than-retail = up (green, the buyer's win).
+function deltaFor(l){
+  const b = baseline();
+  if (isExclusive(l)) return { txt:(l.landed/b).toFixed(1)+"\u00d7", cls:"flat", sub:"vs retail" };
+  if (isPack(l)) { const pct = Math.round((l.landed/5/b - 1)*100); return { txt:(pct>0?"+":"")+pct+"%", cls: pct<0?"up":pct>0?"down":"flat", sub:"per print" }; }
+  const pct = Math.round((l.landed/b - 1)*100);
+  return { txt:(pct>0?"+":"")+pct+"%", cls: pct<0?"up":pct>0?"down":"flat", sub:"vs retail" };
+}
 function listingsFor(name){ return MARKET.listings.filter(l => l.print && l.print.matched && l.print.name === name); }
 function rangeFor(name){
   const ls = listingsFor(name).filter(l => l.status !== "gone");
@@ -91,9 +101,9 @@ function rangeFor(name){
 function renderStatus(){
   const live = MARKET.source === "ebay-browse";
   $("status").className = "status" + (live ? "" : " sample");
-  $("statusText").textContent = live ? "Live · eBay" : "Sample data";
+  $("statusText").textContent = live ? "Live" : "Sample";
 }
-function renderPulse(){
+function renderBoard(){
   const live = MARKET.listings.filter(l => l.status !== "gone");
   const deals = live.filter(l => !isExclusive(l) && verdict(l).k === "buy").length;
   const fresh = live.filter(l => l.status === "new").length;
@@ -101,18 +111,18 @@ function renderPulse(){
   const drops = live.filter(l => (l.priceHistory||[]).length > 1 && l.priceHistory[l.priceHistory.length-1].landed < l.priceHistory[0].landed)
     .map(l => { const h=l.priceHistory; return { l, pct: Math.round((1 - h[h.length-1].landed/h[0].landed)*100) }; })
     .sort((a,b) => b.pct - a.pct)[0];
-  const temp = deals >= 5 ? "Market's warm" : deals >= 2 ? "A few live deals" : "Quiet scan";
-  $("pulse").innerHTML = `
+  const temp = deals >= 5 ? "Market's warm" : deals >= 2 ? "A few live deals" : "Quiet tape";
+  $("board").innerHTML = `
     <div class="read">
       <div class="eyebrow">Buy side</div>
       <div class="headline">${temp}</div>
-      <div class="sub">${deals} under-retail ${deals===1?"deal":"deals"} worth a look right now</div>
+      <div class="sub">${deals} under-retail ${deals===1?"quote":"quotes"} live now</div>
     </div>
     <div class="figs">
-      <div class="fig up"><div class="l">Under retail</div><div class="v">${deals}</div><div class="n">flagged buys</div></div>
+      <div class="fig up"><div class="l">Under retail</div><div class="v">${deals>0?'<span class="arw">\u25b2</span>':""}${deals}</div><div class="n">flagged buys</div></div>
       <div class="fig"><div class="l">New</div><div class="v">${fresh}</div><div class="n">since last scan</div></div>
-      <div class="fig down"><div class="l">Biggest drop</div><div class="v">${drops?"−"+drops.pct+"%":"—"}</div><div class="n">${drops?esc(drops.l.print&&drops.l.print.matched?drops.l.print.name:"a listing"):"no movers"}</div></div>
-      <div class="fig mute"><div class="l">Sold / pulled</div><div class="v">${gone}</div><div class="n">gone since scan</div></div>
+      <div class="fig down"><div class="l">Top mover</div><div class="v">${drops?'<span class="arw">\u25bc</span>'+drops.pct+"%":"\u2014"}</div><div class="n">${drops?esc(drops.l.print&&drops.l.print.matched?drops.l.print.name:"a listing"):"no movers"}</div></div>
+      <div class="fig mute"><div class="l">Pulled</div><div class="v">${gone}</div><div class="n">gone since scan</div></div>
     </div>`;
 }
 function renderCounts(){
@@ -160,14 +170,14 @@ function renderStock(){
     const gain = (mkt && s.paid) ? mkt - s.paid : null;
     return `<div class="stockrow">
       <div class="thumb" style="background:${thumbBg(cat?cat.category:"mini")};color:${thumbInk(cat?cat.category:"mini")}">${initials(s.name)}</div>
-      <div><div style="font-weight:600;font-size:0.95rem">${esc(s.name)}</div>
+      <div><div style="font-weight:600;font-size:0.88rem">${esc(s.name)}</div>
         <div class="d-meta">${esc(s.condition||"—")}${s.paid?` <span class="sep">·</span> paid ${money(s.paid)}`:""}${excl?` <span class="sell-flag">sell signal</span>`:""}</div></div>
       <div class="d-price"><div class="landed">${mkt?money(mkt):"—"}</div>
-        <div class="sub-price">${mkt?"market low":"not listed"}</div>
-        ${gain!==null?`<div class="verdict ${gain>=0?"buy":"watch"}">${gain>=0?"+":""}${money(gain)}</div>`:""}</div>
+        <div class="sub-price">${mkt?"market low":"not listed"}</div></div>
+      ${gain!==null?`<div class="delta ${gain>=0?"up":"down"}">${gain>=0?"+":""}${money(gain)}<span class="dsub">unreal.</span></div>`:`<div class="delta flat">—</div>`}
       <button class="rm" data-i="${i}" aria-label="Remove"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>`;
   }).join("");
-  panel.innerHTML = `<p class="section-lead">Prints you own, valued against the live eBay market. Stored on this device only. Exclusives flag a <b>sell signal</b> when the market runs hot.</p>
+  panel.innerHTML = `<p class="section-lead">Prints you own, marked to the live eBay market. Stored on this device only. Exclusives flag a <b>sell signal</b> when the market runs hot.</p>
     <div class="stockform">
       <select id="stkName">${opts}</select>
       <select id="stkCond"><option>New</option><option>Used</option><option>Sealed</option></select>
@@ -175,10 +185,10 @@ function renderStock(){
       <button class="btn" id="stkAdd">Add print</button>
     </div>
     ${stock.length ? `<div class="portfolio">
-        <div class="p"><div class="n">${stock.length}</div><div class="l">Prints held</div></div>
-        <div class="p"><div class="n">${money(totalMkt)}</div><div class="l">Market value</div></div>
-        <div class="p"><div class="n${totalPaid&&totalMkt-totalPaid>=0?" gain":""}">${totalPaid?money(totalMkt-totalPaid):"—"}</div><div class="l">Unrealized</div></div>
-      </div>${rows}` : empty("package","Nothing tracked yet","Add a print above. Exclusives you hold will flag when the market's hot.")}`;
+        <div class="p"><div class="n">${stock.length}</div><div class="l">Positions</div></div>
+        <div class="p"><div class="n">${money(totalMkt)}</div><div class="l">Mark-to-market</div></div>
+        <div class="p"><div class="n${totalPaid&&totalMkt-totalPaid>=0?" gain":""}">${totalPaid?money(totalMkt-totalPaid):"—"}</div><div class="l">Unrealized P/L</div></div>
+      </div>${rows}` : empty("package","No positions yet","Add a print above. Exclusives you hold will flag when the market's hot.")}`;
   $("stkAdd").addEventListener("click", () => {
     const s = getStock(); s.push({ name: $("stkName").value, condition: $("stkCond").value, paid: $("stkPaid").value || null });
     setStock(s); renderCounts(); render();
@@ -201,7 +211,7 @@ function renderCatalog(){
         <div class="stat">${line}${p.retail?` · retail ${money(p.retail)}`:""}</div></div>`;
     }).join("") + `</div>`;
   });
-  html += `<div class="vanished" style="margin-top:var(--s6)">${icon("refresh-cw")}<div><b>${listed} of ${prints.length} catalog prints are on eBay right now.</b> This list widens each time the catalog refresh runs a wide web search; the master run is 500+ prints.</div></div>`;
+  html += `<div class="vanished" style="margin-top:var(--s5)">${icon("refresh-cw")}<div><b>${listed} of ${prints.length} catalog prints are on eBay right now.</b> This list widens each time the catalog refresh runs a wide web search; the master run is 500+ prints.</div></div>`;
   panel.innerHTML = html;
 }
 function renderMachines(){
@@ -223,8 +233,8 @@ function renderAll(){
 }
 
 /* ---- components ---- */
-function thumbBg(cat){ return `oklch(93% 0.045 ${THUMB_HUE[cat]||72})`; }
-function thumbInk(cat){ return `oklch(45% 0.12 ${THUMB_HUE[cat]||72})`; }
+function thumbBg(cat){ return `oklch(30% 0.05 ${THUMB_HUE[cat]||72})`; }
+function thumbInk(cat){ return `oklch(80% 0.11 ${THUMB_HUE[cat]||72})`; }
 function initials(name){ if(!name) return "?"; return name.split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase(); }
 function thumb(l){
   const cat = (l.print && (CATALOG.prints||[]).find(p => p.name === l.print.name)) || { category:"mini" };
@@ -232,7 +242,7 @@ function thumb(l){
   return `<div class="thumb" style="background:${thumbBg(cat.category)};color:${thumbInk(cat.category)}">${initials(l.print&&l.print.name)}</div>`;
 }
 function dealCard(l, v){
-  const dv = v || verdict(l), buy = dv.k === "buy" && !isExclusive(l);
+  const dv = v || verdict(l), buy = dv.k === "buy" && !isExclusive(l), d = deltaFor(l);
   return `<article class="deal${buy?" buy":""}">
     ${thumb(l)}
     <div class="d-body">
@@ -242,14 +252,15 @@ function dealCard(l, v){
     </div>
     <div class="d-price">
       <div class="landed">${money(l.landed)}</div>
-      <div class="sub-price">${l.shipping?money(l.price)+" + "+money(l.shipping)+" ship":"free ship"}</div>
-      <div class="verdict ${dv.k}">${dv.k==="buy"?'<span class="tick"></span>':""}${esc(dv.t)}</div>
+      <div class="sub-price">${l.shipping?"+"+money(l.shipping)+" ship":"free ship"}</div>
     </div>
+    <div class="delta ${d.cls}">${d.txt}<span class="dsub">${d.sub}</span></div>
+    <div class="rating ${RATING_CLASS[dv.k]}">${RATING_LABEL[dv.k]}</div>
   </article>`;
 }
 function sellRow(l){
   const hist = (l.priceHistory||[]).map(h=>h.landed), max = Math.max(...hist, 1);
-  const bars = hist.map(h => `<span style="height:${Math.max(12, h/max*30)}px"></span>`).join("");
+  const bars = hist.map(h => `<span style="height:${Math.max(10, h/max*28)}px"></span>`).join("");
   const trend = hist.length>1 ? (hist[hist.length-1]<hist[0]?{c:"down",t:"▼ dropping"}:hist[hist.length-1]>hist[0]?{c:"up",t:"▲ climbing"}:{c:"",t:"flat"}) : null;
   return `<article class="sell-row">
     <div>
@@ -258,6 +269,7 @@ function sellRow(l){
       ${hist.length>1?`<div class="spark">${bars}</div>`:""}
     </div>
     <div class="sr-price"><div class="sr-mult">${money(l.landed)}</div><div class="sr-vs">${(l.landed/baseline()).toFixed(1)}× retail</div></div>
+    <div class="rating hold">EXCL</div>
   </article>`;
 }
 function empty(name,h,p){ return `<div class="empty">${icon(name)}<h3>${esc(h)}</h3><p>${esc(p)}</p></div>`; }
@@ -267,10 +279,11 @@ function getStock(){ try { return JSON.parse(localStorage.getItem("inciardi_stoc
 function setStock(s){ localStorage.setItem("inciardi_stock", JSON.stringify(s)); }
 
 /* ---- theme + utils ---- */
-function initTheme(){ if (localStorage.getItem("inciardi_theme")==="dark"){ document.documentElement.dataset.theme="dark"; themeToggle.setAttribute("aria-pressed","true"); } }
-function toggleTheme(){ const d=document.documentElement.dataset.theme==="dark";
-  if(d){ delete document.documentElement.dataset.theme; localStorage.setItem("inciardi_theme","light"); themeToggle.setAttribute("aria-pressed","false"); }
-  else { document.documentElement.dataset.theme="dark"; localStorage.setItem("inciardi_theme","dark"); themeToggle.setAttribute("aria-pressed","true"); } }
+// dark terminal is the default; light is opt-in via [data-theme="light"].
+function initTheme(){ if (localStorage.getItem("inciardi_theme")==="light"){ document.documentElement.dataset.theme="light"; themeToggle.setAttribute("aria-pressed","false"); } else { themeToggle.setAttribute("aria-pressed","true"); } }
+function toggleTheme(){ const isLight = document.documentElement.dataset.theme==="light";
+  if(isLight){ delete document.documentElement.dataset.theme; localStorage.setItem("inciardi_theme","dark"); themeToggle.setAttribute("aria-pressed","true"); }
+  else { document.documentElement.dataset.theme="light"; localStorage.setItem("inciardi_theme","light"); themeToggle.setAttribute("aria-pressed","false"); } }
 function stampFooter(){
   const live = MARKET.source === "ebay-browse";
   $("f-build").textContent = `Inciardi Market ${BUILD}${PR?" · PR #"+PR:""}`;
