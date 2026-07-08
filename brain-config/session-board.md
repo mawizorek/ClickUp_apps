@@ -30,11 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session F1 panel polish · started 2026-07-07 22:25
-
-**Status:** active
-
-Standings driver card: (1) fix clipped team-name header (sticky solid header), (2) invert round-by-round to recent-first + add a summary header row (avg finish, points, podiums, DNFs). Touching source/standings/panel.js + panel.css only.
+*(empty — no agents currently working in the repo)*
 
 ---
 
