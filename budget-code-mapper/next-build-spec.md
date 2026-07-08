@@ -1,5 +1,11 @@
 # Budget Code Mapper v6 — Build Spec (Data Separation Retrofit)
 
+> **☐ OPEN WORK ITEM — redesign `index.html` into a pointer, not content.**
+> Any agent opening this app: treat this as ACTIVE WORK, not a passive rule. Refactor `index.html` into a thin pointer/router that references source pages/modules instead of storing servable content. **Check it off when done for this app** — then it clears.
+> _Current state: `index.html` is a ~227KB monolith — this is the biggest offender in the repo. High priority._
+>
+> - [ ] `index.html` redesigned into a pointer/router (not a content store)
+
 **Date:** 2026-07-02  
 **Source chunk set:** `budget-code-mapper/source/_index.md` (v5 baseline)  
 **App task:** Budget Code Mapper (APPS list)  
@@ -110,9 +116,3 @@ The data-separation retrofit makes the JSON round-trip native: the app's runtime
 - Offline: works fully from localStorage cache after first load.
 - Mobile: existing responsive behavior preserved.
 - Data file stays well under 30KB (budget code schema is compact).
-
----
-
-## Index = pointer, not a store (LOCKED 2026-07-08, standing)
-
-`index.html` is an INDEX: a thin shell/router that references source pages, never a file that itself stores a full servable page. The moment this app has more than one servable page/view, `index.html` becomes the dispatcher that points at them (real pages live as their own named files; the default landing is a one-line constant it can repoint without a rebuild). Keep the shell well under the read cap and never grow `index.html` into a multi-page store. Mirror of the locked rule in the Apps / HTML Artifacts standard + GitHub MCP Operating Standard.

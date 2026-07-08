@@ -1,5 +1,10 @@
 # World Cup 2026 Bracket — Next Build Spec
 
+> **☐ OPEN WORK ITEM — redesign `index.html` into a pointer, not content.**
+> Any agent opening this app: treat this as ACTIVE WORK, not a passive rule. Refactor `index.html` into a thin pointer/router that references `source/*` modules instead of storing servable content. If it's already a pure shell, verify and check the box. **Check it off when done for this app** — then it clears.
+>
+> - [ ] `index.html` redesigned into a pointer/router (not a content store)
+
 **Version target:** v5.0 (engine, bracket path system overhaul)
 **Current shipped:** v4.3 (arrows) + data.json
 **Live:** https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/
@@ -45,7 +50,6 @@
 - Mobile-first: legend chips must wrap, ≥44px targets, no overflow at 320px. The bracket already h-scrolls — the off-screen-highlight sliver (a highlighted card scrolled partly off the right edge reads as a floating fragment) is a known cosmetic rough edge; consider a subtle scroll-to-fit or edge fade when a path is traced.
 - Interaction-State standard (Dev+Research owned): every new control (chips, ✕, clear-all, multi-add) needs entry/exit/rest/collision answered.
 - Data-schema unchanged; colors/convergence computed at runtime from `fedBy` + selection state.
-- **Index = pointer, not a store (LOCKED 2026-07-08).** `index.html` stays a thin shell/router that references source pages; the instant a second servable page/view exists it becomes the dispatcher (real pages = their own named files, default landing = a one-line constant). Never grow `index.html` into a multi-page store. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.
 
 ## Futures (parked)
 

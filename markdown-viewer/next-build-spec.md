@@ -1,5 +1,10 @@
 # markdown-viewer v[N+1] — Build Spec (Surgical Diffs)
 
+> **☐ OPEN WORK ITEM — redesign `index.html` into a pointer, not content.**
+> Any agent opening this app: treat this as ACTIVE WORK, not a passive rule. Refactor `index.html` into a thin pointer/router that references source pages/modules instead of storing servable content. If it's already a pure shell, verify and check the box. **Check it off when done for this app** — then it clears.
+>
+> - [ ] `index.html` redesigned into a pointer/router (not a content store)
+
 > **STUB — not an active build.** Placeholder to bring this app in line with the repo standard (every app carries a `next-build-spec.md`). Populate this when a next version is actually scoped. Structure mirrors `template-app/next-build-spec.md`.
 >
 > **Standing rule (applies to this app):** must be designed for clean mobile viewing AND desktop — no horizontal overflow at 320px, footers/action bars that wrap or stack, touch targets ≥44px, fluid layout via `clamp()`/`min()`/`%`, safe-area insets. Test at phone width before shipping.
@@ -46,9 +51,3 @@
 
 - Base64 armor is mandatory for HTML source chunks (plaintext gets tag-flattened).
 - Prefer commit-pinned raw URLs over `main` branch URLs (transient CDN 404s on recent commits).
-
----
-
-## Index = pointer, not a store (LOCKED 2026-07-08, standing)
-
-`index.html` is an INDEX: a thin shell/router that references source pages, never a file that itself stores a full servable page. The moment this app has more than one servable page/view, `index.html` becomes the dispatcher that points at them (real pages live as their own named files; the default landing is a one-line constant it can repoint without a rebuild). Keep the shell well under the read cap and never grow `index.html` into a multi-page store. Mirror of the locked rule in the Apps / HTML Artifacts standard + GitHub MCP Operating Standard.
