@@ -21,7 +21,7 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 | `markdown-viewer` | — | retired | Superseded by `prism`. `status:'retired'` in app-dashboard; hidden by default behind the Show-retired toggle. README is a redirect/history stub. Do not develop. |
 | `file-chunker` | unverified (last known v16.2, 2026-07-01) | live | Verify against commit history before next PR. |
 | `budget-code-mapper` | unverified (last known v6, design) | live | Verify before next PR. |
-| `f1-racetracks` | unverified (last known v4/v5) | live | Verify before next PR. **Flagged 2026-07-08:** `data.json` commingles app manifest + per-season results + an `update_focus` changelog blob. Standard says split results to a per-year `f1-results/2026.json` + slim manifest + move changelog to commit messages. Queued as its own task (touches the F1 refresh routine). |
+| `f1-racetracks` | app unverified (last known v4/v5) · **standings lens v4** | live | **Standings (Championship Matrix) v4 (PR #95, 2026-07-08):** constructor rows now open a season-story side panel, drivers rolled up (points-contribution split showing who scored what + per-round team haul). Standings source (`source/standings/*`) verified fresh via blob reads; circuit app shell (`index.html`) still unverified. **Flagged 2026-07-08:** `data.json` commingles app manifest + per-season results + an `update_focus` changelog blob. Standard says split results to a per-year `f1-results/2026.json` + slim manifest + move changelog to commit messages. Queued as its own task (touches the F1 refresh routine). |
 | `world-cup-bracket` | shell v5.4 · data 2026-07-07 (verified) | live | Data-separated app: refreshes change only `data.json` (NO shell/version bump). Shell = v5.4 (last known; footer reads `v5.4 · direct`). Data 2026-07-07: R16 complete (8/8), QF slate seeded, lower-half `feedsTo` wiring fix. PR #76, merge SHA `1b50113`; ledger stamps PR #77. Verified against immutable commit-SHA path. Next refresh after QFs (Jul 9-11). |
 | `pdf-splitter` | unverified | live | Verify before next PR. |
 | `on-track` | unverified | live | Verify before next PR. |
@@ -32,4 +32,4 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 
 ---
 
-_Rollout note: `unverified` rows carry the last value I could see without a fresh read; each gets confirmed and firmed up the next time that app is touched. Confirmed rows (prism, app-dashboard, markdown-viewer, world-cup-bracket) are current as of 2026-07-08._
+_Rollout note: `unverified` rows carry the last value I could see without a fresh read; each gets confirmed and firmed up the next time that app is touched. Confirmed rows (prism, app-dashboard, markdown-viewer, world-cup-bracket, f1-racetracks standings lens) are current as of 2026-07-08._
