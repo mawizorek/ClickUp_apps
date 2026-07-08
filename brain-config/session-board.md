@@ -30,11 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session F1 trajectory metrics · started 2026-07-07 22:11
-
-**Status:** active
-
-Adding 3 toggleable trajectory metrics (standings/gap/position) + teammate overlay to the standings driver card. Touching source/standings/ (data.js, panel.js, panel.css, new trajectory.js) + standings.html script order + sprint-cell divider fix. Add-only to f1-racetracks; main app untouched.
+*(empty — no agents currently working in the repo)*
 
 ---
 
