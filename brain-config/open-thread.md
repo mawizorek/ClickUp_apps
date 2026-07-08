@@ -27,14 +27,15 @@ Prism shipped v1 this session (`prism/`, live at https://mawizorek.github.io/Cli
 ---
 
 ## F1 Schema-Shift — pending items
-**Added:** 2026-07-07
+**Added:** 2026-07-07 · **Updated:** 2026-07-08
 
-The results schema-shift shipped its data foundation this session: `f1-results/2026/` (per-round files + `index.json`), full 20-car verified order, race + sprint, provenance, computable standings. Spec: `f1-racetracks/next-build-spec.md`. Still open:
+The results schema-shift shipped its data foundation: `f1-racetracks/f1-results/2026/` (per-round files + `index.json`, RELOCATED 2026-07-08 from repo root to under the app so the root lists only apps), full 20-car verified order, race + sprint, provenance, computed standings. The standings lens (`f1-racetracks/standings.html` + `source/standings/`) is live with the 3-metric trajectory + teammate overlay. Spec: `f1-racetracks/next-build-spec.md`. Still open:
 
-- **(a) Driver-anchor dedup — BLOCKS the ClickUp mirror.** Rows for Colapinto, Lindblad, Bottas, Perez carry `driverId:null` + `_anchor:"UNRESOLVED-DUP"` in the round files. The F1 Drivers list has DUPLICATE tasks (two Colapinto, two Bottas, two Lindblad; Perez single but in the newer ID block), so a 1:1 resolve isn't possible and IDs were NOT guessed. ACTION: dedup the list (🗑️ + DUPLICATE label on the extras per posting hygiene), confirm canonical IDs, backfill the null anchors. Likely-canonical originals in the established 86ae52* block: Colapinto `86ae52rq5`, Bottas `86ae52rtd`, Lindblad `86ae52ryh`; Perez only `86aj1ra1z` exists.
+- **(a) Driver-anchor dedup — ✅ RESOLVED (2026-07-08, PR #61).** Colapinto/Lindblad/Bottas/Perez now carry canonical `driverId`s (86aj1ra0h / 86aj1ra31 / 86aj1ra1g / 86aj1ra1z); no UNRESOLVED-DUP remain in the round files. (Michael to delete the three December placeholder driver-task stubs in ClickUp: 86ae52rq5, 86ae52ryh, 86ae52rtd.)
 - **(b) f1-refresh mirror rework — time-sensitive (Ricky runs Thu–Sun).** `routines/f1-refresh.md` still targets the retired per-year ClickUp result dropdown. Post-shift the mirror must: keep slim writes (status-flip, dates, notifications), and its one data write becomes appending the frozen year-line to the new slim "Race History" text field, resolved by `cuTaskId`. Full order never touches ClickUp. Rework before the next race weekend or Ricky writes to a dead field.
 - **(c) ClickUp "Race History" field not yet created.** One slim year-labeled text field per track (frozen archive lens, fill-if-blank, prior years immutable). Retire the per-year result dropdowns once it's populated.
-- **(d) Builds 2–4 are aesthetic (pit-wall restyle) — do WITH Michael, not solo.** Championship points matrix + computed standings, driver-brief cell interaction, then propagate the sharp-corner/tabular restyle. Backend is done; these wait for a live design session.
+- **(d) Pit-wall restyle propagation (build 4) — do WITH Michael.** The standings lens is shipped in the pit-wall language; the OTHER pages (index.html circuit views, live-tracker) still carry the old OnTrack aesthetic and will mismatch until propagated. Aesthetic session, with Michael.
+- **(e) OpenF1 sourcing** for the granular per-cell fields (grid, best lap, pits, tyres, story tags) to replace the illustrative `DETAIL` preview data in `source/standings/data.js`.
 
 ---
 
