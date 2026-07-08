@@ -14,12 +14,13 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/app-dashboard/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%82%EF%B8%8F%3C/text%3E%3C/svg%3E">
-<!-- INFRASTRUCTURE: modular. Slim loader + source/{styles,sheet,settings}.css + source/{data,render,sheet,settings,app}.js -->
+<!-- INFRASTRUCTURE: modular. Slim loader + source/{styles,sheet,settings,retired}.css + source/{data,render,sheet,settings,app}.js -->
 <!-- Each source file kept under the ~12KB gate. Engine version + PR live in app.js. Theme: settings gear, persisted to localStorage. -->
 <script>try{if(localStorage.getItem('appDashboard_theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
 <link rel="stylesheet" href="source/styles.css">
 <link rel="stylesheet" href="source/sheet.css">
 <link rel="stylesheet" href="source/settings.css">
+<link rel="stylesheet" href="source/retired.css">
 </head>
 <body>
 <div class="wrap">
@@ -42,7 +43,7 @@
       <button class="win-seg on" data-window="clickup" role="tab" aria-selected="true">ClickUp</button>
       <button class="win-seg" data-window="filemaker" role="tab" aria-selected="false">FileMaker</button>
     </div>
-    <p class="status-line" id="statusLine">Loading apps…</p>
+    <p class="status-line" id="statusLine">Loading apps\u2026</p>
     <p class="demo-note" id="demoNote" style="display:none">Preview with sample data. Live build reads the repo.</p>
   </header>
 
@@ -73,6 +74,8 @@
     <button class="chip on" data-filter="all">All</button>
     <button class="chip" data-filter="dashboard">Dashboards</button>
     <button class="chip" data-filter="tool">Tools</button>
+    <span class="chip-sep"></span>
+    <button class="chip retired-chip" id="retiredToggle" aria-pressed="false">Show retired</button>
   </div>
 
   <p class="sec-label" id="secLabel">Apps</p>
@@ -86,7 +89,7 @@
 </div>
 
 <footer>
-  <span class="stamp">app-dashboard <span id="verStamp"></span> · <span id="refreshStamp">—</span></span>
+  <span class="stamp">app-dashboard <span id="verStamp"></span> \u00b7 <span id="refreshStamp">\u2014</span></span>
 </footer>
 
 <!-- settings panel -->
@@ -118,9 +121,9 @@
   <div class="sheet-scroll">
     <p class="sheet-desc" id="sheetDesc"></p>
     <div class="sheet-metrics">
-      <div class="metric"><div class="v" id="mHealth">—</div><div class="k">Status</div></div>
-      <div class="metric"><div class="v" id="mUpdated">—</div><div class="k">Updated</div></div>
-      <div class="metric"><div class="v" id="mCommits">—</div><div class="k">Commits</div></div>
+      <div class="metric"><div class="v" id="mHealth">\u2014</div><div class="k">Status</div></div>
+      <div class="metric"><div class="v" id="mUpdated">\u2014</div><div class="k">Updated</div></div>
+      <div class="metric"><div class="v" id="mCommits">\u2014</div><div class="k">Commits</div></div>
     </div>
     <div class="sheet-actions">
       <a class="sa sa-open" id="sheetOpen" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>Open app</a>
