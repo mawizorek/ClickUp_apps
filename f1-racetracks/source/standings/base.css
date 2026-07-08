@@ -90,7 +90,7 @@ tbody tr:hover td{background:var(--s2)}
 td.col-pts .tot{height:45px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.98rem}
 tbody tr:first-child td.col-pts .tot{color:var(--gold)}
 
-.cell{width:100%;height:45px;border:0;border-left:1px solid var(--line-soft);background:transparent;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-family:inherit;color:inherit;padding:4px 2px;transition:background .12s var(--ease)}
+.cell{width:100%;height:45px;border:0;border-left:1px solid var(--line-soft);background:transparent;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit;color:inherit;padding:4px 2px;transition:background .12s var(--ease)}
 .cell:hover{background:var(--s3) !important}
 .cell:focus-visible{outline:2px solid var(--purple);outline-offset:-2px}
 .cell .cp{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.92rem;line-height:1;color:var(--txt)}
@@ -108,7 +108,9 @@ tbody tr:first-child td.col-pts .tot{color:var(--gold)}
 .cell.dnfhot{background:color-mix(in oklch,var(--red) 15%,transparent)}
 .cell.dnfhot::before{content:"";position:absolute;inset:0;border:1px solid color-mix(in oklch,var(--red) 40%,transparent);pointer-events:none}
 .cell .flmark{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--purple)}
-.cell .sprmark{font-family:'JetBrains Mono',monospace;font-size:0.48rem;font-weight:700;color:var(--amber);line-height:1;margin-top:1px}
+/* sprint sub-result: a distinct bordered pill so a strong sprint on a weak GP (e.g.
+   Britain P16 + sprint win) reads as TWO results, not a math error. */
+.cell .sprmark{font-family:'JetBrains Mono',monospace;font-size:0.5rem;font-weight:700;color:var(--amber);line-height:1;border:1px solid color-mix(in oklch,var(--amber) 45%,var(--line));padding:1px 4px;letter-spacing:0.03em}
 .cell .deep{position:absolute;bottom:4px;left:5px;width:4px;height:4px;background:var(--txt-dim);border-radius:50%}
 .cell.story .deep,.cell.mover .deep{background:var(--txt-mid)}
 .cell.empty{cursor:default}

@@ -1,7 +1,7 @@
 /* data.js — fetch the canonical per-round store, compute standings, shared helpers.
-   Loaded first; defines globals used by matrix.js and panel.js. No data duplicated:
-   verified results live in ../f1-results/2026/. */
-const APP_VERSION='v1';
+   Loaded first; defines globals used by matrix.js, trajectory.js and panel.js. No data
+   duplicated: verified results live in ../f1-results/2026/. */
+const APP_VERSION='v2';
 const DATA_BASE='../f1-results/2026/';
 const TEAM_VAR={"Mercedes":"--t-mercedes","Ferrari":"--t-ferrari","McLaren":"--t-mclaren","Red Bull":"--t-redbull","Racing Bulls":"--t-racingbulls","Alpine":"--t-alpine","Aston Martin":"--t-astonmartin","Williams":"--t-williams","Haas":"--t-haas","Audi":"--t-audi","Cadillac":"--t-cadillac"};
 const teamColor=t=>`var(${TEAM_VAR[t]||'--txt-dim'})`;
@@ -48,6 +48,11 @@ function wins(id){return ROUNDS.filter(rd=>{const r=raceRow(rd,id);return r&&r.p
 function bestFin(id){let b=99;ROUNDS.forEach(rd=>{const r=raceRow(rd,id);if(r&&r.status==='FIN'&&r.pos&&r.pos<b)b=r.pos;});return b;}
 function teammate(id){const t=DRV[id].team;return Object.keys(DRV).find(k=>k!==id&&DRV[k].team===t);}
 function h2h(id,mate){let me=0,them=0;ROUNDS.forEach(rd=>{const a=raceRow(rd,id),b=raceRow(rd,mate);if(a&&b&&a.status==='FIN'&&b.status==='FIN'){if(a.pos<b.pos)me++;else them++;}});return[me,them];}
+
+/* trajectory source series (combined race + sprint), used by trajectory.js */
+function cumPoints(id){let t=0;return ROUNDS.map(rd=>{const r=(rd.classification||[]).find(x=>x.driverId===id);const s=rd.sprint?rd.sprint.classification.find(x=>x.driverId===id):null;t+=(r?r.points:0)+(s?s.points:0);return t;});}
+function leaderPace(){return ROUNDS.map((_,i)=>Math.max(...Object.keys(DRV).map(id=>cumPoints(id)[i])));}
+function gapVals(id){const c=cumPoints(id),l=leaderPace();return c.map((v,i)=>v-l[i]);}
 function rankTrajectory(id){const cum={};Object.keys(DRV).forEach(k=>cum[k]=0);const tr=[];ROUNDS.forEach(rd=>{(rd.classification||[]).forEach(r=>cum[r.driverId]+=r.points);if(rd.sprint)rd.sprint.classification.forEach(r=>cum[r.driverId]+=r.points);const board=Object.keys(cum).sort((a,b)=>cum[b]-cum[a]);tr.push(board.indexOf(id)+1);});return tr;}
 
 function cellMeta(rd,id){

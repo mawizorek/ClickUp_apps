@@ -66,9 +66,29 @@
 .h2h .h2h-vs{font-size:0.74rem;color:var(--txt-mid);margin-left:auto;text-align:right}
 .h2h .h2h-vs b{color:var(--txt);font-weight:600}
 
+/* trajectory chart (3 metrics + teammate overlay) */
 .traj{border:1px solid var(--line-soft);background:var(--s1);padding:12px 14px}
-.traj .tl{font-size:0.54rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between}
-.traj svg{width:100%;height:50px;display:block}
+.traj-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.tt-lbl{font-size:0.54rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
+.tt-end{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.9rem}
+.traj-seg{display:inline-flex;border:1px solid var(--line);margin-bottom:14px}
+.traj-seg button{font-family:'Chakra Petch',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--txt-dim);background:transparent;border:0;cursor:pointer;padding:6px 10px;transition:.12s var(--ease)}
+.traj-seg button + button{border-left:1px solid var(--line)}
+.traj-seg button[aria-selected="true"]{background:var(--s3);color:var(--txt)}
+.traj-seg button:hover:not([aria-selected="true"]){color:var(--txt-mid)}
+.traj-svg{width:100%;height:150px;display:block;overflow:visible}
+.traj-svg .tg{stroke:var(--line-soft);stroke-width:1;vector-effect:non-scaling-stroke}
+.traj-svg .tax{fill:var(--txt-dim);font-family:'JetBrains Mono',monospace;font-size:9px}
+.traj-svg .tref{fill:none;stroke:var(--txt-dim);stroke-width:1.5;stroke-dasharray:2 3;opacity:0.55;vector-effect:non-scaling-stroke}
+.traj-svg .tmate{fill:none;stroke:var(--txt-mid);stroke-width:1.5;stroke-dasharray:5 3;opacity:0.7;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.traj-svg .tmain{fill:none;stroke:var(--team);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.traj-leg{display:flex;gap:12px;flex-wrap:wrap;font-size:0.62rem;color:var(--txt-dim);margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft);align-items:center}
+.traj-leg span{display:inline-flex;align-items:center;gap:5px}
+.tk-main{width:14px;height:2.5px;border-radius:2px}
+.tk-mate{width:14px;height:0;border-top:2px dashed var(--txt-mid)}
+.tk-ref{width:14px;height:0;border-top:1.5px dashed var(--txt-dim);opacity:0.7}
+.tk-dot{width:7px;height:7px;border-radius:50%}
+.tk-dot.g{background:var(--gold)}.tk-dot.r{background:var(--red)}
 
 .season-list{display:flex;flex-direction:column;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft)}
 .season-row{background:var(--s1);display:grid;grid-template-columns:30px 1fr auto auto;gap:12px;align-items:center;padding:9px 13px}
