@@ -30,9 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session prism-v1.1-mobile-chrome · started 2026-07-07 23:25 (last update 23:25)
-
-**Status:** active — slimming Prism's mobile header in `prism/prism.css`, bumping `?v=` cache tokens in `prism/index.html`, updating `VERSIONS.md`. Not touching `prism.*.js` (footer sheet already lives there).
+*(empty — no agents currently working in the repo)*
 
 ---
 
