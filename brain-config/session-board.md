@@ -30,11 +30,7 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session close hook migration · started 2026-07-07 21:24 ET (last update 21:24)
-
-**Status:** active
-**Touching:** `brain-config/hooks/session-close.md` (new file), session-board.md
-**Intent:** Migrating session close procedure from ClickUp doc to repo hook. No other files affected this commit.
+*(empty — no agents currently working in the repo)*
 
 ---
 
