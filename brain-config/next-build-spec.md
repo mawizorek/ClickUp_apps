@@ -29,3 +29,4 @@ One file per app, overwritten each cycle. Version lives in this header, never th
 - **Read path:** file bodies via raw.githubusercontent URL; `githubmcp_get_file_contents` returns metadata/SHA only on a file path. Do not reconstruct source from the index summary.
 - **Pages lag ~60s** after commit before the live URL reflects the new build.
 - **Prose-metadata convention:** the viewer extracts `**Shortcut:**` / `**Launch prompt:**` by regex, matching how it already reads `**Purpose:**`. Keep the fenced-block form for the prompt so multi-line prompts survive.
+- **Index = pointer, not a store (LOCKED 2026-07-08).** The landing `index.html` is a toggle shell (Our AI Index / Platform Tools) that iframes `custom-tools.html` + `tool-index.html`; it stores no tool content. Keep it a pointer; never fold the registry or platform list back into it. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.

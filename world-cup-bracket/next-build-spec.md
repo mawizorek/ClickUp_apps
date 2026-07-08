@@ -45,6 +45,7 @@
 - Mobile-first: legend chips must wrap, ≥44px targets, no overflow at 320px. The bracket already h-scrolls — the off-screen-highlight sliver (a highlighted card scrolled partly off the right edge reads as a floating fragment) is a known cosmetic rough edge; consider a subtle scroll-to-fit or edge fade when a path is traced.
 - Interaction-State standard (Dev+Research owned): every new control (chips, ✕, clear-all, multi-add) needs entry/exit/rest/collision answered.
 - Data-schema unchanged; colors/convergence computed at runtime from `fedBy` + selection state.
+- **Index = pointer, not a store (LOCKED 2026-07-08).** `index.html` stays a thin shell/router that references source pages; the instant a second servable page/view exists it becomes the dispatcher (real pages = their own named files, default landing = a one-line constant). Never grow `index.html` into a multi-page store. Mirror of the Apps / HTML Artifacts + GitHub MCP standards.
 
 ## Futures (parked)
 
