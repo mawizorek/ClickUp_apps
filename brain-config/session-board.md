@@ -30,7 +30,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-*(empty — no agents currently working in the repo)*
+### Brain · session F1 data relocation · started 2026-07-07 22:36
+
+**Status:** active
+
+Moving the results store OUT of repo root INTO the app: `f1-results/2026/` → `f1-racetracks/f1-results/2026/` so the repo root shows only apps. Touching: new nested data files, `source/standings/data.js` (DATA_BASE path), next-build-spec.md, open-thread.md; deleting old root `f1-results/`. NOT touching standings.html (preserving the cache-bust another session just shipped).
 
 ---
 
