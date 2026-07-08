@@ -20,7 +20,7 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 | `file-chunker` | unverified (last known v16.2, 2026-07-01) | live | Verify against commit history before next PR. |
 | `budget-code-mapper` | unverified (last known v6, design) | live | Verify before next PR. |
 | `f1-racetracks` | unverified (last known v4/v5) | live | Verify before next PR. |
-| `world-cup-bracket` | unverified | live | Verify before next PR. |
+| `world-cup-bracket` | data 2026-07-07 (verified) | live | Data-separated app: only `data.json` changes on refresh, NO `index.html`/version bump. R16 complete (8/8), QF slate seeded, lower-half `feedsTo` wiring fix. PR #76, merge SHA `1b50113`. Verified against immutable commit-SHA path. Next refresh after QFs (Jul 9-11). Ledger stamp = the read-of-record for daily refreshes. |
 | `pdf-splitter` | unverified | live | Verify before next PR. |
 | `on-track` | unverified | live | Verify before next PR. |
 | `inciardi-market` | unverified | live | Verify before next PR. |
@@ -30,4 +30,4 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 
 ---
 
-_Rollout note: `unverified` rows carry the last value I could see without a fresh read; each gets confirmed and firmed up the next time that app is touched. Confirmed rows (prism, app-dashboard, markdown-viewer) are current as of 2026-07-07._
+_Rollout note: `unverified` rows carry the last value I could see without a fresh read; each gets confirmed and firmed up the next time that app is touched. Confirmed rows (prism, app-dashboard, markdown-viewer, world-cup-bracket) are current as of 2026-07-07._
