@@ -1,7 +1,7 @@
 /* Inciardi Market — engine. Reads market.json (eBay prices) + catalog.json (master + machines). */
 
 const BUILD = "v7";
-const PR = 95; // merged PR that shipped this version
+const PR = 96; // merged PR that shipped this version
 
 // Live data source. Soft default: if the user hasn't pasted an override in Settings,
 // the app pulls from the Worker. Blank/failed Worker falls back to bundled sample.
