@@ -32,7 +32,7 @@ function render(){
   const map={};STANDINGS.forEach(d=>{map[d.team]=map[d.team]||{team:d.team,total:0,wins:0};map[d.team].total+=d.total;});
   ROUNDS.forEach(rd=>{const w=(rd.classification||[]).find(x=>x.pos===1);if(w)map[DRV[w.driverId].team].wins++;});
   const wrows=Object.values(map).sort((a,b)=>b.total-a.total);const wmax=wrows[0].total;
-  const wcc=wrows.map((t,i)=>`<div class="wcc-row"><div class="wcc-rank num">${i+1}</div><div class="wcc-bar" style="--team:${teamColor(t.team)}"></div><div class="wcc-name">${t.team}</div><div class="wcc-wins">${t.wins} ${t.wins===1?'win':'wins'}</div><div class="wcc-pts num">${t.total}</div><div class="wcc-track" style="--team:${teamColor(t.team)};width:${(t.total/wmax*100).toFixed(1)}%"></div></div>`).join('');
+  const wcc=wrows.map((t,i)=>`<div class="wcc-row" data-constructor="${t.team}" role="button" tabindex="0" aria-label="${t.team} season story"><div class="wcc-rank num">${i+1}</div><div class="wcc-bar" style="--team:${teamColor(t.team)}"></div><div class="wcc-name">${t.team}</div><div class="wcc-wins">${t.wins} ${t.wins===1?'win':'wins'}</div><div class="wcc-pts num">${t.total}</div><div class="wcc-cue" aria-hidden="true">\u203A</div><div class="wcc-track" style="--team:${teamColor(t.team)};width:${(t.total/wmax*100).toFixed(1)}%"></div></div>`).join('');
 
   document.getElementById('stage').innerHTML=`<div class="scroll-wrap" id="matrixWrap"><table class="matrix"><thead>${head}</thead><tbody>${body}</tbody></table></div><div class="wcc hidden" id="wccWrap">${wcc}</div>`;
 }

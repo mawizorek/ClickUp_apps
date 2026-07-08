@@ -1,13 +1,13 @@
 :root{
-  --bg:oklch(0.15 0.012 255);--s1:oklch(0.185 0.014 255);--s2:oklch(0.225 0.016 255);
-  --s3:oklch(0.275 0.018 255);--line:oklch(0.32 0.018 255);--line-soft:oklch(0.26 0.016 255);
-  --txt:oklch(0.96 0.006 255);--txt-mid:oklch(0.74 0.010 255);--txt-dim:oklch(0.55 0.012 255);
-  --gold:oklch(0.86 0.155 90);--silver:oklch(0.86 0.010 255);--bronze:oklch(0.73 0.10 55);
-  --purple:oklch(0.72 0.17 300);--amber:oklch(0.80 0.155 78);--mover:oklch(0.78 0.13 200);--red:oklch(0.64 0.20 25);
-  --t-mercedes:oklch(0.80 0.13 182);--t-ferrari:oklch(0.64 0.22 26);--t-mclaren:oklch(0.74 0.17 58);
-  --t-redbull:oklch(0.60 0.15 268);--t-racingbulls:oklch(0.72 0.13 262);--t-alpine:oklch(0.74 0.13 232);
-  --t-astonmartin:oklch(0.66 0.13 168);--t-williams:oklch(0.66 0.16 252);--t-haas:oklch(0.80 0.02 255);
-  --t-audi:oklch(0.70 0.085 35);--t-cadillac:oklch(0.78 0.10 88);--ease:cubic-bezier(0.22,1,0.36,1);
+ --bg:oklch(0.15 0.012 255);--s1:oklch(0.185 0.014 255);--s2:oklch(0.225 0.016 255);
+ --s3:oklch(0.275 0.018 255);--line:oklch(0.32 0.018 255);--line-soft:oklch(0.26 0.016 255);
+ --txt:oklch(0.96 0.006 255);--txt-mid:oklch(0.74 0.010 255);--txt-dim:oklch(0.55 0.012 255);
+ --gold:oklch(0.86 0.155 90);--silver:oklch(0.86 0.010 255);--bronze:oklch(0.73 0.10 55);
+ --purple:oklch(0.72 0.17 300);--amber:oklch(0.80 0.155 78);--mover:oklch(0.78 0.13 200);--red:oklch(0.64 0.20 25);
+ --t-mercedes:oklch(0.80 0.13 182);--t-ferrari:oklch(0.64 0.22 26);--t-mclaren:oklch(0.74 0.17 58);
+ --t-redbull:oklch(0.60 0.15 268);--t-racingbulls:oklch(0.72 0.13 262);--t-alpine:oklch(0.74 0.13 232);
+ --t-astonmartin:oklch(0.66 0.13 168);--t-williams:oklch(0.66 0.16 252);--t-haas:oklch(0.80 0.02 255);
+ --t-audi:oklch(0.70 0.085 35);--t-cadillac:oklch(0.78 0.10 88);--ease:cubic-bezier(0.22,1,0.36,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -55,8 +55,8 @@ thead th{position:sticky;top:0;z-index:3;background:var(--s2);border-bottom:1px 
 .col-pos{min-width:32px;width:32px;text-align:center;left:0;position:sticky;z-index:5}
 .col-drv{text-align:left;left:32px;position:sticky;z-index:5;min-width:146px}
 /* PTS is sticky WITHOUT a left offset on purpose: it glides over the name column on
-   horizontal scroll (a deliberate touch), then off-screen, while race cells slide under
-   the frozen name. Higher z + solid bg keep it legible. Do NOT add a left offset. */
+ horizontal scroll (a deliberate touch), then off-screen, while race cells slide under
+ the frozen name. Higher z + solid bg keep it legible. Do NOT add a left offset. */
 .col-pts{text-align:center;position:sticky;z-index:6;min-width:54px;border-right:2px solid var(--line)}
 thead .col-pos,thead .col-drv,thead .col-pts{z-index:7;background:var(--s2)}
 td.col-pos,td.col-drv,td.col-pts{background:var(--s1)}
@@ -109,7 +109,7 @@ tbody tr:first-child td.col-pts .tot{color:var(--gold)}
 .cell.dnfhot::before{content:"";position:absolute;inset:0;border:1px solid color-mix(in oklch,var(--red) 40%,transparent);pointer-events:none}
 .cell .flmark{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--purple)}
 /* sprint sub-result: a distinct bordered pill so a strong sprint on a weak GP (e.g.
-   Britain P16 + sprint win) reads as TWO results, not a math error. */
+ Britain P16 + sprint win) reads as TWO results, not a math error. */
 .cell .sprmark{font-family:'JetBrains Mono',monospace;font-size:0.5rem;font-weight:700;color:var(--amber);line-height:1;border:1px solid color-mix(in oklch,var(--amber) 45%,var(--line));padding:1px 4px;letter-spacing:0.03em}
 .cell .deep{position:absolute;bottom:4px;left:5px;width:4px;height:4px;background:var(--txt-dim);border-radius:50%}
 .cell.story .deep,.cell.mover .deep{background:var(--txt-mid)}
@@ -117,14 +117,19 @@ tbody tr:first-child td.col-pts .tot{color:var(--gold)}
 .cell.empty .cp{color:var(--txt-dim);font-weight:500}
 
 .wcc{border:1px solid var(--line);background:var(--s1)}
-.wcc-row{display:grid;grid-template-columns:44px 4px 1fr auto auto;align-items:center;gap:14px;padding:0 18px;height:56px;border-bottom:1px solid var(--line-soft);position:relative}
+.wcc-row{display:grid;grid-template-columns:44px 4px 1fr auto auto 18px;align-items:center;gap:14px;padding:0 18px;height:56px;border-bottom:1px solid var(--line-soft);position:relative}
 .wcc-row:last-child{border-bottom:0}
+.wcc-row[data-constructor]{cursor:pointer;transition:background .12s var(--ease)}
+.wcc-row[data-constructor]:hover{background:var(--s2)}
+.wcc-row[data-constructor]:focus-visible{outline:2px solid var(--purple);outline-offset:-2px}
 .wcc-rank{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.02rem;color:var(--txt-mid);text-align:center}
 .wcc-row:first-child .wcc-rank{color:var(--gold)}
 .wcc-bar{width:4px;height:30px;background:var(--team)}
 .wcc-name{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:1rem}
 .wcc-wins{font-size:0.68rem;color:var(--txt-dim);letter-spacing:0.06em;text-transform:uppercase}
 .wcc-pts{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:1.18rem;min-width:58px;text-align:right}
+.wcc-cue{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:1.1rem;line-height:1;color:var(--txt-dim);text-align:center;transition:color .12s var(--ease),transform .12s var(--ease)}
+.wcc-row[data-constructor]:hover .wcc-cue{color:var(--txt);transform:translateX(2px)}
 .wcc-track{position:absolute;left:0;bottom:0;height:2px;background:var(--team);opacity:0.5}
 
 footer{margin-top:18px;padding-top:12px;border-top:1px solid var(--line-soft);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:0.66rem;color:var(--txt-dim)}
@@ -132,8 +137,8 @@ footer .num{color:var(--txt-mid)}
 
 @media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
 @media (max-width:560px){
-  .col-drv{min-width:100px}
-  .drv-team{display:none}.drv-name .fn{display:none}
-  .team-bar{height:22px}
-  .leader-strip{width:100%}.leader-cell{flex:1}
+ .col-drv{min-width:100px}
+ .drv-team{display:none}.drv-name .fn{display:none}
+ .team-bar{height:22px}
+ .leader-strip{width:100%}.leader-cell{flex:1}
 }

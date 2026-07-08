@@ -1,7 +1,7 @@
 /* data.js — fetch the canonical per-round store, compute standings, shared helpers.
  Loaded first; defines globals used by matrix.js, trajectory.js and panel.js. No data
  duplicated: verified results live in ./f1-results/2026/ (nested under the app). */
-const APP_VERSION='v3';
+const APP_VERSION='v4';
 const DATA_BASE='f1-results/2026/';
 const TEAM_VAR={"Mercedes":"--t-mercedes","Ferrari":"--t-ferrari","McLaren":"--t-mclaren","Red Bull":"--t-redbull","Racing Bulls":"--t-racingbulls","Alpine":"--t-alpine","Aston Martin":"--t-astonmartin","Williams":"--t-williams","Haas":"--t-haas","Audi":"--t-audi","Cadillac":"--t-cadillac"};
 const teamColor=t=>`var(${TEAM_VAR[t]||'--txt-dim'})`;

@@ -4,8 +4,8 @@
 .panel{position:fixed;top:0;right:0;height:100dvh;width:min(420px,94vw);background:var(--s1);border-left:1px solid var(--line);transform:translateX(102%);transition:transform .32s var(--ease);z-index:61;display:flex;flex-direction:column;box-shadow:-24px 0 60px oklch(0.08 0.01 255 / 0.5)}
 .panel.open{transform:translateX(0)}
 /* flex:none is load-bearing: without it the header (a flex child) shrinks below its
-   content when the body is tall, and overflow:hidden clips the team-name line
-   (the Oscar/MCLAREN clip). Header must never shrink; body takes the remaining height. */
+ content when the body is tall, and overflow:hidden clips the team-name line
+ (the Oscar/MCLAREN clip). Header must never shrink; body takes the remaining height. */
 .panel-head{flex:none;position:relative;padding:19px 20px 17px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;overflow:hidden}
 .panel-head::before{content:"";position:absolute;inset:0;background:linear-gradient(150deg,color-mix(in oklch,var(--team) 22%,var(--s1)) 0%,var(--s1) 62%);opacity:0.9;z-index:0}
 .panel-head > *{position:relative;z-index:1}
@@ -108,3 +108,22 @@
 .season-row .sr-fin{font-family:'JetBrains Mono',monospace;font-size:0.77rem;font-weight:700;text-align:right;min-width:34px}
 .season-row .sr-pts{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--txt-mid);min-width:26px;text-align:right}
 .section-h{font-family:'Chakra Petch',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);margin-bottom:8px;display:block}
+
+/* constructor season story: drivers rolled up into one narrative */
+.csplit{border:1px solid var(--line-soft);background:var(--s1);padding:13px 14px;display:flex;flex-direction:column;gap:13px}
+.csplit-bar{display:flex;height:10px;gap:2px}
+.csplit-bar span{display:block;height:100%;min-width:3px}
+.csplit-rows{display:flex;flex-direction:column;gap:10px}
+.csplit-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center}
+.csplit-nm{display:flex;align-items:center;gap:9px;min-width:0;font-size:0.84rem;font-weight:600}
+.csplit-nm .cdot{width:9px;height:9px;flex:none}
+.csplit-nm .cn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.csplit-pts{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.98rem}
+.csplit-pct{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--txt-mid);min-width:42px;text-align:right}
+.season-row.crow{grid-template-columns:34px 1fr auto;align-items:start;padding:10px 13px}
+.crow .cr-ev{display:flex;flex-direction:column;gap:6px;min-width:0}
+.crow .cr-nm{font-size:0.79rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .cr-chips{display:flex;gap:11px;flex-wrap:wrap}
+.crow .cr-chip{font-family:'JetBrains Mono',monospace;font-size:0.67rem;color:var(--txt-mid);display:inline-flex;gap:5px;align-items:center;white-space:nowrap}
+.crow .cr-chip b{color:var(--txt-dim);font-weight:700;letter-spacing:0.03em}
+.crow .cr-pts{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.9rem;text-align:right;min-width:24px}

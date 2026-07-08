@@ -36,6 +36,49 @@ function seasonBrief(id){
   return `<div class="panel-head" style="--team:${teamColor(d.team)}"><div><div class="panel-ey">Season \u00B7 Championship P${d.champRank}</div><div class="panel-drv">${d.name}</div>${teamChip(d.team)}</div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body"><div class="stat-grid"><div class="stat"><span class="sl">Total</span><span class="sv num" style="color:${d.champRank===1?'var(--gold)':'var(--txt)'}">${d.total}</span></div><div class="stat"><span class="sl">Pos</span><span class="sv num">P${d.champRank}</span></div><div class="stat"><span class="sl">Race / Spr</span><span class="sv num">${d.race}<small> / ${d.sprint}</small></span></div><div class="stat"><span class="sl">Wins</span><span class="sv num">${w}</span></div><div class="stat"><span class="sl">Best</span><span class="sv num">${best===99?'\u2014':'P'+best}</span></div><div class="stat"><span class="sl">Rounds</span><span class="sv num">${ROUNDS.length}</span></div></div>${h2hHtml}<div class="traj" id="trajBox">${buildTrajectory(id,'position')}</div><div><span class="section-h">Round by round</span>${summary}<div class="season-list">${colhead}${rows}</div></div></div>`;
 }
 
+/* constructorTable — WCC standings, mirrors matrix.js (sum of both drivers' race+sprint;
+   wins = race wins). Kept here so the story panel and the table never disagree. */
+function constructorTable(){
+  const map={};
+  STANDINGS.forEach(d=>{const m=map[d.team]||(map[d.team]={team:d.team,total:0,race:0,sprint:0,wins:0});m.total+=d.total;m.race+=d.race;m.sprint+=d.sprint;});
+  ROUNDS.forEach(rd=>{const w=(rd.classification||[]).find(x=>x.pos===1);if(w&&map[DRV[w.driverId].team])map[DRV[w.driverId].team].wins++;});
+  return Object.values(map).sort((a,b)=>b.total-a.total);
+}
+
+/* constructorSeason — the drivers rolled up: how the team's points came to be.
+   Contribution split (who scored what) + real per-round team haul. All verified data. */
+function constructorSeason(team){
+  const table=constructorTable();
+  const rank=table.findIndex(t=>t.team===team)+1;
+  const T=table[rank-1];
+  const drivers=STANDINGS.filter(d=>d.team===team).sort((a,b)=>b.total-a.total);
+  let podiums=0,poles=0,fls=0;
+  ROUNDS.forEach(rd=>{
+    drivers.forEach(d=>{const r=raceRow(rd,d.id);if(r&&r.status==='FIN'&&r.pos&&r.pos<=3)podiums++;});
+    if(rd.pole&&DRV[rd.pole.driverId]&&DRV[rd.pole.driverId].team===team)poles++;
+    if(rd.fastestLap&&DRV[rd.fastestLap.driverId]&&DRV[rd.fastestLap.driverId].team===team)fls++;
+  });
+  const lead=teamColor(team);
+  const tone=i=>i===0?lead:`color-mix(in oklch,${lead} 42%,var(--s3))`;
+  const bar=drivers.map((d,i)=>`<span style="width:${T.total?(d.total/T.total*100).toFixed(1):(100/drivers.length).toFixed(1)}%;background:${tone(i)}"></span>`).join('');
+  const crows=drivers.map((d,i)=>`<div class="csplit-row"><div class="csplit-nm"><span class="cdot" style="background:${tone(i)}"></span><span class="cn">${d.name}</span></div><span class="csplit-pts num">${d.total}</span><span class="csplit-pct">${T.total?Math.round(d.total/T.total*100)+'%':'\u2014'}</span></div>`).join('');
+  const split=`<div class="csplit"><div class="csplit-bar">${bar}</div><div class="csplit-rows">${crows}</div></div>`;
+  const colhead=`<div class="season-row shead"><span class="sr-rn">Rnd</span><span class="sr-ev">Event \u00B7 drivers</span><span class="sr-pts">Pts</span></div>`;
+  const rbr=[...ROUNDS].sort((a,b)=>b.round-a.round).map(rd=>{
+    let rpts=0;
+    const chips=drivers.map(d=>{
+      const r=raceRow(rd,d.id);const sp=rd.sprint?rd.sprint.classification.find(x=>x.driverId===d.id):null;
+      rpts+=(r?r.points:0)+(sp?sp.points:0);
+      let fin='\u2014',col='var(--txt-dim)';
+      if(r){if(r.status==='DNF'){fin='DNF';col='var(--red)';}else{fin='P'+r.pos;col=r.pos===1?'var(--gold)':r.pos<=3?'var(--txt)':'var(--txt-mid)';}}
+      return `<span class="cr-chip"><b>${LAST(d.id).slice(0,3).toUpperCase()}</b><span style="color:${col}">${fin}</span></span>`;
+    }).join('');
+    return `<div class="season-row crow"><span class="sr-rn num">R${rd.round}</span><div class="cr-ev"><span class="cr-nm">${codeOf(rd)} \u00B7 ${rd.name.replace(' Grand Prix','')}</span><div class="cr-chips">${chips}</div></div><span class="cr-pts num">${rpts||''}</span></div>`;
+  }).join('');
+  const lineup=drivers.map(d=>LAST(d.id)).join(' \u00B7 ');
+  return `<div class="panel-head" style="--team:${lead}"><div><div class="panel-ey">Constructors \u00B7 Championship P${rank}</div><div class="panel-drv">${team}</div><span class="panel-team"><span class="team-bar" style="--team:${lead}"></span>${lineup}</span></div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body"><div class="stat-grid"><div class="stat"><span class="sl">Total</span><span class="sv num" style="color:${rank===1?'var(--gold)':'var(--txt)'}">${T.total}</span></div><div class="stat"><span class="sl">Pos</span><span class="sv num">P${rank}</span></div><div class="stat"><span class="sl">Wins</span><span class="sv num">${T.wins}</span></div><div class="stat"><span class="sl">Podiums</span><span class="sv num" style="color:${podiums?'var(--gold)':'var(--txt)'}">${podiums}</span></div><div class="stat"><span class="sl">Poles</span><span class="sv num">${poles}</span></div><div class="stat"><span class="sl">Fastest Laps</span><span class="sv num">${fls}</span></div></div><div><span class="section-h">Points contribution</span>${split}</div><div><span class="section-h">Round by round</span><div class="season-list">${colhead}${rbr}</div></div></div>`;
+}
+
 const scrim=document.getElementById('scrim'),panel=document.getElementById('panel');
 function openPanel(html,team){panel.style.setProperty('--team',teamColor(team));panel.innerHTML=html;panel.classList.add('open');scrim.classList.add('open');const x=panel.querySelector('.x');if(x)x.focus();}
 function closePanel(){panel.classList.remove('open');scrim.classList.remove('open');}
@@ -45,10 +88,14 @@ document.addEventListener('click',e=>{
   const sortEl=e.target.closest('[data-sort]');if(sortEl){const v=sortEl.dataset.sort;sortMode=(v==='champ'||v==='name')?v:parseInt(v,10);render();return;}
   const cell=e.target.closest('[data-cell]');if(cell){const parts=cell.dataset.cell.split(':');openPanel(raceBrief(parts[0],parts[1]),DRV[parts[1]].team);return;}
   const drv=e.target.closest('[data-driver]');if(drv){openPanel(seasonBrief(drv.dataset.driver),DRV[drv.dataset.driver].team);return;}
+  const con=e.target.closest('[data-constructor]');if(con){openPanel(constructorSeason(con.dataset.constructor),con.dataset.constructor);return;}
   if(e.target.closest('.x')){closePanel();return;}
   const seg=e.target.closest('.seg button');if(seg){document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-selected','false'));seg.setAttribute('aria-selected','true');const drivers=seg.dataset.view==='drivers';const mw=document.getElementById('matrixWrap'),ww=document.getElementById('wccWrap');if(mw)mw.classList.toggle('hidden',!drivers);if(ww)ww.classList.toggle('hidden',drivers);document.getElementById('legend').classList.toggle('off',!drivers);}
 });
 scrim.addEventListener('click',closePanel);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closePanel();return;}
+  if(e.key==='Enter'||e.key===' '){const con=e.target.closest&&e.target.closest('[data-constructor]');if(con){e.preventDefault();openPanel(constructorSeason(con.dataset.constructor),con.dataset.constructor);}}
+});
 
 load();
