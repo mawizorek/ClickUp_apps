@@ -1,8 +1,6 @@
 /* app-dashboard v4 — core engine + boot. Companion modules: data.js (metadata/samples),
  render.js (list rendering), sheet.js (detail sheet), settings.js (theme/drawer). Load order:
- data → render → sheet → settings → app.
- NOTE: on any source change, bump the ?v=<APP_VERSION>-<APP_PR> cache-bust token on the
- <link>/<script> tags in index.html so browsers fetch fresh files instead of stale cache. */
+ data → render → sheet → settings → app. */
 const APP_VERSION = 'v4';
 const APP_PR = '72'; // stamped with the PR number that shipped this build
 const OWNER = 'mawizorek';
