@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#161014">
+<title>Squash — target-size image compressor</title>
+<meta name="description" content="Define a byte cap. Squash compresses your image until it fits, right in the browser.">
+<meta property="og:title" content="Squash">
+<meta property="og:description" content="Define a cap. It compresses until it fits.">
+<meta property="og:image" content="./og.png">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.png">
+<style>
+  :root {
+    --bg: oklch(16% 0.011 350);
+    --surface: oklch(20% 0.013 350);
+    --sunk: oklch(24% 0.015 350);
+    --ink: oklch(94% 0.011 350);
+    --ink-soft: oklch(76% 0.014 350);
+    --ink-faint: oklch(60% 0.015 350);
+    --line: oklch(30% 0.016 350);
+    --line-soft: oklch(26% 0.013 350);
+    --accent: oklch(72% 0.165 350);
+    --accent-ink: oklch(82% 0.145 352);
+    --accent-bg: oklch(32% 0.09 350);
+    --accent-deep: oklch(20% 0.05 350);
+    --warn: oklch(70% 0.05 25);
+    --warn-bg: oklch(30% 0.05 25);
+    --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;--s10:40px;--s12:48px;
+    --ease: cubic-bezier(0.22,1,0.36,1);
+    --radius:14px;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink); line-height: 1.55;
+    -webkit-font-smoothing: antialiased; font-optical-sizing: auto;
+    min-height: 100vh; padding: var(--s6) var(--s4) var(--s12);
+  }
+  .wrap { max-width: 680px; margin: 0 auto; }
+
+  header { margin-bottom: var(--s8); }
+  .brand { display: flex; align-items: center; gap: var(--s3); }
+  .mark { width: 42px; height: 42px; flex: none; }
+  h1 { font-size: 1.4rem; font-weight: 750; letter-spacing: -0.02em; }
+  .sub { font-size: 0.86rem; color: var(--ink-faint); margin-top: var(--s2);
+    font-family: ui-monospace, "IBM Plex Mono", Menlo, monospace; letter-spacing: 0.02em; }
+
+  .drop {
+    border: 1.5px dashed var(--line); border-radius: var(--radius);
+    background: var(--surface); padding: var(--s10) var(--s6); text-align: center;
+    cursor: pointer; transition: border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .drop:hover, .drop.over { border-color: var(--accent); background: var(--sunk); }
+  .drop .big { font-size: 1.05rem; font-weight: 620; }
+  .drop .hint { font-size: 0.82rem; color: var(--ink-faint); margin-top: var(--s2); }
+  .drop svg { color: var(--ink-faint); margin-bottom: var(--s3); }
+  input[type=file] { display: none; }
+
+  .controls { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); margin-top: var(--s6); }
+  .ctl { display: flex; flex-direction: column; gap: var(--s2); }
+  .ctl.full { grid-column: 1 / -1; }
+  label { font-size: 0.72rem; font-weight: 640; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
+  .caprow { display: flex; gap: var(--s2); align-items: stretch; }
+  input[type=number], select {
+    font: inherit; font-size: 0.95rem; padding: var(--s3) var(--s4);
+    background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; color: var(--ink);
+    width: 100%; font-variant-numeric: tabular-nums;
+  }
+  input[type=number]:focus-visible, select:focus-visible { outline: none; border-color: var(--accent); }
+  .unit { display: grid; place-items: center; padding: 0 var(--s4); background: var(--sunk);
+    border: 1px solid var(--line); border-radius: 10px; color: var(--ink-faint); font-size: 0.85rem;
+    font-family: ui-monospace, monospace; flex: none; }
+  .presets { display: flex; gap: var(--s2); flex-wrap: wrap; margin-top: var(--s2); }
+  .preset { font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    padding: var(--s1) var(--s3); border-radius: 20px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink-soft); font-variant-numeric: tabular-nums;
+    transition: all .15s var(--ease); }
+  .preset:hover { border-color: var(--ink-faint); }
+  .preset.on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-ink); }
+
+  .go { font: inherit; font-size: 1rem; font-weight: 680; cursor: pointer; width: 100%;
+    padding: var(--s4); border-radius: 12px; border: none; background: var(--accent);
+    color: var(--accent-deep); margin-top: var(--s6);
+    transition: background .15s var(--ease), transform .1s var(--ease); }
+  .go:hover { background: var(--accent-ink); }
+  .go:active { transform: translateY(1px); }
+  .go:disabled { background: var(--sunk); color: var(--ink-faint); cursor: not-allowed; }
+
+  .result { margin-top: var(--s8); display: none; }
+  .result.show { display: block; }
+  .preview { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line);
+    background: var(--sunk) repeating-conic-gradient(oklch(23% 0.012 350) 0% 25%, transparent 0% 50%) 50% / 22px 22px; }
+  .preview img { display: block; width: 100%; height: auto; max-height: 360px; object-fit: contain; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s3); margin-top: var(--s4); }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: var(--s4); }
+  .stat .k { font-size: 0.68rem; font-weight: 640; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
+  .stat .v { font-size: 1.35rem; font-weight: 720; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin-top: 2px; }
+  .stat .d { font-size: 0.76rem; color: var(--ink-faint); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .stat.win .v { color: var(--accent-ink); }
+
+  .verdict { margin-top: var(--s4); font-size: 0.88rem; padding: var(--s3) var(--s4); border-radius: 10px;
+    display: flex; gap: var(--s2); align-items: flex-start; }
+  .verdict.ok { background: var(--accent-bg); color: var(--accent-ink); }
+  .verdict.warn { background: var(--warn-bg); color: var(--warn); }
+  .verdict b { font-weight: 700; }
+
+  .dl { display: block; text-align: center; font-weight: 680; font-size: 0.98rem; text-decoration: none;
+    margin-top: var(--s4); padding: var(--s4); border-radius: 12px; border: 1px solid var(--accent);
+    color: var(--accent-ink); -webkit-touch-callout: default;
+    transition: background .15s var(--ease); }
+  .dl:hover { background: var(--accent-bg); }
+
+  .note { font-size: 0.8rem; color: var(--ink-faint); line-height: 1.6; margin-top: var(--s8);
+    padding-top: var(--s5); border-top: 1px solid var(--line-soft); }
+  .note b { color: var(--ink-soft); font-weight: 640; }
+  code { font-family: ui-monospace, "IBM Plex Mono", monospace; font-size: 0.82em;
+    background: var(--sunk); padding: 1px 5px; border-radius: 5px; }
+
+  footer { max-width: 680px; margin: var(--s10) auto 0; padding-top: var(--s5);
+    border-top: 1px solid var(--line-soft); font-family: ui-monospace, "IBM Plex Mono", monospace;
+    font-size: 0.72rem; color: var(--ink-faint); letter-spacing: 0.02em; text-align: center; }
+
+  @media (max-width: 520px) {
+    .controls { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 48 48" fill="none" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="16" y="16" width="16" height="16" rx="3.5" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+        <path d="M6 10 V6 H10 M38 6 H42 V10 M42 38 V42 H38 M10 42 H6 V38" fill="none" stroke="var(--ink-faint)" stroke-width="2.5"/>
+        <path d="M24 5 V13 M24 13 l-3 -4 M24 13 l3 -4" stroke="var(--accent)" stroke-width="2.5"/>
+        <path d="M24 43 V35 M24 35 l-3 4 M24 35 l3 4" stroke="var(--accent)" stroke-width="2.5"/>
+        <path d="M5 24 H13 M13 24 l-4 -3 M13 24 l-4 3" stroke="var(--accent)" stroke-width="2.5"/>
+        <path d="M43 24 H35 M35 24 l4 -3 M35 24 l4 3" stroke="var(--accent)" stroke-width="2.5"/>
+      </svg>
+      <div>
+        <h1>Squash</h1>
+      </div>
+    </div>
+    <p class="sub">DEFINE A CAP · IT COMPRESSES UNTIL IT FITS</p>
+  </header>
+
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose or drop an image">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v13"/>
+    </svg>
+    <div class="big" id="dropTitle">Drop an image, or tap to choose</div>
+    <div class="hint" id="dropHint">PNG · JPEG · WebP</div>
+    <input type="file" id="file" accept="image/*">
+  </div>
+
+  <div class="controls">
+    <div class="ctl full">
+      <label for="cap">Target cap</label>
+      <div class="caprow">
+        <input type="number" id="cap" value="100" min="1" step="1" inputmode="numeric">
+        <div class="unit">KB</div>
+      </div>
+      <div class="presets" id="presets">
+        <button class="preset" data-kb="100">icon 100</button>
+        <button class="preset" data-kb="300">og 300</button>
+        <button class="preset" data-kb="500">500</button>
+        <button class="preset" data-kb="1000">1 MB</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <label for="fmt">Output format</label>
+      <select id="fmt">
+        <option value="image/png">PNG (shrinks via palette, keeps alpha)</option>
+        <option value="image/webp">WebP (smallest, keeps alpha)</option>
+        <option value="image/jpeg">JPEG (smallest, no alpha)</option>
+      </select>
+    </div>
+    <div class="ctl">
+      <label for="maxdim">Max dimension</label>
+      <div class="caprow">
+        <input type="number" id="maxdim" value="0" min="0" step="1" inputmode="numeric" placeholder="original">
+        <div class="unit">px</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="go" id="go" disabled>Squash it</button>
+
+  <div class="result" id="result">
+    <div class="preview"><img id="out" alt="Compressed preview"></div>
+    <div class="stats">
+      <div class="stat"><div class="k">Before</div><div class="v" id="sBefore">—</div><div class="d" id="dBefore"></div></div>
+      <div class="stat win"><div class="k">After</div><div class="v" id="sAfter">—</div><div class="d" id="dAfter"></div></div>
+      <div class="stat"><div class="k">Saved</div><div class="v" id="sSaved">—</div><div class="d" id="dSaved"></div></div>
+    </div>
+    <div class="verdict" id="verdict"></div>
+    <a class="dl" id="dl" download>Download</a>
+  </div>
+
+  <p class="note">
+    <b>PNG in, PNG out, actually smaller.</b> Re-saving a PNG returns the same bytes because PNG is lossless.
+    To shrink it Squash reduces the color palette (median-cut quantization), so DEFLATE packs it tighter, real byte reduction, transparency intact.
+    It binary-searches the palette down until you're under cap, then downscales only if it has to.
+    <b>WebP/JPEG</b> go smaller still by searching encoder quality; pick those when you don't need a literal PNG.
+  </p>
+</div>
+
+<footer id="stamp">Squash v1</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const drop = $('#drop'), fileInput = $('#file'), go = $('#go');
+const capIn = $('#cap'), fmtIn = $('#fmt'), maxdimIn = $('#maxdim');
+let img = null, srcName = '', srcSize = 0;
+
+const fmtBytes = b =>
+  b < 1024 ? b + ' B' :
+  b < 1048576 ? (b/1024).toFixed(b < 10240 ? 1 : 0) + ' KB' :
+  (b/1048576).toFixed(2) + ' MB';
+
+['dragover','dragenter'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', ev => { const f = ev.dataTransfer.files[0]; if (f) loadFile(f); });
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+document.querySelectorAll('.preset').forEach(p => p.addEventListener('click', () => {
+  capIn.value = p.dataset.kb;
+  document.querySelectorAll('.preset').forEach(x => x.classList.remove('on'));
+  p.classList.add('on');
+}));
+
+function loadFile(f){
+  srcName = f.name.replace(/\.[^.]+$/, '');
+  srcSize = f.size;
+  const url = URL.createObjectURL(f);
+  const im = new Image();
+  im.onload = () => {
+    img = im;
+    $('#dropTitle').textContent = f.name;
+    $('#dropHint').textContent = im.naturalWidth + ' × ' + im.naturalHeight + ' · ' + fmtBytes(f.size);
+    go.disabled = false;
+    URL.revokeObjectURL(url);
+  };
+  im.src = url;
+}
+
+const yield_ = () => new Promise(r => setTimeout(r, 0));
+const encode = (canvas, type, q) => new Promise(res => canvas.toBlob(res, type, q));
+
+function drawCanvas(scale){
+  const w = Math.max(1, Math.round(img.naturalWidth * scale));
+  const h = Math.max(1, Math.round(img.naturalHeight * scale));
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, w, h);
+  return c;
+}
+
+// median-cut palette quantization (real PNG byte reduction)
+function buildPalette(sample, maxDepth){
+  const boxes = [];
+  (function cut(px, depth){
+    if (!px.length) return;
+    if (depth === maxDepth){
+      let r=0,g=0,b=0,a=0;
+      for (const p of px){ r+=p[0]; g+=p[1]; b+=p[2]; a+=p[3]; }
+      const n = px.length;
+      boxes.push([Math.round(r/n),Math.round(g/n),Math.round(b/n),Math.round(a/n)]);
+      return;
+    }
+    let mn=[255,255,255,255], mx=[0,0,0,0];
+    for (const p of px) for (let c=0;c<4;c++){ if(p[c]<mn[c])mn[c]=p[c]; if(p[c]>mx[c])mx[c]=p[c]; }
+    const rng=[mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2],(mx[3]-mn[3])*1.2];
+    let ch=0; for(let c=1;c<4;c++) if(rng[c]>rng[ch]) ch=c;
+    px.sort((a,b)=>a[ch]-b[ch]);
+    const mid = px.length>>1;
+    cut(px.slice(0,mid), depth+1);
+    cut(px.slice(mid), depth+1);
+  })(sample, 0);
+  return boxes;
+}
+
+function quantizeToBlob(canvas, colors){
+  const ctx = canvas.getContext('2d');
+  const id = ctx.getImageData(0,0,canvas.width,canvas.height);
+  const d = id.data;
+  const total = d.length/4;
+  const step = Math.max(1, Math.floor(total/20000));
+  const sample = [];
+  for (let i=0;i<d.length;i+=4*step) sample.push([d[i],d[i+1],d[i+2],d[i+3]]);
+  const depth = Math.max(1, Math.round(Math.log2(colors)));
+  const pal = buildPalette(sample, depth);
+  if (!pal.length) return encode(canvas, 'image/png');
+  const cache = new Map();
+  for (let i=0;i<d.length;i+=4){
+    const key = ((d[i]<<24)|(d[i+1]<<16)|(d[i+2]<<8)|d[i+3])>>>0;
+    let idx = cache.get(key);
+    if (idx === undefined){
+      let best=0, bd=Infinity;
+      for (let p=0;p<pal.length;p++){
+        const q=pal[p];
+        const dr=d[i]-q[0], dg=d[i+1]-q[1], db=d[i+2]-q[2], da=d[i+3]-q[3];
+        const dist=dr*dr+dg*dg+db*db+da*da*1.4;
+        if (dist<bd){ bd=dist; best=p; }
+      }
+      idx=best; cache.set(key,idx);
+    }
+    const q=pal[idx];
+    d[i]=q[0]; d[i+1]=q[1]; d[i+2]=q[2]; d[i+3]=q[3];
+  }
+  ctx.putImageData(id,0,0);
+  return encode(canvas, 'image/png');
+}
+
+async function squash(){
+  const capKB = parseFloat(capIn.value);
+  if (!img || !(capKB > 0)) return;
+  const cap = capKB * 1024;
+  const type = fmtIn.value;
+  const maxdim = parseInt(maxdimIn.value) || 0;
+
+  go.disabled = true; go.textContent = 'Squashing…';
+  await yield_();
+
+  let scale = 1;
+  const longest = Math.max(img.naturalWidth, img.naturalHeight);
+  if (maxdim > 0 && longest > maxdim) scale = maxdim / longest;
+
+  let best = null, bestDims = null;
+
+  for (let step = 0; step < 9 && !best; step++){
+    const canvas = drawCanvas(scale);
+    const dims = [canvas.width, canvas.height];
+
+    if (type === 'image/png'){
+      const full = await encode(canvas, 'image/png');
+      if (full.size <= cap){ best = full; bestDims = dims; break; }
+      for (const colors of [256,128,64,32,16,8,4]){
+        await yield_();
+        const blob = await quantizeToBlob(drawCanvas(scale), colors);
+        if (blob.size <= cap){ best = blob; bestDims = dims; break; }
+      }
+    } else {
+      let lo=0.05, hi=0.98, cand=null;
+      for (let i=0;i<8;i++){
+        const q=(lo+hi)/2;
+        const blob = await encode(canvas, type, q);
+        if (blob.size <= cap){ cand=blob; lo=q; } else { hi=q; }
+      }
+      if (!cand){ const floor = await encode(canvas,type,0.05); if (floor.size<=cap) cand=floor; }
+      if (cand){ best=cand; bestDims=dims; }
+    }
+    if (!best) scale *= 0.82;
+  }
+
+  if (!best){
+    const canvas = drawCanvas(scale);
+    best = type==='image/png' ? await quantizeToBlob(canvas,4) : await encode(canvas,type,0.05);
+    bestDims = [canvas.width, canvas.height];
+  }
+
+  render(best, bestDims, cap, type);
+  go.disabled = false; go.textContent = 'Squash it';
+}
+
+function render(blob, dims, cap, type){
+  const url = URL.createObjectURL(blob);
+  const outImg = $('#out');
+  if (outImg.dataset.url) URL.revokeObjectURL(outImg.dataset.url);
+  outImg.src = url; outImg.dataset.url = url;
+
+  $('#sBefore').textContent = fmtBytes(srcSize);
+  $('#dBefore').textContent = img.naturalWidth + '×' + img.naturalHeight;
+  $('#sAfter').textContent = fmtBytes(blob.size);
+  $('#dAfter').textContent = dims[0] + '×' + dims[1];
+  const saved = srcSize - blob.size;
+  const pct = srcSize ? Math.round(saved/srcSize*100) : 0;
+  $('#sSaved').textContent = (pct>0?pct:0) + '%';
+  $('#dSaved').textContent = (saved>=0?'−':'+') + fmtBytes(Math.abs(saved));
+
+  const v = $('#verdict');
+  if (blob.size <= cap){
+    v.className = 'verdict ok';
+    v.innerHTML = '<b>Under cap.</b>&nbsp;Landed at ' + fmtBytes(blob.size) + ', budget was ' + fmtBytes(cap) + '.';
+  } else {
+    v.className = 'verdict warn';
+    v.innerHTML = '<b>Floor reached.</b>&nbsp;Smallest here is ' + fmtBytes(blob.size) + '. Drop the max dimension to go lower.';
+  }
+
+  const ext = type.split('/')[1];
+  const dl = $('#dl');
+  dl.href = url;
+  dl.download = srcName + '-' + Math.round(cap/1024) + 'kb.' + (ext==='jpeg'?'jpg':ext);
+  $('#result').classList.add('show');
+}
+
+go.addEventListener('click', squash);
+</script>
+</body>
+</html>
