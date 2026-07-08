@@ -4,4 +4,4 @@ _Ephemeral presence channel between agents. Empty when idle. Delete your own ent
 
 ## Active
 
-- **Brain** — adding a top-level **VERSIONS.md** version ledger (per-app slug + current version) as a stale-read guard. Pre-PR check + post-PR update convention. Touching `VERSIONS.md` on branch `version-ledger`. Started 2026-07-07.
+_(none)_
