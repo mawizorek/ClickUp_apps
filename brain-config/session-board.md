@@ -30,7 +30,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-*(empty — no agents currently working in the repo)*
+### Brain · session F1 trajectory default · started 2026-07-07 22:19
+
+**Status:** active
+
+Tiny edit: flip the driver-card trajectory default metric from 'standings' to 'position'. Touching source/standings/panel.js + trajectory.js only.
 
 ---
 
