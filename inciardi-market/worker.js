@@ -1,5 +1,5 @@
 /**
- * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0)
+ * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0.1)
  *
  * Fetches active eBay listings via the Browse API, normalizes them,
  * diffs against the previous snapshot (Cloudflare KV), and returns
@@ -13,8 +13,8 @@
 
 const SEARCH_QUERY = "inciardi mini print";
 const MARKETPLACE = "EBAY_US";
-const RETAIL_DEFAULT = 14;          // USD baseline until we compute median ask
-const UNDERPRICED_PCT = 0.85;       // landed <= 85% of baseline => underpriced flag
+const RETAIL_DEFAULT = 14; // USD baseline until we compute median ask
+const UNDERPRICED_PCT = 0.85; // landed <= 85% of baseline => underpriced flag
 const EXCLUSIVE_TOKENS = ["nyc", "lacma", "grand central", "holiday", "exclusive"];
 const PACK_TOKENS = ["pack", "set", "lot", "bundle"];
 
@@ -79,7 +79,7 @@ async function getToken(env) {
 
 async function fetchListings(env) {
   const token = await getToken(env);
-  const endpoint = "https://api.ebay.com/buy/api_v1/item_summary/search" +
+  const endpoint = "https://api.ebay.com/buy/browse/v1/item_summary/search" +
     `?q=${encodeURIComponent(SEARCH_QUERY)}&limit=200` +
     `&filter=${encodeURIComponent("buyingOptions:{FIXED_PRICE|AUCTION}")}`;
   const res = await fetch(endpoint, {
@@ -126,7 +126,7 @@ function parsePrint(title) {
   const t = title.toLowerCase();
   const exclusive = EXCLUSIVE_TOKENS.find((k) => t.includes(k)) || null;
   let name = null;
-  const m = title.match(/mini print[\s:–-]+([A-Za-z0-9'"&\s]{2,40})/i);
+  const m = title.match(/mini print[\s:\u2013-]+([A-Za-z0-9'"&\s]{2,40})/i);
   if (m) name = m[1].trim();
   return { name, exclusive, matched: Boolean(name) };
 }
@@ -144,7 +144,7 @@ async function buildMarket(env) {
     const old = prevById.get(l.itemId);
     if (!old) {
       return { ...l, status: "new", firstSeen: now, lastSeen: now,
-               priceHistory: [{ t: now, landed: l.landed }], flags: flagsFor(l) };
+        priceHistory: [{ t: now, landed: l.landed }], flags: flagsFor(l) };
     }
     const changed = old.landed !== l.landed ||
       (old.buyingOptions || []).join() !== (l.buyingOptions || []).join();
