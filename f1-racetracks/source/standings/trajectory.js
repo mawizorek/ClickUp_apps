@@ -1,6 +1,7 @@
 /* trajectory.js — season-card trajectory chart. Three toggleable metrics + teammate overlay.
-   Loaded after matrix.js, before panel.js. Uses globals from data.js. */
-let trajState={id:null,metric:'standings'};
+   Loaded after matrix.js, before panel.js. Uses globals from data.js.
+   Default metric = 'position' (set here + in panel.js seasonBrief). */
+let trajState={id:null,metric:'position'};
 
 const TRAJ_META={
   standings:{label:'Championship points',ref:true},
