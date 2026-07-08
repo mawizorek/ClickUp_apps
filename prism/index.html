@@ -18,7 +18,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="prism.css?v=3">
+<link rel="stylesheet" href="prism.css?v=4">
 <style>
   #access-gate{position:fixed;inset:0;z-index:9999;background:#1a1c24;color:#e7e8ee;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
   #access-gate .box{text-align:center;max-width:340px;padding:32px}
@@ -80,6 +80,8 @@
   </section>
 </main>
 
+<footer class="stamp" id="stamp"></footer>
+
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-hidden="true">
   <button class="icon-btn close" id="closeDrawer" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-linecap="round"/></svg></button>
@@ -109,9 +111,10 @@
   fetch("./config.json", { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); }).catch(function () { var cached = null; try { cached = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(cached || FALLBACK); });
 })();
 </script>
-<script src="prism.json.js?v=3"></script>
-<script src="prism.md.js?v=3"></script>
-<script src="prism.core.js?v=3"></script>
-<script src="prism.mobile.js?v=3"></script>
+<script>document.getElementById("stamp").textContent = "Prism v2.2 \u00b7 PR #84";</script>
+<script src="prism.json.js?v=4"></script>
+<script src="prism.md.js?v=4"></script>
+<script src="prism.core.js?v=4"></script>
+<script src="prism.mobile.js?v=4"></script>
 </body>
 </html>
