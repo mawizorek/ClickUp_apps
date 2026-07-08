@@ -1,96 +1,90 @@
 # F1 Racetracks — next build spec
 
-> **RECONCILED 2026-07-07.** The F1 results SCHEMA-SHIFT is now the primary next build. It was brainstormed on clean context (7-lens gate) before this spec was written. The prior module-refactor items were NOT discarded — they converge with the shift and are sequenced underneath it (splitting module `10` is the first step, because the new season-history render lands in the results-history submodule that split creates). Decisions below are LOCKED by Michael 2026-07-07; do not re-litigate.
+> **RECONCILED 2026-07-07.** The F1 results SCHEMA-SHIFT is the primary build, brainstormed on clean context (7-lens gate) before writing. Prior module-refactor items converge with the shift and are sequenced underneath it. Decisions below are LOCKED by Michael 2026-07-07; do not re-litigate.
+
+## ⛔ HARD RULE — Segment BEFORE authoring, never flag-after (LOCKED 2026-07-07, Michael)
+
+**Source size is a pre-authoring decision, not a post-build check. The moment a build would be “one HTML file with inline CSS + JS,” that is the trigger to segment BEFORE writing a single line: a slim loader shell + concern-split modules under `source/<app>/`, every file under the ~12KB soft line, never near the 30KB redline.**
+
+- **Authoring a monolith and disclosing its size afterward is a GATE FAILURE, not a heads-up.** A gate that fires after the commit is not a gate. Shipping an over-cap file does not count as a build and must be reverted, no matter how good the content is.
+- **The size decision happens at design time.** Before authoring: state the file split. If it can’t be stated as under-cap files up front, it is not ready to author.
+- **No “I’ll flag it in the report” escape hatch.** The Source-Size Budget Enforcer, Commit Pre-Flight, and Size Sally all fire BEFORE the write. If any would trip, segment first.
+- **Applies to every app, every lens, every future build in the repo.** This is a corrections-generalize rule: it is not scoped to F1.
+
+Context: the standings lens shipped 2026-07-07 as a 38KB monolith with an after-the-fact size note. Michael rejected it outright and it was reverted (PR #68). Rebuilt segmented. This rule exists so it never repeats.
 
 ## Build sequence (Michael, 2026-07-07)
 
-1. **Data foundation** — per-round season store. ✅ **SHIPPED** (PR #55 built it; PR #58 split it to per-round). Invisible, unblocks everything.
-2. **Matrix + standings view, born in the pit-wall language** — greenfield championship points matrix; new aesthetic proven here. AESTHETIC BUILD — do WITH Michael, not solo.
-3. **Driver-brief cell interaction** — click-through layer on the matrix.
-4. **Propagate the pit-wall restyle** across the rest of the app (kill rounded corners globally, retabularize).
+1. **Data foundation** — per-round season store `f1-results/2026/`. ✅ SHIPPED (#55 built, #58 split, #61 anchors backfilled).
+2. **Standings lens** — `f1-racetracks/standings.html` championship points matrix (NEW sibling lens, add-only; fetches the JSON store; standings computed live). Rebuilt SEGMENTED per the hard rule above. AESTHETIC iterated WITH Michael across renders.
+3. **Driver-brief cell interaction** — shipped inside the lens (race + season briefs, teammate H2H, championship trajectory).
+4. **Propagate the pit-wall restyle** to the other pages (kill rounded corners, retabularize) — future, WITH Michael.
 
-Michael's standing instruction: backend/data can proceed solo; **big aesthetic shifts (builds 2-4) happen with him in the room.**
+Standing instruction: backend/data proceeds solo; big aesthetic shifts happen with Michael in the room.
 
 ## Locked decisions (Michael, 2026-07-07)
 
-1. **Per-season results store, keyed by LOCATION not round number.** Location (track slug) is the durable identity; round number is a per-season ordering attribute that shuffles year to year. Matches the racetracks file key, so the two JSON sources join cleanly cross-year.
-2. **`points` on every classification row.** Standings (WDC + WCC) are COMPUTED live from the results (race + sprint), never stored separately. Live standings render in-scope.
-3. **ClickUp history = ONE slim year-labeled "Race History" text field per track.** One line per year. Full order LEAVES ClickUp, lives only in JSON. FROZEN ARCHIVE LENS: written once per year (fill-if-blank), prior years immutable, conflicts STOP-and-flag.
-4. **Migration = full verified 20-car order for all 9 completed rounds**, primary-source re-verified. ✅ done.
-5. **`routines/f1-refresh.md` mirror rework folded into this build.** Slim writes only + append the frozen year-line by `cuTaskId`. STILL PENDING (see open-thread): mirror targets the retired per-year dropdown; Ricky runs Thu-Sun.
-6. **Sprints = optional per-round block** reusing the race-classification shape + sprint scale (8-7-6-5-4-3-2-1, top 8). Non-sprint rounds omit the key. Total points = race + sprint, computed live.
-7. **Standings = ONE canonical final order** + per-row `onRoadPos`/`stewardNote` + a round-level amended flag. No multiple standings versions.
-8. **Interaction: cell tap = driver race brief; flag tap = provenance popup.** Separate tap targets on the shared surface. Full state lifecycle per the Interaction-State Standard.
-9. **Aesthetic = dark pit-wall:** sharp corners (a purposeful circle or two is fine — it's the rounded-EVERYTHING nav-app feel we're killing), tabular/monospaced numerics, dense tables over cards, color-as-data (team accent, purple fastest lap, amber amended flag). Moving AWAY from the OnTrack navigation-app aesthetic. Design-skill hard bans still apply.
+1. **Per-season results store keyed by LOCATION** (slug = identity), `round` a per-season order attribute. Joins cleanly to the racetracks file.
+2. **`points` on every classification row.** WDC + WCC COMPUTED live (race + sprint), never stored.
+3. **ClickUp history = ONE slim year-labeled “Race History” text field per track.** Full order leaves ClickUp, lives only in JSON. Frozen archive lens: written once per year (fill-if-blank), prior years immutable, conflicts STOP-and-flag.
+4. **Migration = full verified 20-car order for all 9 rounds**, primary-source re-verified. ✅ done.
+5. **`routines/f1-refresh.md` mirror rework folded in.** Slim writes + append the frozen year-line by `cuTaskId`. STILL PENDING (see open-thread).
+6. **Sprints = optional per-round block** reusing the race-classification shape + sprint scale (8-7-6-5-4-3-2-1, top 8). Non-sprint rounds omit the key. Total = race + sprint, computed live.
+7. **Standings = ONE canonical final order** + per-row `onRoadPos`/`stewardNote` + round-level amended flag. No multiple standings versions.
+8. **Interaction: cell tap = driver race brief; flag tap = provenance.** Full state lifecycle per the Interaction-State Standard.
+9. **Aesthetic = dark pit-wall:** sharp corners (a purposeful circle or two is fine), tabular/mono numerics, dense tables over cards, color-as-data (team accent, purple fastest lap, amber amended). Away from the OnTrack nav-app feel. Design-skill hard bans apply.
 
 ## Data store layout (SHIPPED — per-round, size-safe)
 
 ```
-f1-results/
-  2026/
-    index.json              <- season meta: version, points scales, provenance, open_flags, ordered round list (slug/round/name/date/cuTaskId/sprint flag/file)
-    albert-park.json        <- one file per LOCATION = canonical record for that round
-    shanghai.json           <- carries optional `sprint` block
-    ...9 rounds total
+f1-results/2026/
+  index.json          season meta + ordered round list (slug/round/name/date/cuTaskId/sprint/file)
+  <slug>.json         one file per LOCATION = canonical round record; optional `sprint` block
 ```
 
-- **Why per-round (not one season file):** the single-file version shipped at 36KB (over the 30KB readback cap) and projected to ~88KB at 22 rounds + more with telemetry. Per-round files are ~2-5KB each, scale indefinitely, and let Ricky update exactly ONE file per weekend. Size Sally now watches `f1-results/` (see her profile).
-- **Round file schema:** `{ season, round, slug, name, date, cuTaskId, version, pole, fastestLap?, summary, sprint?{classification[]}, classification[] }`. Classification rows: `{ pos, driverId, driver, team, status (FIN|DNF|DNS|DSQ|WD), points, onRoadPos?, stewardNote? }`. Growth (reserved, optional): `grid, gap, laps, pits, stints, fastestLapTime, telemetry`. Engine reads defensively.
-- **Standings computed:** WDC = sum of race+sprint `points` per `driverId` across round files; WCC = sum per `team`. No stored standings.
-- **Anchors:** round-level `cuTaskId` → F1 Races task; row-level `driverId` → F1 Drivers task. Resolve by ID, never name. Four rows carry `driverId:null` + `_anchor:"UNRESOLVED-DUP"` pending list dedup (see open-thread).
-- **Two sources of truth, lensed by time horizon:** `f1-results/<year>/` (per-season, live lens, canonical in-season) + `f1-racetracks/data.json` (persistent cross-year reference). Both carry anchors.
+- Round file: `{ season, round, slug, name, date, cuTaskId, version, pole, fastestLap?, summary, sprint?{classification[]}, classification[] }`. Rows: `{ pos, driverId, driver, team, status(FIN|DNF|DNS|DSQ|WD), points, onRoadPos?, stewardNote? }`. Growth (reserved, optional): grid, gap, laps, pits, stints, telemetry. Engine reads defensively.
+- Standings computed: WDC = sum race+sprint points per driverId; WCC = sum per team.
+- Anchors: round `cuTaskId` → F1 Races task; row `driverId` → F1 Drivers task. Resolve by ID. Dedup complete (Colapinto 86aj1ra0h, Lindblad 86aj1ra31, Bottas 86aj1ra1g, Perez 86aj1ra1z).
 
-## Build 1 — SHIPPED (PR #55 data, PR #58 split)
+## Standings lens layout (SHIPPED — segmented)
 
-- All 9 rounds, full verified classification (P1->last + DNFs), race + sprint, pole, fastest lap, provenance.
-- Verified vs formula1.com / FIA PDFs / RaceFans. Sprint points reconcile every driver's official season total to the exact figure.
-- THREE store errors corrected: Austria (Russell won), Spain (Hamilton maiden Ferrari win; Antonelli DNF from P2), Monaco (Gasly P3, penalties overturned on appeal).
-- Split to per-round files under the readback cap (PR #58); 36KB monolith removed.
+```
+f1-racetracks/
+  standings.html               slim loader shell (markup + <link>/<script> refs only)
+  source/standings/
+    base.css                   tokens, masthead, controls, matrix table, cells, wcc, footer, states
+    panel.css                  side panel, grid→finish flow, badges, story box, stats, tyres, H2H, trajectory
+    data.js                    fetch ../f1-results/2026/, compute standings, helpers, story bank, illustrative DETAIL
+    matrix.js                  matrix + constructors render + column sort
+    panel.js                   race brief + season brief + events + boot
+```
+
+- Every file under the ~12KB soft line. `standings.html` references the modules; browser loads them same-origin on Pages.
+- Fetches the canonical JSON store; no data duplicated in the engine. Ricky’s data commits flow through automatically.
+- Granular grid/lap/pit/tyre + story-tag fields are illustrative (flagged “preview”) until sourced from OpenF1; verified points/positions are real.
 
 ## OPEN FLAGS (durable copy in brain-config/open-thread.md)
 
-- **🚩 Driver-anchor dedup — BLOCKS the ClickUp mirror.** Colapinto / Lindblad / Bottas / Perez rows carry `driverId:null`. F1 Drivers list has duplicate tasks; not guessed. Dedup + backfill. Likely-canonical: Colapinto `86ae52rq5`, Bottas `86ae52rtd`, Lindblad `86ae52ryh`; Perez only `86aj1ra1z`.
-- **✅ RESOLVED: size flag.** The 36KB monolith is split to per-round files; Size Sally now watches `f1-results/` so growth is forecast on the build path, not caught reactively.
-
-## Next build (schema shift — remaining)
-
-1. **Split `source/10_track_views_and_profile.js`** into stable submodules: track render / **results-history** / profile-helpers. FIRST step (load-bearing for the render).
-2. **Championship points matrix + computed standings view** in the pit-wall language (build 2, WITH Michael).
-3. **Driver-brief cell interaction** (build 3).
-4. **Propagate pit-wall restyle** (build 4).
-5. **ClickUp:** create the one slim "Race History" text field per track; backfill each year-line fill-if-blank; retire the per-year result dropdowns.
-6. **Rework `routines/f1-refresh.md`:** slim writes only + append the frozen year-line by `cuTaskId`.
-
-## In review
-
-- direct-to-main structural cleanup shipped on Sat Jul 4:
-  - retired `source/14_surface_rescue.js`
-  - retired `source/15_compact_polish.js`
-  - replaced them with permanent weekend modules:
-    - `14_weekend_state_and_data.js`
-    - `15_weekend_surface_render.js`
-    - `16_weekend_live_mode.js`
-    - `17_weekend_mount.js`
-    - `18_home_and_mobile_polish.js`
+- **🚩 f1-refresh mirror rework** — targets the retired per-year dropdown; Ricky runs Thu–Sun. Rework before next race weekend.
+- **🚩 ClickUp “Race History” field** not yet created (one slim year-labeled text field per track).
+- OpenF1 sourcing for the granular per-cell fields (grid, best lap, pits, tyres) to replace the illustrative preview data.
 
 ## Futures
 
-- rebalance grouped round-data files `06` / `07` / `08` under the 15 KB working threshold (carried from prior spec; do alongside the module-10 split where it overlaps)
-- decide whether the companion `live-tracker.html` stays a separate surface or gets structurally narrowed now that the main app owns more weekend context (carried from prior spec)
-- move more seeded weekend timing/replay content into canonical runtime data instead of JS-held seeds
-- expand support-series schedule density only after the core F1 weekend surface is stable
-- per-driver times/gaps, grid-vs-finish deltas, pit stops, telemetry — populate the reserved round-file growth fields as data becomes available (data change, not engine change); Sally forecasts when a round file needs its own telemetry sub-file
-- standings-progression chart (v2 of the matrix view) computed from per-round points
-- `f1-results/2027/` and beyond: independent per-year folders; racetracks file persists across years
+- rebalance grouped round-data files `06`/`07`/`08` under the 15KB working threshold
+- decide whether `live-tracker.html` stays a separate surface or narrows now the main app owns more weekend context
+- per-driver times/gaps, grid-vs-finish, pits, telemetry — populate reserved round-file growth fields as data lands (data change, not engine change)
+- standings-progression chart (v2 of the matrix) computed from per-round points
+- `f1-results/2027/` and beyond: independent per-year folders; racetracks file persists
 
 ## Known guardrails
 
-- start normal edits from `source/`, not from `index.html`
-- semantic source target stays ~10–12 KB soft / ~15 KB hard unless explicitly approved otherwise
-- 30 KB is an absolute redline / failure state for readback, not a planning target
-- do not create new temp-fix source buckets like `surface_rescue` / `compact_polish`; add or split permanent concern-based modules instead
-- keep the visible footer build token useful during runtime verification so deploy refreshes are obvious from screenshots
-- **anchor by inline `cuTaskId` / `driverId`; resolve by ID never by name; unresolved anchor = STOP-and-flag, never guess or create a filling object**
-- **JSON is canonical data; ClickUp stays slim (events/triggers/notifications/mirrors), never a data store; no field-per-year growth in ClickUp**
-- **do NOT trust the existing store during migration — primary-source re-verify every finishing position** (three silent errors found this session, all favoring one narrative)
-- **data stores that grow by row/round are Size Sally watch targets — forecast the split on the build path, never ship a monolith over the readback cap**
+- **segment before authoring; never author a monolith then flag its size (see HARD RULE above)**
+- start normal edits from `source/`, not from a single big file
+- semantic source target ~10–12KB soft / ~15KB hard unless explicitly approved; 30KB is an absolute redline / failure state for readback
+- do not create temp-fix source buckets; add/split permanent concern-based modules
+- keep a visible footer build token useful during runtime verification
+- anchor by inline `cuTaskId`/`driverId`; resolve by ID never by name; unresolved anchor = STOP-and-flag
+- JSON is canonical data; ClickUp stays slim (events/triggers/notifications/mirrors), never a data store; no field-per-year growth in ClickUp
+- do NOT trust the existing store during migration — primary-source re-verify every finishing position (three silent errors found this session)
+- data stores that grow by row/round are Size Sally watch targets — forecast the split on the build path
