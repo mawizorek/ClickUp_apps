@@ -1,7 +1,7 @@
 /* Inciardi Market — engine. Reads market.json (eBay prices) + catalog.json (master + machines). */
 
-const BUILD = "v5";
-const PR = 92; // merged PR that shipped this version
+const BUILD = "v6";
+const PR = 93; // merged PR that shipped this version
 
 const MARKET_FALLBACK = { version:"sample", source:"sample", baseline:{ retailDefault:14, currency:"USD" }, listings:[
   { itemId:"a", title:"Anastasia Inciardi Mini Print — Negroni", price:9.5, shipping:0, landed:9.5, condition:"New", buyingOptions:["FIXED_PRICE"], url:"https://www.ebay.com/itm/156812754385", image:null, seller:"printfan_me", status:"new", firstSeen:"2026-07-06", print:{name:"Negroni",exclusive:null,matched:true}, flags:["underpriced"], priceHistory:[{t:"2026-07-06",landed:9.5}] },
@@ -242,8 +242,8 @@ function thumb(l){
   return `<div class="thumb" style="background:${thumbBg(cat.category)};color:${thumbInk(cat.category)}">${initials(l.print&&l.print.name)}</div>`;
 }
 function dealCard(l, v){
-  const dv = v || verdict(l), buy = dv.k === "buy" && !isExclusive(l), d = deltaFor(l);
-  return `<article class="deal${buy?" buy":""}">
+  const dv = v || verdict(l), d = deltaFor(l);
+  return `<article class="deal">
     ${thumb(l)}
     <div class="d-body">
       <h3><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)}</a></h3>
