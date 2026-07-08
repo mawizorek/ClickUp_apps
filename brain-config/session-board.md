@@ -30,11 +30,11 @@ It is NOT `open-thread.md` (that's durable pending work) and NOT git history (th
 
 ## Active
 
-### Brain · session F1 trajectory default · started 2026-07-07 22:19
+### Brain · app-dashboard native retired filter · started 2026-07-07
+
+Replacing the data.js DOM-injection graft with a **native** retired filter. Touching `source/data.js` (metadata, remove graft), `source/render.js` (data-status + Retired badge), `source/app.js` (showRetired state + applyFilter + toggle wiring), NEW `source/retired.css`, and `index.html` (toggle button + css link). All read byte-exact via the blob API. Branch `dashboard-retired-native`.
 
 **Status:** active
-
-Tiny edit: flip the driver-card trajectory default metric from 'standings' to 'position'. Touching source/standings/panel.js + trajectory.js only.
 
 ---
 
