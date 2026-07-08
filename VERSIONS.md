@@ -15,8 +15,8 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 | App (slug) | Current version | Status | Last PR / notes |
 | --- | --- | --- | --- |
 | `prism` | v1 | live | Data App Viewer (JSON + Markdown). Initial build PR #54. |
-| `app-dashboard` | v4 launcher + settings gear (PR #40) | ⚠️ REGRESSED on main | The true current is the slim launcher (per-app icons, ClickUp/FileMaker toggle, Brain Config hub, detail sheet, settings gear) at commit `9b4dc40`. PR #57 + #59 clobbered `index.html` with an old card layout; `source/` engine is intact. RESTORE PENDING — do NOT build on current `main` HEAD until restored. |
-| `markdown-viewer` | — | retired | Superseded by `prism`. Redirect/history stub only; do not develop. |
+| `app-dashboard` | v4 launcher + settings gear | live | Slim launcher: per-app icons, ClickUp/FileMaker toggle, Brain Config hub, detail sheet, settings gear. `index.html` = thin loader over `source/` modules. Restored 2026-07-07 by reverting PR #57 + #59 (which had regressed it to an old card layout); `index.html` back to commit `9b4dc40` byte-for-byte. |
+| `markdown-viewer` | — | live (retirement pending) | The PR #57 revert UN-retired it. Superseded by `prism`; needs "retired" re-applied cleanly on top of the launcher (in `source/`), NOT on the old card layout. |
 | `file-chunker` | unverified (last known v16.2, 2026-07-01) | live | Verify against commit history before next PR. |
 | `budget-code-mapper` | unverified (last known v6, design) | live | Verify before next PR. |
 | `f1-racetracks` | unverified (last known v4) | live | Verify before next PR. |
