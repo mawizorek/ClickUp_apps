@@ -1,7 +1,11 @@
 /* Inciardi Market — engine. Reads market.json (eBay prices) + catalog.json (master + machines). */
 
-const BUILD = "v6";
-const PR = 93; // merged PR that shipped this version
+const BUILD = "v7";
+const PR = 96; // merged PR that shipped this version
+
+// Live data source. Soft default: if the user hasn't pasted an override in Settings,
+// the app pulls from the Worker. Blank/failed Worker falls back to bundled sample.
+const DEFAULT_EP = "https://inciardi-market.mawizorek-online.workers.dev/market";
 
 const MARKET_FALLBACK = { version:"sample", source:"sample", baseline:{ retailDefault:14, currency:"USD" }, listings:[
   { itemId:"a", title:"Anastasia Inciardi Mini Print — Negroni", price:9.5, shipping:0, landed:9.5, condition:"New", buyingOptions:["FIXED_PRICE"], url:"https://www.ebay.com/itm/156812754385", image:null, seller:"printfan_me", status:"new", firstSeen:"2026-07-06", print:{name:"Negroni",exclusive:null,matched:true}, flags:["underpriced"], priceHistory:[{t:"2026-07-06",landed:9.5}] },
@@ -47,8 +51,9 @@ epInput.addEventListener("change", () => { localStorage.setItem("inciardi_ep", e
 load();
 
 async function load() {
-  const ep = (localStorage.getItem("inciardi_ep") || "").trim();
-  MARKET = await grab(ep || "./market.json", "inciardi_mkt", MARKET_FALLBACK);
+  // Priority: user override (Settings) -> Worker default -> bundled sample.
+  const override = (localStorage.getItem("inciardi_ep") || "").trim();
+  MARKET = await grab(override || DEFAULT_EP, "inciardi_mkt", MARKET_FALLBACK);
   CATALOG = await grab("./catalog.json", "inciardi_cat", CATALOG_FALLBACK);
   renderStatus(); renderBoard(); renderCounts(); render(); stampFooter();
 }
