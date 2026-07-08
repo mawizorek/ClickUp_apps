@@ -1,94 +1,92 @@
-# F1 Racetracks — next build spec
+# f1-racetracks — Circuit-Page Reskin Brief (pit-wall)
 
-> **RECONCILED 2026-07-07.** The F1 results SCHEMA-SHIFT is the primary build, brainstormed on clean context (7-lens gate) before writing. Prior module-refactor items converge with the shift and are sequenced underneath it. Decisions below are LOCKED by Michael 2026-07-07; do not re-litigate.
+**Cycle:** post-schema-shift → circuit-page aesthetic pass
+**Theme:** Bring the OLD circuit pages (`circuits.html` + `live-tracker.html`) up to the new dark **pit-wall** look already shipped on the standings lens. This is the aesthetic reskin session, run **WITH Michael**, after the data/architecture work is done.
 
-## ⛔ HARD RULE — Segment BEFORE authoring, never flag-after (LOCKED 2026-07-07, Michael)
+> **Reconcile note:** This file previously held the v4→v5 mobile-responsive spec, which targeted a 126KB monolith `index.html` that no longer exists (that file is now the router shell; the app was rebuilt segmented). That spec is obsolete and replaced here. The **mobile-first standing rule** from it is preserved verbatim at the bottom — it still applies to every app.
 
-**Source size is a pre-authoring decision, not a post-build check. The moment a build would be “one HTML file with inline CSS + JS,” that is the trigger to segment BEFORE writing a single line: a slim loader shell + concern-split modules under `source/ /`, every file under the ~12KB soft line, never near the 30KB redline.**
+---
 
-- **Authoring a monolith and disclosing its size afterward is a GATE FAILURE, not a heads-up.** A gate that fires after the commit is not a gate. Shipping an over-cap file does not count as a build and must be reverted, no matter how good the content is.
-- **The size decision happens at design time.** Before authoring: state the file split. If it can’t be stated as under-cap files up front, it is not ready to author.
-- **No “I’ll flag it in the report” escape hatch.** The Source-Size Budget Enforcer, Commit Pre-Flight, and Size Sally all fire BEFORE the write. If any would trip, segment first.
-- **Applies to every app, every lens, every future build in the repo.** This is a corrections-generalize rule: it is not scoped to F1.
+## Where things stand (already shipped, do NOT redo)
 
-Context: the standings lens shipped 2026-07-07 as a 38KB monolith with an after-the-fact size note. Michael rejected it outright and it was reverted (PR #68). Rebuilt segmented. This rule exists so it never repeats.
+- **Schema shift done.** Full race data lives in per-round JSON under `f1-racetracks/f1-results/2026/` (`index.json` + 9 rounds), keyed by **location** (track slug = durable identity); `round` is a per-season ordering attribute. All 9 rounds verified against primary sources; 3 silent store errors corrected.
+- **Standings lens shipped and is HOME.** `f1-racetracks/standings.html` (shell) + `source/standings/{base.css, panel.css, data.js, matrix.js, panel.js, trajectory.js, nav.js}`. WDC/WCC computed live from race + sprint, never stored. Trajectory feature (position default + teammate overlay) live.
+- **Router in place.** `index.html` is a pure router shell: default → standings, `#/<slug>` → circuits.html, `#circuits` → circuits jump. Never stores a servable page.
+- **Nav connector live.** Masthead switcher (Standings · Circuits), jump-to-round deep links, in-panel "Circuit guide →" connector.
+- **ClickUp is slim.** Full finishing order LEFT ClickUp. History collapses to ONE year-labeled "Race History" text field per track (fill-if-blank, prior years immutable). *(Field creation + f1-refresh mirror rework still pending — separate track, not this build.)*
 
-## Build sequence (Michael, 2026-07-07)
+**This build = aesthetics only on the circuit pages.** No engine, no schema, no data-store changes.
 
-1. **Data foundation** — per-round season store `f1-racetracks/f1-results/2026/`. ✅ SHIPPED (#55 built, #58 split, #61 anchors backfilled, relocated under the app 2026-07-08).
-2. **Standings lens** — `f1-racetracks/standings.html` championship points matrix (NEW sibling lens, add-only; fetches the JSON store; standings computed live). Rebuilt SEGMENTED per the hard rule above. AESTHETIC iterated WITH Michael across renders.
-3. **Driver-brief cell interaction** — shipped inside the lens (race + season briefs, teammate H2H, 3-metric championship trajectory).
-4. **Propagate the pit-wall restyle** to the other pages (kill rounded corners, retabularize) — future, WITH Michael.
+---
 
-Standing instruction: backend/data proceeds solo; big aesthetic shifts happen with Michael in the room.
+## Aesthetic direction (match standings lens)
 
-## Locked decisions (Michael, 2026-07-07)
+Dark **pit-wall**, not the OnTrack nav-app feel:
 
-1. **Per-season results store keyed by LOCATION** (slug = identity), `round` a per-season order attribute. Joins cleanly to the racetracks file.
-2. **`points` on every classification row.** WDC + WCC COMPUTED live (race + sprint), never stored.
-3. **ClickUp history = ONE slim year-labeled “Race History” text field per track.** Full order leaves ClickUp, lives only in JSON. Frozen archive lens: written once per year (fill-if-blank), prior years immutable, conflicts STOP-and-flag.
-4. **Migration = full verified 20-car order for all 9 rounds**, primary-source re-verified. ✅ done.
-5. **`routines/f1-refresh.md` mirror rework folded in.** Slim writes + append the frozen year-line by `cuTaskId`. STILL PENDING (see open-thread).
-6. **Sprints = optional per-round block** reusing the race-classification shape + sprint scale (8-7-6-5-4-3-2-1, top 8). Non-sprint rounds omit the key. Total = race + sprint, computed live.
-7. **Standings = ONE canonical final order** + per-row `onRoadPos`/`stewardNote` + round-level amended flag. No multiple standings versions.
-8. **Interaction: cell tap = driver race brief; flag tap = provenance.** Full state lifecycle per the Interaction-State Standard.
-9. **Aesthetic = dark pit-wall:** sharp corners (a purposeful circle or two is fine), tabular/mono numerics, dense tables over cards, color-as-data (team accent, purple fastest lap, amber amended). Away from the OnTrack nav-app feel. Design-skill hard bans apply.
+- **Sharp corners.** A purposeful circle or two is fine; default is square/tabular.
+- **Tabular / mono numerics.** Numbers align, monospace figures, dense.
+- **Dense tables over cards.** Information-rich, timing-screen density. Cards are the exception, not the default.
+- **Color-as-data, never decoration:** team accent per driver, **purple** = fastest lap, **amber** = amended / story tint (loud signal), **bright gold number** = win.
+- **Story-tint reads as a signal**, not a background wash.
+- Circuit pages are **transitory drill-throughs**; standings is home. Streamline them toward a fast in/out state, not a destination.
 
-## Data store layout (SHIPPED — per-round, size-safe, nested under the app)
+Pull the actual tokens/spacing/type scale from `source/standings/base.css` + `panel.css` so the two lenses feel like one app.
 
-**Relocated 2026-07-08:** the store moved from repo-root `f1-results/` to `f1-racetracks/f1-results/` so the repo root lists only apps; the data lives under the app that consumes it. Path-only change; content unchanged.
+---
 
-```
-f1-racetracks/f1-results/2026/
-  index.json          season meta + ordered round list (slug/round/name/date/cuTaskId/sprint/file)
-  <slug>.json         one file per LOCATION = canonical round record; optional `sprint` block
-```
+## Architecture rules that are now LAW (do not violate)
 
-- Round file: `{ season, round, slug, name, date, cuTaskId, version, pole, fastestLap?, summary, sprint?{classification[]}, classification[] }`. Rows: `{ pos, driverId, driver, team, status(FIN|DNF|DNS|DSQ|WD), points, onRoadPos?, stewardNote? }`. Growth (reserved, optional): grid, gap, laps, pits, stints, telemetry. Engine reads defensively.
-- Standings computed: WDC = sum race+sprint points per driverId; WCC = sum per team.
-- Anchors: round `cuTaskId` → F1 Races task; row `driverId` → F1 Drivers task. Resolve by ID. Dedup complete (Colapinto 86aj1ra0h, Lindblad 86aj1ra31, Bottas 86aj1ra1g, Perez 86aj1ra1z).
+1. **Segment BEFORE authoring — never flag-after.** Every file ≤ ~12KB soft / 30KB hard readback cap. Authoring a monolith and disclosing its size afterward is a GATE FAILURE; an over-cap file must be reverted and rebuilt segmented. No exceptions.
+2. **Data nests UNDER its consuming app** (`<app-slug>/<data-dir>/`), never at repo root. Root = apps + infra only. Shared data → `shared/`.
+3. **index.html = router/shell, never a servable page.** The instant an app has >1 page, index is a dispatcher; default landing is a one-line constant.
+4. **Byte-fragile: REBUILD, do not blind-edit `circuits.html`.** Its footer IDs are wired to the live-weather / footer-export module (`source/11_weather_and_footer_exports.js` per the working map below). A careless string edit corrupts those hooks. Read source byte-exact via `get_commit` `detail=full_patch` (raw fetch flattens HTML). If a file body won't read back clean, do NOT overwrite it.
+5. **DESIGN-UI hard bans still apply** (load the skill before building).
 
-## Standings lens layout (SHIPPED — segmented)
+---
 
-```
-f1-racetracks/
-  standings.html               slim loader shell (markup + <link>/<script> refs only)
-  f1-results/2026/             the season store this lens reads (nested, see above)
-  source/standings/
-    base.css                   tokens, masthead, controls, matrix table, cells, wcc, footer, states
-    panel.css                  side panel, grid→finish flow, badges, story box, stats, tyres, H2H, trajectory, rbr summary
-    data.js                    fetch ./f1-results/2026/, compute standings, helpers, story bank, illustrative DETAIL
-    matrix.js                  matrix + constructors render + column sort
-    trajectory.js              3 toggleable metrics (standings/gap/position) + teammate overlay
-    panel.js                   race brief + season brief + events + boot
-```
+## Source map (WORKING MAP — confirm the real chunk set at pickup)
 
-- Every file under the ~12KB soft line. `standings.html` references the modules; browser loads them same-origin on Pages.
-- Fetches the canonical JSON store at `./f1-results/2026/` (relative to standings.html); no data duplicated in the engine. Ricky’s data commits flow through automatically.
-- Granular grid/lap/pit/tyre + story-tag fields are illustrative (flagged “preview”) until sourced from OpenF1; verified points/positions are real.
+The circuit app is chunked into `f1-racetracks/source/` modules. The working understanding from the last session:
 
-## OPEN FLAGS (durable copy in brain-config/open-thread.md)
+- `circuits.html` — shell (formerly `index.html`, renamed via GitHub UI)
+- `live-tracker.html` — live circuit tracker page
+- `source/05..18_*.js` — circuit page logic modules (weather, footer/exports at ~`11_weather_and_footer_exports.js`)
+- `source/*.css.txt` — runtime styles injected with a `BUILD_STAMP`
+- `source/standings/*` — standings lens (DONE; reference for tokens, don't restyle)
 
-- **🚩 f1-refresh mirror rework** — targets the retired per-year dropdown; Ricky runs Thu–Sun. Rework before next race weekend.
-- **🚩 ClickUp “Race History” field** not yet created (one slim year-labeled text field per track).
-- OpenF1 sourcing for the granular per-cell fields (grid, best lap, pits, tyres) to replace the illustrative preview data.
+**Do not trust these filenames blind.** First step at pickup: list `f1-racetracks/source/` and confirm the actual module inventory + which module owns the footer/weather hooks BEFORE touching anything.
 
-## Futures
+---
 
-- rebalance grouped round-data files `06`/`07`/`08` under the 15KB working threshold
-- decide whether `live-tracker.html` stays a separate surface or narrows now the main app owns more weekend context
-- per-driver times/gaps, grid-vs-finish, pits, telemetry — populate reserved round-file growth fields as data lands (data change, not engine change)
-- `f1-racetracks/f1-results/2027/` and beyond: independent per-year folders under the app; racetracks file persists
+## Build procedure
 
-## Known guardrails
+1. Read this brief. Load the **DESIGN-UI** skill.
+2. List `f1-racetracks/source/` and confirm the real chunk set + footer/weather owner module. Read the standings tokens (`base.css`, `panel.css`) so the reskin matches.
+3. Read `circuits.html` + `live-tracker.html` byte-exact (`get_commit` full_patch). If either won't read clean, STOP and flag — do not blind-overwrite.
+4. Reskin to pit-wall, **segmented from the first keystroke** (respect the cap; never author a monolith "to split later").
+5. Keep desktop AND mobile first-class (see standing rule below).
+6. Bump `BUILD_STAMP` / version. PR → self-merge. Post one board line before any git op; clear it on close.
+7. **Do this WITH Michael** — it's an aesthetic pass; get his eyes on iterations before merge.
 
-- **segment before authoring; never author a monolith then flag its size (see HARD RULE above)**
-- start normal edits from `source/`, not from a single big file
-- semantic source target ~10–12KB soft / ~15KB hard unless explicitly approved; 30KB is an absolute redline / failure state for readback
-- do not create temp-fix source buckets; add/split permanent concern-based modules
-- keep a visible footer build token useful during runtime verification
-- anchor by inline `cuTaskId`/`driverId`; resolve by ID never by name; unresolved anchor = STOP-and-flag
-- JSON is canonical data; ClickUp stays slim (events/triggers/notifications/mirrors), never a data store; no field-per-year growth in ClickUp
-- data store lives UNDER its app (`f1-racetracks/f1-results/`), not at repo root — root lists apps only
-- do NOT trust the existing store during migration — primary-source re-verify every finishing position (three silent errors found this session)
-- data stores that grow by row/round are Size Sally watch targets — forecast the split on the build path
+### Do NOT
+- Touch engine, schema, or data store. Ricky never touches engine/source.
+- Blind-edit `circuits.html` footer/weather hooks.
+- Ship any over-cap file. Segment first.
+- Restyle the standings lens — it's the reference, not a target.
+
+---
+
+## Acceptance criteria
+
+- [ ] `circuits.html` + `live-tracker.html` read as pit-wall siblings of the standings lens (shared tokens, sharp corners, tabular numerics, color-as-data).
+- [ ] Footer / weather / export hooks still function (IDs intact, not corrupted).
+- [ ] Every touched file under the readback cap; nothing authored as a monolith.
+- [ ] Mobile first-class: zero horizontal scroll at 320/375/390px, touch targets ≥44px.
+- [ ] Router + nav switcher still route correctly to the reskinned pages.
+- [ ] `BUILD_STAMP` / version bumped.
+
+---
+
+## Standing rule (applies to ALL apps) — PRESERVED
+
+**Every app in `mawizorek/ClickUp_apps` must be explicitly designed for clean mobile viewing AND desktop — mobile is a first-class target, not an afterthought.** Every build and build spec includes a responsive pass: no horizontal overflow at 320px, footers/action bars that wrap or stack, touch targets ≥44px, fluid layout via `clamp()`/`min()`/`%`, safe-area insets. Test every ship at phone width before calling it done. Also recorded in the Brain Reference Library (Apps / HTML Artifacts → Architecture).
