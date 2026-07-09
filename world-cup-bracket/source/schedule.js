@@ -38,7 +38,7 @@ export const periods = [
   }},
   { id: 'r32', label: 'R32', filter: m => m.round === 'R32' },
   { id: 'r16', label: 'R16', filter: m => m.round === 'R16' },
-  { id: 'later', label: 'QF+', filter: m => ['QF', 'SF', 'Final'].includes(m.round) },
+  { id: 'later', label: 'QF+', filter: m => ['QF', 'SF', '3P', 'Final'].includes(m.round) },
   { id: 'all', label: 'All', filter: () => true },
 ];
 
