@@ -3,16 +3,45 @@
 function teamChip(t){return `<span class="panel-team"><span class="team-bar" style="--team:${teamColor(t)}"></span>${t}</span>`;}
 function tyreChips(arr){return arr?`<div class="tyres">`+arr.map((c,i)=>`${i>0?'<span class="tyre-arrow">\u203A</span>':''}<span class="tyre ${c}">${c}</span>`).join('')+`</div>`:'';}
 
+/* Qualifying + position-journey block, sourced from the enriched round row
+   (qualifying{pos,q1,q2,q3}, grid, onRoadPos). Guarded: renders only when the
+   round carries qualifying data, degrades to nothing otherwise. */
+function qualiBlock(rd,id,m){
+  const row=(typeof raceRow==='function')?raceRow(rd,id):null;
+  const q=row&&row.qualifying;
+  if(!q)return '';
+  const jQual=q.pos!=null?'P'+q.pos:'\u2014';
+  const started=row.grid;
+  const jStart=started==null?'\u2014':(started==='PL'?'PL':'P'+started);
+  const jFin=m.status==='DNF'?'DNF':(m.pos!=null?'P'+m.pos:'\u2014');
+  const finCls=m.status==='DNF'?' dnf':(m.pos===1?' win':'');
+  const startCls=started==='PL'?' pl':'';
+  const times=['q1','q2','q3'].map(function(k){return `<div class="qt"><span class="qt-l">${k.toUpperCase()}</span><span class="qt-v num">${q[k]||'\u2014'}</span></div>`;}).join('');
+  const onRoad=(row.onRoadPos!=null&&row.onRoadPos!==m.pos)?`<div class="qj-note">Crossed the line P${row.onRoadPos}; classified ${jFin} after a penalty.</div>`:'';
+  return `<div class="qual"><span class="section-h">Qualifying &amp; grid</span>`+
+    `<div class="qj">`+
+      `<div class="qj-node"><span class="qj-l">Qualified</span><span class="qj-v num">${jQual}</span></div>`+
+      `<span class="qj-arrow">\u203A</span>`+
+      `<div class="qj-node"><span class="qj-l">Started</span><span class="qj-v num${startCls}">${jStart}</span></div>`+
+      `<span class="qj-arrow">\u203A</span>`+
+      `<div class="qj-node"><span class="qj-l">Finished</span><span class="qj-v num${finCls}">${jFin}</span></div>`+
+    `</div>`+
+    `<div class="qt-row">${times}</div>`+
+    onRoad+
+  `</div>`;
+}
+
 function raceBrief(roundNo,id){
   const rd=ROUNDS.find(x=>x.round==roundNo);const m=cellMeta(rd,id);const det=m.det||{};const finish=m.status==='DNF'?'DNF':m.pos;det.finish=finish;
   const name=DRV[id].name,team=DRV[id].team;const isFL=rd.fastestLap&&rd.fastestLap.driverId===id,isPole=rd.pole&&rd.pole.driverId===id;
   const sp=rd.sprint?rd.sprint.classification.find(x=>x.driverId===id):null;const total=(sp?sp.points:0)+m.pts;
   let badges='';if(isPole)badges+=`<span class="badge">Pole</span>`;if(isFL)badges+=`<span class="badge fl">Fastest Lap</span>`;if(sp)badges+=`<span class="badge spr">Sprint P${sp.pos} \u00B7 +${sp.points}</span>`;
   let flow;if(det.grid){const gd=m.gridDelta,dcls=gd>0?'up':(gd<0?'down':''),dtxt=gd>0?`\u25B2 +${gd}`:(gd<0?`\u25BC ${gd}`:'\u2013 held');flow=`<div class="flow"><div class="node"><span class="nl">Grid</span><span class="nv num">${det.grid}</span></div><div class="arrow"><span class="delta ${dcls} num">${m.status==='DNF'?'':dtxt}</span><span class="track"></span></div><div class="node"><span class="nl">Finish</span><span class="nv ${finish===1?'win':''} ${m.status==='DNF'?'dnf':''} num">${m.status==='DNF'?'DNF':'P'+finish}</span></div></div>`;}else{flow=`<div class="flow"><div class="node"><span class="nl">Finish</span><span class="nv ${finish===1?'win':''} ${m.status==='DNF'?'dnf':''} num">${m.status==='DNF'?'DNF':'P'+finish}</span></div></div>`;}
+  const qb=qualiBlock(rd,id,m);
   const noteText=m.note?m.note.text:null;const tagText=(det.story&&det.story.length)?renderStory(det.story,det):[];let storyHtml='';if(noteText||tagText.length){const isMv=!m.note&&m.bigMover;storyHtml=`<div class="story-box ${isMv?'mv':''}"><span class="sdot"></span><div class="stext">${noteText?`<p>${noteText}${m.note.onRoad?` <b>(on road: P${m.note.onRoad})</b>`:''}</p>`:''}${tagText.map(t=>`<p>${t}</p>`).join('')}</div></div>`;}
   const hasIllus=!!det.grid;const il=hasIllus?'illus':'';let stats=`<div class="stat-grid"><div class="stat"><span class="sl">Race Pts</span><span class="sv num">${m.pts}</span></div><div class="stat"><span class="sl">Sprint</span><span class="sv num">${sp?sp.points:'\u2014'}</span></div><div class="stat"><span class="sl">Total</span><span class="sv num">${total}</span></div>`;if(det.best)stats+=`<div class="stat ${il}"><span class="sl">Best Lap</span><span class="sv num">${det.best}</span></div>`;if(det.pits!=null)stats+=`<div class="stat ${il}"><span class="sl">Pits</span><span class="sv num">${det.pits}</span></div>`;if(det.tyres)stats+=`<div class="stat ${il}"><span class="sl">Tyres</span>${tyreChips(det.tyres)}</div>`;stats+=`</div>`;
   const illusNote=hasIllus?`<div class="illus-note"><b>Preview:</b> grid, lap, pits and tyres are illustrative; verified values (OpenF1) fill these once sourced.</div>`:'';
-  return `<div class="panel-head" style="--team:${teamColor(team)}"><div><div class="panel-ey">R${rd.round} \u00B7 ${rd.name}${rd.sprint?' \u00B7 Sprint':''}</div><div class="panel-drv">${name}</div>${teamChip(team)}</div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body">${flow}${badges?`<div class="badges">${badges}</div>`:''}${storyHtml}${stats}<div class="report">${rd.summary?`<p>${rd.summary}</p>`:''}</div>${illusNote}</div>`;
+  return `<div class="panel-head" style="--team:${teamColor(team)}"><div><div class="panel-ey">R${rd.round} \u00B7 ${rd.name}${rd.sprint?' \u00B7 Sprint':''}</div><div class="panel-drv">${name}</div>${teamChip(team)}</div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body">${flow}${badges?`<div class="badges">${badges}</div>`:''}${qb}${storyHtml}${stats}<div class="report">${rd.summary?`<p>${rd.summary}</p>`:''}</div>${illusNote}</div>`;
 }
 
 function seasonBrief(id){
