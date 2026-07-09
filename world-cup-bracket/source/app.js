@@ -1,6 +1,6 @@
 // World Cup 2026 Bracket - entry point. Wires modules, loads data, boots views.
 import { S, APP_VERSION, BUILD_PR, DATA_URL, CACHE_KEY, REPO_OWNER, REPO_NAME, DATA_PATH } from './store.js';
-import { buildFedBy, byId } from './util.js';
+import { buildFedBy, byId, normalizeMatches } from './util.js';
 import { renderTimeNav, renderSchedule, DEFAULT_PERIOD } from './schedule.js';
 import { renderBracket } from './bracket.js';
 import { togglePick, applyPaths } from './paths.js';
@@ -105,7 +105,9 @@ async function init() {
     document.getElementById('scheduleContent').innerHTML = '<div class="loading-msg">Could not load match data. Open via GitHub Pages or ensure data.json is in the same folder.</div>';
     return;
   }
-  S.allMatches = data.matches;
+  // Normalize at the load boundary: derive status/tbd/winner from the raw facts so the
+  // render layer only ever sees the canonical shape (see util.js normalizeMatches).
+  S.allMatches = normalizeMatches(data.matches);
   S.rankings = data.rankings || {};
   buildFedBy();
   setupViewToggle();
