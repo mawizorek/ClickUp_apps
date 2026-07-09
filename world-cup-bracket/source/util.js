@@ -148,6 +148,8 @@ export function routeHistory(team, excludeId) {
 }
 
 // ---- kickoff time + countdown ----
+// data.json `time` is authored in US Eastern (ET); the whole tournament (Jun-Jul 2026)
+// runs on EDT = UTC-4. kickoffDate returns the true UTC instant of kickoff.
 export function kickoffDate(m) {
   if (!m.time || m.time === 'TBD') return null;
   const t = m.time.replace(/\s*ET$/i, '').trim();
@@ -158,6 +160,16 @@ export function kickoffDate(m) {
   if (ap === 'AM' && h === 12) h = 0;
   const [Y, Mo, D] = m.day.split('-').map(Number);
   return new Date(Date.UTC(Y, Mo - 1, D, h + ET_UTC_OFFSET, min));
+}
+
+// Kickoff rendered in the VIEWER'S local timezone, with a short zone label so it's
+// unambiguous (e.g. "4:00 PM CDT" for a Central viewer, "9:00 PM BST" in the UK).
+// Built from the true UTC instant (kickoffDate), so the browser handles the conversion.
+// Returns null when there's no set time (caller falls back to 'TBD').
+export function localKickoff(m) {
+  const ko = kickoffDate(m);
+  if (!ko) return null;
+  return ko.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZoneName: 'short' });
 }
 
 export function fmtCountdown(target) {
