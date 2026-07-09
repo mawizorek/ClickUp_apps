@@ -4,40 +4,21 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
-## Prism v1 — beta test + hardening (NEVER shakedown-tested in the repo)
-**Added:** 2026-07-07
+## F1 Racetracks — data layer refactor follow-ups
+**Added:** 2026-07-09
 
-**Update 2026-07-08 (PR #78, Prism now v2):** First mobile beta finding shipped — the export bar was getting eaten by the sticky header + Safari's bottom chrome on mobile, so exports now live in a bottom-sheet triggered by a floating Export button (new self-contained `prism.mobile.js`; desktop unchanged). Loose-end (a) fixed in the same pass. `?v=2` cache-bust tokens added to `index.html`. The rest of the beta pass (real-file drops, every-export verification, edge cases) and items (b)–(e) are STILL OPEN.
+Canonical results store shipped (PRs #105, #108, #109). One source of truth: `f1-racetracks/f1-results/2026/` (per-round files + `index_rounds.json`). Enriched per-driver schema (qualifying + grid + fastLap) is LIVE and surfaced in the standings driver popup (v5.1). Albert Park (r1) is the complete reference round.
 
-Prism shipped v1 this session (`prism/`, live at https://mawizorek.github.io/ClickUp_apps/prism/, build PR #54) but we went straight from build to ship without a real beta test against actual files. It's the unified Data App Viewer: one shell, two lenses (JSON + Markdown), split-by-table default, single-record auto-pivot, flag panel, CSV/Excel export. NEXT SESSION: put it through real use before calling it done.
+**STILL OPEN (next agent picks up here):**
+- **(a) Qualifying backfill, rounds 2-7.** Full quali tables live in each round's ClickUp race task; migrate Q1/Q2/Q3 + grid + onRoadPos into each round file's `classification` rows, matching Albert Park's shape. Do it carefully, one round at a time (this store was just de-rotted; don't reintroduce errors). This is Ricky's kind of job now: pure data dig into a fixed format, NO schema edits.
+- **(b) Qualifying dig, rounds 8-9 (Austria + Silverstone).** These have NO quali table in ClickUp — need a genuine external source dig. Austria task is race-narrative only; Silverstone is still a preview.
+- **(c) Per-driver race `fastLap`.** Not in the CU tasks (they carry only the one official FL). Backfills empty; degrades gracefully; Ricky's going-forward dig from a lap-time source.
+- **(d) Michael has layout notes on the v5.1 quali popup** (unspecified as of close) — collect them before the next UI pass.
+- **(e) Lens integration not squared.** `index.html` is a thin router landing on the drivers matrix, forwarding `#/<slug>` to `circuits.html`. The true integration of the two lenses (matrix + circuit guide) is an open design question, deliberately not forced.
+- **(f) 2024/2025 historical backfill (future, Michael-flagged).** Structure is built for it: each season = its own `f1-results/<year>/` folder with its own `index_rounds.json`; a cross-season `index_seasons.json` at the store root slots in when a second season exists. Needs a NEW viewing level in the app (ties to (e)). Build nothing until Michael calls it; it's the stress-test of this schema.
+- **(g) Cosmetic:** circuit guide's TRACKS round numbering (Silverstone R11) differs from the store's (R9). They join by slug so nothing breaks; reconcile if it bugs you.
 
-**Beta-test pass (do with real files, not just the built-in samples):**
-- Drop actual ClickUp JSON backup exports (task lists, docs). Confirm flatten + split-by-table reads sanely on real nesting depth, and the flag panel catches the real irregularities (irregular schema, numbers-as-text, mixed types).
-- Drop real `.md` files (e.g. a Brain reference doc) through the Markdown lens; confirm tables/code/nested lists render.
-- Exercise every export: CSV (comma AND the tab delimiter), Excel `.xls`, Markdown-to-HTML. Open the outputs in Excel/Sheets and verify columns/rows survive.
-- Edge cases: giant file (perf), deeply nested JSON, arrays-of-arrays, empty file, invalid JSON (error state), a single-object file (pivot view).
-
-**Known open items carried from build:**
-- **(a) Tab CSV delimiter bug — ✅ RESOLVED (2026-07-08, PR #78).** The Tab button carries `data-d="\t"` (a literal backslash-t); core.js stored that literal in `S.delim` while the CSV export compared against a real tab, so the escape leaked into the file. `prism.mobile.js` normalizes `S.delim` to a real tab at select time. Comma (default) was always fine.
-- **(b) Excel export is `.xls` HTML-table, not true `.xlsx`.** Roadmap: SheetJS for real xlsx. Decide if worth it after beta.
-- **(c) og.png / icon.png binaries not dropped** via GitHub UI yet (referenced in head + manifest; unfurls/install degrade gracefully until added).
-- **(d) Big-file table perf** — no virtualization yet; flagged as a v2 item. See if beta actually stresses it.
-- **(e) App is gated** (`config.json`, code 2026). Flip to `open` if/when it should be shareable.
-
-**Cold-pickup pointers:** source `prism/` (modular: `index.html` loader + `prism.css` + `prism.core.js`/`prism.json.js`/`prism.md.js` + `prism.mobile.js` mobile chrome). Ledger row: `VERSIONS.md` → `prism` = v2. ClickUp APPS task repurposed from Markdown Viewer (title now "Prism — Data App Viewer").
-
----
-
-## F1 Schema-Shift — pending items
-**Added:** 2026-07-07 · **Updated:** 2026-07-08
-
-The results schema-shift shipped its data foundation: `f1-racetracks/f1-results/2026/` (per-round files + `index.json`, RELOCATED 2026-07-08 from repo root to under the app so the root lists only apps), full 20-car verified order, race + sprint, provenance, computed standings. The standings lens (`f1-racetracks/standings.html` + `source/standings/`) is live with the 3-metric trajectory + teammate overlay. Spec: `f1-racetracks/next-build-spec.md`. Still open:
-
-- **(a) Driver-anchor dedup — ✅ RESOLVED (2026-07-08, PR #61).** Colapinto/Lindblad/Bottas/Perez now carry canonical `driverId`s (86aj1ra0h / 86aj1ra31 / 86aj1ra1g / 86aj1ra1z); no UNRESOLVED-DUP remain in the round files. (Michael to delete the three December placeholder driver-task stubs in ClickUp: 86ae52rq5, 86ae52ryh, 86ae52rtd.)
-- **(b) f1-refresh mirror rework — time-sensitive (Ricky runs Thu–Sun).** `routines/f1-refresh.md` still targets the retired per-year ClickUp result dropdown. Post-shift the mirror must: keep slim writes (status-flip, dates, notifications), and its one data write becomes appending the frozen year-line to the new slim "Race History" text field, resolved by `cuTaskId`. Full order never touches ClickUp. Rework before the next race weekend or Ricky writes to a dead field.
-- **(c) ClickUp "Race History" field not yet created.** One slim year-labeled text field per track (frozen archive lens, fill-if-blank, prior years immutable). Retire the per-year result dropdowns once it's populated.
-- **(d) Pit-wall restyle propagation (build 4) — do WITH Michael.** The standings lens is shipped in the pit-wall language; the OTHER pages (index.html circuit views, live-tracker) still carry the old OnTrack aesthetic and will mismatch until propagated. Aesthetic session, with Michael.
-- **(e) OpenF1 sourcing** for the granular per-cell fields (grid, best lap, pits, tyres, story tags) to replace the illustrative `DETAIL` preview data in `source/standings/data.js`.
+**Canonicality rule (LOCKED 2026-07-09):** repo store = canonical for RESULTS (numbers); ClickUp race task = canonical for NARRATIVE (stories, one-liners). Store wins on conflict. NO more timing tables maintained in ClickUp. Ricky's routine doc (F1 Weekly Refresh, STEP 1 + STEP 4C) already reflects this.
 
 ---
 
