@@ -3,13 +3,17 @@
 function teamChip(t){return `<span class="panel-team"><span class="team-bar" style="--team:${teamColor(t)}"></span>${t}</span>`;}
 function tyreChips(arr){return arr?`<div class="tyres">`+arr.map((c,i)=>`${i>0?'<span class="tyre-arrow">\u203A</span>':''}<span class="tyre ${c}">${c}</span>`).join('')+`</div>`:'';}
 
-/* Qualifying + position-journey block, sourced from the enriched round row
+/* Qualifying + race block, sourced from the enriched round row
    (qualifying{pos,q1,q2,q3}, grid, onRoadPos). Guarded: renders only when the
-   round carries qualifying data, degrades to nothing otherwise. */
-function qualiBlock(rd,id,m){
+   round carries qualifying data, degrades to nothing otherwise.
+   v5.2 layout: the qualifying lap times (Q1/Q2/Q3) sit under the QUALIFYING
+   position only; the race start/finish positions carry the fastest-lap +
+   tyre-strategy detail (real when sourced, illustrative det.* meanwhile). */
+function qualiBlock(rd,id,m,det,isFL,il){
   const row=(typeof raceRow==='function')?raceRow(rd,id):null;
   const q=row&&row.qualifying;
   if(!q)return '';
+  det=det||{};
   const jQual=q.pos!=null?'P'+q.pos:'\u2014';
   const started=row.grid;
   const jStart=started==null?'\u2014':(started==='PL'?'PL':'P'+started);
@@ -18,16 +22,28 @@ function qualiBlock(rd,id,m){
   const startCls=started==='PL'?' pl':'';
   const times=['q1','q2','q3'].map(function(k){return `<div class="qt"><span class="qt-l">${k.toUpperCase()}</span><span class="qt-v num">${q[k]||'\u2014'}</span></div>`;}).join('');
   const onRoad=(row.onRoadPos!=null&&row.onRoadPos!==m.pos)?`<div class="qj-note">Crossed the line P${row.onRoadPos}; classified ${jFin} after a penalty.</div>`:'';
-  return `<div class="qual"><span class="section-h">Qualifying &amp; grid</span>`+
-    `<div class="qj">`+
+  // race detail: this driver's fastest lap + tyre strategy under the race positions.
+  // fastest lap is real when this driver holds the round FL, else the illustrative det.best.
+  const flTime=(isFL&&rd.fastestLap&&rd.fastestLap.time)?rd.fastestLap.time:(det.best||null);
+  let rdStats='';
+  if(flTime)rdStats+=`<div class="stat ${isFL?'':il}"><span class="sl">Fastest Lap</span><span class="sv num">${flTime}</span></div>`;
+  if(det.pits!=null)rdStats+=`<div class="stat ${il}"><span class="sl">Pit Stops</span><span class="sv num">${det.pits}</span></div>`;
+  if(det.tyres)rdStats+=`<div class="stat ${il}"><span class="sl">Tyre Strategy</span>${tyreChips(det.tyres)}</div>`;
+  const raceDetail=rdStats?`<div class="stat-grid">${rdStats}</div>`:'';
+  return `<div class="qual">`+
+    `<div class="qual-seg"><span class="section-h">Qualifying</span>`+
       `<div class="qj-node"><span class="qj-l">Qualified</span><span class="qj-v num">${jQual}</span></div>`+
-      `<span class="qj-arrow">\u203A</span>`+
-      `<div class="qj-node"><span class="qj-l">Started</span><span class="qj-v num${startCls}">${jStart}</span></div>`+
-      `<span class="qj-arrow">\u203A</span>`+
-      `<div class="qj-node"><span class="qj-l">Finished</span><span class="qj-v num${finCls}">${jFin}</span></div>`+
+      `<div class="qt-row">${times}</div>`+
     `</div>`+
-    `<div class="qt-row">${times}</div>`+
-    onRoad+
+    `<div class="qual-seg"><span class="section-h">Race</span>`+
+      `<div class="qj">`+
+        `<div class="qj-node"><span class="qj-l">Started</span><span class="qj-v num${startCls}">${jStart}</span></div>`+
+        `<span class="qj-arrow">\u203A</span>`+
+        `<div class="qj-node"><span class="qj-l">Finished</span><span class="qj-v num${finCls}">${jFin}</span></div>`+
+      `</div>`+
+      onRoad+
+      raceDetail+
+    `</div>`+
   `</div>`;
 }
 
@@ -37,12 +53,13 @@ function raceBrief(roundNo,id){
   const sp=rd.sprint?rd.sprint.classification.find(x=>x.driverId===id):null;const total=(sp?sp.points:0)+m.pts;
   let badges='';if(isPole)badges+=`<span class="badge">Pole</span>`;if(isFL)badges+=`<span class="badge fl">Fastest Lap</span>`;if(sp)badges+=`<span class="badge spr">Sprint P${sp.pos} \u00B7 +${sp.points}</span>`;
   let flow;if(det.grid){const gd=m.gridDelta,dcls=gd>0?'up':(gd<0?'down':''),dtxt=gd>0?`\u25B2 +${gd}`:(gd<0?`\u25BC ${gd}`:'\u2013 held');flow=`<div class="flow"><div class="node"><span class="nl">Grid</span><span class="nv num">${det.grid}</span></div><div class="arrow"><span class="delta ${dcls} num">${m.status==='DNF'?'':dtxt}</span><span class="track"></span></div><div class="node"><span class="nl">Finish</span><span class="nv ${finish===1?'win':''} ${m.status==='DNF'?'dnf':''} num">${m.status==='DNF'?'DNF':'P'+finish}</span></div></div>`;}else{flow=`<div class="flow"><div class="node"><span class="nl">Finish</span><span class="nv ${finish===1?'win':''} ${m.status==='DNF'?'dnf':''} num">${m.status==='DNF'?'DNF':'P'+finish}</span></div></div>`;}
-  const qb=qualiBlock(rd,id,m);
+  const qb=qualiBlock(rd,id,m,det,isFL,hasIllusFlag(det));
   const noteText=m.note?m.note.text:null;const tagText=(det.story&&det.story.length)?renderStory(det.story,det):[];let storyHtml='';if(noteText||tagText.length){const isMv=!m.note&&m.bigMover;storyHtml=`<div class="story-box ${isMv?'mv':''}"><span class="sdot"></span><div class="stext">${noteText?`<p>${noteText}${m.note.onRoad?` <b>(on road: P${m.note.onRoad})</b>`:''}</p>`:''}${tagText.map(t=>`<p>${t}</p>`).join('')}</div></div>`;}
-  const hasIllus=!!det.grid;const il=hasIllus?'illus':'';let stats=`<div class="stat-grid"><div class="stat"><span class="sl">Race Pts</span><span class="sv num">${m.pts}</span></div><div class="stat"><span class="sl">Sprint</span><span class="sv num">${sp?sp.points:'\u2014'}</span></div><div class="stat"><span class="sl">Total</span><span class="sv num">${total}</span></div>`;if(det.best)stats+=`<div class="stat ${il}"><span class="sl">Best Lap</span><span class="sv num">${det.best}</span></div>`;if(det.pits!=null)stats+=`<div class="stat ${il}"><span class="sl">Pits</span><span class="sv num">${det.pits}</span></div>`;if(det.tyres)stats+=`<div class="stat ${il}"><span class="sl">Tyres</span>${tyreChips(det.tyres)}</div>`;stats+=`</div>`;
+  const hasIllus=!!det.grid;let stats=`<div class="stat-grid"><div class="stat"><span class="sl">Race Pts</span><span class="sv num">${m.pts}</span></div><div class="stat"><span class="sl">Sprint</span><span class="sv num">${sp?sp.points:'\u2014'}</span></div><div class="stat"><span class="sl">Total</span><span class="sv num">${total}</span></div></div>`;
   const illusNote=hasIllus?`<div class="illus-note"><b>Preview:</b> grid, lap, pits and tyres are illustrative; verified values (OpenF1) fill these once sourced.</div>`:'';
   return `<div class="panel-head" style="--team:${teamColor(team)}"><div><div class="panel-ey">R${rd.round} \u00B7 ${rd.name}${rd.sprint?' \u00B7 Sprint':''}</div><div class="panel-drv">${name}</div>${teamChip(team)}</div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body">${flow}${badges?`<div class="badges">${badges}</div>`:''}${qb}${storyHtml}${stats}<div class="report">${rd.summary?`<p>${rd.summary}</p>`:''}</div>${illusNote}</div>`;
 }
+function hasIllusFlag(det){return det&&det.grid?'illus':'';}
 
 function seasonBrief(id){
   const d=STANDINGS.find(x=>x.id===id),w=wins(id),best=bestFin(id);
@@ -62,7 +79,7 @@ function seasonBrief(id){
   // recent-first
   const rows=[...ROUNDS].sort((a,b)=>b.round-a.round).map(rd=>{const r=raceRow(rd,id);const sp=rd.sprint?rd.sprint.classification.find(x=>x.driverId===id):null;let fin='\u2014',pts=0;if(r){fin=r.status==='DNF'?'DNF':'P'+r.pos;pts=r.points+(sp?sp.points:0);}return `<div class="season-row"><span class="sr-rn num">R${rd.round}</span><span class="sr-ev">${codeOf(rd)} \u00B7 ${rd.name.replace(' Grand Prix','')}</span><span class="sr-fin num" style="color:${r&&r.pos===1?'var(--gold)':r&&r.status==='DNF'?'var(--red)':'var(--txt)'}">${fin}</span><span class="sr-pts num">${pts||''}</span></div>`;}).join('');
   const mate=teammate(id);let h2hHtml='';if(mate){const[me,them]=h2h(id,mate);h2hHtml=`<div class="h2h"><div><div class="h2h-l">Teammate H2H</div><div class="h2h-score"><span class="${me>=them?'win-n':'lose-n'}">${me}</span><span style="color:var(--txt-dim);font-size:0.9rem">\u2013</span><span class="${them>me?'win-n':'lose-n'}">${them}</span></div></div><div class="h2h-vs">race finishes<br>vs <b>${LAST(mate)}</b></div></div>`;}
-  return `<div class="panel-head" style="--team:${teamColor(d.team)}"><div><div class="panel-ey">Season \u00B7 Championship P${d.champRank}</div><div class="panel-drv">${d.name}</div>${teamChip(d.team)}</div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body"><div class="stat-grid"><div class="stat"><span class="sl">Total</span><span class="sv num" style="color:${d.champRank===1?'var(--gold)':'var(--txt)'}">${d.total}</span></div><div class="stat"><span class="sl">Pos</span><span class="sv num">P${d.champRank}</span></div><div class="stat"><span class="sl">Race / Spr</span><span class="sv num">${d.race}<small> / ${d.sprint}</small></span></div><div class="stat"><span class="sl">Wins</span><span class="sv num">${w}</span></div><div class="stat"><span class="sl">Best</span><span class="sv num">${best===99?'\u2014':'P'+best}</span></div><div class="stat"><span class="sl">Rounds</span><span class="sv num">${ROUNDS.length}</span></div></div>${h2hHtml}<div class="traj" id="trajBox">${buildTrajectory(id,'position')}</div><div><span class="section-h">Round by round</span>${summary}<div class="season-list">${colhead}${rows}</div></div></div>`;
+  return `<div class="panel-head" style="--team:${teamColor(d.team)}"><div><div class="panel-ey">Season \u00B7 Championship P${d.champRank}</div><div class="panel-drv">${d.name}</div>${teamChip(d.team)}</div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body"><div class="stat-grid"><div class="stat"><span class="sl">Total</span><span class="sv num" style="color:${d.champRank===1?'var(--gold)':'var(--txt)'}">${d.total}</span></div><div class="stat"><span class="sl">Pos</span><span class="sv num">P${d.champRank}</span></div><div class="stat"><span class="sl">Race / Spr</span><span class="sv num">${d.race}<small> / ${d.sprint}</small></span></div><div class="stat"><span class="sl">Wins</span><span class="sv num">${w}</span></div><div class="stat"><span class="sl">Best</span><span class="sv num">${best===99?'\u2014':'P'+best}</span></div><div class="stat"><span class="sl">Rounds</span><span class="sv num">${ROUNDS.length}</span></div></div>${h2hHtml}<div class="traj" id="trajBox">${buildTrajectory(id,'position')}</div><div><span class="section-h">Round by round</span>${summary}<div class="season-list">${colhead}${rows}</div></div></div></div>`;
 }
 
 /* constructorTable — WCC standings, mirrors matrix.js (sum of both drivers' race+sprint;
@@ -105,7 +122,7 @@ function constructorSeason(team){
     return `<div class="season-row crow"><span class="sr-rn num">R${rd.round}</span><div class="cr-ev"><span class="cr-nm">${codeOf(rd)} \u00B7 ${rd.name.replace(' Grand Prix','')}</span><div class="cr-chips">${chips}</div></div><span class="cr-pts num">${rpts||''}</span></div>`;
   }).join('');
   const lineup=drivers.map(d=>LAST(d.id)).join(' \u00B7 ');
-  return `<div class="panel-head" style="--team:${lead}"><div><div class="panel-ey">Constructors \u00B7 Championship P${rank}</div><div class="panel-drv">${team}</div><span class="panel-team"><span class="team-bar" style="--team:${lead}"></span>${lineup}</span></div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body"><div class="stat-grid"><div class="stat"><span class="sl">Total</span><span class="sv num" style="color:${rank===1?'var(--gold)':'var(--txt)'}">${T.total}</span></div><div class="stat"><span class="sl">Pos</span><span class="sv num">P${rank}</span></div><div class="stat"><span class="sl">Wins</span><span class="sv num">${T.wins}</span></div><div class="stat"><span class="sl">Podiums</span><span class="sv num" style="color:${podiums?'var(--gold)':'var(--txt)'}">${podiums}</span></div><div class="stat"><span class="sl">Poles</span><span class="sv num">${poles}</span></div><div class="stat"><span class="sl">Fastest Laps</span><span class="sv num">${fls}</span></div></div><div><span class="section-h">Points contribution</span>${split}</div><div><span class="section-h">Round by round</span><div class="season-list">${colhead}${rbr}</div></div></div>`;
+  return `<div class="panel-head" style="--team:${lead}"><div><div class="panel-ey">Constructors \u00B7 Championship P${rank}</div><div class="panel-drv">${team}</div><span class="panel-team"><span class="team-bar" style="--team:${lead}"></span>${lineup}</span></div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body"><div class="stat-grid"><div class="stat"><span class="sl">Total</span><span class="sv num" style="color:${rank===1?'var(--gold)':'var(--txt)'}">${T.total}</span></div><div class="stat"><span class="sl">Pos</span><span class="sv num">P${rank}</span></div><div class="stat"><span class="sl">Wins</span><span class="sv num">${T.wins}</span></div><div class="stat"><span class="sl">Podiums</span><span class="sv num" style="color:${podiums?'var(--gold)':'var(--txt)'}">${podiums}</span></div><div class="stat"><span class="sl">Poles</span><span class="sv num">${poles}</span></div><div class="stat"><span class="sl">Fastest Laps</span><span class="sv num">${fls}</span></div></div><div><span class="section-h">Points contribution</span>${split}</div><div><span class="section-h">Round by round</span><div class="season-list">${colhead}${rbr}</div></div></div></div>`;
 }
 
 const scrim=document.getElementById('scrim'),panel=document.getElementById('panel');
