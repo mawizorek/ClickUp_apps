@@ -32,6 +32,7 @@
     { "id": 28, "cuTaskId": "86aj8z5cf", "round": "QF", "day": "2026-07-11", "dayLabel": "Sat Jul 11", "home": "Argentina", "away": "Switzerland", "hs": null, "as": null, "winner": null, "venue": "Kansas City Stadium", "time": "9:00 PM", "feedsTo": 30 },
     { "id": 29, "cuTaskId": "86aj8z5ck", "round": "SF", "day": "2026-07-14", "dayLabel": "Tue Jul 14", "home": null, "away": null, "hs": null, "as": null, "winner": null, "venue": "Dallas Stadium", "feedsTo": 31 },
     { "id": 30, "cuTaskId": "86aj8z5cn", "round": "SF", "day": "2026-07-15", "dayLabel": "Wed Jul 15", "home": null, "away": null, "hs": null, "as": null, "winner": null, "venue": "Atlanta Stadium", "feedsTo": 31 },
+    { "id": 32, "cuTaskId": "86aj8z5cq", "round": "3P", "day": "2026-07-18", "dayLabel": "Sat Jul 18", "home": null, "away": null, "hs": null, "as": null, "winner": null, "venue": "TBD", "feedsTo": null },
     { "id": 31, "cuTaskId": "86aj8z5cr", "round": "Final", "day": "2026-07-19", "dayLabel": "Sun Jul 19", "home": null, "away": null, "hs": null, "as": null, "winner": null, "venue": "New York New Jersey Stadium", "feedsTo": null }
   ]
 }
