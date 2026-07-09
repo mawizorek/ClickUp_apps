@@ -13,7 +13,7 @@ const CODES = {
 export const cc = (n) => CODES[n] || (n ? n.substring(0, 3).toUpperCase() : '\u2014');
 
 export const ROUND_ORDER = ['R32', 'R16', 'QF', 'SF', 'Final'];
-export const ROUND_FULL = { R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarterfinal', SF: 'Semifinal', Final: 'Final' };
+export const ROUND_FULL = { R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarterfinal', SF: 'Semifinal', '3P': '3rd Place', Final: 'Final' };
 
 export const isComplete = (m) => ['ft', 'aet', 'pso'].includes(m.status);
 export const winnerName = (m) => m.winner === 'home' ? m.home : m.winner === 'away' ? m.away : null;
