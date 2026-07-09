@@ -2,7 +2,7 @@
  Loaded first; defines globals used by matrix.js, trajectory.js and panel.js. No data
  duplicated: verified results live in ./f1-results/2026/ (nested under the app).
  Index file: index_rounds.json (renamed from index.json 2026-07-09). */
-const APP_VERSION='v5';
+const APP_VERSION='v5.1';
 const DATA_BASE='f1-results/2026/';
 const DATA_INDEX='index_rounds.json';
 const TEAM_VAR={"Mercedes":"--t-mercedes","Ferrari":"--t-ferrari","McLaren":"--t-mclaren","Red Bull":"--t-redbull","Racing Bulls":"--t-racingbulls","Alpine":"--t-alpine","Aston Martin":"--t-astonmartin","Williams":"--t-williams","Haas":"--t-haas","Audi":"--t-audi","Cadillac":"--t-cadillac"};
