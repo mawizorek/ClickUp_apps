@@ -1,7 +1,7 @@
 {
- "season": 2026, "round": 1, "slug": "albert-park", "name": "Australian Grand Prix", "date": "2026-03-08", "cuTaskId": "86ae52ghx", "version": "2026-07-07",
+ "season": 2026, "round": 1, "slug": "albert-park", "name": "Australian Grand Prix", "date": "2026-03-08", "cuTaskId": "86ae52ghx", "version": "2026-07-09",
  "pole": { "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "time": "1:19.507" },
- "fastestLap": { "driverId": "86ae52rym", "driver": "Max Verstappen", "team": "Red Bull", "time": "1:22.091", "lap": 43 },
+ "fastestLap": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:22.417", "lap": 57 },
  "summary": "Russell won the season opener from pole, leading an emotional Mercedes 1-2 over Antonelli. Attrition-heavy race.",
  "classification": [
  { "pos": 1, "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "status": "FIN", "points": 25 },

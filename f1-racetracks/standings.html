@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- INFRASTRUCTURE: slim loader shell. SEGMENTED app: styling in source/standings/*.css, logic in source/standings/*.js. Every file under the 12KB soft cap. Never inline this back into one file. -->
-<!-- DATA: modules fetch the canonical per-round store at ../f1-results/2026/. No data duplicated here. -->
+<!-- DATA: modules fetch the canonical per-round store at ./f1-results/2026/ (index_rounds.json + round files). No data duplicated here. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/standings/base.css">
-<link rel="stylesheet" href="source/standings/panel.css">
+<link rel="stylesheet" href="source/standings/base.css?v=5">
+<link rel="stylesheet" href="source/standings/panel.css?v=5">
 </head>
 <body>
   <header class="mast">
@@ -41,17 +41,17 @@
   </div>
 
   <footer>
-    <span>Championship Matrix <span class="num" id="stamp">v4</span></span>
-    <span>PR #95</span>
+    <span>Championship Matrix <span class="num" id="stamp">v5</span></span>
+    <span>canonical store</span>
   </footer>
 
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
 
-  <script src="source/standings/data.js"></script>
-  <script src="source/standings/matrix.js"></script>
-  <script src="source/standings/trajectory.js"></script>
-  <script src="source/standings/panel.js"></script>
-  <script src="source/standings/nav.js"></script>
+  <script src="source/standings/data.js?v=5"></script>
+  <script src="source/standings/matrix.js?v=5"></script>
+  <script src="source/standings/trajectory.js?v=5"></script>
+  <script src="source/standings/panel.js?v=5"></script>
+  <script src="source/standings/nav.js?v=5"></script>
 </body>
 </html>

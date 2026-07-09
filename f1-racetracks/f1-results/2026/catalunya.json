@@ -1,7 +1,8 @@
 {
- "season": 2026, "round": 7, "slug": "catalunya", "name": "Barcelona-Catalunya Grand Prix", "date": "2026-06-14", "cuTaskId": "86ae52gq5", "version": "2026-07-07",
- "pole": { "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes" },
- "summary": "Hamilton's emotional maiden Ferrari win via a VSC-aided three-stop, ending Mercedes' streak. Championship leader Antonelli retired from P2 with ~4 laps to go (electrical shutdown), ending his five-race winning run.",
+ "season": 2026, "round": 7, "slug": "catalunya", "name": "Barcelona-Catalunya Grand Prix", "date": "2026-06-14", "cuTaskId": "86ae52gq5", "version": "2026-07-09",
+ "pole": { "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "time": "1:14.679" },
+ "fastestLap": { "driverId": "86ae52rxg", "driver": "Lewis Hamilton", "team": "Ferrari" },
+ "summary": "Hamilton's emotional maiden Ferrari win via a VSC-aided three-stop, ending Mercedes' streak. Championship leader Antonelli retired from P2 with ~4 laps to go (electrical shutdown), ending his five-race winning run. (Hamilton set the fastest lap; exact time not recorded.)",
  "classification": [
  { "pos": 1, "driverId": "86ae52rxg", "driver": "Lewis Hamilton", "team": "Ferrari", "status": "FIN", "points": 25 },
  { "pos": 2, "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "status": "FIN", "points": 18 },
@@ -12,14 +13,18 @@
  { "pos": 7, "driverId": "86ae52rq4", "driver": "Pierre Gasly", "team": "Alpine", "status": "FIN", "points": 6 },
  { "pos": 8, "driverId": "86ae52rye", "driver": "Liam Lawson", "team": "Racing Bulls", "status": "FIN", "points": 4 },
  { "pos": 9, "driverId": "86aj1ra31", "driver": "Arvid Lindblad", "team": "Racing Bulls", "status": "FIN", "points": 2 },
- { "pos": 10, "driverId": "86aj1ra0h", "driver": "Franco Colapinto", "team": "Alpine", "status": "FIN", "points": 1 },
- { "pos": 11, "driverId": "86ae52rqp", "driver": "Gabriel Bortoleto", "team": "Audi", "status": "FIN", "points": 0 },
- { "pos": 12, "driverId": "86ae52rqj", "driver": "Carlos Sainz", "team": "Williams", "status": "FIN", "points": 0 },
- { "pos": 13, "driverId": "86ae52rxu", "driver": "Esteban Ocon", "team": "Haas", "status": "FIN", "points": 0 },
- { "pos": 14, "driverId": "86aj1ra1z", "driver": "Sergio Perez", "team": "Cadillac", "status": "FIN", "points": 0 },
- { "pos": 15, "driverId": "86ae52rxd", "driver": "Charles Leclerc", "team": "Ferrari", "status": "FIN", "points": 0 },
- { "pos": 16, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "DNF", "points": 0, "stewardNote": "Retired from P2 with ~4 laps to go (electrical shutdown), classified 16th." },
- { "pos": 17, "driverId": "86ae52rxv", "driver": "Oliver Bearman", "team": "Haas", "status": "FIN", "points": 0 },
- { "pos": 18, "driverId": "86ae52rqc", "driver": "Alexander Albon", "team": "Williams", "status": "FIN", "points": 0 }
+ { "pos": 10, "driverId": "86aj1ra0h", "driver": "Franco Colapinto", "team": "Alpine", "status": "FIN", "points": 1, "stewardNote": "10-second post-race penalty for a yellow-flag infringement dropped him from P8 to P10." },
+ { "pos": 11, "driverId": "86ae52rxd", "driver": "Charles Leclerc", "team": "Ferrari", "status": "FIN", "points": 0 },
+ { "pos": 12, "driverId": "86ae52rqw", "driver": "Nico Hulkenberg", "team": "Audi", "status": "FIN", "points": 0 },
+ { "pos": 13, "driverId": "86ae52rqj", "driver": "Carlos Sainz", "team": "Williams", "status": "FIN", "points": 0 },
+ { "pos": 14, "driverId": "86ae52rqc", "driver": "Alexander Albon", "team": "Williams", "status": "FIN", "points": 0 },
+ { "pos": 15, "driverId": "86ae52rxv", "driver": "Oliver Bearman", "team": "Haas", "status": "FIN", "points": 0 },
+ { "pos": 16, "driverId": "86ae52rqp", "driver": "Gabriel Bortoleto", "team": "Audi", "status": "FIN", "points": 0 },
+ { "pos": 17, "driverId": "86ae52rxu", "driver": "Esteban Ocon", "team": "Haas", "status": "FIN", "points": 0 },
+ { "pos": 18, "driverId": "86aj1ra1z", "driver": "Sergio Perez", "team": "Cadillac", "status": "FIN", "points": 0 },
+ { "pos": 19, "driverId": "86aj1ra1g", "driver": "Valtteri Bottas", "team": "Cadillac", "status": "FIN", "points": 0 },
+ { "pos": 20, "driverId": "86ae52rqa", "driver": "Lance Stroll", "team": "Aston Martin", "status": "FIN", "points": 0 },
+ { "pos": null, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "DNF", "points": 0, "stewardNote": "Retired from P2 with ~3 laps to go (electrical failure), ending his five-race winning run." },
+ { "pos": null, "driverId": "86ae52rq8", "driver": "Fernando Alonso", "team": "Aston Martin", "status": "DNF", "points": 0, "stewardNote": "Mechanical failure triggered the VSC that aided Hamilton's strategy." }
  ]
 }
