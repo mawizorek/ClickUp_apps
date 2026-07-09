@@ -20,6 +20,59 @@ export const winnerName = (m) => m.winner === 'home' ? m.home : m.winner === 'aw
 export const rankOf = (name) => (name && S.rankings[name]) ? S.rankings[name] : null;
 export const byId = (id) => S.allMatches.find(x => x.id === id);
 
+// ---- status derivation (THE APP OWNS STATUS; data carries only facts) ----
+// The refresh job (Routine Ricky) writes FACTS only: teams, scores (hs/as, null until
+// played), psoNote (shootouts), aet:true (extra time), day + time (ET), venue, feedsTo.
+// It NEVER writes a status string. The app derives upcoming/live/done here so the
+// schedule stays real-time and off-contract values (e.g. "scheduled") can't reach render.
+// LIVE_WINDOW_MS = how long after kickoff a match reads as live before it needs a score.
+const LIVE_WINDOW_MS = 2.5 * 3600000;
+
+export function scoresIn(m) {
+  return m.hs !== null && m.hs !== undefined && m.as !== null && m.as !== undefined;
+}
+
+export function deriveStatus(m) {
+  if (scoresIn(m)) {
+    if (m.psoNote) return 'pso';   // decided on penalties
+    if (m.aet) return 'aet';       // decided in extra time
+    return 'ft';                   // regulation full-time
+  }
+  const ko = kickoffDate(m);
+  if (ko) {
+    const elapsed = Date.now() - ko.getTime();
+    if (elapsed >= 0 && elapsed < LIVE_WINDOW_MS) return 'live';
+  }
+  return 'upcoming';
+}
+
+// Winner is a RESULT fact Ricky writes; this only backfills it when scores are decisive
+// and winner was omitted, so a draw-then-pens (winner explicit) is never clobbered.
+export function deriveWinner(m) {
+  if (m.winner === 'home' || m.winner === 'away') return m.winner;
+  if (!scoresIn(m)) return null;
+  if (m.hs > m.as) return 'home';
+  if (m.as > m.hs) return 'away';
+  return null; // level score with no explicit winner => undecided (pens not yet recorded)
+}
+
+// Normalize raw data to the canonical runtime shape ONCE at load. Single boundary that
+// absorbs refresh-side drift (missing/undefined scores, absent tbd/winner, any stray
+// status) so every downstream module sees only the canonical shape.
+export function normalizeMatches(matches) {
+  return (matches || []).map(m => {
+    const norm = Object.assign({}, m);
+    norm.hs = (m.hs === undefined) ? null : m.hs;
+    norm.as = (m.as === undefined) ? null : m.as;
+    norm.winner = deriveWinner(norm);
+    norm.status = deriveStatus(norm);
+    const homeUnknown = !norm.home || norm.home === 'TBD';
+    const awayUnknown = !norm.away || norm.away === 'TBD';
+    norm.tbd = homeUnknown && awayUnknown;
+    return norm;
+  });
+}
+
 export function buildFedBy() {
   const f = S.fedBy;
   Object.keys(f).forEach(k => delete f[k]);
