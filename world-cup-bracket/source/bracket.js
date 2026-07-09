@@ -9,6 +9,16 @@ import { togglePick, removePick, clearPicks, applyPaths } from './paths.js';
 const ROUND_LABELS = { R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarters', SF: 'Semis', Final: 'Final' };
 let resetBound = false;
 
+// 3rd-place match(es) render as a small standalone node under the Final, NOT wired
+// into the championship tree (its teams are the SF LOSERS, so it isn't part of the
+// feedsTo path). Reuses the round-label styling so no CSS change is needed.
+function thirdPlaceBlock() {
+  const tp = S.allMatches.filter(m => m.round === '3P');
+  if (!tp.length) return '';
+  return `<div class="bracket-round-label" style="margin-top:14px">3rd Place</div>`
+    + tp.map(renderBracketMatch).join('');
+}
+
 export function renderBracket() {
   const container = document.getElementById('bracketContent');
   let html = '';
@@ -16,7 +26,7 @@ export function renderBracket() {
     const matches = S.allMatches.filter(m => m.round === round);
     html += `<div class="bracket-round"><div class="bracket-round-label">${ROUND_LABELS[round]}</div>`
       + matches.map(renderBracketMatch).join('')
-      + `${round === 'Final' ? '<div class="trophy">\uD83C\uDFC6</div>' : ''}</div>`;
+      + `${round === 'Final' ? '<div class="trophy">\uD83C\uDFC6</div>' + thirdPlaceBlock() : ''}</div>`;
     if (rIdx < ROUND_ORDER.length - 1) {
       const nextMatches = S.allMatches.filter(m => m.round === ROUND_ORDER[rIdx + 1]);
       html += `<div class="bracket-connectors">${nextMatches.map(() => '<div class="connector-pair"></div>').join('')}</div>`;
