@@ -3,7 +3,7 @@
 // a SWAPPING filter (one active at a time, each renders a different card set) --
 // not additive. Agenda is the home/reset the others bootstrap back to.
 import { S, POTENTIAL_PREFIX, today } from './store.js';
-import { cc, isComplete, winnerName, rankOf, slotLabel, kickoffDate, fmtCountdown, ROUND_FULL } from './util.js';
+import { cc, isComplete, winnerName, rankOf, slotLabel, kickoffDate, localKickoff, fmtCountdown, ROUND_FULL } from './util.js';
 import { openSheet } from './sheet.js';
 
 // Soonest day (>= today, ET) with an unplayed match -- the "next running game".
@@ -126,7 +126,8 @@ function summaryLine(m) {
 function renderMatchCard(m) {
   const done = isComplete(m);
   const classes = ['match', done ? 'completed' : '', m.status === 'live' ? 'is-live' : '', m.tbd ? 'tbd' : ''].filter(Boolean).join(' ');
-  const statusText = m.status === 'ft' ? 'FT' : m.status === 'aet' ? 'AET' : m.status === 'pso' ? 'PEN' : m.status === 'live' ? 'LIVE' : (m.time || 'TBD');
+  // Upcoming shows kickoff in the VIEWER'S local zone (e.g. "4:00 PM CDT"); done/live use their badge.
+  const statusText = m.status === 'ft' ? 'FT' : m.status === 'aet' ? 'AET' : m.status === 'pso' ? 'PEN' : m.status === 'live' ? 'LIVE' : (localKickoff(m) || 'TBD');
   const statusClass = m.status === 'upcoming' ? 'upcoming' : m.status;
 
   const ko = (!done && m.day === today) ? kickoffDate(m) : null;

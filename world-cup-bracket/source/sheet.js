@@ -5,7 +5,7 @@
 import {
   cc, isComplete, winnerName, rankOf, ROUND_FULL,
   slotLabel, sideTeams, advancesToFace, routeHistory,
-  kickoffDate, fmtCountdown, oddsEstimate
+  kickoffDate, localKickoff, fmtCountdown, oddsEstimate
 } from './util.js';
 
 function chip(team) {
@@ -16,7 +16,9 @@ function chip(team) {
 
 function whenLine(m) {
   const ko = kickoffDate(m);
-  const timePart = (m.time && m.time !== 'TBD') ? m.time : (ko ? '' : 'Time TBD');
+  // Show kickoff in the viewer's local zone with a zone label (e.g. "4:00 PM CDT").
+  const local = localKickoff(m);
+  const timePart = local ? local : (ko ? '' : 'Time TBD');
   const cd = ko ? ` <span class="cd" data-countdown="${ko.getTime()}">${fmtCountdown(ko)}</span>` : '';
   return `${m.dayLabel}${timePart ? ', ' + timePart : ''}${cd}`;
 }
