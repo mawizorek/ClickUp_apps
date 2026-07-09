@@ -1,7 +1,7 @@
 {
  "season": 2026,
- "version": "2026-07-09b",
- "last_updated": "2026-07-09T11:10:00-04:00",
+ "version": "2026-07-09c",
+ "last_updated": "2026-07-09T12:02:00-04:00",
  "renamed_from": "index.json (2026-07-09): self-describing name. There is exactly one bare index.* in the repo (the root dashboard); every other index carries a suffix saying what it indexes.",
  "scope_note": "Indexes 2026 rounds ONLY. The year lives in the path (f1-results/2026/), so this file never goes cumulative. A future cross-season pointer would be a separate f1-results/index_seasons.json at the store root, added only when a second season exists.",
  "current_round_slug": "spa",
@@ -12,8 +12,8 @@
  "sprint_points_scale": [8, 7, 6, 5, 4, 3, 2, 1],
  "race_points_scale": [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
  "fastest_lap_note": "Round-level fastestLap backfilled/corrected from the ClickUp race tasks on 2026-07-09; the retired data.json had a wrong Albert Park FL. Suzuka round-level FL is null (task records it as not confirmed); Silverstone absent pending the race task update. Per-driver row `fastLap` is NOT in the CU tasks (they only record the one official FL); it backfills empty and is Ricky's going-forward dig from a lap-time source.",
- "backfill_status": "Enriched per-driver schema (qualifying + grid) reference-implemented on Albert Park (r1), migrated from its CU race task. Rounds 2-7 have full quali tables in their CU tasks and are queued for the same backfill (Ricky's data dig). Austria (r8) + Silverstone (r9) have NO quali table in CU and need a genuine source dig. This was the LAST migration of timing out of ClickUp; from here CU holds narrative/one-liners only and Ricky digs raw timing straight into these round files.",
- "provenance_verified": "Finishing positions + points re-verified vs the ClickUp race tasks (2026-07-09). Store is canonical for RESULTS; the ClickUp task is canonical for NARRATIVE. Corrections the store carries that CU may still lag: Austria (Russell won, not Antonelli), Spain/Catalunya (Hamilton maiden Ferrari win; Antonelli DNF from P2), Monaco (P3 Gasly, penalties overturned on appeal).",
+ "backfill_status": "Enriched per-driver schema (qualifying + grid) reference-implemented on Albert Park (r1). Rounds 2-7 quali + grid backfilled from their CU race tasks on 2026-07-09 (matched by driverId, never by name; Q1/Q2/Q3 times present only where the task tabulated them, else null; grid penalties + pit-lane starts captured, e.g. Miami Hadjar PU penalty grid=22 with quali.pos null, Barcelona Alonso grid='PL'). Austria (r8) + Silverstone (r9) have NO quali table in CU and are LEFT ABSENT on purpose (fields degrade gracefully) pending a genuine matching source; they were NOT filled from real-world 2026 data, which does not match this season's canon. Per-driver row fastLap remains null pending a lap-time source. From here CU holds narrative/one-liners only.",
+ "provenance_verified": "Finishing positions + points re-verified vs the ClickUp race tasks (2026-07-09). Store is canonical for RESULTS; the ClickUp task is canonical for NARRATIVE. Corrections the store carries that CU may still lag: Austria (Russell won, not Antonelli), Spain/Catalunya (Hamilton maiden Ferrari win; Antonelli DNF from P2), Monaco (P3 Gasly, penalties overturned on appeal). NOTE (2026-07-09, quali pass): the store's classification for Suzuka (20 rows; Bearman + Stroll absent) and Miami (21 rows; Gasly absent) is short of the 22-car grid, and several rounds' store finishing order diverges from the CU narrative. Store is results-canon so this pass left results untouched and only added quali by driverId; the missing-car gaps are flagged for a separate results reconciliation, NOT this quali pass.",
  "rounds": [
  { "round": 1, "slug": "albert-park", "name": "Australian Grand Prix", "date": "2026-03-08", "cuTaskId": "86ae52ghx", "sprint": false, "file": "./albert-park.json" },
  { "round": 2, "slug": "shanghai", "name": "Chinese Grand Prix", "date": "2026-03-15", "cuTaskId": "86ae52gpp", "sprint": true, "file": "./shanghai.json" },
