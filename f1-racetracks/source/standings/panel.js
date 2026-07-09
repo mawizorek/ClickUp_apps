@@ -7,10 +7,11 @@ function tyreChips(arr){return arr?`<div class="tyres">`+arr.map((c,i)=>`${i>0?'
    (qualifying{pos,q1,q2,q3}, grid, onRoadPos). Guarded: renders only when the
    round carries qualifying data, degrades to nothing otherwise.
    v5.3 layout: the Qualified → Started → Finished journey stays ONE unbroken
-   visual line (the position story). Beneath it, a two-column detail hangs the
+   visual line (the position story). Beneath it a two-column detail hangs the
    qualifying lap times under the qualifying side and this driver's fastest lap
    + tyre strategy under the race side, so each fact sits with its position
-   without chopping the journey into separate portals. */
+   without chopping the journey into separate portals. Detail block is styled
+   inline (reuses CSS vars) so panel.css stays untouched. */
 function qualiBlock(rd,id,m,det,isFL,il){
   const row=(typeof raceRow==='function')?raceRow(rd,id):null;
   const q=row&&row.qualifying;
@@ -22,16 +23,23 @@ function qualiBlock(rd,id,m,det,isFL,il){
   const jFin=m.status==='DNF'?'DNF':(m.pos!=null?'P'+m.pos:'\u2014');
   const finCls=m.status==='DNF'?' dnf':(m.pos===1?' win':'');
   const startCls=started==='PL'?' pl':'';
+  const capS='font-size:0.52rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);font-weight:600';
+  const colS='background:var(--s1);padding:9px 11px;display:flex;flex-direction:column;gap:6px';
+  const lineS='display:flex;justify-content:space-between;align-items:center;gap:8px';
+  const kS='font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--txt-dim);font-weight:600';
+  const vS='font-weight:700;font-size:0.82rem';
+  const line=(k,v,dim)=>`<div style="${lineS}"><span style="${kS}${dim?';color:var(--txt-dim)':''}">${k}</span>${v?`<span class="num" style="${vS}">${v}</span>`:''}</div>`;
   // qualifying-side detail: the Q1/Q2/Q3 lap times
-  const qLines=['q1','q2','q3'].map(k=>`<div class="qd-line"><span class="k">${k.toUpperCase()}</span><span class="v">${q[k]||'\u2014'}</span></div>`).join('');
+  const qLines=['q1','q2','q3'].map(k=>line(k.toUpperCase(),q[k]||'\u2014')).join('');
   // race-side detail: this driver's fastest lap + tyre strategy (real FL when this
   // driver holds the round FL, else illustrative det.best; pits/tyres illustrative)
   const flTime=(isFL&&rd.fastestLap&&rd.fastestLap.time)?rd.fastestLap.time:(det.best||null);
   let rLines='';
-  if(flTime)rLines+=`<div class="qd-line"><span class="k">Fastest Lap</span><span class="v">${flTime}</span></div>`;
-  if(det.pits!=null)rLines+=`<div class="qd-line"><span class="k">Pit Stops</span><span class="v">${det.pits}</span></div>`;
-  if(det.tyres)rLines+=`<div class="qd-line"><span class="k">Tyres</span>${tyreChips(det.tyres)}</div>`;
-  if(!rLines)rLines=`<div class="qd-line"><span class="k" style="color:var(--txt-dim)">Race pace TBC</span></div>`;
+  if(flTime)rLines+=line('Fastest Lap',flTime);
+  if(det.pits!=null)rLines+=line('Pit Stops',det.pits);
+  if(det.tyres)rLines+=`<div style="${lineS}"><span style="${kS}">Tyres</span>${tyreChips(det.tyres)}</div>`;
+  if(!rLines)rLines=line('Race pace TBC','',true);
+  const detailS='display:grid;grid-template-columns:1fr 1.4fr;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);margin-top:2px';
   const onRoad=(row.onRoadPos!=null&&row.onRoadPos!==m.pos)?`<div class="qj-note">Crossed the line P${row.onRoadPos}; classified ${jFin} after a penalty.</div>`:'';
   return `<div class="qual"><span class="section-h">Qualifying \u2192 Race</span>`+
     `<div class="qj">`+
@@ -41,9 +49,9 @@ function qualiBlock(rd,id,m,det,isFL,il){
       `<span class="qj-arrow">\u203A</span>`+
       `<div class="qj-node"><span class="qj-l">Finished</span><span class="qj-v num${finCls}">${jFin}</span></div>`+
     `</div>`+
-    `<div class="qual-detail">`+
-      `<div class="qd-col"><span class="qd-cap">Qualifying</span>${qLines}</div>`+
-      `<div class="qd-col"><span class="qd-cap">Race</span>${rLines}</div>`+
+    `<div style="${detailS}">`+
+      `<div style="${colS}"><span style="${capS}">Qualifying</span>${qLines}</div>`+
+      `<div style="${colS}"><span style="${capS}">Race</span>${rLines}</div>`+
     `</div>`+
     onRoad+
   `</div>`;
