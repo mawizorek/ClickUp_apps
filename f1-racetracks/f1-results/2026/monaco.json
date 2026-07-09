@@ -1,7 +1,7 @@
 {
- "season": 2026, "round": 6, "slug": "monaco", "name": "Monaco Grand Prix", "date": "2026-06-07", "cuTaskId": "86ae52gq4", "version": "2026-07-07",
+ "season": 2026, "round": 6, "slug": "monaco", "name": "Monaco Grand Prix", "date": "2026-06-07", "cuTaskId": "86ae52gq4", "version": "2026-07-09",
  "pole": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:12.051" },
- "fastestLap": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:13.481" },
+ "fastestLap": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:13.481", "lap": 76 },
  "summary": "Antonelli's fifth straight win in a chaotic, red-flagged race with seven retirements. Hamilton P2. P3 is Gasly, whose two penalties were overturned on appeal (final classification); the earlier provisional result had him P7.",
  "classification": [
  { "pos": 1, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "FIN", "points": 25 },

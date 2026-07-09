@@ -1,8 +1,8 @@
 {
- "season": 2026, "round": 3, "slug": "suzuka", "name": "Japanese Grand Prix", "date": "2026-03-29", "cuTaskId": "86ae52gpr", "version": "2026-07-07",
+ "season": 2026, "round": 3, "slug": "suzuka", "name": "Japanese Grand Prix", "date": "2026-03-29", "cuTaskId": "86ae52gpr", "version": "2026-07-09",
  "pole": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:28.778" },
- "fastestLap": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:32.432", "lap": 49 },
- "summary": "Antonelli's second straight win from pole; became the youngest-ever championship leader. Piastri P2, Leclerc P3.",
+ "fastestLap": null,
+ "summary": "Antonelli's second straight win from pole; became the youngest-ever championship leader. Piastri P2, Leclerc P3. (Fastest lap not recorded for this round.)",
  "classification": [
  { "pos": 1, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "FIN", "points": 25 },
  { "pos": 2, "driverId": "86ae52q7p", "driver": "Oscar Piastri", "team": "McLaren", "status": "FIN", "points": 18 },

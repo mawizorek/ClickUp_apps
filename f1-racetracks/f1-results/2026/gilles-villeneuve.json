@@ -1,6 +1,7 @@
 {
- "season": 2026, "round": 5, "slug": "gilles-villeneuve", "name": "Canadian Grand Prix", "date": "2026-05-24", "cuTaskId": "86ae52gq3", "version": "2026-07-07",
+ "season": 2026, "round": 5, "slug": "gilles-villeneuve", "name": "Canadian Grand Prix", "date": "2026-05-24", "cuTaskId": "86ae52gq3", "version": "2026-07-09",
  "pole": { "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "time": "1:12.578" },
+ "fastestLap": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:14.210", "lap": 68 },
  "summary": "Antonelli's fourth win in a row after leader Russell retired from the lead battle with a power-unit issue on lap 30. First driver to win his first four F1 races in succession.",
  "sprint": {
  "classification": [

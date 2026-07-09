@@ -1,6 +1,7 @@
 {
- "season": 2026, "round": 4, "slug": "miami", "name": "Miami Grand Prix", "date": "2026-05-03", "cuTaskId": "86ae52gq2", "version": "2026-07-07",
+ "season": 2026, "round": 4, "slug": "miami", "name": "Miami Grand Prix", "date": "2026-05-03", "cuTaskId": "86ae52gq2", "version": "2026-07-09",
  "pole": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:27.798" },
+ "fastestLap": { "driverId": "86ae52q76", "driver": "Lando Norris", "team": "McLaren", "time": "1:31.869", "lap": 35 },
  "summary": "Antonelli's third win from three poles, beating Norris and Piastri; first driver to convert his first three poles into wins.",
  "sprint": {
  "classification": [
