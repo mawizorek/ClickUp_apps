@@ -3,12 +3,14 @@
 function teamChip(t){return `<span class="panel-team"><span class="team-bar" style="--team:${teamColor(t)}"></span>${t}</span>`;}
 function tyreChips(arr){return arr?`<div class="tyres">`+arr.map((c,i)=>`${i>0?'<span class="tyre-arrow">\u203A</span>':''}<span class="tyre ${c}">${c}</span>`).join('')+`</div>`:'';}
 
-/* Qualifying + race block, sourced from the enriched round row
+/* Qualifying + position-journey block, sourced from the enriched round row
    (qualifying{pos,q1,q2,q3}, grid, onRoadPos). Guarded: renders only when the
    round carries qualifying data, degrades to nothing otherwise.
-   v5.2 layout: the qualifying lap times (Q1/Q2/Q3) sit under the QUALIFYING
-   position only; the race start/finish positions carry the fastest-lap +
-   tyre-strategy detail (real when sourced, illustrative det.* meanwhile). */
+   v5.3 layout: the Qualified → Started → Finished journey stays ONE unbroken
+   visual line (the position story). Beneath it, a two-column detail hangs the
+   qualifying lap times under the qualifying side and this driver's fastest lap
+   + tyre strategy under the race side, so each fact sits with its position
+   without chopping the journey into separate portals. */
 function qualiBlock(rd,id,m,det,isFL,il){
   const row=(typeof raceRow==='function')?raceRow(rd,id):null;
   const q=row&&row.qualifying;
@@ -20,30 +22,30 @@ function qualiBlock(rd,id,m,det,isFL,il){
   const jFin=m.status==='DNF'?'DNF':(m.pos!=null?'P'+m.pos:'\u2014');
   const finCls=m.status==='DNF'?' dnf':(m.pos===1?' win':'');
   const startCls=started==='PL'?' pl':'';
-  const times=['q1','q2','q3'].map(function(k){return `<div class="qt"><span class="qt-l">${k.toUpperCase()}</span><span class="qt-v num">${q[k]||'\u2014'}</span></div>`;}).join('');
-  const onRoad=(row.onRoadPos!=null&&row.onRoadPos!==m.pos)?`<div class="qj-note">Crossed the line P${row.onRoadPos}; classified ${jFin} after a penalty.</div>`:'';
-  // race detail: this driver's fastest lap + tyre strategy under the race positions.
-  // fastest lap is real when this driver holds the round FL, else the illustrative det.best.
+  // qualifying-side detail: the Q1/Q2/Q3 lap times
+  const qLines=['q1','q2','q3'].map(k=>`<div class="qd-line"><span class="k">${k.toUpperCase()}</span><span class="v">${q[k]||'\u2014'}</span></div>`).join('');
+  // race-side detail: this driver's fastest lap + tyre strategy (real FL when this
+  // driver holds the round FL, else illustrative det.best; pits/tyres illustrative)
   const flTime=(isFL&&rd.fastestLap&&rd.fastestLap.time)?rd.fastestLap.time:(det.best||null);
-  let rdStats='';
-  if(flTime)rdStats+=`<div class="stat ${isFL?'':il}"><span class="sl">Fastest Lap</span><span class="sv num">${flTime}</span></div>`;
-  if(det.pits!=null)rdStats+=`<div class="stat ${il}"><span class="sl">Pit Stops</span><span class="sv num">${det.pits}</span></div>`;
-  if(det.tyres)rdStats+=`<div class="stat ${il}"><span class="sl">Tyre Strategy</span>${tyreChips(det.tyres)}</div>`;
-  const raceDetail=rdStats?`<div class="stat-grid">${rdStats}</div>`:'';
-  return `<div class="qual">`+
-    `<div class="qual-seg"><span class="section-h">Qualifying</span>`+
+  let rLines='';
+  if(flTime)rLines+=`<div class="qd-line"><span class="k">Fastest Lap</span><span class="v">${flTime}</span></div>`;
+  if(det.pits!=null)rLines+=`<div class="qd-line"><span class="k">Pit Stops</span><span class="v">${det.pits}</span></div>`;
+  if(det.tyres)rLines+=`<div class="qd-line"><span class="k">Tyres</span>${tyreChips(det.tyres)}</div>`;
+  if(!rLines)rLines=`<div class="qd-line"><span class="k" style="color:var(--txt-dim)">Race pace TBC</span></div>`;
+  const onRoad=(row.onRoadPos!=null&&row.onRoadPos!==m.pos)?`<div class="qj-note">Crossed the line P${row.onRoadPos}; classified ${jFin} after a penalty.</div>`:'';
+  return `<div class="qual"><span class="section-h">Qualifying \u2192 Race</span>`+
+    `<div class="qj">`+
       `<div class="qj-node"><span class="qj-l">Qualified</span><span class="qj-v num">${jQual}</span></div>`+
-      `<div class="qt-row">${times}</div>`+
+      `<span class="qj-arrow">\u203A</span>`+
+      `<div class="qj-node"><span class="qj-l">Started</span><span class="qj-v num${startCls}">${jStart}</span></div>`+
+      `<span class="qj-arrow">\u203A</span>`+
+      `<div class="qj-node"><span class="qj-l">Finished</span><span class="qj-v num${finCls}">${jFin}</span></div>`+
     `</div>`+
-    `<div class="qual-seg"><span class="section-h">Race</span>`+
-      `<div class="qj">`+
-        `<div class="qj-node"><span class="qj-l">Started</span><span class="qj-v num${startCls}">${jStart}</span></div>`+
-        `<span class="qj-arrow">\u203A</span>`+
-        `<div class="qj-node"><span class="qj-l">Finished</span><span class="qj-v num${finCls}">${jFin}</span></div>`+
-      `</div>`+
-      onRoad+
-      raceDetail+
+    `<div class="qual-detail">`+
+      `<div class="qd-col"><span class="qd-cap">Qualifying</span>${qLines}</div>`+
+      `<div class="qd-col"><span class="qd-cap">Race</span>${rLines}</div>`+
     `</div>`+
+    onRoad+
   `</div>`;
 }
 
