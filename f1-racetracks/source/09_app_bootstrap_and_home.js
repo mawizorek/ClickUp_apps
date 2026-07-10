@@ -1,8 +1,11 @@
 /* Runtime boot + home surface for the circuit guide.
-   v5.1: data.json is RETIRED. Track data is assembled from the inline
+   v5.2: data.json is RETIRED. Track data is assembled from the inline
    TRACK_DATA_ROUNDS_* globals defined by modules 05-08 (loaded before this),
    and completed-race results come from the canonical store via module 12
    (12_results_store.js), which populates window.raceResults and calls router().
+   Home surface pins two quick-access cards (current round + latest result)
+   above the full circuit grid, driven by the store's current_round_slug /
+   last_completed_round_slug (window.appDataMeta), with a status-derived fallback.
    Source assembly order:
      ...TRACK_DATA_ROUNDS_01_03,
      ...TRACK_DATA_ROUNDS_06_09,
@@ -10,7 +13,7 @@
      ...TRACK_DATA_ROUNDS_14_24
  */
 
-const APP_VERSION = "v5.1";
+const APP_VERSION = "v5.2";
 const APP_DATE = "2026-07-10";
 const SEASON = "2026";
 
@@ -114,6 +117,61 @@ function router() {
 
 window.addEventListener("hashchange", router);
 
+/* Resolve which round is "current" (next/active) and which is the most recent
+   completed. Prefer the canonical store meta (window.appDataMeta, filled by
+   module 12); fall back to the inline track statuses so the cards still show
+   even before the store lands or if the meta slugs go missing. */
+function pickCurrentSlug() {
+ const meta = appDataMeta || {};
+ if (meta.current_round_slug && bySlug[meta.current_round_slug]) return meta.current_round_slug;
+ const active = TRACKS.find(t => t.status === "active");
+ if (active) return active.slug;
+ // else the first not-yet-done round
+ const upcoming = TRACKS.find(t => t.status === "pending");
+ return upcoming ? upcoming.slug : null;
+}
+function pickLatestSlug() {
+ const meta = appDataMeta || {};
+ if (meta.last_completed_round_slug && bySlug[meta.last_completed_round_slug]) return meta.last_completed_round_slug;
+ const done = TRACKS.filter(t => t.status === "done");
+ return done.length ? done[done.length - 1].slug : null;
+}
+
+function quickCard(slug, kind) {
+ const t = bySlug[slug];
+ if (!t) return "";
+ const isCurrent = kind === "current";
+ const label = isCurrent ? "Current Round" : "Latest Result";
+ const accent = isCurrent ? "var(--active)" : "var(--done)";
+ const res = (window.raceResults || {})[slug];
+ let detail;
+ if (!isCurrent && res && res.winner) {
+ detail = `<div class="qa-detail"><span class="qa-k">Winner</span><span class="qa-v">${esc(lastName(res.winner))}</span><span class="qa-t">${esc(res.team || "")}</span></div>`;
+ } else if (isCurrent) {
+ detail = `<div class="qa-detail"><span class="qa-k">Race weekend</span><span class="qa-v">${esc(t.date)} ${SEASON}</span></div>`;
+ } else {
+ detail = `<div class="qa-detail"><span class="qa-k">Raced</span><span class="qa-v">${esc(t.date)} ${SEASON}</span></div>`;
+ }
+ return `<button class="qa-card" style="--accent:${accent}" onclick="location.hash='#/${t.slug}'">
+ <span class="qa-stripe"></span>
+ <div class="qa-top"><span class="qa-eyebrow">${label}</span><span class="qa-rn">R${String(t.round).padStart(2, "0")} <span class="qa-flag">${t.flag}</span></span></div>
+ <div class="qa-gp">${esc(t.gp)}</div>
+ <div class="qa-circ">${esc(t.title)}</div>
+ ${detail}
+ <span class="qa-go">${t.report ? "View breakdown" : "Preview"} \u2192</span>
+ </button>`;
+}
+
+function quickAccessMarkup() {
+ const curSlug = pickCurrentSlug();
+ const lastSlug = pickLatestSlug();
+ const cards = [
+ curSlug ? quickCard(curSlug, "current") : "",
+ (lastSlug && lastSlug !== curSlug) ? quickCard(lastSlug, "latest") : ""
+ ].filter(Boolean).join("");
+ return cards ? `<div class="quick-access">${cards}</div>` : "";
+}
+
 function renderHome() {
  app.innerHTML = `
  <div class="view">
@@ -122,6 +180,7 @@ function renderHome() {
  <h1>F1 Racetracks</h1>
  <p class="sub">Every 2026 circuit breakdown in one place \u2014 official map, lap profile, tyre strategy, overtaking notes, live weather, and completed-race panels.</p>
  </div>
+ ${quickAccessMarkup()}
  <div class="legend">
  <span class="lg"><span class="d" style="background:var(--done)"></span>Completed race</span>
  <span class="lg"><span class="d" style="background:var(--active)"></span>Race weekend live</span>
