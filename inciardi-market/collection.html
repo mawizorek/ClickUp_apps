@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Inciardi Collection — Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: oklch(0.16 0.008 70);--surface: oklch(0.205 0.01 70);--raised: oklch(0.245 0.012 70);
+  --line: oklch(0.32 0.012 70);--line-soft: oklch(0.28 0.01 70);
+  --ink: oklch(0.95 0.008 75);--muted: oklch(0.70 0.012 75);--faint: oklch(0.56 0.012 75);
+  --own: oklch(0.70 0.17 38);--own-soft: oklch(0.70 0.17 38 / 0.14);--want: oklch(0.82 0.13 88);
+  --r-mini: oklch(0.74 0.05 70);--r-linocut: oklch(0.70 0.12 300);--r-riso: oklch(0.72 0.11 205);
+  --r-pack: oklch(0.74 0.12 150);--r-excl: oklch(0.82 0.13 86);
+  --mono: "IBM Plex Mono", ui-monospace, monospace;--sans: "Space Grotesk", system-ui, sans-serif;
+  --e-out: cubic-bezier(0.22,1,0.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-optical-sizing:auto;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+h1,h2,h3{text-wrap:balance}
+svg{display:block}
+.masthead{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;padding:14px 20px 12px;border-bottom:1px solid var(--line);background:var(--surface)}
+.wordmark{font-weight:700;font-size:1.15rem;letter-spacing:-0.01em}
+.wordmark b{color:var(--own)}
+.sys{font-family:var(--mono);font-size:0.66rem;color:var(--faint);text-transform:uppercase;letter-spacing:0.14em}
+.counts{margin-left:auto;display:flex;gap:18px;font-family:var(--mono);font-size:0.72rem}
+.counts .c{display:flex;flex-direction:column;line-height:1.15;text-align:right}
+.counts .n{font-size:1.05rem;font-weight:600;font-variant-numeric:tabular-nums}
+.counts .k{font-size:0.58rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--faint)}
+.counts .own .n{color:var(--own)}.counts .want .n{color:var(--want)}
+.stage{display:flex;flex:1;min-height:0}
+.rail{width:250px;flex-shrink:0;border-right:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:16px 16px 40px}
+.search{position:relative;margin-bottom:18px}
+.search input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:0.82rem;padding:9px 10px 9px 30px;border-radius:6px;outline:none;transition:border-color .15s}
+.search input:focus-visible{border-color:var(--own)}
+.search .ic{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--faint)}
+.views{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:22px}
+.view-chip{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.03em;padding:5px 9px;border:1px solid var(--line);border-radius:5px;background:transparent;color:var(--muted);cursor:pointer;transition:all .14s var(--e-out)}
+.view-chip:hover{border-color:var(--faint);color:var(--ink)}
+.view-chip[aria-pressed="true"]{background:var(--own-soft);border-color:var(--own);color:var(--own)}
+.facet{margin-bottom:18px}
+.facet h3{font-family:var(--mono);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.16em;color:var(--faint);margin-bottom:9px;display:flex;justify-content:space-between;align-items:center}
+.facet h3 button{background:none;border:none;color:var(--faint);font-family:var(--mono);font-size:0.58rem;cursor:pointer;letter-spacing:0.08em}
+.facet h3 button:hover{color:var(--own)}
+.opts{display:flex;flex-direction:column;gap:2px}
+.opt{display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:5px;cursor:pointer;font-size:0.82rem;color:var(--muted);transition:background .12s,color .12s;user-select:none}
+.opt:hover{background:var(--raised);color:var(--ink)}
+.opt .box{width:13px;height:13px;border:1.5px solid var(--faint);border-radius:3px;flex-shrink:0;display:grid;place-items:center;transition:all .14s var(--e-out)}
+.opt[aria-pressed="true"]{color:var(--ink)}
+.opt[aria-pressed="true"] .box{background:var(--own);border-color:var(--own)}
+.opt[aria-pressed="true"] .box::after{content:"";width:5px;height:8px;border:2px solid var(--bg);border-top:0;border-left:0;transform:rotate(43deg) translateY(-1px)}
+.opt .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.opt .ct{margin-left:auto;font-family:var(--mono);font-size:0.66rem;color:var(--faint);font-variant-numeric:tabular-nums}
+.deck-wrap{flex:1;min-width:0;display:flex;flex-direction:column}
+.deck-head{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--line-soft);font-family:var(--mono)}
+.deck-head .showing{font-size:0.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.deck-head .showing b{color:var(--ink)}
+.active-tags{display:flex;gap:6px;flex-wrap:wrap;margin-left:4px}
+.tag{font-size:0.64rem;background:var(--raised);border:1px solid var(--line);color:var(--muted);padding:3px 7px 3px 8px;border-radius:20px;display:flex;align-items:center;gap:5px}
+.tag button{background:none;border:none;color:var(--faint);cursor:pointer;font-size:0.8rem;line-height:1;padding:0}
+.tag button:hover{color:var(--own)}
+.legend{margin-left:auto;display:flex;gap:13px;font-size:0.62rem;color:var(--faint)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend .sw{width:9px;height:9px;border-radius:2px}
+.deck{flex:1;overflow-y:auto;padding:18px 20px 60px;display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:13px;align-content:start}
+.card{position:relative;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface);cursor:pointer;text-align:left;color:inherit;font-family:inherit;padding:0;display:flex;flex-direction:column;transition:transform .18s var(--e-out),border-color .18s,box-shadow .18s;animation:pop .4s var(--e-out) both;animation-delay:calc(var(--i,0)*22ms)}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.card:hover{transform:translateY(-3px);border-color:var(--faint);box-shadow:0 10px 24px oklch(0 0 0 / 0.35)}
+.card:focus-visible{outline:2px solid var(--own);outline-offset:2px}
+.card .chip{height:92px;position:relative;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:1.5rem;color:oklch(0.18 0.01 70);filter:saturate(0.35) brightness(0.72);transition:filter .25s var(--e-out)}
+.card[data-own="1"] .chip{filter:none}
+.card .rar{position:absolute;top:7px;left:7px;width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 2px oklch(0.18 0.01 70 / .5)}
+.card .avail{position:absolute;top:6px;right:7px;font-family:var(--mono);font-size:0.6rem;font-weight:600;background:oklch(0.18 0.01 70 / .82);color:var(--ink);padding:2px 5px;border-radius:4px;display:flex;align-items:center;gap:3px}
+.card .avail.deal{color:oklch(0.85 0.16 145)}
+.card .want-flag{position:absolute;bottom:6px;right:7px;color:var(--want);opacity:0;transform:scale(.6);transition:all .18s var(--e-out)}
+.card[data-want="1"] .want-flag{opacity:1;transform:none}
+.card .meta{padding:9px 10px 11px;border-top:1px solid var(--line-soft);background:var(--surface)}
+.card .nm{font-size:0.83rem;font-weight:600;line-height:1.2;letter-spacing:-0.01em;margin-bottom:5px}
+.card .sub{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:0.63rem;color:var(--faint)}
+.card .sub .col{text-transform:uppercase;letter-spacing:0.08em}
+.card .price{color:var(--muted)}
+.card .own-ring{position:absolute;inset:0;border:2px solid var(--own);border-radius:9px;pointer-events:none;opacity:0;transition:opacity .2s}
+.card[data-own="1"]{border-color:var(--own)}
+.card[data-own="1"] .own-ring{opacity:1}
+.card .caught{position:absolute;top:6px;right:7px;background:var(--own);color:var(--bg);width:20px;height:20px;border-radius:50%;display:none;place-items:center;box-shadow:0 2px 6px oklch(0 0 0 /.4)}
+.card[data-own="1"] .caught{display:grid}
+.card[data-own="1"] .avail{display:none}
+.empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--faint)}
+.empty p{font-family:var(--mono);font-size:0.8rem;line-height:1.6;margin-top:14px}
+.empty b{color:var(--muted)}
+.statusbar{border-top:1px solid var(--line);background:var(--surface);padding:7px 20px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:0.64rem;color:var(--faint);letter-spacing:0.04em}
+.statusbar .rec{color:var(--muted);font-variant-numeric:tabular-nums}
+.statusbar .note{margin-left:auto;display:flex;align-items:center;gap:6px}
+.statusbar .blink{width:6px;height:6px;border-radius:50%;background:var(--own);animation:blink 1.8s var(--e-out) infinite}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+.rail-toggle{display:none}
+@media(max-width:820px){
+.rail{position:fixed;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);transition:transform .3s var(--e-out);box-shadow:0 0 40px oklch(0 0 0/.5)}
+.rail.open{transform:none}
+.rail-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--raised);border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:0.7rem;padding:6px 10px;border-radius:6px;cursor:pointer}
+.counts{gap:12px}.counts .c.known{display:none}.legend{display:none}
+.deck{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:11px}}
+@media(max-width:480px){.masthead{padding:11px 14px}.deck{padding:14px}}
+</style>
+</head>
+<body>
+<div class="masthead">
+  <div>
+    <div class="wordmark">Inciardi<b>·</b>Collection</div>
+    <div class="sys">Print Registry · rev 0.1 · sample market feed</div>
+  </div>
+  <div class="counts">
+    <div class="c known"><span class="n" id="cKnown">0</span><span class="k">known</span></div>
+    <div class="c own"><span class="n" id="cOwn">0</span><span class="k">owned</span></div>
+    <div class="c want"><span class="n" id="cWant">0</span><span class="k">wanted</span></div>
+  </div>
+</div>
+<div class="stage">
+  <aside class="rail" id="rail">
+    <div class="search">
+      <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+      <input id="q" type="text" placeholder="filter by name…" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="views" role="group" aria-label="Quick views">
+      <button class="view-chip" data-view="all" aria-pressed="true">All</button>
+      <button class="view-chip" data-view="own" aria-pressed="false">Owned</button>
+      <button class="view-chip" data-view="want" aria-pressed="false">Wanted</button>
+      <button class="view-chip" data-view="missing" aria-pressed="false">Missing</button>
+      <button class="view-chip" data-view="listed" aria-pressed="false">Listed now</button>
+    </div>
+    <div class="facet" data-facet="rarity"><h3>Rarity <button data-clear="rarity">clear</button></h3><div class="opts" id="fRarity"></div></div>
+    <div class="facet" data-facet="collection"><h3>Collection <button data-clear="collection">clear</button></h3><div class="opts" id="fCollection"></div></div>
+    <div class="facet" data-facet="subject"><h3>Subject <button data-clear="subject">clear</button></h3><div class="opts" id="fSubject"></div></div>
+  </aside>
+  <section class="deck-wrap">
+    <div class="deck-head">
+      <button class="rail-toggle" id="railToggle">Lenses</button>
+      <div class="showing"><b id="showN">0</b> of <span id="totN">0</span> records</div>
+      <div class="active-tags" id="activeTags"></div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--r-mini)"></span>Mini</span>
+        <span><span class="sw" style="background:var(--r-linocut)"></span>Linocut</span>
+        <span><span class="sw" style="background:var(--r-riso)"></span>Big Riso</span>
+        <span><span class="sw" style="background:var(--r-excl)"></span>Exclusive</span>
+      </div>
+    </div>
+    <div class="deck" id="deck"></div>
+    <div class="statusbar">
+      <span class="rec" id="recLine">registry idle</span>
+      <span>tap a card to catch it · shift-tap to want</span>
+      <span class="note"><span class="blink"></span>local session · not yet synced to D1</span>
+    </div>
+  </section>
+</div>
+<script>
+const SVG={
+  check:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  bookmark:'<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+  tag:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.6 2.6a2 2 0 0 0-1.4-.6H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.2 8.2a2 2 0 0 0 2.8 0l6.8-6.8a2 2 0 0 0 0-2.8z"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor"/></svg>',
+  deal:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 17h6v-6"/><path d="m22 17-8.5-8.5-5 5L2 7"/></svg>',
+  ghost:'<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L15 19l2.5 2.5L20 19V10a8 8 0 0 0-8-8z"/></svg>'
+};
+const RAW=[["Negroni","mini",null,6,"food"],["Milk","mini",null,6,"food"],["Olive","mini",null,6,"food"],["Strawberry","mini",null,6,"food"],["Jam","mini",null,6,"food"],["Cornichon","mini",null,6,"food"],["Macaroni","mini",null,6,"food"],["Bird's Eye Chili","mini",null,6,"food"],["Clementine","mini",null,6,"food"],["Tinned Fish","mini",null,6,"food"],["Cheese #1","mini",null,6,"food"],["Cheese #2","mini",null,6,"food"],["Goldfish","mini",null,6,"food"],["Cheez-It","mini",null,6,"food"],["You & Me Conversation Heart","mini",null,6,"holiday"],["Mystery Pack","pack",null,18,"other"],["MetroCard","big-riso",null,20,"transit"],["Evening on the B Train","big-riso",null,20,"transit"],["On The Road","big-riso",null,20,"transit"],["Jello","big-riso",null,20,"food"],["Rainbow Swiss Chard","big-riso",null,20,"food"],["Grand Central Terminal Ceiling","big-riso",null,22,"place"],["Grand Central Terminal Clock","big-riso",null,22,"place"],["Rainbow Cookie","linocut",null,15,"food"],["Mini PBR Can","linocut",null,15,"food"],["Camp Coffee","linocut",null,15,"food"],["Hot Dog","linocut",null,15,"food"],["Cento Tomato Can","linocut",null,15,"food"],["Garlic Scapes","linocut",null,15,"food"],["Grand Central","exclusive","nyc",null,"place"],["Holiday Edition","exclusive","holiday",null,"holiday"],["Monet's Flowers","exclusive","lacma",null,"art"],["Pipe","exclusive","lacma",null,"art"],["Lamp Post","exclusive","lacma",null,"place"],["Lowly Worm","exclusive","richard-scarry",null,"character"],["Pickle Car","exclusive","richard-scarry",null,"character"],["LACMA set","pack","lacma",null,"art"]];
+const RARITY_OF=c=>c==="exclusive"?"exclusive":c==="pack"?"pack":c==="big-riso"?"big-riso":c==="linocut"?"linocut":"mini";
+const RAR_LABEL={mini:"Mini",linocut:"Linocut","big-riso":"Big Riso",pack:"Pack",exclusive:"Exclusive"};
+const RAR_VAR={mini:"var(--r-mini)",linocut:"var(--r-linocut)","big-riso":"var(--r-riso)",pack:"var(--r-pack)",exclusive:"var(--r-excl)"};
+const COL_LABEL={nyc:"NYC",lacma:"LACMA",holiday:"Holiday","richard-scarry":"Richard Scarry"};
+const SUB_LABEL={food:"Food",transit:"Transit",place:"Place",art:"Art",character:"Character",holiday:"Holiday",other:"Other"};
+const CHIP_HUE={food:35,transit:205,place:150,art:300,character:86,holiday:15,other:70};
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+function sampleMarket(id){let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;const listed=h%10<4;const deal=listed&&h%10<1;const price=listed?8+(h%22):null;return{listed,deal,price};}
+const PRINTS=RAW.map(([name,cat,excl,retail,subject])=>{const id=slug(name);return{id,name,category:cat,rarity:RARITY_OF(cat),collection:excl,subject,retail,market:sampleMarket(id)};});
+const KEY="inciardi-deck-v1";
+let INV=JSON.parse(localStorage.getItem(KEY)||"{}");
+const save=()=>localStorage.setItem(KEY,JSON.stringify(INV));
+let filters={rarity:new Set(),collection:new Set(),subject:new Set()};
+let view="all",query="";
+function facetCounts(field){const m=new Map();for(const p of PRINTS){const v=p[field];if(!v)continue;m.set(v,(m.get(v)||0)+1);}return m;}
+function renderFacet(elId,field,labelMap,withDot){const el=document.getElementById(elId),counts=facetCounts(field);const keys=[...counts.keys()].sort((a,b)=>counts.get(b)-counts.get(a));el.innerHTML="";for(const k of keys){const o=document.createElement("div");o.className="opt";o.setAttribute("role","button");o.setAttribute("aria-pressed","false");o.dataset.field=field;o.dataset.val=k;const dot=withDot?`<span class="dot" style="background:${RAR_VAR[k]}"></span>`:"";o.innerHTML=`<span class="box"></span>${dot}<span>${(labelMap&&labelMap[k])||k}</span><span class="ct">${counts.get(k)}</span>`;o.addEventListener("click",()=>{const s=filters[field];s.has(k)?s.delete(k):s.add(k);o.setAttribute("aria-pressed",s.has(k));render();});el.appendChild(o);}}
+function pass(p){const st=INV[p.id];if(view==="own"&&st!=="own")return false;if(view==="want"&&st!=="want")return false;if(view==="missing"&&st)return false;if(view==="listed"&&!p.market.listed)return false;if(query&&!p.name.toLowerCase().includes(query))return false;for(const f of ["rarity","collection","subject"]){const s=filters[f];if(s.size&&!s.has(p[f]))return false;}return true;}
+function render(){const deck=document.getElementById("deck");const list=PRINTS.filter(pass);deck.innerHTML="";if(!list.length){deck.innerHTML=`<div class="empty">${SVG.ghost}<p>No prints match these lenses.<br><b>Loosen a filter</b> or clear the search.</p></div>`;}else{list.forEach((p,i)=>deck.appendChild(card(p,i)));}const own=Object.values(INV).filter(v=>v==="own").length;const want=Object.values(INV).filter(v=>v==="want").length;document.getElementById("cKnown").textContent=PRINTS.length;document.getElementById("cOwn").textContent=own;document.getElementById("cWant").textContent=want;document.getElementById("showN").textContent=list.length;document.getElementById("totN").textContent=PRINTS.length;const pct=Math.round(own/PRINTS.length*100);document.getElementById("recLine").textContent=`registry · ${own}/${PRINTS.length} caught (${pct}% of seed catalog)`;renderTags();}
+function card(p,i){const b=document.createElement("button");b.className="card";b.style.setProperty("--i",i%40);const st=INV[p.id];b.dataset.own=st==="own"?1:0;b.dataset.want=st==="want"?1:0;const hue=CHIP_HUE[p.subject]||70;const chipBg=`oklch(0.78 0.12 ${hue})`;const initials=p.name.replace(/[^A-Za-z0-9 ]/g,"").split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();const retail=p.retail?`$${p.retail}`:"exclusive";const col=p.collection?`<span class="col">${COL_LABEL[p.collection]||p.collection}</span>`:`<span class="col">${RAR_LABEL[p.rarity]}</span>`;let avail="";if(p.market.listed){avail=p.market.deal?`<span class="avail deal">${SVG.deal}$${p.market.price}</span>`:`<span class="avail">${SVG.tag}$${p.market.price}</span>`;}b.innerHTML=`<div class="chip" style="background:${chipBg}"><span class="rar" style="background:${RAR_VAR[p.rarity]}"></span>${initials}${avail}<span class="caught">${SVG.check}</span><span class="want-flag">${SVG.bookmark}</span></div><div class="meta"><div class="nm">${p.name}</div><div class="sub">${col}<span class="price">${retail}</span></div></div><span class="own-ring"></span>`;b.addEventListener("click",e=>{if(e.shiftKey){INV[p.id]=INV[p.id]==="want"?undefined:"want";}else{INV[p.id]=INV[p.id]==="own"?undefined:"own";}if(!INV[p.id])delete INV[p.id];save();render();});return b;}
+function renderTags(){const wrap=document.getElementById("activeTags");wrap.innerHTML="";const add=(field,val,label)=>{const t=document.createElement("span");t.className="tag";t.innerHTML=`${label}<button aria-label="remove">×</button>`;t.querySelector("button").addEventListener("click",()=>{if(field==="view"){setView("all");}else{filters[field].delete(val);syncFacetUI();}render();});wrap.appendChild(t);};if(view!=="all")add("view",view,{own:"Owned",want:"Wanted",missing:"Missing",listed:"Listed now"}[view]);for(const f of ["rarity","collection","subject"])for(const v of filters[f])add(f,v,(f==="collection"?(COL_LABEL[v]||v):f==="rarity"?RAR_LABEL[v]:SUB_LABEL[v]||v));}
+function syncFacetUI(){document.querySelectorAll(".opt").forEach(o=>{o.setAttribute("aria-pressed",filters[o.dataset.field].has(o.dataset.val));});}
+function setView(v){view=v;document.querySelectorAll(".view-chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.view===v));}
+document.querySelectorAll(".view-chip").forEach(c=>c.addEventListener("click",()=>{setView(c.dataset.view);render();}));
+document.getElementById("q").addEventListener("input",e=>{query=e.target.value.trim().toLowerCase();render();});
+document.querySelectorAll("[data-clear]").forEach(btn=>btn.addEventListener("click",()=>{filters[btn.dataset.clear].clear();syncFacetUI();render();}));
+document.getElementById("railToggle").addEventListener("click",()=>document.getElementById("rail").classList.toggle("open"));
+renderFacet("fRarity","rarity",RAR_LABEL,true);
+renderFacet("fCollection","collection",COL_LABEL,false);
+renderFacet("fSubject","subject",SUB_LABEL,false);
+render();
+</script>
+</body>
+</html>
