@@ -1,12 +1,13 @@
 /* Runtime boot + home surface for the circuit guide.
-   v5.3: data.json is RETIRED. Track data is assembled from the inline
+   v5.4: data.json is RETIRED. Track data is assembled from the inline
    TRACK_DATA_ROUNDS_* globals defined by modules 05-08 (loaded before this),
    and completed-race results come from the canonical store via module 12
    (12_results_store.js), which populates window.raceResults and calls router().
    Home surface: a slim header carousel pins TWO condensed race tiles side by
-   side (defaulting to the current round + the next one) flanked by chevrons
-   that page through the calendar two rounds at a time. Each tile is a shortcut
-   into that circuit's breakdown. Full 24-circuit grid still lives below.
+   side (defaulting to the current round + the next one) flanked by chevrons.
+   Each chevron advances the window by ONE round (slide: keep a tile, bring in
+   the next), so tabbing feels continuous. Each tile is a shortcut into that
+   circuit's breakdown. Full 24-circuit grid still lives below.
    Source assembly order:
      ...TRACK_DATA_ROUNDS_01_03,
      ...TRACK_DATA_ROUNDS_06_09,
@@ -14,7 +15,7 @@
      ...TRACK_DATA_ROUNDS_14_24
  */
 
-const APP_VERSION = "v5.3";
+const APP_VERSION = "v5.4";
 const APP_DATE = "2026-07-10";
 const SEASON = "2026";
 
@@ -168,18 +169,19 @@ function carouselMarkup() {
  const chevL = '<svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
  const chevR = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
  return `<div class="cx" role="group" aria-label="Quick race carousel">
- <button class="cx-nav" aria-label="Previous rounds" ${canPrev ? 'onclick="f1Carousel(-1)"' : "disabled"}>${chevL}</button>
+ <button class="cx-nav" aria-label="Previous round" ${canPrev ? 'onclick="f1Carousel(-1)"' : "disabled"}>${chevL}</button>
  <div class="cx-tiles">${carouselTile(pair[0])}${carouselTile(pair[1])}</div>
- <button class="cx-nav" aria-label="Next rounds" ${canNext ? 'onclick="f1Carousel(1)"' : "disabled"}>${chevR}</button>
+ <button class="cx-nav" aria-label="Next round" ${canNext ? 'onclick="f1Carousel(1)"' : "disabled"}>${chevR}</button>
  </div>`;
 }
 
-// Page the carousel window by whole steps of 2 (a fresh pair each tab),
-// clamped, then re-render just the carousel band in place.
+// Advance the carousel window by ONE round per chevron (slide: one tile stays,
+// the next comes in), clamped to the calendar ends, then re-render just the
+// #cx-host band in place.
 window.f1Carousel = function (dir) {
  const total = TRACKS.length;
  const maxStart = Math.max(0, total - 2);
- let next = carouselStart + dir * 2;
+ let next = carouselStart + dir;
  if (next < 0) next = 0;
  if (next > maxStart) next = maxStart;
  carouselStart = next;
