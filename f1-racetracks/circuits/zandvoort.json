@@ -1,9 +1,9 @@
 {
- "slug": "zandvoort", "round": 14, "gp": "Dutch GP", "flag": "🇳🇱", "date": "23 Aug", "status": "pending", "report": true,
+ "slug": "zandvoort", "gp": "Dutch GP", "flag": "🇳🇱", "report": true,
  "title": "Circuit Zandvoort", "loc": "Zandvoort", "cc": "NL", "length": "4.259", "turns": 14, "laps": 72, "drsZones": 2, "elev": "~16 m", "topSpeed": "~315", "record": "1:11.097 · HAM ’21",
  "sub": "A thrilling old-school rollercoaster through the North Sea dunes, modernised with steep banking at Turn 3 and the final corner. Narrow, undulating and notoriously hard to pass on.",
  "mapFile": "Zandvoort.svg", "mapTag": "Official layout · 2021 banking", "mapCredit": "Will Pittenger / Wikimedia Commons · CC BY-SA", "poleRef": "1:09.673 (Norris ’24)", "lat": 52.3888, "lng": 4.5409, "tz": "Europe/Amsterdam",
- "sessions": [{"date":"2026-08-21","sess":"Fri · Practice"},{"date":"2026-08-22","sess":"Sat · Practice + Qualifying"},{"date":"2026-08-23","sess":"Sun · Grand Prix"}], "elevLabel": "~16 m swing", "elevMax": 18, "asl0": 4,
+ "elevLabel": "~16 m swing", "elevMax": 18, "asl0": 4,
  "profile": [[0,6],[0.06,8],[0.12,12],[0.18,14],[0.24,10],[0.32,8],[0.40,12],[0.48,10],[0.56,14],[0.64,12],[0.72,8],[0.80,10],[0.88,14],[0.95,9],[1,6]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.10,"det":0.86,"label":"DRS 1"},{"from":0.30,"to":0.38,"det":0.24,"label":"DRS 2"}],

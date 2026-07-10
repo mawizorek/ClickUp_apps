@@ -1,9 +1,9 @@
 {
- "slug": "marina-bay", "round": 18, "gp": "Singapore GP", "flag": "🇸🇬", "date": "11 Oct", "status": "pending", "report": true,
+ "slug": "marina-bay", "gp": "Singapore GP", "flag": "🇸🇬", "report": true,
  "title": "Marina Bay Street Circuit", "loc": "Singapore", "cc": "SG", "length": "4.940", "turns": 19, "laps": 62, "drsZones": 3, "elev": "~flat", "topSpeed": "~320", "record": "1:33.808 · HAM ’25",
  "sub": "F1’s original night race: a bumpy, humid, wall-lined lap through downtown Singapore run under floodlights. Brutally physical, punishing on concentration, and one of the hardest places on the calendar to overtake.",
  "mapFile": "Marina_Bay_Street_Circuit.svg", "mapTag": "Official layout · 2023 revision", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:29.525 (Norris ’24)", "lat": 1.2914, "lng": 103.8640, "tz": "Asia/Singapore",
- "sessions": [{"date":"2026-10-09","sess":"Fri · Practice"},{"date":"2026-10-10","sess":"Sat · Practice + Qualifying"},{"date":"2026-10-11","sess":"Sun · Grand Prix (night)"}], "elevLabel": "flat", "elevMax": 10, "asl0": 2,
+ "elevLabel": "flat", "elevMax": 10, "asl0": 2,
  "profile": [[0,4],[0.08,4],[0.16,5],[0.24,4],[0.32,5],[0.40,4],[0.48,5],[0.56,4],[0.64,5],[0.72,4],[0.80,5],[0.88,4],[1,4]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.32},{"k":"s2","from":0.32,"to":0.64},{"k":"s3","from":0.64,"to":1}],
  "drs": [{"from":0,"to":0.09,"det":0.88,"label":"DRS 1"},{"from":0.30,"to":0.40,"det":0.26,"label":"DRS 2"},{"from":0.70,"to":0.80,"det":0.64,"label":"DRS 3"}],
