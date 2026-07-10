@@ -24,3 +24,78 @@
 #app .home-h h1 { font-size: clamp(1.7rem, 4.2vw, 2.7rem); }
 #app .home-h .sub { font-size: .96rem; max-width: 60ch; }
 #app .legend { margin: 16px 0 20px; font-size: .78rem; gap: 14px; }
+
+/* ---- v5.2 quick-access: pinned current-round + latest-result cards ---- */
+#app .quick-access {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+ gap: 12px;
+ margin: 20px 0 4px;
+}
+#app .qa-card {
+ position: relative;
+ display: block;
+ text-align: left;
+ width: 100%;
+ font: inherit;
+ color: inherit;
+ cursor: pointer;
+ background: linear-gradient(150deg, color-mix(in oklch, var(--accent) 12%, var(--surface)) 0%, var(--surface) 60%);
+ border: 1px solid var(--line);
+ border-radius: 10px;
+ padding: 15px 16px 14px 20px;
+ overflow: hidden;
+ transition: border-color .18s var(--ease), transform .18s var(--ease), background .18s var(--ease);
+}
+#app .qa-card:hover {
+ transform: translateY(-2px);
+ border-color: color-mix(in oklch, var(--accent) 55%, var(--line));
+}
+#app .qa-card .qa-stripe {
+ position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+ background: var(--accent);
+}
+#app .qa-top {
+ display: flex; align-items: center; justify-content: space-between; gap: 10px;
+ margin-bottom: 9px;
+}
+#app .qa-eyebrow {
+ font-family: "IBM Plex Mono", monospace;
+ font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
+ color: var(--accent); font-weight: 600;
+ display: inline-flex; align-items: center; gap: 8px;
+}
+#app .qa-eyebrow::before {
+ content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+}
+#app .qa-rn {
+ font-family: "IBM Plex Mono", monospace;
+ font-size: .66rem; letter-spacing: .08em; color: var(--faint);
+ display: inline-flex; align-items: center; gap: 6px;
+}
+#app .qa-rn .qa-flag { font-size: .9rem; }
+#app .qa-gp {
+ font-size: 1.28rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.05;
+ margin-bottom: 2px;
+}
+#app .qa-circ { font-size: .82rem; color: var(--muted); }
+#app .qa-detail {
+ display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+ margin: 12px 0 10px;
+ padding-top: 11px;
+ border-top: 1px solid var(--line);
+}
+#app .qa-detail .qa-k {
+ font-family: "IBM Plex Mono", monospace;
+ font-size: .58rem; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-weight: 600;
+}
+#app .qa-detail .qa-v { font-size: .96rem; font-weight: 700; }
+#app .qa-detail .qa-t { font-size: .78rem; color: var(--muted); }
+#app .qa-go {
+ font-family: "IBM Plex Mono", monospace;
+ font-size: .66rem; letter-spacing: .06em; color: var(--accent); font-weight: 600;
+ display: inline-block;
+}
+@media (max-width: 560px) {
+ #app .quick-access { grid-template-columns: 1fr; }
+}
