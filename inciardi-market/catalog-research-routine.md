@@ -1,6 +1,6 @@
 # Inciardi Market — Catalog Research Routine (Deep Rebuild SOP)
 
-**Purpose:** systematically rebuild `catalog.json` toward the *full* Ana Inciardi print universe (500+ prints) from legitimate primary sources, scrubbed and normalized, with provenance on every row. This is the **deep excavation** routine. Any agent should be able to pick this up cold and make real progress.
+**Purpose:** systematically rebuild `catalog.json` toward the *full* Ana Inciardi print universe (500+ prints) from legitimate primary sources, scrubbed and normalized, with provenance and a reference image on every row. This is the **deep excavation** routine. Any agent should be able to pick this up cold and make real progress.
 
 > **This is NOT `catalog-refresh.md`.** That doc is the light periodic top-up ("a new drop landed, add it"). THIS doc is the systematic dig-and-scrub campaign that grows a 37-row working seed into the real universe. Different depth, different cadence. Refresh = maintenance. Research = construction.
 
@@ -44,13 +44,39 @@ Collections give the **category/series classification** a flat product list can'
 
 ---
 
+## Reference images (source alongside every print)
+
+Every print gets a canonical reference image, sourced in the SAME harvest pass, not bolted on later. The image URLs are already in the JSON we pull, so this is nearly free.
+
+### Where the image URLs live
+
+- **Product-level:** `products[].images[].src` (position 1 is usually the hero shot).
+- **Variant-level (the important one):** `products[].variants[].featured_image.src`. For multi-print products like the 8x10 Riso set, EACH variant has its OWN image, so a per-print image maps cleanly to a per-variant `featured_image`. Match on `variant_ids` to pair the right image to the right print.
+- All are hosted on `cdn.shopify.com/s/files/1/0566/6183/5916/...` (Anastasia's store CDN), 3000px+ originals. Append Shopify size params for thumbnails when needed (e.g. `?width=400`).
+
+### Decision (LOCKED, Michael 2026-07-10): REFERENCE the CDN URL, do NOT self-host blobs
+
+- Store the canonical CDN URL in the catalog row's **`image`** field (the schema field already exists for exactly this). That URL *is* the import. No binary lands in the repo.
+- **Why not self-host:** binaries can't round-trip the MCP commit tool (they'd each need a manual GitHub-UI drop). At 500 prints that's a nonstarter for reference thumbnails. Blob self-hosting stays reserved for the app's own `og.png` / `icon.png`.
+- **Drift risk (accepted):** if Anastasia re-uploads an image its CDN URL can change, leaving a stale link. Caught + refreshed on the next research pass; not worth self-hosting to avoid. Note it, move on.
+- **Provisional prints:** a print with no sourced image (surfaced from press or an eBay title, not the store) gets `image: null` and stays flagged until a real reference image is found. Never fabricate or borrow an image URL from Vault or a seller listing as canonical.
+
+### How to source images during the harvest
+
+1. For each store product, grab `images[0].src` as the product hero.
+2. For multi-variant/multi-print products, walk `variants[]` and take each `featured_image.src`, pairing image -> print via `variant_ids`. This is how the 9 Riso themes each get their own art.
+3. Write the chosen URL into the print's `image` field in `catalog.json` in the same reconcile step that writes name/retail/source.
+4. Prints that only exist via secondary sources (retired seasonals, press-only exclusives): try to recover an image from Instagram/press; if none, `image: null` + provisional.
+
+---
+
 ## Secondary sources (fill gaps the store doesn't show)
 
 The store shows what's *currently listed*. Retired drops, sold-out seasonals, and exclusives that never hit the main store need these:
 
 | Source | Pulls | Notes |
 | --- | --- | --- |
-| Anastasia's Instagram drop history | Retired/seasonal prints, brand-new-print announcements, drop dates | Primary for prints no longer for sale |
+| Anastasia's Instagram drop history | Retired/seasonal prints, brand-new-print announcements, drop dates, print art for images | Primary for prints no longer for sale |
 | Official store locator `inciardiprints.com/pages/store-locator` | **Canonical machine locations** | The machine truth; always link out rather than claim completeness |
 | Vending info `inciardiprints.com/pages/mini-print-vending-machine-1` | Machine count, program background, exclusive-collection context | Refresh `machineCount` from here |
 | Press (People, local news; search "Inciardi vending machine") | New machine openings, exclusive collections (Richard Scarry, LACMA, Grand Central) | Exclusives often break in press before the store |
@@ -76,13 +102,14 @@ The normalized backbone is already built in `db/schema.sql` (`catalog` + `catalo
 1. **Pull the whole store.** Page through `/products.json?limit=250` until empty. Capture title + variants + body_html + images + dates + availability for every product.
 2. **Explode the three layers.** Extract product-level prints, variant-level prints, AND parse mystery-pack `body_html` for embedded print-name lists. The mystery packs are where a lot of the 500 hide.
 3. **Classify via collections.** Hit each `/collections/<handle>/products.json`; use membership to assign `category` (mini | pack | big-riso | linocut | exclusive | ...) and detect series/exclusives.
-4. **Reconcile against existing `catalog.json`.** For each harvested print: exact/fuzzy match to a canonical row. Match -> add any new name as an alias, refresh retail/availability/image. No match -> new canonical row (sourced) OR provisional if uncertain.
-5. **Sweep secondary sources** for retired/seasonal/exclusive prints the store no longer lists (Instagram history, press, host shops). Add with `source` noting where each came from.
-6. **Cross-check eBay `unmatched`.** Anything the market surfaces that we still don't have = a targeted research item. Resolve to Anastasia's real name before adding.
-7. **Coverage gauge (Vault as answer key only).** Note the delta vs the claimed 500+. Do NOT copy anything; just know how much universe is left to dig.
-8. **Write `catalog.json`** with honest `source`/`note`, real per-print `retail` where known, `null` for exclusives with no standard retail. Update `machineCount` / `richardScarryMachineCount` from the vending page.
-9. **Log the pass** in the Progress Log below (date, sources hit, print count before/after, known gaps). This is what makes the routine resumable.
-10. **Commit** via branch -> PR -> self-merge (GitHub MCP Operating Standard). Data-only change: no app shell/version bump.
+4. **Source the image** for each print in the same pass (product hero or per-variant `featured_image`; see Reference Images above). Write the CDN URL into `image`.
+5. **Reconcile against existing `catalog.json`.** For each harvested print: exact/fuzzy match to a canonical row. Match -> add any new name as an alias, refresh retail/availability/image. No match -> new canonical row (sourced) OR provisional if uncertain.
+6. **Sweep secondary sources** for retired/seasonal/exclusive prints the store no longer lists (Instagram history, press, host shops). Add with `source` noting where each came from; recover an image where possible, else `image: null` + provisional.
+7. **Cross-check eBay `unmatched`.** Anything the market surfaces that we still don't have = a targeted research item. Resolve to Anastasia's real name before adding.
+8. **Coverage gauge (Vault as answer key only).** Note the delta vs the claimed 500+. Do NOT copy anything; just know how much universe is left to dig.
+9. **Write `catalog.json`** with honest `source`/`note`, real per-print `retail` where known (`null` for exclusives with no standard retail), and the sourced `image` URL per print. Update `machineCount` / `richardScarryMachineCount` from the vending page.
+10. **Log the pass** in the Progress Log below (date, sources hit, print count before/after, image coverage, known gaps). This is what makes the routine resumable.
+11. **Commit** via branch -> PR -> self-merge (GitHub MCP Operating Standard). Data-only change: no app shell/version bump.
 
 ---
 
@@ -91,6 +118,7 @@ The normalized backbone is already built in `db/schema.sql` (`catalog` + `catalo
 - **Never reference/copy Vault.** Answer key only. Everything ships sourced from our own pulls.
 - **Official names win.** Seller titles normalize to aliases.
 - **Provenance or provisional.** Unsourced never enters canonical.
+- **Images are referenced, not stored.** Canonical Shopify CDN URL in the `image` field; no blobs in the repo. `image: null` + provisional when no legit image exists. Never borrow a Vault or seller image as canonical.
 - **Merge, don't delete.** Corrections preserve `print_id` links and history.
 - **Retail != market.** Retail is Anastasia's fixed price (belongs here). Market is eBay's rolling number (belongs in the trend store, not here).
 - **Catalog is owner-agnostic.** The print *universe*, not anyone's collection. Ownership lives in the `inventory` plane, not here.
@@ -102,13 +130,17 @@ The normalized backbone is already built in `db/schema.sql` (`catalog` + `catalo
 
 _Append one entry per research pass. Newest on top. This is what makes the routine resumable by any agent._
 
+### 2026-07-10 — Image sourcing folded into the routine
+
+- Added the **Reference Images** section + image step in the cold-run sequence. Decision locked: source the canonical Shopify CDN URL into each print's `image` field (reference, not self-hosted blob); `image: null` + provisional when no legit image exists. Variant-level `featured_image` gives per-print art for multi-print products (e.g. the 9 8x10 Riso themes each get their own image).
+
 ### 2026-07-10 — Routine established + first harvest pass begun
 
 - **Sources hit:** `inciardiprints.com/products.json` (verified working, rich 3-layer data), `/collections` index (29 collections mapped), `/collections/all` + `/collections/minis` + `/collections/holiday-print-drop` (linocuts), spot press/store data.
-- **Key discovery:** the Shopify `/products.json` endpoint is the excavation backbone (products + variants + mystery-pack body prose = three layers of prints). Storefront HTML lazy-loads and returns nothing to a plain fetch; the JSON endpoint returns everything. Documented above.
+- **Key discovery:** the Shopify `/products.json` endpoint is the excavation backbone (products + variants + mystery-pack body prose = three layers of prints). Storefront HTML lazy-loads and returns nothing to a plain fetch; the JSON endpoint returns everything, including image URLs. Documented above.
 - **New prints surfaced this pass (not yet all in `catalog.json`):** 8x10 Riso themes (Swiss Chard, Cake, Jello, Lowly, Pickle Car, Martini, Blueberries); Spring pack set (gingko leaf, umbrellas, bunny, sunday afternoon bike flowers, crocus, wellie, robin's nest, spring peeper, daffodils, clippers, bee, slickers, watering can, luna moth); Winter pack set (Sock, Hat, Mitten, Pippa, Chimney, Hot Cocoa, Pickle Ornament, Pinecone, Sled, Spitzbuben Cookie); Valentine's pack set (Bow, Conversation Hearts, Box of Chocolates, Heart Cake, Valentine, Puppy Love, Queen of Hearts, Love Note, Wedding Chapel, Cherries, Tulips, Bouquet); Classics pack (10 from 50+); linocut additions (Tulip Bouquet, Carrots).
 - **State:** `catalog.json` still the ~37-row seed. Full paginated harvest + explode + reconcile into `catalog.json` is the next execution step (not yet committed to `catalog.json` this pass; routine + method locked first).
-- **Known gaps / next:** page through ALL `/products.json` pages; harvest every `/collections/<handle>/products.json`; parse ALL mystery-pack bodies; sweep Instagram drop history for retired seasonals; then do the big reconcile write into `catalog.json` and feed `catalog_alias` from eBay `unmatched` titles.
+- **Known gaps / next:** page through ALL `/products.json` pages; harvest every `/collections/<handle>/products.json`; parse ALL mystery-pack bodies; sweep Instagram drop history for retired seasonals; capture images per print; then do the big reconcile write into `catalog.json` and feed `catalog_alias` from eBay `unmatched` titles.
 
 ---
 
