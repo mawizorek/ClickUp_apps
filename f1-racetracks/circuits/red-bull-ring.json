@@ -1,9 +1,9 @@
 {
- "slug": "red-bull-ring", "round": 10, "gp": "Austrian GP", "flag": "🇦🇹", "date": "28 Jun", "status": "done", "report": true,
+ "slug": "red-bull-ring", "gp": "Austrian GP", "flag": "🇦🇹", "report": true,
  "title": "Red Bull Ring", "loc": "Spielberg", "cc": "AT", "length": "4.318", "turns": 10, "laps": 71, "drsZones": 3, "elev": "63 m", "topSpeed": "~320", "record": "1:05.619 · SAI ’20",
  "sub": "Short, sharp and savage: ten corners crammed into a mountain amphitheatre. Big elevation, heavy braking, and one of the easiest tracks to overtake on.",
  "mapFile": "Circuit_Red_Bull_Ring.svg", "mapTag": "Official layout · 2022+", "mapCredit": "Pitlane02 / Wikimedia Commons · CC BY-SA", "poleRef": "1:04.314 (Verstappen ’24)", "lat": 47.2197, "lng": 14.7647, "tz": "Europe/Vienna",
- "sessions": [{"date":"2026-06-26","sess":"Fri · Practice + Sprint Quali"},{"date":"2026-06-27","sess":"Sat · Sprint + Qualifying"},{"date":"2026-06-28","sess":"Sun · Grand Prix"}], "elevLabel": "63 m swing", "elevMax": 66, "asl0": 654,
+ "elevLabel": "63 m swing", "elevMax": 66, "asl0": 654,
  "profile": [[0,8],[0.04,6],[0.08,20],[0.16,52],[0.24,60],[0.30,58],[0.36,44],[0.44,40],[0.52,30],[0.60,24],[0.68,30],[0.76,22],[0.84,16],[0.92,12],[1,8]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.07,"det":0.86,"label":"DRS 3"},{"from":0.30,"to":0.40,"det":0.24,"label":"DRS 1"},{"from":0.52,"to":0.62,"det":0.46,"label":"DRS 2"}],

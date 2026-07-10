@@ -1,10 +1,10 @@
 {
- "slug": "miami", "round": 6, "gp": "Miami GP", "flag": "🇺🇸", "date": "03 May", "status": "done", "report": true,
+ "slug": "miami", "gp": "Miami GP", "flag": "🇺🇸", "report": true,
  "title": "Miami International Autodrome", "loc": "Miami Gardens", "cc": "US", "length": "5.412", "turns": 19, "laps": 57, "drsZones": 3, "elev": "~flat", "topSpeed": "~340", "record": "1:29.708 · VER ’23",
  "sub": "A purpose-built ribbon wrapped around the Hard Rock Stadium: three long straights for slipstreaming, a tight technical infield, and a flyover that adds the lap’s only real elevation.",
  "mapFile": "Formula1_Circuit_Miami_Hard_Rock_Stadium.svg", "mapTag": "Official layout · since 2022", "mapCredit": "Wikimedia Commons · CC BY-SA",
  "poleRef": "1:27.241 (Verstappen ’24)", "lat": 25.9580, "lng": -80.2389, "tz": "America/New_York",
- "sessions": [{"date":"2026-05-01","sess":"Fri · Practice + Sprint Quali"},{"date":"2026-05-02","sess":"Sat · Sprint + Qualifying"},{"date":"2026-05-03","sess":"Sun · Grand Prix"}], "elevLabel": "flat + flyover", "elevMax": 16, "asl0": -1.6,
+ "elevLabel": "flat + flyover", "elevMax": 16, "asl0": -1.6,
  "profile": [[0,4],[0.1,4],[0.2,3.6],[0.3,4],[0.4,3.8],[0.5,4],[0.6,5],[0.66,9],[0.72,13],[0.78,9],[0.84,5],[0.92,4],[1,4]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.34},{"k":"s2","from":0.34,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.08,"det":0.90,"label":"DRS 1"},{"from":0.22,"to":0.32,"det":0.17,"label":"DRS 2"},{"from":0.50,"to":0.60,"det":0.44,"label":"DRS 3"}],

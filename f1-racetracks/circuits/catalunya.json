@@ -1,10 +1,10 @@
 {
- "slug": "catalunya", "round": 9, "gp": "Spanish GP", "flag": "🇪🇸", "date": "14 Jun", "status": "done", "report": true,
+ "slug": "catalunya", "gp": "Spanish GP", "flag": "🇪🇸", "report": true,
  "title": "Circuit de Barcelona-Catalunya", "loc": "Montmeló", "cc": "ES", "length": "4.657", "turns": 14, "laps": 66, "drsZones": 2, "elev": "~30 m", "topSpeed": "~330", "record": "1:15.743 · PIA ’25",
  "sub": "F1’s definitive aero benchmark and every team’s winter-testing home. A flowing, high-energy lap that gobbles front tyres and exposes any weakness in a car.",
  "mapFile": "Formula1_Circuit_Catalunya.svg", "mapTag": "Official layout (F1 sectors)", "mapCredit": "Wikimedia Commons · CC BY-SA",
  "poleRef": "1:11.383 (Norris ’25)", "lat": 41.5700, "lng": 2.2611, "tz": "Europe/Madrid",
- "sessions": [{"date":"2026-06-12","sess":"Fri · Practice"},{"date":"2026-06-13","sess":"Sat · Practice + Qualifying"},{"date":"2026-06-14","sess":"Sun · Grand Prix"}], "elevLabel": "~30 m swing", "elevMax": 30, "asl0": 124,
+ "elevLabel": "~30 m swing", "elevMax": 30, "asl0": 124,
  "profile": [[0,6],[0.05,8],[0.10,22],[0.18,26],[0.26,24],[0.34,20],[0.42,16],[0.50,18],[0.58,22],[0.66,16],[0.72,12],[0.80,14],[0.88,10],[0.95,7],[1,6]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.34},{"k":"s2","from":0.34,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.07,"det":0.88,"label":"DRS 1"},{"from":0.55,"to":0.64,"det":0.50,"label":"DRS 2"}],

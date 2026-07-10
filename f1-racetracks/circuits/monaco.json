@@ -1,10 +1,10 @@
 {
- "slug": "monaco", "round": 8, "gp": "Monaco GP", "flag": "🇲🇨", "date": "07 Jun", "status": "done", "report": true,
+ "slug": "monaco", "gp": "Monaco GP", "flag": "🇲🇨", "report": true,
  "title": "Circuit de Monaco", "loc": "Monte Carlo", "cc": "MC", "length": "3.337", "turns": 19, "laps": 78, "drsZones": 1, "elev": "42 m", "topSpeed": "~290", "record": "1:12.909 · HAM ’21",
  "sub": "The jewel of the calendar: 3.3km of armco-lined street through Monte Carlo, barely changed since 1929. Impossible to pass, impossible to forgive, the ultimate test of qualifying nerve.",
  "mapFile": "Circuit_Monaco.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · public domain",
  "poleRef": "1:10.063 (Leclerc ’24)", "lat": 43.7347, "lng": 7.4206, "tz": "Europe/Monaco",
- "sessions": [{"date":"2026-06-05","sess":"Fri · Practice"},{"date":"2026-06-06","sess":"Sat · Practice + Qualifying"},{"date":"2026-06-07","sess":"Sun · Grand Prix"}], "elevLabel": "42 m swing", "elevMax": 46, "asl0": 3,
+ "elevLabel": "42 m swing", "elevMax": 46, "asl0": 3,
  "profile": [[0,12],[0.04,10],[0.08,22],[0.14,38],[0.20,42],[0.26,40],[0.32,30],[0.38,20],[0.44,12],[0.50,6],[0.54,4],[0.60,6],[0.68,10],[0.78,12],[0.88,12],[1,12]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.62},{"k":"s3","from":0.62,"to":1}],
  "drs": [{"from":0.86,"to":1.0,"det":0.80,"label":"DRS 1"}],

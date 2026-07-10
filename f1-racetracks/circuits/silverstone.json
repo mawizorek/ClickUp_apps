@@ -1,9 +1,9 @@
 {
- "slug": "silverstone", "round": 11, "gp": "British GP", "flag": "🇬🇧", "date": "05 Jul", "status": "done", "report": true,
+ "slug": "silverstone", "gp": "British GP", "flag": "🇬🇧", "report": true,
  "title": "Silverstone Circuit", "loc": "Towcester", "cc": "UK", "length": "5.891", "turns": 18, "laps": 52, "drsZones": 2, "elev": "~6 m", "topSpeed": "~330", "record": "1:27.097 · VER ’20",
  "sub": "F1’s spiritual home, built on a WWII airfield. Pancake-flat and ferociously fast, with the legendary Maggotts-Becketts-Chapel esses at its heart.",
  "mapFile": "Silverstone_Circuit_2020.png", "mapTag": "Official layout · 2010+", "mapCredit": "Antoine266 / Wikimedia Commons · CC BY-SA 4.0", "poleRef": "1:25.819 (Russell ’24)", "lat": 52.0681, "lng": -1.0230, "tz": "Europe/London",
- "sessions": [{"date":"2026-07-03","sess":"Fri · Practice + Sprint Quali"},{"date":"2026-07-04","sess":"Sat · Sprint + Qualifying"},{"date":"2026-07-05","sess":"Sun · Grand Prix"}], "elevLabel": "≈6 m range", "elevMax": 7, "asl0": 148,
+ "elevLabel": "≈6 m range", "elevMax": 7, "asl0": 148,
  "profile": [[0,3.0],[0.05,3.5],[0.13,2.4],[0.18,2.0],[0.27,3.0],[0.34,3.6],[0.46,4.4],[0.52,5.6],[0.58,5.0],[0.66,3.6],[0.74,2.6],[0.82,2.2],[0.9,3.0],[1,3.0]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.31},{"k":"s2","from":0.31,"to":0.73},{"k":"s3","from":0.73,"to":1}],
  "drs": [{"from":0.275,"to":0.345,"det":0.13,"label":"DRS 1"},{"from":0.60,"to":0.70,"det":0.55,"label":"DRS 2"}],
