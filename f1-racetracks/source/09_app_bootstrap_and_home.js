@@ -1,11 +1,12 @@
 /* Runtime boot + home surface for the circuit guide.
-   v5.2: data.json is RETIRED. Track data is assembled from the inline
+   v5.3: data.json is RETIRED. Track data is assembled from the inline
    TRACK_DATA_ROUNDS_* globals defined by modules 05-08 (loaded before this),
    and completed-race results come from the canonical store via module 12
    (12_results_store.js), which populates window.raceResults and calls router().
-   Home surface pins two quick-access cards (current round + latest result)
-   above the full circuit grid, driven by the store's current_round_slug /
-   last_completed_round_slug (window.appDataMeta), with a status-derived fallback.
+   Home surface: a slim header carousel pins TWO condensed race tiles side by
+   side (defaulting to the current round + the next one) flanked by chevrons
+   that page through the calendar two rounds at a time. Each tile is a shortcut
+   into that circuit's breakdown. Full 24-circuit grid still lives below.
    Source assembly order:
      ...TRACK_DATA_ROUNDS_01_03,
      ...TRACK_DATA_ROUNDS_06_09,
@@ -13,7 +14,7 @@
      ...TRACK_DATA_ROUNDS_14_24
  */
 
-const APP_VERSION = "v5.2";
+const APP_VERSION = "v5.3";
 const APP_DATE = "2026-07-10";
 const SEASON = "2026";
 
@@ -38,6 +39,11 @@ let reportTracks = [];
 let raceResults = window.raceResults = window.raceResults || {};
 let historicWinners = window.historicWinners = window.historicWinners || {};
 let appDataMeta = window.appDataMeta = window.appDataMeta || {};
+
+// Carousel window: index (into TRACKS) of the LEFT tile. -1 = not yet set,
+// initialised to the current round on first home render, then persists as the
+// user pages so re-renders (e.g. the store landing) don't snap it back.
+let carouselStart = -1;
 
 const SECCOL = { s1: "var(--s1)", s2: "var(--s2)", s3: "var(--s3)" };
 const SN = { s1: "S1", s2: "S2", s3: "S3" };
@@ -72,8 +78,6 @@ function buildJump() {
 
 function applyData(data) {
  TRACKS = data.tracks || [];
- // keep the live store bindings (module 12 owns these); only adopt inline
- // fallbacks if the store globals are somehow absent.
  raceResults = window.raceResults = window.raceResults || data.raceResults || {};
  historicWinners = window.historicWinners = window.historicWinners || data.historicWinners || {};
  appDataMeta = window.appDataMeta = window.appDataMeta || {};
@@ -117,60 +121,74 @@ function router() {
 
 window.addEventListener("hashchange", router);
 
-/* Resolve which round is "current" (next/active) and which is the most recent
-   completed. Prefer the canonical store meta (window.appDataMeta, filled by
-   module 12); fall back to the inline track statuses so the cards still show
-   even before the store lands or if the meta slugs go missing. */
-function pickCurrentSlug() {
+/* Index of the "current" round: prefer the canonical store meta
+   (window.appDataMeta.current_round_slug, filled by module 12), else the first
+   active round, else the first not-yet-done round, else 0. */
+function currentIndex() {
  const meta = appDataMeta || {};
- if (meta.current_round_slug && bySlug[meta.current_round_slug]) return meta.current_round_slug;
- const active = TRACKS.find(t => t.status === "active");
- if (active) return active.slug;
- // else the first not-yet-done round
- const upcoming = TRACKS.find(t => t.status === "pending");
- return upcoming ? upcoming.slug : null;
-}
-function pickLatestSlug() {
- const meta = appDataMeta || {};
- if (meta.last_completed_round_slug && bySlug[meta.last_completed_round_slug]) return meta.last_completed_round_slug;
- const done = TRACKS.filter(t => t.status === "done");
- return done.length ? done[done.length - 1].slug : null;
+ if (meta.current_round_slug) {
+ const i = TRACKS.findIndex(t => t.slug === meta.current_round_slug);
+ if (i >= 0) return i;
+ }
+ let i = TRACKS.findIndex(t => t.status === "active");
+ if (i >= 0) return i;
+ i = TRACKS.findIndex(t => t.status === "pending");
+ return i >= 0 ? i : 0;
 }
 
-function quickCard(slug, kind) {
- const t = bySlug[slug];
- if (!t) return "";
- const isCurrent = kind === "current";
- const label = isCurrent ? "Current Round" : "Latest Result";
- const accent = isCurrent ? "var(--active)" : "var(--done)";
- const res = (window.raceResults || {})[slug];
- let detail;
- if (!isCurrent && res && res.winner) {
- detail = `<div class="qa-detail"><span class="qa-k">Winner</span><span class="qa-v">${esc(lastName(res.winner))}</span><span class="qa-t">${esc(res.team || "")}</span></div>`;
- } else if (isCurrent) {
- detail = `<div class="qa-detail"><span class="qa-k">Race weekend</span><span class="qa-v">${esc(t.date)} ${SEASON}</span></div>`;
- } else {
- detail = `<div class="qa-detail"><span class="qa-k">Raced</span><span class="qa-v">${esc(t.date)} ${SEASON}</span></div>`;
- }
- return `<button class="qa-card" style="--accent:${accent}" onclick="location.hash='#/${t.slug}'">
- <span class="qa-stripe"></span>
- <div class="qa-top"><span class="qa-eyebrow">${label}</span><span class="qa-rn">R${String(t.round).padStart(2, "0")} <span class="qa-flag">${t.flag}</span></span></div>
- <div class="qa-gp">${esc(t.gp)}</div>
- <div class="qa-circ">${esc(t.title)}</div>
- ${detail}
- <span class="qa-go">${t.report ? "View breakdown" : "Preview"} \u2192</span>
+/* One condensed carousel tile: a shortcut, not the full card. */
+function carouselTile(t) {
+ if (!t) return `<div class="cx-tile cx-empty"></div>`;
+ const chip = t.status === "active"
+ ? '<span class="cx-chip live">Live</span>'
+ : t.status === "done"
+ ? '<span class="cx-chip done">Result</span>'
+ : '<span class="cx-chip soon">Upcoming</span>';
+ const dis = t.report ? "" : " cx-dis";
+ const onclick = t.report ? `onclick="location.hash='#/${t.slug}'"` : "disabled";
+ return `<button class="cx-tile${dis}" ${onclick}>
+ <div class="cx-top"><span class="cx-rn">R${String(t.round).padStart(2, "0")}</span><span class="cx-flag">${t.flag}</span>${chip}</div>
+ <div class="cx-gp">${esc(t.gp)}</div>
+ <div class="cx-meta"><span class="cx-circ">${esc(t.loc)}</span><span class="cx-date">${esc(t.date)}</span></div>
  </button>`;
 }
 
-function quickAccessMarkup() {
- const curSlug = pickCurrentSlug();
- const lastSlug = pickLatestSlug();
- const cards = [
- curSlug ? quickCard(curSlug, "current") : "",
- (lastSlug && lastSlug !== curSlug) ? quickCard(lastSlug, "latest") : ""
- ].filter(Boolean).join("");
- return cards ? `<div class="quick-access">${cards}</div>` : "";
+function carouselMarkup() {
+ const total = TRACKS.length;
+ if (total < 1) return "";
+ if (carouselStart < 0) carouselStart = currentIndex();
+ // clamp so a full pair stays visible
+ const maxStart = Math.max(0, total - 2);
+ if (carouselStart > maxStart) carouselStart = maxStart;
+ if (carouselStart < 0) carouselStart = 0;
+ const start = carouselStart;
+ const pair = [TRACKS[start], TRACKS[start + 1]];
+ const canPrev = start > 0;
+ const canNext = start + 2 < total;
+ const chevL = '<svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+ const chevR = '<svg viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+ return `<div class="cx" role="group" aria-label="Quick race carousel">
+ <button class="cx-nav" aria-label="Previous rounds" ${canPrev ? 'onclick="f1Carousel(-1)"' : "disabled"}>${chevL}</button>
+ <div class="cx-tiles">${carouselTile(pair[0])}${carouselTile(pair[1])}</div>
+ <button class="cx-nav" aria-label="Next rounds" ${canNext ? 'onclick="f1Carousel(1)"' : "disabled"}>${chevR}</button>
+ </div>`;
 }
+
+// Page the carousel window by whole steps of 2 (a fresh pair each tab),
+// clamped, then re-render just the carousel band in place.
+window.f1Carousel = function (dir) {
+ const total = TRACKS.length;
+ const maxStart = Math.max(0, total - 2);
+ let next = carouselStart + dir * 2;
+ if (next < 0) next = 0;
+ if (next > maxStart) next = maxStart;
+ carouselStart = next;
+ const host = document.getElementById("cx-host");
+ if (host) {
+ host.innerHTML = carouselMarkup();
+ if (window.lucide) lucide.createIcons();
+ }
+};
 
 function renderHome() {
  app.innerHTML = `
@@ -180,7 +198,7 @@ function renderHome() {
  <h1>F1 Racetracks</h1>
  <p class="sub">Every 2026 circuit breakdown in one place \u2014 official map, lap profile, tyre strategy, overtaking notes, live weather, and completed-race panels.</p>
  </div>
- ${quickAccessMarkup()}
+ <div id="cx-host">${carouselMarkup()}</div>
  <div class="legend">
  <span class="lg"><span class="d" style="background:var(--done)"></span>Completed race</span>
  <span class="lg"><span class="d" style="background:var(--active)"></span>Race weekend live</span>
