@@ -39,12 +39,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-optical-
 body.locked{overflow:hidden}
 h1,h2,h3{text-wrap:balance}
 svg{display:block}
-.masthead{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);background:var(--surface);flex-shrink:0}
+.masthead{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);background:var(--surface);flex-shrink:0}
 .brand{display:flex;align-items:center;gap:11px;min-width:0}
 .brand .glyph{width:32px;height:32px;border-radius:9px;background:var(--own);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:1.05rem;flex-shrink:0}
 .brand .txt{min-width:0}
 .brand .nm{font-weight:700;font-size:1.02rem;letter-spacing:-0.015em;line-height:1.1;white-space:nowrap}
 .brand .sub{font-family:var(--mono);font-size:0.6rem;color:var(--faint);text-transform:uppercase;letter-spacing:0.13em;white-space:nowrap}
+.app-nav{display:flex;gap:3px;margin-left:8px;padding:3px;background:var(--bg);border:1px solid var(--line);border-radius:9px;flex-shrink:0}
+.app-nav a{font-family:var(--mono);font-size:0.68rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:6px;transition:all .15s var(--e-out);white-space:nowrap}
+.app-nav a:hover{color:var(--ink)}
+.app-nav a[aria-current="page"]{background:var(--own-soft);color:var(--own)}
 .mast-stats{margin-left:auto;display:flex;gap:16px;font-family:var(--mono)}
 .mast-stats .c{display:flex;flex-direction:column;line-height:1.1;text-align:right}
 .mast-stats .n{font-size:1rem;font-weight:600;font-variant-numeric:tabular-nums}
@@ -163,8 +167,9 @@ svg{display:block}
 .rail-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--raised);border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:0.7rem;padding:6px 10px;border-radius:6px;cursor:pointer}
 .mast-stats{gap:12px}.mast-stats .c.known{display:none}.legend{display:none}
 .brand .sub{display:none}
+.app-nav a{padding:5px 9px}
 }
-@media(max-width:480px){.masthead{padding:11px 14px}.deck{padding:14px;gap:14px}:root{--card-w:150px}}
+@media(max-width:480px){.masthead{padding:11px 14px;gap:8px}.deck{padding:14px;gap:14px}:root{--card-w:150px}.brand .txt{display:none}}
 @media(max-width:360px){:root{--card-w:44vw}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 </style>
@@ -174,10 +179,14 @@ svg{display:block}
   <div class="brand">
     <span class="glyph">I</span>
     <div class="txt">
-      <div class="nm">Inciardi Collection</div>
+      <div class="nm">Inciardi</div>
       <div class="sub">Print Registry</div>
     </div>
   </div>
+  <nav class="app-nav" aria-label="Sections">
+    <a href="./">Market</a>
+    <a href="./collection.html" aria-current="page">Collection</a>
+  </nav>
   <div class="mast-stats">
     <div class="c known"><span class="n" id="cKnown">0</span><span class="k">known</span></div>
     <div class="c own"><span class="n" id="cOwn">0</span><span class="k">owned</span></div>
@@ -235,6 +244,7 @@ svg{display:block}
           <div class="note-row"><span class="b"></span><span>Tap a card to <b>catch</b> it (mark as owned). Tap again to release.</span></div>
           <div class="note-row"><span class="b"></span><span>Long-press a card (or shift-tap on desktop) to flag it <b>wanted</b>.</span></div>
           <div class="note-row"><span class="b"></span><span>Owned prints show in full color; everything else is ghosted until you catch it.</span></div>
+          <div class="note-row"><span class="b"></span><span>The <b>Market</b> tab up top switches to the price terminal (deals, sell signals, live eBay).</span></div>
         </div>
       </div>
       <div class="set-block">
@@ -273,8 +283,8 @@ svg{display:block}
 </footer>
 <script>
 const APP_NAME="Inciardi Collection";
-const APP_VERSION="v0.7";
-const APP_PR=143;
+const APP_VERSION="v0.8";
+const APP_PR=144;
 const WORKER="https://inciardi-market.mawizorek-online.workers.dev";
 const WKEY_KEY="inciardi-write-key";
 const SVG={
@@ -300,7 +310,6 @@ let INV=JSON.parse(localStorage.getItem(KEY)||"{}");
 const save=()=>localStorage.setItem(KEY,JSON.stringify(INV));
 let filters={rarity:new Set(),collection:new Set(),subject:new Set()};
 let view="all",query="";
-/* ---------- live sync ---------- */
 function wkey(){return localStorage.getItem(WKEY_KEY)||"";}
 function setSync(s){
   const map={local:"local only",syncing:"syncing\u2026",synced:"synced",error:"offline (cached)",nokey:"set sync key to save"};
