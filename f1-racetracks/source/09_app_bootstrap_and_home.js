@@ -1,21 +1,22 @@
 /* Runtime boot + home surface for the circuit guide.
-   v5.4: data.json is RETIRED. Track data is assembled from the inline
-   TRACK_DATA_ROUNDS_* globals defined by modules 05-08 (loaded before this),
+   v5.5: data.json is RETIRED. Track data is assembled from the inline
+   TRACK_DATA_ROUNDS_* globals defined by modules 05-08c (loaded before this),
    and completed-race results come from the canonical store via module 12
    (12_results_store.js), which populates window.raceResults and calls router().
    Home surface: a slim header carousel pins TWO condensed race tiles side by
    side (defaulting to the current round + the next one) flanked by chevrons.
-   Each chevron advances the window by ONE round (slide: keep a tile, bring in
-   the next), so tabbing feels continuous. Each tile is a shortcut into that
-   circuit's breakdown. Full 24-circuit grid still lives below.
-   Source assembly order:
-     ...TRACK_DATA_ROUNDS_01_03,
-     ...TRACK_DATA_ROUNDS_06_09,
-     ...TRACK_DATA_ROUNDS_10_13,
-     ...TRACK_DATA_ROUNDS_14_24
+   Each chevron advances the window by ONE round (slide, keep one tile). Each
+   tile is a shortcut into that circuit's breakdown. Full 24-circuit grid below.
+   Source assembly order (every 2026 round now a full breakdown):
+     ...TRACK_DATA_ROUNDS_01_03,   // r1-3
+     ...TRACK_DATA_ROUNDS_06_09,   // r6-9
+     ...TRACK_DATA_ROUNDS_10_13,   // r10-13
+     ...TRACK_DATA_ROUNDS_14_24,   // r14-17 (name kept; split point)
+     ...TRACK_DATA_ROUNDS_18_21,   // r18-21 (module 08b)
+     ...TRACK_DATA_ROUNDS_22_24    // r22-24 (module 08c)
  */
 
-const APP_VERSION = "v5.4";
+const APP_VERSION = "v5.5";
 const APP_DATE = "2026-07-10";
 const SEASON = "2026";
 
@@ -98,7 +99,7 @@ function renderDataUnavailable(error) {
  </div>
  <div class="card empty-card">
  <div class="panel-b" style="padding:22px 4px">
- <p class="note">The <code>source/05\u201308_track_data_*.js</code> modules failed to load, so there are no circuits to index. Reload the page; if it persists, the source bundle is incomplete.</p>
+ <p class="note">The <code>source/05\u201308c_track_data_*.js</code> modules failed to load, so there are no circuits to index. Reload the page; if it persists, the source bundle is incomplete.</p>
  </div>
  </div>
  </div>
@@ -244,7 +245,9 @@ jump.addEventListener("change", () => {
  typeof TRACK_DATA_ROUNDS_01_03 !== "undefined" ? TRACK_DATA_ROUNDS_01_03 : [],
  typeof TRACK_DATA_ROUNDS_06_09 !== "undefined" ? TRACK_DATA_ROUNDS_06_09 : [],
  typeof TRACK_DATA_ROUNDS_10_13 !== "undefined" ? TRACK_DATA_ROUNDS_10_13 : [],
- typeof TRACK_DATA_ROUNDS_14_24 !== "undefined" ? TRACK_DATA_ROUNDS_14_24 : []
+ typeof TRACK_DATA_ROUNDS_14_24 !== "undefined" ? TRACK_DATA_ROUNDS_14_24 : [],
+ typeof TRACK_DATA_ROUNDS_18_21 !== "undefined" ? TRACK_DATA_ROUNDS_18_21 : [],
+ typeof TRACK_DATA_ROUNDS_22_24 !== "undefined" ? TRACK_DATA_ROUNDS_22_24 : []
  );
  if (!inline.length) throw new Error("No inline track data present");
  applyData({ tracks: inline, season: Number(SEASON) });
