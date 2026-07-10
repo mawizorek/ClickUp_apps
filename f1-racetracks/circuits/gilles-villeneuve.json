@@ -1,0 +1,22 @@
+{
+ "slug": "gilles-villeneuve", "round": 7, "gp": "Canadian GP", "flag": "🇨🇦", "date": "24 May", "status": "done", "report": true,
+ "title": "Circuit Gilles Villeneuve", "loc": "Montreal", "cc": "CA", "length": "4.361", "turns": 14, "laps": 70, "drsZones": 3, "elev": "~3 m", "topSpeed": "~340", "record": "1:13.078 · BOT ’19",
+ "sub": "A stop-and-go island circuit on the St. Lawrence: long straights, brutal braking into tight chicanes, a famous hairpin, and the unforgiving Wall of Champions on the way home.",
+ "mapFile": "Circuit_Gilles_Villeneuve.svg", "mapTag": "Official layout", "mapCredit": "Will Pittenger / Wikimedia Commons · CC BY-SA",
+ "poleRef": "1:12.000 (Russell ’24)", "lat": 45.5000, "lng": -73.5228, "tz": "America/Toronto",
+ "sessions": [{"date":"2026-05-22","sess":"Fri · Practice"},{"date":"2026-05-23","sess":"Sat · Practice + Qualifying"},{"date":"2026-05-24","sess":"Sun · Grand Prix"}], "elevLabel": "flat · ~3 m", "elevMax": 8, "asl0": 3.2,
+ "profile": [[0,3],[0.1,3.2],[0.2,2.8],[0.3,3.0],[0.4,3.3],[0.5,2.9],[0.6,3.1],[0.7,2.8],[0.8,3.2],[0.9,3.0],[1,3]],
+ "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.66},{"k":"s3","from":0.66,"to":1}],
+ "drs": [{"from":0,"to":0.08,"det":0.90,"label":"DRS 1"},{"from":0.40,"to":0.50,"det":0.34,"label":"DRS 2"},{"from":0.72,"to":0.92,"det":0.62,"label":"DRS 3"}],
+ "marks": [[0.05,"T1–2"],[0.34,"T6–7"],[0.55,"Hairpin"],[0.92,"Wall"]],
+ "sectors": [{"k":"s1","name":"Sector 1","corners":"T1–6 · opening chicanes","time":"22.5","char":"Short straight into the Turn 1-2 chicane, then flowing esses and chicanes along the river."},{"k":"s2","name":"Sector 2","corners":"T7–10 · run to the hairpin","time":"25.5","char":"Quick chicanes, a DRS straight and the heavy stop into the Turn 10 hairpin."},{"k":"s3","name":"Sector 3","corners":"T11–14 · back straight + Wall","time":"24.0","char":"The long back straight, top DRS zone, into the final chicane and the Wall of Champions."}],
+ "pit": [["Pit location","Main straight","between T14 & T1"],["Pit-lane loss","~17 s",""],["Speed limit","60 km/h",""],["Typical stops","1 (SC often forces variation)",""]],
+ "tyres": [["C3","Hard"],["C4","Medium"],["C5","Soft"]], "tyreAlloc": "Softest in the range · C3 / C4 / C5",
+ "strat": [["fav","Favoured","1-stop · Medium → Hard"],["","SC react","Soft → Medium (free stop)"]],
+ "stratNote": "Low grip early and a smooth surface keep wear modest. The hard braking causes graining more than thermal deg, so warm-up and front-locking matter.",
+ "otScore": 4.0, "otWord": "High", "otPct": 80,
+ "spots": [["Final chicane (T13–14)","End of the back straight + DRS, the longest zone. The big braking move into the Wall."],["Hairpin (T10)","Slowest corner on the lap; out-brake on entry, switchback on exit."],["Turn 1 chicane","Off the short main straight + DRS, a tight right-left for early moves."]],
+ "otNote": "Three DRS zones, big braking, and low grip make for plentiful overtaking. The walls punish errors: the Wall of Champions has bitten title winners.",
+ "corners": [["1–2","Virage Senna","s1","Right-left chicane","Tight opening chicane off the short main straight; first-lap flashpoint."],["3–4","Turn 3–4","s1","Chicane","Quick chicane keeping the rhythm along the river."],["5","Turn 5","s1","Left","Short left linking the opening complexes."],["6–7","Turn 6–7","s1","Esses","Flowing esses that flick the car between the walls."],["8–9","Turn 8–9","s2","Chicane","Quick chicane before the run to the hairpin."],["10","L’Épingle (Hairpin)","s2","Slow hairpin","The slowest corner; tight 180° right and a classic overtaking spot."],["11","Turn 11","s3","Exit onto straight","Opens onto the long back straight and top speeds."],["12","Turn 12","s3","Kink","Slight kink at the end of the back straight before braking."],["13–14","Final chicane","s3","Right-left chicane","Heavy braking into the last chicane; the Wall of Champions on the exit."]],
+ "geo": [["waves","Island circuit","Built on Île Notre-Dame, a man-made island in the St. Lawrence created for Expo 67. Pancake-flat, ringed by water and walls."],["construction","Wall of Champions","The exit wall at the final chicane, named after 1999 when Hill, Hakkinen and Villeneuve all hit it. Still claims victims."],["gauge","Stop-and-go power track","Long full-throttle straights into slow chicanes and the hairpin. Hard on brakes and traction; low downforce."],["cloud-rain","Safety-car magnet","Tight walls and low grip mean Montreal almost always throws a safety car. Strategy is built around when."]]
+}

@@ -1,0 +1,30 @@
+{
+  "season": 2026,
+  "version": "2026-07-10",
+  "schema": "Per-circuit store for the circuit-guide lens. Each circuit is its own file in this folder (canonical record for that circuit's breakdown). This index lists display order + the file pointer + the join-by-slug key. The circuit guide fetches this index, then loads each circuit file. Mirrors the f1-results/2026 per-round pattern. Circuit-guide round numbers are the guide's own display numbering and join to the results store BY SLUG, not by round (they differ: e.g. Silverstone is r11 here, r9 in the results store).",
+  "note": "Rounds 4-5 are intentionally unused in the circuit-guide numbering (pre-existing quirk carried over from the inline modules); the calendar is 22 built circuits. Flagged for Michael, not changed in this data-layer refactor.",
+  "circuits": [
+    { "round": 1, "slug": "albert-park", "file": "./albert-park.json" },
+    { "round": 2, "slug": "shanghai", "file": "./shanghai.json" },
+    { "round": 3, "slug": "suzuka", "file": "./suzuka.json" },
+    { "round": 6, "slug": "miami", "file": "./miami.json" },
+    { "round": 7, "slug": "gilles-villeneuve", "file": "./gilles-villeneuve.json" },
+    { "round": 8, "slug": "monaco", "file": "./monaco.json" },
+    { "round": 9, "slug": "catalunya", "file": "./catalunya.json" },
+    { "round": 10, "slug": "red-bull-ring", "file": "./red-bull-ring.json" },
+    { "round": 11, "slug": "silverstone", "file": "./silverstone.json" },
+    { "round": 12, "slug": "spa", "file": "./spa.json" },
+    { "round": 13, "slug": "hungaroring", "file": "./hungaroring.json" },
+    { "round": 14, "slug": "zandvoort", "file": "./zandvoort.json" },
+    { "round": 15, "slug": "monza", "file": "./monza.json" },
+    { "round": 16, "slug": "madring", "file": "./madring.json" },
+    { "round": 17, "slug": "baku", "file": "./baku.json" },
+    { "round": 18, "slug": "marina-bay", "file": "./marina-bay.json" },
+    { "round": 19, "slug": "cota", "file": "./cota.json" },
+    { "round": 20, "slug": "mexico", "file": "./mexico.json" },
+    { "round": 21, "slug": "interlagos", "file": "./interlagos.json" },
+    { "round": 22, "slug": "las-vegas", "file": "./las-vegas.json" },
+    { "round": 23, "slug": "losail", "file": "./losail.json" },
+    { "round": 24, "slug": "yas-marina", "file": "./yas-marina.json" }
+  ]
+}
