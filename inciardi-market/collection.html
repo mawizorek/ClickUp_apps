@@ -1,40 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex">
-<title>Inciardi Collection — Deck</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0d0b">
+<meta name="robots" content="noindex, nofollow">
+<title>Inciardi Collection</title>
+<meta name="description" content="A visual registry of Anastasia Inciardi prints: what exists, what you own, what's listed now.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127912;</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg: oklch(0.16 0.008 70);--surface: oklch(0.205 0.01 70);--raised: oklch(0.245 0.012 70);
-  --line: oklch(0.32 0.012 70);--line-soft: oklch(0.28 0.01 70);
-  --ink: oklch(0.95 0.008 75);--muted: oklch(0.70 0.012 75);--faint: oklch(0.56 0.012 75);
-  --own: oklch(0.70 0.17 38);--own-soft: oklch(0.70 0.17 38 / 0.14);--want: oklch(0.82 0.13 88);
+  --own: oklch(0.70 0.17 38);--own-soft: oklch(0.70 0.17 38 / 0.14);--want: oklch(0.80 0.13 88);
   --r-mini: oklch(0.74 0.05 70);--r-linocut: oklch(0.70 0.12 300);--r-riso: oklch(0.72 0.11 205);
   --r-pack: oklch(0.74 0.12 150);--r-excl: oklch(0.82 0.13 86);
-  --card-w: 156px;
+  --card-w: 158px;
   --mono: "IBM Plex Mono", ui-monospace, monospace;--sans: "Space Grotesk", system-ui, sans-serif;
   --e-out: cubic-bezier(0.22,1,0.36,1);
 }
+html[data-theme="dark"]{
+  --bg: oklch(0.16 0.008 70);--surface: oklch(0.205 0.01 70);--raised: oklch(0.245 0.012 70);
+  --line: oklch(0.32 0.012 70);--line-soft: oklch(0.28 0.01 70);
+  --ink: oklch(0.95 0.008 75);--muted: oklch(0.70 0.012 75);--faint: oklch(0.56 0.012 75);
+  --art-dim: saturate(0.32) brightness(0.66);--scrim: oklch(0.10 0.008 70 / 0.62);
+}
+html[data-theme="light"]{
+  --bg: oklch(0.965 0.006 75);--surface: oklch(0.995 0.003 75);--raised: oklch(0.94 0.008 75);
+  --line: oklch(0.88 0.01 75);--line-soft: oklch(0.92 0.007 75);
+  --ink: oklch(0.26 0.02 60);--muted: oklch(0.46 0.02 60);--faint: oklch(0.58 0.018 60);
+  --own: oklch(0.58 0.19 38);--art-dim: saturate(0.5) brightness(0.94);--scrim: oklch(0.4 0.02 70 / 0.35);
+}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-optical-sizing:auto;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-optical-sizing:auto;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:background .25s var(--e-out),color .25s var(--e-out)}
 body.locked{overflow:hidden}
 h1,h2,h3{text-wrap:balance}
 svg{display:block}
-.masthead{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;padding:14px 20px 12px;border-bottom:1px solid var(--line);background:var(--surface)}
-.wordmark{font-weight:700;font-size:1.15rem;letter-spacing:-0.01em}
-.wordmark b{color:var(--own)}
-.sys{font-family:var(--mono);font-size:0.66rem;color:var(--faint);text-transform:uppercase;letter-spacing:0.14em}
-.counts{margin-left:auto;display:flex;gap:18px;font-family:var(--mono);font-size:0.72rem}
-.counts .c{display:flex;flex-direction:column;line-height:1.15;text-align:right}
-.counts .n{font-size:1.05rem;font-weight:600;font-variant-numeric:tabular-nums}
-.counts .k{font-size:0.58rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--faint)}
-.counts .own .n{color:var(--own)}.counts .want .n{color:var(--want)}
+.masthead{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand .glyph{width:32px;height:32px;border-radius:9px;background:var(--own);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:1.05rem;flex-shrink:0}
+.brand .txt{min-width:0}
+.brand .nm{font-weight:700;font-size:1.02rem;letter-spacing:-0.015em;line-height:1.1;white-space:nowrap}
+.brand .sub{font-family:var(--mono);font-size:0.6rem;color:var(--faint);text-transform:uppercase;letter-spacing:0.13em;white-space:nowrap}
+.mast-stats{margin-left:auto;display:flex;gap:16px;font-family:var(--mono)}
+.mast-stats .c{display:flex;flex-direction:column;line-height:1.1;text-align:right}
+.mast-stats .n{font-size:1rem;font-weight:600;font-variant-numeric:tabular-nums}
+.mast-stats .k{font-size:0.55rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--faint)}
+.mast-stats .own .n{color:var(--own)}.mast-stats .want .n{color:var(--want)}
+.gear{flex-shrink:0;width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;transition:all .15s var(--e-out)}
+.gear:hover{color:var(--ink);border-color:var(--faint)}
 .stage{display:flex;flex:1;min-height:0}
 .rail{width:250px;flex-shrink:0;border-right:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:16px 16px 40px}
 .rail-head{display:none}
@@ -56,7 +72,7 @@ svg{display:block}
 .opt .box{width:13px;height:13px;border:1.5px solid var(--faint);border-radius:3px;flex-shrink:0;display:grid;place-items:center;transition:all .14s var(--e-out)}
 .opt[aria-pressed="true"]{color:var(--ink)}
 .opt[aria-pressed="true"] .box{background:var(--own);border-color:var(--own)}
-.opt[aria-pressed="true"] .box::after{content:"";width:5px;height:8px;border:2px solid var(--bg);border-top:0;border-left:0;transform:rotate(43deg) translateY(-1px)}
+.opt[aria-pressed="true"] .box::after{content:"";width:5px;height:8px;border:2px solid var(--surface);border-top:0;border-left:0;transform:rotate(43deg) translateY(-1px)}
 .opt .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .opt .ct{margin-left:auto;font-family:var(--mono);font-size:0.66rem;color:var(--faint);font-variant-numeric:tabular-nums}
 .deck-wrap{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -73,17 +89,17 @@ svg{display:block}
 .deck{flex:1;overflow-y:auto;padding:18px 20px 60px;display:grid;grid-template-columns:repeat(auto-fill,var(--card-w));justify-content:center;gap:16px;align-content:start}
 .card{width:var(--card-w);position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--surface);cursor:pointer;text-align:left;display:flex;flex-direction:column;transition:transform .18s var(--e-out),border-color .18s,box-shadow .18s;animation:pop .4s var(--e-out) both;animation-delay:calc(var(--i,0)*22ms);-webkit-tap-highlight-color:transparent}
 @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
-.card:hover{transform:translateY(-3px);border-color:var(--faint);box-shadow:0 10px 24px oklch(0 0 0 / 0.35)}
+.card:hover{transform:translateY(-3px);border-color:var(--faint);box-shadow:0 10px 24px oklch(0 0 0 / 0.28)}
 .card:focus-visible{outline:2px solid var(--own);outline-offset:2px}
-.card .art{aspect-ratio:3/4;width:100%;position:relative;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:2rem;color:oklch(0.18 0.01 70);overflow:hidden;filter:saturate(0.32) brightness(0.68);transition:filter .25s var(--e-out)}
+.card .art{height:calc(var(--card-w) * 4 / 3);width:100%;position:relative;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:2rem;color:oklch(0.22 0.02 70);overflow:hidden;filter:var(--art-dim);transition:filter .25s var(--e-out)}
 .card .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .card[data-own="1"] .art{filter:none}
-.card .rar{position:absolute;top:8px;left:8px;width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 2px oklch(0.18 0.01 70 / .5)}
-.card .avail{position:absolute;top:7px;right:8px;font-family:var(--mono);font-size:0.62rem;font-weight:600;background:oklch(0.14 0.01 70 / .86);color:var(--ink);padding:2px 6px;border-radius:5px;display:flex;align-items:center;gap:3px}
+.card .rar{position:absolute;top:8px;left:8px;width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 2px oklch(0.15 0.01 70 / .55)}
+.card .avail{position:absolute;top:7px;right:8px;font-family:var(--mono);font-size:0.62rem;font-weight:600;background:oklch(0.13 0.01 70 / .86);color:oklch(0.95 0.008 75);padding:2px 6px;border-radius:5px;display:flex;align-items:center;gap:3px}
 .card .avail.deal{color:oklch(0.85 0.16 145)}
 .card .want-flag{position:absolute;bottom:8px;right:8px;color:var(--want);opacity:0;transform:scale(.6);transition:all .18s var(--e-out);filter:drop-shadow(0 1px 2px oklch(0 0 0 /.5))}
 .card[data-want="1"] .want-flag{opacity:1;transform:none}
-.card .meta{padding:9px 11px 11px;border-top:1px solid var(--line-soft);background:var(--surface);flex:1;display:flex;flex-direction:column;justify-content:center}
+.card .meta{padding:9px 11px 11px;border-top:1px solid var(--line-soft);background:var(--surface)}
 .card .nm{font-size:0.82rem;font-weight:600;line-height:1.2;letter-spacing:-0.01em;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card .sub{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:0.63rem;color:var(--faint)}
 .card .sub .col{text-transform:uppercase;letter-spacing:0.08em}
@@ -91,50 +107,70 @@ svg{display:block}
 .card .own-ring{position:absolute;inset:0;border:2px solid var(--own);border-radius:11px;pointer-events:none;opacity:0;transition:opacity .2s}
 .card[data-own="1"]{border-color:var(--own)}
 .card[data-own="1"] .own-ring{opacity:1}
-.card .caught{position:absolute;top:7px;right:8px;background:var(--own);color:var(--bg);width:22px;height:22px;border-radius:50%;display:none;place-items:center;box-shadow:0 2px 6px oklch(0 0 0 /.4)}
+.card .caught{position:absolute;top:7px;right:8px;background:var(--own);color:var(--surface);width:22px;height:22px;border-radius:50%;display:none;place-items:center;box-shadow:0 2px 6px oklch(0 0 0 /.4)}
 .card[data-own="1"] .caught{display:grid}
 .card[data-own="1"] .avail{display:none}
 .empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--faint)}
 .empty p{font-family:var(--mono);font-size:0.8rem;line-height:1.6;margin-top:14px}
 .empty b{color:var(--muted)}
-.statusbar{border-top:1px solid var(--line);background:var(--surface);padding:7px 20px;display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:0.64rem;color:var(--faint);letter-spacing:0.04em}
-.statusbar .rec{color:var(--muted);font-variant-numeric:tabular-nums}
-.statusbar .note{margin-left:auto;display:flex;align-items:center;gap:6px}
-.statusbar .blink{width:6px;height:6px;border-radius:50%;background:var(--own);animation:blink 1.8s var(--e-out) infinite}
-@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
-.rail-toggle{display:none}
-.scrim{display:none;position:fixed;inset:0;background:oklch(0.10 0.008 70 / 0.6);z-index:39;opacity:0;transition:opacity .28s var(--e-out)}
+.app-footer{border-top:1px solid var(--line);background:var(--surface)}
+.app-footer .foot-in{padding:9px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:0.66rem;color:var(--faint)}
+.app-footer .foot-sources{display:flex;gap:16px;flex-wrap:wrap}
+.app-footer .foot-sources a{color:var(--muted);text-decoration:none}
+.app-footer .foot-sources a:hover{color:var(--own)}
+.app-footer .foot-stamp{font-variant-numeric:tabular-nums;margin-left:auto;letter-spacing:0.04em}
+.scrim{display:none;position:fixed;inset:0;background:var(--scrim);z-index:39;opacity:0;transition:opacity .28s var(--e-out)}
 .scrim.show{display:block;opacity:1}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(88vw,340px);background:var(--surface);border-left:1px solid var(--line);z-index:41;transform:translateX(100%);transition:transform .3s var(--e-out);display:flex;flex-direction:column;box-shadow:0 0 40px oklch(0 0 0/.4)}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+.drawer-head .t{font-family:var(--mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--faint)}
+.drawer-body{padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:22px}
+.x-btn{background:var(--raised);border:1px solid var(--line);color:var(--ink);width:30px;height:30px;border-radius:7px;display:grid;place-items:center;cursor:pointer}
+.set-block h4{font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--faint);margin-bottom:9px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;background:transparent;border:none;color:var(--muted);font-family:var(--sans);font-size:0.82rem;font-weight:500;padding:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s var(--e-out)}
+.seg button[aria-pressed="true"]{background:var(--own-soft);color:var(--own)}
+.notes{display:flex;flex-direction:column;gap:11px}
+.note-row{display:flex;gap:9px;font-size:0.8rem;color:var(--muted);line-height:1.4}
+.note-row .b{width:6px;height:6px;border-radius:50%;background:var(--own);margin-top:6px;flex-shrink:0}
+.note-row.pending .b{background:var(--want)}
+.rail-toggle{display:none}
 @media(max-width:820px){
 .rail{position:fixed;inset:0 auto 0 0;z-index:40;width:min(84vw,320px);transform:translateX(-100%);transition:transform .3s var(--e-out);box-shadow:0 0 40px oklch(0 0 0/.5)}
 .rail.open{transform:none}
 .rail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .rail-head .t{font-family:var(--mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--faint)}
-.rail-head .x{background:var(--raised);border:1px solid var(--line);color:var(--ink);width:30px;height:30px;border-radius:7px;display:grid;place-items:center;cursor:pointer}
 .rail-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--raised);border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:0.7rem;padding:6px 10px;border-radius:6px;cursor:pointer}
-.counts{gap:12px}.counts .c.known{display:none}.legend{display:none}
-.deck{gap:14px}}
-@media(max-width:480px){.masthead{padding:11px 14px}.deck{padding:14px}:root{--card-w:150px}}
+.mast-stats{gap:12px}.mast-stats .c.known{display:none}.legend{display:none}
+.brand .sub{display:none}
+}
+@media(max-width:480px){.masthead{padding:11px 14px}.deck{padding:14px;gap:14px}:root{--card-w:150px}}
 @media(max-width:360px){:root{--card-w:44vw}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 </style>
 </head>
 <body>
-<div class="masthead">
-  <div>
-    <div class="wordmark">Inciardi<b>·</b>Collection</div>
-    <div class="sys">Print Registry · rev 0.2 · sample market feed</div>
+<header class="masthead">
+  <div class="brand">
+    <span class="glyph">I</span>
+    <div class="txt">
+      <div class="nm">Inciardi Collection</div>
+      <div class="sub">Print Registry</div>
+    </div>
   </div>
-  <div class="counts">
+  <div class="mast-stats">
     <div class="c known"><span class="n" id="cKnown">0</span><span class="k">known</span></div>
     <div class="c own"><span class="n" id="cOwn">0</span><span class="k">owned</span></div>
     <div class="c want"><span class="n" id="cWant">0</span><span class="k">wanted</span></div>
   </div>
-</div>
+  <button class="gear" id="gearBtn" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+</header>
 <div class="stage">
   <aside class="rail" id="rail">
     <div class="rail-head">
       <span class="t">Lenses</span>
-      <button class="x" id="railClose" aria-label="Close filters"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <button class="x-btn" id="railClose" aria-label="Close filters"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
     <div class="search">
       <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
@@ -152,6 +188,37 @@ svg{display:block}
     <div class="facet" data-facet="subject"><h3>Subject <button data-clear="subject">clear</button></h3><div class="opts" id="fSubject"></div></div>
   </aside>
   <div class="scrim" id="scrim"></div>
+  <aside class="drawer" id="drawer" aria-label="Settings">
+    <div class="drawer-head">
+      <span class="t">Settings</span>
+      <button class="x-btn" id="drawerClose" aria-label="Close settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="drawer-body">
+      <div class="set-block">
+        <h4>Theme</h4>
+        <div class="seg" role="group" aria-label="Theme">
+          <button data-theme-set="dark" aria-pressed="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>Dark</button>
+          <button data-theme-set="light" aria-pressed="false"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Light</button>
+        </div>
+      </div>
+      <div class="set-block">
+        <h4>How it works</h4>
+        <div class="notes">
+          <div class="note-row"><span class="b"></span><span>Tap a card to <b>catch</b> it (mark as owned). Tap again to release.</span></div>
+          <div class="note-row"><span class="b"></span><span>Long-press a card (or shift-tap on desktop) to flag it <b>wanted</b>.</span></div>
+          <div class="note-row"><span class="b"></span><span>Owned prints show in full color; everything else is ghosted until you catch it.</span></div>
+        </div>
+      </div>
+      <div class="set-block">
+        <h4>Data status</h4>
+        <div class="notes">
+          <div class="note-row pending"><span class="b"></span><span>Market prices are <b>sample data</b>, not the live eBay feed yet.</span></div>
+          <div class="note-row pending"><span class="b"></span><span>Your collection saves to <b>this device</b> only; not yet synced to the shared database.</span></div>
+          <div class="note-row"><span class="b"></span><span>Catalog is a working seed of <span id="seedN">0</span> prints; the full run is larger and still filling in.</span></div>
+        </div>
+      </div>
+    </div>
+  </aside>
   <section class="deck-wrap">
     <div class="deck-head">
       <button class="rail-toggle" id="railToggle"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M6 12h12M10 18h4"/></svg>Lenses</button>
@@ -165,14 +232,20 @@ svg{display:block}
       </div>
     </div>
     <div class="deck" id="deck"></div>
-    <div class="statusbar">
-      <span class="rec" id="recLine">registry idle</span>
-      <span>tap a card to catch it · shift-tap to want</span>
-      <span class="note"><span class="blink"></span>local session · not yet synced to D1</span>
-    </div>
   </section>
 </div>
+<footer class="app-footer">
+  <div class="foot-in">
+    <nav class="foot-sources" aria-label="Sources">
+      <a href="https://inciardiprints.com" target="_blank" rel="noopener">Inciardi Prints ↗</a>
+    </nav>
+    <span class="foot-stamp" id="footStamp">—</span>
+  </div>
+</footer>
 <script>
+const APP_NAME="Inciardi Collection";
+const APP_VERSION="v0.3";
+const APP_PR=139;
 const SVG={
   check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
   bookmark:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
@@ -189,7 +262,6 @@ const SUB_LABEL={food:"Food",transit:"Transit",place:"Place",art:"Art",character
 const CHIP_HUE={food:35,transit:205,place:150,art:300,character:86,holiday:15,other:70};
 const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 function sampleMarket(id){let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;const listed=h%10<4;const deal=listed&&h%10<1;const price=listed?8+(h%22):null;return{listed,deal,price};}
-// IMAGE SLOT: when real card PNGs exist, drop them at ./cards/<id>.png and this picks them up automatically.
 const IMG_BASE="./cards/";
 const PRINTS=RAW.map(([name,cat,excl,retail,subject])=>{const id=slug(name);return{id,name,category:cat,rarity:RARITY_OF(cat),collection:excl,subject,retail,market:sampleMarket(id),img:IMG_BASE+id+".png"};});
 const KEY="inciardi-deck-v1";
@@ -200,26 +272,46 @@ let view="all",query="";
 function facetCounts(field){const m=new Map();for(const p of PRINTS){const v=p[field];if(!v)continue;m.set(v,(m.get(v)||0)+1);}return m;}
 function renderFacet(elId,field,labelMap,withDot){const el=document.getElementById(elId),counts=facetCounts(field);const keys=[...counts.keys()].sort((a,b)=>counts.get(b)-counts.get(a));el.innerHTML="";for(const k of keys){const o=document.createElement("div");o.className="opt";o.setAttribute("role","button");o.setAttribute("aria-pressed","false");o.dataset.field=field;o.dataset.val=k;const dot=withDot?`<span class="dot" style="background:${RAR_VAR[k]}"></span>`:"";o.innerHTML=`<span class="box"></span>${dot}<span>${(labelMap&&labelMap[k])||k}</span><span class="ct">${counts.get(k)}</span>`;o.addEventListener("click",()=>{const s=filters[field];s.has(k)?s.delete(k):s.add(k);o.setAttribute("aria-pressed",s.has(k));render();});el.appendChild(o);}}
 function pass(p){const st=INV[p.id];if(view==="own"&&st!=="own")return false;if(view==="want"&&st!=="want")return false;if(view==="missing"&&st)return false;if(view==="listed"&&!p.market.listed)return false;if(query&&!p.name.toLowerCase().includes(query))return false;for(const f of ["rarity","collection","subject"]){const s=filters[f];if(s.size&&!s.has(p[f]))return false;}return true;}
-function render(){const deck=document.getElementById("deck");const list=PRINTS.filter(pass);deck.innerHTML="";if(!list.length){deck.innerHTML=`<div class="empty">${SVG.ghost}<p>No prints match these lenses.<br><b>Loosen a filter</b> or clear the search.</p></div>`;}else{list.forEach((p,i)=>deck.appendChild(card(p,i)));}const own=Object.values(INV).filter(v=>v==="own").length;const want=Object.values(INV).filter(v=>v==="want").length;document.getElementById("cKnown").textContent=PRINTS.length;document.getElementById("cOwn").textContent=own;document.getElementById("cWant").textContent=want;document.getElementById("showN").textContent=list.length;document.getElementById("totN").textContent=PRINTS.length;const pct=Math.round(own/PRINTS.length*100);document.getElementById("recLine").textContent=`registry · ${own}/${PRINTS.length} caught (${pct}% of seed catalog)`;renderTags();}
+function render(){const deck=document.getElementById("deck");const list=PRINTS.filter(pass);deck.innerHTML="";if(!list.length){deck.innerHTML=`<div class="empty">${SVG.ghost}<p>No prints match these lenses.<br><b>Loosen a filter</b> or clear the search.</p></div>`;}else{list.forEach((p,i)=>deck.appendChild(card(p,i)));}const own=Object.values(INV).filter(v=>v==="own").length;const want=Object.values(INV).filter(v=>v==="want").length;document.getElementById("cKnown").textContent=PRINTS.length;document.getElementById("cOwn").textContent=own;document.getElementById("cWant").textContent=want;document.getElementById("showN").textContent=list.length;document.getElementById("totN").textContent=PRINTS.length;const sn=document.getElementById("seedN");if(sn)sn.textContent=PRINTS.length;renderTags();}
 function toggle(p,wantMode){if(wantMode){INV[p.id]=INV[p.id]==="want"?undefined:"want";}else{INV[p.id]=INV[p.id]==="own"?undefined:"own";}if(!INV[p.id])delete INV[p.id];save();render();}
-function card(p,i){const b=document.createElement("div");b.className="card";b.setAttribute("role","button");b.tabIndex=0;b.style.setProperty("--i",i%40);const st=INV[p.id];b.dataset.own=st==="own"?1:0;b.dataset.want=st==="want"?1:0;const hue=CHIP_HUE[p.subject]||70;const chipBg=`oklch(0.78 0.12 ${hue})`;const initials=p.name.replace(/[^A-Za-z0-9 ]/g,"").split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();const retail=p.retail?`$${p.retail}`:"exclusive";const col=p.collection?`<span class="col">${COL_LABEL[p.collection]||p.collection}</span>`:`<span class="col">${RAR_LABEL[p.rarity]}</span>`;let avail="";if(p.market.listed){avail=p.market.deal?`<span class="avail deal">${SVG.deal}$${p.market.price}</span>`:`<span class="avail">${SVG.tag}$${p.market.price}</span>`;}const art=`<img src="${p.img}" alt="" loading="lazy" onerror="this.remove()">`;b.innerHTML=`<div class="art" style="background:${chipBg}">${art}<span class="rar" style="background:${RAR_VAR[p.rarity]}"></span><span class="mono-init" aria-hidden="true">${initials}</span>${avail}<span class="caught">${SVG.check}</span><span class="want-flag">${SVG.bookmark}</span></div><div class="meta"><div class="nm">${p.name}</div><div class="sub">${col}<span class="price">${retail}</span></div></div><span class="own-ring"></span>`;b.addEventListener("click",e=>toggle(p,e.shiftKey));b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle(p,e.shiftKey);}});return b;}
+function card(p,i){const b=document.createElement("div");b.className="card";b.setAttribute("role","button");b.tabIndex=0;b.style.setProperty("--i",i%40);const st=INV[p.id];b.dataset.own=st==="own"?1:0;b.dataset.want=st==="want"?1:0;const hue=CHIP_HUE[p.subject]||70;const chipBg=`oklch(0.80 0.11 ${hue})`;const initials=p.name.replace(/[^A-Za-z0-9 ]/g,"").split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();const retail=p.retail?`$${p.retail}`:"exclusive";const col=p.collection?`<span class="col">${COL_LABEL[p.collection]||p.collection}</span>`:`<span class="col">${RAR_LABEL[p.rarity]}</span>`;let avail="";if(p.market.listed){avail=p.market.deal?`<span class="avail deal">${SVG.deal}$${p.market.price}</span>`:`<span class="avail">${SVG.tag}$${p.market.price}</span>`;}const art=`<img src="${p.img}" alt="" loading="lazy" onerror="this.remove()">`;b.innerHTML=`<div class="art" style="background:${chipBg}">${art}<span class="rar" style="background:${RAR_VAR[p.rarity]}"></span><span aria-hidden="true">${initials}</span>${avail}<span class="caught">${SVG.check}</span><span class="want-flag">${SVG.bookmark}</span></div><div class="meta"><div class="nm">${p.name}</div><div class="sub">${col}<span class="price">${retail}</span></div></div><span class="own-ring"></span>`;
+  let lp=null,moved=false;
+  const startLP=()=>{moved=false;lp=setTimeout(()=>{lp=null;toggle(p,true);if(navigator.vibrate)navigator.vibrate(15);},450);};
+  const cancelLP=()=>{if(lp){clearTimeout(lp);lp=null;}};
+  b.addEventListener("touchstart",startLP,{passive:true});
+  b.addEventListener("touchmove",()=>{moved=true;cancelLP();},{passive:true});
+  b.addEventListener("touchend",e=>{if(lp){cancelLP();toggle(p,false);}else{e.preventDefault();}});
+  b.addEventListener("click",e=>{if(e.pointerType==="touch"||moved)return;toggle(p,e.shiftKey);});
+  b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle(p,e.shiftKey);}});
+  return b;}
 function renderTags(){const wrap=document.getElementById("activeTags");wrap.innerHTML="";const add=(field,val,label)=>{const t=document.createElement("span");t.className="tag";t.innerHTML=`${label}<button aria-label="remove">×</button>`;t.querySelector("button").addEventListener("click",()=>{if(field==="view"){setView("all");}else{filters[field].delete(val);syncFacetUI();}render();});wrap.appendChild(t);};if(view!=="all")add("view",view,{own:"Owned",want:"Wanted",missing:"Missing",listed:"Listed now"}[view]);for(const f of ["rarity","collection","subject"])for(const v of filters[f])add(f,v,(f==="collection"?(COL_LABEL[v]||v):f==="rarity"?RAR_LABEL[v]:SUB_LABEL[v]||v));}
 function syncFacetUI(){document.querySelectorAll(".opt").forEach(o=>{o.setAttribute("aria-pressed",filters[o.dataset.field].has(o.dataset.val));});}
 function setView(v){view=v;document.querySelectorAll(".view-chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.view===v));}
 document.querySelectorAll(".view-chip").forEach(c=>c.addEventListener("click",()=>{setView(c.dataset.view);render();}));
 document.getElementById("q").addEventListener("input",e=>{query=e.target.value.trim().toLowerCase();render();});
 document.querySelectorAll("[data-clear]").forEach(btn=>btn.addEventListener("click",()=>{filters[btn.dataset.clear].clear();syncFacetUI();render();}));
-const rail=document.getElementById("rail"),scrim=document.getElementById("scrim");
-function openRail(){rail.classList.add("open");scrim.classList.add("show");document.body.classList.add("locked");}
-function closeRail(){rail.classList.remove("open");scrim.classList.remove("show");document.body.classList.remove("locked");}
+const rail=document.getElementById("rail"),scrim=document.getElementById("scrim"),drawer=document.getElementById("drawer");
+function showScrim(){scrim.classList.add("show");document.body.classList.add("locked");}
+function hideScrimIfIdle(){if(!rail.classList.contains("open")&&!drawer.classList.contains("open")){scrim.classList.remove("show");document.body.classList.remove("locked");}}
+function openRail(){rail.classList.add("open");showScrim();}
+function openDrawer(){drawer.classList.add("open");showScrim();}
+function closeAll(){rail.classList.remove("open");drawer.classList.remove("open");hideScrimIfIdle();}
 document.getElementById("railToggle").addEventListener("click",openRail);
-document.getElementById("railClose").addEventListener("click",closeRail);
-scrim.addEventListener("click",closeRail);
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeRail();});
+document.getElementById("railClose").addEventListener("click",closeAll);
+document.getElementById("gearBtn").addEventListener("click",openDrawer);
+document.getElementById("drawerClose").addEventListener("click",closeAll);
+scrim.addEventListener("click",closeAll);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll();});
+const THEME_KEY="inciardi-theme";
+function setTheme(t){document.documentElement.setAttribute("data-theme",t);localStorage.setItem(THEME_KEY,t);document.querySelectorAll("[data-theme-set]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.themeSet===t));var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute("content",t==="light"?"#f7f5f2":"#0f0d0b");}
+document.querySelectorAll("[data-theme-set]").forEach(b=>b.addEventListener("click",()=>setTheme(b.dataset.themeSet)));
+setTheme(localStorage.getItem(THEME_KEY)||"dark");
+function stampFooter(){var el=document.getElementById("footStamp");if(el)el.textContent=APP_NAME+" "+APP_VERSION+" \u00b7 PR #"+APP_PR;}
 renderFacet("fRarity","rarity",RAR_LABEL,true);
 renderFacet("fCollection","collection",COL_LABEL,false);
 renderFacet("fSubject","subject",SUB_LABEL,false);
 render();
+stampFooter();
 </script>
 </body>
 </html>
