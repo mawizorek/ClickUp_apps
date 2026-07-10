@@ -1,4 +1,4 @@
-/* v5.1 technical index overrides: denser circuit grid + compact cards.
+/* v5.1+ technical index overrides: denser circuit grid + compact cards + header carousel.
    High-specificity (#app / #grid) so these win regardless of the order the
    runtime injects the fetched stylesheets. Loaded last in RUNTIME_STYLE_SOURCES. */
 
@@ -23,79 +23,91 @@
 /* tighten the home masthead so the index is the focus */
 #app .home-h h1 { font-size: clamp(1.7rem, 4.2vw, 2.7rem); }
 #app .home-h .sub { font-size: .96rem; max-width: 60ch; }
-#app .legend { margin: 16px 0 20px; font-size: .78rem; gap: 14px; }
+#app .legend { margin: 14px 0 20px; font-size: .78rem; gap: 14px; }
 
-/* ---- v5.2 quick-access: pinned current-round + latest-result cards ---- */
-#app .quick-access {
- display: grid;
- grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
- gap: 12px;
- margin: 20px 0 4px;
+/* ---- v5.3 header carousel: two condensed tiles flanked by chevrons ---- */
+/* Reads as part of the header: a slim band, tight, mono-accented. Pages the
+   calendar two rounds at a time; default window is current round + next. */
+#app .cx {
+ display: flex;
+ align-items: stretch;
+ gap: 8px;
+ margin: 16px 0 4px;
 }
-#app .qa-card {
+#app .cx-nav {
+ flex: none;
+ width: 34px;
+ align-self: stretch;
+ display: grid;
+ place-items: center;
+ background: var(--surface);
+ border: 1px solid var(--line);
+ border-radius: 9px;
+ color: var(--muted);
+ cursor: pointer;
+ transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease);
+}
+#app .cx-nav:hover:not(:disabled) { background: var(--surface2); color: var(--text); border-color: oklch(45% 0.02 264); }
+#app .cx-nav:disabled { opacity: .32; cursor: default; }
+#app .cx-nav svg { width: 18px; height: 18px; display: block; }
+#app .cx-tiles {
+ flex: 1;
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 8px;
+ min-width: 0;
+}
+#app .cx-tile {
  position: relative;
  display: block;
  text-align: left;
  width: 100%;
+ min-width: 0;
  font: inherit;
  color: inherit;
  cursor: pointer;
- background: linear-gradient(150deg, color-mix(in oklch, var(--accent) 12%, var(--surface)) 0%, var(--surface) 60%);
+ background: var(--surface);
  border: 1px solid var(--line);
- border-radius: 10px;
- padding: 15px 16px 14px 20px;
- overflow: hidden;
- transition: border-color .18s var(--ease), transform .18s var(--ease), background .18s var(--ease);
+ border-radius: 9px;
+ padding: 10px 12px;
+ transition: background .15s var(--ease), border-color .15s var(--ease), transform .15s var(--ease);
 }
-#app .qa-card:hover {
- transform: translateY(-2px);
- border-color: color-mix(in oklch, var(--accent) 55%, var(--line));
-}
-#app .qa-card .qa-stripe {
- position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
- background: var(--accent);
-}
-#app .qa-top {
- display: flex; align-items: center; justify-content: space-between; gap: 10px;
- margin-bottom: 9px;
-}
-#app .qa-eyebrow {
+#app .cx-tile:hover:not(.cx-dis) { background: var(--surface2); border-color: oklch(45% 0.02 264); transform: translateY(-1px); }
+#app .cx-tile.cx-dis { cursor: default; opacity: .6; }
+#app .cx-tile.cx-empty { background: transparent; border-style: dashed; opacity: .4; pointer-events: none; }
+#app .cx-top { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+#app .cx-rn {
  font-family: "IBM Plex Mono", monospace;
- font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
- color: var(--accent); font-weight: 600;
- display: inline-flex; align-items: center; gap: 8px;
+ font-size: .6rem; letter-spacing: .1em; color: var(--faint); font-weight: 600;
 }
-#app .qa-eyebrow::before {
- content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
-}
-#app .qa-rn {
+#app .cx-flag { font-size: .82rem; }
+#app .cx-chip {
+ margin-left: auto;
  font-family: "IBM Plex Mono", monospace;
- font-size: .66rem; letter-spacing: .08em; color: var(--faint);
- display: inline-flex; align-items: center; gap: 6px;
+ font-size: .5rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600;
+ padding: 2px 6px; border-radius: 5px; border: 1px solid var(--line);
 }
-#app .qa-rn .qa-flag { font-size: .9rem; }
-#app .qa-gp {
- font-size: 1.28rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.05;
- margin-bottom: 2px;
+#app .cx-chip.live { color: var(--active); border-color: color-mix(in oklch, var(--active) 45%, var(--line)); }
+#app .cx-chip.done { color: var(--done); border-color: color-mix(in oklch, var(--done) 45%, var(--line)); }
+#app .cx-chip.soon { color: var(--muted); }
+#app .cx-gp {
+ font-size: .95rem; font-weight: 700; letter-spacing: -.01em; line-height: 1.1;
+ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-#app .qa-circ { font-size: .82rem; color: var(--muted); }
-#app .qa-detail {
- display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
- margin: 12px 0 10px;
- padding-top: 11px;
- border-top: 1px solid var(--line);
+#app .cx-meta {
+ display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+ margin-top: 3px;
 }
-#app .qa-detail .qa-k {
+#app .cx-circ { font-size: .74rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#app .cx-date {
+ flex: none;
  font-family: "IBM Plex Mono", monospace;
- font-size: .58rem; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); font-weight: 600;
+ font-size: .64rem; color: var(--faint);
 }
-#app .qa-detail .qa-v { font-size: .96rem; font-weight: 700; }
-#app .qa-detail .qa-t { font-size: .78rem; color: var(--muted); }
-#app .qa-go {
- font-family: "IBM Plex Mono", monospace;
- font-size: .66rem; letter-spacing: .06em; color: var(--accent); font-weight: 600;
- display: inline-block;
-}
-@media (max-width: 560px) {
- #app .quick-access { grid-template-columns: 1fr; }
+@media (max-width: 480px) {
+ /* keep both tiles visible on narrow screens, just tighter */
+ #app .cx { gap: 6px; }
+ #app .cx-nav { width: 28px; }
+ #app .cx-tile { padding: 9px 10px; }
+ #app .cx-gp { font-size: .84rem; }
 }
