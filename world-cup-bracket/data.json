@@ -331,8 +331,8 @@
       "time": "8:00 PM",
       "home": "USA",
       "away": "Belgium",
-      "hs": 4,
-      "as": 1,
+      "hs": 1,
+      "as": 4,
       "winner": "away",
       "venue": "Santa Clara",
       "feedsTo": 26
