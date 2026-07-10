@@ -4,6 +4,52 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
+## Inciardi Market — split index.html into a router shell + market.html
+**Added:** 2026-07-10
+
+### WHAT THIS APP IS
+"Inciardi Market" is a two-part collector tool for Anastasia Inciardi mini prints. Repo `mawizorek/ClickUp_apps`, folder `inciardi-market/`, Pages at https://mawizorek.github.io/ClickUp_apps/inciardi-market/. Two faces of ONE app:
+
+1. **Market terminal** (`index.html` today) — price terminal reading live eBay listings via the Cloudflare Worker. Tabs: Deal Radar, Sell Signal, My Stock, Catalog, Machines, All, Compare. Logic in `app.js`. Surfaces underpriced buys + sell signals on exclusives. Prices from Worker `/market`; `market.json` is the sample fallback. The "should I buy/sell" lens.
+2. **Collection deck** (`collection.html`) — Pokedex-style visual registry of every known print. Fixed-size trading cards, owned = full color, unowned = ghosted. Tap to catch, long-press to want. Stacking lenses (search + views + rarity/collection/subject). Reads/writes inventory live to D1 via the Worker. The "what do I own / what exists" lens.
+
+Three data planes, ONE join key (`print_id`): catalog (D1, ~37 seeded of ~542 known), inventory (D1, print_id-keyed), market (KV snapshot rebuilt each run; trend points distilled into D1).
+
+### THE TASK
+Split `index.html` per the LOCKED index-as-router standard (GitHub MCP Operating Standard). Today `index.html` is a 24KB single-file terminal wired to `app.js` — transitional debt. Convert to:
+- **`market.html`** — the terminal, MOVED verbatim from today's `index.html` (keep the `app.js` wiring; do NOT rewrite the logic).
+- **`index.html`** — a THIN router shell: shared masthead nav (Market / Collection switcher, the component already in `collection.html` v0.8), a one-line default-landing constant, nothing servable itself.
+- **`collection.html`** — switcher already added (v0.8); just confirm its Market link targets `market.html`, not `./`.
+
+END STATE: one app, both-way nav. Market ⇄ Collection from inside either page.
+
+### WHY IT'S A HANDOFF (hard blocker)
+`index.html` (24KB) + `app.js` (21KB) do NOT read back whole through the current tools: blob API truncates `index.html` at ~15KB (cuts mid-CSS at `.sell-flag`), raw fetch flattens markup, `app.js` unreadable so far. Splitting safely REQUIRES a clean full read of both files first (Michael pastes/uploads them, OR a session with working full-file reads). Do NOT blind-write `market.html` from a partial read — breaks the live terminal + violates read-before-write and the "large files never through create_or_update_file" locked rules.
+
+### ALREADY DONE (don't redo)
+- D1 `inciardi-market` created; bindings live: `DB` (D1) + `SNAPSHOTS` (KV).
+- Schema applied: catalog, catalog_alias, inventory, market_point, print_point, gone_event.
+- Worker v0.3 deployed: `GET /market`, `GET/POST /inventory` (setState op), `POST /catalog/confirm`, cron scaffold. Gated by `x-write-key`. Endpoint is `buy/browse/v1` (correct).
+- Collection deck built + live through v0.8: fixed cards, lenses, D1 sync, sync-key in Settings, Market/Collection switcher.
+- Catalog seed (37 prints) in `db/seed-catalog.sql`.
+
+### OPEN LOOPS (after the split)
+- **$0.00 / -100% price-parse bug on Deal Radar** — live terminal shows listings with no price parsed (screenshot 2026-07-10). Fix the Worker/app price extraction so real landed prices render.
+- eBay Cert ID rotation (treat as exposed).
+- Cron trigger not attached yet (~6h) — no trend history accumulates until it is.
+- Real catalog: ~37 seeded of ~542 known. Grow via `/catalog/confirm` + research passes. Full 542 list is NOT publicly harvestable (lives in miniprint.io's app) — do NOT fabricate names.
+- Real card images: drop PNGs at `inciardi-market/cards/<print_id>.png`, deck auto-loads them.
+- Live per-card eBay prices on the deck (currently labelled sample data).
+
+### STANDARDS (non-negotiable)
+- PR-merge workflow: branch → PR → self-merge. Never direct to main.
+- Read via blob API first; re-fetch fresh before any write; never reuse a carried SHA.
+- `.nojekyll` stays at repo root. Footer = JS-written stamp `<App> v<N> · PR #<n>`.
+- Secrets (WRITE_KEY, eBay keys) stay Worker-side / device-side, NEVER in the repo.
+- Read the session board before touching the repo; clear your entry on close.
+
+---
+
 ## F1 Racetracks — data layer refactor follow-ups
 **Added:** 2026-07-09
 
