@@ -1,0 +1,26 @@
+/* v5.1 technical index overrides: denser circuit grid + compact cards.
+   High-specificity (#app / #grid) so these win regardless of the order the
+   runtime injects the fetched stylesheets. Loaded last in RUNTIME_STYLE_SOURCES. */
+
+/* denser grid: more circuits per row, tighter gutters */
+#app #grid { grid-template-columns: repeat(auto-fill, minmax(186px, 1fr)); gap: 10px; }
+
+/* compact cards */
+#app button.race { padding: 11px 12px; border-radius: 8px; }
+#app button.race:hover { transform: translateY(-1px); }
+#app .race .rd { font-size: .58rem; letter-spacing: .12em; }
+#app .race .flag { font-size: .84rem; }
+#app .race .gp { font-size: .9rem; margin: 7px 0 1px; line-height: 1.12; }
+#app .race .circ { font-size: .76rem; }
+#app .race .foot { margin-top: 9px; padding-top: 8px; }
+#app .race .date { font-size: .66rem; }
+#app .race .badge { font-size: .55rem; padding: 2px 6px; }
+#app .race .status-stripe { top: 12px; bottom: 12px; width: 2px; }
+
+/* technical accent: monospace round label sits on its own hairline row */
+#app .race .rd { padding-bottom: 8px; margin-bottom: 2px; border-bottom: 1px solid var(--line); }
+
+/* tighten the home masthead so the index is the focus */
+#app .home-h h1 { font-size: clamp(1.7rem, 4.2vw, 2.7rem); }
+#app .home-h .sub { font-size: .96rem; max-width: 60ch; }
+#app .legend { margin: 16px 0 20px; font-size: .78rem; gap: 14px; }
