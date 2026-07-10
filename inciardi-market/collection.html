@@ -14,6 +14,7 @@
 <style>
 :root{
   --own: oklch(0.70 0.17 38);--own-soft: oklch(0.70 0.17 38 / 0.14);--want: oklch(0.80 0.13 88);
+  --ok: oklch(0.80 0.14 150);
   --r-mini: oklch(0.74 0.05 70);--r-linocut: oklch(0.70 0.12 300);--r-riso: oklch(0.72 0.11 205);
   --r-pack: oklch(0.74 0.12 150);--r-excl: oklch(0.82 0.13 86);
   --card-w: 158px;
@@ -49,8 +50,12 @@ svg{display:block}
 .mast-stats .n{font-size:1rem;font-weight:600;font-variant-numeric:tabular-nums}
 .mast-stats .k{font-size:0.55rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--faint)}
 .mast-stats .own .n{color:var(--own)}.mast-stats .want .n{color:var(--want)}
-.gear{flex-shrink:0;width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;transition:all .15s var(--e-out)}
+.gear{flex-shrink:0;width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;transition:all .15s var(--e-out);position:relative}
 .gear:hover{color:var(--ink);border-color:var(--faint)}
+.gear .dot{position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;border:2px solid var(--surface);background:var(--faint);transition:background .2s}
+.gear .dot[data-s="synced"]{background:var(--ok)}
+.gear .dot[data-s="syncing"]{background:var(--want)}
+.gear .dot[data-s="error"],.gear .dot[data-s="nokey"]{background:var(--own)}
 .stage{display:flex;flex:1;min-height:0}
 .rail{width:250px;flex-shrink:0;border-right:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:16px 16px 40px}
 .rail-head{display:none}
@@ -118,9 +123,14 @@ svg{display:block}
 .empty b{color:var(--muted)}
 .app-footer{border-top:1px solid var(--line);background:var(--surface);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
 .app-footer .foot-in{padding:4px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--mono);font-size:0.62rem;color:var(--faint)}
-.app-footer .foot-sources{display:flex;gap:16px}
+.app-footer .foot-sources{display:flex;gap:14px;align-items:center}
 .app-footer .foot-sources a{color:var(--muted);text-decoration:none}
 .app-footer .foot-sources a:hover{color:var(--own)}
+.app-footer .foot-sync{display:flex;align-items:center;gap:5px}
+.app-footer .foot-sync .d{width:6px;height:6px;border-radius:50%;background:var(--faint);transition:background .2s}
+.app-footer .foot-sync .d[data-s="synced"]{background:var(--ok)}
+.app-footer .foot-sync .d[data-s="syncing"]{background:var(--want)}
+.app-footer .foot-sync .d[data-s="error"],.app-footer .foot-sync .d[data-s="nokey"]{background:var(--own)}
 .app-footer .foot-stamp{font-variant-numeric:tabular-nums;margin-left:auto;letter-spacing:0.04em;white-space:nowrap}
 .scrim{display:none;position:fixed;inset:0;background:var(--scrim);z-index:39;opacity:0;transition:opacity .28s var(--e-out)}
 .scrim.show{display:block;opacity:1}
@@ -131,6 +141,12 @@ svg{display:block}
 .drawer-body{padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:22px}
 .x-btn{background:var(--raised);border:1px solid var(--line);color:var(--ink);width:30px;height:30px;border-radius:7px;display:grid;place-items:center;cursor:pointer}
 .set-block h4{font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--faint);margin-bottom:9px}
+.set-block .hint{font-size:0.75rem;color:var(--faint);line-height:1.45;margin-bottom:10px}
+.keyrow{display:flex;gap:8px}
+.keyrow input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:0.8rem;padding:8px 10px;border-radius:7px;outline:none}
+.keyrow input:focus-visible{border-color:var(--own)}
+.keyrow button{background:var(--own-soft);border:1px solid var(--own);color:var(--own);font-family:var(--sans);font-weight:600;font-size:0.8rem;padding:0 14px;border-radius:7px;cursor:pointer}
+.keystate{font-family:var(--mono);font-size:0.68rem;margin-top:8px;color:var(--faint)}
 .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg button{flex:1;background:transparent;border:none;color:var(--muted);font-family:var(--sans);font-size:0.82rem;font-weight:500;padding:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s var(--e-out)}
 .seg button[aria-pressed="true"]{background:var(--own-soft);color:var(--own)}
@@ -167,7 +183,7 @@ svg{display:block}
     <div class="c own"><span class="n" id="cOwn">0</span><span class="k">owned</span></div>
     <div class="c want"><span class="n" id="cWant">0</span><span class="k">wanted</span></div>
   </div>
-  <button class="gear" id="gearBtn" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  <button class="gear" id="gearBtn" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="dot" id="gearDot" data-s="local"></span></button>
 </header>
 <div class="stage">
   <aside class="rail" id="rail">
@@ -198,6 +214,15 @@ svg{display:block}
     </div>
     <div class="drawer-body">
       <div class="set-block">
+        <h4>Live sync</h4>
+        <p class="hint">Paste your sync key to save this collection to the shared database and keep every device in step. Stored on this device only.</p>
+        <div class="keyrow">
+          <input id="wkey" type="password" placeholder="sync key" autocomplete="off" spellcheck="false">
+          <button id="wkeySave">Save</button>
+        </div>
+        <div class="keystate" id="keyState">no key set — changes stay on this device</div>
+      </div>
+      <div class="set-block">
         <h4>Theme</h4>
         <div class="seg" role="group" aria-label="Theme">
           <button data-theme-set="dark" aria-pressed="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>Dark</button>
@@ -216,7 +241,7 @@ svg{display:block}
         <h4>Data status</h4>
         <div class="notes">
           <div class="note-row pending"><span class="b"></span><span>Market prices are <b>sample data</b>, not the live eBay feed yet.</span></div>
-          <div class="note-row pending"><span class="b"></span><span>Your collection saves to <b>this device</b> only; not yet synced to the shared database.</span></div>
+          <div class="note-row"><span class="b"></span><span>With a sync key set, your collection lives in the <b>shared database</b> and syncs across devices. Without one, it stays on this device.</span></div>
           <div class="note-row"><span class="b"></span><span>Catalog is a working seed of <span id="seedN">0</span> prints; the full run is larger and still filling in.</span></div>
         </div>
       </div>
@@ -241,14 +266,17 @@ svg{display:block}
   <div class="foot-in">
     <nav class="foot-sources" aria-label="Sources">
       <a href="https://inciardiprints.com" target="_blank" rel="noopener">Inciardi Prints ↗</a>
+      <span class="foot-sync"><span class="d" id="syncDot" data-s="local"></span><span id="syncStat">local only</span></span>
     </nav>
     <span class="foot-stamp" id="footStamp">—</span>
   </div>
 </footer>
 <script>
 const APP_NAME="Inciardi Collection";
-const APP_VERSION="v0.6";
-const APP_PR=142;
+const APP_VERSION="v0.7";
+const APP_PR=143;
+const WORKER="https://inciardi-market.mawizorek-online.workers.dev";
+const WKEY_KEY="inciardi-write-key";
 const SVG={
   check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
   bookmark:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
@@ -272,13 +300,45 @@ let INV=JSON.parse(localStorage.getItem(KEY)||"{}");
 const save=()=>localStorage.setItem(KEY,JSON.stringify(INV));
 let filters={rarity:new Set(),collection:new Set(),subject:new Set()};
 let view="all",query="";
+/* ---------- live sync ---------- */
+function wkey(){return localStorage.getItem(WKEY_KEY)||"";}
+function setSync(s){
+  const map={local:"local only",syncing:"syncing\u2026",synced:"synced",error:"offline (cached)",nokey:"set sync key to save"};
+  const dot=document.getElementById("syncDot"),stat=document.getElementById("syncStat"),gd=document.getElementById("gearDot");
+  if(dot)dot.dataset.s=s;if(gd)gd.dataset.s=s;if(stat)stat.textContent=map[s]||map.local;
+}
+function refreshKeyState(){
+  const el=document.getElementById("keyState");if(!el)return;
+  if(wkey()){el.textContent="key set \u2014 changes save to the shared database";el.style.color="var(--ok)";}
+  else{el.textContent="no key set \u2014 changes stay on this device";el.style.color="var(--faint)";}
+}
+async function loadRemote(){
+  try{
+    setSync("syncing");
+    const r=await fetch(WORKER+"/inventory",{cache:"no-store"});
+    if(!r.ok)throw 0;
+    const data=await r.json();
+    const next={};
+    (data.inventory||[]).forEach(row=>{if(row.print_id&&row.disposition)next[row.print_id]=row.disposition;});
+    INV=next;save();render();
+    setSync(wkey()?"synced":"nokey");
+  }catch(e){setSync(wkey()?"error":"local");}
+}
+function pushRemote(printId,disposition){
+  const k=wkey();
+  if(!k){setSync("nokey");return;}
+  setSync("syncing");
+  fetch(WORKER+"/inventory",{method:"POST",headers:{"Content-Type":"application/json","x-write-key":k},body:JSON.stringify({op:"setState",print_id:printId,disposition:disposition||null})})
+    .then(r=>{if(!r.ok)throw 0;setSync("synced");})
+    .catch(()=>setSync("error"));
+}
 function facetCounts(field){const m=new Map();for(const p of PRINTS){const v=p[field];if(!v)continue;m.set(v,(m.get(v)||0)+1);}return m;}
 function renderFacet(elId,field,labelMap,withDot){const el=document.getElementById(elId),counts=facetCounts(field);const keys=[...counts.keys()].sort((a,b)=>counts.get(b)-counts.get(a));el.innerHTML="";for(const k of keys){const o=document.createElement("div");o.className="opt";o.setAttribute("role","button");o.setAttribute("aria-pressed","false");o.dataset.field=field;o.dataset.val=k;const dot=withDot?`<span class="dot" style="background:${RAR_VAR[k]}"></span>`:"";o.innerHTML=`<span class="box"></span>${dot}<span>${(labelMap&&labelMap[k])||k}</span><span class="ct">${counts.get(k)}</span>`;o.addEventListener("click",()=>{const s=filters[field];s.has(k)?s.delete(k):s.add(k);o.setAttribute("aria-pressed",s.has(k));render();});el.appendChild(o);}}
 function pass(p){const st=INV[p.id];if(view==="own"&&st!=="own")return false;if(view==="want"&&st!=="want")return false;if(view==="missing"&&st)return false;if(view==="listed"&&!p.market.listed)return false;if(query&&!p.name.toLowerCase().includes(query))return false;for(const f of ["rarity","collection","subject"]){const s=filters[f];if(s.size&&!s.has(p[f]))return false;}return true;}
 function applyState(el,p){const st=INV[p.id];el.dataset.own=st==="own"?1:0;el.dataset.want=st==="want"?1:0;}
 function updateCounts(){const own=Object.values(INV).filter(v=>v==="own").length;const want=Object.values(INV).filter(v=>v==="want").length;document.getElementById("cKnown").textContent=PRINTS.length;document.getElementById("cOwn").textContent=own;document.getElementById("cWant").textContent=want;const sn=document.getElementById("seedN");if(sn)sn.textContent=PRINTS.length;const showEl=document.getElementById("showN");if(showEl)showEl.textContent=document.querySelectorAll(".card:not(.leaving)").length;}
 function render(){const deck=document.getElementById("deck");const list=PRINTS.filter(pass);deck.classList.add("intro");deck.innerHTML="";if(!list.length){deck.innerHTML=`<div class="empty">${SVG.ghost}<p>No prints match these lenses.<br><b>Loosen a filter</b> or clear the search.</p></div>`;}else{list.forEach((p,i)=>deck.appendChild(card(p,i)));}document.getElementById("showN").textContent=list.length;document.getElementById("totN").textContent=PRINTS.length;updateCounts();renderTags();setTimeout(()=>deck.classList.remove("intro"),900);}
-function toggle(p,el,wantMode){if(wantMode){INV[p.id]=INV[p.id]==="want"?undefined:"want";}else{INV[p.id]=INV[p.id]==="own"?undefined:"own";}if(!INV[p.id])delete INV[p.id];save();applyState(el,p);updateCounts();if(!pass(p)){el.classList.add("leaving");setTimeout(()=>{el.remove();updateCounts();if(!document.querySelector(".card")){render();}},210);}}
+function toggle(p,el,wantMode){if(wantMode){INV[p.id]=INV[p.id]==="want"?undefined:"want";}else{INV[p.id]=INV[p.id]==="own"?undefined:"own";}if(!INV[p.id])delete INV[p.id];save();applyState(el,p);updateCounts();pushRemote(p.id,INV[p.id]||null);if(!pass(p)){el.classList.add("leaving");setTimeout(()=>{el.remove();updateCounts();if(!document.querySelector(".card")){render();}},210);}}
 function card(p,i){const b=document.createElement("div");b.className="card";b.setAttribute("role","button");b.tabIndex=0;b.style.setProperty("--i",i%40);applyState(b,p);const hue=CHIP_HUE[p.subject]||70;const chipBg=`oklch(0.80 0.11 ${hue})`;const initials=p.name.replace(/[^A-Za-z0-9 ]/g,"").split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();const retail=p.retail?`$${p.retail}`:"exclusive";const col=p.collection?`<span class="col">${COL_LABEL[p.collection]||p.collection}</span>`:`<span class="col">${RAR_LABEL[p.rarity]}</span>`;let avail="";if(p.market.listed){avail=p.market.deal?`<span class="avail deal">${SVG.deal}$${p.market.price}</span>`:`<span class="avail">${SVG.tag}$${p.market.price}</span>`;}const art=`<img src="${p.img}" alt="" loading="lazy" onerror="this.remove()">`;b.innerHTML=`<div class="art" style="background:${chipBg}">${art}<span class="rar" style="background:${RAR_VAR[p.rarity]}"></span><span class="glyph-ph" aria-hidden="true">${initials}</span>${avail}<span class="caught">${SVG.check}</span><span class="want-flag">${SVG.bookmark}</span></div><div class="meta"><div class="nm">${p.name}</div><div class="sub">${col}<span class="price">${retail}</span></div></div><span class="own-ring"></span>`;
   let lp=null,moved=false,touched=false;
   const startLP=()=>{moved=false;touched=true;lp=setTimeout(()=>{lp=null;toggle(p,b,true);if(navigator.vibrate)navigator.vibrate(15);},450);};
@@ -307,6 +367,9 @@ document.getElementById("gearBtn").addEventListener("click",openDrawer);
 document.getElementById("drawerClose").addEventListener("click",closeAll);
 scrim.addEventListener("click",closeAll);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll();});
+const wkeyInput=document.getElementById("wkey");
+if(wkey())wkeyInput.value=wkey();
+document.getElementById("wkeySave").addEventListener("click",()=>{const v=wkeyInput.value.trim();if(v)localStorage.setItem(WKEY_KEY,v);else localStorage.removeItem(WKEY_KEY);refreshKeyState();loadRemote();});
 const THEME_KEY="inciardi-theme";
 function setTheme(t){document.documentElement.setAttribute("data-theme",t);localStorage.setItem(THEME_KEY,t);document.querySelectorAll("[data-theme-set]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.themeSet===t));var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute("content",t==="light"?"#f7f5f2":"#0f0d0b");}
 document.querySelectorAll("[data-theme-set]").forEach(b=>b.addEventListener("click",()=>setTheme(b.dataset.themeSet)));
@@ -317,6 +380,9 @@ renderFacet("fCollection","collection",COL_LABEL,false);
 renderFacet("fSubject","subject",SUB_LABEL,false);
 render();
 stampFooter();
+refreshKeyState();
+setSync(wkey()?"syncing":"local");
+loadRemote();
 </script>
 </body>
 </html>
