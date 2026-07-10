@@ -1,10 +1,10 @@
 /**
- * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0.2)
+ * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0.3)
  *
  * Reads live eBay listings (Browse API), diffs vs the KV snapshot, and
- * serves market.json on GET /market. NEW in v0.2:
+ * serves market.json on GET /market.
  *   - GET  /inventory        — read the collection (D1, joined to catalog)
- *   - POST /inventory         — upsert/delete an inventory row (GATED)
+ *   - POST /inventory         — upsert/delete/setState an inventory row (GATED)
  *   - POST /catalog/confirm   — promote a spotted print into the catalog (GATED)
  *   - scheduled() cron        — distills trend points into D1 each run
  *
@@ -16,15 +16,14 @@
  * Secrets:  EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY (gate for POST routes).
  *
  * WRITE GATE: reads are open; every POST requires header 'x-write-key' to match
- * env.WRITE_KEY. This is an INTEGRITY gate (stop public vandalism), not privacy
- * — the data is non-sensitive by design.
+ * env.WRITE_KEY. Integrity gate (stop public vandalism), not privacy.
  *
  * NOTE: deploy target. NOT served by GitHub Pages.
  */
 
 const SEARCH_QUERY = "inciardi mini print";
 const MARKETPLACE = "EBAY_US";
-const RETAIL_DEFAULT = 14; // USD cold-start baseline until rolling market price exists
+const RETAIL_DEFAULT = 14;
 const UNDERPRICED_PCT = 0.85;
 const EXCLUSIVE_TOKENS = ["nyc", "lacma", "grand central", "holiday", "exclusive"];
 const PACK_TOKENS = ["pack", "set", "lot", "bundle"];
@@ -62,7 +61,6 @@ export default {
  }
  },
 
- // Cron: refresh the KV snapshot AND distill trend points into D1.
  async scheduled(_event, env, ctx) {
  ctx.waitUntil(runCron(env).catch((e) => console.error("cron", e)));
  },
@@ -75,7 +73,6 @@ function json(obj, status = 200) {
  });
 }
 
-// Integrity gate for write routes. Throws 401 unless the shared key matches.
 function gate(request, env) {
  const supplied = request.headers.get("x-write-key");
  if (!env.WRITE_KEY || supplied !== env.WRITE_KEY) {
@@ -153,7 +150,6 @@ function shipCost(opts) {
  return c ? num(c.value) : 0;
 }
 
-// Fuzzy print identity from the title. matched:false when unresolved.
 function parsePrint(title) {
  const t = title.toLowerCase();
  const exclusive = EXCLUSIVE_TOKENS.find((k) => t.includes(k)) || null;
@@ -228,14 +224,9 @@ function flagsFor(l) {
 
 /* ---------- D1: catalog matching ---------- */
 
-// Load catalog + aliases once, return a resolver(title) -> print_id | null.
 async function catalogResolver(env) {
- const cat = await env.DB.prepare(
- "SELECT print_id, title FROM catalog"
- ).all();
- const aliases = await env.DB.prepare(
- "SELECT print_id, alias FROM catalog_alias"
- ).all();
+ const cat = await env.DB.prepare("SELECT print_id, title FROM catalog").all();
+ const aliases = await env.DB.prepare("SELECT print_id, alias FROM catalog_alias").all();
  const rows = (cat.results || []).map((r) => ({
  printId: r.print_id, needle: String(r.title || "").toLowerCase(),
  }));
@@ -257,22 +248,16 @@ async function runCron(env) {
  const payload = await buildMarket(env);
  const now = new Date().toISOString();
  const resolve = await catalogResolver(env);
-
  const live = payload.listings.filter((l) => l.status !== "gone");
  const goneNow = payload.listings.filter((l) => l.status === "gone");
 
- // 1) general market point
  const landeds = live.map((l) => l.landed).filter((n) => n > 0);
  const packs = live.filter((l) => (l.flags || []).includes("pack-deal")).length;
  const excl = live.filter((l) => (l.flags || []).includes("exclusive")).length;
  await env.DB.prepare(
  "INSERT INTO market_point (captured_at,total_listings,median_landed,avg_landed,min_landed,max_landed,singles_count,packs_count,exclusives_count) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9)"
- ).bind(
- now, live.length, median(landeds), avg(landeds), min(landeds), max(landeds),
- live.length - packs, packs, excl
- ).run();
+ ).bind(now, live.length, median(landeds), avg(landeds), min(landeds), max(landeds), live.length - packs, packs, excl).run();
 
- // 2) per-print points (group live listings by resolved print_id)
  const byPrint = new Map();
  for (const l of live) {
  const pid = resolve(l.title);
@@ -287,13 +272,11 @@ async function runCron(env) {
  ).bind(pid, now, arr.length, min(nums), median(nums), max(nums)).run();
  }
 
- // 3) gone events (free sold-price proxy: last landed before it vanished)
  for (const g of goneNow) {
  await env.DB.prepare(
  "INSERT INTO gone_event (print_id,item_id,last_landed,gone_at) VALUES (?1,?2,?3,?4)"
  ).bind(resolve(g.title), g.itemId || null, g.landed || null, now).run();
  }
-
  return { ok: true, capturedAt: now, prints: byPrint.size, gone: goneNow.length };
 }
 
@@ -310,12 +293,24 @@ async function readInventory(env) {
  return { count: (res.results || []).length, inventory: res.results || [] };
 }
 
-// Body: { op:'upsert'|'delete', inv_id?, print_id?, provisional_label?,
-//         disposition?, qty?, condition?, acquired_price?, acquired_where?,
-//         acquired_at?, notes? }
+// Body ops:
+//   { op:'setState', print_id, disposition }  -> one row per print; disposition null clears it.
+//   { op:'delete', inv_id }
+//   { op:'upsert', inv_id?, print_id?, provisional_label?, disposition?, qty?, ... }
 async function writeInventory(env, body) {
  const op = (body && body.op) || "upsert";
  const now = new Date().toISOString();
+
+ if (op === "setState") {
+ if (!body.print_id) throw new Error("setState requires print_id");
+ await env.DB.prepare("DELETE FROM inventory WHERE print_id = ?1").bind(body.print_id).run();
+ if (body.disposition) {
+ await env.DB.prepare(
+ "INSERT INTO inventory (print_id, disposition, qty, created_at, updated_at) VALUES (?1,?2,1,?3,?3)"
+ ).bind(body.print_id, body.disposition, now).run();
+ }
+ return { ok: true, print_id: body.print_id, disposition: body.disposition || null };
+ }
 
  if (op === "delete") {
  if (!body.inv_id) throw new Error("delete requires inv_id");
@@ -340,10 +335,7 @@ async function writeInventory(env, body) {
  "UPDATE inventory SET print_id=?1, provisional_label=?2, disposition=?3, qty=?4, " +
  "condition=?5, acquired_price=?6, acquired_where=?7, acquired_at=?8, notes=?9, " +
  "updated_at=?10 WHERE inv_id=?11"
- ).bind(
- f.print_id, f.provisional_label, f.disposition, f.qty, f.condition,
- f.acquired_price, f.acquired_where, f.acquired_at, f.notes, now, body.inv_id
- ).run();
+ ).bind(f.print_id, f.provisional_label, f.disposition, f.qty, f.condition, f.acquired_price, f.acquired_where, f.acquired_at, f.notes, now, body.inv_id).run();
  return { ok: true, updated: body.inv_id };
  }
 
@@ -351,21 +343,14 @@ async function writeInventory(env, body) {
  "INSERT INTO inventory (print_id, provisional_label, disposition, qty, condition, " +
  "acquired_price, acquired_where, acquired_at, notes, created_at, updated_at) " +
  "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?10)"
- ).bind(
- f.print_id, f.provisional_label, f.disposition, f.qty, f.condition,
- f.acquired_price, f.acquired_where, f.acquired_at, f.notes, now
- ).run();
+ ).bind(f.print_id, f.provisional_label, f.disposition, f.qty, f.condition, f.acquired_price, f.acquired_where, f.acquired_at, f.notes, now).run();
  return { ok: true, inserted: ins.meta && ins.meta.last_row_id };
 }
 
 /* ---------- D1: catalog confirm (promote a spotted print) ---------- */
 
-// Body: { print_id, title, series?, year?, exclusive?, retail?, status?,
-//         image?, source_url?, source?, alias? }
 async function confirmCatalog(env, body) {
- if (!body || !body.print_id || !body.title) {
- throw new Error("confirm requires print_id and title");
- }
+ if (!body || !body.print_id || !body.title) throw new Error("confirm requires print_id and title");
  const now = new Date().toISOString();
  await env.DB.prepare(
  "INSERT INTO catalog (print_id,title,series,year,exclusive,retail,status,image,source_url,source,notes,created_at,updated_at) " +
@@ -374,17 +359,9 @@ async function confirmCatalog(env, body) {
  "year=excluded.year, exclusive=excluded.exclusive, retail=excluded.retail, " +
  "status=excluded.status, image=excluded.image, source_url=excluded.source_url, " +
  "source=excluded.source, updated_at=excluded.updated_at"
- ).bind(
- body.print_id, body.title, body.series ?? null, body.year ?? null,
- body.exclusive ? 1 : 0, body.retail ?? null, body.status || "unknown",
- body.image ?? null, body.source_url ?? null, body.source || "ebay-confirm",
- body.notes ?? null, now
- ).run();
-
+ ).bind(body.print_id, body.title, body.series ?? null, body.year ?? null, body.exclusive ? 1 : 0, body.retail ?? null, body.status || "unknown", body.image ?? null, body.source_url ?? null, body.source || "ebay-confirm", body.notes ?? null, now).run();
  if (body.alias) {
- await env.DB.prepare(
- "INSERT OR IGNORE INTO catalog_alias (print_id, alias) VALUES (?1, ?2)"
- ).bind(body.print_id, String(body.alias).toLowerCase()).run();
+ await env.DB.prepare("INSERT OR IGNORE INTO catalog_alias (print_id, alias) VALUES (?1, ?2)").bind(body.print_id, String(body.alias).toLowerCase()).run();
  }
  return { ok: true, print_id: body.print_id };
 }
