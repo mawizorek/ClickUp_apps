@@ -14,7 +14,7 @@
       "hs": 1,
       "as": 0,
       "winner": "home",
-      "venue": "Houston",
+      "venue": "SoFi Stadium, Inglewood, CA",
       "feedsTo": 9
     },
     {
@@ -29,7 +29,7 @@
       "hs": 2,
       "as": 1,
       "winner": "home",
-      "venue": "MetLife, NJ",
+      "venue": "Houston Stadium, Houston, TX",
       "feedsTo": 11
     },
     {
@@ -45,7 +45,7 @@
       "as": 1,
       "psoNote": "Paraguay 4-3 pens",
       "winner": "away",
-      "venue": "Philadelphia",
+      "venue": "Boston Stadium, Foxborough, MA",
       "feedsTo": 10
     },
     {
@@ -61,7 +61,7 @@
       "as": 1,
       "psoNote": "Morocco 3-2 pens",
       "winner": "away",
-      "venue": "Guadalajara",
+      "venue": "Estadio Monterrey, Guadalupe, Mexico",
       "feedsTo": 9
     },
     {
@@ -76,7 +76,7 @@
       "hs": 3,
       "as": 0,
       "winner": "home",
-      "venue": "East Rutherford",
+      "venue": "MetLife Stadium, East Rutherford, NJ",
       "feedsTo": 10
     },
     {
@@ -91,7 +91,7 @@
       "hs": 1,
       "as": 2,
       "winner": "away",
-      "venue": "Arlington",
+      "venue": "Dallas Stadium, Arlington, TX",
       "feedsTo": 11
     },
     {
@@ -167,7 +167,7 @@
       "hs": 3,
       "as": 0,
       "winner": "home",
-      "venue": "SoFi, LA",
+      "venue": "SoFi Stadium, Los Angeles",
       "feedsTo": 13
     },
     {
@@ -213,7 +213,7 @@
       "as": 2,
       "aet": true,
       "winner": "home",
-      "venue": "Miami Gardens",
+      "venue": "Hard Rock Stadium, Miami",
       "feedsTo": 15
     },
     {
@@ -274,7 +274,7 @@
       "hs": 0,
       "as": 1,
       "winner": "away",
-      "venue": "Lincoln Financial, Philly",
+      "venue": "Lincoln Financial Field, Philadelphia",
       "feedsTo": 25
     },
     {
@@ -289,7 +289,7 @@
       "hs": 1,
       "as": 2,
       "winner": "away",
-      "venue": "MetLife, NJ",
+      "venue": "MetLife Stadium, East Rutherford",
       "feedsTo": 27
     },
     {
@@ -304,7 +304,7 @@
       "hs": 2,
       "as": 3,
       "winner": "away",
-      "venue": "Azteca, Mexico City",
+      "venue": "Estadio Azteca, Mexico City",
       "feedsTo": 27
     },
     {
@@ -319,7 +319,7 @@
       "hs": 0,
       "as": 1,
       "winner": "away",
-      "venue": "AT&T, Arlington",
+      "venue": "AT&T Stadium, Arlington",
       "feedsTo": 26
     },
     {
@@ -334,7 +334,7 @@
       "hs": 1,
       "as": 4,
       "winner": "away",
-      "venue": "Santa Clara",
+      "venue": "Lumen Field, Seattle",
       "feedsTo": 26
     },
     {
@@ -349,7 +349,7 @@
       "hs": 3,
       "as": 2,
       "winner": "home",
-      "venue": "Miami Gardens",
+      "venue": "Mercedes-Benz Stadium, Atlanta",
       "feedsTo": 28
     },
     {
@@ -365,7 +365,7 @@
       "as": 0,
       "psoNote": "Switzerland 4-3 pens",
       "winner": "home",
-      "venue": "Kansas City Stadium",
+      "venue": "BC Place, Vancouver",
       "feedsTo": 28
     },
     {
@@ -380,7 +380,7 @@
       "hs": 2,
       "as": 0,
       "winner": "home",
-      "venue": "Boston Stadium",
+      "venue": "Gillette Stadium, Foxborough",
       "feedsTo": 29
     },
     {
@@ -389,13 +389,10 @@
       "round": "QF",
       "day": "2026-07-10",
       "dayLabel": "Fri Jul 10",
-      "time": "6:00 PM",
+      "time": "3:00 PM",
       "home": "Spain",
       "away": "Belgium",
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Los Angeles Stadium",
+      "venue": "SoFi Stadium, Inglewood",
       "feedsTo": 29
     },
     {
@@ -407,10 +404,7 @@
       "time": "5:00 PM",
       "home": "Norway",
       "away": "England",
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Miami Stadium",
+      "venue": "Hard Rock Stadium, Miami Gardens",
       "feedsTo": 30
     },
     {
@@ -422,10 +416,7 @@
       "time": "9:00 PM",
       "home": "Argentina",
       "away": "Switzerland",
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Kansas City Stadium",
+      "venue": "Arrowhead Stadium, Kansas City",
       "feedsTo": 30
     },
     {
@@ -436,11 +427,8 @@
       "dayLabel": "Tue Jul 14",
       "time": "4:00 PM",
       "home": "France",
-      "away": null,
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Dallas Stadium",
+      "away": "TBD",
+      "venue": "Arlington",
       "feedsTo": 31
     },
     {
@@ -450,12 +438,9 @@
       "day": "2026-07-15",
       "dayLabel": "Wed Jul 15",
       "time": "3:00 PM",
-      "home": null,
-      "away": null,
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Atlanta Stadium",
+      "home": "TBD",
+      "away": "TBD",
+      "venue": "Atlanta",
       "feedsTo": 31
     },
     {
@@ -465,28 +450,9 @@
       "day": "2026-07-19",
       "dayLabel": "Sun Jul 19",
       "time": "3:00 PM",
-      "home": null,
-      "away": null,
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "New York New Jersey Stadium",
-      "feedsTo": null
-    },
-    {
-      "id": 32,
-      "cuTaskId": "86aj8z5cq",
-      "round": "3P",
-      "day": "2026-07-18",
-      "dayLabel": "Sat Jul 18",
-      "time": "5:00 PM",
-      "home": null,
-      "away": null,
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Miami Stadium",
-      "feedsTo": null
+      "home": "TBD",
+      "away": "TBD",
+      "venue": "MetLife Stadium, East Rutherford, NJ"
     }
   ]
 }
