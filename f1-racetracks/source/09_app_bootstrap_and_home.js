@@ -1,24 +1,18 @@
 /* Runtime boot + home surface for the circuit guide.
-   v5.5: data.json is RETIRED. Track data is assembled from the inline
-   TRACK_DATA_ROUNDS_* globals defined by modules 05-08c (loaded before this),
-   and completed-race results come from the canonical store via module 12
-   (12_results_store.js), which populates window.raceResults and calls router().
-   Home surface: a slim header carousel pins TWO condensed race tiles side by
-   side (defaulting to the current round + the next one) flanked by chevrons.
-   Each chevron advances the window by ONE round (slide, keep one tile). Each
-   tile is a shortcut into that circuit's breakdown. Full 24-circuit grid below.
-   Source assembly order (every 2026 round now a full breakdown):
-     ...TRACK_DATA_ROUNDS_01_03,   // r1-3
-     ...TRACK_DATA_ROUNDS_06_09,   // r6-9
-     ...TRACK_DATA_ROUNDS_10_13,   // r10-13
-     ...TRACK_DATA_ROUNDS_14_24,   // r14-17 (name kept; split point)
-     ...TRACK_DATA_ROUNDS_18_21,   // r18-21 (module 08b)
-     ...TRACK_DATA_ROUNDS_22_24    // r22-24 (module 08c)
- */
+   v6 (2026-07-10): PER-CIRCUIT DATA LAYER. Track data is no longer inline JS
+   modules. Each circuit is its own file: circuits/<slug>.json, listed by
+   circuits/index_circuits.json. Boot fetches the index, then loads each circuit
+   file (Promise.all), assembles TRACKS in index order, and renders. This mirrors
+   the f1-results/2026 per-round store exactly. Completed-race results still come
+   from the canonical store via module 12 (window.raceResults + its router()).
+   Soft-fail: a circuit file that 404s or won't parse is skipped (logged), the
+   rest of the guide still renders. Home surface keeps the header carousel
+   (two condensed tiles + chevrons, single-round step). */
 
-const APP_VERSION = "v5.5";
+const APP_VERSION = "v6";
 const APP_DATE = "2026-07-10";
 const SEASON = "2026";
+const CIRCUITS_BASE = "circuits/";
 
 const TEAM_COLORS = {
  Mercedes: "#6CD3BF",
@@ -36,15 +30,12 @@ const TEAM_COLORS = {
 let TRACKS = [];
 let bySlug = {};
 let reportTracks = [];
-// These point at the SAME objects module 12 mutates in place (window.race*),
-// so the store's async fill + its router() re-render surface through here.
+// bound to the same window.* objects module 12 mutates in place.
 let raceResults = window.raceResults = window.raceResults || {};
 let historicWinners = window.historicWinners = window.historicWinners || {};
 let appDataMeta = window.appDataMeta = window.appDataMeta || {};
 
-// Carousel window: index (into TRACKS) of the LEFT tile. -1 = not yet set,
-// initialised to the current round on first home render, then persists as the
-// user pages so re-renders (e.g. the store landing) don't snap it back.
+// Carousel window: index (into TRACKS) of the LEFT tile. -1 = not yet set.
 let carouselStart = -1;
 
 const SECCOL = { s1: "var(--s1)", s2: "var(--s2)", s3: "var(--s3)" };
@@ -78,11 +69,8 @@ function buildJump() {
  jump.innerHTML = '<option value="">Jump to circuit\u2026</option>' + TRACKS.map(t => `<option value="${t.slug}">R${t.round} \u00b7 ${esc(t.gp)}${t.report ? "" : " (soon)"}</option>`).join("");
 }
 
-function applyData(data) {
- TRACKS = data.tracks || [];
- raceResults = window.raceResults = window.raceResults || data.raceResults || {};
- historicWinners = window.historicWinners = window.historicWinners || data.historicWinners || {};
- appDataMeta = window.appDataMeta = window.appDataMeta || {};
+function applyData(tracks) {
+ TRACKS = tracks || [];
  bySlug = Object.fromEntries(TRACKS.map(t => [t.slug, t]));
  reportTracks = TRACKS.filter(t => t.report);
  buildJump();
@@ -95,11 +83,11 @@ function renderDataUnavailable(error) {
  <div class="home-h">
  <p class="eyebrow">2026 circuit guide // data load issue</p>
  <h1>F1 Racetracks</h1>
- <p class="sub">The runtime loaded, but the circuit data modules did not.</p>
+ <p class="sub">The runtime loaded, but the circuit data did not.</p>
  </div>
  <div class="card empty-card">
  <div class="panel-b" style="padding:22px 4px">
- <p class="note">The <code>source/05\u201308c_track_data_*.js</code> modules failed to load, so there are no circuits to index. Reload the page; if it persists, the source bundle is incomplete.</p>
+ <p class="note">Couldn\u2019t load <code>circuits/index_circuits.json</code> (or every circuit file failed). Keep the page on the same origin as the <code>circuits/</code> folder, or reload once the store is reachable.</p>
  </div>
  </div>
  </div>
@@ -123,9 +111,8 @@ function router() {
 
 window.addEventListener("hashchange", router);
 
-/* Index of the "current" round: prefer the canonical store meta
-   (window.appDataMeta.current_round_slug, filled by module 12), else the first
-   active round, else the first not-yet-done round, else 0. */
+/* Index of the "current" round: prefer the canonical results-store meta
+   (window.appDataMeta.current_round_slug), else first active, else first pending. */
 function currentIndex() {
  const meta = appDataMeta || {};
  if (meta.current_round_slug) {
@@ -138,7 +125,6 @@ function currentIndex() {
  return i >= 0 ? i : 0;
 }
 
-/* One condensed carousel tile: a shortcut, not the full card. */
 function carouselTile(t) {
  if (!t) return `<div class="cx-tile cx-empty"></div>`;
  const chip = t.status === "active"
@@ -159,7 +145,6 @@ function carouselMarkup() {
  const total = TRACKS.length;
  if (total < 1) return "";
  if (carouselStart < 0) carouselStart = currentIndex();
- // clamp so a full pair stays visible
  const maxStart = Math.max(0, total - 2);
  if (carouselStart > maxStart) carouselStart = maxStart;
  if (carouselStart < 0) carouselStart = 0;
@@ -176,9 +161,6 @@ function carouselMarkup() {
  </div>`;
 }
 
-// Advance the carousel window by ONE round per chevron (slide: one tile stays,
-// the next comes in), clamped to the calendar ends, then re-render just the
-// #cx-host band in place.
 window.f1Carousel = function (dir) {
  const total = TRACKS.length;
  const maxStart = Math.max(0, total - 2);
@@ -238,19 +220,28 @@ jump.addEventListener("change", () => {
  if (jump.value) location.hash = "#/" + jump.value;
 });
 
-(function boot() {
+/* Boot: fetch the per-circuit index, then each circuit file. Soft-fail per file. */
+(async function boot() {
  try {
  updateFooterMeta(null);
- const inline = [].concat(
- typeof TRACK_DATA_ROUNDS_01_03 !== "undefined" ? TRACK_DATA_ROUNDS_01_03 : [],
- typeof TRACK_DATA_ROUNDS_06_09 !== "undefined" ? TRACK_DATA_ROUNDS_06_09 : [],
- typeof TRACK_DATA_ROUNDS_10_13 !== "undefined" ? TRACK_DATA_ROUNDS_10_13 : [],
- typeof TRACK_DATA_ROUNDS_14_24 !== "undefined" ? TRACK_DATA_ROUNDS_14_24 : [],
- typeof TRACK_DATA_ROUNDS_18_21 !== "undefined" ? TRACK_DATA_ROUNDS_18_21 : [],
- typeof TRACK_DATA_ROUNDS_22_24 !== "undefined" ? TRACK_DATA_ROUNDS_22_24 : []
- );
- if (!inline.length) throw new Error("No inline track data present");
- applyData({ tracks: inline, season: Number(SEASON) });
+ const idxRes = await fetch(CIRCUITS_BASE + "index_circuits.json", { cache: "no-cache" });
+ if (!idxRes.ok) throw new Error("index_circuits.json " + idxRes.status);
+ const idx = await idxRes.json();
+ const entries = (idx.circuits || []);
+ const loaded = await Promise.all(entries.map(async (e) => {
+ try {
+ const path = CIRCUITS_BASE + String(e.file).replace("./", "");
+ const r = await fetch(path, { cache: "no-cache" });
+ if (!r.ok) throw new Error(e.slug + " " + r.status);
+ return await r.json();
+ } catch (err) {
+ console.error("circuit load failed:", e.slug, err);
+ return null; // soft-fail: skip this one, keep the rest
+ }
+ }));
+ const tracks = loaded.filter(Boolean);
+ if (!tracks.length) throw new Error("no circuit files loaded");
+ applyData(tracks);
  if (window.lucide) lucide.createIcons();
  } catch (err) {
  renderDataUnavailable(err);
