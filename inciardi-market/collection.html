@@ -34,11 +34,11 @@ html[data-theme="light"]{
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-optical-sizing:auto;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:background .25s var(--e-out),color .25s var(--e-out)}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-optical-sizing:auto;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;transition:background .25s var(--e-out),color .25s var(--e-out)}
 body.locked{overflow:hidden}
 h1,h2,h3{text-wrap:balance}
 svg{display:block}
-.masthead{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.masthead{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line);background:var(--surface);flex-shrink:0}
 .brand{display:flex;align-items:center;gap:11px;min-width:0}
 .brand .glyph{width:32px;height:32px;border-radius:9px;background:var(--own);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:1.05rem;flex-shrink:0}
 .brand .txt{min-width:0}
@@ -75,8 +75,8 @@ svg{display:block}
 .opt[aria-pressed="true"] .box::after{content:"";width:5px;height:8px;border:2px solid var(--surface);border-top:0;border-left:0;transform:rotate(43deg) translateY(-1px)}
 .opt .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .opt .ct{margin-left:auto;font-family:var(--mono);font-size:0.66rem;color:var(--faint);font-variant-numeric:tabular-nums}
-.deck-wrap{flex:1;min-width:0;display:flex;flex-direction:column}
-.deck-head{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--line-soft);font-family:var(--mono)}
+.deck-wrap{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0}
+.deck-head{display:flex;align-items:center;gap:14px;padding:11px 20px;border-bottom:1px solid var(--line-soft);font-family:var(--mono);flex-shrink:0}
 .deck-head .showing{font-size:0.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .deck-head .showing b{color:var(--ink)}
 .active-tags{display:flex;gap:6px;flex-wrap:wrap;margin-left:4px}
@@ -86,14 +86,14 @@ svg{display:block}
 .legend{margin-left:auto;display:flex;gap:13px;font-size:0.62rem;color:var(--faint)}
 .legend span{display:flex;align-items:center;gap:5px}
 .legend .sw{width:9px;height:9px;border-radius:2px}
-.deck{flex:1;overflow-y:auto;padding:18px 20px 60px;display:grid;grid-template-columns:repeat(auto-fill,var(--card-w));justify-content:center;gap:16px;align-content:start}
+.deck{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 20px 40px;display:grid;grid-template-columns:repeat(auto-fill,var(--card-w));grid-auto-rows:max-content;justify-content:center;align-items:start;align-content:start;gap:16px}
 .card{width:var(--card-w);position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--surface);cursor:pointer;text-align:left;display:flex;flex-direction:column;transition:transform .18s var(--e-out),border-color .18s,box-shadow .18s,opacity .2s var(--e-out)}
 .deck.intro .card{animation:pop .4s var(--e-out) both;animation-delay:calc(var(--i,0)*22ms)}
 @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
 .card.leaving{opacity:0;transform:scale(.94);pointer-events:none}
 .card:hover{transform:translateY(-3px);border-color:var(--faint);box-shadow:0 10px 24px oklch(0 0 0 / 0.28)}
 .card:focus-visible{outline:2px solid var(--own);outline-offset:2px}
-.card .art{height:calc(var(--card-w) * 4 / 3);width:100%;position:relative;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:2rem;color:oklch(0.22 0.02 70);overflow:hidden;filter:var(--art-dim);transition:filter .25s var(--e-out)}
+.card .art{height:calc(var(--card-w) * 4 / 3);width:100%;flex:0 0 auto;position:relative;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:2rem;color:oklch(0.22 0.02 70);overflow:hidden;filter:var(--art-dim);transition:filter .25s var(--e-out)}
 .card .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .card[data-own="1"] .art{filter:none}
 .card .rar{position:absolute;top:8px;left:8px;width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 2px oklch(0.15 0.01 70 / .55)}
@@ -101,7 +101,7 @@ svg{display:block}
 .card .avail.deal{color:oklch(0.85 0.16 145)}
 .card .want-flag{position:absolute;bottom:8px;right:8px;color:var(--want);opacity:0;transform:scale(.6);transition:all .18s var(--e-out);filter:drop-shadow(0 1px 2px oklch(0 0 0 /.5))}
 .card[data-want="1"] .want-flag{opacity:1;transform:none}
-.card .meta{padding:9px 11px 11px;border-top:1px solid var(--line-soft);background:var(--surface)}
+.card .meta{padding:9px 11px 11px;border-top:1px solid var(--line-soft);background:var(--surface);flex:0 0 auto}
 .card .nm{font-size:0.82rem;font-weight:600;line-height:1.2;letter-spacing:-0.01em;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card .sub{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:0.63rem;color:var(--faint)}
 .card .sub .col{text-transform:uppercase;letter-spacing:0.08em}
@@ -115,12 +115,12 @@ svg{display:block}
 .empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--faint)}
 .empty p{font-family:var(--mono);font-size:0.8rem;line-height:1.6;margin-top:14px}
 .empty b{color:var(--muted)}
-.app-footer{border-top:1px solid var(--line);background:var(--surface)}
-.app-footer .foot-in{padding:9px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:0.66rem;color:var(--faint)}
-.app-footer .foot-sources{display:flex;gap:16px;flex-wrap:wrap}
+.app-footer{border-top:1px solid var(--line);background:var(--surface);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.app-footer .foot-in{padding:4px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--mono);font-size:0.62rem;color:var(--faint)}
+.app-footer .foot-sources{display:flex;gap:16px}
 .app-footer .foot-sources a{color:var(--muted);text-decoration:none}
 .app-footer .foot-sources a:hover{color:var(--own)}
-.app-footer .foot-stamp{font-variant-numeric:tabular-nums;margin-left:auto;letter-spacing:0.04em}
+.app-footer .foot-stamp{font-variant-numeric:tabular-nums;margin-left:auto;letter-spacing:0.04em;white-space:nowrap}
 .scrim{display:none;position:fixed;inset:0;background:var(--scrim);z-index:39;opacity:0;transition:opacity .28s var(--e-out)}
 .scrim.show{display:block;opacity:1}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:min(88vw,340px);background:var(--surface);border-left:1px solid var(--line);z-index:41;transform:translateX(100%);transition:transform .3s var(--e-out);display:flex;flex-direction:column;box-shadow:0 0 40px oklch(0 0 0/.4)}
@@ -246,8 +246,8 @@ svg{display:block}
 </footer>
 <script>
 const APP_NAME="Inciardi Collection";
-const APP_VERSION="v0.4";
-const APP_PR=140;
+const APP_VERSION="v0.5";
+const APP_PR=141;
 const SVG={
   check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
   bookmark:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
@@ -276,19 +276,8 @@ function renderFacet(elId,field,labelMap,withDot){const el=document.getElementBy
 function pass(p){const st=INV[p.id];if(view==="own"&&st!=="own")return false;if(view==="want"&&st!=="want")return false;if(view==="missing"&&st)return false;if(view==="listed"&&!p.market.listed)return false;if(query&&!p.name.toLowerCase().includes(query))return false;for(const f of ["rarity","collection","subject"]){const s=filters[f];if(s.size&&!s.has(p[f]))return false;}return true;}
 function applyState(el,p){const st=INV[p.id];el.dataset.own=st==="own"?1:0;el.dataset.want=st==="want"?1:0;}
 function updateCounts(){const own=Object.values(INV).filter(v=>v==="own").length;const want=Object.values(INV).filter(v=>v==="want").length;document.getElementById("cKnown").textContent=PRINTS.length;document.getElementById("cOwn").textContent=own;document.getElementById("cWant").textContent=want;const sn=document.getElementById("seedN");if(sn)sn.textContent=PRINTS.length;const showEl=document.getElementById("showN");if(showEl)showEl.textContent=document.querySelectorAll(".card:not(.leaving)").length;}
-// FULL render: only on filter/search/view change. Toggling own/want updates a single card in place.
-function render(){const deck=document.getElementById("deck");const list=PRINTS.filter(pass);deck.classList.add("intro");deck.innerHTML="";if(!list.length){deck.innerHTML=`<div class="empty">${SVG.ghost}<p>No prints match these lenses.<br><b>Loosen a filter</b> or clear the search.</p></div>`;}else{list.forEach((p,i)=>deck.appendChild(card(p,i)));}document.getElementById("showN").textContent=list.length;document.getElementById("totN").textContent=PRINTS.length;updateCounts();renderTags();
-  // let the intro stagger play once, then drop the class so in-place updates never re-ripple
-  setTimeout(()=>deck.classList.remove("intro"),900);}
-function toggle(p,el,wantMode){
-  if(wantMode){INV[p.id]=INV[p.id]==="want"?undefined:"want";}else{INV[p.id]=INV[p.id]==="own"?undefined:"own";}
-  if(!INV[p.id])delete INV[p.id];
-  save();
-  applyState(el,p);
-  updateCounts();
-  // if this card no longer belongs in the active filter, fade JUST it out (no full re-render)
-  if(!pass(p)){el.classList.add("leaving");setTimeout(()=>{el.remove();updateCounts();if(!document.querySelector(".card")){render();}},210);}
-}
+function render(){const deck=document.getElementById("deck");const list=PRINTS.filter(pass);deck.classList.add("intro");deck.innerHTML="";if(!list.length){deck.innerHTML=`<div class="empty">${SVG.ghost}<p>No prints match these lenses.<br><b>Loosen a filter</b> or clear the search.</p></div>`;}else{list.forEach((p,i)=>deck.appendChild(card(p,i)));}document.getElementById("showN").textContent=list.length;document.getElementById("totN").textContent=PRINTS.length;updateCounts();renderTags();setTimeout(()=>deck.classList.remove("intro"),900);}
+function toggle(p,el,wantMode){if(wantMode){INV[p.id]=INV[p.id]==="want"?undefined:"want";}else{INV[p.id]=INV[p.id]==="own"?undefined:"own";}if(!INV[p.id])delete INV[p.id];save();applyState(el,p);updateCounts();if(!pass(p)){el.classList.add("leaving");setTimeout(()=>{el.remove();updateCounts();if(!document.querySelector(".card")){render();}},210);}}
 function card(p,i){const b=document.createElement("div");b.className="card";b.setAttribute("role","button");b.tabIndex=0;b.style.setProperty("--i",i%40);applyState(b,p);const hue=CHIP_HUE[p.subject]||70;const chipBg=`oklch(0.80 0.11 ${hue})`;const initials=p.name.replace(/[^A-Za-z0-9 ]/g,"").split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();const retail=p.retail?`$${p.retail}`:"exclusive";const col=p.collection?`<span class="col">${COL_LABEL[p.collection]||p.collection}</span>`:`<span class="col">${RAR_LABEL[p.rarity]}</span>`;let avail="";if(p.market.listed){avail=p.market.deal?`<span class="avail deal">${SVG.deal}$${p.market.price}</span>`:`<span class="avail">${SVG.tag}$${p.market.price}</span>`;}const art=`<img src="${p.img}" alt="" loading="lazy" onerror="this.remove()">`;b.innerHTML=`<div class="art" style="background:${chipBg}">${art}<span class="rar" style="background:${RAR_VAR[p.rarity]}"></span><span aria-hidden="true">${initials}</span>${avail}<span class="caught">${SVG.check}</span><span class="want-flag">${SVG.bookmark}</span></div><div class="meta"><div class="nm">${p.name}</div><div class="sub">${col}<span class="price">${retail}</span></div></div><span class="own-ring"></span>`;
   let lp=null,moved=false;
   const startLP=()=>{moved=false;lp=setTimeout(()=>{lp=null;toggle(p,b,true);if(navigator.vibrate)navigator.vibrate(15);},450);};
