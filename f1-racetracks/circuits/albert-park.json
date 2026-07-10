@@ -1,10 +1,9 @@
 {
- "slug": "albert-park", "round": 1, "gp": "Australian GP", "flag": "🇦🇺", "date": "08 Mar", "status": "done", "report": true,
+ "slug": "albert-park", "gp": "Australian GP", "flag": "🇦🇺", "report": true,
  "title": "Albert Park Circuit", "loc": "Melbourne", "cc": "AU", "length": "5.278", "turns": 14, "laps": 58, "drsZones": 4, "elev": "~flat", "topSpeed": "~330", "record": "1:19.813 · LEC ’24",
  "sub": "F1’s traditional season-opener: a fast, flowing semi-street circuit around a Melbourne lake. Reprofiled in 2022 into a quicker, wider layout with a rare four DRS zones.",
  "mapFile": "Circuit_Albert_Park.svg", "mapTag": "Official layout · 2022 revision", "mapCredit": "Wikimedia Commons · public domain",
  "poleRef": "1:15.915 (Norris ’24)", "lat": -37.8497, "lng": 144.9680, "tz": "Australia/Melbourne",
- "sessions": [{"date":"2026-03-06","sess":"Fri · Practice"},{"date":"2026-03-07","sess":"Sat · Practice + Qualifying"},{"date":"2026-03-08","sess":"Sun · Grand Prix"}],
  "elevLabel": "flat", "elevMax": 12, "asl0": 2,
  "profile": [[0,5],[0.08,6],[0.16,5],[0.26,6],[0.36,5],[0.46,6],[0.56,5],[0.66,6],[0.74,5],[0.82,6],[0.9,5],[1,5]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.64},{"k":"s3","from":0.64,"to":1}],

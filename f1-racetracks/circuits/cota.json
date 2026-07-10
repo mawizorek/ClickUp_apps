@@ -1,9 +1,9 @@
 {
- "slug": "cota", "round": 19, "gp": "United States GP", "flag": "🇺🇸", "date": "25 Oct", "status": "pending", "report": true,
+ "slug": "cota", "gp": "United States GP", "flag": "🇺🇸", "report": true,
  "title": "Circuit of the Americas", "loc": "Austin", "cc": "US", "length": "5.513", "turns": 20, "laps": 56, "drsZones": 2, "elev": "41 m", "topSpeed": "~340", "record": "1:36.169 · LEC ’19",
  "sub": "A Tilke greatest-hits circuit in the Texas hills: a steep uphill blast to a hairpin Turn 1, a Silverstone-style ess sequence, an Istanbul-inspired multi-apex left, and a stadium section. Fast, flowing and a proper driver’s track.",
  "mapFile": "Austin_circuit.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:32.330 (Norris ’24)", "lat": 30.1328, "lng": -97.6411, "tz": "America/Chicago",
- "sessions": [{"date":"2026-10-23","sess":"Fri · Practice + Sprint Quali"},{"date":"2026-10-24","sess":"Sat · Sprint + Qualifying"},{"date":"2026-10-25","sess":"Sun · Grand Prix"}], "elevLabel": "41 m swing", "elevMax": 44, "asl0": 150,
+ "elevLabel": "41 m swing", "elevMax": 44, "asl0": 150,
  "profile": [[0,6],[0.05,40],[0.10,34],[0.18,30],[0.26,24],[0.34,20],[0.42,16],[0.50,26],[0.58,20],[0.66,14],[0.74,18],[0.82,22],[0.90,12],[1,6]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0.42,"to":0.52,"det":0.36,"label":"DRS 1"},{"from":0,"to":0.05,"det":0.90,"label":"DRS 2"}],

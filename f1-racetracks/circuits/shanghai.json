@@ -1,10 +1,9 @@
 {
- "slug": "shanghai", "round": 2, "gp": "Chinese GP", "flag": "🇨🇳", "date": "15 Mar", "status": "done", "report": true,
+ "slug": "shanghai", "gp": "Chinese GP", "flag": "🇨🇳", "report": true,
  "title": "Shanghai International Circuit", "loc": "Shanghai", "cc": "CN", "length": "5.451", "turns": 16, "laps": 56, "drsZones": 2, "elev": "~flat", "topSpeed": "~325", "record": "1:32.238 · MSC ’04",
  "sub": "A Tilke landmark shaped like the character 上 (shàng, \"upward\"): a hypnotic decreasing-radius opening spiral, a kilometre-plus back straight, and one of the calendar’s best overtaking hairpins.",
  "mapFile": "Shanghai_International_Racing_Circuit_track_map.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · public domain",
  "poleRef": "1:30.641 (Piastri ’25)", "lat": 31.3389, "lng": 121.2200, "tz": "Asia/Shanghai",
- "sessions": [{"date":"2026-03-13","sess":"Fri · Practice + Sprint Quali"},{"date":"2026-03-14","sess":"Sat · Sprint + Qualifying"},{"date":"2026-03-15","sess":"Sun · Grand Prix"}],
  "elevLabel": "flat", "elevMax": 12, "asl0": -1,
  "profile": [[0,5],[0.08,7],[0.16,8],[0.24,6],[0.32,5],[0.40,6],[0.48,5],[0.56,6],[0.64,5],[0.72,5],[0.80,4],[0.88,5],[1,5]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.64},{"k":"s3","from":0.64,"to":1}],

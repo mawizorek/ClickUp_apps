@@ -1,9 +1,9 @@
 {
- "slug": "hungaroring", "round": 13, "gp": "Hungarian GP", "flag": "🇭🇺", "date": "26 Jul", "status": "pending", "report": true,
+ "slug": "hungaroring", "gp": "Hungarian GP", "flag": "🇭🇺", "report": true,
  "title": "Hungaroring", "loc": "Budapest", "cc": "HU", "length": "4.381", "turns": 14, "laps": 70, "drsZones": 2, "elev": "~36 m", "topSpeed": "~315", "record": "1:16.627 · HAM ’20",
  "sub": "Tight, twisty and relentless: often called \"Monaco without the walls\". A go-kart track of constant direction changes where track position is gold and overtaking is brutally hard.",
  "mapFile": "Hungaroring.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:15.227 (Russell ’24)", "lat": 47.5789, "lng": 19.2486, "tz": "Europe/Budapest",
- "sessions": [{"date":"2026-07-24","sess":"Fri · Practice"},{"date":"2026-07-25","sess":"Sat · Practice + Qualifying"},{"date":"2026-07-26","sess":"Sun · Grand Prix"}], "elevLabel": "~36 m swing", "elevMax": 40, "asl0": 250,
+ "elevLabel": "~36 m swing", "elevMax": 40, "asl0": 250,
  "profile": [[0,8],[0.05,6],[0.10,18],[0.16,30],[0.22,26],[0.30,20],[0.38,28],[0.46,22],[0.54,16],[0.62,24],[0.70,18],[0.78,30],[0.86,22],[0.93,12],[1,8]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.32},{"k":"s2","from":0.32,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.10,"det":0.88,"label":"DRS 1"},{"from":0.30,"to":0.37,"det":0.24,"label":"DRS 2"}],

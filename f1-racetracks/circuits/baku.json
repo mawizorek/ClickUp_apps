@@ -1,9 +1,9 @@
 {
- "slug": "baku", "round": 17, "gp": "Azerbaijan GP", "flag": "🇦🇿", "date": "26 Sep", "status": "pending", "report": true,
+ "slug": "baku", "gp": "Azerbaijan GP", "flag": "🇦🇿", "report": true,
  "title": "Baku City Circuit", "loc": "Baku", "cc": "AZ", "length": "6.003", "turns": 20, "laps": 51, "drsZones": 2, "elev": "~flat", "topSpeed": "~355", "record": "1:43.009 · LEC ’19",
  "sub": "Monaco meets Monza on the shores of the Caspian: a Tilke street circuit pairing a claustrophobic uphill castle section with one of the longest flat-out blasts in F1. Walls everywhere, and a safety car almost guaranteed.",
  "mapFile": "Baku_City_Circuit.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:41.365 (Leclerc ’24)", "lat": 40.3725, "lng": 49.8533, "tz": "Asia/Baku",
- "sessions": [{"date":"2026-09-24","sess":"Fri · Practice"},{"date":"2026-09-25","sess":"Sat · Practice + Qualifying"},{"date":"2026-09-26","sess":"Sun · Grand Prix"}], "elevLabel": "flat · castle rise", "elevMax": 20, "asl0": -5,
+ "elevLabel": "flat · castle rise", "elevMax": 20, "asl0": -5,
  "profile": [[0,4],[0.06,4],[0.14,5],[0.22,4],[0.30,5],[0.38,10],[0.44,16],[0.50,18],[0.56,14],[0.62,8],[0.70,5],[0.80,4],[0.90,4],[1,4]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.62},{"k":"s3","from":0.62,"to":1}],
  "drs": [{"from":0,"to":0.10,"det":0.88,"label":"DRS 1"},{"from":0.14,"to":0.24,"det":0.11,"label":"DRS 2"}],

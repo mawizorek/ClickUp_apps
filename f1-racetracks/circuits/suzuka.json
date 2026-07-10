@@ -1,10 +1,9 @@
 {
- "slug": "suzuka", "round": 3, "gp": "Japanese GP", "flag": "🇯🇵", "date": "29 Mar", "status": "done", "report": true,
+ "slug": "suzuka", "gp": "Japanese GP", "flag": "🇯🇵", "report": true,
  "title": "Suzuka Circuit", "loc": "Suzuka", "cc": "JP", "length": "5.807", "turns": 18, "laps": 53, "drsZones": 1, "elev": "~40 m", "topSpeed": "~330", "record": "1:30.965 · ANT ’25",
  "sub": "The only figure-eight on the calendar and a driver’s favourite. Flowing esses, the daunting 130R, and a rhythm that punishes the smallest hesitation.",
  "mapFile": "Suzuka_circuit_map--2005.svg", "mapTag": "Official layout", "mapCredit": "Will Pittenger / Wikimedia Commons · CC BY-SA",
  "poleRef": "1:26.983 (Verstappen ’25)", "lat": 34.8431, "lng": 136.5407, "tz": "Asia/Tokyo",
- "sessions": [{"date":"2026-03-27","sess":"Fri · Practice"},{"date":"2026-03-28","sess":"Sat · Practice + Qualifying"},{"date":"2026-03-29","sess":"Sun · Grand Prix"}],
  "elevLabel": "~40 m swing", "elevMax": 44, "asl0": 5,
  "profile": [[0,8],[0.06,10],[0.12,20],[0.20,34],[0.28,40],[0.34,36],[0.42,30],[0.50,24],[0.58,16],[0.64,10],[0.70,14],[0.78,22],[0.86,18],[0.94,10],[1,8]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.34},{"k":"s2","from":0.34,"to":0.70},{"k":"s3","from":0.70,"to":1}],

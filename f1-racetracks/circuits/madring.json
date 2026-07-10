@@ -1,9 +1,9 @@
 {
- "slug": "madring", "round": 16, "gp": "Spanish GP (Madrid)", "flag": "🇪🇸", "date": "13 Sep", "status": "pending", "report": true,
+ "slug": "madring", "gp": "Spanish GP (Madrid)", "flag": "🇪🇸", "report": true,
  "title": "Madring", "loc": "Madrid", "cc": "ES", "length": "5.474", "turns": 22, "laps": 57, "drsZones": 2, "elev": "~30 m", "topSpeed": "~340", "record": "New for 2026", "recordNote": true,
  "sub": "F1’s brand-new Madrid circuit: a hybrid street-and-purpose-built layout around the IFEMA exhibition centre, debuting in 2026 as the new home of the Spanish GP. 22 corners, including a rare banked section.",
  "mapFile": "Madring_circuit.svg", "mapTag": "Provisional 2026 layout", "mapCredit": "Wikimedia Commons (if available)", "poleRef": "inaugural — no data yet", "lat": 40.4650, "lng": -3.6160, "tz": "Europe/Madrid",
- "sessions": [{"date":"2026-09-11","sess":"Fri · Practice"},{"date":"2026-09-12","sess":"Sat · Practice + Qualifying"},{"date":"2026-09-13","sess":"Sun · Grand Prix"}], "elevLabel": "~30 m swing (est.)", "elevMax": 34, "asl0": 600,
+ "elevLabel": "~30 m swing (est.)", "elevMax": 34, "asl0": 600,
  "profile": [[0,10],[0.06,14],[0.12,20],[0.18,18],[0.26,26],[0.34,30],[0.42,24],[0.50,18],[0.58,22],[0.66,16],[0.74,20],[0.82,14],[0.90,12],[0.96,10],[1,10]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.34},{"k":"s2","from":0.34,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.09,"det":0.88,"label":"DRS 1"},{"from":0.46,"to":0.55,"det":0.40,"label":"DRS 2"}],

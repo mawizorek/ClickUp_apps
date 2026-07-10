@@ -1,9 +1,9 @@
 {
- "slug": "mexico", "round": 20, "gp": "Mexico City GP", "flag": "🇲🇽", "date": "01 Nov", "status": "pending", "report": true,
+ "slug": "mexico", "gp": "Mexico City GP", "flag": "🇲🇽", "report": true,
  "title": "Autódromo Hermanos Rodríguez", "loc": "Mexico City", "cc": "MX", "length": "4.304", "turns": 17, "laps": 71, "drsZones": 3, "elev": "~5 m", "topSpeed": "~350", "record": "1:17.774 · VER ’21",
  "sub": "The highest race on the calendar at 2,240m, where thin air saps downforce and cooling and sends cars to their highest top speeds. Ends with the unique stadium section through the old Foro Sol, roaring with 40,000 fans.",
  "mapFile": "Autodromo_Hermanos_Rodriguez.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:15.946 (Sainz ’24)", "lat": 19.4042, "lng": -99.0907, "tz": "America/Mexico_City",
- "sessions": [{"date":"2026-10-30","sess":"Fri · Practice"},{"date":"2026-10-31","sess":"Sat · Practice + Qualifying"},{"date":"2026-11-01","sess":"Sun · Grand Prix"}], "elevLabel": "flat · 2,240m ASL", "elevMax": 8, "asl0": 2240,
+ "elevLabel": "flat · 2,240m ASL", "elevMax": 8, "asl0": 2240,
  "profile": [[0,4],[0.10,4],[0.20,5],[0.30,4],[0.40,5],[0.50,4],[0.58,6],[0.66,5],[0.74,4],[0.82,5],[0.90,4],[1,4]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.34},{"k":"s2","from":0.34,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.12,"det":0.86,"label":"DRS 1"},{"from":0.34,"to":0.42,"det":0.28,"label":"DRS 2"},{"from":0.50,"to":0.58,"det":0.46,"label":"DRS 3"}],

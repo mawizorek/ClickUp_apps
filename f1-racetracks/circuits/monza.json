@@ -1,9 +1,9 @@
 {
- "slug": "monza", "round": 15, "gp": "Italian GP", "flag": "🇮🇹", "date": "06 Sep", "status": "pending", "report": true,
+ "slug": "monza", "gp": "Italian GP", "flag": "🇮🇹", "report": true,
  "title": "Autodromo Nazionale Monza", "loc": "Monza", "cc": "IT", "length": "5.793", "turns": 11, "laps": 53, "drsZones": 2, "elev": "~10 m", "topSpeed": "~360", "record": "1:21.046 · BAR ’04",
  "sub": "The Temple of Speed: the fastest circuit on the calendar. Long straights and big braking into chicanes, run at minimum downforce, where slipstreaming and late lunges define the race.",
  "mapFile": "Monza_track_map.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:19.328 (Norris ’24)", "lat": 45.6156, "lng": 9.2811, "tz": "Europe/Rome",
- "sessions": [{"date":"2026-09-04","sess":"Fri · Practice"},{"date":"2026-09-05","sess":"Sat · Practice + Qualifying"},{"date":"2026-09-06","sess":"Sun · Grand Prix"}], "elevLabel": "flat · ~10 m", "elevMax": 14, "asl0": 162,
+ "elevLabel": "flat · ~10 m", "elevMax": 14, "asl0": 162,
  "profile": [[0,6],[0.08,6],[0.14,5],[0.22,7],[0.30,6],[0.40,7],[0.50,6],[0.58,8],[0.66,7],[0.74,6],[0.82,8],[0.90,6],[1,6]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.34},{"k":"s2","from":0.34,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.10,"det":0.88,"label":"DRS 1"},{"from":0.52,"to":0.60,"det":0.46,"label":"DRS 2"}],
