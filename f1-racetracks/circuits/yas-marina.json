@@ -1,9 +1,9 @@
 {
- "slug": "yas-marina", "round": 24, "gp": "Abu Dhabi GP", "flag": "🇦🇪", "date": "06 Dec", "status": "pending", "report": true,
+ "slug": "yas-marina", "gp": "Abu Dhabi GP", "flag": "🇦🇪", "report": true,
  "title": "Yas Marina Circuit", "loc": "Abu Dhabi", "cc": "AE", "length": "5.281", "turns": 16, "laps": 58, "drsZones": 2, "elev": "~flat", "topSpeed": "~330", "record": "1:25.637 · ’24",
  "sub": "The season finale: a twilight-to-night race on Yas Island, reprofiled in 2021 into a faster, flowing lap. Immaculate, glamorous, and the stage where more than one championship has been settled on the last day.",
  "mapFile": "Yas_Marina_Circuit.svg", "mapTag": "Official layout · 2021 revision", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:23.445 (Verstappen ’23)", "lat": 24.4672, "lng": 54.6031, "tz": "Asia/Dubai",
- "sessions": [{"date":"2026-12-04","sess":"Fri · Practice"},{"date":"2026-12-05","sess":"Sat · Practice + Qualifying"},{"date":"2026-12-06","sess":"Sun · Grand Prix (twilight)"}], "elevLabel": "flat", "elevMax": 8, "asl0": 4,
+ "elevLabel": "flat", "elevMax": 8, "asl0": 4,
  "profile": [[0,4],[0.10,4],[0.20,5],[0.30,4],[0.40,5],[0.50,4],[0.60,5],[0.68,4],[0.76,5],[0.84,4],[0.92,4],[1,4]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.30},{"k":"s2","from":0.30,"to":0.62},{"k":"s3","from":0.62,"to":1}],
  "drs": [{"from":0,"to":0.10,"det":0.88,"label":"DRS 1"},{"from":0.30,"to":0.42,"det":0.26,"label":"DRS 2"}],

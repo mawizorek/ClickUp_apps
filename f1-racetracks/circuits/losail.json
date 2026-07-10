@@ -1,9 +1,9 @@
 {
- "slug": "losail", "round": 23, "gp": "Qatar GP", "flag": "🇶🇦", "date": "29 Nov", "status": "pending", "report": true,
+ "slug": "losail", "gp": "Qatar GP", "flag": "🇶🇦", "report": true,
  "title": "Lusail International Circuit", "loc": "Lusail", "cc": "QA", "length": "5.419", "turns": 16, "laps": 57, "drsZones": 2, "elev": "~flat", "topSpeed": "~325", "record": "1:22.384 · NOR ’24",
  "sub": "A fast, flowing desert lap run under floodlights: an almost unbroken chain of medium-to-high-speed sweeps that pile on relentless lateral G. The most physically brutal circuit of the year on the neck and the tyres.",
  "mapFile": "Lusail_International_Circuit.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:20.520 (Russell ’24)", "lat": 25.4900, "lng": 51.4542, "tz": "Asia/Qatar",
- "sessions": [{"date":"2026-11-27","sess":"Fri · Practice + Sprint Quali"},{"date":"2026-11-28","sess":"Sat · Sprint + Qualifying"},{"date":"2026-11-29","sess":"Sun · Grand Prix (night)"}], "elevLabel": "flat", "elevMax": 8, "asl0": 12,
+ "elevLabel": "flat", "elevMax": 8, "asl0": 12,
  "profile": [[0,4],[0.10,5],[0.20,6],[0.30,5],[0.40,6],[0.50,5],[0.60,6],[0.68,5],[0.76,6],[0.84,5],[0.92,4],[1,4]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.32},{"k":"s2","from":0.32,"to":0.66},{"k":"s3","from":0.66,"to":1}],
  "drs": [{"from":0,"to":0.12,"det":0.88,"label":"DRS 1"},{"from":0.54,"to":0.62,"det":0.48,"label":"DRS 2"}],

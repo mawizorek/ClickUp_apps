@@ -1,9 +1,9 @@
 {
- "slug": "las-vegas", "round": 22, "gp": "Las Vegas GP", "flag": "🇺🇸", "date": "21 Nov", "status": "pending", "report": true,
+ "slug": "las-vegas", "gp": "Las Vegas GP", "flag": "🇺🇸", "report": true,
  "title": "Las Vegas Strip Circuit", "loc": "Las Vegas", "cc": "US", "length": "6.201", "turns": 17, "laps": 50, "drsZones": 2, "elev": "~flat", "topSpeed": "~350", "record": "1:33.365 · VER ’25",
  "sub": "A midnight blast down the Las Vegas Strip: F1’s second-longest lap, built around a ~1.9km flat-out run past the casinos. Cold, low-grip and glittering, it is pure spectacle wrapped around a genuine slipstream battle.",
  "mapFile": "Las_Vegas_Strip_Circuit.svg", "mapTag": "Official layout", "mapCredit": "Wikimedia Commons · CC BY-SA", "poleRef": "1:32.312 (Russell ’24)", "lat": 36.1147, "lng": -115.1728, "tz": "America/Los_Angeles",
- "sessions": [{"date":"2026-11-19","sess":"Thu · Practice"},{"date":"2026-11-20","sess":"Fri · Practice + Qualifying"},{"date":"2026-11-21","sess":"Sat · Grand Prix (night)"}], "elevLabel": "flat", "elevMax": 8, "asl0": 620,
+ "elevLabel": "flat", "elevMax": 8, "asl0": 620,
  "profile": [[0,4],[0.08,4],[0.16,5],[0.24,4],[0.32,4],[0.44,4],[0.56,4],[0.66,4],[0.74,5],[0.82,4],[0.90,4],[1,4]],
  "sectorsBar": [{"k":"s1","from":0,"to":0.28},{"k":"s2","from":0.28,"to":0.60},{"k":"s3","from":0.60,"to":1}],
  "drs": [{"from":0.32,"to":0.52,"det":0.28,"label":"DRS 1"},{"from":0.90,"to":1,"det":0.86,"label":"DRS 2"}],
