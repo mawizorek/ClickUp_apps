@@ -1,15 +1,19 @@
 /* Runtime boot + home surface for the circuit guide.
-   v6 (2026-07-10): PER-CIRCUIT DATA LAYER. Track data is no longer inline JS
-   modules. Each circuit is its own file: circuits/<slug>.json, listed by
-   circuits/index_circuits.json. Boot fetches the index, then loads each circuit
-   file (Promise.all), assembles TRACKS in index order, and renders. This mirrors
-   the f1-results/2026 per-round store exactly. Completed-race results still come
-   from the canonical store via module 12 (window.raceResults + its router()).
-   Soft-fail: a circuit file that 404s or won't parse is skipped (logged), the
-   rest of the guide still renders. Home surface keeps the header carousel
-   (two condensed tiles + chevrons, single-round step). */
+ v6.1 (2026-07-10): PER-CIRCUIT DATA LAYER + PER-YEAR SEASON INDEX. Track data
+ is no longer inline JS modules. Each circuit is its own file:
+ circuits/<slug>.json, holding TIMELESS identity + layout only. The per-year
+ fields (round, date, status, sessions) live in circuits/index_circuits.json
+ keyed by slug. Boot fetches the index, loads each circuit file (Promise.all),
+ merges the per-year fields onto each circuit object, assembles TRACKS in index
+ order, and renders. This mirrors the f1-results/2026 per-round store and makes
+ the identity files reusable across seasons (2024/2025 historical) with only a
+ new season index. Completed-race results still come from the canonical store
+ via module 12 (window.raceResults + its router()). Soft-fail: a circuit file
+ that 404s or won't parse is skipped (logged), the rest of the guide still
+ renders. Home surface keeps the header carousel (two condensed tiles +
+ chevrons, single-round step). */
 
-const APP_VERSION = "v6";
+const APP_VERSION = "v6.1";
 const APP_DATE = "2026-07-10";
 const SEASON = "2026";
 const CIRCUITS_BASE = "circuits/";
@@ -112,7 +116,7 @@ function router() {
 window.addEventListener("hashchange", router);
 
 /* Index of the "current" round: prefer the canonical results-store meta
-   (window.appDataMeta.current_round_slug), else first active, else first pending. */
+ (window.appDataMeta.current_round_slug), else first active, else first pending. */
 function currentIndex() {
  const meta = appDataMeta || {};
  if (meta.current_round_slug) {
@@ -220,7 +224,9 @@ jump.addEventListener("change", () => {
  if (jump.value) location.hash = "#/" + jump.value;
 });
 
-/* Boot: fetch the per-circuit index, then each circuit file. Soft-fail per file. */
+/* Boot: fetch the per-circuit index, then each circuit file. Merge the per-year
+ fields (round/date/status/sessions) from the index entry onto each circuit.
+ Soft-fail per file. */
 (async function boot() {
  try {
  updateFooterMeta(null);
@@ -233,7 +239,16 @@ jump.addEventListener("change", () => {
  const path = CIRCUITS_BASE + String(e.file).replace("./", "");
  const r = await fetch(path, { cache: "no-cache" });
  if (!r.ok) throw new Error(e.slug + " " + r.status);
- return await r.json();
+ const circuit = await r.json();
+ // v6.1: per-year fields live in the season index, not the timeless
+ // circuit identity file. Merge them on so the assembled track object
+ // (and every renderer downstream) is unchanged.
+ return Object.assign(circuit, {
+ round: e.round,
+ date: e.date,
+ status: e.status,
+ sessions: e.sessions
+ });
  } catch (err) {
  console.error("circuit load failed:", e.slug, err);
  return null; // soft-fail: skip this one, keep the rest
