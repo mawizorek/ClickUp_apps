@@ -1,0 +1,29 @@
+# Cloudflare Worker config for the Inciardi Market backend.
+#
+# This file lets Workers Builds (the dashboard "Connect to Git" option)
+# build and deploy worker.js automatically on every push to main.
+# It also works for a manual `wrangler deploy` from this folder.
+#
+# SECRETS ARE NOT HERE ON PURPOSE. EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, and
+# WRITE_KEY live in the Cloudflare dashboard (Worker > Settings > Variables
+# and Secrets). Never commit them to the repo.
+
+name = "inciardi-market"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# eBay pull cadence: every 6 hours. scheduled() in worker.js runs runCron().
+[triggers]
+crons = ["0 */6 * * *"]
+
+# Live eBay snapshot cache (rebuilt each run).
+[[kv_namespaces]]
+binding = "SNAPSHOTS"
+id = "9780d26434c74f5a81c8df3d8bf67dd6"
+
+# Permanent store: history + catalog + inventory.
+# database_name is cosmetic here; the binding resolves by database_id.
+[[d1_databases]]
+binding = "DB"
+database_name = "inciardi-market"
+database_id = "18f3459f-8273-44d6-8380-6971d6173b3e"
