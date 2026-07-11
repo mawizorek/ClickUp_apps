@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#14161c">
 <title>Inciardi Market</title>
 <meta name="description" content="A market terminal for mini prints: underpriced buys, sell signals on exclusives, priced off eBay.">
+<meta name="robots" content="noindex, nofollow">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/inciardi-market/">
 <meta property="og:title" content="Inciardi Market">
@@ -54,8 +55,18 @@ a{color:inherit}
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
 svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
 
+/* ---- site nav (shared across the 3 pages) ---- */
+.sitenav{display:flex;align-items:center;gap:var(--s2);padding:calc(var(--s4) + env(safe-area-inset-top)) 0 0;flex-wrap:wrap}
+.sitenav .seg{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.sitenav a{font-family:var(--mono);font-size:0.72rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+ color:var(--ink-faint);text-decoration:none;padding:8px 15px;border-right:1px solid var(--line-soft);transition:background 0.15s var(--ease),color 0.15s var(--ease);display:flex;align-items:center;gap:6px}
+.sitenav a:last-child{border-right:none}
+.sitenav a:hover{background:var(--sunk);color:var(--ink-soft)}
+.sitenav a[aria-current="page"]{background:var(--accent);color:var(--bg)}
+.sitenav a svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
 /* ---- masthead ---- */
-.masthead{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding:calc(var(--s6) + env(safe-area-inset-top)) 0 var(--s4)}
+.masthead{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding:var(--s5) 0 var(--s4)}
 .brand{display:flex;align-items:center;gap:var(--s3)}
 .ticker{font-family:var(--mono);font-weight:600;font-size:0.74rem;letter-spacing:0.04em;color:var(--bg);
  background:var(--accent);padding:3px 7px;border-radius:4px}
@@ -101,7 +112,7 @@ svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;strok
 .section-lead{font-size:0.82rem;color:var(--ink-soft);margin-bottom:var(--s3);max-width:74ch}
 .section-lead b{color:var(--ink);font-weight:600}
 
-/* ---- watchlist feed (tightened, no buy-row fill) ---- */
+/* ---- watchlist feed ---- */
 .feed{border-top:1px solid var(--line)}
 .deal{display:grid;grid-template-columns:34px 1fr auto;gap:var(--s3);align-items:center;
  padding:var(--s3) var(--s2);border-bottom:1px solid var(--line-soft);transition:background 0.12s var(--ease)}
@@ -239,67 +250,75 @@ footer{margin-top:var(--s16);border-top:1px solid var(--line);background:var(--s
  .wrap{padding:0 var(--s4)}
  .figs{flex-wrap:wrap} .fig{flex-basis:50%;border-bottom:1px solid var(--line-soft)}
  .portfolio .p{flex-basis:50%}
+ .sitenav a{flex:1;justify-content:center;padding:8px 10px}
+ .sitenav .seg{width:100%}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
+
+ <nav class="sitenav" aria-label="Sections">
+  <div class="seg">
+   <a href="./catalog.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Catalog</a>
+   <a href="./index.html" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Market</a>
+   <a href="./collection.html"><svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/></svg>Collection</a>
+  </div>
+ </nav>
+
  <header class="masthead">
- <div class="brand">
- <span class="ticker">IMKT</span>
- <div class="name">Inciardi <span>Market</span></div>
- </div>
- <div class="rgt">
- <div class="status sample" id="status"><span class="dot"></span><span id="statusText">Sample</span></div>
- <button class="gear" id="gear" aria-label="Settings" aria-expanded="false">
- <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
- </button>
- </div>
+  <div class="brand">
+   <span class="ticker">IMKT</span>
+   <span class="name">Inciardi <span>Market</span></span>
+  </div>
+  <div class="rgt">
+   <div class="status" id="status"><span class="dot"></span><span id="statusText">Sample</span></div>
+   <button class="gear" id="gear" aria-expanded="false" aria-label="Settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
  </header>
 
  <div class="board" id="board"></div>
 
- <nav class="tabs" role="tablist">
- <button class="tab" role="tab" data-tab="radar" aria-selected="true">Deal Radar <span class="count" id="c-radar">0</span></button>
- <button class="tab" role="tab" data-tab="sell" aria-selected="false">Sell Signal <span class="count" id="c-sell">0</span></button>
- <button class="tab" role="tab" data-tab="stock" aria-selected="false">My Stock <span class="count" id="c-stock">0</span></button>
- <button class="tab" role="tab" data-tab="catalog" aria-selected="false">Catalog <span class="count" id="c-cat">0</span></button>
- <button class="tab" role="tab" data-tab="machines" aria-selected="false">Machines <span class="count" id="c-mach">0</span></button>
- <button class="tab" role="tab" data-tab="all" aria-selected="false">All <span class="count" id="c-all">0</span></button>
+ <nav class="tabs" role="tablist" aria-label="Views">
+  <button class="tab" role="tab" data-tab="radar" aria-selected="true">Deal Radar <span class="count" id="c-radar">0</span></button>
+  <button class="tab" role="tab" data-tab="sell" aria-selected="false">Sell Signal <span class="count" id="c-sell">0</span></button>
+  <button class="tab" role="tab" data-tab="stock" aria-selected="false">My Stock <span class="count" id="c-stock">0</span></button>
+  <button class="tab" role="tab" data-tab="catalog" aria-selected="false">Catalog <span class="count" id="c-cat">0</span></button>
+  <button class="tab" role="tab" data-tab="machines" aria-selected="false">Machines <span class="count" id="c-mach">0</span></button>
+  <button class="tab" role="tab" data-tab="all" aria-selected="false">All <span class="count" id="c-all">0</span></button>
  </nav>
 
- <main id="panel"></main>
+ <div id="panel"></div>
 </div>
 
 <footer>
  <div class="foot-in">
- <div>
- <div class="foot-brand">Inciardi Market</div>
- <div class="foot-desc">A market terminal for mini prints: underpriced buys, sell signals on exclusives, priced off eBay.</div>
- </div>
- <div class="foot-links">
- <a href="https://inciardiprints.com" target="_blank" rel="noopener">Inciardi Prints <svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></a>
- <a href="https://inciardiprints.com/pages/store-locator" target="_blank" rel="noopener">Machine map <svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></a>
- <a href="https://www.ebay.com/sch/i.html?_nkw=inciardi+mini+print" target="_blank" rel="noopener">eBay search <svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></a>
- </div>
+  <div>
+   <div class="foot-brand">Inciardi Market</div>
+   <div class="foot-desc">A market terminal for mini prints: underpriced buys, sell signals on exclusives, priced off eBay.</div>
+  </div>
+  <div class="foot-links">
+   <a href="https://inciardiprints.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Inciardi Prints</a>
+   <a href="https://inciardiprints.com/pages/store-locator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Machine map</a>
+   <a href="https://www.ebay.com/sch/i.html?_nkw=anastasia+inciardi+mini+print" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>eBay search</a>
+  </div>
  </div>
  <div class="foot-base"><div class="foot-base-in"><span id="f-build">Inciardi Market</span><span id="f-stamp"></span></div></div>
 </footer>
 
-<dialog class="drawer" id="drawer">
+<dialog class="drawer" id="drawer" aria-label="Settings">
  <button class="drawer-close" id="drawerClose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
  <h2>Settings</h2>
  <div class="field">
- <div><label>Dark terminal</label><div class="desc">Persists on this device</div></div>
- <button class="toggle" id="themeToggle" role="switch" aria-pressed="true" aria-label="Toggle dark terminal"></button>
+  <div><label>Dark terminal</label><div class="desc">Persists on this device</div></div>
+  <button class="toggle" id="themeToggle" role="switch" aria-pressed="true" aria-label="Toggle dark theme"></button>
  </div>
- <div style="padding:var(--s4) 0;border-bottom:1px solid var(--line-soft)">
- <label style="font-size:0.9rem;font-weight:550">Data source</label>
- <div class="desc" style="font-size:0.74rem;color:var(--ink-faint);margin-top:2px">Blank uses bundled sample. Paste your Worker URL to go live.</div>
- <input class="ep" id="epInput" type="url" placeholder="https://…workers.dev/market" autocomplete="off" spellcheck="false">
+ <div class="field" style="display:block">
+  <div><label>Data source</label><div class="desc">Blank uses bundled sample. Paste your Worker URL to go live.</div></div>
+  <input class="ep" id="epInput" type="text" placeholder="https://…workers.dev/market" spellcheck="false" autocomplete="off">
  </div>
- <div class="drawer-note">Prices come from the scheduled eBay pull (every 6h once live). Catalog and machine locations refresh occasionally from a wide web search, not automatically. My Stock stays on this device. Baseline is retail plus the active-listing spread; no sold-price history yet.</div>
+ <p class="drawer-note">Prices come from the scheduled eBay pull (every 6h once live). Catalog and machine locations refresh occasionally from a wide web search, not automatically. My Stock stays on this device. Baseline is retail plus the active-listing spread; no sold-price history yet.</p>
 </dialog>
 
 <script src="app.js"></script>
