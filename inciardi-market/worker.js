@@ -1,19 +1,19 @@
 /**
- * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0.3)
+ * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0.4)
  *
  * Reads live eBay listings (Browse API), diffs vs the KV snapshot, and
  * serves market.json on GET /market.
- *   - GET  /inventory        — read the collection (D1, joined to catalog)
- *   - POST /inventory         — upsert/delete/setState an inventory row (GATED)
- *   - POST /catalog/confirm   — promote a spotted print into the catalog (GATED)
- *   - scheduled() cron        — distills trend points into D1 each run
+ * - GET /inventory — read the collection (D1, joined to catalog)
+ * - POST /inventory — upsert/delete/setState an inventory row (GATED)
+ * - POST /catalog/confirm — promote a spotted print into the catalog (GATED)
+ * - scheduled() cron — distills trend points into D1 each run
  *
  * DATA HOMES:
- *   - Live eBay listings  -> Cloudflare KV (SNAPSHOTS), rebuilt every run.
- *   - History + catalog + inventory -> Cloudflare D1 (DB). Permanent.
+ * - Live eBay listings -> Cloudflare KV (SNAPSHOTS), rebuilt every run.
+ * - History + catalog + inventory -> Cloudflare D1 (DB). Permanent.
  *
  * Bindings: KV 'SNAPSHOTS', D1 'DB'.
- * Secrets:  EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY (gate for POST routes).
+ * Secrets: EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY (gate for POST routes).
  *
  * WRITE GATE: reads are open; every POST requires header 'x-write-key' to match
  * env.WRITE_KEY. Integrity gate (stop public vandalism), not privacy.
@@ -122,15 +122,25 @@ async function fetchListings(env) {
  return (data.itemSummaries || []).map(normalize);
 }
 
+// eBay Browse returns the amount in `price` for FIXED_PRICE, but in
+// `currentBidPrice` for AUCTION listings. Read whichever is present so
+// auctions don't collapse to a 0 landed price (the $0.00 / -100% bug).
+function priceObjOf(it) {
+ if (it.price && it.price.value != null) return it.price;
+ if (it.currentBidPrice && it.currentBidPrice.value != null) return it.currentBidPrice;
+ return null;
+}
+
 function normalize(it) {
- const price = num(it.price && it.price.value);
+ const priceObj = priceObjOf(it);
+ const price = num(priceObj && priceObj.value);
  const shipping = shipCost(it.shippingOptions);
  const title = it.title || "";
  return {
  itemId: it.itemId,
  title,
  price,
- currency: (it.price && it.price.currency) || "USD",
+ currency: (priceObj && priceObj.currency) || "USD",
  shipping,
  landed: round2(price + shipping),
  condition: it.condition || "Unknown",
@@ -294,9 +304,9 @@ async function readInventory(env) {
 }
 
 // Body ops:
-//   { op:'setState', print_id, disposition }  -> one row per print; disposition null clears it.
-//   { op:'delete', inv_id }
-//   { op:'upsert', inv_id?, print_id?, provisional_label?, disposition?, qty?, ... }
+// { op:'setState', print_id, disposition } -> one row per print; disposition null clears it.
+// { op:'delete', inv_id }
+// { op:'upsert', inv_id?, print_id?, provisional_label?, disposition?, qty?, ... }
 async function writeInventory(env, body) {
  const op = (body && body.op) || "upsert";
  const now = new Date().toISOString();
