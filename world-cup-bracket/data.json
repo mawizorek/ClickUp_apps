@@ -289,8 +289,8 @@
       "hs": 1,
       "as": 2,
       "winner": "away",
-      "venue": "MetLife Stadium, East Rutherford",
-      "feedsTo": 26
+      "venue": "MetLife Stadium, East Rutherford, NJ",
+      "feedsTo": 27
     },
     {
       "id": 12,
@@ -305,7 +305,7 @@
       "as": 3,
       "winner": "away",
       "venue": "Estadio Azteca, Mexico City",
-      "feedsTo": 26
+      "feedsTo": 27
     },
     {
       "id": 13,
@@ -320,7 +320,7 @@
       "as": 1,
       "winner": "away",
       "venue": "AT&T Stadium, Arlington",
-      "feedsTo": 27
+      "feedsTo": 26
     },
     {
       "id": 14,
@@ -335,7 +335,7 @@
       "as": 4,
       "winner": "away",
       "venue": "Lumen Field, Seattle",
-      "feedsTo": 27
+      "feedsTo": 26
     },
     {
       "id": 15,
@@ -363,6 +363,7 @@
       "away": "Colombia",
       "hs": 0,
       "as": 0,
+      "aet": true,
       "psoNote": "Switzerland 4-3 pens",
       "winner": "home",
       "venue": "BC Place, Vancouver",
@@ -440,8 +441,8 @@
       "hs": null,
       "as": null,
       "winner": null,
-      "venue": "AT&T Stadium, Arlington",
-      "feedsTo": 32
+      "venue": "Dallas Stadium, Arlington, TX",
+      "feedsTo": 31
     },
     {
       "id": 30,
@@ -450,38 +451,23 @@
       "day": "2026-07-15",
       "dayLabel": "Wed Jul 15",
       "time": "3:00 PM",
-      "home": null,
-      "away": null,
+      "home": "TBD",
+      "away": "TBD",
       "hs": null,
       "as": null,
       "winner": null,
-      "venue": "Mercedes-Benz Stadium, Atlanta",
-      "feedsTo": 32
+      "venue": "Atlanta Stadium, Atlanta, GA",
+      "feedsTo": 31
     },
     {
       "id": 31,
-      "cuTaskId": "86aj8z5cq",
-      "round": "3P",
-      "day": "2026-07-18",
-      "dayLabel": "Sat Jul 18",
-      "time": "5:00 PM",
-      "home": null,
-      "away": null,
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Hard Rock Stadium, Miami Gardens",
-      "feedsTo": null
-    },
-    {
-      "id": 32,
       "cuTaskId": "86aj8z5cr",
       "round": "Final",
       "day": "2026-07-19",
       "dayLabel": "Sun Jul 19",
       "time": "3:00 PM",
-      "home": null,
-      "away": null,
+      "home": "TBD",
+      "away": "TBD",
       "hs": null,
       "as": null,
       "winner": null,
