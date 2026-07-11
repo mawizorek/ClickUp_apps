@@ -1,6 +1,6 @@
 <!--
   F1 Racetracks (circuit guide lens)
-  Version: v6.1
+  Version: v6.1 (shell) · cross-lens switcher added 2026-07-11
   Live: https://mawizorek.github.io/ClickUp_apps/f1-racetracks/circuits.html
   Source: https://github.com/mawizorek/ClickUp_apps/tree/main/f1-racetracks
   INFRASTRUCTURE: slim runtime entrypoint + direct source modules in /source.
@@ -11,6 +11,10 @@
   circuits/index_circuits.json keyed by slug; source/09 fetches the index + each
   circuit file at boot and merges the per-year fields on (mirrors the f1-results
   per-round store). No more inline TRACK_DATA modules.
+  CROSS-LENS NAV (2026-07-11): topbar carries a 3-way lens switcher
+  (Matrix / History / Circuits) matching the standings switcher; styles in
+  source/03e_lens_switcher.css.txt. Matrix -> standings.html, History ->
+  standings.html#history (deep-links straight into the History lens).
   CACHE-BUST: bump BUILD_STAMP below AND the ?v= token on the module <script> tags on every source/style deploy.
   Footer version label lives in source/09 (APP_VERSION). Keep it in sync with this header.
 -->
@@ -33,13 +37,14 @@
   </style>
   <script>
     // Bump this one token on every source/style deploy to guarantee fresh bytes.
-    const BUILD_STAMP = '20260710h';
+    const BUILD_STAMP = '20260710i';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
       './source/03b_styles_results_and_mobile.css.txt',
       './source/03c_live_session_panel.css.txt',
-      './source/03d_styles_technical_index.css.txt'
+      './source/03d_styles_technical_index.css.txt',
+      './source/03e_lens_switcher.css.txt'
     ];
 
     window.runtimeStylesReady = Promise.all(
@@ -65,8 +70,15 @@
         <span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 17c4-1 6-9 10-9 3 0 4 3 8 2" stroke="white" stroke-width="2.4" stroke-linecap="round"></path><circle cx="6" cy="16.5" r="1.7" fill="white"></circle></svg></span>
         <span class="t">F1 Racetracks<small>2026 Circuit Guide</small></span>
       </button>
-      <div class="nav-jump">
-        <select id="jump" aria-label="Jump to circuit"><option value="">Jump to circuit…</option></select>
+      <div class="topbar-r">
+        <nav class="lens" aria-label="Lens switcher">
+          <a href="./standings.html">Matrix</a>
+          <a href="./standings.html#history">History</a>
+          <span class="on" aria-current="page">Circuits</span>
+        </nav>
+        <div class="nav-jump">
+          <select id="jump" aria-label="Jump to circuit"><option value="">Jump to circuit…</option></select>
+        </div>
       </div>
     </div>
 
@@ -87,15 +99,15 @@
     </footer>
   </div>
 
-  <script src="./source/12_results_store.js?v=20260710h"></script>
-  <script src="./source/09_app_bootstrap_and_home.js?v=20260710h"></script>
-  <script src="./source/10_track_views_and_profile.js?v=20260710h"></script>
-  <script src="./source/13_live_session_panel.js?v=20260710h"></script>
-  <script src="./source/11_weather_and_footer_exports.js?v=20260710h"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260710h"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260710h"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260710h"></script>
-  <script src="./source/17_weekend_mount.js?v=20260710h"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260710h"></script>
+  <script src="./source/12_results_store.js?v=20260710i"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260710i"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260710i"></script>
+  <script src="./source/13_live_session_panel.js?v=20260710i"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260710i"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260710i"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260710i"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260710i"></script>
+  <script src="./source/17_weekend_mount.js?v=20260710i"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260710i"></script>
 </body>
 </html>

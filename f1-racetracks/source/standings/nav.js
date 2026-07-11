@@ -1,8 +1,9 @@
 /* nav.js — cross-lens navigation for the standings surface. Additive only: injects a
-   masthead switcher (Standings · Circuits) with a "jump to round" menu that deep-links
+   masthead switcher (Matrix · History · Circuits) with a "jump to round" menu that deep-links
    each round to its circuit page, and drops a "circuit guide" connector into the race
    brief. Loaded LAST so its click handler runs after panel.js has rendered the panel.
-   Touches no other module. Race pages are transitory drill-throughs; standings is home. */
+   Touches no other module. Race pages are transitory drill-throughs; standings is home.
+   (The History segment is injected by history.js, which loads after this one.) */
 (function(){
   const CIRCUITS='circuits.html';
   const roundBy=rn=>(window.ROUNDS||[]).find(r=>String(r.round)===String(rn))||null;
@@ -34,7 +35,7 @@
   const st=document.createElement('style');st.id='nav-css';st.textContent=css;document.head.appendChild(st);
 
   const nav=document.createElement('nav');nav.className='xnav';nav.setAttribute('aria-label','Lens switcher');
-  nav.innerHTML='<div class="xseg"><span class="on" aria-current="page">Standings</span><a href="'+CIRCUITS+'">Circuits</a></div>'+
+  nav.innerHTML='<div class="xseg"><span class="on" aria-current="page">Matrix</span><a href="'+CIRCUITS+'">Circuits</a></div>'+
     '<div class="xdrop"><div class="xseg"><button type="button" id="xRoundsBtn" aria-haspopup="true" aria-expanded="false">Jump to round <span class="ar">&#9662;</span></button></div><div class="xmenu" id="xRoundsMenu" role="menu"></div></div>';
   document.body.insertBefore(nav,document.body.firstChild);
 
