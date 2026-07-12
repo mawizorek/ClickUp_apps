@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-11",
+  "version": "2026-07-12",
   "tournament": "FIFA World Cup 2026",
   "matches": [
     {
@@ -290,11 +290,11 @@
       "as": 2,
       "winner": "away",
       "venue": "MetLife Stadium, East Rutherford, NJ",
-      "feedsTo": 27
+      "feedsTo": 26
     },
     {
       "id": 12,
-      "cuTaskId": "86aj8z5bm",
+      "cuTaskId": "86aj8z5bp",
       "round": "R16",
       "day": "2026-07-05",
       "dayLabel": "Sun Jul 5",
@@ -302,71 +302,70 @@
       "home": "Mexico",
       "away": "England",
       "hs": 2,
-      "as": 3,
-      "winner": "away",
+      "as": 1,
+      "winner": "home",
       "venue": "Estadio Azteca, Mexico City",
-      "feedsTo": 27
+      "feedsTo": 26
     },
     {
       "id": 13,
-      "cuTaskId": "86aj8z5bq",
+      "cuTaskId": "86aj8z5bu",
       "round": "R16",
       "day": "2026-07-06",
       "dayLabel": "Mon Jul 6",
       "time": "3:00 PM",
-      "home": "Portugal",
-      "away": "Spain",
-      "hs": 0,
-      "as": 1,
-      "winner": "away",
-      "venue": "AT&T Stadium, Arlington",
-      "feedsTo": 26
+      "home": "Spain",
+      "away": "Portugal",
+      "hs": 2,
+      "as": 2,
+      "psoNote": "Spain 5-4 pens",
+      "winner": "home",
+      "venue": "SoFi Stadium, Inglewood, CA",
+      "feedsTo": 27
     },
     {
       "id": 14,
-      "cuTaskId": "86aj8z5bt",
+      "cuTaskId": "86aj8z5bz",
       "round": "R16",
       "day": "2026-07-06",
       "dayLabel": "Mon Jul 6",
-      "time": "8:00 PM",
-      "home": "USA",
-      "away": "Belgium",
+      "time": "7:00 PM",
+      "home": "Belgium",
+      "away": "USA",
       "hs": 1,
-      "as": 4,
+      "as": 2,
       "winner": "away",
-      "venue": "Lumen Field, Seattle",
-      "feedsTo": 26
+      "venue": "Levi's Stadium, Santa Clara, CA",
+      "feedsTo": 27
     },
     {
       "id": 15,
-      "cuTaskId": "86aj8z5bx",
-      "round": "R16",
-      "day": "2026-07-07",
-      "dayLabel": "Tue Jul 7",
-      "time": "12:00 PM",
-      "home": "Argentina",
-      "away": "Egypt",
-      "hs": 3,
-      "as": 2,
-      "winner": "home",
-      "venue": "Mercedes-Benz Stadium, Atlanta",
-      "feedsTo": 28
-    },
-    {
-      "id": 16,
-      "cuTaskId": "86aj8z5c0",
+      "cuTaskId": "86aj8z5c4",
       "round": "R16",
       "day": "2026-07-07",
       "dayLabel": "Tue Jul 7",
       "time": "4:00 PM",
+      "home": "Argentina",
+      "away": "Egypt",
+      "hs": 2,
+      "as": 1,
+      "winner": "home",
+      "venue": "Hard Rock Stadium, Miami Gardens, FL",
+      "feedsTo": 28
+    },
+    {
+      "id": 16,
+      "cuTaskId": "86aj8z5c9",
+      "round": "R16",
+      "day": "2026-07-07",
+      "dayLabel": "Tue Jul 7",
+      "time": "8:00 PM",
       "home": "Switzerland",
       "away": "Colombia",
-      "hs": 0,
+      "hs": 1,
       "as": 0,
-      "aet": true,
-      "psoNote": "Switzerland 4-3 pens",
       "winner": "home",
-      "venue": "BC Place, Vancouver",
+      "venue": "BC Place, Vancouver, Canada",
       "feedsTo": 28
     },
     {
@@ -381,7 +380,7 @@
       "hs": 2,
       "as": 0,
       "winner": "home",
-      "venue": "Gillette Stadium, Foxborough",
+      "venue": "Boston Stadium, Foxborough, MA",
       "feedsTo": 29
     },
     {
@@ -396,7 +395,7 @@
       "hs": 2,
       "as": 1,
       "winner": "home",
-      "venue": "SoFi Stadium, Inglewood",
+      "venue": "SoFi Stadium, Inglewood, CA",
       "feedsTo": 29
     },
     {
@@ -408,10 +407,11 @@
       "time": "5:00 PM",
       "home": "Norway",
       "away": "England",
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Hard Rock Stadium, Miami Gardens",
+      "hs": 1,
+      "as": 2,
+      "aet": true,
+      "winner": "away",
+      "venue": "Hard Rock Stadium, Miami Gardens, FL",
       "feedsTo": 30
     },
     {
@@ -423,10 +423,11 @@
       "time": "9:00 PM",
       "home": "Argentina",
       "away": "Switzerland",
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "Arrowhead Stadium, Kansas City",
+      "hs": 3,
+      "as": 1,
+      "aet": true,
+      "winner": "home",
+      "venue": "Arrowhead Stadium, Kansas City, MO",
       "feedsTo": 30
     },
     {
@@ -438,9 +439,6 @@
       "time": "4:00 PM",
       "home": "France",
       "away": "Spain",
-      "hs": null,
-      "as": null,
-      "winner": null,
       "venue": "Dallas Stadium, Arlington, TX",
       "feedsTo": 31
     },
@@ -451,11 +449,8 @@
       "day": "2026-07-15",
       "dayLabel": "Wed Jul 15",
       "time": "3:00 PM",
-      "home": "TBD",
-      "away": "TBD",
-      "hs": null,
-      "as": null,
-      "winner": null,
+      "home": "England",
+      "away": "Argentina",
       "venue": "Atlanta Stadium, Atlanta, GA",
       "feedsTo": 31
     },
@@ -466,13 +461,20 @@
       "day": "2026-07-19",
       "dayLabel": "Sun Jul 19",
       "time": "3:00 PM",
-      "home": "TBD",
-      "away": "TBD",
-      "hs": null,
-      "as": null,
-      "winner": null,
-      "venue": "MetLife Stadium, East Rutherford, NJ",
-      "feedsTo": null
+      "home": null,
+      "away": null,
+      "venue": "New York New Jersey Stadium, East Rutherford, NJ"
+    },
+    {
+      "id": 32,
+      "cuTaskId": "86aj8z5cq",
+      "round": "3P",
+      "day": "2026-07-18",
+      "dayLabel": "Sat Jul 18",
+      "time": "5:00 PM",
+      "home": null,
+      "away": null,
+      "venue": "Miami Stadium, Miami Gardens, FL"
     }
   ]
 }
