@@ -11,17 +11,22 @@
 
  DEEP LINK: standings.html#history opens this lens directly (on load + hashchange),
  and the History/Matrix segments drive the hash so the view is shareable and
- back-button friendly. The circuit guide's switcher links here via that hash. */
+ back-button friendly. The circuit guide's switcher links here via that hash.
+
+ RESILIENCE: data is fetched asynchronously by data.js (index + every round file).
+ This lens renders as soon as that lands — it listens for the 'season-ready' event
+ AND keeps a long fallback poll — so a slow mobile load never leaves History frozen
+ on "Loading the season…" (the old 40-try / 6s cap did exactly that). */
 (function () {
-  const CIRCUITS = 'circuits.html';
+ const CIRCUITS = 'circuits.html';
 
-  const ln = n => { n = String(n || ''); return n === 'Andrea Kimi Antonelli' ? 'Antonelli' : (n.split(' ').slice(-1)[0] || n); };
-  const short = s => String(s || '').replace(' Grand Prix', '');
-  const fmtDate = d => { if (!d) return ''; const dt = new Date(d + 'T00:00:00'); return isNaN(dt) ? d : dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
-  const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+ const ln = n => { n = String(n || ''); return n === 'Andrea Kimi Antonelli' ? 'Antonelli' : (n.split(' ').slice(-1)[0] || n); };
+ const short = s => String(s || '').replace(' Grand Prix', '');
+ const fmtDate = d => { if (!d) return ''; const dt = new Date(d + 'T00:00:00'); return isNaN(dt) ? d : dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
+ const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
-  /* ---- self-contained styles (reuses base.css tokens; panel/base untouched) ---- */
-  const css = `
+ /* ---- self-contained styles (reuses base.css tokens; panel/base untouched) ---- */
+ const css = `
 #hx-stage{display:flex;flex-direction:column;gap:12px}
 #hx-stage.hidden{display:none!important}
 .hx-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px}
@@ -51,40 +56,40 @@
 .hx-empty{padding:50px 20px;text-align:center;color:var(--txt-dim);font-size:0.9rem;border:1px solid var(--line);background:var(--s1)}
 .hx-lens.on{background:var(--s3);color:var(--txt);cursor:default}
 `;
-  const st = document.createElement('style'); st.id = 'hx-css'; st.textContent = css; document.head.appendChild(st);
+ const st = document.createElement('style'); st.id = 'hx-css'; st.textContent = css; document.head.appendChild(st);
 
-  /* ---- resulting WDC after ROUNDS index i (ascending order; cumPoints aligns to it) ---- */
-  function wdcAfter(i) {
-    const rows = Object.keys(DRV).map(id => ({ id, pts: cumPoints(id)[i] }))
-      .sort((a, b) => b.pts - a.pts || ln(DRV[a.id].name).localeCompare(ln(DRV[b.id].name)));
-    const L = rows[0], S = rows[1];
-    return { id: L.id, pts: L.pts, margin: S ? L.pts - S.pts : L.pts };
-  }
+ /* ---- resulting WDC after ROUNDS index i (ascending order; cumPoints aligns to it) ---- */
+ function wdcAfter(i) {
+ const rows = Object.keys(DRV).map(id => ({ id, pts: cumPoints(id)[i] }))
+ .sort((a, b) => b.pts - a.pts || ln(DRV[a.id].name).localeCompare(ln(DRV[b.id].name)));
+ const L = rows[0], S = rows[1];
+ return { id: L.id, pts: L.pts, margin: S ? L.pts - S.pts : L.pts };
+ }
 
-  function card(rd, i) {
-    const cls = rd.classification || [];
-    const at = n => cls.find(r => r.pos === n);
-    const w = at(1), p2 = at(2), p3 = at(3);
-    const wTeam = w ? (w.team || (DRV[w.driverId] && DRV[w.driverId].team) || '') : '';
-    const rail = wTeam ? teamColor(wTeam) : 'var(--line)';
-    const pole = rd.pole, fl = rd.fastestLap;
-    const spr = (rd.sprint && rd.sprint.classification) ? rd.sprint.classification.find(r => r.pos === 1) : null;
-    const wdc = wdcAfter(i);
+ function card(rd, i) {
+ const cls = rd.classification || [];
+ const at = n => cls.find(r => r.pos === n);
+ const w = at(1), p2 = at(2), p3 = at(3);
+ const wTeam = w ? (w.team || (DRV[w.driverId] && DRV[w.driverId].team) || '') : '';
+ const rail = wTeam ? teamColor(wTeam) : 'var(--line)';
+ const pole = rd.pole, fl = rd.fastestLap;
+ const spr = (rd.sprint && rd.sprint.classification) ? rd.sprint.classification.find(r => r.pos === 1) : null;
+ const wdc = wdcAfter(i);
 
-    const pod = [
-      w && `<span class="hx-p p1"><i>1</i>${esc(ln(w.driver))}<span class="tm">${esc(wTeam)}</span></span>`,
-      p2 && `<span class="hx-p p2"><i>2</i>${esc(ln(p2.driver))}</span>`,
-      p3 && `<span class="hx-p p3"><i>3</i>${esc(ln(p3.driver))}</span>`
-    ].filter(Boolean).join('');
+ const pod = [
+ w && `<span class="hx-p p1"><i>1</i>${esc(ln(w.driver))}<span class="tm">${esc(wTeam)}</span></span>`,
+ p2 && `<span class="hx-p p2"><i>2</i>${esc(ln(p2.driver))}</span>`,
+ p3 && `<span class="hx-p p3"><i>3</i>${esc(ln(p3.driver))}</span>`
+ ].filter(Boolean).join('');
 
-    const meta = [
-      `<span><b>Pole</b>${pole ? `${esc(ln(pole.driver))}${pole.time ? ` <span class="mono">${esc(pole.time)}</span>` : ''}` : '\u2014'}</span>`,
-      `<span><b>FL</b>${fl ? `${esc(ln(fl.driver))}${fl.time ? ` <span class="mono">${esc(fl.time)}</span>` : ''}` : '\u2014'}</span>`,
-      spr ? `<span><b>Sprint</b>${esc(ln(spr.driver))}</span>` : ''
-    ].filter(Boolean).join('');
+ const meta = [
+ `<span><b>Pole</b>${pole ? `${esc(ln(pole.driver))}${pole.time ? ` <span class="mono">${esc(pole.time)}</span>` : ''}` : '\u2014'}</span>`,
+ `<span><b>FL</b>${fl ? `${esc(ln(fl.driver))}${fl.time ? ` <span class="mono">${esc(fl.time)}</span>` : ''}` : '\u2014'}</span>`,
+ spr ? `<span><b>Sprint</b>${esc(ln(spr.driver))}</span>` : ''
+ ].filter(Boolean).join('');
 
-    const mg = wdc.margin === 0 ? 'level' : `+${wdc.margin}`;
-    return `<article class="hx-card" style="--team:${rail}">
+ const mg = wdc.margin === 0 ? 'level' : `+${wdc.margin}`;
+ return `<article class="hx-card" style="--team:${rail}">
 <div class="hx-rail"></div>
 <div class="hx-body">
 <div class="hx-top"><span class="hx-rn">R${rd.round}</span><span class="hx-gp">${esc(short(rd.name))}</span><span class="hx-date">${esc(fmtDate(rd.date))}</span>${rd.slug ? `<a class="hx-circuit" href="${CIRCUITS}#/${rd.slug}">Circuit \u2192</a>` : ''}</div>
@@ -93,61 +98,68 @@ ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
 <div class="hx-wdc"><span class="hx-wdc-k">Championship after R${rd.round}</span><span class="hx-wdc-v">${esc(ln(DRV[wdc.id].name))} leads<span class="mg">${mg}</span></span></div>
 </div>
 </article>`;
-  }
+ }
 
-  let tries = 0;
-  function renderHistory() {
-    const hs = document.getElementById('hx-stage'); if (!hs) return;
-    if (!window.ROUNDS || !ROUNDS.length || !Object.keys(DRV).length) {
-      hs.innerHTML = '<div class="hx-empty">Loading the season\u2026</div>';
-      if (tries++ < 40) setTimeout(renderHistory, 150);
-      return;
-    }
-    tries = 0;
-    // ROUNDS is ascending; keep the original index for cumPoints, display newest-first.
-    const cards = ROUNDS.map((rd, i) => ({ rd, i }))
-      .sort((a, b) => b.rd.round - a.rd.round)
-      .map(o => card(o.rd, o.i)).join('');
-    hs.innerHTML = `<div class="hx-head"><span class="hx-title">Season History</span><span class="hx-sub">${ROUNDS.length} rounds \u00b7 round by round</span></div>${cards}`;
-  }
+ let tries = 0;
+ function renderHistory() {
+ const hs = document.getElementById('hx-stage'); if (!hs) return;
+ if (!window.ROUNDS || !ROUNDS.length || !Object.keys(DRV).length) {
+ hs.innerHTML = '<div class="hx-empty">Loading the season\u2026</div>';
+ // Fallback poll only. The real trigger is the 'season-ready' event (listener below);
+ // this just covers the case where the event was missed. ~30s cap so a slow mobile
+ // load has room to finish instead of freezing forever (was 40 tries / 6s).
+ if (tries++ < 200) setTimeout(renderHistory, 150);
+ return;
+ }
+ tries = 0;
+ // ROUNDS is ascending; keep the original index for cumPoints, display newest-first.
+ const cards = ROUNDS.map((rd, i) => ({ rd, i }))
+ .sort((a, b) => b.rd.round - a.rd.round)
+ .map(o => card(o.rd, o.i)).join('');
+ hs.innerHTML = `<div class="hx-head"><span class="hx-title">Season History</span><span class="hx-sub">${ROUNDS.length} rounds \u00b7 round by round</span></div>${cards}`;
+ }
 
-  /* ---- fold into the existing lens switcher ---- */
-  const xseg = document.querySelector('.xnav .xseg');
-  if (!xseg) return; // nav.js absent — nothing to fold into
+ /* ---- fold into the existing lens switcher ---- */
+ const xseg = document.querySelector('.xnav .xseg');
+ if (!xseg) return; // nav.js absent — nothing to fold into
 
-  const stage = document.getElementById('stage');
-  const controls = document.querySelector('.controls');
-  const hs = document.createElement('section'); hs.id = 'hx-stage'; hs.className = 'hidden';
-  if (stage && stage.parentNode) stage.parentNode.insertBefore(hs, stage.nextSibling);
+ const stage = document.getElementById('stage');
+ const controls = document.querySelector('.controls');
+ const hs = document.createElement('section'); hs.id = 'hx-stage'; hs.className = 'hidden';
+ if (stage && stage.parentNode) stage.parentNode.insertBefore(hs, stage.nextSibling);
 
-  const circuitsLink = xseg.querySelector('a[href*="circuits"]');
-  const standingsEl = [...xseg.children].find(c => c !== circuitsLink) || null;
+ const circuitsLink = xseg.querySelector('a[href*="circuits"]');
+ const standingsEl = [...xseg.children].find(c => c !== circuitsLink) || null;
 
-  const hb = document.createElement('button');
-  hb.type = 'button'; hb.className = 'hx-lens'; hb.textContent = 'History';
-  if (circuitsLink) xseg.insertBefore(hb, circuitsLink); else xseg.appendChild(hb);
+ const hb = document.createElement('button');
+ hb.type = 'button'; hb.className = 'hx-lens'; hb.textContent = 'History';
+ if (circuitsLink) xseg.insertBefore(hb, circuitsLink); else xseg.appendChild(hb);
 
-  function showHistory() {
-    if (typeof closePanel === 'function') closePanel();
-    controls && controls.classList.add('hidden');
-    stage && stage.classList.add('hidden');
-    hs.classList.remove('hidden');
-    hb.classList.add('on');
-    standingsEl && standingsEl.classList.remove('on');
-    renderHistory();
-  }
-  function showStandings() {
-    hs.classList.add('hidden');
-    controls && controls.classList.remove('hidden');
-    stage && stage.classList.remove('hidden');
-    hb.classList.remove('on');
-    standingsEl && standingsEl.classList.add('on');
-  }
+ function showHistory() {
+ if (typeof closePanel === 'function') closePanel();
+ controls && controls.classList.add('hidden');
+ stage && stage.classList.add('hidden');
+ hs.classList.remove('hidden');
+ hb.classList.add('on');
+ standingsEl && standingsEl.classList.remove('on');
+ tries = 0; // fresh polling budget each time History opens
+ renderHistory();
+ }
+ function showStandings() {
+ hs.classList.add('hidden');
+ controls && controls.classList.remove('hidden');
+ stage && stage.classList.remove('hidden');
+ hb.classList.remove('on');
+ standingsEl && standingsEl.classList.add('on');
+ }
 
-  // Hash drives the view so History is shareable / back-button friendly and the
-  // circuit guide can deep-link in via standings.html#history.
-  hb.addEventListener('click', e => { e.preventDefault(); if (location.hash !== '#history') { location.hash = 'history'; } else { showHistory(); } });
-  if (standingsEl) standingsEl.addEventListener('click', e => { e.preventDefault(); if (location.hash === '#history') { history.replaceState(null, '', location.pathname + location.search); } showStandings(); });
-  window.addEventListener('hashchange', () => { if (location.hash === '#history') showHistory(); else showStandings(); });
-  if (location.hash === '#history') showHistory();
+ // Hash drives the view so History is shareable / back-button friendly and the
+ // circuit guide can deep-link in via standings.html#history.
+ hb.addEventListener('click', e => { e.preventDefault(); if (location.hash !== '#history') { location.hash = 'history'; } else { showHistory(); } });
+ if (standingsEl) standingsEl.addEventListener('click', e => { e.preventDefault(); if (location.hash === '#history') { history.replaceState(null, '', location.pathname + location.search); } showStandings(); });
+ window.addEventListener('hashchange', () => { if (location.hash === '#history') showHistory(); else showStandings(); });
+ // Self-heal: when data.js finishes loading the season it fires 'season-ready'. If History
+ // is the active lens, render immediately — this is what stops the mobile "Loading…" freeze.
+ window.addEventListener('season-ready', () => { if (!hs.classList.contains('hidden')) { tries = 0; renderHistory(); } });
+ if (location.hash === '#history') showHistory();
 })();
