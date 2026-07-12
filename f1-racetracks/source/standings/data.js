@@ -2,7 +2,7 @@
  Loaded first; defines globals used by matrix.js, trajectory.js and panel.js. No data
  duplicated: verified results live in ./f1-results/2026/ (nested under the app).
  Index file: index_rounds.json (renamed from index.json 2026-07-09). */
-const APP_VERSION='v5.6';
+const APP_VERSION='v5.7';
 const DATA_BASE='f1-results/2026/';
 const DATA_INDEX='index_rounds.json';
 const TEAM_VAR={"Mercedes":"--t-mercedes","Ferrari":"--t-ferrari","McLaren":"--t-mclaren","Red Bull":"--t-redbull","Racing Bulls":"--t-racingbulls","Alpine":"--t-alpine","Aston Martin":"--t-astonmartin","Williams":"--t-williams","Haas":"--t-haas","Audi":"--t-audi","Cadillac":"--t-cadillac"};
@@ -28,6 +28,9 @@ async function load(){
  ROUNDS=await Promise.all(files.map(f=>fetch(DATA_BASE+f.file.replace('./',''),{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.json();})));
  compute();
  render();
+ // Publish that the season is loaded so lenses mounted after this (e.g. history.js)
+ // can render immediately instead of blind-polling — fixes History hanging on slow mobile.
+ window.dispatchEvent(new Event('season-ready'));
  }catch(e){
  document.getElementById('stage').innerHTML='<div class="state">Could not load the season data.<br><span style="font-size:0.78rem">This lens reads the results store at <code>'+DATA_BASE+DATA_INDEX+'</code>; it needs to run on GitHub Pages (same origin), not opened as a local file.</span></div>';
  }
