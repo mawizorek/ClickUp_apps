@@ -150,12 +150,4 @@ ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
   if (standingsEl) standingsEl.addEventListener('click', e => { e.preventDefault(); if (location.hash === '#history') { history.replaceState(null, '', location.pathname + location.search); } showStandings(); });
   window.addEventListener('hashchange', () => { if (location.hash === '#history') showHistory(); else showStandings(); });
   if (location.hash === '#history') showHistory();
-
-  /* Footer version reflects the lens build this feature ships with. data.js APP_VERSION
-     predates the segmented-module versioning; pinned here until data.js is next revised. */
-  (function pinStamp(n) {
-    const s = document.getElementById('stamp');
-    if (window.ROUNDS && ROUNDS.length) { if (s) s.textContent = 'v5.5'; return; }
-    if (n > 0) setTimeout(() => pinStamp(n - 1), 150);
-  })(40);
 })();

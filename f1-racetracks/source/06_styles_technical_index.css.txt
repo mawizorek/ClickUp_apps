@@ -1,6 +1,7 @@
-/* v5.1+ technical index overrides: denser circuit grid + compact cards + header carousel.
-   High-specificity (#app / #grid) so these win regardless of the order the
-   runtime injects the fetched stylesheets. Loaded last in RUNTIME_STYLE_SOURCES. */
+/* Technical index overrides: denser circuit grid + compact cards + header carousel.
+ High-specificity (#app / #grid) so these win regardless of the order the
+ runtime injects the fetched stylesheets. Loaded near-last, before
+ 07_styles_lens_switcher.css.txt. */
 
 /* denser grid: more circuits per row, tighter gutters */
 #app #grid { grid-template-columns: repeat(auto-fill, minmax(186px, 1fr)); gap: 10px; }
@@ -25,9 +26,9 @@
 #app .home-h .sub { font-size: .96rem; max-width: 60ch; }
 #app .legend { margin: 14px 0 20px; font-size: .78rem; gap: 14px; }
 
-/* ---- v5.3 header carousel: two condensed tiles flanked by chevrons ---- */
+/* ---- header carousel: two condensed tiles flanked by chevrons ---- */
 /* Reads as part of the header: a slim band, tight, mono-accented. Pages the
-   calendar two rounds at a time; default window is current round + next. */
+ calendar two rounds at a time; default window is current round + next. */
 #app .cx {
  display: flex;
  align-items: stretch;

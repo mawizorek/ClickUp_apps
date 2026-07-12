@@ -1,5 +1,5 @@
-/* Current-runtime delta styles synced from the shipped v5 app.
-   Keep this file loaded after 03_styles_panels_tables_footer.css.txt.
+/* Results/classification + mobile-layout styles for the circuit guide.
+ Loaded after 03_styles_panels_tables_footer.css.txt.
 */
 
 .feature-grid{display:grid;grid-template-columns:1.35fr .95fr;gap:14px;margin:0 0 var(--space-lg);min-width:0;max-width:100%}
@@ -76,38 +76,38 @@ body{max-width:100%;overflow-x:hidden}
 .map-cap,.legend-row,.toolbar,.save-wrap{min-width:0;max-width:100%}
 
 @media (max-width:900px){
-  .feature-grid,.sb-cols,.info2{grid-template-columns:1fr}
-  .meta{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .legend-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
-  .crumb,.eyebrow,.home-h .eyebrow{align-items:flex-start}
+ .feature-grid,.sb-cols,.info2{grid-template-columns:1fr}
+ .meta{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .legend-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
+ .crumb,.eyebrow,.home-h .eyebrow{align-items:flex-start}
 }
 
 @media (max-width:720px){
-  body{padding-inline:18px}
-  .topbar{align-items:flex-start;gap:12px;margin-bottom:18px}
-  .brand .mark{width:26px;height:26px;border-radius:7px}
-  .brand .mark svg{width:16px;height:16px}
-  .brand .t{font-size:1rem}
-  .brand .t small{display:none}
-  .nav-jump{width:100%}
-  .nav-jump select{width:100%;max-width:none;padding:10px 12px}
-  .home-h .eyebrow,.eyebrow{font-size:.54rem;letter-spacing:.12em;gap:8px;line-height:1.45}
-  .home-h .eyebrow::before,.eyebrow::before{width:7px;height:7px}
-  .home-h h1{font-size:clamp(1.95rem,9vw,2.5rem);margin:12px 0 10px}
-  .sub{font-size:.96rem}
-  .legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;margin:18px 0 24px}
-  .crumb{font-size:.62rem;line-height:1.4}
-  .cls-last{font-size:1rem}
-  .fl-meta{margin-left:0;flex-basis:100%}
-  .rate{flex-wrap:wrap}
-  .wx-row{gap:10px}
-  .prevnext{flex-direction:column}
-  footer.app{position:static;margin:28px -18px 0;padding:12px 18px 18px;background:linear-gradient(180deg,oklch(16% 0.02 264/.94),oklch(14% 0.02 264/.98));backdrop-filter:none}
-  footer.app .meta-txt{width:100%;font-size:.62rem;margin-bottom:2px}
-  .toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:10px}
-  .tool,.save-link{justify-content:center;width:100%;min-height:44px;padding:10px 12px}
-  .save-wrap{display:block;grid-column:1/-1}
-  .toolbar>.tool:last-child{display:none}
-  .history-row{grid-template-columns:64px 1fr}
-  .history-row .team{grid-column:2}
+ body{padding-inline:18px}
+ .topbar{align-items:flex-start;gap:12px;margin-bottom:18px}
+ .brand .mark{width:26px;height:26px;border-radius:7px}
+ .brand .mark svg{width:16px;height:16px}
+ .brand .t{font-size:1rem}
+ .brand .t small{display:none}
+ .nav-jump{width:100%}
+ .nav-jump select{width:100%;max-width:none;padding:10px 12px}
+ .home-h .eyebrow,.eyebrow{font-size:.54rem;letter-spacing:.12em;gap:8px;line-height:1.45}
+ .home-h .eyebrow::before,.eyebrow::before{width:7px;height:7px}
+ .home-h h1{font-size:clamp(1.95rem,9vw,2.5rem);margin:12px 0 10px}
+ .sub{font-size:.96rem}
+ .legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;margin:18px 0 24px}
+ .crumb{font-size:.62rem;line-height:1.4}
+ .cls-last{font-size:1rem}
+ .fl-meta{margin-left:0;flex-basis:100%}
+ .rate{flex-wrap:wrap}
+ .wx-row{gap:10px}
+ .prevnext{flex-direction:column}
+ footer.app{position:static;margin:28px -18px 0;padding:12px 18px 18px;background:linear-gradient(180deg,oklch(16% 0.02 264/.94),oklch(14% 0.02 264/.98));backdrop-filter:none}
+ footer.app .meta-txt{width:100%;font-size:.62rem;margin-bottom:2px}
+ .toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:10px}
+ .tool,.save-link{justify-content:center;width:100%;min-height:44px;padding:10px 12px}
+ .save-wrap{display:block;grid-column:1/-1}
+ .toolbar>.tool:last-child{display:none}
+ .history-row{grid-template-columns:64px 1fr}
+ .history-row .team{grid-column:2}
 }
