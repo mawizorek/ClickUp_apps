@@ -1,0 +1,113 @@
+/* Results/classification + mobile-layout styles for the circuit guide.
+ Loaded after 03_styles_panels_tables_footer.css.txt.
+*/
+
+.feature-grid{display:grid;grid-template-columns:1.35fr .95fr;gap:14px;margin:0 0 var(--space-lg);min-width:0;max-width:100%}
+
+/* Race classification \2014 pit-wall timing style (replaces the old podium blocks) */
+.classification-card{overflow:hidden;padding:0;border-radius:8px}
+.cls-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 14px;border-bottom:1px solid var(--line);min-width:0}
+.cls-top .tag,.pole-panel .tag,.history-head .tag{font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.cls-top h2,.pole-panel h3{font-size:1.04rem;font-weight:700;letter-spacing:-.02em;margin-top:3px}
+.cls-rows{display:flex;flex-direction:column}
+.cls-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);transition:background .15s var(--ease);min-width:0}
+.cls-row:hover{background:oklch(26% 0.024 264/.5)}
+.cls-pos{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:.88rem;font-variant-numeric:tabular-nums;text-align:center;padding:4px 0;border-radius:3px;color:oklch(16% 0.02 264)}
+.cls-row.p1 .cls-pos{background:oklch(80% 0.14 92)}
+.cls-row.p2 .cls-pos{background:oklch(80% 0.02 264)}
+.cls-row.p3 .cls-pos{background:oklch(64% 0.12 55)}
+.cls-driver{min-width:0}
+.cls-last{display:flex;align-items:center;gap:9px;font-weight:700;font-size:1.06rem;letter-spacing:-.02em;line-height:1.12}
+.team-dot{width:9px;height:9px;border-radius:2px;flex:none}
+.cls-full{display:block;font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
+.cls-team{color:var(--faint)}
+.cls-gap{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.9rem;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.cls-gap-lbl{display:block;font-size:.52rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.cls-gap.win{color:var(--done)}
+
+/* Fastest lap \2014 promoted out of the footnote into a purple signal strip */
+.fl-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 14px;background:oklch(30% 0.09 300/.32);border-bottom:1px solid oklch(46% 0.12 300/.5)}
+.fl-badge{display:inline-flex;align-items:center;gap:6px;font-family:"IBM Plex Mono",monospace;font-size:.56rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:oklch(17% 0.05 300);background:oklch(72% 0.17 300);padding:4px 8px;border-radius:3px;white-space:nowrap}
+.fl-badge svg{width:12px;height:12px}
+.fl-driver{font-weight:700;font-size:1rem;letter-spacing:-.01em}
+.fl-time{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:1rem;font-variant-numeric:tabular-nums;color:oklch(83% 0.11 300)}
+.fl-meta{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;color:oklch(75% 0.07 300);margin-left:auto;white-space:nowrap}
+.race-summary{font-size:.88rem;color:var(--muted);line-height:1.55;padding:12px 14px 14px;overflow-wrap:anywhere}
+
+.pole-panel{background:linear-gradient(180deg,oklch(24% 0.04 285),oklch(22% 0.024 264));border:1px solid oklch(45% 0.09 290/.38);border-radius:8px;padding:14px;min-width:0}
+.pole-kicker{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:14px;min-width:0}
+.pole-big{font-size:1.7rem;font-weight:700;letter-spacing:-0.03em;line-height:1.02}
+.pole-big small{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-family:"IBM Plex Mono",monospace;margin-top:3px}
+.pole-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.pole-chip{border:1px solid var(--line);border-radius:6px;padding:10px;background:oklch(18% 0.02 264/.38);min-width:0}
+.pole-chip .k{display:block;font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.12em;color:var(--faint);text-transform:uppercase}
+.pole-chip .v{display:block;margin-top:5px;font-size:.98rem;font-weight:700;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.quali-mini{width:100%;border-collapse:collapse;margin-top:14px;font-size:.82rem;table-layout:fixed}
+.quali-mini th{text-align:left;padding:0 0 8px;font-family:"IBM Plex Mono",monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line)}
+.quali-mini td{padding:8px 0;border-bottom:1px solid oklch(32% 0.02 264/.45);overflow-wrap:anywhere}
+.quali-mini td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.quali-mini tr:last-child td{border-bottom:none}
+.history-board{border:1px solid var(--line);border-radius:8px;background:linear-gradient(180deg,oklch(19% 0.02 264),oklch(16% 0.02 264));overflow:hidden;min-width:0;max-width:100%}
+.history-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.history-head h2{font-size:1.12rem;font-weight:700;letter-spacing:-0.02em}
+.history-list{padding:10px 16px 14px}
+.history-row{display:grid;grid-template-columns:72px minmax(0,1.4fr) minmax(0,1fr);gap:10px;padding:9px 0;border-bottom:1px solid oklch(32% 0.02 264/.45);font-family:"IBM Plex Mono",monospace;font-size:.84rem}
+.history-row:last-child{border-bottom:none}
+.history-row .year{color:var(--faint)}
+.history-row .driver{color:var(--text);font-weight:600;overflow-wrap:anywhere}
+.history-row .team{color:var(--muted);overflow-wrap:anywhere}
+.history-empty{padding:10px 0;font-family:"IBM Plex Mono",monospace;font-size:.8rem;color:var(--muted);overflow-wrap:anywhere}
+
+/* Runtime mobile fixes added after the original source split */
+html{max-width:100%;overflow-x:hidden}
+body{max-width:100%;overflow-x:hidden}
+.wrap{overflow-x:clip}
+.nav-jump{min-width:0}
+.crumb{flex-wrap:wrap;row-gap:4px;max-width:100%}
+.view{overflow-x:clip}
+.home-h .eyebrow,.eyebrow{flex-wrap:wrap;row-gap:4px;max-width:100%}
+.home-h .eyebrow::before,.eyebrow::before{flex:none}
+.eyebrow span{min-width:0}
+.sub,.sb-col .corners,.sb-col .char,.note,.wx-day .desc,.history-empty,.history-row .driver,.history-row .team,.geo p,.tnote,.pole-chip .v,.cls-full,.race-summary,.kv .v,.strat .seq,.spots .s span,.pn .nm{overflow-wrap:anywhere}
+.meta,.feature-grid,.info2,.wx,.wx-grid,.history-board,.geo,.card,.sb-cols{min-width:0;max-width:100%}
+.meta div,.panel,.panel-h,.panel-b,.sb-col,.wx-day,.geo article,.pole-panel,.pole-kicker,.cls-top,.cls-row,.kv,.rate,.spots .s{min-width:0}
+.plate img,svg.profile{max-width:100%}
+.quali-mini,.tbl{table-layout:fixed}
+.map-cap,.legend-row,.toolbar,.save-wrap{min-width:0;max-width:100%}
+
+@media (max-width:900px){
+ .feature-grid,.sb-cols,.info2{grid-template-columns:1fr}
+ .meta{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .legend-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
+ .crumb,.eyebrow,.home-h .eyebrow{align-items:flex-start}
+}
+
+@media (max-width:720px){
+ body{padding-inline:18px}
+ .topbar{align-items:flex-start;gap:12px;margin-bottom:18px}
+ .brand .mark{width:26px;height:26px;border-radius:7px}
+ .brand .mark svg{width:16px;height:16px}
+ .brand .t{font-size:1rem}
+ .brand .t small{display:none}
+ .nav-jump{width:100%}
+ .nav-jump select{width:100%;max-width:none;padding:10px 12px}
+ .home-h .eyebrow,.eyebrow{font-size:.54rem;letter-spacing:.12em;gap:8px;line-height:1.45}
+ .home-h .eyebrow::before,.eyebrow::before{width:7px;height:7px}
+ .home-h h1{font-size:clamp(1.95rem,9vw,2.5rem);margin:12px 0 10px}
+ .sub{font-size:.96rem}
+ .legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;margin:18px 0 24px}
+ .crumb{font-size:.62rem;line-height:1.4}
+ .cls-last{font-size:1rem}
+ .fl-meta{margin-left:0;flex-basis:100%}
+ .rate{flex-wrap:wrap}
+ .wx-row{gap:10px}
+ .prevnext{flex-direction:column}
+ footer.app{position:static;margin:28px -18px 0;padding:12px 18px 18px;background:linear-gradient(180deg,oklch(16% 0.02 264/.94),oklch(14% 0.02 264/.98));backdrop-filter:none}
+ footer.app .meta-txt{width:100%;font-size:.62rem;margin-bottom:2px}
+ .toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:10px}
+ .tool,.save-link{justify-content:center;width:100%;min-height:44px;padding:10px 12px}
+ .save-wrap{display:block;grid-column:1/-1}
+ .toolbar>.tool:last-child{display:none}
+ .history-row{grid-template-columns:64px 1fr}
+ .history-row .team{grid-column:2}
+}

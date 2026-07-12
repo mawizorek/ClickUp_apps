@@ -1,55 +1,35 @@
 # F1 Racetracks — Exact Source Path
 
-This page documents the **trustworthy exact-source path** for the current v5 runtime and source companion.
+This page defines the **trustworthy exact-source path** for recovering current source safely when a normal read distorts or summarizes a file body.
 
-## Purpose
+## Preferred working surfaces (by concern)
 
-Some read paths can still distort or summarize file bodies when Patch Penelope tries to read them directly. When that happens, this hierarchy defines the fallback order for recovering the current source safely.
+- **Circuit guide shell / styles / logic:** `f1-racetracks/source/` (+ `circuits.html`)
+- **Standings / Matrix / History:** `f1-racetracks/source/standings/` (+ `standings.html`)
+- **Router landing:** `f1-racetracks/index.html`
+- **Standalone live companion:** `f1-racetracks/live-tracker.html`
+- **Canonical data:** `f1-racetracks/f1-results/2026/` (results) and `f1-racetracks/circuits/` (circuit identity + per-year index). No `data.json`.
 
 ## Exact-source hierarchy
 
-### 1. Preferred working surfaces
+### 1. Preferred body read
 
-Use these surfaces by concern:
+Raw GitHub URL per file. Read the circuit-guide style band in order: `02 → 03 → 04 → 05 → 06 → 07`, then logic `09 → 18`. For standings, read `./standings/` (`base.css`, `panel.css`, then `data.js`, `matrix.js`, `trajectory.js`, `panel.js`, `nav.js`, `history.js`).
 
-- **Shell / styles / logic:** `f1-racetracks/source/`
-- **Runtime data:** `f1-racetracks/data.json`
-- **Shipped runtime artifact:** `f1-racetracks/index.html`
-- **Standalone live companion:** `f1-racetracks/live-tracker.html`
+### 2. Exact fallback: the git blob API
 
-Within `source/`, read in this order:
+HTML/JS bodies can be flattened or summarized by some read paths. When that happens, fetch the file's blob via the Git blob API, which returns **base64** and does NOT flatten markup. This is the reliable byte-exact read for `.html` files especially.
 
-- `01_runtime_head.html`
-- `02_styles_foundation_and_layout.css.txt`
-- `03_styles_panels_tables_footer.css.txt`
-- `03b_styles_results_and_mobile.css.txt`
-- `03c_live_session_panel.css.txt`
-- `04_runtime_shell.html`
-- `09_app_bootstrap_and_home.js`
-- `10_track_views_and_profile.js`
-- `11_weather_and_footer_exports.js`
-- `13_live_session_panel.js`
+### 3. Exact fallback: commit-patch reconstruction
 
-Primary body-read attempt remains the raw GitHub URL for each file.
+If a blob is still ambiguous, recover exact lines from the Git commit patch that last materially rewrote that file (`githubmcp_get_commit` with the full patch).
 
-### 2. Exact fallback: commit-patch reconstruction
+### 4. Runtime role
 
-If a file body is distorted or truncated through the normal read path, recover the exact lines from the Git commit patches that introduced or last materially rewrote that file.
-
-Use `githubmcp_get_commit(detail: "full_patch")` on the relevant source-establishing or source-sync commit for the specific file you are repairing.
-
-### 3. Runtime role
-
-- `index.html` remains the shipped runtime artifact for GitHub Pages.
-- `data.json` remains the authoritative runtime data surface.
-- `source/` remains the canonical shell/style/logic companion.
-
-## Important note
-
-The old semantic-source migration blocker note is retired. The active exact-source path is now:
-
-**source shell/style/logic files first → data.json for runtime data → commit-patch reconstruction if needed → runtime artifact last**
+- `index.html` is the shipped router; `circuits.html` and `standings.html` are the two lens entrypoints.
+- `f1-results/2026/` + `circuits/` are the canonical data surfaces.
+- `source/` (+ `source/standings/`) is the canonical shell/style/logic companion.
 
 ## Why this matters
 
-This keeps Patch Penelope on the current, trustworthy surfaces and prevents future work from falling back to stale migration notes or retired duplicated data bundles.
+Keeps future work on the current, trustworthy surfaces and prevents falling back to retired migration notes or the deleted `data.json` monolith.
