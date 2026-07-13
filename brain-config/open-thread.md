@@ -4,49 +4,45 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
-## Inciardi Market — split index.html into a router shell + market.html
-**Added:** 2026-07-10
+## Inciardi Market — full catalog HARVEST PASS (do first next session)
+**Added:** 2026-07-13
 
-### WHAT THIS APP IS
-"Inciardi Market" is a two-part collector tool for Anastasia Inciardi mini prints. Repo `mawizorek/ClickUp_apps`, folder `inciardi-market/`, Pages at https://mawizorek.github.io/ClickUp_apps/inciardi-market/. Two faces of ONE app:
+The catalog-research-routine is written and good; execution is the gap. Catalog is ~37 of ~542 known prints after one partial pass. **Next session: run a full deep-excavation harvest per `inciardi-market/catalog-research-routine.md`.** Do NOT reinvent the routine — it already has the Shopify unlock, the 3-layer explode, classification, image sourcing, scrub rules, and a resumable Progress Log. Just run it cold from step 1.
 
-1. **Market terminal** (`index.html` today) — price terminal reading live eBay listings via the Cloudflare Worker. Tabs: Deal Radar, Sell Signal, My Stock, Catalog, Machines, All, Compare. Logic in `app.js`. Surfaces underpriced buys + sell signals on exclusives. Prices from Worker `/market`; `market.json` is the sample fallback. The "should I buy/sell" lens.
-2. **Collection deck** (`collection.html`) — Pokedex-style visual registry of every known print. Fixed-size trading cards, owned = full color, unowned = ghosted. Tap to catch, long-press to want. Stacking lenses (search + views + rarity/collection/subject). Reads/writes inventory live to D1 via the Worker. The "what do I own / what exists" lens.
+- **Primary source (the unlock):** `inciardiprints.com/products.json?limit=250&page=N` (page until empty). Clean structured JSON, zero scraping. Three layers of prints: products, variants, and print-name lists buried in mystery-pack `body_html`.
+- **Classify** via `/collections/<handle>/products.json` membership (category + exclusive/series).
+- **Images:** variant-level `featured_image.src` -> per-print art; write the canonical Shopify CDN URL into each row's `image` field (LOCKED: reference the CDN URL, do NOT self-host blobs). `image: null` + provisional when none.
+- **Reconcile** against existing `catalog.json`: match -> add alias + refresh; no match -> new canonical (sourced) OR provisional if uncertain. Merge, don't delete. Official names win; seller/eBay titles become aliases.
+- **Secondary sweeps:** Instagram drop history, press, host shops, store-locator (machines) for retired/seasonal/exclusive prints the store no longer lists.
+- **NEVER** copy miniprint.io (competitor) — answer-key only ("they claim 500, we have N"). Never fabricate names.
+- **On finish:** log the pass in the routine's Progress Log (before/after count, sources hit, image coverage, gaps), then commit `catalog.json` data-only (no app shell/version bump) via branch->PR->self-merge.
+- Fresh-read the current `catalog.json` first (its blob failed to load 2026-07-13 late-night; re-pull clean).
 
-Three data planes, ONE join key (`print_id`): catalog (D1, ~37 seeded of ~542 known), inventory (D1, print_id-keyed), market (KV snapshot rebuilt each run; trend points distilled into D1).
+## Inciardi Market — NEW print viewer (after the harvest)
+**Added:** 2026-07-13
 
-### THE TASK
-Split `index.html` per the LOCKED index-as-router standard (GitHub MCP Operating Standard). Today `index.html` is a 24KB single-file terminal wired to `app.js` — transitional debt. Convert to:
-- **`market.html`** — the terminal, MOVED verbatim from today's `index.html` (keep the `app.js` wiring; do NOT rewrite the logic).
-- **`index.html`** — a THIN router shell: shared masthead nav (Market / Collection switcher, the component already in `collection.html` v0.8), a one-line default-landing constant, nothing servable itself.
-- **`collection.html`** — switcher already added (v0.8); just confirm its Market link targets `market.html`, not `./`.
+After the catalog is fat with real prints, Michael wants **the best app to view / sort / filter / find / interact with the available prints.** This is a rebuild of the lens, not a patch.
 
-END STATE: one app, both-way nav. Market ⇄ Collection from inside either page.
+- **Michael's direction (verbatim intent):** the prior version was buggy and "kind of cheesy." Wants **sharp corners** and a **database / search-field feel** for this lens (think fast queryable table/registry, not a soft card toy). Sharp, dense, precise.
+- **Workshop team INVOLVED** — explicit ask. Run The Workshop (6 lenses) on the design before committing source; this is committed-source work so it gates through the pre-build stress-test.
+- **NO monolith files** — explicit ask, and it matches the locked modular standard. Thin HTML shell + `source/` modules (the app is already modular post-v10: `base.css` + per-page css/js). Extend that pattern, don't regress it.
+- Lives in the existing three-page app (Catalog / Market / Collection). Decide whether this sharp "database" viewer replaces/reskins `catalog.html` (the gallery) or is a distinct lens. Open design question for the Workshop.
+- Reads the harvested `catalog.json`; cross-refs live market status the way the current catalog does. Per-print detail view (history + details about a specific available print) is part of the ask.
 
-### WHY IT'S A HANDOFF (hard blocker)
-`index.html` (24KB) + `app.js` (21KB) do NOT read back whole through the current tools: blob API truncates `index.html` at ~15KB (cuts mid-CSS at `.sell-flag`), raw fetch flattens markup, `app.js` unreadable so far. Splitting safely REQUIRES a clean full read of both files first (Michael pastes/uploads them, OR a session with working full-file reads). Do NOT blind-write `market.html` from a partial read — breaks the live terminal + violates read-before-write and the "large files never through create_or_update_file" locked rules.
+## Inciardi Market — DONE this session (2026-07-12/13, don't redo)
+- **index-as-router reconcile (PR #156):** `index.html` -> thin router (1.8KB, one-line `DEFAULT_LANDING = market.html` + JS redirect + noscript). Market terminal moved verbatim to `market.html`. catalog/collection Market-nav links repointed to `./market.html`.
+- **Worker v0.4 price fix (PR #157):** the $0.00 / -100% Deal Radar bug was AUCTION listings — `normalize()` only read `it.price.value` (absent on auctions); now falls back to `it.currentBidPrice`.
+- **Ledger (PR #158):** inciardi-market row = shell v10 (index=router) · worker v0.4. Stale PR #155 closed (its content already landed + it regressed the f1 row).
+- **wrangler.toml + git-connect (PRs #159, #166):** Worker now connected to the repo (root dir `inciardi-market`, prod branch main, cron `0 */6 * * *`). **Workers Builds auto-deploy is LIVE** — merge to main now auto-ships the Worker. Confirmed: active deployment flipped to a fresh git build, retired the 2-day-old v0.3. KV `SNAPSHOTS`=`9780d264...`, D1 `DB`=`18f3459f-8273-44d6-8380-6971d6173b3e`. Secrets stay dashboard-side.
+- **Cron now live** — was an open loop ("no trend history until cron attached"). `market_point` + `print_point` now accumulate every 6h.
 
-### ALREADY DONE (don't redo)
-- D1 `inciardi-market` created; bindings live: `DB` (D1) + `SNAPSHOTS` (KV).
-- Schema applied: catalog, catalog_alias, inventory, market_point, print_point, gone_event.
-- Worker v0.3 deployed: `GET /market`, `GET/POST /inventory` (setState op), `POST /catalog/confirm`, cron scaffold. Gated by `x-write-key`. Endpoint is `buy/browse/v1` (correct).
-- Collection deck built + live through v0.8: fixed cards, lenses, D1 sync, sync-key in Settings, Market/Collection switcher.
-- Catalog seed (37 prints) in `db/seed-catalog.sql`.
+## Inciardi Market — scoring backbone (PAUSED by Michael, revisit after harvest+viewer)
+**Added:** 2026-07-13
 
-### OPEN LOOPS (after the split)
-- **$0.00 / -100% price-parse bug on Deal Radar** — live terminal shows listings with no price parsed (screenshot 2026-07-10). Fix the Worker/app price extraction so real landed prices render.
-- eBay Cert ID rotation (treat as exposed).
-- Cron trigger not attached yet (~6h) — no trend history accumulates until it is.
-- Real catalog: ~37 seeded of ~542 known. Grow via `/catalog/confirm` + research passes. Full 542 list is NOT publicly harvestable (lives in miniprint.io's app) — do NOT fabricate names.
-- Real card images: drop PNGs at `inciardi-market/cards/<print_id>.png`, deck auto-loads them.
-- Live per-card eBay prices on the deck (currently labelled sample data).
-
-### STANDARDS (non-negotiable)
-- PR-merge workflow: branch → PR → self-merge. Never direct to main.
-- Read via blob API first; re-fetch fresh before any write; never reuse a carried SHA.
-- `.nojekyll` stays at repo root. Footer = JS-written stamp `<App> v<N> · PR #<n>`.
-- Secrets (WRITE_KEY, eBay keys) stay Worker-side / device-side, NEVER in the repo.
-- Read the session board before touching the repo; clear your entry on close.
+Move scoring off the flat `14` retail constant. Two layers:
+1. **Per-print retail** (cheap, no new data): `verdict`/`deltaFor` read `catalog.retail` for the print, fall back to `14` only when unknown. Kills most of the noise (a $6 Negroni judged against $14).
+2. **Market-anchored baseline** (needs accumulated `print_point` history): fair value = the print's own median landed over time, not a retail guess.
+- **Undecided fork (Michael must call):** is "fair value" retail-anchored ("cheaper than she sold it") or market-anchored ("cheaper than it trades")? Diverges hard on exclusives (retail $6, trades $80). Defines what BUY means. Spec both into `next-build-spec.md` before building.
 
 ---
 
