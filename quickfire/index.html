@@ -16,6 +16,7 @@
     --accent: oklch(72% 0.16 25);
     --accent-dim: oklch(72% 0.16 25 / 0.15);
     --chip: oklch(20% 0.012 250);
+    --warn: oklch(74% 0.12 75);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 32px 20px calc(48px + env(safe-area-inset-bottom)); }
@@ -25,14 +26,22 @@
   header { margin-bottom: 24px; }
   header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
   header p { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 52ch; }
-  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
   .filter { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--muted); background: var(--chip); border: 1px solid var(--line); border-radius: 100px; padding: 5px 12px; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; -webkit-tap-highlight-color: transparent; }
   .filter:hover { color: var(--text); }
   .filter:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .filter[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .showall { font-family: inherit; font-size: 12px; font-weight: 600; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 100px; padding: 5px 12px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; transition: color 0.15s, border-color 0.15s; -webkit-tap-highlight-color: transparent; }
+  .showall:hover { color: var(--text); border-color: var(--muted); }
+  .showall:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .showall[aria-pressed="true"] { color: var(--warn); border-color: oklch(74% 0.12 75 / 0.5); }
+  .showall .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line); transition: background 0.15s; }
+  .showall[aria-pressed="true"] .dot { background: var(--warn); }
   .list { display: flex; flex-direction: column; gap: 2px; }
   .item { display: block; padding: 14px 16px; border-radius: 10px; text-decoration: none; color: var(--text); transition: background 0.15s; }
   .item:hover { background: var(--accent-dim); }
+  .item.muted { opacity: 0.62; }
   .item-top { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 16px; }
   .item-title { font-size: 15px; font-weight: 600; }
   .item-date { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -41,6 +50,7 @@
   .tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: var(--chip); color: var(--muted); border: 1px solid var(--line); }
   .tag.type { color: var(--accent); border-color: oklch(72% 0.16 25 / 0.4); }
   .badge { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--chip); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; margin-left: 8px; vertical-align: middle; }
+  .badge.status { color: var(--warn); border-color: oklch(74% 0.12 75 / 0.4); }
   .empty { font-size: 13px; color: var(--muted); padding: 20px 16px; }
   .count { font-size: 12px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -51,39 +61,50 @@
   <a class="back" href="../">← All Apps</a>
   <header>
     <h1>Quickfire</h1>
-    <p>One-shot standalone artifacts. No versioning, no spec files, no task overhead. Just shipped HTML. Filter by subject below.</p>
+    <p>One-shot standalone artifacts. No versioning, no spec files, no task overhead. Just shipped HTML. Filter by subject, or Show all to include archived + hidden.</p>
   </header>
-  <div class="filters" id="filters"></div>
+  <div class="toolbar">
+    <div class="filters" id="filters"></div>
+    <button class="showall" id="showall" aria-pressed="false" title="Reveal archived + hidden artifacts"><span class="dot"></span>Show all</button>
+  </div>
   <div class="list" id="list"></div>
   <div class="count" id="count"></div>
 </div>
 <script>
   let ART = [];
-  let active = null;
+  let active = null;      // subject filter
+  let showAll = false;    // reveal archived + hidden
 
   function esc(s) { return (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
   function render() {
     const list = document.getElementById('list');
     const rows = ART
+      .filter(a => showAll || (a.status || 'active') === 'active')
       .filter(a => !active || (a.subjects || []).includes(active))
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     if (!rows.length) {
-      list.innerHTML = '<div class="empty">Nothing tagged “' + esc(active) + '” yet.</div>';
+      list.innerHTML = '<div class="empty">Nothing here' + (active ? ' tagged “' + esc(active) + '”' : '') + '. Try Show all.</div>';
     } else {
       list.innerHTML = rows.map(a => {
+        const st = a.status || 'active';
         const tags = ['<span class="tag type">' + esc(a.type) + '</span>']
           .concat((a.subjects || []).map(s => '<span class="tag">' + esc(s) + '</span>')).join('');
-        const badge = a.reviewed === false ? '<span class="badge">needs tags</span>' : '';
-        return '<a class="item" href="./' + encodeURIComponent(a.slug) + '/">'
-          + '<div class="item-top"><span class="item-title">' + esc(a.title) + badge + '</span>'
+        const statusBadge = st !== 'active' ? '<span class="badge status">' + esc(st) + '</span>' : '';
+        const tagBadge = a.reviewed === false ? '<span class="badge">needs tags</span>' : '';
+        return '<a class="item' + (st !== 'active' ? ' muted' : '') + '" href="./' + encodeURIComponent(a.slug) + '/">'
+          + '<div class="item-top"><span class="item-title">' + esc(a.title) + statusBadge + tagBadge + '</span>'
           + '<span class="item-date">' + (a.date || '—') + '</span></div>'
           + '<div class="item-meta">' + esc(a.desc) + '</div>'
           + '<div class="tags">' + tags + '</div></a>';
       }).join('');
     }
-    document.getElementById('count').textContent = ART.length + ' artifact' + (ART.length === 1 ? '' : 's')
-      + (active ? ' · filtered by ' + active : '');
+    const shown = rows.length;
+    const hiddenCount = ART.filter(a => (a.status || 'active') !== 'active').length;
+    document.getElementById('count').textContent =
+      shown + ' shown · ' + ART.length + ' total'
+      + (active ? ' · subject: ' + active : '')
+      + (!showAll && hiddenCount ? ' · ' + hiddenCount + ' hidden (Show all)' : '');
   }
 
   function buildFilters() {
@@ -108,6 +129,12 @@
     });
     render();
   }
+
+  document.getElementById('showall').addEventListener('click', (e) => {
+    showAll = !showAll;
+    e.currentTarget.setAttribute('aria-pressed', String(showAll));
+    render();
+  });
 
   fetch('./manifest.json', { cache: 'no-store' })
     .then(r => r.ok ? r.json() : Promise.reject())
