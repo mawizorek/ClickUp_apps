@@ -16,7 +16,11 @@
  RESILIENCE: data is fetched asynchronously by data.js (index + every round file).
  This lens renders as soon as that lands — it listens for the 'season-ready' event
  AND keeps a long fallback poll — so a slow mobile load never leaves History frozen
- on "Loading the season…" (the old 40-try / 6s cap did exactly that). */
+ on "Loading the season…".
+
+ SCOPE NOTE: ROUNDS/DRV are top-level `let` in data.js. Top-level let/const are NOT
+ window properties, so we read the BARE identifiers (shared classic-script scope),
+ never window.ROUNDS — that was undefined and kept History permanently "loading". */
 (function () {
  const CIRCUITS = 'circuits.html';
 
@@ -24,6 +28,11 @@
  const short = s => String(s || '').replace(' Grand Prix', '');
  const fmtDate = d => { if (!d) return ''; const dt = new Date(d + 'T00:00:00'); return isNaN(dt) ? d : dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
  const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+ // Bare-identifier readers: ROUNDS/DRV are top-level `let` (not on window). typeof-guard
+ // avoids a ReferenceError if this ever runs before data.js has declared them.
+ const rounds = () => (typeof ROUNDS !== 'undefined' && Array.isArray(ROUNDS)) ? ROUNDS : null;
+ const drv = () => (typeof DRV !== 'undefined' && DRV) ? DRV : null;
 
  /* ---- self-contained styles (reuses base.css tokens; panel/base untouched) ---- */
  const css = `
@@ -60,17 +69,19 @@
 
  /* ---- resulting WDC after ROUNDS index i (ascending order; cumPoints aligns to it) ---- */
  function wdcAfter(i) {
- const rows = Object.keys(DRV).map(id => ({ id, pts: cumPoints(id)[i] }))
- .sort((a, b) => b.pts - a.pts || ln(DRV[a.id].name).localeCompare(ln(DRV[b.id].name)));
+ const D = drv();
+ const rows = Object.keys(D).map(id => ({ id, pts: cumPoints(id)[i] }))
+ .sort((a, b) => b.pts - a.pts || ln(D[a.id].name).localeCompare(ln(D[b.id].name)));
  const L = rows[0], S = rows[1];
  return { id: L.id, pts: L.pts, margin: S ? L.pts - S.pts : L.pts };
  }
 
  function card(rd, i) {
+ const D = drv();
  const cls = rd.classification || [];
  const at = n => cls.find(r => r.pos === n);
  const w = at(1), p2 = at(2), p3 = at(3);
- const wTeam = w ? (w.team || (DRV[w.driverId] && DRV[w.driverId].team) || '') : '';
+ const wTeam = w ? (w.team || (D[w.driverId] && D[w.driverId].team) || '') : '';
  const rail = wTeam ? teamColor(wTeam) : 'var(--line)';
  const pole = rd.pole, fl = rd.fastestLap;
  const spr = (rd.sprint && rd.sprint.classification) ? rd.sprint.classification.find(r => r.pos === 1) : null;
@@ -95,7 +106,7 @@
 <div class="hx-top"><span class="hx-rn">R${rd.round}</span><span class="hx-gp">${esc(short(rd.name))}</span><span class="hx-date">${esc(fmtDate(rd.date))}</span>${rd.slug ? `<a class="hx-circuit" href="${CIRCUITS}#/${rd.slug}">Circuit \u2192</a>` : ''}</div>
 <div class="hx-pod">${pod}</div>
 ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
-<div class="hx-wdc"><span class="hx-wdc-k">Championship after R${rd.round}</span><span class="hx-wdc-v">${esc(ln(DRV[wdc.id].name))} leads<span class="mg">${mg}</span></span></div>
+<div class="hx-wdc"><span class="hx-wdc-k">Championship after R${rd.round}</span><span class="hx-wdc-v">${esc(ln(D[wdc.id].name))} leads<span class="mg">${mg}</span></span></div>
 </div>
 </article>`;
  }
@@ -103,20 +114,21 @@ ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
  let tries = 0;
  function renderHistory() {
  const hs = document.getElementById('hx-stage'); if (!hs) return;
- if (!window.ROUNDS || !ROUNDS.length || !Object.keys(DRV).length) {
+ const R = rounds(), D = drv();
+ if (!R || !R.length || !D || !Object.keys(D).length) {
  hs.innerHTML = '<div class="hx-empty">Loading the season\u2026</div>';
  // Fallback poll only. The real trigger is the 'season-ready' event (listener below);
  // this just covers the case where the event was missed. ~30s cap so a slow mobile
- // load has room to finish instead of freezing forever (was 40 tries / 6s).
+ // load has room to finish instead of freezing forever.
  if (tries++ < 200) setTimeout(renderHistory, 150);
  return;
  }
  tries = 0;
  // ROUNDS is ascending; keep the original index for cumPoints, display newest-first.
- const cards = ROUNDS.map((rd, i) => ({ rd, i }))
+ const cards = R.map((rd, i) => ({ rd, i }))
  .sort((a, b) => b.rd.round - a.rd.round)
  .map(o => card(o.rd, o.i)).join('');
- hs.innerHTML = `<div class="hx-head"><span class="hx-title">Season History</span><span class="hx-sub">${ROUNDS.length} rounds \u00b7 round by round</span></div>${cards}`;
+ hs.innerHTML = `<div class="hx-head"><span class="hx-title">Season History</span><span class="hx-sub">${R.length} rounds \u00b7 round by round</span></div>${cards}`;
  }
 
  /* ---- fold into the existing lens switcher ---- */
