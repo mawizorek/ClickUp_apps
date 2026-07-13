@@ -1,141 +1,132 @@
--- Inciardi Mini Print Market Tracker — Cloudflare D1 schema (v1)
+-- Inciardi Market — D1 relational schema (v1, 2026-07-13)
+-- Source of truth for the catalog, the owned collection, image storage, and market history.
+-- Apply:  wrangler d1 execute inciardi-market --file=inciardi-market/db/schema.sql
+-- Idempotent: safe to re-run (CREATE ... IF NOT EXISTS).
 --
--- Three data planes, one join key (print_id):
---   1. catalog    — the universe: every print that exists (grows via confirms)
---   2. inventory  — what Michael owns (mutable, edited in-app via the Worker)
---   3. trend store — market_point / print_point / gone_event (written by cron)
---
--- The market SNAPSHOT (current live eBay listings) stays in Cloudflare KV,
--- rebuilt every run. Only the DISTILLED trend points land here so history
--- stays small and chartable. Raw listings are never archived row-by-row.
---
--- Apply:  wrangler d1 execute inciardi-market --file=./db/schema.sql
--- (add --remote to run against the deployed DB, omit for a local test DB)
+-- Design principles
+--   * catalog = the master print universe (one row per distinct print).
+--   * inventory = the prints Michael OWNS, one row per physical copy, FK'd to catalog.
+--     (This is the catalog-vs-collection distinction: the catalog is what EXISTS,
+--      inventory is what he HAS. A print can be catalogued and un-owned, owned and
+--      un-catalogued (provisional), or both.)
+--   * print_image = many images per print, versioned. R2 holds the bytes; this table
+--     holds the metadata + which one is primary + active/archived (archived = restorable).
+--   * provenance + locked: a manual/owner-entered row is locked so the harvest/enrichment
+--     pass can fill blanks but NEVER clobber a hand-entered value.
 
 PRAGMA foreign_keys = ON;
 
-----------------------------------------------------------------------
--- PLANE 1 — CATALOG (the universe)
-----------------------------------------------------------------------
-
+-- ============================================================ catalog
 CREATE TABLE IF NOT EXISTS catalog (
-  print_id     TEXT PRIMARY KEY,          -- permanent slug, the join key everywhere
+  print_id     TEXT PRIMARY KEY,             -- kebab slug, stable join key
   title        TEXT NOT NULL,
-  series       TEXT,                       -- nyc | lacma | grand-central | holiday | standard | ...
-  year         INTEGER,
-  exclusive    INTEGER NOT NULL DEFAULT 0, -- 0/1 bool
-  retail       REAL,                       -- fixed MSRP baseline (distinct from market price)
-  status       TEXT NOT NULL DEFAULT 'unknown', -- in-print | sold-out | unknown
-  image        TEXT,
-  source_url   TEXT,
-  source       TEXT,                       -- provenance: shop | miniprint | ebay-confirm | manual
+  category     TEXT,                          -- mini | big-riso | linocut | exclusive | pack
+  exclusive    TEXT,                          -- nyc | lacma | grand-central | richard-scarry | holiday | NULL
+  retail       REAL,                          -- fixed fact (what Anastasia charges new); NULL if unknown
+  in_print     INTEGER NOT NULL DEFAULT 0,    -- 0/1, currently available new
+  pack_of      INTEGER,                        -- pack size (prints per pack), NULL if not a pack
+  pack_from    INTEGER,                        -- pool size the pack draws from
+  source       TEXT NOT NULL DEFAULT 'manual',-- manual | shop-harvest | ebay-confirm | seed | press | vending
+  locked       INTEGER NOT NULL DEFAULT 0,    -- 1 = hand-entered; enrichment must not clobber populated fields
   notes        TEXT,
-  created_at   TEXT NOT NULL DEFAULT (datetime('now')),
-  updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT NOT NULL
 );
+CREATE INDEX IF NOT EXISTS ix_catalog_cat  ON catalog(category);
+CREATE INDEX IF NOT EXISTS ix_catalog_excl ON catalog(exclusive);
 
-CREATE INDEX IF NOT EXISTS idx_catalog_series ON catalog(series);
-CREATE INDEX IF NOT EXISTS idx_catalog_status ON catalog(status);
-
--- Title variants sellers actually use. Every resolved eBay listing feeds a
--- new alias here, so the fuzzy matcher gets smarter over time instead of
--- re-guessing forever.
+-- Alternate names a print is listed under (drives fuzzy market matching + dedupe-on-add).
 CREATE TABLE IF NOT EXISTS catalog_alias (
-  alias_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-  print_id   TEXT NOT NULL REFERENCES catalog(print_id) ON DELETE CASCADE,
-  alias      TEXT NOT NULL,
-  added_at   TEXT NOT NULL DEFAULT (datetime('now')),
-  UNIQUE(print_id, alias)
+  print_id TEXT NOT NULL REFERENCES catalog(print_id) ON DELETE CASCADE,
+  alias    TEXT NOT NULL,
+  norm     TEXT NOT NULL,                      -- normalized (lower, alnum-collapsed) for matching
+  PRIMARY KEY (print_id, norm)
 );
+CREATE INDEX IF NOT EXISTS ix_alias_norm ON catalog_alias(norm);
 
-CREATE INDEX IF NOT EXISTS idx_alias_print ON catalog_alias(print_id);
+-- ============================================================ print_image
+-- Many images per print. R2 holds bytes at r2_key; this row is the metadata.
+-- overwrite  = insert new row (is_primary=1) + archive the old primary.
+-- restore    = flip an archived row back to active (its R2 blob was never deleted).
+-- multiple   = many active rows for one print_id; exactly one is_primary among active.
+CREATE TABLE IF NOT EXISTS print_image (
+  image_id     TEXT PRIMARY KEY,              -- uuid
+  print_id     TEXT NOT NULL REFERENCES catalog(print_id) ON DELETE CASCADE,
+  r2_key       TEXT,                          -- prints/<print_id>/<image_id>.<ext>; NULL if reference-only
+  source_url   TEXT,                          -- original CDN url (scrubbed or referenced)
+  kind         TEXT NOT NULL DEFAULT 'upload',-- upload | scrub | reference
+  content_type TEXT,
+  bytes        INTEGER,
+  width        INTEGER,
+  height       INTEGER,
+  is_primary   INTEGER NOT NULL DEFAULT 0,
+  status       TEXT NOT NULL DEFAULT 'active',-- active | archived
+  sort         INTEGER NOT NULL DEFAULT 0,
+  created_at   TEXT NOT NULL,
+  archived_at  TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_img_print ON print_image(print_id, status, sort);
+-- At most one active primary per print (safety net; code also clears the old primary on write).
+CREATE UNIQUE INDEX IF NOT EXISTS ux_img_primary
+  ON print_image(print_id) WHERE is_primary = 1 AND status = 'active';
 
-----------------------------------------------------------------------
--- PLANE 2 — INVENTORY (what we own; edited in-app)
-----------------------------------------------------------------------
--- print_id is nullable: a print you own that isn't in the catalog yet gets a
--- provisional_label and is reconciled to a real print_id later. Inventory must
--- never reject an unknown print.
-
+-- ============================================================ inventory (owned copies)
+-- One row per PHYSICAL print owned. print_id NULL until matched to the catalog (provisional).
 CREATE TABLE IF NOT EXISTS inventory (
-  inv_id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  inv_id            TEXT PRIMARY KEY,          -- uuid
   print_id          TEXT REFERENCES catalog(print_id) ON DELETE SET NULL,
-  provisional_label TEXT,                  -- set when print_id is NULL (not yet in catalog)
-  disposition       TEXT NOT NULL DEFAULT 'own', -- own | want | dupe
+  provisional_label TEXT,                      -- free-text name when not yet catalog-matched
+  disposition       TEXT NOT NULL DEFAULT 'own',-- own | want | sold
+  condition         TEXT,                       -- new | used | sealed
+  framed            INTEGER NOT NULL DEFAULT 0,
   qty               INTEGER NOT NULL DEFAULT 1,
-  condition         TEXT,                  -- new | good | worn | ...
   acquired_price    REAL,
   acquired_where    TEXT,
   acquired_at       TEXT,
+  sold_price        REAL,
+  sold_at           TEXT,
   notes             TEXT,
-  created_at        TEXT NOT NULL DEFAULT (datetime('now')),
-  updated_at        TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at        TEXT NOT NULL,
+  updated_at        TEXT NOT NULL
 );
+CREATE INDEX IF NOT EXISTS ix_inv_print ON inventory(print_id);
+CREATE INDEX IF NOT EXISTS ix_inv_disp  ON inventory(disposition);
 
-CREATE INDEX IF NOT EXISTS idx_inventory_print       ON inventory(print_id);
-CREATE INDEX IF NOT EXISTS idx_inventory_disposition ON inventory(disposition);
-
-----------------------------------------------------------------------
--- PLANE 3 — TREND STORE (written by the cron each run)
-----------------------------------------------------------------------
-
--- General market: ONE roll-up row per cron run.
+-- ============================================================ market history (time series)
+-- Banked by the worker cron each scan. Feeds scoring v2 + per-print trend charts.
 CREATE TABLE IF NOT EXISTS market_point (
-  point_id         INTEGER PRIMARY KEY AUTOINCREMENT,
-  captured_at      TEXT NOT NULL DEFAULT (datetime('now')),
-  total_listings   INTEGER NOT NULL,
-  median_landed    REAL,
-  avg_landed       REAL,
-  min_landed       REAL,
-  max_landed       REAL,
-  singles_count    INTEGER,
-  packs_count      INTEGER,
+  point_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+  captured_at     TEXT NOT NULL,
+  total_listings  INTEGER,
+  median_landed   REAL,
+  avg_landed      REAL,
+  min_landed      REAL,
+  max_landed      REAL,
+  singles_count   INTEGER,
+  packs_count     INTEGER,
   exclusives_count INTEGER
 );
+CREATE INDEX IF NOT EXISTS ix_mp_at ON market_point(captured_at);
 
-CREATE INDEX IF NOT EXISTS idx_market_point_time ON market_point(captured_at);
-
--- Per-print: ONE roll-up row per print per cron run. This is what scoring v2
--- averages against (rolling market price), NOT the hard-coded retail default.
 CREATE TABLE IF NOT EXISTS print_point (
   point_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-  print_id      TEXT NOT NULL REFERENCES catalog(print_id) ON DELETE CASCADE,
-  captured_at   TEXT NOT NULL DEFAULT (datetime('now')),
-  active_count  INTEGER NOT NULL,          -- live listings for this print this run
+  print_id      TEXT,
+  captured_at   TEXT NOT NULL,
+  active_count  INTEGER,
   min_landed    REAL,
   median_landed REAL,
   max_landed    REAL
 );
+CREATE INDEX IF NOT EXISTS ix_pp_print ON print_point(print_id, captured_at);
 
-CREATE INDEX IF NOT EXISTS idx_print_point_print ON print_point(print_id);
-CREATE INDEX IF NOT EXISTS idx_print_point_time  ON print_point(print_id, captured_at);
-
--- gone events = a listing present last run, absent now. Free sold-price proxy
--- (Marketplace Insights sold comps stay locked). last_landed is the last price
--- we saw before it vanished.
+-- Sold-proxy: when a listing disappears, log its last price. The distribution of
+-- "prices that vanished" over time is the closest thing to a sold curve without the
+-- locked Marketplace Insights API.
 CREATE TABLE IF NOT EXISTS gone_event (
-  event_id     INTEGER PRIMARY KEY AUTOINCREMENT,
-  print_id     TEXT REFERENCES catalog(print_id) ON DELETE SET NULL,
-  item_id      TEXT,                       -- eBay itemId (ephemeral, for de-dup only)
-  last_landed  REAL,
-  gone_at      TEXT NOT NULL DEFAULT (datetime('now'))
+  event_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+  print_id    TEXT,
+  item_id     TEXT,
+  last_landed REAL,
+  gone_at     TEXT NOT NULL
 );
-
-CREATE INDEX IF NOT EXISTS idx_gone_print ON gone_event(print_id);
-
-----------------------------------------------------------------------
--- EXAMPLE READS (the questions this whole thing exists to answer)
-----------------------------------------------------------------------
--- Prints I don't own that are listed under retail right now would join
--- catalog LEFT JOIN inventory (print_id IS NULL on the inventory side) against
--- the live KV snapshot in the Worker. Kept in app/Worker code, not as a view,
--- since the live listings live in KV, not D1.
---
--- Rolling market price for a print (scoring v2 baseline):
---   SELECT median_landed FROM print_point
---   WHERE print_id = ?1 AND captured_at >= datetime('now','-30 days')
---   ORDER BY captured_at;
---
--- Catalog coverage on the market this run:
---   SELECT COUNT(DISTINCT print_id) FROM print_point
---   WHERE captured_at = (SELECT MAX(captured_at) FROM print_point);
+CREATE INDEX IF NOT EXISTS ix_gone_print ON gone_event(print_id, gone_at);
