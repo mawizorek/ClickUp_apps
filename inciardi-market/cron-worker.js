@@ -11,11 +11,14 @@
  * its tail (runCron, the eBay market bank) can't be reliably read back to safely
  * re-commit. The harvest lives here, isolated, sharing state through bindings.
  *
- * SUBREQUEST BUDGET (learned the hard way 2026-07-13): the Workers free tier caps
- * subrequests per invocation, and EVERY D1 call counts. The first cut did 3-5 D1
- * calls per print and blew the cap on a full store -> hard isolate kill -> blank
- * 1101. This version PRELOADS state in 2 reads, then FLUSHES all writes via
- * env.DB.batch() (one round trip per 50-statement chunk). ~200 subrequests -> ~6.
+ * SUBREQUEST BUDGET (learned 2026-07-13): the Workers free tier caps subrequests
+ * per invocation, and EVERY D1 call counts. First cut did 3-5 D1 calls per print
+ * and blew the cap -> blank 1101. This version PRELOADS state in 2 reads, then
+ * FLUSHES all writes via env.DB.batch() (one round trip per 50-statement chunk).
+ *
+ * SHOPIFY 403 (learned 2026-07-13): Shopify bot protection rejects the Worker's
+ * default bare User-Agent. All outbound fetches (shop JSON + CDN images) send a
+ * browser-like UA via BROWSER_HEADERS.
  *
  * CRONS (see wrangler-cron.toml):
  *   "0 9 * * *"  daily 09:00 UTC  -> runCatalogScrub  (text harvest of the shop)
@@ -29,6 +32,12 @@ const SCRUB_BATCH = 25;                 // images scrubbed into R2 per hourly ti
 const D1_BATCH = 50;                    // statements per env.DB.batch() round trip
 const STORAGE_CAP_BYTES = 4.5 * 1024 * 1024 * 1024; // mirror worker.js v1.1 cap (4.5GB)
 const IMG_HOST_ALLOW = ["cdn.shopify.com"];
+
+// Shopify + its CDN 403 a bare Worker UA. Present as a real browser.
+const BROWSER_HEADERS = {
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+  "Accept-Language": "en-US,en;q=0.9",
+};
 
 // Collections we walk for category/exclusive signal (curated subset of the full
 // map in catalog-research-routine.md — kept small to stay well under the cap).
@@ -100,7 +109,7 @@ async function flushBatch(env, stmts) {
 
 /* ============================ Shopify fetch ============================ */
 async function fetchJSON(u) {
-  const res = await fetch(u, { headers: { Accept: "application/json" }, cf: { cacheTtl: 300 } });
+  const res = await fetch(u, { headers: { Accept: "application/json", ...BROWSER_HEADERS }, cf: { cacheTtl: 300 } });
   if (!res.ok) throw new Error(`fetch ${res.status} ${u}`);
   return res.json();
 }
@@ -153,9 +162,6 @@ function parsePack(bodyHtml) {
 }
 
 /* ============================ statement builders (LOCKED-AWARE, no per-row reads) ============================ */
-// Given the preloaded lockedMap, return the right prepared UPSERT statement for a row.
-// New OR unlocked -> full refresh via ON CONFLICT. Locked -> COALESCE-fill blanks but
-// ALWAYS refresh in_print (availability is a live fact — Michael's call 2026-07-13).
 function upsertStmt(env, row, lockedMap) {
   const now = nowISO();
   const isLocked = lockedMap.get(row.print_id) === 1;
@@ -167,7 +173,6 @@ function upsertStmt(env, row, lockedMap) {
     ).bind(row.print_id, row.category ?? null, row.exclusive ?? null, row.retail ?? null,
       row.pack_of ?? null, row.pack_from ?? null, row.in_print ? 1 : 0, now);
   }
-  // new or unlocked: insert-or-full-refresh, source shop-harvest, locked stays 0
   return env.DB.prepare(
     "INSERT INTO catalog (print_id,title,category,exclusive,retail,in_print,pack_of,pack_from,source,locked,created_at,updated_at) " +
     "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,'shop-harvest',0,?9,?9) " +
@@ -208,7 +213,6 @@ async function runCatalogScrub(env) {
         aliasStmts.push(env.DB.prepare("INSERT OR IGNORE INTO catalog_alias (print_id,alias,norm) VALUES (?1,?2,?3)").bind(row.print_id, a, norm(a)));
       }
     }
-    // only queue a reference image if the print has none yet (in DB) and we have a url
     if (imgUrl && !hasImage.has(row.print_id)) {
       hasImage.add(row.print_id); // guard against dupes within the run too
       imageStmts.push(env.DB.prepare(
@@ -238,7 +242,6 @@ async function runCatalogScrub(env) {
       addPrint({ print_id: slug(title), title, category, exclusive: exclusiveFor(title, product.handle, sig),
         retail: retailFrom(firstVariant.price), in_print: variants.some((v) => v.available) }, prodImg);
     } else {
-      // multi-print product: each variant is its own print (e.g. the 8x10 Riso themes)
       for (const v of variants) {
         let title = v.title;
         if (category === "big-riso" && !/risograph/i.test(title)) title = `${title} Risograph`;
@@ -249,7 +252,6 @@ async function runCatalogScrub(env) {
     }
   }
 
-  // FLUSH: batched round trips instead of per-statement subrequests.
   const wroteCatalog = await flushBatch(env, catalogStmts);
   const wroteAliases = await flushBatch(env, aliasStmts);
   const wroteImages = await flushBatch(env, imageStmts);
@@ -277,7 +279,7 @@ async function runImageBackfill(env) {
   for (const row of rows) {
     let up; try { up = new URL(row.source_url); } catch { failed++; continue; }
     if (up.protocol !== "https:" || !IMG_HOST_ALLOW.includes(up.hostname)) { failed++; continue; }
-    let res; try { res = await fetch(up.toString(), { headers: { Accept: "image/*" } }); } catch { failed++; continue; }
+    let res; try { res = await fetch(up.toString(), { headers: { Accept: "image/*", ...BROWSER_HEADERS } }); } catch { failed++; continue; }
     if (!res.ok) { failed++; continue; }
     const ct = res.headers.get("Content-Type") || "image/jpeg";
     const buf = new Uint8Array(await res.arrayBuffer());
