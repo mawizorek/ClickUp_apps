@@ -1,0 +1,108 @@
+/* weekend/base.css — Race Weekend lens, foundation layer (v2.0).
+   Shared design system (oklch hue 268) + Chakra Petch / JetBrains Mono / Inter,
+   identical to standings + circuits so all three lenses read as one app.
+   Holds: tokens, body, topbar + drill-through nav (prev/next + round select),
+   masthead, headline strip, section chrome, reveal-animation base. */
+:root{
+  --bg:oklch(0.16 0.012 268);
+  --s1:oklch(0.195 0.014 268);
+  --s2:oklch(0.225 0.015 268);
+  --s3:oklch(0.265 0.016 268);
+  --line:oklch(0.30 0.014 268);
+  --line-soft:oklch(0.25 0.013 268);
+  --txt:oklch(0.95 0.006 268);
+  --txt-mid:oklch(0.74 0.011 268);
+  --txt-dim:oklch(0.56 0.013 268);
+  --red:oklch(0.64 0.21 26);
+  --gold:oklch(0.84 0.135 88);
+  --silver:oklch(0.82 0.012 268);
+  --bronze:oklch(0.70 0.10 58);
+  --green:oklch(0.72 0.15 158);
+  --purple:oklch(0.72 0.16 300);
+  --ty-soft:oklch(0.64 0.20 26);
+  --ty-med:oklch(0.82 0.14 92);
+  --ty-hard:oklch(0.86 0.01 268);
+  --ty-int:oklch(0.70 0.15 158);
+  --t-mercedes:oklch(0.75 0.10 178);
+  --t-ferrari:oklch(0.60 0.21 27);
+  --t-mclaren:oklch(0.74 0.17 56);
+  --t-redbull:oklch(0.56 0.15 268);
+  --t-racingbulls:oklch(0.62 0.13 256);
+  --t-alpine:oklch(0.70 0.14 344);
+  --t-astonmartin:oklch(0.62 0.12 168);
+  --t-williams:oklch(0.68 0.14 246);
+  --t-haas:oklch(0.74 0.02 262);
+  --t-audi:oklch(0.60 0.17 20);
+  --t-cadillac:oklch(0.74 0.09 92);
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:'Inter',system-ui,sans-serif;font-weight:450;
+  line-height:1.55;letter-spacing:0.006em;
+  padding:0 14px 72px;max-width:680px;margin:0 auto;
+  -webkit-font-smoothing:antialiased;font-optical-sizing:auto;
+}
+h1,h2,h3{text-wrap:balance;font-family:'Chakra Petch',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 2px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;background:none;border:0;cursor:pointer;padding:0;color:inherit}
+.brand .mk{width:30px;height:30px;border-radius:8px;background:var(--red);display:grid;place-items:center;box-shadow:0 0 22px oklch(0.64 0.21 26 / 0.4)}
+.brand .mk svg{width:19px;height:19px}
+.brand .t{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.94rem;line-height:1;text-align:left}
+.brand .t small{display:block;font-family:'JetBrains Mono',monospace;font-weight:500;font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--txt-dim);margin-top:4px}
+.lens{display:inline-flex;border:1px solid var(--line);background:var(--s1);margin-left:auto}
+.lens a,.lens span{font-family:'JetBrains Mono',monospace;font-size:0.66rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--txt-mid);padding:8px 13px;text-decoration:none;transition:color .15s var(--ease),background .15s var(--ease)}
+.lens a+a,.lens a+span,.lens span+a{border-left:1px solid var(--line)}
+.lens .on{background:var(--s3);color:var(--txt)}
+.lens a:hover{color:var(--txt);background:var(--s2)}
+@media(max-width:560px){.lens a,.lens span{padding:8px 11px;font-size:0.6rem;letter-spacing:0.06em}}
+
+/* drill-through nav: prev / round-select / next */
+.wknav{display:flex;align-items:center;gap:10px;margin-top:20px}
+.wknav button{width:38px;height:38px;flex:none;border:1px solid var(--line);background:var(--s1);color:var(--txt-mid);cursor:pointer;display:grid;place-items:center;transition:background .15s var(--ease),color .15s var(--ease)}
+.wknav button:hover:not(:disabled){background:var(--s3);color:var(--txt)}
+.wknav button:disabled{opacity:0.32;cursor:default}
+.wknav button svg{width:17px;height:17px}
+.wksel{flex:1;position:relative}
+.wksel select{width:100%;appearance:none;-webkit-appearance:none;background:var(--s1);border:1px solid var(--line);color:var(--txt);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.86rem;letter-spacing:0.02em;padding:10px 38px 10px 14px;cursor:pointer}
+.wksel::after{content:"";position:absolute;right:15px;top:50%;width:8px;height:8px;border-right:2px solid var(--txt-dim);border-bottom:2px solid var(--txt-dim);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+
+.mast{padding:22px 2px 0}
+.eyebrow{display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt-dim);margin-bottom:11px}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--red)}
+.hgp{font-size:clamp(2.05rem,10vw,2.85rem);font-weight:700;line-height:0.98;letter-spacing:-0.01em}
+.hgp b{color:var(--red)}
+.hsub{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;color:var(--txt-mid);font-size:0.82rem}
+.hsub .rnd{font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:0.06em;color:var(--txt);background:var(--s2);border:1px solid var(--line);padding:3px 9px;font-size:0.72rem}
+.hsub .dot{width:3px;height:3px;border-radius:50%;background:var(--txt-dim)}
+.hsub .track{font-weight:600}
+.hsub .circuit-link{margin-left:auto;color:var(--red);text-decoration:none;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:0.66rem;letter-spacing:0.07em;text-transform:uppercase;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.narr{margin-top:16px;color:var(--txt-mid);font-size:0.92rem;line-height:1.6;max-width:64ch;text-wrap:pretty}
+
+.strip{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);background:var(--s1);margin-top:22px}
+.strip .cell{padding:13px 14px;min-width:0}
+.strip .cell+.cell{border-left:1px solid var(--line)}
+.strip .k{font-size:0.54rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-bottom:6px}
+.strip .v{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.98rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip .sub{margin-top:3px;font-size:0.62rem;color:var(--txt-dim)}
+.strip .win .v{color:var(--gold)}
+
+section{margin-top:38px}
+.shead{display:flex;align-items:baseline;gap:11px;margin-bottom:16px}
+.shead h2{font-size:1.18rem;font-weight:700;letter-spacing:0.01em}
+.shead .idx{font-family:'JetBrains Mono',monospace;font-size:0.66rem;font-weight:700;color:var(--red);letter-spacing:0.08em;padding-top:2px}
+.shead .note{margin-left:auto;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
+
+.empty{border:1px solid var(--line);background:var(--s1);padding:44px 18px;text-align:center;color:var(--txt-dim);font-size:0.88rem;margin-top:30px}
+
+footer{margin-top:42px;padding-top:16px;border-top:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;font-size:0.62rem;color:var(--txt-dim);letter-spacing:0.03em}
+footer .num{font-family:'JetBrains Mono',monospace;color:var(--txt-mid)}
+
+@media(prefers-reduced-motion:no-preference){
+  .reveal{opacity:0;transform:translateY(10px);animation:rise .6s var(--ease) forwards;animation-delay:calc(var(--i,0)*55ms)}
+  @keyframes rise{to{opacity:1;transform:none}}
+}
