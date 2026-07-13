@@ -6,8 +6,8 @@ import { renderMap } from './ui-map.js';
 import { renderOutput } from './ui-output.js';
 import { renderCatalog } from './ui-catalog.js';
 
-const APP_VERSION = 'v1';
-const PR = '192';
+const APP_VERSION = 'v1.1';
+const PR = '196';
 const stage = $('#stage');
 
 function setStep(step) {

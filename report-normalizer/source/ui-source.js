@@ -1,11 +1,12 @@
-// Step 1: Source. Drop/pick a CSV, parse it, fingerprint headers, auto-match a saved profile.
+// Step 1: Source. Drop/pick a CSV or Excel file, parse it, fingerprint headers, auto-match a saved profile.
 import { S, el } from './state.js';
 import * as csv from './csv.js';
+import * as xlsx from './xlsx.js';
 import { passthroughProfile, passthroughSchema } from './engine.js';
 
 export function renderSource(stage, go) {
   stage.innerHTML = '';
-  const input = el('input', { type: 'file', accept: '.csv,text/csv', id: 'fileInput' });
+  const input = el('input', { type: 'file', accept: '.csv,.xlsx,.xls,text/csv', id: 'fileInput' });
   const drop = el('div', { class: 'drop' + (S.file ? ' done' : '') }, [
     S.file
       ? el('div', {}, [
@@ -15,8 +16,8 @@ export function renderSource(stage, go) {
         ])
       : el('label', { for: 'fileInput' }, [
           el('div', { style: 'font-size:28px' }, '\uD83E\uDDF9'),
-          el('div', { style: 'margin:8px 0 4px;font-weight:600' }, 'Drop a CSV here, or tap to choose'),
-          el('div', { class: 'muted', style: 'font-size:13px' }, 'Processed in your browser. Nothing is uploaded.'),
+          el('div', { style: 'margin:8px 0 4px;font-weight:600' }, 'Drop a CSV or Excel file here, or tap to choose'),
+          el('div', { class: 'muted', style: 'font-size:13px' }, '.csv, .xlsx, .xls \u00b7 processed in your browser, nothing is uploaded.'),
         ]),
     input,
   ]);
@@ -60,19 +61,31 @@ function manual(stage, go) {
   renderSource(stage, go);
 }
 
-function load(file, stage, go) {
-  const rd = new FileReader();
-  rd.onload = () => {
-    const { headers, rows } = csv.parse(String(rd.result));
-    if (!headers.length) { alert('Could not read any columns from that file.'); return; }
+async function load(file, stage, go) {
+  try {
+    let parsed;
+    if (xlsx.isExcel(file.name)) {
+      showBusy(stage, 'Reading Excel\u2026');
+      parsed = await xlsx.parseFile(file);
+    } else {
+      parsed = csv.parse(await file.text());
+    }
+    const { headers, rows } = parsed;
+    if (!headers.length) { alert('Could not read any columns from that file.'); renderSource(stage, go); return; }
     S.file = { name: file.name };
     S.headers = headers; S.rows = rows;
     S.fingerprint = csv.fingerprint(headers);
     matchProfile(file.name);
     renderSource(stage, go);
-  };
-  rd.onerror = () => alert('Failed to read the file.');
-  rd.readAsText(file);
+  } catch (err) {
+    alert(err && err.message ? err.message : 'Failed to read the file.');
+    renderSource(stage, go);
+  }
+}
+
+function showBusy(stage, msg) {
+  stage.innerHTML = '';
+  stage.append(el('p', { class: 'muted center', style: 'padding:24px' }, msg));
 }
 
 // Exact-or-warn: match on header fingerprint first, else a filename hint. Never partial auto-apply.
