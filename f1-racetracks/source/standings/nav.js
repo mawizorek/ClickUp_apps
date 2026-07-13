@@ -1,9 +1,15 @@
 /* nav.js — cross-lens navigation for the standings surface. Additive only: injects a
-   masthead switcher (Matrix · History · Weekend · Circuits) with a "jump to round" menu that
-   deep-links each round to its circuit page, and drops race-weekend + circuit-guide connectors
-   into the race brief. Loaded LAST so its click handler runs after panel.js has rendered the
-   panel. Touches no other module. Race pages are transitory drill-throughs; standings is home.
-   (The History segment is injected by history.js, which loads after this one.) */
+   masthead switcher (Matrix · History · Circuits) with a "jump to round" menu that
+   deep-links each round to its RACE WEEKEND page, and drops race-weekend + circuit-guide
+   connectors into the race brief. Loaded LAST so its click handler runs after panel.js has
+   rendered the panel. Touches no other module. Race pages are transitory drill-throughs;
+   standings is home.
+   (The History segment is injected by history.js, which loads after this one.)
+
+   NAV MODEL: Weekend is NOT a top-level tab — a cold Weekend tab has no round context.
+   It is the per-round detail layer you reach FROM a History card or a Circuit card, and
+   nav back out of. The switcher is Matrix / History / Circuits; the Jump-to-round menu and
+   the panel connectors are the doors INTO a weekend. */
 (function(){
   const CIRCUITS='circuits.html';
   const WEEKEND='weekend.html';
@@ -36,7 +42,7 @@
   const st=document.createElement('style');st.id='nav-css';st.textContent=css;document.head.appendChild(st);
 
   const nav=document.createElement('nav');nav.className='xnav';nav.setAttribute('aria-label','Lens switcher');
-  nav.innerHTML='<div class="xseg"><span class="on" aria-current="page">Matrix</span><a href="'+WEEKEND+'">Weekend</a><a href="'+CIRCUITS+'">Circuits</a></div>'+
+  nav.innerHTML='<div class="xseg"><span class="on" aria-current="page">Matrix</span><a href="'+CIRCUITS+'">Circuits</a></div>'+
     '<div class="xdrop"><div class="xseg"><button type="button" id="xRoundsBtn" aria-haspopup="true" aria-expanded="false">Jump to round <span class="ar">&#9662;</span></button></div><div class="xmenu" id="xRoundsMenu" role="menu"></div></div>';
   document.body.insertBefore(nav,document.body.firstChild);
 
