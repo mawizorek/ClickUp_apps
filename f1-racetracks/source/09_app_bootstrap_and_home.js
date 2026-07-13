@@ -1,22 +1,25 @@
 /* Runtime boot + home surface for the circuit guide.
- v6.1 (2026-07-10): PER-CIRCUIT DATA LAYER + PER-YEAR SEASON INDEX. Track data
- is no longer inline JS modules. Each circuit is its own file: circuits/<slug>.json,
- holding TIMELESS identity + layout only. The per-year fields (round/date/status/
- sessions) live in circuits/index_circuits.json keyed by slug. Boot fetches the index,
- loads each circuit file (Promise.all), merges the per-year fields onto each circuit
- object, assembles TRACKS in index order, and renders. Completed-race results come from
- the canonical store via module 12 (window.raceResults + its router()). Soft-fail per
- file. Home surface keeps the header carousel (two condensed tiles + chevrons).
+ v6.1 (2026-07-10): PER-CIRCUIT DATA LAYER + PER-YEAR SEASON INDEX. Each circuit is its
+ own file circuits/<slug>.json (TIMELESS identity + layout); per-year fields (round/date/
+ status/sessions) live in circuits/index_circuits.json keyed by slug. Boot fetches the
+ index, loads each circuit file (Promise.all), merges the per-year fields on, assembles
+ TRACKS in index order, renders. Completed-race results come from module 12. Soft-fail.
 
- v8 (2026-07-13): CIRCUITS card + jump restyle, self-contained in this module.
- - Home grid cards reworked to a database/table-row feel (.rcard / .rc-*): leading mono
- Rxx + status dot, hairline dividers, tabular date, no side-stripe. New scoped classes
- so the old 02css .race/.status-stripe rules stop matching (left as dead CSS for now).
- - The topbar <select id="jump"> is replaced at runtime by a styled right-side DRAWER
- (trigger + scrim + filter + full round list). All markup/CSS injected here; scoped to
- .jump-* so circuits.html is untouched and it works embedded under the v7 shell. */
+ v8 (2026-07-13): CIRCUITS card + jump restyle (database cards .rcard/.rc-*, jump side
+ drawer .jump-*), self-contained here.
 
-const APP_VERSION = "v8";
+ v9 (2026-07-13): CULL + FILTERS.
+ - Header culled: dropped the marketing hero (H1 + paragraph; the shell bar already brands
+ the app). Kept a slim eyebrow + the current-round carousel. The standalone legend row is
+ gone — the Status filter chips carry the legend (colored dots) now.
+ - Real top-level FILTER BAR on the home surface (.filters / .chip / .flt-*), all data-
+ backed: Continent (derived from cc), Era (Classic/Modern editorial split), Status
+ (Completed/Live/Upcoming from index status), Breakdown (report flag). AND across
+ dimensions, OR within one; live count + reset + empty state. All markup/CSS injected
+ here, scoped, so circuits.html stays a thin shell and it works under the v7 app shell.
+ Team-home-race deliberately omitted (ambiguous; needs a curated mapping, not a guess). */
+
+const APP_VERSION = "v9";
 const APP_DATE = "2026-07-13";
 const SEASON = "2026";
 const CIRCUITS_BASE = "circuits/";
@@ -34,6 +37,20 @@ const TEAM_COLORS = {
  Aston: "#66D1A7"
 };
 
+/* Continent derived from the circuit's country code (cc). Verified against the circuit
+ files, every circuit has a cc, so this maps cleanly with no guessing. */
+const CONTINENT = {
+ AU: "Oceania",
+ CN: "Asia", JP: "Asia", SG: "Asia", AZ: "Asia",
+ QA: "Middle East", AE: "Middle East",
+ US: "N. America", CA: "N. America", MX: "N. America",
+ BR: "S. America",
+ MC: "Europe", ES: "Europe", AT: "Europe", GB: "Europe", BE: "Europe", HU: "Europe", NL: "Europe", IT: "Europe"
+};
+const CONTINENT_ORDER = ["Europe", "Asia", "Middle East", "N. America", "S. America", "Oceania"];
+// Editorial era split: recently-added / street-era venues = Modern; heritage venues = Classic.
+const MODERN = new Set(["miami", "las-vegas", "losail", "yas-marina", "cota", "baku", "madring", "marina-bay"]);
+
 let TRACKS = [];
 let bySlug = {};
 let reportTracks = [];
@@ -44,6 +61,9 @@ let appDataMeta = window.appDataMeta = window.appDataMeta || {};
 
 // Carousel window: index (into TRACKS) of the LEFT tile. -1 = not yet set.
 let carouselStart = -1;
+
+// Active filter state. Sets are empty = "no constraint on this dimension".
+const flt = { cont: new Set(), era: new Set(), status: new Set(), breakdown: false };
 
 const SECCOL = { s1: "var(--s1)", s2: "var(--s2)", s3: "var(--s3)" };
 const SN = { s1: "S1", s2: "S2", s3: "S3" };
@@ -73,17 +93,17 @@ function updateFooterMeta(target) {
 }
 
 /* ---------------------------------------------------------------------------
- Injected styles (v8): database-feel cards + jump drawer. Scoped to new class
- names (#grid / .rcard / .rc-* / .jump-*) so load order vs the async 02..07
- style band doesn't matter and nothing in 02css needs editing. Uses the
- circuit-guide tokens (--surface/--bg2/--line/--grid/--faint/--muted/--done/
- --active/--red/--ease) that already exist in 02css :root.
+ Injected styles (v9): database cards + jump drawer + filter bar. Scoped to new
+ class names (#grid / .rcard / .rc-* / .jump-* / .filters / .chip / .flt-*) so
+ load order vs the async 02..07 band doesn't matter and 02css needs no edits.
+ Uses the circuit-guide tokens already defined in 02css :root.
 --------------------------------------------------------------------------- */
-(function injectV8Styles() {
- if (document.getElementById("v8-circuits-css")) return;
+(function injectV9Styles() {
+ if (document.getElementById("v9-circuits-css")) return;
  const css = `
 /* database-feel circuit cards */
 #grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.grid-empty{grid-column:1/-1;padding:34px 16px;text-align:center;color:var(--faint);font-size:.86rem;border:1px dashed var(--line);border-radius:8px}
 .rcard{display:flex;flex-direction:column;text-align:left;width:100%;font:inherit;color:inherit;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:0;overflow:hidden;transition:background .16s var(--ease),border-color .16s var(--ease)}
 .rcard:hover{background:var(--bg2);border-color:oklch(0.42 0.02 268)}
 .rcard:disabled{cursor:default;opacity:.55}
@@ -103,6 +123,24 @@ function updateFooterMeta(target) {
 .rc-tag{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;border-radius:4px;padding:3px 6px;white-space:nowrap}
 .rc-tag.ready{color:var(--done);border:1px solid color-mix(in oklch,var(--done) 40%,var(--line))}
 .rc-tag.soon{color:var(--faint);border:1px solid var(--line)}
+
+/* top-level filter bar */
+.filters{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:12px 14px;margin:2px 0 18px;display:flex;flex-direction:column;gap:10px}
+.flt-row{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.flt-lbl{font-family:'JetBrains Mono',monospace;font-size:.57rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);min-width:72px;padding-top:6px}
+.flt-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.chip{font-family:'JetBrains Mono',monospace;font-size:.64rem;font-weight:600;letter-spacing:.02em;color:var(--muted);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .14s var(--ease),color .14s var(--ease),border-color .14s var(--ease)}
+.chip:hover{color:var(--text);border-color:oklch(0.42 0.02 268)}
+.chip[aria-pressed="true"]{background:var(--surface2);color:var(--text);border-color:oklch(0.5 0.02 268)}
+.chip .cdot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--faint)}
+.chip.done .cdot{background:var(--done)}
+.chip.active .cdot{background:var(--active)}
+.chip.pending .cdot{background:var(--faint)}
+.flt-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--grid);padding-top:10px}
+.flt-count{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.flt-reset{font-family:'JetBrains Mono',monospace;font-size:.64rem;font-weight:600;letter-spacing:.03em;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:6px;padding:5px 11px;cursor:pointer;transition:background .14s var(--ease),color .14s var(--ease)}
+.flt-reset:hover{background:var(--bg2);color:var(--text)}
+.flt-reset[hidden]{display:none}
 
 /* jump-to-circuit side drawer */
 .jump-trigger{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;letter-spacing:.04em;display:inline-flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px 13px;cursor:pointer;transition:background .15s var(--ease),border-color .15s var(--ease)}
@@ -132,10 +170,10 @@ function updateFooterMeta(target) {
 .jd-gp{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:.9rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .jd-flag{font-size:1rem;flex:none}
 .jd-empty{padding:26px 12px;text-align:center;color:var(--faint);font-size:.82rem}
-@media(max-width:560px){.jump-drawer{width:100vw}}
+@media(max-width:560px){.jump-drawer{width:100vw}.flt-lbl{min-width:100%;padding-top:0}}
 `;
  const st = document.createElement("style");
- st.id = "v8-circuits-css";
+ st.id = "v9-circuits-css";
  st.textContent = css;
  document.head.appendChild(st);
 })();
@@ -256,8 +294,110 @@ function buildJump() {
  });
 }
 
+/* ---- filter bar ---- */
+function chipHTML(dim, val, label, dotCls) {
+ const on = dim === "breakdown" ? flt.breakdown : flt[dim].has(val);
+ return `<button class="chip${dotCls ? " " + dotCls : ""}" data-dim="${dim}" data-val="${val}" aria-pressed="${on ? "true" : "false"}">${dotCls ? '<span class="cdot"></span>' : ""}${label}</button>`;
+}
+
+function filterBarHTML() {
+ const conts = CONTINENT_ORDER.filter(c => TRACKS.some(t => t._cont === c));
+ const contChips = conts.map(c => chipHTML("cont", c, c)).join("");
+ return `<div class="filters" id="filters">
+ <div class="flt-row"><span class="flt-lbl">Continent</span><div class="flt-chips">${contChips}</div></div>
+ <div class="flt-row"><span class="flt-lbl">Era</span><div class="flt-chips">${chipHTML("era", "Classic", "Classic")}${chipHTML("era", "Modern", "Modern")}</div></div>
+ <div class="flt-row"><span class="flt-lbl">Status</span><div class="flt-chips">${chipHTML("status", "done", "Completed", "done")}${chipHTML("status", "active", "Live", "active")}${chipHTML("status", "pending", "Upcoming", "pending")}</div></div>
+ <div class="flt-row"><span class="flt-lbl">Breakdown</span><div class="flt-chips">${chipHTML("breakdown", "1", "Ready only")}</div></div>
+ <div class="flt-foot"><span class="flt-count" id="flt-count"></span><button class="flt-reset" id="flt-reset" type="button" hidden>Reset filters</button></div>
+ </div>`;
+}
+
+function wireFilters() {
+ const box = document.getElementById("filters");
+ if (!box) return;
+ box.addEventListener("click", e => {
+ const chip = e.target.closest(".chip");
+ if (chip) { toggleChip(chip.dataset.dim, chip.dataset.val); return; }
+ if (e.target.closest("#flt-reset")) resetFilters();
+ });
+}
+
+function toggleChip(dim, val) {
+ if (dim === "breakdown") flt.breakdown = !flt.breakdown;
+ else { const s = flt[dim]; s.has(val) ? s.delete(val) : s.add(val); }
+ renderGrid();
+ syncChips();
+}
+
+function resetFilters() {
+ flt.cont.clear(); flt.era.clear(); flt.status.clear(); flt.breakdown = false;
+ renderGrid();
+ syncChips();
+}
+
+function syncChips() {
+ document.querySelectorAll("#filters .chip").forEach(c => {
+ const dim = c.dataset.dim, val = c.dataset.val;
+ const on = dim === "breakdown" ? flt.breakdown : flt[dim].has(val);
+ c.setAttribute("aria-pressed", on ? "true" : "false");
+ });
+ const any = flt.cont.size || flt.era.size || flt.status.size || flt.breakdown;
+ const r = document.getElementById("flt-reset");
+ if (r) r.hidden = !any;
+}
+
+function matchesFilter(t) {
+ if (flt.cont.size && !flt.cont.has(t._cont)) return false;
+ if (flt.era.size && !flt.era.has(t._era)) return false;
+ if (flt.status.size && !flt.status.has(t.status)) return false;
+ if (flt.breakdown && !t.report) return false;
+ return true;
+}
+
+function renderGrid() {
+ const grid = document.getElementById("grid");
+ if (!grid) return;
+ const rows = TRACKS.filter(matchesFilter);
+ const cnt = document.getElementById("flt-count");
+ if (cnt) cnt.textContent = rows.length === TRACKS.length
+ ? `${TRACKS.length} circuits`
+ : `${rows.length} of ${TRACKS.length} circuits`;
+ if (!rows.length) {
+ grid.innerHTML = '<div class="grid-empty">No circuits match these filters.</div>';
+ return;
+ }
+ grid.innerHTML = "";
+ rows.forEach(t => {
+ const b = document.createElement("button");
+ b.className = "rcard";
+ if (!t.report) b.disabled = true;
+ else b.onclick = () => location.hash = "#/" + t.slug;
+ const stCls = t.status === "done" ? "done" : t.status === "active" ? "active" : "pending";
+ const stWord = t.status === "done" ? "Completed" : t.status === "active" ? "Live" : "Upcoming";
+ b.innerHTML = `
+ <div class="rc-top">
+ <span class="rc-rn">R${String(t.round).padStart(2, "0")}</span>
+ <span class="rc-status ${stCls}"><span class="rc-dot"></span>${stWord}</span>
+ </div>
+ <div class="rc-body">
+ <div class="rc-gp">${esc(t.gp)}</div>
+ <div class="rc-circ">${esc(t.title)}</div>
+ </div>
+ <div class="rc-foot">
+ <span class="rc-date">${t.flag} ${t.date} \u00b7 ${SEASON}</span>
+ ${t.report ? '<span class="rc-tag ready">Breakdown</span>' : '<span class="rc-tag soon">Soon</span>'}
+ </div>
+ `;
+ grid.appendChild(b);
+ });
+}
+
 function applyData(tracks) {
  TRACKS = tracks || [];
+ TRACKS.forEach(t => {
+ t._cont = CONTINENT[t.cc] || "\u2014";
+ t._era = MODERN.has(t.slug) ? "Modern" : "Classic";
+ });
  bySlug = Object.fromEntries(TRACKS.map(t => [t.slug, t]));
  reportTracks = TRACKS.filter(t => t.report);
  buildJump();
@@ -269,8 +409,6 @@ function renderDataUnavailable(error) {
  <div class="view">
  <div class="home-h">
  <p class="eyebrow">2026 circuit guide // data load issue</p>
- <h1>F1 Racetracks</h1>
- <p class="sub">The runtime loaded, but the circuit data did not.</p>
  </div>
  <div class="card empty-card">
  <div class="panel-b" style="padding:22px 4px">
@@ -299,8 +437,8 @@ function router() {
 
 window.addEventListener("hashchange", router);
 
-/* Index of the "current" round: prefer the canonical results-store meta
- (window.appDataMeta.current_round_slug), else first active, else first pending. */
+/* Index of the "current" round: prefer the canonical results-store meta, else first
+ active, else first pending. */
 function currentIndex() {
  const meta = appDataMeta || {};
  if (meta.current_round_slug) {
@@ -368,54 +506,23 @@ function renderHome() {
  <div class="view">
  <div class="home-h">
  <p class="eyebrow">2026 circuit guide // technical breakdowns</p>
- <h1>F1 Racetracks</h1>
- <p class="sub">Every 2026 circuit breakdown in one place \u2014 official map, lap profile, tyre strategy, overtaking notes, live weather, and completed-race panels.</p>
  </div>
  <div id="cx-host">${carouselMarkup()}</div>
- <div class="legend">
- <span class="lg"><span class="d" style="background:var(--done)"></span>Completed race</span>
- <span class="lg"><span class="d" style="background:var(--active)"></span>Race weekend live</span>
- <span class="lg"><span class="d" style="background:var(--line)"></span>Upcoming</span>
- <span class="lg"><span class="badge b-report" style="padding:2px 6px"><span class="d" style="background:var(--done)"></span>Breakdown ready</span></span>
- </div>
+ ${filterBarHTML()}
  <div class="grid" id="grid"></div>
  </div>
  `;
-
- const grid = document.getElementById("grid");
- TRACKS.forEach(t => {
- const b = document.createElement("button");
- b.className = "rcard";
- if (!t.report) b.disabled = true;
- else b.onclick = () => location.hash = "#/" + t.slug;
-
- const stCls = t.status === "done" ? "done" : t.status === "active" ? "active" : "pending";
- const stWord = t.status === "done" ? "Completed" : t.status === "active" ? "Live" : "Upcoming";
- b.innerHTML = `
- <div class="rc-top">
- <span class="rc-rn">R${String(t.round).padStart(2, "0")}</span>
- <span class="rc-status ${stCls}"><span class="rc-dot"></span>${stWord}</span>
- </div>
- <div class="rc-body">
- <div class="rc-gp">${esc(t.gp)}</div>
- <div class="rc-circ">${esc(t.title)}</div>
- </div>
- <div class="rc-foot">
- <span class="rc-date">${t.flag} ${t.date} \u00b7 ${SEASON}</span>
- ${t.report ? '<span class="rc-tag ready">Breakdown</span>' : '<span class="rc-tag soon">Soon</span>'}
- </div>
- `;
- grid.appendChild(b);
- });
+ wireFilters();
+ syncChips();
+ renderGrid();
 }
 
 // Build the drawer chrome as soon as the module runs, so the trigger is present
 // before circuit data lands (the list fills in later via buildJump()).
 setupJump();
 
-/* Boot: fetch the per-circuit index, then each circuit file. Merge the per-year
- fields (round/date/status/sessions) from the index entry onto each circuit.
- Soft-fail per file. */
+/* Boot: fetch the per-circuit index, then each circuit file. Merge the per-year fields
+ from the index entry onto each circuit. Soft-fail per file. */
 (async function boot() {
  try {
  updateFooterMeta(null);
