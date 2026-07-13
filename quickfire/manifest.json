@@ -28,6 +28,36 @@
       "reviewed": true
     },
     {
+      "slug": "custom-field-catalog",
+      "title": "Custom Field Catalog",
+      "desc": "Permanent build record of write-once custom-field artifacts (dropdowns, labels), tagged by ClickUp list.",
+      "type": "reference",
+      "subjects": ["clickup", "work"],
+      "status": "active",
+      "date": "2026-07-07",
+      "reviewed": true
+    },
+    {
+      "slug": "iphone-home-screen-plan",
+      "title": "iPhone Home Screen Plan",
+      "desc": "Three-page iPhone layout: sunset backdrop, one-job widgets, apps sorted into zone folders. Build-order included.",
+      "type": "plan",
+      "subjects": ["tech", "home"],
+      "status": "active",
+      "date": "2026-07-06",
+      "reviewed": true
+    },
+    {
+      "slug": "live-data-connectivity-transcript",
+      "title": "Live Data Connectivity — Transcript",
+      "desc": "Full session log: HTML apps to live data via a Cloudflare Worker proxy, landing on the URITP Safety Suite build.",
+      "type": "reference",
+      "subjects": ["work", "tech", "clickup"],
+      "status": "archived",
+      "date": "2026-07-06",
+      "reviewed": true
+    },
+    {
       "slug": "course-engine",
       "title": "Course Engine — Blueprint",
       "desc": "Relational course-planning system for Intro to Lighting (curriculum vault + disposable sessions).",
@@ -35,6 +65,16 @@
       "subjects": ["work"],
       "status": "active",
       "date": "2026-07-06",
+      "reviewed": true
+    },
+    {
+      "slug": "fireworks-countdown",
+      "title": "Fireworks Countdown",
+      "desc": "Full-screen July 4th countdown with tap-to-launch fireworks; auto-rolls to next year.",
+      "type": "fun",
+      "subjects": ["family"],
+      "status": "archived",
+      "date": "2026-07-04",
       "reviewed": true
     },
     {
@@ -46,46 +86,6 @@
       "status": "archived",
       "date": "2026-07-03",
       "reviewed": true
-    },
-    {
-      "slug": "custom-field-catalog",
-      "title": "Custom Field Catalog",
-      "desc": "Reference catalog of ClickUp custom fields.",
-      "type": "reference",
-      "subjects": ["clickup", "work"],
-      "status": "active",
-      "date": null,
-      "reviewed": false
-    },
-    {
-      "slug": "fireworks-countdown",
-      "title": "Fireworks Countdown",
-      "desc": "Countdown display for the July 4th fireworks.",
-      "type": "fun",
-      "subjects": ["family"],
-      "status": "archived",
-      "date": null,
-      "reviewed": false
-    },
-    {
-      "slug": "iphone-home-screen-plan",
-      "title": "iPhone Home Screen Plan",
-      "desc": "Layout plan for organizing the iPhone home screen.",
-      "type": "plan",
-      "subjects": ["tech", "home"],
-      "status": "active",
-      "date": null,
-      "reviewed": false
-    },
-    {
-      "slug": "live-data-connectivity-transcript",
-      "title": "Live Data Connectivity — Transcript",
-      "desc": "Saved transcript from the live-data connectivity exploration.",
-      "type": "reference",
-      "subjects": ["work", "tech"],
-      "status": "hidden",
-      "date": null,
-      "reviewed": false
     }
   ]
 }
