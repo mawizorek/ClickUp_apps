@@ -78,6 +78,12 @@ export default {
       try { return json(await runImageBackfill(env)); }
       catch (e) { return json({ ok: false, route: "images", error: String((e && e.message) || e), stack: (e && e.stack) || null }, 500); }
     }
+    // Compact diagnostic peek: first 30 catalog rows + image counts. Small payload
+    // (safe to fetch whole), read-only, so we can SEE what the harvest actually wrote.
+    if (url.pathname === "/debug") {
+      try { return json(await debugPeek(env)); }
+      catch (e) { return json({ ok: false, route: "debug", error: String((e && e.message) || e), stack: (e && e.stack) || null }, 500); }
+    }
     return json({ error: "not found" }, 404);
   },
 
@@ -109,6 +115,25 @@ async function flushBatch(env, stmts) {
     if (chunk.length) { await env.DB.batch(chunk); ran += chunk.length; }
   }
   return ran;
+}
+
+/* ============================ diagnostic peek ============================ */
+async function debugPeek(env) {
+  const total = await env.DB.prepare("SELECT COUNT(*) AS c FROM catalog").first();
+  const withImg = await env.DB.prepare("SELECT COUNT(DISTINCT print_id) AS c FROM print_image WHERE status='active'").first();
+  const stored = await env.DB.prepare("SELECT COUNT(*) AS c FROM print_image WHERE r2_key IS NOT NULL").first();
+  const pendImg = await env.DB.prepare("SELECT COUNT(*) AS c FROM print_image WHERE r2_key IS NULL AND source_url IS NOT NULL AND status='active'").first();
+  const rows = await env.DB.prepare("SELECT print_id, title, category, retail, in_print, source, locked FROM catalog ORDER BY updated_at DESC LIMIT 30").all();
+  return {
+    ok: true,
+    counts: {
+      catalog: (total && total.c) || 0,
+      prints_with_image_row: (withImg && withImg.c) || 0,
+      images_stored_in_r2: (stored && stored.c) || 0,
+      images_pending_backfill: (pendImg && pendImg.c) || 0,
+    },
+    sample: rows.results || [],
+  };
 }
 
 /* ============================ Shopify fetch ============================ */
