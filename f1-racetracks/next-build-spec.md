@@ -1,97 +1,100 @@
-# f1-racetracks — Circuit-Page Reskin Brief (pit-wall)
+# f1-racetracks — Build Spec
 
-> **☑ WORK ITEM — `index.html` is a pointer, not content (DONE for this app).**
-> Kept here as the standing pattern; already satisfied. Never grow `index.html` back into a servable page.
->
-> - [x] `index.html` redesigned into a pointer/router — already a pure router shell (done, verified 2026-07-08)
-
-**Cycle:** post-schema-shift → circuit-page aesthetic pass
-**Theme:** Bring the OLD circuit pages (`circuits.html` + `live-tracker.html`) up to the new dark **pit-wall** look already shipped on the standings lens. This is the aesthetic reskin session, run **WITH Michael**, after the data/architecture work is done.
-
-> **Reconcile note:** This file previously held the v4→v5 mobile-responsive spec, which targeted a 126KB monolith `index.html` that no longer exists (that file is now the router shell; the app was rebuilt segmented). That spec is obsolete and replaced here. The **mobile-first standing rule** from it is preserved verbatim at the bottom — it still applies to every app.
+> **⚠️ MONOLITH BLOCKER (read first).** Neither `index.html` (~126KB) nor `weekend.html` (30KB+) has a `source/` chunk set, and both clip past the ~30KB whole-file read cap. **Do NOT commit edits into either monolith blind.** The unblock is the SAME for every item below: generate the `source/` chunk set for the target file FIRST, then author literal find/replace diffs against the chunks and reassemble. Michael is routing the chunk-set generation to a dedicated agent. Until that lands, no monolith surgery.
 
 ---
 
-## Where things stand (already shipped, do NOT redo)
+## Next build — A) Story mode on the Race Detail (weekend.html)
 
-- **Schema shift done.** Full race data lives in per-round JSON under `f1-racetracks/f1-results/2026/` (`index.json` + 9 rounds), keyed by **location** (track slug = durable identity); `round` is a per-season ordering attribute. All 9 rounds verified against primary sources; 3 silent store errors corrected.
-- **Standings lens shipped and is HOME.** `f1-racetracks/standings.html` (shell) + `source/standings/{base.css, panel.css, data.js, matrix.js, panel.js, trajectory.js, nav.js}`. WDC/WCC computed live from race + sprint, never stored. Trajectory feature (position default + teammate overlay) live.
-- **Router in place.** `index.html` is a pure router shell: default → standings, `#/<slug>` → circuits.html, `#circuits` → circuits jump. Never stores a servable page.
-- **Nav connector live.** Masthead switcher (Standings · Circuits), jump-to-round deep links, in-panel "Circuit guide →" connector.
-- **ClickUp is slim.** Full finishing order LEFT ClickUp. History collapses to ONE year-labeled "Race History" text field per track (fill-if-blank, prior years immutable). *(Field creation + f1-refresh mirror rework still pending — separate track, not this build.)*
+**Theme:** Add a **Results / Story** mode toggle to the Weekend race-detail page. Same round, same page, same data load. Results = the existing weekend render (podium / pole / fastest lap / grid / qualifying / sprint / classification / championship swing). Story = the same race brought to life: a scrubbable lap-by-lap replay.
 
-**This build = aesthetics only on the circuit pages.** No engine, no schema, no data-store changes.
+**Reference build (approved look + behavior):** the `weekend-story-mode.html` preview artifact (ClickUp). It is already themed in weekend.html's exact hue-268 tokens + Chakra Petch / Inter / JetBrains Mono, the brand mark, and the Matrix/History/Weekend/Circuits lens. Treat it as the visual + interaction contract. Do NOT restyle; port it in.
 
----
+### What Story mode contains
+- **Transport bar:** play/pause, `L{lap}/{total}` + phase + sector readout, a scrubber with a lap tick at every lap and SC/Green/flag markers, a **Lap / Sector / Sec** scrub-resolution toggle, and a 1x/2x/4x speed toggle.
+- **Continuous-time model:** one time value `T` in [1, TOTAL laps]. Integer-lap views (timing tower, radio) render on lap change; continuous views (ladder scrub dot, grid cards, telemetry) render per animation frame. This split is load-bearing: it is what keeps the page smooth and flash-free. Do not collapse it to per-frame full re-render.
+- **Timing tower** (left): position (gold/silver/bronze for P1-3), team bar, DRS pill, tyre compound + stint age, gap-to-leader, interval, last-lap time (purple = fastest overall, green = personal best). Click a row to select a driver.
+- **Tab card** (right), three lenses so nothing overlaps:
+  - **Positions:** step ladder, 22 lanes, laps L-R; the scrub line + continuous dots ride over the static per-lap step paths. 2025-winner ghost toggle (stub for the history-overlay future).
+  - **Grid:** starting-grid formation of persistent wheel-key cards (position, speed, gear, rpm bar, DRS dot, delta) that STAY MOUNTED and transform/slide on a position change (never rebuilt per frame). A steering-wheel focus strip (shift lights, gear, speed, ENG/BBAL/DIFF/DRS) for the selected driver. Pit lane sidebar: a stop card slides in when a driver boxes; the pit list rebuilds ONLY on pit-set-signature change (this is the flicker fix, keep it).
+  - **Radio:** team radio as a group chat, timestamped to the lap, driver vs pit-wall roles, system messages (safety car / green / chequered).
 
-## Aesthetic direction (match standings lens)
+### Integration shape (once chunked)
+- Story lives INSIDE weekend.html as a second mode of the current race-detail view, gated by the `Results / Story` toggle in the mast. Not a new lens, not a new file. The lens switcher stays Matrix / History / Weekend / Circuits.
+- Results markup = the current weekend render, untouched. Story markup + its scoped CSS/JS mount alongside; toggling flips `.hidden` between the two blocks and pauses playback when leaving Story.
+- Guard the ladder/grid render behind `mode==='story'` so hidden-mode work is skipped; re-render on toggle-in (offsetWidth is 0 while hidden — the preview already defers the ladder base render until the SVG has width, keep that guard).
 
-Dark **pit-wall**, not the OnTrack nav-app feel:
+### Data (both modes share ONE round file)
+- Results already derives everything from `f1-results/2026/` (index_rounds.json + round files): podium, pole, fastest lap, grid, quali, sprint, classification, swing. **Story reuses the SAME round file** for the light layer.
+- **Three LOD tiers** (the scrub-resolution architecture):
+  - **Lap** (coarse, always loaded, KBs): per-lap order/gaps/intervals/lap-times/tyre-stint/DRS/pit events. Powers tower + ladder + grid positions. Lives in the round file (extend the existing schema; do not store twice).
+  - **Sector** (mid): ~3 chunks/lap, the default scrub snap, break at every lap line. Derived or lightly sampled.
+  - **Second** (fine, HEAVY, ~1M points/race, ~5-15MB raw / 1-3MB gzip): full telemetry (speed/throttle/brake/gear/rpm/drs/x/y). **Does NOT go in the round file or any ClickUp note (size).** One object per race in **Cloudflare R2**, lazy-loaded per selected driver only. This is the only NEW backend Story needs; everything else rides the existing store.
+- The preview currently fabricates positions/telemetry with a seeded model as a stand-in. Real ingest: OpenF1 (positions, laps, pits, car telemetry, team_radio audio) + Jolpica/Ergast for results. Transcribe radio once, cache text, tag to lap/driver.
 
-- **Sharp corners.** A purposeful circle or two is fine; default is square/tabular.
-- **Tabular / mono numerics.** Numbers align, monospace figures, dense.
-- **Dense tables over cards.** Information-rich, timing-screen density. Cards are the exception, not the default.
-- **Color-as-data, never decoration:** team accent per driver, **purple** = fastest lap, **amber** = amended / story tint (loud signal), **bright gold number** = win.
-- **Story-tint reads as a signal**, not a background wash.
-- Circuit pages are **transitory drill-throughs**; standings is home. Streamline them toward a fast in/out state, not a destination.
+### Futures (captured, not this build)
+- **Customizable driver steering wheels (Michael):** each grid card is a mini wheel. Let the user choose which readouts show per driver, reorder them, pick a wheel skin per team/driver. Needs a per-driver wheel-config object + a render layer that reads it. Card render is already isolated (buildCards/updateGrid) so the layout is swappable.
+- **Historical ghost overlays:** the 2025-winner ghost is stubbed. Overlay any prior-year same-circuit line, or a historical-average line, from the growing results archive.
+- **Radio audio playback:** radio is text bubbles now; play the actual OpenF1 team_radio clip on tap, synced to the lap.
 
-Pull the actual tokens/spacing/type scale from `source/standings/base.css` + `panel.css` so the two lenses feel like one app.
-
----
-
-## Architecture rules that are now LAW (do not violate)
-
-1. **Segment BEFORE authoring — never flag-after.** Every file ≤ ~12KB soft / 30KB hard readback cap. Authoring a monolith and disclosing its size afterward is a GATE FAILURE; an over-cap file must be reverted and rebuilt segmented. No exceptions.
-2. **Data nests UNDER its consuming app** (`<app-slug>/<data-dir>/`), never at repo root. Root = apps + infra only. Shared data → `shared/`.
-3. **index.html = router/shell, never a servable page.** The instant an app has >1 page, index is a dispatcher; default landing is a one-line constant.
-4. **Byte-fragile: REBUILD, do not blind-edit `circuits.html`.** Its footer IDs are wired to the live-weather / footer-export module (`source/11_weather_and_footer_exports.js` per the working map below). A careless string edit corrupts those hooks. Read source byte-exact via `get_commit` `detail=full_patch` (raw fetch flattens HTML). If a file body won't read back clean, do NOT overwrite it.
-5. **DESIGN-UI hard bans still apply** (load the skill before building).
-
----
-
-## Source map (WORKING MAP — confirm the real chunk set at pickup)
-
-The circuit app is chunked into `f1-racetracks/source/` modules. The working understanding from the last session:
-
-- `circuits.html` — shell (formerly `index.html`, renamed via GitHub UI)
-- `live-tracker.html` — live circuit tracker page
-- `source/05..18_*.js` — circuit page logic modules (weather, footer/exports at ~`11_weather_and_footer_exports.js`)
-- `source/*.css.txt` — runtime styles injected with a `BUILD_STAMP`
-- `source/standings/*` — standings lens (DONE; reference for tokens, don't restyle)
-
-**Do not trust these filenames blind.** First step at pickup: list `f1-racetracks/source/` and confirm the actual module inventory + which module owns the footer/weather hooks BEFORE touching anything.
+### Acceptance
+- [ ] `Results / Story` toggle in the weekend mast; Results = current render untouched.
+- [ ] Story matches the approved preview (tower, ladder, wheel-key grid, pit lane, radio) in hue-268 tokens.
+- [ ] Continuous-time split preserved (lap-render vs frame-render); no flicker on scrub; pit list rebuilds only on signature change.
+- [ ] Both modes hydrate from the same `f1-results/2026/` round file.
+- [ ] Mobile pass per the standing rule (below): no horizontal overflow at 320px, controls wrap, ≥44px targets.
 
 ---
 
-## Build procedure
+## Next build — B) Mobile-first responsive pass (index.html) [pre-existing, still open]
 
-1. Read this brief. Load the **DESIGN-UI** skill.
-2. List `f1-racetracks/source/` and confirm the real chunk set + footer/weather owner module. Read the standings tokens (`base.css`, `panel.css`) so the reskin matches.
-3. Read `circuits.html` + `live-tracker.html` byte-exact (`get_commit` full_patch). If either won't read clean, STOP and flag — do not blind-overwrite.
-4. Reskin to pit-wall, **segmented from the first keystroke** (respect the cap; never author a monolith "to split later").
-5. Keep desktop AND mobile first-class (see standing rule below).
-6. Bump `BUILD_STAMP` / version. PR → self-merge. Post one board line before any git op; clear it on close.
-7. **Do this WITH Michael** — it's an aesthetic pass; get his eyes on iterations before merge.
+**Theme:** Mobile-first responsive pass. The app overflows and clips on phones. Fix the footer/action bar and make the whole screen scale cleanly to small viewports without horizontal overflow.
+
+> **Format note:** DIRECTIONAL spec (symptoms + target + acceptance), NOT surgical-diff, because there is no `/source` chunk set for `index.html` yet (see MONOLITH BLOCKER). Upgrade to literal diffs once chunked.
+
+### Observed problem (iPhone Safari, v4)
+- Footer/action bar overflows horizontally and clips off the left edge (`Copy source`, `Prepare download`, `Open in new tab`, `Export data (.json)`, `Right-click → Save As`). Buttons not wrapping/stacking.
+- Footer meta line (`Racetracks v4 · 14 breakdowns · 22 rounds`) pinned to desktop width.
+- General scale is desktop-first; horizontal overflow in the footer subtree forces the action bar off-canvas.
+
+### Target behavior (v5)
+1. Never overflow the viewport horizontally (fit within 100vw at 320px+).
+2. Below ~600px, action row `flex-wrap:wrap` or vertical stack; every button visible + tappable.
+3. Full-width, ≥44px touch targets on mobile.
+4. `Right-click → Save As` hint: hide under the breakpoint or reword for touch.
+5. Footer meta line wraps + centers on mobile.
+6. Audit + kill the overflow source (fixed width / min-width / nowrap / non-wrapping flex) in the footer; `overflow-x:hidden` on root only as backstop.
+7. Fluid layout (`%`, `clamp()`, `min()`) 320px → desktop; reduce outer padding on mobile.
+8. `clamp()` on large headings.
+9. `env(safe-area-inset-*)` padding on the footer.
+
+### Acceptance criteria
+- [ ] 320 / 375 / 390px: zero horizontal scroll.
+- [ ] Every footer button fully visible + tappable; none clipped.
+- [ ] Footer meta + legend rows wrap cleanly.
+- [ ] Right-click hint hidden or reworded for touch.
+- [ ] Headings scale down on mobile without forcing width.
+- [ ] Desktop layout unchanged above 600px.
+- [ ] `APP_VERSION` = v5.
+
+---
+
+## Agent instructions (BOTH items)
+
+1. **Generate the `source/` chunk set for the target monolith FIRST** (`source/weekend/` for item A, `source/` for item B — mirror the existing `source/standings/` split: concern-separated CSS + JS chunks + a source_index.md + reassembly note). Do not skip this; it is the blocker.
+2. Read the FULL source via the chunk set (or a local whole-file copy), NEVER trust a single >30KB fetch.
+3. Confirm REAL class names / IDs / router hooks in the target file before editing — do not assume.
+4. Author literal find/replace diffs against the chunks; reassemble; verify.
+5. Deliver the complete modified source as a ClickUp artifact. **Commit only if the source was read whole via the chunk set.**
 
 ### Do NOT
-- Touch engine, schema, or data store. Ricky never touches engine/source.
-- Blind-edit `circuits.html` footer/weather hooks.
-- Ship any over-cap file. Segment first.
-- Restyle the standings lens — it's the reference, not a target.
+- Commit into a monolith that could not be read whole.
+- Rewrite the desktop layout or restyle cards (item B is responsive-fit + footer, not a redesign).
+- Add Print All / Download All buttons or synthetic-click downloads (repo download rules stand).
+- Put per-second telemetry in the round file or any note (item A) — that is R2 only.
 
 ---
 
-## Acceptance criteria
-
-- [ ] `circuits.html` + `live-tracker.html` read as pit-wall siblings of the standings lens (shared tokens, sharp corners, tabular numerics, color-as-data).
-- [ ] Footer / weather / export hooks still function (IDs intact, not corrupted).
-- [ ] Every touched file under the readback cap; nothing authored as a monolith.
-- [ ] Mobile first-class: zero horizontal scroll at 320/375/390px, touch targets ≥44px.
-- [ ] Router + nav switcher still route correctly to the reskinned pages.
-- [ ] `BUILD_STAMP` / version bumped.
-
----
-
-## Standing rule (applies to ALL apps) — PRESERVED
+## Standing rule (applies to ALL apps)
 
 **Every app in `mawizorek/ClickUp_apps` must be explicitly designed for clean mobile viewing AND desktop — mobile is a first-class target, not an afterthought.** Every build and build spec includes a responsive pass: no horizontal overflow at 320px, footers/action bars that wrap or stack, touch targets ≥44px, fluid layout via `clamp()`/`min()`/`%`, safe-area insets. Test every ship at phone width before calling it done. Also recorded in the Brain Reference Library (Apps / HTML Artifacts → Architecture).
