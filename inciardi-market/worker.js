@@ -29,6 +29,7 @@
  * Secrets:  EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY.
  * NOTE: deploy target. NOT served by GitHub Pages.
  */
+// redeploy nonce 2026-07-13: force Workers Builds to rebind IMAGES after the inciardi-images bucket was created.
 
 const SEARCH_QUERY = "inciardi mini print";
 const MARKETPLACE = "EBAY_US";
