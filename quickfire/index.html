@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Quickfire Artifacts</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -16,55 +15,104 @@
     --muted: oklch(65% 0.01 250);
     --accent: oklch(72% 0.16 25);
     --accent-dim: oklch(72% 0.16 25 / 0.15);
+    --chip: oklch(20% 0.012 250);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 32px 20px; }
-  .container { max-width: 600px; margin: 0 auto; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 32px 20px calc(48px + env(safe-area-inset-bottom)); }
+  .container { max-width: 620px; margin: 0 auto; }
   .back { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--muted); text-decoration: none; margin-bottom: 24px; letter-spacing: 0.04em; text-transform: uppercase; }
   .back:hover { color: var(--accent); }
-  header { margin-bottom: 32px; }
+  header { margin-bottom: 24px; }
   header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
-  header p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+  header p { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 52ch; }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .filter { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--muted); background: var(--chip); border: 1px solid var(--line); border-radius: 100px; padding: 5px 12px; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; -webkit-tap-highlight-color: transparent; }
+  .filter:hover { color: var(--text); }
+  .filter:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .filter[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
   .list { display: flex; flex-direction: column; gap: 2px; }
-  .item { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 14px 16px; border-radius: 10px; text-decoration: none; color: var(--text); transition: background 0.15s; }
+  .item { display: block; padding: 14px 16px; border-radius: 10px; text-decoration: none; color: var(--text); transition: background 0.15s; }
   .item:hover { background: var(--accent-dim); }
+  .item-top { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 16px; }
   .item-title { font-size: 15px; font-weight: 600; }
-  .item-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
   .item-date { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .item-meta { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: var(--chip); color: var(--muted); border: 1px solid var(--line); }
+  .tag.type { color: var(--accent); border-color: oklch(72% 0.16 25 / 0.4); }
+  .badge { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: var(--chip); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; margin-left: 8px; vertical-align: middle; }
+  .empty { font-size: 13px; color: var(--muted); padding: 20px 16px; }
   .count { font-size: 12px; color: var(--muted); margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-  <div class="container">
-    <a class="back" href="../">&larr; All Apps</a>
-    <header>
-      <h1>Quickfire</h1>
-      <p>One-shot standalone artifacts. No versioning, no spec files, no task overhead. Just shipped HTML.</p>
-    </header>
-    <div class="list">
-      <a class="item" href="atomic-trail/">
-        <div>
-          <div class="item-title">The Atomic Trail</div>
-          <div class="item-meta">TVA nuclear history + Manhattan Project road-trip planner, sparked flying CHI&rarr;CHA</div>
-        </div>
-        <div class="item-date">2026-07-13</div>
-      </a>
-      <a class="item" href="course-engine/">
-        <div>
-          <div class="item-title">Course Engine &mdash; Blueprint</div>
-          <div class="item-meta">Relational course-planning system for Intro to Lighting (curriculum vault + disposable sessions)</div>
-        </div>
-        <div class="item-date">2026-07-06</div>
-      </a>
-      <a class="item" href="rock-city-morning-plan/">
-        <div>
-          <div class="item-title">Rock City Morning Plan</div>
-          <div class="item-meta">Family activity banner for July 3rd trip with Dad, Jen &amp; Trooper</div>
-        </div>
-        <div class="item-date">2026-07-03</div>
-      </a>
-    </div>
-    <div class="count">3 artifacts</div>
-  </div>
+<div class="container">
+  <a class="back" href="../">← All Apps</a>
+  <header>
+    <h1>Quickfire</h1>
+    <p>One-shot standalone artifacts. No versioning, no spec files, no task overhead. Just shipped HTML. Filter by subject below.</p>
+  </header>
+  <div class="filters" id="filters"></div>
+  <div class="list" id="list"></div>
+  <div class="count" id="count"></div>
+</div>
+<script>
+  let ART = [];
+  let active = null;
+
+  function esc(s) { return (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function render() {
+    const list = document.getElementById('list');
+    const rows = ART
+      .filter(a => !active || (a.subjects || []).includes(active))
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    if (!rows.length) {
+      list.innerHTML = '<div class="empty">Nothing tagged “' + esc(active) + '” yet.</div>';
+    } else {
+      list.innerHTML = rows.map(a => {
+        const tags = ['<span class="tag type">' + esc(a.type) + '</span>']
+          .concat((a.subjects || []).map(s => '<span class="tag">' + esc(s) + '</span>')).join('');
+        const badge = a.reviewed === false ? '<span class="badge">needs tags</span>' : '';
+        return '<a class="item" href="./' + encodeURIComponent(a.slug) + '/">'
+          + '<div class="item-top"><span class="item-title">' + esc(a.title) + badge + '</span>'
+          + '<span class="item-date">' + (a.date || '—') + '</span></div>'
+          + '<div class="item-meta">' + esc(a.desc) + '</div>'
+          + '<div class="tags">' + tags + '</div></a>';
+      }).join('');
+    }
+    document.getElementById('count').textContent = ART.length + ' artifact' + (ART.length === 1 ? '' : 's')
+      + (active ? ' · filtered by ' + active : '');
+  }
+
+  function buildFilters() {
+    const subs = [...new Set(ART.flatMap(a => a.subjects || []))].sort();
+    const bar = document.getElementById('filters');
+    bar.innerHTML = '';
+    const mk = (label, val) => {
+      const b = document.createElement('button');
+      b.className = 'filter'; b.textContent = label; b.dataset.val = val === null ? '' : val;
+      b.setAttribute('aria-pressed', String(active === val));
+      b.addEventListener('click', () => { active = (active === val) ? null : val; sync(); });
+      return b;
+    };
+    bar.appendChild(mk('All', null));
+    subs.forEach(s => bar.appendChild(mk(s, s)));
+  }
+
+  function sync() {
+    document.querySelectorAll('.filter').forEach(b => {
+      const val = b.dataset.val || null;
+      b.setAttribute('aria-pressed', String(active === val));
+    });
+    render();
+  }
+
+  fetch('./manifest.json', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => { ART = data.artifacts || []; buildFilters(); render(); })
+    .catch(() => { document.getElementById('list').innerHTML = '<div class="empty">Could not load the manifest. Refresh to retry.</div>'; });
+</script>
 </body>
 </html>
