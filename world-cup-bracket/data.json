@@ -288,7 +288,7 @@
       "hs": 3,
       "as": 0,
       "winner": "home",
-      "venue": "SoFi Stadium, Los Angeles",
+      "venue": "SoFi Stadium, Inglewood",
       "feedsTo": 13
     },
     {
@@ -303,7 +303,7 @@
       "hs": 2,
       "as": 1,
       "winner": "home",
-      "venue": "BMO Field, Toronto",
+      "venue": "Toronto Stadium, Toronto",
       "feedsTo": 13
     },
     {
@@ -319,7 +319,7 @@
       "as": 2,
       "aet": true,
       "winner": "home",
-      "venue": "Hard Rock Stadium, Miami Gardens",
+      "venue": "Hard Rock Stadium, Miami",
       "feedsTo": 15
     },
     {
@@ -440,7 +440,7 @@
       "home": "France",
       "away": "Spain",
       "venue": "AT&T Stadium, Arlington",
-      "feedsTo": 31
+      "feedsTo": 32
     },
     {
       "id": 30,
@@ -452,21 +452,10 @@
       "home": "England",
       "away": "Argentina",
       "venue": "Mercedes-Benz Stadium, Atlanta",
-      "feedsTo": 31
+      "feedsTo": 32
     },
     {
       "id": 31,
-      "cuTaskId": "86aj8z5cr",
-      "round": "Final",
-      "day": "2026-07-19",
-      "dayLabel": "Sun Jul 19",
-      "time": "3:00 PM",
-      "home": null,
-      "away": null,
-      "venue": "MetLife Stadium, East Rutherford, NJ"
-    },
-    {
-      "id": 32,
       "cuTaskId": "86aj8z5cq",
       "round": "3P",
       "day": "2026-07-18",
@@ -475,6 +464,17 @@
       "home": null,
       "away": null,
       "venue": "Hard Rock Stadium, Miami Gardens"
+    },
+    {
+      "id": 32,
+      "cuTaskId": "86aj8z5cr",
+      "round": "Final",
+      "day": "2026-07-19",
+      "dayLabel": "Sun Jul 19",
+      "time": "3:00 PM",
+      "home": null,
+      "away": null,
+      "venue": "MetLife Stadium, East Rutherford, NJ"
     }
   ]
 }
