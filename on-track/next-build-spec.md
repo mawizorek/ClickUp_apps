@@ -1,15 +1,14 @@
 # On Track — Next Build Spec
 
 > **☐ OPEN WORK ITEM — redesign `index.html` into a pointer, not content.**
+>
 > Any agent opening this app: treat this as ACTIVE WORK, not a passive rule. `index.html` is already a thin shell loading `source/*` for the single dashboard view — VERIFY it holds no servable page body of its own, then check the box. **Check it off when confirmed/done** — then it clears.
 >
 > - [ ] `index.html` verified/redesigned as a pointer/router (not a content store)
 
 One file per app, overwritten each version cycle. Current shipped: **v1.8**.
 
-## Next build
-
-_(nothing committed yet)_
+## Next build _(nothing committed yet)_
 
 ## Recently shipped
 
@@ -18,7 +17,7 @@ _(nothing committed yet)_
 
 ## Futures
 
-### 🧹 Brand-asset cleanup (soft, not urgent)
+### Brand-asset cleanup (soft, not urgent)
 
 The icon + share banner are live and working, but shipped under their raw mobile-upload filenames because renaming wasn't possible from the phone. Tidy when convenient:
 
@@ -28,9 +27,13 @@ The icon + share banner are live and working, but shipped under their raw mobile
 
 No rush: everything maps and renders as-is. This is polish, not a blocker.
 
-### 🔄 Changed-event UI callout (“was X → now Y”)
+### Changed-event UI callout (“was X → now Y”)
 
 When a refresh detects that an existing event materially shifted (rain delay, moved session, time change, cancellation), the UI should be able to surface that it changed — e.g. a small badge or strikethrough showing the old time/status next to the new. Requires: a data field on the event to carry the prior value + a change flag, and engine render support for it. Build item, not a routine (data-only agents can't add fields or render logic). Rare, low priority.
+
+### Soft TBD event support (needed for honest refreshes)
+
+Confirmed-date events with unannounced start times should still be able to live in `data.json` and render in the UI without inventing a fake hour. Add a schema-safe representation for date-known / time-TBD events, render them as honest TBD entries instead of filtering them out, and keep them out of live/next countdown logic until an exact time is published. This unblocks refreshes for series that publish weekends before race times or TV slots (for example MotoAmerica, MXGP, and similar cases). Build item, not a routine.
 
 ## Known guardrails
 
