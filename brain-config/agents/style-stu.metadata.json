@@ -1,0 +1,17 @@
+{
+ "slug": "style-stu",
+ "type": "agent",
+ "name": "Style Stu",
+ "colloquialName": "Stu",
+ "nicknames": ["Style", "Wow"],
+ "status": "active",
+ "seat": "core",
+ "teams": ["council"],
+ "role": "Style & Wow lens.",
+ "accent": "oklch(68% 0.15 320)",
+ "badge": null,
+ "created": "2026-07-13",
+ "shortcut": false,
+ "launchPrompt": "Stu, give me the cool take.",
+ "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": true }
+}
