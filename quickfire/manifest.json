@@ -1,9 +1,10 @@
 {
   "version": "2026-07-13",
-  "note": "Source of truth for the quickfire index. Add an artifact = add an entry here. Subjects/type must come from the controlled vocabulary below; adding a new vocab term is a deliberate edit, not an ad-hoc tag. reviewed:false = auto-surfaced folder with inferred tags, needs a human pass.",
+  "note": "Source of truth for the quickfire index. Add an artifact = add an entry here. type/subjects/status must come from the controlled vocabulary below; adding a new vocab term is a deliberate edit, not an ad-hoc tag. status: active=shown at rest, archived=hidden until 'Show all', hidden=dev/junk kept out of the default view (still reachable via Show all). reviewed:false = auto-surfaced folder with inferred tags, needs a human pass.",
   "vocabulary": {
     "type": ["plan", "research", "reference", "tool", "fun"],
-    "subjects": ["home", "kitchen", "food", "history", "europe", "travel", "family", "work", "clickup", "tech"]
+    "subjects": ["home", "kitchen", "food", "history", "europe", "travel", "family", "work", "clickup", "tech"],
+    "status": ["active", "archived", "hidden"]
   },
   "artifacts": [
     {
@@ -12,6 +13,7 @@
       "desc": "Roman garum to Cetara colatura: salt history, how it's made, five recipes, and where to buy.",
       "type": "research",
       "subjects": ["food", "history", "europe"],
+      "status": "active",
       "date": "2026-07-13",
       "reviewed": true
     },
@@ -21,6 +23,7 @@
       "desc": "TVA nuclear history + Manhattan Project road-trip planner, sparked flying CHI→CHA.",
       "type": "plan",
       "subjects": ["history", "travel"],
+      "status": "active",
       "date": "2026-07-13",
       "reviewed": true
     },
@@ -30,6 +33,7 @@
       "desc": "Relational course-planning system for Intro to Lighting (curriculum vault + disposable sessions).",
       "type": "tool",
       "subjects": ["work"],
+      "status": "active",
       "date": "2026-07-06",
       "reviewed": true
     },
@@ -39,6 +43,7 @@
       "desc": "Family activity banner for July 3rd trip with Dad, Jen & Trooper.",
       "type": "plan",
       "subjects": ["travel", "family"],
+      "status": "archived",
       "date": "2026-07-03",
       "reviewed": true
     },
@@ -48,6 +53,7 @@
       "desc": "Reference catalog of ClickUp custom fields.",
       "type": "reference",
       "subjects": ["clickup", "work"],
+      "status": "active",
       "date": null,
       "reviewed": false
     },
@@ -57,6 +63,7 @@
       "desc": "Countdown display for the July 4th fireworks.",
       "type": "fun",
       "subjects": ["family"],
+      "status": "archived",
       "date": null,
       "reviewed": false
     },
@@ -66,6 +73,7 @@
       "desc": "Layout plan for organizing the iPhone home screen.",
       "type": "plan",
       "subjects": ["tech", "home"],
+      "status": "active",
       "date": null,
       "reviewed": false
     },
@@ -75,6 +83,7 @@
       "desc": "Saved transcript from the live-data connectivity exploration.",
       "type": "reference",
       "subjects": ["work", "tech"],
+      "status": "hidden",
       "date": null,
       "reviewed": false
     }
