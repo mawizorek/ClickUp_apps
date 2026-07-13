@@ -13,6 +13,9 @@
   per-round store). No more inline TRACK_DATA modules.
   STYLE BAND: 02..07 (foundation, panels/tables/footer, results+mobile,
   live-session, technical-index, lens-switcher) fetched in order below.
+  DESIGN SYSTEM (v6.2): reskinned to match the standings + race-weekend lenses —
+  Chakra Petch (display) / JetBrains Mono (timing) / Inter (body) + shared oklch
+  (hue 268) palette. One app across all three surfaces.
   CROSS-LENS NAV (v6.2): topbar carries a 3-way switcher (Matrix / History / Circuits)
   matching the standings switcher; Matrix -> standings.html, History ->
   standings.html#history. Weekend is NOT a peer tab — it is the per-round
@@ -29,17 +32,17 @@
   <link rel="icon" type="image/png" href="https://app-cdn.clickup.com/assets/favicons/favicon-32x32.png" sizes="32x32">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
   <style>
-    html{background:#13161d}
+    html{background:#17171d}
     body{opacity:0;transition:opacity .12s ease}
     body.runtime-ready{opacity:1}
   </style>
   <script>
     // Bump this one token on every source/style deploy to guarantee fresh bytes.
-    const BUILD_STAMP = '20260713a';
+    const BUILD_STAMP = '20260713b';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
@@ -101,15 +104,15 @@
     </footer>
   </div>
 
-  <script src="./source/12_results_store.js?v=20260713a"></script>
-  <script src="./source/09_app_bootstrap_and_home.js?v=20260713a"></script>
-  <script src="./source/10_track_views_and_profile.js?v=20260713a"></script>
-  <script src="./source/13_live_session_panel.js?v=20260713a"></script>
-  <script src="./source/11_weather_and_footer_exports.js?v=20260713a"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260713a"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260713a"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260713a"></script>
-  <script src="./source/17_weekend_mount.js?v=20260713a"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260713a"></script>
+  <script src="./source/12_results_store.js?v=20260713b"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260713b"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260713b"></script>
+  <script src="./source/13_live_session_panel.js?v=20260713b"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260713b"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260713b"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260713b"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260713b"></script>
+  <script src="./source/17_weekend_mount.js?v=20260713b"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260713b"></script>
 </body>
 </html>
