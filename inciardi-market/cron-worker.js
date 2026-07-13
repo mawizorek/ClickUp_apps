@@ -57,10 +57,16 @@ export default {
     if (url.pathname === "/health" || url.pathname === "/") {
       return json({ ok: true, worker: "inciardi-market-cron", crons: ["0 9 * * * (harvest)", "0 * * * * (image backfill)"] });
     }
-    // Opt-in manual kick for testing (no secrets stored here; harmless — only reads the
-    // public shop + writes the same rows the daily cron would).
-    if (url.pathname === "/run/harvest") return json(await runCatalogScrub(env));
-    if (url.pathname === "/run/images")  return json(await runImageBackfill(env));
+    // Opt-in manual kick for testing. Wrapped so a thrown exception returns the
+    // actual message + stack as JSON instead of a blank Cloudflare 1101.
+    if (url.pathname === "/run/harvest") {
+      try { return json(await runCatalogScrub(env)); }
+      catch (e) { return json({ ok: false, route: "harvest", error: String((e && e.message) || e), stack: (e && e.stack) || null }, 500); }
+    }
+    if (url.pathname === "/run/images") {
+      try { return json(await runImageBackfill(env)); }
+      catch (e) { return json({ ok: false, route: "images", error: String((e && e.message) || e), stack: (e && e.stack) || null }, 500); }
+    }
     return json({ error: "not found" }, 404);
   },
 
