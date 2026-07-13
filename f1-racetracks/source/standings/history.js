@@ -8,6 +8,8 @@
  Each round card fuses the RESULT (podium + pole + fastest lap + sprint winner)
  with the resulting CHAMPIONSHIP STATE: who led the WDC and by how much AFTER that
  round, computed live from cumPoints (race + sprint cumulative through that round).
+ Each card links onward to the RACE WEEKEND lens (weekend.html#/<slug>) — the per-round
+ detail driver — which in turn links to the circuit guide.
 
  DEEP LINK: standings.html#history opens this lens directly (on load + hashchange),
  and the History/Matrix segments drive the hash so the view is shareable and
@@ -23,6 +25,7 @@
  never window.ROUNDS — that was undefined and kept History permanently "loading". */
 (function () {
  const CIRCUITS = 'circuits.html';
+ const WEEKEND = 'weekend.html';
 
  const ln = n => { n = String(n || ''); return n === 'Andrea Kimi Antonelli' ? 'Antonelli' : (n.split(' ').slice(-1)[0] || n); };
  const short = s => String(s || '').replace(' Grand Prix', '');
@@ -103,7 +106,7 @@
  return `<article class="hx-card" style="--team:${rail}">
 <div class="hx-rail"></div>
 <div class="hx-body">
-<div class="hx-top"><span class="hx-rn">R${rd.round}</span><span class="hx-gp">${esc(short(rd.name))}</span><span class="hx-date">${esc(fmtDate(rd.date))}</span>${rd.slug ? `<a class="hx-circuit" href="${CIRCUITS}#/${rd.slug}">Circuit \u2192</a>` : ''}</div>
+<div class="hx-top"><span class="hx-rn">R${rd.round}</span><span class="hx-gp">${esc(short(rd.name))}</span><span class="hx-date">${esc(fmtDate(rd.date))}</span>${rd.slug ? `<a class="hx-circuit" href="${WEEKEND}#/${rd.slug}">Race Weekend \u2192</a>` : ''}</div>
 <div class="hx-pod">${pod}</div>
 ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
 <div class="hx-wdc"><span class="hx-wdc-k">Championship after R${rd.round}</span><span class="hx-wdc-v">${esc(ln(D[wdc.id].name))} leads<span class="mg">${mg}</span></span></div>
@@ -117,9 +120,6 @@ ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
  const R = rounds(), D = drv();
  if (!R || !R.length || !D || !Object.keys(D).length) {
  hs.innerHTML = '<div class="hx-empty">Loading the season\u2026</div>';
- // Fallback poll only. The real trigger is the 'season-ready' event (listener below);
- // this just covers the case where the event was missed. ~30s cap so a slow mobile
- // load has room to finish instead of freezing forever.
  if (tries++ < 200) setTimeout(renderHistory, 150);
  return;
  }
@@ -140,12 +140,14 @@ ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
  const hs = document.createElement('section'); hs.id = 'hx-stage'; hs.className = 'hidden';
  if (stage && stage.parentNode) stage.parentNode.insertBefore(hs, stage.nextSibling);
 
+ const weekendLink = xseg.querySelector('a[href*="weekend"]');
  const circuitsLink = xseg.querySelector('a[href*="circuits"]');
- const standingsEl = [...xseg.children].find(c => c !== circuitsLink) || null;
+ const standingsEl = [...xseg.children].find(c => c !== circuitsLink && c !== weekendLink) || null;
 
  const hb = document.createElement('button');
  hb.type = 'button'; hb.className = 'hx-lens'; hb.textContent = 'History';
- if (circuitsLink) xseg.insertBefore(hb, circuitsLink); else xseg.appendChild(hb);
+ const anchorRef = weekendLink || circuitsLink;
+ if (anchorRef) xseg.insertBefore(hb, anchorRef); else xseg.appendChild(hb);
 
  function showHistory() {
  if (typeof closePanel === 'function') closePanel();
