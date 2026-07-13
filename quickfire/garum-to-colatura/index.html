@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Garum to Colatura</title>
+<!-- quickfire metadata -->
+<meta name="qf:type" content="research">
+<meta name="qf:subjects" content="food, history, europe">
+<meta name="qf:date" content="2026-07-13">
+<meta name="qf:summary" content="From Roman garum to Cetara colatura: the salt-and-sea history, how it's made, five recipes, and where to buy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink-900: oklch(15% 0.012 65);
+    --ink-850: oklch(18% 0.014 65);
+    --ink-800: oklch(21% 0.016 66);
+    --ink-750: oklch(25% 0.018 66);
+    --ink-700: oklch(32% 0.02 67);
+    --line: oklch(30% 0.018 66);
+    --paper: oklch(88% 0.02 74);
+    --paper-dim: oklch(72% 0.02 72);
+    --paper-faint: oklch(58% 0.018 70);
+    --amber: oklch(78% 0.13 72);
+    --amber-deep: oklch(68% 0.14 62);
+    --amber-glow: oklch(82% 0.11 78);
+    --sea: oklch(72% 0.07 200);
+    --space-xs: 6px; --space-sm: 12px; --space-md: 20px; --space-lg: 32px; --space-xl: 52px; --space-2xl: 80px;
+    --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+    --measure: 62ch;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--ink-900); color: var(--paper);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    font-weight: 400; line-height: 1.65; letter-spacing: 0.01em;
+    font-optical-sizing: auto; -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility; overflow-x: hidden;
+  }
+  .shell {
+    max-width: 460px; margin: 0 auto; min-height: 100vh;
+    background: radial-gradient(120% 60% at 50% -8%, oklch(24% 0.03 68) 0%, transparent 55%), var(--ink-900);
+    position: relative;
+  }
+  h1, h2, h3 { text-wrap: balance; font-family: 'Fraunces', Georgia, serif; }
+  p { text-wrap: pretty; }
+  .eyebrow {
+    font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber);
+  }
+  .hero { padding: calc(var(--space-2xl) + env(safe-area-inset-top)) var(--space-md) var(--space-xl); position: relative; overflow: hidden; text-align: left; }
+  .drip { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 3px; height: 96px; background: linear-gradient(var(--amber-glow), var(--amber)); border-radius: 0 0 3px 3px; }
+  .drip::after { content: ""; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%); width: 11px; height: 13px; background: var(--amber); border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%; box-shadow: 0 0 22px 3px oklch(78% 0.13 72 / 0.4); animation: fall 3.6s var(--ease-out-quint) infinite; }
+  @keyframes fall { 0%, 62% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; } 82% { transform: translateX(-50%) translateY(140px) scale(0.7); opacity: 0.5; } 100% { transform: translateX(-50%) translateY(180px) scale(0.4); opacity: 0; } }
+  .hero .eyebrow { display: block; margin-bottom: var(--space-md); }
+  .hero h1 { font-size: clamp(2.6rem, 13vw, 3.6rem); line-height: 0.98; font-weight: 500; letter-spacing: -0.015em; }
+  .hero h1 em { font-style: italic; color: var(--amber); font-weight: 400; }
+  .hero .lede { margin-top: var(--space-md); font-size: 1.06rem; color: var(--paper-dim); max-width: 40ch; font-weight: 450; }
+  .hero .stamp { margin-top: var(--space-lg); font-family: 'Fraunces', serif; font-style: italic; font-size: 0.9rem; color: var(--paper-faint); }
+  .hero .stamp b { color: var(--paper-dim); font-style: normal; font-weight: 500; }
+  section { padding: var(--space-xl) var(--space-md); }
+  .sec-head { margin-bottom: var(--space-lg); }
+  .sec-head .eyebrow { display: block; margin-bottom: var(--space-sm); }
+  .sec-head h2 { font-size: clamp(1.7rem, 7vw, 2.1rem); font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; }
+  .timeline { position: relative; padding-left: 34px; }
+  .timeline::before { content: ""; position: absolute; left: 9px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--amber-deep), var(--line) 70%); }
+  .era { position: relative; padding-bottom: var(--space-lg); opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease-out-quint), transform 0.7s var(--ease-out-quint); }
+  .era.in { opacity: 1; transform: none; }
+  .era:last-child { padding-bottom: 0; }
+  .era::before { content: ""; position: absolute; left: -33px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--ink-900); border: 2px solid var(--amber); }
+  .era.dim::before { border-color: var(--paper-faint); }
+  .era .when { font-family: 'Inter', sans-serif; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+  .era.dim .when { color: var(--paper-faint); }
+  .era h3 { font-size: 1.28rem; font-weight: 500; margin: 4px 0 var(--space-xs); line-height: 1.15; }
+  .era p { font-size: 0.96rem; color: var(--paper-dim); max-width: var(--measure); }
+  .make { background: var(--ink-850); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .make-steps { display: flex; flex-direction: column; gap: var(--space-md); margin-top: var(--space-md); }
+  .make-step { display: grid; grid-template-columns: 40px 1fr; gap: var(--space-sm); align-items: start; }
+  .make-step .n { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 500; color: var(--amber); line-height: 1; padding-top: 2px; }
+  .make-step h4 { font-family: 'Inter', sans-serif; font-size: 0.98rem; font-weight: 600; margin-bottom: 2px; }
+  .make-step p { font-size: 0.9rem; color: var(--paper-dim); }
+  .recipe { border-bottom: 1px solid var(--line); }
+  .recipe:first-of-type { border-top: 1px solid var(--line); }
+  .recipe-btn { width: 100%; background: none; border: none; color: inherit; font: inherit; text-align: left; padding: var(--space-md) 0; cursor: pointer; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--space-sm); -webkit-tap-highlight-color: transparent; }
+  .recipe-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; border-radius: 4px; }
+  .recipe-title { display: flex; flex-direction: column; gap: 3px; }
+  .recipe-title .flag { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); }
+  .recipe-title .dim-flag { color: var(--paper-faint); }
+  .recipe-title h3 { font-size: 1.24rem; font-weight: 500; line-height: 1.15; }
+  .recipe-title .meta { font-size: 0.82rem; color: var(--paper-faint); font-family: 'Inter', sans-serif; }
+  .chev { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; color: var(--paper-dim); transition: transform 0.4s var(--ease-out-quint), border-color 0.3s, color 0.3s; flex-shrink: 0; }
+  .recipe[open] .chev { transform: rotate(45deg); border-color: var(--amber); color: var(--amber); }
+  .recipe-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.45s var(--ease-out-quint); }
+  .recipe[open] .recipe-body { grid-template-rows: 1fr; }
+  .recipe-body-inner { overflow: hidden; }
+  .recipe-body-pad { padding: 0 0 var(--space-md); }
+  .recipe-body p { font-size: 0.94rem; color: var(--paper-dim); margin-bottom: var(--space-sm); }
+  .recipe-body p:last-child { margin-bottom: 0; }
+  .ing { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-md); }
+  .ing li { font-size: 0.78rem; font-family: 'Inter', sans-serif; color: var(--paper-dim); background: var(--ink-800); border: 1px solid var(--line); padding: 4px 10px; border-radius: 100px; }
+  .steps { list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 10px; }
+  .steps li { counter-increment: s; position: relative; padding-left: 30px; font-size: 0.94rem; color: var(--paper); }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 20px; height: 20px; background: var(--amber-deep); color: var(--ink-900); border-radius: 50%; font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 700; display: grid; place-items: center; }
+  .tip { margin-top: var(--space-md); font-family: 'Fraunces', serif; font-style: italic; font-size: 0.92rem; color: var(--amber-glow); padding-top: var(--space-sm); border-top: 1px dashed var(--line); }
+  .buy { background: var(--ink-850); border-top: 1px solid var(--line); }
+  .buy-list { display: flex; flex-direction: column; gap: 10px; margin-top: var(--space-md); }
+  .buy-card { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--ink-800); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: inherit; transition: border-color 0.3s, transform 0.3s var(--ease-out-quint), background 0.3s; -webkit-tap-highlight-color: transparent; }
+  .buy-card:active { transform: scale(0.985); }
+  .buy-card:hover, .buy-card:focus-visible { border-color: var(--amber); background: var(--ink-750); outline: none; }
+  .buy-info .name { font-weight: 600; font-size: 0.98rem; }
+  .buy-info .note { font-size: 0.8rem; color: var(--paper-faint); }
+  .buy-price { font-family: 'Fraunces', serif; font-size: 1.05rem; color: var(--amber); white-space: nowrap; }
+  .buy-price span { display: block; font-family: 'Inter', sans-serif; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-faint); text-align: right; }
+  .pick { font-family:'Inter',sans-serif; font-size: 0.62rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color: var(--ink-900); background: var(--amber); padding: 2px 7px; border-radius: 100px; margin-left: 6px; vertical-align: middle; }
+  .local-grid { display: flex; flex-direction: column; gap: var(--space-md); margin-top: var(--space-md); }
+  .city .city-name { font-family:'Fraunces',serif; font-style: italic; font-size: 1.15rem; color: var(--sea); margin-bottom: 8px; }
+  .shop { font-size: 0.92rem; color: var(--paper-dim); padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .shop:last-child { border-bottom: none; }
+  .shop b { color: var(--paper); font-weight: 600; }
+  .shop a { color: var(--amber); text-decoration: none; }
+  .callout { margin-top: var(--space-md); font-size: 0.86rem; color: var(--paper-dim); background: var(--ink-800); border: 1px solid var(--line); border-radius: 12px; padding: var(--space-sm) var(--space-md); }
+  .callout b { color: var(--amber); }
+  footer { padding: var(--space-xl) var(--space-md) calc(var(--space-2xl) + env(safe-area-inset-bottom)); text-align: center; border-top: 1px solid var(--line); }
+  footer .mark { font-family:'Fraunces',serif; font-style:italic; font-size: 1.3rem; color: var(--amber); }
+  footer p { font-size: 0.8rem; color: var(--paper-faint); margin-top: 8px; max-width: 34ch; margin-inline: auto; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .era { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="hero">
+    <span class="drip"></span>
+    <span class="eyebrow">Salt · Rome · The Amalfi Coast</span>
+    <h1>From <em>Garum</em> to your kitchen</h1>
+    <p class="lede">A single amber drop of fermented anchovy has carried more flavor, and more history, than almost anything else on the table.</p>
+    <p class="stamp"><b>2,000 years</b> of salt, sea, and time in one bottle.</p>
+  </header>
+  <section>
+    <div class="sec-head"><span class="eyebrow">The long way back</span><h2>How we got here</h2></div>
+    <div class="timeline" id="timeline">
+      <div class="era"><span class="when">1st c. BCE · Rome</span><h3>Garum runs the empire</h3><p>Romans fermented oily fish and guts under heavy salt in the sun until it broke down into a pungent liquid. They poured it on nearly everything: part ketchup, part soy sauce, part fish sauce. Salt made it possible, and salt is why it mattered.</p></div>
+      <div class="era"><span class="when">Coastal Italy</span><h3>Salt built the trade</h3><p>Rome's salt came from the coastal pans (the <em>salinae</em> at Ostia), hauled inland along the Via Salaria, the "Salt Road." Salt didn't rot or decay, so it read as pure and permanent: sacred enough for offerings and covenants, valuable enough to anchor an economy.</p></div>
+      <div class="era dim"><span class="when">Middle Ages</span><h3>Garum nearly disappears</h3><p>As Rome faded, so did large-scale garum. The recipe survived in pockets, kept alive quietly by fishing communities rather than empires.</p></div>
+      <div class="era"><span class="when">Cetara · Amalfi Coast</span><h3>The monks keep the flame</h3><p>In the tiny fishing village of Cetara, anchovies caught in spring were salted, pressed, and left to mature in chestnut barrels. The amber liquid that dripped from the bottom became <em>colatura di alici</em>: garum's direct, refined descendant.</p></div>
+      <div class="era"><span class="when">Today</span><h3>Umami in a dropper</h3><p>Aged for months (the finest, years, in oak), colatura is now protected as a heritage food. A few drops make everything taste more intensely of itself. You can buy the real thing and cook with 2,000 years of history tonight.</p></div>
+    </div>
+  </section>
+  <section class="make">
+    <div class="sec-head"><span class="eyebrow">Anchovies · Salt · Time</span><h2>How it's made</h2></div>
+    <div class="make-steps">
+      <div class="make-step"><span class="n">01</span><div><h4>Catch &amp; clean</h4><p>Spring anchovies from the Gulf of Salerno, cleaned by hand within hours of the catch.</p></div></div>
+      <div class="make-step"><span class="n">02</span><div><h4>Salt &amp; press</h4><p>Layered with sea salt in chestnut-wood barrels (<em>terzigni</em>), weighted, and left under pressure.</p></div></div>
+      <div class="make-step"><span class="n">03</span><div><h4>Wait</h4><p>Months of slow maturation. The salt draws water out by osmosis, so microbes can't spoil it: preservation and flavor in one move.</p></div></div>
+      <div class="make-step"><span class="n">04</span><div><h4>Drip &amp; bottle</h4><p>The amber liquid trickles from a hole in the barrel base, filtered clear. That drip <em>is</em> colatura.</p></div></div>
+    </div>
+  </section>
+  <section>
+    <div class="sec-head"><span class="eyebrow">Five ways to use it</span><h2>What to cook</h2></div>
+    <details class="recipe" open>
+      <summary class="recipe-btn"><span class="recipe-title"><span class="flag">The flagship</span><h3>Spaghetti alla Colatura</h3><span class="meta">~15 min · no-cook sauce · serves 4</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+      <div class="recipe-body"><div class="recipe-body-inner"><div class="recipe-body-pad">
+        <ul class="ing"><li>400g spaghetti</li><li>4 tbsp colatura</li><li>8 tbsp olive oil</li><li>1 garlic clove</li><li>chili</li><li>parsley</li></ul>
+        <ol class="steps"><li>Boil spaghetti in <b>unsalted</b> water. The colatura is salty enough.</li><li>Gently warm the oil with a bashed garlic clove and chili. Don't brown the garlic, then pull it off the heat.</li><li>Off the heat, stir the colatura into the warm oil. Never over direct flame: high heat wrecks it.</li><li>Drain (save a splash of pasta water), toss into the oil, add water to emulsify into a glossy coat.</li><li>Finish with chopped parsley.</li></ol>
+        <p class="tip">This plate is a straight-line descendant of Roman garum. You're eating history.</p>
+      </div></div></div>
+    </details>
+    <details class="recipe">
+      <summary class="recipe-btn"><span class="recipe-title"><span class="flag">Sea meets greens</span><h3>Orecchiette, Clams &amp; Broccoli</h3><span class="meta">colatura ties it all together</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+      <div class="recipe-body"><div class="recipe-body-inner"><div class="recipe-body-pad">
+        <p>Steam clams open, blanch the broccoli, then toss with orecchiette, garlic-chili oil, and a finishing drizzle of colatura. The sauce bridges the brine of the clams and the bitterness of the greens.</p>
+        <p><a href="https://blog.vorrei.co.uk/orecchiette-with-colatura-di-alici/" style="color:var(--amber);text-decoration:none;">Full recipe →</a></p>
+      </div></div></div>
+    </details>
+    <details class="recipe">
+      <summary class="recipe-btn"><span class="recipe-title"><span class="flag">Eataly classic</span><h3>Linguine &amp; Broccoli Rabe</h3><span class="meta">bitter greens + umami = Campania</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+      <div class="recipe-body"><div class="recipe-body-inner"><div class="recipe-body-pad">
+        <p>Sauté broccoli rabe (erbe di campo) with garlic, chili flakes and good oil, fold through linguine, then season off-heat with colatura instead of salt. Rustic, fast, deeply savory.</p>
+        <p><a href="https://www.italymagazine.com/recipe/linguine-colatura-di-alici-and-erbe-di-campo" style="color:var(--amber);text-decoration:none;">Full recipe →</a></p>
+      </div></div></div>
+    </details>
+    <details class="recipe">
+      <summary class="recipe-btn"><span class="recipe-title"><span class="flag">Summer, cold</span><h3>Shaved Fennel &amp; Tomato Salad</h3><span class="meta">colatura in the dressing</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+      <div class="recipe-body"><div class="recipe-body-inner"><div class="recipe-body-pad">
+        <p>Shave fennel thin, add ripe tomatoes and salted capers, dress with olive oil and a few drops of colatura, then top with crispy panko. Light and refreshing with a salty umami hit: the perfect hot-weather plate.</p>
+        <p><a href="https://rosannaetc.com/post/fennel-tomato-salad/" style="color:var(--amber);text-decoration:none;">Full recipe →</a></p>
+      </div></div></div>
+    </details>
+    <details class="recipe">
+      <summary class="recipe-btn"><span class="recipe-title"><span class="flag dim-flag">The sneaky uses</span><h3>A few drops, everywhere</h3><span class="meta">its real value as a seasoning</span></span><span class="chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+      <div class="recipe-body"><div class="recipe-body-inner"><div class="recipe-body-pad">
+        <p>Think of it as Worcestershire's classier Italian cousin. A little goes a long way, so treat it as a seasoning, not a sauce base:</p>
+        <ul class="ing"><li>into salad dressings</li><li>over roasted veg</li><li>over grilled fish</li><li>into braises</li><li>to deepen tomato sauce</li></ul>
+        <p class="tip">A few drops make everything taste more intensely of itself.</p>
+      </div></div></div>
+    </details>
+  </section>
+  <section class="buy">
+    <div class="sec-head"><span class="eyebrow">Ships in the US · fast</span><h2>Get a bottle</h2></div>
+    <div class="buy-list">
+      <a class="buy-card" href="https://www.digiacomobros.com/products/scalia-colatura-di-alici-garum-3oz" target="_blank" rel="noopener"><span class="buy-info"><span class="name">Scalia Colatura <span class="pick">Start here</span></span><span class="note">DiGiacomo Bros · easy entry bottle</span></span><span class="buy-price">$15<span>approx</span></span></a>
+      <a class="buy-card" href="https://www.gustiamo.com/colatura-anchovy-sauce-from-cetara-by-nettuno/" target="_blank" rel="noopener"><span class="buy-info"><span class="name">Nettuno, Cetara</span><span class="note">Gustiamo · the real Cetara gold standard</span></span><span class="buy-price">$$<span>top tier</span></span></a>
+      <a class="buy-card" href="https://www.markethallfoods.com/products/colatura-di-alici-anchovy-syrup-from-iasa" target="_blank" rel="noopener"><span class="buy-info"><span class="name">IASA Colatura</span><span class="note">Market Hall Foods · widely loved</span></span><span class="buy-price">$$<span>mid</span></span></a>
+      <a class="buy-card" href="https://www.dolceterra.com/products/colatura-di-alici" target="_blank" rel="noopener"><span class="buy-info"><span class="name">Cetara 100ml</span><span class="note">Dolceterra · US-based shipping</span></span><span class="buy-price">$27<span>approx</span></span></a>
+    </div>
+    <p class="callout">First bottle? Grab the <b>Scalia</b> to experiment, then graduate to <b>Nettuno</b> once you're hooked. Look for anything labeled <b>Colatura di Alici di Cetara DOP</b>: that's the real deal.</p>
+  </section>
+  <section>
+    <div class="sec-head"><span class="eyebrow">Find it in person</span><h2>Local shots</h2></div>
+    <div class="local-grid">
+      <div class="city"><div class="city-name">Chattanooga, TN</div><div class="shop"><b>Olive Rustica</b> · 1700 Broadway · premium Italian oils &amp; sauces. <a href="https://www.wdef.com/olive-rustica-brings-old-world-flavors-to-chattanooga/" target="_blank" rel="noopener">Details →</a></div><div class="shop"><b>Alimentari Cafe &amp; Market</b> · 841 Chestnut St · Italian specialty. <a href="https://www.restaurantji.com/tn/chattanooga/alimentari-cafe-and-market-/" target="_blank" rel="noopener">Details →</a></div></div>
+      <div class="city"><div class="city-name">Portland, ME</div><div class="shop"><b>Micucci Grocery</b> · 45 India St · legendary Italian importer, your best bet. Call the deli: (207) 775-1854. <a href="https://micuccis.com/" target="_blank" rel="noopener">Site →</a></div><div class="shop"><b>SKORDO</b> · 372 Fore St · curated ingredients downtown. <a href="https://skordo.com/" target="_blank" rel="noopener">Site →</a></div></div>
+    </div>
+    <p class="callout">Colatura is niche enough that even good shops don't always stock it. <b>Call ahead</b> before you drive over. If both strike out, the online bottles above ship fast.</p>
+  </section>
+  <footer>
+    <div class="mark">colare</div>
+    <p>Italian for "to drip." Exactly what happens in the barrel, and how garum found its way to today.</p>
+  </footer>
+</div>
+<script>
+  const eras = document.querySelectorAll('.era');
+  const io = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' });
+  eras.forEach(el => io.observe(el));
+  const recipes = document.querySelectorAll('.recipe');
+  recipes.forEach(r => { r.querySelector('.recipe-btn').addEventListener('click', () => { if (!r.open) recipes.forEach(o => { if (o !== r) o.open = false; }); }); });
+</script>
+</body>
+</html>
