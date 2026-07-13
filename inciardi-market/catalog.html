@@ -1,99 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#14161c">
-<title>Inciardi Catalog</title>
-<meta name="description" content="The Anastasia Inciardi mini-print universe: a visual, searchable catalog of every print, crossed against the live eBay market.">
+<meta name="theme-color" content="#0a0e13">
 <meta name="robots" content="noindex, nofollow">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/inciardi-market/catalog.html">
-<meta property="og:title" content="Inciardi Catalog">
-<meta property="og:description" content="The Anastasia Inciardi mini-print universe: a visual, searchable catalog crossed against the live eBay market.">
-<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/inciardi-market/og.png?v=2">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Inciardi Catalog">
-<meta name="twitter:description" content="The Anastasia Inciardi mini-print universe, visual and searchable.">
-<link rel="icon" href="./icon.png" type="image/png">
-<link rel="apple-touch-icon" href="./icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./source/base.css?v=9">
-<link rel="stylesheet" href="./source/catalog.css?v=9">
+<title>Catalog · Inciardi Market</title>
+<meta name="description" content="The Anastasia Inciardi print universe, crossed against the live eBay market.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\uD83D\uDDBC\uFE0F</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="source/base.css">
+<link rel="stylesheet" href="source/catalog.css">
 </head>
 <body>
-<div class="wrap">
+<header class="topbar"><div class="wrap row">
+  <span class="brand"><span class="dot"></span>Inciardi Market <span class="tk">CATALOG</span></span>
+  <nav class="nav">
+    <a href="terminal.html">Terminal</a>
+    <a href="catalog.html" aria-current="page">Catalog</a>
+    <a href="collection.html">Collection</a>
+    <a href="market.html">Market</a>
+  </nav>
+  <button class="gear" id="gear" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+</div></header>
 
- <nav class="sitenav" aria-label="Sections">
-  <div class="seg">
-   <a href="./catalog.html" aria-current="page"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Catalog</a>
-   <a href="./market.html"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Market</a>
-   <a href="./collection.html"><svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/></svg>Collection</a>
+<main class="wrap">
+  <div class="phead">
+    <div class="kick">The print universe</div>
+    <h1>Catalog</h1>
+    <p>Every Anastasia Inciardi print, crossed against the live eBay market. Own images stored for good, not hotlinked.</p>
   </div>
- </nav>
 
- <header class="masthead">
-  <div class="brand">
-   <div class="kicker"><span class="ticker">CATALOG</span></div>
-   <h1>The <span>Print Universe</span></h1>
-   <p class="tag">Every Anastasia Inciardi mini print we've catalogued, from her own store, crossed against what's live on eBay right now.</p>
+  <div class="strip" id="strip"></div>
+
+  <div class="controls">
+    <div class="searchbar" id="searchbar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search" placeholder="Search prints\u2026" spellcheck="false">
+      <button class="clr" id="searchClr" aria-label="Clear"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="filterrow">
+      <div class="chips" id="catChips"></div>
+      <span class="spacer"></span>
+      <button class="toggle-mini" id="ebayToggle" aria-pressed="false">On eBay now</button>
+      <button class="btn sm primary write-only" id="addBtn">+ Add print</button>
+    </div>
   </div>
-  <button class="gear" id="gear" aria-expanded="false" aria-label="Settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
- </header>
 
- <div class="strip" id="strip"></div>
+  <div class="count-line" id="countLine"></div>
+  <div class="grid" id="grid"></div>
 
- <div class="controls">
-  <div class="searchbar" id="searchbar">
-   <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-   <input type="text" id="search" placeholder="Search prints…" spellcheck="false" autocomplete="off" aria-label="Search prints">
-   <button class="clr" id="searchClr" aria-label="Clear search"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  <footer class="footer"><span id="f-build">Inciardi Market v10</span><span id="f-src">connecting\u2026</span></footer>
+</main>
+
+<dialog id="detail"><div class="drawer" id="detailInner"></div></dialog>
+
+<dialog id="addPrint"><div class="sheet">
+  <div class="sheet-h"><h2>Add a print</h2><button class="x" id="addClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="field"><label>Name</label><input id="ap-name" placeholder="e.g. Negroni" spellcheck="false"></div>
+  <div class="row2">
+    <div class="field"><label>Category</label><select id="ap-cat"><option value="mini">Mini</option><option value="big-riso">Big Risograph</option><option value="linocut">Linocut</option><option value="exclusive">Exclusive</option><option value="pack">Pack</option></select></div>
+    <div class="field"><label>Retail ($)</label><input id="ap-retail" type="number" step="1" placeholder="15"></div>
   </div>
-  <div class="filterrow">
-   <div class="chips" id="catChips"></div>
-   <span class="spacer"></span>
-   <button class="toggle-mini" id="ebayToggle" aria-pressed="false">On eBay now</button>
+  <div class="row2">
+    <div class="field"><label>Exclusive series</label><select id="ap-excl"><option value="">\u2014 none \u2014</option><option value="nyc">NYC</option><option value="lacma">LACMA</option><option value="grand-central">Grand Central</option><option value="richard-scarry">Richard Scarry</option><option value="holiday">Holiday</option></select></div>
+    <div class="field"><label>In print?</label><select id="ap-inprint"><option value="0">Retired / sold out</option><option value="1">Available new</option></select></div>
   </div>
- </div>
+  <div id="ap-warn" class="dedupe-warn" hidden></div>
+  <div style="display:flex;gap:var(--s3);margin-top:var(--s4)"><button class="btn primary" id="ap-save">Save print</button><button class="btn ghost" id="ap-cancel">Cancel</button></div>
+</div></dialog>
 
- <div class="count-line" id="countLine"></div>
- <div class="grid" id="grid"></div>
-</div>
+<dialog id="settings"><div class="drawer" style="padding:var(--s6)">
+  <div class="drawer-h"><h2>Settings</h2><button class="x" id="settingsClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="field" style="flex-direction:row;align-items:center;justify-content:space-between"><label style="margin:0">Dark terminal</label><button class="btn sm" id="themeToggle" aria-pressed="true">Toggle</button></div>
+  <div class="field"><label>Data source (Worker URL)</label><input id="epInput" placeholder="https://inciardi-market\u2026workers.dev" spellcheck="false"></div>
+  <div class="field"><label>Write key (unlocks editing)</label><input id="wkeyInput" type="password" placeholder="paste to enable catalog edits" spellcheck="false"></div>
+  <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Editing the catalog and storing images require the write key. Without it, the catalog is read-only.</p>
+</div></dialog>
 
-<footer>
- <div class="foot-in">
-  <div>
-   <div class="foot-brand">Inciardi Catalog</div>
-   <div class="foot-desc">The sourced print universe. Images are Anastasia's own; the master run is 500+ and this set grows each research pass.</div>
-  </div>
-  <div class="foot-links">
-   <a href="https://inciardiprints.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Inciardi Prints</a>
-   <a href="./market.html"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Market</a>
-   <a href="./collection.html"><svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/></svg>Collection</a>
-  </div>
- </div>
- <div class="foot-base"><div class="foot-base-in"><span id="f-build">Inciardi Catalog v1</span><span id="f-stamp"></span></div></div>
-</footer>
-
-<dialog class="detail" id="detail" aria-label="Print detail">
- <button class="dt-close" id="dtClose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
- <div id="dtInner"></div>
-</dialog>
-
-<dialog class="drawer" id="drawer" aria-label="Settings">
- <button class="drawer-close" id="drawerClose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
- <h2>Settings</h2>
- <div class="field">
-  <div><label>Dark terminal</label><div class="desc">Persists on this device, shared with the Market view</div></div>
-  <button class="toggle" id="themeToggle" role="switch" aria-pressed="true" aria-label="Toggle dark theme"></button>
- </div>
- <p class="drawer-note">The catalog is the sourced print universe, owner-agnostic. Reference images link to Anastasia's own store CDN. Market status is cross-referenced from the live eBay feed the Market view reads, and refreshes with it. The master universe is 500+ prints; this catalog is a growing, sourced working set.</p>
-</dialog>
-
-<script src="./source/catalog.js?v=9"></script>
+<script src="source/app-core.js"></script>
+<script src="source/catalog.js"></script>
 </body>
 </html>

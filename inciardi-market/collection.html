@@ -1,150 +1,77 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#14161c">
-<title>Inciardi Collection</title>
-<meta name="description" content="The Inciardi print registry: catch what you own, flag what you want, across the full mini-print universe.">
+<meta name="theme-color" content="#0a0e13">
 <meta name="robots" content="noindex, nofollow">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/inciardi-market/collection.html">
-<meta property="og:title" content="Inciardi Collection">
-<meta property="og:description" content="The Inciardi print registry: catch what you own, flag what you want, across the full mini-print universe.">
-<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/inciardi-market/og.png?v=2">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Inciardi Collection">
-<meta name="twitter:description" content="The Inciardi print registry: catch what you own, flag what you want.">
-<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/inciardi-market/og.png?v=2">
-<link rel="icon" href="./icon.png" type="image/png">
-<link rel="apple-touch-icon" href="./icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="./source/collection.css?v=9">
+<title>Collection · Inciardi Market</title>
+<meta name="description" content="The individual Inciardi prints you own, marked to the live market.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\uD83D\uDDBC\uFE0F</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="source/base.css">
+<link rel="stylesheet" href="source/collection.css">
 </head>
 <body>
-
- <header class="masthead">
-  <div class="brand">
-   <div class="glyph">I</div>
-   <div class="txt">
-    <div class="nm">Inciardi</div>
-    <div class="sub">Print Registry</div>
-   </div>
-  </div>
-  <nav class="app-nav" aria-label="Sections">
-   <a href="./catalog.html">Catalog</a>
-   <a href="./market.html">Market</a>
-   <a href="./collection.html" aria-current="page">Collection</a>
+<header class="topbar"><div class="wrap row">
+  <span class="brand"><span class="dot"></span>Inciardi Market <span class="tk">COLLECTION</span></span>
+  <nav class="nav">
+    <a href="terminal.html">Terminal</a>
+    <a href="catalog.html">Catalog</a>
+    <a href="collection.html" aria-current="page">Collection</a>
+    <a href="market.html">Market</a>
   </nav>
-  <div class="mast-stats">
-   <div class="c known"><span class="n" id="statKnown">0</span><span class="k">known</span></div>
-   <div class="c own"><span class="n" id="statOwned">0</span><span class="k">owned</span></div>
-   <div class="c want"><span class="n" id="statWanted">0</span><span class="k">wanted</span></div>
+  <button class="gear" id="gear" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+</div></header>
+
+<main class="wrap">
+  <div class="phead">
+    <div class="kick">Your holdings</div>
+    <h1>Collection</h1>
+    <p>Every individual print you own, matched to the catalog and marked to the live eBay market. This is your book, separate from the catalog of what exists.</p>
   </div>
-  <button class="gear" id="gear" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="dot" id="gearDot" data-s="local"></span></button>
- </header>
 
- <div class="stage">
-  <aside class="rail" id="rail">
-   <div class="rail-head"><span class="t">Lenses</span><button class="x-btn" id="railClose" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
-   <div class="search">
-    <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-    <input type="text" id="search" placeholder="Search prints…" spellcheck="false" autocomplete="off" aria-label="Search prints">
-   </div>
-   <div class="views" role="group" aria-label="View">
-    <button class="view-chip" data-view="all" aria-pressed="true">All</button>
-    <button class="view-chip" data-view="owned" aria-pressed="false">Owned</button>
-    <button class="view-chip" data-view="wanted" aria-pressed="false">Wanted</button>
-    <button class="view-chip" data-view="missing" aria-pressed="false">Missing</button>
-    <button class="view-chip" data-view="listed" aria-pressed="false">Listed now</button>
-   </div>
-   <div class="facet">
-    <h3>Rarity <button data-clear="rarity">clear</button></h3>
-    <div class="opts" id="facetRarity"></div>
-   </div>
-   <div class="facet">
-    <h3>Collection <button data-clear="collection">clear</button></h3>
-    <div class="opts" id="facetCollection"></div>
-   </div>
-   <div class="facet">
-    <h3>Subject <button data-clear="subject">clear</button></h3>
-    <div class="opts" id="facetSubject"></div>
-   </div>
-  </aside>
+  <div class="pstats" id="pstats"></div>
 
-  <section class="deck-wrap">
-   <div class="deck-head">
-    <button class="rail-toggle" id="railToggle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Lenses</button>
-    <span class="showing" id="showing">0 of 0 records</span>
-    <div class="active-tags" id="activeTags"></div>
-    <div class="legend">
-     <span><span class="sw" style="background:var(--r-mini)"></span>Mini</span>
-     <span><span class="sw" style="background:var(--r-linocut)"></span>Linocut</span>
-     <span><span class="sw" style="background:var(--r-riso)"></span>Big Riso</span>
-     <span><span class="sw" style="background:var(--r-excl)"></span>Exclusive</span>
+  <div class="col-controls">
+    <div class="chips" id="dispChips">
+      <button class="chip" data-d="own" aria-pressed="true">Owned</button>
+      <button class="chip" data-d="want" aria-pressed="false">Wishlist</button>
+      <button class="chip" data-d="sold" aria-pressed="false">Sold</button>
     </div>
-   </div>
-   <div class="deck" id="deck"></div>
-  </section>
- </div>
-
- <footer class="app-footer">
-  <div class="foot-in">
-   <div class="foot-sources">
-    <a href="https://inciardiprints.com" target="_blank" rel="noopener">Inciardi Prints ↗</a>
-    <span class="foot-sync"><span class="d" id="footSyncDot" data-s="local"></span><span id="footSyncLabel">local only</span></span>
-   </div>
-   <span class="foot-stamp" id="footStamp">—</span>
+    <span class="spacer"></span>
+    <button class="btn sm primary write-only" id="addBtn">+ Add holding</button>
   </div>
- </footer>
 
- <div class="scrim" id="scrim"></div>
+  <div id="ledger"><div class="skeleton" style="height:220px"></div></div>
 
- <aside class="drawer" id="drawer" aria-label="Settings">
-  <div class="drawer-head">
-   <span class="t">Settings</span>
-   <button class="x-btn" id="drawerClose" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  <footer class="footer"><span id="f-build">Inciardi Market v10</span><span id="f-src">connecting\u2026</span></footer>
+</main>
+
+<dialog id="addHold"><div class="sheet">
+  <div class="sheet-h"><h2 id="ah-title">Add holding</h2><button class="x" id="ahClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="field"><label>Print</label><input id="ah-print" list="ah-list" placeholder="start typing a catalogued name\u2026" spellcheck="false"><datalist id="ah-list"></datalist><small style="font-family:var(--mono);font-size:0.62rem;color:var(--ink-faint);margin-top:4px">No catalog match? It's saved as a provisional holding.</small></div>
+  <div class="row2">
+    <div class="field"><label>Status</label><select id="ah-disp"><option value="own">Own it</option><option value="want">Want it</option></select></div>
+    <div class="field"><label>Condition</label><select id="ah-cond"><option value="">\u2014</option><option>new</option><option>used</option><option>sealed</option></select></div>
   </div>
-  <div class="drawer-body">
-   <div class="set-block">
-    <h4>Live sync</h4>
-    <p class="hint">Paste a sync key to reserve this collection for the shared database once cross-device sync ships. Today, everything stays on this device.</p>
-    <div class="keyrow">
-     <input type="text" id="syncKey" placeholder="sync key" spellcheck="false" autocomplete="off">
-     <button id="syncSave">Save</button>
-    </div>
-    <div class="keystate" id="keyState">no key set — changes stay on this device</div>
-   </div>
-   <div class="set-block">
-    <h4>Theme</h4>
-    <div class="seg">
-     <button id="themeDark" aria-pressed="true">Dark</button>
-     <button id="themeLight" aria-pressed="false">Light</button>
-    </div>
-   </div>
-   <div class="set-block">
-    <h4>How it works</h4>
-    <div class="notes">
-     <div class="note-row"><span class="b"></span><span>Tap a card to catch it (mark as owned). Tap again to release.</span></div>
-     <div class="note-row"><span class="b"></span><span>Long-press a card (or shift-tap on desktop) to flag it wanted.</span></div>
-     <div class="note-row"><span class="b"></span><span>Owned prints show in full color; everything else is ghosted until you catch it.</span></div>
-     <div class="note-row"><span class="b"></span><span>The Market tab up top switches to the price terminal (deals, sell signals, live eBay).</span></div>
-    </div>
-   </div>
-   <div class="set-block">
-    <h4>Data status</h4>
-    <div class="notes">
-     <div class="note-row pending"><span class="b"></span><span>Market prices are sample data, not the live eBay feed yet.</span></div>
-     <div class="note-row pending"><span class="b"></span><span>Shared cross-device sync isn't live yet; your collection stays on this device.</span></div>
-     <div class="note-row"><span class="b"></span><span>Catalog draws from the shared registry of <b id="dataKnown">0</b> prints; the full run is larger and still filling in.</span></div>
-    </div>
-   </div>
+  <div class="row2">
+    <div class="field"><label>Paid ($)</label><input id="ah-paid" type="number" step="0.01" placeholder="optional"></div>
+    <div class="field"><label>Acquired where</label><input id="ah-where" placeholder="machine / eBay / shop"></div>
   </div>
- </aside>
+  <div style="display:flex;gap:var(--s3);margin-top:var(--s4)"><button class="btn primary" id="ah-save">Save</button><button class="btn ghost" id="ah-cancel">Cancel</button></div>
+</div></dialog>
 
-<script src="./source/collection.js?v=9"></script>
+<dialog id="settings"><div class="drawer" style="padding:var(--s6)">
+  <div class="drawer-h"><h2>Settings</h2><button class="x" id="settingsClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="field" style="flex-direction:row;align-items:center;justify-content:space-between"><label style="margin:0">Dark terminal</label><button class="btn sm" id="themeToggle" aria-pressed="true">Toggle</button></div>
+  <div class="field"><label>Data source (Worker URL)</label><input id="epInput" placeholder="https://inciardi-market\u2026workers.dev" spellcheck="false"></div>
+  <div class="field"><label>Write key (unlocks editing)</label><input id="wkeyInput" type="password" placeholder="paste to enable collection edits" spellcheck="false"></div>
+  <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Your collection is stored in the database. Editing requires the write key. It's private-by-integrity, not encrypted \u2014 don't store anything sensitive here.</p>
+</div></dialog>
+
+<script src="source/app-core.js"></script>
+<script src="source/collection.js"></script>
 </body>
 </html>
