@@ -1,25 +1,20 @@
 <!DOCTYPE html>
 <!-- INFRASTRUCTURE: slim loader shell. SEGMENTED app: styling in source/standings/*.css, logic in source/standings/*.js. Every file under the 12KB soft cap. Never inline this back into one file. -->
 <!-- DATA: modules fetch the canonical per-round store at ./f1-results/2026/ (index_rounds.json + round files). No data duplicated here. -->
-<!-- v5.4: Season History lens (source/standings/history.js) folded into the nav.xnav switcher. -->
-<!-- v5.5: cross-lens nav — first switcher segment reads Matrix (Matrix / History / Circuits); History gets a #history deep-link. -->
-<!-- v5.6: maintenance — data.js APP_VERSION reconciled; removed the history.js pinStamp hack. -->
-<!-- v5.7: History self-heal — data.js fires 'season-ready', history.js listens + longer fallback poll. -->
-<!-- v5.8: REAL History fix — renderHistory guard reads bare ROUNDS/DRV (window.ROUNDS was always undefined). -->
-<!-- v6.0: Race Weekend lens — nav switcher briefly carried a Weekend segment; side-panel race brief drops 'Race weekend' + 'Circuit guide' connectors; History cards deep-link to weekend.html#/<slug>. -->
-<!-- v6.1: nav model correction — Weekend is a per-round DRILL-THROUGH, not a top-level tab. Switcher trimmed to Matrix / History / Circuits; you reach a weekend FROM a History or Circuit card (+ the Jump-to-round menu). ?v bumped across modules. -->
+<!-- v6.1: nav model — Weekend is a per-round drill-through, switcher is Matrix / History / Circuits. -->
+<!-- v6.3: cohesion pass — standings palette + ease unified to the shared hue-268 system (was 255); shared F1 brand lockup added to the nav appbar so Matrix/History reads as one app with Weekend + Circuits; suave stage-reveal on view swap. ?v bumped across modules. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#26262e">
+<meta name="theme-color" content="#17171d">
 <title>2026 F1 Championship Matrix</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/standings/base.css?v=6.1">
-<link rel="stylesheet" href="source/standings/panel.css?v=6.1">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="source/standings/base.css?v=6.3">
+<link rel="stylesheet" href="source/standings/panel.css?v=6.3">
 </head>
 <body>
   <header class="mast">
@@ -48,18 +43,18 @@
   </div>
 
   <footer>
-    <span>Championship Matrix <span class="num" id="stamp">v6.1</span></span>
+    <span>Championship Matrix <span class="num" id="stamp">v6.3</span></span>
     <span>canonical store</span>
   </footer>
 
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
 
-  <script src="source/standings/data.js?v=6.1"></script>
-  <script src="source/standings/matrix.js?v=6.1"></script>
-  <script src="source/standings/trajectory.js?v=6.1"></script>
-  <script src="source/standings/panel.js?v=6.1"></script>
-  <script src="source/standings/nav.js?v=6.1"></script>
-  <script src="source/standings/history.js?v=6.1"></script>
+  <script src="source/standings/data.js?v=6.3"></script>
+  <script src="source/standings/matrix.js?v=6.3"></script>
+  <script src="source/standings/trajectory.js?v=6.3"></script>
+  <script src="source/standings/panel.js?v=6.3"></script>
+  <script src="source/standings/nav.js?v=6.3"></script>
+  <script src="source/standings/history.js?v=6.3"></script>
 </body>
 </html>
