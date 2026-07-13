@@ -1,24 +1,28 @@
 /**
- * Inciardi Mini Print Market Tracker — Cloudflare Worker (v1.1)
+ * Inciardi Mini Print Market Tracker — Cloudflare Worker (v1.2)
  *
- * Relational backend over D1 (catalog / inventory / images / history) + R2 (image bytes),
+ * Relational backend over D1 (catalog / inventory / images / history / machines) + R2 (image bytes),
  * plus the live eBay market feed. This is the API the terminal front-end reads.
  *
  * READS (open):
- *   GET /market                 live eBay listings, diffed vs KV snapshot
- *   GET /catalog                master print universe from D1, each print + its images
- *   GET /inventory              owned copies (D1), joined to catalog + primary image
- *   GET /history?print_id=       per-print trend points + gone events
- *   GET /usage                  R2 storage used vs cap (for the storage meter)
- *   GET /img?key=<r2key>&w=      serve a stored image from R2 (primary path)
- *   GET /img?u=<cdn-url>&w=      allowlisted CDN passthrough (transient preview / pre-store)
+ *   GET /market              live eBay listings, diffed vs KV snapshot
+ *   GET /catalog             master print universe from D1, each print + its images
+ *   GET /inventory           owned copies (D1), joined to catalog + primary image
+ *   GET /history?print_id=   per-print trend points + gone events
+ *   GET /machines            vending machines (D1); filter by ?state= &city= &status= &collection=; or ?print_id= for machines carrying a print
+ *   GET /usage               R2 storage used vs cap (for the storage meter)
+ *   GET /img?key= &w=        serve a stored image from R2 (primary path)
+ *   GET /img?u= &w=          allowlisted CDN passthrough (transient preview / pre-store)
  *
  * WRITES (gated: header x-write-key === env.WRITE_KEY):
- *   POST /catalog               upsert a print (manual add / edit); dedupe is client-side
- *   POST /catalog/image         upload an image (base64 body) -> R2 -> print_image row
- *   POST /catalog/image/scrub   fetch an allowlisted CDN url server-side -> store in R2
- *   POST /catalog/image/state   { image_id, op: primary | archive | restore | delete }
- *   POST /inventory             { op: upsert | delete } one physical owned copy
+ *   POST /catalog                upsert a print (manual add / edit); dedupe is client-side
+ *   POST /catalog/image          upload an image (base64 body) -> R2 -> print_image row
+ *   POST /catalog/image/scrub    fetch an allowlisted CDN url server-side -> store in R2
+ *   POST /catalog/image/state    { image_id, op: primary | archive | restore | delete }
+ *   POST /inventory              { op: upsert | delete } one physical owned copy
+ *   POST /machines               { op: upsert | delete } one vending machine
+ *   POST /machines/stock         { machine_id, status, source, notes } flip status + log a machine_event
+ *   POST /machines/print         { op: link | unlink, machine_id, print_id, in_stock, last_seen_at } M:N print<->machine
  *
  * scheduled() cron: banks market_point + print_point + gone_event into D1 each run.
  *
@@ -26,7 +30,7 @@
  * write checks total stored bytes (tracked in D1) and refuses to cross STORAGE_CAP_BYTES.
  *
  * Bindings: KV 'SNAPSHOTS', D1 'DB', R2 'IMAGES'.
- * Secrets:  EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY.
+ * Secrets: EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY.
  * NOTE: deploy target. NOT served by GitHub Pages.
  */
 // redeploy nonce 2026-07-13: force Workers Builds to rebind IMAGES after the inciardi-images bucket was created.
@@ -65,6 +69,7 @@ export default {
       if (p === "/catalog" && request.method === "GET") return json(await readCatalog(env, base));
       if (p === "/inventory" && request.method === "GET") return json(await readInventory(env, base));
       if (p === "/history" && request.method === "GET") return json(await readHistory(env, url));
+      if (p === "/machines" && request.method === "GET") return json(await readMachines(env, url, base));
       if (p === "/usage" && request.method === "GET") return json(await readUsage(env));
 
       if (p === "/catalog" && request.method === "POST") { gate(request, env); return json(await upsertCatalog(env, await request.json())); }
@@ -72,6 +77,9 @@ export default {
       if (p === "/catalog/image/scrub" && request.method === "POST") { gate(request, env); return json(await scrubImage(env, await request.json())); }
       if (p === "/catalog/image/state" && request.method === "POST") { gate(request, env); return json(await imageState(env, await request.json())); }
       if (p === "/inventory" && request.method === "POST") { gate(request, env); return json(await writeInventory(env, await request.json())); }
+      if (p === "/machines" && request.method === "POST") { gate(request, env); return json(await writeMachine(env, await request.json())); }
+      if (p === "/machines/stock" && request.method === "POST") { gate(request, env); return json(await machineStock(env, await request.json())); }
+      if (p === "/machines/print" && request.method === "POST") { gate(request, env); return json(await machinePrint(env, await request.json())); }
 
       return json({ error: "not found" }, 404);
     } catch (err) {
@@ -165,7 +173,7 @@ async function insertImageRow(env, r) {
     r.bytes || null, r.width || null, r.height || null, r.is_primary ? 1 : 0, r.sort || 0, nowISO()).run();
 }
 
-// POST /catalog/image  { print_id, data (base64), content_type, make_primary, width, height }
+// POST /catalog/image { print_id, data (base64), content_type, make_primary, width, height }
 async function uploadImage(env, body) {
   if (!body || !body.print_id || !body.data) throw new Error("upload requires print_id and data");
   const image_id = uuid();
@@ -180,7 +188,7 @@ async function uploadImage(env, body) {
   return { ok: true, image_id, r2_key };
 }
 
-// POST /catalog/image/scrub  { print_id, source_url, make_primary }
+// POST /catalog/image/scrub { print_id, source_url, make_primary }
 // Fetch the CDN image server-side and STORE it in R2 (not just hotlink).
 async function scrubImage(env, body) {
   if (!body || !body.print_id || !body.source_url) throw new Error("scrub requires print_id and source_url");
@@ -200,7 +208,7 @@ async function scrubImage(env, body) {
   return { ok: true, image_id, r2_key, bytes: buf.length };
 }
 
-// POST /catalog/image/state  { image_id, op: primary | archive | restore | delete }
+// POST /catalog/image/state { image_id, op: primary | archive | restore | delete }
 async function imageState(env, body) {
   if (!body || !body.image_id || !body.op) throw new Error("state requires image_id and op");
   const row = await env.DB.prepare("SELECT image_id,print_id,r2_key,is_primary FROM print_image WHERE image_id=?1").bind(body.image_id).first();
@@ -236,7 +244,7 @@ async function imagesFor(env, print_id, base, includeArchived) {
     content_type: r.content_type, bytes: r.bytes, width: r.width, height: r.height,
     source_url: r.source_url,
     url: r.r2_key ? `${base}/img?key=${encodeURIComponent(r.r2_key)}`
-       : (r.source_url ? `${base}/img?u=${encodeURIComponent(r.source_url)}` : null),
+      : (r.source_url ? `${base}/img?u=${encodeURIComponent(r.source_url)}` : null),
   }));
 }
 
@@ -259,7 +267,7 @@ async function readCatalog(env, base) {
   return { version: nowISO(), source: "d1", count: prints.length, prints };
 }
 
-// POST /catalog  { print_id?, name/title, category, exclusive, retail, in_print, pack_of, pack_from, aliases[], notes, source, locked }
+// POST /catalog { print_id?, name/title, category, exclusive, retail, in_print, pack_of, pack_from, aliases[], notes, source, locked }
 async function upsertCatalog(env, body) {
   const title = body.title || body.name;
   if (!title) throw new Error("catalog upsert requires a title/name");
@@ -299,7 +307,7 @@ async function readInventory(env, base) {
   return { count: rows.length, inventory: rows };
 }
 
-// POST /inventory  { op: upsert | delete, ...fields }
+// POST /inventory { op: upsert | delete, ...fields }
 async function writeInventory(env, body) {
   const op = (body && body.op) || "upsert";
   const now = nowISO();
@@ -327,6 +335,90 @@ async function writeInventory(env, body) {
     "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?14)"
   ).bind(inv_id, f.print_id, f.provisional_label, f.disposition, f.condition, f.framed, f.qty, f.acquired_price, f.acquired_where, f.acquired_at, f.sold_price, f.sold_at, f.notes, now).run();
   return { ok: true, inserted: inv_id };
+}
+
+/* ================= machines (D1 — location layer) ================= */
+// GET /machines            all machines + their linked prints
+// GET /machines?print_id=  machines carrying a given print (reverse filter)
+// GET /machines?state=&city=&status=&collection=  filtered list
+async function readMachines(env, url, base) {
+  const printId = url.searchParams.get("print_id");
+  if (printId) {
+    const res = await env.DB.prepare(
+      "SELECT m.*, mp.in_stock, mp.last_seen_at FROM machine_print mp " +
+      "JOIN machine m ON m.machine_id=mp.machine_id WHERE mp.print_id=?1 ORDER BY m.state, m.city"
+    ).bind(printId).all();
+    return { print_id: printId, machines: res.results || [] };
+  }
+  const where = [], binds = [];
+  for (const key of ["state", "city", "status", "collection"]) {
+    const v = url.searchParams.get(key);
+    if (v) { binds.push(v); where.push(`${key}=?${binds.length}`); }
+  }
+  const sql = "SELECT * FROM machine" + (where.length ? " WHERE " + where.join(" AND ") : "") + " ORDER BY state, city, name";
+  const res = await env.DB.prepare(sql).bind(...binds).all();
+  const machines = [];
+  for (const m of res.results || []) {
+    const pr = await env.DB.prepare(
+      "SELECT mp.print_id, mp.in_stock, mp.last_seen_at, c.title, c.exclusive " +
+      "FROM machine_print mp LEFT JOIN catalog c ON c.print_id=mp.print_id WHERE mp.machine_id=?1"
+    ).bind(m.machine_id).all();
+    machines.push({ ...m, prints: pr.results || [] });
+  }
+  return { count: machines.length, machines };
+}
+
+// POST /machines { op: upsert | delete, ...fields }
+async function writeMachine(env, body) {
+  const op = (body && body.op) || "upsert";
+  const now = nowISO();
+  if (op === "delete") {
+    if (!body.machine_id) throw new Error("delete requires machine_id");
+    await env.DB.prepare("DELETE FROM machine WHERE machine_id=?1").bind(body.machine_id).run();
+    return { ok: true, deleted: body.machine_id };
+  }
+  if (!body.name) throw new Error("machine upsert requires a name");
+  const machine_id = body.machine_id || slug(`${body.name}-${body.city || ""}`);
+  const locked = body.locked != null ? (body.locked ? 1 : 0) : 0;
+  await env.DB.prepare(
+    "INSERT INTO machine (machine_id,name,address,city,state,country,lat,lng,collection,status,status_checked_at,source,locked,notes,created_at,updated_at) " +
+    "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?15) " +
+    "ON CONFLICT(machine_id) DO UPDATE SET name=excluded.name, address=excluded.address, city=excluded.city, " +
+    "state=excluded.state, country=excluded.country, lat=excluded.lat, lng=excluded.lng, collection=excluded.collection, " +
+    "status=excluded.status, status_checked_at=excluded.status_checked_at, source=excluded.source, locked=excluded.locked, " +
+    "notes=excluded.notes, updated_at=excluded.updated_at"
+  ).bind(machine_id, body.name, body.address ?? null, body.city ?? null, body.state ?? null, body.country || "US",
+    body.lat ?? null, body.lng ?? null, body.collection ?? null, body.status || "unknown",
+    body.status_checked_at ?? null, body.source || "manual", locked, body.notes ?? null, now).run();
+  return { ok: true, machine_id };
+}
+
+// POST /machines/stock { machine_id, status, source, notes, collection } — flip status + log an event
+async function machineStock(env, body) {
+  if (!body || !body.machine_id || !body.status) throw new Error("stock requires machine_id and status");
+  const now = nowISO();
+  await env.DB.prepare("UPDATE machine SET status=?2, status_checked_at=?3, updated_at=?3 WHERE machine_id=?1")
+    .bind(body.machine_id, body.status, now).run();
+  const evMap = { empty: "emptied", "out-of-stock": "out-of-stock", restocked: "restocked", active: "seen", removed: "removed" };
+  await env.DB.prepare("INSERT INTO machine_event (machine_id,event,collection,at,source,notes) VALUES (?1,?2,?3,?4,?5,?6)")
+    .bind(body.machine_id, evMap[body.status] || "seen", body.collection ?? null, now, body.source ?? null, body.notes ?? null).run();
+  return { ok: true, machine_id: body.machine_id, status: body.status };
+}
+
+// POST /machines/print { op: link | unlink, machine_id, print_id, in_stock, last_seen_at, notes }
+async function machinePrint(env, body) {
+  const op = (body && body.op) || "link";
+  if (!body || !body.machine_id || !body.print_id) throw new Error("machine/print requires machine_id and print_id");
+  if (op === "unlink") {
+    await env.DB.prepare("DELETE FROM machine_print WHERE machine_id=?1 AND print_id=?2").bind(body.machine_id, body.print_id).run();
+    return { ok: true, unlinked: [body.machine_id, body.print_id] };
+  }
+  const now = nowISO();
+  await env.DB.prepare(
+    "INSERT INTO machine_print (machine_id,print_id,in_stock,last_seen_at,notes) VALUES (?1,?2,?3,?4,?5) " +
+    "ON CONFLICT(machine_id,print_id) DO UPDATE SET in_stock=excluded.in_stock, last_seen_at=excluded.last_seen_at, notes=excluded.notes"
+  ).bind(body.machine_id, body.print_id, body.in_stock != null ? (body.in_stock ? 1 : 0) : 1, body.last_seen_at || now, body.notes ?? null).run();
+  return { ok: true, linked: [body.machine_id, body.print_id] };
 }
 
 /* ================= history (D1) ================= */
