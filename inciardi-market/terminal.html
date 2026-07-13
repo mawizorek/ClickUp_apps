@@ -5,51 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0a0e13">
 <meta name="robots" content="noindex, nofollow">
-<title>Market · Inciardi Market</title>
-<meta name="description" content="Live eBay radar for Anastasia Inciardi mini prints.">
+<title>Terminal · Inciardi Market</title>
+<meta name="description" content="Your Inciardi print collection marked to the live eBay market.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\uD83D\uDDBC\uFE0F</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="source/base.css">
-<link rel="stylesheet" href="source/market.css">
+<link rel="stylesheet" href="source/terminal.css">
 </head>
 <body>
 <header class="topbar"><div class="wrap row">
-  <span class="brand"><span class="dot"></span>Inciardi Market <span class="tk">MARKET</span></span>
+  <span class="brand"><span class="dot"></span>Inciardi Market <span class="tk">TERMINAL</span></span>
   <nav class="nav">
-    <a href="terminal.html">Terminal</a>
+    <a href="terminal.html" aria-current="page">Terminal</a>
     <a href="catalog.html">Catalog</a>
     <a href="collection.html">Collection</a>
-    <a href="market.html" aria-current="page">Market</a>
+    <a href="market.html">Market</a>
   </nav>
   <button class="gear" id="gear" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 </div></header>
 
 <main class="wrap">
   <div class="phead">
-    <div class="kick">Live radar · <span id="live-pill">connecting\u2026</span></div>
-    <h1>Market</h1>
-    <p>Every live Inciardi listing on eBay, scored against per-print retail. Deals first; exclusives flagged as sell signals.</p>
+    <div class="kick">Collector's Terminal · <span id="live-pill">connecting\u2026</span></div>
+    <h1>Your collection, marked to the market.</h1>
+    <p>Everything you own priced against live eBay listings, the day's best moves, and the print universe at a glance.</p>
   </div>
 
-  <div class="strip" id="strip"></div>
+  <section class="portfolio panel">
+    <div class="panel-h"><span class="t">Portfolio · mark-to-market</span><a class="btn sm ghost" href="collection.html">Manage \u2192</a></div>
+    <div class="pstats" id="pstats"><div class="skeleton" style="height:96px"></div></div>
+  </section>
 
-  <div class="controls"><div class="chips" id="flagChips"></div></div>
-  <div class="count-line" id="countLine"></div>
-  <div id="list"><div class="skeleton" style="height:240px"></div></div>
+  <div class="grid2">
+    <section class="panel">
+      <div class="panel-h"><span class="t">Market tape · today</span><a class="btn sm ghost" href="market.html">Radar \u2192</a></div>
+      <div id="tape"><div class="skeleton" style="height:180px"></div></div>
+    </section>
+    <section class="panel">
+      <div class="panel-h"><span class="t">Best moves · under retail</span><a class="btn sm ghost" href="catalog.html">Catalog \u2192</a></div>
+      <div id="deals"><div class="skeleton" style="height:180px"></div></div>
+    </section>
+  </div>
 
-  <footer class="footer"><span id="f-build">Inciardi Market v10</span><span id="f-src">connecting\u2026</span></footer>
+  <section class="panel" style="margin-top:var(--s5)">
+    <div class="panel-h"><span class="t">Print universe</span></div>
+    <div class="universe" id="universe"><div class="skeleton" style="height:70px"></div></div>
+  </section>
+
+  <footer class="footer"><span id="f-build">Inciardi Market v10</span><span id="f-src">connecting\u2026</span><span>Anastasia Inciardi · Portland, ME</span></footer>
 </main>
 
 <dialog id="settings"><div class="drawer" style="padding:var(--s6)">
   <div class="drawer-h"><h2>Settings</h2><button class="x" id="settingsClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="field" style="flex-direction:row;align-items:center;justify-content:space-between"><label style="margin:0">Dark terminal</label><button class="btn sm" id="themeToggle" aria-pressed="true">Toggle</button></div>
   <div class="field"><label>Data source (Worker URL)</label><input id="epInput" placeholder="https://inciardi-market\u2026workers.dev" spellcheck="false"></div>
-  <div class="field"><label>Write key (unlocks editing)</label><input id="wkeyInput" type="password" spellcheck="false"></div>
-  <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Prices are live eBay active-listing asks, refreshed each load. No sold comps (that API is gated); vanished listings feed the sold-proxy history instead.</p>
+  <div class="field"><label>Write key (unlocks editing)</label><input id="wkeyInput" type="password" placeholder="paste to enable catalog + collection edits" spellcheck="false"></div>
+  <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Reads are open. Editing the catalog, uploading images, and changing your collection require the write key (it never ships in the app). Prices are live from eBay active listings, refreshed each load; on an outage the terminal falls back to the last cached data.</p>
 </div></dialog>
 
 <script src="source/app-core.js"></script>
-<script src="source/market.js"></script>
+<script src="source/terminal.js"></script>
 </body>
 </html>

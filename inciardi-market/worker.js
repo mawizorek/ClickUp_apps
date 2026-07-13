@@ -1,24 +1,28 @@
 /**
- * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0.5)
+ * Inciardi Mini Print Market Tracker — Cloudflare Worker (v1.0)
  *
- * Reads live eBay listings (Browse API), diffs vs the KV snapshot, and
- * serves market.json on GET /market.
- * - GET /img — same-origin image proxy for catalog thumbnails (edge-cached)
- * - GET /inventory — read the collection (D1, joined to catalog)
- * - POST /inventory — upsert/delete/setState an inventory row (GATED)
- * - POST /catalog/confirm — promote a spotted print into the catalog (GATED)
- * - scheduled() cron — distills trend points into D1 each run
+ * Relational backend over D1 (catalog / inventory / images / history) + R2 (image bytes),
+ * plus the live eBay market feed. This is the API the terminal front-end reads.
  *
- * DATA HOMES:
- * - Live eBay listings -> Cloudflare KV (SNAPSHOTS), rebuilt every run.
- * - History + catalog + inventory -> Cloudflare D1 (DB). Permanent.
+ * READS (open):
+ *   GET /market                 live eBay listings, diffed vs KV snapshot
+ *   GET /catalog                master print universe from D1, each print + its images
+ *   GET /inventory              owned copies (D1), joined to catalog + primary image
+ *   GET /history?print_id=       per-print trend points + gone events
+ *   GET /img?key=<r2key>&w=      serve a stored image from R2 (primary path)
+ *   GET /img?u=<cdn-url>&w=      allowlisted CDN passthrough (transient preview / pre-store)
  *
- * Bindings: KV 'SNAPSHOTS', D1 'DB'.
- * Secrets: EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY (gate for POST routes).
+ * WRITES (gated: header x-write-key === env.WRITE_KEY):
+ *   POST /catalog               upsert a print (manual add / edit); dedupe is client-side
+ *   POST /catalog/image         upload an image (base64 body) -> R2 -> print_image row
+ *   POST /catalog/image/scrub   fetch an allowlisted CDN url server-side -> store in R2
+ *   POST /catalog/image/state   { image_id, op: primary | archive | restore | delete }
+ *   POST /inventory             { op: upsert | delete } one physical owned copy
  *
- * WRITE GATE: reads are open; every POST requires header 'x-write-key' to match
- * env.WRITE_KEY. Integrity gate (stop public vandalism), not privacy.
+ * scheduled() cron: banks market_point + print_point + gone_event into D1 each run.
  *
+ * Bindings: KV 'SNAPSHOTS', D1 'DB', R2 'IMAGES'.
+ * Secrets:  EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY.
  * NOTE: deploy target. NOT served by GitHub Pages.
  */
 
@@ -29,399 +33,372 @@ const UNDERPRICED_PCT = 0.85;
 const EXCLUSIVE_TOKENS = ["nyc", "lacma", "grand central", "holiday", "exclusive"];
 const PACK_TOKENS = ["pack", "set", "lot", "bundle"];
 
-// Image proxy: only these hosts may be fetched through GET /img. Keeps this from
-// becoming an open proxy. All catalog reference images are Anastasia's Shopify CDN.
+// GET /img may only fetch/store from these hosts (keeps it from being an open proxy).
 const IMG_HOST_ALLOW = ["cdn.shopify.com"];
-const IMG_CACHE_TTL = 604800; // 7 days at the Cloudflare edge
+const IMG_CACHE_TTL = 604800; // 7 days at the edge
 
 const CORS = {
- "Access-Control-Allow-Origin": "*",
- "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
- "Access-Control-Allow-Headers": "Content-Type, x-write-key",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, x-write-key",
 };
 
 export default {
- async fetch(request, env) {
- if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
- const url = new URL(request.url);
- const path = url.pathname;
- try {
- if ((path === "/market" || path === "/") && request.method === "GET") {
- return json(await buildMarket(env));
- }
- if (path === "/img" && request.method === "GET") {
- return proxyImage(url);
- }
- if (path === "/inventory" && request.method === "GET") {
- return json(await readInventory(env));
- }
- if (path === "/inventory" && request.method === "POST") {
- gate(request, env);
- return json(await writeInventory(env, await request.json()));
- }
- if (path === "/catalog/confirm" && request.method === "POST") {
- gate(request, env);
- return json(await confirmCatalog(env, await request.json()));
- }
- return json({ error: "not found" }, 404);
- } catch (err) {
- const code = (err && err.status) || 502;
- return json({ error: String((err && err.message) || err) }, code);
- }
- },
+  async fetch(request, env) {
+    if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
+    const url = new URL(request.url);
+    const p = url.pathname;
+    const base = url.origin;
+    try {
+      if ((p === "/market" || p === "/") && request.method === "GET") return json(await buildMarket(env));
+      if (p === "/img" && request.method === "GET") return serveImage(url, env);
+      if (p === "/catalog" && request.method === "GET") return json(await readCatalog(env, base));
+      if (p === "/inventory" && request.method === "GET") return json(await readInventory(env, base));
+      if (p === "/history" && request.method === "GET") return json(await readHistory(env, url));
 
- async scheduled(_event, env, ctx) {
- ctx.waitUntil(runCron(env).catch((e) => console.error("cron", e)));
- },
+      if (p === "/catalog" && request.method === "POST") { gate(request, env); return json(await upsertCatalog(env, await request.json())); }
+      if (p === "/catalog/image" && request.method === "POST") { gate(request, env); return json(await uploadImage(env, await request.json())); }
+      if (p === "/catalog/image/scrub" && request.method === "POST") { gate(request, env); return json(await scrubImage(env, await request.json())); }
+      if (p === "/catalog/image/state" && request.method === "POST") { gate(request, env); return json(await imageState(env, await request.json())); }
+      if (p === "/inventory" && request.method === "POST") { gate(request, env); return json(await writeInventory(env, await request.json())); }
+
+      return json({ error: "not found" }, 404);
+    } catch (err) {
+      const code = (err && err.status) || 502;
+      return json({ error: String((err && err.message) || err) }, code);
+    }
+  },
+  async scheduled(_event, env, ctx) {
+    ctx.waitUntil(runCron(env).catch((e) => console.error("cron", e)));
+  },
 };
 
 function json(obj, status = 200) {
- return new Response(JSON.stringify(obj, null, 2), {
- status,
- headers: { "Content-Type": "application/json", ...CORS },
- });
+  return new Response(JSON.stringify(obj, null, 2), { status, headers: { "Content-Type": "application/json", ...CORS } });
 }
-
 function gate(request, env) {
- const supplied = request.headers.get("x-write-key");
- if (!env.WRITE_KEY || supplied !== env.WRITE_KEY) {
- const e = new Error("unauthorized: bad or missing x-write-key");
- e.status = 401;
- throw e;
- }
+  const supplied = request.headers.get("x-write-key");
+  if (!env.WRITE_KEY || supplied !== env.WRITE_KEY) { const e = new Error("unauthorized: bad or missing x-write-key"); e.status = 401; throw e; }
+}
+function uuid() { return (crypto.randomUUID && crypto.randomUUID()) || (Date.now().toString(36) + Math.random().toString(36).slice(2)); }
+function nowISO() { return new Date().toISOString(); }
+function norm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+function slug(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || ("print-" + uuid().slice(0, 8)); }
+function extFor(ct) { return ct && ct.includes("png") ? "png" : ct && ct.includes("webp") ? "webp" : ct && ct.includes("gif") ? "gif" : "jpg"; }
+
+/* ================= image storage (R2) ================= */
+async function serveImage(url, env) {
+  const key = url.searchParams.get("key");
+  if (key) {
+    const obj = await env.IMAGES.get(key);
+    if (!obj) return json({ error: "not found" }, 404);
+    const h = new Headers(CORS);
+    h.set("Content-Type", (obj.httpMetadata && obj.httpMetadata.contentType) || "image/jpeg");
+    h.set("Cache-Control", `public, max-age=${IMG_CACHE_TTL}, immutable`);
+    return new Response(obj.body, { status: 200, headers: h });
+  }
+  // CDN passthrough (allowlisted) for transient preview / not-yet-stored images.
+  const target = url.searchParams.get("u");
+  if (!target) return json({ error: "img requires ?key= or ?u=" }, 400);
+  let up; try { up = new URL(target); } catch { return json({ error: "bad url" }, 400); }
+  if (up.protocol !== "https:" || !IMG_HOST_ALLOW.includes(up.hostname)) return json({ error: "host not allowed" }, 403);
+  const w = url.searchParams.get("w");
+  if (w && /^\d{2,4}$/.test(w) && !up.searchParams.has("width")) up.searchParams.set("width", w);
+  const res = await fetch(up.toString(), { cf: { cacheEverything: true, cacheTtl: IMG_CACHE_TTL }, headers: { Accept: "image/*" } });
+  if (!res.ok) return json({ error: `upstream ${res.status}` }, 502);
+  const h = new Headers(CORS);
+  h.set("Content-Type", res.headers.get("Content-Type") || "image/jpeg");
+  h.set("Cache-Control", `public, max-age=${IMG_CACHE_TTL}, immutable`);
+  return new Response(res.body, { status: 200, headers: h });
 }
 
-/* ---------- image proxy (GET /img?u=<url>&w=<n>) ---------- */
-// Fetches an allowlisted CDN image server-side and serves it back same-origin,
-// CORS-clean and edge-cached. This is the fix for the catalog flash-then-vanish:
-// the browser no longer makes 30+ flaky cross-origin hits to Shopify per load.
-async function proxyImage(url) {
- const target = url.searchParams.get("u");
- if (!target) return json({ error: "img requires ?u=" }, 400);
- let up;
- try { up = new URL(target); } catch { return json({ error: "bad url" }, 400); }
- if (up.protocol !== "https:" || !IMG_HOST_ALLOW.includes(up.hostname)) {
- return json({ error: "host not allowed" }, 403);
- }
- // Optional width passthrough -> Shopify honors ?width=<n>.
- const w = url.searchParams.get("w");
- if (w && /^\d{2,4}$/.test(w) && !up.searchParams.has("width")) up.searchParams.set("width", w);
-
- const res = await fetch(up.toString(), {
- cf: { cacheEverything: true, cacheTtl: IMG_CACHE_TTL },
- headers: { Accept: "image/*", "User-Agent": "inciardi-market-img-proxy" },
- });
- if (!res.ok) return json({ error: `upstream ${res.status}` }, 502);
-
- const headers = new Headers(CORS);
- headers.set("Content-Type", res.headers.get("Content-Type") || "image/jpeg");
- headers.set("Cache-Control", `public, max-age=${IMG_CACHE_TTL}, immutable`);
- return new Response(res.body, { status: 200, headers });
+function b64ToBytes(b64) {
+  const clean = String(b64).replace(/^data:[^,]+,/, "");
+  const bin = atob(clean);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return arr;
+}
+async function clearPrimary(env, print_id) {
+  await env.DB.prepare("UPDATE print_image SET is_primary=0 WHERE print_id=?1 AND is_primary=1").bind(print_id).run();
+}
+async function insertImageRow(env, r) {
+  await env.DB.prepare(
+    "INSERT INTO print_image (image_id,print_id,r2_key,source_url,kind,content_type,bytes,width,height,is_primary,status,sort,created_at) " +
+    "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,'active',?11,?12)"
+  ).bind(r.image_id, r.print_id, r.r2_key || null, r.source_url || null, r.kind, r.content_type || null,
+    r.bytes || null, r.width || null, r.height || null, r.is_primary ? 1 : 0, r.sort || 0, nowISO()).run();
 }
 
-/* ---------- eBay auth (client-credentials, cached in KV) ---------- */
-
-async function getToken(env) {
- const cached = await env.SNAPSHOTS.get("ebay_token");
- if (cached) return cached;
- const basic = btoa(`${env.EBAY_CLIENT_ID}:${env.EBAY_CLIENT_SECRET}`);
- const res = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
- method: "POST",
- headers: {
- Authorization: `Basic ${basic}`,
- "Content-Type": "application/x-www-form-urlencoded",
- },
- body: "grant_type=client_credentials&scope=" +
- encodeURIComponent("https://api.ebay.com/oauth/api_scope"),
- });
- if (!res.ok) throw new Error(`eBay token ${res.status}: ${await res.text()}`);
- const data = await res.json();
- const ttl = Math.max(60, (data.expires_in || 7200) - 300);
- await env.SNAPSHOTS.put("ebay_token", data.access_token, { expirationTtl: ttl });
- return data.access_token;
+// POST /catalog/image  { print_id, data (base64), content_type, make_primary, width, height }
+async function uploadImage(env, body) {
+  if (!body || !body.print_id || !body.data) throw new Error("upload requires print_id and data");
+  const image_id = uuid();
+  const ct = body.content_type || "image/jpeg";
+  const bytes = b64ToBytes(body.data);
+  const r2_key = `prints/${body.print_id}/${image_id}.${extFor(ct)}`;
+  await env.IMAGES.put(r2_key, bytes, { httpMetadata: { contentType: ct } });
+  const makePrimary = body.make_primary !== false; // default new uploads to primary
+  if (makePrimary) await clearPrimary(env, body.print_id);
+  await insertImageRow(env, { image_id, print_id: body.print_id, r2_key, kind: "upload", content_type: ct, bytes: bytes.length, width: body.width, height: body.height, is_primary: makePrimary });
+  return { ok: true, image_id, r2_key };
 }
 
-/* ---------- fetch + normalize ---------- */
-
-async function fetchListings(env) {
- const token = await getToken(env);
- const endpoint = "https://api.ebay.com/buy/browse/v1/item_summary/search" +
- `?q=${encodeURIComponent(SEARCH_QUERY)}&limit=200` +
- `&filter=${encodeURIComponent("buyingOptions:{FIXED_PRICE|AUCTION}")}`;
- const res = await fetch(endpoint, {
- headers: {
- Authorization: `Bearer ${token}`,
- "X-EBAY-C-MARKETPLACE-ID": MARKETPLACE,
- },
- });
- if (!res.ok) throw new Error(`eBay search ${res.status}: ${await res.text()}`);
- const data = await res.json();
- return (data.itemSummaries || []).map(normalize);
+// POST /catalog/image/scrub  { print_id, source_url, make_primary }
+// Fetch the CDN image server-side and STORE it in R2 (not just hotlink).
+async function scrubImage(env, body) {
+  if (!body || !body.print_id || !body.source_url) throw new Error("scrub requires print_id and source_url");
+  let up; try { up = new URL(body.source_url); } catch { throw new Error("bad source_url"); }
+  if (up.protocol !== "https:" || !IMG_HOST_ALLOW.includes(up.hostname)) { const e = new Error("host not allowed"); e.status = 403; throw e; }
+  const res = await fetch(up.toString(), { headers: { Accept: "image/*" } });
+  if (!res.ok) { const e = new Error(`upstream ${res.status}`); e.status = 502; throw e; }
+  const ct = res.headers.get("Content-Type") || "image/jpeg";
+  const buf = new Uint8Array(await res.arrayBuffer());
+  const image_id = uuid();
+  const r2_key = `prints/${body.print_id}/${image_id}.${extFor(ct)}`;
+  await env.IMAGES.put(r2_key, buf, { httpMetadata: { contentType: ct } });
+  const makePrimary = body.make_primary === true;
+  if (makePrimary) await clearPrimary(env, body.print_id);
+  await insertImageRow(env, { image_id, print_id: body.print_id, r2_key, source_url: body.source_url, kind: "scrub", content_type: ct, bytes: buf.length, is_primary: makePrimary });
+  return { ok: true, image_id, r2_key, bytes: buf.length };
 }
 
-// eBay Browse returns the amount in `price` for FIXED_PRICE, but in
-// `currentBidPrice` for AUCTION listings. Read whichever is present so
-// auctions don't collapse to a 0 landed price (the $0.00 / -100% bug).
-function priceObjOf(it) {
- if (it.price && it.price.value != null) return it.price;
- if (it.currentBidPrice && it.currentBidPrice.value != null) return it.currentBidPrice;
- return null;
+// POST /catalog/image/state  { image_id, op: primary | archive | restore | delete }
+async function imageState(env, body) {
+  if (!body || !body.image_id || !body.op) throw new Error("state requires image_id and op");
+  const row = await env.DB.prepare("SELECT image_id,print_id,r2_key,is_primary FROM print_image WHERE image_id=?1").bind(body.image_id).first();
+  if (!row) throw new Error("image not found");
+  if (body.op === "primary") {
+    await clearPrimary(env, row.print_id);
+    await env.DB.prepare("UPDATE print_image SET is_primary=1, status='active', archived_at=NULL WHERE image_id=?1").bind(body.image_id).run();
+    return { ok: true, primary: body.image_id };
+  }
+  if (body.op === "archive") {
+    await env.DB.prepare("UPDATE print_image SET status='archived', is_primary=0, archived_at=?2 WHERE image_id=?1").bind(body.image_id, nowISO()).run();
+    return { ok: true, archived: body.image_id };
+  }
+  if (body.op === "restore") {
+    await env.DB.prepare("UPDATE print_image SET status='active', archived_at=NULL WHERE image_id=?1").bind(body.image_id).run();
+    return { ok: true, restored: body.image_id };
+  }
+  if (body.op === "delete") {
+    if (row.r2_key) { try { await env.IMAGES.delete(row.r2_key); } catch (e) { /* blob may already be gone */ } }
+    await env.DB.prepare("DELETE FROM print_image WHERE image_id=?1").bind(body.image_id).run();
+    return { ok: true, deleted: body.image_id };
+  }
+  throw new Error("unknown op: " + body.op);
 }
 
-function normalize(it) {
- const priceObj = priceObjOf(it);
- const price = num(priceObj && priceObj.value);
- const shipping = shipCost(it.shippingOptions);
- const title = it.title || "";
- return {
- itemId: it.itemId,
- title,
- price,
- currency: (priceObj && priceObj.currency) || "USD",
- shipping,
- landed: round2(price + shipping),
- condition: it.condition || "Unknown",
- buyingOptions: it.buyingOptions || [],
- url: it.itemWebUrl,
- image: (it.image && it.image.imageUrl) || null,
- seller: (it.seller && it.seller.username) || null,
- location: (it.itemLocation && it.itemLocation.country) || null,
- listedAt: it.itemCreationDate || null,
- print: parsePrint(title),
- };
+async function imagesFor(env, print_id, base, includeArchived) {
+  const q = includeArchived
+    ? "SELECT * FROM print_image WHERE print_id=?1 ORDER BY is_primary DESC, sort ASC, created_at ASC"
+    : "SELECT * FROM print_image WHERE print_id=?1 AND status='active' ORDER BY is_primary DESC, sort ASC, created_at ASC";
+  const res = await env.DB.prepare(q).bind(print_id).all();
+  return (res.results || []).map((r) => ({
+    image_id: r.image_id, kind: r.kind, is_primary: !!r.is_primary, status: r.status,
+    content_type: r.content_type, bytes: r.bytes, width: r.width, height: r.height,
+    source_url: r.source_url,
+    url: r.r2_key ? `${base}/img?key=${encodeURIComponent(r.r2_key)}`
+       : (r.source_url ? `${base}/img?u=${encodeURIComponent(r.source_url)}` : null),
+  }));
 }
 
-function shipCost(opts) {
- if (!opts || !opts.length) return 0;
- const c = opts[0].shippingCost;
- return c ? num(c.value) : 0;
+/* ================= catalog (D1) ================= */
+async function readCatalog(env, base) {
+  const cat = await env.DB.prepare("SELECT * FROM catalog ORDER BY category, title").all();
+  const prints = [];
+  for (const r of cat.results || []) {
+    const aliasRes = await env.DB.prepare("SELECT alias FROM catalog_alias WHERE print_id=?1").bind(r.print_id).all();
+    const images = await imagesFor(env, r.print_id, base, false);
+    const primary = images.find((i) => i.is_primary) || images[0] || null;
+    prints.push({
+      print_id: r.print_id, name: r.title, category: r.category, exclusive: r.exclusive,
+      retail: r.retail, available: !!r.in_print, packOf: r.pack_of, packFrom: r.pack_from,
+      source: r.source, locked: !!r.locked, notes: r.notes,
+      aliases: (aliasRes.results || []).map((a) => a.alias),
+      image: primary ? primary.url : null, imageCount: images.length, images,
+    });
+  }
+  return { version: nowISO(), source: "d1", count: prints.length, prints };
 }
 
-function parsePrint(title) {
- const t = title.toLowerCase();
- const exclusive = EXCLUSIVE_TOKENS.find((k) => t.includes(k)) || null;
- let name = null;
- const m = title.match(/mini print[\s:\u2013-]+([A-Za-z0-9'"&\s]{2,40})/i);
- if (m) name = m[1].trim();
- return { name, exclusive, matched: Boolean(name) };
+// POST /catalog  { print_id?, name/title, category, exclusive, retail, in_print, pack_of, pack_from, aliases[], notes, source, locked }
+async function upsertCatalog(env, body) {
+  const title = body.title || body.name;
+  if (!title) throw new Error("catalog upsert requires a title/name");
+  const print_id = body.print_id || slug(title);
+  const now = nowISO();
+  const source = body.source || "manual";
+  const locked = body.locked != null ? (body.locked ? 1 : 0) : (source === "manual" ? 1 : 0);
+  await env.DB.prepare(
+    "INSERT INTO catalog (print_id,title,category,exclusive,retail,in_print,pack_of,pack_from,source,locked,notes,created_at,updated_at) " +
+    "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?12) " +
+    "ON CONFLICT(print_id) DO UPDATE SET title=excluded.title, category=excluded.category, exclusive=excluded.exclusive, " +
+    "retail=excluded.retail, in_print=excluded.in_print, pack_of=excluded.pack_of, pack_from=excluded.pack_from, " +
+    "source=excluded.source, locked=excluded.locked, notes=excluded.notes, updated_at=excluded.updated_at"
+  ).bind(print_id, title, body.category || null, body.exclusive || null, body.retail ?? null,
+    body.in_print ? 1 : 0, body.pack_of ?? null, body.pack_from ?? null, source, locked, body.notes ?? null, now).run();
+  if (Array.isArray(body.aliases)) {
+    for (const a of body.aliases) {
+      if (!a) continue;
+      await env.DB.prepare("INSERT OR IGNORE INTO catalog_alias (print_id,alias,norm) VALUES (?1,?2,?3)").bind(print_id, a, norm(a)).run();
+    }
+  }
+  return { ok: true, print_id };
 }
 
-/* ---------- diff against previous snapshot (KV) ---------- */
-
-async function buildMarket(env) {
- const fresh = await fetchListings(env);
- const prevRaw = await env.SNAPSHOTS.get("snapshot", "json");
- const prev = (prevRaw && prevRaw.listings) || [];
- const prevById = new Map(prev.map((l) => [l.itemId, l]));
- const now = new Date().toISOString();
-
- const listings = fresh.map((l) => {
- const old = prevById.get(l.itemId);
- if (!old) {
- return { ...l, status: "new", firstSeen: now, lastSeen: now,
- priceHistory: [{ t: now, landed: l.landed }], flags: flagsFor(l) };
- }
- const changed = old.landed !== l.landed ||
- (old.buyingOptions || []).join() !== (l.buyingOptions || []).join();
- const history = (old.priceHistory || []).slice();
- if (changed) history.push({ t: now, landed: l.landed });
- return {
- ...l,
- status: changed ? "changed" : "live",
- firstSeen: old.firstSeen || now,
- lastSeen: now,
- priceHistory: history,
- flags: flagsFor(l),
- };
- });
-
- const freshIds = new Set(fresh.map((l) => l.itemId));
- const gone = prev
- .filter((l) => !freshIds.has(l.itemId) && l.status !== "gone")
- .map((l) => ({ ...l, status: "gone", lastSeen: l.lastSeen || now }));
-
- const all = listings.concat(gone);
- const payload = {
- version: now,
- query: SEARCH_QUERY,
- source: "ebay-browse",
- baseline: { retailDefault: RETAIL_DEFAULT, currency: "USD" },
- summary: {
- total: listings.length,
- new: listings.filter((l) => l.status === "new").length,
- changed: listings.filter((l) => l.status === "changed").length,
- gone: gone.length,
- flagged: all.filter((l) => l.flags && l.flags.length).length,
- },
- listings: all,
- };
-
- await env.SNAPSHOTS.put("snapshot", JSON.stringify(payload));
- return payload;
+/* ================= inventory (D1) ================= */
+async function readInventory(env, base) {
+  const res = await env.DB.prepare(
+    "SELECT i.*, c.title AS catalog_title, c.category, c.exclusive, c.retail " +
+    "FROM inventory i LEFT JOIN catalog c ON c.print_id=i.print_id ORDER BY i.updated_at DESC"
+  ).all();
+  const rows = [];
+  for (const r of res.results || []) {
+    let image = null;
+    if (r.print_id) { const imgs = await imagesFor(env, r.print_id, base, false); const pr = imgs.find((i) => i.is_primary) || imgs[0]; image = pr ? pr.url : null; }
+    rows.push({ ...r, framed: !!r.framed, name: r.catalog_title || r.provisional_label, image });
+  }
+  return { count: rows.length, inventory: rows };
 }
 
-function flagsFor(l) {
- const flags = [];
- if (l.landed > 0 && l.landed <= RETAIL_DEFAULT * UNDERPRICED_PCT) flags.push("underpriced");
- if (l.print && l.print.exclusive) flags.push("exclusive");
- const t = l.title.toLowerCase();
- if (PACK_TOKENS.some((k) => t.includes(k))) flags.push("pack-deal");
- return flags;
-}
-
-/* ---------- D1: catalog matching ---------- */
-
-async function catalogResolver(env) {
- const cat = await env.DB.prepare("SELECT print_id, title FROM catalog").all();
- const aliases = await env.DB.prepare("SELECT print_id, alias FROM catalog_alias").all();
- const rows = (cat.results || []).map((r) => ({
- printId: r.print_id, needle: String(r.title || "").toLowerCase(),
- }));
- for (const a of aliases.results || []) {
- rows.push({ printId: a.print_id, needle: String(a.alias || "").toLowerCase() });
- }
- return (title) => {
- const t = String(title || "").toLowerCase();
- for (const r of rows) {
- if (r.needle && r.needle.length >= 3 && t.includes(r.needle)) return r.printId;
- }
- return null;
- };
-}
-
-/* ---------- cron: refresh snapshot + distill trend points into D1 ---------- */
-
-async function runCron(env) {
- const payload = await buildMarket(env);
- const now = new Date().toISOString();
- const resolve = await catalogResolver(env);
- const live = payload.listings.filter((l) => l.status !== "gone");
- const goneNow = payload.listings.filter((l) => l.status === "gone");
-
- const landeds = live.map((l) => l.landed).filter((n) => n > 0);
- const packs = live.filter((l) => (l.flags || []).includes("pack-deal")).length;
- const excl = live.filter((l) => (l.flags || []).includes("exclusive")).length;
- await env.DB.prepare(
- "INSERT INTO market_point (captured_at,total_listings,median_landed,avg_landed,min_landed,max_landed,singles_count,packs_count,exclusives_count) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9)"
- ).bind(now, live.length, median(landeds), avg(landeds), min(landeds), max(landeds), live.length - packs, packs, excl).run();
-
- const byPrint = new Map();
- for (const l of live) {
- const pid = resolve(l.title);
- if (!pid) continue;
- if (!byPrint.has(pid)) byPrint.set(pid, []);
- byPrint.get(pid).push(l.landed);
- }
- for (const [pid, arr] of byPrint) {
- const nums = arr.filter((n) => n > 0);
- await env.DB.prepare(
- "INSERT INTO print_point (print_id,captured_at,active_count,min_landed,median_landed,max_landed) VALUES (?1,?2,?3,?4,?5,?6)"
- ).bind(pid, now, arr.length, min(nums), median(nums), max(nums)).run();
- }
-
- for (const g of goneNow) {
- await env.DB.prepare(
- "INSERT INTO gone_event (print_id,item_id,last_landed,gone_at) VALUES (?1,?2,?3,?4)"
- ).bind(resolve(g.title), g.itemId || null, g.landed || null, now).run();
- }
- return { ok: true, capturedAt: now, prints: byPrint.size, gone: goneNow.length };
-}
-
-/* ---------- D1: inventory read/write ---------- */
-
-async function readInventory(env) {
- const res = await env.DB.prepare(
- "SELECT i.inv_id, i.print_id, i.provisional_label, i.disposition, i.qty, " +
- "i.condition, i.acquired_price, i.acquired_where, i.acquired_at, i.notes, " +
- "i.updated_at, c.title AS catalog_title, c.series, c.retail " +
- "FROM inventory i LEFT JOIN catalog c ON c.print_id = i.print_id " +
- "ORDER BY i.updated_at DESC"
- ).all();
- return { count: (res.results || []).length, inventory: res.results || [] };
-}
-
-// Body ops:
-// { op:'setState', print_id, disposition } -> one row per print; disposition null clears it.
-// { op:'delete', inv_id }
-// { op:'upsert', inv_id?, print_id?, provisional_label?, disposition?, qty?, ... }
+// POST /inventory  { op: upsert | delete, ...fields }
 async function writeInventory(env, body) {
- const op = (body && body.op) || "upsert";
- const now = new Date().toISOString();
-
- if (op === "setState") {
- if (!body.print_id) throw new Error("setState requires print_id");
- await env.DB.prepare("DELETE FROM inventory WHERE print_id = ?1").bind(body.print_id).run();
- if (body.disposition) {
- await env.DB.prepare(
- "INSERT INTO inventory (print_id, disposition, qty, created_at, updated_at) VALUES (?1,?2,1,?3,?3)"
- ).bind(body.print_id, body.disposition, now).run();
- }
- return { ok: true, print_id: body.print_id, disposition: body.disposition || null };
- }
-
- if (op === "delete") {
- if (!body.inv_id) throw new Error("delete requires inv_id");
- await env.DB.prepare("DELETE FROM inventory WHERE inv_id = ?1").bind(body.inv_id).run();
- return { ok: true, deleted: body.inv_id };
- }
-
- const f = {
- print_id: body.print_id ?? null,
- provisional_label: body.provisional_label ?? null,
- disposition: body.disposition || "own",
- qty: body.qty ?? 1,
- condition: body.condition ?? null,
- acquired_price: body.acquired_price ?? null,
- acquired_where: body.acquired_where ?? null,
- acquired_at: body.acquired_at ?? null,
- notes: body.notes ?? null,
- };
-
- if (body.inv_id) {
- await env.DB.prepare(
- "UPDATE inventory SET print_id=?1, provisional_label=?2, disposition=?3, qty=?4, " +
- "condition=?5, acquired_price=?6, acquired_where=?7, acquired_at=?8, notes=?9, " +
- "updated_at=?10 WHERE inv_id=?11"
- ).bind(f.print_id, f.provisional_label, f.disposition, f.qty, f.condition, f.acquired_price, f.acquired_where, f.acquired_at, f.notes, now, body.inv_id).run();
- return { ok: true, updated: body.inv_id };
- }
-
- const ins = await env.DB.prepare(
- "INSERT INTO inventory (print_id, provisional_label, disposition, qty, condition, " +
- "acquired_price, acquired_where, acquired_at, notes, created_at, updated_at) " +
- "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?10)"
- ).bind(f.print_id, f.provisional_label, f.disposition, f.qty, f.condition, f.acquired_price, f.acquired_where, f.acquired_at, f.notes, now).run();
- return { ok: true, inserted: ins.meta && ins.meta.last_row_id };
+  const op = (body && body.op) || "upsert";
+  const now = nowISO();
+  if (op === "delete") {
+    if (!body.inv_id) throw new Error("delete requires inv_id");
+    await env.DB.prepare("DELETE FROM inventory WHERE inv_id=?1").bind(body.inv_id).run();
+    return { ok: true, deleted: body.inv_id };
+  }
+  const f = {
+    print_id: body.print_id ?? null, provisional_label: body.provisional_label ?? null,
+    disposition: body.disposition || "own", condition: body.condition ?? null, framed: body.framed ? 1 : 0,
+    qty: body.qty ?? 1, acquired_price: body.acquired_price ?? null, acquired_where: body.acquired_where ?? null,
+    acquired_at: body.acquired_at ?? null, sold_price: body.sold_price ?? null, sold_at: body.sold_at ?? null, notes: body.notes ?? null,
+  };
+  if (body.inv_id) {
+    await env.DB.prepare(
+      "UPDATE inventory SET print_id=?1,provisional_label=?2,disposition=?3,condition=?4,framed=?5,qty=?6," +
+      "acquired_price=?7,acquired_where=?8,acquired_at=?9,sold_price=?10,sold_at=?11,notes=?12,updated_at=?13 WHERE inv_id=?14"
+    ).bind(f.print_id, f.provisional_label, f.disposition, f.condition, f.framed, f.qty, f.acquired_price, f.acquired_where, f.acquired_at, f.sold_price, f.sold_at, f.notes, now, body.inv_id).run();
+    return { ok: true, updated: body.inv_id };
+  }
+  const inv_id = uuid();
+  await env.DB.prepare(
+    "INSERT INTO inventory (inv_id,print_id,provisional_label,disposition,condition,framed,qty,acquired_price,acquired_where,acquired_at,sold_price,sold_at,notes,created_at,updated_at) " +
+    "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?14)"
+  ).bind(inv_id, f.print_id, f.provisional_label, f.disposition, f.condition, f.framed, f.qty, f.acquired_price, f.acquired_where, f.acquired_at, f.sold_price, f.sold_at, f.notes, now).run();
+  return { ok: true, inserted: inv_id };
 }
 
-/* ---------- D1: catalog confirm (promote a spotted print) ---------- */
-
-async function confirmCatalog(env, body) {
- if (!body || !body.print_id || !body.title) throw new Error("confirm requires print_id and title");
- const now = new Date().toISOString();
- await env.DB.prepare(
- "INSERT INTO catalog (print_id,title,series,year,exclusive,retail,status,image,source_url,source,notes,created_at,updated_at) " +
- "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?12) " +
- "ON CONFLICT(print_id) DO UPDATE SET title=excluded.title, series=excluded.series, " +
- "year=excluded.year, exclusive=excluded.exclusive, retail=excluded.retail, " +
- "status=excluded.status, image=excluded.image, source_url=excluded.source_url, " +
- "source=excluded.source, updated_at=excluded.updated_at"
- ).bind(body.print_id, body.title, body.series ?? null, body.year ?? null, body.exclusive ? 1 : 0, body.retail ?? null, body.status || "unknown", body.image ?? null, body.source_url ?? null, body.source || "ebay-confirm", body.notes ?? null, now).run();
- if (body.alias) {
- await env.DB.prepare("INSERT OR IGNORE INTO catalog_alias (print_id, alias) VALUES (?1, ?2)").bind(body.print_id, String(body.alias).toLowerCase()).run();
- }
- return { ok: true, print_id: body.print_id };
+/* ================= history (D1) ================= */
+async function readHistory(env, url) {
+  const print_id = url.searchParams.get("print_id");
+  if (print_id) {
+    const pts = await env.DB.prepare("SELECT captured_at,active_count,min_landed,median_landed,max_landed FROM print_point WHERE print_id=?1 ORDER BY captured_at").bind(print_id).all();
+    const gone = await env.DB.prepare("SELECT gone_at,last_landed FROM gone_event WHERE print_id=?1 ORDER BY gone_at").bind(print_id).all();
+    return { print_id, points: pts.results || [], gone: gone.results || [] };
+  }
+  const mp = await env.DB.prepare("SELECT * FROM market_point ORDER BY captured_at DESC LIMIT 180").all();
+  return { market: (mp.results || []).reverse() };
 }
 
-/* ---------- stats + utils ---------- */
+/* ================= eBay market feed (KV) ================= */
+async function getToken(env) {
+  const cached = await env.SNAPSHOTS.get("ebay_token");
+  if (cached) return cached;
+  const basic = btoa(`${env.EBAY_CLIENT_ID}:${env.EBAY_CLIENT_SECRET}`);
+  const res = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
+    method: "POST", headers: { Authorization: `Basic ${basic}`, "Content-Type": "application/x-www-form-urlencoded" },
+    body: "grant_type=client_credentials&scope=" + encodeURIComponent("https://api.ebay.com/oauth/api_scope"),
+  });
+  if (!res.ok) throw new Error(`eBay token ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  const ttl = Math.max(60, (data.expires_in || 7200) - 300);
+  await env.SNAPSHOTS.put("ebay_token", data.access_token, { expirationTtl: ttl });
+  return data.access_token;
+}
+async function fetchListings(env) {
+  const token = await getToken(env);
+  const endpoint = "https://api.ebay.com/buy/browse/v1/item_summary/search" +
+    `?q=${encodeURIComponent(SEARCH_QUERY)}&limit=200&filter=${encodeURIComponent("buyingOptions:{FIXED_PRICE|AUCTION}")}`;
+  const res = await fetch(endpoint, { headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": MARKETPLACE } });
+  if (!res.ok) throw new Error(`eBay search ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  return (data.itemSummaries || []).map(normalize);
+}
+function priceObjOf(it) { if (it.price && it.price.value != null) return it.price; if (it.currentBidPrice && it.currentBidPrice.value != null) return it.currentBidPrice; return null; }
+function normalize(it) {
+  const priceObj = priceObjOf(it); const price = num(priceObj && priceObj.value); const shipping = shipCost(it.shippingOptions); const title = it.title || "";
+  return { itemId: it.itemId, title, price, currency: (priceObj && priceObj.currency) || "USD", shipping, landed: round2(price + shipping),
+    condition: it.condition || "Unknown", buyingOptions: it.buyingOptions || [], url: it.itemWebUrl, image: (it.image && it.image.imageUrl) || null,
+    seller: (it.seller && it.seller.username) || null, location: (it.itemLocation && it.itemLocation.country) || null, listedAt: it.itemCreationDate || null, print: parsePrint(title) };
+}
+function shipCost(opts) { if (!opts || !opts.length) return 0; const c = opts[0].shippingCost; return c ? num(c.value) : 0; }
+function parsePrint(title) {
+  const t = title.toLowerCase(); const exclusive = EXCLUSIVE_TOKENS.find((k) => t.includes(k)) || null;
+  let name = null; const m = title.match(/mini print[\s:\u2013-]+([A-Za-z0-9'"&\s]{2,40})/i); if (m) name = m[1].trim();
+  return { name, exclusive, matched: Boolean(name) };
+}
+async function buildMarket(env) {
+  const fresh = await fetchListings(env);
+  const prevRaw = await env.SNAPSHOTS.get("snapshot", "json");
+  const prev = (prevRaw && prevRaw.listings) || [];
+  const prevById = new Map(prev.map((l) => [l.itemId, l]));
+  const now = nowISO();
+  const listings = fresh.map((l) => {
+    const old = prevById.get(l.itemId);
+    if (!old) return { ...l, status: "new", firstSeen: now, lastSeen: now, priceHistory: [{ t: now, landed: l.landed }], flags: flagsFor(l) };
+    const changed = old.landed !== l.landed || (old.buyingOptions || []).join() !== (l.buyingOptions || []).join();
+    const history = (old.priceHistory || []).slice(); if (changed) history.push({ t: now, landed: l.landed });
+    return { ...l, status: changed ? "changed" : "live", firstSeen: old.firstSeen || now, lastSeen: now, priceHistory: history, flags: flagsFor(l) };
+  });
+  const freshIds = new Set(fresh.map((l) => l.itemId));
+  const gone = prev.filter((l) => !freshIds.has(l.itemId) && l.status !== "gone").map((l) => ({ ...l, status: "gone", lastSeen: l.lastSeen || now }));
+  const all = listings.concat(gone);
+  const payload = { version: now, query: SEARCH_QUERY, source: "ebay-browse", baseline: { retailDefault: RETAIL_DEFAULT, currency: "USD" },
+    summary: { total: listings.length, new: listings.filter((l) => l.status === "new").length, changed: listings.filter((l) => l.status === "changed").length, gone: gone.length, flagged: all.filter((l) => l.flags && l.flags.length).length }, listings: all };
+  await env.SNAPSHOTS.put("snapshot", JSON.stringify(payload));
+  return payload;
+}
+function flagsFor(l) {
+  const flags = [];
+  if (l.landed > 0 && l.landed <= RETAIL_DEFAULT * UNDERPRICED_PCT) flags.push("underpriced");
+  if (l.print && l.print.exclusive) flags.push("exclusive");
+  const t = l.title.toLowerCase(); if (PACK_TOKENS.some((k) => t.includes(k))) flags.push("pack-deal");
+  return flags;
+}
+async function catalogResolver(env) {
+  const cat = await env.DB.prepare("SELECT print_id, title FROM catalog").all();
+  const aliases = await env.DB.prepare("SELECT print_id, norm FROM catalog_alias").all();
+  const rows = (cat.results || []).map((r) => ({ printId: r.print_id, needle: norm(r.title) }));
+  for (const a of aliases.results || []) rows.push({ printId: a.print_id, needle: a.norm });
+  return (title) => { const t = norm(title); for (const r of rows) if (r.needle && r.needle.length >= 3 && t.includes(r.needle)) return r.printId; return null; };
+}
+async function runCron(env) {
+  const payload = await buildMarket(env);
+  const now = nowISO();
+  const resolve = await catalogResolver(env);
+  const live = payload.listings.filter((l) => l.status !== "gone");
+  const goneNow = payload.listings.filter((l) => l.status === "gone");
+  const landeds = live.map((l) => l.landed).filter((n) => n > 0);
+  const packs = live.filter((l) => (l.flags || []).includes("pack-deal")).length;
+  const excl = live.filter((l) => (l.flags || []).includes("exclusive")).length;
+  await env.DB.prepare("INSERT INTO market_point (captured_at,total_listings,median_landed,avg_landed,min_landed,max_landed,singles_count,packs_count,exclusives_count) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9)")
+    .bind(now, live.length, median(landeds), avg(landeds), min(landeds), max(landeds), live.length - packs, packs, excl).run();
+  const byPrint = new Map();
+  for (const l of live) { const pid = resolve(l.title); if (!pid) continue; if (!byPrint.has(pid)) byPrint.set(pid, []); byPrint.get(pid).push(l.landed); }
+  for (const [pid, arr] of byPrint) { const nums = arr.filter((n) => n > 0);
+    await env.DB.prepare("INSERT INTO print_point (print_id,captured_at,active_count,min_landed,median_landed,max_landed) VALUES (?1,?2,?3,?4,?5,?6)").bind(pid, now, arr.length, min(nums), median(nums), max(nums)).run(); }
+  for (const g of goneNow) await env.DB.prepare("INSERT INTO gone_event (print_id,item_id,last_landed,gone_at) VALUES (?1,?2,?3,?4)").bind(resolve(g.title), g.itemId || null, g.landed || null, now).run();
+  return { ok: true, capturedAt: now, prints: byPrint.size, gone: goneNow.length };
+}
+
+/* ================= utils ================= */
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function round2(n) { return Math.round(n * 100) / 100; }
 function min(a) { return a.length ? round2(Math.min(...a)) : null; }
 function max(a) { return a.length ? round2(Math.max(...a)) : null; }
 function avg(a) { return a.length ? round2(a.reduce((s, n) => s + n, 0) / a.length) : null; }
-function median(a) {
- if (!a.length) return null;
- const s = a.slice().sort((x, y) => x - y);
- const m = Math.floor(s.length / 2);
- return round2(s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2);
-}
+function median(a) { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y); const m = Math.floor(s.length / 2); return round2(s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2); }

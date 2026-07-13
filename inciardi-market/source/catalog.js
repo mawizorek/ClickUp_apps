@@ -1,189 +1,157 @@
-/* Inciardi Catalog — gallery page logic. Reads catalog.json + cross-refs the live market feed. */
-const CAT_LABELS = { mini:"Minis", pack:"Packs", "big-riso":"Big Risographs", linocut:"Linocuts", exclusive:"Exclusives" };
-const EXCL_LABEL = { nyc:"NYC", lacma:"LACMA", holiday:"Holiday", "grand-central":"Grand Central", "richard-scarry":"Richard Scarry" };
-const CAT_ORDER = ["mini","big-riso","linocut","exclusive","pack"];
-const THUMB_HUE = { mini:72, pack:205, exclusive:305, "big-riso":152, linocut:40 };
-const WORKER_EP = "https://inciardi-market.mawizorek-online.workers.dev/market";
-// Images route through the Worker's same-origin /img proxy (edge-cached), never
-// hotlinked straight from Shopify's CDN. That direct hotlink was the flash-then-
-// vanish bug: 30+ concurrent cross-origin hits flaked on mobile.
-const IMG_EP = "https://inciardi-market.mawizorek-online.workers.dev/img";
+/* Catalog gallery + full image lifecycle. Reads /catalog (D1) with catalog.json seed fallback. */
+const CAT_LABELS={mini:"Minis",pack:"Packs","big-riso":"Big Risographs",linocut:"Linocuts",exclusive:"Exclusives"};
+const EXCL_LABEL={nyc:"NYC",lacma:"LACMA",holiday:"Holiday","grand-central":"Grand Central","richard-scarry":"Richard Scarry"};
+const CAT_ORDER=["mini","big-riso","linocut","exclusive","pack"];
+const THUMB_HUE={mini:72,pack:205,exclusive:305,"big-riso":152,linocut:40};
 
-const $ = (id) => document.getElementById(id);
-let CATALOG = null, MARKET = null;
-let state = { q:"", cat:"all", ebayOnly:false };
+let CATALOG={prints:[]}, MARKET={listings:[]}, INV={inventory:[]}, fromD1=false;
+let state={q:"",cat:"all",ebayOnly:false};
+let openPid=null;
 
-/* ---- theme (shared key with market view) ---- */
-const themeToggle = $("themeToggle");
-function initTheme(){ if (localStorage.getItem("inciardi_theme")==="light"){ document.documentElement.dataset.theme="light"; themeToggle.setAttribute("aria-pressed","false"); } else { themeToggle.setAttribute("aria-pressed","true"); } }
-function toggleTheme(){ const isLight = document.documentElement.dataset.theme==="light";
- if(isLight){ delete document.documentElement.dataset.theme; localStorage.setItem("inciardi_theme","dark"); themeToggle.setAttribute("aria-pressed","true"); }
- else { document.documentElement.dataset.theme="light"; localStorage.setItem("inciardi_theme","light"); themeToggle.setAttribute("aria-pressed","false"); } }
-initTheme();
+initChrome();
+boot();
 
-/* ---- settings drawer ---- */
-const gear = $("gear"), drawer = $("drawer");
-gear.addEventListener("click", () => { drawer.showModal(); gear.setAttribute("aria-expanded","true"); });
-$("drawerClose").addEventListener("click", () => drawer.close());
-drawer.addEventListener("click", (e) => { if (e.target === drawer) drawer.close(); });
-drawer.addEventListener("close", () => gear.setAttribute("aria-expanded","false"));
-themeToggle.addEventListener("click", toggleTheme);
-
-/* ---- detail dialog ---- */
-const detail = $("detail");
-$("dtClose").addEventListener("click", () => detail.close());
-detail.addEventListener("click", (e) => { if (e.target === detail) detail.close(); });
-
-/* ---- boot ---- */
-showSkeletons();
-load();
-
-async function load(){
- CATALOG = await grab("./catalog.json", { prints:[], machines:[] });
- const ep = (localStorage.getItem("inciardi_ep") || "").trim() || WORKER_EP;
- MARKET = await grab(ep, { listings:[], source:"none" });
- buildChips(); renderStrip(); render();
- $("f-stamp").textContent = liveMarket() ? "market: live \u00b7 eBay" : "market: sample";
+async function boot(){
+  const [cat, market, inv] = await Promise.all([ apiGet("/catalog", null), apiGet("/market",{listings:[],source:"none"}), apiGet("/inventory",{inventory:[]}) ]);
+  if(cat && cat.prints){ CATALOG=cat; fromD1=true; } else { CATALOG=await seedCatalog(); fromD1=false; }
+  MARKET=market; INV=inv;
+  const live=MARKET.source==="ebay-browse"; $("f-src").textContent="market: "+(live?"live \u00b7 eBay":"sample"); $("f-src").className=live?"up":"";
+  buildChips(); renderStrip(); render(); wireControls();
+  if(location.hash) openDetail(decodeURIComponent(location.hash.slice(1)));
 }
-async function grab(src, fallback){
- try { const r = await fetch(src, { headers:{ Accept:"application/json" } }); if(!r.ok) throw 0; const d = await r.json(); if(d.error) throw 0; return d; }
- catch { return fallback; }
-}
-function liveMarket(){ return MARKET && MARKET.source === "ebay-browse"; }
+async function seedCatalog(){ try{ const r=await fetch("./catalog.json"); const d=await r.json(); return d; }catch(e){ return {prints:[]}; } }
 
-/* ---- market cross-reference ---- */
-function norm(s){ return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim(); }
-function marketFor(p){
- if(!MARKET || !MARKET.listings) return null;
- const names = [norm(p.name), ...((p.aliases||[]).map(norm))];
- const ls = MARKET.listings.filter(l => { if(l.status==="gone") return false; const n = l.print && l.print.matched && norm(l.print.name); return n && names.includes(n); });
- if(!ls.length) return null;
- const prices = ls.map(l => l.landed).filter(x => x!=null);
- return { count: ls.length, low: prices.length?Math.min(...prices):null };
-}
+function ownedSet(){ const s=new Set(); (INV.inventory||[]).forEach(r=>{ if(r.disposition==="own"){ if(r.print_id) s.add(r.print_id); if(r.name) s.add(normStr(r.name)); } }); return s; }
+function isOwned(p, set){ return set.has(p.print_id) || set.has(normStr(p.name)); }
 
 /* ---- controls ---- */
 function buildChips(){
- const prints = CATALOG.prints || [];
- const counts = {}; prints.forEach(p => counts[p.category] = (counts[p.category]||0)+1);
- const cats = CAT_ORDER.filter(c => counts[c]);
- const chips = [`<button class="chip" data-cat="all" aria-pressed="true">All <span class="cnt">${prints.length}</span></button>`]
-  .concat(cats.map(c => `<button class="chip" data-cat="${c}" aria-pressed="false">${CAT_LABELS[c]||c} <span class="cnt">${counts[c]}</span></button>`));
- $("catChips").innerHTML = chips.join("");
- $("catChips").querySelectorAll(".chip").forEach(ch => ch.addEventListener("click", () => {
-  state.cat = ch.dataset.cat;
-  $("catChips").querySelectorAll(".chip").forEach(x => x.setAttribute("aria-pressed", String(x===ch)));
-  render();
- }));
+  const prints=CATALOG.prints||[]; const counts={}; prints.forEach(p=>counts[p.category]=(counts[p.category]||0)+1);
+  const cats=CAT_ORDER.filter(c=>counts[c]);
+  const chips=[`<button class="chip" data-cat="all" aria-pressed="true">All ${prints.length}</button>`]
+    .concat(cats.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="false">${CAT_LABELS[c]||c} ${counts[c]}</button>`));
+  $("catChips").innerHTML=chips.join("");
+  $("catChips").querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>{ state.cat=ch.dataset.cat; $("catChips").querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",String(x===ch))); render(); }));
 }
-const searchEl = $("search"), searchbar = $("searchbar");
-searchEl.addEventListener("input", () => { state.q = searchEl.value; searchbar.classList.toggle("has-val", !!state.q); render(); });
-$("searchClr").addEventListener("click", () => { searchEl.value=""; state.q=""; searchbar.classList.remove("has-val"); searchEl.focus(); render(); });
-const ebayToggle = $("ebayToggle");
-ebayToggle.addEventListener("click", () => { state.ebayOnly = !state.ebayOnly; ebayToggle.setAttribute("aria-pressed", String(state.ebayOnly)); render(); });
-document.addEventListener("keydown", (e) => {
- if(e.key==="Escape"){ if(detail.open) detail.close(); else if(drawer.open) drawer.close(); }
-});
+function wireControls(){
+  const s=$("search"), bar=$("searchbar");
+  s.addEventListener("input",()=>{ state.q=s.value; bar.classList.toggle("has-val",!!state.q); render(); });
+  $("searchClr").addEventListener("click",()=>{ s.value=""; state.q=""; bar.classList.remove("has-val"); s.focus(); render(); });
+  const t=$("ebayToggle"); t.addEventListener("click",()=>{ state.ebayOnly=!state.ebayOnly; t.setAttribute("aria-pressed",String(state.ebayOnly)); render(); });
+  $("addBtn").addEventListener("click",openAdd);
+  const d=$("detail"); d.addEventListener("click",(e)=>{ if(e.target===d) d.close(); });
+  const ap=$("addPrint"); ap.addEventListener("click",(e)=>{ if(e.target===ap) ap.close(); });
+  $("addClose").addEventListener("click",()=>ap.close()); $("ap-cancel").addEventListener("click",()=>ap.close());
+  $("ap-save").addEventListener("click",saveNewPrint);
+  document.addEventListener("keydown",(e)=>{ if(e.key==="Escape"){ if(d.open)d.close(); else if(ap.open)ap.close(); } });
+}
 
 /* ---- render ---- */
 function renderStrip(){
- const prints = CATALOG.prints || [];
- const withImg = prints.filter(p => p.image).length;
- const excl = prints.filter(p => p.exclusive).length;
- const onEbay = prints.filter(p => marketFor(p)).length;
- $("strip").innerHTML = `
-  <div class="s"><div class="v">${prints.length}</div><div class="l">Catalogued</div></div>
-  <div class="s"><div class="v accent">${withImg}</div><div class="l">With image</div></div>
-  <div class="s"><div class="v">${excl}</div><div class="l">Exclusives</div></div>
-  <div class="s"><div class="v up">${onEbay}</div><div class="l">On eBay now</div></div>`;
+  const prints=CATALOG.prints||[]; const withImg=prints.filter(p=>p.image).length; const excl=prints.filter(p=>p.exclusive).length; const onEbay=prints.filter(p=>marketFor(MARKET,p)).length; const owned=ownedSet(); const own=prints.filter(p=>isOwned(p,owned)).length;
+  $("strip").innerHTML=`
+    <div class="s"><div class="v">${prints.length}</div><div class="l">Catalogued</div></div>
+    <div class="s"><div class="v">${withImg}</div><div class="l">With image</div></div>
+    <div class="s"><div class="v up">${own}</div><div class="l">You own</div></div>
+    <div class="s"><div class="v plum">${excl}</div><div class="l">Exclusives</div></div>
+    <div class="s"><div class="v up">${onEbay}</div><div class="l">On eBay now</div></div>`;
 }
-function matchQ(p, q){ if(!q) return true; const hay = norm(p.name+" "+(p.aliases||[]).join(" ")+" "+(p.category||"")+" "+(p.exclusive||"")); return hay.includes(norm(q)); }
+function matchQ(p,q){ if(!q) return true; const hay=normStr(p.name+" "+(p.aliases||[]).join(" ")+" "+(p.category||"")+" "+(p.exclusive||"")); return hay.includes(normStr(q)); }
 function render(){
- const prints = (CATALOG.prints || []).slice();
- let list = prints.filter(p => (state.cat==="all"||p.category===state.cat) && matchQ(p, state.q));
- if(state.ebayOnly) list = list.filter(p => marketFor(p));
- list.sort((a,b) => (!!b.image - !!a.image) || a.name.localeCompare(b.name));
- const grid = $("grid");
- const total = (CATALOG.prints||[]).length;
- $("countLine").innerHTML = `Showing <b>${list.length}</b> of ${total} prints${state.cat!=="all"?` \u00b7 ${CAT_LABELS[state.cat]||state.cat}`:""}${state.ebayOnly?` \u00b7 on eBay now`:""}`;
- if(!list.length){
-  grid.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><h3>No prints match</h3><p>Try a different search or clear the filters to see the full universe.</p></div>`;
-  return;
- }
- grid.innerHTML = list.map((p, i) => cardHTML(p, i)).join("");
- grid.querySelectorAll(".card").forEach(el => {
-  el.addEventListener("click", () => openDetail(el.dataset.name));
-  const img = el.querySelector("img");
-  if(img){
-   if(img.complete && img.naturalWidth) img.classList.add("loaded");
-   else img.addEventListener("load", () => img.classList.add("loaded"));
-   // Retry once with a cache-bust before giving up. A single flaky fetch used to
-   // hard-hide the image for the whole session (the flash-then-vanish bug).
-   img.addEventListener("error", () => {
-    if(img.dataset.retried){ img.style.display="none"; return; }
-    img.dataset.retried = "1";
-    img.src = img.src + (img.src.includes("?") ? "&" : "?") + "r=" + Date.now();
-   });
-  }
- });
+  const owned=ownedSet();
+  let list=(CATALOG.prints||[]).filter(p=>(state.cat==="all"||p.category===state.cat)&&matchQ(p,state.q));
+  if(state.ebayOnly) list=list.filter(p=>marketFor(MARKET,p));
+  list.sort((a,b)=>(!!b.image-!!a.image)||a.name.localeCompare(b.name));
+  const total=(CATALOG.prints||[]).length;
+  $("countLine").innerHTML=`Showing <b>${list.length}</b> of ${total} prints${state.cat!=="all"?" \u00b7 "+(CAT_LABELS[state.cat]||state.cat):""}${fromD1?"":" \u00b7 seed (connect Worker for live catalog)"}`;
+  const grid=$("grid");
+  if(!list.length){ grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><h3>No prints match</h3><p>Try a different search or clear the filters.</p></div>`; return; }
+  grid.innerHTML=list.map((p,i)=>cardHTML(p,i,owned)).join("");
+  grid.querySelectorAll(".card").forEach(el=>{ el.addEventListener("click",()=>openDetail(el.dataset.key));
+    const img=el.querySelector("img"); if(img){ if(img.complete&&img.naturalWidth) img.classList.add("loaded"); else{ img.addEventListener("load",()=>img.classList.add("loaded")); img.addEventListener("error",()=>{ if(img.dataset.r){img.style.display="none";return;} img.dataset.r="1"; img.src=img.src+(img.src.includes("?")?"&":"?")+"r="+Date.now(); }); } } });
 }
-function thumb(url, w){ if(!url) return null; return `${IMG_EP}?u=${encodeURIComponent(url)}&w=${w}`; }
-function initials(name){ return String(name||"?").split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase(); }
-function phStyle(cat){ const h = THUMB_HUE[cat]||72; return `background:oklch(30% 0.05 ${h});color:oklch(80% 0.11 ${h})`; }
-function cardHTML(p, i){
- const m = marketFor(p);
- const img = p.image ? `<img src="${thumb(p.image,360)}" alt="${esc(p.name)}" loading="lazy" decoding="async">` : "";
- const ph = `<div class="ph" style="${phStyle(p.category)}">${p.image?"":initials(p.name)}</div>`;
- const mkt = m ? `<span class="mkt">${m.count} on eBay</span>` : "";
- const excl = p.exclusive ? `<span class="excl">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>` : "";
- return `<button class="card" data-name="${esc(p.name)}" style="--i:${i}">
-   <div class="frame">${ph}${img}${excl}${mkt}</div>
-   <div class="body">
-    <div class="nm">${esc(p.name)}</div>
-    <div class="rl"><span class="cat">${CAT_LABELS[p.category]||p.category||""}</span><span>${p.retail!=null?"$"+p.retail:"\u2014"}</span></div>
-   </div>
+function phStyle(cat){ const h=THUMB_HUE[cat]||72; return `background:oklch(30% 0.05 ${h});color:oklch(80% 0.11 ${h})`; }
+function cardHTML(p,i,owned){
+  const m=marketFor(MARKET,p);
+  const img=p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" decoding="async">`:"";
+  const ph=`<div class="ph" style="${phStyle(p.category)}">${p.image?"":initials(p.name)}</div>`;
+  const key=esc(p.print_id||p.name);
+  return `<button class="card" data-key="${key}" style="--i:${i}">
+    <div class="frame">${ph}${img}${p.exclusive?`<span class="excl">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>`:""}${m?`<span class="mkt">${m.count} on eBay</span>`:""}${isOwned(p,owned)?`<span class="owned">Owned</span>`:""}</div>
+    <div class="body"><div class="nm">${esc(p.name)}</div><div class="rl"><span class="cat">${CAT_LABELS[p.category]||p.category||""}</span><span>${p.retail!=null?money0(p.retail):"\u2014"}</span></div></div>
   </button>`;
 }
 
-/* ---- detail ---- */
-function openDetail(name){
- const p = (CATALOG.prints||[]).find(x => x.name === name); if(!p) return;
- const m = marketFor(p);
- const big = p.image ? `<img src="${thumb(p.image,900)}" alt="${esc(p.name)}">` : `<div class="ph" style="${phStyle(p.category)}">${initials(p.name)}</div>`;
- const tags = [
-  `<span class="dt-tag">${CAT_LABELS[p.category]||p.category||""}</span>`,
-  p.exclusive ? `<span class="dt-tag excl">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>` : "",
-  m ? `<span class="dt-tag mkt">On eBay now</span>` : ""
- ].join("");
- const facts = [
-  ["Retail", p.retail!=null ? "$"+p.retail : "\u2014", false],
-  ["Category", CAT_LABELS[p.category]||p.category||"\u2014", false],
-  p.exclusive ? ["Series", EXCL_LABEL[p.exclusive]||p.exclusive, false] : null,
-  ["In print", p.available===false ? "Sold out / retired" : p.available===true ? "Yes" : "\u2014", false],
-  m ? ["Live on eBay", `${m.count} listing${m.count>1?"s":""}`, true] : ["Live on eBay", "Not listed", false],
-  m && m.low!=null ? ["Market low", "$"+m.low.toFixed(2), true] : null
- ].filter(Boolean).map(([k,v,up]) => `<div class="dt-fact"><span class="k">${k}</span><span class="v${up?" up":""}">${esc(v)}</span></div>`).join("");
- const contents = (p.contents && p.contents.length) ? `<div class="dt-section-h">In this pack (${p.packOf?p.packOf+" of "+(p.packFrom||p.contents.length):p.contents.length})</div><div class="dt-contents">${p.contents.map(c => `<span>${esc(c)}</span>`).join("")}</div>` : "";
- const ebayUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent("anastasia inciardi "+p.name)}`;
- const shopMsg = p.available===false ? "View on eBay" : "Find it";
- $("dtInner").innerHTML = `
-  <div class="dt-frame">${big}</div>
-  <div class="dt-body">
-   <h2>${esc(p.name)}</h2>
-   <div class="dt-tags">${tags}</div>
-   <div class="dt-facts">${facts}</div>
-   ${contents}
-   <div class="dt-actions">
-    <a class="dt-btn primary" href="${ebayUrl}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>${shopMsg}</a>
-    <a class="dt-btn ghost" href="https://inciardiprints.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Shop</a>
-   </div>
-   <div class="dt-src">Source: ${esc(p.source||"catalog")}${(p.aliases&&p.aliases.length)?` \u00b7 also listed as: ${p.aliases.map(esc).join(", ")}`:""}. ${p.image?"Reference image: Anastasia's store CDN.":"No reference image sourced yet."}</div>
-  </div>`;
- detail.showModal();
+/* ---- detail + image lifecycle ---- */
+function findPrint(key){ const prints=CATALOG.prints||[]; return prints.find(p=>p.print_id===key)||prints.find(p=>normStr(p.name)===normStr(key)); }
+function openDetail(key){
+  const p=findPrint(key); if(!p) return; openPid=p.print_id||null;
+  const m=marketFor(MARKET,p);
+  const hero=p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}">`:`<div class="ph">${initials(p.name)}</div>`;
+  const facts=[["Retail",p.retail!=null?money(p.retail):"\u2014",false],["Category",CAT_LABELS[p.category]||p.category||"\u2014",false],p.exclusive?["Series",EXCL_LABEL[p.exclusive]||p.exclusive,false]:null,["In print",p.available?"Yes":"Retired / sold out",false],m?["Live on eBay",m.count+" listing"+(m.count>1?"s":""),true]:["Live on eBay","Not listed",false],m&&m.low!=null?["Market low",money(m.low),true]:null].filter(Boolean)
+    .map(([k,v,up])=>`<div class="dt-fact"><span class="k">${k}</span><span class="v${up?" up":""}">${esc(v)}</span></div>`).join("");
+  const ebayUrl=`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent("anastasia inciardi "+p.name)}`;
+  $("detailInner").innerHTML=`
+    <div class="dt-hero">${hero}<button class="dt-close" id="dtClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div class="dt-body">
+      <h2>${esc(p.name)}</h2>
+      <div class="dt-tags"><span class="chip">${CAT_LABELS[p.category]||p.category||""}</span>${p.exclusive?`<span class="chip plum">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>`:""}${m?`<span class="chip up">On eBay now</span>`:""}</div>
+      <div class="dt-facts">${facts}</div>
+      <div id="imgMgr"></div>
+      <div class="dt-actions">
+        <a class="btn" href="${ebayUrl}" target="_blank" rel="noopener">Find on eBay</a>
+        <button class="btn write-only" id="dtAddOwn">+ I own this</button>
+      </div>
+    </div>`;
+  $("dtClose").addEventListener("click",()=>$("detail").close());
+  const own=$("dtAddOwn"); if(own) own.addEventListener("click",()=>addOwned(p));
+  document.body.classList.toggle("can-write",canWrite());
+  renderImgMgr(p);
+  $("detail").showModal();
 }
+function renderImgMgr(p){
+  const box=$("imgMgr"); if(!box) return;
+  if(!canWrite()){ box.innerHTML=`<div class="dt-sec">Images</div><div class="readonly-note">Add your write key in Settings to upload, store, and manage images for this print.</div>`; return; }
+  if(!fromD1 || !p.print_id){
+    box.innerHTML=`<div class="dt-sec">Images</div><div class="readonly-note">This print isn't in the database yet. Save it to enable reliable image storage.</div><button class="btn primary" id="promote">Save to database</button>`;
+    $("promote").addEventListener("click",()=>promote(p));
+    return;
+  }
+  const imgs=p.images||[]; const active=imgs.filter(i=>i.status==="active"); const arch=imgs.filter(i=>i.status==="archived");
+  const thumb=(i)=>`<div class="thumb ${i.is_primary?"primary":""} ${i.status==="archived"?"arch":""}">${i.url?`<img src="${esc(i.url)}" alt="">`:""}${i.is_primary?`<span class="badge">Main</span>`:""}<div class="thumb-acts">${i.status==="active"?(i.is_primary?"":`<button data-op="primary" data-id="${i.image_id}">Set</button>`)+`<button data-op="archive" data-id="${i.image_id}">Arch</button>`:`<button data-op="restore" data-id="${i.image_id}">Restore</button><button data-op="delete" data-id="${i.image_id}">Del</button>`}</div></div>`;
+  const seedUrl = p.image && /^https?:/.test(p.image) && p.image.includes("cdn.shopify.com") ? p.image : (p._srcUrl||"");
+  box.innerHTML=`
+    <div class="dt-sec">Images \u00b7 ${active.length} active${arch.length?` \u00b7 ${arch.length} archived`:""}</div>
+    <div class="thumbs">${active.map(thumb).join("")||`<span style="font-size:0.82rem;color:var(--ink-faint)">No images stored yet.</span>`}</div>
+    ${arch.length?`<div class="thumbs">${arch.map(thumb).join("")}</div>`:""}
+    <div class="img-actions">
+      <label class="btn sm"><input type="file" accept="image/*" id="upIn" hidden>Upload photo</label>
+      ${seedUrl?`<button class="btn sm" id="scrubBtn">Scrub &amp; store original</button>`:""}
+    </div>`;
+  box.querySelectorAll(".thumb-acts button").forEach(b=>b.addEventListener("click",()=>imgOp(b.dataset.op,b.dataset.id)));
+  const up=$("upIn"); if(up) up.addEventListener("change",()=>uploadImg(p, up.files[0]));
+  const sb=$("scrubBtn"); if(sb) sb.addEventListener("click",()=>scrubStore(p, seedUrl));
+}
+async function refreshCatalog(reopenKey){ const cat=await apiGet("/catalog",null); if(cat&&cat.prints){ CATALOG=cat; fromD1=true; } renderStrip(); render(); if(reopenKey) openDetail(reopenKey); }
+async function imgOp(op,image_id){ try{ toast("working\u2026"); await apiPost("/catalog/image/state",{image_id,op}); toast(op+" done"); await refreshCatalog(openPid); }catch(e){ toast(e.message,true); } }
+async function uploadImg(p,file){ if(!file) return; try{ toast("uploading\u2026"); const s=await fileToScaledB64(file,1400); await apiPost("/catalog/image",{print_id:p.print_id,data:s.data,content_type:s.content_type,width:s.width,height:s.height,make_primary:true}); toast("image stored"); await refreshCatalog(p.print_id); }catch(e){ toast(e.message,true); } }
+async function scrubStore(p,url){ try{ toast("scrubbing\u2026"); await apiPost("/catalog/image/scrub",{print_id:p.print_id,source_url:url,make_primary:true}); toast("original stored in R2"); await refreshCatalog(p.print_id); }catch(e){ toast(e.message,true); } }
+async function promote(p){ try{ toast("saving\u2026"); const r=await apiPost("/catalog",{title:p.name,category:p.category,exclusive:p.exclusive||null,retail:p.retail,in_print:p.available?1:0,pack_of:p.packOf,pack_from:p.packFrom,aliases:p.aliases||[],source:p.source||"seed"}); if(p.image&&p.image.includes("cdn.shopify.com")){ try{ await apiPost("/catalog/image/scrub",{print_id:r.print_id,source_url:p.image,make_primary:true}); }catch(e){} } toast("saved to database"); await refreshCatalog(r.print_id); }catch(e){ toast(e.message,true); } }
+async function addOwned(p){ try{ if(!fromD1||!p.print_id){ await promote(p); } const pid = (findPrint(p.print_id||p.name)||{}).print_id || p.print_id; await apiPost("/inventory",{op:"upsert",print_id:pid,disposition:"own",qty:1}); INV=await apiGet("/inventory",{inventory:[]}); toast("added to your collection"); renderStrip(); render(); }catch(e){ toast(e.message,true); } }
 
-/* ---- skeleton + utils ---- */
-function showSkeletons(){
- $("grid").innerHTML = Array.from({length:10}).map(() => `<div class="skeleton"><div class="sk-frame"></div><div class="sk-line"></div><div class="sk-line short"></div></div>`).join("");
+/* ---- manual add + dedupe ---- */
+function openAdd(){ $("ap-name").value=""; $("ap-retail").value=""; $("ap-excl").value=""; $("ap-cat").value="mini"; $("ap-inprint").value="0"; $("ap-warn").hidden=true; $("addPrint").showModal(); $("ap-name").focus(); }
+function dedupe(name){ const n=normStr(name); const prints=CATALOG.prints||[];
+  const exact=prints.find(p=>normStr(p.name)===n||(p.aliases||[]).some(a=>normStr(a)===n));
+  if(exact) return {kind:"exact",p:exact};
+  const near=prints.find(p=>{ const pn=normStr(p.name); return pn&&(pn.includes(n)||n.includes(pn)); });
+  if(near) return {kind:"near",p:near};
+  return null;
 }
-function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+async function saveNewPrint(){
+  const name=$("ap-name").value.trim(); if(!name){ toast("name required",true); return; }
+  const hit=dedupe(name);
+  if(hit&&hit.kind==="exact"){ $("addPrint").close(); toast("already catalogued \u2014 opening it"); openDetail(hit.p.print_id||hit.p.name); return; }
+  if(hit&&hit.kind==="near"){ const w=$("ap-warn"); w.hidden=false; w.innerHTML=`Looks close to <b>${esc(hit.p.name)}</b>. If that's the same print, <a href="#" id="ap-open" style="color:var(--accent)">open it instead</a>. Otherwise press Save again to add as new.`; $("ap-open").addEventListener("click",(e)=>{e.preventDefault();$("addPrint").close();openDetail(hit.p.print_id||hit.p.name);}); if(w.dataset.armed!==name){ w.dataset.armed=name; return; } }
+  try{ toast("saving\u2026"); const r=await apiPost("/catalog",{title:name,category:$("ap-cat").value,exclusive:$("ap-excl").value||null,retail:$("ap-retail").value?Number($("ap-retail").value):null,in_print:$("ap-inprint").value==="1"?1:0,source:"manual",locked:1}); $("addPrint").close(); toast("print added"); await refreshCatalog(r.print_id); }catch(e){ toast(e.message,true); }
+}
