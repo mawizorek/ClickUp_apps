@@ -1,0 +1,40 @@
+# Cloudflare Worker config for the Inciardi Market CATALOG HARVEST cron.
+#
+# This is a SECOND worker, separate from wrangler.toml (the main API + eBay
+# market worker). It shares the SAME D1 database and R2 bucket by ID, so it
+# writes into the exact store the app reads — it just owns the harvest crons.
+#
+# WHY SEPARATE: worker.js is over the 30KB read cap; folding another cron into
+# it blind risks its unseen runCron() market-bank. cron-worker.js isolates the
+# harvest with zero edits to the working main worker.
+#
+# ONE-TIME DEPLOY SETUP (pick one):
+#   A) Dashboard: Workers & Pages > create a second "Connect to Git" build
+#      project on this repo, set the config path to
+#      inciardi-market/wrangler-cron.toml. It then auto-deploys on push to main.
+#   B) Manual:  wrangler deploy -c inciardi-market/wrangler-cron.toml
+#
+# NO SECRETS required here (unlike the main worker). The harvest only reads the
+# public shop + public CDN and writes through the D1/R2 bindings.
+
+name = "inciardi-market-cron"
+main = "cron-worker.js"
+compatibility_date = "2024-11-01"
+
+# Two schedules, dispatched by event.cron in cron-worker.js:
+#   09:00 UTC daily -> runCatalogScrub  (Shopify text harvest into D1)
+#   hourly          -> runImageBackfill (scrub 25 reference images into R2, self-idling)
+[triggers]
+crons = ["0 9 * * *", "0 * * * *"]
+
+# SAME relational store as the main worker (catalog / print_image / etc).
+[[d1_databases]]
+binding = "DB"
+database_name = "inciardi-market"
+database_id = "18f3459f-8273-44d6-8380-6971d6173b3e"
+
+# SAME image bucket as the main worker. Scrubbed print bytes land here; the main
+# worker's GET /img?key= serves them back.
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "inciardi-images"
