@@ -9,24 +9,17 @@
   CIRCUIT DATA (v6.1): PER-CIRCUIT files in circuits/<slug>.json hold TIMELESS
   identity + layout only. PER-YEAR fields (round/date/status/sessions) live in
   circuits/index_circuits.json keyed by slug; source/09 fetches the index + each
-  circuit file at boot and merges the per-year fields on (mirrors the f1-results
-  per-round store). No more inline TRACK_DATA modules.
-  STYLE BAND: 02..07 (foundation, panels/tables/footer, results+mobile,
-  live-session, technical-index, lens-switcher) fetched in order below.
-  DESIGN SYSTEM (v6.2): reskinned to match the standings + race-weekend lenses —
-  Chakra Petch (display) / JetBrains Mono (timing) / Inter (body) + shared oklch
-  (hue 268) palette. One app across all three surfaces.
-  CROSS-LENS NAV (v6.2): topbar carries a 3-way switcher (Matrix / History / Circuits)
-  matching the standings switcher; Matrix -> standings.html, History ->
-  standings.html#history. Weekend is NOT a peer tab — it is the per-round
-  DRILL-THROUGH reached from a circuit card (circuits link to weekend.html#/<slug>).
-  SEAMLESS NAV (v6.5): cross-document View Transitions (cross-fade, not a hard reload)
-  + the chrome paints on the first byte via inline critical CSS so only the #app data
-  surface fades in — arriving reads as a content swap, not a full-page reload. The
-  red F1 lockup persists/morphs across lenses (shared view-transition-name f1-brand).
-  v8: under the unified shell (index.html) the brand + lens switcher here are hidden;
-  source/09 replaces the Jump-to-circuit <select> with a styled side drawer and reworks
-  the home cards to a database feel. Bytes bumped to 20260713d.
+  circuit file at boot and merges the per-year fields on.
+  STYLE BAND: 02..07 fetched in order below.
+  DESIGN SYSTEM (v6.2): Chakra Petch / JetBrains Mono / Inter + shared oklch (hue 268).
+  SEAMLESS NAV (v6.5): cross-document View Transitions + chrome paints on first byte.
+  v7: runs under the unified shell (index.html); the brand + lens switcher here are
+  hidden when embedded (shell owns them).
+  v8: source/09 replaced the Jump-to-circuit <select> with a styled side drawer and
+  reworked the home cards to a database feel.
+  v9: source/09 culls the marketing hero and adds a top-level filter bar (Continent /
+  Era / Status / Breakdown). Footer culled here to version meta + a single Live tracker
+  link (the dev/export tools were sloppy under the unified shell). Bytes -> 20260713e.
   CACHE-BUST: bump BUILD_STAMP below AND the ?v= token on the module <script> tags on every source/style deploy.
   Footer version label lives in source/09 (APP_VERSION). Keep it in sync with this header.
 -->
@@ -44,21 +37,11 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
   <style>
     html{background:oklch(0.16 0.012 268)}
-
-    /* seamless cross-lens navigation: same-origin cross-document view transitions
-       so switching to the Matrix/History lens cross-fades instead of a hard reload. */
     @view-transition{navigation:auto}
     ::view-transition-old(root),::view-transition-new(root){animation-duration:.32s;animation-timing-function:cubic-bezier(0.16,1,0.3,1)}
     @media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
-
-    /* content-only reveal: chrome paints instantly (critical CSS below), only the
-       #app data surface + footer fade in once the async style band lands — so
-       arriving here reads as "chrome stayed, content filled in", NOT a full reload. */
     #app,footer.app{opacity:0}
     body.runtime-ready #app,body.runtime-ready footer.app{opacity:1;transition:opacity .22s cubic-bezier(0.16,1,0.3,1)}
-
-    /* --- critical chrome (mirrors source/02 + 07 so the topbar is styled on the
-       first paint; the async band re-declares these identically) --- */
     :root{
       --bg:oklch(0.16 0.012 268);--bg2:oklch(0.195 0.014 268);
       --surface:oklch(0.225 0.015 268);--surface2:oklch(0.265 0.016 268);
@@ -87,7 +70,7 @@
   </style>
   <script>
     // Bump this one token on every source/style deploy to guarantee fresh bytes.
-    const BUILD_STAMP = '20260713d';
+    const BUILD_STAMP = '20260713e';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
@@ -137,27 +120,20 @@
     <footer class="app">
       <span class="meta-txt" id="foot-meta">F1 Racetracks v6.2 · loading data…</span>
       <div class="toolbar">
-        <a class="tool" href="./standings.html">Championship Matrix</a>
         <a class="tool" href="./live-tracker.html">Live tracker</a>
-        <button class="tool" id="t-copy" title="Copy the full page source to your clipboard">Copy source</button>
-        <button class="tool" id="t-prep" title="Build a Save link you click to download the .html">Prepare download</button>
-        <button class="tool" id="t-tab" title="Open the raw source in a new tab, then Cmd/Ctrl+S to save">Open in new tab</button>
-        <button class="tool" id="t-data" title="Export the current resolved data as JSON">Export data (.json)</button>
-        <span class="save-wrap" id="save-slot"></span>
-        <span class="tool" style="cursor:default"><span class="hint">or Right-click → Save As</span></span>
       </div>
     </footer>
   </div>
 
-  <script src="./source/12_results_store.js?v=20260713d"></script>
-  <script src="./source/09_app_bootstrap_and_home.js?v=20260713d"></script>
-  <script src="./source/10_track_views_and_profile.js?v=20260713d"></script>
-  <script src="./source/13_live_session_panel.js?v=20260713d"></script>
-  <script src="./source/11_weather_and_footer_exports.js?v=20260713d"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260713d"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260713d"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260713d"></script>
-  <script src="./source/17_weekend_mount.js?v=20260713d"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260713d"></script>
+  <script src="./source/12_results_store.js?v=20260713e"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260713e"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260713e"></script>
+  <script src="./source/13_live_session_panel.js?v=20260713e"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260713e"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260713e"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260713e"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260713e"></script>
+  <script src="./source/17_weekend_mount.js?v=20260713e"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260713e"></script>
 </body>
 </html>
