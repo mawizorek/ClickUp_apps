@@ -1,8 +1,9 @@
 /**
- * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0.4)
+ * Inciardi Mini Print Market Tracker — Cloudflare Worker (v0.5)
  *
  * Reads live eBay listings (Browse API), diffs vs the KV snapshot, and
  * serves market.json on GET /market.
+ * - GET /img — same-origin image proxy for catalog thumbnails (edge-cached)
  * - GET /inventory — read the collection (D1, joined to catalog)
  * - POST /inventory — upsert/delete/setState an inventory row (GATED)
  * - POST /catalog/confirm — promote a spotted print into the catalog (GATED)
@@ -28,6 +29,11 @@ const UNDERPRICED_PCT = 0.85;
 const EXCLUSIVE_TOKENS = ["nyc", "lacma", "grand central", "holiday", "exclusive"];
 const PACK_TOKENS = ["pack", "set", "lot", "bundle"];
 
+// Image proxy: only these hosts may be fetched through GET /img. Keeps this from
+// becoming an open proxy. All catalog reference images are Anastasia's Shopify CDN.
+const IMG_HOST_ALLOW = ["cdn.shopify.com"];
+const IMG_CACHE_TTL = 604800; // 7 days at the Cloudflare edge
+
 const CORS = {
  "Access-Control-Allow-Origin": "*",
  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -42,6 +48,9 @@ export default {
  try {
  if ((path === "/market" || path === "/") && request.method === "GET") {
  return json(await buildMarket(env));
+ }
+ if (path === "/img" && request.method === "GET") {
+ return proxyImage(url);
  }
  if (path === "/inventory" && request.method === "GET") {
  return json(await readInventory(env));
@@ -80,6 +89,34 @@ function gate(request, env) {
  e.status = 401;
  throw e;
  }
+}
+
+/* ---------- image proxy (GET /img?u=<url>&w=<n>) ---------- */
+// Fetches an allowlisted CDN image server-side and serves it back same-origin,
+// CORS-clean and edge-cached. This is the fix for the catalog flash-then-vanish:
+// the browser no longer makes 30+ flaky cross-origin hits to Shopify per load.
+async function proxyImage(url) {
+ const target = url.searchParams.get("u");
+ if (!target) return json({ error: "img requires ?u=" }, 400);
+ let up;
+ try { up = new URL(target); } catch { return json({ error: "bad url" }, 400); }
+ if (up.protocol !== "https:" || !IMG_HOST_ALLOW.includes(up.hostname)) {
+ return json({ error: "host not allowed" }, 403);
+ }
+ // Optional width passthrough -> Shopify honors ?width=<n>.
+ const w = url.searchParams.get("w");
+ if (w && /^\d{2,4}$/.test(w) && !up.searchParams.has("width")) up.searchParams.set("width", w);
+
+ const res = await fetch(up.toString(), {
+ cf: { cacheEverything: true, cacheTtl: IMG_CACHE_TTL },
+ headers: { Accept: "image/*", "User-Agent": "inciardi-market-img-proxy" },
+ });
+ if (!res.ok) return json({ error: `upstream ${res.status}` }, 502);
+
+ const headers = new Headers(CORS);
+ headers.set("Content-Type", res.headers.get("Content-Type") || "image/jpeg");
+ headers.set("Cache-Control", `public, max-age=${IMG_CACHE_TTL}, immutable`);
+ return new Response(res.body, { status: 200, headers });
 }
 
 /* ---------- eBay auth (client-credentials, cached in KV) ---------- */

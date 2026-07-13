@@ -4,6 +4,10 @@ const EXCL_LABEL = { nyc:"NYC", lacma:"LACMA", holiday:"Holiday", "grand-central
 const CAT_ORDER = ["mini","big-riso","linocut","exclusive","pack"];
 const THUMB_HUE = { mini:72, pack:205, exclusive:305, "big-riso":152, linocut:40 };
 const WORKER_EP = "https://inciardi-market.mawizorek-online.workers.dev/market";
+// Images route through the Worker's same-origin /img proxy (edge-cached), never
+// hotlinked straight from Shopify's CDN. That direct hotlink was the flash-then-
+// vanish bug: 30+ concurrent cross-origin hits flaked on mobile.
+const IMG_EP = "https://inciardi-market.mawizorek-online.workers.dev/img";
 
 const $ = (id) => document.getElementById(id);
 let CATALOG = null, MARKET = null;
@@ -110,15 +114,25 @@ function render(){
  grid.querySelectorAll(".card").forEach(el => {
   el.addEventListener("click", () => openDetail(el.dataset.name));
   const img = el.querySelector("img");
-  if(img){ if(img.complete) img.classList.add("loaded"); else img.addEventListener("load", () => img.classList.add("loaded")); img.addEventListener("error", () => { img.style.display="none"; }); }
+  if(img){
+   if(img.complete && img.naturalWidth) img.classList.add("loaded");
+   else img.addEventListener("load", () => img.classList.add("loaded"));
+   // Retry once with a cache-bust before giving up. A single flaky fetch used to
+   // hard-hide the image for the whole session (the flash-then-vanish bug).
+   img.addEventListener("error", () => {
+    if(img.dataset.retried){ img.style.display="none"; return; }
+    img.dataset.retried = "1";
+    img.src = img.src + (img.src.includes("?") ? "&" : "?") + "r=" + Date.now();
+   });
+  }
  });
 }
-function thumb(url, w){ if(!url) return null; const sep = url.includes("?") ? "&" : "?"; return `${url}${sep}width=${w}`; }
+function thumb(url, w){ if(!url) return null; return `${IMG_EP}?u=${encodeURIComponent(url)}&w=${w}`; }
 function initials(name){ return String(name||"?").split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase(); }
 function phStyle(cat){ const h = THUMB_HUE[cat]||72; return `background:oklch(30% 0.05 ${h});color:oklch(80% 0.11 ${h})`; }
 function cardHTML(p, i){
  const m = marketFor(p);
- const img = p.image ? `<img src="${thumb(p.image,360)}" alt="${esc(p.name)}" loading="lazy">` : "";
+ const img = p.image ? `<img src="${thumb(p.image,360)}" alt="${esc(p.name)}" loading="lazy" decoding="async">` : "";
  const ph = `<div class="ph" style="${phStyle(p.category)}">${p.image?"":initials(p.name)}</div>`;
  const mkt = m ? `<span class="mkt">${m.count} on eBay</span>` : "";
  const excl = p.exclusive ? `<span class="excl">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>` : "";
