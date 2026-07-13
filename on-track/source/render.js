@@ -1,37 +1,37 @@
 // On Track — engine: constants, data model, date/format helpers, and all render/paint logic.
 // Loaded before app.js. Classic script (shared global scope with app.js).
-const APP_VERSION = 'v1.9';
-const APP_DATE = '2026-07-05';
+const APP_VERSION = 'v2.0';
+const APP_DATE = '2026-07-13';
 const APP_SLUG = 'on-track';
 const SERIES = {
-  'F1':          { label: 'Formula 1',      color: 'var(--s-f1)' },
-  'F2':          { label: 'Formula 2',      color: 'var(--s-f2)' },
-  'F3':          { label: 'Formula 3',      color: 'var(--s-f3)' },
-  'NASCAR':      { label: 'NASCAR',         color: 'var(--s-nascar)' },
-  'IndyCar':     { label: 'IndyCar',        color: 'var(--s-indycar)' },
-  'MotoGP':      { label: 'MotoGP',         color: 'var(--s-motogp)' },
-  'Moto2':       { label: 'Moto2',          color: 'var(--s-moto2)' },
-  'Moto3':       { label: 'Moto3',          color: 'var(--s-moto3)' },
-  'IMSA':        { label: 'IMSA',           color: 'var(--s-imsa)' },
-  'WEC':         { label: 'WEC',            color: 'var(--s-wec)' },
-  'NHRA':        { label: 'NHRA',           color: 'var(--s-nhra)' },
-  'Formula E':   { label: 'Formula E',      color: 'var(--s-formulae)' },
-  'WSBK':        { label: 'World Superbike',color: 'var(--s-wsbk)' },
-  'MotoAmerica': { label: 'MotoAmerica',    color: 'var(--s-motoamerica)' },
-  'MXGP':        { label: 'MXGP',           color: 'var(--s-mxgp)' },
+  'F1':          { label: 'Formula 1',       color: 'var(--s-f1)' },
+  'F2':          { label: 'Formula 2',       color: 'var(--s-f2)' },
+  'F3':          { label: 'Formula 3',       color: 'var(--s-f3)' },
+  'NASCAR':      { label: 'NASCAR',          color: 'var(--s-nascar)' },
+  'IndyCar':     { label: 'IndyCar',         color: 'var(--s-indycar)' },
+  'MotoGP':      { label: 'MotoGP',          color: 'var(--s-motogp)' },
+  'Moto2':       { label: 'Moto2',           color: 'var(--s-moto2)' },
+  'Moto3':       { label: 'Moto3',           color: 'var(--s-moto3)' },
+  'IMSA':        { label: 'IMSA',            color: 'var(--s-imsa)' },
+  'WEC':         { label: 'WEC',             color: 'var(--s-wec)' },
+  'NHRA':        { label: 'NHRA',            color: 'var(--s-nhra)' },
+  'Formula E':   { label: 'Formula E',       color: 'var(--s-formulae)' },
+  'WSBK':        { label: 'World Superbike', color: 'var(--s-wsbk)' },
+  'MotoAmerica': { label: 'MotoAmerica',     color: 'var(--s-motoamerica)' },
+  'MXGP':        { label: 'MXGP',            color: 'var(--s-mxgp)' },
   'BSB':         { label: 'British Superbike', color: 'var(--s-bsb)' },
-  'Speedway':    { label: 'FIM Speedway',   color: 'var(--s-speedway)' },
-  'FIM Speedway':{ label: 'FIM Speedway',   color: 'var(--s-speedway)' },
-  'SMX':         { label: 'Supercross/SMX', color: 'var(--s-smx)' },
-  'Supercars':   { label: 'Supercars',      color: 'var(--s-supercars)' }
+  'Speedway':    { label: 'FIM Speedway',    color: 'var(--s-speedway)' },
+  'FIM Speedway':{ label: 'FIM Speedway',    color: 'var(--s-speedway)' },
+  'SMX':         { label: 'Supercross/SMX',  color: 'var(--s-smx)' },
+  'Supercars':   { label: 'Supercars',       color: 'var(--s-supercars)' }
 };
 const seriesColor = s => (SERIES[s] && SERIES[s].color) || 'var(--s-default)';
 const FALLBACK_DATA = {
   version: '2026-07-04b',
   events: [
-    { series:'F1',      kind:'Race', title:'British Grand Prix', detail:'Silverstone', start:'2026-07-05T10:00:00-04:00', end:'2026-07-05T12:00:00-04:00', platforms:['Apple TV'] },
-    { series:'NASCAR',  kind:'Race', title:'eero 400', detail:'Chicagoland, Cup Series', start:'2026-07-05T18:00:00-04:00', end:'2026-07-05T21:00:00-04:00', platforms:['TNT Sports','HBO Max'] },
-    { series:'MotoGP',  kind:'Race', title:'German Grand Prix', detail:'Sachsenring', start:'2026-07-12T08:00:00-04:00', end:'2026-07-12T09:30:00-04:00', platforms:['FS1'] }
+    { series:'F1',     kind:'Race', title:'British Grand Prix', detail:'Silverstone', start:'2026-07-05T10:00:00-04:00', end:'2026-07-05T12:00:00-04:00', platforms:['Apple TV'] },
+    { series:'NASCAR', kind:'Race', title:'eero 400', detail:'Chicagoland, Cup Series', start:'2026-07-05T18:00:00-04:00', end:'2026-07-05T21:00:00-04:00', platforms:['TNT Sports','HBO Max'] },
+    { series:'MotoGP', kind:'Race', title:'German Grand Prix', detail:'Sachsenring', start:'2026-07-12T08:00:00-04:00', end:'2026-07-12T09:30:00-04:00', platforms:['FS1'] }
   ]
 };
 let DATA = FALLBACK_DATA;
@@ -61,13 +61,28 @@ const labelFromKey = k => new Intl.DateTimeFormat('en-US', { timeZone:'UTC', wee
 const shortFromKey = k => new Intl.DateTimeFormat('en-US', { timeZone:'UTC', weekday:'short', month:'short', day:'numeric' }).format(new Date(k + 'T12:00:00Z'));
 const addDays = (k, n) => { const [y,m,d]=k.split('-').map(Number); const dt=new Date(Date.UTC(y,m-1,d)); dt.setUTCDate(dt.getUTCDate()+n); return dt.toISOString().slice(0,10); };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Soft TBD support: a date-known / time-TBD event groups by its authored calendar date
+// (timezone-independent, since it has no real instant); fully-timed events group by their
+// real instant in the active timezone. This is the ONLY grouping key the schedule uses.
+const groupKey = e => e._tbd ? e._dayKey : dayKey(e._s);
 function hydrate() {
   events = (DATA.events || []).map((e, i) => {
+    // Soft TBD: date confirmed, start time not yet published. We invent NO hour.
+    // _s/_e anchor to the END of the authored ET date purely so day-grouping, the
+    // visible() window, and sort ordering keep functioning; they are never displayed,
+    // and the _tbd flag keeps these events out of ALL live/next/countdown logic.
+    if (e.timeTBD && e.date) {
+      const anchor = new Date(e.date + 'T23:59:59-04:00');
+      return Object.assign({}, e, { _i: i, _tbd: true, _dayKey: e.date, _s: anchor, _e: anchor });
+    }
     const s = new Date(e.start), en = new Date(e.end);
-    return Object.assign({}, e, { _i: i, _s: s, _e: en });
+    return Object.assign({}, e, { _i: i, _tbd: false, _s: s, _e: en });
   }).filter(e => !isNaN(e._s.getTime())).sort((a, b) => a._s - b._s);
 }
 function stateOf(e, now) {
+  // TBD events have no start time, so they can never be "live" and are never a
+  // countdown target: date in the future/today = upcoming, date passed = past.
+  if (e._tbd) return e._e <= now ? 'past' : 'upcoming';
   if (now >= e._s && now < e._e) return 'live';
   if (e._s > now) return 'upcoming';
   return 'past';
@@ -93,7 +108,8 @@ function renderHero() {
       '</div>';
     return;
   }
-  const next = events.find(e => e._s > now);
+  // TBD events are excluded from the up-next countdown: there is no exact time to count to.
+  const next = events.find(e => !e._tbd && e._s > now);
   if (next) {
     const diff = next._s - now;
     hero.innerHTML =
@@ -109,7 +125,7 @@ function renderHero() {
       '</div>';
     return;
   }
-  const last = events.slice().reverse().find(e => e._e <= now);
+  const last = events.slice().reverse().find(e => !e._tbd && e._e <= now);
   hero.innerHTML =
     '<div class="hero-eyebrow">That\'s a wrap</div>' +
     '<div class="live-title">No sessions live right now.</div>' +
@@ -141,10 +157,10 @@ function buildChips() {
 }
 function buildJump() {
   const todayK = dayKey(new Date());
-  const days = Array.from(new Set(events.map(e => dayKey(e._s)))).sort();
+  const days = Array.from(new Set(events.map(e => groupKey(e)))).sort();
   const sel = $('#jumpDate');
   sel.innerHTML = '<option value="">Jump to date…</option>' + days.map(k => {
-    const n = events.filter(e => dayKey(e._s) === k).length;
+    const n = events.filter(e => groupKey(e) === k).length;
     const tag = k === todayK ? ' · Today' : (k < todayK ? ' · past' : '');
     return '<option value="' + k + '">' + esc(shortFromKey(k)) + tag + ' (' + n + ')</option>';
   }).join('');
@@ -198,7 +214,7 @@ function renderSchedule() {
   if (typeof syncFilterAction === 'function') syncFilterAction();
   const visible = e => state.showPast || e._e > now;
   const dayMap = new Map();
-  matched.forEach(e => { if (!visible(e)) return; const k = dayKey(e._s); if (!dayMap.has(k)) dayMap.set(k, []); dayMap.get(k).push(e); });
+  matched.forEach(e => { if (!visible(e)) return; const k = groupKey(e); if (!dayMap.has(k)) dayMap.set(k, []); dayMap.get(k).push(e); });
   const pastCount = matched.filter(e => e._e <= now).length;
   const pt = $('#pastToggle');
   if (pastCount) {
@@ -216,7 +232,7 @@ function renderSchedule() {
   if (anyFilter) {
     keys = Array.from(dayMap.keys()).sort();
   } else {
-    const allK = events.map(e => dayKey(e._s));
+    const allK = events.map(e => groupKey(e));
     if (!allK.length) { keys = []; }
     else {
       const minK = allK.reduce((a, b) => a < b ? a : b);
@@ -252,24 +268,28 @@ function renderSchedule() {
       : evs.map(e => {
           const st = stateOf(e, now);
           return '<div class="evt ' + (st==='live'?'is-live':'') + ' ' + (st==='past'?'is-past':'') + '" style="--sc:' + seriesColor(e.series) + '">' +
-            '<div class="evt-time">' + fmtTime(e._s) + '<span class="end">' + fmtTime(e._e) + '</span></div>' +
+            '<div class="evt-time">' + (e._tbd
+              ? '<span class="tbd" style="color:var(--text-3);font-weight:700;letter-spacing:0.02em">TBD</span>'
+              : fmtTime(e._s) + '<span class="end">' + fmtTime(e._e) + '</span>') + '</div>' +
             '<div class="evt-bar"></div>' +
             '<div class="evt-main">' +
-              '<span class="evt-series">' + esc((SERIES[e.series]||{}).label||e.series) + '</span> ' +
-              '<span class="evt-kind">' + esc(e.kind) + '</span> ' +
-              (st==='live' ? '<span class="livepill"><span class="dot-live" style="background:var(--live-ink);width:6px;height:6px"></span>Live</span>' : '') +
+              '<span class="evt-series">' + esc((SERIES[e.series]||{}).label||e.series) + '</span>' +
+              '<span class="evt-kind">' + esc(e.kind) + '</span>' +
+              (e._tbd
+                ? '<span class="evt-kind" style="border-style:dashed;color:var(--text-3)">Time TBD</span>'
+                : (st==='live' ? '<span class="livepill"><span class="dot-live" style="background:var(--live-ink)"></span>Live</span>' : '')) +
               '<div class="evt-title">' + esc(e.title) + (e.detail ? ' <span class="det">· ' + esc(e.detail) + '</span>' : '') + '</div>' +
             '</div>' +
             '<div class="evt-plats">' + e.platforms.map(p => '<span class="plat-badge">' + esc(p) + '</span>').join('') + '</div>' +
           '</div>';
         }).join('');
-    return '<section class="day-group' + (isEarlier ? ' past-group' : '') + (empty ? ' empty-day' : '') + '" id="day-' + k + '">' +
+    return '<div class="day-group' + (isEarlier ? ' past-group' : '') + (empty ? ' empty-day' : '') + '" id="day-' + k + '">' +
       '<div class="day-head">' +
         '<h2>' + esc(labelFromKey(k)) + '</h2>' +
         (isToday ? '<span class="today">Today</span>' : (isEarlier ? '<span class="earlier">Earlier</span>' : '')) +
         (empty ? '' : '<span class="cnt">' + evs.length + ' session' + (evs.length>1?'s':'') + '</span>') +
       '</div>' + body +
-    '</section>';
+    '</div>';
   }).join('');
 }
 function jumpTo(k) {
@@ -287,7 +307,7 @@ function tick() {
   $('#clockZone').textContent = tzAbbrev();
   const c = $('#count');
   if (c) {
-    const next = events.find(e => e._s > now);
+    const next = events.find(e => !e._tbd && e._s > now);
     const live = events.some(e => stateOf(e, now) === 'live');
     if (!next || live || now >= next._s) { renderHero(); renderSchedule(); }
     else c.innerHTML = fmtDur(next._s - now);
