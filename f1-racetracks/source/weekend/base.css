@@ -1,49 +1,49 @@
-/* weekend/base.css — Race Weekend lens, foundation layer (v2.0).
-   Shared design system (oklch hue 268) + Chakra Petch / JetBrains Mono / Inter,
-   identical to standings + circuits so all three lenses read as one app.
-   Holds: tokens, body, topbar + drill-through nav (prev/next + round select),
-   masthead, headline strip, section chrome, reveal-animation base. */
+/* weekend/base.css — Race Weekend lens, foundation layer (v2.1).
+ Shared design system (oklch hue 268) + Chakra Petch / JetBrains Mono / Inter,
+ identical to standings + circuits so all three lenses read as one app.
+ Holds: tokens, body, topbar + drill-through nav (prev/next + round select),
+ masthead, headline strip, section chrome, reveal-animation base. */
 :root{
-  --bg:oklch(0.16 0.012 268);
-  --s1:oklch(0.195 0.014 268);
-  --s2:oklch(0.225 0.015 268);
-  --s3:oklch(0.265 0.016 268);
-  --line:oklch(0.30 0.014 268);
-  --line-soft:oklch(0.25 0.013 268);
-  --txt:oklch(0.95 0.006 268);
-  --txt-mid:oklch(0.74 0.011 268);
-  --txt-dim:oklch(0.56 0.013 268);
-  --red:oklch(0.64 0.21 26);
-  --gold:oklch(0.84 0.135 88);
-  --silver:oklch(0.82 0.012 268);
-  --bronze:oklch(0.70 0.10 58);
-  --green:oklch(0.72 0.15 158);
-  --purple:oklch(0.72 0.16 300);
-  --ty-soft:oklch(0.64 0.20 26);
-  --ty-med:oklch(0.82 0.14 92);
-  --ty-hard:oklch(0.86 0.01 268);
-  --ty-int:oklch(0.70 0.15 158);
-  --t-mercedes:oklch(0.75 0.10 178);
-  --t-ferrari:oklch(0.60 0.21 27);
-  --t-mclaren:oklch(0.74 0.17 56);
-  --t-redbull:oklch(0.56 0.15 268);
-  --t-racingbulls:oklch(0.62 0.13 256);
-  --t-alpine:oklch(0.70 0.14 344);
-  --t-astonmartin:oklch(0.62 0.12 168);
-  --t-williams:oklch(0.68 0.14 246);
-  --t-haas:oklch(0.74 0.02 262);
-  --t-audi:oklch(0.60 0.17 20);
-  --t-cadillac:oklch(0.74 0.09 92);
-  --ease:cubic-bezier(0.16,1,0.3,1);
+ --bg:oklch(0.16 0.012 268);
+ --s1:oklch(0.195 0.014 268);
+ --s2:oklch(0.225 0.015 268);
+ --s3:oklch(0.265 0.016 268);
+ --line:oklch(0.30 0.014 268);
+ --line-soft:oklch(0.25 0.013 268);
+ --txt:oklch(0.95 0.006 268);
+ --txt-mid:oklch(0.74 0.011 268);
+ --txt-dim:oklch(0.56 0.013 268);
+ --red:oklch(0.64 0.21 26);
+ --gold:oklch(0.84 0.135 88);
+ --silver:oklch(0.82 0.012 268);
+ --bronze:oklch(0.70 0.10 58);
+ --green:oklch(0.72 0.15 158);
+ --purple:oklch(0.72 0.16 300);
+ --ty-soft:oklch(0.64 0.20 26);
+ --ty-med:oklch(0.82 0.14 92);
+ --ty-hard:oklch(0.86 0.01 268);
+ --ty-int:oklch(0.70 0.15 158);
+ --t-mercedes:oklch(0.75 0.10 178);
+ --t-ferrari:oklch(0.60 0.21 27);
+ --t-mclaren:oklch(0.74 0.17 56);
+ --t-redbull:oklch(0.56 0.15 268);
+ --t-racingbulls:oklch(0.62 0.13 256);
+ --t-alpine:oklch(0.70 0.14 344);
+ --t-astonmartin:oklch(0.62 0.12 168);
+ --t-williams:oklch(0.68 0.14 246);
+ --t-haas:oklch(0.74 0.02 262);
+ --t-audi:oklch(0.60 0.17 20);
+ --t-cadillac:oklch(0.74 0.09 92);
+ --ease:cubic-bezier(0.16,1,0.3,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{background:var(--bg);-webkit-text-size-adjust:100%}
 body{
-  background:var(--bg);color:var(--txt);
-  font-family:'Inter',system-ui,sans-serif;font-weight:450;
-  line-height:1.55;letter-spacing:0.006em;
-  padding:0 14px 72px;max-width:680px;margin:0 auto;
-  -webkit-font-smoothing:antialiased;font-optical-sizing:auto;
+ background:var(--bg);color:var(--txt);
+ font-family:'Inter',system-ui,sans-serif;font-weight:450;
+ line-height:1.55;letter-spacing:0.006em;
+ padding:0 14px 72px;max-width:680px;margin:0 auto;
+ -webkit-font-smoothing:antialiased;font-optical-sizing:auto;
 }
 h1,h2,h3{text-wrap:balance;font-family:'Chakra Petch',sans-serif}
 .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
@@ -60,6 +60,15 @@ h1,h2,h3{text-wrap:balance;font-family:'Chakra Petch',sans-serif}
 .lens .on{background:var(--s3);color:var(--txt)}
 .lens a:hover{color:var(--txt);background:var(--s2)}
 @media(max-width:560px){.lens a,.lens span{padding:8px 11px;font-size:0.6rem;letter-spacing:0.06em}}
+
+/* Embedded in the unified F1 shell (index.html iframe): app-shell.js adds
+ .shell-embedded to <html> and owns the persistent top chrome. Hide THIS lens's own
+ brand + switcher so drilling into a weekend from a History/Circuit card doesn't stack
+ a second topbar. Opened standalone (direct link) the class is absent and chrome shows.
+ Mirrors how app-shell.js adopts the circuits lens. */
+html.shell-embedded #topbar,
+html.shell-embedded .topbar{display:none!important}
+html.shell-embedded .mast{padding-top:16px}
 
 /* drill-through nav: prev / round-select / next */
 .wknav{display:flex;align-items:center;gap:10px;margin-top:20px}
@@ -103,6 +112,6 @@ footer{margin-top:42px;padding-top:16px;border-top:1px solid var(--line-soft);di
 footer .num{font-family:'JetBrains Mono',monospace;color:var(--txt-mid)}
 
 @media(prefers-reduced-motion:no-preference){
-  .reveal{opacity:0;transform:translateY(10px);animation:rise .6s var(--ease) forwards;animation-delay:calc(var(--i,0)*55ms)}
-  @keyframes rise{to{opacity:1;transform:none}}
+ .reveal{opacity:0;transform:translateY(10px);animation:rise .6s var(--ease) forwards;animation-delay:calc(var(--i,0)*55ms)}
+ @keyframes rise{to{opacity:1;transform:none}}
 }
