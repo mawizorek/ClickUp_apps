@@ -1,0 +1,349 @@
+<!-- REFERENCE BUILD, NOT the live app. Full working Weekend Story mode (Results/Story toggle)
+     in weekend.html's hue-268 tokens + chrome. Splice FROM this into weekend.html once the
+     source/weekend/ chunk set exists. See story-mode-handoff.md. Do not link this from the shell. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Race Weekend · Story Mode — Silverstone 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;450;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:oklch(0.16 0.012 268);--s1:oklch(0.195 0.014 268);--s2:oklch(0.225 0.015 268);--s3:oklch(0.265 0.016 268);
+    --line:oklch(0.30 0.014 268);--line-soft:oklch(0.25 0.013 268);
+    --txt:oklch(0.95 0.006 268);--txt-mid:oklch(0.74 0.011 268);--txt-dim:oklch(0.56 0.013 268);
+    --red:oklch(0.64 0.21 26);--gold:oklch(0.84 0.135 88);--silver:oklch(0.82 0.012 268);--bronze:oklch(0.70 0.10 58);
+    --green:oklch(0.72 0.15 158);--purple:oklch(0.72 0.16 300);--amber:oklch(0.80 0.14 78);
+    --t-mercedes:oklch(0.75 0.10 178);--t-ferrari:oklch(0.60 0.21 27);--t-mclaren:oklch(0.74 0.17 56);
+    --t-redbull:oklch(0.56 0.15 268);--t-racingbulls:oklch(0.62 0.13 256);--t-alpine:oklch(0.70 0.14 344);
+    --t-astonmartin:oklch(0.62 0.12 168);--t-williams:oklch(0.68 0.14 246);--t-haas:oklch(0.74 0.02 262);
+    --t-audi:oklch(0.60 0.17 20);--t-cadillac:oklch(0.74 0.09 92);--ease:cubic-bezier(0.16,1,0.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--bg);-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;font-weight:450;line-height:1.55;letter-spacing:0.006em;-webkit-font-smoothing:antialiased;font-optical-sizing:auto;padding:0 14px 20px;max-width:1120px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+  h1,h2,h3{text-wrap:balance;font-family:'Chakra Petch',sans-serif}
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  button{font-family:inherit;cursor:pointer}
+  .topbar{display:flex;align-items:center;gap:12px;padding:16px 2px 0;flex-wrap:wrap;flex:none}
+  .brand{display:flex;align-items:center;gap:9px;background:none;border:0;cursor:pointer;padding:0;color:inherit}
+  .brand .mk{width:30px;height:30px;border-radius:8px;background:var(--red);display:grid;place-items:center;box-shadow:0 0 22px oklch(0.64 0.21 26/0.4)}
+  .brand .mk svg{width:18px;height:18px;fill:oklch(0.16 0.01 268)}
+  .brand .t{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.94rem;line-height:1;text-align:left}
+  .brand .t small{display:block;font-family:'JetBrains Mono',monospace;font-weight:500;font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--txt-dim);margin-top:4px}
+  .lens{display:inline-flex;border:1px solid var(--line);background:var(--s1);margin-left:auto}
+  .lens a,.lens span{font-family:'Chakra Petch',sans-serif;font-size:0.68rem;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:var(--txt-mid);padding:8px 12px;text-decoration:none;transition:color .15s var(--ease),background .15s var(--ease)}
+  .lens a+a,.lens a+span,.lens span+a{border-left:1px solid var(--line)}
+  .lens .on{background:var(--s3);color:var(--txt)}
+  .lens a:hover{color:var(--txt);background:var(--s2)}
+  .mast{padding:22px 2px 0;flex:none}
+  .eyebrow{display:flex;align-items:center;gap:9px;font-family:'Chakra Petch',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--txt-dim);margin-bottom:11px}
+  .eyebrow::before{content:"";width:22px;height:2px;background:var(--red)}
+  .mast-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .hgp{font-size:clamp(1.9rem,6vw,2.6rem);font-weight:700;line-height:0.98;letter-spacing:-0.01em}
+  .hgp b{color:var(--red)}
+  .hsub{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;color:var(--txt-mid);font-size:0.82rem}
+  .hsub .rnd{font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:0.06em;color:var(--txt);background:var(--s2);border:1px solid var(--line);padding:3px 9px;font-size:0.72rem}
+  .hsub .dot{width:3px;height:3px;border-radius:50%;background:var(--txt-dim)}
+  .mode{display:inline-flex;border:1px solid var(--line);background:var(--s1);flex:none}
+  .mode button{font-family:'Chakra Petch',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--txt-mid);background:transparent;border:0;cursor:pointer;padding:9px 16px;display:inline-flex;align-items:center;gap:7px;transition:color .15s var(--ease),background .15s var(--ease)}
+  .mode button+button{border-left:1px solid var(--line)}
+  .mode button[aria-selected="true"]{background:var(--s3);color:var(--txt)}
+  .mode button:hover:not([aria-selected="true"]){color:var(--txt)}
+  .mode button::before{content:"";width:7px;height:7px;flex:none}
+  .mode button[data-mode="results"]::before{background:var(--txt-dim)}
+  .mode button[aria-selected="true"][data-mode="results"]::before{background:var(--green)}
+  .mode button[data-mode="story"]::before{background:var(--txt-dim);border-radius:50%}
+  .mode button[aria-selected="true"][data-mode="story"]::before{background:var(--red);border-radius:50%}
+  #results{margin-top:22px}
+  #results.hidden,#story.hidden{display:none}
+  .strip{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);background:var(--s1)}
+  .strip .cell{padding:13px 14px;min-width:0}
+  .strip .cell+.cell{border-left:1px solid var(--line)}
+  .strip .k{font-size:0.54rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-bottom:6px}
+  .strip .v{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.98rem;line-height:1.1}
+  .strip .sub{margin-top:3px;font-size:0.62rem;color:var(--txt-dim)}
+  .strip .win .v{color:var(--gold)}
+  .rt-note{margin-top:14px;border:1px solid var(--line);background:var(--s1);padding:16px 16px;color:var(--txt-mid);font-size:0.84rem;line-height:1.6}
+  .rt-note b{color:var(--txt)}
+  #story{margin-top:18px;flex:1;min-height:0;display:flex;flex-direction:column}
+  .transport{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--line);background:var(--s1);padding:9px 12px;margin-bottom:11px;flex:none}
+  .play{width:36px;height:36px;flex:none;border:1px solid var(--line);background:var(--s2);color:var(--txt);display:grid;place-items:center;transition:background .15s,border-color .15s}
+  .play:hover{background:var(--s3);border-color:var(--red)}
+  .play svg{width:15px;height:15px;fill:currentColor}
+  .lapread{flex:none;min-width:116px}
+  .lapread .big{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:800;line-height:1}
+  .lapread .big b{color:var(--red)}.lapread .big span{color:var(--txt-dim);font-weight:500}
+  .lapread .ph{font-family:'Chakra Petch',sans-serif;font-size:0.55rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);margin-top:4px}
+  .lapread .ph b{color:var(--txt-mid);font-weight:600}
+  .scrub{flex:1;min-width:190px;display:flex;flex-direction:column;gap:5px}
+  .scrub-flags{position:relative;height:11px}
+  .scrub-flags .tick{position:absolute;top:6px;width:1px;height:4px;background:var(--line-soft);transform:translateX(-50%)}
+  .scrub-flags span.mk{position:absolute;top:0;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:0.53rem;color:var(--txt-dim);white-space:nowrap}
+  .scrub-flags span.mk::before{content:"";display:block;width:1px;height:5px;margin:0 auto 2px;background:var(--line)}
+  .scrub-flags span.mk.sc::before{background:var(--amber)}.scrub-flags span.mk.gr::before{background:var(--green)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--s3);border:1px solid var(--line);cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--red);border:2px solid var(--bg);cursor:grab}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--red);border:2px solid var(--bg);border-radius:0;cursor:grab}
+  .seg{display:inline-flex;border:1px solid var(--line);background:var(--s1);flex:none}
+  .seg button{font-family:'Chakra Petch',sans-serif;font-size:0.62rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--txt-mid);background:transparent;border:0;cursor:pointer;padding:7px 11px;transition:color .15s var(--ease),background .15s var(--ease)}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button[aria-selected="true"]{background:var(--s3);color:var(--txt)}
+  .seg button:hover:not([aria-selected="true"]){color:var(--txt)}
+  .seg-lbl{font-family:'Chakra Petch',sans-serif;font-size:0.5rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-right:-6px}
+  .st-main{flex:1;min-height:0;display:grid;grid-template-columns:400px 1fr;gap:11px}
+  .tower{border:1px solid var(--line);background:var(--s1);display:flex;flex-direction:column;min-height:0}
+  .tower-head,.row{display:grid;grid-template-columns:24px 44px 26px 40px 56px 52px;gap:6px;align-items:center}
+  .tower-head{padding:9px 11px;background:var(--s2);border-bottom:1px solid var(--line);font-family:'Chakra Petch',sans-serif;font-size:0.51rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
+  .tower-head span:nth-child(5),.tower-head span:nth-child(6){text-align:right}
+  .tower-body{flex:1;overflow-y:auto}
+  .tower-body::-webkit-scrollbar{width:7px}.tower-body::-webkit-scrollbar-thumb{background:var(--s3)}
+  .row{padding:7px 11px;border-bottom:1px solid var(--line-soft);cursor:pointer;position:relative;transition:background .12s}
+  .row:last-child{border-bottom:0}.row:hover,.row.sel{background:var(--s2)}
+  .row.sel{box-shadow:inset 3px 0 0 var(--red)}
+  .row .pos{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.82rem;text-align:center;color:var(--txt-mid)}
+  .row.p1 .pos{color:var(--gold)}.row.p2 .pos{color:var(--silver)}.row.p3 .pos{color:var(--bronze)}
+  .row .drv{display:flex;align-items:center;gap:7px}
+  .row .drv .bar{width:4px;height:20px;flex:none;background:var(--tm)}
+  .row .drv .code{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.8rem}
+  .drs{font-family:'JetBrains Mono',monospace;font-size:0.5rem;font-weight:700;text-align:center;padding:3px 0;color:var(--txt-dim);background:var(--s3);border:1px solid var(--line)}
+  .drs.on{color:var(--bg);background:var(--green);border-color:var(--green)}
+  .tyre{display:flex;align-items:center;gap:4px}
+  .tyre .circ{width:20px;height:20px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:0.56rem;font-weight:800;border:2px solid}
+  .tyre .circ.S{color:var(--red);border-color:var(--red)}.tyre .circ.M{color:var(--amber);border-color:var(--amber)}.tyre .circ.H{color:var(--txt);border-color:var(--txt)}
+  .tyre .age{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--txt-dim)}
+  .gapint{text-align:right;line-height:1.15}
+  .gapint .gap{font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:700}.gapint .gap.leader{color:var(--gold)}
+  .gapint .int{font-family:'JetBrains Mono',monospace;font-size:0.57rem;color:var(--txt-dim)}
+  .lastlap{font-family:'JetBrains Mono',monospace;text-align:right;font-size:0.72rem;font-weight:500}
+  .lastlap.pb{color:var(--green)}.lastlap.best{color:var(--purple)}
+  .row.pit .drv .code::after{content:" PIT";color:var(--amber);font-size:0.53rem;font-weight:700}
+  .card{border:1px solid var(--line);background:var(--s1);display:flex;flex-direction:column;min-height:0}
+  .card-head{display:flex;align-items:center;gap:8px;padding:8px 11px;background:var(--s2);border-bottom:1px solid var(--line)}
+  .ctx{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .ctx .cbar{width:4px;height:22px;background:var(--tm)}
+  .ctx .cinfo{line-height:1.05}
+  .ctx .ccode{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.86rem}
+  .ctx .cteam{font-size:0.53rem;color:var(--txt-dim);letter-spacing:0.08em;text-transform:uppercase}
+  .ctx .cpos{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:1.18rem;margin-left:4px}
+  .panel{flex:1;min-height:0;display:none}.panel.on{display:flex;flex-direction:column}
+  #panelPos{padding:11px 13px 6px;position:relative}
+  .ghost-tg{position:absolute;top:11px;right:13px;z-index:2;display:flex;align-items:center;gap:7px;font-family:'Chakra Petch',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--txt-mid);cursor:pointer;user-select:none}
+  .ghost-tg .sw{width:26px;height:14px;background:var(--s3);border:1px solid var(--line);position:relative;transition:.2s}
+  .ghost-tg .sw::after{content:"";position:absolute;top:1px;left:1px;width:10px;height:10px;background:var(--txt-dim);transition:transform .2s var(--ease),background .2s}
+  .ghost-tg.on .sw{background:oklch(0.4 0.06 268)}.ghost-tg.on .sw::after{transform:translateX(12px);background:var(--txt)}
+  svg.ladder{width:100%;height:100%;display:block;overflow:visible}
+  .grid-line{stroke:var(--line-soft);stroke-width:1}
+  .lane-lbl{fill:var(--txt-dim);font-size:8px;font-family:'JetBrains Mono',monospace}
+  .lap-lbl{fill:var(--txt-dim);font-size:9px;font-family:'JetBrains Mono',monospace}
+  .drv-line{fill:none;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round;transition:opacity .2s}
+  .drv-line.ghost{stroke-dasharray:2 4;stroke-width:1.4;opacity:.55}
+  .scrub-line{stroke:var(--red);stroke-width:1.3;stroke-dasharray:3 3;opacity:.85}
+  .node-code{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:10px}
+  .dimmed{opacity:.1 !important}
+  #panelGrid{min-height:0}
+  .gfocus{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--s2)}
+  .gf-id{display:flex;align-items:center;gap:9px}
+  .gf-id .bar{width:5px;height:36px;background:var(--tm)}
+  .gf-id .code{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.32rem;line-height:1}
+  .gf-id .team{font-size:0.55rem;color:var(--txt-dim);letter-spacing:0.09em;text-transform:uppercase;margin-top:3px}
+  .gf-id .pos{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:1.55rem;margin-left:4px}
+  .gf-wheel{display:flex;flex-direction:column;gap:8px}
+  .shiftlights{display:flex;gap:3px}
+  .shiftlights .sl{flex:1;height:6px;background:var(--s3);transition:background .06s linear}
+  .shiftlights .sl.g{background:var(--green)}.shiftlights .sl.y{background:var(--amber)}.shiftlights .sl.r{background:var(--red)}
+  .gf-core{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .gf-core .gear{font-family:'JetBrains Mono',monospace;font-size:2.3rem;font-weight:800;line-height:.8}
+  .gf-core .sp{display:flex;align-items:baseline;gap:5px}
+  .gf-core .sp .kph{font-family:'JetBrains Mono',monospace;font-size:1.65rem;font-weight:800}.gf-core .sp i{font-size:0.6rem;color:var(--txt-dim);font-style:normal;letter-spacing:0.08em}
+  .gf-set{display:flex;gap:12px;font-family:'Chakra Petch',sans-serif;font-size:0.56rem;color:var(--txt-dim);letter-spacing:0.06em;text-transform:uppercase;font-weight:600;flex-wrap:wrap}
+  .gf-set b{color:var(--txt);font-weight:700;font-family:'JetBrains Mono',monospace}
+  .gf-set b.drs.on{color:var(--green)}
+  .gstage{flex:1;min-height:0;display:grid;grid-template-columns:1fr 142px}
+  .formation{position:relative;overflow-y:auto;padding:11px 11px 18px}
+  .formation::-webkit-scrollbar{width:7px}.formation::-webkit-scrollbar-thumb{background:var(--s3)}
+  .grid-strip{position:absolute;top:0;bottom:0;left:0;width:3px;background:repeating-linear-gradient(var(--line) 0 6px,transparent 6px 12px);opacity:.7}
+  .track-area{position:relative}
+  .gcar{position:absolute;left:2px;top:0;width:calc(100% - 8px);height:29px;background:var(--s2);border:1px solid var(--line);box-shadow:inset 3px 0 0 var(--tm);padding:0 9px 0 12px;display:grid;grid-template-columns:16px 36px 1fr auto;gap:8px;align-items:center;cursor:grab;will-change:transform;transition:transform .5s var(--ease),background .12s,box-shadow .12s}
+  .gcar:hover{background:var(--s3)}
+  .gcar.sel{background:var(--s3);box-shadow:inset 3px 0 0 var(--tm),0 0 0 1px var(--red);z-index:3}
+  .gcar.pitting{opacity:.32}
+  .gc-pos{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.78rem;color:var(--txt-mid);text-align:center}
+  .gc-code{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.8rem}
+  .gc-mid{display:flex;align-items:center;gap:8px;min-width:0}
+  .gc-kph{font-family:'JetBrains Mono',monospace;font-size:0.8rem;font-weight:700}.gc-kph i{font-size:0.42rem;color:var(--txt-dim);font-style:normal;margin-left:1px}
+  .gc-gear{font-family:'JetBrains Mono',monospace;font-size:0.76rem;font-weight:700;color:var(--red)}
+  .gc-rpm{flex:1;min-width:16px;height:3px;background:var(--s3);overflow:hidden}
+  .gc-rpm i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--amber) 70%,var(--red))}
+  .gc-right{display:flex;align-items:center;gap:7px}
+  .gc-drs{width:6px;height:6px;border-radius:50%;background:var(--s3);flex:none}
+  .gc-drs.on{background:var(--green);box-shadow:0 0 5px var(--green)}
+  .gc-delta{font-family:'JetBrains Mono',monospace;font-size:0.57rem;color:var(--txt-dim);min-width:30px;text-align:right}
+  .pitlane{background:var(--bg);border-left:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:9px;overflow-y:auto}
+  .pit-title{font-family:'Chakra Petch',sans-serif;font-size:0.55rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;display:flex;align-items:center;gap:6px}
+  .pit-title::before{content:"";width:7px;height:7px;background:var(--amber);flex:none}
+  .pit-empty{font-size:0.63rem;color:var(--txt-dim);margin-top:4px;line-height:1.5;opacity:.7}
+  .pitcar{background:var(--s2);border:1px solid var(--line);box-shadow:inset 3px 0 0 var(--tm);padding:8px 10px;animation:pitin .45s var(--ease) both}
+  @keyframes pitin{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+  .pitcar .pc-top{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+  .pitcar .pc-code{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.84rem}
+  .pitcar .pc-pos{font-family:'JetBrains Mono',monospace;margin-left:auto;font-size:0.61rem;color:var(--txt-dim)}
+  .pitcar .pc-tyre{font-size:0.61rem;color:var(--txt-mid);font-family:'JetBrains Mono',monospace}
+  .pitcar .pc-tyre .from{color:var(--txt-dim);text-decoration:line-through}
+  .pitcar .pc-timer{font-family:'JetBrains Mono',monospace;font-size:0.57rem;color:var(--amber);letter-spacing:0.04em;margin-top:4px}
+  #panelRadio{min-height:0}
+  .feed{flex:1;overflow-y:auto;padding:12px 13px 18px;display:flex;flex-direction:column;gap:11px;scroll-behavior:smooth}
+  .feed::-webkit-scrollbar{width:7px}.feed::-webkit-scrollbar-thumb{background:var(--s3)}
+  .msg{display:flex;gap:9px;animation:pop .3s var(--ease) both;max-width:88%}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .msg .av{width:28px;height:28px;flex:none;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.55rem;color:var(--bg);background:var(--tm)}
+  .msg .who{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.76rem}
+  .msg .role{font-size:0.53rem;color:var(--txt-dim);letter-spacing:0.07em;text-transform:uppercase}
+  .msg .lap{font-family:'JetBrains Mono',monospace;margin-left:auto;font-size:0.57rem;color:var(--txt-dim)}
+  .msg .meta{display:flex;align-items:baseline;gap:7px;margin-bottom:3px}
+  .msg .bubble{background:var(--s2);border:1px solid var(--line-soft);padding:7px 11px;font-size:0.82rem;line-height:1.45}
+  .msg.crowd .bubble{background:color-mix(in oklch,var(--amber) 12%,var(--s1));border-color:color-mix(in oklch,var(--amber) 40%,var(--line))}
+  .msg.pit .bubble{border-color:color-mix(in oklch,var(--purple) 40%,var(--line))}
+  .sysmsg{align-self:center;text-align:center;padding:5px 13px;font-family:'Chakra Petch',sans-serif;font-size:0.61rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;background:var(--s2);border:1px solid var(--line);color:var(--txt-mid);animation:pop .3s var(--ease) both}
+  .sysmsg.sc{background:color-mix(in oklch,var(--amber) 16%,var(--s1));border-color:color-mix(in oklch,var(--amber) 45%,var(--line));color:var(--amber)}
+  .sysmsg.gr{background:color-mix(in oklch,var(--green) 14%,var(--s1));border-color:color-mix(in oklch,var(--green) 45%,var(--line));color:var(--green)}
+  .sysmsg.flag{background:var(--s3);border-color:var(--line);color:var(--txt)}
+  .empty{margin:auto;text-align:center;color:var(--txt-dim);font-size:0.76rem;max-width:220px;line-height:1.5}
+  footer{margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;font-size:0.62rem;color:var(--txt-dim);letter-spacing:0.03em;flex:none;flex-wrap:wrap;gap:8px}
+  footer .num{font-family:'JetBrains Mono',monospace;color:var(--txt-mid)}
+  @media(max-width:1080px){.st-main{grid-template-columns:1fr}body{height:auto}.tower{max-height:40vh}#story{min-height:auto}}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="brand"><span class="mk"><svg viewBox="0 0 24 24"><path d="M3 17l6-10 4 6 3-4 5 8z"/></svg></span><span class="t">F1 2026 Race Weekend<small>Silverstone · Round 12</small></span></button>
+    <nav class="lens"><a href="#">Matrix</a><a href="#">History</a><span class="on">Weekend</span><a href="#">Circuits</a></nav>
+  </div>
+  <div class="mast">
+    <div class="eyebrow">British Grand Prix</div>
+    <div class="mast-row">
+      <div>
+        <div class="hgp">Silverstone <b>2026</b></div>
+        <div class="hsub"><span class="rnd">Round 12</span><span class="dot"></span><span class="track">Silverstone Circuit</span><span class="dot"></span><span>13 Jul 2026 · 24 laps</span></div>
+      </div>
+      <div class="mode" id="mode" role="tablist">
+        <button data-mode="results" role="tab" aria-selected="false">Results</button>
+        <button data-mode="story" role="tab" aria-selected="true">Story</button>
+      </div>
+    </div>
+  </div>
+  <section id="results" class="hidden">
+    <div class="strip">
+      <div class="cell win"><div class="k">Winner</div><div class="v">Lando Norris</div><div class="sub">McLaren · from P1</div></div>
+      <div class="cell"><div class="k">Pole</div><div class="v">Lando Norris</div><div class="sub">1:24.892</div></div>
+      <div class="cell"><div class="k">Fastest Lap</div><div class="v">Verstappen</div><div class="sub">1:27.201 · L21</div></div>
+    </div>
+    <div class="rt-note">In the live app THIS block is the existing weekend.html race-detail render (podium, grid, qualifying tiers, sprint, classification, championship swing) — left untouched. Story mode is the same round brought to life; toggle up top to switch.</div>
+  </section>
+  <section id="story">
+    <div class="transport">
+      <button class="play" id="play"><svg id="playicon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <div class="lapread"><div class="big mono">L<b id="lapNum">1</b><span>/24</span></div><div class="ph" id="phase">Lights out · <b id="sector">S1</b></div></div>
+      <div class="scrub"><div class="scrub-flags" id="scrubFlags"></div><input type="range" id="scrubber" min="1" max="24" value="1" step="0.02"></div>
+      <span class="seg-lbl">Scrub</span>
+      <div class="seg" id="lodsel"><button data-lod="lap">Lap</button><button data-lod="sector" aria-selected="true">Sector</button><button data-lod="sec">Sec</button></div>
+      <div class="seg" id="speeds"><button data-s="2000">1×</button><button data-s="1000" aria-selected="true">2×</button><button data-s="480">4×</button></div>
+    </div>
+    <div class="st-main">
+      <section class="tower">
+        <div class="tower-head"><span>P</span><span>Driver</span><span>DRS</span><span>Tyre</span><span>Gap</span><span>Last</span></div>
+        <div class="tower-body" id="towerBody"></div>
+      </section>
+      <section class="card">
+        <div class="card-head">
+          <div class="seg" id="tabs"><button data-tab="pos" aria-selected="true">Positions</button><button data-tab="grid">Grid</button><button data-tab="radio">Radio <span class="mono" id="radioBadge" style="opacity:.6"></span></button></div>
+          <div class="ctx"><span class="cbar" id="ctxBar"></span><div class="cinfo"><div class="ccode" id="ctxCode">NOR</div><div class="cteam" id="ctxTeam">McLaren</div></div><span class="cpos mono" id="ctxPos">P1</span></div>
+        </div>
+        <div class="panel on" id="panelPos"><label class="ghost-tg" id="ghostTg"><span class="sw"></span> 2025 ghost</label><svg class="ladder" id="ladder" preserveAspectRatio="none"></svg></div>
+        <div class="panel" id="panelGrid">
+          <div class="gfocus">
+            <div class="gf-id"><span class="bar" id="fBar"></span><div><div class="code" id="fCode">NOR</div><div class="team" id="fTeam">McLaren</div></div><span class="pos mono" id="fPos">P1</span></div>
+            <div class="gf-wheel"><div class="shiftlights" id="shift"></div><div class="gf-core"><span class="gear mono" id="fGear">1</span><div class="sp"><span class="kph mono" id="fKph">0</span><i>KM/H</i></div><div class="gf-set"><span>ENG <b id="fEng">4</b></span><span>BBAL <b id="fBB">57%</b></span><span>DIFF <b id="fDiff">MID</b></span><span>DRS <b class="drs" id="fDrs">OFF</b></span></div></div></div>
+          </div>
+          <div class="gstage"><div class="formation"><div class="grid-strip"></div><div class="track-area" id="trackArea"></div></div><aside class="pitlane"><div class="pit-title">Pit Lane</div><div id="pitBody"></div></aside></div>
+        </div>
+        <div class="panel" id="panelRadio"><div class="feed" id="feed"><div class="empty">Play or scrub the timeline. Radio drops in as the story unfolds.</div></div></div>
+      </section>
+    </div>
+  </section>
+  <footer>
+    <span>Story + Results derive from the same <span class="num">f1-results/2026/</span> round file</span>
+    <span class="num">RACE WEEKEND · story mode reference</span>
+  </footer>
+<script>
+const TEAMS={MCL:['var(--t-mclaren)','oklch(0.82 0.13 60)'],FER:['var(--t-ferrari)','oklch(0.70 0.17 20)'],RBR:['var(--t-redbull)','oklch(0.68 0.11 268)'],MER:['var(--t-mercedes)','oklch(0.86 0.09 178)'],AST:['var(--t-astonmartin)','oklch(0.70 0.10 168)'],ALP:['var(--t-alpine)','oklch(0.80 0.10 344)'],WIL:['var(--t-williams)','oklch(0.78 0.11 246)'],RB:['var(--t-racingbulls)','oklch(0.74 0.10 256)'],HAA:['var(--t-haas)','oklch(0.86 0.02 262)'],SAU:['var(--t-audi)','oklch(0.72 0.14 20)'],CAD:['var(--t-cadillac)','oklch(0.85 0.08 92)']};
+const TEAMNAME={MCL:'McLaren',FER:'Ferrari',RBR:'Red Bull',MER:'Mercedes',AST:'Aston Martin',ALP:'Alpine',WIL:'Williams',RB:'Racing Bulls',HAA:'Haas',SAU:'Audi',CAD:'Cadillac'};
+const DRIVERS={NOR:{name:'Norris',team:'MCL',i:0},PIA:{name:'Piastri',team:'MCL',i:1},LEC:{name:'Leclerc',team:'FER',i:0},HAM:{name:'Hamilton',team:'FER',i:1},VER:{name:'Verstappen',team:'RBR',i:0},TSU:{name:'Tsunoda',team:'RBR',i:1},RUS:{name:'Russell',team:'MER',i:0},ANT:{name:'Antonelli',team:'MER',i:1},ALO:{name:'Alonso',team:'AST',i:0},STR:{name:'Stroll',team:'AST',i:1},GAS:{name:'Gasly',team:'ALP',i:0},COL:{name:'Colapinto',team:'ALP',i:1},SAI:{name:'Sainz',team:'WIL',i:0},ALB:{name:'Albon',team:'WIL',i:1},HAD:{name:'Hadjar',team:'RB',i:0},LAW:{name:'Lawson',team:'RB',i:1},OCO:{name:'Ocon',team:'HAA',i:0},BEA:{name:'Bearman',team:'HAA',i:1},HUL:{name:'Hulkenberg',team:'SAU',i:0},BOR:{name:'Bortoleto',team:'SAU',i:1},PER:{name:'Perez',team:'CAD',i:0},BOT:{name:'Bottas',team:'CAD',i:1}};
+const colorOf=c=>TEAMS[DRIVERS[c].team][DRIVERS[c].i];const teamOf=c=>TEAMNAME[DRIVERS[c].team];
+const START=['NOR','VER','PIA','LEC','HAM','RUS','ANT','ALO','SAI','GAS','ALB','LAW','HAD','TSU','STR','OCO','BEA','HUL','BOR','COL','PER','BOT'];
+const FINISH={NOR:1,HAM:2,PIA:3,VER:4,LEC:5,RUS:6,ANT:7,SAI:8,ALO:9,ALB:10,GAS:11,LAW:12,HAD:13,TSU:14,OCO:15,STR:16,BEA:17,HUL:18,BOR:19,PER:20,COL:21,BOT:22};
+const startPos={};START.forEach((c,i)=>startPos[c]=i+1);
+const pitStops={VER:13,SAI:16,OCO:9,HUL:11,STR:14,COL:8,BOT:10,GAS:17,TSU:12};
+const TOTAL=24,NDRV=22;const GHOST=[4,4,4,3,3,3,2,2,2,2,2,3,4,4,4,3,3,2,2,2,1,1,1,1];
+function seeded(str){let s=0;for(const c of str)s=(s*31+c.charCodeAt(0))>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+const isSC=l=>l>=12&&l<=14;
+function rankVal(code,lap){const t=(lap-1)/(TOTAL-1),e=t*t*(3-2*t);let v=startPos[code]*(1-e)+FINISH[code]*e;v+=(seeded(code+'~'+lap)()-0.5)*0.8;const pl=pitStops[code];if(pl){if(lap===pl)v+=30;else if(lap===pl+1)v+=5;else if(lap===pl+2)v+=1.5;}return v;}
+const ORDER=[];for(let lap=1;lap<=TOTAL;lap++){if(lap===1){ORDER.push([...START]);continue;}ORDER.push([...START].sort((a,b)=>rankVal(a,lap)-rankVal(b,lap)));}
+const COMP=['SOFT','MED','HARD'];const startComp={},pitComp={};START.forEach((c,i)=>{startComp[c]=COMP[i%3];pitComp[c]=COMP[(i+1)%3];});startComp.NOR='SOFT';startComp.PIA='SOFT';startComp.VER='HARD';pitComp.VER='SOFT';
+function tyreOf(code,lap){const pl=pitStops[code];if(pl&&lap>=pl)return{comp:pitComp[code],age:lap-pl+1};return{comp:startComp[code],age:lap};}
+function fmtLap(ms){const m=Math.floor(ms/60000),s=(ms%60000)/1000;return m+':'+s.toFixed(1).padStart(4,'0');}
+const DATA={};let bestByCode={},overallBest=Infinity;
+for(let lap=1;lap<=TOTAL;lap++){DATA[lap]={};const ord=ORDER[lap-1];let cum=0;ord.forEach((code,i)=>{const rnd=seeded(code+'-'+lap);let intv;if(i===0)intv=0;else if(isSC(lap))intv=0.3+rnd()*0.5;else intv=0.6+i*0.08+rnd()*0.8;cum+=intv;const base=87500+i*90+rnd()*500+(isSC(lap)?36000:0);const lastMs=Math.round(base);if(!isSC(lap)){if(!bestByCode[code]||lastMs<bestByCode[code])bestByCode[code]=lastMs;if(lastMs<overallBest)overallBest=lastMs;}const drs=(i>0&&intv<1.0&&lap>=3&&!isSC(lap)&&rnd()<0.7);const ty=tyreOf(code,lap);DATA[lap][code]={pos:i+1,gap:cum,intv,lastMs,drs,comp:ty.comp,age:ty.age};});}
+for(let lap=1;lap<=TOTAL;lap++)for(const code in DATA[lap]){const d=DATA[lap][code];d.isBest=(!isSC(lap)&&d.lastMs===overallBest);d.isPB=(!isSC(lap)&&d.lastMs===bestByCode[code]&&!d.isBest);}
+const SETTINGS={};START.forEach(c=>{const r=seeded('set'+c);SETTINGS[c]={eng:1+Math.floor(r()*9),bb:52+Math.floor(r()*11),diff:['LOW','MID','HIGH'][Math.floor(r()*3)]};});
+const PHASE={};START.forEach(c=>{PHASE[c]=(([...c].reduce((a,ch)=>a+ch.charCodeAt(0),0))%100)/100;});
+const RADIO=[{lap:1,who:'NOR',role:'driver',text:"Good launch. Head down now."},{lap:3,who:'PIA',role:'driver',text:"Yes! Sent it into Stowe, got Max. Feeling strong."},{lap:3,who:'VER',role:'driver',text:"No grip. No grip on these hards, I'm telling you."},{lap:5,who:'ENG-RB',role:'engineer',text:"Copy Max. We go long on this set, it'll come to us."},{lap:6,who:'HAM',role:'driver',crowd:true,text:"GET IN THERE!! P4 at home. Listen to that crowd!!"},{lap:6,who:'ENG-FER',role:'pitwall',text:"Charles, Lewis is through. Reset, build your own race."},{lap:8,who:'ALB',role:'driver',text:"Williams feels mega today. Keep me updated on Sainz."},{lap:10,who:'SAI',role:'driver',text:"Told you the pace was there. Pushing now."},{lap:12,sys:true,kind:'sc',text:"Safety Car — Gasly ran wide at Club"},{lap:13,who:'VER',role:'driver',pit:true,text:"Box now? ...okay but we're throwing this away."},{lap:13,who:'ENG-RB',role:'engineer',pit:true,text:"Trust us Max. Softs on, free stop under the SC."},{lap:15,sys:true,kind:'gr',text:"Green Flag — racing resumes"},{lap:15,who:'ENG-MCL',role:'engineer',text:"Full send on the restart Lando. Oscar's your only friend behind."},{lap:17,who:'VER',role:'driver',text:"Okay. NOW the car's alive. Give me the gaps ahead."},{lap:19,who:'RUS',role:'driver',text:"Verstappen's all over me, totally different tyre."},{lap:19,who:'ENG-MER',role:'pitwall',text:"Copy George. Hold him where you can."},{lap:21,who:'VER',role:'driver',text:"P4. Where's the podium? Delta to Piastri, now."},{lap:22,who:'HAM',role:'driver',crowd:true,text:"P2!!! AT SILVERSTONE!! LET'S GOOO!!"},{lap:22,who:'PIA',role:'driver',text:"Nothing left, flat-spotted the fronts. Bring it home."},{lap:24,sys:true,kind:'flag',text:"Chequered Flag — Norris wins"},{lap:24,who:'NOR',role:'driver',crowd:true,text:"YES! YES! What a car, what a day. Thank you boys."}];
+const ROLE_LABEL={driver:'Driver',engineer:'Race Eng.',pitwall:'Pit Wall'};
+let T=1,selected='NOR',playing=false,stepMs=1000,ghostOn=false,raf=null,tab='pos',lastLap=0,lod='sector',lastPitSig='__init__',mode='story';
+const LOD_STEP={lap:1,sector:1/3,sec:0.02};const $=s=>document.querySelector(s);const compChar=c=>c[0];
+const curLap=()=>Math.min(TOTAL,Math.max(1,Math.round(T)));const frac=()=>T-Math.floor(T);const posOf=(c,l)=>DATA[l][c].pos;
+function contPos(c){const lo=Math.floor(T),hi=Math.min(TOTAL,Math.ceil(T));if(lo===hi)return posOf(c,lo);const f=T-lo;return posOf(c,lo)*(1-f)+posOf(c,hi)*f;}
+function renderTower(){const lap=curLap();const ord=ORDER[lap-1];$('#towerBody').innerHTML=ord.map(code=>{const d=DATA[lap][code];const col=colorOf(code);const gap=d.pos===1?'<span class="gap leader">LEADER</span>':'<span class="gap mono">+'+d.gap.toFixed(1)+'</span>';const intv=d.pos===1?'':'<span class="int mono">+'+d.intv.toFixed(1)+'</span>';const lc=d.isBest?'best':(d.isPB?'pb':'');const isPit=pitStops[code]===lap;const pc=d.pos<=3?' p'+d.pos:'';return `<div class="row${pc} ${selected===code?'sel':''} ${isPit?'pit':''}" data-code="${code}" style="--tm:${col}"><span class="pos mono">${d.pos}</span><span class="drv"><span class="bar"></span><span class="code">${code}</span></span><span class="drs ${d.drs?'on':''}">DRS</span><span class="tyre"><span class="circ ${compChar(d.comp)}">${compChar(d.comp)}</span><span class="age">${d.age}</span></span><span class="gapint">${gap}${intv}</span><span class="lastlap ${lc}">${isSC(lap)?'—':fmtLap(d.lastMs)}</span></div>`;}).join('');$('#towerBody').querySelectorAll('.row').forEach(r=>r.addEventListener('click',()=>selectDriver(r.dataset.code)));}
+const ladder=$('#ladder');let LB={pl:28,pr:42,pt:12,pb:18,w:0,h:0};
+function lay(){const r=ladder.getBoundingClientRect();LB.w=r.width;LB.h=r.height;}
+const xAt=l=>LB.pl+(l-1)/(TOTAL-1)*(LB.w-LB.pl-LB.pr);const yAt=p=>LB.pt+(p-1)/(NDRV-1)*(LB.h-LB.pt-LB.pb);
+function stepPath(fn){let d='';for(let l=1;l<=TOTAL;l++){const x=xAt(l),y=yAt(fn(l));if(l===1)d=`M ${x.toFixed(1)} ${y.toFixed(1)}`;else{const mx=(xAt(l-1)+x)/2;d+=` L ${mx.toFixed(1)} ${yAt(fn(l-1)).toFixed(1)} L ${mx.toFixed(1)} ${y.toFixed(1)} L ${x.toFixed(1)} ${y.toFixed(1)}`;}}return d;}
+function renderLadderBase(){if(mode!=='story'||tab!=='pos')return;lay();if(LB.w<20){requestAnimationFrame(renderLadderBase);return;}let s='';for(let p=1;p<=NDRV;p++){const y=yAt(p);s+=`<line class="grid-line" x1="${LB.pl}" y1="${y}" x2="${LB.w-LB.pr}" y2="${y}"/><text class="lane-lbl" x="${LB.pl-6}" y="${y+3}" text-anchor="end">${p}</text>`;}for(let l=1;l<=TOTAL;l+=3){const x=xAt(l);s+=`<text class="lap-lbl" x="${x}" y="${LB.h-4}" text-anchor="middle">L${l}</text>`;}if(ghostOn)s+=`<path class="drv-line ghost" style="stroke:var(--txt-dim)" d="${stepPath(l=>GHOST[l-1])}"/>`;Object.keys(DRIVERS).forEach(c=>{const dim=selected&&selected!==c?' dimmed':'';const sw=selected===c?3:1.7;s+=`<path class="drv-line${dim}" style="stroke:${colorOf(c)};stroke-width:${sw}" d="${stepPath(l=>posOf(c,l))}"/>`;});s+=`<g id="ladDyn"></g>`;ladder.innerHTML=s;}
+function renderLadderDyn(){const g=$('#ladDyn');if(!g)return;let s=`<line class="scrub-line" x1="${xAt(T)}" y1="${LB.pt-4}" x2="${xAt(T)}" y2="${LB.h-LB.pb+3}"/>`;Object.keys(DRIVERS).forEach(c=>{const sel=selected===c;const dim=selected&&!sel?' dimmed':'';const x=xAt(T),y=yAt(contPos(c));s+=`<g class="${dim}"><circle cx="${x}" cy="${y}" r="${sel?4.5:2.8}" fill="${colorOf(c)}" stroke="var(--bg)" stroke-width="1.3"/>${sel?`<text class="node-code" x="${x+7}" y="${y+3.2}" fill="${colorOf(c)}">${c}</text>`:''}</g>`;});g.innerHTML=s;}
+const SPEED=[];(function(){const cor=[[0.06,.55],[0.16,.42],[0.27,.68],[0.36,.3],[0.46,.6],[0.58,.38],[0.7,.72],[0.8,.34],[0.9,.5]];for(let i=0;i<=120;i++){const t=i/120;let sp=1;cor.forEach(([p,d])=>{const w=0.035;sp=Math.min(sp,1-(1-d)*Math.exp(-((t-p)**2)/(2*w*w)));});SPEED.push(sp);}})();
+const paceOf=c=>{const h=[...c].reduce((a,ch)=>a+ch.charCodeAt(0),0);return 0.93+(h%10)/100;};
+function telemAt(code,prog){const idx=Math.min(SPEED.length-1,Math.floor(prog*(SPEED.length-1)));const base=SPEED[idx];const top=340*paceOf(code);const kph=Math.round(base*top);const nxt=SPEED[Math.min(SPEED.length-1,idx+1)];const slope=nxt-base;const thr=slope>=0?Math.min(100,60+slope*900+base*30):Math.max(0,base*40);const gear=Math.max(1,Math.round(base*7)+1);const rpm=8000+base*5000;return{base,kph,gear,rpm,thr};}
+const shiftSpans=[];(function(){const w=$('#shift');for(let i=0;i<15;i++){const sp=document.createElement('span');sp.className='sl';w.appendChild(sp);shiftSpans.push(sp);}})();
+const trackArea=$('#trackArea');let cardRefs={};let cardBuilt=false;const ROW=33;
+function buildCards(){trackArea.innerHTML='';cardRefs={};Object.keys(DRIVERS).forEach(code=>{const col=colorOf(code);const el=document.createElement('div');el.className='gcar';el.style.setProperty('--tm',col);el.dataset.code=code;el.innerHTML=`<span class="gc-pos mono"></span><span class="gc-code">${code}</span><div class="gc-mid"><span class="gc-kph mono">0<i>KM/H</i></span><span class="gc-gear mono">1</span><span class="gc-rpm"><i></i></span></div><div class="gc-right"><span class="gc-drs"></span><span class="gc-delta mono"></span></div>`;el.addEventListener('click',()=>selectDriver(code));trackArea.appendChild(el);cardRefs[code]={el,pos:el.querySelector('.gc-pos'),kph:el.querySelector('.gc-kph'),gear:el.querySelector('.gc-gear'),rpm:el.querySelector('.gc-rpm i'),drs:el.querySelector('.gc-drs'),delta:el.querySelector('.gc-delta')};});cardBuilt=true;trackArea.style.height=(NDRV*ROW)+'px';}
+function updateGrid(){if(mode!=='story'||tab!=='grid')return;if(!cardBuilt)buildCards();const lap=curLap();Object.keys(DRIVERS).forEach(code=>{const r=cardRefs[code];const cp=contPos(code);const y=(cp-1)*ROW;const x=(Math.round(cp)%2===0)?20:0;r.el.style.transform=`translate(${x}px,${y}px)`;const t=telemAt(code,(frac()+PHASE[code])%1);r.pos.textContent=Math.round(cp);r.kph.innerHTML=t.kph+'<i>KM/H</i>';r.gear.textContent=t.gear;r.rpm.style.width=Math.min(100,(t.rpm-8000)/5000*100).toFixed(0)+'%';const d=DATA[lap][code];const on=d.drs&&t.thr>70;r.drs.classList.toggle('on',on);r.delta.textContent=d.pos===1?'LEAD':'+'+d.intv.toFixed(1);r.el.classList.toggle('sel',selected===code);r.el.classList.toggle('pitting',pitStops[code]===lap);});renderPit(lap);updateFocus();}
+function renderPit(lap){const inPit=ORDER[lap-1].filter(c=>pitStops[c]===lap);const sig=lap+':'+inPit.join(',');if(sig===lastPitSig)return;lastPitSig=sig;$('#pitBody').innerHTML=inPit.length?inPit.map(code=>{const col=colorOf(code);const d=DATA[lap][code];return `<div class="pitcar" style="--tm:${col}"><div class="pc-top"><span class="pc-code">${code}</span><span class="pc-pos">P${d.pos}</span></div><div class="pc-tyre"><span class="from">${compChar(startComp[code])}</span> → ${compChar(pitComp[code])} fresh</div><div class="pc-timer">STATIONARY · 2.${3+(code.charCodeAt(0)%6)}s</div></div>`;}).join(''):'<div class="pit-empty">Pit lane clear. A stop card slides in when a driver boxes.</div>';}
+function updateFocus(){const code=selected;const t=telemAt(code,(frac()+PHASE[code])%1);$('#fKph').textContent=t.kph;$('#fGear').textContent=t.gear;const fr=Math.min(1,(t.rpm-8000)/5000);const n=Math.round(fr*15);shiftSpans.forEach((sp,i)=>sp.className='sl '+(i<n?(i<9?'g':i<13?'y':'r'):''));const on=DATA[curLap()][code].drs&&t.thr>70;$('#fDrs').textContent=on?'OPEN':'OFF';$('#fDrs').classList.toggle('on',on);}
+function refreshFocusId(){const code=selected;$('#fBar').style.background=colorOf(code);$('#fCode').textContent=code;$('#fTeam').textContent=teamOf(code);$('#fPos').textContent='P'+posOf(code,curLap());const s=SETTINGS[code];$('#fEng').textContent=s.eng;$('#fBB').textContent=s.bb+'%';$('#fDiff').textContent=s.diff;}
+function renderRadio(){const lap=curLap();const msgs=RADIO.filter(m=>m.lap<=lap);$('#radioBadge').textContent=msgs.length?msgs.length:'';const feed=$('#feed');if(!msgs.length){feed.innerHTML='<div class="empty">Play or scrub the timeline. Radio drops in as the story unfolds.</div>';return;}feed.innerHTML=msgs.map(m=>{if(m.sys)return `<div class="sysmsg ${m.kind}">${m.text}</div>`;const isDrv=m.role==='driver';const dc=isDrv?m.who:m.who.split('-')[1];const col=DRIVERS[dc]?colorOf(dc):'var(--txt-dim)';const who=isDrv?DRIVERS[m.who].name:(TEAMNAME[dc]||dc);const cls=m.crowd?'crowd':(m.pit?'pit':'');const av=isDrv?dc:dc.slice(0,3);return `<div class="msg ${cls}" style="--tm:${col}"><div class="av">${av}</div><div class="body"><div class="meta"><span class="who" style="color:${col}">${who}</span><span class="role">${ROLE_LABEL[m.role]||''}</span><span class="lap">Lap ${m.lap}</span></div><div class="bubble">${m.text}</div></div></div>`;}).join('');feed.scrollTop=feed.scrollHeight;}
+function updateCtx(){const col=colorOf(selected);$('#ctxBar').style.background=col;$('#ctxCode').textContent=selected;$('#ctxTeam').textContent=teamOf(selected);$('#ctxPos').textContent='P'+posOf(selected,curLap());$('.ctx').style.setProperty('--tm',col);}
+function phaseTxt(){const l=curLap();if(l===1&&frac()<0.15)return'Lights out';if(isSC(l))return'Safety Car';if(l===15)return'Restart';if(l>=22)return'Closing laps';if(l===TOTAL)return'Finish';return'Racing';}
+function syncLap(){renderTower();renderRadio();refreshFocusId();updateCtx();}
+function syncFrame(){$('#lapNum').textContent=curLap();const sN=Math.min(3,Math.floor(frac()*3)+1);$('#sector').textContent='S'+sN;$('#phase').firstChild.textContent=phaseTxt()+' · ';$('#scrubber').value=T;if(tab==='pos')renderLadderDyn();if(tab==='grid')updateGrid();}
+function fullSync(){const lap=curLap();if(lap!==lastLap){lastLap=lap;syncLap();}syncFrame();}
+function selectDriver(c){selected=c;renderTower();if(tab==='pos'){renderLadderBase();renderLadderDyn();}refreshFocusId();updateCtx();if(tab==='grid')updateGrid();}
+function loop(){if(!playing)return;T+=(1/60)*(1000/stepMs);if(T>=TOTAL){T=TOTAL;fullSync();pause();return;}fullSync();raf=requestAnimationFrame(loop);}
+function play(){if(T>=TOTAL){T=1;lastLap=0;fullSync();}playing=true;$('#playicon').innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';raf=requestAnimationFrame(loop);}
+function pause(){playing=false;$('#playicon').innerHTML='<path d="M8 5v14l11-7z"/>';cancelAnimationFrame(raf);}
+$('#play').addEventListener('click',()=>playing?pause():play());
+$('#scrubber').addEventListener('input',e=>{pause();let v=+e.target.value;const st=LOD_STEP[lod];if(lod!=='sec')v=Math.round((v-1)/st)*st+1;T=Math.min(TOTAL,Math.max(1,v));fullSync();});
+function segPick(box,fn){box.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;box.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected','false'));b.setAttribute('aria-selected','true');fn(b);});}
+segPick($('#speeds'),b=>{stepMs=+b.dataset.s;});
+segPick($('#lodsel'),b=>{lod=b.dataset.lod;$('#scrubber').step=lod==='sec'?0.02:LOD_STEP[lod];});
+$('#ghostTg').addEventListener('click',()=>{ghostOn=!ghostOn;$('#ghostTg').classList.toggle('on',ghostOn);if(tab==='pos'){renderLadderBase();renderLadderDyn();}});
+segPick($('#tabs'),b=>{tab=b.dataset.tab;document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));$('#panel'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('on');if(tab==='pos'){renderLadderBase();renderLadderDyn();}if(tab==='grid'){lastPitSig='__init__';updateGrid();}if(tab==='radio')renderRadio();});
+segPick($('#mode'),b=>{mode=b.dataset.mode;const st=mode==='story';$('#story').classList.toggle('hidden',!st);$('#results').classList.toggle('hidden',st);if(!st)pause();else{if(tab==='pos'){renderLadderBase();renderLadderDyn();}else if(tab==='grid')updateGrid();}});
+(function(){let h='';for(let l=1;l<=TOTAL;l++){h+=`<span class="tick" style="left:${(l-1)/(TOTAL-1)*100}%"></span>`;}[{l:12,c:'sc',t:'SC'},{l:15,c:'gr',t:'GRN'},{l:24,c:'',t:'🏁'}].forEach(m=>{h+=`<span class="mk ${m.c}" style="left:${(m.l-1)/(TOTAL-1)*100}%">${m.t}</span>`;});$('#scrubFlags').innerHTML=h;})();
+window.addEventListener('resize',()=>{if(mode==='story'&&tab==='pos'){renderLadderBase();renderLadderDyn();}});
+renderLadderBase();fullSync();
+</script>
+</body>
+</html>
