@@ -1,5 +1,5 @@
 /**
- * Inciardi Mini Print Market Tracker — Cloudflare Worker (v1.0)
+ * Inciardi Mini Print Market Tracker — Cloudflare Worker (v1.1)
  *
  * Relational backend over D1 (catalog / inventory / images / history) + R2 (image bytes),
  * plus the live eBay market feed. This is the API the terminal front-end reads.
@@ -9,6 +9,7 @@
  *   GET /catalog                master print universe from D1, each print + its images
  *   GET /inventory              owned copies (D1), joined to catalog + primary image
  *   GET /history?print_id=       per-print trend points + gone events
+ *   GET /usage                  R2 storage used vs cap (for the storage meter)
  *   GET /img?key=<r2key>&w=      serve a stored image from R2 (primary path)
  *   GET /img?u=<cdn-url>&w=      allowlisted CDN passthrough (transient preview / pre-store)
  *
@@ -20,6 +21,9 @@
  *   POST /inventory             { op: upsert | delete } one physical owned copy
  *
  * scheduled() cron: banks market_point + print_point + gone_event into D1 each run.
+ *
+ * STORAGE CAP: R2 has no native write-blocking quota. We enforce our own: every image
+ * write checks total stored bytes (tracked in D1) and refuses to cross STORAGE_CAP_BYTES.
  *
  * Bindings: KV 'SNAPSHOTS', D1 'DB', R2 'IMAGES'.
  * Secrets:  EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY.
@@ -36,6 +40,11 @@ const PACK_TOKENS = ["pack", "set", "lot", "bundle"];
 // GET /img may only fetch/store from these hosts (keeps it from being an open proxy).
 const IMG_HOST_ALLOW = ["cdn.shopify.com"];
 const IMG_CACHE_TTL = 604800; // 7 days at the edge
+
+// HARD R2 storage ceiling. R2's free tier is 10GB-month and egress is free, but there is
+// NO native quota that blocks writes, so we enforce our own well under Michael's 5GB line.
+// Archived images still occupy R2 (their blob is kept for restore); only delete frees space.
+const STORAGE_CAP_BYTES = 4.5 * 1024 * 1024 * 1024; // 4.5 GB
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -55,6 +64,7 @@ export default {
       if (p === "/catalog" && request.method === "GET") return json(await readCatalog(env, base));
       if (p === "/inventory" && request.method === "GET") return json(await readInventory(env, base));
       if (p === "/history" && request.method === "GET") return json(await readHistory(env, url));
+      if (p === "/usage" && request.method === "GET") return json(await readUsage(env));
 
       if (p === "/catalog" && request.method === "POST") { gate(request, env); return json(await upsertCatalog(env, await request.json())); }
       if (p === "/catalog/image" && request.method === "POST") { gate(request, env); return json(await uploadImage(env, await request.json())); }
@@ -85,6 +95,30 @@ function nowISO() { return new Date().toISOString(); }
 function norm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function slug(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || ("print-" + uuid().slice(0, 8)); }
 function extFor(ct) { return ct && ct.includes("png") ? "png" : ct && ct.includes("webp") ? "webp" : ct && ct.includes("gif") ? "gif" : "jpg"; }
+
+/* ================= storage cap (D1-tracked bytes vs R2 ceiling) ================= */
+async function storedBytes(env) {
+  const r = await env.DB.prepare("SELECT COALESCE(SUM(bytes),0) AS b FROM print_image WHERE r2_key IS NOT NULL").first();
+  return (r && r.b) || 0;
+}
+// Refuse a write that would cross the cap. Called before every env.IMAGES.put.
+async function assertRoom(env, incoming) {
+  const used = await storedBytes(env);
+  if (used + (incoming || 0) > STORAGE_CAP_BYTES) {
+    const gb = (n) => (n / (1024 * 1024 * 1024)).toFixed(2);
+    const e = new Error(`storage cap reached: ${gb(used)}GB stored of ${gb(STORAGE_CAP_BYTES)}GB cap. Delete images to free space.`);
+    e.status = 507; throw e;
+  }
+}
+async function readUsage(env) {
+  const used = await storedBytes(env);
+  const cnt = await env.DB.prepare("SELECT COUNT(*) AS c FROM print_image WHERE r2_key IS NOT NULL").first();
+  return {
+    used_bytes: used, cap_bytes: STORAGE_CAP_BYTES,
+    used_gb: +(used / (1024 * 1024 * 1024)).toFixed(3), cap_gb: +(STORAGE_CAP_BYTES / (1024 * 1024 * 1024)).toFixed(1),
+    pct: Math.round((used / STORAGE_CAP_BYTES) * 100), images: (cnt && cnt.c) || 0,
+  };
+}
 
 /* ================= image storage (R2) ================= */
 async function serveImage(url, env) {
@@ -136,6 +170,7 @@ async function uploadImage(env, body) {
   const image_id = uuid();
   const ct = body.content_type || "image/jpeg";
   const bytes = b64ToBytes(body.data);
+  await assertRoom(env, bytes.length); // enforce the cap BEFORE writing to R2
   const r2_key = `prints/${body.print_id}/${image_id}.${extFor(ct)}`;
   await env.IMAGES.put(r2_key, bytes, { httpMetadata: { contentType: ct } });
   const makePrimary = body.make_primary !== false; // default new uploads to primary
@@ -154,6 +189,7 @@ async function scrubImage(env, body) {
   if (!res.ok) { const e = new Error(`upstream ${res.status}`); e.status = 502; throw e; }
   const ct = res.headers.get("Content-Type") || "image/jpeg";
   const buf = new Uint8Array(await res.arrayBuffer());
+  await assertRoom(env, buf.length); // enforce the cap BEFORE writing to R2
   const image_id = uuid();
   const r2_key = `prints/${body.print_id}/${image_id}.${extFor(ct)}`;
   await env.IMAGES.put(r2_key, buf, { httpMetadata: { contentType: ct } });
