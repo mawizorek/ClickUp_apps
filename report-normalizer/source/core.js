@@ -7,7 +7,7 @@ import { renderOutput } from './ui-output.js';
 import { renderCatalog } from './ui-catalog.js';
 
 const APP_VERSION = 'v1';
-const PR = '187';
+const PR = '192';
 const stage = $('#stage');
 
 function setStep(step) {
