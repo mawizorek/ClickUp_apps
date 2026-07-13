@@ -11,14 +11,17 @@
  * its tail (runCron, the eBay market bank) can't be reliably read back to safely
  * re-commit. The harvest lives here, isolated, sharing state through bindings.
  *
- * SUBREQUEST BUDGET (learned 2026-07-13): the Workers free tier caps subrequests
- * per invocation, and EVERY D1 call counts. First cut did 3-5 D1 calls per print
- * and blew the cap -> blank 1101. This version PRELOADS state in 2 reads, then
- * FLUSHES all writes via env.DB.batch() (one round trip per 50-statement chunk).
+ * SUBREQUEST BUDGET (learned the hard way 2026-07-13): the Workers free tier caps
+ * subrequests per invocation at ~50, and EVERY fetch / D1 query / R2 op counts.
+ *   - Harvest: preload state in 2 reads, flush writes via env.DB.batch() (one
+ *     round trip per 50-statement chunk). ~6 subrequests total.
+ *   - Image backfill: 3 subrequests PER image (CDN fetch + R2 put + D1 update),
+ *     so SCRUB_BATCH must stay low. 12*3=36 fits with headroom. Do NOT bump
+ *     SCRUB_BATCH back toward 25 on the free tier — that's what caused the blank
+ *     1101. On a paid plan (1000 cap) it can go much higher.
  *
- * SHOPIFY 403 (learned 2026-07-13): Shopify bot protection rejects the Worker's
- * default bare User-Agent. All outbound fetches (shop JSON + CDN images) send a
- * browser-like UA via BROWSER_HEADERS.
+ * SHOPIFY 403 (learned 2026-07-13): Shopify + its CDN reject the Worker's default
+ * bare User-Agent. All outbound fetches send a browser-like UA via BROWSER_HEADERS.
  *
  * CRONS (see wrangler-cron.toml):
  *   "0 9 * * *"  daily 09:00 UTC  -> runCatalogScrub  (text harvest of the shop)
@@ -28,7 +31,8 @@
  */
 
 const SHOP = "https://inciardiprints.com";
-const SCRUB_BATCH = 25;                 // images scrubbed into R2 per hourly tick
+const SCRUB_BATCH = 12;                 // images per hourly tick. 3 subrequests each
+                                        // (fetch+R2+D1) => 36, safe under the 50 free cap.
 const D1_BATCH = 50;                    // statements per env.DB.batch() round trip
 const STORAGE_CAP_BYTES = 4.5 * 1024 * 1024 * 1024; // mirror worker.js v1.1 cap (4.5GB)
 const IMG_HOST_ALLOW = ["cdn.shopify.com"];
