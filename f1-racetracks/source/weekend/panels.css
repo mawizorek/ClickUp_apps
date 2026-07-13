@@ -1,0 +1,146 @@
+/* weekend/panels.css — Race Weekend lens, section layer (v2.0).
+   Championship swing, podium, biggest-mover hero, interactive grid, qualifying,
+   sprint, race classification, tyre stints. Team colors are rails/fills, never
+   side-stripe accents. Animations are transform/opacity only. */
+
+/* championship swing */
+.swing{border:1px solid var(--line);background:linear-gradient(120deg,var(--s2),var(--s1));padding:18px}
+.swing .k{font-size:0.54rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-bottom:10px}
+.swing .lead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.swing .lead .nm{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.4rem;color:var(--gold)}
+.swing .lead .verb{font-size:0.86rem;color:var(--txt-mid)}
+.swing .lead .mg{margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:1.15rem;color:var(--gold)}
+.swing .delta{margin-top:10px;font-size:0.78rem;color:var(--txt-mid);display:flex;align-items:center;gap:7px}
+.swing .delta .ex{font-family:'JetBrains Mono',monospace;font-weight:700}
+.swing .delta .ex.grew{color:var(--green)}.swing .delta .ex.cut{color:var(--red)}
+.swing .bar{margin-top:15px;display:flex;flex-direction:column;gap:7px}
+.swing .brow{display:grid;grid-template-columns:78px 1fr 36px;align-items:center;gap:9px;font-size:0.74rem}
+.swing .brow .bn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swing .brow .bt{position:relative;height:7px;background:var(--s3);overflow:hidden}
+.swing .brow .bt i{position:absolute;inset:0 auto 0 0;background:var(--tm,var(--txt-dim));transform-origin:left;transform:scaleX(var(--w,0));transition:transform .8s var(--ease);transition-delay:calc(var(--i,0)*80ms + 150ms)}
+.swing .brow .bv{font-family:'JetBrains Mono',monospace;font-weight:700;text-align:right;color:var(--txt-mid)}
+.swing .brow.leader .bn{color:var(--txt)}
+
+/* podium */
+.podium{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:8px;align-items:end}
+.pod{border:1px solid var(--line);background:var(--s1);padding:14px 12px;position:relative;overflow:hidden}
+.pod::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--tm,var(--line))}
+.pod .pl{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.9rem}
+.pod.p1{padding-top:26px}
+.pod.p1 .pl{color:var(--gold)}.pod.p2 .pl{color:var(--silver)}.pod.p3 .pl{color:var(--bronze)}
+.pod .nm{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.04rem;line-height:1.05;margin-top:9px}
+.pod.p1 .nm{font-size:1.22rem}
+.pod .tm{font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-top:5px}
+.pod .pts{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.8rem;color:var(--txt-mid);margin-top:10px}
+.pod .pts b{color:var(--txt)}
+
+/* biggest movers */
+.movers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mover{border:1px solid var(--line);background:var(--s1);padding:13px 12px;position:relative;overflow:hidden}
+.mover::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--tm,var(--line))}
+.mover .delta{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:1.3rem;color:var(--green);line-height:1}
+.mover .delta::before{content:"\25B2";font-size:0.7rem;vertical-align:middle;margin-right:3px}
+.mover .mn{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.88rem;margin-top:8px}
+.mover .mp{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--txt-dim);margin-top:5px}
+
+/* starting grid (interactive: tap to link finish) */
+.gridwrap{border:1px solid var(--line);background:linear-gradient(var(--s1),var(--bg));padding:22px 16px 26px;position:relative}
+.gridwrap .polebadge{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--txt-dim);font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;max-width:340px;margin:30px auto 0;position:relative}
+.grid::before{content:"";position:absolute;left:50%;top:-16px;bottom:-16px;width:1px;background:repeating-linear-gradient(var(--line) 0 6px,transparent 6px 12px);transform:translateX(-0.5px)}
+.slot{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--line);background:var(--s2);position:relative;cursor:pointer;transition:border-color .18s var(--ease),background .18s var(--ease)}
+.slot::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tm,var(--line))}
+.slot.right{transform:translateY(30px)}
+.slot .gp{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.84rem;color:var(--txt);min-width:16px}
+.slot.pole .gp{color:var(--gold)}
+.slot .info{min-width:0}
+.slot .dn{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.82rem;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot .dt{font-size:0.5rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-top:3px}
+.slot .fin{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:0.56rem;font-weight:700;letter-spacing:0.04em;color:var(--txt-dim);opacity:0;transition:opacity .2s var(--ease)}
+.slot.lit{background:var(--s3);border-color:var(--tm,var(--txt-mid))}
+.slot.lit .fin{opacity:1}
+.slot.lit .fin.up{color:var(--green)}.slot.lit .fin.down{color:var(--red)}.slot.lit .fin.dnf{color:var(--red)}
+.gridfoot{text-align:center;margin-top:46px;font-size:0.62rem;color:var(--txt-dim);letter-spacing:0.03em}
+.gridfoot b{color:var(--gold);font-weight:700}
+.gridhint{text-align:center;margin-top:8px;font-size:0.6rem;color:var(--txt-dim);letter-spacing:0.04em;font-style:italic}
+
+/* tyre stints (elevate; flagged illustrative) */
+.stintlegend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;font-size:0.64rem;color:var(--txt-mid)}
+.stintlegend span{display:inline-flex;align-items:center;gap:6px}
+.stintlegend i{width:11px;height:11px;border-radius:2px;display:inline-block}
+.stintrow{display:grid;grid-template-columns:74px 1fr;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line-soft)}
+.stintrow:last-child{border-bottom:0}
+.stintname{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stintbar{display:flex;height:16px;gap:2px}
+.stint{position:relative;transform:scaleX(0);transform-origin:left;animation:draw .55s var(--ease) forwards;animation-delay:calc(var(--r,0)*70ms + var(--s,0)*110ms)}
+.stint.soft{background:var(--ty-soft)}.stint.med{background:var(--ty-med)}.stint.hard{background:var(--ty-hard)}.stint.int{background:var(--ty-int)}
+.stint span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.52rem;font-weight:800;color:oklch(0.16 0.012 268);opacity:0;animation:fade .3s var(--ease) forwards;animation-delay:calc(var(--r,0)*70ms + var(--s,0)*110ms + .4s)}
+.stintnote{margin-top:14px;font-size:0.66rem;color:var(--txt-dim);line-height:1.5;font-style:italic}
+
+/* qualifying */
+.qtier{margin-bottom:18px}
+.qtier:last-child{margin-bottom:0}
+.qlabel{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.qlabel .qn{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.78rem;letter-spacing:0.06em}
+.qlabel .qd{font-size:0.56rem;letter-spacing:0.11em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
+.qlabel .qline{flex:1;height:1px;background:var(--line-soft)}
+.qrow{display:grid;grid-template-columns:26px 1fr auto auto auto;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid var(--line-soft);font-size:0.82rem}
+.qrow:last-child{border-bottom:0}
+.qrow .qp{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--txt-dim);font-size:0.72rem}
+.qrow.top .qp{color:var(--gold)}
+.qrow .qnm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow .qnm span{color:var(--txt-dim);font-weight:450;font-size:0.72rem;margin-left:6px}
+.qrow .qt{font-family:'JetBrains Mono',monospace;font-size:0.73rem;color:var(--txt-dim);text-align:right;min-width:58px}
+.qrow .qt.best{color:var(--txt);font-weight:700}
+@media(max-width:460px){.qrow{grid-template-columns:24px 1fr auto}.qrow .qt.q1,.qrow .qt.q2{display:none}}
+
+/* sprint */
+.sprintband{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid var(--line);background:var(--s1);margin-bottom:14px}
+.sprintband .tag{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--bg);background:var(--gold);padding:3px 8px}
+.sprintband .txt{font-size:0.76rem;color:var(--txt-mid)}
+.sprow{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid var(--line-soft);font-size:0.82rem}
+.sprow:last-child{border-bottom:0}
+.sprow .sp{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.72rem;color:var(--txt-dim)}
+.sprow.p1 .sp{color:var(--gold)}
+.sprow .snm{font-weight:600}
+.sprow .snm i{font-style:normal;color:var(--txt-dim);font-weight:450;font-size:0.72rem;margin-left:6px}
+.sprow .spt{font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:var(--txt);font-weight:700}
+.sprow .spt em{color:var(--txt-dim);font-style:normal;font-weight:450}
+
+/* race classification */
+.rtable{border:1px solid var(--line);background:var(--s1)}
+.rhead{display:grid;grid-template-columns:30px 1fr 52px 40px;gap:10px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
+.rhead .r{text-align:right}
+.rrow{display:grid;grid-template-columns:30px 1fr 52px 40px;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--line-soft);position:relative;transition:background .18s var(--ease)}
+.rrow:last-child{border-bottom:0}
+.rrow::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tm,transparent)}
+.rrow.dnf{background:oklch(0.60 0.21 26 / 0.055)}
+.rrow.lit{background:var(--s3)}
+.rrow .rp{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:0.92rem}
+.rrow.p1 .rp{color:var(--gold)}.rrow.p2 .rp{color:var(--silver)}.rrow.p3 .rp{color:var(--bronze)}
+.rrow.dnf .rp{color:var(--red);font-size:0.58rem;font-weight:700;letter-spacing:0.05em}
+.rname{min-width:0}
+.rname .rn{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.94rem;display:flex;align-items:center;gap:7px}
+.rname .rn .fl{font-family:'JetBrains Mono',monospace;font-size:0.48rem;font-weight:700;letter-spacing:0.05em;color:var(--purple);border:1px solid oklch(0.72 0.16 300 / 0.4);padding:1px 4px;border-radius:2px}
+.rname .rn .plflag{font-family:'JetBrains Mono',monospace;font-size:0.48rem;font-weight:700;color:var(--gold);border:1px solid oklch(0.84 0.135 88 / 0.4);padding:1px 4px;border-radius:2px}
+.rname .rt{font-size:0.56rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-top:4px}
+.rname .steward{font-size:0.68rem;color:var(--txt-dim);margin-top:5px;line-height:1.4;font-style:italic}
+.rgain{font-family:'JetBrains Mono',monospace;font-size:0.72rem;text-align:right;font-weight:700}
+.rgain .up{color:var(--green)}.rgain .down{color:var(--red)}.rgain .flat{color:var(--txt-dim)}
+.rgain .glabel{display:block;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--txt-dim);font-weight:600;margin-top:2px}
+.rpts{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.9rem;text-align:right}
+.rpts.zero{color:var(--txt-dim);font-weight:450}
+
+@keyframes draw{to{transform:scaleX(1)}}
+@keyframes fade{to{opacity:1}}
+@media(prefers-reduced-motion:no-preference){
+  .slot{opacity:0;animation:formup .5s var(--ease) forwards;animation-delay:calc(var(--g,0)*42ms + 120ms)}
+  .slot.right{animation-name:formup-r}
+  @keyframes formup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes formup-r{from{opacity:0;transform:translateY(48px)}to{opacity:1;transform:translateY(30px)}}
+}
+@media(prefers-reduced-motion:reduce){
+  .stint{transform:scaleX(1)!important;animation:none!important}
+  .stint span{opacity:1!important;animation:none!important}
+  .slot.right{transform:translateY(30px)!important}
+}
