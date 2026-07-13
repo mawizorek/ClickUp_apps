@@ -21,7 +21,7 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 | `markdown-viewer` | — | retired | Superseded by `prism`. `status:'retired'` in app-dashboard; hidden by default behind the Show-retired toggle. README is a redirect/history stub. Do not develop. |
 | `file-chunker` | unverified (last known v16.2, 2026-07-01) | live | Verify against commit history before next PR. |
 | `budget-code-mapper` | unverified (last known v6, design) | live | Verify before next PR. |
-| `f1-racetracks` | unverified (last known v4/v5) | live | Verify before next PR. |
+| `f1-racetracks` | v6.5 (verified) | live | Multi-lens app: `standings.html` (Matrix/History, blocking-link CSS) + `circuits.html` (Circuits, async style band) + `weekend.html` drill-through, over shared `source/` modules. v6.3 cohesion (hue-268 palette + shared brand lockup), v6.4 matrix density, **v6.5 seamless cross-lens nav** — cross-document View Transitions (cross-fade instead of hard reload), circuits paints chrome on the first byte via inline critical CSS (content-only fade, no more whole-body blank), persistent `f1-brand` morph across lenses. PR #171. Verified via git blob API. |
 | `world-cup-bracket` | shell v5.4 · data 2026-07-07 (verified) | live | Data-separated app: refreshes change only `data.json` (NO shell/version bump). Shell = v5.4 (last known; footer reads `v5.4 · direct`). Data 2026-07-07: R16 complete (8/8), QF slate seeded, lower-half `feedsTo` wiring fix. PR #76, merge SHA `1b50113`; ledger stamps PR #77. Verified against immutable commit-SHA path. Next refresh after QFs (Jul 9-11). |
 | `pdf-splitter` | unverified | live | Verify before next PR. |
 | `on-track` | unverified | live | Verify before next PR. |
@@ -32,4 +32,4 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 
 ---
 
-_Rollout note: `unverified` rows carry the last value I could see without a fresh read; each gets confirmed and firmed up the next time that app is touched. Confirmed rows (prism, app-dashboard, markdown-viewer, world-cup-bracket, inciardi-market) are current as of 2026-07-13._
+_Rollout note: `unverified` rows carry the last value I could see without a fresh read; each gets confirmed and firmed up the next time that app is touched. Confirmed rows (prism, app-dashboard, markdown-viewer, world-cup-bracket, inciardi-market, f1-racetracks) are current as of 2026-07-13._
