@@ -3,8 +3,9 @@
 <!-- DATA: modules fetch the canonical per-round store at ./f1-results/2026/ (index_rounds.json + round files). No data duplicated here. -->
 <!-- v5.4: Season History lens (source/standings/history.js) folded into the nav.xnav switcher. -->
 <!-- v5.5: cross-lens nav — first switcher segment reads Matrix (Matrix / History / Circuits); History gets a #history deep-link so the circuit guide can jump straight into it. -->
-<!-- v5.6: maintenance — data.js APP_VERSION reconciled to v5.6 so the footer stamp flows from the constant via matrix.js; removed the history.js pinStamp hack. ?v bumped across modules. -->
-<!-- v5.7: fix — History froze on "Loading the season…" on slow mobile (hard 6s poll cap, no recovery). data.js now fires 'season-ready'; history.js listens + re-renders and keeps a longer fallback poll. ?v bumped across modules to bust the mobile cache. -->
+<!-- v5.6: maintenance — data.js APP_VERSION reconciled so the footer stamp flows from the constant via matrix.js; removed the history.js pinStamp hack. -->
+<!-- v5.7: History self-heal attempt — data.js fires 'season-ready', history.js listens + longer fallback poll. -->
+<!-- v5.8: REAL History fix — renderHistory guard read window.ROUNDS, but ROUNDS is a top-level `let` (not a window property), so the guard was always truthy and History never rendered on any device. Now reads bare ROUNDS/DRV. ?v bumped to bust the mobile cache. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,8 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/standings/base.css?v=5.7">
-<link rel="stylesheet" href="source/standings/panel.css?v=5.7">
+<link rel="stylesheet" href="source/standings/base.css?v=5.8">
+<link rel="stylesheet" href="source/standings/panel.css?v=5.8">
 </head>
 <body>
   <header class="mast">
@@ -45,18 +46,18 @@
   </div>
 
   <footer>
-    <span>Championship Matrix <span class="num" id="stamp">v5.7</span></span>
+    <span>Championship Matrix <span class="num" id="stamp">v5.8</span></span>
     <span>canonical store</span>
   </footer>
 
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
 
-  <script src="source/standings/data.js?v=5.7"></script>
-  <script src="source/standings/matrix.js?v=5.7"></script>
-  <script src="source/standings/trajectory.js?v=5.7"></script>
-  <script src="source/standings/panel.js?v=5.7"></script>
-  <script src="source/standings/nav.js?v=5.7"></script>
-  <script src="source/standings/history.js?v=5.7"></script>
+  <script src="source/standings/data.js?v=5.8"></script>
+  <script src="source/standings/matrix.js?v=5.8"></script>
+  <script src="source/standings/trajectory.js?v=5.8"></script>
+  <script src="source/standings/panel.js?v=5.8"></script>
+  <script src="source/standings/nav.js?v=5.8"></script>
+  <script src="source/standings/history.js?v=5.8"></script>
 </body>
 </html>
