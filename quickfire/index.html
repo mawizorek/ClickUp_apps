@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Quickfire Artifacts</title>
+<meta name="description" content="One-shot standalone HTML artifacts. Filter by subject or type; Show all reveals archived and hidden.">
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0b0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🔥%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -26,12 +29,14 @@
   header { margin-bottom: 24px; }
   header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
   header p { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 52ch; }
-  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
-  .filters { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
-  .filter { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--muted); background: var(--chip); border: 1px solid var(--line); border-radius: 100px; padding: 5px 12px; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; -webkit-tap-highlight-color: transparent; }
-  .filter:hover { color: var(--text); }
-  .filter:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .filter[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .ctl-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .ctl-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); min-width: 52px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+  .chip-btn { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--muted); background: var(--chip); border: 1px solid var(--line); border-radius: 100px; padding: 5px 12px; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; -webkit-tap-highlight-color: transparent; }
+  .chip-btn:hover { color: var(--text); }
+  .chip-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .chip-btn[aria-pressed="true"] { color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 600; }
   .showall { font-family: inherit; font-size: 12px; font-weight: 600; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 100px; padding: 5px 12px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; transition: color 0.15s, border-color 0.15s; -webkit-tap-highlight-color: transparent; }
   .showall:hover { color: var(--text); border-color: var(--muted); }
   .showall:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -61,19 +66,27 @@
   <a class="back" href="../">← All Apps</a>
   <header>
     <h1>Quickfire</h1>
-    <p>One-shot standalone artifacts. No versioning, no spec files, no task overhead. Just shipped HTML. Filter by subject, or Show all to include archived + hidden.</p>
+    <p>One-shot standalone artifacts. No versioning, no spec files, no task overhead. Just shipped HTML. Filter below, or Show all to include archived + hidden.</p>
   </header>
-  <div class="toolbar">
-    <div class="filters" id="filters"></div>
-    <button class="showall" id="showall" aria-pressed="false" title="Reveal archived + hidden artifacts"><span class="dot"></span>Show all</button>
+  <div class="controls">
+    <div class="ctl-row">
+      <span class="ctl-label">Subject</span>
+      <div class="chips" id="subjects"></div>
+    </div>
+    <div class="ctl-row">
+      <span class="ctl-label">Type</span>
+      <div class="chips" id="types"></div>
+      <button class="showall" id="showall" aria-pressed="false" title="Reveal archived + hidden artifacts"><span class="dot"></span>Show all</button>
+    </div>
   </div>
   <div class="list" id="list"></div>
   <div class="count" id="count"></div>
 </div>
 <script>
   let ART = [];
-  let active = null;      // subject filter
-  let showAll = false;    // reveal archived + hidden
+  let activeSubject = null;
+  let activeType = null;
+  let showAll = false;
 
   function esc(s) { return (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -81,10 +94,11 @@
     const list = document.getElementById('list');
     const rows = ART
       .filter(a => showAll || (a.status || 'active') === 'active')
-      .filter(a => !active || (a.subjects || []).includes(active))
+      .filter(a => !activeSubject || (a.subjects || []).includes(activeSubject))
+      .filter(a => !activeType || a.type === activeType)
       .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     if (!rows.length) {
-      list.innerHTML = '<div class="empty">Nothing here' + (active ? ' tagged “' + esc(active) + '”' : '') + '. Try Show all.</div>';
+      list.innerHTML = '<div class="empty">No artifacts match this filter. Try clearing it or Show all.</div>';
     } else {
       list.innerHTML = rows.map(a => {
         const st = a.status || 'active';
@@ -99,35 +113,37 @@
           + '<div class="tags">' + tags + '</div></a>';
       }).join('');
     }
-    const shown = rows.length;
     const hiddenCount = ART.filter(a => (a.status || 'active') !== 'active').length;
-    document.getElementById('count').textContent =
-      shown + ' shown · ' + ART.length + ' total'
-      + (active ? ' · subject: ' + active : '')
-      + (!showAll && hiddenCount ? ' · ' + hiddenCount + ' hidden (Show all)' : '');
+    const bits = [rows.length + ' shown', ART.length + ' total'];
+    if (activeSubject) bits.push('subject: ' + activeSubject);
+    if (activeType) bits.push('type: ' + activeType);
+    if (!showAll && hiddenCount) bits.push(hiddenCount + ' hidden (Show all)');
+    document.getElementById('count').textContent = bits.join(' · ');
   }
 
-  function buildFilters() {
+  function mkChip(container, label, val, getActive, setActive) {
+    const b = document.createElement('button');
+    b.className = 'chip-btn'; b.textContent = label; b.dataset.val = val === null ? '' : val;
+    b.setAttribute('aria-pressed', String(getActive() === val));
+    b.addEventListener('click', () => { setActive(getActive() === val ? null : val); syncChips(); render(); });
+    container.appendChild(b);
+  }
+
+  function buildChips() {
     const subs = [...new Set(ART.flatMap(a => a.subjects || []))].sort();
-    const bar = document.getElementById('filters');
-    bar.innerHTML = '';
-    const mk = (label, val) => {
-      const b = document.createElement('button');
-      b.className = 'filter'; b.textContent = label; b.dataset.val = val === null ? '' : val;
-      b.setAttribute('aria-pressed', String(active === val));
-      b.addEventListener('click', () => { active = (active === val) ? null : val; sync(); });
-      return b;
-    };
-    bar.appendChild(mk('All', null));
-    subs.forEach(s => bar.appendChild(mk(s, s)));
+    const types = [...new Set(ART.map(a => a.type).filter(Boolean))].sort();
+    const subBar = document.getElementById('subjects');
+    const typeBar = document.getElementById('types');
+    subBar.innerHTML = ''; typeBar.innerHTML = '';
+    mkChip(subBar, 'All', null, () => activeSubject, v => activeSubject = v);
+    subs.forEach(s => mkChip(subBar, s, s, () => activeSubject, v => activeSubject = v));
+    mkChip(typeBar, 'All', null, () => activeType, v => activeType = v);
+    types.forEach(t => mkChip(typeBar, t, t, () => activeType, v => activeType = v));
   }
 
-  function sync() {
-    document.querySelectorAll('.filter').forEach(b => {
-      const val = b.dataset.val || null;
-      b.setAttribute('aria-pressed', String(active === val));
-    });
-    render();
+  function syncChips() {
+    document.querySelectorAll('#subjects .chip-btn').forEach(b => b.setAttribute('aria-pressed', String(activeSubject === (b.dataset.val || null))));
+    document.querySelectorAll('#types .chip-btn').forEach(b => b.setAttribute('aria-pressed', String(activeType === (b.dataset.val || null))));
   }
 
   document.getElementById('showall').addEventListener('click', (e) => {
@@ -138,7 +154,7 @@
 
   fetch('./manifest.json', { cache: 'no-store' })
     .then(r => r.ok ? r.json() : Promise.reject())
-    .then(data => { ART = data.artifacts || []; buildFilters(); render(); })
+    .then(data => { ART = data.artifacts || []; buildChips(); render(); })
     .catch(() => { document.getElementById('list').innerHTML = '<div class="empty">Could not load the manifest. Refresh to retry.</div>'; });
 </script>
 </body>
