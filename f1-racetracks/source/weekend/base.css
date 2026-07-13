@@ -1,8 +1,10 @@
-/* weekend/base.css — Race Weekend lens, foundation layer (v2.1).
+/* weekend/base.css — Race Weekend lens, foundation layer (v2.2).
  Shared design system (oklch hue 268) + Chakra Petch / JetBrains Mono / Inter,
  identical to standings + circuits so all three lenses read as one app.
  Holds: tokens, body, topbar + drill-through nav (prev/next + round select),
- masthead, headline strip, section chrome, reveal-animation base. */
+ masthead, headline strip, section chrome, reveal-animation base.
+ v2.2: body is the scroll container (iOS-safe: height:100% + overflow-y:auto + touch),
+ so the page scrolls inside the shell's fixed iframe. Standalone unaffected. */
 :root{
  --bg:oklch(0.16 0.012 268);
  --s1:oklch(0.195 0.014 268);
@@ -37,11 +39,12 @@
  --ease:cubic-bezier(0.16,1,0.3,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{background:var(--bg);-webkit-text-size-adjust:100%}
+html{background:var(--bg);-webkit-text-size-adjust:100%;height:100%}
 body{
  background:var(--bg);color:var(--txt);
  font-family:'Inter',system-ui,sans-serif;font-weight:450;
  line-height:1.55;letter-spacing:0.006em;
+ height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
  padding:0 14px 72px;max-width:680px;margin:0 auto;
  -webkit-font-smoothing:antialiased;font-optical-sizing:auto;
 }
