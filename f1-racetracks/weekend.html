@@ -1,45 +1,47 @@
 <!DOCTYPE html>
 <!--
-  F1 Race Weekend (weekend lens) — v2.0 SLIM SHELL
-  Per-round race-weekend detail layer, hash-routed #/<slug>.
-  DECOMPOSED (2026-07-13): the former 37KB inline monolith is now a slim shell +
-  source modules under source/weekend/, matching the standings/ and circuits engines.
-    styles : source/weekend/base.css   (tokens, topbar, drill-through nav, chrome)
-             source/weekend/panels.css (all section styling + animations)
-    logic  : source/weekend/data.js    (store fetch + embed fallback + live swing)
-             source/weekend/render.js  (section renderers)
-             source/weekend/nav.js     (topbar, prev/next, routing, boot)
+  F1 Race Weekend (weekend lens) — v6 shell.
+  Per-round race-weekend detail layer, DECOMPOSED to source modules under source/weekend/.
+  styles : source/weekend/base.css   (tokens, topbar, drill-through nav, chrome)
+           source/weekend/panels.css (all section styling + animations)
+           source/weekend/story.css  (Story mode: Results/Story toggle + replay surface)
+  logic  : source/weekend/data.js    (store fetch + embed fallback + live swing)
+           source/weekend/story.js   (Story mode engine — defines window.mountStory)
+           source/weekend/render.js  (section renderers + Results/Story toggle, v2.1)
+           source/weekend/nav.js     (topbar, prev/next, routing, boot)
   DATA: derives everything from the canonical per-round store (f1-results/2026/);
-  fails soft to an embedded Canada snapshot off-origin. Championship swing computed live.
+        fails soft to an embedded Canada snapshot off-origin. Championship swing computed live.
+        Story mode derives its position ladder from the round's own classification; per-second
+        telemetry + team radio are illustrative/future (flagged in-UI) until the R2 tier + archived radio land.
   NAV: Weekend is a DRILL-THROUGH, not a peer tab — switcher is Matrix / History / Circuits.
-  Entered from a History card or a Circuit card (weekend.html#/<slug>); links back to the guide.
+       Entered from a History card or a Circuit card (weekend.html#/<slug>); links back to the guide.
+  LOAD ORDER: data.js (globals) → story.js (window.mountStory) → render.js (uses mountStory) → nav.js (boots).
   CACHE-BUST: bump every ?v= token below on each source deploy.
 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#17171d">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Race Weekend · F1 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/weekend/base.css?v=2.0">
-<link rel="stylesheet" href="source/weekend/panels.css?v=2.0">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="source/weekend/base.css?v=6">
+<link rel="stylesheet" href="source/weekend/panels.css?v=6">
+<link rel="stylesheet" href="source/weekend/story.css?v=6">
 </head>
 <body>
-  <div class="topbar" id="topbar"></div>
-  <div class="wknav" id="wknav"></div>
-  <div class="mast" id="mast"></div>
-  <main id="app"></main>
+  <div id="topbar"></div>
+  <div id="wknav"></div>
+  <div id="mast"></div>
+  <div id="app"></div>
   <footer>
-    <span>Race Weekend <span class="num" id="foot-stamp">v2.0</span></span>
-    <span>derived from results store</span>
+    <span>Race Weekend <b class="num" id="foot-stamp">v6</b> · derived from results store</span>
+    <span class="num">f1-results/2026/</span>
   </footer>
-
-  <script src="source/weekend/data.js?v=2.0"></script>
-  <script src="source/weekend/render.js?v=2.0"></script>
-  <script src="source/weekend/nav.js?v=2.0"></script>
+  <script src="source/weekend/data.js?v=6"></script>
+  <script src="source/weekend/story.js?v=6"></script>
+  <script src="source/weekend/render.js?v=6"></script>
+  <script src="source/weekend/nav.js?v=6"></script>
 </body>
 </html>
