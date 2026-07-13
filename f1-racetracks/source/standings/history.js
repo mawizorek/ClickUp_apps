@@ -1,28 +1,29 @@
 /* history.js — Season History lens for the Championship Matrix.
- Additive only: adds a "History" segment to the existing lens switcher (nav.xnav,
- built by nav.js) and renders a newest-first, round-by-round feed into an in-page
- stage that swaps with the matrix. Reads the SAME globals the other modules use
- (ROUNDS, DRV, cumPoints, teamColor) — no data duplicated, nothing else touched.
- Loaded LAST (after nav.js) so the switcher exists when this runs.
+ Additive only: adds a "History" segment to the existing lens switcher (nav.xnav, built by
+ nav.js) and renders a newest-first, round-by-round FEED into an in-page stage that swaps
+ with the matrix. Reads the SAME globals the other modules use (ROUNDS, DRV, cumPoints,
+ teamColor) — no data duplicated, nothing else touched. Loaded LAST (after nav.js).
 
- Each round card fuses the RESULT (podium + pole + fastest lap + sprint winner)
- with the resulting CHAMPIONSHIP STATE: who led the WDC and by how much AFTER that
- round, computed live from cumPoints (race + sprint cumulative through that round).
- Each card links onward to the RACE WEEKEND lens (weekend.html#/<slug>) — the per-round
- detail driver — which in turn links to the circuit guide.
+ v10 (2026-07-13): restyled from bordered rows into a social/activity FEED. Dropped the
+ banned left `.hx-rail` color stripe for a timeline (centered connector line + team-tinted
+ node dot) with full-bordered post cards. Each round is a 'post': GP name + Rxx badge +
+ RELATIVE timestamp, podium as the body (P1 gold / P2 silver / P3 bronze), pole/FL/sprint
+ meta, and the championship swing as the engagement footer. Logic/data unchanged.
 
- DEEP LINK: standings.html#history opens this lens directly (on load + hashchange),
- and the History/Matrix segments drive the hash so the view is shareable and
- back-button friendly. The circuit guide's switcher links here via that hash.
+ Each post fuses the RESULT (podium + pole + fastest lap + sprint winner) with the
+ resulting CHAMPIONSHIP STATE: who led the WDC and by how much AFTER that round, computed
+ live from cumPoints (race + sprint cumulative through that round). Each card links onward
+ to the RACE WEEKEND lens (weekend.html#/<slug>).
 
- RESILIENCE: data is fetched asynchronously by data.js (index + every round file).
- This lens renders as soon as that lands — it listens for the 'season-ready' event
- AND keeps a long fallback poll — so a slow mobile load never leaves History frozen
- on "Loading the season…".
+ DEEP LINK: standings.html#history opens this lens directly (on load + hashchange), and the
+ History/Matrix segments drive the hash so the view is shareable and back-button friendly.
 
- SCOPE NOTE: ROUNDS/DRV are top-level `let` in data.js. Top-level let/const are NOT
- window properties, so we read the BARE identifiers (shared classic-script scope),
- never window.ROUNDS — that was undefined and kept History permanently "loading". */
+ RESILIENCE: data is fetched async by data.js; this lens renders on the 'season-ready'
+ event AND keeps a long fallback poll so a slow mobile load never leaves History frozen on
+ "Loading the season\u2026".
+
+ SCOPE NOTE: ROUNDS/DRV are top-level `let` in data.js (NOT window props), so we read the
+ BARE identifiers via a typeof-guard, never window.ROUNDS. */
 (function () {
  const CIRCUITS = 'circuits.html';
  const WEEKEND = 'weekend.html';
@@ -30,6 +31,16 @@
  const ln = n => { n = String(n || ''); return n === 'Andrea Kimi Antonelli' ? 'Antonelli' : (n.split(' ').slice(-1)[0] || n); };
  const short = s => String(s || '').replace(' Grand Prix', '');
  const fmtDate = d => { if (!d) return ''; const dt = new Date(d + 'T00:00:00'); return isNaN(dt) ? d : dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
+ const rel = d => {
+ if (!d) return '';
+ const t = new Date(d + 'T00:00:00'); if (isNaN(t)) return '';
+ const days = Math.floor((Date.now() - t.getTime()) / 86400000);
+ if (days <= 0) return 'just now';
+ if (days === 1) return '1d ago';
+ if (days < 7) return days + 'd ago';
+ if (days < 35) return Math.round(days / 7) + 'w ago';
+ return Math.round(days / 30) + 'mo ago';
+ };
  const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
  // Bare-identifier readers: ROUNDS/DRV are top-level `let` (not on window). typeof-guard
@@ -37,35 +48,40 @@
  const rounds = () => (typeof ROUNDS !== 'undefined' && Array.isArray(ROUNDS)) ? ROUNDS : null;
  const drv = () => (typeof DRV !== 'undefined' && DRV) ? DRV : null;
 
- /* ---- self-contained styles (reuses base.css tokens; panel/base untouched) ---- */
+ /* ---- feed styles (reuses base.css tokens; panel/base untouched). No side-stripe:
+ the timeline is a centered connector line + node dot, and posts have full borders. ---- */
  const css = `
-#hx-stage{display:flex;flex-direction:column;gap:12px}
+#hx-stage{display:flex;flex-direction:column;gap:0}
 #hx-stage.hidden{display:none!important}
-.hx-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px}
+.hx-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:4px}
 .hx-title{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.02rem;letter-spacing:0.02em}
 .hx-sub{font-size:0.64rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
-.hx-card{display:flex;border:1px solid var(--line);background:var(--s1)}
-.hx-rail{width:4px;flex:none;background:var(--team,var(--line))}
-.hx-body{flex:1;min-width:0;padding:12px 15px;display:flex;flex-direction:column;gap:9px}
-.hx-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.hx-rn{font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:700;color:var(--txt-dim);letter-spacing:0.1em}
-.hx-gp{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.96rem;letter-spacing:0.02em}
-.hx-date{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--txt-dim)}
-.hx-circuit{margin-left:auto;font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--red);text-decoration:none;white-space:nowrap;transition:color .15s var(--ease)}
-.hx-circuit:hover{color:var(--txt)}
+.hx-item{display:flex;gap:13px;align-items:stretch}
+.hx-railcol{position:relative;width:26px;flex:none;display:flex;justify-content:center}
+.hx-railcol::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;transform:translateX(-50%);background:var(--line-soft)}
+.hx-item:first-child .hx-railcol::before{top:24px}
+.hx-item:last-child .hx-railcol::before{bottom:calc(100% - 24px)}
+.hx-node{position:relative;z-index:1;width:12px;height:12px;border-radius:50%;margin-top:18px;background:var(--bg);border:2px solid var(--team,var(--line));box-shadow:0 0 0 3px var(--bg)}
+.hx-post{flex:1;min-width:0;border:1px solid var(--line);background:var(--s1);border-radius:10px;padding:13px 15px;margin:8px 0;display:flex;flex-direction:column;gap:10px}
+.hx-phead{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.hx-gp{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1rem;letter-spacing:-0.005em}
+.hx-badge{font-family:'JetBrains Mono',monospace;font-size:0.56rem;font-weight:700;letter-spacing:0.1em;color:var(--txt-dim);border:1px solid var(--line);border-radius:5px;padding:2px 6px}
+.hx-time{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.64rem;color:var(--txt-dim);white-space:nowrap}
 .hx-pod{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
-.hx-p{display:inline-flex;align-items:center;gap:6px;font-size:0.84rem;font-weight:600;color:var(--txt)}
-.hx-p i{font-family:'JetBrains Mono',monospace;font-style:normal;font-weight:800;font-size:0.68rem;width:15px;text-align:center;flex:none}
+.hx-p{display:inline-flex;align-items:center;gap:6px;font-size:0.9rem;font-weight:600;color:var(--txt)}
+.hx-p i{font-family:'JetBrains Mono',monospace;font-style:normal;font-weight:800;font-size:0.7rem;width:15px;text-align:center;flex:none}
 .hx-p.p1 i{color:var(--gold)}.hx-p.p2 i{color:var(--silver)}.hx-p.p3 i{color:var(--bronze)}
 .hx-p .tm{font-size:0.56rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
 .hx-meta{display:flex;gap:18px;flex-wrap:wrap;font-size:0.72rem;color:var(--txt-mid)}
 .hx-meta b{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.54rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--txt-dim);margin-right:6px}
 .hx-meta .mono{font-family:'JetBrains Mono',monospace;color:var(--txt)}
-.hx-wdc{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line-soft);padding-top:8px}
-.hx-wdc-k{font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--txt-dim);font-weight:600}
-.hx-wdc-v{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:0.84rem;color:var(--txt)}
-.hx-wdc-v .mg{font-family:'JetBrains Mono',monospace;color:var(--gold);font-weight:800;margin-left:7px}
-.hx-empty{padding:50px 20px;text-align:center;color:var(--txt-dim);font-size:0.9rem;border:1px solid var(--line);background:var(--s1)}
+.hx-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line-soft);padding-top:9px;flex-wrap:wrap}
+.hx-lead{font-size:0.78rem;color:var(--txt-mid)}
+.hx-lead b{font-family:'Chakra Petch',sans-serif;color:var(--txt);font-weight:600}
+.hx-lead .mg{font-family:'JetBrains Mono',monospace;color:var(--gold);font-weight:800;margin-left:5px}
+.hx-weekend{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--red);text-decoration:none;font-weight:600;white-space:nowrap;transition:color .15s var(--ease)}
+.hx-weekend:hover{color:var(--txt)}
+.hx-empty{padding:50px 20px;text-align:center;color:var(--txt-dim);font-size:0.9rem;border:1px solid var(--line);background:var(--s1);border-radius:10px}
 .hx-lens.on{background:var(--s3);color:var(--txt);cursor:default}
 `;
  const st = document.createElement('style'); st.id = 'hx-css'; st.textContent = css; document.head.appendChild(st);
@@ -103,13 +119,14 @@
  ].filter(Boolean).join('');
 
  const mg = wdc.margin === 0 ? 'level' : `+${wdc.margin}`;
- return `<article class="hx-card" style="--team:${rail}">
-<div class="hx-rail"></div>
-<div class="hx-body">
-<div class="hx-top"><span class="hx-rn">R${rd.round}</span><span class="hx-gp">${esc(short(rd.name))}</span><span class="hx-date">${esc(fmtDate(rd.date))}</span>${rd.slug ? `<a class="hx-circuit" href="${WEEKEND}#/${rd.slug}">Race Weekend \u2192</a>` : ''}</div>
+ const when = [rel(rd.date), fmtDate(rd.date)].filter(Boolean).join(' \u00b7 ');
+ return `<article class="hx-item">
+<div class="hx-railcol"><span class="hx-node" style="--team:${rail}"></span></div>
+<div class="hx-post" style="--team:${rail}">
+<div class="hx-phead"><span class="hx-gp">${esc(short(rd.name))}</span><span class="hx-badge">R${rd.round}</span><span class="hx-time">${esc(when)}</span></div>
 <div class="hx-pod">${pod}</div>
 ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
-<div class="hx-wdc"><span class="hx-wdc-k">Championship after R${rd.round}</span><span class="hx-wdc-v">${esc(ln(D[wdc.id].name))} leads<span class="mg">${mg}</span></span></div>
+<div class="hx-foot"><span class="hx-lead"><b>${esc(ln(D[wdc.id].name))}</b> leads<span class="mg">${mg}</span></span>${rd.slug ? `<a class="hx-weekend" href="${WEEKEND}#/${rd.slug}">Race weekend \u2192</a>` : ''}</div>
 </div>
 </article>`;
  }
@@ -128,7 +145,7 @@ ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
  const cards = R.map((rd, i) => ({ rd, i }))
  .sort((a, b) => b.rd.round - a.rd.round)
  .map(o => card(o.rd, o.i)).join('');
- hs.innerHTML = `<div class="hx-head"><span class="hx-title">Season History</span><span class="hx-sub">${R.length} rounds \u00b7 round by round</span></div>${cards}`;
+ hs.innerHTML = `<div class="hx-head"><span class="hx-title">Season History</span><span class="hx-sub">${R.length} rounds \u00b7 newest first</span></div>${cards}`;
  }
 
  /* ---- fold into the existing lens switcher ---- */
@@ -173,7 +190,7 @@ ${meta ? `<div class="hx-meta">${meta}</div>` : ''}
  if (standingsEl) standingsEl.addEventListener('click', e => { e.preventDefault(); if (location.hash === '#history') { history.replaceState(null, '', location.pathname + location.search); } showStandings(); });
  window.addEventListener('hashchange', () => { if (location.hash === '#history') showHistory(); else showStandings(); });
  // Self-heal: when data.js finishes loading the season it fires 'season-ready'. If History
- // is the active lens, render immediately — this is what stops the mobile "Loading…" freeze.
+ // is the active lens, render immediately — this is what stops the mobile "Loading\u2026" freeze.
  window.addEventListener('season-ready', () => { if (!hs.classList.contains('hidden')) { tries = 0; renderHistory(); } });
  if (location.hash === '#history') showHistory();
 })();

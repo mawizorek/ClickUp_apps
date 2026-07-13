@@ -5,6 +5,7 @@
 <!-- v6.3: cohesion pass — standings palette + ease unified to the shared hue-268 system; shared F1 brand lockup added to the nav appbar; suave stage-reveal on view swap. -->
 <!-- v6.4: matrix density — row/header/type/team-bar/WCC tightened so more drivers show per screen. ?v bumped across modules. -->
 <!-- v6.5: seamless cross-lens nav — cross-document View Transitions (cross-fade instead of hard reload) + persistent F1 brand morph shared with the circuits lens. -->
+<!-- v10 (history feed): history.js restyled into a social/activity feed (timeline + post cards, no side-stripe). Module + css ?v bumped 6.5 -> 6.6 so clients refetch; footer stamp -> v6.6. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,8 +16,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/standings/base.css?v=6.5">
-<link rel="stylesheet" href="source/standings/panel.css?v=6.5">
+<link rel="stylesheet" href="source/standings/base.css?v=6.6">
+<link rel="stylesheet" href="source/standings/panel.css?v=6.6">
 <style>
   html{background:oklch(0.16 0.012 268)}
   /* seamless cross-lens navigation: same-origin cross-document view transitions
@@ -55,18 +56,18 @@
   </div>
 
   <footer>
-    <span>Championship Matrix <span class="num" id="stamp">v6.5</span></span>
+    <span>Championship Matrix <span class="num" id="stamp">v6.6</span></span>
     <span>canonical store</span>
   </footer>
 
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
 
-  <script src="source/standings/data.js?v=6.5"></script>
-  <script src="source/standings/matrix.js?v=6.5"></script>
-  <script src="source/standings/trajectory.js?v=6.5"></script>
-  <script src="source/standings/panel.js?v=6.5"></script>
-  <script src="source/standings/nav.js?v=6.5"></script>
-  <script src="source/standings/history.js?v=6.5"></script>
+  <script src="source/standings/data.js?v=6.6"></script>
+  <script src="source/standings/matrix.js?v=6.6"></script>
+  <script src="source/standings/trajectory.js?v=6.6"></script>
+  <script src="source/standings/panel.js?v=6.6"></script>
+  <script src="source/standings/nav.js?v=6.6"></script>
+  <script src="source/standings/history.js?v=6.6"></script>
 </body>
 </html>
