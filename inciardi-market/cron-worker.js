@@ -7,30 +7,31 @@
  * catalog-harvest crons. It exposes no public API surface beyond a tiny health
  * route and never touches the eBay market feed.
  *
- * WHY A SEPARATE WORKER (not a second cron branch inside worker.js):
- *   worker.js is ~33KB, over the 30KB single-read cap, and its tail (runCron,
- *   the eBay market bank) can't be reliably read back to safely re-commit the
- *   whole file. Rather than grow an over-cap monolith blind, the harvest lives
- *   here, isolated, and shares state through bindings. Clean separation of
- *   concerns: worker.js = live API + market bank; cron-worker.js = harvest.
+ * WHY A SEPARATE WORKER: worker.js is ~33KB, over the 30KB single-read cap, and
+ * its tail (runCron, the eBay market bank) can't be reliably read back to safely
+ * re-commit. The harvest lives here, isolated, sharing state through bindings.
+ *
+ * SUBREQUEST BUDGET (learned the hard way 2026-07-13): the Workers free tier caps
+ * subrequests per invocation, and EVERY D1 call counts. The first cut did 3-5 D1
+ * calls per print and blew the cap on a full store -> hard isolate kill -> blank
+ * 1101. This version PRELOADS state in 2 reads, then FLUSHES all writes via
+ * env.DB.batch() (one round trip per 50-statement chunk). ~200 subrequests -> ~6.
  *
  * CRONS (see wrangler-cron.toml):
  *   "0 9 * * *"  daily 09:00 UTC  -> runCatalogScrub  (text harvest of the shop)
  *   "0 * * * *"  hourly           -> runImageBackfill (self-idling image scrub)
  *
- * Bindings: D1 'DB', R2 'IMAGES'. No secrets (products.json + cdn.shopify.com
- * are public; D1/R2 writes are in-binding, so no x-write-key dance).
- * NOTE: deploy target. NOT served by GitHub Pages.
+ * Bindings: D1 'DB', R2 'IMAGES'. No secrets. NOT served by GitHub Pages.
  */
 
 const SHOP = "https://inciardiprints.com";
 const SCRUB_BATCH = 25;                 // images scrubbed into R2 per hourly tick
+const D1_BATCH = 50;                    // statements per env.DB.batch() round trip
 const STORAGE_CAP_BYTES = 4.5 * 1024 * 1024 * 1024; // mirror worker.js v1.1 cap (4.5GB)
 const IMG_HOST_ALLOW = ["cdn.shopify.com"];
 
 // Collections we walk for category/exclusive signal (curated subset of the full
-// map in catalog-research-routine.md — kept small to stay well under the Worker
-// subrequest cap; the full 28-collection walk is a future refinement).
+// map in catalog-research-routine.md — kept small to stay well under the cap).
 const SIGNAL_COLLECTIONS = {
   "bigger-risograph-prints": { category: "big-riso" },
   "holiday-print-drop":      { category: "linocut" },
@@ -50,15 +51,12 @@ const CORS = {
 };
 
 export default {
-  // Minimal HTTP surface: a health/manual-trigger route (handy for a one-off run).
   async fetch(request, env) {
     if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
     const url = new URL(request.url);
     if (url.pathname === "/health" || url.pathname === "/") {
       return json({ ok: true, worker: "inciardi-market-cron", crons: ["0 9 * * * (harvest)", "0 * * * * (image backfill)"] });
     }
-    // Opt-in manual kick for testing. Wrapped so a thrown exception returns the
-    // actual message + stack as JSON instead of a blank Cloudflare 1101.
     if (url.pathname === "/run/harvest") {
       try { return json(await runCatalogScrub(env)); }
       catch (e) { return json({ ok: false, route: "harvest", error: String((e && e.message) || e), stack: (e && e.stack) || null }, 500); }
@@ -74,13 +72,12 @@ export default {
     if (event.cron === "0 * * * *") {
       ctx.waitUntil(runImageBackfill(env).catch((e) => console.error("img-backfill", e)));
     } else {
-      // "0 9 * * *" (and any other) -> daily text harvest
       ctx.waitUntil(runCatalogScrub(env).catch((e) => console.error("catalog-scrub", e)));
     }
   },
 };
 
-/* ============================ utils (parity w/ worker.js) ============================ */
+/* ============================ utils ============================ */
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj, null, 2), { status, headers: { "Content-Type": "application/json", ...CORS } });
 }
@@ -91,14 +88,22 @@ function slug(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "
 function extFor(ct) { return ct && ct.includes("png") ? "png" : ct && ct.includes("webp") ? "webp" : ct && ct.includes("gif") ? "gif" : "jpg"; }
 function isMerch(t) { const s = String(t || "").toLowerCase(); return MERCH_TOKENS.some((k) => s.includes(k)); }
 
+// Flush an array of prepared statements in chunks, one round trip per chunk.
+async function flushBatch(env, stmts) {
+  let ran = 0;
+  for (let i = 0; i < stmts.length; i += D1_BATCH) {
+    const chunk = stmts.slice(i, i + D1_BATCH);
+    if (chunk.length) { await env.DB.batch(chunk); ran += chunk.length; }
+  }
+  return ran;
+}
+
 /* ============================ Shopify fetch ============================ */
 async function fetchJSON(u) {
   const res = await fetch(u, { headers: { Accept: "application/json" }, cf: { cacheTtl: 300 } });
   if (!res.ok) throw new Error(`fetch ${res.status} ${u}`);
   return res.json();
 }
-
-// Page /products.json until empty. Bounded page cap as a safety rail.
 async function fetchAllProducts() {
   const all = [];
   for (let page = 1; page <= 10; page++) {
@@ -110,18 +115,13 @@ async function fetchAllProducts() {
   }
   return all;
 }
-
-// Build handle -> {category?, exclusive?} membership from the curated signal collections.
 async function fetchCollectionSignals() {
   const byHandle = new Map();
   for (const [coll, sig] of Object.entries(SIGNAL_COLLECTIONS)) {
     let prods = [];
     try { const d = await fetchJSON(`${SHOP}/collections/${coll}/products.json?limit=250`); prods = (d && d.products) || []; }
     catch (e) { continue; } // a missing/renamed collection must not kill the run
-    for (const p of prods) {
-      const cur = byHandle.get(p.handle) || {};
-      byHandle.set(p.handle, { ...cur, ...sig });
-    }
+    for (const p of prods) byHandle.set(p.handle, { ...(byHandle.get(p.handle) || {}), ...sig });
   }
   return byHandle;
 }
@@ -144,12 +144,7 @@ function exclusiveFor(title, handle, sig) {
   if (/\bholiday\b/.test(t)) return "holiday";
   return null;
 }
-// Shopify prices on this store are cents-as-string ("4800.00" => $48). Convert to dollars.
-function retailFrom(priceStr) {
-  const n = parseFloat(priceStr);
-  if (isNaN(n)) return null;
-  return Math.round(n) / 100;
-}
+function retailFrom(priceStr) { const n = parseFloat(priceStr); return isNaN(n) ? null : Math.round(n) / 100; }
 function parsePack(bodyHtml) {
   const b = String(bodyHtml || "").replace(/<[^>]+>/g, " ");
   const of = (b.match(/pack of (\d+)/i) || b.match(/assortment of (\d+)/i) || [])[1];
@@ -157,63 +152,72 @@ function parsePack(bodyHtml) {
   return { pack_of: of ? parseInt(of, 10) : null, pack_from: from ? parseInt(from, 10) : null };
 }
 
-/* ============================ D1 upsert (LOCKED-AWARE) ============================ */
-// New row -> insert (source shop-harvest, locked 0).
-// Unlocked existing -> harvest owns it, refresh harvest fields.
-// Locked existing -> COALESCE-fill blanks ONLY, EXCEPT in_print which ALWAYS refreshes
-//   (availability is a live fact, not a hand-entered opinion — Michael's call 2026-07-13).
-async function harvestUpsertCatalog(env, row) {
+/* ============================ statement builders (LOCKED-AWARE, no per-row reads) ============================ */
+// Given the preloaded lockedMap, return the right prepared UPSERT statement for a row.
+// New OR unlocked -> full refresh via ON CONFLICT. Locked -> COALESCE-fill blanks but
+// ALWAYS refresh in_print (availability is a live fact — Michael's call 2026-07-13).
+function upsertStmt(env, row, lockedMap) {
   const now = nowISO();
-  const existing = await env.DB.prepare("SELECT print_id, locked FROM catalog WHERE print_id=?1").bind(row.print_id).first();
-  if (!existing) {
-    await env.DB.prepare(
-      "INSERT INTO catalog (print_id,title,category,exclusive,retail,in_print,pack_of,pack_from,source,locked,created_at,updated_at) " +
-      "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,'shop-harvest',0,?9,?9)"
-    ).bind(row.print_id, row.title, row.category ?? null, row.exclusive ?? null, row.retail ?? null,
-      row.in_print ? 1 : 0, row.pack_of ?? null, row.pack_from ?? null, now).run();
-  } else if (!existing.locked) {
-    await env.DB.prepare(
-      "UPDATE catalog SET title=?2, category=?3, exclusive=?4, retail=?5, in_print=?6, " +
-      "pack_of=?7, pack_from=?8, source='shop-harvest', updated_at=?9 WHERE print_id=?1"
-    ).bind(row.print_id, row.title, row.category ?? null, row.exclusive ?? null, row.retail ?? null,
-      row.in_print ? 1 : 0, row.pack_of ?? null, row.pack_from ?? null, now).run();
-  } else {
-    // locked: fill blanks only, but ALWAYS refresh in_print
-    await env.DB.prepare(
+  const isLocked = lockedMap.get(row.print_id) === 1;
+  if (isLocked) {
+    return env.DB.prepare(
       "UPDATE catalog SET category=COALESCE(category,?2), exclusive=COALESCE(exclusive,?3), " +
       "retail=COALESCE(retail,?4), pack_of=COALESCE(pack_of,?5), pack_from=COALESCE(pack_from,?6), " +
       "in_print=?7, updated_at=?8 WHERE print_id=?1"
     ).bind(row.print_id, row.category ?? null, row.exclusive ?? null, row.retail ?? null,
-      row.pack_of ?? null, row.pack_from ?? null, row.in_print ? 1 : 0, now).run();
+      row.pack_of ?? null, row.pack_from ?? null, row.in_print ? 1 : 0, now);
   }
-  if (Array.isArray(row.aliases)) {
-    for (const a of row.aliases) {
-      if (!a) continue;
-      await env.DB.prepare("INSERT OR IGNORE INTO catalog_alias (print_id,alias,norm) VALUES (?1,?2,?3)").bind(row.print_id, a, norm(a)).run();
-    }
-  }
+  // new or unlocked: insert-or-full-refresh, source shop-harvest, locked stays 0
+  return env.DB.prepare(
+    "INSERT INTO catalog (print_id,title,category,exclusive,retail,in_print,pack_of,pack_from,source,locked,created_at,updated_at) " +
+    "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,'shop-harvest',0,?9,?9) " +
+    "ON CONFLICT(print_id) DO UPDATE SET title=excluded.title, category=excluded.category, exclusive=excluded.exclusive, " +
+    "retail=excluded.retail, in_print=excluded.in_print, pack_of=excluded.pack_of, pack_from=excluded.pack_from, " +
+    "source='shop-harvest', updated_at=excluded.updated_at"
+  ).bind(row.print_id, row.title, row.category ?? null, row.exclusive ?? null, row.retail ?? null,
+    row.in_print ? 1 : 0, row.pack_of ?? null, row.pack_from ?? null, now);
 }
 
-// Ensure a print has at least one image row. If it has none and we have a CDN url,
-// insert a kind='reference' row (r2_key NULL, source_url set). readCatalog renders it
-// immediately via the /img?u= CDN passthrough; runImageBackfill later stores the bytes.
-async function ensureReferenceImage(env, print_id, sourceUrl) {
-  if (!sourceUrl) return;
-  const existing = await env.DB.prepare("SELECT COUNT(*) AS c FROM print_image WHERE print_id=?1 AND status='active'").bind(print_id).first();
-  if (existing && existing.c > 0) return; // already has an image (reference or scrubbed)
-  const image_id = uuid();
-  await env.DB.prepare(
-    "INSERT INTO print_image (image_id,print_id,r2_key,source_url,kind,is_primary,status,sort,created_at) " +
-    "VALUES (?1,?2,NULL,?3,'reference',1,'active',0,?4)"
-  ).bind(image_id, print_id, sourceUrl, nowISO()).run();
-}
-
-/* ============================ the daily harvest ============================ */
+/* ============================ the daily harvest (preload -> build -> batch) ============================ */
 async function runCatalogScrub(env) {
   const started = nowISO();
-  const products = await fetchAllProducts();
-  const signals = await fetchCollectionSignals();
+  const products = await fetchAllProducts();      // ~1-2 subrequests
+  const signals = await fetchCollectionSignals(); // ~4 subrequests
+
+  // PRELOAD state: 2 reads total, replacing all per-print SELECTs.
+  const lockedMap = new Map();
+  const lockRes = await env.DB.prepare("SELECT print_id, locked FROM catalog").all();
+  for (const r of (lockRes.results || [])) lockedMap.set(r.print_id, r.locked);
+  const hasImage = new Set();
+  const imgRes = await env.DB.prepare("SELECT DISTINCT print_id FROM print_image WHERE status='active'").all();
+  for (const r of (imgRes.results || [])) hasImage.add(r.print_id);
+
+  const catalogStmts = [];  // upserts
+  const aliasStmts = [];    // alias inserts
+  const imageStmts = [];    // reference-image inserts
+  const seen = new Set();    // dedupe print_ids within this run
   let prints = 0, skipped = 0;
+
+  const addPrint = (row, imgUrl) => {
+    if (seen.has(row.print_id)) return; // first occurrence wins within a run
+    seen.add(row.print_id);
+    catalogStmts.push(upsertStmt(env, row, lockedMap));
+    if (Array.isArray(row.aliases)) {
+      for (const a of row.aliases) {
+        if (!a) continue;
+        aliasStmts.push(env.DB.prepare("INSERT OR IGNORE INTO catalog_alias (print_id,alias,norm) VALUES (?1,?2,?3)").bind(row.print_id, a, norm(a)));
+      }
+    }
+    // only queue a reference image if the print has none yet (in DB) and we have a url
+    if (imgUrl && !hasImage.has(row.print_id)) {
+      hasImage.add(row.print_id); // guard against dupes within the run too
+      imageStmts.push(env.DB.prepare(
+        "INSERT INTO print_image (image_id,print_id,r2_key,source_url,kind,is_primary,status,sort,created_at) " +
+        "VALUES (?1,?2,NULL,?3,'reference',1,'active',0,?4)"
+      ).bind(uuid(), row.print_id, imgUrl, nowISO()));
+    }
+    prints++;
+  };
 
   for (const product of products) {
     if (isMerch(`${product.title} ${product.handle} ${product.product_type || ""}`)) { skipped++; continue; }
@@ -222,55 +226,36 @@ async function runCatalogScrub(env) {
     const variants = product.variants || [];
     const firstVariant = variants[0] || {};
     const isDefault = variants.length <= 1 || (firstVariant.title || "").toLowerCase() === "default title";
+    const prodImg = (product.images && product.images[0] && product.images[0].src) || null;
 
     if (category === "pack") {
-      // one row for the pack itself
       const { pack_of, pack_from } = parsePack(product.body_html);
       const title = product.title;
-      const print_id = slug(title);
-      await harvestUpsertCatalog(env, {
-        print_id, title, category: "pack",
-        exclusive: exclusiveFor(title, product.handle, sig),
-        retail: retailFrom(firstVariant.price),
-        in_print: variants.some((v) => v.available),
-        pack_of, pack_from,
-      });
-      await ensureReferenceImage(env, print_id, (product.images && product.images[0] && product.images[0].src) || null);
-      prints++;
+      addPrint({ print_id: slug(title), title, category: "pack", exclusive: exclusiveFor(title, product.handle, sig),
+        retail: retailFrom(firstVariant.price), in_print: variants.some((v) => v.available), pack_of, pack_from }, prodImg);
     } else if (isDefault) {
-      // single-print product
       const title = product.title;
-      const print_id = slug(title);
-      await harvestUpsertCatalog(env, {
-        print_id, title, category,
-        exclusive: exclusiveFor(title, product.handle, sig),
-        retail: retailFrom(firstVariant.price),
-        in_print: variants.some((v) => v.available),
-      });
-      await ensureReferenceImage(env, print_id, (product.images && product.images[0] && product.images[0].src) || null);
-      prints++;
+      addPrint({ print_id: slug(title), title, category, exclusive: exclusiveFor(title, product.handle, sig),
+        retail: retailFrom(firstVariant.price), in_print: variants.some((v) => v.available) }, prodImg);
     } else {
       // multi-print product: each variant is its own print (e.g. the 8x10 Riso themes)
       for (const v of variants) {
-        // big-riso themes are catalogued as "<Theme> Risograph" to match the existing seed
-        // and avoid slug collisions with same-named minis/linocuts (e.g. Hot Dog).
         let title = v.title;
         if (category === "big-riso" && !/risograph/i.test(title)) title = `${title} Risograph`;
-        const print_id = slug(title);
-        await harvestUpsertCatalog(env, {
-          print_id, title, category,
-          exclusive: exclusiveFor(v.title, product.handle, sig),
-          retail: retailFrom(v.price),
-          in_print: !!v.available,
-          aliases: [v.title], // fold the bare variant name in as an alias
-        });
-        const img = (v.featured_image && v.featured_image.src) || (product.images && product.images[0] && product.images[0].src) || null;
-        await ensureReferenceImage(env, print_id, img);
-        prints++;
+        const img = (v.featured_image && v.featured_image.src) || prodImg;
+        addPrint({ print_id: slug(title), title, category, exclusive: exclusiveFor(v.title, product.handle, sig),
+          retail: retailFrom(v.price), in_print: !!v.available, aliases: [v.title] }, img);
       }
     }
   }
-  return { ok: true, started, finished: nowISO(), products: products.length, prints, skipped_merch: skipped };
+
+  // FLUSH: batched round trips instead of per-statement subrequests.
+  const wroteCatalog = await flushBatch(env, catalogStmts);
+  const wroteAliases = await flushBatch(env, aliasStmts);
+  const wroteImages = await flushBatch(env, imageStmts);
+
+  return { ok: true, started, finished: nowISO(), products: products.length, prints, skipped_merch: skipped,
+    wrote: { catalog: wroteCatalog, aliases: wroteAliases, reference_images: wroteImages } };
 }
 
 /* ============================ hourly image backfill (self-idling) ============================ */
@@ -279,7 +264,6 @@ async function storedBytes(env) {
   return (r && r.b) || 0;
 }
 async function runImageBackfill(env) {
-  // reference rows waiting to be stored: have a source_url, no bytes in R2 yet
   const pend = await env.DB.prepare(
     "SELECT image_id, print_id, source_url FROM print_image " +
     "WHERE r2_key IS NULL AND source_url IS NOT NULL AND status='active' " +
@@ -297,7 +281,7 @@ async function runImageBackfill(env) {
     if (!res.ok) { failed++; continue; }
     const ct = res.headers.get("Content-Type") || "image/jpeg";
     const buf = new Uint8Array(await res.arrayBuffer());
-    if (used + buf.length > STORAGE_CAP_BYTES) { capped = true; break; } // honor the R2 cap
+    if (used + buf.length > STORAGE_CAP_BYTES) { capped = true; break; }
     const r2_key = `prints/${row.print_id}/${row.image_id}.${extFor(ct)}`;
     await env.IMAGES.put(r2_key, buf, { httpMetadata: { contentType: ct } });
     await env.DB.prepare(
