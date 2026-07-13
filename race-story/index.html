@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Race Story Map — British Grand Prix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:oklch(15% 0.018 265);--bg-deep:oklch(11% 0.016 265);
+    --surface-1:oklch(19% 0.02 265);--surface-2:oklch(23% 0.022 265);--surface-3:oklch(28% 0.024 265);
+    --line:oklch(30% 0.02 265);--line-soft:oklch(24% 0.016 265);
+    --text:oklch(94% 0.008 265);--text-dim:oklch(70% 0.014 265);--text-fade:oklch(54% 0.014 265);
+    --accent:oklch(74% 0.17 55);
+    --drs:oklch(76% 0.17 150);--purple:oklch(66% 0.2 300);--green:oklch(76% 0.16 150);
+    --sgray:oklch(46% 0.015 265);--live:oklch(68% 0.2 22);--yellow:oklch(85% 0.16 95);
+    --soft:oklch(62% 0.21 25);--med:oklch(84% 0.15 95);--hard:oklch(92% 0.006 265);
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.4;overflow:hidden}
+  .mono{font-family:'Chivo Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  button{font-family:inherit;cursor:pointer}
+  .app{display:grid;grid-template-rows:auto auto 1fr;height:100vh}
+  header{display:flex;align-items:center;gap:16px;padding:10px 18px;background:var(--bg-deep);border-bottom:1px solid var(--line)}
+  .flag{width:30px;height:30px;border-radius:5px;flex:none;border:1px solid var(--line);background:linear-gradient(45deg,transparent 46%,oklch(90% 0.02 265) 46% 54%,transparent 54%),linear-gradient(-45deg,transparent 46%,oklch(90% 0.02 265) 46% 54%,transparent 54%),linear-gradient(0deg,transparent 44%,oklch(90% 0.02 265) 44% 56%,transparent 56%),linear-gradient(90deg,transparent 44%,oklch(90% 0.02 265) 44% 56%,transparent 56%),oklch(32% 0.09 258)}
+  header h1{font-size:1.05rem;font-weight:800;line-height:1}
+  header .sub{font-size:0.66rem;color:var(--text-fade);letter-spacing:0.11em;text-transform:uppercase;margin-top:3px}
+  .sess{margin-left:auto;display:flex;gap:16px;align-items:center}
+  .sess .stat{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+  .sess .stat .v{font-size:0.82rem;font-weight:600}
+  .sess .stat .k{font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-fade);margin-top:2px}
+  .flagchip{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:6px;background:var(--surface-1);border:1px solid var(--line);font-size:0.68rem;letter-spacing:0.09em;text-transform:uppercase;font-weight:600;color:var(--text-dim)}
+  .flagchip .dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+  .flagchip.sc{background:oklch(30% 0.08 95);border-color:oklch(52% 0.14 95);color:oklch(90% 0.11 95)}
+  .flagchip.sc .dot{background:var(--yellow);animation:pulse 1.2s infinite}
+  .flagchip.chk{background:var(--surface-2);color:var(--text)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .transport{display:flex;align-items:center;gap:16px;padding:11px 18px;background:var(--bg);border-bottom:1px solid var(--line)}
+  .play{width:42px;height:42px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--text);display:grid;place-items:center;transition:background .15s,border-color .15s,transform .1s}
+  .play:hover{background:var(--surface-3);border-color:var(--accent)}
+  .play:active{transform:scale(.93)}
+  .play svg{width:17px;height:17px;fill:currentColor}
+  .lapread{flex:none;min-width:128px}
+  .lapread .big{font-size:1.5rem;font-weight:700;line-height:1}
+  .lapread .big b{color:var(--accent)} .lapread .big span{color:var(--text-fade);font-weight:500}
+  .lapread .ph{font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-fade);margin-top:4px}
+  .lapread .ph b{color:var(--text-dim);font-weight:600}
+  .scrub{flex:1;display:flex;flex-direction:column;gap:5px}
+  .scrub-flags{position:relative;height:12px}
+  .scrub-flags .tick{position:absolute;top:6px;width:1px;height:4px;background:var(--line-soft);transform:translateX(-50%)}
+  .scrub-flags span.mk{position:absolute;top:0;transform:translateX(-50%);font-size:0.56rem;color:var(--text-fade);white-space:nowrap}
+  .scrub-flags span.mk::before{content:"";display:block;width:1px;height:5px;margin:0 auto 2px;background:var(--line)}
+  .scrub-flags span.mk.sc::before{background:var(--yellow)} .scrub-flags span.mk.gr::before{background:var(--green)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--accent);border:3px solid var(--bg);box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
+  .lodsel,.speeds{display:flex;gap:2px;flex:none;background:var(--surface-1);border:1px solid var(--line);border-radius:7px;padding:3px}
+  .lodsel button,.speeds button{background:none;border:none;color:var(--text-fade);font-size:0.66rem;font-weight:600;padding:4px 8px;border-radius:5px;transition:.12s;letter-spacing:0.02em}
+  .lodsel button.on,.speeds button.on{background:var(--surface-3);color:var(--text)}
+  .lodsel{margin-left:2px}
+  .main{display:grid;grid-template-columns:452px 1fr;min-height:0}
+  .tower{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:var(--bg-deep)}
+  .tower-head,.row{display:grid;grid-template-columns:24px 50px 28px 40px 60px 56px 62px;gap:7px;align-items:center}
+  .tower-head{padding:8px 12px 7px;font-size:0.53rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-fade);border-bottom:1px solid var(--line)}
+  .tower-head span:nth-child(5),.tower-head span:nth-child(6){text-align:right}
+  .tower-body{flex:1;overflow-y:auto}
+  .tower-body::-webkit-scrollbar{width:7px}.tower-body::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:99px}
+  .row{padding:8px 12px;border-bottom:1px solid var(--line-soft);cursor:pointer;position:relative;transition:background .12s}
+  .row:hover,.row.sel{background:var(--surface-1)}
+  .row.sel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+  .row .pos{font-weight:700;font-size:0.92rem;text-align:center}
+  .row .drv{display:flex;align-items:center;gap:6px}
+  .row .drv .bar{width:4px;height:19px;border-radius:2px;flex:none}
+  .row .drv .code{font-weight:700;font-size:0.82rem}
+  .drs{font-size:0.52rem;font-weight:700;text-align:center;padding:3px 0;border-radius:4px;color:var(--text-fade);background:var(--surface-2);border:1px solid var(--line)}
+  .drs.on{color:oklch(16% 0.02 265);background:var(--drs);border-color:var(--drs)}
+  .tyre{display:flex;align-items:center;gap:4px}
+  .tyre .circ{width:21px;height:21px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:0.6rem;font-weight:700;border:2px solid}
+  .tyre .circ.S{color:var(--soft);border-color:var(--soft)}.tyre .circ.M{color:var(--med);border-color:var(--med)}.tyre .circ.H{color:var(--hard);border-color:var(--hard)}
+  .tyre .age{font-size:0.62rem;color:var(--text-fade)}
+  .gapint{text-align:right;line-height:1.15}
+  .gapint .gap{font-size:0.78rem;font-weight:600}.gapint .gap.leader{color:var(--accent)}
+  .gapint .int{font-size:0.6rem;color:var(--text-fade)}
+  .lastlap{text-align:right;font-size:0.76rem;font-weight:500}
+  .lastlap.pb{color:var(--green)}.lastlap.best{color:var(--purple)}
+  .row.pit .drv .code::after{content:" PIT";color:var(--yellow);font-size:0.56rem;font-weight:700}
+  .card{display:flex;flex-direction:column;min-height:0;background:var(--bg)}
+  .card-head{display:flex;align-items:center;gap:4px;padding:8px 12px;border-bottom:1px solid var(--line)}
+  .tab{background:none;border:none;color:var(--text-fade);font-size:0.76rem;font-weight:600;padding:8px 14px;border-radius:7px;transition:.14s;display:flex;align-items:center;gap:7px}
+  .tab:hover{color:var(--text-dim);background:var(--surface-1)}
+  .tab.on{color:var(--text);background:var(--surface-2)}
+  .tab .ic{width:14px;height:14px}
+  .ctx{margin-left:auto;display:flex;align-items:center;gap:9px;padding-right:4px}
+  .ctx .cbar{width:4px;height:22px;border-radius:2px}
+  .ctx .cinfo{line-height:1.1}.ctx .ccode{font-weight:700;font-size:0.9rem}
+  .ctx .cteam{font-size:0.58rem;color:var(--text-fade);letter-spacing:0.07em;text-transform:uppercase}
+  .ctx .cpos{font-weight:700;font-size:1.3rem;margin-left:6px}
+  .panel{flex:1;min-height:0;display:none}.panel.on{display:flex;flex-direction:column}
+  #panelPos{padding:12px 16px 8px}
+  .ladwrap{flex:1;min-height:0;position:relative}
+  .ghost-tg{position:absolute;top:0;right:0;z-index:2;display:flex;align-items:center;gap:7px;font-size:0.68rem;color:var(--text-dim);cursor:pointer;user-select:none}
+  .ghost-tg .sw{width:28px;height:16px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);position:relative;transition:.2s}
+  .ghost-tg .sw::after{content:"";position:absolute;top:1px;left:1px;width:12px;height:12px;border-radius:50%;background:var(--text-fade);transition:transform .2s var(--ease),background .2s}
+  .ghost-tg.on .sw{background:oklch(42% 0.08 265)}.ghost-tg.on .sw::after{transform:translateX(12px);background:var(--text)}
+  svg.ladder{width:100%;height:100%;display:block;overflow:visible}
+  .grid-line{stroke:var(--line-soft);stroke-width:1}
+  .lane-lbl{fill:var(--text-fade);font-size:8px;font-family:'Chivo Mono',monospace}
+  .lap-lbl{fill:var(--text-fade);font-size:9px;font-family:'Chivo Mono',monospace}
+  .drv-line{fill:none;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round;transition:opacity .2s}
+  .drv-line.ghost{stroke-dasharray:2 5;stroke-width:1.4;opacity:.5}
+  .scrub-line{stroke:var(--accent);stroke-width:1.3;stroke-dasharray:3 3;opacity:.8}
+  .node-code{font-family:'Chivo Mono',monospace;font-weight:700;font-size:10px}
+  .dimmed{opacity:.1 !important}
+  #panelGrid{min-height:0}
+  .gfocus{display:grid;grid-template-columns:auto 1fr 220px;gap:18px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--bg-deep)}
+  .gf-id{display:flex;align-items:center;gap:10px}
+  .gf-id .bar{width:5px;height:38px;border-radius:3px}
+  .gf-id .code{font-weight:800;font-size:1.5rem;line-height:1}
+  .gf-id .team{font-size:0.6rem;color:var(--text-fade);letter-spacing:0.08em;text-transform:uppercase;margin-top:3px}
+  .gf-id .pos{font-weight:800;font-size:1.8rem;margin-left:6px}
+  .gf-wheel{display:flex;flex-direction:column;gap:9px}
+  .shiftlights{display:flex;gap:3px}
+  .shiftlights .sl{flex:1;height:7px;border-radius:2px;background:var(--surface-2);transition:background .06s linear}
+  .shiftlights .sl.g{background:var(--green)}.shiftlights .sl.y{background:var(--yellow)}.shiftlights .sl.r{background:var(--live)}
+  .gf-core{display:flex;align-items:baseline;gap:16px}
+  .gf-core .gear{font-size:3rem;font-weight:800;line-height:.8}
+  .gf-core .sp{display:flex;align-items:baseline;gap:6px}
+  .gf-core .sp .kph{font-size:2rem;font-weight:700}.gf-core .sp i{font-size:0.7rem;color:var(--text-fade);font-style:normal;letter-spacing:0.06em}
+  .gf-set{display:flex;gap:14px;font-size:0.64rem;color:var(--text-fade);letter-spacing:0.05em}
+  .gf-set b{color:var(--text);font-weight:700;font-family:'Chivo Mono',monospace}
+  .gf-set b.drs.on{color:var(--drs)}
+  .gf-spark{align-self:stretch}
+  .spark{width:100%;height:64px;display:block}
+  .spark path.fill{fill:oklch(74% 0.17 55 / .1)}.spark path.stroke{fill:none;stroke:var(--accent);stroke-width:1.6}
+  .spark line.cursor{stroke:var(--text-dim);stroke-width:1;stroke-dasharray:2 2}
+  .gstage{flex:1;min-height:0;display:grid;grid-template-columns:1fr 150px}
+  .formation{position:relative;overflow-y:auto;padding:12px 12px 20px}
+  .formation::-webkit-scrollbar{width:8px}.formation::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:99px}
+  .grid-strip{position:absolute;top:0;bottom:0;left:0;width:3px;background:repeating-linear-gradient(var(--line) 0 6px,transparent 6px 12px);opacity:.6}
+  .track-area{position:relative}
+  .gcar{position:absolute;left:2px;top:0;width:calc(100% - 10px);height:30px;background:linear-gradient(180deg,var(--surface-2),var(--surface-1));border:1px solid var(--line);border-left:3px solid var(--tc);border-radius:7px;box-shadow:0 1px 0 oklch(9% 0.016 265),inset 0 1px 0 oklch(30% 0.02 265 / .4);padding:0 9px;display:grid;grid-template-columns:18px 40px 1fr auto;gap:8px;align-items:center;cursor:grab;will-change:transform;transition:transform .5s var(--ease),box-shadow .12s,background .12s,border-color .12s,opacity .3s}
+  .gcar:hover{background:linear-gradient(180deg,var(--surface-3),var(--surface-2));box-shadow:0 2px 6px oklch(8% 0.02 265 / .5),inset 0 1px 0 oklch(32% 0.02 265 / .5)}
+  .gcar:active{cursor:grabbing;box-shadow:0 1px 2px oklch(8% 0.02 265 / .6),inset 0 1px 2px oklch(10% 0.02 265 / .6)}
+  .gcar.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 2px 8px oklch(8% 0.02 265 / .5);z-index:3}
+  .gcar.pitting{opacity:.35}
+  .gc-pos{font-weight:800;font-size:0.82rem;color:var(--text-dim);text-align:center}
+  .gc-code{font-weight:800;font-size:0.86rem;letter-spacing:0.02em}
+  .gc-mid{display:flex;align-items:center;gap:8px;min-width:0}
+  .gc-kph{font-size:0.86rem;font-weight:700}.gc-kph i{font-size:0.46rem;color:var(--text-fade);font-style:normal;margin-left:1px}
+  .gc-gear{font-size:0.8rem;font-weight:700;color:var(--accent)}
+  .gc-rpm{flex:1;min-width:20px;height:3px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+  .gc-rpm i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--yellow) 70%,var(--live))}
+  .gc-right{display:flex;align-items:center;gap:7px}
+  .gc-drs{width:7px;height:7px;border-radius:50%;background:var(--surface-3);flex:none}
+  .gc-drs.on{background:var(--drs);box-shadow:0 0 5px var(--drs)}
+  .gc-delta{font-size:0.6rem;color:var(--text-fade);min-width:34px;text-align:right}
+  .pitlane{background:var(--bg-deep);border-left:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+  .pit-title{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-fade);display:flex;align-items:center;gap:6px}
+  .pit-title::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:pulse 1.2s infinite}
+  .pit-empty{font-size:0.68rem;color:var(--text-fade);margin-top:6px;line-height:1.5;opacity:.7}
+  .pitcar{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--tc);border-radius:8px;padding:9px 10px;animation:pitin .45s var(--ease) both}
+  @keyframes pitin{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+  .pitcar .pc-top{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .pitcar .pc-code{font-weight:800;font-size:0.9rem}
+  .pitcar .pc-pos{margin-left:auto;font-size:0.66rem;color:var(--text-fade)}
+  .pitcar .pc-tyre{display:flex;align-items:center;gap:6px;font-size:0.64rem;color:var(--text-dim)}
+  .pitcar .pc-tyre .from{color:var(--text-fade);text-decoration:line-through}
+  .pitcar .pc-timer{font-size:0.6rem;color:var(--yellow);letter-spacing:0.05em;margin-top:5px}
+  #panelRadio{min-height:0}
+  .feed{flex:1;overflow-y:auto;padding:14px 16px 22px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+  .feed::-webkit-scrollbar{width:8px}.feed::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:99px}
+  .msg{display:flex;gap:9px;animation:pop .32s var(--ease) both;max-width:88%}
+  @keyframes pop{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+  .msg .av{width:30px;height:30px;flex:none;border-radius:8px;display:grid;place-items:center;font-family:'Chivo Mono',monospace;font-weight:700;font-size:0.6rem;color:oklch(15% 0.02 265)}
+  .msg .who{font-weight:700;font-size:0.78rem}
+  .msg .role{font-size:0.56rem;color:var(--text-fade);letter-spacing:0.06em;text-transform:uppercase}
+  .msg .lap{margin-left:auto;font-size:0.6rem;color:var(--text-fade)}
+  .msg .meta{display:flex;align-items:baseline;gap:7px;margin-bottom:3px}
+  .msg .bubble{background:var(--surface-1);border:1px solid var(--line-soft);border-radius:4px 12px 12px 12px;padding:7px 11px;font-size:0.83rem;line-height:1.4}
+  .msg.crowd .bubble{background:oklch(24% 0.05 55);border-color:oklch(40% 0.09 55)}
+  .msg.pit .bubble{border-color:oklch(46% 0.05 265)}
+  .sysmsg{align-self:center;text-align:center;padding:5px 14px;border-radius:99px;font-size:0.68rem;background:var(--surface-1);border:1px solid var(--line);color:var(--text-dim);animation:pop .32s var(--ease) both}
+  .sysmsg.sc{background:oklch(28% 0.07 95);border-color:oklch(50% 0.13 95);color:oklch(90% 0.1 95)}
+  .sysmsg.gr{background:oklch(28% 0.07 150);border-color:oklch(48% 0.12 150);color:oklch(88% 0.12 150)}
+  .sysmsg.flag{background:var(--surface-2);border-color:var(--line);color:var(--text)}
+  .empty{margin:auto;text-align:center;color:var(--text-fade);font-size:0.78rem;max-width:220px;line-height:1.5}
+  @media(max-width:1220px){.main{grid-template-columns:1fr}.tower{border-right:none;border-bottom:1px solid var(--line);max-height:40vh}.gfocus{grid-template-columns:auto 1fr}.gf-spark{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="flag"></div>
+    <div><h1>British Grand Prix</h1><div class="sub">Silverstone · Round 12 · 2026 · Replay</div></div>
+    <div class="sess">
+      <div class="flagchip" id="flagchip"><span class="dot"></span><span id="flagtxt">Green</span></div>
+      <div class="stat"><span class="v mono" id="trackT">41°C</span><span class="k">Track</span></div>
+      <div class="stat"><span class="v mono" id="airT">23°C</span><span class="k">Air</span></div>
+      <div class="stat"><span class="v mono">62%</span><span class="k">Humidity</span></div>
+    </div>
+  </header>
+  <div class="transport">
+    <button class="play" id="play"><svg id="playicon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+    <div class="lapread"><div class="big mono">L<b id="lapNum">1</b><span>/24</span></div><div class="ph" id="phase">Lights out · <b id="sector">S1</b></div></div>
+    <div class="scrub"><div class="scrub-flags" id="scrubFlags"></div><input type="range" id="scrubber" min="1" max="24" value="1" step="0.02"></div>
+    <div class="lodsel" id="lodsel" title="Scrub resolution"><button data-lod="lap">Lap</button><button data-lod="sector" class="on">Sector</button><button data-lod="sec">Sec</button></div>
+    <div class="speeds" id="speeds"><button data-s="2000">1×</button><button data-s="1000" class="on">2×</button><button data-s="480">4×</button></div>
+  </div>
+  <div class="main">
+    <section class="tower">
+      <div class="tower-head"><span>P</span><span>Driver</span><span>DRS</span><span>Tyre</span><span>Gap</span><span>Last</span><span></span></div>
+      <div class="tower-body" id="towerBody"></div>
+    </section>
+    <section class="card">
+      <div class="card-head">
+        <button class="tab on" data-tab="pos"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Positions</button>
+        <button class="tab" data-tab="grid"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="7" height="8" rx="1"/><rect x="13" y="8" width="7" height="8" rx="1"/><rect x="4" y="15" width="7" height="6" rx="1"/></svg>Grid</button>
+        <button class="tab" data-tab="radio"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a8 8 0 0116 0M8 11v3a2 2 0 01-2 2H5v-5zM16 11v3a2 2 0 002 2h1v-5z"/></svg>Radio <span class="mono" id="radioBadge" style="opacity:.6"></span></button>
+        <div class="ctx"><span class="cbar" id="ctxBar"></span><div class="cinfo"><div class="ccode" id="ctxCode">NOR</div><div class="cteam" id="ctxTeam">McLaren</div></div><span class="cpos mono" id="ctxPos">P1</span></div>
+      </div>
+      <div class="panel on" id="panelPos"><div class="ladwrap"><label class="ghost-tg" id="ghostTg"><span class="sw"></span> 2025 winner ghost</label><svg class="ladder" id="ladder" preserveAspectRatio="none"></svg></div></div>
+      <div class="panel" id="panelGrid">
+        <div class="gfocus">
+          <div class="gf-id"><span class="bar" id="fBar"></span><div><div class="code" id="fCode">NOR</div><div class="team" id="fTeam">McLaren</div></div><span class="pos mono" id="fPos">P1</span></div>
+          <div class="gf-wheel">
+            <div class="shiftlights" id="shift"></div>
+            <div class="gf-core"><span class="gear mono" id="fGear">1</span><div class="sp"><span class="kph mono" id="fKph">0</span><i>KM/H</i></div></div>
+            <div class="gf-set"><span>ENG <b class="mono" id="fEng">4</b></span><span>BRAKE BIAS <b class="mono" id="fBB">57%</b></span><span>DIFF <b id="fDiff">MID</b></span><span>DRS <b class="drs" id="fDrs">OFF</b></span></div>
+          </div>
+          <div class="gf-spark"><svg class="spark" id="spark" viewBox="0 0 320 64" preserveAspectRatio="none"><path class="fill" id="sparkFill"></path><path class="stroke" id="sparkStroke"></path><line class="cursor" id="sparkCursor" x1="0" y1="0" x2="0" y2="64"></line></svg></div>
+        </div>
+        <div class="gstage"><div class="formation"><div class="grid-strip"></div><div class="track-area" id="trackArea"></div></div><aside class="pitlane"><div class="pit-title">Pit Lane</div><div id="pitBody"></div></aside></div>
+      </div>
+      <div class="panel" id="panelRadio"><div class="feed" id="feed"><div class="empty">Play or scrub the lap slider. Radio drops in as the story unfolds.</div></div></div>
+    </section>
+  </div>
+</div>
+<script>
+const TEAMS={MCL:['oklch(74% 0.17 55)','oklch(83% 0.13 60)'],FER:['oklch(58% 0.2 25)','oklch(69% 0.16 20)'],RBR:['oklch(58% 0.15 265)','oklch(71% 0.11 268)'],MER:['oklch(80% 0.12 185)','oklch(88% 0.09 185)'],AST:['oklch(60% 0.12 165)','oklch(71% 0.1 165)'],ALP:['oklch(72% 0.14 350)','oklch(81% 0.1 345)'],WIL:['oklch(72% 0.13 240)','oklch(82% 0.1 240)'],RB:['oklch(66% 0.13 288)','oklch(76% 0.1 290)'],HAA:['oklch(78% 0.03 265)','oklch(87% 0.02 265)'],SAU:['oklch(70% 0.17 150)','oklch(80% 0.13 150)'],CAD:['oklch(74% 0.11 90)','oklch(84% 0.09 92)']};
+const TEAMNAME={MCL:'McLaren',FER:'Ferrari',RBR:'Red Bull',MER:'Mercedes',AST:'Aston Martin',ALP:'Alpine',WIL:'Williams',RB:'Racing Bulls',HAA:'Haas',SAU:'Audi',CAD:'Cadillac'};
+const DRIVERS={NOR:{name:'Norris',team:'MCL',i:0},PIA:{name:'Piastri',team:'MCL',i:1},LEC:{name:'Leclerc',team:'FER',i:0},HAM:{name:'Hamilton',team:'FER',i:1},VER:{name:'Verstappen',team:'RBR',i:0},TSU:{name:'Tsunoda',team:'RBR',i:1},RUS:{name:'Russell',team:'MER',i:0},ANT:{name:'Antonelli',team:'MER',i:1},ALO:{name:'Alonso',team:'AST',i:0},STR:{name:'Stroll',team:'AST',i:1},GAS:{name:'Gasly',team:'ALP',i:0},COL:{name:'Colapinto',team:'ALP',i:1},SAI:{name:'Sainz',team:'WIL',i:0},ALB:{name:'Albon',team:'WIL',i:1},HAD:{name:'Hadjar',team:'RB',i:0},LAW:{name:'Lawson',team:'RB',i:1},OCO:{name:'Ocon',team:'HAA',i:0},BEA:{name:'Bearman',team:'HAA',i:1},HUL:{name:'Hulkenberg',team:'SAU',i:0},BOR:{name:'Bortoleto',team:'SAU',i:1},PER:{name:'Perez',team:'CAD',i:0},BOT:{name:'Bottas',team:'CAD',i:1}};
+const colorOf=c=>TEAMS[DRIVERS[c].team][DRIVERS[c].i];const teamOf=c=>TEAMNAME[DRIVERS[c].team];
+const START=['NOR','VER','PIA','LEC','HAM','RUS','ANT','ALO','SAI','GAS','ALB','LAW','HAD','TSU','STR','OCO','BEA','HUL','BOR','COL','PER','BOT'];
+const FINISH={NOR:1,HAM:2,PIA:3,VER:4,LEC:5,RUS:6,ANT:7,SAI:8,ALO:9,ALB:10,GAS:11,LAW:12,HAD:13,TSU:14,OCO:15,STR:16,BEA:17,HUL:18,BOR:19,PER:20,COL:21,BOT:22};
+const startPos={};START.forEach((c,i)=>startPos[c]=i+1);
+const pitStops={VER:13,SAI:16,OCO:9,HUL:11,STR:14,COL:8,BOT:10,GAS:17,TSU:12};
+const TOTAL=24,NDRV=22;const GHOST=[4,4,4,3,3,3,2,2,2,2,2,3,4,4,4,3,3,2,2,2,1,1,1,1];
+function seeded(str){let s=0;for(const c of str)s=(s*31+c.charCodeAt(0))>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+const isSC=l=>l>=12&&l<=14;
+function rankVal(code,lap){const t=(lap-1)/(TOTAL-1),e=t*t*(3-2*t);let v=startPos[code]*(1-e)+FINISH[code]*e;v+=(seeded(code+'~'+lap)()-0.5)*0.8;const pl=pitStops[code];if(pl){if(lap===pl)v+=30;else if(lap===pl+1)v+=5;else if(lap===pl+2)v+=1.5;}return v;}
+const ORDER=[];for(let lap=1;lap<=TOTAL;lap++){if(lap===1){ORDER.push([...START]);continue;}ORDER.push([...START].sort((a,b)=>rankVal(a,lap)-rankVal(b,lap)));}
+const COMP=['SOFT','MED','HARD'];const startComp={},pitComp={};START.forEach((c,i)=>{startComp[c]=COMP[i%3];pitComp[c]=COMP[(i+1)%3];});startComp.NOR='SOFT';startComp.PIA='SOFT';startComp.VER='HARD';pitComp.VER='SOFT';
+function tyreOf(code,lap){const pl=pitStops[code];if(pl&&lap>=pl)return{comp:pitComp[code],age:lap-pl+1};return{comp:startComp[code],age:lap};}
+function fmtLap(ms){const m=Math.floor(ms/60000),s=(ms%60000)/1000;return m+':'+s.toFixed(1).padStart(4,'0');}
+const DATA={};let bestByCode={},overallBest=Infinity;
+for(let lap=1;lap<=TOTAL;lap++){DATA[lap]={};const ord=ORDER[lap-1];let cum=0;ord.forEach((code,i)=>{const rnd=seeded(code+'-'+lap);let intv;if(i===0)intv=0;else if(isSC(lap))intv=0.3+rnd()*0.5;else intv=0.6+i*0.08+rnd()*0.8;cum+=intv;const base=87500+i*90+rnd()*500+(isSC(lap)?36000:0);const lastMs=Math.round(base);if(!isSC(lap)){if(!bestByCode[code]||lastMs<bestByCode[code])bestByCode[code]=lastMs;if(lastMs<overallBest)overallBest=lastMs;}const sec=[0,1,2].map(()=>{const r=rnd();if(r<0.05+(NDRV-i)*0.006)return'p';if(r<0.4)return'g';return'';});const drs=(i>0&&intv<1.0&&lap>=3&&!isSC(lap)&&rnd()<0.7);const ty=tyreOf(code,lap);DATA[lap][code]={pos:i+1,gap:cum,intv,lastMs,sec,drs,comp:ty.comp,age:ty.age};});}
+for(let lap=1;lap<=TOTAL;lap++)for(const code in DATA[lap]){const d=DATA[lap][code];d.isBest=(!isSC(lap)&&d.lastMs===overallBest);d.isPB=(!isSC(lap)&&d.lastMs===bestByCode[code]&&!d.isBest);}
+const SETTINGS={};START.forEach(c=>{const r=seeded('set'+c);SETTINGS[c]={eng:1+Math.floor(r()*9),bb:52+Math.floor(r()*11),diff:['LOW','MID','HIGH'][Math.floor(r()*3)]};});
+const PHASE={};START.forEach(c=>{PHASE[c]=(([...c].reduce((a,ch)=>a+ch.charCodeAt(0),0))%100)/100;});
+const RADIO=[{lap:1,who:'NOR',role:'driver',text:"Good launch. Head down now."},{lap:3,who:'PIA',role:'driver',text:"Yes! Sent it into Stowe, got Max. Feeling strong."},{lap:3,who:'VER',role:'driver',text:"No grip. No grip on these hards, I'm telling you."},{lap:5,who:'ENG-RB',role:'engineer',text:"Copy Max. We go long on this set, it'll come to us."},{lap:6,who:'HAM',role:'driver',crowd:true,text:"GET IN THERE!! P4 at home. Listen to that crowd!!"},{lap:6,who:'ENG-FER',role:'pitwall',text:"Charles, Lewis is through. Reset, build your own race."},{lap:8,who:'ALB',role:'driver',text:"Williams feels mega today. Keep me updated on Sainz."},{lap:10,who:'SAI',role:'driver',text:"Told you the pace was there. Pushing now."},{lap:12,sys:true,kind:'sc',text:"🟡 SAFETY CAR — Gasly ran wide at Club, debris on track"},{lap:13,who:'VER',role:'driver',pit:true,text:"Box now? ...okay but we're throwing this away."},{lap:13,who:'ENG-RB',role:'engineer',pit:true,text:"Trust us Max. Softs on, free stop under the SC. Send it after."},{lap:15,sys:true,kind:'gr',text:"🟢 GREEN FLAG — racing resumes"},{lap:15,who:'ENG-MCL',role:'engineer',text:"Full send on the restart Lando. Oscar's your only friend behind."},{lap:17,who:'VER',role:'driver',text:"Okay. NOW the car's alive. Give me the gaps ahead."},{lap:19,who:'RUS',role:'driver',text:"Verstappen's all over me, totally different tyre."},{lap:19,who:'ENG-MER',role:'pitwall',text:"Copy George. Hold him where you can, he'll cost himself time."},{lap:21,who:'VER',role:'driver',text:"P4. Where's the podium? Delta to Piastri, now."},{lap:22,who:'HAM',role:'driver',crowd:true,text:"P2!!! AT SILVERSTONE!! LET'S GOOO!!"},{lap:22,who:'PIA',role:'driver',text:"Nothing left, flat-spotted the fronts. Bring it home."},{lap:24,sys:true,kind:'flag',text:"🏁 CHEQUERED FLAG — Norris wins the British Grand Prix"},{lap:24,who:'NOR',role:'driver',crowd:true,text:"YES! YES! What a car, what a day. Thank you boys."}];
+const ROLE_LABEL={driver:'Driver',engineer:'Race Eng.',pitwall:'Pit Wall'};
+let T=1,selected='NOR',playing=false,stepMs=1000,ghostOn=false,raf=null,tab='pos',lastLap=0,lod='sector',lastPitSig='__init__';
+const LOD_STEP={lap:1,sector:1/3,sec:0.02};const $=s=>document.querySelector(s);const compChar=c=>c[0];
+const curLap=()=>Math.min(TOTAL,Math.max(1,Math.round(T)));const frac=()=>T-Math.floor(T);const posOf=(c,l)=>DATA[l][c].pos;
+function contPos(c){const lo=Math.floor(T),hi=Math.min(TOTAL,Math.ceil(T));if(lo===hi)return posOf(c,lo);const f=T-lo;return posOf(c,lo)*(1-f)+posOf(c,hi)*f;}
+function renderTower(){const lap=curLap();const ord=ORDER[lap-1];$('#towerBody').innerHTML=ord.map(code=>{const d=DATA[lap][code];const col=colorOf(code);const gap=d.pos===1?'<span class="gap leader">LEADER</span>':'<span class="gap mono">+'+d.gap.toFixed(1)+'</span>';const intv=d.pos===1?'':'<span class="int mono">+'+d.intv.toFixed(1)+'</span>';const lc=d.isBest?'best':(d.isPB?'pb':'');const isPit=pitStops[code]===lap;return `<div class="row ${selected===code?'sel':''} ${isPit?'pit':''}" data-code="${code}"><span class="pos mono">${d.pos}</span><span class="drv"><span class="bar" style="background:${col}"></span><span class="code">${code}</span></span><span class="drs ${d.drs?'on':''}">DRS</span><span class="tyre"><span class="circ ${compChar(d.comp)}">${compChar(d.comp)}</span><span class="age mono">${d.age}</span></span><span class="gapint">${gap}${intv}</span><span class="lastlap mono ${lc}">${isSC(lap)?'—':fmtLap(d.lastMs)}</span><span></span></div>`;}).join('');$('#towerBody').querySelectorAll('.row').forEach(r=>r.addEventListener('click',()=>selectDriver(r.dataset.code)));}
+const ladder=$('#ladder');let LB={pl:30,pr:44,pt:12,pb:18,w:0,h:0};
+function lay(){const r=ladder.getBoundingClientRect();LB.w=r.width;LB.h=r.height;}
+const xAt=l=>LB.pl+(l-1)/(TOTAL-1)*(LB.w-LB.pl-LB.pr);const yAt=p=>LB.pt+(p-1)/(NDRV-1)*(LB.h-LB.pt-LB.pb);
+function stepPath(fn){let d='';for(let l=1;l<=TOTAL;l++){const x=xAt(l),y=yAt(fn(l));if(l===1)d=`M ${x.toFixed(1)} ${y.toFixed(1)}`;else{const mx=(xAt(l-1)+x)/2;d+=` L ${mx.toFixed(1)} ${yAt(fn(l-1)).toFixed(1)} L ${mx.toFixed(1)} ${y.toFixed(1)} L ${x.toFixed(1)} ${y.toFixed(1)}`;}}return d;}
+function renderLadderBase(){lay();let s='';for(let p=1;p<=NDRV;p++){const y=yAt(p);s+=`<line class="grid-line" x1="${LB.pl}" y1="${y}" x2="${LB.w-LB.pr}" y2="${y}"/><text class="lane-lbl" x="${LB.pl-6}" y="${y+3}" text-anchor="end">${p}</text>`;}for(let l=1;l<=TOTAL;l+=3){const x=xAt(l);s+=`<text class="lap-lbl" x="${x}" y="${LB.h-4}" text-anchor="middle">L${l}</text>`;}if(ghostOn)s+=`<path class="drv-line ghost" style="stroke:var(--text-dim)" d="${stepPath(l=>GHOST[l-1])}"/>`;Object.keys(DRIVERS).forEach(c=>{const dim=selected&&selected!==c?' dimmed':'';const sw=selected===c?3:1.7;s+=`<path class="drv-line${dim}" style="stroke:${colorOf(c)};stroke-width:${sw}" d="${stepPath(l=>posOf(c,l))}"/>`;});s+=`<g id="ladDyn"></g>`;ladder.innerHTML=s;}
+function renderLadderDyn(){const g=$('#ladDyn');if(!g)return;let s=`<line class="scrub-line" x1="${xAt(T)}" y1="${LB.pt-4}" x2="${xAt(T)}" y2="${LB.h-LB.pb+3}"/>`;Object.keys(DRIVERS).forEach(c=>{const sel=selected===c;const dim=selected&&!sel?' dimmed':'';const x=xAt(T),y=yAt(contPos(c));s+=`<g class="${dim}"><circle cx="${x}" cy="${y}" r="${sel?4.5:2.8}" fill="${colorOf(c)}" stroke="var(--bg)" stroke-width="1.3"/>${sel?`<text class="node-code" x="${x+7}" y="${y+3.2}" fill="${colorOf(c)}">${c}</text>`:''}</g>`;});g.innerHTML=s;}
+const SPEED=[];(function(){const cor=[[0.06,.55],[0.16,.42],[0.27,.68],[0.36,.3],[0.46,.6],[0.58,.38],[0.7,.72],[0.8,.34],[0.9,.5]];for(let i=0;i<=120;i++){const t=i/120;let sp=1;cor.forEach(([p,d])=>{const w=0.035;sp=Math.min(sp,1-(1-d)*Math.exp(-((t-p)**2)/(2*w*w)));});SPEED.push(sp);}})();
+const paceOf=c=>{const h=[...c].reduce((a,ch)=>a+ch.charCodeAt(0),0);return 0.93+(h%10)/100;};
+function telemAt(code,prog){const idx=Math.min(SPEED.length-1,Math.floor(prog*(SPEED.length-1)));const base=SPEED[idx];const top=340*paceOf(code);const kph=Math.round(base*top);const nxt=SPEED[Math.min(SPEED.length-1,idx+1)];const slope=nxt-base;const thr=slope>=0?Math.min(100,60+slope*900+base*30):Math.max(0,base*40);const gear=Math.max(1,Math.round(base*7)+1);const rpm=8000+base*5000;return{base,kph,gear,rpm,thr};}
+function buildSpark(){const w=320,h=64;const y0=h-(SPEED[0]*0.9+0.05)*h;let st=`M 0 ${y0.toFixed(1)}`;SPEED.forEach((s,i)=>{const x=i/(SPEED.length-1)*w;const y=h-(s*0.9+0.05)*h;st+=` L ${x.toFixed(1)} ${y.toFixed(1)}`;});$('#sparkStroke').setAttribute('d',st);$('#sparkFill').setAttribute('d',st+` L 320 ${h} L 0 ${h} Z`);}
+const shiftSpans=[];(function(){const w=$('#shift');for(let i=0;i<15;i++){const sp=document.createElement('span');sp.className='sl';w.appendChild(sp);shiftSpans.push(sp);}})();
+const trackArea=$('#trackArea');let cardRefs={};let cardBuilt=false;const ROW=34;
+function buildCards(){trackArea.innerHTML='';cardRefs={};Object.keys(DRIVERS).forEach(code=>{const col=colorOf(code);const el=document.createElement('div');el.className='gcar';el.style.setProperty('--tc',col);el.dataset.code=code;el.innerHTML=`<span class="gc-pos mono"></span><span class="gc-code">${code}</span><div class="gc-mid"><span class="gc-kph mono">0<i>KM/H</i></span><span class="gc-gear mono">1</span><span class="gc-rpm"><i></i></span></div><div class="gc-right"><span class="gc-drs"></span><span class="gc-delta mono"></span></div>`;el.addEventListener('click',()=>selectDriver(code));trackArea.appendChild(el);cardRefs[code]={el,pos:el.querySelector('.gc-pos'),kph:el.querySelector('.gc-kph'),gear:el.querySelector('.gc-gear'),rpm:el.querySelector('.gc-rpm i'),drs:el.querySelector('.gc-drs'),delta:el.querySelector('.gc-delta')};});cardBuilt=true;trackArea.style.height=(NDRV*ROW)+'px';}
+function updateGrid(){if(tab!=='grid')return;if(!cardBuilt)buildCards();const lap=curLap();Object.keys(DRIVERS).forEach(code=>{const r=cardRefs[code];const cp=contPos(code);const y=(cp-1)*ROW;const x=(Math.round(cp)%2===0)?22:0;r.el.style.transform=`translate(${x}px,${y}px)`;const t=telemAt(code,(frac()+PHASE[code])%1);r.pos.textContent=Math.round(cp);r.kph.innerHTML=t.kph+'<i>KM/H</i>';r.gear.textContent=t.gear;r.rpm.style.width=Math.min(100,(t.rpm-8000)/5000*100).toFixed(0)+'%';const d=DATA[lap][code];const on=d.drs&&t.thr>70;r.drs.classList.toggle('on',on);r.delta.textContent=d.pos===1?'LEAD':'+'+d.intv.toFixed(1);r.el.classList.toggle('sel',selected===code);r.el.classList.toggle('pitting',pitStops[code]===lap);});renderPit(lap);updateFocus();}
+function renderPit(lap){const inPit=ORDER[lap-1].filter(c=>pitStops[c]===lap);const sig=lap+':'+inPit.join(',');if(sig===lastPitSig)return;lastPitSig=sig;$('#pitBody').innerHTML=inPit.length?inPit.map(code=>{const col=colorOf(code);const d=DATA[lap][code];return `<div class="pitcar" style="--tc:${col}"><div class="pc-top"><span class="pc-code">${code}</span><span class="pc-pos mono">P${d.pos}</span></div><div class="pc-tyre"><span class="from">${compChar(startComp[code])}</span> → <span>${compChar(pitComp[code])}</span> fresh</div><div class="pc-timer mono">STATIONARY · 2.${3+(code.charCodeAt(0)%6)}s</div></div>`;}).join(''):'<div class="pit-empty">Pit lane clear. A stop card slides in here when a driver boxes.</div>';}
+function updateFocus(){const code=selected;const t=telemAt(code,(frac()+PHASE[code])%1);$('#fKph').textContent=t.kph;$('#fGear').textContent=t.gear;const fr=Math.min(1,(t.rpm-8000)/5000);const n=Math.round(fr*15);shiftSpans.forEach((sp,i)=>sp.className='sl '+(i<n?(i<9?'g':i<13?'y':'r'):''));const on=DATA[curLap()][code].drs&&t.thr>70;$('#fDrs').textContent=on?'OPEN':'OFF';$('#fDrs').classList.toggle('on',on);const cx=((frac()+PHASE[code])%1)*320;$('#sparkCursor').setAttribute('x1',cx);$('#sparkCursor').setAttribute('x2',cx);}
+function refreshFocusId(){const code=selected;$('#fBar').style.background=colorOf(code);$('#fCode').textContent=code;$('#fTeam').textContent=teamOf(code);$('#fPos').textContent='P'+posOf(code,curLap());const s=SETTINGS[code];$('#fEng').textContent=s.eng;$('#fBB').textContent=s.bb+'%';$('#fDiff').textContent=s.diff;}
+function renderRadio(){const lap=curLap();const msgs=RADIO.filter(m=>m.lap<=lap);$('#radioBadge').textContent=msgs.length?msgs.length:'';const feed=$('#feed');if(!msgs.length){feed.innerHTML='<div class="empty">Play or scrub the lap slider. Radio drops in as the story unfolds.</div>';return;}feed.innerHTML=msgs.map(m=>{if(m.sys)return `<div class="sysmsg ${m.kind}">${m.text}</div>`;const isDrv=m.role==='driver';const dc=isDrv?m.who:m.who.split('-')[1];const col=DRIVERS[dc]?colorOf(dc):(TEAMS[dc]?TEAMS[dc][0]:'oklch(60% 0.02 265)');const who=isDrv?DRIVERS[m.who].name:(TEAMNAME[dc]||dc);const cls=m.crowd?'crowd':(m.pit?'pit':'');const av=isDrv?dc:dc.slice(0,3);return `<div class="msg ${cls}"><div class="av" style="background:${col}">${av}</div><div class="body"><div class="meta"><span class="who" style="color:${col}">${who}</span><span class="role">${ROLE_LABEL[m.role]||''}</span><span class="lap">Lap ${m.lap}</span></div><div class="bubble">${m.text}</div></div></div>`;}).join('');feed.scrollTop=feed.scrollHeight;}
+function updateCtx(){$('#ctxBar').style.background=colorOf(selected);$('#ctxCode').textContent=selected;$('#ctxTeam').textContent=teamOf(selected);$('#ctxPos').textContent='P'+posOf(selected,curLap());}
+function phaseTxt(){const l=curLap();if(l===1&&frac()<0.15)return'Lights out';if(isSC(l))return'🟡 Safety Car';if(l===15)return'🟢 Restart';if(l>=22)return'Closing laps';if(l===TOTAL)return'🏁 Finish';return'Racing';}
+function sessionStrip(){const l=curLap();const fc=$('#flagchip'),ft=$('#flagtxt');fc.className='flagchip';if(isSC(l)){fc.classList.add('sc');ft.textContent='Safety Car';}else if(l===TOTAL){fc.classList.add('chk');ft.textContent='Chequered';}else ft.textContent='Green';$('#trackT').textContent=(42-Math.round(l*0.15))+'°C';$('#airT').textContent=(24-Math.round(l*0.05))+'°C';}
+function syncLap(){renderTower();renderRadio();sessionStrip();refreshFocusId();updateCtx();}
+function syncFrame(){$('#lapNum').textContent=curLap();const sN=Math.min(3,Math.floor(frac()*3)+1);$('#sector').textContent='S'+sN;$('#phase').firstChild.textContent=phaseTxt()+' · ';$('#scrubber').value=T;if(tab==='pos')renderLadderDyn();if(tab==='grid')updateGrid();}
+function fullSync(){const lap=curLap();if(lap!==lastLap){lastLap=lap;syncLap();}syncFrame();}
+function selectDriver(c){selected=c;renderTower();if(tab==='pos'){renderLadderBase();renderLadderDyn();}refreshFocusId();updateCtx();if(tab==='grid')updateGrid();}
+function loop(){if(!playing)return;T+=(1/60)*(1000/stepMs);if(T>=TOTAL){T=TOTAL;fullSync();pause();return;}fullSync();raf=requestAnimationFrame(loop);}
+function play(){if(T>=TOTAL){T=1;lastLap=0;fullSync();}playing=true;$('#playicon').innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';raf=requestAnimationFrame(loop);}
+function pause(){playing=false;$('#playicon').innerHTML='<path d="M8 5v14l11-7z"/>';cancelAnimationFrame(raf);}
+$('#play').addEventListener('click',()=>playing?pause():play());
+$('#scrubber').addEventListener('input',e=>{pause();let v=+e.target.value;const st=LOD_STEP[lod];if(lod!=='sec')v=Math.round((v-1)/st)*st+1;T=Math.min(TOTAL,Math.max(1,v));fullSync();});
+$('#speeds').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#speeds').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');stepMs=+b.dataset.s;});
+$('#lodsel').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('#lodsel').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');lod=b.dataset.lod;$('#scrubber').step=lod==='sec'?0.02:LOD_STEP[lod];});
+$('#ghostTg').addEventListener('click',()=>{ghostOn=!ghostOn;$('#ghostTg').classList.toggle('on',ghostOn);if(tab==='pos'){renderLadderBase();renderLadderDyn();}});
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{tab=t.dataset.tab;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));$('#panel'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('on');if(tab==='pos'){renderLadderBase();renderLadderDyn();}if(tab==='grid'){lastPitSig='__init__';updateGrid();}if(tab==='radio')renderRadio();}));
+(function(){let h='';for(let l=1;l<=TOTAL;l++){h+=`<span class="tick" style="left:${(l-1)/(TOTAL-1)*100}%"></span>`;}[{l:12,c:'sc',t:'SC'},{l:15,c:'gr',t:'GREEN'},{l:24,c:'',t:'🏁'}].forEach(m=>{h+=`<span class="mk ${m.c}" style="left:${(m.l-1)/(TOTAL-1)*100}%">${m.t}</span>`;});$('#scrubFlags').innerHTML=h;})();
+window.addEventListener('resize',()=>{if(tab==='pos'){renderLadderBase();renderLadderDyn();}});
+buildSpark();renderLadderBase();fullSync();
+</script>
+</body>
+</html>
