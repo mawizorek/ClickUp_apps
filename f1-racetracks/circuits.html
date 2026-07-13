@@ -20,6 +20,10 @@
   matching the standings switcher; Matrix -> standings.html, History ->
   standings.html#history. Weekend is NOT a peer tab — it is the per-round
   DRILL-THROUGH reached from a circuit card (circuits link to weekend.html#/<slug>).
+  SEAMLESS NAV (v6.5): cross-document View Transitions (cross-fade, not a hard reload)
+  + the chrome paints on the first byte via inline critical CSS so only the #app data
+  surface fades in — arriving reads as a content swap, not a full-page reload. The
+  red F1 lockup persists/morphs across lenses (shared view-transition-name f1-brand).
   CACHE-BUST: bump BUILD_STAMP below AND the ?v= token on the module <script> tags on every source/style deploy.
   Footer version label lives in source/09 (APP_VERSION). Keep it in sync with this header.
 -->
@@ -36,13 +40,51 @@
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
   <style>
-    html{background:#17171d}
-    body{opacity:0;transition:opacity .12s ease}
-    body.runtime-ready{opacity:1}
+    html{background:oklch(0.16 0.012 268)}
+
+    /* seamless cross-lens navigation: same-origin cross-document view transitions
+       so switching to the Matrix/History lens cross-fades instead of a hard reload. */
+    @view-transition{navigation:auto}
+    ::view-transition-old(root),::view-transition-new(root){animation-duration:.32s;animation-timing-function:cubic-bezier(0.16,1,0.3,1)}
+    @media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
+
+    /* content-only reveal: chrome paints instantly (critical CSS below), only the
+       #app data surface + footer fade in once the async style band lands — so
+       arriving here reads as "chrome stayed, content filled in", NOT a full reload. */
+    #app,footer.app{opacity:0}
+    body.runtime-ready #app,body.runtime-ready footer.app{opacity:1;transition:opacity .22s cubic-bezier(0.16,1,0.3,1)}
+
+    /* --- critical chrome (mirrors source/02 + 07 so the topbar is styled on the
+       first paint; the async band re-declares these identically) --- */
+    :root{
+      --bg:oklch(0.16 0.012 268);--bg2:oklch(0.195 0.014 268);
+      --surface:oklch(0.225 0.015 268);--surface2:oklch(0.265 0.016 268);
+      --line:oklch(0.30 0.014 268);--text:oklch(0.95 0.006 268);
+      --muted:oklch(0.74 0.011 268);--faint:oklch(0.56 0.013 268);
+      --red:oklch(0.64 0.21 26);--ease:cubic-bezier(0.16,1,0.3,1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;font-weight:450;background:var(--bg);color:var(--text);line-height:1.55;letter-spacing:0.006em;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;padding:clamp(16px,3vw,40px) clamp(16px,3.5vw,52px) 0;min-height:100vh}
+    .wrap{max-width:1200px;margin:0 auto}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+    .brand{display:flex;align-items:center;gap:11px;cursor:pointer;background:none;border:none;color:inherit;font:inherit;padding:0;view-transition-name:f1-brand}
+    .brand .mark{width:30px;height:30px;border-radius:8px;background:var(--red);display:grid;place-items:center;flex:none;box-shadow:0 6px 18px -6px oklch(0.64 0.21 26/.7)}
+    .brand .mark svg{width:18px;height:18px;display:block}
+    .brand .t{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:-0.01em}
+    .brand .t small{display:block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:500;margin-top:2px}
+    .topbar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .nav-jump{display:flex;align-items:center;gap:8px}
+    .nav-jump select{font-family:'JetBrains Mono',monospace;font-size:.74rem;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px 11px;cursor:pointer;max-width:60vw}
+    .lens{display:inline-flex;border:1px solid var(--line);background:var(--surface)}
+    .lens>*{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:transparent;border:0;cursor:pointer;padding:8px 15px;text-decoration:none;display:inline-flex;align-items:center;transition:color .15s var(--ease),background .15s var(--ease)}
+    .lens>*+*{border-left:1px solid var(--line)}
+    .lens .on{background:var(--surface2);color:var(--text);cursor:default}
+    .lens a:hover:not(.on){color:var(--text);background:var(--bg2)}
+    @media (max-width:560px){.lens>*{padding:8px 12px;font-size:.62rem;letter-spacing:.06em}}
   </style>
   <script>
     // Bump this one token on every source/style deploy to guarantee fresh bytes.
-    const BUILD_STAMP = '20260713b';
+    const BUILD_STAMP = '20260713c';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
@@ -104,15 +146,15 @@
     </footer>
   </div>
 
-  <script src="./source/12_results_store.js?v=20260713b"></script>
-  <script src="./source/09_app_bootstrap_and_home.js?v=20260713b"></script>
-  <script src="./source/10_track_views_and_profile.js?v=20260713b"></script>
-  <script src="./source/13_live_session_panel.js?v=20260713b"></script>
-  <script src="./source/11_weather_and_footer_exports.js?v=20260713b"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260713b"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260713b"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260713b"></script>
-  <script src="./source/17_weekend_mount.js?v=20260713b"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260713b"></script>
+  <script src="./source/12_results_store.js?v=20260713c"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260713c"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260713c"></script>
+  <script src="./source/13_live_session_panel.js?v=20260713c"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260713c"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260713c"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260713c"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260713c"></script>
+  <script src="./source/17_weekend_mount.js?v=20260713c"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260713c"></script>
 </body>
 </html>
