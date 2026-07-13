@@ -1,6 +1,6 @@
 {
   "version": "2026-07-13",
-  "note": "Source of truth for the quickfire index. Add an artifact = add an entry here. Subjects/type must come from the controlled vocabulary below; adding a new vocab term is a deliberate edit, not an ad-hoc tag.",
+  "note": "Source of truth for the quickfire index. Add an artifact = add an entry here. Subjects/type must come from the controlled vocabulary below; adding a new vocab term is a deliberate edit, not an ad-hoc tag. reviewed:false = auto-surfaced folder with inferred tags, needs a human pass.",
   "vocabulary": {
     "type": ["plan", "research", "reference", "tool", "fun"],
     "subjects": ["home", "kitchen", "food", "history", "europe", "travel", "family", "work", "clickup", "tech"]
@@ -12,6 +12,15 @@
       "desc": "Roman garum to Cetara colatura: salt history, how it's made, five recipes, and where to buy.",
       "type": "research",
       "subjects": ["food", "history", "europe"],
+      "date": "2026-07-13",
+      "reviewed": true
+    },
+    {
+      "slug": "atomic-trail",
+      "title": "The Atomic Trail",
+      "desc": "TVA nuclear history + Manhattan Project road-trip planner, sparked flying CHI→CHA.",
+      "type": "plan",
+      "subjects": ["history", "travel"],
       "date": "2026-07-13",
       "reviewed": true
     },
