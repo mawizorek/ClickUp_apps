@@ -1,33 +1,113 @@
 <!DOCTYPE html>
 <!--
-  F1 Racetracks \u2014 slim entry router (index = index, never a stored app).
-  Lands on the Championship Matrix (drivers/constructors standings) by default.
-  Forwards legacy circuit deep links (#/<slug>) to the circuit guide.
-  LANDING is a one-line constant below; repoint the default lens without a rebuild.
-  The two lenses are not yet fully integrated \u2014 this router is the seam.
+  F1 2026 — unified app shell (v7).
+  REAL one-app: this file is the router/shell, not a stored page. It owns the ONE
+  persistent chrome (brand + Matrix / History / Circuits switcher) and a single hash
+  router. Each lens is an isolated surface mounted here:
+    - Matrix + History  -> standings.html  (in-doc DOM swap, driven by inner hash)
+    - Circuits          -> circuits.html
+  Both surfaces are kept warm and cross-faded, so switching never reloads and the chrome
+  never unmounts. Isolation is deliberate: the two lenses are classic-script bundles that
+  share (and depend on) their own document's global scope, and their CSS :root token sets
+  clash on purpose (--s1/2/3 mean different things per lens). Separate surfaces = zero
+  collision, no rewrite. The shell is same-origin with both lenses, so app-shell.js ADOPTS
+  each on load (injects chrome-hiding CSS + drives its hash) without editing the lens code.
+  Router: source/app-shell.js. Cache-bust: bump ?v on it per deploy.
 -->
 <html lang="en-US">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex, nofollow">
-  <title>F1 Racetracks</title>
-  <style>html{background:#13161d;color:#e7e9ee;font-family:system-ui,sans-serif}body{margin:0;display:grid;place-items:center;height:100dvh}a{color:#e7e9ee}</style>
-  <script>
-    (function(){
-      var LANDING = 'standings.html';   // default lens: Championship Matrix
-      var CIRCUITS = 'circuits.html';   // circuit guide lens
-      var hash = location.hash || '';
-      var slug = hash.replace(/^#\/?/, '').trim();
-      if (slug) { location.replace(CIRCUITS + hash); }
-      else { location.replace(LANDING); }
-    })();
-  </script>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#15161c">
+  <title>F1 2026 — Championship &amp; Circuits</title>
+  <link rel="icon" type="image/png" href="https://app-cdn.clickup.com/assets/favicons/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="https://app-cdn.clickup.com/assets/favicons/favicon-32x32.png" sizes="32x32">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:oklch(0.15 0.012 268);
+      --bar:oklch(0.185 0.013 268);
+      --s3:oklch(0.275 0.017 268);
+      --line:oklch(0.31 0.014 268);
+      --txt:oklch(0.96 0.006 268);
+      --txt-mid:oklch(0.74 0.011 268);
+      --txt-dim:oklch(0.56 0.013 268);
+      --red:oklch(0.64 0.21 26);
+      --ease:cubic-bezier(0.16,1,0.3,1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    html{background:var(--bg)}
+    body{
+      background:var(--bg);color:var(--txt);
+      font-family:'Inter',system-ui,sans-serif;font-weight:450;
+      -webkit-font-smoothing:antialiased;font-optical-sizing:auto;
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+
+    /* --- the one persistent chrome --- */
+    .app-bar{
+      flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:11px clamp(14px,3vw,30px);
+      background:linear-gradient(to bottom,var(--bar),oklch(0.17 0.013 268));
+      border-bottom:1px solid var(--line);
+      box-shadow:0 1px 0 oklch(1 0 0/0.02), 0 12px 34px -26px oklch(0 0 0/0.9);
+      position:relative;z-index:5;
+    }
+    .brand{display:flex;align-items:center;gap:11px;cursor:pointer;background:none;border:0;color:inherit;font:inherit;padding:4px 6px;margin:-4px -6px;border-radius:10px;transition:background .15s var(--ease)}
+    .brand:hover{background:oklch(1 0 0/0.03)}
+    .brand:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+    .brand .mark{width:32px;height:32px;border-radius:9px;background:var(--red);display:grid;place-items:center;flex:none;box-shadow:0 0 24px -4px oklch(0.64 0.21 26/0.6)}
+    .brand .mark svg{width:19px;height:19px;display:block}
+    .brand .t{text-align:left;line-height:1}
+    .brand .t b{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.02rem;letter-spacing:-0.01em;display:block}
+    .brand .t small{display:block;font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.19em;text-transform:uppercase;color:var(--txt-dim);font-weight:500;margin-top:4px}
+
+    .switch{display:inline-flex;border:1px solid var(--line);border-radius:11px;background:oklch(0.155 0.012 268);padding:3px;gap:2px}
+    .switch button{
+      font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--txt-dim);background:transparent;border:0;cursor:pointer;
+      padding:8px 15px;border-radius:8px;transition:color .16s var(--ease),background .16s var(--ease);
+    }
+    .switch button:hover{color:var(--txt-mid)}
+    .switch button[aria-selected="true"]{background:var(--s3);color:var(--txt);box-shadow:inset 0 1px 0 oklch(1 0 0/0.05)}
+    .switch button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+    /* --- warm, cross-faded lens surfaces --- */
+    .stage{flex:1;position:relative;min-height:0;background:var(--bg)}
+    .stage iframe{
+      position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg);
+      opacity:0;pointer-events:none;transition:opacity .3s var(--ease);
+    }
+    .stage iframe.active{opacity:1;pointer-events:auto}
+
+    @media (prefers-reduced-motion:reduce){.stage iframe{transition:none}}
+    @media (max-width:560px){
+      .app-bar{gap:10px;padding:10px 14px}
+      .brand .t small{display:none}
+      .switch button{padding:8px 11px;font-size:.6rem;letter-spacing:.06em}
+    }
+  </style>
 </head>
 <body>
-  <noscript>
-    <p>F1 Racetracks needs JavaScript. Open the <a href="standings.html">Championship Matrix</a> or the <a href="circuits.html">circuit guide</a>.</p>
-  </noscript>
-  <p style="opacity:.6;font-size:.8rem">Loading the Championship Matrix\u2026 <a href="standings.html">continue</a></p>
+  <header class="app-bar">
+    <button class="brand" data-nav="matrix" aria-label="F1 2026 home">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 17c4-1 6-9 10-9 3 0 4 3 8 2" stroke="white" stroke-width="2.4" stroke-linecap="round"></path><circle cx="6" cy="16.5" r="1.7" fill="white"></circle></svg></span>
+      <span class="t"><b>F1 2026</b><small>Championship &amp; Circuits</small></span>
+    </button>
+    <nav class="switch" role="tablist" aria-label="Lens">
+      <button role="tab" data-nav="matrix" aria-selected="true">Matrix</button>
+      <button role="tab" data-nav="history" aria-selected="false">History</button>
+      <button role="tab" data-nav="circuits" aria-selected="false">Circuits</button>
+    </nav>
+  </header>
+  <main class="stage">
+    <iframe id="lens-standings" title="Championship Matrix" src="standings.html"></iframe>
+    <iframe id="lens-circuits" title="Circuit Guide" src="circuits.html"></iframe>
+  </main>
+  <script src="source/app-shell.js?v=7"></script>
 </body>
 </html>
