@@ -1,7 +1,7 @@
 :root{
  --bg:oklch(0.16 0.012 268);--s1:oklch(0.195 0.014 268);--s2:oklch(0.225 0.015 268);
- --s3:oklch(0.265 0.016 268);--line:oklch(0.30 0.014 268);--line-soft:oklch(0.25 0.013 268);
- --txt:oklch(0.95 0.006 268);--txt-mid:oklch(0.74 0.011 268);--txt-dim:oklch(0.56 0.013 268);
+ --s3:oklch(0.275 0.018 255);--line:oklch(0.30 0.014 268);--line-soft:oklch(0.25 0.013 268);
+ --txt:oklch(0.95 0.006 268);--txt-mid:oklch(0.74 0.011 268);--txt-dim:oklch(0.56 0.012 268);
  --gold:oklch(0.84 0.135 88);--silver:oklch(0.82 0.012 268);--bronze:oklch(0.70 0.10 58);
  --purple:oklch(0.72 0.16 300);--amber:oklch(0.80 0.155 78);--mover:oklch(0.78 0.13 200);
  --green:oklch(0.72 0.15 158);--red:oklch(0.64 0.21 26);
@@ -12,8 +12,8 @@
  --row:37px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;padding:clamp(9px,2vw,20px);padding-bottom:calc(env(safe-area-inset-bottom) + 20px)}
+html{-webkit-text-size-adjust:100%;height:100%}
+body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:clamp(9px,2vw,20px);padding-bottom:calc(env(safe-area-inset-bottom) + 20px)}
 .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
 .hidden{display:none !important}
 
