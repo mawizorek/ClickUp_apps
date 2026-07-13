@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>The Atomic Trail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --ink: oklch(18% 0.02 250);
+    --ink-2: oklch(23% 0.022 250);
+    --ink-3: oklch(28% 0.024 250);
+    --line: oklch(38% 0.02 250);
+    --paper: oklch(93% 0.015 85);
+    --paper-dim: oklch(78% 0.018 85);
+    --paper-faint: oklch(62% 0.016 85);
+    --amber: oklch(76% 0.15 62);
+    --amber-deep: oklch(66% 0.16 52);
+    --radium: oklch(80% 0.13 158);
+    --rust: oklch(58% 0.14 35);
+    --f-display: "Fraunces", Georgia, serif;
+    --f-sans: "Inter", system-ui, sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, monospace;
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+    --sp-6: 24px; --sp-8: 32px; --sp-12: 48px; --sp-16: 64px; --sp-24: 96px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--ink); color: var(--paper); font-family: var(--f-sans);
+    font-weight: 400; line-height: 1.6; letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased; font-optical-sizing: auto; overflow-x: hidden;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 0 var(--sp-6); }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+  .hero {
+    position: relative; min-height: 92vh; display: flex; flex-direction: column;
+    justify-content: flex-end; padding: var(--sp-16) 0 var(--sp-12); overflow: hidden;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(120% 80% at 70% 15%, oklch(66% 0.16 52 / 0.28), transparent 60%), radial-gradient(90% 60% at 20% 90%, oklch(80% 0.13 158 / 0.12), transparent 55%);
+    z-index: 0; pointer-events: none;
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+  .eyebrow {
+    font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--amber); display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-6);
+  }
+  .eyebrow::before { content: ""; width: 28px; height: 1px; background: var(--amber); }
+  .hero h1 {
+    font-family: var(--f-display); font-weight: 900; font-size: clamp(3rem, 15vw, 5.2rem);
+    line-height: 0.92; letter-spacing: -0.02em; text-wrap: balance; margin-bottom: var(--sp-6);
+  }
+  .hero h1 em { font-style: italic; font-weight: 500; color: var(--amber); display: block; }
+  .hero .lede { font-size: 1.12rem; color: var(--paper-dim); max-width: 42ch; line-height: 1.65; }
+  .compass {
+    position: absolute; top: var(--sp-16); right: -40px; width: 220px; height: 220px;
+    opacity: 0.5; z-index: 0; animation: drift 24s ease-in-out infinite alternate;
+  }
+  @keyframes drift { to { transform: rotate(12deg) translateY(14px); } }
+  .scroll-cue {
+    margin-top: var(--sp-12); font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--paper-faint); display: flex; align-items: center; gap: var(--sp-2);
+  }
+  .scroll-cue i { animation: bob 1.8s var(--ease-out) infinite; }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+  section { padding: var(--sp-24) 0; position: relative; }
+  .kicker { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--radium); margin-bottom: var(--sp-4); }
+  h2 { font-family: var(--f-display); font-weight: 900; font-size: clamp(2rem, 8vw, 2.9rem); line-height: 1.02; letter-spacing: -0.015em; text-wrap: balance; margin-bottom: var(--sp-6); }
+  h2 .light { font-weight: 400; font-style: italic; color: var(--paper-dim); }
+  .prose p { color: var(--paper-dim); margin-bottom: var(--sp-4); max-width: 64ch; }
+  .prose p strong { color: var(--paper); font-weight: 600; }
+  .prose .drop::first-letter { font-family: var(--f-display); font-weight: 900; font-size: 3.4em; float: left; line-height: 0.72; padding: 6px 10px 0 0; color: var(--amber); }
+  a.src { color: var(--radium); text-decoration: none; border-bottom: 1px solid oklch(80% 0.13 158 / 0.4); transition: border-color .2s var(--ease-out), color .2s var(--ease-out); }
+  a.src:hover { color: var(--amber); border-bottom-color: var(--amber); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: var(--sp-12) 0; }
+  .stat { padding: var(--sp-6) var(--sp-4); text-align: center; border-right: 1px solid var(--line); }
+  .stat:last-child { border-right: none; }
+  .stat .n { font-family: var(--f-display); font-weight: 900; font-size: 2.6rem; line-height: 1; color: var(--amber); font-variant-numeric: tabular-nums; }
+  .stat .l { font-family: var(--f-mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--paper-faint); margin-top: var(--sp-3); line-height: 1.4; }
+  .mix-grid { display: grid; grid-template-columns: 1fr; gap: var(--sp-8); margin-top: var(--sp-8); }
+  .chart-box { position: relative; width: 100%; max-width: 340px; margin: 0 auto; }
+  .chart-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+  .chart-center .big { font-family: var(--f-display); font-weight: 900; font-size: 2.4rem; color: var(--radium); line-height: 1; }
+  .chart-center .cap { font-family: var(--f-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-faint); margin-top: 6px; text-align: center; max-width: 14ch; }
+  .mix-list { list-style: none; }
+  .mix-row { display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: var(--sp-3); padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); }
+  .mix-row:last-child { border-bottom: none; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; }
+  .mix-name { font-size: 0.95rem; color: var(--paper); font-weight: 500; }
+  .mix-name span { display: block; font-size: 0.76rem; color: var(--paper-faint); font-weight: 400; font-family: var(--f-mono); }
+  .mix-pct { font-family: var(--f-display); font-weight: 900; font-size: 1.3rem; color: var(--paper); font-variant-numeric: tabular-nums; }
+  .timeline { margin-top: var(--sp-8); position: relative; padding-left: var(--sp-8); }
+  .timeline::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--amber), var(--radium), transparent); }
+  .tl-item { position: relative; padding-bottom: var(--sp-8); }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-item::before { content: ""; position: absolute; left: calc(-1 * var(--sp-8)); top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); border: 2px solid var(--amber); }
+  .tl-year { font-family: var(--f-mono); font-size: 0.8rem; color: var(--amber); letter-spacing: 0.08em; margin-bottom: var(--sp-1); }
+  .tl-item h3 { font-family: var(--f-display); font-size: 1.35rem; font-weight: 600; margin-bottom: var(--sp-2); }
+  .tl-item p { color: var(--paper-dim); font-size: 0.96rem; max-width: 58ch; }
+  .pull { margin: var(--sp-16) 0; padding: var(--sp-8) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .pull blockquote { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 6vw, 2.1rem); line-height: 1.25; color: var(--paper); text-wrap: balance; }
+  .pull cite { display: block; margin-top: var(--sp-4); font-family: var(--f-mono); font-style: normal; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--radium); }
+  .trip-head { margin-bottom: var(--sp-8); }
+  .stop { position: relative; border: 1px solid var(--line); border-radius: 14px; padding: var(--sp-6); margin-bottom: var(--sp-4); background: var(--ink-2); transition: border-color .3s var(--ease-out), transform .3s var(--ease-out); }
+  .stop:hover { border-color: var(--amber); transform: translateY(-3px); }
+  .stop-top { display: flex; align-items: flex-start; gap: var(--sp-4); }
+  .stop-num { flex: 0 0 auto; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--amber); font-family: var(--f-display); font-weight: 900; font-size: 1.3rem; color: var(--amber); font-variant-numeric: tabular-nums; }
+  .stop-title { flex: 1; }
+  .stop-title h3 { font-family: var(--f-display); font-size: 1.4rem; font-weight: 600; line-height: 1.1; }
+  .stop-title .where { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--radium); margin-top: var(--sp-1); display: flex; align-items: center; gap: 6px; }
+  .stop-body { color: var(--paper-dim); font-size: 0.96rem; margin-top: var(--sp-4); }
+  .stop-body strong { color: var(--paper); font-weight: 600; }
+  .links { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
+  .link-btn { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-radius: 10px; background: var(--ink-3); border: 1px solid var(--line); color: var(--paper); text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: border-color .2s var(--ease-out), background .2s var(--ease-out), transform .2s var(--ease-out); }
+  .link-btn:hover { border-color: var(--radium); background: oklch(28% 0.03 250); transform: translateX(3px); }
+  .link-btn i { color: var(--radium); flex: 0 0 auto; }
+  .link-btn .lb-txt { flex: 1; }
+  .link-btn .lb-host { font-family: var(--f-mono); font-size: 0.68rem; color: var(--paper-faint); letter-spacing: 0.04em; }
+  .link-btn .lb-arrow { color: var(--paper-faint); }
+  .tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-4); }
+  .tag { font-family: var(--f-mono); font-size: 0.66rem; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 100px; background: var(--ink-3); color: var(--paper-dim); border: 1px solid var(--line); }
+  .tag.hot { color: var(--amber); border-color: var(--amber-deep); }
+  .tag.warn { color: var(--rust); border-color: var(--rust); }
+  .anchor-badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-mono); font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); background: var(--amber); padding: 3px 9px; border-radius: 4px; margin-bottom: var(--sp-3); font-weight: 500; }
+  .callout { margin-top: var(--sp-8); border: 1px solid var(--rust); border-radius: 14px; padding: var(--sp-6); background: oklch(58% 0.14 35 / 0.08); }
+  .callout h4 { font-family: var(--f-sans); font-weight: 700; font-size: 0.95rem; color: var(--rust); display: flex; align-items: center; gap: 8px; margin-bottom: var(--sp-2); letter-spacing: 0.02em; }
+  .callout p { color: var(--paper-dim); font-size: 0.92rem; }
+  .callout a.src { color: var(--rust); border-bottom-color: oklch(58% 0.14 35 / 0.5); }
+  .callout a.src:hover { color: var(--amber); border-bottom-color: var(--amber); }
+  .checklist { list-style: none; margin-top: var(--sp-6); }
+  .checklist li { display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-4) 0; border-bottom: 1px solid var(--line); color: var(--paper-dim); font-size: 0.96rem; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li i { color: var(--radium); flex: 0 0 auto; margin-top: 3px; }
+  .checklist li strong { color: var(--paper); font-weight: 600; }
+  .sources { background: var(--ink-2); border-top: 1px solid var(--line); }
+  .src-list { list-style: none; margin-top: var(--sp-6); counter-reset: s; }
+  .src-list li { display: grid; grid-template-columns: 28px 1fr; gap: var(--sp-3); align-items: baseline; padding: var(--sp-4) 0; border-bottom: 1px solid var(--line); counter-increment: s; }
+  .src-list li:last-child { border-bottom: none; }
+  .src-list li::before { content: counter(s, decimal-leading-zero); font-family: var(--f-mono); font-size: 0.75rem; color: var(--amber); letter-spacing: 0.05em; }
+  .src-list a { color: var(--paper); text-decoration: none; font-weight: 500; font-size: 0.95rem; }
+  .src-list a:hover { color: var(--amber); }
+  .src-list .host { display: block; font-family: var(--f-mono); font-size: 0.7rem; color: var(--paper-faint); margin-top: 2px; word-break: break-all; }
+  footer { padding: var(--sp-16) 0 var(--sp-24); border-top: 1px solid var(--line); text-align: center; }
+  footer .mark { font-family: var(--f-display); font-weight: 900; font-size: 1.6rem; color: var(--amber); }
+  footer p { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--paper-faint); text-transform: uppercase; margin-top: var(--sp-3); }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; scroll-behavior: auto; } .reveal { opacity: 1; transform: none; transition: none; } }
+</style>
+</head>
+<body>
+  <header class="hero">
+    <svg class="compass" viewBox="0 0 100 100" fill="none" stroke="var(--amber)" stroke-width="0.6">
+      <circle cx="50" cy="50" r="46"/>
+      <circle cx="50" cy="50" r="34" stroke-dasharray="1 3"/>
+      <path d="M50 8 L56 50 L50 92 L44 50 Z" fill="var(--amber)" stroke="none" opacity="0.85"/>
+      <path d="M8 50 L50 44 L92 50 L50 56 Z" fill="var(--radium)" stroke="none" opacity="0.4"/>
+      <circle cx="50" cy="50" r="3" fill="var(--paper)" stroke="none"/>
+    </svg>
+    <div class="wrap">
+      <p class="eyebrow">Field Dossier &middot; CHI &rarr; CHA</p>
+      <h1>The Atomic <em>Trail</em></h1>
+      <p class="lede">You flew over a cooling tower and asked a question. It leads back to the New Deal, the bomb, and a road trip hiding in plain sight below your wing.</p>
+      <div class="scroll-cue"><span>Descend into it</span><i data-lucide="arrow-down" width="14" height="14"></i></div>
+    </div>
+  </header>
+  <section class="wrap reveal">
+    <p class="kicker">01 &middot; What's under the wing</p>
+    <h2>One utility <span class="light">quietly runs the whole valley.</span></h2>
+    <div class="prose">
+      <p class="drop">The two hyperbolic cooling towers you spotted on the peninsula are <strong>Sequoyah Nuclear Plant</strong>, on Chickamauga Lake about 18 miles north of Chattanooga <a class="src" href="https://lakeinfo.tva.gov/web/sites/sequoyah.htm" target="_blank" rel="noopener">[1]</a>. It's one node in a system most people never think about: the <strong>Tennessee Valley Authority</strong>.</p>
+      <p>TVA isn't a state grid and isn't a private company. It's a <strong>federally owned power corporation</strong> born out of the 1933 New Deal, today the largest public utility in the country <a class="src" href="https://en.wikipedia.org/wiki/Tennessee_Valley_Authority" target="_blank" rel="noopener">[2]</a>. It generates the power AND moves it, then sells wholesale to ~150 local utilities who bill your house. No shareholders. Surplus loops back into cheaper rates and infrastructure.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n">3</div><div class="l">Nuclear plants in the network</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">Reactors online</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">States on the grid</div></div>
+    </div>
+    <div class="prose">
+      <p><strong>The three plants:</strong> Sequoyah (2 reactors, the one you saw), Watts Bar near Spring City (2), and Browns Ferry in Alabama (3). All feeding roughly 10 million people <a class="src" href="https://tva.com/energy/our-power-system/nuclear" target="_blank" rel="noopener">[3]</a>.</p>
+    </div>
+  </section>
+  <section class="wrap reveal">
+    <p class="kicker">02 &middot; What actually powers the grid</p>
+    <h2>Nuclear's the big one, <span class="light">but gas is coming fast.</span></h2>
+    <div class="prose">
+      <p>The plant you flew over pulls the largest single share. Here's TVA's full generation mix from its most recent reported full year <a class="src" href="https://wpln.org/post/tvas-power-mix-explained-in-two-charts/" target="_blank" rel="noopener">[4]</a>:</p>
+    </div>
+    <div class="mix-grid">
+      <div class="chart-box">
+        <canvas id="mixChart" width="340" height="340" aria-label="TVA generation mix donut chart" role="img"></canvas>
+        <div class="chart-center">
+          <div class="big">~52%</div>
+          <div class="cap">Carbon-free (nuclear + hydro)</div>
+        </div>
+      </div>
+      <ul class="mix-list">
+        <li class="mix-row"><span class="swatch" style="background:oklch(76% 0.15 62)"></span><span class="mix-name">Nuclear <span>Sequoyah &middot; Watts Bar &middot; Browns Ferry</span></span><span class="mix-pct">42%</span></li>
+        <li class="mix-row"><span class="swatch" style="background:oklch(58% 0.14 35)"></span><span class="mix-name">Natural gas <span>17 plants &middot; growing</span></span><span class="mix-pct">31%</span></li>
+        <li class="mix-row"><span class="swatch" style="background:oklch(45% 0.03 250)"></span><span class="mix-name">Coal <span>4 fossil plants &middot; phasing down</span></span><span class="mix-pct">14%</span></li>
+        <li class="mix-row"><span class="swatch" style="background:oklch(70% 0.11 230)"></span><span class="mix-name">Hydro <span>29 dams &middot; the original backbone</span></span><span class="mix-pct">9%</span></li>
+        <li class="mix-row"><span class="swatch" style="background:oklch(80% 0.13 158)"></span><span class="mix-name">Wind + solar <span>9 solar sites + purchased wind</span></span><span class="mix-pct">4%</span></li>
+      </ul>
+    </div>
+    <div class="callout">
+      <h4><i data-lucide="trending-up" width="16" height="16"></i> The mix is shifting right now</h4>
+      <p>TVA's 2026 resource plan floats up to <strong>26 GW of new natural gas by 2040</strong>, driven largely by AI data centers slamming the region with demand. Expect gas to climb and coal to keep shrinking <a class="src" href="https://256today.com/tva-revises-long-term-power-plan-as-rising-demand-reshapes-energy-strategy/" target="_blank" rel="noopener">[5]</a>.</p>
+    </div>
+  </section>
+  <section class="wrap reveal">
+    <p class="kicker">03 &middot; The twist</p>
+    <h2>The same dams that lit up dirt-poor farms <span class="light">powered the bomb.</span></h2>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-year">1933</div><h3>Rock bottom, then FDR</h3><p>The Tennessee Valley was one of the poorest, most flood-ravaged corners of America. Private utilities wouldn't wire the countryside; it wasn't profitable. So the government became the utility <a class="src" href="https://en.wikipedia.org/wiki/Tennessee_Valley_Authority" target="_blank" rel="noopener">[2]</a>.</p></div>
+      <div class="tl-item"><div class="tl-year">1942</div><h3>Enter "Site X"</h3><p>The Manhattan Project needed staggering electricity and empty land. TVA had both. The government dropped <strong>Oak Ridge, Tennessee</strong> in its backyard; the mile-long K-25 plant pioneered gaseous-diffusion uranium enrichment <a class="src" href="https://www.nps.gov/mapr/oak-ridge.htm" target="_blank" rel="noopener">[6]</a>.</p></div>
+      <div class="tl-item"><div class="tl-year">1959</div><h3>Cutting the cord</h3><p>TVA went self-funding. Zero taxpayer dollars since. It runs on power revenue and bonds, still owned by the U.S. government, still governed by a presidentially appointed board <a class="src" href="https://en.wikipedia.org/wiki/Tennessee_Valley_Authority" target="_blank" rel="noopener">[2]</a>.</p></div>
+    </div>
+  </section>
+  <section class="wrap reveal">
+    <div class="pull">
+      <blockquote>"Manhattan Project" is a codename, not a place. The bomb was really a Tennessee, New Mexico and Washington operation.</blockquote>
+      <cite>Named for the Army's Manhattan Engineer District &middot; HQ'd in NYC on paper only</cite>
+    </div>
+    <div class="prose">
+      <p>The work sprawled across three secret sites: <strong>Oak Ridge</strong> enriched uranium, <strong>Los Alamos</strong> designed the weapon, and <strong>Hanford</strong> made plutonium. Today all three form a single national park <a class="src" href="https://www.nps.gov/mapr/index.htm" target="_blank" rel="noopener">[7]</a>.</p>
+    </div>
+  </section>
+  <section class="wrap reveal">
+    <p class="kicker">04 &middot; The itinerary</p>
+    <h2>The Atomic Trail, <span class="light">bookable from your seat.</span></h2>
+    <div class="trip-head"><p style="color:var(--paper-dim);max-width:52ch;">Every stop links straight to the official page. Start local, then decide how deep the rabbit hole goes.</p></div>
+    <div class="stop">
+      <div class="anchor-badge"><i data-lucide="anchor" width="11" height="11"></i> Start here &middot; you're basically parked</div>
+      <div class="stop-top"><div class="stop-num">1</div><div class="stop-title"><h3>Oak Ridge</h3><div class="where"><i data-lucide="map-pin" width="12" height="12"></i> Tennessee &middot; ~1.5 hrs from CHA</div></div></div>
+      <div class="stop-body">The crown jewel and the HQ of the whole project. Start at the park visitor center, then the museum, then book the "behind the fence" DOE bus tour.</div>
+      <div class="links">
+        <a class="link-btn" href="https://www.nps.gov/mapr/oak-ridge.htm" target="_blank" rel="noopener"><i data-lucide="landmark" width="18" height="18"></i><span class="lb-txt">Oak Ridge park overview<span class="lb-host">nps.gov</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+        <a class="link-btn" href="https://amse.org/bus-tours/" target="_blank" rel="noopener"><i data-lucide="bus" width="18" height="18"></i><span class="lb-txt">Behind-the-fence bus tour ($20)<span class="lb-host">amse.org</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+        <a class="link-btn" href="https://www.nps.gov/places/k-25-history-center.htm" target="_blank" rel="noopener"><i data-lucide="building-2" width="18" height="18"></i><span class="lb-txt">K-25 History Center<span class="lb-host">nps.gov</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+      </div>
+      <div class="tags"><span class="tag">National Park unit</span><span class="tag warn">Reserve + photo ID</span></div>
+    </div>
+    <div class="stop">
+      <div class="stop-top"><div class="stop-num">2</div><div class="stop-title"><h3>Norris Dam</h3><div class="where"><i data-lucide="map-pin" width="12" height="12"></i> Tennessee &middot; ~40 min from Oak Ridge</div></div></div>
+      <div class="stop-body">TVA's very first dam, 1936. Where the whole New Deal origin story physically begins. State park attached, so it doubles as the scenic breather.</div>
+      <div class="links"><a class="link-btn" href="https://tnstateparks.com/parks/norris-dam" target="_blank" rel="noopener"><i data-lucide="waves" width="18" height="18"></i><span class="lb-txt">Norris Dam State Park<span class="lb-host">tnstateparks.com</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a></div>
+      <div class="tags"><span class="tag">Origin site</span><span class="tag hot">Free</span></div>
+    </div>
+    <div class="stop">
+      <div class="stop-top"><div class="stop-num">3</div><div class="stop-title"><h3>Sequoyah + Watts Bar</h3><div class="where"><i data-lucide="map-pin" width="12" height="12"></i> Tennessee &middot; the modern bookend</div></div></div>
+      <div class="stop-body">The plants you flew over, for the "here's where TVA nuclear lives now" chapter. No deep public reactor tours, but the lake overlooks are worth the pullover.</div>
+      <div class="links"><a class="link-btn" href="https://www.tva.com/energy/our-power-system/nuclear/sequoyah-nuclear-plant" target="_blank" rel="noopener"><i data-lucide="atom" width="18" height="18"></i><span class="lb-txt">Sequoyah plant profile<span class="lb-host">tva.com</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a></div>
+      <div class="tags"><span class="tag">Overlook</span><span class="tag">Present day</span></div>
+    </div>
+    <div class="stop">
+      <div class="stop-top"><div class="stop-num">4</div><div class="stop-title"><h3>Los Alamos</h3><div class="where"><i data-lucide="map-pin" width="12" height="12"></i> New Mexico &middot; "Site Y"</div></div></div>
+      <div class="stop-body">Where the bombs were actually designed. The <strong>Bradbury Science Museum</strong> is walk-in; the "behind the fence" lab tours run twice a year <strong>by random lottery</strong>, so plan around the draw.</div>
+      <div class="links">
+        <a class="link-btn" href="https://www.lanl.gov/about/history-innovation/mapr/behind-the-fence-tours" target="_blank" rel="noopener"><i data-lucide="ticket" width="18" height="18"></i><span class="lb-txt">Behind-the-fence lottery tours<span class="lb-host">lanl.gov</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+        <a class="link-btn" href="https://www.lanl.gov/museum" target="_blank" rel="noopener"><i data-lucide="flask-conical" width="18" height="18"></i><span class="lb-txt">Bradbury Science Museum<span class="lb-host">lanl.gov</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+      </div>
+      <div class="tags"><span class="tag">Museum</span><span class="tag warn">Lottery &middot; twice a year</span><span class="tag">Fly-to leg</span></div>
+    </div>
+    <div class="stop">
+      <div class="stop-top"><div class="stop-num">5</div><div class="stop-title"><h3>Trinity Site</h3><div class="where"><i data-lucide="map-pin" width="12" height="12"></i> New Mexico &middot; ground zero</div></div></div>
+      <div class="stop-body">The actual first detonation crater on White Sands Missile Range. The pilgrimage payoff, and the hardest ticket: it opens to the public only <strong>once a year, the third Saturday in October</strong> (next: Oct 17, 2026). Free, no reservation.</div>
+      <div class="links">
+        <a class="link-btn" href="https://home.army.mil/wsmr/contact/public-affairs-office/trinity-site-open-house" target="_blank" rel="noopener"><i data-lucide="calendar-check" width="18" height="18"></i><span class="lb-txt">Trinity Site Open House<span class="lb-host">home.army.mil/wsmr</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+        <a class="link-btn" href="https://www.nps.gov/whsa/learn/historyculture/trinity-site.htm" target="_blank" rel="noopener"><i data-lucide="book-open" width="18" height="18"></i><span class="lb-txt">Trinity history (NPS)<span class="lb-host">nps.gov</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+      </div>
+      <div class="tags"><span class="tag warn">One day/year</span><span class="tag warn">3rd Sat of October</span><span class="tag hot">Free</span></div>
+    </div>
+    <div class="stop">
+      <div class="stop-top"><div class="stop-num">6</div><div class="stop-title"><h3>Hanford B Reactor</h3><div class="where"><i data-lucide="map-pin" width="12" height="12"></i> Washington &middot; the plutonium site</div></div></div>
+      <div class="stop-body">The world's first full-scale plutonium reactor and one of the best industrial-history tours anywhere. <strong>Heads up:</strong> reactor tours are currently <strong>suspended for construction</strong>, so check status before building a trip around it.</div>
+      <div class="links">
+        <a class="link-btn" href="https://manhattanprojectbreactor.hanford.gov/" target="_blank" rel="noopener"><i data-lucide="alert-octagon" width="18" height="18"></i><span class="lb-txt">B Reactor tour status<span class="lb-host">manhattanprojectbreactor.hanford.gov</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+        <a class="link-btn" href="https://www.nps.gov/thingstodo/hanford-attend-a-b-reactor-tour.htm" target="_blank" rel="noopener"><i data-lucide="info" width="18" height="18"></i><span class="lb-txt">B Reactor tour info (NPS)<span class="lb-host">nps.gov</span></span><i class="lb-arrow" data-lucide="arrow-up-right" width="15" height="15"></i></a>
+      </div>
+      <div class="tags"><span class="tag">National Park unit</span><span class="tag warn">Tours suspended &middot; verify</span></div>
+    </div>
+    <div class="callout">
+      <h4><i data-lucide="alert-triangle" width="16" height="16"></i> Time-sensitive, do not wing it</h4>
+      <p>Two hard constraints drive the whole plan. <strong>Trinity</strong> opens just one day a year (3rd Sat of October, next Oct 17, 2026) <a class="src" href="https://home.army.mil/wsmr/contact/public-affairs-office/trinity-site-open-house" target="_blank" rel="noopener">[8]</a>, and <strong>Hanford's</strong> B Reactor tours are suspended for construction <a class="src" href="https://manhattanprojectbreactor.hanford.gov/" target="_blank" rel="noopener">[9]</a>. Los Alamos lab tours are lottery-only <a class="src" href="https://www.lanl.gov/about/history-innovation/mapr/behind-the-fence-tours" target="_blank" rel="noopener">[10]</a>. Lock those dates first, build everything else around them.</p>
+    </div>
+  </section>
+  <section class="wrap reveal">
+    <p class="kicker">05 &middot; Before you go</p>
+    <h2>The nerd's pre-flight <span class="light">checklist.</span></h2>
+    <ul class="checklist">
+      <li><i data-lucide="calendar-clock" width="18" height="18"></i><span><strong>Target the October Trinity date.</strong> Once a year, no reservation, but everything in New Mexico bends around it.</span></li>
+      <li><i data-lucide="dice-5" width="18" height="18"></i><span><strong>Enter the Los Alamos lottery early.</strong> Registration windows open months ahead; you're drawn at random.</span></li>
+      <li><i data-lucide="alert-octagon" width="18" height="18"></i><span><strong>Verify Hanford before booking flights.</strong> Reactor tours are paused for construction; don't assume.</span></li>
+      <li><i data-lucide="route" width="18" height="18"></i><span><strong>Split it into two runs.</strong> Tennessee (Oak Ridge / Norris / the plants) is a weekend. New Mexico + Washington is the cross-country ambition.</span></li>
+      <li><i data-lucide="badge-check" width="18" height="18"></i><span><strong>Collect all three park units.</strong> Oak Ridge, Los Alamos and Hanford share one national park. Full set = bragging rights.</span></li>
+    </ul>
+  </section>
+  <section class="sources">
+    <div class="wrap reveal">
+      <p class="kicker">Sources</p>
+      <h2>Everything above, <span class="light">verifiable.</span></h2>
+      <ol class="src-list">
+        <li><a href="https://lakeinfo.tva.gov/web/sites/sequoyah.htm" target="_blank" rel="noopener">TVA &mdash; Sequoyah Nuclear Plant<span class="host">lakeinfo.tva.gov</span></a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Tennessee_Valley_Authority" target="_blank" rel="noopener">Tennessee Valley Authority &mdash; history &amp; structure<span class="host">en.wikipedia.org</span></a></li>
+        <li><a href="https://tva.com/energy/our-power-system/nuclear" target="_blank" rel="noopener">TVA &mdash; Nuclear power (3 plants)<span class="host">tva.com</span></a></li>
+        <li><a href="https://wpln.org/post/tvas-power-mix-explained-in-two-charts/" target="_blank" rel="noopener">WPLN &mdash; TVA's power mix explained<span class="host">wpln.org</span></a></li>
+        <li><a href="https://256today.com/tva-revises-long-term-power-plan-as-rising-demand-reshapes-energy-strategy/" target="_blank" rel="noopener">TVA revises long-term plan (2026 gas expansion)<span class="host">256today.com</span></a></li>
+        <li><a href="https://www.nps.gov/mapr/oak-ridge.htm" target="_blank" rel="noopener">NPS &mdash; Oak Ridge, TN<span class="host">nps.gov</span></a></li>
+        <li><a href="https://www.nps.gov/mapr/index.htm" target="_blank" rel="noopener">NPS &mdash; Manhattan Project National Historical Park<span class="host">nps.gov</span></a></li>
+        <li><a href="https://home.army.mil/wsmr/contact/public-affairs-office/trinity-site-open-house" target="_blank" rel="noopener">White Sands Missile Range &mdash; Trinity Site Open House<span class="host">home.army.mil/wsmr</span></a></li>
+        <li><a href="https://manhattanprojectbreactor.hanford.gov/" target="_blank" rel="noopener">Hanford &mdash; B Reactor tour status<span class="host">manhattanprojectbreactor.hanford.gov</span></a></li>
+        <li><a href="https://www.lanl.gov/about/history-innovation/mapr/behind-the-fence-tours" target="_blank" rel="noopener">LANL &mdash; Behind-the-fence tours (lottery)<span class="host">lanl.gov</span></a></li>
+        <li><a href="https://www.eia.gov/states/TN/analysis" target="_blank" rel="noopener">U.S. EIA &mdash; Tennessee energy profile<span class="host">eia.gov</span></a></li>
+      </ol>
+    </div>
+  </section>
+  <footer class="wrap">
+    <div class="mark">&#9762;</div>
+    <p>Assembled mid-descent &middot; CHI &rarr; CHA &middot; July 2026</p>
+  </footer>
+<script>
+  if (window.lucide) lucide.createIcons();
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  const ctx = document.getElementById('mixChart');
+  if (ctx && window.Chart) {
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels: ['Nuclear', 'Natural gas', 'Coal', 'Hydro', 'Wind + solar'], datasets: [{ data: [42, 31, 14, 9, 4], backgroundColor: ['oklch(76% 0.15 62)','oklch(58% 0.14 35)','oklch(45% 0.03 250)','oklch(70% 0.11 230)','oklch(80% 0.13 158)'], borderColor: 'oklch(18% 0.02 250)', borderWidth: 3, hoverOffset: 8 }] },
+      options: { cutout: '68%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => ' ' + c.label + ': ' + c.parsed + '%' }, backgroundColor: 'oklch(23% 0.022 250)', titleColor: 'oklch(93% 0.015 85)', bodyColor: 'oklch(93% 0.015 85)', borderColor: 'oklch(38% 0.02 250)', borderWidth: 1, padding: 10, bodyFont: { family: 'IBM Plex Mono' } } }, animation: { animateRotate: true, duration: 1100, easing: 'easeOutQuart' } }
+    });
+  }
+</script>
+</body>
+</html>

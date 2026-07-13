@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quickfire Artifacts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: oklch(12% 0.015 250);
@@ -15,29 +18,15 @@
     --accent-dim: oklch(72% 0.16 25 / 0.15);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background: var(--bg); color: var(--text);
-    min-height: 100vh; padding: 32px 20px;
-  }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 32px 20px; }
   .container { max-width: 600px; margin: 0 auto; }
-  .back {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 500; color: var(--muted);
-    text-decoration: none; margin-bottom: 24px;
-    letter-spacing: 0.04em; text-transform: uppercase;
-  }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--muted); text-decoration: none; margin-bottom: 24px; letter-spacing: 0.04em; text-transform: uppercase; }
   .back:hover { color: var(--accent); }
   header { margin-bottom: 32px; }
   header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
   header p { font-size: 14px; color: var(--muted); line-height: 1.5; }
   .list { display: flex; flex-direction: column; gap: 2px; }
-  .item {
-    display: grid; grid-template-columns: 1fr auto;
-    align-items: center; gap: 16px; padding: 14px 16px;
-    border-radius: 10px; text-decoration: none; color: var(--text);
-    transition: background 0.15s;
-  }
+  .item { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 14px 16px; border-radius: 10px; text-decoration: none; color: var(--text); transition: background 0.15s; }
   .item:hover { background: var(--accent-dim); }
   .item-title { font-size: 15px; font-weight: 600; }
   .item-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
@@ -47,20 +36,27 @@
 </head>
 <body>
   <div class="container">
-    <a class="back" href="../">← All Apps</a>
+    <a class="back" href="../">&larr; All Apps</a>
     <header>
       <h1>Quickfire</h1>
       <p>One-shot standalone artifacts. No versioning, no spec files, no task overhead. Just shipped HTML.</p>
     </header>
     <div class="list">
-      <a class="item" href="./course-engine/">
+      <a class="item" href="atomic-trail/">
         <div>
-          <div class="item-title">Course Engine — Blueprint</div>
+          <div class="item-title">The Atomic Trail</div>
+          <div class="item-meta">TVA nuclear history + Manhattan Project road-trip planner, sparked flying CHI&rarr;CHA</div>
+        </div>
+        <div class="item-date">2026-07-13</div>
+      </a>
+      <a class="item" href="course-engine/">
+        <div>
+          <div class="item-title">Course Engine &mdash; Blueprint</div>
           <div class="item-meta">Relational course-planning system for Intro to Lighting (curriculum vault + disposable sessions)</div>
         </div>
         <div class="item-date">2026-07-06</div>
       </a>
-      <a class="item" href="./rock-city-morning-plan/">
+      <a class="item" href="rock-city-morning-plan/">
         <div>
           <div class="item-title">Rock City Morning Plan</div>
           <div class="item-meta">Family activity banner for July 3rd trip with Dad, Jen &amp; Trooper</div>
@@ -68,7 +64,7 @@
         <div class="item-date">2026-07-03</div>
       </a>
     </div>
-    <div class="count">2 artifacts</div>
+    <div class="count">3 artifacts</div>
   </div>
 </body>
 </html>
