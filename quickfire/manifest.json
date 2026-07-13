@@ -1,0 +1,73 @@
+{
+  "version": "2026-07-13",
+  "note": "Source of truth for the quickfire index. Add an artifact = add an entry here. Subjects/type must come from the controlled vocabulary below; adding a new vocab term is a deliberate edit, not an ad-hoc tag.",
+  "vocabulary": {
+    "type": ["plan", "research", "reference", "tool", "fun"],
+    "subjects": ["home", "kitchen", "food", "history", "europe", "travel", "family", "work", "clickup", "tech"]
+  },
+  "artifacts": [
+    {
+      "slug": "garum-to-colatura",
+      "title": "From Garum to Colatura",
+      "desc": "Roman garum to Cetara colatura: salt history, how it's made, five recipes, and where to buy.",
+      "type": "research",
+      "subjects": ["food", "history", "europe"],
+      "date": "2026-07-13",
+      "reviewed": true
+    },
+    {
+      "slug": "course-engine",
+      "title": "Course Engine — Blueprint",
+      "desc": "Relational course-planning system for Intro to Lighting (curriculum vault + disposable sessions).",
+      "type": "tool",
+      "subjects": ["work"],
+      "date": "2026-07-06",
+      "reviewed": true
+    },
+    {
+      "slug": "rock-city-morning-plan",
+      "title": "Rock City Morning Plan",
+      "desc": "Family activity banner for July 3rd trip with Dad, Jen & Trooper.",
+      "type": "plan",
+      "subjects": ["travel", "family"],
+      "date": "2026-07-03",
+      "reviewed": true
+    },
+    {
+      "slug": "custom-field-catalog",
+      "title": "Custom Field Catalog",
+      "desc": "Reference catalog of ClickUp custom fields.",
+      "type": "reference",
+      "subjects": ["clickup", "work"],
+      "date": null,
+      "reviewed": false
+    },
+    {
+      "slug": "fireworks-countdown",
+      "title": "Fireworks Countdown",
+      "desc": "Countdown display for the July 4th fireworks.",
+      "type": "fun",
+      "subjects": ["family"],
+      "date": null,
+      "reviewed": false
+    },
+    {
+      "slug": "iphone-home-screen-plan",
+      "title": "iPhone Home Screen Plan",
+      "desc": "Layout plan for organizing the iPhone home screen.",
+      "type": "plan",
+      "subjects": ["tech", "home"],
+      "date": null,
+      "reviewed": false
+    },
+    {
+      "slug": "live-data-connectivity-transcript",
+      "title": "Live Data Connectivity — Transcript",
+      "desc": "Saved transcript from the live-data connectivity exploration.",
+      "type": "reference",
+      "subjects": ["work", "tech"],
+      "date": null,
+      "reviewed": false
+    }
+  ]
+}
