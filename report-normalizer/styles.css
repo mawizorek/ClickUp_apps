@@ -8,6 +8,8 @@
   --text:#1b1e24; --muted:#5b6474; --accent:#c96a1f; --accent-soft:#c96a1f18;
 }
 *{box-sizing:border-box}
+/* [hidden] must win over the display rules below (drawers/backdrop are display:flex/block otherwise) */
+[hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--bg);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
@@ -49,13 +51,13 @@ main{padding:8px 16px 40px;max-width:1100px;margin:0 auto}
 .maprow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .maprow:last-child{border-bottom:0}
 .src{font-family:ui-monospace,Menlo,monospace;font-size:13px;flex:1 1 160px;word-break:break-word}
-select,input[type=text],input[type=url],input[type=password]{width:100%;min-height:38px;padding:8px 10px;
-  background:var(--surface2);color:var(--text);border:1px solid var(--line);border-radius:8px;font-size:13.5px}
-select{flex:1 1 160px;width:auto}
 .ops{display:flex;flex-wrap:wrap;gap:4px;flex:1 1 100%}
 .op{font-size:11.5px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);
   color:var(--muted);cursor:pointer}
 .op.on{color:var(--text);border-color:var(--accent);background:var(--accent-soft)}
+select,input[type=text],input[type=url],input[type=password]{width:100%;min-height:38px;padding:8px 10px;
+  background:var(--surface2);color:var(--text);border:1px solid var(--line);border-radius:8px;font-size:13.5px}
+select{flex:1 1 160px;width:auto}
 table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed}
 th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;word-break:break-word}
 th{background:var(--surface2);position:sticky;top:0}
