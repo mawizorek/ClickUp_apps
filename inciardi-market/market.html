@@ -1,95 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#14161c">
-<title>Inciardi Market</title>
-<meta name="description" content="A market terminal for mini prints: underpriced buys, sell signals on exclusives, priced off eBay.">
+<meta name="theme-color" content="#0a0e13">
 <meta name="robots" content="noindex, nofollow">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/inciardi-market/market.html">
-<meta property="og:title" content="Inciardi Market">
-<meta property="og:description" content="A market terminal for mini prints: underpriced buys, sell signals on exclusives, priced off eBay.">
-<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/inciardi-market/og.png?v=2">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Inciardi Market">
-<meta name="twitter:description" content="A market terminal for mini prints: underpriced buys, sell signals on exclusives, priced off eBay.">
-<link rel="icon" href="./icon.png" type="image/png">
-<link rel="apple-touch-icon" href="./icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./source/base.css?v=9">
-<link rel="stylesheet" href="./source/market.css?v=9">
+<title>Market · Inciardi Market</title>
+<meta name="description" content="Live eBay radar for Anastasia Inciardi mini prints.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\uD83D\uDDBC\uFE0F</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="source/base.css">
+<link rel="stylesheet" href="source/market.css">
 </head>
 <body>
-<div class="wrap">
+<header class="topbar"><div class="wrap row">
+  <span class="brand"><span class="dot"></span>Inciardi Market <span class="tk">MARKET</span></span>
+  <nav class="nav">
+    <a href="terminal.html">Terminal</a>
+    <a href="catalog.html">Catalog</a>
+    <a href="collection.html">Collection</a>
+    <a href="market.html" aria-current="page">Market</a>
+  </nav>
+  <button class="gear" id="gear" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+</div></header>
 
- <nav class="sitenav" aria-label="Sections">
-  <div class="seg">
-   <a href="./catalog.html"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Catalog</a>
-   <a href="./market.html" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Market</a>
-   <a href="./collection.html"><svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/></svg>Collection</a>
+<main class="wrap">
+  <div class="phead">
+    <div class="kick">Live radar · <span id="live-pill">connecting\u2026</span></div>
+    <h1>Market</h1>
+    <p>Every live Inciardi listing on eBay, scored against per-print retail. Deals first; exclusives flagged as sell signals.</p>
   </div>
- </nav>
 
- <header class="masthead">
-  <div class="brand">
-   <span class="ticker">IMKT</span>
-   <span class="name">Inciardi <span>Market</span></span>
-  </div>
-  <div class="rgt">
-   <div class="status" id="status"><span class="dot"></span><span id="statusText">Sample</span></div>
-   <button class="gear" id="gear" aria-expanded="false" aria-label="Settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-  </div>
- </header>
+  <div class="strip" id="strip"></div>
 
- <div class="board" id="board"></div>
+  <div class="controls"><div class="chips" id="flagChips"></div></div>
+  <div class="count-line" id="countLine"></div>
+  <div id="list"><div class="skeleton" style="height:240px"></div></div>
 
- <nav class="tabs" role="tablist" aria-label="Views">
-  <button class="tab" role="tab" data-tab="radar" aria-selected="true">Deal Radar <span class="count" id="c-radar">0</span></button>
-  <button class="tab" role="tab" data-tab="sell" aria-selected="false">Sell Signal <span class="count" id="c-sell">0</span></button>
-  <button class="tab" role="tab" data-tab="stock" aria-selected="false">My Stock <span class="count" id="c-stock">0</span></button>
-  <button class="tab" role="tab" data-tab="catalog" aria-selected="false">Catalog <span class="count" id="c-cat">0</span></button>
-  <button class="tab" role="tab" data-tab="machines" aria-selected="false">Machines <span class="count" id="c-mach">0</span></button>
-  <button class="tab" role="tab" data-tab="all" aria-selected="false">All <span class="count" id="c-all">0</span></button>
- </nav>
+  <footer class="footer"><span id="f-build">Inciardi Market v10</span><span id="f-src">connecting\u2026</span></footer>
+</main>
 
- <div id="panel"></div>
-</div>
+<dialog id="settings"><div class="drawer" style="padding:var(--s6)">
+  <div class="drawer-h"><h2>Settings</h2><button class="x" id="settingsClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="field" style="flex-direction:row;align-items:center;justify-content:space-between"><label style="margin:0">Dark terminal</label><button class="btn sm" id="themeToggle" aria-pressed="true">Toggle</button></div>
+  <div class="field"><label>Data source (Worker URL)</label><input id="epInput" placeholder="https://inciardi-market\u2026workers.dev" spellcheck="false"></div>
+  <div class="field"><label>Write key (unlocks editing)</label><input id="wkeyInput" type="password" spellcheck="false"></div>
+  <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Prices are live eBay active-listing asks, refreshed each load. No sold comps (that API is gated); vanished listings feed the sold-proxy history instead.</p>
+</div></dialog>
 
-<footer>
- <div class="foot-in">
-  <div>
-   <div class="foot-brand">Inciardi Market</div>
-   <div class="foot-desc">A market terminal for mini prints: underpriced buys, sell signals on exclusives, priced off eBay.</div>
-  </div>
-  <div class="foot-links">
-   <a href="https://inciardiprints.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Inciardi Prints</a>
-   <a href="https://inciardiprints.com/pages/store-locator" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Machine map</a>
-   <a href="https://www.ebay.com/sch/i.html?_nkw=anastasia+inciardi+mini+print" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>eBay search</a>
-  </div>
- </div>
- <div class="foot-base"><div class="foot-base-in"><span id="f-build">Inciardi Market</span><span id="f-stamp"></span></div></div>
-</footer>
-
-<dialog class="drawer" id="drawer" aria-label="Settings">
- <button class="drawer-close" id="drawerClose" aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
- <h2>Settings</h2>
- <div class="field">
-  <div><label>Dark terminal</label><div class="desc">Persists on this device</div></div>
-  <button class="toggle" id="themeToggle" role="switch" aria-pressed="true" aria-label="Toggle dark theme"></button>
- </div>
- <div class="field" style="display:block">
-  <div><label>Data source</label><div class="desc">Blank uses bundled sample. Paste your Worker URL to go live.</div></div>
-  <input class="ep" id="epInput" type="text" placeholder="https://…workers.dev/market" spellcheck="false" autocomplete="off">
- </div>
- <p class="drawer-note">Prices come from the scheduled eBay pull (every 6h once live). Catalog and machine locations refresh occasionally from a wide web search, not automatically. My Stock stays on this device. Baseline is retail plus the active-listing spread; no sold-price history yet.</p>
-</dialog>
-
-<script src="app.js"></script>
+<script src="source/app-core.js"></script>
+<script src="source/market.js"></script>
 </body>
 </html>
