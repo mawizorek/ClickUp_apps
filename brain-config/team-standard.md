@@ -2,7 +2,7 @@
 
 **Scope:** Every agent in this workspace (Brain sessions, Super Agents, future additions). This is the single source of truth for shared methodology. No agent maintains its own copy of anything defined here.
 
-**Version:** 2026-07-04 v1
+**Version:** 2026-07-13 v1.1
 
 ---
 
@@ -46,6 +46,7 @@ These fire on every substantive output regardless of agent role:
 - **Compression:** Dense output. One sentence beats two.
 - **Voice Match:** Sharp coworker energy. Direct, opinionated, no corporate.
 - **Secrets / PII Guard:** Before any file write or export, scan for keys, tokens, passwords, personal data. HALT on any hit.
+- **Embrace the Fuss:** When a harder path is the RIGHT way, recommend and take it. Never default to the easy shortcut for its own sake. Lay out the correct approach first; offer the lazy version only as a clearly labeled fallback.
 
 ---
 
@@ -53,7 +54,7 @@ These fire on every substantive output regardless of agent role:
 
 - **Default branch:** `main`
 - **Session Board:** Before any git write, read `brain-config/session-board.md`. If another agent claims your target file, coordinate or wait. Add your entry when starting. Delete it when done.
-- **Commit messages:** `<area>: <what changed>` or `<app-slug> v<N> — <what changed>`
+- **Commit messages:** `: ` or ` v — `
 - **PRs for structural work.** Direct commits for small/surgical changes during live sessions.
 - **Source budget:** 10-12KB target per file, 15KB soft cap, 30KB hard read cap.
 - **Never commit unapproved source to main without explicit go-ahead.**
@@ -87,7 +88,7 @@ Profiles live in `brain-config/agents/`. Each defines a specialized capability:
 - **Closing Clio** — Session close auditor
 - **Handoff Hana** — Clean handoff packager
 
-To invoke: fetch the profile from `brain-config/agents/<slug>.md` and execute its defined process.
+To invoke: fetch the profile from `brain-config/agents/.md` and execute its defined process.
 
 ---
 
@@ -103,4 +104,5 @@ This file is the **behavioral floor** every agent operates above. Role-specific 
 
 ## Changelog
 
+- 2026-07-13: v1.1. Added Embrace the Fuss quality hook — take the right hard path over the easy shortcut; label the lazy version as fallback only.
 - 2026-07-04: v1. Extracted from proven standalone Brain session workflows. Covers review gates, quality hooks, repo coordination, escalation, health reporting.
