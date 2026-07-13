@@ -15,46 +15,46 @@
 <meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/report-normalizer/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/report-normalizer/og.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E\uD83E\uDDF9%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🧹%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icon.png">
-<link rel="stylesheet" href="styles.css?v=1">
+<link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 <noscript><p style="padding:1rem">Report Normalizer needs JavaScript enabled.</p></noscript>
 
 <header class="masthead">
-  <div class="brand"><span class="glyph">\uD83E\uDDF9</span><h1>Report Normalizer</h1></div>
+  <div class="brand"><span class="glyph">🧹</span><h1>Report Normalizer</h1></div>
   <div class="mast-actions">
-    <button id="btnCatalog" class="icon-btn" aria-label="Mappings catalog" title="Mappings">\u2637</button>
-    <button id="btnSettings" class="icon-btn" aria-label="Settings" aria-expanded="false" title="Settings">\u2699</button>
+    <button id="btnCatalog" class="icon-btn" aria-label="Mappings catalog" title="Mappings">🗂</button>
+    <button id="btnSettings" class="icon-btn" aria-label="Settings" aria-expanded="false" title="Settings">⚙️</button>
   </div>
 </header>
 
 <nav class="rail" id="rail" aria-label="Steps">
-  <button class="step is-active" data-step="source">1 \u00b7 Source</button>
-  <button class="step" data-step="map" disabled>2 \u00b7 Map</button>
-  <button class="step" data-step="output" disabled>3 \u00b7 Output</button>
+  <button class="step is-active" data-step="source">1 · Source</button>
+  <button class="step" data-step="map" disabled>2 · Map</button>
+  <button class="step" data-step="output" disabled>3 · Output</button>
 </nav>
 
-<main id="stage"><p class="muted center">Loading\u2026</p></main>
+<main id="stage"><p class="muted center">Loading…</p></main>
 
 <aside id="drawerSettings" class="drawer" hidden aria-label="Settings">
-  <div class="drawer-head"><h2>Settings</h2><button class="icon-btn" data-close-drawer>\u2715</button></div>
+  <div class="drawer-head"><h2>Settings</h2><button class="icon-btn" data-close-drawer>✕</button></div>
   <div class="drawer-body">
     <label class="field"><span>Theme</span>
       <button id="themeToggle" class="btn ghost">Toggle light / dark</button></label>
     <label class="field"><span>Worker URL (D1 backend)</span>
-      <input id="workerUrl" type="url" placeholder="https://report-normalizer.\u2026workers.dev" autocomplete="off">
+      <input id="workerUrl" type="url" placeholder="https://report-normalizer.…workers.dev" autocomplete="off">
       <small class="muted">Leave blank to run local-only (profiles saved in this browser). Point at your Cloudflare Worker to persist to D1.</small></label>
     <label class="field"><span>Write key</span>
       <input id="writeKey" type="password" placeholder="only needed to save to D1" autocomplete="off">
-      <small class="muted">Gates writes to the Worker. Not security \u2014 keeps stray writes out. Never used in local-only mode.</small></label>
+      <small class="muted">Gates writes to the Worker. Not security — keeps stray writes out. Never used in local-only mode.</small></label>
     <p class="muted note">Manual upload only. Files are processed in your browser and never stored; only mapping profiles, target schemas, and run history persist.</p>
   </div>
 </aside>
 
 <aside id="drawerCatalog" class="drawer" hidden aria-label="Mappings catalog">
-  <div class="drawer-head"><h2>Mappings</h2><button class="icon-btn" data-close-drawer>\u2715</button></div>
+  <div class="drawer-head"><h2>Mappings</h2><button class="icon-btn" data-close-drawer>✕</button></div>
   <div class="drawer-body" id="catalogBody"></div>
 </aside>
 
@@ -62,6 +62,6 @@
 
 <footer class="footer"><span id="stamp" class="muted"></span></footer>
 
-<script type="module" src="source/core.js?v=1"></script>
+<script type="module" src="source/core.js?v=2"></script>
 </body>
 </html>
