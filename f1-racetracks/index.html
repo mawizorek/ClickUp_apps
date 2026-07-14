@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  F1 2026 — unified app shell (v9).
+  F1 2026 — unified app shell (v10).
   REAL one-app: this file is the router/shell, not a stored page. It owns the ONE
   persistent chrome (brand + Matrix / History / Circuits switcher) and a single hash
   router. Each lens is an isolated surface mounted here:
@@ -14,9 +14,13 @@
   each on load (injects chrome-hiding CSS + drives its hash) without editing the lens code.
   Router: source/app-shell.js. Cache-bust: bump ?v on it per deploy.
 
-  v9 (revert): v8 grid-stacking regressed Circuits scroll and did not fix standings, so the
-  absolute-positioned layout was correct for iframe touch-scroll. Restored it. The standings
-  Matrix/History freeze is a standings.html-internal issue, not a shell issue.
+  v10 (iOS scroll fix, PROVEN): the two lens iframes are position:absolute overlays and the
+  Circuits one paints on top. When standings is active, the invisible Circuits iframe still
+  covered it: iOS passed taps through (pointer-events:none) but the covering iframe swallowed
+  the vertical scroll-drag, freezing Matrix + History. Fix = the inactive iframe gets
+  visibility:hidden (removes it from touch hit-testing) + z-index so the active lens is
+  topmost. visibility flips to hidden AFTER the opacity fade (transition delay), preserving
+  the cross-fade with no reload.
 -->
 <html lang="en-US">
 <head>
@@ -80,13 +84,22 @@
     .switch button[aria-selected="true"]{background:var(--s3);color:var(--txt);box-shadow:inset 0 1px 0 oklch(1 0 0/0.05)}
     .switch button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
 
-    /* --- warm, cross-faded lens surfaces (absolute-positioned: scrolls on iOS) --- */
+    /* --- warm, cross-faded lens surfaces ---
+       v10: both iframes are absolute overlays. The INACTIVE one gets visibility:hidden so
+       iOS removes it from touch hit-testing (an invisible-but-present iframe still swallows
+       scroll-drag even with pointer-events:none). z-index keeps the active lens topmost.
+       visibility flips to hidden AFTER the opacity fade via transition delay, so the
+       cross-fade still plays and neither lens reloads. */
     .stage{flex:1;position:relative;min-height:0;background:var(--bg)}
     .stage iframe{
       position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg);
-      opacity:0;pointer-events:none;transition:opacity .3s var(--ease);
+      opacity:0;visibility:hidden;pointer-events:none;z-index:1;
+      transition:opacity .3s var(--ease),visibility 0s linear .3s;
     }
-    .stage iframe.active{opacity:1;pointer-events:auto}
+    .stage iframe.active{
+      opacity:1;visibility:visible;pointer-events:auto;z-index:2;
+      transition:opacity .3s var(--ease),visibility 0s;
+    }
 
     @media (prefers-reduced-motion:reduce){.stage iframe{transition:none}}
     @media (max-width:560px){
@@ -112,6 +125,6 @@
     <iframe id="lens-standings" title="Championship Matrix" src="standings.html"></iframe>
     <iframe id="lens-circuits" title="Circuit Guide" src="circuits.html"></iframe>
   </main>
-  <script src="source/app-shell.js?v=9"></script>
+  <script src="source/app-shell.js?v=10"></script>
 </body>
 </html>
