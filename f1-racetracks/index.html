@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  F1 2026 — unified app shell (v8).
+  F1 2026 — unified app shell (v9).
   REAL one-app: this file is the router/shell, not a stored page. It owns the ONE
   persistent chrome (brand + Matrix / History / Circuits switcher) and a single hash
   router. Each lens is an isolated surface mounted here:
@@ -14,10 +14,9 @@
   each on load (injects chrome-hiding CSS + drives its hash) without editing the lens code.
   Router: source/app-shell.js. Cache-bust: bump ?v on it per deploy.
 
-  v8 (iOS scroll fix): the two lens iframes are stacked in a single CSS grid cell
-  (grid-area:1/1) rather than position:absolute. iOS Safari refuses to touch-scroll an
-  absolutely-positioned iframe inside an overflow:hidden ancestor; in-flow grid stacking
-  scrolls natively while preserving the opacity cross-fade. app-shell.js is unchanged.
+  v9 (revert): v8 grid-stacking regressed Circuits scroll and did not fix standings, so the
+  absolute-positioned layout was correct for iframe touch-scroll. Restored it. The standings
+  Matrix/History freeze is a standings.html-internal issue, not a shell issue.
 -->
 <html lang="en-US">
 <head>
@@ -81,16 +80,11 @@
     .switch button[aria-selected="true"]{background:var(--s3);color:var(--txt);box-shadow:inset 0 1px 0 oklch(1 0 0/0.05)}
     .switch button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
 
-    /* --- warm, cross-faded lens surfaces ---
-       v8: both iframes share ONE grid cell (grid-area:1/1) so they overlay for the
-       cross-fade while staying IN-FLOW. iOS Safari won't touch-scroll a
-       position:absolute iframe inside an overflow:hidden ancestor; in-flow grid
-       stacking scrolls the inner document natively. */
-    .stage{flex:1;display:grid;grid-template:1fr/1fr;min-height:0;background:var(--bg)}
+    /* --- warm, cross-faded lens surfaces (absolute-positioned: scrolls on iOS) --- */
+    .stage{flex:1;position:relative;min-height:0;background:var(--bg)}
     .stage iframe{
-      grid-area:1/1;width:100%;height:100%;border:0;background:var(--bg);
+      position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg);
       opacity:0;pointer-events:none;transition:opacity .3s var(--ease);
-      -webkit-overflow-scrolling:touch;
     }
     .stage iframe.active{opacity:1;pointer-events:auto}
 
@@ -118,6 +112,6 @@
     <iframe id="lens-standings" title="Championship Matrix" src="standings.html"></iframe>
     <iframe id="lens-circuits" title="Circuit Guide" src="circuits.html"></iframe>
   </main>
-  <script src="source/app-shell.js?v=8"></script>
+  <script src="source/app-shell.js?v=9"></script>
 </body>
 </html>
