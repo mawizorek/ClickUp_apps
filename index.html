@@ -113,11 +113,11 @@ header p {
 }
 .gate-card {
   width: 100%;
-  max-width: 360px;
+  max-width: 320px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 16px;
-  padding: 32px 28px;
+  padding: 32px 24px;
   text-align: center;
 }
 .gate-lock {
@@ -136,50 +136,66 @@ header p {
   margin-bottom: 24px;
   line-height: 1.5;
 }
-.gate-form {
+.pin-dots {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.pin-dot.filled {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
-.gate-input {
-  width: 100%;
-  padding: 14px 16px;
-  min-height: 48px;
+.key {
+  aspect-ratio: 1;
+  min-height: 56px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--text);
-  font-size: 16px;
-  font-family: inherit;
-  text-align: center;
-  letter-spacing: 0.1em;
-  outline: none;
-  transition: border-color 0.15s;
-}
-.gate-input:focus {
-  border-color: var(--accent);
-}
-.gate-btn {
-  width: 100%;
-  padding: 14px 16px;
-  min-height: 48px;
-  background: var(--accent);
-  border: none;
-  border-radius: 12px;
-  color: oklch(12% 0.015 250);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: filter 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s, transform 0.1s;
 }
-.gate-btn:hover {
-  filter: brightness(1.08);
+.key:active {
+  background: var(--accent-dim);
+  transform: scale(0.95);
+}
+.key.ghost {
+  background: transparent;
+  border: none;
+  cursor: default;
+  pointer-events: none;
+}
+.key.action {
+  font-size: 20px;
+  color: var(--muted);
 }
 .gate-error {
   font-size: 13px;
   color: var(--accent);
   min-height: 18px;
+  margin-top: 18px;
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -196,7 +212,7 @@ header p {
 }
 @media (prefers-reduced-motion: reduce) {
   .gate-card.shake { animation: none; }
-  .nav-link, .nav-link-arrow, .gate-input, .gate-btn, .gate-error { transition: none; }
+  .nav-link, .nav-link-arrow, .pin-dot, .key, .gate-error { transition: none; }
 }
 body.locked { overflow: hidden; }
 body.locked .container { display: none; }
@@ -209,11 +225,27 @@ body:not(.locked) .gate { display: none; }
     <div class="gate-lock">🔒</div>
     <h1>MAW Apps</h1>
     <p>Enter the passcode to continue.</p>
-    <form class="gate-form" id="gateForm" autocomplete="off">
-      <input class="gate-input" id="gateInput" type="password" inputmode="text" placeholder="Passcode" aria-label="Passcode" autofocus>
-      <button class="gate-btn" type="submit">Unlock</button>
-      <div class="gate-error" id="gateError">Wrong passcode, try again.</div>
-    </form>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+      <div class="pin-dot"></div>
+    </div>
+    <div class="keypad" id="keypad">
+      <button class="key" type="button" data-key="1">1</button>
+      <button class="key" type="button" data-key="2">2</button>
+      <button class="key" type="button" data-key="3">3</button>
+      <button class="key" type="button" data-key="4">4</button>
+      <button class="key" type="button" data-key="5">5</button>
+      <button class="key" type="button" data-key="6">6</button>
+      <button class="key" type="button" data-key="7">7</button>
+      <button class="key" type="button" data-key="8">8</button>
+      <button class="key" type="button" data-key="9">9</button>
+      <div class="key ghost"></div>
+      <button class="key" type="button" data-key="0">0</button>
+      <button class="key action" type="button" data-key="del" aria-label="Delete">⌫</button>
+    </div>
+    <div class="gate-error" id="gateError">Wrong passcode, try again.</div>
   </div>
 </div>
 
@@ -262,31 +294,71 @@ body:not(.locked) .gate { display: none; }
 
   const KEY = "maw-apps-unlocked";
   const body = document.body;
-  const form = document.getElementById("gateForm");
-  const input = document.getElementById("gateInput");
   const card = document.getElementById("gateCard");
   const err = document.getElementById("gateError");
+  const keypad = document.getElementById("keypad");
+  const dots = Array.prototype.slice.call(document.querySelectorAll(".pin-dot"));
+  let entry = "";
 
   // Already unlocked this session? Skip the gate.
   if (sessionStorage.getItem(KEY) === "1") {
     body.classList.remove("locked");
-  } else {
-    setTimeout(function () { input.focus(); }, 50);
   }
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    if (input.value === PASSCODE) {
-      sessionStorage.setItem(KEY, "1");
-      body.classList.remove("locked");
-    } else {
-      err.classList.add("show");
-      card.classList.add("shake");
-      input.value = "";
-      input.focus();
-      setTimeout(function () { card.classList.remove("shake"); }, 400);
+  function render() {
+    dots.forEach(function (d, i) {
+      d.classList.toggle("filled", i < entry.length);
+    });
+  }
+
+  function unlock() {
+    sessionStorage.setItem(KEY, "1");
+    body.classList.remove("locked");
+  }
+
+  function reject() {
+    err.classList.add("show");
+    card.classList.add("shake");
+    setTimeout(function () {
+      card.classList.remove("shake");
+      entry = "";
+      render();
+    }, 400);
+  }
+
+  function press(k) {
+    if (k === "del") {
+      entry = entry.slice(0, -1);
+      err.classList.remove("show");
+      render();
+      return;
     }
+    if (entry.length >= PASSCODE.length) return;
+    entry += k;
+    render();
+    if (entry.length === PASSCODE.length) {
+      if (entry === PASSCODE) {
+        unlock();
+      } else {
+        reject();
+      }
+    }
+  }
+
+  keypad.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-key]");
+    if (!btn) return;
+    press(btn.getAttribute("data-key"));
   });
+
+  // Optional: allow a physical keyboard too, without ever showing one.
+  document.addEventListener("keydown", function (e) {
+    if (!body.classList.contains("locked")) return;
+    if (e.key >= "0" && e.key <= "9") press(e.key);
+    else if (e.key === "Backspace") press("del");
+  });
+
+  render();
 </script>
 </body>
 </html>
