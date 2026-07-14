@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-08",
+  "version": "2026-07-14",
   "events": [
     {
       "series": "MXGP",
@@ -477,6 +477,60 @@
       "start": "2026-08-09T16:00:00-04:00",
       "end": "2026-08-09T18:30:00-04:00",
       "platforms": ["FOX"]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 1",
+      "title": "Great Britain Sail Grand Prix",
+      "detail": "Portsmouth, UK",
+      "timeTBD": true,
+      "date": "2026-07-25",
+      "platforms": ["CBS Sports Network"]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 2",
+      "title": "Great Britain Sail Grand Prix",
+      "detail": "Portsmouth, UK",
+      "timeTBD": true,
+      "date": "2026-07-26",
+      "platforms": ["CBS Sports Network"]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 1",
+      "title": "Germany Sail Grand Prix",
+      "detail": "Sassnitz, Germany",
+      "timeTBD": true,
+      "date": "2026-08-22",
+      "platforms": ["CBS Sports Network"]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 2",
+      "title": "Germany Sail Grand Prix",
+      "detail": "Sassnitz, Germany",
+      "timeTBD": true,
+      "date": "2026-08-23",
+      "platforms": ["CBS Sports Network"]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 1",
+      "title": "France Sail Grand Prix",
+      "detail": "Saint-Tropez, France",
+      "timeTBD": true,
+      "date": "2026-09-12",
+      "platforms": ["CBS Sports Network"]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 2",
+      "title": "France Sail Grand Prix",
+      "detail": "Saint-Tropez, France",
+      "timeTBD": true,
+      "date": "2026-09-13",
+      "platforms": ["CBS Sports Network"]
     }
   ]
 }
