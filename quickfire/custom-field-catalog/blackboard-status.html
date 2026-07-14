@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blackboard Status — Dropdown Preview</title>
+<style>
+  :root{--canvas:#0b0b0d;--panel:#17181a;--band:#2a2b2e;--divider:#26272a;--search-bg:#1a1b1e;--ink:#e8e8ea;--ink-soft:#9a9ba0;--ink-faint:#6b6c72;--grip:#55565c;--purple:#8b6df0;--radius-pop:12px;--radius-ctl:9px;--radius-chip:5px;--radius-band:8px;font-synthesis:none;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--canvas);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;padding:40px 20px 64px;display:flex;justify-content:center;}
+  .frame{width:100%;max-width:600px;}
+  .fld-head{display:flex;align-items:center;justify-content:space-between;padding:0 6px;margin-bottom:12px;}
+  .fld-head .name{font-size:1.0625rem;color:var(--ink-soft);}
+  .fld-head .add{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-faint);display:grid;place-items:center;color:var(--ink-faint);}
+  .control{border-top:1px solid var(--divider);border-bottom:1px solid var(--divider);padding:12px 6px;margin-bottom:4px;}
+  .control .box{width:62%;min-height:46px;border:1.5px solid var(--purple);border-radius:var(--radius-ctl);background:rgba(139,109,240,0.05);display:flex;align-items:center;padding:0 12px;color:var(--ink-faint);font-size:1rem;}
+  .control .box .placeholder{padding:0 4px;}
+  .popup{background:var(--panel);border-radius:var(--radius-pop);box-shadow:0 20px 60px -12px rgba(0,0,0,.7),0 6px 18px -6px rgba(0,0,0,.5);overflow:hidden;}
+  .search{background:var(--search-bg);padding:18px 22px;border-bottom:1px solid var(--divider);color:var(--ink-faint);font-size:1.0625rem;display:flex;align-items:center;}
+  .search .caret{width:1px;height:20px;background:var(--ink-soft);margin-right:8px;animation:blink 1.1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .opt-list{max-height:520px;overflow-y:auto;padding:8px 0;}
+  .opt-list::-webkit-scrollbar{width:12px;}
+  .opt-list::-webkit-scrollbar-thumb{background:#35363a;border-radius:999px;border:4px solid var(--panel);}
+  .row{display:flex;align-items:center;gap:14px;padding:5px 16px 5px 20px;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .row .band{position:absolute;inset:1px 12px;background:var(--band);border-radius:var(--radius-band);opacity:0;transition:opacity .1s ease;}
+  .row:hover .band,.row.selected .band{opacity:1;}
+  .row>*:not(.band){position:relative;z-index:1;}
+  .grip{display:grid;grid-template-columns:repeat(2,3px);grid-template-rows:repeat(3,3px);gap:3px;flex-shrink:0;}
+  .grip span{width:3px;height:3px;border-radius:50%;background:var(--grip);}
+  .chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:var(--radius-chip);font-size:.9375rem;font-weight:500;line-height:1.5;min-width:84px;}
+  .control .chip{min-width:0;}
+  .row .tick{margin-left:auto;color:var(--purple);display:flex;opacity:0;}
+  .row.selected .tick{opacity:1;}
+  .row .dots{margin-left:auto;color:var(--ink-soft);letter-spacing:1.5px;font-size:1.1rem;opacity:0;}
+  .row:hover .dots{opacity:1;}
+  .row.selected:hover .dots{opacity:0;}
+  .notes{margin-top:24px;padding:20px;background:var(--panel);border-radius:var(--radius-pop);color:var(--ink-soft);font-size:.875rem;line-height:1.6;}
+  .notes h4{color:var(--ink);font-size:.9375rem;margin-bottom:8px;}
+  .notes ul{padding-left:18px;}
+  .notes li{margin-bottom:4px;}
+  @media(max-width:520px){body{padding:24px 12px 48px;}.control .box{width:74%;}}
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="fld-head"><span class="name">Blackboard Status</span><span class="add"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></div>
+    <div class="control"><div class="box" id="control"><span class="placeholder">&ndash;</span></div></div>
+    <div class="popup"><div class="search"><span class="caret"></span>Search or add options...</div><div class="opt-list" id="list"></div></div>
+    <div class="notes"><h4>Agent Notes</h4><ul><li><strong>Location:</strong> Decks list (COURSE ENGINE folder, URITP Courses space)</li><li><strong>Field ID:</strong> 6e54e370-cd89-4a0d-97d0-261f80648e3c</li><li><strong>Purpose:</strong> Tracks whether the blank deck version has been uploaded to Blackboard (LMS). Simple lifecycle status for the file artifact.</li><li><strong>Retroactive entry:</strong> Field was created 2026-07-07 during Session 2 build. Catalog entry added 2026-07-14 during COURSE ENGINE audit.</li><li><strong>Status:</strong> Created, values confirmed matching spec. No population yet.</li></ul></div>
+  </div>
+  <script>
+    const PALETTE={1:['#5b3fd6','#fff'],2:['#3a1f27','#e06a8c','#5c2f3b'],3:['#1f2d4a','#7ba0dd','#31456b'],4:['#233457','#6f95d6','#354e7d'],5:['#183c38','#5ec0af','#265a53'],6:['#1c3d2a','#6ec088','#2c5c40'],7:['#3c3410','#c9a83f','#5a5019'],8:['#3c2410','#d18841','#5a3819'],9:['#6b4fe0','#fff'],10:['#4a6fd0','#fff'],11:['#5b9ae8','#fff'],12:['#5fb5a5','#0c2420'],13:['#57a86f','#fff'],14:['#e8c85a','#2a2410'],15:['#e08840','#fff'],16:['#3c1a20','#d0627c','#5c2a33'],17:['#2c1f3c','#a97ad8','#463159'],18:['#3c2818','#c08a5a','#5a3e28'],19:['#2a2a2c','#9a9ba0','#3d3d40'],20:['#333336','#c8c9cd','#48484c'],21:['#d85a52','#fff'],22:['#d84f8a','#fff'],23:['#a850c8','#fff'],24:['#a8887f','#fff'],25:['#8a8a90','#fff'],26:['#1a1a1c','#c8c9cd','#2e2e31'],27:['#8a3a52','#fff'],28:['#3f5fd0','#fff'],29:['#4a80a0','#fff'],30:['#b8e8c8','#123020'],31:['#a8b8e8','#1a2340'],32:['#7a7a8a','#fff'],33:['#b89840','#2a2210'],34:['#7fa888','#12281a'],35:['#4a80b0','#fff'],36:['#2a3f8a','#fff'],37:['#4a9850','#fff'],38:['#d85040','#fff'],39:['#a89040','#fff'],40:['#b8a8e8','#221a40'],41:['#c8e858','#2a3010'],42:['#6f88d8','#fff'],43:['#8fb898','#152a1c'],44:['#b8e8c0','#123020'],45:['#e04030','#fff'],46:['#c8b860','#2a2610'],47:['#2f7040','#fff'],48:['#5fc0b0','#0c2420'],49:['#c850d8','#fff'],50:['#6f90c0','#fff'],51:['#d040a0','#fff']};
+    const OPTIONS=[[19,'new'],[13,'uploaded'],[8,'needs-update']];
+    const PRESELECT=null;
+    const TICK='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    const list=document.getElementById('list'),control=document.getElementById('control');
+    function chip(i,label,min){const[bg,fg,bd]=PALETTE[i];return`<span class="chip" style="background:${bg};color:${fg};${bd?'box-shadow:inset 0 0 0 1px '+bd+';':''}${min?'min-width:0;':''}">${label}</span>`;}
+    let sel=null;
+    function select(idx,row){const[i,label]=OPTIONS[idx];if(sel===idx){sel=null;row.classList.remove('selected');control.innerHTML='<span class="placeholder">&ndash;</span>';return;}sel=idx;list.querySelectorAll('.row.selected').forEach(r=>r.classList.remove('selected'));row.classList.add('selected');control.innerHTML=chip(i,label,true);}
+    OPTIONS.forEach(([i,label],idx)=>{const row=document.createElement('div');row.className='row';row.innerHTML=`<div class="band"></div><div class="grip"><span></span><span></span><span></span><span></span><span></span><span></span></div>${chip(i,label,false)}<span class="dots">&#8943;</span><span class="tick">${TICK}</span>`;row.addEventListener('click',()=>select(idx,row));list.appendChild(row);if(PRESELECT===idx)select(idx,row);});
+  </script>
+</body>
+</html>
