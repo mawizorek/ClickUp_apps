@@ -99,9 +99,124 @@ header p {
   color: var(--accent);
   text-decoration: none;
 }
+
+/* --- soft passcode gate (cosmetic, not security) --- */
+.gate {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+.gate-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+}
+.gate-lock {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+.gate-card h1 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.gate-card p {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.gate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gate-input {
+  width: 100%;
+  padding: 14px 16px;
+  min-height: 48px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 16px;
+  font-family: inherit;
+  text-align: center;
+  letter-spacing: 0.1em;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.gate-input:focus {
+  border-color: var(--accent);
+}
+.gate-btn {
+  width: 100%;
+  padding: 14px 16px;
+  min-height: 48px;
+  background: var(--accent);
+  border: none;
+  border-radius: 12px;
+  color: oklch(12% 0.015 250);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.gate-btn:hover {
+  filter: brightness(1.08);
+}
+.gate-error {
+  font-size: 13px;
+  color: var(--accent);
+  min-height: 18px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.gate-error.show {
+  opacity: 1;
+}
+.gate-card.shake {
+  animation: shake 0.4s;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gate-card.shake { animation: none; }
+  .nav-link, .nav-link-arrow, .gate-input, .gate-btn, .gate-error { transition: none; }
+}
+body.locked { overflow: hidden; }
+body.locked .container { display: none; }
+body:not(.locked) .gate { display: none; }
 </style>
 </head>
-<body>
+<body class="locked">
+<div class="gate" id="gate">
+  <div class="gate-card" id="gateCard">
+    <div class="gate-lock">🔒</div>
+    <h1>MAW Apps</h1>
+    <p>Enter the passcode to continue.</p>
+    <form class="gate-form" id="gateForm" autocomplete="off">
+      <input class="gate-input" id="gateInput" type="password" inputmode="text" placeholder="Passcode" aria-label="Passcode" autofocus>
+      <button class="gate-btn" type="submit">Unlock</button>
+      <div class="gate-error" id="gateError">Wrong passcode, try again.</div>
+    </form>
+  </div>
+</div>
+
 <div class="container">
   <header>
     <h1>MAW Apps</h1>
@@ -138,5 +253,40 @@ header p {
     <a href="https://github.com/mawizorek/ClickUp_apps" target="_blank" rel="noopener">View on GitHub</a>
   </div>
 </div>
+
+<script>
+  // Soft passcode gate — COSMETIC only, NOT security. The code sits in this file
+  // and the repo is public; this keeps casual eyes out and nothing more.
+  // Change the passcode here (one line):
+  const PASSCODE = "2026";
+
+  const KEY = "maw-apps-unlocked";
+  const body = document.body;
+  const form = document.getElementById("gateForm");
+  const input = document.getElementById("gateInput");
+  const card = document.getElementById("gateCard");
+  const err = document.getElementById("gateError");
+
+  // Already unlocked this session? Skip the gate.
+  if (sessionStorage.getItem(KEY) === "1") {
+    body.classList.remove("locked");
+  } else {
+    setTimeout(function () { input.focus(); }, 50);
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (input.value === PASSCODE) {
+      sessionStorage.setItem(KEY, "1");
+      body.classList.remove("locked");
+    } else {
+      err.classList.add("show");
+      card.classList.add("shake");
+      input.value = "";
+      input.focus();
+      setTimeout(function () { card.classList.remove("shake"); }, 400);
+    }
+  });
+</script>
 </body>
 </html>
