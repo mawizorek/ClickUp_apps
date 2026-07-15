@@ -1,6 +1,6 @@
-# &lt;TableName&gt;
+# <TableName>
 
-**Role:** &lt;role&gt; · **Status:** &lt;locked|under-review|pending&gt; · **App:** &lt;app-slug&gt;
+**Role:** <role> · **Status:** <locked|under-review|pending> · **App:** <app-slug>
 
 > One-line description.
 
@@ -10,9 +10,21 @@
 |---|---|---|---|---|---|
 | PrimaryKey | text-uuid | pk | key | | |
 
+## Calculations
+
+> One block per calc field, INLINE (DOCUMENTATION-STANDARD.md, locked 2026-07-15). Never centralize formula bodies in a separate calc file.
+
+### <calc_FieldName>
+
+_Purpose:_ <what it computes and why>
+
+```
+<FileMaker calc-option text>
+```
+
 ## Relationships
 
-- `&lt;Table&gt;.&lt;fk&gt;` → `&lt;Parent&gt;.PrimaryKey` (cardinality, status)
+- `<Table>.<fk>` → `<Parent>.PrimaryKey` (cardinality, status)
 
 ## Open Items
 
@@ -20,4 +32,4 @@
 
 ## Changelog
 
-- &lt;date&gt;: created.
+- <date>: created.

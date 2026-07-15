@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "app": "maw-budget",
+    "schemaVersion": "1.0",
+    "generated": "2026-07-15",
+    "description": "Self-describing FileMaker schema source. Designed to be rendered by a passive viewer skin: every field carries the metadata needed to color, sort, and frame it without the viewer knowing anything app-specific.",
+    "conventions": {
+      "pk": "PrimaryKey (UUID text) on every table",
+      "fk": "fk<Parent> prefix",
+      "calc": "calc_ prefix",
+      "global": "g_ prefix; gLIST_ reserved for value-list globals",
+      "audit": "CreationTimestamp, CreatedBy, ModificationTimestamp, ModifiedBy"
+    },
+    "conventionNote": "Defaulted to HML_LLC house style at scaffold time. Flip here before any real table is added if URITP style (pk_/fk_) is preferred.",
+    "keyTypes": ["pk", "fk", "calc", "global", "audit", "container", "plain"],
+    "roleColors": {
+      "singleton": "#7B3FA0",
+      "ledger": "#B8860B",
+      "join": "#555",
+      "snapshot": "#C0392B",
+      "taxonomy": "#555",
+      "party": "#2E7D5B",
+      "document": "#B8860B"
+    },
+    "statusLegend": {
+      "locked": "canonical, do not rename without a schema decision",
+      "pending": "planned, not yet built",
+      "under-review": "exists but a decision is open"
+    }
+  },
+  "tables": []
+}

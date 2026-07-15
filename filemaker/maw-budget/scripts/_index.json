@@ -1,0 +1,9 @@
+{
+  "_meta": { "app": "maw-budget", "folder": "scripts", "schemaVersion": "1.0", "generated": "2026-07-15" },
+  "folders": [
+    { "name": "imports", "status": "pending", "scripts": [] },
+    { "name": "navigation", "status": "pending", "scripts": [] },
+    { "name": "utilities", "status": "pending", "scripts": [] },
+    { "name": "triggers", "status": "pending", "scripts": [] }
+  ]
+}
