@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-14",
+  "version": "2026-07-15",
   "tournament": "FIFA World Cup 2026",
   "matches": [
     {
@@ -439,9 +439,9 @@
       "time": "3:00 PM",
       "home": "France",
       "away": "Spain",
-      "hs": null,
-      "as": null,
-      "winner": null,
+      "hs": 0,
+      "as": 2,
+      "winner": "away",
       "venue": "AT&T Stadium, Arlington",
       "feedsTo": 32
     },
@@ -467,7 +467,7 @@
       "day": "2026-07-18",
       "dayLabel": "Sat Jul 18",
       "time": "5:00 PM",
-      "home": "TBD",
+      "home": "France",
       "away": "TBD",
       "hs": null,
       "as": null,
@@ -482,7 +482,7 @@
       "day": "2026-07-19",
       "dayLabel": "Sun Jul 19",
       "time": "3:00 PM",
-      "home": "TBD",
+      "home": "Spain",
       "away": "TBD",
       "hs": null,
       "as": null,
