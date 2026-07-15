@@ -1,5 +1,5 @@
 {
-  "$schema_note": "Canonical machine-readable data for the ClickUp Super Agent fleet. Hand-edit THIS file; index.html renders it, index.md points at both. Do not maintain a parallel table anywhere. See audit-instruction.md for the audit workflow and metadata-schema.md for the sidecar envelope.",
+  "$schema_note": "CANONICAL, SINGLE SOURCE of all global fleet metadata for ClickUp Super Agents. Every structured fact about an agent (identity, track, version, status, channels, lane, triggers) lives HERE and nowhere else. Per-agent folders hold ONLY non-duplicated content: preferences.md (the agent's own config self-mirror), working-notes.md (next spec / revision log), and audits/ (dated audit records). Never hand-mirror any field below into a folder file. index.html renders this; index.md points at both.",
   "golden_standard": {
     "version": "1.0",
     "set": "2026-07-15",
@@ -27,7 +27,16 @@
       "golden_standard_version": "1.0",
       "status": "up-to-date",
       "last_audit": "2026-07-15",
-      "declaration": "brain-config/super-agents/clickup-coach-corey/",
+      "clickup_user_id": -39958913,
+      "profile_url": "https://app.clickup.com/36074068/ai/agents/12cwjm-53993",
+      "creator": "Michael Wizorek",
+      "triggers": ["mention", "dm", "assignment", "schedule"],
+      "channels": {
+        "activity_log": "https://app.clickup.com/36074068/chat/r/12cwjm-56673",
+        "shared_cross_agent": "https://app.clickup.com/36074068/chat/r/12cwjm-56653"
+      },
+      "lane": "URITP workspace structure, singularity/cleanup auditing, standards & agent-creation coaching, and Agent Fleet Steward.",
+      "declaration_folder": "brain-config/super-agents/clickup-coach-corey/",
       "notes": "Fleet Steward. Reference implementation for v1.0."
     },
     {
@@ -37,7 +46,13 @@
       "golden_standard_version": null,
       "status": "needs-declaration",
       "last_audit": null,
-      "declaration": null,
+      "clickup_user_id": -39940529,
+      "profile_url": null,
+      "creator": "Michael Wizorek",
+      "triggers": [],
+      "channels": {},
+      "lane": "URITP production & operational execution (per Cross-Agent Roster).",
+      "declaration_folder": null,
       "notes": "Next in queue for declaration + audit."
     },
     {
@@ -47,7 +62,13 @@
       "golden_standard_version": null,
       "status": "needs-declaration",
       "last_audit": null,
-      "declaration": null,
+      "clickup_user_id": -39958890,
+      "profile_url": "https://app.clickup.com/36074068/ai/agents/12cwjm-53893",
+      "creator": "Michael Wizorek",
+      "triggers": [],
+      "channels": {},
+      "lane": "FileMaker (FMP) solution design & documentation.",
+      "declaration_folder": null,
       "notes": "Track (full-standard) to confirm with Michael."
     },
     {
@@ -57,8 +78,14 @@
       "golden_standard_version": null,
       "status": "needs-declaration",
       "last_audit": null,
-      "declaration": null,
-      "notes": "Track (full-standard) to confirm; check lane overlap with Milo."
+      "clickup_user_id": null,
+      "profile_url": "https://app.clickup.com/36074068/ai/agents/12cwjm-47273",
+      "creator": "Michael Wizorek",
+      "triggers": [],
+      "channels": {},
+      "lane": "URITP resource-portal / doc-artifact builds. Confirm lane overlap with Milo.",
+      "declaration_folder": null,
+      "notes": "Track (full-standard) to confirm."
     },
     {
       "slug": "origination-date-agent",
@@ -67,8 +94,14 @@
       "golden_standard_version": null,
       "status": "inventory-only",
       "last_audit": null,
-      "declaration": null,
-      "notes": "Sets due date = origination date + 1 month. Exempt."
+      "clickup_user_id": -34104764,
+      "profile_url": null,
+      "creator": "Michael Wizorek",
+      "triggers": [],
+      "channels": {},
+      "lane": "Sets due date = origination date + 1 month.",
+      "declaration_folder": null,
+      "notes": "Exempt — no declaration/self-mirror required."
     },
     {
       "slug": "parse-property-emails",
@@ -77,8 +110,14 @@
       "golden_standard_version": null,
       "status": "inventory-only",
       "last_audit": null,
-      "declaration": null,
-      "notes": "Parses payoff/loan fields from emails. Exempt."
+      "clickup_user_id": -34104415,
+      "profile_url": null,
+      "creator": "Michael Wizorek",
+      "triggers": [],
+      "channels": {},
+      "lane": "Parses payoff/loan fields from emails.",
+      "declaration_folder": null,
+      "notes": "Exempt."
     },
     {
       "slug": "update-amount-paid",
@@ -87,8 +126,14 @@
       "golden_standard_version": null,
       "status": "inventory-only",
       "last_audit": null,
-      "declaration": null,
-      "notes": "Single-field reconciliation. Exempt."
+      "clickup_user_id": -27943803,
+      "profile_url": null,
+      "creator": "Michael Wizorek",
+      "triggers": [],
+      "channels": {},
+      "lane": "Single-field reconciliation (Amount Paid).",
+      "declaration_folder": null,
+      "notes": "Exempt."
     }
   ],
   "status_legend": {
@@ -99,6 +144,8 @@
     "inventory-only": "Task-Specific / Exempt; tracked but not held to the full standard."
   },
   "changelog": [
-    "2026-07-15: split from index.md table into JSON data + index.html renderer (single data source). Corey up-to-date on v1.0."
+    "2026-07-15: enriched to hold ALL global metadata (identity, channels, lane, triggers) so per-agent folder files never mirror metadata.",
+    "2026-07-15: split from index.md table into JSON data + index.html renderer.",
+    "2026-07-15: fleet index created in Git (moved off ClickUp)."
   ]
 }
