@@ -1,4 +1,12 @@
 {
-  "_meta": { "app": "hml-llc", "folder": "layouts", "schemaVersion": "1.0", "generated": "2026-07-14", "note": "Pending enumeration from the FileMaker file." },
-  "layouts": []
+  "_meta": { "app": "hml-llc", "folder": "layouts", "schemaVersion": "1.0", "generated": "2026-07-14", "note": "Functional roles; exact FMP layout names PENDING a DDR pass." },
+  "layouts": [
+    { "name": "Property Hub", "file": "property-hub.md", "context": "PropertySUMMARIES", "status": "role-defined" },
+    { "name": "Loan Detail", "file": "loan-detail.md", "context": "Loans", "status": "role-defined" },
+    { "name": "Transactions", "file": "transactions.md", "context": "Loans", "status": "role-defined" },
+    { "name": "Payment Application", "file": "payment-application.md", "context": "PaymentApplications", "status": "role-defined" },
+    { "name": "Payoff", "file": "payoff.md", "context": "Payoffs", "status": "role-defined" },
+    { "name": "Document Binder", "file": "document-binder.md", "context": "Documents", "status": "parked" },
+    { "name": "Global Setup", "file": "global-setup.md", "context": "GLOBAL_USE_VARIABLES", "status": "role-defined" }
+  ]
 }

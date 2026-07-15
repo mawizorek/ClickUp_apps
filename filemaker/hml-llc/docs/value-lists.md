@@ -1,5 +1,3 @@
-# Value Lists
+# Value Lists — (absorbed)
 
-> Structured source: [`../schema/value-lists.json`](../schema/value-lists.json). **PENDING** enumeration from the FileMaker file.
-
-Known from the design system: transaction **status** (Late / Paid / Outstanding-Due / Upcoming) and **delivery type** (mailing / wire / ACH). Anything carrying metadata beyond a display label belongs in a table (`Standard_Transactions`), not a value list.
+> **Absorbed into [`../value-lists/README.md`](../value-lists/README.md)** and `../schema/value-lists.json`. Superseded 2026-07-14. Do not edit here.

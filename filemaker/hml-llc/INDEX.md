@@ -36,7 +36,7 @@ See [functions/README.md](./functions/README.md).
 
 ## Layouts (`layouts/`)
 
-See [layouts/README.md](./layouts/README.md) — pending enumeration.
+7 role-defined layouts (exact FMP names pending). See [layouts/README.md](./layouts/README.md).
 
 ## Value Lists (`value-lists/`)
 
@@ -44,4 +44,10 @@ See [value-lists/README.md](./value-lists/README.md).
 
 ## Meta / narrative (`meta/`)
 
-Design decisions, architecture, data standards, changelog, graph log, import/export. See [meta/README.md](./meta/README.md).
+- [design-decisions](./meta/design-decisions.md) · [architecture-notes](./meta/architecture-notes.md) · [data-standards](./meta/data-standards.md)
+- [calculation-fields](./meta/calculation-fields.md) (all calc formulas) · [schema-notes](./meta/schema-notes.md) (normalization + live inventory)
+- [import-export-specs](./meta/import-export-specs.md) · [database-graph-log](./meta/database-graph-log.md) · [changelog](./meta/changelog.md)
+
+## Legacy
+
+`docs/` holds pointer stubs to their absorbed destinations (kept so old links don't break).
