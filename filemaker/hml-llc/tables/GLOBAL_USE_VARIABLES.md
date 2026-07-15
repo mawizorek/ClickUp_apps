@@ -15,9 +15,9 @@
 | ModifiedBy | text | audit | audit | |
 | APP_TITLE | text | plain | setup | |
 | APP_VERSION | text | plain | setup | |
-| calc_filePath | calc | calc | setup | see meta/calculation-fields.md |
-| calc_fileName | calc | calc | setup | see meta/calculation-fields.md |
-| calc_hostedStatus | calc | calc | setup | see meta/calculation-fields.md |
+| calc_filePath | calc | calc | setup | see Calculations |
+| calc_fileName | calc | calc | setup | see Calculations |
+| calc_hostedStatus | calc | calc | setup | see Calculations |
 | calc_fileSizeMB | calc | calc | setup | numeric; append "MB" in display only |
 | script_Stats_RecordCounts | text | plain | setup | script-adjacent helper |
 | script_LastSaved | text | plain | setup | script-adjacent helper |
@@ -31,7 +31,28 @@
 
 ## Calculations
 
-File-info calcs (`calc_filePath`, `calc_fileName`, `calc_hostedStatus`, `calc_fileSizeMB`) — formulas in [`../meta/calculation-fields.md`](../meta/calculation-fields.md).
+**`calc_filePath`** — Text, unstored. Current file path/location.
+```
+Get ( FilePath )
+```
+
+**`calc_fileName`** — Text, unstored. Current file name.
+```
+Get ( FileName )
+```
+
+**`calc_hostedStatus`** — Text, unstored. Hosted vs local helper.
+```
+If ( Get ( MultiUserState ) > 1 ; "Hosted" ; "Local" )
+```
+
+**`calc_fileSizeMB`** — Number, unstored. Numeric file size; append "MB" only in display contexts.
+```
+Let (
+  ~bytes = Get ( FileSize ) ;
+  Round ( ~bytes / 1048576 ; 2 )
+)
+```
 
 ## Relationships
 
@@ -43,4 +64,5 @@ None (singleton state table).
 
 ## Changelog
 
+- 2026-07-15: Calc formulas embedded inline (were in meta/calculation-fields.md).
 - 2026-07-14: Per-table file; absorbed file-info + record-count calc detail from legacy docs.

@@ -21,7 +21,15 @@
 
 ## Calculations
 
-`countNumDocuments` (formula in [`../meta/calculation-fields.md`](../meta/calculation-fields.md)).
+**`countNumDocuments`** — Number, unstored. Count of related property documents.
+```
+GetAsNumber (
+  ExecuteSQL (
+    "SELECT COUNT(PrimaryKey) FROM Documents WHERE fkProperty = ?" ;
+    "" ; "" ; PrimaryKey
+  )
+)
+```
 
 ## Relationships
 
@@ -37,4 +45,5 @@
 
 ## Changelog
 
+- 2026-07-15: `countNumDocuments` formula embedded inline.
 - 2026-07-14: Per-table file; absorbed countNumDocuments + FK re-eval notes from legacy docs.

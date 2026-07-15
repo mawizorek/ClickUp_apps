@@ -30,7 +30,112 @@
 
 ## Calculations
 
-Loan math (formulas in [`../meta/calculation-fields.md`](../meta/calculation-fields.md)): `calc_CurrentPrincipalBalance`, `calc_CurrentPayoffAmount`, `calc_TotalOutstanding`, `calc_NextDueDate`, `calc_NextMaturityDate`, `calc_FirstMaturation`, `calc_MaturationPayment`, `calc_MonthlyPayment`, `calc_perDiemInterest`, `calc_originationPoints`, `calc_expROI`.
+**`calc_CurrentPrincipalBalance`** — Number, stored. Current principal basis.
+```
+OriginalPrincipal
+```
+
+**`calc_originationPoints`** — Number, stored. Origination-points amount.
+```
+OriginalPrincipal * OriginationPoints
+```
+
+**`calc_MaturationPayment`** — Number, stored. Maturity-side payment amount.
+```
+OriginalPrincipal * MaturationPoints
+```
+
+**`calc_MonthlyPayment`** — Number, stored. Recurring interest/payment helper.
+```
+OriginalPrincipal * InterestRateAnnual / 12
+```
+
+**`calc_perDiemInterest`** — Number, unstored. Per-diem interest helper.
+```
+OriginalPrincipal * InterestRateAnnual / 365
+```
+
+**`calc_FirstMaturation`** — Number, stored. First maturation milestone helper.
+```
+Case (
+  not IsEmpty ( OriginationDate ) and not IsEmpty ( MaturationTerm_inDays ) ;
+    OriginationDate + MaturationTerm_inDays ;
+  ""
+)
+```
+
+**`calc_NextMaturityDate`** — Date, unstored. Next maturity milestone, distinct from next due date.
+```
+Let (
+  [
+    _baseDate = Case ( not IsEmpty ( ClosingDate ) ; ClosingDate ; OriginationDate ) ;
+    _termDays = MaturationTerm_inDays
+  ] ;
+  Case (
+    not IsEmpty ( _baseDate ) and not IsEmpty ( _termDays ) ; _baseDate + _termDays ;
+    ""
+  )
+)
+```
+
+**`calc_NextDueDate`** — Date, unstored. Next collectible expected due date.
+```
+GetAsDate (
+  ExecuteSQL (
+    "SELECT MIN(DueDate) FROM ExpectedTransactions WHERE fkLoan = ? AND DueDate >= ?" ;
+    "" ; "" ; PrimaryKey ; Get ( CurrentDate )
+  )
+)
+```
+
+**`calc_TotalOutstanding`** — Number, unstored. Total outstanding balance helper. Prefers a frozen payoff if one exists, else sums remaining expected.
+```
+Let (
+[
+  _currentPayoff = ExecuteSQL (
+    "SELECT TotalPayoffAmount FROM Payoffs WHERE PrimaryKey = ?" ;
+    "" ; "" ; fkCurrentPayoff
+  ) ;
+  _remainingExpected = ExecuteSQL (
+    "SELECT COALESCE(SUM(CASE WHEN et.AmountAdjusted IS NOT NULL THEN et.AmountAdjusted ELSE et.OriginalAmount END),0) - COALESCE(SUM(pa.AmountApplied),0) FROM ExpectedTransactions et LEFT JOIN PaymentApplications pa ON et.PrimaryKey = pa.fkExpectedTransaction WHERE et.fkLoan = ?" ;
+    "" ; "" ; PrimaryKey
+  )
+] ;
+  Case (
+    not IsEmpty ( _currentPayoff ) ; GetAsNumber ( _currentPayoff ) ;
+    GetAsNumber ( _remainingExpected )
+  )
+)
+```
+
+**`calc_CurrentPayoffAmount`** — Number, unstored. Current all-in payoff helper. Frozen payoff if present, else `calc_TotalOutstanding`.
+```
+Let (
+  _currentPayoff = ExecuteSQL (
+    "SELECT TotalPayoffAmount FROM Payoffs WHERE PrimaryKey = ?" ;
+    "" ; "" ; fkCurrentPayoff
+  ) ;
+  Case (
+    not IsEmpty ( _currentPayoff ) ; GetAsNumber ( _currentPayoff ) ;
+    calc_TotalOutstanding
+  )
+)
+```
+
+**`calc_expROI`** — Number, stored. Analytical ROI helper kept by decision.
+```
+Let (
+[
+  _expectedInterest = calc_MonthlyPayment * Ceiling ( LoanTerm_inDays / 30.5 ) ;
+  _originationRevenue = calc_originationPoints ;
+  _maturityRevenue = calc_MaturationPayment
+] ;
+  Case (
+    IsEmpty ( OriginalPrincipal ) or OriginalPrincipal = 0 ; "" ;
+    ( _expectedInterest + _originationRevenue + _maturityRevenue ) / OriginalPrincipal
+  )
+)
+```
 
 ## Relationships
 
@@ -43,7 +148,9 @@ Loan math (formulas in [`../meta/calculation-fields.md`](../meta/calculation-fie
 
 - **Field-naming reconciliation (blocking calc wiring):** calc text uses `OriginalPrincipal` / `InterestRateAnnual` / `ClosingDate` / `GraceDays` / `fkCurrentPayoff`; `schema/tables.json` uses `LoanAmount` / `InterestRate` and omits the latter three. Confirm the live-file names and align schema JSON + calc text.
 - Finish calc-name cleanup to one consistent `calc_` family; confirm `ServicingStatus` is a real status reference.
+- Later renames worth considering: `calc_originationPoints` → `calc_OriginationPointsAmount`; confirm `calc_FirstMaturation` is the forever name.
 
 ## Changelog
 
+- 2026-07-15: All 11 loan-math formulas embedded inline (were in meta/calculation-fields.md).
 - 2026-07-14: Per-table file; absorbed full loan-terms field set + calc inventory from legacy docs; flagged principal/rate naming drift.
