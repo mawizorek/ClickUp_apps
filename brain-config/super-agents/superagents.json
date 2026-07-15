@@ -1,5 +1,5 @@
 {
-  "$schema_note": "CANONICAL, SINGLE SOURCE of all global fleet metadata for ClickUp Super Agents. Every structured fact about an agent (identity, track, version, status, channels, lane, triggers) lives HERE and nowhere else. Per-agent folders hold ONLY non-duplicated content: preferences.md (the agent's own config self-mirror), working-notes.md (next spec / revision log), and audits/ (dated audit records). Never hand-mirror any field below into a folder file. index.html renders this; index.md points at both.",
+  "$schema_note": "CANONICAL, SINGLE SOURCE of all global fleet metadata for ClickUp Super Agents. Every structured fact about an agent (identity, track, version, status, channels, lane, triggers) lives HERE and nowhere else. Per-agent folders hold ONLY non-duplicated content: preferences.md (near-1:1 verbatim mirror of the live config; header + config only), working-notes.md (next spec / revision log), and audits/ (dated audit records). Never hand-mirror any field below into a folder file. index.html renders this; index.md points at both.",
   "golden_standard": {
     "version": "1.0",
     "set": "2026-07-15",
@@ -50,10 +50,13 @@
       "profile_url": null,
       "creator": "Michael Wizorek",
       "triggers": [],
-      "channels": {},
-      "lane": "URITP production & operational execution (per Cross-Agent Roster).",
-      "declaration_folder": null,
-      "notes": "Next in queue for declaration + audit."
+      "channels": {
+        "activity_log": "https://app.clickup.com/36074068/chat/r/12cwjm-56633",
+        "shared_cross_agent": "https://app.clickup.com/36074068/chat/r/12cwjm-56653"
+      },
+      "lane": "URITP production & operational execution — running-show/production ops, INBOX email intake triage, availability & labor scheduling, training/PD routing, resource portals & doc/artifact builds, custom-field/subtask upkeep, and maintaining URITP operational SOP content (per Cross-Agent Roster).",
+      "declaration_folder": "brain-config/super-agents/mainstage-milo/",
+      "notes": "Folder scaffolded 2026-07-15; preferences.md PENDING verbatim config paste before first audit. Activity-log channel 12cwjm-56633 from Creation & Setup Checklist doc — confirm. Triggers + profile URL unconfirmed."
     },
     {
       "slug": "fmp-frank",
@@ -68,8 +71,8 @@
       "triggers": [],
       "channels": {},
       "lane": "FileMaker (FMP) solution design & documentation.",
-      "declaration_folder": null,
-      "notes": "Track (full-standard) to confirm with Michael."
+      "declaration_folder": "brain-config/super-agents/fmp-frank/",
+      "notes": "Folder scaffolded 2026-07-15; preferences.md PENDING verbatim config paste before first audit. Full-standard track to CONFIRM with Michael (may be a narrower FileMaker specialist). Triggers + channels unconfirmed."
     },
     {
       "slug": "update-uritp",
@@ -138,12 +141,13 @@
   ],
   "status_legend": {
     "up-to-date": "Full-Standard agent verified against current golden-standard version.",
-    "needs-declaration": "Full-Standard agent with no repo declaration folder yet.",
+    "needs-declaration": "Full-Standard agent whose declaration folder and/or verbatim preferences.md mirror is not yet complete.",
     "needs-re-audit": "Standard bumped or config changed; re-verify.",
     "behind": "Known gaps against the current golden standard.",
     "inventory-only": "Task-Specific / Exempt; tracked but not held to the full standard."
   },
   "changelog": [
+    "2026-07-15: scaffolded declaration folders for mainstage-milo + fmp-frank (README + PENDING preferences + working-notes); wired their rows (declaration_folder, Milo channels). preferences.md verbatim paste still pending for both.",
     "2026-07-15: enriched to hold ALL global metadata (identity, channels, lane, triggers) so per-agent folder files never mirror metadata.",
     "2026-07-15: split from index.md table into JSON data + index.html renderer.",
     "2026-07-15: fleet index created in Git (moved off ClickUp)."
