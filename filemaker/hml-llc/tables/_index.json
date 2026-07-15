@@ -1,0 +1,18 @@
+{
+  "_meta": { "app": "hml-llc", "folder": "tables", "schemaVersion": "1.0", "generated": "2026-07-14", "source": "../schema/tables.json" },
+  "roleColors": { "singleton": "#7B3FA0", "collateral": "#2E7D5B", "servicing-parent": "#7B3FA0", "ledger": "#B8860B", "join": "#555555", "snapshot": "#C0392B", "source": "#2E7D5B", "taxonomy": "#555555", "party": "#2E7D5B", "document": "#B8860B" },
+  "tables": [
+    { "name": "GLOBAL_USE_VARIABLES", "file": "GLOBAL_USE_VARIABLES.md", "role": "singleton", "status": "locked", "fieldCount": 15 },
+    { "name": "PropertySUMMARIES", "file": "PropertySUMMARIES.md", "role": "collateral", "status": "locked", "fieldCount": 10 },
+    { "name": "Loans", "file": "Loans.md", "role": "servicing-parent", "status": "locked", "fieldCount": 17 },
+    { "name": "ExpectedTransactions", "file": "ExpectedTransactions.md", "role": "ledger", "status": "locked", "fieldCount": 15 },
+    { "name": "AccountTransactions", "file": "AccountTransactions.md", "role": "ledger", "status": "locked", "fieldCount": 13 },
+    { "name": "PaymentApplications", "file": "PaymentApplications.md", "role": "join", "status": "locked", "fieldCount": 9 },
+    { "name": "Payoffs", "file": "Payoffs.md", "role": "snapshot", "status": "locked", "fieldCount": 11 },
+    { "name": "PaymentInstructions", "file": "PaymentInstructions.md", "role": "source", "status": "under-review", "fieldCount": 12 },
+    { "name": "Standard_Transactions", "file": "Standard_Transactions.md", "role": "taxonomy", "status": "locked", "fieldCount": 12 },
+    { "name": "Documents", "file": "Documents.md", "role": "document", "status": "pending", "fieldCount": 4 },
+    { "name": "Organizations", "file": "Organizations.md", "role": "party", "status": "pending", "fieldCount": 1 },
+    { "name": "Contacts", "file": "Contacts.md", "role": "party", "status": "pending", "fieldCount": 1 }
+  ]
+}

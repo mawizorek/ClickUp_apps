@@ -1,0 +1,16 @@
+{
+  "_meta": { "app": "hml-llc", "folder": "relationships", "schemaVersion": "1.0", "generated": "2026-07-14", "source": "../schema/relationships.json", "model": "loan-first" },
+  "relationships": [
+    { "from": { "table": "Loans", "field": "fkProperty" }, "to": { "table": "PropertySUMMARIES", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
+    { "from": { "table": "Loans", "field": "fkBorrower" }, "to": { "table": "Organizations", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "pending" },
+    { "from": { "table": "ExpectedTransactions", "field": "fkLoan" }, "to": { "table": "Loans", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
+    { "from": { "table": "AccountTransactions", "field": "fkLoan" }, "to": { "table": "Loans", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
+    { "from": { "table": "ExpectedTransactions", "field": "fkStandardTransaction" }, "to": { "table": "Standard_Transactions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
+    { "from": { "table": "AccountTransactions", "field": "fkStandardTransaction" }, "to": { "table": "Standard_Transactions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
+    { "from": { "table": "PaymentApplications", "field": "fkExpectedTransaction" }, "to": { "table": "ExpectedTransactions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
+    { "from": { "table": "PaymentApplications", "field": "fkAccountTransaction" }, "to": { "table": "AccountTransactions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
+    { "from": { "table": "Payoffs", "field": "fkLoan" }, "to": { "table": "Loans", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
+    { "from": { "table": "PropertySUMMARIES", "field": "fkDocuments" }, "to": { "table": "Documents", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review" },
+    { "from": { "table": "PropertySUMMARIES", "field": "fkBorrower" }, "to": { "table": "Organizations", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review" }
+  ]
+}

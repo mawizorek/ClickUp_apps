@@ -1,0 +1,6 @@
+{
+  "_meta": { "app": "hml-llc", "folder": "functions", "schemaVersion": "1.0", "generated": "2026-07-14", "note": "Pending full enumeration; JSON helper family to migrate." },
+  "functions": [
+    { "name": "MSG_ValueListErrors", "file": "MSG_ValueListErrors.md", "signature": "MSG_ValueListErrors ( token )", "role": "single-sourced validation message text" }
+  ]
+}

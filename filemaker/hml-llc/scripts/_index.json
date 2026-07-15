@@ -1,0 +1,9 @@
+{
+  "_meta": { "app": "hml-llc", "folder": "scripts", "schemaVersion": "1.0", "generated": "2026-07-14", "note": "Subfolders mirror FMP Manage Scripts folder names. Pending full enumeration." },
+  "folders": [
+    { "name": "imports", "status": "pending", "scripts": [] },
+    { "name": "navigation", "status": "pending", "scripts": [] },
+    { "name": "utilities", "status": "partial", "scripts": [ { "name": "commitRecord", "file": "utilities/commitRecord.md", "role": "generic commit + validation-error handler" } ] },
+    { "name": "triggers", "status": "pending", "scripts": [] }
+  ]
+}
