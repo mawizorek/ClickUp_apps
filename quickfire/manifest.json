@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-14",
+  "version": "2026-07-15",
   "note": "Source of truth for the quickfire index. Add an artifact = add an entry here. type/subjects/status must come from the controlled vocabulary below; adding a new vocab term is a deliberate edit, not an ad-hoc tag. status: active=shown at rest, archived=hidden until 'Show all', hidden=dev/junk kept out of the default view (still reachable via Show all). reviewed:false = auto-surfaced folder with inferred tags, needs a human pass.",
   "vocabulary": {
     "type": ["plan", "research", "reference", "tool", "fun"],
@@ -7,6 +7,16 @@
     "status": ["active", "archived", "hidden"]
   },
   "artifacts": [
+    {
+      "slug": "side-play-board",
+      "title": "Side Play Board — 21 Concepts",
+      "desc": "Comparative board of 21 side-business ideas from three models, scored on burst/moat/cash, with competitor research on the top three (venue twins, workspace consulting, script breakdown).",
+      "type": "tool",
+      "subjects": ["work"],
+      "status": "active",
+      "date": "2026-07-15",
+      "reviewed": true
+    },
     {
       "slug": "garage-dashboard",
       "title": "Garage Registry Dashboard",

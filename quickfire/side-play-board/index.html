@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4efe4">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Comparative board of 21 side-business concepts scored across three models, with competitor research on the top three.">
+<title>Side Play Board · 21 Concepts</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>&#9878;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:oklch(0.964 0.014 92);--card:oklch(0.988 0.008 92);--ink:oklch(0.26 0.03 168);
+  --muted:oklch(0.48 0.028 168);--faint:oklch(0.62 0.022 168);--line:oklch(0.86 0.02 100);
+  --forest:oklch(0.44 0.09 168);--clay:oklch(0.62 0.14 46);--gold:oklch(0.74 0.11 82);
+  --claude:oklch(0.60 0.13 44);--gemini:oklch(0.55 0.10 232);--gpt:oklch(0.52 0.12 300);
+  --meter-bg:oklch(0.90 0.015 100);
+  --serif:'Fraunces',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'Spline Sans Mono',monospace;
+  --ease:cubic-bezier(.16,1,.3,1)
+}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;padding:0 18px calc(72px + env(safe-area-inset-bottom));font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+main{max-width:900px;margin:auto}
+h1,h2,h3{margin:0;font-family:var(--serif);font-weight:600;text-wrap:balance;line-height:1.06;letter-spacing:-.01em}
+p{margin:0;text-wrap:pretty}.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+header{padding:52px 0 26px}
+.eyebrow{font:600 .68rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--clay)}
+h1{font-size:clamp(2.5rem,9vw,4.4rem);margin-top:14px}
+.dek{font-size:1.06rem;color:var(--muted);max-width:60ch;margin-top:16px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px;font-size:.8rem;color:var(--muted)}
+.legend b{font-family:var(--mono);font-weight:600}
+.src-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.d-claude{background:var(--claude)}.d-gemini{background:var(--gemini)}.d-gpt{background:var(--gpt)}
+
+.controls{position:sticky;top:0;z-index:5;background:var(--paper);padding:14px 0 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.ctl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ctl-label{font:600 .6rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);width:100%;margin-bottom:2px}
+.chip{font:500 .82rem var(--sans);padding:6px 13px;min-height:36px;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:100px;cursor:pointer;transition:all .2s var(--ease)}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+.ctl-sort{margin-left:auto}
+.ctl-sort .ctl-label{width:auto;margin:0 8px 0 0;display:inline}
+
+.count{font:600 .74rem var(--mono);color:var(--faint);padding:14px 0 6px}
+.list{display:flex;flex-direction:column;gap:0}
+.row{display:grid;grid-template-columns:34px 1fr auto;gap:14px;align-items:center;padding:15px 4px;border-bottom:1px solid var(--line);transition:background .18s linear}
+.row:hover{background:var(--card)}
+.rank{font:600 .8rem var(--mono);color:var(--faint)}
+.row-main{min-width:0}
+.row-title{font-weight:600;line-height:1.22;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.row-cat{font:500 .68rem var(--mono);color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+.meters{display:flex;gap:16px;flex-shrink:0}
+.meter{text-align:right}
+.meter-k{font:600 .54rem var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.bar{width:52px;height:6px;border-radius:3px;background:var(--meter-bg);margin-top:4px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px}
+.b-burst i{background:var(--forest)}.b-moat i{background:var(--clay)}.b-cash i{background:var(--gold)}
+.score{font:600 1rem var(--mono);color:var(--ink);min-width:30px;text-align:right}
+.top-badge{font:600 .55rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--clay);border:1px solid var(--clay);border-radius:4px;padding:2px 6px}
+
+section.picks{margin-top:56px}
+.picks-head{font-size:clamp(1.8rem,6vw,2.6rem);letter-spacing:-.02em}
+.picks-sub{color:var(--muted);margin-top:10px;max-width:60ch}
+.pick{margin-top:26px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.pick-top{padding:22px 22px 18px}
+.pick-rank{font:600 .66rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--clay)}
+.pick h3{font-size:1.5rem;margin-top:8px}
+.pick-why{color:var(--muted);margin-top:10px;font-size:.98rem}
+.pick-why strong{color:var(--ink)}
+.comp{border-top:1px solid var(--line);padding:18px 22px;background:oklch(0.978 0.01 92)}
+.comp-label{font:600 .6rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:12px}
+.comp-item{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:9px 0;border-top:1px dotted var(--line)}
+.comp-item:first-of-type{border-top:0}
+.comp-name{font-weight:600;font-size:.9rem}
+.comp-name a{color:var(--forest);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+.comp-name a:hover{border-color:var(--forest)}
+.comp-price{font:600 .78rem var(--mono);color:var(--muted);text-align:right;white-space:nowrap}
+.comp-note{grid-column:1/-1;font-size:.85rem;color:var(--muted)}
+.gap{margin-top:14px;padding:13px 15px;background:oklch(0.93 0.05 82);border-radius:9px;font-size:.9rem;color:oklch(0.34 0.05 82)}
+.gap b{font-weight:600}
+.threat{background:oklch(0.92 0.055 40)!important;color:oklch(0.38 0.09 40)}
+
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font:500 .74rem var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.reveal{opacity:0;transform:translateY(10px);transition:opacity .5s var(--ease),transform .5s var(--ease)}.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}*{transition:none!important}}
+@media(max-width:620px){
+  .meters{display:none}
+  .row{grid-template-columns:28px 1fr auto;gap:10px;padding:14px 2px}
+  .ctl-sort{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="eyebrow">Side Revenue · Comparative Board</div>
+  <h1>Twenty-one plays, one board.</h1>
+  <p class="dek">Every concept three models generated from the same brief, scored on the same axes. Filter by author, sort by what you care about, then see where the top three actually stand against real competitors.</p>
+  <div class="legend">
+    <span><span class="src-dot d-claude"></span>Claude · 8</span>
+    <span><span class="src-dot d-gemini"></span>Gemini · 5</span>
+    <span><span class="src-dot d-gpt"></span>GPT · 8</span>
+    <span><b>Burst</b> = survives interruption</span>
+    <span><b>Moat</b> = unfair advantage</span>
+    <span><b>Cash</b> = speed to first dollar</span>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="ctl-row">
+    <span class="ctl-label">Filter + sort</span>
+    <button class="chip" data-src="all" aria-pressed="true">All 21</button>
+    <button class="chip" data-src="claude" aria-pressed="false">Claude</button>
+    <button class="chip" data-src="gemini" aria-pressed="false">Gemini</button>
+    <button class="chip" data-src="gpt" aria-pressed="false">GPT</button>
+    <span class="ctl-sort">
+      <span class="ctl-label" style="display:inline">Sort</span>
+      <button class="chip" data-sort="total" aria-pressed="true">Total</button>
+      <button class="chip" data-sort="burst" aria-pressed="false">Burst</button>
+      <button class="chip" data-sort="moat" aria-pressed="false">Moat</button>
+      <button class="chip" data-sort="cash" aria-pressed="false">Cash</button>
+    </span>
+  </div>
+</div>
+<div class="count" id="count"></div>
+<div class="list" id="list"></div>
+
+<section class="picks reveal">
+  <div class="pick-rank" style="font-size:.68rem">The verdict</div>
+  <h2 class="picks-head">My top three</h2>
+  <p class="picks-sub">Chosen for defensible moat, clean burst boundaries, and real competitive whitespace, not just a high score. One build-once asset, one high-ceiling service, one clean production service with a caveat.</p>
+
+  <article class="pick reveal">
+    <div class="pick-top">
+      <div class="pick-rank">01 · GPT · Digital asset</div>
+      <h3>Venue Digital Twin Licensing</h3>
+      <p class="pick-why">Build accurate Vectorworks models of small and midsize venues once, license each file repeatedly to incoming designers. <strong>The strongest whitespace on the board:</strong> the market is fragmented into free venue giveaways and bespoke one-offs, with no catalog player.</p>
+    </div>
+    <div class="comp">
+      <div class="comp-label">Real competitors</div>
+      <div class="comp-item"><span class="comp-name"><a href="https://www.edgelightrgb.com/theater" target="_blank" rel="noopener">Edgelight RGB · VWX Theater Model</a></span><span class="comp-price">$25</span><span class="comp-note">A generic, customizable theater model. Not a real venue, no verified data. Commodity floor, not a competitor to venue-specific twins.</span></div>
+      <div class="comp-item"><span class="comp-name"><a href="https://vectorworksoutsourcing.com/2022/08/15/vectorworks-drafting-services/" target="_blank" rel="noopener">Vectorworks Outsourcing</a></span><span class="comp-price">Per project</span><span class="comp-note">General drafting-for-hire (events, scenery, theatre). Sells labor by the job, not a reusable venue library.</span></div>
+      <div class="comp-item"><span class="comp-name">Individual designers (Colby Anderson, Dani Clifford, Matt Grenier)</span><span class="comp-price">Portfolio</span><span class="comp-note">Build venue base files as one-off portfolio pieces. Proof the skill is valued, but nobody productizes it.</span></div>
+      <div class="comp-item"><span class="comp-name">Venues themselves (e.g. Rothstein Theatre)</span><span class="comp-price">Free</span><span class="comp-note">Larger houses post their own Vectorworks plots free. Your target is the majority of venues that have nothing usable.</span></div>
+      <div class="gap"><b>The gap:</b> no one runs a verified, maintained catalog of small-venue twins licensed to designers. Generic models are cheap and useless; real ones are free-if-they-exist or costly bespoke. That middle is empty.</div>
+    </div>
+  </article>
+
+  <article class="pick reveal">
+    <div class="pick-top">
+      <div class="pick-rank">02 · Claude · High-value consulting</div>
+      <h3>Second-Brain Workspace Consulting</h3>
+      <p class="pick-why">Package the git-backed agent, memory, and workflow system you already run daily. <strong>Highest ceiling, most crowded field.</strong> The moat is not "I set up ClickUp," it is a live, versioned agent system you can demo, which almost none of the incumbents can show.</p>
+    </div>
+    <div class="comp">
+      <div class="comp-label">Real competitors</div>
+      <div class="comp-item"><span class="comp-name"><a href="https://camelai.tech/service-clickup/" target="_blank" rel="noopener">camelai</a></span><span class="comp-price">$8,800</span><span class="comp-note">Verified ClickUp implementation for teams on EOS, plus an AI-automation tier at the same price. The high end of generic done-for-you.</span></div>
+      <div class="comp-item"><span class="comp-name"><a href="https://tuckconsultinggroup.com/clickup/clickup-managed-services/" target="_blank" rel="noopener">Tuck Consulting Group</a></span><span class="comp-price">$750+/mo</span><span class="comp-note">ClickUp Ruby Partner, ongoing managed services and training. This is the recurring-retainer model you would compete with.</span></div>
+      <div class="comp-item"><span class="comp-name"><a href="https://www.robynhenke.com/the-full-build" target="_blank" rel="noopener">Robyn Henke</a></span><span class="comp-price">$350 – full build</span><span class="comp-note">Freelancer-focused: a 90-minute Process Reset at $350 up to a 14-day Full Build. Closest to a solo-operator positioning.</span></div>
+      <div class="comp-item"><span class="comp-name">ConsultEvo, BlueCreative, Solution Integrators, stackset, Ellie Rogers</span><span class="comp-price">Custom</span><span class="comp-note">A deep bench of "verified ClickUp consultant" shops all selling audits, cleanups, automations. The category is mature.</span></div>
+      <div class="gap threat"><b>Reality check:</b> this is a red ocean. Generic ClickUp setup is a commodity. You only win by narrowing hard to the git-versioned agent architecture as the demo, a thing these incumbents structurally do not have.</div>
+    </div>
+  </article>
+
+  <article class="pick reveal">
+    <div class="pick-top">
+      <div class="pick-rank">03 · GPT · Analysis service</div>
+      <h3>Script Breakdown Bureau</h3>
+      <p class="pick-why">Turn a script into a production-intelligence packet before departments burn a week rediscovering it. <strong>Cleanest burst profile of the three,</strong> but it carries the most active competitive threat, so it ranks third on purpose.</p>
+    </div>
+    <div class="comp">
+      <div class="comp-label">Real competitors</div>
+      <div class="comp-item"><span class="comp-name"><a href="https://www.showbuild.live/" target="_blank" rel="noopener">ShowBuild</a></span><span class="comp-price">SaaS</span><span class="comp-note">The one direct theatrical player: automates pre-production breakdown into scene analysis, department breakdowns, and cue suggestions. Watch this one.</span></div>
+      <div class="comp-item"><span class="comp-name"><a href="https://aiscriptreader.com/script-breakdown" target="_blank" rel="noopener">AIScriptReader</a></span><span class="comp-price">$29 / script</span><span class="comp-note">AI tags 15 production categories per scene, editable. This is the price floor your human judgment has to clear.</span></div>
+      <div class="comp-item"><span class="comp-name"><a href="https://filmustage.com/script-breakdown/" target="_blank" rel="noopener">Filmustage</a>, Scriptflow, Studiovity, Martin</span><span class="comp-price">SaaS</span><span class="comp-note">Mature film/TV AI breakdown tools. Not theatre-focused, but they set buyer expectations for speed and cost.</span></div>
+      <div class="gap threat"><b>The threat:</b> AI is commoditizing the tagging layer at ~$29 a script. What survives is theatrical production-load judgment (practicals, transitions, staffing pressure, staging risk) the tools can't infer. Sell the interpretation, never the tag list, or a bot underbids you.</div>
+    </div>
+  </article>
+</section>
+
+<footer>
+  <span>Side Play Board · 21 concepts · 3 models</span>
+  <span id="stamp">v1</span>
+</footer>
+</main>
+
+<script>
+const DATA=[
+ {n:"Micro-App Studio",s:"claude",c:"Productized service",b:4,m:3,h:4},
+ {n:"Remote Online Notary + Signing Agent",s:"claude",c:"Licensed service",b:5,m:2,h:3},
+ {n:"Safety Programs for Small Venues",s:"claude",c:"Domain consulting",b:4,m:4,h:2},
+ {n:"Living Handbook Sites",s:"claude",c:"Recurring service",b:5,m:3,h:4},
+ {n:"Collectibles Intel + Flip Desk",s:"claude",c:"Arbitrage + product",b:3,m:3,h:3},
+ {n:"Remote-First Lighting Design",s:"claude",c:"Skilled freelance",b:3,m:4,h:2},
+ {n:"Cricut Decal Micro-Brand",s:"claude",c:"Physical product",b:5,m:1,h:4},
+ {n:"Second-Brain Workspace Consulting",s:"claude",c:"High-value consulting",b:4,m:5,h:3},
+ {n:"Drafting & Paperwork Ghost Prep",s:"gemini",c:"Async production service",b:5,m:4,h:4},
+ {n:"Legacy FileMaker Extraction Audits",s:"gemini",c:"Technical audit",b:3,m:4,h:3},
+ {n:"Fractional Production Analytics",s:"gemini",c:"Data retainer",b:4,m:3,h:3},
+ {n:"Production Archive Architecture",s:"gemini",c:"Infrastructure",b:5,m:3,h:2},
+ {n:"Legacy-to-Web Bridge Scripts",s:"gemini",c:"Integration service",b:4,m:4,h:3},
+ {n:"Venue Digital Twin Licensing",s:"gpt",c:"Digital asset · licensing",b:5,m:5,h:3},
+ {n:"Technical Rider Advance Desk",s:"gpt",c:"Productized operations",b:4,m:4,h:5},
+ {n:"Script Breakdown Bureau",s:"gpt",c:"Analysis service",b:5,m:3,h:4},
+ {n:"Production Training Lab Kits",s:"gpt",c:"Curriculum IP",b:5,m:4,h:3},
+ {n:"Show-Control File Surgeon",s:"gpt",c:"Technical repair",b:3,m:4,h:3},
+ {n:"Stage Equipment Consignment Broker",s:"gpt",c:"Brokerage",b:4,m:3,h:3},
+ {n:"Season Feasibility Stress Test",s:"gpt",c:"Decision product",b:3,m:4,h:3},
+ {n:"Specialist Procurement Desk",s:"gpt",c:"Procurement service",b:5,m:2,h:4}
+];
+const TOP3=new Set(["Venue Digital Twin Licensing","Second-Brain Workspace Consulting","Script Breakdown Bureau"]);
+const SRC={claude:"Claude",gemini:"Gemini",gpt:"GPT"};
+let src="all",sort="total";
+const listEl=document.getElementById("list"),countEl=document.getElementById("count");
+const tot=d=>d.b+d.m+d.h;
+function render(){
+  let rows=DATA.filter(d=>src==="all"||d.s===src);
+  rows.sort((a,b)=> sort==="total"?tot(b)-tot(a):b[sort[0]]-a[sort[0]] || tot(b)-tot(a));
+  countEl.textContent=`${rows.length} concept${rows.length>1?"s":""} · sorted by ${sort==="total"?"total score":sort}`;
+  listEl.innerHTML=rows.map((d,i)=>`
+   <div class="row">
+     <span class="rank">${String(i+1).padStart(2,"0")}</span>
+     <div class="row-main">
+       <div class="row-title"><span class="src-dot d-${d.s}"></span>${d.n}${TOP3.has(d.n)?'<span class="top-badge">Top 3</span>':''}</div>
+       <div class="row-cat">${SRC[d.s]} · ${d.c}</div>
+     </div>
+     <div style="display:flex;align-items:center;gap:16px">
+       <div class="meters">
+         ${meter("Burst","burst",d.b)}${meter("Moat","moat",d.m)}${meter("Cash","cash",d.h)}
+       </div>
+       <span class="score mono">${tot(d)}</span>
+     </div>
+   </div>`).join("");
+}
+function meter(label,cls,v){return `<div class="meter"><div class="meter-k">${label}</div><div class="bar b-${cls}"><i style="width:${v*20}%"></i></div></div>`}
+document.querySelectorAll("[data-src]").forEach(b=>b.addEventListener("click",()=>{
+  src=b.dataset.src;document.querySelectorAll("[data-src]").forEach(x=>x.setAttribute("aria-pressed",x===b));render();
+}));
+document.querySelectorAll("[data-sort]").forEach(b=>b.addEventListener("click",()=>{
+  sort=b.dataset.sort;document.querySelectorAll("[data-sort]").forEach(x=>x.setAttribute("aria-pressed",x===b));render();
+}));
+render();
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.1});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+document.getElementById("stamp").textContent="Side Play Board v1";
+</script>
+</body>
+</html>
