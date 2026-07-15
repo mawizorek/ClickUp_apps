@@ -1,6 +1,6 @@
 # FileMaker Documentation Standard (repo-native)
 
-**Status:** v1 · Locked 2026-07-14 · **Source of truth:** this repo.
+**Status:** v1.1 · Locked 2026-07-14, calc-inline rule added 2026-07-15 · **Source of truth:** this repo.
 **Supersedes:** the ClickUp "FileMaker Documentation Standards" doc, which becomes a one-line pointer here once the cull runs.
 
 ---
@@ -14,6 +14,10 @@ This **replaces the old "11 fixed documentation pages" model.** Those pages deco
 - **Object pages** (Tables, Relationships, Layouts, Scripts, Value Lists) → mirror **folders**, one file per object.
 - **Narrative pages** (Design Decisions, Architecture Notes, Data Standards, Changelog, Database Graph Log, Import/Export Specs) → `meta/`.
 
+## Calcs live inline with what they define (LOCKED 2026-07-15, Michael)
+
+**A calculation field's full FileMaker calc-option text lives in a code block INSIDE the file of the object that owns it** — the table file for a table calc, right beside that field. Never make a reader navigate to a separate file to see a formula they're looking at in a field list. **Do NOT centralize formula bodies in a separate calc file.** A cross-table `meta/calculation-fields.md` may exist ONLY as a thin index (field name + owning table + one-line purpose, linking to the inline definition); it must never hold the formula bodies. One definition, one home, physically next to the field. This generalizes to every FMP app.
+
 ## Per-app structure
 
 ```
@@ -22,14 +26,14 @@ filemaker/<app-slug>/
   INDEX.md               rendering manifest — links every object folder
   next-build-spec.md     overwritten each build cycle
   schema/                machine mirror (generated JSON: tables/relationships/value-lists)
-  tables/                one file per table  (+ README, _index.json)
+  tables/                one file per table  (+ README, _index.json) — calc formulas inline here
   relationships/         graph as data + prose (+ README, _index.json)
   layouts/               one file per layout (+ README, _index.json)
   scripts/               mirrors FMP script folders (+ README, _index.json)
     imports/  navigation/  utilities/  triggers/   ...one file per script
   functions/             one file per custom function (+ README, _index.json)
   value-lists/           value lists (+ README)
-  meta/                  narrative docs (design/architecture/data-standards/changelog/graph-log/import-export)
+  meta/                  narrative docs (design/architecture/data-standards/changelog/graph-log/import-export) + calc INDEX only
   notes/                 per-build / session notes, PR-linked
 ```
 
@@ -43,7 +47,7 @@ Every mirror folder carries an `_index.json` machine manifest so the **Phase 2 v
 
 ### Table file (`tables/<TableName>.md`)
 
-Header line (Role · Status · App) → one-line description → **Fields** table (Field · Type · Key · Category · Status · Notes) → **Relationships** (edges touching this table) → **Open Items** → **Changelog**.
+Header line (Role · Status · App) → one-line description → **Fields** table (Field · Type · Key · Category · Status · Notes) → **Calculations** (each calc field's purpose + its FileMaker calc-option text in a code block, INLINE) → **Relationships** (edges touching this table) → **Open Items** → **Changelog**.
 
 ### Script file (`scripts/<folder>/<ScriptName>.md`)
 
@@ -51,7 +55,7 @@ Uses the **build-ready header** from the FMP Coding Gate: SCRIPT · ROLE · CALL
 
 ### Function file (`functions/<FunctionName>.md`)
 
-Signature → Purpose → Parameters → Returns → Body → Related → Changelog.
+Signature → Purpose → Parameters → Returns → Body (code block, inline) → Related → Changelog.
 
 ## Script folders mirror FileMaker
 
