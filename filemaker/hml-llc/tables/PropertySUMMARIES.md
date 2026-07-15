@@ -2,7 +2,7 @@
 
 **Role:** collateral · **Status:** locked · **App:** hml-llc
 
-> Collateral / operating property table. NOT the financial parent — loan-servicing ownership lives on `Loans`.
+> Collateral / operating property table. NOT the financial parent — loan-servicing ownership lives on `Loans`. The property-first navigation hub.
 
 ## Fields
 
@@ -13,11 +13,15 @@
 | CreatedBy | text | audit | audit | | |
 | ModificationTimestamp | timestamp | audit | audit | | |
 | ModifiedBy | text | audit | audit | | |
-| fkBorrower | text-uuid | fk | key | under-review | FK ownership under re-eval |
-| fkDocuments | text-uuid | fk | key | under-review | |
+| fkBorrower | text-uuid | fk | key | under-review | FK ownership under re-eval (property lens vs loan-servicing) |
+| fkDocuments | text-uuid | fk | key | under-review | scalar FK vs true one-to-many documents |
 | fkBalloonNote | text-uuid | fk | key | under-review | |
-| fkPropertyStatus | text-uuid | fk | key | under-review | |
-| &lt;property identity + operating fields&gt; | text | plain | identity | pending | address/collateral identity fields — enumerate from FileMaker file |
+| fkPropertyStatus | text-uuid | fk | key | under-review | resolve to statuses_PropertySummaries PK |
+| &lt;property identity + operating fields&gt; | text | plain | identity | pending | address/collateral identity — enumerate from file |
+
+## Calculations
+
+`countNumDocuments` (formula in [`../meta/calculation-fields.md`](../meta/calculation-fields.md)).
 
 ## Relationships
 
@@ -27,9 +31,10 @@
 
 ## Open Items
 
-- Enumerate the real property identity / operating fields from the FileMaker file.
-- Re-evaluate the four under-review FKs so each clearly belongs to a real parent/module.
+- Enumerate the real property identity / operating fields from the file.
+- Verify no loan-owned terms drifted back here; re-check the four under-review FKs.
+- The legacy `PropertyExpectations` calc layer folds into `Loans` calc fields (see meta/schema-notes.md).
 
 ## Changelog
 
-- 2026-07-14: Migrated to per-table file (repo-native docs revamp).
+- 2026-07-14: Per-table file; absorbed countNumDocuments + FK re-eval notes from legacy docs.
