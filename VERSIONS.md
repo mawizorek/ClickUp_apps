@@ -26,10 +26,10 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 | `pdf-splitter` | unverified | live | Verify before next PR. |
 | `on-track` | shell v2.0 · data 2026-07-14 (verified) | live | Data-separated: refreshes change only `data.json` (no shell bump). Shell v2.0 verified against immutable commit-SHA path. Data 2026-07-14: added **SailGP** series to feed (Portsmouth Jul 25-26, Sassnitz Aug 22-23, Saint-Tropez Sep 12-13; `timeTBD` entries, CBS Sports Network). PR #207. Follow-up pending: SailGP brand color (SERIES entry in `render.js` + `--s-sailgp` token in `styles.css`) not yet applied — renders in default color for now. |
 | `inciardi-market` | unverified | live | Verify before next PR. |
-| `filemaker` | unverified | reference | FileMaker app docs, runs in FMP (no Pages). Verify before next PR. |
+| `filemaker` | docs-model v1 (repo-native mirror) · hml-llc = reference impl | reference | FileMaker app docs, run in FMP (no Pages). **2026-07-14:** repo-native docs standard shipped (`filemaker/DOCUMENTATION-STANDARD.md`) — 1:1 one-file-per-object mirror, `_index.json` manifests, `_template-fmp-app` rebuilt. HML_LLC migrated to the mirror (tables split 12 files, relationships, scripts w/ commitRecord, functions, layouts, value-lists, meta, notes, INDEX). Legacy `hml-llc/docs/` preserved, flagged for absorption. Scripts/functions/layouts pending real enumeration from the FMP file. This PR. |
 
 **Non-app infra (not launchable apps, listed so they're not mistaken for apps):** `brain-config`, `agent-reports`, `routines`, `shared`, `quickfire`, `template-app`, `polish-demo`.
 
 ---
 
-_Rollout note: `unverified` rows carry the last value I could see without a fresh read; each gets confirmed and firmed up the next time that app is touched. Confirmed rows (prism, app-dashboard, markdown-viewer, world-cup-bracket, on-track) are current as of their listed dates._
+_Rollout note: `unverified` rows carry the last value I could see without a fresh read; each gets confirmed and firmed up the next time that app is touched. Confirmed rows (prism, app-dashboard, markdown-viewer, world-cup-bracket, on-track, filemaker) are current as of their listed dates._

@@ -1,0 +1,9 @@
+{
+  "_meta": { "app": "<app-slug>", "folder": "scripts", "schemaVersion": "1.0", "generated": "<date>" },
+  "folders": [
+    { "name": "imports", "status": "pending", "scripts": [] },
+    { "name": "navigation", "status": "pending", "scripts": [] },
+    { "name": "utilities", "status": "pending", "scripts": [] },
+    { "name": "triggers", "status": "pending", "scripts": [] }
+  ]
+}

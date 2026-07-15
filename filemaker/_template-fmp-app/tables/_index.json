@@ -1,0 +1,4 @@
+{
+  "_meta": { "app": "<app-slug>", "folder": "tables", "schemaVersion": "1.0", "generated": "<date>", "source": "../schema/tables.json" },
+  "tables": []
+}
