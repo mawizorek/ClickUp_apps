@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f3f1ec">
+<title>Garage Registry</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🚗%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper: oklch(0.965 0.006 85);
+    --surface: oklch(0.995 0.003 85);
+    --surface-2: oklch(0.945 0.007 85);
+    --line: oklch(0.87 0.008 85);
+    --line-2: oklch(0.78 0.01 85);
+    --ink: oklch(0.22 0.012 85);
+    --ink-2: oklch(0.42 0.01 85);
+    --ink-3: oklch(0.56 0.008 85);
+
+    --accent: oklch(0.42 0.055 220);
+    --accent-strong: oklch(0.34 0.06 220);
+    --accent-tint: oklch(0.93 0.02 220);
+
+    --ok: oklch(0.5 0.11 150);
+    --ok-bg: oklch(0.95 0.035 150);
+    --warn: oklch(0.58 0.12 65);
+    --warn-bg: oklch(0.95 0.05 72);
+    --bad: oklch(0.52 0.17 27);
+    --bad-bg: oklch(0.955 0.045 27);
+
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px;
+    --r: 3px;
+    --ease: cubic-bezier(0.22,1,0.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--sans);background:var(--paper);color:var(--ink);
+    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+    padding-bottom:calc(var(--sp-7) + env(safe-area-inset-bottom));
+  }
+  h1,h2{text-wrap:balance;line-height:1.1}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  .wrap{max-width:1160px;margin:0 auto;padding:0 var(--sp-4)}
+
+  header.top{
+    border-bottom:2px solid var(--ink);padding:var(--sp-6) 0 var(--sp-4);margin-bottom:var(--sp-5);
+  }
+  .eyebrow{
+    font-size:0.7rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--accent);font-family:var(--mono);
+  }
+  h1.title{font-size:clamp(1.9rem,5vw,2.6rem);font-weight:800;letter-spacing:-0.02em;margin-top:6px}
+  .sub{color:var(--ink-2);font-size:1rem;max-width:64ch;margin-top:var(--sp-2)}
+
+  .ledger{
+    display:flex;flex-wrap:wrap;gap:0;margin-top:var(--sp-4);
+    border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;
+    background:var(--surface);width:fit-content;max-width:100%;
+  }
+  .ledger .cell{
+    padding:var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-4);
+    border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px;
+  }
+  .ledger .cell:last-child{border-right:0}
+  .ledger .n{font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;font-family:var(--mono);line-height:1}
+  .ledger .l{font-size:0.72rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3)}
+  .ledger .cell.bad{background:var(--bad-bg)} .ledger .cell.bad .n{color:var(--bad)}
+  .ledger .cell.warn{background:var(--warn-bg)} .ledger .cell.warn .n{color:oklch(0.48 0.13 58)}
+
+  .controls{
+    position:sticky;top:0;z-index:20;background:var(--paper);
+    padding:var(--sp-3) 0;margin-bottom:var(--sp-4);
+    display:flex;flex-wrap:wrap;gap:var(--sp-2);align-items:center;
+    border-bottom:1px solid var(--line);
+  }
+  .search{position:relative;flex:1 1 220px;min-width:0}
+  .search input{
+    width:100%;font:inherit;font-size:0.95rem;padding:9px 12px;
+    border:1px solid var(--line-2);border-radius:var(--r);background:var(--surface);color:var(--ink);
+    transition:border-color .15s var(--ease),box-shadow .15s var(--ease);
+  }
+  .search input::placeholder{color:var(--ink-3)}
+  .search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-tint)}
+  .chip{
+    font:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;
+    padding:8px 13px;border:1px solid var(--line-2);border-radius:var(--r);
+    background:var(--surface);color:var(--ink-2);white-space:nowrap;
+    display:inline-flex;align-items:center;gap:7px;
+    transition:all .15s var(--ease);-webkit-tap-highlight-color:transparent;
+  }
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .chip.attn[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:oklch(0.99 0 0)}
+  .chip .c{font-family:var(--mono);font-size:0.72rem;opacity:0.7}
+  .chip[aria-pressed="true"] .c{opacity:0.85}
+
+  .grid{display:grid;gap:var(--sp-4);grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+
+  .rec{
+    background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r);
+    display:flex;flex-direction:column;overflow:hidden;
+    transition:border-color .18s var(--ease),box-shadow .18s var(--ease);
+    opacity:0;transform:translateY(8px);animation:rise .45s var(--ease) forwards;
+    animation-delay:calc(var(--i,0)*40ms);
+  }
+  @keyframes rise{to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.rec{animation:none;opacity:1;transform:none}}
+  .rec:hover{border-color:var(--ink-3);box-shadow:0 2px 10px oklch(0.3 0.02 85/0.07)}
+  .rec.flag{border-color:var(--bad)}
+
+  .rec-head{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:var(--sp-3);
+    padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--line);
+    background:var(--surface-2);
+  }
+  .rec-head .nm{font-size:1.15rem;font-weight:700;letter-spacing:-0.01em}
+  .rec-head .ymm{font-size:0.78rem;color:var(--ink-2);margin-top:2px;font-family:var(--mono)}
+  .flagchip{
+    display:inline-flex;align-items:center;gap:5px;flex:none;
+    font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--bad);background:var(--bad-bg);border:1px solid var(--bad);
+    padding:3px 7px;border-radius:2px;
+  }
+
+  .fields{display:grid;grid-template-columns:1fr 1fr}
+  .field{
+    padding:var(--sp-2) var(--sp-4);border-bottom:1px solid var(--line);
+    border-right:1px solid var(--line);
+  }
+  .field:nth-child(even){border-right:0}
+  .field.full{grid-column:1 / -1;border-right:0}
+  .field .k{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);display:block}
+  .field .v{font-family:var(--mono);font-size:0.9rem;font-weight:500;margin-top:2px;word-break:break-all}
+  .field .v.empty{color:var(--ink-3);font-style:italic;font-family:var(--sans);font-weight:400}
+
+  .status{display:flex;flex-direction:column}
+  .srow{
+    display:flex;align-items:center;gap:var(--sp-2);padding:10px var(--sp-4);
+    border-bottom:1px solid var(--line);font-size:0.88rem;
+  }
+  .srow .dot{width:8px;height:8px;border-radius:1px;flex:none}
+  .srow .lb{font-weight:600;color:var(--ink-2);min-width:96px;font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase}
+  .srow .vl{font-weight:600}
+  .srow .dt{margin-left:auto;font-family:var(--mono);font-size:0.78rem;color:var(--ink-3)}
+  .srow.ok .dot{background:var(--ok)} .srow.ok .vl{color:var(--ok)}
+  .srow.warn .dot{background:var(--warn)} .srow.warn .vl{color:oklch(0.48 0.13 58)}
+  .srow.bad .dot{background:var(--bad)} .srow.bad .vl{color:var(--bad)}
+  .srow.none .dot{background:var(--line-2)} .srow.none .vl{color:var(--ink-3);font-weight:500}
+
+  .action{padding:var(--sp-3) var(--sp-4);margin-top:auto}
+  .docbtn{
+    width:100%;font:inherit;font-weight:700;font-size:0.95rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    padding:13px;border-radius:var(--r);text-decoration:none;
+    background:var(--accent);color:oklch(0.99 0.01 220);border:1px solid var(--accent);
+    transition:background .15s var(--ease);
+  }
+  .docbtn:hover{background:var(--accent-strong)}
+  .docbtn:active{transform:translateY(1px)}
+  .docbtn svg{width:18px;height:18px;stroke-width:2.2}
+  .docbtn.pending{
+    background:var(--surface-2);color:var(--ink-3);border:1px dashed var(--line-2);
+    cursor:default;font-weight:600;
+  }
+  .docbtn.pending:hover{background:var(--surface-2)}
+  .cu{
+    display:block;text-align:center;margin-top:8px;
+    font-size:0.75rem;font-weight:600;color:var(--ink-3);text-decoration:none;
+    font-family:var(--mono);letter-spacing:0.02em;
+  }
+  .cu:hover{color:var(--accent)}
+
+  .empty{display:none;text-align:center;padding:var(--sp-7) var(--sp-4);color:var(--ink-3)}
+  .empty h2{font-size:1.1rem;color:var(--ink-2);font-weight:700;margin-bottom:6px}
+
+  footer.foot{
+    margin-top:var(--sp-6);padding-top:var(--sp-4);border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:var(--sp-4);justify-content:space-between;align-items:center;
+    color:var(--ink-3);font-size:0.78rem;font-family:var(--mono);
+  }
+  .legend{display:flex;gap:var(--sp-4);flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend .dot{width:8px;height:8px;border-radius:1px}
+  .legend .ok{background:var(--ok)} .legend .warn{background:var(--warn)} .legend .bad{background:var(--bad)}
+
+  @media (max-width:560px){
+    .grid{grid-template-columns:1fr}
+    .ledger{width:100%}
+    .ledger .cell{flex:1}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Wizorek Garage · Registry</span>
+    <h1 class="title">Vehicle Documents</h1>
+    <p class="sub">Current registration and insurance for every vehicle. Tap a record to open its document folder. Papers stay current in Drive; this list stays put.</p>
+    <div class="ledger" id="ledger"></div>
+  </header>
+
+  <div class="controls">
+    <label class="search">
+      <input type="text" id="q" placeholder="Search name, make, plate, VIN…" autocomplete="off" aria-label="Search">
+    </label>
+    <button class="chip" data-f="all" aria-pressed="true">All <span class="c" data-c="all"></span></button>
+    <button class="chip attn" data-f="attn" aria-pressed="false">Needs attention <span class="c" data-c="attn"></span></button>
+    <button class="chip" data-f="car" aria-pressed="false">Cars &amp; trucks <span class="c" data-c="car"></span></button>
+    <button class="chip" data-f="bike" aria-pressed="false">Bikes &amp; ATVs <span class="c" data-c="bike"></span></button>
+  </div>
+
+  <main class="grid" id="grid" aria-live="polite"></main>
+  <div class="empty" id="empty"><h2>No records match</h2><p>Clear the search or filter to see everything.</p></div>
+
+  <footer class="foot">
+    <div class="legend">
+      <span><span class="dot ok"></span> Current</span>
+      <span><span class="dot warn"></span> Expiring ≤30d</span>
+      <span><span class="dot bad"></span> Expired</span>
+    </div>
+    <div id="synced"></div>
+  </footer>
+</div>
+
+<script>
+/* ClickUp owns history/tasks/versioning. Drive owns the live files.
+   drive = per-vehicle Drive folder share link (Anyone with link → Viewer).
+   null = folder not linked yet → button renders "Folder pending". */
+const VEHICLES = [
+  {slug:"raptor", name:"Raptor", make:"Ford", model:"F150 SVT Raptor", year:2010, vin:"1FTEX1EV6AFB54724", plate:"BGY6074", color:"Black", type:"car", reg:{onFile:true,exp:"2026-03-31"}, ins:{onFile:true,exp:"2025-07-24"}, drive:null, cu:"https://app.clickup.com/t/86a2pkdfa"},
+  {slug:"zeppis-m3", name:"Zeppi's M3", make:"BMW", model:"M3", year:2006, vin:"WBSBR93456PK11964", plate:"BGY6075", type:"car", reg:{onFile:true,exp:"2026-03-31"}, ins:{onFile:true,exp:"2026-07-23"}, drive:null, cu:"https://app.clickup.com/t/86a2pk7hh"},
+  {slug:"dads-m3", name:"Dad's M3", make:"BMW", model:"M3", year:2008, vin:"WBSVA93568E041108", plate:null, type:"car", reg:{onFile:false,exp:null}, ins:{onFile:true,exp:"2026-07-23"}, drive:null, cu:"https://app.clickup.com/t/86a2pk7kz"},
+  {slug:"laguna-seca-m3", name:"Laguna Seca Blue M3", make:"BMW", model:"M3", year:2001, vin:"WBSBR93421EX21046", plate:"BTT5988", type:"car", reg:{onFile:false,exp:"2026-10-31"}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86ajayvrp"},
+  {slug:"fj-cruiser", name:"FJ Cruiser", make:"Toyota", model:"FJ Cruiser", year:2007, vin:"JTEBU11F270030953", plate:"JSHALLN", type:"car", reg:{onFile:true,exp:"2027-03-30"}, ins:{onFile:true,exp:"2026-07-23"}, drive:null, cu:"https://app.clickup.com/t/86a28ug5p"},
+  {slug:"sienna", name:"Sienna", make:"Toyota", model:"Sienna", year:2008, vin:"5TDZK22C38S131081", plate:"BGY6076", type:"car", reg:{onFile:true,exp:"2026-03-31"}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86a2pk76y"},
+  {slug:"cj7-blue", name:"CJ7 · Blue", make:"Jeep", model:"CJ7", year:1984, vin:"1JCCM87E3ET034651", plate:"SOOPER", color:"Blue", type:"car", reg:{onFile:true,exp:"2027-05-30"}, ins:{onFile:true,exp:"2025-11-30"}, drive:null, cu:"https://app.clickup.com/t/86a2pk2ab"},
+  {slug:"cj7-orange", name:"CJ7 · Orange", make:"Jeep", model:"CJ7", year:1983, vin:"1JCCN87E3DT064826", plate:"BHW7247", color:"Orange", type:"car", reg:{onFile:true,exp:"2026-05-31"}, ins:{onFile:true,exp:"2025-11-30"}, drive:null, cu:"https://app.clickup.com/t/86a2pjwc6"},
+  {slug:"cj7-black", name:"CJ7 · Black", make:"Jeep", model:"CJ7", year:1985, vin:null, plate:null, color:"Black", type:"car", reg:{onFile:false,exp:null}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86a2pq1zp"},
+  {slug:"subaru-outback", name:"Nick's Subaru Outback", make:"Subaru", model:"Outback", year:null, vin:null, plate:null, type:"car", reg:{onFile:false,exp:null}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86afxbf91"},
+  {slug:"trailer", name:"Trailer", make:"Quality", model:"5LE", year:2011, vin:"5LEBT2026B1105141", plate:"1388TE1", type:"car", reg:{onFile:true,exp:"2027-07-30"}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86a2pkenm"},
+  {slug:"b70", name:"B70", make:"Honda", model:"CB700", year:1984, vin:"JH2RC2009EM002105", plate:"K24332", type:"bike", reg:{onFile:false,exp:"2026-03-31"}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86a2ppqc6"},
+  {slug:"k75", name:"K75", make:"BMW", model:"K75", year:1990, vin:"WB1057201L0152068", plate:"K24331", type:"bike", reg:{onFile:true,exp:"2026-03-31"}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86a28um0t"},
+  {slug:"italjet", name:"Italjet", make:"Italjet", model:"Dragster", year:1999, vin:"ZJTDRG00XX0906540", plate:null, type:"bike", reg:{onFile:false,exp:null}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86a28umaq"},
+  {slug:"recon", name:"Recon", make:"Honda", model:"TRX250 Recon", year:2004, vin:"478TE214144410731", plate:null, type:"bike", reg:{onFile:false,exp:null}, ins:{onFile:false,exp:null}, drive:null, cu:"https://app.clickup.com/t/86a2rwtx2"}
+];
+
+const DAY=864e5, now=new Date(), SOON=30;
+const esc=s=>(s??"").toString().replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function docState(d){
+  if(!d.exp) return d.onFile?{cls:"ok",vl:"On file",dt:""}:{cls:"none",vl:"Not on file",dt:""};
+  const exp=new Date(d.exp+"T12:00:00"), days=Math.round((exp-now)/DAY);
+  const dt=exp.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"2-digit"});
+  if(days<0) return {cls:"bad",vl:"Expired",dt};
+  if(days<=SOON) return {cls:"warn",vl:days===0?"Due today":`${days}d left`,dt};
+  return {cls:"ok",vl:"Current",dt};
+}
+const critical=v=>docState(v.reg).cls==="bad"||docState(v.ins).cls==="bad";
+const attention=v=>{const r=docState(v.reg).cls,i=docState(v.ins).cls;return ["bad","warn"].includes(r)||["bad","warn"].includes(i);};
+
+const FOLDER=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h5l2 3h9v11H4z"/></svg>`;
+
+function field(k,v){
+  const empty=v===null||v===undefined||v==="";
+  return `<div class="field"><span class="k">${k}</span><span class="v${empty?' empty':''}">${empty?'—':esc(v)}</span></div>`;
+}
+function srow(label,d){
+  const dt=d.dt?`<span class="dt">${esc(d.dt)}</span>`:"";
+  return `<div class="srow ${d.cls}"><span class="dot"></span><span class="lb">${label}</span><span class="vl">${esc(d.vl)}</span>${dt}</div>`;
+}
+
+const grid=document.getElementById("grid");
+function render(list){
+  grid.innerHTML=list.map((v,i)=>{
+    const r=docState(v.reg), ins=docState(v.ins), flag=critical(v);
+    const ymm=[v.year,v.make,v.model].filter(Boolean).join(" · ")||"—";
+    const btn = v.drive
+      ? `<a class="docbtn" href="${esc(v.drive)}" target="_blank" rel="noopener">${FOLDER} Open documents</a>`
+      : `<span class="docbtn pending">${FOLDER} Folder pending</span>`;
+    return `<article class="rec ${flag?'flag':''}" style="--i:${i}">
+      <div class="rec-head">
+        <div><div class="nm">${esc(v.name)}</div><div class="ymm">${esc(ymm)}</div></div>
+        ${flag?`<span class="flagchip">Action</span>`:""}
+      </div>
+      <div class="fields">
+        ${field("Plate",v.plate)}
+        ${field("Year",v.year)}
+        ${field("Make",v.make)}
+        ${field("Model",v.model)}
+        ${field("VIN",v.vin)}${v.color?field("Color",v.color):`<div class="field"></div>`}
+      </div>
+      <div class="status">
+        ${srow("Registration",r)}
+        ${srow("Insurance",ins)}
+      </div>
+      <div class="action">
+        ${btn}
+        <a class="cu" href="${v.cu}" target="_blank" rel="noopener">History &amp; tasks in ClickUp →</a>
+      </div>
+    </article>`;
+  }).join("");
+  document.getElementById("empty").style.display=list.length?"none":"block";
+}
+
+function ledger(){
+  const total=VEHICLES.length, expired=VEHICLES.filter(critical).length;
+  const soon=VEHICLES.filter(v=>!critical(v)&&attention(v)).length;
+  document.getElementById("ledger").innerHTML=
+    `<div class="cell"><span class="n">${total}</span><span class="l">Vehicles</span></div>`+
+    (expired?`<div class="cell bad"><span class="n">${expired}</span><span class="l">Expired papers</span></div>`:"")+
+    (soon?`<div class="cell warn"><span class="n">${soon}</span><span class="l">Expiring ≤30d</span></div>`:"");
+}
+
+let F="all", Q="";
+const match=v=>{
+  if(F==="attn"&&!attention(v))return false;
+  if(F==="car"&&v.type!=="car")return false;
+  if(F==="bike"&&v.type!=="bike")return false;
+  if(Q){const h=[v.name,v.make,v.model,v.plate,v.vin,v.year].filter(Boolean).join(" ").toLowerCase();if(!h.includes(Q))return false;}
+  return true;
+};
+const apply=()=>render(VEHICLES.filter(match));
+
+const counts={all:VEHICLES.length,attn:VEHICLES.filter(attention).length,car:VEHICLES.filter(v=>v.type==="car").length,bike:VEHICLES.filter(v=>v.type==="bike").length};
+document.querySelectorAll("[data-c]").forEach(s=>s.textContent=counts[s.dataset.c]);
+
+document.querySelector(".controls").addEventListener("click",e=>{
+  const b=e.target.closest(".chip");if(!b)return;
+  F=b.dataset.f;
+  document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",String(c===b)));
+  apply();
+});
+document.getElementById("q").addEventListener("input",e=>{Q=e.target.value.trim().toLowerCase();apply();});
+document.getElementById("synced").textContent="Synced "+now.toLocaleDateString("en-US",{month:"short",day:"2-digit",year:"numeric"});
+
+ledger();
+apply();
+</script>
+</body>
+</html>

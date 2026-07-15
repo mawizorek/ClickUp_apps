@@ -1,12 +1,22 @@
 {
-  "version": "2026-07-13",
+  "version": "2026-07-14",
   "note": "Source of truth for the quickfire index. Add an artifact = add an entry here. type/subjects/status must come from the controlled vocabulary below; adding a new vocab term is a deliberate edit, not an ad-hoc tag. status: active=shown at rest, archived=hidden until 'Show all', hidden=dev/junk kept out of the default view (still reachable via Show all). reviewed:false = auto-surfaced folder with inferred tags, needs a human pass.",
   "vocabulary": {
     "type": ["plan", "research", "reference", "tool", "fun"],
-    "subjects": ["home", "kitchen", "food", "history", "europe", "travel", "family", "work", "clickup", "tech"],
+    "subjects": ["home", "kitchen", "food", "history", "europe", "travel", "family", "work", "clickup", "tech", "auto"],
     "status": ["active", "archived", "hidden"]
   },
   "artifacts": [
+    {
+      "slug": "garage-dashboard",
+      "title": "Garage Registry Dashboard",
+      "desc": "Vehicle registration + insurance dashboard for Dad: fielded records, expiry flags, one Drive doc folder per vehicle. NFC-tag ready. v2 direction (sharpened, database-field style).",
+      "type": "tool",
+      "subjects": ["family", "auto", "home"],
+      "status": "active",
+      "date": "2026-07-14",
+      "reviewed": true
+    },
     {
       "slug": "garum-to-colatura",
       "title": "From Garum to Colatura",
