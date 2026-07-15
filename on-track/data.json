@@ -1,195 +1,6 @@
 {
-  "version": "2026-07-14",
+  "version": "2026-07-15",
   "events": [
-    {
-      "series": "MXGP",
-      "kind": "MX2 Race 2",
-      "title": "MXGP of South Africa",
-      "detail": "Johannesburg",
-      "start": "2026-07-05T09:00:00-04:00",
-      "end": "2026-07-05T10:00:00-04:00",
-      "platforms": ["CBSSN"]
-    },
-    {
-      "series": "MXGP",
-      "kind": "MXGP Race 2",
-      "title": "MXGP of South Africa",
-      "detail": "Johannesburg",
-      "start": "2026-07-05T10:00:00-04:00",
-      "end": "2026-07-05T11:00:00-04:00",
-      "platforms": ["CBSSN"]
-    },
-    {
-      "series": "Supercars",
-      "kind": "Race 20",
-      "title": "Townsville 500",
-      "detail": "Reid Park",
-      "start": "2026-07-10T02:15:00-04:00",
-      "end": "2026-07-10T04:15:00-04:00",
-      "platforms": ["RACER"]
-    },
-    {
-      "series": "Supercars",
-      "kind": "Race 21",
-      "title": "Townsville 500",
-      "detail": "Reid Park",
-      "start": "2026-07-11T01:05:00-04:00",
-      "end": "2026-07-11T03:05:00-04:00",
-      "platforms": ["RACER"]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "Sprint",
-      "title": "German Grand Prix",
-      "detail": "Sachsenring",
-      "start": "2026-07-11T09:00:00-04:00",
-      "end": "2026-07-11T09:45:00-04:00",
-      "platforms": ["FS1"]
-    },
-    {
-      "series": "WSBK",
-      "kind": "Race 1",
-      "title": "Donington Park",
-      "detail": "Donington Park",
-      "start": "2026-07-11T10:30:00-04:00",
-      "end": "2026-07-11T11:15:00-04:00",
-      "platforms": ["RACER"]
-    },
-    {
-      "series": "FIM Speedway",
-      "kind": "Grand Prix",
-      "title": "Speedway GP of Sweden",
-      "detail": "Malilla",
-      "start": "2026-07-11T13:00:00-04:00",
-      "end": "2026-07-11T16:00:00-04:00",
-      "platforms": ["RACER"]
-    },
-    {
-      "series": "MotoAmerica",
-      "kind": "Race 1",
-      "title": "Laguna Seca Superbike",
-      "detail": "WeatherTech Raceway Laguna Seca",
-      "start": "2026-07-11T15:12:00-04:00",
-      "end": "2026-07-11T16:12:00-04:00",
-      "platforms": ["Samsung TV Plus"]
-    },
-    {
-      "series": "IMSA",
-      "kind": "Qualifying",
-      "title": "Chevrolet Grand Prix",
-      "detail": "Canadian Tire Motorsport Park",
-      "start": "2026-07-11T15:55:00-04:00",
-      "end": "2026-07-11T17:05:00-04:00",
-      "platforms": ["Stream"]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Qualifying",
-      "title": "Quaker State 400",
-      "detail": "EchoPark Speedway",
-      "start": "2026-07-11T16:30:00-04:00",
-      "end": "2026-07-11T18:00:00-04:00",
-      "platforms": ["truTV"]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Race",
-      "title": "Atlanta O'Reilly Race",
-      "detail": "EchoPark Speedway",
-      "start": "2026-07-11T19:00:00-04:00",
-      "end": "2026-07-11T22:00:00-04:00",
-      "platforms": ["The CW"]
-    },
-    {
-      "series": "Supercars",
-      "kind": "Race 22",
-      "title": "Townsville 500",
-      "detail": "Reid Park",
-      "start": "2026-07-12T01:05:00-04:00",
-      "end": "2026-07-12T03:05:00-04:00",
-      "platforms": ["RACER"]
-    },
-    {
-      "series": "Moto3",
-      "kind": "Race",
-      "title": "German Grand Prix",
-      "detail": "Sachsenring",
-      "start": "2026-07-12T05:00:00-04:00",
-      "end": "2026-07-12T05:45:00-04:00",
-      "platforms": ["Stream"]
-    },
-    {
-      "series": "WSBK",
-      "kind": "Superpole Race",
-      "title": "Donington Park",
-      "detail": "Donington Park",
-      "start": "2026-07-12T06:10:00-04:00",
-      "end": "2026-07-12T06:30:00-04:00",
-      "platforms": ["RACER"]
-    },
-    {
-      "series": "Moto2",
-      "kind": "Race",
-      "title": "German Grand Prix",
-      "detail": "Sachsenring",
-      "start": "2026-07-12T06:15:00-04:00",
-      "end": "2026-07-12T07:05:00-04:00",
-      "platforms": ["Stream"]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "Race",
-      "title": "German Grand Prix",
-      "detail": "Sachsenring",
-      "start": "2026-07-12T08:00:00-04:00",
-      "end": "2026-07-12T08:50:00-04:00",
-      "platforms": ["FS1"]
-    },
-    {
-      "series": "WSBK",
-      "kind": "Race 2",
-      "title": "Donington Park",
-      "detail": "Donington Park",
-      "start": "2026-07-12T10:30:00-04:00",
-      "end": "2026-07-12T11:15:00-04:00",
-      "platforms": ["RACER"]
-    },
-    {
-      "series": "WEC",
-      "kind": "Race",
-      "title": "6 Hours of Sao Paulo",
-      "detail": "Interlagos",
-      "start": "2026-07-12T10:30:00-04:00",
-      "end": "2026-07-12T16:30:00-04:00",
-      "platforms": ["truTV", "Max"]
-    },
-    {
-      "series": "IMSA",
-      "kind": "Race",
-      "title": "Chevrolet Grand Prix",
-      "detail": "Canadian Tire Motorsport Park",
-      "start": "2026-07-12T14:00:00-04:00",
-      "end": "2026-07-12T17:00:00-04:00",
-      "platforms": ["Peacock"]
-    },
-    {
-      "series": "MotoAmerica",
-      "kind": "Race 2",
-      "title": "Laguna Seca Superbike",
-      "detail": "WeatherTech Raceway Laguna Seca",
-      "start": "2026-07-12T15:12:00-04:00",
-      "end": "2026-07-12T16:12:00-04:00",
-      "platforms": ["Samsung TV Plus"]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Race",
-      "title": "Quaker State 400",
-      "detail": "EchoPark Speedway",
-      "start": "2026-07-12T19:00:00-04:00",
-      "end": "2026-07-12T22:30:00-04:00",
-      "platforms": ["TNT", "truTV", "Max"]
-    },
     {
       "series": "F3",
       "kind": "Sprint Race",
@@ -197,7 +8,9 @@
       "detail": "Spa-Francorchamps",
       "start": "2026-07-18T04:00:00-04:00",
       "end": "2026-07-18T04:50:00-04:00",
-      "platforms": ["Apple TV"]
+      "platforms": [
+        "Apple TV"
+      ]
     },
     {
       "series": "F1",
@@ -206,7 +19,9 @@
       "detail": "Spa-Francorchamps",
       "start": "2026-07-18T08:00:00-04:00",
       "end": "2026-07-18T09:00:00-04:00",
-      "platforms": ["Apple TV"]
+      "platforms": [
+        "Apple TV"
+      ]
     },
     {
       "series": "F2",
@@ -215,7 +30,20 @@
       "detail": "Spa-Francorchamps",
       "start": "2026-07-18T08:15:00-04:00",
       "end": "2026-07-18T09:05:00-04:00",
-      "platforms": ["Apple TV"]
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "British Superbike",
+      "kind": "Race 1",
+      "title": "Brands Hatch GP",
+      "detail": "Brands Hatch",
+      "start": "2026-07-18T11:10:00-04:00",
+      "end": "2026-07-18T12:00:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
     },
     {
       "series": "NHRA",
@@ -224,7 +52,9 @@
       "detail": "Sonoma Raceway",
       "start": "2026-07-18T21:30:00-04:00",
       "end": "2026-07-18T22:30:00-04:00",
-      "platforms": ["FS1"]
+      "platforms": [
+        "FS1"
+      ]
     },
     {
       "series": "NHRA",
@@ -233,7 +63,9 @@
       "detail": "Sonoma Raceway",
       "start": "2026-07-18T22:30:00-04:00",
       "end": "2026-07-18T23:30:00-04:00",
-      "platforms": ["FS1"]
+      "platforms": [
+        "FS1"
+      ]
     },
     {
       "series": "F3",
@@ -242,7 +74,9 @@
       "detail": "Spa-Francorchamps",
       "start": "2026-07-19T02:30:00-04:00",
       "end": "2026-07-19T03:20:00-04:00",
-      "platforms": ["Apple TV"]
+      "platforms": [
+        "Apple TV"
+      ]
     },
     {
       "series": "F2",
@@ -251,7 +85,9 @@
       "detail": "Spa-Francorchamps",
       "start": "2026-07-19T04:00:00-04:00",
       "end": "2026-07-19T05:05:00-04:00",
-      "platforms": ["Apple TV"]
+      "platforms": [
+        "Apple TV"
+      ]
     },
     {
       "series": "F1",
@@ -260,7 +96,31 @@
       "detail": "Spa-Francorchamps",
       "start": "2026-07-19T07:00:00-04:00",
       "end": "2026-07-19T09:00:00-04:00",
-      "platforms": ["Apple TV"]
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "British Superbike",
+      "kind": "Race 2",
+      "title": "Brands Hatch GP",
+      "detail": "Brands Hatch",
+      "start": "2026-07-19T08:00:00-04:00",
+      "end": "2026-07-19T08:50:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "British Superbike",
+      "kind": "Race 3",
+      "title": "Brands Hatch GP",
+      "detail": "Brands Hatch",
+      "start": "2026-07-19T11:15:00-04:00",
+      "end": "2026-07-19T12:05:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
     },
     {
       "series": "IndyCar",
@@ -269,7 +129,9 @@
       "detail": "Nashville Superspeedway",
       "start": "2026-07-19T17:30:00-04:00",
       "end": "2026-07-19T20:00:00-04:00",
-      "platforms": ["FOX"]
+      "platforms": [
+        "FOX"
+      ]
     },
     {
       "series": "NASCAR",
@@ -278,7 +140,22 @@
       "detail": "North Wilkesboro Speedway",
       "start": "2026-07-19T19:00:00-04:00",
       "end": "2026-07-19T22:30:00-04:00",
-      "platforms": ["TNT", "truTV", "Max"]
+      "platforms": [
+        "TNT",
+        "truTV",
+        "Max"
+      ]
+    },
+    {
+      "series": "NHRA",
+      "kind": "Final Eliminations",
+      "title": "Sonoma Nationals",
+      "detail": "Sonoma Raceway",
+      "start": "2026-07-19T22:00:00-04:00",
+      "end": "2026-07-20T01:00:00-04:00",
+      "platforms": [
+        "FS1"
+      ]
     },
     {
       "series": "NASCAR",
@@ -287,196 +164,9 @@
       "detail": "Lucas Oil Indianapolis Raceway Park",
       "start": "2026-07-24T20:00:00-04:00",
       "end": "2026-07-24T22:00:00-04:00",
-      "platforms": ["FS1"]
-    },
-    {
-      "series": "F3",
-      "kind": "Sprint Race",
-      "title": "Hungarian Grand Prix",
-      "detail": "Hungaroring",
-      "start": "2026-07-25T04:05:00-04:00",
-      "end": "2026-07-25T04:50:00-04:00",
-      "platforms": ["Apple TV"]
-    },
-    {
-      "series": "Formula E",
-      "kind": "Race",
-      "title": "Tokyo E-Prix",
-      "detail": "Tokyo Big Sight",
-      "start": "2026-07-25T07:05:00-04:00",
-      "end": "2026-07-25T08:00:00-04:00",
-      "platforms": ["Roku Sports Channel"]
-    },
-    {
-      "series": "F1",
-      "kind": "Qualifying",
-      "title": "Hungarian Grand Prix",
-      "detail": "Hungaroring",
-      "start": "2026-07-25T08:00:00-04:00",
-      "end": "2026-07-25T09:00:00-04:00",
-      "platforms": ["Apple TV"]
-    },
-    {
-      "series": "F2",
-      "kind": "Sprint Race",
-      "title": "Hungarian Grand Prix",
-      "detail": "Hungaroring",
-      "start": "2026-07-25T08:15:00-04:00",
-      "end": "2026-07-25T09:05:00-04:00",
-      "platforms": ["Apple TV"]
-    },
-    {
-      "series": "British Superbike",
-      "kind": "Race 1",
-      "title": "Brands Hatch GP",
-      "detail": "Brands Hatch",
-      "start": "2026-07-25T11:10:00-04:00",
-      "end": "2026-07-25T12:00:00-04:00",
-      "platforms": ["Unknown"]
-    },
-    {
-      "series": "F3",
-      "kind": "Feature Race",
-      "title": "Hungarian Grand Prix",
-      "detail": "Hungaroring",
-      "start": "2026-07-26T02:40:00-04:00",
-      "end": "2026-07-26T03:30:00-04:00",
-      "platforms": ["Apple TV"]
-    },
-    {
-      "series": "Formula E",
-      "kind": "Race",
-      "title": "Tokyo E-Prix",
-      "detail": "Tokyo Big Sight",
-      "start": "2026-07-26T07:05:00-04:00",
-      "end": "2026-07-26T08:00:00-04:00",
-      "platforms": ["Roku Sports Channel"]
-    },
-    {
-      "series": "British Superbike",
-      "kind": "Race 2",
-      "title": "Brands Hatch GP",
-      "detail": "Brands Hatch",
-      "start": "2026-07-26T08:00:00-04:00",
-      "end": "2026-07-26T08:50:00-04:00",
-      "platforms": ["Unknown"]
-    },
-    {
-      "series": "F2",
-      "kind": "Feature Race",
-      "title": "Hungarian Grand Prix",
-      "detail": "Hungaroring",
-      "start": "2026-07-26T05:25:00-04:00",
-      "end": "2026-07-26T06:30:00-04:00",
-      "platforms": ["Apple TV"]
-    },
-    {
-      "series": "F1",
-      "kind": "Race",
-      "title": "Hungarian Grand Prix",
-      "detail": "Hungaroring",
-      "start": "2026-07-26T09:00:00-04:00",
-      "end": "2026-07-26T11:00:00-04:00",
-      "platforms": ["Apple TV"]
-    },
-    {
-      "series": "British Superbike",
-      "kind": "Race 3",
-      "title": "Brands Hatch GP",
-      "detail": "Brands Hatch",
-      "start": "2026-07-26T11:15:00-04:00",
-      "end": "2026-07-26T12:05:00-04:00",
-      "platforms": ["Unknown"]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Race",
-      "title": "Brickyard 400",
-      "detail": "Indianapolis Motor Speedway",
-      "start": "2026-07-26T14:00:00-04:00",
-      "end": "2026-07-26T17:30:00-04:00",
-      "platforms": ["TNT", "truTV", "Max"]
-    },
-    {
-      "series": "NHRA",
-      "kind": "Final Eliminations",
-      "title": "Northwest Nationals",
-      "detail": "Pacific Raceways",
-      "start": "2026-07-26T16:00:00-04:00",
-      "end": "2026-07-26T19:00:00-04:00",
-      "platforms": ["FOX"]
-    },
-    {
-      "series": "IMSA",
-      "kind": "Race",
-      "title": "SportsCar Grand Prix",
-      "detail": "Road America",
-      "start": "2026-08-02T11:40:00-04:00",
-      "end": "2026-08-02T17:40:00-04:00",
-      "platforms": ["Peacock"]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Race",
-      "title": "Iowa O'Reilly Race",
-      "detail": "Iowa Speedway",
-      "start": "2026-08-08T17:00:00-04:00",
-      "end": "2026-08-08T20:00:00-04:00",
-      "platforms": ["The CW"]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "Sprint",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-08T11:00:00-04:00",
-      "end": "2026-08-08T11:45:00-04:00",
-      "platforms": ["Unknown"]
-    },
-    {
-      "series": "Moto3",
-      "kind": "Race",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-09T07:00:00-04:00",
-      "end": "2026-08-09T07:45:00-04:00",
-      "platforms": ["Unknown"]
-    },
-    {
-      "series": "Moto2",
-      "kind": "Race",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-09T08:15:00-04:00",
-      "end": "2026-08-09T09:05:00-04:00",
-      "platforms": ["Unknown"]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Race",
-      "title": "Iowa Corn 350",
-      "detail": "Iowa Speedway",
-      "start": "2026-08-09T15:30:00-04:00",
-      "end": "2026-08-09T19:00:00-04:00",
-      "platforms": ["USA Network"]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "Race",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-09T10:00:00-04:00",
-      "end": "2026-08-09T10:50:00-04:00",
-      "platforms": ["Unknown"]
-    },
-    {
-      "series": "IndyCar",
-      "kind": "Race",
-      "title": "Grand Prix of Portland",
-      "detail": "Portland International Raceway",
-      "start": "2026-08-09T16:00:00-04:00",
-      "end": "2026-08-09T18:30:00-04:00",
-      "platforms": ["FOX"]
+      "platforms": [
+        "FS1"
+      ]
     },
     {
       "series": "SailGP",
@@ -485,7 +175,75 @@
       "detail": "Portsmouth, UK",
       "timeTBD": true,
       "date": "2026-07-25",
-      "platforms": ["CBS Sports Network"]
+      "platforms": [
+        "CBS Sports Network"
+      ]
+    },
+    {
+      "series": "F3",
+      "kind": "Sprint Race",
+      "title": "Hungarian Grand Prix",
+      "detail": "Hungaroring",
+      "start": "2026-07-25T04:05:00-04:00",
+      "end": "2026-07-25T04:50:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "Formula E",
+      "kind": "Race",
+      "title": "Tokyo E-Prix",
+      "detail": "Tokyo Big Sight",
+      "start": "2026-07-25T07:05:00-04:00",
+      "end": "2026-07-25T08:00:00-04:00",
+      "platforms": [
+        "The Roku Channel"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "Qualifying",
+      "title": "Hungarian Grand Prix",
+      "detail": "Hungaroring",
+      "start": "2026-07-25T08:00:00-04:00",
+      "end": "2026-07-25T09:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F2",
+      "kind": "Sprint Race",
+      "title": "Hungarian Grand Prix",
+      "detail": "Hungaroring",
+      "start": "2026-07-25T08:15:00-04:00",
+      "end": "2026-07-25T09:05:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "MX2 Race 2",
+      "title": "MXGP of Czech Republic",
+      "detail": "Loket",
+      "timeTBD": true,
+      "date": "2026-07-26",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "MXGP Race 2",
+      "title": "MXGP of Czech Republic",
+      "detail": "Loket",
+      "timeTBD": true,
+      "date": "2026-07-26",
+      "platforms": [
+        "Unknown"
+      ]
     },
     {
       "series": "SailGP",
@@ -494,43 +252,263 @@
       "detail": "Portsmouth, UK",
       "timeTBD": true,
       "date": "2026-07-26",
-      "platforms": ["CBS Sports Network"]
+      "platforms": [
+        "CBS Sports Network"
+      ]
     },
     {
-      "series": "SailGP",
-      "kind": "Race Day 1",
-      "title": "Germany Sail Grand Prix",
-      "detail": "Sassnitz, Germany",
-      "timeTBD": true,
-      "date": "2026-08-22",
-      "platforms": ["CBS Sports Network"]
+      "series": "F3",
+      "kind": "Feature Race",
+      "title": "Hungarian Grand Prix",
+      "detail": "Hungaroring",
+      "start": "2026-07-26T02:40:00-04:00",
+      "end": "2026-07-26T03:30:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
     },
     {
-      "series": "SailGP",
-      "kind": "Race Day 2",
-      "title": "Germany Sail Grand Prix",
-      "detail": "Sassnitz, Germany",
-      "timeTBD": true,
-      "date": "2026-08-23",
-      "platforms": ["CBS Sports Network"]
+      "series": "F2",
+      "kind": "Feature Race",
+      "title": "Hungarian Grand Prix",
+      "detail": "Hungaroring",
+      "start": "2026-07-26T05:25:00-04:00",
+      "end": "2026-07-26T06:30:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
     },
     {
-      "series": "SailGP",
-      "kind": "Race Day 1",
-      "title": "France Sail Grand Prix",
-      "detail": "Saint-Tropez, France",
-      "timeTBD": true,
-      "date": "2026-09-12",
-      "platforms": ["CBS Sports Network"]
+      "series": "F1",
+      "kind": "Race",
+      "title": "Hungarian Grand Prix",
+      "detail": "Hungaroring",
+      "start": "2026-07-26T07:00:00-04:00",
+      "end": "2026-07-26T09:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
     },
     {
-      "series": "SailGP",
-      "kind": "Race Day 2",
-      "title": "France Sail Grand Prix",
-      "detail": "Saint-Tropez, France",
+      "series": "Formula E",
+      "kind": "Race",
+      "title": "Tokyo E-Prix",
+      "detail": "Tokyo Big Sight",
+      "start": "2026-07-26T07:05:00-04:00",
+      "end": "2026-07-26T08:00:00-04:00",
+      "platforms": [
+        "The Roku Channel"
+      ]
+    },
+    {
+      "series": "NASCAR",
+      "kind": "Race",
+      "title": "Brickyard 400",
+      "detail": "Indianapolis Motor Speedway",
+      "start": "2026-07-26T14:00:00-04:00",
+      "end": "2026-07-26T17:30:00-04:00",
+      "platforms": [
+        "TNT",
+        "Max"
+      ]
+    },
+    {
+      "series": "NHRA",
+      "kind": "Final Eliminations",
+      "title": "Northwest Nationals",
+      "detail": "Pacific Raceways",
+      "start": "2026-07-26T16:00:00-04:00",
+      "end": "2026-07-26T19:00:00-04:00",
+      "platforms": [
+        "FOX"
+      ]
+    },
+    {
+      "series": "MotoAmerica",
+      "kind": "Race 1",
+      "title": "Mid-Ohio Superbike",
+      "detail": "Mid-Ohio Sports Car Course",
       "timeTBD": true,
-      "date": "2026-09-13",
-      "platforms": ["CBS Sports Network"]
+      "date": "2026-08-01",
+      "platforms": [
+        "Samsung TV Plus"
+      ]
+    },
+    {
+      "series": "Supercars",
+      "kind": "Race 23",
+      "title": "Perth Super 440",
+      "detail": "Wanneroo Raceway",
+      "start": "2026-08-01T00:45:00-04:00",
+      "end": "2026-08-01T02:45:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "Supercars",
+      "kind": "Race 24",
+      "title": "Perth Super 440",
+      "detail": "Wanneroo Raceway",
+      "start": "2026-08-01T04:20:00-04:00",
+      "end": "2026-08-01T06:20:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "FIM Speedway",
+      "kind": "Grand Prix",
+      "title": "Speedway GP of Poland",
+      "detail": "Łódź",
+      "start": "2026-08-01T13:00:00-04:00",
+      "end": "2026-08-01T16:00:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "IMSA",
+      "kind": "Qualifying",
+      "title": "Motul SportsCar Endurance Grand Prix",
+      "detail": "Road America",
+      "start": "2026-08-01T16:20:00-04:00",
+      "end": "2026-08-01T17:40:00-04:00",
+      "platforms": [
+        "Peacock"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "MX2 Race 2",
+      "title": "MXGP of Flanders",
+      "detail": "Lommel",
+      "timeTBD": true,
+      "date": "2026-08-02",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "MXGP Race 2",
+      "title": "MXGP of Flanders",
+      "detail": "Lommel",
+      "timeTBD": true,
+      "date": "2026-08-02",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "MotoAmerica",
+      "kind": "Race 2",
+      "title": "Mid-Ohio Superbike",
+      "detail": "Mid-Ohio Sports Car Course",
+      "timeTBD": true,
+      "date": "2026-08-02",
+      "platforms": [
+        "Samsung TV Plus"
+      ]
+    },
+    {
+      "series": "Supercars",
+      "kind": "Race 25",
+      "title": "Perth Super 440",
+      "detail": "Wanneroo Raceway",
+      "start": "2026-08-02T03:20:00-04:00",
+      "end": "2026-08-02T05:20:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "IMSA",
+      "kind": "Race",
+      "title": "Motul SportsCar Endurance Grand Prix",
+      "detail": "Road America",
+      "start": "2026-08-02T11:30:00-04:00",
+      "end": "2026-08-02T18:00:00-04:00",
+      "platforms": [
+        "Peacock"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Sprint",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-08T11:00:00-04:00",
+      "end": "2026-08-08T11:45:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "NASCAR",
+      "kind": "Race",
+      "title": "Iowa O'Reilly Race",
+      "detail": "Iowa Speedway",
+      "start": "2026-08-08T17:00:00-04:00",
+      "end": "2026-08-08T20:00:00-04:00",
+      "platforms": [
+        "The CW"
+      ]
+    },
+    {
+      "series": "Moto2",
+      "kind": "Race",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-09T06:15:00-04:00",
+      "end": "2026-08-09T07:05:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Race",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-09T08:00:00-04:00",
+      "end": "2026-08-09T08:50:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "Moto3",
+      "kind": "Race",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-09T09:30:00-04:00",
+      "end": "2026-08-09T10:15:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "NASCAR",
+      "kind": "Race",
+      "title": "Iowa Corn 350",
+      "detail": "Iowa Speedway",
+      "start": "2026-08-09T15:30:00-04:00",
+      "end": "2026-08-09T19:00:00-04:00",
+      "platforms": [
+        "USA Network"
+      ]
+    },
+    {
+      "series": "IndyCar",
+      "kind": "Race",
+      "title": "Grand Prix of Portland",
+      "detail": "Portland International Raceway",
+      "start": "2026-08-09T16:00:00-04:00",
+      "end": "2026-08-09T18:30:00-04:00",
+      "platforms": [
+        "FOX"
+      ]
     }
   ]
 }
