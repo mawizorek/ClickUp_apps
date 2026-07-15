@@ -1,0 +1,104 @@
+{
+  "$schema_note": "Canonical machine-readable data for the ClickUp Super Agent fleet. Hand-edit THIS file; index.html renders it, index.md points at both. Do not maintain a parallel table anywhere. See audit-instruction.md for the audit workflow and metadata-schema.md for the sidecar envelope.",
+  "golden_standard": {
+    "version": "1.0",
+    "set": "2026-07-15",
+    "defined_by": [
+      "ClickUp Super Agent — Creation & Setup Checklist (docs/12cwjm-54133/12cwjm-74773)",
+      "Golden Config Skeleton — Copy-Me Starting Instructions (docs/12cwjm-54133/12cwjm-74793)"
+    ],
+    "requirements": [
+      "Identity block",
+      "Load-then-think",
+      "Roster pointer",
+      "Two-tier channels",
+      "Guardrails",
+      "Memory-over-thread",
+      "Copy-block markdown fences",
+      "Declaration in sync"
+    ]
+  },
+  "updated": "2026-07-15",
+  "agents": [
+    {
+      "slug": "clickup-coach-corey",
+      "display_name": "ClickUp Coach Corey",
+      "track": "full-standard",
+      "golden_standard_version": "1.0",
+      "status": "up-to-date",
+      "last_audit": "2026-07-15",
+      "declaration": "brain-config/super-agents/clickup-coach-corey/",
+      "notes": "Fleet Steward. Reference implementation for v1.0."
+    },
+    {
+      "slug": "mainstage-milo",
+      "display_name": "Mainstage Milo",
+      "track": "full-standard",
+      "golden_standard_version": null,
+      "status": "needs-declaration",
+      "last_audit": null,
+      "declaration": null,
+      "notes": "Next in queue for declaration + audit."
+    },
+    {
+      "slug": "fmp-frank",
+      "display_name": "FMP Frank",
+      "track": "full-standard",
+      "golden_standard_version": null,
+      "status": "needs-declaration",
+      "last_audit": null,
+      "declaration": null,
+      "notes": "Track (full-standard) to confirm with Michael."
+    },
+    {
+      "slug": "update-uritp",
+      "display_name": "Update URITP",
+      "track": "full-standard",
+      "golden_standard_version": null,
+      "status": "needs-declaration",
+      "last_audit": null,
+      "declaration": null,
+      "notes": "Track (full-standard) to confirm; check lane overlap with Milo."
+    },
+    {
+      "slug": "origination-date-agent",
+      "display_name": "Origination Date agent",
+      "track": "task-specific",
+      "golden_standard_version": null,
+      "status": "inventory-only",
+      "last_audit": null,
+      "declaration": null,
+      "notes": "Sets due date = origination date + 1 month. Exempt."
+    },
+    {
+      "slug": "parse-property-emails",
+      "display_name": "Parse new property emails",
+      "track": "task-specific",
+      "golden_standard_version": null,
+      "status": "inventory-only",
+      "last_audit": null,
+      "declaration": null,
+      "notes": "Parses payoff/loan fields from emails. Exempt."
+    },
+    {
+      "slug": "update-amount-paid",
+      "display_name": "Update AMOUNT PAID (when associated)",
+      "track": "task-specific",
+      "golden_standard_version": null,
+      "status": "inventory-only",
+      "last_audit": null,
+      "declaration": null,
+      "notes": "Single-field reconciliation. Exempt."
+    }
+  ],
+  "status_legend": {
+    "up-to-date": "Full-Standard agent verified against current golden-standard version.",
+    "needs-declaration": "Full-Standard agent with no repo declaration folder yet.",
+    "needs-re-audit": "Standard bumped or config changed; re-verify.",
+    "behind": "Known gaps against the current golden standard.",
+    "inventory-only": "Task-Specific / Exempt; tracked but not held to the full standard."
+  },
+  "changelog": [
+    "2026-07-15: split from index.md table into JSON data + index.html renderer (single data source). Corey up-to-date on v1.0."
+  ]
+}

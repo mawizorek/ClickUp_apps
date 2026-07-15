@@ -1,38 +1,20 @@
 # Super-Agent Fleet Index
 
-Canonical, Git-only index of every ClickUp Super Agent: track, golden-standard version, and
-current compliance status. Replaces the retired ClickUp "Agent Fleet Register" doc (that page is
-flagged for deletion; do not recreate a ClickUp copy). Open this file, or ask the Fleet Steward
-(ClickUp Coach Corey) for the link.
+> **Data + view are split (singularity):**
+> - **Data (edit here):** [`superagents.json`](./superagents.json) — the canonical machine-readable fleet record: every ClickUp super agent, track, golden-standard version, and compliance status.
+> - **Pretty view:** [`index.html`](./index.html) — renders `superagents.json`; holds no data of its own.
+>
+> Do **not** keep a duplicate table here or anywhere else. This page is a pointer only. `brain-config/agents/` is the separate Brain-session council, not this fleet.
 
-**Golden standard:** v1.0 — defined by the Creation & Setup Checklist + Golden Config Skeleton
-(ClickUp AI Toolkit). Audit procedure: `brain-config/super-agents/audit-instruction.md`.
-
----
-
-## Fleet
-
-| Agent (slug) | Track | Golden std | Status | Last audit |
-|--------------|-------|-----------|--------|------------|
-| ClickUp Coach Corey (`clickup-coach-corey`) | Full-Standard | v1.0 | Up to date | 2026-07-15 |
-| Mainstage Milo | Full-Standard | v1.0 | Needs declaration + audit | — |
-| FMP Frank | Full-Standard (confirm) | — | Needs declaration + audit | — |
-| Update URITP | Full-Standard (confirm) | — | Needs declaration + audit | — |
-| Origination Date agent | Task-Specific / Exempt | n/a | Inventory only | — |
-| Parse new property emails | Task-Specific / Exempt | n/a | Inventory only | — |
-| Update AMOUNT PAID (when associated) | Task-Specific / Exempt | n/a | Inventory only | — |
-
-> Fleet roster is incomplete and grounded in verified agents only. We proceed **one agent at a
-> time**; new agents get a folder under `super-agents/<slug>/` + a row here. Unconfirmed details
-> are marked — never invented.
-
----
+**Audit workflow:** `brain-config/super-agents/audit-instruction.md`. Each declaration/audit change lands via its own PR (PR history = audit trail). Per-agent declarations live in `brain-config/super-agents/<slug>/` (`README.md` + `preferences.md` + `audits/`).
 
 ## Structure
 
 ```
 brain-config/super-agents/
-  index.md                     # this file (the fleet index)
+  superagents.json             # DATA: the fleet record (hand-edit this)
+  index.html                   # VIEW: renders superagents.json
+  index.md                     # this pointer
   audit-instruction.md         # the audit standard
   <slug>/
     README.md                  # steward-controlled uniform metadata
@@ -40,12 +22,7 @@ brain-config/super-agents/
     audits/<slug>.<date>.md    # dated audit records (one per audit, via PR)
 ```
 
-Distinct from `brain-config/agents/` (the Brain-session council: Mira, Wes, Renata, lenses,
-gates). This folder is the **ClickUp Super Agent** fleet.
-
----
-
 ## Changelog
 
-- 2026-07-15: created. Fleet index moved from ClickUp to Git (single source). Corey audited
-  Up-to-date on v1.0.
+- 2026-07-15: index split into `superagents.json` (data) + `index.html` (renderer); this file reduced to a pointer.
+- 2026-07-15: fleet index created in Git (moved off ClickUp).
