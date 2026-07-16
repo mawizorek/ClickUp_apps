@@ -24,7 +24,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint; resolve.js = live switching. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./styles.css?v=2">
 </head>
 <body>
 <!-- ACCESS GATE (config.json drives it; inline fallback keeps it working on file:// or a 404) -->
@@ -47,13 +47,13 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js"></script>
+<script src="./chrome.js?v=2"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS — swap these when you copy the template ==== */
   var APP_NAME    = "App Name";
-  var APP_VERSION = "v1";
-  var APP_PR      = 0;              // merged PR number that shipped this version
+  var APP_VERSION = "v2";
+  var APP_PR      = 286;           // merged PR number that shipped this version
   var DEFAULT_THEME = (window.THEMES && THEMES.DEFAULT) || "default-theme";
   var DEFAULT_PAGE  = "home";       // one-line landing repoint, no rebuild needed
   var NAV = [
@@ -62,10 +62,12 @@
   ];
   /* ============================================================= */
 
-  /* ---- THEME: apply saved (or default) via the spine ---- */
+  /* ---- THEME: apply saved (or default) via the spine, with a data-theme fallback ---- */
   var savedTheme = null;
   try { savedTheme = localStorage.getItem("app_theme"); } catch (e) {}
-  if (window.THEMES) { THEMES.apply(savedTheme || DEFAULT_THEME, { root: document.documentElement }); }
+  var bootTheme = savedTheme || DEFAULT_THEME;
+  if (window.THEMES) { THEMES.apply(bootTheme, { root: document.documentElement }); }
+  else { document.documentElement.setAttribute("data-theme", bootTheme); }
 
   /* ---- ACCESS GATE ---- */
   (function gate() {
@@ -98,7 +100,7 @@
       .catch(function () { var c = null; try { c = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(c || FALLBACK); });
   })();
 
-  /* ---- CHROME: header (banner + menu + settings drawer) + footer ---- */
+  /* ---- CHROME: header (hamburger + brand + gear), left nav drawer, right settings drawer, footer ---- */
   Chrome.init({
     appName: APP_NAME, version: APP_VERSION, pr: APP_PR,
     nav: NAV, defaultTheme: DEFAULT_THEME, logo: "\uD83E\uDDE9",
