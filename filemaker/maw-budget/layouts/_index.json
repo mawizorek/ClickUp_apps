@@ -1,4 +1,24 @@
 {
-  "_meta": { "app": "maw-budget", "folder": "layouts", "schemaVersion": "1.0", "generated": "2026-07-15" },
-  "layouts": []
+  "_meta": {
+    "app": "maw-budget",
+    "folder": "layouts",
+    "schemaVersion": "1.1",
+    "generated": "2026-07-15",
+    "convention": "folder-per-layout: each layout is its own folder (layouts/<folder>/LAYOUT-<name>/) holding index.html (render) + layout.json (canonical manifest) + README.md. Diverges from the one-file-per-layout line in DOCUMENTATION-STANDARD v1.1; standard update pending sign-off."
+  },
+  "layouts": [
+    {
+      "name": "GLOBAL_Settings",
+      "path": "utility/LAYOUT-global-variables",
+      "fmpFolder": "utility",
+      "occurrence": "Globals",
+      "baseTable": "Globals",
+      "theme": "MAW Dark Utility",
+      "status": "render-draft",
+      "objectCount": 16,
+      "bindingsStatus": "proposed",
+      "render": "utility/LAYOUT-global-variables/index.html",
+      "manifest": "utility/LAYOUT-global-variables/layout.json"
+    }
+  ]
 }

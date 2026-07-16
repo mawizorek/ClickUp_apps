@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>maw-budget · GLOBAL_Settings (layout render)</title>
+<style>
+  :root{
+    --chrome-bg: oklch(0.19 0.012 262);
+    --chrome-bar: oklch(0.245 0.014 262);
+    --chrome-raise: oklch(0.275 0.015 262);
+    --chrome-line: oklch(0.33 0.016 262);
+    --chrome-text: oklch(0.93 0.008 262);
+    --chrome-dim: oklch(0.66 0.011 262);
+    --chrome-faint: oklch(0.52 0.01 262);
+    --accent: oklch(0.74 0.12 218);
+    --proposed: oklch(0.82 0.11 86);
+    --danger: oklch(0.68 0.15 26);
+    --radius: 7px;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    /* canvas theme (overwritten from manifest at runtime) */
+    --cv-bg: oklch(0.23 0.013 260);
+    --cv-part-header: oklch(0.28 0.02 260);
+    --cv-part-body: oklch(0.235 0.012 260);
+    --cv-part-footer: oklch(0.27 0.016 260);
+    --cv-field-fill: oklch(0.31 0.014 260);
+    --cv-field-border: oklch(0.44 0.02 260);
+    --cv-field-text: oklch(0.94 0.008 260);
+    --cv-label: oklch(0.70 0.012 260);
+    --cv-accent: oklch(0.72 0.11 205);
+    --cv-title: oklch(0.96 0.02 205);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--chrome-bg);color:var(--chrome-text);
+    font-family:var(--sans);font-size:15px;line-height:1.5;font-weight:350;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;
+    display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  }
+  h1,h2,h3{text-wrap:balance;margin:0}
+  .mono{font-family:var(--mono)}
+  /* ---- top layout bar (FileMaker chrome) ---- */
+  .bar{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:10px 16px;background:var(--chrome-bar);
+    border-bottom:1px solid var(--chrome-line);flex:0 0 auto;
+  }
+  .lname{
+    display:flex;align-items:center;gap:9px;font-weight:600;font-size:15px;
+    padding:6px 12px;background:var(--chrome-raise);border:1px solid var(--chrome-line);
+    border-radius:var(--radius);
+  }
+  .lname .chev{color:var(--chrome-faint);font-size:11px}
+  .lname .dot{width:7px;height:7px;border-radius:50%;background:var(--cv-accent)}
+  .pill{
+    font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;
+    padding:4px 9px;border-radius:100px;border:1px solid var(--chrome-line);
+    color:var(--chrome-dim);white-space:nowrap;
+  }
+  .pill b{color:var(--chrome-text);font-weight:600}
+  .pill.mode{color:oklch(0.85 0.13 150);border-color:oklch(0.4 0.06 150)}
+  .bar .spacer{flex:1 1 auto}
+  .toggle{
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;
+    font-size:13px;color:var(--chrome-dim);padding:6px 11px;border-radius:var(--radius);
+    border:1px solid transparent;transition:background .15s cubic-bezier(.25,1,.5,1),color .15s;
+  }
+  .toggle:hover{background:var(--chrome-raise);color:var(--chrome-text)}
+  .toggle .sw{width:34px;height:19px;border-radius:100px;background:var(--chrome-line);position:relative;transition:background .2s cubic-bezier(.25,1,.5,1)}
+  .toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--chrome-text);transition:transform .22s cubic-bezier(.22,1,.36,1)}
+  .toggle.on .sw{background:var(--accent)}
+  .toggle.on .sw::after{transform:translateX(15px)}
+  .toggle.on{color:var(--chrome-text)}
+  /* ---- workspace split ---- */
+  .work{display:flex;flex:1 1 auto;min-height:0}
+  .stage{flex:1 1 auto;overflow:auto;padding:34px;display:flex;justify-content:center;min-width:0}
+  /* ---- the rendered FileMaker layout ---- */
+  .canvas{
+    width:min(720px,100%);background:var(--cv-bg);border:1px solid var(--chrome-line);
+    border-radius:4px;box-shadow:0 24px 60px -30px oklch(0 0 0 / .7);overflow:hidden;
+    color:var(--cv-field-text);
+  }
+  .part{display:grid;grid-template-columns:26px 1fr;border-bottom:1px dashed oklch(0.4 0.01 260 / .5)}
+  .part:last-child{border-bottom:0}
+  .gutter{
+    writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;
+    font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
+    color:oklch(0.6 0.01 260);background:oklch(0.2 0.01 260 / .45);
+    padding:8px 0;border-right:1px solid oklch(0.4 0.01 260 / .4);
+  }
+  .pcontent{padding:20px 24px}
+  .part.header .pcontent{background:var(--cv-part-header);padding:18px 24px}
+  .part.body .pcontent{background:var(--cv-part-body)}
+  .part.footer .pcontent{background:var(--cv-part-footer);display:flex;gap:12px;align-items:center;padding:14px 24px}
+  .obj-title{font-size:27px;font-weight:600;letter-spacing:-.01em;color:var(--cv-title)}
+  .obj-merge{font-family:var(--mono);font-size:12px;color:var(--cv-label);margin-top:5px}
+  .section{margin-bottom:22px}
+  .section:last-child{margin-bottom:0}
+  .section > .shead{
+    font-size:11px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;
+    color:var(--cv-accent);margin-bottom:12px;padding-bottom:6px;
+    border-bottom:1px solid oklch(0.4 0.01 260 / .45);
+  }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+  /* ---- objects + fields ---- */
+  .obj{position:relative}
+  .obj .label{display:block;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--cv-label);margin-bottom:5px}
+  .field{
+    background:var(--cv-field-fill);border:1px solid var(--cv-field-border);border-radius:5px;
+    padding:8px 11px;font-size:13.5px;min-height:36px;display:flex;align-items:center;
+    font-variant-numeric:tabular-nums;transition:border-color .15s,box-shadow .15s;
+  }
+  .field.multi{min-height:auto;white-space:pre-line;line-height:1.55;align-items:flex-start;font-family:var(--mono);font-size:12px}
+  .field.display{background:transparent;border-style:dashed;border-color:oklch(0.4 0.02 260);color:oklch(0.82 0.01 260)}
+  .field.select{justify-content:space-between}
+  .field .chev{color:var(--cv-label);font-size:10px}
+  .field:hover{border-color:var(--cv-accent)}
+  .checkset{display:flex;align-items:center;gap:9px}
+  .box{width:16px;height:16px;border:1.5px solid var(--cv-field-border);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:var(--cv-accent)}
+  .radios{display:flex;gap:8px}
+  .radio{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:6px 12px;border:1px solid var(--cv-field-border);border-radius:100px;color:var(--cv-label)}
+  .radio.on{border-color:var(--cv-accent);color:var(--cv-field-text);background:oklch(0.72 0.11 205 / .12)}
+  .radio .rd{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--cv-field-border)}
+  .radio.on .rd{border-color:var(--cv-accent);background:var(--cv-accent)}
+  .fm-btn{
+    font-family:var(--sans);font-size:13px;font-weight:550;cursor:pointer;
+    padding:9px 16px;border-radius:6px;border:1px solid var(--cv-field-border);
+    background:var(--cv-field-fill);color:var(--cv-field-text);
+    transition:border-color .15s,background .15s,transform .06s;
+  }
+  .fm-btn:hover{border-color:var(--cv-accent)}
+  .fm-btn:active{transform:translateY(1px)}
+  .fm-btn.primary{background:oklch(0.72 0.11 205 / .16);border-color:var(--cv-accent);color:var(--cv-title)}
+  /* ---- annotation badges + selection ---- */
+  .badge{
+    position:absolute;top:-9px;left:-9px;z-index:3;width:20px;height:20px;border-radius:50%;
+    background:var(--accent);color:oklch(0.16 0.01 262);font-size:11px;font-weight:700;
+    display:none;align-items:center;justify-content:center;font-family:var(--mono);
+    box-shadow:0 2px 6px oklch(0 0 0 / .5);cursor:pointer;
+  }
+  .obj[data-bind="proposed"] .badge{background:var(--proposed)}
+  body.annotate .badge{display:inline-flex}
+  .obj.sel > .badge{display:inline-flex;outline:2px solid var(--chrome-text);outline-offset:1px}
+  .obj.sel .field,.obj.sel .fm-btn{border-color:var(--accent);box-shadow:0 0 0 2px oklch(0.74 0.12 218 / .35)}
+  .obj.clickable{cursor:pointer}
+  /* ---- inspector ---- */
+  .insp{
+    flex:0 0 340px;background:var(--chrome-bar);border-left:1px solid var(--chrome-line);
+    display:flex;flex-direction:column;min-height:0;transition:margin-right .28s cubic-bezier(.22,1,.36,1);
+  }
+  body.hide-insp .insp{margin-right:-341px}
+  .insp .ih{padding:14px 18px;border-bottom:1px solid var(--chrome-line)}
+  .insp .ih .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--chrome-faint);font-weight:700}
+  .insp .ih h2{font-size:16px;font-weight:600;margin-top:3px}
+  .insp .ih .meta{font-size:12px;color:var(--chrome-dim);margin-top:7px;display:flex;flex-wrap:wrap;gap:5px 12px}
+  .insp .ih .meta span b{color:var(--chrome-text);font-weight:600}
+  .iscroll{overflow:auto;flex:1 1 auto}
+  .olist{list-style:none;margin:0;padding:8px}
+  .olist li{
+    display:grid;grid-template-columns:22px 1fr auto;gap:9px;align-items:center;
+    padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;
+    transition:background .12s;
+  }
+  .olist li:hover{background:var(--chrome-raise)}
+  .olist li.sel{background:oklch(0.74 0.12 218 / .16);outline:1px solid oklch(0.74 0.12 218 / .5)}
+  .olist .n{font-family:var(--mono);font-size:11px;color:var(--chrome-faint);text-align:center}
+  .olist .nm{font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .olist .nm small{display:block;font-weight:400;color:var(--chrome-dim);font-size:11px;font-family:var(--mono)}
+  .tag{font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;padding:3px 7px;border-radius:100px;white-space:nowrap}
+  .tag.bound{color:var(--accent);border:1px solid oklch(0.5 0.09 218)}
+  .tag.prop{color:var(--proposed);border:1px solid oklch(0.55 0.09 86)}
+  .tag.none{color:var(--chrome-faint);border:1px solid var(--chrome-line)}
+  /* detail */
+  .detail{padding:16px 18px}
+  .detail .drow{display:grid;grid-template-columns:104px 1fr;gap:6px 12px;padding:9px 0;border-bottom:1px solid oklch(0.3 0.01 262 / .6);font-size:13px}
+  .detail .drow:last-of-type{border-bottom:0}
+  .detail .drow .dk{color:var(--chrome-faint);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;padding-top:1px}
+  .detail .drow .dv{color:var(--chrome-text)}
+  .detail .drow .dv.code{font-family:var(--mono);font-size:12px}
+  .detail .drow .dv .field-ref{color:var(--accent)}
+  .detail .notes{margin-top:14px;font-size:13px;line-height:1.6;color:var(--chrome-dim);background:var(--chrome-bg);padding:12px 14px;border-radius:7px;border:1px solid var(--chrome-line)}
+  .detail .empty{color:var(--chrome-faint);font-size:13px;padding:40px 8px;text-align:center;line-height:1.6}
+  /* footer legend */
+  .legend{
+    flex:0 0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+    padding:9px 18px;background:var(--chrome-bar);border-top:1px solid var(--chrome-line);
+    font-size:12px;color:var(--chrome-dim);
+  }
+  .legend .li{display:inline-flex;align-items:center;gap:7px}
+  .legend .sw2{width:12px;height:12px;border-radius:50%}
+  .legend .path{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--chrome-faint)}
+  @media (max-width:900px){
+    .insp{position:fixed;right:0;top:0;bottom:0;z-index:20;box-shadow:-20px 0 50px -20px oklch(0 0 0 /.7)}
+    .stage{padding:18px}
+  }
+</style>
+</head>
+<body class="annotate">
+  <div class="bar">
+    <div class="lname"><span class="dot"></span><span id="lname">Layout</span><span class="chev">▾</span></div>
+    <span class="pill mode" id="mode">Browse</span>
+    <span class="pill">TO&nbsp;<b id="occ">—</b></span>
+    <span class="pill">Theme&nbsp;<b id="themeName">—</b></span>
+    <span class="pill">Folder&nbsp;<b id="folder">—</b></span>
+    <div class="spacer"></div>
+    <label class="toggle on" id="tgAnnotate"><span class="sw"></span>Annotations</label>
+    <label class="toggle on" id="tgInsp"><span class="sw"></span>Inspector</label>
+  </div>
+
+  <div class="work">
+    <div class="stage"><div class="canvas" id="canvas"></div></div>
+    <aside class="insp">
+      <div class="ih">
+        <div class="k">Inspector</div>
+        <h2 id="ih-title">Layout objects</h2>
+        <div class="meta" id="ih-meta"></div>
+      </div>
+      <div class="iscroll">
+        <ul class="olist" id="olist"></ul>
+        <div class="detail" id="detail"><div class="empty">Select an object on the layout or in the list to see its type, control style, field binding, and notes.</div></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="legend">
+    <span class="li"><span class="sw2" style="background:oklch(0.74 0.12 218)"></span>Bound object</span>
+    <span class="li"><span class="sw2" style="background:oklch(0.82 0.11 86)"></span>Proposed binding (no table yet)</span>
+    <span class="li"><span class="sw2" style="background:oklch(0.52 0.01 262)"></span>Unbound (text / button)</span>
+    <span class="path" id="path">layouts/utility/LAYOUT-global-variables/</span>
+  </div>
+
+<script type="application/json" id="layout-manifest">
+{
+  "_meta": {
+    "app": "maw-budget",
+    "kind": "filemaker-layout-render",
+    "rendererVersion": "0.1",
+    "generated": "2026-07-15",
+    "note": "Layout-first articulation. Field bindings are PROPOSED; no table articulated yet. This manifest is the canonical spec; index.html renders it. When schema/tables.json exists, bindings validate against it."
+  },
+  "layout": {
+    "name": "GLOBAL_Settings",
+    "folder": "utility",
+    "occurrence": "Globals",
+    "baseTable": "Globals",
+    "recordScope": "Single-record utility table (global-storage fields)",
+    "mode": "Browse",
+    "purpose": "App-wide setup: session identity, preferences (theme, default account, budget month), value-list global seeds, and import/process state. The one screen where g_ globals live so they can be seen and set.",
+    "theme": {
+      "name": "MAW Dark Utility",
+      "tokens": {
+        "cv-bg": "oklch(0.23 0.013 260)",
+        "cv-part-header": "oklch(0.28 0.02 260)",
+        "cv-part-body": "oklch(0.235 0.012 260)",
+        "cv-part-footer": "oklch(0.27 0.016 260)",
+        "cv-field-fill": "oklch(0.31 0.014 260)",
+        "cv-field-border": "oklch(0.44 0.02 260)",
+        "cv-field-text": "oklch(0.94 0.008 260)",
+        "cv-label": "oklch(0.70 0.012 260)",
+        "cv-accent": "oklch(0.72 0.11 205)",
+        "cv-title": "oklch(0.96 0.02 205)"
+      }
+    }
+  },
+  "sections": [
+    { "id": "identity", "label": "Session & Identity" },
+    { "id": "prefs", "label": "Preferences" },
+    { "id": "vlists", "label": "Value-List Globals" },
+    { "id": "import", "label": "Import / Process State" }
+  ],
+  "objects": [
+    { "seq": 1, "part": "header", "kind": "text", "control": "staticText", "label": "Global Settings", "sample": "Global Settings", "notes": "Layout title. Static text object using the theme title token (27px / 600)." },
+    { "seq": 2, "part": "header", "kind": "text", "control": "mergeText", "label": "Environment / version merge", "sample": "PROD · v0.1.0", "binding": { "table": "Globals", "field": "g_Environment", "fieldType": "Text", "storage": "Global", "status": "proposed", "alsoRefs": ["Globals::g_AppVersion"] }, "notes": "Merge text object: <<Globals::g_Environment>> · v<<Globals::g_AppVersion>>. Read-only." },
+
+    { "seq": 3, "part": "body", "section": "identity", "kind": "field", "control": "editBox", "label": "Current User", "sample": "Michael Wizorek", "binding": { "table": "Globals", "field": "g_CurrentUser", "fieldType": "Text", "storage": "Global", "status": "proposed" }, "notes": "Set on startup from Get(AccountName). Single-user, but drives the CreatedBy / ModifiedBy audit quad." },
+    { "seq": 4, "part": "body", "section": "identity", "kind": "field", "control": "displayOnly", "label": "App Version", "sample": "0.1.0", "binding": { "table": "Globals", "field": "g_AppVersion", "fieldType": "Calculation (Text, unstored)", "storage": "Unstored calc", "status": "proposed" }, "notes": "Calc returning the solution version string. Display only." },
+    { "seq": 5, "part": "body", "section": "identity", "kind": "field", "control": "popupMenu", "label": "Environment", "sample": "PROD", "options": ["DEV", "PROD"], "binding": { "table": "Globals", "field": "g_Environment", "fieldType": "Text", "storage": "Global", "valueList": "gLIST_Environment", "status": "proposed" }, "notes": "Pop-up menu bound to value list gLIST_Environment. Gates debug-only tooling." },
+    { "seq": 6, "part": "body", "section": "identity", "kind": "field", "control": "checkboxSet", "label": "Debug Mode", "sample": "off", "checked": false, "binding": { "table": "Globals", "field": "g_DebugMode", "fieldType": "Number", "storage": "Global", "status": "proposed" }, "notes": "1/0 flag. Reveals developer buttons + verbose script logging." },
+
+    { "seq": 7, "part": "body", "section": "prefs", "kind": "field", "control": "radioButtonSet", "label": "Theme", "sample": "Dark", "options": ["Dark", "Light"], "binding": { "table": "Globals", "field": "g_ThemeMode", "fieldType": "Text", "storage": "Global", "valueList": "gLIST_ThemeMode", "status": "proposed" }, "notes": "Default Dark. Drives conditional layout theming across the solution." },
+    { "seq": 8, "part": "body", "section": "prefs", "kind": "field", "control": "dropDownList", "label": "Default Account", "sample": "Chase Checking", "binding": { "table": "Globals", "field": "g_DefaultAccount", "fieldType": "Text (holds fkAccount UUID)", "storage": "Global", "valueList": "gLIST_Accounts", "status": "proposed" }, "notes": "Stores an Account PrimaryKey; value list gLIST_Accounts shows names. Pre-selects the account for quick manual entry." },
+    { "seq": 9, "part": "body", "section": "prefs", "kind": "field", "control": "editBox", "label": "Current Budget Month", "sample": "2026-07-01", "binding": { "table": "Globals", "field": "g_CurrentBudgetMonth", "fieldType": "Date", "storage": "Global", "status": "proposed" }, "notes": "First-of-month date the budgeting + report screens default to. Phase 3 relevant, seeded now." },
+    { "seq": 10, "part": "body", "section": "prefs", "kind": "field", "control": "displayOnly", "label": "Today", "sample": "2026-07-15", "binding": { "table": "Globals", "field": "g_DateToday", "fieldType": "Calculation (Date, unstored)", "storage": "Unstored calc", "status": "proposed" }, "notes": "Get(CurrentDate). Display anchor for the staleness nudges in DD-018." },
+
+    { "seq": 11, "part": "body", "section": "vlists", "kind": "field", "control": "displayMulti", "label": "Account Types (seed)", "sample": "Checking\nSavings\nCredit Card\nCash\nLoan\nReceivable\nAsset (feed-less)", "binding": { "table": "Globals", "field": "gLIST_AccountTypes", "fieldType": "Text", "storage": "Global", "status": "proposed" }, "notes": "Global feeding a 'use values from field' value list. Seeds the Account type taxonomy (DD-011 / DD-013)." },
+    { "seq": 12, "part": "body", "section": "vlists", "kind": "field", "control": "displayMulti", "label": "Transaction States", "sample": "Pending\nCleared", "binding": { "table": "Globals", "field": "gLIST_TransactionStates", "fieldType": "Text", "storage": "Global", "status": "proposed" }, "notes": "Seeds the cleared / pending reconciliation states (DD-021)." },
+
+    { "seq": 13, "part": "body", "section": "import", "kind": "field", "control": "checkboxSet", "label": "Import In Progress", "sample": "off", "checked": false, "binding": { "table": "Globals", "field": "g_ImportInProgress", "fieldType": "Number", "storage": "Global", "status": "proposed" }, "notes": "1/0 guard set during CSV import to block re-entrancy (DD-012)." },
+    { "seq": 14, "part": "body", "section": "import", "kind": "field", "control": "displayOnly", "label": "Last Import Session", "sample": "2026-07-14 · Chase · 42 rows", "binding": { "table": "Globals", "field": "g_LastImportSession", "fieldType": "Text (holds fkImportSession UUID)", "storage": "Global", "status": "proposed" }, "notes": "Points at the most recent ImportSessions record for a quick 'last import' readout." },
+
+    { "seq": 15, "part": "footer", "kind": "button", "control": "buttonPrimary", "label": "Reset Session Globals", "script": "util_ResetGlobals", "notes": "Clears / reinitializes session g_ globals to defaults. Script proposed under scripts/utilities/." },
+    { "seq": 16, "part": "footer", "kind": "button", "control": "button", "label": "Toggle Theme", "script": "util_ToggleTheme", "notes": "Flips g_ThemeMode Dark/Light and refreshes. Script proposed under scripts/utilities/." }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  var M = JSON.parse(document.getElementById('layout-manifest').textContent);
+  var L = M.layout;
+  var cv = document.getElementById('canvas');
+  Object.keys(L.theme.tokens).forEach(function(k){ cv.style.setProperty('--'+k, L.theme.tokens[k]); });
+  document.getElementById('lname').textContent = L.name;
+  document.getElementById('mode').textContent = L.mode;
+  document.getElementById('occ').textContent = L.occurrence;
+  document.getElementById('themeName').textContent = L.theme.name;
+  document.getElementById('folder').textContent = L.folder;
+
+  function bindClass(o){ if(!o.binding) return 'none'; return o.binding.status==='proposed' ? 'proposed' : 'bound'; }
+  function byPart(p){ return M.objects.filter(function(o){return o.part===p;}); }
+
+  function controlHTML(o){
+    switch(o.control){
+      case 'staticText': return '<div class="obj-title">'+o.sample+'</div>';
+      case 'mergeText':  return '<div class="obj-merge">'+o.sample+'</div>';
+      case 'editBox':    return '<div class="field">'+o.sample+'</div>';
+      case 'displayOnly':return '<div class="field display">'+o.sample+'</div>';
+      case 'displayMulti':return '<div class="field display multi">'+o.sample+'</div>';
+      case 'popupMenu':
+      case 'dropDownList':return '<div class="field select">'+o.sample+'<span class="chev">▼</span></div>';
+      case 'checkboxSet':return '<div class="field checkset"><span class="box">'+(o.checked?'✓':'')+'</span>'+(o.checked?'Enabled':'Disabled')+'</div>';
+      case 'radioButtonSet':
+        return '<div class="radios">'+o.options.map(function(op){var on=op===o.sample;return '<span class="radio'+(on?' on':'')+'"><span class="rd"></span>'+op+'</span>';}).join('')+'</div>';
+      case 'button':      return '<button class="fm-btn">'+o.label+'</button>';
+      case 'buttonPrimary':return '<button class="fm-btn primary">'+o.label+'</button>';
+      default: return '<div class="field">'+(o.sample||'')+'</div>';
+    }
+  }
+  function objWrap(o){
+    var showLabel = o.kind==='field';
+    var inner = (showLabel ? '<span class="label">'+o.label+'</span>' : '') + controlHTML(o);
+    return '<div class="obj clickable" data-seq="'+o.seq+'" data-bind="'+bindClass(o)+'">'+
+           '<span class="badge">'+o.seq+'</span>'+inner+'</div>';
+  }
+
+  function part(id, label, contentHTML, cls){
+    return '<div class="part '+id+'"><div class="gutter">'+label+'</div><div class="pcontent '+(cls||'')+'">'+contentHTML+'</div></div>';
+  }
+
+  var headerHTML = byPart('header').map(objWrap).join('');
+  var bodyHTML = M.sections.map(function(s){
+    var objs = M.objects.filter(function(o){return o.part==='body' && o.section===s.id;});
+    return '<div class="section"><div class="shead">'+s.label+'</div><div class="grid">'+objs.map(objWrap).join('')+'</div></div>';
+  }).join('');
+  var footerHTML = byPart('footer').map(objWrap).join('');
+
+  cv.innerHTML = part('header','Header',headerHTML) + part('body','Body',bodyHTML) + part('footer','Footer',footerHTML);
+
+  var ihMeta = document.getElementById('ih-meta');
+  var bound = M.objects.filter(function(o){return o.binding;}).length;
+  ihMeta.innerHTML = '<span><b>'+M.objects.length+'</b> objects</span><span><b>'+bound+'</b> field-bound</span><span>base table <b>'+L.baseTable+'</b></span>';
+
+  var olist = document.getElementById('olist');
+  olist.innerHTML = M.objects.map(function(o){
+    var ref = o.binding ? (o.binding.table+'::'+o.binding.field) : (o.script ? 'script · '+o.script : o.control);
+    var bc = bindClass(o), tag = bc==='bound'?'<span class="tag bound">bound</span>':bc==='proposed'?'<span class="tag prop">proposed</span>':'<span class="tag none">—</span>';
+    return '<li data-seq="'+o.seq+'"><span class="n">'+o.seq+'</span><span class="nm">'+o.label+'<small>'+ref+'</small></span>'+tag+'</li>';
+  }).join('');
+
+  var detail = document.getElementById('detail');
+  var ihTitle = document.getElementById('ih-title');
+  function row(k,v,code){ return '<div class="drow"><div class="dk">'+k+'</div><div class="dv'+(code?' code':'')+'">'+v+'</div></div>'; }
+  function select(seq){
+    var o = M.objects.filter(function(x){return x.seq===seq;})[0]; if(!o) return;
+    document.querySelectorAll('.obj').forEach(function(el){el.classList.toggle('sel', +el.dataset.seq===seq);});
+    document.querySelectorAll('.olist li').forEach(function(el){el.classList.toggle('sel', +el.dataset.seq===seq);});
+    ihTitle.textContent = o.label;
+    var h = '';
+    h += row('Object #', o.seq, true);
+    h += row('Kind', o.kind);
+    h += row('Control', o.control);
+    h += row('Part', o.part);
+    if(o.binding){
+      h += row('Binds to', '<span class="field-ref">'+o.binding.table+'::'+o.binding.field+'</span>', true);
+      h += row('Field type', o.binding.fieldType);
+      h += row('Storage', o.binding.storage);
+      if(o.binding.valueList) h += row('Value list', o.binding.valueList, true);
+      if(o.binding.alsoRefs) h += row('Also refs', o.binding.alsoRefs.join(', '), true);
+      h += row('Status', o.binding.status==='proposed' ? '<span class="tag prop">proposed</span>' : '<span class="tag bound">bound</span>');
+    } else if(o.script){
+      h += row('Runs script', '<span class="field-ref">'+o.script+'</span>', true);
+    } else {
+      h += row('Binding', 'none (static)');
+    }
+    h += row('Theme', L.theme.name);
+    h += '<div class="notes">'+o.notes+'</div>';
+    detail.innerHTML = h;
+    var sel = document.querySelector('.olist li[data-seq="'+seq+'"]'); if(sel) sel.scrollIntoView({block:'nearest'});
+  }
+  cv.addEventListener('click', function(e){ var el=e.target.closest('.obj'); if(el) select(+el.dataset.seq); });
+  olist.addEventListener('click', function(e){ var el=e.target.closest('li'); if(el) select(+el.dataset.seq); });
+
+  var tgA=document.getElementById('tgAnnotate'), tgI=document.getElementById('tgInsp');
+  tgA.addEventListener('click', function(){ document.body.classList.toggle('annotate'); tgA.classList.toggle('on'); });
+  tgI.addEventListener('click', function(){ document.body.classList.toggle('hide-insp'); tgI.classList.toggle('on'); });
+})();
+</script>
+</body>
+</html>
