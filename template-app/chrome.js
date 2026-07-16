@@ -106,7 +106,7 @@
           '<button class="theme-trigger" id="themeTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="themeLbl themeCurrent">' +
             '<span class="sw" id="themeSw"><i></i></span>' +
             '<span class="theme-current" id="themeCurrent">\u2014</span>' +
-            '<span class="theme-chev" aria-hidden="true">\u25BE</span>' +
+            '<span class="theme-chev" id="themeChev" aria-hidden="true">\u25BE</span>' +
           '</button>' +
           '<div class="theme-pop" id="themePop" role="listbox" tabindex="-1" aria-label="Theme"></div>' +
         '</div>' +
@@ -123,8 +123,10 @@
   function closePop() {
     var pop = document.getElementById("themePop");
     var trg = document.getElementById("themeTrigger");
+    var chev = document.getElementById("themeChev");
     if (pop) pop.classList.remove("is-open");
     if (trg) trg.setAttribute("aria-expanded", "false");
+    if (chev) chev.classList.remove("is-open");
     open.pop = false;
   }
   function setTrigger(slug, name) {
@@ -136,13 +138,17 @@
   function initThemePicker(cfg) {
     var trigger = document.getElementById("themeTrigger");
     var pop = document.getElementById("themePop");
+    var chev = document.getElementById("themeChev");
     var note = document.getElementById("themeNote");
     var chosen = savedSlug(cfg.defaultTheme);
 
     trigger.addEventListener("click", function () {
       open.pop = !open.pop;
       pop.classList.toggle("is-open", open.pop);
+      chev.classList.toggle("is-open", open.pop);
       trigger.setAttribute("aria-expanded", String(open.pop));
+      // keep the freshly-opened list in view within the scrolling drawer
+      if (open.pop) { setTimeout(function () { pop.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, 60); }
     });
 
     themeIndex().then(function (idx) {
@@ -159,7 +165,7 @@
         });
       });
       setTrigger(chosen, found ? found.name : chosen);
-      note.textContent = window.THEMES ? "" : "Live resolver unavailable — theming via stylesheet fallback.";
+      note.textContent = ""; // theming works via resolver OR the stylesheet fallback; no need to alarm
     }).catch(function () {
       note.textContent = "Could not load the theme index. Check the shared/themes spine.";
     });
