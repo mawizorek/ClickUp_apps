@@ -61,6 +61,8 @@ Documents what's inside the VWX file so a designer (or future rebuild) understan
 
 **Integration principle:** the base file *conforms to* the general standards; the show package captures only what's venue-specific and **points up** to the general standard rather than duplicating it.
 
+**File-topology principle (D-011):** the base file is a **dense MASTER** that department/show files **reference** (not copy). Venue geometry is authored once in the master and consumed downstream. See VWX-BEST-PRACTICES.md § S-2.
+
 ---
 
 ## 6. Phases (RATIFIED 2026-07-16, D-007)
@@ -90,7 +92,9 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 | D-007 | 2026-07-16 | **Ratify the 7-phase lifecycle spine** (Phase 0–6), brainstorming → closing & archiving. | Approved by Michael. Detail in README. |
 | D-008 | 2026-07-16 | **Rebuild risk accepted** with a mitigation path: export **DWG** directly from the file; with resources embedded + laid out, re-importing the DWG should de-skin but bring content back. Keep resources embedded + cleanly laid out throughout. | No way around the Educational→licensed rebuild; DWG round-trip is the hedge. |
 | D-009 | 2026-07-16 | **`.vwx` files will NOT live in git. Git is solely the documentation trail.** Actively planning to **export documentation out of Vectorworks into git** (worksheet/report export → CSV/markdown). | Files live elsewhere; bundle references them. Report-setup design is a Phase 0 task. |
-| D-010 | 2026-07-16 | **Do a Vectorworks best-practices deep dive + deep research as a brainstorming sub-session** before designing our workflow. | Build on established practice, not habit. |
+| D-010 | 2026-07-16 | **Do a Vectorworks best-practices deep dive + deep research as a brainstorming sub-session** before designing our workflow. | Build on established practice, not habit. First-pass findings F-001..F-008 logged in VWX-BEST-PRACTICES.md. |
+| D-011 | 2026-07-16 | **Adopt the master-file reference model.** One dense **MASTER** base file holds all departments as layers (single source of truth for venue geometry); department/show files **reference** it (VW referencing / design-layer viewport references), pulling only the layers they need rather than duplicating geometry. | Confirmed by Michael. Promoted to VWX-BEST-PRACTICES.md § S-2. Downstream files are thin consumers of the master. |
+| D-012 | 2026-07-16 | **Adopt the hybrid layer/class division.** **Classes = object-category filtering** (steel, wood, framing, masking…) for viewport/saved-view visibility control. **Layers = location + department routing + elevation band** (`0 NOTES / 1 DECK / 1.5 MEZZ / 2 TOE / 3 CATWALK`). **Elevation lives in layers, never classes.** Object-classes use dash-delimited ≤4-part naming (F-002). | Confirmed by Michael. Promoted to VWX-BEST-PRACTICES.md § S-1. Diverges from Spotlight's lean-layer advice because this is a multi-department master, not a single plot. Specific class tree + layer list still to define. |
 
 ---
 
@@ -99,15 +103,22 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 - **Package folder/file schema:** exact folder layout, filenames, and CSV columns (layers.csv, classes.csv, resources.csv, etc.).
 - **VWX report/worksheet export design:** which worksheets/reports to build in Vectorworks, what columns they emit, and the export-to-git mechanism (D-009).
 - **Where the `.vwx` files actually live** (Box? Drive? local + referenced) now that git is docs-only.
+- **Object-class tree (under D-012/S-1):** the specific object categories (steel / wood / framing / masking / …) and their dash-delimited hierarchy.
+- **House layer list (under D-012/S-1):** finalize the department × elevation layer set; the Google Sheet's ~27 layers are the working draft.
 - **Phase 5–6 ownership boundary:** how much of Production Use / Closing is *this project's* scope vs. lifecycle context around the deliverable.
 - **Template location & naming** under `Vectorworks/`.
-- **Per-show sub-reference mechanism** (D-005).
+- **Per-show sub-reference mechanism** (D-005) — now framed by the master-reference model (D-011).
 - **Inventory worksheet:** each object resource with its default layer + class.
-- **Pipes & hang positions:** symbols vs. lighting pipe tool; hybrid 2D/3D handling.
+- **Pipes & hang positions:** symbols vs. lighting pipe tool; hybrid 2D/3D handling (F-005).
 - **N/S/E/W conventions.**
-- **Class scheme:** toe / mid / high pipes; galleries as a super-group/class.
+- **Origin / reference-line convention (OPEN, under discussion):** lock CL × plaster line = 0,0 on the internal origin? Recommendation on the table (F-007); not yet ruled.
 - **HTML package viewer:** build or not (hold until content exists).
 - **Licensed rebuild:** when/how, via the D-008 DWG path.
+
+### Resolved (moved out of Open Questions)
+
+- ~~**Class scheme:** object-based vs. graphic/linestyle-based~~ → **D-012**: object-category classes (steel/wood/framing/masking) for filtering; linework handled separately. Elevation stays in layers.
+- ~~**File topology:** one file vs. referenced department files~~ → **D-011**: dense master referenced by department/show files.
 
 ---
 
@@ -115,14 +126,16 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 
 - **Task:** URITP-4421 — "Vectorworks base show file (and model)" (status: working). 55 attachments (drawings, PDFs, `.vwx` files, photos), scattered TODO braindumps, subtasks (REP plot; recreate resource-page PDFs as DWG).
 - **ClickUp docs:** "🟡 SMITH THEATRE VWX TEMPLATE FILE 🟡" + subpages (Classes, Layers & Classes, Sheet Layers, Resources, Recreate), under the "Vectorworks" standards doc. Also "Smith Theatre ARCHITECTURE Notes" (bottom of toe = 18'8\" from deck) and "MAW BASE SHOW FILES."
+- **Layer worksheet (working draft):** Google Sheet "URITP VWX Smith Theatre BASE FILE Worksheets" — ~27 layers keyed on DEPARTMENT × elevation band (0 NOTES / 1 DECK / 1.5 MEZZ / 2 TOE / 3 CATWALK), with 2D/3D flags and STATUS. This is the working source for the D-012/S-1 layer list.
 - **Rigging facts (from the task):** High Steel — concentrated point limit 2000 lbs, total load limit 8000 lbs; max 4 simultaneous loads per beam, no closer than 4'-0\" on center, 12,000 lbs total over all beams; beams run E/W at 4' & 12' from center.
 
 ---
 
 ## 10. Next actions
 
-1. Run the Vectorworks best-practices deep dive / deep research (D-010).
-2. Design the VWX report/worksheet export → git mechanism (D-009).
-3. Define package contents → then the folder/file schema → then build the template skeleton.
+1. **Decide the origin convention** (F-007) — the live open question; recommendation is CL × PL = 0,0 on internal origin.
+2. Define the **object-class tree** and the **house layer list** under S-1 (D-012).
+3. Design the VWX report/worksheet export → git mechanism (D-009).
+4. Define package contents → then the folder/file schema → then build the template skeleton.
 
 *Last updated: 2026-07-16.*
