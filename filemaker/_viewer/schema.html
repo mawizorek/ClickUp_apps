@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schema Renderer</title>
+<style>
+  :root {
+    --bg-0: oklch(16% 0.012 285); --bg-1: oklch(19% 0.014 285); --bg-2: oklch(23% 0.016 285); --bg-3: oklch(27% 0.018 285); --bg-code: oklch(14% 0.014 285);
+    --line: oklch(32% 0.02 285); --line-soft: oklch(27% 0.016 285);
+    --text-0: oklch(94% 0.008 285); --text-1: oklch(78% 0.012 285); --text-2: oklch(63% 0.014 285); --text-3: oklch(52% 0.014 285);
+    --accent: oklch(72% 0.14 285);
+    --key-pk: oklch(70% 0.15 300); --key-fk: oklch(72% 0.13 230); --key-calc: oklch(74% 0.13 90); --key-audit: oklch(60% 0.03 285); --key-global: oklch(72% 0.14 25); --key-plain: oklch(58% 0.02 285);
+    --ok: oklch(72% 0.14 155); --warn: oklch(76% 0.14 75); --danger: oklch(68% 0.16 25);
+    --syn-fn: oklch(78% 0.13 230); --syn-kw: oklch(76% 0.15 320); --syn-str: oklch(76% 0.13 145); --syn-num: oklch(80% 0.12 75); --syn-var: oklch(80% 0.10 55); --syn-com: oklch(52% 0.02 285); --syn-op: oklch(70% 0.02 285);
+    --mono: ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace; --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; --ease: cubic-bezier(0.22,1,0.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg-0); color: var(--text-1); font-weight: 350; line-height: 1.55; letter-spacing: 0.01em; -webkit-font-smoothing: antialiased; display: grid; grid-template-columns: 300px 1fr; grid-template-rows: 100vh; overflow: hidden; }
+  h1,h2 { text-wrap: balance; color: var(--text-0); letter-spacing: 0; }
+  a { color: var(--accent); }
+  .sidebar { background: var(--bg-1); border-right: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
+  .brand { padding: 24px 24px 16px; border-bottom: 1px solid var(--line-soft); }
+  .brand .back { font-size: 0.6875rem; color: var(--text-3); text-decoration: none; }
+  .brand .kicker { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); font-weight: 600; margin-top: 8px; }
+  .brand h1 { font-size: 1.0625rem; font-weight: 600; margin-top: 6px; font-family: var(--mono); }
+  .brand .status { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.6875rem; font-family: var(--mono); }
+  .brand .status .led { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+  .brand .status.live .led { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .brand .status.err .led { background: var(--danger); }
+  .filter { padding: 12px 16px; border-bottom: 1px solid var(--line-soft); }
+  .filter input { width: 100%; background: var(--bg-0); border: 1px solid var(--line); color: var(--text-0); font-family: var(--sans); font-size: 0.8125rem; padding: 8px 12px; border-radius: 6px; }
+  .filter input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px oklch(72% 0.14 285 / 0.18); }
+  .nav { overflow-y: auto; padding: 12px 8px 32px; flex: 1; }
+  .nav-group-label { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); padding: 16px 12px 8px; font-weight: 600; }
+  .nav-item { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: none; border: none; color: var(--text-1); font-family: var(--sans); font-size: 0.8125rem; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.12s var(--ease); }
+  .nav-item:hover { background: var(--bg-2); color: var(--text-0); }
+  .nav-item.active { background: var(--bg-3); color: var(--text-0); }
+  .nav-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .nav-item .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--mono); font-size: 0.75rem; }
+  .nav-item .cc { font-size: 0.625rem; color: var(--key-calc); font-family: var(--mono); }
+  .nav-item .ct { font-variant-numeric: tabular-nums; font-size: 0.6875rem; color: var(--text-3); }
+  .nav-item.pending .nm { color: var(--text-3); font-style: italic; }
+  .main { overflow-y: auto; }
+  .topbar { position: sticky; top: 0; z-index: 5; background: oklch(16% 0.012 285 / 0.86); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line-soft); padding: 12px 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .src { font-family: var(--mono); font-size: 0.6875rem; color: var(--text-3); }
+  .src b { color: var(--text-1); font-weight: 500; }
+  .tabs { display: flex; gap: 4px; background: var(--bg-2); padding: 3px; border-radius: 8px; }
+  .tabs button { background: none; border: none; color: var(--text-2); font-family: var(--sans); font-size: 0.75rem; font-weight: 500; padding: 5px 12px; border-radius: 6px; cursor: pointer; }
+  .tabs button.active { background: var(--bg-0); color: var(--text-0); }
+  .main-inner { max-width: 1000px; padding: 32px 48px 48px; }
+  .table-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .table-head h2 { font-family: var(--mono); font-size: 1.75rem; font-weight: 600; }
+  .badge { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-1); white-space: nowrap; }
+  .badge.role { color: var(--bg-0); }
+  .badge.s-locked { color: var(--ok); border-color: color-mix(in oklch, var(--ok), transparent 65%); }
+  .badge.s-pending { color: var(--warn); border-color: color-mix(in oklch, var(--warn), transparent 65%); }
+  .badge.s-under-review { color: var(--danger); border-color: color-mix(in oklch, var(--danger), transparent 65%); }
+  .desc { color: var(--text-2); font-size: 0.9375rem; max-width: 72ch; margin-bottom: 32px; text-wrap: pretty; }
+  .section-label { display: flex; align-items: center; gap: 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); font-weight: 600; margin: 32px 0 12px; }
+  .section-label .n { font-variant-numeric: tabular-nums; color: var(--text-3); font-weight: 400; }
+  table.fields { width: 100%; border-collapse: collapse; font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+  table.fields th { text-align: left; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-3); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  table.fields td { padding: 12px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  table.fields tr:hover td { background: var(--bg-1); }
+  .fname { font-family: var(--mono); color: var(--text-0); }
+  .ftype { font-family: var(--mono); color: var(--text-2); font-size: 0.75rem; }
+  .key-chip { display: inline-block; font-family: var(--mono); font-size: 0.6875rem; font-weight: 600; padding: 1px 7px; border-radius: 4px; color: var(--bg-0); }
+  .cat { color: var(--text-2); font-size: 0.75rem; }
+  .fnote { color: var(--text-3); font-size: 0.75rem; max-width: 42ch; text-wrap: pretty; }
+  .fstatus { font-size: 0.6875rem; font-weight: 600; }
+  .fstatus.pending { color: var(--warn); } .fstatus.under-review { color: var(--danger); }
+  .calc { border: 1px solid var(--line-soft); border-radius: 10px; margin-bottom: 12px; overflow: hidden; background: var(--bg-1); }
+  .calc-hd { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; user-select: none; }
+  .calc-hd:hover { background: var(--bg-2); }
+  .calc-hd .chev { color: var(--text-3); font-size: 0.75rem; transition: transform 0.2s var(--ease); width: 12px; }
+  .calc.open .calc-hd .chev { transform: rotate(90deg); }
+  .calc-hd .cname { font-family: var(--mono); font-size: 0.8125rem; color: var(--text-0); flex: 1; }
+  .calc-hd .ret { font-family: var(--mono); font-size: 0.6875rem; color: var(--syn-fn); }
+  .calc-hd .stored { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+  .calc-hd .stored.yes { color: var(--ok); border: 1px solid color-mix(in oklch, var(--ok), transparent 70%); }
+  .calc-hd .stored.no { color: var(--text-3); border: 1px solid var(--line); }
+  .calc-body { display: none; border-top: 1px solid var(--line-soft); } .calc.open .calc-body { display: block; }
+  .code-wrap { position: relative; margin: 12px 16px 16px; }
+  pre.code { background: var(--bg-code); border: 1px solid var(--line); border-radius: 8px; padding: 24px 16px 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.8125rem; line-height: 1.6; color: var(--text-1); tab-size: 2; }
+  pre.code .fn { color: var(--syn-fn); } pre.code .kw { color: var(--syn-kw); font-weight: 600; } pre.code .str { color: var(--syn-str); } pre.code .num { color: var(--syn-num); } pre.code .var { color: var(--syn-var); } pre.code .com { color: var(--syn-com); font-style: italic; } pre.code .op { color: var(--syn-op); }
+  .copy-btn { position: absolute; top: 8px; right: 8px; background: var(--bg-2); border: 1px solid var(--line); color: var(--text-2); font-family: var(--sans); font-size: 0.6875rem; font-weight: 500; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+  .copy-btn:hover { background: var(--bg-3); color: var(--text-0); }
+  .copy-btn.done { color: var(--ok); }
+  .code-loading { padding: 16px; color: var(--text-3); font-family: var(--mono); font-size: 0.8125rem; }
+  .deps { padding: 0 16px 16px; } .deps .dl { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-3); font-weight: 600; margin-bottom: 8px; }
+  .dep-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .dep-chip { font-family: var(--mono); font-size: 0.6875rem; padding: 2px 8px; border-radius: 4px; background: var(--bg-3); color: var(--text-1); border: 1px solid var(--line); }
+  .dep-chip.calc { border-color: color-mix(in oklch, var(--key-calc), transparent 55%); color: var(--key-calc); cursor: pointer; }
+  .dep-chip.cross { border-color: color-mix(in oklch, var(--key-fk), transparent 55%); color: var(--key-fk); }
+  .dep-chip.env { color: var(--text-3); font-style: italic; }
+  .calcref { font-family: var(--mono); font-size: 0.625rem; color: var(--text-3); padding: 0 16px 16px; }
+  #graph { width: 100%; height: 640px; border: 1px solid var(--line-soft); border-radius: 12px; background: var(--bg-code); }
+  .graph-note { color: var(--text-3); font-size: 0.8125rem; margin-bottom: 16px; max-width: 72ch; }
+  .g-node-label { font-family: var(--mono); font-size: 10px; fill: var(--text-1); pointer-events: none; }
+  .g-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .g-legend .li { display: flex; align-items: center; gap: 6px; font-size: 0.6875rem; color: var(--text-2); }
+  .g-legend .sw { width: 12px; height: 12px; border-radius: 3px; }
+  .empty { color: var(--text-3); font-size: 0.875rem; padding: 24px 0; }
+  .fatal { padding: 48px; color: var(--text-2); }
+  .fatal code { font-family: var(--mono); background: var(--bg-2); padding: 1px 6px; border-radius: 4px; color: var(--text-0); }
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <a class="back" href="index.html">← all apps</a>
+      <div class="kicker">Schema Renderer</div>
+      <h1 id="appName">…</h1>
+      <div class="status" id="srcStatus"><span class="led"></span><span id="srcStatusText">connecting…</span></div>
+    </div>
+    <div class="filter"><input type="text" id="filter" placeholder="Filter tables + fields…" autocomplete="off" spellcheck="false"></div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="src">source · <b id="srcPath">…</b></div>
+      <div class="tabs"><button data-tab="table" class="active">Table</button><button data-tab="graph">Dependency graph</button></div>
+    </div>
+    <div class="main-inner" id="doc"></div>
+  </main>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const APP = params.get('app');
+if (!APP){ document.body.innerHTML = '<div class="fatal">No app specified. Use <code>?app=&lt;slug&gt;</code> or go back to <a href="index.html">the launcher</a>.</div>'; throw new Error('no app'); }
+const BASE = '../' + APP + '/';
+document.getElementById('appName').textContent = APP;
+document.getElementById('srcPath').textContent = APP + '/schema/tables.json';
+
+const KEY_COLORS = { pk:'var(--key-pk)', fk:'var(--key-fk)', calc:'var(--key-calc)', audit:'var(--key-audit)', global:'var(--key-global)', plain:'var(--key-plain)' };
+const FM_KEYWORDS = new Set(["Let","Case","If","not","and","or","xor"]);
+let SCHEMA = null, MANIFEST = null, active = null, tab = 'table';
+const calcCache = {};
+const nav = document.getElementById('nav'), doc = document.getElementById('doc');
+const roleColor = r => (SCHEMA._meta.roleColors && SCHEMA._meta.roleColors[r]) || 'var(--text-3)';
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function highlight(src){
+  const out=[]; let i=0, n=src.length;
+  const push=(cls,txt)=>out.push(cls?`<span class="${cls}">${esc(txt)}</span>`:esc(txt));
+  while(i<n){ const c=src[i];
+    if(c==='/'&&src[i+1]==='/'){ let j=src.indexOf('\n',i); if(j===-1)j=n; push('com',src.slice(i,j)); i=j; continue; }
+    if(c==='"'){ let j=i+1; while(j<n&&src[j]!=='"'){ if(src[j]==='\\')j++; j++; } j=Math.min(j+1,n); push('str',src.slice(i,j)); i=j; continue; }
+    if(/[0-9]/.test(c)&&!/[A-Za-z_]/.test(src[i-1]||'')){ let j=i; while(j<n&&/[0-9.]/.test(src[j]))j++; push('num',src.slice(i,j)); i=j; continue; }
+    if(/[A-Za-z_~]/.test(c)){ let j=i; while(j<n&&/[A-Za-z0-9_.~]/.test(src[j]))j++; const w=src.slice(i,j); let k=j; while(k<n&&/\s/.test(src[k]))k++;
+      if(w[0]==='~'||w[0]==='_')push('var',w); else if(FM_KEYWORDS.has(w))push('kw',w); else if(src[k]==='(')push('fn',w); else push('var',w); i=j; continue; }
+    if(/[;?=<>+\-*/(),\[\]]/.test(c)){ push('op',c); i++; continue; } push(null,c); i++;
+  }
+  return out.join('');
+}
+async function tryFetch(path){ try{ const r=await fetch(BASE+path,{cache:'no-store'}); if(!r.ok)throw 0; return await r.text(); }catch(e){ return null; } }
+
+async function boot(){
+  const [s,m] = await Promise.all([ tryFetch('schema/tables.json'), tryFetch('calculations/_index.json') ]);
+  const st=document.getElementById('srcStatus'), stt=document.getElementById('srcStatusText');
+  if(!s){ st.className='status err'; stt.textContent='schema not found'; doc.innerHTML=`<div class="fatal">Could not load <code>${APP}/schema/tables.json</code>. Check the slug and that the app follows the standard.</div>`; return; }
+  try{ SCHEMA=JSON.parse(s); }catch(e){ st.className='status err'; stt.textContent='schema parse error'; return; }
+  if(m){ try{ MANIFEST=JSON.parse(m); }catch(e){} }
+  st.className='status live'; stt.textContent='live · v'+(SCHEMA._meta.schemaVersion||'?');
+  active = SCHEMA.tables[0].name; buildNav(); render();
+}
+async function getCalc(fn){ if(calcCache[fn])return calcCache[fn]; const t=await tryFetch('calculations/'+fn); calcCache[fn]=t; return t; }
+function manifestFor(tbl,fld){ return MANIFEST ? MANIFEST.calculations.find(c=>c.table===tbl&&c.field===fld) : null; }
+
+function buildNav(filter=''){
+  nav.innerHTML=''; const f=filter.trim().toLowerCase();
+  const groups={locked:[],'under-review':[],pending:[]};
+  SCHEMA.tables.forEach(t=>{ const match=!f||t.name.toLowerCase().includes(f)||t.fields.some(fl=>fl.name.toLowerCase().includes(f)); if(match)(groups[t.status]||groups.locked).push(t); });
+  const labels={locked:'Locked','under-review':'Under review',pending:'Pending'};
+  ['locked','under-review','pending'].forEach(g=>{ if(!groups[g].length)return;
+    const lbl=document.createElement('div'); lbl.className='nav-group-label'; lbl.textContent=labels[g]; nav.appendChild(lbl);
+    groups[g].forEach(t=>{ const cc=t.fields.filter(x=>x.keyType==='calc').length;
+      const btn=document.createElement('button'); btn.className='nav-item'+(t.name===active?' active':'')+(t.status==='pending'?' pending':'');
+      btn.innerHTML=`<span class="dot" style="background:${roleColor(t.role)}"></span><span class="nm">${esc(t.name)}</span>${cc?`<span class="cc">ƒ${cc}</span>`:''}<span class="ct">${t.fields.length}</span>`;
+      btn.onclick=()=>{ active=t.name; render(); buildNav(document.getElementById('filter').value); }; nav.appendChild(btn); });
+  });
+  if(!nav.children.length)nav.innerHTML='<div class="nav-group-label">No matches</div>';
+}
+function renderTable(){
+  const t=SCHEMA.tables.find(x=>x.name===active);
+  const structural=t.fields.filter(f=>f.keyType!=='calc'), calcs=t.fields.filter(f=>f.keyType==='calc');
+  const rows=structural.map(f=>{ const st=f.status?`<span class="fstatus ${f.status}">${f.status}</span>`:'';
+    return `<tr><td class="fname">${esc(f.name)}</td><td class="ftype">${esc(f.type)}</td><td><span class="key-chip" style="background:${KEY_COLORS[f.keyType]||'var(--key-plain)'}">${f.keyType}</span></td><td class="cat">${esc(f.category||'')}</td><td>${st}</td><td class="fnote">${esc(f.notes||'')}</td></tr>`; }).join('');
+  const calcBlocks=calcs.map(f=>{ const man=manifestFor(t.name,f.name)||{}; const reads=man.reads||[];
+    const depChips=reads.map(r=>{ if(/^Get\(/.test(r))return `<span class="dep-chip env">${esc(r)}</span>`; if(r.startsWith('calc_'))return `<span class="dep-chip calc" data-jump="${esc(r)}">${esc(r)}</span>`; if(r.includes('.'))return `<span class="dep-chip cross">${esc(r)}</span>`; return `<span class="dep-chip">${esc(r)}</span>`; }).join('');
+    return `<div class="calc" data-calc="${esc(f.name)}" data-ref="${esc(f.calcRef||'')}"><div class="calc-hd"><span class="chev">▶</span><span class="cname">${esc(f.name)}</span><span class="ret">${esc(f.returns||'')}</span><span class="stored ${f.stored?'yes':'no'}">${f.stored?'stored':'unstored'}</span></div><div class="calc-body"><div class="code-wrap"><div class="code-loading">loading formula…</div></div>${reads.length?`<div class="deps"><div class="dl">reads</div><div class="dep-chips">${depChips}</div></div>`:''}${f.calcRef?`<div class="calcref">source · <a href="${BASE+f.calcRef}" target="_blank" rel="noopener">${esc(f.calcRef)}</a></div>`:''}</div></div>`; }).join('');
+  doc.innerHTML=`<div class="table-head"><h2>${esc(t.name)}</h2><span class="badge role" style="background:${roleColor(t.role)}">${esc(t.role)}</span><span class="badge s-${t.status}">${esc(t.status)}</span></div><p class="desc">${esc(t.description||'')}</p><div class="section-label">Fields <span class="n">${structural.length}</span></div><table class="fields"><thead><tr><th>Field</th><th>Type</th><th>Key</th><th>Category</th><th>Status</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>${calcs.length?`<div class="section-label">Calculations <span class="n">${calcs.length}</span></div>${calcBlocks}`:''}`;
+  doc.scrollTop=0;
+  doc.querySelectorAll('.calc').forEach(el=>{ el.querySelector('.calc-hd').onclick=async()=>{ el.classList.toggle('open');
+    if(el.classList.contains('open')&&!el.dataset.loaded){ el.dataset.loaded='1'; const ref=el.dataset.ref.split('/').pop(); const txt=await getCalc(ref); const wrap=el.querySelector('.code-wrap');
+      if(txt==null){ wrap.innerHTML='<div class="code-loading">formula unavailable</div>'; return; }
+      wrap.innerHTML=`<button class="copy-btn">copy</button><pre class="code">${highlight(txt.replace(/\n+$/,''))}</pre>`;
+      const btn=wrap.querySelector('.copy-btn'); btn.onclick=e=>{ e.stopPropagation(); navigator.clipboard.writeText(txt.replace(/\n+$/,'')).then(()=>{ btn.textContent='copied ✓'; btn.classList.add('done'); setTimeout(()=>{ btn.textContent='copy'; btn.classList.remove('done'); },1400); }); };
+    } }; });
+  doc.querySelectorAll('.dep-chip.calc').forEach(chip=>{ chip.onclick=()=>{ const target=doc.querySelector(`.calc[data-calc="${chip.dataset.jump}"]`); if(target){ target.querySelector('.calc-hd').click(); target.scrollIntoView({behavior:'smooth',block:'center'}); } }; });
+}
+function renderGraph(){
+  const t=SCHEMA.tables.find(x=>x.name===active); const calcs=t.fields.filter(f=>f.keyType==='calc');
+  doc.innerHTML=`<div class="table-head"><h2>${esc(t.name)}</h2><span class="badge role" style="background:${roleColor(t.role)}">${esc(t.role)}</span></div><p class="graph-note">Directed dependency graph from each calc's <code>reads</code> hint. Edges point from a calc to what it reads: the blast-radius view before a rename.</p><div class="g-legend"><span class="li"><span class="sw" style="background:var(--key-calc)"></span>calc</span><span class="li"><span class="sw" style="background:var(--key-plain)"></span>plain field</span><span class="li"><span class="sw" style="background:var(--key-fk)"></span>cross-table</span><span class="li"><span class="sw" style="background:var(--text-3)"></span>environment</span></div><svg id="graph"></svg>`;
+  if(!calcs.length){ doc.querySelector('#graph').outerHTML='<p class="empty">No calculations on this table.</p>'; return; }
+  if(typeof d3==='undefined'){ doc.querySelector('#graph').outerHTML='<p class="empty">Graph library unavailable offline.</p>'; return; }
+  const nodes={}, links=[]; const addNode=(id,type)=>{ if(!nodes[id])nodes[id]={id,type}; };
+  calcs.forEach(f=>{ addNode(f.name,'calc'); const man=manifestFor(t.name,f.name)||{}; (man.reads||[]).forEach(r=>{ let type='plain'; if(/^Get\(/.test(r))type='env'; else if(r.startsWith('calc_'))type='calc'; else if(r.includes('.'))type='cross'; addNode(r,type); links.push({source:f.name,target:r}); }); });
+  const nodeArr=Object.values(nodes); const svg=d3.select('#graph'); const W=svg.node().clientWidth, H=640; svg.attr('viewBox',`0 0 ${W} ${H}`);
+  const colorOf=ty=>({calc:'var(--key-calc)',cross:'var(--key-fk)',env:'var(--text-3)',plain:'var(--key-plain)'}[ty]||'var(--key-plain)');
+  svg.append('defs').append('marker').attr('id','arrow').attr('viewBox','0 -5 10 10').attr('refX',20).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto').append('path').attr('d','M0,-4L8,0L0,4').attr('fill','oklch(45% 0.02 285)');
+  const sim=d3.forceSimulation(nodeArr).force('link',d3.forceLink(links).id(d=>d.id).distance(90).strength(0.5)).force('charge',d3.forceManyBody().strength(-320)).force('center',d3.forceCenter(W/2,H/2)).force('collide',d3.forceCollide(38));
+  const link=svg.append('g').attr('stroke','oklch(38% 0.02 285)').attr('stroke-width',1.2).selectAll('line').data(links).join('line').attr('marker-end','url(#arrow)');
+  const node=svg.append('g').selectAll('g').data(nodeArr).join('g').style('cursor','grab').call(d3.drag().on('start',(e,d)=>{ if(!e.active)sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; }).on('drag',(e,d)=>{ d.fx=e.x; d.fy=e.y; }).on('end',(e,d)=>{ if(!e.active)sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+  node.append('circle').attr('r',d=>d.type==='calc'?9:6).attr('fill',d=>colorOf(d.type)).attr('stroke','var(--bg-code)').attr('stroke-width',2);
+  node.append('text').attr('class','g-node-label').attr('x',12).attr('y',4).text(d=>d.id);
+  sim.on('tick',()=>{ link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y); node.attr('transform',d=>`translate(${d.x},${d.y})`); });
+}
+function render(){ tab==='graph'?renderGraph():renderTable(); }
+document.querySelectorAll('.tabs button').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); tab=b.dataset.tab; render(); }; });
+document.getElementById('filter').addEventListener('input',e=>buildNav(e.target.value));
+boot();
+</script>
+</body>
+</html>

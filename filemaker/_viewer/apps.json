@@ -1,0 +1,9 @@
+{
+  "_meta": {
+    "purpose": "Registry of FileMaker apps the shared viewer can render. Add an app here and it appears in the launcher; no viewer code changes needed.",
+    "generated": "2026-07-16"
+  },
+  "apps": [
+    { "slug": "hml-llc", "name": "HML_LLC", "desc": "Hard money loan servicing. Reference implementation of the repo-native FileMaker doc standard." }
+  ]
+}
