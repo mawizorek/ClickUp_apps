@@ -26,6 +26,8 @@ Account balance = sum of its legs (plus the latest `Valuation` for feed-less ass
 
 **Why:** stored balances drift out of sync the moment anything is edited. Derived balances can't lie.
 
+**Refinement (DD-016):** a periodic **net-worth snapshot** is the ONE exception — it is a deliberate historical record, not a live balance, so it does not violate this rule.
+
 ## DD-004 — UI vocabulary: money-in / money-out, never "debit/credit" `LOCKED` (2026-07-15)
 
 The interface speaks in plain money-in / money-out. The double-entry balancing happens underneath; the user never types a debit or a credit.
@@ -76,19 +78,21 @@ Primary intake is **CSV import**, with **manual entry and manual post-import cle
 
 **Why:** FileMaker has no live bank feed, and Michael will drive intake by hand on a roughly weekly rhythm. Implications: (1) `ImportSessions` + a CSV mapper are **Phase 1**, not deferred; (2) `Account` needs a **per-account CSV column-mapping** (banks differ); (3) a **dedup key** (`rawHash`) prevents double-posting overlapping re-imports; (4) manual entry is a peer path, not a fallback. Sample CSV per bank gathered when the mapper is built.
 
-## DD-013 — Reimbursements & receivables ("owed to me") `LOCKED` (2026-07-15)
+**Prior art (2026-07-15):** Michael already has a **URITP BETA BUDGET** ClickUp space + a **Venmo** list with a real combined CSV statement (Chase, Capital One, Venmo balance; dad = Joseph J. Wizorek reimbursements, gig income from Alarm Will Sound / drafting clients). Scattered but a real sample of the intake shape — use it as the first CSV mapping target and as validation the model fits actual data.
+
+## DD-013 — Reimbursements & receivables ("owed to me") `LOCKED`; packaging RESOLVED (2026-07-15)
 
 maw-budget must track money Michael fronts that someone else pays back: **dad, U of R, gig-work payers, one-offs.** Model this as a **receivable**, not a special expense flag.
 
-**Why & how:** in double-entry this is a textbook receivable. Two clean options, and the double-entry model already supports both for free:
-- **(a) Party as an account.** Each reimbursing party (Dad, UofR, a gig client) is an `Account` of a new sub-type **receivable** (an asset = "money owed to me"). Fronting $100 for dad: `+100` expense (or the real category) offset by a leg that leaves a `+100` balance owed on "Due from Dad"; when dad pays you back, `-100` the receivable, `+100` checking. The receivable nets to zero and net worth is never overstated.
-- **(b) Reimbursable status + match.** A lighter tag on a transaction ("reimbursable, expected from X") with a later match to the incoming payment. Mirrors the Phase 2 Bill↔actual match pattern.
+**Mechanic:** in double-entry this is a textbook receivable. Fronting $100 for dad: `+100` expense (or the real category) and a `+100` balance owed on "Due from Dad"; when dad pays back, `-100` the receivable, `+100` checking. The receivable nets to zero and net worth is never overstated.
 
-**Design implications, regardless of which we pick:**
-- Validates a **party / payee** concept richer than a free-text string — reimbursers are real entities you track a running "owed" balance for.
+**RESOLVED (inquiry L, 2026-07-15):** Michael wants a **live "who owes me / how much" view**, in **Phase 1**. That resolves the packaging to **option (a): party-as-receivable-account.** Each reimbursing party is an `Account` of sub-type **receivable**; its live balance IS the "owed" number, so the view is just a filtered account list — no separate status/match machinery needed for the basic case. (Option (b) status+match is retired as the default; a Phase 2 match layer can still auto-clear receivables against incoming payments as a convenience.)
+
+**Design implications:**
+- **Parties** are real entities (a `Party` concept, or receivable `Account`s) you carry a running balance against — not free-text.
 - Adds a **receivable** account sub-type to the type taxonomy under DD-011.
-- **Gig-work income is distinct from a reimbursement:** gig pay is real income, not money paid back. "Gig accounts" as a payer is a party; the money landing is income, not a receivable clearing. Keep the two concepts separate.
-- Which of (a)/(b) is the default, and whether receivables are in **Phase 1** or fold into the Phase 2 match layer, is the open sub-question — see inquiry item **L**. The model choice (receivable, not a flag) is LOCKED; the packaging is open.
+- A **"Who owes me" view** = receivable accounts with non-zero balance. Phase 1.
+- **Gig-work income is distinct from a reimbursement:** gig pay is real income, not money paid back. Confirmed against real data (Venmo: Alarm Will Sound performance fees, drafting gigs = income; dad's Venmo transfers = the reimbursement/support pattern). "Gig payer" is a party; the money is income, not a receivable clearing.
 
 ## DD-014 — Hierarchical categories (parent → child) `LOCKED` (2026-07-15)
 
@@ -113,8 +117,37 @@ A single purchase can be **split across multiple categories** (Target run = Groc
 - Reports and category rollups (DD-014) already handle this for free — each split leg tags its own category and rolls up its own tree branch.
 - Reinforces: the ledger tags **legs**, not transactions, to categories. A "transaction category" is just the common case of a single-leg split.
 
+## DD-016 — Net worth over time (trend, via snapshots) `LOCKED` (2026-07-15)
+
+Michael wants to **watch net worth grow over time**, not just see today's number. (Answer to inquiry E.)
+
+**How:** a `NetWorthSnapshot` table — one row = {date, total net worth, optionally per-account balances at that moment}. The trend chart reads snapshots. This is the single sanctioned exception to DD-003 (stored vs derived): a snapshot is a deliberate historical record, not a live balance, so it can't "drift" — it's meant to be frozen.
+
+**Why snapshots vs full re-derivation:** you *can* re-derive any past net worth from the ledger, but feed-less assets (house/car) only have sparse valuations and back-dated edits would silently rewrite history. A frozen snapshot captures "what net worth was on this date" honestly and makes the chart cheap to draw.
+
+**Capture cadence:** manual/one-tap in Phase 1. **Autonomous capture (on app open, or every Monday 9a) is explicitly TABLED** — nice-to-have automation, Futures, not a v1 blocker. The table is built Phase 1 so the automation can be added later without a schema change.
+
+## DD-017 — Bills: expected-vs-actual, variable, soft forecasting `LOCKED` (direction) (2026-07-15)
+
+**What a "bill" is (proposed & accepted as the working definition):** a **recurring expected outflow on a schedule** — rent, utilities, subscriptions, insurance. The distinction from a normal transaction: a bill is something you *expect ahead of time* on a cadence, so it carries an **expected amount + a due schedule** and then gets **matched to the actual transaction** once paid. A one-off purchase is just a transaction; a bill is a transaction you saw coming. (Answer to inquiry G.)
+
+**Decisions:**
+- **Variable amounts, not fixed-only.** A `Bill` carries an **expected/forecast amount** (for planning) that can differ from the **actual amount** posted when paid (utilities swing month to month). Both are tracked; the variance is meaningful.
+- **Soft forecasting.** Upcoming bills surface as **visual flags on a clear schedule** (what's due, when, expected amount) — not a heavy reminders/notifications engine. "Softly for now," not the whole point of the app.
+- **Phase 2.** Bills + the bill↔actual match layer stay Phase 2 (per DD-007). The expected-vs-actual variance pattern is the HML `ExpectedTransactions` → `PaymentApplications` shape.
+
+**Implications:** `Bill` = {payee/party, category, expected amount, schedule/cadence, next-due date}; a match links the paid transaction back to its bill so "expected vs actual" and "paid vs upcoming" both compute. Reminders/push = Futures.
+
+## DD-018 — Feed-less asset valuation cadence: on-demand, softly nudged `PROVISIONAL` (2026-07-15)
+
+House/car re-valuation has **no rigid schedule**. Michael re-values **whenever** (a new estimate, a Kelley Blue Book check, a refi). The app **softly nudges** if a valuation is stale (e.g. >6–12 months old) rather than forcing a cadence. (Answer to inquiry F — Michael was unsure; this is the sensible default.)
+
+**Why:** you don't get a house/car statement, so there's no natural cadence. Forcing quarterly re-valuation is busywork; never prompting lets net worth quietly rot on stale numbers. On-demand + a gentle staleness flag is the honest middle. Marked PROVISIONAL — revisit once Michael has felt the rhythm in real use.
+
+**Plain-English note ("finance for idiots"):** a valuation is just *"what's this worth today, roughly?"* You're not tracking every gas fill-up on the car; you occasionally say "the car's worth ~$18k now" and that number feeds net worth until you update it. Same for the house. That's all a `Valuation` row is.
+
 ---
 
 ## Deferred / not yet decided
 
-Remaining open interrogation: **E–L** (net-worth-over-time, valuation cadence, bills, budgeting model, reports, reconciliation, platform, and reimbursement packaging/phase). See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
+Remaining open interrogation: **H** (budgeting model — phase 3), **I** (top-3 reports), **J** (reconciliation / cleared-vs-pending), **K** (desktop-only vs FileMaker Go mobile). Plus resolve **DD-008** naming. See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
