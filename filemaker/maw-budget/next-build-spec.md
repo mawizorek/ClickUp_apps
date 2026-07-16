@@ -8,7 +8,7 @@
 - 2026-07-15 brainstorm: core job = **account / net-worth tracking + bill/subscription tracking**, budgeting later. Single user (Michael). Naming = HML_LLC style (clean PascalCase, drop legacy SCREAMING names).
 - 2026-07-15 research pass (v0.1): benchmarked QuickBooks, YNAB/Monarch/Copilot/Actual, Firefly III, Maybe, GnuCash, and Bloomberg Terminal. Confirmed the double-entry lean. Deep-dive below.
 - 2026-07-15 (v0.2): **double-entry RULED IN by Michael.** Fork closed. Foundational design calls locked in `meta/design-decisions.md`. Now interrogating goals (below) BEFORE any table is written — no field-guessing.
-- 2026-07-15 (v0.2, inquiry): answers **A** and **B** captured (see Open inquiry). Import tooling confirmed as a **Phase 1** concern (CSV).
+- 2026-07-15 (v0.2, inquiry): answers **A** and **B** captured. Import tooling confirmed as a **Phase 1** concern (CSV). **Reimbursements** raised → receivables model (DD-013), new inquiry item **L**.
 
 ## Locked decisions (see `meta/design-decisions.md` for the why)
 
@@ -23,6 +23,7 @@
 - **DD-009 Single user.**
 - **DD-011 Full account-type coverage** — model supports every account class (see A).
 - **DD-012 CSV import + manual entry, ~weekly** — import tooling is Phase 1 (see B).
+- **DD-013 Reimbursements = receivables** — parties owed-by tracked as receivable accounts; gig income is separate (see L).
 
 ## Reference model deep-dive (researched 2026-07-15)
 
@@ -31,7 +32,7 @@
 - Core object is the **Chart of Accounts (COA)**: a typed list of every account, in 5 buckets: **Assets, Liabilities, Income (Revenue), Expenses, Equity.**
 - Every transaction posts to **>= 2 accounts** and must balance (double-entry). Usually one side is a bank/card account, the other is a category (income/expense) account.
 - Each account carries an **account type** (which report it feeds) plus a **detail type** (sub-classification).
-- Takeaway: our "Categories" are really income/expense accounts, and our "Accounts" are asset/liability accounts. Same COA, two flavors.
+- Takeaway: our "Categories" are really income/expense accounts, and our "Accounts" are asset/liability accounts. Same COA, two flavors. **Receivables ("owed to me") are just another asset account type** — see DD-013.
 
 ### Budgeting apps (the UX layer, not the ledger)
 
@@ -43,7 +44,7 @@
 
 ### Open-source accounting engines (the actual schema to copy)
 
-- **Firefly III** — `TransactionGroup -> TransactionJournal (the event) -> Transaction (the legs)`. Legs reference an account, carry a signed amount, sum to 0. The pattern we steal.
+- **Firefly III** — `TransactionGroup -> TransactionJournal (the event) -> Transaction (the legs)`. Legs reference an account, carry a signed amount, sum to 0. The pattern we steal. (Firefly models reimbursements exactly this way: a revenue/expense party account you carry a balance against.)
 - **Maybe** — adds point-in-time **Valuations** for feed-less assets. Adopted (DD-005).
 - **GnuCash** — classic strict double-entry desktop. Confirms the model.
 
@@ -69,13 +70,15 @@ The case a single-row model breaks — the reason for DD-001.
 - **Transfer (Checking -> Savings):** ONE group, TWO legs: `-100` Checking, `+100` Savings. Not income/expense. Nets to 0.
 - **Paying a credit card (Checking -> Visa):** ONE group: `-500` Checking (asset down), `+500` Visa (liability down). A card payment is a **transfer between your own accounts**, NOT an expense — the expense posted at swipe.
 - **The swipe (buying $500 on the Visa):** `+500` Expense category, `-500` Visa (liability up).
+- **Reimbursement (front $100 for dad):** ONE group: `+100` expense/category, `-100` "Due from Dad" (receivable, asset up = he owes you). When dad pays you: `+100` checking, `-100` "Due from Dad" (receivable clears). Net worth is never overstated. Same mechanic as a transfer, just against a party account (DD-013).
 - Net worth dropped $500 at swipe; paying the card just moves the liability off. Double-entry gets this exactly right; single-entry double-counts or loses the transfer.
 
 ## Proposed spine (double-entry flavor, HML naming) — SHAPE ONLY, not final fields
 
 > This is the object shape we're committing to conceptually. **Field lists are deliberately NOT written here** — they come after the Open inquiry below is answered, in a dedicated field-articulation session.
 
-- **Institutions** -> **Accounts** (`fkInstitution`; typed asset/liability, on/off budget, normal sign)
+- **Institutions** -> **Accounts** (`fkInstitution`; typed asset/liability/**receivable**, on/off budget, normal sign)
+- **Parties** (payers/payees you track a running balance against: Dad, UofR, gig clients) — shape TBD by inquiry L; may be modeled as receivable Accounts rather than a separate table
 - **TransactionGroups** (event: date, payee, memo) -> **TransactionLines** (legs: `fkAccount`, `fkCategory`, signed `amount`; sum to 0 per group)
 - **Categories** (self-referencing `fkParentCategory`; typed income/expense, envelope-ready)
 - **ImportSessions** (`fkAccount`; provenance + dedup `rawHash`)
@@ -87,8 +90,8 @@ The case a single-row model breaks — the reason for DD-001.
 
 ## Phasing (DD-007)
 
-- **Phase 1 (v1):** Institutions, Accounts, Categories, TransactionGroups, TransactionLines, ImportSessions, Valuations. Delivers balances, net worth, transfers, card payments, spend by category. **Import (CSV) is in v1 per DD-012.**
-- **Phase 2:** Bills (expected/recurring) + Bill<->actual match (HML `PaymentApplications` pattern).
+- **Phase 1 (v1):** Institutions, Accounts, Categories, TransactionGroups, TransactionLines, ImportSessions, Valuations. Delivers balances, net worth, transfers, card payments, spend by category. **Import (CSV) is in v1 per DD-012.** Reimbursement receivables likely land here too (pending L).
+- **Phase 2:** Bills (expected/recurring) + Bill<->actual match (HML `PaymentApplications` pattern). Reimbursement↔payment matching may share this layer.
 - **Phase 3:** Budgeting layer (envelope, Actual/YNAB style): `BudgetAllocations`; Available = assigned - activity + rollover.
 - **Out of scope v1:** investments, multi-currency, live market data.
 
@@ -96,15 +99,15 @@ The case a single-row model breaks — the reason for DD-001.
 
 > The point of this pass: pressure-test what the app is actually FOR, so fields are derived from real goals, not guessed. Each answer feeds directly into the field-articulation session.
 
-**A. Account inventory. ✅ ANSWERED (2026-07-15):** Michael wants to track **every account class** — checking, savings, each credit card, cash, loans/mortgage, retirement, house, car. Model must support all of them (→ DD-011). Two follow-ups still open, but they do NOT block schema shape (they're data, not structure):
-- Actual counts per type (how many checking, how many cards, etc.) — gather at data-entry time.
-- On-budget vs net-worth-only flag per account (e.g. mortgage/401k = net-worth-only). Design implication: `Account` carries an **on-budget boolean**; the per-account value is set when accounts are entered.
+**A. Account inventory. ✅ ANSWERED (2026-07-15):** track **every account class** — checking, savings, each card, cash, loans/mortgage, retirement, house, car (→ DD-011). Follow-ups (non-blocking): actual counts per type; on-budget vs net-worth-only flag per account (→ `Account` carries an on-budget boolean).
 
-**B. Data intake. ✅ ANSWERED (2026-07-15):** **CSV import** as the primary path, **with manual entry/adjustment steps** Michael takes by hand. Cadence: aiming every other day, realistically **~weekly** (→ DD-012). Design implications:
-- `ImportSessions` + CSV mapping is a **Phase 1** deliverable, not deferred.
-- Need a **per-account CSV column-mapping** concept (banks export different column layouts) and a **dedup key** (`rawHash`) so a re-imported overlapping CSV doesn't double-post.
-- Manual entry and manual post-import cleanup are first-class (not an afterthought).
-- Follow-up (non-blocking): which banks / what their CSV columns look like — gather a sample CSV per account when we build the mapper.
+**B. Data intake. ✅ ANSWERED (2026-07-15):** **CSV import** primary + **manual steps**, ~weekly (→ DD-012). `ImportSessions` + per-account CSV column-mapping + `rawHash` dedup are Phase 1. Follow-up: sample CSV per bank when building the mapper.
+
+**L. Reimbursements. ✅ RAISED (2026-07-15):** track money fronted and paid back by **dad, U of R, gig-work payers, one-offs** (→ DD-013). Modeled as a **receivable** ("owed to me"), not a special expense flag. Open sub-questions:
+- Default packaging: **(a)** party-as-receivable-account (carry a running "Due from X" balance) vs **(b)** a lighter reimbursable-status + later match to the incoming payment?
+- Phase: receivables in **Phase 1**, or fold the matching into the Phase 2 Bill↔actual layer?
+- Do you want a live "who owes me / how much" view, or just correctness in net worth?
+- Note: **gig-work income is NOT a reimbursement** — it's real income. "Gig payer" is a party; the money is income, not a receivable clearing. Confirm that split holds for how you think about it.
 
 **C. Categories — shape & granularity.** Flat list or hierarchical (parent → child)? Roughly how many? QuickBooks-style income/expense accounts, or simple spending buckets?
 
@@ -126,7 +129,7 @@ The case a single-row model breaks — the reason for DD-001.
 
 ## Next build (BLOCKED until inquiry answered)
 
-- Remaining inquiry: C–K. Plus resolve DD-008 naming.
+- Remaining inquiry: C–L. Plus resolve DD-008 naming.
 - THEN: spin up a fresh agent session to articulate real fields per object, writing `tables/` files + `schema/tables.json` off these answers.
 
 ## Futures
