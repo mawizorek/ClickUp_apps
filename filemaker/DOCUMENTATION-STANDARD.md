@@ -2,6 +2,7 @@
 
 **Status:** v1.3 · Locked 2026-07-14; calc-inline rule added 2026-07-15; calc-externalize rule replaced it 2026-07-16; **markdown calc sections retired 2026-07-16 (v1.3)** · **Source of truth:** this repo.
 **Supersedes:** the ClickUp "FileMaker Documentation Standards" doc, which becomes a one-line pointer here once the cull runs.
+**Why (decision log):** [`DECISIONS.md`](./DECISIONS.md) records the reasoning + reversals behind these rules.
 
 ---
 
@@ -26,7 +27,17 @@ This **replaces the old "11 fixed documentation pages" model.** Those pages deco
 - **Rendered inline, stored centralized.** The JSON-driven viewer fetches each `calcRef` file and shows the formula inline beside its field, so the human never navigates to read it. Storage location and presentation are decoupled: files centralized, presentation inline.
 - **The table markdown carries NO calc content (v1.3).** No formula bodies, no pointer list, no per-calc index. The most a table file does is a single prose line noting calcs exist and pointing at the `calculations/` folder. The JSON + manifest + renderer are the calc surface; a markdown pointer list would just be a second index to drift against, which is the exact duplication this model removes.
 
-**Supersession history.** The 2026-07-15 rule "calcs live inline in the owning table's markdown / do NOT centralize" was correct for a markdown-only world where inline was the only way a human saw the formula. 2026-07-16 externalized bodies to `calculations/` and briefly kept a markdown pointer list; v1.3 (same day) retired even the pointer list once the renderer proved out. A cross-table `meta/calculation-fields.md` is not used; the manifest replaces it.
+**Supersession history.** The 2026-07-15 rule "calcs live inline in the owning table's markdown / do NOT centralize" was correct for a markdown-only world where inline was the only way a human saw the formula. 2026-07-16 externalized bodies to `calculations/` and briefly kept a markdown pointer list; v1.3 (same day) retired even the pointer list once the renderer proved out. A cross-table `meta/calculation-fields.md` is not used; the manifest replaces it. Full reasoning: [`DECISIONS.md`](./DECISIONS.md) D-002 → D-003 → D-004.
+
+## Tooling — the shared viewer (`_viewer/`)
+
+The docs are meant to be **rendered**, not just read as raw markdown. `filemaker/_viewer/` is an app-agnostic viewer that renders any app documented to this standard, driven entirely by that app's `schema/tables.json` + `calculations/`:
+
+- **`_viewer/schema.html?app=<slug>`** — field tables with key-type color coding + per-calc formula (fetched live from the `.fmcalc` file, FileMaker syntax highlighting, copy-to-clipboard) + a dependency graph from each calc's `reads` hint.
+- **`_viewer/linter.html?app=<slug>`** — validates `calculations/` against the schema (orphan/missing `calcRef`, balanced parens/brackets/quotes, unused `Let` vars, same- and cross-table `reads` resolution, manifest↔schema coverage, header match). Run it before opening a calc PR.
+- **`_viewer/index.html`** — launcher; reads `_viewer/apps.json`. **Register a new app by adding one row to `apps.json`** — no viewer code changes. Live: `https://mawizorek.github.io/ClickUp_apps/filemaker/_viewer/?app=<slug>`.
+
+The viewer is live-only (same-origin fetch on Pages); it holds no app data of its own. An app becomes fully viewable the moment its `schema/` + `calculations/` exist and it's registered in `apps.json`.
 
 ## Per-app structure
 
@@ -48,11 +59,11 @@ filemaker/<app-slug>/
   notes/                 per-build / session notes, PR-linked
 ```
 
-Copy `_template-fmp-app/` to start a new app. Every future FMP app uses this shape; HML_LLC is the reference implementation.
+Copy `_template-fmp-app/` to start a new app. Every future FMP app uses this shape; HML_LLC is the reference implementation. (`_viewer/` and `_template-fmp-app/` are infra, not apps.)
 
 ## Rendering manifests (`_index.json`)
 
-Every mirror folder carries an `_index.json` machine manifest so the **Phase 2 viewer skin** can render the folder without app-specific logic. Humans read the markdown; the viewer reads the JSON. **Keep them in sync in the same PR** — a folder's markdown is never "done" until its `_index.json` reflects it.
+Every mirror folder carries an `_index.json` machine manifest so the **viewer** can render the folder without app-specific logic. Humans read the markdown; the viewer reads the JSON. **Keep them in sync in the same PR** — a folder's markdown is never "done" until its `_index.json` reflects it.
 
 ## Object file formats
 
@@ -97,6 +108,7 @@ Every object edit = branch → PR → self-merge (per GitHub MCP Operating Stand
 
 ## Changelog
 
+- **2026-07-16 (v1.3.1):** Added the **Tooling** section — promoted the schema renderer + calc linter into `_viewer/` (app-agnostic, `?app=<slug>`, registered via `apps.json`). Added domain decision log `DECISIONS.md` and cross-linked it. Retired the stale `hml-llc/meta/calculation-fields.md` to a breadcrumb.
 - **2026-07-16 (v1.3):** Retired the table-markdown `Calculations` section entirely (not even a pointer list). `calculations/` + `calcRef` + the manifest + the renderer are the sole calc surface. Stripped the inline blocks from Loans, ExpectedTransactions, GLOBAL_USE_VARIABLES.
 - **2026-07-16 (v1.2):** Calc bodies externalized to `calculations/` (one `.fmcalc` per field, verbatim + round-trippable), referenced by `calcRef` in `schema/tables.json`. Added `calculations/_index.json` manifest with dependency hints. Supersedes the 2026-07-15 inline-calc lock. HML_LLC migrated as the reference implementation.
 - **2026-07-15 (v1.1):** Added the (now-superseded) calc-inline rule.

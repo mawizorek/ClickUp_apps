@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calc Linter</title>
+<style>
+  :root {
+    --bg-0: oklch(16% 0.012 285); --bg-1: oklch(19% 0.014 285); --bg-2: oklch(23% 0.016 285); --bg-3: oklch(27% 0.018 285);
+    --line: oklch(32% 0.02 285); --line-soft: oklch(27% 0.016 285);
+    --text-0: oklch(94% 0.008 285); --text-1: oklch(78% 0.012 285); --text-2: oklch(63% 0.014 285); --text-3: oklch(52% 0.014 285);
+    --accent: oklch(72% 0.14 285); --ok: oklch(72% 0.14 155); --warn: oklch(78% 0.14 75); --danger: oklch(68% 0.17 25);
+    --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace; --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; --ease: cubic-bezier(0.22,1,0.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg-0); color: var(--text-1); font-weight: 350; line-height: 1.55; letter-spacing: 0.01em; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  h1,h2 { text-wrap: balance; color: var(--text-0); letter-spacing: 0; }
+  a { color: var(--accent); }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 48px 24px; }
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+  .back { font-size: 0.6875rem; color: var(--text-3); text-decoration: none; }
+  .kicker { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); font-weight: 600; margin-top: 6px; }
+  h1 { font-size: 1.75rem; font-weight: 600; margin-top: 8px; } h1 span { font-family: var(--mono); }
+  .status { display: flex; align-items: center; gap: 7px; font-size: 0.6875rem; font-family: var(--mono); color: var(--text-2); }
+  .status .led { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); }
+  .status.live .led { background: var(--ok); box-shadow: 0 0 6px var(--ok); } .status.err .led { background: var(--danger); }
+  .rerun { background: var(--bg-2); border: 1px solid var(--line); color: var(--text-1); font-family: var(--sans); font-size: 0.8125rem; font-weight: 500; padding: 7px 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+  .rerun:hover { background: var(--bg-3); color: var(--text-0); }
+  .verdict { border-radius: 14px; padding: 24px; margin-bottom: 32px; border: 1px solid var(--line); display: flex; align-items: center; gap: 24px; }
+  .verdict.pass { background: color-mix(in oklch, var(--ok), var(--bg-0) 84%); border-color: color-mix(in oklch, var(--ok), transparent 55%); }
+  .verdict.warn { background: color-mix(in oklch, var(--warn), var(--bg-0) 86%); border-color: color-mix(in oklch, var(--warn), transparent 55%); }
+  .verdict.fail { background: color-mix(in oklch, var(--danger), var(--bg-0) 85%); border-color: color-mix(in oklch, var(--danger), transparent 50%); }
+  .verdict .mark { font-size: 2rem; line-height: 1; }
+  .verdict .vtext h2 { font-size: 1.125rem; font-weight: 600; } .verdict .vtext p { font-size: 0.875rem; color: var(--text-2); margin-top: 2px; }
+  .counts { display: flex; gap: 12px; margin-left: auto; } .count { text-align: center; font-variant-numeric: tabular-nums; }
+  .count .num { font-size: 1.5rem; font-weight: 600; font-family: var(--mono); } .count .lbl { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); }
+  .count.err .num { color: var(--danger); } .count.warn .num { color: var(--warn); } .count.pass .num { color: var(--ok); }
+  .checks-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .chk { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-1); border: 1px solid var(--line-soft); border-radius: 10px; }
+  .chk .ci { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .chk.ok .ci { background: var(--ok); } .chk.warn .ci { background: var(--warn); } .chk.err .ci { background: var(--danger); }
+  .chk .cn { font-size: 0.8125rem; color: var(--text-1); flex: 1; } .chk .cc { font-family: var(--mono); font-size: 0.75rem; color: var(--text-3); }
+  .findings h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); font-weight: 600; margin: 32px 0 12px; }
+  .finding { display: flex; gap: 12px; padding: 12px 16px; border-radius: 10px; margin-bottom: 8px; background: var(--bg-1); border: 1px solid var(--line-soft); }
+  .finding .sev { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; padding: 2px 8px; border-radius: 999px; height: fit-content; white-space: nowrap; }
+  .finding.error .sev { color: var(--danger); border: 1px solid color-mix(in oklch, var(--danger), transparent 55%); }
+  .finding.warning .sev { color: var(--warn); border: 1px solid color-mix(in oklch, var(--warn), transparent 55%); }
+  .finding .where { font-family: var(--mono); font-size: 0.75rem; color: var(--text-0); } .finding .msg { font-size: 0.8125rem; color: var(--text-2); margin-top: 2px; } .finding .rule { font-family: var(--mono); font-size: 0.625rem; color: var(--text-3); margin-top: 4px; }
+  .allclear { text-align: center; padding: 48px 24px; color: var(--text-3); } .allclear .big { font-size: 2.5rem; } .allclear p { font-size: 0.9375rem; margin-top: 12px; }
+  .loading { text-align: center; padding: 48px; color: var(--text-3); font-family: var(--mono); font-size: 0.875rem; }
+  .fatal { padding: 48px 0; color: var(--text-2); } .fatal code { font-family: var(--mono); background: var(--bg-2); padding: 1px 6px; border-radius: 4px; color: var(--text-0); }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line-soft); font-size: 0.75rem; color: var(--text-3); } footer code { font-family: var(--mono); background: var(--bg-2); padding: 1px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><a class="back" href="index.html">← all apps</a><div class="kicker">Calc Linter</div><h1><span id="appName">…</span></h1></div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px"><div class="status" id="srcStatus"><span class="led"></span><span id="srcStatusText">connecting…</span></div><button class="rerun" id="rerun">Re-run</button></div>
+  </header>
+  <div id="out"><div class="loading">fetching schema + calc files…</div></div>
+  <footer>Rules: orphan/missing <code>calcRef</code> · balanced parens/brackets/quotes · <code>Let</code> declared-but-unused · same-table <code>reads</code> resolve · cross-table <code>Table.field</code> resolve · manifest↔schema coverage · header matches <code>Table::field</code>. <code>reads</code> hints are hand-authored; this is what validates them.</footer>
+</div>
+<script>
+const params=new URLSearchParams(location.search); const APP=params.get('app');
+if(!APP){ document.body.innerHTML='<div class="wrap"><div class="fatal">No app specified. Use <code>?app=&lt;slug&gt;</code> or go back to <a href="index.html">the launcher</a>.</div></div>'; throw new Error('no app'); }
+const BASE='../'+APP+'/'; document.getElementById('appName').textContent=APP;
+const CHECKS=[{id:'calcref-resolves',name:'calcRef resolves to a file'},{id:'calcref-present',name:'Every calc field has calcRef'},{id:'balanced',name:'Balanced parens / brackets / quotes'},{id:'let-vars',name:'Let vars declared are used'},{id:'reads-same',name:'Same-table reads resolve to a field'},{id:'reads-cross',name:'Cross-table Table.field resolves'},{id:'manifest-cover',name:'Manifest ↔ schema coverage'},{id:'header',name:'File header matches Table::field'}];
+async function tryFetch(p){ try{ const r=await fetch(BASE+p,{cache:'no-store'}); if(!r.ok)throw 0; return await r.text(); }catch(e){ return null; } }
+function lexParenBalance(src){ const stack=[]; const pairs={')':'(',']':'['}; let i=0,n=src.length,quoteOpen=false;
+  while(i<n){ const c=src[i]; if(c==='/'&&src[i+1]==='/'){ let j=src.indexOf('\n',i); i=j===-1?n:j; continue; }
+    if(c==='"'){ let j=i+1; while(j<n&&src[j]!=='"'){ if(src[j]==='\\')j++; j++; } if(j>=n){ quoteOpen=true; break; } i=j+1; continue; }
+    if(c==='('||c==='[')stack.push(c); else if(c===')'||c===']'){ if(stack.pop()!==pairs[c])return {ok:false,reason:`unmatched '${c}'`}; } i++; }
+  if(quoteOpen)return {ok:false,reason:'unterminated string literal'}; if(stack.length)return {ok:false,reason:`${stack.length} unclosed '${stack[stack.length-1]}'`}; return {ok:true};
+}
+function codeOnly(src){ let out='',i=0,n=src.length; while(i<n){ const c=src[i]; if(c==='/'&&src[i+1]==='/'){ let j=src.indexOf('\n',i); i=j===-1?n:j; continue; } if(c==='"'){ let j=i+1; while(j<n&&src[j]!=='"'){ if(src[j]==='\\')j++; j++; } i=Math.min(j+1,n); out+=' '; continue; } out+=c; i++; } return out; }
+function letVarCheck(src){ const code=codeOnly(src); const issues=[]; const declRe=/([_~][A-Za-z0-9_]*)\s*=/g; const declared=new Set(); let m; while((m=declRe.exec(code)))declared.add(m[1]); if(!declared.size)return issues;
+  declared.forEach(v=>{ const useRe=new RegExp('(^|[^A-Za-z0-9_])'+v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'($|[^A-Za-z0-9_=])','g'); const uses=(code.match(useRe)||[]).length; if(uses<1)issues.push(v); }); return issues; }
+function classifyRead(r){ if(/^Get\(/.test(r))return 'env'; if(r.startsWith('calc_'))return 'calc'; if(r.includes('.'))return 'cross'; return 'plain'; }
+async function run(){
+  const out=document.getElementById('out'); out.innerHTML='<div class="loading">fetching schema + calc files…</div>';
+  const [schemaTxt,manifestTxt]=await Promise.all([ tryFetch('schema/tables.json'), tryFetch('calculations/_index.json') ]);
+  const st=document.getElementById('srcStatus'), stt=document.getElementById('srcStatusText');
+  if(!schemaTxt){ st.className='status err'; stt.textContent='schema not found'; out.innerHTML=`<div class="fatal">Could not load <code>${APP}/schema/tables.json</code>.</div>`; return; }
+  let schema=null, manifest=null; try{ schema=JSON.parse(schemaTxt); }catch(e){ st.className='status err'; stt.textContent='schema parse error'; out.innerHTML='<div class="fatal">schema/tables.json did not parse.</div>'; return; }
+  if(manifestTxt){ try{ manifest=JSON.parse(manifestTxt); }catch(e){} }
+  st.className='status live'; stt.textContent='live · v'+(schema._meta.schemaVersion||'?');
+  const fieldIndex={}, calcFields=[]; schema.tables.forEach(t=>{ fieldIndex[t.name]=new Set(t.fields.map(f=>f.name)); t.fields.filter(f=>f.keyType==='calc').forEach(f=>calcFields.push({table:t.name,field:f.name,calcRef:f.calcRef,stored:f.stored,returns:f.returns})); });
+  const manifestCalcs=manifest?manifest.calculations:null; const mkey=c=>c.table+'::'+c.field; const manifestMap={}; if(manifestCalcs)manifestCalcs.forEach(c=>manifestMap[mkey(c)]=c);
+  const bodies={}; await Promise.all(calcFields.map(async cf=>{ const fn=(cf.calcRef||`calculations/${cf.table}__${cf.field}.fmcalc`).split('/').pop(); bodies[fn]=await tryFetch('calculations/'+fn); }));
+  const findings=[]; const checkCounts={}; CHECKS.forEach(c=>checkCounts[c.id]={err:0,warn:0});
+  const add=(id,sev,where,msg)=>{ findings.push({checkId:id,sev,where,msg}); checkCounts[id][sev==='error'?'err':'warn']++; };
+  for(const cf of calcFields){ const key=cf.table+'::'+cf.field; const fn=(cf.calcRef||`calculations/${cf.table}__${cf.field}.fmcalc`).split('/').pop(); const body=bodies[fn];
+    if(!cf.calcRef)add('calcref-present','error',key,'calc field has no calcRef pointer in schema/tables.json');
+    if(body==null){ add('calcref-resolves','error',key,`calcRef points at ${fn} but the file could not be read`); continue; }
+    const firstLine=body.split('\n')[0].trim(); const expected=`// ${cf.table}::${cf.field}`; if(firstLine!==expected)add('header','warning',key,`header line is "${firstLine}", expected "${expected}"`);
+    const bal=lexParenBalance(body); if(!bal.ok)add('balanced','error',key,bal.reason);
+    letVarCheck(body).forEach(v=>add('let-vars','warning',key,`Let variable "${v}" is declared but never used`));
+    const man=manifestMap[key]; if(man&&man.reads){ man.reads.forEach(r=>{ const cls=classifyRead(r);
+      if(cls==='plain'||cls==='calc'){ if(fieldIndex[cf.table]&&!fieldIndex[cf.table].has(r))add('reads-same','error',key,`reads "${r}" but that field is not on ${cf.table}`); }
+      else if(cls==='cross'){ const [tbl,fld]=r.split('.'); if(!fieldIndex[tbl])add('reads-cross','error',key,`reads "${r}" but table ${tbl} does not exist`); else if(!fieldIndex[tbl].has(fld))add('reads-cross','error',key,`reads "${r}" but ${fld} is not on ${tbl}`); } }); }
+  }
+  if(manifestCalcs){ const schemaKeys=new Set(calcFields.map(c=>c.table+'::'+c.field)); const manKeys=new Set(manifestCalcs.map(mkey));
+    schemaKeys.forEach(k=>{ if(!manKeys.has(k))add('manifest-cover','warning',k,'calc field in schema has no entry in calculations/_index.json'); });
+    manKeys.forEach(k=>{ if(!schemaKeys.has(k))add('manifest-cover','error',k,'manifest entry has no matching calc field in schema/tables.json (orphan)'); });
+  } else add('manifest-cover','warning','_index.json','manifest could not be read; coverage check skipped');
+  render(out,{findings,checkCounts,calcCount:calcFields.length});
+}
+function render(out,res){
+  const errors=res.findings.filter(f=>f.sev==='error'), warns=res.findings.filter(f=>f.sev==='warning');
+  const verdict=errors.length?'fail':(warns.length?'warn':'pass');
+  const vmap={pass:{mark:'✓',h:'Clean',p:`${res.calcCount} calc fields validated, no issues.`},warn:{mark:'!',h:'Passes with warnings',p:`${res.calcCount} calc fields validated. ${warns.length} warning${warns.length>1?'s':''}, 0 errors.`},fail:{mark:'✕',h:'Failing',p:`${errors.length} error${errors.length>1?'s':''} across ${res.calcCount} calc fields. Fix before shipping.`}}[verdict];
+  let html=`<div class="verdict ${verdict}"><span class="mark">${vmap.mark}</span><div class="vtext"><h2>${vmap.h}</h2><p>${vmap.p}</p></div><div class="counts"><div class="count ${errors.length?'err':''}"><div class="num">${errors.length}</div><div class="lbl">errors</div></div><div class="count ${warns.length?'warn':''}"><div class="num">${warns.length}</div><div class="lbl">warnings</div></div><div class="count pass"><div class="num">${res.calcCount}</div><div class="lbl">calcs</div></div></div></div><div class="checks-summary">`;
+  CHECKS.forEach(c=>{ const cc=res.checkCounts[c.id]; const cls=cc.err?'err':(cc.warn?'warn':'ok'); const label=cc.err?`${cc.err} err`:(cc.warn?`${cc.warn} warn`:'pass'); html+=`<div class="chk ${cls}"><span class="ci"></span><span class="cn">${c.name}</span><span class="cc">${label}</span></div>`; });
+  html+=`</div>`;
+  if(!res.findings.length){ html+=`<div class="allclear"><div class="big">✓</div><p>Every calc file resolves, parses balanced, and its dependency hints check out against the schema.</p></div>`; }
+  else { html+=`<div class="findings">`; if(errors.length){ html+=`<h3>Errors</h3>`; errors.forEach(f=>html+=finding(f)); } if(warns.length){ html+=`<h3>Warnings</h3>`; warns.forEach(f=>html+=finding(f)); } html+=`</div>`; }
+  out.innerHTML=html;
+}
+function finding(f){ const chk=CHECKS.find(c=>c.id===f.checkId); return `<div class="finding ${f.sev}"><span class="sev">${f.sev}</span><div class="body"><div class="where">${f.where}</div><div class="msg">${f.msg}</div><div class="rule">${chk?chk.name:f.checkId}</div></div></div>`; }
+document.getElementById('rerun').onclick=run; run();
+</script>
+</body>
+</html>
