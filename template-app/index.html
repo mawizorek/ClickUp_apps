@@ -1,242 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<!-- INFRASTRUCTURE: modular router shell + pages/ partials (hash router, theme spine). Pages-hosted only, not file:// capable. -->
+<!-- GOLD STANDARD TEMPLATE. Copy this folder to start a new app; swap the APP_* constants + "App Name"/slug placeholders. -->
+<html lang="en" data-theme="default-theme" data-mode="mid">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="github-folder" content="template-app">
-<title>Template Reference</title>
-<!-- INFRASTRUCTURE: self-contained (no external data file) -->
-<style>
-:root {
-  --bg: oklch(10% 0.015 260);
-  --surface: oklch(15% 0.012 260);
-  --surface-2: oklch(19% 0.01 260);
-  --text: oklch(93% 0.005 260);
-  --text-mid: oklch(76% 0.008 260);
-  --text-muted: oklch(58% 0.01 260);
-  --text-dim: oklch(44% 0.008 260);
-  --accent: oklch(72% 0.14 200);
-  --accent-soft: oklch(72% 0.14 200 / 0.1);
-  --green: oklch(72% 0.14 155);
-  --border: oklch(24% 0.008 260);
-  --code-bg: oklch(12% 0.01 260);
-  --radius: 10px;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100svh;
-  -webkit-font-smoothing: antialiased;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-
-.container {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 36px 16px 100px;
-}
-
-.badge-top {
-  display: inline-block;
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border: 1px solid oklch(35% 0.08 200);
-  padding: 4px 10px;
-  border-radius: 4px;
-  margin-bottom: 16px;
-}
-
-h1 {
-  font-size: clamp(1.5rem, 5vw, 1.875rem);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  margin-bottom: 8px;
-}
-
-.subtitle {
-  font-size: 0.8125rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin-bottom: 28px;
-}
-
-section {
-  margin-bottom: 28px;
-}
-
-h2 {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--text-mid);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 12px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-}
-
-.folder-tree {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 18px;
-  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
-  font-size: 0.75rem;
-  line-height: 1.8;
-  color: var(--text-mid);
-  overflow-x: auto;
-}
-
-.folder-tree .dir { color: var(--accent); font-weight: 600; }
-.folder-tree .file { color: var(--text-muted); }
-.folder-tree .note { color: var(--text-dim); font-style: italic; }
-
-.checklist {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.checklist li {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.8125rem;
-  color: var(--text-mid);
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.checklist li::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
-  flex-shrink: 0;
-  margin-top: 6px;
-}
-
-.links {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.link-card {
-  display: block;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-  text-decoration: none;
-  color: var(--text-mid);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  transition: border-color 150ms;
-}
-
-.link-card:hover { border-color: var(--accent); }
-.link-card span { color: var(--text-dim); font-weight: 400; display: block; font-size: 0.6875rem; margin-top: 2px; }
-
-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: oklch(10% 0.015 260 / 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border);
-  text-align: center;
-  font-size: 0.625rem;
-  color: var(--text-dim);
-}
-
-footer a { color: var(--text-muted); text-decoration: none; }
-
-@media (min-width: 640px) {
-  .container { max-width: 600px; padding: 48px 24px 100px; }
-}
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#9a9a9a">
+<meta name="robots" content="noindex, nofollow">
+<title>App Name</title>
+<meta name="description" content="One-line description of what this app does.">
+<!-- Open Graph / Twitter. Drop a real og.png (1200x630, <300KB) at the app root via the GitHub UI. -->
+<meta property="og:title" content="App Name">
+<meta property="og:description" content="One-line description of what this app does.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/template-app/">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/template-app/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="App Name">
+<meta name="twitter:description" content="One-line description of what this app does.">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/template-app/og.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#129513;</text></svg>">
+<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<!-- THEME SPINE: static themes.css = instant themed first paint; resolve.js = live switching. -->
+<link rel="stylesheet" href="../shared/themes/themes.css">
+<link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<div class="container">
-  <div class="badge-top">Reference template</div>
-  <h1>App Build Standard</h1>
-  <p class="subtitle">This folder is the scaffold every new app starts from. Copy it, rename it, build on it. Everything here defines the shape, docs, and workflow that all apps in this repo follow.</p>
-
-  <section>
-    <h2>Required folder shape</h2>
-    <div class="folder-tree">
-      <span class="dir">your-app/</span><br>
-      ├── <span class="file">index.html</span> <span class="note">← the app itself + Pages entry point</span><br>
-      ├── <span class="file">README.md</span> <span class="note">← permanent docs, launch link, architecture</span><br>
-      ├── <span class="file">next-build-spec.md</span> <span class="note">← current build contract (overwritten each cycle)</span><br>
-      ├── <span class="file">data.json</span> <span class="note">← optional, for data-separated apps</span><br>
-      └── <span class="dir">source/</span> <span class="note">← chunk set for Brain readback (if app &gt; 30KB)</span>
-    </div>
-  </section>
-
-  <section>
-    <h2>README structure (every app)</h2>
-    <ul class="checklist">
-      <li>Title + launch button at the very top</li>
-      <li>Status line (Live / Source of truth)</li>
-      <li>What it does</li>
-      <li>How to use it</li>
-      <li>Infrastructure table (files + roles + update frequency)</li>
-      <li>Architecture (non-obvious technical decisions)</li>
-      <li>Version history (highlights, commit history is authoritative)</li>
-      <li>Related links (ClickUp task, revision history)</li>
-      <li>Roadmap</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Build workflow</h2>
-    <ul class="checklist">
-      <li><strong>Brainstorm Gate</strong> — 7 teams, all fired before any spec is written</li>
-      <li><strong>Session 1 (Spec Agent)</strong> — hash out changes, commit next-build-spec.md</li>
-      <li><strong>Session 2 (Render Agent)</strong> — reads spec, applies diffs, delivers artifact</li>
-      <li><strong>Pre-ship gates</strong> — Syntax Gate + Runtime/Sandbox Gate, both mandatory</li>
-      <li><strong>Ship</strong> — version comment, twin capture, field updates</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Quick links</h2>
-    <div class="links">
-      <a href="https://mawizorek.github.io/ClickUp_apps/app-dashboard/" class="link-card">
-        App Dashboard
-        <span>Live launcher for all repo apps</span>
-      </a>
-      <a href="https://github.com/mawizorek/ClickUp_apps" class="link-card">
-        GitHub Repo
-        <span>mawizorek/ClickUp_apps</span>
-      </a>
-      <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app" class="link-card">
-        This folder on GitHub
-        <span>template-app/ — the physical scaffold</span>
-      </a>
-    </div>
-  </section>
+<!-- ACCESS GATE (config.json drives it; inline fallback keeps it working on file:// or a 404) -->
+<div id="access-gate" hidden>
+  <div class="gate-card">
+    <h1 id="gate-title">Under maintenance</h1>
+    <p id="gate-msg">This app is being updated. Check back soon.</p>
+    <form id="gate-form">
+      <input id="gate-code" type="password" inputmode="numeric" autocomplete="off" aria-label="Access code" placeholder="Access code">
+      <button type="submit">Enter</button>
+    </form>
+  </div>
 </div>
 
-<footer>
-  <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app">template-app</a> · reference page · 2026-07-02
-</footer>
+<a class="skip-link" href="#view">Skip to content</a>
+<header id="appHeader"></header>
+<main id="view" tabindex="-1"></main>
+<footer id="appFooter"></footer>
+
+<noscript>This app needs JavaScript enabled to run.</noscript>
+
+<script src="../shared/themes/resolve.js"></script>
+<script src="./chrome.js"></script>
+<script>
+(function () {
+  /* ==== APP CONSTANTS — swap these when you copy the template ==== */
+  var APP_NAME    = "App Name";
+  var APP_VERSION = "v1";
+  var APP_PR      = 0;              // merged PR number that shipped this version
+  var DEFAULT_THEME = (window.THEMES && THEMES.DEFAULT) || "default-theme";
+  var DEFAULT_PAGE  = "home";       // one-line landing repoint, no rebuild needed
+  var NAV = [
+    { route: "home",  label: "Home" },
+    { route: "about", label: "About" }
+  ];
+  /* ============================================================= */
+
+  /* ---- THEME: apply saved (or default) via the spine ---- */
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem("app_theme"); } catch (e) {}
+  if (window.THEMES) { THEMES.apply(savedTheme || DEFAULT_THEME, { root: document.documentElement }); }
+
+  /* ---- ACCESS GATE ---- */
+  (function gate() {
+    var FALLBACK = { access: "gated", code: "0000",
+      coverTitle: "Under maintenance", coverMessage: "This app is being updated. Check back soon.",
+      downTitle: "Temporarily offline", downMessage: "This app is currently unavailable." };
+    var SS = "gate_ok";
+    function apply(cfg) {
+      var g = document.getElementById("access-gate");
+      if (cfg.access === "open" || sessionStorage.getItem(SS) === "1") { g.remove(); return; }
+      g.hidden = false;
+      var form = document.getElementById("gate-form");
+      if (cfg.access === "down") {
+        document.getElementById("gate-title").textContent = cfg.downTitle || FALLBACK.downTitle;
+        document.getElementById("gate-msg").textContent  = cfg.downMessage || FALLBACK.downMessage;
+        form.style.display = "none"; return;
+      }
+      document.getElementById("gate-title").textContent = cfg.coverTitle || FALLBACK.coverTitle;
+      document.getElementById("gate-msg").textContent  = cfg.coverMessage || FALLBACK.coverMessage;
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (document.getElementById("gate-code").value.trim() === String(cfg.code)) {
+          sessionStorage.setItem(SS, "1"); g.remove();
+        } else { var c = document.getElementById("gate-code"); c.value = ""; c.focus(); }
+      });
+    }
+    fetch("./config.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); })
+      .catch(function () { var c = null; try { c = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(c || FALLBACK); });
+  })();
+
+  /* ---- CHROME: header (banner + menu + settings drawer) + footer ---- */
+  Chrome.init({
+    appName: APP_NAME, version: APP_VERSION, pr: APP_PR,
+    nav: NAV, defaultTheme: DEFAULT_THEME, logo: "\uD83E\uDDE9",
+    sources: [ /* { label: "Source ↗", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/template-app" } */ ]
+  });
+
+  /* ---- ROUTER: hash -> pages/<route>.html injected into #view ---- */
+  var view = document.getElementById("view");
+  var routes = NAV.map(function (n) { return n.route; });
+  function render(route) {
+    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
+    fetch("./pages/" + route + ".html", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+      .then(function (html) { view.innerHTML = html; Chrome.setActive(route); view.focus(); window.scrollTo(0, 0); })
+      .catch(function () {
+        view.innerHTML = '<section class="page"><h1>Page not found</h1>' +
+          '<p class="muted">No page matches <code>#' + route + '</code>.</p></section>';
+      });
+  }
+  function current() { return (location.hash || "").replace(/^#/, "") || DEFAULT_PAGE; }
+  window.addEventListener("hashchange", function () { render(current()); });
+  render(current());
+})();
+</script>
 </body>
 </html>
