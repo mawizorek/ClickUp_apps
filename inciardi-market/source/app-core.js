@@ -1,7 +1,8 @@
-/* Inciardi Market v10 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
-const BUILD = "v10.1";
-const PR = 174; // merged PR that shipped this version
+/* Inciardi Market v12 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
+const BUILD = "v12";
+const PR = 246; // merged PR that shipped this version
 const API_DEFAULT = "https://inciardi-market.mawizorek-online.workers.dev";
+const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fallback can render
 
 const $ = (id) => document.getElementById(id);
 function apiBase(){ return (localStorage.getItem("inciardi_ep") || "").trim() || API_DEFAULT; }
@@ -10,21 +11,30 @@ function canWrite(){ return !!wkey(); }
 
 async function apiGet(path, fallback){
  const key = "cache:" + path;
+ const ctrl = new AbortController();
+ const timer = setTimeout(()=>ctrl.abort(), API_TIMEOUT_MS);
  try{
- const r = await fetch(apiBase() + path, { headers:{ Accept:"application/json" } });
- if(!r.ok) throw 0; const d = await r.json(); if(d && d.error) throw 0;
+ let d;
+ try{
+ const r = await fetch(apiBase() + path, { headers:{ Accept:"application/json" }, signal: ctrl.signal });
+ if(!r.ok) throw 0; d = await r.json(); if(d && d.error) throw 0;
+ } finally { clearTimeout(timer); }
  try{ localStorage.setItem(key, JSON.stringify(d)); }catch(e){}
  return d;
  }catch(e){
- const c = localStorage.getItem(key); if(c) return JSON.parse(c);
+ const c = localStorage.getItem(key); if(c){ try{ return JSON.parse(c); }catch(_){} }
  return fallback;
  }
 }
 async function apiPost(path, body){
- const r = await fetch(apiBase() + path, { method:"POST", headers:{ "Content-Type":"application/json", "x-write-key": wkey() }, body: JSON.stringify(body) });
+ const ctrl = new AbortController();
+ const timer = setTimeout(()=>ctrl.abort(), API_TIMEOUT_MS);
+ try{
+ const r = await fetch(apiBase() + path, { method:"POST", headers:{ "Content-Type":"application/json", "x-write-key": wkey() }, body: JSON.stringify(body), signal: ctrl.signal });
  const d = await r.json().catch(()=>({}));
  if(!r.ok || (d && d.error)) throw new Error((d && d.error) || ("HTTP "+r.status));
  return d;
+ } finally { clearTimeout(timer); }
 }
 
 /* ---- formatting ---- */
@@ -64,8 +74,39 @@ function initTheme(){ const t=$("themeToggle"); if(!t) return;
  if(light){ delete document.documentElement.dataset.theme; localStorage.setItem("inciardi_theme","dark"); t.setAttribute("aria-pressed","true"); }
  else { document.documentElement.dataset.theme="light"; localStorage.setItem("inciardi_theme","light"); t.setAttribute("aria-pressed","false"); } });
 }
+/* ---- mobile slide-out nav: hamburger + right-side drawer, built from the existing .nav so pages stay DRY ---- */
+function buildMobileNav(){
+ const row = document.querySelector(".topbar .row");
+ const nav = row && row.querySelector(".nav");
+ if(!row || !nav || $("navToggle")) return;
+ const btn = document.createElement("button");
+ btn.className = "navtoggle"; btn.id = "navToggle";
+ btn.setAttribute("aria-label","Menu"); btn.setAttribute("aria-expanded","false"); btn.setAttribute("aria-controls","navDrawer");
+ btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>';
+ const gear = $("gear");
+ row.insertBefore(btn, gear || null);
+ const backdrop = document.createElement("div");
+ backdrop.className = "navdrawer-backdrop"; backdrop.id = "navBackdrop";
+ const drawer = document.createElement("aside");
+ drawer.className = "navdrawer"; drawer.id = "navDrawer"; drawer.setAttribute("aria-hidden","true"); drawer.setAttribute("aria-label","Menu");
+ const links = Array.from(nav.querySelectorAll("a")).map(a=>{
+ const cur = a.getAttribute("aria-current")==="page";
+ return `<a href="${a.getAttribute("href")}"${cur?' aria-current="page"':''}>${esc(a.textContent.trim())}</a>`;
+ }).join("");
+ drawer.innerHTML = `<div class="navdrawer-h"><span class="brand"><span class="dot"></span>Inciardi Market</span><button class="x" id="navClose" aria-label="Close menu"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><nav class="navdrawer-links">${links}</nav>`;
+ document.body.appendChild(backdrop);
+ document.body.appendChild(drawer);
+ const open=()=>{ document.body.classList.add("nav-open"); drawer.setAttribute("aria-hidden","false"); btn.setAttribute("aria-expanded","true"); };
+ const close=()=>{ document.body.classList.remove("nav-open"); drawer.setAttribute("aria-hidden","true"); btn.setAttribute("aria-expanded","false"); };
+ btn.addEventListener("click",()=>{ document.body.classList.contains("nav-open") ? close() : open(); });
+ backdrop.addEventListener("click",close);
+ $("navClose").addEventListener("click",close);
+ drawer.querySelectorAll("a").forEach(a=>a.addEventListener("click",close));
+ document.addEventListener("keydown",(e)=>{ if(e.key==="Escape"&&document.body.classList.contains("nav-open")) close(); });
+}
 function initChrome(){
  initTheme();
+ buildMobileNav();
  const gear=$("gear"), drawer=$("settings");
  if(gear&&drawer){
  gear.addEventListener("click",()=>{ drawer.showModal(); gear.setAttribute("aria-expanded","true"); });
