@@ -1,0 +1,9 @@
+// ExpectedTransactions::calc_amountPaid
+// Number, unstored. Total applied amount from PaymentApplications.
+
+GetAsNumber (
+  ExecuteSQL (
+    "SELECT COALESCE(SUM(AmountApplied),0) FROM PaymentApplications WHERE fkExpectedTransaction = ?" ;
+    "" ; "" ; PrimaryKey
+  )
+)

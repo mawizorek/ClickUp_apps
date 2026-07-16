@@ -1,0 +1,10 @@
+// ExpectedTransactions::calc_remaining
+// Number, unstored. Remaining unpaid balance (adjusted amount if set, else original, minus applied).
+
+Let (
+  _targetAmount = Case (
+    not IsEmpty ( AmountAdjusted ) ; AmountAdjusted ;
+    OriginalAmount
+  ) ;
+  _targetAmount - calc_amountPaid
+)

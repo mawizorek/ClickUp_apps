@@ -1,0 +1,9 @@
+// Loans::calc_NextDueDate
+// Date, unstored. Next collectible expected due date.
+
+GetAsDate (
+  ExecuteSQL (
+    "SELECT MIN(DueDate) FROM ExpectedTransactions WHERE fkLoan = ? AND DueDate >= ?" ;
+    "" ; "" ; PrimaryKey ; Get ( CurrentDate )
+  )
+)

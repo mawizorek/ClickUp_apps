@@ -1,0 +1,8 @@
+// Loans::calc_FirstMaturation
+// Number, stored. First maturation milestone helper.
+
+Case (
+  not IsEmpty ( OriginationDate ) and not IsEmpty ( MaturationTerm_inDays ) ;
+    OriginationDate + MaturationTerm_inDays ;
+  ""
+)

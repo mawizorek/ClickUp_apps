@@ -1,0 +1,7 @@
+// GLOBAL_USE_VARIABLES::calc_fileSizeMB
+// Number, unstored. Numeric file size; append "MB" only in display contexts.
+
+Let (
+  ~bytes = Get ( FileSize ) ;
+  Round ( ~bytes / 1048576 ; 2 )
+)

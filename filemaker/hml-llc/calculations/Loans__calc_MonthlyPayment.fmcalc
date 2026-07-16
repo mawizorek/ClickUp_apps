@@ -1,0 +1,4 @@
+// Loans::calc_MonthlyPayment
+// Number, stored. Recurring interest/payment helper.
+
+OriginalPrincipal * InterestRateAnnual / 12

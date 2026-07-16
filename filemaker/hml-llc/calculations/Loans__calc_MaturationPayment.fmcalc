@@ -1,0 +1,4 @@
+// Loans::calc_MaturationPayment
+// Number, stored. Maturity-side payment amount.
+
+OriginalPrincipal * MaturationPoints

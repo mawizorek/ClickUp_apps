@@ -1,0 +1,4 @@
+// GLOBAL_USE_VARIABLES::calc_fileName
+// Text, unstored. Current file name.
+
+Get ( FileName )

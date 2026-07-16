@@ -1,0 +1,4 @@
+// GLOBAL_USE_VARIABLES::calc_hostedStatus
+// Text, unstored. Hosted vs local helper.
+
+If ( Get ( MultiUserState ) > 1 ; "Hosted" ; "Local" )

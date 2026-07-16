@@ -1,0 +1,4 @@
+// Loans::calc_originationPoints
+// Number, stored. Origination-points amount.
+
+OriginalPrincipal * OriginationPoints

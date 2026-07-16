@@ -1,0 +1,19 @@
+// Loans::calc_TotalOutstanding
+// Number, unstored. Total outstanding balance. Prefers a frozen payoff if one exists, else sums remaining expected.
+
+Let (
+[
+  _currentPayoff = ExecuteSQL (
+    "SELECT TotalPayoffAmount FROM Payoffs WHERE PrimaryKey = ?" ;
+    "" ; "" ; fkCurrentPayoff
+  ) ;
+  _remainingExpected = ExecuteSQL (
+    "SELECT COALESCE(SUM(CASE WHEN et.AmountAdjusted IS NOT NULL THEN et.AmountAdjusted ELSE et.OriginalAmount END),0) - COALESCE(SUM(pa.AmountApplied),0) FROM ExpectedTransactions et LEFT JOIN PaymentApplications pa ON et.PrimaryKey = pa.fkExpectedTransaction WHERE et.fkLoan = ?" ;
+    "" ; "" ; PrimaryKey
+  )
+] ;
+  Case (
+    not IsEmpty ( _currentPayoff ) ; GetAsNumber ( _currentPayoff ) ;
+    GetAsNumber ( _remainingExpected )
+  )
+)

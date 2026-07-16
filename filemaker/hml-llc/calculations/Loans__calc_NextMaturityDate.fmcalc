@@ -1,0 +1,13 @@
+// Loans::calc_NextMaturityDate
+// Date, unstored. Next maturity milestone, distinct from next due date.
+
+Let (
+  [
+    _baseDate = Case ( not IsEmpty ( ClosingDate ) ; ClosingDate ; OriginationDate ) ;
+    _termDays = MaturationTerm_inDays
+  ] ;
+  Case (
+    not IsEmpty ( _baseDate ) and not IsEmpty ( _termDays ) ; _baseDate + _termDays ;
+    ""
+  )
+)
