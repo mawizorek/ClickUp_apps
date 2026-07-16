@@ -15,6 +15,12 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ---
 
+## 2026-07-16 · default-theme tuned to MID-gray, high-contrast, mode `mid`
+**Decision:** Lightened `default-theme` from a dark gray (bg L=0.28) to a true MID-gray (bg L=0.62) with near-black text (L=0.16) and a dark charcoal accent for higher contrast than the F1-style slick dark themes. Introduced a third `mode` value, **`mid`** (neither `light` nor `dark`), used only by this default; it renders type at full weight (no dark-mode weight reduction) so the higher contrast reads crisp. Updated the JSON, the `themes.css` block + `:root` spine, and the `resolve.js` embedded ULTIMATE together.
+**Why:** Michael's nitpick: the first cut read as a dark theme. The default should feel like an in-between gray placeholder, not dark and not a light/paper theme, and carry more contrast than the polished dark skins. `mid` mode encodes "in-between" honestly (the picker badge shows · mid) and keeps font weight full for contrast; it's harmless to consumers (matches neither `[data-mode=light]` nor `[data-mode=dark]`, so full default weight applies).
+**Status:** locked
+**Supersedes:** the initial dark-gray default values + `dark` mode from the entry below.
+
 ## 2026-07-16 · `default-theme` is the standing default pointer + ultimate fallback
 **Decision:** Added `default-theme`: a deliberately grayscale (zero-chroma) skin — medium-gray canvas, lighter gray surfaces, gray highlight accent (NOT black-on-white paper). It is the standing DEFAULT: new apps/renders point at it unless Michael names a theme or there's an intentional reason to diverge. Also set as the resolver's `ultimateFallback` + `defaultTheme` in `_index.json`, and the embedded ULTIMATE in `resolve.js`. `preview.html` opens on it.
 **Why:** Michael wants a default that visibly reads as UNSKINNED ("if it's still gray, it hasn't been themed yet"), so agents always start from a theme pointer instead of designing colors from scratch, and swapping to a real theme is a one-line slug change. Making it the ultimate fallback means a failed/stub resolve lands on the honest gray placeholder, never a broken or arbitrary skin. The build instruction lives in the theme-contract gate + root README.
