@@ -101,8 +101,20 @@ Categories are **hierarchical**: a self-referencing tree (parent → child), not
 - Reports roll up the tree; the ledger still tags each leg to a single (usually leaf) category.
 - Depth: **2 levels** (parent → child) is the working assumption — enough for real rollups, shallow enough to stay sane. Confirm if you want arbitrary depth. Exact category list is data, gathered at entry time, not structure.
 
+## DD-015 — Multi-category splits `LOCKED` (2026-07-15)
+
+A single purchase can be **split across multiple categories** (Target run = Groceries + Household + Clothing on one receipt). (Answer to inquiry D.)
+
+**Why:** this is the payoff of the double-entry choice — a split isn't a special feature, it's just **more legs on the same event.** One `TransactionGroup` (the Target purchase, `-120` on the Visa) with three category legs (`+60` Groceries, `+40` Household, `+20` Clothing) that still sum to zero. No new table, no schema change; the model already supports N legs per group.
+
+**Implications:**
+- Confirms `TransactionGroup` → `TransactionLines` is **1-to-many with N > 2** allowed (not just a 2-leg pair). The zero-sum rule holds regardless of leg count.
+- The **UI needs a split editor** (add category rows to one transaction, live remainder that must reach zero before save). This is a Phase 1 layout concern.
+- Reports and category rollups (DD-014) already handle this for free — each split leg tags its own category and rolls up its own tree branch.
+- Reinforces: the ledger tags **legs**, not transactions, to categories. A "transaction category" is just the common case of a single-leg split.
+
 ---
 
 ## Deferred / not yet decided
 
-Remaining open interrogation: **D–L** (splits, net-worth-over-time, valuation cadence, bills, budgeting model, reports, reconciliation, platform, and reimbursement packaging/phase). See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
+Remaining open interrogation: **E–L** (net-worth-over-time, valuation cadence, bills, budgeting model, reports, reconciliation, platform, and reimbursement packaging/phase). See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
