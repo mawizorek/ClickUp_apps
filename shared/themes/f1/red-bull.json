@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "Red Bull Racing",
+  "slug": "red-bull",
+  "status": "locked",
+  "mode": "dark",
+  "intendedUse": "data-dense / ledger",
+  "description": "Deep navy chrome, red actionable accent, yellow secondary highlight.",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "bg": "oklch(0.17 0.030 265)",
+    "surface-1": "oklch(0.20 0.040 265)",
+    "surface-2": "oklch(0.24 0.045 265)",
+    "surface-3": "oklch(0.27 0.050 265)",
+    "border": "oklch(0.40 0.050 265)",
+    "field": "oklch(0.26 0.045 265)",
+    "text": "oklch(0.96 0.010 265)",
+    "text-soft": "oklch(0.74 0.020 265)",
+    "text-faint": "oklch(0.56 0.020 265)",
+    "accent": "oklch(0.60 0.20 25)",
+    "accent-2": "oklch(0.85 0.16 95)",
+    "accent-soft": "oklch(0.30 0.07 25)",
+    "on-accent": "oklch(0.98 0.02 25)",
+    "good": "oklch(0.72 0.15 150)",
+    "warn": "oklch(0.84 0.14 90)",
+    "bad": "oklch(0.60 0.21 20)",
+    "info": "oklch(0.72 0.13 258)"
+  }
+}
