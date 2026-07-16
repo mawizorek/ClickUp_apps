@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Theme picker · shared/themes</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.55;
+    transition: background-color .3s, color .3s;
+    padding: 0 clamp(16px, 4vw, 40px) 64px;
+    -webkit-font-smoothing: antialiased;
+  }
+  [data-mode="dark"] body { font-weight: 350; }
+  h1, h2, h3 { font-family: "Space Grotesk", system-ui, sans-serif; line-height: 1.15; }
+  .mono { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  header.mast {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    padding: 40px 0 24px;
+  }
+  header.mast h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); letter-spacing: -0.02em; }
+  header.mast .sub { color: var(--text-soft); font-size: .95rem; }
+  .badge {
+    font-family: ui-monospace, monospace; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 12px;
+  }
+
+  .picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .chip {
+    font: inherit; font-size: .85rem; cursor: pointer; padding: 7px 14px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-soft);
+    display: inline-flex; align-items: center; gap: 8px; transition: transform .15s, border-color .2s, color .2s;
+  }
+  .chip:hover { transform: translateY(-1px); color: var(--text); }
+  .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .chip .dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--border); }
+  .chip .gp { font-size: .62rem; opacity: .6; text-transform: uppercase; letter-spacing: .06em; }
+
+  .board { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
+  .panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 22px; transition: background-color .3s, border-color .3s; }
+  .panel h3 { font-size: 1.05rem; margin-bottom: 14px; }
+  .panel .lbl { color: var(--text-soft); font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+
+  /* swatch grid */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .sw { border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+  .sw .cap { font-family: ui-monospace, monospace; font-size: .68rem; padding: 6px 8px; background: var(--surface-2); color: var(--text-soft); border-top: 1px solid var(--border); }
+  .sw .fill { height: 44px; }
+
+  /* sample UI */
+  .metric { font-family: "Space Grotesk", system-ui; font-size: 2.4rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .metric-label { color: var(--text-soft); font-size: .9rem; }
+  .delta { color: var(--good); font-weight: 600; font-size: .9rem; }
+  .field { width: 100%; background: var(--field); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font: inherit; margin-top: 6px; }
+  .field::placeholder { color: var(--text-faint); }
+  .flabel { color: var(--text-soft); font-size: .82rem; }
+  .btn { border: none; cursor: pointer; font: inherit; font-weight: 600; background: var(--accent); color: var(--on-accent); padding: 10px 16px; border-radius: 8px; transition: transform .15s; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+  .semrow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .pill { font-size: .78rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; color: var(--on-accent); }
+
+  table.grid { width: 100%; border-collapse: collapse; font-size: .85rem; font-variant-numeric: tabular-nums; }
+  table.grid th { text-align: left; color: var(--text-soft); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; }
+  table.grid td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+  table.grid tr:nth-child(even) td { background: var(--surface-2); }
+  table.grid .pos { color: var(--accent); font-weight: 700; }
+
+  .trail { font-family: ui-monospace, monospace; font-size: .76rem; color: var(--text-faint); margin-top: 24px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <h1>Theme picker</h1>
+      <div class="sub">Pick a theme. Every sample below reskins from the same 17 tokens. This is the reskin/compare tool.</div>
+    </div>
+    <span class="badge" id="activeBadge">loading…</span>
+  </header>
+
+  <div class="picker" id="picker" role="group" aria-label="Theme picker"></div>
+
+  <div class="board">
+    <div class="panel">
+      <div class="lbl">Tokens</div>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="panel">
+      <div class="lbl">Sample UI</div>
+      <div class="metric">8,412</div>
+      <div class="row" style="margin-top:2px"><span class="delta">▲ 12.4%</span><span class="metric-label">active this week</span></div>
+      <div style="margin-top:16px">
+        <label class="flabel" for="f1">Driver name</label>
+        <input class="field" id="f1" placeholder="e.g. Piastri">
+      </div>
+      <div class="row">
+        <button class="btn">Primary action</button>
+        <button class="btn ghost">Secondary</button>
+      </div>
+      <div class="lbl" style="margin-top:20px">Semantic</div>
+      <div class="semrow">
+        <span class="pill" style="background:var(--good)">good</span>
+        <span class="pill" style="background:var(--warn)">warn</span>
+        <span class="pill" style="background:var(--bad)">bad</span>
+        <span class="pill" style="background:var(--info)">info</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="lbl">Championship matrix</div>
+      <table class="grid">
+        <thead><tr><th>Pos</th><th>Driver</th><th>Pts</th></tr></thead>
+        <tbody>
+          <tr><td class="pos">1</td><td>Norris</td><td>287</td></tr>
+          <tr><td class="pos">2</td><td>Piastri</td><td>264</td></tr>
+          <tr><td class="pos">3</td><td>Verstappen</td><td>241</td></tr>
+          <tr><td class="pos">4</td><td>Leclerc</td><td>198</td></tr>
+          <tr><td class="pos">5</td><td>Russell</td><td>176</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="trail mono" id="trail"></div>
+</div>
+
+<script src="./resolve.js"></script>
+<script>
+  var TOKENS = window.THEMES.TOKEN_KEYS;
+  var picker = document.getElementById('picker');
+  var swatches = document.getElementById('swatches');
+  var badge = document.getElementById('activeBadge');
+  var trailEl = document.getElementById('trail');
+
+  function renderSwatches() {
+    var cs = getComputedStyle(document.documentElement);
+    swatches.innerHTML = TOKENS.map(function(k){
+      var v = cs.getPropertyValue('--' + k).trim();
+      return '<div class="sw"><div class="fill" style="background:var(--'+k+')"></div><div class="cap">--'+k+'</div></div>';
+    }).join('');
+  }
+
+  function select(slug) {
+    window.THEMES.apply(slug, { onResolved: function(res){
+      badge.textContent = res.name + ' · ' + res.mode + (res.stub ? ' · stub' : '');
+      trailEl.textContent = 'resolve trail: ' + res.trail.join('  →  ');
+      Array.prototype.forEach.call(picker.children, function(c){
+        c.setAttribute('aria-pressed', c.dataset.slug === slug ? 'true' : 'false');
+      });
+      // repaint swatches after custom props settle
+      setTimeout(renderSwatches, 60);
+    }});
+  }
+
+  window.THEMES.list().then(function(idx){
+    idx.groups.forEach(function(g){
+      g.themes.forEach(function(t){
+        var b = document.createElement('button');
+        b.className = 'chip';
+        b.dataset.slug = t.slug;
+        b.setAttribute('aria-pressed', 'false');
+        b.innerHTML = '<span class="dot" style="background:'+ (t.mode==='light'?'#eee':'#222') +'"></span>' +
+                      t.name + ' <span class="gp">'+ g.id +'</span>';
+        b.addEventListener('click', function(){ select(t.slug); });
+        picker.appendChild(b);
+      });
+    });
+    select(idx.ultimateFallback || 'maw-dark-utility');
+  }).catch(function(e){
+    badge.textContent = 'manifest load failed';
+    trailEl.textContent = String(e);
+  });
+</script>
+</body>
+</html>
