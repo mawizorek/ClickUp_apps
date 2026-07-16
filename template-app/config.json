@@ -1,6 +1,6 @@
 {
-  "access": "open",
-  "code": "0000",
+  "access": "gated",
+  "code": "0426",
   "coverTitle": "Under maintenance",
   "coverMessage": "This app is being updated. Check back soon.",
   "downTitle": "Temporarily offline",

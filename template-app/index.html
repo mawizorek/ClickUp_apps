@@ -27,16 +27,18 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint; resolve.js = live switching. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=4">
+<link rel="stylesheet" href="./styles.css?v=5">
 </head>
 <body>
-<!-- ACCESS GATE (config.json drives it; inline fallback keeps it working on file:// or a 404) -->
+<!-- ACCESS GATE (config.json drives it; inline fallback keeps it working on file:// or a 404).
+     Input is a VISIBLE numeric field (not password dots) and autofocus+selects on render so the
+     keyboard raises without a tap where the browser allows it (iOS may still need one gesture). -->
 <div id="access-gate" hidden>
   <div class="gate-card">
     <h1 id="gate-title">Under maintenance</h1>
     <p id="gate-msg">This app is being updated. Check back soon.</p>
     <form id="gate-form">
-      <input id="gate-code" type="password" inputmode="numeric" autocomplete="off" aria-label="Access code" placeholder="Access code">
+      <input id="gate-code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autofocus aria-label="Access code" placeholder="0426">
       <button type="submit">Enter</button>
     </form>
   </div>
@@ -50,13 +52,13 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js?v=4"></script>
+<script src="./chrome.js?v=5"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS — swap these when you copy the template ==== */
   var APP_NAME    = "App Name";
-  var APP_VERSION = "v4";
-  var APP_PR      = 299;           // merged PR number that shipped this version
+  var APP_VERSION = "v5";
+  var APP_PR      = 300;           // merged PR number that shipped this version
   var DEFAULT_THEME = (window.THEMES && THEMES.DEFAULT) || "default-theme";
   var DEFAULT_PAGE  = "home";       // one-line landing repoint, no rebuild needed
   var NAV = [
@@ -74,10 +76,14 @@
 
   /* ---- ACCESS GATE ---- */
   (function gate() {
-    var FALLBACK = { access: "gated", code: "0000",
+    var FALLBACK = { access: "gated", code: "0426",
       coverTitle: "Under maintenance", coverMessage: "This app is being updated. Check back soon.",
       downTitle: "Temporarily offline", downMessage: "This app is currently unavailable." };
     var SS = "gate_ok";
+    function focusCode() {
+      var c = document.getElementById("gate-code");
+      if (c) { try { c.focus(); c.select(); } catch (e) {} }
+    }
     function apply(cfg) {
       var g = document.getElementById("access-gate");
       if (cfg.access === "open" || sessionStorage.getItem(SS) === "1") { g.remove(); return; }
@@ -96,6 +102,8 @@
           sessionStorage.setItem(SS, "1"); g.remove();
         } else { var c = document.getElementById("gate-code"); c.value = ""; c.focus(); }
       });
+      // raise the keyboard without a manual tap where the browser allows it
+      focusCode(); setTimeout(focusCode, 80);
     }
     fetch("./config.json", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
