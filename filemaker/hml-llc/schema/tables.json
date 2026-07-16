@@ -1,14 +1,15 @@
 {
   "_meta": {
     "app": "hml-llc",
-    "schemaVersion": "1.1",
-    "generated": "2026-07-15",
-    "source": "Migrated from ClickUp: HML_LLC Design Constitution + 'Lock canonical schema and base tables' (HMLLC-2740). Reconciled 2026-07-15 to the locked per-table files in ../tables/ (canonical field + calc names).",
-    "description": "Self-describing FileMaker schema source for HML_LLC. Every field carries keyType + category so a passive viewer can color/sort/frame without app-specific logic.",
+    "schemaVersion": "1.2",
+    "generated": "2026-07-16",
+    "source": "Migrated from ClickUp: HML_LLC Design Constitution + 'Lock canonical schema and base tables' (HMLLC-2740). Reconciled 2026-07-15 to the locked per-table files. 2026-07-16: calc formula bodies externalized to ../calculations/ (one .fmcalc per field); calc fields now carry calcRef/returns/stored instead of inline bodies. GLOBAL_USE_VARIABLES calc names reconciled to canonical camelCase.",
+    "description": "Self-describing FileMaker schema source for HML_LLC. Every field carries keyType + category so a passive viewer can color/sort/frame without app-specific logic. Calc fields point at standalone formula files via calcRef.",
+    "calcDir": "calculations/",
     "conventions": {
       "pk": "PrimaryKey (UUID text) on every table",
       "fk": "fk<Parent> prefix",
-      "calc": "calc_ prefix",
+      "calc": "calc_ prefix; formula body lives in calculations/<Table>__<field>.fmcalc, referenced by calcRef",
       "global": "g_ prefix; gLIST_ reserved for value-list globals",
       "audit": "CreationTimestamp, CreatedBy, ModificationTimestamp, ModifiedBy"
     },
@@ -45,10 +46,10 @@
         { "name": "ModifiedBy", "type": "text", "keyType": "audit", "category": "audit" },
         { "name": "APP_TITLE", "type": "text", "keyType": "plain", "category": "setup" },
         { "name": "APP_VERSION", "type": "text", "keyType": "plain", "category": "setup" },
-        { "name": "calc_FILEPATH", "type": "calc", "keyType": "calc", "category": "setup" },
-        { "name": "calc_FILENAME", "type": "calc", "keyType": "calc", "category": "setup" },
-        { "name": "calc_HOSTED_STATUS", "type": "calc", "keyType": "calc", "category": "setup" },
-        { "name": "calc_FILESIZE_MB", "type": "calc", "keyType": "calc", "category": "setup" },
+        { "name": "calc_filePath", "type": "calc", "keyType": "calc", "category": "setup", "returns": "Text", "stored": false, "calcRef": "calculations/GLOBAL_USE_VARIABLES__calc_filePath.fmcalc" },
+        { "name": "calc_fileName", "type": "calc", "keyType": "calc", "category": "setup", "returns": "Text", "stored": false, "calcRef": "calculations/GLOBAL_USE_VARIABLES__calc_fileName.fmcalc" },
+        { "name": "calc_hostedStatus", "type": "calc", "keyType": "calc", "category": "setup", "returns": "Text", "stored": false, "calcRef": "calculations/GLOBAL_USE_VARIABLES__calc_hostedStatus.fmcalc" },
+        { "name": "calc_fileSizeMB", "type": "calc", "keyType": "calc", "category": "setup", "returns": "Number", "stored": false, "calcRef": "calculations/GLOBAL_USE_VARIABLES__calc_fileSizeMB.fmcalc", "notes": "numeric; append 'MB' in display only" },
         { "name": "script_Stats_RecordCounts", "type": "text", "keyType": "plain", "category": "setup" },
         { "name": "script_LastSaved", "type": "text", "keyType": "plain", "category": "setup" },
         { "name": "g_fkCurrentProperty", "type": "text-uuid", "keyType": "global", "category": "context", "notes": "current property context" },
@@ -60,7 +61,7 @@
       "name": "PropertySUMMARIES",
       "role": "collateral",
       "status": "locked",
-      "description": "Collateral / operating property table. NOT the financial parent — loan-servicing ownership lives on Loans.",
+      "description": "Collateral / operating property table. NOT the financial parent - loan-servicing ownership lives on Loans.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "keyType": "pk", "category": "key" },
         { "name": "CreationTimestamp", "type": "timestamp", "keyType": "audit", "category": "audit" },
@@ -71,7 +72,7 @@
         { "name": "fkDocuments", "type": "text-uuid", "keyType": "fk", "category": "key", "status": "under-review" },
         { "name": "fkBalloonNote", "type": "text-uuid", "keyType": "fk", "category": "key", "status": "under-review" },
         { "name": "fkPropertyStatus", "type": "text-uuid", "keyType": "fk", "category": "key", "status": "under-review" },
-        { "name": "<property identity + operating fields>", "type": "text", "keyType": "plain", "category": "identity", "status": "pending", "notes": "address/collateral identity fields — enumerate from FileMaker file" }
+        { "name": "<property identity + operating fields>", "type": "text", "keyType": "plain", "category": "identity", "status": "pending", "notes": "address/collateral identity fields - enumerate from FileMaker file" }
       ]
     },
     {
@@ -91,25 +92,25 @@
         { "name": "LoanNumber", "type": "text", "keyType": "plain", "category": "terms" },
         { "name": "OriginationDate", "type": "date", "keyType": "plain", "category": "terms" },
         { "name": "ClosingDate", "type": "date", "keyType": "plain", "category": "terms", "status": "pending", "notes": "used by calc_NextMaturityDate; confirm presence in live file" },
-        { "name": "OriginalPrincipal", "type": "number", "keyType": "plain", "category": "terms", "notes": "principal basis (canonical; was LoanAmount in schema v1.0 — reconciled 2026-07-15). Confirm the live-file name matches." },
-        { "name": "InterestRateAnnual", "type": "number", "keyType": "plain", "category": "terms", "notes": "annual rate (canonical; was InterestRate in schema v1.0 — reconciled 2026-07-15). Confirm the live-file name matches." },
+        { "name": "OriginalPrincipal", "type": "number", "keyType": "plain", "category": "terms", "notes": "principal basis (canonical; was LoanAmount in schema v1.0). Confirm the live-file name matches." },
+        { "name": "InterestRateAnnual", "type": "number", "keyType": "plain", "category": "terms", "notes": "annual rate (canonical; was InterestRate in schema v1.0). Confirm the live-file name matches." },
         { "name": "OriginationPoints", "type": "number", "keyType": "plain", "category": "terms", "notes": "rate/fraction feeding calc_originationPoints" },
         { "name": "MaturationPoints", "type": "number", "keyType": "plain", "category": "terms" },
         { "name": "MaturationTerm_inDays", "type": "number", "keyType": "plain", "category": "terms" },
         { "name": "LoanTerm_inDays", "type": "number", "keyType": "plain", "category": "terms" },
         { "name": "GraceDays", "type": "number", "keyType": "plain", "category": "terms", "status": "pending", "notes": "read by ExpectedTransactions.calc_lateAfterDate; confirm presence in live file" },
         { "name": "ServicingStatus", "type": "text", "keyType": "plain", "category": "status", "notes": "should resolve to a real status PK, not free text" },
-        { "name": "calc_CurrentPrincipalBalance", "type": "calc", "keyType": "calc", "category": "calc", "notes": "stored; current principal basis" },
-        { "name": "calc_originationPoints", "type": "calc", "keyType": "calc", "category": "calc", "notes": "stored; origination-points amount" },
-        { "name": "calc_MaturationPayment", "type": "calc", "keyType": "calc", "category": "calc", "notes": "stored; maturity-side payment" },
-        { "name": "calc_MonthlyPayment", "type": "calc", "keyType": "calc", "category": "calc", "notes": "stored; recurring interest/payment" },
-        { "name": "calc_perDiemInterest", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; per-diem interest — drives date-scoped payoff accrual" },
-        { "name": "calc_FirstMaturation", "type": "calc", "keyType": "calc", "category": "calc", "notes": "stored; first maturation milestone" },
-        { "name": "calc_NextMaturityDate", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; next maturity milestone" },
-        { "name": "calc_NextDueDate", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; next collectible due date" },
-        { "name": "calc_TotalOutstanding", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; total outstanding balance" },
-        { "name": "calc_CurrentPayoffAmount", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; current all-in payoff" },
-        { "name": "calc_expROI", "type": "calc", "keyType": "calc", "category": "calc", "notes": "stored; analytical ROI" }
+        { "name": "calc_CurrentPrincipalBalance", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": true, "calcRef": "calculations/Loans__calc_CurrentPrincipalBalance.fmcalc" },
+        { "name": "calc_originationPoints", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": true, "calcRef": "calculations/Loans__calc_originationPoints.fmcalc" },
+        { "name": "calc_MaturationPayment", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": true, "calcRef": "calculations/Loans__calc_MaturationPayment.fmcalc" },
+        { "name": "calc_MonthlyPayment", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": true, "calcRef": "calculations/Loans__calc_MonthlyPayment.fmcalc" },
+        { "name": "calc_perDiemInterest", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": false, "calcRef": "calculations/Loans__calc_perDiemInterest.fmcalc" },
+        { "name": "calc_FirstMaturation", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": true, "calcRef": "calculations/Loans__calc_FirstMaturation.fmcalc" },
+        { "name": "calc_NextMaturityDate", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Date", "stored": false, "calcRef": "calculations/Loans__calc_NextMaturityDate.fmcalc" },
+        { "name": "calc_NextDueDate", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Date", "stored": false, "calcRef": "calculations/Loans__calc_NextDueDate.fmcalc" },
+        { "name": "calc_TotalOutstanding", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": false, "calcRef": "calculations/Loans__calc_TotalOutstanding.fmcalc" },
+        { "name": "calc_CurrentPayoffAmount", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": false, "calcRef": "calculations/Loans__calc_CurrentPayoffAmount.fmcalc" },
+        { "name": "calc_expROI", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": true, "calcRef": "calculations/Loans__calc_expROI.fmcalc" }
       ]
     },
     {
@@ -127,17 +128,17 @@
         { "name": "fkStandardTransaction", "type": "text-uuid", "keyType": "fk", "category": "key", "notes": "type" },
         { "name": "fkStatus", "type": "text-uuid", "keyType": "fk", "category": "key", "notes": "Outstanding / Paid / Partially Paid / Waived (status PK)" },
         { "name": "DueDate", "type": "date", "keyType": "plain", "category": "detail", "notes": "anchored to origination day-of-month" },
-        { "name": "OriginalAmount", "type": "number", "keyType": "plain", "category": "detail", "notes": "canonical expected amount (was single 'Amount' in schema v1.0 — reconciled 2026-07-15 to the OriginalAmount + AmountAdjusted family). For late fees: calculated 5% amount." },
+        { "name": "OriginalAmount", "type": "number", "keyType": "plain", "category": "detail", "notes": "canonical expected amount. For late fees: calculated 5% amount." },
         { "name": "AmountAdjusted", "type": "number", "keyType": "plain", "category": "detail", "notes": "actual amount to collect; supports waiver/discount" },
         { "name": "AdjustmentReason", "type": "text", "keyType": "plain", "category": "detail", "notes": "optional" },
         { "name": "AdjustmentStatus", "type": "text", "keyType": "plain", "category": "detail", "notes": "Normal / Discounted / Waived" },
-        { "name": "SequenceNumber", "type": "number", "keyType": "plain", "category": "detail", "notes": "1..n per loan; enforces uniqueness (was SortOrder in schema v1.0)" },
+        { "name": "SequenceNumber", "type": "number", "keyType": "plain", "category": "detail", "notes": "1..n per loan; enforces uniqueness" },
         { "name": "GraceDaysOverride", "type": "number", "keyType": "plain", "category": "detail", "notes": "row-level override; else falls back to Loans.GraceDays" },
         { "name": "Notes", "type": "text", "keyType": "plain", "category": "detail" },
-        { "name": "calc_amountPaid", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; total applied from PaymentApplications" },
-        { "name": "calc_remaining", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; remaining unpaid balance" },
-        { "name": "calc_lateAfterDate", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; late threshold date (due + grace)" },
-        { "name": "calc_islate", "type": "calc", "keyType": "calc", "category": "calc", "notes": "unstored; late/not-late 1/0" }
+        { "name": "calc_amountPaid", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": false, "calcRef": "calculations/ExpectedTransactions__calc_amountPaid.fmcalc" },
+        { "name": "calc_remaining", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": false, "calcRef": "calculations/ExpectedTransactions__calc_remaining.fmcalc" },
+        { "name": "calc_lateAfterDate", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Date", "stored": false, "calcRef": "calculations/ExpectedTransactions__calc_lateAfterDate.fmcalc" },
+        { "name": "calc_islate", "type": "calc", "keyType": "calc", "category": "calc", "returns": "Number", "stored": false, "calcRef": "calculations/ExpectedTransactions__calc_islate.fmcalc" }
       ]
     },
     {
@@ -196,7 +197,7 @@
         { "name": "AsOfDate", "type": "date", "keyType": "plain", "category": "detail", "notes": "payoff effective date; the exported figure is computed as-of this date" },
         { "name": "PayoffDisplayDate", "type": "date", "keyType": "plain", "category": "detail", "notes": "statement display date (NOT a creation/prepared timestamp)" },
         { "name": "GoodThroughDate", "type": "date", "keyType": "plain", "category": "detail", "notes": "payoff-validity endpoint (distinct from display date); per-diem runs through this date" },
-        { "name": "TotalPayoffAmount", "type": "number", "keyType": "plain", "category": "frozen", "notes": "frozen — never recomputed (was FrozenPayoffAmount in schema v1.0); read by Loans.calc_CurrentPayoffAmount / calc_TotalOutstanding" },
+        { "name": "TotalPayoffAmount", "type": "number", "keyType": "plain", "category": "frozen", "notes": "frozen - never recomputed (was FrozenPayoffAmount in schema v1.0); read by Loans.calc_CurrentPayoffAmount / calc_TotalOutstanding" },
         { "name": "FrozenPaymentInstructions", "type": "text", "keyType": "plain", "category": "frozen", "notes": "snapshot of PaymentInstructions at issue" }
       ]
     },
@@ -215,7 +216,7 @@
         { "name": "PayeeText", "type": "text", "keyType": "plain", "category": "detail" },
         { "name": "DeliveryType", "type": "text", "keyType": "plain", "category": "detail", "notes": "mailing/wire/ACH" },
         { "name": "DeliveryDetailText", "type": "text", "keyType": "plain", "category": "detail" },
-        { "name": "SignatureReference", "type": "text", "keyType": "plain", "category": "detail", "status": "pending", "notes": "container vs document-module reference — decision open" },
+        { "name": "SignatureReference", "type": "text", "keyType": "plain", "category": "detail", "status": "pending", "notes": "container vs document-module reference - decision open" },
         { "name": "SortOrder", "type": "number", "keyType": "plain", "category": "detail" },
         { "name": "IsActive", "type": "number", "keyType": "plain", "category": "detail" }
       ]
