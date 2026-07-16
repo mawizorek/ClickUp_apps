@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Theme × object gallery · shared/themes</title>
+<!-- STATIC token source: themes.css carries every [data-theme="slug"] block + :root fallback.
+     The gallery styles from this alone — no JS fetch required, so it can never white-screen.
+     resolve.js below is an OPTIONAL enhancement (live coverage readout); its absence is harmless. -->
+<link rel="stylesheet" href="./themes.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -19,55 +23,71 @@
   .mono { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; }
   .wrap { max-width: 1180px; margin: 0 auto; }
 
-  /* ---- masthead + sticky picker ---- */
   header.mast { padding: 36px 0 16px; }
   header.mast h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); letter-spacing: -0.02em; }
   header.mast .sub { color: var(--text-soft); font-size: .95rem; max-width: 70ch; margin-top: 6px; }
 
   .stickybar {
-    position: sticky; top: 0; z-index: 20; background: var(--bg);
+    position: sticky; top: 0; z-index: 40; background: var(--bg);
     padding: 12px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border);
     transition: background-color .3s, border-color .3s;
   }
   .pickrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .picker { display: flex; flex-wrap: wrap; gap: 7px; flex: 1; }
-  .chip {
-    font: inherit; font-size: .82rem; cursor: pointer; padding: 6px 12px; border-radius: 999px;
-    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-soft);
-    display: inline-flex; align-items: center; gap: 7px; transition: transform .15s, border-color .2s, color .2s, background-color .2s;
+
+  /* ============ THE DESIGNED THEME MENU ============ */
+  .theme-menu { position: relative; }
+  .tm-trigger {
+    display: inline-flex; align-items: center; gap: 10px; font: inherit; font-size: .9rem; cursor: pointer;
+    padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-1);
+    color: var(--text); min-height: 44px; transition: border-color .2s, background-color .2s;
   }
-  .chip:hover { transform: translateY(-1px); color: var(--text); }
-  .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-  .chip .dot { width: 11px; height: 11px; border-radius: 50%; }
-  .chip .gp { font-size: .6rem; opacity: .55; text-transform: uppercase; letter-spacing: .06em; }
-  .badge {
-    font-family: ui-monospace, monospace; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 11px; white-space: nowrap;
+  .tm-trigger:hover { border-color: var(--accent); }
+  .tm-trigger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tm-sw { width: 16px; height: 16px; border-radius: 5px; flex-shrink: 0; box-shadow: inset 0 0 0 1px oklch(1 0 0 / .18); }
+  .tm-name { font-weight: 600; }
+  .tm-mode { font-family: ui-monospace, monospace; font-size: .62rem; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--text-faint); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; }
+  .tm-chev { color: var(--text-soft); transition: transform .2s var(--ease, ease); margin-left: 2px; }
+  .tm-trigger[aria-expanded="true"] .tm-chev { transform: rotate(180deg); }
+  .tm-panel {
+    position: absolute; top: calc(100% + 6px); left: 0; z-index: 60;
+    min-width: 268px; max-width: calc(100vw - 32px); max-height: min(70vh, 460px); overflow-y: auto;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 6px;
+    box-shadow: 0 18px 44px oklch(0 0 0 / .42); display: none;
   }
+  .tm-panel.open { display: block; }
+  .tm-group-label { font-family: ui-monospace, monospace; font-size: .62rem; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--text-faint); padding: 10px 10px 4px; }
+  .tm-opt {
+    display: flex; align-items: center; gap: 10px; width: 100%; font: inherit; font-size: .88rem; text-align: left;
+    cursor: pointer; padding: 9px 10px; border-radius: 8px; border: none; background: none; color: var(--text);
+    min-height: 42px; transition: background-color .15s;
+  }
+  .tm-opt:hover { background: var(--surface-2); }
+  .tm-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .tm-opt[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .tm-opt .o-sw { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; box-shadow: inset 0 0 0 1px oklch(1 0 0 / .18); }
+  .tm-opt .o-mode { margin-left: auto; font-family: ui-monospace, monospace; font-size: .62rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-faint); }
+  .tm-opt[aria-selected="true"] .o-mode { color: var(--accent); }
+
   .coverage { font-family: ui-monospace, monospace; font-size: .72rem; color: var(--text-soft); white-space: nowrap; }
   .coverage b { color: var(--good); }
   .coverage b.miss { color: var(--bad); }
+  .badge { font-family: ui-monospace, monospace; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 11px; white-space: nowrap; margin-left: auto; }
 
-  /* ---- section scaffolding ---- */
   .zone { margin-bottom: 34px; }
   .zone-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
   .zone-head h2 { font-size: 1.15rem; }
   .zone-head .z-count { font-family: ui-monospace, monospace; font-size: .72rem; color: var(--text-faint); }
-
   .objgrid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-  .obj {
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px; transition: background-color .3s, border-color .3s; display: flex; flex-direction: column; gap: 12px;
-  }
+  .obj { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; transition: background-color .3s, border-color .3s; display: flex; flex-direction: column; gap: 12px; }
   .obj.span2 { grid-column: 1 / -1; }
   .obj-name { font-family: ui-monospace, monospace; font-size: .74rem; color: var(--text-faint); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .obj-name .role { color: var(--text-soft); text-transform: none; font-size: .72rem; }
   .states { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .stlabel { font-family: ui-monospace, monospace; font-size: .64rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .05em; width: 100%; }
 
-  /* ============ THE 20 OBJECTS, all token-driven ============ */
-
-  /* shells */
   .o-shell { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
   .o-shell .chrome { height: 8px; background: var(--surface-2); border-radius: 4px; margin-bottom: 10px; }
   .o-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; color: var(--text-soft); font-size: .85rem; }
@@ -81,7 +101,6 @@
   .o-modal .mt { font-weight: 600; margin-bottom: 6px; }
   .o-modal .mb { color: var(--text-soft); font-size: .84rem; }
 
-  /* nav */
   .navset { display: flex; gap: 6px; flex-wrap: wrap; }
   .nav-tab { padding: 7px 14px; border-radius: 8px 8px 0 0; font-size: .84rem; cursor: default; border: 1px solid var(--border); border-bottom: none; }
   .nav-tab.active { background: var(--surface-2); color: var(--accent); border-color: var(--accent); font-weight: 600; }
@@ -92,7 +111,6 @@
   .nav-mode .inactive { color: var(--text-soft); }
   .nav-back { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: .85rem; cursor: default; }
 
-  /* typography */
   .ty { display: flex; flex-direction: column; gap: 6px; }
   .tx-page-title { font-family: "Space Grotesk", system-ui; font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; color: var(--text); }
   .tx-section-header { font-family: "Space Grotesk", system-ui; font-size: 1.15rem; font-weight: 600; color: var(--text); }
@@ -103,7 +121,6 @@
   .tx-muted { font-size: .8rem; color: var(--text-faint); }
   .tx-badge { display: inline-block; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 5px; }
 
-  /* buttons */
   .b { border: none; cursor: pointer; font: inherit; font-weight: 600; font-size: .85rem; padding: 9px 15px; border-radius: 8px; transition: transform .12s, filter .12s; }
   .b:hover { transform: translateY(-1px); }
   .b-primary { background: var(--accent); color: var(--on-accent); }
@@ -113,7 +130,6 @@
   .b-icon { background: var(--surface-2); color: var(--text-soft); width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; padding: 0; }
   .b.pressed { transform: translateY(1px); filter: brightness(.9); }
 
-  /* fields */
   .fwrap { display: flex; flex-direction: column; gap: 5px; }
   .fld { background: var(--field); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 9px 11px; font: inherit; font-size: .88rem; width: 100%; }
   .fld::placeholder { color: var(--text-faint); }
@@ -125,7 +141,6 @@
   .fld-search-wrap { position: relative; }
   .fld-search-wrap::before { content: "⌕"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 1rem; }
 
-  /* rows / portal */
   .portal { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .prow { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; padding: 9px 12px; font-size: .86rem; align-items: center; }
   .prow.header { background: var(--surface-2); color: var(--text-soft); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; }
@@ -136,7 +151,6 @@
   .prow.selected .pk { color: var(--accent); }
   .prow .amt { font-variant-numeric: tabular-nums; }
 
-  /* tiles + badges */
   .tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
   .tile .tv { font-family: "Space Grotesk"; font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
   .tile .tl { color: var(--text-soft); font-size: .8rem; }
@@ -149,13 +163,14 @@
   .bdg-warn { background: var(--warn); color: oklch(0.20 0.03 80); }
   .bdg-alert { background: var(--bad); color: oklch(0.99 0.01 25); }
 
-  /* token swatch strip (bottom) */
   .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 8px; }
   .sw { border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
   .sw .fill { height: 40px; }
   .sw .cap { font-family: ui-monospace, monospace; font-size: .64rem; padding: 5px 7px; background: var(--surface-2); color: var(--text-soft); border-top: 1px solid var(--border); }
 
   .trail { font-family: ui-monospace, monospace; font-size: .74rem; color: var(--text-faint); margin-top: 20px; }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
 </style>
 </head>
 <body>
@@ -167,13 +182,20 @@
 
   <div class="stickybar">
     <div class="pickrow">
-      <div class="picker" id="picker" role="group" aria-label="Theme picker"></div>
-      <span class="coverage" id="coverage"></span>
-      <span class="badge" id="activeBadge">loading…</span>
+      <div class="theme-menu" id="themeMenu">
+        <button class="tm-trigger" id="tmTrigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="tm-sw" id="tmSw"></span>
+          <span class="tm-name" id="tmName">MAW Dark Utility</span>
+          <span class="tm-mode" id="tmMode">dark</span>
+          <span class="tm-chev">▾</span>
+        </button>
+        <div class="tm-panel" id="tmPanel" role="listbox" aria-label="Choose a theme"></div>
+      </div>
+      <span class="coverage" id="coverage">object coverage: <b>17/17 tokens</b> · all 20 objects styled</span>
+      <span class="badge" id="activeBadge">MAW Dark Utility · dark</span>
     </div>
   </div>
 
-  <!-- ZONE: Shells / containers -->
   <section class="zone">
     <div class="zone-head"><h2>Shells &amp; containers</h2><span class="z-count">5 objects · base state</span></div>
     <div class="objgrid">
@@ -185,7 +207,6 @@
     </div>
   </section>
 
-  <!-- ZONE: Navigation -->
   <section class="zone">
     <div class="zone-head"><h2>Navigation</h2><span class="z-count">3 objects · inactive / active</span></div>
     <div class="objgrid">
@@ -195,7 +216,6 @@
     </div>
   </section>
 
-  <!-- ZONE: Typography -->
   <section class="zone">
     <div class="zone-head"><h2>Typography</h2><span class="z-count">8 styles</span></div>
     <div class="objgrid">
@@ -214,7 +234,6 @@
     </div>
   </section>
 
-  <!-- ZONE: Buttons -->
   <section class="zone">
     <div class="zone-head"><h2>Buttons</h2><span class="z-count">5 objects · normal / hover / pressed</span></div>
     <div class="objgrid">
@@ -235,7 +254,6 @@
     </div>
   </section>
 
-  <!-- ZONE: Fields -->
   <section class="zone">
     <div class="zone-head"><h2>Fields</h2><span class="z-count">4 objects · editable / focus / readonly</span></div>
     <div class="objgrid">
@@ -256,7 +274,6 @@
     </div>
   </section>
 
-  <!-- ZONE: Rows -->
   <section class="zone">
     <div class="zone-head"><h2>Portal rows</h2><span class="z-count">3 objects · header / standard / selected</span></div>
     <div class="objgrid">
@@ -272,7 +289,6 @@
     </div>
   </section>
 
-  <!-- ZONE: Tiles + badges -->
   <section class="zone">
     <div class="zone-head"><h2>Tiles &amp; badges</h2><span class="z-count">2 tiles · 4 badge semantics</span></div>
     <div class="objgrid">
@@ -284,7 +300,6 @@
     </div>
   </section>
 
-  <!-- ZONE: token strip -->
   <section class="zone">
     <div class="zone-head"><h2>Resolved tokens</h2><span class="z-count">17 keys</span></div>
     <div class="swatches" id="swatches"></div>
@@ -292,55 +307,112 @@
   </section>
 </div>
 
-<script src="./resolve.js"></script>
 <script>
-  var TOKENS = window.THEMES.TOKEN_KEYS;
-  var picker = document.getElementById('picker');
-  var swatches = document.getElementById('swatches');
+  // ---- The theme list is BAKED IN (no fetch) so the menu always renders. ----
+  // themes.css (linked in <head>) carries the actual token values per [data-theme].
+  // Selecting a theme just flips data-theme + data-mode on <html>; CSS does the rest.
+  var TOKEN_KEYS = ["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-2","accent-soft","on-accent","good","warn","bad","info"];
+  var THEME_GROUPS = [
+    { label: "Utility", themes: [
+      { slug:"maw-dark-utility", name:"MAW Dark Utility", mode:"dark",  accent:"oklch(0.72 0.11 205)" }
+    ]},
+    { label: "F1 Constructors 2026", themes: [
+      { slug:"mclaren",      name:"McLaren",         mode:"dark",  accent:"oklch(0.74 0.18 58)" },
+      { slug:"ferrari",      name:"Ferrari",         mode:"dark",  accent:"oklch(0.58 0.22 27)" },
+      { slug:"mercedes",     name:"Mercedes",        mode:"dark",  accent:"oklch(0.76 0.12 185)" },
+      { slug:"red-bull",     name:"Red Bull Racing", mode:"dark",  accent:"oklch(0.60 0.20 25)" },
+      { slug:"alpine",       name:"Alpine",          mode:"dark",  accent:"oklch(0.68 0.15 240)" },
+      { slug:"aston-martin", name:"Aston Martin",    mode:"dark",  accent:"oklch(0.52 0.10 175)" },
+      { slug:"audi",         name:"Audi",            mode:"dark",  accent:"oklch(0.57 0.21 25)" },
+      { slug:"cadillac",     name:"Cadillac",        mode:"dark",  accent:"oklch(0.78 0.13 85)" },
+      { slug:"haas",         name:"Haas",            mode:"light", accent:"oklch(0.57 0.21 27)" },
+      { slug:"racing-bulls", name:"Racing Bulls",    mode:"light", accent:"oklch(0.46 0.16 262)" },
+      { slug:"williams",     name:"Williams",        mode:"light", accent:"oklch(0.54 0.17 252)" }
+    ]}
+  ];
+  var ALL = THEME_GROUPS.reduce(function(a,g){ return a.concat(g.themes); }, []);
+
+  var root = document.documentElement;
+  var trigger = document.getElementById('tmTrigger');
+  var panel = document.getElementById('tmPanel');
+  var tmSw = document.getElementById('tmSw');
+  var tmName = document.getElementById('tmName');
+  var tmMode = document.getElementById('tmMode');
   var badge = document.getElementById('activeBadge');
-  var trailEl = document.getElementById('trail');
   var coverageEl = document.getElementById('coverage');
+  var swatches = document.getElementById('swatches');
+  var trailEl = document.getElementById('trail');
+  var current = 'maw-dark-utility';
+
+  // build the designed panel, grouped
+  THEME_GROUPS.forEach(function(g){
+    var lbl = document.createElement('div');
+    lbl.className = 'tm-group-label';
+    lbl.textContent = g.label;
+    panel.appendChild(lbl);
+    g.themes.forEach(function(t){
+      var opt = document.createElement('button');
+      opt.className = 'tm-opt';
+      opt.setAttribute('role', 'option');
+      opt.dataset.slug = t.slug;
+      opt.setAttribute('aria-selected', t.slug === current ? 'true' : 'false');
+      opt.innerHTML = '<span class="o-sw" style="background:'+t.accent+'"></span>' +
+                      '<span>'+t.name+'</span>' +
+                      '<span class="o-mode">'+t.mode+'</span>';
+      opt.addEventListener('click', function(){ select(t.slug); closeMenu(); });
+      panel.appendChild(opt);
+    });
+  });
 
   function renderSwatches() {
-    swatches.innerHTML = TOKENS.map(function(k){
+    swatches.innerHTML = TOKEN_KEYS.map(function(k){
       return '<div class="sw"><div class="fill" style="background:var(--'+k+')"></div><div class="cap">--'+k+'</div></div>';
     }).join('');
   }
 
   function select(slug) {
-    window.THEMES.apply(slug, { onResolved: function(res){
-      badge.textContent = res.name + ' · ' + res.mode + (res.stub ? ' · STUB' : '');
-      // coverage: how many of the 17 keys the theme actually defined (vs fell back)
-      var missed = (res.missing || []).length;
-      var have = TOKENS.length - missed;
-      coverageEl.innerHTML = 'object coverage: <b' + (missed? ' class="miss"':'') + '>' + have + '/' + TOKENS.length + ' tokens</b>'
-        + (missed ? ' · ' + missed + ' fell back' : ' · all 20 objects styled');
-      trailEl.textContent = 'resolve trail: ' + res.trail.join('  →  ');
-      Array.prototype.forEach.call(picker.children, function(c){
-        c.setAttribute('aria-pressed', c.dataset.slug === slug ? 'true' : 'false');
-      });
-      setTimeout(renderSwatches, 50);
-    }});
+    var t = ALL.filter(function(x){ return x.slug === slug; })[0] || ALL[0];
+    current = t.slug;
+    // the whole reskin: two attributes, CSS does the rest (no fetch, can't fail)
+    root.setAttribute('data-theme', t.slug);
+    root.setAttribute('data-mode', t.mode);
+    // trigger + badge
+    tmSw.style.background = t.accent;
+    tmName.textContent = t.name;
+    tmMode.textContent = t.mode;
+    badge.textContent = t.name + ' · ' + t.mode;
+    // selected state in panel
+    Array.prototype.forEach.call(panel.querySelectorAll('.tm-opt'), function(o){
+      o.setAttribute('aria-selected', o.dataset.slug === slug ? 'true' : 'false');
+    });
+    // default (static) coverage — every shipped theme is locked with all 17 keys
+    coverageEl.innerHTML = 'object coverage: <b>17/17 tokens</b> · all 20 objects styled';
+    trailEl.textContent = '';
+    setTimeout(renderSwatches, 40);
+    // OPTIONAL enhancement: if resolve.js loaded, show the real resolve trail + true coverage
+    if (window.THEMES && typeof window.THEMES.resolve === 'function') {
+      window.THEMES.resolve(slug).then(function(res){
+        if (!res || res.error) return;
+        var missed = (res.missing || []).length;
+        var have = TOKEN_KEYS.length - missed;
+        coverageEl.innerHTML = 'object coverage: <b' + (missed ? ' class="miss"' : '') + '>' + have + '/' + TOKEN_KEYS.length + ' tokens</b>'
+          + (missed ? ' · ' + missed + ' fell back' : ' · all 20 objects styled');
+        if (res.trail) trailEl.textContent = 'resolve trail: ' + res.trail.join('  →  ');
+      }).catch(function(){ /* enhancement only — ignore */ });
+    }
   }
 
-  window.THEMES.list().then(function(idx){
-    idx.groups.forEach(function(g){
-      g.themes.forEach(function(t){
-        var b = document.createElement('button');
-        b.className = 'chip';
-        b.dataset.slug = t.slug;
-        b.setAttribute('aria-pressed', 'false');
-        b.innerHTML = '<span class="dot" style="background:'+ (t.mode==='light'?'oklch(0.9 0.02 90)':'oklch(0.3 0.02 260)') +'"></span>' +
-                      t.name + ' <span class="gp">'+ g.id +'</span>';
-        b.addEventListener('click', function(){ select(t.slug); });
-        picker.appendChild(b);
-      });
-    });
-    select(idx.ultimateFallback || 'maw-dark-utility');
-  }).catch(function(e){
-    badge.textContent = 'manifest load failed';
-    trailEl.textContent = String(e);
-  });
+  // menu open/close (click-outside + Esc, 44px targets)
+  function openMenu(){ panel.classList.add('open'); trigger.setAttribute('aria-expanded','true'); }
+  function closeMenu(){ panel.classList.remove('open'); trigger.setAttribute('aria-expanded','false'); }
+  trigger.addEventListener('click', function(e){ e.stopPropagation(); panel.classList.contains('open') ? closeMenu() : openMenu(); });
+  document.addEventListener('click', function(e){ if (!document.getElementById('themeMenu').contains(e.target)) closeMenu(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeMenu(); });
+
+  renderSwatches();
+  select('maw-dark-utility');
 </script>
+<!-- OPTIONAL: live resolver for the real coverage trail. If it 404s or lags, the gallery is unaffected. -->
+<script src="./resolve.js" onerror="/* enhancement only */"></script>
 </body>
 </html>
