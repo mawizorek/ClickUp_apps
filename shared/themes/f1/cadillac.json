@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "Cadillac",
+  "slug": "cadillac",
+  "status": "locked",
+  "mode": "dark",
+  "intendedUse": "data-dense / ledger",
+  "description": "Deep navy chrome, gold actionable accent, platinum secondary. 2026 grid entry.",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "bg": "oklch(0.17 0.020 265)",
+    "surface-1": "oklch(0.145 0.022 265)",
+    "surface-2": "oklch(0.21 0.026 265)",
+    "surface-3": "oklch(0.24 0.030 265)",
+    "border": "oklch(0.40 0.035 265)",
+    "field": "oklch(0.25 0.026 265)",
+    "text": "oklch(0.96 0.008 265)",
+    "text-soft": "oklch(0.74 0.014 265)",
+    "text-faint": "oklch(0.56 0.014 265)",
+    "accent": "oklch(0.78 0.13 85)",
+    "accent-2": "oklch(0.80 0.02 250)",
+    "accent-soft": "oklch(0.30 0.06 85)",
+    "on-accent": "oklch(0.22 0.03 85)",
+    "good": "oklch(0.72 0.15 150)",
+    "warn": "oklch(0.82 0.14 88)",
+    "bad": "oklch(0.62 0.20 25)",
+    "info": "oklch(0.72 0.12 250)"
+  }
+}
