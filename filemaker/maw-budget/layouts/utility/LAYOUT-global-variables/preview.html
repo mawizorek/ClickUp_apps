@@ -3,23 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>maw-budget · SYS | Global Settings [DSK] — layout render</title>
+<title>SYS | Global Settings [DSK]</title>
 <style>
+  /* ============================================================
+     PURE LAYOUT RENDER. No dev chrome, no metadata wrapper.
+     This is the built FileMaker layout in Browse mode: themed,
+     to-scale, interactive. Theme tokens + objects come from the
+     embedded manifest (auto-extends as objects are added).
+     ============================================================ */
   :root{
-    /* FileMaker Pro app chrome (light, realistic) */
-    --app-bg: oklch(0.93 0.004 255);
-    --app-bar: oklch(0.97 0.003 255);
-    --app-bar2: oklch(0.9 0.005 255);
-    --app-line: oklch(0.82 0.006 255);
-    --app-ink: oklch(0.32 0.01 255);
-    --app-dim: oklch(0.52 0.008 255);
-    --app-faint: oklch(0.66 0.006 255);
-    --app-accent: oklch(0.58 0.13 250);
-    --ruler: oklch(0.87 0.005 255);
-    --ruler-ink: oklch(0.6 0.007 255);
-    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --win: oklch(0.9 0.004 255);          /* FileMaker window gray behind the layout */
+    --win-edge: oklch(0.8 0.006 255);
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    /* layout THEME tokens (MAW Dark Utility) — provisional, pending theme-doc migration */
+    /* theme tokens (overwritten from manifest) */
     --t-bg: oklch(0.23 0.013 260);
     --t-header: oklch(0.285 0.02 260);
     --t-body: oklch(0.235 0.012 260);
@@ -30,167 +27,117 @@
     --t-label: oklch(0.70 0.012 260);
     --t-accent: oklch(0.72 0.11 205);
     --t-title: oklch(0.96 0.02 205);
-    --t-section: oklch(0.4 0.012 260);
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{
-    background:var(--app-bg);color:var(--app-ink);font-family:var(--sans);
-    font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;font-optical-sizing:auto;
-    display:flex;flex-direction:column;height:100vh;overflow:hidden;
+    background:var(--win);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;
+    min-height:100vh;overflow-x:hidden;
+    display:flex;justify-content:center;align-items:flex-start;
   }
-  h1,h2,h3{margin:0;text-wrap:balance}
-  /* ---------- FileMaker layout bar ---------- */
-  .fmbar{
-    flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:9px 16px;
-    background:linear-gradient(var(--app-bar),var(--app-bar2));
-    border-bottom:1px solid var(--app-line);
+  /* auto-fit wrapper: scales the fixed-width layout to the viewport, silently */
+  #fit{transform-origin:top center;will-change:transform}
+  /* the layout itself: a fixed-width FileMaker layout (design width from manifest) */
+  #layout{
+    width:1024px;background:var(--t-bg);color:var(--t-field-text);
+    box-shadow:0 1px 0 var(--win-edge), 0 22px 55px -32px oklch(0 0 0/.6);
   }
-  .lname{
-    display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px;color:var(--app-ink);
-    padding:6px 12px;background:oklch(1 0 0);border:1px solid var(--app-line);border-radius:7px;
-    box-shadow:0 1px 0 oklch(1 0 0);
-  }
-  .lname .swatch{width:8px;height:8px;border-radius:2px;background:var(--t-accent)}
-  .lname .chev{color:var(--app-faint);font-size:10px}
-  .modeseg{display:flex;border:1px solid var(--app-line);border-radius:7px;overflow:hidden;background:oklch(1 0 0)}
-  .modeseg span{padding:6px 12px;font-size:12px;color:var(--app-dim);border-right:1px solid var(--app-line)}
-  .modeseg span:last-child{border-right:0}
-  .modeseg span.on{background:var(--app-accent);color:oklch(0.98 0.01 250);font-weight:600}
-  .meta{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--app-dim);flex-wrap:wrap}
-  .chip{padding:4px 9px;border:1px solid var(--app-line);border-radius:100px;background:oklch(1 0 0);white-space:nowrap}
-  .chip b{color:var(--app-ink);font-weight:600}
-  .fmbar .spacer{flex:1 1 auto}
-  .zoom{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--app-dim);font-variant-numeric:tabular-nums}
-  .zbtn{cursor:pointer;user-select:none;width:24px;height:24px;border:1px solid var(--app-line);background:oklch(1 0 0);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--app-ink);font-size:14px}
-  .zbtn:hover{border-color:var(--app-accent);color:var(--app-accent)}
-  .zval{min-width:44px;text-align:center;font-weight:600;color:var(--app-ink)}
-  .guidetog{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none;font-size:12px;color:var(--app-dim);padding:5px 10px;border:1px solid var(--app-line);border-radius:7px;background:oklch(1 0 0)}
-  .guidetog .sw{width:30px;height:17px;border-radius:100px;background:var(--app-line);position:relative;transition:background .18s cubic-bezier(.25,1,.5,1)}
-  .guidetog .sw::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:oklch(1 0 0);box-shadow:0 1px 2px oklch(0 0 0/.3);transition:transform .2s cubic-bezier(.22,1,.36,1)}
-  .guidetog.on{color:var(--app-ink);border-color:var(--app-accent)}
-  .guidetog.on .sw{background:var(--app-accent)}
-  .guidetog.on .sw::after{transform:translateX(13px)}
-  /* ---------- ruler + stage ---------- */
-  .rulerwrap{flex:0 0 auto;display:flex;background:var(--app-bar2);border-bottom:1px solid var(--app-line)}
-  .rcorner{width:30px;flex:0 0 30px;border-right:1px solid var(--app-line)}
-  .ruler{flex:1 1 auto;overflow:hidden;position:relative;height:22px}
-  .rInner{position:absolute;top:0;left:0;height:100%;transform-origin:top left}
-  .tick{position:absolute;top:0;height:100%;border-left:1px solid var(--ruler);font-size:9px;color:var(--ruler-ink);padding-left:3px;font-family:var(--mono);line-height:22px}
-  .tick.major{border-left-color:var(--ruler-ink)}
-  .stage{flex:1 1 auto;overflow:auto;background:var(--app-bg);padding:26px 30px 60px;display:flex;justify-content:center;align-items:flex-start}
-  .devwrap{transform-origin:top center}
-  .device{
-    width:1024px;background:var(--t-bg);border:1px solid oklch(0.5 0.01 260);border-radius:8px;
-    box-shadow:0 30px 70px -30px oklch(0 0 0/.55),0 4px 14px -8px oklch(0 0 0/.4);
-    overflow:hidden;color:var(--t-field-text);
-  }
-  /* ---------- layout parts ---------- */
   .part{position:relative}
-  .part + .part{border-top:1px solid oklch(0.42 0.01 260/.4)}
-  .part.header{background:var(--t-header);padding:22px 40px}
-  .part.body{background:var(--t-body);padding:30px 40px}
-  .part.footer{background:var(--t-footer);padding:18px 40px;display:flex;gap:12px;align-items:center}
-  /* part guides (layout-mode style) */
-  .plabel{
-    position:absolute;left:0;top:0;font-size:9px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;
-    color:oklch(0.62 0.01 260);background:oklch(0.18 0.01 260/.6);padding:3px 8px;border-bottom-right-radius:6px;
-    display:none;
-  }
-  body.guides .plabel{display:inline-block}
-  body.guides .part + .part{border-top:1px dashed oklch(0.6 0.08 205/.55)}
-  /* ---------- objects ---------- */
-  .title{font-size:30px;font-weight:600;letter-spacing:-.015em;color:var(--t-title)}
-  .merge{font-family:var(--mono);font-size:12.5px;color:var(--t-label);margin-top:6px}
-  .section + .section{margin-top:26px}
+  .part.header{background:var(--t-header);padding:20px 40px 18px}
+  .part.body{background:var(--t-body);padding:26px 40px 32px}
+  .part.footer{background:var(--t-footer);padding:14px 40px;display:flex;gap:10px;align-items:center}
+
+  .title{font-size:23px;font-weight:600;letter-spacing:-.01em;color:var(--t-title);line-height:1.1}
+  .merge{font-family:var(--mono);font-size:11.5px;color:var(--t-label);margin-top:5px}
+
+  .section + .section{margin-top:22px}
   .shead{
-    font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--t-accent);
-    margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid oklch(0.42 0.01 260/.5);
+    font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--t-accent);
+    margin:0 0 12px;padding-bottom:6px;border-bottom:1px solid oklch(0.42 0.01 260/.45);
   }
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 26px}
-  .obj .lab{display:block;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--t-label);margin-bottom:6px}
-  .field{
-    background:var(--t-field);border:1px solid var(--t-field-border);border-radius:5px;padding:9px 12px;
-    font-size:13.5px;min-height:38px;display:flex;align-items:center;font-variant-numeric:tabular-nums;
-    box-shadow:inset 0 1px 2px oklch(0 0 0/.15);
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 30px}
+  .obj.span2{grid-column:1 / -1}
+
+  .lab{display:block;font-size:10.5px;font-weight:600;letter-spacing:.01em;color:var(--t-label);margin-bottom:4px}
+
+  /* --- real interactive controls --- */
+  .inp{
+    width:100%;height:29px;background:var(--t-field);color:var(--t-field-text);
+    border:1px solid var(--t-field-border);border-radius:3px;padding:0 9px;
+    font-family:var(--sans);font-size:13px;line-height:27px;font-variant-numeric:tabular-nums;
+    box-shadow:inset 0 1px 1px oklch(0 0 0/.14);outline:none;
+    transition:border-color .12s cubic-bezier(.25,1,.5,1), box-shadow .12s cubic-bezier(.25,1,.5,1);
   }
-  .field.disp{background:transparent;border-style:dashed;border-color:oklch(0.42 0.02 260);color:oklch(0.82 0.01 260);box-shadow:none}
-  .field.multi{min-height:auto;white-space:pre-line;line-height:1.6;align-items:flex-start;font-family:var(--mono);font-size:12px}
-  .field.sel{justify-content:space-between}
-  .field .chev{color:var(--t-label);font-size:10px}
-  .checkset{display:flex;align-items:center;gap:10px}
-  .box{width:17px;height:17px;border:1.5px solid var(--t-field-border);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:var(--t-accent);background:var(--t-field)}
-  .radios{display:flex;gap:9px;flex-wrap:wrap}
-  .radio{display:inline-flex;align-items:center;gap:7px;font-size:13px;padding:7px 13px;border:1px solid var(--t-field-border);border-radius:100px;color:var(--t-label)}
-  .radio.on{border-color:var(--t-accent);color:var(--t-field-text);background:oklch(0.72 0.11 205/.13)}
-  .radio .rd{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--t-field-border)}
-  .radio.on .rd{border-color:var(--t-accent);background:var(--t-accent)}
-  .fmbtn{
-    font-family:var(--sans);font-size:13px;font-weight:550;cursor:default;padding:10px 18px;border-radius:6px;
+  .inp:focus{border-color:var(--t-accent);box-shadow:0 0 0 3px oklch(0.72 0.11 205/.28)}
+  select.inp{-webkit-appearance:none;appearance:none;cursor:pointer;padding-right:26px;
+    background-image:linear-gradient(45deg,transparent 50%,var(--t-label) 50%),linear-gradient(135deg,var(--t-label) 50%,transparent 50%);
+    background-position:calc(100% - 14px) 12px,calc(100% - 9px) 12px;background-size:5px 5px,5px 5px;background-repeat:no-repeat;}
+  /* display-only (calc / merge fields): no entry box, just the value */
+  .disp{font-size:13px;color:oklch(0.82 0.01 260);height:29px;line-height:29px;font-variant-numeric:tabular-nums}
+  .disp.mono{font-family:var(--mono);font-size:12px}
+  /* multi-line value-list seed: bordered readout */
+  .multibox{
+    background:var(--t-field);border:1px solid var(--t-field-border);border-radius:3px;
+    padding:8px 10px;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--t-field-text);
+    white-space:pre-line;box-shadow:inset 0 1px 1px oklch(0 0 0/.14);
+  }
+  /* checkbox set */
+  .chk{display:inline-flex;align-items:center;gap:9px;height:29px;cursor:pointer;user-select:none;font-size:13px;color:var(--t-field-text)}
+  .chk .box{width:16px;height:16px;border:1.5px solid var(--t-field-border);border-radius:3px;background:var(--t-field);display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:var(--t-bg);transition:background .12s,border-color .12s}
+  .chk.on .box{background:var(--t-accent);border-color:var(--t-accent)}
+  .chk .box svg{opacity:0;transition:opacity .1s}
+  .chk.on .box svg{opacity:1}
+  /* radio set */
+  .radios{display:flex;gap:8px;height:29px;align-items:center;flex-wrap:wrap}
+  .radio{display:inline-flex;align-items:center;gap:7px;font-size:13px;padding:5px 13px;border:1px solid var(--t-field-border);border-radius:100px;color:var(--t-label);cursor:pointer;user-select:none;transition:border-color .12s,color .12s,background .12s}
+  .radio .rd{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--t-field-border);transition:border-color .12s,box-shadow .12s}
+  .radio.on{border-color:var(--t-accent);color:var(--t-field-text);background:oklch(0.72 0.11 205/.12)}
+  .radio.on .rd{border-color:var(--t-accent);box-shadow:inset 0 0 0 2.5px var(--t-accent)}
+  /* buttons */
+  .btn{
+    font-family:var(--sans);font-size:12.5px;font-weight:550;cursor:pointer;padding:8px 16px;border-radius:5px;
     border:1px solid var(--t-field-border);background:var(--t-field);color:var(--t-field-text);
+    transition:border-color .12s,background .12s,transform .05s;
   }
-  .fmbtn.primary{background:oklch(0.72 0.11 205/.18);border-color:var(--t-accent);color:var(--t-title)}
-  .foot-note{margin-left:auto;font-size:11px;color:var(--t-label);font-family:var(--mono)}
-  /* ---------- bottom status ---------- */
-  .status{
-    flex:0 0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 18px;
-    background:linear-gradient(var(--app-bar),var(--app-bar2));border-top:1px solid var(--app-line);
-    font-size:12px;color:var(--app-dim);
-  }
-  .status .k{color:var(--app-faint)}
-  .status .v{color:var(--app-ink);font-weight:600}
-  .status .prov{color:oklch(0.55 0.12 70);font-weight:600}
-  .status .path{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--app-faint)}
-  @media (max-width:720px){ .grid{grid-template-columns:1fr} .stage{padding:16px} }
+  .btn:hover{border-color:var(--t-accent)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:oklch(0.72 0.11 205/.18);border-color:var(--t-accent);color:var(--t-title)}
+  /* tiny transient confirmation when a button fires (interactivity feedback) */
+  #flash{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(12px);
+    background:var(--t-header);color:var(--t-field-text);border:1px solid var(--t-field-border);
+    padding:8px 15px;border-radius:7px;font-size:12.5px;opacity:0;pointer-events:none;
+    box-shadow:0 12px 30px -12px oklch(0 0 0/.6);transition:opacity .18s,transform .28s cubic-bezier(.22,1,.36,1)}
+  #flash.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
-<body class="guides">
-  <div class="fmbar">
-    <div class="lname"><span class="swatch"></span><span id="viewName">Layout</span><span class="chev">▾</span></div>
-    <div class="modeseg"><span class="on">Browse</span><span>Find</span><span>Preview</span></div>
-    <div class="meta">
-      <span class="chip">TO&nbsp;<b id="occ">—</b></span>
-      <span class="chip" id="stencil">—</span>
-      <span class="chip">Theme&nbsp;<b id="themeName">—</b></span>
-    </div>
-    <div class="spacer"></div>
-    <label class="guidetog on" id="tgGuides"><span class="sw"></span>Layout guides</label>
-    <div class="zoom">
-      <span class="zbtn" id="zOut">−</span><span class="zval" id="zVal">100%</span><span class="zbtn" id="zIn">+</span>
-    </div>
-  </div>
-
-  <div class="rulerwrap"><div class="rcorner"></div><div class="ruler"><div class="rInner" id="rInner"></div></div></div>
-
-  <div class="stage" id="stage">
-    <div class="devwrap" id="devwrap">
-      <div class="device" id="device"></div>
-    </div>
-  </div>
-
-  <div class="status">
-    <span><span class="k">Platform</span> <span class="v" id="s-plat">—</span></span>
-    <span><span class="k">Design width</span> <span class="v" id="s-width">—</span></span>
-    <span><span class="k">Base table</span> <span class="v" id="s-base">—</span></span>
-    <span><span class="k">Objects</span> <span class="v" id="s-count">—</span></span>
-    <span><span class="k">Theme</span> <span class="prov" id="s-theme">provisional</span></span>
-    <span class="path">layouts/utility/LAYOUT-global-variables/preview.html</span>
-  </div>
+<body>
+  <div id="fit"><div id="layout"></div></div>
+  <div id="flash"></div>
 
 <script type="application/json" id="layout-manifest">
 {
-  "_meta": { "app": "maw-budget", "kind": "filemaker-layout-render", "rendererVersion": "0.2", "generated": "2026-07-16", "note": "Real as-built render. Geometry + theme drive the canvas. Theme is PROVISIONAL pending the FMP themes doc-set migration." },
+  "_meta": { "app": "maw-budget", "kind": "filemaker-layout-render", "rendererVersion": "0.3", "generated": "2026-07-16", "note": "Pure interactive Browse-mode render. No dev chrome. Manifest-driven; auto-extends with new objects. Theme provisional pending themes doc-set." },
   "layout": {
     "name": "GLOBAL_Settings",
     "viewName": "SYS | Global Settings [DSK]",
-    "folder": "utility",
-    "occurrence": "Globals",
-    "baseTable": "Globals",
-    "mode": "Browse",
-    "platform": "Computer",
-    "targetStencil": "Desktop: 1024 x 768",
     "layoutWidth": 1024,
-    "theme": { "name": "MAW Dark Utility", "status": "provisional", "themeRef": "meta/themes.md#maw-dark-utility (pending migration)" }
+    "theme": {
+      "name": "MAW Dark Utility",
+      "tokens": {
+        "t-bg": "oklch(0.23 0.013 260)",
+        "t-header": "oklch(0.285 0.02 260)",
+        "t-body": "oklch(0.235 0.012 260)",
+        "t-footer": "oklch(0.27 0.016 260)",
+        "t-field": "oklch(0.31 0.014 260)",
+        "t-field-border": "oklch(0.44 0.02 260)",
+        "t-field-text": "oklch(0.94 0.008 260)",
+        "t-label": "oklch(0.70 0.012 260)",
+        "t-accent": "oklch(0.72 0.11 205)",
+        "t-title": "oklch(0.96 0.02 205)"
+      }
+    }
   },
   "sections": [
     { "id": "identity", "label": "Session & Identity" },
@@ -199,22 +146,22 @@
     { "id": "import", "label": "Import / Process State" }
   ],
   "objects": [
-    { "seq": 1, "part": "header", "kind": "text", "control": "staticText", "label": "Global Settings", "sample": "Global Settings" },
-    { "seq": 2, "part": "header", "kind": "text", "control": "mergeText", "label": "Env / version", "sample": "PROD · v0.1.0" },
-    { "seq": 3, "part": "body", "section": "identity", "kind": "field", "control": "editBox", "label": "Current User", "sample": "Michael Wizorek" },
-    { "seq": 4, "part": "body", "section": "identity", "kind": "field", "control": "displayOnly", "label": "App Version", "sample": "0.1.0" },
-    { "seq": 5, "part": "body", "section": "identity", "kind": "field", "control": "popupMenu", "label": "Environment", "sample": "PROD" },
-    { "seq": 6, "part": "body", "section": "identity", "kind": "field", "control": "checkboxSet", "label": "Debug Mode", "sample": "off", "checked": false },
-    { "seq": 7, "part": "body", "section": "prefs", "kind": "field", "control": "radioButtonSet", "label": "Theme", "sample": "Dark", "options": ["Dark","Light"] },
-    { "seq": 8, "part": "body", "section": "prefs", "kind": "field", "control": "dropDownList", "label": "Default Account", "sample": "Chase Checking" },
-    { "seq": 9, "part": "body", "section": "prefs", "kind": "field", "control": "editBox", "label": "Current Budget Month", "sample": "2026-07-01" },
-    { "seq": 10, "part": "body", "section": "prefs", "kind": "field", "control": "displayOnly", "label": "Today", "sample": "2026-07-16" },
-    { "seq": 11, "part": "body", "section": "vlists", "kind": "field", "control": "displayMulti", "label": "Account Types (seed)", "sample": "Checking\nSavings\nCredit Card\nCash\nLoan\nReceivable\nAsset (feed-less)" },
-    { "seq": 12, "part": "body", "section": "vlists", "kind": "field", "control": "displayMulti", "label": "Transaction States", "sample": "Pending\nCleared" },
-    { "seq": 13, "part": "body", "section": "import", "kind": "field", "control": "checkboxSet", "label": "Import In Progress", "sample": "off", "checked": false },
-    { "seq": 14, "part": "body", "section": "import", "kind": "field", "control": "displayOnly", "label": "Last Import Session", "sample": "2026-07-14 · Chase · 42 rows" },
-    { "seq": 15, "part": "footer", "kind": "button", "control": "buttonPrimary", "label": "Reset Session Globals" },
-    { "seq": 16, "part": "footer", "kind": "button", "control": "button", "label": "Toggle Theme" }
+    { "seq": 1, "part": "header", "kind": "text", "control": "staticText", "sample": "Global Settings" },
+    { "seq": 2, "part": "header", "kind": "text", "control": "mergeText", "sample": "PROD · v0.1.0" },
+    { "seq": 3, "part": "body", "section": "identity", "control": "editBox", "label": "Current User", "value": "Michael Wizorek" },
+    { "seq": 4, "part": "body", "section": "identity", "control": "displayOnly", "label": "App Version", "value": "0.1.0" },
+    { "seq": 5, "part": "body", "section": "identity", "control": "popupMenu", "label": "Environment", "value": "PROD", "options": ["DEV","PROD"] },
+    { "seq": 6, "part": "body", "section": "identity", "control": "checkboxSet", "label": "Debug Mode", "checked": false },
+    { "seq": 7, "part": "body", "section": "prefs", "control": "radioButtonSet", "label": "Theme", "value": "Dark", "options": ["Dark","Light"] },
+    { "seq": 8, "part": "body", "section": "prefs", "control": "dropDownList", "label": "Default Account", "value": "Chase Checking", "options": ["Chase Checking","Chase Savings","Capital One Venture","Amex Blue Cash","Cash Wallet"] },
+    { "seq": 9, "part": "body", "section": "prefs", "control": "editBox", "label": "Current Budget Month", "value": "2026-07-01" },
+    { "seq": 10, "part": "body", "section": "prefs", "control": "displayOnly", "label": "Today", "value": "2026-07-16" },
+    { "seq": 11, "part": "body", "section": "vlists", "control": "displayMulti", "label": "Account Types (seed)", "span2": true, "value": "Checking\nSavings\nCredit Card\nCash\nLoan\nReceivable\nAsset (feed-less)" },
+    { "seq": 12, "part": "body", "section": "vlists", "control": "displayMulti", "label": "Transaction States", "span2": true, "value": "Pending\nCleared" },
+    { "seq": 13, "part": "body", "section": "import", "control": "checkboxSet", "label": "Import In Progress", "checked": false },
+    { "seq": 14, "part": "body", "section": "import", "control": "displayOnly", "label": "Last Import Session", "value": "2026-07-14 · Chase · 42 rows" },
+    { "seq": 15, "part": "footer", "control": "buttonPrimary", "label": "Reset Session Globals" },
+    { "seq": 16, "part": "footer", "control": "button", "label": "Toggle Theme" }
   ]
 }
 </script>
@@ -222,72 +169,74 @@
 <script>
 (function(){
   var M = JSON.parse(document.getElementById('layout-manifest').textContent);
-  var L = M.layout;
-  var dev = document.getElementById('device');
-  var T = L.theme;
-  document.getElementById('viewName').textContent = L.viewName || L.name;
-  document.getElementById('occ').textContent = L.occurrence;
-  document.getElementById('stencil').textContent = L.targetStencil;
-  document.getElementById('themeName').textContent = T.name;
-  document.getElementById('s-plat').textContent = L.platform;
-  document.getElementById('s-width').textContent = L.layoutWidth + ' pt';
-  document.getElementById('s-base').textContent = L.baseTable;
-  document.getElementById('s-count').textContent = M.objects.length;
-  document.getElementById('s-theme').textContent = T.name + ' · ' + (T.status||'—');
-  dev.style.width = L.layoutWidth + 'px';
+  var L = M.layout, root = document.getElementById('layout');
+  document.title = L.viewName || L.name;
+  var tk = L.theme.tokens; Object.keys(tk).forEach(function(k){ root.style.setProperty('--'+k, tk[k]); document.documentElement.style.setProperty('--'+k, tk[k]); });
+  root.style.width = (L.layoutWidth||1024)+'px';
 
-  function byPart(p){ return M.objects.filter(function(o){return o.part===p;}); }
+  var CHECK = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.2 2.2 4.8-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var uid=0;
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
   function control(o){
+    var id='c'+(++uid);
     switch(o.control){
-      case 'staticText': return '<div class="title">'+o.sample+'</div>';
-      case 'mergeText':  return '<div class="merge">'+o.sample+'</div>';
-      case 'editBox':    return '<div class="field">'+o.sample+'</div>';
-      case 'displayOnly':return '<div class="field disp">'+o.sample+'</div>';
-      case 'displayMulti':return '<div class="field disp multi">'+o.sample+'</div>';
+      case 'staticText': return '<div class="title">'+esc(o.sample)+'</div>';
+      case 'mergeText':  return '<div class="merge">'+esc(o.sample)+'</div>';
+      case 'editBox':    return '<input class="inp" type="text" value="'+esc(o.value||'')+'">';
+      case 'displayOnly':return '<div class="disp mono">'+esc(o.value||'')+'</div>';
+      case 'displayMulti':return '<div class="multibox">'+esc(o.value||'')+'</div>';
       case 'popupMenu':
-      case 'dropDownList':return '<div class="field sel">'+o.sample+'<span class="chev">▼</span></div>';
-      case 'checkboxSet':return '<div class="field checkset"><span class="box">'+(o.checked?'✓':'')+'</span>'+(o.checked?'Enabled':'Disabled')+'</div>';
-      case 'radioButtonSet':return '<div class="radios">'+o.options.map(function(op){var on=op===o.sample;return '<span class="radio'+(on?' on':'')+'"><span class="rd"></span>'+op+'</span>';}).join('')+'</div>';
-      case 'button':      return '<button class="fmbtn">'+o.label+'</button>';
-      case 'buttonPrimary':return '<button class="fmbtn primary">'+o.label+'</button>';
-      default: return '<div class="field">'+(o.sample||'')+'</div>';
+      case 'dropDownList':
+        return '<select class="inp">'+ (o.options||[]).map(function(op){return '<option'+(op===o.value?' selected':'')+'>'+esc(op)+'</option>';}).join('') +'</select>';
+      case 'checkboxSet':
+        return '<div class="chk'+(o.checked?' on':'')+'" data-chk role="checkbox" aria-checked="'+(!!o.checked)+'" tabindex="0"><span class="box">'+CHECK+'</span><span class="chk-t">'+(o.checked?'Enabled':'Disabled')+'</span></div>';
+      case 'radioButtonSet':
+        return '<div class="radios" data-radio>'+ (o.options||[]).map(function(op){return '<span class="radio'+(op===o.value?' on':'')+'" data-val="'+esc(op)+'"><span class="rd"></span>'+esc(op)+'</span>';}).join('') +'</div>';
+      case 'button':      return '<button class="btn" data-btn="'+esc(o.label)+'">'+esc(o.label)+'</button>';
+      case 'buttonPrimary':return '<button class="btn primary" data-btn="'+esc(o.label)+'">'+esc(o.label)+'</button>';
+      default: return '<input class="inp" type="text" value="'+esc(o.value||'')+'">';
     }
   }
   function objHTML(o){
-    if(o.kind==='field') return '<div class="obj"><span class="lab">'+o.label+'</span>'+control(o)+'</div>';
-    return '<div class="obj">'+control(o)+'</div>';
+    var body = control(o);
+    if(o.kind==='text' || o.control==='button' || o.control==='buttonPrimary') return o.part==='footer' ? body : '<div class="obj'+(o.span2?' span2':'')+'">'+body+'</div>';
+    return '<div class="obj'+(o.span2?' span2':'')+'"><span class="lab">'+esc(o.label||'')+'</span>'+body+'</div>';
   }
-  var header = '<div class="plabel">Header</div>' + byPart('header').map(objHTML).join('');
-  var body = '<div class="plabel">Body</div>' + M.sections.map(function(s){
-    var objs = M.objects.filter(function(o){return o.part==='body'&&o.section===s.id;});
-    return '<div class="section"><div class="shead">'+s.label+'</div><div class="grid">'+objs.map(objHTML).join('')+'</div></div>';
+  function part(p){ return M.objects.filter(function(o){return o.part===p;}); }
+
+  var header = part('header').map(objHTML).join('');
+  var body = M.sections.map(function(s){
+    var objs = M.objects.filter(function(o){return o.part==='body' && o.section===s.id;});
+    if(!objs.length) return '';
+    return '<div class="section"><div class="shead">'+esc(s.label)+'</div><div class="grid">'+objs.map(objHTML).join('')+'</div></div>';
   }).join('');
-  var footer = '<div class="plabel">Footer</div>' + byPart('footer').map(objHTML).join('') + '<span class="foot-note">'+ (L.viewName||L.name) +'</span>';
-  dev.innerHTML = '<div class="part header">'+header+'</div><div class="part body">'+body+'</div><div class="part footer">'+footer+'</div>';
+  var footer = part('footer').map(objHTML).join('');
 
-  var rInner = document.getElementById('rInner');
-  var W = L.layoutWidth, step = 128, rh='';
-  rInner.style.width = W+'px';
-  for(var x=0;x<=W;x+=step){ rh += '<div class="tick'+(x%256===0?' major':'')+'" style="left:'+x+'px">'+(x%256===0?x:'')+'</div>'; }
-  rInner.innerHTML = rh;
+  root.innerHTML =
+    '<div class="part header">'+header+'</div>'+
+    '<div class="part body">'+body+'</div>'+
+    '<div class="part footer">'+footer+'</div>';
 
-  var stage=document.getElementById('stage'), devwrap=document.getElementById('devwrap');
-  var userZoom=null;
-  function fit(){
-    var avail = stage.clientWidth - 60;
-    var auto = Math.min(1, avail / W);
-    var s = userZoom!==null ? userZoom : auto;
-    devwrap.style.transform='scale('+s+')';
-    rInner.style.transform='scale('+s+')';
-    document.getElementById('zVal').textContent = Math.round(s*100)+'%';
-  }
-  document.getElementById('zIn').onclick=function(){ var cur=parseFloat(document.getElementById('zVal').textContent)/100; userZoom=Math.min(2,cur+0.1); fit(); };
-  document.getElementById('zOut').onclick=function(){ var cur=parseFloat(document.getElementById('zVal').textContent)/100; userZoom=Math.max(0.3,cur-0.1); fit(); };
-  window.addEventListener('resize', function(){ if(userZoom===null) fit(); });
-  fit();
+  // --- interactivity ---
+  root.addEventListener('click', function(e){
+    var chk = e.target.closest('[data-chk]');
+    if(chk){ var on=chk.classList.toggle('on'); chk.setAttribute('aria-checked',on); chk.querySelector('.chk-t').textContent = on?'Enabled':'Disabled'; return; }
+    var rb = e.target.closest('.radio');
+    if(rb && rb.parentElement.hasAttribute('data-radio')){ rb.parentElement.querySelectorAll('.radio').forEach(function(r){r.classList.remove('on');}); rb.classList.add('on'); return; }
+    var btn = e.target.closest('[data-btn]');
+    if(btn){ flash(btn.getAttribute('data-btn')+' →  (script stub)'); }
+  });
+  root.addEventListener('keydown', function(e){
+    if((e.key===' '||e.key==='Enter') && e.target.hasAttribute && e.target.hasAttribute('data-chk')){ e.preventDefault(); e.target.click(); }
+  });
+  var ft, flashEl=document.getElementById('flash');
+  function flash(msg){ flashEl.textContent=msg; flashEl.classList.add('show'); clearTimeout(ft); ft=setTimeout(function(){flashEl.classList.remove('show');},1400); }
 
-  var tg=document.getElementById('tgGuides');
-  tg.onclick=function(){ document.body.classList.toggle('guides'); tg.classList.toggle('on'); };
+  // --- silent auto-fit to viewport (no zoom UI) ---
+  var fit=document.getElementById('fit'), W=(L.layoutWidth||1024);
+  function scale(){ var s=Math.min(1,(window.innerWidth-0)/W); fit.style.transform='scale('+s+')'; document.body.style.height=(root.offsetHeight*s)+'px'; }
+  window.addEventListener('resize',scale); scale();
 })();
 </script>
 </body>

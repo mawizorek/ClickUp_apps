@@ -2,9 +2,10 @@
   "_meta": {
     "app": "maw-budget",
     "folder": "layouts",
-    "schemaVersion": "1.2",
+    "schemaVersion": "1.3",
     "generated": "2026-07-16",
-    "convention": "folder-per-layout: each layout is its own folder (layouts/<folder>/LAYOUT-<name>/) holding layout.json (canonical manifest) + index.html (object/JSON inspector) + preview.html (real to-scale as-built render) + README.md. Diverges from the one-file-per-layout line in DOCUMENTATION-STANDARD v1.1; standard update pending sign-off. PROPOSED next step: extract the inspector into a shared repo-root app (slug fm-layout-viewer) that loads any app's layout.json, so per-layout folders stop shipping an inspector copy and index.html can become the render."
+    "convention": "folder-per-layout: each layout is its own folder (layouts/<folder>/LAYOUT-<name>/) holding layout.json (canonical manifest) + preview.html (pure, chrome-free, interactive Browse-mode render — feels exactly like the built FileMaker layout) + index.html (object/JSON inspector, annotated) + README.md. Diverges from the one-file-per-layout line in DOCUMENTATION-STANDARD v1.1; standard update pending sign-off.",
+    "viewerDecision": "DECIDED (Michael, 2026-07-16): the shared object/JSON inspector becomes a standalone app named 'z-fm-layout-object-viewer', living at the filemaker/ folder level (filemaker/z-fm-layout-object-viewer/), alongside the FileMaker apps — NOT at the repo root with the ClickUp apps. It loads any FMP app's layout.json by slug+path. Once built, per-layout folders stop shipping an inspector copy; preview.html stays the pure render. BUILD PENDING explicit go-ahead."
   },
   "layouts": [
     {
@@ -23,8 +24,8 @@
       "objectCount": 16,
       "bindingsStatus": "proposed",
       "manifest": "utility/LAYOUT-global-variables/layout.json",
-      "inspector": "utility/LAYOUT-global-variables/index.html",
-      "render": "utility/LAYOUT-global-variables/preview.html"
+      "render": "utility/LAYOUT-global-variables/preview.html",
+      "inspector": "utility/LAYOUT-global-variables/index.html"
     }
   ]
 }
