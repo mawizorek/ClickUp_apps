@@ -15,6 +15,17 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ---
 
+## 2026-07-16 · preview.html auto-populates its menu from the registry
+**Decision:** The gallery's theme menu builds itself from `_index.json` (the theme registry) at load, with a baked-in list as fallback; each swatch color is read from `themes.css` via a hidden probe. Adding a theme (JSON + register + regen CSS) makes it appear in the menu with NO edit to `preview.html`.
+**Why:** "Themes should auto-populate into this index." A hand-maintained theme list in the preview would drift from the registry. Reading the registry + probing the CSS for swatches means the menu can never fall out of sync, and no accent is ever hand-copied. Styling still comes from the static `themes.css` so the page can't white-screen if the fetch fails.
+**Status:** locked
+**Supersedes:** the temporary fully-baked-in theme list introduced when the menu was hardened against the resolve.js load failure.
+
+## 2026-07-16 · Neutral & Natural light pair added (paper-mono, papyrus)
+**Decision:** Added two light themes in a new `neutral` group: `paper-mono` (plain white surfaces, near-black monochrome ink, accent = ink) and `papyrus` (warm parchment surfaces, sepia ink, burnt-ochre wooded accent).
+**Why:** First non-F1 light themes; gives a clean neutral baseline and a warm natural option, and proves the "drop in a theme by filling 17 variables" flow end to end (JSON → register → regen CSS → auto-appears in the menu).
+**Status:** locked
+
 ## 2026-07-16 · 20-object coverage is the theme acceptance test
 **Decision:** A theme is only "done" when it styles all 20 canonical FileMaker objects with no token fallback (17/17). `preview.html` is the theme × object gallery that proves it; `OBJECT-COVERAGE.md` is the contract.
 **Why:** Guarantees every object has a defined style in every theme AND forces every theme to define all 17 tokens. Ties the object system and the token system together so neither can drift.
