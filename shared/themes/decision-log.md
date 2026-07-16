@@ -15,6 +15,16 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ---
 
+## 2026-07-16 · `_template.json` is the canonical copy-me start for a new theme
+**Decision:** New themes start by copying `_template.json` (all 17 tokens present with role-hint values + an inline `_README` of the 4 steps). The README "Adding a theme" section is the crisp procedure: copy → fill 17 → register one line in `_index.json` → `node build-themes.mjs`.
+**Why:** A cold agent had no obvious file to copy and would clone an existing theme (and might miss the register/regen steps). A named template + a 4-step README makes the instruction literal and unmissable, and states plainly that themes.css is generated (not the 1-file mental model, but close).
+**Status:** locked
+
+## 2026-07-16 · Americana light theme added
+**Decision:** Added `americana` (light) to the Neutral & Natural group: soft white surfaces, Old Glory Blue (#3C3B6E) ink + secondary, Old Glory Red (#B22234) actionable accent.
+**Why:** Requested; also the first theme built via the copy-`_template.json` flow, validating the cold-agent path end to end.
+**Status:** locked
+
 ## 2026-07-16 · preview.html auto-populates its menu from the registry
 **Decision:** The gallery's theme menu builds itself from `_index.json` (the theme registry) at load, with a baked-in list as fallback; each swatch color is read from `themes.css` via a hidden probe. Adding a theme (JSON + register + regen CSS) makes it appear in the menu with NO edit to `preview.html`.
 **Why:** "Themes should auto-populate into this index." A hand-maintained theme list in the preview would drift from the registry. Reading the registry + probing the CSS for swatches means the menu can never fall out of sync, and no accent is ever hand-copied. Styling still comes from the static `themes.css` so the page can't white-screen if the fetch fails.
