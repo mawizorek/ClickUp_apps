@@ -9,6 +9,7 @@
    black-alpha scrim, which must darken regardless of theme). */
 (function () {
   var open = { nav: false, settings: false, pop: false };
+  var lastTrigger = null; // element focus returns to when a drawer closes
   var SPINE_INDEX = "../shared/themes/_index.json"; // fallback if resolve.js didn't load
 
   function el(tag, attrs, html) {
@@ -47,8 +48,8 @@
           '<span class="hd-name">' + cfg.appName + '</span></a>' +
         '<button class="hd-icon hd-gear" id="gearBtn" aria-label="Settings" aria-expanded="false" aria-controls="settingsDrawer">\u2699</button>' +
       '</div>';
-    document.getElementById("navBtn").addEventListener("click", function () { toggle("nav"); });
-    document.getElementById("gearBtn").addEventListener("click", function () { toggle("settings"); });
+    document.getElementById("navBtn").addEventListener("click", function () { toggle("nav", this); });
+    document.getElementById("gearBtn").addEventListener("click", function () { toggle("settings", this); });
   }
 
   /* ---------- shared scrim + open/close ---------- */
@@ -66,23 +67,28 @@
     d.classList.toggle("is-open", v);
     d.setAttribute("aria-hidden", String(!v));
     document.getElementById(btn).setAttribute("aria-expanded", String(v));
+    if (v) { var x = d.querySelector(".drawer-x"); if (x) setTimeout(function () { x.focus(); }, 60); }
   }
-  function toggle(which) {
+  function toggle(which, trigger) {
     var willOpen = !open[which];
+    if (willOpen && trigger) lastTrigger = trigger;
     // mutually exclusive: opening one closes the other
     setDrawer("nav", which === "nav" ? willOpen : false);
     setDrawer("settings", which === "settings" ? willOpen : false);
     if (!open.settings) closePop();
     scrim().hidden = !(open.nav || open.settings);
+    if (!open.nav && !open.settings) restoreFocus();
   }
+  function restoreFocus() { if (lastTrigger) { try { lastTrigger.focus(); } catch (e) {} lastTrigger = null; } }
   function closeAll() {
     setDrawer("nav", false); setDrawer("settings", false); closePop();
     scrim().hidden = true;
+    restoreFocus();
   }
 
   /* ---------- left nav drawer ---------- */
   function buildNavDrawer(cfg) {
-    var d = el("aside", { id: "navDrawer", "class": "drawer drawer-left", "aria-hidden": "true", role: "dialog", "aria-label": "Menu" });
+    var d = el("aside", { id: "navDrawer", "class": "drawer drawer-left", "aria-hidden": "true", role: "dialog", "aria-modal": "true", "aria-label": "Menu" });
     d.innerHTML =
       '<div class="drawer-head"><h2>Menu</h2><button class="drawer-x" id="navX" aria-label="Close menu">\u2715</button></div>' +
       '<nav class="drawer-body nav-list" aria-label="Primary">' +
@@ -97,7 +103,7 @@
 
   /* ---------- right settings drawer ---------- */
   function buildSettingsDrawer(cfg) {
-    var d = el("aside", { id: "settingsDrawer", "class": "drawer drawer-right", "aria-hidden": "true", role: "dialog", "aria-label": "Settings" });
+    var d = el("aside", { id: "settingsDrawer", "class": "drawer drawer-right", "aria-hidden": "true", role: "dialog", "aria-modal": "true", "aria-label": "Settings" });
     d.innerHTML =
       '<div class="drawer-head"><h2>Settings</h2><button class="drawer-x" id="setX" aria-label="Close settings">\u2715</button></div>' +
       '<div class="drawer-body">' +

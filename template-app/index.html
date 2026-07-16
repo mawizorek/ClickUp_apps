@@ -7,6 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#9a9a9a">
 <meta name="robots" content="noindex, nofollow">
+<!-- EARLY THEME: set the saved theme's data-theme before first paint so a saved
+     non-default theme paints instantly (no gray flash). themes.css keys off this attribute. -->
+<script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <title>App Name</title>
 <meta name="description" content="One-line description of what this app does.">
 <!-- Open Graph / Twitter. Drop a real og.png (1200x630, <300KB) at the app root via the GitHub UI. -->
@@ -24,7 +27,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint; resolve.js = live switching. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=3">
+<link rel="stylesheet" href="./styles.css?v=4">
 </head>
 <body>
 <!-- ACCESS GATE (config.json drives it; inline fallback keeps it working on file:// or a 404) -->
@@ -47,13 +50,13 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js?v=3"></script>
+<script src="./chrome.js?v=4"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS — swap these when you copy the template ==== */
   var APP_NAME    = "App Name";
-  var APP_VERSION = "v3";
-  var APP_PR      = 293;           // merged PR number that shipped this version
+  var APP_VERSION = "v4";
+  var APP_PR      = 299;           // merged PR number that shipped this version
   var DEFAULT_THEME = (window.THEMES && THEMES.DEFAULT) || "default-theme";
   var DEFAULT_PAGE  = "home";       // one-line landing repoint, no rebuild needed
   var NAV = [
