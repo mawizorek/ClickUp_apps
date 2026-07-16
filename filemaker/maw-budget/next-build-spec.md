@@ -8,7 +8,7 @@
 - 2026-07-15 brainstorm: core job = **account / net-worth tracking + bill/subscription tracking**, budgeting later. Single user (Michael). Naming = HML_LLC style (clean PascalCase, drop legacy SCREAMING names).
 - 2026-07-15 research pass (v0.1): benchmarked QuickBooks, YNAB/Monarch/Copilot/Actual, Firefly III, Maybe, GnuCash, and Bloomberg Terminal. Confirmed the double-entry lean. Deep-dive below.
 - 2026-07-15 (v0.2): **double-entry RULED IN by Michael.** Fork closed. Foundational design calls locked in `meta/design-decisions.md`. Now interrogating goals (below) BEFORE any table is written — no field-guessing.
-- 2026-07-15 (v0.2, inquiry): answers **A**, **B**, **C** captured; **L** raised (reimbursements → DD-013). Import (CSV) + hierarchical categories confirmed.
+- 2026-07-15 (v0.2, inquiry): answers **A**, **B**, **C**, **D** captured; **L** raised (reimbursements → DD-013). Import (CSV), hierarchical categories, and splits confirmed.
 
 ## Locked decisions (see `meta/design-decisions.md` for the why)
 
@@ -25,6 +25,7 @@
 - **DD-012 CSV import + manual entry, ~weekly** — import tooling is Phase 1 (see B).
 - **DD-013 Reimbursements = receivables** — parties owed-by tracked as receivable accounts; gig income is separate (see L).
 - **DD-014 Hierarchical categories** — self-referencing parent → child tree; rollups for free (see C).
+- **DD-015 Multi-category splits** — N legs on one event; a split is just more legs (see D).
 
 ## Reference model deep-dive (researched 2026-07-15)
 
@@ -45,7 +46,7 @@
 
 ### Open-source accounting engines (the actual schema to copy)
 
-- **Firefly III** — `TransactionGroup -> TransactionJournal (the event) -> Transaction (the legs)`. Legs reference an account, carry a signed amount, sum to 0. The pattern we steal. (Firefly models reimbursements exactly this way: a revenue/expense party account you carry a balance against.)
+- **Firefly III** — `TransactionGroup -> TransactionJournal (the event) -> Transaction (the legs)`. Legs reference an account, carry a signed amount, sum to 0. The pattern we steal. Splits = extra legs (DD-015). (Firefly models reimbursements exactly this way: a revenue/expense party account you carry a balance against.)
 - **Maybe** — adds point-in-time **Valuations** for feed-less assets. Adopted (DD-005).
 - **GnuCash** — classic strict double-entry desktop. Confirms the model.
 
@@ -57,7 +58,7 @@
 
 ## Money direction, signs, debit vs credit (the mental model)
 
-- **Double-entry in plain terms:** every event moves money FROM one account TO another. Two legs, opposite signs, net zero.
+- **Double-entry in plain terms:** every event moves money FROM one account TO another. Two legs (or more), opposite signs, net zero.
 - **Debit / credit = left / right of an entry, not add / subtract.** Effect depends on account type:
   - **Assets & Expenses:** debit **increases**, credit **decreases**.
   - **Liabilities, Equity & Income:** credit **increases**, debit **decreases**.
@@ -71,6 +72,7 @@ The case a single-row model breaks — the reason for DD-001.
 - **Transfer (Checking -> Savings):** ONE group, TWO legs: `-100` Checking, `+100` Savings. Not income/expense. Nets to 0.
 - **Paying a credit card (Checking -> Visa):** ONE group: `-500` Checking (asset down), `+500` Visa (liability down). A card payment is a **transfer between your own accounts**, NOT an expense — the expense posted at swipe.
 - **The swipe (buying $500 on the Visa):** `+500` Expense category, `-500` Visa (liability up).
+- **Split purchase (Target run, $120 on the Visa):** ONE group, FOUR legs: `-120` Visa, `+60` Groceries, `+40` Household, `+20` Clothing. Still sums to zero. A split is just more legs (DD-015).
 - **Reimbursement (front $100 for dad):** ONE group: `+100` expense/category, `-100` "Due from Dad" (receivable, asset up = he owes you). When dad pays you: `+100` checking, `-100` "Due from Dad" (receivable clears). Net worth is never overstated. Same mechanic as a transfer, just against a party account (DD-013).
 - Net worth dropped $500 at swipe; paying the card just moves the liability off. Double-entry gets this exactly right; single-entry double-counts or loses the transfer.
 
@@ -80,7 +82,7 @@ The case a single-row model breaks — the reason for DD-001.
 
 - **Institutions** -> **Accounts** (`fkInstitution`; typed asset/liability/**receivable**, on/off budget, normal sign)
 - **Parties** (payers/payees you track a running balance against: Dad, UofR, gig clients) — shape TBD by inquiry L; may be modeled as receivable Accounts rather than a separate table
-- **TransactionGroups** (event: date, payee, memo) -> **TransactionLines** (legs: `fkAccount`, `fkCategory`, signed `amount`; sum to 0 per group)
+- **TransactionGroups** (event: date, payee, memo) -> **TransactionLines** (legs: `fkAccount`, `fkCategory`, signed `amount`; **N legs, sum to 0 per group** — splits per DD-015)
 - **Categories** (self-referencing `fkParentCategory`, parent → child tree per DD-014; typed income/expense, envelope-ready)
 - **ImportSessions** (`fkAccount`; provenance + dedup `rawHash`)
 - **Valuations** (`fkAccount`; point-in-time worth for feed-less assets)
@@ -91,7 +93,7 @@ The case a single-row model breaks — the reason for DD-001.
 
 ## Phasing (DD-007)
 
-- **Phase 1 (v1):** Institutions, Accounts, Categories, TransactionGroups, TransactionLines, ImportSessions, Valuations. Delivers balances, net worth, transfers, card payments, spend by category. **Import (CSV) is in v1 per DD-012.** Reimbursement receivables likely land here too (pending L).
+- **Phase 1 (v1):** Institutions, Accounts, Categories, TransactionGroups, TransactionLines, ImportSessions, Valuations. Delivers balances, net worth, transfers, card payments, splits, spend by category. **Import (CSV) is in v1 per DD-012.** Split editor is a Phase 1 UI concern (DD-015). Reimbursement receivables likely land here too (pending L).
 - **Phase 2:** Bills (expected/recurring) + Bill<->actual match (HML `PaymentApplications` pattern). Reimbursement↔payment matching may share this layer.
 - **Phase 3:** Budgeting layer (envelope, Actual/YNAB style): `BudgetAllocations`; Available = assigned - activity + rollover.
 - **Out of scope v1:** investments, multi-currency, live market data.
@@ -106,13 +108,13 @@ The case a single-row model breaks — the reason for DD-001.
 
 **C. Categories. ✅ ANSWERED (2026-07-15):** **hierarchical, parent → child** (→ DD-014). Self-referencing `fkParentCategory`, income/expense typed, rollups for free. Working depth = 2 levels (confirm if arbitrary depth wanted). Exact category list is data, gathered at entry time.
 
+**D. Splits. ✅ ANSWERED (2026-07-15):** **yes, multi-category splits** (→ DD-015). One purchase across several categories = N legs on one `TransactionGroup`, still summing to zero. No new table; needs a split-editor UI in Phase 1.
+
 **L. Reimbursements. ✅ RAISED (2026-07-15):** track money fronted and paid back by **dad, U of R, gig-work payers, one-offs** (→ DD-013). Modeled as a **receivable** ("owed to me"), not a special expense flag. Open sub-questions:
 - Default packaging: **(a)** party-as-receivable-account (carry a running "Due from X" balance) vs **(b)** a lighter reimbursable-status + later match to the incoming payment?
 - Phase: receivables in **Phase 1**, or fold the matching into the Phase 2 Bill↔actual layer?
 - Do you want a live "who owes me / how much" view, or just correctness in net worth?
 - Note: **gig-work income is NOT a reimbursement** — it's real income. "Gig payer" is a party; the money is income, not a receivable clearing. Confirm that split holds for how you think about it.
-
-**D. Splits.** One purchase across multiple categories (Target run = groceries + household + clothing) — do you need it? (Double-entry supports it free; confirms UI need.)
 
 **E. Net worth over time.** Net-worth trend chart, or just today's number? (Trend needs periodic snapshots or full-history derivation.)
 
@@ -130,7 +132,7 @@ The case a single-row model breaks — the reason for DD-001.
 
 ## Next build (BLOCKED until inquiry answered)
 
-- Remaining inquiry: D–L. Plus resolve DD-008 naming.
+- Remaining inquiry: E–L. Plus resolve DD-008 naming.
 - THEN: spin up a fresh agent session to articulate real fields per object, writing `tables/` files + `schema/tables.json` off these answers.
 
 ## Futures
