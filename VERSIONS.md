@@ -30,7 +30,7 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 
 **Non-app infra (not launchable apps, listed so they're not mistaken for apps):** `brain-config`, `agent-reports`, `routines`, `shared`, `quickfire`, `template-app`, `polish-demo`.
 
-- `template-app` — **gold standard, v3 (PR #293, 2026-07-16).** The copy/place/audit baseline: slim hash-router `index.html` shell + `chrome.js` (header/menu/settings drawer/footer) + `pages/` partials, all styled off the `shared/themes` spine (`var(--token)`, default `default-theme`). Carries `CONFORMANCE.md` as the audit checklist. v1 (PR #285) initial rebuild; v2 (PR #288) added a left slide-in nav drawer + a themed theme-picker popup + resilient theme load; v3 (PR #293) made the theme picker expand inline so the drawer scroll carries it (fixes the clipped menu) + quieted the fallback note. Local assets loaded with `?v=` cache-bust. `source/` retired; loose head/footer snippets folded into `index.html` / `chrome.js`.
+- `template-app` — **gold standard, v4 (PR #299, 2026-07-16). Access: OPEN (demo).** The copy/place/audit baseline: slim hash-router `index.html` shell + `chrome.js` (header/menu/settings drawer/footer) + `pages/` partials, all styled off the `shared/themes` spine (`var(--token)`, default `default-theme`). Carries `CONFORMANCE.md` as the audit checklist. v1 (PR #285) initial rebuild; v2 (PR #288) left slide-in nav drawer + themed theme-picker popup + resilient theme load; v3 (PR #293) inline-expanding picker (fixed clipped menu); v4 (PR #299) killed saved-theme FOUC (early `data-theme` in head) + drawer focus management. Local assets loaded with `?v=` cache-bust. `source/` retired; loose head/footer snippets folded into `index.html` / `chrome.js`.
 
 ---
 
