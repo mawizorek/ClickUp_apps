@@ -1,4 +1,4 @@
-/* Inciardi Market v10 — shared terminal design system. Loaded first on every page. */
+/* Inciardi Market v11 — shared terminal design system. Loaded first on every page. */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0a0e13; --surface:#121a23; --surface-2:#18232f; --sunk:#0d141b;
@@ -22,7 +22,9 @@
   --up:#1f9d63; --up-bg:rgba(31,157,99,0.12); --down:#c8483f; --down-bg:rgba(200,72,63,0.10);
   --amber:#b3801f; --amber-bg:rgba(179,128,31,0.12); --plum:#7d4fb0; --plum-bg:rgba(125,79,176,0.12);
 }
-html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-text-size-adjust:100%}
+/* Overscroll guard: clip (not hidden) so position:sticky keeps working. */
+html{overflow-x:clip}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-text-size-adjust:100%;overflow-x:clip;max-width:100%}
 body{min-height:100dvh;padding:0 max(env(safe-area-inset-left),0px)}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--s5)}
 a{color:inherit}
@@ -30,12 +32,14 @@ img{max-width:100%;display:block}
 
 /* topbar */
 .topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.topbar .row{display:flex;align-items:center;gap:var(--s4);height:60px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-0.01em;font-size:1.02rem;white-space:nowrap}
+.topbar .row{display:flex;align-items:center;gap:var(--s4);height:60px;min-width:0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-0.01em;font-size:1.02rem;white-space:nowrap;flex-shrink:0}
 .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
 .brand .tk{font-family:var(--mono);font-size:0.66rem;letter-spacing:0.16em;color:var(--ink-faint);text-transform:uppercase;border:1px solid var(--line);padding:2px 6px;border-radius:4px}
-.nav{display:flex;gap:2px;margin-left:auto}
-.nav a{font-family:var(--mono);font-size:0.74rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-faint);text-decoration:none;padding:8px 13px;border-radius:6px;transition:all .15s var(--ease)}
+/* nav shrinks + scrolls internally instead of dragging the page sideways */
+.nav{display:flex;gap:2px;margin-left:auto;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font-family:var(--mono);font-size:0.74rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-faint);text-decoration:none;padding:8px 13px;border-radius:6px;transition:all .15s var(--ease);flex-shrink:0;white-space:nowrap}
 .nav a:hover{color:var(--ink);background:var(--surface)}
 .nav a[aria-current="page"]{color:var(--accent);background:var(--accent-bg)}
 .gear{background:none;border:1px solid var(--line);color:var(--ink-soft);width:38px;height:38px;border-radius:8px;display:grid;place-items:center;cursor:pointer;flex-shrink:0}
@@ -45,7 +49,7 @@ img{max-width:100%;display:block}
 /* page head */
 .phead{padding:var(--s8) 0 var(--s6)}
 .phead .kick{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
-.phead h1{font-size:clamp(1.9rem,5vw,2.9rem);font-weight:700;letter-spacing:-0.025em;line-height:1.02}
+.phead h1{font-size:clamp(1.9rem,5vw,2.9rem);font-weight:700;letter-spacing:-0.025em;line-height:1.02;overflow-wrap:break-word}
 .phead p{color:var(--ink-soft);font-size:1rem;max-width:60ch;margin-top:12px;line-height:1.5}
 
 /* cards + panels */
@@ -115,6 +119,7 @@ dialog::backdrop{background:rgba(6,10,14,0.66);backdrop-filter:blur(2px)}
 .toast.err{border-color:color-mix(in srgb,var(--down) 50%,transparent);color:var(--down)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media(max-width:640px){
+  .topbar .row{gap:var(--s3)}
   .nav a{padding:7px 9px;font-size:0.66rem}
   .brand .tk{display:none}
   .row2{grid-template-columns:1fr}
