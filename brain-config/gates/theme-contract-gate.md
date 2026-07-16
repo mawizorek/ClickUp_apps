@@ -6,6 +6,14 @@
 
 ---
 
+## The default (START HERE on any new build)
+
+**New apps/renders point at `default-theme` unless told otherwise or there's an intentional reason to diverge.** `default-theme` is the standing default pointer: a deliberately grayscale (zero-chroma) skin that reads as clearly UNSKINNED, so an unthemed build looks like a placeholder, not a finished product. Swapping to a real theme later is a one-line slug change.
+
+- **Default posture:** if Michael names a theme, use it. If he doesn't, use `default-theme` and say so ("themed with the grayscale default, swap the slug when you want a look"). Never invent a palette to fill the gap.
+- **Diverge only with a reason:** a stated brand, an obvious fit (an F1 app → an F1 theme), or Michael's direction. If you diverge, name why. Absent a reason, the default holds.
+- It is also the resolver's **ultimate fallback** (`_index.json` → `ultimateFallback` + `defaultTheme`), so a failed/stub resolve lands on gray, never on a broken or arbitrary skin.
+
 ## The rule
 
 **Color comes from a shared theme, never from ad-hoc inline values.** Every app and every render references an existing theme **slug** from `/shared/themes/`. There is one global token contract (17 semantic keys: `bg`, `surface-1/2/3`, `border`, `field`, `text`, `text-soft`, `text-faint`, `accent`, `accent-2`, `accent-soft`, `on-accent`, `good`, `warn`, `bad`, `info`). Both consumers use the same vocabulary.
@@ -16,7 +24,7 @@
 
 ## How to comply per consumer
 
-- **ClickUp HTML app (Pages-hosted):** link `/shared/themes/resolve.js` and call `THEMES.apply('<slug>')`, or link `themes.css` + set `data-theme="<slug>"`. Reskins live; no rebuild to change theme.
+- **ClickUp HTML app (Pages-hosted):** link `/shared/themes/resolve.js` and call `THEMES.apply('<slug>')` (use `THEMES.DEFAULT` when none is chosen), or link `themes.css` + set `data-theme="<slug>"`. Reskins live; no rebuild to change theme.
 - **FileMaker layout render (local design mockup, never hosted):** inline the resolved 17 tokens into the render's `:root` at build time. Runtime fetch is the wrong path here (these open from a local filesystem). `resolve.js` is the reference for the values.
 
 ## Headline rule for the FileMaker render space (LOCKED)
@@ -29,7 +37,7 @@
 
 ## Fail-loud
 
-Unknown slug → hard fail with a visible banner, never a silent unstyled render. Stub or missing key → `_base` spine → ultimate fallback (`maw-dark-utility`). See the fallback trail in the shared README.
+Unknown slug → hard fail with a visible banner, never a silent unstyled render. Stub or missing key → `_base` spine → ultimate fallback (`default-theme`, the grayscale default). See the fallback trail in the shared README.
 
 ## Version note
 
