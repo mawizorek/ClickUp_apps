@@ -28,7 +28,7 @@ The hold is deliberate: it keeps the log meaningful. A session full of transcrip
 
 On the first trigger hit, Scribe **immediately**:
 
-1. Opens a Session Log root + thread in the A.I. Prompts channel (`https://app.clickup.com/36074068/chat/r/6-901327646617-8`) using the session-close root format (header / trigger / status), with status `in progress`.
+1. Opens a Session Log root + thread in the A.I. Prompts channel (https://app.clickup.com/36074068/chat/r/6-901327646617-8) using the session-close root format (header / trigger / status), with status `in progress`.
 2. Begins a **chronological, speaker-labeled, back-and-forth transcript** in that thread, treating the session like a live conversation record:
    - `**Michael:**` / `**Brain:**` turn labels, in order.
    - Verbatim wording where it matters (decisions, instructions, key phrasing); tight paraphrase only where exact wording is unrecoverable, marked as paraphrase.
