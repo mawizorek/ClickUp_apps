@@ -15,6 +15,11 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ---
 
+## 2026-07-16 · Theming backbone is the repo-root law for ALL future designs
+**Decision:** The theme system is now stated as a standing law at the repo ROOT (`README.md`, top section): every visual thing built here — ClickUp HTML apps, FileMaker layout renders, standalone artifacts, quickfire pages, any layout — draws color from `shared/themes/` by slug. No agent invents a palette, hardcodes color, or rolls its own theme. Root README doubles as the cold-agent orientation map.
+**Why:** The theme-contract gate enforced this on build, but the highest-level doc an agent hits on entering the Git (root README) was empty, so a fresh agent could design in a vacuum before ever seeing the gate. Putting the backbone at the front door makes it the first thing read and the default posture, not a rule discovered late.
+**Status:** locked
+
 ## 2026-07-16 · `_template.json` is the canonical copy-me start for a new theme
 **Decision:** New themes start by copying `_template.json` (all 17 tokens present with role-hint values + an inline `_README` of the 4 steps). The README "Adding a theme" section is the crisp procedure: copy → fill 17 → register one line in `_index.json` → `node build-themes.mjs`.
 **Why:** A cold agent had no obvious file to copy and would clone an existing theme (and might miss the register/regen steps). A named template + a 4-step README makes the instruction literal and unmissable, and states plainly that themes.css is generated (not the 1-file mental model, but close).
