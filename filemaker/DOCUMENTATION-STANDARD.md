@@ -1,6 +1,6 @@
 # FileMaker Documentation Standard (repo-native)
 
-**Status:** v1.2 · Locked 2026-07-14; calc-inline rule added 2026-07-15; **calc-externalize rule replaced it 2026-07-16** · **Source of truth:** this repo.
+**Status:** v1.3 · Locked 2026-07-14; calc-inline rule added 2026-07-15; calc-externalize rule replaced it 2026-07-16; **markdown calc sections retired 2026-07-16 (v1.3)** · **Source of truth:** this repo.
 **Supersedes:** the ClickUp "FileMaker Documentation Standards" doc, which becomes a one-line pointer here once the cull runs.
 
 ---
@@ -14,9 +14,9 @@ This **replaces the old "11 fixed documentation pages" model.** Those pages deco
 - **Object pages** (Tables, Relationships, Layouts, Scripts, Value Lists) → mirror **folders**, one file per object.
 - **Narrative pages** (Design Decisions, Architecture Notes, Data Standards, Changelog, Database Graph Log, Import/Export Specs) → `meta/`.
 
-## Calc bodies live in standalone files, referenced by pointer (LOCKED 2026-07-16, Michael)
+## Calc bodies live ONLY in standalone files, referenced by pointer (LOCKED 2026-07-16, Michael)
 
-**Every calculation field's formula body lives in its own file under `calculations/`, verbatim FileMaker calc text, referenced from the field by a `calcRef` pointer.** One calc, one file, one source of truth. Nothing else restates the formula body.
+**Every calculation field's formula body lives in its own file under `calculations/`, verbatim FileMaker calc text, referenced from the field by a `calcRef` pointer.** One calc, one file, one source of truth. Nothing else restates OR indexes the formula body — not the table markdown, not a pointer list.
 
 - **Folder:** `<app-slug>/calculations/` — mirrors how `functions/` already works.
 - **Filename:** `<Table>__<FieldName>.fmcalc`. The `__` matches the existing namespace-separator convention and kills collisions, since calc field names are NOT globally unique across tables. Extension `.fmcalc` (plain text; the renderer applies its own highlighting).
@@ -24,8 +24,9 @@ This **replaces the old "11 fixed documentation pages" model.** Those pages deco
 - **The pointer:** each calc field in `schema/tables.json` carries `calcRef` (path to the file), plus `returns` and `stored`. The field's structural metadata lives in the JSON; the formula body lives ONLY in the file.
 - **Manifest:** `calculations/_index.json` lists every calc with owning table, return type, stored/unstored, purpose, and a `reads` dependency hint (fields + tables the formula touches). The viewer reads the manifest to render the computation layer and draw the dependency graph.
 - **Rendered inline, stored centralized.** The JSON-driven viewer fetches each `calcRef` file and shows the formula inline beside its field, so the human never navigates to read it. Storage location and presentation are decoupled: files centralized, presentation inline.
+- **The table markdown carries NO calc content (v1.3).** No formula bodies, no pointer list, no per-calc index. The most a table file does is a single prose line noting calcs exist and pointing at the `calculations/` folder. The JSON + manifest + renderer are the calc surface; a markdown pointer list would just be a second index to drift against, which is the exact duplication this model removes.
 
-**This supersedes the 2026-07-15 "calcs live inline in the owning table's markdown / do NOT centralize" lock.** That rule was correct for a markdown-only world where inline was the only way a human saw the formula. Once a renderer exists, centralized files + inline rendering deliver the same legibility with a single source of truth and a clean per-calc git diff. The per-table markdown `Calculations` section becomes a **pointer list** (field name + purpose + link to the file), never a formula-body restatement. A cross-table `meta/calculation-fields.md`, if it exists, is a thin index only.
+**Supersession history.** The 2026-07-15 rule "calcs live inline in the owning table's markdown / do NOT centralize" was correct for a markdown-only world where inline was the only way a human saw the formula. 2026-07-16 externalized bodies to `calculations/` and briefly kept a markdown pointer list; v1.3 (same day) retired even the pointer list once the renderer proved out. A cross-table `meta/calculation-fields.md` is not used; the manifest replaces it.
 
 ## Per-app structure
 
@@ -35,7 +36,7 @@ filemaker/<app-slug>/
   INDEX.md               rendering manifest — links every object folder
   next-build-spec.md     overwritten each build cycle
   schema/                machine mirror (generated JSON: tables/relationships/value-lists)
-  tables/                one file per table  (+ README, _index.json)
+  tables/                one file per table  (+ README, _index.json) — NO calc bodies
   calculations/          one .fmcalc file per calc field (+ README, _index.json) — canonical formula bodies
   relationships/         graph as data + prose (+ README, _index.json)
   layouts/               one file per layout (+ README, _index.json)
@@ -57,7 +58,7 @@ Every mirror folder carries an `_index.json` machine manifest so the **Phase 2 v
 
 ### Table file (`tables/<TableName>.md`)
 
-Header line (Role · Status · App) → one-line description → **Fields** table (Field · Type · Key · Category · Status · Notes) → **Calculations** (a POINTER list: each calc field's purpose + return/stored + a link to its `calculations/<Table>__<field>.fmcalc` file; NOT the formula body) → **Relationships** (edges touching this table) → **Open Items** → **Changelog**.
+Header line (Role · Status · App) → one-line description → **Fields** table (Field · Type · Key · Category · Status · Notes) → **Relationships** (edges touching this table) → **Open Items** → **Changelog**. **No Calculations section** (v1.3): calc fields still appear as rows in the Fields table, but their formula bodies live only in `calculations/`. A single prose line pointing at `../calculations/` is allowed, nothing more.
 
 ### Calculation file (`calculations/<Table>__<FieldName>.fmcalc`)
 
@@ -96,6 +97,7 @@ Every object edit = branch → PR → self-merge (per GitHub MCP Operating Stand
 
 ## Changelog
 
-- **2026-07-16 (v1.2):** Calc bodies externalized to `calculations/` (one `.fmcalc` per field, verbatim + round-trippable), referenced by `calcRef` in `schema/tables.json`. Added `calculations/_index.json` manifest with dependency hints. Table-file `Calculations` section is now a pointer list, not a formula-body restatement. Supersedes the 2026-07-15 inline-calc lock. HML_LLC migrated as the reference implementation.
+- **2026-07-16 (v1.3):** Retired the table-markdown `Calculations` section entirely (not even a pointer list). `calculations/` + `calcRef` + the manifest + the renderer are the sole calc surface. Stripped the inline blocks from Loans, ExpectedTransactions, GLOBAL_USE_VARIABLES.
+- **2026-07-16 (v1.2):** Calc bodies externalized to `calculations/` (one `.fmcalc` per field, verbatim + round-trippable), referenced by `calcRef` in `schema/tables.json`. Added `calculations/_index.json` manifest with dependency hints. Supersedes the 2026-07-15 inline-calc lock. HML_LLC migrated as the reference implementation.
 - **2026-07-15 (v1.1):** Added the (now-superseded) calc-inline rule.
 - **2026-07-14 (v1.0):** Repo-native per-object model locked; replaced the 11-fixed-pages model.
