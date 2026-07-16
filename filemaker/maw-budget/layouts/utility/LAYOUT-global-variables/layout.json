@@ -2,9 +2,9 @@
   "_meta": {
     "app": "maw-budget",
     "kind": "filemaker-layout-render",
-    "rendererVersion": "0.2",
+    "rendererVersion": "0.3",
     "generated": "2026-07-16",
-    "note": "Canonical manifest for the GLOBAL_Settings layout. TWO renderers read it: index.html (object/JSON inspector, annotated) and preview.html (real to-scale as-built render). Keep all three in sync in the same PR. Field bindings are PROPOSED (no table articulated yet) and will validate against schema/tables.json once it exists. Theme is LOCKED to the z-themes doc-set (maw-dark-utility). Inline tokens below are a MIRROR of the canonical definition for the current renderer; they will be dropped in Phase 2 when the renderer resolves slug->tokens from z-themes directly."
+    "note": "Canonical manifest for the GLOBAL_Settings layout. Renderers read it: index.html (object/JSON inspector, annotated) and preview.html (real to-scale as-built render, now resolves theme tokens live from z-themes via resolve.js). Field bindings are PROPOSED (no table articulated yet) and will validate against schema/tables.json once it exists. Theme is LOCKED to the z-themes doc-set (maw-dark-utility). Inline token MIRROR removed in Phase 2 — tokens now resolve from z-themes by slug; this manifest carries only the reference."
   },
   "layout": {
     "name": "GLOBAL_Settings",
@@ -22,21 +22,9 @@
     "theme": {
       "name": "MAW Dark Utility",
       "status": "locked",
-      "themeRef": "../../../../z-themes/maw-dark-utility.json#maw-dark-utility",
       "themeSlug": "maw-dark-utility",
-      "tokensNote": "MIRROR of z-themes/maw-dark-utility.json tokens (byte-identical). Canonical source is the z-themes doc-set; do not edit here. Dropped in Phase 2.",
-      "tokens": {
-        "cv-bg": "oklch(0.23 0.013 260)",
-        "cv-part-header": "oklch(0.285 0.02 260)",
-        "cv-part-body": "oklch(0.235 0.012 260)",
-        "cv-part-footer": "oklch(0.27 0.016 260)",
-        "cv-field-fill": "oklch(0.31 0.014 260)",
-        "cv-field-border": "oklch(0.44 0.02 260)",
-        "cv-field-text": "oklch(0.94 0.008 260)",
-        "cv-label": "oklch(0.70 0.012 260)",
-        "cv-accent": "oklch(0.72 0.11 205)",
-        "cv-title": "oklch(0.96 0.02 205)"
-      }
+      "themeRef": "../../../../z-themes/maw-dark-utility.json#maw-dark-utility",
+      "tokensNote": "Tokens resolved live from the z-themes doc-set by slug (via z-themes/resolve.js). No inline token mirror — z-themes is the single source of truth. Changing the theme there reskins this layout with no re-render."
     }
   },
   "sections": [
