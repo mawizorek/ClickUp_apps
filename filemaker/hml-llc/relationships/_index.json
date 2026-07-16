@@ -1,16 +1,19 @@
 {
-  "_meta": { "app": "hml-llc", "folder": "relationships", "schemaVersion": "1.0", "generated": "2026-07-14", "source": "../schema/relationships.json", "model": "loan-first" },
-  "relationships": [
-    { "from": { "table": "Loans", "field": "fkProperty" }, "to": { "table": "PropertySUMMARIES", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
-    { "from": { "table": "Loans", "field": "fkBorrower" }, "to": { "table": "Organizations", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "pending" },
-    { "from": { "table": "ExpectedTransactions", "field": "fkLoan" }, "to": { "table": "Loans", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
-    { "from": { "table": "AccountTransactions", "field": "fkLoan" }, "to": { "table": "Loans", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
-    { "from": { "table": "ExpectedTransactions", "field": "fkStandardTransaction" }, "to": { "table": "Standard_Transactions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
-    { "from": { "table": "AccountTransactions", "field": "fkStandardTransaction" }, "to": { "table": "Standard_Transactions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
-    { "from": { "table": "PaymentApplications", "field": "fkExpectedTransaction" }, "to": { "table": "ExpectedTransactions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
-    { "from": { "table": "PaymentApplications", "field": "fkAccountTransaction" }, "to": { "table": "AccountTransactions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
-    { "from": { "table": "Payoffs", "field": "fkLoan" }, "to": { "table": "Loans", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "locked" },
-    { "from": { "table": "PropertySUMMARIES", "field": "fkDocuments" }, "to": { "table": "Documents", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review" },
-    { "from": { "table": "PropertySUMMARIES", "field": "fkBorrower" }, "to": { "table": "Organizations", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review" }
-  ]
+  "_meta": {
+    "app": "hml-llc",
+    "folder": "relationships",
+    "schemaVersion": "2.0",
+    "generated": "2026-07-16",
+    "source": "../schema/relationships.json",
+    "model": "loan-first",
+    "note": "Single edge surface is ../schema/relationships.json (DECISIONS D-006). This manifest holds render hints ONLY and does NOT restate edges — the renderer reads schema/relationships.json directly, the same way the schema viewer reads schema/tables.json. Removing the duplicated edge list kills the triplicate-index drift D-004 killed for calcs."
+  },
+  "render": {
+    "view": "to-graph",
+    "nodes": "tables",
+    "edge": "child.field -> parent.PrimaryKey",
+    "labelBy": "cardinality",
+    "colorBy": "status",
+    "statusColors": { "locked": "good", "pending": "warn", "under-review": "info" }
+  }
 }
