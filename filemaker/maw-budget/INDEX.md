@@ -6,7 +6,7 @@ _Navigable map of every documented object. Mirrors the FileMaker solution. Human
 
 | Table | Role | Status |
 |---|---|---|
-| _none yet — blocked on goal interrogation_ | | |
+| _none yet — goal interrogation closed; blocked only on DD-008 naming, then field articulation_ | | |
 
 ## Relationships (`relationships/`)
 
@@ -31,4 +31,5 @@ See [value-lists/README.md](./value-lists/README.md).
 ## Meta / narrative (`meta/`)
 
 - [architecture-notes](./meta/architecture-notes.md) — the double-entry model, sign convention, transfers.
-- [design-decisions](./meta/design-decisions.md) — decision log (what's locked, what's provisional, what's still open).
+- [design-decisions](./meta/design-decisions.md) — decision log (DD-001–022): what's locked, provisional, open.
+- [changelog](./meta/changelog.md) — chronological "what changed when" trail + a cold-agent reading order.
