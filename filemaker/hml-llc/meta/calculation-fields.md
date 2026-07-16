@@ -1,43 +1,30 @@
-# Calculation Fields — Index
+# Calculation Fields — (retired index)
 
-> **Formula bodies live inline in each table file, next to the field they define** (per the calc-inline rule in [`../../DOCUMENTATION-STANDARD.md`](../../DOCUMENTATION-STANDARD.md)). This page is a **thin cross-table index only** — no formula text here, just where each calc lives so you can see the whole calc surface at a glance. If you're editing a formula, edit it in the table file; never copy a body here.
+> **This page is retired as of 2026-07-16.** It used to be a thin cross-table index back when formula bodies lived inline in each table's markdown (the calc-inline rule). That rule was reversed: formula bodies now live in standalone files under [`../calculations/`](../calculations/), one `.fmcalc` per calc field, referenced by `calcRef` in [`../schema/tables.json`](../schema/tables.json). See decision **D-003 / D-004** in [`../../DECISIONS.md`](../../DECISIONS.md) and the LOCKED section in [`../../DOCUMENTATION-STANDARD.md`](../../DOCUMENTATION-STANDARD.md).
 
-## Index
+## Where the calc surface lives now
 
-| Calc field | Owning table | Result | Storage | Purpose |
-|---|---|---|---|---|
-| `calc_filePath` | [GLOBAL_USE_VARIABLES](../tables/GLOBAL_USE_VARIABLES.md#calculations) | Text | Unstored | Current file path. |
-| `calc_fileName` | [GLOBAL_USE_VARIABLES](../tables/GLOBAL_USE_VARIABLES.md#calculations) | Text | Unstored | Current file name. |
-| `calc_hostedStatus` | [GLOBAL_USE_VARIABLES](../tables/GLOBAL_USE_VARIABLES.md#calculations) | Text | Unstored | Hosted vs local. |
-| `calc_fileSizeMB` | [GLOBAL_USE_VARIABLES](../tables/GLOBAL_USE_VARIABLES.md#calculations) | Number | Unstored | File size (MB in display only). |
-| `countNumDocuments` | [PropertySUMMARIES](../tables/PropertySUMMARIES.md#calculations) | Number | Unstored | Count of related documents. |
-| `calc_CurrentPrincipalBalance` | [Loans](../tables/Loans.md#calculations) | Number | Stored | Current principal basis. |
-| `calc_originationPoints` | [Loans](../tables/Loans.md#calculations) | Number | Stored | Origination-points amount. |
-| `calc_MaturationPayment` | [Loans](../tables/Loans.md#calculations) | Number | Stored | Maturity-side payment. |
-| `calc_MonthlyPayment` | [Loans](../tables/Loans.md#calculations) | Number | Stored | Recurring interest/payment. |
-| `calc_perDiemInterest` | [Loans](../tables/Loans.md#calculations) | Number | Unstored | Per-diem interest. |
-| `calc_FirstMaturation` | [Loans](../tables/Loans.md#calculations) | Number | Stored | First maturation milestone. |
-| `calc_NextMaturityDate` | [Loans](../tables/Loans.md#calculations) | Date | Unstored | Next maturity milestone. |
-| `calc_NextDueDate` | [Loans](../tables/Loans.md#calculations) | Date | Unstored | Next collectible due date. |
-| `calc_TotalOutstanding` | [Loans](../tables/Loans.md#calculations) | Number | Unstored | Total outstanding balance. |
-| `calc_CurrentPayoffAmount` | [Loans](../tables/Loans.md#calculations) | Number | Unstored | Current all-in payoff. |
-| `calc_expROI` | [Loans](../tables/Loans.md#calculations) | Number | Stored | Analytical ROI. |
-| `calc_amountPaid` | [ExpectedTransactions](../tables/ExpectedTransactions.md#calculations) | Number | Unstored | Total applied from PaymentApplications. |
-| `calc_remaining` | [ExpectedTransactions](../tables/ExpectedTransactions.md#calculations) | Number | Unstored | Remaining unpaid balance. |
-| `calc_lateAfterDate` | [ExpectedTransactions](../tables/ExpectedTransactions.md#calculations) | Date | Unstored | Late threshold date. |
-| `calc_islate` | [ExpectedTransactions](../tables/ExpectedTransactions.md#calculations) | Number | Unstored | Late/not-late 1/0. |
+- **Formula bodies (canonical):** `../calculations/<Table>__<field>.fmcalc` — verbatim FileMaker text, round-trippable.
+- **Structural metadata + pointer:** each calc field in `../schema/tables.json` carries `calcRef` + `returns` + `stored`.
+- **Cross-table index + dependency hints:** `../calculations/_index.json` (owning table, return, stored, purpose, `reads`).
+- **Rendered view:** the shared viewer at `../../_viewer/` (`schema.html?app=hml-llc`) shows every calc inline with syntax highlighting, copy-to-clipboard, and a dependency graph. Validate with `linter.html?app=hml-llc`.
 
-## Scope note
+Do not add formula text or a per-calc index here. This file is kept only as a breadcrumb from the old path; the manifest replaces it.
 
-`PaymentApplications`, `PaymentInstructions`, `Standard_Transactions`, and `Payoffs` need no dedicated calc fields in the active v1 core.
+## Locked nuance (moved, do not lose)
 
-## Locked nuance (cross-cutting, kept here)
+These cross-cutting semantics are recorded in the relevant field `notes` in `schema/tables.json` and remain true:
 
 - `calc_NextDueDate` and `calc_NextMaturityDate` are **not** synonyms.
-- `PayoffDisplayDate` is a payoff statement display date, not a creation/prepared timestamp.
-- `CreationTimestamp` on `Payoffs` covers when the record was actually generated.
-- `GoodThroughDate` is the separate payoff-validity endpoint.
+- `Payoffs.PayoffDisplayDate` is a statement display date, not a creation/prepared timestamp.
+- `Payoffs.CreationTimestamp` covers when the record was actually generated.
+- `Payoffs.GoodThroughDate` is the separate payoff-validity endpoint.
+
+## Note on `countNumDocuments`
+
+The old index listed a `countNumDocuments` calc on `PropertySUMMARIES`. It is NOT in the current locked schema or the manifest. If it exists in the live FMP file, add it as a real calc field (row in `tables.json` + a `.fmcalc` file + a manifest entry) so the linter covers it; otherwise it stays dropped. Flagged 2026-07-16.
 
 ## Changelog
 
-- 2026-07-15: Demoted from formula home to thin index; all bodies moved inline into their table files per the calc-inline rule.
+- 2026-07-16: Retired. Calc surface moved to `../calculations/` + `../schema/tables.json` `calcRef` + `../calculations/_index.json`; rendered by `../../_viewer/`. Flagged the phantom `countNumDocuments`.
+- 2026-07-15: Demoted from formula home to thin index (the now-reversed inline rule).
