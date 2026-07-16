@@ -10,9 +10,12 @@
 
    Fallback trail (fail loud):
      unknown slug   → visible error banner, no skin applied
-     status: stub   → _base spine → ultimate fallback (maw-dark-utility)
+     status: stub   → _base spine → ultimate fallback (default-theme)
      resolved, key gap → that key falls back to the ultimate spine
      fetch fails (file://) → ultimate fallback so it never white-screens (reported offline)
+
+   The ultimate fallback is DEFAULT-THEME (the unskinned grayscale default): if resolution
+   fails, a consumer lands on the deliberately-gray default so it reads as unthemed, never broken.
 
    Depth-independent: computes its own base dir, so a consumer at any folder depth just
    points a tag at this file.
@@ -24,17 +27,20 @@
      THEMES.apply('mclaren', { aliasMap: { 'surface-1':'cv-part-header', 'field':'cv-field-fill' } });
      // list available themes (for a picker), grouped as in the manifest:
      THEMES.list().then(function(idx){ /* idx.groups[].themes[] */ });
+     // the default slug a new app should use when none is chosen:
+     THEMES.DEFAULT  // 'default-theme'
 */
 (function(){
   var TOKEN_KEYS = ["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-2","accent-soft","on-accent","good","warn","bad","info"];
-  // maw-dark-utility, embedded so a fetch failure never blanks the consumer
+  var DEFAULT = 'default-theme';
+  // default-theme (unskinned grayscale), embedded so a fetch failure never blanks the consumer
   var ULTIMATE = {
-    "bg":"oklch(0.20 0.010 260)","surface-1":"oklch(0.245 0.014 260)","surface-2":"oklch(0.285 0.016 260)",
-    "surface-3":"oklch(0.31 0.018 260)","border":"oklch(0.44 0.020 260)","field":"oklch(0.31 0.014 260)",
-    "text":"oklch(0.95 0.008 260)","text-soft":"oklch(0.72 0.012 260)","text-faint":"oklch(0.55 0.012 260)",
-    "accent":"oklch(0.72 0.11 205)","accent-2":"oklch(0.80 0.09 195)","accent-soft":"oklch(0.30 0.04 205)",
-    "on-accent":"oklch(0.20 0.02 205)","good":"oklch(0.72 0.15 150)","warn":"oklch(0.80 0.13 80)",
-    "bad":"oklch(0.62 0.20 25)","info":"oklch(0.70 0.12 235)"
+    "bg":"oklch(0.28 0 0)","surface-1":"oklch(0.33 0 0)","surface-2":"oklch(0.38 0 0)",
+    "surface-3":"oklch(0.43 0 0)","border":"oklch(0.52 0 0)","field":"oklch(0.36 0 0)",
+    "text":"oklch(0.96 0 0)","text-soft":"oklch(0.78 0 0)","text-faint":"oklch(0.62 0 0)",
+    "accent":"oklch(0.70 0 0)","accent-2":"oklch(0.60 0 0)","accent-soft":"oklch(0.44 0 0)",
+    "on-accent":"oklch(0.20 0 0)","good":"oklch(0.72 0 0)","warn":"oklch(0.66 0 0)",
+    "bad":"oklch(0.58 0 0)","info":"oklch(0.62 0 0)"
   };
 
   var base = (function(){
@@ -59,7 +65,7 @@
     return getJSON(base + '_index.json').then(function(idx){
       var entry = findTheme(idx, slug);
       if(!entry){ return { error:'unknown theme: "'+slug+'"', trail:['lookup "'+slug+'"','NOT IN MANIFEST'], tokens:null }; }
-      var ultimateSlug = idx.ultimateFallback || 'maw-dark-utility';
+      var ultimateSlug = idx.ultimateFallback || DEFAULT;
       if(entry.status === 'stub' || !entry.file){
         trail.push(entry.slug+' (stub)', 'no tokens', '_base', ultimateSlug);
         return { slug:slug, name:entry.name, mode:entry.mode||'dark', tokens:assign({}, ULTIMATE), trail:trail, stub:true };
@@ -75,7 +81,7 @@
         return { slug:slug, name:entry.name, mode:def.mode||entry.mode||'dark', tokens:out, trail:trail, stub:false, missing:missing };
       });
     }).catch(function(err){
-      return { slug:slug, name:'(offline fallback)', mode:'dark', tokens:assign({}, ULTIMATE), trail:['fetch failed: '+err.message, 'ULTIMATE fallback'], stub:false, offline:true };
+      return { slug:slug, name:'(offline fallback)', mode:'dark', tokens:assign({}, ULTIMATE), trail:['fetch failed: '+err.message, 'ULTIMATE fallback (default-theme)'], stub:false, offline:true };
     });
   }
 
@@ -100,5 +106,5 @@
     (document.body || document.documentElement).appendChild(d);
   }
 
-  window.THEMES = { resolve:resolve, apply:apply, list:list, TOKEN_KEYS:TOKEN_KEYS, base:base };
+  window.THEMES = { resolve:resolve, apply:apply, list:list, TOKEN_KEYS:TOKEN_KEYS, DEFAULT:DEFAULT, base:base };
 })();
