@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "note": "Shared structural tokens + the fallback token spine. Stubs and missing keys resolve here, which itself mirrors maw-dark-utility neutrals with a muted accent. Never referenced directly by a layout; it is the safety net.",
+  "structure": {
+    "radius": "6px",
+    "radiusLarge": "10px",
+    "space": [4, 8, 12, 16, 24, 32],
+    "typeScaleRatio": 1.25,
+    "partHeaderPad": "18px 24px",
+    "bodyPad": "20px 24px 24px"
+  },
+  "tokens": {
+    "cv-bg": "oklch(0.23 0.013 260)",
+    "cv-part-header": "oklch(0.285 0.02 260)",
+    "cv-part-body": "oklch(0.235 0.012 260)",
+    "cv-part-footer": "oklch(0.27 0.016 260)",
+    "cv-field-fill": "oklch(0.31 0.014 260)",
+    "cv-field-border": "oklch(0.44 0.02 260)",
+    "cv-field-text": "oklch(0.94 0.008 260)",
+    "cv-label": "oklch(0.70 0.012 260)",
+    "cv-accent": "oklch(0.55 0.03 260)",
+    "cv-title": "oklch(0.92 0.01 260)"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Mercedes",
+  "slug": "mercedes",
+  "status": "stub",
+  "mode": "dark",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): liquid silver precision, teal engineering glow, ice-blue + lime driver accents. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Mercedes Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}

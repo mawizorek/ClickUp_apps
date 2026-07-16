@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Ferrari",
+  "slug": "ferrari",
+  "status": "stub",
+  "mode": "dark",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): scarlet pressure, warm ivory contrast, Monaco champagne + Hamilton plum-luxury touches. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Ferrari Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}

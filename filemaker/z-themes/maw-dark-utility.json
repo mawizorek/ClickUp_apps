@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "name": "MAW Dark Utility",
+  "slug": "maw-dark-utility",
+  "status": "locked",
+  "mode": "dark",
+  "intendedUse": "utility/admin",
+  "description": "Cool slate dark skin for setup, admin, and single-record utility layouts. The anchor theme and ultimate fallback for the whole doc-set. Tokens lifted verbatim from the maw-budget GLOBAL_Settings layout (was provisional inline, now canonical here).",
+  "fmpMapping": {
+    "fmTheme": "MAW Dark",
+    "note": "Corresponds to the 'MAW Dark' FileMaker theme in the built solution. Per-role FMP style names not yet catalogued; add them here as the solution's object styles are named so render and build stay in agreement.",
+    "styles": {}
+  },
+  "tokens": {
+    "cv-bg": "oklch(0.23 0.013 260)",
+    "cv-part-header": "oklch(0.285 0.02 260)",
+    "cv-part-body": "oklch(0.235 0.012 260)",
+    "cv-part-footer": "oklch(0.27 0.016 260)",
+    "cv-field-fill": "oklch(0.31 0.014 260)",
+    "cv-field-border": "oklch(0.44 0.02 260)",
+    "cv-field-text": "oklch(0.94 0.008 260)",
+    "cv-label": "oklch(0.70 0.012 260)",
+    "cv-accent": "oklch(0.72 0.11 205)",
+    "cv-title": "oklch(0.96 0.02 205)"
+  }
+}

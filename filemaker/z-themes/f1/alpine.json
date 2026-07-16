@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Alpine",
+  "slug": "alpine",
+  "status": "stub",
+  "mode": "dark",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): French-electric blue with pink charge, tricolor + sky-blue driver notes. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Alpine Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}
