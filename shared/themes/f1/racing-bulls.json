@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "Racing Bulls",
+  "slug": "racing-bulls",
+  "status": "locked",
+  "mode": "light",
+  "intendedUse": "data-dense / ledger",
+  "description": "Light theme. White surfaces, navy actionable accent, red secondary highlight.",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "bg": "oklch(0.97 0.005 255)",
+    "surface-1": "oklch(0.995 0.003 255)",
+    "surface-2": "oklch(0.945 0.010 255)",
+    "surface-3": "oklch(0.90 0.014 255)",
+    "border": "oklch(0.87 0.020 255)",
+    "field": "oklch(0.995 0.004 255)",
+    "text": "oklch(0.28 0.030 260)",
+    "text-soft": "oklch(0.47 0.030 260)",
+    "text-faint": "oklch(0.63 0.025 260)",
+    "accent": "oklch(0.46 0.16 262)",
+    "accent-2": "oklch(0.58 0.20 25)",
+    "accent-soft": "oklch(0.92 0.05 262)",
+    "on-accent": "oklch(0.99 0.01 262)",
+    "good": "oklch(0.55 0.15 150)",
+    "warn": "oklch(0.62 0.14 75)",
+    "bad": "oklch(0.55 0.20 25)",
+    "info": "oklch(0.50 0.14 258)"
+  }
+}
