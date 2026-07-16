@@ -2,10 +2,10 @@
   "_meta": {
     "app": "maw-budget",
     "folder": "layouts",
-    "schemaVersion": "1.4",
+    "schemaVersion": "1.5",
     "generated": "2026-07-16",
     "convention": "folder-per-layout: each layout is its own folder (layouts/<folder>/LAYOUT-<name>/) holding layout.json (canonical manifest) + preview.html (pure interactive Browse render) + index.html (object/JSON inspector) + README.md. Diverges from the one-file-per-layout line in DOCUMENTATION-STANDARD v1.1; standard update pending sign-off.",
-    "auditModel": "This roll-up is the source of truth for 'what layouts exist' + the cross-layout view. Each layout carries occurrenceId, the join key into relationships/_index.json (the TO graph). Audits are QUERIES over these two indexes, not a stored xref. High-level cross-layout data lives ONLY here; layout folders stay lean. See meta/relationship-audit-model.md.",
+    "auditModel": "This roll-up is the source of truth for 'what layouts exist' + the cross-layout view. Each layout carries occurrenceId, the join key into relationships/_index.json (the TO graph) and (via binding.valueList on objects) into value-lists/_index.json. Audits are QUERIES over these indexes, not a stored xref. High-level cross-layout data lives ONLY here; layout folders stay lean. See meta/relationship-audit-model.md + meta/value-list-tracking-model.md.",
     "viewerDecision": "DECIDED (Michael, 2026-07-16): shared object/JSON inspector becomes standalone app 'z-fm-layout-object-viewer' at the filemaker/ folder level (filemaker/z-fm-layout-object-viewer/), NOT repo root. Loads any FMP app's layout.json by slug+path; computes the relationship/audit joins live. BUILD PENDING explicit go-ahead."
   },
   "layouts": [
@@ -28,6 +28,27 @@
       "manifest": "utility/LAYOUT-global-variables/layout.json",
       "render": "utility/LAYOUT-global-variables/preview.html",
       "inspector": "utility/LAYOUT-global-variables/index.html"
+    },
+    {
+      "name": "VALUE_Lists",
+      "viewName": "SYS | Value Lists [DSK]",
+      "path": "utility/LAYOUT-value-lists",
+      "fmpFolder": "utility",
+      "occurrenceId": "ValueLists",
+      "occurrence": "ValueLists",
+      "baseTable": "ValueLists",
+      "platform": "Computer",
+      "targetStencil": "Desktop: 1024 x 768",
+      "layoutWidth": 1024,
+      "theme": "MAW Dark Utility",
+      "themeStatus": "provisional",
+      "status": "render-draft",
+      "objectCount": 15,
+      "bindingsStatus": "proposed",
+      "valueListRegistry": "../value-lists/_index.json",
+      "manifest": "utility/LAYOUT-value-lists/layout.json",
+      "render": "utility/LAYOUT-value-lists/preview.html",
+      "inspector": "utility/LAYOUT-value-lists/index.html"
     }
   ]
 }

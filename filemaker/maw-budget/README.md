@@ -10,8 +10,8 @@ Personal finance app. First **git-first** FMP app: never lived in ClickUp; docum
 
 ## Next Steps
 
-- [ ] **Confirm DD-008 naming** (HML `PrimaryKey`/`fk<Parent>` vs URITP `pk_`/`fk_`). This is the ONLY gate left before tables.
-- [ ] **Fresh agent session: field articulation.** Write real fields per object into `tables/` + `schema/tables.json`, driven by DD-011–022. The [decision log](./meta/design-decisions.md) + [spec](./next-build-spec.md) are the full brief — a cold agent should run it without re-interviewing Michael.
+- [ ] **Field articulation session.** Write real fields per object into `tables/` + `schema/tables.json`, driven by DD-011–022 in HML naming (DD-008 LOCKED). The [decision log](./meta/design-decisions.md) + [spec](./next-build-spec.md) are the full brief — a cold agent should run it without re-interviewing Michael. Layout-first articulation is surfacing the fields/value-lists/scripts ahead of this.
+- [ ] **Continue layout-first renders.** `GLOBAL_Settings` + `VALUE_Lists` done; ledger/register + report layouts (LDGR/RPT) next.
 
 ## Design decisions (goal interrogation A–L CLOSED — full rationale in [meta/design-decisions.md](./meta/design-decisions.md))
 
@@ -22,6 +22,7 @@ Personal finance app. First **git-first** FMP app: never lived in ClickUp; docum
 - **Feed-less assets (house, car) via point-in-time Valuations** (DD-005); re-valued on-demand + soft staleness nudge (DD-018).
 - **Bloomberg / market data out of scope** (DD-006).
 - **Phasing: spine → bills → budgeting** (DD-007).
+- **Naming = HML house style** (DD-008, **LOCKED** — `PrimaryKey`/`fk<Parent>`, PascalCase, `g_`/`gLIST_` globals, `calc_`, audit quad).
 - **Single user** (DD-009).
 - **Every account class in one typed `Account` table** + on-budget boolean (DD-011).
 - **CSV import + manual entry, ~weekly** (DD-012); dedup via `rawHash`.
@@ -34,7 +35,6 @@ Personal finance app. First **git-first** FMP app: never lived in ClickUp; docum
 - **Priority reports:** spend-by-category, account register, who-owes-me (DD-020).
 - **Reconciliation: cleared/pending in scope** (DD-021).
 - **Platform: desktop + FileMaker Go**, serverless pref, receipts wanted — sync/hosting is an open architecture question (DD-022).
-- Naming = HML house style (DD-008, **PROVISIONAL — the last open gate**).
 
 ## Purpose
 
@@ -60,7 +60,7 @@ Single-user (Michael) personal finance: see every account balance and total net 
 
 ## Build Status
 
-Planning complete through the goal interrogation (A–L, DD-001–022). **No objects built yet — by design.** Next: confirm DD-008 naming, then a dedicated field-articulation session. See [meta/changelog.md](./meta/changelog.md) for the full trail.
+Planning complete through the goal interrogation (A–L, DD-001–022). All decisions locked incl. HML naming (DD-008). **No tables built yet — by design.** Layout-first articulation underway (`GLOBAL_Settings`, `VALUE_Lists`), surfacing fields/value-lists/scripts ahead of the field-articulation session. Three source-of-truth indexes exist and join on keys: layouts, relationships (TO graph), value-lists. See [meta/changelog.md](./meta/changelog.md) for the full trail.
 
 ## Workflow
 
@@ -68,10 +68,12 @@ Double-entry ledger: every event = balanced legs summing to zero; balances and n
 
 ## Architecture Notes
 
-See [meta/architecture-notes.md](./meta/architecture-notes.md) (model), [meta/design-decisions.md](./meta/design-decisions.md) (decision log), [meta/changelog.md](./meta/changelog.md) (chronological trail).
+See [meta/architecture-notes.md](./meta/architecture-notes.md) (model), [meta/design-decisions.md](./meta/design-decisions.md) (decision log), [meta/relationship-audit-model.md](./meta/relationship-audit-model.md) + [meta/value-list-tracking-model.md](./meta/value-list-tracking-model.md) (the join/audit models), [meta/changelog.md](./meta/changelog.md) (chronological trail).
 
 ## Artifacts
 
 | Date | Artifact | Link | Description |
 |---|---|---|---|
+| 2026-07-16 | VALUE_Lists render | [layouts/utility/LAYOUT-value-lists/preview.html](./layouts/utility/LAYOUT-value-lists/preview.html) | Interactive master-detail value-list editor (status-style, GLOBALS panel). |
+| 2026-07-16 | GLOBAL_Settings render | [layouts/utility/LAYOUT-global-variables/preview.html](./layouts/utility/LAYOUT-global-variables/preview.html) | Interactive global settings layout. |
 | 2026-07-15 | Planning brief v0.1 | HTML artifact (chat) | Double-entry explainer: the mechanic, debit/credit, the transfer problem, tools reframed, our phased plan. |
