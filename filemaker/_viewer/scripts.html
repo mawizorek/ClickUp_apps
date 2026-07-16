@@ -51,6 +51,12 @@
   .head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
   .head h2 { font-family: var(--mono); font-size: 1.75rem; font-weight: 600; }
   .head .fld { font-family: var(--mono); font-size: 0.75rem; color: var(--text-3); }
+  .vbadge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.6875rem; font-weight: 600; font-family: var(--mono); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-2); white-space: nowrap; }
+  .vbadge .vdot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); }
+  .vbadge.green { color: var(--ok); border-color: color-mix(in oklch, var(--ok), transparent 60%); } .vbadge.green .vdot { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .vbadge.yellow { color: var(--warn); border-color: color-mix(in oklch, var(--warn), transparent 60%); } .vbadge.yellow .vdot { background: var(--warn); }
+  .vbadge.red { color: var(--danger); border-color: color-mix(in oklch, var(--danger), transparent 55%); } .vbadge.red .vdot { background: var(--danger); }
+  .vdetail { font-size: 0.6875rem; color: var(--text-3); margin: 8px 0 0; font-family: var(--mono); }
   .rel { display: flex; gap: 28px; flex-wrap: wrap; margin: 20px 0 8px; }
   .rel-col { min-width: 200px; }
   .rel-col .rl { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-3); font-weight: 600; margin-bottom: 8px; }
@@ -108,14 +114,35 @@ const params = new URLSearchParams(location.search);
 const APP = params.get('app');
 if (!APP){ document.body.innerHTML = '<div class="fatal">No app specified. Use <code>?app=&lt;slug&gt;</code> or go back to <a href="index.html">the launcher</a>.</div>'; throw new Error('no app'); }
 const BASE = '../' + APP + '/';
+const REPO = 'mawizorek/ClickUp_apps';
 document.getElementById('appName').textContent = APP;
 document.getElementById('srcPath').textContent = APP + '/scripts/_index.json';
 
-let INDEX = null, SCRIPTS = [], NAMES = new Set(), CALLEDBY = {}, active = null, tab = 'script';
-const bodyCache = {};
+let INDEX = null, SCRIPTS = [], NAMES = new Set(), CALLEDBY = {}, LEDGER = null, active = null, tab = 'script';
+const bodyCache = {}, shaCache = {};
 const nav = document.getElementById('nav'), doc = document.getElementById('doc');
 function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 async function tryFetch(path){ try{ const r=await fetch(BASE+path,{cache:'no-store'}); if(!r.ok)throw 0; return await r.text(); }catch(e){ return null; } }
+
+// --- D-007 verification (derive-don't-store; self-invalidating) ---
+async function loadLedger(){ const t=await tryFetch('meta/verification.json'); if(t){ try{ LEDGER=JSON.parse(t); }catch(e){ LEDGER=null; } } }
+function ledgerEntry(objectPath){ if(!LEDGER||!LEDGER.objects)return null; return LEDGER.objects[objectPath]||null; }
+async function currentSha(objectPath){ if(shaCache[objectPath]!==undefined)return shaCache[objectPath];
+  try{ const r=await fetch(`https://api.github.com/repos/${REPO}/contents/filemaker/${APP}/${objectPath}?ref=main`,{cache:'no-store'});
+    if(!r.ok){ shaCache[objectPath]=null; return null; } const j=await r.json(); shaCache[objectPath]=j.sha||null; return shaCache[objectPath]; }catch(e){ shaCache[objectPath]=null; return null; } }
+// internalOk=false short-circuits to red. Otherwise compare verified.sha to the live blob SHA.
+async function verifyState(objectPath, internalOk, internalMsg){
+  if(!internalOk) return {level:'red', label:'inconsistent', detail:internalMsg||'index does not match body'};
+  const e=ledgerEntry(objectPath);
+  if(!e||!e.verified) return {level:'yellow', label:'unverified', detail:'never confirmed against the live FileMaker file'};
+  const cur=await currentSha(objectPath);
+  if(cur && e.verified.sha && cur!==e.verified.sha) return {level:'yellow', label:'stale', detail:`edited since last verified (${e.verified.date}) — re-confirm against the live file`};
+  if(!cur) return {level:'yellow', label:'verified*', detail:`verified ${e.verified.date}; live SHA check unavailable — run the linter`};
+  return {level:'green', label:'verified', detail:`confirmed against the live file ${e.verified.date}${e.verified.by?' · '+e.verified.by:''}`};
+}
+function badgeHtml(st){ return `<span class="vbadge ${st.level}" title="${esc(st.detail)}"><span class="vdot"></span>${esc(st.label)}</span>`; }
+function parseFmHeader(txt){ const g=re=>{ const m=txt.match(re); return m?m[1].trim():null; };
+  return { name:g(/^#\s*SCRIPT:\s*(.+)$/mi), folder:g(/^#\s*FOLDER:\s*(.+)$/mi) }; }
 
 async function boot(){
   const s = await tryFetch('scripts/_index.json');
@@ -124,8 +151,8 @@ async function boot(){
   try{ INDEX=JSON.parse(s); }catch(e){ st.className='status err'; stt.textContent='parse error'; return; }
   SCRIPTS = INDEX.scripts || [];
   NAMES = new Set(SCRIPTS.map(x=>x.name));
-  // Derive calledBy by inverting every row's calls[] — never stored.
   CALLEDBY = {}; SCRIPTS.forEach(s=>{ (s.calls||[]).forEach(t=>{ if(NAMES.has(t)){ (CALLEDBY[t]=CALLEDBY[t]||[]).push(s.name); } }); });
+  await loadLedger();
   st.className='status live'; stt.textContent='live · v'+((INDEX._meta&&INDEX._meta.schemaVersion)||'?')+' · '+SCRIPTS.length+' scripts';
   active = SCRIPTS.length ? SCRIPTS[0].name : null; buildNav(); render();
 }
@@ -162,7 +189,8 @@ async function renderScript(){
   const r=rowFor(active); const calls=r.calls||[]; const cb=CALLEDBY[active]||[];
   const callsHtml = calls.length ? calls.map(chip).join('') : '<span class="chip none">nothing</span>';
   const cbHtml = cb.length ? cb.map(backChip).join('') : '<span class="chip none">nothing (entry point)</span>';
-  doc.innerHTML=`<div class="head"><h2>${esc(r.name)}</h2><span class="fld">${esc(r.folder||'')}/</span></div>
+  doc.innerHTML=`<div class="head"><h2>${esc(r.name)}</h2><span class="fld">${esc(r.folder||'')}/</span><span id="vbadge"></span></div>
+    <div class="vdetail" id="vdetail"></div>
     <div class="rel">
       <div class="rel-col"><div class="rl">calls →</div>${callsHtml}</div>
       <div class="rel-col"><div class="rl">called by ← (derived)</div>${cbHtml}</div>
@@ -173,6 +201,13 @@ async function renderScript(){
   doc.scrollTop=0;
   const wrap=doc.querySelector('.code-wrap');
   const txt = r.scriptRef ? await getBody(r.scriptRef) : null;
+  // D-007: index<->body agreement + ref resolves
+  let internalOk=true, internalMsg='';
+  if(!r.scriptRef){ internalOk=false; internalMsg='row has no scriptRef'; }
+  else if(txt==null){ internalOk=false; internalMsg='scriptRef does not resolve to a file'; }
+  else { const h=parseFmHeader(txt);
+    if(h.name && h.name!==r.name){ internalOk=false; internalMsg=`body # SCRIPT: "${h.name}" != index name "${r.name}"`; }
+    else if(h.folder && r.folder && h.folder!==r.folder){ internalOk=false; internalMsg=`body # FOLDER: "${h.folder}" != index folder "${r.folder}"`; } }
   if(txt==null){ wrap.innerHTML='<div class="code-loading">script body unavailable ('+(r.scriptRef?esc(r.scriptRef):'no scriptRef')+')</div>'; }
   else {
     const clean=txt.replace(/\n+$/,'');
@@ -180,6 +215,9 @@ async function renderScript(){
     const btn=wrap.querySelector('.copy-btn'); btn.onclick=()=>{ navigator.clipboard.writeText(clean).then(()=>{ btn.textContent='copied ✓'; btn.classList.add('done'); setTimeout(()=>{ btn.textContent='copy'; btn.classList.remove('done'); },1400); }); };
   }
   doc.querySelectorAll('.chip[data-jump]').forEach(c=>{ c.onclick=()=>{ if(NAMES.has(c.dataset.jump)){ active=c.dataset.jump; render(); buildNav(document.getElementById('filter').value); } }; });
+  // paint verification badge (async, degrades safe)
+  const objectPath = r.scriptRef ? 'scripts/'+r.scriptRef : 'scripts/'+r.name;
+  verifyState(objectPath, internalOk, internalMsg).then(stt=>{ const b=document.getElementById('vbadge'), d=document.getElementById('vdetail'); if(b)b.innerHTML=badgeHtml(stt); if(d)d.textContent=stt.detail; });
 }
 
 function renderGraph(){
