@@ -1,70 +1,86 @@
 # LAYOUT-global-variables — `GLOBAL_Settings`
 
-**Render + spec for one FileMaker layout.** First artifact of maw-budget's **layout-first articulation**: we articulate the app layout-by-layout via real HTML renders of FileMaker layouts, *before* writing table docs. Each layout render surfaces exactly which fields, value lists, and scripts the backend will need.
+**Render + spec for one FileMaker layout.** First artifact of maw-budget's **layout-first articulation**: we articulate the app layout-by-layout via real HTML renders of FileMaker layouts, *before* writing table docs, so each render surfaces exactly which fields, value lists, and scripts the backend will need.
 
-## Folder-per-layout convention (new)
-
-Each layout is its **own folder** inside `layouts/`, mirroring where it lives in FileMaker's Layouts menu (`layouts/<folder>/LAYOUT-<name>/`). The folder holds three files:
+## Files in this folder
 
 | File | Role |
 |---|---|
-| `index.html` | The render. Open it. A self-contained, JSON-driven FileMaker-layout renderer: parts (Header/Body/Footer), field controls, an object inspector, and annotation overlays. |
-| `layout.json` | **Canonical manifest.** Every object with its control style, theme, and field binding. `index.html` embeds a copy and renders it; keep the two in sync in the same PR (same rule as `_index.json`). |
+| `layout.json` | **Canonical manifest.** Every object with control style, part/section, theme, geometry, and (proposed) field binding. Both HTML files render from it; keep all three in sync in the same PR (same rule as `_index.json`). |
+| `preview.html` | **The real, to-scale, as-built render.** What the layout looks like when built in FileMaker: themed, at the defined layout width, with the FileMaker layout bar, a ruler, zoom, and toggleable layout-part guides. No annotations. |
+| `index.html` | **The object / JSON inspector.** Annotated view: numbered badges, an object list, and per-object bindings (`Table::field`, storage, value list, notes). The generic auto-extending skin — add objects to the manifest and it grows. |
 | `README.md` | This doc. |
 
-> **Standard divergence, flagged:** `DOCUMENTATION-STANDARD.md` v1.1 says "one file per layout." This folder-per-layout shape supersedes that for renders. The standard should be updated once Michael signs off on the convention.
+> **Heads-up (naming in flux):** Michael's direction is to extract the inspector into a **single shared repo-root app** (proposed slug `fm-layout-viewer`) that loads any app's `layout.json` by slug+path, so each layout folder stops shipping an inspector copy. Once that exists, `index.html` here becomes the real render and the shared app holds the inspector. Until then, `preview.html` = render, `index.html` = inspector. Pending Michael's green light.
 
 ## Layout facts
 
-- **Name:** `GLOBAL_Settings`
-- **FMP layout folder:** `utility`
-- **Table occurrence:** `Globals` (base table `Globals`) — a **single-record utility table** holding global-storage (`g_`) fields
+- **FileMaker layout name (view):** `SYS | Global Settings [DSK]` *(provisional — see naming convention below)*
+- **Internal name:** `GLOBAL_Settings` · **FMP layout folder:** `utility`
+- **Platform:** Computer (Desktop) · **Target screen stencil:** `Desktop: 1024 × 768` · **Design width:** `1024 pt`
+- **Table occurrence:** `Globals` (base table `Globals`) — a single-record utility table holding global-storage (`g_`) fields
 - **Mode:** Browse
-- **Theme:** `MAW Dark Utility` (tokens declared in `layout.json` → `layout.theme.tokens`)
-- **Purpose:** the one screen where app-wide `g_` globals live so they can be seen and set: session identity, preferences (theme, default account, budget month), value-list seeds, and import/process state.
+- **Theme:** `MAW Dark Utility` *(**PROVISIONAL** — pending the FMP themes doc-set migration; see below)*
+
+### FileMaker layout sizing (researched)
+
+FileMaker layouts have **no hard width property** — effective width is implied by object placement. The design discipline is to target a **screen stencil** (Claris's nonprinting device guides). Desktop stencils: **640×480, 1024×768, 1280×960, 1600×1200**. We target **1024×768** for this utility screen and design a hair inside it (Claris notes stencils overstate usable space — they ignore toolbars, scroll bars, and the status area). A FileMaker Go (iOS) variant, if wanted later, is a **separate layout** at an iOS stencil, not a reflow of this one.
+
+## Proposed app-wide layout naming convention (provisional)
+
+`<AREA> | <Name> [<Platform>]`
+
+- **AREA** groups layouts in the Layouts menu: `SYS` (utility/setup), `LDGR` (ledger/registers), `RPT` (reports), `IMPORT`, `NAV`, `DASH`.
+- **Platform** suffix: `[DSK]` (Computer) or `[GO]` (FileMaker Go / iOS).
+- This layout: **`SYS | Global Settings [DSK]`**. Internal/manifest name stays `GLOBAL_Settings`; the folder stays `LAYOUT-global-variables`.
+
+> Confirm the convention and it graduates from provisional; then it applies to every future layout render.
 
 ## Object inventory (16)
 
-| # | Object | Control | Binds to (proposed) | Notes |
-|---|---|---|---|---|
-| 1 | Global Settings | static text | — | Layout title |
-| 2 | Env / version merge | merge text | `Globals::g_Environment` (+`g_AppVersion`) | Read-only merge |
-| 3 | Current User | edit box | `Globals::g_CurrentUser` | From `Get(AccountName)`; drives audit quad |
-| 4 | App Version | display | `Globals::g_AppVersion` | Unstored calc |
-| 5 | Environment | pop-up menu | `Globals::g_Environment` | VL `gLIST_Environment` (DEV/PROD) |
-| 6 | Debug Mode | checkbox | `Globals::g_DebugMode` | 1/0 flag |
-| 7 | Theme | radio set | `Globals::g_ThemeMode` | VL `gLIST_ThemeMode`; default Dark |
-| 8 | Default Account | drop-down | `Globals::g_DefaultAccount` | Holds `fkAccount`; VL `gLIST_Accounts` |
-| 9 | Current Budget Month | edit box (date) | `Globals::g_CurrentBudgetMonth` | Phase-3 seed |
-| 10 | Today | display | `Globals::g_DateToday` | `Get(CurrentDate)`; DD-018 anchor |
-| 11 | Account Types (seed) | display (multi) | `Globals::gLIST_AccountTypes` | Seeds Account taxonomy (DD-011/013) |
-| 12 | Transaction States | display (multi) | `Globals::gLIST_TransactionStates` | Cleared/Pending seed (DD-021) |
-| 13 | Import In Progress | checkbox | `Globals::g_ImportInProgress` | Re-entrancy guard (DD-012) |
-| 14 | Last Import Session | display | `Globals::g_LastImportSession` | Holds `fkImportSession` |
-| 15 | Reset Session Globals | button | script `util_ResetGlobals` | scripts/utilities/ |
-| 16 | Toggle Theme | button | script `util_ToggleTheme` | scripts/utilities/ |
+| # | Object | Control | Binds to (proposed) |
+|---|---|---|---|
+| 1 | Global Settings | static text | — |
+| 2 | Env / version merge | merge text | `Globals::g_Environment` (+`g_AppVersion`) |
+| 3 | Current User | edit box | `Globals::g_CurrentUser` |
+| 4 | App Version | display | `Globals::g_AppVersion` |
+| 5 | Environment | pop-up menu | `Globals::g_Environment` (VL `gLIST_Environment`) |
+| 6 | Debug Mode | checkbox | `Globals::g_DebugMode` |
+| 7 | Theme | radio set | `Globals::g_ThemeMode` (VL `gLIST_ThemeMode`) |
+| 8 | Default Account | drop-down | `Globals::g_DefaultAccount` (VL `gLIST_Accounts`) |
+| 9 | Current Budget Month | edit box (date) | `Globals::g_CurrentBudgetMonth` |
+| 10 | Today | display | `Globals::g_DateToday` |
+| 11 | Account Types (seed) | display (multi) | `Globals::gLIST_AccountTypes` |
+| 12 | Transaction States | display (multi) | `Globals::gLIST_TransactionStates` |
+| 13 | Import In Progress | checkbox | `Globals::g_ImportInProgress` |
+| 14 | Last Import Session | display | `Globals::g_LastImportSession` |
+| 15 | Reset Session Globals | button | script `util_ResetGlobals` |
+| 16 | Toggle Theme | button | script `util_ToggleTheme` |
 
-## Field bindings & the automation path (the "cool factor")
+## Theme (provisional) & the themes doc-set
 
-Bindings live as **data** in `layout.json`, not prose. Today every binding is `status: "proposed"` because no table is articulated yet (rendered with amber badges). The roadmap:
+The render is themed with **MAW Dark Utility** (tokens live in `layout.json` → `layout.theme.tokens`). This is **provisional**: available themes should be a **governed FMP git documentation set** (`filemaker/meta/themes.md` or a `filemaker/themes/` doc set) that every layout render is constrained to, mirroring the ClickUp themes doc but repo-native. That migration is being **handed to a separate agent** (Michael's call) so this session stays on maw-budget. Once `themes.md` exists, `layout.theme.themeRef` resolves to a real anchor and `themeStatus` flips to `locked`.
 
-1. **Now:** the render *declares demand* — each object names the `Table::field` it will need. This layout-first pass is the input to the eventual field-articulation session.
-2. **Next:** when `schema/tables.json` exists, a validator diffs every `layout.json` binding against it. Green = field exists and types match; amber = proposed; red = references a field that doesn't exist. No hand-maintained MD binding tables.
-3. The renderer stays generic: drop a new `layout.json` beside a copy of `index.html` and any layout renders.
+## Field bindings & the automation path
+
+Bindings live as **data** in `layout.json`, not prose. Today every binding is `status: "proposed"` (no table articulated yet). Roadmap: when `schema/tables.json` exists, a validator diffs each binding — green (exists + type match) / amber (proposed) / red (missing field). No hand-maintained MD binding tables.
 
 ## Backend this layout implies (feeds field articulation)
 
 - **Table `Globals`** — single-record utility table, all fields global storage: `g_CurrentUser`, `g_AppVersion` (calc), `g_Environment`, `g_DebugMode`, `g_ThemeMode`, `g_DefaultAccount`, `g_CurrentBudgetMonth`, `g_DateToday` (calc), `gLIST_AccountTypes`, `gLIST_TransactionStates`, `g_ImportInProgress`, `g_LastImportSession`.
-- **Value lists:** `gLIST_Environment`, `gLIST_ThemeMode`, `gLIST_Accounts` (plus the field-based lists fed by the `gLIST_` globals).
+- **Value lists:** `gLIST_Environment`, `gLIST_ThemeMode`, `gLIST_Accounts` (+ field-based lists fed by the `gLIST_` globals).
 - **Scripts (scripts/utilities/):** `util_ResetGlobals`, `util_ToggleTheme`.
 
 ## Open items
 
-- [ ] Confirm the **folder-per-layout** convention, then update `DOCUMENTATION-STANDARD.md`.
-- [ ] Confirm the utility table name **`Globals`** (vs `Settings` / `Prefs`).
-- [ ] Decide: should the JSON binding-validator run in the render itself, or as a repo check against `schema/tables.json`?
-- [ ] Confirm `g_DefaultAccount` stores an `fkAccount` value vs. resolving via a relationship.
+- [ ] Green-light the **shared `fm-layout-viewer` app** + the eventual `index.html` → render / inspector → shared-app swap.
+- [ ] Confirm the **layout naming convention** (`<AREA> | <Name> [<Platform>]`).
+- [ ] Confirm **`Globals`** as the utility table name (vs `Settings` / `Prefs`).
+- [ ] Confirm **folder-per-layout**, then update `DOCUMENTATION-STANDARD.md`.
+- [ ] Themes doc-set migration (handed to a separate agent) → flip theme from provisional to locked.
+- [ ] Decide where the JSON binding-validator runs (in-render vs a repo check against `schema/tables.json`).
 
 ## Changelog
 
-- **2026-07-15 — v0.1.** Initial render + manifest. 16 objects, all bindings proposed. Establishes the folder-per-layout + JSON-driven renderer convention.
+- **2026-07-16 — v0.2.** Added `preview.html` (real to-scale themed render; Computer / 1024×768 stencil / 1024pt). Added geometry + `viewName` (`SYS | Global Settings [DSK]`, provisional) + provisional theme ref to `layout.json`. Documented the naming convention + shared-viewer proposal.
+- **2026-07-15 — v0.1.** Initial inspector render + manifest. 16 objects, all bindings proposed. Established the folder-per-layout + JSON-driven renderer convention.
