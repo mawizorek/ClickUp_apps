@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Collection · Inciardi Market</title>
 <meta name="description" content="The individual Inciardi prints you own, marked to the live market.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>\uD83D\uDDBC\uFE0F</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="source/base.css">
@@ -46,15 +46,15 @@
 
   <div id="ledger"><div class="skeleton" style="height:220px"></div></div>
 
-  <footer class="footer"><span id="f-build">Inciardi Market v10</span><span id="f-src">connecting\u2026</span></footer>
+  <footer class="footer"><span id="f-build">Inciardi Market v11</span><span id="f-src">connecting…</span></footer>
 </main>
 
 <dialog id="addHold"><div class="sheet">
   <div class="sheet-h"><h2 id="ah-title">Add holding</h2><button class="x" id="ahClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
-  <div class="field"><label>Print</label><input id="ah-print" list="ah-list" placeholder="start typing a catalogued name\u2026" spellcheck="false"><datalist id="ah-list"></datalist><small style="font-family:var(--mono);font-size:0.62rem;color:var(--ink-faint);margin-top:4px">No catalog match? It's saved as a provisional holding.</small></div>
+  <div class="field"><label>Print</label><input id="ah-print" list="ah-list" placeholder="start typing a catalogued name…" spellcheck="false"><datalist id="ah-list"></datalist><small style="font-family:var(--mono);font-size:0.62rem;color:var(--ink-faint);margin-top:4px">No catalog match? It's saved as a provisional holding.</small></div>
   <div class="row2">
     <div class="field"><label>Status</label><select id="ah-disp"><option value="own">Own it</option><option value="want">Want it</option></select></div>
-    <div class="field"><label>Condition</label><select id="ah-cond"><option value="">\u2014</option><option>new</option><option>used</option><option>sealed</option></select></div>
+    <div class="field"><label>Condition</label><select id="ah-cond"><option value="">Any</option><option>new</option><option>used</option><option>sealed</option></select></div>
   </div>
   <div class="row2">
     <div class="field"><label>Paid ($)</label><input id="ah-paid" type="number" step="0.01" placeholder="optional"></div>
@@ -66,9 +66,9 @@
 <dialog id="settings"><div class="drawer" style="padding:var(--s6)">
   <div class="drawer-h"><h2>Settings</h2><button class="x" id="settingsClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="field" style="flex-direction:row;align-items:center;justify-content:space-between"><label style="margin:0">Dark terminal</label><button class="btn sm" id="themeToggle" aria-pressed="true">Toggle</button></div>
-  <div class="field"><label>Data source (Worker URL)</label><input id="epInput" placeholder="https://inciardi-market\u2026workers.dev" spellcheck="false"></div>
+  <div class="field"><label>Data source (Worker URL)</label><input id="epInput" placeholder="https://inciardi-market…workers.dev" spellcheck="false"></div>
   <div class="field"><label>Write key (unlocks editing)</label><input id="wkeyInput" type="password" placeholder="paste to enable collection edits" spellcheck="false"></div>
-  <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Your collection is stored in the database. Editing requires the write key. It's private-by-integrity, not encrypted \u2014 don't store anything sensitive here.</p>
+  <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Your collection is stored in the database. Editing requires the write key. It's private-by-integrity, not encrypted, so don't store anything sensitive here.</p>
 </div></dialog>
 
 <script src="source/app-core.js"></script>
