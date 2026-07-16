@@ -4,7 +4,7 @@
 >
 > **Companions:** [`README.md`](./README.md) = phase-plan map · [`DECISION-LOG.md`](./DECISION-LOG.md) = decision journal. This doc = the knowledge base (raw research → ratified practice).
 >
-> **Status: DEEP DIVE — FINDINGS LOGGED (2026-07-16); STANDARDS S-1..S-3 ADOPTED (2026-07-16).** All eight Research Agenda questions have a dated, sourced Findings entry. Three standards promoted — S-1 (hybrid layer/class, D-012), S-2 (master-file reference model, D-011), S-3 (origin = centered-rectangle datum, D-013). New open thread: reference-plane / tolerance-detail convention (the "minutia" question).
+> **Status: DEEP DIVE — FINDINGS LOGGED (2026-07-16); STANDARDS S-1..S-4 ADOPTED (2026-07-16).** Research Agenda answered (F-001..F-010). Four standards promoted — S-1 (hybrid layer/class, D-012), S-2 (master-file reference model, D-011), S-3 (origin datum, D-013), S-4 (datums & reference-planes documentation convention, D-014). Active work: articulating the **standard show-file structure** (design layers / classes / sheet layers / resources) as a proposal for Michael.
 
 ---
 
@@ -24,19 +24,19 @@ Two layers, kept deliberately separate:
 Starter questions — refine as we go. Status tags added 2026-07-16 (✅ = first-pass finding logged; deeper follow-ups noted per item).
 
 - ✅ **Layers vs. classes:** the accepted division of labor (design layers for physical/spatial separation, classes for graphic/visibility control). What's the industry-standard scheme for theatrical drafting? → **F-001** · *resolved into our house model → S-1*
-- ✅ **Class naming conventions:** hierarchical/delimited naming (e.g. category-subcategory) as used by Spotlight / USITT-aligned templates. → **F-002** · *naming mechanics adopted for object-classes; specific tree still open*
+- ✅ **Class naming conventions:** hierarchical/delimited naming (e.g. category-subcategory) as used by Spotlight / USITT-aligned templates. → **F-002 / F-010** · *naming mechanics adopted for object-classes; specific tree still open*
 - ✅ **Sheet layers vs. design layers:** viewport workflow, scale handling, title-block placement. → **F-003**
 - ✅ **Reports & worksheets:** how Vectorworks worksheets/records generate schedules and manifests — the export path that feeds our git docs (ties to D-009). → **F-004**
 - ✅ **Symbols & hybrid 2D/3D:** best practice for pipes/hang positions, resource embedding, screen-plane vs. layer-plane geometry. → **F-005**
 - ✅ **DWG export/import fidelity:** what survives the round-trip (ties to the D-008 rebuild mitigation). → **F-006**
 - ✅ **Origin / reference lines:** locking origin at CL/PL 0,0 conventions. → **F-007** · *resolved → S-3 (centered-rectangle datum, D-013)*
-- ✅ **Existing standard templates:** what ships with Spotlight, USITT recommended practices, and reputable community templates worth borrowing from. → **F-008**
+- ✅ **Existing standard templates:** what ships with Spotlight, USITT recommended practices, and reputable community templates worth borrowing from. → **F-008 / F-010**
 
 ---
 
 ## Findings
 
-> Format: `F-NNN | date | claim | source | confidence`. Confidence: **High** = vendor documentation (app-help.vectorworks.net) or published standard; **Medium** = reputable community/practitioner source; **Low** = single/unverified source. All entries below are FIRST-PASS — trusted enough to inform a decision, not yet promoted to Standards.
+> Format: `F-NNN | date | claim | source | confidence`. Confidence: **High** = vendor documentation (app-help.vectorworks.net) or published standard; **Medium** = reputable community/practitioner source; **Low** = single/unverified source.
 
 ### F-001 — Layers vs. classes: the division of labor · 2026-07-16 · Confidence: High
 
@@ -97,7 +97,7 @@ The single most important gotcha for the D-008 DWG round-trip: **a DWG/DXF "laye
 - **Symbols, plug-ins, layer links, and groups export as blocks.** Symbol blocks keep the symbol name; plug-ins/layer links get generic names unless named in the OIP Data tab. There's an option to **decompose** symbols/groups/PIOs to simple geometry on export.
 - **Version range:** VW imports DWG/DXF v2.5–2025, exports v12–2025. DWG is safer than DXF for files with image links.
 - **Round-trip coordinate integrity depends on origin discipline** (see F-007 / S-3): imports can land far from the internal origin and cause precision/working-plane issues.
-- **Net for D-008:** the DWG round-trip is a real hedge, but expect *de-classing/renaming* and block-name genericization. Clean class naming (F-002), named plug-ins, and embedded + laid-out resources (F-005) are what make the re-import survivable. Confirms the DECISION-LOG note to keep resources embedded and cleanly laid out.
+- **Net for D-008:** the DWG round-trip is a real hedge, but expect *de-classing/renaming* and block-name genericization. Clean class naming (F-002), named plug-ins, and embedded + laid-out resources (F-005) are what make the re-import survivable.
 
 - Sources: [Mapping DXF/DWG layer and class names (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/DXFDWG/Mapping_DXFDWG_layer_and_class_names.htm) · [DXF/DWG import options — layers ≈ classes (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/DXFDWG/DXF_DWG_and_DWF_import_options.htm) · [DXF/DWG file export — symbols/groups as blocks (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/DXFDWG/DXF_DWG_and_DWF_file_export.htm) · [DXF/DWG file formats — version range (VW2025)](https://app-help.vectorworks.net/2025/eng/VW2025_Guide/DXFDWG/DXF_DWG_and_DWF_file_formats.htm)
 
@@ -109,18 +109,6 @@ The single most important gotcha for the D-008 DWG round-trip: **a DWG/DXF "laye
 
 - Sources: [Concept: Internal origin and user origin (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Setup/Concept__Internal_origin_and_user_origin.htm) · [Setting the user origin (VW2024)](https://app-help.vectorworks.net/2024/eng/VW2024_Guide/Setup/Setting_the_user_origin.htm) · [Centering the drawing on the internal origin (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Setup/Centering_the_drawing_on_the_internal_origin.htm) · [The Vectorworks Internal Origin and You (Focus Notes)](https://focusnotes.wordpress.com/2015/08/26/the-vectoworks-internal-origin-and-you/)
 
-### F-009 — Reference planes & tolerance detail (the "minutia" problem) · 2026-07-16 · Confidence: Medium (house-empirical)
-
-Real-world venue geometry carries sub-inch realities that don't reduce to one clean number. Concrete Smith example (from Michael):
-
-- Nominal room is **50' × 70'**, but the **interior trim shaves ~1/8" off each wall**, and **deck-level measurements are taken off the interior trim face**, not the nominal wall.
-- **Relative to the mezzanine / upper floors / catwalks, the walls (nominal structure) are the reference**, not the trim.
-- So the reference plane *changes by elevation*: deck references interior trim; upper levels reference wall structure. More minutia of this kind is expected.
-
-**The design question this raises (OPEN):** how much of this granularity belongs in the *documentation package* vs. in the *file geometry itself*? See the Open-question + candidate below — recommendation is to document the **rule** (which surface is the datum at each elevation) and let the **actual numbers live in the file + exported worksheets** (D-009), not hand-transcribed prose.
-
-- Source: Michael, working session 2026-07-16 (venue-empirical; to be verified against as-builts / architectural drawings).
-
 ### F-008 — Existing standard templates & references · 2026-07-16 · Confidence: High
 
 - **Vectorworks itself recommends a template workflow:** build a file holding your standard classes, design layers, resources, page size, and default attributes, then `File > Save As Template`. New show files start from it (or import standard elements from it). This is directly the Phase 1 "reusable package skeleton" pattern.
@@ -130,30 +118,53 @@ Real-world venue geometry carries sub-inch realities that don't reduce to one cl
 
 - Sources: [Lighting Design workflow — Save As Template (VW2019)](https://app-help.vectorworks.net/2019/eng/VW2019_Guide/LightingDesign1/Lighting_Design.htm) · [Resource Management for Entertainment Design (VW newsroom)](https://www.vectorworks.net/en-US/newsroom/managing-resource-libraries-vectorworks-spotlight) · [USITT Lighting Documentation RP — 2024 review draft (PDF)](https://www.usitt.org/sites/default/files/2024-10/USITT%20Lighting%20Documentation%20RP-Review%20Draft%202024-10-17.pdf) · [USITT RP-2 (2006) (PDF)](https://cad4theatre.org.uk/USITT-RP2-Lighting-Standard.pdf)
 
+### F-009 — Reference planes & tolerance detail (the "minutia" problem) · 2026-07-16 · Confidence: Medium (house-empirical)
+
+Real-world venue geometry carries sub-inch realities that don't reduce to one clean number. Concrete Smith example (from Michael):
+
+- Nominal room is **50' × 70'**, but the **interior trim shaves ~1/8" off each wall**, and **deck-level measurements are taken off the interior trim face**, not the nominal wall.
+- **Relative to the mezzanine / upper floors / catwalks, the walls (nominal structure) are the reference**, not the trim.
+- So the reference plane *changes by elevation*: deck references interior trim; upper levels reference wall structure. More minutia of this kind is expected.
+- **Scope (confirmed 2026-07-16):** this specific elevation/reference-plane behavior is **Smith-specific**, so the rule lives in the **Smith package**, not the universal template. The *convention of documenting such rules* (S-4) is universal.
+
+**Resolved into S-4 (D-014):** document the **rule** (which surface is the datum at each elevation); actual numbers live in the file + exported worksheets (D-009), never hand-transcribed prose.
+
+- Source: Michael, working session 2026-07-16 (venue-empirical; to be verified against as-builts / architectural drawings).
+
+### F-010 — Vectorworks Standard Naming system (native hook for a house standard) · 2026-07-16 · Confidence: High
+
+Vectorworks has a **built-in Standard Naming facility** for layers, classes, and viewports/views (`File > Document Settings > Standard Naming`). Ships with **VWArch and AIA/NCS** standards plus **User 1 / User 2 / User 3** slots; up to **99** custom standards can be defined per type by editing the `ClassNameStds`, `LayerNameStds`, and `ViewNameStds` worksheets that the command generates in the Resource Manager.
+
+- **Why it matters for us:** our house layer/class/view naming (department × elevation layers, object-category classes, dept-prefixed sheet numbering) can be **registered as a formal custom naming standard in the template**, so new files inherit it and auto-classing/auto-naming stays consistent. It also aligns with the DWG mapping story (F-006) since AIA naming is one of the built-in options.
+- **Architect/Landmark standards** additionally auto-create classes for many plug-in objects at setup — worth knowing when Spotlight objects self-class.
+
+- Sources: [Creating additional custom standards (VW2023)](https://app-help.vectorworks.net/2022/eng/VW2023_Guide/Setup/Creating_additional_custom_standards.htm) · [Layer, class, and viewport standards (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Structure/Layer_class_and_viewport_standards.htm) · [Importing drawing structure from standards or other files (VW2024)](https://app-help.vectorworks.net/2024/eng/VW2024_Guide/Structure/Importing_drawing_structure_from_standards_or_other_files.htm)
+
 ---
 
 ## Research Agenda — progress (2026-07-16)
 
-- **8 / 8** starter questions have a first-pass, sourced Finding (F-001..F-008), plus F-009 (reference-plane/tolerance, house-empirical).
-- **Adopted into Standards:** layer/class division (S-1, D-012), master-file reference model (S-2, D-011), origin datum (S-3, D-013).
-- **Deeper follow-ups still open** (not blockers, refine as we build):
+- **8 / 8** starter questions answered (F-001..F-008), plus F-009 (reference-plane/tolerance, house-empirical) and F-010 (Standard Naming system).
+- **Adopted into Standards:** layer/class division (S-1, D-012), master-file reference model (S-2, D-011), origin datum (S-3, D-013), datums & reference-planes doc convention (S-4, D-014).
+- **Active:** articulating the **standard show-file structure** (design layers / classes / sheet layers / resources) — proposal being drafted for Michael; synthesizes S-1..S-4 + the existing ClickUp sheet-layer scheme + F-010.
+- **Deeper follow-ups still open** (not blockers):
   - The exact **object-class tree** (steel / wood / framing / masking / …) and dash-delimited naming under S-1.
   - The exact **house layer list** (department × elevation) — the Google Sheet's ~27 layers are the working draft.
-  - **Reference-plane / tolerance-detail convention** (F-009) — how granular the docs get vs. the file.
-  - Which **specific reports/worksheets** to build and their **CSV columns** for the git manifest (F-004 → the D-009 design task).
+  - The **sheet-layer numbering scheme** (UR / S / L / A / R / V dept prefixes) — exists in ClickUp docs, needs ratifying.
+  - Which **specific reports/worksheets** to build and their **CSV columns** for the git manifest (F-004 → D-009).
   - Confirming **which USITT RP-2 symbols/graphics** we adopt vs. Spotlight defaults (F-008).
   - A hands-on **DWG round-trip test** on a sample of the actual Smith file (F-006 is doc-level, not yet empirical).
+  - Whether to register the house naming as a formal **Standard Naming** standard in the template (F-010).
 
 ---
 
 ## Candidate decisions for Michael (NOT yet adopted — do not promote until ruled)
 
-Remaining open candidates (adopted ones moved to Standards below):
-
-1. **Reference-plane / tolerance convention (F-009) — RECOMMENDED:** document the **rule** (which surface is the datum at each elevation: deck → interior trim face; mezzanine/catwalks → nominal wall structure), and let **actual sub-inch numbers live in the file geometry + exported worksheets** (D-009), never hand-transcribed into prose. Prose captures the *logic + gotchas*; the file/CSV carries the *values*. Add a short "Datums & Reference Planes" note to the package. — *awaiting Michael's ruling.*
+1. **Standard show-file structure** — the design-layer / class / sheet-layer / resource skeleton (proposal in chat 2026-07-16). Ratify to promote as S-5.
 2. **D-008 DWG hedge as procedure (F-006):** maintain a saved class↔DWG-layer mapping set, keep resources embedded + laid out, name plug-ins, and run a real round-trip test before trusting it.
 3. **Template strategy (F-008):** base the Phase 1 skeleton on a `Save As Template` file that conforms to **USITT RP-2** graphics and leverages **Spotlight default libraries**.
-4. **D-009 export path (design task, not a yes/no) (F-004):** build class/layer/resource **reports → CSV export** as the git-manifest mechanism; column design is the open follow-up.
+4. **Register house naming as a Standard Naming standard (F-010).**
+5. **D-009 export path (design task) (F-004):** build class/layer/resource **reports → CSV export** as the git-manifest mechanism; column design is the open follow-up.
 
 ---
 
@@ -183,7 +194,16 @@ Our file uses a deliberate split (diverging from Spotlight's lean-layer advice b
 - **That center is set coincident with the Vectorworks INTERNAL origin (0,0)** — not merely a shifted user origin. Already built in the current file.
 - **Why internal, not just user:** keeps all geometry tight around (0,0) so DWG round-trips (D-008/F-006) don't drift far from origin and wreck precision; every referencing department file (S-2) inherits the identical coordinate frame for free.
 - **Coordinate reading:** +X / −X = stage-right/left of center; +Y / −Y = up/downstage of center (exact axis polarity to confirm when we document N/S/E/W).
-- **Caveat feeding F-009 / the reference-plane question:** "center of the nominal rectangle" is the *origin*; it does NOT resolve which *surface* (interior trim vs. nominal wall) is the measurement reference at a given elevation. That's the open reference-plane convention.
+- **Caveat feeding S-4:** "center of the nominal rectangle" is the *origin*; it does NOT resolve which *surface* (interior trim vs. nominal wall) is the measurement reference at a given elevation. That's the S-4 reference-plane convention.
+
+### S-4 — Datums & reference-planes documentation convention · adopted 2026-07-16 · D-014
+
+How we handle sub-inch venue realities and other measurement minutia in the package:
+
+- **Document the RULE, not the numbers.** Every package carries a short **"Datums & Reference Planes"** note (prose) stating which surface is the measurement datum, and where that changes — e.g. *by elevation* (deck references interior trim face; mezzanine/catwalks reference nominal wall structure). Capture the *logic + gotchas* a drafter would otherwise get wrong.
+- **Values live in the file, not the prose.** Actual dimensions (nominal vs. as-built, the 1/8" trim, etc.) stay in the VWX geometry and flow out through worksheet/CSV export (D-009). Prose NEVER holds dimension values, save for a few deliberate, explicitly-flagged exceptions.
+- **Model to real dimensions.** If deck placement is taken off the interior trim, the geometry reflects that; the doc only flags that deck-datum ≠ nominal-wall so a downstream user isn't surprised.
+- **Scope split:** the *convention* (having a Datums & Reference Planes note) is **universal** — every package/template gets one. The *specific rules* it contains are **venue-specific** (the deck-vs-upper-wall reference behavior is a **Smith** rule and lives in the Smith package, per F-009).
 
 ---
 
