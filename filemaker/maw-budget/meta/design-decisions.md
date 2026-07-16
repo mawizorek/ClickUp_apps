@@ -76,8 +76,22 @@ Primary intake is **CSV import**, with **manual entry and manual post-import cle
 
 **Why:** FileMaker has no live bank feed, and Michael will drive intake by hand on a roughly weekly rhythm. Implications: (1) `ImportSessions` + a CSV mapper are **Phase 1**, not deferred; (2) `Account` needs a **per-account CSV column-mapping** (banks differ); (3) a **dedup key** (`rawHash`) prevents double-posting overlapping re-imports; (4) manual entry is a peer path, not a fallback. Sample CSV per bank gathered when the mapper is built.
 
+## DD-013 — Reimbursements & receivables ("owed to me") `LOCKED` (2026-07-15)
+
+maw-budget must track money Michael fronts that someone else pays back: **dad, U of R, gig-work payers, one-offs.** Model this as a **receivable**, not a special expense flag.
+
+**Why & how:** in double-entry this is a textbook receivable. Two clean options, and the double-entry model already supports both for free:
+- **(a) Party as an account.** Each reimbursing party (Dad, UofR, a gig client) is an `Account` of a new sub-type **receivable** (an asset = "money owed to me"). Fronting $100 for dad: `+100` expense (or the real category) offset by a leg that leaves a `+100` balance owed on "Due from Dad"; when dad pays you back, `-100` the receivable, `+100` checking. The receivable nets to zero and net worth is never overstated.
+- **(b) Reimbursable status + match.** A lighter tag on a transaction ("reimbursable, expected from X") with a later match to the incoming payment. Mirrors the Phase 2 Bill↔actual match pattern.
+
+**Design implications, regardless of which we pick:**
+- Validates a **party / payee** concept richer than a free-text string — reimbursers are real entities you track a running "owed" balance for.
+- Adds a **receivable** account sub-type to the type taxonomy under DD-011.
+- **Gig-work income is distinct from a reimbursement:** gig pay is real income, not money paid back. "Gig accounts" as a payer is a party; the money landing is income, not a receivable clearing. Keep the two concepts separate.
+- Which of (a)/(b) is the default, and whether receivables are in **Phase 1** or fold into the Phase 2 match layer, is the open sub-question — see inquiry item **L**. The model choice (receivable, not a flag) is LOCKED; the packaging is open.
+
 ---
 
 ## Deferred / not yet decided
 
-Remaining open interrogation: **C–K** (categories, splits, net-worth-over-time, valuation cadence, bills, budgeting model, reports, reconciliation, platform). See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
+Remaining open interrogation: **C–L** (categories, splits, net-worth-over-time, valuation cadence, bills, budgeting model, reports, reconciliation, platform, and reimbursement packaging/phase). See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
