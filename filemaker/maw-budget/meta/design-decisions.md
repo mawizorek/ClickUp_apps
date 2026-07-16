@@ -64,8 +64,20 @@ Michael only. No sharing/permissions model, no household split.
 
 Git-first app. Every object is one file, edited by branch → PR → self-merge. Calc formulas live inline in their owning table file (per `../../DOCUMENTATION-STANDARD.md`).
 
+## DD-011 — Full account-type coverage `LOCKED` (2026-07-15)
+
+The model must support every account class Michael holds: checking, savings, each credit card, cash, loans/mortgage, retirement, house, car. (Answer to inquiry A.)
+
+**Why:** Michael wants all of them tracked. Implication: a single `Account` table with a **type** field (asset/liability + a sub-type detail) and an **on-budget boolean** covers the spread; we do NOT make a table per account class. Feed-less assets (house, car) use Valuations per DD-005. Actual counts and the on-budget flag per account are data set at entry time, not structure.
+
+## DD-012 — CSV import + manual entry, ~weekly cadence `LOCKED` (2026-07-15)
+
+Primary intake is **CSV import**, with **manual entry and manual post-import cleanup** as first-class steps. Cadence: aiming every other day, realistically ~weekly. (Answer to inquiry B.)
+
+**Why:** FileMaker has no live bank feed, and Michael will drive intake by hand on a roughly weekly rhythm. Implications: (1) `ImportSessions` + a CSV mapper are **Phase 1**, not deferred; (2) `Account` needs a **per-account CSV column-mapping** (banks differ); (3) a **dedup key** (`rawHash`) prevents double-posting overlapping re-imports; (4) manual entry is a peer path, not a fallback. Sample CSV per bank gathered when the mapper is built.
+
 ---
 
 ## Deferred / not yet decided
 
-These are NOT design decisions yet — they are the open interrogation of goals that must be answered before tables get written. See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
+Remaining open interrogation: **C–K** (categories, splits, net-worth-over-time, valuation cadence, bills, budgeting model, reports, reconciliation, platform). See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
