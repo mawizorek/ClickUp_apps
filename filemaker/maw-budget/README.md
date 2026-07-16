@@ -10,14 +10,37 @@ Personal finance app. First **git-first** FMP app: never lived in ClickUp; docum
 
 ## Next Steps
 
-- [ ] **RULE the double-entry vs single-entry fork** (see [next-build-spec.md](./next-build-spec.md) "In review"). This unblocks all table work. Recommendation: **double-entry.**
-- [ ] Confirm naming convention (HML_LLC house style default) before the first table.
-- [ ] Draft Phase 1 tables (Institutions, Accounts, Categories, TransactionGroups, TransactionLines, ImportSessions, Valuations) into `tables/` + `schema/tables.json`.
+- [ ] **Answer the goal interrogation** (Open Questions below / full version in [next-build-spec.md](./next-build-spec.md) “Open inquiry”). This is the gate.
+- [ ] Confirm the naming convention (DD-008, defaulted to HML) before any table exists.
+- [ ] **Then: fresh agent session** to articulate real fields per object off these answers — write `tables/` + `schema/tables.json`. No tables until the inquiry is done; guessing bakes in the wrong shape.
 
-## Open Questions
+## Design decisions (LOCKED — full rationale in [meta/design-decisions.md](./meta/design-decisions.md))
 
-- Naming convention: keep HML_LLC (`PrimaryKey` / `fk<Parent>`) or switch to URITP (`pk_` / `fk_`)? Defaulted to HML.
-- v1 report set: which reports matter first (net-worth trend? monthly spend by category? account register?).
+- **Double-entry ledger** (DD-001): a transaction is an event of balanced legs summing to zero. Ruled in by Michael 2026-07-15.
+- **Signed-amount legs; account TYPE first-class** (DD-002).
+- **Balances & net worth are derived, never stored** (DD-003).
+- **UI speaks money-in / money-out, never debit/credit** (DD-004).
+- **Feed-less assets (house, car) via point-in-time Valuations** (DD-005).
+- **Bloomberg / market data out of scope** — separate app if ever (DD-006).
+- **Phasing: spine → bills → budgeting** (DD-007).
+- **Single user** (DD-009).
+- Naming = HML house style (DD-008, PROVISIONAL).
+
+## Open Questions (the goal interrogation — answer before tables)
+
+Full prompts in [next-build-spec.md](./next-build-spec.md) “Open inquiry.” In short:
+
+- **A. Accounts:** every real account you hold, and which are on-budget vs net-worth-only.
+- **B. Intake:** manual vs CSV/OFX import (no live bank feed in FileMaker); which banks, how often.
+- **C. Categories:** flat or hierarchical, how granular.
+- **D. Splits:** one purchase across multiple categories — needed?
+- **E. Net worth:** trend-over-time, or just today's number?
+- **F. Valuations:** how often re-value the house/car?
+- **G. Bills:** what's a bill vs a transaction; forecasting/reminders?
+- **H. Budgeting:** true envelope or target-vs-actual; rollover?
+- **I. Reports:** rank the 3 you'd actually open.
+- **J. Reconcile:** mark cleared vs pending against statements?
+- **K. Platform:** desktop only, or FileMaker Go on mobile too?
 
 ## Purpose
 
@@ -33,16 +56,16 @@ Single-user (Michael) personal finance: see every account balance and total net 
 
 ## Imports
 
-- Bank / card CSV via `ImportSessions` (provenance stamp + dedup by `rawHash`).
+- Bank / card CSV or OFX via `ImportSessions` (provenance stamp + dedup by `rawHash`). Exact formats pending inquiry B.
 - Feed-less assets (house, car) updated via point-in-time `Valuations`.
 
 ## Reports / Exports
 
-- Net-worth-over-time, spending-by-category, account register. (Exact v1 set TBD — see Open Questions.)
+- Candidates: net-worth-over-time, spending-by-category, account register, cash flow. v1 set pending inquiry I.
 
 ## Build Status
 
-Plan articulated (v0.1). Double-entry spine + phasing defined in [next-build-spec.md](./next-build-spec.md). No objects built yet — blocked on the double-entry decision.
+Decisions locked (v0.2). Double-entry ruled in; foundational calls in [meta/design-decisions.md](./meta/design-decisions.md). **No objects built yet — blocked on the goal interrogation**, then a dedicated field-articulation session.
 
 ## Workflow
 
@@ -50,9 +73,10 @@ Double-entry ledger: every event = balanced legs summing to zero; balances and n
 
 ## Architecture Notes
 
-See `meta/architecture-notes.md`.
+See [meta/architecture-notes.md](./meta/architecture-notes.md) (model) and [meta/design-decisions.md](./meta/design-decisions.md) (decision log).
 
 ## Artifacts
 
 | Date | Artifact | Link | Description |
 |---|---|---|---|
+| 2026-07-15 | Planning brief v0.1 | HTML artifact (chat) | Double-entry explainer: the mechanic, debit/credit, the transfer problem, tools reframed, our phased plan. |
