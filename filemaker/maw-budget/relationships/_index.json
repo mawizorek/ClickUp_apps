@@ -1,4 +1,22 @@
 {
-  "_meta": { "app": "maw-budget", "folder": "relationships", "schemaVersion": "1.0", "generated": "2026-07-15", "source": "../schema/relationships.json" },
+  "_meta": {
+    "app": "maw-budget",
+    "folder": "relationships",
+    "schemaVersion": "2.0",
+    "generated": "2026-07-16",
+    "source": "../schema/relationships.json",
+    "model": "TO graph (anchor-buoy). occurrenceId is the join key into layouts/_index.json. See meta/relationship-audit-model.md."
+  },
+  "occurrences": [
+    {
+      "occurrenceId": "Globals",
+      "baseTable": "Globals",
+      "anchorGroup": "Globals",
+      "role": "anchor",
+      "status": "proposed",
+      "note": "Single-record global-storage utility TO. Anchor for SYS | Global Settings [DSK]. Island of one — no relationships yet by design (globals screen).",
+      "edges": []
+    }
+  ],
   "relationships": []
 }

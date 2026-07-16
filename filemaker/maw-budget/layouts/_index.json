@@ -2,10 +2,11 @@
   "_meta": {
     "app": "maw-budget",
     "folder": "layouts",
-    "schemaVersion": "1.3",
+    "schemaVersion": "1.4",
     "generated": "2026-07-16",
-    "convention": "folder-per-layout: each layout is its own folder (layouts/<folder>/LAYOUT-<name>/) holding layout.json (canonical manifest) + preview.html (pure, chrome-free, interactive Browse-mode render — feels exactly like the built FileMaker layout) + index.html (object/JSON inspector, annotated) + README.md. Diverges from the one-file-per-layout line in DOCUMENTATION-STANDARD v1.1; standard update pending sign-off.",
-    "viewerDecision": "DECIDED (Michael, 2026-07-16): the shared object/JSON inspector becomes a standalone app named 'z-fm-layout-object-viewer', living at the filemaker/ folder level (filemaker/z-fm-layout-object-viewer/), alongside the FileMaker apps — NOT at the repo root with the ClickUp apps. It loads any FMP app's layout.json by slug+path. Once built, per-layout folders stop shipping an inspector copy; preview.html stays the pure render. BUILD PENDING explicit go-ahead."
+    "convention": "folder-per-layout: each layout is its own folder (layouts/<folder>/LAYOUT-<name>/) holding layout.json (canonical manifest) + preview.html (pure interactive Browse render) + index.html (object/JSON inspector) + README.md. Diverges from the one-file-per-layout line in DOCUMENTATION-STANDARD v1.1; standard update pending sign-off.",
+    "auditModel": "This roll-up is the source of truth for 'what layouts exist' + the cross-layout view. Each layout carries occurrenceId, the join key into relationships/_index.json (the TO graph). Audits are QUERIES over these two indexes, not a stored xref. High-level cross-layout data lives ONLY here; layout folders stay lean. See meta/relationship-audit-model.md.",
+    "viewerDecision": "DECIDED (Michael, 2026-07-16): shared object/JSON inspector becomes standalone app 'z-fm-layout-object-viewer' at the filemaker/ folder level (filemaker/z-fm-layout-object-viewer/), NOT repo root. Loads any FMP app's layout.json by slug+path; computes the relationship/audit joins live. BUILD PENDING explicit go-ahead."
   },
   "layouts": [
     {
@@ -13,6 +14,7 @@
       "viewName": "SYS | Global Settings [DSK]",
       "path": "utility/LAYOUT-global-variables",
       "fmpFolder": "utility",
+      "occurrenceId": "Globals",
       "occurrence": "Globals",
       "baseTable": "Globals",
       "platform": "Computer",
