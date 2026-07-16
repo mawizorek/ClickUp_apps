@@ -85,6 +85,26 @@
   --info: oklch(0.50 0.10 230);
 }
 
+[data-theme="americana"]{
+  --bg: oklch(0.975 0.004 265);
+  --surface-1: oklch(0.998 0.002 265);
+  --surface-2: oklch(0.95 0.008 265);
+  --surface-3: oklch(0.91 0.012 265);
+  --border: oklch(0.86 0.020 265);
+  --field: oklch(0.998 0.002 265);
+  --text: oklch(0.30 0.055 285);
+  --text-soft: oklch(0.46 0.050 285);
+  --text-faint: oklch(0.62 0.040 285);
+  --accent: oklch(0.50 0.19 25);
+  --accent-2: oklch(0.38 0.12 285);
+  --accent-soft: oklch(0.92 0.06 25);
+  --on-accent: oklch(0.99 0.01 25);
+  --good: oklch(0.55 0.14 150);
+  --warn: oklch(0.64 0.13 70);
+  --bad: oklch(0.50 0.20 27);
+  --info: oklch(0.44 0.13 285);
+}
+
 [data-theme="mclaren"]{
   --bg: oklch(0.21 0.008 55);
   --surface-1: oklch(0.185 0.008 55);
