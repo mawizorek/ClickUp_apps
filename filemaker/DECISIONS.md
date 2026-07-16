@@ -6,6 +6,18 @@ Domain-level record of **why** the FileMaker documentation model is shaped the w
 
 ---
 
+## D-007 · 2026-07-16 · Object verification & audit trail (derive-don't-store, one self-invalidating stamp)
+
+**Ruling:** every documented object (table, calc, script, relationship, function, value list, layout) exposes a single derived verification badge built from FOUR signals: (1) **status** (already stored), (2) **index↔body agreement** (derived), (3) **blob identity / current** (derived from the git blob SHA), (4) **live-file verification** (the only signal that must be asserted). The ONLY things stored are `status` (already on each object) and a `verified: { date, sha, by }` stamp in ONE per-app ledger, `<app>/meta/verification.json`, keyed by object path. Absence of an entry = unverified (the safe default). NO per-object version numbers (the blob SHA IS the version); NO stored reverse/derived data. The linter is authoritative (does the SHA comparison + index↔body checks, blocks a PR on red); the renderer paints a green/yellow/red badge for at-a-glance reading. Uniform across all object types; rolls up to `VERSIONS.md`. (Standard v1.5.)
+
+**Why:** an agent must be able to open a script or calc and immediately trust (or distrust) what it's reading. The naive answer — stamp every object with version + current + verified fields — just manufactures a new drift surface, the exact sin D-004 (duplicate calc index) and D-006 (triplicate edge list) killed. So verification obeys the same **derive-don't-store** discipline as `calledBy` (D-005): compute every signal that CAN be computed from the source of truth, store only what nothing else can produce. Only signal 4 (has a human/agent confirmed this against the actual FileMaker file?) is unknowable from git, so it is the only thing written.
+
+**The safety property (the crux):** the `verified` stamp records the exact blob SHA confirmed against the live file, making it **self-invalidating** — the moment the object's file changes, current SHA != verified.sha, so it auto-flips to yellow "stale / re-verify." A forgotten stamp update therefore fails SAFE (yellow), never DANGEROUS (false green). An audit trail you can forget to update and still blindly trust is worse than none; anchoring to content-addressed truth means it cannot lie. This is the property that justified building it at all.
+
+**Placement choice (the one real fork):** the stamp lives in ONE per-app ledger (`meta/verification.json`), not scattered as `_meta.verification` across every manifest. Rationale: one findable audit trail, no bloat on minimal-by-design manifests (scripts rows are ~90 bytes for cap reasons), no forced rewrite of the 23KB `schema/tables.json`, and a clean roll-up to the repo-level `VERSIONS.md`. Unverified objects cost zero bytes (no entry). Chosen by Brain on Michael's "push forward with what you think is best."
+
+**Superseded:** nothing — net-new audit layer. Composes with the GitHub read-body ladder (blob-first, immutable SHA) which supplies signal 3, and with `VERSIONS.md` (app-level) which this feeds at the object level.
+
 ## D-006 · 2026-07-16 · Relationships: one edge surface (`schema/relationships.json`)
 
 **Ruling:** `schema/relationships.json` is the SINGLE source + render surface for the relationship graph. The `relationships/README.md` edge table is retired (narrative only), and `relationships/_index.json` no longer restates edges (render hints only, pointing at the schema file). The renderer + linter read `schema/relationships.json` directly, the way the schema viewer reads `schema/tables.json`. (Standard v1.4.)
