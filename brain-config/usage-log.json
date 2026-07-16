@@ -1,23 +1,25 @@
 {
   "_schema": "v1",
   "_note": "Updated at session close. Each key is the tool filename (without .md). Value is cumulative fire count.",
-  "sessions_logged": 3,
+  "sessions_logged": 4,
   "last_updated": "2026-07-16",
   "tools": {
     "memory-edit-guard": 3,
-    "stale-context-reload": 9,
-    "commit-pre-flight": 13,
-    "link-provenance": 7,
-    "multi-edit-batch-gate": 3,
-    "secrets-pii-guard": 13,
-    "source-size-budget-enforcer": 13,
+    "stale-context-reload": 10,
+    "commit-pre-flight": 14,
+    "link-provenance": 8,
+    "multi-edit-batch-gate": 4,
+    "secrets-pii-guard": 14,
+    "source-size-budget-enforcer": 14,
     "roster-scan-planner": 2,
     "agent-invocation-gate": 1,
-    "intent-check": 3,
+    "intent-check": 4,
+    "decision-log": 1,
+    "theme-contract-gate": 1,
     "repo-renata": 0,
-    "workshop-wes": 0,
+    "workshop-wes": 1,
     "scout-sage": 1,
-    "closing-clio": 3,
-    "handoff-hana": 1
+    "closing-clio": 4,
+    "handoff-hana": 2
   }
 }
