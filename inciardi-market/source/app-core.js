@@ -1,6 +1,6 @@
 /* Inciardi Market v12 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
 const BUILD = "v12";
-const PR = 246; // merged PR that shipped this version
+const PR = 247; // merged PR that shipped this version
 const API_DEFAULT = "https://inciardi-market.mawizorek-online.workers.dev";
 const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fallback can render
 
