@@ -47,7 +47,7 @@
       "id": "default",
       "label": "Default",
       "themes": [
-        { "slug": "default-theme", "name": "Default Theme", "file": "default-theme.json", "status": "locked", "mode": "dark", "intendedUse": "unskinned default — new apps point here until a theme is chosen", "fmp": "pending" }
+        { "slug": "default-theme", "name": "Default Theme", "file": "default-theme.json", "status": "locked", "mode": "mid", "intendedUse": "unskinned default — new apps point here until a theme is chosen", "fmp": "pending" }
       ]
     },
     {

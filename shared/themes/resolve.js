@@ -5,8 +5,8 @@
        build time; this resolver is still the reference for what those values are.
 
    Applies the 17 global tokens as bare CSS custom properties (--accent, --surface-1, ...),
-   so an app just writes var(--accent) and links a theme. Also sets data-mode (light|dark)
-   on the root so an app's mode-conditional CSS keys off the theme.
+   so an app just writes var(--accent) and links a theme. Also sets data-mode on the root
+   (light | dark | mid) so an app's mode-conditional CSS keys off the theme.
 
    Fallback trail (fail loud):
      unknown slug   → visible error banner, no skin applied
@@ -14,7 +14,7 @@
      resolved, key gap → that key falls back to the ultimate spine
      fetch fails (file://) → ultimate fallback so it never white-screens (reported offline)
 
-   The ultimate fallback is DEFAULT-THEME (the unskinned grayscale default): if resolution
+   The ultimate fallback is DEFAULT-THEME (the unskinned MID-gray default): if resolution
    fails, a consumer lands on the deliberately-gray default so it reads as unthemed, never broken.
 
    Depth-independent: computes its own base dir, so a consumer at any folder depth just
@@ -33,14 +33,14 @@
 (function(){
   var TOKEN_KEYS = ["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-2","accent-soft","on-accent","good","warn","bad","info"];
   var DEFAULT = 'default-theme';
-  // default-theme (unskinned grayscale), embedded so a fetch failure never blanks the consumer
+  // default-theme (unskinned MID-gray, high-contrast), embedded so a fetch failure never blanks the consumer
   var ULTIMATE = {
-    "bg":"oklch(0.28 0 0)","surface-1":"oklch(0.33 0 0)","surface-2":"oklch(0.38 0 0)",
-    "surface-3":"oklch(0.43 0 0)","border":"oklch(0.52 0 0)","field":"oklch(0.36 0 0)",
-    "text":"oklch(0.96 0 0)","text-soft":"oklch(0.78 0 0)","text-faint":"oklch(0.62 0 0)",
-    "accent":"oklch(0.70 0 0)","accent-2":"oklch(0.60 0 0)","accent-soft":"oklch(0.44 0 0)",
-    "on-accent":"oklch(0.20 0 0)","good":"oklch(0.72 0 0)","warn":"oklch(0.66 0 0)",
-    "bad":"oklch(0.58 0 0)","info":"oklch(0.62 0 0)"
+    "bg":"oklch(0.62 0 0)","surface-1":"oklch(0.68 0 0)","surface-2":"oklch(0.73 0 0)",
+    "surface-3":"oklch(0.78 0 0)","border":"oklch(0.40 0 0)","field":"oklch(0.71 0 0)",
+    "text":"oklch(0.16 0 0)","text-soft":"oklch(0.30 0 0)","text-faint":"oklch(0.42 0 0)",
+    "accent":"oklch(0.26 0 0)","accent-2":"oklch(0.38 0 0)","accent-soft":"oklch(0.82 0 0)",
+    "on-accent":"oklch(0.97 0 0)","good":"oklch(0.52 0 0)","warn":"oklch(0.46 0 0)",
+    "bad":"oklch(0.30 0 0)","info":"oklch(0.42 0 0)"
   };
 
   var base = (function(){
@@ -68,20 +68,20 @@
       var ultimateSlug = idx.ultimateFallback || DEFAULT;
       if(entry.status === 'stub' || !entry.file){
         trail.push(entry.slug+' (stub)', 'no tokens', '_base', ultimateSlug);
-        return { slug:slug, name:entry.name, mode:entry.mode||'dark', tokens:assign({}, ULTIMATE), trail:trail, stub:true };
+        return { slug:slug, name:entry.name, mode:entry.mode||'mid', tokens:assign({}, ULTIMATE), trail:trail, stub:true };
       }
       return getJSON(base + entry.file).then(function(def){
         if(!def.tokens){
           trail.push(entry.slug+' ('+entry.status+')', 'tokens null', '_base', ultimateSlug);
-          return { slug:slug, name:entry.name, mode:entry.mode||'dark', tokens:assign({}, ULTIMATE), trail:trail, stub:true };
+          return { slug:slug, name:entry.name, mode:entry.mode||'mid', tokens:assign({}, ULTIMATE), trail:trail, stub:true };
         }
         var out = {}, missing = [];
         TOKEN_KEYS.forEach(function(key){ if(def.tokens[key]){ out[key]=def.tokens[key]; } else { out[key]=ULTIMATE[key]; missing.push(key); } });
         trail.push(entry.slug+' ('+entry.status+')', missing.length ? (missing.length+' key(s) -> _base') : 'all keys resolved');
-        return { slug:slug, name:entry.name, mode:def.mode||entry.mode||'dark', tokens:out, trail:trail, stub:false, missing:missing };
+        return { slug:slug, name:entry.name, mode:def.mode||entry.mode||'mid', tokens:out, trail:trail, stub:false, missing:missing };
       });
     }).catch(function(err){
-      return { slug:slug, name:'(offline fallback)', mode:'dark', tokens:assign({}, ULTIMATE), trail:['fetch failed: '+err.message, 'ULTIMATE fallback (default-theme)'], stub:false, offline:true };
+      return { slug:slug, name:'(offline fallback)', mode:'mid', tokens:assign({}, ULTIMATE), trail:['fetch failed: '+err.message, 'ULTIMATE fallback (default-theme)'], stub:false, offline:true };
     });
   }
 
