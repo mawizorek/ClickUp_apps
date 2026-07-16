@@ -1,9 +1,23 @@
 {
-  "_meta": { "app": "hml-llc", "folder": "scripts", "schemaVersion": "1.0", "generated": "2026-07-14", "note": "Subfolders mirror FMP Manage Scripts folder names. Pending full enumeration." },
-  "folders": [
-    { "name": "imports", "status": "pending", "scripts": [] },
-    { "name": "navigation", "status": "pending", "scripts": [] },
-    { "name": "utilities", "status": "partial", "scripts": [ { "name": "commitRecord", "file": "utilities/commitRecord.md", "role": "generic commit + validation-error handler" } ] },
-    { "name": "triggers", "status": "pending", "scripts": [] }
+  "_meta": {
+    "app": "hml-llc",
+    "folder": "scripts",
+    "schemaVersion": "2.0",
+    "generated": "2026-07-16",
+    "model": "ONE master index for the whole Manage Scripts tree. Flat scripts[] array (parallels calculations/_index.json). Minimal rows only: name, folder, calls, scriptRef. The renderer builds the folder tree from each row's `folder` and the CALLS/CALLED-BY graph from `calls[]`; `calledBy` is DERIVED at render time by inverting every row's calls[] and is NEVER stored. Listing is not loading: the tree + graph read only this file; a body is fetched lazily, one at a time, on drill-in.",
+    "bodyExtension": ".fmscript",
+    "bodyNature": "DICTATION reference (the exact steps to type into Manage Scripts, narrative as native # comment lines) — NOT paste-round-trippable, because FileMaker's script clipboard is XML, not plain text. Unlike .fmcalc.",
+    "keying": "Script names are unique per FileMaker file, so `name` is a safe graph key (calc fields needed <Table>__<Field> because they are not unique; scripts are).",
+    "callsResolution": "calls[] may target a script OR a custom function; the linter resolves each against this file first, then functions/_index.json.",
+    "capDiscipline": "Keep rows minimal so this master index stays under the ~30KB read cap (~90 bytes/row). If a solution ever crosses it, shard by top-level folder behind a pointer — still no renderer change.",
+    "status": "Skeleton. Only commitRecord is populated (shared standard helper). Real HML script inventory pending a live-file DDR enumeration pass."
+  },
+  "scripts": [
+    {
+      "name": "commitRecord",
+      "folder": "utilities",
+      "calls": ["MSG_ValueListErrors"],
+      "scriptRef": "utilities/commitRecord.fmscript"
+    }
   ]
 }
