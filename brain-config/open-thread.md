@@ -4,6 +4,33 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
+## FileMaker calc externalization (HML_LLC) — SHIPPED this session (2026-07-16), follow-ups open
+**Added:** 2026-07-16
+
+Big structural change to how FileMaker calc fields are documented. Reversed a locked rule with Michael's explicit go. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` (now v1.3) first — it is the source of truth for the model below.**
+
+**What changed (all merged to main):**
+- **PR #260** — Externalized every calc formula body to `filemaker/hml-llc/calculations/`, one `.fmcalc` file per calc field (19 files: 11 Loans, 4 ExpectedTransactions, 4 GLOBAL_USE_VARIABLES). Each file = 2 `//` header lines + blank + verbatim FileMaker formula, round-trippable (paste straight into the calc dialog). `schema/tables.json` bumped to v1.2: each calc field carries `calcRef` + `returns` + `stored`, formula bodies removed. Added `calculations/_index.json` manifest (owning table, return, stored, purpose, `reads` dependency hints). GLOBAL calc names reconciled to canonical camelCase.
+- **PR #261** — Retired the inline `Calculations` sections from the three table markdown files. NO pointer list retained (Michael: markdown is fully replaced, a pointer list is just a second index to drift). Calc fields still appear as ROWS in each Fields table; each file keeps one prose line pointing at `../calculations/`. Standard bumped to v1.3.
+
+**The locked model now (v1.3):** formula body lives ONLY in `calculations/*.fmcalc`; structural metadata in `schema/tables.json`; dependency hints in `calculations/_index.json`; presentation via the renderer. Table markdown carries zero calc bodies. One definition, one home.
+
+**Rendering/tooling artifacts (ClickUp run.clickup.ai artifacts, NOT in repo yet):**
+- Schema Renderer v2 — reads live schema + fetches `.fmcalc` bodies, FileMaker syntax highlighting, copy-to-clipboard, `reads` dependency graph (D3). 
+- Calc Linter — validates calculations/ against the schema (orphan/missing calcRef, balanced parens/brackets/quotes, unused Let vars, same-table + cross-table `reads` resolution, manifest↔schema coverage, header match). Built with an embedded offline snapshot fallback so it runs even if the raw fetch is cache-lagged.
+
+**STILL OPEN (next agent picks up here):**
+- **(a) Promote the renderer + linter into the repo.** They live as ClickUp artifacts right now. Per the locked standard they should become the shared `filemaker/_viewer/` (app-agnostic, param-driven by app slug) so every FMP app gets docs the moment its JSON exists. Modular shell + source/, not a monolith.
+- **(b) The `reads` dependency hints are HAND-AUTHORED** in `_index.json`. The linter validates them but does not GENERATE them. Consider a real parser that derives `reads` from each formula so the hint can't drift from the body. Until then, treat `reads` as advisory.
+- **(c) Fold the calc linter into the Schema Linter tool** (AI Toolkit) rather than a standalone artifact, so it fires on the normal FileMaker doc-edit path.
+- **(d) Markdown generation.** Table markdown Fields tables are still hand-maintained and duplicate `schema/tables.json`. The endgame (discussed, not started) is to GENERATE the markdown from the JSON so there's nothing to keep in sync. Separate pass.
+- **(e) Live-file name confirmation (pre-existing, still open):** schema names `OriginalPrincipal`/`InterestRateAnnual`/`ClosingDate`/`GraceDays`/`fkCurrentPayoff` are reconciled in docs but NOT yet confirmed against the live FMP file. File is the tiebreaker if they differ.
+- **(f) Apply the model to the other FMP app** (`filemaker/maw-budget`) once the viewer is promoted. HML_LLC is the reference implementation.
+
+**Convention reference (for a cold pickup):** filename `<Table>__<FieldName>.fmcalc` (double-underscore namespace sep, kills cross-table collisions since calc names aren't globally unique). Ext `.fmcalc` = plain text.
+
+---
+
 ## Inciardi Market — full catalog HARVEST PASS (do first next session)
 **Added:** 2026-07-13
 
