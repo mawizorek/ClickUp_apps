@@ -8,6 +8,7 @@
 - 2026-07-15 brainstorm: core job = **account / net-worth tracking + bill/subscription tracking**, budgeting later. Single user (Michael). Naming = HML_LLC style (clean PascalCase, drop legacy SCREAMING names).
 - 2026-07-15 research pass (v0.1): benchmarked QuickBooks, YNAB/Monarch/Copilot/Actual, Firefly III, Maybe, GnuCash, and Bloomberg Terminal. Confirmed the double-entry lean. Deep-dive below.
 - 2026-07-15 (v0.2): **double-entry RULED IN by Michael.** Fork closed. Foundational design calls locked in `meta/design-decisions.md`. Now interrogating goals (below) BEFORE any table is written — no field-guessing.
+- 2026-07-15 (v0.2, inquiry): answers **A** and **B** captured (see Open inquiry). Import tooling confirmed as a **Phase 1** concern (CSV).
 
 ## Locked decisions (see `meta/design-decisions.md` for the why)
 
@@ -20,6 +21,8 @@
 - **DD-007 Phasing** — spine → bills → budgeting.
 - **DD-008 Naming = HML style** (PROVISIONAL — confirm before first table).
 - **DD-009 Single user.**
+- **DD-011 Full account-type coverage** — model supports every account class (see A).
+- **DD-012 CSV import + manual entry, ~weekly** — import tooling is Phase 1 (see B).
 
 ## Reference model deep-dive (researched 2026-07-15)
 
@@ -84,46 +87,46 @@ The case a single-row model breaks — the reason for DD-001.
 
 ## Phasing (DD-007)
 
-- **Phase 1 (v1):** Institutions, Accounts, Categories, TransactionGroups, TransactionLines, ImportSessions, Valuations. Delivers balances, net worth, transfers, card payments, spend by category.
+- **Phase 1 (v1):** Institutions, Accounts, Categories, TransactionGroups, TransactionLines, ImportSessions, Valuations. Delivers balances, net worth, transfers, card payments, spend by category. **Import (CSV) is in v1 per DD-012.**
 - **Phase 2:** Bills (expected/recurring) + Bill<->actual match (HML `PaymentApplications` pattern).
 - **Phase 3:** Budgeting layer (envelope, Actual/YNAB style): `BudgetAllocations`; Available = assigned - activity + rollover.
 - **Out of scope v1:** investments, multi-currency, live market data.
 
 ## Open inquiry — goal interrogation (ANSWER BEFORE ANY TABLE) 🔍
 
-> The point of this pass: pressure-test what the app is actually FOR, so fields are derived from real goals, not guessed. Each answer feeds directly into the field-articulation session. Nothing below is decided.
+> The point of this pass: pressure-test what the app is actually FOR, so fields are derived from real goals, not guessed. Each answer feeds directly into the field-articulation session.
 
-**A. Account inventory — what actually exists.**
-- List every real account: checking(s), savings, each credit card, cash, loans/mortgage, HSA/retirement, the house, the car(s). How many of each?
-- Which are "on budget" (spending flows through) vs "off budget" (tracked for net worth only, e.g. mortgage, 401k)?
+**A. Account inventory. ✅ ANSWERED (2026-07-15):** Michael wants to track **every account class** — checking, savings, each credit card, cash, loans/mortgage, retirement, house, car. Model must support all of them (→ DD-011). Two follow-ups still open, but they do NOT block schema shape (they're data, not structure):
+- Actual counts per type (how many checking, how many cards, etc.) — gather at data-entry time.
+- On-budget vs net-worth-only flag per account (e.g. mortgage/401k = net-worth-only). Design implication: `Account` carries an **on-budget boolean**; the per-account value is set when accounts are entered.
 
-**B. Data intake — how do transactions get IN?** (FileMaker has no live bank feed.)
-- Manual entry, CSV/OFX import from each bank, or a mix? Which banks, what export format?
-- How often will you actually sit down to enter/import? (Drives whether import tooling is v1 or later.)
+**B. Data intake. ✅ ANSWERED (2026-07-15):** **CSV import** as the primary path, **with manual entry/adjustment steps** Michael takes by hand. Cadence: aiming every other day, realistically **~weekly** (→ DD-012). Design implications:
+- `ImportSessions` + CSV mapping is a **Phase 1** deliverable, not deferred.
+- Need a **per-account CSV column-mapping** concept (banks export different column layouts) and a **dedup key** (`rawHash`) so a re-imported overlapping CSV doesn't double-post.
+- Manual entry and manual post-import cleanup are first-class (not an afterthought).
+- Follow-up (non-blocking): which banks / what their CSV columns look like — gather a sample CSV per account when we build the mapper.
 
-**C. Categories — shape & granularity.**
-- Flat list or hierarchical (parent → child)? Roughly how many?
-- QuickBooks-style income/expense accounts, or simple spending buckets?
+**C. Categories — shape & granularity.** Flat list or hierarchical (parent → child)? Roughly how many? QuickBooks-style income/expense accounts, or simple spending buckets?
 
 **D. Splits.** One purchase across multiple categories (Target run = groceries + household + clothing) — do you need it? (Double-entry supports it free; confirms UI need.)
 
-**E. Net worth over time.** Do you want a net-worth trend chart, or just today's number? (Trend needs periodic snapshots or full-history derivation.)
+**E. Net worth over time.** Net-worth trend chart, or just today's number? (Trend needs periodic snapshots or full-history derivation.)
 
 **F. Feed-less asset cadence.** How often re-value the house/car — manually when you feel like it, or on a schedule?
 
-**G. Bills (phase 2 shape).** What counts as a "bill" vs a normal transaction? Fixed recurring only, or variable (utilities)? Do you want upcoming-bill forecasting / reminders?
+**G. Bills (phase 2 shape).** What counts as a "bill" vs a normal transaction? Fixed recurring only, or variable (utilities)? Upcoming-bill forecasting / reminders?
 
 **H. Budgeting model (phase 3).** True envelope (YNAB: assign every dollar) or simpler target-vs-actual per category? Should unspent roll over month to month?
 
 **I. Reports — the 3 you'd actually open.** Net-worth trend? Monthly spend by category? Account register? Cash-flow in/out? Rank them.
 
-**J. Reconciliation.** Will you reconcile against real statements (mark cleared vs pending)? That adds a `cleared`/statement concept to lines.
+**J. Reconciliation.** Reconcile against real statements (mark cleared vs pending)? That adds a `cleared`/statement concept to lines.
 
 **K. Platform reach.** FileMaker Pro on desktop only, or also FileMaker Go on iPhone/iPad for on-the-go entry?
 
 ## Next build (BLOCKED until inquiry answered)
 
-- Resolve DD-008 naming + the Open inquiry above.
+- Remaining inquiry: C–K. Plus resolve DD-008 naming.
 - THEN: spin up a fresh agent session to articulate real fields per object, writing `tables/` files + `schema/tables.json` off these answers.
 
 ## Futures
