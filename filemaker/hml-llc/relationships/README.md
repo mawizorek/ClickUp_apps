@@ -1,6 +1,6 @@
 # Relationships
 
-The HML_LLC relationship graph. Machine mirror: `../schema/relationships.json`. Manifest for the viewer: `_index.json`.
+The HML_LLC relationship graph. **Single edge surface: [`../schema/relationships.json`](../schema/relationships.json)** (the machine mirror; the renderer + linter read it directly). This README carries only narrative — the edge list is NOT restated here (standard v1.4 / `DECISIONS.md` D-006), the same no-second-index rule that retired inline calc bodies. `_index.json` holds render hints only.
 
 ## The loan-first spine
 
@@ -12,24 +12,12 @@ The defining decision: **loans are the financial parent, not properties.** The u
 - `Payoffs.fkLoan` → `Loans` — payoffs belong to the loan and freeze their numbers.
 - `ExpectedTransactions` / `AccountTransactions` `.fkStandardTransaction` → `Standard_Transactions` — type taxonomy.
 
-## Edges
-
-| From | To | Cardinality | Status | Notes |
-|---|---|---|---|---|
-| Loans.fkProperty | PropertySUMMARIES.PrimaryKey | many-to-one | locked | loan secured by property |
-| Loans.fkBorrower | Organizations.PrimaryKey | many-to-one | pending | party table decision open |
-| Loans.fkCurrentPayoff | Payoffs.PrimaryKey | many-to-one | pending | current-payoff pointer |
-| ExpectedTransactions.fkLoan | Loans.PrimaryKey | many-to-one | locked | |
-| AccountTransactions.fkLoan | Loans.PrimaryKey | many-to-one | locked | (fkProperty retained transitionally) |
-| ExpectedTransactions.fkStandardTransaction | Standard_Transactions.PrimaryKey | many-to-one | locked | |
-| AccountTransactions.fkStandardTransaction | Standard_Transactions.PrimaryKey | many-to-one | locked | |
-| PaymentApplications.fkExpectedTransaction | ExpectedTransactions.PrimaryKey | many-to-one | locked | join side A |
-| PaymentApplications.fkAccountTransaction | AccountTransactions.PrimaryKey | many-to-one | locked | join side B |
-| Payoffs.fkLoan | Loans.PrimaryKey | many-to-one | locked | |
-| PropertySUMMARIES.fkDocuments | Documents.PrimaryKey | many-to-one | under-review | |
-| PropertySUMMARIES.fkBorrower | Organizations.PrimaryKey | many-to-one | under-review | |
-
 ## Under review
 
 - Party links (`fkBorrower`) pending the Organizations vs Borrowers decision.
 - `PropertySUMMARIES.fkDocuments` / `fkBalloonNote` / `fkPropertyStatus` FK ownership under re-eval.
+
+## Tooling (build-session work, not yet built)
+
+- **Renderer:** a TO-graph view in `_viewer/`, a near-clone of the calc `reads` D3 graph — nodes = tables, edges = FKs (child.field → parent.PrimaryKey), label = cardinality, color = status (locked / pending / under-review). Reads `../schema/relationships.json` directly.
+- **Linter:** both endpoints resolve to a real table+field in `../schema/tables.json`; `to.field` is a PrimaryKey; cardinality + status are valid enums; no edge references a nonexistent table; manifest ↔ schema coverage.
