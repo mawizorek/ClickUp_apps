@@ -1,0 +1,57 @@
+{
+  "_meta": {
+    "app": "maw-budget",
+    "kind": "filemaker-layout-render",
+    "rendererVersion": "0.1",
+    "generated": "2026-07-15",
+    "note": "Canonical manifest for the GLOBAL_Settings layout. index.html embeds a copy of this and renders it; keep the two in sync in the same PR (mirrors the _index.json rule). Field bindings are PROPOSED (no table articulated yet) and will validate against schema/tables.json once it exists."
+  },
+  "layout": {
+    "name": "GLOBAL_Settings",
+    "folder": "utility",
+    "occurrence": "Globals",
+    "baseTable": "Globals",
+    "recordScope": "Single-record utility table (global-storage fields)",
+    "mode": "Browse",
+    "purpose": "App-wide setup: session identity, preferences (theme, default account, budget month), value-list global seeds, and import/process state. The one screen where g_ globals live so they can be seen and set.",
+    "theme": {
+      "name": "MAW Dark Utility",
+      "tokens": {
+        "cv-bg": "oklch(0.23 0.013 260)",
+        "cv-part-header": "oklch(0.28 0.02 260)",
+        "cv-part-body": "oklch(0.235 0.012 260)",
+        "cv-part-footer": "oklch(0.27 0.016 260)",
+        "cv-field-fill": "oklch(0.31 0.014 260)",
+        "cv-field-border": "oklch(0.44 0.02 260)",
+        "cv-field-text": "oklch(0.94 0.008 260)",
+        "cv-label": "oklch(0.70 0.012 260)",
+        "cv-accent": "oklch(0.72 0.11 205)",
+        "cv-title": "oklch(0.96 0.02 205)"
+      }
+    }
+  },
+  "sections": [
+    { "id": "identity", "label": "Session & Identity" },
+    { "id": "prefs", "label": "Preferences" },
+    { "id": "vlists", "label": "Value-List Globals" },
+    { "id": "import", "label": "Import / Process State" }
+  ],
+  "objects": [
+    { "seq": 1, "part": "header", "kind": "text", "control": "staticText", "label": "Global Settings", "sample": "Global Settings", "notes": "Layout title. Static text object using the theme title token (27px / 600)." },
+    { "seq": 2, "part": "header", "kind": "text", "control": "mergeText", "label": "Environment / version merge", "sample": "PROD · v0.1.0", "binding": { "table": "Globals", "field": "g_Environment", "fieldType": "Text", "storage": "Global", "status": "proposed", "alsoRefs": ["Globals::g_AppVersion"] }, "notes": "Merge text object: <<Globals::g_Environment>> · v<<Globals::g_AppVersion>>. Read-only." },
+    { "seq": 3, "part": "body", "section": "identity", "kind": "field", "control": "editBox", "label": "Current User", "sample": "Michael Wizorek", "binding": { "table": "Globals", "field": "g_CurrentUser", "fieldType": "Text", "storage": "Global", "status": "proposed" }, "notes": "Set on startup from Get(AccountName). Single-user, but drives the CreatedBy / ModifiedBy audit quad." },
+    { "seq": 4, "part": "body", "section": "identity", "kind": "field", "control": "displayOnly", "label": "App Version", "sample": "0.1.0", "binding": { "table": "Globals", "field": "g_AppVersion", "fieldType": "Calculation (Text, unstored)", "storage": "Unstored calc", "status": "proposed" }, "notes": "Calc returning the solution version string. Display only." },
+    { "seq": 5, "part": "body", "section": "identity", "kind": "field", "control": "popupMenu", "label": "Environment", "sample": "PROD", "options": ["DEV", "PROD"], "binding": { "table": "Globals", "field": "g_Environment", "fieldType": "Text", "storage": "Global", "valueList": "gLIST_Environment", "status": "proposed" }, "notes": "Pop-up menu bound to value list gLIST_Environment. Gates debug-only tooling." },
+    { "seq": 6, "part": "body", "section": "identity", "kind": "field", "control": "checkboxSet", "label": "Debug Mode", "sample": "off", "checked": false, "binding": { "table": "Globals", "field": "g_DebugMode", "fieldType": "Number", "storage": "Global", "status": "proposed" }, "notes": "1/0 flag. Reveals developer buttons + verbose script logging." },
+    { "seq": 7, "part": "body", "section": "prefs", "kind": "field", "control": "radioButtonSet", "label": "Theme", "sample": "Dark", "options": ["Dark", "Light"], "binding": { "table": "Globals", "field": "g_ThemeMode", "fieldType": "Text", "storage": "Global", "valueList": "gLIST_ThemeMode", "status": "proposed" }, "notes": "Default Dark. Drives conditional layout theming across the solution." },
+    { "seq": 8, "part": "body", "section": "prefs", "kind": "field", "control": "dropDownList", "label": "Default Account", "sample": "Chase Checking", "binding": { "table": "Globals", "field": "g_DefaultAccount", "fieldType": "Text (holds fkAccount UUID)", "storage": "Global", "valueList": "gLIST_Accounts", "status": "proposed" }, "notes": "Stores an Account PrimaryKey; value list gLIST_Accounts shows names. Pre-selects the account for quick manual entry." },
+    { "seq": 9, "part": "body", "section": "prefs", "kind": "field", "control": "editBox", "label": "Current Budget Month", "sample": "2026-07-01", "binding": { "table": "Globals", "field": "g_CurrentBudgetMonth", "fieldType": "Date", "storage": "Global", "status": "proposed" }, "notes": "First-of-month date the budgeting + report screens default to. Phase 3 relevant, seeded now." },
+    { "seq": 10, "part": "body", "section": "prefs", "kind": "field", "control": "displayOnly", "label": "Today", "sample": "2026-07-15", "binding": { "table": "Globals", "field": "g_DateToday", "fieldType": "Calculation (Date, unstored)", "storage": "Unstored calc", "status": "proposed" }, "notes": "Get(CurrentDate). Display anchor for the staleness nudges in DD-018." },
+    { "seq": 11, "part": "body", "section": "vlists", "kind": "field", "control": "displayMulti", "label": "Account Types (seed)", "sample": "Checking\nSavings\nCredit Card\nCash\nLoan\nReceivable\nAsset (feed-less)", "binding": { "table": "Globals", "field": "gLIST_AccountTypes", "fieldType": "Text", "storage": "Global", "status": "proposed" }, "notes": "Global feeding a 'use values from field' value list. Seeds the Account type taxonomy (DD-011 / DD-013)." },
+    { "seq": 12, "part": "body", "section": "vlists", "kind": "field", "control": "displayMulti", "label": "Transaction States", "sample": "Pending\nCleared", "binding": { "table": "Globals", "field": "gLIST_TransactionStates", "fieldType": "Text", "storage": "Global", "status": "proposed" }, "notes": "Seeds the cleared / pending reconciliation states (DD-021)." },
+    { "seq": 13, "part": "body", "section": "import", "kind": "field", "control": "checkboxSet", "label": "Import In Progress", "sample": "off", "checked": false, "binding": { "table": "Globals", "field": "g_ImportInProgress", "fieldType": "Number", "storage": "Global", "status": "proposed" }, "notes": "1/0 guard set during CSV import to block re-entrancy (DD-012)." },
+    { "seq": 14, "part": "body", "section": "import", "kind": "field", "control": "displayOnly", "label": "Last Import Session", "sample": "2026-07-14 · Chase · 42 rows", "binding": { "table": "Globals", "field": "g_LastImportSession", "fieldType": "Text (holds fkImportSession UUID)", "storage": "Global", "status": "proposed" }, "notes": "Points at the most recent ImportSessions record for a quick 'last import' readout." },
+    { "seq": 15, "part": "footer", "kind": "button", "control": "buttonPrimary", "label": "Reset Session Globals", "script": "util_ResetGlobals", "notes": "Clears / reinitializes session g_ globals to defaults. Script proposed under scripts/utilities/." },
+    { "seq": 16, "part": "footer", "kind": "button", "control": "button", "label": "Toggle Theme", "script": "util_ToggleTheme", "notes": "Flips g_ThemeMode Dark/Light and refreshes. Script proposed under scripts/utilities/." }
+  ]
+}
