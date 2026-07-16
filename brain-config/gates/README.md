@@ -5,3 +5,4 @@ Workflow gates are lightweight decision points that fire WITHIN another process 
 Current gates:
 - **agent-invocation-gate.md** — Disambiguates agent names from real-person mentions. Fires during 🧠 subagent evaluation.
 - **inbox-triage-trigger.md** — Any agent assigned to a task in URITP ▸ INBOX ▸ Default runs the inbox interrogation. Routing only; the procedure lives solely in the ClickUp triage doc. Agent-agnostic (decoupled from Milo).
+- **session-transcript-gate.md** — Decides WHEN Scribe Sana opens the live, chronological, speaker-labeled session log. Evaluated at session start; fires on the first real decision, or by the 3rd message during build/work. Holds on lookups. Once fired, Scribe appends the transcript in real time and finalizes it into the same Session Log thread at close.
