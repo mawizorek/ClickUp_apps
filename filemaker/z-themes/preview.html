@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>z-themes · FileMaker theme preview</title>
+<style>
+  :root{
+    --chrome-bg: oklch(0.17 0.012 265);
+    --chrome-surface: oklch(0.21 0.014 265);
+    --chrome-surface-2: oklch(0.245 0.016 265);
+    --chrome-line: oklch(0.32 0.018 265);
+    --chrome-line-soft: oklch(0.28 0.016 265);
+    --chrome-text: oklch(0.93 0.01 265);
+    --chrome-muted: oklch(0.66 0.012 265);
+    --chrome-faint: oklch(0.52 0.012 265);
+    --chrome-accent: oklch(0.74 0.13 205);
+    --ok: oklch(0.74 0.14 155);
+    --warn: oklch(0.78 0.13 78);
+    --err: oklch(0.66 0.19 22);
+    --space-xs:4px; --space-sm:8px; --space-md:12px; --space-lg:16px; --space-xl:24px; --space-2xl:32px;
+    --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+    --drawer-w: 288px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:var(--sans); background:var(--chrome-bg); color:var(--chrome-text);
+    font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  h1,h2,h3{text-wrap:balance;}
+
+  .topbar{
+    display:flex; align-items:center; gap:var(--space-lg);
+    padding:0 var(--space-lg); height:52px; flex:0 0 auto;
+    background:var(--chrome-surface); border-bottom:1px solid var(--chrome-line);
+    z-index:30;
+  }
+  .menu-btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:8px; border:1px solid var(--chrome-line);
+    background:var(--chrome-surface-2); color:var(--chrome-text); cursor:pointer;
+    transition:background .13s var(--ease-out-quint), border-color .13s var(--ease-out-quint);
+  }
+  .menu-btn:hover{background:var(--chrome-line-soft); border-color:var(--chrome-accent);}
+  .menu-btn:focus-visible{outline:2px solid var(--chrome-accent); outline-offset:2px;}
+  .menu-btn svg{width:18px; height:18px;}
+  .brand{display:flex; align-items:baseline; gap:var(--space-sm);}
+  .brand .mark{font-family:var(--mono); font-weight:600; font-size:13px; letter-spacing:.06em; color:var(--chrome-accent); text-transform:uppercase;}
+  .brand .sub{font-size:12.5px; color:var(--chrome-faint);}
+  .topbar .spacer{flex:1;}
+  .count-pill{
+    font-family:var(--mono); font-size:11.5px; color:var(--chrome-muted);
+    padding:4px 9px; border:1px solid var(--chrome-line); border-radius:20px;
+    background:var(--chrome-bg);
+  }
+  .count-pill b{color:var(--chrome-text); font-weight:600;}
+
+  .shell{flex:1; display:flex; min-height:0; position:relative;}
+
+  .scrim{
+    position:absolute; inset:0; background:oklch(0.1 0.01 265 / 0.55);
+    opacity:0; pointer-events:none; transition:opacity .25s var(--ease-out-quint); z-index:19;
+  }
+  body.drawer-open .scrim{opacity:1; pointer-events:auto;}
+  .drawer{
+    position:absolute; top:0; left:0; bottom:0; width:var(--drawer-w);
+    background:var(--chrome-surface); border-right:1px solid var(--chrome-line);
+    transform:translateX(-100%); transition:transform .32s var(--ease-out-quint);
+    z-index:20; display:flex; flex-direction:column;
+  }
+  body.drawer-open .drawer{transform:translateX(0);}
+  .drawer-head{
+    padding:var(--space-lg) var(--space-lg) var(--space-md);
+    border-bottom:1px solid var(--chrome-line-soft); flex:0 0 auto;
+  }
+  .drawer-head .t{font-size:13px; font-weight:600; letter-spacing:.02em;}
+  .drawer-head .d{font-size:12px; color:var(--chrome-faint); margin-top:2px;}
+  .drawer-body{overflow-y:auto; padding:var(--space-sm) 0 var(--space-lg); flex:1;}
+  .group{margin-top:var(--space-sm);}
+  .group-head{
+    display:flex; align-items:center; gap:var(--space-sm);
+    width:100%; text-align:left; cursor:pointer;
+    padding:var(--space-sm) var(--space-lg); background:none; border:0; color:var(--chrome-muted);
+    font-family:var(--mono); font-size:11px; letter-spacing:.11em; text-transform:uppercase;
+  }
+  .group-head:hover{color:var(--chrome-text);}
+  .group-head .chev{width:12px; height:12px; transition:transform .2s var(--ease-out-quint); color:var(--chrome-faint);}
+  .group.collapsed .chev{transform:rotate(-90deg);}
+  .group-head .gcount{margin-left:auto; font-size:10.5px; color:var(--chrome-faint);}
+  .group-items{display:flex; flex-direction:column; overflow:hidden;}
+  .group.collapsed .group-items{display:none;}
+  .theme-row{
+    display:flex; align-items:center; gap:var(--space-md);
+    padding:9px var(--space-lg); cursor:pointer; border:0; background:none;
+    color:var(--chrome-text); text-align:left; width:100%;
+    border-left:2px solid transparent; transition:background .12s var(--ease-out-quint);
+  }
+  .theme-row:hover{background:var(--chrome-surface-2);}
+  .theme-row.active{background:var(--chrome-surface-2); border-left-color:var(--chrome-accent);}
+  .theme-row:focus-visible{outline:2px solid var(--chrome-accent); outline-offset:-2px;}
+  .swatch{width:22px; height:22px; border-radius:6px; flex:0 0 auto; border:1px solid oklch(1 0 0 / 0.14);}
+  .theme-row .meta{min-width:0; flex:1;}
+  .theme-row .nm{font-size:13.5px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .theme-row .sl{font-family:var(--mono); font-size:11px; color:var(--chrome-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .status{font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; padding:3px 6px; border-radius:5px; flex:0 0 auto;}
+  .status.locked{color:var(--ok); background:oklch(0.74 0.14 155 / 0.14);}
+  .status.draft{color:var(--chrome-accent); background:oklch(0.74 0.13 205 / 0.14);}
+  .status.stub{color:var(--warn); background:oklch(0.78 0.13 78 / 0.14);}
+
+  .stage{flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden;}
+  .stage-head{
+    display:flex; align-items:center; gap:var(--space-lg); flex-wrap:wrap;
+    padding:var(--space-md) var(--space-xl); border-bottom:1px solid var(--chrome-line-soft);
+    background:var(--chrome-bg); flex:0 0 auto;
+  }
+  .th-title{display:flex; flex-direction:column; gap:1px;}
+  .th-title .nm{font-size:17px; font-weight:600; letter-spacing:-0.01em;}
+  .th-title .sub{font-family:var(--mono); font-size:11.5px; color:var(--chrome-faint);}
+  .th-facts{display:flex; gap:var(--space-lg); flex-wrap:wrap;}
+  .fact{display:flex; flex-direction:column; gap:1px;}
+  .fact .k{font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--chrome-faint);}
+  .fact .v{font-size:13px; color:var(--chrome-text); font-weight:500;}
+  .stage-head .spacer{flex:1;}
+
+  .trail{
+    display:flex; align-items:center; gap:var(--space-sm); flex-wrap:wrap;
+    padding:8px var(--space-xl); font-family:var(--mono); font-size:11.5px;
+    border-bottom:1px solid var(--chrome-line-soft); flex:0 0 auto;
+    color:var(--chrome-muted); background:var(--chrome-surface);
+  }
+  .trail .lbl{color:var(--chrome-faint); text-transform:uppercase; letter-spacing:.08em; font-size:10px;}
+  .trail .hop{color:var(--chrome-text);}
+  .trail .arr{color:var(--chrome-faint);}
+  .trail.warn{background:oklch(0.78 0.13 78 / 0.1);}
+  .trail.warn .msg{color:var(--warn);}
+  .trail.err{background:oklch(0.66 0.19 22 / 0.12);}
+  .trail.err .msg{color:var(--err);}
+
+  .canvas-wrap{flex:1; overflow:auto; padding:var(--space-2xl); display:flex; justify-content:center;}
+
+  .fm{
+    width:100%; max-width:1024px; align-self:flex-start;
+    background:var(--cv-bg); border-radius:10px; overflow:hidden;
+    box-shadow:0 18px 40px -20px oklch(0.05 0.02 265 / 0.7); color:var(--cv-field-text);
+    font-size:13px;
+  }
+  .fm-part-header{
+    background:var(--cv-part-header); padding:18px 24px;
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+    border-bottom:1px solid var(--cv-field-border);
+  }
+  .fm-title{font-size:26px; font-weight:600; color:var(--cv-title); letter-spacing:-0.01em; line-height:1.1;}
+  .fm-merge{font-family:var(--mono); font-size:12px; color:var(--cv-label);}
+  .fm-body{background:var(--cv-part-body); padding:20px 24px 24px;}
+  .fm-section{margin-top:22px;}
+  .fm-section:first-child{margin-top:4px;}
+  .fm-section-label{
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--cv-label);
+    padding-bottom:8px; margin-bottom:14px; border-bottom:1px solid var(--cv-field-border);
+  }
+  .fm-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:14px 20px;}
+  .fm-field{display:flex; flex-direction:column; gap:5px;}
+  .fm-label{font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--cv-label);}
+  .fm-input{
+    background:var(--cv-field-fill); border:1px solid var(--cv-field-border); border-radius:6px;
+    padding:8px 11px; color:var(--cv-field-text); font-size:13px; min-height:34px; display:flex; align-items:center;
+    font-family:var(--sans);
+  }
+  .fm-input.ro{background:transparent; border-style:dashed; color:var(--cv-label);}
+  .fm-input.select{justify-content:space-between;}
+  .fm-input.select::after{content:""; width:0; height:0; border-left:4px solid transparent; border-right:4px solid transparent; border-top:5px solid var(--cv-label);}
+  .fm-radio, .fm-check{display:flex; gap:16px; align-items:center; min-height:34px;}
+  .fm-opt{display:inline-flex; align-items:center; gap:6px; color:var(--cv-field-text);}
+  .fm-dot{width:14px; height:14px; border-radius:50%; border:1.5px solid var(--cv-field-border); display:inline-block; position:relative;}
+  .fm-opt.on .fm-dot{border-color:var(--cv-accent);}
+  .fm-opt.on .fm-dot::after{content:""; position:absolute; inset:3px; border-radius:50%; background:var(--cv-accent);}
+  .fm-box{width:15px; height:15px; border-radius:4px; border:1.5px solid var(--cv-field-border); display:inline-block;}
+  .fm-opt.on .fm-box{background:var(--cv-accent); border-color:var(--cv-accent);}
+  .fm-multi{background:var(--cv-field-fill); border:1px solid var(--cv-field-border); border-radius:6px; padding:8px 11px; white-space:pre-line; line-height:1.7; color:var(--cv-field-text); font-size:12.5px;}
+
+  .fm-tiles{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:14px; margin-top:22px;}
+  .fm-tile{background:var(--cv-field-fill); border:1px solid var(--cv-field-border); border-radius:8px; padding:14px 16px;}
+  .fm-tile .tl{font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--cv-label);}
+  .fm-tile .tv{font-size:22px; font-weight:600; color:var(--cv-title); margin-top:4px; font-variant-numeric:tabular-nums;}
+  .fm-badges{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;}
+  .fm-badge{font-size:10.5px; font-weight:600; padding:3px 9px; border-radius:20px; letter-spacing:.02em;}
+  .fm-badge.accent{background:var(--cv-accent); color:var(--cv-bg);}
+  .fm-badge.ghost{border:1px solid var(--cv-field-border); color:var(--cv-label);}
+
+  .fm-portal{margin-top:22px; border:1px solid var(--cv-field-border); border-radius:8px; overflow:hidden;}
+  .fm-portal-head{background:var(--cv-part-header); padding:10px 14px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--cv-label); display:grid; grid-template-columns:1.4fr 1fr .8fr; gap:12px;}
+  .fm-row{padding:11px 14px; display:grid; grid-template-columns:1.4fr 1fr .8fr; gap:12px; align-items:center; border-top:1px solid var(--cv-field-border); font-variant-numeric:tabular-nums;}
+  .fm-row:nth-child(even){background:color-mix(in oklab, var(--cv-part-body), var(--cv-field-fill) 45%);}
+  .fm-row.sel{background:color-mix(in oklab, var(--cv-part-body), var(--cv-accent) 20%);}
+  .fm-row .nm{display:flex; align-items:center; gap:9px;}
+  .fm-row.sel .marker{width:7px; height:7px; border-radius:50%; background:var(--cv-accent); flex:0 0 auto;}
+  .fm-row .marker{width:7px; height:7px; flex:0 0 auto;}
+  .fm-amt.pos{color:var(--cv-accent);}
+
+  .fm-part-footer{background:var(--cv-part-footer); padding:16px 24px; display:flex; gap:12px; border-top:1px solid var(--cv-field-border);}
+  .fm-btn{padding:9px 18px; border-radius:7px; font-size:13px; font-weight:600; cursor:default; border:1px solid transparent; font-family:var(--sans);}
+  .fm-btn.primary{background:var(--cv-accent); color:var(--cv-bg);}
+  .fm-btn.secondary{background:transparent; border-color:var(--cv-field-border); color:var(--cv-field-text);}
+
+  .stub-note{
+    max-width:1024px; width:100%; margin:0 auto 18px; align-self:flex-start;
+    border:1px dashed var(--warn); border-radius:8px; padding:12px 16px;
+    color:var(--warn); font-size:12.5px; background:oklch(0.78 0.13 78 / 0.08);
+    display:flex; gap:10px; align-items:flex-start;
+  }
+  .stub-note svg{width:16px; height:16px; flex:0 0 auto; margin-top:1px;}
+  .stub-note b{color:var(--chrome-text);}
+  .canvas-col{display:flex; flex-direction:column; align-items:center; width:100%;}
+
+  @media (max-width:720px){
+    .th-facts{display:none;}
+    .canvas-wrap{padding:var(--space-lg);}
+    :root{--drawer-w: 84vw;}
+  }
+</style>
+</head>
+<body class="drawer-open">
+  <div class="topbar">
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle theme drawer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+    <div class="brand">
+      <span class="mark">z-themes</span>
+      <span class="sub">FileMaker theme preview harness</span>
+    </div>
+    <div class="spacer"></div>
+    <span class="count-pill"><b id="themeCount">0</b> themes · <b id="groupCount">0</b> groups</span>
+  </div>
+
+  <div class="shell">
+    <div class="scrim" id="scrim"></div>
+    <aside class="drawer" aria-label="Theme selector">
+      <div class="drawer-head">
+        <div class="t">Theme library</div>
+        <div class="d">Grouped by folder · reads the manifest, auto-updates as themes are added</div>
+      </div>
+      <div class="drawer-body" id="drawerBody"></div>
+    </aside>
+
+    <div class="stage">
+      <div class="stage-head">
+        <div class="th-title">
+          <span class="nm" id="curName">—</span>
+          <span class="sub" id="curSlug">—</span>
+        </div>
+        <div class="spacer"></div>
+        <div class="th-facts">
+          <div class="fact"><span class="k">Mode</span><span class="v" id="curMode">—</span></div>
+          <div class="fact"><span class="k">Intended use</span><span class="v" id="curUse">—</span></div>
+          <div class="fact"><span class="k">Status</span><span class="v" id="curStatus">—</span></div>
+          <div class="fact"><span class="k">FMP theme</span><span class="v" id="curFmp">—</span></div>
+        </div>
+      </div>
+      <div class="trail" id="trail"></div>
+      <div class="canvas-wrap">
+        <div class="canvas-col">
+          <div id="stubNote"></div>
+          <div class="fm" id="fmRender"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const BASE_FALLBACK = {
+  "cv-bg":"oklch(0.23 0.013 260)","cv-part-header":"oklch(0.285 0.02 260)","cv-part-body":"oklch(0.235 0.012 260)",
+  "cv-part-footer":"oklch(0.27 0.016 260)","cv-field-fill":"oklch(0.31 0.014 260)","cv-field-border":"oklch(0.44 0.02 260)",
+  "cv-field-text":"oklch(0.94 0.008 260)","cv-label":"oklch(0.70 0.012 260)","cv-accent":"oklch(0.55 0.03 260)","cv-title":"oklch(0.92 0.01 260)"
+};
+const TOKEN_KEYS = ["cv-bg","cv-part-header","cv-part-body","cv-part-footer","cv-field-fill","cv-field-border","cv-field-text","cv-label","cv-accent","cv-title"];
+
+const MANIFEST = {
+  schemaVersion: 1,
+  ultimateFallback: "maw-dark-utility",
+  groups: [
+    { id:"utility", label:"Utility", themes:[
+      { slug:"maw-dark-utility", name:"MAW Dark Utility", file:"maw-dark-utility.json", status:"locked", mode:"dark", intendedUse:"utility/admin", fmp:"MAW Dark",
+        tokens:{ "cv-bg":"oklch(0.23 0.013 260)","cv-part-header":"oklch(0.285 0.02 260)","cv-part-body":"oklch(0.235 0.012 260)","cv-part-footer":"oklch(0.27 0.016 260)","cv-field-fill":"oklch(0.31 0.014 260)","cv-field-border":"oklch(0.44 0.02 260)","cv-field-text":"oklch(0.94 0.008 260)","cv-label":"oklch(0.70 0.012 260)","cv-accent":"oklch(0.72 0.11 205)","cv-title":"oklch(0.96 0.02 205)" } }
+    ]},
+    { id:"f1", label:"F1 Constructors", themes:[
+      { slug:"mclaren", name:"McLaren", file:"f1/mclaren.json", status:"draft", mode:"dark", intendedUse:"data-dense / ledger", fmp:"pending",
+        tokens:{ "cv-bg":"oklch(0.21 0.008 55)","cv-part-header":"oklch(0.185 0.008 55)","cv-part-body":"oklch(0.235 0.008 55)","cv-part-footer":"oklch(0.27 0.01 55)","cv-field-fill":"oklch(0.29 0.01 55)","cv-field-border":"oklch(0.45 0.008 55)","cv-field-text":"oklch(0.95 0.004 90)","cv-label":"oklch(0.84 0.13 200)","cv-accent":"oklch(0.74 0.18 58)","cv-title":"oklch(0.80 0.17 58)" } },
+      { slug:"mercedes", name:"Mercedes", file:"f1/mercedes.json", status:"stub", mode:"dark", intendedUse:"—", fmp:"pending" },
+      { slug:"ferrari", name:"Ferrari", file:"f1/ferrari.json", status:"stub", mode:"dark", intendedUse:"—", fmp:"pending" },
+      { slug:"red-bull", name:"Red Bull Racing", file:"f1/red-bull.json", status:"stub", mode:"dark", intendedUse:"—", fmp:"pending" },
+      { slug:"alpine", name:"Alpine", file:"f1/alpine.json", status:"stub", mode:"dark", intendedUse:"—", fmp:"pending" },
+      { slug:"haas", name:"Haas", file:"f1/haas.json", status:"stub", mode:"light", intendedUse:"—", fmp:"pending" },
+      { slug:"racing-bulls", name:"Racing Bulls", file:"f1/racing-bulls.json", status:"stub", mode:"light", intendedUse:"—", fmp:"pending" },
+      { slug:"williams", name:"Williams", file:"f1/williams.json", status:"stub", mode:"light", intendedUse:"—", fmp:"pending" },
+      { slug:"audi", name:"Audi", file:"f1/audi.json", status:"stub", mode:"dark", intendedUse:"—", fmp:"pending" },
+      { slug:"aston-martin", name:"Aston Martin", file:"f1/aston-martin.json", status:"stub", mode:"dark", intendedUse:"—", fmp:"pending" },
+      { slug:"cadillac", name:"Cadillac", file:"f1/cadillac.json", status:"stub", mode:"dark", intendedUse:"—", fmp:"pending" }
+    ]}
+  ]
+};
+
+function allThemes(m){ return m.groups.flatMap(g => g.themes.map(t => ({...t, group:g.label}))); }
+
+function renderFM(){
+  return `
+  <div class="fm-part-header">
+    <div class="fm-title">Global Settings</div>
+    <div class="fm-merge">PROD · v0.1.0</div>
+  </div>
+  <div class="fm-body">
+    <div class="fm-section">
+      <div class="fm-section-label">Session &amp; Identity</div>
+      <div class="fm-grid">
+        <div class="fm-field"><span class="fm-label">Current User</span><div class="fm-input">Michael Wizorek</div></div>
+        <div class="fm-field"><span class="fm-label">App Version</span><div class="fm-input ro">0.1.0</div></div>
+        <div class="fm-field"><span class="fm-label">Environment</span><div class="fm-input select">PROD</div></div>
+        <div class="fm-field"><span class="fm-label">Debug Mode</span><div class="fm-check"><span class="fm-opt"><span class="fm-box"></span>On</span></div></div>
+      </div>
+    </div>
+    <div class="fm-section">
+      <div class="fm-section-label">Preferences</div>
+      <div class="fm-grid">
+        <div class="fm-field"><span class="fm-label">Theme</span><div class="fm-radio"><span class="fm-opt on"><span class="fm-dot"></span>Dark</span><span class="fm-opt"><span class="fm-dot"></span>Light</span></div></div>
+        <div class="fm-field"><span class="fm-label">Default Account</span><div class="fm-input select">Chase Checking</div></div>
+        <div class="fm-field"><span class="fm-label">Current Budget Month</span><div class="fm-input">2026-07-01</div></div>
+        <div class="fm-field"><span class="fm-label">Today</span><div class="fm-input ro">2026-07-16</div></div>
+      </div>
+    </div>
+    <div class="fm-tiles">
+      <div class="fm-tile"><div class="tl">Accounts</div><div class="tv">7</div></div>
+      <div class="fm-tile"><div class="tl">Budget Month</div><div class="tv">Jul</div></div>
+      <div class="fm-tile"><div class="tl">Last Import</div><div class="tv">42</div><div class="fm-badges"><span class="fm-badge accent">Cleared</span><span class="fm-badge ghost">Chase</span></div></div>
+    </div>
+    <div class="fm-portal">
+      <div class="fm-portal-head"><span>Account Type</span><span>State</span><span style="text-align:right">Rows</span></div>
+      <div class="fm-row sel"><span class="nm"><span class="marker"></span>Checking</span><span>Cleared</span><span class="fm-amt pos" style="text-align:right">128</span></div>
+      <div class="fm-row"><span class="nm"><span class="marker"></span>Savings</span><span>Cleared</span><span style="text-align:right">44</span></div>
+      <div class="fm-row"><span class="nm"><span class="marker"></span>Credit Card</span><span>Pending</span><span style="text-align:right">203</span></div>
+      <div class="fm-row"><span class="nm"><span class="marker"></span>Cash</span><span>Cleared</span><span style="text-align:right">12</span></div>
+    </div>
+  </div>
+  <div class="fm-part-footer">
+    <button class="fm-btn primary">Reset Session Globals</button>
+    <button class="fm-btn secondary">Toggle Theme</button>
+  </div>`;
+}
+
+function resolveTheme(slug){
+  const themes = allThemes(MANIFEST);
+  const t = themes.find(x => x.slug === slug);
+  const trail = [];
+  if(!t){
+    return { error:`unknown theme: "${slug}"`, trail:[`lookup "${slug}"`, "NOT IN MANIFEST"], tokens:null };
+  }
+  if(t.status === "stub" || !t.tokens){
+    const ult = themes.find(x => x.slug === MANIFEST.ultimateFallback);
+    trail.push(`${t.slug} (stub)`, "no tokens", "_base", MANIFEST.ultimateFallback);
+    const tokens = {...BASE_FALLBACK, ...(ult && ult.tokens ? ult.tokens : {})};
+    return { theme:t, tokens, trail, stub:true };
+  }
+  const tokens = {}; const missing=[];
+  TOKEN_KEYS.forEach(k => { if(t.tokens[k]){ tokens[k]=t.tokens[k]; } else { tokens[k]=BASE_FALLBACK[k]; missing.push(k); } });
+  trail.push(`${t.slug} (${t.status})`, missing.length ? `${missing.length} key(s) → _base` : "all keys resolved");
+  return { theme:t, tokens, trail, stub:false, missing };
+}
+
+function applyTheme(slug){
+  const r = resolveTheme(slug);
+  const fm = document.getElementById('fmRender');
+  const trailEl = document.getElementById('trail');
+  const stubNote = document.getElementById('stubNote');
+  stubNote.innerHTML = "";
+
+  if(r.error){
+    trailEl.className = "trail err";
+    trailEl.innerHTML = `<span class="lbl">Resolution</span><span class="msg">${r.error}</span>`;
+    fm.innerHTML = `<div style="padding:60px 24px; text-align:center; color:var(--chrome-muted); font-family:var(--mono); background:var(--chrome-surface);">Render halted. No skin applied.<br><br>Every layout must reference an existing slug from z-themes.</div>`;
+    fm.style.cssText = "background:var(--chrome-surface);";
+    return;
+  }
+
+  TOKEN_KEYS.forEach(k => fm.style.setProperty('--'+k, r.tokens[k]));
+  fm.style.background = "var(--cv-bg)";
+  fm.innerHTML = renderFM();
+
+  const t = r.theme;
+  document.getElementById('curName').textContent = t.name;
+  document.getElementById('curSlug').textContent = t.slug + "  ·  " + (t.file||"");
+  document.getElementById('curMode').textContent = t.mode || "—";
+  document.getElementById('curUse').textContent = t.intendedUse || "—";
+  document.getElementById('curStatus').textContent = t.status;
+  document.getElementById('curFmp').textContent = t.fmp || "—";
+
+  const hops = r.trail.map((h,i)=> (i? `<span class="arr">→</span>`:``) + `<span class="hop">${h}</span>`).join(" ");
+  if(r.stub){
+    trailEl.className = "trail warn";
+    trailEl.innerHTML = `<span class="lbl">Fallback trail</span>${hops}<span class="msg" style="margin-left:auto">stub · showing base fallback</span>`;
+    stubNote.innerHTML = `<div class="stub-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><div><b>${t.name}</b> is a stub: no tokens defined yet. Rendering the <b>_base</b> fallback spine (resolves to <b>${MANIFEST.ultimateFallback}</b>). Define <b>${t.file}</b> to give it a real skin.</div></div>`;
+  } else {
+    trailEl.className = "trail";
+    trailEl.innerHTML = `<span class="lbl">Resolution trail</span>${hops}`;
+  }
+
+  document.querySelectorAll('.theme-row').forEach(el => el.classList.toggle('active', el.dataset.slug === slug));
+}
+
+function buildDrawer(){
+  const body = document.getElementById('drawerBody');
+  body.innerHTML = "";
+  MANIFEST.groups.forEach(g => {
+    const group = document.createElement('div');
+    group.className = "group";
+    const head = document.createElement('button');
+    head.className = "group-head";
+    head.innerHTML = `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg><span>${g.label}</span><span class="gcount">${g.themes.length}</span>`;
+    head.addEventListener('click', ()=> group.classList.toggle('collapsed'));
+    group.appendChild(head);
+    const items = document.createElement('div');
+    items.className = "group-items";
+    g.themes.forEach(t => {
+      const accent = t.tokens && t.tokens['cv-accent'] ? t.tokens['cv-accent'] : 'var(--chrome-line)';
+      const row = document.createElement('button');
+      row.className = "theme-row"; row.dataset.slug = t.slug;
+      row.innerHTML = `<span class="swatch" style="background:${accent}"></span>
+        <span class="meta"><span class="nm">${t.name}</span><span class="sl">${t.slug}</span></span>
+        <span class="status ${t.status}">${t.status}</span>`;
+      row.addEventListener('click', ()=> applyTheme(t.slug));
+      items.appendChild(row);
+    });
+    group.appendChild(items);
+    body.appendChild(group);
+  });
+  const themes = allThemes(MANIFEST);
+  document.getElementById('themeCount').textContent = themes.length;
+  document.getElementById('groupCount').textContent = MANIFEST.groups.length;
+}
+
+async function tryLiveManifest(){
+  try{
+    const res = await fetch('_index.json', {cache:'no-store'});
+    if(!res.ok) return false;
+    const live = await res.json();
+    if(live && Array.isArray(live.groups)){
+      MANIFEST.groups = live.groups;
+      if(live.ultimateFallback) MANIFEST.ultimateFallback = live.ultimateFallback;
+      await Promise.all(allThemes(MANIFEST).map(async t=>{
+        if(t.status !== 'stub' && t.file && !t.tokens){
+          try{ const r = await fetch(t.file,{cache:'no-store'}); if(r.ok){ const j = await r.json(); const ref = MANIFEST.groups.flatMap(g=>g.themes).find(x=>x.slug===t.slug); if(ref) ref.tokens = j.tokens; } }catch(e){}
+        }
+      }));
+      return true;
+    }
+  }catch(e){ }
+  return false;
+}
+
+const menuBtn = document.getElementById('menuBtn');
+const scrim = document.getElementById('scrim');
+menuBtn.addEventListener('click', ()=> document.body.classList.toggle('drawer-open'));
+scrim.addEventListener('click', ()=> document.body.classList.remove('drawer-open'));
+
+(async function(){
+  await tryLiveManifest();
+  buildDrawer();
+  applyTheme('maw-dark-utility');
+})();
+</script>
+</body>
+</html>
