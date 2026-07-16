@@ -52,11 +52,11 @@ Phase 1 = the ledger spine (accounts, balances, net worth, transfers, spend-by-c
 
 **Why:** budgeting is a derived layer, not a second ledger. Building the correct spine first means the envelope layer is additive, not surgical.
 
-## DD-008 — Naming convention: HML_LLC house style `PROVISIONAL` (2026-07-15)
+## DD-008 — Naming convention: HML_LLC house style `LOCKED` (2026-07-15)
 
-Defaulted to HML style (`PrimaryKey` / `fk<Parent>`, clean PascalCase, no legacy SCREAMING names). Alternative is URITP style (`pk_` / `fk_`).
+**RULED by Michael 2026-07-15: HML style.** Primary keys `PrimaryKey` (UUID text), foreign keys `fk<Parent>` (e.g. `fkAccount`, `fkParentCategory`), calc fields `calc_`, globals `g_` (`gLIST_` for value-list globals), audit fields `CreationTimestamp / CreatedBy / ModificationTimestamp / ModifiedBy`. Clean PascalCase; no legacy SCREAMING names. URITP style (`pk_`/`fk_`) is rejected for this app.
 
-**Confirm before the first real table is written.** Flip in `schema/tables.json` `_meta.conventions` if changing. This is the LAST open item before field articulation.
+**This was the last open gate.** With it locked, the field-articulation session can write `tables/` + `schema/tables.json` with no open naming question. `schema/tables.json` `_meta.conventions` already encodes this; `conventionNote` updated from "defaulted" to "LOCKED."
 
 ## DD-009 — Single user `LOCKED` (2026-07-15)
 
@@ -78,7 +78,16 @@ Primary intake is **CSV import**, with **manual entry and manual post-import cle
 
 **Why:** FileMaker has no live bank feed, and Michael will drive intake by hand on a roughly weekly rhythm. Implications: (1) `ImportSessions` + a CSV mapper are **Phase 1**, not deferred; (2) `Account` needs a **per-account CSV column-mapping** (banks differ); (3) a **dedup key** (`rawHash`) prevents double-posting overlapping re-imports; (4) manual entry is a peer path, not a fallback. Sample CSV per bank gathered when the mapper is built.
 
-**Prior art (2026-07-15):** Michael already has a **URITP BETA BUDGET** ClickUp space + a **Venmo** list with a real combined CSV statement (Chase, Capital One, Venmo balance; dad = Joseph J. Wizorek reimbursements, gig income from Alarm Will Sound / drafting clients). Scattered but a real sample of the intake shape — use it as the first CSV mapping target and as validation the model fits actual data.
+**Prior art — CORRECTED (2026-07-15):** the real, dense precursor for maw-budget is the **Budgeting | Shopping** ClickUp space (space id `4026860067684899417`), NOT the URITP BETA BUDGET space. Per Michael: **BETA BUDGET has different use cases and its own separate FileMaker plan — it is NOT this build.** Do not treat BETA BUDGET as maw-budget prior art.
+
+The **Budgeting | Shopping** space is the model-validation + first-migration source. Its structure (as of 2026-07-15):
+- **Statements** (folder) + **Statement Imports** (list) — the real CSV/statement intake pattern; primary Phase-1 CSV mapping target.
+- **Budget** (list) + **Budget** (folder) — the existing rough budgeting workflow (feeds DD-019 target-vs-actual).
+- **Subscriptions** (list) — recurring outflows; direct feed for DD-017 Bills.
+- **Vendors** (list) — payee/party precursor (feeds the DD-013 Party concept).
+- **Wish List / Gifts / Family Gifts / Thank Yous / out shopping / home life / Print Machines / (dog) folder** — shopping-side lists; mostly OUT of maw-budget's ledger scope (shopping intent, not posted transactions). Flag at migration: decide per-list what is ledger data vs shopping-list data. Some (e.g. a paid gift) become transactions; most stay shopping.
+
+**Migration note:** the field-articulation + migration session pulls from **Budgeting | Shopping**, not BETA BUDGET. Look at Statement Imports + Budget + Subscriptions + Vendors first; those map most directly onto Accounts/Transactions/Bills/Parties. maw-budget (FileMaker) is the long-term home.
 
 **Open (deferred to interaction/interface session):** the manual-entry-vs-CSV-import UX and the **dedup interaction** (how a freshly-imported row that overlaps an existing/manual entry is surfaced, merged, or rejected AT the ledger). The `rawHash` mechanism is decided; the *interface* for reviewing/resolving dupes is a Phase 1 UI design task, its own session.
 
@@ -91,7 +100,7 @@ maw-budget must track money Michael fronts that someone else pays back: **dad, U
 **RESOLVED (inquiry L, 2026-07-15):** Michael wants a **live "who owes me / how much" view**, in **Phase 1**. That resolves the packaging to **option (a): party-as-receivable-account.** Each reimbursing party is an `Account` of sub-type **receivable**; its live balance IS the "owed" number, so the view is just a filtered account list — no separate status/match machinery needed for the basic case. (Option (b) status+match is retired as the default; a Phase 2 match layer can still auto-clear receivables against incoming payments as a convenience.)
 
 **Design implications:**
-- **Parties** are real entities (a `Party` concept, or receivable `Account`s) you carry a running balance against — not free-text.
+- **Parties** are real entities (a `Party` concept, or receivable `Account`s) you carry a running balance against — not free-text. The Budgeting|Shopping **Vendors** list is the party precursor.
 - Adds a **receivable** account sub-type to the type taxonomy under DD-011.
 - A **"Who owes me" view** = receivable accounts with non-zero balance. Phase 1.
 - **Gig-work income is distinct from a reimbursement:** gig pay is real income, not money paid back. Confirmed against real data (Venmo: Alarm Will Sound performance fees, drafting gigs = income; dad's Venmo transfers = the reimbursement/support pattern). "Gig payer" is a party; the money is income, not a receivable clearing.
@@ -136,7 +145,7 @@ Michael wants to **watch net worth grow over time**, not just see today's number
 **Decisions:**
 - **Variable amounts, not fixed-only.** A `Bill` carries an **expected/forecast amount** (for planning) that can differ from the **actual amount** posted when paid (utilities swing month to month). Both are tracked; the variance is meaningful.
 - **Soft forecasting.** Upcoming bills surface as **visual flags on a clear schedule** (what's due, when, expected amount) — not a heavy reminders/notifications engine. "Softly for now," not the whole point of the app.
-- **Phase 2.** Bills + the bill↔actual match layer stay Phase 2 (per DD-007). The expected-vs-actual variance pattern is the HML `ExpectedTransactions` → `PaymentApplications` shape.
+- **Phase 2.** Bills + the bill↔actual match layer stay Phase 2 (per DD-007). The expected-vs-actual variance pattern is the HML `ExpectedTransactions` → `PaymentApplications` shape. The Budgeting|Shopping **Subscriptions** list is the seed data.
 
 **Implications:** `Bill` = {payee/party, category, expected amount, schedule/cadence, next-due date}; a match links the paid transaction back to its bill so "expected vs actual" and "paid vs upcoming" both compute. Reminders/push = Futures.
 
@@ -152,7 +161,7 @@ House/car re-valuation has **no rigid schedule**. Michael re-values **whenever**
 
 Phase 3 budgeting starts as **simple target-vs-actual per category** (set a monthly target per category, compare to actual spend), with a **deliberate path to grow into full YNAB-style envelopes later**. (Answer to inquiry H.)
 
-**Why:** Michael leans simpler now but wants the door open. Target-vs-actual is the lighter-upkeep entry point; the full envelope model (assign every dollar, available = assigned - activity + rollover) is a superset. Building the simple version on the same `BudgetAllocations` shape (category + month + amount) means envelopes are an ADD, not a rebuild — rollover + "assign every dollar" become extra columns/rules on the existing table.
+**Why:** Michael leans simpler now but wants the door open. Target-vs-actual is the lighter-upkeep entry point; the full envelope model (assign every dollar, available = assigned - activity + rollover) is a superset. Building the simple version on the same `BudgetAllocations` shape (category + month + amount) means envelopes are an ADD, not a rebuild — rollover + "assign every dollar" become extra columns/rules on the existing table. The Budgeting|Shopping **Budget** list/folder is the existing rough workflow this replaces.
 
 **Rollover:** deferred sub-decision. Target-vs-actual v1 does NOT need month-to-month rollover; envelopes do. Design `BudgetAllocations` so a `rollover` concept can be added without migration. Confirm rollover behavior when the envelope upgrade is actually built.
 
@@ -185,14 +194,14 @@ Michael wants **both FileMaker Pro (desktop) and FileMaker Go (iPhone/iPad)**, i
 
 ---
 
-## Inquiry status: A–L COMPLETE (2026-07-15)
+## Inquiry status: A–L COMPLETE, all gates cleared (2026-07-15)
 
-All twelve goal-interrogation items (A–L) are answered and logged (DD-011 through DD-022). The goal-interrogation phase is CLOSED.
+All twelve goal-interrogation items (A–L) are answered and logged (DD-011 through DD-022). **DD-008 naming is now LOCKED (HML).** There is NO open gate left before field articulation.
 
-**One decision remains before field articulation:** **DD-008 naming convention** (HML vs URITP style) is still PROVISIONAL. Confirm it, then the fresh field-articulation session can write `tables/` + `schema/tables.json`.
+**Next action:** a fresh field-articulation session writes `tables/` + `schema/tables.json` off DD-001–022, in HML naming. The decision log + spec are the complete brief; a cold agent should run it without re-interviewing Michael.
 
 **Deferred to their own later sessions (do NOT block field articulation):**
 - Interaction/interface design, including the **manual-vs-CSV dedup review UX** (DD-012).
 - The **hosting/sync architecture** for desktop + FileMaker Go, and the **receipt-storage** approach (DD-022).
 - **Rollover** behavior for the envelope upgrade (DD-019).
-- One-time **migration** from the existing URITP BETA BUDGET / Venmo data (DD-012 prior art).
+- One-time **migration** from the **Budgeting | Shopping** space (DD-012 prior art) — NOT from BETA BUDGET, which is a separate build.

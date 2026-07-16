@@ -1,8 +1,8 @@
-# maw-budget — Next Build Spec (v0.4)
+# maw-budget — Next Build Spec (v0.5)
 
 > One file per app, overwritten each build cycle. Version lives in this header, never in the filename.
 
-## Status: goal interrogation COMPLETE. One gate left: DD-008 naming. Then field articulation.
+## Status: PLANNING COMPLETE. All decisions locked incl. HML naming. Ready for field articulation.
 
 ## Scratch intake
 
@@ -10,8 +10,8 @@
 - 2026-07-15 brainstorm: core job = account/net-worth tracking + bill/subscription tracking, budgeting later. Single user. HML naming.
 - 2026-07-15 research pass (v0.1): benchmarked QuickBooks, YNAB/Monarch/Copilot/Actual, Firefly III, Maybe, GnuCash, Bloomberg. Confirmed double-entry.
 - 2026-07-15 (v0.2): **double-entry RULED IN.** Foundational calls locked (DD-001–010). Goal interrogation opened.
-- 2026-07-15 (v0.2–0.3, inquiry): A, B, C, D, E, F, G captured; L raised then resolved. Prior art found (URITP BETA BUDGET + Venmo CSV).
-- 2026-07-15 (v0.4, inquiry): **H, I, J, K captured — interrogation A–L CLOSED.** DD-019–022 logged. Changelog added. Only DD-008 naming remains before tables.
+- 2026-07-15 (v0.2–0.4, inquiry): A–L captured & closed. DD-011–022 logged. Changelog added.
+- 2026-07-15 (v0.5): **DD-008 naming LOCKED = HML.** Prior-art corrected to the **Budgeting | Shopping** space (BETA BUDGET is a separate build). **No gate remains — field articulation can begin.**
 
 ## Locked decisions (see `meta/design-decisions.md` for the why)
 
@@ -22,10 +22,10 @@
 - **DD-005 Feed-less assets via Valuations** (house, car).
 - **DD-006 Bloomberg / market data OUT** — separate app if ever.
 - **DD-007 Phasing** — spine → bills → budgeting.
-- **DD-008 Naming = HML style** (PROVISIONAL — THE LAST GATE before field articulation).
+- **DD-008 Naming = HML style** — `PrimaryKey` / `fk<Parent>` / `calc_` / `g_` / PascalCase. **LOCKED.**
 - **DD-009 Single user.**
-- **DD-011 Full account-type coverage** — every account class (A).
-- **DD-012 CSV import + manual entry, ~weekly** — Phase 1 (B). Prior art: Venmo CSV. Dedup-review UX deferred to interaction session.
+- **DD-011 Full account-type coverage** — every account class in one typed `Account` table (A).
+- **DD-012 CSV import + manual entry, ~weekly** — Phase 1 (B). Prior art: **Budgeting | Shopping** space. Dedup-review UX deferred.
 - **DD-013 Reimbursements = receivables**, RESOLVED → party-as-receivable-account, live "who owes me" view, Phase 1 (L).
 - **DD-014 Hierarchical categories** — parent → child tree; rollups for free (C).
 - **DD-015 Multi-category splits** — N legs on one event (D).
@@ -33,9 +33,9 @@
 - **DD-017 Bills = expected-vs-actual, variable, soft forecasting** — Phase 2 (G).
 - **DD-018 Valuation cadence = on-demand + soft staleness nudge** (PROVISIONAL, F).
 - **DD-019 Budgeting = target-vs-actual first, envelope-ready later** — Phase 3 (H). Rollover deferred.
-- **DD-020 Priority reports** = spend-by-category, account register, who-owes-me (I). Net-worth trend is the headline; cash-flow is Futures.
-- **DD-021 Reconciliation = cleared/pending in scope** (J). Pairs with import dedup. Phase 1 flag; full statement-balance reconcile is 1.5.
-- **DD-022 Platform = desktop + FileMaker Go, serverless pref, receipts wanted** (K, PROVISIONAL). Sync/hosting + receipt storage = own architecture session. Schema stays sync-agnostic + receipt-light.
+- **DD-020 Priority reports** = spend-by-category, account register, who-owes-me (I).
+- **DD-021 Reconciliation = cleared/pending in scope** (J).
+- **DD-022 Platform = desktop + FileMaker Go, serverless pref, receipts wanted** (K, PROVISIONAL). Sync/hosting = own session. Schema stays sync-agnostic + receipt-light.
 
 ## Reference model deep-dive (researched 2026-07-15)
 
@@ -44,7 +44,7 @@
 - Our "Categories" = income/expense accounts; "Accounts" = asset/liability accounts. Receivables = another asset type (DD-013). Sub-accounts = our hierarchical categories (DD-014).
 
 ### Budgeting apps (UX layer, not the ledger)
-- **YNAB** envelope; **Actual** OSS envelope on a real ledger (closest pattern for Phase 3); **Monarch** net-worth dashboard (DD-016); **Copilot** AI categorization (UX lesson). Budgeting = a derived layer, not a second ledger.
+- **YNAB** envelope; **Actual** OSS envelope on a real ledger (closest pattern for Phase 3); **Monarch** net-worth dashboard (DD-016); **Copilot** AI categorization. Budgeting = a derived layer, not a second ledger.
 
 ### OSS engines (the schema to copy)
 - **Firefly III** — group → journal → legs, sum to 0. Splits = extra legs; reimbursements = party account. **Maybe** — Valuations + net-worth-over-time. **GnuCash** — strict double-entry.
@@ -68,10 +68,10 @@
 
 ## Proposed spine (HML naming) — SHAPE ONLY, not final fields
 
-> Field lists come in the field-articulation session, after DD-008 is confirmed.
+> Field lists come in the field-articulation session. Naming is HML (DD-008): `PrimaryKey` UUID PK, `fk<Parent>` FKs, `calc_` calcs, `g_` globals, audit quartet.
 
 - **Institutions** -> **Accounts** (`fkInstitution`; typed asset/liability/**receivable**, on/off budget, normal sign)
-- **Parties** (Dad, UofR, gig clients) — receivable `Account`s carry a running "owed" balance (DD-013)
+- **Parties** (Dad, UofR, gig clients) — receivable `Account`s carry a running "owed" balance (DD-013). Vendors list = precursor.
 - **TransactionGroups** (date, payee, memo, **cleared/pending** per DD-021) -> **TransactionLines** (legs: `fkAccount`, `fkCategory`, signed `amount`; **N legs, sum to 0**)
 - **Categories** (`fkParentCategory` tree, DD-014; typed income/expense)
 - **ImportSessions** (`fkAccount`; provenance + dedup `rawHash`, DD-012)
@@ -91,29 +91,31 @@
 - **Out of scope v1:** investments, multi-currency, live market data.
 - **Tabled:** autonomous net-worth capture; full statement-balance reconciliation (Phase 1.5); envelope rollover.
 
-## Open inquiry — CLOSED (A–L all answered)
+## Open inquiry — CLOSED, all gates cleared (A–L + DD-008)
 
-**A. Accounts ✅** every class (DD-011). **B. Intake ✅** CSV + manual, weekly (DD-012). **C. Categories ✅** hierarchical (DD-014). **D. Splits ✅** yes (DD-015). **E. Net worth ✅** trend/snapshots (DD-016). **F. Valuations ✅** on-demand + nudge (DD-018). **G. Bills ✅** expected-vs-actual, soft, Phase 2 (DD-017). **H. Budgeting ✅** target-vs-actual→envelope (DD-019). **I. Reports ✅** category / register / who-owes-me (DD-020). **J. Reconcile ✅** cleared/pending (DD-021). **K. Platform ✅** desktop + Go, sync deferred (DD-022). **L. Reimbursements ✅** receivables, live view, Phase 1 (DD-013).
-
-## Last gate before tables
-
-- **DD-008 naming convention** — confirm HML (`PrimaryKey`/`fk<Parent>`) vs URITP (`pk_`/`fk_`). This is the ONLY thing blocking field articulation.
+**A. Accounts ✅** every class (DD-011). **B. Intake ✅** CSV + manual, weekly (DD-012). **C. Categories ✅** hierarchical (DD-014). **D. Splits ✅** yes (DD-015). **E. Net worth ✅** trend/snapshots (DD-016). **F. Valuations ✅** on-demand + nudge (DD-018). **G. Bills ✅** expected-vs-actual, soft, Phase 2 (DD-017). **H. Budgeting ✅** target-vs-actual→envelope (DD-019). **I. Reports ✅** category / register / who-owes-me (DD-020). **J. Reconcile ✅** cleared/pending (DD-021). **K. Platform ✅** desktop + Go, sync deferred (DD-022). **L. Reimbursements ✅** receivables, live view, Phase 1 (DD-013). **Naming ✅** HML (DD-008).
 
 ## Deferred to their own sessions (do NOT block field articulation)
 
 - **Interaction/interface design**, incl. the manual-vs-CSV **dedup review UX** (DD-012) and the split editor UX (DD-015).
 - **Hosting/sync architecture** for desktop + FileMaker Go, and **receipt storage** approach (DD-022).
 - **Rollover** behavior for the envelope upgrade (DD-019).
-- One-time **migration** from URITP BETA BUDGET / Venmo data (DD-012 prior art).
+- One-time **migration** from the **Budgeting | Shopping** space (DD-012 prior art). NOT from BETA BUDGET (separate build).
 
-## Next build
+## Next build — FIELD ARTICULATION (ready now)
 
-- Confirm DD-008 naming.
-- THEN: fresh agent session articulates real fields per object → writes `tables/` files + `schema/tables.json` off DD-011–022. The decision log + this spec are the brief; a cold agent should be able to run it without re-interviewing Michael.
+- Fresh agent session articulates real fields per object → writes `tables/` files + `schema/tables.json` off DD-011–022, in HML naming (DD-008). The decision log + this spec are the complete brief; a cold agent should run it without re-interviewing Michael.
+- Start with the Phase 1 spine tables. Cross-reference the **Budgeting | Shopping** space (Statement Imports, Budget, Subscriptions, Vendors) for real field shapes + the migration path.
 
-## Prior art — existing ClickUp budget space
+## Prior art — existing ClickUp budget space (CORRECTED)
 
-**URITP BETA BUDGET** space + **Venmo** list (`Journal Entry` task type) + combined Venmo CSV. Validates the model (dad = reimbursement pattern, Alarm Will Sound/drafting = gig income, Chase/Capital One/Venmo = multi-source CSV). First CSV mapping target + one-time migration source. maw-budget (FileMaker) is the long-term home, not this space.
+**Budgeting | Shopping** (space id `4026860067684899417`) is the dense precursor — NOT URITP BETA BUDGET (which has different use cases + its own separate FileMaker plan, per Michael). Relevant lists:
+- **Statements** (folder) + **Statement Imports** — real CSV/statement intake; Phase-1 mapping target.
+- **Budget** (list + folder) — existing rough budgeting workflow (DD-019).
+- **Subscriptions** — recurring outflows; seed for DD-017 Bills.
+- **Vendors** — payee/party precursor (DD-013).
+- Shopping-side lists (Wish List, Gifts, Family Gifts, Thank Yous, out shopping, home life, Print Machines, dog) — mostly OUT of ledger scope; decide per-list at migration what is a transaction vs a shopping note.
+maw-budget (FileMaker) is the long-term home.
 
 ## Futures
 
