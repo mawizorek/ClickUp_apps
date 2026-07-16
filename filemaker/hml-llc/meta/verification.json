@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "app": "hml-llc",
+    "contract": "D-007 object verification ledger",
+    "schemaVersion": "1.0",
+    "generated": "2026-07-16",
+    "purpose": "ONE per-app audit trail of which documented objects have been confirmed against the LIVE FileMaker file, and at what git blob SHA. This is the ONLY stored verification data; every other signal (index<->body agreement, ref-resolves, blob-current) is DERIVED at read time by the renderer + linter. See filemaker/DOCUMENTATION-STANDARD.md 'Object verification & audit trail' + DECISIONS D-007.",
+    "model": "Store ONLY status (which already lives on each object) + a self-invalidating verified stamp. NEVER store version numbers (the blob SHA IS the version) and NEVER store calledBy/derived signals.",
+    "selfInvalidating": "An entry's verified.sha anchors the confirmation to exact content. The moment the object's file changes, its current blob SHA != verified.sha, so the object auto-flips to 'stale / re-verify'. A forgotten stamp update therefore fails SAFE (yellow), never dangerous (false green).",
+    "entryShape": { "<objectPath relative to app root>": { "verified": { "date": "YYYY-MM-DD", "sha": "<git blob sha confirmed against the live FileMaker file>", "by": "<agent or Michael>" }, "note": "optional" } },
+    "rule": "Absence of an entry = UNVERIFIED (yellow), the safe default. Only add an entry when a real confirmation against the live FMP file happened. Unverified objects cost zero bytes here.",
+    "rollup": "Object-level truth here feeds the repo-level VERSIONS.md 'where are we now' view; do not build a parallel version system.",
+    "badge": "green = internally consistent AND verified.sha == current blob SHA. yellow = consistent but no entry, or edited since verified, or live-SHA check unavailable. red = index<->body mismatch or ref does not resolve."
+  },
+  "objects": {}
+}
