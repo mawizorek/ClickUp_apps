@@ -10,40 +10,43 @@ Personal finance app. First **git-first** FMP app: never lived in ClickUp; docum
 
 ## Next Steps
 
-- [ ] Brainstorm session: define the app's core job and the 3-5 anchor tables
-- [ ] Confirm naming convention (defaulted to HML_LLC house style; flip in `schema/tables.json` `_meta.conventions` before any real table exists)
-- [ ] Draft first tables into `tables/` + `schema/tables.json`
+- [ ] **RULE the double-entry vs single-entry fork** (see [next-build-spec.md](./next-build-spec.md) "In review"). This unblocks all table work. Recommendation: **double-entry.**
+- [ ] Confirm naming convention (HML_LLC house style default) before the first table.
+- [ ] Draft Phase 1 tables (Institutions, Accounts, Categories, TransactionGroups, TransactionLines, ImportSessions, Valuations) into `tables/` + `schema/tables.json`.
 
 ## Open Questions
 
-- Core job: budgeting, account/net-worth tracking, bill/subscription tracking, or all of it?
-- Anchor tables (candidates): Accounts, Transactions, Categories, Budgets, Bills?
-- Single-user (Michael only) or shared?
-- Naming convention: keep HML_LLC style (`PrimaryKey` + `fk<Parent>`) or switch to URITP style (`pk_`/`fk_`)?
+- Naming convention: keep HML_LLC (`PrimaryKey` / `fk<Parent>`) or switch to URITP (`pk_` / `fk_`)? Defaulted to HML.
+- v1 report set: which reports matter first (net-worth trend? monthly spend by category? account register?).
 
 ## Purpose
 
-_TBD in brainstorm._
+Single-user (Michael) personal finance: see every account balance and total net worth accurately, handle transfers and credit-card payments between accounts without double-counting, and track recurring bills/subscriptions. Envelope budgeting layers on later. Built on a correct accounting foundation (double-entry) so the budgeting layer never forces a rebuild.
 
 ## Goals
 
-_TBD in brainstorm._
+- One place to see every account balance and total net worth, accurate to the day.
+- Transfers and card payments modeled correctly (no double-count, no lost transfers).
+- Recurring bills/subscriptions tracked (phase 2).
+- Envelope budgeting (phase 3) without re-architecting.
+- Fully repo-documented, FileMaker-built, single-user.
 
 ## Imports
 
-_TBD._
+- Bank / card CSV via `ImportSessions` (provenance stamp + dedup by `rawHash`).
+- Feed-less assets (house, car) updated via point-in-time `Valuations`.
 
 ## Reports / Exports
 
-_TBD._
+- Net-worth-over-time, spending-by-category, account register. (Exact v1 set TBD — see Open Questions.)
 
 ## Build Status
 
-Scaffold only. No objects defined yet.
+Plan articulated (v0.1). Double-entry spine + phasing defined in [next-build-spec.md](./next-build-spec.md). No objects built yet — blocked on the double-entry decision.
 
 ## Workflow
 
-_TBD._
+Double-entry ledger: every event = balanced legs summing to zero; balances and net worth are derived, not stored. The UI shows money-in / money-out, never debit/credit. See [meta/architecture-notes.md](./meta/architecture-notes.md).
 
 ## Architecture Notes
 
