@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "Williams",
+  "slug": "williams",
+  "status": "locked",
+  "mode": "light",
+  "intendedUse": "data-dense / ledger",
+  "description": "Light theme. White surfaces, Williams blue actionable accent, sky secondary.",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "bg": "oklch(0.97 0.006 250)",
+    "surface-1": "oklch(0.995 0.003 250)",
+    "surface-2": "oklch(0.945 0.012 250)",
+    "surface-3": "oklch(0.90 0.016 250)",
+    "border": "oklch(0.87 0.025 250)",
+    "field": "oklch(0.995 0.004 250)",
+    "text": "oklch(0.28 0.030 250)",
+    "text-soft": "oklch(0.47 0.030 250)",
+    "text-faint": "oklch(0.63 0.025 250)",
+    "accent": "oklch(0.54 0.17 252)",
+    "accent-2": "oklch(0.65 0.14 220)",
+    "accent-soft": "oklch(0.92 0.06 252)",
+    "on-accent": "oklch(0.99 0.01 252)",
+    "good": "oklch(0.55 0.15 150)",
+    "warn": "oklch(0.62 0.14 75)",
+    "bad": "oklch(0.55 0.20 25)",
+    "info": "oklch(0.54 0.15 248)"
+  }
+}

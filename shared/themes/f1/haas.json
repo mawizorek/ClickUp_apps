@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "Haas",
+  "slug": "haas",
+  "status": "locked",
+  "mode": "light",
+  "intendedUse": "data-dense / ledger",
+  "description": "Light theme. White surfaces, red actionable accent, steel/near-black secondary.",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "bg": "oklch(0.97 0.004 25)",
+    "surface-1": "oklch(0.995 0.002 25)",
+    "surface-2": "oklch(0.945 0.008 25)",
+    "surface-3": "oklch(0.90 0.012 25)",
+    "border": "oklch(0.87 0.020 25)",
+    "field": "oklch(0.995 0.003 25)",
+    "text": "oklch(0.26 0.020 25)",
+    "text-soft": "oklch(0.46 0.020 25)",
+    "text-faint": "oklch(0.62 0.018 25)",
+    "accent": "oklch(0.57 0.21 27)",
+    "accent-2": "oklch(0.30 0.015 260)",
+    "accent-soft": "oklch(0.93 0.05 27)",
+    "on-accent": "oklch(0.99 0.01 27)",
+    "good": "oklch(0.55 0.15 150)",
+    "warn": "oklch(0.62 0.14 75)",
+    "bad": "oklch(0.55 0.20 25)",
+    "info": "oklch(0.52 0.14 240)"
+  }
+}

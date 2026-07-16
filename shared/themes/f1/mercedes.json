@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "Mercedes",
+  "slug": "mercedes",
+  "status": "locked",
+  "mode": "dark",
+  "intendedUse": "data-dense / ledger",
+  "description": "Petronas teal on near-black, silver secondary.",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "bg": "oklch(0.19 0.008 190)",
+    "surface-1": "oklch(0.16 0.010 190)",
+    "surface-2": "oklch(0.23 0.012 190)",
+    "surface-3": "oklch(0.26 0.014 190)",
+    "border": "oklch(0.42 0.018 190)",
+    "field": "oklch(0.27 0.012 190)",
+    "text": "oklch(0.96 0.004 190)",
+    "text-soft": "oklch(0.74 0.010 200)",
+    "text-faint": "oklch(0.56 0.010 200)",
+    "accent": "oklch(0.76 0.12 185)",
+    "accent-2": "oklch(0.82 0.006 220)",
+    "accent-soft": "oklch(0.30 0.05 185)",
+    "on-accent": "oklch(0.20 0.03 185)",
+    "good": "oklch(0.74 0.15 150)",
+    "warn": "oklch(0.80 0.13 80)",
+    "bad": "oklch(0.62 0.20 25)",
+    "info": "oklch(0.74 0.10 205)"
+  }
+}

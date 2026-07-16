@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "McLaren",
+  "slug": "mclaren",
+  "status": "locked",
+  "mode": "dark",
+  "intendedUse": "data-dense / ledger",
+  "description": "Papaya-on-carbon. Carbon black chrome, papaya (#FF8000) as the actionable accent, electric cyan as informational labels/secondary. Cyan is informational, papaya is actionable.",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "bg": "oklch(0.21 0.008 55)",
+    "surface-1": "oklch(0.185 0.008 55)",
+    "surface-2": "oklch(0.245 0.008 55)",
+    "surface-3": "oklch(0.27 0.010 55)",
+    "border": "oklch(0.45 0.008 55)",
+    "field": "oklch(0.29 0.010 55)",
+    "text": "oklch(0.95 0.004 90)",
+    "text-soft": "oklch(0.84 0.13 200)",
+    "text-faint": "oklch(0.60 0.08 200)",
+    "accent": "oklch(0.74 0.18 58)",
+    "accent-2": "oklch(0.84 0.13 200)",
+    "accent-soft": "oklch(0.30 0.06 58)",
+    "on-accent": "oklch(0.20 0.03 58)",
+    "good": "oklch(0.72 0.15 150)",
+    "warn": "oklch(0.80 0.13 80)",
+    "bad": "oklch(0.62 0.20 25)",
+    "info": "oklch(0.78 0.12 210)"
+  }
+}

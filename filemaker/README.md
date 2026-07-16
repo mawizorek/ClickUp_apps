@@ -2,6 +2,22 @@
 
 **The FileMaker documentation window of `mawizorek/ClickUp_apps`.**
 
+> ## ⚠️ READ FIRST — what a FileMaker render IS (and is not)
+>
+> **Everything Brain builds under `filemaker/` is a DESIGN MOCKUP / BUILD TOOL ONLY. Never a production or hosted asset. Web viewing is NOT on the table.**
+>
+> These HTML renders exist to articulate *how a native FileMaker layout should look and behave*, so Michael can build it natively in FileMaker (the real native work lands end-of-year). An agent entering this space is building a **design tool to help Michael design**, not web content and not a web-viewer payload.
+>
+> - No live data, no runtime fetches, no hosting. Michael adds real placeholder text/fields himself during the native build.
+> - The render's value is **communication**: layout, hierarchy, theming, and object behavior. Encouraged — build-time affordances that make the native build faster, e.g. a hover-over inspector on an object that surfaces its theme role + intended field definition (“surface-1 chrome · pulls `Race.Winner`”). That is build documentation, not app behavior.
+> - Same *kind* of artifact as the ClickUp HTML apps, themed the same way (see below); they differ only in purpose (documentation vs running product) and delivery (theme tokens are **inlined at build time**, never fetched, because these open from a local filesystem).
+>
+> Enforced by [`brain-config/gates/theme-contract-gate.md`](../brain-config/gates/theme-contract-gate.md).
+
+## Theming (GLOBAL)
+
+FileMaker renders and ClickUp apps share **one** theme system: **[`/shared/themes/`](../shared/themes/)**. One 17-token semantic contract, one set of themes, referenced by slug. A render inlines the resolved tokens for its chosen theme into its `:root`; changing the theme file reskins every consumer that references that slug. When the native FileMaker theme gets built end-of-year, map FMP object styles to the same 17 roles (see `fmpRoleMap` in `shared/themes/_index.json`) so render and solution stay in agreement. **Do not define colors inline or per-app.**
+
 Where `clickup-apps` folders hold apps that *run* in the repo (`index.html` IS the app), `filemaker/` folders hold the **documented source of truth** for apps that run in FileMaker Pro. Apps are BUILT in FileMaker by Michael and DOCed here by Brain. **Git is canonical**; ClickUp FMP docs are being culled to pointers.
 
 ## Documentation model (repo-native, v1 — 2026-07-14)
