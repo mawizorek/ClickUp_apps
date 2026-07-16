@@ -4,6 +4,31 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
+## Global theme system + 20-object gallery — SHIPPED this session (2026-07-16), follow-ups open
+**Added:** 2026-07-16
+
+Established a GLOBAL, token-driven theme system shared by ClickUp HTML apps AND FileMaker layout renders. **If picking this up cold: read `shared/themes/README.md` (the standard) + `shared/themes/OBJECT-COVERAGE.md` (the coverage contract) first — they are the source of truth.**
+
+**What changed (all merged to main):**
+- **PR #264** — Promoted the FileMaker-scoped `filemaker/z-themes/` up to **`shared/themes/`** and made it global. One **17-key semantic token contract** (`bg`, `surface-1/2/3`, `border`, `field`, `text`, `text-soft`, `text-faint`, `accent`, `accent-2`, `accent-soft`, `on-accent`, `good/warn/bad/info`), bare `--name` custom props. Merged the old FileMaker `cv-*` 10-key vocab in via `fmpRoleMap` in `_index.json`. **12 themes, all real tokens:** `maw-dark-utility` (anchor + ultimate fallback) + full 2026 F1 grid (mclaren, ferrari, mercedes, red-bull, alpine, aston-martin, audi, cadillac dark; haas, racing-bulls, williams light). Tooling: `resolve.js` (mode-aware, fallback trail), `build-themes.mjs` (17-key schema check), generated `themes.css`. Foundational gate at `brain-config/gates/theme-contract-gate.md`. Old `filemaker/z-themes/` reduced to a MOVED pointer + dupes deleted; `filemaker/README.md` leads with the mockup-only headline rule; `filemaker/THEMING-INTEGRATION.md` marked RESOLVED.
+- **PR (this branch: themes-object-gallery)** — Rebuilt `preview.html` into the **theme × object gallery**: renders all **20 canonical FileMaker objects** (the defensible set from the ClickUp *FileMaker Canonical Object Library*) from the active theme, each with its real state matrix, plus a live per-theme token-coverage readout. Added `shared/themes/OBJECT-COVERAGE.md` (the 20-object table + acceptance test) and wired both into the README.
+
+**The locked model:** color lives ONLY in `shared/themes/*.json`; consumers reference a slug (apps resolve live via `resolve.js`; FileMaker renders inline the resolved tokens at build time, never fetch — they're local mockups, never hosted). A theme is only "done" when it styles all 20 canonical objects with no token fallback (17/17). New tokens/objects bump `schemaVersion` — never per-consumer drift.
+
+**Headline rule (LOCKED):** everything under `filemaker/` is a design mockup / build tool ONLY, never a production/hosted asset. Web viewing is off the table. Renders articulate how a NATIVE FileMaker layout should look/behave (native build is Michael's, end-of-year). Build-time affordances that speed the native build are encouraged (e.g. hover inspector surfacing an object's theme role + intended field definition).
+
+**STILL OPEN (next agent picks up here):**
+- **(a) Verify the live picker serves.** After the merge, fetch `https://mawizorek.github.io/ClickUp_apps/shared/themes/preview.html` (Pages ~60s lag). It 404'd immediately post-merge on the first pass — confirm it resolves once the build settles; if still blank, check `.nojekyll` + build status.
+- **(b) The two existing maw-budget renders still point at `../../../../z-themes/resolve.js`** (path moved to `shared/themes/`). They will break until re-pointed or re-tokenized (inline the 17 tokens). Michael OK'd breaking them temporarily to land the global setup first. Fix on the next FileMaker render pass. Michael said NOT to fix them this session — the docs should make it obvious.
+- **(c) `filemaker/LAYOUT-RENDER-STANDARD.md` DD-R06** still describes the old per-render token block; reconcile it to point at the global contract on the next FileMaker pass.
+- **(d) Mirror the standard into the ClickUp docs as pointers** (Apps/Artifacts doc + FileMaker Home theme docs). The ClickUp *FileMaker Theme System* / *Canonical Object Library* / *Build Instructions* docs are the narrative prior-art; per their own cull note they become one-line pointers to `shared/themes/` after one full cycle proves the flow. This session is that proof.
+- **(e) FileMaker object hover-inspector** (Michael's ask): renders should get a hover-over object inspector surfacing each object's theme role + intended field definition (build documentation, not app behavior). Not built yet — spec it into the next FileMaker render.
+- **(f) `themes.css` is generated** by `build-themes.mjs` but was hand-written this session to match (no node runtime here). If any theme JSON changes, regenerate rather than hand-editing.
+
+**Convention reference (cold pickup):** theme file = `shared/themes/<slug>.json` (or `f1/<slug>.json`), all 17 tokens in OKLCH + `mode` + `fmpMapping`. Register in `_index.json` under a group. The 20 canonical objects + their token dependencies are tabled in `OBJECT-COVERAGE.md`.
+
+---
+
 ## FileMaker calc externalization (HML_LLC) — SHIPPED this session (2026-07-16), follow-ups open
 **Added:** 2026-07-16
 

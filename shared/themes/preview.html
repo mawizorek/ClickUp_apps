@@ -1,135 +1,295 @@
 <!DOCTYPE html>
-<html lang="en" data-mode="dark">
+<html lang="en" data-mode="dark" data-theme="maw-dark-utility">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Theme picker · shared/themes</title>
+<title>Theme × object gallery · shared/themes</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    background: var(--bg); color: var(--text); line-height: 1.55;
+    background: var(--bg); color: var(--text); line-height: 1.5;
     transition: background-color .3s, color .3s;
-    padding: 0 clamp(16px, 4vw, 40px) 64px;
+    padding: 0 clamp(14px, 3.5vw, 40px) 80px;
     -webkit-font-smoothing: antialiased;
   }
   [data-mode="dark"] body { font-weight: 350; }
   h1, h2, h3 { font-family: "Space Grotesk", system-ui, sans-serif; line-height: 1.15; }
   .mono { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; }
-  .wrap { max-width: 1100px; margin: 0 auto; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
 
-  header.mast {
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
-    padding: 40px 0 24px;
-  }
-  header.mast h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); letter-spacing: -0.02em; }
-  header.mast .sub { color: var(--text-soft); font-size: .95rem; }
-  .badge {
-    font-family: ui-monospace, monospace; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 12px;
-  }
+  /* ---- masthead + sticky picker ---- */
+  header.mast { padding: 36px 0 16px; }
+  header.mast h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); letter-spacing: -0.02em; }
+  header.mast .sub { color: var(--text-soft); font-size: .95rem; max-width: 70ch; margin-top: 6px; }
 
-  .picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .stickybar {
+    position: sticky; top: 0; z-index: 20; background: var(--bg);
+    padding: 12px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border);
+    transition: background-color .3s, border-color .3s;
+  }
+  .pickrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .picker { display: flex; flex-wrap: wrap; gap: 7px; flex: 1; }
   .chip {
-    font: inherit; font-size: .85rem; cursor: pointer; padding: 7px 14px; border-radius: 999px;
+    font: inherit; font-size: .82rem; cursor: pointer; padding: 6px 12px; border-radius: 999px;
     border: 1px solid var(--border); background: var(--surface-1); color: var(--text-soft);
-    display: inline-flex; align-items: center; gap: 8px; transition: transform .15s, border-color .2s, color .2s;
+    display: inline-flex; align-items: center; gap: 7px; transition: transform .15s, border-color .2s, color .2s, background-color .2s;
   }
   .chip:hover { transform: translateY(-1px); color: var(--text); }
   .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-  .chip .dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--border); }
-  .chip .gp { font-size: .62rem; opacity: .6; text-transform: uppercase; letter-spacing: .06em; }
+  .chip .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .chip .gp { font-size: .6rem; opacity: .55; text-transform: uppercase; letter-spacing: .06em; }
+  .badge {
+    font-family: ui-monospace, monospace; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 11px; white-space: nowrap;
+  }
+  .coverage { font-family: ui-monospace, monospace; font-size: .72rem; color: var(--text-soft); white-space: nowrap; }
+  .coverage b { color: var(--good); }
+  .coverage b.miss { color: var(--bad); }
 
-  .board { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
-  .panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 22px; transition: background-color .3s, border-color .3s; }
-  .panel h3 { font-size: 1.05rem; margin-bottom: 14px; }
-  .panel .lbl { color: var(--text-soft); font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  /* ---- section scaffolding ---- */
+  .zone { margin-bottom: 34px; }
+  .zone-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
+  .zone-head h2 { font-size: 1.15rem; }
+  .zone-head .z-count { font-family: ui-monospace, monospace; font-size: .72rem; color: var(--text-faint); }
 
-  /* swatch grid */
-  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .objgrid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .obj {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; transition: background-color .3s, border-color .3s; display: flex; flex-direction: column; gap: 12px;
+  }
+  .obj.span2 { grid-column: 1 / -1; }
+  .obj-name { font-family: ui-monospace, monospace; font-size: .74rem; color: var(--text-faint); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .obj-name .role { color: var(--text-soft); text-transform: none; font-size: .72rem; }
+  .states { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .stlabel { font-family: ui-monospace, monospace; font-size: .64rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .05em; width: 100%; }
+
+  /* ============ THE 20 OBJECTS, all token-driven ============ */
+
+  /* shells */
+  .o-shell { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .o-shell .chrome { height: 8px; background: var(--surface-2); border-radius: 4px; margin-bottom: 10px; }
+  .o-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; color: var(--text-soft); font-size: .85rem; }
+  .o-toolbar { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; gap: 8px; align-items: center; }
+  .o-toolbar .tdot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .o-toolbar .tlbl { font-size: .8rem; color: var(--text); }
+  .o-filter { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .o-filter .fchip { font-size: .72rem; padding: 3px 10px; border-radius: 999px; background: var(--surface-3); color: var(--text-soft); border: 1px solid var(--border); }
+  .o-filter .fchip.on { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .o-modal { background: var(--surface-3); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 10px 30px oklch(0 0 0 / .35); }
+  .o-modal .mt { font-weight: 600; margin-bottom: 6px; }
+  .o-modal .mb { color: var(--text-soft); font-size: .84rem; }
+
+  /* nav */
+  .navset { display: flex; gap: 6px; flex-wrap: wrap; }
+  .nav-tab { padding: 7px 14px; border-radius: 8px 8px 0 0; font-size: .84rem; cursor: default; border: 1px solid var(--border); border-bottom: none; }
+  .nav-tab.active { background: var(--surface-2); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .nav-tab.inactive { background: transparent; color: var(--text-faint); }
+  .nav-mode { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .nav-mode span { padding: 6px 14px; font-size: .8rem; }
+  .nav-mode .active { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+  .nav-mode .inactive { color: var(--text-soft); }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: .85rem; cursor: default; }
+
+  /* typography */
+  .ty { display: flex; flex-direction: column; gap: 6px; }
+  .tx-page-title { font-family: "Space Grotesk", system-ui; font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; color: var(--text); }
+  .tx-section-header { font-family: "Space Grotesk", system-ui; font-size: 1.15rem; font-weight: 600; color: var(--text); }
+  .tx-subsection-header { font-size: .95rem; font-weight: 600; color: var(--text); }
+  .tx-field-label { font-size: .8rem; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: .05em; }
+  .tx-body { font-size: .92rem; color: var(--text); }
+  .tx-helper { font-size: .8rem; color: var(--text-soft); }
+  .tx-muted { font-size: .8rem; color: var(--text-faint); }
+  .tx-badge { display: inline-block; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 5px; }
+
+  /* buttons */
+  .b { border: none; cursor: pointer; font: inherit; font-weight: 600; font-size: .85rem; padding: 9px 15px; border-radius: 8px; transition: transform .12s, filter .12s; }
+  .b:hover { transform: translateY(-1px); }
+  .b-primary { background: var(--accent); color: var(--on-accent); }
+  .b-secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .b-quiet { background: var(--surface-2); color: var(--text-soft); }
+  .b-destructive { background: var(--bad); color: oklch(0.99 0.01 25); }
+  .b-icon { background: var(--surface-2); color: var(--text-soft); width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; padding: 0; }
+  .b.pressed { transform: translateY(1px); filter: brightness(.9); }
+
+  /* fields */
+  .fwrap { display: flex; flex-direction: column; gap: 5px; }
+  .fld { background: var(--field); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 9px 11px; font: inherit; font-size: .88rem; width: 100%; }
+  .fld::placeholder { color: var(--text-faint); }
+  .fld.focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); outline: none; }
+  .fld.ro { background: var(--surface-2); color: var(--text-soft); border-style: dashed; }
+  .fld-select { position: relative; }
+  .fld-select::after { content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-soft); pointer-events: none; }
+  .fld-search { padding-left: 32px; }
+  .fld-search-wrap { position: relative; }
+  .fld-search-wrap::before { content: "⌕"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-faint); font-size: 1rem; }
+
+  /* rows / portal */
+  .portal { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .prow { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; padding: 9px 12px; font-size: .86rem; align-items: center; }
+  .prow.header { background: var(--surface-2); color: var(--text-soft); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; }
+  .prow.standard { color: var(--text); border-top: 1px solid var(--border); }
+  .prow.alt { background: var(--surface-1); }
+  .prow.selected { background: var(--accent-soft); color: var(--accent); border-top: 1px solid var(--accent); font-weight: 600; }
+  .prow .pk { font-family: ui-monospace, monospace; color: var(--text-faint); }
+  .prow.selected .pk { color: var(--accent); }
+  .prow .amt { font-variant-numeric: tabular-nums; }
+
+  /* tiles + badges */
+  .tile { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .tile .tv { font-family: "Space Grotesk"; font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .tile .tl { color: var(--text-soft); font-size: .8rem; }
+  .tile.alert { border-color: var(--warn); }
+  .tile.alert .tv { color: var(--warn); }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .bdg { font-size: .72rem; font-weight: 700; padding: 3px 11px; border-radius: 999px; }
+  .bdg-neutral { background: var(--surface-3); color: var(--text-soft); }
+  .bdg-good { background: var(--good); color: oklch(0.16 0.02 150); }
+  .bdg-warn { background: var(--warn); color: oklch(0.20 0.03 80); }
+  .bdg-alert { background: var(--bad); color: oklch(0.99 0.01 25); }
+
+  /* token swatch strip (bottom) */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 8px; }
   .sw { border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
-  .sw .cap { font-family: ui-monospace, monospace; font-size: .68rem; padding: 6px 8px; background: var(--surface-2); color: var(--text-soft); border-top: 1px solid var(--border); }
-  .sw .fill { height: 44px; }
+  .sw .fill { height: 40px; }
+  .sw .cap { font-family: ui-monospace, monospace; font-size: .64rem; padding: 5px 7px; background: var(--surface-2); color: var(--text-soft); border-top: 1px solid var(--border); }
 
-  /* sample UI */
-  .metric { font-family: "Space Grotesk", system-ui; font-size: 2.4rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-  .metric-label { color: var(--text-soft); font-size: .9rem; }
-  .delta { color: var(--good); font-weight: 600; font-size: .9rem; }
-  .field { width: 100%; background: var(--field); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font: inherit; margin-top: 6px; }
-  .field::placeholder { color: var(--text-faint); }
-  .flabel { color: var(--text-soft); font-size: .82rem; }
-  .btn { border: none; cursor: pointer; font: inherit; font-weight: 600; background: var(--accent); color: var(--on-accent); padding: 10px 16px; border-radius: 8px; transition: transform .15s; }
-  .btn:hover { transform: translateY(-1px); }
-  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
-  .semrow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-  .pill { font-size: .78rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; color: var(--on-accent); }
-
-  table.grid { width: 100%; border-collapse: collapse; font-size: .85rem; font-variant-numeric: tabular-nums; }
-  table.grid th { text-align: left; color: var(--text-soft); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; }
-  table.grid td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
-  table.grid tr:nth-child(even) td { background: var(--surface-2); }
-  table.grid .pos { color: var(--accent); font-weight: 700; }
-
-  .trail { font-family: ui-monospace, monospace; font-size: .76rem; color: var(--text-faint); margin-top: 24px; text-align: center; }
+  .trail { font-family: ui-monospace, monospace; font-size: .74rem; color: var(--text-faint); margin-top: 20px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="mast">
-    <div>
-      <h1>Theme picker</h1>
-      <div class="sub">Pick a theme. Every sample below reskins from the same 17 tokens. This is the reskin/compare tool.</div>
-    </div>
-    <span class="badge" id="activeBadge">loading…</span>
+    <h1>Theme × object gallery</h1>
+    <div class="sub">The 20 canonical FileMaker objects (the defensible cross-app set from the Canonical Object Library), each rendered from the 17 shared theme tokens with its real state matrix. Pick any theme: every object reskins live. This is the coverage proof — if an object looks wrong or a token is missing, that theme can't define that object.</div>
   </header>
 
-  <div class="picker" id="picker" role="group" aria-label="Theme picker"></div>
-
-  <div class="board">
-    <div class="panel">
-      <div class="lbl">Tokens</div>
-      <div class="swatches" id="swatches"></div>
-    </div>
-
-    <div class="panel">
-      <div class="lbl">Sample UI</div>
-      <div class="metric">8,412</div>
-      <div class="row" style="margin-top:2px"><span class="delta">▲ 12.4%</span><span class="metric-label">active this week</span></div>
-      <div style="margin-top:16px">
-        <label class="flabel" for="f1">Driver name</label>
-        <input class="field" id="f1" placeholder="e.g. Piastri">
-      </div>
-      <div class="row">
-        <button class="btn">Primary action</button>
-        <button class="btn ghost">Secondary</button>
-      </div>
-      <div class="lbl" style="margin-top:20px">Semantic</div>
-      <div class="semrow">
-        <span class="pill" style="background:var(--good)">good</span>
-        <span class="pill" style="background:var(--warn)">warn</span>
-        <span class="pill" style="background:var(--bad)">bad</span>
-        <span class="pill" style="background:var(--info)">info</span>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="lbl">Championship matrix</div>
-      <table class="grid">
-        <thead><tr><th>Pos</th><th>Driver</th><th>Pts</th></tr></thead>
-        <tbody>
-          <tr><td class="pos">1</td><td>Norris</td><td>287</td></tr>
-          <tr><td class="pos">2</td><td>Piastri</td><td>264</td></tr>
-          <tr><td class="pos">3</td><td>Verstappen</td><td>241</td></tr>
-          <tr><td class="pos">4</td><td>Leclerc</td><td>198</td></tr>
-          <tr><td class="pos">5</td><td>Russell</td><td>176</td></tr>
-        </tbody>
-      </table>
+  <div class="stickybar">
+    <div class="pickrow">
+      <div class="picker" id="picker" role="group" aria-label="Theme picker"></div>
+      <span class="coverage" id="coverage"></span>
+      <span class="badge" id="activeBadge">loading…</span>
     </div>
   </div>
 
-  <div class="trail mono" id="trail"></div>
+  <!-- ZONE: Shells / containers -->
+  <section class="zone">
+    <div class="zone-head"><h2>Shells &amp; containers</h2><span class="z-count">5 objects · base state</span></div>
+    <div class="objgrid">
+      <div class="obj"><div class="obj-name"><span>cnt_page_shell</span><span class="role">app canvas</span></div><div class="o-shell"><div class="chrome"></div><div style="font-size:.82rem;color:var(--text-soft)">page body surface</div></div></div>
+      <div class="obj"><div class="obj-name"><span>cnt_section_card</span><span class="role">grouping card</span></div><div class="o-card">A section card holds a related group of fields or content.</div></div>
+      <div class="obj"><div class="obj-name"><span>cnt_toolbar</span><span class="role">action bar</span></div><div class="o-toolbar"><span class="tdot"></span><span class="tlbl">Toolbar</span></div></div>
+      <div class="obj"><div class="obj-name"><span>cnt_filter_bar</span><span class="role">filter strip</span></div><div class="o-filter"><span class="fchip on">All</span><span class="fchip">Open</span><span class="fchip">Closed</span></div></div>
+      <div class="obj"><div class="obj-name"><span>card_modal_standard</span><span class="role">modal shell</span></div><div class="o-modal"><div class="mt">Confirm action</div><div class="mb">Modal / card window surface, highest elevation.</div></div></div>
+    </div>
+  </section>
+
+  <!-- ZONE: Navigation -->
+  <section class="zone">
+    <div class="zone-head"><h2>Navigation</h2><span class="z-count">3 objects · inactive / active</span></div>
+    <div class="objgrid">
+      <div class="obj"><div class="obj-name"><span>nav_tab</span><span class="role">tabs</span></div><div class="states"><span class="stlabel">active / inactive</span><div class="navset"><span class="nav-tab active">Loans</span><span class="nav-tab inactive">Parties</span><span class="nav-tab inactive">Docs</span></div></div></div>
+      <div class="obj"><div class="obj-name"><span>nav_mode</span><span class="role">mode toggle</span></div><div class="states"><span class="stlabel">active / inactive</span><div class="nav-mode"><span class="active">List</span><span class="inactive">Grid</span></div></div></div>
+      <div class="obj"><div class="obj-name"><span>nav_back</span><span class="role">back affordance</span></div><div class="nav-back">‹ Back to hub</div></div>
+    </div>
+  </section>
+
+  <!-- ZONE: Typography -->
+  <section class="zone">
+    <div class="zone-head"><h2>Typography</h2><span class="z-count">8 styles</span></div>
+    <div class="objgrid">
+      <div class="obj span2"><div class="obj-name"><span>tx_* type ramp</span><span class="role">title → muted + badge</span></div>
+        <div class="ty">
+          <span class="tx-page-title">tx_page_title</span>
+          <span class="tx-section-header">tx_section_header</span>
+          <span class="tx-subsection-header">tx_subsection_header</span>
+          <span class="tx-field-label">tx_field_label</span>
+          <span class="tx-body">tx_body — the standard reading size for record content and prose.</span>
+          <span class="tx-helper">tx_helper — secondary guidance under a field.</span>
+          <span class="tx-muted">tx_muted — tertiary metadata, timestamps.</span>
+          <span><span class="tx-badge">tx_badge</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZONE: Buttons -->
+  <section class="zone">
+    <div class="zone-head"><h2>Buttons</h2><span class="z-count">5 objects · normal / hover / pressed</span></div>
+    <div class="objgrid">
+      <div class="obj span2"><div class="obj-name"><span>btn_primary / secondary / quiet / destructive / icon</span><span class="role">action hierarchy</span></div>
+        <div class="states"><span class="stlabel">normal</span>
+          <button class="b b-primary">Primary</button>
+          <button class="b b-secondary">Secondary</button>
+          <button class="b b-quiet">Quiet</button>
+          <button class="b b-destructive">Delete</button>
+          <button class="b b-icon" aria-label="icon">⚙</button>
+        </div>
+        <div class="states"><span class="stlabel">pressed</span>
+          <button class="b b-primary pressed">Primary</button>
+          <button class="b b-secondary pressed">Secondary</button>
+          <button class="b b-quiet pressed">Quiet</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZONE: Fields -->
+  <section class="zone">
+    <div class="zone-head"><h2>Fields</h2><span class="z-count">4 objects · editable / focus / readonly</span></div>
+    <div class="objgrid">
+      <div class="obj"><div class="obj-name"><span>fd_text_standard</span><span class="role">editable / focus / readonly</span></div>
+        <div class="fwrap"><span class="tx-field-label">Editable</span><input class="fld" placeholder="e.g. Piastri"></div>
+        <div class="fwrap"><span class="tx-field-label">In focus</span><input class="fld focus" value="typing…"></div>
+        <div class="fwrap"><span class="tx-field-label">Readonly</span><input class="fld ro" value="locked value" readonly></div>
+      </div>
+      <div class="obj"><div class="obj-name"><span>fd_dropdown_standard</span><span class="role">selector</span></div>
+        <div class="fwrap"><span class="tx-field-label">Dropdown</span><div class="fld-select"><input class="fld" value="McLaren" readonly></div></div>
+      </div>
+      <div class="obj"><div class="obj-name"><span>fd_readonly_display</span><span class="role">calc display</span></div>
+        <div class="fwrap"><span class="tx-field-label">Computed</span><input class="fld ro" value="$1,240,000" readonly></div>
+      </div>
+      <div class="obj"><div class="obj-name"><span>fd_search_filter</span><span class="role">search</span></div>
+        <div class="fwrap"><span class="tx-field-label">Search</span><div class="fld-search-wrap"><input class="fld fld-search" placeholder="Filter records…"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZONE: Rows -->
+  <section class="zone">
+    <div class="zone-head"><h2>Portal rows</h2><span class="z-count">3 objects · header / standard / selected</span></div>
+    <div class="objgrid">
+      <div class="obj span2"><div class="obj-name"><span>row_portal_header / standard / selected</span><span class="role">list system</span></div>
+        <div class="portal">
+          <div class="prow header"><span>#</span><span>Driver</span><span>Points</span></div>
+          <div class="prow standard"><span class="pk">1</span><span>Norris</span><span class="amt">287</span></div>
+          <div class="prow standard alt"><span class="pk">2</span><span>Piastri</span><span class="amt">264</span></div>
+          <div class="prow selected"><span class="pk">3</span><span>Verstappen</span><span class="amt">241</span></div>
+          <div class="prow standard alt"><span class="pk">4</span><span>Leclerc</span><span class="amt">198</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZONE: Tiles + badges -->
+  <section class="zone">
+    <div class="zone-head"><h2>Tiles &amp; badges</h2><span class="z-count">2 tiles · 4 badge semantics</span></div>
+    <div class="objgrid">
+      <div class="obj"><div class="obj-name"><span>sum_metric_tile</span><span class="role">metric</span></div><div class="tile"><div class="tv">8,412</div><div class="tl">Active this week</div></div></div>
+      <div class="obj"><div class="obj-name"><span>sum_metric_tile_alert</span><span class="role">metric · alert</span></div><div class="tile alert"><div class="tv">3 overdue</div><div class="tl">Needs attention</div></div></div>
+      <div class="obj"><div class="obj-name"><span>badge_status_*</span><span class="role">neutral / good / warn / alert</span></div>
+        <div class="badges"><span class="bdg bdg-neutral">Draft</span><span class="bdg bdg-good">Active</span><span class="bdg bdg-warn">Pending</span><span class="bdg bdg-alert">Overdue</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZONE: token strip -->
+  <section class="zone">
+    <div class="zone-head"><h2>Resolved tokens</h2><span class="z-count">17 keys</span></div>
+    <div class="swatches" id="swatches"></div>
+    <div class="trail mono" id="trail"></div>
+  </section>
 </div>
 
 <script src="./resolve.js"></script>
@@ -139,24 +299,27 @@
   var swatches = document.getElementById('swatches');
   var badge = document.getElementById('activeBadge');
   var trailEl = document.getElementById('trail');
+  var coverageEl = document.getElementById('coverage');
 
   function renderSwatches() {
-    var cs = getComputedStyle(document.documentElement);
     swatches.innerHTML = TOKENS.map(function(k){
-      var v = cs.getPropertyValue('--' + k).trim();
       return '<div class="sw"><div class="fill" style="background:var(--'+k+')"></div><div class="cap">--'+k+'</div></div>';
     }).join('');
   }
 
   function select(slug) {
     window.THEMES.apply(slug, { onResolved: function(res){
-      badge.textContent = res.name + ' · ' + res.mode + (res.stub ? ' · stub' : '');
+      badge.textContent = res.name + ' · ' + res.mode + (res.stub ? ' · STUB' : '');
+      // coverage: how many of the 17 keys the theme actually defined (vs fell back)
+      var missed = (res.missing || []).length;
+      var have = TOKENS.length - missed;
+      coverageEl.innerHTML = 'object coverage: <b' + (missed? ' class="miss"':'') + '>' + have + '/' + TOKENS.length + ' tokens</b>'
+        + (missed ? ' · ' + missed + ' fell back' : ' · all 20 objects styled');
       trailEl.textContent = 'resolve trail: ' + res.trail.join('  →  ');
       Array.prototype.forEach.call(picker.children, function(c){
         c.setAttribute('aria-pressed', c.dataset.slug === slug ? 'true' : 'false');
       });
-      // repaint swatches after custom props settle
-      setTimeout(renderSwatches, 60);
+      setTimeout(renderSwatches, 50);
     }});
   }
 
@@ -167,7 +330,7 @@
         b.className = 'chip';
         b.dataset.slug = t.slug;
         b.setAttribute('aria-pressed', 'false');
-        b.innerHTML = '<span class="dot" style="background:'+ (t.mode==='light'?'#eee':'#222') +'"></span>' +
+        b.innerHTML = '<span class="dot" style="background:'+ (t.mode==='light'?'oklch(0.9 0.02 90)':'oklch(0.3 0.02 260)') +'"></span>' +
                       t.name + ' <span class="gp">'+ g.id +'</span>';
         b.addEventListener('click', function(){ select(t.slug); });
         picker.appendChild(b);
