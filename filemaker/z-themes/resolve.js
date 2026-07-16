@@ -17,6 +17,8 @@
      ZTHEMES.apply('maw-dark-utility', { root: document.documentElement });
      // optional aliasMap for renderers using local var names:
      ZTHEMES.apply('maw-dark-utility', { aliasMap: { 'cv-bg':'t-bg', ... } });
+     // list available themes (for a picker), grouped as in the manifest:
+     ZTHEMES.list().then(function(idx){ /* idx.groups[].themes[] */ });
 */
 (function(){
   var TOKEN_KEYS = ["cv-bg","cv-part-header","cv-part-body","cv-part-footer","cv-field-fill","cv-field-border","cv-field-text","cv-label","cv-accent","cv-title"];
@@ -41,6 +43,10 @@
     for(var i=0;i<groups.length;i++){ var ts = groups[i].themes||[]; for(var k=0;k<ts.length;k++){ if(ts[k].slug===slug) return ts[k]; } }
     return null;
   }
+
+  // list() -> Promise<manifest>  (groups[].themes[] with slug/name/status/mode/file)
+  // For building theme pickers. Same manifest resolve() reads; cache-busted.
+  function list(){ return getJSON(base + '_index.json'); }
 
   // resolve(slug) -> Promise<{slug,name,tokens,trail,stub,error,offline}>
   function resolve(slug){
@@ -88,5 +94,5 @@
     (document.body || document.documentElement).appendChild(d);
   }
 
-  window.ZTHEMES = { resolve:resolve, apply:apply, TOKEN_KEYS:TOKEN_KEYS, base:base };
+  window.ZTHEMES = { resolve:resolve, apply:apply, list:list, TOKEN_KEYS:TOKEN_KEYS, base:base };
 })();
