@@ -25,59 +25,7 @@
 | GraceDaysOverride | number | plain | detail | row-level override; else falls back to Loans.GraceDays |
 | Notes | text | plain | detail | |
 
-## Calculations
-
-**`calc_amountPaid`** — Number, unstored. Total applied amount from PaymentApplications.
-```
-GetAsNumber (
-  ExecuteSQL (
-    "SELECT COALESCE(SUM(AmountApplied),0) FROM PaymentApplications WHERE fkExpectedTransaction = ?" ;
-    "" ; "" ; PrimaryKey
-  )
-)
-```
-
-**`calc_remaining`** — Number, unstored. Remaining unpaid balance (adjusted amount if set, else original, minus applied).
-```
-Let (
-  _targetAmount = Case (
-    not IsEmpty ( AmountAdjusted ) ; AmountAdjusted ;
-    OriginalAmount
-  ) ;
-  _targetAmount - calc_amountPaid
-)
-```
-
-**`calc_lateAfterDate`** — Date, unstored. Late threshold date (due date + grace, row override beats loan default).
-```
-Let (
-[
-  _loanGrace = ExecuteSQL (
-    "SELECT GraceDays FROM Loans WHERE PrimaryKey = ?" ;
-    "" ; "" ; fkLoan
-  ) ;
-  _graceDays = Case (
-    not IsEmpty ( GraceDaysOverride ) ; GraceDaysOverride ;
-    not IsEmpty ( _loanGrace ) ; GetAsNumber ( _loanGrace ) ;
-    0
-  )
-] ;
-  Case (
-    not IsEmpty ( DueDate ) ; DueDate + _graceDays ;
-    ""
-  )
-)
-```
-
-**`calc_islate`** — Number (1/0), unstored. Late/not-late helper; not late if fully paid.
-```
-Case (
-  IsEmpty ( DueDate ) ; 0 ;
-  calc_remaining <= 0 ; 0 ;
-  Get ( CurrentDate ) > calc_lateAfterDate ; 1 ;
-  0
-)
-```
+> **Calculations:** this table has 4 calc fields. Their formula bodies are the single-source `.fmcalc` files in [`../calculations/`](../calculations/) (canonical) and are surfaced inline by the schema renderer. This markdown intentionally does not restate or index them; the JSON (`schema/tables.json` `calcRef`) + `calculations/_index.json` own that.
 
 ## Relationships
 
@@ -92,5 +40,6 @@ Case (
 
 ## Changelog
 
+- 2026-07-16: Retired the inline `Calculations` section. Formula bodies now live solely in `../calculations/*.fmcalc` (referenced by `calcRef` in `schema/tables.json`) and are surfaced by the renderer. No pointer list retained per the v1.3 standard.
 - 2026-07-15: The 4 calc formulas embedded inline (were in meta/calculation-fields.md).
 - 2026-07-14: Per-table file; absorbed adjustment/sequence/grace fields + calc set from legacy docs.

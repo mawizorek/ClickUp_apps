@@ -28,114 +28,7 @@
 | GraceDays | number | plain | terms | pending | read by ExpectedTransactions.calc_lateAfterDate; confirm presence in file |
 | ServicingStatus | text | plain | status | | should resolve to a real status PK, not free text |
 
-## Calculations
-
-**`calc_CurrentPrincipalBalance`** — Number, stored. Current principal basis.
-```
-OriginalPrincipal
-```
-
-**`calc_originationPoints`** — Number, stored. Origination-points amount.
-```
-OriginalPrincipal * OriginationPoints
-```
-
-**`calc_MaturationPayment`** — Number, stored. Maturity-side payment amount.
-```
-OriginalPrincipal * MaturationPoints
-```
-
-**`calc_MonthlyPayment`** — Number, stored. Recurring interest/payment helper.
-```
-OriginalPrincipal * InterestRateAnnual / 12
-```
-
-**`calc_perDiemInterest`** — Number, unstored. Per-diem interest helper.
-```
-OriginalPrincipal * InterestRateAnnual / 365
-```
-
-**`calc_FirstMaturation`** — Number, stored. First maturation milestone helper.
-```
-Case (
-  not IsEmpty ( OriginationDate ) and not IsEmpty ( MaturationTerm_inDays ) ;
-    OriginationDate + MaturationTerm_inDays ;
-  ""
-)
-```
-
-**`calc_NextMaturityDate`** — Date, unstored. Next maturity milestone, distinct from next due date.
-```
-Let (
-  [
-    _baseDate = Case ( not IsEmpty ( ClosingDate ) ; ClosingDate ; OriginationDate ) ;
-    _termDays = MaturationTerm_inDays
-  ] ;
-  Case (
-    not IsEmpty ( _baseDate ) and not IsEmpty ( _termDays ) ; _baseDate + _termDays ;
-    ""
-  )
-)
-```
-
-**`calc_NextDueDate`** — Date, unstored. Next collectible expected due date.
-```
-GetAsDate (
-  ExecuteSQL (
-    "SELECT MIN(DueDate) FROM ExpectedTransactions WHERE fkLoan = ? AND DueDate >= ?" ;
-    "" ; "" ; PrimaryKey ; Get ( CurrentDate )
-  )
-)
-```
-
-**`calc_TotalOutstanding`** — Number, unstored. Total outstanding balance helper. Prefers a frozen payoff if one exists, else sums remaining expected.
-```
-Let (
-[
-  _currentPayoff = ExecuteSQL (
-    "SELECT TotalPayoffAmount FROM Payoffs WHERE PrimaryKey = ?" ;
-    "" ; "" ; fkCurrentPayoff
-  ) ;
-  _remainingExpected = ExecuteSQL (
-    "SELECT COALESCE(SUM(CASE WHEN et.AmountAdjusted IS NOT NULL THEN et.AmountAdjusted ELSE et.OriginalAmount END),0) - COALESCE(SUM(pa.AmountApplied),0) FROM ExpectedTransactions et LEFT JOIN PaymentApplications pa ON et.PrimaryKey = pa.fkExpectedTransaction WHERE et.fkLoan = ?" ;
-    "" ; "" ; PrimaryKey
-  )
-] ;
-  Case (
-    not IsEmpty ( _currentPayoff ) ; GetAsNumber ( _currentPayoff ) ;
-    GetAsNumber ( _remainingExpected )
-  )
-)
-```
-
-**`calc_CurrentPayoffAmount`** — Number, unstored. Current all-in payoff helper. Frozen payoff if present, else `calc_TotalOutstanding`.
-```
-Let (
-  _currentPayoff = ExecuteSQL (
-    "SELECT TotalPayoffAmount FROM Payoffs WHERE PrimaryKey = ?" ;
-    "" ; "" ; fkCurrentPayoff
-  ) ;
-  Case (
-    not IsEmpty ( _currentPayoff ) ; GetAsNumber ( _currentPayoff ) ;
-    calc_TotalOutstanding
-  )
-)
-```
-
-**`calc_expROI`** — Number, stored. Analytical ROI helper kept by decision.
-```
-Let (
-[
-  _expectedInterest = calc_MonthlyPayment * Ceiling ( LoanTerm_inDays / 30.5 ) ;
-  _originationRevenue = calc_originationPoints ;
-  _maturityRevenue = calc_MaturationPayment
-] ;
-  Case (
-    IsEmpty ( OriginalPrincipal ) or OriginalPrincipal = 0 ; "" ;
-    ( _expectedInterest + _originationRevenue + _maturityRevenue ) / OriginalPrincipal
-  )
-)
-```
+> **Calculations:** this table has 11 calc fields. Their formula bodies are the single-source `.fmcalc` files in [`../calculations/`](../calculations/) (canonical) and are surfaced inline by the schema renderer. This markdown intentionally does not restate or index them; the JSON (`schema/tables.json` `calcRef`) + `calculations/_index.json` own that.
 
 ## Relationships
 
@@ -152,6 +45,7 @@ Let (
 
 ## Changelog
 
+- 2026-07-16: Retired the inline `Calculations` section. Formula bodies now live solely in `../calculations/*.fmcalc` (referenced by `calcRef` in `schema/tables.json`) and are surfaced by the renderer. No pointer list retained per the v1.3 standard.
 - 2026-07-15: Schema JSON reconciled to canonical names; cleared the blocking naming-drift flag (now a live-file confirmation item only).
 - 2026-07-15: All 11 loan-math formulas embedded inline (were in meta/calculation-fields.md).
 - 2026-07-14: Per-table file; absorbed full loan-terms field set + calc inventory from legacy docs; flagged principal/rate naming drift.
