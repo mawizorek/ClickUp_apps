@@ -4,7 +4,7 @@
 >
 > **Companions:** [`README.md`](./README.md) = phase-plan map · [`DECISION-LOG.md`](./DECISION-LOG.md) = decision journal. This doc = the knowledge base (raw research → ratified practice).
 >
-> **Status: DEEP DIVE — FINDINGS F-001..F-014 LOGGED; STANDARDS S-1..S-4 ADOPTED (2026-07-16).** Second research pass (2026-07-16) covered the *extraction / reporting / referencing / publish* layer — i.e. WHAT the file can emit and HOW it becomes git artifacts. A **documentation-manifest + file-format proposal** is on the table (candidate #1) ahead of building the first template folder. Nothing new promoted this pass.
+> **Status: DEEP DIVE — FINDINGS F-001..F-014 LOGGED; STANDARDS S-1..S-5 ADOPTED (2026-07-16).** S-5 sets the direction of truth: **Git = the plan (design-time source of truth); Vectorworks = the realization; VWX→Git export = reconciliation, not population.** This reframes the whole package from "docs generated from the file" to "the plan the file is built from" (FileMaker-workflow parallel).
 
 ---
 
@@ -26,12 +26,12 @@ Starter questions — refine as we go. Status tags added 2026-07-16 (✅ = first
 - ✅ **Layers vs. classes:** design layers for physical/spatial separation, classes for graphic/visibility control. → **F-001** · *resolved into our house model → S-1*
 - ✅ **Class naming conventions:** hierarchical/delimited naming. → **F-002 / F-010** · *naming mechanics adopted; specific tree still open*
 - ✅ **Sheet layers vs. design layers:** viewport workflow, scale handling, title-block placement. → **F-003**
-- ✅ **Reports & worksheets:** how worksheets/records generate schedules and manifests. → **F-004 / F-011** · *export path for D-009*
+- ✅ **Reports & worksheets:** how worksheets/records generate schedules and manifests. → **F-004 / F-011** · *export path — now a reconciliation aid per S-5*
 - ✅ **Symbols & hybrid 2D/3D:** pipes/hang positions, resource embedding, screen- vs layer-plane. → **F-005**
 - ✅ **DWG export/import fidelity:** what survives the round-trip. → **F-006**
 - ✅ **Origin / reference lines:** locking origin at 0,0. → **F-007** · *resolved → S-3*
 - ✅ **Existing standard templates:** Spotlight defaults, USITT RP, community templates. → **F-008 / F-010**
-- ➕ **Extraction / reporting engine** (2nd pass): what a VWX file can emit + how it becomes git artifacts. → **F-011 (worksheet/criteria), F-012 (resources), F-013 (referencing), F-014 (publish/PDF)**
+- ➕ **Extraction / reporting engine** (2nd pass): what a VWX file can emit + how it becomes git artifacts. → **F-011 (worksheet/criteria), F-012 (resources), F-013 (referencing), F-014 (publish/PDF)** · *reframed by S-5: these power the reconciliation check, not a routine population pipeline*
 
 ---
 
@@ -63,12 +63,14 @@ Vendor guidance: **decide a naming scheme before creating classes.** For large c
 
 - Sources: [Organizing the drawing (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Structure/Organizing_the_drawing.htm) · [Setting the user origin (VW2024)](https://app-help.vectorworks.net/2024/eng/VW2024_Guide/Setup/Setting_the_user_origin.htm) · [VW equivalents to AutoCAD/Revit terms](https://app-help.vectorworks.net/2020/eng/VW2020_Guide/DXFDWG/Vectorworks_equivalents_to_AutoCAD_and_Revit_terms_and_concepts.htm)
 
-### F-004 — Reports & worksheets export (feeds D-009 git docs) · 2026-07-16 · Confidence: High
+### F-004 — Reports & worksheets export (feeds the S-5 reconciliation check) · 2026-07-16 · Confidence: High
 
 - **Worksheets export directly to CSV** (comma/semicolon), tab-delimited text, and Excel (`File > Export`). CSV is the clean machine-readable path into git.
 - **Reports are worksheets built from object record data.** `Create Report` (Spotlight > Reports / Tools > Reports) builds a worksheet keyed on object data — **including the object's class**.
 - **Preformatted reports** ship for lighting devices etc. (e.g. `SL Instrument Schedule Database`); `Generate Paperwork` builds schedules + reports in one pass.
 - **Export Instrument Data** (`File > Export`) dumps instrument/accessory/power/position data (Lightwright-compatible).
+
+> **S-5 note:** this export path is how Michael produces a snapshot to *check against the plan*, not how the git package is routinely populated. See S-5.
 
 - Sources: [Exporting worksheets (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Exporting%20worksheets.htm) · [Creating reports (VW2025)](https://app-help.vectorworks.net/2025/eng/VW2025_Guide/RecordsSchedules/Creating%20reports.htm) · [Generating paperwork (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/LightingDesign2/Generating%20paperwork.htm) · [Exporting instrument data (VW2020)](https://app-help.vectorworks.net/2020/eng/VW2020_Guide/Export/Exporting_instrument_data.htm)
 
@@ -110,94 +112,76 @@ Built-in **Standard Naming** for layers/classes/viewports (`File > Document Sett
 
 ### F-011 — Worksheet database rows + Criteria engine (the extraction workhorse) · 2026-07-16 · Confidence: High
 
-This is *how* we generate every manifest CSV. A worksheet has two row types: **spreadsheet rows** (constants/notes) and **database rows** (a header row + auto-generated sub-rows, one per matching object). The **Criteria dialog** defines which objects populate a database row — by **class, layer, object type, record field, symbol name, line weight**, with nested AND/OR condition sets. Each **column** picks a function or field: object data (record fields) OR general properties like **`the layer it's on`, `its class`, symbol name, count, dimensions**. So:
+How a snapshot/manifest CSV is produced. A worksheet has two row types: **spreadsheet rows** (constants/notes) and **database rows** (a header row + auto-generated sub-rows, one per matching object). The **Criteria dialog** defines which objects populate a database row — by **class, layer, object type, record field, symbol name, line weight**, with nested AND/OR condition sets. Each **column** picks a function or field: object data (record fields) OR general properties like **`the layer it's on`, `its class`, symbol name, count, dimensions**. So a layers/classes/resource snapshot is a database row with the right criteria + columns, then **File > Export → CSV** (F-004). Because a column emits an object's layer *and* class, the "each object with its default layer + class" view is native.
 
-- A **layers manifest**, **classes manifest**, and **resource/inventory manifest** are each just a database row with the right criteria + columns, then **File > Export → CSV** (F-004).
-- Because a column can emit an object's layer *and* class, the inventory CSV ("each stock object with its default layer + class") that the plan calls for is natively achievable — no hand-transcription.
-- Vectorworks publishes its full **worksheet function reference** on GitHub (per-version markdown), useful when we design exact columns.
+> **S-5 note:** this is the engine behind the reconciliation snapshot Michael runs to check the file against the plan — not a routine git-population pipeline.
 
 - Sources: [Defining worksheet rows (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Defining_worksheet_rows.htm) · [The Criteria dialog box (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/The_Criteria_dialog_box.htm) · [Selecting a function or field for a database column (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Selecting_a_function_or_field_for_a_database_column.htm) · [Worksheet functions reference (Vectorworks GitHub)](https://github.com/Vectorworks/developer-worksheets/blob/main/Worksheet%20Functions/Vectorworks%202026%20US.md)
 
-### F-012 — Resource types + Resource Manager (what "resources" actually are, and how they list/export) · 2026-07-16 · Confidence: High
+### F-012 — Resource types + Resource Manager · 2026-07-16 · Confidence: High
 
-"Resources" is a specific VWX bucket managed in the **Resource Manager**: **symbols, record formats, worksheets, hatches, line types, text styles, dimension standards, title block border styles, textures/Renderworks styles, gradients, class/layer definitions, saved views**, and more. Key facts for documentation:
+"Resources" is a specific VWX bucket managed in the **Resource Manager**: **symbols, record formats, worksheets, hatches, line types, text styles, dimension standards, title block border styles, textures/Renderworks styles, gradients, class/layer definitions, saved views**, and more. **Record formats** are the data schema attached to objects/symbols; attaching a record to a **symbol definition** auto-attaches it to every instance. The Resource Manager exports individual resources/folders and (Design Suite) can **reference** resources from a master file (italicized = referenced). Community-confirmed: there's **no clean one-click "dump all symbol names to a spreadsheet"** from the RM — the reliable CSV path is a **worksheet database row** (F-011).
 
-- **Record formats** are the data schema attached to objects/symbols; attaching a record to a **symbol definition** auto-attaches it to every instance — this is the backbone of a machine-readable inventory (F-011 reads these fields).
-- The **Resource Manager exports** individual resources/folders to another file, and (Design Suite) can **reference** resources from a master file — italicized = referenced. Ties directly to S-2.
-- Community-confirmed gotcha: there's **no clean one-click "dump all symbol names to a spreadsheet"** from the Resource Manager itself — the reliable path to a text/CSV manifest is a **worksheet database row** (F-011), not the RM. Confirms our manifests must be worksheet-driven.
-
-- Sources: [Resource Manager (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/ResourceManager/Resource%20Manager.htm) · [Exporting resources (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/ResourceManager/Exporting_resources.htm) · [Attaching record formats to symbols/objects/materials (VW2023)](https://app-help.vectorworks.net/2023/eng/VW2023_Guide/RecordsSchedules/Attaching_record_formats_to_symbols_objects_and_materials.htm) · [BIM Manager Guide to Resource Management (VW ebook, PDF)](https://download2.vectorworks.net/ebooks/us/guides/bim-manager-guide-to-resource-management.pdf) · [Symbol name export from Resource Manager (VW Forum)](https://forum.vectorworks.net/index.php?/topic/115928-symbol-name-export-from-resource-manager/)
+- Sources: [Resource Manager (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/ResourceManager/Resource%20Manager.htm) · [Exporting resources (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/ResourceManager/Exporting_resources.htm) · [Attaching record formats to symbols/objects/materials (VW2023)](https://app-help.vectorworks.net/2023/eng/VW2023_Guide/RecordsSchedules/Attaching_record_formats_to_symbols_objects_and_materials.htm) · [Symbol name export from Resource Manager (VW Forum)](https://forum.vectorworks.net/index.php?/topic/115928-symbol-name-export-from-resource-manager/)
 
 ### F-013 — Referencing mechanism (the technical spine of S-2) · 2026-07-16 · Confidence: High
 
-Confirms the master-reference model is natively supported and names the right method:
+- **Design Suite's recommended method = referenced Design Layer Viewport (DLVP):** create a DLVP in the target file and reference the master's design layers into it. **Advantage: the master's layers/classes/resources are NOT all force-imported** — the department file stays thin (exactly S-2's intent).
+- The older **layer-import** referencing (Fundamentals default) copies layers in — heavier; avoid.
+- Referencing pulls the referenced layers *with their classes + resources*; referenced items show **italicized**. Master and target **must be the same VW version** (matters for the D-008 Educational→licensed rebuild).
+- **Project Sharing** (`.vwxp` + working files) is a separate multi-user mechanism; possibly relevant later, not required for the reference model.
 
-- **Design Suite's recommended method = referenced Design Layer Viewport (DLVP):** create a DLVP in the target file and reference the master's design layers into it. **Advantage: the master's layers/classes/resources are NOT all force-imported** into the target — the department file stays thin (exactly S-2's intent).
-- The older **layer-import** referencing (Fundamentals default) copies layers in — heavier; avoid for our model.
-- **Referencing pulls the referenced layers *with their classes + resources*;** referenced items show **italicized** in the Organization dialog / Resource Manager. Master and target **must be the same VW version** (matters for the D-008 Educational→licensed rebuild — all files move versions together).
-- **Project Sharing** (`.vwxp` project file + working files, one checkout per layer/object) is a *separate* multi-user mechanism; potentially relevant later if multiple people edit the master, but not required for the reference model itself.
-
-- Sources: [Concept: Layer referencing (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Workgroup/Concept_Layer_referencing.htm) · [Creating a referenced design layer viewport (VW2024)](https://app-help.vectorworks.net/2024/eng/VW2024_Guide/Viewports1/Creating_a_referenced_design_layer_viewport.htm) · [Referencing resources (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Workgroup/Referencing_resources.htm) · [Concept: Project sharing (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/ProjectSharing/Concept_Project_sharing.htm)
+- Sources: [Concept: Layer referencing (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Workgroup/Concept_Layer_referencing.htm) · [Creating a referenced design layer viewport (VW2024)](https://app-help.vectorworks.net/2024/eng/VW2024_Guide/Viewports1/Creating_a_referenced_design_layer_viewport.htm) · [Referencing resources (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Workgroup/Referencing_resources.htm)
 
 ### F-014 — Batch publish + PDF export (the human-readable drawing trail) · 2026-07-16 · Confidence: High
 
-Alongside the machine-readable CSVs, the file can emit the *drawings* as a versionable set:
-
 - **Publish command** batch-exports **multiple sheet layers, saved views, and worksheets** at once, to **PDF / DXF-DWG / DWF / Excel / image** (PDF + images need Design Suite). Can auto-pull all sheets in a title-block issue.
-- **PDF export** turns each sheet/page into a PDF page, embeds fonts, and offers **PDF/A-1b** — an **archival** format that flattens layers and embeds color/font. Good candidate for the frozen "as-published" drawing set in a package (Phase 3/6).
-- Implication: the git package can hold BOTH (a) **CSV manifests** (structure, from worksheets) and (b) **PDF plates** (the actual drawings, from Publish) — two complementary documentation artifacts, both generated from the file, neither hand-made.
+- **PDF export** turns each sheet/page into a PDF page, embeds fonts, offers **PDF/A-1b** — an **archival** format that flattens layers and embeds color/font. Good candidate for a frozen "as-published" drawing set (Phase 3/6).
+- Note (S-5): the primary handout to collaborators is the **hand-drawn plan/notes in git**; a published PDF plate set is an optional as-built snapshot, not the lead artifact.
 
 - Sources: [Batch publishing (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/PrintPublish/Batch%20publishing.htm) · [Exporting PDF files — incl. PDF/A-1b archival (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Export/Exporting_PDF_files.htm)
 
 ---
 
-## Proposed documentation manifest + file formats (DRAFT — for Michael, NOT adopted)
+## Documentation model + file formats (reframed by S-5 — 2026-07-16)
 
-> This is the "what exactly do we document in git, and in what format" plan Michael asked to pencil in before building the first template folder. Built entirely on F-004/F-011/F-012/F-013/F-014 — everything below is **generated from the file**, nothing hand-transcribed (honors S-4 + D-009). Confidence in feasibility: High.
+> Michael's clarification (S-5) flips the emphasis: **git holds the PLAN we build FROM, not a mirror generated from the file.** So the package is primarily **hand-authored intent + reference notes** (what gets handed to collaborators and what Michael drafts against), and the VWX exports are an **occasional reconciliation snapshot** to confirm the built file matches the plan. Rebalanced below.
 
-**A. Machine-readable manifests (CSV, from worksheet database rows — F-011):**
+**PRIMARY — the plan (hand-authored, git-native, the lead artifacts):**
 
-| Artifact | Source | Suggested columns (draft) |
-|---|---|---|
-| `layers.csv` | worksheet DB row, criteria = all design layers | layer name, department, elevation band, scale, 2D/3D, status |
-| `classes.csv` | worksheet DB row, criteria = all classes | class name (dash path), parent group, purpose, default attributes |
-| `resources.csv` (inventory) | worksheet DB row over symbols/records | resource name, type, **default layer**, **default class**, record fields, count |
-| `sheets.csv` | worksheet DB row over sheet layers | sheet number, title, dept prefix, scale, viewport source layers |
+- **Intended structure specs** — the layer list we expect, the object-class tree, the sheet-layer scheme, naming/drafting/symbol standards. This is *dictated in git first*, then built in VWX (FileMaker-workflow parallel). 
+- **Hand-drawn reference notes / drawings** — the actual handout to designers and Michael's build reference. First-class package content, not incidental.
+- **Prose standards + per-department READMEs** — the WHY; includes `datums-and-reference-planes.md` (S-4). Never holds dimension values.
+- **CHANGELOG / version ledger** — tracks the plan's evolution.
 
-**B. Human-readable drawing set (PDF, from Publish — F-014):**
+**SECONDARY — the reconciliation snapshot (generated from the file, occasional, a checking aid):**
 
-- `plates/` — batch-published **PDF/A-1b** of the sheet layers (the actual groundplan/sections/plots), archival-flattened. Frozen per version.
+- CSV manifests via worksheet database rows (F-011): `layers`, `classes`, `resources/inventory`, `sheets` — exported when Michael wants to diff the *built* file against the *planned* structure. Columns draft: layer→(dept, elevation, scale, 2D/3D); class→(dash path, parent, attributes); resource→(name, type, default layer, default class, record fields, count).
+- Optional PDF/A-1b plate set via Publish (F-014) as a frozen as-built snapshot.
+- **These are NOT the primary git content and are NOT routinely imported.** They exist so "does what I built match what we documented?" has a concrete answer.
 
-**C. Prose docs (Markdown, hand-written — the WHY):**
-
-- `README.md` (package overview), per-department `README`s (Michael: "probably every department"), `standards/` (classes, layers, sheet numbering, symbols, drafting), and the **`datums-and-reference-planes.md`** note (S-4). Prose carries logic/gotchas; **never dimension values** (S-4).
-
-**D. Version ledger (Markdown/CSV):**
-
-- `CHANGELOG.md` per package + a row in a top-level ledger; mirrors how the master file's version advances.
-
-**Open format questions to pencil in:** CSV delimiter (comma vs semicolon — VW offers both), whether plates are PDF/A-1b (archival, flattened) vs standard PDF (smaller, layered), and whether `resources.csv` splits per department or stays one file.
+**Open format questions to pencil in:** CSV delimiter (comma vs semicolon); PDF/A-1b (archival, flattened) vs standard PDF for any snapshot plates; whether a reconciliation snapshot lives in the repo at all vs. is a throwaway diff Michael shows in chat.
 
 ---
 
 ## Research Agenda — progress (2026-07-16)
 
 - **Pass 1:** F-001..F-010 (structure, naming, symbols, DWG, origin, templates, Standard Naming).
-- **Pass 2 (this session):** F-011..F-014 — the extraction/reporting/referencing/publish layer. We now know *exactly* how each planned git artifact is produced from the file.
-- **Adopted into Standards:** S-1 (D-012), S-2 (D-011), S-3 (D-013), S-4 (D-014).
-- **On the table:** the documentation-manifest + file-format proposal above, and the standard show-file structure (sheet-layer prefixes tabled pending more research per Michael).
-- **Still open:** object-class tree; final layer list; sheet-layer numbering; which reports/worksheets + exact CSV columns; USITT RP-2 symbol adoption; empirical DWG round-trip test; Standard Naming registration; `.vwx` storage location.
+- **Pass 2:** F-011..F-014 (extraction/reporting/referencing/publish).
+- **Direction-of-truth ruling (S-5, D-015):** git = plan of record, VWX = realization, export = reconciliation. Reframes D-001/D-009 emphasis and the manifest proposal above.
+- **Adopted into Standards:** S-1 (D-012), S-2 (D-011), S-3 (D-013), S-4 (D-014), S-5 (D-015).
+- **Still open:** object-class tree; final layer list; sheet-layer numbering (tabled, more research); which snapshot worksheets + columns; USITT RP-2 symbol adoption; empirical DWG round-trip test; Standard Naming registration; `.vwx` storage location.
 
 ---
 
 ## Candidate decisions for Michael (NOT yet adopted — do not promote until ruled)
 
-1. **Documentation manifest + file formats** (proposal above) — the git artifact set: CSV manifests (worksheet-driven), PDF/A plates (Publish), Markdown prose + per-dept READMEs, CHANGELOG. Ratify → promote as S-5 + D-015.
-2. **Standard show-file structure** — design-layer / class / sheet-layer / resource skeleton (sheet-layer prefixes tabled pending research).
-3. **Referencing method (F-013):** adopt **referenced Design Layer Viewports** (not layer-import) as the S-2 mechanism; note the same-version constraint.
-4. **D-008 DWG hedge as procedure (F-006):** saved class↔DWG-layer mapping set, embedded/laid-out resources, named plug-ins, real round-trip test.
-5. **Template strategy (F-008):** `Save As Template` conforming to USITT RP-2 + Spotlight defaults.
-6. **Register house naming as a Standard Naming standard (F-010).**
+1. **Standard show-file structure** — design-layer / class / sheet-layer / resource skeleton (sheet-layer prefixes tabled pending research). This is the next big plan artifact to dictate in git per S-5.
+2. **Referencing method (F-013):** adopt **referenced Design Layer Viewports** (not layer-import) as the S-2 mechanism; note the same-version constraint.
+3. **D-008 DWG hedge as procedure (F-006):** saved class↔DWG-layer mapping set, embedded/laid-out resources, named plug-ins, real round-trip test.
+4. **Template strategy (F-008):** `Save As Template` conforming to USITT RP-2 + Spotlight defaults.
+5. **Register house naming as a Standard Naming standard (F-010).**
+6. **Whether reconciliation snapshots live in the repo** or stay throwaway diffs (S-5 open format question).
 
 ---
 
@@ -233,6 +217,16 @@ Alongside the machine-readable CSVs, the file can emit the *drawings* as a versi
 - **Values live in the file, not the prose.** Actual dimensions flow out through worksheet/CSV export (D-009); prose never holds dimension values, save a few deliberately-flagged exceptions.
 - **Model to real dimensions.** Geometry reflects reality; the doc only flags that deck-datum ≠ nominal-wall.
 - **Scope split:** the *convention* is universal (every package gets the note); the *specific rules* are venue-specific (Smith's elevation rule lives in the Smith package, per F-009).
+
+### S-5 — Direction of truth: Git = plan, Vectorworks = realization · adopted 2026-07-16 · D-015
+
+The governing model for the whole project (parallels the FileMaker workflow: the agent designs/preps specs in git, Michael builds from them):
+
+- **Git is the plan / design-time source of truth.** It holds the *intended* structure (layers we expect, class tree, sheet scheme, conventions), the goals, and the **hand-drawn reference notes/drawings that are actually handed to collaborators** and that Michael drafts against in Vectorworks. Git LEADS.
+- **Vectorworks (local files) is the realization / as-built.** It reflects what has actually been built. The `.vwx` lives locally (D-009), never in git.
+- **The VWX→Git export is RECONCILIATION, not population.** The worksheet/CSV/PDF export machinery (F-004/F-011/F-014) exists so Michael can produce a snapshot and ask "does what I built match what we documented?" It is an occasional checking aid — **we do not routinely import the file's state into git**, and the file's export does not become the primary package content.
+- **Direction of authorship:** plan first in git → build in VWX from it → spot-check the build against the plan. Not: build in VWX → dump to git.
+- **Refines (does not contradict) D-001 + D-009:** the package is still versioned docs in git with the file outside git, but its center of gravity is the **forward-looking plan**, not a file-trailing description. Where earlier text reads file-first, S-5 governs.
 
 ---
 
