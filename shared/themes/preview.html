@@ -7,7 +7,8 @@
 <title>Theme × object gallery · shared/themes</title>
 <!-- STATIC token source: themes.css carries every [data-theme="slug"] block + :root fallback.
      The gallery styles from this alone — no JS fetch required, so it can never white-screen.
-     resolve.js below is an OPTIONAL enhancement (live coverage readout); its absence is harmless. -->
+     The MENU auto-populates from _index.json (the theme registry) with a baked-in fallback;
+     each swatch color is read straight from themes.css, so a new theme is never hand-copied here. -->
 <link rel="stylesheet" href="./themes.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,11 +44,11 @@
   }
   .tm-trigger:hover { border-color: var(--accent); }
   .tm-trigger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .tm-sw { width: 16px; height: 16px; border-radius: 5px; flex-shrink: 0; box-shadow: inset 0 0 0 1px oklch(1 0 0 / .18); }
+  .tm-sw { width: 16px; height: 16px; border-radius: 5px; flex-shrink: 0; box-shadow: inset 0 0 0 1px oklch(0.5 0 0 / .25); }
   .tm-name { font-weight: 600; }
   .tm-mode { font-family: ui-monospace, monospace; font-size: .62rem; text-transform: uppercase; letter-spacing: .06em;
     color: var(--text-faint); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; }
-  .tm-chev { color: var(--text-soft); transition: transform .2s var(--ease, ease); margin-left: 2px; }
+  .tm-chev { color: var(--text-soft); transition: transform .2s ease; margin-left: 2px; }
   .tm-trigger[aria-expanded="true"] .tm-chev { transform: rotate(180deg); }
   .tm-panel {
     position: absolute; top: calc(100% + 6px); left: 0; z-index: 60;
@@ -66,7 +67,7 @@
   .tm-opt:hover { background: var(--surface-2); }
   .tm-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .tm-opt[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-  .tm-opt .o-sw { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; box-shadow: inset 0 0 0 1px oklch(1 0 0 / .18); }
+  .tm-opt .o-sw { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; box-shadow: inset 0 0 0 1px oklch(0.5 0 0 / .25); }
   .tm-opt .o-mode { margin-left: auto; font-family: ui-monospace, monospace; font-size: .62rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-faint); }
   .tm-opt[aria-selected="true"] .o-mode { color: var(--accent); }
 
@@ -308,29 +309,29 @@
 </div>
 
 <script>
-  // ---- The theme list is BAKED IN (no fetch) so the menu always renders. ----
-  // themes.css (linked in <head>) carries the actual token values per [data-theme].
-  // Selecting a theme just flips data-theme + data-mode on <html>; CSS does the rest.
+  // ---- Styling comes from the static themes.css ([data-theme] blocks) — can't white-screen. ----
+  // The MENU auto-populates from _index.json (the theme registry). Add a theme to the registry
+  // + themes.css and it shows up here with no edit to this file. Baked-in fallback below covers
+  // a failed fetch. Each swatch color is READ from themes.css via a hidden probe, so a new
+  // theme's accent is never hand-copied into this page.
   var TOKEN_KEYS = ["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-2","accent-soft","on-accent","good","warn","bad","info"];
-  var THEME_GROUPS = [
-    { label: "Utility", themes: [
-      { slug:"maw-dark-utility", name:"MAW Dark Utility", mode:"dark",  accent:"oklch(0.72 0.11 205)" }
+
+  // Fallback registry (used ONLY if ./_index.json fails to load). Mirrors the manifest.
+  var FALLBACK_GROUPS = [
+    { label:"Utility", themes:[ {slug:"maw-dark-utility",name:"MAW Dark Utility",mode:"dark"} ]},
+    { label:"Neutral & Natural", themes:[
+      {slug:"paper-mono",name:"Paper Mono",mode:"light"},
+      {slug:"papyrus",name:"Papyrus",mode:"light"}
     ]},
-    { label: "F1 Constructors 2026", themes: [
-      { slug:"mclaren",      name:"McLaren",         mode:"dark",  accent:"oklch(0.74 0.18 58)" },
-      { slug:"ferrari",      name:"Ferrari",         mode:"dark",  accent:"oklch(0.58 0.22 27)" },
-      { slug:"mercedes",     name:"Mercedes",        mode:"dark",  accent:"oklch(0.76 0.12 185)" },
-      { slug:"red-bull",     name:"Red Bull Racing", mode:"dark",  accent:"oklch(0.60 0.20 25)" },
-      { slug:"alpine",       name:"Alpine",          mode:"dark",  accent:"oklch(0.68 0.15 240)" },
-      { slug:"aston-martin", name:"Aston Martin",    mode:"dark",  accent:"oklch(0.52 0.10 175)" },
-      { slug:"audi",         name:"Audi",            mode:"dark",  accent:"oklch(0.57 0.21 25)" },
-      { slug:"cadillac",     name:"Cadillac",        mode:"dark",  accent:"oklch(0.78 0.13 85)" },
-      { slug:"haas",         name:"Haas",            mode:"light", accent:"oklch(0.57 0.21 27)" },
-      { slug:"racing-bulls", name:"Racing Bulls",    mode:"light", accent:"oklch(0.46 0.16 262)" },
-      { slug:"williams",     name:"Williams",        mode:"light", accent:"oklch(0.54 0.17 252)" }
+    { label:"F1 Constructors 2026", themes:[
+      {slug:"mclaren",name:"McLaren",mode:"dark"}, {slug:"ferrari",name:"Ferrari",mode:"dark"},
+      {slug:"mercedes",name:"Mercedes",mode:"dark"}, {slug:"red-bull",name:"Red Bull Racing",mode:"dark"},
+      {slug:"alpine",name:"Alpine",mode:"dark"}, {slug:"aston-martin",name:"Aston Martin",mode:"dark"},
+      {slug:"audi",name:"Audi",mode:"dark"}, {slug:"cadillac",name:"Cadillac",mode:"dark"},
+      {slug:"haas",name:"Haas",mode:"light"}, {slug:"racing-bulls",name:"Racing Bulls",mode:"light"},
+      {slug:"williams",name:"Williams",mode:"light"}
     ]}
   ];
-  var ALL = THEME_GROUPS.reduce(function(a,g){ return a.concat(g.themes); }, []);
 
   var root = document.documentElement;
   var trigger = document.getElementById('tmTrigger');
@@ -343,26 +344,40 @@
   var swatches = document.getElementById('swatches');
   var trailEl = document.getElementById('trail');
   var current = 'maw-dark-utility';
+  var ALL = [];
 
-  // build the designed panel, grouped
-  THEME_GROUPS.forEach(function(g){
-    var lbl = document.createElement('div');
-    lbl.className = 'tm-group-label';
-    lbl.textContent = g.label;
-    panel.appendChild(lbl);
-    g.themes.forEach(function(t){
-      var opt = document.createElement('button');
-      opt.className = 'tm-opt';
-      opt.setAttribute('role', 'option');
-      opt.dataset.slug = t.slug;
-      opt.setAttribute('aria-selected', t.slug === current ? 'true' : 'false');
-      opt.innerHTML = '<span class="o-sw" style="background:'+t.accent+'"></span>' +
-                      '<span>'+t.name+'</span>' +
-                      '<span class="o-mode">'+t.mode+'</span>';
-      opt.addEventListener('click', function(){ select(t.slug); closeMenu(); });
-      panel.appendChild(opt);
+  // hidden probe: reads a theme's --accent straight out of themes.css so swatches are never hand-copied
+  var probe = document.createElement('div');
+  probe.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';
+  document.body.appendChild(probe);
+  function accentOf(slug){
+    probe.setAttribute('data-theme', slug);
+    var v = getComputedStyle(probe).getPropertyValue('--accent').trim();
+    return v || 'var(--border)';
+  }
+  function modeOf(slug){ var t = ALL.filter(function(x){return x.slug===slug;})[0]; return (t && t.mode) || 'dark'; }
+
+  function buildPanel(groups){
+    panel.innerHTML = '';
+    groups.forEach(function(g){
+      var lbl = document.createElement('div');
+      lbl.className = 'tm-group-label';
+      lbl.textContent = g.label;
+      panel.appendChild(lbl);
+      g.themes.forEach(function(t){
+        var opt = document.createElement('button');
+        opt.className = 'tm-opt';
+        opt.setAttribute('role', 'option');
+        opt.dataset.slug = t.slug;
+        opt.setAttribute('aria-selected', t.slug === current ? 'true' : 'false');
+        opt.innerHTML = '<span class="o-sw" style="background:'+accentOf(t.slug)+'"></span>' +
+                        '<span>'+t.name+'</span>' +
+                        '<span class="o-mode">'+t.mode+'</span>';
+        opt.addEventListener('click', function(){ select(t.slug); closeMenu(); });
+        panel.appendChild(opt);
+      });
     });
-  });
+  }
 
   function renderSwatches() {
     swatches.innerHTML = TOKEN_KEYS.map(function(k){
@@ -371,25 +386,23 @@
   }
 
   function select(slug) {
-    var t = ALL.filter(function(x){ return x.slug === slug; })[0] || ALL[0];
+    var t = ALL.filter(function(x){ return x.slug === slug; })[0];
+    if (!t) { t = { slug: slug, name: slug, mode: modeOf(slug) }; }
     current = t.slug;
     // the whole reskin: two attributes, CSS does the rest (no fetch, can't fail)
     root.setAttribute('data-theme', t.slug);
     root.setAttribute('data-mode', t.mode);
-    // trigger + badge
-    tmSw.style.background = t.accent;
+    tmSw.style.background = accentOf(t.slug);
     tmName.textContent = t.name;
     tmMode.textContent = t.mode;
     badge.textContent = t.name + ' · ' + t.mode;
-    // selected state in panel
     Array.prototype.forEach.call(panel.querySelectorAll('.tm-opt'), function(o){
       o.setAttribute('aria-selected', o.dataset.slug === slug ? 'true' : 'false');
     });
-    // default (static) coverage — every shipped theme is locked with all 17 keys
     coverageEl.innerHTML = 'object coverage: <b>17/17 tokens</b> · all 20 objects styled';
     trailEl.textContent = '';
     setTimeout(renderSwatches, 40);
-    // OPTIONAL enhancement: if resolve.js loaded, show the real resolve trail + true coverage
+    // OPTIONAL: if resolve.js loaded, show the real resolve trail + true coverage
     if (window.THEMES && typeof window.THEMES.resolve === 'function') {
       window.THEMES.resolve(slug).then(function(res){
         if (!res || res.error) return;
@@ -398,9 +411,29 @@
         coverageEl.innerHTML = 'object coverage: <b' + (missed ? ' class="miss"' : '') + '>' + have + '/' + TOKEN_KEYS.length + ' tokens</b>'
           + (missed ? ' · ' + missed + ' fell back' : ' · all 20 objects styled');
         if (res.trail) trailEl.textContent = 'resolve trail: ' + res.trail.join('  →  ');
-      }).catch(function(){ /* enhancement only — ignore */ });
+      }).catch(function(){ /* enhancement only */ });
     }
   }
+
+  function init(groups){
+    ALL = groups.reduce(function(a,g){ return a.concat(g.themes); }, []);
+    buildPanel(groups);
+    // keep current if still present, else land on the registry's first theme
+    if (!ALL.filter(function(x){return x.slug===current;}).length && ALL.length) current = ALL[0].slug;
+    select(current);
+  }
+
+  // AUTO-POPULATE from the registry; fall back to baked-in on any failure
+  fetch('./_index.json', { cache: 'no-store' })
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(idx){
+      var groups = (idx.groups || []).map(function(g){
+        return { label: g.label, themes: (g.themes||[]).map(function(t){ return { slug:t.slug, name:t.name, mode:t.mode||'dark' }; }) };
+      });
+      if (!groups.length) throw new Error('empty registry');
+      init(groups);
+    })
+    .catch(function(){ init(FALLBACK_GROUPS); });
 
   // menu open/close (click-outside + Esc, 44px targets)
   function openMenu(){ panel.classList.add('open'); trigger.setAttribute('aria-expanded','true'); }
@@ -408,9 +441,6 @@
   trigger.addEventListener('click', function(e){ e.stopPropagation(); panel.classList.contains('open') ? closeMenu() : openMenu(); });
   document.addEventListener('click', function(e){ if (!document.getElementById('themeMenu').contains(e.target)) closeMenu(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeMenu(); });
-
-  renderSwatches();
-  select('maw-dark-utility');
 </script>
 <!-- OPTIONAL: live resolver for the real coverage trail. If it 404s or lags, the gallery is unaffected. -->
 <script src="./resolve.js" onerror="/* enhancement only */"></script>
