@@ -30,7 +30,7 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 
 **Non-app infra (not launchable apps, listed so they're not mistaken for apps):** `brain-config`, `agent-reports`, `routines`, `shared`, `quickfire`, `template-app`, `polish-demo`.
 
-- `template-app` — **gold standard, rebuilt v1 (PR #285, 2026-07-16).** The copy/place/audit baseline: slim hash-router `index.html` shell + `chrome.js` (header/menu/settings drawer/footer) + `pages/` partials, all styled off the `shared/themes` spine (`var(--token)`, default `default-theme`). Carries `CONFORMANCE.md` as the audit checklist. `source/` retired; loose head/footer snippets folded into `index.html` / `chrome.js`.
+- `template-app` — **gold standard, v2 (PR #288, 2026-07-16).** The copy/place/audit baseline: slim hash-router `index.html` shell + `chrome.js` (header/menu/settings drawer/footer) + `pages/` partials, all styled off the `shared/themes` spine (`var(--token)`, default `default-theme`). Carries `CONFORMANCE.md` as the audit checklist. v1 (PR #285) initial rebuild; v2 (PR #288) added a left slide-in nav drawer + a themed theme-picker popup (replacing the native select) + resilient theme load (falls back to `data-theme` if `resolve.js` misses). Local assets loaded with `?v=` cache-bust. `source/` retired; loose head/footer snippets folded into `index.html` / `chrome.js`.
 
 ---
 
