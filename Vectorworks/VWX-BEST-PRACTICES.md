@@ -2,9 +2,9 @@
 
 > **What this file is:** the home for the Vectorworks best-practices **deep dive** (Phase 0 / D-010) and the distilled standards it produces. This is where research notes live so another agent can pick up where we left off.
 >
-> **Companions:** [`README.md`](./README.md) = phase-plan map · [`DECISION-LOG.md`](./DECISION-LOG.md) = decision journal. This doc = the knowledge base (raw research → ratified practice).
+> **Companions:** [`README.md`](./README.md) = phase-plan map · [`DECISION-LOG.md`](./DECISION-LOG.md) = decision journal · [`BUILD-PLAN.md`](./BUILD-PLAN.md) = the one-page build-from artifact. This doc = the knowledge base (raw research → ratified practice).
 >
-> **Status: DEEP DIVE — FINDINGS F-001..F-014 LOGGED; STANDARDS S-1..S-5 ADOPTED (2026-07-16).** S-5 sets the direction of truth: **Git = the plan (design-time source of truth); Vectorworks = the realization; VWX→Git export = reconciliation, not population.** This reframes the whole package from "docs generated from the file" to "the plan the file is built from" (FileMaker-workflow parallel).
+> **Status: DEEP DIVE — FINDINGS F-001..F-015 LOGGED; STANDARDS S-1..S-6 ADOPTED (2026-07-16).** S-5 sets the direction of truth (Git = plan, VWX = realization, export = reconciliation); S-6 sets the file-format split (Markdown prose / comma-CSV manifests). Package structure is now largely settled at the skeleton level; remaining work is the exhaustive lists + sheet-layer numbering.
 
 ---
 
@@ -32,6 +32,7 @@ Starter questions — refine as we go. Status tags added 2026-07-16 (✅ = first
 - ✅ **Origin / reference lines:** locking origin at 0,0. → **F-007** · *resolved → S-3*
 - ✅ **Existing standard templates:** Spotlight defaults, USITT RP, community templates. → **F-008 / F-010**
 - ➕ **Extraction / reporting engine** (2nd pass): what a VWX file can emit + how it becomes git artifacts. → **F-011 (worksheet/criteria), F-012 (resources), F-013 (referencing), F-014 (publish/PDF)** · *reframed by S-5: these power the reconciliation check, not a routine population pipeline*
+- ➕ **File formats** (3rd pass): what file types the package uses. → **F-015** · *resolved → S-6*
 
 ---
 
@@ -70,7 +71,7 @@ Vendor guidance: **decide a naming scheme before creating classes.** For large c
 - **Preformatted reports** ship for lighting devices etc. (e.g. `SL Instrument Schedule Database`); `Generate Paperwork` builds schedules + reports in one pass.
 - **Export Instrument Data** (`File > Export`) dumps instrument/accessory/power/position data (Lightwright-compatible).
 
-> **S-5 note:** this export path is how Michael produces a snapshot to *check against the plan*, not how the git package is routinely populated. See S-5.
+> **S-5 note:** this export path is how Michael produces a snapshot to *check against the plan*, not how the git package is routinely populated. See S-5. **Delimiter locked to comma per S-6.**
 
 - Sources: [Exporting worksheets (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Exporting%20worksheets.htm) · [Creating reports (VW2025)](https://app-help.vectorworks.net/2025/eng/VW2025_Guide/RecordsSchedules/Creating%20reports.htm) · [Generating paperwork (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/LightingDesign2/Generating%20paperwork.htm) · [Exporting instrument data (VW2020)](https://app-help.vectorworks.net/2020/eng/VW2020_Guide/Export/Exporting_instrument_data.htm)
 
@@ -114,7 +115,7 @@ Built-in **Standard Naming** for layers/classes/viewports (`File > Document Sett
 
 How a snapshot/manifest CSV is produced. A worksheet has two row types: **spreadsheet rows** (constants/notes) and **database rows** (a header row + auto-generated sub-rows, one per matching object). The **Criteria dialog** defines which objects populate a database row — by **class, layer, object type, record field, symbol name, line weight**, with nested AND/OR condition sets. Each **column** picks a function or field: object data (record fields) OR general properties like **`the layer it's on`, `its class`, symbol name, count, dimensions**. So a layers/classes/resource snapshot is a database row with the right criteria + columns, then **File > Export → CSV** (F-004). Because a column emits an object's layer *and* class, the "each object with its default layer + class" view is native.
 
-> **S-5 note:** this is the engine behind the reconciliation snapshot Michael runs to check the file against the plan — not a routine git-population pipeline.
+> **S-5 note:** this is the engine behind the reconciliation snapshot Michael runs to check the file against the plan — not a routine git-population pipeline. **S-6 note:** the git-side CSV (the plan) is authored first; the worksheet renders the file's actual state to diff against it — the worksheet never becomes the source.
 
 - Sources: [Defining worksheet rows (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Defining_worksheet_rows.htm) · [The Criteria dialog box (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/The_Criteria_dialog_box.htm) · [Selecting a function or field for a database column (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Selecting_a_function_or_field_for_a_database_column.htm) · [Worksheet functions reference (Vectorworks GitHub)](https://github.com/Vectorworks/developer-worksheets/blob/main/Worksheet%20Functions/Vectorworks%202026%20US.md)
 
@@ -141,26 +142,18 @@ How a snapshot/manifest CSV is produced. A worksheet has two row types: **spread
 
 - Sources: [Batch publishing (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/PrintPublish/Batch%20publishing.htm) · [Exporting PDF files — incl. PDF/A-1b archival (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Export/Exporting_PDF_files.htm)
 
----
+### F-015 — File-format tradeoffs: Markdown vs .txt vs CSV vs worksheet-mirror · 2026-07-16 · Confidence: High (workshop-reasoned + tooling facts)
 
-## Documentation model + file formats (reframed by S-5 — 2026-07-16)
+The package holds **two distinct kinds** of file, and they want different formats:
 
-> Michael's clarification (S-5) flips the emphasis: **git holds the PLAN we build FROM, not a mirror generated from the file.** So the package is primarily **hand-authored intent + reference notes** (what gets handed to collaborators and what Michael drafts against), and the VWX exports are an **occasional reconciliation snapshot** to confirm the built file matches the plan. Rebalanced below.
+- **Markdown for prose** beats `.txt`: GitHub renders `.md` into clean headed pages with tables and cross-links (a designer reads it in-browser, zero tooling), yet it's still plain text under the hood so it diffs perfectly in git. `.txt` is "Markdown with the benefits removed" — no structure, no rendering, a flat wall at scale. So the "txt is cleaner" instinct is really "I want it readable," and md is the *more* readable of the two.
+- **CSV for data manifests** (layers/classes/symbols/inventory): machine-comparable, row-level git diffs, and it **mirrors a VWX database worksheet** (F-011) so the reconciliation diff is trivial (both sides CSV). VW's worksheet export offers a comma-or-semicolon delimiter (F-004) — **pick one and standardize** so every export is consistent.
+- **The worksheet-mirror is a RECONCILIATION device, not a source (S-5 guardrail):** git CSV = the plan (authored first) → VWX worksheet renders the actual state → export → diff. If the worksheet is ever treated as the origin of the CSV, the file leads and git trails, inverting S-5. Keep auto-render strictly to the tabular manifests; never render the prose standards as worksheets.
+- **Rule of thumb:** if a VWX worksheet will ever mirror it → CSV. If a human reads it top-to-bottom → Markdown.
 
-**PRIMARY — the plan (hand-authored, git-native, the lead artifacts):**
+Resolved → S-6 (D-016), with the delimiter locked to **comma**.
 
-- **Intended structure specs** — the layer list we expect, the object-class tree, the sheet-layer scheme, naming/drafting/symbol standards. This is *dictated in git first*, then built in VWX (FileMaker-workflow parallel). 
-- **Hand-drawn reference notes / drawings** — the actual handout to designers and Michael's build reference. First-class package content, not incidental.
-- **Prose standards + per-department READMEs** — the WHY; includes `datums-and-reference-planes.md` (S-4). Never holds dimension values.
-- **CHANGELOG / version ledger** — tracks the plan's evolution.
-
-**SECONDARY — the reconciliation snapshot (generated from the file, occasional, a checking aid):**
-
-- CSV manifests via worksheet database rows (F-011): `layers`, `classes`, `resources/inventory`, `sheets` — exported when Michael wants to diff the *built* file against the *planned* structure. Columns draft: layer→(dept, elevation, scale, 2D/3D); class→(dash path, parent, attributes); resource→(name, type, default layer, default class, record fields, count).
-- Optional PDF/A-1b plate set via Publish (F-014) as a frozen as-built snapshot.
-- **These are NOT the primary git content and are NOT routinely imported.** They exist so "does what I built match what we documented?" has a concrete answer.
-
-**Open format questions to pencil in:** CSV delimiter (comma vs semicolon); PDF/A-1b (archival, flattened) vs standard PDF for any snapshot plates; whether a reconciliation snapshot lives in the repo at all vs. is a throwaway diff Michael shows in chat.
+- Sources: workshop reasoning 2026-07-16 (6 lenses) + tooling facts from [Exporting worksheets (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Exporting%20worksheets.htm) (delimiter options) and GitHub Markdown rendering behavior.
 
 ---
 
@@ -168,15 +161,17 @@ How a snapshot/manifest CSV is produced. A worksheet has two row types: **spread
 
 - **Pass 1:** F-001..F-010 (structure, naming, symbols, DWG, origin, templates, Standard Naming).
 - **Pass 2:** F-011..F-014 (extraction/reporting/referencing/publish).
-- **Direction-of-truth ruling (S-5, D-015):** git = plan of record, VWX = realization, export = reconciliation. Reframes D-001/D-009 emphasis and the manifest proposal above.
-- **Adopted into Standards:** S-1 (D-012), S-2 (D-011), S-3 (D-013), S-4 (D-014), S-5 (D-015).
-- **Still open:** object-class tree; final layer list; sheet-layer numbering (tabled, more research); which snapshot worksheets + columns; USITT RP-2 symbol adoption; empirical DWG round-trip test; Standard Naming registration; `.vwx` storage location.
+- **Pass 3:** F-015 (file formats).
+- **Direction-of-truth ruling (S-5, D-015):** git = plan of record, VWX = realization, export = reconciliation.
+- **File-format ruling (S-6, D-016):** Markdown prose / comma-CSV manifests; worksheet-mirror is reconciliation-only.
+- **Adopted into Standards:** S-1 (D-012), S-2 (D-011), S-3 (D-013), S-4 (D-014), S-5 (D-015), S-6 (D-016).
+- **Still open:** object-class tree; final layer list; sheet-layer numbering (tabled, more research); which snapshot worksheets + columns; USITT RP-2 symbol adoption; empirical DWG round-trip test; Standard Naming registration; `.vwx` storage location; whether reconciliation snapshots live in-repo vs. throwaway.
 
 ---
 
 ## Candidate decisions for Michael (NOT yet adopted — do not promote until ruled)
 
-1. **Standard show-file structure** — design-layer / class / sheet-layer / resource skeleton (sheet-layer prefixes tabled pending research). This is the next big plan artifact to dictate in git per S-5.
+1. **Standard show-file structure** — design-layer / class / sheet-layer / resource skeleton (sheet-layer prefixes tabled pending research). Folder skeleton + file manifest now drafted in `BUILD-PLAN.md`.
 2. **Referencing method (F-013):** adopt **referenced Design Layer Viewports** (not layer-import) as the S-2 mechanism; note the same-version constraint.
 3. **D-008 DWG hedge as procedure (F-006):** saved class↔DWG-layer mapping set, embedded/laid-out resources, named plug-ins, real round-trip test.
 4. **Template strategy (F-008):** `Save As Template` conforming to USITT RP-2 + Spotlight defaults.
@@ -227,6 +222,16 @@ The governing model for the whole project (parallels the FileMaker workflow: the
 - **The VWX→Git export is RECONCILIATION, not population.** The worksheet/CSV/PDF export machinery (F-004/F-011/F-014) exists so Michael can produce a snapshot and ask "does what I built match what we documented?" It is an occasional checking aid — **we do not routinely import the file's state into git**, and the file's export does not become the primary package content.
 - **Direction of authorship:** plan first in git → build in VWX from it → spot-check the build against the plan. Not: build in VWX → dump to git.
 - **Refines (does not contradict) D-001 + D-009:** the package is still versioned docs in git with the file outside git, but its center of gravity is the **forward-looking plan**, not a file-trailing description. Where earlier text reads file-first, S-5 governs.
+
+### S-6 — File-format split: Markdown prose, comma-CSV manifests · adopted 2026-07-16 · D-016
+
+Format each file by its JOB, not one blanket rule:
+
+- **Prose / standards / conventions / the WHY → Markdown (`.md`).** Renders as clean headed pages on GitHub (tables, cross-links) so a designer reads it in-browser with zero tooling, and it still diffs perfectly as plain text. **No `.txt`** — it's Markdown with the benefits stripped out.
+- **Data manifests (layers, classes, symbols, inventory) → CSV, comma-delimited.** Machine-comparable, clean per-row diffs, and mirrors a VWX database worksheet (F-011). **Comma is the locked delimiter** (quote any value containing a comma).
+- **The VWX-worksheet mirror is the RECONCILIATION half ONLY (S-5 guardrail).** The git CSV is authored first as the plan; the worksheet renders the file's actual state; export → diff. The worksheet renders a check, never becomes the source. Auto-render stays strictly on the tabular manifests — never render prose standards as worksheets.
+- **Rule of thumb:** VWX worksheet will ever mirror it → CSV. Human reads it top-to-bottom → Markdown.
+- **Reach (S-6 pairs with S-5):** applies to every package in this org-agnostic template, not just URITP/Smith.
 
 ---
 
