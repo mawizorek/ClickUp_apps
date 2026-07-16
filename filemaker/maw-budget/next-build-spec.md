@@ -8,7 +8,7 @@
 - 2026-07-15 brainstorm: core job = **account / net-worth tracking + bill/subscription tracking**, budgeting later. Single user (Michael). Naming = HML_LLC style (clean PascalCase, drop legacy SCREAMING names).
 - 2026-07-15 research pass (v0.1): benchmarked QuickBooks, YNAB/Monarch/Copilot/Actual, Firefly III, Maybe, GnuCash, and Bloomberg Terminal. Confirmed the double-entry lean. Deep-dive below.
 - 2026-07-15 (v0.2): **double-entry RULED IN by Michael.** Fork closed. Foundational design calls locked in `meta/design-decisions.md`. Now interrogating goals (below) BEFORE any table is written — no field-guessing.
-- 2026-07-15 (v0.2, inquiry): answers **A** and **B** captured. Import tooling confirmed as a **Phase 1** concern (CSV). **Reimbursements** raised → receivables model (DD-013), new inquiry item **L**.
+- 2026-07-15 (v0.2, inquiry): answers **A**, **B**, **C** captured; **L** raised (reimbursements → DD-013). Import (CSV) + hierarchical categories confirmed.
 
 ## Locked decisions (see `meta/design-decisions.md` for the why)
 
@@ -24,6 +24,7 @@
 - **DD-011 Full account-type coverage** — model supports every account class (see A).
 - **DD-012 CSV import + manual entry, ~weekly** — import tooling is Phase 1 (see B).
 - **DD-013 Reimbursements = receivables** — parties owed-by tracked as receivable accounts; gig income is separate (see L).
+- **DD-014 Hierarchical categories** — self-referencing parent → child tree; rollups for free (see C).
 
 ## Reference model deep-dive (researched 2026-07-15)
 
@@ -32,11 +33,11 @@
 - Core object is the **Chart of Accounts (COA)**: a typed list of every account, in 5 buckets: **Assets, Liabilities, Income (Revenue), Expenses, Equity.**
 - Every transaction posts to **>= 2 accounts** and must balance (double-entry). Usually one side is a bank/card account, the other is a category (income/expense) account.
 - Each account carries an **account type** (which report it feeds) plus a **detail type** (sub-classification).
-- Takeaway: our "Categories" are really income/expense accounts, and our "Accounts" are asset/liability accounts. Same COA, two flavors. **Receivables ("owed to me") are just another asset account type** — see DD-013.
+- Takeaway: our "Categories" are really income/expense accounts, and our "Accounts" are asset/liability accounts. Same COA, two flavors. **Receivables ("owed to me") are just another asset account type** — see DD-013. QuickBooks sub-accounts = our hierarchical categories (DD-014).
 
 ### Budgeting apps (the UX layer, not the ledger)
 
-- **YNAB** — zero-based / envelope: every dollar gets a job. Method-first, sits ON TOP of an account ledger.
+- **YNAB** — zero-based / envelope: every dollar gets a job. Method-first, sits ON TOP of an account ledger. Category **groups** = our parent categories (DD-014).
 - **Actual Budget** — open-source YNAB clone, local-first, envelope model on a real ledger. Closest OSS pattern for the budgeting phase.
 - **Monarch** — dashboard / net-worth first, couples, broad sync. Best "what is happening across all my money" view.
 - **Copilot** — Apple-only, AI categorization, beautiful. A UX lesson, not a data-model one.
@@ -80,13 +81,13 @@ The case a single-row model breaks — the reason for DD-001.
 - **Institutions** -> **Accounts** (`fkInstitution`; typed asset/liability/**receivable**, on/off budget, normal sign)
 - **Parties** (payers/payees you track a running balance against: Dad, UofR, gig clients) — shape TBD by inquiry L; may be modeled as receivable Accounts rather than a separate table
 - **TransactionGroups** (event: date, payee, memo) -> **TransactionLines** (legs: `fkAccount`, `fkCategory`, signed `amount`; sum to 0 per group)
-- **Categories** (self-referencing `fkParentCategory`; typed income/expense, envelope-ready)
+- **Categories** (self-referencing `fkParentCategory`, parent → child tree per DD-014; typed income/expense, envelope-ready)
 - **ImportSessions** (`fkAccount`; provenance + dedup `rawHash`)
 - **Valuations** (`fkAccount`; point-in-time worth for feed-less assets)
 - **Bills** (recurring expected) — phase 2
 - **BudgetAllocations** (category + month) — phase 3
 
-**Derived, not stored:** account balance = sum of its legs (+ latest Valuation). Net worth = sum of balances.
+**Derived, not stored:** account balance = sum of its legs (+ latest Valuation). Net worth = sum of balances. Category spend rolls up the tree (DD-014).
 
 ## Phasing (DD-007)
 
@@ -103,13 +104,13 @@ The case a single-row model breaks — the reason for DD-001.
 
 **B. Data intake. ✅ ANSWERED (2026-07-15):** **CSV import** primary + **manual steps**, ~weekly (→ DD-012). `ImportSessions` + per-account CSV column-mapping + `rawHash` dedup are Phase 1. Follow-up: sample CSV per bank when building the mapper.
 
+**C. Categories. ✅ ANSWERED (2026-07-15):** **hierarchical, parent → child** (→ DD-014). Self-referencing `fkParentCategory`, income/expense typed, rollups for free. Working depth = 2 levels (confirm if arbitrary depth wanted). Exact category list is data, gathered at entry time.
+
 **L. Reimbursements. ✅ RAISED (2026-07-15):** track money fronted and paid back by **dad, U of R, gig-work payers, one-offs** (→ DD-013). Modeled as a **receivable** ("owed to me"), not a special expense flag. Open sub-questions:
 - Default packaging: **(a)** party-as-receivable-account (carry a running "Due from X" balance) vs **(b)** a lighter reimbursable-status + later match to the incoming payment?
 - Phase: receivables in **Phase 1**, or fold the matching into the Phase 2 Bill↔actual layer?
 - Do you want a live "who owes me / how much" view, or just correctness in net worth?
 - Note: **gig-work income is NOT a reimbursement** — it's real income. "Gig payer" is a party; the money is income, not a receivable clearing. Confirm that split holds for how you think about it.
-
-**C. Categories — shape & granularity.** Flat list or hierarchical (parent → child)? Roughly how many? QuickBooks-style income/expense accounts, or simple spending buckets?
 
 **D. Splits.** One purchase across multiple categories (Target run = groceries + household + clothing) — do you need it? (Double-entry supports it free; confirms UI need.)
 
@@ -129,7 +130,7 @@ The case a single-row model breaks — the reason for DD-001.
 
 ## Next build (BLOCKED until inquiry answered)
 
-- Remaining inquiry: C–L. Plus resolve DD-008 naming.
+- Remaining inquiry: D–L. Plus resolve DD-008 naming.
 - THEN: spin up a fresh agent session to articulate real fields per object, writing `tables/` files + `schema/tables.json` off these answers.
 
 ## Futures
