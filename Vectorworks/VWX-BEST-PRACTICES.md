@@ -4,7 +4,7 @@
 >
 > **Companions:** [`README.md`](./README.md) = phase-plan map · [`DECISION-LOG.md`](./DECISION-LOG.md) = decision journal · [`BUILD-PLAN.md`](./BUILD-PLAN.md) = the one-page build-from artifact. This doc = the knowledge base (raw research → ratified practice).
 >
-> **Status: DEEP DIVE — FINDINGS F-001..F-015 LOGGED; STANDARDS S-1..S-6 ADOPTED (2026-07-16).** S-5 sets the direction of truth (Git = plan, VWX = realization, export = reconciliation); S-6 sets the file-format split (Markdown prose / comma-CSV manifests). Package structure is now largely settled at the skeleton level; remaining work is the exhaustive lists + sheet-layer numbering.
+> **Status: DEEP DIVE — FINDINGS F-001..F-016 LOGGED; STANDARDS S-1..S-6 ADOPTED (2026-07-16).** S-5 sets the direction of truth (Git = plan, VWX = realization, export = reconciliation); S-6 sets the file-format split (Markdown prose / comma-CSV manifests). Resource-capture list confirmed (D-017). Package structure is settled at the skeleton level; remaining work is the exhaustive lists + the full sheet-layer list (finalized at Smith build).
 
 ---
 
@@ -25,14 +25,15 @@ Starter questions — refine as we go. Status tags added 2026-07-16 (✅ = first
 
 - ✅ **Layers vs. classes:** design layers for physical/spatial separation, classes for graphic/visibility control. → **F-001** · *resolved into our house model → S-1*
 - ✅ **Class naming conventions:** hierarchical/delimited naming. → **F-002 / F-010** · *naming mechanics adopted; specific tree still open*
-- ✅ **Sheet layers vs. design layers:** viewport workflow, scale handling, title-block placement. → **F-003**
+- ✅ **Sheet layers vs. design layers:** viewport workflow, scale handling, title-block placement. → **F-003 / F-016**
 - ✅ **Reports & worksheets:** how worksheets/records generate schedules and manifests. → **F-004 / F-011** · *export path — now a reconciliation aid per S-5*
 - ✅ **Symbols & hybrid 2D/3D:** pipes/hang positions, resource embedding, screen- vs layer-plane. → **F-005**
 - ✅ **DWG export/import fidelity:** what survives the round-trip. → **F-006**
 - ✅ **Origin / reference lines:** locking origin at 0,0. → **F-007** · *resolved → S-3*
 - ✅ **Existing standard templates:** Spotlight defaults, USITT RP, community templates. → **F-008 / F-010**
-- ➕ **Extraction / reporting engine** (2nd pass): what a VWX file can emit + how it becomes git artifacts. → **F-011 (worksheet/criteria), F-012 (resources), F-013 (referencing), F-014 (publish/PDF)** · *reframed by S-5: these power the reconciliation check, not a routine population pipeline*
+- ➕ **Extraction / reporting engine** (2nd pass): what a VWX file can emit + how it becomes git artifacts. → **F-011 (worksheet/criteria), F-012 (resources), F-013 (referencing), F-014 (publish/PDF)** · *reframed by S-5*
 - ➕ **File formats** (3rd pass): what file types the package uses. → **F-015** · *resolved → S-6*
+- ➕ **Sheet numbering** (4th pass): drawing-set numbering conventions. → **F-016** · *draft in BUILD-PLAN; finalized at Smith build*
 
 ---
 
@@ -146,14 +147,25 @@ How a snapshot/manifest CSV is produced. A worksheet has two row types: **spread
 
 The package holds **two distinct kinds** of file, and they want different formats:
 
-- **Markdown for prose** beats `.txt`: GitHub renders `.md` into clean headed pages with tables and cross-links (a designer reads it in-browser, zero tooling), yet it's still plain text under the hood so it diffs perfectly in git. `.txt` is "Markdown with the benefits removed" — no structure, no rendering, a flat wall at scale. So the "txt is cleaner" instinct is really "I want it readable," and md is the *more* readable of the two.
-- **CSV for data manifests** (layers/classes/symbols/inventory): machine-comparable, row-level git diffs, and it **mirrors a VWX database worksheet** (F-011) so the reconciliation diff is trivial (both sides CSV). VW's worksheet export offers a comma-or-semicolon delimiter (F-004) — **pick one and standardize** so every export is consistent.
-- **The worksheet-mirror is a RECONCILIATION device, not a source (S-5 guardrail):** git CSV = the plan (authored first) → VWX worksheet renders the actual state → export → diff. If the worksheet is ever treated as the origin of the CSV, the file leads and git trails, inverting S-5. Keep auto-render strictly to the tabular manifests; never render the prose standards as worksheets.
+- **Markdown for prose** beats `.txt`: GitHub renders `.md` into clean headed pages with tables and cross-links (a designer reads it in-browser, zero tooling), yet it's still plain text under the hood so it diffs perfectly in git. `.txt` is "Markdown with the benefits removed" — no structure, no rendering, a flat wall at scale.
+- **CSV for data manifests** (layers/classes/symbols/inventory): machine-comparable, row-level git diffs, and it **mirrors a VWX database worksheet** (F-011) so the reconciliation diff is trivial. VW's worksheet export offers a comma-or-semicolon delimiter (F-004) — standardized to comma.
+- **The worksheet-mirror is a RECONCILIATION device, not a source (S-5 guardrail).** git CSV = the plan (authored first) → VWX worksheet renders the actual state → export → diff. Keep auto-render strictly to the tabular manifests; never render the prose standards as worksheets.
 - **Rule of thumb:** if a VWX worksheet will ever mirror it → CSV. If a human reads it top-to-bottom → Markdown.
 
-Resolved → S-6 (D-016), with the delimiter locked to **comma**.
+Resolved → S-6 (D-016), delimiter locked to **comma**.
 
-- Sources: workshop reasoning 2026-07-16 (6 lenses) + tooling facts from [Exporting worksheets (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Exporting%20worksheets.htm) (delimiter options) and GitHub Markdown rendering behavior.
+- Sources: workshop reasoning 2026-07-16 (6 lenses) + tooling facts from [Exporting worksheets (VW2026)](https://app-help.vectorworks.net/2026/eng/VW2026_Guide/Worksheets/Exporting%20worksheets.htm) and GitHub Markdown rendering behavior.
+
+### F-016 — Sheet / drawing-set numbering conventions · 2026-07-16 · Confidence: High
+
+How professional drawing sets number sheets, to ground our (draft) sheet-layer scheme:
+
+- **National CAD Standard model:** a sheet number = a **discipline designator** (letter[s] identifying the discipline — A architectural, S structural, E electrical, etc.) + a **sheet-type digit** (plans vs sections vs details vs schedules) + a sequence number. The discipline-letter prefix is the load-bearing idea.
+- **Discipline ordering** is conventionally general → site → architectural → structural → MEP; offices adapt it.
+- **USITT graphic standards** (RP-2 for lighting; the Scenic Design & Technical Production Graphic Standard) establish theatre's discipline-set conventions and graphic language, the theatre analogue to the CAD standard.
+- **Application to us:** our existing ClickUp scheme (UR / S / L / A / R / V dept prefix + number, `0` = readme sheet, indent = viewport) is already a discipline-prefix system. **Drafted lightweight in `BUILD-PLAN.md`; the full per-department drawing list is finalized at the Smith build** (Michael), so the template stays light for now. Not promoted to a Standard yet.
+
+- Sources: [Construction Document Sheet Numbers and Order (Archtoolbox, National CAD Standard)](https://www.archtoolbox.com/construction-document-sheet-numbers/) · [USITT RP-2 (2006) (PDF)](https://cad4theatre.org.uk/USITT-RP2-Lighting-Standard.pdf) · [USITT Scenic Design & Technical Production Graphic Standard](https://docslib.org/doc/1655565/usitt-scenicdesign-and-technicalproduction-graphicstandard)
 
 ---
 
@@ -162,21 +174,22 @@ Resolved → S-6 (D-016), with the delimiter locked to **comma**.
 - **Pass 1:** F-001..F-010 (structure, naming, symbols, DWG, origin, templates, Standard Naming).
 - **Pass 2:** F-011..F-014 (extraction/reporting/referencing/publish).
 - **Pass 3:** F-015 (file formats).
-- **Direction-of-truth ruling (S-5, D-015):** git = plan of record, VWX = realization, export = reconciliation.
-- **File-format ruling (S-6, D-016):** Markdown prose / comma-CSV manifests; worksheet-mirror is reconciliation-only.
+- **Pass 4:** F-016 (sheet numbering).
+- **Rulings:** S-5/D-015 (direction of truth), S-6/D-016 (file-format split), D-017 (resource-capture list + segmentation + per-record CSVs).
 - **Adopted into Standards:** S-1 (D-012), S-2 (D-011), S-3 (D-013), S-4 (D-014), S-5 (D-015), S-6 (D-016).
-- **Still open:** object-class tree; final layer list; sheet-layer numbering (tabled, more research); which snapshot worksheets + columns; USITT RP-2 symbol adoption; empirical DWG round-trip test; Standard Naming registration; `.vwx` storage location; whether reconciliation snapshots live in-repo vs. throwaway.
+- **Still open:** object-class tree; final layer list; full sheet-layer list (Smith build); reconciliation snapshot in-repo vs throwaway; USITT RP-2 symbol adoption; empirical DWG round-trip test; Standard Naming registration; `.vwx` storage location.
 
 ---
 
 ## Candidate decisions for Michael (NOT yet adopted — do not promote until ruled)
 
-1. **Standard show-file structure** — design-layer / class / sheet-layer / resource skeleton (sheet-layer prefixes tabled pending research). Folder skeleton + file manifest now drafted in `BUILD-PLAN.md`.
+1. **Standard show-file structure** — design-layer / class / sheet-layer / resource skeleton. Folder skeleton + file manifest + resource-capture list now settled in `BUILD-PLAN.md`; ratify the prose structure doc → S-7.
 2. **Referencing method (F-013):** adopt **referenced Design Layer Viewports** (not layer-import) as the S-2 mechanism; note the same-version constraint.
 3. **D-008 DWG hedge as procedure (F-006):** saved class↔DWG-layer mapping set, embedded/laid-out resources, named plug-ins, real round-trip test.
 4. **Template strategy (F-008):** `Save As Template` conforming to USITT RP-2 + Spotlight defaults.
 5. **Register house naming as a Standard Naming standard (F-010).**
-6. **Whether reconciliation snapshots live in the repo** or stay throwaway diffs (S-5 open format question).
+6. **Whether reconciliation snapshots live in the repo** or stay throwaway diffs.
+7. **Sheet-numbering** — promote the F-016 draft to a Standard once the full per-department list is settled at the Smith build.
 
 ---
 
@@ -228,7 +241,7 @@ The governing model for the whole project (parallels the FileMaker workflow: the
 Format each file by its JOB, not one blanket rule:
 
 - **Prose / standards / conventions / the WHY → Markdown (`.md`).** Renders as clean headed pages on GitHub (tables, cross-links) so a designer reads it in-browser with zero tooling, and it still diffs perfectly as plain text. **No `.txt`** — it's Markdown with the benefits stripped out.
-- **Data manifests (layers, classes, symbols, inventory) → CSV, comma-delimited.** Machine-comparable, clean per-row diffs, and mirrors a VWX database worksheet (F-011). **Comma is the locked delimiter** (quote any value containing a comma).
+- **Data manifests (layers, classes, symbols, records, inventory) → CSV, comma-delimited.** Machine-comparable, clean per-row diffs, and mirrors a VWX database worksheet (F-011). **Comma is the locked delimiter** (quote any value containing a comma).
 - **The VWX-worksheet mirror is the RECONCILIATION half ONLY (S-5 guardrail).** The git CSV is authored first as the plan; the worksheet renders the file's actual state; export → diff. The worksheet renders a check, never becomes the source. Auto-render stays strictly on the tabular manifests — never render prose standards as worksheets.
 - **Rule of thumb:** VWX worksheet will ever mirror it → CSV. Human reads it top-to-bottom → Markdown.
 - **Reach (S-6 pairs with S-5):** applies to every package in this org-agnostic template, not just URITP/Smith.
