@@ -1,6 +1,6 @@
 # FileMaker Documentation Standard (repo-native)
 
-**Status:** v1.1 · Locked 2026-07-14, calc-inline rule added 2026-07-15 · **Source of truth:** this repo.
+**Status:** v1.2 · Locked 2026-07-14; calc-inline rule added 2026-07-15; **calc-externalize rule replaced it 2026-07-16** · **Source of truth:** this repo.
 **Supersedes:** the ClickUp "FileMaker Documentation Standards" doc, which becomes a one-line pointer here once the cull runs.
 
 ---
@@ -14,9 +14,18 @@ This **replaces the old "11 fixed documentation pages" model.** Those pages deco
 - **Object pages** (Tables, Relationships, Layouts, Scripts, Value Lists) → mirror **folders**, one file per object.
 - **Narrative pages** (Design Decisions, Architecture Notes, Data Standards, Changelog, Database Graph Log, Import/Export Specs) → `meta/`.
 
-## Calcs live inline with what they define (LOCKED 2026-07-15, Michael)
+## Calc bodies live in standalone files, referenced by pointer (LOCKED 2026-07-16, Michael)
 
-**A calculation field's full FileMaker calc-option text lives in a code block INSIDE the file of the object that owns it** — the table file for a table calc, right beside that field. Never make a reader navigate to a separate file to see a formula they're looking at in a field list. **Do NOT centralize formula bodies in a separate calc file.** A cross-table `meta/calculation-fields.md` may exist ONLY as a thin index (field name + owning table + one-line purpose, linking to the inline definition); it must never hold the formula bodies. One definition, one home, physically next to the field. This generalizes to every FMP app.
+**Every calculation field's formula body lives in its own file under `calculations/`, verbatim FileMaker calc text, referenced from the field by a `calcRef` pointer.** One calc, one file, one source of truth. Nothing else restates the formula body.
+
+- **Folder:** `<app-slug>/calculations/` — mirrors how `functions/` already works.
+- **Filename:** `<Table>__<FieldName>.fmcalc`. The `__` matches the existing namespace-separator convention and kills collisions, since calc field names are NOT globally unique across tables. Extension `.fmcalc` (plain text; the renderer applies its own highlighting).
+- **File body:** two `//` header comment lines (owner + return type / stored / one-line purpose), a blank line, then the raw formula exactly as it reads in the FileMaker calc dialog. FileMaker ignores the comment lines, so the whole file is round-trippable: copy the file into the calc dialog, paste it back out unchanged.
+- **The pointer:** each calc field in `schema/tables.json` carries `calcRef` (path to the file), plus `returns` and `stored`. The field's structural metadata lives in the JSON; the formula body lives ONLY in the file.
+- **Manifest:** `calculations/_index.json` lists every calc with owning table, return type, stored/unstored, purpose, and a `reads` dependency hint (fields + tables the formula touches). The viewer reads the manifest to render the computation layer and draw the dependency graph.
+- **Rendered inline, stored centralized.** The JSON-driven viewer fetches each `calcRef` file and shows the formula inline beside its field, so the human never navigates to read it. Storage location and presentation are decoupled: files centralized, presentation inline.
+
+**This supersedes the 2026-07-15 "calcs live inline in the owning table's markdown / do NOT centralize" lock.** That rule was correct for a markdown-only world where inline was the only way a human saw the formula. Once a renderer exists, centralized files + inline rendering deliver the same legibility with a single source of truth and a clean per-calc git diff. The per-table markdown `Calculations` section becomes a **pointer list** (field name + purpose + link to the file), never a formula-body restatement. A cross-table `meta/calculation-fields.md`, if it exists, is a thin index only.
 
 ## Per-app structure
 
@@ -26,14 +35,15 @@ filemaker/<app-slug>/
   INDEX.md               rendering manifest — links every object folder
   next-build-spec.md     overwritten each build cycle
   schema/                machine mirror (generated JSON: tables/relationships/value-lists)
-  tables/                one file per table  (+ README, _index.json) — calc formulas inline here
+  tables/                one file per table  (+ README, _index.json)
+  calculations/          one .fmcalc file per calc field (+ README, _index.json) — canonical formula bodies
   relationships/         graph as data + prose (+ README, _index.json)
   layouts/               one file per layout (+ README, _index.json)
   scripts/               mirrors FMP script folders (+ README, _index.json)
     imports/  navigation/  utilities/  triggers/   ...one file per script
   functions/             one file per custom function (+ README, _index.json)
   value-lists/           value lists (+ README)
-  meta/                  narrative docs (design/architecture/data-standards/changelog/graph-log/import-export) + calc INDEX only
+  meta/                  narrative docs (design/architecture/data-standards/changelog/graph-log/import-export)
   notes/                 per-build / session notes, PR-linked
 ```
 
@@ -47,7 +57,11 @@ Every mirror folder carries an `_index.json` machine manifest so the **Phase 2 v
 
 ### Table file (`tables/<TableName>.md`)
 
-Header line (Role · Status · App) → one-line description → **Fields** table (Field · Type · Key · Category · Status · Notes) → **Calculations** (each calc field's purpose + its FileMaker calc-option text in a code block, INLINE) → **Relationships** (edges touching this table) → **Open Items** → **Changelog**.
+Header line (Role · Status · App) → one-line description → **Fields** table (Field · Type · Key · Category · Status · Notes) → **Calculations** (a POINTER list: each calc field's purpose + return/stored + a link to its `calculations/<Table>__<field>.fmcalc` file; NOT the formula body) → **Relationships** (edges touching this table) → **Open Items** → **Changelog**.
+
+### Calculation file (`calculations/<Table>__<FieldName>.fmcalc`)
+
+Two `//` header comment lines (owner + return/stored/purpose) → blank line → raw FileMaker formula. Verbatim and round-trippable. This file is the single source of truth for the formula body.
 
 ### Script file (`scripts/<folder>/<ScriptName>.md`)
 
@@ -79,3 +93,9 @@ Every object edit = branch → PR → self-merge (per GitHub MCP Operating Stand
 1. Repo becomes canonical (this standard).
 2. ClickUp FMP doc bodies get a one-line "source of truth: repo" pointer at top.
 3. After **one full build cycle** proves the repo flow end to end, cull the ClickUp doc bodies down to pointers. Do not delete ClickUp content before that cycle completes.
+
+## Changelog
+
+- **2026-07-16 (v1.2):** Calc bodies externalized to `calculations/` (one `.fmcalc` per field, verbatim + round-trippable), referenced by `calcRef` in `schema/tables.json`. Added `calculations/_index.json` manifest with dependency hints. Table-file `Calculations` section is now a pointer list, not a formula-body restatement. Supersedes the 2026-07-15 inline-calc lock. HML_LLC migrated as the reference implementation.
+- **2026-07-15 (v1.1):** Added the (now-superseded) calc-inline rule.
+- **2026-07-14 (v1.0):** Repo-native per-object model locked; replaced the 11-fixed-pages model.

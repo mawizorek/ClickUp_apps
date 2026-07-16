@@ -1,0 +1,13 @@
+// Loans::calc_CurrentPayoffAmount
+// Number, unstored. Current all-in payoff. Frozen payoff if present, else calc_TotalOutstanding.
+
+Let (
+  _currentPayoff = ExecuteSQL (
+    "SELECT TotalPayoffAmount FROM Payoffs WHERE PrimaryKey = ?" ;
+    "" ; "" ; fkCurrentPayoff
+  ) ;
+  Case (
+    not IsEmpty ( _currentPayoff ) ; GetAsNumber ( _currentPayoff ) ;
+    calc_TotalOutstanding
+  )
+)

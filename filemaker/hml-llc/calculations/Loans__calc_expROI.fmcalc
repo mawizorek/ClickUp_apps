@@ -1,0 +1,14 @@
+// Loans::calc_expROI
+// Number, stored. Analytical ROI helper kept by decision.
+
+Let (
+[
+  _expectedInterest = calc_MonthlyPayment * Ceiling ( LoanTerm_inDays / 30.5 ) ;
+  _originationRevenue = calc_originationPoints ;
+  _maturityRevenue = calc_MaturationPayment
+] ;
+  Case (
+    IsEmpty ( OriginalPrincipal ) or OriginalPrincipal = 0 ; "" ;
+    ( _expectedInterest + _originationRevenue + _maturityRevenue ) / OriginalPrincipal
+  )
+)

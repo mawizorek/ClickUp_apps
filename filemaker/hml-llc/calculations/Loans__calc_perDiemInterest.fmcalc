@@ -1,0 +1,4 @@
+// Loans::calc_perDiemInterest
+// Number, unstored. Per-diem interest helper; drives date-scoped payoff accrual.
+
+OriginalPrincipal * InterestRateAnnual / 365

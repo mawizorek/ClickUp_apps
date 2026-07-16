@@ -1,0 +1,20 @@
+// ExpectedTransactions::calc_lateAfterDate
+// Date, unstored. Late threshold date (due date + grace, row override beats loan default).
+
+Let (
+[
+  _loanGrace = ExecuteSQL (
+    "SELECT GraceDays FROM Loans WHERE PrimaryKey = ?" ;
+    "" ; "" ; fkLoan
+  ) ;
+  _graceDays = Case (
+    not IsEmpty ( GraceDaysOverride ) ; GraceDaysOverride ;
+    not IsEmpty ( _loanGrace ) ; GetAsNumber ( _loanGrace ) ;
+    0
+  )
+] ;
+  Case (
+    not IsEmpty ( DueDate ) ; DueDate + _graceDays ;
+    ""
+  )
+)

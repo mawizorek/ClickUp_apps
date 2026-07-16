@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "app": "hml-llc",
+    "folder": "calculations",
+    "schemaVersion": "1.0",
+    "generated": "2026-07-16",
+    "source": "Externalized from per-table markdown inline blocks (supersedes the 2026-07-15 inline-calc lock).",
+    "fileExtension": ".fmcalc",
+    "naming": "<Table>__<FieldName>.fmcalc",
+    "note": "reads[] is a dependency hint parsed from the formula (fields + Table.field / Table refs). Feeds the renderer dependency graph; not authoritative until the calc linter validates it."
+  },
+  "calculations": [
+    { "field": "calc_CurrentPrincipalBalance", "table": "Loans", "file": "Loans__calc_CurrentPrincipalBalance.fmcalc", "returns": "Number", "stored": true, "purpose": "Current principal basis.", "reads": ["OriginalPrincipal"] },
+    { "field": "calc_originationPoints", "table": "Loans", "file": "Loans__calc_originationPoints.fmcalc", "returns": "Number", "stored": true, "purpose": "Origination-points amount.", "reads": ["OriginalPrincipal", "OriginationPoints"] },
+    { "field": "calc_MaturationPayment", "table": "Loans", "file": "Loans__calc_MaturationPayment.fmcalc", "returns": "Number", "stored": true, "purpose": "Maturity-side payment amount.", "reads": ["OriginalPrincipal", "MaturationPoints"] },
+    { "field": "calc_MonthlyPayment", "table": "Loans", "file": "Loans__calc_MonthlyPayment.fmcalc", "returns": "Number", "stored": true, "purpose": "Recurring interest/payment helper.", "reads": ["OriginalPrincipal", "InterestRateAnnual"] },
+    { "field": "calc_perDiemInterest", "table": "Loans", "file": "Loans__calc_perDiemInterest.fmcalc", "returns": "Number", "stored": false, "purpose": "Per-diem interest; drives date-scoped payoff accrual.", "reads": ["OriginalPrincipal", "InterestRateAnnual"] },
+    { "field": "calc_FirstMaturation", "table": "Loans", "file": "Loans__calc_FirstMaturation.fmcalc", "returns": "Number", "stored": true, "purpose": "First maturation milestone helper.", "reads": ["OriginationDate", "MaturationTerm_inDays"] },
+    { "field": "calc_NextMaturityDate", "table": "Loans", "file": "Loans__calc_NextMaturityDate.fmcalc", "returns": "Date", "stored": false, "purpose": "Next maturity milestone, distinct from next due date.", "reads": ["ClosingDate", "OriginationDate", "MaturationTerm_inDays"] },
+    { "field": "calc_NextDueDate", "table": "Loans", "file": "Loans__calc_NextDueDate.fmcalc", "returns": "Date", "stored": false, "purpose": "Next collectible expected due date.", "reads": ["PrimaryKey", "ExpectedTransactions.DueDate", "ExpectedTransactions.fkLoan"] },
+    { "field": "calc_TotalOutstanding", "table": "Loans", "file": "Loans__calc_TotalOutstanding.fmcalc", "returns": "Number", "stored": false, "purpose": "Total outstanding balance; frozen payoff if present, else remaining expected.", "reads": ["fkCurrentPayoff", "PrimaryKey", "Payoffs.TotalPayoffAmount", "ExpectedTransactions.AmountAdjusted", "ExpectedTransactions.OriginalAmount", "PaymentApplications.AmountApplied"] },
+    { "field": "calc_CurrentPayoffAmount", "table": "Loans", "file": "Loans__calc_CurrentPayoffAmount.fmcalc", "returns": "Number", "stored": false, "purpose": "Current all-in payoff; frozen payoff if present, else calc_TotalOutstanding.", "reads": ["fkCurrentPayoff", "Payoffs.TotalPayoffAmount", "calc_TotalOutstanding"] },
+    { "field": "calc_expROI", "table": "Loans", "file": "Loans__calc_expROI.fmcalc", "returns": "Number", "stored": true, "purpose": "Analytical ROI helper kept by decision.", "reads": ["calc_MonthlyPayment", "LoanTerm_inDays", "calc_originationPoints", "calc_MaturationPayment", "OriginalPrincipal"] },
+    { "field": "calc_amountPaid", "table": "ExpectedTransactions", "file": "ExpectedTransactions__calc_amountPaid.fmcalc", "returns": "Number", "stored": false, "purpose": "Total applied amount from PaymentApplications.", "reads": ["PrimaryKey", "PaymentApplications.AmountApplied", "PaymentApplications.fkExpectedTransaction"] },
+    { "field": "calc_remaining", "table": "ExpectedTransactions", "file": "ExpectedTransactions__calc_remaining.fmcalc", "returns": "Number", "stored": false, "purpose": "Remaining unpaid balance (adjusted else original, minus applied).", "reads": ["AmountAdjusted", "OriginalAmount", "calc_amountPaid"] },
+    { "field": "calc_lateAfterDate", "table": "ExpectedTransactions", "file": "ExpectedTransactions__calc_lateAfterDate.fmcalc", "returns": "Date", "stored": false, "purpose": "Late threshold date (due + grace, row override beats loan default).", "reads": ["fkLoan", "GraceDaysOverride", "DueDate", "Loans.GraceDays"] },
+    { "field": "calc_islate", "table": "ExpectedTransactions", "file": "ExpectedTransactions__calc_islate.fmcalc", "returns": "Number", "stored": false, "purpose": "Late/not-late helper; not late if fully paid.", "reads": ["DueDate", "calc_remaining", "calc_lateAfterDate"] },
+    { "field": "calc_filePath", "table": "GLOBAL_USE_VARIABLES", "file": "GLOBAL_USE_VARIABLES__calc_filePath.fmcalc", "returns": "Text", "stored": false, "purpose": "Current file path/location.", "reads": ["Get(FilePath)"] },
+    { "field": "calc_fileName", "table": "GLOBAL_USE_VARIABLES", "file": "GLOBAL_USE_VARIABLES__calc_fileName.fmcalc", "returns": "Text", "stored": false, "purpose": "Current file name.", "reads": ["Get(FileName)"] },
+    { "field": "calc_hostedStatus", "table": "GLOBAL_USE_VARIABLES", "file": "GLOBAL_USE_VARIABLES__calc_hostedStatus.fmcalc", "returns": "Text", "stored": false, "purpose": "Hosted vs local helper.", "reads": ["Get(MultiUserState)"] },
+    { "field": "calc_fileSizeMB", "table": "GLOBAL_USE_VARIABLES", "file": "GLOBAL_USE_VARIABLES__calc_fileSizeMB.fmcalc", "returns": "Number", "stored": false, "purpose": "Numeric file size; append MB in display only.", "reads": ["Get(FileSize)"] }
+  ]
+}
