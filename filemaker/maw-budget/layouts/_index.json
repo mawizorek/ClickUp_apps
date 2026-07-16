@@ -2,23 +2,29 @@
   "_meta": {
     "app": "maw-budget",
     "folder": "layouts",
-    "schemaVersion": "1.1",
-    "generated": "2026-07-15",
-    "convention": "folder-per-layout: each layout is its own folder (layouts/<folder>/LAYOUT-<name>/) holding index.html (render) + layout.json (canonical manifest) + README.md. Diverges from the one-file-per-layout line in DOCUMENTATION-STANDARD v1.1; standard update pending sign-off."
+    "schemaVersion": "1.2",
+    "generated": "2026-07-16",
+    "convention": "folder-per-layout: each layout is its own folder (layouts/<folder>/LAYOUT-<name>/) holding layout.json (canonical manifest) + index.html (object/JSON inspector) + preview.html (real to-scale as-built render) + README.md. Diverges from the one-file-per-layout line in DOCUMENTATION-STANDARD v1.1; standard update pending sign-off. PROPOSED next step: extract the inspector into a shared repo-root app (slug fm-layout-viewer) that loads any app's layout.json, so per-layout folders stop shipping an inspector copy and index.html can become the render."
   },
   "layouts": [
     {
       "name": "GLOBAL_Settings",
+      "viewName": "SYS | Global Settings [DSK]",
       "path": "utility/LAYOUT-global-variables",
       "fmpFolder": "utility",
       "occurrence": "Globals",
       "baseTable": "Globals",
+      "platform": "Computer",
+      "targetStencil": "Desktop: 1024 x 768",
+      "layoutWidth": 1024,
       "theme": "MAW Dark Utility",
+      "themeStatus": "provisional",
       "status": "render-draft",
       "objectCount": 16,
       "bindingsStatus": "proposed",
-      "render": "utility/LAYOUT-global-variables/index.html",
-      "manifest": "utility/LAYOUT-global-variables/layout.json"
+      "manifest": "utility/LAYOUT-global-variables/layout.json",
+      "inspector": "utility/LAYOUT-global-variables/index.html",
+      "render": "utility/LAYOUT-global-variables/preview.html"
     }
   ]
 }
