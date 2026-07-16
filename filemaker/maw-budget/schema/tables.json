@@ -11,7 +11,7 @@
       "global": "g_ prefix; gLIST_ reserved for value-list globals",
       "audit": "CreationTimestamp, CreatedBy, ModificationTimestamp, ModifiedBy"
     },
-    "conventionNote": "Defaulted to HML_LLC house style at scaffold time. Flip here before any real table is added if URITP style (pk_/fk_) is preferred.",
+    "conventionNote": "HML_LLC house style LOCKED by Michael 2026-07-15 (DD-008). URITP style (pk_/fk_) rejected for this app. Do not change without a superseding decision.",
     "keyTypes": ["pk", "fk", "calc", "global", "audit", "container", "plain"],
     "roleColors": {
       "singleton": "#7B3FA0",
