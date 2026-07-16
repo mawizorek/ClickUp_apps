@@ -24,7 +24,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint; resolve.js = live switching. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=2">
+<link rel="stylesheet" href="./styles.css?v=3">
 </head>
 <body>
 <!-- ACCESS GATE (config.json drives it; inline fallback keeps it working on file:// or a 404) -->
@@ -47,13 +47,13 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js?v=2"></script>
+<script src="./chrome.js?v=3"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS — swap these when you copy the template ==== */
   var APP_NAME    = "App Name";
-  var APP_VERSION = "v2";
-  var APP_PR      = 288;           // merged PR number that shipped this version
+  var APP_VERSION = "v3";
+  var APP_PR      = 293;           // merged PR number that shipped this version
   var DEFAULT_THEME = (window.THEMES && THEMES.DEFAULT) || "default-theme";
   var DEFAULT_PAGE  = "home";       // one-line landing repoint, no rebuild needed
   var NAV = [
