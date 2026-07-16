@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-15",
+  "version": "2026-07-16",
   "note": "Source of truth for the quickfire index. Add an artifact = add an entry here. type/subjects/status must come from the controlled vocabulary below; adding a new vocab term is a deliberate edit, not an ad-hoc tag. status: active=shown at rest, archived=hidden until 'Show all', hidden=dev/junk kept out of the default view (still reachable via Show all). reviewed:false = auto-surfaced folder with inferred tags, needs a human pass.",
   "vocabulary": {
     "type": ["plan", "research", "reference", "tool", "fun"],
@@ -7,6 +7,16 @@
     "status": ["active", "archived", "hidden"]
   },
   "artifacts": [
+    {
+      "slug": "html-css-json-explained",
+      "title": "How HTML, CSS & JSON Work",
+      "desc": "Live theming workshop: reskin six apps by dragging one variable (OKLCH tokens), plus how HTML/CSS/JSON split the work, what an .mjs module is, and how an app is built, rendered, and layered. The research render behind the global theme system.",
+      "type": "research",
+      "subjects": ["tech", "work"],
+      "status": "active",
+      "date": "2026-07-16",
+      "reviewed": true
+    },
     {
       "slug": "side-play-board",
       "title": "Side Play Board — 21 Concepts",
