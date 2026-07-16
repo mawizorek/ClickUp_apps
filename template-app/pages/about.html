@@ -1,0 +1,15 @@
+<section class="page">
+  <h1>About this template</h1>
+  <p class="lead">A second page, proving the router. The shell (<code>index.html</code>) never stores a page; it loads these partials from <code>pages/</code> by hash route and repoints the landing with a single <code>DEFAULT_PAGE</code> constant.</p>
+
+  <h2>How it fits together</h2>
+  <p>The header, menu, settings drawer, and footer are built once by <code>chrome.js</code> and persist across every page. Switching pages swaps only the content in <code>#view</code>, so the chrome and the active theme never flicker.</p>
+
+  <h2>The theme spine</h2>
+  <p>All styling references <code>shared/themes</code> through <code>var(--token)</code>. Pick a theme in Settings and it applies live via <code>resolve.js</code> and persists to this browser. A static <code>themes.css</code> paints the correct theme on first load so there is no unstyled flash.</p>
+
+  <div class="callout">Need a color the 17 tokens can't express? Don't inline it. Flag a theme expansion (see README) so the spine stays the single source of color.</div>
+
+  <h2>Copy me</h2>
+  <p>This folder is the starting point for every new app. Copy it, rename it, swap the <code>APP_*</code> constants at the top of <code>index.html</code>, add your pages, pick a theme. See <code>CONFORMANCE.md</code> for the checklist an audit compares against.</p>
+</section>
