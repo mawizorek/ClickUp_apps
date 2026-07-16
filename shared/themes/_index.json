@@ -50,6 +50,14 @@
       ]
     },
     {
+      "id": "neutral",
+      "label": "Neutral & Natural",
+      "themes": [
+        { "slug": "paper-mono", "name": "Paper Mono", "file": "paper-mono.json", "status": "locked", "mode": "light", "intendedUse": "clean / neutral / print-like", "fmp": "pending" },
+        { "slug": "papyrus", "name": "Papyrus", "file": "papyrus.json", "status": "locked", "mode": "light", "intendedUse": "warm / editorial / natural", "fmp": "pending" }
+      ]
+    },
+    {
       "id": "f1",
       "label": "F1 Constructors 2026",
       "themes": [
