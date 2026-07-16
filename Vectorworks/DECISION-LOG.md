@@ -6,7 +6,7 @@
 >
 > **Handoff rule:** if the working session is interrupted, another agent should be able to read this file top-to-bottom and resume the brainstorm with full context. Keep it current. New decisions append to the Decisions Log; open items live in Open Questions.
 >
-> **Companion:** [`README.md`](./README.md) is the phase-plan map (phases + where we are). This file is the journal (what we decided, when, why).
+> **Companion:** [`README.md`](./README.md) is the phase-plan map (phases + where we are) · [`BUILD-PLAN.md`](./BUILD-PLAN.md) is the one-page build-from artifact. This file is the journal (what we decided, when, why).
 
 ---
 
@@ -40,22 +40,22 @@ Home: the **`mawizorek/ClickUp_apps`** repo. Git holds the **plan + documentatio
   - **A template** — the reusable package skeleton. Every show package clones from it.
   - **Individual show-file packages** — starting with the **Smith Theatre base show file** (first real package).
 
-**Scope guardrails:** don't clutter the `Vectorworks/` top level with a spot per production; productions become **sub-references elsewhere**. For now, focus only on the base show file.
+**Scope guardrails:** don't clutter the `Vectorworks/` top level with a spot per production; productions become **sub-references elsewhere**. For now, focus only on the base show file. **Note (D-016 scope):** the template + its standards are org-agnostic — reusable for any Vectorworks file, not just URITP; URITP/Smith are the first users.
 
 ---
 
-## 4. What the package contains (reframed by D-015 — plan-first)
+## 4. What the package contains (reframed by D-015 — plan-first; formats per D-016)
 
-**PRIMARY — the plan (hand-authored, the lead artifacts):**
+**PRIMARY — the plan (hand-authored, the lead artifacts) — Markdown (D-016):**
 
 - **Intended structure specs** — the expected layer list, object-class tree, sheet-layer scheme, naming/drafting/symbol standards. Dictated in git first, built in VWX from it.
 - **Hand-drawn reference notes / drawings** — the actual handout to designers and Michael's build reference. First-class content.
 - **Prose standards + per-department READMEs** — the WHY; includes a **Datums & Reference Planes** note (S-4/D-014). Never holds dimension values.
 - **CHANGELOG / version ledger** — tracks the plan's evolution.
 
-**SECONDARY — reconciliation snapshot (generated from the file, occasional, a checking aid, per S-5):**
+**SECONDARY — reconciliation snapshot (generated from the file, occasional, a checking aid, per S-5) — comma-CSV (D-016):**
 
-- CSV manifests via worksheet database rows (layers / classes / resources / sheets), exported when Michael wants to diff the built file against the plan. **Preferably generated from Vectorworks** (F-011), never hand-transcribed.
+- CSV manifests via worksheet database rows (layers / classes / symbols / sheets), exported when Michael wants to diff the built file against the plan. **Preferably generated from Vectorworks** (F-011), never hand-transcribed. Comma-delimited (D-016). The VWX worksheet mirrors the git CSV as a reconciliation device only — the worksheet never becomes the source (S-5/S-6).
 - Optional PDF/A-1b plate set (Publish) as a frozen as-built snapshot.
 - Reference to **the `.vwx` file**, which lives outside git.
 
@@ -73,6 +73,8 @@ Home: the **`mawizorek/ClickUp_apps`** repo. Git holds the **plan + documentatio
 **File-topology principle (D-011):** the base file is a **dense MASTER** that department/show files **reference** (not copy) — technical method = referenced Design Layer Viewport (F-013). Venue geometry is authored once in the master and consumed downstream. See VWX-BEST-PRACTICES.md § S-2.
 
 **Direction-of-truth principle (D-015):** the plan is authored in git and the file is built to match it; see § 2b and S-5.
+
+**File-format principle (D-016):** prose → Markdown, data manifests → comma-CSV; see S-6.
 
 ---
 
@@ -103,20 +105,21 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 | D-007 | 2026-07-16 | **Ratify the 7-phase lifecycle spine** (Phase 0–6), brainstorming → closing & archiving. | Approved by Michael. Detail in README. |
 | D-008 | 2026-07-16 | **Rebuild risk accepted** with a mitigation path: export **DWG** directly from the file; with resources embedded + laid out, re-importing the DWG should de-skin but bring content back. Keep resources embedded + cleanly laid out throughout. | No way around the Educational→licensed rebuild; DWG round-trip is the hedge. |
 | D-009 | 2026-07-16 | **`.vwx` files will NOT live in git. Git is solely the documentation trail.** Planning to **export documentation out of Vectorworks into git** (worksheet/report export → CSV/markdown). | Files live elsewhere; bundle references them. Export role refined by D-015 to a reconciliation check, not routine population. |
-| D-010 | 2026-07-16 | **Do a Vectorworks best-practices deep dive + deep research as a brainstorming sub-session** before designing our workflow. | Build on established practice, not habit. Findings F-001..F-014 logged in VWX-BEST-PRACTICES.md. |
+| D-010 | 2026-07-16 | **Do a Vectorworks best-practices deep dive + deep research as a brainstorming sub-session** before designing our workflow. | Build on established practice, not habit. Findings F-001..F-015 logged in VWX-BEST-PRACTICES.md. |
 | D-011 | 2026-07-16 | **Adopt the master-file reference model.** One dense **MASTER** base file holds all departments as layers; department/show files **reference** it (referenced Design Layer Viewport, F-013), pulling only the layers they need. | Confirmed by Michael. VWX-BEST-PRACTICES.md § S-2. Downstream files are thin consumers of the master. |
 | D-012 | 2026-07-16 | **Adopt the hybrid layer/class division.** **Classes = object-category filtering** (steel, wood, framing, masking…). **Layers = location + department routing + elevation band** (`0 NOTES / 1 DECK / 1.5 MEZZ / 2 TOE / 3 CATWALK`). **Elevation lives in layers, never classes.** Object-classes use dash-delimited ≤4-part naming (F-002). | Confirmed by Michael. § S-1. Diverges from Spotlight's lean-layer advice (multi-dept master, not a single plot). |
 | D-013 | 2026-07-16 | **Adopt the origin / datum convention.** Smith is a blackbox rectangle (~50'×70' nominal); datum = **center of the room rectangle**, coincident with the Vectorworks **internal origin (0,0)**. Already built in the file. | Confirmed by Michael. § S-3. Internal-origin coincidence protects DWG round-trip precision (D-008) and shares one coordinate frame across referencing files (D-011). |
 | D-014 | 2026-07-16 | **Adopt the datums & reference-planes documentation convention.** Document the **RULE** (which surface is the datum at each elevation), never the numbers, in a short **"Datums & Reference Planes"** note. Values live in the file + exported worksheets. Convention is universal; the specific Smith elevation rule (deck-off-trim / upper-off-wall) lives in the **Smith package**. | Confirmed by Michael. § S-4. Resolves F-009. |
 | D-015 | 2026-07-16 | **Adopt the direction-of-truth model: Git = plan, Vectorworks = realization, export = reconciliation.** Git holds the intended structure + goals + hand-drawn reference notes (the actual collaborator handout + Michael's build reference) and LEADS; Michael builds in VWX from the git plan (FileMaker parallel); the `.vwx` lives locally (D-009); VWX→Git export is an occasional check that the built file matches the plan, **not** a routine population pipeline. | Confirmed by Michael. Promoted to VWX-BEST-PRACTICES.md § S-5. **Refines the emphasis of D-001 (package is plan-first, not file-trailing) and D-009 (export = reconciliation, not primary import).** |
+| D-016 | 2026-07-16 | **Adopt the file-format split.** **Prose / standards / the WHY → Markdown (`.md`)** (renders for designers on GitHub, diffs clean as plain text; no `.txt`). **Data manifests (layers, classes, symbols, inventory) → CSV, comma-delimited** (machine-comparable; mirrors a VWX database worksheet). The VWX-worksheet mirror is a **reconciliation device only** — the git CSV is authored first as the plan, the worksheet renders the actual state to diff against it, and never becomes the source (S-5 guardrail). Applies to every package (org-agnostic). | Confirmed by Michael; comma delimiter chosen per recommendation. Promoted to VWX-BEST-PRACTICES.md § S-6. Resolves F-015 + the CSV-delimiter open question. |
 
 ---
 
 ## 8. Open Questions (to decide before building schema)
 
-- **Standard show-file structure (ACTIVE, next big plan artifact):** the design-layer / class / sheet-layer / resource skeleton for a VWX show file, dictated in git per D-015. Sheet-layer prefixes tabled pending more research (Michael). Ratify → S-6.
-- **Package folder/file schema:** exact folder layout + filenames (plan docs vs. reconciliation-snapshot dirs).
-- **Reconciliation snapshot policy (S-5 open):** does a generated snapshot live in the repo, or stay a throwaway diff Michael shows in chat? If in-repo: CSV delimiter, and PDF/A-1b vs standard PDF for any plate set.
+- **Standard show-file structure (ACTIVE, next big plan artifact):** the design-layer / class / sheet-layer / resource skeleton for a VWX show file, dictated in git per D-015. Folder skeleton + file manifest now drafted in `BUILD-PLAN.md`. Sheet-layer prefixes tabled pending more research (Michael). Ratify → S-7.
+- **Resource-capture list:** confirm which resource types the package captures (draft table in `BUILD-PLAN.md`: symbols = yes/the big one; records, title-blocks, line+text/dim styles = yes; hatches, saved views = maybe; textures = probably not).
+- **Reconciliation snapshot policy (S-5 open):** does a generated snapshot live in the repo, or stay a throwaway diff Michael shows in chat? (Format now settled by D-016: comma-CSV / PDF-A if in-repo.)
 - **Where the `.vwx` files actually live** (Box? Drive? local + referenced).
 - **Object-class tree (D-012/S-1):** the specific categories (steel / wood / framing / masking / …) + dash hierarchy.
 - **House layer list (D-012/S-1):** finalize the department × elevation set; the Google Sheet's ~27 layers are the working draft.
@@ -139,6 +142,7 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 - ~~**Origin / reference-line convention**~~ → **D-013**.
 - ~~**Reference-plane / tolerance detail granularity**~~ → **D-014**.
 - ~~**Direction of truth: is git a mirror of the file or the plan we build from?**~~ → **D-015**: git = plan, VWX = realization, export = reconciliation.
+- ~~**File formats: Markdown vs .txt vs CSV; CSV delimiter**~~ → **D-016**: Markdown prose / comma-CSV manifests; worksheet-mirror is reconciliation-only.
 
 ---
 
@@ -155,10 +159,10 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 
 ## 10. Next actions
 
-1. **Dictate the standard show-file structure in git** (design layers / classes / sheet layers / resources) per D-015 → ratify as S-6. This is the primary plan artifact Michael builds from.
-2. Define the **object-class tree** and finalize the **house layer list** under S-1 (D-012).
-3. Settle the **reconciliation snapshot policy** (in-repo vs throwaway) + formats (S-5 open question).
+1. **Dictate the standard show-file structure in git** (design layers / classes / sheet layers / resources) per D-015 → ratify as S-7. This is the primary plan artifact Michael builds from.
+2. **Confirm the resource-capture list** (BUILD-PLAN draft table) + settle whether `resources/` sub-files stand alone or fold into one README.
+3. Define the **object-class tree** and finalize the **house layer list** under S-1 (D-012).
 4. Ratify the **sheet-layer numbering scheme** (UR/S/L/A/R/V) once research resumes.
-5. Define package folder layout → build the first template skeleton.
+5. Stand up the first template folder skeleton (BUILD-PLAN manifest), then generate the READMEs in one pass.
 
 *Last updated: 2026-07-16.*
