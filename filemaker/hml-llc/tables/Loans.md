@@ -15,17 +15,17 @@
 | ModifiedBy | text | audit | audit | | |
 | fkProperty | text-uuid | fk | key | | secured-by property |
 | fkBorrower | text-uuid | fk | key | pending | party-table decision |
-| fkCurrentPayoff | text-uuid | fk | key | pending | points at current Payoffs row; used by payoff calcs |
+| fkCurrentPayoff | text-uuid | fk | key | pending | points at current Payoffs row; used by payoff calcs. Must be empty during live payoff compute or calc_TotalOutstanding/calc_CurrentPayoffAmount short-circuit to the frozen prior payoff. |
 | LoanNumber | text | plain | terms | | |
 | OriginationDate | date | plain | terms | | |
 | ClosingDate | date | plain | terms | pending | used by calc_NextMaturityDate; confirm presence in file |
-| OriginalPrincipal | number | plain | terms | naming | principal basis (schema JSON currently calls this `LoanAmount` — reconcile) |
-| InterestRateAnnual | number | plain | terms | naming | annual rate (schema JSON currently `InterestRate` — reconcile) |
+| OriginalPrincipal | number | plain | terms | | canonical principal basis; schema JSON aligned 2026-07-15 (was `LoanAmount`). Confirm live-file name matches. |
+| InterestRateAnnual | number | plain | terms | | canonical annual rate; schema JSON aligned 2026-07-15 (was `InterestRate`). Confirm live-file name matches. |
 | OriginationPoints | number | plain | terms | | rate/fraction feeding calc_originationPoints |
 | MaturationPoints | number | plain | terms | | |
 | MaturationTerm_inDays | number | plain | terms | | |
 | LoanTerm_inDays | number | plain | terms | | |
-| GraceDays | number | plain | terms | pending | read by ExpectedTransactions.calc_lateAfterDate; confirm presence |
+| GraceDays | number | plain | terms | pending | read by ExpectedTransactions.calc_lateAfterDate; confirm presence in file |
 | ServicingStatus | text | plain | status | | should resolve to a real status PK, not free text |
 
 ## Calculations
@@ -146,11 +146,12 @@ Let (
 
 ## Open Items
 
-- **Field-naming reconciliation (blocking calc wiring):** calc text uses `OriginalPrincipal` / `InterestRateAnnual` / `ClosingDate` / `GraceDays` / `fkCurrentPayoff`; `schema/tables.json` uses `LoanAmount` / `InterestRate` and omits the latter three. Confirm the live-file names and align schema JSON + calc text.
+- **Live-file name confirmation:** schema JSON + calc text are now aligned on `OriginalPrincipal` / `InterestRateAnnual` / `ClosingDate` / `GraceDays` / `fkCurrentPayoff` (reconciled 2026-07-15). Remaining task is confirming these exact names exist in the live FMP file; if the file differs, the file is the tiebreaker and both docs update to match.
 - Finish calc-name cleanup to one consistent `calc_` family; confirm `ServicingStatus` is a real status reference.
 - Later renames worth considering: `calc_originationPoints` → `calc_OriginationPointsAmount`; confirm `calc_FirstMaturation` is the forever name.
 
 ## Changelog
 
+- 2026-07-15: Schema JSON reconciled to canonical names; cleared the blocking naming-drift flag (now a live-file confirmation item only).
 - 2026-07-15: All 11 loan-math formulas embedded inline (were in meta/calculation-fields.md).
 - 2026-07-14: Per-table file; absorbed full loan-terms field set + calc inventory from legacy docs; flagged principal/rate naming drift.
