@@ -6,6 +6,24 @@ Domain-level record of **why** the FileMaker documentation model is shaped the w
 
 ---
 
+## D-006 · 2026-07-16 · Relationships: one edge surface (`schema/relationships.json`)
+
+**Ruling:** `schema/relationships.json` is the SINGLE source + render surface for the relationship graph. The `relationships/README.md` edge table is retired (narrative only), and `relationships/_index.json` no longer restates edges (render hints only, pointing at the schema file). The renderer + linter read `schema/relationships.json` directly, the way the schema viewer reads `schema/tables.json`. (Standard v1.4.)
+
+**Why:** the edge list had been living in three places — the schema JSON, the README edge table, and the folder `_index.json` — the exact triplicate-index drift D-004 killed for calcs. One surface, one home. Relationships have no code body, so there is no externalized `.fm*` file: they are pure data. Record shape (`from{table,field}` · `to{table,field}` · `cardinality` · `status` · `notes`) was already right and is unchanged.
+
+**Superseded:** the README-restates-edges and `_index`-duplicates-edges halves of the 2026-07-14 relationships scaffolding.
+
+## D-005 · 2026-07-16 · Scripts ride the calc externalization model as DICTATION references
+
+**Ruling:** every script's body lives in its own lean `scripts/<folder>/<ScriptName>.fmscript` (plain text: the exact steps to dictate into *Manage Scripts*, with narrative carried as native `#` comment lines). ONE master `scripts/_index.json` indexes the whole tree as a flat `scripts[]` array with minimal rows (`name`, `folder`, `calls[]`, `scriptRef`); the renderer builds the folder tree from `folder` and the call graph from `calls[]`, and DERIVES `calledBy` at render time by inverting `calls[]` (never stored). No per-script sidecar, no per-folder index, no indexes-of-indexes, no prose markdown per script. (Standard v1.4.)
+
+**Why:** same single-source-of-truth + thin-renderer baseline as calcs — metadata in JSON, body in a lean legible file, presentation via a renderer that reads the JSON. Michael's constraints drove three specifics: (1) ONE master index, not indexes-of-indexes and not fat sidecars, so the renderer never bulk-loads the corpus and never needs a code change when scripts/folders are added (listing is not loading — the tree + graph read only the small index; a body is fetched lazily on drill-in); (2) minimal rows + render-time `calledBy` so the index stays far under the ~30KB read cap (~90 bytes/row ≈ 300 scripts before it's even a question; shard by top-level folder behind a pointer only if some monster solution ever crosses it, still no renderer change); (3) narrative as `#` comments INSIDE the body so the body is 1:1 with the FileMaker dialog and the index stays lean. `calls[]` may reference a custom function as well as a script; the linter resolves each target against `scripts/_index.json` then `functions/_index.json`.
+
+**The one honest limit (Workshop / Breaker Beckett catch):** unlike a `.fmcalc`, a `.fmscript` does NOT paste back into FileMaker verbatim — FileMaker's script-step clipboard is a proprietary XML snippet, not plain text. So a `.fmscript` is a DICTATION reference (you read/type it into *Manage Scripts*), not a round-trippable paste artifact. Legibility was chosen over round-trip deliberately; the standard must never claim script paste-round-trip. Script names are unique per file, so `name` is a safe graph key (calc fields needed `<Table>__<Field>` because they are not).
+
+**Superseded:** the 2026-07-14 markdown script-file format (build-ready header + Current Build / Design Notes / Candidate Upgrades / Related / Changelog as prose sections). That narrative now lives as `#` comments in the `.fmscript`; the machine fields live in `_index.json`. `commitRecord` was converted to the new form as the reference implementation; its old `.md` is a breadcrumb pointer.
+
 ## D-004 · 2026-07-16 · Table markdown carries no calc content at all
 
 **Ruling:** the per-table markdown `Calculations` section is retired entirely — not even a pointer list. Calc fields still appear as rows in the Fields table; their bodies live only in `calculations/`. (Standard v1.3.)
