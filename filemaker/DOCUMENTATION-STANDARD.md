@@ -1,6 +1,6 @@
 # FileMaker Documentation Standard (repo-native)
 
-**Status:** v1.4 · Locked 2026-07-14; calc-inline rule added 2026-07-15; calc-externalize rule replaced it 2026-07-16; **markdown calc sections retired 2026-07-16 (v1.3)**; **scripts + relationships doc model locked 2026-07-16 (v1.4)** · **Source of truth:** this repo.
+**Status:** v1.5 · Locked 2026-07-14; calc-inline rule added 2026-07-15; calc-externalize rule replaced it 2026-07-16; **markdown calc sections retired 2026-07-16 (v1.3)**; **scripts + relationships doc model locked 2026-07-16 (v1.4)**; **object verification & audit trail locked 2026-07-16 (v1.5)** · **Source of truth:** this repo.
 **Supersedes:** the ClickUp "FileMaker Documentation Standards" doc, which becomes a one-line pointer here once the cull runs.
 **Why (decision log):** [`DECISIONS.md`](./DECISIONS.md) records the reasoning + reversals behind these rules.
 
@@ -18,6 +18,8 @@ This **replaces the old "11 fixed documentation pages" model.** Those pages deco
 ## The baseline model (all object types)
 
 Every object type follows one shape: **self-describing metadata JSON is the source of truth, read by a thin, type-specific renderer.** The JSON carries enough type/role/status metadata that a passive viewer draws it with zero app-specific logic. A type that has a **code body which must stay legible** stores that body in its own lean standalone file, referenced by a pointer; everything else lives in the JSON. Markdown never duplicates what the JSON owns. This is the calc model (below), and scripts, relationships, functions, value lists, and layouts each take as much of this ladder as their nature needs.
+
+**Derive, don't store.** A recurring rule across this standard: any signal that can be COMPUTED from the source of truth is computed at read time, never stored as a second copy that can drift. `calledBy` is derived by inverting `calls[]` (D-005); relationship edges live in one surface (D-006); verification state is derived from a tiny anchor (D-007, below). The only things stored are the ones nothing else can produce.
 
 ## Calc bodies live ONLY in standalone files, referenced by pointer (LOCKED 2026-07-16, Michael)
 
@@ -61,17 +63,56 @@ Relationships have **no code body**, so there is no externalized `.fm*` file —
 
 Why: the edge list had been living in three places (schema JSON, README table, folder `_index.json`) — the same triplicate-index drift D-004 killed for calcs. One surface, one home. Full reasoning: [`DECISIONS.md`](./DECISIONS.md) D-006.
 
+## Object verification & audit trail (LOCKED 2026-07-16, Michael — uniform across ALL object types)
+
+An agent must be able to open ANY documented object (table, calc, script, relationship, function, value list, layout) and know, at a glance, **whether what it's reading is current and trustworthy.** The trap to avoid: a pile of hand-maintained version fields that themselves drift — the exact sin D-004/D-006 killed. So verification follows the same **derive-don't-store** discipline as `calledBy`.
+
+### The four signals
+
+1. **Status** — the object's declared state (`locked`/`pending`/`under-review`; for scripts, the audit flag). Human judgment. Already stored on the object; not duplicated.
+2. **Index ↔ body agreement** — does the manifest row match the body file (name/calls in a `.fmscript` header vs its `_index.json` row; return type in a `.fmcalc` header vs the manifest; does `scriptRef`/`calcRef` resolve). **DERIVED** — the renderer already holds both; the linter computes it.
+3. **Blob identity (current)** — the git blob SHA is the object's fingerprint and its de-facto version. "Is the copy I fetched the current one on `main`?" **DERIVED** by comparing the fetched content's SHA to the repo's current blob SHA (the anti-stale rule from the GitHub read-body ladder, surfaced per object). **No version integers, ever — the blob SHA IS the version.**
+4. **Live-file verification** — "has a human/agent confirmed this doc against the ACTUAL FileMaker file?" This is the ONLY signal that cannot be computed from git; someone must assert it. It is therefore the ONLY thing stored.
+
+### What is stored (the whole surface)
+
+Exactly two things, and one already exists:
+
+- **`status`** — already on each object. Unchanged.
+- **A `verified` stamp** — `{ date, sha, by }`, recorded in ONE per-app ledger: **`<app-slug>/meta/verification.json`** (a single findable audit trail, NOT scattered per-manifest fields that bloat every file and force large rewrites). Keyed by object path relative to the app root. **Absence of an entry = unverified**, the safe default, costing zero bytes.
+
+Everything else (signals 2 and 3) is derived at read time. **No per-object version numbers. No stored `calledBy`-style reverse data.**
+
+### The safety property (why the stamp is anchored to a SHA)
+
+The `verified` stamp is **self-invalidating**: it records the exact blob SHA that was confirmed against the live file. The instant the object's file changes, its current blob SHA no longer equals `verified.sha`, so the object auto-flips to "stale / re-verify." This means a **forgotten** stamp update fails **SAFE** (shows yellow: changed-since-verified) rather than **DANGEROUS** (shows green while lying). An audit trail you can forget to update and still trust is worse than none; this one is anchored to content-addressed truth, so it cannot show a false green.
+
+### What the agent sees — one derived badge, three states
+
+- 🟢 **green** — index agrees with body AND `verified.sha` == current blob SHA (confirmed against the live file since the last edit).
+- 🟡 **yellow** — internally consistent but NOT confirmed: no ledger entry, OR edited since `verified.date` (SHA moved), OR the current-SHA check was unavailable. "Trust the structure, re-confirm against FileMaker."
+- 🔴 **red** — index ↔ body mismatch, or `scriptRef`/`calcRef` doesn't resolve. Structurally broken; fix before trusting.
+
+### Enforcement (exact)
+
+- **The linter is authoritative.** It performs the SHA comparison (fetch the object's current blob SHA, compare to `verified.sha`) and the index↔body checks, and emits the verdict. Run it before opening a PR; a red verdict blocks the PR.
+- **The renderer paints the badge** for at-a-glance reading when an agent opens an object. It computes signals 2–3 client-side and reads the ledger for signal 4; any check it can't complete degrades to yellow with a reason, never a false green.
+- **Uniform across every object type** — same four signals, same ledger, same badge, for tables, calcs, scripts, relationships, functions, value lists, layouts.
+- **Rolls up, doesn't duplicate.** Object-level stamps feed the repo-level `VERSIONS.md` "where are we now" view; do not build a parallel version system.
+
+Full reasoning: [`DECISIONS.md`](./DECISIONS.md) D-007.
+
 ## Tooling — the shared viewer (`_viewer/`)
 
-The docs are meant to be **rendered**, not just read as raw markdown. `filemaker/_viewer/` is an app-agnostic viewer that renders any app documented to this standard, driven entirely by that app's `schema/tables.json` + `calculations/`:
+The docs are meant to be **rendered**, not just read as raw markdown. `filemaker/_viewer/` is an app-agnostic viewer that renders any app documented to this standard, driven entirely by that app's data files:
 
 - **`_viewer/schema.html?app=<slug>`** — field tables with key-type color coding + per-calc formula (fetched live from the `.fmcalc` file, FileMaker syntax highlighting, copy-to-clipboard) + a dependency graph from each calc's `reads` hint.
-- **`_viewer/linter.html?app=<slug>`** — validates `calculations/` against the schema (orphan/missing `calcRef`, balanced parens/brackets/quotes, unused `Let` vars, same- and cross-table `reads` resolution, manifest↔schema coverage, header match). Run it before opening a calc PR.
+- **`_viewer/relationships.html?app=<slug>`** — TO-graph + edge table from `schema/relationships.json`; carries the D-007 verification badge for the edge surface.
+- **`_viewer/scripts.html?app=<slug>`** — folder tree + CALLS/CALLED-BY graph from `scripts/_index.json`, lazy-loads one `.fmscript`; carries the D-007 verification badge per script.
+- **`_viewer/linter.html?app=<slug>`** — validates `calculations/` against the schema (orphan/missing `calcRef`, balanced parens/brackets/quotes, unused `Let` vars, same- and cross-table `reads` resolution, manifest↔schema coverage, header match) AND is the authoritative home for the D-007 SHA/verification check. Run it before opening a PR.
 - **`_viewer/index.html`** — launcher; reads `_viewer/apps.json`. **Register a new app by adding one row to `apps.json`** — no viewer code changes. Live: `https://mawizorek.github.io/ClickUp_apps/filemaker/_viewer/?app=<slug>`.
 
 The viewer is live-only (same-origin fetch on Pages); it holds no app data of its own. An app becomes fully viewable the moment its `schema/` + `calculations/` exist and it's registered in `apps.json`.
-
-**Extending the viewer per type (build-session roadmap, not built this pass):** a scripts view (folder tree + CALLS/CALLED-BY graph from `scripts/_index.json`, lazy-loads one `.fmscript`) and a relationships view (TO-graph from `schema/relationships.json`) are near-clones of the calc graph. Both depend on the calc renderer + linter first being promoted from their ClickUp-artifact state into `_viewer/` (see `brain-config/open-thread.md`).
 
 ## Per-app structure
 
@@ -89,7 +130,7 @@ filemaker/<app-slug>/
     imports/  navigation/  utilities/  triggers/   ...one .fmscript per script
   functions/             one file per custom function (+ README, _index.json)
   value-lists/           value lists (+ README)
-  meta/                  narrative docs (design/architecture/data-standards/changelog/graph-log/import-export)
+  meta/                  narrative docs + verification.json (the D-007 object audit ledger)
   notes/                 per-build / session notes, PR-linked
 ```
 
@@ -121,6 +162,10 @@ The single edge surface. Each edge: `from{table,field}` · `to{table,field}` · 
 
 Signature → Purpose → Parameters → Returns → Body (code block, inline) → Related → Changelog. *(Custom-function externalization to `.fmfn` + a manifest — riding the calc model, since functions round-trip like calcs — is proposed but NOT locked this pass; do not treat it as standard until Michael rules.)*
 
+### Verification ledger (`meta/verification.json`)
+
+One per app. Keyed by object path relative to the app root; each entry is `{ verified: { date, sha, by }, note? }`. Absence = unverified (safe default). The ONLY stored verification data; all other audit signals are derived (D-007).
+
 ## Script folders mirror FileMaker
 
 `scripts/` subfolders match the solution's **actual** script-folder names (imports, navigation, utilities, triggers, …). A script's file path equals where it lives in *Manage Scripts*. Do not invent groupings; mirror the file.
@@ -146,7 +191,8 @@ Every object edit = branch → PR → self-merge (per GitHub MCP Operating Stand
 
 ## Changelog
 
-- **2026-07-16 (v1.4):** Locked the **scripts** doc model (`.fmscript` lean bodies with `#`-comment narrative + ONE master flat `scripts/_index.json`; minimal rows `name`/`folder`/`calls`/`scriptRef`; `calledBy` derived at render time; dictation reference, NOT paste-round-trip). Locked the **relationships** model (`schema/relationships.json` = single edge surface; README table + `_index.json` edge duplication retired). Rewrote the Script file format section, added the baseline-model + relationships sections, added the viewer per-type roadmap. Reasoning + reversals: `DECISIONS.md` D-005, D-006.
+- **2026-07-16 (v1.5):** Added the **Object verification & audit trail** section (D-007): the four signals (status · index↔body · blob identity · live-file verify), store-only-`status`-plus-a-self-invalidating-`verified`-stamp, one per-app `meta/verification.json` ledger, derive everything else, the green/yellow/red badge, linter-authoritative enforcement, uniform across all object types, rolls up to `VERSIONS.md`. Added a `meta/verification.json` file format entry + the `derive-don't-store` note to the baseline model. HML_LLC ledger seeded (empty = honest unverified baseline).
+- **2026-07-16 (v1.4):** Locked the **scripts** doc model (`.fmscript` lean bodies with `#`-comment narrative + ONE master flat `scripts/_index.json`; minimal rows; `calledBy` derived; dictation reference, NOT paste-round-trip). Locked the **relationships** model (`schema/relationships.json` = single edge surface; README table + `_index.json` edge duplication retired). Reasoning: `DECISIONS.md` D-005, D-006.
 - **2026-07-16 (v1.3.1):** Added the **Tooling** section — promoted the schema renderer + calc linter into `_viewer/` (app-agnostic, `?app=<slug>`, registered via `apps.json`). Added domain decision log `DECISIONS.md` and cross-linked it. Retired the stale `hml-llc/meta/calculation-fields.md` to a breadcrumb.
 - **2026-07-16 (v1.3):** Retired the table-markdown `Calculations` section entirely (not even a pointer list). `calculations/` + `calcRef` + the manifest + the renderer are the sole calc surface. Stripped the inline blocks from Loans, ExpectedTransactions, GLOBAL_USE_VARIABLES.
 - **2026-07-16 (v1.2):** Calc bodies externalized to `calculations/` (one `.fmcalc` per field, verbatim + round-trippable), referenced by `calcRef` in `schema/tables.json`. Added `calculations/_index.json` manifest with dependency hints. Supersedes the 2026-07-15 inline-calc lock. HML_LLC migrated as the reference implementation.

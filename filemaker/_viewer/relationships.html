@@ -47,6 +47,12 @@
   .main-inner { max-width: 1000px; padding: 32px 48px 48px; }
   .head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
   .head h2 { font-family: var(--mono); font-size: 1.75rem; font-weight: 600; }
+  .vbadge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.6875rem; font-weight: 600; font-family: var(--mono); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-2); white-space: nowrap; }
+  .vbadge .vdot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); }
+  .vbadge.green { color: var(--ok); border-color: color-mix(in oklch, var(--ok), transparent 60%); } .vbadge.green .vdot { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .vbadge.yellow { color: var(--warn); border-color: color-mix(in oklch, var(--warn), transparent 60%); } .vbadge.yellow .vdot { background: var(--warn); }
+  .vbadge.red { color: var(--danger); border-color: color-mix(in oklch, var(--danger), transparent 55%); } .vbadge.red .vdot { background: var(--danger); }
+  .vdetail { font-size: 0.6875rem; color: var(--text-3); margin: 0 0 20px; font-family: var(--mono); }
   .desc { color: var(--text-2); font-size: 0.9375rem; max-width: 72ch; margin-bottom: 24px; text-wrap: pretty; }
   .section-label { display: flex; align-items: center; gap: 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); font-weight: 600; margin: 28px 0 12px; }
   .section-label .n { font-variant-numeric: tabular-nums; color: var(--text-3); font-weight: 400; }
@@ -100,21 +106,39 @@ const params = new URLSearchParams(location.search);
 const APP = params.get('app');
 if (!APP){ document.body.innerHTML = '<div class="fatal">No app specified. Use <code>?app=&lt;slug&gt;</code> or go back to <a href="index.html">the launcher</a>.</div>'; throw new Error('no app'); }
 const BASE = '../' + APP + '/';
+const REPO = 'mawizorek/ClickUp_apps';
+const REL_PATH = 'schema/relationships.json';
 document.getElementById('appName').textContent = APP;
-document.getElementById('srcPath').textContent = APP + '/schema/relationships.json';
+document.getElementById('srcPath').textContent = APP + '/' + REL_PATH;
 
 const STATUS_COLOR = { 'locked':'var(--ok)', 'pending':'var(--warn)', 'under-review':'var(--info)' };
-let DATA = null, tab = 'graph', tableFilter = null;
+let DATA = null, LEDGER = null, tab = 'graph', tableFilter = null;
 const nav = document.getElementById('nav'), doc = document.getElementById('doc');
 function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 function statusColor(s){ return STATUS_COLOR[s] || 'var(--text-3)'; }
 async function tryFetch(path){ try{ const r=await fetch(BASE+path,{cache:'no-store'}); if(!r.ok)throw 0; return await r.text(); }catch(e){ return null; } }
 
+// --- D-007 verification (derive-don't-store; self-invalidating) ---
+async function loadLedger(){ const t=await tryFetch('meta/verification.json'); if(t){ try{ LEDGER=JSON.parse(t); }catch(e){ LEDGER=null; } } }
+function ledgerEntry(p){ if(!LEDGER||!LEDGER.objects)return null; return LEDGER.objects[p]||null; }
+async function currentSha(p){ try{ const r=await fetch(`https://api.github.com/repos/${REPO}/contents/filemaker/${APP}/${p}?ref=main`,{cache:'no-store'}); if(!r.ok)return null; const j=await r.json(); return j.sha||null; }catch(e){ return null; } }
+async function verifyState(objectPath, internalOk, internalMsg){
+  if(!internalOk) return {level:'red', label:'inconsistent', detail:internalMsg||'edge endpoints do not resolve'};
+  const e=ledgerEntry(objectPath);
+  if(!e||!e.verified) return {level:'yellow', label:'unverified', detail:'never confirmed against the live FileMaker file'};
+  const cur=await currentSha(objectPath);
+  if(cur && e.verified.sha && cur!==e.verified.sha) return {level:'yellow', label:'stale', detail:`edited since last verified (${e.verified.date}) — re-confirm against the live file`};
+  if(!cur) return {level:'yellow', label:'verified*', detail:`verified ${e.verified.date}; live SHA check unavailable — run the linter`};
+  return {level:'green', label:'verified', detail:`confirmed against the live file ${e.verified.date}${e.verified.by?' · '+e.verified.by:''}`};
+}
+function badgeHtml(st){ return `<span class="vbadge ${st.level}" title="${esc(st.detail)}"><span class="vdot"></span>${esc(st.label)}</span>`; }
+
 async function boot(){
-  const s = await tryFetch('schema/relationships.json');
+  const s = await tryFetch(REL_PATH);
   const st=document.getElementById('srcStatus'), stt=document.getElementById('srcStatusText');
-  if(!s){ st.className='status err'; stt.textContent='relationships not found'; doc.innerHTML=`<div class="fatal">Could not load <code>${APP}/schema/relationships.json</code>. Check the slug and that the app follows the standard.</div>`; return; }
+  if(!s){ st.className='status err'; stt.textContent='relationships not found'; doc.innerHTML=`<div class="fatal">Could not load <code>${APP}/${REL_PATH}</code>. Check the slug and that the app follows the standard.</div>`; return; }
   try{ DATA=JSON.parse(s); }catch(e){ st.className='status err'; stt.textContent='parse error'; return; }
+  await loadLedger();
   st.className='status live'; stt.textContent='live · v'+((DATA._meta&&DATA._meta.schemaVersion)||'?');
   buildNav(); render();
 }
@@ -136,6 +160,22 @@ function buildNav(filter=''){
 
 function currentEdges(){ return tableFilter===null ? (DATA.relationships||[]) : edgesFor(tableFilter); }
 
+// D-007: internal consistency of the edge surface — every edge has both endpoints (table+field) + valid enums.
+function edgeSurfaceOk(){
+  const cards=new Set(['one-to-one','one-to-many','many-to-one','many-to-many']);
+  const stats=new Set(['locked','pending','under-review']);
+  for(const e of (DATA.relationships||[])){
+    if(!e.from||!e.from.table||!e.from.field||!e.to||!e.to.table||!e.to.field) return {ok:false,msg:'an edge is missing a table/field endpoint'};
+    if(e.cardinality && !cards.has(e.cardinality)) return {ok:false,msg:`invalid cardinality "${e.cardinality}"`};
+    if(e.status && !stats.has(e.status)) return {ok:false,msg:`invalid status "${e.status}"`};
+  }
+  return {ok:true,msg:''};
+}
+function paintBadge(){
+  const chk=edgeSurfaceOk();
+  verifyState(REL_PATH, chk.ok, chk.msg).then(st=>{ const b=document.getElementById('vbadge'), d=document.getElementById('vdetail'); if(b)b.innerHTML=badgeHtml(st); if(d)d.textContent=st.detail; });
+}
+
 function renderEdges(){
   const edges=currentEdges();
   const rows=edges.map(e=>`<tr>
@@ -145,18 +185,21 @@ function renderEdges(){
     <td class="card">${esc(e.cardinality||'')}</td>
     <td><span class="badge s-${esc(e.status||'')}">${esc(e.status||'')}</span></td>
     <td class="enote">${esc(e.notes||'')}</td></tr>`).join('');
-  doc.innerHTML=`<div class="head"><h2>${tableFilter===null?'All edges':esc(tableFilter)}</h2></div>
+  doc.innerHTML=`<div class="head"><h2>${tableFilter===null?'All edges':esc(tableFilter)}</h2><span id="vbadge"></span></div>
+    <div class="vdetail" id="vdetail"></div>
     <p class="desc">${esc((DATA._meta&&DATA._meta.description)||'The foreign-key graph. Each edge points from a child field to the parent PrimaryKey it references.')}</p>
     <div class="section-label">Edges <span class="n">${edges.length}</span></div>
     <table class="edges"><thead><tr><th>From</th><th></th><th>To</th><th>Cardinality</th><th>Status</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`;
-  doc.scrollTop=0;
+  doc.scrollTop=0; paintBadge();
 }
 
 function renderGraph(){
-  doc.innerHTML=`<div class="head"><h2>${tableFilter===null?'Relationship graph':esc(tableFilter)}</h2></div>
+  doc.innerHTML=`<div class="head"><h2>${tableFilter===null?'Relationship graph':esc(tableFilter)}</h2><span id="vbadge"></span></div>
+    <div class="vdetail" id="vdetail"></div>
     <p class="graph-note">Table-occurrence graph. Edges point <code>child.field → parent.PrimaryKey</code>; label = cardinality, color = status. Drag nodes to untangle. Pick a table on the left to isolate its edges.</p>
     <div class="g-legend"><span class="li"><span class="sw" style="background:var(--ok)"></span>locked</span><span class="li"><span class="sw" style="background:var(--warn)"></span>pending</span><span class="li"><span class="sw" style="background:var(--info)"></span>under-review</span></div>
     <svg id="graph"></svg>`;
+  paintBadge();
   const edges=currentEdges();
   if(!edges.length){ doc.querySelector('#graph').outerHTML='<p class="empty">No edges to graph.</p>'; return; }
   if(typeof d3==='undefined'){ doc.querySelector('#graph').outerHTML='<p class="empty">Graph library unavailable offline.</p>'; return; }

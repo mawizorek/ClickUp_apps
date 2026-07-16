@@ -4,6 +4,22 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
+## FileMaker object verification & audit trail (D-007) — SHIPPED this session (2026-07-16)
+**Added:** 2026-07-16
+
+Every documented object (table, calc, script, relationship, function, value list, layout) now has a uniform verification model so an agent can open it and know at a glance whether it's current + trustworthy. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` v1.5 → 'Object verification & audit trail' + `DECISIONS.md` D-007 first.**
+
+**The locked model:** four signals — status · index↔body agreement · blob identity (current) · live-file verification. **Derive-don't-store:** the ONLY stored data is `status` (already on each object) + a self-invalidating `verified:{date,sha,by}` stamp in ONE per-app ledger `<app>/meta/verification.json`. No version numbers (the blob SHA IS the version), no stored derived signals. Absence of a ledger entry = unverified (safe default, zero bytes). The stamp is anchored to a blob SHA so a content change auto-flips it to yellow — a forgotten update fails SAFE, never a false green. Badge: 🟢 consistent + verified.sha==current, 🟡 unverified/stale/SHA-check-unavailable, 🔴 index↔body mismatch or ref unresolved. Rolls up to `VERSIONS.md`.
+
+**Shipped (PR on branch `filemaker-verification-audit-d007`):** standard → v1.5; DECISIONS D-007; `filemaker/hml-llc/meta/verification.json` ledger created (empty `objects` = honest unverified baseline, nothing has been confirmed against the live FMP file yet); badge wired into `scripts.html` + `relationships.html` (reads ledger, computes index↔body + ref-resolve client-side, fetches current blob SHA via the public GitHub contents API, degrades safe); viewer README documents it.
+
+**STILL OPEN:**
+- **(a) Add the same badge to `schema.html`** (calc/table lens) on the next pass — left off this pass to avoid a high-risk rewrite of the 23KB mature renderer.
+- **(b) Fold the AUTHORITATIVE SHA/verification check into `linter.html`** so a red verdict blocks a PR (the renderer badge is the glance; the linter is enforcement). Ties to the calc-linter promotion below.
+- **(c) First real verification pass:** once the live FMP file is available, confirm objects against it and write real `verified` entries into `meta/verification.json` (today everything is honestly yellow/unverified). Naturally pairs with open item (e) on the calc entry (live-file name confirmation) + the scripts migration.
+
+---
+
 ## ➡️ NEXT SESSION: Migrate HML script docs from ClickUp into the Git .fmscript model
 **Added:** 2026-07-16
 
@@ -15,28 +31,30 @@ The scripts doc MODEL is locked (v1.4) and the renderer is live, but the Git sid
 - **Convert per script:** a `.fmscript` body (`#`-comment narrative + dictation step text) + a minimal row in the master `scripts/_index.json`. Mirror `commitRecord`.
 - **⚠️ Two traps (in the handoff):** (1) folder-name mismatch — Git skeleton has `imports/navigation/triggers/utilities`, but the REAL FileMaker tree is numbered (`00_APP`…`90_ADMIN`, `zz_DEV_ARCHIVE`); reconcile to the numbered set FIRST, with Michael. (2) The 2026-06-18 audit marks several script pages stale (property-centered / pre-Payoffs-table) — 5 red "needs rewrite," 2 yellow; migrate faithfully but stamp each file's CHANGELOG with its audit status, don't launder old logic clean. Confirm with Michael whether red-status scripts migrate as-is-with-warning or wait.
 - **Also:** pseudo-code pages migrate as dictation refs (mark them, live file is tiebreaker); narrative pages (`HML Scripting Practices`, `Script Organization Review`) → `meta/`, not `.fmscript`.
+- **When populating, set verification honestly (D-007):** migrated-from-ClickUp ≠ verified-against-live-file. Leave objects unverified (no ledger entry) unless actually confirmed against the FMP file.
 
 ---
 
 ## FileMaker scripts + relationships doc model — DESIGN LOCKED + skeleton + renderers shipped (2026-07-16)
 **Added:** 2026-07-16
 
-Design session for the next two object types after calcs. Model decided, Workshop-vetted, skeleton committed, and both baseline renderers built. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` (v1.4) + `filemaker/DECISIONS.md` D-005/D-006 first.**
+Design session for the next two object types after calcs. Model decided, Workshop-vetted, skeleton committed, and both baseline renderers built. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` (v1.5) + `filemaker/DECISIONS.md` D-005/D-006 first.**
 
-**The locked model (v1.4):**
+**The locked model:**
 - **Scripts ride the calc model.** Body = lean `scripts/<folder>/<ScriptName>.fmscript` (steps to dictate into Manage Scripts, narrative as native `#` comment lines). ONE master `scripts/_index.json` (flat `scripts[]`, minimal rows: `name`/`folder`/`calls`/`scriptRef`). Renderer builds the tree from `folder` + CALLS/CALLED-BY graph from `calls[]`; **`calledBy` derived at render time, never stored**. No sidecars, no per-folder indexes. Listing ≠ loading: a body is lazy-loaded on drill-in.
 - **The one honest limit:** a `.fmscript` is a DICTATION reference, NOT paste-round-trippable — FileMaker's script clipboard is XML, not plain text (unlike `.fmcalc`). Never claim script paste-round-trip.
 - **Relationships are pure data.** `schema/relationships.json` = the SINGLE edge surface. README edge table retired; `relationships/_index.json` slimmed to render hints.
 
-**Shipped this session:**
-- **PR #270** — standard → v1.4; DECISIONS D-005 + D-006; `scripts/_index.json` reshaped to flat master manifest; `commitRecord.fmscript` added as canonical reference (old `.md` → breadcrumb); script + relationship READMEs rewritten; relationships README edge table retired; `relationships/_index.json` slimmed.
-- **PR #272** — built both baseline renderers into `filemaker/_viewer/`: `relationships.html` (TO-graph + edge table, reads `schema/relationships.json`) and `scripts.html` (folder tree + call graph, lazy-loads one `.fmscript`, derives `calledBy`). Launcher lists all four lenses. Live + verified serving on Pages. App-agnostic: `?app=<slug>` points at any app following the standard.
+**Shipped:**
+- **PR #270** — standard → v1.4; DECISIONS D-005 + D-006; `scripts/_index.json` reshaped to flat master manifest; `commitRecord.fmscript` added as canonical reference (old `.md` → breadcrumb); READMEs rewritten; relationships README edge table retired; `relationships/_index.json` slimmed.
+- **PR #272** — built both baseline renderers into `filemaker/_viewer/`: `relationships.html` + `scripts.html`. Launcher lists all four lenses. Live + verified serving. App-agnostic via `?app=<slug>`.
+- **D-007 badge** later wired into both (see the verification entry above).
 
 **STILL OPEN:**
-- **(a) Populate the real script inventory** — see the migration handoff entry above (this is the immediate next step; scripts lens shows only `commitRecord` until done).
-- **(b) Renderers are baseline v1** — left clean for a follow-up agent: add a script linter (every `calls[]` target resolves against `scripts/_index.json` then `functions/_index.json`; `folder` matches path; `name` unique; `scriptRef` exists), richer graph layout/zoom, cross-lens deep-links. Relationships linter: endpoints resolve in `schema/tables.json`, `to.field` is a PK, cardinality/status enums.
-- **(c) PREREQ still open:** the calc renderer + linter still live as ClickUp artifacts, not yet promoted into `_viewer/`. The scripts + relationships lenses shipped standalone but the full viewer convergence (shared shell / `z-fm-layout-object-viewer`) still wants that promotion.
-- **(d) Custom functions + value lists + layouts NOT designed this pass (Scope Skye held the line).** Functions likely ride the CALC model (round-trip like calcs → `.fmfn` + a manifest) — proposed, noted in the standard's Function-file section as NOT locked. Value lists = thin JSON + README (no ladder). Layouts = `layout.json` object/part inventory as the cross-index join, needs a DDR pass. Per `filemaker/HANDOFF-object-doc-schemas.md`.
+- **(a) Populate the real script inventory** — see the migration handoff entry above (immediate next step; scripts lens shows only `commitRecord` until done).
+- **(b) Renderers are baseline v1** — follow-up: script linter (every `calls[]` target resolves against `scripts/_index.json` then `functions/_index.json`; `folder` matches path; `name` unique; `scriptRef` exists), the authoritative D-007 SHA check folded into `linter.html`, richer graph layout/zoom, cross-lens deep-links, `schema.html` badge. Relationships linter: endpoints resolve in `schema/tables.json`, `to.field` is a PK, cardinality/status enums.
+- **(c) PREREQ still open:** the calc renderer + linter still live as ClickUp artifacts, not yet promoted into `_viewer/`. Full viewer convergence (shared shell / `z-fm-layout-object-viewer`) still wants that promotion.
+- **(d) Custom functions + value lists + layouts NOT designed this pass.** Functions likely ride the CALC model (`.fmfn` + a manifest) — proposed, noted in the standard's Function-file section as NOT locked. Value lists = thin JSON + README. Layouts = `layout.json` object/part inventory as the cross-index join, needs a DDR pass. Per `filemaker/HANDOFF-object-doc-schemas.md`.
 
 ---
 
@@ -68,24 +86,24 @@ Established a GLOBAL, token-driven theme system shared by ClickUp HTML apps AND 
 ## FileMaker calc externalization (HML_LLC) — SHIPPED this session (2026-07-16), follow-ups open
 **Added:** 2026-07-16
 
-Big structural change to how FileMaker calc fields are documented. Reversed a locked rule with Michael's explicit go. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` (now v1.3) first — it is the source of truth for the model below.**
+Big structural change to how FileMaker calc fields are documented. Reversed a locked rule with Michael's explicit go. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` first — it is the source of truth for the model below.**
 
 **What changed (all merged to main):**
 - **PR #260** — Externalized every calc formula body to `filemaker/hml-llc/calculations/`, one `.fmcalc` file per calc field (19 files: 11 Loans, 4 ExpectedTransactions, 4 GLOBAL_USE_VARIABLES). Each file = 2 `//` header lines + blank + verbatim FileMaker formula, round-trippable (paste straight into the calc dialog). `schema/tables.json` bumped to v1.2: each calc field carries `calcRef` + `returns` + `stored`, formula bodies removed. Added `calculations/_index.json` manifest (owning table, return, stored, purpose, `reads` dependency hints). GLOBAL calc names reconciled to canonical camelCase.
-- **PR #261** — Retired the inline `Calculations` sections from the three table markdown files. NO pointer list retained (Michael: markdown is fully replaced, a pointer list is just a second index to drift). Calc fields still appear as ROWS in each Fields table; each file keeps one prose line pointing at `../calculations/`. Standard bumped to v1.3.
+- **PR #261** — Retired the inline `Calculations` sections from the three table markdown files. NO pointer list retained. Calc fields still appear as ROWS in each Fields table; each file keeps one prose line pointing at `../calculations/`. Standard bumped to v1.3.
 
-**The locked model now (v1.3):** formula body lives ONLY in `calculations/*.fmcalc`; structural metadata in `schema/tables.json`; dependency hints in `calculations/_index.json`; presentation via the renderer. Table markdown carries zero calc bodies. One definition, one home.
+**The locked model:** formula body lives ONLY in `calculations/*.fmcalc`; structural metadata in `schema/tables.json`; dependency hints in `calculations/_index.json`; presentation via the renderer. Table markdown carries zero calc bodies. One definition, one home.
 
 **Rendering/tooling artifacts (ClickUp run.clickup.ai artifacts, NOT in repo yet):**
 - Schema Renderer v2 — reads live schema + fetches `.fmcalc` bodies, FileMaker syntax highlighting, copy-to-clipboard, `reads` dependency graph (D3). 
 - Calc Linter — validates calculations/ against the schema (orphan/missing calcRef, balanced parens/brackets/quotes, unused Let vars, same-table + cross-table `reads` resolution, manifest↔schema coverage, header match). Built with an embedded offline snapshot fallback so it runs even if the raw fetch is cache-lagged.
 
 **STILL OPEN (next agent picks up here):**
-- **(a) Promote the renderer + linter into the repo.** They live as ClickUp artifacts right now. Per the locked standard they should become the shared `filemaker/_viewer/` (app-agnostic, param-driven by app slug) so every FMP app gets docs the moment its JSON exists. Modular shell + source/, not a monolith. **(This is the prereq for full viewer convergence; the scripts + relationships lenses already shipped standalone.)**
+- **(a) Promote the renderer + linter into the repo.** They live as ClickUp artifacts right now. Per the locked standard they should become the shared `filemaker/_viewer/` (app-agnostic, param-driven by app slug). Modular shell + source/, not a monolith. **(This is the prereq for full viewer convergence AND for folding the authoritative D-007 SHA check into `linter.html`.)**
 - **(b) The `reads` dependency hints are HAND-AUTHORED** in `_index.json`. The linter validates them but does not GENERATE them. Consider a real parser that derives `reads` from each formula so the hint can't drift from the body. Until then, treat `reads` as advisory.
 - **(c) Fold the calc linter into the Schema Linter tool** (AI Toolkit) rather than a standalone artifact, so it fires on the normal FileMaker doc-edit path.
 - **(d) Markdown generation.** Table markdown Fields tables are still hand-maintained and duplicate `schema/tables.json`. The endgame (discussed, not started) is to GENERATE the markdown from the JSON so there's nothing to keep in sync. Separate pass.
-- **(e) Live-file name confirmation (pre-existing, still open):** schema names `OriginalPrincipal`/`InterestRateAnnual`/`ClosingDate`/`GraceDays`/`fkCurrentPayoff` are reconciled in docs but NOT yet confirmed against the live FMP file. File is the tiebreaker if they differ.
+- **(e) Live-file name confirmation (pre-existing, still open):** schema names `OriginalPrincipal`/`InterestRateAnnual`/`ClosingDate`/`GraceDays`/`fkCurrentPayoff` are reconciled in docs but NOT yet confirmed against the live FMP file. File is the tiebreaker if they differ. **(This is exactly the D-007 live-file verification pass — when done, write real `verified` entries into `meta/verification.json`.)**
 - **(f) Apply the model to the other FMP app** (`filemaker/maw-budget`) once the viewer is promoted. HML_LLC is the reference implementation.
 
 **Convention reference (for a cold pickup):** filename `<Table>__<FieldName>.fmcalc` (double-underscore namespace sep, kills cross-table collisions since calc names aren't globally unique). Ext `.fmcalc` = plain text.
