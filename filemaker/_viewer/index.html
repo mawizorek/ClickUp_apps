@@ -24,7 +24,7 @@
   .app:hover { border-color: var(--line); }
   .app h2 { font-family: var(--mono); font-size: 1.125rem; font-weight: 600; color: var(--text-0); letter-spacing: 0; }
   .app p { color: var(--text-2); font-size: 0.8125rem; margin-top: 4px; max-width: 60ch; text-wrap: pretty; }
-  .lenses { display: flex; gap: 10px; margin-top: 16px; }
+  .lenses { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
   .lens { text-decoration: none; font-size: 0.8125rem; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: all 0.12s var(--ease); }
   .lens.primary { background: var(--accent); color: var(--bg-0); }
   .lens.primary:hover { filter: brightness(1.08); }
@@ -39,7 +39,7 @@
 <div class="wrap">
   <div class="kicker">Repo-native docs</div>
   <h1>FileMaker Doc Viewer</h1>
-  <div class="sub">Renders any app under <code style="font-family:var(--mono)">filemaker/&lt;slug&gt;/</code> from its schema + calc files.</div>
+  <div class="sub">Renders any app under <code style="font-family:var(--mono)">filemaker/&lt;slug&gt;/</code> from its schema, calcs, scripts + relationships.</div>
   <div class="apps" id="apps"><div class="loading">loading registry…</div></div>
   <footer>Add an app to <code>apps.json</code> to register it. Deep link: <code>?app=&lt;slug&gt;</code> forwards to the schema view.</footer>
 </div>
@@ -51,15 +51,19 @@
   fetch('apps.json', { cache: 'no-store' }).then(r => r.json()).then(data => {
     const el = document.getElementById('apps');
     if (!data.apps || !data.apps.length){ el.innerHTML = '<div class="empty">No apps registered yet.</div>'; return; }
-    el.innerHTML = data.apps.map(a => `
+    el.innerHTML = data.apps.map(a => {
+      const slug = encodeURIComponent(a.slug);
+      return `
       <div class="app">
         <h2>${a.name || a.slug}</h2>
         <p>${a.desc || ''}</p>
         <div class="lenses">
-          <a class="lens primary" href="schema.html?app=${encodeURIComponent(a.slug)}">Schema + calcs</a>
-          <a class="lens ghost" href="linter.html?app=${encodeURIComponent(a.slug)}">Calc linter</a>
+          <a class="lens primary" href="schema.html?app=${slug}">Schema + calcs</a>
+          <a class="lens ghost" href="relationships.html?app=${slug}">Relationships</a>
+          <a class="lens ghost" href="scripts.html?app=${slug}">Scripts</a>
+          <a class="lens ghost" href="linter.html?app=${slug}">Calc linter</a>
         </div>
-      </div>`).join('');
+      </div>`; }).join('');
   }).catch(() => {
     document.getElementById('apps').innerHTML = '<div class="empty">Could not load apps.json.</div>';
   });

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relationships Renderer</title>
+<style>
+  :root {
+    --bg-0: oklch(16% 0.012 285); --bg-1: oklch(19% 0.014 285); --bg-2: oklch(23% 0.016 285); --bg-3: oklch(27% 0.018 285); --bg-code: oklch(14% 0.014 285);
+    --line: oklch(32% 0.02 285); --line-soft: oklch(27% 0.016 285);
+    --text-0: oklch(94% 0.008 285); --text-1: oklch(78% 0.012 285); --text-2: oklch(63% 0.014 285); --text-3: oklch(52% 0.014 285);
+    --accent: oklch(72% 0.14 285);
+    --ok: oklch(72% 0.14 155); --warn: oklch(76% 0.14 75); --danger: oklch(68% 0.16 25); --info: oklch(72% 0.13 230);
+    --mono: ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace; --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; --ease: cubic-bezier(0.22,1,0.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg-0); color: var(--text-1); font-weight: 350; line-height: 1.55; letter-spacing: 0.01em; -webkit-font-smoothing: antialiased; display: grid; grid-template-columns: 300px 1fr; grid-template-rows: 100vh; overflow: hidden; }
+  h1,h2 { text-wrap: balance; color: var(--text-0); letter-spacing: 0; }
+  a { color: var(--accent); }
+  .sidebar { background: var(--bg-1); border-right: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
+  .brand { padding: 24px 24px 16px; border-bottom: 1px solid var(--line-soft); }
+  .brand .back { font-size: 0.6875rem; color: var(--text-3); text-decoration: none; }
+  .brand .kicker { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); font-weight: 600; margin-top: 8px; }
+  .brand h1 { font-size: 1.0625rem; font-weight: 600; margin-top: 6px; font-family: var(--mono); }
+  .brand .status { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.6875rem; font-family: var(--mono); }
+  .brand .status .led { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+  .brand .status.live .led { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .brand .status.err .led { background: var(--danger); }
+  .filter { padding: 12px 16px; border-bottom: 1px solid var(--line-soft); }
+  .filter input { width: 100%; background: var(--bg-0); border: 1px solid var(--line); color: var(--text-0); font-family: var(--sans); font-size: 0.8125rem; padding: 8px 12px; border-radius: 6px; }
+  .filter input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px oklch(72% 0.14 285 / 0.18); }
+  .nav { overflow-y: auto; padding: 12px 8px 32px; flex: 1; }
+  .nav-group-label { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); padding: 16px 12px 8px; font-weight: 600; }
+  .nav-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: none; color: var(--text-1); font-family: var(--sans); font-size: 0.8125rem; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.12s var(--ease); }
+  .nav-item:hover { background: var(--bg-2); color: var(--text-0); }
+  .nav-item.active { background: var(--bg-3); color: var(--text-0); }
+  .nav-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .nav-item .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--mono); font-size: 0.75rem; }
+  .nav-item .ct { font-variant-numeric: tabular-nums; font-size: 0.6875rem; color: var(--text-3); }
+  .main { overflow-y: auto; }
+  .topbar { position: sticky; top: 0; z-index: 5; background: oklch(16% 0.012 285 / 0.86); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line-soft); padding: 12px 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .src { font-family: var(--mono); font-size: 0.6875rem; color: var(--text-3); }
+  .src b { color: var(--text-1); font-weight: 500; }
+  .tabs { display: flex; gap: 4px; background: var(--bg-2); padding: 3px; border-radius: 8px; }
+  .tabs button { background: none; border: none; color: var(--text-2); font-family: var(--sans); font-size: 0.75rem; font-weight: 500; padding: 5px 12px; border-radius: 6px; cursor: pointer; }
+  .tabs button.active { background: var(--bg-0); color: var(--text-0); }
+  .main-inner { max-width: 1000px; padding: 32px 48px 48px; }
+  .head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .head h2 { font-family: var(--mono); font-size: 1.75rem; font-weight: 600; }
+  .desc { color: var(--text-2); font-size: 0.9375rem; max-width: 72ch; margin-bottom: 24px; text-wrap: pretty; }
+  .section-label { display: flex; align-items: center; gap: 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); font-weight: 600; margin: 28px 0 12px; }
+  .section-label .n { font-variant-numeric: tabular-nums; color: var(--text-3); font-weight: 400; }
+  table.edges { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+  table.edges th { text-align: left; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-3); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  table.edges td { padding: 11px 12px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  table.edges tr:hover td { background: var(--bg-1); }
+  .ep { font-family: var(--mono); font-size: 0.78rem; }
+  .ep .tbl { color: var(--text-0); } .ep .fld { color: var(--info); }
+  .arrow { color: var(--text-3); font-family: var(--mono); }
+  .card { font-family: var(--mono); font-size: 0.7rem; color: var(--text-2); white-space: nowrap; }
+  .enote { color: var(--text-3); font-size: 0.75rem; max-width: 40ch; text-wrap: pretty; }
+  .badge { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; border: 1px solid var(--line); }
+  .s-locked { color: var(--ok); border-color: color-mix(in oklch, var(--ok), transparent 65%); }
+  .s-pending { color: var(--warn); border-color: color-mix(in oklch, var(--warn), transparent 65%); }
+  .s-under-review { color: var(--info); border-color: color-mix(in oklch, var(--info), transparent 60%); }
+  #graph { width: 100%; height: 660px; border: 1px solid var(--line-soft); border-radius: 12px; background: var(--bg-code); }
+  .graph-note { color: var(--text-3); font-size: 0.8125rem; margin-bottom: 16px; max-width: 72ch; }
+  .graph-note code { font-family: var(--mono); background: var(--bg-2); padding: 1px 6px; border-radius: 4px; }
+  .g-node-label { font-family: var(--mono); font-size: 10px; fill: var(--text-1); pointer-events: none; }
+  .g-edge-label { font-family: var(--mono); font-size: 8.5px; fill: var(--text-3); pointer-events: none; }
+  .g-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .g-legend .li { display: flex; align-items: center; gap: 6px; font-size: 0.6875rem; color: var(--text-2); }
+  .g-legend .sw { width: 12px; height: 3px; border-radius: 2px; }
+  .empty { color: var(--text-3); font-size: 0.875rem; padding: 24px 0; }
+  .fatal { padding: 48px; color: var(--text-2); }
+  .fatal code { font-family: var(--mono); background: var(--bg-2); padding: 1px 6px; border-radius: 4px; color: var(--text-0); }
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <a class="back" href="index.html">← all apps</a>
+      <div class="kicker">Relationships</div>
+      <h1 id="appName">…</h1>
+      <div class="status" id="srcStatus"><span class="led"></span><span id="srcStatusText">connecting…</span></div>
+    </div>
+    <div class="filter"><input type="text" id="filter" placeholder="Filter tables…" autocomplete="off" spellcheck="false"></div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="src">source · <b id="srcPath">…</b></div>
+      <div class="tabs"><button data-tab="graph" class="active">Graph</button><button data-tab="edges">Edge table</button></div>
+    </div>
+    <div class="main-inner" id="doc"></div>
+  </main>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const APP = params.get('app');
+if (!APP){ document.body.innerHTML = '<div class="fatal">No app specified. Use <code>?app=&lt;slug&gt;</code> or go back to <a href="index.html">the launcher</a>.</div>'; throw new Error('no app'); }
+const BASE = '../' + APP + '/';
+document.getElementById('appName').textContent = APP;
+document.getElementById('srcPath').textContent = APP + '/schema/relationships.json';
+
+const STATUS_COLOR = { 'locked':'var(--ok)', 'pending':'var(--warn)', 'under-review':'var(--info)' };
+let DATA = null, tab = 'graph', tableFilter = null;
+const nav = document.getElementById('nav'), doc = document.getElementById('doc');
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function statusColor(s){ return STATUS_COLOR[s] || 'var(--text-3)'; }
+async function tryFetch(path){ try{ const r=await fetch(BASE+path,{cache:'no-store'}); if(!r.ok)throw 0; return await r.text(); }catch(e){ return null; } }
+
+async function boot(){
+  const s = await tryFetch('schema/relationships.json');
+  const st=document.getElementById('srcStatus'), stt=document.getElementById('srcStatusText');
+  if(!s){ st.className='status err'; stt.textContent='relationships not found'; doc.innerHTML=`<div class="fatal">Could not load <code>${APP}/schema/relationships.json</code>. Check the slug and that the app follows the standard.</div>`; return; }
+  try{ DATA=JSON.parse(s); }catch(e){ st.className='status err'; stt.textContent='parse error'; return; }
+  st.className='status live'; stt.textContent='live · v'+((DATA._meta&&DATA._meta.schemaVersion)||'?');
+  buildNav(); render();
+}
+
+function tables(){ const set=new Set(); (DATA.relationships||[]).forEach(e=>{ set.add(e.from.table); set.add(e.to.table); }); return [...set].sort(); }
+function edgesFor(t){ return (DATA.relationships||[]).filter(e=>e.from.table===t||e.to.table===t); }
+
+function buildNav(filter=''){
+  nav.innerHTML=''; const f=filter.trim().toLowerCase(); const all=tables().filter(t=>!f||t.toLowerCase().includes(f));
+  const lbl=document.createElement('div'); lbl.className='nav-group-label'; lbl.textContent='Tables · '+all.length; nav.appendChild(lbl);
+  const allBtn=document.createElement('button'); allBtn.className='nav-item'+(tableFilter===null?' active':'');
+  allBtn.innerHTML=`<span class="dot" style="background:var(--accent)"></span><span class="nm">∗ all edges</span><span class="ct">${(DATA.relationships||[]).length}</span>`;
+  allBtn.onclick=()=>{ tableFilter=null; render(); buildNav(document.getElementById('filter').value); }; nav.appendChild(allBtn);
+  all.forEach(t=>{ const btn=document.createElement('button'); btn.className='nav-item'+(t===tableFilter?' active':'');
+    btn.innerHTML=`<span class="dot" style="background:var(--info)"></span><span class="nm">${esc(t)}</span><span class="ct">${edgesFor(t).length}</span>`;
+    btn.onclick=()=>{ tableFilter=t; render(); buildNav(document.getElementById('filter').value); }; nav.appendChild(btn); });
+  if(!all.length)nav.innerHTML='<div class="nav-group-label">No matches</div>';
+}
+
+function currentEdges(){ return tableFilter===null ? (DATA.relationships||[]) : edgesFor(tableFilter); }
+
+function renderEdges(){
+  const edges=currentEdges();
+  const rows=edges.map(e=>`<tr>
+    <td class="ep"><span class="tbl">${esc(e.from.table)}</span>.<span class="fld">${esc(e.from.field)}</span></td>
+    <td class="arrow">→</td>
+    <td class="ep"><span class="tbl">${esc(e.to.table)}</span>.<span class="fld">${esc(e.to.field)}</span></td>
+    <td class="card">${esc(e.cardinality||'')}</td>
+    <td><span class="badge s-${esc(e.status||'')}">${esc(e.status||'')}</span></td>
+    <td class="enote">${esc(e.notes||'')}</td></tr>`).join('');
+  doc.innerHTML=`<div class="head"><h2>${tableFilter===null?'All edges':esc(tableFilter)}</h2></div>
+    <p class="desc">${esc((DATA._meta&&DATA._meta.description)||'The foreign-key graph. Each edge points from a child field to the parent PrimaryKey it references.')}</p>
+    <div class="section-label">Edges <span class="n">${edges.length}</span></div>
+    <table class="edges"><thead><tr><th>From</th><th></th><th>To</th><th>Cardinality</th><th>Status</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`;
+  doc.scrollTop=0;
+}
+
+function renderGraph(){
+  doc.innerHTML=`<div class="head"><h2>${tableFilter===null?'Relationship graph':esc(tableFilter)}</h2></div>
+    <p class="graph-note">Table-occurrence graph. Edges point <code>child.field → parent.PrimaryKey</code>; label = cardinality, color = status. Drag nodes to untangle. Pick a table on the left to isolate its edges.</p>
+    <div class="g-legend"><span class="li"><span class="sw" style="background:var(--ok)"></span>locked</span><span class="li"><span class="sw" style="background:var(--warn)"></span>pending</span><span class="li"><span class="sw" style="background:var(--info)"></span>under-review</span></div>
+    <svg id="graph"></svg>`;
+  const edges=currentEdges();
+  if(!edges.length){ doc.querySelector('#graph').outerHTML='<p class="empty">No edges to graph.</p>'; return; }
+  if(typeof d3==='undefined'){ doc.querySelector('#graph').outerHTML='<p class="empty">Graph library unavailable offline.</p>'; return; }
+  const nodes={}, links=[]; const addNode=id=>{ if(!nodes[id])nodes[id]={id}; };
+  edges.forEach(e=>{ addNode(e.from.table); addNode(e.to.table); links.push({source:e.from.table,target:e.to.table,card:e.cardinality||'',status:e.status||'',fromField:e.from.field}); });
+  const nodeArr=Object.values(nodes); const svg=d3.select('#graph'); const W=svg.node().clientWidth, H=660; svg.attr('viewBox',`0 0 ${W} ${H}`);
+  svg.append('defs').append('marker').attr('id','arrow').attr('viewBox','0 -5 10 10').attr('refX',26).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto').append('path').attr('d','M0,-4L8,0L0,4').attr('fill','oklch(48% 0.02 285)');
+  const sim=d3.forceSimulation(nodeArr).force('link',d3.forceLink(links).id(d=>d.id).distance(150).strength(0.4)).force('charge',d3.forceManyBody().strength(-520)).force('center',d3.forceCenter(W/2,H/2)).force('collide',d3.forceCollide(52));
+  const link=svg.append('g').selectAll('line').data(links).join('line').attr('stroke',d=>statusColor(d.status)).attr('stroke-width',1.6).attr('stroke-opacity',0.7).attr('marker-end','url(#arrow)');
+  const elabel=svg.append('g').selectAll('text').data(links).join('text').attr('class','g-edge-label').text(d=>d.card);
+  const node=svg.append('g').selectAll('g').data(nodeArr).join('g').style('cursor','grab').call(d3.drag().on('start',(e,d)=>{ if(!e.active)sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; }).on('drag',(e,d)=>{ d.fx=e.x; d.fy=e.y; }).on('end',(e,d)=>{ if(!e.active)sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+  node.append('circle').attr('r',10).attr('fill','var(--bg-3)').attr('stroke','var(--info)').attr('stroke-width',2);
+  node.append('text').attr('class','g-node-label').attr('x',14).attr('y',4).text(d=>d.id);
+  sim.on('tick',()=>{ link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y); elabel.attr('x',d=>(d.source.x+d.target.x)/2).attr('y',d=>(d.source.y+d.target.y)/2-3); node.attr('transform',d=>`translate(${d.x},${d.y})`); });
+}
+function render(){ tab==='edges'?renderEdges():renderGraph(); }
+document.querySelectorAll('.tabs button').forEach(b=>{ b.onclick=()=>{ document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); tab=b.dataset.tab; render(); }; });
+document.getElementById('filter').addEventListener('input',e=>buildNav(e.target.value));
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scripts Renderer</title>
+<style>
+  :root {
+    --bg-0: oklch(16% 0.012 285); --bg-1: oklch(19% 0.014 285); --bg-2: oklch(23% 0.016 285); --bg-3: oklch(27% 0.018 285); --bg-code: oklch(14% 0.014 285);
+    --line: oklch(32% 0.02 285); --line-soft: oklch(27% 0.016 285);
+    --text-0: oklch(94% 0.008 285); --text-1: oklch(78% 0.012 285); --text-2: oklch(63% 0.014 285); --text-3: oklch(52% 0.014 285);
+    --accent: oklch(72% 0.14 285);
+    --ok: oklch(72% 0.14 155); --warn: oklch(76% 0.14 75); --danger: oklch(68% 0.16 25); --info: oklch(72% 0.13 230);
+    --calls: oklch(74% 0.13 90); --calledby: oklch(72% 0.13 230); --fn: oklch(74% 0.13 320);
+    --syn-com: oklch(60% 0.03 145); --syn-step: oklch(80% 0.10 55); --syn-hdr: oklch(72% 0.10 285);
+    --mono: ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace; --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; --ease: cubic-bezier(0.22,1,0.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg-0); color: var(--text-1); font-weight: 350; line-height: 1.55; letter-spacing: 0.01em; -webkit-font-smoothing: antialiased; display: grid; grid-template-columns: 300px 1fr; grid-template-rows: 100vh; overflow: hidden; }
+  h1,h2 { text-wrap: balance; color: var(--text-0); letter-spacing: 0; }
+  a { color: var(--accent); }
+  .sidebar { background: var(--bg-1); border-right: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
+  .brand { padding: 24px 24px 16px; border-bottom: 1px solid var(--line-soft); }
+  .brand .back { font-size: 0.6875rem; color: var(--text-3); text-decoration: none; }
+  .brand .kicker { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); font-weight: 600; margin-top: 8px; }
+  .brand h1 { font-size: 1.0625rem; font-weight: 600; margin-top: 6px; font-family: var(--mono); }
+  .brand .status { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 0.6875rem; font-family: var(--mono); }
+  .brand .status .led { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+  .brand .status.live .led { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .brand .status.err .led { background: var(--danger); }
+  .filter { padding: 12px 16px; border-bottom: 1px solid var(--line-soft); }
+  .filter input { width: 100%; background: var(--bg-0); border: 1px solid var(--line); color: var(--text-0); font-family: var(--sans); font-size: 0.8125rem; padding: 8px 12px; border-radius: 6px; }
+  .filter input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px oklch(72% 0.14 285 / 0.18); }
+  .nav { overflow-y: auto; padding: 12px 8px 32px; flex: 1; }
+  .nav-group-label { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); padding: 16px 12px 6px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+  .nav-group-label .fct { color: var(--text-3); font-weight: 400; font-variant-numeric: tabular-nums; }
+  .nav-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: none; color: var(--text-1); font-family: var(--sans); font-size: 0.8125rem; padding: 7px 12px 7px 22px; border-radius: 6px; cursor: pointer; transition: background 0.12s var(--ease); }
+  .nav-item:hover { background: var(--bg-2); color: var(--text-0); }
+  .nav-item.active { background: var(--bg-3); color: var(--text-0); }
+  .nav-item .dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; background: var(--calls); }
+  .nav-item .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--mono); font-size: 0.75rem; }
+  .nav-item .cc { font-size: 0.625rem; color: var(--text-3); font-family: var(--mono); }
+  .main { overflow-y: auto; }
+  .topbar { position: sticky; top: 0; z-index: 5; background: oklch(16% 0.012 285 / 0.86); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line-soft); padding: 12px 48px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .src { font-family: var(--mono); font-size: 0.6875rem; color: var(--text-3); }
+  .src b { color: var(--text-1); font-weight: 500; }
+  .tabs { display: flex; gap: 4px; background: var(--bg-2); padding: 3px; border-radius: 8px; }
+  .tabs button { background: none; border: none; color: var(--text-2); font-family: var(--sans); font-size: 0.75rem; font-weight: 500; padding: 5px 12px; border-radius: 6px; cursor: pointer; }
+  .tabs button.active { background: var(--bg-0); color: var(--text-0); }
+  .main-inner { max-width: 1000px; padding: 32px 48px 48px; }
+  .head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+  .head h2 { font-family: var(--mono); font-size: 1.75rem; font-weight: 600; }
+  .head .fld { font-family: var(--mono); font-size: 0.75rem; color: var(--text-3); }
+  .rel { display: flex; gap: 28px; flex-wrap: wrap; margin: 20px 0 8px; }
+  .rel-col { min-width: 200px; }
+  .rel-col .rl { font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-3); font-weight: 600; margin-bottom: 8px; }
+  .chip { display: inline-block; font-family: var(--mono); font-size: 0.7rem; padding: 3px 9px; border-radius: 5px; margin: 0 5px 5px 0; border: 1px solid var(--line); cursor: pointer; background: var(--bg-2); color: var(--text-1); }
+  .chip.calls { border-color: color-mix(in oklch, var(--calls), transparent 55%); color: var(--calls); }
+  .chip.calledby { border-color: color-mix(in oklch, var(--calledby), transparent 55%); color: var(--calledby); }
+  .chip.fn { border-color: color-mix(in oklch, var(--fn), transparent 50%); color: var(--fn); cursor: default; }
+  .chip.missing { border-color: color-mix(in oklch, var(--danger), transparent 45%); color: var(--danger); cursor: default; }
+  .chip.none { color: var(--text-3); font-style: italic; border-style: dashed; cursor: default; }
+  .code-wrap { position: relative; margin: 20px 0 0; }
+  pre.code { background: var(--bg-code); border: 1px solid var(--line); border-radius: 10px; padding: 32px 16px 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.8125rem; line-height: 1.65; color: var(--text-1); tab-size: 2; white-space: pre; }
+  pre.code .com { color: var(--syn-com); }
+  pre.code .hdr { color: var(--syn-hdr); font-weight: 600; }
+  pre.code .step { color: var(--text-0); }
+  pre.code .div { color: var(--text-3); }
+  .copy-btn { position: absolute; top: 8px; right: 8px; background: var(--bg-2); border: 1px solid var(--line); color: var(--text-2); font-family: var(--sans); font-size: 0.6875rem; font-weight: 500; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+  .copy-btn:hover { background: var(--bg-3); color: var(--text-0); }
+  .copy-btn.done { color: var(--ok); }
+  .srcref { font-family: var(--mono); font-size: 0.625rem; color: var(--text-3); margin-top: 10px; }
+  .code-loading { padding: 16px; color: var(--text-3); font-family: var(--mono); font-size: 0.8125rem; }
+  .dictation-note { font-size: 0.7rem; color: var(--text-3); margin-top: 12px; max-width: 66ch; text-wrap: pretty; border-left: 2px solid var(--line); padding-left: 10px; }
+  #graph { width: 100%; height: 660px; border: 1px solid var(--line-soft); border-radius: 12px; background: var(--bg-code); }
+  .graph-note { color: var(--text-3); font-size: 0.8125rem; margin-bottom: 16px; max-width: 72ch; }
+  .graph-note code { font-family: var(--mono); background: var(--bg-2); padding: 1px 6px; border-radius: 4px; }
+  .g-node-label { font-family: var(--mono); font-size: 10px; fill: var(--text-1); pointer-events: none; }
+  .g-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .g-legend .li { display: flex; align-items: center; gap: 6px; font-size: 0.6875rem; color: var(--text-2); }
+  .g-legend .sw { width: 12px; height: 12px; border-radius: 3px; }
+  .empty { color: var(--text-3); font-size: 0.875rem; padding: 24px 0; }
+  .fatal { padding: 48px; color: var(--text-2); }
+  .fatal code { font-family: var(--mono); background: var(--bg-2); padding: 1px 6px; border-radius: 4px; color: var(--text-0); }
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <a class="back" href="index.html">← all apps</a>
+      <div class="kicker">Scripts</div>
+      <h1 id="appName">…</h1>
+      <div class="status" id="srcStatus"><span class="led"></span><span id="srcStatusText">connecting…</span></div>
+    </div>
+    <div class="filter"><input type="text" id="filter" placeholder="Filter scripts…" autocomplete="off" spellcheck="false"></div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="src">source · <b id="srcPath">…</b></div>
+      <div class="tabs"><button data-tab="script" class="active">Script</button><button data-tab="graph">Call graph</button></div>
+    </div>
+    <div class="main-inner" id="doc"></div>
+  </main>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const APP = params.get('app');
+if (!APP){ document.body.innerHTML = '<div class="fatal">No app specified. Use <code>?app=&lt;slug&gt;</code> or go back to <a href="index.html">the launcher</a>.</div>'; throw new Error('no app'); }
+const BASE = '../' + APP + '/';
+document.getElementById('appName').textContent = APP;
+document.getElementById('srcPath').textContent = APP + '/scripts/_index.json';
+
+let INDEX = null, SCRIPTS = [], NAMES = new Set(), CALLEDBY = {}, active = null, tab = 'script';
+const bodyCache = {};
+const nav = document.getElementById('nav'), doc = document.getElementById('doc');
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+async function tryFetch(path){ try{ const r=await fetch(BASE+path,{cache:'no-store'}); if(!r.ok)throw 0; return await r.text(); }catch(e){ return null; } }
+
+async function boot(){
+  const s = await tryFetch('scripts/_index.json');
+  const st=document.getElementById('srcStatus'), stt=document.getElementById('srcStatusText');
+  if(!s){ st.className='status err'; stt.textContent='scripts index not found'; doc.innerHTML=`<div class="fatal">Could not load <code>${APP}/scripts/_index.json</code>. Check the slug and that the app follows the standard.</div>`; return; }
+  try{ INDEX=JSON.parse(s); }catch(e){ st.className='status err'; stt.textContent='parse error'; return; }
+  SCRIPTS = INDEX.scripts || [];
+  NAMES = new Set(SCRIPTS.map(x=>x.name));
+  // Derive calledBy by inverting every row's calls[] — never stored.
+  CALLEDBY = {}; SCRIPTS.forEach(s=>{ (s.calls||[]).forEach(t=>{ if(NAMES.has(t)){ (CALLEDBY[t]=CALLEDBY[t]||[]).push(s.name); } }); });
+  st.className='status live'; stt.textContent='live · v'+((INDEX._meta&&INDEX._meta.schemaVersion)||'?')+' · '+SCRIPTS.length+' scripts';
+  active = SCRIPTS.length ? SCRIPTS[0].name : null; buildNav(); render();
+}
+function rowFor(name){ return SCRIPTS.find(s=>s.name===name); }
+async function getBody(ref){ if(bodyCache[ref]!==undefined)return bodyCache[ref]; const t=await tryFetch('scripts/'+ref); bodyCache[ref]=t; return t; }
+
+function buildNav(filter=''){
+  nav.innerHTML=''; const f=filter.trim().toLowerCase();
+  const folders={}; SCRIPTS.forEach(s=>{ const match=!f||s.name.toLowerCase().includes(f)||(s.folder||'').toLowerCase().includes(f); if(match)(folders[s.folder||'(root)']=folders[s.folder||'(root)']||[]).push(s); });
+  const keys=Object.keys(folders).sort();
+  if(!keys.length){ nav.innerHTML='<div class="nav-group-label">No matches</div>'; return; }
+  keys.forEach(fld=>{ const lbl=document.createElement('div'); lbl.className='nav-group-label'; lbl.innerHTML=`${esc(fld)}<span class="fct">${folders[fld].length}</span>`; nav.appendChild(lbl);
+    folders[fld].sort((a,b)=>a.name.localeCompare(b.name)).forEach(s=>{ const cc=(s.calls||[]).length;
+      const btn=document.createElement('button'); btn.className='nav-item'+(s.name===active?' active':'');
+      btn.innerHTML=`<span class="dot"></span><span class="nm">${esc(s.name)}</span>${cc?`<span class="cc">→${cc}</span>`:''}`;
+      btn.onclick=()=>{ active=s.name; tab='script'; syncTabs(); render(); buildNav(document.getElementById('filter').value); }; nav.appendChild(btn); });
+  });
+}
+
+function highlightBody(src){
+  return src.split('\n').map(line=>{
+    if(/^\s*#\s*---/.test(line)) return `<span class="div">${esc(line)}</span>`;
+    if(/^\s*#\s*[A-Z][A-Z ]+:/.test(line)) return `<span class="hdr">${esc(line)}</span>`;
+    if(/^\s*#/.test(line)) return `<span class="com">${esc(line)}</span>`;
+    return `<span class="step">${esc(line)}</span>`;
+  }).join('\n');
+}
+
+function chip(name){ if(NAMES.has(name))return `<span class="chip calls" data-jump="${esc(name)}">${esc(name)}</span>`; return `<span class="chip fn" title="resolves in functions/, not a script">${esc(name)}() ƒ</span>`; }
+function backChip(name){ return `<span class="chip calledby" data-jump="${esc(name)}">${esc(name)}</span>`; }
+
+async function renderScript(){
+  if(!active){ doc.innerHTML='<p class="empty">No scripts documented yet. Add a row to <code>scripts/_index.json</code> + a <code>.fmscript</code> body.</p>'; return; }
+  const r=rowFor(active); const calls=r.calls||[]; const cb=CALLEDBY[active]||[];
+  const callsHtml = calls.length ? calls.map(chip).join('') : '<span class="chip none">nothing</span>';
+  const cbHtml = cb.length ? cb.map(backChip).join('') : '<span class="chip none">nothing (entry point)</span>';
+  doc.innerHTML=`<div class="head"><h2>${esc(r.name)}</h2><span class="fld">${esc(r.folder||'')}/</span></div>
+    <div class="rel">
+      <div class="rel-col"><div class="rl">calls →</div>${callsHtml}</div>
+      <div class="rel-col"><div class="rl">called by ← (derived)</div>${cbHtml}</div>
+    </div>
+    <div class="code-wrap"><div class="code-loading">loading script body…</div></div>
+    <div class="dictation-note">Dictation reference: this is the text to type into <b>Manage Scripts</b>, narrative carried as native <code>#</code> comment lines. FileMaker's script clipboard is XML, so a <code>.fmscript</code> does not paste back verbatim (unlike a <code>.fmcalc</code>).</div>
+    ${r.scriptRef?`<div class="srcref">source · <a href="${BASE+'scripts/'+r.scriptRef}" target="_blank" rel="noopener">scripts/${esc(r.scriptRef)}</a></div>`:''}`;
+  doc.scrollTop=0;
+  const wrap=doc.querySelector('.code-wrap');
+  const txt = r.scriptRef ? await getBody(r.scriptRef) : null;
+  if(txt==null){ wrap.innerHTML='<div class="code-loading">script body unavailable ('+(r.scriptRef?esc(r.scriptRef):'no scriptRef')+')</div>'; }
+  else {
+    const clean=txt.replace(/\n+$/,'');
+    wrap.innerHTML=`<button class="copy-btn">copy</button><pre class="code">${highlightBody(clean)}</pre>`;
+    const btn=wrap.querySelector('.copy-btn'); btn.onclick=()=>{ navigator.clipboard.writeText(clean).then(()=>{ btn.textContent='copied ✓'; btn.classList.add('done'); setTimeout(()=>{ btn.textContent='copy'; btn.classList.remove('done'); },1400); }); };
+  }
+  doc.querySelectorAll('.chip[data-jump]').forEach(c=>{ c.onclick=()=>{ if(NAMES.has(c.dataset.jump)){ active=c.dataset.jump; render(); buildNav(document.getElementById('filter').value); } }; });
+}
+
+function renderGraph(){
+  doc.innerHTML=`<div class="head"><h2>Call graph</h2></div>
+    <p class="graph-note">Directed graph of script-to-script calls from each row's <code>calls[]</code>. Edges point <code>caller → callee</code>; <code>calledBy</code> is the reverse of these edges (derived, never stored). Function targets resolve in <code>functions/</code> and show hollow.</p>
+    <div class="g-legend"><span class="li"><span class="sw" style="background:var(--calls)"></span>script</span><span class="li"><span class="sw" style="background:var(--fn)"></span>function (external)</span></div>
+    <svg id="graph"></svg>`;
+  if(!SCRIPTS.length){ doc.querySelector('#graph').outerHTML='<p class="empty">No scripts to graph.</p>'; return; }
+  if(typeof d3==='undefined'){ doc.querySelector('#graph').outerHTML='<p class="empty">Graph library unavailable offline.</p>'; return; }
+  const nodes={}, links=[]; const addNode=(id,type)=>{ if(!nodes[id])nodes[id]={id,type}; };
+  SCRIPTS.forEach(s=>{ addNode(s.name,'script'); (s.calls||[]).forEach(t=>{ addNode(t, NAMES.has(t)?'script':'fn'); links.push({source:s.name,target:t}); }); });
+  const nodeArr=Object.values(nodes); const svg=d3.select('#graph'); const W=svg.node().clientWidth, H=660; svg.attr('viewBox',`0 0 ${W} ${H}`);
+  const colorOf=ty=>ty==='fn'?'var(--fn)':'var(--calls)';
+  svg.append('defs').append('marker').attr('id','arrow').attr('viewBox','0 -5 10 10').attr('refX',20).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto').append('path').attr('d','M0,-4L8,0L0,4').attr('fill','oklch(48% 0.02 285)');
+  const sim=d3.forceSimulation(nodeArr).force('link',d3.forceLink(links).id(d=>d.id).distance(120).strength(0.4)).force('charge',d3.forceManyBody().strength(-420)).force('center',d3.forceCenter(W/2,H/2)).force('collide',d3.forceCollide(46));
+  const link=svg.append('g').attr('stroke','oklch(40% 0.02 285)').attr('stroke-width',1.4).selectAll('line').data(links).join('line').attr('marker-end','url(#arrow)');
+  const node=svg.append('g').selectAll('g').data(nodeArr).join('g').style('cursor','grab').call(d3.drag().on('start',(e,d)=>{ if(!e.active)sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; }).on('drag',(e,d)=>{ d.fx=e.x; d.fy=e.y; }).on('end',(e,d)=>{ if(!e.active)sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+  node.append('circle').attr('r',d=>d.type==='fn'?7:9).attr('fill',d=>d.type==='fn'?'var(--bg-code)':colorOf(d.type)).attr('stroke',d=>colorOf(d.type)).attr('stroke-width',2);
+  node.append('text').attr('class','g-node-label').attr('x',13).attr('y',4).text(d=>d.type==='fn'?d.id+'()':d.id);
+  node.on('click',(e,d)=>{ if(d.type==='script'){ active=d.id; tab='script'; syncTabs(); render(); buildNav(document.getElementById('filter').value); } });
+  sim.on('tick',()=>{ link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y); node.attr('transform',d=>`translate(${d.x},${d.y})`); });
+}
+function render(){ tab==='graph'?renderGraph():renderScript(); }
+function syncTabs(){ document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active', x.dataset.tab===tab)); }
+document.querySelectorAll('.tabs button').forEach(b=>{ b.onclick=()=>{ tab=b.dataset.tab; syncTabs(); render(); }; });
+document.getElementById('filter').addEventListener('input',e=>buildNav(e.target.value));
+boot();
+</script>
+</body>
+</html>
