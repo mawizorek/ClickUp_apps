@@ -1,0 +1,137 @@
+{
+  "_meta": {
+    "app": "maw-budget",
+    "folder": "value-lists",
+    "schemaVersion": "1.0",
+    "generated": "2026-07-16",
+    "model": "Third source-of-truth index in the audit model, joined to layouts/_index.json + relationships/_index.json on keys. Each entry = one value list: how it DERIVES, what VALUES it may contain, its status-list flags, and which gLIST_ global keys point at it. 'usedBy' is NEVER stored here - it is a QUERY over layout objects where binding.valueList == valueListId (same derive-dont-store discipline as DD-003). See meta/value-list-tracking-model.md.",
+    "derivationTypes": {
+      "custom": "FileMaker 'Use custom values'. Values are hand-typed and stored in values[].",
+      "fromField": "FileMaker 'Use values from field'. DERIVED from a TO::field at runtime; values[] is null (never stored).",
+      "globalSeed": "Status-style seed: a gLIST_ global on Globals holds newline-delimited keys and a from-field value list points at that global. values[] mirrors the seed for documentation.",
+      "relatedTable": "Backed by a real table (ValueListItems) and edited via the portal on the Value Lists layout. Supports per-item metadata (sort order, status mapping, notes)."
+    },
+    "statusListModel": "A list with flags.isStatusList=true carries a per-item mapping onto the CANONICAL status categories (VL_StatusCategories: New/Error/Active/Done/Closed). flags.enforce1to1=true requires each item map to exactly one canonical status. This lets any custom vocabulary (e.g. import row statuses) roll up to canonical states. Mirrors the URITP Budget prior-art page.",
+    "auditNote": "Layout objects already carry binding.valueList in each layout.json. So 'where is list X used' and 'which lists pull from field F' are one-hop queries, not a stored xref (matching meta/relationship-audit-model.md)."
+  },
+  "canonicalStatusCategories": ["New", "Error", "Active", "Done", "Closed"],
+  "valueLists": [
+    {
+      "valueListId": "VL_StatusCategories",
+      "name": "Status Categories",
+      "derivation": "relatedTable",
+      "isCanonical": true,
+      "flags": { "isActive": true, "isStatusList": true, "enforce1to1": true },
+      "storage": "ValueListItems (fkValueList -> this list)",
+      "globalKeys": ["gLIST_StatusCategories"],
+      "items": [
+        { "sort": 0, "value": "New",    "statusCategory": "New" },
+        { "sort": 1, "value": "Error",  "statusCategory": "Error" },
+        { "sort": 4, "value": "Active", "statusCategory": "Active" },
+        { "sort": 7, "value": "Done",   "statusCategory": "Done" },
+        { "sort": 9, "value": "Closed", "statusCategory": "Closed" }
+      ],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "Canonical status master; every other status list maps onto these five. Mirrors the URITP Budget Status Categories list." }
+    },
+    {
+      "valueListId": "VL_TransactionStates",
+      "name": "Transaction States",
+      "derivation": "relatedTable",
+      "flags": { "isActive": true, "isStatusList": true, "enforce1to1": true },
+      "storage": "ValueListItems (fkValueList -> this list)",
+      "globalKeys": ["gLIST_TransactionStates"],
+      "items": [
+        { "sort": 1, "value": "Pending", "statusCategory": "Active" },
+        { "sort": 2, "value": "Cleared", "statusCategory": "Done" }
+      ],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "Reconciliation states (DD-021). Pending->Active, Cleared->Done." }
+    },
+    {
+      "valueListId": "VL_ImportRowStatus",
+      "name": "Import Row Statuses",
+      "derivation": "relatedTable",
+      "flags": { "isActive": true, "isStatusList": true, "enforce1to1": true },
+      "storage": "ValueListItems (fkValueList -> this list)",
+      "globalKeys": ["gLIST_ImportRowStatus"],
+      "items": [
+        { "sort": 1, "value": "new",               "statusCategory": "New" },
+        { "sort": 3, "value": "needs_review",      "statusCategory": "Error" },
+        { "sort": 2, "value": "carry_forward",     "statusCategory": "Active" },
+        { "sort": 4, "value": "ignored_duplicate", "statusCategory": "Closed" }
+      ],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "CSV import per-row triage (DD-012). Mirrors the URITP Budget prior-art screenshot exactly." }
+    },
+    {
+      "valueListId": "VL_ImportSessionStatus",
+      "name": "Import Session Statuses",
+      "derivation": "relatedTable",
+      "flags": { "isActive": true, "isStatusList": true, "enforce1to1": true },
+      "storage": "ValueListItems (fkValueList -> this list)",
+      "globalKeys": ["gLIST_ImportSessionStatus"],
+      "items": [
+        { "sort": 1, "value": "queued",    "statusCategory": "New" },
+        { "sort": 2, "value": "importing", "statusCategory": "Active" },
+        { "sort": 3, "value": "failed",    "statusCategory": "Error" },
+        { "sort": 4, "value": "complete",  "statusCategory": "Done" }
+      ],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "ImportSessions lifecycle (DD-012)." }
+    },
+    {
+      "valueListId": "VL_AccountTypes",
+      "name": "Account Types",
+      "derivation": "globalSeed",
+      "flags": { "isActive": true, "isStatusList": false, "enforce1to1": false },
+      "storage": "Globals::gLIST_AccountTypes",
+      "globalKeys": ["gLIST_AccountTypes"],
+      "values": ["Checking", "Savings", "Credit Card", "Cash", "Loan", "Receivable", "Asset (feed-less)"],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "Account type taxonomy (DD-011 + DD-013 receivable). Seeds the GLOBAL_Settings 'Account Types (seed)' object." }
+    },
+    {
+      "valueListId": "VL_CategoryType",
+      "name": "Category Type",
+      "derivation": "custom",
+      "flags": { "isActive": true, "isStatusList": false, "enforce1to1": false },
+      "values": ["Income", "Expense"],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "Constrains the category tree; a parent's type constrains its children (DD-014)." }
+    },
+    {
+      "valueListId": "VL_BillCadence",
+      "name": "Bill Cadence",
+      "derivation": "custom",
+      "flags": { "isActive": true, "isStatusList": false, "enforce1to1": false },
+      "values": ["Weekly", "Biweekly", "Monthly", "Quarterly", "Annual"],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "Recurring bill schedule (DD-017, Phase 2)." }
+    },
+    {
+      "valueListId": "VL_Environment",
+      "name": "Environment",
+      "derivation": "globalSeed",
+      "flags": { "isActive": true, "isStatusList": false, "enforce1to1": false },
+      "storage": "Globals::gLIST_Environment",
+      "globalKeys": ["gLIST_Environment"],
+      "values": ["DEV", "PROD"],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "Gates debug tooling (GLOBAL_Settings Environment pop-up)." }
+    },
+    {
+      "valueListId": "VL_ThemeMode",
+      "name": "Theme Mode",
+      "derivation": "globalSeed",
+      "flags": { "isActive": true, "isStatusList": false, "enforce1to1": false },
+      "storage": "Globals::gLIST_ThemeMode",
+      "globalKeys": ["gLIST_ThemeMode"],
+      "values": ["Dark", "Light"],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "Drives conditional theming (GLOBAL_Settings Theme radio set)." }
+    },
+    {
+      "valueListId": "VL_Accounts",
+      "name": "Accounts",
+      "derivation": "fromField",
+      "flags": { "isActive": true, "isStatusList": false, "enforce1to1": false },
+      "source": { "occurrenceId": "Account", "displayField": "Name", "keyField": "PrimaryKey", "useRelated": false, "sort": "Name ASC" },
+      "values": null,
+      "storage": "Globals::gLIST_Accounts (dynamic reference)",
+      "globalKeys": ["gLIST_Accounts"],
+      "provenance": { "status": "proposed", "added": "2026-07-16", "note": "Dynamic list of Account names keyed by PrimaryKey. Derived, never stored (DD-003). Referenced by g_DefaultAccount on GLOBAL_Settings. NOTE: Account TO not yet articulated; source is proposed." }
+    }
+  ]
+}
