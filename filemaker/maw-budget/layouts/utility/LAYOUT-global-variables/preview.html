@@ -6,19 +6,26 @@
 <title>SYS | Global Settings [DSK]</title>
 <style>
   /* ============================================================
-     PURE LAYOUT RENDER. No dev chrome, no metadata wrapper.
-     This is the built FileMaker layout in Browse mode: themed,
-     to-scale, interactive. Theme tokens are resolved LIVE from the
+     PURE LAYOUT RENDER. The built FileMaker layout in Browse mode:
+     themed, to-scale, interactive. Theme tokens resolve LIVE from the
      z-themes doc-set by slug (via ../../../../z-themes/resolve.js).
-     Objects come from the embedded manifest (auto-extends).
-     The --t-* values below are an OFFLINE-SAFETY fallback only
-     (maw-dark-utility); resolve.js overrides them from z-themes.
+     A DEV theme-switcher (top bar) lets you flip any available theme
+     and watch this real layout reskin — it is a preview affordance,
+     NOT part of the built FileMaker layout. Maps to the solution's
+     g_ThemeMode global, widened from Dark/Light to any theme slug.
+     The --t-* values below are an OFFLINE-SAFETY fallback only.
      ============================================================ */
   :root{
     --win: oklch(0.9 0.004 255);
     --win-edge: oklch(0.8 0.006 255);
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    /* switcher chrome (fixed, theme-independent so it stays readable) */
+    --sw-bg: oklch(0.19 0.012 262);
+    --sw-line: oklch(0.33 0.016 262);
+    --sw-text: oklch(0.93 0.008 262);
+    --sw-dim: oklch(0.64 0.011 262);
+    --sw-accent: oklch(0.74 0.12 218);
     /* theme tokens (offline fallback; resolved live from z-themes) */
     --t-bg: oklch(0.23 0.013 260);
     --t-header: oklch(0.285 0.02 260);
@@ -38,8 +45,33 @@
     font-family:var(--sans);
     -webkit-font-smoothing:antialiased;font-optical-sizing:auto;
     min-height:100vh;overflow-x:hidden;
-    display:flex;justify-content:center;align-items:flex-start;
+    display:flex;flex-direction:column;align-items:center;
   }
+  /* ---- dev theme switcher bar ---- */
+  #devbar{
+    position:sticky;top:0;z-index:50;width:100%;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:9px 16px;background:var(--sw-bg);border-bottom:1px solid var(--sw-line);
+    font-size:13px;color:var(--sw-text);
+  }
+  #devbar .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--sw-accent);font-weight:600}
+  #devbar .lbl{color:var(--sw-dim);font-size:12px}
+  #devbar select{
+    -webkit-appearance:none;appearance:none;cursor:pointer;
+    background:oklch(0.25 0.014 262);color:var(--sw-text);
+    border:1px solid var(--sw-line);border-radius:7px;padding:7px 30px 7px 11px;
+    font-family:var(--sans);font-size:13px;font-weight:500;
+    background-image:linear-gradient(45deg,transparent 50%,var(--sw-dim) 50%),linear-gradient(135deg,var(--sw-dim) 50%,transparent 50%);
+    background-position:calc(100% - 16px) 15px,calc(100% - 11px) 15px;background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+    transition:border-color .13s cubic-bezier(.25,1,.5,1);
+  }
+  #devbar select:hover{border-color:var(--sw-accent)}
+  #devbar select:focus-visible{outline:2px solid var(--sw-accent);outline-offset:1px}
+  #devbar .trail{font-family:var(--mono);font-size:11px;color:var(--sw-dim);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+  #devbar .trail b{color:var(--sw-text);font-weight:600}
+  #devbar .trail.warn b{color:oklch(0.82 0.13 78)}
+  #devbar .trail.err b{color:oklch(0.72 0.17 25)}
+  #stagewrap{flex:1;width:100%;display:flex;justify-content:center;align-items:flex-start;overflow-x:hidden}
   #fit{transform-origin:top center;will-change:transform}
   #layout{
     width:1024px;background:var(--t-bg);color:var(--t-field-text);
@@ -107,12 +139,18 @@
 </style>
 </head>
 <body>
-  <div id="fit"><div id="layout"></div></div>
+  <div id="devbar">
+    <span class="tag">z-themes</span>
+    <span class="lbl">Theme</span>
+    <select id="themePick" aria-label="Preview theme"></select>
+    <span class="trail" id="swTrail"></span>
+  </div>
+  <div id="stagewrap"><div id="fit"><div id="layout"></div></div></div>
   <div id="flash"></div>
 
 <script type="application/json" id="layout-manifest">
 {
-  "_meta": { "app": "maw-budget", "kind": "filemaker-layout-render", "rendererVersion": "0.4", "generated": "2026-07-16", "note": "Pure interactive Browse-mode render. No dev chrome. Manifest-driven; auto-extends with new objects. Theme tokens resolved LIVE from z-themes by slug via resolve.js — no inline token mirror." },
+  "_meta": { "app": "maw-budget", "kind": "filemaker-layout-render", "rendererVersion": "0.5", "generated": "2026-07-16", "note": "Pure interactive Browse-mode render. Theme tokens resolved LIVE from z-themes by slug via resolve.js — no inline token mirror. Dev theme-switcher reads the z-themes manifest and reskins this real layout live; it is a preview affordance, not part of the built layout." },
   "layout": {
     "name": "GLOBAL_Settings",
     "viewName": "SYS | Global Settings [DSK]",
@@ -159,17 +197,63 @@
   document.title = L.viewName || L.name;
   root.style.width = (L.layoutWidth||1024)+'px';
 
-  // --- resolve theme tokens LIVE from z-themes by slug ---
-  // resolve.js sets canonical --cv-* vars; this renderer's CSS uses --t-*,
-  // so we alias cv -> t. Change the theme in z-themes and this reskins with no re-render.
+  // cv-* (canonical, set by resolve.js) -> this renderer's local --t-* vocabulary
   var ALIAS = {
     'cv-bg':'t-bg','cv-part-header':'t-header','cv-part-body':'t-body','cv-part-footer':'t-footer',
     'cv-field-fill':'t-field','cv-field-border':'t-field-border','cv-field-text':'t-field-text',
     'cv-label':'t-label','cv-accent':'t-accent','cv-title':'t-title'
   };
-  if(window.ZTHEMES && L.theme && L.theme.slug){
-    ZTHEMES.apply(L.theme.slug, { root: document.documentElement, aliasMap: ALIAS });
+  var STORE_KEY = 'zthemes.preview.GLOBAL_Settings'; // sticky picker selection (maps to g_ThemeMode)
+  var trailEl = document.getElementById('swTrail');
+
+  function applySlug(slug){
+    if(!window.ZTHEMES) return;
+    ZTHEMES.apply(slug, {
+      root: document.documentElement,
+      aliasMap: ALIAS,
+      onResolved: function(res){
+        var cls = res.stub ? 'trail warn' : (res.offline ? 'trail err' : 'trail');
+        trailEl.className = cls;
+        trailEl.innerHTML = 'resolve: <b>' + res.trail.join(' &rarr; ') + '</b>';
+      },
+      onError: function(res){
+        trailEl.className = 'trail err';
+        trailEl.innerHTML = '<b>' + res.error + '</b>';
+      }
+    });
   }
+
+  // build the picker from the live manifest (auto-updates as themes are added)
+  function buildPicker(){
+    var sel = document.getElementById('themePick');
+    if(!window.ZTHEMES || !ZTHEMES.list){ return; }
+    ZTHEMES.list().then(function(idx){
+      sel.innerHTML = '';
+      (idx.groups||[]).forEach(function(g){
+        var og = document.createElement('optgroup');
+        og.label = g.label;
+        (g.themes||[]).forEach(function(t){
+          var o = document.createElement('option');
+          o.value = t.slug;
+          o.textContent = t.name + (t.status && t.status!=='locked' ? '  (' + t.status + ')' : '');
+          og.appendChild(o);
+        });
+        sel.appendChild(og);
+      });
+      var initial = localStorage.getItem(STORE_KEY) || (L.theme && L.theme.slug) || 'maw-dark-utility';
+      sel.value = initial;
+      if(sel.value !== initial && L.theme){ sel.value = L.theme.slug; } // selection no longer exists
+      applySlug(sel.value);
+      sel.addEventListener('change', function(){
+        localStorage.setItem(STORE_KEY, sel.value);
+        applySlug(sel.value);
+      });
+    }).catch(function(){
+      // manifest unreachable (file://): still skin with the layout's own slug
+      applySlug((L.theme && L.theme.slug) || 'maw-dark-utility');
+    });
+  }
+  buildPicker();
 
   var CHECK = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.2 2.2 4.8-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -230,7 +314,7 @@
 
   // --- silent auto-fit to viewport ---
   var fit=document.getElementById('fit'), W=(L.layoutWidth||1024);
-  function scale(){ var s=Math.min(1,(window.innerWidth)/W); fit.style.transform='scale('+s+')'; document.body.style.height=(root.offsetHeight*s)+'px'; }
+  function scale(){ var s=Math.min(1,(window.innerWidth)/W); fit.style.transform='scale('+s+')'; document.body.style.minHeight='auto'; }
   window.addEventListener('resize',scale); scale();
 })();
 </script>
