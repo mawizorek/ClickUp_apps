@@ -1,6 +1,6 @@
 # Design Decisions — maw-budget
 
-_Decision log (ADR-style). Each entry is a call we've committed to, why, and its status. This is the "why" record; the "what" lives in `../next-build-spec.md` and `architecture-notes.md`. New decisions append here; never silently reverse a LOCKED one without a superseding entry._
+_Decision log (ADR-style). Each entry is a call we've committed to, why, and its status. This is the "why" record; the "what" lives in `../next-build-spec.md` and `architecture-notes.md`. The chronological "what changed when" trail lives in `changelog.md`. New decisions append here; never silently reverse a LOCKED one without a superseding entry._
 
 **Status key:** `LOCKED` = decided, build on it · `PROVISIONAL` = defaulted, confirm before it hardens · `OPEN` = still being interrogated (see spec).
 
@@ -56,7 +56,7 @@ Phase 1 = the ledger spine (accounts, balances, net worth, transfers, spend-by-c
 
 Defaulted to HML style (`PrimaryKey` / `fk<Parent>`, clean PascalCase, no legacy SCREAMING names). Alternative is URITP style (`pk_` / `fk_`).
 
-**Confirm before the first real table is written.** Flip in `schema/tables.json` `_meta.conventions` if changing.
+**Confirm before the first real table is written.** Flip in `schema/tables.json` `_meta.conventions` if changing. This is the LAST open item before field articulation.
 
 ## DD-009 — Single user `LOCKED` (2026-07-15)
 
@@ -79,6 +79,8 @@ Primary intake is **CSV import**, with **manual entry and manual post-import cle
 **Why:** FileMaker has no live bank feed, and Michael will drive intake by hand on a roughly weekly rhythm. Implications: (1) `ImportSessions` + a CSV mapper are **Phase 1**, not deferred; (2) `Account` needs a **per-account CSV column-mapping** (banks differ); (3) a **dedup key** (`rawHash`) prevents double-posting overlapping re-imports; (4) manual entry is a peer path, not a fallback. Sample CSV per bank gathered when the mapper is built.
 
 **Prior art (2026-07-15):** Michael already has a **URITP BETA BUDGET** ClickUp space + a **Venmo** list with a real combined CSV statement (Chase, Capital One, Venmo balance; dad = Joseph J. Wizorek reimbursements, gig income from Alarm Will Sound / drafting clients). Scattered but a real sample of the intake shape — use it as the first CSV mapping target and as validation the model fits actual data.
+
+**Open (deferred to interaction/interface session):** the manual-entry-vs-CSV-import UX and the **dedup interaction** (how a freshly-imported row that overlaps an existing/manual entry is surfaced, merged, or rejected AT the ledger). The `rawHash` mechanism is decided; the *interface* for reviewing/resolving dupes is a Phase 1 UI design task, its own session.
 
 ## DD-013 — Reimbursements & receivables ("owed to me") `LOCKED`; packaging RESOLVED (2026-07-15)
 
@@ -146,8 +148,51 @@ House/car re-valuation has **no rigid schedule**. Michael re-values **whenever**
 
 **Plain-English note ("finance for idiots"):** a valuation is just *"what's this worth today, roughly?"* You're not tracking every gas fill-up on the car; you occasionally say "the car's worth ~$18k now" and that number feeds net worth until you update it. Same for the house. That's all a `Valuation` row is.
 
+## DD-019 — Budgeting: start target-vs-actual, grow toward envelope `LOCKED` (direction) (2026-07-15)
+
+Phase 3 budgeting starts as **simple target-vs-actual per category** (set a monthly target per category, compare to actual spend), with a **deliberate path to grow into full YNAB-style envelopes later**. (Answer to inquiry H.)
+
+**Why:** Michael leans simpler now but wants the door open. Target-vs-actual is the lighter-upkeep entry point; the full envelope model (assign every dollar, available = assigned - activity + rollover) is a superset. Building the simple version on the same `BudgetAllocations` shape (category + month + amount) means envelopes are an ADD, not a rebuild — rollover + "assign every dollar" become extra columns/rules on the existing table.
+
+**Rollover:** deferred sub-decision. Target-vs-actual v1 does NOT need month-to-month rollover; envelopes do. Design `BudgetAllocations` so a `rollover` concept can be added without migration. Confirm rollover behavior when the envelope upgrade is actually built.
+
+## DD-020 — Priority reports (v1 set) `LOCKED` (2026-07-15)
+
+The three reports Michael will actually open, ranked (answer to inquiry I):
+1. **Spend by category** (with the DD-014 rollups — zoom parent, drill child).
+2. **Account register** (the ledger view for one account: running list of transactions + balance).
+3. **"Who owes me"** (receivable accounts with a non-zero balance — DD-013).
+
+**Why it matters for the build:** these three are the Phase 1 layout priority order. Net-worth trend (DD-016) still ships in Phase 1 as the headline number + chart, but Michael's *working* reports are these three — build/polish them first. Cash-flow in/out is NOT in the top set; treat as a Futures report.
+
+## DD-021 — Reconciliation: cleared vs pending, in scope `LOCKED` (direction) (2026-07-15)
+
+Transactions carry a **cleared / pending** state so Michael can reconcile against real statements. (Answer to inquiry J — leaned "definitely bother.")
+
+**Why:** reconciliation is what keeps the ledger honest against reality — it's how you catch a missed import, a duplicate, or a bank error. It also pairs directly with the CSV-import dedup flow (DD-012): a freshly imported row lands **pending**, and clearing it is the human confirmation step.
+
+**Shape:** a `cleared` status on the transaction (or line) — at minimum pending → cleared; optionally a `reconciledDate` / statement reference later. Phase 1 gets the flag + a way to mark cleared; full statement-balance reconciliation ("does my cleared total match the statement's closing balance?") can be a Phase 1.5 polish. Exact placement (group vs line) is a field-articulation call.
+
+## DD-022 — Platform: desktop + FileMaker Go, receipts wanted, sync is the open risk `PROVISIONAL` (2026-07-15)
+
+Michael wants **both FileMaker Pro (desktop) and FileMaker Go (iPhone/iPad)**, ideally **serverless**, and wants to **track receipts** (images). (Answer to inquiry K.) These three pull against each other and the tension is NOT yet resolved — flagged honestly rather than hand-waved.
+
+**The real tension:**
+- **Serverless + multi-device is the hard part.** FileMaker Go opening a *single local file* means desktop and phone hold separate copies that diverge. True live multi-device sync normally wants **FileMaker Server / FileMaker Cloud** (i.e. NOT serverless). Options to explore in an architecture session: (a) host the single file on FileMaker Cloud (drops "serverless" but solves sync cleanly); (b) a one-file-hosted-on-a-Mac-mini self-host; (c) mobile as a capture-only satellite that syncs deltas to the desktop master (more build, keeps serverless-ish).
+- **Receipts amplify it.** Storing receipt images *inside* the file (container fields) bloats it fast — painful for any move/sync of a single file, and heavy on FileMaker Go. Mitigation: **externally-stored container data** (references, not embedded blobs) or a light "receipt = a file path / cloud link" approach. Michael already flagged wanting to minimize image tracking while still keeping receipts — that instinct is right.
+
+**Provisional stance:** design the schema to be **sync-agnostic and receipt-light** — UUID PKs everywhere (DD-010 already), no auto-enter serials that collide across devices, and a `Receipt` concept that stores a *reference* (external container or link) rather than embedding by default. That keeps every hosting/sync path open. **The hosting/sync model itself is a dedicated architecture decision, deferred to its own session** — do not let it block field articulation, but do not pretend it's solved.
+
 ---
 
-## Deferred / not yet decided
+## Inquiry status: A–L COMPLETE (2026-07-15)
 
-Remaining open interrogation: **H** (budgeting model — phase 3), **I** (top-3 reports), **J** (reconciliation / cleared-vs-pending), **K** (desktop-only vs FileMaker Go mobile). Plus resolve **DD-008** naming. See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
+All twelve goal-interrogation items (A–L) are answered and logged (DD-011 through DD-022). The goal-interrogation phase is CLOSED.
+
+**One decision remains before field articulation:** **DD-008 naming convention** (HML vs URITP style) is still PROVISIONAL. Confirm it, then the fresh field-articulation session can write `tables/` + `schema/tables.json`.
+
+**Deferred to their own later sessions (do NOT block field articulation):**
+- Interaction/interface design, including the **manual-vs-CSV dedup review UX** (DD-012).
+- The **hosting/sync architecture** for desktop + FileMaker Go, and the **receipt-storage** approach (DD-022).
+- **Rollover** behavior for the envelope upgrade (DD-019).
+- One-time **migration** from the existing URITP BETA BUDGET / Venmo data (DD-012 prior art).
