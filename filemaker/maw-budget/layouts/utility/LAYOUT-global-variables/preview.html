@@ -8,15 +8,18 @@
   /* ============================================================
      PURE LAYOUT RENDER. No dev chrome, no metadata wrapper.
      This is the built FileMaker layout in Browse mode: themed,
-     to-scale, interactive. Theme tokens + objects come from the
-     embedded manifest (auto-extends as objects are added).
+     to-scale, interactive. Theme tokens are resolved LIVE from the
+     z-themes doc-set by slug (via ../../../../z-themes/resolve.js).
+     Objects come from the embedded manifest (auto-extends).
+     The --t-* values below are an OFFLINE-SAFETY fallback only
+     (maw-dark-utility); resolve.js overrides them from z-themes.
      ============================================================ */
   :root{
-    --win: oklch(0.9 0.004 255);          /* FileMaker window gray behind the layout */
+    --win: oklch(0.9 0.004 255);
     --win-edge: oklch(0.8 0.006 255);
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    /* theme tokens (overwritten from manifest) */
+    /* theme tokens (offline fallback; resolved live from z-themes) */
     --t-bg: oklch(0.23 0.013 260);
     --t-header: oklch(0.285 0.02 260);
     --t-body: oklch(0.235 0.012 260);
@@ -37,9 +40,7 @@
     min-height:100vh;overflow-x:hidden;
     display:flex;justify-content:center;align-items:flex-start;
   }
-  /* auto-fit wrapper: scales the fixed-width layout to the viewport, silently */
   #fit{transform-origin:top center;will-change:transform}
-  /* the layout itself: a fixed-width FileMaker layout (design width from manifest) */
   #layout{
     width:1024px;background:var(--t-bg);color:var(--t-field-text);
     box-shadow:0 1px 0 var(--win-edge), 0 22px 55px -32px oklch(0 0 0/.6);
@@ -62,7 +63,6 @@
 
   .lab{display:block;font-size:10.5px;font-weight:600;letter-spacing:.01em;color:var(--t-label);margin-bottom:4px}
 
-  /* --- real interactive controls --- */
   .inp{
     width:100%;height:29px;background:var(--t-field);color:var(--t-field-text);
     border:1px solid var(--t-field-border);border-radius:3px;padding:0 9px;
@@ -74,28 +74,23 @@
   select.inp{-webkit-appearance:none;appearance:none;cursor:pointer;padding-right:26px;
     background-image:linear-gradient(45deg,transparent 50%,var(--t-label) 50%),linear-gradient(135deg,var(--t-label) 50%,transparent 50%);
     background-position:calc(100% - 14px) 12px,calc(100% - 9px) 12px;background-size:5px 5px,5px 5px;background-repeat:no-repeat;}
-  /* display-only (calc / merge fields): no entry box, just the value */
   .disp{font-size:13px;color:oklch(0.82 0.01 260);height:29px;line-height:29px;font-variant-numeric:tabular-nums}
   .disp.mono{font-family:var(--mono);font-size:12px}
-  /* multi-line value-list seed: bordered readout */
   .multibox{
     background:var(--t-field);border:1px solid var(--t-field-border);border-radius:3px;
     padding:8px 10px;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--t-field-text);
     white-space:pre-line;box-shadow:inset 0 1px 1px oklch(0 0 0/.14);
   }
-  /* checkbox set */
   .chk{display:inline-flex;align-items:center;gap:9px;height:29px;cursor:pointer;user-select:none;font-size:13px;color:var(--t-field-text)}
   .chk .box{width:16px;height:16px;border:1.5px solid var(--t-field-border);border-radius:3px;background:var(--t-field);display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:var(--t-bg);transition:background .12s,border-color .12s}
   .chk.on .box{background:var(--t-accent);border-color:var(--t-accent)}
   .chk .box svg{opacity:0;transition:opacity .1s}
   .chk.on .box svg{opacity:1}
-  /* radio set */
   .radios{display:flex;gap:8px;height:29px;align-items:center;flex-wrap:wrap}
   .radio{display:inline-flex;align-items:center;gap:7px;font-size:13px;padding:5px 13px;border:1px solid var(--t-field-border);border-radius:100px;color:var(--t-label);cursor:pointer;user-select:none;transition:border-color .12s,color .12s,background .12s}
   .radio .rd{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--t-field-border);transition:border-color .12s,box-shadow .12s}
   .radio.on{border-color:var(--t-accent);color:var(--t-field-text);background:oklch(0.72 0.11 205/.12)}
   .radio.on .rd{border-color:var(--t-accent);box-shadow:inset 0 0 0 2.5px var(--t-accent)}
-  /* buttons */
   .btn{
     font-family:var(--sans);font-size:12.5px;font-weight:550;cursor:pointer;padding:8px 16px;border-radius:5px;
     border:1px solid var(--t-field-border);background:var(--t-field);color:var(--t-field-text);
@@ -104,7 +99,6 @@
   .btn:hover{border-color:var(--t-accent)}
   .btn:active{transform:translateY(1px)}
   .btn.primary{background:oklch(0.72 0.11 205/.18);border-color:var(--t-accent);color:var(--t-title)}
-  /* tiny transient confirmation when a button fires (interactivity feedback) */
   #flash{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(12px);
     background:var(--t-header);color:var(--t-field-text);border:1px solid var(--t-field-border);
     padding:8px 15px;border-radius:7px;font-size:12.5px;opacity:0;pointer-events:none;
@@ -118,25 +112,16 @@
 
 <script type="application/json" id="layout-manifest">
 {
-  "_meta": { "app": "maw-budget", "kind": "filemaker-layout-render", "rendererVersion": "0.3", "generated": "2026-07-16", "note": "Pure interactive Browse-mode render. No dev chrome. Manifest-driven; auto-extends with new objects. Theme provisional pending themes doc-set." },
+  "_meta": { "app": "maw-budget", "kind": "filemaker-layout-render", "rendererVersion": "0.4", "generated": "2026-07-16", "note": "Pure interactive Browse-mode render. No dev chrome. Manifest-driven; auto-extends with new objects. Theme tokens resolved LIVE from z-themes by slug via resolve.js — no inline token mirror." },
   "layout": {
     "name": "GLOBAL_Settings",
     "viewName": "SYS | Global Settings [DSK]",
     "layoutWidth": 1024,
     "theme": {
       "name": "MAW Dark Utility",
-      "tokens": {
-        "t-bg": "oklch(0.23 0.013 260)",
-        "t-header": "oklch(0.285 0.02 260)",
-        "t-body": "oklch(0.235 0.012 260)",
-        "t-footer": "oklch(0.27 0.016 260)",
-        "t-field": "oklch(0.31 0.014 260)",
-        "t-field-border": "oklch(0.44 0.02 260)",
-        "t-field-text": "oklch(0.94 0.008 260)",
-        "t-label": "oklch(0.70 0.012 260)",
-        "t-accent": "oklch(0.72 0.11 205)",
-        "t-title": "oklch(0.96 0.02 205)"
-      }
+      "slug": "maw-dark-utility",
+      "status": "locked",
+      "themeRef": "../../../../z-themes/maw-dark-utility.json#maw-dark-utility"
     }
   },
   "sections": [
@@ -166,25 +151,35 @@
 }
 </script>
 
+<script src="../../../../z-themes/resolve.js"></script>
 <script>
 (function(){
   var M = JSON.parse(document.getElementById('layout-manifest').textContent);
   var L = M.layout, root = document.getElementById('layout');
   document.title = L.viewName || L.name;
-  var tk = L.theme.tokens; Object.keys(tk).forEach(function(k){ root.style.setProperty('--'+k, tk[k]); document.documentElement.style.setProperty('--'+k, tk[k]); });
   root.style.width = (L.layoutWidth||1024)+'px';
 
+  // --- resolve theme tokens LIVE from z-themes by slug ---
+  // resolve.js sets canonical --cv-* vars; this renderer's CSS uses --t-*,
+  // so we alias cv -> t. Change the theme in z-themes and this reskins with no re-render.
+  var ALIAS = {
+    'cv-bg':'t-bg','cv-part-header':'t-header','cv-part-body':'t-body','cv-part-footer':'t-footer',
+    'cv-field-fill':'t-field','cv-field-border':'t-field-border','cv-field-text':'t-field-text',
+    'cv-label':'t-label','cv-accent':'t-accent','cv-title':'t-title'
+  };
+  if(window.ZTHEMES && L.theme && L.theme.slug){
+    ZTHEMES.apply(L.theme.slug, { root: document.documentElement, aliasMap: ALIAS });
+  }
+
   var CHECK = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2l2.2 2.2 4.8-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  var uid=0;
-  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   function control(o){
-    var id='c'+(++uid);
     switch(o.control){
-      case 'staticText': return '<div class="title">'+esc(o.sample)+'</div>';
-      case 'mergeText':  return '<div class="merge">'+esc(o.sample)+'</div>';
-      case 'editBox':    return '<input class="inp" type="text" value="'+esc(o.value||'')+'">';
-      case 'displayOnly':return '<div class="disp mono">'+esc(o.value||'')+'</div>';
+      case 'staticText':  return '<div class="title">'+esc(o.sample)+'</div>';
+      case 'mergeText':   return '<div class="merge">'+esc(o.sample)+'</div>';
+      case 'editBox':     return '<input class="inp" type="text" value="'+esc(o.value||'')+'">';
+      case 'displayOnly': return '<div class="disp mono">'+esc(o.value||'')+'</div>';
       case 'displayMulti':return '<div class="multibox">'+esc(o.value||'')+'</div>';
       case 'popupMenu':
       case 'dropDownList':
@@ -193,8 +188,8 @@
         return '<div class="chk'+(o.checked?' on':'')+'" data-chk role="checkbox" aria-checked="'+(!!o.checked)+'" tabindex="0"><span class="box">'+CHECK+'</span><span class="chk-t">'+(o.checked?'Enabled':'Disabled')+'</span></div>';
       case 'radioButtonSet':
         return '<div class="radios" data-radio>'+ (o.options||[]).map(function(op){return '<span class="radio'+(op===o.value?' on':'')+'" data-val="'+esc(op)+'"><span class="rd"></span>'+esc(op)+'</span>';}).join('') +'</div>';
-      case 'button':      return '<button class="btn" data-btn="'+esc(o.label)+'">'+esc(o.label)+'</button>';
-      case 'buttonPrimary':return '<button class="btn primary" data-btn="'+esc(o.label)+'">'+esc(o.label)+'</button>';
+      case 'button':        return '<button class="btn" data-btn="'+esc(o.label)+'">'+esc(o.label)+'</button>';
+      case 'buttonPrimary': return '<button class="btn primary" data-btn="'+esc(o.label)+'">'+esc(o.label)+'</button>';
       default: return '<input class="inp" type="text" value="'+esc(o.value||'')+'">';
     }
   }
@@ -233,9 +228,9 @@
   var ft, flashEl=document.getElementById('flash');
   function flash(msg){ flashEl.textContent=msg; flashEl.classList.add('show'); clearTimeout(ft); ft=setTimeout(function(){flashEl.classList.remove('show');},1400); }
 
-  // --- silent auto-fit to viewport (no zoom UI) ---
+  // --- silent auto-fit to viewport ---
   var fit=document.getElementById('fit'), W=(L.layoutWidth||1024);
-  function scale(){ var s=Math.min(1,(window.innerWidth-0)/W); fit.style.transform='scale('+s+')'; document.body.style.height=(root.offsetHeight*s)+'px'; }
+  function scale(){ var s=Math.min(1,(window.innerWidth)/W); fit.style.transform='scale('+s+')'; document.body.style.height=(root.offsetHeight*s)+'px'; }
   window.addEventListener('resize',scale); scale();
 })();
 </script>
