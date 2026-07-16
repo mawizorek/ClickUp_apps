@@ -15,6 +15,12 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ---
 
+## 2026-07-16 · `default-theme` is the standing default pointer + ultimate fallback
+**Decision:** Added `default-theme`: a deliberately grayscale (zero-chroma) skin — medium-gray canvas, lighter gray surfaces, gray highlight accent (NOT black-on-white paper). It is the standing DEFAULT: new apps/renders point at it unless Michael names a theme or there's an intentional reason to diverge. Also set as the resolver's `ultimateFallback` + `defaultTheme` in `_index.json`, and the embedded ULTIMATE in `resolve.js`. `preview.html` opens on it.
+**Why:** Michael wants a default that visibly reads as UNSKINNED ("if it's still gray, it hasn't been themed yet"), so agents always start from a theme pointer instead of designing colors from scratch, and swapping to a real theme is a one-line slug change. Making it the ultimate fallback means a failed/stub resolve lands on the honest gray placeholder, never a broken or arbitrary skin. The build instruction lives in the theme-contract gate + root README.
+**Status:** locked
+**Supersedes:** `maw-dark-utility` as the resolver's ultimateFallback (maw-dark-utility remains a normal utility theme).
+
 ## 2026-07-16 · Theming backbone is the repo-root law for ALL future designs
 **Decision:** The theme system is now stated as a standing law at the repo ROOT (`README.md`, top section): every visual thing built here — ClickUp HTML apps, FileMaker layout renders, standalone artifacts, quickfire pages, any layout — draws color from `shared/themes/` by slug. No agent invents a palette, hardcodes color, or rolls its own theme. Root README doubles as the cold-agent orientation map.
 **Why:** The theme-contract gate enforced this on build, but the highest-level doc an agent hits on entering the Git (root README) was empty, so a fresh agent could design in a vacuum before ever seeing the gate. Putting the backbone at the front door makes it the first thing read and the default posture, not a rule discovered late.

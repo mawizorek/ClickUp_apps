@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "Default Theme",
+  "slug": "default-theme",
+  "status": "locked",
+  "mode": "dark",
+  "intendedUse": "the unskinned default — what a new app points at before a theme is chosen",
+  "description": "Deliberately grayscale (zero chroma) so an unthemed app reads as clearly UNSKINNED, not finished. Medium gray canvas with lighter gray surfaces and a gray highlight accent — NOT a black-on-white paper look. This is the standing default pointer: new apps use it until a real theme is swapped in. If your app is still gray, it hasn't been themed yet.",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "bg": "oklch(0.28 0 0)",
+    "surface-1": "oklch(0.33 0 0)",
+    "surface-2": "oklch(0.38 0 0)",
+    "surface-3": "oklch(0.43 0 0)",
+    "border": "oklch(0.52 0 0)",
+    "field": "oklch(0.36 0 0)",
+    "text": "oklch(0.96 0 0)",
+    "text-soft": "oklch(0.78 0 0)",
+    "text-faint": "oklch(0.62 0 0)",
+    "accent": "oklch(0.70 0 0)",
+    "accent-2": "oklch(0.60 0 0)",
+    "accent-soft": "oklch(0.44 0 0)",
+    "on-accent": "oklch(0.20 0 0)",
+    "good": "oklch(0.72 0 0)",
+    "warn": "oklch(0.66 0 0)",
+    "bad": "oklch(0.58 0 0)",
+    "info": "oklch(0.62 0 0)"
+  }
+}

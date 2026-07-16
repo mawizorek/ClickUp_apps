@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-mode="dark" data-theme="maw-dark-utility">
+<html lang="en" data-mode="dark" data-theme="default-theme">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -8,7 +8,8 @@
 <!-- STATIC token source: themes.css carries every [data-theme="slug"] block + :root fallback.
      The gallery styles from this alone — no JS fetch required, so it can never white-screen.
      The MENU auto-populates from _index.json (the theme registry) with a baked-in fallback;
-     each swatch color is read straight from themes.css, so a new theme is never hand-copied here. -->
+     each swatch color is read straight from themes.css, so a new theme is never hand-copied here.
+     Lands on default-theme (the unskinned grayscale default) until a theme is picked. -->
 <link rel="stylesheet" href="./themes.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -178,7 +179,7 @@
 <div class="wrap">
   <header class="mast">
     <h1>Theme × object gallery</h1>
-    <div class="sub">The 20 canonical FileMaker objects (the defensible cross-app set from the Canonical Object Library), each rendered from the 17 shared theme tokens with its real state matrix. Pick any theme: every object reskins live. This is the coverage proof — if an object looks wrong or a token is missing, that theme can't define that object.</div>
+    <div class="sub">The 20 canonical FileMaker objects (the defensible cross-app set from the Canonical Object Library), each rendered from the 17 shared theme tokens with its real state matrix. Opens on <strong>Default Theme</strong> (the unskinned grayscale default) — pick any theme and every object reskins live. This is the coverage proof: if an object looks wrong or a token is missing, that theme can't define that object.</div>
   </header>
 
   <div class="stickybar">
@@ -186,14 +187,14 @@
       <div class="theme-menu" id="themeMenu">
         <button class="tm-trigger" id="tmTrigger" aria-haspopup="listbox" aria-expanded="false">
           <span class="tm-sw" id="tmSw"></span>
-          <span class="tm-name" id="tmName">MAW Dark Utility</span>
+          <span class="tm-name" id="tmName">Default Theme</span>
           <span class="tm-mode" id="tmMode">dark</span>
           <span class="tm-chev">▾</span>
         </button>
         <div class="tm-panel" id="tmPanel" role="listbox" aria-label="Choose a theme"></div>
       </div>
       <span class="coverage" id="coverage">object coverage: <b>17/17 tokens</b> · all 20 objects styled</span>
-      <span class="badge" id="activeBadge">MAW Dark Utility · dark</span>
+      <span class="badge" id="activeBadge">Default Theme · dark</span>
     </div>
   </div>
 
@@ -313,15 +314,17 @@
   // The MENU auto-populates from _index.json (the theme registry). Add a theme to the registry
   // + themes.css and it shows up here with no edit to this file. Baked-in fallback below covers
   // a failed fetch. Each swatch color is READ from themes.css via a hidden probe, so a new
-  // theme's accent is never hand-copied into this page.
+  // theme's accent is never hand-copied into this page. Lands on default-theme until a pick.
   var TOKEN_KEYS = ["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-2","accent-soft","on-accent","good","warn","bad","info"];
 
   // Fallback registry (used ONLY if ./_index.json fails to load). Mirrors the manifest.
   var FALLBACK_GROUPS = [
+    { label:"Default", themes:[ {slug:"default-theme",name:"Default Theme",mode:"dark"} ]},
     { label:"Utility", themes:[ {slug:"maw-dark-utility",name:"MAW Dark Utility",mode:"dark"} ]},
     { label:"Neutral & Natural", themes:[
       {slug:"paper-mono",name:"Paper Mono",mode:"light"},
-      {slug:"papyrus",name:"Papyrus",mode:"light"}
+      {slug:"papyrus",name:"Papyrus",mode:"light"},
+      {slug:"americana",name:"Americana",mode:"light"}
     ]},
     { label:"F1 Constructors 2026", themes:[
       {slug:"mclaren",name:"McLaren",mode:"dark"}, {slug:"ferrari",name:"Ferrari",mode:"dark"},
@@ -343,7 +346,7 @@
   var coverageEl = document.getElementById('coverage');
   var swatches = document.getElementById('swatches');
   var trailEl = document.getElementById('trail');
-  var current = 'maw-dark-utility';
+  var current = 'default-theme';
   var ALL = [];
 
   // hidden probe: reads a theme's --accent straight out of themes.css so swatches are never hand-copied
@@ -389,7 +392,6 @@
     var t = ALL.filter(function(x){ return x.slug === slug; })[0];
     if (!t) { t = { slug: slug, name: slug, mode: modeOf(slug) }; }
     current = t.slug;
-    // the whole reskin: two attributes, CSS does the rest (no fetch, can't fail)
     root.setAttribute('data-theme', t.slug);
     root.setAttribute('data-mode', t.mode);
     tmSw.style.background = accentOf(t.slug);
@@ -402,7 +404,6 @@
     coverageEl.innerHTML = 'object coverage: <b>17/17 tokens</b> · all 20 objects styled';
     trailEl.textContent = '';
     setTimeout(renderSwatches, 40);
-    // OPTIONAL: if resolve.js loaded, show the real resolve trail + true coverage
     if (window.THEMES && typeof window.THEMES.resolve === 'function') {
       window.THEMES.resolve(slug).then(function(res){
         if (!res || res.error) return;
@@ -418,7 +419,6 @@
   function init(groups){
     ALL = groups.reduce(function(a,g){ return a.concat(g.themes); }, []);
     buildPanel(groups);
-    // keep current if still present, else land on the registry's first theme
     if (!ALL.filter(function(x){return x.slug===current;}).length && ALL.length) current = ALL[0].slug;
     select(current);
   }
@@ -431,6 +431,8 @@
         return { label: g.label, themes: (g.themes||[]).map(function(t){ return { slug:t.slug, name:t.name, mode:t.mode||'dark' }; }) };
       });
       if (!groups.length) throw new Error('empty registry');
+      // default the landing theme to the registry's declared default when present
+      if (idx.defaultTheme) current = idx.defaultTheme;
       init(groups);
     })
     .catch(function(){ init(FALLBACK_GROUPS); });

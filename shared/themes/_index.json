@@ -2,7 +2,8 @@
   "schemaVersion": 1,
   "contract": "global",
   "note": "GLOBAL theme contract. Shared by ClickUp HTML apps (Pages-hosted, resolve live) AND FileMaker layout renders (local design mockups, tokens inlined at render time). One vocabulary, one source of truth. Change a theme file once and every consumer that references its slug reskins.",
-  "ultimateFallback": "maw-dark-utility",
+  "defaultTheme": "default-theme",
+  "ultimateFallback": "default-theme",
   "tokenKeys": [
     "bg", "surface-1", "surface-2", "surface-3", "border", "field",
     "text", "text-soft", "text-faint",
@@ -42,6 +43,13 @@
     "cv-title": "text (use accent-2 for highlighted titles)"
   },
   "groups": [
+    {
+      "id": "default",
+      "label": "Default",
+      "themes": [
+        { "slug": "default-theme", "name": "Default Theme", "file": "default-theme.json", "status": "locked", "mode": "dark", "intendedUse": "unskinned default — new apps point here until a theme is chosen", "fmp": "pending" }
+      ]
+    },
     {
       "id": "utility",
       "label": "Utility",
