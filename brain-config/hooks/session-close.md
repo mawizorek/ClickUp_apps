@@ -4,7 +4,7 @@ display_name: Session Close
 type: hook
 status: active
 trigger: end of every Brain session (no exceptions)
-owner_agents: [closing-clio, memory-maggie]
+owner_agents: [closing-clio, memory-maggie, scribe-sana]
 ---
 
 # Session Close Hook
@@ -18,6 +18,8 @@ owner_agents: [closing-clio, memory-maggie]
 ## Overview
 
 Two posts, two channels, every session. Both follow the same structural rule: **root = tight header only, thread reply = all detail.** The root is what shows in the channel feed; the thread is what you expand when you want the full picture.
+
+The Session Log (Channel 2) is not built from scratch at close. On any real working session, Scribe Sana has already been keeping a live, chronological, speaker-labeled transcript in that channel from the moment the Session Transcript Gate fired (`gates/session-transcript-gate.md`). At close, that existing thread is FINALIZED — not re-created from memory.
 
 ---
 
@@ -38,7 +40,7 @@ Two posts, two channels, every session. Both follow the same structural rule: **
 **What's SKIPPED:**
 
 - **Channel 1 (Memory Audit):** skipped **only if memory was NOT written this session.** If any memory edit landed (or bounced), the audit STILL fires.
-- **Channel 2 (Session Log):** no transcript log on a soft close.
+- **Channel 2 (Session Log):** no transcript log on a soft close. (A soft close means the transcript gate never crossed the bar; if Scribe DID open a live thread this session, that session was substantive — finalize it as a full close.)
 
 If a soft-close session unexpectedly turned substantive (real decisions, a build), upgrade to a full close.
 
@@ -99,8 +101,10 @@ Post as a reply to the root. Contains the full audit:
 ## Channel 2: A.I. Prompts (Session Log)
 
 **URL:** https://app.clickup.com/36074068/chat/r/6-901327646617-8
-**Owner:** Closing Clio (session health, ref inventory, hurdles, doc/index reconciliation).
-**Purpose:** Permanent append-only log of every Brain session. The historical record of what was discussed, decided, built, and left open.
+**Owner:** Closing Clio (session health, ref inventory, hurdles, doc/index reconciliation) + Scribe Sana (the live transcript that Clio finalizes).
+**Purpose:** Permanent append-only log of every Brain session. The historical record of what was discussed, decided, built, and left open — as a true chronological back-and-forth, captured live, not a hazy after-the-fact summary.
+
+**Live-first:** on any real working session, this thread already exists before close. Scribe Sana opened it when the Session Transcript Gate fired (first real decision, or by the 3rd message during build/work) and has been appending the speaker-labeled transcript in real time. At close, finalize THAT thread — do not open a new root and do not rebuild the transcript from memory.
 
 ### Root message format (EXACT)
 
@@ -108,10 +112,10 @@ Post as a reply to the root. Contains the full audit:
 ## {Session Topic}
 
 trigger: {what started the session} | {date range} ET
-status: {complete | partial | handed off}
+status: {in progress | complete | partial | handed off}
 ```
 
-Three lines. Header, trigger line, status line. No detail, no bullet points, no refs.
+Three lines. Header, trigger line, status line. No detail, no bullet points, no refs. (Scribe posts this at `in progress` when the log opens; close flips the status.)
 
 **Correct:**
 ```
@@ -125,20 +129,22 @@ status: v17 built + shipped as artifact; repo commit walked back
 
 ### Thread reply format
 
-Post as a reply to the root. Contains the full session record:
+The thread is the live transcript Scribe kept, finalized. Lead with the chronological back-and-forth; the summary structure sits beneath it.
 
 ```
-## Session Transcript Summary
+## Session Transcript
 
 **Duration:** {time range}
 **Model:** {model name}
 **Closing capacity:** ~{context tokens used}K / {window}K ({X}%) · feel: {sharp / full / degraded, plus what recall is reliable vs hazy}
 
-### What happened
+### Transcript (chronological, speaker-labeled)
 
-1. **{Topic}:** {what was done}
-2. **{Topic}:** {what was done}
-...
+**Michael:** {what he said — verbatim where it matters}
+**Brain:** {what was said/done back — verbatim where it matters}
+**Michael:** ...
+**Brain:** ...
+{full back-and-forth in order; tight paraphrase only where exact wording is unrecoverable, marked as paraphrase}
 
 ### Key decisions
 
@@ -193,18 +199,19 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 2. **NEVER put detail in the root.** The root is the feed-scannable identifier. If someone scrolling the channel can't read your root in under 2 seconds, it's too long.
 3. **ALWAYS thread the detail.** Use `parent_message` pointing at the root message URL you just created.
 4. **Both channels, every session.** Even if memory didn't change (audit says "no changes, stable at X%"). Even if the session was short.
-5. **Closing capacity is MANDATORY in the session-log thread.** Every close reports Brain's real context usage (numbers, not vibes) + one honest line on how it feels and what recall is reliable vs hazy.
-6. **Memory audit posts first, then session log.** Maggie posts Channel 1; Clio posts Channel 2. Two owners, two posts, both root + thread.
-7. **Root messages are never edited after posting.** If you need to add info, thread it.
-8. **Thread replies can have addenda.** If the session continues after initial close (extended session), post an addendum reply in the same thread rather than a new root.
-9. **Usage log commit (after both posts).** Tally which profiled tools (hooks, gates, agents) fired during the session. Commit an update to `brain-config/usage-log.json` incrementing each tool's count and bumping `sessions_logged`. Format: `{ "tools": { "tool-slug": N, ... }, "sessions_logged": N, "last_updated": "YYYY-MM-DD" }`.
+5. **The Session Log thread is a live transcript, finalized — not reconstructed.** On any real working session Scribe opens it early (via the transcript gate) and appends in real time. At close you finalize that same thread. Building the transcript from memory at close is a failure mode, not the procedure.
+6. **Closing capacity is MANDATORY in the session-log thread.** Every close reports Brain's real context usage (numbers, not vibes) + one honest line on how it feels and what recall is reliable vs hazy.
+7. **Memory audit posts first, then session log.** Maggie posts Channel 1; Clio finalizes Channel 2 (the thread Scribe kept). Two owners on the posts, both root + thread.
+8. **Root messages are never edited after posting — except the Session Log status line,** which Scribe sets to `in progress` at open and close flips to its final state. No other root edits; add info by threading.
+9. **Thread replies can have addenda.** If the session continues after initial close (extended session), post an addendum reply in the same thread rather than a new root.
+10. **Usage log commit (after both posts).** Tally which profiled tools (hooks, gates, agents) fired during the session — including the session-transcript-gate and Scribe Sana when the live log ran. Commit an update to `brain-config/usage-log.json` incrementing each tool's count and bumping `sessions_logged`. Format: `{ "tools": { "tool-slug": N, ... }, "sessions_logged": N, "last_updated": "YYYY-MM-DD" }`.
 
 ---
 
 ## Execution Order
 
 1. Memory Maggie posts Channel 1 (Memory Audit: root + thread)
-2. Closing Clio posts Channel 2 (Session Log: root + thread)
+2. Closing Clio finalizes Channel 2 (Session Log: the live thread Scribe kept — flip status, add closing structure beneath the transcript)
 3. Warm-start handoff prompt (if open loops exist)
 4. Usage-log commit to `brain-config/usage-log.json`
 
@@ -214,7 +221,7 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 
 **Memory Audit:** root is a bare token line; thread carries full audit structure even when nothing changed.
 
-**Session Log:** root is tight header with trigger/date/status; thread has full chronology, decisions, refs, open loops.
+**Session Log:** root is tight header with trigger/date/status; thread leads with the chronological speaker-labeled transcript, then decisions, refs, open loops.
 
 ---
 
@@ -225,6 +232,8 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 | Detail in the root message | Agent forgot to thread | Repost detail as thread reply |
 | Used Post format | Agent confused Posts with messages | Never use `create_as_post: true` |
 | Missing thread reply | Agent posted root then moved on | Always post both root AND thread |
+| Transcript rebuilt from memory at close | Scribe never opened the live log | Open the log when the transcript gate fires; finalize that thread at close |
+| Thin / summary-only session log | Agent summarized instead of transcribing | Lead the thread with the chronological speaker-labeled back-and-forth |
 | Audit says "no changes" with no thread | Agent skipped the structure | Still post full audit template with "None" in changes |
 | Multiple roots for same session | Agent posted twice | Use addendum replies in thread |
 | Root too verbose | Agent put summary in root | Root = identifier only |
@@ -233,4 +242,4 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 
 ## Why This Matters
 
-These channels are the institutional memory of our work together. A cold agent picking up next week can scroll the session log and reconstruct exactly what state everything is in. The memory audit channel tracks preference file health over time without loading the full file. Inconsistent, unscannable, or detail-missing posts degrade the whole system into noise.
+These channels are the institutional memory of our work together. A cold agent picking up next week can scroll the session log and reconstruct exactly what state everything is in — and now, read the actual back-and-forth that got us there, not a hazy summary. The memory audit channel tracks preference file health over time without loading the full file. Inconsistent, unscannable, or detail-missing posts degrade the whole system into noise.
