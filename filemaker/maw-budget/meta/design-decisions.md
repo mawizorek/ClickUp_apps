@@ -90,8 +90,19 @@ maw-budget must track money Michael fronts that someone else pays back: **dad, U
 - **Gig-work income is distinct from a reimbursement:** gig pay is real income, not money paid back. "Gig accounts" as a payer is a party; the money landing is income, not a receivable clearing. Keep the two concepts separate.
 - Which of (a)/(b) is the default, and whether receivables are in **Phase 1** or fold into the Phase 2 match layer, is the open sub-question — see inquiry item **L**. The model choice (receivable, not a flag) is LOCKED; the packaging is open.
 
+## DD-014 — Hierarchical categories (parent → child) `LOCKED` (2026-07-15)
+
+Categories are **hierarchical**: a self-referencing tree (parent → child), not a flat list. (Answer to inquiry C.)
+
+**Why:** matches how every reference tool does it (QuickBooks sub-accounts, YNAB category groups, Firefly categories). A tree gives **rollups for free** — spend on Food = the sum of Food → Groceries + Food → Dining + Food → Coffee — so reports can zoom out to a parent or drill into a child without re-tagging anything. It also sets up the Phase 3 envelope layer cleanly (assign at whatever level you budget at). Structurally it's the same self-reference we already sketched (`fkParentCategory`), so it costs nothing to support now.
+
+**Implications:**
+- `Category` carries `fkParentCategory` (null = top-level) + its income/expense type. A parent's type constrains its children.
+- Reports roll up the tree; the ledger still tags each leg to a single (usually leaf) category.
+- Depth: **2 levels** (parent → child) is the working assumption — enough for real rollups, shallow enough to stay sane. Confirm if you want arbitrary depth. Exact category list is data, gathered at entry time, not structure.
+
 ---
 
 ## Deferred / not yet decided
 
-Remaining open interrogation: **C–L** (categories, splits, net-worth-over-time, valuation cadence, bills, budgeting model, reports, reconciliation, platform, and reimbursement packaging/phase). See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
+Remaining open interrogation: **D–L** (splits, net-worth-over-time, valuation cadence, bills, budgeting model, reports, reconciliation, platform, and reimbursement packaging/phase). See the **Open inquiry** section of `../next-build-spec.md`. No table is drafted until these are resolved; guessing fields now would bake in the wrong shape.
