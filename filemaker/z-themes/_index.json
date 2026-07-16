@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "ultimateFallback": "maw-dark-utility",
+  "tokenKeys": ["cv-bg","cv-part-header","cv-part-body","cv-part-footer","cv-field-fill","cv-field-border","cv-field-text","cv-label","cv-accent","cv-title"],
+  "groups": [
+    {
+      "id": "utility",
+      "label": "Utility",
+      "themes": [
+        { "slug": "maw-dark-utility", "name": "MAW Dark Utility", "file": "maw-dark-utility.json", "status": "locked", "mode": "dark", "intendedUse": "utility/admin", "fmp": "MAW Dark" }
+      ]
+    },
+    {
+      "id": "f1",
+      "label": "F1 Constructors",
+      "themes": [
+        { "slug": "mclaren", "name": "McLaren", "file": "f1/mclaren.json", "status": "draft", "mode": "dark", "intendedUse": "data-dense / ledger", "fmp": "pending" },
+        { "slug": "mercedes", "name": "Mercedes", "file": "f1/mercedes.json", "status": "stub", "mode": "dark", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "ferrari", "name": "Ferrari", "file": "f1/ferrari.json", "status": "stub", "mode": "dark", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "red-bull", "name": "Red Bull Racing", "file": "f1/red-bull.json", "status": "stub", "mode": "dark", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "alpine", "name": "Alpine", "file": "f1/alpine.json", "status": "stub", "mode": "dark", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "haas", "name": "Haas", "file": "f1/haas.json", "status": "stub", "mode": "light", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "racing-bulls", "name": "Racing Bulls", "file": "f1/racing-bulls.json", "status": "stub", "mode": "light", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "williams", "name": "Williams", "file": "f1/williams.json", "status": "stub", "mode": "light", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "audi", "name": "Audi", "file": "f1/audi.json", "status": "stub", "mode": "dark", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "aston-martin", "name": "Aston Martin", "file": "f1/aston-martin.json", "status": "stub", "mode": "dark", "intendedUse": "—", "fmp": "pending" },
+        { "slug": "cadillac", "name": "Cadillac", "file": "f1/cadillac.json", "status": "stub", "mode": "dark", "intendedUse": "—", "fmp": "pending" }
+      ]
+    }
+  ]
+}

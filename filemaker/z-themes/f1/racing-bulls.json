@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Racing Bulls",
+  "slug": "racing-bulls",
+  "status": "stub",
+  "mode": "light",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): pearl-white/lightweight energy with navy structure, red punch, junior-team sharpness. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Racing Bulls Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}

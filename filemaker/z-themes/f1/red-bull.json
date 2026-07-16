@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Red Bull Racing",
+  "slug": "red-bull",
+  "status": "stub",
+  "mode": "dark",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): midnight navy aggression, electric blue power, orange + magenta driver sparks. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Red Bull Racing Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "name": "McLaren",
+  "slug": "mclaren",
+  "status": "draft",
+  "mode": "dark",
+  "intendedUse": "data-dense / ledger",
+  "description": "Papaya-on-carbon board. Derived from the ClickUp McLaren Racing palette: carbon black chrome, anthracite panels, papaya (#FF8000) as the actionable accent, electric cyan (#00E5FF) as informational field labels (Piastri pattern). Cyan is informational, papaya is actionable — never both on one element.",
+  "source": "ClickUp doc: App Theme: McLaren Racing",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": {
+    "cv-bg": "oklch(0.21 0.008 55)",
+    "cv-part-header": "oklch(0.185 0.008 55)",
+    "cv-part-body": "oklch(0.235 0.008 55)",
+    "cv-part-footer": "oklch(0.27 0.010 55)",
+    "cv-field-fill": "oklch(0.29 0.010 55)",
+    "cv-field-border": "oklch(0.45 0.008 55)",
+    "cv-field-text": "oklch(0.95 0.004 90)",
+    "cv-label": "oklch(0.84 0.13 200)",
+    "cv-accent": "oklch(0.74 0.18 58)",
+    "cv-title": "oklch(0.80 0.17 58)"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Audi",
+  "slug": "audi",
+  "status": "stub",
+  "mode": "dark",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): obsidian minimalism, crimson engineering severity, lime + Brazil-green signals. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Audi Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Aston Martin",
+  "slug": "aston-martin",
+  "status": "stub",
+  "mode": "dark",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): racing-green luxury, lime edge, neon-yellow + cool-teal driver cues. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Aston Martin Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}

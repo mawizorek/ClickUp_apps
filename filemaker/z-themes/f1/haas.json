@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Haas",
+  "slug": "haas",
+  "status": "stub",
+  "mode": "light",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): workshop white/graphite austerity with red pressure and lime rookie edge. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Haas Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}

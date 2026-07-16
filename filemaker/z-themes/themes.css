@@ -1,0 +1,45 @@
+/* z-themes/themes.css — GENERATED from the per-theme JSON. DO NOT HAND-EDIT.
+   One [data-theme="<slug>"] block per resolved theme. Renderers link this file
+   and set data-theme on the render root; elements skin off var(--cv-*).
+   Stub themes are intentionally omitted here — they resolve via the _base
+   fallback spine at runtime (see README § Fallback trail). */
+
+/* ultimate fallback spine (also used when a resolved theme is missing a key) */
+:root{
+  --cv-bg: oklch(0.23 0.013 260);
+  --cv-part-header: oklch(0.285 0.02 260);
+  --cv-part-body: oklch(0.235 0.012 260);
+  --cv-part-footer: oklch(0.27 0.016 260);
+  --cv-field-fill: oklch(0.31 0.014 260);
+  --cv-field-border: oklch(0.44 0.02 260);
+  --cv-field-text: oklch(0.94 0.008 260);
+  --cv-label: oklch(0.70 0.012 260);
+  --cv-accent: oklch(0.55 0.03 260);
+  --cv-title: oklch(0.92 0.01 260);
+}
+
+[data-theme="maw-dark-utility"]{
+  --cv-bg: oklch(0.23 0.013 260);
+  --cv-part-header: oklch(0.285 0.02 260);
+  --cv-part-body: oklch(0.235 0.012 260);
+  --cv-part-footer: oklch(0.27 0.016 260);
+  --cv-field-fill: oklch(0.31 0.014 260);
+  --cv-field-border: oklch(0.44 0.02 260);
+  --cv-field-text: oklch(0.94 0.008 260);
+  --cv-label: oklch(0.70 0.012 260);
+  --cv-accent: oklch(0.72 0.11 205);
+  --cv-title: oklch(0.96 0.02 205);
+}
+
+[data-theme="mclaren"]{
+  --cv-bg: oklch(0.21 0.008 55);
+  --cv-part-header: oklch(0.185 0.008 55);
+  --cv-part-body: oklch(0.235 0.008 55);
+  --cv-part-footer: oklch(0.27 0.010 55);
+  --cv-field-fill: oklch(0.29 0.010 55);
+  --cv-field-border: oklch(0.45 0.008 55);
+  --cv-field-text: oklch(0.95 0.004 90);
+  --cv-label: oklch(0.84 0.13 200);
+  --cv-accent: oklch(0.74 0.18 58);
+  --cv-title: oklch(0.80 0.17 58);
+}

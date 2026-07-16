@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "name": "Cadillac",
+  "slug": "cadillac",
+  "status": "stub",
+  "mode": "dark",
+  "intendedUse": "—",
+  "description": "STUB. Signature (ClickUp prior-art): American luxury navy, white and red chrome, Mexico-green + ice-blue accents. Renders the _base fallback until tokens are defined.",
+  "source": "ClickUp doc: Cadillac Theme Object Template — 2026",
+  "fmpMapping": { "fmTheme": "pending", "styles": {} },
+  "tokens": null
+}
