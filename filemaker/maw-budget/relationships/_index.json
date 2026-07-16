@@ -2,7 +2,7 @@
   "_meta": {
     "app": "maw-budget",
     "folder": "relationships",
-    "schemaVersion": "2.0",
+    "schemaVersion": "2.1",
     "generated": "2026-07-16",
     "source": "../schema/relationships.json",
     "model": "TO graph (anchor-buoy). occurrenceId is the join key into layouts/_index.json. See meta/relationship-audit-model.md."
@@ -14,9 +14,31 @@
       "anchorGroup": "Globals",
       "role": "anchor",
       "status": "proposed",
-      "note": "Single-record global-storage utility TO. Anchor for SYS | Global Settings [DSK]. Island of one — no relationships yet by design (globals screen).",
+      "note": "Single-record global-storage utility TO. Anchor for SYS | Global Settings [DSK]. Island of one - no relationships yet by design. NOTE: holds gLIST_ value-list keys that reference value lists by name (a stored key, not a relationship); the Value Lists layout edits those assignments.",
+      "edges": []
+    },
+    {
+      "occurrenceId": "ValueLists",
+      "baseTable": "ValueLists",
+      "anchorGroup": "ValueLists",
+      "role": "anchor",
+      "status": "proposed",
+      "note": "Value-list registry TO. Anchor for SYS | Value Lists [DSK]. Left rail = found set of this TO; right portal = its ValueListItems.",
+      "edges": [
+        { "toOccurrenceId": "ValueListItems", "fromField": "PrimaryKey", "toField": "fkValueList", "cardinality": "one-to-many", "allowCreate": true, "allowDelete": true }
+      ]
+    },
+    {
+      "occurrenceId": "ValueListItems",
+      "baseTable": "ValueListItems",
+      "anchorGroup": "ValueLists",
+      "role": "buoy",
+      "status": "proposed",
+      "note": "Members of a value list (sort order, value, status-category mapping, notes). Buoy off ValueLists. Status mapping (fkStatusCategory / StatusCategory) resolves against the canonical VL_StatusCategories members; modeled as a value-list-backed field for now, not a TO edge.",
       "edges": []
     }
   ],
-  "relationships": []
+  "relationships": [
+    { "from": "ValueLists", "to": "ValueListItems", "predicate": "ValueLists::PrimaryKey = ValueListItems::fkValueList", "cardinality": "one-to-many", "status": "proposed" }
+  ]
 }

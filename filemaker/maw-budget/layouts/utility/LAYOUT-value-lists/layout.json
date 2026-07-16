@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "app": "maw-budget",
+    "kind": "filemaker-layout-render",
+    "rendererVersion": "0.3",
+    "generated": "2026-07-16",
+    "note": "Canonical manifest for the Value Lists editor layout (master-detail). preview.html is the pure interactive render; index.html is the inspector. The value-list DATA itself is the source of truth in ../../../value-lists/_index.json; the objects here describe the LAYOUT (what controls sit where + their bindings). Bindings are PROPOSED (no tables yet). Theme mirrors z-themes maw-dark-utility (provisional). Prior art: URITP Budget Value Lists page."
+  },
+  "layout": {
+    "name": "VALUE_Lists",
+    "viewName": "SYS | Value Lists [DSK]",
+    "viewNameStatus": "provisional",
+    "folder": "utility",
+    "occurrence": "ValueLists",
+    "occurrenceId": "ValueLists",
+    "baseTable": "ValueLists",
+    "recordScope": "Found set of ValueLists; left rail selects one, right portal shows its ValueListItems.",
+    "mode": "Browse",
+    "platform": "Computer",
+    "targetStencil": "Desktop: 1024 x 768",
+    "layoutWidth": 1024,
+    "purpose": "Central value-list documentation + editor for the app: define each list, how it derives, its members, its status-category mapping (for status lists), and which gLIST_ global keys point at it. This is the per-app value-list registry surfaced as an editable FileMaker layout.",
+    "theme": {
+      "name": "MAW Dark Utility",
+      "status": "provisional",
+      "themeRef": "../../../../z-themes/maw-dark-utility.json#maw-dark-utility",
+      "themeSlug": "maw-dark-utility",
+      "tokensNote": "MIRROR of z-themes tokens. Canonical source is the z-themes doc-set (separate agent migration). URITP prior art uses an amber+teal scheme; the themes doc-set decides the real palette.",
+      "tokens": {
+        "cv-bg": "oklch(0.23 0.013 260)",
+        "cv-part-header": "oklch(0.285 0.02 260)",
+        "cv-part-body": "oklch(0.235 0.012 260)",
+        "cv-part-footer": "oklch(0.27 0.016 260)",
+        "cv-rail": "oklch(0.205 0.012 260)",
+        "cv-field-fill": "oklch(0.31 0.014 260)",
+        "cv-field-border": "oklch(0.44 0.02 260)",
+        "cv-field-text": "oklch(0.94 0.008 260)",
+        "cv-label": "oklch(0.70 0.012 260)",
+        "cv-accent": "oklch(0.72 0.11 205)",
+        "cv-title": "oklch(0.96 0.02 205)"
+      }
+    }
+  },
+  "sections": [
+    { "id": "rail", "label": "Value Lists (left rail)" },
+    { "id": "detail", "label": "Selected List Detail" },
+    { "id": "globals", "label": "gLIST Assignments (GLOBALS panel)" }
+  ],
+  "objects": [
+    { "seq": 1, "part": "header", "kind": "text", "control": "staticText", "label": "Area / title", "sample": "Value Lists", "notes": "Area label + teal title, matching URITP prior art header." },
+    { "seq": 2, "part": "header", "kind": "button", "control": "buttonPrimary", "label": "New Value List", "script": "vl_NewValueList", "notes": "Creates a new ValueLists record." },
+    { "seq": 3, "part": "header", "kind": "button", "control": "button", "label": "Navigation placeholder", "notes": "Reserved nav slot (prior art parity)." },
+    { "seq": 4, "part": "header", "kind": "button", "control": "button", "label": "GLOBALS", "script": "vl_ToggleGlobalsPanel", "notes": "Toggles the gLIST assignment popover." },
+    { "seq": 5, "part": "body", "section": "rail", "kind": "portal", "control": "listPortal", "label": "Value Lists list", "binding": { "table": "ValueLists", "field": "Name", "fieldType": "Text", "status": "proposed" }, "notes": "Portal/list of ValueLists on the anchor TO; selecting a row sets the detail context (g_SelectedValueList)." },
+    { "seq": 6, "part": "body", "section": "detail", "kind": "field", "control": "staticText", "label": "Selected list title", "sample": "Status Categories", "binding": { "table": "ValueLists", "field": "Name", "fieldType": "Text", "status": "proposed" } },
+    { "seq": 7, "part": "body", "section": "detail", "kind": "field", "control": "checkboxSet", "label": "IS_ACTIVE", "binding": { "table": "ValueLists", "field": "IsActive", "fieldType": "Number", "status": "proposed" } },
+    { "seq": 8, "part": "body", "section": "detail", "kind": "field", "control": "checkboxSet", "label": "IS_STATUS_LIST", "binding": { "table": "ValueLists", "field": "IsStatusList", "fieldType": "Number", "status": "proposed" }, "notes": "When on, the STATUS mapping column shows in the item portal." },
+    { "seq": 9, "part": "body", "section": "detail", "kind": "field", "control": "checkboxSet", "label": "ENFORCE 1-TO-1", "binding": { "table": "ValueLists", "field": "Enforce1to1", "fieldType": "Number", "status": "proposed" }, "notes": "Requires each item map to exactly one canonical status category." },
+    { "seq": 10, "part": "body", "section": "detail", "kind": "button", "control": "button", "label": "NOTES", "script": "vl_ShowListNotes" },
+    { "seq": 11, "part": "body", "section": "detail", "kind": "portal", "control": "itemPortal", "label": "List members", "columns": ["SORT", "VALUE", "info", "STATUS"], "binding": { "table": "ValueListItems", "via": "ValueLists::PrimaryKey = ValueListItems::fkValueList", "fields": { "sort": "SortOrder", "value": "Value", "statusCategory": "fkStatusCategory" }, "valueList": "VL_StatusCategories", "status": "proposed" }, "notes": "Portal of the selected list's items. STATUS dropdown value list = VL_StatusCategories (canonical). Shown only when IsStatusList." },
+    { "seq": 12, "part": "body", "section": "detail", "kind": "field", "control": "editBox", "label": "add value", "binding": { "table": "ValueListItems", "field": "Value", "fieldType": "Text", "status": "proposed" }, "notes": "Blank creation row; commits a new ValueListItems record on entry." },
+    { "seq": 13, "part": "body", "section": "globals", "kind": "panel", "control": "assignmentGrid", "label": "gLIST Assignments", "binding": { "table": "Globals", "fieldPattern": "gLIST_*", "status": "proposed" }, "notes": "Popover: each gLIST_ global key -> value-list dropdown. Keys live in Globals but are edited here, not on GLOBAL_Settings." },
+    { "seq": 14, "part": "footer", "kind": "field", "control": "displayOnly", "label": "PrimaryKey", "sample": "E44D55B3-3800-4603-9EC0-4698235", "binding": { "table": "ValueLists", "field": "PrimaryKey", "fieldType": "Text (UUID)", "status": "proposed" } },
+    { "seq": 15, "part": "footer", "kind": "text", "control": "mergeText", "label": "Version / last save", "sample": "v0.1.0" }
+  ]
+}
