@@ -1,0 +1,8 @@
+field_name,data_type,example_value,notes
+Name,text,Point HS-3,the rig point name
+Position,text,3 CATWALK,catwalk / high-steel location
+Beam,text,East 4ft,beam reference (runs E/W off center)
+Rated Load,text,see file,rated capacity (value lives in the file per S-4)
+Rig Type,text,Bridle,point / bridle / motor
+Default Class,text,Rigging-Point,the object's class (S-1)
+Default Layer,text,RIGGING - OVERHEAD,the object's layer (S-1)

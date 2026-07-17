@@ -1,0 +1,10 @@
+field_name,data_type,example_value,notes
+Name,text,Source Four 26deg,the object/symbol name
+Position,text,2 TOE PIPE,hanging position / location
+Unit Number,integer,12,auto-numbered where applicable
+Purpose,text,Front Wash SR,designer-facing purpose
+Channel,integer,101,control channel
+Dimmer,text,A12,dimmer / circuit
+Color,text,R80,gel / color
+Default Class,text,Lighting-Device,the object's class (S-1)
+Default Layer,text,LX - PLOT 2 TOE PIPES,the object's layer (S-1)

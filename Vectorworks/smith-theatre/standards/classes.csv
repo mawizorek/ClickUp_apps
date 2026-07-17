@@ -1,0 +1,21 @@
+class_name,parent_group,purpose,default_attributes
+Steel,,structural steel objects,by-class
+Wood,,structural/scenic wood objects,by-class
+Framing-Stud,Framing,stud-wall framing,by-class
+Framing-Platform,Framing,platform framing,by-class
+Framing-Facing,Framing,facing/skin on framing,by-class
+Masking-Border,Masking,overhead masking borders,by-class
+Masking-Leg,Masking,vertical masking legs,by-class
+Masking-Traveler,Masking,traveling masking,by-class
+Masking-Ground-Row,Masking,ground-row masking,by-class
+Rigging-Pipe,Rigging,battens / pipes,by-class
+Rigging-Point,Rigging,rig points / bridles,by-class
+Rigging-Hardware,Rigging,shackles / clamps / hardware,by-class
+Rigging-Motor,Rigging,hoists / motors,by-class
+Lighting-Device,Lighting,lighting instruments (auto-class candidate),by-class
+Lighting-Accessory,Lighting,gobos / barn doors / accessories,by-class
+Lighting-Cable,Lighting,cable / circuiting,by-class
+Scenic-Hard,Scenic,hard scenic units,by-class
+Scenic-Soft,Scenic,soft goods / drops,by-class
+Scenic-Deck,Scenic,deck / flooring,by-class
+Hardware,,generic hardware,by-class
