@@ -511,7 +511,7 @@ function buildCard(obj) {
   if(stateKeys.length > 1) {
     tabsHtml = '<div class="card-tabs">';
     stateKeys.forEach(function(sk) {
-      tabsHtml += '<button class="card-tab" data-card="'+obj.id+'" data-state="'+sk+'" onclick="switchCardTab(\\''+obj.id+'\\', \\''+sk+'\\')">'+sk+'</button>';
+      tabsHtml += '<button class="card-tab" data-card="'+obj.id+'" data-state="'+sk+'" onclick="switchCardTab(\''+obj.id+'\', \''+sk+'\')">'+sk+'</button>';
     });
     tabsHtml += '</div>';
   }
