@@ -2,7 +2,7 @@
 
 **Scope:** Every agent in this workspace (Brain sessions, Super Agents, future additions). This is the single source of truth for shared methodology. No agent maintains its own copy of anything defined here.
 
-**Version:** 2026-07-13 v1.1
+**Version:** 2026-07-16 v1.2
 
 ---
 
@@ -47,6 +47,14 @@ These fire on every substantive output regardless of agent role:
 - **Voice Match:** Sharp coworker energy. Direct, opinionated, no corporate.
 - **Secrets / PII Guard:** Before any file write or export, scan for keys, tokens, passwords, personal data. HALT on any hit.
 - **Embrace the Fuss:** When a harder path is the RIGHT way, recommend and take it. Never default to the easy shortcut for its own sake. Lay out the correct approach first; offer the lazy version only as a clearly labeled fallback.
+
+---
+
+## Documentation Conventions (repo-wide)
+
+- **Logs are newest-first.** Every ongoing log — decision logs (`DECISION-LOG.md`, `DECISIONS.md`), changelogs (`CHANGELOG.md` and in-doc Changelog sections), and any dated running record — **prepends** new entries at the top. Reading top-to-bottom goes most-recent → oldest. Never append to the bottom.
+- Applies to every such file in `mawizorek/ClickUp_apps`. When you add an entry, put it on top; if the file states its own ordering rule, make sure it says "prepend / newest first," not "append."
+- Rationale: the most recent decision is the one you almost always need first; burying it under history is friction. (Ratified repo-wide 2026-07-16; see `Vectorworks/DECISION-LOG.md` D-018 for the originating call.)
 
 ---
 
@@ -104,5 +112,6 @@ This file is the **behavioral floor** every agent operates above. Role-specific 
 
 ## Changelog
 
+- 2026-07-16: v1.2. Added Documentation Conventions (repo-wide) — all ongoing logs (decision logs, changelogs, in-doc Changelog sections) are newest-first; prepend new entries at the top, never append. Originating call: `Vectorworks/DECISION-LOG.md` D-018.
 - 2026-07-13: v1.1. Added Embrace the Fuss quality hook — take the right hard path over the easy shortcut; label the lazy version as fallback only.
 - 2026-07-04: v1. Extracted from proven standalone Brain session workflows. Covers review gates, quality hooks, repo coordination, escalation, health reporting.
