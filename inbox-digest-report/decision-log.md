@@ -4,6 +4,16 @@ Newest on top. Each entry = a decision made + why, so a cold agent reconstructs 
 
 ---
 
+## 2026-07-17 - v5: report reskinned as a mobile-primary VIEWER (no table)
+
+- **Decision:** the report renders each email as a stacked ROW UNIT (status pill → sender/subject → plan), not a `<table>`. On phone the row stacks; at `>=720px` the same DOM reflows into three aligned columns (status / email / plan) via CSS grid. Drill-in `matrix.html` stays device-specific (wide horizontal-scroll grid), unedited.
+- **Why:** Michael runs sweeps mostly on mobile and wanted a VIEWER, not a toy activity app. The v3.2 `<table>` fought phones (fixed columns, cramped) and read app-y. A single responsive row unit merges cleanly across phone/desktop from one DOM, so there's no second layout to maintain, and it reads like a data viewer.
+- **What shipped (renderer + CSS only; JSON + data-only lock untouched):**
+  - `pages/report.html`: render emits `.bucket` sections of `.row` units (`.cell-status`/`.cell-email`/`.cell-plan`), no `<table>`. Still a pure renderer of `data/inbox-state.json`; copy tightened.
+  - `styles.css`: REPORT ADDITIONS block replaced with the v5 viewer (mobile-first; `@media (min-width:720px)` promotes rows to aligned columns; status strip 2x2→row-of-4; headline scoreboard number). Calmer framing (surface borders, small radius), dropped the squared-everything spreadsheet look. Matrix block untouched.
+  - `index.html` styles.css cache token → `?v=4`; shell v4 → v5.
+- **Locked:** report is mobile-primary and responsive from one DOM; drill-ins may stay device-specific. This is still a pure renderer — a sweep edits only `data/inbox-state.json`.
+
 ## 2026-07-17 - v4: app is a PURE RENDERER; data lives ONLY in inbox-state.json
 
 - **Decision:** `pages/report.html` no longer contains any email data. It fetches `data/inbox-state.json` and renders it. **A sweep refresh edits ONLY that JSON — never the renderer, index, or CSS.** This is the ONLY Gmail workflow we're building right now.
