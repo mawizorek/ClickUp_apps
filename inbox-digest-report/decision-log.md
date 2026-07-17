@@ -4,6 +4,19 @@ Newest on top. Each entry = a decision made + why, so a cold agent reconstructs 
 
 ---
 
+## 2026-07-16 - Report becomes the LANDING page; matrix demoted to page 2 (unedited)
+
+- **Decision:** when the Report page (v3) ships, it becomes the DEFAULT landing page (`DEFAULT_PAGE=report`). The existing field-capture matrix stays **exactly as-is** and lives on as the second page, pointed to by index/NAV as the direct raw read-out.
+- **Why:** the report is what Michael acts on; the matrix is the underlying data proof. Lead with the actionable surface, keep the raw grid one click away.
+- **Fence:** `pages/matrix.html` is NOT edited. The v3 build only ADDS `pages/report.html`, flips `DEFAULT_PAGE`, and reorders NAV. Nothing else on the matrix side moves.
+
+## 2026-07-16 - Auth deferred: bot-run on a dictated plan, NOT a GitHub Action (for now)
+
+- **Decision:** do NOT set up Gmail API auth / a GitHub Action to auto-pull `inbox-state.json` yet. Brain runs the sweep + dedup + historical-log checks on a dictated plan, in-session. Leave the built-in Gmail API pulls for in-app tricks (live "open in Gmail" links, on-demand refresh a page might want).
+- **Why:** a sweep is on-demand (Michael initiates "clean my inbox"), not a background heartbeat, so the Action's only advantage (unattended refresh) isn't needed. Auth is fragile: needs a Google Cloud project, OAuth consent, a one-time refresh-token mint, and secrets in the repo; refresh tokens rot (~6mo unused, or on password/re-auth change) and the cron then fails silently -> stale data nobody's watching. The dedup + historical-log logic is JUDGMENT, which is Brain's strength and cron's weakness.
+- **Reliability path chosen:** document the process crisply (hook + this log + next-build-spec) so any agent runs it the same way. The repeatable process is the DICTATED PLAN, not a CI pipeline.
+- **Not closed forever:** revisit only if sweeps ever need to run unattended. Auth setup steps are captured in `next-build-spec.md`'s parked section if that day comes.
+
 ## 2026-07-16 - v2: rebuilt as a true template copy (CORRECTION)
 
 - **Decision:** scrap the hand-rolled shell; copy `template-app` wholesale, then skin. Standard going forward: **every new app copies the gold-standard template folder verbatim (index shell + chrome.js + styles.css + manifest + icon + pages/), then adds pages. Never hand-roll a shell.**
