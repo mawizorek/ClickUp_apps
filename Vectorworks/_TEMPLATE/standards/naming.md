@@ -1,6 +1,6 @@
 # Naming Discipline (F-002 / F-010)
 
-> Naming conventions for layers, classes, and views — the discipline that keeps the file navigable and the reconciliation diffs clean.
+> **Package-local copy — self-contained on purpose.** Seeded from the global starting point in the package README; on clone this becomes THIS file's own naming standard, **allowed to drift per venue**, and it **travels with the package when exported** to the file viewer (it never depends on pointing up to the app-level notes, which don't ship with the export). State the rule fully here rather than deferring.
 
 ---
 
@@ -18,7 +18,7 @@ Up to **4 parts, dash-separated** (`Category-Sub-Detail`). The dash drives hiera
 
 ## Register it as a Standard Naming standard (F-010)
 
-Vectorworks has a built-in **Standard Naming** facility (`File > Document Settings > Standard Naming`) for layers/classes/viewports — ships VWArch + AIA/NCS + User 1/2/3 slots, up to 99 custom standards per type via the `ClassNameStds` / `LayerNameStds` / `ViewNameStds` worksheets. **Register the house naming here in the template** so every cloned file inherits it and auto-classing stays consistent.
+Vectorworks has a built-in **Standard Naming** facility (`File > Document Settings > Standard Naming`) for layers/classes/viewports — ships VWArch + AIA/NCS + User 1/2/3 slots, up to 99 custom standards per type via the `ClassNameStds` / `LayerNameStds` / `ViewNameStds` worksheets. **Register the house naming** so every cloned file inherits it and auto-classing stays consistent.
 
 ## General rules
 
@@ -31,6 +31,6 @@ Vectorworks has a built-in **Standard Naming** facility (`File > Document Settin
 ## TODO (per-instance)
 
 - [ ] Confirm the department-name vocabulary for this venue.
-- [ ] Register the house naming as a Standard Naming standard in the template file.
+- [ ] Register the house naming as a Standard Naming standard in the file.
 
-*Canonical: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-002 / F-010.*
+*Canonical research: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-002 / F-010. Global seed: the package README naming section.*

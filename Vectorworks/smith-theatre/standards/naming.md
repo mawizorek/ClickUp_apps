@@ -1,6 +1,6 @@
 # Naming Discipline — Smith Theatre (F-002 / F-010)
 
-> Naming for layers, classes, views — the discipline that keeps the file navigable and reconciliation diffs clean. The RULE is universal; this notes the Smith vocabulary.
+> **Package-local naming standard — self-contained on purpose (D-024).** Seeded from the template's global starting point, this is **Smith's own copy**: true to this file, **allowed to drift** from other packages, and it **travels with the package when exported** to the file viewer. It states the rule in full rather than pointing up to app-level notes (those don't ship with the export). Surfaced in summary in the package [`../README.md`](../README.md).
 
 ---
 
@@ -26,6 +26,6 @@ Up to 4 parts, dash-separated (`Category-Sub-Detail`); the dash drives nesting (
 
 ## To confirm (per-instance)
 
-- [ ] Register the house naming as a Vectorworks **Standard Naming** standard in the Smith file so clones inherit it and auto-classing stays consistent (F-010). Open pending Michael.
+- [ ] Register the Smith house naming as a Vectorworks **Standard Naming** standard in the file so clones inherit it and auto-classing stays consistent (F-010). Open pending Michael.
 
-*Canonical: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-002 / F-010.*
+*Canonical research: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-002 / F-010. Global seed: the template README naming section.*
