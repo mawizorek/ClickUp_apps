@@ -6,14 +6,15 @@
      To refresh the dashboard, edit ONLY that JSON. If you are about to paste email
      content into this file, STOP - it belongs in the JSON. This file is the VIEW;
      the JSON is the DATA; they never mix.
-     The router (index.html) re-executes this <script> after injecting the fragment,
-     so the fetch below runs on every navigation to #report.
-     Skin: v3.2 spreadsheet-dashboard (.rpt-* in styles.css REPORT ADDITIONS block);
-     every color a theme token. -->
+     The router (index.html) re-executes this <script> after injecting the fragment.
+     v5 skin: mobile-primary VIEWER. Each email renders as a stacked row (status pill,
+     sender/subject, plan) on phone; the same DOM reflows into aligned columns on wide
+     screens (>=720px). No <table>, so long senders/addresses never shred. Styling lives
+     in the REPORT ADDITIONS block of styles.css; every color is a theme token. -->
 <section class="page report">
   <h1>Gmail &rarr; ClickUp Pipeline</h1>
-  <p class="lead">Five buckets, one click-list: what to merge, reply, forward, archive, and delete to drive the inbox to zero. Brain reads, searches, and drafts; every state change (mark read, archive, forward, send) is your click. This report never claims a click already happened.</p>
-  <div id="rpt-root"><p class="rpt-empty">Loading the latest sweep&hellip;</p></div>
+  <p class="lead">What to merge, reply, forward, archive, and delete to hit inbox zero. Every state change is your tap; nothing here has touched Gmail yet.</p>
+  <div id="rpt-root"><p class="bucket-empty">Loading the latest sweep&hellip;</p></div>
   <script>
   (function () {
     var root = document.getElementById("rpt-root");
@@ -38,47 +39,48 @@
       deleted:         ["good","deleted"]
     };
     var BUCKETS = [
-      { key:"TO_MERGE",        col3:"Plan \u2192 destination", cls:"good" },
-      { key:"NEEDS_REPLY",     col3:"Plan \u2192 destination", cls:"info" },
-      { key:"HAS_ATTACHMENTS", col3:"Plan \u2192 destination", cls:"warn" },
-      { key:"ALREADY_HANDLED", col3:"Note",                    cls:"good" },
-      { key:"SLOP",            col3:"Type",                    cls:"bad"  }
+      { key:"TO_MERGE",        cls:"good" },
+      { key:"NEEDS_REPLY",     cls:"info" },
+      { key:"HAS_ATTACHMENTS", cls:"warn" },
+      { key:"ALREADY_HANDLED", cls:"good" },
+      { key:"SLOP",            cls:"bad"  }
     ];
 
     function pill(state){ var m=STATE[state]||["info",esc(state)]; return '<span class="badge '+m[0]+'">'+m[1]+'</span>'; }
 
+    function statusCell(e){ return '<div class="cell-status">'+pill(e.state)+'</div>'; }
     function emailCell(e){
-      return '<span class="em-from">'+esc(e.sender)+'</span>'+
-             '<span class="em-subj">'+esc(e.subject)+'</span>'+
-             (e.gmail_url?'<a class="em-link" href="'+esc(e.gmail_url)+'" target="_blank" rel="noopener">open in Gmail \u2197</a>':'');
+      return '<div class="cell-email">'+
+        '<span class="em-from">'+esc(e.sender)+'</span>'+
+        '<span class="em-subj">'+esc(e.subject)+'</span>'+
+        (e.gmail_url?'<a class="em-link" href="'+esc(e.gmail_url)+'" target="_blank" rel="noopener">open in Gmail \u2197</a>':'')+
+      '</div>';
     }
-    function thirdCell(e){
-      var h=esc(e.plan||"");
+    function planCell(e){
+      var h='<div class="cell-plan">'+esc(e.plan||"");
       if(e.dest_task_url && e.dest_task_title){ h+=' <a class="dest" href="'+esc(e.dest_task_url)+'" target="_blank" rel="noopener">'+esc(e.dest_task_title)+' \u2197</a>'; }
-      else if(e.dest_task_title){ h+=' <span class="tag thread-multi plan-tag">new task: '+esc(e.dest_task_title)+'</span>'; }
+      else if(e.dest_task_title){ h+=' <span class="tag plan-tag">new task: '+esc(e.dest_task_title)+'</span>'; }
       if(e.plan_note){ h+='<span class="plan-note">'+esc(e.plan_note)+'</span>'; }
-      return h;
+      return h+'</div>';
     }
-    function rowHtml(e){ return '<tr><td>'+pill(e.state)+'</td><td>'+emailCell(e)+'</td><td>'+thirdCell(e)+'</td></tr>'; }
+    function rowHtml(e){ return '<div class="row" data-state="'+esc(e.state)+'">'+statusCell(e)+emailCell(e)+planCell(e)+'</div>'; }
 
     function countBadge(b,n){
       var label=(b.key==="TO_MERGE" && n>0)?(n+' keeper'+(n>1?'s':'')):String(n);
-      return '<span class="badge '+b.cls+' rpt-count">'+label+'</span>';
+      return '<span class="badge '+b.cls+' bucket-count">'+label+'</span>';
     }
     function slopSub(rows){
       var g={},order=[];
       rows.forEach(function(e){ var k=e.sender||"?"; if(!g[k]){g[k]={t:e.slop_group||"slop",n:0};order.push(k);} g[k].n++; });
       var chips=order.map(function(k){ return '<span class="chip off"><span class="dot"></span>'+esc(g[k].t)+' <b>'+esc(k)+' ('+g[k].n+')</b></span>'; }).join("");
-      return '<div class="rpt-sub"><div class="coverage">'+chips+'</div></div>';
+      return '<div class="bucket-sub">'+chips+'</div>';
     }
     function block(b,emails){
       var rows=emails.filter(function(e){return e.bucket===b.key;});
-      var head='<div class="rpt-head"><span class="rpt-title">'+b.key+'</span>'+countBadge(b,rows.length)+'</div>';
-      if(!rows.length) return '<div class="rpt-block">'+head+'<div class="rpt-empty">none</div></div>';
+      var head='<header class="bucket-head"><span class="bucket-name">'+b.key+'</span>'+countBadge(b,rows.length)+'</header>';
+      if(!rows.length) return '<section class="bucket is-empty" data-bucket="'+b.key+'">'+head+'<div class="bucket-empty">none</div></section>';
       var sub=(b.key==="SLOP")?slopSub(rows):"";
-      var body='<table class="rpt"><colgroup><col class="c-status"><col class="c-email"><col></colgroup>'+
-        '<thead><tr><th>Status</th><th>Email</th><th>'+b.col3+'</th></tr></thead><tbody>'+rows.map(rowHtml).join("")+'</tbody></table>';
-      return '<div class="rpt-block">'+head+sub+body+'</div>';
+      return '<section class="bucket" data-bucket="'+b.key+'">'+head+sub+'<div class="rows">'+rows.map(rowHtml).join("")+'</div></section>';
     }
 
     function fmtSwept(iso){
@@ -103,34 +105,38 @@
       '</div>';
 
       var note=isPlan
-        ? '<div class="rpt-note"><b>PLAN \u2014 nothing has changed in Gmail yet.</b> Awaiting your greenlight. On &ldquo;go,&rdquo; Brain merges keeper content byte-for-byte into the destination task and parks any drafts; you forward attachments, archive, and clear slop. Each row\u2019s status pill tells a plan apart from a done audit at a glance.</div>'
-        : '<div class="rpt-note"><b>EXECUTED audit.</b> The merges + drafts ran; the pills below record what landed. Any archive / forward / delete clicks marked done were yours.</div>';
+        ? '<div class="rpt-note"><b>PLAN \u2014 nothing has changed in Gmail yet.</b> On &ldquo;go,&rdquo; Brain merges keeper content into the destination task and parks any drafts. You forward attachments, archive, and clear slop.</div>'
+        : '<div class="rpt-note"><b>EXECUTED audit.</b> The merges + drafts ran; the pills below record what landed.</div>';
 
       var legend='<div class="rpt-legend">'+
-        '<span class="chip k-pending"><span class="dot"></span><b>pending</b> awaiting go</span>'+
-        '<span class="chip k-merged"><span class="dot"></span><b>merged</b> captured</span>'+
-        '<span class="chip k-archived"><span class="dot"></span><b>archive</b> your click</span>'+
-        '<span class="chip k-delete"><span class="dot"></span><b>delete</b> slop</span>'+
+        '<span class="chip k-pending"><span class="dot"></span>pending</span>'+
+        '<span class="chip k-merged"><span class="dot"></span>merged</span>'+
+        '<span class="chip k-archived"><span class="dot"></span>archive</span>'+
+        '<span class="chip k-delete"><span class="dot"></span>delete</span>'+
       '</div>';
 
       var blocks=BUCKETS.map(function(b){return block(b,emails);}).join("");
 
       var slop='';
       if(d.slop_delete_query){
-        slop='<div class="rpt-note"><b>One-click slop clear.</b> Tap the line to select it, paste into Gmail search, select all, delete. Scoped to <code>in:inbox</code> on purpose: a bare <code>from:()</code> searches ALL mail (archive + every label) and would sweep up account records and receipts from the same senders.'+
+        slop='<div class="rpt-note"><b>One-tap slop clear.</b> Tap to select, paste into Gmail search, select all, delete. Scoped to <code>in:inbox</code> so it never touches archived mail or account records from the same senders.'+
           '<code class="rpt-q">'+esc(d.slop_delete_query)+'</code></div>';
       }
 
       function c(k){return emails.filter(function(e){return e.bucket===k;}).length;}
       var parts=[];
-      if(c("TO_MERGE"))parts.push(c("TO_MERGE")+" to merge");
-      if(c("NEEDS_REPLY"))parts.push(c("NEEDS_REPLY")+" to reply");
-      if(c("HAS_ATTACHMENTS"))parts.push(c("HAS_ATTACHMENTS")+" to forward");
-      if(c("ALREADY_HANDLED"))parts.push(c("ALREADY_HANDLED")+" to archive");
-      if(c("SLOP"))parts.push(c("SLOP")+" to delete");
-      var score='<div class="rpt-score"><b>Inbox: '+before+' \u2192 '+after+'</b>'+(isPlan?" projected on greenlight":"")+(parts.length?" \u00b7 "+parts.join(" \u00b7 "):"")+'.</div>';
+      if(c("TO_MERGE"))parts.push(c("TO_MERGE")+" merge");
+      if(c("NEEDS_REPLY"))parts.push(c("NEEDS_REPLY")+" reply");
+      if(c("HAS_ATTACHMENTS"))parts.push(c("HAS_ATTACHMENTS")+" forward");
+      if(c("ALREADY_HANDLED"))parts.push(c("ALREADY_HANDLED")+" archive");
+      if(c("SLOP"))parts.push(c("SLOP")+" delete");
+      var score='<div class="rpt-score">'+
+        '<span class="score-big">'+before+' \u2192 '+after+'</span>'+
+        '<span class="score-lab">inbox'+(isPlan?", projected on greenlight":"")+'</span>'+
+        (parts.length?'<span class="score-parts">'+parts.join(" \u00b7 ")+'</span>':'')+
+      '</div>';
 
-      var foot='<p class="foot-hint">Rendered from <code>data/inbox-state.json</code> (swept '+fmtSwept(s.swept_at)+', '+esc(s.swept_by||"Brain")+'). Pure renderer: to refresh, edit that JSON only.</p>';
+      var foot='<p class="foot-hint">Rendered from <code>data/inbox-state.json</code> \u00b7 swept '+fmtSwept(s.swept_at)+' by '+esc(s.swept_by||"Brain")+'.</p>';
 
       root.innerHTML=meta+note+legend+blocks+slop+score+foot;
     }
