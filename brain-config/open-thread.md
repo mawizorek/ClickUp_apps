@@ -31,6 +31,54 @@ Every new open-thread entry uses the exact shape below. Copy the block, fill eve
 
 ---
 
+## [OPEN] Theme system — 4-vector matrix: preview expansion handoff + carried follow-ups
+
+- **ID:** OT-2026-07-17-1
+- **Logged:** 2026-07-17 17:20 ET
+- **Session:** https://app.clickup.com/t/86ajk74jd (Agent Activity Board task — full transcript)
+- **Urgency:** 🟡 Medium
+- **Item:** The theme system was extracted into a **4-vector matrix** this session, all merged to main and verified present: `colors.tsv` (paint), `typography.tsv` (voice), `forms.tsv` (radii/borders/shadows), `spacing.tsv` (density). `feelings.tsv` was DROPPED as a vague catch-all; `_themes.json` is now the join table connecting one of each vector into a Theme, with fallback defaults. `preview.html` (the Theme Studio, ~42KB) rebuilt with independent dropdowns mixing all four vectors live over the 20 canonical objects + Full App view. `THEME-SYSTEM.md` rewritten to document the 4-vector architecture. **A NEW agent is taking over to expand the preview to roughly twice its current size** — this Brain session is closed and should NOT touch the theme system further.
+- **Next action:** Incoming agent: read `shared/themes/THEME-SYSTEM.md` (4-vector architecture) + `shared/themes/decision-log.md` before touching anything. Before expanding `preview.html`, note the PR #349 lesson: the committed Studio must NOT hard-depend on runtime fetch — it embeds a first-paint snapshot of the grids, then best-effort fetches the live TSVs to override. Doubling the preview means that embedded snapshot now has to stay in sync with FOUR TSVs, not two; keep the embed + override pattern or first paint breaks on mobile Safari again.
+- **Refs:** `shared/themes/` (colors.tsv, typography.tsv, forms.tsv, spacing.tsv, _themes.json, preview.html, THEME-SYSTEM.md, decision-log.md, FILEMAKER-CAPABILITIES.md, OBJECT-COVERAGE.md); session task https://app.clickup.com/t/86ajk74jd; session log https://app.clickup.com/36074068/chat/r/6-901327646617-8
+
+---
+
+## [OPEN] Theme system — color values + font substitution need a human spot-check
+
+- **ID:** OT-2026-07-17-2
+- **Logged:** 2026-07-17 17:20 ET
+- **Session:** https://app.clickup.com/t/86ajk74jd
+- **Urgency:** 🟡 Medium
+- **Item:** Two tuning loops rode along all session and were never closed. (1) The 15 hex values in `colors.tsv` are hand-converted from the old OKLCH palette and need a spot-check; only `mclaren` (the reference) was done carefully, and the `accent-deep` gradient stops are first-pass guesses across all 15 colors. (2) `sharp-racing` typography still uses Chakra Petch as a placeholder — Michael wants to pick the actual FileMaker-installed font so the hand-rebuild matches exactly; he has been deferring this pick.
+- **Next action:** When Michael is ready, spot-check/tune the 14 non-reference color rows + their `accent-deep` stops in `colors.tsv` (one-cell edits), and swap the `sharp-racing` font in `typography.tsv` to his chosen FMP-installed face. All are single-cell TSV edits, no code.
+- **Refs:** `shared/themes/colors.tsv`, `shared/themes/typography.tsv`
+
+---
+
+## [OPEN] Theme system — legacy color-layer naming + superseded files not yet retired
+
+- **ID:** OT-2026-07-17-3
+- **Logged:** 2026-07-17 17:20 ET
+- **Session:** https://app.clickup.com/t/86ajk74jd
+- **Urgency:** 🟢 Low
+- **Item:** Two deliberate cleanups were flagged-not-fixed to avoid breaking consumers mid-flight. (1) The palette layer still calls a COLOR a "theme" in the legacy path (`resolve.js` back-compat `THEMES.apply(colorSlug)`, `themes.css`, `data-theme` attribute) even though vocabulary is now Color · Typography · Forms · Spacing · (join =) Theme. A deliberate rename pass is owed. (2) Superseded artifacts left in place so nothing breaks: per-color JSONs (`americana.json`, `maw-dark-utility.json`, etc.), `themes.css`, `build-themes.mjs`, and the `feelings/` dir (holds `sharp-racing.json`, now replaced by the 4 vector TSVs). Retire in a later cleanup pass once the 4-vector path is proven with a consumer.
+- **Next action:** On a dedicated cleanup pass (NOT mid-build): rename the legacy color-layer "theme" usages to "color," then delete the superseded per-color JSONs + `themes.css` + `build-themes.mjs` + `feelings/` once confirmed no consumer references them.
+- **Refs:** `shared/themes/resolve.js`, `shared/themes/themes.css`, `shared/themes/build-themes.mjs`, `shared/themes/feelings/`, per-color `*.json`
+
+---
+
+## [OPEN] Golden Shell app — standalone layout reference (net-new, not started)
+
+- **ID:** OT-2026-07-17-4
+- **Logged:** 2026-07-17 17:20 ET
+- **Session:** https://app.clickup.com/t/86ajk74jd
+- **Urgency:** 🟡 Medium
+- **Item:** A standalone "golden" shell app was scoped this session as a layout **audit reference** (conformance-by-audit, not global-link): standalone left nav bar + right settings pop-up + canonical grid geometry. Golden template and layout shell are tracked as two separate entities; participation marked by a `standard layout` metadata tag; explicitly a single test, NOT applied globally. Unresolved sub-question (Novice Nia's crack): FileMaker can't import a shared web file, so downstream FileMaker rebuilds are always a copy-at-build-time — the audit-against-golden framing side-steps needing live linkage. Direction agreed; no build started.
+- **Next action:** Pick up the dedicated task and build/designate the standalone golden shell app, then draft the Recon-Renata-style reconciliation audit checklist ("does this app match the golden shell? if not, what reconciles them?").
+- **Refs:** task https://app.clickup.com/t/86ajkg7wc (Build Golden Shell app); direction logged https://app.clickup.com/t/86ajk74jd (comment 2026-07-17 4:38 ET)
+
+---
+
 ## FileMaker object verification & audit trail (D-007) — SHIPPED this session (2026-07-16)
 **Added:** 2026-07-16
 
