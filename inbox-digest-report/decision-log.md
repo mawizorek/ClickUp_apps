@@ -4,6 +4,13 @@ Newest on top. Each entry = a decision made + why, so a cold agent reconstructs 
 
 ---
 
+## 2026-07-16 - Slop clear query MUST be scoped to `in:inbox` (v3.1 bugfix)
+
+- **Decision:** the one-click slop clear block is always `in:inbox from:(a OR b OR c)`, never a bare `from:(...)`. This scoping is now part of the locked report format.
+- **Why:** a bare `from:(sender)` searches ALL mail (archive + every label), not the inbox. In the Jul 16 sweep the unscoped query surfaced ~15 results per sender's full history - archived newsletters, **ACCOUNTS-labeled Lightwright license/renewal records, and a Payment Confirmation with an attachment** - all keepers, none of them the 3 inbox slop threads the sweep flagged. Handing Michael a "select all -> delete" on that set would have destroyed account records and a receipt. Michael caught it from the live Gmail result count.
+- **Rule cemented:** any Gmail delete/clear string the report hands over is inbox-scoped by default. The sweep acts on the LIVE INBOX only; a sender's historical mail in other labels/archive is out of scope and must never be swept up. `in:inbox` prefix is mandatory on the slop clear.
+- Result: v3.1. Only `pages/report.html`'s slop clear block changed (+ this log); shell bumped v3 -> v3.1.
+
 ## 2026-07-16 - Report becomes the LANDING page; matrix demoted to page 2 (unedited)
 
 - **Decision:** when the Report page (v3) ships, it becomes the DEFAULT landing page (`DEFAULT_PAGE=report`). The existing field-capture matrix stays **exactly as-is** and lives on as the second page, pointed to by index/NAV as the direct raw read-out.
@@ -50,7 +57,7 @@ Newest on top. Each entry = a decision made + why, so a cold agent reconstructs 
 - **Buckets:** TO_MERGE, NEEDS_REPLY, HAS_ATTACHMENTS, ALREADY_HANDLED, SLOP. Every header always renders (empty = `none`) so nothing looks silently dropped.
 - **Inline live Gmail links** on every email line (tap opens the actual message), same treatment as task links.
 - **Slop grouped** by sender/type (`Domino's (2) - Zillow (2) - scam (3)`), not one row each.
-- **One-click slop clear:** a `from:(a OR b OR c)` Gmail search block, copy-paste into mobile/desktop Gmail -> select all -> delete. Built fresh each sweep from the actual slop senders. This is the workaround for "can't mark read."
+- **One-click slop clear:** an `in:inbox from:(a OR b OR c)` Gmail search block (inbox-scoped - see the 2026-07-16 v3.1 bugfix entry), copy-paste into mobile/desktop Gmail -> select all -> delete. Built fresh each sweep from the actual slop senders. This is the workaround for "can't mark read."
 - **Closing line:** inbox-zero scoreboard (`Inbox: N -> M`).
 
 ## 2026-07-16 - The pipeline it renders (upstream context)

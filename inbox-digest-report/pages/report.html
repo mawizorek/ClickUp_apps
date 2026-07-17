@@ -6,7 +6,9 @@
      classes (.page/.callout/.badge/.tbl) plus the .tag/.chip/.coverage/.matrix-meta
      helpers already in styles.css; every color is a theme token. The Jul 16 2026 sweep
      (same 5 threads as pages/matrix.html) is hardcoded for this build - the
-     data/inbox-state.json fetch is a later build. -->
+     data/inbox-state.json fetch is a later build.
+     v3.1: slop clear query scoped with in:inbox - a bare from:() searches ALL mail
+     (archive + every label), which pulled unrelated account records + a receipt. -->
 <section class="page">
   <h1>Gmail &rarr; ClickUp Pipeline</h1>
   <p class="lead">One sweep, five buckets, one click-list: what to merge, reply, forward, archive, and delete to drive the inbox to zero. Brain can read, search, and draft Gmail; every state change (mark read, archive, forward, send) is your click. This report never claims a click already happened.</p>
@@ -89,7 +91,7 @@
       </tr>
     </tbody>
   </table>
-  <div class="callout"><b>One-click slop clear.</b> Paste into Gmail search (mobile or desktop), select all, delete:<br><code>from:(beacon@sentinel.nexusrisklab.com OR marketing@lightwright.com OR hello@m.plex.tv)</code></div>
+  <div class="callout"><b>One-click slop clear.</b> Paste into Gmail search (mobile or desktop), select all, delete. <b>Scoped to <code>in:inbox</code></b> on purpose &mdash; a bare <code>from:()</code> searches ALL mail (archive + every label) and would sweep up unrelated account records and receipts from the same senders:<br><code>in:inbox from:(beacon@sentinel.nexusrisklab.com OR marketing@lightwright.com OR hello@m.plex.tv)</code></div>
 
   <h2>Scoreboard</h2>
   <div class="callout"><b>Inbox: 5 &rarr; 0</b> projected on greenlight &mdash; 1 merged + archived &middot; 1 archived &middot; 3 deleted &rarr; inbox zero.</div>
