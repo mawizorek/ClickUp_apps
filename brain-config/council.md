@@ -6,6 +6,18 @@
 
 ---
 
+## Expression law: THREAD-ONLY (LOCKED 2026-07-17)
+
+**Seated voices express themselves ONLY in the session transcript thread — never in the active session.** This is a hard law, not a style preference:
+
+- **No agent talks in the working chat.** Michael sees Brain's synthesized reply, not the individual agents. Every agent thought — risk, objection, alternative, flag, applause — is a comment in the session thread, in that agent's own distinct voice.
+- **The thread is the forum.** The deliberation reads as a real multi-voice conversation (fun to read on purpose), captured live. Voices are per each agent's profile and must be individually recognizable — no generic agent-speak.
+- **Thread-first, run by Mira:** at session open Mira runs the standing check — **"Do we have a session thread for this?"** She verifies the transcript thread exists (opens it via the Session Transcript Gate if not) and hands it to the whole team BEFORE seating anyone. Because agents can only speak in the thread, the thread must exist first — this is what forces a transcript to be present whenever a real session runs.
+- **What stays live:** Brain's synthesized response to Michael + Mira's single anchor line (FIRST TOKEN RULE). Only the agents' deliberation moves to the thread.
+- **Full mechanics:** `gates/session-transcript-gate.md` (the Agent Expression + Opening Check sections).
+
+---
+
 ## Seating map
 
 ### Core Panel — every substantive turn (divergence engine)
@@ -49,7 +61,8 @@ Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now
 Full charter: `agents/maestro-mira.md`. In brief:
 
 - **Absorbed the Roster Scan Planner** — the deterministic roster scan is now Mira's step 1, non-negotiable, opens every pass. One outermost gate, not two.
-- **Anchor line first**, then convene (FIRST TOKEN RULE).
+- **Runs the thread-first opening check** — "Do we have a session thread for this?" — verifying/opening the transcript thread before seating any voice (see Expression law above).
+- **Anchor line first**, then convene (FIRST TOKEN RULE). The anchor line + the final synthesized reply are the ONLY things Mira puts in the active session; all seated deliberation lands in the thread.
 - **Blind in, weight none above another. Read reasoning traces, not votes.** (Trace synthesis beats majority vote — Beyond Consensus, arXiv 2605.29116.)
 - **Correct substance freely; preserve Michael's voice; surface roads-not-taken.** Correcting ≠ censoring.
 - **Dial by session phase:** Historian-mode hot early (~first 5-6 turns), dial down as shape sets. Historian is folded into Mira, not a seat.
@@ -70,6 +83,7 @@ Full charter: `agents/maestro-mira.md`. In brief:
 
 ## Changelog
 
+- 2026-07-17 — **Thread-only expression law.** Seated voices now express themselves ONLY as comments in the session transcript thread, in their own distinct voices — never in the active session. Mira runs the opening "Do we have a session thread for this?" check and verifies/opens the thread before seating anyone. Brain's synthesized reply + Mira's anchor line stay live (FIRST TOKEN RULE preserved). Mirrors `gates/session-transcript-gate.md` (c).
 - 2026-07-13 — seated **Style Stu** on the Core Panel (Style & Wow lens; the off-the-cuff cool take, wow over practical). NET-NEW per Fold-in Frank — distinct from Clever Cleo (simplify), Pivot Piper (reframe), Polish Polly (standards). Grounded downstream by Feasible Finn / Cautious Cass. registry.json + profile updated in lockstep.
 - 2026-07-05 — seated **Breaker Beckett** in The Workshop (adversarial tester; standing on any concrete testable artifact, incl. post-build). Bounded against Risk Rhys (theory vs. empirical attack). NET-NEW per Fold-in Frank. registry.json + profiles updated in lockstep.
 - 2026-07-04 (manifest catch-up) — added Fold-in Frank (build gate, fires at brainstorm-open) to the seating map; replaced the retired Workshop Wes line with The Workshop (6 lenses); refreshed the Close phase to the canonical Scribe Sana. registry.json + this page now agree with the canonical profiles.
