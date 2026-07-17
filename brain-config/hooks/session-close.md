@@ -286,12 +286,14 @@ Never just post a bare link as a handoff. The prompt in the task must be self-co
 
 ---
 
-## Companion files to reconcile (flagged 2026-07-17)
+## Companion files — reconciled ✅ (verified 2026-07-17, Audit Anna)
 
-This reframe shifts the live transcript from the channel to the Activity Board task. Two companion specs still describe the OLD channel-transcript model and should be reconciled next repo session:
+The transcript-location reframe touched two companion specs; an audit this session verified BOTH have since been migrated to the session-task model. No open reconciliation remains:
 
-- `gates/session-transcript-gate.md` — currently opens a live channel thread; should instead open/point at the Agent Activity Board session task.
-- Scribe Sana's agent profile — her live-transcript role now targets the session task's comments, not the channel thread.
+- `gates/session-transcript-gate.md` — reconciled (rev e→i): "the thread" is the session task's comment stream on the 🟢 Agent Activity Board; #A.I. Prompts is demoted to backup + the permanent close-transcript home. Adds the two-tier Workshop Post Protocol.
+- Scribe Sana's agent profile — reconciled (rev e→h): her live-transcript role targets the session task's comments, not the channel thread; canonical board pointer corrected to `901327879922`.
+
+*(This note previously read "should be reconciled next repo session" — that was stale; the work had already landed. Corrected to the realized state per the missed-gate/drift protocol.)*
 
 ---
 
