@@ -1,0 +1,97 @@
+<!-- report.html - Gmail Clean-into-ClickUp Pipeline Report. The acting surface for a
+     sweep: five locked buckets (every header always renders, empty = none), inline live
+     gmail_url links + destination task links, slop grouped with a one-click clear block,
+     and an inbox-zero scoreboard. Two-phase spine: renders as PLAN (pending greenlight)
+     or as an EXECUTED audit, told apart by a per-row status pill. Uses the template
+     classes (.page/.callout/.badge/.tbl) plus the .tag/.chip/.coverage/.matrix-meta
+     helpers already in styles.css; every color is a theme token. The Jul 16 2026 sweep
+     (same 5 threads as pages/matrix.html) is hardcoded for this build - the
+     data/inbox-state.json fetch is a later build. -->
+<section class="page">
+  <h1>Gmail &rarr; ClickUp Pipeline</h1>
+  <p class="lead">One sweep, five buckets, one click-list: what to merge, reply, forward, archive, and delete to drive the inbox to zero. Brain can read, search, and draft Gmail; every state change (mark read, archive, forward, send) is your click. This report never claims a click already happened.</p>
+
+  <div class="matrix-meta">
+    <span>swept <b>Jul 16, 2026 &middot; 9:28 PM</b></span>
+    <span>threads <b>5</b></span>
+    <span>inbox <b>5 &rarr; 0</b> projected</span>
+    <span>phase <b>PLAN &middot; pending greenlight</b></span>
+  </div>
+
+  <div class="callout"><b>PLAN &mdash; nothing has changed in Gmail yet.</b> This is the plan awaiting your greenlight. On &ldquo;go,&rdquo; Brain merges keeper content byte-for-byte into the destination task and parks any drafts; you forward attachments, archive, and clear slop. Each row carries a status pill, so a plan and a completed audit read differently at a glance.</div>
+
+  <div class="coverage">
+    <span class="chip"><span class="dot"></span><b>pending</b> awaiting greenlight</span>
+    <span class="chip"><span class="dot"></span><b>merged</b> content captured</span>
+    <span class="chip"><span class="dot"></span><b>archived</b> your click</span>
+    <span class="chip off"><span class="dot"></span><b>delete</b> slop</span>
+  </div>
+
+  <h2>TO_MERGE</h2>
+  <div class="badges"><span class="badge good">1 keeper</span></div>
+  <table class="tbl">
+    <thead><tr><th>Status</th><th>Email</th><th>Plan &rarr; destination</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge warn">pending</span></td>
+        <td><b>Maya Kleinsorge</b><br><span class="muted">Re: M Wizorek- Welcome from OP CoMa</span><br><a href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d92dde485cce" target="_blank" rel="noopener">open in Gmail &#8599;</a></td>
+        <td>COMBINE onsite logistics (driving up, onsite tomorrow evening, Cabin 11 with Nick) as a verbatim comment, then archive.<br><span class="tag thread-multi">new task: Ogunquit Playhouse &mdash; Onsite / CoMa (Summer 2026)</span><br><span class="muted">proposed home &mdash; confirm or repoint on greenlight</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>NEEDS_REPLY</h2>
+  <div class="badges"><span class="badge info">0</span></div>
+  <p class="muted">none</p>
+
+  <h2>HAS_ATTACHMENTS</h2>
+  <div class="badges"><span class="badge info">0</span></div>
+  <p class="muted">none. <span class="att-src">Thread 03's source carried 3 files before it became the ingested-flag draft, so there is nothing left to forward.</span></p>
+
+  <h2>ALREADY_HANDLED</h2>
+  <div class="badges"><span class="badge good">1</span></div>
+  <table class="tbl">
+    <thead><tr><th>Status</th><th>Email</th><th>Note &rarr; destination</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge good">merged</span></td>
+        <td><b>Joe</b><br><span class="muted">Fwd: [INGESTED to ClickUp] WisDOT Noise Barrier Vote</span><br><a href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d76ff55e0a85" target="_blank" rel="noopener">open in Gmail &#8599;</a></td>
+        <td>Already ingested &mdash; this thread is the ingested-flag draft. Safe to archive now.<br><a href="https://app.clickup.com/t/36074068/86ajjz72e" target="_blank" rel="noopener">Vote on WisDOT noise barrier &mdash; Great Wolf Lodge condo &#8599;</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>SLOP</h2>
+  <div class="badges"><span class="badge bad">3</span></div>
+  <p class="muted">Grouped by sender/type. Nothing captured &mdash; archive or delete.</p>
+  <div class="coverage">
+    <span class="chip off"><span class="dot"></span>scam <b>Nexus Risk Lab (1)</b></span>
+    <span class="chip off"><span class="dot"></span>newsletter <b>Lightwright (1)</b></span>
+    <span class="chip off"><span class="dot"></span>promo <b>Plex (1)</b></span>
+  </div>
+  <table class="tbl">
+    <thead><tr><th>Status</th><th>Email</th><th>Type</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="badge bad">delete</span></td>
+        <td><b>Nexus Risk Lab</b><br><span class="muted">Positions Available</span><br><a href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d82d30d808c2" target="_blank" rel="noopener">open in Gmail &#8599;</a></td>
+        <td>scam &mdash; Cyrillic-lookalike click-here evasion</td>
+      </tr>
+      <tr>
+        <td><span class="badge bad">delete</span></td>
+        <td><b>Lightwright</b><br><span class="muted">What's New at Lightwright</span><br><a href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19ee0f2c4335aaa4" target="_blank" rel="noopener">open in Gmail &#8599;</a></td>
+        <td>newsletter &mdash; product marketing</td>
+      </tr>
+      <tr>
+        <td><span class="badge bad">delete</span></td>
+        <td><b>Plex</b><br><span class="muted">Reminder | Lifetime Plex Pass pricing increases July 1</span><br><a href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19edc0cc2d950440" target="_blank" rel="noopener">open in Gmail &#8599;</a></td>
+        <td>promo &mdash; pricing reminder</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="callout"><b>One-click slop clear.</b> Paste into Gmail search (mobile or desktop), select all, delete:<br><code>from:(beacon@sentinel.nexusrisklab.com OR marketing@lightwright.com OR hello@m.plex.tv)</code></div>
+
+  <h2>Scoreboard</h2>
+  <div class="callout"><b>Inbox: 5 &rarr; 0</b> projected on greenlight &mdash; 1 merged + archived &middot; 1 archived &middot; 3 deleted &rarr; inbox zero.</div>
+  <p class="muted">PLAN state: no Gmail changes have been made. Greenlight to execute the merge + any drafts; the archive, forward, and delete clicks are yours. Seeded from the Jul 16 sweep (same 5 threads as the Field Matrix); the live <code>data/inbox-state.json</code> feed is the next build.</p>
+</section>
