@@ -27,6 +27,20 @@ Canonical detail lives in [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md)
 
 ---
 
+## Naming conventions — Smith (package-local, ships with the export) (D-024)
+
+Seeded from the template's global starting point; this is **Smith's own copy**, true to this file and **allowed to drift** from other packages. It travels with the package when exported to the file viewer, so it's stated here (and in full in [`standards/naming.md`](./standards/naming.md)) rather than only pointing up.
+
+- **Classes:** dash-delimited, up to 4 parts (`Category-Sub-Detail`); the dash drives nesting (F-002). See [`standards/classes.md`](./standards/classes.md).
+- **Layers:** `DEPARTMENT - NAME` + elevation band. Smith department vocabulary (canonical, use over synonyms): **UR, SCENIC, LX DESIGNER, HEAD ELECTRICIAN, AUDIO, RIGGING, VIDEO, UTILITY, PM**.
+- **Sheets:** `<DEPT><n>`, `0` = department readme sheet (see [`standards/sheet-layers.md`](./standards/sheet-layers.md)).
+- **No commas in names** (comma-CSV, S-6); prefer the standard vocabulary over ad-hoc synonyms.
+- **Open:** register the Smith house naming as a VWX Standard Naming standard so clones inherit it (F-010) — pending.
+
+Full detail: [`standards/naming.md`](./standards/naming.md).
+
+---
+
 ## What's filled vs. still open
 
 | Area | State |
@@ -35,7 +49,8 @@ Canonical detail lives in [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md)
 | `standards/datums-and-reference-planes.md` | **Filled** — Smith's reference-plane rule (deck-off-trim / upper-off-nominal-wall), RULE only (D-021, S-4). |
 | `standards/sheet-layers.md` | **Drafted** — full per-department sheet list from the ClickUp scheme; stays an F-016 **DRAFT** pending Michael's ruling to promote (D-022). |
 | `standards/classes.md` | **Proposed** — object-class tree (steel/wood/framing/masking + dash children) as a per-instance PROPOSAL, NOT promoted (D-023). Needs Michael's ruling. |
-| `standards/naming.md`, `drafting.md` | Rule prose kept; venue vocabulary noted; drafting tiers still TODO. |
+| `standards/naming.md` | **Filled** — package-local naming copy (Smith vocabulary), surfaced in this README, ships with the export (D-024). Standard Naming registration still open. |
+| `standards/drafting.md` | Rule prose kept; drafting tiers still TODO. |
 | `resources/*` | Smith categories noted; per-record CSV examples seeded; inventories still TODO. |
 | `reference-notes/` | Awaiting the hand-drawn handouts (S-5 primary). |
 | `reconciliation/` | Empty until the file is built and worksheets are exported to check the plan. |
@@ -44,4 +59,4 @@ Canonical detail lives in [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md)
 
 **Package:** smith-theatre · **Status:** Phase 2 (base-file build) — plan authored, `.vwx` follows · **Venue:** Smith Theatre, SPAC (URITP)
 
-*See [`CHANGELOG.md`](./CHANGELOG.md) for this package's version history and [`../DECISION-LOG.md`](../DECISION-LOG.md) (D-019..D-023) for the decisions behind it.*
+*See [`CHANGELOG.md`](./CHANGELOG.md) for this package's version history and [`../DECISION-LOG.md`](../DECISION-LOG.md) (D-019..D-024) for the decisions behind it.*

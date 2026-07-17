@@ -30,6 +30,22 @@ Canonical detail lives in the domain doc [`../VWX-BEST-PRACTICES.md`](../VWX-BES
 
 ---
 
+## Naming conventions — global starting point (D-024)
+
+**This is the seed every package inherits.** On clone, it becomes the package's **own local copy** ([`standards/naming.md`](./standards/naming.md)) that is **allowed to drift per venue** and **travels with the package when it's exported** to the file viewer. The package-local copy is the source of truth for THAT file; this template section is only the default it starts from. (Drift is intentional — different showfile templates may legitimately name things differently.)
+
+The default discipline:
+
+- **Classes — dash-delimited hierarchy.** Up to 4 parts, dash-separated (`Category-Sub-Detail`); the dash drives nesting in the Navigation / Organization palettes (F-002).
+- **Layers — `DEPARTMENT - NAME`** with an elevation band; the department prefix routes the master-reference model (S-2).
+- **Sheets — `<DEPT><n>`**, `0` = the department readme sheet.
+- **No commas in names** (they'd need quoting in the comma-CSV manifests, S-6). Prefer the standard vocabulary over ad-hoc synonyms; a name is the key the reconciliation diff matches on.
+- **Register as a VWX Standard Naming standard** (`File > Document Settings > Standard Naming`) so every cloned file inherits it and auto-classing stays consistent (F-010).
+
+Full rule + per-instance vocabulary slots: [`standards/naming.md`](./standards/naming.md). Canonical research: [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md) § F-002 / F-010.
+
+---
+
 ## What's in this package (the tree)
 
 ```
@@ -39,7 +55,7 @@ Canonical detail lives in the domain doc [`../VWX-BEST-PRACTICES.md`](../VWX-BES
     layers.md                   — design-layer scheme (dept × elevation)
     classes.md                  — object-class scheme (categories, dash-nested)
     sheet-layers.md             — sheet numbering + viewport convention
-    naming.md                   — naming discipline (dash-delimited, Standard Naming)
+    naming.md                   — naming discipline (package-local copy; may drift; exported)
     drafting.md                 — line weights, text, dimension standards
     datums-and-reference-planes.md  — which surface is the datum, per elevation (S-4)
   resources/                    — the reusable content plan (prose .md + per-record CSVs)
@@ -60,8 +76,8 @@ Canonical detail lives in the domain doc [`../VWX-BEST-PRACTICES.md`](../VWX-BES
 
 ## How to start a new package (clone checklist)
 
-1. Copy `_TEMPLATE/` → `<venue-slug>/`.
-2. Fill this README's venue line + status.
+1. Copy `_TEMPLATE/` → ` /`.
+2. Fill this README's venue line + status, and surface the venue's naming conventions in the package README (seeded from the section above; may drift per venue).
 3. Work `standards/` first (the plan you build from), then `resources/`.
 4. Drop hand-drawn handouts in `reference-notes/`.
 5. Only after the plan is set, build the `.vwx` from it; use `reconciliation/` to check the build.
