@@ -1,6 +1,6 @@
 # Sheet-Layer Numbering + Viewport Convention — Smith Theatre (DRAFT — F-016)
 
-> **DRAFT, not a ratified Standard.** The pattern is set (dept letter + number; `0` = department readme sheet; indent = viewport). The full Smith per-department list below is drafted from the existing ClickUp scheme (D-021). **Promotion to a Standard needs Michael's ruling + a mirrored DECISION-LOG row.**
+> **DRAFT, not a ratified Standard.** The pattern is set (dept letter + number; `0` = department readme sheet; indent = viewport). The full Smith per-department list below is drafted from the existing ClickUp scheme (D-022). **Promotion to a Standard needs Michael's ruling + a mirrored DECISION-LOG row.**
 
 ---
 

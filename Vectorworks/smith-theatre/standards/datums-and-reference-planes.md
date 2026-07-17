@@ -31,4 +31,4 @@ The interior trim sits slightly proud of the nominal wall, so deck geometry and 
 - [ ] Lock `+X/+Y` polarity + the N/S/E/W convention off the center datum.
 - [ ] Confirm the interior-trim vs. nominal-wall rule against the built file.
 
-*Canonical: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § S-3 / S-4. Decisions: D-013 (origin), D-014 (convention), D-020 (Smith rule).*
+*Canonical: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § S-3 / S-4. Decisions: D-013 (origin), D-014 (convention), D-021 (Smith rule).*

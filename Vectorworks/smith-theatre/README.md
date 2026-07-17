@@ -1,6 +1,6 @@
 # Vectorworks Documentation Package — Smith Theatre
 
-> Cloned from [`../_TEMPLATE/`](../_TEMPLATE/) (2026-07-16, D-018). This is the **first real package instance** and the base show file for URITP's Smith Theatre (SPAC). Prose files state the RULE; the exhaustive lists (layers, class tree, sheets, resources) are the per-instance content filled here. **Git is the plan; the `.vwx` is the realization** (S-5).
+> Cloned from [`../_TEMPLATE/`](../_TEMPLATE/) (2026-07-16, D-019). This is the **first real package instance** and the base show file for URITP's Smith Theatre (SPAC). Prose files state the RULE; the exhaustive lists (layers, class tree, sheets, resources) are the per-instance content filled here. **Git is the plan; the `.vwx` is the realization** (S-5).
 >
 > **Scope:** the standards are org-agnostic (they live in the template); this package captures only what is **Smith-specific** and points up to the template + [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md).
 
@@ -31,10 +31,10 @@ Canonical detail lives in [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md)
 
 | Area | State |
 |---|---|
-| `standards/layers.md` + `layers.csv` | **Filled** — the ~26-layer house list (dept × elevation) as a comma-CSV manifest (D-019). Working draft (per-row status), not a ratified Standard. |
-| `standards/datums-and-reference-planes.md` | **Filled** — Smith's reference-plane rule (deck-off-trim / upper-off-nominal-wall), RULE only (D-020, S-4). |
-| `standards/sheet-layers.md` | **Drafted** — full per-department sheet list from the ClickUp scheme; stays an F-016 **DRAFT** pending Michael's ruling to promote (D-021). |
-| `standards/classes.md` | **Proposed** — object-class tree (steel/wood/framing/masking + dash children) as a per-instance PROPOSAL, NOT promoted (D-022). Needs Michael's ruling. |
+| `standards/layers.md` + `layers.csv` | **Filled** — the ~26-layer house list (dept × elevation) as a comma-CSV manifest (D-020). Working draft (per-row status), not a ratified Standard. |
+| `standards/datums-and-reference-planes.md` | **Filled** — Smith's reference-plane rule (deck-off-trim / upper-off-nominal-wall), RULE only (D-021, S-4). |
+| `standards/sheet-layers.md` | **Drafted** — full per-department sheet list from the ClickUp scheme; stays an F-016 **DRAFT** pending Michael's ruling to promote (D-022). |
+| `standards/classes.md` | **Proposed** — object-class tree (steel/wood/framing/masking + dash children) as a per-instance PROPOSAL, NOT promoted (D-023). Needs Michael's ruling. |
 | `standards/naming.md`, `drafting.md` | Rule prose kept; venue vocabulary noted; drafting tiers still TODO. |
 | `resources/*` | Smith categories noted; per-record CSV examples seeded; inventories still TODO. |
 | `reference-notes/` | Awaiting the hand-drawn handouts (S-5 primary). |
@@ -44,4 +44,4 @@ Canonical detail lives in [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md)
 
 **Package:** smith-theatre · **Status:** Phase 2 (base-file build) — plan authored, `.vwx` follows · **Venue:** Smith Theatre, SPAC (URITP)
 
-*See [`CHANGELOG.md`](./CHANGELOG.md) for this package's version history and [`../DECISION-LOG.md`](../DECISION-LOG.md) (D-018..D-022) for the decisions behind it.*
+*See [`CHANGELOG.md`](./CHANGELOG.md) for this package's version history and [`../DECISION-LOG.md`](../DECISION-LOG.md) (D-019..D-023) for the decisions behind it.*

@@ -1,6 +1,6 @@
 # Object-Class Scheme — Smith Theatre (S-1)
 
-> **PROPOSAL — not a ratified Standard.** The RULE is universal (classes = object category for filtering, dash-nested, no elevation, S-1). The tree below is a **per-instance proposal**; there is no authoritative Smith class list yet. **Nothing here promotes to a Standard without Michael's explicit ruling + a mirrored DECISION-LOG row** (D-022). No `classes.csv` manifest is authored until the tree is ruled.
+> **PROPOSAL — not a ratified Standard.** The RULE is universal (classes = object category for filtering, dash-nested, no elevation, S-1). The tree below is a **per-instance proposal**; there is no authoritative Smith class list yet. **Nothing here promotes to a Standard without Michael's explicit ruling + a mirrored DECISION-LOG row** (D-023). No `classes.csv` manifest is authored until the tree is ruled.
 
 ---
 

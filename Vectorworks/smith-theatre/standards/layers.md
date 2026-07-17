@@ -38,4 +38,4 @@ The full house layer list is [`layers.csv`](./layers.csv) — one row per layer,
 - [ ] Lock the house layer set → promote from working draft to Standard (Michael's ruling).
 - [ ] Confirm the uniform design-layer scale value in the file.
 
-*Companion: [`classes.md`](./classes.md) (orthogonal axis) · rule in [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § S-1. Source: Google Sheet "URITP VWX Smith Theatre BASE FILE Worksheets" (D-019).*
+*Companion: [`classes.md`](./classes.md) (orthogonal axis) · rule in [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § S-1. Source: Google Sheet "URITP VWX Smith Theatre BASE FILE Worksheets" (D-020).*
