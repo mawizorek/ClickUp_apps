@@ -21,6 +21,8 @@ Two posts, two channels, every session. Both follow the same structural rule: **
 
 **Transcript-location reframe (2026-07-17):** the live play-by-play transcript now accrues on the session's **Agent Activity Board task** (as comments), NOT in the A.I. Prompts channel. That task is the live working record and functionally replaces the old active session thread. See `Agent Activity Board — Gold Standard` (Brain Reference). Consequently the Channel 2 (Session Log) post is now a **SUMMARY that points back to the session task**, not a re-created full transcript. Do not rebuild a faithful transcript at close — it already accrued on the task, comment-by-comment, as the session ran.
 
+**The session task did NOT replace the channel close (hard rule, Michael 2026-07-17).** Having an Activity Board task is an ADDITIONAL surface, not a substitute for the two-channel close. When a session ends (or Michael says "session closed"), the FULL close hook still fires: both channel posts happen AND the session task is shut down with a final pointer comment. Do not treat "I updated the task" as a completed close. "Closed out" is only true once both threads are posted, the task carries its final pointer comment, and Michael has been handed the task link.
+
 ---
 
 ## Two Modes: Full Close (default) vs Soft Close
@@ -96,7 +98,13 @@ Post as a reply to the root. Contains the full audit:
 **Optional sections (include when relevant):**
 
 - `### Issue flagged:` — process gaps or drift caught during the session
-- `### Pending writes:` — if a memory edit bounced/failed and needs retry
+- `### Pending writes:` — if a memory edit bounced/failed and needs retry. **If a write bounced, ALSO drop it in `brain-config/open-memory-requests.md` (see the bounced-write rule below) so a later agent lands it — the audit note alone is not enough.**
+
+---
+
+## Bounced / unlanded memory writes — drop them in the open queue (2026-07-17)
+
+If a memory write was attempted this session but did NOT land (no memory manager available, edit-guard bounce, tool failure), closing the session includes **dropping it into `brain-config/open-memory-requests.md`** (Door 1: append ONE `OMR-<date>-<n>` entry under Open, self-contained, with a non-binding placement guess). Do NOT silently leave it as only a chat mention or an audit footnote — those don't survive into the next session. The open-memory-requests queue is the durable handoff; Memory Maggie drains it in a fresh session. This step runs before the usage-log commit. Michael's directive: "if you have a memory addition request, drop it in the open memory thread in the Git for another agent to pick up later."
 
 ---
 
@@ -174,6 +182,18 @@ The thread is a SUMMARY that leads with a pointer to the session task, then the 
 
 ---
 
+## Session-task shutdown (the fourth close surface, 2026-07-17)
+
+After both channel posts, the session's Agent Activity Board task is CLOSED OUT, not just left open:
+
+1. **Post the final task comment** — its last comment is a `[CLOSE-POINTER]` that links the two threads you just posted (Memory Audit + Session Log) and states that the task holds the full transcript. Template `T4` lives in the Agent Activity Board — Gold Standard.
+2. **Flip the task status to `done`.**
+3. **Hand Michael the task link in chat** — the ONE link that matters, since the task now contains the full transcript from open through close, including links out to both channel threads. Template `T5` (the chat close message) lives in the Agent Activity Board — Gold Standard.
+
+The task pointer comment and the channel posts cross-link: the channel Session Log points INTO the task (full transcript); the task's final comment points OUT to the two channel threads.
+
+---
+
 ## Warm-Start Handoff Prompt
 
 **When:** only when a session has open loops that require continuity into the next session. If the session closed clean with no pending work, skip this entirely.
@@ -200,11 +220,13 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 3. **ALWAYS thread the detail.** Use `parent_message` pointing at the root message URL you just created.
 4. **Both channels, every session.** Even if memory didn't change (audit says "no changes, stable at X%"). Even if the session was short.
 5. **The full transcript lives on the Agent Activity Board session task, not the channel.** It accrued live as comments during the session. At close, the channel Session Log is a SUMMARY that links to that task. Rebuilding a faithful transcript in the channel at close is a failure mode, not the procedure — point to the task.
-6. **Closing capacity is MANDATORY in the session-log summary thread.** Every close reports Brain's real context usage (numbers, not vibes) + one honest line on how it feels and what recall is reliable vs hazy.
-7. **Memory audit posts first, then session log summary.** Maggie posts Channel 1; Clio posts Channel 2 (summary + task pointer). Two owners on the posts, both root + thread.
-8. **Root messages are never edited after posting.** Add info by threading.
-9. **Thread replies can have addenda.** If the session continues after initial close (extended session), post an addendum reply in the same thread rather than a new root.
-10. **Usage log commit (after both posts).** Tally which profiled tools (hooks, gates, agents) fired during the session. Commit an update to `brain-config/usage-log.json` incrementing each tool's count and bumping `sessions_logged`. Format: `{ "tools": { "tool-slug": N, ... }, "sessions_logged": N, "last_updated": "YYYY-MM-DD" }`.
+6. **The session task is CLOSED OUT at close, and the channel close STILL fires.** The task never replaced the two-channel close; both happen. Shut the task (final `[CLOSE-POINTER]` comment + status `done`) AND post both channels AND hand Michael the task link. "Closed out" is false until all of that is done — if any piece is missing, say what's missing instead of claiming closure.
+7. **A bounced/unlanded memory write is dropped in `brain-config/open-memory-requests.md`** as part of close, not left as only a chat mention or audit footnote.
+8. **Closing capacity is MANDATORY in the session-log summary thread.** Every close reports Brain's real context usage (numbers, not vibes) + one honest line on how it feels and what recall is reliable vs hazy.
+9. **Memory audit posts first, then session log summary.** Maggie posts Channel 1; Clio posts Channel 2 (summary + task pointer). Two owners on the posts, both root + thread.
+10. **Root messages are never edited after posting.** Add info by threading.
+11. **Thread replies can have addenda.** If the session continues after initial close (extended session), post an addendum reply in the same thread rather than a new root.
+12. **Usage log commit (after both posts + task shutdown).** Tally which profiled tools (hooks, gates, agents) fired during the session. Commit an update to `brain-config/usage-log.json` incrementing each tool's count and bumping `sessions_logged`. Format: `{ "tools": { "tool-slug": N, ... }, "sessions_logged": N, "last_updated": "YYYY-MM-DD" }`.
 
 ---
 
@@ -212,8 +234,10 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 
 1. Memory Maggie posts Channel 1 (Memory Audit: root + thread)
 2. Closing Clio posts Channel 2 (Session Log: root + summary thread that links the Agent Activity Board session task as the full transcript)
-3. Warm-start handoff prompt (if open loops exist)
-4. Usage-log commit to `brain-config/usage-log.json`
+3. Session-task shutdown: final `[CLOSE-POINTER]` comment (links both threads) + flip status to `done` + hand Michael the task link in chat (templates T4/T5)
+4. Bounced-memory-write drop: if any write didn't land, append an `OMR` entry to `brain-config/open-memory-requests.md`
+5. Warm-start handoff prompt (if open loops exist)
+6. Usage-log commit to `brain-config/usage-log.json`
 
 ---
 
@@ -233,6 +257,9 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 | Used Post format | Agent confused Posts with messages | Never use `create_as_post: true` |
 | Missing thread reply | Agent posted root then moved on | Always post both root AND thread |
 | Full transcript pasted/rebuilt in the channel | Agent ignored the reframe | Transcript lives on the session task; channel = summary + task pointer |
+| Closed the task but skipped the channel posts | Agent treated the task as a replacement for the channel close | Both fire; the task is an additional surface, not a substitute |
+| Said "closed out" without handing Michael the links | Agent stopped after the task update | Not closed until both threads posted + task shut + task link given |
+| Bounced memory write left as only a chat/audit mention | Agent skipped the durable drop | Append an OMR entry to open-memory-requests.md at close |
 | No session task opened, so no transcript exists | Startup gate missed | Open the Agent Activity Board task at session start; comment near-per-prompt |
 | Audit says "no changes" with no thread | Agent skipped the structure | Still post full audit template with "None" in changes |
 | Multiple roots for same session | Agent posted twice | Use addendum replies in thread |
