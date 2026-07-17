@@ -26,6 +26,7 @@ Git commit history remains the authoritative changelog; this ledger is the fast 
 | `pdf-splitter` | unverified | live | Verify before next PR. |
 | `on-track` | unverified | live | Verify before next PR. |
 | `inciardi-market` | unverified | live | Verify before next PR. |
+| `inbox-digest-report` | v1 (shell) · data: static seed 2026-07-16 | live | NEW. Data-audit surface for the Gmail Inbox Sweep. `index.html` = router shell (pointer, `DEFAULT_PAGE=matrix`); `pages/matrix.html` = field-capture matrix (10 captured fields per thread, live Jul 16 sweep rows). Themed off `shared/themes` spine (maw-dark-utility default), swappable. Rolling `data/inbox-state.json` + dashboard page are the follow-on build (tracked in ClickUp). PR #311. |
 | `filemaker` | unverified | reference | FileMaker app docs, runs in FMP (no Pages). Verify before next PR. |
 
 **Non-app infra (not launchable apps, listed so they're not mistaken for apps):** `brain-config`, `agent-reports`, `routines`, `shared`, `quickfire`, `template-app`, `polish-demo`.
