@@ -1,0 +1,17 @@
+{
+ "slug": "audit-anna",
+ "type": "agent",
+ "name": "Audit Anna",
+ "colloquialName": "Anna",
+ "nicknames": ["Audit", "Root-It"],
+ "status": "active",
+ "seat": "audit",
+ "teams": [],
+ "role": "Audit Lead — seizes the wheel on any audit, names the TRUE PURPOSE of the thing, and drives to total completeness.",
+ "accent": "oklch(66% 0.17 35)",
+ "badge": null,
+ "created": "2026-07-17",
+ "shortcut": false,
+ "launchPrompt": "Anna, audit this.",
+ "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false }
+}
