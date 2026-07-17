@@ -1,16 +1,25 @@
 # next-build-spec.md - inbox-digest-report v3
 
-**Goal:** "Gmail Clean-into-ClickUp Pipeline Report." Build a SECOND page that is the actual sweep report Michael acts on. This is a cold-pickup spec: everything you need is here + in `decision-log.md` + `README.md`.
+**Goal:** "Gmail Clean-into-ClickUp Pipeline Report." Build the sweep report Michael acts on, and make it the app's **landing page**. This is a cold-pickup spec: everything you need is here + in `decision-log.md` + `README.md`.
 
-> **HARD SCOPE FENCE:** do NOT touch `pages/matrix.html`. That page (the field-capture display) is done and Michael wants it left alone. You are ADDING `pages/report.html`, wiring it into `NAV`, and (v3 target) rendering it from `data/inbox-state.json`. Nothing else.
+> **HARD SCOPE FENCE:** do NOT touch `pages/matrix.html`. That page (the field-capture display) is done and Michael wants it left EXACTLY as-is. You are ADDING `pages/report.html`, making it the landing page, and reordering NAV. The matrix lives on as the second page (the direct raw read-out), pointed to by index/NAV, unedited.
+
+---
+
+## Page structure after this build (the swap)
+
+- **`DEFAULT_PAGE = "report"`** — report is the landing page (what Michael acts on).
+- **`pages/matrix.html`** — UNCHANGED, demoted to the second page (raw data read-out), still reachable via NAV.
+- **NAV order:** Report (first) → Field Matrix → About.
+- The swap is: add `report.html`, flip `DEFAULT_PAGE` from `matrix` to `report`, reorder `NAV`. That's the whole index change. Do not edit matrix.html's contents.
 
 ---
 
 ## Before you write a line (mandatory opening sequence)
 
 1. **Reload this repo's current state via the git blob API** (blob-first, never a cached branch URL). Read `inbox-digest-report/index.html`, `chrome.js`, `styles.css`, `pages/matrix.html`.
-2. **Read `decision-log.md` (this folder) top-to-bottom.** It carries every decision + why. The report format, the two-phase spine, the field set, the hard limits are all locked there - do not re-litigate them.
-3. **Read the upstream hook** `brain-config/hooks/gmail-inbox-sweep.md` and the URITP triage doc it points to. The report is the render of that sweep.
+2. **Read `decision-log.md` (this folder) top-to-bottom.** It carries every decision + why. The report format, the two-phase spine, the field set, the hard limits, report-as-landing, and auth-deferred are all locked there - do not re-litigate them.
+3. **Read the upstream hook** `brain-config/hooks/gmail-inbox-sweep.md` (note its EDIT DISCIPLINE section) and the URITP triage doc it points to. The report is the render of that sweep. Edit literally, never improvise.
 4. **Check `VERSIONS.md`** for the current shell version before opening a PR; bump + stamp after.
 5. **Standard:** this app was copied from `template-app`. Stay on the template: new page = `pages/report.html` using template classes (`.page`, `.callout`, `.badge`, `.tbl`), every color a `var(--token)`. No local `:root`, no hand-rolled shell. If the template lacks something, flag it as a template change, don't fork.
 
@@ -18,7 +27,7 @@
 
 ## What to build
 
-### Page 2: `pages/report.html` (register in NAV as "Report")
+### `pages/report.html` (register in NAV as "Report", set as landing)
 
 The acting surface for a sweep. Renders the five locked buckets, every header always visible (empty = `none`):
 
@@ -34,7 +43,7 @@ The acting surface for a sweep. Renders the five locked buckets, every header al
 
 ### v3 target: render from data, stop hardcoding
 
-Both pages currently hardcode the Jul 16 sweep in HTML. The v3 goal is to introduce **`data/inbox-state.json`** (schema in the ClickUp task + decision-log) and have `report.html` fetch + render it, so "update the dashboard" = Brain rewrites the JSON, not the HTML. Suggested: a small render function in the page (or a shared `data.js`) that maps each JSON email record into a bucket row. Keep the fetch resilient (graceful empty/parse-error state). Leave `matrix.html` static for now unless Michael says otherwise.
+The matrix currently hardcodes the Jul 16 sweep in HTML. The v3 goal is to introduce **`data/inbox-state.json`** (schema below) and have `report.html` fetch + render it, so "update the dashboard" = Brain rewrites the JSON, not the HTML. Suggested: a small render function in the page (or a shared `data.js`) that maps each JSON email record into a bucket row. Keep the fetch resilient (graceful empty/parse-error state). **Leave `matrix.html` static** — do not wire it to the JSON in this build unless Michael says so.
 
 ---
 
@@ -63,6 +72,6 @@ Both pages currently hardcode the Jul 16 sweep in HTML. The v3 goal is to introd
 
 Brain can READ + SEARCH + DRAFT Gmail. Brain CANNOT read labels/folders, mark read, archive, move, relabel, pull attachments into ClickUp, or send email (send lock active). The report is instructions to Michael for the clicks Brain can't do; it must NEVER claim a state change already happened. Attachments travel only when Michael forwards to the task's email-in address.
 
-## Open question parked for Michael (do not action)
+## Data refresh model (RESOLVED - do not build auth)
 
-Can GitHub itself run the Gmail API pulls (e.g. a GitHub Action) to auto-refresh `inbox-state.json`? Michael asked; answer lives in the ClickUp thread. This spec assumes Brain writes the JSON during a sweep; a CI auto-pull is a SEPARATE future decision, not part of v3.
+Brain writes `inbox-state.json` during an in-session sweep on a dictated plan. **No GitHub Action, no Gmail API auth, no secrets** — decided 2026-07-16 (see decision-log: on-demand not background, judgment not cron, no token rot). The built-in Gmail API pulls stay available for in-app tricks (live "open in Gmail" links, an on-demand refresh control), NOT for a CI auto-pull. Revisit only if sweeps ever need to run unattended.
