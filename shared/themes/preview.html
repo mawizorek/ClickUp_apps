@@ -57,6 +57,14 @@
   .spec{background:var(--ch-panel);border:1px solid var(--ch-line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
   .spec-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-bottom:1px solid var(--ch-line);}
   .spec-h .nm{font-weight:700;font-size:0.85rem;} .spec-h .id{font-family:var(--ch-mono);font-size:0.62rem;color:var(--ch-faint);}
+  
+  /* Tabs UI */
+  .card-tabs{display:flex;background:var(--ch-sunk);border-bottom:1px solid var(--ch-line);}
+  .card-tab{flex:1;font-family:var(--ch-mono);font-size:0.65rem;font-weight:600;color:var(--ch-faint);padding:8px 4px;border:none;background:transparent;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;transition:all 150ms;border-bottom:2px solid transparent;}
+  .card-tab:hover{color:var(--ch-soft);}
+  .card-tab.active{color:var(--ch-ink);border-bottom-color:var(--ch-accent);background:var(--ch-panel);}
+  .r-swatch{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:6px;border:1px solid oklch(0 0 0 / 0.15);box-shadow:inset 0 1px 2px oklch(0 0 0 / 0.1);}
+
   .stage{padding:var(--pad-card, 20px);display:flex;flex-direction:column;align-items:stretch;gap:var(--gap-md, 12px);min-height:96px;background:var(--bg);transition:background 260ms cubic-bezier(.16,1,.3,1);}
   .stage.row{flex-direction:row;align-items:center;flex-wrap:wrap;justify-content:center;}
   .recipe{padding:11px 14px;border-top:1px solid var(--ch-line);background:var(--ch-sunk);}
@@ -186,9 +194,7 @@
   <div id="stageRoot">
     <div id="studioWrap">
       <section class="sec"><h2>Typography ramp</h2><p class="subt">Display + body faces from Typography; ink colors from Color.</p>
-        <div class="grid"><div class="spec"><div class="spec-h"><span class="nm">Type ramp</span><span class="id">tx_*</span></div>
-          <div class="stage ttype"><div class="t1">Race weekend</div><div class="t2">Section header</div><div class="t3">Body copy is the standard reading size for record content and prose in the layout.</div><div class="t4">Helper text under a field.</div><div class="t5">Muted metadata · timestamps</div></div>
-          <div class="recipe" id="rcpType"></div></div></div></section>
+        <div class="grid" id="typeGrid"></div></section>
       <section class="sec"><h2>Buttons — full state set</h2><p class="subt">Primary uses the two-stop hex gradient. Pressed swaps outer shadow for inner (the infill rounded-rect look).</p><div class="grid" id="btnGrid"></div></section>
       <section class="sec"><h2>Shells, toolbar, nav & modal</h2><p class="subt">Depth from surface fill + border + one outer shadow.</p><div class="grid" id="shellGrid"></div></section>
       <section class="sec"><h2>Fields — editable, focus, readonly</h2><p class="subt">Focus = inner shadow + accent border.</p><div class="grid" id="fieldGrid"></div></section>
@@ -295,7 +301,177 @@ var curColor="mclaren", curType="sharp-racing", curForm="sharp", curSpace="tight
 function applyChrome(mode){ var set=CHROME[mode]||CHROME.light; for(var k in set){ document.documentElement.style.setProperty(k,set[k]); } }
 function fmv(){ return {font:(TYPES[curType]['font-display']||'').split(',')[0].replace(/'/g,''),radius:FORMS[curForm].radius||'',pill:FORMS[curForm]['radius-pill']||'',border:FORMS[curForm]['border-w']||'',angle:FORMS[curForm]['grad-angle']||''}; }
 function r(k,v){return '<div class="r"><span class="rk">'+k+'</span><span class="rv">'+v+'</span></div>';}
-function card(id,name,stage,recipe,rowLayout){return '<div class="spec"><div class="spec-h"><span class="nm">'+name+'</span><span class="id">'+id+'</span></div><div class="stage '+(rowLayout?'row':'')+'">'+stage+'</div><div class="recipe">'+recipe+'</div></div>';}
+
+/* --- THE OBJECT REGISTRY WITH STATE TABS --- */
+var REGISTRY = {
+  type: [
+    {
+      id: 'tx_ramp', name: 'Type ramp', rowLayout: false,
+      states: {
+        normal: {
+          html: '<div class="ttype"><div class="t1">Race weekend</div><div class="t2">Section header</div><div class="t3">Body copy is the standard reading size for record content and prose in the layout.</div><div class="t4">Helper text under a field.</div><div class="t5">Muted metadata · timestamps</div></div>',
+          props: { 'Display': 'font-display', 'Body': 'font-body', 'Lead': 'fs-lead', 'Standard': 'fs-body' }
+        }
+      }
+    }
+  ],
+  buttons: [
+    {
+      id: 'btn_primary', name: 'Primary', rowLayout: true,
+      states: {
+        normal: { html: '<button class="tb primary">Save changes</button>', props: { Fill: 'accent-grad', Corner: 'radius', Shadow: 'shadow-out', Text: 'on-accent' } },
+        hover: { html: '<button class="tb primary" style="filter:brightness(1.15)">Save changes</button>', props: { Note: 'brightness(1.15) or opacity' } },
+        pressed: { html: '<button class="tb pressed">Save changes</button>', props: { Fill: 'accent-grad', Shadow: 'shadow-in', Transform: 'translateY(1px)' } }
+      }
+    },
+    {
+      id: 'btn_secondary', name: 'Secondary', rowLayout: true,
+      states: {
+        normal: { html: '<button class="tb secondary">Cancel</button>', props: { Fill: 'surface-2', Line: 'border', Text: 'text' } },
+        pressed: { html: '<button class="tb secondary" style="background:var(--surface-3);box-shadow:var(--shadow-in)">Cancel</button>', props: { Fill: 'surface-3', Shadow: 'shadow-in' } }
+      }
+    },
+    {
+      id: 'btn_destructive', name: 'Destructive', rowLayout: true,
+      states: {
+        normal: { html: '<button class="tb destructive">Delete</button>', props: { Fill: 'bad', Text: '#ffffff', Shadow: 'shadow-out' } },
+        pressed: { html: '<button class="tb destructive" style="box-shadow:var(--shadow-in);transform:translateY(1px)">Delete</button>', props: { Shadow: 'shadow-in' } }
+      }
+    },
+    {
+      id: 'btn_ghost', name: 'Ghost + icon', rowLayout: true,
+      states: {
+        normal: { html: '<button class="tb ghost">Details</button><button class="tb icon">★</button>', props: { Ghost: 'transparent', Text: 'accent', Size: 'touch' } }
+      }
+    }
+  ],
+  shells: [
+    {
+      id: 'cnt_toolbar', name: 'Toolbar + nav', rowLayout: false,
+      states: {
+        normal: { html: '<div class="ttoolbar"><span class="tt">On Track</span><span class="sp"></span><span class="tnav on">Live</span><span class="tnav off">History</span></div>', props: { Fill: 'surface-1', 'Nav on': 'accent', 'Nav off': 'text-faint' } }
+      }
+    },
+    {
+      id: 'cnt_card', name: 'Section card', rowLayout: false,
+      states: {
+        normal: { html: '<div class="tcard"><h3>Constructor standings</h3><p>Surface fill + border + one outer shadow for depth.</p></div>', props: { Fill: 'surface-2', Corner: 'radius-lg', Shadow: 'shadow-out' } }
+      }
+    },
+    {
+      id: 'cnt_modal', name: 'Modal', rowLayout: false,
+      states: {
+        normal: { html: '<div class="tmodal"><h3>Confirm action</h3><p>Highest elevation surface.</p><button class="tb primary">Confirm</button></div>', props: { Fill: 'surface-3', Corner: 'radius-lg', Shadow: 'shadow-out' } }
+      }
+    },
+    {
+      id: 'cnt_callout', name: 'Callout', rowLayout: false,
+      states: {
+        normal: { html: '<div class="tcallout">Accent-soft fill, accent border. Retints with the color.</div>', props: { Fill: 'accent-soft', Line: 'accent', Corner: 'radius' } }
+      }
+    }
+  ],
+  fields: [
+    {
+      id: 'fd_text', name: 'Text field', rowLayout: false,
+      states: {
+        editable: { html: '<div class="tfield"><label>Driver name</label><input placeholder="Type a name..."></div>', props: { Fill: 'field', Line: 'border', Corner: 'radius' } },
+        focus: { html: '<div class="tfield"><label>Driver name</label><input class="focus" value="Lando Norris"></div>', props: { Line: 'accent', Shadow: 'shadow-in' } },
+        readonly: { html: '<div class="tfield"><label>Team</label><input value="McLaren" readonly style="background:var(--surface-2);color:var(--text-soft);pointer-events:none"></div>', props: { Fill: 'surface-2', Text: 'text-soft' } }
+      }
+    }
+  ],
+  pills: [
+    {
+      id: 'tx_badge', name: 'Pills & badges', rowLayout: true,
+      states: {
+        normal: { html: '<div><span class="tpill accent">Featured</span> <span class="tpill good">Confirmed</span> <span class="tpill warn">Pending</span> <span class="tpill bad">Blocked</span> <span class="tpill info">Note</span></div>', props: { Accent: 'accent-grad', Corner: 'radius-pill', Padding: 'pad-cell' } }
+      }
+    },
+    {
+      id: 'sum_tile', name: 'Metric tile', rowLayout: false,
+      states: {
+        normal: { html: '<div class="ttile"><div class="big">8,412</div><div class="lab">Active this week</div></div>', props: { Fill: 'surface-2', Shadow: 'shadow-out', Pad: 'pad-card' } }
+      }
+    }
+  ],
+  tables: [
+    {
+      id: 'row_portal', name: 'Table rows', rowLayout: false,
+      states: {
+        header: { html: '<table class="ttable"><thead><tr><th>Pos</th><th>Driver</th><th class="n">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class="n">287</td></tr></tbody></table>', props: { Fill: 'transparent', Text: 'text-soft' } },
+        standard: { html: '<table class="ttable"><thead><tr><th>Pos</th><th>Driver</th><th class="n">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class="n">287</td></tr></tbody></table>', props: { Fill: 'transparent', Line: 'border' } },
+        alternate: { html: '<table class="ttable"><thead><tr><th>Pos</th><th>Driver</th><th class="n">Pts</th></tr></thead><tbody><tr class="alt"><td>2</td><td>Piastri</td><td class="n">265</td></tr></tbody></table>', props: { Fill: 'surface-2' } },
+        selected: { html: '<table class="ttable"><thead><tr><th>Pos</th><th>Driver</th><th class="n">Pts</th></tr></thead><tbody><tr class="sel"><td>3</td><td>Verstappen</td><td class="n">241</td></tr></tbody></table>', props: { Fill: 'accent-soft' } }
+      }
+    }
+  ]
+};
+
+function resolvePropValue(val) {
+  var c=COLORS[curColor]||{}, f=FORMS[curForm]||{}, t=TYPES[curType]||{}, s=SPACES[curSpace]||{};
+  var res = val, swatch = '';
+  if(val === 'accent-grad') {
+    swatch = '<span class="r-swatch" style="background:linear-gradient('+(f['grad-angle']||'180deg')+', '+(c.accent||'#888')+', '+(c['accent-deep']||'#555')+')"></span>';
+    res = swatch + 'var(--accent-grad)';
+  } else if (c[val]) {
+    swatch = '<span class="r-swatch" style="background:'+c[val]+'"></span>';
+    res = swatch + 'var(--'+val+') <b>' + c[val] + '</b>';
+  } else if (f[val] || t[val] || s[val]) {
+    res = 'var(--'+val+') <b>' + (f[val]||t[val]||s[val]) + '</b>';
+  } else {
+    res = '<b>' + val + '</b>';
+  }
+  return res;
+}
+
+window.switchCardTab = function(cardId, stateName) {
+  var obj;
+  for(var group in REGISTRY) {
+    var found = REGISTRY[group].find(function(o){ return o.id === cardId; });
+    if(found) { obj = found; break; }
+  }
+  if(!obj) return;
+  var state = obj.states[stateName];
+  if(!state) return;
+  
+  var stageEl = document.getElementById('stage_'+cardId);
+  if(stageEl) stageEl.innerHTML = state.html;
+  
+  var rcpEl = document.getElementById('rcp_'+cardId);
+  if(rcpEl) {
+    var rHtml = '';
+    for(var k in state.props) {
+      rHtml += r(k, resolvePropValue(state.props[k]));
+    }
+    rcpEl.innerHTML = rHtml;
+  }
+  
+  var tabs = document.querySelectorAll('.card-tab[data-card="'+cardId+'"]');
+  for(var i=0; i<tabs.length; i++) {
+    if(tabs[i].getAttribute('data-state') === stateName) tabs[i].classList.add('active');
+    else tabs[i].classList.remove('active');
+  }
+};
+
+function buildCard(obj) {
+  var stateKeys = Object.keys(obj.states);
+  var tabsHtml = '';
+  if(stateKeys.length > 1) {
+    tabsHtml = '<div class="card-tabs">';
+    stateKeys.forEach(function(sk) {
+      tabsHtml += '<button class="card-tab" data-card="'+obj.id+'" data-state="'+sk+'" onclick="switchCardTab(\\''+obj.id+'\\', \\''+sk+'\\')">'+sk+'</button>';
+    });
+    tabsHtml += '</div>';
+  }
+  var res = '<div class="spec" id="card_'+obj.id+'">';
+  res += '<div class="spec-h"><span class="nm">'+obj.name+'</span><span class="id">'+obj.id+'</span></div>';
+  res += tabsHtml;
+  res += '<div class="stage '+(obj.rowLayout?'row':'')+'" id="stage_'+obj.id+'"></div>';
+  res += '<div class="recipe" id="rcp_'+obj.id+'"></div>';
+  res += '</div>';
+  return res;
+}
 
 function applyTokens(){
   var c=COLORS[curColor]||{};
@@ -310,6 +486,15 @@ function applyTokens(){
   
   root.style.setProperty('--accent-grad','linear-gradient('+(f['grad-angle']||'180deg')+', '+(c.accent||'#888')+', '+(c['accent-deep']||'#555')+')');
   applyChrome(c.mode||'light');
+  
+  // Re-render the active tab for every card to refresh live hex values
+  for(var grp in REGISTRY) {
+    REGISTRY[grp].forEach(function(obj) {
+      var activeTab = document.querySelector('.card-tab.active[data-card="'+obj.id+'"]');
+      var stateToRender = activeTab ? activeTab.getAttribute('data-state') : Object.keys(obj.states)[0];
+      switchCardTab(obj.id, stateToRender);
+    });
+  }
 }
 
 function refreshTriggers(){
@@ -335,29 +520,20 @@ function refreshTriggers(){
 }
 
 function renderObjects(){
-  var f=fmv();
-  document.getElementById('rcpType').innerHTML=r('Display',f.font)+r('Tracking','tight on headings')+r('Sizes','from Typography grid');
-  document.getElementById('btnGrid').innerHTML=
-    card('btn_primary','Primary','<button class="tb primary">Save changes</button><div class="stag">Normal</div>',r('Fill','<b>gradient</b> '+f.angle)+r('Corner',f.radius)+r('Shadow','outer')+r('Text','on-accent'),true)+
-    card('btn_primary·pressed','Primary — pressed','<button class="tb pressed">Save changes</button><div class="stag">Pressed</div>',r('Fill','<b>gradient</b>')+r('Shadow','<b>inner</b> · infill')+r('Note','pressed state'),true)+
-    card('btn_secondary','Secondary','<button class="tb secondary">Cancel</button>',r('Fill','surface-2')+r('Line',f.border)+r('Corner',f.radius),true)+
-    card('btn_destructive','Destructive','<button class="tb destructive">Delete</button>',r('Fill','bad')+r('Shadow','outer'),true)+
-    card('btn_ghost/icon','Ghost + icon','<button class="tb ghost">Details</button><button class="tb icon">★</button>',r('Ghost','transparent · accent')+r('Icon','square '+f.radius),true);
-  document.getElementById('shellGrid').innerHTML=
-    card('cnt_toolbar','Toolbar + nav','<div class="ttoolbar"><span class="tt">On Track</span><span class="sp"></span><span class="tnav on">Live</span><span class="tnav off">History</span></div>',r('Fill','surface-1')+r('Nav on','accent')+r('Nav off','text-faint+border'))+
-    card('cnt_section_card','Section card','<div class="tcard"><h3>Constructor standings</h3><p>Surface fill + border + one outer shadow for depth.</p></div>',r('Fill','surface-2')+r('Corner',f.radius+' lg')+r('Shadow','outer'))+
-    card('card_modal','Modal','<div class="tmodal"><h3>Confirm action</h3><p>Highest elevation surface.</p><button class="tb primary">Confirm</button></div>',r('Fill','surface-3')+r('Shadow','outer')+r('Corner',f.radius+' lg'))+
-    card('t_callout','Callout','<div class="tcallout">Accent-soft fill, accent border. Retints with the color.</div>',r('Fill','accent-soft')+r('Line',f.border+' accent'));
-  document.getElementById('fieldGrid').innerHTML=
-    card('fd_text·editable','Field — editable','<div class="tfield"><label>Driver name</label><input placeholder="Type a name..."></div>',r('Fill','field')+r('Line',f.border)+r('Corner',f.radius))+
-    card('fd_text·focus','Field — focus','<div class="tfield"><label>Driver name</label><input class="focus" value="Lando Norris"></div>',r('Line','accent')+r('Shadow','<b>inner</b>'))+
-    card('fd_readonly','Field — readonly','<div class="tfield"><label>Team</label><input value="McLaren" readonly style="background:var(--surface-2);color:var(--text-soft);pointer-events:none"></div>',r('Fill','surface-2')+r('Text','text-soft'));
-  document.getElementById('pillGrid').innerHTML=
-    card('tx_badge','Pills & badges','<div><span class="tpill accent">Featured</span> <span class="tpill good">Confirmed</span> <span class="tpill warn">Pending</span> <span class="tpill bad">Blocked</span> <span class="tpill info">Note</span></div>',r('Accent','<b>gradient</b>')+r('Semantic','good/warn/bad/info')+r('Corner',f.pill))+
-    card('sum_metric_tile','Metric tile','<div class="ttile"><div class="big">8,412</div><div class="lab">Active this week</div></div>',r('Fill','surface-2')+r('Shadow','outer')+r('Number',f.font));
-  document.getElementById('tableGrid').innerHTML=
-    card('row_portal','Table / portal rows','<table class="ttable"><thead><tr><th>Pos</th><th>Driver</th><th class="n">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class="n">287</td></tr><tr class="alt"><td>2</td><td>Piastri</td><td class="n">265</td></tr><tr class="sel"><td>3</td><td>Verstappen</td><td class="n">241</td></tr><tr class="alt"><td>4</td><td>Leclerc</td><td class="n">218</td></tr></tbody></table>',r('Header','surface/text-soft')+r('Alt','surface-2')+r('Selected','accent-soft'));
+  document.getElementById('typeGrid').innerHTML = REGISTRY.type.map(buildCard).join('');
+  document.getElementById('btnGrid').innerHTML = REGISTRY.buttons.map(buildCard).join('');
+  document.getElementById('shellGrid').innerHTML = REGISTRY.shells.map(buildCard).join('');
+  document.getElementById('fieldGrid').innerHTML = REGISTRY.fields.map(buildCard).join('');
+  document.getElementById('pillGrid').innerHTML = REGISTRY.pills.map(buildCard).join('');
+  document.getElementById('tableGrid').innerHTML = REGISTRY.tables.map(buildCard).join('');
+  
+  for(var grp in REGISTRY) {
+    REGISTRY[grp].forEach(function(obj) {
+      switchCardTab(obj.id, Object.keys(obj.states)[0]);
+    });
+  }
 }
+
 function renderSwatches(){
   var c=COLORS[curColor]||{};
   document.getElementById('swGrid').innerHTML=SW_ORDER.map(function(k){ return '<button class="sw" data-hex="'+(c[k]||'')+'"><div class="chip" style="background:'+(c[k]||'#888')+'"></div><div class="m"><div class="k">'+k+'</div><div class="hex">'+(c[k]||'')+'</div><div class="role">'+(ROLES[k]||'')+'</div></div></button>'; }).join('');
@@ -367,12 +543,12 @@ var toastT;
 function copyHex(hex){ if(!hex) return; var done=function(){ var t=document.getElementById('toast'); t.textContent='Copied '+hex; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove('show'); },1400); };
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(hex).then(done).catch(done); } else { var ta=document.createElement('textarea'); ta.value=hex; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); done(); } }
 
-function renderAll(){ applyTokens(); refreshTriggers(); renderObjects(); renderSwatches(); syncSel(); }
+function renderAll(){ renderObjects(); applyTokens(); refreshTriggers(); renderSwatches(); syncSel(); }
 
-function pickColor(slug){ curColor=slug; closeAll(); renderAll(); }
-function pickType(slug){ curType=slug; closeAll(); renderAll(); }
-function pickForm(slug){ curForm=slug; closeAll(); renderAll(); }
-function pickSpace(slug){ curSpace=slug; closeAll(); renderAll(); }
+function pickColor(slug){ curColor=slug; closeAll(); applyTokens(); refreshTriggers(); renderSwatches(); syncSel(); }
+function pickType(slug){ curType=slug; closeAll(); applyTokens(); refreshTriggers(); syncSel(); }
+function pickForm(slug){ curForm=slug; closeAll(); applyTokens(); refreshTriggers(); syncSel(); }
+function pickSpace(slug){ curSpace=slug; closeAll(); applyTokens(); refreshTriggers(); syncSel(); }
 
 function setView(v){ curView=v; document.getElementById('studioWrap').style.display=(v==='studio')?'block':'none'; document.getElementById('appWrap').style.display=(v==='app')?'block':'none'; document.getElementById('vStudio').setAttribute('aria-pressed',v==='studio'); document.getElementById('vApp').setAttribute('aria-pressed',v==='app'); }
 document.getElementById('vStudio').onclick=function(){ setView('studio'); };
