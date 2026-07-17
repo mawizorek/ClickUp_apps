@@ -23,6 +23,8 @@ Two posts, two channels, every session. Both follow the same structural rule: **
 
 **The session task did NOT replace the channel close (hard rule, Michael 2026-07-17).** Having an Activity Board task is an ADDITIONAL surface, not a substitute for the two-channel close. When a session ends (or Michael says "session closed"), the FULL close hook still fires: both channel posts happen AND the session task is shut down with a final pointer comment. Do not treat "I updated the task" as a completed close. "Closed out" is only true once both threads are posted, the task carries its final pointer comment, and Michael has been handed the task link.
 
+**Status semantics + handoff-at-close (ELEVATED 2026-07-17, Michael).** An actively-driven session task is `in progress` from the moment it's created (never parked at `to do` — you're doing it this second); the FIRST status (`to do`/New/Open) is repurposed as the HANDOFF/waiting slot, meaning "nobody is driving this yet." At close the warm-start handoff is no longer pasted as a chat code block: the agent CREATES the next-session task in the `to do` handoff slot, pre-loaded with the handoff prompt (Block T6 in the Gold Standard), and chains it to the closing task via a task relationship + pointer comment (Block T7). Michael starts the next session by opening that task and saying "complete the handoff prompt here, let's keep going"; the picking-up agent flips it to `in progress` and runs. See `Agent Activity Board — Gold Standard`.
+
 ---
 
 ## Two Modes: Full Close (default) vs Soft Close
@@ -205,13 +207,13 @@ The task pointer comment and the channel posts cross-link: the channel Session L
 
 ---
 
-## Warm-Start Handoff Prompt
+## Warm-Start Handoff → the next-session handoff TASK (reframed 2026-07-17)
 
-**When:** only when a session has open loops that require continuity into the next session. If the session closed clean with no pending work, skip this entirely.
+**When:** whenever a session has a next step / open loops that continue into the next session. Skip only on a genuinely clean close with no next step.
 
-**Delivery:** paste the next-session prompt inline in the close reply as a bare code block (no language tag). Agent-to-agent technical voice, not Michael's voice.
+**Delivery (CHANGED 2026-07-17).** Do NOT paste the next-session prompt as a bare code block in chat anymore. Instead **create the next-session task on the Agent Activity Board**, in the FIRST status (`to do` = handoff/waiting slot — no agent is driving it yet), pre-loaded with the handoff prompt in its description (Block T6 in the Gold Standard). Then **chain it to the closing session:** (1) a task **relationship** (follow-up of the closing task) and (2) a **pointer comment** on both tasks (Block T7). Michael triggers the next session by opening that task and saying "complete the handoff prompt here, let's keep going"; the picking-up agent flips it to `in progress`, posts its opening transcript comment (referencing the handoff), and runs. It's fine for a handoff task to sit open and untouched — it's the queue, not debt.
 
-**Fixed sections (in order):**
+**The handoff prompt content — fixed sections (in order), written into the task description so a cold agent can act without loading prior conversation:**
 
 1. **OBJECTIVE** — what the next session is picking up
 2. **READ FIRST** — repo paths + read-method caveats (raw vs MCP, known truncation risks)
@@ -220,7 +222,7 @@ The task pointer comment and the channel posts cross-link: the channel Session L
 5. **GUARDRAILS** — what to avoid / known failure modes
 6. **OPEN THREADS** — anything unresolved
 
-Never just post a link as a handoff. The prompt must be self-contained enough that a cold agent can act on it without loading prior conversation.
+Never just post a bare link as a handoff. The prompt in the task must be self-contained enough that a cold agent can act on it without loading prior conversation.
 
 ---
 
@@ -239,6 +241,7 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 11. **Thread replies can have addenda.** If the session continues after initial close (extended session), post an addendum reply in the same thread rather than a new root.
 12. **Usage log commit (after both posts + task shutdown).** Tally which profiled tools (hooks, gates, agents) fired during the session. Commit an update to `brain-config/usage-log.json` incrementing each tool's count and bumping `sessions_logged`. Format: `{ "tools": { "tool-slug": N, ... }, "sessions_logged": N, "last_updated": "YYYY-MM-DD" }`.
 13. **The session's open-thread note is appended to `brain-config/open-thread.md` at close, no review.** It's already a comment on the session task (in-session record); the append is the durable cross-session queue a cold agent reads at Session Open. Append the next entry, never overwrite; commit via the normal branch → PR → self-merge flow.
+14. **The warm-start handoff is a TASK, not a chat code block (2026-07-17).** At close, create the next-session task in the first status (`to do` = handoff/waiting slot), pre-load the handoff prompt (Block T6), and chain it to the closing task (relationship + pointer comment T7). Active session tasks are `in progress` from creation; the first status is reserved for handoff/waiting. Don't paste the next-session prompt inline in chat anymore.
 
 ---
 
@@ -249,7 +252,7 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 3. Session-task shutdown: final `[CLOSE-POINTER]` comment (links both threads) + flip status to `done` + hand Michael the task link in chat (templates T4/T5)
 4. Bounced-memory-write drop: if any write didn't land, append an `OMR` entry to `brain-config/open-memory-requests.md`
 5. Open-thread append: take the session's open-thread note (already a comment on the session task) and append it as the next entry in `brain-config/open-thread.md`. No review.
-6. Warm-start handoff prompt (if open loops exist)
+6. Next-session handoff TASK (if a next step exists): create it on the Agent Activity Board in `to do` (handoff slot), pre-loaded with the handoff prompt (Block T6), linked to the closing task as a follow-up (relationship + pointer comment T7). Replaces the old inline chat code block.
 7. Usage-log commit to `brain-config/usage-log.json`
 
 ---
@@ -274,6 +277,8 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 | Said "closed out" without handing Michael the links | Agent stopped after the task update | Not closed until both threads posted + task shut + task link given |
 | Bounced memory write left as only a chat/audit mention | Agent skipped the durable drop | Append an OMR entry to open-memory-requests.md at close |
 | Open-thread note left only as a task comment | Agent skipped the durable append | Also append it as the next entry in open-thread.md at close (no review) |
+| Warm-start handoff pasted as a chat code block | Agent used the retired inline-prompt path | Create the next-session handoff TASK in `to do`, pre-load the prompt, chain it to the closing task |
+| Active session task left at `to do` | Agent didn't flip on start | Active work is `in progress` from creation; `to do` = handoff/waiting only |
 | No session task opened, so no transcript exists | Startup gate missed | Open the Agent Activity Board task at session start; comment near-per-prompt |
 | Audit says "no changes" with no thread | Agent skipped the structure | Still post full audit template with "None" in changes |
 | Multiple roots for same session | Agent posted twice | Use addendum replies in thread |
