@@ -8,6 +8,17 @@
 
 ---
 
+## Opening check (standing, every session): "Do we have a session thread for this?"
+
+**This is the first question of every working session.** Before any council/Workshop agent expresses anything, the first voice seated (Maestro Mira by default — she opens every pass) VERIFIES the session transcript thread exists:
+
+- **Exists?** Hand it off to the whole team — every seated agent posts into that same thread.
+- **Doesn't exist?** Open it immediately (per the triggers below), THEN seat agents. No agent speaks before the thread is live.
+
+The thread-first rule is deliberate and structural: because agents can ONLY express themselves in the thread (see Agent Expression below), the thread MUST exist before the team can think out loud. This is what forces a transcript to be present whenever a real session starts — the agents literally have nowhere else to speak.
+
+---
+
 ## Default posture: open-then-discard (LOCKED 2026-07-17)
 
 **The bias is now all the way toward opening.** The default is not "wait until the session proves it's substantive" — it's **open a silent provisional log for anything that isn't an obvious one-off lookup, and DISCARD the stub if the session stays trivial.** The cost math is lopsided and settles it: a discarded stub costs nothing, but a missed transcript costs a hazy close-time reconstruction (the exact failure that prompted this change). When torn between holding and opening, open.
@@ -21,7 +32,7 @@
 ## Trigger: whichever comes first
 
 1. **Deterministic action signal (STRONGEST — no judgment call).** The moment Brain is about to **create a task or a doc/page** (or any comparable persistent-artifact creation), the log fires immediately. This is mechanical, not a vibe check: creating a task or a Decision Log is unmistakably a working session. This trigger is the primary backstop and beats all discretion.
-2. **Literal trigger phrases (keyword match, no discretion).** Any of these in Michael's message fires the log immediately: **"take notes" / "take notes on this" / "run it by the team" / "log this" / "start a decision log" / "decision log" / "pencil it in" / "capture this" / "tear it apart" / "convene the team."** Keyword match beats judgment (same reasoning as the memory zoom-link + accounts-lookup routing). List is extensible — add phrases as new planning-session tells surface.
+2. **Literal trigger phrases (keyword match, no discretion).** Any of these in Michael's message fires the log immediately: **"take notes" / "take notes on this" / "run it by the team" / "log this" / "start a decision log" / "decision log" / "pencil it in" / "capture this" / "tear it apart" / "convene the team" / "run it by the workshop" / "clean session."** Keyword match beats judgment (same reasoning as the memory zoom-link + accounts-lookup routing). List is extensible — add phrases as new planning-session tells surface.
 3. **First real decision.** The moment the session produces a genuine decision, direction, tradeoff, or commitment (not a lookup, not a status answer), Scribe opens the log immediately.
 4. **Third message during build/work.** If the session is building, editing, designing, or otherwise *working on something* (not a one-off lookup), Scribe opens the log by the 3rd message at the latest, even if no single crisp decision has landed yet.
 
@@ -29,15 +40,15 @@ Bias toward firing. When it's a close call between "lookup" and "work," treat it
 
 ---
 
-## Hold (don't fire / discard the stub)
+## Agent expression: THREAD-ONLY (LOCKED 2026-07-17)
 
-Scribe stays silent — no promoted log — on sessions that never cross the bar. Under open-then-discard, a provisional stub may have opened; it gets discarded at close on these:
+**Council and Workshop agents may NOT respond in the active session. Their ONE and ONLY channel of expression is a comment in the session transcript thread.** This is the heart of the design:
 
-- Mundane research or a one-off lookup ("what's X", "find me Y", "is Z done").
-- A single trivial action with no decisions (uploading a photo, a one-line status check).
-- Small talk / clarifying exchanges that haven't turned into work.
-
-The hold is deliberate: it keeps the log meaningful. A session full of transcript noise is as useless as no transcript. The difference now: we open first and discard on non-substance, rather than waiting and risking a missed record.
+- **No agent voice appears in the working chat.** Michael's active session shows Brain's synthesized reply, not the individual agents talking. If an agent has something to say — a risk, an objection, a clever alternative, a flag — it goes in the thread as a comment, never in the live reply.
+- **The thread is their forum.** Each agent leaves comments in the session thread in their OWN distinct voice. This is deliberately fun to read: the thread becomes a real multi-voice record of how the team actually deliberated, not a flattened summary.
+- **Individual voices are required, not optional.** Every seated agent posts under their own name with their own signature style (Rhys = calm failure-theorist, Beckett = hands-on toddler-with-a-hammer, Cleo = elegant minimalist, Polly = standards stickler, Finn = pragmatic builder, Skye = scope hawk, Enzo = systems/side-effects, etc. — voices per each agent's profile). No generic agent-speak; the point is that you can tell who's talking without the name tag.
+- **What STAYS in the active session (not thread-only):** Brain's own synthesized response to Michael, and Maestro Mira's single anchor line before convening (FIRST TOKEN RULE — Michael always gets an early human-facing token). The agents' deliberation is what moves to the thread; the synthesized answer and the anchor stay live.
+- **Why this forces the transcript:** if the only place an agent can speak is the thread, then a working session cannot proceed without a thread. The transcript's existence is no longer a nice-to-have that competes with momentum — it's a precondition for the team to function.
 
 ---
 
@@ -51,6 +62,7 @@ On the first trigger hit (or promotion of a provisional stub), Scribe **immediat
    - `**Michael:**` / `**Brain:**` turn labels, in order.
    - Verbatim wording where it matters (decisions, instructions, key phrasing); tight paraphrase only where exact wording is unrecoverable, marked as paraphrase.
    - Decisions, reasoning, and tradeoffs captured inline as they land — not summarized after the fact.
+   - **Agent comments interleaved in their own voices** — the seated council/Workshop voices post here (and ONLY here), so the thread reads as the real multi-voice deliberation.
    - Backfill any pre-trigger turns from the session so far, so the record starts from message 1, not from the trigger point.
 4. Keeps appending in real time as the session continues. The thread grows turn by turn; it is never reconstructed from memory at the end.
 
@@ -72,6 +84,8 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 
 ## Rules
 
+- **Thread-first: the thread must exist before any agent speaks.** The opening check ("Do we have a session thread for this?") runs at session start; the first voice seated verifies/opens the thread and hands it to the team.
+- **Thread-only: council/Workshop agents express ONLY in the session thread, never in the active session.** Each posts in their own distinct voice. Brain's synthesized reply + Mira's anchor line are the only things that stay live.
 - **Open-then-discard is the default.** Open a silent provisional log for anything that isn't an obvious lookup; discard the stub at close if the session stayed trivial. Bias all the way toward opening.
 - **Deterministic triggers beat discretion.** About-to-create-a-task/doc (trigger 1) and the literal keyword list (trigger 2) fire with no judgment call and are the primary reason the log now opens near message 1.
 - **Fire once per session, and fire easily.** After the log opens/promotes, this gate is satisfied; don't re-evaluate.
@@ -88,12 +102,14 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 
 - **Session Close hook** (`hooks/session-close.md`) — Channel 2 (Session Log) is where this gate's thread lives; the close hook finalizes it rather than creating a fresh one.
 - **Scribe Sana** (`agents/scribe-sana.md`) — the owner/operator; her profile carries the behavioral detail.
+- **The Council** (`council.md`) — the thread-only expression rule is mirrored there: seated voices deliberate in the thread, not the active session. Mira runs the opening thread-existence check.
 - **Decision Log hook** (`hooks/decision-log.md`) — the repo-file `decision-log.md` convention (durable "why" in git) is distinct from this live chat transcript; a locked decision can land in both, full text in the decision log, pointer in the transcript.
 
 ---
 
 ## Changelog
 
-- 2026-07-17: **Fire earlier.** Added the open-then-discard default posture, a deterministic action-signal trigger (about to create a task/doc), and a literal trigger-phrase list ("take notes", "run it by the team", "log this", "start a decision log", etc.). Added a backfill-to-message-1 rule so a late-opened log is still complete from the top. Prompted by the 2026-07-17 Production Paperwork Planner session, where a Decision-Log build never opened a live log and the transcript was reconstructed at close — the exact failure the gate exists to prevent. Triggers reordered so the two deterministic ones lead.
+- 2026-07-17 (c): **Thread-only agent expression + thread-first opening check.** Council/Workshop agents may no longer speak in the active session — their sole channel is comments in the session transcript thread, each in their own distinct voice. Added the standing opening check ("Do we have a session thread for this?") run by Mira, who verifies/opens the thread before any agent speaks and hands it to the team. This structurally forces the transcript to exist whenever a real session starts (agents have nowhere else to speak). Brain's synthesized reply + Mira's anchor line stay live (FIRST TOKEN RULE preserved). Mirrored in `council.md`.
+- 2026-07-17 (b): **Fire earlier.** Added the open-then-discard default posture, a deterministic action-signal trigger (about to create a task/doc), and a literal trigger-phrase list. Added a backfill-to-message-1 rule. Prompted by the 2026-07-17 Production Paperwork Planner session, where a Decision-Log build never opened a live log and the transcript was reconstructed at close.
 - 2026-07-16 (b): Scribe now announces the transcript start ONCE (upbeat), then works silently. Gate biased to fire easily. Added to the load-and-sync step so it's evaluated every reply.
 - 2026-07-16: Initial version. Splits transcript *capture* (this start gate, real-time, Scribe-owned) from transcript *finalization* (the close hook). Created so session logs stop being thin memory-reconstructions and become true chronological back-and-forth records.
