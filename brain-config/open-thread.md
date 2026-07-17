@@ -4,6 +4,33 @@ Scratch pad for pending work items. Brain checks this at session opens via the S
 
 ---
 
+## 📋 Entry template (COPY THIS — do not improvise a format)
+
+Every new open-thread entry uses the exact shape below. Copy the block, fill every field, append it to the bottom (newest at the bottom, under the existing entries). Never overwrite an existing entry. This is the same note that gets posted as a comment on the session's Agent Activity Board task at close — one note, two surfaces (the task comment is the in-session record; this file is the durable cross-session queue read at Session Open).
+
+```
+## [OPEN] <short title of the open item>
+
+- **ID:** OT-YYYY-MM-DD-<n>              (stable handle; increment <n> if multiple land same day)
+- **Logged:** YYYY-MM-DD HH:MM ET
+- **Session:** <link to the Agent Activity Board session task OR the session-close chat thread>
+- **Urgency:** 🔴 High | 🟡 Medium | 🟢 Low     (keep one, delete the rest)
+- **Item:** <what is open, in enough detail that a cold agent understands it without loading prior chat>
+- **Next action:** <the single first thing the next agent should do>
+- **Refs:** <repo paths, PR #s, doc/task links, or "none">
+```
+
+**Field rules:**
+- **Status flag** in the heading: `[OPEN]` while pending; flip to `[RESOLVED]` (with a date) when done rather than silently deleting, so the trail survives one cycle before cleanup.
+- **ID** is a stable handle so the item can be referenced in chat, commits, and other entries. Format `OT-<date>-<n>`. Never reuse an ID.
+- **Logged** is a real timestamp (date + time + ET), not just a date. (Older entries below use `**Added:** YYYY-MM-DD` — that's the legacy shape; new entries use this template.)
+- **Session** must be a link, not a description — it's how a cold agent gets back to the full context.
+- **Urgency** is one of the three flags; delete the two you don't pick.
+- **Next action** is mandatory: one concrete first step, so the entry is actionable, not just informational.
+- **Refs** carries anything load-first (repo paths, PR numbers, doc/task links). Write `none` if genuinely nothing.
+
+---
+
 ## FileMaker object verification & audit trail (D-007) — SHIPPED this session (2026-07-16)
 **Added:** 2026-07-16
 
