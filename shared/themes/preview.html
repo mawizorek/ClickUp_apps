@@ -4,191 +4,344 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Theme Render Board — Color × Feeling</title>
+<title>Theme Studio — Color × Feeling</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ch-bg:oklch(0.965 0.006 265);--ch-panel:oklch(0.995 0.003 265);--ch-sunk:oklch(0.945 0.008 265);
-    --ch-line:oklch(0.88 0.012 265);--ch-ink:oklch(0.25 0.03 275);--ch-soft:oklch(0.47 0.03 275);
-    --ch-faint:oklch(0.63 0.025 275);--ch-accent:oklch(0.52 0.18 275);--ch-accent-soft:oklch(0.94 0.045 275);
-    --ch-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;--ch-sans:"Inter",system-ui,-apple-system,sans-serif;--ch-r:12px;
+    --ch-bg:oklch(0.93 0.005 265);--ch-panel:oklch(0.98 0.003 265);--ch-sunk:oklch(0.905 0.006 265);
+    --ch-line:oklch(0.85 0.012 265);--ch-ink:oklch(0.24 0.02 275);--ch-soft:oklch(0.46 0.02 275);
+    --ch-faint:oklch(0.60 0.02 275);--ch-accent:oklch(0.54 0.16 275);--ch-accent-soft:oklch(0.90 0.04 275);
+    --ch-mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;--ch-sans:"Inter",system-ui,-apple-system,sans-serif;
   }
   *{box-sizing:border-box;} html,body{margin:0;}
-  body{font-family:var(--ch-sans);background:var(--ch-bg);color:var(--ch-ink);-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);}
-  h1,h2,h3,h4{text-wrap:balance;}
-  .wrap{max-width:1280px;margin:0 auto;padding:26px 22px 80px;}
-  .kicker{font-size:0.7rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--ch-accent);margin:0 0 8px;}
-  .masthead h1{font-size:clamp(1.7rem,3.6vw,2.35rem);font-weight:900;letter-spacing:-0.03em;margin:0 0 10px;}
-  .masthead p{font-size:0.98rem;line-height:1.6;color:var(--ch-soft);max-width:76ch;margin:0;}
+  body{font-family:var(--ch-sans);background:var(--ch-bg);color:var(--ch-ink);-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);transition:background 300ms cubic-bezier(.16,1,.3,1),color 300ms;}
+  h1,h2,h3,h4{text-wrap:balance;margin:0;}
+  .wrap{max-width:1300px;margin:0 auto;padding:24px 22px 40px;}
+  .masthead .kicker{font-size:0.7rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--ch-accent);margin:0 0 8px;}
+  .masthead h1{font-size:clamp(1.6rem,3.4vw,2.2rem);font-weight:900;letter-spacing:-0.03em;}
+  .masthead p{font-size:0.92rem;line-height:1.55;color:var(--ch-soft);max-width:70ch;margin:9px 0 0;}
   .masthead b{color:var(--ch-ink);font-weight:700;}
-  .eq{font-family:var(--ch-mono);font-size:0.82rem;color:var(--ch-soft);background:var(--ch-sunk);border:1px solid var(--ch-line);border-radius:8px;padding:8px 12px;margin:14px 0 0;display:inline-block;} .eq b{color:var(--ch-accent);}
-  .pickbar{position:sticky;top:0;z-index:60;background:oklch(0.965 0.006 265 / 0.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--ch-line);margin:22px -22px 0;padding:14px 22px;}
-  .pickbar-in{max-width:1236px;margin:0 auto;display:flex;flex-direction:column;gap:14px;}
-  .prow{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;}
-  .picker{flex:1;min-width:240px;} .picker>.lbl{font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ch-faint);margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;}
-  .picker>.lbl b{color:var(--ch-accent);font-weight:700;letter-spacing:0;text-transform:none;font-size:0.82rem;}
-  .theme-chips,.feel-chips{display:flex;gap:8px;flex-wrap:wrap;}
-  .theme-chip{background:var(--ch-panel);border:1.5px solid var(--ch-line);border-radius:9px;padding:8px 14px;cursor:pointer;font:inherit;font-weight:700;font-size:0.88rem;display:flex;align-items:center;gap:9px;transition:border-color 160ms cubic-bezier(.16,1,.3,1);}
-  .theme-chip:hover{border-color:var(--ch-accent);} .theme-chip[aria-pressed="true"]{border-color:var(--ch-accent);background:var(--ch-accent-soft);}
-  .theme-chip .tdot{width:16px;height:16px;border-radius:5px;} .theme-chip .lk{font-family:var(--ch-mono);font-size:0.56rem;padding:1px 5px;border-radius:4px;background:var(--ch-accent);color:#fff;}
-  .feel-chip{background:var(--ch-panel);border:1px solid var(--ch-line);border-radius:9px;padding:8px 12px;cursor:pointer;font:inherit;text-align:left;transition:border-color 160ms;}
-  .feel-chip:hover{border-color:var(--ch-accent);} .feel-chip[aria-pressed="true"]{border-color:var(--ch-accent);background:var(--ch-accent-soft);}
-  .feel-chip .fn{font-weight:700;font-size:0.88rem;display:block;} .feel-chip .ft{font-size:0.7rem;color:var(--ch-soft);}
-  .feel-chip .dft{font-family:var(--ch-mono);font-size:0.55rem;padding:1px 4px;border-radius:3px;background:var(--ch-line);color:var(--ch-soft);margin-left:5px;}
-  .color-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
-  .color-chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;cursor:pointer;font:inherit;padding:2px;}
-  .color-chip .dot{width:32px;height:32px;border-radius:9px;border:2px solid transparent;position:relative;overflow:hidden;transition:transform 140ms cubic-bezier(.16,1,.3,1);}
-  .color-chip .dot::after{content:"";position:absolute;inset:0;background:linear-gradient(150deg,transparent 55%,rgba(255,255,255,0.28));}
-  .color-chip:hover .dot{transform:scale(1.07);} .color-chip[aria-pressed="true"] .dot{border-color:var(--ch-ink);}
-  .color-chip .cl{font-size:0.58rem;color:var(--ch-soft);max-width:52px;text-align:center;line-height:1.15;} .color-chip[aria-pressed="true"] .cl{color:var(--ch-ink);font-weight:700;}
-  .divider{font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ch-faint);border-top:1px dashed var(--ch-line);padding-top:12px;margin-top:2px;}
-  .combo-line{max-width:1236px;margin:12px auto 0;font-family:var(--ch-mono);font-size:0.76rem;color:var(--ch-soft);display:flex;gap:12px;flex-wrap:wrap;align-items:center;} .combo-line b{color:var(--ch-accent);} .combo-line .sep{color:var(--ch-faint);}
-  .board-sec{margin-top:34px;} .board-sec>h2{font-size:0.82rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--ch-faint);margin:0 0 4px;}
-  .board-sec>.sub{font-size:0.86rem;color:var(--ch-soft);margin:0 0 16px;max-width:72ch;line-height:1.5;}
-  .spec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
-  .spec{background:var(--ch-panel);border:1px solid var(--ch-line);border-radius:var(--ch-r);overflow:hidden;display:flex;flex-direction:column;}
-  .spec-name{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-bottom:1px solid var(--ch-line);}
-  .spec-name .nm{font-weight:700;font-size:0.86rem;} .spec-name .id{font-family:var(--ch-mono);font-size:0.62rem;color:var(--ch-faint);}
-  .stage-zone{padding:20px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;min-height:92px;background:var(--bg);transition:background 240ms cubic-bezier(.16,1,.3,1);}
-  .stage-zone.col{flex-direction:column;align-items:stretch;}
-  .spec-recipe{padding:11px 14px;border-top:1px solid var(--ch-line);background:var(--ch-sunk);}
-  .spec-recipe .rrow{display:grid;grid-template-columns:auto 1fr;gap:8px;font-size:0.72rem;padding:3px 0;}
-  .spec-recipe .rk{color:var(--ch-faint);font-weight:600;} .spec-recipe .rv{font-family:var(--ch-mono);font-size:0.67rem;color:var(--ch-soft);text-align:right;} .spec-recipe .rv b{color:var(--ch-accent);font-weight:600;}
-  /* themed objects consume color tokens + feeling vars set by resolve.js on #board */
-  #board{--accent-grad:linear-gradient(var(--grad-angle,180deg), var(--accent), var(--accent-deep));--surface-grad:var(--surface-2);}
-  .stage-zone{font-family:var(--font-body);color:var(--text);}
-  .t-btn{font-family:var(--font-body);font-weight:700;font-size:var(--fs-body);border-radius:var(--radius);padding:0 20px;min-height:var(--touch);border:var(--border-w) solid transparent;cursor:pointer;letter-spacing:var(--track-btn);display:inline-flex;align-items:center;gap:8px;}
-  .t-btn.primary{background:var(--accent-grad);color:var(--on-accent);box-shadow:var(--shadow-out);}
-  .t-btn.secondary{background:var(--surface-2);color:var(--text);border-color:var(--border);}
-  .t-btn.ghost{background:transparent;color:var(--accent);} .t-btn.destructive{background:var(--bad);color:#fff;box-shadow:var(--shadow-out);}
-  .t-btn.pressed{background:var(--accent-grad);color:var(--on-accent);box-shadow:var(--shadow-in);transform:translateY(1px);}
-  .t-btn.icon{padding:0;width:var(--touch);justify-content:center;background:var(--surface-2);color:var(--text);border-color:var(--border);}
-  .state-tag{font-family:var(--ch-mono);font-size:0.6rem;color:var(--text-faint);}
-  .t-pill{font-size:var(--fs-xs);font-weight:700;padding:5px 12px;border-radius:var(--radius-pill);color:var(--on-accent);font-family:var(--font-body);}
-  .t-pill.accent{background:var(--accent-grad);} .t-pill.good{background:var(--good);} .t-pill.warn{background:var(--warn);color:#241d05;} .t-pill.bad{background:var(--bad);color:#fff;} .t-pill.info{background:var(--info);}
-  .t-card{width:100%;background:var(--surface-grad);border:var(--border-w) solid var(--border);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-out);}
-  .t-card h3{font-family:var(--font-display);margin:0 0 6px;font-size:var(--fs-lead);font-weight:700;color:var(--text);letter-spacing:var(--track-tight);}
-  .t-card p{margin:0;font-size:var(--fs-sm);line-height:1.5;color:var(--text-soft);}
-  .t-field{width:100%;} .t-field label{display:block;font-size:var(--fs-xs);font-weight:600;color:var(--text-soft);margin-bottom:5px;}
-  .t-field input{width:100%;font:inherit;font-size:var(--fs-body);background:var(--field);color:var(--text);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:0 12px;min-height:var(--touch);}
-  .t-field input.focus{border-color:var(--accent);box-shadow:var(--shadow-in);} .t-field input::placeholder{color:var(--text-faint);}
-  .t-toolbar{width:100%;display:flex;align-items:center;gap:10px;background:var(--surface-1);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:10px 12px;}
-  .t-toolbar .tt{font-family:var(--font-display);font-weight:800;font-size:var(--fs-body);color:var(--text);letter-spacing:var(--track-tight);} .t-toolbar .tspacer{flex:1;}
-  .t-nav{font-family:var(--font-body);font-size:var(--fs-xs);font-weight:700;padding:5px 11px;border-radius:var(--radius-pill);}
-  .t-nav.active{background:var(--accent);color:var(--on-accent);} .t-nav.inactive{color:var(--text-faint);border:var(--border-w) solid var(--border);}
-  .t-table{width:100%;border-collapse:collapse;font-size:var(--fs-sm);font-variant-numeric:tabular-nums;}
-  .t-table th,.t-table td{text-align:left;padding:8px 11px;border-bottom:var(--border-w) solid var(--border);}
-  .t-table th{font-family:var(--font-display);font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:0.06em;color:var(--text-soft);font-weight:700;} .t-table td.n{text-align:right;}
-  .t-table tbody tr.sel{background:var(--accent-soft);} .t-table tbody tr.alt{background:var(--surface-2);}
-  .t-callout{width:100%;background:var(--accent-soft);border:var(--border-w) solid var(--accent);border-radius:var(--radius);padding:13px 15px;font-size:var(--fs-sm);line-height:1.5;color:var(--text);}
-  .sw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;}
-  .sw-item{border:1px solid var(--ch-line);border-radius:9px;overflow:hidden;background:var(--ch-panel);}
-  .sw-chip{height:50px;} .sw-meta{padding:7px 9px;} .sw-meta .sk{font-family:var(--ch-mono);font-size:0.66rem;font-weight:600;color:var(--ch-ink);} .sw-meta .sv{font-family:var(--ch-mono);font-size:0.62rem;color:var(--ch-accent);} .sw-meta .sr{font-size:0.62rem;color:var(--ch-faint);line-height:1.3;}
-  .note{font-size:0.8rem;color:var(--ch-faint);line-height:1.55;margin:16px 0 0;max-width:74ch;} .note b{color:var(--ch-soft);} a.dl{color:var(--ch-accent);text-decoration:none;font-weight:600;}
+  .bar{position:sticky;top:0;z-index:80;background:color-mix(in oklch, var(--ch-bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--ch-line);margin:20px -22px 0;padding:16px 22px;transition:background 300ms,border-color 300ms;}
+  .bar-in{max-width:1256px;margin:0 auto;display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;}
+  .dd{position:relative;flex:1;min-width:210px;}
+  .dd > label{display:block;font-size:0.66rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ch-faint);margin-bottom:7px;}
+  .dd-trigger{width:100%;display:flex;align-items:center;gap:11px;background:var(--ch-panel);border:1.5px solid var(--ch-line);border-radius:11px;padding:12px 14px;font:inherit;color:var(--ch-ink);cursor:pointer;min-height:52px;transition:border-color 160ms cubic-bezier(.16,1,.3,1),box-shadow 160ms;}
+  .dd-trigger:hover{border-color:var(--ch-accent);}
+  .dd-trigger.open{border-color:var(--ch-accent);box-shadow:0 0 0 4px var(--ch-accent-soft);}
+  .dd-sw{width:26px;height:26px;min-width:26px;border-radius:7px;border:1px solid oklch(0 0 0 / 0.15);}
+  .dd-meta{flex:1;text-align:left;min-width:0;}
+  .dd-meta .nm{font-weight:700;font-size:0.98rem;display:block;line-height:1.15;}
+  .dd-meta .sub{font-size:0.72rem;color:var(--ch-faint);font-family:var(--ch-mono);}
+  .dd-chev{color:var(--ch-faint);font-size:0.7rem;transition:transform 200ms cubic-bezier(.16,1,.3,1);}
+  .dd-trigger.open .dd-chev{transform:rotate(180deg);}
+  .dd-pop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--ch-panel);border:1px solid var(--ch-line);border-radius:12px;box-shadow:0 12px 34px oklch(0 0 0 / 0.22);padding:6px;z-index:90;max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;}
+  .dd-pop.open{display:block;}
+  .dd-grouplabel{font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ch-faint);padding:8px 10px 4px;}
+  .dd-opt{width:100%;display:flex;align-items:center;gap:10px;background:none;border:1px solid transparent;border-radius:8px;padding:9px 10px;font:inherit;color:var(--ch-ink);cursor:pointer;text-align:left;min-height:44px;}
+  .dd-opt:hover{background:var(--ch-sunk);}
+  .dd-opt[aria-selected="true"]{background:var(--ch-accent-soft);border-color:var(--ch-accent);}
+  .dd-opt .osw{width:22px;height:22px;min-width:22px;border-radius:6px;border:1px solid oklch(0 0 0 / 0.14);}
+  .dd-opt .onm{flex:1;font-weight:600;font-size:0.9rem;}
+  .dd-opt .otag{font-family:var(--ch-mono);font-size:0.6rem;color:var(--ch-faint);padding:1px 6px;border:1px solid var(--ch-line);border-radius:4px;}
+  .dd-opt .otag.lock{background:var(--ch-accent);color:#fff;border-color:transparent;}
+  .viewtog{display:inline-flex;background:var(--ch-sunk);border:1px solid var(--ch-line);border-radius:10px;padding:3px;gap:2px;}
+  .viewtog button{font:inherit;font-weight:700;font-size:0.82rem;color:var(--ch-soft);background:none;border:0;border-radius:7px;padding:9px 16px;cursor:pointer;min-height:44px;transition:color 160ms;}
+  .viewtog button[aria-pressed="true"]{background:var(--ch-panel);color:var(--ch-ink);box-shadow:0 1px 3px oklch(0 0 0 / 0.12);}
+  .vt-wrap{display:flex;flex-direction:column;gap:7px;} .vt-wrap > label{font-size:0.66rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ch-faint);}
+  .combo{max-width:1256px;margin:12px auto 0;font-family:var(--ch-mono);font-size:0.75rem;color:var(--ch-soft);display:flex;gap:10px;flex-wrap:wrap;align-items:center;} .combo b{color:var(--ch-accent);} .combo .sep{color:var(--ch-faint);} .combo .eq{color:var(--ch-faint);}
+  .sec{margin-top:34px;} .sec > h2{font-size:0.8rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--ch-faint);margin-bottom:4px;}
+  .sec > .subt{font-size:0.85rem;color:var(--ch-soft);margin:0 0 16px;max-width:70ch;line-height:1.5;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+  .spec{background:var(--ch-panel);border:1px solid var(--ch-line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
+  .spec-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-bottom:1px solid var(--ch-line);}
+  .spec-h .nm{font-weight:700;font-size:0.85rem;} .spec-h .id{font-family:var(--ch-mono);font-size:0.62rem;color:var(--ch-faint);}
+  .stage{padding:22px 20px;display:flex;flex-direction:column;align-items:stretch;gap:12px;min-height:96px;background:var(--bg);transition:background 260ms cubic-bezier(.16,1,.3,1);}
+  .stage.row{flex-direction:row;align-items:center;flex-wrap:wrap;justify-content:center;}
+  .recipe{padding:11px 14px;border-top:1px solid var(--ch-line);background:var(--ch-sunk);}
+  .recipe .r{display:grid;grid-template-columns:auto 1fr;gap:8px;font-size:0.71rem;padding:2.5px 0;}
+  .recipe .rk{color:var(--ch-faint);font-weight:600;} .recipe .rv{font-family:var(--ch-mono);font-size:0.66rem;color:var(--ch-soft);text-align:right;} .recipe .rv b{color:var(--ch-accent);}
+  #stageRoot{--accent-grad:linear-gradient(var(--grad-angle,180deg), var(--accent), var(--accent-deep));}
+  .stage,.appview{font-family:var(--font-body);color:var(--text);}
+  .tb{font-family:var(--font-body);font-weight:700;font-size:var(--fs-body);border-radius:var(--radius);padding:0 20px;min-height:var(--touch);border:var(--border-w) solid transparent;cursor:pointer;letter-spacing:var(--track-btn);display:inline-flex;align-items:center;gap:8px;}
+  .tb.primary{background:var(--accent-grad);color:var(--on-accent);box-shadow:var(--shadow-out);}
+  .tb.secondary{background:var(--surface-2);color:var(--text);border-color:var(--border);}
+  .tb.ghost{background:transparent;color:var(--accent);} .tb.destructive{background:var(--bad);color:#fff;box-shadow:var(--shadow-out);}
+  .tb.pressed{background:var(--accent-grad);color:var(--on-accent);box-shadow:var(--shadow-in);transform:translateY(1px);}
+  .tb.icon{padding:0;width:var(--touch);justify-content:center;background:var(--surface-2);color:var(--text);border-color:var(--border);}
+  .stag{font-family:var(--ch-mono);font-size:0.58rem;color:var(--text-faint);text-align:center;}
+  .tpill{font-size:var(--fs-xs);font-weight:700;padding:5px 12px;border-radius:var(--radius-pill);color:var(--on-accent);font-family:var(--font-body);display:inline-block;}
+  .tpill.accent{background:var(--accent-grad);} .tpill.good{background:var(--good);} .tpill.warn{background:var(--warn);color:#241d05;} .tpill.bad{background:var(--bad);color:#fff;} .tpill.info{background:var(--info);}
+  .tcard{background:var(--surface-2);border:var(--border-w) solid var(--border);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-out);}
+  .tcard h3{font-family:var(--font-display);margin:0 0 6px;font-size:var(--fs-lead);font-weight:700;color:var(--text);letter-spacing:var(--track-tight);}
+  .tcard p{margin:0;font-size:var(--fs-sm);line-height:1.5;color:var(--text-soft);}
+  .tfield label{display:block;font-size:var(--fs-xs);font-weight:600;color:var(--text-soft);margin-bottom:5px;}
+  .tfield input{width:100%;font:inherit;font-size:var(--fs-body);background:var(--field);color:var(--text);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:0 12px;min-height:var(--touch);}
+  .tfield input.focus{border-color:var(--accent);box-shadow:var(--shadow-in);} .tfield input::placeholder{color:var(--text-faint);}
+  .ttoolbar{width:100%;display:flex;align-items:center;gap:10px;background:var(--surface-1);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:10px 12px;}
+  .ttoolbar .tt{font-family:var(--font-display);font-weight:800;font-size:var(--fs-body);color:var(--text);letter-spacing:var(--track-tight);} .ttoolbar .sp{flex:1;}
+  .tnav{font-family:var(--font-body);font-size:var(--fs-xs);font-weight:700;padding:6px 12px;border-radius:var(--radius-pill);}
+  .tnav.on{background:var(--accent);color:var(--on-accent);} .tnav.off{color:var(--text-faint);border:var(--border-w) solid var(--border);}
+  .tmodal{width:100%;background:var(--surface-3);border:var(--border-w) solid var(--border);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow-out);}
+  .tmodal h3{font-family:var(--font-display);margin:0 0 4px;font-size:var(--fs-lead);color:var(--text);letter-spacing:var(--track-tight);}
+  .tmodal p{margin:0 0 12px;font-size:var(--fs-sm);color:var(--text-soft);line-height:1.5;}
+  .tcallout{width:100%;background:var(--accent-soft);border:var(--border-w) solid var(--accent);border-radius:var(--radius);padding:13px 15px;font-size:var(--fs-sm);line-height:1.5;color:var(--text);}
+  .ttable{width:100%;border-collapse:collapse;font-size:var(--fs-sm);font-variant-numeric:tabular-nums;}
+  .ttable th,.ttable td{text-align:left;padding:8px 11px;border-bottom:var(--border-w) solid var(--border);}
+  .ttable th{font-family:var(--font-display);font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:0.06em;color:var(--text-soft);font-weight:700;} .ttable td.n{text-align:right;}
+  .ttable tr.sel{background:var(--accent-soft);} .ttable tr.alt{background:var(--surface-2);}
+  .ttile{background:var(--surface-2);border:var(--border-w) solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;box-shadow:var(--shadow-out);}
+  .ttile .big{font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:var(--text);letter-spacing:var(--track-tight);line-height:1;}
+  .ttile .lab{font-size:var(--fs-xs);color:var(--text-soft);margin-top:4px;}
+  .ttype .t1{font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--text);letter-spacing:var(--track-tight);line-height:1.1;}
+  .ttype .t2{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.06em;margin-top:8px;}
+  .ttype .t3{font-size:var(--fs-body);color:var(--text);margin-top:8px;line-height:1.5;}
+  .ttype .t4{font-size:var(--fs-sm);color:var(--text-soft);margin-top:4px;} .ttype .t5{font-size:var(--fs-xs);color:var(--text-faint);margin-top:4px;}
+  #appWrap{display:none;}
+  .appframe{border:1px solid var(--ch-line);border-radius:16px;overflow:hidden;box-shadow:0 18px 50px oklch(0 0 0 / 0.16);}
+  .appview{background:var(--bg);min-height:640px;transition:background 260ms cubic-bezier(.16,1,.3,1);}
+  .app-top{display:flex;align-items:center;gap:12px;background:var(--surface-1);border-bottom:var(--border-w) solid var(--border);padding:14px 20px;}
+  .app-logo{width:34px;height:34px;min-width:34px;display:grid;place-items:center;border-radius:var(--radius);background:var(--accent-grad);color:var(--on-accent);font-family:var(--font-display);font-weight:700;box-shadow:var(--shadow-out);}
+  .app-title{font-family:var(--font-display);font-weight:800;font-size:1.05rem;color:var(--text);letter-spacing:var(--track-tight);}
+  .app-sub{font-size:var(--fs-xs);color:var(--text-faint);}
+  .app-navrow{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;}
+  .app-body{display:grid;grid-template-columns:210px 1fr;gap:0;min-height:560px;}
+  @media (max-width:760px){.app-body{grid-template-columns:1fr;} .app-side{display:none;}}
+  .app-side{background:var(--surface-1);border-right:var(--border-w) solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:4px;}
+  .side-link{font-family:var(--font-body);font-size:var(--fs-sm);font-weight:600;color:var(--text-soft);padding:10px 12px;border-radius:var(--radius);border:var(--border-w) solid transparent;}
+  .side-link.on{background:var(--accent-soft);color:var(--text);border-color:var(--accent);}
+  .app-main{padding:24px;display:flex;flex-direction:column;gap:20px;overflow:hidden;}
+  .app-h1{font-family:var(--font-display);font-size:clamp(1.4rem,3vw,1.9rem);font-weight:900;color:var(--text);letter-spacing:var(--track-tight);margin:0;}
+  .app-lead{font-size:var(--fs-body);color:var(--text-soft);margin:2px 0 0;line-height:1.55;max-width:60ch;}
+  .app-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;}
+  .app-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .app-two{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;}
+  @media (max-width:640px){.app-two{grid-template-columns:1fr;}}
+  .app-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+  .sw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .sw{border:1px solid var(--ch-line);border-radius:9px;overflow:hidden;background:var(--ch-panel);cursor:pointer;transition:transform 120ms;} .sw:hover{transform:translateY(-2px);}
+  .sw .chip{height:48px;} .sw .m{padding:7px 9px;}
+  .sw .k{font-family:var(--ch-mono);font-size:0.64rem;font-weight:600;color:var(--ch-ink);} .sw .hex{font-family:var(--ch-mono);font-size:0.68rem;color:var(--ch-accent);} .sw .role{font-size:0.6rem;color:var(--ch-faint);}
+  .foot{max-width:1256px;margin:34px auto 0;padding-top:16px;border-top:1px solid var(--ch-line);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:0.72rem;color:var(--ch-faint);}
+  .foot a{color:var(--ch-soft);text-decoration:none;} .foot a:hover{color:var(--ch-accent);} .foot .stamp{font-family:var(--ch-mono);}
+  .copied{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ch-ink);color:var(--ch-bg);font-size:0.82rem;font-weight:600;padding:10px 18px;border-radius:999px;opacity:0;transition:opacity 200ms,transform 200ms cubic-bezier(.16,1,.3,1);pointer-events:none;z-index:200;}
+  .copied.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .banner{background:#b23a2f;color:#fff;font:600 13px var(--ch-mono);padding:8px 14px;text-align:center;border-radius:8px;margin-top:14px;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="masthead">
-    <p class="kicker">Theme Render Board · reference build: sharp-mclaren</p>
-    <h1>A theme is a color and a feeling.</h1>
-    <p>Three entities: a <b>Color</b> (hue, 17 hex tokens + a gradient-deep stop), a <b>Feeling</b> (form: type, corners, line weight, shadow, gradient angle), and a <b>Theme</b> — the named pairing of exactly one of each. Values come straight from the TSV grids (<b>colors.tsv</b>, <b>feelings.tsv</b>); every color is a literal hex, and the gradient is two explicit hex stops. Nothing is computed at runtime, so what you see is what you copy into FileMaker.</p>
-    <div class="eq"><b>Theme</b> &nbsp;=&nbsp; <b>Color</b> &nbsp;×&nbsp; <b>Feeling</b></div>
+    <p class="kicker">Theme Studio · shared/themes</p>
+    <h1>Pick a feeling. Pick a color. Copy the hex.</h1>
+    <p>Every value is read live from <b>colors.tsv</b> + <b>feelings.tsv</b>. <b>Studio</b> shows each object with its FileMaker recipe; <b>Full App</b> shows the same theme as a composed layout. Tap any swatch to copy its hex.</p>
   </header>
 
-  <div class="pickbar">
-    <div class="pickbar-in">
-      <div class="picker"><p class="lbl">Themes (blessed pairings) <b id="themeName">Sharp Racing · McLaren</b></p><div class="theme-chips" id="themeChips"></div></div>
-      <div class="prow divider">… or mix your own</div>
-      <div class="prow">
-        <div class="picker"><p class="lbl">Feeling (form) <b id="feelName">Sharp Racing</b></p><div class="feel-chips" id="feelChips"></div></div>
-        <div class="picker"><p class="lbl">Color (hue) <b id="colorName">McLaren</b></p><div class="color-scroll" id="colorChips"></div></div>
+  <div class="bar">
+    <div class="bar-in">
+      <div class="dd" id="ddFeel">
+        <label>Feeling — form</label>
+        <button class="dd-trigger" id="feelTrigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dd-meta"><span class="nm" id="feelNm">Sharp Racing</span><span class="sub" id="feelSub">sharp-racing</span></span>
+          <span class="dd-chev">▼</span>
+        </button>
+        <div class="dd-pop" id="feelPop" role="listbox"></div>
+      </div>
+      <div class="dd" id="ddColor">
+        <label>Color — hue</label>
+        <button class="dd-trigger" id="colorTrigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dd-sw" id="colorTrigSw"></span>
+          <span class="dd-meta"><span class="nm" id="colorNm">McLaren</span><span class="sub" id="colorSub">mclaren</span></span>
+          <span class="dd-chev">▼</span>
+        </button>
+        <div class="dd-pop" id="colorPop" role="listbox"></div>
+      </div>
+      <div class="vt-wrap">
+        <label>View</label>
+        <div class="viewtog" role="tablist">
+          <button id="vStudio" aria-pressed="true">Studio</button>
+          <button id="vApp" aria-pressed="false">Full App</button>
+        </div>
       </div>
     </div>
-    <div class="combo-line"><span>render:</span><span><b id="cl-feel">sharp-racing</b> <span class="sep">×</span> <b id="cl-color">mclaren</b></span><span class="sep">·</span><span id="cl-font">Chakra Petch</span><span class="sep">·</span><span id="cl-grad">gradient: 2 hex stops</span></div>
+    <div class="combo"><span class="eq">theme =</span><b id="cFeel">sharp-racing</b><span class="sep">×</span><b id="cColor">mclaren</b><span class="sep">·</span><span id="cFont">Chakra Petch</span><span class="sep">·</span><span id="cGrad">gradient</span></div>
   </div>
 
-  <div id="board">
-    <section class="board-sec"><h2>Buttons — full set with states</h2>
-      <p class="sub">Fill + corner + one shadow + text. Primary uses the two-stop hex gradient (accent → accent-deep); pressed swaps the outer shadow for an inner shadow (the infill rounded-rect look).</p>
-      <div class="spec-grid" id="buttonSpecs"></div></section>
-    <section class="board-sec"><h2>Shells, toolbar & nav</h2><p class="sub">Depth = surface fill + border + one outer shadow. One shadow per object, FileMaker's budget.</p><div class="spec-grid" id="shellSpecs"></div></section>
-    <section class="board-sec"><h2>Fields — editable, focus, readonly</h2><p class="sub">Focus = inner shadow + accent border. Readonly drops to a surface fill.</p><div class="spec-grid" id="fieldSpecs"></div></section>
-    <section class="board-sec"><h2>Pills, badges & callout</h2><p class="sub">Pill radius is a feeling decision. Semantic fills come from good/warn/bad/info.</p><div class="spec-grid" id="pillSpecs"></div></section>
-    <section class="board-sec"><h2>Table & portal rows</h2><p class="sub">Header, standard, alternating, selected. Selected = accent-soft; alt = surface-2.</p><div class="spec-grid" id="tableSpecs"></div></section>
+  <div id="stageRoot">
+    <div id="studioWrap">
+      <section class="sec"><h2>Typography ramp</h2><p class="subt">Display + body faces from the feeling; ink colors from the color.</p>
+        <div class="grid"><div class="spec"><div class="spec-h"><span class="nm">Type ramp</span><span class="id">tx_*</span></div>
+          <div class="stage ttype"><div class="t1">Race weekend</div><div class="t2">Section header</div><div class="t3">Body copy is the standard reading size for record content and prose in the layout.</div><div class="t4">Helper text under a field.</div><div class="t5">Muted metadata · timestamps</div></div>
+          <div class="recipe" id="rcpType"></div></div></div></section>
+      <section class="sec"><h2>Buttons — full state set</h2><p class="subt">Primary uses the two-stop hex gradient. Pressed swaps outer shadow for inner (the infill rounded-rect look).</p><div class="grid" id="btnGrid"></div></section>
+      <section class="sec"><h2>Shells, toolbar, nav & modal</h2><p class="subt">Depth from surface fill + border + one outer shadow.</p><div class="grid" id="shellGrid"></div></section>
+      <section class="sec"><h2>Fields — editable, focus, readonly</h2><p class="subt">Focus = inner shadow + accent border.</p><div class="grid" id="fieldGrid"></div></section>
+      <section class="sec"><h2>Pills, tiles & callout</h2><p class="subt">Pill radius follows the feeling; semantic fills from good/warn/bad/info.</p><div class="grid" id="pillGrid"></div></section>
+      <section class="sec"><h2>Table & portal rows</h2><p class="subt">Header, standard, alternating, selected.</p><div class="grid" id="tableGrid"></div></section>
+    </div>
+    <div id="appWrap">
+      <section class="sec"><h2>Full app render — <span id="appThemeName">Sharp Racing · McLaren</span></h2><p class="subt">The same theme as a composed layout: masthead, sidebar, stats, filters, table, detail. No studio chrome.</p>
+        <div class="appframe"><div class="appview">
+          <div class="app-top">
+            <div class="app-logo">◆</div>
+            <div><div class="app-title">On Track</div><div class="app-sub">2026 Season · Round 13</div></div>
+            <div class="app-navrow"><span class="tnav on">Standings</span><span class="tnav off">Calendar</span><span class="tnav off">Teams</span></div>
+          </div>
+          <div class="app-body">
+            <aside class="app-side">
+              <div class="side-link on">Constructor standings</div>
+              <div class="side-link">Driver standings</div>
+              <div class="side-link">Race results</div>
+              <div class="side-link">Circuits</div>
+              <div class="side-link">Regulations</div>
+            </aside>
+            <main class="app-main">
+              <div><h1 class="app-h1">Constructor standings</h1><p class="app-lead">Live points after the British Grand Prix. Two rounds until the summer break.</p></div>
+              <div class="app-stats">
+                <div class="ttile"><div class="big">287</div><div class="lab">McLaren points</div></div>
+                <div class="ttile"><div class="big">+46</div><div class="lab">Lead over P2</div></div>
+                <div class="ttile"><div class="big">9</div><div class="lab">Wins this season</div></div>
+              </div>
+              <div class="app-filters"><span class="tpill accent">All teams</span><span class="tnav off">Podiums</span><span class="tnav off">Points finishes</span><div style="flex:1"></div><div class="tfield" style="min-width:180px"><input placeholder="Search teams..."></div></div>
+              <div class="app-two">
+                <div class="tcard" style="padding:0;overflow:hidden">
+                  <table class="ttable">
+                    <thead><tr><th>Pos</th><th>Constructor</th><th class="n">Pts</th></tr></thead>
+                    <tbody>
+                      <tr><td>1</td><td>McLaren</td><td class="n">287</td></tr>
+                      <tr class="alt"><td>2</td><td>Ferrari</td><td class="n">241</td></tr>
+                      <tr class="sel"><td>3</td><td>Red Bull</td><td class="n">228</td></tr>
+                      <tr class="alt"><td>4</td><td>Mercedes</td><td class="n">204</td></tr>
+                      <tr><td>5</td><td>Aston Martin</td><td class="n">96</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:14px">
+                  <div class="tcard"><h3>Next race</h3><p>Hungarian Grand Prix · Hungaroring · Aug 2. Lights out 15:00 CET.</p></div>
+                  <div class="tcallout">McLaren clinches the constructors' title with a P3 or better this weekend.</div>
+                  <div class="app-actions"><button class="tb primary">Add prediction</button><button class="tb secondary">Share</button></div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div></div>
+      </section>
+    </div>
   </div>
 
-  <section class="board-sec"><h2>Color swatches — hex tokens for <span id="swName">McLaren</span></h2>
-    <p class="sub">The active color's full token set with hex values + roles. Copy these straight into FileMaker. The two gradient stops (accent, accent-deep) are both here as literal hex.</p>
-    <div class="sw-grid" id="swatchGrid"></div>
-    <p class="note"><b>To build this natively:</b> for each object card, create one FileMaker Style using its recipe + these hex values, then save all Styles into one FileMaker Theme. Toolbox + limits: <a class="dl" href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/FILEMAKER-CAPABILITIES.md">FILEMAKER-CAPABILITIES.md</a> · structure: <a class="dl" href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/THEME-SYSTEM.md">THEME-SYSTEM.md</a>.</p>
+  <section class="sec"><h2>Color swatches — <span id="swName">McLaren</span> <span style="color:var(--ch-faint);font-weight:400;font-size:0.72rem">(tap to copy hex)</span></h2>
+    <div class="sw-grid" id="swGrid"></div>
     <div id="errBanner"></div>
   </section>
+
+  <footer class="foot">
+    <span>Reads <b>colors.tsv</b> + <b>feelings.tsv</b> live. Hex is canonical; gradient = two hex stops, no runtime color math.</span>
+    <span class="stamp"><a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/THEME-SYSTEM.md">structure</a> · <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/FILEMAKER-CAPABILITIES.md">FileMaker toolbox</a></span>
+  </footer>
 </div>
+<div class="copied" id="toast">Copied</div>
 
 <script src="./resolve.js"></script>
 <script>
-const TOKEN_ROLES={bg:"page canvas","surface-1":"toolbar / header","surface-2":"card / row alt","surface-3":"modal / raised",border:"lines & edges",field:"input fill",text:"primary text","text-soft":"secondary text","text-faint":"muted / helper",accent:"actionable / gradient top","accent-deep":"gradient bottom","accent-2":"secondary accent","accent-soft":"tint / selected","on-accent":"text on accent",good:"success",warn:"warning",bad:"error / destructive",info:"informational"};
+/* presentation-only grouping for the color dropdown (not color data) */
+const GROUPS={"default-theme":"Utility","maw-dark-utility":"Utility","paper-mono":"Neutral","papyrus":"Neutral","americana":"Neutral","mclaren":"F1 Dark","ferrari":"F1 Dark","mercedes":"F1 Dark","red-bull":"F1 Dark","alpine":"F1 Dark","aston-martin":"F1 Dark","audi":"F1 Dark","cadillac":"F1 Dark","haas":"F1 Light","racing-bulls":"F1 Light","williams":"F1 Light"};
+const ROLES={bg:"page canvas","surface-1":"toolbar/header","surface-2":"card / row alt","surface-3":"modal / raised",border:"lines & edges",field:"input fill",text:"primary text","text-soft":"secondary text","text-faint":"muted/helper",accent:"actionable · grad top","accent-deep":"gradient bottom","accent-2":"secondary accent","accent-soft":"tint / selected","on-accent":"text on accent",good:"success",warn:"warning",bad:"error/destructive",info:"informational"};
 const SW_ORDER=["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-deep","accent-2","accent-soft","on-accent","good","warn","bad","info"];
-const board=document.getElementById('board');
-let curColor="mclaren",curFeel="sharp-racing";
+/* CHROME palettes per theme mode: light→soft gray, dark→charcoal, mid→mid gray (never white/black) */
+const CHROME={
+  light:{"--ch-bg":"oklch(0.93 0.005 265)","--ch-panel":"oklch(0.98 0.003 265)","--ch-sunk":"oklch(0.905 0.006 265)","--ch-line":"oklch(0.85 0.012 265)","--ch-ink":"oklch(0.24 0.02 275)","--ch-soft":"oklch(0.46 0.02 275)","--ch-faint":"oklch(0.60 0.02 275)","--ch-accent":"oklch(0.54 0.16 275)","--ch-accent-soft":"oklch(0.90 0.04 275)"},
+  mid:{"--ch-bg":"oklch(0.86 0.004 265)","--ch-panel":"oklch(0.92 0.003 265)","--ch-sunk":"oklch(0.83 0.005 265)","--ch-line":"oklch(0.74 0.010 265)","--ch-ink":"oklch(0.20 0.02 275)","--ch-soft":"oklch(0.38 0.02 275)","--ch-faint":"oklch(0.50 0.02 275)","--ch-accent":"oklch(0.42 0.16 275)","--ch-accent-soft":"oklch(0.80 0.05 275)"},
+  dark:{"--ch-bg":"oklch(0.24 0.008 265)","--ch-panel":"oklch(0.29 0.010 265)","--ch-sunk":"oklch(0.21 0.008 265)","--ch-line":"oklch(0.40 0.014 265)","--ch-ink":"oklch(0.95 0.006 265)","--ch-soft":"oklch(0.74 0.010 265)","--ch-faint":"oklch(0.58 0.010 265)","--ch-accent":"oklch(0.72 0.13 265)","--ch-accent-soft":"oklch(0.34 0.05 265)"}
+};
 
-function rr(k,v){return `<div class="rrow"><span class="rk">${k}</span><span class="rv">${v}</span></div>`;}
-function spec(id,name,stage,recipe){return `<div class="spec"><div class="spec-name"><span class="nm">${name}</span><span class="id">${id}</span></div><div class="stage-zone col">${stage}</div><div class="spec-recipe">${recipe}</div></div>`;}
+const root=document.getElementById('stageRoot');
+let curColor="mclaren",curFeel="sharp-racing",curView="studio";
 
-function feelFM(){ const f=(THEMES.feelings||{})[curFeel]||{}; return {font:(f['font-display']||'').split(',')[0].replace(/'/g,''),radius:f.radius||'',pill:f['radius-pill']||'',border:f['border-w']||'',angle:f['grad-angle']||''}; }
+function applyChrome(mode){ const set=CHROME[mode]||CHROME.light; for(const k in set){ document.documentElement.style.setProperty(k,set[k]); } }
+function fm(){ const f=(THEMES.feelings||{})[curFeel]||{}; return {font:(f['font-display']||'').split(',')[0].replace(/'/g,''),radius:f.radius||'',pill:f['radius-pill']||'',border:f['border-w']||'',angle:f['grad-angle']||''}; }
+function r(k,v){return `<div class="r"><span class="rk">${k}</span><span class="rv">${v}</span></div>`;}
+function card(id,name,stage,recipe,rowLayout){return `<div class="spec"><div class="spec-h"><span class="nm">${name}</span><span class="id">${id}</span></div><div class="stage ${rowLayout?'row':''}">${stage}</div><div class="recipe">${recipe}</div></div>`;}
 
-function renderBoard(){
-  const f=feelFM();
-  document.getElementById('buttonSpecs').innerHTML=
-    spec('btn_primary','Primary button',`<button class="t-btn primary">Save changes</button><span class="state-tag">Normal</span>`,rr('Fill','<b>gradient</b> '+f.angle+' accent→accent-deep')+rr('Corner',f.radius)+rr('Shadow','outer')+rr('Text','on-accent'))+
-    spec('btn_primary·pressed','Primary — pressed',`<button class="t-btn pressed">Save changes</button><span class="state-tag">Pressed</span>`,rr('Fill','<b>gradient</b> same')+rr('Shadow','<b>inner</b> (infill)')+rr('Note','pressed state'))+
-    spec('btn_secondary','Secondary',`<button class="t-btn secondary">Cancel</button>`,rr('Fill','surface-2')+rr('Line',f.border)+rr('Corner',f.radius))+
-    spec('btn_destructive','Destructive',`<button class="t-btn destructive">Delete</button>`,rr('Fill','bad')+rr('Shadow','outer'))+
-    spec('btn_ghost / icon','Ghost + icon',`<button class="t-btn ghost">Details</button><button class="t-btn icon">★</button>`,rr('Ghost','transparent · accent')+rr('Icon','square '+f.radius));
-  document.getElementById('shellSpecs').innerHTML=
-    spec('cnt_toolbar','Toolbar + nav',`<div class="t-toolbar"><span class="tt">On Track</span><span class="tspacer"></span><span class="t-nav active">Live</span><span class="t-nav inactive">History</span></div>`,rr('Fill','surface-1')+rr('Nav on','accent+on-accent')+rr('Nav off','text-faint+border'))+
-    spec('cnt_section_card','Section card',`<div class="t-card"><h3>Constructor standings</h3><p>Surface fill + border + one outer shadow.</p></div>`,rr('Fill','surface-2')+rr('Line',f.border)+rr('Corner',f.radius+' lg')+rr('Shadow','outer'))+
-    spec('t_callout','Callout',`<div class="t-callout">Accent-soft fill, accent border. Retints with the color.</div>`,rr('Fill','accent-soft')+rr('Line',f.border+' accent')+rr('Corner',f.radius));
-  document.getElementById('fieldSpecs').innerHTML=
-    spec('fd_text·editable','Field — editable',`<div class="t-field"><label>Driver name</label><input placeholder="Type a name..."></div>`,rr('Fill','field')+rr('Line',f.border+' border')+rr('Corner',f.radius))+
-    spec('fd_text·focus','Field — in focus',`<div class="t-field"><label>Driver name</label><input class="focus" value="Lando Norris"></div>`,rr('Line','accent')+rr('Shadow','<b>inner</b>'))+
-    spec('fd_readonly','Field — readonly',`<div class="t-field"><label>Team</label><input value="McLaren" readonly style="background:var(--surface-2);color:var(--text-soft);pointer-events:none"></div>`,rr('Fill','surface-2')+rr('Text','text-soft'));
-  document.getElementById('pillSpecs').innerHTML=
-    spec('tx_badge (family)','Pills & badges',`<span class="t-pill accent">Featured</span><span class="t-pill good">Confirmed</span><span class="t-pill warn">Pending</span><span class="t-pill bad">Blocked</span><span class="t-pill info">Note</span>`,rr('Accent','<b>gradient</b> '+f.angle)+rr('Semantic','good/warn/bad/info')+rr('Corner',f.pill));
-  document.getElementById('tableSpecs').innerHTML=
-    spec('row_portal (family)','Table / portal rows',`<table class="t-table"><thead><tr><th>Pos</th><th>Driver</th><th class="n">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class="n">287</td></tr><tr class="alt"><td>2</td><td>Piastri</td><td class="n">265</td></tr><tr class="sel"><td>3</td><td>Verstappen</td><td class="n">241</td></tr><tr class="alt"><td>4</td><td>Leclerc</td><td class="n">218</td></tr></tbody></table>`,rr('Header','surface/text-soft')+rr('Alt','surface-2')+rr('Selected','accent-soft')+rr('Lines',f.border));
-  const row=(THEMES.colors||{})[curColor]||{};
-  document.getElementById('swatchGrid').innerHTML=SW_ORDER.map(k=>`<div class="sw-item"><div class="sw-chip" style="background:${row[k]||'#888'}"></div><div class="sw-meta"><div class="sk">${k}</div><div class="sv">${row[k]||''}</div><div class="sr">${TOKEN_ROLES[k]||''}</div></div></div>`).join('');
+function renderObjects(){
+  const f=fm();
+  document.getElementById('rcpType').innerHTML=r('Display',f.font)+r('Tracking','tight on headings')+r('Sizes','from feeling fs-*');
+  document.getElementById('btnGrid').innerHTML=
+    card('btn_primary','Primary',`<button class="tb primary">Save changes</button><div class="stag">Normal</div>`,r('Fill','<b>gradient</b> '+f.angle)+r('Corner',f.radius)+r('Shadow','outer')+r('Text','on-accent'),true)+
+    card('btn_primary·pressed','Primary — pressed',`<button class="tb pressed">Save changes</button><div class="stag">Pressed</div>`,r('Fill','<b>gradient</b>')+r('Shadow','<b>inner</b> · infill')+r('Note','pressed state'),true)+
+    card('btn_secondary','Secondary',`<button class="tb secondary">Cancel</button>`,r('Fill','surface-2')+r('Line',f.border)+r('Corner',f.radius),true)+
+    card('btn_destructive','Destructive',`<button class="tb destructive">Delete</button>`,r('Fill','bad')+r('Shadow','outer'),true)+
+    card('btn_ghost/icon','Ghost + icon',`<button class="tb ghost">Details</button><button class="tb icon">★</button>`,r('Ghost','transparent · accent')+r('Icon','square '+f.radius),true);
+  document.getElementById('shellGrid').innerHTML=
+    card('cnt_toolbar','Toolbar + nav',`<div class="ttoolbar"><span class="tt">On Track</span><span class="sp"></span><span class="tnav on">Live</span><span class="tnav off">History</span></div>`,r('Fill','surface-1')+r('Nav on','accent')+r('Nav off','text-faint+border'))+
+    card('cnt_section_card','Section card',`<div class="tcard"><h3>Constructor standings</h3><p>Surface fill + border + one outer shadow for depth.</p></div>`,r('Fill','surface-2')+r('Corner',f.radius+' lg')+r('Shadow','outer'))+
+    card('card_modal','Modal',`<div class="tmodal"><h3>Confirm action</h3><p>Highest elevation surface.</p><button class="tb primary">Confirm</button></div>`,r('Fill','surface-3')+r('Shadow','outer')+r('Corner',f.radius+' lg'))+
+    card('t_callout','Callout',`<div class="tcallout">Accent-soft fill, accent border. Retints with the color.</div>`,r('Fill','accent-soft')+r('Line',f.border+' accent'));
+  document.getElementById('fieldGrid').innerHTML=
+    card('fd_text·editable','Field — editable',`<div class="tfield"><label>Driver name</label><input placeholder="Type a name..."></div>`,r('Fill','field')+r('Line',f.border)+r('Corner',f.radius))+
+    card('fd_text·focus','Field — focus',`<div class="tfield"><label>Driver name</label><input class="focus" value="Lando Norris"></div>`,r('Line','accent')+r('Shadow','<b>inner</b>'))+
+    card('fd_readonly','Field — readonly',`<div class="tfield"><label>Team</label><input value="McLaren" readonly style="background:var(--surface-2);color:var(--text-soft);pointer-events:none"></div>`,r('Fill','surface-2')+r('Text','text-soft'));
+  document.getElementById('pillGrid').innerHTML=
+    card('tx_badge','Pills & badges',`<div><span class="tpill accent">Featured</span> <span class="tpill good">Confirmed</span> <span class="tpill warn">Pending</span> <span class="tpill bad">Blocked</span> <span class="tpill info">Note</span></div>`,r('Accent','<b>gradient</b>')+r('Semantic','good/warn/bad/info')+r('Corner',f.pill))+
+    card('sum_metric_tile','Metric tile',`<div class="ttile"><div class="big">8,412</div><div class="lab">Active this week</div></div>`,r('Fill','surface-2')+r('Shadow','outer')+r('Number',f.font));
+  document.getElementById('tableGrid').innerHTML=
+    card('row_portal','Table / portal rows',`<table class="ttable"><thead><tr><th>Pos</th><th>Driver</th><th class="n">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class="n">287</td></tr><tr class="alt"><td>2</td><td>Piastri</td><td class="n">265</td></tr><tr class="sel"><td>3</td><td>Verstappen</td><td class="n">241</td></tr><tr class="alt"><td>4</td><td>Leclerc</td><td class="n">218</td></tr></tbody></table>`,r('Header','surface/text-soft')+r('Alt','surface-2')+r('Selected','accent-soft'));
 }
-
-function applyColor(slug){ curColor=slug; return THEMES.applyColor(slug,{root:board,silent:true}).then(()=>{ const r=(THEMES.colors||{})[slug]||{}; document.getElementById('colorName').textContent=r.name||slug; document.getElementById('swName').textContent=r.name||slug; document.getElementById('cl-color').textContent=slug; renderBoard(); syncSel(); }); }
-function applyFeel(slug){ curFeel=slug; return THEMES.applyFeeling(slug,{root:board,silent:true}).then(()=>{ const f=(THEMES.feelings||{})[slug]||{}; document.getElementById('feelName').textContent=f.name||slug; document.getElementById('cl-feel').textContent=slug; document.getElementById('cl-font').textContent=(f['font-display']||'').split(',')[0].replace(/'/g,''); renderBoard(); syncSel(); }); }
-function applyThemeJoin(t){ return applyColor(t.color).then(()=>applyFeel(t.feeling)).then(()=>{ document.getElementById('themeName').textContent=t.name; syncSel(); }); }
-function syncSel(){
-  document.querySelectorAll('.feel-chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.slug===curFeel));
-  document.querySelectorAll('.color-chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.slug===curColor));
-  document.querySelectorAll('.theme-chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.color===curColor&&b.dataset.feeling===curFeel));
+function renderSwatches(){
+  const c=(THEMES.colors||{})[curColor]||{};
+  document.getElementById('swGrid').innerHTML=SW_ORDER.map(k=>`<button class="sw" data-hex="${c[k]||''}"><div class="chip" style="background:${c[k]||'#888'}"></div><div class="m"><div class="k">${k}</div><div class="hex">${c[k]||''}</div><div class="role">${ROLES[k]||''}</div></div></button>`).join('');
+  document.querySelectorAll('.sw').forEach(b=>b.onclick=()=>copyHex(b.dataset.hex));
 }
+let toastT;
+function copyHex(hex){ if(!hex) return; const done=()=>{const t=document.getElementById('toast');t.textContent='Copied '+hex;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1400);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(hex).then(done).catch(done);}else{const ta=document.createElement('textarea');ta.value=hex;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}ta.remove();done();} }
 
-function buildChips(){
-  const cols=THEMES.colors||{}, feels=THEMES.feelings||{}, joins=THEMES.themes||[];
-  const fc=document.getElementById('feelChips'); fc.innerHTML='';
-  Object.keys(feels).forEach(slug=>{ const fe=feels[slug]; const b=document.createElement('button'); b.className='feel-chip'; b.dataset.slug=slug; b.innerHTML=`<span class="fn">${fe.name}${fe.status==='draft'?'<span class="dft">draft</span>':''}</span><span class="ft">${slug}</span>`; b.onclick=()=>applyFeel(slug); fc.appendChild(b); });
-  const cc=document.getElementById('colorChips'); cc.innerHTML='';
-  Object.keys(cols).forEach(slug=>{ const c=cols[slug]; const b=document.createElement('button'); b.className='color-chip'; b.dataset.slug=slug; b.innerHTML=`<span class="dot" style="background:${c.accent||'#888'}"></span><span class="cl">${c.name}</span>`; b.onclick=()=>applyColor(slug); cc.appendChild(b); });
-  const tc=document.getElementById('themeChips'); tc.innerHTML='';
-  joins.forEach(t=>{ const acc=(cols[t.color]||{}).accent||'#888'; const b=document.createElement('button'); b.className='theme-chip'; b.dataset.color=t.color; b.dataset.feeling=t.feeling; b.innerHTML=`<span class="tdot" style="background:${acc}"></span>${t.name}${t.status==='locked'?'<span class="lk">LOCKED</span>':''}`; b.onclick=()=>applyThemeJoin(t); tc.appendChild(b); });
+function refreshTriggers(){
+  const c=(THEMES.colors||{})[curColor]||{}, f=(THEMES.feelings||{})[curFeel]||{};
+  document.getElementById('feelNm').textContent=f.name||curFeel;
+  document.getElementById('feelSub').textContent=curFeel;
+  document.getElementById('colorNm').textContent=c.name||curColor;
+  document.getElementById('colorSub').textContent=curColor+(c.mode?' · '+c.mode:'');
+  document.getElementById('colorTrigSw').style.background=`linear-gradient(${f['grad-angle']||'135deg'}, ${c.accent||'#888'}, ${c['accent-deep']||'#555'})`;
+  document.getElementById('cFeel').textContent=curFeel;
+  document.getElementById('cColor').textContent=curColor;
+  document.getElementById('cFont').textContent=(f['font-display']||'').split(',')[0].replace(/'/g,'');
+  document.getElementById('cGrad').textContent=`${c.accent||''} → ${c['accent-deep']||''} @ ${f['grad-angle']||''}`;
+  document.getElementById('swName').textContent=c.name||curColor;
+  document.getElementById('appThemeName').textContent=(f.name||curFeel)+' · '+(c.name||curColor);
 }
+function applyColor(slug){ curColor=slug; return THEMES.applyColor(slug,{root:root,silent:true}).then(()=>{ const c=(THEMES.colors||{})[slug]||{}; applyChrome(c.mode||'light'); refreshTriggers(); renderObjects(); renderSwatches(); syncSel(); }); }
+function applyFeel(slug){ curFeel=slug; return THEMES.applyFeeling(slug,{root:root,silent:true}).then(()=>{ refreshTriggers(); renderObjects(); syncSel(); }); }
+function applyThemeJoin(t){ return applyColor(t.color).then(()=>applyFeel(t.feeling)); }
+
+function setView(v){ curView=v; document.getElementById('studioWrap').style.display=(v==='studio')?'block':'none'; document.getElementById('appWrap').style.display=(v==='app')?'block':'none'; document.getElementById('vStudio').setAttribute('aria-pressed',v==='studio'); document.getElementById('vApp').setAttribute('aria-pressed',v==='app'); }
+document.getElementById('vStudio').onclick=()=>setView('studio');
+document.getElementById('vApp').onclick=()=>setView('app');
+
+function buildFeelPop(){ const pop=document.getElementById('feelPop'); pop.innerHTML='';
+  Object.keys(THEMES.feelings||{}).forEach(slug=>{const fe=THEMES.feelings[slug];const o=document.createElement('button');o.className='dd-opt';o.dataset.slug=slug;o.setAttribute('role','option');
+    o.innerHTML=`<span class="onm">${fe.name||slug}</span><span class="otag ${fe.status==='locked'?'lock':''}">${fe.status||''}</span>`;
+    o.onclick=()=>{closeAll();applyFeel(slug);};pop.appendChild(o);});}
+function buildColorPop(){ const pop=document.getElementById('colorPop'); pop.innerHTML='';
+  const cols=THEMES.colors||{}, groups={}; Object.keys(cols).forEach(s=>{const g=GROUPS[s]||'Other';(groups[g]=groups[g]||[]).push(s);});
+  Object.keys(groups).forEach(g=>{const gl=document.createElement('div');gl.className='dd-grouplabel';gl.textContent=g;pop.appendChild(gl);
+    groups[g].forEach(slug=>{const c=cols[slug];const o=document.createElement('button');o.className='dd-opt';o.dataset.slug=slug;o.setAttribute('role','option');
+      o.innerHTML=`<span class="osw" style="background:linear-gradient(135deg, ${c.accent} 50%, ${c['accent-deep']} 50%)"></span><span class="onm">${c.name}</span><span class="otag">${c.mode||''}</span>`;
+      o.onclick=()=>{closeAll();applyColor(slug);};pop.appendChild(o);});});}
+function toggle(which){const t=document.getElementById(which+'Trigger'),p=document.getElementById(which+'Pop');const isOpen=p.classList.contains('open');closeAll();if(!isOpen){t.classList.add('open');t.setAttribute('aria-expanded','true');p.classList.add('open');}}
+function closeAll(){['feel','color'].forEach(w=>{document.getElementById(w+'Trigger').classList.remove('open');document.getElementById(w+'Trigger').setAttribute('aria-expanded','false');document.getElementById(w+'Pop').classList.remove('open');});}
+function syncSel(){ document.querySelectorAll('#feelPop .dd-opt').forEach(o=>o.setAttribute('aria-selected',o.dataset.slug===curFeel)); document.querySelectorAll('#colorPop .dd-opt').forEach(o=>o.setAttribute('aria-selected',o.dataset.slug===curColor)); }
+document.getElementById('feelTrigger').onclick=e=>{e.stopPropagation();toggle('feel');};
+document.getElementById('colorTrigger').onclick=e=>{e.stopPropagation();toggle('color');};
+document.addEventListener('click',e=>{if(!e.target.closest('.dd'))closeAll();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
 
 THEMES.ready.then(()=>{
   if(!Object.keys(THEMES.colors||{}).length){ document.getElementById('errBanner').innerHTML='<div class="banner">grids didn\u2019t load (offline / file://). Serve over http to view.</div>'; return; }
-  buildChips();
+  buildFeelPop(); buildColorPop();
   const ref=(THEMES.themes||[]).find(t=>t.slug==='sharp-mclaren')||(THEMES.themes||[])[0];
   if(ref){ applyThemeJoin(ref); } else { applyColor(curColor).then(()=>applyFeel(curFeel)); }
+  setView('studio');
 });
 </script>
 </body>
