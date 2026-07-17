@@ -1,6 +1,6 @@
 # Session Transcript Gate
 
-**Purpose:** Decides WHEN Scribe Sana opens a live, chronological, speaker-labeled session log and starts appending to it in real time, and WHERE that log lives. This is the capture layer. It exists because a transcript reconstructed from memory at close is thin and hazy; a transcript written *as the session happens* is complete and accurate.
+**Purpose:** Decides WHEN Scribe Sana opens a live, chronological, speaker-labeled session log and starts appending to it in real time, and WHERE that log lives. This is the capture layer. It exists because a transcript reconstructed from memory at close is thin and hazy; a transcript written *as the session happens* is complete and accurate. Real-time is the goal — but a reconstructed-at-close transcript is the fallback when the record wasn't kept, because a faithful-if-hazy record beats no record (see Backfill fallback).
 
 **Mode:** Always-on (deterministic). Evaluated at the start of every new Brain session and re-checked on each subsequent turn until it fires. It should fire EASILY — lean toward starting. Once it fires, Scribe announces the start once, then runs quietly in the background for the rest of the session.
 
@@ -10,7 +10,7 @@
 
 ## WHERE THE THREAD LIVES (LOCKED 2026-07-17 e) — the session TASK, not the channel
 
-**"The session transcript thread" = the COMMENT STREAM on the session's TASK in the 🟢 Agent Activity Board list** (list id `901328269587`; the AI-sessions list Brain maintains). Every working session has (or gets) exactly one task on that board — the live working record for that session — and the play-by-play accrues as **comments on that task.** That comment stream is where the team deliberates. This resolves the three words that were previously left to guess:
+**"The session transcript thread" = the COMMENT STREAM on the session's TASK in the 🟢 Agent Activity Board list** (the AI-sessions list Brain maintains; confirm the live list id against the Agent Activity Board — Gold Standard doc rather than trusting a hardcoded id). Every working session has (or gets) exactly one task on that board — the live working record for that session — and the play-by-play accrues as **comments on that task.** That comment stream is where the team deliberates. This resolves the three words that were previously left to guess:
 
 - **Session** = one task on the 🟢 Agent Activity Board. One per working session, maintained by Brain. If the current session has no task on the board yet, that is the thing Mira/Scribe create first (see Fire).
 - **Thread** = the comment stream on that session task. **ALL live agent deliberation lands there as comments.** This is the interactive, part-of-the-team layer — the whole point is that it feels like the team is actually working alongside Michael on the task.
@@ -44,11 +44,17 @@ The thread-first rule is deliberate and structural: because agents can ONLY expr
 ## Trigger: whichever comes first
 
 1. **Deterministic action signal (STRONGEST — no judgment call).** The moment Brain is about to **create a task or a doc/page** (or any comparable persistent-artifact creation), the record fires immediately. This is mechanical, not a vibe check: creating a task or a Decision Log is unmistakably a working session. This trigger is the primary backstop and beats all discretion.
-2. **Literal trigger phrases (keyword match, no discretion).** Any of these in Michael's message fires the record immediately: **"take notes" / "take notes on this" / "run it by the team" / "log this" / "start a decision log" / "decision log" / "pencil it in" / "capture this" / "tear it apart" / "convene the team" / "run it by the workshop" / "clean session."** Keyword match beats judgment. List is extensible — add phrases as new planning-session tells surface.
+2. **Literal trigger phrases (keyword match, no discretion).** Any of these in Michael's message fires the record immediately: **"take notes" / "take notes on this" / "run it by the team" / "log this" / "start a decision log" / "decision log" / "pencil it in" / "capture this" / "tear it apart" / "convene the team" / "run it by the workshop" / "clean session" / "create the task" / "start your session task".** Keyword match beats judgment. List is extensible — add phrases as new planning-session tells surface.
 3. **First real decision.** The moment the session produces a genuine decision, direction, tradeoff, or commitment (not a lookup, not a status answer), Scribe opens the record immediately.
 4. **Third message during build/work.** If the session is building, editing, designing, or otherwise *working on something* (not a one-off lookup), Scribe opens the record by the 3rd message at the latest, even if no single crisp decision has landed yet.
 
 Bias toward firing. When it's a close call between "lookup" and "work," treat it as work and start. Triggers 1 and 2 are deterministic and exist specifically so the record opens near message 1 on planning/build sessions instead of losing to work momentum.
+
+---
+
+## Mid-session catch-up (LOCKED 2026-07-17 f)
+
+When a trigger fires LATE — most commonly Michael saying **"create the task"** or "start your session task" partway through — opening the record is only half the job. Scribe/Brain **immediately backfills a transcript comment covering everything that has happened so far this session**, then continues live. Opening late NEVER means the record starts at the open point; it always backfills to message 1. This is the same backfill muscle as the close-time watchdog, just triggered mid-session.
 
 ---
 
@@ -113,16 +119,27 @@ Calmly — the thread is now a **single point of failure**. If it can't open, th
 On the first trigger hit (or promotion of a provisional stub), Scribe **immediately**:
 
 1. **Announces the start — ONCE.** A single short, upbeat line to Michael in the working chat: she's excited to be spinning up a fresh session record and is on it. This is the ONLY time she speaks up about it. Example voice: "Ooh, opening a session task for this one — the team's deliberating in its comments from here, I'll keep it quiet."
-2. **Ensures the session TASK exists on the 🟢 Agent Activity Board** (list id `901328269587`) and uses its comment stream as the thread. If a task for this session already exists (the common case — Brain maintains the board), use it; if not, create it (title = session topic + date, e.g. `Brain (Opus 4.8) · <topic> · <date>`), status `to do`/`in progress`. Only if a board task genuinely cannot be created does Brain fall back to a #A.I. Prompts thread. (If a provisional stub already opened silently, promote that same task — don't open a second.)
+2. **Ensures the session TASK exists on the 🟢 Agent Activity Board** and uses its comment stream as the thread. If a task for this session already exists (the common case — Brain maintains the board), use it; if not, create it (title = session topic + date, e.g. `Brain (Opus 4.8) · <topic> · <date>`), status `to do`/`in progress`. Only if a board task genuinely cannot be created does Brain fall back to a #A.I. Prompts thread. (If a provisional stub already opened silently, promote that same task — don't open a second.)
 3. Begins a **chronological, speaker-labeled, back-and-forth record** in the task's comments, treating the session like a live conversation:
    - `**Michael:**` / `**Brain:**` turn labels, in order.
-   - Verbatim wording where it matters (decisions, instructions, key phrasing); tight paraphrase only where exact wording is unrecoverable, marked as paraphrase.
+   - Verbatim wording ONLY where it matters (decisions, instructions, key phrasing); tight paraphrase everywhere else — a faithful, readable record, NOT a word-perfect court transcript.
    - Decisions, reasoning, and tradeoffs captured inline as they land — not summarized after the fact.
    - **Agent comments interleaved in their own voices**, formatted per the emoji-badge + full-body standard above — the seated council/Workshop voices post here (and ONLY here), so the task reads as the real multi-voice deliberation.
    - Backfill any pre-trigger turns from the session so far, so the record starts from message 1, not from the trigger point.
-4. Keeps appending in real time as the session continues. The comment stream grows turn by turn; it is never reconstructed from memory at the end.
+4. Keeps appending in real time as the session continues. The comment stream grows turn by turn.
 
 After the one start announcement, Scribe works **quietly in the background.** She does not re-announce, does not narrate each entry, does not interrupt the work, and does not ask permission. One "I've started" up front, then silence until the end.
+
+---
+
+## Backfill fallback — "better late than nothing" (LOCKED 2026-07-17 f)
+
+The old absolute — *"never reconstruct from memory"* — is RETIRED. It was right that a live record beats a reconstructed one, but wrong that a reconstruction is worse than nothing: a blank session task is the actual worst outcome. Two fallback behaviors:
+
+1. **Close-time watchdog (Scribe's steward duty).** At close, Scribe looks back at the session task's comments. **If there is no coherent transcript** (gate missed, or the record lapsed mid-session), she reconstructs the best faithful transcript she can from the conversation and posts it, **flagged as reconstructed** so its lower fidelity is honest. A reconstructed transcript is a fallback, not the standard — but it beats a session that left no record.
+2. **Mid-session catch-up.** See the Mid-session catch-up section above — a late "create the task" opens the record AND backfills to message 1.
+
+Real-time capture is still the goal and the default; these fallbacks exist so a lapse degrades to a hazy record instead of a lost one.
 
 ---
 
@@ -130,8 +147,9 @@ After the one start announcement, Scribe works **quietly in the background.** Sh
 
 When Michael requests a close (or at full close), Scribe finalizes the session:
 
+- **Runs the close-time watchdog first:** confirm the session task holds a coherent transcript; if not, backfill a reconstructed one (flagged) before finalizing.
 - Flips the session task's state to done/`complete` (or `partial | handed off`) and ensures the running comment deliberation is intact on it.
-- Produces the dense **close transcript** in **#A.I. Prompts** (https://app.clickup.com/36074068/chat/r/6-901327646617-8) per the Session Close hook — that channel is the permanent, long-standing archive of the session (root header + threaded dense record). The live per-voice deliberation stays on the session task; the close post is the summarized permanent record + pointer back to the task.
+- Produces the dense **close summary** in **#A.I. Prompts** (https://app.clickup.com/36074068/chat/r/6-901327646617-8) per the Session Close hook — that channel holds the permanent, long-standing record of the session (root header + threaded summary) and **points back at the session task** as the full transcript. Per the reframed close hook, this post is a SUMMARY + task pointer, not a re-created full transcript (the transcript lives on the task).
 - Hands Closing Clio the finalized task + close post for the standard close.
 
 If the gate never fired (session stayed below the bar), discard any provisional stub and close follows the normal path — or a soft close, if Michael called one.
@@ -149,26 +167,28 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 - **Fire once per session, and fire easily.** After the record opens/promotes, this gate is satisfied; don't re-evaluate.
 - **Announce exactly once.** One upbeat "I've started" line at open/promotion. Never again. All subsequent logging is silent.
 - **First-decision beats the message count.** If a real decision lands on message 1, the record opens on message 1. The 3rd-message rule is the *backstop* for build/work sessions, not a delay.
-- **Backfill to message 1.** When the record opens after the session already started, backfill the earlier turns so it's complete from the top.
+- **Backfill to message 1.** When the record opens after the session already started (including a mid-session "create the task"), backfill the earlier turns so it's complete from the top.
+- **Prefer live; backfill rather than lose.** Real-time capture is the goal. But if the record lapsed, reconstruct a faithful (flagged) transcript at close — the retired "never reconstruct from memory" absolute must not be read as "leave it blank."
+- **Faithful, not verbatim.** Quote exactly where wording matters; paraphrase tightly elsewhere. The target is a true, readable record, not a word-perfect transcript.
 - **Background after the announce.** Past the single start line, the record is silent. Michael sees it because it's the live session task, not because Brain narrates each entry.
-- **Never reconstruct from memory.** The whole point is real-time capture. A record written at close from recall defeats the gate.
 
 ---
 
 ## Composes with
 
-- **Session Close hook** (`hooks/session-close.md`) — the dense permanent close transcript lands in #A.I. Prompts (Channel 2); the close hook produces it and points back at the session task where the live deliberation happened.
-- **Scribe Sana** (`agents/scribe-sana.md`) — the owner/operator; her profile carries the behavioral detail.
+- **Session Close hook** (`hooks/session-close.md`) — the permanent close post lands in #A.I. Prompts (Channel 2) as a SUMMARY + pointer to the session task; the close hook produces it and points back at the session task where the live deliberation happened.
+- **Scribe Sana** (`agents/scribe-sana.md`) — the owner/operator; her profile carries the behavioral detail incl. the faithful-not-verbatim posture + backfill fallback.
 - **Maestro Mira** (`agents/maestro-mira.md`) — runs the opening "do we have a session task?" check and creates it before seating anyone.
 - **The Council** (`council.md`) — the thread-only expression rule + emoji-badge format + Mira-synthesis-only output + the Standing-agent conduct law are mirrored there.
-- **Agent Activity Board** (🟢, list id `901328269587`) — the AI-sessions list Brain maintains; each session task's comment stream is the thread.
+- **Agent Activity Board** (🟢) — the AI-sessions list Brain maintains; each session task's comment stream is the thread. Confirm the live list id against the Agent Activity Board — Gold Standard (Brain Reference) doc.
 - **Decision Log hook** — the repo/doc `decision-log.md` convention (durable "why") is distinct from this live deliberation; a locked decision can land in both: synthesis + pointer in the decision log, full per-voice detail on the session task.
 
 ---
 
 ## Changelog
 
-- 2026-07-17 (e): **Defined session / thread / chat, and moved the live thread onto the session TASK.** "The thread" is now explicitly the comment stream on the session's task in the 🟢 Agent Activity Board list (the AI-sessions list Brain maintains) — one task per session, all live agent deliberation posts there as comments. #A.I. Prompts is demoted to the backup default + the home for the long-standing permanent CLOSE transcript, NOT active deliberation. Opening check reworded to "do we have a session task?"; Fire step 2 now ensures/creates the board task; Close routes the dense archive to #A.I. Prompts while the live per-voice record stays on the task. Prompted by Michael: the words session/thread/chat had no explicit pointer, so the agent was guessing; the AI-sessions board task is the interactive, part-of-the-team home.
+- 2026-07-17 (f): **Retired the "never reconstruct from memory" absolute; added the close-time backfill watchdog + mid-session catch-up.** Real-time stays the goal, but a lapse now degrades to a flagged reconstructed transcript at close rather than a blank task, and a late "create the task" backfills to message 1. Added "create the task" / "start your session task" to the literal trigger list. Added the Faithful-not-verbatim rule. Close section now runs the watchdog first and routes the channel post as a summary + task pointer (per the reframed close hook). Prompted by Michael.
+- 2026-07-17 (e): **Defined session / thread / chat, and moved the live thread onto the session TASK.** "The thread" is now explicitly the comment stream on the session's task in the 🟢 Agent Activity Board list — one task per session, all live agent deliberation posts there as comments. #A.I. Prompts demoted to the backup default + the home for the long-standing permanent CLOSE transcript. Opening check reworded to "do we have a session task?"; Fire step 2 ensures/creates the board task; Close routes the dense archive to #A.I. Prompts while the live per-voice record stays on the task.
 - 2026-07-17 (d2): Emoji-badge headers + full-formatting bodies (personality restore).
 - 2026-07-17 (d): Thread comment format + Mira-synthesis-only output. (Format specifics superseded by d2.) A session where agents posted is non-discardable.
 - 2026-07-17 (c): Thread-only agent expression + thread-first opening check. Council/Workshop agents may no longer speak in the active session. Brain's synthesized reply + Mira's anchor line stay live.
