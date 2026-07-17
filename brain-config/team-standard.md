@@ -2,7 +2,7 @@
 
 **Scope:** Every agent in this workspace (Brain sessions, Super Agents, future additions). This is the single source of truth for shared methodology. No agent maintains its own copy of anything defined here.
 
-**Version:** 2026-07-17 v1.3
+**Version:** 2026-07-17 v1.4
 
 ---
 
@@ -18,11 +18,14 @@ Chat is ephemeral. Conversations are not decisions and do not constitute a persi
 
 Every agent's first instinct on any substantive exchange is to **route the outcome into an existing persistent structure** (Decision Log, comment thread, snapshot, template, question block) rather than leaving it to linger only in chat. Chat is the medium; the destination is always a structured artifact attached to the relevant entity.
 
+**The point of a decision log is WHY, not WHAT.** This is the load-bearing principle, not a detail. A decision log is an **active history of why we did what we did** — the reasoning, the options considered, what got rejected and on what grounds — NOT a changelog of what changed. A changelog says "added X, removed Y." A decision log says "we chose X over Y because Z, and here's the context that made Z true." The item's own descriptor already records the *what*; the log exists to preserve the *why* so a future agent (or future Michael) inherits the reasoning instead of re-litigating a settled call. **If an entry only records what changed, it has failed its job.** Lead every entry with the decision and its rationale.
+
 **Rules:**
 - Route to the entity's Decision Log or comment thread, not chat.
-- Format per the Decision Logs Gold Standard (ClickUp Brain Reference Library).
+- Capture WHY: the reasoning, the rejected alternatives, the context. Never a bare what-changed summary.
+- Format per the Decision Logs Gold Standard (ClickUp Brain Reference Library) — Q blocks (questions), J entries (decisions settled without a question), S snapshots (synthesis).
 - Fire on real decisions, not every aside. Don't slop up spaces with low-value entries.
-- When in doubt: is this something that matters next week? If yes, it belongs in a persistent artifact. If no, chat is fine.
+- When in doubt: is this something that matters next week? If yes, it belongs in a persistent artifact — with its rationale. If no, chat is fine.
 
 ---
 
@@ -119,6 +122,7 @@ This file is the **behavioral floor** every agent operates above. Role-specific 
 
 ## Changelog
 
+- 2026-07-17: v1.4. Sharpened Documentation Instinct — elevated WHY-as-active-history to the load-bearing principle. A decision log captures reasoning + rejected alternatives + context, NOT a what-changed summary; an entry that only records the change has failed. Named the Q/J/S block types. Origin: Michael's coaching after a session close that summarized what changed instead of why.
 - 2026-07-17: v1.3. Added Documentation Instinct section — chat is ephemeral, route real decisions to Decision Logs/comment threads on the entity itself. Format per Gold Standard. Replaces code-block question pattern in Brain memory.
 - 2026-07-16: v1.2. Added Log ordering rule (Repo Coordination) — all chronological repo logs are newest-at-top; new entries prepend. Per-entity ledgers keyed by name (VERSIONS.md) exempt. Origin: standardization pass that flipped Vectorworks/DECISION-LOG.md (D-018).
 - 2026-07-13: v1.1. Added Embrace the Fuss quality hook — take the right hard path over the easy shortcut; label the lazy version as fallback only.
