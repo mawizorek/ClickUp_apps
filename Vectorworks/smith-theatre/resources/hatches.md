@@ -6,9 +6,7 @@
 
 ## The plan
 
-Any house-standard hatches / tile fills: what they represent (e.g. section fills, material indications) and their names. Keep the set small and purposeful; a hatch earns its place by being reused across drawings.
-
-If the set grows enough to be worth machine-comparing, add a `hatches.csv` manifest (comma-CSV, S-6).
+House-standard hatches / tile fills: what they represent (section fills, material indications) and their names. Keep the set small and purposeful; a hatch earns its place by being reused across drawings. If the set grows enough to machine-compare, add a `hatches.csv` manifest (comma-CSV, S-6).
 
 ---
 

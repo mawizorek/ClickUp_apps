@@ -1,32 +1,30 @@
-# Record Formats — Overview — Smith Theatre
+# Record Formats — Smith Theatre (overview)
 
-> Record formats are the **data schema** attached to objects/symbols — the fields the worksheet manifests read (F-011/F-012). This is the prose overview; **each record type gets its own example CSV** (`record-<NAME>.csv`) with explicit sample rows (D-017).
+> Record formats are the data schema attached to objects/symbols — the fields the worksheet manifests read (F-011/F-012). This is the prose overview; **each record type gets its own example CSV** (`record-<NAME>.csv`) with explicit sample rows (D-017).
 
 ---
 
 ## What a record format is
 
-A named set of fields (model, position, purpose, dimensions, etc.) attached to an object or symbol. Attach a record to a **symbol definition** and it auto-attaches to every instance (F-012) — the backbone that makes the symbol inventory machine-readable.
+A named set of fields attached to an object or symbol. Attach a record to a **symbol definition** and it auto-attaches to every instance (F-012) — the backbone that makes the inventory machine-readable.
 
-## Smith record types (per-type CSVs)
+## Smith record types (per-type CSVs, D-017)
 
-| Record type | CSV | Rides on |
-|---|---|---|
-| Lighting device | [`record-lighting-device.csv`](./record-lighting-device.csv) | Lighting-Device symbols (auto-attach) |
-| Rigging point | [`record-rigging-point.csv`](./record-rigging-point.csv) | Rigging-Point symbols |
+Comma-delimited (S-6). Each type is documented by example in its own file:
 
-One CSV per record type keeps each schema tokenized, comparable, and easy to diff. Comma-delimited (S-6).
+- [`record-lighting-device.csv`](./record-lighting-device.csv) — instruments (position, unit #, purpose, class/layer).
+- [`record-rigging-point.csv`](./record-rigging-point.csv) — high-steel points (beam, capacity intent, class/layer).
 
-## Why segmented
+More types (scenic unit, audio device, video device) get their own `record-<NAME>.csv` as they're defined.
 
-Michael's call (D-017): separate files over one fat page — cleaner tokenization and diffs, and every record schema carries its own concrete examples rather than being described abstractly.
+> The template's `record-EXAMPLE.csv` demo is **not** carried into Smith (replaced by the real per-type CSVs above).
 
 ---
 
 ## TODO (per-instance)
 
-- [x] List the record formats this venue uses (lighting device, rigging point).
-- [ ] Add further record types as the build surfaces them (scenic unit, audio device, video device).
+- [ ] Confirm the full record-format list Smith uses.
 - [ ] Note which records auto-attach to which symbol definitions.
+- [ ] Add `record-<NAME>.csv` for scenic / audio / video as defined.
 
-*Companion: [`symbols.md`](./symbols.md) (records ride on symbols) · canonical [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-012 + D-017.*
+*Companion: [`symbols.md`](./symbols.md) · canonical [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-012 + D-017.*

@@ -1,38 +1,34 @@
-# Datums & Reference Planes (S-3 / S-4) — Smith Theatre
+# Datums & Reference Planes — Smith Theatre (S-3 / S-4)
 
-> **Document the RULE, never the numbers.** This states the origin datum and which surface is the measurement reference at each elevation. Actual dimensions live in the file + exported worksheets, NOT here (S-4).
+> **Document the RULE, never the numbers.** This states Smith's origin datum and which surface is the measurement reference at each elevation. Actual dimensions (trim heights, beam positions, load ratings) live in the file + exported worksheets, NOT here (S-4).
 
 ---
 
-## Origin datum (S-3) — already built (D-013)
+## Origin datum (S-3) — documented, not re-derived
 
-The drawing origin is the **center of the Smith blackbox room rectangle**, set coincident with the Vectorworks **INTERNAL origin (0,0)** — not just a shifted user origin. **This is already built in Michael's file (D-013); document, don't re-derive.**
+Smith is a **blackbox rectangle**. The drawing origin is the **geometric center of the room rectangle, set coincident with the Vectorworks internal origin (0,0)** — **already built in Michael's file** (D-013). This protects DWG round-trip precision (D-008) and shares one coordinate frame across every referencing file (S-2). Do not re-derive it; document it.
 
-- Putting it on the **internal** origin keeps DWG round-trips (D-008) precise and gives every referencing file (S-2) one shared coordinate frame.
+**Coordinate reading (OPEN — confirm per venue):** `+X / -X` = stage-right / left of center; `+Y / -Y` = up / downstage. The `+X/+Y` polarity vs. the N/S/E/W convention still needs confirming (noted in S-3 / DECISION-LOG open threads). Rigging beams run **E/W** — tie the axis polarity to that convention when locked.
 
-**Coordinate reading (OPEN — confirm per venue):** `+X / −X` = stage-right / left of center; `+Y / −Y` = up / downstage. **The `+X/+Y` axis polarity vs. the N/S/E/W convention still needs confirming** (open thread, noted in S-3).
+## Reference planes (S-4) — Smith's rule
 
-## Reference planes (S-4) — the Smith rule (D-020, executing D-014)
+The measurement reference **changes by elevation** at Smith. State the rule so a drafter doesn't measure off the wrong surface:
 
-The measurement reference **changes by elevation**. State the rule so a drafter doesn't measure off the wrong surface:
+- At **deck**: measurements are taken off the **interior trim face** (the finished inside surface of the wall).
+- At **mezzanine / catwalk**: measurements reference the **nominal wall structure** (behind the trim).
 
-- At **deck** (`1 DECK`): measurements are taken off the **interior trim face**.
-- At **mezzanine / catwalk** (`1.5 MEZZ` / `2 TOE` / `3 CATWALK`): measurements reference the **nominal wall structure**.
-
-> Why: the interior trim shaves the room slightly off the nominal wall, so deck-level work keys to the trim face a drafter can actually measure to, while upper-level structure keys to the nominal wall the steel is built to. The **magnitudes** of both (trim shave, trim heights) live in the file + exported worksheets, never here (S-4).
+The interior trim sits slightly proud of the nominal wall, so deck geometry and upper-level geometry key off **different surfaces** by design. That is the gotcha this note exists to prevent.
 
 ## The hard rule (S-4)
 
-- **Prose captures the logic + gotchas** (which surface, where it changes, why).
-- **The file carries the numbers.** Model to real dimensions; let values flow out via worksheet/CSV export. Never hand-transcribe measurements into this doc.
-- The *convention* of having this note is **universal**; the *specific rules* above are **Smith-specific** (D-014).
+- **Prose captures the logic + gotchas** (which surface, where it changes, why) — above.
+- **The file carries the numbers.** Model to real dimensions; let values flow out via worksheet/CSV export. Never hand-transcribe measurements (trim offset, toe height, beam spacing, load limits) into this doc — those live in the file and in the [`../reference-notes/`](../reference-notes/) handouts.
 
 ---
 
-## TODO (per-instance)
+## To confirm (per-instance)
 
-- [x] State the origin datum + confirm it's on the internal origin (D-013).
-- [x] Fill the per-elevation reference-plane rule (deck-off-trim / upper-off-nominal-wall).
-- [ ] Confirm `+X/+Y` polarity + N/S/E/W (open thread).
+- [ ] Lock `+X/+Y` polarity + the N/S/E/W convention off the center datum.
+- [ ] Confirm the interior-trim vs. nominal-wall rule against the built file.
 
-*Canonical: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § S-3 / S-4.*
+*Canonical: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § S-3 / S-4. Decisions: D-013 (origin), D-014 (convention), D-020 (Smith rule).*

@@ -1,79 +1,37 @@
-# Sheet-Layer Numbering + Viewport Convention (DRAFT — F-016) — Smith Theatre
+# Sheet-Layer Numbering + Viewport Convention — Smith Theatre (DRAFT — F-016)
 
-> **Lightweight draft.** The pattern is set; the full per-department drawing list below is drafted from the **existing ClickUp scheme** and is **not yet a ratified Standard** — F-016 promotion awaits Michael (candidate #2).
+> **DRAFT, not a ratified Standard.** The pattern is set (dept letter + number; `0` = department readme sheet; indent = viewport). The full Smith per-department list below is drafted from the existing ClickUp scheme (D-021). **Promotion to a Standard needs Michael's ruling + a mirrored DECISION-LOG row.**
 
 ---
 
 ## What sheet layers are
 
-Sheet layers = presentation / "paper space," always at **1:1**, holding **viewports, title block borders, notes, annotations** (F-003). Scale is per-viewport, not on the sheet. Each sheet layer has its own user origin.
+Sheet layers = presentation / paper space, always **1:1**, holding viewports, title-block borders, notes, annotations (F-003). Scale is per-viewport, not on the sheet. Each sheet layer has its own user origin. Title block lives on the sheet layer ([`../resources/title-blocks.md`](../resources/title-blocks.md)).
 
 ## The numbering pattern
 
-`<DEPT><n>` — a department letter + a number. Grounded in the National CAD Standard (discipline-letter prefix + sheet-type digit) and USITT discipline-set conventions (F-016).
+`<DEPT><n>` — department letter + number. `0` = the department's readme sheet (hard rule); real drawings start at `1`; numbers ascend in drawing order; an **indented number = a viewport** off the sheet above it.
 
-| Prefix | Department | `0` sheet |
+## Smith per-department draft list
+
+| Prefix | Department | Sheets (draft, from ClickUp scheme) |
 |---|---|---|
-| `UR` | Venue base / architecture (groundplan, sections) | `UR0` = file readme |
-| `S` | Scenic | `S0` = scenic readme |
-| `L` | Lighting | `L0` = lighting readme |
-| `A` | Audio | `A0` = audio readme |
-| `R` | Rigging | `R0` = rigging readme |
-| `V` | Video | `V0` = video readme |
+| `UR` | Venue base / architecture | UR0 = file readme · UR1 groundplan · UR2 overhead · UR3 W section · UR4 N section · UR5 E section · UR6 S section |
+| `S` | Scenic | S0 = scenic readme · S1..S7 scenic plates |
+| `L` | Lighting | L0 = lighting readme · L1.. (catwalks / toe / deck plots, sections) |
+| `A` | Audio | A0 = audio readme · A1.. |
+| `R` | Rigging | R0 = rigging readme · R1.. (overhead / high steel) |
+| `V` | Video | V0 = video readme · V1.. |
 
-## Rules
-
-- **`0` = the department's readme sheet** (hard rule). Real drawings start at `1`.
-- Numbers **ascend in drawing order** within a department.
-- An **indented sheet number = a viewport** off the sheet above it.
-- Title block lives on the sheet layer (see [`../resources/title-blocks.md`](../resources/title-blocks.md)).
+> **Utility / PM layers** (cameras, tech setup, scratch) are working/notes content — they route under `UR` notes sheets or stay off-sheet rather than getting their own discipline prefix. Confirm at build.
 
 ---
 
-## Drafted per-department sheet list (from the existing ClickUp scheme)
+## To finalize before promotion
 
-### `UR` — Venue base / architecture
+- [ ] Lock the exact drawing list per department (which plates exist, in order).
+- [ ] Decide if any department needs a two-digit sheet-type split (plans vs sections vs details).
+- [ ] Confirm the prefix set against the final [`layers.csv`](./layers.csv) departments.
+- [ ] Michael's ruling → promote F-016 draft to a Standard + mirror a DECISION-LOG row.
 
-| Sheet | Drawing |
-|---|---|
-| UR0 | File readme |
-| UR1 | Groundplan |
-| UR2 | Overhead |
-| UR3 | Section — West |
-| UR4 | Section — North |
-| UR5 | Section — East |
-| UR6 | Section — South |
-
-### `S` — Scenic
-
-| Sheet | Drawing |
-|---|---|
-| S0 | Scenic readme |
-| S1–S7 | Scenic drawings (exact list locked at build) |
-
-### `L` — Lighting · `A` — Audio · `R` — Rigging · `V` — Video
-
-| Sheet | Drawing |
-|---|---|
-| L0 / A0 / R0 / V0 | Department readme |
-| L1+ / A1+ / R1+ / V1+ | Department drawings (exact list locked at build) |
-
----
-
-## Reconciling the sheet scheme against the layer list (flag for Michael)
-
-The **layer-department set is richer than the sheet-prefix set** ([`layers.md`](./layers.md)):
-
-- **Lighting** splits across two layer departments — `LX DESIGNER` and `HEAD ELECTRICIAN` — but both feed the single **`L`** sheet prefix. Confirm this is intended (one lighting sheet set, two layer owners).
-- **`UTILITY`** (cameras, PViz, working scratch) and **`PM`** (tech setup) are **working layers** with no drawing set in the draft scheme. Confirm they get no department sheets (their content appears on other departments' sheets / utility views).
-
----
-
-## TODO (finalized at first venue build)
-
-- [ ] The full per-department drawing list (which sheets exist, in order).
-- [ ] Whether any department needs a two-digit sheet-type split (plans vs sections vs details).
-- [ ] **Michael's confirmation** of the prefix set vs. the actual departments (LX split; UTILITY/PM).
-- [ ] Promote draft → Standard once locked (mirror with a dated DECISION-LOG row).
-
-*Research basis: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-016 / F-003.*
+*Research basis: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-016 / F-003. Existing scheme: DECISION-LOG § 9.*

@@ -1,110 +1,41 @@
-# Design-Layer Scheme (S-1) — Smith Theatre
+# Design-Layer Scheme — Smith Theatre (S-1)
 
-> **The rule, then the list.** This states HOW layers are organized (universal), followed by the **actual Smith layer list** (filled per-instance, D-019). The list is cross-checked against the file via [`../reconciliation/`](../reconciliation/).
+> **The rule, plus the venue list.** The RULE is universal (layers carry location + department + elevation, S-1); the enumerated Smith house layers live in the comma-CSV manifest [`layers.csv`](./layers.csv) (S-6). This file states the rule and the Smith department/elevation vocabulary.
 
 ---
 
-## The rule
+## The rule (S-1)
 
-**Layers carry LOCATION + DEPARTMENT + ELEVATION.** (S-1)
+**Layers carry LOCATION + DEPARTMENT + ELEVATION.** Elevation lives in the LAYER, never in a class. Department prefix routes the master-reference model (S-2) — a department file references only the layers it needs. All design layers share the **same scale** (F-001) so referenced viewports line up; scale is therefore uniform across the manifest and not enumerated per-row (it lives in the file).
 
-A design layer encodes three things:
+## Elevation bands (Smith set)
 
-1. **Department** — who owns it (venue-base/UR, scenic, lighting, audio, rigging, video, utility, PM).
-2. **Elevation band** — the vertical zone the geometry lives in.
-3. **Location / content** — what the layer actually holds.
+Smith uses the standard band vocabulary:
 
-**Elevation lives in the LAYER, never in a class.** (hard rule, S-1)
-
-## Elevation bands (D-012 — matches the Smith worksheet exactly)
-
-| Band | Meaning |
+| Band | Meaning at Smith |
 |---|---|
-| `0 NOTES` | non-geometry / notes / scratch / cameras |
-| `1 DECK` | deck level |
-| `1.5 MEZZ` | mezzanine / intermediate |
+| `0 NOTES` | non-geometry: scratch, system notes, render/PViz cameras |
+| `1 DECK` | deck level: groundplan, deck plots, architecture |
+| `1.5 MEZZ` | mezzanine / tech-setup intermediate |
 | `2 TOE` | toe-pipe level |
-| `3 CATWALK` | catwalk / high steel |
+| `3 CATWALK` | catwalk / high steel: rigging, overhead positions |
 
-## Naming
+## Departments (Smith vocabulary)
 
-`DEPARTMENT - NAME` (see [`naming.md`](./naming.md)). The department prefix routes the master-reference model (S-2): a department file references only the layers it needs. `VENUE BASE` layers are the master geometry authored once and consumed downstream (S-2/D-011); `DEPARTMENT` layers are the per-department working layers.
+From the working layer list: **UR** (venue base / architecture), **SCENIC**, **LX DESIGNER** + **HEAD ELECTRICIAN** (lighting), **AUDIO**, **RIGGING**, **VIDEO**, **UTILITY** (cameras / scratch), **PM** (tech setup). `VENUE BASE` layers are authored once in the master; `DEPARTMENT` layers are the thin per-discipline consumers (S-2).
 
-## Scale
+## The manifest
 
-All design layers share the **same scale** (Spotlight guidance, F-001) so referenced viewports line up. The shared value is set in the file and confirmed on reconciliation; it is not restated per-row (S-4).
+The full house layer list is [`layers.csv`](./layers.csv) — one row per layer, columns `layer_name, department, elevation_band, scope, 2D, 3D, status, tags`. It is the **plan authored in git first** (S-5); once the file is built, a Vectorworks worksheet renders the actual layers and is exported to `../reconciliation/` to diff against this manifest. The worksheet never becomes the source.
 
----
-
-## The Smith layer list (27 layers — source: Google Sheet "URITP VWX Smith Theatre BASE FILE Worksheets")
-
-Machine-comparable manifest: [`layers.csv`](./layers.csv) (authored first as the plan, S-5). Grouped below by elevation band for reading.
-
-### `3 CATWALK`
-
-| Layer | Department | Scope | 2D/3D | Status |
-|---|---|---|---|---|
-| RIGGING - OVERHEAD | RIGGING | VENUE BASE | 2D+3D | CREATED |
-| _HANG POSITIONS | UR | VENUE BASE | 2D | REVIEWING |
-| 3D 3 CATWALKS | UR | VENUE BASE | 3D | REVIEWING |
-| LX - REP | HEAD ELECTRICIAN | VENUE BASE | 2D+3D | NEW (house/work lights) |
-| LX - PLOT SECTIONS | HEAD ELECTRICIAN | DEPARTMENT | 2D | NEW |
-| LX - PLOT 1 CATWALKS | LX DESIGNER | DEPARTMENT | 2D+3D | NEW |
-| UTL - CAMERAS | UTILITY | DEPARTMENT | 2D+3D | PLANNED (rep) |
-| VID - OVERHEAD | VIDEO | DEPARTMENT | — | DRAFTING |
-
-### `2 TOE`
-
-| Layer | Department | Scope | 2D/3D | Status |
-|---|---|---|---|---|
-| AUDIO - OVERHEAD | AUDIO | DEPARTMENT | 2D+3D | CREATED |
-| AUDIO - REP | AUDIO | VENUE BASE | 3D | DRAFTING (rep) |
-| LX - PLOT 2 TOE PIPES | LX DESIGNER | DEPARTMENT | 2D+3D | NEW |
-| SCENIC - OVERHEAD | SCENIC | DEPARTMENT | — | PLANNED |
-| VID - TOE PIPES | VIDEO | DEPARTMENT | — | PLANNED |
-
-### `1.5 MEZZ`
-
-| Layer | Department | Scope | 2D/3D | Status |
-|---|---|---|---|---|
-| 3D 2 MEZZANINE | UR | VENUE BASE | 3D | REVIEWING |
-| LX - MEZZ | LX DESIGNER | DEPARTMENT | 2D+3D | NEW |
-| TECH SETUP | PM | DEPARTMENT | 2D+3D | PLANNED |
-
-### `1 DECK`
-
-| Layer | Department | Scope | 2D/3D | Status |
-|---|---|---|---|---|
-| Theatre Architecture | UR | VENUE BASE | 2D+3D | PLANNED |
-| 3D 1 GROUNDPLAN | UR | VENUE BASE | 3D | REVIEWING |
-| LX - focus points | LX DESIGNER | DEPARTMENT | 2D+3D | CREATED |
-| LX - PLOT 3 DECK | LX DESIGNER | DEPARTMENT | 2D+3D | NEW |
-| SCENIC - DECK | SCENIC | DEPARTMENT | — | DRAFTING |
-| SCENIC - Symbols | SCENIC | DEPARTMENT | — | PLANNED |
-| VID - DECK | VIDEO | DEPARTMENT | — | PLANNED |
-
-### `0 NOTES`
-
-| Layer | Department | Scope | 2D/3D | Status |
-|---|---|---|---|---|
-| PVIZ - View CAMERAS | UTILITY | VENUE BASE | 3D | DRAFTING (render cameras) |
-| WORKING SCRATCH | UTILITY | VENUE BASE | 2D+3D | PLANNED |
-| VID - SYSTEM NOTES | VIDEO | DEPARTMENT | — | PLANNED |
-
-### Elevation unassigned (confirm at build)
-
-| Layer | Department | Scope | 2D/3D | Status |
-|---|---|---|---|---|
-| VID - REP | VIDEO | VENUE BASE | — | PLANNED (rep) |
-
-> `2D/3D` reflects the worksheet's 2D/3D content flags; `—` = not yet built. `Status` carried verbatim from the worksheet (blank → PLANNED). `rep` = repertory/house layer.
+> **Status: working draft.** Per-row `status` (REVIEWING / CREATED / NEW / DRAFTING / CUT?) mirrors the working sheet. The list is **not** a ratified Standard; the house layer set promotes only on Michael's explicit ruling + a mirrored DECISION-LOG row.
 
 ---
 
-## TODO (per-instance)
+## Still open (per-instance)
 
-- [ ] Confirm `VID - REP` elevation band (unset in the worksheet).
-- [ ] Confirm which `VENUE BASE` layers form the referenced master vs. department working layers (S-2/D-011).
-- [ ] Generate `../reconciliation/layers.csv` from the file and diff against [`layers.csv`](./layers.csv) once the file is built.
+- [ ] Resolve the `CUT?` candidate (`2D 2 [SPAC] Mezzanine`) and the unnumbered `>import 3D` / `VID - REP` rows.
+- [ ] Lock the house layer set → promote from working draft to Standard (Michael's ruling).
+- [ ] Confirm the uniform design-layer scale value in the file.
 
-*Companion: [`classes.md`](./classes.md) (the orthogonal axis) · canonical rule in [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § S-1.*
+*Companion: [`classes.md`](./classes.md) (orthogonal axis) · rule in [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § S-1. Source: Google Sheet "URITP VWX Smith Theatre BASE FILE Worksheets" (D-019).*

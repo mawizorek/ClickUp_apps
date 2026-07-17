@@ -1,36 +1,29 @@
-# Drafting Standards — Line Weights, Text, Dimensions — Smith Theatre
+# Drafting Standards — Smith Theatre (line weights, text, dimensions)
 
-> The graphic language of the file: how linework, text, and dimensions read. Distinct from classes (object category) and layers (location/elevation).
+> The graphic language of the file: how linework, text, and dimensions read. Distinct from classes (object category) and layers (location/elevation). Conform to **USITT RP-2** graphics + the USITT Scenic Design & Technical Production Graphic Standard where applicable (F-008/F-016). Dimension **values** live in the file, never here (S-4) — this governs dimension *style*, not measurements.
 
 ---
 
-## Line types / line weights
+## Line types / weights
 
-The linework vocabulary — weight tiers and line styles (continuous, dashed, hidden, phantom, centerline, etc.). Align to **USITT RP-2** graphics where applicable (F-008).
-
-> Note: linework is a graphic concern handled here, NOT via object classes (S-1). A class says *what a thing is*; drafting standards say *how it's drawn*.
+Weight tiers + line styles (continuous, dashed, hidden, phantom, centerline). Linework is a graphic concern handled here, NOT via object classes (S-1).
 
 ## Text styles
 
-Standard text styles (labels, notes, titles). Register as resources so every sheet reads consistently.
+Standard text styles (labels, notes, titles), registered as resources so every sheet reads consistently.
 
 ## Dimension styles
 
-Standard dimension styles + the units/precision convention. Dimension **values** live in the file, never in prose (S-4) — this doc governs dimension *style*, not measurements.
-
-## Alignment to standards
-
-- **USITT RP-2** (Theatrical Lighting Design Graphics) + the USITT Scenic Design & Technical Production Graphic Standard = the graphic language to conform to (F-008/F-016).
-- Spotlight default libraries provide a tooling baseline (F-008).
+Standard dimension styles + units/precision convention (governs style, not values).
 
 ---
 
 ## TODO (per-instance)
 
-- [ ] The line-weight tier table (weights + when to use each).
-- [ ] The standard line-type list.
+- [ ] Line-weight tier table (weights + when to use each).
+- [ ] Standard line-type list.
 - [ ] Text style list.
 - [ ] Dimension style + units/precision.
-- [ ] Confirm which USITT RP-2 conventions we adopt vs. house variations.
+- [ ] Which USITT RP-2 conventions we adopt vs. house variations.
 
-*Canonical references: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-008 / F-016. Resource capture in [`../resources/README.md`](../resources/README.md).*
+*Canonical: [`../../VWX-BEST-PRACTICES.md`](../../VWX-BEST-PRACTICES.md) § F-008 / F-016. Resource capture in [`../resources/README.md`](../resources/README.md).*

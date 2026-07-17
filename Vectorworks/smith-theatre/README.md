@@ -1,66 +1,47 @@
 # Vectorworks Documentation Package — Smith Theatre
 
-> Cloned from [`../_TEMPLATE/`](../_TEMPLATE/) (D-018). This is the **first real package instance** (D-002). It documents the Smith Theatre base show file: the **plan** we build the `.vwx` FROM. Git leads, the file follows (S-5).
+> Cloned from [`../_TEMPLATE/`](../_TEMPLATE/) (2026-07-16, D-018). This is the **first real package instance** and the base show file for URITP's Smith Theatre (SPAC). Prose files state the RULE; the exhaustive lists (layers, class tree, sheets, resources) are the per-instance content filled here. **Git is the plan; the `.vwx` is the realization** (S-5).
 >
-> **Scope:** Smith Theatre (URITP). Universal rules point up to [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md); only venue-specific content lives here.
+> **Scope:** the standards are org-agnostic (they live in the template); this package captures only what is **Smith-specific** and points up to the template + [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md).
 
 ---
 
-## What this package is
+## What Smith is
 
-A **versioned documentation package** that defines how the Smith Theatre base show file is structured, so the file is built to a known plan instead of improvised. **Git is the plan; the `.vwx` is the realization** (S-5).
-
-- You draft *from* these docs in Vectorworks. The docs lead; the file follows.
-- The `.vwx` itself lives **outside git** (locally / Box / Drive). This package documents it, references it, and is used to check it (D-009).
+A **blackbox** house at the Sarah B. Performing Arts Center: a nominal rectangle, room-center set on the Vectorworks **internal origin (0,0)** (S-3, already built, D-013). Departments live as design layers on a dense **MASTER** file; department/show files **reference** it (S-2). Elevation bands in play: `0 NOTES / 1 DECK / 1.5 MEZZ / 2 TOE / 3 CATWALK`.
 
 ---
 
-## Venue snapshot (rules, not numbers — S-4)
+## The standards this package follows
 
-- **Room:** blackbox rectangle. Datum = center of the room rectangle, coincident with the Vectorworks **internal origin (0,0)** — already built (D-013). See [`standards/datums-and-reference-planes.md`](./standards/datums-and-reference-planes.md).
-- **Departments (from the layer worksheet):** UR (venue base / architecture), SCENIC, LX DESIGNER, HEAD ELECTRICIAN, AUDIO, RIGGING, VIDEO, UTILITY, PM.
-- **Elevation bands (D-012):** `0 NOTES / 1 DECK / 1.5 MEZZ / 2 TOE / 3 CATWALK`.
-- Real dimensions, trim heights, and load limits live **in the file + exported worksheets**, never in this prose (S-4).
+Canonical detail lives in [`../VWX-BEST-PRACTICES.md`](../VWX-BEST-PRACTICES.md); the one-line version:
 
----
-
-## Package tree
-
-```
-smith-theatre/
-  README.md                        — this file
-  standards/                       — the PLAN: rules a drafter builds from (+ filled Smith lists)
-    layers.md                      — design-layer scheme + the actual 27-layer list
-    layers.csv                     — layer manifest (the plan; reconciled against the file)
-    classes.md                     — object-class scheme + PROPOSED Smith tree (pending ruling)
-    classes.csv                    — class manifest (proposed)
-    sheet-layers.md                — sheet numbering + drafted per-department list (F-016 draft)
-    naming.md                      — naming discipline + Smith department vocabulary
-    drafting.md                    — line weights, text, dimension standards
-    datums-and-reference-planes.md — Smith origin + per-elevation reference-plane RULE (S-4)
-  resources/                       — reusable content plan (prose .md + per-record CSVs)
-    README.md                      — which resource types we capture + why (index)
-    symbols.md                     — symbol library organization + naming
-    records.md                     — record-format overview
-    record-lighting-device.csv     — lighting-device record schema (example fields)
-    record-rigging-point.csv       — rigging-point record schema (example fields)
-    title-blocks.md                — title block border styles
-    hatches.md                     — standardized hatches / tile fills
-    saved-views.md                 — standardized saved views / navigation
-  reference-notes/                 — hand-drawn handouts + Michael's build reference (S-5 primary)
-    README.md
-  reconciliation/                  — exports dumped FROM the file to check built-vs-planned (S-5 secondary)
-    README.md
-  CHANGELOG.md                     — this package's version history
-```
+| # | Standard | One-line |
+|---|----------|----------|
+| S-1 | Hybrid layer/class | **Layers** = location + department + elevation. **Classes** = object category for filtering. Elevation never in classes. |
+| S-2 | Master-reference model | One dense **master** file; department/show files **reference** it (Design Layer Viewport), staying thin. |
+| S-3 | Origin datum | Room-center, coincident with the **internal origin (0,0)** — built. |
+| S-4 | Datums & reference planes | Document the **rule**, never the numbers; values live in the file. |
+| S-5 | Direction of truth | **Git leads** (plan + hand-drawn notes), VWX realizes, export = reconciliation check. |
+| S-6 | File-format split | **Prose → Markdown**, **data manifests → comma-CSV**. No `.txt`. |
 
 ---
 
-## Status
+## What's filled vs. still open
 
-**Package:** smith-theatre · **Status:** Phase 1→2 (skeleton cloned, per-instance placeholders filled) · **Venue:** Smith Theatre
+| Area | State |
+|---|---|
+| `standards/layers.md` + `layers.csv` | **Filled** — the ~26-layer house list (dept × elevation) as a comma-CSV manifest (D-019). Working draft (per-row status), not a ratified Standard. |
+| `standards/datums-and-reference-planes.md` | **Filled** — Smith's reference-plane rule (deck-off-trim / upper-off-nominal-wall), RULE only (D-020, S-4). |
+| `standards/sheet-layers.md` | **Drafted** — full per-department sheet list from the ClickUp scheme; stays an F-016 **DRAFT** pending Michael's ruling to promote (D-021). |
+| `standards/classes.md` | **Proposed** — object-class tree (steel/wood/framing/masking + dash children) as a per-instance PROPOSAL, NOT promoted (D-022). Needs Michael's ruling. |
+| `standards/naming.md`, `drafting.md` | Rule prose kept; venue vocabulary noted; drafting tiers still TODO. |
+| `resources/*` | Smith categories noted; per-record CSV examples seeded; inventories still TODO. |
+| `reference-notes/` | Awaiting the hand-drawn handouts (S-5 primary). |
+| `reconciliation/` | Empty until the file is built and worksheets are exported to check the plan. |
 
-- `standards/` filled first, then `resources/` (clone checklist step 3).
-- **Filled from source:** layer list (Google Sheet), reference-plane rule (D-014), department vocabulary.
-- **PROPOSED / pending Michael's ruling before Standard promotion:** object-class tree, full per-department sheet list (F-016). See CANDIDATES in [`../DECISION-LOG.md`](../DECISION-LOG.md).
-- **Deferred to the build:** hand-drawn handouts (drop in `reference-notes/`), generated reconciliation manifests, dimension values (live in the `.vwx`).
+---
+
+**Package:** smith-theatre · **Status:** Phase 2 (base-file build) — plan authored, `.vwx` follows · **Venue:** Smith Theatre, SPAC (URITP)
+
+*See [`CHANGELOG.md`](./CHANGELOG.md) for this package's version history and [`../DECISION-LOG.md`](../DECISION-LOG.md) (D-018..D-022) for the decisions behind it.*
