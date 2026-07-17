@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#8f8f8f">
 <meta name="robots" content="noindex, nofollow">
 <title>Theme Studio</title>
-<meta name="description" content="The 4-vector theme matrix (color x typography x forms x spacing) rendered across the canonical FileMaker object library.">
+<meta name="description" content="The 4-vector theme matrix (color x typography x forms x spacing) rendered across the canonical 20-object FileMaker library.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -48,17 +48,20 @@
   /* ---------- MAIN SHELL ---------- */
   #view{flex:1 0 auto;outline:none;}
   .studio-shell{max-width:var(--maxw);margin:0 auto;padding:var(--s5) var(--s4) var(--s6);}
-  .sec{margin-top:34px;} .sec:first-child{margin-top:var(--s2);}
+  .cov{font-size:0.82rem;color:var(--ch-soft);margin:0 0 var(--s2);line-height:1.55;max-width:76ch;}
+  .cov b{color:var(--ch-accent);font-weight:800;} .cov code{font-family:var(--ch-mono);font-size:0.75rem;background:var(--ch-sunk);padding:1px 5px;border-radius:4px;color:var(--ch-ink);}
+  .sec{margin-top:34px;} .sec:first-child{margin-top:var(--s3);}
   .sec > h2{font-size:0.8rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--ch-faint);margin-bottom:4px;}
   .sec > .subt{font-size:0.85rem;color:var(--ch-soft);margin:0 0 16px;max-width:70ch;line-height:1.5;}
+  .sec > h2 .cnt{color:var(--ch-faint);font-weight:600;font-size:0.72rem;margin-left:6px;}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
   .spec{background:var(--ch-panel);border:1px solid var(--ch-line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
   .spec-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-bottom:1px solid var(--ch-line);}
   .spec-h .nm{font-weight:700;font-size:0.85rem;} .spec-h .id{font-family:var(--ch-mono);font-size:0.62rem;color:var(--ch-faint);}
 
   /* Tabs UI */
-  .card-tabs{display:flex;background:var(--ch-sunk);border-bottom:1px solid var(--ch-line);}
-  .card-tab{flex:1;font-family:var(--ch-mono);font-size:0.65rem;font-weight:600;color:var(--ch-faint);padding:8px 4px;border:none;background:transparent;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;transition:all 150ms;border-bottom:2px solid transparent;}
+  .card-tabs{display:flex;flex-wrap:wrap;background:var(--ch-sunk);border-bottom:1px solid var(--ch-line);}
+  .card-tab{flex:1;min-width:60px;font-family:var(--ch-mono);font-size:0.65rem;font-weight:600;color:var(--ch-faint);padding:8px 4px;border:none;background:transparent;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;transition:all 150ms;border-bottom:2px solid transparent;}
   .card-tab:hover{color:var(--ch-soft);}
   .card-tab.active{color:var(--ch-ink);border-bottom-color:var(--ch-accent);background:var(--ch-panel);}
   .r-swatch{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:6px;border:1px solid oklch(0 0 0 / 0.15);box-shadow:inset 0 1px 2px oklch(0 0 0 / 0.1);}
@@ -78,13 +81,19 @@
   .tb.icon{padding:0;width:var(--touch);justify-content:center;background:var(--surface-2);color:var(--text);border-color:var(--border);}
   .stag{font-family:var(--ch-mono);font-size:0.58rem;color:var(--text-faint);text-align:center;}
   .tpill{font-size:var(--fs-xs);font-weight:700;padding:var(--pad-cell, 5px) var(--gap-md, 12px);border-radius:var(--radius-pill);color:var(--on-accent);font-family:var(--font-body);display:inline-block;}
-  .tpill.accent{background:var(--accent-grad);} .tpill.good{background:var(--good);} .tpill.warn{background:var(--warn);color:#241d05;} .tpill.bad{background:var(--bad);color:#fff;} .tpill.info{background:var(--info);}
+  .tpill.accent{background:var(--accent-grad);} .tpill.good{background:var(--good);} .tpill.warn{background:var(--warn);color:#241d05;} .tpill.bad{background:var(--bad);color:#fff;} .tpill.info{background:var(--info);} .tpill.neutral{background:var(--surface-3);color:var(--text-soft);}
   .tcard{background:var(--surface-2);border:var(--border-w) solid var(--border);border-radius:var(--radius-lg);padding:var(--pad-card, 16px);box-shadow:var(--shadow-out);}
   .tcard h3{font-family:var(--font-display);margin:0 0 6px;font-size:var(--fs-lead);font-weight:700;color:var(--text);letter-spacing:var(--track-tight);}
   .tcard p{margin:0;font-size:var(--fs-sm);line-height:1.5;color:var(--text-soft);}
-  .tfield label{display:block;font-size:var(--fs-xs);font-weight:600;color:var(--text-soft);margin-bottom:var(--gap-xs, 4px);}
+  .tshell{width:100%;min-height:72px;background:var(--bg);border:var(--border-w) solid var(--border);border-radius:var(--radius-lg);display:grid;place-items:center;color:var(--text-faint);font-size:var(--fs-sm);}
+  .tfield{width:100%;} .tfield label{display:block;font-size:var(--fs-xs);font-weight:600;color:var(--text-soft);margin-bottom:var(--gap-xs, 4px);}
   .tfield input{width:100%;font:inherit;font-size:var(--fs-body);background:var(--field);color:var(--text);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:0 var(--gap-md, 12px);min-height:var(--touch);}
   .tfield input.focus{border-color:var(--accent);box-shadow:var(--shadow-in);} .tfield input::placeholder{color:var(--text-faint);}
+  .tselect{width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--field);color:var(--text);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:0 var(--gap-md, 12px);min-height:var(--touch);font-size:var(--fs-body);}
+  .tselect span{color:var(--text-faint);}
+  .tro{width:100%;display:flex;align-items:center;background:var(--surface-2);color:var(--text-soft);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:0 var(--gap-md, 12px);min-height:var(--touch);font-size:var(--fs-body);font-variant-numeric:tabular-nums;}
+  .tsearch{width:100%;display:flex;align-items:center;gap:8px;background:var(--field);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:0 var(--gap-md, 12px);min-height:var(--touch);}
+  .tsearch span{color:var(--text-faint);font-size:0.9em;} .tsearch input{flex:1;border:0;background:transparent;color:var(--text);font:inherit;font-size:var(--fs-body);outline:none;padding:0;min-height:auto;}
   .ttoolbar{width:100%;display:flex;align-items:center;gap:var(--gap-md, 10px);background:var(--surface-1);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:var(--pad-cell, 8px) var(--gap-md, 12px);}
   .ttoolbar .tt{font-family:var(--font-display);font-weight:800;font-size:var(--fs-body);color:var(--text);letter-spacing:var(--track-tight);} .ttoolbar .sp{flex:1;}
   .tnav{font-family:var(--font-body);font-size:var(--fs-xs);font-weight:700;padding:var(--pad-cell, 6px) var(--gap-md, 12px);border-radius:var(--radius-pill);}
@@ -102,8 +111,11 @@
   .ttile .lab{font-size:var(--fs-xs);color:var(--text-soft);margin-top:var(--gap-xs, 4px);}
   .ttype .t1{font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--text);letter-spacing:var(--track-tight);line-height:1.1;}
   .ttype .t2{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.06em;margin-top:8px;}
+  .ttype .t2:first-child{margin-top:0;}
   .ttype .t3{font-size:var(--fs-body);color:var(--text);margin-top:8px;line-height:1.5;}
+  .ttype .t3:first-child,.ttype .t1:first-child{margin-top:0;}
   .ttype .t4{font-size:var(--fs-sm);color:var(--text-soft);margin-top:4px;} .ttype .t5{font-size:var(--fs-xs);color:var(--text-faint);margin-top:4px;}
+  .ttype .t4:first-child{margin-top:0;}
   #appWrap{display:none;}
   .appframe{border:1px solid var(--ch-line);border-radius:16px;overflow:hidden;box-shadow:0 18px 50px oklch(0 0 0 / 0.16);}
   .appview{background:var(--bg);min-height:640px;transition:background 260ms cubic-bezier(.16,1,.3,1);}
@@ -142,7 +154,7 @@
   .drawer-body{padding:var(--s4);overflow-y:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch;}
   .drawer-hr{height:1px;background:var(--ch-line);margin:var(--s4) 0;}
   .drawer-note{font-size:0.75rem;color:var(--ch-faint);margin:var(--s3) 0 0;line-height:1.5;}
-  .drawer-note a{color:var(--ch-soft);text-decoration:none;} .drawer-note a:hover{color:var(--ch-accent);}
+  .drawer-note a{color:var(--ch-soft);text-decoration:none;} .drawer-note a:hover{color:var(--ch-accent);} .drawer-note code{font-family:var(--ch-mono);font-size:0.72rem;}
   .chrome-scrim{position:fixed;inset:0;background:oklch(0 0 0 / 0.45);z-index:110;}
 
   /* left nav (view switch) */
@@ -202,13 +214,8 @@
 <main id="view" tabindex="-1">
   <div id="stageRoot" class="studio-shell">
     <div id="studioWrap">
-      <section class="sec"><h2>Typography ramp</h2><p class="subt">Display + body faces from Typography; ink colors from Color.</p>
-        <div class="grid" id="typeGrid"></div></section>
-      <section class="sec"><h2>Buttons — full state set</h2><p class="subt">Primary uses the two-stop hex gradient. Pressed swaps outer shadow for inner (the infill rounded-rect look).</p><div class="grid" id="btnGrid"></div></section>
-      <section class="sec"><h2>Shells, toolbar, nav & modal</h2><p class="subt">Depth from surface fill + border + one outer shadow.</p><div class="grid" id="shellGrid"></div></section>
-      <section class="sec"><h2>Fields — editable, focus, readonly</h2><p class="subt">Focus = inner shadow + accent border.</p><div class="grid" id="fieldGrid"></div></section>
-      <section class="sec"><h2>Pills, tiles & callout</h2><p class="subt">Pill radius follows the feeling; semantic fills from good/warn/bad/info.</p><div class="grid" id="pillGrid"></div></section>
-      <section class="sec"><h2>Table & portal rows</h2><p class="subt">Header, standard, alternating, selected.</p><div class="grid" id="tableGrid"></div></section>
+      <p class="cov" id="covLine"></p>
+      <div id="studioSections"></div>
       <section class="sec"><h2>Color swatches — <span id="swName">McLaren</span> <span style="color:var(--ch-faint);font-weight:400;font-size:0.72rem">(tap to copy hex)</span></h2>
         <div class="sw-grid" id="swGrid"></div></section>
     </div>
@@ -268,8 +275,8 @@
     <div class="foot-sources">
       <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/preview.html">Source ↗</a>
       <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/_objects.json">Object JSON ↗</a>
+      <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/OBJECT-COVERAGE.md">Object list ↗</a>
       <a href="https://github.com/mawizorek/ClickUp_apps/commits/main/shared/themes/preview.html">Commits & PRs ↗</a>
-      <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/THEME-SYSTEM.md">System ↗</a>
     </div>
     <div class="foot-stamp" id="footStamp">Theme Studio · shared/themes</div>
   </div>
@@ -323,7 +330,7 @@
     </div>
     <div class="drawer-hr"></div>
     <div class="combo"><span class="eq">theme = </span><b id="cTheme">manual-mix</b><br><span id="cFont">Chakra Petch</span><span class="sep">·</span><span id="cGrad">gradient</span></div>
-    <p class="drawer-note">Renders the 4 canonical grids (color × typography × forms × spacing) across the object library in <b>_objects.json</b>. Hex is canonical; gradient = two hex stops, no runtime color math. Embedded first-paint; the grids live-fetch and override.</p>
+    <p class="drawer-note">Renders the 4 canonical grids (color × typography × forms × spacing) across the 20-object library in <code>_objects.json</code>. Need a new object? Add it there + to <code>OBJECT-COVERAGE.md</code> and it appears here automatically. Hex is canonical; gradient = two hex stops.</p>
   </div>
 </aside>
 
@@ -352,161 +359,41 @@ var SPACES={
 "standard":{"touch":"44px","pad-cell":"10px","pad-card":"20px","gap-xs":"6px","gap-md":"14px","gap-lg":"28px"}
 };
 
-// EMBEDDED OBJECT REGISTRY FALLBACK (mirrors _objects.json for first paint; live fetch overrides)
+// EMBEDDED OBJECT REGISTRY FALLBACK — mirrors _objects.json (canonical 20). Live fetch overrides.
 var REGISTRY={
   "groups": {
-    "type": {
-      "name": "Typography Ramp",
-      "desc": "Display + body faces from Typography; ink colors from Color.",
-      "objects": [
-        {
-          "id": "tx_ramp",
-          "name": "Type ramp",
-          "rowLayout": false,
-          "states": {
-            "normal": {
-              "html": "<div class=\"ttype\"><div class=\"t1\">Race weekend</div><div class=\"t2\">Section header</div><div class=\"t3\">Body copy is the standard reading size for record content and prose in the layout.</div><div class=\"t4\">Helper text under a field.</div><div class=\"t5\">Muted metadata · timestamps</div></div>",
-              "props": { "Display": "font-display", "Body": "font-body", "Lead": "fs-lead", "Standard": "fs-body" }
-            }
-          }
-        }
-      ]
-    },
-    "buttons": {
-      "name": "Buttons — full state set",
-      "desc": "Primary uses the two-stop hex gradient. Pressed swaps outer shadow for inner.",
-      "objects": [
-        {
-          "id": "btn_primary",
-          "name": "Primary",
-          "rowLayout": true,
-          "states": {
-            "normal": { "html": "<button class=\"tb primary\">Save changes</button>", "props": { "Fill": "accent-grad", "Corner": "radius", "Shadow": "shadow-out", "Text": "on-accent" } },
-            "hover": { "html": "<button class=\"tb primary\" style=\"filter:brightness(1.15)\">Save changes</button>", "props": { "Note": "brightness(1.15) or opacity" } },
-            "pressed": { "html": "<button class=\"tb pressed\">Save changes</button>", "props": { "Fill": "accent-grad", "Shadow": "shadow-in", "Transform": "translateY(1px)" } }
-          }
-        },
-        {
-          "id": "btn_secondary",
-          "name": "Secondary",
-          "rowLayout": true,
-          "states": {
-            "normal": { "html": "<button class=\"tb secondary\">Cancel</button>", "props": { "Fill": "surface-2", "Line": "border", "Text": "text" } },
-            "pressed": { "html": "<button class=\"tb secondary\" style=\"background:var(--surface-3);box-shadow:var(--shadow-in)\">Cancel</button>", "props": { "Fill": "surface-3", "Shadow": "shadow-in" } }
-          }
-        },
-        {
-          "id": "btn_destructive",
-          "name": "Destructive",
-          "rowLayout": true,
-          "states": {
-            "normal": { "html": "<button class=\"tb destructive\">Delete</button>", "props": { "Fill": "bad", "Text": "#ffffff", "Shadow": "shadow-out" } },
-            "pressed": { "html": "<button class=\"tb destructive\" style=\"box-shadow:var(--shadow-in);transform:translateY(1px)\">Delete</button>", "props": { "Shadow": "shadow-in" } }
-          }
-        },
-        {
-          "id": "btn_ghost",
-          "name": "Ghost + icon",
-          "rowLayout": true,
-          "states": {
-            "normal": { "html": "<button class=\"tb ghost\">Details</button><button class=\"tb icon\">★</button>", "props": { "Ghost": "transparent", "Text": "accent", "Size": "touch" } }
-          }
-        }
-      ]
-    },
-    "shells": {
-      "name": "Shells, toolbar, nav & modal",
-      "desc": "Depth from surface fill + border + one outer shadow.",
-      "objects": [
-        {
-          "id": "cnt_toolbar",
-          "name": "Toolbar + nav",
-          "rowLayout": false,
-          "states": {
-            "normal": { "html": "<div class=\"ttoolbar\"><span class=\"tt\">On Track</span><span class=\"sp\"></span><span class=\"tnav on\">Live</span><span class=\"tnav off\">History</span></div>", "props": { "Fill": "surface-1", "Nav on": "accent", "Nav off": "text-faint" } }
-          }
-        },
-        {
-          "id": "cnt_card",
-          "name": "Section card",
-          "rowLayout": false,
-          "states": {
-            "normal": { "html": "<div class=\"tcard\"><h3>Constructor standings</h3><p>Surface fill + border + one outer shadow for depth.</p></div>", "props": { "Fill": "surface-2", "Corner": "radius-lg", "Shadow": "shadow-out" } }
-          }
-        },
-        {
-          "id": "cnt_modal",
-          "name": "Modal",
-          "rowLayout": false,
-          "states": {
-            "normal": { "html": "<div class=\"tmodal\"><h3>Confirm action</h3><p>Highest elevation surface.</p><button class=\"tb primary\">Confirm</button></div>", "props": { "Fill": "surface-3", "Corner": "radius-lg", "Shadow": "shadow-out" } }
-          }
-        },
-        {
-          "id": "cnt_callout",
-          "name": "Callout",
-          "rowLayout": false,
-          "states": {
-            "normal": { "html": "<div class=\"tcallout\">Accent-soft fill, accent border. Retints with the color.</div>", "props": { "Fill": "accent-soft", "Line": "accent", "Corner": "radius" } }
-          }
-        }
-      ]
-    },
-    "fields": {
-      "name": "Fields — editable, focus, readonly",
-      "desc": "Focus = inner shadow + accent border.",
-      "objects": [
-        {
-          "id": "fd_text",
-          "name": "Text field",
-          "rowLayout": false,
-          "states": {
-            "editable": { "html": "<div class=\"tfield\"><label>Driver name</label><input placeholder=\"Type a name...\"></div>", "props": { "Fill": "field", "Line": "border", "Corner": "radius" } },
-            "focus": { "html": "<div class=\"tfield\"><label>Driver name</label><input class=\"focus\" value=\"Lando Norris\"></div>", "props": { "Line": "accent", "Shadow": "shadow-in" } },
-            "readonly": { "html": "<div class=\"tfield\"><label>Team</label><input value=\"McLaren\" readonly style=\"background:var(--surface-2);color:var(--text-soft);pointer-events:none\"></div>", "props": { "Fill": "surface-2", "Text": "text-soft" } }
-          }
-        }
-      ]
-    },
-    "pills": {
-      "name": "Pills, tiles & callout",
-      "desc": "Pill radius follows the feeling; semantic fills from good/warn/bad/info.",
-      "objects": [
-        {
-          "id": "tx_badge",
-          "name": "Pills & badges",
-          "rowLayout": true,
-          "states": {
-            "normal": { "html": "<div><span class=\"tpill accent\">Featured</span> <span class=\"tpill good\">Confirmed</span> <span class=\"tpill warn\">Pending</span> <span class=\"tpill bad\">Blocked</span> <span class=\"tpill info\">Note</span></div>", "props": { "Accent": "accent-grad", "Corner": "radius-pill", "Padding": "pad-cell" } }
-          }
-        },
-        {
-          "id": "sum_tile",
-          "name": "Metric tile",
-          "rowLayout": false,
-          "states": {
-            "normal": { "html": "<div class=\"ttile\"><div class=\"big\">8,412</div><div class=\"lab\">Active this week</div></div>", "props": { "Fill": "surface-2", "Shadow": "shadow-out", "Pad": "pad-card" } }
-          }
-        }
-      ]
-    },
-    "tables": {
-      "name": "Table & portal rows",
-      "desc": "Header, standard, alternating, selected.",
-      "objects": [
-        {
-          "id": "row_portal",
-          "name": "Table rows",
-          "rowLayout": false,
-          "states": {
-            "header": { "html": "<table class=\"ttable\"><thead><tr><th>Pos</th><th>Driver</th><th class=\"n\">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class=\"n\">287</td></tr></tbody></table>", "props": { "Fill": "transparent", "Text": "text-soft" } },
-            "standard": { "html": "<table class=\"ttable\"><thead><tr><th>Pos</th><th>Driver</th><th class=\"n\">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class=\"n\">287</td></tr></tbody></table>", "props": { "Fill": "transparent", "Line": "border" } },
-            "alternate": { "html": "<table class=\"ttable\"><thead><tr><th>Pos</th><th>Driver</th><th class=\"n\">Pts</th></tr></thead><tbody><tr class=\"alt\"><td>2</td><td>Piastri</td><td class=\"n\">265</td></tr></tbody></table>", "props": { "Fill": "surface-2" } },
-            "selected": { "html": "<table class=\"ttable\"><thead><tr><th>Pos</th><th>Driver</th><th class=\"n\">Pts</th></tr></thead><tbody><tr class=\"sel\"><td>3</td><td>Verstappen</td><td class=\"n\">241</td></tr></tbody></table>", "props": { "Fill": "accent-soft" } }
-          }
-        }
-      ]
-    }
+    "shells": { "name": "Shells & containers", "desc": "Structural surfaces. Depth from surface fill + border + one outer shadow.", "objects": [
+      { "id":"cnt_page_shell", "name":"Page shell", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tshell\">Page canvas · app body surface</div>", "props":{ "Fill":"bg", "Line":"border", "Corner":"radius-lg" } } } },
+      { "id":"cnt_section_card", "name":"Section card", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tcard\"><h3>Section card</h3><p>A grouping card holds a related set of fields or content.</p></div>", "props":{ "Fill":"surface-2", "Line":"border", "Corner":"radius-lg", "Shadow":"shadow-out" } } } },
+      { "id":"cnt_toolbar", "name":"Toolbar", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttoolbar\"><span class=\"tt\">On Track</span><span class=\"sp\"></span><span class=\"tnav on\">Live</span><span class=\"tnav off\">History</span></div>", "props":{ "Fill":"surface-1", "Title":"text", "Nav on":"accent", "Nav off":"text-faint" } } } },
+      { "id":"cnt_filter_bar", "name":"Filter bar", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttoolbar\"><span class=\"tnav on\">All</span> <span class=\"tnav off\">Open</span> <span class=\"tnav off\">Closed</span></div>", "props":{ "Fill":"surface-1", "Active chip":"accent", "Idle chip":"text-faint" } } } },
+      { "id":"card_modal_standard", "name":"Modal", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tmodal\"><h3>Confirm action</h3><p>Highest elevation surface.</p><button class=\"tb primary\">Confirm</button></div>", "props":{ "Fill":"surface-3", "Line":"border", "Corner":"radius-lg", "Shadow":"shadow-out" } } } }
+    ] },
+    "nav": { "name": "Navigation", "desc": "Active vs inactive must read at a glance.", "objects": [
+      { "id":"nav_tab", "name":"Tabs", "rowLayout":true, "states":{ "active":{ "html":"<span class=\"tnav on\">Loans</span> <span class=\"tnav off\">Parties</span> <span class=\"tnav off\">Docs</span>", "props":{ "Active":"accent", "On text":"on-accent", "Inactive":"text-faint" } }, "inactive":{ "html":"<span class=\"tnav off\">Loans</span> <span class=\"tnav off\">Parties</span> <span class=\"tnav off\">Docs</span>", "props":{ "Idle":"text-faint", "Line":"border" } } } },
+      { "id":"nav_mode", "name":"Mode toggle", "rowLayout":true, "states":{ "active":{ "html":"<span class=\"tnav on\">List</span> <span class=\"tnav off\">Grid</span>", "props":{ "Selected":"accent", "On text":"on-accent", "Unselected":"text-soft" } } } },
+      { "id":"nav_back", "name":"Back affordance", "rowLayout":true, "states":{ "base":{ "html":"<button class=\"tb ghost\">‹ Back to hub</button>", "props":{ "Text":"accent", "Fill":"transparent" } } } }
+    ] },
+    "type": { "name": "Typography", "desc": "Display + body faces from Typography; ink colors from Color.", "objects": [
+      { "id":"tx_page_title", "name":"Page title", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttype\"><div class=\"t1\">Loan application #4021</div></div>", "props":{ "Face":"font-display", "Ink":"text", "Size":"fs-lead" } } } },
+      { "id":"tx_section_header", "name":"Section + subsection header", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttype\"><div class=\"t2\">Section header</div><div class=\"t2\" style=\"opacity:.7;font-size:0.82rem\">Subsection header</div></div>", "props":{ "Face":"font-display", "Ink":"text" } } } },
+      { "id":"tx_field_label", "name":"Field label", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tfield\"><label>Field label</label></div>", "props":{ "Ink":"text-soft", "Size":"fs-xs" } } } },
+      { "id":"tx_body", "name":"Body copy", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttype\"><div class=\"t3\">Body copy is the standard reading size for record content and prose in the layout.</div></div>", "props":{ "Ink":"text", "Size":"fs-body" } } } },
+      { "id":"tx_helper_muted", "name":"Helper + muted", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttype\"><div class=\"t4\">Helper text under a field.</div><div class=\"t5\">Muted metadata · timestamps</div></div>", "props":{ "Helper":"text-soft", "Muted":"text-faint" } } } },
+      { "id":"tx_badge", "name":"Text badge", "rowLayout":true, "states":{ "base":{ "html":"<span class=\"tpill accent\">Featured</span>", "props":{ "Fill":"accent-grad", "Text":"on-accent", "Corner":"radius-pill" } } } }
+    ] },
+    "buttons": { "name": "Buttons — full family", "desc": "Primary uses the two-stop hex gradient. Pressed swaps outer shadow for inner (the infill look).", "objects": [
+      { "id":"btn_family", "name":"Primary / secondary / quiet / destructive / icon", "rowLayout":true, "states":{ "normal":{ "html":"<button class=\"tb primary\">Primary</button> <button class=\"tb secondary\">Secondary</button> <button class=\"tb ghost\">Quiet</button> <button class=\"tb destructive\">Delete</button> <button class=\"tb icon\">⚙</button>", "props":{ "Primary":"accent-grad", "On text":"on-accent", "Secondary":"surface-2", "Destructive":"bad", "Shadow":"shadow-out", "Corner":"radius" } }, "pressed":{ "html":"<button class=\"tb pressed\">Primary</button> <button class=\"tb secondary\" style=\"background:var(--surface-3);box-shadow:var(--shadow-in)\">Secondary</button> <button class=\"tb ghost\">Quiet</button>", "props":{ "Fill":"accent-grad", "Shadow":"shadow-in", "Transform":"translateY(1px)" } } } }
+    ] },
+    "fields": { "name": "Fields", "desc": "Focus = inner shadow + accent border. Readonly drops to a muted surface.", "objects": [
+      { "id":"fd_text_standard", "name":"Text field", "rowLayout":false, "states":{ "editable":{ "html":"<div class=\"tfield\"><label>Driver name</label><input placeholder=\"Type a name...\"></div>", "props":{ "Fill":"field", "Line":"border", "Corner":"radius" } }, "focus":{ "html":"<div class=\"tfield\"><label>Driver name</label><input class=\"focus\" value=\"Lando Norris\"></div>", "props":{ "Line":"accent", "Shadow":"shadow-in" } }, "readonly":{ "html":"<div class=\"tfield\"><label>Team</label><input value=\"McLaren\" readonly style=\"background:var(--surface-2);color:var(--text-soft);pointer-events:none\"></div>", "props":{ "Fill":"surface-2", "Text":"text-soft" } } } },
+      { "id":"fd_dropdown_standard", "name":"Dropdown", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tfield\"><label>Team</label><div class=\"tselect\">McLaren <span>▾</span></div></div>", "props":{ "Fill":"field", "Line":"border", "Chevron":"text-faint" } } } },
+      { "id":"fd_readonly_display", "name":"Readonly / calc display", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tfield\"><label>Computed total</label><div class=\"tro\">$48,210.00</div></div>", "props":{ "Fill":"surface-2", "Text":"text-soft" } } } },
+      { "id":"fd_search_filter", "name":"Search field", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tfield\"><label>Search</label><div class=\"tsearch\"><span>🔍</span><input placeholder=\"Search records...\"></div></div>", "props":{ "Fill":"field", "Icon":"text-faint", "Line":"border" } } } }
+    ] },
+    "data": { "name": "Rows, tiles & badges", "desc": "The list-and-status family: portal rows, metric tiles, and status badges.", "objects": [
+      { "id":"row_tile_badge", "name":"Portal rows / metric tiles / status badges", "rowLayout":false, "states":{ "rows":{ "html":"<table class=\"ttable\"><thead><tr><th>Pos</th><th>Driver</th><th class=\"n\">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class=\"n\">287</td></tr><tr class=\"alt\"><td>2</td><td>Piastri</td><td class=\"n\">265</td></tr><tr class=\"sel\"><td>3</td><td>Verstappen</td><td class=\"n\">241</td></tr></tbody></table>", "props":{ "Header":"text-soft", "Alternate":"surface-2", "Selected":"accent-soft" } }, "tiles":{ "html":"<div style=\"display:flex;gap:12px;flex-wrap:wrap;width:100%\"><div class=\"ttile\"><div class=\"big\">8,412</div><div class=\"lab\">Active this week</div></div><div class=\"ttile\"><div class=\"big\" style=\"color:var(--bad)\">3 overdue</div><div class=\"lab\">Needs attention</div></div></div>", "props":{ "Fill":"surface-2", "Shadow":"shadow-out", "Alert":"bad" } }, "badges":{ "html":"<div><span class=\"tpill neutral\">Draft</span> <span class=\"tpill good\">Active</span> <span class=\"tpill warn\">Pending</span> <span class=\"tpill bad\">Overdue</span></div>", "props":{ "Neutral":"surface-3", "Good":"good", "Warn":"warn", "Alert":"bad" } } } }
+    ] }
   }
 };
 
@@ -644,20 +531,20 @@ function refreshTriggers(){
   document.getElementById('hdDot').style.background='linear-gradient(135deg, '+(c.accent||'#888')+' 50%, '+(c['accent-deep']||'#555')+' 50%)';
 }
 
-function renderObjects(){
+function renderSections(){
   if(!REGISTRY.groups) return;
-  document.getElementById('typeGrid').innerHTML = REGISTRY.groups.type.objects.map(buildCard).join('');
-  document.getElementById('btnGrid').innerHTML = REGISTRY.groups.buttons.objects.map(buildCard).join('');
-  document.getElementById('shellGrid').innerHTML = REGISTRY.groups.shells.objects.map(buildCard).join('');
-  document.getElementById('fieldGrid').innerHTML = REGISTRY.groups.fields.objects.map(buildCard).join('');
-  document.getElementById('pillGrid').innerHTML = REGISTRY.groups.pills.objects.map(buildCard).join('');
-  document.getElementById('tableGrid').innerHTML = REGISTRY.groups.tables.objects.map(buildCard).join('');
-
-  for(var grp in REGISTRY.groups) {
-    REGISTRY.groups[grp].objects.forEach(function(obj) {
-      switchCardTab(obj.id, Object.keys(obj.states)[0]);
-    });
+  var host=document.getElementById('studioSections');
+  var html='';
+  var count=0;
+  for(var grp in REGISTRY.groups){
+    var g=REGISTRY.groups[grp];
+    var n=g.objects.length; count+=n;
+    html+='<section class="sec"><h2>'+g.name+'<span class="cnt">'+n+'</span></h2>'+(g.desc?'<p class="subt">'+g.desc+'</p>':'')+'<div class="grid">'+g.objects.map(buildCard).join('')+'</div></section>';
   }
+  host.innerHTML=html;
+  for(var grp2 in REGISTRY.groups){ REGISTRY.groups[grp2].objects.forEach(function(o){ switchCardTab(o.id, Object.keys(o.states)[0]); }); }
+  var cov=document.getElementById('covLine');
+  if(cov) cov.innerHTML='<b>'+count+'</b> canonical objects, every one reskins live from the active theme. This set is the shared design vocabulary, not a cap: to add one, drop it into <code>_objects.json</code> and list it in <code>OBJECT-COVERAGE.md</code> and it renders here automatically.';
 }
 
 function renderSwatches(){
@@ -669,7 +556,7 @@ var toastT;
 function copyHex(hex){ if(!hex) return; var done=function(){ var t=document.getElementById('toast'); t.textContent='Copied '+hex; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove('show'); },1400); };
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(hex).then(done).catch(done); } else { var ta=document.createElement('textarea'); ta.value=hex; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); done(); } }
 
-function renderAll(){ renderObjects(); applyTokens(); refreshTriggers(); renderSwatches(); syncSel(); }
+function renderAll(){ renderSections(); applyTokens(); refreshTriggers(); renderSwatches(); syncSel(); }
 
 function pickColor(slug){ curColor=slug; ddCloseAll(); applyTokens(); refreshTriggers(); renderSwatches(); syncSel(); }
 function pickType(slug){ curType=slug; ddCloseAll(); applyTokens(); refreshTriggers(); syncSel(); }
