@@ -15,6 +15,16 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ---
 
+## 2026-07-17 · FileMaker Capability Handbook is the styling allowlist + passive gate
+**Decision:** Added `FILEMAKER-CAPABILITIES.md`: the definitive list of layout-object styling FileMaker actually supports (fill/gradient, line, per-corner radius, outer+inner shadow, padding, four object states, Styles/Themes), an explicit NOT-ALLOWED list (motion, gradient text, glassmorphism, stacked shadows, runtime color math, pseudo-elements), button-look recipes, the axis→property split, and the native rebuild workflow. It is a passive gate: any theme visual that isn't in the allowlist is out of scope, not a workaround to invent. Same handbook serves agents (building renders/replicable apps) AND Michael (native rebuild).
+**Why:** Before investing in the two-axis schema, the FileMaker-replicability constraint needed to be documented so future agents don't assume capabilities FileMaker lacks (or wrongly rule out ones it has). One instruction book both sides work from keeps the ClickUp render and the native FileMaker Theme in lockstep, and stops capability drift.
+**Status:** locked
+
+## 2026-07-17 · Shadows + gradients ARE in scope (FileMaker-native)
+**Decision:** Depth via shadows and gradient fills is explicitly IN the themeable toolbox. FileMaker's Advanced Graphic area provides one outer + one inner shadow per object (color, opacity, blur, spread, offset) and Fill supports multi-stop gradients with an angle. The "infill rounded-rectangle shadow" = an inner shadow on a rounded rect (the pressed/inset button look). Budget is one outer + one inner per object (no stacked shadows), and gradient stop colors must be baked to concrete values (no runtime `color-mix`).
+**Why:** Corrects an earlier working assumption that FileMaker couldn't do shadows, which had pushed the theme design toward borders-only depth. FileMaker does support them natively, so professional depth/elevation is a legitimate theme tool, not an app-only extra. Michael flagged this directly.
+**Status:** locked
+
 ## 2026-07-16 · default-theme tuned to MID-gray, high-contrast, mode `mid`
 **Decision:** Lightened `default-theme` from a dark gray (bg L=0.28) to a true MID-gray (bg L=0.62) with near-black text (L=0.16) and a dark charcoal accent for higher contrast than the F1-style slick dark themes. Introduced a third `mode` value, **`mid`** (neither `light` nor `dark`), used only by this default; it renders type at full weight (no dark-mode weight reduction) so the higher contrast reads crisp. Updated the JSON, the `themes.css` block + `:root` spine, and the `resolve.js` embedded ULTIMATE together.
 **Why:** Michael's nitpick: the first cut read as a dark theme. The default should feel like an in-between gray placeholder, not dark and not a light/paper theme, and carry more contrast than the polished dark skins. `mid` mode encodes "in-between" honestly (the picker badge shows · mid) and keeps font weight full for contrast; it's harmless to consumers (matches neither `[data-mode=light]` nor `[data-mode=dark]`, so full default weight applies).
