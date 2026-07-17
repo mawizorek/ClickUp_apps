@@ -49,6 +49,14 @@ The front-matter and the sidecar overlap on identity fields, and two docs used t
 3. If you find the same authored fact maintained in two non-mirror places, one is trickle-down: delete it from the projection, point to the canonical home. The exemplar to copy is the Expression law (canonical in the transcript gate, one-line mirror in council, pointer in every profile).
 4. The ONLY sanctioned full duplication is the registry ↔ ClickUp-index mirror pair above.
 
+### Personalization-seam exception (NOT trickle-down — do not consolidate away)
+
+One case that LOOKS like trickle-down but is deliberate: the **4-line Standing-agent conduct block carried in every agent profile** (+ `_template.md` seeds it, `council.md` states the roster-wide version). This is NOT a fact duplicated across projections — it is a **shared starting point that each agent is meant to personalize in its own voice.** The four directives (have a personality / make a comment / own your lane / read the room + reply by name) are identical *as seeds*; the value is that each profile then diverges — Rhys's "read the room" cites failure modes, Beckett's aims his hammer at a colleague's claim, Mira's is her synthesis naming voices. **That per-agent divergence is where the block earns its keep** (Michael, 2026-07-17).
+
+- **Keep it in every profile.** An agent that loads only its own profile (Profile Load Integrity, below) must see its conduct rules without a second fetch — a pointer would break that.
+- **Personalize, don't clone.** A new agent starts from the `_template.md` four lines, then rewrites the examples/emphasis to its own character. Verbatim copies are the floor, not the goal.
+- **Auditors: do NOT strip these as "duplication."** This block is explicitly exempt from consolidation-principle rule 3. `council.md` holds the canonical roster-wide statement; each profile's copy is a personalized instance, not drift.
+
 ---
 
 ## Layout
