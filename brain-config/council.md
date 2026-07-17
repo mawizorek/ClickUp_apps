@@ -58,7 +58,7 @@ The naive question + the expert answer, on purpose. They compound.
 - Fold-in Frank → `agents/foldin-frank.md` (anti-sprawl gate: "does this already exist?" before design energy is spent. Verdict: FOLD-IN / NET-NEW / MERGE; pauses a net-new build until Michael rules. Overlaps intentionally with Eco Enzo — Frank checks whether a thing should be built at all, Enzo checks the side-effects of one already built.)
 
 ### The Workshop — repo edits, specs, structural work (seated inline w/ Core)
-Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now lives in Future Faye.
+Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now lives in Future Faye. Roster + invocation routing: `teams/the-workshop.md`. Mira IS the Workshop — whole-team invocation always routes through her; a direct single-agent call is the only standalone path.
 - Risk Rhys → `agents/risk-rhys.md` (Risk & Failure — theorizes failure modes on the spec, pre-commit)
 - Breaker Beckett → `agents/breaker-beckett.md` (Adversarial Tester — empirically attacks the actual artifact; standing on ANY concrete testable thing, including post-build on the live artifact. The hands-on counterpart to Rhys's on-paper pre-mortem.)
 - Clever Cleo → `agents/clever-cleo.md` (Elegance & Alternative)
@@ -77,6 +77,7 @@ Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now
 
 Full charter: `agents/maestro-mira.md`. In brief:
 
+- **Mira is the single front door to the Workshop — she IS the index and the controller.** When Michael invokes the team as a whole ("workshop this" / "run it by the team" / auto at the pre-commit gate), that is by definition a handoff to Mira: she holds the roster, seats the lenses, posts the Opening Post, synthesizes. Brain never holds the Workshop itself; the lenses never self-assemble without her. The ONLY agent output that bypasses Mira is a direct single-agent call by name ("Rhys, what breaks here?") — that one lens posts a standalone comment. Full routing: `teams/the-workshop.md`.
 - **Absorbed the Roster Scan Planner** — the deterministic roster scan is now Mira's step 1, non-negotiable, opens every pass. One outermost gate, not two.
 - **Runs the thread-first opening check** — "Do we have a session task for this?" — verifying/creating the session task on the Agent Activity Board before seating any voice (see Expression law above).
 - **Posts the Tier-1 Opening Post** — the parent comment that prompts the team on the X / Y / Z, per the two-tier Workshop Post Protocol. Mira always owns the parent; seated voices reply threaded beneath it.
@@ -101,6 +102,7 @@ Full charter: `agents/maestro-mira.md`. In brief:
 
 ## Changelog
 
+- 2026-07-17 (h) — **Mira is the single front door to the Workshop.** Added a lead-charter bullet stating Mira IS the Workshop's index + controller: a whole-team invocation always routes through her (Brain never holds the workshop; lenses never self-assemble), and the only bypass is a direct single-agent call by name. Cross-linked the Workshop seating-map entry to `teams/the-workshop.md`. Prompted by Michael: "pass this off to Mira, who controls the workshop — Mira is the index, and she is the workshop."
 - 2026-07-17 (g) — **Two-tier Workshop Post Protocol + phantom list-id fix.** Expression law grew a thread-structure rule: Mira 🎼 posts one Opening Post (parent, prompts the team on the specific X / Y / Z) and every seated voice replies threaded beneath it (one agent per reply) — killing the lump-comment / bare-summary / headerless-roots drift. Standing-agent conduct directive 2 + Mira's charter updated to name the Opening Post. Canonical templates live in `gates/session-transcript-gate.md` (i); this page mirrors the one-line law only. Also corrected the phantom list id `901328269587` → the real board `901327879922` (the gate was fixed in its rev (h); council.md still carried the stale id). Prompted by Michael (1A · Mira · Ship).
 - 2026-07-17 (f) — **Cross-talk directive.** Standing-agent conduct law grew a 4th line: every seated voice READS what others posted on the session task and replies BY NAME (agree / extend / challenge). The thread is a real conversation, not parallel monologues. Same 4th line dropped into every agent profile. Prompted by Michael: agents should actively respond to each other by name in the thread.
 - 2026-07-17 (e) — **The thread is the SESSION TASK; added the Standing-agent conduct law.** Expression law now points "the thread" at the comment stream on the session's task in the 🟢 Agent Activity Board (not the #A.I. Prompts channel, which is demoted to backup + permanent close-transcript home). Added a roster-wide Standing-agent conduct law applied to every seated voice, with the same lines dropped into each agent profile. Mirrors `gates/session-transcript-gate.md` (e).
