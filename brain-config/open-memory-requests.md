@@ -16,7 +16,11 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 
 ## Open
 
-_None._
+### OMR-20260717-1 · OPEN
+- Requested by: Brain (Opus 4.8)
+- Candidate note: Auto-open an Agent Activity Board session task WITHOUT asking whenever project work begins (any time a project conversation starts). Opening the task is a standing default, not a permission gate. Established by Michael 2026-07-17.
+- Requester's guess (non-binding): brain memory (update the existing Agent Activity Board pointer line rather than adding a new bullet, to avoid file growth); the fuller rule already lives in the Agent Activity Board Gold Standard startup gate.
+- Context / why: memory write bounced this session (no memory manager available); Michael directed dropping it here for a later agent to land. Pairs with the session-close fix also made 2026-07-17.
 
 ---
 
