@@ -8,15 +8,24 @@
 
 ---
 
+## Canonical pointers (LOCKED 2026-07-17 h) — the two surfaces, direct
+
+- **PRIMARY — 🟢 Agent Activity Board list:** id **`901327879922`**, URL https://app.clickup.com/36074068/v/li/901327879922 (MAW Documents › ClickUp Use, next to A.I. Prompts). One task per session; the live transcript + all agent deliberation are comments on that task.
+- **FALLBACK — #A.I. Prompts chat channel:** https://app.clickup.com/36074068/chat/r/6-901327646617-8. Backup when no session task can be created, AND the home for the permanent close summary (which points back at the session task).
+
+*(The earlier hardcoded id `901328269587` was a phantom — no such list existed. Corrected to the real board `901327879922` on 2026-07-17. Full spec: the Agent Activity Board — Gold Standard (Brain Reference) doc.)*
+
+---
+
 ## WHERE THE THREAD LIVES (LOCKED 2026-07-17 e) — the session TASK, not the channel
 
-**"The session transcript thread" = the COMMENT STREAM on the session's TASK in the 🟢 Agent Activity Board list** (the AI-sessions list Brain maintains; confirm the live list id against the Agent Activity Board — Gold Standard doc rather than trusting a hardcoded id). Every working session has (or gets) exactly one task on that board — the live working record for that session — and the play-by-play accrues as **comments on that task.** That comment stream is where the team deliberates. This resolves the three words that were previously left to guess:
+**"The session transcript thread" = the COMMENT STREAM on the session's TASK in the 🟢 Agent Activity Board list** (id `901327879922` — see Canonical pointers above). Every working session has (or gets) exactly one task on that board — the live working record for that session — and the play-by-play accrues as **comments on that task.** That comment stream is where the team deliberates. This resolves the three words that were previously left to guess:
 
 - **Session** = one task on the 🟢 Agent Activity Board. One per working session, maintained by Brain. If the current session has no task on the board yet, that is the thing Mira/Scribe create first (see Fire).
 - **Thread** = the comment stream on that session task. **ALL live agent deliberation lands there as comments.** This is the interactive, part-of-the-team layer — the whole point is that it feels like the team is actually working alongside Michael on the task.
-- **Chat** (#A.I. Prompts, https://app.clickup.com/36074068/chat/r/6-901327646617-8) = the **backup default + the home for long-standing CLOSE transcripts**, NOT active deliberation. If for some reason no session task can be found or created, Brain may prompt Michael for / fall back to a chat thread there — but that is the fallback, not the default. The dense close-time transcript (Session Close hook) still lands in #A.I. Prompts as the permanent archive.
+- **Chat** (#A.I. Prompts, https://app.clickup.com/36074068/chat/r/6-901327646617-8) = the **backup default + the home for long-standing CLOSE transcripts**, NOT active deliberation. If for some reason no session task can be found or created, Brain may prompt Michael for / fall back to a chat thread there — but that is the fallback, not the default. The dense close-time summary (Session Close hook) still lands in #A.I. Prompts as the permanent archive.
 
-**In one line:** live deliberation → comments on the session TASK; permanent close-transcript + fallback → the #A.I. Prompts channel.
+**In one line:** live deliberation → comments on the session TASK (`901327879922`); permanent close-summary + fallback → the #A.I. Prompts channel (https://app.clickup.com/36074068/chat/r/6-901327646617-8).
 
 ---
 
@@ -119,7 +128,7 @@ Calmly — the thread is now a **single point of failure**. If it can't open, th
 On the first trigger hit (or promotion of a provisional stub), Scribe **immediately**:
 
 1. **Announces the start — ONCE.** A single short, upbeat line to Michael in the working chat: she's excited to be spinning up a fresh session record and is on it. This is the ONLY time she speaks up about it. Example voice: "Ooh, opening a session task for this one — the team's deliberating in its comments from here, I'll keep it quiet."
-2. **Ensures the session TASK exists on the 🟢 Agent Activity Board** and uses its comment stream as the thread. If a task for this session already exists (the common case — Brain maintains the board), use it; if not, create it (title = session topic + date, e.g. `Brain (Opus 4.8) · <topic> · <date>`), status `to do`/`in progress`. Only if a board task genuinely cannot be created does Brain fall back to a #A.I. Prompts thread. (If a provisional stub already opened silently, promote that same task — don't open a second.)
+2. **Ensures the session TASK exists on the 🟢 Agent Activity Board** (list id `901327879922`) and uses its comment stream as the thread. If a task for this session already exists (the common case — Brain maintains the board), use it; if not, create it (title = session topic + date, e.g. `Brain (Opus 4.8) · <topic> · <date>`), status `to do`/`in progress`. Only if a board task genuinely cannot be created does Brain fall back to a #A.I. Prompts thread (https://app.clickup.com/36074068/chat/r/6-901327646617-8). (If a provisional stub already opened silently, promote that same task — don't open a second.)
 3. Begins a **chronological, speaker-labeled, back-and-forth record** in the task's comments, treating the session like a live conversation:
    - `**Michael:**` / `**Brain:**` turn labels, in order.
    - Verbatim wording ONLY where it matters (decisions, instructions, key phrasing); tight paraphrase everywhere else — a faithful, readable record, NOT a word-perfect court transcript.
@@ -158,7 +167,7 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 
 ## Rules
 
-- **Thread lives on the session TASK.** Live agent deliberation = comments on the session's task in the 🟢 Agent Activity Board. #A.I. Prompts is the backup + the home for the permanent close transcript, never the default forum for active deliberation.
+- **Thread lives on the session TASK** (🟢 Agent Activity Board, list id `901327879922`). Live agent deliberation = comments on the session's task there. #A.I. Prompts (https://app.clickup.com/36074068/chat/r/6-901327646617-8) is the backup + the home for the permanent close summary, never the default forum for active deliberation.
 - **Thread-first: the task must exist before any agent speaks.** The opening check ("Do we have a session task for this?") runs at session start; the first voice seated verifies/creates it and hands its comments to the team.
 - **Thread-only: council/Workshop agents express ONLY on the session task, never in the active session, never in a working doc.** Each posts in their own distinct voice, emoji-badge header + full-formatting body. Brain's synthesized reply + Mira's anchor line are the only things that stay live.
 - **Active session = Mira's synthesis only.** No per-agent recap in the live chat; the per-voice detail lives on the task. Mira writes in full formatting, may flag a heavy section in one pointer line, never re-lists each agent.
@@ -180,13 +189,14 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 - **Scribe Sana** (`agents/scribe-sana.md`) — the owner/operator; her profile carries the behavioral detail incl. the faithful-not-verbatim posture + backfill fallback.
 - **Maestro Mira** (`agents/maestro-mira.md`) — runs the opening "do we have a session task?" check and creates it before seating anyone.
 - **The Council** (`council.md`) — the thread-only expression rule + emoji-badge format + Mira-synthesis-only output + the Standing-agent conduct law are mirrored there.
-- **Agent Activity Board** (🟢) — the AI-sessions list Brain maintains; each session task's comment stream is the thread. Confirm the live list id against the Agent Activity Board — Gold Standard (Brain Reference) doc.
+- **Agent Activity Board** (🟢, list id `901327879922`, https://app.clickup.com/36074068/v/li/901327879922) — the AI-sessions list Brain maintains; each session task's comment stream is the thread.
 - **Decision Log hook** — the repo/doc `decision-log.md` convention (durable "why") is distinct from this live deliberation; a locked decision can land in both: synthesis + pointer in the decision log, full per-voice detail on the session task.
 
 ---
 
 ## Changelog
 
+- 2026-07-17 (h): **Fixed the phantom list id.** `901328269587` referenced no existing list; corrected to the real 🟢 Agent Activity Board `901327879922` (MAW Documents › ClickUp Use, https://app.clickup.com/36074068/v/li/901327879922). Added a Canonical pointers block with direct list + chat-fallback URLs. Prompted by Michael.
 - 2026-07-17 (f): **Retired the "never reconstruct from memory" absolute; added the close-time backfill watchdog + mid-session catch-up.** Real-time stays the goal, but a lapse now degrades to a flagged reconstructed transcript at close rather than a blank task, and a late "create the task" backfills to message 1. Added "create the task" / "start your session task" to the literal trigger list. Added the Faithful-not-verbatim rule. Close section now runs the watchdog first and routes the channel post as a summary + task pointer (per the reframed close hook). Prompted by Michael.
 - 2026-07-17 (e): **Defined session / thread / chat, and moved the live thread onto the session TASK.** "The thread" is now explicitly the comment stream on the session's task in the 🟢 Agent Activity Board list — one task per session, all live agent deliberation posts there as comments. #A.I. Prompts demoted to the backup default + the home for the long-standing permanent CLOSE transcript. Opening check reworded to "do we have a session task?"; Fire step 2 ensures/creates the board task; Close routes the dense archive to #A.I. Prompts while the live per-voice record stays on the task.
 - 2026-07-17 (d2): Emoji-badge headers + full-formatting bodies (personality restore).
