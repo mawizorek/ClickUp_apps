@@ -2,16 +2,16 @@
 
 > **What this file is:** the **phase plan** and "where are we right now" tracker for the Vectorworks base-show-file project. It defines the phases from brainstorming through closing & archiving a show, and marks the current phase.
 >
-> **Companions:** [`DECISION-LOG.md`](./DECISION-LOG.md) = the **journal** (decisions D-001..D-017, dated) · [`VWX-BEST-PRACTICES.md`](./VWX-BEST-PRACTICES.md) = research + **Standards S-1..S-6** · [`BUILD-PLAN.md`](./BUILD-PLAN.md) = the one-page build-from artifact · [`_TEMPLATE/`](./_TEMPLATE/) = the **gold-standard package skeleton** to clone. This README is the **map**.
+> **Companions:** [`DECISION-LOG.md`](./DECISION-LOG.md) = the **journal** (decisions D-001..D-022, dated) · [`VWX-BEST-PRACTICES.md`](./VWX-BEST-PRACTICES.md) = research + **Standards S-1..S-6** · [`BUILD-PLAN.md`](./BUILD-PLAN.md) = the one-page build-from artifact · [`_TEMPLATE/`](./_TEMPLATE/) = the **gold-standard package skeleton** to clone · [`smith-theatre/`](./smith-theatre/) = the **first real instance**. This README is the **map**.
 >
-> **Status: PHASE 1 — TEMPLATE BUILD.** Phase 0 planning complete (Standards S-1..S-6 adopted, D-001..D-017). The `_TEMPLATE/` documentation tree is stood up (2026-07-16). Next: clone `_TEMPLATE/` → `smith-theatre/` and begin the Smith notes/plan.
+> **Status: PHASE 2 — BASE SHOW FILE BUILD (Smith Theatre).** Phase 0 planning + Phase 1 template build complete. `_TEMPLATE/` cloned → `smith-theatre/` and per-instance placeholders filled (2026-07-16, D-018..D-022): house layer list, Smith reference-plane rule, sheet-list draft, proposed class tree. Next: Michael rules the open candidates, then build the `.vwx` from the plan.
 
 ---
 
 ## Current position
 
-**▶ Active phase: Phase 1 — Template Build.**
-The reusable package skeleton [`_TEMPLATE/`](./_TEMPLATE/) exists with all prose standards + resource docs written as RULES (not venue lists). Remaining Phase-1/handoff work: the next agent clones it for Smith and fills the per-instance placeholders (layer list, class tree, symbol inventory, sheet list).
+**▶ Active phase: Phase 2 — Base Show File Build (Smith Theatre).**
+The reusable skeleton [`_TEMPLATE/`](./_TEMPLATE/) is complete, and the first instance [`smith-theatre/`](./smith-theatre/) is authored: layers (`layers.md` + `layers.csv`), datums/reference-planes rule, sheet-layer draft, and a proposed class tree. Remaining before/at the `.vwx` build: Michael's rulings on the open candidates (class tree, sheet-numbering promotion, layer-list lock), then draft the file from the plan.
 
 ---
 
@@ -19,7 +19,7 @@ The reusable package skeleton [`_TEMPLATE/`](./_TEMPLATE/) exists with all prose
 
 The full arc, brainstorming → closing & archiving. **Ratified 2026-07-16.**
 
-### Phase 0 — Brainstorming & Planning  ✅ *complete*
+### Phase 0 — Brainstorming & Planning ✅ *complete*
 Define what the file is, what it accomplishes, and what we build. Set structure and intent in broad strokes before building schema.
 - [x] Reframe the deliverable as a versioned package (D-001)
 - [x] Repo home + `Vectorworks/` structure (D-003 / D-004)
@@ -31,14 +31,17 @@ Define what the file is, what it accomplishes, and what we build. Set structure 
 - [x] **File formats** — Markdown prose / comma-CSV manifests (D-016 / S-6)
 - [x] **Package folder/file schema** — settled in BUILD-PLAN + realized in `_TEMPLATE/`
 
-### Phase 1 — Template Build  ▶ *active*
+### Phase 1 — Template Build ✅ *complete*
 Stand up the reusable package skeleton every show file clones from. Universal standards live here (classes, layers, sheet layers, title block, drafting conventions), pointing up to MAW's general Vectorworks standards.
 - [x] **`_TEMPLATE/` documentation tree stood up** (2026-07-16) — standards/, resources/ (segmented, per-record CSV pattern), reference-notes/, reconciliation/, CHANGELOG. Every file states the RULE; venue content marked `TODO (per-instance)`.
-- [ ] Exhaustive lists (object-class tree, house layer list) — filled per-instance, deferred to the Smith build.
+- [x] **Cloned `_TEMPLATE/` → `smith-theatre/`** (2026-07-16, D-018) and filled per-instance placeholders (D-019..D-022).
 - Note: prefer **generating** the layer/class/resource manifests *from* the VWX file (worksheet/report export) over hand-transcription, so the docs stay in sync with the file. The VWX worksheet mirrors the git CSV as a *check*, never the source (S-5).
 
-### Phase 2 — Base Show File Build (Smith Theatre)
-Build the first real instance: dimensionally-accurate architecture shell, standards applied, rigging & hang positions, inventory/resources. This is the current VWX work, given a defined endpoint.
+### Phase 2 — Base Show File Build (Smith Theatre) ▶ *active*
+Build the first real instance: dimensionally-accurate architecture shell, standards applied, rigging & hang positions, inventory/resources. This is the current VWX work, given a defined endpoint. The plan is authored in [`smith-theatre/`](./smith-theatre/) (D-018..D-022); the `.vwx` is built from it.
+- [x] **Plan authored** — house layer list (D-019), Smith reference-plane rule (D-020), sheet-list draft (D-021), proposed class tree (D-022).
+- [ ] **Michael's rulings** on the open candidates (class tree, sheet-numbering promotion, layer-list lock) — see DECISION-LOG § 8 + § 10.
+- [ ] **Build the `.vwx`** from the authored plan.
 - **Rebuild risk (accepted, D-008):** file is built in VWX Educational and must eventually be re-created in a licensed version. Mitigation: **DWG export** directly from the file. As long as resources are embedded and laid out, re-importing a DWG should de-skin but bring the content back in. Keep resources embedded + cleanly laid out throughout so this path stays viable.
 
 ### Phase 3 — Package & Publish
