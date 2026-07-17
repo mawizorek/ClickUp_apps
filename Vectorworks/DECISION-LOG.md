@@ -68,7 +68,7 @@ Home: the **`mawizorek/ClickUp_apps`** repo. Git holds the **plan + documentatio
 - **Universal (lives in the template):** the class system, layer system, text/dimension/drafting standards, title-block structure, symbol conventions, and the *convention* of a Datums & Reference Planes note (D-014). Conform to MAW's general Vectorworks standards used when drafting *outside* this base file — one source of truth governs both.
 - **Per-instance (lives in the show package):** venue geometry, real dimensions and trim heights, the specific class names populated (e.g. Smith's toe/mid/high pipes), inventory selections, the actual plot, and **venue-specific reference-plane rules** (e.g. Smith's deck-off-trim / upper-off-wall behavior, D-014).
 
-**Integration principle:** the base file *conforms to* the general standards; the show package captures only what's venue-specific and **points up** to the general standard rather than duplicating it.
+**Integration principle:** the base file *conforms to* the general standards; the show package captures only what's venue-specific and **points up** to the general standard rather than duplicating it. **Exception (D-024):** naming conventions are seeded globally but kept as a **self-contained per-package copy** (allowed to drift, ships with the export) rather than a pure pointer-up.
 
 **File-topology principle (D-011):** the base file is a **dense MASTER** that department/show files **reference** (not copy) — technical method = referenced Design Layer Viewport (F-013). Venue geometry is authored once in the master and consumed downstream. See VWX-BEST-PRACTICES.md § S-2.
 
@@ -86,7 +86,7 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 
 - **Phase 0 — Brainstorming & Planning** *(complete)*: define intent + structure; includes the best-practices deep dive (D-010), the VWX-reports export design (D-009), and defining package contents/schema.
 - **Phase 1 — Template Build** *(complete)*: reusable package skeleton; universal standards.
-- **Phase 2 — Base Show File Build (Smith Theatre)** *(active)*: the accurate file itself; carries the rebuild-risk mitigation (D-008). Plan authored in git (D-019..D-023); `.vwx` follows.
+- **Phase 2 — Base Show File Build (Smith Theatre)** *(active)*: the accurate file itself; carries the rebuild-risk mitigation (D-008). Plan authored in git (D-019..D-024); `.vwx` follows.
 - **Phase 3 — Package & Publish**: assemble the bundle; version docs in git (`.vwx` excluded, D-009).
 - **Phase 4 — Per-Show Instantiation**: clone template/base per production.
 - **Phase 5 — Production Use**: designers work on the shell. *(Ownership boundary = open question.)*
@@ -100,6 +100,7 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 
 | ID | Date | Decision | Notes |
 |----|------|----------|-------|
+| D-024 | 2026-07-16 | **Naming conventions = global seed + self-contained per-package copy.** The universal naming rule is **seeded in the template README** (the global starting point every package inherits). On clone, each package carries its **own local naming copy** (`standards/naming.md` + a summary surfaced in the package README) that is **allowed to drift per venue** and **travels with the package when exported** to the file viewer. The package-local copy is the source of truth for THAT file; it states the rule in full rather than pointing up to app-level notes (which don't ship with the export). | Confirmed by Michael. Deliberate exception to the "point up, don't duplicate" integration principle (§ 5): naming drift is intentional (showfile templates may legitimately differ) and the exported bundle must be self-contained. Applied to `_TEMPLATE/` (README seed + naming.md reframe) and `smith-theatre/` (README naming section + naming.md). Canonical research stays in VWX-BEST-PRACTICES.md § F-002/F-010. |
 | D-023 | 2026-07-16 | **Propose the object-class tree** (steel/wood/framing/masking + dash-nested children) in `smith-theatre/standards/classes.md` as a per-instance **PROPOSAL**, NOT promoted to a Standard, and NO `classes.csv` authored yet. | No authoritative source list exists; the tree is a structured proposal from D-012's shape. Highest-priority open candidate; awaiting Michael's ruling. S-1: category only, no elevation. |
 | D-022 | 2026-07-16 | **Draft the full Smith per-department sheet list** in `smith-theatre/standards/sheet-layers.md` from the existing ClickUp scheme (UR/S/L/A/R/V; `0` = department readme sheet; indent = viewport). Utility/PM route under UR/notes. | Remains an **F-016 DRAFT** — promotion to a Standard needs Michael's explicit ruling + a mirrored DECISION-LOG row. |
 | D-021 | 2026-07-16 | **Record the Smith reference-plane rule** in `smith-theatre/standards/datums-and-reference-planes.md` per D-014/S-4: **deck measures off the interior trim face; mezzanine/catwalk reference the nominal wall structure.** Origin = room-center on internal origin (S-3), already built (D-013) — documented, not re-derived. **RULE only, no dimension values.** | Smith-scoped, not template. `+X/+Y` polarity vs. N/S/E/W convention still OPEN (beams run E/W). |
@@ -134,7 +135,7 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 - **Where the `.vwx` files actually live** (Box? Drive? local + referenced).
 - **Object-class tree (D-012/S-1):** the specific categories (steel / wood / framing / masking / …) + dash hierarchy. **PROPOSED** in `smith-theatre/standards/classes.md` (D-023); awaiting Michael's ruling before promotion + a `classes.csv`.
 - **House layer list (D-012/S-1):** the department × elevation set is **AUTHORED as a working draft** in `smith-theatre/standards/layers.csv` (D-020). Lock + promote to Standard on Michael's ruling; resolve the `CUT?`/import candidates.
-- **Standard Naming registration (F-010):** register the house naming as a formal custom standard in the template file? (Noted in Smith `naming.md`; pending.)
+- **Standard Naming registration (F-010):** register the house naming as a formal custom standard in the file? (Package-local naming now settled by D-024; Standard Naming registration in the VWX file still pending.)
 - **Referencing method (F-013):** confirm referenced Design Layer Viewports as the S-2 mechanism (+ same-version constraint).
 - **Phase 5–6 ownership boundary.**
 - **Template location & naming** under `Vectorworks/`.
@@ -155,6 +156,7 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 - ~~**File formats: Markdown vs .txt vs CSV; CSV delimiter**~~ → **D-016**: Markdown prose / comma-CSV manifests; worksheet-mirror is reconciliation-only.
 - ~~**Resource-capture list + resources/ segmentation**~~ → **D-017**: capture all but rendering polish; segmented files; per-record CSVs.
 - ~~**Repo log ordering: append vs prepend**~~ → **D-018**: newest-at-top, prepend.
+- ~~**Naming: global vs per-package, and does it travel with the export?**~~ → **D-024**: global seed in template + self-contained per-package copy that may drift and ships with the export.
 
 ---
 
@@ -177,4 +179,4 @@ Full lifecycle, brainstorming → closing & archiving. Canonical detail + curren
 4. Settle the **reconciliation snapshot policy** (in-repo vs throwaway).
 5. Confirm **+X/+Y polarity + N/S/E/W** off the center datum (beams run E/W).
 
-*Last updated: 2026-07-16 (D-019..D-023: Smith Theatre clone + per-instance fills; reconciled under D-018 newest-at-top ordering).*
+*Last updated: 2026-07-16 (D-024: naming = global seed + self-contained per-package copy).*
