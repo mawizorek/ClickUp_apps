@@ -15,6 +15,23 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ---
 
+## 2026-07-17 · Three-entity vocabulary: Color, Feeling, Theme(=join)
+**Decision:** The theme system is three distinct entities. **Color** = the 17-token palette (hue only). **Feeling** = a form language (fonts, sizes, radii, line weight, gradient character, shadow spec). **Theme** = the JOIN of exactly one color + one feeling, named, tracked in `_themes.json`. **Apps are skinned with a THEME, never a raw color or feeling.** Vocabulary is strict from here: the word "theme" means the join only. Documented in `THEME-SYSTEM.md`; feelings live in `feelings/`; the join table is `_themes.json`.
+**Why:** Michael's explicit modeling call. Separating form (feeling) from hue (color) and binding them through a named join makes theme growth cheap and contained: a new theme is one row pairing an existing color + existing feeling (no new tokens/files), editing a feeling once updates every theme on it, and apps point at one stable slug instead of a color+feeling they must keep in sync. This is the anti-sprawl mechanism — grow by combining, not by authoring loose templates.
+**Why (naming caveat):** the pre-existing palette layer (`mclaren.json`, `themes.css`, `data-theme`, `THEMES.apply()`) uses "theme" to mean what is now a COLOR. Flagged as a legacy mismatch to reconcile in a deliberate rename pass (touches resolve.js + every consumer); until then, existing "theme"=color in the color layer only.
+**Status:** locked
+
+## 2026-07-17 · One reference theme proven end-to-end before multiplying
+**Decision:** `sharp-mclaren` (color `mclaren` × feeling `sharp-racing`) is the FIRST and reference theme, built all the way through (feeling JSON, join row, renderer, object recipes, FMP mapping). No second feeling or theme is authored until the process is proven on this one. A feeling is `locked` or it does not exist — no half-defined drafts left to backfill. `sharp-racing` values (Chakra Petch/Inter, 3px corners, crisp shadows, 100° gradient) chosen by Brain per Michael's "I don't care exactly which" latitude; all are editable in one file since everything is contained in the feeling.
+**Why:** Michael's anti-sprawl directive: define one theme completely so a second theme or any edit becomes trivial and contained, and a cold agent has a worked example to copy rather than a pile of loose templates to reverse-engineer.
+**Status:** locked
+
+## 2026-07-17 · preview.html is the render board (pick color + feeling, see 20 objects)
+**Decision:** Overwrote `preview.html` with the render board: a "pick a theme, or mix any color × feeling" page where every one of the 20 canonical objects renders as a copy-me **spec card** (live object + its exact FileMaker recipe: fill/gradient, corner, line weight, shadow, text). Buttons carry the full state set incl. pressed=inner-shadow. Color tokens load via `resolve.js` (single source); feelings embedded with `feelings/*.json` as canonical; join loaded from `_themes.json` with inline fallback. ~27KB, under the read cap.
+**Why:** Michael wanted the single canonical page he rebuilds in FileMaker every time, not loose per-theme mockups. The spec card (shape + recipe) is the copy-me unit; the renderer proves any color×feeling composes correctly and is the acceptance surface for new themes.
+**Status:** locked
+**Supersedes:** the prior color-only `preview.html` theme×object gallery.
+
 ## 2026-07-17 · FileMaker Capability Handbook is the styling allowlist + passive gate
 **Decision:** Added `FILEMAKER-CAPABILITIES.md`: the definitive list of layout-object styling FileMaker actually supports (fill/gradient, line, per-corner radius, outer+inner shadow, padding, four object states, Styles/Themes), an explicit NOT-ALLOWED list (motion, gradient text, glassmorphism, stacked shadows, runtime color math, pseudo-elements), button-look recipes, the axis→property split, and the native rebuild workflow. It is a passive gate: any theme visual that isn't in the allowlist is out of scope, not a workaround to invent. Same handbook serves agents (building renders/replicable apps) AND Michael (native rebuild).
 **Why:** Before investing in the two-axis schema, the FileMaker-replicability constraint needed to be documented so future agents don't assume capabilities FileMaker lacks (or wrongly rule out ones it has). One instruction book both sides work from keeps the ClickUp render and the native FileMaker Theme in lockstep, and stops capability drift.

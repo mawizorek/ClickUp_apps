@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "feeling",
+  "name": "<Display Name>",
+  "slug": "<kebab-slug>",
+  "status": "draft",
+  "intendedUse": "<one line: who/what this feeling is for>",
+  "description": "<the feel in one or two sentences>",
+  "_note": "A FEELING is FORM ONLY — never color. Fill all 18 form tokens. Every value must map to a FileMaker object property (FILEMAKER-CAPABILITIES.md). Flip status to 'locked' when done. See THEME-SYSTEM.md for the authoring steps.",
+  "tokens": {
+    "font-display": "'<Display Font>', system-ui, sans-serif",
+    "font-body": "'<Body Font>', system-ui, sans-serif",
+    "radius": "<px>",
+    "radius-lg": "<px>",
+    "radius-pill": "<px | 999px>",
+    "border-w": "<px>",
+    "grad-angle": "<deg>",
+    "grad-lift": "<% lighter top stop>",
+    "grad-drop": "<% darker bottom stop>",
+    "shadow-out": "<outer shadow: one or two layers>",
+    "shadow-in": "<inset shadow>",
+    "fs-lead": "<rem>",
+    "fs-body": "<rem>",
+    "fs-sm": "<rem>",
+    "fs-xs": "<rem>",
+    "track-tight": "<em, heading tracking>",
+    "track-btn": "<em, button label tracking>",
+    "touch": "<px, min touch target>"
+  },
+  "fmpMapping": {
+    "fmTheme": "pending",
+    "font": "<installed FMP font substitution + note>",
+    "bodyPt": "<pt>",
+    "cornerRadius": "<pt>",
+    "lineWeight": "<pt>",
+    "gradient": "<angle + 2 stops off accent>",
+    "outerShadow": "<offset/blur/opacity>",
+    "innerShadow": "<inset offset/blur/opacity>"
+  }
+}

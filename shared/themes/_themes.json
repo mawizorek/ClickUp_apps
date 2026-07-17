@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "note": "THE JOIN TABLE. A THEME is one COLOR + one FEELING, named. Apps reference a THEME slug (never a raw color or feeling); it resolves to color tokens + feeling tokens. Colors live as the palette JSONs registered in _index.json; feelings live in feelings/. This file is the only place a pairing is declared.",
+  "vocabulary": {
+    "color": "entity — the 17-token palette (hue only). e.g. mclaren, papyrus.",
+    "feeling": "entity — form tokens (type, radius, line weight, gradient, shadow). e.g. sharp-racing.",
+    "theme": "JOIN — exactly one color + one feeling. The unit an app is skinned with."
+  },
+  "themes": [
+    {
+      "slug": "sharp-mclaren",
+      "name": "Sharp Racing · McLaren",
+      "color": "mclaren",
+      "feeling": "sharp-racing",
+      "status": "locked",
+      "intendedUse": "Reference build: the first fully-defined theme, proving the color×feeling pipeline end to end."
+    }
+  ]
+}

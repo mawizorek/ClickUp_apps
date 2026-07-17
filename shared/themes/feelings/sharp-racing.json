@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "kind": "feeling",
+  "name": "Sharp Racing",
+  "slug": "sharp-racing",
+  "status": "locked",
+  "intendedUse": "technical / motorsport / data-dense",
+  "description": "Pit-wall energy. Condensed display type, near-square corners, crisp tight shadows, a punchy hard-angle gradient. The first fully-defined feeling and the reference every later feeling is authored against.",
+  "_note": "A FEELING is form only (type, shape, depth, gradient character) — NEVER color. It composes with any color to form a THEME (see _themes.json). All values map to a FileMaker layout-object property per FILEMAKER-CAPABILITIES.md.",
+  "tokens": {
+    "font-display": "'Chakra Petch', system-ui, sans-serif",
+    "font-body": "'Inter', system-ui, sans-serif",
+    "radius": "3px",
+    "radius-lg": "4px",
+    "radius-pill": "4px",
+    "border-w": "1.5px",
+    "grad-angle": "100deg",
+    "grad-lift": "12%",
+    "grad-drop": "16%",
+    "shadow-out": "0 1px 2px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.35)",
+    "shadow-in": "inset 0 2px 4px oklch(0 0 0 / 0.5)",
+    "fs-lead": "1rem",
+    "fs-body": "0.875rem",
+    "fs-sm": "0.8rem",
+    "fs-xs": "0.7rem",
+    "track-tight": "-0.01em",
+    "track-btn": "0.02em",
+    "touch": "42px"
+  },
+  "fmpMapping": {
+    "fmTheme": "pending",
+    "font": "Chakra Petch (display) / Inter (body) — substitute installed equivalents; record the substitution here",
+    "bodyPt": "14pt",
+    "cornerRadius": "3pt (4pt large); pill = 4pt near-square",
+    "lineWeight": "1.5pt",
+    "gradient": "linear, 100 degrees, 2 stops (+12% lift top / -16% drop bottom off the accent)",
+    "outerShadow": "offset y2, blur6, opacity 35% (crisp)",
+    "innerShadow": "inset offset y2, blur4, opacity 50% (pressed / focus inset)"
+  }
+}
