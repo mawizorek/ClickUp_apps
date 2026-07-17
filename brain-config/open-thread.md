@@ -31,6 +31,30 @@ Every new open-thread entry uses the exact shape below. Copy the block, fill eve
 
 ---
 
+## [OPEN] Agent folder upgrade — promote flat `<slug>.md` profiles to slug-keyed folders (spec ready, not built)
+
+- **ID:** OT-2026-07-17-5
+- **Logged:** 2026-07-17 18:06 ET
+- **Session:** https://app.clickup.com/t/86ajkbr63 (Agent Activity Board task — full transcript)
+- **Urgency:** 🟡 Medium
+- **Item:** Audit Anna's profile ballooned to ~35KB in one session and became unloadable, exposing that single-file agent profiles don't survive iteration. Proposal (spec'd + Workshop-vetted + Frank-ruled): promote each agent from a flat `<slug>.md` to a **folder keyed by slug** holding `preferences.md` (the lean profile — the ONE load-to-embody file) + `change-log.md` + `decision-log.md` (created on first use) + `memory.md` (Super Agent memory-file style, created on first use) + `metadata.json` (moved in). Fold-in Frank: this is FOLD-IN / PARTIALLY-EXISTS — six agents ALREADY have slug folders (closing-clio, handoff-hana, memory-maggie, recon-renata, scout-sage, workshop-wes) and closing-clio already has a `reports/` subdir; formalize the half-adopted pattern, don't reinvent. Storage reorg ONLY — no agent's behavior changes.
+- **Next action:** Answer the 5 open questions at the bottom of the spec WITH Michael (entry filename, agent-memory vs brain-memory boundary, empty-stubs vs create-on-use, big-bang vs dual-resolver, whether tiny lens agents earn folders), THEN author `_template-agent/` and migrate Audit Anna FIRST as the reference. The full cold-agent handoff prompt was delivered in the Anna session chat (2026-07-17 ~6:06 ET).
+- **Refs:** spec `brain-config/specs/agent-folder-upgrade.md` (PR #360); blast-radius surfaces = `registry.json` (generated, repoint `profile` fields), `council.md`, AI Toolkit index trigger table, viewer read paths (`index.html`/`tool-index.html`/`custom-tools.html`); `brain-config/agents/_template.md` + `_template-tool/` as skeleton precedent; session log https://app.clickup.com/36074068/chat/r/6-901327646617-8
+
+---
+
+## [OPEN] Audit Anna profile size — ~17.6KB, still over the 15KB target (Michael-tabled)
+
+- **ID:** OT-2026-07-17-6
+- **Logged:** 2026-07-17 18:06 ET
+- **Session:** https://app.clickup.com/t/86ajkbr63
+- **Urgency:** 🟢 Low
+- **Item:** Audit Anna (`brain-config/agents/audit-anna.md`) is LOCKED at v11 after a condense pass took her ~35KB → ~17.6KB with zero behavior lost. Still ~2.6KB over the 15KB split-line target. Michael explicitly TABLED this — leave the profile alone for now, revisit deliberately with another agent. A natural condense got most of the way; the remaining slim likely comes from the agent-folder upgrade (OT-2026-07-17-5) moving her changelog/history OUT to a sibling `change-log.md`, rather than cutting any rule. Do NOT cut behavioral rules to hit the number.
+- **Next action:** Fold this into the agent-folder migration — when Anna is migrated (she's the pilot), move her change-log + refinement history to `change-log.md` and confirm `preferences.md` lands under 15KB. Only pursue a standalone trim if the folder move doesn't get there.
+- **Refs:** `brain-config/agents/audit-anna.md` (v11, PR #353); ties to OT-2026-07-17-5; session task https://app.clickup.com/t/86ajkbr63
+
+---
+
 ## [OPEN] Theme system — 4-vector matrix: preview expansion handoff + carried follow-ups
 
 - **ID:** OT-2026-07-17-1
