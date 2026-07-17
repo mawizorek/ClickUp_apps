@@ -4,6 +4,18 @@ Newest on top. Each entry = a decision made + why, so a cold agent reconstructs 
 
 ---
 
+## 2026-07-16 - Report becomes the landing page; matrix demoted, untouched
+
+- **Decision:** the next build makes `pages/report.html` the NEW landing page (index points at it). The field-capture matrix stays **byte-for-byte unedited** and lives on as the second page at `#matrix` - the direct read-out.
+- **Why:** the report is what Michael acts on; the matrix is a reference/audit view. Lead with the actionable surface, keep the raw data grid one click away.
+- **Exact edits (no improvising):** in `index.html`, `DEFAULT_PAGE` -> `report`; add `{route:"report",label:"Report"}` FIRST in `NAV`; bump version/PR. Nothing else. `matrix.html` is not opened.
+
+## 2026-07-16 - NO auth / no GitHub Action (LOCKED)
+
+- **Decision:** do NOT set up Gmail OAuth for a GitHub Action to auto-pull. Brain writes the data in-session on a dictated plan. Built-in API pulls stay available for in-app tricks (live "open in Gmail" links, on-demand refresh), NOT for a background CI heartbeat.
+- **Why:** a sweep is on-demand (Michael initiates "clean my inbox"), not a background need. Auth is fragile: a refresh token rots (~6mo idle, or on any Google password change / re-auth), and a dead cron fails silently -> stale data nobody's watching. The dupe-catch + historical-log logic is judgment, which cron is worst at and Brain is best at. Paying the auth-fragility tax to automate a thing Michael triggers is a bad trade.
+- **Consequence for docs:** reliability comes from crystal-clear hook/spec instructions an agent follows exactly (edit-not-improvise), not from a CI pipeline. Keep honing those instructions.
+
 ## 2026-07-16 - v2: rebuilt as a true template copy (CORRECTION)
 
 - **Decision:** scrap the hand-rolled shell; copy `template-app` wholesale, then skin. Standard going forward: **every new app copies the gold-standard template folder verbatim (index shell + chrome.js + styles.css + manifest + icon + pages/), then adds pages. Never hand-roll a shell.**
