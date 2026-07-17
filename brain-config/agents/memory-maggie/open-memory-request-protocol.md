@@ -26,20 +26,30 @@ The fix: one public queue any agent drops requests into, plus a single batch tri
 
 ---
 
-## The queue
+## The two doors
 
-- Lives at `brain-config/open-memory-requests.md` (sibling to `open-thread.md` + `session-board.md`).
-- Any agent that wants something remembered but cannot / should not land it appends **one** entry. No write access to the destination needed: just append to the queue.
-- The queue is a **dumping ground, not the memory.** Nothing in it is "remembered" until Maggie places it. An OMR entry is a request, not a commitment.
-- Distinct from its neighbors: OMR = memory-write candidates; `open-thread.md` = durable pending work; `session-board.md` = live presence. Never mix them.
+The workflow is deliberately split across two sessions so a request costs nothing to file and gets real gatekeeping when it's drained.
+
+**Door 1 — DROP (write side, any agent, mid-session).** Michael (or Brain, or any agent) says some variant of:
+
+> "Add that to the open memory log."
+
+Also: "drop that in the open memory requests," "log a memory request," "OMR that." On this phrase the CURRENT agent — whoever it is, Maggie need not be present — appends ONE entry to `brain-config/open-memory-requests.md` and does nothing else. It does NOT place the note, does NOT touch `/PREFERENCES.md`, does NOT judge the destination. Filing a request is free and unprivileged; placement is not.
+
+**Door 2 — DRAIN (read side, Maggie, fresh session).** In a new session Michael says:
+
+> "Open as Memory Maggie" → then "run your thing on the open memory requests" (or just "open as Maggie and clear the memory log").
+
+"Open as Memory Maggie" loads this protocol + her profile as the session's operating identity; the drain trigger then processes the whole queue through the Placement Triage Gate below. Opening as Maggie with a non-empty queue should surface the pending count immediately, even before the explicit drain phrase.
 
 ---
 
-## The trigger
+## The queue
 
-> "Run your thing on the open memory requests."
-
-(Also: "process the OMR queue," "clear the memory requests.") Maggie reads every OPEN entry and processes the whole batch in one pass. This is the replacement for per-request hand-copying.
+- Lives at `brain-config/open-memory-requests.md` (sibling to `open-thread.md` + `session-board.md`).
+- Any agent that wants something remembered but cannot / should not land it appends **one** entry via Door 1. No write access to the destination needed: just append to the queue.
+- The queue is a **dumping ground, not the memory.** Nothing in it is "remembered" until Maggie places it. An OMR entry is a request, not a commitment.
+- Distinct from its neighbors: OMR = memory-write candidates; `open-thread.md` = durable pending work; `session-board.md` = live presence. Never mix them.
 
 ---
 
@@ -79,7 +89,7 @@ Rules that bind the gate:
 ## Boundaries
 
 - The queue holds **memory-write candidates only.**
-- **Maggie owns disposition.** Other agents write requests; they never self-approve placement into brain memory.
+- **Maggie owns disposition.** Other agents write requests (Door 1); they never self-approve placement into brain memory.
 - This does not change her session-close Memory Audit; a run may feed it ("N requests placed this session").
 
 ---
@@ -87,3 +97,4 @@ Rules that bind the gate:
 ## Changelog
 
 - 2026-07-17 (created) — Public Open Memory Request queue + batch trigger ("run your thing on the open memory requests") + Placement Triage Gate (deny-by-default for brain memory). Operationalizes the existing "Maggie decides placement, not requester / Edit Guard placement test overrides 'put in memory' framing" doctrine into a standing queue Michael no longer has to hand-copy. (Michael's directive.)
+- 2026-07-17 (two doors) — Named the two invocation phrases explicitly: Door 1 DROP ("add that to the open memory log," any agent, appends to the queue) and Door 2 DRAIN ("open as Memory Maggie" → "run your thing on the open memory requests," fresh session). Opening as Maggie with a non-empty queue surfaces the pending count up front.
