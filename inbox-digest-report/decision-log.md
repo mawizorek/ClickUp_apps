@@ -4,6 +4,18 @@ Newest on top. Each entry = a decision made + why, so a cold agent reconstructs 
 
 ---
 
+## 2026-07-17 - v4: app is a PURE RENDERER; data lives ONLY in inbox-state.json
+
+- **Decision:** `pages/report.html` no longer contains any email data. It fetches `data/inbox-state.json` and renders it. **A sweep refresh edits ONLY that JSON — never the renderer, index, or CSS.** This is the ONLY Gmail workflow we're building right now.
+- **Why:** v3–v3.2 hardcoded each sweep into the HTML, so “refresh the dashboard” kept meaning “re-edit the renderer.” That's backwards and error-prone. The renderer is a fixed view; the inbox state is data. Separating them means a refresh is a single small JSON rewrite with zero HTML risk, and the data file doubles as the handoff-safe audit trail.
+- **What shipped:**
+  - `pages/report.html` = pure renderer (fetch + build the five buckets from the JSON; graceful empty/parse-error state). A loud header comment forbids hardcoding data in it.
+  - `data/inbox-state.json` = the rolling sweep state (seeded with the Jul 17 8-thread sweep).
+  - `data/README.md` = standalone FIELD SPEC dictating every available field, the bucket enum, the `state`→pill map, and the locked `in:inbox` slop-query format. This is the component to read before editing the JSON.
+  - `index.html` router now re-executes page `<script>` tags after injecting a fragment (innerHTML doesn't run scripts). Shell bumped v3.2 → v4. This router capability is generic and should fold back into `template-app`.
+  - `brain-config/hooks/gmail-inbox-sweep.md` gained a DATA WRITE PROTOCOL: the sweep's only artifact is the JSON, edited per `data/README.md`; the renderer is never touched.
+- **Locked:** the app is a renderer of `inbox-state.json`, period. Available fields are dictated in `data/README.md`. Touching the Gmail read tool for a sweep = rewrite the JSON, nothing else.
+
 ## 2026-07-16 - Slop clear query MUST be scoped to `in:inbox` (v3.1 bugfix)
 
 - **Decision:** the one-click slop clear block is always `in:inbox from:(a OR b OR c)`, never a bare `from:(...)`. This scoping is now part of the locked report format.

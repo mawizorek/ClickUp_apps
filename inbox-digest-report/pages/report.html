@@ -1,169 +1,139 @@
-<!-- report.html - Gmail Clean-into-ClickUp Pipeline Report. The acting surface for a
-     sweep: five locked buckets (every header always renders, empty = none), inline live
-     gmail_url links + destination task links, slop grouped with a one-click clear block,
-     and an inbox-zero scoreboard. Two-phase spine: renders as PLAN (pending greenlight)
-     or as an EXECUTED audit, told apart by a per-row status pill.
-     v3.2 skin: spreadsheet-dashboard, mobile-primary. Styling lives in the REPORT
-     ADDITIONS block of styles.css; every color is a theme token. Data is hardcoded per
-     sweep here (the data/inbox-state.json fetch is a later build).
-     DATA: Jul 17 2026 sweep, 8 inbox threads. PLAN state, pending greenlight.
-     v3.1: slop clear query scoped with in:inbox - a bare from:() searches ALL mail. -->
+<!-- report.html - PURE RENDERER. Renders 100% from ./data/inbox-state.json.
+     ================================================================
+     NOTHING in this file is hardcoded email data. Do NOT add email rows, threads,
+     senders, buckets, or a slop query here. There is exactly one place inbox data
+     lives: inbox-digest-report/data/inbox-state.json (field spec: data/README.md).
+     To refresh the dashboard, edit ONLY that JSON. If you are about to paste email
+     content into this file, STOP - it belongs in the JSON. This file is the VIEW;
+     the JSON is the DATA; they never mix.
+     The router (index.html) re-executes this <script> after injecting the fragment,
+     so the fetch below runs on every navigation to #report.
+     Skin: v3.2 spreadsheet-dashboard (.rpt-* in styles.css REPORT ADDITIONS block);
+     every color a theme token. -->
 <section class="page report">
   <h1>Gmail &rarr; ClickUp Pipeline</h1>
   <p class="lead">Five buckets, one click-list: what to merge, reply, forward, archive, and delete to drive the inbox to zero. Brain reads, searches, and drafts; every state change (mark read, archive, forward, send) is your click. This report never claims a click already happened.</p>
+  <div id="rpt-root"><p class="rpt-empty">Loading the latest sweep&hellip;</p></div>
+  <script>
+  (function () {
+    var root = document.getElementById("rpt-root");
+    if (!root) return;
+    fetch("./data/inbox-state.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(render)
+      .catch(function () {
+        root.innerHTML = '<div class="rpt-note"><b>No sweep data.</b> This report renders entirely from <code>data/inbox-state.json</code>. Confirm the file exists and is valid JSON.</div>';
+      });
 
-  <div class="rpt-meta">
-    <span>swept <b>Jul 17 &middot; 5:13 AM</b></span>
-    <span>threads <b>8</b></span>
-    <span>inbox <b>8 &rarr; 0</b></span>
-    <span>phase <b>PLAN</b></span>
-  </div>
+    function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 
-  <div class="rpt-note"><b>PLAN &mdash; nothing has changed in Gmail yet.</b> Awaiting your greenlight. On &ldquo;go,&rdquo; Brain merges keeper content byte-for-byte into the destination task and parks any drafts; you forward attachments, archive, and clear slop. Each row's status pill tells a plan apart from a done audit at a glance.</div>
+    var STATE = {
+      merge_pending:   ["warn","merge"],
+      reply_pending:   ["warn","reply"],
+      forward_pending: ["warn","forward"],
+      archive_ready:   ["info","archive"],
+      delete_ready:    ["bad","delete"],
+      merged:          ["good","merged"],
+      archived:        ["good","archived"],
+      deleted:         ["good","deleted"]
+    };
+    var BUCKETS = [
+      { key:"TO_MERGE",        col3:"Plan \u2192 destination", cls:"good" },
+      { key:"NEEDS_REPLY",     col3:"Plan \u2192 destination", cls:"info" },
+      { key:"HAS_ATTACHMENTS", col3:"Plan \u2192 destination", cls:"warn" },
+      { key:"ALREADY_HANDLED", col3:"Note",                    cls:"good" },
+      { key:"SLOP",            col3:"Type",                    cls:"bad"  }
+    ];
 
-  <div class="rpt-legend">
-    <span class="chip k-pending"><span class="dot"></span><b>pending</b> awaiting go</span>
-    <span class="chip k-merged"><span class="dot"></span><b>merged</b> captured</span>
-    <span class="chip k-archived"><span class="dot"></span><b>archived</b> your click</span>
-    <span class="chip k-delete"><span class="dot"></span><b>delete</b> slop</span>
-  </div>
+    function pill(state){ var m=STATE[state]||["info",esc(state)]; return '<span class="badge '+m[0]+'">'+m[1]+'</span>'; }
 
-  <div class="rpt-block">
-    <div class="rpt-head"><span class="rpt-title">TO_MERGE</span><span class="badge good rpt-count">1 keeper</span></div>
-    <table class="rpt">
-      <colgroup><col class="c-status"><col class="c-email"><col></colgroup>
-      <thead><tr><th>Status</th><th>Email</th><th>Plan &rarr; destination</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><span class="badge warn">pending</span></td>
-          <td>
-            <span class="em-from">Maya Kleinsorge</span>
-            <span class="em-subj">Re: M Wizorek- Welcome from OP CoMa</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d92dde485cce" target="_blank" rel="noopener">open in Gmail &#8599;</a>
-          </td>
-          <td>
-            COMBINE the closing reply (&ldquo;No worries, we trusted you'd be here! Safe travels and see you soon!&rdquo;) as a verbatim comment onto the onsite thread, then archive.
-            <span class="tag thread-multi plan-tag">new task: Ogunquit Playhouse &mdash; Onsite / CoMa</span>
-            <span class="plan-note">proposed home &mdash; confirm or repoint on greenlight. The 2 image.png are signature/logo images, not files to forward.</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    function emailCell(e){
+      return '<span class="em-from">'+esc(e.sender)+'</span>'+
+             '<span class="em-subj">'+esc(e.subject)+'</span>'+
+             (e.gmail_url?'<a class="em-link" href="'+esc(e.gmail_url)+'" target="_blank" rel="noopener">open in Gmail \u2197</a>':'');
+    }
+    function thirdCell(e){
+      var h=esc(e.plan||"");
+      if(e.dest_task_url && e.dest_task_title){ h+=' <a class="dest" href="'+esc(e.dest_task_url)+'" target="_blank" rel="noopener">'+esc(e.dest_task_title)+' \u2197</a>'; }
+      else if(e.dest_task_title){ h+=' <span class="tag thread-multi plan-tag">new task: '+esc(e.dest_task_title)+'</span>'; }
+      if(e.plan_note){ h+='<span class="plan-note">'+esc(e.plan_note)+'</span>'; }
+      return h;
+    }
+    function rowHtml(e){ return '<tr><td>'+pill(e.state)+'</td><td>'+emailCell(e)+'</td><td>'+thirdCell(e)+'</td></tr>'; }
 
-  <div class="rpt-block">
-    <div class="rpt-head"><span class="rpt-title">NEEDS_REPLY</span><span class="badge info rpt-count">0</span></div>
-    <div class="rpt-empty">none</div>
-  </div>
+    function countBadge(b,n){
+      var label=(b.key==="TO_MERGE" && n>0)?(n+' keeper'+(n>1?'s':'')):String(n);
+      return '<span class="badge '+b.cls+' rpt-count">'+label+'</span>';
+    }
+    function slopSub(rows){
+      var g={},order=[];
+      rows.forEach(function(e){ var k=e.sender||"?"; if(!g[k]){g[k]={t:e.slop_group||"slop",n:0};order.push(k);} g[k].n++; });
+      var chips=order.map(function(k){ return '<span class="chip off"><span class="dot"></span>'+esc(g[k].t)+' <b>'+esc(k)+' ('+g[k].n+')</b></span>'; }).join("");
+      return '<div class="rpt-sub"><div class="coverage">'+chips+'</div></div>';
+    }
+    function block(b,emails){
+      var rows=emails.filter(function(e){return e.bucket===b.key;});
+      var head='<div class="rpt-head"><span class="rpt-title">'+b.key+'</span>'+countBadge(b,rows.length)+'</div>';
+      if(!rows.length) return '<div class="rpt-block">'+head+'<div class="rpt-empty">none</div></div>';
+      var sub=(b.key==="SLOP")?slopSub(rows):"";
+      var body='<table class="rpt"><colgroup><col class="c-status"><col class="c-email"><col></colgroup>'+
+        '<thead><tr><th>Status</th><th>Email</th><th>'+b.col3+'</th></tr></thead><tbody>'+rows.map(rowHtml).join("")+'</tbody></table>';
+      return '<div class="rpt-block">'+head+sub+body+'</div>';
+    }
 
-  <div class="rpt-block">
-    <div class="rpt-head"><span class="rpt-title">HAS_ATTACHMENTS</span><span class="badge warn rpt-count">1</span></div>
-    <table class="rpt">
-      <colgroup><col class="c-status"><col class="c-email"><col></colgroup>
-      <thead><tr><th>Status</th><th>Email</th><th>Plan &rarr; destination</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><span class="badge warn">pending</span></td>
-          <td>
-            <span class="em-from">Joe</span>
-            <span class="em-subj">Fw: WisDOT Noise Barrier Vote &mdash; Board Recommendation Enclosed</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d2243882b70c" target="_blank" rel="noopener">open in Gmail &#8599;</a>
-          </td>
-          <td>
-            The real source email, carrying the 3 files (<b>Wisconsin DOT.pdf</b>, Noise analysis for barrier.jpg, Benefited Receptors.jpg). Content is already on the task; to land the files, forward this to the task's email-in address, THEN archive.
-            <a class="dest" href="https://app.clickup.com/t/36074068/86ajjz72e" target="_blank" rel="noopener">Vote on WisDOT noise barrier &mdash; Great Wolf Lodge condo &#8599;</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    function fmtSwept(iso){
+      if(!iso) return "\u2014";
+      var d=new Date(iso); if(isNaN(d.getTime())) return esc(iso);
+      var mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()];
+      var h=d.getHours(),m=d.getMinutes(),ap=h<12?"AM":"PM"; h=h%12||12; m=(m<10?"0":"")+m;
+      return mo+" "+d.getDate()+" \u00b7 "+h+":"+m+" "+ap;
+    }
 
-  <div class="rpt-block">
-    <div class="rpt-head"><span class="rpt-title">ALREADY_HANDLED</span><span class="badge good rpt-count">2</span></div>
-    <table class="rpt">
-      <colgroup><col class="c-status"><col class="c-email"><col></colgroup>
-      <thead><tr><th>Status</th><th>Email</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><span class="badge info">archive</span></td>
-          <td>
-            <span class="em-from">Google</span>
-            <span class="em-subj">Security alert &mdash; new sign-in</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6dd74e82e6c05" target="_blank" rel="noopener">open in Gmail &#8599;</a>
-          </td>
-          <td>Informational &mdash; your own new sign-in. Nothing to capture; safe to archive.</td>
-        </tr>
-        <tr>
-          <td><span class="badge info">archive</span></td>
-          <td>
-            <span class="em-from">Airbnb</span>
-            <span class="em-subj">Log in to Airbnb to keep your account</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6ede77843138d" target="_blank" rel="noopener">open in Gmail &#8599;</a>
-          </td>
-          <td>Dormant-account nudge. No task. If you want to keep the account, log in once; otherwise safe to archive.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    function render(d){
+      d=d||{}; var s=d.sweep||{}, emails=Array.isArray(d.emails)?d.emails:[];
+      var isPlan=!s.status || /PLAN/i.test(s.status);
+      var before=(s.inbox_before!=null)?s.inbox_before:emails.length;
+      var after=(s.inbox_projected_after!=null)?s.inbox_projected_after:0;
 
-  <div class="rpt-block">
-    <div class="rpt-head"><span class="rpt-title">SLOP</span><span class="badge bad rpt-count">4</span></div>
-    <div class="rpt-sub">
-      <div class="coverage">
-        <span class="chip off"><span class="dot"></span>scam <b>Risk Thresholds (1)</b></span>
-        <span class="chip off"><span class="dot"></span>scam <b>Nexus Risk Lab (1)</b></span>
-        <span class="chip off"><span class="dot"></span>newsletter <b>Lightwright (1)</b></span>
-        <span class="chip off"><span class="dot"></span>promo <b>Plex (1)</b></span>
-      </div>
-    </div>
-    <table class="rpt">
-      <colgroup><col class="c-status"><col class="c-email"><col></colgroup>
-      <thead><tr><th>Status</th><th>Email</th><th>Type</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><span class="badge bad">delete</span></td>
-          <td>
-            <span class="em-from">Marcus Vane via Risk Thresholds</span>
-            <span class="em-subj">The Number One Way to Play Gold</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6f1c22df07b45" target="_blank" rel="noopener">open in Gmail &#8599;</a>
-          </td>
-          <td>scam &mdash; Cyrillic-lookalike click-here evasion</td>
-        </tr>
-        <tr>
-          <td><span class="badge bad">delete</span></td>
-          <td>
-            <span class="em-from">Nexus Risk Lab</span>
-            <span class="em-subj">Positions Available</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d82d30d808c2" target="_blank" rel="noopener">open in Gmail &#8599;</a>
-          </td>
-          <td>scam &mdash; Cyrillic-lookalike click-here evasion</td>
-        </tr>
-        <tr>
-          <td><span class="badge bad">delete</span></td>
-          <td>
-            <span class="em-from">Lightwright</span>
-            <span class="em-subj">What's New at Lightwright</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19ee0f2c4335aaa4" target="_blank" rel="noopener">open in Gmail &#8599;</a>
-          </td>
-          <td>newsletter &mdash; product marketing</td>
-        </tr>
-        <tr>
-          <td><span class="badge bad">delete</span></td>
-          <td>
-            <span class="em-from">Plex</span>
-            <span class="em-subj">Reminder | Lifetime Plex Pass pricing increases July 1</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19edc0cc2d950440" target="_blank" rel="noopener">open in Gmail &#8599;</a>
-          </td>
-          <td>promo &mdash; pricing reminder</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+      var meta='<div class="rpt-meta">'+
+        '<span>swept <b>'+fmtSwept(s.swept_at)+'</b></span>'+
+        '<span>threads <b>'+(s.threads_reviewed!=null?s.threads_reviewed:emails.length)+'</b></span>'+
+        '<span>inbox <b>'+before+' \u2192 '+after+'</b></span>'+
+        '<span>phase <b>'+(isPlan?"PLAN":"EXECUTED")+'</b></span>'+
+      '</div>';
 
-  <div class="rpt-note"><b>One-click slop clear.</b> Tap the line to select it, paste into Gmail search, select all, delete. Scoped to <code>in:inbox</code> on purpose: a bare <code>from:()</code> searches ALL mail (archive + every label) and would sweep up account records and receipts from the same senders.
-    <code class="rpt-q">in:inbox from:(voice@cast.riskthresholds.com OR beacon@sentinel.nexusrisklab.com OR marketing@lightwright.com OR hello@m.plex.tv)</code>
-  </div>
+      var note=isPlan
+        ? '<div class="rpt-note"><b>PLAN \u2014 nothing has changed in Gmail yet.</b> Awaiting your greenlight. On &ldquo;go,&rdquo; Brain merges keeper content byte-for-byte into the destination task and parks any drafts; you forward attachments, archive, and clear slop. Each row\u2019s status pill tells a plan apart from a done audit at a glance.</div>'
+        : '<div class="rpt-note"><b>EXECUTED audit.</b> The merges + drafts ran; the pills below record what landed. Any archive / forward / delete clicks marked done were yours.</div>';
 
-  <div class="rpt-score"><b>Inbox: 8 &rarr; 0</b> projected on greenlight &middot; 1 merged + archived &middot; 1 forwarded + archived &middot; 2 archived &middot; 4 deleted.</div>
-  <p class="foot-hint">PLAN state: no Gmail changes made. Greenlight to run the merge; the archive, forward, and delete clicks are yours. Data is the Jul 17 5:13 AM sweep (8 inbox threads), hardcoded here; the live <code>data/inbox-state.json</code> feed is the next build.</p>
+      var legend='<div class="rpt-legend">'+
+        '<span class="chip k-pending"><span class="dot"></span><b>pending</b> awaiting go</span>'+
+        '<span class="chip k-merged"><span class="dot"></span><b>merged</b> captured</span>'+
+        '<span class="chip k-archived"><span class="dot"></span><b>archive</b> your click</span>'+
+        '<span class="chip k-delete"><span class="dot"></span><b>delete</b> slop</span>'+
+      '</div>';
+
+      var blocks=BUCKETS.map(function(b){return block(b,emails);}).join("");
+
+      var slop='';
+      if(d.slop_delete_query){
+        slop='<div class="rpt-note"><b>One-click slop clear.</b> Tap the line to select it, paste into Gmail search, select all, delete. Scoped to <code>in:inbox</code> on purpose: a bare <code>from:()</code> searches ALL mail (archive + every label) and would sweep up account records and receipts from the same senders.'+
+          '<code class="rpt-q">'+esc(d.slop_delete_query)+'</code></div>';
+      }
+
+      function c(k){return emails.filter(function(e){return e.bucket===k;}).length;}
+      var parts=[];
+      if(c("TO_MERGE"))parts.push(c("TO_MERGE")+" to merge");
+      if(c("NEEDS_REPLY"))parts.push(c("NEEDS_REPLY")+" to reply");
+      if(c("HAS_ATTACHMENTS"))parts.push(c("HAS_ATTACHMENTS")+" to forward");
+      if(c("ALREADY_HANDLED"))parts.push(c("ALREADY_HANDLED")+" to archive");
+      if(c("SLOP"))parts.push(c("SLOP")+" to delete");
+      var score='<div class="rpt-score"><b>Inbox: '+before+' \u2192 '+after+'</b>'+(isPlan?" projected on greenlight":"")+(parts.length?" \u00b7 "+parts.join(" \u00b7 "):"")+'.</div>';
+
+      var foot='<p class="foot-hint">Rendered from <code>data/inbox-state.json</code> (swept '+fmtSwept(s.swept_at)+', '+esc(s.swept_by||"Brain")+'). Pure renderer: to refresh, edit that JSON only.</p>';
+
+      root.innerHTML=meta+note+legend+blocks+slop+score+foot;
+    }
+  })();
+  </script>
 </section>
