@@ -3,21 +3,19 @@
      gmail_url links + destination task links, slop grouped with a one-click clear block,
      and an inbox-zero scoreboard. Two-phase spine: renders as PLAN (pending greenlight)
      or as an EXECUTED audit, told apart by a per-row status pill.
-     v3.2 skin: spreadsheet-dashboard, mobile-primary. Each bucket is a titled grid block
-     (header bar connected to its table), sharp corners, connected gridlines, dense mono
-     labels. Styling lives in the REPORT ADDITIONS block of styles.css; every color is a
-     theme token (.rpt-*, plus template .badge/.chip/.tag squared on .report). The Jul 16
-     2026 sweep (same 5 threads as pages/matrix.html) is hardcoded for this build - the
-     data/inbox-state.json fetch is a later build.
+     v3.2 skin: spreadsheet-dashboard, mobile-primary. Styling lives in the REPORT
+     ADDITIONS block of styles.css; every color is a theme token. Data is hardcoded per
+     sweep here (the data/inbox-state.json fetch is a later build).
+     DATA: Jul 17 2026 sweep, 8 inbox threads. PLAN state, pending greenlight.
      v3.1: slop clear query scoped with in:inbox - a bare from:() searches ALL mail. -->
 <section class="page report">
   <h1>Gmail &rarr; ClickUp Pipeline</h1>
   <p class="lead">Five buckets, one click-list: what to merge, reply, forward, archive, and delete to drive the inbox to zero. Brain reads, searches, and drafts; every state change (mark read, archive, forward, send) is your click. This report never claims a click already happened.</p>
 
   <div class="rpt-meta">
-    <span>swept <b>Jul 16 &middot; 9:28 PM</b></span>
-    <span>threads <b>5</b></span>
-    <span>inbox <b>5 &rarr; 0</b></span>
+    <span>swept <b>Jul 17 &middot; 5:13 AM</b></span>
+    <span>threads <b>8</b></span>
+    <span>inbox <b>8 &rarr; 0</b></span>
     <span>phase <b>PLAN</b></span>
   </div>
 
@@ -44,9 +42,9 @@
             <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d92dde485cce" target="_blank" rel="noopener">open in Gmail &#8599;</a>
           </td>
           <td>
-            COMBINE onsite logistics (driving up, onsite tomorrow evening, Cabin 11 with Nick) as a verbatim comment, then archive.
+            COMBINE the closing reply (&ldquo;No worries, we trusted you'd be here! Safe travels and see you soon!&rdquo;) as a verbatim comment onto the onsite thread, then archive.
             <span class="tag thread-multi plan-tag">new task: Ogunquit Playhouse &mdash; Onsite / CoMa</span>
-            <span class="plan-note">proposed home &mdash; confirm or repoint on greenlight</span>
+            <span class="plan-note">proposed home &mdash; confirm or repoint on greenlight. The 2 image.png are signature/logo images, not files to forward.</span>
           </td>
         </tr>
       </tbody>
@@ -59,25 +57,20 @@
   </div>
 
   <div class="rpt-block">
-    <div class="rpt-head"><span class="rpt-title">HAS_ATTACHMENTS</span><span class="badge info rpt-count">0</span></div>
-    <div class="rpt-empty">none<span class="att-src">Thread 03's source carried 3 files before it became the ingested-flag draft, so there is nothing left to forward.</span></div>
-  </div>
-
-  <div class="rpt-block">
-    <div class="rpt-head"><span class="rpt-title">ALREADY_HANDLED</span><span class="badge good rpt-count">1</span></div>
+    <div class="rpt-head"><span class="rpt-title">HAS_ATTACHMENTS</span><span class="badge warn rpt-count">1</span></div>
     <table class="rpt">
       <colgroup><col class="c-status"><col class="c-email"><col></colgroup>
-      <thead><tr><th>Status</th><th>Email</th><th>Note &rarr; destination</th></tr></thead>
+      <thead><tr><th>Status</th><th>Email</th><th>Plan &rarr; destination</th></tr></thead>
       <tbody>
         <tr>
-          <td><span class="badge good">merged</span></td>
+          <td><span class="badge warn">pending</span></td>
           <td>
             <span class="em-from">Joe</span>
-            <span class="em-subj">Fwd: [INGESTED to ClickUp] WisDOT Noise Barrier Vote</span>
-            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d76ff55e0a85" target="_blank" rel="noopener">open in Gmail &#8599;</a>
+            <span class="em-subj">Fw: WisDOT Noise Barrier Vote &mdash; Board Recommendation Enclosed</span>
+            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6d2243882b70c" target="_blank" rel="noopener">open in Gmail &#8599;</a>
           </td>
           <td>
-            Already ingested &mdash; this thread is the ingested-flag draft. Safe to archive now.
+            The real source email, carrying the 3 files (<b>Wisconsin DOT.pdf</b>, Noise analysis for barrier.jpg, Benefited Receptors.jpg). Content is already on the task; to land the files, forward this to the task's email-in address, THEN archive.
             <a class="dest" href="https://app.clickup.com/t/36074068/86ajjz72e" target="_blank" rel="noopener">Vote on WisDOT noise barrier &mdash; Great Wolf Lodge condo &#8599;</a>
           </td>
         </tr>
@@ -86,9 +79,38 @@
   </div>
 
   <div class="rpt-block">
-    <div class="rpt-head"><span class="rpt-title">SLOP</span><span class="badge bad rpt-count">3</span></div>
+    <div class="rpt-head"><span class="rpt-title">ALREADY_HANDLED</span><span class="badge good rpt-count">2</span></div>
+    <table class="rpt">
+      <colgroup><col class="c-status"><col class="c-email"><col></colgroup>
+      <thead><tr><th>Status</th><th>Email</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="badge info">archive</span></td>
+          <td>
+            <span class="em-from">Google</span>
+            <span class="em-subj">Security alert &mdash; new sign-in</span>
+            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6dd74e82e6c05" target="_blank" rel="noopener">open in Gmail &#8599;</a>
+          </td>
+          <td>Informational &mdash; your own new sign-in. Nothing to capture; safe to archive.</td>
+        </tr>
+        <tr>
+          <td><span class="badge info">archive</span></td>
+          <td>
+            <span class="em-from">Airbnb</span>
+            <span class="em-subj">Log in to Airbnb to keep your account</span>
+            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6ede77843138d" target="_blank" rel="noopener">open in Gmail &#8599;</a>
+          </td>
+          <td>Dormant-account nudge. No task. If you want to keep the account, log in once; otherwise safe to archive.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rpt-block">
+    <div class="rpt-head"><span class="rpt-title">SLOP</span><span class="badge bad rpt-count">4</span></div>
     <div class="rpt-sub">
       <div class="coverage">
+        <span class="chip off"><span class="dot"></span>scam <b>Risk Thresholds (1)</b></span>
         <span class="chip off"><span class="dot"></span>scam <b>Nexus Risk Lab (1)</b></span>
         <span class="chip off"><span class="dot"></span>newsletter <b>Lightwright (1)</b></span>
         <span class="chip off"><span class="dot"></span>promo <b>Plex (1)</b></span>
@@ -98,6 +120,15 @@
       <colgroup><col class="c-status"><col class="c-email"><col></colgroup>
       <thead><tr><th>Status</th><th>Email</th><th>Type</th></tr></thead>
       <tbody>
+        <tr>
+          <td><span class="badge bad">delete</span></td>
+          <td>
+            <span class="em-from">Marcus Vane via Risk Thresholds</span>
+            <span class="em-subj">The Number One Way to Play Gold</span>
+            <a class="em-link" href="https://mail.google.com/mail/?authuser=mawizorek%40gmail.com#all/19f6f1c22df07b45" target="_blank" rel="noopener">open in Gmail &#8599;</a>
+          </td>
+          <td>scam &mdash; Cyrillic-lookalike click-here evasion</td>
+        </tr>
         <tr>
           <td><span class="badge bad">delete</span></td>
           <td>
@@ -130,9 +161,9 @@
   </div>
 
   <div class="rpt-note"><b>One-click slop clear.</b> Tap the line to select it, paste into Gmail search, select all, delete. Scoped to <code>in:inbox</code> on purpose: a bare <code>from:()</code> searches ALL mail (archive + every label) and would sweep up account records and receipts from the same senders.
-    <code class="rpt-q">in:inbox from:(beacon@sentinel.nexusrisklab.com OR marketing@lightwright.com OR hello@m.plex.tv)</code>
+    <code class="rpt-q">in:inbox from:(voice@cast.riskthresholds.com OR beacon@sentinel.nexusrisklab.com OR marketing@lightwright.com OR hello@m.plex.tv)</code>
   </div>
 
-  <div class="rpt-score"><b>Inbox: 5 &rarr; 0</b> projected on greenlight &middot; 1 merged + archived &middot; 1 archived &middot; 3 deleted.</div>
-  <p class="foot-hint">PLAN state: no Gmail changes made. Greenlight to run the merge + drafts; archive, forward, and delete clicks are yours. Seeded from the Jul 16 sweep (same 5 threads as the Field Matrix); the live <code>data/inbox-state.json</code> feed is the next build.</p>
+  <div class="rpt-score"><b>Inbox: 8 &rarr; 0</b> projected on greenlight &middot; 1 merged + archived &middot; 1 forwarded + archived &middot; 2 archived &middot; 4 deleted.</div>
+  <p class="foot-hint">PLAN state: no Gmail changes made. Greenlight to run the merge; the archive, forward, and delete clicks are yours. Data is the Jul 17 5:13 AM sweep (8 inbox threads), hardcoded here; the live <code>data/inbox-state.json</code> feed is the next build.</p>
 </section>
