@@ -1,7 +1,10 @@
 <!doctype html>
 <!-- inbox-digest-report - copied from the gold-standard template-app.
      Shell + chrome.js + styles.css + pages/ partials, all painted by the shared theme spine.
-     Swap the APP_* constants; add pages under pages/ and register in NAV. -->
+     Swap the APP_* constants; add pages under pages/ and register in NAV.
+     v4: router re-executes page <script> tags after injecting a fragment, so a data-driven
+     page (report.html fetches data/inbox-state.json) can run its own render. This is a
+     generic shell capability and should fold back into template-app. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="mid">
 <head>
 <meta charset="utf-8">
@@ -46,8 +49,8 @@
 (function () {
   /* ==== APP CONSTANTS ==== */
   var APP_NAME    = "Inbox Digest";
-  var APP_VERSION = "v3.2";
-  var APP_PR      = 319;
+  var APP_VERSION = "v4";
+  var APP_PR      = 321;
   var DEFAULT_THEME = "maw-dark-utility";
   var DEFAULT_PAGE  = "report";        // report is the acting landing surface; matrix is page 2
   var NAV = [
@@ -104,11 +107,21 @@
   /* ---- ROUTER ---- */
   var view = document.getElementById("view");
   var routes = NAV.map(function (n) { return n.route; });
+  // Fragments are injected via innerHTML, which does NOT execute their <script> tags.
+  // Re-create each script node so a data-driven page (e.g. report.html) runs its render.
+  function runScripts(container) {
+    var olds = container.querySelectorAll("script");
+    for (var i = 0; i < olds.length; i++) {
+      var o = olds[i], s = document.createElement("script");
+      if (o.src) { s.src = o.src; } else { s.textContent = o.textContent; }
+      o.parentNode.replaceChild(s, o);
+    }
+  }
   function render(route) {
     if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
     fetch("./pages/" + route + ".html", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw 0; return r.text(); })
-      .then(function (html) { view.innerHTML = html; Chrome.setActive(route); view.focus(); window.scrollTo(0, 0); })
+      .then(function (html) { view.innerHTML = html; runScripts(view); Chrome.setActive(route); view.focus(); window.scrollTo(0, 0); })
       .catch(function () {
         view.innerHTML = '<section class="page"><h1>Page not found</h1>' +
           '<p class="muted">No page matches <code>#' + route + '</code>.</p></section>';
