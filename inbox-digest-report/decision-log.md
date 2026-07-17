@@ -4,25 +4,33 @@ Newest on top. Each entry = a decision made + why, so a cold agent reconstructs 
 
 ---
 
+## 2026-07-17 - v6: functional tool — view toggle + per-bucket row templates
+
+- **Decision:** the report gains a sticky top TOGGLE (All / Merge / Reply / Attach / Handled / Slop, each with a live count + color key) that filters to one bucket at a time. Each bucket now has a DISTINCT color-keyed header (colored top-accent bar + dot) and its OWN row template, so different categories show different fields:
+  - TO_MERGE / NEEDS_REPLY / HAS_ATTACHMENTS = action rows: sender + subject + Gmail link, and a plan cell led by a verb chip (MERGE / DRAFT / FORWARD) + destination task. HAS_ATTACHMENTS additionally renders attachment filename chips.
+  - ALREADY_HANDLED = minimal two-line row (sender + one muted note); no destination/verb.
+  - SLOP = delete-first workflow: sender/type group chips + the `in:inbox` one-tap clear block lead the bucket; individual rows collapse to a tight one-line strip (type · sender · subject · link), no plan/destination.
+- **Why:** Michael asked for a functional tool, not a dashboard viewer. v5 rendered every bucket with the identical 3-part row, so SLOP carried the same weight/columns as TO_MERGE even though it needs almost none of that. Distinct headers + per-bucket templates make categories scannable and give SLOP its own tightened flow (glance the senders, tap the clear query, done).
+- **What shipped (renderer + CSS only; JSON + data-only lock intact):**
+  - `pages/report.html`: render builds the toggle + per-bucket row renderers (`rowMerge`/`rowReply`/`rowAttach`/`rowHandled`/`rowSlop`); a small click handler filters buckets via a `hidden` toggle. Still a pure renderer of `data/inbox-state.json`; no new fields required (uses existing `attachments`, `slop_group`, `dest_task_*`, `plan`, `plan_note`).
+  - `styles.css`: REPORT ADDITIONS block replaced with v6 (sticky pill toggle; per-bucket color via colored top-accent bar keyed to the semantic role token; action-row 2-col reflow >=720px; slop strip). Ban-safe: colored TOP border (not a side stripe), no gradient text, no glass. Matrix block untouched.
+  - `index.html` styles.css cache token → `?v=5`; shell v5 → v6.
+- **Locked:** the report is a functional tool with a view toggle + per-category templates. Adding/altering a bucket's displayed fields is a RENDERER concern (report.html + styles.css); the sweep still only writes `data/inbox-state.json`.
+
 ## 2026-07-17 - v5: report reskinned as a mobile-primary VIEWER (no table)
 
 - **Decision:** the report renders each email as a stacked ROW UNIT (status pill → sender/subject → plan), not a `<table>`. On phone the row stacks; at `>=720px` the same DOM reflows into three aligned columns (status / email / plan) via CSS grid. Drill-in `matrix.html` stays device-specific (wide horizontal-scroll grid), unedited.
-- **Why:** Michael runs sweeps mostly on mobile and wanted a VIEWER, not a toy activity app. The v3.2 `<table>` fought phones (fixed columns, cramped) and read app-y. A single responsive row unit merges cleanly across phone/desktop from one DOM, so there's no second layout to maintain, and it reads like a data viewer.
-- **What shipped (renderer + CSS only; JSON + data-only lock untouched):**
-  - `pages/report.html`: render emits `.bucket` sections of `.row` units (`.cell-status`/`.cell-email`/`.cell-plan`), no `<table>`. Still a pure renderer of `data/inbox-state.json`; copy tightened.
-  - `styles.css`: REPORT ADDITIONS block replaced with the v5 viewer (mobile-first; `@media (min-width:720px)` promotes rows to aligned columns; status strip 2x2→row-of-4; headline scoreboard number). Calmer framing (surface borders, small radius), dropped the squared-everything spreadsheet look. Matrix block untouched.
-  - `index.html` styles.css cache token → `?v=4`; shell v4 → v5.
-- **Locked:** report is mobile-primary and responsive from one DOM; drill-ins may stay device-specific. This is still a pure renderer — a sweep edits only `data/inbox-state.json`.
+- **Why:** Michael runs sweeps mostly on mobile and wanted a VIEWER, not a toy activity app. The v3.2 `<table>` fought phones (fixed columns, cramped) and read app-y. A single responsive row unit merges cleanly across phone/desktop from one DOM, so there's no second layout to maintain, and it reads like a data viewer. (Superseded by v6's per-bucket templates, but the no-table row-unit approach carries forward.)
 
 ## 2026-07-17 - v4: app is a PURE RENDERER; data lives ONLY in inbox-state.json
 
 - **Decision:** `pages/report.html` no longer contains any email data. It fetches `data/inbox-state.json` and renders it. **A sweep refresh edits ONLY that JSON — never the renderer, index, or CSS.** This is the ONLY Gmail workflow we're building right now.
 - **Why:** v3–v3.2 hardcoded each sweep into the HTML, so “refresh the dashboard” kept meaning “re-edit the renderer.” That's backwards and error-prone. The renderer is a fixed view; the inbox state is data. Separating them means a refresh is a single small JSON rewrite with zero HTML risk, and the data file doubles as the handoff-safe audit trail.
 - **What shipped:**
-  - `pages/report.html` = pure renderer (fetch + build the five buckets from the JSON; graceful empty/parse-error state). A loud header comment forbids hardcoding data in it.
+  - `pages/report.html` = pure renderer (fetch + build the buckets from the JSON; graceful empty/parse-error state). A loud header comment forbids hardcoding data in it.
   - `data/inbox-state.json` = the rolling sweep state (seeded with the Jul 17 8-thread sweep).
   - `data/README.md` = standalone FIELD SPEC dictating every available field, the bucket enum, the `state`→pill map, and the locked `in:inbox` slop-query format. This is the component to read before editing the JSON.
-  - `index.html` router now re-executes page `<script>` tags after injecting a fragment (innerHTML doesn't run scripts). Shell bumped v3.2 → v4. This router capability is generic and should fold back into `template-app`.
+  - `index.html` router now re-executes page `<script>` tags after injecting a fragment (innerHTML doesn't run scripts). This router capability is generic and should fold back into `template-app`.
   - `brain-config/hooks/gmail-inbox-sweep.md` gained a DATA WRITE PROTOCOL: the sweep's only artifact is the JSON, edited per `data/README.md`; the renderer is never touched.
 - **Locked:** the app is a renderer of `inbox-state.json`, period. Available fields are dictated in `data/README.md`. Touching the Gmail read tool for a sweep = rewrite the JSON, nothing else.
 

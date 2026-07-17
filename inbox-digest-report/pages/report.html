@@ -7,13 +7,14 @@
      content into this file, STOP - it belongs in the JSON. This file is the VIEW;
      the JSON is the DATA; they never mix.
      The router (index.html) re-executes this <script> after injecting the fragment.
-     v5 skin: mobile-primary VIEWER. Each email renders as a stacked row (status pill,
-     sender/subject, plan) on phone; the same DOM reflows into aligned columns on wide
-     screens (>=720px). No <table>, so long senders/addresses never shred. Styling lives
+     v6 skin: FUNCTIONAL TOOL. A sticky top toggle picks the view (All / one bucket).
+     Each bucket has a distinct color-keyed header and its OWN row template, so a SLOP
+     row (tight, delete-first) shows different fields than a TO_MERGE row (sender +
+     destination task). Mobile-primary; rows reflow to columns >=720px. Styling lives
      in the REPORT ADDITIONS block of styles.css; every color is a theme token. -->
 <section class="page report">
   <h1>Gmail &rarr; ClickUp Pipeline</h1>
-  <p class="lead">What to merge, reply, forward, archive, and delete to hit inbox zero. Every state change is your tap; nothing here has touched Gmail yet.</p>
+  <p class="lead">Pick a view, work the pile. Every state change is your tap; nothing here has touched Gmail yet.</p>
   <div id="rpt-root"><p class="bucket-empty">Loading the latest sweep&hellip;</p></div>
   <script>
   (function () {
@@ -27,60 +28,79 @@
       });
 
     function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+    function link(e,label){ return e.gmail_url?'<a class="em-link" href="'+esc(e.gmail_url)+'" target="_blank" rel="noopener">'+(label||'open in Gmail')+' \u2197</a>':''; }
+    function dest(e){
+      if(e.dest_task_url && e.dest_task_title) return '<a class="dest" href="'+esc(e.dest_task_url)+'" target="_blank" rel="noopener">'+esc(e.dest_task_title)+' \u2197</a>';
+      if(e.dest_task_title) return '<span class="tag plan-tag">new task: '+esc(e.dest_task_title)+'</span>';
+      return '';
+    }
+    function who(e){ return '<span class="em-from">'+esc(e.sender)+'</span><span class="em-subj">'+esc(e.subject)+'</span>'; }
+    function note(e){ return e.plan_note?'<span class="plan-note">'+esc(e.plan_note)+'</span>':''; }
 
-    var STATE = {
-      merge_pending:   ["warn","merge"],
-      reply_pending:   ["warn","reply"],
-      forward_pending: ["warn","forward"],
-      archive_ready:   ["info","archive"],
-      delete_ready:    ["bad","delete"],
-      merged:          ["good","merged"],
-      archived:        ["good","archived"],
-      deleted:         ["good","deleted"]
-    };
+    /* ---- per-bucket ROW TEMPLATES (each category shows only what it needs) ---- */
+    function rowMerge(e){
+      return '<div class="row r-act">'+
+        '<div class="cell-email">'+who(e)+link(e)+'</div>'+
+        '<div class="cell-plan"><span class="act-verb">MERGE</span> '+esc(e.plan||"")+' '+dest(e)+note(e)+'</div></div>';
+    }
+    function rowReply(e){
+      return '<div class="row r-act">'+
+        '<div class="cell-email">'+who(e)+link(e)+'</div>'+
+        '<div class="cell-plan"><span class="act-verb">DRAFT</span> '+esc(e.plan||"")+' '+dest(e)+note(e)+'</div></div>';
+    }
+    function rowAttach(e){
+      var files=(e.attachments||[]).map(function(f){return '<span class="file">\uD83D\uDCCE '+esc(f)+'</span>';}).join("");
+      return '<div class="row r-act">'+
+        '<div class="cell-email">'+who(e)+link(e)+'</div>'+
+        '<div class="cell-plan">'+(files?'<span class="files">'+files+'</span>':'')+
+          '<span class="act-verb">FORWARD</span> '+esc(e.plan||"")+' '+dest(e)+note(e)+'</div></div>';
+    }
+    function rowHandled(e){
+      return '<div class="row r-min">'+
+        '<div class="cell-email">'+who(e)+link(e)+'</div>'+
+        '<div class="cell-min">'+esc(e.plan||"safe to archive")+'</div></div>';
+    }
+    function rowSlop(e){
+      return '<div class="row r-slop">'+
+        '<span class="slop-type">'+esc(e.slop_group||"slop")+'</span>'+
+        '<span class="slop-from">'+esc(e.sender)+'</span>'+
+        '<span class="slop-subj">'+esc(e.subject)+'</span>'+
+        link(e)+'</div>';
+    }
+
     var BUCKETS = [
-      { key:"TO_MERGE",        cls:"good" },
-      { key:"NEEDS_REPLY",     cls:"info" },
-      { key:"HAS_ATTACHMENTS", cls:"warn" },
-      { key:"ALREADY_HANDLED", cls:"good" },
-      { key:"SLOP",            cls:"bad"  }
+      { key:"TO_MERGE",        tab:"Merge",   role:"good", row:rowMerge },
+      { key:"NEEDS_REPLY",     tab:"Reply",   role:"info", row:rowReply },
+      { key:"HAS_ATTACHMENTS", tab:"Attach",  role:"warn", row:rowAttach },
+      { key:"ALREADY_HANDLED", tab:"Handled", role:"info", row:rowHandled },
+      { key:"SLOP",            tab:"Slop",    role:"bad",  row:rowSlop }
     ];
-
-    function pill(state){ var m=STATE[state]||["info",esc(state)]; return '<span class="badge '+m[0]+'">'+m[1]+'</span>'; }
-
-    function statusCell(e){ return '<div class="cell-status">'+pill(e.state)+'</div>'; }
-    function emailCell(e){
-      return '<div class="cell-email">'+
-        '<span class="em-from">'+esc(e.sender)+'</span>'+
-        '<span class="em-subj">'+esc(e.subject)+'</span>'+
-        (e.gmail_url?'<a class="em-link" href="'+esc(e.gmail_url)+'" target="_blank" rel="noopener">open in Gmail \u2197</a>':'')+
-      '</div>';
-    }
-    function planCell(e){
-      var h='<div class="cell-plan">'+esc(e.plan||"");
-      if(e.dest_task_url && e.dest_task_title){ h+=' <a class="dest" href="'+esc(e.dest_task_url)+'" target="_blank" rel="noopener">'+esc(e.dest_task_title)+' \u2197</a>'; }
-      else if(e.dest_task_title){ h+=' <span class="tag plan-tag">new task: '+esc(e.dest_task_title)+'</span>'; }
-      if(e.plan_note){ h+='<span class="plan-note">'+esc(e.plan_note)+'</span>'; }
-      return h+'</div>';
-    }
-    function rowHtml(e){ return '<div class="row" data-state="'+esc(e.state)+'">'+statusCell(e)+emailCell(e)+planCell(e)+'</div>'; }
+    var BY = {}; BUCKETS.forEach(function(b){BY[b.key]=b;});
 
     function countBadge(b,n){
       var label=(b.key==="TO_MERGE" && n>0)?(n+' keeper'+(n>1?'s':'')):String(n);
-      return '<span class="badge '+b.cls+' bucket-count">'+label+'</span>';
+      return '<span class="badge '+b.role+' bucket-count">'+label+'</span>';
     }
-    function slopSub(rows){
+    function slopGroups(rows){
       var g={},order=[];
       rows.forEach(function(e){ var k=e.sender||"?"; if(!g[k]){g[k]={t:e.slop_group||"slop",n:0};order.push(k);} g[k].n++; });
-      var chips=order.map(function(k){ return '<span class="chip off"><span class="dot"></span>'+esc(g[k].t)+' <b>'+esc(k)+' ('+g[k].n+')</b></span>'; }).join("");
-      return '<div class="bucket-sub">'+chips+'</div>';
+      return order.map(function(k){ return '<span class="chip off"><span class="dot"></span>'+esc(g[k].t)+' <b>'+esc(k)+' ('+g[k].n+')</b></span>'; }).join("");
     }
-    function block(b,emails){
+
+    function bucketBlock(b,emails,slopQuery){
       var rows=emails.filter(function(e){return e.bucket===b.key;});
-      var head='<header class="bucket-head"><span class="bucket-name">'+b.key+'</span>'+countBadge(b,rows.length)+'</header>';
-      if(!rows.length) return '<section class="bucket is-empty" data-bucket="'+b.key+'">'+head+'<div class="bucket-empty">none</div></section>';
-      var sub=(b.key==="SLOP")?slopSub(rows):"";
-      return '<section class="bucket" data-bucket="'+b.key+'">'+head+sub+'<div class="rows">'+rows.map(rowHtml).join("")+'</div></section>';
+      var head='<header class="bucket-head"><span class="bucket-dot"></span><span class="bucket-name">'+b.key.replace(/_/g," ")+'</span>'+countBadge(b,rows.length)+'</header>';
+      if(!rows.length) return '<section class="bucket b-'+b.role+'" data-bucket="'+b.key+'">'+head+'<div class="bucket-empty">nothing here</div></section>';
+      var body;
+      if(b.key==="SLOP"){
+        var clear = slopQuery
+          ? '<div class="slop-clear"><span class="slop-clear-lab">One-tap clear \u00b7 tap to select, paste into Gmail, select all, delete. Scoped to <code>in:inbox</code>.</span><code class="rpt-q">'+esc(slopQuery)+'</code></div>'
+          : '';
+        body='<div class="bucket-sub">'+slopGroups(rows)+'</div>'+clear+'<div class="rows slop-rows">'+rows.map(b.row).join("")+'</div>';
+      } else {
+        body='<div class="rows">'+rows.map(b.row).join("")+'</div>';
+      }
+      return '<section class="bucket b-'+b.role+'" data-bucket="'+b.key+'">'+head+body+'</section>';
     }
 
     function fmtSwept(iso){
@@ -96,6 +116,7 @@
       var isPlan=!s.status || /PLAN/i.test(s.status);
       var before=(s.inbox_before!=null)?s.inbox_before:emails.length;
       var after=(s.inbox_projected_after!=null)?s.inbox_projected_after:0;
+      function c(k){return emails.filter(function(e){return e.bucket===k;}).length;}
 
       var meta='<div class="rpt-meta">'+
         '<span>swept <b>'+fmtSwept(s.swept_at)+'</b></span>'+
@@ -105,31 +126,20 @@
       '</div>';
 
       var note=isPlan
-        ? '<div class="rpt-note"><b>PLAN \u2014 nothing has changed in Gmail yet.</b> On &ldquo;go,&rdquo; Brain merges keeper content into the destination task and parks any drafts. You forward attachments, archive, and clear slop.</div>'
-        : '<div class="rpt-note"><b>EXECUTED audit.</b> The merges + drafts ran; the pills below record what landed.</div>';
+        ? '<div class="rpt-note"><b>PLAN \u2014 nothing has changed in Gmail yet.</b> On &ldquo;go,&rdquo; Brain merges keepers into their task and parks any drafts. You forward attachments, archive, and clear slop.</div>'
+        : '<div class="rpt-note"><b>EXECUTED audit.</b> The merges + drafts ran; the states below record what landed.</div>';
 
-      var legend='<div class="rpt-legend">'+
-        '<span class="chip k-pending"><span class="dot"></span>pending</span>'+
-        '<span class="chip k-merged"><span class="dot"></span>merged</span>'+
-        '<span class="chip k-archived"><span class="dot"></span>archive</span>'+
-        '<span class="chip k-delete"><span class="dot"></span>delete</span>'+
-      '</div>';
+      // top toggle: All + one per bucket, each with live count + color key
+      var tabs='<button class="rpt-tab is-active" data-filter="ALL">All <b>'+emails.length+'</b></button>'+
+        BUCKETS.map(function(b){
+          return '<button class="rpt-tab t-'+b.role+'" data-filter="'+b.key+'"><span class="dot"></span>'+b.tab+' <b>'+c(b.key)+'</b></button>';
+        }).join("");
+      var toggle='<div class="rpt-toggle" role="tablist">'+tabs+'</div>';
 
-      var blocks=BUCKETS.map(function(b){return block(b,emails);}).join("");
+      var blocks='<div class="buckets" data-filter="ALL">'+BUCKETS.map(function(b){return bucketBlock(b,emails,d.slop_delete_query);}).join("")+'</div>';
 
-      var slop='';
-      if(d.slop_delete_query){
-        slop='<div class="rpt-note"><b>One-tap slop clear.</b> Tap to select, paste into Gmail search, select all, delete. Scoped to <code>in:inbox</code> so it never touches archived mail or account records from the same senders.'+
-          '<code class="rpt-q">'+esc(d.slop_delete_query)+'</code></div>';
-      }
-
-      function c(k){return emails.filter(function(e){return e.bucket===k;}).length;}
       var parts=[];
-      if(c("TO_MERGE"))parts.push(c("TO_MERGE")+" merge");
-      if(c("NEEDS_REPLY"))parts.push(c("NEEDS_REPLY")+" reply");
-      if(c("HAS_ATTACHMENTS"))parts.push(c("HAS_ATTACHMENTS")+" forward");
-      if(c("ALREADY_HANDLED"))parts.push(c("ALREADY_HANDLED")+" archive");
-      if(c("SLOP"))parts.push(c("SLOP")+" delete");
+      BUCKETS.forEach(function(b){ var n=c(b.key); if(n) parts.push(n+" "+b.tab.toLowerCase()); });
       var score='<div class="rpt-score">'+
         '<span class="score-big">'+before+' \u2192 '+after+'</span>'+
         '<span class="score-lab">inbox'+(isPlan?", projected on greenlight":"")+'</span>'+
@@ -138,7 +148,18 @@
 
       var foot='<p class="foot-hint">Rendered from <code>data/inbox-state.json</code> \u00b7 swept '+fmtSwept(s.swept_at)+' by '+esc(s.swept_by||"Brain")+'.</p>';
 
-      root.innerHTML=meta+note+legend+blocks+slop+score+foot;
+      root.innerHTML=meta+note+toggle+blocks+score+foot;
+
+      // ---- toggle behavior: pick a view, hide the rest ----
+      var box=root.querySelector(".buckets");
+      var btns=root.querySelectorAll(".rpt-tab");
+      function setFilter(f){
+        box.setAttribute("data-filter", f);
+        for(var i=0;i<btns.length;i++){ btns[i].classList.toggle("is-active", btns[i].getAttribute("data-filter")===f); }
+        var secs=box.querySelectorAll(".bucket");
+        for(var j=0;j<secs.length;j++){ secs[j].hidden = (f!=="ALL" && secs[j].getAttribute("data-bucket")!==f); }
+      }
+      for(var k=0;k<btns.length;k++){ btns[k].addEventListener("click", function(){ setFilter(this.getAttribute("data-filter")); }); }
     }
   })();
   </script>
