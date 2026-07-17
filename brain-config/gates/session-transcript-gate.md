@@ -113,6 +113,43 @@ Calmly — the thread is now a **single point of failure**. If it can't open, th
 - Sequence the opening check so it always runs before anyone's seated.
 ```
 
+### Thread structure (LOCKED 2026-07-17 i) — the two-tier Workshop Post Protocol
+
+The Thread comment format above governs how ONE comment looks. THIS governs how the whole deliberation is SHAPED — the layer that was never mandated, which is exactly why the output drifted run-to-run. The observed drift was three-way: (a) one lump comment with each voice bulleted inside it, (b) a real header comment + threaded replies, (c) a bare summary with no inline voices at all. **Only (b) is correct.** The deliberation is ALWAYS two tiers, no exceptions:
+
+**Tier 1 — the Opening Post (parent comment, posted by Maestro Mira 🎼 the moment the team convenes).** One root comment that PROMPTS the team. It names what's on the table and poses the specific things to weigh in on (the X / Y / Z). It is a prompt, never a summary of conclusions — the conclusions don't exist yet. This is the copy block Michael standardized; match it:
+
+```
+🎼 Workshop convened — <topic>
+
+On the table: <one line — what we're deciding or building>
+
+Team, weigh in on:
+1. <X> — <the specific question>
+2. <Y> — <the specific question>
+3. <Z> — <the specific question>
+
+Seated: <badges + names of the voices convened>
+Reply in-thread with your lens. Read what's above you before you post.
+```
+
+**Tier 2 — the Agent Replies (each seated voice, as a THREADED reply to Mira's Opening Post).** Every seated agent posts its own comment as a reply to the parent — never a bullet inside one shared comment, never a free-floating root comment alongside the parent. One agent per reply, in the emoji-badge + full-body format above. Dictated template:
+
+```
+<badge> <Agent Name>
+
+<the take, in the agent's own voice, addressing the X / Y / Z on the table — full markdown>
+
+<cross-talk: name at least one colleague and agree / extend / challenge, per Standing-agent conduct directive 4>
+<verdict where the role calls for one: pass / adjust / halt>
+```
+
+**Why two tiers, enforced:** the parent gives the deliberation a single conversational anchor (the prompt), and threading every voice beneath it makes the exchange read as one real back-and-forth instead of scattered monologues or a flattened lump. This is what kills all three drift variants at once — a lump comment violates one-agent-per-reply, a bare summary violates the mandatory replies, and a headerless pile of roots violates the parent-prompt. **The container is fixed; the personality fills the body.** Preserving each agent's voice inside a consistently-defined block is the whole point — exactly what Michael asked for.
+
+- **Who posts the Opening Post:** Maestro Mira, always (she convenes and runs the thread-first opening check). Not the convening agent, not Brain — Mira owns the parent so there is one predictable author for the prompt.
+- **Threading is literal:** replies are posted with the Opening Post as their `parent_comment`, so they nest under it in ClickUp. A reply posted at root level (not nested) is a protocol miss.
+- **Single source of truth:** these templates live HERE and only here. `council.md` mirrors the rule as a one-line law; agent profiles carry a pointer, never a copy. Do not fork the templates into per-agent profiles (that was the rejected option — 20 files drifting out of sync).
+
 ### Active-session output = Mira's synthesis ONLY (LOCKED 2026-07-17)
 
 **The live chat gets Maestro Mira's synthesis and nothing else — never a per-agent recap.** The full per-voice detail already lives on the session task; re-listing "what each agent said" in the active session clobbers it with redundant noise.
@@ -133,7 +170,7 @@ On the first trigger hit (or promotion of a provisional stub), Scribe **immediat
    - `**Michael:**` / `**Brain:**` turn labels, in order.
    - Verbatim wording ONLY where it matters (decisions, instructions, key phrasing); tight paraphrase everywhere else — a faithful, readable record, NOT a word-perfect court transcript.
    - Decisions, reasoning, and tradeoffs captured inline as they land — not summarized after the fact.
-   - **Agent comments interleaved in their own voices**, formatted per the emoji-badge + full-body standard above — the seated council/Workshop voices post here (and ONLY here), so the task reads as the real multi-voice deliberation.
+   - **Agent comments interleaved in their own voices**, formatted per the emoji-badge + full-body standard above and shaped per the two-tier Workshop Post Protocol — the seated council/Workshop voices post here (and ONLY here), so the task reads as the real multi-voice deliberation.
    - Backfill any pre-trigger turns from the session so far, so the record starts from message 1, not from the trigger point.
 4. Keeps appending in real time as the session continues. The comment stream grows turn by turn.
 
@@ -170,6 +207,7 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 - **Thread lives on the session TASK** (🟢 Agent Activity Board, list id `901327879922`). Live agent deliberation = comments on the session's task there. #A.I. Prompts (https://app.clickup.com/36074068/chat/r/6-901327646617-8) is the backup + the home for the permanent close summary, never the default forum for active deliberation.
 - **Thread-first: the task must exist before any agent speaks.** The opening check ("Do we have a session task for this?") runs at session start; the first voice seated verifies/creates it and hands its comments to the team.
 - **Thread-only: council/Workshop agents express ONLY on the session task, never in the active session, never in a working doc.** Each posts in their own distinct voice, emoji-badge header + full-formatting body. Brain's synthesized reply + Mira's anchor line are the only things that stay live.
+- **Two-tier Workshop Post Protocol governs thread STRUCTURE.** Every deliberation = Tier 1 a single Opening Post by Mira 🎼 (parent comment that prompts the team on the specific X / Y / Z) + Tier 2 one THREADED reply per seated voice (badge + full body, own voice, nested under the parent). Never a lump comment with voices bulleted inside it, never a bare summary with no inline voices, never a pile of headerless root comments. Templates live in Thread structure above; profiles carry a pointer, never a copy.
 - **Active session = Mira's synthesis only.** No per-agent recap in the live chat; the per-voice detail lives on the task. Mira writes in full formatting, may flag a heavy section in one pointer line, never re-lists each agent.
 - **Open-then-discard is the default.** Open a silent provisional session task for anything that isn't an obvious lookup; discard the stub at close if the session stayed trivial — UNLESS an agent posted deliberation, which makes it substantive and non-discardable. Bias all the way toward opening.
 - **Deterministic triggers beat discretion.** About-to-create-a-task/doc (trigger 1) and the literal keyword list (trigger 2) fire with no judgment call.
@@ -187,8 +225,8 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 
 - **Session Close hook** (`hooks/session-close.md`) — the permanent close post lands in #A.I. Prompts (Channel 2) as a SUMMARY + pointer to the session task; the close hook produces it and points back at the session task where the live deliberation happened.
 - **Scribe Sana** (`agents/scribe-sana.md`) — the owner/operator; her profile carries the behavioral detail incl. the faithful-not-verbatim posture + backfill fallback.
-- **Maestro Mira** (`agents/maestro-mira.md`) — runs the opening "do we have a session task?" check and creates it before seating anyone.
-- **The Council** (`council.md`) — the thread-only expression rule + emoji-badge format + Mira-synthesis-only output + the Standing-agent conduct law are mirrored there.
+- **Maestro Mira** (`agents/maestro-mira.md`) — runs the opening "do we have a session task?" check and creates it before seating anyone; posts the Tier-1 Opening Post.
+- **The Council** (`council.md`) — the thread-only expression rule + emoji-badge format + two-tier Workshop Post Protocol + Mira-synthesis-only output + the Standing-agent conduct law are mirrored there.
 - **Agent Activity Board** (🟢, list id `901327879922`, https://app.clickup.com/36074068/v/li/901327879922) — the AI-sessions list Brain maintains; each session task's comment stream is the thread.
 - **Decision Log hook** — the repo/doc `decision-log.md` convention (durable "why") is distinct from this live deliberation; a locked decision can land in both: synthesis + pointer in the decision log, full per-voice detail on the session task.
 
@@ -196,6 +234,7 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 
 ## Changelog
 
+- 2026-07-17 (i): **Added the two-tier Workshop Post Protocol (thread STRUCTURE).** The gate governed how one comment looks (badge + body) but never how the whole deliberation is shaped, so output drifted three ways: lump comment / header+replies / bare summary. Locked the structure: Tier 1 = Mira's Opening Post (parent, copy-block prompt on X/Y/Z), Tier 2 = one threaded reply per seated voice (nested under the parent). Canonical templates live here; `council.md` mirrors a one-line law and profiles carry a pointer (no per-agent copies — the rejected option). Prompted by Michael (decision: 1A · Mira · Ship).
 - 2026-07-17 (h): **Fixed the phantom list id.** `901328269587` referenced no existing list; corrected to the real 🟢 Agent Activity Board `901327879922` (MAW Documents › ClickUp Use, https://app.clickup.com/36074068/v/li/901327879922). Added a Canonical pointers block with direct list + chat-fallback URLs. Prompted by Michael.
 - 2026-07-17 (f): **Retired the "never reconstruct from memory" absolute; added the close-time backfill watchdog + mid-session catch-up.** Real-time stays the goal, but a lapse now degrades to a flagged reconstructed transcript at close rather than a blank task, and a late "create the task" backfills to message 1. Added "create the task" / "start your session task" to the literal trigger list. Added the Faithful-not-verbatim rule. Close section now runs the watchdog first and routes the channel post as a summary + task pointer (per the reframed close hook). Prompted by Michael.
 - 2026-07-17 (e): **Defined session / thread / chat, and moved the live thread onto the session TASK.** "The thread" is now explicitly the comment stream on the session's task in the 🟢 Agent Activity Board list — one task per session, all live agent deliberation posts there as comments. #A.I. Prompts demoted to the backup default + the home for the long-standing permanent CLOSE transcript. Opening check reworded to "do we have a session task?"; Fire step 2 ensures/creates the board task; Close routes the dense archive to #A.I. Prompts while the live per-voice record stays on the task.
