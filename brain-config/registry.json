@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-13",
+ "generated": "2026-07-17",
  "source": "Bootstrap manifest, hand-authored from brain-config/agents/*.md front-matter. GOING FORWARD: regenerate from profile front-matter whenever a profile changes (no CI yet, so an agent regenerates it; Scribe Sana + Closing Clio verify at session close). Front-matter is canonical; this file is a generated artifact. NOTE: intentionally holds agents/teams/domain_procedures only. Per-tool safety-net mapping lives in tool-index.html to keep this file lean (Size Sally forecast).",
  "schema": {
  "agent": "slug | name | type(hook|trigger|subagent|gate) | status(active|building|dormant|retired) | seat | teams[] | role | profile",
@@ -28,6 +28,7 @@
  { "slug": "closing-clio", "name": "Closing Clio", "type": "subagent", "status": "active", "seat": "close", "teams": [], "role": "Session-close auditor; inventory refs, log hurdles, reconcile docs + indexes, report health. Owns the usage-log.json tool tally.", "profile": "agents/closing-clio.md", "accent": "oklch(70% 0.12 20)" },
  { "slug": "scout-sage", "name": "Scout Sage", "type": "subagent", "status": "active", "seat": "research", "teams": [], "role": "Research runner; multi-source sourced lookup with confidence + one recommendation.", "profile": "agents/scout-sage.md", "accent": "oklch(70% 0.12 20)" },
  { "slug": "recon-renata", "name": "Recon Renata", "type": "subagent", "status": "active", "seat": "audit", "teams": [], "role": "Repo auditor; audits mawizorek/ClickUp_apps vs the operating standard. Read-only.", "profile": "agents/recon-renata.md", "accent": "oklch(70% 0.12 20)" },
+ { "slug": "audit-anna", "name": "Audit Anna", "type": "subagent", "status": "active", "seat": "audit", "teams": [], "role": "Audit lead; seizes the wheel on any audit, cuts through process/field noise to name the TRUE PURPOSE of the thing, drives Know/Touch/Do to total completeness, and won't declare done while the Open-Surface Ledger is non-empty. Orchestrates Renata/Beckett/List-Audit rather than duplicating them.", "profile": "agents/audit-anna.md", "accent": "oklch(66% 0.17 35)" },
  { "slug": "size-sally", "name": "Size Sally", "type": "subagent", "status": "active", "seat": "build-path", "teams": [], "role": "Data-model growth forecaster; fires BEFORE build/edit/expand of structural files (schema/registry/index), projects size trend, proposes splits in advance. NOT a session-close tool. Seated near Fold-in Frank.", "profile": "agents/size-sally.md", "accent": "oklch(70% 0.13 55)" },
  { "slug": "workshop-wes", "name": "Workshop Wes", "type": "subagent", "status": "retired", "seat": "workshop", "teams": [], "role": "RETIRED 2026-07-04. Decomposed into The Workshop (6 lenses) + Future Faye. Tombstone.", "profile": "agents/workshop-wes.md", "accent": "oklch(70% 0.13 45)" }
  ],
