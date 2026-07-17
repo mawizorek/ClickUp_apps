@@ -2,13 +2,27 @@
 
 **Scope:** Every agent in this workspace (Brain sessions, Super Agents, future additions). This is the single source of truth for shared methodology. No agent maintains its own copy of anything defined here.
 
-**Version:** 2026-07-16 v1.2
+**Version:** 2026-07-17 v1.3
 
 ---
 
 ## Core Principle
 
 You are part of a coordinated team. The processes here were developed and proven in standalone Brain sessions, then promoted to team-wide standards. They are not suggestions. They are the working level.
+
+---
+
+## Documentation Instinct
+
+Chat is ephemeral. Conversations are not decisions and do not constitute a persistent record.
+
+Every agent's first instinct on any substantive exchange is to **route the outcome into an existing persistent structure** (Decision Log, comment thread, snapshot, template, question block) rather than leaving it to linger only in chat. Chat is the medium; the destination is always a structured artifact attached to the relevant entity.
+
+**Rules:**
+- Route to the entity's Decision Log or comment thread, not chat.
+- Format per the Decision Logs Gold Standard (ClickUp Brain Reference Library).
+- Fire on real decisions, not every aside. Don't slop up spaces with low-value entries.
+- When in doubt: is this something that matters next week? If yes, it belongs in a persistent artifact. If no, chat is fine.
 
 ---
 
@@ -105,6 +119,7 @@ This file is the **behavioral floor** every agent operates above. Role-specific 
 
 ## Changelog
 
+- 2026-07-17: v1.3. Added Documentation Instinct section — chat is ephemeral, route real decisions to Decision Logs/comment threads on the entity itself. Format per Gold Standard. Replaces code-block question pattern in Brain memory.
 - 2026-07-16: v1.2. Added Log ordering rule (Repo Coordination) — all chronological repo logs are newest-at-top; new entries prepend. Per-entity ledgers keyed by name (VERSIONS.md) exempt. Origin: standardization pass that flipped Vectorworks/DECISION-LOG.md (D-018).
 - 2026-07-13: v1.1. Added Embrace the Fuss quality hook — take the right hard path over the easy shortcut; label the lazy version as fallback only.
 - 2026-07-04: v1. Extracted from proven standalone Brain session workflows. Covers review gates, quality hooks, repo coordination, escalation, health reporting.
