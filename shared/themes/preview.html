@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8f8f8f">
 <meta name="robots" content="noindex, nofollow">
 <title>Theme Studio</title>
+<meta name="description" content="The 4-vector theme matrix (color x typography x forms x spacing) rendered across the canonical FileMaker object library.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -25,16 +27,19 @@
   .skip-link{position:absolute;left:-999px;top:0;background:var(--ch-accent);color:#fff;padding:8px 14px;border-radius:0 0 var(--ch-radius) 0;z-index:200;}
   .skip-link:focus{left:0;}
 
-  /* ---------- HEADER ---------- */
+  /* ---------- HEADER (slim) ---------- */
   .app-header{position:sticky;top:0;z-index:50;background:var(--ch-panel);border-bottom:1px solid var(--ch-line);transition:background 300ms,border-color 300ms;}
-  .hd-in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);}
-  .hd-brand{display:flex;align-items:center;gap:var(--s2);text-decoration:none;color:var(--ch-ink);font-weight:800;letter-spacing:-0.02em;}
-  .hd-logo{display:inline-grid;place-items:center;width:30px;height:30px;background:var(--ch-accent);color:#fff;border-radius:var(--ch-radius);font-size:1rem;}
-  .hd-name{font-size:1.05rem;}
-  .hd-name .hd-kick{display:block;font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ch-faint);line-height:1;margin-top:2px;}
-  .hd-icon{width:40px;height:40px;min-width:40px;display:grid;place-items:center;background:var(--ch-sunk);color:var(--ch-soft);border:1px solid var(--ch-line);border-radius:var(--ch-radius);font-size:1.05rem;cursor:pointer;transition:color 150ms,border-color 150ms;}
+  .hd-in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:var(--s3);padding:9px var(--s4);}
+  .hd-brand{display:flex;align-items:center;gap:var(--s2);text-decoration:none;color:var(--ch-ink);font-weight:800;letter-spacing:-0.02em;min-width:0;}
+  .hd-logo{display:inline-grid;place-items:center;width:28px;height:28px;min-width:28px;background:var(--ch-accent);color:#fff;border-radius:var(--ch-radius);font-size:0.95rem;}
+  .hd-name{font-size:1rem;line-height:1.05;white-space:nowrap;}
+  .hd-name .hd-kick{display:block;font-size:0.58rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ch-faint);line-height:1;margin-top:2px;}
+  .hd-theme{margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:var(--ch-sunk);border:1px solid var(--ch-line);border-radius:999px;padding:5px 11px 5px 8px;font-family:var(--ch-mono);font-size:0.68rem;color:var(--ch-soft);white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis;}
+  .hd-theme .dot{width:12px;height:12px;min-width:12px;border-radius:4px;border:1px solid oklch(0 0 0 / 0.18);}
+  .hd-theme b{color:var(--ch-ink);font-weight:700;}
+  @media (max-width:560px){.hd-theme .htxt{display:none;} .hd-theme{padding:5px 7px;}}
+  .hd-icon{width:38px;height:38px;min-width:38px;display:grid;place-items:center;background:var(--ch-sunk);color:var(--ch-soft);border:1px solid var(--ch-line);border-radius:var(--ch-radius);font-size:1.02rem;cursor:pointer;transition:color 150ms,border-color 150ms;}
   .hd-icon:hover{color:var(--ch-ink);border-color:var(--ch-accent);}
-  .hd-gear{margin-left:auto;}
   .hd-bars,.hd-bars::before,.hd-bars::after{display:block;width:18px;height:2px;background:currentColor;position:relative;}
   .hd-burger{color:var(--ch-soft);}
   .hd-bars::before,.hd-bars::after{content:"";position:absolute;left:0;}
@@ -171,12 +176,12 @@
   .dd-opt .otag{font-family:var(--ch-mono);font-size:0.6rem;color:var(--ch-faint);padding:1px 6px;border:1px solid var(--ch-line);border-radius:4px;}
   .combo{margin-top:var(--s2);font-family:var(--ch-mono);font-size:0.72rem;color:var(--ch-soft);line-height:1.6;word-break:break-word;} .combo b{color:var(--ch-accent);} .combo .sep{color:var(--ch-faint);padding:0 2px;}
 
-  /* ---------- FOOTER ---------- */
+  /* ---------- FOOTER (narrow) ---------- */
   .app-footer{flex-shrink:0;margin-top:var(--s8);border-top:1px solid var(--ch-line);background:var(--ch-panel);transition:background 300ms,border-color 300ms;}
-  .foot-in{max-width:var(--maxw);margin:0 auto;padding:var(--s4);display:flex;justify-content:space-between;align-items:center;gap:var(--s3);flex-wrap:wrap;font-size:0.74rem;color:var(--ch-faint);}
-  .foot-sources{display:flex;gap:var(--s4);flex-wrap:wrap;}
+  .foot-in{max-width:var(--maxw);margin:0 auto;padding:11px var(--s4);display:flex;justify-content:space-between;align-items:center;gap:var(--s3);flex-wrap:wrap;font-size:0.72rem;color:var(--ch-faint);}
+  .foot-sources{display:flex;gap:var(--s4);flex-wrap:wrap;align-items:center;}
   .foot-sources a{color:var(--ch-soft);text-decoration:none;} .foot-sources a:hover{color:var(--ch-accent);}
-  .foot-stamp{font-family:var(--ch-mono);margin-left:auto;}
+  .foot-stamp{font-family:var(--ch-mono);margin-left:auto;color:var(--ch-faint);}
 
   .copied{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ch-ink);color:var(--ch-bg);font-size:0.82rem;font-weight:600;padding:10px 18px;border-radius:999px;opacity:0;transition:opacity 200ms,transform 200ms cubic-bezier(.16,1,.3,1);pointer-events:none;z-index:200;}
   .copied.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -189,6 +194,7 @@
   <div class="hd-in">
     <button class="hd-icon hd-burger" id="navBtn" aria-label="View" aria-expanded="false" aria-controls="navDrawer"><span class="hd-bars"></span></button>
     <a class="hd-brand" href="#"><span class="hd-logo" aria-hidden="true">◆</span><span class="hd-name">Theme Studio<span class="hd-kick">4-Vector Matrix</span></span></a>
+    <span class="hd-theme" id="hdTheme" title="Active theme"><span class="dot" id="hdDot"></span><span class="htxt"><b id="hdThemeName">McLaren</b> · <span id="hdThemeFont">Chakra Petch</span></span></span>
     <button class="hd-icon hd-gear" id="gearBtn" aria-label="Settings" aria-expanded="false" aria-controls="settingsDrawer">⚙</button>
   </div>
 </header>
@@ -260,10 +266,12 @@
 <footer class="app-footer">
   <div class="foot-in">
     <div class="foot-sources">
-      <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/THEME-SYSTEM.md">Structure ↗</a>
-      <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/FILEMAKER-CAPABILITIES.md">FileMaker toolbox ↗</a>
+      <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/preview.html">Source ↗</a>
+      <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/_objects.json">Object JSON ↗</a>
+      <a href="https://github.com/mawizorek/ClickUp_apps/commits/main/shared/themes/preview.html">Commits & PRs ↗</a>
+      <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/THEME-SYSTEM.md">System ↗</a>
     </div>
-    <div class="foot-stamp">Theme Studio · shared/themes</div>
+    <div class="foot-stamp" id="footStamp">Theme Studio · shared/themes</div>
   </div>
 </footer>
 
@@ -315,7 +323,7 @@
     </div>
     <div class="drawer-hr"></div>
     <div class="combo"><span class="eq">theme = </span><b id="cTheme">manual-mix</b><br><span id="cFont">Chakra Petch</span><span class="sep">·</span><span id="cGrad">gradient</span></div>
-    <p class="drawer-note">Hex is canonical; gradient = two hex stops, no runtime color math. Embedded first-paint; the 4 grids live-fetch and override.</p>
+    <p class="drawer-note">Renders the 4 canonical grids (color × typography × forms × spacing) across the object library in <b>_objects.json</b>. Hex is canonical; gradient = two hex stops, no runtime color math. Embedded first-paint; the grids live-fetch and override.</p>
   </div>
 </aside>
 
@@ -344,7 +352,7 @@ var SPACES={
 "standard":{"touch":"44px","pad-cell":"10px","pad-card":"20px","gap-xs":"6px","gap-md":"14px","gap-lg":"28px"}
 };
 
-// EMBEDDED OBJECT REGISTRY FALLBACK
+// EMBEDDED OBJECT REGISTRY FALLBACK (mirrors _objects.json for first paint; live fetch overrides)
 var REGISTRY={
   "groups": {
     "type": {
@@ -624,10 +632,16 @@ function refreshTriggers(){
   document.getElementById('spaceNm').textContent=curSpace;
   document.getElementById('spaceSub').textContent=curSpace;
 
+  var fontName=(TYPES[curType] && TYPES[curType]['font-display']||'').split(',')[0].replace(/'/g,'');
   document.getElementById('cTheme').textContent='manual-mix';
-  document.getElementById('cFont').textContent=(TYPES[curType] && TYPES[curType]['font-display']||'').split(',')[0].replace(/'/g,'');
+  document.getElementById('cFont').textContent=fontName;
   document.getElementById('cGrad').textContent=(c.accent||'')+' → '+(c['accent-deep']||'')+' @ '+(f['grad-angle']||'');
   document.getElementById('swName').textContent=c.name||curColor;
+
+  /* live header readout */
+  document.getElementById('hdThemeName').textContent=c.name||curColor;
+  document.getElementById('hdThemeFont').textContent=fontName;
+  document.getElementById('hdDot').style.background='linear-gradient(135deg, '+(c.accent||'#888')+' 50%, '+(c['accent-deep']||'#555')+' 50%)';
 }
 
 function renderObjects(){
@@ -747,6 +761,9 @@ Array.prototype.forEach.call(document.querySelectorAll('.nav-link'),function(lnk
 /* ---- FIRST PAINT from embedded snapshot ---- */
 buildColorPop(); buildPop('typePop', TYPES, pickType); buildPop('formsPop', FORMS, pickForm); buildPop('spacePop', SPACES, pickSpace);
 renderAll(); setView('studio');
+
+/* ---- footer build stamp ---- */
+(function(){ try{ var d=new Date(); var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]; document.getElementById('footStamp').textContent='shared/themes · loaded '+mo+' '+d.getDate(); }catch(e){} })();
 
 /* ---- best-effort live override from the canonical TSV grids and JSON registry ---- */
 function parseTSV(txt){ var lines=txt.replace(/\r/g,'').split('\n').filter(function(l){return l.length;}); if(!lines.length) return null; var head=lines[0].split('\t'); var rows={}; for(var i=1;i<lines.length;i++){ var cells=lines[i].split('\t'); if(cells.length<2) continue; var o={}; for(var j=0;j<head.length;j++){ o[head[j]]=cells[j]; } if(o.slug) rows[o.slug]=o; } return rows; }
