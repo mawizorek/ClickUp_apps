@@ -1,8 +1,8 @@
 # Tool Metadata Schema
 
-Every brain tool gets a `metadata.json` sidecar next to its profile (or, for triggers, standing alone). This is the machine-writable control surface the viewer reads and the config UI edits. The `.md` profile stays the human narrative (prose, checklist, personality, changelog); the `.json` holds structured, editable fields. No overlap, no sync problem.
+Every brain tool gets a `metadata.json` sidecar next to its profile (or, for triggers, standing alone). This is the machine-writable control surface the viewer reads and the config UI edits. The `.md` profile stays the human narrative (prose, checklist, personality, changelog); the `.json` holds structured, editable fields.
 
-**Canonical rule:** the sidecar is the source of truth for structured metadata. `registry.json` becomes a GENERATED artifact (concatenation of all sidecars) in a later segment - do not hand-edit it.
+**Canonical rule (RECONCILED 2026-07-17 — see the Agent & Tool Surface Map in `README.md`, which is authoritative):** ownership splits by FIELD, not by record. The profile **front-matter owns identity** (`slug`, `display_name`, `nicknames`, `role`, `type`, `status`, `seat`, `accent`) — that's the immutable-slug lock and it wins for those fields. The **sidecar owns the operational wiring the front-matter doesn't carry** (`colloquialName`, `teams`, `badge`, `created`, `shortcut`, `launchPrompt`, `toggles`); on the identity fields it mirrors the front-matter and does not re-author them. `registry.json` is a GENERATED artifact (from front-matter + sidecars) — do not hand-edit it. *(Supersedes the earlier "the sidecar is the source of truth for structured metadata / no overlap" line: there IS overlap on identity, and front-matter wins it.)*
 
 ---
 
@@ -10,30 +10,30 @@ Every brain tool gets a `metadata.json` sidecar next to its profile (or, for tri
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `slug` | string | kebab-case, matches the filename |
+| `slug` | string | kebab-case, matches the filename. Identity — authored in front-matter. |
 | `type` | string | `agent` \| `hook` \| `trigger` |
-| `name` | string | display name |
-| `status` | string | `active` \| `building` \| `dormant` \| `retired` |
+| `name` | string | display name (mirrors front-matter `display_name`) |
+| `status` | string | `active` \| `building` \| `dormant` \| `retired` (mirrors front-matter) |
 
 ---
 
 ## Agent (super-record)
 
-The rich record. Carries the launcher, team wiring, and the open-ended toggle bag.
+The rich record. Carries the launcher, team wiring, and the open-ended toggle bag. Identity fields mirror the front-matter (front-matter is canonical for them); the fields below marked *operational* are the sidecar's own.
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `colloquialName` | string | the everyday name you call it ("Renata") |
-| `nicknames` | string[] | alternate names for invocation/search |
-| `seat` | string | council \| workshop \| close \| audit \| research \| etc. |
-| `teams` | string[] | team slugs this agent sits on |
-| `role` | string | one-line role summary |
-| `accent` | string | oklch color token for the card |
-| `badge` | string\|null | `halt` \| `warn` \| `silent` \| null |
-| `created` | string | YYYY-MM-DD |
-| `shortcut` | boolean | renders the Run-me launcher |
-| `launchPrompt` | string | the default prompt copied on launch |
-| `toggles` | object | open-ended booleans, e.g. `{ "hasWriteAccess": false, "firesAtSessionClose": true }`. Add switches here with NO schema change. |
+| `colloquialName` | string | *operational.* the everyday name you call it ("Renata") |
+| `nicknames` | string[] | alternate names for invocation/search (mirrors front-matter) |
+| `seat` | string | council \| workshop \| close \| audit \| research \| etc. (mirrors front-matter) |
+| `teams` | string[] | *operational.* team slugs this agent sits on |
+| `role` | string | one-line role summary (mirrors front-matter) |
+| `accent` | string | oklch color token for the card (mirrors front-matter) |
+| `badge` | string\|null | *operational.* `halt` \| `warn` \| `silent` \| null |
+| `created` | string | *operational.* YYYY-MM-DD |
+| `shortcut` | boolean | *operational.* renders the Run-me launcher |
+| `launchPrompt` | string | *operational.* the default prompt copied on launch |
+| `toggles` | object | *operational.* open-ended booleans, e.g. `{ "hasWriteAccess": false, "firesAtSessionClose": true }`. Add switches here with NO schema change. |
 
 ## Hook (thin record)
 
