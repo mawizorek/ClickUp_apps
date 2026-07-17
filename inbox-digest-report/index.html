@@ -1,0 +1,104 @@
+<!doctype html>
+<!-- inbox-digest-report — ROUTER SHELL (index = pointer, NOT a stored page).
+     Lands on the field-capture matrix by default. When the dashboard agent adds
+     pages/dashboard.html, flip DEFAULT_PAGE below — one line, no rebuild.
+     Theme spine: ../shared/themes/themes.css keyed off data-theme; local :root in
+     styles lives in each page as a fallback so it renders even off-spine. -->
+<html lang="en" data-theme="maw-dark-utility">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<title>Inbox Digest — Field Capture Matrix</title>
+<meta name="description" content="Data-coverage matrix for the Gmail inbox sweep: every field Brain captures per thread.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128229;</text></svg>">
+<link rel="stylesheet" href="../shared/themes/themes.css">
+<style>
+  /* ==== matrix styles (fallback :root mirrors maw-dark-utility token names) ==== */
+  :root{
+    --bg:oklch(20% 0.012 265); --surface:oklch(24% 0.013 265); --surface-2:oklch(27% 0.014 265);
+    --surface-hover:oklch(31% 0.018 265); --border:oklch(35% 0.015 265); --border-soft:oklch(30% 0.012 265);
+    --text:oklch(93% 0.006 265); --text-dim:oklch(72% 0.012 265); --text-faint:oklch(56% 0.012 265);
+    --accent:oklch(72% 0.14 230); --accent-dim:oklch(60% 0.10 230);
+    --ok:oklch(74% 0.15 150); --warn:oklch(80% 0.14 85); --danger:oklch(68% 0.19 25); --unread:oklch(72% 0.14 230);
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);}
+  body{font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent);text-decoration:none;} a:hover{text-decoration:underline;}
+  .wrap{max-width:1400px;margin:0 auto;padding:28px 22px 80px;}
+  .topbar{display:flex;align-items:baseline;flex-wrap:wrap;gap:14px 20px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+  .topbar h1{font-size:19px;font-weight:650;letter-spacing:-0.01em;margin:0;}
+  .topbar h1 .dim{color:var(--text-faint);font-weight:500;}
+  .meta{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--text-dim);}
+  .meta b{color:var(--text);font-weight:600;}
+  .sub{margin:14px 0 22px;color:var(--text-dim);font-size:13px;max-width:78ch;}
+  .sub code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 6px;border-radius:4px;color:var(--text);}
+  .coverage{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;}
+  .chip{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:100px;font-size:12px;font-family:var(--mono);border:1px solid var(--border-soft);background:var(--surface);color:var(--text-dim);}
+  .chip .dot{width:7px;height:7px;border-radius:50%;flex:none;}
+  .chip.on .dot{background:var(--ok);} .chip.off{color:var(--text-faint);border-style:dashed;} .chip.off .dot{background:var(--danger);}
+  .chip b{color:var(--text);font-weight:600;}
+  .scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);}
+  table{border-collapse:collapse;width:100%;min-width:1180px;font-size:13px;}
+  thead th{position:sticky;top:0;z-index:2;text-align:left;padding:11px 13px;background:var(--surface-2);color:var(--text-dim);font-weight:600;font-size:11px;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--border);}
+  thead th .t{display:block;font-family:var(--mono);font-size:10px;color:var(--text-faint);text-transform:none;letter-spacing:0;font-weight:500;margin-top:2px;}
+  tbody td{padding:12px 13px;border-bottom:1px solid var(--border-soft);vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover td{background:var(--surface-hover);}
+  tbody tr:nth-child(even) td{background:color-mix(in oklch,var(--surface) 60%,var(--surface-2));}
+  tbody tr:nth-child(even):hover td{background:var(--surface-hover);}
+  .idx{font-family:var(--mono);color:var(--text-faint);font-size:12px;}
+  .from{font-weight:600;white-space:nowrap;}
+  .addr,.date,.tid{font-family:var(--mono);font-size:11.5px;color:var(--text-dim);white-space:nowrap;}
+  .subj{min-width:230px;max-width:340px;}
+  .snip{min-width:240px;max-width:360px;color:var(--text-faint);font-size:12px;}
+  .snip .clip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:100px;font-size:11px;font-family:var(--mono);white-space:nowrap;}
+  .pill.read{background:color-mix(in oklch,var(--surface-2) 70%,transparent);color:var(--text-faint);border:1px solid var(--border-soft);}
+  .pill.unread{background:color-mix(in oklch,var(--unread) 18%,transparent);color:var(--unread);border:1px solid color-mix(in oklch,var(--unread) 40%,transparent);}
+  .pill.unread .dot{width:6px;height:6px;border-radius:50%;background:var(--unread);}
+  .thread{font-family:var(--mono);font-size:12px;color:var(--text);}
+  .thread .n{display:inline-block;min-width:20px;text-align:center;padding:1px 6px;border-radius:5px;background:var(--surface-2);border:1px solid var(--border-soft);}
+  .thread.multi .n{color:var(--accent);border-color:color-mix(in oklch,var(--accent) 35%,transparent);}
+  .att{font-family:var(--mono);font-size:11.5px;} .att.none{color:var(--text-faint);}
+  .att .file{display:block;color:var(--text-dim);white-space:nowrap;} .att .file::before{content:"◗ ";color:var(--warn);}
+  .na{font-family:var(--mono);font-size:11px;color:var(--text-faint);font-style:italic;} .na::before{content:"— ";}
+  .link{font-family:var(--mono);font-size:11.5px;white-space:nowrap;}
+  .note{margin-top:22px;padding:16px 18px;border:1px dashed var(--border);border-radius:10px;background:var(--surface);color:var(--text-dim);font-size:12.5px;}
+  .note b{color:var(--text);} .note .k{font-family:var(--mono);font-size:11.5px;color:var(--accent-dim);}
+  #view:empty::after{content:"Loading…";display:block;padding:60px 22px;color:var(--text-faint);font-family:var(--mono);font-size:13px;}
+</style>
+</head>
+<body>
+<main id="view"></main>
+<noscript>This render needs JavaScript to load the matrix page.</noscript>
+<script src="../shared/themes/resolve.js"></script>
+<script>
+(function(){
+  /* ==== APP CONSTANTS ==== */
+  var DEFAULT_PAGE = "matrix";                 // flip to "dashboard" once that page lands
+  var PAGES = ["matrix"];                        // register new pages here
+  var DEFAULT_THEME = (window.THEMES && THEMES.DEFAULT) || "maw-dark-utility";
+  /* ======================== */
+  var saved=null; try{saved=localStorage.getItem("app_theme");}catch(e){}
+  var boot=saved||DEFAULT_THEME;
+  if(window.THEMES){THEMES.apply(boot,{root:document.documentElement});}
+  else{document.documentElement.setAttribute("data-theme",boot);}
+  var view=document.getElementById("view");
+  function render(route){
+    if(PAGES.indexOf(route)===-1) route=DEFAULT_PAGE;
+    fetch("./pages/"+route+".html",{cache:"no-store"})
+      .then(function(r){if(!r.ok)throw 0;return r.text();})
+      .then(function(html){view.innerHTML=html;window.scrollTo(0,0);})
+      .catch(function(){view.innerHTML='<div class="wrap"><p class="na">Page not found: #'+route+'</p></div>';});
+  }
+  function current(){return (location.hash||"").replace(/^#/,"")||DEFAULT_PAGE;}
+  window.addEventListener("hashchange",function(){render(current());});
+  render(current());
+})();
+</script>
+</body>
+</html>
