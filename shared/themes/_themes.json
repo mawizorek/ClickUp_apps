@@ -1,19 +1,43 @@
 {
-  "schemaVersion": 1,
-  "note": "THE JOIN TABLE. A THEME is one COLOR + one FEELING, named. Apps reference a THEME slug (never a raw color or feeling); it resolves to color tokens + feeling tokens. Colors live as the palette JSONs registered in _index.json; feelings live in feelings/. This file is the only place a pairing is declared.",
+  "schemaVersion": 2,
+  "note": "THE JOIN TABLE. A THEME binds the 4 independent vectors: Color, Typography, Forms, and Spacing.",
   "vocabulary": {
-    "color": "entity — the 17-token palette (hue only). e.g. mclaren, papyrus.",
-    "feeling": "entity — form tokens (type, radius, line weight, gradient, shadow). e.g. sharp-racing.",
-    "theme": "JOIN — exactly one color + one feeling. The unit an app is skinned with."
+    "color": "entity — the 17-token palette (hue only). e.g. mclaren.",
+    "typography": "entity — type scale and fonts.",
+    "forms": "entity — tactility (radii, shadows, borders, gradient angles).",
+    "spacing": "entity — density (padding, gaps, touch targets).",
+    "theme": "JOIN — named combination of the above."
   },
   "themes": [
     {
       "slug": "sharp-mclaren",
       "name": "Sharp Racing · McLaren",
-      "color": "mclaren",
-      "feeling": "sharp-racing",
       "status": "locked",
-      "intendedUse": "Reference build: the first fully-defined theme, proving the color×feeling pipeline end to end."
+      "color": "mclaren",
+      "typography": "sharp-racing",
+      "forms": "sharp",
+      "spacing": "tight",
+      "intendedUse": "Reference build for F1 apps."
+    },
+    {
+      "slug": "mclaren-mobile",
+      "name": "Mobile Racing · McLaren",
+      "status": "draft",
+      "color": "mclaren",
+      "typography": "mobile-legible",
+      "forms": "soft",
+      "spacing": "loose",
+      "intendedUse": "Padded mobile F1 variant."
+    },
+    {
+      "slug": "grounded-neutral",
+      "name": "Grounded Neutral",
+      "status": "locked",
+      "color": "maw-dark-utility",
+      "typography": "grounded",
+      "forms": "grounded",
+      "spacing": "standard",
+      "intendedUse": "Default non-F1 dashboard."
     }
   ]
 }
