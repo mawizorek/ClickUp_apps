@@ -2,6 +2,10 @@
 
 Human-readable history of the AI Toolkit runtime layer. The repo has full git history; this is the fast-scan version so you (or the next agent) can see the toolkit's evolution without spelunking commits. Mirrors the changelog on the ClickUp AI Toolkit index.
 
+## 2026-07-16
+
+- **Log ordering standardized to newest-first (repo-wide).** Flipped `Vectorworks/DECISION-LOG.md` (previously oldest-first with an "append" handoff rule) to newest-first, recorded the ruling as its **D-018**, and switched its handoff rule from "append" to "prepend." Codified the rule in `brain-config/team-standard.md` (v1.2) as a repo-wide Documentation Convention: every ongoing log (decision logs, changelogs, in-doc Changelog sections) prepends new entries at the top. Also noted in `Vectorworks/VWX-BEST-PRACTICES.md`. Already-conforming logs (`filemaker/DECISIONS.md`, `filemaker/DOCUMENTATION-STANDARD.md` changelog, `Vectorworks/_TEMPLATE/CHANGELOG.md`, this file) left as-is.
+
 ## 2026-07-03
 
 - **`1c798...` → this commit** — Added two write-chain hooks + a memory hook, plus this changelog:
