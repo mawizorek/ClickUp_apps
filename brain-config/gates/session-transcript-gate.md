@@ -50,30 +50,48 @@ Bias toward firing. When it's a close call between "lookup" and "work," treat it
 - **What STAYS in the active session (not thread-only):** Brain's own synthesized response to Michael, and Maestro Mira's single anchor line before convening (FIRST TOKEN RULE — Michael always gets an early human-facing token). The agents' deliberation is what moves to the thread; the synthesized answer and the anchor stay live.
 - **Why this forces the transcript:** if the only place an agent can speak is the thread, then a working session cannot proceed without a thread. The transcript's existence is no longer a nice-to-have that competes with momentum — it's a precondition for the team to function.
 
-### Thread comment format (LOCKED 2026-07-17) — name chip + blue quote line
+### Thread comment format (LOCKED 2026-07-17, rev. d2) — emoji badge header + full-formatting body
 
-**Every agent comment in the thread renders like a chat bubble:** a small NAME CHIP, then the actual comment as a BLUE quote line beneath it. Concretely, in ClickUp markdown:
+**Every agent comment reads like a real, personalized chat comment.** The prior code-chip + forced-blue-quote shape is RETIRED (it segmented well but flattened the personality). New shape:
 
-- **Name chip:** the agent's name wrapped in inline code so it renders as a small pill/chip — `` `Risk Rhys` ``.
-- **Comment:** the agent's actual words as a blockquote (`> …`), which renders as the blue vertical-bar line.
-- One agent per comment block. Chip on its own line, blue quote line(s) directly beneath.
+- **Header line:** the agent's **emoji badge** + their **bold name**, e.g. `⚠️ **Risk Rhys**`. The badge is the at-a-glance identity; the bold name anchors it.
+- **Body:** the agent's actual words in **full markdown** — bold, italics, lists, inline code for real code, whatever fits their voice. NOT trapped in a blockquote, NOT wrapped in an inline-code chip. The body should feel like that agent typed a comment, using formatting to express personality.
+- One agent per comment block. Header line, then body beneath.
+
+**Per-agent signature badges (canonical):**
+
+| Agent | Badge | Agent | Badge |
+|---|---|---|---|
+| Maestro Mira | 🎼 | Risk Rhys | ⚠️ |
+| Breaker Beckett | 🔨 | Clever Cleo | 💡 |
+| Polish Polly | ✨ | Feasible Finn | 🔧 |
+| Scope Skye | 📐 | Eco Enzo | 🌐 |
+| Scribe Sana | ✍️ | Fold-in Frank | 🧩 |
+| Mimic Mika | 🎭 | Cautious Cass | 🧊 |
+| Literal Lena | 📏 | Counter Cole | ↩️ |
+| Pivot Piper | 🔀 | Style Stu | 😎 |
+| Novice Nia | 🐣 | Domain Dara | 🎓 |
+| Future Faye | 🔮 | Handoff Hana | 🏁 |
+
+Badges are extensible; a new agent gets a distinct emoji when seated. Keep agent NAMES free of backticks/pipes so nothing breaks the header render (Finn's constraint).
 
 **Copyable reference example (this IS the standard — match it):**
 
 ```
-`Risk Rhys`
-> Calmly: the thread is now a single point of failure. If it can't open, the team goes mute with no fallback. Define graceful degradation.
-```
+⚠️ **Risk Rhys**
 
-This reference example is the canonical pattern (per Polly's "codify a copyable example" ask). When in doubt, match the shape above exactly: chip, then blue line.
+Calmly — the thread is now a **single point of failure**. If it can't open, the team goes mute with no fallback. Two asks:
+- Define graceful degradation (marked inline block, never silence).
+- Sequence the opening check so it always runs before anyone's seated.
+```
 
 ### Active-session output = Mira's synthesis ONLY (LOCKED 2026-07-17)
 
 **The live chat gets Maestro Mira's synthesis and nothing else — never a per-agent recap.** The full per-voice detail already lives in the thread; re-listing "what each agent said" in the active session clobbers it with redundant noise.
 
-- Mira posts ONE synthesis to Michael in the active session: the headline of what to consider moving forward (act-now items + notes).
-- She does NOT summarize each agent in turn. If a thread section is heavy enough to warrant a direct read, she may flag *that* ("the Workshop thread has substantial detail on X worth a read"), but Michael assumes he'll read the thread for depth regardless.
-- The division: **thread = extensive per-voice detail; active session = Mira's headline synthesis only.**
+- Mira posts ONE synthesis to Michael in the active session: the headline of what to consider moving forward (act-now items + notes). **She writes in full formatting** — she is NOT trapped in a quote block or a badge header in the live chat; she responds like Brain's lead voice, naturally.
+- She does NOT summarize each agent in turn. If a thread section is heavy enough to warrant a direct read, she may flag *that* in a single pointer line ("the Workshop thread has substantial detail on X worth a read"), but never re-lists what each voice said, and never lets that pointer balloon into a backdoor recap (Skye's guard rail).
+- The division: **thread = extensive per-voice detail, badge headers + full-formatting bodies; active session = Mira's headline synthesis only, full formatting, no recap.**
 
 ---
 
@@ -87,7 +105,7 @@ On the first trigger hit (or promotion of a provisional stub), Scribe **immediat
    - `**Michael:**` / `**Brain:**` turn labels, in order.
    - Verbatim wording where it matters (decisions, instructions, key phrasing); tight paraphrase only where exact wording is unrecoverable, marked as paraphrase.
    - Decisions, reasoning, and tradeoffs captured inline as they land — not summarized after the fact.
-   - **Agent comments interleaved in their own voices**, formatted per the chip + blue-line standard above — the seated council/Workshop voices post here (and ONLY here), so the thread reads as the real multi-voice deliberation.
+   - **Agent comments interleaved in their own voices**, formatted per the emoji-badge + full-body standard above — the seated council/Workshop voices post here (and ONLY here), so the thread reads as the real multi-voice deliberation.
    - Backfill any pre-trigger turns from the session so far, so the record starts from message 1, not from the trigger point.
 4. Keeps appending in real time as the session continues. The thread grows turn by turn; it is never reconstructed from memory at the end.
 
@@ -110,8 +128,8 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 ## Rules
 
 - **Thread-first: the thread must exist before any agent speaks.** The opening check ("Do we have a session thread for this?") runs at session start; the first voice seated verifies/opens the thread and hands it to the team.
-- **Thread-only: council/Workshop agents express ONLY in the session thread, never in the active session.** Each posts in their own distinct voice, formatted as a name chip + blue quote line. Brain's synthesized reply + Mira's anchor line are the only things that stay live.
-- **Active session = Mira's synthesis only.** No per-agent recap in the live chat; the per-voice detail lives in the thread. Mira may flag a heavy section worth reading, never re-list each agent.
+- **Thread-only: council/Workshop agents express ONLY in the session thread, never in the active session.** Each posts in their own distinct voice, formatted as an emoji-badge header + full-formatting body. Brain's synthesized reply + Mira's anchor line are the only things that stay live.
+- **Active session = Mira's synthesis only.** No per-agent recap in the live chat; the per-voice detail lives in the thread. Mira writes in full formatting (not a quote block), may flag a heavy section worth reading in one pointer line, never re-lists each agent.
 - **Open-then-discard is the default.** Open a silent provisional log for anything that isn't an obvious lookup; discard the stub at close if the session stayed trivial — UNLESS an agent posted deliberation, which makes it substantive and non-discardable. Bias all the way toward opening.
 - **Deterministic triggers beat discretion.** About-to-create-a-task/doc (trigger 1) and the literal keyword list (trigger 2) fire with no judgment call and are the primary reason the log now opens near message 1.
 - **Fire once per session, and fire easily.** After the log opens/promotes, this gate is satisfied; don't re-evaluate.
@@ -128,15 +146,16 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 
 - **Session Close hook** (`hooks/session-close.md`) — Channel 2 (Session Log) is where this gate's thread lives; the close hook finalizes it rather than creating a fresh one.
 - **Scribe Sana** (`agents/scribe-sana.md`) — the owner/operator; her profile carries the behavioral detail.
-- **The Council** (`council.md`) — the thread-only expression rule + chip/blue-line format + Mira-synthesis-only output are mirrored there: seated voices deliberate in the thread, Mira headlines in the active session. Mira runs the opening thread-existence check.
+- **The Council** (`council.md`) — the thread-only expression rule + emoji-badge format + Mira-synthesis-only output are mirrored there: seated voices deliberate in the thread, Mira headlines in the active session. Mira runs the opening thread-existence check.
 - **Decision Log hook** (`hooks/decision-log.md`) — the repo-file `decision-log.md` convention (durable "why" in git) is distinct from this live chat transcript; a locked decision can land in both, full text in the decision log, pointer in the transcript.
 
 ---
 
 ## Changelog
 
-- 2026-07-17 (d): **Thread comment format + Mira-synthesis-only output.** Each agent comment now renders as a name CHIP (inline-code pill) + a BLUE blockquote line, chat-bubble style, with a copyable reference example. The active session now carries ONLY Mira's synthesis — no per-agent recap (detail lives in the thread; Mira may flag a heavy section worth reading). Also locked: a session where agents posted is non-discardable (resolves the open-then-discard vs thread-only interaction Enzo flagged).
-- 2026-07-17 (c): **Thread-only agent expression + thread-first opening check.** Council/Workshop agents may no longer speak in the active session — their sole channel is comments in the session transcript thread, each in their own distinct voice. Added the standing opening check ("Do we have a session thread for this?") run by Mira, who verifies/opens the thread before any agent speaks and hands it to the team. This structurally forces the transcript to exist whenever a real session starts. Brain's synthesized reply + Mira's anchor line stay live (FIRST TOKEN RULE preserved). Mirrored in `council.md`.
+- 2026-07-17 (d2): **Emoji-badge headers + full-formatting bodies (personality restore).** Retired the code-chip + forced-blue-quote shape — it segmented cleanly but flattened each agent's personality. Agent comments now lead with an emoji badge + bold name header, then a full-markdown body (no chip, no forced quote block). Added a canonical per-agent badge table. Mira's active-session synthesis also uses full formatting (not a quote block). Prompted by Michael: "we lost all the personality — use a badge icon, let each comment feel like a real comment."
+- 2026-07-17 (d): **Thread comment format + Mira-synthesis-only output.** (Superseded by d2 on the format specifics.) Introduced chip + blue blockquote line and locked active-session output to Mira's synthesis only. Also locked: a session where agents posted is non-discardable.
+- 2026-07-17 (c): **Thread-only agent expression + thread-first opening check.** Council/Workshop agents may no longer speak in the active session — their sole channel is comments in the session transcript thread, each in their own distinct voice. Added the standing opening check ("Do we have a session thread for this?") run by Mira. Brain's synthesized reply + Mira's anchor line stay live (FIRST TOKEN RULE preserved). Mirrored in `council.md`.
 - 2026-07-17 (b): **Fire earlier.** Added the open-then-discard default posture, a deterministic action-signal trigger (about to create a task/doc), and a literal trigger-phrase list. Added a backfill-to-message-1 rule. Prompted by the 2026-07-17 Production Paperwork Planner session, where a Decision-Log build never opened a live log and the transcript was reconstructed at close.
 - 2026-07-16 (b): Scribe now announces the transcript start ONCE (upbeat), then works silently. Gate biased to fire easily. Added to the load-and-sync step so it's evaluated every reply.
 - 2026-07-16: Initial version. Splits transcript *capture* (this start gate, real-time, Scribe-owned) from transcript *finalization* (the close hook). Created so session logs stop being thin memory-reconstructions and become true chronological back-and-forth records.
