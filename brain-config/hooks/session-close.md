@@ -108,6 +108,17 @@ If a memory write was attempted this session but did NOT land (no memory manager
 
 ---
 
+## Open-thread note → also append to open-thread.md (2026-07-17, Michael)
+
+The open-loop / open-thread note for a session is ALREADY posted as a comment on the session's Agent Activity Board task — that's part of the normal in-session workflow and does not change. At close, that SAME note is ALSO appended as the next entry in `brain-config/open-thread.md`.
+
+- **No review required.** Do not gate this on a review pass or ask permission — just post it as the next line/entry, same as any other close step. Michael's directive (2026-07-17): "take the same open-thread note and just post it in the open thread section... we won't require a review of that; just post it as the next line."
+- **Two surfaces, one note, different jobs:** the task comment is the in-session record where the loop was raised; `brain-config/open-thread.md` is the durable cross-session queue a cold agent reads at the Session Open trigger. The append is what carries the loop into the next session — a comment alone doesn't get read at session open.
+- **Format:** follow the existing `open-thread.md` entry shape (heading + `**Added:** YYYY-MM-DD` + the note body). Append; never overwrite existing entries. Repo write, so it goes through the normal branch → PR → self-merge flow like any other close-time commit.
+- Parallel to the bounced-memory-write drop above: both are durable handoffs written at close so nothing that's still open dies inside a single session's chat/comments.
+
+---
+
 ## Channel 2: A.I. Prompts (Session Log)
 
 **URL:** https://app.clickup.com/36074068/chat/r/6-901327646617-8
@@ -227,6 +238,7 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 10. **Root messages are never edited after posting.** Add info by threading.
 11. **Thread replies can have addenda.** If the session continues after initial close (extended session), post an addendum reply in the same thread rather than a new root.
 12. **Usage log commit (after both posts + task shutdown).** Tally which profiled tools (hooks, gates, agents) fired during the session. Commit an update to `brain-config/usage-log.json` incrementing each tool's count and bumping `sessions_logged`. Format: `{ "tools": { "tool-slug": N, ... }, "sessions_logged": N, "last_updated": "YYYY-MM-DD" }`.
+13. **The session's open-thread note is appended to `brain-config/open-thread.md` at close, no review.** It's already a comment on the session task (in-session record); the append is the durable cross-session queue a cold agent reads at Session Open. Append the next entry, never overwrite; commit via the normal branch → PR → self-merge flow.
 
 ---
 
@@ -236,8 +248,9 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 2. Closing Clio posts Channel 2 (Session Log: root + summary thread that links the Agent Activity Board session task as the full transcript)
 3. Session-task shutdown: final `[CLOSE-POINTER]` comment (links both threads) + flip status to `done` + hand Michael the task link in chat (templates T4/T5)
 4. Bounced-memory-write drop: if any write didn't land, append an `OMR` entry to `brain-config/open-memory-requests.md`
-5. Warm-start handoff prompt (if open loops exist)
-6. Usage-log commit to `brain-config/usage-log.json`
+5. Open-thread append: take the session's open-thread note (already a comment on the session task) and append it as the next entry in `brain-config/open-thread.md`. No review.
+6. Warm-start handoff prompt (if open loops exist)
+7. Usage-log commit to `brain-config/usage-log.json`
 
 ---
 
@@ -260,6 +273,7 @@ Never just post a link as a handoff. The prompt must be self-contained enough th
 | Closed the task but skipped the channel posts | Agent treated the task as a replacement for the channel close | Both fire; the task is an additional surface, not a substitute |
 | Said "closed out" without handing Michael the links | Agent stopped after the task update | Not closed until both threads posted + task shut + task link given |
 | Bounced memory write left as only a chat/audit mention | Agent skipped the durable drop | Append an OMR entry to open-memory-requests.md at close |
+| Open-thread note left only as a task comment | Agent skipped the durable append | Also append it as the next entry in open-thread.md at close (no review) |
 | No session task opened, so no transcript exists | Startup gate missed | Open the Agent Activity Board task at session start; comment near-per-prompt |
 | Audit says "no changes" with no thread | Agent skipped the structure | Still post full audit template with "None" in changes |
 | Multiple roots for same session | Agent posted twice | Use addendum replies in thread |
