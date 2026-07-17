@@ -1,0 +1,15 @@
+<section class="page">
+  <h1>About Inbox Digest</h1>
+  <p class="lead">A data-rendered audit surface for the Gmail inbox sweep. The sweep reads the inbox, merges keeper content into ClickUp tasks, and this app renders what was captured so the whole loop is auditable.</p>
+
+  <h2>What it is (and isn't)</h2>
+  <p>This is <b>not</b> an email viewer. It renders metadata only: who, what, when, thread size, read state, attachment names, and a two-line snippet, never full body text. The current landing page is the <b>Field Capture Matrix</b>: proof of exactly which fields the sweep can pull.</p>
+
+  <h2>How it will work</h2>
+  <p>The matrix maps 1:1 to a rolling <code>data/inbox-state.json</code> that Brain rewrites each sweep. The file is the audit trail: if a session ends mid-sweep, another agent reads it and continues. The dashboard view (state + action buckets) is the next build; <code>index.html</code> repoints the landing to it with one constant when it lands.</p>
+
+  <div class="callout">Built on the gold-standard template: shared chrome, dual drawers, and the <code>shared/themes</code> spine. Open Settings and switch themes to reskin the whole app live.</div>
+
+  <h2>Hard limits</h2>
+  <p class="muted">The sweep cannot read Gmail labels/folders, mark messages read, archive, or send. Every state change is a manual click; this app only shows what was captured and what to do next. Attachments travel only when you forward an email into ClickUp.</p>
+</section>
