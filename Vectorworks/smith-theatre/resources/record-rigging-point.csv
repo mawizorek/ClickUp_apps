@@ -1,0 +1,7 @@
+field_name,data_type,example_value,notes
+Name,text,High Steel Point A,the rigging point name
+Beam,text,Beam E-4,which E/W beam it hangs from
+Purpose,text,Scenic bridle,what the point carries
+Default Class,text,Steel-Beam,object class (S-1) — category only
+Default Layer,text,RIGGING - OVERHEAD,object layer (S-1) — 3 CATWALK
+Notes,text,"capacity per rigging plate; values live in file (S-4)",no dimension/load values transcribed here
