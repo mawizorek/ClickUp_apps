@@ -2,6 +2,12 @@
 
 Human-readable history of the AI Toolkit runtime layer. The repo has full git history; this is the fast-scan version so you (or the next agent) can see the toolkit's evolution without spelunking commits. Mirrors the changelog on the ClickUp AI Toolkit index.
 
+**Newest at top** (repo-wide convention, see `team-standard.md` → Repo Coordination): prepend new entries, never append.
+
+## 2026-07-16
+
+- **`docs: log-order` PR** — Standardized newest-at-top ordering across the repo's chronological logs (D-018). Flipped `Vectorworks/DECISION-LOG.md` (was oldest-first / append → newest-first / prepend) and made the convention explicit here. Canonical rule added to `brain-config/team-standard.md` (Repo Coordination, v1.2); VWX note in `Vectorworks/VWX-BEST-PRACTICES.md` (Documentation conventions). Per-entity ledgers (`VERSIONS.md`) exempt.
+
 ## 2026-07-03
 
 - **`1c798...` → this commit** — Added two write-chain hooks + a memory hook, plus this changelog:

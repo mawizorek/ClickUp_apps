@@ -2,7 +2,7 @@
 
 **Scope:** Every agent in this workspace (Brain sessions, Super Agents, future additions). This is the single source of truth for shared methodology. No agent maintains its own copy of anything defined here.
 
-**Version:** 2026-07-13 v1.1
+**Version:** 2026-07-16 v1.2
 
 ---
 
@@ -58,6 +58,7 @@ These fire on every substantive output regardless of agent role:
 - **PRs for structural work.** Direct commits for small/surgical changes during live sessions.
 - **Source budget:** 10-12KB target per file, 15KB soft cap, 30KB hard read cap.
 - **Never commit unapproved source to main without explicit go-ahead.**
+- **Log ordering (newest at top):** Every chronological log in the repo (changelogs, decision logs) lists the most recent entry FIRST. New entries **prepend**, never append. Per-entity ledgers keyed by name rather than date (e.g. `VERSIONS.md`) are exempt — order those however reads best.
 
 ---
 
@@ -104,5 +105,6 @@ This file is the **behavioral floor** every agent operates above. Role-specific 
 
 ## Changelog
 
+- 2026-07-16: v1.2. Added Log ordering rule (Repo Coordination) — all chronological repo logs are newest-at-top; new entries prepend. Per-entity ledgers keyed by name (VERSIONS.md) exempt. Origin: standardization pass that flipped Vectorworks/DECISION-LOG.md (D-018).
 - 2026-07-13: v1.1. Added Embrace the Fuss quality hook — take the right hard path over the easy shortcut; label the lazy version as fallback only.
 - 2026-07-04: v1. Extracted from proven standalone Brain session workflows. Covers review gates, quality hooks, repo coordination, escalation, health reporting.

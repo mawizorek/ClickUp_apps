@@ -17,6 +17,8 @@ Two layers, kept deliberately separate:
 
 **To resume research:** read the Research Agenda, pick an open question, add dated entries under Findings with sources. Don't write into Standards without a decision.
 
+> **Ordering note (D-018):** Findings (F-NNN) and Standards (S-N) are numbered registers, not chronological logs, so they stay in ascending-number order. The **chronological** companion `DECISION-LOG.md` is newest-at-top — see Documentation conventions at the bottom of this file.
+
 ---
 
 ## Research Agenda (what the deep dive should answer)
@@ -245,6 +247,12 @@ Format each file by its JOB, not one blanket rule:
 - **The VWX-worksheet mirror is the RECONCILIATION half ONLY (S-5 guardrail).** The git CSV is authored first as the plan; the worksheet renders the file's actual state; export → diff. The worksheet renders a check, never becomes the source. Auto-render stays strictly on the tabular manifests — never render prose standards as worksheets.
 - **Rule of thumb:** VWX worksheet will ever mirror it → CSV. Human reads it top-to-bottom → Markdown.
 - **Reach (S-6 pairs with S-5):** applies to every package in this org-agnostic template, not just URITP/Smith.
+
+---
+
+## Documentation conventions (repo-wide) · 2026-07-16 · D-018
+
+**Chronological logs are newest-at-top.** The companion `DECISION-LOG.md` lists the most recent decision FIRST, and new decisions **prepend** (never append at the bottom). This file's **Findings (F-NNN) and Standards (S-N) are numbered registers, not chronological logs**, so they stay in ascending-number order and are exempt. The canonical rule lives in `brain-config/team-standard.md` (Repo Coordination) and applies to every changelog / decision log in `mawizorek/ClickUp_apps`; per-entity ledgers keyed by name (e.g. `VERSIONS.md`) are exempt.
 
 ---
 
