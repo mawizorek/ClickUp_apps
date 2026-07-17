@@ -2,7 +2,7 @@
 
 **Scope:** Every agent in this workspace (Brain sessions, Super Agents, future additions). This is the single source of truth for shared methodology. No agent maintains its own copy of anything defined here.
 
-**Version:** 2026-07-17 v1.4
+**Version:** 2026-07-17 v1.5
 
 ---
 
@@ -31,25 +31,21 @@ Every agent's first instinct on any substantive exchange is to **route the outco
 
 ## Review & Brainstorm Gate
 
-Before committing source code, shipping a significant spec change, or finalizing a major deliverable, run the **Workshop Wes** process.
+Before committing source code, shipping a significant spec change, or finalizing a major deliverable, the work goes through a review body. **That body is conducted by Maestro Mira — you do NOT run a fixed checklist yourself.**
 
-Profile: `brain-config/agents/workshop-wes.md`
+**Maestro Mira** (`brain-config/agents/maestro-mira.md`) is the conductor and the single front door. You hand her the work; she decides who weighs in right now and returns one synthesized verdict. There are three layers, and it matters that they're not the same thing:
 
-**The process (seven lenses):**
+- **Maestro Mira** — the conductor (one agent, always-on, outermost gate). Reads the roster, seats the voices the moment needs, synthesizes reasoning traces (not a vote), talks to Michael. Everything below is seated BY her.
+- **The Council** (`brain-config/council.md`) — the full standing review body + orchestration rules (Core Panel, Depth Pair, Future Faye, Fold-in Frank, the Workshop, close-phase agents). The umbrella roster.
+- **The Workshop** (`brain-config/teams/the-workshop.md`) — a sub-team INSIDE the Council: the pre-commit stress-test lenses (Risk Rhys, Breaker Beckett, Clever Cleo, Polish Polly, Feasible Finn, Scope Skye, Eco Enzo). Seated inline on repo/spec/structural work. Owns its own verdict math.
 
-| # | Lens | What it checks |
-|---|------|----------------|
-| 1 | Red (Risk & Failure) | What breaks? Worst-case? Recoverable? |
-| 2 | Creative (Elegance) | Simpler way? Over/under-engineered? |
-| 3 | Professionalism (Quality) | Meets standards? Naming? Patterns? |
-| 4 | Development (Feasibility) | Buildable with available tools? Dependencies? |
-| 5 | Scope (Boundaries) | Staying on target or drifting? |
-| 6 | Ecosystem (Integration) | Conflicts with existing? Maintenance burden? |
-| 7 | Handoff (Continuity) | Cold agent picks this up next session? |
+**Workshop Wes is retired (2026-07-04, decomposed).** The old single "Wes" seven-lens checklist no longer exists as a thing you invoke. When you want that whole-team stress-test spirit, you ask **Mira**, and she tells you who is weighing in right now — seating the relevant lenses and, per her dynamic-weighting authority, giving extra weight to the voices the phase makes decisive (planners at phase-open; Breaker Beckett + Risk Rhys before anything large ships). Do not reference a "Wes process"; route to Mira.
 
-**Output:** Per-lens verdict table (pass / adjust / halt) + overall go/no-go.
+**How to invoke:**
+- **Whole-team review** ("run it by the team" / "workshop this" / auto at the pre-commit gate) → hand it to Mira. She convenes. The lenses never self-assemble without her.
+- **One specific voice** ("Rhys, what breaks here?" / "get Beckett on this") → that single agent posts a standalone comment. This is the only path that bypasses Mira's convening.
 
-**Verdict logic:** any HALT = overall HALT. 2+ ADJUST = overall ADJUST. All pass = GO.
+**Verdict logic (Workshop lenses):** each returns pass / adjust / halt. Any HALT → overall HALT. 2+ ADJUST → overall ADJUST. All pass → GO. Mira synthesizes the traces (not a tally) and reports GO / ADJUST / HALT with the specific fixes.
 
 ---
 
@@ -98,15 +94,18 @@ These fire on every substantive output regardless of agent role:
 
 ## Agent Roster
 
-Profiles live in `brain-config/agents/`. Each defines a specialized capability:
+Profiles live in `brain-config/agents/`. The review body is conducted by Mira and rostered in `council.md` (full cast) + `teams/the-workshop.md` (the pre-commit lenses). The standing on-demand workers:
 
-- **Workshop Wes** — Brainstorm/review gate (seven lenses)
-- **Recon Renata** — Repo structure auditor
-- **Scout Sage** — Multi-source research runner
-- **Closing Clio** — Session close auditor
-- **Handoff Hana** — Clean handoff packager
+- **Maestro Mira** — Council conductor; the outermost gate + single front door to all review (`agents/maestro-mira.md`).
+- **Recon Renata** — Repo structure auditor.
+- **Scout Sage** — Multi-source research runner.
+- **Closing Clio** — Session close auditor.
+- **Handoff Hana** — Clean handoff packager.
+- **Memory Maggie** — Memory steward (owns the brain-memory file lifecycle).
 
-To invoke: fetch the profile from `brain-config/agents/.md` and execute its defined process.
+Council + Workshop voices (Core Panel, Depth Pair, Fold-in Frank, the six Workshop lenses, Future Faye, Scribe Sana) are seated by Mira, not invoked freehand — see `council.md`. **Workshop Wes is retired**; his lenses were decomposed into the Workshop's named agents on 2026-07-04.
+
+To invoke a worker: fetch its profile from `brain-config/agents/<slug>.md` and execute its defined process. To invoke review: hand it to Mira.
 
 ---
 
@@ -122,6 +121,7 @@ This file is the **behavioral floor** every agent operates above. Role-specific 
 
 ## Changelog
 
+- 2026-07-17: v1.5. **Retired Workshop Wes from the Review & Brainstorm Gate.** The gate no longer instructs agents to "run the Workshop Wes process" with his 7-lens table (he was decomposed 2026-07-04 but this file still pointed at `workshop-wes.md` as the live gate). Rewrote the section around the real structure: Maestro Mira conducts (single front door), the Council is the umbrella body, the Workshop is the pre-commit sub-team; whole-team review routes through Mira, a single named voice is the only bypass. Mira's dynamic-weighting authority named (planners at phase-open; Beckett + Rhys pre-ship). Refreshed the Agent Roster off the stale 5-name list. Origin: Michael's reconciliation sweep — "people keep bringing up Wes randomly, but he's functionally retired; when we want that spirit we want Mira to say who's weighing in now."
 - 2026-07-17: v1.4. Sharpened Documentation Instinct — elevated WHY-as-active-history to the load-bearing principle. A decision log captures reasoning + rejected alternatives + context, NOT a what-changed summary; an entry that only records the change has failed. Named the Q/J/S block types. Origin: Michael's coaching after a session close that summarized what changed instead of why.
 - 2026-07-17: v1.3. Added Documentation Instinct section — chat is ephemeral, route real decisions to Decision Logs/comment threads on the entity itself. Format per Gold Standard. Replaces code-block question pattern in Brain memory.
 - 2026-07-16: v1.2. Added Log ordering rule (Repo Coordination) — all chronological repo logs are newest-at-top; new entries prepend. Per-entity ledgers keyed by name (VERSIONS.md) exempt. Origin: standardization pass that flipped Vectorworks/DECISION-LOG.md (D-018).
