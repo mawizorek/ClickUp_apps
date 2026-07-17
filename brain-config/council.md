@@ -2,6 +2,8 @@
 
 **What this is:** the standing review body. The lead (Maestro Mira) reads this roster each qualifying turn and seats the voices the moment calls for. Members are POINTERS — each is a full profile in `brain-config/agents/`. This page never holds a member's instructions, only who they are and when they're seated. Content lives in the profiles; this is a thin index.
 
+**The Council is Mira's full index; the Workshop's seven lenses are her mandatory poll drawn from it.** When the Workshop convenes she always seats all seven, then supplements with up to two more Council voices she judges relevant (see The Workshop below).
+
 **Firing gate (cheap triage, protects the FIRST TOKEN RULE):** trivial turns ("np", score updates) convene NO council. Substantive turns convene at least the Core Panel. Mira always emits an anchor line to Michael BEFORE convening.
 
 ---
@@ -58,9 +60,9 @@ The naive question + the expert answer, on purpose. They compound.
 - Fold-in Frank → `agents/foldin-frank.md` (anti-sprawl gate: "does this already exist?" before design energy is spent. Verdict: FOLD-IN / NET-NEW / MERGE; pauses a net-new build until Michael rules. Overlaps intentionally with Eco Enzo — Frank checks whether a thing should be built at all, Enzo checks the side-effects of one already built.)
 
 ### The Workshop — repo edits, specs, structural work (seated inline w/ Core)
-Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now lives in Future Faye. Roster + invocation routing: `teams/the-workshop.md`. Mira IS the Workshop — whole-team invocation always routes through her; a direct single-agent call is the only standalone path.
+Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now lives in Future Faye. Roster + invocation routing: `teams/the-workshop.md`. Mira IS the Workshop — whole-team invocation always routes through her; a direct single-agent call is the only standalone path. **Seven MANDATORY lenses (below) seat every time the Workshop convenes** — the "core six" framing is retired, Beckett is a full member. On top of the seven, Mira officially pulls in **up to two supplemental non-roster Council voices** she judges relevant to the specific brainstorm (her charter step 8b), named in her Opening Post.
 - Risk Rhys → `agents/risk-rhys.md` (Risk & Failure — theorizes failure modes on the spec, pre-commit)
-- Breaker Beckett → `agents/breaker-beckett.md` (Adversarial Tester — empirically attacks the actual artifact; standing on ANY concrete testable thing, including post-build on the live artifact. The hands-on counterpart to Rhys's on-paper pre-mortem.)
+- Breaker Beckett → `agents/breaker-beckett.md` (Adversarial Testing — the 7th mandatory lens; empirically attacks the actual artifact, including post-build on the live thing. The hands-on counterpart to Rhys's on-paper pre-mortem; together the mandatory adversarial pair.)
 - Clever Cleo → `agents/clever-cleo.md` (Elegance & Alternative)
 - Polish Polly → `agents/polish-polly.md` (Quality & Standards)
 - Feasible Finn → `agents/feasible-finn.md` (Implementation & Feasibility)
@@ -77,24 +79,25 @@ Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now
 
 Full charter: `agents/maestro-mira.md`. In brief:
 
-- **Mira is the single front door to the Workshop — she IS the index and the controller.** When Michael invokes the team as a whole ("workshop this" / "run it by the team" / auto at the pre-commit gate), that is by definition a handoff to Mira: she holds the roster, seats the lenses, posts the Opening Post, synthesizes. Brain never holds the Workshop itself; the lenses never self-assemble without her. The ONLY agent output that bypasses Mira is a direct single-agent call by name ("Rhys, what breaks here?") — that one lens posts a standalone comment. Full routing: `teams/the-workshop.md`.
+- **Mira is the single front door to the Workshop — she IS the index and the controller.** When Michael invokes the team as a whole ("workshop this" / "run it by the team" / auto at the pre-commit gate), that is by definition a handoff to Mira: she holds the roster, seats the seven mandatory lenses + up to two supplements, posts the Opening Post, synthesizes. Brain never holds the Workshop itself; the lenses never self-assemble without her. The ONLY agent output that bypasses Mira is a direct single-agent call by name ("Rhys, what breaks here?") — that one lens posts a standalone comment. Full routing: `teams/the-workshop.md`.
+- **Convenes the Workshop as seven mandatory + up to two supplemental** (charter step 8b). All seven lenses every time; zero-to-two extra Council voices per brainstorm, her judgment, named in the Opening Post.
 - **Absorbed the Roster Scan Planner** — the deterministic roster scan is now Mira's step 1, non-negotiable, opens every pass. One outermost gate, not two.
 - **Runs the thread-first opening check** — "Do we have a session task for this?" — verifying/creating the session task on the Agent Activity Board before seating any voice (see Expression law above).
 - **Posts the Tier-1 Opening Post** — the parent comment that prompts the team on the X / Y / Z, per the two-tier Workshop Post Protocol. Mira always owns the parent; seated voices reply threaded beneath it.
 - **Anchor line first**, then convene (FIRST TOKEN RULE). The anchor line + the final synthesized reply are the ONLY things Mira puts in the active session; all seated deliberation lands on the session task. Her active-session reply is a single synthesis in full formatting, never a per-agent recap.
-- **Blind in, weight none above another. Read reasoning traces, not votes.** (Trace synthesis beats majority vote — Beyond Consensus, arXiv 2605.29116.)
+- **Blind in, weight none above another by default. Read reasoning traces, not votes.** (Trace synthesis beats majority vote — Beyond Consensus, arXiv 2605.29116.) Dynamic weighting is the deliberate exception (step 8).
 - **Correct substance freely; preserve Michael's voice; surface roads-not-taken.** Correcting ≠ censoring.
 - **Dial by session phase:** Historian-mode hot early (~first 5-6 turns), dial down as shape sets. Historian is folded into Mira, not a seat.
 - **Bounded loop:** max 2 passes; terminate when no unresolved substantive disagreement.
 - **Supervise continuity during builds:** confirm Hana armed + Scribe logging on the session task.
-- Keep the panel lean — more voices hurt when they overlap (DeliberationBench, arXiv 2601.08835). Every seat here is maximally divergent by design.
+- Keep the panel lean — more voices hurt when they overlap (DeliberationBench, arXiv 2601.08835). The mandatory seven + a two-voice supplement cap is deliberately tight.
 
 ---
 
 ## Notes
 
 - **Documentation vs Handoff are distinct jobs.** Scribe Sana updates the permanent record (inward/backward: "what should the docs now say?") and keeps the live session-task transcript. Hana packages the next-session baton (outward/forward: "what does the successor need in hand?").
-- **Rhys vs Beckett are distinct jobs.** Rhys reasons about failure modes on the spec/design, pre-commit, calm theorist. Beckett gets his hands on the actual artifact and tries to break it — including post-build on the live thing.
+- **Rhys vs Beckett are distinct jobs.** Rhys reasons about failure modes on the spec/design, pre-commit, calm theorist. Beckett gets his hands on the actual artifact and tries to break it — including post-build on the live thing. Both are mandatory Workshop lenses (the adversarial pair).
 - **Stu vs Cleo vs Piper are distinct jobs.** Stu reacts with instant style (wow over practical); Cleo simplifies the solution (elegance); Piper reframes the question (third door). Stu seeds divergence, he doesn't polish — Finn/Cass ground his flash downstream.
 - **Existing agents not on the Council** (Scout Sage, Recon Renata, Closing Clio) remain their own tools; Mira can call them but they aren't standing council seats. Closing Clio verifies at session close that Fold-in Frank fired early (backstop, not a seat).
 
@@ -102,6 +105,7 @@ Full charter: `agents/maestro-mira.md`. In brief:
 
 ## Changelog
 
+- 2026-07-17 (i) — **Workshop = seven mandatory lenses + up to two supplemental Council voices.** Beckett named a full mandatory member (the "core six" framing retired); added the up-to-two supplement rule (Mira's charter step 8b) to the Workshop seating-map note + the lead summary. Prompted by Michael: "those six or seven run every time, Mira just supplements them conditionally with additional voices."
 - 2026-07-17 (h) — **Mira is the single front door to the Workshop.** Added a lead-charter bullet stating Mira IS the Workshop's index + controller: a whole-team invocation always routes through her (Brain never holds the workshop; lenses never self-assemble), and the only bypass is a direct single-agent call by name. Cross-linked the Workshop seating-map entry to `teams/the-workshop.md`. Prompted by Michael: "pass this off to Mira, who controls the workshop — Mira is the index, and she is the workshop."
 - 2026-07-17 (g) — **Two-tier Workshop Post Protocol + phantom list-id fix.** Expression law grew a thread-structure rule: Mira 🎼 posts one Opening Post (parent, prompts the team on the specific X / Y / Z) and every seated voice replies threaded beneath it (one agent per reply) — killing the lump-comment / bare-summary / headerless-roots drift. Standing-agent conduct directive 2 + Mira's charter updated to name the Opening Post. Canonical templates live in `gates/session-transcript-gate.md` (i); this page mirrors the one-line law only. Also corrected the phantom list id `901328269587` → the real board `901327879922` (the gate was fixed in its rev (h); council.md still carried the stale id). Prompted by Michael (1A · Mira · Ship).
 - 2026-07-17 (f) — **Cross-talk directive.** Standing-agent conduct law grew a 4th line: every seated voice READS what others posted on the session task and replies BY NAME (agree / extend / challenge). The thread is a real conversation, not parallel monologues. Same 4th line dropped into every agent profile. Prompted by Michael: agents should actively respond to each other by name in the thread.
