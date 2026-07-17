@@ -15,6 +15,12 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ---
 
+## 2026-07-17 · TSV migration EXECUTED (grids live, resolve.js rewired)
+**Decision:** Shipped the storage migration. `colors.tsv` (15 colors, hex, +`accent-deep` gradient-stop column) and `feelings.tsv` (3 feelings, `grad-angle` only — no lift/drop) are now the value source. `resolve.js` rewritten to parse the TSV grids, drop ALL color math, and build the gradient as `linear-gradient(angle, accent, accent-deep)` from two literal hex stops. `preview.html` reads the grids live via `resolve.js`; picking a theme/color/feeling reskins from the grids. `_themes.json` join unchanged (`sharp-mclaren` reference). Legacy per-color JSONs + `themes.css` + `build-themes.mjs` are now SUPERSEDED (left in place this pass to avoid breaking any consumer that still links `themes.css`; retire in a dedicated cleanup once consumers are confirmed off them).
+**Why:** Executes the three decisions below (hex canonical, TSV grids, no runtime color math). resolve.js API kept backward-compatible: `THEMES.apply(colorSlug)` still applies a color (now hex), so existing apps keep working; new `applyFeeling` / `applyTheme` handle the feeling + join.
+**⚠️ Verify note:** the 15 hex values were CONVERTED from the prior OKLCH tokens by hand and should be spot-checked before any theme is treated as final. `mclaren` (the reference) was converted most carefully; the papaya accent + cyan text-soft read correctly. Since colors are now hand-authored anyway (per the no-math rule), tuning any hex is a one-cell edit in `colors.tsv`. The `accent-deep` stops are first-pass darker values, meant to be eyeballed/tuned per color.
+**Status:** locked
+
 ## 2026-07-17 · HARD CONSTRAINT: every consumed color is a literal hex; NO runtime color math
 **Decision:** Every color value any design consumes must be a **literal hex code stored in the grid** — nothing computed, nothing in a color space that needs conversion. This kills runtime color math outright: no `color-mix`, no OKLCH blends, no auto-derived gradient stops. A gradient is TWO explicit hex stops stored as their own columns in the color grid (e.g. `accent` + `accent-deep`); the feeling keeps only the gradient **angle** (form), never computed colors. OKLCH is dropped entirely as a stored/authoring format. This is the color-side twin of the FileMaker object allowlist: constrain the design up front to what FileMaker copies easily.
 **Why:** Michael's bottom line: he hand-copies hex into FileMaker's color picker, so hex is the only format that serves the actual workflow. A computed stop is a value that lives nowhere in the table, so it can't be copied — that violates the same rule as an un-drawable shadow. Every color the render uses must be a reference value sitting in the shared file, on the assumption Michael recreates it by hand rather than re-running a calculation. Cost: designing a new color means picking both gradient-stop hexes by eye instead of auto-lift/drop; accepted (arguably better-looking, both ends chosen deliberately).
@@ -38,7 +44,7 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 **Status:** locked
 
 ## 2026-07-17 · preview.html is the render board (pick color + feeling, see 20 objects)
-**Decision:** Overwrote `preview.html` with the render board: a "pick a theme, or mix any color × feeling" page where every one of the 20 canonical objects renders as a copy-me **spec card** (live object + its exact FileMaker recipe: fill/gradient, corner, line weight, shadow, text). Buttons carry the full state set incl. pressed=inner-shadow. Color tokens load via `resolve.js` (single source); feelings embedded with `feelings/*.json` as canonical; join loaded from `_themes.json` with inline fallback. ~27KB, under the read cap.
+**Decision:** Overwrote `preview.html` with the render board: a "pick a theme, or mix any color × feeling" page where every one of the 20 canonical objects renders as a copy-me **spec card** (live object + its exact FileMaker recipe: fill/gradient, corner, line weight, shadow, text). Buttons carry the full state set incl. pressed=inner-shadow. Color tokens load via `resolve.js` (single source); feelings embedded with `feelings/*.json` as canonical; join loaded from `_themes.json` with inline fallback. ~27KB, under the read cap. (Updated same day: now reads the TSV grids via resolve.js — see the migration entry at top.)
 **Why:** Michael wanted the single canonical page he rebuilds in FileMaker every time, not loose per-theme mockups. The spec card (shape + recipe) is the copy-me unit; the renderer proves any color×feeling composes correctly and is the acceptance surface for new themes.
 **Status:** locked
 **Supersedes:** the prior color-only `preview.html` theme×object gallery.
@@ -72,8 +78,9 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ## 2026-07-16 · `_template.json` is the canonical copy-me start for a new theme
 **Decision:** New themes start by copying `_template.json` (all 17 tokens present with role-hint values + an inline `_README` of the 4 steps). The README "Adding a theme" section is the crisp procedure: copy → fill 17 → register one line in `_index.json` → `node build-themes.mjs`.
-**Why:** A cold agent had no obvious file to copy and would clone an existing theme (and might miss the register/regen steps). A named template + a 4-step README makes the instruction literal and unmissable, and states plainly that themes.css is generated (not the 1-file mental model, but close).
-**Status:** locked
+**Why:** A cold agent had no obvious file to copy and would clone an existing theme (and might miss the register/regen steps). A named template + a 4-step README makes the instruction literal and unmissable, and states plainly that themes.css is generated. NOTE (superseded by the TSV migration): colors now live in `colors.tsv`, not per-color JSON; `build-themes.mjs`/`themes.css` are legacy. Adding a color = a new row in `colors.tsv`.
+**Status:** superseded
+**Supersedes by:** the TSV migration entry at top.
 
 ## 2026-07-16 · Americana light theme added
 **Decision:** Added `americana` (light) to the Neutral & Natural group: soft white surfaces, Old Glory Blue (#3C3B6E) ink + secondary, Old Glory Red (#B22234) actionable accent.
@@ -82,7 +89,7 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ## 2026-07-16 · preview.html auto-populates its menu from the registry
 **Decision:** The gallery's theme menu builds itself from `_index.json` (the theme registry) at load, with a baked-in list as fallback; each swatch color is read from `themes.css` via a hidden probe. Adding a theme (JSON + register + regen CSS) makes it appear in the menu with NO edit to `preview.html`.
-**Why:** "Themes should auto-populate into this index." A hand-maintained theme list in the preview would drift from the registry. Reading the registry + probing the CSS for swatches means the menu can never fall out of sync, and no accent is ever hand-copied. Styling still comes from the static `themes.css` so the page can't white-screen if the fetch fails.
+**Why:** "Themes should auto-populate into this index." A hand-maintained theme list in the preview would drift from the registry. Reading the registry + probing the CSS for swatches means the menu can never fall out of sync, and no accent is ever hand-copied. NOTE (updated by TSV migration): the menu now builds from `colors.tsv` / `feelings.tsv` / `_themes.json` via resolve.js; same auto-populate principle, grid-sourced.
 **Status:** locked
 **Supersedes:** the temporary fully-baked-in theme list introduced when the menu was hardened against the resolve.js load failure.
 
@@ -125,5 +132,5 @@ Append-only record of decisions made in the theming space (`shared/themes/`). Ne
 
 ## 2026-07-16 · F1 constructor grid is the first theme batch
 **Decision:** Seed set is `maw-dark-utility` (anchor + ultimate fallback) plus the full 2026 F1 constructor grid (11 themes: mclaren, ferrari, mercedes, red-bull, alpine, aston-martin, audi, cadillac dark; haas, racing-bulls, williams light).
-**Why:** F1 is Michael's chosen proving ground and gives a wide, opinionated color range (dark + light, warm + cool) that stress-tests whether one object system can carry clearly distinct brands. All shipped with real OKLCH tokens, not stubs.
+**Why:** F1 is Michael's chosen proving ground and gives a wide, opinionated color range (dark + light, warm + cool) that stress-tests whether one object system can carry clearly distinct brands. All shipped with real OKLCH tokens, not stubs. NOTE: OKLCH values superseded by hex in `colors.tsv` (see migration entry).
 **Status:** locked
