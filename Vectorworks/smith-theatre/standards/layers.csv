@@ -1,0 +1,30 @@
+layer_name,department,elevation_band,scope,2D,3D,status,tags
+RIGGING - OVERHEAD,RIGGING,3 CATWALK,venue-base,Y,Y,CREATED,
+VID - OVERHEAD,VIDEO,3 CATWALK,department,N,N,DRAFTING,
+UTL - CAMERAS,UTILITY,3 CATWALK,department,Y,Y,,rep
+LX - PLOT 1 CATWALKS,LX DESIGNER,3 CATWALK,department,Y,Y,NEW,
+_HANG POSITIONS,UR,3 CATWALK,venue-base,,N,REVIEWING,
+3D 3 CATWALKS,UR,3 CATWALK,venue-base,,Y,REVIEWING,
+LX - PLOT SECTIONS,HEAD ELECTRICIAN,3 CATWALK,department,Y,N,NEW,
+LX - REP,HEAD ELECTRICIAN,3 CATWALK,venue-base,Y,Y,NEW,"rep; house + work lights"
+VID - TOE PIPES,VIDEO,2 TOE,department,N,N,,
+LX - PLOT 2 TOE PIPES,LX DESIGNER,2 TOE,department,Y,Y,NEW,
+AUDIO - OVERHEAD,AUDIO,2 TOE,department,Y,Y,CREATED,
+AUDIO - REP,AUDIO,2 TOE,venue-base,N,,DRAFTING,rep
+SCENIC - OVERHEAD,SCENIC,2 TOE,department,N,N,,
+TECH SETUP,PM,1.5 MEZZ,department,Y,Y,,
+LX - MEZZ,LX DESIGNER,1.5 MEZZ,department,Y,Y,NEW,
+3D 2 MEZZANINE,UR,1.5 MEZZ,venue-base,,Y,REVIEWING,
+VID - DECK,VIDEO,1 DECK,department,N,N,,
+LX - focus points,LX DESIGNER,1 DECK,department,Y,Y,CREATED,
+LX - PLOT 3 DECK,LX DESIGNER,1 DECK,department,Y,Y,NEW,
+SCENIC - DECK,SCENIC,1 DECK,department,N,N,DRAFTING,
+3D 1 GROUNDPLAN,UR,1 DECK,venue-base,,Y,REVIEWING,
+Theatre Architecture,UR,1 DECK,venue-base,Y,Y,,
+SCENIC - Symbols,SCENIC,1 DECK,department,N,N,,
+PVIZ - View CAMERAS,UTILITY,0 NOTES,venue-base,N,Y,DRAFTING,"for render viewport cameras"
+VID - SYSTEM NOTES,VIDEO,0 NOTES,department,N,N,,
+WORKING SCRATCH,UTILITY,0 NOTES,venue-base,Y,Y,,
+>import 3D,UR,,department,N,N,CREATED,"2D master the LX file references"
+2D 2 [SPAC] Mezzanine,UR,,venue-base,N,N,CUT?,
+VID - REP,VIDEO,,venue-base,N,N,,rep
