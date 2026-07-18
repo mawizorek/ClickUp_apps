@@ -4,6 +4,10 @@ Human-readable history of the AI Toolkit runtime layer. The repo has full git hi
 
 **Newest at top** (repo-wide convention, see `team-standard.md` → Repo Coordination): prepend new entries, never append.
 
+## 2026-07-18
+
+- **`docs/skills-git-integration` PR** — Added `skills-integration.md`: the canonical standard for how native ClickUp AI Skills relate to this git runtime. Core law: **Skill = TRIGGER + PATTERN, git = STEPS; the skill points at git, never copies it.** Discovered while building the first real skills (`/email-ingest` + `/uritp-email-ingest`, `/question-me`, `/audit-loop`): AI Skills are the platform-native version of the AI Toolkit index + gate/agent profiles, so the same-shape overlap risks registry↔index-style drift. The doc defines the decision rule (when to build a Skill vs. a git file), the stable-vs-volatile test for what may live inline in a skill, worked examples, and how the two layers grow together (index = deterministic in-session firing; Skills = shareable on-demand triggers). Only sanctioned duplication remains the registry↔index mirror pair.
+
 ## 2026-07-16
 
 - **`docs: log-order` PR** — Standardized newest-at-top ordering across the repo's chronological logs (D-018). Flipped `Vectorworks/DECISION-LOG.md` (was oldest-first / append → newest-first / prepend) and made the convention explicit here. Canonical rule added to `brain-config/team-standard.md` (Repo Coordination, v1.2); VWX note in `Vectorworks/VWX-BEST-PRACTICES.md` (Documentation conventions). Per-entity ledgers (`VERSIONS.md`) exempt.
