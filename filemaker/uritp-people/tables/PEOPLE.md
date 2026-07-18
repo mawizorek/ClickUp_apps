@@ -2,7 +2,7 @@
 
 **Role:** identity-hub · **Status:** under-review · **App:** uritp-people
 
-> The identity hub — the one canonical record per human. This is the **target-state** definition (what we build toward), not a dump of the old file. Lean by design: names + display cascade + pronunciation + playbill credit + broad classification + the ClickUp merge handle + audit. Every spoke app references this by person PK and never restates these fields.
+> The identity hub — the one canonical record per human. This is the **target-state** definition (what we build toward), not a dump of the old file. Lean by design: names + display cascade + pronunciation + playbill credit + the ClickUp merge handle + audit. Classification (Student/Non-Student) is DERIVED from which extension a person has, not a stored field. Every spoke app references this by person PK and never restates these fields.
 
 ## Fields
 
@@ -20,7 +20,6 @@
 | autoFirstLast | calc | plain | name | | "First Last" working name (preferred if set, else true) |
 | autoLastFirst | calc | plain | name | | "Last, First" working name |
 | customID | text | plain | id | | **KEEP** — CRM-### human-readable handle; the merge key to ClickUp (alongside email). Distinct from the UUID PK, which is machine-only. |
-| broadClassification | text | plain | classification | pending | Student / Non-Student. Powers the chooser start context. Confirm: explicit stored flag vs. derived from extension existence. |
 | summary_CountPeople | summary | plain | meta | | |
 | ScratchNotes | text | plain | notes | | freeform |
 | CreationTimestamp | timestamp | audit | audit | | auto |
@@ -28,7 +27,18 @@
 | ModificationTimestamp | timestamp | audit | audit | | auto |
 | ModifiedBy | text | audit | audit | | auto |
 
-**19 fields.** Two as-built fields were deliberately CUT this pass (see Changelog + `meta/design-decisions.md` ledger): `emailTEMP` (legacy import staging) and `hiddenLatestImport` (import-batch cruft that doesn't belong on the canonical identity record).
+**18 fields.** Classification is NOT a stored field (see below). Three as-built fields were deliberately CUT/derived-away this pass (see Changelog + `meta/design-decisions.md`): `emailTEMP` (legacy import staging), `hiddenLatestImport` (import-batch cruft), and `broadClassification` (now derived, not stored).
+
+## Classification is DERIVED, not stored (RULED 2026-07-18, Workshop W1)
+
+The Student / Non-Student context is computed from which role extension a person holds, NOT a stored flag:
+
+- has `STUDENTS_ext` → Student context
+- has `ADULTS_ext` → Non-Student context
+- has both → both
+- has neither → unclassified
+
+The chooser card reads this derived context to set its starting filter. A stored flag would be a drift surface (flag says Student while no `STUDENTS_ext` exists). Consistent with the repo's derive-don't-store discipline (D-005/006/007).
 
 ## The name model (why FOUR name inputs, none redundant)
 
@@ -50,11 +60,11 @@ This is intentional, not over-built. Each input solves a distinct real case:
 
 ## Open Items
 
-- **`broadClassification`**: store an explicit Student/Non-Student flag on PEOPLE (powers the chooser start context), or derive from extension existence? Confirm target.
-- **Naming house style** (`PrimaryKey`→`pk_`?) — cross-app governance, see `meta/design-decisions.md` ledger A1/A2.
+- Naming house style is LOCKED to bare `PrimaryKey`/`fkPERSON` (no prefixes) — see `meta/design-decisions.md`.
 - Confirm all field names/types against the live FMP file (reconciliation pass).
 
 ## Changelog
 
-- 2026-07-18 (target-state pass): Reframed from as-built to build-toward. **Cut** `emailTEMP` + `hiddenLatestImport` from the hub. Applied the three typo renames inline (`preferred*`, `namePronunciation`). Documented the four-input name model with the real case behind each (Michael: alternate = foreign-exchange; playbill = manual print source of truth; customID = ClickUp merge handle). All three defended fields KEPT.
+- 2026-07-18 (Workshop W1): `broadClassification` removed as a stored field — now DERIVED from extension existence (derive-don't-store). PEOPLE 19 → 18 fields.
+- 2026-07-18 (target-state pass): Reframed from as-built to build-toward. Cut `emailTEMP` + `hiddenLatestImport`. Applied typo renames inline. Documented the four-input name model with the real case behind each. `customID` kept as the ClickUp merge handle.
 - 2026-07-18: First-pass migration from the ClickUp `URITP People FMP` doc.
