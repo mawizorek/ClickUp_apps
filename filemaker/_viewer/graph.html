@@ -7,208 +7,231 @@
 <title>URITP FileMaker — Package Map</title>
 <style>
   :root{
-    --bg: oklch(0.19 0.02 275);
-    --surface-1: oklch(0.24 0.025 275);
-    --surface-2: oklch(0.29 0.03 275);
-    --border: oklch(0.42 0.03 275);
-    --text: oklch(0.95 0.01 275);
-    --text-soft: oklch(0.74 0.02 275);
-    --text-faint: oklch(0.58 0.02 275);
-    --spine: oklch(0.68 0.17 300);
-    --builder: oklch(0.76 0.15 75);
-    --spoke: oklch(0.72 0.13 190);
-    --util: oklch(0.62 0.04 275);
-    --edge: oklch(0.5 0.03 275);
-    --pointer: oklch(0.76 0.15 75);
+    --bg: oklch(0.985 0.006 85);
+    --panel: oklch(1 0 0);
+    --line: oklch(0.9 0.008 85);
+    --ink: oklch(0.29 0.02 275);
+    --ink-soft: oklch(0.5 0.02 275);
+    --ink-faint: oklch(0.66 0.015 275);
+    --spine: oklch(0.52 0.16 300);
+    --builder: oklch(0.56 0.13 55);
+    --spoke: oklch(0.5 0.1 205);
+    --util: oklch(0.58 0.02 275);
+    --wire: oklch(0.8 0.01 275);
+    --wire-lit: oklch(0.52 0.16 300);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
   body{
-    background:var(--bg);color:var(--text);
-    font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    overflow:hidden;
+    background:var(--bg);color:var(--ink);
+    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:0 0 4rem;
   }
-  header{
-    position:fixed;top:0;left:0;right:0;z-index:5;
-    display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap;
-    padding:.9rem 1.15rem calc(.9rem + env(safe-area-inset-top));
-    background:linear-gradient(var(--bg),transparent);
-    pointer-events:none;
-  }
-  header h1{font-size:1.05rem;font-weight:640;letter-spacing:-.01em}
-  header p{font-size:.82rem;color:var(--text-soft);font-weight:420}
-  #stage{position:fixed;inset:0}
-  svg{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
-  svg.grabbing{cursor:grabbing}
-  .edge{stroke:var(--edge);stroke-width:1.4;fill:none;opacity:.5;transition:opacity .25s cubic-bezier(.16,1,.3,1),stroke .25s}
-  .edge.pointer{stroke:var(--pointer);stroke-dasharray:5 4;opacity:.6}
-  .edge.dim{opacity:.08}
-  .edge.lit{opacity:.95;stroke:var(--text-soft)}
-  .elabel{fill:var(--text-faint);font-size:9.5px;opacity:0;transition:opacity .2s;pointer-events:none;text-anchor:middle}
-  .elabel.lit{opacity:1;fill:var(--text-soft)}
-  .node{cursor:pointer}
-  .node circle{stroke:var(--bg);stroke-width:2.5;transition:opacity .25s}
-  .node text{fill:var(--text);font-size:12px;font-weight:520;pointer-events:none;transition:opacity .25s}
-  .node .role{fill:var(--text-faint);font-size:9.5px;font-weight:420}
-  .node.dim{opacity:.22}
-  .node.spine circle{fill:var(--spine)}
-  .node.builder circle{fill:var(--builder)}
-  .node.spoke circle{fill:var(--spoke)}
-  .node.util circle{fill:var(--util)}
-  .node.planned circle{fill:var(--bg);stroke-width:2;stroke-dasharray:3 3}
-  .node.planned.spine circle{stroke:var(--spine)}
-  .node.planned.builder circle{stroke:var(--builder)}
-  .node.planned.spoke circle{stroke:var(--spoke)}
-  .node.planned.util circle{stroke:var(--util)}
-  .legend{
-    position:fixed;left:1.15rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:5;
-    background:var(--surface-1);border:1px solid var(--border);border-radius:12px;
-    padding:.7rem .85rem;font-size:.8rem;color:var(--text-soft);max-width:min(84vw,340px);
-  }
-  .legend h2{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;color:var(--text-faint);font-weight:600;margin-bottom:.5rem}
-  .legrow{display:flex;align-items:center;gap:.5rem;padding:.12rem 0}
-  .dot{width:12px;height:12px;border-radius:50%;flex:none}
-  .dot.spine{background:var(--spine)}.dot.builder{background:var(--builder)}
-  .dot.spoke{background:var(--spoke)}.dot.util{background:var(--util)}
-  .dot.ring{background:transparent;border:2px dashed var(--text-faint)}
-  .legend .hint{margin-top:.55rem;color:var(--text-faint);font-size:.74rem;line-height:1.45}
-  #fit{
-    position:fixed;right:1.15rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:5;
-    background:var(--surface-2);color:var(--text);border:1px solid var(--border);
-    border-radius:10px;padding:.6rem .95rem;font:inherit;font-size:.85rem;font-weight:540;
-    cursor:pointer;min-height:44px;transition:background .2s,border-color .2s;
-  }
-  #fit:hover{background:var(--surface-1);border-color:var(--text-faint)}
-  #fit:focus-visible{outline:2px solid var(--spine);outline-offset:2px}
-  #msg{position:fixed;inset:0;display:none;place-items:center;text-align:center;padding:2rem;color:var(--text-soft)}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+  header{padding:clamp(1.6rem,5vw,3rem) 0 1.2rem}
+  .eyebrow{font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+  header h1{font-size:clamp(1.7rem,4.5vw,2.5rem);font-weight:680;letter-spacing:-.02em;margin:.35rem 0 .5rem;line-height:1.05}
+  header p{color:var(--ink-soft);max-width:60ch;font-size:1.02rem}
+  section{margin-top:clamp(1.8rem,5vw,3rem)}
+  h2.sec{font-size:.78rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;
+    padding-bottom:.6rem;border-bottom:1px solid var(--line);margin-bottom:1.4rem}
+  /* diagram */
+  .board{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:.5rem;overflow:hidden}
+  svg{display:block;width:100%;height:auto}
+  .wire{fill:none;stroke:var(--wire);stroke-width:1.5;transition:stroke .18s,stroke-width .18s,opacity .18s}
+  .wire.pointer{stroke-dasharray:5 4;stroke:var(--builder);opacity:.7}
+  .card-hit{cursor:default}
+  .card{transition:opacity .18s}
+  .card .box{fill:var(--panel);stroke:var(--line);stroke-width:1.5;transition:stroke .18s}
+  .card .kbar{transition:opacity .18s}
+  .card.spine .kbar{fill:var(--spine)} .card.builder .kbar{fill:var(--builder)}
+  .card.spoke .kbar{fill:var(--spoke)} .card.util .kbar{fill:var(--util)}
+  .card .nm{fill:var(--ink);font-weight:620;font-size:14px}
+  .card .rl{fill:var(--ink-faint);font-size:10.5px}
+  .card.planned .box{stroke-dasharray:4 3}
+  .card.planned .nm{fill:var(--ink-soft)}
+  svg.focusing .wire{opacity:.12}
+  svg.focusing .wire.lit{opacity:1;stroke:var(--wire-lit);stroke-width:2.2}
+  svg.focusing .card{opacity:.32}
+  svg.focusing .card.lit{opacity:1}
+  .wlabel{fill:var(--ink-faint);font-size:9.5px;text-anchor:middle;opacity:0;transition:opacity .18s}
+  svg.focusing .wlabel.lit{opacity:1}
+  /* passive tree */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+  .kgroup{margin-bottom:1.8rem}
+  .kgroup h3{display:flex;align-items:center;gap:.5rem;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:600;margin-bottom:.9rem}
+  .kdot{width:10px;height:10px;border-radius:3px;flex:none}
+  .kdot.spine{background:var(--spine)}.kdot.builder{background:var(--builder)}
+  .kdot.spoke{background:var(--spoke)}.kdot.util{background:var(--util)}
+  .app{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem}
+  .app .top{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem}
+  .app .name{font-weight:640;font-size:1rem}
+  .app .name a{color:inherit;text-decoration:none;border-bottom:1.5px solid var(--spine)}
+  .app .name a:hover{color:var(--spine)}
+  .app .st{font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;
+    padding:.15rem .5rem;border:1px solid var(--line);border-radius:99px;white-space:nowrap}
+  .app .st.built{color:var(--spoke);border-color:color-mix(in oklch,var(--spoke),transparent 65%)}
+  .app .st.migrating{color:var(--spine);border-color:color-mix(in oklch,var(--spine),transparent 65%)}
+  .app .role{color:var(--ink-soft);font-size:.86rem;margin:.15rem 0 .6rem}
+  .app .refs{font-size:.82rem;color:var(--ink-soft);line-height:1.7}
+  .app .refs .lab{color:var(--ink-faint)}
+  .app .refs b{color:var(--ink);font-weight:600}
+  .app .none{color:var(--ink-faint);font-style:italic;font-size:.82rem}
+  .legend{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin-top:1.1rem;font-size:.82rem;color:var(--ink-soft)}
+  .legend span{display:inline-flex;align-items:center;gap:.45rem}
+  #msg{display:none;padding:2rem;text-align:center;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);border-radius:16px}
+  footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--ink-faint);font-size:.8rem}
 </style>
 </head>
 <body>
-<header>
-  <h1>URITP FileMaker</h1>
-  <p>package map · tap a solid node to open its schema</p>
-</header>
-<div id="stage"><svg xmlns="http://www.w3.org/2000/svg"><g id="root"><g id="gEdge"></g><g id="gElab"></g><g id="gNode"></g></g></svg></div>
-<div id="msg"></div>
-<div class="legend">
-  <h2>App kinds</h2>
-  <div class="legrow"><span class="dot spine"></span> Spine — shared backbone</div>
-  <div class="legrow"><span class="dot builder"></span> Builder — owns an entity + assignments</div>
-  <div class="legrow"><span class="dot spoke"></span> Spoke — references the spines</div>
-  <div class="legrow"><span class="dot util"></span> Util — reference data</div>
-  <div class="legrow"><span class="dot ring"></span> Dashed = planned / not built</div>
-  <p class="hint">Drag nodes · scroll/pinch to zoom · hover to trace links. Amber dashes = Global Setup's selector pointer at Productions.</p>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">URITP FileMaker</div>
+    <h1>Package Map</h1>
+    <p>How the app ecosystem fits together. Two shared spines at the top; everything below references them. This page reads live from the ecosystem index, so it stays current on its own.</p>
+  </header>
+
+  <section>
+    <h2 class="sec">The structure</h2>
+    <div class="board"><svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="App relationship diagram"></svg></div>
+    <div class="legend">
+      <span><span class="kdot spine"></span> Spine · shared backbone</span>
+      <span><span class="kdot builder"></span> Builder · owns an entity + assignments</span>
+      <span><span class="kdot spoke"></span> Spoke · references the spines</span>
+      <span><span class="kdot util"></span> Util · reference data</span>
+      <span>Dashed outline = planned · hover a card to trace its links</span>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">Reference tree</h2>
+    <div id="tree"></div>
+  </section>
+
+  <div id="msg"></div>
+  <footer id="foot">URITP FileMaker package map</footer>
 </div>
-<button id="fit">Fit</button>
+
 <script>
 (async function(){
   const NS='http://www.w3.org/2000/svg';
-  const svg=document.querySelector('svg');
-  const root=document.getElementById('root');
-  const gEdge=document.getElementById('gEdge'), gElab=document.getElementById('gElab'), gNode=document.getElementById('gNode');
+  const el=(t,a,txt)=>{const n=document.createElementNS(NS,t);for(const k in (a||{}))n.setAttribute(k,a[k]);if(txt!=null)n.textContent=txt;return n;};
+  const svg=document.getElementById('svg');
+  const tree=document.getElementById('tree');
   const msg=document.getElementById('msg');
-  const el=(t,a)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);return n;};
-  function fail(t){msg.textContent=t;msg.style.display='grid';}
 
   let data;
-  try{ data = await fetch('./package-graph.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();}); }
-  catch(e){ return fail('Could not load package-graph.json. Refresh in a moment (Pages may still be publishing).'); }
+  try{ data=await fetch('./package-graph.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();}); }
+  catch(e){ msg.style.display='block'; msg.textContent='Could not load the ecosystem index (package-graph.json). Refresh in a moment — GitHub Pages may still be publishing.'; return; }
 
-  const rOf = d=> d.kind==='spine'?26 : d.kind==='builder'?19 : d.kind==='util'?13 : 15;
-  const nodes = data.nodes.map((d,i)=>({...d,
-    x:Math.cos(i/data.nodes.length*6.283)*180,
-    y:Math.sin(i/data.nodes.length*6.283)*180, vx:0, vy:0}));
-  const byId=new Map(nodes.map(n=>[n.id,n]));
-  const links = data.edges.filter(e=>byId.has(e.from)&&byId.has(e.to))
-                          .map(e=>({s:byId.get(e.from),t:byId.get(e.to),from:e.from,to:e.to,label:e.label,kind:e.kind}));
+  const nodes=data.nodes, byId=new Map(nodes.map(n=>[n.id,n]));
+  const edges=data.edges.filter(e=>byId.has(e.from)&&byId.has(e.to));
+  const KLABEL={spine:'Spines',builder:'Builders',spoke:'Spokes',util:'Utilities'};
+  const KORDER=['spine','builder','spoke','util'];
+
+  // ---------- deterministic tier layout ----------
+  // tier 0 = spines, tier 1 = builders, tier 2 = spokes+utils (wrapped)
+  const tierOf=n=> n.kind==='spine'?0 : n.kind==='builder'?1 : 2;
+  const rows=[[],[],[]];
+  nodes.forEach(n=>rows[tierOf(n)].push(n));
+  // wrap tier 2 into subrows of <=5
+  const PER=5, W=1040, CW=176, CH=60, PADX=24;
+  const layout=[]; // {row: y-center, items:[nodes]}
+  layout.push({items:rows[0]});
+  layout.push({items:rows[1]});
+  for(let i=0;i<rows[2].length;i+=PER) layout.push({items:rows[2].slice(i,i+PER)});
+  const rowGap=118, topPad=30;
+  const pos=new Map();
+  layout.forEach((r,ri)=>{
+    const y=topPad+ri*rowGap;
+    const n=r.items.length;
+    r.items.forEach((node,i)=>{
+      const cx=(W)*(i+1)/(n+1);
+      pos.set(node.id,{cx, cy:y+CH/2, x:cx-CW/2, y});
+    });
+  });
+  const H=topPad+layout.length*rowGap+10;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio','xMidYMin meet');
+
+  const gWire=el('g'), gLab=el('g'), gCard=el('g');
+  svg.appendChild(gWire); svg.appendChild(gLab); svg.appendChild(gCard);
+
+  // ---------- wires ----------
   const adj=new Map(nodes.map(n=>[n.id,new Set([n.id])]));
-  links.forEach(l=>{adj.get(l.from).add(l.to);adj.get(l.to).add(l.from);});
-
-  // ---- build DOM ----
-  const linkEls=links.map(l=>{const p=el('path',{class:'edge'+(l.kind==='pointer'?' pointer':'')});gEdge.appendChild(p);l._p=p;
-    const tx=el('text',{class:'elabel'});tx.textContent=l.label;gElab.appendChild(tx);l._tx=tx;return p;});
-  nodes.forEach(d=>{
-    const g=el('g',{class:`node ${d.kind} ${d.status==='planned'?'planned':''}`});
-    g.appendChild(el('circle',{r:rOf(d)}));
-    const t1=el('text',{y:rOf(d)+15,'text-anchor':'middle'});t1.textContent=d.label;g.appendChild(t1);
-    const t2=el('text',{class:'role',y:rOf(d)+27,'text-anchor':'middle'});t2.textContent=d.role;g.appendChild(t2);
-    gNode.appendChild(g);d._g=g;
-    g.addEventListener('mouseenter',()=>focus(d.id));
-    g.addEventListener('mouseleave',clearFocus);
-    g.addEventListener('pointerdown',ev=>startDrag(ev,d));
-    g.addEventListener('click',()=>{ if(d.viewer && !d._moved) location.href='./schema.html?app='+d.id; });
+  const wireByNode=new Map(nodes.map(n=>[n.id,[]]));
+  edges.forEach(e=>{
+    const a=pos.get(e.from), b=pos.get(e.to);
+    const my=(a.cy+b.cy)/2;
+    const p=el('path',{class:'wire'+(e.kind==='pointer'?' pointer':''),
+      d:`M ${a.cx} ${a.cy} C ${a.cx} ${my}, ${b.cx} ${my}, ${b.cx} ${b.cy}`});
+    gWire.appendChild(p);
+    const lab=el('text',{class:'wlabel',x:(a.cx+b.cx)/2,y:my-3},e.label); gLab.appendChild(lab);
+    adj.get(e.from).add(e.to); adj.get(e.to).add(e.from);
+    wireByNode.get(e.from).push({p,lab}); wireByNode.get(e.to).push({p,lab});
   });
 
-  function focus(id){const near=adj.get(id);
-    nodes.forEach(n=>n._g.classList.toggle('dim',!near.has(n.id)));
-    links.forEach(l=>{const on=l.from===id||l.to===id;l._p.classList.toggle('dim',!on);l._p.classList.toggle('lit',on);l._tx.classList.toggle('lit',on);});}
-  function clearFocus(){nodes.forEach(n=>n._g.classList.remove('dim'));
-    links.forEach(l=>{l._p.classList.remove('dim','lit');l._tx.classList.remove('lit');});}
-
-  // ---- force sim (hand-rolled velocity relaxation) ----
-  let alpha=1;
-  function step(){
-    if(alpha>0.002){
-      // repulsion
-      for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
-        const a=nodes[i],b=nodes[j];let dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy||0.01;
-        const dist=Math.sqrt(d2);const rep=6200/d2;const ux=dx/dist,uy=dy/dist;
-        a.vx+=ux*rep;a.vy+=uy*rep;b.vx-=ux*rep;b.vy-=uy*rep;
-        const minD=rOf(a)+rOf(b)+40;if(dist<minD){const push=(minD-dist)*0.5;a.vx+=ux*push;a.vy+=uy*push;b.vx-=ux*push;b.vy-=uy*push;}
-      }
-      // springs
-      links.forEach(l=>{const dx=l.t.x-l.s.x,dy=l.t.y-l.s.y;const dist=Math.hypot(dx,dy)||0.01;
-        const rest=l.kind==='pointer'?95:135;const f=(dist-rest)*0.045;const ux=dx/dist,uy=dy/dist;
-        l.s.vx+=ux*f;l.s.vy+=uy*f;l.t.vx-=ux*f;l.t.vy-=uy*f;});
-      // centering + integrate
-      nodes.forEach(n=>{if(n===dragging)return;n.vx+=-n.x*0.006;n.vy+=-n.y*0.006;
-        n.vx*=0.86;n.vy*=0.86;n.x+=n.vx*alpha*1.2;n.y+=n.vy*alpha*1.2;});
-      alpha*=0.985;
-    }
-    render();requestAnimationFrame(step);
-  }
-  function render(){
-    links.forEach(l=>{const mx=(l.s.x+l.t.x)/2,my=(l.s.y+l.t.y)/2-Math.hypot(l.t.x-l.s.x,l.t.y-l.s.y)*0.08;
-      l._p.setAttribute('d',`M${l.s.x} ${l.s.y} Q ${mx} ${my} ${l.t.x} ${l.t.y}`);
-      l._tx.setAttribute('x',(l.s.x+l.t.x)/2);l._tx.setAttribute('y',(l.s.y+l.t.y)/2-4);});
-    nodes.forEach(n=>n._g.setAttribute('transform',`translate(${n.x},${n.y})`));
-  }
-
-  // ---- pan / zoom ----
-  let view={x:0,y:0,k:1};
-  function applyView(){root.setAttribute('transform',`translate(${view.x},${view.y}) scale(${view.k})`);}
-  function toWorld(cx,cy){return {x:(cx-view.x)/view.k,y:(cy-view.y)/view.k};}
-  svg.addEventListener('wheel',ev=>{ev.preventDefault();const r=svg.getBoundingClientRect();
-    const mx=ev.clientX-r.left,my=ev.clientY-r.top;const w=toWorld(mx,my);
-    const k2=Math.min(3,Math.max(0.3,view.k*(ev.deltaY<0?1.12:0.89)));
-    view.x=mx-w.x*k2;view.y=my-w.y*k2;view.k=k2;applyView();},{passive:false});
-
-  let dragging=null,moved=false,panning=null;
-  function startDrag(ev,d){ev.stopPropagation();dragging=d;moved=false;d._moved=false;
-    svg.setPointerCapture(ev.pointerId);alpha=Math.max(alpha,0.25);}
-  svg.addEventListener('pointerdown',ev=>{if(dragging)return;panning={x:ev.clientX,y:ev.clientY,vx:view.x,vy:view.y};svg.classList.add('grabbing');});
-  svg.addEventListener('pointermove',ev=>{
-    const r=svg.getBoundingClientRect();
-    if(dragging){const w=toWorld(ev.clientX-r.left,ev.clientY-r.top);dragging.x=w.x;dragging.y=w.y;dragging.vx=0;dragging.vy=0;moved=true;dragging._moved=true;alpha=Math.max(alpha,0.15);}
-    else if(panning){view.x=panning.vx+(ev.clientX-panning.x);view.y=panning.vy+(ev.clientY-panning.y);applyView();}
+  // ---------- cards ----------
+  nodes.forEach(n=>{
+    const p=pos.get(n);
+    const g=el('g',{class:`card ${n.kind} ${n.status==='planned'?'planned':''}`});
+    g.appendChild(el('rect',{class:'box',x:p.x,y:p.y,width:CW,height:CH,rx:11}));
+    g.appendChild(el('rect',{class:'kbar',x:p.x,y:p.y,width:5,height:CH,rx:2}));
+    g.appendChild(el('text',{class:'nm',x:p.x+16,y:p.y+25},n.label));
+    g.appendChild(el('text',{class:'rl',x:p.x+16,y:p.y+42},n.role));
+    if(n.viewer){
+      const a=el('a',{href:'./schema.html?app='+n.id}); a.appendChild(g);
+      a.style.cursor='pointer'; gCard.appendChild(a);
+    } else gCard.appendChild(g);
+    n._g=g;
+    g.addEventListener('mouseenter',()=>{
+      svg.classList.add('focusing');
+      const near=adj.get(n.id);
+      nodes.forEach(m=>m._g.classList.toggle('lit',near.has(m.id)));
+      wireByNode.get(n.id).forEach(w=>{w.p.classList.add('lit');w.lab.classList.add('lit');});
+    });
+    g.addEventListener('mouseleave',()=>{
+      svg.classList.remove('focusing');
+      nodes.forEach(m=>m._g.classList.remove('lit'));
+      document.querySelectorAll('.wire.lit,.wlabel.lit').forEach(x=>x.classList.remove('lit'));
+    });
   });
-  function endPtr(){if(dragging){setTimeout(()=>{if(dragging)dragging._moved=false;},0);}dragging=null;panning=null;svg.classList.remove('grabbing');}
-  svg.addEventListener('pointerup',endPtr);svg.addEventListener('pointercancel',endPtr);
 
-  // ---- fit ----
-  function fit(){
-    if(!nodes.length)return;
-    let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
-    nodes.forEach(n=>{const r=rOf(n)+30;minX=Math.min(minX,n.x-r);minY=Math.min(minY,n.y-r);maxX=Math.max(maxX,n.x+r);maxY=Math.max(maxY,n.y+r);});
-    const bw=maxX-minX,bh=maxY-minY;const w=svg.clientWidth,h=svg.clientHeight;
-    const k=Math.min(2.2,0.9*Math.min(w/bw,h/bh));
-    view.k=k;view.x=w/2-k*(minX+bw/2);view.y=h/2-k*(minY+bh/2);applyView();
-  }
-  document.getElementById('fit').onclick=fit;
-  applyView();step();
-  setTimeout(fit,700);
-  window.addEventListener('resize',fit);
+  // ---------- passive reference tree ----------
+  const refsOut=new Map(nodes.map(n=>[n.id,[]]));
+  const refsIn=new Map(nodes.map(n=>[n.id,[]]));
+  edges.forEach(e=>{ refsOut.get(e.from).push({to:e.to,label:e.label,kind:e.kind}); refsIn.get(e.to).push({from:e.from,label:e.label}); });
+  const nm=id=>byId.get(id).label;
+
+  KORDER.forEach(kind=>{
+    const group=nodes.filter(n=>n.kind===kind);
+    if(!group.length) return;
+    const gd=document.createElement('div'); gd.className='kgroup';
+    const h=document.createElement('h3');
+    h.innerHTML=`<span class="kdot ${kind}"></span> ${KLABEL[kind]}`;
+    gd.appendChild(h);
+    const grid=document.createElement('div'); grid.className='grid';
+    group.forEach(n=>{
+      const c=document.createElement('div'); c.className='app'+(n.status==='planned'?' planned':'');
+      const nameHtml = n.viewer ? `<a href="./schema.html?app=${n.id}">${n.label}</a>` : n.label;
+      const st=n.status||'';
+      let refsHtml='';
+      const out=refsOut.get(n.id).filter(r=>r.kind!=='pointer');
+      const pointer=refsOut.get(n.id).filter(r=>r.kind==='pointer');
+      const inbound=refsIn.get(n.id);
+      if(out.length) refsHtml+=`<div><span class="lab">references</span> ${out.map(r=>`<b>${nm(r.to)}</b> <span class="lab">(${r.label})</span>`).join(', ')}</div>`;
+      if(pointer.length) refsHtml+=`<div><span class="lab">selector pointer →</span> ${pointer.map(r=>`<b>${nm(r.to)}</b>`).join(', ')}</div>`;
+      if(kind==='spine'||kind==='builder'){ if(inbound.length) refsHtml+=`<div><span class="lab">referenced by</span> ${inbound.map(r=>nm(r.from)).join(', ')}</div>`; }
+      if(!refsHtml) refsHtml='<div class="none">standalone — no references yet</div>';
+      c.innerHTML=`<div class="top"><span class="name">${nameHtml}</span>${st?`<span class="st ${st}">${st}</span>`:''}</div>`+
+                  `<div class="role">${n.role}</div><div class="refs">${refsHtml}</div>`;
+      grid.appendChild(c);
+    });
+    gd.appendChild(grid); tree.appendChild(gd);
+  });
+
+  document.getElementById('foot').textContent=`URITP FileMaker package map · ${nodes.length} apps · reads ./package-graph.json`;
 })();
 </script>
 </body>
