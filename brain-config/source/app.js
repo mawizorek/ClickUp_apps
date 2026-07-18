@@ -1,6 +1,15 @@
 /* Brain Config Index \u2014 engine.
  Multi-file build: index.html (shell) + source/styles.css + source/data.js + source/app.js.
- Engine updates: version-bump this file + the shell. Reads PROSE_HOOKS/TRIGGERS/BADGES/NICKNAMES from data.js. */
+ Engine updates: version-bump this file + the shell. Reads PROSE_HOOKS/TRIGGERS/BADGES/NICKNAMES from data.js.
+
+ 2026-07-17 (folder migration): the AGENTS shelf is now REGISTRY-DRIVEN, not directory-driven.
+ Previously loadShelf() dir-listed brain-config/agents/ and filtered top-level *.md files, so a
+ slug-keyed FOLDER (<slug>/profile.md) was invisible (it is a dir, not a .md) — a migrated agent
+ vanished from the viewer. Now the agents shelf reads registry.json agents[] and follows each agent's
+ `profile` path (flat agents/<slug>.md OR folder agents/<slug>/profile.md). Folders + flats both appear;
+ every future migration falls out of the regenerated registry with no viewer edit. Gates + hooks shelves
+ still dir-list their own folders (they are not migrating). Agent rows render an in-app #agent/<slug>
+ route with data-agentlink so detail.js routing/enrichment key off the slug, not the href shape. */
 
 // ---- Config (top-level constants; change here, nowhere else) ----
 const OWNER = 'mawizorek';
@@ -12,7 +21,7 @@ const CACHE_TTL = 300000; // 5 min
 
 // Launch target for the Run-me button: ClickUp web home (Michael confirmed 2026-07-04).
 // No documented web deep-link prefills a prompt, so the button OPENS Brain and the
-// prompt rides the clipboard \u2014 paste + pick an agent + send.
+// prompt rides the clipboard — paste + pick an agent + send.
 const BRAIN_MAX_URL = 'https://app.clickup.com/home';
 
 const SHELVES = [
@@ -104,15 +113,52 @@ async function loadShelf(shelf) {
  return tools;
 }
 
+/* Agents shelf: driven by registry.json (folder-safe). The registry is the canonical manifest and is
+ regenerated from profile front-matter on every profile change, so its `profile` path is authoritative
+ whether the agent is flat (agents/<slug>.md) or a folder (agents/<slug>/profile.md). We still fetch the
+ profile body for created-date / shortcut / launch-prompt, but purpose falls back to the registry `role`
+ so a row is informative even if the body fetch misses. agentlink=slug drives in-app routing in detail.js. */
+async function loadAgentsFromRegistry() {
+ const text = await fetchText(`${RAW}/brain-config/registry.json`);
+ if (!text) return [];
+ let reg;
+ try { reg = JSON.parse(text); } catch (e) { return []; }
+ const agents = Array.isArray(reg.agents) ? reg.agents : [];
+ const tools = [];
+ for (const a of agents) {
+ const rel = a.profile || `agents/${a.slug}.md`;
+ const path = `brain-config/${rel}`;
+ const content = await fetchText(`${RAW}/${path}`);
+ const shortcut = extractShortcut(content);
+ tools.push({
+ slug: a.slug,
+ name: a.name || slugToName(a.slug),
+ purpose: a.role || extractPurpose(content),
+ shelf: 'agents',
+ url: `${BLOB}/${path}`,
+ created: extractCreatedDate(content),
+ uses: usageData[a.slug] || 0,
+ badge: BADGES[a.slug] || null,
+ nicknames: NICKNAMES[a.slug] || null,
+ shortcut,
+ launchPrompt: shortcut ? extractLaunchPrompt(content) : '',
+ agentlink: a.slug
+ });
+ }
+ return tools;
+}
+
 function renderTool(tool) {
  const badge = tool.badge ? `<span class="badge badge-${tool.badge}">${tool.badge}</span>` : '';
  const nicks = tool.nicknames ? `<span class="nicknames">${esc(tool.nicknames)}</span>` : '';
  const run = (tool.shortcut && tool.launchPrompt)
  ? `<a class="run-btn" href="${BRAIN_MAX_URL}" target="_blank" rel="noopener" data-prompt64="${b64(tool.launchPrompt)}" title="Copy prompt &amp; open Brain">\u25B6 Run me</a>`
  : '';
- const nameInner = tool.url
+ const nameInner = tool.agentlink
+ ? `<a href="#agent/${tool.agentlink}" data-agentlink="${esc(tool.agentlink)}">${esc(tool.name)}</a>`
+ : (tool.url
  ? `<a href="${tool.url}" target="_blank" rel="noopener">${esc(tool.name)}</a>`
- : `<span class="no-profile">${esc(tool.name)}</span>`;
+ : `<span class="no-profile">${esc(tool.name)}</span>`);
  const usesHtml = tool.uses > 0 ? `<span class="uses">${tool.uses}\u00D7</span>` : '';
  const dateHtml = tool.created ? `<span>${tool.created}</span>` : '';
  const searchData = `${tool.name} ${tool.purpose} ${tool.nicknames || ''}`.toLowerCase();
@@ -243,7 +289,10 @@ function bindLaunch() {
 
 async function init() {
  await loadUsageLog();
- for (const shelf of SHELVES) { allTools.push(...await loadShelf(shelf)); }
+ for (const shelf of SHELVES) {
+ const tools = shelf.key === 'agents' ? await loadAgentsFromRegistry() : await loadShelf(shelf);
+ allTools.push(...tools);
+ }
  document.getElementById('loading').style.display = 'none';
  updateCounts();
  renderAll();
