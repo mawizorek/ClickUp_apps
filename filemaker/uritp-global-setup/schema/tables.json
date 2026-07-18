@@ -1,14 +1,16 @@
 {
   "_meta": {
     "app": "uritp-global-setup",
-    "schemaVersion": "1.0",
+    "schemaVersion": "1.1",
     "generated": "2026-07-18",
-    "intent": "TARGET-STATE config spine. Slow-changing org reference data only. Operational entities (PRODUCTIONS) are owned by their spoke, not here (DG-001, greenfield discipline).",
+    "intent": "TARGET-STATE config spine. Slow-changing org reference data only. Operational entities (PRODUCTIONS) AND assignment/position data (Staff Positions) are owned by their spoke, not here (DG-001, DG-005, greenfield discipline).",
     "status": "target-state draft, unverified against live file",
     "conventions": {
       "keys": "bare PrimaryKey + fk<Parent> style (matches uritp-people + HML house style)",
-      "excluded": ["PRODUCTIONS → owned by the Productions/Company builder; GS keeps only selector table-occurrences (match-key context), not the table"],
-      "added": ["Staff_Positions — the layer graduated here from uritp-people DP-006"]
+      "excluded": [
+        "PRODUCTIONS → owned by the Productions/Company builder; GS keeps only selector table-occurrences (match-key context), not the table",
+        "Staff Positions / position assignments → owned by LABOUR (DG-005). Positions are so intertwined with employment + student-worker assignment that they are operational, not config. GS carries nothing; contact sheets get a title by joining THROUGH Labour at report time."
+      ]
     }
   },
   "tables": [
@@ -60,7 +62,7 @@
       "name": "Departments",
       "role": "reference",
       "status": "under-review",
-      "description": "Shared department reference. Consumed by department-aware apps (Labour, Inventory, Safety, budget apps).",
+      "description": "Shared department reference. Consumed by department-aware apps (Labour, Inventory, Safety, budget apps). NOTE: Labour's position/assignment tables reference THIS for department, keeping departments the shared spine while positions live in Labour.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "Name", "type": "text", "key": "plain", "category": "label", "notes": "full department name" },
@@ -69,20 +71,6 @@
         { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
         { "name": "ModificationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
         { "name": "ModifiedBy", "type": "text", "key": "audit", "category": "audit" }
-      ]
-    },
-    {
-      "name": "Staff_Positions",
-      "role": "reference",
-      "status": "pending",
-      "description": "NEW: the Staff-Positions layer graduated here from uritp-people (DP-006). Governs department + title/level as reference data. Referenced by uritp-people/ADULTS_ext.fkStaffPosition and by Labour. Seeds from the as-built _setup_Staff Positions / URJobProfileLevels / Supervisors.",
-      "fields": [
-        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
-        { "name": "Title", "type": "text", "key": "plain", "category": "label", "status": "pending", "notes": "position/job title" },
-        { "name": "fkDepartment", "type": "text-uuid", "key": "fk", "category": "key", "status": "pending", "notes": "→ Departments" },
-        { "name": "Level", "type": "text", "key": "plain", "category": "label", "status": "pending", "notes": "UR job profile level (from URJobProfileLevels)" },
-        { "name": "fkSupervisorPosition", "type": "text-uuid", "key": "fk", "category": "key", "status": "pending", "notes": "self-ref → Staff_Positions (reporting line); confirm shape when building" },
-        { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" }
       ]
     }
   ]
