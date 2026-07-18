@@ -6,9 +6,10 @@
     "intent": "TARGET-STATE schema — the source of truth to build TOWARD, not a mirror of the old file. Researched from the ClickUp 'URITP People FMP' doc, then edited: fields earn their place or get cut.",
     "status": "target-state draft, unverified against live file",
     "conventions": {
-      "target": "URITP standard = pk_/fk_ prefixes, g_ globals, PascalCase tables. Key-prefix adoption is an open governance item (A1/A2); typos already corrected to target names here.",
+      "keys": "BARE style LOCKED (Michael 2026-07-18): PrimaryKey + fkPERSON/fkContact etc. This app does NOT use pk_/fk_ prefixes. Matches HML house style.",
       "typosCorrected": "prefferedFirstName→preferredFirstName, prefferedLastName→preferredLastName, namePronounciation→namePronunciation",
-      "cutThisPass": ["emailTEMP (legacy import staging)", "hiddenLatestImport (import-batch cruft, not identity)"]
+      "cutThisPass": ["emailTEMP (legacy import staging)", "hiddenLatestImport (import-batch cruft, not identity)"],
+      "graduated": ["ADULTS_ext Department+Title → Staff-Positions layer via fkStaffPosition"]
     }
   },
   "tables": [
@@ -57,13 +58,12 @@
       "name": "ADULTS_ext",
       "role": "role-extension",
       "status": "pending",
-      "description": "Non-student role extension off PEOPLE (one-to-one via fkPERSON). Faculty, staff, guest artists, vendors, volunteers. Carries adult classification; dept/title placement is an OPEN QUESTION.",
+      "description": "Non-student role extension off PEOPLE (one-to-one via fkPERSON). Faculty, staff, guest artists, vendors, volunteers. Dept/Title graduate to a Staff-Positions layer via fkStaffPosition (Michael ruling 2026-07-18).",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
         { "name": "AdultType", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Faculty, Staff, Adjunct, Guest Artist, Vendor, Volunteer" },
-        { "name": "Department", "type": "text", "key": "plain", "category": "classification", "status": "pending", "notes": "OPEN QUESTION: keep here or graduate to a Staff-Positions layer" },
-        { "name": "Title", "type": "text", "key": "plain", "category": "classification", "status": "pending", "notes": "OPEN QUESTION with Department" },
+        { "name": "fkStaffPosition", "type": "text-uuid", "key": "fk", "category": "classification", "status": "pending", "notes": "→ Staff-Positions layer (Department + Title/level). replaces as-built free-text Department/Title. layer home TBD (dedicated table vs Labour spoke)" },
         { "name": "AdultStatus", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Active, Inactive" },
         { "name": "NotesAdult", "type": "text", "key": "plain", "category": "notes" },
         { "name": "StartDate", "type": "date", "key": "plain", "category": "lifecycle" },
