@@ -1,11 +1,10 @@
 {
-  "_meta": { "app": "uritp-global-setup", "folder": "tables", "schemaVersion": "1.0", "generated": "2026-07-18", "source": "../schema/tables.json" },
+  "_meta": { "app": "uritp-global-setup", "folder": "tables", "schemaVersion": "1.1", "generated": "2026-07-18", "source": "../schema/tables.json" },
   "roleColors": { "singleton-config": "#7B3FA0", "reference": "#2E7D5B" },
   "tables": [
     { "name": "GLOBAL_USAGE_VARIABLES", "file": "GLOBAL_USAGE_VARIABLES.md", "role": "singleton-config", "status": "under-review", "fieldCount": 8 },
     { "name": "Fiscal_Years", "file": "Fiscal_Years.md", "role": "reference", "status": "under-review", "fieldCount": 6 },
     { "name": "Academic_Periods", "file": "Academic_Periods.md", "role": "reference", "status": "under-review", "fieldCount": 6 },
-    { "name": "Departments", "file": "Departments.md", "role": "reference", "status": "under-review", "fieldCount": 7 },
-    { "name": "Staff_Positions", "file": "Staff_Positions.md", "role": "reference", "status": "pending", "fieldCount": 6 }
+    { "name": "Departments", "file": "Departments.md", "role": "reference", "status": "under-review", "fieldCount": 7 }
   ]
 }
