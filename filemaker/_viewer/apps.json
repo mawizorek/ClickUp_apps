@@ -4,6 +4,7 @@
     "generated": "2026-07-16"
   },
   "apps": [
-    { "slug": "hml-llc", "name": "HML_LLC", "desc": "Hard money loan servicing. Reference implementation of the repo-native FileMaker doc standard." }
+    { "slug": "hml-llc", "name": "HML_LLC", "desc": "Hard money loan servicing. Reference implementation of the repo-native FileMaker doc standard." },
+    { "slug": "uritp-people", "name": "URITP People", "desc": "Identity hub for the URITP FileMaker package. Lean canonical person record; every spoke app references it. Hub-and-spoke." }
   ]
 }
