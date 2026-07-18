@@ -22,6 +22,12 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 - Requester's guess (non-binding): brain memory (update the existing Agent Activity Board pointer line rather than adding a new bullet, to avoid file growth); the fuller rule already lives in the Agent Activity Board Gold Standard startup gate.
 - Context / why: memory write bounced this session (no memory manager available); Michael directed dropping it here for a later agent to land. Pairs with the session-close fix also made 2026-07-17.
 
+### OMR-20260717-2 · OPEN
+- Requested by: Brain (Opus 4.8)
+- Candidate note: NEVER touch Michael's real/external calendar (Google Calendar, etc). All scheduling is done as ClickUp tasks with start/due times that render in the ClickUp calendar. Multi-day or multi-event schedules are built as subtask events nested under the parent/anchor task. Established by Michael 2026-07-17.
+- Requester's guess (non-binding): brain memory (Workflow Defaults) — must-fire behavioral default; possibly also a brain-config gate to hard-block external-calendar tools.
+- Context / why: memory write bounced this session (no memory manager available). Rule set while building the City of Angels changeover schedule as ClickUp subtask events under the changeover task.
+
 ---
 
 ## Entry template
