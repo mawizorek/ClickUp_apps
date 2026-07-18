@@ -6,12 +6,15 @@
 <meta name="theme-color" content="#8f8f8f">
 <meta name="robots" content="noindex, nofollow">
 <title>Theme Studio</title>
-<meta name="description" content="The 4-vector theme matrix (color x typography x forms x spacing) rendered across the canonical 20-object FileMaker library.">
+<meta name="description" content="The 4-vector theme matrix (color x typography x forms x spacing) rendered across the canonical FileMaker object library.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- Studio styles (extracted from the former monolith — modular split 2026-07-17) -->
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Studio styles (extracted from the former monolith — modular split 2026-07-17). preview.objects.css
+     (Tier 2, 2026-07-18) adds the tool/input object styles and MUST load after preview.css so it inherits
+     the same theme tokens. -->
 <link rel="stylesheet" href="preview.css">
+<link rel="stylesheet" href="preview.objects.css?v=t2">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -144,14 +147,14 @@
     </div>
     <div class="drawer-hr"></div>
     <div class="combo"><span class="eq">theme = </span><b id="cTheme">manual-mix</b><br><span id="cFont">Chakra Petch</span><span class="sep">·</span><span id="cGrad">gradient</span></div>
-    <p class="drawer-note">Renders the 4 canonical grids (color × typography × forms × spacing) across the 20-object library in <code>_objects.json</code>. Need a new object? Add it there + to <code>OBJECT-COVERAGE.md</code> and it appears here automatically. Hex is canonical; gradient = two hex stops.</p>
+    <p class="drawer-note">Renders the 4 canonical grids (color × typography × forms × spacing) across the object library in <code>_objects.json</code>. Need a new object? Add it there + to <code>OBJECT-COVERAGE.md</code> and it appears here automatically. Hex is canonical; gradient = two hex stops.</p>
   </div>
 </aside>
 
 <div class="copied" id="toast">Copied</div>
 
 <!-- Modular split (2026-07-17): data snapshot first, then the render engine. Was one inline <script>. -->
-<script src="preview.data.js"></script>
-<script src="preview.core.js"></script>
+<script src="preview.data.js?v=t2"></script>
+<script src="preview.core.js?v=t2"></script>
 </body>
 </html>
