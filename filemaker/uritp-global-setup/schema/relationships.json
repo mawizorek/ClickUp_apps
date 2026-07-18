@@ -1,16 +1,14 @@
 {
   "_meta": {
     "app": "uritp-global-setup",
-    "schemaVersion": "1.0",
+    "schemaVersion": "1.1",
     "generated": "2026-07-18",
-    "description": "Global Setup internal edges. Fiscal_Years is the fanout hub for time. Staff_Positions self-references for reporting lines and points at Departments. PRODUCTIONS is builder-owned and NOT represented here; cross-file references (other apps → GS) live in each consumer's own relationships.json."
+    "description": "Global Setup internal edges. Fiscal_Years is the fanout hub for time. Staff_Positions was removed (moved to Labour, DG-005). PRODUCTIONS is builder-owned and NOT represented here; cross-file references (other apps → GS) live in each consumer's own relationships.json."
   },
   "relationships": [
     { "from": { "table": "GLOBAL_USAGE_VARIABLES", "field": "fkCURRENT_FISCAL_YEAR" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review", "notes": "active year pointer" },
     { "from": { "table": "GLOBAL_USAGE_VARIABLES", "field": "fkPREVIOUS_FISCAL_YEAR" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review" },
     { "from": { "table": "GLOBAL_USAGE_VARIABLES", "field": "fkNEXT_FISCAL_YEAR" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review" },
-    { "from": { "table": "Academic_Periods", "field": "fkFiscalYear" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review", "notes": "each term belongs to a fiscal year" },
-    { "from": { "table": "Staff_Positions", "field": "fkDepartment" }, "to": { "table": "Departments", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "pending", "notes": "a position belongs to a department" },
-    { "from": { "table": "Staff_Positions", "field": "fkSupervisorPosition" }, "to": { "table": "Staff_Positions", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "pending", "notes": "self-ref reporting line; confirm when building the layer" }
+    { "from": { "table": "Academic_Periods", "field": "fkFiscalYear" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review", "notes": "each term belongs to a fiscal year" }
   ]
 }
