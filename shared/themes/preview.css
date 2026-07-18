@@ -3,14 +3,16 @@
    Chrome tokens (--ch-*) are the studio's OWN shell palette (fixed light chrome), distinct from
    the theme tokens (--accent, --surface-1, ...) that the render stage consumes.
 
-   ACCENT SYSTEM (2026-07-17, cross-integration pass): two brand hues split by JOB.
-     --accent   = the INTERACTIVE / ACTIVE language: nav-on fill, focus border, ghost-button text, primary fill base.
-     --accent-2 = the STRUCTURAL ENERGY layer, woven as edges so the pop is consistent, not dumped on one object:
+   ACCENT SYSTEM (2026-07-17, rebalance pass): two brand hues split by JOB.
+     --accent   = the INTERACTIVE / ACTIVE language: primary-button fill (SOLID, no gradient), nav-on fill, focus border, ghost-button text.
+     --accent-2 = the STRUCTURAL ENERGY layer + the SECONDARY-button highlight, peppered lightly so the pop is consistent, never dumped on one object:
+                  • highlight-pink secondary button (accent-2 text + border on a surface fill)
                   • top rail on elevated surfaces (.tcard / .tmodal / .ttile) via inset top box-shadow
                   • left rail on selected/active surfaces (.ttable tr.sel / .side-link.on / .tcallout)
                   • gradient hairline on the masthead bottom edge (.app-top)
                   • gradient leading tick before titles (.ttype .t1 / .app-h1)
-                  • plus the far stop of every --accent-grad fill (buttons / badges / logo)
+                  • the badge/pill fill + logo diamond keep the two-hue gradient (small, sparing accents)
+     The primary button is now a SOLID accent fill — the big gradient block was too heavy on one object.
      Rails use inset box-shadow on purpose: it respects border-radius (clean curved corners) and never
      shifts layout. No color math — tokens are consumed directly (honors the 2026-07-17 hex lock). */
 
@@ -77,10 +79,10 @@
   #stageRoot{--accent-grad:linear-gradient(var(--grad-angle,135deg), var(--accent), var(--accent-2));}
   .stage,.appview{font-family:var(--font-body);color:var(--text);}
   .tb{font-family:var(--font-body);font-weight:700;font-size:var(--fs-body);border-radius:var(--radius);padding:0 20px;min-height:var(--touch);border:var(--border-w) solid transparent;cursor:pointer;letter-spacing:var(--track-btn);display:inline-flex;align-items:center;gap:8px;}
-  .tb.primary{background:var(--accent-grad);color:var(--on-accent);box-shadow:var(--shadow-out);}
-  .tb.secondary{background:var(--surface-2);color:var(--text);border-color:var(--border);}
+  .tb.primary{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-out);}
+  .tb.secondary{background:var(--surface-2);color:var(--accent-2);border-color:var(--accent-2);}
   .tb.ghost{background:transparent;color:var(--accent);} .tb.destructive{background:var(--bad);color:#fff;box-shadow:var(--shadow-out);}
-  .tb.pressed{background:var(--accent-grad);color:var(--on-accent);box-shadow:var(--shadow-in);transform:translateY(1px);}
+  .tb.pressed{background:var(--accent);color:var(--on-accent);box-shadow:var(--shadow-in);transform:translateY(1px);}
   .tb.icon{padding:0;width:var(--touch);justify-content:center;background:var(--surface-2);color:var(--text);border-color:var(--border);}
   .stag{font-family:var(--ch-mono);font-size:0.58rem;color:var(--text-faint);text-align:center;}
   .tpill{font-size:var(--fs-xs);font-weight:700;padding:var(--pad-cell, 5px) var(--gap-md, 12px);border-radius:var(--radius-pill);color:var(--on-accent);font-family:var(--font-body);display:inline-block;}
