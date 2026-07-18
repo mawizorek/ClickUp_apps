@@ -1,10 +1,10 @@
 {
-  "_meta": { "app": "uritp-people", "folder": "tables", "schemaVersion": "1.0", "generated": "2026-07-18", "source": "../schema/tables.json" },
+  "_meta": { "app": "uritp-people", "folder": "tables", "schemaVersion": "1.1", "generated": "2026-07-18", "source": "../schema/tables.json" },
   "roleColors": { "identity-hub": "#7B3FA0", "role-extension": "#2E7D5B", "contact": "#B8860B", "contact-child": "#555555", "value-source": "#555555" },
   "tables": [
-    { "name": "PEOPLE", "file": "PEOPLE.md", "role": "identity-hub", "status": "under-review", "fieldCount": 21 },
+    { "name": "PEOPLE", "file": "PEOPLE.md", "role": "identity-hub", "status": "under-review", "fieldCount": 19 },
     { "name": "STUDENTS_ext", "file": "STUDENTS_ext.md", "role": "role-extension", "status": "under-review", "fieldCount": 6 },
-    { "name": "ADULTS_ext", "file": "ADULTS_ext.md", "role": "role-extension", "status": "pending", "fieldCount": 11 },
+    { "name": "ADULTS_ext", "file": "ADULTS_ext.md", "role": "role-extension", "status": "pending", "fieldCount": 10 },
     { "name": "CONTACT_INFORMATION", "file": "CONTACT_INFORMATION.md", "role": "contact", "status": "under-review", "fieldCount": 8 },
     { "name": "Emails", "file": "Emails.md", "role": "contact-child", "status": "under-review", "fieldCount": 4 },
     { "name": "PhoneNumbers", "file": "PhoneNumbers.md", "role": "contact-child", "status": "under-review", "fieldCount": 4 },

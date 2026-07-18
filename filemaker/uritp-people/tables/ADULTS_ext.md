@@ -2,7 +2,7 @@
 
 **Role:** role-extension · **Status:** pending · **App:** uritp-people
 
-> Non-student role extension off PEOPLE (one-to-one via `fkPERSON`). Faculty, staff, adjuncts, guest artists, vendors, volunteers. Carries the adult classification. **Department + Title placement is the one genuinely open question** (here vs a Staff-Positions layer).
+> Non-student role extension off PEOPLE (one-to-one via `fkPERSON`). Faculty, staff, adjuncts, guest artists, vendors, volunteers. Carries the adult classification. **Ruling 2026-07-18:** Department + Title do NOT live here as free text — they reference a **Staff-Positions layer** (via `fkStaffPosition`), so titles/levels are governed in one place instead of typed per person.
 
 ## Fields
 
@@ -11,8 +11,7 @@
 | PrimaryKey | text-uuid | pk | key | | |
 | fkPERSON | text-uuid | fk | key | | → PEOPLE.PrimaryKey |
 | AdultType | text | plain | classification | | value list: Faculty, Staff, Adjunct, Guest Artist, Vendor, Volunteer |
-| Department | text | plain | classification | pending | **OPEN QUESTION**: keep here or graduate to a Staff-Positions layer |
-| Title | text | plain | classification | pending | **OPEN QUESTION** (with Department) |
+| fkStaffPosition | text-uuid | fk | classification | pending | → Staff-Positions layer (holds Department + Title/level). Replaces the as-built free-text Department/Title. Home of that layer TBD: dedicated positions table vs. Labour spoke. |
 | AdultStatus | text | plain | classification | | value list: Active, Inactive |
 | NotesAdult | text | plain | notes | | |
 | StartDate | date | plain | lifecycle | | when relationship began (optional) |
@@ -20,16 +19,19 @@
 | CreationTimestamp | timestamp | audit | audit | | auto |
 | CreatedBy | text | audit | audit | | auto |
 
+**10 fields.** As-built free-text `Department` + `Title` were replaced by the single `fkStaffPosition` reference per Michael's ruling that dept/title graduate to a Staff-Positions layer.
+
 ## Relationships
 
 - `ADULTS_ext.fkPERSON` → `PEOPLE.PrimaryKey` (one-to-one, pending) — a person may hold BOTH student + adult extensions
+- `ADULTS_ext.fkStaffPosition` → Staff-Positions layer PK (many-to-one, pending) — layer's home app TBD
 
 ## Open Items
 
-- **Dept/Title**: the fuzzy field. If URITP tracks staff positions/levels formally (the as-built file had `_setup_Staff Positions` + `URJobProfileLevels` + `Supervisors`), dept/title may want to be a reference to that layer rather than free text here. Parked, non-blocking.
+- **Staff-Positions layer home:** dedicated positions table in this file, or the Labour spoke? The as-built People file carried `_setup_Staff Positions` / `URJobProfileLevels` / `Supervisors` — those are the seed for this layer. Deferred-to-Labour is the current lean (see `meta/design-decisions.md`).
 - `AdultType` + `AdultStatus` should resolve to value lists (see `value-lists/`, pending).
-- Confirm the design-only Layout C (ADULTS) field needs against this set.
 
 ## Changelog
 
-- 2026-07-18: First-pass migration from the ClickUp `URITP People FMP` doc "Fields to add for Layout C" spec. Dept/Title flagged as the open placement question.
+- 2026-07-18 (target-state): Dept/Title graduated to a Staff-Positions layer via `fkStaffPosition` (Michael ruling). Field count 11→10.
+- 2026-07-18: First-pass migration from the ClickUp `URITP People FMP` doc "Fields to add for Layout C" spec.
