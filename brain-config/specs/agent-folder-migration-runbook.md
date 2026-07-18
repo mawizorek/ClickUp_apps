@@ -1,6 +1,6 @@
 # Agent Flat→Folder Migration — COLD-OPEN RUNBOOK
 
-**Status:** LIVE runbook (not a proposal). Authored 2026-07-17 from the Audit Anna reference build; hardened same day by a second run (Fold-in Frank), a viewer-resolution audit, and the app.js registry rewire.
+**Status:** LIVE runbook (not a proposal). Authored 2026-07-17 from the Audit Anna reference build; hardened by the Fold-in Frank run, the viewer-resolution audit, the app.js registry rewire, and the detail.js split.
 **Steward:** **Audit Anna**, in her audit capacity (this is exactly the "AUTHORING new audit templates/DoDs" role in her profile — she owns, hardens, and edge-cases this doc as agents migrate).
 **Companion spec:** `brain-config/specs/agent-folder-upgrade.md` (the why, Frank's verdict, Workshop read, open questions).
 **Reference implementations:**
@@ -40,47 +40,27 @@ brain-config/agents/<slug>/
 The upgrade spec assumed a **big-bang single-merge**. Michael's 2026-07-17 direction supersedes that: migrate **incrementally, one agent (or a capable batch) per session, over the next few weeks.** Two consequences:
 
 - **Agent-level half-migration stays FORBIDDEN.** An agent is never a folder while its flat `<slug>.md` twin is still live. Within one agent's migration it's all-or-nothing, in a single PR: delete the flat files in the SAME PR that verifies the folder, never a commit apart.
-- **Roster-level coexistence is SANCTIONED.** During the transition the roster holds some folder-agents and some flat-agents at once. That is NOT drift — it's an explicit, time-boxed transitional state. It is safe because each agent is individually atomic (above) AND because the viewer now resolves agents from the registry (§2), which is regenerated per migration.
+- **Roster-level coexistence is SANCTIONED.** During the transition the roster holds some folder-agents and some flat-agents at once. That is NOT drift — it's an explicit, time-boxed transitional state. It is safe because each agent is individually atomic (above) AND because the viewer resolves agents from the registry (§2), which is regenerated per migration.
 
 > **Litmus:** at any commit on `main`, every agent is EITHER fully flat OR fully folder — never caught mid-move. The mix is across the roster (allowed), never inside one agent (banned).
 
-**Note:** an earlier draft called for a "dual-resolution / folder-first flat-fallback" layer in every reader. That was a phantom — each agent is atomic, so there's no per-agent inconsistency window to guard. The ONE real prerequisite is the registry-driven viewer (§2). Retired to avoid the phantom gate.
-
 ---
 
-## 🔧 2. THE Prerequisite: registry-driven viewer (LIST done; DETAIL residual below)
+## ✅ 2. THE Prerequisite: registry-driven viewer — COMPLETE (2026-07-17/18, on the migration branch)
 
-The agents viewer is `brain-config/custom-tools.html` → `source/app.js` (the list) + `source/detail.js` (the detail pane). Audited 2026-07-17. It was **directory-driven** — which breaks on migration. Status of the fix:
+The agents viewer is `brain-config/custom-tools.html` → `source/app.js` (list) + `source/detail.js` (detail pane). It was directory-driven, which breaks on migration. Both halves are now fixed on the `agent-folder-migration` branch:
 
-### ✅ DONE (2026-07-17, commit on `agent-folder-migration`): the LIST is registry-driven
-`source/app.js` no longer dir-lists `agents/` for the agents shelf. It now reads `registry.json` `agents[]` and follows each agent's `profile` path (flat `agents/<slug>.md` OR folder `agents/<slug>/profile.md`). Effects:
-- Folder agents and flat agents BOTH appear — the "folder is a dir, not a .md, so it vanishes" bug is dead.
-- Row purpose comes from the registry `role`, so a row is informative even if the profile-body fetch misses.
-- Agent rows render an in-app `#agent/<slug>` route with `data-agentlink`, so `detail.js` routing + enrichment key off the slug, not the href shape (which the old regex couldn't parse for folder paths).
-- Gates + hooks shelves still dir-list their own folders — they are NOT migrating, leave them.
-- Net: every future migration "falls out" of the regenerated registry (recipe §3 step 10) with NO app.js edit ever again.
+### ✅ LIST (app.js, commit fb5342e)
+The agents shelf reads `registry.json agents[]` and follows each agent's `profile` path (flat `agents/<slug>.md` OR folder `agents/<slug>/profile.md`). Folder + flat agents both render; row purpose comes from the registry `role`; rows route in-app via `#agent/<slug>` + `data-agentlink`. Gates/hooks shelves still dir-list (not migrating). Every future migration falls out of the regenerated registry with no app.js edit.
 
-### ⚠️ RESIDUAL (the last viewer touch, NOT yet applied): `detail.js` getSidecar
-`source/detail.js` `getSidecar(slug)` still fetches the sidecar from a HARDCODED flat path:
-```
-fetch(RAW + '/' + AGENTS_DIR + '/' + slug + '.metadata.json', { cache: 'no-cache' })
-```
-This powers the DETAIL PANE (settings tab / JSON view / badges + Reports tab enrichment). For a FOLDER agent whose sidecar moved to `<slug>/metadata.json`, this 404s. The LIST is unaffected (purpose comes from the registry now), and the 404 is caught, so nothing crashes — but a migrated agent's detail pane would miss its sidecar-driven fields.
+### ✅ DETAIL (detail.js, commit eb3f416) — split + folder-first, both done
+- **getSidecar is now FOLDER-FIRST:** fetches `<slug>/metadata.json`, falls back to flat `<slug>.metadata.json`. The detail pane stays whole for folder + flat agents. Residual closed.
+- **detail.js split to stay under the 30KB cap:** its ~5KB inline CSS array moved to `source/agent-detail.css` (26.3KB→21KB). `injectStyles()` now lazy-links that file (same guard id, same timing) — `custom-tools.html` was NOT touched. detail.js is now readable/writable whole, so future edits (like this one) are safe, not blind.
 
-**Exact fix (fold-first, flat-fallback) — replace the getSidecar fetch with:**
-```
-sidecarCache[slug] = fetch(RAW + '/' + AGENTS_DIR + '/' + slug + '/metadata.json', { cache: 'no-cache' })
-  .then(function (r) {
-    if (r.ok) return r.json();
-    return fetch(RAW + '/' + AGENTS_DIR + '/' + slug + '.metadata.json', { cache: 'no-cache' })
-      .then(function (r2) { if (!r2.ok) throw new Error('HTTP ' + r2.status); return r2.json(); });
-  });
-```
-**Why this was NOT done in the same pass:** `detail.js` is ~26KB and the repo read path truncates its tail, so a full-file rewrite (the only write mode the tools offer) would risk dropping unseen code — the exact corruption the GitHub Operating Standard forbids. Apply this as a focused edit with `detail.js` open directly / fully in hand. It is a self-contained one-function change; nothing else in detail.js needs to move (routing + enrichment already key off `data-agentlink`, which app.js now emits).
+### Split rationale (for the next person eyeing further modularization)
+The JS was NOT shattered into separate script files: all its functions share ONE private IIFE closure (`panel`, `sidecarCache`, helpers, cross-calls like `showDetail`↔`openAgent`), so splitting them would force promoting privates to a shared global namespace — real behavior risk for little gain. The CSS extraction is the clean concern-split (presentation vs logic) with zero shared-scope coupling, and it alone brought the file under cap. If detail.js grows again, the next safe seam is a `window.AgentDetail` namespace object, but only if a real need forces it.
 
-**Second-order:** `tool-index.html` has ONE hardcoded agent link (`./agents/size-sally.md`) in its GUARDS map — repoint it to `./agents/size-sally/profile.md` when Sally migrates. Minor; inventory it.
-
-**Alternative if you'd rather not touch detail.js at all:** keep the sidecar FLAT (`<slug>.metadata.json`) during migration and move only `profile.md` + `change-log.md` into the folder. Zero detail.js edits, viewer 100% stable. Cost: reverses the "metadata.json moves in" design point (Eco Enzo / Michael's original framing) — so it's Michael's call, not a silent change. Default remains: metadata moves in + apply the getSidecar patch above.
+**Second-order (still open):** `tool-index.html` has ONE hardcoded agent link (`./agents/size-sally.md`) in its GUARDS map — repoint to `./agents/size-sally/profile.md` when Sally migrates. And the detail Settings pane shows a cosmetic "writes to `<slug>.metadata.json`" label that stays flat-worded for folder agents — harmless (it's an editor hint, the copy-block still works), fix opportunistically.
 
 ---
 
@@ -92,11 +72,11 @@ For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank
 
 ### Pre-flight
 1. Load `GitHub MCP — Operating Standard` (blob-API reads, branch→PR→self-merge, `.nojekyll`, VERSIONS ledger). Non-negotiable.
-2. Confirm the §2 prerequisite state: the app.js LIST rewire is live; if you're merging folder agents to main and want the detail pane whole, the getSidecar patch (§2 residual) should be applied first. If neither is true, STOP — you're the wrong task.
+2. The §2 viewer prerequisite is COMPLETE on the `agent-folder-migration` branch — it must reach `main` (merge the branch, or land these viewer commits) BEFORE the first folder agent lands on main, so folder agents render. If it's not on main yet, that merge is your first move.
 3. `get_file_contents` on `brain-config/agents/` — get the current blob SHAs for `<slug>.md` and `<slug>.metadata.json`. Note whether a `<slug>/` folder ALREADY exists (six do: closing-clio, handoff-hana, memory-maggie, recon-renata, scout-sage, workshop-wes) and what it contains — you will PRESERVE that content, not clobber it.
 
 ### Read (byte-safe)
-4. Fetch the FULL `<slug>.md` body via the **git blob API** (`.../git/blobs/<sha>`, Base64-decode) — NOT a branch/raw URL, which clips at ~30KB and flattens markup. Verify the returned SHA matches the listing. This is the source of truth for the rules diff.
+4. Fetch the FULL `<slug>.md` body via the **git blob API** (`.../git/blobs/<sha>`, Base64-decode) — NOT a branch/raw URL, which clips at ~30KB and flattens markup. **If the file's Base64 would exceed the ~30KB tool return cap (roughly any source file > ~16KB), use `get_file_contents` instead — it returns raw UTF-8 (no Base64 inflation, no markup flattening) and this is how detail.js at 26KB was read whole.** Verify the returned SHA matches the listing. This is the source of truth for the rules diff.
 5. Fetch `<slug>.metadata.json` the same way.
 
 ### Transform (storage-only — rules diff MUST be empty)
@@ -111,7 +91,7 @@ For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank
 
 ### Verify, THEN delete (same PR)
 12. Blob-read `<slug>/profile.md` back; confirm the rules diff vs the original flat body is EMPTY (only the Changelog removal + footer differ).
-13. Confirm every repointed pointer resolves live, and that the agent still renders in the viewer list.
+13. Confirm every repointed pointer resolves live, and that the agent still renders in the viewer list + its detail pane loads (getSidecar now folder-first).
 14. ONLY NOW delete the flat `<slug>.md` and `<slug>.metadata.json` — in THIS PR, not a later one.
 15. Open the PR (title: `brain-config: migrate <slug> to folder`), self-merge, report: PR link + verified pointers.
 16. Log the beat to the active Agent Activity Board session task (Anna's Rule 3 pattern): what moved, SHA verified, rules diff empty.
@@ -133,7 +113,7 @@ For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank
 
 - **Storage-only.** No agent's behavior/rules change during migration. A diff of the actual rules pre/post must be empty. Do NOT condense, reword, or "fix" a profile mid-migration — not even to strip an em dash or a typo. Source is preserved verbatim.
 - **`registry.json` is generated.** Regenerate, never hand-edit.
-- **Blob-API reads only** for file bodies; re-fetch fresh before any write; never reuse a carried-over SHA. (This is exactly why detail.js's getSidecar patch was deferred, not blind-written — §2.)
+- **Blob-API reads for file bodies, get_file_contents for big ones** (§3 step 4); re-fetch fresh before any write; never reuse a carried-over SHA. NEVER whole-rewrite a file you can't read in full + faithfully — that's how you drop the unseen tail. (detail.js's split waited until it could be read whole via get_file_contents, then was verified on readback.)
 - **Never half-migrate an agent.** Folder + flat-deletion land together or not at all. (Batch OK; per-agent atomicity NOT negotiable.)
 - **One agent per PR is the floor** during the incremental phase — a capable session may batch, but each agent is independently complete + revertible in the diff.
 
@@ -141,7 +121,8 @@ For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank
 
 ## 6. Edge cases found so far (Anna hardens this list as agents move)
 
-- **Viewer was directory-driven** (audited + fixed 2026-07-17). See §2. The LIST is now registry-driven (app.js done). The DETAIL pane's `detail.js getSidecar` still reads a flat sidecar path — apply the fold-first patch in §2 (deferred only because the 26KB file truncates on read, not because it's hard).
+- **Viewer was directory-driven** (audited 2026-07-17, FIXED 2026-07-17/18). See §2 — both halves done: app.js list is registry-driven, detail.js getSidecar is folder-first + the module was split under cap. This is no longer a blocker; it just has to ride to `main` ahead of the first folder agent.
+- **Big source files clip on Base64 read.** A file whose Base64 exceeds the ~30KB tool cap (~any file > ~16KB) truncates via the blob API / raw fetch, and raw ALSO flattens HTML in JS template strings. Use `get_file_contents` (raw UTF-8, unflattened) for those. This is why detail.js couldn't be safely rewritten until read whole. Applies to profiles too: Anna's 17.6KB read fine via get_file_contents.
 - **Agent ABSENT from `registry.json`** (found on Fold-in Frank). Some live-in-git profiles were never registered — the index flags Breaker Beckett, Fold-in Frank, and Memory Maggie as stranded. Frank's `metadata.json` carries a `_note`: "ABSENT from registry.json at backfill time. Add to the registry agents array on the S5 regen." **Handling:** no `profile` field to repoint — the regen must ADD the agent's row (pointing at `<slug>/profile.md`). Preserve the `_note` verbatim in the moved metadata; it's a live instruction to the regen, not cruft. Matters double now that the viewer resolves from the registry: an unregistered agent won't render at all.
 - **Profile still over the 15KB target after the move.** Anna's `profile.md` lands ~16KB even with the changelog lifted out. The folder move is NOT guaranteed to get a bloated profile under target — that needs a real condense pass, a **separate, behavior-adjacent audit**, explicitly OUT of scope for this storage-only migration. Flag it, don't do it here.
 - **Agents with an existing folder** (the six). Migrating them means dropping `profile.md`/`change-log.md`/`metadata.json` BESIDE existing content — `memory-maggie/` already holds `open-memory-request-protocol.md`; `recon-renata/` + `workshop-wes/` hold real `reports/*.json`; the other three (`closing-clio/`, `handoff-hana/`, `scout-sage/`) hold an empty `reports/` placeholder. Preserve every existing file; the migration only ADDS the standard set.
@@ -155,4 +136,4 @@ For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank
 
 ---
 
-*Authored 2026-07-17 from the Audit Anna reference build; hardened same day by the Fold-in Frank run, the viewer-resolution audit, and the app.js registry rewire. Companion to `agent-folder-upgrade.md`. Steward: Audit Anna.*
+*Authored 2026-07-17 from the Audit Anna reference build; hardened by the Fold-in Frank run, the viewer-resolution audit, the app.js registry rewire, and the detail.js split (2026-07-18). Companion to `agent-folder-upgrade.md`. Steward: Audit Anna.*
