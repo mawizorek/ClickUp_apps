@@ -38,7 +38,7 @@
   header h1{font-size:1.05rem;font-weight:640;letter-spacing:-.01em}
   header p{font-size:.82rem;color:var(--text-soft);font-weight:420}
   #stage{position:fixed;inset:0}
-  svg{width:100%;height:100%;display:block;cursor:grab}
+  svg{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
   svg.grabbing{cursor:grabbing}
   .edge{stroke:var(--edge);stroke-width:1.4;fill:none;opacity:.5;transition:opacity .25s cubic-bezier(.16,1,.3,1),stroke .25s}
   .edge.pointer{stroke:var(--pointer);stroke-dasharray:5 4;opacity:.6}
@@ -47,7 +47,7 @@
   .elabel{fill:var(--text-faint);font-size:9.5px;opacity:0;transition:opacity .2s;pointer-events:none;text-anchor:middle}
   .elabel.lit{opacity:1;fill:var(--text-soft)}
   .node{cursor:pointer}
-  .node circle{stroke:var(--bg);stroke-width:2.5;transition:opacity .25s,r .2s cubic-bezier(.16,1,.3,1)}
+  .node circle{stroke:var(--bg);stroke-width:2.5;transition:opacity .25s}
   .node text{fill:var(--text);font-size:12px;font-weight:520;pointer-events:none;transition:opacity .25s}
   .node .role{fill:var(--text-faint);font-size:9.5px;font-weight:420}
   .node.dim{opacity:.22}
@@ -55,7 +55,7 @@
   .node.builder circle{fill:var(--builder)}
   .node.spoke circle{fill:var(--spoke)}
   .node.util circle{fill:var(--util)}
-  .node.planned circle{fill:none;stroke-width:2;stroke-dasharray:3 3}
+  .node.planned circle{fill:var(--bg);stroke-width:2;stroke-dasharray:3 3}
   .node.planned.spine circle{stroke:var(--spine)}
   .node.planned.builder circle{stroke:var(--builder)}
   .node.planned.spoke circle{stroke:var(--spoke)}
@@ -80,6 +80,7 @@
   }
   #fit:hover{background:var(--surface-1);border-color:var(--text-faint)}
   #fit:focus-visible{outline:2px solid var(--spine);outline-offset:2px}
+  #msg{position:fixed;inset:0;display:none;place-items:center;text-align:center;padding:2rem;color:var(--text-soft)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -88,7 +89,8 @@
   <h1>URITP FileMaker</h1>
   <p>package map · tap a solid node to open its schema</p>
 </header>
-<div id="stage"><svg></svg></div>
+<div id="stage"><svg xmlns="http://www.w3.org/2000/svg"><g id="root"><g id="gEdge"></g><g id="gElab"></g><g id="gNode"></g></g></svg></div>
+<div id="msg"></div>
 <div class="legend">
   <h2>App kinds</h2>
   <div class="legrow"><span class="dot spine"></span> Spine — shared backbone</div>
@@ -96,84 +98,117 @@
   <div class="legrow"><span class="dot spoke"></span> Spoke — references the spines</div>
   <div class="legrow"><span class="dot util"></span> Util — reference data</div>
   <div class="legrow"><span class="dot ring"></span> Dashed = planned / not built</div>
-  <p class="hint">Drag nodes · scroll to zoom · hover to trace links. Amber dashes = Global Setup's selector pointer at Productions.</p>
+  <p class="hint">Drag nodes · scroll/pinch to zoom · hover to trace links. Amber dashes = Global Setup's selector pointer at Productions.</p>
 </div>
 <button id="fit">Fit</button>
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script>
 (async function(){
-  const data = await fetch('./package-graph.json').then(r=>r.json());
-  const nodes = data.nodes.map(d=>({...d}));
-  const idset = new Set(nodes.map(n=>n.id));
-  const links = data.edges.filter(e=>idset.has(e.from)&&idset.has(e.to))
-                          .map(e=>({source:e.from,target:e.target=e.to,label:e.label,kind:e.kind}));
-  // adjacency for hover highlight
-  const adj = new Map(nodes.map(n=>[n.id,new Set([n.id])]));
-  links.forEach(l=>{adj.get(l.from).add(l.to);adj.get(l.to).add(l.from);});
+  const NS='http://www.w3.org/2000/svg';
+  const svg=document.querySelector('svg');
+  const root=document.getElementById('root');
+  const gEdge=document.getElementById('gEdge'), gElab=document.getElementById('gElab'), gNode=document.getElementById('gNode');
+  const msg=document.getElementById('msg');
+  const el=(t,a)=>{const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);return n;};
+  function fail(t){msg.textContent=t;msg.style.display='grid';}
 
-  const svg = d3.select('svg');
-  const root = svg.append('g');
-  const gEdge = root.append('g'), gElab = root.append('g'), gNode = root.append('g');
+  let data;
+  try{ data = await fetch('./package-graph.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();}); }
+  catch(e){ return fail('Could not load package-graph.json. Refresh in a moment (Pages may still be publishing).'); }
 
   const rOf = d=> d.kind==='spine'?26 : d.kind==='builder'?19 : d.kind==='util'?13 : 15;
+  const nodes = data.nodes.map((d,i)=>({...d,
+    x:Math.cos(i/data.nodes.length*6.283)*180,
+    y:Math.sin(i/data.nodes.length*6.283)*180, vx:0, vy:0}));
+  const byId=new Map(nodes.map(n=>[n.id,n]));
+  const links = data.edges.filter(e=>byId.has(e.from)&&byId.has(e.to))
+                          .map(e=>({s:byId.get(e.from),t:byId.get(e.to),from:e.from,to:e.to,label:e.label,kind:e.kind}));
+  const adj=new Map(nodes.map(n=>[n.id,new Set([n.id])]));
+  links.forEach(l=>{adj.get(l.from).add(l.to);adj.get(l.to).add(l.from);});
 
-  const link = gEdge.selectAll('path').data(links).join('path')
-    .attr('class',d=>'edge'+(d.kind==='pointer'?' pointer':''));
-  const elab = gElab.selectAll('text').data(links).join('text')
-    .attr('class','elabel').text(d=>d.label);
+  // ---- build DOM ----
+  const linkEls=links.map(l=>{const p=el('path',{class:'edge'+(l.kind==='pointer'?' pointer':'')});gEdge.appendChild(p);l._p=p;
+    const tx=el('text',{class:'elabel'});tx.textContent=l.label;gElab.appendChild(tx);l._tx=tx;return p;});
+  nodes.forEach(d=>{
+    const g=el('g',{class:`node ${d.kind} ${d.status==='planned'?'planned':''}`});
+    g.appendChild(el('circle',{r:rOf(d)}));
+    const t1=el('text',{y:rOf(d)+15,'text-anchor':'middle'});t1.textContent=d.label;g.appendChild(t1);
+    const t2=el('text',{class:'role',y:rOf(d)+27,'text-anchor':'middle'});t2.textContent=d.role;g.appendChild(t2);
+    gNode.appendChild(g);d._g=g;
+    g.addEventListener('mouseenter',()=>focus(d.id));
+    g.addEventListener('mouseleave',clearFocus);
+    g.addEventListener('pointerdown',ev=>startDrag(ev,d));
+    g.addEventListener('click',()=>{ if(d.viewer && !d._moved) location.href='./schema.html?app='+d.id; });
+  });
 
-  const node = gNode.selectAll('g').data(nodes).join('g')
-    .attr('class',d=>`node ${d.kind} ${d.status==='planned'?'planned':''}`)
-    .call(d3.drag()
-      .on('start',(e,d)=>{if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
-      .on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y;})
-      .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
-  node.append('circle').attr('r',rOf);
-  node.append('text').attr('y',d=>rOf(d)+15).attr('text-anchor','middle').text(d=>d.label);
-  node.append('text').attr('class','role').attr('y',d=>rOf(d)+27).attr('text-anchor','middle').text(d=>d.role);
+  function focus(id){const near=adj.get(id);
+    nodes.forEach(n=>n._g.classList.toggle('dim',!near.has(n.id)));
+    links.forEach(l=>{const on=l.from===id||l.to===id;l._p.classList.toggle('dim',!on);l._p.classList.toggle('lit',on);l._tx.classList.toggle('lit',on);});}
+  function clearFocus(){nodes.forEach(n=>n._g.classList.remove('dim'));
+    links.forEach(l=>{l._p.classList.remove('dim','lit');l._tx.classList.remove('lit');});}
 
-  node.on('click',(e,d)=>{ if(d.viewer) location.href='./schema.html?app='+d.id; });
-  function focus(id){
-    const near=adj.get(id);
-    node.classed('dim',n=>!near.has(n.id));
-    link.classed('dim',l=>!(l.from===id||l.to===id)).classed('lit',l=>l.from===id||l.to===id);
-    elab.classed('lit',l=>l.from===id||l.to===id);
+  // ---- force sim (hand-rolled velocity relaxation) ----
+  let alpha=1;
+  function step(){
+    if(alpha>0.002){
+      // repulsion
+      for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+        const a=nodes[i],b=nodes[j];let dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy||0.01;
+        const dist=Math.sqrt(d2);const rep=6200/d2;const ux=dx/dist,uy=dy/dist;
+        a.vx+=ux*rep;a.vy+=uy*rep;b.vx-=ux*rep;b.vy-=uy*rep;
+        const minD=rOf(a)+rOf(b)+40;if(dist<minD){const push=(minD-dist)*0.5;a.vx+=ux*push;a.vy+=uy*push;b.vx-=ux*push;b.vy-=uy*push;}
+      }
+      // springs
+      links.forEach(l=>{const dx=l.t.x-l.s.x,dy=l.t.y-l.s.y;const dist=Math.hypot(dx,dy)||0.01;
+        const rest=l.kind==='pointer'?95:135;const f=(dist-rest)*0.045;const ux=dx/dist,uy=dy/dist;
+        l.s.vx+=ux*f;l.s.vy+=uy*f;l.t.vx-=ux*f;l.t.vy-=uy*f;});
+      // centering + integrate
+      nodes.forEach(n=>{if(n===dragging)return;n.vx+=-n.x*0.006;n.vy+=-n.y*0.006;
+        n.vx*=0.86;n.vy*=0.86;n.x+=n.vx*alpha*1.2;n.y+=n.vy*alpha*1.2;});
+      alpha*=0.985;
+    }
+    render();requestAnimationFrame(step);
   }
-  function clearFocus(){node.classed('dim',false);link.classed('dim',false).classed('lit',false);elab.classed('lit',false);}
-  node.on('mouseenter',(e,d)=>focus(d.id)).on('mouseleave',clearFocus);
-
-  const sim = d3.forceSimulation(nodes)
-    .force('link',d3.forceLink(links).id(d=>d.id).distance(l=>l.kind==='pointer'?90:130).strength(.5))
-    .force('charge',d3.forceManyBody().strength(-620))
-    .force('collide',d3.forceCollide().radius(d=>rOf(d)+34))
-    .force('center',d3.forceCenter(0,0))
-    .on('tick',ticked);
-
-  function ticked(){
-    link.attr('d',d=>{
-      const dx=d.target.x-d.source.x, dy=d.target.y-d.source.y;
-      const c=`${(d.source.x+d.target.x)/2} ${(d.source.y+d.target.y)/2 - Math.hypot(dx,dy)*0.08}`;
-      return `M${d.source.x} ${d.source.y} Q ${c} ${d.target.x} ${d.target.y}`;
-    });
-    elab.attr('x',d=>(d.source.x+d.target.x)/2).attr('y',d=>(d.source.y+d.target.y)/2-4);
-    node.attr('transform',d=>`translate(${d.x},${d.y})`);
+  function render(){
+    links.forEach(l=>{const mx=(l.s.x+l.t.x)/2,my=(l.s.y+l.t.y)/2-Math.hypot(l.t.x-l.s.x,l.t.y-l.s.y)*0.08;
+      l._p.setAttribute('d',`M${l.s.x} ${l.s.y} Q ${mx} ${my} ${l.t.x} ${l.t.y}`);
+      l._tx.setAttribute('x',(l.s.x+l.t.x)/2);l._tx.setAttribute('y',(l.s.y+l.t.y)/2-4);});
+    nodes.forEach(n=>n._g.setAttribute('transform',`translate(${n.x},${n.y})`));
   }
 
-  const zoom=d3.zoom().scaleExtent([.35,3]).on('zoom',e=>root.attr('transform',e.transform));
-  svg.call(zoom).on('dblclick.zoom',null);
-  svg.on('mousedown',()=>svg.classed('grabbing',true)).on('mouseup',()=>svg.classed('grabbing',false));
+  // ---- pan / zoom ----
+  let view={x:0,y:0,k:1};
+  function applyView(){root.setAttribute('transform',`translate(${view.x},${view.y}) scale(${view.k})`);}
+  function toWorld(cx,cy){return {x:(cx-view.x)/view.k,y:(cy-view.y)/view.k};}
+  svg.addEventListener('wheel',ev=>{ev.preventDefault();const r=svg.getBoundingClientRect();
+    const mx=ev.clientX-r.left,my=ev.clientY-r.top;const w=toWorld(mx,my);
+    const k2=Math.min(3,Math.max(0.3,view.k*(ev.deltaY<0?1.12:0.89)));
+    view.x=mx-w.x*k2;view.y=my-w.y*k2;view.k=k2;applyView();},{passive:false});
 
+  let dragging=null,moved=false,panning=null;
+  function startDrag(ev,d){ev.stopPropagation();dragging=d;moved=false;d._moved=false;
+    svg.setPointerCapture(ev.pointerId);alpha=Math.max(alpha,0.25);}
+  svg.addEventListener('pointerdown',ev=>{if(dragging)return;panning={x:ev.clientX,y:ev.clientY,vx:view.x,vy:view.y};svg.classList.add('grabbing');});
+  svg.addEventListener('pointermove',ev=>{
+    const r=svg.getBoundingClientRect();
+    if(dragging){const w=toWorld(ev.clientX-r.left,ev.clientY-r.top);dragging.x=w.x;dragging.y=w.y;dragging.vx=0;dragging.vy=0;moved=true;dragging._moved=true;alpha=Math.max(alpha,0.15);}
+    else if(panning){view.x=panning.vx+(ev.clientX-panning.x);view.y=panning.vy+(ev.clientY-panning.y);applyView();}
+  });
+  function endPtr(){if(dragging){setTimeout(()=>{if(dragging)dragging._moved=false;},0);}dragging=null;panning=null;svg.classList.remove('grabbing');}
+  svg.addEventListener('pointerup',endPtr);svg.addEventListener('pointercancel',endPtr);
+
+  // ---- fit ----
   function fit(){
-    const b=root.node().getBBox(), s=svg.node();
-    const w=s.clientWidth,h=s.clientHeight;
-    if(!b.width) return;
-    const k=Math.min(2.2, .82*Math.min(w/b.width,h/b.height));
-    const tx=w/2-k*(b.x+b.width/2), ty=h/2-k*(b.y+b.height/2);
-    svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity.translate(tx,ty).scale(k));
+    if(!nodes.length)return;
+    let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+    nodes.forEach(n=>{const r=rOf(n)+30;minX=Math.min(minX,n.x-r);minY=Math.min(minY,n.y-r);maxX=Math.max(maxX,n.x+r);maxY=Math.max(maxY,n.y+r);});
+    const bw=maxX-minX,bh=maxY-minY;const w=svg.clientWidth,h=svg.clientHeight;
+    const k=Math.min(2.2,0.9*Math.min(w/bw,h/bh));
+    view.k=k;view.x=w/2-k*(minX+bw/2);view.y=h/2-k*(minY+bh/2);applyView();
   }
   document.getElementById('fit').onclick=fit;
-  sim.on('end',fit);
-  setTimeout(fit,900);
+  applyView();step();
+  setTimeout(fit,700);
+  window.addEventListener('resize',fit);
 })();
 </script>
 </body>
