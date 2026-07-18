@@ -1,0 +1,74 @@
+/* shared/themes/preview.data.js — Theme Studio embedded snapshot (SELF-CONTAINED FIRST-PAINT FALLBACK).
+   Extracted verbatim from the former monolithic preview.html (2026-07-17 modular split).
+   These globals seed a safe first paint before preview.core.js's liveOverride() re-fetches the
+   canonical TSV grids + _objects.json and overwrites them. Loaded BEFORE preview.core.js. */
+
+/* SELF-CONTAINED EMBED FOR SAFE FIRST PAINT */
+var COLORS={
+"default-theme":{name:"Default",group:"Utility",mode:"mid",bg:"#8f8f8f","surface-1":"#a0a0a0","surface-2":"#b0b0b0","surface-3":"#bfbfbf",border:"#565656",field:"#ababab",text:"#1c1c1c","text-soft":"#3f3f3f","text-faint":"#5b5b5b",accent:"#353535","accent-deep":"#222222","accent-2":"#515151","accent-soft":"#cccccc","on-accent":"#f6f6f6",good:"#757575",warn:"#656565",bad:"#3f3f3f",info:"#5b5b5b"},
+"maw-dark-utility":{name:"MAW Dark Utility",group:"Utility",mode:"dark",bg:"#2a2d33","surface-1":"#333740","surface-2":"#3c414b","surface-3":"#434955",border:"#656d7c",field:"#3c414b",text:"#eef0f3","text-soft":"#a7adb8","text-faint":"#7b818d",accent:"#46b8cf","accent-deep":"#2e8ba0","accent-2":"#6fccd6","accent-soft":"#26414a","on-accent":"#10262c",good:"#35c48a",warn:"#d8ab4f",bad:"#d64f3f",info:"#56a8dd"},
+"mclaren":{name:"McLaren",group:"F1 Dark",mode:"dark",bg:"#292420","surface-1":"#231f1b","surface-2":"#2f2a25","surface-3":"#35302a",border:"#5f5850",field:"#3a342e",text:"#f2f1ec","text-soft":"#5fc9d8","text-faint":"#4c8b98",accent:"#f5842f","accent-deep":"#c05e18","accent-2":"#5fc9d8","accent-soft":"#432f20","on-accent":"#2a1d10",good:"#35c48a",warn:"#d8ab4f",bad:"#d64f3f",info:"#63bce0"}
+};
+var TYPES={
+"sharp-racing":{"font-display":"'Chakra Petch', system-ui, sans-serif","font-body":"'Inter', system-ui, sans-serif","fs-lead":"1rem","fs-body":"0.875rem","fs-sm":"0.8rem","fs-xs":"0.7rem","track-tight":"-0.01em","track-btn":"0.02em"},
+"mobile-legible":{"font-display":"'Manrope', system-ui, sans-serif","font-body":"'Manrope', system-ui, sans-serif","fs-lead":"1.15rem","fs-body":"1.02rem","fs-sm":"0.92rem","fs-xs":"0.8rem","track-tight":"-0.015em","track-btn":"0"},
+"grounded":{"font-display":"'Inter', system-ui, sans-serif","font-body":"'Inter', system-ui, sans-serif","fs-lead":"1.05rem","fs-body":"0.94rem","fs-sm":"0.85rem","fs-xs":"0.75rem","track-tight":"-0.02em","track-btn":"0"}
+};
+var FORMS={
+"sharp":{"radius":"3px","radius-lg":"4px","radius-pill":"4px","border-w":"1.5px","grad-angle":"100deg","shadow-out":"0 1px 2px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.35)","shadow-in":"inset 0 2px 4px rgba(0,0,0,0.5)"},
+"soft":{"radius":"6px","radius-lg":"10px","radius-pill":"999px","border-w":"1px","grad-angle":"180deg","shadow-out":"0 2px 8px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.14)","shadow-in":"inset 0 1px 4px rgba(0,0,0,0.24)"},
+"grounded":{"radius":"8px","radius-lg":"12px","radius-pill":"999px","border-w":"1px","grad-angle":"160deg","shadow-out":"0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.18)","shadow-in":"inset 0 1px 3px rgba(0,0,0,0.28)"}
+};
+var SPACES={
+"tight":{"touch":"42px","pad-cell":"8px","pad-card":"16px","gap-xs":"4px","gap-md":"12px","gap-lg":"24px"},
+"loose":{"touch":"52px","pad-cell":"12px","pad-card":"24px","gap-xs":"8px","gap-md":"16px","gap-lg":"32px"},
+"standard":{"touch":"44px","pad-cell":"10px","pad-card":"20px","gap-xs":"6px","gap-md":"14px","gap-lg":"28px"}
+};
+
+// EMBEDDED OBJECT REGISTRY FALLBACK — mirrors _objects.json (canonical 20). Live fetch overrides.
+var REGISTRY={
+  "groups": {
+    "shells": { "name": "Shells & containers", "desc": "Structural surfaces. Depth from surface fill + border + one outer shadow.", "objects": [
+      { "id":"cnt_page_shell", "name":"Page shell", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tshell\">Page canvas · app body surface</div>", "props":{ "Fill":"bg", "Line":"border", "Corner":"radius-lg" } } } },
+      { "id":"cnt_section_card", "name":"Section card", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tcard\"><h3>Section card</h3><p>A grouping card holds a related set of fields or content.</p></div>", "props":{ "Fill":"surface-2", "Line":"border", "Corner":"radius-lg", "Shadow":"shadow-out" } } } },
+      { "id":"cnt_toolbar", "name":"Toolbar", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttoolbar\"><span class=\"tt\">On Track</span><span class=\"sp\"></span><span class=\"tnav on\">Live</span><span class=\"tnav off\">History</span></div>", "props":{ "Fill":"surface-1", "Title":"text", "Nav on":"accent", "Nav off":"text-faint" } } } },
+      { "id":"cnt_filter_bar", "name":"Filter bar", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttoolbar\"><span class=\"tnav on\">All</span> <span class=\"tnav off\">Open</span> <span class=\"tnav off\">Closed</span></div>", "props":{ "Fill":"surface-1", "Active chip":"accent", "Idle chip":"text-faint" } } } },
+      { "id":"card_modal_standard", "name":"Modal", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tmodal\"><h3>Confirm action</h3><p>Highest elevation surface.</p><button class=\"tb primary\">Confirm</button></div>", "props":{ "Fill":"surface-3", "Line":"border", "Corner":"radius-lg", "Shadow":"shadow-out" } } } }
+    ] },
+    "nav": { "name": "Navigation", "desc": "Active vs inactive must read at a glance.", "objects": [
+      { "id":"nav_tab", "name":"Tabs", "rowLayout":true, "states":{ "active":{ "html":"<span class=\"tnav on\">Loans</span> <span class=\"tnav off\">Parties</span> <span class=\"tnav off\">Docs</span>", "props":{ "Active":"accent", "On text":"on-accent", "Inactive":"text-faint" } }, "inactive":{ "html":"<span class=\"tnav off\">Loans</span> <span class=\"tnav off\">Parties</span> <span class=\"tnav off\">Docs</span>", "props":{ "Idle":"text-faint", "Line":"border" } } } },
+      { "id":"nav_mode", "name":"Mode toggle", "rowLayout":true, "states":{ "active":{ "html":"<span class=\"tnav on\">List</span> <span class=\"tnav off\">Grid</span>", "props":{ "Selected":"accent", "On text":"on-accent", "Unselected":"text-soft" } } } },
+      { "id":"nav_back", "name":"Back affordance", "rowLayout":true, "states":{ "base":{ "html":"<button class=\"tb ghost\">‹ Back to hub</button>", "props":{ "Text":"accent", "Fill":"transparent" } } } }
+    ] },
+    "type": { "name": "Typography", "desc": "Display + body faces from Typography; ink colors from Color.", "objects": [
+      { "id":"tx_page_title", "name":"Page title", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttype\"><div class=\"t1\">Loan application #4021</div></div>", "props":{ "Face":"font-display", "Ink":"text", "Size":"fs-lead" } } } },
+      { "id":"tx_section_header", "name":"Section + subsection header", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttype\"><div class=\"t2\">Section header</div><div class=\"t2\" style=\"opacity:.7;font-size:0.82rem\">Subsection header</div></div>", "props":{ "Face":"font-display", "Ink":"text" } } } },
+      { "id":"tx_field_label", "name":"Field label", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tfield\"><label>Field label</label></div>", "props":{ "Ink":"text-soft", "Size":"fs-xs" } } } },
+      { "id":"tx_body", "name":"Body copy", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttype\"><div class=\"t3\">Body copy is the standard reading size for record content and prose in the layout.</div></div>", "props":{ "Ink":"text", "Size":"fs-body" } } } },
+      { "id":"tx_helper_muted", "name":"Helper + muted", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ttype\"><div class=\"t4\">Helper text under a field.</div><div class=\"t5\">Muted metadata · timestamps</div></div>", "props":{ "Helper":"text-soft", "Muted":"text-faint" } } } },
+      { "id":"tx_badge", "name":"Text badge", "rowLayout":true, "states":{ "base":{ "html":"<span class=\"tpill accent\">Featured</span>", "props":{ "Fill":"accent-grad", "Text":"on-accent", "Corner":"radius-pill" } } } }
+    ] },
+    "buttons": { "name": "Buttons — full family", "desc": "Primary uses the two-stop hex gradient. Pressed swaps outer shadow for inner (the infill look).", "objects": [
+      { "id":"btn_family", "name":"Primary / secondary / quiet / destructive / icon", "rowLayout":true, "states":{ "normal":{ "html":"<button class=\"tb primary\">Primary</button> <button class=\"tb secondary\">Secondary</button> <button class=\"tb ghost\">Quiet</button> <button class=\"tb destructive\">Delete</button> <button class=\"tb icon\">⚙</button>", "props":{ "Primary":"accent-grad", "On text":"on-accent", "Secondary":"surface-2", "Destructive":"bad", "Shadow":"shadow-out", "Corner":"radius" } }, "pressed":{ "html":"<button class=\"tb pressed\">Primary</button> <button class=\"tb secondary\" style=\"background:var(--surface-3);box-shadow:var(--shadow-in)\">Secondary</button> <button class=\"tb ghost\">Quiet</button>", "props":{ "Fill":"accent-grad", "Shadow":"shadow-in", "Transform":"translateY(1px)" } } } }
+    ] },
+    "fields": { "name": "Fields", "desc": "Focus = inner shadow + accent border. Readonly drops to a muted surface.", "objects": [
+      { "id":"fd_text_standard", "name":"Text field", "rowLayout":false, "states":{ "editable":{ "html":"<div class=\"tfield\"><label>Driver name</label><input placeholder=\"Type a name...\"></div>", "props":{ "Fill":"field", "Line":"border", "Corner":"radius" } }, "focus":{ "html":"<div class=\"tfield\"><label>Driver name</label><input class=\"focus\" value=\"Lando Norris\"></div>", "props":{ "Line":"accent", "Shadow":"shadow-in" } }, "readonly":{ "html":"<div class=\"tfield\"><label>Team</label><input value=\"McLaren\" readonly style=\"background:var(--surface-2);color:var(--text-soft);pointer-events:none\"></div>", "props":{ "Fill":"surface-2", "Text":"text-soft" } } } },
+      { "id":"fd_dropdown_standard", "name":"Dropdown", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tfield\"><label>Team</label><div class=\"tselect\">McLaren <span>▾</span></div></div>", "props":{ "Fill":"field", "Line":"border", "Chevron":"text-faint" } } } },
+      { "id":"fd_readonly_display", "name":"Readonly / calc display", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tfield\"><label>Computed total</label><div class=\"tro\">$48,210.00</div></div>", "props":{ "Fill":"surface-2", "Text":"text-soft" } } } },
+      { "id":"fd_search_filter", "name":"Search field", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"tfield\"><label>Search</label><div class=\"tsearch\"><span>🔍</span><input placeholder=\"Search records...\"></div></div>", "props":{ "Fill":"field", "Icon":"text-faint", "Line":"border" } } } }
+    ] },
+    "data": { "name": "Rows, tiles & badges", "desc": "The list-and-status family: portal rows, metric tiles, and status badges.", "objects": [
+      { "id":"row_tile_badge", "name":"Portal rows / metric tiles / status badges", "rowLayout":false, "states":{ "rows":{ "html":"<table class=\"ttable\"><thead><tr><th>Pos</th><th>Driver</th><th class=\"n\">Pts</th></tr></thead><tbody><tr><td>1</td><td>Norris</td><td class=\"n\">287</td></tr><tr class=\"alt\"><td>2</td><td>Piastri</td><td class=\"n\">265</td></tr><tr class=\"sel\"><td>3</td><td>Verstappen</td><td class=\"n\">241</td></tr></tbody></table>", "props":{ "Header":"text-soft", "Alternate":"surface-2", "Selected":"accent-soft" } }, "tiles":{ "html":"<div style=\"display:flex;gap:12px;flex-wrap:wrap;width:100%\"><div class=\"ttile\"><div class=\"big\">8,412</div><div class=\"lab\">Active this week</div></div><div class=\"ttile\"><div class=\"big\" style=\"color:var(--bad)\">3 overdue</div><div class=\"lab\">Needs attention</div></div></div>", "props":{ "Fill":"surface-2", "Shadow":"shadow-out", "Alert":"bad" } }, "badges":{ "html":"<div><span class=\"tpill neutral\">Draft</span> <span class=\"tpill good\">Active</span> <span class=\"tpill warn\">Pending</span> <span class=\"tpill bad\">Overdue</span></div>", "props":{ "Neutral":"surface-3", "Good":"good", "Warn":"warn", "Alert":"bad" } } } }
+    ] }
+  }
+};
+
+var GROUPS={"default-theme":"Utility","maw-dark-utility":"Utility","mclaren":"F1 Dark"};
+var ROLES={bg:"page canvas","surface-1":"toolbar/header","surface-2":"card / row alt","surface-3":"modal / raised",border:"lines & edges",field:"input fill",text:"primary text","text-soft":"secondary text","text-faint":"muted/helper",accent:"actionable · grad top","accent-deep":"gradient bottom","accent-2":"secondary accent","accent-soft":"tint / selected","on-accent":"text on accent",good:"success",warn:"warning",bad:"error/destructive",info:"informational"};
+var SW_ORDER=["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-deep","accent-2","accent-soft","on-accent","good","warn","bad","info"];
+
+var CHROME={
+  light:{"--ch-bg":"oklch(0.93 0.005 265)","--ch-panel":"oklch(0.98 0.003 265)","--ch-sunk":"oklch(0.905 0.006 265)","--ch-line":"oklch(0.85 0.012 265)","--ch-ink":"oklch(0.24 0.02 275)","--ch-soft":"oklch(0.46 0.02 275)","--ch-faint":"oklch(0.60 0.02 275)","--ch-accent":"oklch(0.54 0.16 275)","--ch-accent-soft":"oklch(0.90 0.04 275)"},
+  mid:{"--ch-bg":"oklch(0.86 0.004 265)","--ch-panel":"oklch(0.92 0.003 265)","--ch-sunk":"oklch(0.83 0.005 265)","--ch-line":"oklch(0.74 0.010 265)","--ch-ink":"oklch(0.20 0.02 275)","--ch-soft":"oklch(0.38 0.02 275)","--ch-faint":"oklch(0.50 0.02 275)","--ch-accent":"oklch(0.42 0.16 275)","--ch-accent-soft":"oklch(0.80 0.05 275)"},
+  dark:{"--ch-bg":"oklch(0.24 0.008 265)","--ch-panel":"oklch(0.29 0.010 265)","--ch-sunk":"oklch(0.21 0.008 265)","--ch-line":"oklch(0.40 0.014 265)","--ch-ink":"oklch(0.95 0.006 265)","--ch-soft":"oklch(0.74 0.010 265)","--ch-faint":"oklch(0.58 0.010 265)","--ch-accent":"oklch(0.72 0.13 265)","--ch-accent-soft":"oklch(0.34 0.05 265)"}
+};
