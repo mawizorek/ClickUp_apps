@@ -4,13 +4,21 @@ App-specific rulings for `uritp-people`. This is the **build-toward source of tr
 
 ---
 
-## DP-006 · 2026-07-18 · Staff-Positions layer is Global-Setup-owned (Workshop W1)
+## DP-007 · 2026-07-18 · Positions belong to LABOUR; People carries no position link (supersedes DP-006)
 
-**Ruling:** the Staff-Positions layer that `ADULTS_ext.fkStaffPosition` references is **Global-Setup-owned reference data** — NOT a People-local table and NOT owned by the Labour spoke. Both People (ADULTS_ext) and Labour read it.
+**Ruling:** `ADULTS_ext` drops `fkStaffPosition`. People holds NO position/title/department field at all. The entire positions concept — catalog AND assignments — is owned by the **Labour** spoke. When a contact sheet or any app needs a person's title, it joins THROUGH Labour at report time. `ADULTS_ext` keeps only the broad `AdultType` classification (kind of non-student), not a job title.
 
-**Why:** staff positions/levels are org reference data (like departments, fiscal years) — exactly Global Setup's remit. Housing them in Labour would force the People hub to depend on a spoke, inverting hub-and-spoke. Global Setup is the neutral spine both consume. Seeds from the as-built `_setup_Staff Positions` / `URJobProfileLevels` / `Supervisors`.
+**Why:** a position/title is only meaningful as an **assignment** (this person holds this role, for pay/hours/a shop slot), and an assignment of any kind is operational, not identity. DP-006 tried to solve the placement by parking positions in Global Setup; Michael's catch ("positions are so intertwined with Labour and other students too") exposed that as the wrong cut — the catalog and the assignment are one domain and splitting them scatters operational data. **Generalized rule (banked): an assignment of any kind — employment, show role, shop slot, course enrollment — is NEVER spine data; it is always spoke-owned.** Same shape as DP-002, applied to positions.
 
-**Source:** Workshop W1 (Feasible Finn + Scope Skye + Eco Enzo converged), delegated by Michael 2026-07-18.
+**Source:** Michael, 2026-07-18 (chose "one catalog + assignments both in Labour; People/Global Setup carry nothing").
+
+**Supersedes:** DP-006. Cross-ref: Global Setup DG-005 (its Staff_Positions is now a tombstone pointing to Labour).
+
+## DP-006 · 2026-07-18 · ~~Staff-Positions layer is Global-Setup-owned~~ (SUPERSEDED by DP-007)
+
+**Ruling (no longer in force):** the Staff-Positions layer `ADULTS_ext.fkStaffPosition` referenced was assigned to Global Setup as reference data both People and Labour read.
+
+**Why reversed (same day, DP-007 / DG-005):** positions are operational assignment data, not org reference. They move to Labour entirely; People drops the link. Kept as a tombstone so the reasoning isn't relitigated.
 
 ## DP-005 · 2026-07-18 · Student/Non-Student classification is DERIVED, not stored (Workshop W1)
 
@@ -41,9 +49,9 @@ App-specific rulings for `uritp-people`. This is the **build-toward source of tr
 
 ## DP-002 · 2026-07-18 · Identity facts vs lifecycle links (the placement rule)
 
-**Ruling:** editable identity facts (name, pronoun, email, class year, student ID) live in People (student-specific ones on `STUDENTS_ext`). A relationship to a thing with its own lifecycle (a course offering, a show, a training) lives in the spoke. No People field is ever maintained in two places; the spoke references the person, it does not restate the field.
+**Ruling:** editable identity facts (name, pronoun, email, class year, student ID) live in People (student-specific ones on `STUDENTS_ext`). A relationship to a thing with its own lifecycle (a course offering, a show, a training, a position) lives in the spoke. No People field is ever maintained in two places; the spoke references the person, it does not restate the field.
 
-**Consequence:** class year + student ID → `STUDENTS_ext` (People-side). Course enrollment → Courses spoke. Contact tree (multiple emails/phones) stays in People (Q4).
+**Consequence:** class year + student ID → `STUDENTS_ext` (People-side). Course enrollment → Courses spoke. Position/title → Labour spoke (DP-007). Contact tree (multiple emails/phones) stays in People (Q4).
 
 **Source:** Michael, 2026-07-18 ("if I want to edit an email, pronoun, class year, ID — that's all in PEOPLE not Course Enrollments").
 
@@ -74,7 +82,7 @@ This app is the **build-toward** source of truth. Typos are corrected inline in 
 
 **Naming house style:** RESOLVED — this app keeps the bare `PrimaryKey`/`fkPERSON` style (matches HML), does NOT adopt URITP `pk_`/`fk_`. The workspace-wide unification question remains open at the domain level (DOCUMENTATION-STANDARD), but uritp-people's own convention is now locked.
 
-### Deliberate field CUTS / derivations (target-state pass, 2026-07-18)
+### Deliberate field CUTS / derivations / graduations (target-state pass, 2026-07-18)
 
 Recorded so the history is kept without polluting the source of truth.
 
@@ -83,15 +91,15 @@ Recorded so the history is kept without polluting the source of truth.
 | `emailTEMP` | CUT | legacy import-staging; migrate live values into CONTACT_INFORMATION, then drop |
 | `hiddenLatestImport` | CUT | import-batch tracking cruft; belongs to the import script's scope |
 | `broadClassification` | DERIVED (not stored) | computed from extension existence (DP-005); a stored flag would drift |
-| `ADULTS_ext.Department` / `Title` | GRADUATED | → Global-Setup Staff-Positions layer via `fkStaffPosition` (DP-006) |
+| `ADULTS_ext.fkStaffPosition` | REMOVED → Labour | positions are Labour-owned assignment data (DP-007); People carries no position link, joins THROUGH Labour for a title |
 
 ---
 
-## Deferred to spokes (NOT People) — removed from the hub this pass
+## Deferred to spokes (NOT People)
 
 The as-built People file carried these; hub-and-spoke moves them out:
 
-- `EMPLOYEES_setup`, `JOB POSTINGS`, `Supervisors`, `_setup_Staff Positions`, `URJobProfileLevels` → seed the **Global-Setup Staff-Positions layer** (DP-006) + **Labour** for employment records.
+- `EMPLOYEES_setup`, `JOB POSTINGS`, `Supervisors`, `_setup_Staff Positions`, `URJobProfileLevels` → **Labour** (owns the positions catalog + assignments, DP-007).
 - `PRODUCTION_STAFFS`, `ROLES_IN_PRODUCTION_setup`, `PRODUCTIONS_*` → **Productions/Company builder**.
 - Enrollment/roster history → **Courses/Student-Records**.
-- `GLOBAL_USAGE_VARIABLES` / org constants / PRODUCTIONS list / Staff-Positions → **Global Setup** (separate spine app).
+- `GLOBAL_USAGE_VARIABLES` / org constants / PRODUCTIONS list → **Global Setup** (config spine; Departments live there and Labour references them).
