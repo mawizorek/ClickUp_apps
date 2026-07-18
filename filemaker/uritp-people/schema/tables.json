@@ -1,0 +1,129 @@
+{
+  "_meta": {
+    "app": "uritp-people",
+    "schemaVersion": "1.0",
+    "generated": "2026-07-18",
+    "source": "ClickUp doc 'URITP People FMP' + DOCUMENTATION subpage (as-built, 2026-06-11 graph)",
+    "status": "first-pass, unverified against live file",
+    "conventions": {
+      "asBuilt": "bare PrimaryKey (UUID) + fkPERSON style FKs; camelCase/PascalCase mixed fields; g_ globals; known typos preffered*/namePronounciation",
+      "target": "URITP standard = pk_/fk_ prefixes, g_ globals, PascalCase tables. NOT yet applied — see meta/design-decisions.md naming-drift ledger.",
+      "ruling": "document AS-BUILT this pass; do not silently rewrite. House-style adoption is an open governance item."
+    }
+  },
+  "tables": [
+    {
+      "name": "PEOPLE",
+      "role": "identity-hub",
+      "status": "under-review",
+      "description": "Canonical identity record, one per human. Lean: names + display cascade + pronunciation + playbill credit + broad classification. No app-specific fields.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "First Name", "type": "text", "key": "plain", "category": "name" },
+        { "name": "Last Name", "type": "text", "key": "plain", "category": "name" },
+        { "name": "prefferedFirstName", "type": "text", "key": "plain", "category": "name", "status": "pending", "notes": "TYPO → preferredFirstName" },
+        { "name": "prefferedLastName", "type": "text", "key": "plain", "category": "name", "status": "pending", "notes": "TYPO → preferredLastName" },
+        { "name": "alternateName", "type": "text", "key": "plain", "category": "name" },
+        { "name": "useAlternateNameGlobally", "type": "boolean", "key": "plain", "category": "name" },
+        { "name": "NameDisplayInPlaybills", "type": "text", "key": "plain", "category": "name", "notes": "semi-manual; playbill credit" },
+        { "name": "namePronounciation", "type": "text", "key": "plain", "category": "name", "status": "pending", "notes": "TYPO → namePronunciation" },
+        { "name": "autoFirstLast", "type": "calc", "key": "plain", "category": "name", "notes": "'First Last' working name (preferred if set)" },
+        { "name": "autoLastFirst", "type": "calc", "key": "plain", "category": "name", "notes": "'Last, First' working name" },
+        { "name": "customID", "type": "text", "key": "plain", "category": "id", "notes": "CRM-### format" },
+        { "name": "broadClassification", "type": "text", "key": "plain", "category": "classification", "status": "pending", "notes": "PROPOSED chooser field: Student / Non-Student. Powers the chooser card starting context. As-built used separate STUDENTS/ADULTS extension existence instead; confirm approach." },
+        { "name": "emailTEMP", "type": "text", "key": "plain", "category": "legacy", "status": "pending", "notes": "legacy/staging; migrate into CONTACT_INFORMATION then deprecate" },
+        { "name": "summary_CountPeople", "type": "summary", "key": "plain", "category": "meta" },
+        { "name": "ScratchNotes", "type": "text", "key": "plain", "category": "notes" },
+        { "name": "hiddenLatestImport", "type": "text", "key": "plain", "category": "meta", "notes": "import tracking" },
+        { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "key": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "key": "audit", "category": "audit" }
+      ]
+    },
+    {
+      "name": "STUDENTS_ext",
+      "role": "role-extension",
+      "status": "under-review",
+      "description": "Student role extension off PEOPLE (one-to-one via fkPERSON). Carries student-specific IDENTITY facts (student ID, class year) per the 'editable identity facts live in People' ruling. Enrollment history does NOT live here — it's a Courses spoke link.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
+        { "name": "fkGraduation_Year", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ GRADUATION_CLASSES.PrimaryKey (class year)" },
+        { "name": "studentID", "type": "text", "key": "plain", "category": "academic", "status": "pending", "notes": "PROPOSED here per ruling: student ID is an editable identity fact, lives in People-side extension, NOT Courses" },
+        { "name": "NotesStudent", "type": "text", "key": "plain", "category": "notes" },
+        { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" }
+      ]
+    },
+    {
+      "name": "ADULTS_ext",
+      "role": "role-extension",
+      "status": "pending",
+      "description": "Non-student role extension off PEOPLE (one-to-one via fkPERSON). Faculty, staff, guest artists, vendors, volunteers. Carries adult classification; dept/title placement is an OPEN QUESTION.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
+        { "name": "AdultType", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Faculty, Staff, Adjunct, Guest Artist, Vendor, Volunteer" },
+        { "name": "Department", "type": "text", "key": "plain", "category": "classification", "status": "pending", "notes": "OPEN QUESTION: keep here or graduate to a Staff-Positions layer" },
+        { "name": "Title", "type": "text", "key": "plain", "category": "classification", "status": "pending", "notes": "OPEN QUESTION with Department" },
+        { "name": "AdultStatus", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Active, Inactive" },
+        { "name": "NotesAdult", "type": "text", "key": "plain", "category": "notes" },
+        { "name": "StartDate", "type": "date", "key": "plain", "category": "lifecycle" },
+        { "name": "EndDate", "type": "date", "key": "plain", "category": "lifecycle" },
+        { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "key": "audit", "category": "audit" }
+      ]
+    },
+    {
+      "name": "CONTACT_INFORMATION",
+      "role": "contact",
+      "status": "under-review",
+      "description": "One record per person. Primary phone/email + parent of the child Emails / PhoneNumbers tables (multiple per person). Q4 ruling: keep the full tree.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
+        { "name": "primaryPhone", "type": "text", "key": "plain", "category": "contact" },
+        { "name": "primaryEmail", "type": "text", "key": "plain", "category": "contact", "notes": "lowercase" },
+        { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
+        { "name": "CreatedBy", "type": "text", "key": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "key": "audit", "category": "audit" }
+      ]
+    },
+    {
+      "name": "Emails",
+      "role": "contact-child",
+      "status": "under-review",
+      "description": "Additional emails per person (one-to-many off CONTACT_INFORMATION via fkCONTACT).",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "fkCONTACT", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ CONTACT_INFORMATION.PrimaryKey" },
+        { "name": "emailAddress", "type": "text", "key": "plain", "category": "contact" },
+        { "name": "label", "type": "text", "key": "plain", "category": "contact", "notes": "e.g. school / personal / work" }
+      ]
+    },
+    {
+      "name": "PhoneNumbers",
+      "role": "contact-child",
+      "status": "under-review",
+      "description": "Additional phone numbers per person (one-to-many off CONTACT_INFORMATION via fkContact).",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "fkContact", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ CONTACT_INFORMATION.PrimaryKey (NOTE as-built casing differs from Emails.fkCONTACT — flag)" },
+        { "name": "phoneNumber", "type": "text", "key": "plain", "category": "contact" },
+        { "name": "label", "type": "text", "key": "plain", "category": "contact", "notes": "e.g. mobile / home" }
+      ]
+    },
+    {
+      "name": "GRADUATION_CLASSES",
+      "role": "value-source",
+      "status": "under-review",
+      "description": "Class-year value source referenced by STUDENTS_ext.fkGraduation_Year. Table (not value list) because entries carry more than a display label.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "dropdownName", "type": "text", "key": "plain", "category": "label", "notes": "Senior, Junior, Sophomore, First Year, Recent Grad, Alumni" },
+        { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" }
+      ]
+    }
+  ]
+}

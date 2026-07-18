@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "app": "uritp-people",
+    "schemaVersion": "1.0",
+    "generated": "2026-07-18",
+    "description": "URITP People internal edge graph. Hub-and-spoke: PEOPLE is the identity hub; role extensions + contact hang off it. Cross-app spoke references (Productions, Safety, Courses, Labour) point AT PEOPLE.PrimaryKey from their own files and are NOT listed here (they live in each spoke's relationships.json)."
+  },
+  "relationships": [
+    { "from": { "table": "STUDENTS_ext", "field": "fkPERSON" }, "to": { "table": "PEOPLE", "field": "PrimaryKey" }, "cardinality": "one-to-one", "status": "under-review", "notes": "student role extension" },
+    { "from": { "table": "ADULTS_ext", "field": "fkPERSON" }, "to": { "table": "PEOPLE", "field": "PrimaryKey" }, "cardinality": "one-to-one", "status": "pending", "notes": "non-student role extension; a person may hold both student + adult extensions" },
+    { "from": { "table": "CONTACT_INFORMATION", "field": "fkPERSON" }, "to": { "table": "PEOPLE", "field": "PrimaryKey" }, "cardinality": "one-to-one", "status": "under-review", "notes": "one contact record per person" },
+    { "from": { "table": "Emails", "field": "fkCONTACT" }, "to": { "table": "CONTACT_INFORMATION", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review", "notes": "additional emails" },
+    { "from": { "table": "PhoneNumbers", "field": "fkContact" }, "to": { "table": "CONTACT_INFORMATION", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review", "notes": "additional phones; as-built FK casing (fkContact) differs from Emails.fkCONTACT — reconcile" },
+    { "from": { "table": "STUDENTS_ext", "field": "fkGraduation_Year" }, "to": { "table": "GRADUATION_CLASSES", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review", "notes": "class-year lookup" }
+  ]
+}
