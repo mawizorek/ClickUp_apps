@@ -1,3 +1,6 @@
+!!!DECISION LOGS and AUDIOT LOGS and REVISION TRACKERS all need to be in reverse INDEX so most recent is alwyas at top!!!
+
+
 # URITP People — Design Decisions & Audit Ledger
 
 App-specific rulings for `uritp-people`. Domain-wide FMP rules live in [../../DECISIONS.md](../../DECISIONS.md); cross-app shared build questions are hashed out in the ClickUp "FMP Apps — Shared Build & Behaviour Decision Log" and fold down here + into DECISIONS.md once locked.
