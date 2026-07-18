@@ -1,14 +1,14 @@
 {
   "_meta": {
     "app": "uritp-people",
-    "schemaVersion": "1.0",
+    "schemaVersion": "1.1",
     "generated": "2026-07-18",
-    "source": "ClickUp doc 'URITP People FMP' + DOCUMENTATION subpage (as-built, 2026-06-11 graph)",
-    "status": "first-pass, unverified against live file",
+    "intent": "TARGET-STATE schema — the source of truth to build TOWARD, not a mirror of the old file. Researched from the ClickUp 'URITP People FMP' doc, then edited: fields earn their place or get cut.",
+    "status": "target-state draft, unverified against live file",
     "conventions": {
-      "asBuilt": "bare PrimaryKey (UUID) + fkPERSON style FKs; camelCase/PascalCase mixed fields; g_ globals; known typos preffered*/namePronounciation",
-      "target": "URITP standard = pk_/fk_ prefixes, g_ globals, PascalCase tables. NOT yet applied — see meta/design-decisions.md naming-drift ledger.",
-      "ruling": "document AS-BUILT this pass; do not silently rewrite. House-style adoption is an open governance item."
+      "target": "URITP standard = pk_/fk_ prefixes, g_ globals, PascalCase tables. Key-prefix adoption is an open governance item (A1/A2); typos already corrected to target names here.",
+      "typosCorrected": "prefferedFirstName→preferredFirstName, prefferedLastName→preferredLastName, namePronounciation→namePronunciation",
+      "cutThisPass": ["emailTEMP (legacy import staging)", "hiddenLatestImport (import-batch cruft, not identity)"]
     }
   },
   "tables": [
@@ -16,25 +16,23 @@
       "name": "PEOPLE",
       "role": "identity-hub",
       "status": "under-review",
-      "description": "Canonical identity record, one per human. Lean: names + display cascade + pronunciation + playbill credit + broad classification. No app-specific fields.",
+      "description": "Canonical identity record, one per human. Lean target: names + display cascade + pronunciation + playbill credit + broad classification + ClickUp merge handle + audit. No app-specific fields.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
-        { "name": "First Name", "type": "text", "key": "plain", "category": "name" },
-        { "name": "Last Name", "type": "text", "key": "plain", "category": "name" },
-        { "name": "prefferedFirstName", "type": "text", "key": "plain", "category": "name", "status": "pending", "notes": "TYPO → preferredFirstName" },
-        { "name": "prefferedLastName", "type": "text", "key": "plain", "category": "name", "status": "pending", "notes": "TYPO → preferredLastName" },
-        { "name": "alternateName", "type": "text", "key": "plain", "category": "name" },
-        { "name": "useAlternateNameGlobally", "type": "boolean", "key": "plain", "category": "name" },
-        { "name": "NameDisplayInPlaybills", "type": "text", "key": "plain", "category": "name", "notes": "semi-manual; playbill credit" },
-        { "name": "namePronounciation", "type": "text", "key": "plain", "category": "name", "status": "pending", "notes": "TYPO → namePronunciation" },
-        { "name": "autoFirstLast", "type": "calc", "key": "plain", "category": "name", "notes": "'First Last' working name (preferred if set)" },
+        { "name": "First Name", "type": "text", "key": "plain", "category": "name", "notes": "true legal first" },
+        { "name": "Last Name", "type": "text", "key": "plain", "category": "name", "notes": "true legal last" },
+        { "name": "preferredFirstName", "type": "text", "key": "plain", "category": "name", "notes": "working name; wins over true in displays. renamed from as-built typo prefferedFirstName" },
+        { "name": "preferredLastName", "type": "text", "key": "plain", "category": "name", "notes": "renamed from as-built typo prefferedLastName" },
+        { "name": "alternateName", "type": "text", "key": "plain", "category": "name", "notes": "KEEP: foreign-exchange-student case — goes by a name distinct from legal/preferred. additive, feeds playbill" },
+        { "name": "useAlternateNameGlobally", "type": "boolean", "key": "plain", "category": "name", "notes": "toggles alternate override globally vs playbill-only" },
+        { "name": "NameDisplayInPlaybills", "type": "text", "key": "plain", "category": "name", "notes": "KEEP: hard-coded manual source of truth for what prints in a playbill; often not any combination of real/preferred/alternate" },
+        { "name": "namePronunciation", "type": "text", "key": "plain", "category": "name", "notes": "renamed from as-built typo namePronounciation" },
+        { "name": "autoFirstLast", "type": "calc", "key": "plain", "category": "name", "notes": "'First Last' working name (preferred if set, else true)" },
         { "name": "autoLastFirst", "type": "calc", "key": "plain", "category": "name", "notes": "'Last, First' working name" },
-        { "name": "customID", "type": "text", "key": "plain", "category": "id", "notes": "CRM-### format" },
-        { "name": "broadClassification", "type": "text", "key": "plain", "category": "classification", "status": "pending", "notes": "PROPOSED chooser field: Student / Non-Student. Powers the chooser card starting context. As-built used separate STUDENTS/ADULTS extension existence instead; confirm approach." },
-        { "name": "emailTEMP", "type": "text", "key": "plain", "category": "legacy", "status": "pending", "notes": "legacy/staging; migrate into CONTACT_INFORMATION then deprecate" },
+        { "name": "customID", "type": "text", "key": "plain", "category": "id", "notes": "KEEP: CRM-### human-readable merge handle to ClickUp (with email). distinct from the machine-only UUID PK" },
+        { "name": "broadClassification", "type": "text", "key": "plain", "category": "classification", "status": "pending", "notes": "Student / Non-Student; powers chooser start context. confirm explicit stored flag vs derived from extension existence" },
         { "name": "summary_CountPeople", "type": "summary", "key": "plain", "category": "meta" },
         { "name": "ScratchNotes", "type": "text", "key": "plain", "category": "notes" },
-        { "name": "hiddenLatestImport", "type": "text", "key": "plain", "category": "meta", "notes": "import tracking" },
         { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
         { "name": "CreatedBy", "type": "text", "key": "audit", "category": "audit" },
         { "name": "ModificationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
@@ -50,7 +48,7 @@
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
         { "name": "fkGraduation_Year", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ GRADUATION_CLASSES.PrimaryKey (class year)" },
-        { "name": "studentID", "type": "text", "key": "plain", "category": "academic", "status": "pending", "notes": "PROPOSED here per ruling: student ID is an editable identity fact, lives in People-side extension, NOT Courses" },
+        { "name": "studentID", "type": "text", "key": "plain", "category": "academic", "notes": "editable identity fact per ruling: lives People-side, not Courses" },
         { "name": "NotesStudent", "type": "text", "key": "plain", "category": "notes" },
         { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" }
       ]
@@ -83,7 +81,7 @@
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
         { "name": "primaryPhone", "type": "text", "key": "plain", "category": "contact" },
-        { "name": "primaryEmail", "type": "text", "key": "plain", "category": "contact", "notes": "lowercase" },
+        { "name": "primaryEmail", "type": "text", "key": "plain", "category": "contact", "notes": "lowercase; second ClickUp merge key with customID" },
         { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
         { "name": "CreatedBy", "type": "text", "key": "audit", "category": "audit" },
         { "name": "ModificationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
@@ -109,7 +107,7 @@
       "description": "Additional phone numbers per person (one-to-many off CONTACT_INFORMATION via fkContact).",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
-        { "name": "fkContact", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ CONTACT_INFORMATION.PrimaryKey (NOTE as-built casing differs from Emails.fkCONTACT — flag)" },
+        { "name": "fkContact", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ CONTACT_INFORMATION.PrimaryKey (as-built casing differs from Emails.fkCONTACT — reconcile to one)" },
         { "name": "phoneNumber", "type": "text", "key": "plain", "category": "contact" },
         { "name": "label", "type": "text", "key": "plain", "category": "contact", "notes": "e.g. mobile / home" }
       ]
@@ -118,7 +116,7 @@
       "name": "GRADUATION_CLASSES",
       "role": "value-source",
       "status": "under-review",
-      "description": "Class-year value source referenced by STUDENTS_ext.fkGraduation_Year. Table (not value list) because entries carry more than a display label.",
+      "description": "Class-year value source referenced by STUDENTS_ext.fkGraduation_Year. Table (not value list) because entries can carry more than a display label.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "dropdownName", "type": "text", "key": "plain", "category": "label", "notes": "Senior, Junior, Sophomore, First Year, Recent Grad, Alumni" },
