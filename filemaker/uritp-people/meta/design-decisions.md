@@ -4,27 +4,21 @@ App-specific rulings for `uritp-people`. This is the **build-toward source of tr
 
 ---
 
-## DP-001 · 2026-07-18 · Hub-and-spoke; People is the lean identity hub
+## DP-006 · 2026-07-18 · Staff-Positions layer is Global-Setup-owned (Workshop W1)
 
-**Ruling:** People owns identity ONLY — names + display/playbill cascade + pronunciation + contact info + broad Student/Non-Student classification + the ClickUp merge handle. It is the hub. Spokes (Productions/Company builder, Safety Programs, Courses/Student-Records, Labour) each own their own join tables and reference `PEOPLE.PrimaryKey`. Production-role joins do NOT merge into People (reverses the old ClickUp-doc plan to fold Contact Sheets into People).
+**Ruling:** the Staff-Positions layer that `ADULTS_ext.fkStaffPosition` references is **Global-Setup-owned reference data** — NOT a People-local table and NOT owned by the Labour spoke. Both People (ADULTS_ext) and Labour read it.
 
-**Why:** the moment production roles (with shows, revisions, confirmations) live in People, it stops being a reusable contacts hub and becomes production-aware, poisoning reuse for every other spoke. Lean hub = every spoke inherits identity without re-deriving it.
+**Why:** staff positions/levels are org reference data (like departments, fiscal years) — exactly Global Setup's remit. Housing them in Labour would force the People hub to depend on a spoke, inverting hub-and-spoke. Global Setup is the neutral spine both consume. Seeds from the as-built `_setup_Staff Positions` / `URJobProfileLevels` / `Supervisors`.
 
-**Source:** Michael, 2026-07-18 ("definitely want hub and spoke").
+**Source:** Workshop W1 (Feasible Finn + Scope Skye + Eco Enzo converged), delegated by Michael 2026-07-18.
 
-## DP-002 · 2026-07-18 · Identity facts vs lifecycle links (the placement rule)
+## DP-005 · 2026-07-18 · Student/Non-Student classification is DERIVED, not stored (Workshop W1)
 
-**Ruling:** editable identity facts (name, pronoun, email, class year, student ID) live in People (student-specific ones on `STUDENTS_ext`). A relationship to a thing with its own lifecycle (a course offering, a show, a training) lives in the spoke. No People field is ever maintained in two places; the spoke references the person, it does not restate the field.
+**Ruling:** classification context is computed from which role extension a person holds (`STUDENTS_ext` → Student, `ADULTS_ext` → Non-Student, both → both, neither → unclassified). There is NO stored `broadClassification` flag on PEOPLE. The chooser card reads the derived context for its start filter.
 
-**Consequence:** class year + student ID → `STUDENTS_ext` (People-side). Course enrollment → Courses spoke. Contact tree (multiple emails/phones) stays in People (Q4).
+**Why:** a stored flag is a drift surface — it can say "Student" while no `STUDENTS_ext` exists. Deriving from the extension that already exists is the single source of truth and obeys the repo's derive-don't-store discipline (D-005/006/007). Removed `broadClassification` from the PEOPLE field list (19→18).
 
-**Source:** Michael, 2026-07-18 ("if I want to edit an email, pronoun, class year, ID — that's all in PEOPLE not Course Enrollments").
-
-## DP-003 · 2026-07-18 · ADULTS/STUDENTS split carried by thin extensions
-
-**Ruling:** the diametric Adult vs Student split lives in two thin role-extension tables off People core (`STUDENTS_ext` / `ADULTS_ext`, one-to-one via `fkPERSON`), NOT in a bloated People table and NOT in a spoke. Different downstream exports compose different joins off the same hub. A person may hold both extensions.
-
-**Open:** Adult Department/Title placement — keep on `ADULTS_ext` or graduate to a Staff-Positions layer (the as-built file had `_setup_Staff Positions` / `URJobProfileLevels` / `Supervisors`). Parked, non-blocking.
+**Source:** Workshop W1, delegated by Michael 2026-07-18.
 
 ## DP-004 · 2026-07-18 · The four-input name model (all justified, none redundant)
 
@@ -41,6 +35,26 @@ App-specific rulings for `uritp-people`. This is the **build-toward source of tr
 
 **Source:** Michael, 2026-07-18 (defended alternate = foreign-exchange, playbill = manual print truth, customID = CU merge key). Brain had proposed cutting alternate + toggle as over-build; Michael overruled with the real cases. Correct call logged so no future agent re-cuts them.
 
+## DP-003 · 2026-07-18 · ADULTS/STUDENTS split carried by thin extensions
+
+**Ruling:** the diametric Adult vs Student split lives in two thin role-extension tables off People core (`STUDENTS_ext` / `ADULTS_ext`, one-to-one via `fkPERSON`), NOT in a bloated People table and NOT in a spoke. Different downstream exports compose different joins off the same hub. A person may hold both extensions. Extension existence also drives the derived classification (DP-005).
+
+## DP-002 · 2026-07-18 · Identity facts vs lifecycle links (the placement rule)
+
+**Ruling:** editable identity facts (name, pronoun, email, class year, student ID) live in People (student-specific ones on `STUDENTS_ext`). A relationship to a thing with its own lifecycle (a course offering, a show, a training) lives in the spoke. No People field is ever maintained in two places; the spoke references the person, it does not restate the field.
+
+**Consequence:** class year + student ID → `STUDENTS_ext` (People-side). Course enrollment → Courses spoke. Contact tree (multiple emails/phones) stays in People (Q4).
+
+**Source:** Michael, 2026-07-18 ("if I want to edit an email, pronoun, class year, ID — that's all in PEOPLE not Course Enrollments").
+
+## DP-001 · 2026-07-18 · Hub-and-spoke; People is the lean identity hub
+
+**Ruling:** People owns identity ONLY — names + display/playbill cascade + pronunciation + contact info + broad Student/Non-Student classification (derived) + the ClickUp merge handle. It is the hub. Spokes (Productions/Company builder, Safety Programs, Courses/Student-Records, Labour) each own their own join tables and reference `PEOPLE.PrimaryKey`. Production-role joins do NOT merge into People (reverses the old ClickUp-doc plan to fold Contact Sheets into People).
+
+**Why:** the moment production roles (with shows, revisions, confirmations) live in People, it stops being a reusable contacts hub and becomes production-aware, poisoning reuse for every other spoke. Lean hub = every spoke inherits identity without re-deriving it.
+
+**Source:** Michael, 2026-07-18 ("definitely want hub and spoke").
+
 ---
 
 ## Naming-Drift Audit Ledger (target vs as-built)
@@ -49,25 +63,27 @@ This app is the **build-toward** source of truth. Typos are corrected inline in 
 
 | # | As-built | Target | Type | Status |
 |---|---|---|---|---|
-| A1 | `PrimaryKey` (bare) | `pk_<Table>ID`? | key prefix | open — governance: bare (HML) vs pk_ (URITP) |
-| A2 | `fkPERSON` / `fkCONTACT` | `fk_Person` / `fk_Contact`? | key prefix | open — tied to A1 |
+| A1 | `PrimaryKey` (bare) | bare, kept | key prefix | **RESOLVED** — bare style locked (Michael 2026-07-18); no pk_ prefix |
+| A2 | `fkPERSON` / `fkCONTACT` | bare, kept | key prefix | **RESOLVED** — bare style locked |
 | A3 | `prefferedFirstName` | `preferredFirstName` | typo | **corrected in target schema** |
 | A4 | `prefferedLastName` | `preferredLastName` | typo | **corrected in target schema** |
 | A5 | `namePronounciation` | `namePronunciation` | typo | **corrected in target schema** |
 | A7 | `Emails.fkCONTACT` vs `PhoneNumbers.fkContact` | one consistent casing | inconsistency | queued (rename pass) |
-| A8 | CONTACT_INFO cascade-delete children | confirm keep/reverse | behavior | open (flagged temporary in file) |
-| A9 | class from extension existence | explicit `broadClassification` flag? | modeling | open |
+| A8 | CONTACT_INFO cascade-delete children | reverse | behavior | **RESOLVED** — reversed (Michael, W1) |
+| A9 | class from extension existence | derived, no stored flag | modeling | **RESOLVED** — derived (DP-005) |
 
-**Governance blocker (A1/A2):** the workspace has two live key-naming patterns — URITP `pk_`/`fk_` vs HML bare `PrimaryKey`/`fk<Parent>` — NOT yet unified (DOCUMENTATION-STANDARD notes this). Pick one house style before the rename pass, or explicitly let each app keep its own declared convention.
+**Naming house style:** RESOLVED — this app keeps the bare `PrimaryKey`/`fkPERSON` style (matches HML), does NOT adopt URITP `pk_`/`fk_`. The workspace-wide unification question remains open at the domain level (DOCUMENTATION-STANDARD), but uritp-people's own convention is now locked.
 
-### Deliberate field CUTS (target-state pass, 2026-07-18)
+### Deliberate field CUTS / derivations (target-state pass, 2026-07-18)
 
-Recorded so the history is kept without polluting the source of truth. These were in the as-built file and were removed on purpose:
+Recorded so the history is kept without polluting the source of truth.
 
-| Field | Why cut | Data disposition |
+| Field | Disposition | Why |
 |---|---|---|
-| `emailTEMP` | legacy import-staging field; a canonical identity hub should not ship a "temp" field | migrate any live values into CONTACT_INFORMATION, then drop |
-| `hiddenLatestImport` | import-batch tracking cruft; belongs to the import script's scope, not on every person record forever | drop; if import needs a marker, use a script global |
+| `emailTEMP` | CUT | legacy import-staging; migrate live values into CONTACT_INFORMATION, then drop |
+| `hiddenLatestImport` | CUT | import-batch tracking cruft; belongs to the import script's scope |
+| `broadClassification` | DERIVED (not stored) | computed from extension existence (DP-005); a stored flag would drift |
+| `ADULTS_ext.Department` / `Title` | GRADUATED | → Global-Setup Staff-Positions layer via `fkStaffPosition` (DP-006) |
 
 ---
 
@@ -75,7 +91,7 @@ Recorded so the history is kept without polluting the source of truth. These wer
 
 The as-built People file carried these; hub-and-spoke moves them out:
 
-- `EMPLOYEES_setup`, `JOB POSTINGS`, `Supervisors`, `_setup_Staff Positions`, `URJobProfileLevels` → **Labour** (or a Staff-Positions layer).
+- `EMPLOYEES_setup`, `JOB POSTINGS`, `Supervisors`, `_setup_Staff Positions`, `URJobProfileLevels` → seed the **Global-Setup Staff-Positions layer** (DP-006) + **Labour** for employment records.
 - `PRODUCTION_STAFFS`, `ROLES_IN_PRODUCTION_setup`, `PRODUCTIONS_*` → **Productions/Company builder**.
 - Enrollment/roster history → **Courses/Student-Records**.
-- `GLOBAL_USAGE_VARIABLES` / org constants / PRODUCTIONS list → **Global Setup** (separate spine app).
+- `GLOBAL_USAGE_VARIABLES` / org constants / PRODUCTIONS list / Staff-Positions → **Global Setup** (separate spine app).
