@@ -1,36 +1,33 @@
 # URITP People — Identity Hub (FileMaker App)
 
-**Status:** Built (split), migrating to repo-native docs · **Runs in:** FileMaker Pro · **Source of truth:** this repo folder (see [INDEX.md](./INDEX.md))
+**Status:** Target-state schema in progress · **Runs in:** FileMaker Pro · **Source of truth:** this repo folder (see [INDEX.md](./INDEX.md))
 
 The **identity hub** of the URITP FileMaker app package. Single canonical record per human (student, faculty, staff, guest artist, vendor) plus how to reach them. Every other URITP app (Productions/Contact Sheets, Safety Programs, Courses, Labour) references People for identity and **never restates a person's fields**. Think "the contacts app on your phone": names, how to reach them, a broad Student/Non-Student classification. Nothing production-, safety-, course-, or labour-specific lives here.
 
-> ⚠️ First-pass migration from the ClickUp doc `URITP People FMP`. Documents the schema **as-built**, flags naming drift + open items, and does NOT silently rewrite to convention. Easy to overwrite/revert — this is a review surface, not a lock.
+> 🎯 **This is the build-TOWARD source of truth**, not a mirror of the old file. The schema was researched from the ClickUp `URITP People FMP` doc, then edited: every field earns its place or gets cut, drift is corrected (not preserved), and decisions are recorded in `meta/design-decisions.md`. Build the native FileMaker file to match THIS.
 
 ---
 
 ## Next Steps
 
-- Review this first pass; confirm the lean-hub table set below matches intent.
-- Confirm live-file field names against the actual FMP file (this pass is from the ClickUp doc, not the file).
-- Resolve the naming-drift audit (see `meta/design-decisions.md`): `PrimaryKey`→`pk_`, `fkPERSON`→`fk_Person`, typo fixes, `emailTEMP` disposition.
+- Confirm live-file field names against the actual FMP file (reconciliation pass — the file is the tiebreaker on names/types only, not on what SHOULD exist).
+- Design the **Staff-Positions layer** that Department/Title reference (see Resolved Decisions); decide whether it's a dedicated positions table or lives in the Labour spoke.
+- Migrate the three typo renames + drop the two cut fields when the native file is edited.
 - Enumerate real scripts (import, batch-create, chooser) into `scripts/`.
 - Migrate URITP Global Setup docs next session (separate app/file — the OTHER shared spine).
 - Stand up the Productions / Company builder as its own app (owns person↔role↔show; contact sheet = one export view).
 
+## Resolved Decisions (Michael, 2026-07-18)
+
+- **Adult dept/title → Staff-Positions layer.** Department + Title do NOT live as resident fields on `ADULTS_ext`; they reference a Staff-Positions layer. (Remaining sub-question: dedicated positions table vs. the Labour spoke — the as-built file had `_setup_Staff Positions` / `URJobProfileLevels` / `Supervisors`.)
+- **Naming house style: keep bare `PrimaryKey` / `fkPERSON`.** This app does NOT adopt the URITP `pk_`/`fk_` prefixes (matches HML's bare style). Ledger A1/A2 resolved.
+- **`emailTEMP`: cut.** Confirmed — it's a legacy import-staging field; drop it (migrate any live value into CONTACT_INFORMATION first).
+- **`hiddenLatestImport`: cut.** Import-batch cruft, not identity.
+
 ## Open Questions
 
-- **Adult dept/title**: does department + job title live on the Adults extension, or graduate to a Staff-Positions layer? (The one genuinely fuzzy field — parked, non-blocking.)
-<graduate to a Staff-Positions layer>
-  
-- **Naming house style**: adopt URITP `pk_`/`fk_` for this file, or keep the as-built bare `PrimaryKey`/`fkPERSON`? (Cross-app governance item; HML uses bare, URITP standard says prefixed.)
-<`PrimaryKey`/`fkPERSON`>
-- 
-- **CONTACT INFORMATION cascade delete** of child Emails/Phones is currently ON, flagged temporary in the as-built file. Keep or reverse?
-<i don't know what this means>
-- 
-- **`emailTEMP`**: migrate into CONTACT INFORMATION then deprecate, or drop?
-<where did you find this? what's it hold? sounds like something to delete or is part of an import workflow - thus needs renaming.>
-- 
+- **CONTACT INFORMATION cascade delete** — *(what it means:)* in the as-built file, deleting a PEOPLE record auto-deletes that person's child Email + Phone records, and the file flagged this as temporary. **Decision needed:** keep the auto-delete (clean, but destroys contact history on any accidental person delete) or reverse it (child records orphan/soft-delete instead)?
+- **`broadClassification`**: store an explicit Student/Non-Student flag on PEOPLE, or derive it from which extension a person has? (Powers the chooser start context.)
 
 ## Purpose
 
@@ -39,7 +36,7 @@ Background utility / identity backbone. Owns canonical human records + reusable 
 ## Goals
 
 - One canonical PEOPLE record per person regardless of how many roles they hold.
-- Flexible name handling (preferred, true, alternate, playbill credit) with a clear priority cascade.
+- Deliberate four-input name model (true / preferred / alternate / playbill), each solving a real case — see `meta/design-decisions.md` DP-004.
 - Fast person lookup + controlled person creation from external files without duplicating identity logic (chooser returns only a person PK).
 - Broad chooser-oriented classification (Student / Non-Student) — NOT app-owned or term-specific roles.
 - Stay lean: it is the hub; every spoke references it.
@@ -54,12 +51,13 @@ Background utility / identity backbone. Owns canonical human records + reusable 
 
 - Canonical person directory (students / non-students / staff).
 - Playbill credit names (`NameDisplayInPlaybills`).
+- ClickUp merge feeds keyed on `customID` (CRM-###) + `primaryEmail`.
 - Broad person-chooser lists + reusable selection contexts for external files.
 - (Contact sheets themselves are a Productions-app export, NOT a People export — they compose a join off this hub.)
 
 ## Build Status
 
-As-built: 7 core People tables (~341 People, ~306 Students). Contact Sheets currently a SEPARATE file (its production-role joins graduate to the Productions builder, per the hub-and-spoke ruling — they do NOT merge into People). Layouts A (ALL PEOPLE) + B (STUDENTS) built; C (ADULTS) designed. Scripts basic. This repo pass = schema + relationships documented; layouts stubbed.
+Reference source: as-built file had 7 core People tables (~341 People, ~306 Students). Contact Sheets is a SEPARATE file whose production-role joins graduate to the Productions builder (hub-and-spoke ruling — they do NOT merge into People). Layouts A (ALL PEOPLE) + B (STUDENTS) built in-file; C (ADULTS) designed. This repo pass = target-state schema + relationships documented; layouts stubbed.
 
 ## Workflow
 
@@ -73,7 +71,7 @@ Hub-and-spoke. People = the identity hub (lean). Spokes (Productions, Safety, Co
 
 | Date | Artifact | Link | Description |
 |---|---|---|---|
-| 2026-06-11 | DB graph screenshots | ClickUp People DOCUMENTATION subpage | People file + Contact Sheets file table graphs (as-built source for this pass) |
+| 2026-06-11 | DB graph screenshots | ClickUp People DOCUMENTATION subpage | People file + Contact Sheets file table graphs (research source for the target-state pass) |
 
 ---
 
