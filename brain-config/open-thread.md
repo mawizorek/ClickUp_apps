@@ -1,6 +1,6 @@
 # Open Thread
 
-Scratch pad for pending work items. Brain checks this at session opens via the Session Open trigger. Remove items once resolved. If it's empty, that's fine.
+Scratch pad for **active loops only**. Brain checks this at session opens via the Session Open trigger. When an item ships: delete the line outright (trivial/superseded — git history holds it) OR, if the writeup has cold-pickup value, move its shipped narrative to `open-thread-archive.md` (one running file, NOT dated) and keep only its still-open bullets here. If this file is empty, that's fine — that's the goal.
 
 ---
 
@@ -127,34 +127,6 @@ Every new open-thread entry uses the exact shape below. Copy the block, fill eve
 
 ---
 
-## ⚠️ open-thread.md is at the size cap — prune/archive pass owed
-
-- **ID:** OT-2026-07-17-9
-- **Logged:** 2026-07-17 20:53 ET
-- **Session:** https://app.clickup.com/t/86ajkdw17
-- **Urgency:** 🟡 Medium
-- **Item:** This file is now ~30KB — at the 30KB hard read-cap. Several entries below are already marked SHIPPED/DONE/RESOLVED (the FileMaker calc externalization, scripts+relationships model, object verification D-007, global theme system, Report Schema, Agent-Name migration, Routine Ricky) and per the template's own rule should be flipped to `[RESOLVED]` and then cleaned up after one cycle. The file risks silent truncation on read if it grows further.
-- **Next action:** Do a dedicated archive pass: move the SHIPPED/RESOLVED entries into a dated `brain-config/handoffs/` archive (or delete the ones already past their one-cycle survival), leaving only genuinely OPEN items. Do NOT do this mid-other-work; it's its own careful pass so no live loop is lost.
-- **Refs:** this file; `brain-config/handoffs/` (archive precedent); Source-Size Budget Enforcer 30KB cap
-
----
-
-## FileMaker object verification & audit trail (D-007) — SHIPPED this session (2026-07-16)
-**Added:** 2026-07-16
-
-Every documented object (table, calc, script, relationship, function, value list, layout) now has a uniform verification model so an agent can open it and know at a glance whether it's current + trustworthy. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` v1.5 → 'Object verification & audit trail' + `DECISIONS.md` D-007 first.**
-
-**The locked model:** four signals — status · index↔body agreement · blob identity (current) · live-file verification. **Derive-don't-store:** the ONLY stored data is `status` (already on each object) + a self-invalidating `verified:{date,sha,by}` stamp in ONE per-app ledger `<app>/meta/verification.json`. No version numbers (the blob SHA IS the version), no stored derived signals. Absence of a ledger entry = unverified (safe default, zero bytes). The stamp is anchored to a blob SHA so a content change auto-flips it to yellow — a forgotten update fails SAFE, never a false green. Badge: 🟢 consistent + verified.sha==current, 🟡 unverified/stale/SHA-check-unavailable, 🔴 index↔body mismatch or ref unresolved. Rolls up to `VERSIONS.md`.
-
-**Shipped (PR on branch `filemaker-verification-audit-d007`):** standard → v1.5; DECISIONS D-007; `filemaker/hml-llc/meta/verification.json` ledger created (empty `objects` = honest unverified baseline, nothing has been confirmed against the live FMP file yet); badge wired into `scripts.html` + `relationships.html` (reads ledger, computes index↔body + ref-resolve client-side, fetches current blob SHA via the public GitHub contents API, degrades safe); viewer README documents it.
-
-**STILL OPEN:**
-- **(a) Add the same badge to `schema.html`** (calc/table lens) on the next pass — left off this pass to avoid a high-risk rewrite of the 23KB mature renderer.
-- **(b) Fold the AUTHORITATIVE SHA/verification check into `linter.html`** so a red verdict blocks a PR (the renderer badge is the glance; the linter is enforcement). Ties to the calc-linter promotion below.
-- **(c) First real verification pass:** once the live FMP file is available, confirm objects against it and write real `verified` entries into `meta/verification.json` (today everything is honestly yellow/unverified). Naturally pairs with open item (e) on the calc entry (live-file name confirmation) + the scripts migration.
-
----
-
 ## ➡️ NEXT SESSION: Migrate HML script docs from ClickUp into the Git .fmscript model
 **Added:** 2026-07-16
 
@@ -170,78 +142,46 @@ The scripts doc MODEL is locked (v1.4) and the renderer is live, but the Git sid
 
 ---
 
-## FileMaker scripts + relationships doc model — DESIGN LOCKED + skeleton + renderers shipped (2026-07-16)
-**Added:** 2026-07-16
-
-Design session for the next two object types after calcs. Model decided, Workshop-vetted, skeleton committed, and both baseline renderers built. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` (v1.5) + `filemaker/DECISIONS.md` D-005/D-006 first.**
-
-**The locked model:**
-- **Scripts ride the calc model.** Body = lean `scripts/<folder>/<ScriptName>.fmscript` (steps to dictate into Manage Scripts, narrative as native `#` comment lines). ONE master `scripts/_index.json` (flat `scripts[]`, minimal rows: `name`/`folder`/`calls`/`scriptRef`). Renderer builds the tree from `folder` + CALLS/CALLED-BY graph from `calls[]`; **`calledBy` derived at render time, never stored**. No sidecars, no per-folder indexes. Listing ≠ loading: a body is lazy-loaded on drill-in.
-- **The one honest limit:** a `.fmscript` is a DICTATION reference, NOT paste-round-trippable — FileMaker's script clipboard is XML, not plain text (unlike `.fmcalc`). Never claim script paste-round-trip.
-- **Relationships are pure data.** `schema/relationships.json` = the SINGLE edge surface. README edge table retired; `relationships/_index.json` slimmed to render hints.
-
-**Shipped:**
-- **PR #270** — standard → v1.4; DECISIONS D-005 + D-006; `scripts/_index.json` reshaped to flat master manifest; `commitRecord.fmscript` added as canonical reference (old `.md` → breadcrumb); READMEs rewritten; relationships README edge table retired; `relationships/_index.json` slimmed.
-- **PR #272** — built both baseline renderers into `filemaker/_viewer/`: `relationships.html` + `scripts.html`. Launcher lists all four lenses. Live + verified serving. App-agnostic via `?app=<slug>`.
-- **D-007 badge** later wired into both (see the verification entry above).
+## FileMaker object verification & audit trail (D-007) — still-open items
+**Shipped 2026-07-16** (narrative → `open-thread-archive.md`). Model locked: four signals (status · index↔body · blob identity · live-file), derive-don't-store, per-app ledger `<app>/meta/verification.json`. Badge wired into `scripts.html` + `relationships.html`.
 
 **STILL OPEN:**
-- **(a) Populate the real script inventory** — see the migration handoff entry above (immediate next step; scripts lens shows only `commitRecord` until done).
-- **(b) Renderers are baseline v1** — follow-up: script linter (every `calls[]` target resolves against `scripts/_index.json` then `functions/_index.json`; `folder` matches path; `name` unique; `scriptRef` exists), the authoritative D-007 SHA check folded into `linter.html`, richer graph layout/zoom, cross-lens deep-links, `schema.html` badge. Relationships linter: endpoints resolve in `schema/tables.json`, `to.field` is a PK, cardinality/status enums.
-- **(c) PREREQ still open:** the calc renderer + linter still live as ClickUp artifacts, not yet promoted into `_viewer/`. Full viewer convergence (shared shell / `z-fm-layout-object-viewer`) still wants that promotion.
-- **(d) Custom functions + value lists + layouts NOT designed this pass.** Functions likely ride the CALC model (`.fmfn` + a manifest) — proposed, noted in the standard's Function-file section as NOT locked. Value lists = thin JSON + README. Layouts = `layout.json` object/part inventory as the cross-index join, needs a DDR pass. Per `filemaker/HANDOFF-object-doc-schemas.md`.
+- **(a)** Add the same badge to `schema.html` (calc/table lens) — deferred to avoid rewriting the 23KB renderer.
+- **(b)** Fold the AUTHORITATIVE SHA/verification check into `linter.html` so a red verdict blocks a PR. Ties to the calc-linter promotion.
+- **(c)** First real verification pass once the live FMP file is available — confirm objects, write real `verified` entries into `meta/verification.json` (everything honestly yellow/unverified today). Pairs with the calc live-file name confirmation + the scripts migration.
 
 ---
 
-## Global theme system + 20-object gallery — SHIPPED this session (2026-07-16), follow-ups open
-**Added:** 2026-07-16
+## FileMaker scripts + relationships doc model — still-open items
+**Design locked v1.4/v1.5, skeleton + both baseline renderers shipped 2026-07-16** (PRs #270/#272, narrative → `open-thread-archive.md`). Read `filemaker/DOCUMENTATION-STANDARD.md` + `DECISIONS.md` D-005/D-006 first.
 
-Established a GLOBAL, token-driven theme system shared by ClickUp HTML apps AND FileMaker layout renders. **If picking this up cold: read `shared/themes/README.md` (the standard) + `shared/themes/OBJECT-COVERAGE.md` (the coverage contract) first — they are the source of truth.**
-
-**What changed (all merged to main):**
-- **PR #264** — Promoted the FileMaker-scoped `filemaker/z-themes/` up to **`shared/themes/`** and made it global. One **17-key semantic token contract** (`bg`, `surface-1/2/3`, `border`, `field`, `text`, `text-soft`, `text-faint`, `accent`, `accent-2`, `accent-soft`, `on-accent`, `good/warn/bad/info`), bare `--name` custom props. Merged the old FileMaker `cv-*` 10-key vocab in via `fmpRoleMap` in `_index.json`. **12 themes, all real tokens:** `maw-dark-utility` (anchor + ultimate fallback) + full 2026 F1 grid (mclaren, ferrari, mercedes, red-bull, alpine, aston-martin, audi, cadillac dark; haas, racing-bulls, williams light). Tooling: `resolve.js` (mode-aware, fallback trail), `build-themes.mjs` (17-key schema check), generated `themes.css`. Foundational gate at `brain-config/gates/theme-contract-gate.md`. Old `filemaker/z-themes/` reduced to a MOVED pointer + dupes deleted; `filemaker/README.md` leads with the mockup-only headline rule; `filemaker/THEMING-INTEGRATION.md` marked RESOLVED.
-- **PR (this branch: themes-object-gallery)** — Rebuilt `preview.html` into the **theme × object gallery**: renders all **20 canonical FileMaker objects** (the defensible set from the ClickUp *FileMaker Canonical Object Library*) from the active theme, each with its real state matrix, plus a live per-theme token-coverage readout. Added `shared/themes/OBJECT-COVERAGE.md` (the 20-object table + acceptance test) and wired both into the README.
-
-**The locked model:** color lives ONLY in `shared/themes/*.json`; consumers reference a slug (apps resolve live via `resolve.js`; FileMaker renders inline the resolved tokens at build time, never fetch — they're local mockups, never hosted). A theme is only "done" when it styles all 20 canonical objects with no token fallback (17/17). New tokens/objects bump `schemaVersion` — never per-consumer drift.
-
-**Headline rule (LOCKED):** everything under `filemaker/` is a design mockup / build tool ONLY, never a production/hosted asset. Web viewing is off the table. Renders articulate how a NATIVE FileMaker layout should look/behave (native build is Michael's, end-of-year). Build-time affordances that speed the native build are encouraged (e.g. hover inspector surfacing an object's theme role + intended field definition).
-
-**STILL OPEN (next agent picks up here):**
-- **(a) Verify the live picker serves.** After the merge, fetch `https://mawizorek.github.io/ClickUp_apps/shared/themes/preview.html` (Pages ~60s lag). It 404'd immediately post-merge on the first pass — confirm it resolves once the build settles; if still blank, check `.nojekyll` + build status.
-- **(b) The two existing maw-budget renders still point at `../../../../z-themes/resolve.js`** (path moved to `shared/themes/`). They will break until re-pointed or re-tokenized (inline the 17 tokens). Michael OK'd breaking them temporarily to land the global setup first. Fix on the next FileMaker render pass. Michael said NOT to fix them this session — the docs should make it obvious.
-- **(c) `filemaker/LAYOUT-RENDER-STANDARD.md` DD-R06** still describes the old per-render token block; reconcile it to point at the global contract on the next FileMaker pass.
-- **(d) Mirror the standard into the ClickUp docs as pointers** (Apps/Artifacts doc + FileMaker Home theme docs). The ClickUp *FileMaker Theme System* / *Canonical Object Library* / *Build Instructions* docs are the narrative prior-art; per their own cull note they become one-line pointers to `shared/themes/` after one full cycle proves the flow. This session is that proof.
-- **(e) FileMaker object hover-inspector** (Michael's ask): renders should get a hover-over object inspector surfacing each object's theme role + intended field definition (build documentation, not app behavior). Not built yet — spec it into the next FileMaker render.
-- **(f) `themes.css` is generated** by `build-themes.mjs` but was hand-written this session to match (no node runtime here). If any theme JSON changes, regenerate rather than hand-editing.
-
-**Convention reference (cold pickup):** theme file = `shared/themes/<slug>.json` (or `f1/<slug>.json`), all 17 tokens in OKLCH + `mode` + `fmpMapping`. Register in `_index.json` under a group. The 20 canonical objects + their token dependencies are tabled in `OBJECT-COVERAGE.md`.
+**STILL OPEN:**
+- **(a)** Populate the real script inventory — see the HML scripts migration brief above (scripts lens shows only `commitRecord` until done).
+- **(b)** Renderers are baseline v1 — follow-up: script linter (`calls[]` targets resolve against `scripts/_index.json` then `functions/_index.json`; `folder` matches path; `name` unique; `scriptRef` exists), authoritative D-007 SHA check folded into `linter.html`, richer graph layout/zoom, cross-lens deep-links, `schema.html` badge. Relationships linter: endpoints resolve in `schema/tables.json`, `to.field` is a PK, cardinality/status enums.
+- **(c)** PREREQ still open: calc renderer + linter still live as ClickUp artifacts, not yet promoted into `_viewer/`. Full viewer convergence wants that promotion.
+- **(d)** Custom functions + value lists + layouts NOT designed. Functions likely ride the CALC model (`.fmfn` + a manifest); value lists = thin JSON + README; layouts = `layout.json` object/part inventory, needs a DDR pass. Per `filemaker/HANDOFF-object-doc-schemas.md`.
 
 ---
 
-## FileMaker calc externalization (HML_LLC) — SHIPPED this session (2026-07-16), follow-ups open
-**Added:** 2026-07-16
+## FileMaker calc externalization (HML_LLC) — still-open items
+**Shipped 2026-07-16** (PRs #260/#261, narrative → `open-thread-archive.md`). Formula bodies externalized to `filemaker/hml-llc/calculations/*.fmcalc`; `schema/tables.json` v1.3; standard is source of truth. Read `filemaker/DOCUMENTATION-STANDARD.md` first.
 
-Big structural change to how FileMaker calc fields are documented. Reversed a locked rule with Michael's explicit go. **If picking this up cold: read `filemaker/DOCUMENTATION-STANDARD.md` first — it is the source of truth for the model below.**
+**STILL OPEN:**
+- **(a)** Promote the renderer + linter into the repo as shared `filemaker/_viewer/` (app-agnostic, param-driven by app slug). Prereq for viewer convergence AND for folding the D-007 SHA check into `linter.html`.
+- **(b)** `reads` dependency hints are HAND-AUTHORED in `_index.json` — consider a parser that derives them from each formula so the hint can't drift. Advisory until then.
+- **(c)** Fold the calc linter into the Schema Linter tool (AI Toolkit) so it fires on the normal FileMaker doc-edit path.
+- **(d)** Generate table markdown Fields tables from `schema/tables.json` so there's nothing to hand-sync. Separate pass.
+- **(e)** Live-file name confirmation: schema names (`OriginalPrincipal`/`InterestRateAnnual`/`ClosingDate`/`GraceDays`/`fkCurrentPayoff`) reconciled in docs but NOT confirmed against the live FMP file (this is the D-007 live-file pass).
+- **(f)** Apply the model to `filemaker/maw-budget` once the viewer is promoted. HML_LLC is the reference implementation.
+- Convention: `<Table>__<FieldName>.fmcalc` (double-underscore namespace sep), ext = plain text.
 
-**What changed (all merged to main):**
-- **PR #260** — Externalized every calc formula body to `filemaker/hml-llc/calculations/`, one `.fmcalc` file per calc field (19 files: 11 Loans, 4 ExpectedTransactions, 4 GLOBAL_USE_VARIABLES). Each file = 2 `//` header lines + blank + verbatim FileMaker formula, round-trippable (paste straight into the calc dialog). `schema/tables.json` bumped to v1.2: each calc field carries `calcRef` + `returns` + `stored`, formula bodies removed. Added `calculations/_index.json` manifest (owning table, return, stored, purpose, `reads` dependency hints). GLOBAL calc names reconciled to canonical camelCase.
-- **PR #261** — Retired the inline `Calculations` sections from the three table markdown files. NO pointer list retained. Calc fields still appear as ROWS in each Fields table; each file keeps one prose line pointing at `../calculations/`. Standard bumped to v1.3.
+---
 
-**The locked model:** formula body lives ONLY in `calculations/*.fmcalc`; structural metadata in `schema/tables.json`; dependency hints in `calculations/_index.json`; presentation via the renderer. Table markdown carries zero calc bodies. One definition, one home.
-
-**Rendering/tooling artifacts (ClickUp run.clickup.ai artifacts, NOT in repo yet):**
-- Schema Renderer v2 — reads live schema + fetches `.fmcalc` bodies, FileMaker syntax highlighting, copy-to-clipboard, `reads` dependency graph (D3). 
-- Calc Linter — validates calculations/ against the schema (orphan/missing calcRef, balanced parens/brackets/quotes, unused Let vars, same-table + cross-table `reads` resolution, manifest↔schema coverage, header match). Built with an embedded offline snapshot fallback so it runs even if the raw fetch is cache-lagged.
-
-**STILL OPEN (next agent picks up here):**
-- **(a) Promote the renderer + linter into the repo.** They live as ClickUp artifacts right now. Per the locked standard they should become the shared `filemaker/_viewer/` (app-agnostic, param-driven by app slug). Modular shell + source/, not a monolith. **(This is the prereq for full viewer convergence AND for folding the authoritative D-007 SHA check into `linter.html`.)**
-- **(b) The `reads` dependency hints are HAND-AUTHORED** in `_index.json`. The linter validates them but does not GENERATE them. Consider a real parser that derives `reads` from each formula so the hint can't drift from the body. Until then, treat `reads` as advisory.
-- **(c) Fold the calc linter into the Schema Linter tool** (AI Toolkit) rather than a standalone artifact, so it fires on the normal FileMaker doc-edit path.
-- **(d) Markdown generation.** Table markdown Fields tables are still hand-maintained and duplicate `schema/tables.json`. The endgame (discussed, not started) is to GENERATE the markdown from the JSON so there's nothing to keep in sync. Separate pass.
-- **(e) Live-file name confirmation (pre-existing, still open):** schema names `OriginalPrincipal`/`InterestRateAnnual`/`ClosingDate`/`GraceDays`/`fkCurrentPayoff` are reconciled in docs but NOT yet confirmed against the live FMP file. File is the tiebreaker if they differ. **(This is exactly the D-007 live-file verification pass — when done, write real `verified` entries into `meta/verification.json`.)**
-- **(f) Apply the model to the other FMP app** (`filemaker/maw-budget`) once the viewer is promoted. HML_LLC is the reference implementation.
-
-**Convention reference (for a cold pickup):** filename `<Table>__<FieldName>.fmcalc` (double-underscore namespace sep, kills cross-table collisions since calc names aren't globally unique). Ext `.fmcalc` = plain text.
+## Global theme system (7/16) — residual open items not covered by the 4-vector work
+The 2026-07-16 global theme system + 20-object gallery is **largely superseded** by the 2026-07-17 4-vector matrix (see OT-2026-07-17-1/2/3); shipped narrative → `open-thread-archive.md`. A few items are NOT covered by the 4-vector entries and survive here:
+- **maw-budget renders** still point at the old `../../../../z-themes/resolve.js` path (moved to `shared/themes/`) — they break until re-pointed or re-tokenized (inline the 17 tokens). Michael OK'd breaking them temporarily. Fix on the next FileMaker render pass.
+- **`filemaker/LAYOUT-RENDER-STANDARD.md` DD-R06** still describes the old per-render token block — reconcile it to the global contract on the next FileMaker pass.
+- **FileMaker object hover-inspector** (Michael's ask): renders should get a hover object inspector surfacing each object's theme role + intended field definition (build documentation, not app behavior). Not built yet — spec into the next FileMaker render.
 
 ---
 
@@ -270,13 +210,6 @@ After the catalog is fat with real prints, Michael wants **the best app to view 
 - Lives in the existing three-page app (Catalog / Market / Collection). Decide whether this sharp "database" viewer replaces/reskins `catalog.html` (the gallery) or is a distinct lens. Open design question for the Workshop.
 - Reads the harvested `catalog.json`; cross-refs live market status the way the current catalog does. Per-print detail view (history + details about a specific available print) is part of the ask.
 
-## Inciardi Market — DONE this session (2026-07-12/13, don't redo)
-- **index-as-router reconcile (PR #156):** `index.html` -> thin router (1.8KB, one-line `DEFAULT_LANDING = market.html` + JS redirect + noscript). Market terminal moved verbatim to `market.html`. catalog/collection Market-nav links repointed to `./market.html`.
-- **Worker v0.4 price fix (PR #157):** the $0.00 / -100% Deal Radar bug was AUCTION listings — `normalize()` only read `it.price.value` (absent on auctions); now falls back to `it.currentBidPrice`.
-- **Ledger (PR #158):** inciardi-market row = shell v10 (index=router) · worker v0.4. Stale PR #155 closed (its content already landed + it regressed the f1 row).
-- **wrangler.toml + git-connect (PRs #159, #166):** Worker now connected to the repo (root dir `inciardi-market`, prod branch main, cron `0 */6 * * *`). **Workers Builds auto-deploy is LIVE** — merge to main now auto-ships the Worker. Confirmed: active deployment flipped to a fresh git build, retired the 2-day-old v0.3. KV `SNAPSHOTS`=`9780d264...`, D1 `DB`=`18f3459f-8273-44d6-8380-6971d6173b3e`. Secrets stay dashboard-side.
-- **Cron now live** — was an open loop ("no trend history until cron attached"). `market_point` + `print_point` now accumulate every 6h.
-
 ## Inciardi Market — scoring backbone (PAUSED by Michael, revisit after harvest+viewer)
 **Added:** 2026-07-13
 
@@ -287,23 +220,18 @@ Move scoring off the flat `14` retail constant. Two layers:
 
 ---
 
-## F1 Racetracks — data layer refactor follow-ups
+## F1 Racetracks — data layer refactor still-open items
 **Added:** 2026-07-09
 
-Canonical results store shipped (PRs #105, #108, #109). One source of truth: `f1-racetracks/f1-results/2026/` (per-round files + `index_rounds.json`). Enriched per-driver schema (qualifying + grid + fastLap) is LIVE and surfaced in the standings driver popup (v5.1). Albert Park (r1) is the complete reference round. **Rounds 2-7 qualifying + grid backfill SHIPPED 2026-07-09 (PRs #116, #117, #118), matched by driverId; Q1/Q2/Q3 present where the CU task tabulated them, grid penalties + pit-lane starts captured.**
+Canonical results store shipped (PRs #105/#108/#109); rounds 2-7 quali+grid backfilled (PRs #116/#117/#118). Narrative → `open-thread-archive.md`. **Canonicality rule (LOCKED 2026-07-09):** repo store = canonical for RESULTS (numbers); ClickUp race task = canonical for NARRATIVE (stories); store wins on conflict. NO more timing tables in ClickUp.
 
-**STILL OPEN (next agent picks up here):**
-- **(a) Qualifying dig, rounds 8-9 (Austria + Silverstone).** These have NO quali table in ClickUp — need a genuine external source dig. Austria task is race-narrative only; Silverstone is still a preview. Left ABSENT on purpose pending a source that matches this season's canon (fields degrade gracefully); do NOT fill from real-world 2026 data, which diverges from this season.
-- **(b) Per-driver race `fastLap`.** Not in the CU tasks (they carry only the one official FL). Backfills empty; degrades gracefully; Ricky's going-forward dig from a lap-time source.
-- **(c) v5.1 quali popup layout notes (Michael, 2026-07-09) — CAPTURED, ready for the next UI pass.** The popup is organized around the driver's position landmarks (qualifying → race start/grid → race finish). Restructure so each block carries only what belongs to it:
-    - **Qualifying block (first, under the qualifying position):** the qualifying lap time (Q1/Q2/Q3) lives HERE and ONLY here. Currently the quali time repeats under every race-story block — pull it out of the later blocks.
-    - **Race start (grid) + race finish (pos) blocks:** go deeper on the race itself — this driver's fastest-lap detail + more tire-strategy info (compounds, stops) for that driver.
-    - **DATA DEPENDENCY (flag before build):** the fastest-lap detail needs per-driver `fastLap` (item (b), still null pending a lap-time source), and per-driver tire strategy is NOT in the store schema at all — that's a NET-NEW field (schema was locked this pass; adding it needs a Fold-in/Size pass + Michael's go). The UI can ship the layout restructure now (relocating the quali time) and degrade the race-detail section until the data lands. Data diff and UI diff = separate PRs.
-- **(d) Lens integration not squared.** `index.html` is a thin router landing on the drivers matrix, forwarding `#/<slug>` to `circuits.html`. The true integration of the two lenses (matrix + circuit guide) is an open design question, deliberately not forced.
-- **(e) 2024/2025 historical backfill (future, Michael-flagged).** Structure is built for it: each season = its own `f1-results/<year>/` folder with its own `index_rounds.json`; a cross-season `index_seasons.json` at the store root slots in when a second season exists. Needs a NEW viewing level in the app (ties to (d)). Build nothing until Michael calls it; it's the stress-test of this schema.
-- **(f) Cosmetic:** circuit guide's TRACKS round numbering (Silverstone R11) differs from the store's (R9). They join by slug so nothing breaks; reconcile if it bugs you.
-
-**Canonicality rule (LOCKED 2026-07-09):** repo store = canonical for RESULTS (numbers); ClickUp race task = canonical for NARRATIVE (stories, one-liners). Store wins on conflict. NO more timing tables maintained in ClickUp. Ricky's routine doc (F1 Weekly Refresh, STEP 1 + STEP 4C) already reflects this.
+**STILL OPEN:**
+- **(a)** Qualifying dig, rounds 8-9 (Austria + Silverstone) — NO quali table in ClickUp; needs a genuine external source dig matching this season's canon. Left ABSENT on purpose; do NOT fill from real-world 2026 data (it diverges from this season).
+- **(b)** Per-driver race `fastLap` — not in the CU tasks (only the one official FL). Backfills empty; degrades gracefully; going-forward dig from a lap-time source.
+- **(c)** v5.1 quali popup layout restructure (captured 2026-07-09): quali time (Q1/Q2/Q3) lives ONLY under the qualifying block; race start (grid) + race finish blocks go deeper on fastest-lap detail + tire strategy. DATA DEP: needs per-driver `fastLap` (b, still null) + per-driver tire strategy (NET-NEW field, needs a Fold-in/Size pass + Michael's go). UI can ship the relocate now and degrade the race-detail section. Data diff and UI diff = separate PRs.
+- **(d)** Lens integration (drivers matrix + circuit guide) — open design question, deliberately not forced.
+- **(e)** 2024/2025 historical backfill (future, Michael-flagged). Structure is built (per-season `f1-results/<year>/` folders + a cross-season `index_seasons.json`). Needs a NEW viewing level (ties to (d)); build nothing until Michael calls it.
+- **(f)** Cosmetic: circuit guide TRACKS round numbering (Silverstone R11) differs from the store's (R9). Join by slug so nothing breaks; reconcile if it bugs you.
 
 ---
 
@@ -331,23 +259,3 @@ Goal: profile header + metadata sidecar = the one source of truth for an agent's
 **STILL OPEN:**
 - **(a) ClickUp AI Toolkit doc** — Subagent roster + Quick-Scan trigger table hard-code display names + nicknames. Fix on the next Toolkit-doc pass.
 - **(b) Viewer NICKNAMES map** — `source/data.js` still carries a hard-coded `NICKNAMES` map. Ideal fix: drop it and read `nicknames` from each sidecar at load time (the viewer already fetches them). Now easy since all 22 sidecars carry identity.
-
----
-
-## Report Schema + Reports Tab
-**Added:** 2026-07-04 (v3.3) · **RESOLVED:** 2026-07-04 (v3.4)
-
-- ~~Lock the report JSON schema.~~ DONE: `brain-config/report-schema.md` (envelope + audit/review/research bodies).
-- ~~Build the Reports tab.~~ DONE: `source/reports.js` (list, per-type render, on-demand HTML export, empty state), loaded by the shell before `detail.js`.
-- ~~detail.js tab shell.~~ DONE: report-makers land on Reports first, Settings second; lenses land straight on Settings (no tab). `makesReports` gates it. `KEY_ORDER` extended with `initials`/`blurb`/`reportsIndex`.
-
-**Follow-ups (not blocking):**
-- No `research`-type report exists yet; the renderer + schema are defined and ready for Scout Sage's first real report.
-- Consider a deep-link sub-route (`#agent/ /report/ `) if sharing a single report becomes useful. Currently tabs switch in-place without a hash change.
-
----
-
-## Routine Ricky — promoted to Super Agent
-**Added:** 2026-07-04 (v3.4)
-
-Ricky was promoted to a live ClickUp Super Agent (created mid-session, hence not in the agent-search registry earlier). His git profile is PARKED at `agents/_archive/routine-ricky.md` with a strengthened banner: the Super Agent's preferences are now the source of truth; the archived file is a stale pre-promotion snapshot. To revive as a standalone git tool, review the live Super Agent's prefs FIRST and reconcile before reusing the name. The `routines/` subsystem is his live runtime data — never delete it. He is intentionally OUT of the viewer roster.
