@@ -1,11 +1,12 @@
-/* shared/themes/preview.objects.css — TOOL / INPUT + FEEDBACK object styles (object-set expansion T2, 2026-07-18).
+/* shared/themes/preview.objects.css — TOOL/INPUT + FEEDBACK + VIEWER object styles (object-set expansion, 2026-07-18).
    Split out of preview.css to stay under the 30KB read cap. Linked from preview.html AFTER preview.css.
    Every rule is theme-driven: it consumes the same tokens the canonical objects use
    (--surface-*, --accent, --accent-2, --field, --border, --text*, --good/warn/bad/info, --data-*),
    the forms vector (--radius, --radius-pill, --border-w, --elev-1/2/3, --motion-*, --ease, --lift),
    and --font-mono. No hard-coded colors, no color math. All hover/transition motion respects the
    global prefers-reduced-motion guard already declared in preview.css. Class prefix `o` = object,
-   chosen to avoid collision with the existing `.t*` canonical-object classes. */
+   chosen to avoid collision with the existing `.t*` canonical-object classes.
+   T2 (2026-07-18): input + feedback families. T3 (2026-07-18): viewer family (meter/pager/breadcrumb/legend). */
 
 /* ---- Dropzone (file intake — report-normalizer / prism open on one) ---- */
 .odrop{width:100%;text-align:center;border:1.5px dashed var(--border);border-radius:var(--radius-lg);background:var(--surface-1);padding:calc(var(--pad-card,20px) + 8px) var(--pad-card,20px);transition:border-color var(--motion-fast,150ms) var(--ease,ease),background var(--motion-fast,150ms) var(--ease,ease);}
@@ -113,3 +114,40 @@
 .odrawer .od-b{padding:6px 14px 12px;}
 .odrawer .od-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:var(--border-w) solid var(--border);font-size:var(--fs-sm);color:var(--text-soft);}
 .odrawer .od-row:last-child{border-bottom:0;}
+
+/* =================================================================
+   VIEWER FAMILY (object-set expansion T3, 2026-07-18)
+   Progress/rating meter, pager, breadcrumb, legend. From racetracks + dashboard.
+   ================================================================= */
+
+/* ---- Meter / progress bar (the rating meter; also % / progress readouts) ---- */
+.ometer{width:100%;}
+.ometer .om-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:7px;}
+.ometer .om-score{font-family:var(--font-mono);font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text);line-height:1;}
+.ometer .om-score small{font-size:0.8rem;color:var(--text-faint);font-weight:500;}
+.ometer .om-word{font-weight:600;color:var(--accent);font-size:var(--fs-sm);}
+.ometer .om-track{height:8px;border-radius:var(--radius-pill);background:var(--surface-3);overflow:hidden;}
+.ometer .om-fill{display:block;height:100%;border-radius:var(--radius-pill);background:var(--accent-grad);transition:width var(--motion-med,240ms) var(--ease,ease);}
+
+/* ---- Pager (prev / next drill-through) ---- */
+.opager{display:flex;justify-content:space-between;gap:12px;width:100%;}
+.opn{flex:1;display:block;text-align:left;background:var(--surface-2);border:var(--border-w) solid var(--border);border-radius:var(--radius);padding:11px 14px;cursor:pointer;color:inherit;font:inherit;transition:background var(--motion-fast,150ms) var(--ease,ease),border-color var(--motion-fast,150ms) var(--ease,ease),transform var(--motion-fast,150ms) var(--ease,ease);}
+.opn:hover{background:var(--surface-3);border-color:var(--accent);transform:translateY(var(--lift,-2px));}
+.opn.next{text-align:right;}
+.opn .opn-l{font-family:var(--font-mono);font-size:var(--fs-xs);letter-spacing:0.08em;text-transform:uppercase;color:var(--text-faint);}
+.opn .opn-n{font-weight:600;color:var(--text);margin-top:3px;}
+.opn:disabled{opacity:0.35;cursor:default;}
+
+/* ---- Breadcrumb (path trail) ---- */
+.ocrumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--font-mono);font-size:var(--fs-xs);letter-spacing:0.04em;color:var(--text-faint);}
+.ocrumb a{color:var(--text-soft);text-decoration:none;transition:color var(--motion-fast,150ms) var(--ease,ease);}
+.ocrumb a:hover{color:var(--accent);}
+.ocrumb .oc-sep{opacity:0.5;}
+.ocrumb .oc-here{color:var(--text);}
+
+/* ---- Legend (data-viz key; swatch + label rows) ---- */
+.olegend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:var(--fs-sm);color:var(--text-soft);}
+.olegend .ol{display:inline-flex;align-items:center;gap:7px;}
+.olegend .ol-sw{width:14px;height:14px;border-radius:4px;flex:none;}
+.olegend .ol-ln{width:16px;height:0;border-top:2px solid currentColor;flex:none;}
+.olegend .ol-d1{color:var(--data-1);} .olegend .ol-d2{color:var(--data-2);} .olegend .ol-d3{color:var(--data-3);} .olegend .ol-d4{color:var(--data-4);}
