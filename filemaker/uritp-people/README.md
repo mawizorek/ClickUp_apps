@@ -20,9 +20,17 @@ The **identity hub** of the URITP FileMaker app package. Single canonical record
 ## Open Questions
 
 - **Adult dept/title**: does department + job title live on the Adults extension, or graduate to a Staff-Positions layer? (The one genuinely fuzzy field — parked, non-blocking.)
+<graduate to a Staff-Positions layer>
+  
 - **Naming house style**: adopt URITP `pk_`/`fk_` for this file, or keep the as-built bare `PrimaryKey`/`fkPERSON`? (Cross-app governance item; HML uses bare, URITP standard says prefixed.)
+<`PrimaryKey`/`fkPERSON`>
+- 
 - **CONTACT INFORMATION cascade delete** of child Emails/Phones is currently ON, flagged temporary in the as-built file. Keep or reverse?
+<i don't know what this means>
+- 
 - **`emailTEMP`**: migrate into CONTACT INFORMATION then deprecate, or drop?
+<where did you find this? what's it hold? sounds like something to delete or is part of an import workflow - thus needs renaming.>
+- 
 
 ## Purpose
 
