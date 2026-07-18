@@ -1,0 +1,11 @@
+{
+  "slug": "email-chain-parse",
+  "type": "trigger",
+  "name": "Email Chain Parse",
+  "status": "active",
+  "purpose": "Decompose a raw email chain into structured, chronological comment chunks posted to a target task.",
+  "requires": ["post_comment", "load_assets"],
+  "composedWith": ["gmail-inbox-sweep", "task-dedup-gate", "attachment-intake"],
+  "created": "2026-07-18",
+  "shortcut": false
+}
