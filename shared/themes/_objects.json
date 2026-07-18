@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "note": "THE CANONICAL FILEMAKER OBJECT LIBRARY. These are the 20 fundamental layout components a theme must be able to style. Themes reskin these objects from the 4 vector grids (color x typography x forms x spacing); they do not invent new ones. This file is the SINGLE SOURCE OF TRUTH: preview.html renders it dynamically and OBJECT-COVERAGE.md documents it. Keep the count in lockstep across all three.",
   "extensible": "NOT a hard cap. Any agent may add a new object when the design calls for one: append it to the right group here (id + name + states + props), add a row to OBJECT-COVERAGE.md, and it renders in the studio automatically (no preview.html code change). The rule is only: add it AND document it. Never feel constrained by the current set.",
-  "accentSystem": "Two brand hues split by job (2026-07-17 cross-integration): accent = interactive/active language (nav-on, focus, ghost text, primary fill base); accent-2 = the structural energy layer woven as edges (top rail on elevated surfaces, left rail on selected/active surfaces, gradient hairlines + title ticks, and the far stop of accent-grad). Props below name the accent-2 role where an object carries one.",
+  "accentSystem": "Two brand hues split by job (2026-07-17 rebalance): accent = interactive/active language (SOLID primary-button fill, nav-on, focus, ghost text); accent-2 = the structural energy layer + secondary-button highlight, peppered lightly (highlight-pink secondary button, top rail on elevated surfaces, left rail on selected/active surfaces, gradient hairlines + title ticks, badge/logo gradient). The primary button is a SOLID accent fill \u2014 the gradient block was too heavy on one object. Props below name the accent-2 role where an object carries one.",
   "tokenRoles": ["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-deep","accent-2","accent-soft","on-accent","good","warn","bad","info"],
   "groups": {
     "shells": {
@@ -138,15 +138,15 @@
     },
     "buttons": {
       "name": "Buttons \u2014 full family",
-      "desc": "Primary uses the two-stop hex gradient (accent \u2192 accent-2). Pressed swaps outer shadow for inner (the infill look).",
+      "desc": "Primary is a SOLID accent fill (the gradient block was too heavy on one object). Secondary is a highlight-pink outline (accent-2 text + border). Pressed swaps outer shadow for inner (the infill look).",
       "objects": [
         {
           "id": "btn_family",
           "name": "Primary / secondary / quiet / destructive / icon",
           "rowLayout": true,
           "states": {
-            "normal": { "html": "<button class=\"tb primary\">Primary</button> <button class=\"tb secondary\">Secondary</button> <button class=\"tb ghost\">Quiet</button> <button class=\"tb destructive\">Delete</button> <button class=\"tb icon\">&#9881;</button>", "props": { "Primary": "accent-grad", "On text": "on-accent", "Secondary": "surface-2", "Destructive": "bad", "Shadow": "shadow-out", "Corner": "radius" } },
-            "pressed": { "html": "<button class=\"tb pressed\">Primary</button> <button class=\"tb secondary\" style=\"background:var(--surface-3);box-shadow:var(--shadow-in)\">Secondary</button> <button class=\"tb ghost\">Quiet</button>", "props": { "Fill": "accent-grad", "Shadow": "shadow-in", "Transform": "translateY(1px)" } }
+            "normal": { "html": "<button class=\"tb primary\">Primary</button> <button class=\"tb secondary\">Secondary</button> <button class=\"tb ghost\">Quiet</button> <button class=\"tb destructive\">Delete</button> <button class=\"tb icon\">&#9881;</button>", "props": { "Primary": "accent", "On text": "on-accent", "Secondary": "accent-2", "Destructive": "bad", "Shadow": "shadow-out", "Corner": "radius" } },
+            "pressed": { "html": "<button class=\"tb pressed\">Primary</button> <button class=\"tb secondary\" style=\"background:var(--surface-3);box-shadow:var(--shadow-in)\">Secondary</button> <button class=\"tb ghost\">Quiet</button>", "props": { "Fill": "accent", "Shadow": "shadow-in", "Transform": "translateY(1px)" } }
           }
         }
       ]
