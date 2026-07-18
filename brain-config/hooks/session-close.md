@@ -161,6 +161,7 @@ The thread is a SUMMARY that leads with a pointer to the session task, then the 
 **Duration:** {time range}
 **Model:** {model name}
 **Closing capacity:** ~{context tokens used}K / {window}K ({X}%) · feel: {sharp / full / degraded, plus what recall is reliable vs hazy}
+**Scoreboard (revised at close):** 🤖 {N} · 🧑 {M} — {points awarded THIS session / bumped by someone else / unchanged since open}
 
 ### Headlines
 
@@ -187,6 +188,8 @@ The thread is a SUMMARY that leads with a pointer to the session task, then the 
 ...
 ```
 
+The `Scoreboard (revised at close)` line is the close-side bookend of the opening transcript comment's `Current scoreboard at:` reading (posted on the session task at open — see the Agent Activity Board — Gold Standard cold-agent path). It states, in one line, whether any scoreboard points were awarded during THIS session, were bumped by someone else while it ran, or the standing is unchanged since open. Pull the current standing from the Scoreboard page.
+
 **Optional sections (include when relevant):**
 
 - `### Commits` — table of repo commits if the session touched GitHub
@@ -199,7 +202,7 @@ The thread is a SUMMARY that leads with a pointer to the session task, then the 
 
 After both channel posts, the session's Agent Activity Board task is CLOSED OUT, not just left open:
 
-1. **Post the final task comment** — its last comment is a `[CLOSE-POINTER]` that links the two threads you just posted (Memory Audit + Session Log) and states that the task holds the full transcript. Template `T4` lives in the Agent Activity Board — Gold Standard.
+1. **Post the final task comment** — its last comment is a `[CLOSE-POINTER]` that links the two threads you just posted (Memory Audit + Session Log) and states that the task holds the full transcript. It also carries the **scoreboard-revised-at-close line** (🤖 N · 🧑 M + whether points were awarded THIS session, bumped by someone else, or unchanged since open) — the bookend to the opening transcript comment's `Current scoreboard at:` reading. Template `T4` lives in the Agent Activity Board — Gold Standard.
 2. **Flip the task status to `done`.**
 3. **Hand Michael the task link in chat** — the ONE link that matters, since the task now contains the full transcript from open through close, including links out to both channel threads. Template `T5` (the chat close message) lives in the Agent Activity Board — Gold Standard.
 
@@ -242,14 +245,15 @@ Never just post a bare link as a handoff. The prompt in the task must be self-co
 12. **Usage log commit (after both posts + task shutdown).** Tally which profiled tools (hooks, gates, agents) fired during the session. Commit an update to `brain-config/usage-log.json` incrementing each tool's count and bumping `sessions_logged`. Format: `{ "tools": { "tool-slug": N, ... }, "sessions_logged": N, "last_updated": "YYYY-MM-DD" }`.
 13. **The session's open-thread note is appended to `brain-config/open-thread.md` at close, no review.** It's already a comment on the session task (in-session record); the append is the durable cross-session queue a cold agent reads at Session Open. Append the next entry, never overwrite; commit via the normal branch → PR → self-merge flow.
 14. **The warm-start handoff is a TASK, not a chat code block (2026-07-17).** At close, create the next-session task in the first status (`to do` = handoff/waiting slot), pre-load the handoff prompt (Block T6), and chain it to the closing task (relationship + pointer comment T7). Active session tasks are `in progress` from creation; the first status is reserved for handoff/waiting. Don't paste the next-session prompt inline in chat anymore.
+15. **Every close reports the scoreboard delta (2026-07-18, Michael).** The opening transcript comment carried a `Current scoreboard at: 🤖 N · 🧑 M` reading; the close carries the matching `Scoreboard revised at close:` line in BOTH the Session Log summary thread and the task's `[CLOSE-POINTER]` comment. One line stating whether points were awarded THIS session, bumped by someone else while it ran, or unchanged since open. Open reading and close reading are bookends; never post one without the other.
 
 ---
 
 ## Execution Order
 
 1. Memory Maggie posts Channel 1 (Memory Audit: root + thread)
-2. Closing Clio posts Channel 2 (Session Log: root + summary thread that links the Agent Activity Board session task as the full transcript)
-3. Session-task shutdown: final `[CLOSE-POINTER]` comment (links both threads) + flip status to `done` + hand Michael the task link in chat (templates T4/T5)
+2. Closing Clio posts Channel 2 (Session Log: root + summary thread that links the Agent Activity Board session task as the full transcript, and carries the `Scoreboard (revised at close)` line)
+3. Session-task shutdown: final `[CLOSE-POINTER]` comment (links both threads + carries the scoreboard-revised-at-close line) + flip status to `done` + hand Michael the task link in chat (templates T4/T5)
 4. Bounced-memory-write drop: if any write didn't land, append an `OMR` entry to `brain-config/open-memory-requests.md`
 5. Open-thread append: take the session's open-thread note (already a comment on the session task) and append it as the next entry in `brain-config/open-thread.md`. No review.
 6. Next-session handoff TASK (if a next step exists): create it on the Agent Activity Board in `to do` (handoff slot), pre-loaded with the handoff prompt (Block T6), linked to the closing task as a follow-up (relationship + pointer comment T7). Replaces the old inline chat code block.
@@ -280,6 +284,7 @@ Never just post a bare link as a handoff. The prompt in the task must be self-co
 | Warm-start handoff pasted as a chat code block | Agent used the retired inline-prompt path | Create the next-session handoff TASK in `to do`, pre-load the prompt, chain it to the closing task |
 | Active session task left at `to do` | Agent didn't flip on start | Active work is `in progress` from creation; `to do` = handoff/waiting only |
 | No session task opened, so no transcript exists | Startup gate missed | Open the Agent Activity Board task at session start; comment near-per-prompt |
+| Close missing the scoreboard delta | Agent posted the open reading but skipped the close bookend | Post `Scoreboard revised at close:` in both the Session Log summary and the task `[CLOSE-POINTER]` — awarded this session / bumped by someone else / unchanged |
 | Audit says "no changes" with no thread | Agent skipped the structure | Still post full audit template with "None" in changes |
 | Multiple roots for same session | Agent posted twice | Use addendum replies in thread |
 | Root too verbose | Agent put summary in root | Root = identifier only |
