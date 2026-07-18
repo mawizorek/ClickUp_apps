@@ -13,9 +13,15 @@ Instead of a mega-table of feelings, we isolate the four axes of UI that vary in
 
 *Note: The old `feelings.tsv` was dropped. It has been replaced by the Typography, Forms, and Spacing grids.*
 
-### Why elevation + motion live in Forms (not a 5th vector) — 2026-07-18
+### The three Forms presets (2026-07-18 retune)
 
-**Motion and elevation are Forms' job, so they fold in as new columns rather than spinning up a new TSV.** Forms already owns tactility: radius, border weight, and the pressed/inset shadow behavior. Depth (an elevation scale) and how surfaces respond to touch (motion timing + hover lift) are the same axis of "how physical does this feel," so they belong here. Adding a whole motion TSV would be sprawl for ~4 values. The `sleek` preset is the flagship demo of the new columns: `border-w:0` (borderless, elevation separates surfaces), generous radius, deep layered `elev-*`, and smooth `motion-med`/`lift`. Consumers read `var(--elev-2)`, `var(--motion-med)`, `var(--ease)`, `var(--lift)` directly; the resolver + studio apply every Forms column automatically, so the objects reskin for free. All motion is wrapped by a `prefers-reduced-motion` guard.
+Forms ships **three genuinely distinct presets** — not degrees of the same look. Each sets its own radius, border weight, elevation tier, and motion feel:
+
+- **`sharp`** — crisp/technical. Small radius (4/6px), squared chips (pill 6px, NOT a full bubble), heavier 1.5px border, tight fast motion. The dense data look.
+- **`soft`** — balanced/professional. Moderate rounding (8/12px), rounded-rect chips (pill 8px), 1px border, medium layered elevation, smooth motion. The everyday usable default.
+- **`grounded`** — spacious/editorial. Generous radius (12/18px), 1px border, the deepest elevation tier, roomy motion. The confident, high-air look.
+
+**Why elevation + motion live in Forms (not a 5th vector):** motion and elevation are Forms' job — it already owns tactility (radius, border weight, press shadows). Depth (an elevation scale) and touch response (motion timing + hover lift) are the same "how physical does this feel" axis, so they fold in as columns rather than a new TSV. A 4th "sleek" preset was trialed and cut: it was just squared corners rounded into toy bubbles (999px pills) with slimmer padding — no real new direction. The lesson: distinctness comes from tiering radius + elevation + border together, not from removing borders. Consumers read `var(--elev-2)`, `var(--motion-med)`, `var(--ease)`, `var(--lift)` directly; the resolver + studio apply every Forms column automatically, so objects reskin for free. All motion is wrapped by a `prefers-reduced-motion` guard.
 
 ## The Join Table (`_themes.json`)
 
@@ -39,7 +45,7 @@ Apps **do not** reference colors or forms directly. An app requests a **Theme Sl
 
 [**Launch the Theme Studio →**](https://mawizorek.github.io/ClickUp_apps/shared/themes/preview.html)
 
-The Theme Studio allows you to mix the 4 vectors live. It renders all 20 canonical FileMaker objects, plus a composed "Full App" view. Pick the **Sleek** forms preset to see the borderless/elevated/animated flagship look.
+The Theme Studio allows you to mix the 4 vectors live. It renders all 20 canonical FileMaker objects, plus a composed "Full App" view. Switch the Forms vector between `sharp` / `soft` / `grounded` to see each preset's radius, elevation depth, and motion.
 
 **Resilience rule:** The studio HTML *embeds* a snapshot of the 4 grids for a safe, instant first paint (especially on mobile), and then does a best-effort `fetch()` of the live TSV grids to override the snapshot if they have changed.
 
