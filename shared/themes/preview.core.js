@@ -13,7 +13,7 @@ function resolvePropValue(val) {
   var c=COLORS[curColor]||{}, f=FORMS[curForm]||{}, t=TYPES[curType]||{}, s=SPACES[curSpace]||{};
   var res = val, swatch = '';
   if(val === 'accent-grad') {
-    swatch = '<span class="r-swatch" style="background:linear-gradient('+(f['grad-angle']||'180deg')+', '+(c.accent||'#888')+', '+(c['accent-deep']||'#555')+')"></span>';
+    swatch = '<span class="r-swatch" style="background:linear-gradient('+(f['grad-angle']||'135deg')+', '+(c.accent||'#888')+', '+(c['accent-2']||'#555')+')"></span>';
     res = swatch + 'var(--accent-grad)';
   } else if (c[val]) {
     swatch = '<span class="r-swatch" style="background:'+c[val]+'"></span>';
@@ -85,7 +85,7 @@ function applyTokens(){
   for(var fk in f) root.style.setProperty('--'+fk, f[fk]);
   for(var sk in s) root.style.setProperty('--'+sk, s[sk]);
 
-  root.style.setProperty('--accent-grad','linear-gradient('+(f['grad-angle']||'180deg')+', '+(c.accent||'#888')+', '+(c['accent-deep']||'#555')+')');
+  root.style.setProperty('--accent-grad','linear-gradient('+(f['grad-angle']||'135deg')+', '+(c.accent||'#888')+', '+(c['accent-2']||'#555')+')');
   applyChrome(c.mode||'light');
 
   if(REGISTRY.groups) {
@@ -104,7 +104,7 @@ function refreshTriggers(){
   var f=FORMS[curForm]||{};
   document.getElementById('colorNm').textContent=c.name||curColor;
   document.getElementById('colorSub').textContent=curColor+(c.mode?' · '+c.mode:'');
-  document.getElementById('colorTrigSw').style.background='linear-gradient('+(f['grad-angle']||'135deg')+', '+(c.accent||'#888')+', '+(c['accent-deep']||'#555')+')';
+  document.getElementById('colorTrigSw').style.background='linear-gradient('+(f['grad-angle']||'135deg')+', '+(c.accent||'#888')+', '+(c['accent-2']||'#555')+')';
 
   document.getElementById('typeNm').textContent=curType;
   document.getElementById('typeSub').textContent=curType;
@@ -118,13 +118,13 @@ function refreshTriggers(){
   var fontName=(TYPES[curType] && TYPES[curType]['font-display']||'').split(',')[0].replace(/'/g,'');
   document.getElementById('cTheme').textContent='manual-mix';
   document.getElementById('cFont').textContent=fontName;
-  document.getElementById('cGrad').textContent=(c.accent||'')+' → '+(c['accent-deep']||'')+' @ '+(f['grad-angle']||'');
+  document.getElementById('cGrad').textContent=(c.accent||'')+' → '+(c['accent-2']||'')+' @ '+(f['grad-angle']||'');
   document.getElementById('swName').textContent=c.name||curColor;
 
   /* live header readout */
   document.getElementById('hdThemeName').textContent=c.name||curColor;
   document.getElementById('hdThemeFont').textContent=fontName;
-  document.getElementById('hdDot').style.background='linear-gradient(135deg, '+(c.accent||'#888')+' 50%, '+(c['accent-deep']||'#555')+' 50%)';
+  document.getElementById('hdDot').style.background='linear-gradient(135deg, '+(c.accent||'#888')+' 50%, '+(c['accent-2']||'#555')+' 50%)';
 }
 
 function renderSections(){
@@ -180,7 +180,7 @@ function buildColorPop(){ var pop=document.getElementById('colorPop'); pop.inner
   Object.keys(COLORS).forEach(function(s){ var g=(COLORS[s].group)||GROUPS[s]||'Other'; (groups[g]=groups[g]||[]).push(s); });
   Object.keys(groups).forEach(function(g){ var gl=document.createElement('div'); gl.className='dd-grouplabel'; gl.textContent=g; pop.appendChild(gl);
     groups[g].forEach(function(slug){ var c=COLORS[slug]; var o=document.createElement('button'); o.className='dd-opt'; o.setAttribute('data-slug',slug); o.setAttribute('role','option');
-      o.innerHTML='<span class="osw" style="background:linear-gradient(135deg, '+c.accent+' 50%, '+c['accent-deep']+' 50%)"></span><span class="onm">'+c.name+'</span><span class="otag">'+(c.mode||'')+'</span>';
+      o.innerHTML='<span class="osw" style="background:linear-gradient(135deg, '+c.accent+' 50%, '+c['accent-2']+' 50%)"></span><span class="onm">'+c.name+'</span><span class="otag">'+(c.mode||'')+'</span>';
       o.onclick=function(){ pickColor(slug); }; pop.appendChild(o); }); }); }
 
 function ddToggle(which){ var t=document.getElementById(which+'Trigger'),p=document.getElementById(which+'Pop'); var isOpen=p.classList.contains('open'); ddCloseAll(); if(!isOpen){ t.classList.add('open'); t.setAttribute('aria-expanded','true'); p.classList.add('open'); } }

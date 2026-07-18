@@ -15,9 +15,9 @@ var TYPES={
 "grounded":{"font-display":"'Inter', system-ui, sans-serif","font-body":"'Inter', system-ui, sans-serif","fs-lead":"1.05rem","fs-body":"0.94rem","fs-sm":"0.85rem","fs-xs":"0.75rem","track-tight":"-0.02em","track-btn":"0"}
 };
 var FORMS={
-"sharp":{"radius":"3px","radius-lg":"4px","radius-pill":"4px","border-w":"1.5px","grad-angle":"100deg","shadow-out":"0 1px 2px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.35)","shadow-in":"inset 0 2px 4px rgba(0,0,0,0.5)"},
-"soft":{"radius":"6px","radius-lg":"10px","radius-pill":"999px","border-w":"1px","grad-angle":"180deg","shadow-out":"0 2px 8px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.14)","shadow-in":"inset 0 1px 4px rgba(0,0,0,0.24)"},
-"grounded":{"radius":"8px","radius-lg":"12px","radius-pill":"999px","border-w":"1px","grad-angle":"160deg","shadow-out":"0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.18)","shadow-in":"inset 0 1px 3px rgba(0,0,0,0.28)"}
+"sharp":{"radius":"3px","radius-lg":"4px","radius-pill":"4px","border-w":"1.5px","grad-angle":"120deg","shadow-out":"0 1px 2px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.35)","shadow-in":"inset 0 2px 4px rgba(0,0,0,0.5)"},
+"soft":{"radius":"6px","radius-lg":"10px","radius-pill":"999px","border-w":"1px","grad-angle":"135deg","shadow-out":"0 2px 8px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.14)","shadow-in":"inset 0 1px 4px rgba(0,0,0,0.24)"},
+"grounded":{"radius":"8px","radius-lg":"12px","radius-pill":"999px","border-w":"1px","grad-angle":"150deg","shadow-out":"0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.18)","shadow-in":"inset 0 1px 3px rgba(0,0,0,0.28)"}
 };
 var SPACES={
 "tight":{"touch":"42px","pad-cell":"8px","pad-card":"16px","gap-xs":"4px","gap-md":"12px","gap-lg":"24px"},
@@ -64,7 +64,7 @@ var REGISTRY={
 };
 
 var GROUPS={"default-theme":"Utility","maw-dark-utility":"Utility","mclaren":"F1 Dark"};
-var ROLES={bg:"page canvas","surface-1":"toolbar/header","surface-2":"card / row alt","surface-3":"modal / raised",border:"lines & edges",field:"input fill",text:"primary text","text-soft":"secondary text","text-faint":"muted/helper",accent:"actionable · grad top","accent-deep":"gradient bottom","accent-2":"secondary accent","accent-soft":"tint / selected","on-accent":"text on accent",good:"success",warn:"warning",bad:"error/destructive",info:"informational"};
+var ROLES={bg:"page canvas","surface-1":"toolbar/header","surface-2":"card / row alt","surface-3":"modal / raised",border:"lines & edges",field:"input fill",text:"primary text","text-soft":"secondary text","text-faint":"muted/helper",accent:"actionable · grad start","accent-deep":"deep shade (spare)","accent-2":"gradient 2nd stop · pop","accent-soft":"tint / selected","on-accent":"text on accent",good:"success",warn:"warning",bad:"error/destructive",info:"informational"};
 var SW_ORDER=["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-deep","accent-2","accent-soft","on-accent","good","warn","bad","info"];
 
 var CHROME={

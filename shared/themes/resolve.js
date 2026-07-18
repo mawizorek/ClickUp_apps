@@ -5,8 +5,10 @@
      - _themes.json : the JOIN — { slug, color, feeling }. Apps reference a THEME.
 
    HARD RULE (locked 2026-07-17): NO runtime color math. Every color is a literal hex from the grid.
-   The button/surface gradient is TWO explicit hex stops (accent → accent-deep) + the feeling's angle.
-   There is no color-mix / OKLCH / derived stop anywhere.
+   The button/surface gradient is TWO explicit hex stops (accent → accent-2, a two-HUE sweep) + the
+   feeling's angle. Repointed 2026-07-17 from accent-deep to accent-2 for cross-theme dynamism (maximalism
+   pass): the second stop is now the contrasting brand hue, not a darker shade of the first. accent-deep
+   stays authored (free for future hover/border roles). There is no color-mix / OKLCH / derived stop anywhere.
 
    BIDIRECTIONAL LIGHT/DARK (added 2026-07-17):
      Each color row ships a DEFAULT ramp (the bare 18 tokens; its absolute mode = the `mode` column)
@@ -104,9 +106,9 @@
       return row;
     });
   }
-  // gradient = TWO explicit hex stops + the feeling's angle. No color math.
+  // gradient = TWO explicit hex stops (accent → accent-2, a two-HUE sweep) + the feeling's angle. No color math.
   function setGrad(root){
-    root.style.setProperty('--accent-grad','linear-gradient(var(--grad-angle,180deg), var(--accent), var(--accent-deep))');
+    root.style.setProperty('--accent-grad','linear-gradient(var(--grad-angle,135deg), var(--accent), var(--accent-2))');
     root.style.setProperty('--surface-grad','var(--surface-2)');
   }
   // apply a THEME (the join) = its color + its feeling. opts.mode threads through to the color.
