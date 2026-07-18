@@ -10,13 +10,14 @@ _The navigable map of every documented object. Mirrors the FileMaker solution. H
 | [Fiscal_Years](./tables/Fiscal_Years.md) | reference | under-review |
 | [Academic_Periods](./tables/Academic_Periods.md) | reference | under-review |
 | [Departments](./tables/Departments.md) | reference | under-review |
-| [Staff_Positions](./tables/Staff_Positions.md) | reference | pending |
 
-> **PRODUCTIONS is deliberately NOT here.** It's owned by the Productions/Company builder (DG-001). Global Setup only carries production-selector table occurrences (match-key context) that reference the builder-owned table. Those are documented under `layouts/` (selector UI) when built, not as an owned table.
+> **Deliberately NOT here:**
+> - **PRODUCTIONS** — owned by the Productions/Company builder (DG-001). GS carries only production-selector table occurrences (match-key context).
+> - **Staff_Positions** — moved to the **Labour** spoke (DG-005); positions are operational assignment data, not config. See the [tombstone](./tables/Staff_Positions.md). Departments stay here; Labour references them.
 
 ## Relationships (`relationships/`)
 
-Config spine — fiscal-year fanout + academic/production time keys. See [relationships/README.md](./relationships/README.md) + `schema/relationships.json`.
+Config spine — fiscal-year fanout + academic time keys. See [relationships/README.md](./relationships/README.md) + `schema/relationships.json`.
 
 ## Scripts (`scripts/`)
 
