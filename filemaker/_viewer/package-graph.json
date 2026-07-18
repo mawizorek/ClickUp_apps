@@ -1,0 +1,54 @@
+{
+  "_meta": {
+    "purpose": "Package-level map of the URITP FileMaker app ecosystem. Nodes = apps, edges = cross-app references. Derived from the design decisions in each app's meta/design-decisions.md and the ClickUp FMP shared decision log. This is the zoom-OUT view; each node links into its per-app schema/relationship graph.",
+    "generated": "2026-07-18",
+    "legend": {
+      "spine": "shared backbone every app references (identity or config)",
+      "builder": "owns a living operational entity + its assignments",
+      "spoke": "app that references the spines; owns its own domain",
+      "util": "reference/authority data feeding another app"
+    }
+  },
+  "nodes": [
+    { "id": "uritp-people", "label": "People", "kind": "spine", "role": "identity hub", "status": "migrating", "viewer": true },
+    { "id": "uritp-global-setup", "label": "Global Setup", "kind": "spine", "role": "config spine", "status": "migrating", "viewer": true },
+    { "id": "productions", "label": "Productions / Company", "kind": "builder", "role": "owns PRODUCTIONS + roles", "status": "planned", "viewer": false },
+    { "id": "labour", "label": "Labour", "kind": "builder", "role": "owns positions + assignments", "status": "planned", "viewer": false },
+    { "id": "courses", "label": "Courses / Student Records", "kind": "builder", "role": "owns enrollments", "status": "planned", "viewer": false },
+    { "id": "safety-programs", "label": "Safety Programs", "kind": "spoke", "role": "training + compliance", "status": "planned", "viewer": false },
+    { "id": "risk-assessment", "label": "Risk Assessment", "kind": "spoke", "role": "production hazard RAs", "status": "planned", "viewer": false },
+    { "id": "beta-budget", "label": "Beta Budget", "kind": "spoke", "role": "budget + allocations", "status": "built", "viewer": false },
+    { "id": "budget-code-authority", "label": "Budget Code Authority", "kind": "util", "role": "budget code reference", "status": "designed", "viewer": false },
+    { "id": "production-calendars", "label": "Production Calendars", "kind": "spoke", "role": "show calendars", "status": "built", "viewer": false },
+    { "id": "signage", "label": "Signage", "kind": "spoke", "role": "printed signs", "status": "planned", "viewer": false },
+    { "id": "patchbay-doc", "label": "Patchbay Doc", "kind": "spoke", "role": "audio patch sheets", "status": "planned", "viewer": false },
+    { "id": "inventory", "label": "Inventory", "kind": "spoke", "role": "physical assets", "status": "planned", "viewer": false },
+    { "id": "paperwork-archive", "label": "Paperwork Archive", "kind": "spoke", "role": "document archive", "status": "planned", "viewer": false }
+  ],
+  "edges": [
+    { "from": "uritp-people", "to": "uritp-global-setup", "label": "branding" },
+    { "from": "productions", "to": "uritp-people", "label": "identity" },
+    { "from": "productions", "to": "uritp-global-setup", "label": "fiscal / selector" },
+    { "from": "uritp-global-setup", "to": "productions", "label": "selector pointer", "kind": "pointer" },
+    { "from": "labour", "to": "uritp-people", "label": "identity" },
+    { "from": "labour", "to": "uritp-global-setup", "label": "departments" },
+    { "from": "courses", "to": "uritp-people", "label": "identity" },
+    { "from": "courses", "to": "uritp-global-setup", "label": "academic periods" },
+    { "from": "safety-programs", "to": "uritp-people", "label": "identity" },
+    { "from": "safety-programs", "to": "uritp-global-setup", "label": "departments" },
+    { "from": "risk-assessment", "to": "uritp-people", "label": "identity" },
+    { "from": "risk-assessment", "to": "safety-programs", "label": "completion" },
+    { "from": "risk-assessment", "to": "productions", "label": "per show" },
+    { "from": "beta-budget", "to": "uritp-global-setup", "label": "fiscal years" },
+    { "from": "beta-budget", "to": "budget-code-authority", "label": "codes" },
+    { "from": "beta-budget", "to": "labour", "label": "cost feed" },
+    { "from": "production-calendars", "to": "uritp-global-setup", "label": "branding" },
+    { "from": "production-calendars", "to": "productions", "label": "shows" },
+    { "from": "signage", "to": "uritp-global-setup", "label": "branding" },
+    { "from": "patchbay-doc", "to": "uritp-global-setup", "label": "branding" },
+    { "from": "patchbay-doc", "to": "productions", "label": "per show" },
+    { "from": "inventory", "to": "uritp-global-setup", "label": "departments" },
+    { "from": "paperwork-archive", "to": "uritp-global-setup", "label": "fiscal / depts" },
+    { "from": "paperwork-archive", "to": "productions", "label": "per show" }
+  ]
+}
