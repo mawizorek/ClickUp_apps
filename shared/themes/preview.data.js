@@ -1,8 +1,8 @@
 /* shared/themes/preview.data.js — Theme Studio embedded snapshot (SELF-CONTAINED FIRST-PAINT FALLBACK).
    Seeds a safe first paint before preview.core.js's liveOverride() re-fetches the canonical TSV grids +
    _objects.json and overwrites them. Loaded BEFORE preview.core.js.
-   Kept in lockstep with the TSVs + _objects.json. T2 (2026-07-18): input + feedback object groups mirrored;
-   their styles live in preview.objects.css. */
+   Kept in lockstep with the TSVs + _objects.json. T2: input + feedback groups. T3: viewer group.
+   Object styles live in preview.objects.css. */
 
 /* SELF-CONTAINED EMBED FOR SAFE FIRST PAINT */
 var COLORS={
@@ -80,6 +80,12 @@ var REGISTRY={
       { "id":"data_typed_table", "name":"Typed data table", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"otblwrap\"><table class=\"otbl\"><thead><tr><th class=\"orownum\">#</th><th>id<span class=\"oty\">int</span></th><th>name<span class=\"oty\">string</span></th><th>active<span class=\"oty\">bool</span></th></tr></thead><tbody><tr><td class=\"orownum\">1</td><td><span class=\"onum\">1001</span></td><td>Norris</td><td><span class=\"obool\">true</span></td></tr><tr><td class=\"orownum\">2</td><td><span class=\"onum\">1002</span></td><td>Piastri</td><td><span class=\"obool\">true</span></td></tr><tr><td class=\"orownum\">3</td><td><span class=\"onum\">1003</span></td><td><span class=\"onull\">null</span></td><td><span class=\"obool\">false</span></td></tr></tbody></table></div>", "props":{ "Header":"surface-2", "Type label":"font-mono", "Number":"data-1", "Bool":"data-2", "Null":"text-faint" } } } },
       { "id":"fb_toast", "name":"Toast", "rowLayout":true, "states":{ "base":{ "html":"<span class=\"otoast\"><span class=\"ot-ic\">\u2713</span> Copied to clipboard</span>", "props":{ "Fill":"surface-3", "Icon":"good", "Elevation":"elev-2" } } } },
       { "id":"fb_empty", "name":"Empty / error state", "rowLayout":false, "states":{ "empty":{ "html":"<div class=\"oempty\"><div class=\"oe-ic\">\u25a1</div><h4>No records yet</h4><p>Import a file or add a row to get started.</p></div>", "props":{ "Icon fill":"surface-2", "Title":"text", "Body":"text-soft" } }, "error":{ "html":"<div class=\"oempty err\"><div class=\"oe-ic\">\u2715</div><h4>Couldn't load data</h4><p>The source returned a 404. Check the path and retry.</p></div>", "props":{ "Icon":"bad", "Title":"text", "Body":"text-soft" } } } }
+    ] },
+    "viewer": { "name": "Viewer & readout", "desc": "Display-side objects a data viewer leans on: meter, pager, breadcrumb, legend. From racetracks + dashboard.", "objects": [
+      { "id":"viz_meter", "name":"Meter / progress bar", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"ometer\"><div class=\"om-head\"><span class=\"om-score\">8.4<small>/10</small></span><span class=\"om-word\">Excellent</span></div><div class=\"om-track\"><i class=\"om-fill\" style=\"width:84%\"></i></div></div>", "props":{ "Track":"surface-3", "Fill":"accent-grad", "Score":"font-mono", "Word":"accent" } } } },
+      { "id":"nav_pager", "name":"Prev / next pager", "rowLayout":false, "states":{ "base":{ "html":"<div class=\"opager\"><button class=\"opn prev\"><span class=\"opn-l\">‹ Prev</span><span class=\"opn-n\">Silverstone</span></button><button class=\"opn next\"><span class=\"opn-l\">Next ›</span><span class=\"opn-n\">Hungaroring</span></button></div>", "props":{ "Fill":"surface-2", "Hover line":"accent", "Label":"font-mono", "Name":"text" } } } },
+      { "id":"nav_breadcrumb", "name":"Breadcrumb", "rowLayout":true, "states":{ "base":{ "html":"<nav class=\"ocrumb\"><a>Circuits</a><span class=\"oc-sep\">/</span><a>Europe</a><span class=\"oc-sep\">/</span><span class=\"oc-here\">Hungaroring</span></nav>", "props":{ "Face":"font-mono", "Link":"text-soft", "Hover":"accent", "Here":"text" } } } },
+      { "id":"viz_legend", "name":"Legend", "rowLayout":true, "states":{ "base":{ "html":"<div class=\"olegend\"><span class=\"ol\"><span class=\"ol-sw\" style=\"background:var(--data-1)\"></span>Sector 1</span><span class=\"ol\"><span class=\"ol-sw\" style=\"background:var(--data-2)\"></span>Sector 2</span><span class=\"ol\"><span class=\"ol-sw\" style=\"background:var(--data-3)\"></span>Sector 3</span><span class=\"ol\"><span class=\"ol-sw\" style=\"background:var(--data-4)\"></span>DRS zone</span></div>", "props":{ "Swatch 1":"data-1", "Swatch 2":"data-2", "Swatch 3":"data-3", "Swatch 4":"data-4", "Label":"text-soft" } } } }
     ] }
   }
 };
