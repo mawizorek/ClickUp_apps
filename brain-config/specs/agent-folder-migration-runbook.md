@@ -1,11 +1,11 @@
 # Agent Flat→Folder Migration — COLD-OPEN RUNBOOK
 
-**Status:** LIVE runbook (not a proposal). Authored 2026-07-17 from the Audit Anna reference build; hardened same day by a second run (Fold-in Frank).
+**Status:** LIVE runbook (not a proposal). Authored 2026-07-17 from the Audit Anna reference build; hardened same day by a second run (Fold-in Frank) + a viewer-resolution audit.
 **Steward:** **Audit Anna**, in her audit capacity (this is exactly the "AUTHORING new audit templates/DoDs" role in her profile — she owns, hardens, and edge-cases this doc as agents migrate).
 **Companion spec:** `brain-config/specs/agent-folder-upgrade.md` (the why, Frank's verdict, Workshop read, open questions).
 **Reference implementations:**
 - `brain-config/agents/audit-anna/` — the BLOATED case (large profile, long changelog lifted out). Copy this for a heavy agent.
-- `brain-config/agents/foldin-frank/` — the CLEAN FLAT-ONLY case (small `gate` agent, no prior folder). Copy this for the common agent. Also the first to surface the registry-absent edge case (§6).
+- `brain-config/agents/foldin-frank/` — the CLEAN FLAT-ONLY case (small `gate` agent, no prior folder). Copy this for the common agent. Also surfaced the registry-absent edge case (§6).
 
 > **Purpose of THIS doc:** let a Brain session with ZERO prior context pick up ONE agent (or a batch, see §3) and migrate it flat→folder quickly, correctly, and identically to every other agent — with no coordination call to Michael. Read this top-to-bottom, do the steps, done. If a step surprises you, the runbook is wrong — flag it to the steward, don't improvise.
 
@@ -35,28 +35,40 @@ brain-config/agents/<slug>/
 
 ---
 
-## ⚠️ 1. The transition-mode rule (the guardrail that changed)
+## ⚠️ 1. The transition-mode rule (incremental over weeks)
 
-The upgrade spec assumed a **big-bang single-merge** (all ~27 agents flip in one atomic PR, main never mixed). Michael's 2026-07-17 direction supersedes that: migrate **incrementally, one agent (or a capable batch) per session, over the next few weeks.** That reversal has one hard consequence you MUST honor:
+The upgrade spec assumed a **big-bang single-merge**. Michael's 2026-07-17 direction supersedes that: migrate **incrementally, one agent (or a capable batch) per session, over the next few weeks.** Two consequences:
 
-- **Agent-level half-migration stays FORBIDDEN.** An agent is never a folder while its flat `<slug>.md` twin is still live. Within one agent's migration it's all-or-nothing, in a single PR. Delete the flat files in the SAME PR that verifies the folder pointers live — never a commit apart.
-- **Roster-level coexistence is now SANCTIONED** (this is the part that changed). During the transition the roster will hold some folder-agents and some flat-agents at once. That is NOT drift — it is an explicit, documented, time-boxed transitional state, made safe by dual-resolution below.
+- **Agent-level half-migration stays FORBIDDEN.** An agent is never a folder while its flat `<slug>.md` twin is still live. Within one agent's migration it's all-or-nothing, in a single PR: delete the flat files in the SAME PR that verifies the folder, never a commit apart.
+- **Roster-level coexistence is SANCTIONED.** During the transition the roster holds some folder-agents and some flat-agents at once. That is NOT drift — it's an explicit, time-boxed transitional state. It is safe because each agent is individually atomic (above) AND because the viewer resolves agents from the registry (§2), which is regenerated per migration.
 
-**Dual-resolution (the prerequisite that makes incremental safe):** every reader of an agent profile must resolve **folder-first, flat-fallback** — try `<slug>/profile.md`, fall back to `<slug>.md`. This applies to the AI Toolkit index pointers, `registry.json` consumers, `council.md`, cross-agent `Composes with` refs, and the viewer read paths (`index.html` / `tool-index.html` / `custom-tools.html`). Until dual-resolution is live everywhere, incremental migration is UNSAFE — see § Prerequisite.
+> **Litmus:** at any commit on `main`, every agent is EITHER fully flat OR fully folder — never caught mid-move. The mix is across the roster (allowed), never inside one agent (banned).
 
-> **Litmus:** at any commit on `main`, every agent is EITHER fully flat OR fully folder, and every pointer resolves both. No agent is ever caught mid-move. The mix is across the roster (allowed), never inside one agent (banned).
+**Note:** an earlier draft of this runbook called for a "dual-resolution / folder-first flat-fallback" fallback layer in every reader. That was wrong — there's no per-agent inconsistency window to protect against (each agent is atomic), so a fallback layer guards nothing. The ONE real prerequisite is §2: make the viewer read the registry. Retired to avoid a phantom gate.
 
 ---
 
-## 2. Prerequisite (ONE-TIME, before ANY further agent migrates on main)
+## 🔧 2. THE Prerequisite (ONE-TIME, before any agent merges to main): make the viewer registry-driven
 
-Before agent #2 lands ON MAIN, dual-resolution must be live in the viewer read paths and the pointer conventions. This is the single build task gating the whole incremental run. Do it once, on its own PR:
+**Audited 2026-07-17. The viewer does NOT read `registry.json` today — and that's the one thing that actually breaks on migration.** How it works now:
 
-- Viewer (`brain-config/index.html`, `tool-index.html`, `custom-tools.html`): read path tries `<slug>/profile.md`, falls back to `<slug>.md`. Same for `<slug>/metadata.json` vs `<slug>.metadata.json`.
-- Document in `registry.json`'s generator that a `profile` field may point at either shape during transition; the generator resolves folder-first.
-- AI Toolkit index trigger table + `council.md`: note the folder-first/flat-fallback convention once, at the top of the agent-pointer section, so every pointer inherits it without per-line edits.
+- `source/app.js` `loadShelf()` builds the agent list by **directory-listing** `brain-config/agents/` and filtering for top-level `*.md` files (`f.name.endsWith('.md')`). Profile link = `agents/<file.name>`.
+- `source/detail.js` `getSidecar()` fetches `agents/<slug>.metadata.json` (hardcoded flat suffix); `slugFromAnchor()` + `rewriteLinks()` match `/agents/<slug>.md`.
 
-Until this PR merges, the migrated agents (Anna, Frank) live ONLY on the `agent-folder-migration` branch as reference builds, with their flat twins still live as the fallback. **Do not merge a folder agent to main before the prerequisite lands.**
+**What breaks the moment an agent becomes a folder (all three, none registry-aware):**
+1. The folder `<slug>/` is a `dir`, not a `.md` file — the `loadShelf` filter SKIPS it, so the migrated agent **vanishes from the viewer entirely**.
+2. `getSidecar` → `agents/<slug>.metadata.json` → 404 (it's now `<slug>/metadata.json`).
+3. Profile link `agents/<slug>.md` → 404 (it's now `<slug>/profile.md`).
+
+**The fix (Michael's call — registry-driven, so migrations fall out with no per-agent viewer edits):** point the viewer's `agents` shelf at `registry.json` instead of the directory listing. The registry already carries per agent: `slug`, `name`, `role`, `status`, `seat`, and the `profile` path, and its header states it's regenerated from profile front-matter on every profile change. So:
+
+- `loadShelf('agents')` reads `registry.json` `agents[]` (not a dir listing). Folders and flats both appear because the list is data, not filenames.
+- Profile link = the registry `profile` field verbatim (`agents/<slug>/profile.md` post-migration, `agents/<slug>.md` pre).
+- Metadata/sidecar path derives from the profile's directory: if `profile` ends in `/profile.md`, sidecar = same dir + `metadata.json`; else legacy `<slug>.metadata.json`. (Or drop the sidecar fetch entirely — the registry already inlines role/status/seat/accent, so the detail view can render from the registry row alone.)
+
+Once this lands, EVERY future migration "falls out" of the registry: the per-agent recipe already regenerates the `profile` field (§3 step 10), the viewer follows automatically, and no viewer file is ever touched per-agent again. This one-time rewire is the whole prerequisite — do it on its own PR before merging any folder agent to main. **Not yet built as of 2026-07-17; the reference agents (Anna, Frank) live on the `agent-folder-migration` branch with flat twins intact until it lands.**
+
+**Second-order:** `tool-index.html` has ONE hardcoded agent link (`./agents/size-sally.md`) in its GUARDS map — repoint it to Sally's folder when she migrates. Minor, but inventory it.
 
 ---
 
@@ -64,11 +76,11 @@ Until this PR merges, the migrated agents (Anna, Frank) live ONLY on the `agent-
 
 For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank reference builds did.
 
-**Batch-in-one-session (Michael, 2026-07-17):** a session with the capacity MAY migrate several agents in one PR. The one-agent-per-PR rule is the FLOOR, not a cap. But every agent in the batch must be INDIVIDUALLY complete inside that PR — folder built + pointers repointed + flat twin deleted, per agent. Never leave one member of a batch half-done to "finish next session." If capacity runs out mid-batch, finish the agent you're on, ship those, and leave the untouched ones fully flat. The unit of atomicity is the agent, whether you do 1 or 12.
+**Batch-in-one-session (Michael, 2026-07-17):** a session with the capacity MAY migrate several agents in one PR. One-agent-per-PR is the FLOOR, not a cap. But every agent in the batch must be INDIVIDUALLY complete inside that PR — folder built + pointers repointed + flat twin deleted, per agent. Never leave one member of a batch half-done to "finish next session." If capacity runs out mid-batch, finish the agent you're on, ship those, and leave the untouched ones fully flat. The unit of atomicity is the agent, whether you do 1 or 12.
 
 ### Pre-flight
 1. Load `GitHub MCP — Operating Standard` (blob-API reads, branch→PR→self-merge, `.nojekyll`, VERSIONS ledger). Non-negotiable.
-2. Confirm the prerequisite (§2) is live on main (or that you're working the reference branch). If neither, STOP — you're the wrong task.
+2. Confirm the §2 prerequisite is live on main (or that you're working the reference branch). If neither, STOP — you're the wrong task.
 3. `get_file_contents` on `brain-config/agents/` — get the current blob SHAs for `<slug>.md` and `<slug>.metadata.json`. Note whether a `<slug>/` folder ALREADY exists (six do: closing-clio, handoff-hana, memory-maggie, recon-renata, scout-sage, workshop-wes) and what it contains — you will PRESERVE that content, not clobber it.
 
 ### Read (byte-safe)
@@ -82,12 +94,12 @@ For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank
 9. Do NOT create `decision-log.md` or `memory.md`. Do NOT touch an existing `reports/` or other sub-content — leave it in place inside the folder.
 
 ### Repoint (every surface that names the agent by path)
-10. `registry.json` — the `profile` field → `<slug>/profile.md`. **REGENERATE via its generator; never hand-edit.** (It's the sanctioned mirror-pair with the AI Toolkit index — reconcile both sides same-session.) **If the agent is ABSENT from registry.json** (see §6), the regen ADDS its row pointing at the folder — there's no existing field to repoint.
-11. `council.md`, the AI Toolkit index trigger table, and every other profile's `Composes with` cross-ref that hard-codes `<slug>.md` → `<slug>/profile.md`. (With dual-resolution live, these keep resolving even before you touch them — but update them so the canonical pointer is the folder.)
+10. `registry.json` — the `profile` field → `<slug>/profile.md`. **REGENERATE via its generator; never hand-edit.** (It's the sanctioned mirror-pair with the AI Toolkit index — reconcile both sides same-session.) **If the agent is ABSENT from registry.json** (see §6), the regen ADDS its row pointing at the folder. This field is also what the viewer resolves from (§2), so getting it right is what makes the migration "fall out" everywhere else.
+11. `council.md`, the AI Toolkit index trigger table, and every other profile's `Composes with` cross-ref that hard-codes `<slug>.md` → `<slug>/profile.md`. Plus the `tool-index.html` GUARDS link if this agent has one (currently only size-sally).
 
 ### Verify, THEN delete (same PR)
 12. Blob-read `<slug>/profile.md` back; confirm the rules diff vs the original flat body is EMPTY (only the Changelog removal + footer differ).
-13. Confirm every repointed pointer resolves live.
+13. Confirm every repointed pointer resolves live, and (post-prerequisite) that the agent still renders in the viewer.
 14. ONLY NOW delete the flat `<slug>.md` and `<slug>.metadata.json` — in THIS PR, not a later one.
 15. Open the PR (title: `brain-config: migrate <slug> to folder`), self-merge, report: PR link + verified pointers.
 16. Log the beat to the active Agent Activity Board session task (Anna's Rule 3 pattern): what moved, SHA verified, rules diff empty.
@@ -110,17 +122,18 @@ For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank
 - **Storage-only.** No agent's behavior/rules change during migration. A diff of the actual rules pre/post must be empty. Do NOT condense, reword, or "fix" a profile mid-migration — not even to strip an em dash or a typo. Source is preserved verbatim.
 - **`registry.json` is generated.** Regenerate, never hand-edit.
 - **Blob-API reads only** for file bodies; re-fetch fresh before any write; never reuse a carried-over SHA.
-- **Never half-migrate an agent.** Folder + flat-deletion land together or not at all. (Batch OK; per-agent atomicity NOT.)
+- **Never half-migrate an agent.** Folder + flat-deletion land together or not at all. (Batch OK; per-agent atomicity NOT negotiable.)
 - **One agent per PR is the floor** during the incremental phase — a capable session may batch, but each agent is independently complete + revertible in the diff.
 
 ---
 
 ## 6. Edge cases found so far (Anna hardens this list as agents move)
 
-- **Agent ABSENT from `registry.json`** (found on Fold-in Frank, 2026-07-17). Some live-in-git profiles were never registered — the index itself flags Breaker Beckett, Fold-in Frank, and Memory Maggie as stranded. Frank's `metadata.json` even carries a `_note`: "ABSENT from registry.json at backfill time. Add to the registry agents array on the S5 regen." **Handling:** there's no `profile` field to repoint — the regen must ADD the agent's row (pointing at `<slug>/profile.md`). Preserve the `_note` verbatim in the moved metadata; it's a live instruction to the registry regen, not migration cruft. Do NOT drop it.
+- **Viewer is directory-driven, not registry-driven** (audited 2026-07-17). See §2 — this is THE prerequisite. A folder agent vanishes from the viewer + 404s its sidecar/profile until the viewer reads the registry. Fix once, up front.
+- **Agent ABSENT from `registry.json`** (found on Fold-in Frank). Some live-in-git profiles were never registered — the index flags Breaker Beckett, Fold-in Frank, and Memory Maggie as stranded. Frank's `metadata.json` carries a `_note`: "ABSENT from registry.json at backfill time. Add to the registry agents array on the S5 regen." **Handling:** no `profile` field to repoint — the regen must ADD the agent's row (pointing at `<slug>/profile.md`). Preserve the `_note` verbatim in the moved metadata; it's a live instruction to the regen, not cruft. This matters double now that the viewer resolves from the registry: an unregistered agent won't render at all.
 - **Profile still over the 15KB target after the move.** Anna's `profile.md` lands ~16KB even with the changelog lifted out. The folder move is NOT guaranteed to get a bloated profile under target — that needs a real condense pass, which is a **separate, behavior-adjacent audit**, explicitly OUT of scope for this storage-only migration. Flag it, don't do it here.
 - **Agents with an existing folder** (the six). Migrating them means dropping `profile.md`/`change-log.md`/`metadata.json` BESIDE existing content — `memory-maggie/` already holds `open-memory-request-protocol.md`; `recon-renata/` + `workshop-wes/` hold real `reports/*.json`; the other three (`closing-clio/`, `handoff-hana/`, `scout-sage/`) hold an empty `reports/` placeholder. Preserve every existing file; the migration only ADDS the standard set.
-- **`workshop-wes` is retired** (tombstone in the roster). It still gets a folder for pointer resolution, but its profile stays as-is — don't revive it.
+- **`workshop-wes` is retired** (tombstone in the roster). It still gets a folder for pointer/registry resolution, but its profile stays as-is — don't revive it.
 
 ---
 
@@ -130,4 +143,4 @@ For a single `<slug>`, one branch, one PR. This is exactly what the Anna + Frank
 
 ---
 
-*Authored 2026-07-17 from the Audit Anna reference build; hardened same day by the Fold-in Frank run. Companion to `agent-folder-upgrade.md`. Steward: Audit Anna.*
+*Authored 2026-07-17 from the Audit Anna reference build; hardened same day by the Fold-in Frank run + the viewer-resolution audit. Companion to `agent-folder-upgrade.md`. Steward: Audit Anna.*
