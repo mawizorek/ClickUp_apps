@@ -103,6 +103,42 @@ Every new open-thread entry uses the exact shape below. Copy the block, fill eve
 
 ---
 
+## [OPEN] Non-mirror projection surfaces can still drift silently (4 surfaces)
+
+- **ID:** OT-2026-07-17-7
+- **Logged:** 2026-07-17 20:53 ET
+- **Session:** https://app.clickup.com/t/86ajkdw17 (Agent Activity Board task — full transcript)
+- **Urgency:** 🟢 Low
+- **Item:** This session locked the `registry.json` ↔ ClickUp AI Toolkit index as a sanctioned MIRROR PAIR with a same-session sync mandate, and added the Agent & Tool Surface Map to `README.md` classifying every surface canonical/generated/projection. But only that ONE pair is formally sync-bound. The other four projection surfaces — `council.md`, `teams/the-workshop.md`, `team-standard.md`, and the viewer — can still fall out of step with the canonical profiles/registry without any gate catching it. Twice this session a stale projection was found by hand (the phantom list id `901328269587` lingering in council.md + Mira's charter after the gate fixed it; the retired-Wes 7-lens process still live in team-standard.md). The consolidation principle now says "author once, projections point," but nothing verifies it holds over time.
+- **Next action:** Decide whether a lightweight drift-check belongs at session close (Closing Clio scans the projection surfaces against the canonical registry/profiles for stale names/statuses/ids and flags mismatches) OR whether the Surface Map's written rule is enough. If building it, scope it as a read-only flag, not an auto-fixer.
+- **Refs:** `brain-config/README.md` (Agent & Tool Surface Map); `registry.json` `sync_mandate`; PRs #361/#366 this session; session task https://app.clickup.com/t/86ajkdw17
+
+---
+
+## [OPEN] Per-profile conduct blocks — standing invitation to personalize (not debt)
+
+- **ID:** OT-2026-07-17-8
+- **Logged:** 2026-07-17 20:53 ET
+- **Session:** https://app.clickup.com/t/86ajkdw17
+- **Urgency:** 🟢 Low
+- **Item:** The 4-line Standing-agent conduct block is carried verbatim in ~20 agent profiles. This session it was RULED (Michael) a deliberate personalization seam, NOT trickle-down duplication, and explicitly protected from consolidation via a README exception. The verbatim copies are the FLOOR, not the goal — each agent is meant to rewrite the four directives' examples/emphasis into its own voice over time (Rhys cites failure modes, Beckett aims his hammer, Mira names voices in synthesis). Not a bug to fix; an open invitation to act on.
+- **Next action:** No dedicated task. When any agent profile is next touched for other reasons, personalize its conduct block in passing rather than leaving the seed verbatim. Purely opportunistic.
+- **Refs:** `brain-config/README.md` (Personalization-seam exception); `council.md` (canonical roster-wide statement); PR #368 this session
+
+---
+
+## ⚠️ open-thread.md is at the size cap — prune/archive pass owed
+
+- **ID:** OT-2026-07-17-9
+- **Logged:** 2026-07-17 20:53 ET
+- **Session:** https://app.clickup.com/t/86ajkdw17
+- **Urgency:** 🟡 Medium
+- **Item:** This file is now ~30KB — at the 30KB hard read-cap. Several entries below are already marked SHIPPED/DONE/RESOLVED (the FileMaker calc externalization, scripts+relationships model, object verification D-007, global theme system, Report Schema, Agent-Name migration, Routine Ricky) and per the template's own rule should be flipped to `[RESOLVED]` and then cleaned up after one cycle. The file risks silent truncation on read if it grows further.
+- **Next action:** Do a dedicated archive pass: move the SHIPPED/RESOLVED entries into a dated `brain-config/handoffs/` archive (or delete the ones already past their one-cycle survival), leaving only genuinely OPEN items. Do NOT do this mid-other-work; it's its own careful pass so no live loop is lost.
+- **Refs:** this file; `brain-config/handoffs/` (archive precedent); Source-Size Budget Enforcer 30KB cap
+
+---
+
 ## FileMaker object verification & audit trail (D-007) — SHIPPED this session (2026-07-16)
 **Added:** 2026-07-16
 
@@ -229,7 +265,7 @@ The catalog-research-routine is written and good; execution is the gap. Catalog 
 After the catalog is fat with real prints, Michael wants **the best app to view / sort / filter / find / interact with the available prints.** This is a rebuild of the lens, not a patch.
 
 - **Michael's direction (verbatim intent):** the prior version was buggy and "kind of cheesy." Wants **sharp corners** and a **database / search-field feel** for this lens (think fast queryable table/registry, not a soft card toy). Sharp, dense, precise.
-- **Workshop team INVOLVED** — explicit ask. Run The Workshop (6 lenses) on the design before committing source; this is committed-source work so it gates through the pre-build stress-test.
+- **Workshop team INVOLVED** — explicit ask. Run The Workshop (7 mandatory lenses + up to 2 supplemental) on the design before committing source; this is committed-source work so it gates through the pre-build stress-test.
 - **NO monolith files** — explicit ask, and it matches the locked modular standard. Thin HTML shell + `source/` modules (the app is already modular post-v10: `base.css` + per-page css/js). Extend that pattern, don't regress it.
 - Lives in the existing three-page app (Catalog / Market / Collection). Decide whether this sharp "database" viewer replaces/reskins `catalog.html` (the gallery) or is a distinct lens. Open design question for the Workshop.
 - Reads the harvested `catalog.json`; cross-refs live market status the way the current catalog does. Per-print detail view (history + details about a specific available print) is part of the ask.
