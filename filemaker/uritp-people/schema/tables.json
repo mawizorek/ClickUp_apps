@@ -1,16 +1,16 @@
 {
   "_meta": {
     "app": "uritp-people",
-    "schemaVersion": "1.2",
+    "schemaVersion": "1.3",
     "generated": "2026-07-18",
     "intent": "TARGET-STATE schema — the source of truth to build TOWARD, not a mirror of the old file. Researched from the ClickUp 'URITP People FMP' doc, then edited: fields earn their place or get cut.",
     "status": "target-state draft, unverified against live file",
     "conventions": {
       "keys": "BARE style LOCKED (Michael 2026-07-18): PrimaryKey + fkPERSON/fkContact etc. This app does NOT use pk_/fk_ prefixes. Matches HML house style.",
       "typosCorrected": "prefferedFirstName→preferredFirstName, prefferedLastName→preferredLastName, namePronounciation→namePronunciation",
-      "cutThisPass": ["emailTEMP (legacy import staging)", "hiddenLatestImport (import-batch cruft)", "broadClassification (now DERIVED from extension existence, not stored — W1)"],
-      "graduated": ["ADULTS_ext Department+Title → Staff-Positions layer via fkStaffPosition; layer is GLOBAL SETUP-owned reference data (W1)"],
-      "derived": ["Student/Non-Student classification = which role extension a person holds (STUDENTS_ext / ADULTS_ext), not a stored flag"]
+      "cutThisPass": ["emailTEMP (legacy import staging)", "hiddenLatestImport (import-batch cruft)", "broadClassification (now DERIVED from extension existence, not stored — W1)", "ADULTS_ext.fkStaffPosition (positions → Labour, DG-005)"],
+      "derived": ["Student/Non-Student classification = which role extension a person holds (STUDENTS_ext / ADULTS_ext), not a stored flag"],
+      "movedToSpokes": ["positions/titles/assignments → Labour (DG-005); People carries no position link, joins THROUGH Labour for a title at report time"]
     }
   },
   "tables": [
@@ -58,12 +58,11 @@
       "name": "ADULTS_ext",
       "role": "role-extension",
       "status": "pending",
-      "description": "Non-student role extension off PEOPLE (one-to-one via fkPERSON). Faculty, staff, guest artists, vendors, volunteers. Dept/Title graduate to a Staff-Positions layer via fkStaffPosition; that layer is Global-Setup-owned reference data (W1). Existence of this record = Non-Student classification context.",
+      "description": "Non-student role extension off PEOPLE (one-to-one via fkPERSON). Carries only the broad adult classification (kind of non-student). Position/title/department are NOT here — they are Labour-owned assignment data (DG-005). Existence of this record = Non-Student classification context.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
-        { "name": "AdultType", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Faculty, Staff, Adjunct, Guest Artist, Vendor, Volunteer" },
-        { "name": "fkStaffPosition", "type": "text-uuid", "key": "fk", "category": "classification", "status": "pending", "notes": "→ Staff-Positions layer (Department + Title/level), GLOBAL SETUP-owned reference data (W1). replaces as-built free-text Department/Title. seeds from _setup_Staff Positions / URJobProfileLevels / Supervisors" },
+        { "name": "AdultType", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Faculty, Staff, Adjunct, Guest Artist, Vendor, Volunteer. broad kind-of-non-student, NOT a job title (titles live in Labour)" },
         { "name": "AdultStatus", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Active, Inactive" },
         { "name": "NotesAdult", "type": "text", "key": "plain", "category": "notes" },
         { "name": "StartDate", "type": "date", "key": "plain", "category": "lifecycle" },
