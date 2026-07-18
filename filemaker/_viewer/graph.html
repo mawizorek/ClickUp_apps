@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>URITP FileMaker — Package Map</title>
+<style>
+  :root{
+    --bg: oklch(0.19 0.02 275);
+    --surface-1: oklch(0.24 0.025 275);
+    --surface-2: oklch(0.29 0.03 275);
+    --border: oklch(0.42 0.03 275);
+    --text: oklch(0.95 0.01 275);
+    --text-soft: oklch(0.74 0.02 275);
+    --text-faint: oklch(0.58 0.02 275);
+    --spine: oklch(0.68 0.17 300);
+    --builder: oklch(0.76 0.15 75);
+    --spoke: oklch(0.72 0.13 190);
+    --util: oklch(0.62 0.04 275);
+    --edge: oklch(0.5 0.03 275);
+    --pointer: oklch(0.76 0.15 75);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--text);
+    font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    overflow:hidden;
+  }
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:5;
+    display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap;
+    padding:.9rem 1.15rem calc(.9rem + env(safe-area-inset-top));
+    background:linear-gradient(var(--bg),transparent);
+    pointer-events:none;
+  }
+  header h1{font-size:1.05rem;font-weight:640;letter-spacing:-.01em}
+  header p{font-size:.82rem;color:var(--text-soft);font-weight:420}
+  #stage{position:fixed;inset:0}
+  svg{width:100%;height:100%;display:block;cursor:grab}
+  svg.grabbing{cursor:grabbing}
+  .edge{stroke:var(--edge);stroke-width:1.4;fill:none;opacity:.5;transition:opacity .25s cubic-bezier(.16,1,.3,1),stroke .25s}
+  .edge.pointer{stroke:var(--pointer);stroke-dasharray:5 4;opacity:.6}
+  .edge.dim{opacity:.08}
+  .edge.lit{opacity:.95;stroke:var(--text-soft)}
+  .elabel{fill:var(--text-faint);font-size:9.5px;opacity:0;transition:opacity .2s;pointer-events:none;text-anchor:middle}
+  .elabel.lit{opacity:1;fill:var(--text-soft)}
+  .node{cursor:pointer}
+  .node circle{stroke:var(--bg);stroke-width:2.5;transition:opacity .25s,r .2s cubic-bezier(.16,1,.3,1)}
+  .node text{fill:var(--text);font-size:12px;font-weight:520;pointer-events:none;transition:opacity .25s}
+  .node .role{fill:var(--text-faint);font-size:9.5px;font-weight:420}
+  .node.dim{opacity:.22}
+  .node.spine circle{fill:var(--spine)}
+  .node.builder circle{fill:var(--builder)}
+  .node.spoke circle{fill:var(--spoke)}
+  .node.util circle{fill:var(--util)}
+  .node.planned circle{fill:none;stroke-width:2;stroke-dasharray:3 3}
+  .node.planned.spine circle{stroke:var(--spine)}
+  .node.planned.builder circle{stroke:var(--builder)}
+  .node.planned.spoke circle{stroke:var(--spoke)}
+  .node.planned.util circle{stroke:var(--util)}
+  .legend{
+    position:fixed;left:1.15rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:5;
+    background:var(--surface-1);border:1px solid var(--border);border-radius:12px;
+    padding:.7rem .85rem;font-size:.8rem;color:var(--text-soft);max-width:min(84vw,340px);
+  }
+  .legend h2{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;color:var(--text-faint);font-weight:600;margin-bottom:.5rem}
+  .legrow{display:flex;align-items:center;gap:.5rem;padding:.12rem 0}
+  .dot{width:12px;height:12px;border-radius:50%;flex:none}
+  .dot.spine{background:var(--spine)}.dot.builder{background:var(--builder)}
+  .dot.spoke{background:var(--spoke)}.dot.util{background:var(--util)}
+  .dot.ring{background:transparent;border:2px dashed var(--text-faint)}
+  .legend .hint{margin-top:.55rem;color:var(--text-faint);font-size:.74rem;line-height:1.45}
+  #fit{
+    position:fixed;right:1.15rem;bottom:calc(1rem + env(safe-area-inset-bottom));z-index:5;
+    background:var(--surface-2);color:var(--text);border:1px solid var(--border);
+    border-radius:10px;padding:.6rem .95rem;font:inherit;font-size:.85rem;font-weight:540;
+    cursor:pointer;min-height:44px;transition:background .2s,border-color .2s;
+  }
+  #fit:hover{background:var(--surface-1);border-color:var(--text-faint)}
+  #fit:focus-visible{outline:2px solid var(--spine);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>URITP FileMaker</h1>
+  <p>package map · tap a solid node to open its schema</p>
+</header>
+<div id="stage"><svg></svg></div>
+<div class="legend">
+  <h2>App kinds</h2>
+  <div class="legrow"><span class="dot spine"></span> Spine — shared backbone</div>
+  <div class="legrow"><span class="dot builder"></span> Builder — owns an entity + assignments</div>
+  <div class="legrow"><span class="dot spoke"></span> Spoke — references the spines</div>
+  <div class="legrow"><span class="dot util"></span> Util — reference data</div>
+  <div class="legrow"><span class="dot ring"></span> Dashed = planned / not built</div>
+  <p class="hint">Drag nodes · scroll to zoom · hover to trace links. Amber dashes = Global Setup's selector pointer at Productions.</p>
+</div>
+<button id="fit">Fit</button>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script>
+(async function(){
+  const data = await fetch('./package-graph.json').then(r=>r.json());
+  const nodes = data.nodes.map(d=>({...d}));
+  const idset = new Set(nodes.map(n=>n.id));
+  const links = data.edges.filter(e=>idset.has(e.from)&&idset.has(e.to))
+                          .map(e=>({source:e.from,target:e.target=e.to,label:e.label,kind:e.kind}));
+  // adjacency for hover highlight
+  const adj = new Map(nodes.map(n=>[n.id,new Set([n.id])]));
+  links.forEach(l=>{adj.get(l.from).add(l.to);adj.get(l.to).add(l.from);});
+
+  const svg = d3.select('svg');
+  const root = svg.append('g');
+  const gEdge = root.append('g'), gElab = root.append('g'), gNode = root.append('g');
+
+  const rOf = d=> d.kind==='spine'?26 : d.kind==='builder'?19 : d.kind==='util'?13 : 15;
+
+  const link = gEdge.selectAll('path').data(links).join('path')
+    .attr('class',d=>'edge'+(d.kind==='pointer'?' pointer':''));
+  const elab = gElab.selectAll('text').data(links).join('text')
+    .attr('class','elabel').text(d=>d.label);
+
+  const node = gNode.selectAll('g').data(nodes).join('g')
+    .attr('class',d=>`node ${d.kind} ${d.status==='planned'?'planned':''}`)
+    .call(d3.drag()
+      .on('start',(e,d)=>{if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;})
+      .on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y;})
+      .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
+  node.append('circle').attr('r',rOf);
+  node.append('text').attr('y',d=>rOf(d)+15).attr('text-anchor','middle').text(d=>d.label);
+  node.append('text').attr('class','role').attr('y',d=>rOf(d)+27).attr('text-anchor','middle').text(d=>d.role);
+
+  node.on('click',(e,d)=>{ if(d.viewer) location.href='./schema.html?app='+d.id; });
+  function focus(id){
+    const near=adj.get(id);
+    node.classed('dim',n=>!near.has(n.id));
+    link.classed('dim',l=>!(l.from===id||l.to===id)).classed('lit',l=>l.from===id||l.to===id);
+    elab.classed('lit',l=>l.from===id||l.to===id);
+  }
+  function clearFocus(){node.classed('dim',false);link.classed('dim',false).classed('lit',false);elab.classed('lit',false);}
+  node.on('mouseenter',(e,d)=>focus(d.id)).on('mouseleave',clearFocus);
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(l=>l.kind==='pointer'?90:130).strength(.5))
+    .force('charge',d3.forceManyBody().strength(-620))
+    .force('collide',d3.forceCollide().radius(d=>rOf(d)+34))
+    .force('center',d3.forceCenter(0,0))
+    .on('tick',ticked);
+
+  function ticked(){
+    link.attr('d',d=>{
+      const dx=d.target.x-d.source.x, dy=d.target.y-d.source.y;
+      const c=`${(d.source.x+d.target.x)/2} ${(d.source.y+d.target.y)/2 - Math.hypot(dx,dy)*0.08}`;
+      return `M${d.source.x} ${d.source.y} Q ${c} ${d.target.x} ${d.target.y}`;
+    });
+    elab.attr('x',d=>(d.source.x+d.target.x)/2).attr('y',d=>(d.source.y+d.target.y)/2-4);
+    node.attr('transform',d=>`translate(${d.x},${d.y})`);
+  }
+
+  const zoom=d3.zoom().scaleExtent([.35,3]).on('zoom',e=>root.attr('transform',e.transform));
+  svg.call(zoom).on('dblclick.zoom',null);
+  svg.on('mousedown',()=>svg.classed('grabbing',true)).on('mouseup',()=>svg.classed('grabbing',false));
+
+  function fit(){
+    const b=root.node().getBBox(), s=svg.node();
+    const w=s.clientWidth,h=s.clientHeight;
+    if(!b.width) return;
+    const k=Math.min(2.2, .82*Math.min(w/b.width,h/b.height));
+    const tx=w/2-k*(b.x+b.width/2), ty=h/2-k*(b.y+b.height/2);
+    svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity.translate(tx,ty).scale(k));
+  }
+  document.getElementById('fit').onclick=fit;
+  sim.on('end',fit);
+  setTimeout(fit,900);
+})();
+</script>
+</body>
+</html>
