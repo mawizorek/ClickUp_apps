@@ -1,9 +1,10 @@
 {
   "schemaVersion": 2,
-  "note": "THE CANONICAL FILEMAKER OBJECT LIBRARY. These are the 20 fundamental layout components a theme must be able to style. Themes reskin these objects from the 4 vector grids (color x typography x forms x spacing); they do not invent new ones. This file is the SINGLE SOURCE OF TRUTH: preview.html renders it dynamically and OBJECT-COVERAGE.md documents it. Keep the count in lockstep across all three.",
+  "note": "THE CANONICAL FILEMAKER OBJECT LIBRARY. The fundamental layout components a theme must be able to style, reskinned from the 4 vector grids (color x typography x forms x spacing). SINGLE SOURCE OF TRUTH: preview.html renders it dynamically and OBJECT-COVERAGE.md documents it. Keep the count in lockstep across all three. The set GROWS as real apps reveal needed objects (2026-07-18 expansion in progress: mono-data role added; tool/input + richer viewer families to follow).",
   "extensible": "NOT a hard cap. Any agent may add a new object when the design calls for one: append it to the right group here (id + name + states + props), add a row to OBJECT-COVERAGE.md, and it renders in the studio automatically (no preview.html code change). The rule is only: add it AND document it. Never feel constrained by the current set.",
-  "accentSystem": "Two brand hues split by job (2026-07-17 rebalance): accent = interactive/active language (SOLID primary-button fill, nav-on, focus, ghost text); accent-2 = the structural energy layer + secondary-button highlight, peppered lightly (highlight-pink secondary button, top rail on elevated surfaces, left rail on selected/active surfaces, gradient hairlines + title ticks, badge/logo gradient). The primary button is a SOLID accent fill \u2014 the gradient block was too heavy on one object. Props below name the accent-2 role where an object carries one.",
-  "tokenRoles": ["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-deep","accent-2","accent-soft","on-accent","good","warn","bad","info"],
+  "accentSystem": "Two brand hues split by job (2026-07-17 rebalance): accent = interactive/active language (SOLID primary-button fill, nav-on, focus, ghost text); accent-2 = the structural energy layer + secondary-button highlight (edge rails, gradient stops). data-1..4 (added 2026-07-18) are categorical chart/series slots, shared across light/dark. Props below name the accent-2 role where an object carries one.",
+  "tokenRoles": ["bg","surface-1","surface-2","surface-3","border","field","text","text-soft","text-faint","accent","accent-deep","accent-2","accent-soft","on-accent","good","warn","bad","info","data-1","data-2","data-3","data-4"],
+  "typeRoles": ["font-display","font-body","font-mono"],
   "groups": {
     "shells": {
       "name": "Shells & containers",
@@ -84,7 +85,7 @@
     },
     "type": {
       "name": "Typography",
-      "desc": "Display + body faces from Typography; ink colors from Color. Page titles carry an accent-grad leading tick.",
+      "desc": "Display + body + mono faces from Typography; ink colors from Color. Page titles carry an accent-grad leading tick.",
       "objects": [
         {
           "id": "tx_page_title",
@@ -116,6 +117,14 @@
           "rowLayout": false,
           "states": {
             "base": { "html": "<div class=\"ttype\"><div class=\"t3\">Body copy is the standard reading size for record content and prose in the layout.</div></div>", "props": { "Ink": "text", "Size": "fs-body" } }
+          }
+        },
+        {
+          "id": "tx_mono_data",
+          "name": "Mono data / code",
+          "rowLayout": false,
+          "states": {
+            "base": { "html": "<div class=\"ttype\"><div class=\"t3\" style=\"font-family:var(--font-mono);font-variant-numeric:tabular-nums\">1:29.148 &nbsp; +0.204 &nbsp; LAP 47/58</div></div>", "props": { "Face": "font-mono", "Ink": "text", "Size": "fs-sm" } }
           }
         },
         {
