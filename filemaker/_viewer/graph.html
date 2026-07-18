@@ -17,70 +17,55 @@
     --builder: oklch(0.56 0.13 55);
     --spoke: oklch(0.5 0.1 205);
     --util: oklch(0.58 0.02 275);
-    --wire: oklch(0.8 0.01 275);
-    --wire-lit: oklch(0.52 0.16 300);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     background:var(--bg);color:var(--ink);
     font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    padding:0 0 4rem;
+    -webkit-font-smoothing:antialiased;padding:0 0 4rem;
   }
-  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
   header{padding:clamp(1.6rem,5vw,3rem) 0 1.2rem}
   .eyebrow{font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
   header h1{font-size:clamp(1.7rem,4.5vw,2.5rem);font-weight:680;letter-spacing:-.02em;margin:.35rem 0 .5rem;line-height:1.05}
-  header p{color:var(--ink-soft);max-width:60ch;font-size:1.02rem}
-  section{margin-top:clamp(1.8rem,5vw,3rem)}
-  h2.sec{font-size:.78rem;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;
-    padding-bottom:.6rem;border-bottom:1px solid var(--line);margin-bottom:1.4rem}
-  /* diagram */
-  .board{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:.5rem;overflow:hidden}
-  svg{display:block;width:100%;height:auto}
-  .wire{fill:none;stroke:var(--wire);stroke-width:1.5;transition:stroke .18s,stroke-width .18s,opacity .18s}
-  .wire.pointer{stroke-dasharray:5 4;stroke:var(--builder);opacity:.7}
-  .card-hit{cursor:default}
-  .card{transition:opacity .18s}
-  .card .box{fill:var(--panel);stroke:var(--line);stroke-width:1.5;transition:stroke .18s}
-  .card .kbar{transition:opacity .18s}
-  .card.spine .kbar{fill:var(--spine)} .card.builder .kbar{fill:var(--builder)}
-  .card.spoke .kbar{fill:var(--spoke)} .card.util .kbar{fill:var(--util)}
-  .card .nm{fill:var(--ink);font-weight:620;font-size:14px}
-  .card .rl{fill:var(--ink-faint);font-size:10.5px}
-  .card.planned .box{stroke-dasharray:4 3}
-  .card.planned .nm{fill:var(--ink-soft)}
-  svg.focusing .wire{opacity:.12}
-  svg.focusing .wire.lit{opacity:1;stroke:var(--wire-lit);stroke-width:2.2}
-  svg.focusing .card{opacity:.32}
-  svg.focusing .card.lit{opacity:1}
-  .wlabel{fill:var(--ink-faint);font-size:9.5px;text-anchor:middle;opacity:0;transition:opacity .18s}
-  svg.focusing .wlabel.lit{opacity:1}
-  /* passive tree */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
-  .kgroup{margin-bottom:1.8rem}
-  .kgroup h3{display:flex;align-items:center;gap:.5rem;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--ink-soft);font-weight:600;margin-bottom:.9rem}
+  header p{color:var(--ink-soft);max-width:62ch;font-size:1.02rem}
+  section{margin-top:clamp(1.8rem,5vw,2.8rem)}
+
+  .tier{margin-bottom:1.4rem}
+  .tier-label{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin-bottom:.6rem}
+  .row{display:flex;flex-wrap:wrap;gap:.75rem}
+  .node{
+    flex:1 1 200px;max-width:280px;min-width:180px;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    border-top:3px solid var(--line);
+    padding:.8rem .95rem;text-decoration:none;color:inherit;display:block;
+    transition:box-shadow .16s,transform .16s,border-color .16s;
+  }
+  .node.spine{border-top-color:var(--spine)} .node.builder{border-top-color:var(--builder)}
+  .node.spoke{border-top-color:var(--spoke)} .node.util{border-top-color:var(--util)}
+  .node.planned{border-style:dashed;background:transparent}
+  .node.link{cursor:pointer}
+  .node.link:hover{box-shadow:0 6px 20px oklch(0.29 0.02 275 / .1);transform:translateY(-2px);border-color:var(--ink-faint)}
+  .node .nm{font-weight:640;font-size:1.02rem;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+  .node .arrow{color:var(--ink-faint);font-weight:500;font-size:.9rem}
+  .node .role{color:var(--ink-soft);font-size:.85rem;margin-top:.15rem}
+  .node .refs{margin-top:.55rem;font-size:.8rem;color:var(--ink-soft);line-height:1.6}
+  .node .refs .lab{color:var(--ink-faint)}
+  .node .refs b{color:var(--ink);font-weight:600}
+  .node .badge{display:inline-block;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;font-weight:700;
+    padding:.1rem .4rem;border-radius:99px}
+  .node.spine .badge{background:color-mix(in oklch,var(--spine),transparent 86%);color:var(--spine)}
+  .node.builder .badge{background:color-mix(in oklch,var(--builder),transparent 86%);color:var(--builder)}
+  .node.spoke .badge{background:color-mix(in oklch,var(--spoke),transparent 86%);color:var(--spoke)}
+  .node.util .badge{background:color-mix(in oklch,var(--util),transparent 86%);color:var(--util)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin-top:1.2rem;font-size:.82rem;color:var(--ink-soft)}
+  .legend span{display:inline-flex;align-items:center;gap:.45rem}
   .kdot{width:10px;height:10px;border-radius:3px;flex:none}
   .kdot.spine{background:var(--spine)}.kdot.builder{background:var(--builder)}
   .kdot.spoke{background:var(--spoke)}.kdot.util{background:var(--util)}
-  .app{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem}
-  .app .top{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem}
-  .app .name{font-weight:640;font-size:1rem}
-  .app .name a{color:inherit;text-decoration:none;border-bottom:1.5px solid var(--spine)}
-  .app .name a:hover{color:var(--spine)}
-  .app .st{font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;
-    padding:.15rem .5rem;border:1px solid var(--line);border-radius:99px;white-space:nowrap}
-  .app .st.built{color:var(--spoke);border-color:color-mix(in oklch,var(--spoke),transparent 65%)}
-  .app .st.migrating{color:var(--spine);border-color:color-mix(in oklch,var(--spine),transparent 65%)}
-  .app .role{color:var(--ink-soft);font-size:.86rem;margin:.15rem 0 .6rem}
-  .app .refs{font-size:.82rem;color:var(--ink-soft);line-height:1.7}
-  .app .refs .lab{color:var(--ink-faint)}
-  .app .refs b{color:var(--ink);font-weight:600}
-  .app .none{color:var(--ink-faint);font-style:italic;font-size:.82rem}
-  .legend{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;margin-top:1.1rem;font-size:.82rem;color:var(--ink-soft)}
-  .legend span{display:inline-flex;align-items:center;gap:.45rem}
-  #msg{display:none;padding:2rem;text-align:center;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);border-radius:16px}
+
+  #msg{display:none;padding:2rem;text-align:center;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);border-radius:14px}
   footer{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--ink-faint);font-size:.8rem}
 </style>
 </head>
@@ -89,24 +74,18 @@
   <header>
     <div class="eyebrow">URITP FileMaker</div>
     <h1>Package Map</h1>
-    <p>How the app ecosystem fits together. Two shared spines at the top; everything below references them. This page reads live from the ecosystem index, so it stays current on its own.</p>
+    <p>How the app ecosystem fits together. Two shared spines up top; every app below references them. This page reads live from the ecosystem index, so it stays current on its own.</p>
   </header>
 
   <section>
-    <h2 class="sec">The structure</h2>
-    <div class="board"><svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="App relationship diagram"></svg></div>
+    <div id="tiers"></div>
     <div class="legend">
       <span><span class="kdot spine"></span> Spine · shared backbone</span>
       <span><span class="kdot builder"></span> Builder · owns an entity + assignments</span>
       <span><span class="kdot spoke"></span> Spoke · references the spines</span>
       <span><span class="kdot util"></span> Util · reference data</span>
-      <span>Dashed outline = planned · hover a card to trace its links</span>
+      <span>Dashed = planned · name with → opens its schema</span>
     </div>
-  </section>
-
-  <section>
-    <h2 class="sec">Reference tree</h2>
-    <div id="tree"></div>
   </section>
 
   <div id="msg"></div>
@@ -115,122 +94,52 @@
 
 <script>
 (async function(){
-  const NS='http://www.w3.org/2000/svg';
-  const el=(t,a,txt)=>{const n=document.createElementNS(NS,t);for(const k in (a||{}))n.setAttribute(k,a[k]);if(txt!=null)n.textContent=txt;return n;};
-  const svg=document.getElementById('svg');
-  const tree=document.getElementById('tree');
-  const msg=document.getElementById('msg');
-
+  const msg=document.getElementById('msg'), tiers=document.getElementById('tiers');
   let data;
   try{ data=await fetch('./package-graph.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();}); }
   catch(e){ msg.style.display='block'; msg.textContent='Could not load the ecosystem index (package-graph.json). Refresh in a moment — GitHub Pages may still be publishing.'; return; }
 
-  const nodes=data.nodes, byId=new Map(nodes.map(n=>[n.id,n]));
-  const edges=data.edges.filter(e=>byId.has(e.from)&&byId.has(e.to));
-  const KLABEL={spine:'Spines',builder:'Builders',spoke:'Spokes',util:'Utilities'};
-  const KORDER=['spine','builder','spoke','util'];
-
-  // ---------- deterministic tier layout ----------
-  // tier 0 = spines, tier 1 = builders, tier 2 = spokes+utils (wrapped)
-  const tierOf=n=> n.kind==='spine'?0 : n.kind==='builder'?1 : 2;
-  const rows=[[],[],[]];
-  nodes.forEach(n=>rows[tierOf(n)].push(n));
-  // wrap tier 2 into subrows of <=5
-  const PER=5, W=1040, CW=176, CH=60, PADX=24;
-  const layout=[]; // {row: y-center, items:[nodes]}
-  layout.push({items:rows[0]});
-  layout.push({items:rows[1]});
-  for(let i=0;i<rows[2].length;i+=PER) layout.push({items:rows[2].slice(i,i+PER)});
-  const rowGap=118, topPad=30;
-  const pos=new Map();
-  layout.forEach((r,ri)=>{
-    const y=topPad+ri*rowGap;
-    const n=r.items.length;
-    r.items.forEach((node,i)=>{
-      const cx=(W)*(i+1)/(n+1);
-      pos.set(node.id,{cx, cy:y+CH/2, x:cx-CW/2, y});
-    });
-  });
-  const H=topPad+layout.length*rowGap+10;
-  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-  svg.setAttribute('preserveAspectRatio','xMidYMin meet');
-
-  const gWire=el('g'), gLab=el('g'), gCard=el('g');
-  svg.appendChild(gWire); svg.appendChild(gLab); svg.appendChild(gCard);
-
-  // ---------- wires ----------
-  const adj=new Map(nodes.map(n=>[n.id,new Set([n.id])]));
-  const wireByNode=new Map(nodes.map(n=>[n.id,[]]));
-  edges.forEach(e=>{
-    const a=pos.get(e.from), b=pos.get(e.to);
-    const my=(a.cy+b.cy)/2;
-    const p=el('path',{class:'wire'+(e.kind==='pointer'?' pointer':''),
-      d:`M ${a.cx} ${a.cy} C ${a.cx} ${my}, ${b.cx} ${my}, ${b.cx} ${b.cy}`});
-    gWire.appendChild(p);
-    const lab=el('text',{class:'wlabel',x:(a.cx+b.cx)/2,y:my-3},e.label); gLab.appendChild(lab);
-    adj.get(e.from).add(e.to); adj.get(e.to).add(e.from);
-    wireByNode.get(e.from).push({p,lab}); wireByNode.get(e.to).push({p,lab});
-  });
-
-  // ---------- cards ----------
-  nodes.forEach(n=>{
-    const p=pos.get(n);
-    const g=el('g',{class:`card ${n.kind} ${n.status==='planned'?'planned':''}`});
-    g.appendChild(el('rect',{class:'box',x:p.x,y:p.y,width:CW,height:CH,rx:11}));
-    g.appendChild(el('rect',{class:'kbar',x:p.x,y:p.y,width:5,height:CH,rx:2}));
-    g.appendChild(el('text',{class:'nm',x:p.x+16,y:p.y+25},n.label));
-    g.appendChild(el('text',{class:'rl',x:p.x+16,y:p.y+42},n.role));
-    if(n.viewer){
-      const a=el('a',{href:'./schema.html?app='+n.id}); a.appendChild(g);
-      a.style.cursor='pointer'; gCard.appendChild(a);
-    } else gCard.appendChild(g);
-    n._g=g;
-    g.addEventListener('mouseenter',()=>{
-      svg.classList.add('focusing');
-      const near=adj.get(n.id);
-      nodes.forEach(m=>m._g.classList.toggle('lit',near.has(m.id)));
-      wireByNode.get(n.id).forEach(w=>{w.p.classList.add('lit');w.lab.classList.add('lit');});
-    });
-    g.addEventListener('mouseleave',()=>{
-      svg.classList.remove('focusing');
-      nodes.forEach(m=>m._g.classList.remove('lit'));
-      document.querySelectorAll('.wire.lit,.wlabel.lit').forEach(x=>x.classList.remove('lit'));
-    });
-  });
-
-  // ---------- passive reference tree ----------
-  const refsOut=new Map(nodes.map(n=>[n.id,[]]));
-  const refsIn=new Map(nodes.map(n=>[n.id,[]]));
-  edges.forEach(e=>{ refsOut.get(e.from).push({to:e.to,label:e.label,kind:e.kind}); refsIn.get(e.to).push({from:e.from,label:e.label}); });
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const nodes=data.nodes||[], byId=new Map(nodes.map(n=>[n.id,n]));
+  const edges=(data.edges||[]).filter(e=>byId.has(e.from)&&byId.has(e.to));
   const nm=id=>byId.get(id).label;
 
-  KORDER.forEach(kind=>{
-    const group=nodes.filter(n=>n.kind===kind);
-    if(!group.length) return;
-    const gd=document.createElement('div'); gd.className='kgroup';
-    const h=document.createElement('h3');
-    h.innerHTML=`<span class="kdot ${kind}"></span> ${KLABEL[kind]}`;
-    gd.appendChild(h);
-    const grid=document.createElement('div'); grid.className='grid';
-    group.forEach(n=>{
-      const c=document.createElement('div'); c.className='app'+(n.status==='planned'?' planned':'');
-      const nameHtml = n.viewer ? `<a href="./schema.html?app=${n.id}">${n.label}</a>` : n.label;
-      const st=n.status||'';
-      let refsHtml='';
-      const out=refsOut.get(n.id).filter(r=>r.kind!=='pointer');
-      const pointer=refsOut.get(n.id).filter(r=>r.kind==='pointer');
-      const inbound=refsIn.get(n.id);
-      if(out.length) refsHtml+=`<div><span class="lab">references</span> ${out.map(r=>`<b>${nm(r.to)}</b> <span class="lab">(${r.label})</span>`).join(', ')}</div>`;
-      if(pointer.length) refsHtml+=`<div><span class="lab">selector pointer →</span> ${pointer.map(r=>`<b>${nm(r.to)}</b>`).join(', ')}</div>`;
-      if(kind==='spine'||kind==='builder'){ if(inbound.length) refsHtml+=`<div><span class="lab">referenced by</span> ${inbound.map(r=>nm(r.from)).join(', ')}</div>`; }
-      if(!refsHtml) refsHtml='<div class="none">standalone — no references yet</div>';
-      c.innerHTML=`<div class="top"><span class="name">${nameHtml}</span>${st?`<span class="st ${st}">${st}</span>`:''}</div>`+
-                  `<div class="role">${n.role}</div><div class="refs">${refsHtml}</div>`;
-      grid.appendChild(c);
-    });
-    gd.appendChild(grid); tree.appendChild(gd);
-  });
+  const refsOut=new Map(nodes.map(n=>[n.id,[]]));
+  const refsIn=new Map(nodes.map(n=>[n.id,[]]));
+  edges.forEach(e=>{ refsOut.get(e.from).push(e); refsIn.get(e.to).push(e); });
 
+  const TIERS=[
+    {kind:'spine',   label:'Spines · shared backbone'},
+    {kind:'builder', label:'Builders · own an entity + its assignments'},
+    {kind:'spoke',   label:'Spokes · reference the spines'},
+    {kind:'util',    label:'Utilities · reference data'}
+  ];
+
+  function cardHTML(n){
+    const cls=`node ${n.kind}${n.status==='planned'?' planned':''}${n.viewer?' link':''}`;
+    const badge=n.status?`<span class="badge">${esc(n.status)}</span>`:'';
+    const out=refsOut.get(n.id).filter(e=>e.kind!=='pointer');
+    const ptr=refsOut.get(n.id).filter(e=>e.kind==='pointer');
+    const inb=refsIn.get(n.id);
+    let refs='';
+    if(out.length) refs+=`<div><span class="lab">references</span> ${out.map(e=>`<b>${esc(nm(e.to))}</b> <span class="lab">(${esc(e.label)})</span>`).join(', ')}</div>`;
+    if(ptr.length) refs+=`<div><span class="lab">selector pointer →</span> ${ptr.map(e=>`<b>${esc(nm(e.to))}</b>`).join(', ')}</div>`;
+    if((n.kind==='spine'||n.kind==='builder') && inb.length) refs+=`<div><span class="lab">referenced by</span> ${inb.map(e=>esc(nm(e.from))).join(', ')}</div>`;
+    if(!refs) refs=`<div><span class="lab">standalone — no links yet</span></div>`;
+    const nameInner = n.viewer ? `${esc(n.label)} <span class="arrow">→</span> ${badge}` : `${esc(n.label)} ${badge}`;
+    const inner=`<div class="nm">${nameInner}</div><div class="role">${esc(n.role)}</div><div class="refs">${refs}</div>`;
+    return n.viewer
+      ? `<a class="${cls}" href="./schema.html?app=${esc(n.id)}">${inner}</a>`
+      : `<div class="${cls}">${inner}</div>`;
+  }
+
+  let html='';
+  TIERS.forEach(t=>{
+    const group=nodes.filter(n=>n.kind===t.kind);
+    if(!group.length) return;
+    html+=`<div class="tier"><div class="tier-label">${esc(t.label)}</div><div class="row">${group.map(cardHTML).join('')}</div></div>`;
+  });
+  tiers.innerHTML=html || '<div id="m2">No apps in the index yet.</div>';
   document.getElementById('foot').textContent=`URITP FileMaker package map · ${nodes.length} apps · reads ./package-graph.json`;
 })();
 </script>
