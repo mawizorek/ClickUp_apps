@@ -1,0 +1,8 @@
+{
+  "_meta": {
+    "app": "uritp-global-setup",
+    "description": "D-007 object verification ledger. Keyed by object path relative to the app root. Absence of an entry = unverified (safe default). Everything is unverified in this first pass — nothing confirmed against the live FMP file yet.",
+    "generated": "2026-07-18"
+  },
+  "verified": {}
+}

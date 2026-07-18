@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "app": "uritp-global-setup",
+    "schemaVersion": "1.1",
+    "generated": "2026-07-18",
+    "intent": "TARGET-STATE config spine. Slow-changing org reference data only. Operational entities (PRODUCTIONS) AND assignment/position data (Staff Positions) are owned by their spoke, not here (DG-001, DG-005, greenfield discipline).",
+    "status": "target-state draft, unverified against live file",
+    "conventions": {
+      "keys": "bare PrimaryKey + fk<Parent> style (matches uritp-people + HML house style)",
+      "excluded": [
+        "PRODUCTIONS → owned by the Productions/Company builder; GS keeps only selector table-occurrences (match-key context), not the table",
+        "Staff Positions / position assignments → owned by LABOUR (DG-005). Positions are so intertwined with employment + student-worker assignment that they are operational, not config. GS carries nothing; contact sheets get a title by joining THROUGH Labour at report time."
+      ]
+    }
+  },
+  "tables": [
+    {
+      "name": "GLOBAL_USAGE_VARIABLES",
+      "role": "singleton-config",
+      "status": "under-review",
+      "description": "Single-row org config. Branding + the three fiscal-year pointers every app reads. Never hardcode these locally.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "Header_Logo", "type": "container", "key": "plain", "category": "branding", "notes": "URITP logo used across all files" },
+        { "name": "FULL_COMPANY_NAME", "type": "text", "key": "plain", "category": "branding", "notes": "University of Rochester International Theatre Program" },
+        { "name": "SHORT_COMPANY_NAME", "type": "text", "key": "plain", "category": "branding" },
+        { "name": "COMPANY_ACRONYM", "type": "text", "key": "plain", "category": "branding", "notes": "URITP" },
+        { "name": "fkCURRENT_FISCAL_YEAR", "type": "text-uuid", "key": "fk", "category": "fiscal", "notes": "→ Fiscal_Years; set by the rollover step-scripts" },
+        { "name": "fkPREVIOUS_FISCAL_YEAR", "type": "text-uuid", "key": "fk", "category": "fiscal", "notes": "→ Fiscal_Years" },
+        { "name": "fkNEXT_FISCAL_YEAR", "type": "text-uuid", "key": "fk", "category": "fiscal", "notes": "→ Fiscal_Years" }
+      ]
+    },
+    {
+      "name": "Fiscal_Years",
+      "role": "reference",
+      "status": "under-review",
+      "description": "Fiscal-year definitions. Referenced by GLOBAL_USAGE_VARIABLES pointers, Academic_Periods, and the builder-owned PRODUCTIONS.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "popup_short", "type": "text", "key": "plain", "category": "label", "notes": "short display label for dropdowns" },
+        { "name": "Title", "type": "text", "key": "plain", "category": "label", "notes": "e.g. FY27" },
+        { "name": "StartDate", "type": "date", "key": "plain", "category": "range" },
+        { "name": "EndDate", "type": "date", "key": "plain", "category": "range" },
+        { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" }
+      ]
+    },
+    {
+      "name": "Academic_Periods",
+      "role": "reference",
+      "status": "under-review",
+      "description": "Semester/term definitions, each tied to a fiscal year. Consumed by semester-aware apps (Courses, Labour).",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "fkFiscalYear", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ Fiscal_Years" },
+        { "name": "popup_short", "type": "text", "key": "plain", "category": "label" },
+        { "name": "Title", "type": "text", "key": "plain", "category": "label", "notes": "e.g. Fall 2026, Spring 2027" },
+        { "name": "StartDate", "type": "date", "key": "plain", "category": "range" },
+        { "name": "EndDate", "type": "date", "key": "plain", "category": "range" }
+      ]
+    },
+    {
+      "name": "Departments",
+      "role": "reference",
+      "status": "under-review",
+      "description": "Shared department reference. Consumed by department-aware apps (Labour, Inventory, Safety, budget apps). NOTE: Labour's position/assignment tables reference THIS for department, keeping departments the shared spine while positions live in Labour.",
+      "fields": [
+        { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
+        { "name": "Name", "type": "text", "key": "plain", "category": "label", "notes": "full department name" },
+        { "name": "Short Name", "type": "text", "key": "plain", "category": "label", "notes": "abbreviation" },
+        { "name": "CreatedBy", "type": "text", "key": "audit", "category": "audit" },
+        { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
+        { "name": "ModificationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
+        { "name": "ModifiedBy", "type": "text", "key": "audit", "category": "audit" }
+      ]
+    }
+  ]
+}

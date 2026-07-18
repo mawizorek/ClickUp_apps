@@ -1,0 +1,14 @@
+{
+  "_meta": {
+    "app": "uritp-global-setup",
+    "schemaVersion": "1.1",
+    "generated": "2026-07-18",
+    "description": "Global Setup internal edges. Fiscal_Years is the fanout hub for time. Staff_Positions was removed (moved to Labour, DG-005). PRODUCTIONS is builder-owned and NOT represented here; cross-file references (other apps → GS) live in each consumer's own relationships.json."
+  },
+  "relationships": [
+    { "from": { "table": "GLOBAL_USAGE_VARIABLES", "field": "fkCURRENT_FISCAL_YEAR" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review", "notes": "active year pointer" },
+    { "from": { "table": "GLOBAL_USAGE_VARIABLES", "field": "fkPREVIOUS_FISCAL_YEAR" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review" },
+    { "from": { "table": "GLOBAL_USAGE_VARIABLES", "field": "fkNEXT_FISCAL_YEAR" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review" },
+    { "from": { "table": "Academic_Periods", "field": "fkFiscalYear" }, "to": { "table": "Fiscal_Years", "field": "PrimaryKey" }, "cardinality": "many-to-one", "status": "under-review", "notes": "each term belongs to a fiscal year" }
+  ]
+}
