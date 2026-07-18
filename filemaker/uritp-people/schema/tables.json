@@ -1,15 +1,16 @@
 {
   "_meta": {
     "app": "uritp-people",
-    "schemaVersion": "1.1",
+    "schemaVersion": "1.2",
     "generated": "2026-07-18",
     "intent": "TARGET-STATE schema — the source of truth to build TOWARD, not a mirror of the old file. Researched from the ClickUp 'URITP People FMP' doc, then edited: fields earn their place or get cut.",
     "status": "target-state draft, unverified against live file",
     "conventions": {
       "keys": "BARE style LOCKED (Michael 2026-07-18): PrimaryKey + fkPERSON/fkContact etc. This app does NOT use pk_/fk_ prefixes. Matches HML house style.",
       "typosCorrected": "prefferedFirstName→preferredFirstName, prefferedLastName→preferredLastName, namePronounciation→namePronunciation",
-      "cutThisPass": ["emailTEMP (legacy import staging)", "hiddenLatestImport (import-batch cruft, not identity)"],
-      "graduated": ["ADULTS_ext Department+Title → Staff-Positions layer via fkStaffPosition"]
+      "cutThisPass": ["emailTEMP (legacy import staging)", "hiddenLatestImport (import-batch cruft)", "broadClassification (now DERIVED from extension existence, not stored — W1)"],
+      "graduated": ["ADULTS_ext Department+Title → Staff-Positions layer via fkStaffPosition; layer is GLOBAL SETUP-owned reference data (W1)"],
+      "derived": ["Student/Non-Student classification = which role extension a person holds (STUDENTS_ext / ADULTS_ext), not a stored flag"]
     }
   },
   "tables": [
@@ -17,7 +18,7 @@
       "name": "PEOPLE",
       "role": "identity-hub",
       "status": "under-review",
-      "description": "Canonical identity record, one per human. Lean target: names + display cascade + pronunciation + playbill credit + broad classification + ClickUp merge handle + audit. No app-specific fields.",
+      "description": "Canonical identity record, one per human. Lean target: names + display cascade + pronunciation + playbill credit + ClickUp merge handle + audit. Classification is derived from extension existence, not stored. No app-specific fields.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "First Name", "type": "text", "key": "plain", "category": "name", "notes": "true legal first" },
@@ -31,7 +32,6 @@
         { "name": "autoFirstLast", "type": "calc", "key": "plain", "category": "name", "notes": "'First Last' working name (preferred if set, else true)" },
         { "name": "autoLastFirst", "type": "calc", "key": "plain", "category": "name", "notes": "'Last, First' working name" },
         { "name": "customID", "type": "text", "key": "plain", "category": "id", "notes": "KEEP: CRM-### human-readable merge handle to ClickUp (with email). distinct from the machine-only UUID PK" },
-        { "name": "broadClassification", "type": "text", "key": "plain", "category": "classification", "status": "pending", "notes": "Student / Non-Student; powers chooser start context. confirm explicit stored flag vs derived from extension existence" },
         { "name": "summary_CountPeople", "type": "summary", "key": "plain", "category": "meta" },
         { "name": "ScratchNotes", "type": "text", "key": "plain", "category": "notes" },
         { "name": "CreationTimestamp", "type": "timestamp", "key": "audit", "category": "audit" },
@@ -44,7 +44,7 @@
       "name": "STUDENTS_ext",
       "role": "role-extension",
       "status": "under-review",
-      "description": "Student role extension off PEOPLE (one-to-one via fkPERSON). Carries student-specific IDENTITY facts (student ID, class year) per the 'editable identity facts live in People' ruling. Enrollment history does NOT live here — it's a Courses spoke link.",
+      "description": "Student role extension off PEOPLE (one-to-one via fkPERSON). Carries student-specific IDENTITY facts (student ID, class year) per the 'editable identity facts live in People' ruling. Enrollment history does NOT live here — it's a Courses spoke link. Existence of this record = Student classification context.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
@@ -58,12 +58,12 @@
       "name": "ADULTS_ext",
       "role": "role-extension",
       "status": "pending",
-      "description": "Non-student role extension off PEOPLE (one-to-one via fkPERSON). Faculty, staff, guest artists, vendors, volunteers. Dept/Title graduate to a Staff-Positions layer via fkStaffPosition (Michael ruling 2026-07-18).",
+      "description": "Non-student role extension off PEOPLE (one-to-one via fkPERSON). Faculty, staff, guest artists, vendors, volunteers. Dept/Title graduate to a Staff-Positions layer via fkStaffPosition; that layer is Global-Setup-owned reference data (W1). Existence of this record = Non-Student classification context.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
         { "name": "AdultType", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Faculty, Staff, Adjunct, Guest Artist, Vendor, Volunteer" },
-        { "name": "fkStaffPosition", "type": "text-uuid", "key": "fk", "category": "classification", "status": "pending", "notes": "→ Staff-Positions layer (Department + Title/level). replaces as-built free-text Department/Title. layer home TBD (dedicated table vs Labour spoke)" },
+        { "name": "fkStaffPosition", "type": "text-uuid", "key": "fk", "category": "classification", "status": "pending", "notes": "→ Staff-Positions layer (Department + Title/level), GLOBAL SETUP-owned reference data (W1). replaces as-built free-text Department/Title. seeds from _setup_Staff Positions / URJobProfileLevels / Supervisors" },
         { "name": "AdultStatus", "type": "text", "key": "plain", "category": "classification", "notes": "value list: Active, Inactive" },
         { "name": "NotesAdult", "type": "text", "key": "plain", "category": "notes" },
         { "name": "StartDate", "type": "date", "key": "plain", "category": "lifecycle" },
@@ -76,7 +76,7 @@
       "name": "CONTACT_INFORMATION",
       "role": "contact",
       "status": "under-review",
-      "description": "One record per person. Primary phone/email + parent of the child Emails / PhoneNumbers tables (multiple per person). Q4 ruling: keep the full tree.",
+      "description": "One record per person. Primary phone/email + parent of the child Emails / PhoneNumbers tables (multiple per person). Q4 ruling: keep the full tree. Cascade-delete of children REVERSED (W1) — deleting a person does not purge contact history.",
       "fields": [
         { "name": "PrimaryKey", "type": "text-uuid", "key": "pk", "category": "key" },
         { "name": "fkPERSON", "type": "text-uuid", "key": "fk", "category": "key", "notes": "→ PEOPLE.PrimaryKey" },
