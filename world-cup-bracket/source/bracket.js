@@ -1,5 +1,5 @@
 // World Cup 2026 Bracket - bracket view. Card tap opens the shared detail
-// sheet; the right-side \u2192 arrow ADDS/REMOVES a team to the multi-team path
+// sheet; the right-side → arrow ADDS/REMOVES a team to the multi-team path
 // compare (paths.js owns the set + colors + convergence).
 import { S } from './store.js';
 import { isComplete, slotLabel, ROUND_ORDER } from './util.js';
@@ -12,8 +12,10 @@ let resetBound = false;
 // 3rd-place match(es) render as a small standalone node under the Final, NOT wired
 // into the championship tree (its teams are the SF LOSERS, so it isn't part of the
 // feedsTo path). Reuses the round-label styling so no CSS change is needed.
+// NOTE: data.json labels this round "3rd Place"; older data used "3P". Match both
+// so the card can't silently vanish on a label change again.
 function thirdPlaceBlock() {
-  const tp = S.allMatches.filter(m => m.round === '3P');
+  const tp = S.allMatches.filter(m => m.round === '3P' || m.round === '3rd Place');
   if (!tp.length) return '';
   return `<div class="bracket-round-label" style="margin-top:14px">3rd Place</div>`
     + tp.map(renderBracketMatch).join('');
@@ -95,7 +97,7 @@ function bindBracketTaps() {
   });
 }
 
-// Legend chip row: per-chip \u00d7 removes one, Clear all resets. Delegated once.
+// Legend chip row: per-chip × removes one, Clear all resets. Delegated once.
 let legendBound = false;
 function bindLegend() {
   if (legendBound) return; legendBound = true;
