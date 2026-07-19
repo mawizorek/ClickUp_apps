@@ -1,15 +1,17 @@
 <!doctype html>
 <!-- INFRASTRUCTURE: modular router shell + pages/ partials (hash router, theme spine) +
      a JS data layer (js/*.js) that binds the dashboard to a unified Day object.
-     Pages-hosted only, not file:// capable. Started from template-app/ (gold standard). -->
+     Pages-hosted only, not file:// capable. Started from template-app/ (gold standard).
+     THEME: points at the composed 4-vector theme `sharp-utility` (color maw-dark-utility ×
+     typography sharp-racing × forms sharp × spacing tight). resolve.js composes all four. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1117">
 <meta name="robots" content="noindex, nofollow">
-<!-- EARLY THEME: set the saved theme before first paint so a saved non-default theme
-     paints instantly (no flash). themes.css keys off this attribute. -->
+<!-- EARLY THEME: set the saved color before first paint so a saved non-default color
+     paints instantly (no flash). themes.css keys off this attribute for the color spine. -->
 <script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <title>Retrocast</title>
 <meta name="description" content="Today's weather against the historical record for this calendar day, plus an on-this-day almanac. Multi-location, factual.">
@@ -25,10 +27,10 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#127777;</text></svg>">
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
-<!-- THEME SPINE: static themes.css = instant themed first paint; resolve.js = live switching. -->
+<!-- THEME SPINE: static themes.css = instant themed first paint (color); resolve.js composes all 4 vectors. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=2">
-<link rel="stylesheet" href="./objects.css?v=2">
+<link rel="stylesheet" href="./styles.css?v=3">
+<link rel="stylesheet" href="./objects.css?v=3">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -52,20 +54,21 @@
 <!-- THEME SPINE -->
 <script src="../shared/themes/resolve.js"></script>
 <!-- APP CHROME -->
-<script src="./chrome.js?v=2"></script>
+<script src="./chrome.js?v=3"></script>
 <!-- DATA LAYER (order matters): store -> providers -> day; then UI: dashboard -> app -->
-<script src="./js/store.js?v=2"></script>
-<script src="./js/providers.js?v=2"></script>
-<script src="./js/day.js?v=2"></script>
-<script src="./js/dashboard.js?v=2"></script>
-<script src="./js/app.js?v=2"></script>
+<script src="./js/store.js?v=3"></script>
+<script src="./js/providers.js?v=3"></script>
+<script src="./js/day.js?v=3"></script>
+<script src="./js/dashboard.js?v=3"></script>
+<script src="./js/app.js?v=3"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
   var APP_NAME    = "Retrocast";
   var APP_VERSION = "v1";
   var APP_PR      = 0;              // direct-to-main scaffold commit for v1 (no PR yet)
-  var DEFAULT_THEME = "maw-dark-utility";
+  var APP_THEME   = "sharp-utility";     // composed 4-vector theme (color+typography+forms+spacing)
+  var DEFAULT_COLOR = "maw-dark-utility"; // color-only fallback if the join can't load
   var DEFAULT_PAGE  = "home";
   var NAV = [
     { route: "home",  label: "Dashboard" },
@@ -73,12 +76,16 @@
   ];
   /* ====================== */
 
-  /* ---- THEME ---- */
-  var savedTheme = null;
-  try { savedTheme = localStorage.getItem("app_theme"); } catch (e) {}
-  var bootTheme = savedTheme || DEFAULT_THEME;
-  if (window.THEMES) { THEMES.apply(bootTheme, { root: document.documentElement }); }
-  else { document.documentElement.setAttribute("data-theme", bootTheme); }
+  /* ---- THEME: point at the composed 4-vector theme; the settings picker overrides COLOR only,
+     keeping the app's forms/typography/spacing. resolve.js sets every token inline. ---- */
+  if (window.THEMES && THEMES.applyTheme) {
+    THEMES.applyTheme(APP_THEME).then(function () {
+      var saved = null; try { saved = localStorage.getItem("app_theme"); } catch (e) {}
+      if (saved && THEMES.apply) THEMES.apply(saved, { silent: true }); // hue swap, keep the feel
+    });
+  } else {
+    document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
+  }
 
   /* ---- ACCESS GATE ---- */
   (function gate() {
@@ -119,7 +126,7 @@
   /* ---- CHROME ---- */
   Chrome.init({
     appName: APP_NAME, version: APP_VERSION, pr: APP_PR,
-    nav: NAV, defaultTheme: DEFAULT_THEME, logo: "\uD83C\uDF21",
+    nav: NAV, defaultTheme: DEFAULT_COLOR, logo: "\uD83C\uDF21",
     sources: [ { label: "Source \u2197", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/retrocast" } ]
   });
 
