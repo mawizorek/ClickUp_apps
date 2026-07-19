@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-18c",
+  "version": "2026-07-18d",
   "tournament": "FIFA World Cup 2026",
   "matches": [
     {
@@ -15,7 +15,10 @@
       "as": 0,
       "winner": "home",
       "venue": "SoFi Stadium, Inglewood, CA",
-      "feedsTo": 9
+      "feedsTo": 9,
+      "goals": [
+        { "m": "90+2", "p": "Eustáquio", "t": "h" }
+      ]
     },
     {
       "id": 2,
@@ -30,7 +33,12 @@
       "as": 1,
       "winner": "home",
       "venue": "Houston Stadium, Houston, TX",
-      "feedsTo": 11
+      "feedsTo": 11,
+      "goals": [
+        { "m": "29", "p": "Sano", "t": "a" },
+        { "m": "56", "p": "Casemiro", "t": "h" },
+        { "m": "90+5", "p": "Martinelli", "t": "h" }
+      ]
     },
     {
       "id": 3,
@@ -46,7 +54,11 @@
       "psoNote": "Paraguay 4-3 pens",
       "winner": "away",
       "venue": "Boston Stadium, Foxborough, MA",
-      "feedsTo": 10
+      "feedsTo": 10,
+      "goals": [
+        { "m": "42", "p": "Enciso", "t": "a" },
+        { "m": "54", "p": "Havertz", "t": "h" }
+      ]
     },
     {
       "id": 4,
@@ -62,7 +74,11 @@
       "psoNote": "Morocco 3-2 pens",
       "winner": "away",
       "venue": "Estadio Monterrey, Guadalupe, Mexico",
-      "feedsTo": 9
+      "feedsTo": 9,
+      "goals": [
+        { "m": "72", "p": "Gakpo", "t": "h" },
+        { "m": "90+1", "p": "Issa Diop", "t": "a" }
+      ]
     },
     {
       "id": 5,
@@ -77,7 +93,12 @@
       "as": 0,
       "winner": "home",
       "venue": "MetLife Stadium, East Rutherford, NJ",
-      "feedsTo": 10
+      "feedsTo": 10,
+      "goals": [
+        { "m": "45", "p": "Mbappé", "t": "h" },
+        { "m": "53", "p": "Barcola", "t": "h" },
+        { "m": "74", "p": "Mbappé", "t": "h" }
+      ]
     },
     {
       "id": 6,
@@ -92,7 +113,12 @@
       "as": 2,
       "winner": "away",
       "venue": "Dallas Stadium, Arlington, TX",
-      "feedsTo": 11
+      "feedsTo": 11,
+      "goals": [
+        { "m": "39", "p": "Nusa", "t": "a" },
+        { "m": "74", "p": "Diallo", "t": "h" },
+        { "m": "86", "p": "Haaland", "t": "a" }
+      ]
     },
     {
       "id": 7,
@@ -107,7 +133,11 @@
       "as": 0,
       "winner": "home",
       "venue": "Estadio Azteca, Mexico City",
-      "feedsTo": 12
+      "feedsTo": 12,
+      "goals": [
+        { "m": "22", "p": "Quiñones", "t": "h" },
+        { "m": "31", "p": "Jiménez", "t": "h" }
+      ]
     },
     {
       "id": 8,
@@ -122,7 +152,12 @@
       "as": 1,
       "winner": "home",
       "venue": "Mercedes-Benz Stadium, Atlanta",
-      "feedsTo": 12
+      "feedsTo": 12,
+      "goals": [
+        { "m": "7", "p": "Cipenga", "t": "a" },
+        { "m": "75", "p": "Kane", "t": "h" },
+        { "m": "86", "p": "Kane", "t": "h" }
+      ]
     },
     {
       "id": 9,
@@ -137,7 +172,12 @@
       "as": 3,
       "winner": "away",
       "venue": "NRG Stadium, Houston",
-      "feedsTo": 25
+      "feedsTo": 25,
+      "goals": [
+        { "m": "50", "p": "Ounahi", "t": "a" },
+        { "m": "82", "p": "Ounahi", "t": "a" },
+        { "m": "90+8", "p": "Rahimi", "t": "a" }
+      ]
     },
     {
       "id": 10,
@@ -152,7 +192,10 @@
       "as": 1,
       "winner": "away",
       "venue": "Lincoln Financial Field, Philadelphia",
-      "feedsTo": 25
+      "feedsTo": 25,
+      "goals": [
+        { "m": "70", "p": "Mbappé", "t": "a", "pen": true }
+      ]
     },
     {
       "id": 11,
@@ -167,7 +210,12 @@
       "as": 2,
       "winner": "away",
       "venue": "MetLife Stadium, East Rutherford",
-      "feedsTo": 27
+      "feedsTo": 27,
+      "goals": [
+        { "m": "79", "p": "Haaland", "t": "a" },
+        { "m": "90", "p": "Haaland", "t": "a" },
+        { "m": "90+10", "p": "Neymar", "t": "h", "pen": true }
+      ]
     },
     {
       "id": 12,
@@ -182,7 +230,14 @@
       "as": 3,
       "winner": "away",
       "venue": "Estadio Azteca, Mexico City",
-      "feedsTo": 27
+      "feedsTo": 27,
+      "goals": [
+        { "m": "36", "p": "Bellingham", "t": "a" },
+        { "m": "38", "p": "Bellingham", "t": "a" },
+        { "m": "42", "p": "Quiñones", "t": "h" },
+        { "m": "60", "p": "Kane", "t": "a", "pen": true },
+        { "m": "69", "p": "Jiménez", "t": "h", "pen": true }
+      ]
     },
     {
       "id": 13,
@@ -197,7 +252,10 @@
       "as": 1,
       "winner": "away",
       "venue": "AT&T Stadium, Arlington",
-      "feedsTo": 26
+      "feedsTo": 26,
+      "goals": [
+        { "m": "90+1", "p": "Merino", "t": "a" }
+      ]
     },
     {
       "id": 14,
@@ -212,7 +270,14 @@
       "as": 4,
       "winner": "away",
       "venue": "Lumen Field, Seattle",
-      "feedsTo": 26
+      "feedsTo": 26,
+      "goals": [
+        { "m": "9", "p": "De Ketelaere", "t": "a" },
+        { "m": "31", "p": "Tillman", "t": "h" },
+        { "m": "33", "p": "De Ketelaere", "t": "a" },
+        { "m": "57", "p": "Vanaken", "t": "a" },
+        { "m": "90+3", "p": "Lukaku", "t": "a" }
+      ]
     },
     {
       "id": 15,
@@ -227,7 +292,14 @@
       "as": 2,
       "winner": "home",
       "venue": "Mercedes-Benz Stadium, Atlanta",
-      "feedsTo": 28
+      "feedsTo": 28,
+      "goals": [
+        { "m": "15", "p": "Ibrahim", "t": "a" },
+        { "m": "67", "p": "Zico", "t": "a" },
+        { "m": "79", "p": "Romero", "t": "h" },
+        { "m": "83", "p": "Messi", "t": "h" },
+        { "m": "90+2", "p": "Enzo Fernández", "t": "h" }
+      ]
     },
     {
       "id": 16,
@@ -259,7 +331,14 @@
       "aet": true,
       "winner": "home",
       "venue": "Lumen Field, Seattle",
-      "feedsTo": 14
+      "feedsTo": 14,
+      "goals": [
+        { "m": "25", "p": "Diarra", "t": "a" },
+        { "m": "51", "p": "Sarr", "t": "a" },
+        { "m": "86", "p": "Lukaku", "t": "h" },
+        { "m": "89", "p": "Tielemans", "t": "h" },
+        { "m": "120+5", "p": "Tielemans", "t": "h", "pen": true }
+      ]
     },
     {
       "id": 18,
@@ -274,7 +353,11 @@
       "as": 0,
       "winner": "home",
       "venue": "Levi's Stadium, Santa Clara",
-      "feedsTo": 14
+      "feedsTo": 14,
+      "goals": [
+        { "m": "45", "p": "Balogun", "t": "h" },
+        { "m": "82", "p": "Tillman", "t": "h" }
+      ]
     },
     {
       "id": 19,
@@ -289,7 +372,12 @@
       "as": 0,
       "winner": "home",
       "venue": "SoFi Stadium, Inglewood, CA",
-      "feedsTo": 13
+      "feedsTo": 13,
+      "goals": [
+        { "m": "36", "p": "Oyarzabal", "t": "h" },
+        { "m": "66", "p": "Porro", "t": "h" },
+        { "m": "89", "p": "Oyarzabal", "t": "h" }
+      ]
     },
     {
       "id": 20,
@@ -304,7 +392,12 @@
       "as": 1,
       "winner": "home",
       "venue": "Toronto Stadium, Toronto",
-      "feedsTo": 13
+      "feedsTo": 13,
+      "goals": [
+        { "m": "53", "p": "Perišić", "t": "a" },
+        { "m": "68", "p": "Ronaldo", "t": "h", "pen": true },
+        { "m": "90+4", "p": "Ramos", "t": "h" }
+      ]
     },
     {
       "id": 21,
@@ -320,7 +413,14 @@
       "aet": true,
       "winner": "home",
       "venue": "Hard Rock Stadium, Miami Gardens",
-      "feedsTo": 15
+      "feedsTo": 15,
+      "goals": [
+        { "m": "29", "p": "Messi", "t": "h" },
+        { "m": "59", "p": "Duarte", "t": "a" },
+        { "m": "92", "p": "L. Martínez", "t": "h" },
+        { "m": "103", "p": "Lopes Cabral", "t": "a" },
+        { "m": "111", "p": "Borges (OG)", "t": "h", "og": true }
+      ]
     },
     {
       "id": 22,
@@ -336,7 +436,11 @@
       "psoNote": "Egypt 4-2 pens",
       "winner": "away",
       "venue": "AT&T Stadium, Arlington",
-      "feedsTo": 15
+      "feedsTo": 15,
+      "goals": [
+        { "m": "13", "p": "Ashour", "t": "a" },
+        { "m": "55", "p": "Hany (OG)", "t": "h", "og": true }
+      ]
     },
     {
       "id": 23,
@@ -351,7 +455,11 @@
       "as": 0,
       "winner": "home",
       "venue": "BC Place, Vancouver",
-      "feedsTo": 16
+      "feedsTo": 16,
+      "goals": [
+        { "m": "10", "p": "Embolo", "t": "h" },
+        { "m": "46", "p": "Ndoye", "t": "h" }
+      ]
     },
     {
       "id": 24,
@@ -366,7 +474,10 @@
       "as": 0,
       "winner": "home",
       "venue": "Arrowhead Stadium, Kansas City",
-      "feedsTo": 16
+      "feedsTo": 16,
+      "goals": [
+        { "m": "14", "p": "Arias", "t": "h" }
+      ]
     },
     {
       "id": 25,
