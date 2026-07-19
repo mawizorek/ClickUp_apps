@@ -1,156 +1,133 @@
-/* day.js — assembles the unified Day object (spec §5). UI binds ONLY to this shape,
-   no matter the underlying source. Storage tiers (spec §4): read OUR durable floor
-   (data/<slug>/baseline.tsv) FIRST for normal/spread/records, then live-fetch only the
-   gaps — today's value (FORECAST endpoint) + the archive series for the weather twin.
-   Cache fronts it all and is the outage fallback. Honesty is load-bearing: sampleYears
-   travels with every normal so a sparse day reports its true confidence, never fakes it. */
-(function () {
-  var VARS = [
-    { key: "tempHigh", label: "High temp", unit: "\u00b0F", di: "temperature_2m_max", col: "tempHigh" },
-    { key: "tempLow",  label: "Low temp",  unit: "\u00b0F", di: "temperature_2m_min", col: "tempLow" },
-    { key: "precip",   label: "Precip",    unit: "in",       di: "precipitation_sum", col: "precip" },
-    { key: "wind",     label: "Wind",      unit: "mph",      di: "wind_speed_10m_max", col: "wind" },
-    { key: "snow",     label: "Snowfall",  unit: "in",       di: "snowfall_sum", col: "snow" }
-  ];
+/* day.js — assembles the unified Day SERIES (the pivot, spec §5/§6 recast). Everything the
+   dashboard binds to comes from ONE normalized shape so all five variables share a single
+   graph. Core idea: plot STANDARDIZED ANOMALY (σ from each variable's own this-day normal),
+   so °F / inches / mph become comparable and the ±1σ band is the shared historical envelope.
 
-  // The LOCATION's local date drives the whole object (spec §7), not the browser's.
+   Window (spec §6 recast): offsets PAST..FUTURE around today's LOCAL date. Left of / at today =
+   realized (forecast endpoint's past_days actuals); right of today = forecast (expected). Deep
+   history (per-calendar-day normal + sd) from the ARCHIVE endpoint. Two-endpoint truth kept.
+   Honesty: sampleYears travels with the series; raw values kept for the readout card; sd floored
+   per var (precip/snow are zero-heavy, so σ is rougher there — the card shows the true numbers). */
+(function () {
+  var PAST = 14, FUTURE = 7;
+  var VARS = [
+    { key: "tempHigh", label: "High",  unit: "\u00b0F", di: "temperature_2m_max", floor: 1.5 },
+    { key: "tempLow",  label: "Low",   unit: "\u00b0F", di: "temperature_2m_min", floor: 1.5 },
+    { key: "precip",   label: "Precip",unit: "in",       di: "precipitation_sum", floor: 0.15 },
+    { key: "wind",     label: "Wind",  unit: "mph",      di: "wind_speed_10m_max", floor: 2 },
+    { key: "snow",     label: "Snow",  unit: "in",       di: "snowfall_sum", floor: 0.3 }
+  ];
+  var CLAMP = 3.4;
+
   function localDate(tz) {
-    try {
-      return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-    } catch (e) { return new Date().toISOString().slice(0, 10); }
+    try { return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()); }
+    catch (e) { return new Date().toISOString().slice(0, 10); }
+  }
+  function offsetDate(iso, off) {
+    var p = iso.split("-"); var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12));
+    d.setUTCDate(d.getUTCDate() + off);
+    return d.toISOString().slice(0, 10);
   }
   function mean(a) { return a.length ? a.reduce(function (x, y) { return x + y; }, 0) / a.length : null; }
+  function sd(a, m) {
+    if (a.length < 2 || m == null) return null;
+    var s = a.reduce(function (t, x) { return t + (x - m) * (x - m); }, 0) / (a.length - 1);
+    return Math.sqrt(s);
+  }
   function round(n, d) { if (n == null || isNaN(n)) return null; var f = Math.pow(10, d || 1); return Math.round(n * f) / f; }
-  function num(s) { if (s == null || s === "") return null; var n = parseFloat(s); return isNaN(n) ? null : n; }
+  function clampZ(z) { return z == null ? null : Math.max(-CLAMP, Math.min(CLAMP, z)); }
 
-  /* ---- TIER 1: durable floor. Parse the committed baseline.tsv row for this mmdd. ---- */
-  function statsFromBaseline(tsvText, mmdd) {
-    if (!tsvText) return null;
-    var lines = tsvText.split(/\r?\n/).filter(function (l) { return l && l[0] !== "#"; });
-    if (lines.length < 2) return null;
-    var head = lines[0].split("\t");
-    var col = {}; head.forEach(function (h, i) { col[h] = i; });
-    for (var r = 1; r < lines.length; r++) {
-      var cells = lines[r].split("\t");
-      if (cells[col.mmdd] !== mmdd) continue;
-      var normal = {}, spread = {};
-      VARS.forEach(function (v) {
-        normal[v.key] = num(cells[col[v.col + "_normal"]]);
-        var mn = num(cells[col[v.col + "_min"]]), mx = num(cells[col[v.col + "_max"]]);
-        spread[v.key] = (mn != null && mx != null) ? { min: mn, max: mx } : null;
-      });
-      normal.sampleYears = num(cells[col.sampleYears]);
-      var records = {
-        recordHigh: num(cells[col.recordHigh]), recordHighYear: num(cells[col.recordHighYear]),
-        recordLow: num(cells[col.recordLow]), recordLowYear: num(cells[col.recordLowYear])
-      };
-      return { normal: normal, spread: spread, records: records };
+  /* index the archive: mmdd -> per-var array of values across all years */
+  function indexArchive(series) {
+    var map = {};
+    if (!series || !series.time) return map;
+    for (var i = 0; i < series.time.length; i++) {
+      var mmdd = series.time[i].slice(5);
+      if (!map[mmdd]) { map[mmdd] = {}; VARS.forEach(function (v) { map[mmdd][v.di] = []; }); }
+      VARS.forEach(function (v) { var val = (series[v.di] || [])[i]; if (val != null) map[mmdd][v.di].push(val); });
     }
-    return null; // mmdd not in file (shouldn't happen for a full 366-row baseline)
+    return map;
+  }
+  /* index the forecast window: date -> per-var value */
+  function indexForecast(fc) {
+    var map = {};
+    if (!fc || !fc.time) return map;
+    for (var i = 0; i < fc.time.length; i++) {
+      map[fc.time[i]] = {};
+      VARS.forEach(function (v) { map[fc.time[i]][v.di] = (fc[v.di] || [])[i]; });
+    }
+    return map;
   }
 
-  /* ---- TIER 2 fallback: compute this-day stats live from a multi-year archive series. ---- */
-  function statsFromArchive(series, mmdd) {
-    if (!series || !series.time) return null;
-    var idx = [];
-    for (var i = 0; i < series.time.length; i++) if (series.time[i].slice(5) === mmdd) idx.push(i);
-    var normal = {}, spread = {}, records = {};
-    VARS.forEach(function (v) {
-      var c = series[v.di] || [];
-      var vals = idx.map(function (k) { return c[k]; }).filter(function (x) { return x != null; });
-      normal[v.key] = round(mean(vals), 1);
-      if (vals.length) {
-        var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
-        spread[v.key] = { min: round(lo, 1), max: round(hi, 1) };
-        if (v.key === "tempHigh") { records.recordHigh = round(hi, 1); records.recordHighYear = yearOf(series, idx, c, hi); }
-        if (v.key === "tempLow")  { records.recordLow  = round(lo, 1); records.recordLowYear  = yearOf(series, idx, c, lo); }
-      } else spread[v.key] = null;
-    });
-    normal.sampleYears = idx.length;
-    return { normal: normal, spread: spread, records: records };
-  }
-  function yearOf(series, idx, col, target) {
-    for (var j = 0; j < idx.length; j++) if (col[idx[j]] === target) return +series.time[idx[j]].slice(0, 4);
-    return null;
-  }
-
-  /* Weather twin: past year whose this-day high+low best matches today (spec Q12). Needs the series. */
-  function findTwin(series, mmdd, today) {
-    if (!series || !series.time || !today) return null;
-    var best = null, hi = series.temperature_2m_max || [], lo = series.temperature_2m_min || [];
+  function twinYear(series, mmdd, todayHi, todayLo) {
+    if (!series || !series.time || todayHi == null || todayLo == null) return null;
+    var hi = series.temperature_2m_max || [], lo = series.temperature_2m_min || [], best = null;
     for (var i = 0; i < series.time.length; i++) {
       if (series.time[i].slice(5) !== mmdd || hi[i] == null || lo[i] == null) continue;
-      var d = Math.abs(hi[i] - today.tempHigh) + Math.abs(lo[i] - today.tempLow);
-      if (!best || d < best.score) best = { year: +series.time[i].slice(0, 4), score: round(d, 1) };
+      var dd = Math.abs(hi[i] - todayHi) + Math.abs(lo[i] - todayLo);
+      if (!best || dd < best.d) best = { year: +series.time[i].slice(0, 4), d: dd };
     }
-    return best;
+    return best ? best.year : null;
   }
 
-  function pick(daily) {
-    if (!daily) return null;
-    var o = {};
-    VARS.forEach(function (v) { var arr = daily[v.di] || []; o[v.key] = round(arr[arr.length - 1], 1); });
-    return o;
-  }
-
-  function loadBaseline(slug) {
-    return fetch("./data/" + slug + "/baseline.tsv", { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw 0; return r.text(); })
-      .catch(function () { return null; }); // no committed baseline yet = fine, archive covers it
-  }
-
-  /* Assemble the full Day. Baseline floor is preferred for stats; archive is twin + stats fallback. */
-  function build(loc) {
-    var date = localDate(loc.tz);
-    var mmdd = date.slice(5);
-    var thisYear = +date.slice(0, 4);
-    var cached = Store.getCached(loc.slug, mmdd);
-    var startYear = thisYear - 30, endYear = thisYear - 1;
+  function buildSeries(loc) {
+    var today = localDate(loc.tz);
+    var thisYear = +today.slice(0, 4), startYear = thisYear - 30, endYear = thisYear - 1;
 
     return Promise.all([
-      Providers.forecastToday(loc).catch(function () { return null; }),
-      loadBaseline(loc.slug),
+      Providers.forecastWindow(loc, PAST, FUTURE).catch(function () { return null; }),
       Providers.archiveSeries(loc, startYear, endYear).catch(function () { return null; })
     ]).then(function (res) {
-      var fc = res[0], baselineText = res[1], arch = res[2];
-      var today = fc ? pick(fc) : (cached && cached.day.weather.today) || null;
+      var fc = res[0], arch = res[1];
+      var aMap = indexArchive(arch), fMap = indexForecast(fc);
 
-      // Tier 1 (baseline file) preferred; Tier 2 (live archive) fills in; cache is last resort.
-      var stats = statsFromBaseline(baselineText, mmdd)
-        || (arch ? statsFromArchive(arch, mmdd) : null)
-        || (cached && { normal: cached.day.weather.normal, spread: cached.day.weather.spread, records: cached.day.weather.records })
-        || null;
-      var source = statsFromBaseline(baselineText, mmdd) ? "baseline" : (arch ? "archive" : (cached ? "cache" : null));
+      var offsets = [], windowRows = [];
+      for (var o = -PAST; o <= FUTURE; o++) offsets.push(o);
 
-      var twin = arch ? findTwin(arch, mmdd, today) : (cached && cached.day.weather.twin) || null;
+      var varsOut = VARS.map(function (v) {
+        return { key: v.key, label: v.label, unit: v.unit, floor: v.floor,
+          normal: [], sd: [], zActual: [], zForecast: [], rawActual: [], rawForecast: [] };
+      });
 
-      var anomaly = {};
-      if (today && stats && stats.normal) {
-        VARS.forEach(function (v) {
-          if (today[v.key] != null && stats.normal[v.key] != null) anomaly[v.key] = round(today[v.key] - stats.normal[v.key], 1);
+      offsets.forEach(function (o, oi) {
+        var d = offsetDate(today, o), mmdd = d.slice(5), isFuture = d > today;
+        windowRows.push({ offset: o, date: d, mmdd: mmdd, isFuture: isFuture });
+        VARS.forEach(function (v, vi) {
+          var vals = (aMap[mmdd] && aMap[mmdd][v.di]) || [];
+          var m = round(mean(vals), 2), s = round(sd(vals, mean(vals)), 3);
+          varsOut[vi].normal.push(m); varsOut[vi].sd.push(s);
+          var fval = fMap[d] ? fMap[d][v.di] : null;
+          var raw = (fval == null ? null : round(fval, 2));
+          var z = (raw != null && m != null && s != null) ? clampZ((raw - m) / Math.max(s, v.floor)) : null;
+          if (isFuture) { varsOut[vi].rawForecast.push(raw); varsOut[vi].zForecast.push(z == null ? null : round(z, 2)); varsOut[vi].rawActual.push(null); varsOut[vi].zActual.push(null); }
+          else { varsOut[vi].rawActual.push(raw); varsOut[vi].zActual.push(z == null ? null : round(z, 2)); varsOut[vi].rawForecast.push(null); varsOut[vi].zForecast.push(null); }
         });
-      }
+      });
 
-      var day = {
-        date: date,
-        location: loc,
-        weather: {
-          today: today,
-          normal: stats ? stats.normal : null,
-          spread: stats ? stats.spread : null,
-          records: stats ? stats.records : null,
-          anomaly: anomaly,
-          twin: twin,
-          baselineYears: { start: startYear, end: endYear },
-          source: source
-        },
-        almanac: null, // hydrated separately (shared MM-DD feed)
-        stale: !fc && !arch && !baselineText
+      // today snapshot (offset 0) + headline (most anomalous var today)
+      var zeroIdx = offsets.indexOf(0);
+      var perVar = {}, headline = null;
+      VARS.forEach(function (v, vi) {
+        var vo = varsOut[vi];
+        var raw = vo.rawActual[zeroIdx]; if (raw == null) raw = vo.rawForecast[zeroIdx];
+        var z = vo.zActual[zeroIdx]; if (z == null) z = vo.zForecast[zeroIdx];
+        var m = vo.normal[zeroIdx];
+        var dev = (raw != null && m != null) ? round(raw - m, 1) : null;
+        perVar[v.key] = { value: raw, normal: m, sd: vo.sd[zeroIdx], z: z, dev: dev, unit: v.unit, label: v.label };
+        if (z != null && (!headline || Math.abs(z) > Math.abs(headline.z))) headline = { key: v.key, label: v.label, z: z, dev: dev, value: raw, normal: m, unit: v.unit };
+      });
+
+      var mmdd0 = today.slice(5);
+      var sampleYears = (aMap[mmdd0] && aMap[mmdd0].temperature_2m_max) ? aMap[mmdd0].temperature_2m_max.length : null;
+      var analog = twinYear(arch, mmdd0, perVar.tempHigh.value, perVar.tempLow.value);
+
+      return {
+        date: today, location: loc, offsets: offsets, window: windowRows, vars: varsOut,
+        today: perVar, headline: headline, analog: analog,
+        meta: { sampleYears: sampleYears, start: startYear, end: endYear, stale: (!fc && !arch), hasArchive: !!arch, hasForecast: !!fc }
       };
-      if (today || stats) Store.setCached(loc.slug, mmdd, day);
-      return day;
     });
   }
 
-  window.DayModel = { build: build, VARS: VARS, localDate: localDate };
+  window.DayModel = { buildSeries: buildSeries, VARS: VARS, localDate: localDate, PAST: PAST, FUTURE: FUTURE };
 })();
