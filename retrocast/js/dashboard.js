@@ -15,8 +15,16 @@
   var VARS = (window.DayModel && DayModel.VARS) || [];
   function pickVar(k) { return VARS.filter(function (x) { return x.key === k; })[0] || VARS[0]; }
 
-  /* ---- DEPARTURE GAUGE: eyebrow + huge data-colored number + word, the distribution fused in
-     as its own baseline, and a quiet credibility footnote. One block, no border, no card. ---- */
+  var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function prettyDate(iso) {
+    if (!iso) return "";
+    var p = iso.split("-"); if (p.length < 3) return iso;
+    return MON[(+p[1] - 1) % 12] + " " + (+p[2]) + ", " + p[0];
+  }
+
+  /* ---- DEPARTURE GAUGE: eyebrow (place + date) + huge data-colored number + word, the
+     distribution fused in as its baseline with a legible legend, then a quiet credibility
+     footnote. One block, no border, no card. ---- */
   function departure(day, activeVarKey) {
     var w = day.weather, v = pickVar(activeVarKey), loc = day.location || {};
     var a = w.anomaly ? w.anomaly[v.key] : null;
@@ -38,9 +46,12 @@
             (nPct != null ? '<span class="rc-dist-normal" style="left:' + nPct + '%"></span>' : "") +
             (tPct != null ? '<span class="rc-dist-today" style="left:' + tPct + '%"></span>' : "") +
           '</div>' +
-          '<div class="rc-dist-scale"><span>' + fmt(lo, v.unit) + '</span>' +
-            '<span class="rc-dist-mid">30-year range · ● today · | normal</span>' +
-            '<span>' + fmt(hi, v.unit) + '</span></div>' +
+          '<div class="rc-dist-ends"><span>' + fmt(lo, v.unit) + '</span><span>' + fmt(hi, v.unit) + '</span></div>' +
+          '<div class="rc-dist-legend">' +
+            '<span class="rc-lg rc-lg-today">today ' + fmt(today, v.unit) + '</span>' +
+            '<span class="rc-lg rc-lg-normal">normal ' + fmt(normal, v.unit) + '</span>' +
+            '<span class="rc-lg-cap">' + esc(v.label.toLowerCase()) + ' · 30-year range for this day</span>' +
+          '</div>' +
         '</div>';
     }
 
@@ -50,30 +61,32 @@
     cred.push("ERA5"); cred.push("as of " + esc(day.date));
     if (day.stale) cred.push("cached");
 
+    var eyebrow = esc(loc.name || "");
+    if (day.date) eyebrow += '<span class="rc-dep-date">' + esc(prettyDate(day.date)) + '</span>';
+
     return '<section class="rc-departure" data-dir="' + dir + '">' +
-      '<div class="rc-dep-eyebrow">' + esc(loc.name || "") + '</div>' +
+      '<div class="rc-dep-eyebrow">' + eyebrow + '</div>' +
       '<div class="rc-dep-read">' +
         '<span class="rc-dep-num">' + signed(a) + '</span>' +
         '<span class="rc-dep-unit">' + esc(v.unit) + '</span>' +
         '<span class="rc-dep-word">' + esc(word(a)) + '</span>' +
       '</div>' +
-      '<div class="rc-dep-sub">Today ' + fmt(today, v.unit) + ' against ' + fmt(normal, v.unit) + ' normal · ' + esc(v.label.toLowerCase()) + '</div>' +
       dist +
       '<div class="rc-dep-cred">' + cred.join(" \u00b7 ") + '</div>' +
     '</section>';
   }
 
-  /* ---- INSTRUMENT STAT STRIP: the key figures as a cluster on ONE panel, hairline-divided
-     cells (no per-cell border, no rail). Skips gracefully when records are null (sparse). ---- */
+  /* ---- INSTRUMENT STAT STRIP: key figures as a cluster on ONE panel, hairline-divided cells
+     (no per-cell border, no rail). Record hi/lo carry a subtle direction tint. Sparse-safe. ---- */
   function stats(day) {
     var w = day.weather, r = w.records || {}, t = w.twin, cells = [];
-    function cell(label, val, sub) {
-      return '<div class="rc-stat"><div class="rc-stat-lab">' + esc(label) + '</div>' +
+    function cell(label, val, sub, tone) {
+      return '<div class="rc-stat' + (tone ? ' rc-stat-' + tone : '') + '"><div class="rc-stat-lab">' + esc(label) + '</div>' +
         '<div class="rc-stat-val">' + esc(val) + '</div>' +
         '<div class="rc-stat-sub">' + esc(sub == null ? "" : sub) + '</div></div>';
     }
-    if (r.recordHigh != null) cells.push(cell("Record high", r.recordHigh + "\u00b0", r.recordHighYear || ""));
-    if (r.recordLow != null)  cells.push(cell("Record low", r.recordLow + "\u00b0", r.recordLowYear || ""));
+    if (r.recordHigh != null) cells.push(cell("Record high", r.recordHigh + "\u00b0", r.recordHighYear || "", "up"));
+    if (r.recordLow != null)  cells.push(cell("Record low", r.recordLow + "\u00b0", r.recordLowYear || "", "down"));
     if (t && t.year)          cells.push(cell("Closest match", t.year, "most like today"));
     if (w.normal && w.normal.sampleYears != null) cells.push(cell("Sample", w.normal.sampleYears, "years on record"));
     if (!cells.length) return "";
