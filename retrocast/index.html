@@ -1,0 +1,150 @@
+<!doctype html>
+<!-- INFRASTRUCTURE: modular router shell + pages/ partials (hash router, theme spine) +
+     a JS data layer (js/*.js) that binds the dashboard to a unified Day object.
+     Pages-hosted only, not file:// capable. Started from template-app/ (gold standard). -->
+<html lang="en" data-theme="maw-dark-utility" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="robots" content="noindex, nofollow">
+<!-- EARLY THEME: set the saved theme before first paint so a saved non-default theme
+     paints instantly (no flash). themes.css keys off this attribute. -->
+<script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<title>Retrocast</title>
+<meta name="description" content="Today's weather against the historical record for this calendar day, plus an on-this-day almanac. Multi-location, factual.">
+<meta property="og:title" content="Retrocast">
+<meta property="og:description" content="Was today weird? Today's weather vs. the historical record for this exact calendar day, plus what happened on this day in history.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/retrocast/">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/retrocast/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Retrocast">
+<meta name="twitter:description" content="Today's weather vs. the historical record for this exact calendar day.">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/retrocast/og.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#127777;</text></svg>">
+<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<!-- THEME SPINE: static themes.css = instant themed first paint; resolve.js = live switching. -->
+<link rel="stylesheet" href="../shared/themes/themes.css">
+<link rel="stylesheet" href="./styles.css?v=1">
+<link rel="stylesheet" href="./objects.css?v=1">
+</head>
+<body>
+<div id="access-gate" hidden>
+  <div class="gate-card">
+    <h1 id="gate-title">Under maintenance</h1>
+    <p id="gate-msg">Retrocast is being updated. Check back soon.</p>
+    <form id="gate-form">
+      <input id="gate-code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autofocus aria-label="Access code" placeholder="0426">
+      <button type="submit">Enter</button>
+    </form>
+  </div>
+</div>
+
+<a class="skip-link" href="#view">Skip to content</a>
+<header id="appHeader"></header>
+<main id="view" tabindex="-1"></main>
+<footer id="appFooter"></footer>
+
+<noscript>Retrocast needs JavaScript enabled to run.</noscript>
+
+<!-- THEME SPINE -->
+<script src="../shared/themes/resolve.js"></script>
+<!-- APP CHROME -->
+<script src="./chrome.js?v=1"></script>
+<!-- DATA LAYER (order matters): store -> providers -> day; then UI: dashboard -> app -->
+<script src="./js/store.js?v=1"></script>
+<script src="./js/providers.js?v=1"></script>
+<script src="./js/day.js?v=1"></script>
+<script src="./js/dashboard.js?v=1"></script>
+<script src="./js/app.js?v=1"></script>
+<script>
+(function () {
+  /* ==== APP CONSTANTS ==== */
+  var APP_NAME    = "Retrocast";
+  var APP_VERSION = "v1";
+  var APP_PR      = 0;              // direct-to-main scaffold commit for v1 (no PR yet)
+  var DEFAULT_THEME = "maw-dark-utility";
+  var DEFAULT_PAGE  = "home";
+  var NAV = [
+    { route: "home",  label: "Dashboard" },
+    { route: "about", label: "About" }
+  ];
+  /* ====================== */
+
+  /* ---- THEME ---- */
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem("app_theme"); } catch (e) {}
+  var bootTheme = savedTheme || DEFAULT_THEME;
+  if (window.THEMES) { THEMES.apply(bootTheme, { root: document.documentElement }); }
+  else { document.documentElement.setAttribute("data-theme", bootTheme); }
+
+  /* ---- ACCESS GATE ---- */
+  (function gate() {
+    var FALLBACK = { access: "gated", code: "0426",
+      coverTitle: "Under maintenance", coverMessage: "Retrocast is being updated. Check back soon.",
+      downTitle: "Temporarily offline", downMessage: "Retrocast is currently unavailable." };
+    var SS = "gate_ok";
+    function focusCode() {
+      var c = document.getElementById("gate-code");
+      if (c) { try { c.focus(); c.select(); } catch (e) {} }
+    }
+    function apply(cfg) {
+      var g = document.getElementById("access-gate");
+      if (cfg.access === "open" || sessionStorage.getItem(SS) === "1") { g.remove(); return; }
+      g.hidden = false;
+      var form = document.getElementById("gate-form");
+      if (cfg.access === "down") {
+        document.getElementById("gate-title").textContent = cfg.downTitle || FALLBACK.downTitle;
+        document.getElementById("gate-msg").textContent  = cfg.downMessage || FALLBACK.downMessage;
+        form.style.display = "none"; return;
+      }
+      document.getElementById("gate-title").textContent = cfg.coverTitle || FALLBACK.coverTitle;
+      document.getElementById("gate-msg").textContent  = cfg.coverMessage || FALLBACK.coverMessage;
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (document.getElementById("gate-code").value.trim() === String(cfg.code)) {
+          sessionStorage.setItem(SS, "1"); g.remove();
+        } else { var c = document.getElementById("gate-code"); c.value = ""; c.focus(); }
+      });
+      focusCode(); setTimeout(focusCode, 80);
+    }
+    fetch("./config.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); })
+      .catch(function () { var c = null; try { c = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(c || FALLBACK); });
+  })();
+
+  /* ---- CHROME ---- */
+  Chrome.init({
+    appName: APP_NAME, version: APP_VERSION, pr: APP_PR,
+    nav: NAV, defaultTheme: DEFAULT_THEME, logo: "\uD83C\uDF21",
+    sources: [ { label: "Source \u2197", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/retrocast" } ]
+  });
+
+  /* ---- ROUTER: hash -> pages/<route>.html injected into #view.
+     After injecting, dispatch page:render so the data layer (app.js) can hydrate
+     dynamic pages (the dashboard) into the freshly-injected markup. ---- */
+  var view = document.getElementById("view");
+  var routes = NAV.map(function (n) { return n.route; });
+  function render(route) {
+    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
+    fetch("./pages/" + route + ".html", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+      .then(function (html) {
+        view.innerHTML = html; Chrome.setActive(route); view.focus(); window.scrollTo(0, 0);
+        window.dispatchEvent(new CustomEvent("page:render", { detail: { route: route } }));
+      })
+      .catch(function () {
+        view.innerHTML = '<section class="page"><h1>Page not found</h1>' +
+          '<p class="muted">No page matches <code>#' + route + '</code>.</p></section>';
+      });
+  }
+  function current() { return (location.hash || "").replace(/^#/, "") || DEFAULT_PAGE; }
+  window.addEventListener("hashchange", function () { render(current()); });
+  render(current());
+})();
+</script>
+</body>
+</html>
