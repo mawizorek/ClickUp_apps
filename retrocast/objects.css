@@ -1,87 +1,102 @@
 /* objects.css — Retrocast dashboard presentation. Theme-driven (var(--token) from the 4-vector
-   sharp-utility theme). Bold instrument composition, NOT a card wall.
-   Design laws: NO side-stripe borders anywhere, NO boxed-card-per-item, NO hero-metric template.
-   Hierarchy from scale + weight + surface elevation + hairline dividers + VARIED spacing.
-   The library objects (departure hero, range band, ribbon) are recomposed, not one-off'd. */
+   sharp-utility theme). The unified anomaly graph is the centerpiece; supporting blocks are quiet.
+   Design laws: no side-stripe borders, no boxed-card-per-item, no hero-metric template.
+   Five-variable color map (categorical, shared light/dark): tempHigh=data-1, tempLow=data-2,
+   precip=data-3, wind=data-4, snow=accent-2. */
 
 .rc-page { max-width: 900px; }
 
 /* ============ LOCATION TABS (underline, no box) ============ */
-.rc-switch { display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-bottom: var(--border-w) solid var(--border); margin-bottom: var(--s6); }
+.rc-switch { display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-bottom: var(--border-w) solid var(--border); margin-bottom: var(--s5); }
 .rc-switch::-webkit-scrollbar { display: none; }
 .rc-loc { flex: 0 0 auto; font: inherit; font-weight: 600; font-size: 0.82rem; padding: 10px 15px; cursor: pointer; background: transparent; color: var(--text-faint); border: 0; border-bottom: 2px solid transparent; margin-bottom: calc(-1 * var(--border-w)); transition: color 140ms var(--ease, ease); letter-spacing: 0.01em; white-space: nowrap; }
 .rc-loc:hover { color: var(--text-soft); }
 .rc-loc.on { color: var(--text); border-bottom-color: var(--accent); }
 .rc-addbtn { color: var(--text-faint); font-family: var(--font-mono); font-size: 1rem; padding: 10px 14px; }
 
-/* ============ DEPARTURE GAUGE (the one dominant element) ============
-   No border, no card. Sits on the page surface; a generous well of space sets it apart.
-   The big number is DATA-colored (warm above / cool below) — meaningful, not decorative. */
-.rc-departure { padding: var(--s2) 0 var(--s6); margin-bottom: var(--s5); border-bottom: var(--border-w) solid var(--border); }
-.rc-dep-eyebrow { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-soft); margin-bottom: var(--s3); }
-.rc-dep-date { font-family: var(--font-mono); font-weight: 500; letter-spacing: 0.02em; color: var(--text-faint); text-transform: none; }
-.rc-dep-read { display: flex; align-items: baseline; gap: var(--s2); flex-wrap: wrap; }
-.rc-dep-num { font-family: var(--font-mono); font-size: clamp(4rem, 22vw, 7.5rem); font-weight: 700; line-height: 0.85; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; color: var(--text); }
-.rc-dep-unit { font-family: var(--font-mono); font-size: clamp(1.2rem, 5vw, 2.1rem); font-weight: 500; color: var(--text-soft); }
-.rc-dep-word { font-size: 0.84rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-left: var(--s2); align-self: center; }
-/* data-driven hue: number + word + today-marker carry the departure direction */
-.rc-departure[data-dir="up"]   .rc-dep-num, .rc-departure[data-dir="up"]   .rc-dep-word { color: var(--warn); }
-.rc-departure[data-dir="down"] .rc-dep-num, .rc-departure[data-dir="down"] .rc-dep-word { color: var(--info); }
-.rc-departure[data-dir="flat"] .rc-dep-word { color: var(--text-soft); }
-.rc-departure.rc-err .rc-dep-word { color: var(--bad); }
-.rc-departure.rc-err .rc-dep-sub, .rc-dep-sub { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-faint); margin-top: var(--s3); }
+/* ============ HEADLINE (the “what's weird today” line) ============ */
+.rc-head { margin-bottom: var(--s5); }
+.rc-eyebrow { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-soft); margin-bottom: var(--s2); }
+.rc-eyebrow-d { font-family: var(--font-mono); font-weight: 500; letter-spacing: 0.02em; color: var(--text-faint); text-transform: none; }
+.rc-lead-line { font-size: clamp(1.35rem, 4.5vw, 1.9rem); font-weight: 800; letter-spacing: -0.03em; margin: 0; line-height: 1.15; color: var(--text); }
+.rc-lead-line b { font-family: var(--font-mono); font-weight: 700; }
+.rc-head[data-dir="up"]   .rc-lead-line b { color: var(--warn); }
+.rc-head[data-dir="down"] .rc-lead-line b { color: var(--info); }
+.rc-lead-sub { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-faint); margin: var(--s2) 0 0; }
 
-/* distribution fused into the gauge as its baseline — today vs the 30-year range for this day */
-.rc-dist { margin-top: var(--s5); }
-.rc-dist-bar { position: relative; height: 6px; border-radius: 999px; background: var(--surface-2); }
-.rc-dist-fill { position: absolute; top: 0; height: 6px; border-radius: 999px; opacity: 0.45; background: var(--text-faint); }
-.rc-departure[data-dir="up"]   .rc-dist-fill { background: var(--warn); }
-.rc-departure[data-dir="down"] .rc-dist-fill { background: var(--info); }
-.rc-dist-normal { position: absolute; top: -3px; transform: translateX(-50%); width: 2px; height: 12px; background: var(--text-soft); border-radius: 1px; }
-.rc-dist-today { position: absolute; top: -4px; transform: translateX(-50%); width: 14px; height: 14px; border-radius: 50%; background: var(--text); border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--text); }
-.rc-departure[data-dir="up"]   .rc-dist-today { background: var(--warn); box-shadow: 0 0 0 1px var(--warn); }
-.rc-departure[data-dir="down"] .rc-dist-today { background: var(--info); box-shadow: 0 0 0 1px var(--info); }
-.rc-dist-ends { display: flex; justify-content: space-between; margin-top: var(--s2); font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
-.rc-dist-legend { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); margin-top: var(--s3); font-size: 0.74rem; color: var(--text-soft); }
-.rc-lg { font-family: var(--font-mono); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 6px; }
-.rc-lg::before { content: ""; display: inline-block; }
-.rc-lg-today::before { width: 10px; height: 10px; border-radius: 50%; background: var(--text); }
-.rc-departure[data-dir="up"]   .rc-lg-today::before { background: var(--warn); }
-.rc-departure[data-dir="down"] .rc-lg-today::before { background: var(--info); }
-.rc-lg-normal::before { width: 2px; height: 12px; background: var(--text-soft); }
-.rc-lg-cap { color: var(--text-faint); font-size: 0.72rem; }
-.rc-dep-cred { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); margin-top: var(--s4); }
+/* ============ THE UNIFIED GRAPH ============ */
+.rc-graph-wrap { margin-bottom: var(--s3); }
+.rc-graph { width: 100%; height: auto; display: block; overflow: visible; }
+/* bands = shared historical ghost envelope */
+.rc-g-band2 { fill: var(--surface-1); }
+.rc-g-band1 { fill: var(--surface-2); }
+.rc-g-grid { stroke: var(--border); stroke-width: 1; opacity: 0.5; }
+.rc-g-zero { stroke: var(--text-soft); stroke-width: 1.5; }
+.rc-g-today { stroke: var(--text-faint); stroke-width: 1; stroke-dasharray: 3 3; }
+.rc-g-ylab, .rc-g-xlab { font-family: var(--font-mono); font-size: 11px; fill: var(--text-faint); }
+.rc-g-todaylab { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; fill: var(--text-soft); }
+/* lines */
+.rc-g-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.rc-g-line.is-dim { opacity: 0.28; stroke-width: 1.5; }
+.rc-g-line.is-emph { opacity: 1; stroke-width: 2.5; }
+.rc-g-fore { stroke-dasharray: 4 4; }
+.rc-g-dot { stroke: var(--bg); stroke-width: 1.5; }
+.rc-g-dot.is-today { stroke-width: 2.5; }
+/* the 5 variable hues (categorical data slots + accent-2) */
+.rc-g-tempHigh { stroke: var(--data-1); } .rc-g-tempHigh .rc-leg-dot, .rc-g-tempHigh.rc-dv-key .rc-leg-dot { background: var(--data-1); }
+.rc-g-tempLow  { stroke: var(--data-2); }
+.rc-g-precip   { stroke: var(--data-3); }
+.rc-g-wind     { stroke: var(--data-4); }
+.rc-g-snow     { stroke: var(--accent-2); }
+circle.rc-g-tempHigh { fill: var(--data-1); } circle.rc-g-tempLow { fill: var(--data-2); }
+circle.rc-g-precip { fill: var(--data-3); } circle.rc-g-wind { fill: var(--data-4); }
+circle.rc-g-snow { fill: var(--accent-2); }
 
-/* ============ VARIABLE SELECTOR (segmented control) ============ */
-.rc-vartoggle { display: flex; flex-wrap: wrap; margin-bottom: var(--s5); border: var(--border-w) solid var(--border); border-radius: var(--radius); overflow: hidden; width: fit-content; max-width: 100%; }
-.rc-seg { font: inherit; font-size: 0.74rem; font-weight: 600; padding: 8px 13px; min-height: 34px; cursor: pointer; background: transparent; color: var(--text-faint); border: 0; border-right: var(--border-w) solid var(--border); text-transform: uppercase; letter-spacing: 0.05em; transition: background 120ms var(--ease, ease), color 120ms var(--ease, ease); }
-.rc-seg:last-child { border-right: 0; }
-.rc-seg:hover { color: var(--text); background: var(--surface-2); }
-.rc-seg.on { color: var(--on-accent); background: var(--accent); }
+/* ============ LEGEND (emphasis control) + analog caption ============ */
+.rc-legend-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
+.rc-legend { display: flex; flex-wrap: wrap; gap: var(--s1); }
+.rc-leg { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 0.74rem; font-weight: 600; padding: 5px 10px; cursor: pointer; background: transparent; color: var(--text-faint); border: var(--border-w) solid transparent; border-radius: var(--radius); transition: color 120ms var(--ease, ease), background 120ms var(--ease, ease); }
+.rc-leg:hover { color: var(--text-soft); background: var(--surface-2); }
+.rc-leg.on { color: var(--text); background: var(--surface-2); border-color: var(--border); }
+.rc-leg-dot { width: 9px; height: 9px; border-radius: 2px; background: var(--text-faint); display: inline-block; }
+.rc-leg.rc-g-tempHigh .rc-leg-dot { background: var(--data-1); }
+.rc-leg.rc-g-tempLow .rc-leg-dot { background: var(--data-2); }
+.rc-leg.rc-g-precip .rc-leg-dot { background: var(--data-3); }
+.rc-leg.rc-g-wind .rc-leg-dot { background: var(--data-4); }
+.rc-leg.rc-g-snow .rc-leg-dot { background: var(--accent-2); }
+.rc-analog { font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-faint); }
+.rc-analog b { color: var(--text-soft); }
+.rc-graph-note { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); margin: var(--s2) 0 var(--s6); }
 
-/* ============ INSTRUMENT STAT STRIP ============
-   One panel, hairline-divided cells. No per-cell border, no rail. Reads as a gauge cluster. */
-.rc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); background: var(--surface-1); border: var(--border-w) solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: var(--s6); }
-.rc-stat { padding: var(--s4); border-right: var(--border-w) solid var(--border); border-bottom: var(--border-w) solid var(--border); }
-.rc-stat-lab { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); }
-.rc-stat-val { font-family: var(--font-mono); font-size: 1.7rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin: 6px 0 2px; line-height: 1; }
-.rc-stat-sub { font-size: 0.7rem; color: var(--text-faint); font-family: var(--font-mono); }
-.rc-stat-up .rc-stat-val { color: var(--warn); }
-.rc-stat-down .rc-stat-val { color: var(--info); }
+/* ============ DEVIATION READOUT (all 5 facts, real numbers) ============ */
+.rc-readout { border-top: var(--border-w) solid var(--border); margin-bottom: var(--s6); }
+.rc-readout-head { display: grid; grid-template-columns: 1fr auto auto 3.6rem; gap: var(--s3); padding: var(--s3) 0 var(--s2); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); }
+.rc-readout-head span:first-child { grid-column: 2; } /* align the value/normal/dev/σ labels right-ward */
+.rc-dv { display: grid; grid-template-columns: 1fr auto auto 3.6rem; gap: var(--s3); align-items: center; padding: var(--s3) 0; border-bottom: var(--border-w) solid var(--border); }
+.rc-dv:last-of-type { border-bottom: 0; }
+.rc-dv-key { display: inline-flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--text); }
+.rc-dv-val { font-family: var(--font-mono); font-size: 0.92rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.rc-dv-norm { font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.rc-dv-sigma { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-soft); }
+.rc-dv[data-dir="up"] .rc-dv-sigma { color: var(--warn); }
+.rc-dv[data-dir="down"] .rc-dv-sigma { color: var(--info); }
+/* the deviation bar: centered zero, fill grows warm-right / cool-left */
+.rc-dv-track { grid-column: 1 / -1; position: relative; height: 4px; background: var(--surface-2); border-radius: 999px; margin-top: 2px; }
+.rc-dv-zero { position: absolute; left: 50%; top: -2px; width: var(--border-w); height: 8px; background: var(--text-faint); transform: translateX(-50%); }
+.rc-dv-fill { position: absolute; top: 0; height: 4px; border-radius: 999px; background: var(--text-faint); }
+.rc-dv-fill[data-dir="up"] { background: var(--warn); }
+.rc-dv-fill[data-dir="down"] { background: var(--info); }
+.rc-readout-cred { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); margin: var(--s3) 0 0; }
 
-/* ============ ON THIS DAY — a dense FEED, not a card grid ============ */
+/* ============ ON THIS DAY — dense feed ============ */
 .rc-alm { margin-top: var(--s5); }
 .rc-alm-top { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s5); }
 .rc-h2 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; margin: 0; color: var(--text); }
 .rc-alm-note { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-faint); }
 .rc-alm-sec { margin-bottom: var(--s6); }
 .rc-alm-h { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-soft); margin: 0 0 var(--s3); padding-bottom: var(--s2); border-bottom: var(--border-w) solid var(--border); }
-
-/* holidays: inline chips (short) */
 .rc-chips { display: flex; flex-wrap: wrap; gap: var(--s2); }
 .rc-chip-lite { font-size: 0.8rem; color: var(--text); background: var(--surface-2); border-radius: var(--radius); padding: 5px 11px; }
-
-/* events / births / deaths: hairline-separated rows, mono year gutter, no box, no rail */
 .rc-feed { list-style: none; margin: 0; padding: 0; }
 .rc-row { display: grid; grid-template-columns: 3.4rem 1fr; gap: var(--s3); padding: var(--s3) 0; border-bottom: var(--border-w) solid var(--border); align-items: baseline; }
 .rc-row:last-child { border-bottom: 0; }
@@ -95,14 +110,12 @@
 
 /* ============ MOTION (transform/opacity only; ease-out-expo; capped stagger) ============ */
 @media (prefers-reduced-motion: no-preference) {
-  .rc-departure, .rc-stats { animation: rc-rise 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .rc-head, .rc-graph-wrap, .rc-readout { animation: rc-rise 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
   .rc-row { animation: rc-rise 420ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
-  .rc-stat { animation: rc-fade 420ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 }
 @keyframes rc-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@keyframes rc-fade { from { opacity: 0; } to { opacity: 1; } }
 
 @media (min-width: 620px) {
-  .rc-dep-sub { font-size: 0.85rem; }
   .rc-row { grid-template-columns: 4rem 1fr; }
+  .rc-dv { grid-template-columns: 1.2fr auto auto 4rem; }
 }
