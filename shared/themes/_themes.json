@@ -1,12 +1,12 @@
 {
-  "schemaVersion": 2,
-  "note": "THE JOIN TABLE. A THEME binds the 4 independent vectors: Color, Typography, Forms, and Spacing.",
+  "schemaVersion": 3,
+  "note": "THE JOIN TABLE. A THEME binds the 4 independent vectors: Color, Typography, Forms, and Spacing. Apps reference a THEME slug via THEMES.applyTheme(slug) and the resolver composes all four. schemaVersion 3 (2026-07-19): confirmed 4-pointer shape end-to-end + added composed utility themes now that resolve.js actually applies every vector.",
   "vocabulary": {
-    "color": "entity — the 17-token palette (hue only). e.g. mclaren.",
-    "typography": "entity — type scale and fonts.",
-    "forms": "entity — tactility (radii, shadows, borders, gradient angles).",
-    "spacing": "entity — density (padding, gaps, touch targets).",
-    "theme": "JOIN — named combination of the above."
+    "color": "entity — the palette (hue only). e.g. maw-dark-utility.",
+    "typography": "entity — fonts + size ramp + tracking. e.g. sharp-racing.",
+    "forms": "entity — tactility: radii, border weight, shadows, elevation, motion, gradient angle. sharp | soft | grounded.",
+    "spacing": "entity — density: touch target, padding, gaps. tight | standard | loose.",
+    "theme": "JOIN — named combination of exactly one token from each of the four vectors."
   },
   "themes": [
     {
@@ -37,7 +37,37 @@
       "typography": "grounded",
       "forms": "grounded",
       "spacing": "standard",
-      "intendedUse": "Default non-F1 dashboard."
+      "intendedUse": "Default non-F1 dashboard — roomy/editorial."
+    },
+    {
+      "slug": "sharp-utility",
+      "name": "Sharp Utility",
+      "status": "locked",
+      "color": "maw-dark-utility",
+      "typography": "sharp-racing",
+      "forms": "sharp",
+      "spacing": "tight",
+      "intendedUse": "Tight instrument/data look — the sleek dashboard direction (Retrocast)."
+    },
+    {
+      "slug": "soft-utility",
+      "name": "Soft Utility",
+      "status": "locked",
+      "color": "maw-dark-utility",
+      "typography": "grounded",
+      "forms": "soft",
+      "spacing": "standard",
+      "intendedUse": "Balanced everyday default for new apps copied from template-app."
+    },
+    {
+      "slug": "sharp-carbon",
+      "name": "Sharp Carbon",
+      "status": "locked",
+      "color": "carbon",
+      "typography": "sharp-racing",
+      "forms": "sharp",
+      "spacing": "tight",
+      "intendedUse": "Neutral-cool tight instrument look; alternative to sharp-utility."
     }
   ]
 }
