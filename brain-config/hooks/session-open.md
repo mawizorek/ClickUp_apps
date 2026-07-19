@@ -3,7 +3,7 @@
 **Type:** MANDATORY gate — fires at the START of every substantive session.  
 **Trigger:** First user message in a new conversation where work will be done (not single-question lookups or casual chat).  
 **Created:** 2026-07-18 (Michael directive: mirror session-close at the top).  
-**Updated:** 2026-07-19 (Michael directive: scan the FULL session list — including closed & done — and REOPEN a precursor session over cutting a new task; keeps the board lean and threads context in line). Same day: hardened so a mid-session prompt/backfill to create is NOT an exemption from the scan.  
+**Updated:** 2026-07-19 (Michael directive: scan the FULL session list — including closed & done — and REOPEN a precursor session over cutting a new task; keeps the board lean and threads context in line). Same day: hardened so a mid-session prompt/backfill to create is NOT an exemption from the scan; added the "If picking up late in a session" addendum + wrong-reopen guard.  
 **Companion:** `session-close.md` (the bookend at session end).
 
 ---
@@ -31,6 +31,30 @@ The same holds for any backfill: if work has already escalated without a session
 
 ---
 
+## ⚠️ If picking up late in a session (ADDENDUM — read before backfilling)
+
+You are mid-work with no session task and now need one — either you caught it yourself or Michael asked. This is the highest-risk entry into the gate, because you already carry a full transcript and the temptation is to dump it somewhere fast. Do NOT. Run these explicit rules:
+
+**Run order (no skips, even though you're late):**
+1. **Scan first, always.** Full list, closed & done included (Step 1). Being late does not authorize skipping to create.
+2. **Apply the match-confidence bar (below) before ANY reopen.** A late pickup carries momentum toward "yeah that one's close enough" — that's exactly the impulse that dumps history into the wrong thread.
+3. **Reopen only on a HIGH-confidence match. Otherwise create fresh.** When uncertain, a new task is the SAFE default here — the inverse of the normal reopen-bias. A duplicate is cheap to merge later; a polluted real record is expensive to untangle.
+4. **Backfill into the chosen task, not before choosing it.** Reconstruct the transcript-so-far as catch-up comments only AFTER the target is confirmed.
+
+**Match-confidence bar (a reopen requires a HIGH-confidence match — ALL of these):**
+- Same subject/scope/domain as the current work, not merely adjacent or same-project.
+- The prior task's objective plausibly CONTAINS the current work (continuation), not just "related."
+- Nothing in its transcript contradicts it being the same thread.
+- If two candidates tie, that ambiguity itself FAILS the bar — create fresh, cross-link both, and flag for Michael.
+
+**When you reopen, make it reversible and visible:**
+- Post the resume comment as a clear seam: `Resumed <Mon DD> — continuing <what/why>; backfilling transcript from a late pickup.` So the join is auditable and a mis-join is spottable.
+- If you realize post-hoc you reopened the WRONG task: STOP, do not keep writing. Flag it to Michael, note the mis-join on both tasks, and split the backfilled transcript out to the correct/new task. A wrong reopen is a corruption to repair, not something to bury.
+
+**Why this addendum exists:** the wrong-reopen dump is strictly worse than a duplicate. A duplicate is additive and deletable; a wrong reopen splices this session's history into an unrelated record, corrupting a source of truth and misleading the next agent that reads it. Late pickups are where that happens, so the bias flips: uncertain → create, not reopen.
+
+---
+
 ## Steps (execute in order)
 
 ### 1. Scan the existing session list FIRST — including closed & done
@@ -41,7 +65,7 @@ The same holds for any backfill: if work has already escalated without a session
 - Search by scope / subject / domain keyword, not just the most recent tasks.
 - Look for: a parked `↪️ HANDOFF · …` task in the `to do` handoff slot, an `in progress` session on the same subject, or a recently closed/done session on the same thread.
 
-### 2. Reopen over create (default bias)
+### 2. Reopen over create (default bias — but see the late-pickup addendum for the exception)
 
 If the scan turns up a genuine precursor, **REOPEN it as a continued session** instead of starting a fresh task:
 
@@ -49,7 +73,7 @@ If the scan turns up a genuine precursor, **REOPEN it as a continued session** i
 - Post a resume comment ("Resumed <Mon DD> — continuing <what/why>").
 - If it's a parked handoff task, complete its warm-start prompt and keep going.
 
-Only fall through to step 3 when the scan finds **no genuine precursor**. Reopening keeps the board lean and threads context instead of scattering it across duplicate tasks.
+Only fall through to step 3 when the scan finds **no genuine precursor**. Reopening keeps the board lean and threads context instead of scattering it across duplicate tasks. **Exception (late pickup):** when you're backfilling mid-session and the match isn't HIGH-confidence, create fresh instead — see the addendum above.
 
 ### 3. Create a new session task (only if no precursor exists)
 
@@ -101,6 +125,7 @@ The line is: will this conversation produce changes to the workspace, repo, or g
 - Sessions with no Activity Board record (invisible work, no transcript, can't be resumed or audited)
 - **Duplicate session tasks for work that was already a thread** — a fresh task cut when a closed/done precursor should have been reopened, scattering context and bloating the board
 - **A blind create triggered by a "did you start your task?" prompt** — the nudge skips the scan and forks a duplicate instead of reopening the real precursor
+- **A wrong reopen on a late pickup** — dumping this session's transcript into an unrelated task, corrupting a real record (worse than a duplicate; guarded by the late-pickup addendum + match-confidence bar)
 - Git collisions from missing presence posts
 - Stale context from skipping the mandatory load step
 - Orphaned sessions that can't be picked up by a fresh agent
