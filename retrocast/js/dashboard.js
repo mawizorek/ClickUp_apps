@@ -1,7 +1,7 @@
-/* dashboard.js — pure render off the day.js SERIES. The graph is the centerpiece; everything
-   else supports it. Factual voice. All five variables are visible AT ONCE (the graph + the
-   readout card), so there is no click-through-one-at-a-time. Legend = emphasis control, not a
-   filter (nothing is hidden). Score removed; weather-twin demoted to a small analog caption. */
+/* dashboard.js — pure render off the day.js SERIES, focused on ONE day at a time (3-day zoom).
+   The headline + deviation readout reflect the CENTERED day (chevrons move it); all five variables
+   are still shown at once. Factual voice. Legend = emphasis control (nothing hidden). Score removed;
+   weather-twin demoted to a small analog caption. */
 (function () {
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function sgn(n, d) { if (n == null) return "\u2014"; var v = (d != null ? n.toFixed(d) : n); return (n > 0 ? "+" : "") + v; }
@@ -9,31 +9,50 @@
   function dir(z) { return z == null ? "flat" : (z > 0.15 ? "up" : (z < -0.15 ? "down" : "flat")); }
 
   var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var WDAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   function prettyDate(iso) { var p = (iso || "").split("-"); return p.length < 3 ? iso : MON[(+p[1] - 1) % 12] + " " + (+p[2]) + ", " + p[0]; }
+  function weekday(iso) { var p = (iso || "").split("-"); if (p.length < 3) return ""; return WDAY[new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay()]; }
+  function whenWord(off, isFuture) { if (off === 0) return "today"; if (off === -1) return "yesterday"; if (off === 1) return "tomorrow"; return isFuture ? "forecast" : "that day"; }
 
-  /* ---- headline: name today's standout variable (the honest “was today weird” answer) ---- */
-  function headline(s) {
-    var loc = s.location || {}, h = s.headline;
-    var eyebrow = '<div class="rc-eyebrow">' + esc(loc.name || "") + '<span class="rc-eyebrow-d">' + esc(prettyDate(s.date)) + '</span></div>';
-    if (!h) return '<section class="rc-head">' + eyebrow + '<h1 class="rc-lead-line">No live reading available.</h1></section>';
+  /* ---- headline: name the focused day's standout variable ---- */
+  function headline(series, focus) {
+    var snap = DayModel.snapshotAt(series, focus), loc = series.location || {}, h = snap.headline;
+    var when = whenWord(focus, snap.isFuture);
+    var eyebrow = '<div class="rc-eyebrow">' + esc(loc.name || "") +
+      '<span class="rc-eyebrow-d">' + esc(weekday(snap.date)) + ' · ' + esc(prettyDate(snap.date)) +
+      (focus !== 0 ? ' · ' + esc(when) : '') + '</span></div>';
+    if (!h) return '<section class="rc-head">' + eyebrow + '<h1 class="rc-lead-line">No reading available for this day.</h1></section>';
     if (Math.abs(h.z) < 1) {
       return '<section class="rc-head" data-dir="flat">' + eyebrow +
-        '<h1 class="rc-lead-line">Close to normal across the board today.</h1>' +
+        '<h1 class="rc-lead-line">Close to normal ' + esc(when) + '.</h1>' +
         '<p class="rc-lead-sub">Nothing more than 1\u03c3 off the 30-year normal for this date.</p></section>';
     }
     return '<section class="rc-head" data-dir="' + dir(h.z) + '">' + eyebrow +
-      '<h1 class="rc-lead-line">' + esc(h.label) + ' is today\u2019s standout: <b>' + sgn(h.z, 1) + '\u03c3</b></h1>' +
+      '<h1 class="rc-lead-line">' + esc(h.label) + ' ' + (snap.isFuture ? "projects" : "is") + ' the standout: <b>' + sgn(h.z, 1) + '\u03c3</b></h1>' +
       '<p class="rc-lead-sub">' + fmt(h.value, h.unit) + ' against ' + fmt(h.normal, h.unit) + ' normal · ' + sgn(h.dev) + h.unit + ' departure</p></section>';
   }
 
-  /* ---- graph + legend (emphasis control) ---- */
-  function graph(s, emphasis) { return '<div class="rc-graph-wrap">' + Graph.render(s, { emphasis: emphasis }) + '</div>'; }
+  /* ---- day navigator: chevrons step the focus ±1 day; disabled at the fetched bounds ---- */
+  function nav(series, focus) {
+    var b = series.bounds || { minFocus: -13, maxFocus: 13 };
+    var atMin = focus <= b.minFocus, atMax = focus >= b.maxFocus;
+    var snap = DayModel.snapshotAt(series, focus);
+    return '<div class="rc-nav">' +
+      '<button class="rc-nav-btn" data-nav="prev"' + (atMin ? ' disabled' : '') + ' aria-label="Previous day">\u2039</button>' +
+      '<div class="rc-nav-center"><span class="rc-nav-day">' + esc(weekday(snap.date)) + '</span>' +
+        '<span class="rc-nav-date">' + esc(prettyDate(snap.date)) + '</span></div>' +
+      '<button class="rc-nav-btn" data-nav="next"' + (atMax ? ' disabled' : '') + ' aria-label="Next day">\u203a</button>' +
+      (focus !== 0 ? '<button class="rc-nav-today" data-nav="today">today</button>' : '') +
+      '</div>';
+  }
 
-  function legend(s, emphasis) {
-    var caption = s.analog ? '<span class="rc-analog">closest analog: <b>' + esc(s.analog) + '</b></span>' : "";
+  function graph(series, focus, emphasis) { return '<div class="rc-graph-wrap">' + Graph.render(series, { focus: focus, emphasis: emphasis, span: 3 }) + '</div>'; }
+
+  function legend(series, emphasis) {
+    var caption = series.analog ? '<span class="rc-analog">closest analog: <b>' + esc(series.analog) + '</b></span>' : "";
     return '<div class="rc-legend-row">' +
       '<div class="rc-legend" role="tablist" aria-label="Emphasize variable">' +
-      s.vars.map(function (v) {
+      series.vars.map(function (v) {
         var on = v.key === emphasis;
         return '<button class="rc-leg rc-g-' + v.key + (on ? " on" : "") + '" role="tab" aria-selected="' + on + '" data-var="' + v.key + '">' +
           '<span class="rc-leg-dot"></span>' + esc(v.label) + '</button>';
@@ -41,10 +60,11 @@
       '<p class="rc-graph-note">solid = realized · dashed = forecast · band = ±1σ / ±2σ historical range for each day</p>';
   }
 
-  /* ---- deviation readout: every variable's real numbers as data points below the graph ---- */
-  function readout(s) {
-    var rows = s.vars.map(function (v) {
-      var t = s.today[v.key] || {}, z = t.z, d = dir(z);
+  /* ---- deviation readout: every variable for the FOCUSED day, real numbers + a centered bar ---- */
+  function readout(series, focus) {
+    var snap = DayModel.snapshotAt(series, focus);
+    var rows = series.vars.map(function (v) {
+      var t = snap.perVar[v.key] || {}, z = t.z, d = dir(z);
       var barPct = z == null ? 50 : Math.max(2, Math.min(98, 50 + (z / 3.5) * 48));
       var bar = '<span class="rc-dv-track"><span class="rc-dv-zero"></span>' +
         (z == null ? "" : '<span class="rc-dv-fill" data-dir="' + d + '" style="' + (z >= 0 ? 'left:50%;width:' + (barPct - 50) + '%' : 'left:' + barPct + '%;width:' + (50 - barPct) + '%') + '"></span>') +
@@ -57,18 +77,18 @@
         '<span class="rc-dv-sigma">' + (z == null ? "\u2014" : sgn(z, 1) + "\u03c3") + '</span>' +
       '</div>';
     }).join("");
-    var m = s.meta || {};
+    var m = series.meta || {};
     var cred = [];
     if (m.sampleYears != null) cred.push(m.sampleYears + " yrs " + m.start + "\u2013" + m.end);
-    cred.push("ERA5 · forecast"); cred.push("as of " + esc(s.date));
+    cred.push((snap.isFuture ? "forecast" : "realized") + " vs ERA5"); cred.push("as of " + esc(series.date));
     if (m.stale) cred.push("cached");
     return '<section class="rc-readout">' +
-      '<div class="rc-readout-head"><span>today</span><span>normal</span><span>departure</span><span>\u03c3</span></div>' +
+      '<div class="rc-readout-head"><span>' + esc(whenWord(focus, snap.isFuture)) + '</span><span>normal</span><span>departure</span><span>\u03c3</span></div>' +
       rows +
       '<p class="rc-readout-cred">' + cred.join(" \u00b7 ") + '</p></section>';
   }
 
-  /* ---- ON THIS DAY: dense feed (unchanged model) ---- */
+  /* ---- ON THIS DAY: dense feed (anchored on today; the almanac follows the calendar date) ---- */
   function almanac(al) {
     if (!al) return '<section class="rc-alm"><h2 class="rc-h2">On this day</h2><p class="muted rc-loading">Reading the record\u2026</p></section>';
     function feed(label, items) {
@@ -90,5 +110,5 @@
     return '<section class="rc-alm"><div class="rc-alm-top"><h2 class="rc-h2">On this day</h2><span class="rc-alm-note">notable per Wikipedia · English-centric</span></div>' + out + '</section>';
   }
 
-  window.Dashboard = { headline: headline, graph: graph, legend: legend, readout: readout, almanac: almanac };
+  window.Dashboard = { headline: headline, nav: nav, graph: graph, legend: legend, readout: readout, almanac: almanac };
 })();
