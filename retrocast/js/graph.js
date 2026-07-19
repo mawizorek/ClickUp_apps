@@ -1,32 +1,40 @@
-/* graph.js — the unified “you are here in history” chart, hand-rolled inline SVG (no Chart.js/D3;
-   fits the vanilla modular repo + file budget; every stroke themed from var(--token)).
+/* graph.js — the unified “you are here in history” chart, hand-rolled inline SVG (no Chart.js/D3).
+   ZOOMED: renders only a focused SPAN of days (default 3: focus-1 / focus / focus+1) from the wide
+   in-memory series, so the app can chevron day-by-day with no refetch. Each of the 3 columns is a
+   real calendar day, dated on the x-axis.
 
-   AXES:
-     x = a day window (PAST .. FUTURE around today). Left of/at today = realized; right = forecast.
-     y = standardized anomaly (σ from this-day normal). Zero line = normal. Because every variable is
-         in σ units, the ±1σ / ±2σ shaded bands ARE the shared historical ghost envelope for all five.
-   LINES: one per variable. Realized = solid (offsets ≤ 0), forecast = dashed (offsets ≥ 0), joined at
-     today so the realized→expected transition is visible. Emphasized variable rides on top with points.
-   Binds ONLY to the series shape from day.js. Returns an SVG string; the dashboard re-renders on
-     legend click to change emphasis. Points carry <title> for native hover/readout. */
+   AXES: x = the focused day window; y = standardized anomaly (σ from this-day normal). Zero = normal.
+   Because every variable is in σ, the ±1σ / ±2σ shaded bands ARE the shared historical ghost
+   envelope for all five at once. Realized days (offset ≤ 0) draw solid; forecast (offset ≥ 0) dashed;
+   joined at today. The emphasized variable rides on top with labeled value points. */
 (function () {
-  var W = 760, H = 380, L = 46, R = 16, T = 18, B = 44, ZMAX = 3.5;
+  var W = 760, H = 380, L = 46, R = 18, T = 26, B = 46, ZMAX = 3.5;
   var INW = W - L - R, INH = H - T - B;
+  var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function dp(n) { return Math.round(n * 10) / 10; }
+  function shortDate(iso) { var p = (iso || "").split("-"); return p.length < 3 ? iso : MON[(+p[1] - 1) % 12] + " " + (+p[2]); }
 
   function render(series, opts) {
     opts = opts || {};
-    var offs = series.offsets, minO = offs[0], maxO = offs[offs.length - 1];
-    var emphasis = opts.emphasis || (series.headline && series.headline.key) || (series.vars[0] && series.vars[0].key);
-    function x(o) { return dp(L + (o - minO) / (maxO - minO) * INW); }
+    var span = opts.span || 3, half = Math.floor(span / 2);
+    var focus = opts.focus == null ? 0 : opts.focus;
+    var emphasis = opts.emphasis || (series.vars[0] && series.vars[0].key);
+
+    var offAll = series.offsets;
+    var slice = offAll.filter(function (o) { return o >= focus - half && o <= focus + half; });
+    var minO = slice[0], maxO = slice[slice.length - 1];
+    var winMap = {}; series.window.forEach(function (r) { winMap[r.offset] = r; });
+
+    function x(o) { return slice.length <= 1 ? dp(L + INW / 2) : dp(L + (o - minO) / (maxO - minO) * INW); }
     function y(z) { return dp(T + (ZMAX - z) / (2 * ZMAX) * INH); }
+    function idxOf(o) { return offAll.indexOf(o); }
 
     var parts = [];
-    parts.push('<svg class="rc-graph" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Standardized weather anomaly for a day window around today">');
+    parts.push('<svg class="rc-graph" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Standardized weather anomaly, ' + span + '-day focus">');
 
-    // bands (ghost envelope): ±2σ then ±1σ
+    // bands (ghost envelope)
     parts.push('<rect class="rc-g-band2" x="' + L + '" y="' + y(2) + '" width="' + INW + '" height="' + dp(y(-2) - y(2)) + '"/>');
     parts.push('<rect class="rc-g-band1" x="' + L + '" y="' + y(1) + '" width="' + INW + '" height="' + dp(y(-1) - y(1)) + '"/>');
 
@@ -37,46 +45,43 @@
       parts.push('<text class="rc-g-ylab" x="' + (L - 8) + '" y="' + dp(yy + 3) + '" text-anchor="end">' + (z === 0 ? "normal" : (z > 0 ? "+" : "") + z + "\u03c3") + '</text>');
     });
 
-    // today marker + realized/forecast split
-    var xt = x(0);
-    parts.push('<line class="rc-g-today" x1="' + xt + '" y1="' + T + '" x2="' + xt + '" y2="' + (H - B) + '"/>');
-    parts.push('<text class="rc-g-todaylab" x="' + xt + '" y="' + (T - 4) + '" text-anchor="middle">TODAY</text>');
-
-    // x labels (relative days)
-    offs.forEach(function (o) {
-      if (o !== minO && o !== maxO && o % 7 !== 0) return;
-      if (o === 0) return; // today already labeled
-      parts.push('<text class="rc-g-xlab" x="' + x(o) + '" y="' + (H - B + 16) + '" text-anchor="middle">' + (o > 0 ? "+" + o : o) + 'd</text>');
+    // per-day vertical guide + date labels; today gets the emphasized marker line
+    slice.forEach(function (o) {
+      var xx = x(o), row = winMap[o] || {}, isToday = o === 0;
+      parts.push('<line class="' + (isToday ? "rc-g-today" : "rc-g-daytick") + '" x1="' + xx + '" y1="' + T + '" x2="' + xx + '" y2="' + (H - B) + '"/>');
+      parts.push('<text class="rc-g-xlab' + (isToday ? ' is-today' : '') + '" x="' + xx + '" y="' + (H - B + 18) + '" text-anchor="middle">' + esc(shortDate(row.date)) + '</text>');
+      if (isToday) parts.push('<text class="rc-g-todaylab" x="' + xx + '" y="' + (T - 10) + '" text-anchor="middle">TODAY</text>');
     });
 
-    // build a polyline points string from an array of {o,z}
     function pts(arr) { return arr.map(function (p) { return x(p.o) + "," + y(p.z); }).join(" "); }
     function collect(vo, which) {
       var out = [];
-      offs.forEach(function (o, i) { var z = vo[which][i]; if (z != null) out.push({ o: o, z: z, i: i }); });
+      slice.forEach(function (o) { var i = idxOf(o); var z = vo[which][i]; if (z != null) out.push({ o: o, z: z, i: i }); });
       return out;
     }
 
-    // draw non-emphasized first, emphasized last (on top)
     var order = series.vars.slice().sort(function (a, b) { return (a.key === emphasis ? 1 : 0) - (b.key === emphasis ? 1 : 0); });
     order.forEach(function (vo) {
       var isEmp = vo.key === emphasis;
       var cls = "rc-g-line rc-g-" + vo.key + (isEmp ? " is-emph" : " is-dim");
-      var real = collect(vo, "zActual");
-      var fore = collect(vo, "zForecast");
-      // join dashed forecast to today's realized point for continuity
-      var zeroIdx = offs.indexOf(0);
-      if (fore.length && vo.zActual[zeroIdx] != null) fore.unshift({ o: 0, z: vo.zActual[zeroIdx], i: zeroIdx });
+      var real = collect(vo, "zActual"), fore = collect(vo, "zForecast");
+      var zi = idxOf(0);
+      if (fore.length && zi >= 0 && vo.zActual[zi] != null && slice.indexOf(0) >= 0) fore.unshift({ o: 0, z: vo.zActual[zi], i: zi });
       if (real.length > 1) parts.push('<polyline class="' + cls + ' rc-g-real" points="' + pts(real) + '"/>');
       if (fore.length > 1) parts.push('<polyline class="' + cls + ' rc-g-fore" points="' + pts(fore) + '"/>');
-      if (isEmp) {
-        real.concat(fore).forEach(function (p) {
-          var isToday = p.o === 0;
-          var raw = (vo.rawActual[p.i] != null ? vo.rawActual[p.i] : vo.rawForecast[p.i]);
-          var t = vo.label + " " + (p.o === 0 ? "today" : (p.o > 0 ? "+" + p.o + "d" : p.o + "d")) + ": " + (raw == null ? "\u2014" : raw + vo.unit) + " (" + (p.z > 0 ? "+" : "") + p.z + "\u03c3)";
-          parts.push('<circle class="rc-g-dot rc-g-' + vo.key + (isToday ? ' is-today' : '') + '" cx="' + x(p.o) + '" cy="' + y(p.z) + '" r="' + (isToday ? 5 : 3) + '"><title>' + esc(t) + '</title></circle>');
-        });
-      }
+      // markers: emphasized var on every slice day, dimmed vars only get a small dot
+      var allPts = real.concat(fore);
+      allPts.forEach(function (p) {
+        var isToday = p.o === 0;
+        var raw = (vo.rawActual[p.i] != null ? vo.rawActual[p.i] : vo.rawForecast[p.i]);
+        var t = vo.label + " " + esc(shortDate((winMap[p.o] || {}).date)) + ": " + (raw == null ? "\u2014" : raw + vo.unit) + " (" + (p.z > 0 ? "+" : "") + p.z + "\u03c3)";
+        var rr = isEmp ? (isToday ? 6 : 5) : (isToday ? 4 : 3);
+        parts.push('<circle class="rc-g-dot rc-g-' + vo.key + (isToday ? ' is-today' : '') + (isEmp ? ' is-emph' : ' is-dim') + '" cx="' + x(p.o) + '" cy="' + y(p.z) + '" r="' + rr + '"><title>' + t + '</title></circle>');
+        if (isEmp && raw != null) {
+          var above = p.z >= 0;
+          parts.push('<text class="rc-g-ptlab" x="' + x(p.o) + '" y="' + dp(y(p.z) + (above ? -12 : 18)) + '" text-anchor="middle">' + esc(raw + vo.unit) + '</text>');
+        }
+      });
     });
 
     parts.push('</svg>');
