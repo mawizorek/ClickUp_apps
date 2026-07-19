@@ -1,5 +1,5 @@
 {
-  "$schema_note": "CANONICAL, SINGLE SOURCE of all global fleet metadata for ClickUp Super Agents. Every structured fact about an agent (identity, track, version, status, channels, lane, triggers) lives HERE and nowhere else. Per-agent folders hold ONLY non-duplicated content: preferences.md (near-1:1 verbatim mirror of the live config; header + config only), working-notes.md (next spec / revision log), and audits/ (dated audit records). Never hand-mirror any field below into a folder file. index.html renders this; index.md points at both.",
+  "$schema_note": "CANONICAL, SINGLE SOURCE of all global fleet metadata for ClickUp Super Agents. Every structured fact about an agent (identity, track, version, status, channels, lane, triggers) lives HERE and nowhere else. Per-agent folders hold ONLY non-duplicated content: preferences.md (profile), memory.md (context), activity-log.md (ledger), decision-log.md (reasoning), README.md (steward pointer), audits/ (dated records). Never hand-mirror any field below into a folder file. index.html renders this; index.md points at both.",
   "golden_standard": {
     "version": "1.0",
     "set": "2026-07-15",
@@ -18,7 +18,12 @@
       "Declaration in sync"
     ]
   },
-  "updated": "2026-07-15",
+  "git_teammate_standard": {
+    "runtime_spec": "brain-config/super-agents/_shared/super-agent-base.md",
+    "authoring_gate": "brain-config/gates/git-agent-authoring.md",
+    "note": "git-teammate track = session-invocable persona via /session.agent=<Name>, rides on the full Brain stack, holds memory across sessions. NOT a native ClickUp Super Agent (no autonomous triggers)."
+  },
+  "updated": "2026-07-19",
   "agents": [
     {
       "slug": "clickup-coach-corey",
@@ -73,6 +78,23 @@
       "lane": "FileMaker (FMP) solution design & documentation.",
       "declaration_folder": "brain-config/super-agents/fmp-frank/",
       "notes": "Folder scaffolded 2026-07-15; preferences.md PENDING verbatim config paste before first audit. Full-standard track to CONFIRM with Michael (may be a narrower FileMaker specialist). Triggers + channels unconfirmed."
+    },
+    {
+      "slug": "workhorse-wes",
+      "display_name": "Workhorse Wes",
+      "track": "git-teammate",
+      "golden_standard_version": null,
+      "status": "active",
+      "last_audit": null,
+      "clickup_user_id": null,
+      "profile_url": null,
+      "creator": "Michael Wizorek",
+      "triggers": ["session-invocation"],
+      "invocation": "/session.agent=Wes  (alias /wes)",
+      "channels": {},
+      "lane": "Driving force — keeps Michael out of the weeds and thinking big-picture; names rabbit holes, kills bikeshedding, protects momentum, challenges premature detail and scope creep.",
+      "declaration_folder": "brain-config/super-agents/workhorse-wes/",
+      "notes": "Migrated 2026-07-19 from brain-config/agents/ (announce-only lens) into the fleet as the reference git-teammate. Full 4-file bundle live. Old agents/workhorse-wes.md redirected. Reference implementation for the git_teammate_standard. NOT a native ClickUp Super Agent — no clickup_user_id, no autonomous triggers; invoked only in-session."
     },
     {
       "slug": "update-uritp",
@@ -144,9 +166,11 @@
     "needs-declaration": "Full-Standard agent whose declaration folder and/or verbatim preferences.md mirror is not yet complete.",
     "needs-re-audit": "Standard bumped or config changed; re-verify.",
     "behind": "Known gaps against the current golden standard.",
-    "inventory-only": "Task-Specific / Exempt; tracked but not held to the full standard."
+    "inventory-only": "Task-Specific / Exempt; tracked but not held to the full standard.",
+    "active": "git-teammate persona live and session-invocable."
   },
   "changelog": [
+    "2026-07-19: registered workhorse-wes as the first git-teammate track (active); added git_teammate_standard pointer block (runtime base spec + authoring gate). Wes migrated from brain-config/agents/ into the fleet with the full 4-file bundle; old lens file redirected.",
     "2026-07-15: scaffolded declaration folders for mainstage-milo + fmp-frank (README + PENDING preferences + working-notes); wired their rows (declaration_folder, Milo channels). preferences.md verbatim paste still pending for both.",
     "2026-07-15: enriched to hold ALL global metadata (identity, channels, lane, triggers) so per-agent folder files never mirror metadata.",
     "2026-07-15: split from index.md table into JSON data + index.html renderer.",
