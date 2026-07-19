@@ -1,6 +1,8 @@
-/* dashboard.js — pure render functions off a Day object (spec §6). No fetching here.
-   Factual, meteorologist-serious voice: no injected wit. Redundant encoding
-   (sign + WORD, never color alone) for the departure read (colorblind-safe). */
+/* dashboard.js — pure render off a Day (spec §6). Bold instrument dashboard, NOT a card wall.
+   Design laws honored: no side-stripe borders, no boxed-card-per-item, no hero-metric template.
+   Hierarchy from scale/weight/surface/space, not from outlining everything. Factual voice;
+   redundant sign + WORD encoding (colorblind-safe); the big number's color is DATA-driven
+   (warm above normal / cool below), meaningful not decorative. */
 (function () {
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function signed(n) { if (n == null) return "\u2014"; return (n > 0 ? "+" : "") + n; }
@@ -10,89 +12,107 @@
     return n > 0 ? "warmer than normal" : "cooler than normal";
   }
   function fmt(n, unit) { return n == null ? "\u2014" : n + (unit || ""); }
-
   var VARS = (window.DayModel && DayModel.VARS) || [];
+  function pickVar(k) { return VARS.filter(function (x) { return x.key === k; })[0] || VARS[0]; }
 
-  /* ---- 1. departure hero (NEW library object: stat_hero_departure) ---- */
-  function hero(day, activeVarKey) {
-    var w = day.weather, v = VARS.filter(function (x) { return x.key === activeVarKey; })[0] || VARS[0];
+  /* ---- DEPARTURE GAUGE: eyebrow + huge data-colored number + word, the distribution fused in
+     as its own baseline, and a quiet credibility footnote. One block, no border, no card. ---- */
+  function departure(day, activeVarKey) {
+    var w = day.weather, v = pickVar(activeVarKey), loc = day.location || {};
     var a = w.anomaly ? w.anomaly[v.key] : null;
     var dir = a == null ? "flat" : (a > 0 ? "up" : (a < 0 ? "down" : "flat"));
-    var today = w.today ? w.today[v.key] : null;
-    var normal = w.normal ? w.normal[v.key] : null;
-    return '<section class="rc-hero" data-dir="' + dir + '">' +
-      '<div class="rc-hero-metric"><span class="rc-hero-num">' + signed(a) + '</span>' +
-      '<span class="rc-hero-unit">' + esc(v.unit) + '</span></div>' +
-      '<div class="rc-hero-word">' + esc(word(a)) + '</div>' +
-      '<div class="rc-hero-sub">Today ' + fmt(today, v.unit) + ' vs. ' + fmt(normal, v.unit) + ' normal \u00b7 ' + esc(v.label.toLowerCase()) + '</div>' +
-      '</section>';
-  }
-
-  /* ---- 2. credibility line (honest "as of" + sample size, spec §6.3) ---- */
-  function credibility(day) {
-    var w = day.weather, n = w.normal ? w.normal.sampleYears : null;
-    var by = w.baselineYears || {};
-    var bits = [];
-    if (n != null) bits.push("based on " + n + " years (" + by.start + "\u2013" + by.end + ")");
-    bits.push("ERA5 reanalysis");
-    bits.push("as of " + esc(day.date));
-    if (day.stale) bits.push("cached \u2014 live data unavailable");
-    return '<p class="rc-cred muted">' + bits.join(" \u00b7 ") + '</p>';
-  }
-
-  /* ---- 3. this-day range band (NEW library object: viz_range_band) ---- */
-  function band(day, activeVarKey) {
-    var w = day.weather, v = VARS.filter(function (x) { return x.key === activeVarKey; })[0] || VARS[0];
-    var sp = w.spread ? w.spread[v.key] : null;
     var today = w.today ? w.today[v.key] : null, normal = w.normal ? w.normal[v.key] : null;
-    if (!sp) return '<section class="card"><h3>This day, historically</h3><p class="muted">No historical spread available for ' + esc(v.label.toLowerCase()) + '.</p></section>';
-    var lo = sp.min, hi = sp.max, range = (hi - lo) || 1;
-    function pct(x) { return Math.max(0, Math.min(100, ((x - lo) / range) * 100)); }
-    var todayPct = today != null ? pct(today) : null, normalPct = normal != null ? pct(normal) : null;
-    return '<section class="card rc-band-card"><h3>This day, historically \u00b7 ' + esc(v.label) + '</h3>' +
-      '<div class="rc-band">' +
-        '<span class="rc-band-track"></span>' +
-        (normalPct != null ? '<span class="rc-band-normal" style="left:' + normalPct + '%" title="normal"></span>' : "") +
-        (todayPct != null ? '<span class="rc-band-today" style="left:' + todayPct + '%" title="today"></span>' : "") +
-      '</div>' +
-      '<div class="rc-band-scale"><span>' + fmt(lo, v.unit) + '</span><span>' + fmt(hi, v.unit) + '</span></div>' +
-      '<div class="rc-band-key"><span><i class="k-normal"></i>normal</span><span><i class="k-today"></i>today ' + fmt(today, v.unit) + '</span></div>' +
-      '</section>';
-  }
+    var sp = w.spread ? w.spread[v.key] : null;
 
-  /* ---- 4. weather twin ---- */
-  function twin(day) {
-    var t = day.weather.twin;
-    if (!t) return "";
-    return '<section class="card rc-twin"><h3>Closest match</h3>' +
-      '<p class="rc-twin-year">' + esc(t.year) + '</p>' +
-      '<p class="muted">This day most resembles ' + esc(t.year) + ' in the record.</p></section>';
-  }
-
-  /* ---- 5. on-this-day ribbon (NEW library object: card_ribbon) ---- */
-  function ribbon(day) {
-    var al = day.almanac;
-    if (!al) return '<section class="card"><h3>On this day</h3><p class="muted rc-loading">Loading the historical record\u2026</p></section>';
-    function cards(items, kind, render) {
-      if (!items || !items.length) return "";
-      return '<div class="rc-rib-group"><h4>' + kind + '</h4><div class="rc-rib" tabindex="0">' +
-        items.slice(0, 12).map(render).join("") + '</div></div>';
+    var dist = "";
+    if (sp && sp.min != null && sp.max != null) {
+      var lo = sp.min, hi = sp.max, range = (hi - lo) || 1;
+      var pct = function (x) { return Math.max(0, Math.min(100, ((x - lo) / range) * 100)); };
+      var tPct = today != null ? pct(today) : null, nPct = normal != null ? pct(normal) : null;
+      var fillL = null, fillW = null;
+      if (tPct != null && nPct != null) { fillL = Math.min(tPct, nPct); fillW = Math.abs(tPct - nPct); }
+      dist =
+        '<div class="rc-dist">' +
+          '<div class="rc-dist-bar">' +
+            (fillL != null ? '<span class="rc-dist-fill" style="left:' + fillL + '%;width:' + fillW + '%"></span>' : "") +
+            (nPct != null ? '<span class="rc-dist-normal" style="left:' + nPct + '%"></span>' : "") +
+            (tPct != null ? '<span class="rc-dist-today" style="left:' + tPct + '%"></span>' : "") +
+          '</div>' +
+          '<div class="rc-dist-scale"><span>' + fmt(lo, v.unit) + '</span>' +
+            '<span class="rc-dist-mid">30-year range · ● today · | normal</span>' +
+            '<span>' + fmt(hi, v.unit) + '</span></div>' +
+        '</div>';
     }
-    var out = "";
-    out += cards(al.holidays, "Holidays &amp; observances", function (h) { return '<article class="rc-card"><p class="rc-card-b">' + esc(h.text || h.name) + '</p></article>'; });
-    out += cards(al.events, "Historical events", function (e) { return '<article class="rc-card"><p class="rc-card-y">' + esc(e.year) + '</p><p class="rc-card-b">' + esc(e.text) + '</p></article>'; });
-    out += cards(al.births, "Born on this day", function (e) { return '<article class="rc-card"><p class="rc-card-y">' + esc(e.year) + '</p><p class="rc-card-b">' + esc(e.text) + '</p></article>'; });
-    out += cards(al.deaths, "Died on this day", function (e) { return '<article class="rc-card"><p class="rc-card-y">' + esc(e.year) + '</p><p class="rc-card-b">' + esc(e.text) + '</p></article>'; });
-    if (!out) out = '<p class="muted">A quiet day \u2014 nothing notable in the record.</p>';
-    return '<section class="rc-ribbon-wrap"><h2>On this day</h2><p class="muted rc-rib-note">Notable per Wikipedia \u00b7 English-centric</p>' + out + '</section>';
+
+    var n = w.normal ? w.normal.sampleYears : null, by = w.baselineYears || {};
+    var cred = [];
+    if (n != null) cred.push(n + " yrs " + by.start + "\u2013" + by.end);
+    cred.push("ERA5"); cred.push("as of " + esc(day.date));
+    if (day.stale) cred.push("cached");
+
+    return '<section class="rc-departure" data-dir="' + dir + '">' +
+      '<div class="rc-dep-eyebrow">' + esc(loc.name || "") + '</div>' +
+      '<div class="rc-dep-read">' +
+        '<span class="rc-dep-num">' + signed(a) + '</span>' +
+        '<span class="rc-dep-unit">' + esc(v.unit) + '</span>' +
+        '<span class="rc-dep-word">' + esc(word(a)) + '</span>' +
+      '</div>' +
+      '<div class="rc-dep-sub">Today ' + fmt(today, v.unit) + ' against ' + fmt(normal, v.unit) + ' normal · ' + esc(v.label.toLowerCase()) + '</div>' +
+      dist +
+      '<div class="rc-dep-cred">' + cred.join(" \u00b7 ") + '</div>' +
+    '</section>';
   }
 
-  /* ---- variable toggle (existing object: ctl_chip) ---- */
+  /* ---- INSTRUMENT STAT STRIP: the key figures as a cluster on ONE panel, hairline-divided
+     cells (no per-cell border, no rail). Skips gracefully when records are null (sparse). ---- */
+  function stats(day) {
+    var w = day.weather, r = w.records || {}, t = w.twin, cells = [];
+    function cell(label, val, sub) {
+      return '<div class="rc-stat"><div class="rc-stat-lab">' + esc(label) + '</div>' +
+        '<div class="rc-stat-val">' + esc(val) + '</div>' +
+        '<div class="rc-stat-sub">' + esc(sub == null ? "" : sub) + '</div></div>';
+    }
+    if (r.recordHigh != null) cells.push(cell("Record high", r.recordHigh + "\u00b0", r.recordHighYear || ""));
+    if (r.recordLow != null)  cells.push(cell("Record low", r.recordLow + "\u00b0", r.recordLowYear || ""));
+    if (t && t.year)          cells.push(cell("Closest match", t.year, "most like today"));
+    if (w.normal && w.normal.sampleYears != null) cells.push(cell("Sample", w.normal.sampleYears, "years on record"));
+    if (!cells.length) return "";
+    return '<section class="rc-stats">' + cells.join("") + '</section>';
+  }
+
+  /* ---- variable selector (segmented control) ---- */
   function varToggle(activeVarKey) {
-    return '<div class="rc-vartoggle">' + VARS.map(function (v) {
-      return '<button class="rc-chip' + (v.key === activeVarKey ? " on" : "") + '" data-var="' + v.key + '">' + esc(v.label) + '</button>';
+    return '<div class="rc-vartoggle" role="tablist">' + VARS.map(function (v) {
+      return '<button class="rc-seg' + (v.key === activeVarKey ? " on" : "") + '" role="tab" aria-selected="' + (v.key === activeVarKey) + '" data-var="' + v.key + '">' + esc(v.label) + '</button>';
     }).join("") + '</div>';
   }
 
-  window.Dashboard = { hero: hero, credibility: credibility, band: band, twin: twin, ribbon: ribbon, varToggle: varToggle };
+  /* ---- ON THIS DAY: a dense FEED, not a card grid. Hairline rows, mono year + text, no boxes,
+     no rails. Holidays = inline chips. Staggered reveal. Sparse day reads as designed. ---- */
+  function almanac(day) {
+    var al = day.almanac;
+    if (!al) return '<section class="rc-alm"><h2 class="rc-h2">On this day</h2><p class="muted rc-loading">Reading the record\u2026</p></section>';
+    function feed(label, items) {
+      if (!items || !items.length) return "";
+      var rows = items.slice(0, 8).map(function (e, i) {
+        return '<li class="rc-row" style="--i:' + i + '"><span class="rc-row-yr">' + esc(e.year || "") + '</span>' +
+          '<span class="rc-row-tx">' + esc(e.text) + '</span></li>';
+      }).join("");
+      return '<div class="rc-alm-sec"><h3 class="rc-alm-h">' + esc(label) + '</h3><ul class="rc-feed">' + rows + '</ul></div>';
+    }
+    var out = "";
+    if (al.holidays && al.holidays.length) {
+      out += '<div class="rc-alm-sec"><h3 class="rc-alm-h">Holidays &amp; observances</h3><div class="rc-chips">' +
+        al.holidays.slice(0, 10).map(function (h) { return '<span class="rc-chip-lite">' + esc(h.text || h.name) + '</span>'; }).join("") + '</div></div>';
+    }
+    out += feed("Historical events", al.events);
+    out += feed("Born", al.births);
+    out += feed("Died", al.deaths);
+    if (!out) out = '<p class="muted rc-alm-empty">A quiet day. Nothing notable in the record for this date.</p>';
+    return '<section class="rc-alm">' +
+      '<div class="rc-alm-top"><h2 class="rc-h2">On this day</h2><span class="rc-alm-note">notable per Wikipedia · English-centric</span></div>' +
+      out + '</section>';
+  }
+
+  window.Dashboard = { departure: departure, stats: stats, varToggle: varToggle, almanac: almanac };
 })();
