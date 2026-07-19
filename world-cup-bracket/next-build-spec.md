@@ -55,6 +55,32 @@
 
 - Round tint ambient layer (if not shipped in v5).
 - Flag emoji / SVG flags per country.
-- Goal scorers / key moments in the road-to-here trail (needs data fields).
+- **[SHIPPED 2026-07-18]** Goal scorers / key moments in the match popup. Delivered as the **goal-timeline feed**: optional facts-only `goals[]` array on each match (`{m,p,t,pen?,og?}`), app-derived half-time split + running tally, rendered on a vertical rail in the detail sheet; "Road to here" collapsed by default to keep the sheet tight. Backfilled across all knockout games (R32→Final). Data-contract + authoring rules live in the **World Cup Refresh — Brain Operations Guide** (ClickUp). Engine: `sheet.js` / `sheet.css`.
 
-## ⏳ Ephemeral — tournament ends Sun Jul 19, 2026. Archive after the Final.
+---
+
+## 🎟️ Futures — GROUP-STAGE PAGE (Michael, 2026-07-18; explicit COLD-HANDOFF target)
+
+**Status: parked until the next tournament (~2030). Written for a cold pickup: assume the agent reading this has ZERO memory of the 2026 build and this app has sat untouched for ~4 years.** Do not attempt in the 2026 lifecycle — this whole app is ephemeral and archived after the 2026 Final; this section is the deliberate exception that survives to seed the next edition.
+
+### What Michael asked for
+Add the group stage to the app as a **NEW, SEPARATE PAGE** — not shoehorned into the current bracket/schedule views. He was explicit on three things:
+1. **Separate page, different feel.** It should read as its own surface, visually distinct from the knockout bracket. Don't reuse the bracket tree; the group stage isn't a tree, it's a set of standings tables + a dense fixture list.
+2. **Grouped BY GROUP.** The organizing unit is the group (A, B, C, …), each with its standings table (P/W/D/L/GF/GA/GD/Pts) and its fixtures. In 2026 the format is **12 groups of 4** (48 teams); confirm the format for the actual edition before building — it may change.
+3. **"A lot more games."** Group stage is the bulk of the tournament (2026: 72 group games vs 32 knockout). Volume is the core design constraint — the current per-match detail-sheet + single scroll won't scale. Plan for grouping, collapsing, filtering by group/day, and lazy rendering from the start.
+
+### The activity feed is the bigger ask here
+Michael flagged that the **goal / activity feed** (shipped for knockout on 2026-07-18) becomes "another more present ask" at group-stage scale — i.e. a headline feature of this page, not a tucked-away popup section. Interpretation for the cold pickup: the group stage wants a **cross-match activity feed** (a live/scrollable river of goals + key moments across ALL group games, filterable by group/team/day), on top of the per-match feed that already exists. This is a genuine net-new surface, not a re-skin of the knockout feed. Treat it as its own design problem: what's the unit (a goal? a match-state change?), what's the sort (chronological across the whole matchday?), how does it stay tight when 12 games kick off at once?
+
+### Load-bearing pointers for whoever picks this up
+- **Fold-in Frank gate FIRST.** A new page + a cross-match feed is exactly the "new structure" that must run the anti-sprawl gate before design energy is spent (FOLD-IN / NET-NEW / MERGE). Likely NET-NEW, but prove it.
+- **Size Sally + the split budget will bite immediately.** ~72 group games with goal feeds will blow the single-`data.json` model that was already ~16.5KB at knockout-only. Forecast the store BEFORE populating: near-certainly split per-group (or group-stage vs knockout as separate data files) rather than one monolith. This is the founding Sally lesson (the F1 season-store monolith) applied here — plan the seam up front.
+- **Reuse the facts-only `goals[]` contract** already defined (see the shipped Futures item above + the Brain Operations Guide). The per-match feed component (`sheet.js` goalFeed) should be liftable as-is; the NEW work is the cross-match aggregate feed + the standings tables + the page shell.
+- **Different feel = a real design pass.** Load DESIGN-UI. The knockout side is a bracket tree in dark OKLCH; the group page should feel like a sibling, not a clone — standings-table-forward, denser, its own rhythm, still in the app's palette family. Seat Style Stu.
+- **Format is not guaranteed stable.** Verify the next edition's group format (group count, teams per group, tiebreakers, how many advance) against a live source before hardcoding 12×4. Tiebreaker rules especially are fiddly and change.
+
+---
+
+## ⏳ Ephemeral note (2026 lifecycle only)
+
+The 2026 tournament ends Sun Jul 19, 2026; the LIVE app + its `data.json` are archived after the Final. **EXCEPTION: the two Futures sections above (group-stage page + any unshipped v5 path work) are deliberately NON-ephemeral — they survive as the seed spec for the next edition. Do not delete them when archiving the 2026 data.**
