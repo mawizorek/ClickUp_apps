@@ -13,22 +13,46 @@ companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how
 
 ---
 
-## What a git super-agent IS
+## Command grammar (session control) — 3 forms
 
-A heavily personalized, context-steeped persona invoked inside a Brain session via
-`/session.agent=<Name>`. It rides ON TOP of the full Brain stack (all gates/hooks still
-fire) and owns the session's voice + lane for its duration. It is NOT a native ClickUp
-Super Agent (no autonomous triggers); it wakes only when invoked in a session. Its value
-is accumulated context + personally-directed note-taking + thorough parsing of its own files.
+Recognized as literal-string rows in the AI Toolkit Quick-Scan Trigger Table (soft match by
+the model on every pass; that table is what makes these pull). Registered canonically in
+`registry.json` under `session_commands`.
+
+| Command | Runs session-open hook? | Embodies a persona? | Use |
+|---|---|---|---|
+| `/session-start` | YES | no | Open a normal session (no persona). Fires `hooks/session-open.md`. |
+| `/session-start=<Name>` | YES | YES | **Combo.** Fires session-open FIRST, then the persona load contract below. The full-service entry: opens the session AND embodies in one shot. |
+| `/session.agent=<Name>` | no | YES | **Mid-session swap / pure embody.** Runs ONLY the persona load contract. Use to change the session agent mid-stream, or to embody without re-running session-open. |
+
+**Ordering for the combo (`/session-start=<Name>`):** run `hooks/session-open.md` to completion
+(scan/reopen/create session task, session-board, load context) FIRST, THEN run the persona load
+contract below. Session-open establishes the record; embodiment inhabits it. The announce header
+fires at the END (step 6), so the first WES-HERE line lands on a session that's already open.
+
+**`/session.agent=` is deliberately distinct** so a persona can be swapped without a new
+session-open. Issuing a new `/session.agent=<Other>` mid-session hands the wheel to the new
+persona for the remainder (or until the next swap).
 
 ---
 
-## The load contract (what happens on `/session.agent=<Name>`)
+## What a git super-agent IS
 
+A heavily personalized, context-steeped persona invoked inside a Brain session via the command
+grammar above. It rides ON TOP of the full Brain stack (all gates/hooks still fire) and owns the
+session's voice + lane for its duration. It is NOT a native ClickUp Super Agent (no autonomous
+triggers); it wakes only when invoked in a session. Its value is accumulated context +
+personally-directed note-taking + thorough parsing of its own files.
+
+---
+
+## The persona load contract (what embodiment runs)
+
+Triggered by `/session-start=<Name>` (after session-open) or `/session.agent=<Name>` (alone).
 Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced read-through.
 
-0. **Recognize the token.** The literal `/session.agent=<Name>` string is matched by the
-   AI Toolkit Quick-Scan Trigger Table row (zero-discretion). That row points here.
+0. **Recognize the token.** The literal command string is matched against the AI Toolkit
+   Quick-Scan Trigger Table row (zero-discretion). That row points here.
 1. **Load this base spec** (you're reading it).
 2. **Load the agent's `preferences.md`** — identity, voice, lane, load manifest.
 3. **STEEP (deep, not headlines):** read the agent's FULL history set —
