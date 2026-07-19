@@ -1,9 +1,9 @@
-/* app.js — orchestration. Listens for the router's page:render hook, builds the
-   home dashboard for the active location, hydrates the shared MM-DD almanac feed,
-   and wires the switcher / variable selector / refresh / add-location. Per-feed
-   loading + empty + error states, never all-or-nothing (spec §7). */
+/* app.js — orchestration. Builds the unified-graph dashboard for the active location from the
+   day.js SERIES, hydrates the shared MM-DD almanac, and wires switcher / legend-emphasis /
+   refresh / add-location. Legend emphasis re-renders only the graph (all vars stay visible). */
 (function () {
-  var activeVar = "tempHigh";
+  var emphasis = null;
+  var currentSeries = null;
   var almanacCache = null; // shared across locations (keyed MM-DD only)
 
   function q(id) { return document.getElementById(id); }
@@ -18,51 +18,47 @@
       '</div>';
   }
 
-  /* Zones only — no restated location H1 (the active tab already names the place; a giant
-     duplicate title is a restated heading). The departure block leads with a compact eyebrow. */
   function skeleton() {
     return '<section class="page rc-page">' +
       '<div id="rcSwitch">' + switcherHTML() + '</div>' +
-      '<div id="rcDeparture"><section class="rc-departure"><div class="rc-dep-read"><span class="rc-dep-word rc-loading">Reading the record\u2026</span></div></section></div>' +
-      '<div id="rcTools"></div>' +
-      '<div id="rcStats"></div>' +
+      '<div id="rcHead"><section class="rc-head"><h1 class="rc-lead-line rc-loading">Reading the record\u2026</h1></section></div>' +
+      '<div id="rcGraph"></div>' +
+      '<div id="rcLegend"></div>' +
+      '<div id="rcReadout"></div>' +
       '<div id="rcAlmanac"></div>' +
       '<div class="rc-actions"><button class="btn btn-secondary rc-refresh" id="rcRefresh">Refresh</button></div>' +
       '</section>';
   }
 
-  function renderWeather(day) {
-    q("rcDeparture").innerHTML = Dashboard.departure(day, activeVar);
-    q("rcTools").innerHTML = Dashboard.varToggle(activeVar);
-    q("rcStats").innerHTML = Dashboard.stats(day);
-    q("rcTools").querySelectorAll(".rc-seg").forEach(function (b) {
-      b.addEventListener("click", function () {
-        activeVar = b.getAttribute("data-var");
-        renderWeather(day); // re-bind same Day, no refetch
-      });
+  function paintGraph() {
+    q("rcGraph").innerHTML = Dashboard.graph(currentSeries, emphasis);
+    q("rcLegend").innerHTML = Dashboard.legend(currentSeries, emphasis);
+    q("rcLegend").querySelectorAll(".rc-leg").forEach(function (b) {
+      b.addEventListener("click", function () { emphasis = b.getAttribute("data-var"); paintGraph(); });
     });
   }
 
-  function renderAlmanac(day) {
-    q("rcAlmanac").innerHTML = Dashboard.almanac(day);
+  function renderSeries(s) {
+    currentSeries = s;
+    emphasis = (s.headline && s.headline.key) || (s.vars[0] && s.vars[0].key);
+    q("rcHead").innerHTML = Dashboard.headline(s);
+    paintGraph();
+    q("rcReadout").innerHTML = Dashboard.readout(s);
   }
 
-  function loadAlmanac(day) {
-    var mmdd = day.date.slice(5), mm = mmdd.slice(0, 2), dd = mmdd.slice(3);
-    var loc = day.location;
-    var year = +day.date.slice(0, 4);
+  function renderAlmanac(al) { q("rcAlmanac").innerHTML = Dashboard.almanac(al); }
+
+  function loadAlmanac(s) {
+    var mmdd = s.date.slice(5), mm = mmdd.slice(0, 2), dd = mmdd.slice(3);
+    var loc = s.location, year = +s.date.slice(0, 4);
     var wiki = almanacCache && almanacCache.mmdd === mmdd
       ? Promise.resolve(almanacCache.data)
       : Providers.onThisDay(mm, dd).then(function (d) { almanacCache = { mmdd: mmdd, data: d }; return d; }).catch(function () { return null; });
     var hol = Providers.holidays(loc.country || "US", year).catch(function () { return []; });
     return Promise.all([wiki, hol]).then(function (r) {
       var w = r[0] || { events: [], births: [], deaths: [], holidays: [] };
-      var todaysHolidays = (r[1] || []).filter(function (h) { return h.mmdd === mmdd; });
-      day.almanac = {
-        events: w.events, births: w.births, deaths: w.deaths,
-        holidays: (todaysHolidays.length ? todaysHolidays : w.holidays)
-      };
-      renderAlmanac(day);
+      var todays = (r[1] || []).filter(function (h) { return h.mmdd === mmdd; });
+      renderAlmanac({ events: w.events, births: w.births, deaths: w.deaths, holidays: (todays.length ? todays : w.holidays) });
     }).catch(function () {
       q("rcAlmanac").innerHTML = '<section class="rc-alm"><h2 class="rc-h2">On this day</h2><p class="muted rc-alm-empty">Couldn\u2019t load the historical record. Try refresh.</p></section>';
     });
@@ -71,12 +67,12 @@
   function loadActive() {
     var loc = Store.activeLocation();
     if (!loc) return;
-    DayModel.build(loc).then(function (day) {
-      renderWeather(day);
-      renderAlmanac(day); // shows loading state
-      loadAlmanac(day);
+    renderAlmanac(null); // loading
+    DayModel.buildSeries(loc).then(function (s) {
+      renderSeries(s);
+      loadAlmanac(s);
     }).catch(function () {
-      q("rcDeparture").innerHTML = '<section class="rc-departure rc-err"><div class="rc-dep-eyebrow">' + (loc.name || "") + '</div><div class="rc-dep-word">Data unavailable</div><div class="rc-dep-sub">No live data and nothing cached for this location yet.</div></section>';
+      q("rcHead").innerHTML = '<section class="rc-head rc-err"><div class="rc-eyebrow">' + (loc.name || "") + '</div><h1 class="rc-lead-line">Data unavailable</h1><p class="rc-lead-sub">No live data and nothing cached for this location yet.</p></section>';
     });
   }
 
@@ -112,13 +108,10 @@
     if (!view) return;
     view.innerHTML = skeleton();
     wireSwitcher();
-    q("rcRefresh").addEventListener("click", function () {
-      almanacCache = null; loadActive();
-    });
+    q("rcRefresh").addEventListener("click", function () { almanacCache = null; loadActive(); });
     loadActive();
   }
 
-  // Router hook: fires after the shell injects a page into #view.
   window.addEventListener("page:render", function (e) {
     if (!e.detail || e.detail.route === "home") build();
   });
