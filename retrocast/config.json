@@ -1,0 +1,9 @@
+{
+  "access": "gated",
+  "code": "0426",
+  "coverTitle": "Under maintenance",
+  "coverMessage": "Retrocast is being updated. Check back soon.",
+  "downTitle": "Temporarily offline",
+  "downMessage": "Retrocast is currently unavailable.",
+  "version": "2026-07-19"
+}
