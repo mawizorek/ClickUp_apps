@@ -1,0 +1,70 @@
+/* objects.css — Retrocast object presentation. COLOR comes only from the theme spine
+   (var(--token)); this file owns structure + the 3 new objects registered in the
+   shared library (stat_hero_departure, viz_range_band, card_ribbon). Mobile-first. */
+
+.rc-page { max-width: 920px; }
+.rc-title { margin-top: var(--s4); }
+
+/* ---- location switcher (scroll-snap row of chips) ---- */
+.rc-switch { display: flex; gap: var(--s2); overflow-x: auto; padding-bottom: var(--s2); -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+.rc-loc { flex: 0 0 auto; font: inherit; font-weight: 700; font-size: 0.85rem; padding: 8px 14px; min-height: 40px; border-radius: 999px; cursor: pointer; background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border); transition: border-color 150ms, color 150ms; }
+.rc-loc:hover { border-color: var(--accent); color: var(--text); }
+.rc-loc.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.rc-addbtn { color: var(--text-faint); }
+
+/* ---- 1. departure hero (stat_hero_departure) ---- */
+.rc-hero { text-align: center; padding: var(--s6) var(--s4) var(--s5); border-radius: var(--radius-lg); background: var(--surface-2); border: 1px solid var(--border); margin-bottom: var(--s4); }
+.rc-hero-metric { display: flex; align-items: baseline; justify-content: center; gap: 4px; }
+.rc-hero-num { font-size: clamp(3rem, 16vw, 5.5rem); font-weight: 900; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--text); }
+.rc-hero-unit { font-size: clamp(1.2rem, 5vw, 1.8rem); font-weight: 700; color: var(--text-soft); }
+.rc-hero-word { font-size: 1.05rem; font-weight: 700; margin-top: var(--s3); text-transform: uppercase; letter-spacing: 0.06em; }
+.rc-hero-sub { font-size: 0.85rem; color: var(--text-faint); margin-top: var(--s2); }
+/* redundant sign+word encoding: a colored side rail reinforces, never carries, meaning */
+.rc-hero[data-dir="up"]   { border-left: 4px solid var(--warn); }
+.rc-hero[data-dir="up"]   .rc-hero-word { color: var(--warn); }
+.rc-hero[data-dir="down"] { border-left: 4px solid var(--info); }
+.rc-hero[data-dir="down"] .rc-hero-word { color: var(--info); }
+.rc-hero[data-dir="flat"] .rc-hero-word { color: var(--text-soft); }
+.rc-hero.rc-err { border-left: 4px solid var(--bad); }
+
+.rc-cred { font-size: 0.78rem; text-align: center; margin: 0 0 var(--s5); font-variant-numeric: tabular-nums; }
+
+/* ---- variable toggle (ctl_chip) ---- */
+.rc-vartoggle { display: flex; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s4); }
+.rc-chip { font: inherit; font-size: 0.8rem; font-weight: 700; padding: 6px 12px; min-height: 36px; border-radius: 999px; cursor: pointer; background: transparent; color: var(--text-faint); border: 1px solid var(--border); }
+.rc-chip:hover { border-color: var(--accent); color: var(--text); }
+.rc-chip.on { color: var(--text); border-color: var(--accent); background: var(--accent-soft); }
+
+/* ---- 3. range band (viz_range_band) ---- */
+.rc-band-card h3 { margin-bottom: var(--s5); }
+.rc-band { position: relative; height: 14px; margin: var(--s4) 0 var(--s2); }
+.rc-band-track { position: absolute; inset: 0; top: 5px; height: 4px; border-radius: 999px; background: var(--surface-3); border: 1px solid var(--border); }
+.rc-band-normal, .rc-band-today { position: absolute; top: 0; transform: translateX(-50%); }
+.rc-band-normal { width: 2px; height: 14px; background: var(--text-faint); }
+.rc-band-today { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px var(--accent); }
+.rc-band-scale { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.rc-band-key { display: flex; gap: var(--s4); margin-top: var(--s3); font-size: 0.75rem; color: var(--text-soft); }
+.rc-band-key i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: middle; }
+.rc-band-key .k-normal { width: 2px; height: 12px; background: var(--text-faint); }
+.rc-band-key .k-today { border-radius: 50%; background: var(--accent); }
+
+/* ---- weather twin ---- */
+.rc-twin { text-align: center; }
+.rc-twin-year { font-size: 2.4rem; font-weight: 900; color: var(--accent); margin: var(--s2) 0; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+
+/* ---- 5. on-this-day ribbon (card_ribbon) ---- */
+.rc-ribbon-wrap { margin-top: var(--s6); }
+.rc-rib-note { font-size: 0.75rem; margin-top: -6px; }
+.rc-rib-group { margin-bottom: var(--s5); }
+.rc-rib-group h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-soft); margin: 0 0 var(--s2); }
+.rc-rib { display: flex; gap: var(--s3); overflow-x: auto; padding-bottom: var(--s2); scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+.rc-rib:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; border-radius: var(--radius); }
+.rc-card { flex: 0 0 240px; scroll-snap-align: start; background: var(--surface-2); border: 1px solid var(--border); border-top: 3px solid var(--accent-2); border-radius: var(--radius-lg); padding: var(--s4); }
+.rc-card-y { font-family: var(--font-mono); font-weight: 700; color: var(--accent); font-size: 0.85rem; margin: 0 0 var(--s2); }
+.rc-card-b { font-size: 0.88rem; line-height: 1.45; margin: 0; color: var(--text); }
+
+.rc-refresh { margin-top: var(--s5); }
+.rc-loading { opacity: 0.7; }
+.rc-err { border-left: 3px solid var(--bad); }
+
+@media (min-width: 620px) { .rc-hero-sub { font-size: 0.9rem; } }
