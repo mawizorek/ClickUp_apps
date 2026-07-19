@@ -1,15 +1,15 @@
-/* day.js — assembles the unified Day SERIES (the pivot, spec §5/§6 recast). Everything the
-   dashboard binds to comes from ONE normalized shape so all five variables share a single
-   graph. Core idea: plot STANDARDIZED ANOMALY (σ from each variable's own this-day normal),
-   so °F / inches / mph become comparable and the ±1σ band is the shared historical envelope.
+/* day.js — assembles the unified Day SERIES. Everything the dashboard binds to comes from ONE
+   normalized shape so all five variables share a single graph. Core idea: plot STANDARDIZED
+   ANOMALY (σ from each variable's own this-day normal), so °F / inches / mph become comparable
+   and the ±1σ band is the shared historical envelope.
 
-   Window (spec §6 recast): offsets PAST..FUTURE around today's LOCAL date. Left of / at today =
-   realized (forecast endpoint's past_days actuals); right of today = forecast (expected). Deep
-   history (per-calendar-day normal + sd) from the ARCHIVE endpoint. Two-endpoint truth kept.
-   Honesty: sampleYears travels with the series; raw values kept for the readout card; sd floored
-   per var (precip/snow are zero-heavy, so σ is rougher there — the card shows the true numbers). */
+   Window: offsets PAST..FUTURE around today's LOCAL date, fetched WIDE so the 3-day zoom can
+   chevron across weeks with NO refetch (the whole span lives in memory; the graph renders a slice).
+   Left of/at today = realized (forecast endpoint past_days actuals); right = forecast. Deep history
+   (per-calendar-day normal + sd) from the ARCHIVE endpoint. Two-endpoint truth kept.
+   Honesty: sampleYears travels with the series; raw values kept for the readout; sd floored per var. */
 (function () {
-  var PAST = 14, FUTURE = 7;
+  var PAST = 30, FUTURE = 14; // wide fetch = free day-stepping within these bounds
   var VARS = [
     { key: "tempHigh", label: "High",  unit: "\u00b0F", di: "temperature_2m_max", floor: 1.5 },
     { key: "tempLow",  label: "Low",   unit: "\u00b0F", di: "temperature_2m_min", floor: 1.5 },
@@ -37,7 +37,6 @@
   function round(n, d) { if (n == null || isNaN(n)) return null; var f = Math.pow(10, d || 1); return Math.round(n * f) / f; }
   function clampZ(z) { return z == null ? null : Math.max(-CLAMP, Math.min(CLAMP, z)); }
 
-  /* index the archive: mmdd -> per-var array of values across all years */
   function indexArchive(series) {
     var map = {};
     if (!series || !series.time) return map;
@@ -48,7 +47,6 @@
     }
     return map;
   }
-  /* index the forecast window: date -> per-var value */
   function indexForecast(fc) {
     var map = {};
     if (!fc || !fc.time) return map;
@@ -89,7 +87,7 @@
           normal: [], sd: [], zActual: [], zForecast: [], rawActual: [], rawForecast: [] };
       });
 
-      offsets.forEach(function (o, oi) {
+      offsets.forEach(function (o) {
         var d = offsetDate(today, o), mmdd = d.slice(5), isFuture = d > today;
         windowRows.push({ offset: o, date: d, mmdd: mmdd, isFuture: isFuture });
         VARS.forEach(function (v, vi) {
@@ -104,30 +102,38 @@
         });
       });
 
-      // today snapshot (offset 0) + headline (most anomalous var today)
-      var zeroIdx = offsets.indexOf(0);
-      var perVar = {}, headline = null;
-      VARS.forEach(function (v, vi) {
-        var vo = varsOut[vi];
-        var raw = vo.rawActual[zeroIdx]; if (raw == null) raw = vo.rawForecast[zeroIdx];
-        var z = vo.zActual[zeroIdx]; if (z == null) z = vo.zForecast[zeroIdx];
-        var m = vo.normal[zeroIdx];
-        var dev = (raw != null && m != null) ? round(raw - m, 1) : null;
-        perVar[v.key] = { value: raw, normal: m, sd: vo.sd[zeroIdx], z: z, dev: dev, unit: v.unit, label: v.label };
-        if (z != null && (!headline || Math.abs(z) > Math.abs(headline.z))) headline = { key: v.key, label: v.label, z: z, dev: dev, value: raw, normal: m, unit: v.unit };
-      });
-
       var mmdd0 = today.slice(5);
       var sampleYears = (aMap[mmdd0] && aMap[mmdd0].temperature_2m_max) ? aMap[mmdd0].temperature_2m_max.length : null;
-      var analog = twinYear(arch, mmdd0, perVar.tempHigh.value, perVar.tempLow.value);
 
-      return {
+      var series = {
         date: today, location: loc, offsets: offsets, window: windowRows, vars: varsOut,
-        today: perVar, headline: headline, analog: analog,
-        meta: { sampleYears: sampleYears, start: startYear, end: endYear, stale: (!fc && !arch), hasArchive: !!arch, hasForecast: !!fc }
+        bounds: { minFocus: -PAST + 1, maxFocus: FUTURE - 1 },
+        meta: { sampleYears: sampleYears, start: startYear, end: endYear, stale: (!fc && !arch), hasArchive: !!arch, hasForecast: !!fc, archive: arch }
       };
+      // analog for today (snapshot uses per-focus, but the header caption anchors on today)
+      var t0 = snapshotAt(series, 0);
+      series.analog = twinYear(arch, mmdd0, t0.perVar.tempHigh.value, t0.perVar.tempLow.value);
+      return series;
     });
   }
 
-  window.DayModel = { buildSeries: buildSeries, VARS: VARS, localDate: localDate, PAST: PAST, FUTURE: FUTURE };
+  /* Extract a per-variable snapshot for ANY focused offset in the window (drives the chevron nav:
+     headline + readout reflect the centered day, not just today). */
+  function snapshotAt(series, offset) {
+    var idx = series.offsets.indexOf(offset);
+    if (idx < 0) idx = series.offsets.indexOf(0);
+    var row = series.window[idx] || { date: series.date, isFuture: false };
+    var perVar = {}, headline = null;
+    series.vars.forEach(function (vo) {
+      var raw = vo.rawActual[idx]; if (raw == null) raw = vo.rawForecast[idx];
+      var z = vo.zActual[idx]; if (z == null) z = vo.zForecast[idx];
+      var m = vo.normal[idx];
+      var dev = (raw != null && m != null) ? round(raw - m, 1) : null;
+      perVar[vo.key] = { value: raw, normal: m, sd: vo.sd[idx], z: z, dev: dev, unit: vo.unit, label: vo.label };
+      if (z != null && (!headline || Math.abs(z) > Math.abs(headline.z))) headline = { key: vo.key, label: vo.label, z: z, dev: dev, value: raw, normal: m, unit: vo.unit };
+    });
+    return { offset: offset, date: row.date, isFuture: row.isFuture, perVar: perVar, headline: headline };
+  }
+
+  window.DayModel = { buildSeries: buildSeries, snapshotAt: snapshotAt, VARS: VARS, localDate: localDate, PAST: PAST, FUTURE: FUTURE };
 })();
