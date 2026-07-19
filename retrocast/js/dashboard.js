@@ -1,115 +1,80 @@
-/* dashboard.js — pure render off a Day (spec §6). Bold instrument dashboard, NOT a card wall.
-   Design laws honored: no side-stripe borders, no boxed-card-per-item, no hero-metric template.
-   Hierarchy from scale/weight/surface/space, not from outlining everything. Factual voice;
-   redundant sign + WORD encoding (colorblind-safe); the big number's color is DATA-driven
-   (warm above normal / cool below), meaningful not decorative. */
+/* dashboard.js — pure render off the day.js SERIES. The graph is the centerpiece; everything
+   else supports it. Factual voice. All five variables are visible AT ONCE (the graph + the
+   readout card), so there is no click-through-one-at-a-time. Legend = emphasis control, not a
+   filter (nothing is hidden). Score removed; weather-twin demoted to a small analog caption. */
 (function () {
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  function signed(n) { if (n == null) return "\u2014"; return (n > 0 ? "+" : "") + n; }
-  function word(n) {
-    if (n == null) return "no baseline";
-    if (Math.abs(n) < 1) return "right on normal";
-    return n > 0 ? "warmer than normal" : "cooler than normal";
-  }
-  function fmt(n, unit) { return n == null ? "\u2014" : n + (unit || ""); }
-  var VARS = (window.DayModel && DayModel.VARS) || [];
-  function pickVar(k) { return VARS.filter(function (x) { return x.key === k; })[0] || VARS[0]; }
+  function sgn(n, d) { if (n == null) return "\u2014"; var v = (d != null ? n.toFixed(d) : n); return (n > 0 ? "+" : "") + v; }
+  function fmt(n, u) { return n == null ? "\u2014" : n + (u || ""); }
+  function dir(z) { return z == null ? "flat" : (z > 0.15 ? "up" : (z < -0.15 ? "down" : "flat")); }
 
   var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  function prettyDate(iso) {
-    if (!iso) return "";
-    var p = iso.split("-"); if (p.length < 3) return iso;
-    return MON[(+p[1] - 1) % 12] + " " + (+p[2]) + ", " + p[0];
+  function prettyDate(iso) { var p = (iso || "").split("-"); return p.length < 3 ? iso : MON[(+p[1] - 1) % 12] + " " + (+p[2]) + ", " + p[0]; }
+
+  /* ---- headline: name today's standout variable (the honest “was today weird” answer) ---- */
+  function headline(s) {
+    var loc = s.location || {}, h = s.headline;
+    var eyebrow = '<div class="rc-eyebrow">' + esc(loc.name || "") + '<span class="rc-eyebrow-d">' + esc(prettyDate(s.date)) + '</span></div>';
+    if (!h) return '<section class="rc-head">' + eyebrow + '<h1 class="rc-lead-line">No live reading available.</h1></section>';
+    if (Math.abs(h.z) < 1) {
+      return '<section class="rc-head" data-dir="flat">' + eyebrow +
+        '<h1 class="rc-lead-line">Close to normal across the board today.</h1>' +
+        '<p class="rc-lead-sub">Nothing more than 1\u03c3 off the 30-year normal for this date.</p></section>';
+    }
+    return '<section class="rc-head" data-dir="' + dir(h.z) + '">' + eyebrow +
+      '<h1 class="rc-lead-line">' + esc(h.label) + ' is today\u2019s standout: <b>' + sgn(h.z, 1) + '\u03c3</b></h1>' +
+      '<p class="rc-lead-sub">' + fmt(h.value, h.unit) + ' against ' + fmt(h.normal, h.unit) + ' normal · ' + sgn(h.dev) + h.unit + ' departure</p></section>';
   }
 
-  /* ---- DEPARTURE GAUGE: eyebrow (place + date) + huge data-colored number + word, the
-     distribution fused in as its baseline with a legible legend, then a quiet credibility
-     footnote. One block, no border, no card. ---- */
-  function departure(day, activeVarKey) {
-    var w = day.weather, v = pickVar(activeVarKey), loc = day.location || {};
-    var a = w.anomaly ? w.anomaly[v.key] : null;
-    var dir = a == null ? "flat" : (a > 0 ? "up" : (a < 0 ? "down" : "flat"));
-    var today = w.today ? w.today[v.key] : null, normal = w.normal ? w.normal[v.key] : null;
-    var sp = w.spread ? w.spread[v.key] : null;
+  /* ---- graph + legend (emphasis control) ---- */
+  function graph(s, emphasis) { return '<div class="rc-graph-wrap">' + Graph.render(s, { emphasis: emphasis }) + '</div>'; }
 
-    var dist = "";
-    if (sp && sp.min != null && sp.max != null) {
-      var lo = sp.min, hi = sp.max, range = (hi - lo) || 1;
-      var pct = function (x) { return Math.max(0, Math.min(100, ((x - lo) / range) * 100)); };
-      var tPct = today != null ? pct(today) : null, nPct = normal != null ? pct(normal) : null;
-      var fillL = null, fillW = null;
-      if (tPct != null && nPct != null) { fillL = Math.min(tPct, nPct); fillW = Math.abs(tPct - nPct); }
-      dist =
-        '<div class="rc-dist">' +
-          '<div class="rc-dist-bar">' +
-            (fillL != null ? '<span class="rc-dist-fill" style="left:' + fillL + '%;width:' + fillW + '%"></span>' : "") +
-            (nPct != null ? '<span class="rc-dist-normal" style="left:' + nPct + '%"></span>' : "") +
-            (tPct != null ? '<span class="rc-dist-today" style="left:' + tPct + '%"></span>' : "") +
-          '</div>' +
-          '<div class="rc-dist-ends"><span>' + fmt(lo, v.unit) + '</span><span>' + fmt(hi, v.unit) + '</span></div>' +
-          '<div class="rc-dist-legend">' +
-            '<span class="rc-lg rc-lg-today">today ' + fmt(today, v.unit) + '</span>' +
-            '<span class="rc-lg rc-lg-normal">normal ' + fmt(normal, v.unit) + '</span>' +
-            '<span class="rc-lg-cap">' + esc(v.label.toLowerCase()) + ' · 30-year range for this day</span>' +
-          '</div>' +
-        '</div>';
-    }
+  function legend(s, emphasis) {
+    var caption = s.analog ? '<span class="rc-analog">closest analog: <b>' + esc(s.analog) + '</b></span>' : "";
+    return '<div class="rc-legend-row">' +
+      '<div class="rc-legend" role="tablist" aria-label="Emphasize variable">' +
+      s.vars.map(function (v) {
+        var on = v.key === emphasis;
+        return '<button class="rc-leg rc-g-' + v.key + (on ? " on" : "") + '" role="tab" aria-selected="' + on + '" data-var="' + v.key + '">' +
+          '<span class="rc-leg-dot"></span>' + esc(v.label) + '</button>';
+      }).join("") + '</div>' + caption + '</div>' +
+      '<p class="rc-graph-note">solid = realized · dashed = forecast · band = ±1σ / ±2σ historical range for each day</p>';
+  }
 
-    var n = w.normal ? w.normal.sampleYears : null, by = w.baselineYears || {};
+  /* ---- deviation readout: every variable's real numbers as data points below the graph ---- */
+  function readout(s) {
+    var rows = s.vars.map(function (v) {
+      var t = s.today[v.key] || {}, z = t.z, d = dir(z);
+      var barPct = z == null ? 50 : Math.max(2, Math.min(98, 50 + (z / 3.5) * 48));
+      var bar = '<span class="rc-dv-track"><span class="rc-dv-zero"></span>' +
+        (z == null ? "" : '<span class="rc-dv-fill" data-dir="' + d + '" style="' + (z >= 0 ? 'left:50%;width:' + (barPct - 50) + '%' : 'left:' + barPct + '%;width:' + (50 - barPct) + '%') + '"></span>') +
+        '</span>';
+      return '<div class="rc-dv" data-dir="' + d + '">' +
+        '<span class="rc-dv-key rc-g-' + v.key + '"><span class="rc-leg-dot"></span>' + esc(v.label) + '</span>' +
+        '<span class="rc-dv-val">' + fmt(t.value, v.unit) + '</span>' +
+        '<span class="rc-dv-norm">/ ' + fmt(t.normal, v.unit) + '</span>' +
+        bar +
+        '<span class="rc-dv-sigma">' + (z == null ? "\u2014" : sgn(z, 1) + "\u03c3") + '</span>' +
+      '</div>';
+    }).join("");
+    var m = s.meta || {};
     var cred = [];
-    if (n != null) cred.push(n + " yrs " + by.start + "\u2013" + by.end);
-    cred.push("ERA5"); cred.push("as of " + esc(day.date));
-    if (day.stale) cred.push("cached");
-
-    var eyebrow = esc(loc.name || "");
-    if (day.date) eyebrow += '<span class="rc-dep-date">' + esc(prettyDate(day.date)) + '</span>';
-
-    return '<section class="rc-departure" data-dir="' + dir + '">' +
-      '<div class="rc-dep-eyebrow">' + eyebrow + '</div>' +
-      '<div class="rc-dep-read">' +
-        '<span class="rc-dep-num">' + signed(a) + '</span>' +
-        '<span class="rc-dep-unit">' + esc(v.unit) + '</span>' +
-        '<span class="rc-dep-word">' + esc(word(a)) + '</span>' +
-      '</div>' +
-      dist +
-      '<div class="rc-dep-cred">' + cred.join(" \u00b7 ") + '</div>' +
-    '</section>';
+    if (m.sampleYears != null) cred.push(m.sampleYears + " yrs " + m.start + "\u2013" + m.end);
+    cred.push("ERA5 · forecast"); cred.push("as of " + esc(s.date));
+    if (m.stale) cred.push("cached");
+    return '<section class="rc-readout">' +
+      '<div class="rc-readout-head"><span>today</span><span>normal</span><span>departure</span><span>\u03c3</span></div>' +
+      rows +
+      '<p class="rc-readout-cred">' + cred.join(" \u00b7 ") + '</p></section>';
   }
 
-  /* ---- INSTRUMENT STAT STRIP: key figures as a cluster on ONE panel, hairline-divided cells
-     (no per-cell border, no rail). Record hi/lo carry a subtle direction tint. Sparse-safe. ---- */
-  function stats(day) {
-    var w = day.weather, r = w.records || {}, t = w.twin, cells = [];
-    function cell(label, val, sub, tone) {
-      return '<div class="rc-stat' + (tone ? ' rc-stat-' + tone : '') + '"><div class="rc-stat-lab">' + esc(label) + '</div>' +
-        '<div class="rc-stat-val">' + esc(val) + '</div>' +
-        '<div class="rc-stat-sub">' + esc(sub == null ? "" : sub) + '</div></div>';
-    }
-    if (r.recordHigh != null) cells.push(cell("Record high", r.recordHigh + "\u00b0", r.recordHighYear || "", "up"));
-    if (r.recordLow != null)  cells.push(cell("Record low", r.recordLow + "\u00b0", r.recordLowYear || "", "down"));
-    if (t && t.year)          cells.push(cell("Closest match", t.year, "most like today"));
-    if (w.normal && w.normal.sampleYears != null) cells.push(cell("Sample", w.normal.sampleYears, "years on record"));
-    if (!cells.length) return "";
-    return '<section class="rc-stats">' + cells.join("") + '</section>';
-  }
-
-  /* ---- variable selector (segmented control) ---- */
-  function varToggle(activeVarKey) {
-    return '<div class="rc-vartoggle" role="tablist">' + VARS.map(function (v) {
-      return '<button class="rc-seg' + (v.key === activeVarKey ? " on" : "") + '" role="tab" aria-selected="' + (v.key === activeVarKey) + '" data-var="' + v.key + '">' + esc(v.label) + '</button>';
-    }).join("") + '</div>';
-  }
-
-  /* ---- ON THIS DAY: a dense FEED, not a card grid. Hairline rows, mono year + text, no boxes,
-     no rails. Holidays = inline chips. Staggered reveal. Sparse day reads as designed. ---- */
-  function almanac(day) {
-    var al = day.almanac;
+  /* ---- ON THIS DAY: dense feed (unchanged model) ---- */
+  function almanac(al) {
     if (!al) return '<section class="rc-alm"><h2 class="rc-h2">On this day</h2><p class="muted rc-loading">Reading the record\u2026</p></section>';
     function feed(label, items) {
       if (!items || !items.length) return "";
       var rows = items.slice(0, 8).map(function (e, i) {
-        return '<li class="rc-row" style="--i:' + i + '"><span class="rc-row-yr">' + esc(e.year || "") + '</span>' +
-          '<span class="rc-row-tx">' + esc(e.text) + '</span></li>';
+        return '<li class="rc-row" style="--i:' + i + '"><span class="rc-row-yr">' + esc(e.year || "") + '</span><span class="rc-row-tx">' + esc(e.text) + '</span></li>';
       }).join("");
       return '<div class="rc-alm-sec"><h3 class="rc-alm-h">' + esc(label) + '</h3><ul class="rc-feed">' + rows + '</ul></div>';
     }
@@ -122,10 +87,8 @@
     out += feed("Born", al.births);
     out += feed("Died", al.deaths);
     if (!out) out = '<p class="muted rc-alm-empty">A quiet day. Nothing notable in the record for this date.</p>';
-    return '<section class="rc-alm">' +
-      '<div class="rc-alm-top"><h2 class="rc-h2">On this day</h2><span class="rc-alm-note">notable per Wikipedia · English-centric</span></div>' +
-      out + '</section>';
+    return '<section class="rc-alm"><div class="rc-alm-top"><h2 class="rc-h2">On this day</h2><span class="rc-alm-note">notable per Wikipedia · English-centric</span></div>' + out + '</section>';
   }
 
-  window.Dashboard = { departure: departure, stats: stats, varToggle: varToggle, almanac: almanac };
+  window.Dashboard = { headline: headline, graph: graph, legend: legend, readout: readout, almanac: almanac };
 })();
