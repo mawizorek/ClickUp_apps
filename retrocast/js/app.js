@@ -1,6 +1,6 @@
 /* app.js — orchestration. Listens for the router's page:render hook, builds the
    home dashboard for the active location, hydrates the shared MM-DD almanac feed,
-   and wires the switcher / variable toggle / refresh / add-location. Per-feed
+   and wires the switcher / variable selector / refresh / add-location. Per-feed
    loading + empty + error states, never all-or-nothing (spec §7). */
 (function () {
   var activeVar = "tempHigh";
@@ -10,36 +10,32 @@
 
   function switcherHTML() {
     var list = Store.locations(), active = Store.activeSlug();
-    return '<div class="rc-switch">' +
+    return '<div class="rc-switch" role="tablist" aria-label="Location">' +
       list.map(function (l) {
-        return '<button class="rc-loc' + (l.slug === active ? " on" : "") + '" data-slug="' + l.slug + '">' + l.name + '</button>';
+        return '<button class="rc-loc' + (l.slug === active ? " on" : "") + '" role="tab" aria-selected="' + (l.slug === active) + '" data-slug="' + l.slug + '">' + l.name + '</button>';
       }).join("") +
-      '<button class="rc-loc rc-addbtn" data-add="1" aria-label="Add location">+ add</button>' +
+      '<button class="rc-loc rc-addbtn" data-add="1" aria-label="Add location">+</button>' +
       '</div>';
   }
 
+  /* Zones only — no restated location H1 (the active tab already names the place; a giant
+     duplicate title is a restated heading). The departure block leads with a compact eyebrow. */
   function skeleton() {
-    var loc = Store.activeLocation();
     return '<section class="page rc-page">' +
       '<div id="rcSwitch">' + switcherHTML() + '</div>' +
-      '<h1 class="rc-title">' + (loc ? loc.name : "Retrocast") + '</h1>' +
-      '<div id="rcHero"><section class="rc-hero"><div class="rc-hero-word rc-loading">Reading the record\u2026</div></section></div>' +
-      '<div id="rcCred"></div>' +
+      '<div id="rcDeparture"><section class="rc-departure"><div class="rc-dep-read"><span class="rc-dep-word rc-loading">Reading the record\u2026</span></div></section></div>' +
       '<div id="rcTools"></div>' +
-      '<div id="rcBand"></div>' +
-      '<div id="rcTwin"></div>' +
-      '<div id="rcRibbon"></div>' +
-      '<button class="btn btn-secondary rc-refresh" id="rcRefresh">Refresh</button>' +
+      '<div id="rcStats"></div>' +
+      '<div id="rcAlmanac"></div>' +
+      '<div class="rc-actions"><button class="btn btn-secondary rc-refresh" id="rcRefresh">Refresh</button></div>' +
       '</section>';
   }
 
   function renderWeather(day) {
-    q("rcHero").innerHTML = Dashboard.hero(day, activeVar);
-    q("rcCred").innerHTML = Dashboard.credibility(day);
+    q("rcDeparture").innerHTML = Dashboard.departure(day, activeVar);
     q("rcTools").innerHTML = Dashboard.varToggle(activeVar);
-    q("rcBand").innerHTML = Dashboard.band(day, activeVar);
-    q("rcTwin").innerHTML = Dashboard.twin(day);
-    q("rcTools").querySelectorAll(".rc-chip").forEach(function (b) {
+    q("rcStats").innerHTML = Dashboard.stats(day);
+    q("rcTools").querySelectorAll(".rc-seg").forEach(function (b) {
       b.addEventListener("click", function () {
         activeVar = b.getAttribute("data-var");
         renderWeather(day); // re-bind same Day, no refetch
@@ -48,7 +44,7 @@
   }
 
   function renderAlmanac(day) {
-    q("rcRibbon").innerHTML = Dashboard.ribbon(day);
+    q("rcAlmanac").innerHTML = Dashboard.almanac(day);
   }
 
   function loadAlmanac(day) {
@@ -68,7 +64,7 @@
       };
       renderAlmanac(day);
     }).catch(function () {
-      q("rcRibbon").innerHTML = '<section class="card rc-err"><h3>On this day</h3><p class="muted">Couldn\u2019t load the historical record. Try refresh.</p></section>';
+      q("rcAlmanac").innerHTML = '<section class="rc-alm"><h2 class="rc-h2">On this day</h2><p class="muted rc-alm-empty">Couldn\u2019t load the historical record. Try refresh.</p></section>';
     });
   }
 
@@ -80,7 +76,7 @@
       renderAlmanac(day); // shows loading state
       loadAlmanac(day);
     }).catch(function () {
-      q("rcHero").innerHTML = '<section class="rc-hero rc-err"><div class="rc-hero-word">Data unavailable</div><div class="rc-hero-sub">No live data and nothing cached for this location yet.</div></section>';
+      q("rcDeparture").innerHTML = '<section class="rc-departure rc-err"><div class="rc-dep-eyebrow">' + (loc.name || "") + '</div><div class="rc-dep-word">Data unavailable</div><div class="rc-dep-sub">No live data and nothing cached for this location yet.</div></section>';
     });
   }
 
@@ -104,8 +100,8 @@
       var pick = results[0];
       if (results.length > 1) {
         var menu = results.map(function (r, i) { return (i + 1) + ". " + r.name; }).join("\n");
-        var n = parseInt(window.prompt("Multiple matches \u2014 pick one:\n" + menu, "1"), 10);
-        if (n >= 1 && n <= results.length) pick = results[n - 1];
+        var nn = parseInt(window.prompt("Multiple matches \u2014 pick one:\n" + menu, "1"), 10);
+        if (nn >= 1 && nn <= results.length) pick = results[nn - 1];
       }
       Store.addLocation(pick); Store.setActive(pick.slug); build();
     }).catch(function () { alert("Location lookup failed. Check your connection."); });
