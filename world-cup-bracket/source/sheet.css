@@ -22,9 +22,44 @@
 .chip-trace { border: none; background: var(--accent-surface); color: var(--accent); width: 18px; height: 18px; border-radius: 50%; font-size: 0.6875rem; font-weight: 800; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
 .chip-trace:hover, .chip-trace:focus-visible { background: oklch(28% 0.07 155); }
 
-/* Road to here */
-.sheet-road { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
-.road-head { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 8px; }
+/* ---- Goal timeline feed ---- */
+/* Two team tints, drawn from the app hue family (cool 'home' / warm 'away'), NOT literal
+   national colors — the team code text carries identity so we never rely on color alone. */
+.gf { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 12px; }
+.gf-head { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 11px; display: flex; align-items: center; gap: 8px; }
+.gf-legend { margin-left: auto; display: flex; gap: 10px; }
+.gf-lg { display: inline-flex; align-items: center; gap: 4px; font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.03em; color: var(--text-dim); }
+.gf-lg::before { content: ''; width: 7px; height: 7px; border-radius: 50%; }
+.gf-lg.home::before { background: oklch(70% 0.11 255); }
+.gf-lg.away::before { background: oklch(72% 0.15 25); }
+
+.gf-line { position: relative; padding-left: 50px; }
+.gf-line::before { content: ''; position: absolute; left: 40px; top: 5px; bottom: 5px; width: 2px; background: var(--border); border-radius: 1px; }
+.gf-goal { position: relative; padding: 5px 0; display: flex; align-items: baseline; gap: 8px; }
+.gf-min { position: absolute; left: -50px; width: 35px; text-align: right; font-size: 0.7rem; font-weight: 700; color: var(--text-mid); font-variant-numeric: tabular-nums; }
+.gf-min .gf-plus { color: var(--text-dim); font-size: 0.58rem; }
+.gf-goal::before { content: ''; position: absolute; left: -12px; top: 9px; width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--surface-1); background: oklch(70% 0.11 255); }
+.gf-goal.away::before { background: oklch(72% 0.15 25); }
+.gf-ball { font-size: 0.68rem; opacity: 0.5; }
+.gf-player { font-size: 0.83rem; font-weight: 700; color: var(--text); }
+.gf-code { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 5px; border-radius: 4px; background: oklch(70% 0.11 255 / 0.16); color: oklch(80% 0.09 255); }
+.gf-goal.away .gf-code { background: oklch(72% 0.15 25 / 0.16); color: oklch(82% 0.12 25); }
+.gf-tag { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.03em; color: var(--gold); background: var(--gold-surface); border-radius: 3px; padding: 1px 5px; }
+.gf-tag.og { color: var(--text-dim); background: var(--surface-3); }
+.gf-ht { position: relative; margin: 7px 0 7px -50px; padding-left: 50px; display: flex; align-items: center; gap: 8px; }
+.gf-ht-lbl { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); background: var(--surface-3); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+.gf-ht-ln { flex: 1; height: 1px; background: var(--border); }
+
+/* ---- Road to here (collapsible; collapsed by default) ---- */
+.sheet-road { margin-top: 14px; border-top: 1px solid var(--border); }
+.road-toggle { width: 100%; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 11px 0 3px; font-family: inherit; }
+.road-head { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); }
+.road-chev { margin-left: auto; color: var(--text-dim); font-size: 0.7rem; line-height: 1; transition: transform 240ms var(--ease-out); }
+.sheet-road.open .road-chev { transform: rotate(180deg); }
+.road-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 300ms var(--ease-out); }
+.sheet-road.open .road-body { grid-template-rows: 1fr; }
+.road-inner { overflow: hidden; }
+.road-inner > .road-team:first-child { padding-top: 9px; }
 .road-team { margin-bottom: 10px; }
 .road-team-name { font-size: 0.625rem; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
 .road-row { display: flex; align-items: baseline; gap: 8px; font-size: 0.75rem; padding: 2px 0; }
