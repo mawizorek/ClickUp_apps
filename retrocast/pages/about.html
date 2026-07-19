@@ -1,0 +1,23 @@
+<section class="page">
+  <h1>About Retrocast</h1>
+  <p class="lead">Retrocast answers one question honestly: was today weird? It compares today's weather to the historical record for this exact calendar day, and surfaces what else happened on this day in history.</p>
+
+  <h2>How it reads the numbers</h2>
+  <p>Today's values come from a forecast model. The historical normal, spread, and records come from the ERA5 reanalysis archive, which lags recent days by about five days. These are two separate models on two separate endpoints; Retrocast never blurs them. "Today" and "this day" always anchor to each location's own local date.</p>
+
+  <h2>Honesty features</h2>
+  <div class="callout">Every departure reads against a 20–30 year baseline, and the credibility line under the hero states the exact sample size and the “as of” date. A sparse day reports its true (smaller) sample rather than faking confidence. Nothing is fabricated from thin data.</div>
+
+  <h2>Sources</h2>
+  <table class="tbl">
+    <thead><tr><th>Layer</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Weather (today + history)</td><td>Open-Meteo · CC BY 4.0</td></tr>
+      <tr><td>On this day (events, births, deaths)</td><td>Wikimedia · notable per Wikipedia, English-centric</td></tr>
+      <tr><td>Public holidays</td><td>Nager.Date</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Refresh</h2>
+  <p class="muted">Data refreshes daily per location and on open, with a manual refresh button on the dashboard. Between refreshes, Retrocast reads its own cached table, so it still renders (with an honest “as of” stamp) when a source is down.</p>
+</section>
