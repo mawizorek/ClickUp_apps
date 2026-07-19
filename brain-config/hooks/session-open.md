@@ -3,7 +3,7 @@
 **Type:** MANDATORY gate — fires at the START of every substantive session.  
 **Trigger:** First user message in a new conversation where work will be done (not single-question lookups or casual chat).  
 **Created:** 2026-07-18 (Michael directive: mirror session-close at the top).  
-**Updated:** 2026-07-19 (Michael directive: scan the FULL session list — including closed & done — and REOPEN a precursor session over cutting a new task; keeps the board lean and threads context in line).  
+**Updated:** 2026-07-19 (Michael directive: scan the FULL session list — including closed & done — and REOPEN a precursor session over cutting a new task; keeps the board lean and threads context in line). Same day: hardened so a mid-session prompt/backfill to create is NOT an exemption from the scan.  
 **Companion:** `session-close.md` (the bookend at session end).
 
 ---
@@ -20,6 +20,14 @@ Do NOT fire for:
 - Single-question lookups ("what's the status of X?")
 - Casual conversation with no workspace action
 - Quick one-off answers that don't touch tasks/docs/repo
+
+---
+
+## ⚠️ A prompt to create is NOT an exemption from the scan (HARD RULE)
+
+If you're caught mid-session without a task and Michael asks "did you start your session task?" (or otherwise nudges you to create one), that prompt does **NOT** authorize a bare create. It fires this whole gate from the top: **scan the full list (Step 1) → reopen a precursor if one exists (Step 2) → create only if none does (Step 3).** The nudge changes the timing, never the sequence.
+
+The same holds for any backfill: if work has already escalated without a session task, run the scan before opening one — the fact that you're late does not let you skip straight to create. Creating a task without first scanning is itself a gate FAILURE, whether it happened at session open or after a prompt. This mirrors the standing principle that a direct build command is not an exemption from its gate.
 
 ---
 
@@ -92,6 +100,7 @@ The line is: will this conversation produce changes to the workspace, repo, or g
 
 - Sessions with no Activity Board record (invisible work, no transcript, can't be resumed or audited)
 - **Duplicate session tasks for work that was already a thread** — a fresh task cut when a closed/done precursor should have been reopened, scattering context and bloating the board
+- **A blind create triggered by a "did you start your task?" prompt** — the nudge skips the scan and forks a duplicate instead of reopening the real precursor
 - Git collisions from missing presence posts
 - Stale context from skipping the mandatory load step
 - Orphaned sessions that can't be picked up by a fresh agent
