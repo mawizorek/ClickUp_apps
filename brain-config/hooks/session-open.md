@@ -3,6 +3,7 @@
 **Type:** MANDATORY gate — fires at the START of every substantive session.  
 **Trigger:** First user message in a new conversation where work will be done (not single-question lookups or casual chat).  
 **Created:** 2026-07-18 (Michael directive: mirror session-close at the top).  
+**Updated:** 2026-07-19 (Michael directive: scan the FULL session list — including closed & done — and REOPEN a precursor session over cutting a new task; keeps the board lean and threads context in line).  
 **Companion:** `session-close.md` (the bookend at session end).
 
 ---
@@ -24,9 +25,27 @@ Do NOT fire for:
 
 ## Steps (execute in order)
 
-### 1. Create session task on the Agent Activity Board
+### 1. Scan the existing session list FIRST — including closed & done
 
-**List:** `4026861396055493779` (🟢 Agent Activity Board)  
+**Before creating anything**, read the Agent Activity Board list (`4026861396055549379`) for a session this conversation might be continuing. The session you're about to open is often a continuation of an earlier one: a paused audit, a build shipped last week, a handoff parked in `to do`. Earlier sessions are context precursors, not clutter.
+
+- Pull **all statuses, INCLUDING `closed` and `done`** — they're hidden by default; retrieve them anyway. A done/closed session is a live context source, not a dead one.
+- Search by scope / subject / domain keyword, not just the most recent tasks.
+- Look for: a parked `↪️ HANDOFF · …` task in the `to do` handoff slot, an `in progress` session on the same subject, or a recently closed/done session on the same thread.
+
+### 2. Reopen over create (default bias)
+
+If the scan turns up a genuine precursor, **REOPEN it as a continued session** instead of starting a fresh task:
+
+- Flip it back to `in progress` (from `closed`/`done`), read its description + transcript comments to warm-start on prior context, and continue the record there.
+- Post a resume comment ("Resumed <Mon DD> — continuing <what/why>").
+- If it's a parked handoff task, complete its warm-start prompt and keep going.
+
+Only fall through to step 3 when the scan finds **no genuine precursor**. Reopening keeps the board lean and threads context instead of scattering it across duplicate tasks.
+
+### 3. Create a new session task (only if no precursor exists)
+
+**List:** `4026861396055549379` (🟢 Agent Activity Board)  
 **Title format:** `Brain (Opus <version>) · <what you're doing, concise> · <Mon DD>`  
 **Description:** Agent Activity Board Gold Standard format:
 - Objective (what the session aims to accomplish)
@@ -36,7 +55,7 @@ Do NOT fire for:
 
 This task is your LIVE working record. Transcript accrues as comments. Close = summary at session end (per session-close hook).
 
-### 2. Read the Session Board (git presence channel)
+### 4. Read the Session Board (git presence channel)
 
 **Path:** `brain-config/session-board.md` in `mawizorek/ClickUp_apps`  
 **Purpose:** Check who else is working in the repo right now.
@@ -44,7 +63,7 @@ This task is your LIVE working record. Transcript accrues as comments. Close = s
 - If another agent has an active entry claiming files you'll touch, coordinate or work elsewhere.
 - If clear, proceed.
 
-### 3. Post your presence (if doing git work)
+### 5. Post your presence (if doing git work)
 
 If your session will touch the repo:
 - Add ONE entry to the Active section of `session-board.md`
@@ -54,7 +73,7 @@ If your session will touch the repo:
 
 If your session is workspace-only (no git), skip this step.
 
-### 4. Load mandatory context
+### 6. Load mandatory context
 
 Per memory rules:
 - AI Toolkit index
@@ -65,13 +84,14 @@ Per memory rules:
 
 ## What "substantive" means
 
-The line is: will this conversation produce changes to the workspace, repo, or generate deliverables? If yes, open a session task. If you're unsure, err on the side of opening one. A session task that ends up being short is fine; a session with no record is not.
+The line is: will this conversation produce changes to the workspace, repo, or generate deliverables? If yes, open (or reopen) a session task. If you're unsure, err on the side of opening one. A session task that ends up being short is fine; a session with no record is not.
 
 ---
 
 ## Failure mode this prevents
 
 - Sessions with no Activity Board record (invisible work, no transcript, can't be resumed or audited)
+- **Duplicate session tasks for work that was already a thread** — a fresh task cut when a closed/done precursor should have been reopened, scattering context and bloating the board
 - Git collisions from missing presence posts
 - Stale context from skipping the mandatory load step
 - Orphaned sessions that can't be picked up by a fresh agent
@@ -82,7 +102,8 @@ The line is: will this conversation produce changes to the workspace, repo, or g
 
 | session-open | session-close |
 |---|---|
-| Create session task | Close/summarize session task |
+| Scan list (incl. closed/done) + reopen precursor | Cut the next-session HANDOFF task |
+| Create session task (only if no precursor) | Close/summarize session task |
 | Post presence on session-board | Delete presence from session-board |
 | Load context | Memory audit + save |
 | Start the work | Report what was done |
