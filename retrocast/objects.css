@@ -1,70 +1,73 @@
 /* objects.css — Retrocast object presentation. COLOR comes only from the theme spine
    (var(--token)); this file owns structure + the 3 new objects registered in the
-   shared library (stat_hero_departure, viz_range_band, card_ribbon). Mobile-first. */
+   shared library (stat_hero_departure, viz_range_band, card_ribbon). Mobile-first.
+   SLEEK PASS (2026-07-19): pills removed (sharp chips), the hero + twin numbers are now
+   mono instrument readouts, cards flattened to hairline dividers over heavy fills. Tight. */
 
-.rc-page { max-width: 920px; }
-.rc-title { margin-top: var(--s4); }
+.rc-page { max-width: 900px; }
+.rc-title { margin-top: var(--s4); text-transform: uppercase; letter-spacing: -0.02em; }
 
-/* ---- location switcher (scroll-snap row of chips) ---- */
-.rc-switch { display: flex; gap: var(--s2); overflow-x: auto; padding-bottom: var(--s2); -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-.rc-loc { flex: 0 0 auto; font: inherit; font-weight: 700; font-size: 0.85rem; padding: 8px 14px; min-height: 40px; border-radius: 999px; cursor: pointer; background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border); transition: border-color 150ms, color 150ms; }
-.rc-loc:hover { border-color: var(--accent); color: var(--text); }
-.rc-loc.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.rc-addbtn { color: var(--text-faint); }
+/* ---- location switcher (sharp segmented row, not pills) ---- */
+.rc-switch { display: flex; gap: 0; overflow-x: auto; padding-bottom: var(--s3); -webkit-overflow-scrolling: touch; scrollbar-width: thin; border-bottom: var(--border-w) solid var(--border); margin-bottom: var(--s4); }
+.rc-loc { flex: 0 0 auto; font: inherit; font-weight: 600; font-size: 0.8rem; padding: 8px 13px; min-height: 38px; cursor: pointer; background: transparent; color: var(--text-faint); border: 0; border-bottom: 2px solid transparent; transition: color 120ms, border-color 120ms; letter-spacing: 0.02em; }
+.rc-loc:hover { color: var(--text); }
+.rc-loc.on { color: var(--text); border-bottom-color: var(--accent); }
+.rc-addbtn { color: var(--text-faint); font-family: var(--font-mono); }
 
-/* ---- 1. departure hero (stat_hero_departure) ---- */
-.rc-hero { text-align: center; padding: var(--s6) var(--s4) var(--s5); border-radius: var(--radius-lg); background: var(--surface-2); border: 1px solid var(--border); margin-bottom: var(--s4); }
-.rc-hero-metric { display: flex; align-items: baseline; justify-content: center; gap: 4px; }
-.rc-hero-num { font-size: clamp(3rem, 16vw, 5.5rem); font-weight: 900; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--text); }
-.rc-hero-unit { font-size: clamp(1.2rem, 5vw, 1.8rem); font-weight: 700; color: var(--text-soft); }
-.rc-hero-word { font-size: 1.05rem; font-weight: 700; margin-top: var(--s3); text-transform: uppercase; letter-spacing: 0.06em; }
-.rc-hero-sub { font-size: 0.85rem; color: var(--text-faint); margin-top: var(--s2); }
-/* redundant sign+word encoding: a colored side rail reinforces, never carries, meaning */
-.rc-hero[data-dir="up"]   { border-left: 4px solid var(--warn); }
+/* ---- 1. departure hero (stat_hero_departure) — instrument readout ---- */
+.rc-hero { text-align: left; padding: var(--s5) var(--s5) var(--s4); border-radius: var(--radius-lg); background: var(--surface-1); border: var(--border-w) solid var(--border); margin-bottom: var(--s3); position: relative; overflow: hidden; }
+.rc-hero-metric { display: flex; align-items: baseline; gap: 3px; }
+.rc-hero-num { font-family: var(--font-mono); font-size: clamp(2.8rem, 15vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--text); }
+.rc-hero-unit { font-family: var(--font-mono); font-size: clamp(1rem, 4vw, 1.5rem); font-weight: 500; color: var(--text-soft); }
+.rc-hero-word { font-size: 0.8rem; font-weight: 700; margin-top: var(--s3); text-transform: uppercase; letter-spacing: 0.1em; }
+.rc-hero-sub { font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-faint); margin-top: var(--s1); letter-spacing: 0; }
+/* redundant sign+word encoding: a colored left rail reinforces, never carries, meaning */
+.rc-hero[data-dir="up"]   { border-left: 3px solid var(--warn); }
 .rc-hero[data-dir="up"]   .rc-hero-word { color: var(--warn); }
-.rc-hero[data-dir="down"] { border-left: 4px solid var(--info); }
+.rc-hero[data-dir="down"] { border-left: 3px solid var(--info); }
 .rc-hero[data-dir="down"] .rc-hero-word { color: var(--info); }
 .rc-hero[data-dir="flat"] .rc-hero-word { color: var(--text-soft); }
-.rc-hero.rc-err { border-left: 4px solid var(--bad); }
+.rc-hero.rc-err { border-left: 3px solid var(--bad); }
 
-.rc-cred { font-size: 0.78rem; text-align: center; margin: 0 0 var(--s5); font-variant-numeric: tabular-nums; }
+.rc-cred { font-family: var(--font-mono); font-size: 0.72rem; margin: 0 0 var(--s5); font-variant-numeric: tabular-nums; letter-spacing: 0; color: var(--text-faint); }
 
-/* ---- variable toggle (ctl_chip) ---- */
-.rc-vartoggle { display: flex; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s4); }
-.rc-chip { font: inherit; font-size: 0.8rem; font-weight: 700; padding: 6px 12px; min-height: 36px; border-radius: 999px; cursor: pointer; background: transparent; color: var(--text-faint); border: 1px solid var(--border); }
-.rc-chip:hover { border-color: var(--accent); color: var(--text); }
-.rc-chip.on { color: var(--text); border-color: var(--accent); background: var(--accent-soft); }
+/* ---- variable toggle (sharp segmented control, not pills) ---- */
+.rc-vartoggle { display: inline-flex; flex-wrap: wrap; margin-bottom: var(--s4); border: var(--border-w) solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.rc-chip { font: inherit; font-size: 0.74rem; font-weight: 600; padding: 7px 12px; min-height: 34px; cursor: pointer; background: transparent; color: var(--text-faint); border: 0; border-right: var(--border-w) solid var(--border); text-transform: uppercase; letter-spacing: 0.04em; transition: background 120ms, color 120ms; }
+.rc-chip:last-child { border-right: 0; }
+.rc-chip:hover { color: var(--text); background: var(--surface-2); }
+.rc-chip.on { color: var(--on-accent); background: var(--accent); }
 
 /* ---- 3. range band (viz_range_band) ---- */
 .rc-band-card h3 { margin-bottom: var(--s5); }
-.rc-band { position: relative; height: 14px; margin: var(--s4) 0 var(--s2); }
-.rc-band-track { position: absolute; inset: 0; top: 5px; height: 4px; border-radius: 999px; background: var(--surface-3); border: 1px solid var(--border); }
+.rc-band { position: relative; height: 12px; margin: var(--s4) 0 var(--s2); }
+.rc-band-track { position: absolute; inset: 0; top: 5px; height: 2px; border-radius: 0; background: var(--border); }
 .rc-band-normal, .rc-band-today { position: absolute; top: 0; transform: translateX(-50%); }
-.rc-band-normal { width: 2px; height: 14px; background: var(--text-faint); }
-.rc-band-today { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg); box-shadow: 0 0 0 1px var(--accent); }
-.rc-band-scale { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
-.rc-band-key { display: flex; gap: var(--s4); margin-top: var(--s3); font-size: 0.75rem; color: var(--text-soft); }
+.rc-band-normal { width: var(--border-w); height: 12px; background: var(--text-faint); }
+.rc-band-today { width: 10px; height: 10px; top: 1px; border-radius: 2px; background: var(--accent); border: 2px solid var(--surface-2); box-shadow: 0 0 0 1px var(--accent); }
+.rc-band-scale { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.rc-band-key { display: flex; gap: var(--s4); margin-top: var(--s3); font-size: 0.72rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
 .rc-band-key i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: middle; }
-.rc-band-key .k-normal { width: 2px; height: 12px; background: var(--text-faint); }
-.rc-band-key .k-today { border-radius: 50%; background: var(--accent); }
+.rc-band-key .k-normal { width: var(--border-w); height: 11px; background: var(--text-faint); }
+.rc-band-key .k-today { border-radius: 2px; background: var(--accent); }
 
-/* ---- weather twin ---- */
-.rc-twin { text-align: center; }
-.rc-twin-year { font-size: 2.4rem; font-weight: 900; color: var(--accent); margin: var(--s2) 0; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+/* ---- weather twin — mono instrument year ---- */
+.rc-twin { text-align: left; }
+.rc-twin-year { font-family: var(--font-mono); font-size: 2.2rem; font-weight: 700; color: var(--accent); margin: var(--s1) 0; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
 /* ---- 5. on-this-day ribbon (card_ribbon) ---- */
 .rc-ribbon-wrap { margin-top: var(--s6); }
-.rc-rib-note { font-size: 0.75rem; margin-top: -6px; }
+.rc-rib-note { font-family: var(--font-mono); font-size: 0.72rem; margin-top: -4px; letter-spacing: 0; }
 .rc-rib-group { margin-bottom: var(--s5); }
-.rc-rib-group h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-soft); margin: 0 0 var(--s2); }
-.rc-rib { display: flex; gap: var(--s3); overflow-x: auto; padding-bottom: var(--s2); scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+.rc-rib-group h4 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-soft); margin: 0 0 var(--s2); font-weight: 700; }
+.rc-rib { display: flex; gap: var(--s2); overflow-x: auto; padding-bottom: var(--s2); scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
 .rc-rib:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; border-radius: var(--radius); }
-.rc-card { flex: 0 0 240px; scroll-snap-align: start; background: var(--surface-2); border: 1px solid var(--border); border-top: 3px solid var(--accent-2); border-radius: var(--radius-lg); padding: var(--s4); }
-.rc-card-y { font-family: var(--font-mono); font-weight: 700; color: var(--accent); font-size: 0.85rem; margin: 0 0 var(--s2); }
-.rc-card-b { font-size: 0.88rem; line-height: 1.45; margin: 0; color: var(--text); }
+.rc-card { flex: 0 0 210px; scroll-snap-align: start; background: var(--surface-2); border: var(--border-w) solid var(--border); border-left: 2px solid var(--accent-2); border-radius: var(--radius); padding: var(--s3) var(--s4); }
+.rc-card-y { font-family: var(--font-mono); font-weight: 700; color: var(--accent); font-size: 0.8rem; margin: 0 0 6px; letter-spacing: 0; }
+.rc-card-b { font-size: 0.84rem; line-height: 1.4; margin: 0; color: var(--text); }
 
 .rc-refresh { margin-top: var(--s5); }
 .rc-loading { opacity: 0.7; }
 .rc-err { border-left: 3px solid var(--bad); }
 
-@media (min-width: 620px) { .rc-hero-sub { font-size: 0.9rem; } }
+@media (min-width: 620px) { .rc-hero-sub { font-size: 0.8rem; } }
