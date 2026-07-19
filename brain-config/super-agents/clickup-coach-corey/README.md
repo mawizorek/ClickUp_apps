@@ -1,17 +1,22 @@
 # ClickUp Coach Corey — Declaration Folder
 
 > **No metadata lives in this file.** All global metadata for this agent (identity, track,
-> golden-standard version, status, channels, lane, triggers) is the single source in
-> [`../superagents.json`](../superagents.json) under `slug: clickup-coach-corey`. Nothing here is
-> hand-mirrored from there.
+> golden-standard version, status, lane) is the single source in
+> [`../superagents.json`](../superagents.json) under `slug: clickup-coach-corey`.
+>
+> **Git-only as of 2026-07-19** — the native ClickUp Super Agent is retired; the git profile is
+> canonical (no live config to mirror anymore).
 >
 > Folder contents:
-> - **`preferences.md`** — a **near-1:1 verbatim mirror of the live ClickUp agent config** (a short
->   timestamp header, then the config top to bottom, nothing else). This is the target an audit
->   compares the live configuration against. No changelog or extra notes belong in it.
-> - **`working-notes.md`** — next spec / working notes / per-agent revision log (this is where
->   changelog-style history goes, NOT preferences.md).
+> - **`preferences.md`** — Corey's CANONICAL git-teammate profile (base pointer + full role + load
+>   manifest). Editable source of truth for his behavior. (Was a verbatim live-config mirror;
+>   reframed when the native agent was retired.)
+> - **`memory.md`** — accumulated context (not process).
+> - **`activity-log.md`** — rolling session ledger (newest on top).
+> - **`decision-log.md`** — reasoning trail.
+> - **`working-notes.md`** — next spec / working notes / revision log.
 > - **`audits/<slug>.<date>.md`** — dated audit records (one per audit, via PR).
 >
-> Audit workflow + PR-body standard: [`../audit-instruction.md`](../audit-instruction.md). Fleet
-> view: [`../index.html`](../index.html) (renders `superagents.json`).
+> Invocation: `/session.agent=Corey` (or `/session-start=Corey`). Runtime contract:
+> [`../_shared/super-agent-base.md`](../_shared/super-agent-base.md). Authoring standard:
+> [`../../gates/git-agent-authoring.md`](../../gates/git-agent-authoring.md).
