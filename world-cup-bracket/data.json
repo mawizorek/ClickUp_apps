@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-18b",
+  "version": "2026-07-18c",
   "tournament": "FIFA World Cup 2026",
   "matches": [
     {
@@ -381,7 +381,11 @@
       "as": 0,
       "winner": "home",
       "venue": "Gillette Stadium, Foxborough",
-      "feedsTo": 29
+      "feedsTo": 29,
+      "goals": [
+        { "m": "60", "p": "Mbappé", "t": "h" },
+        { "m": "66", "p": "Dembélé", "t": "h" }
+      ]
     },
     {
       "id": 26,
@@ -396,7 +400,12 @@
       "as": 1,
       "winner": "home",
       "venue": "SoFi Stadium, Inglewood",
-      "feedsTo": 29
+      "feedsTo": 29,
+      "goals": [
+        { "m": "30", "p": "Fabián Ruiz", "t": "h" },
+        { "m": "41", "p": "De Ketelaere", "t": "a" },
+        { "m": "88", "p": "Merino", "t": "h" }
+      ]
     },
     {
       "id": 27,
@@ -412,7 +421,12 @@
       "aet": true,
       "winner": "away",
       "venue": "Hard Rock Stadium, Miami Gardens",
-      "feedsTo": 30
+      "feedsTo": 30,
+      "goals": [
+        { "m": "36", "p": "Schjelderup", "t": "h" },
+        { "m": "45+2", "p": "Bellingham", "t": "a" },
+        { "m": "93", "p": "Bellingham", "t": "a" }
+      ]
     },
     {
       "id": 28,
@@ -428,7 +442,13 @@
       "aet": true,
       "winner": "home",
       "venue": "Arrowhead Stadium, Kansas City",
-      "feedsTo": 30
+      "feedsTo": 30,
+      "goals": [
+        { "m": "10", "p": "Mac Allister", "t": "h" },
+        { "m": "67", "p": "Ndoye", "t": "a" },
+        { "m": "112", "p": "Álvarez", "t": "h" },
+        { "m": "120+1", "p": "Lautaro", "t": "h" }
+      ]
     },
     {
       "id": 29,
@@ -443,7 +463,11 @@
       "as": 2,
       "winner": "away",
       "venue": "AT&T Stadium, Arlington",
-      "feedsTo": 32
+      "feedsTo": 32,
+      "goals": [
+        { "m": "22", "p": "Oyarzabal", "t": "a", "pen": true },
+        { "m": "58", "p": "Porro", "t": "a" }
+      ]
     },
     {
       "id": 30,
@@ -458,7 +482,12 @@
       "as": 2,
       "winner": "away",
       "venue": "Mercedes-Benz Stadium, Atlanta",
-      "feedsTo": 32
+      "feedsTo": 32,
+      "goals": [
+        { "m": "55", "p": "Gordon", "t": "h" },
+        { "m": "85", "p": "Enzo Fernández", "t": "a" },
+        { "m": "90+2", "p": "Lautaro", "t": "a" }
+      ]
     },
     {
       "id": 31,
@@ -473,7 +502,19 @@
       "as": 6,
       "winner": "away",
       "venue": "Hard Rock Stadium, Miami Gardens",
-      "feedsTo": null
+      "feedsTo": null,
+      "goals": [
+        { "m": "3", "p": "Rice", "t": "a" },
+        { "m": "18", "p": "Konsa", "t": "a" },
+        { "m": "37", "p": "Saka", "t": "a" },
+        { "m": "45+1", "p": "Saka", "t": "a" },
+        { "m": "48", "p": "Mbappé", "t": "h" },
+        { "m": "54", "p": "Barcola", "t": "h" },
+        { "m": "66", "p": "Mbappé", "t": "h" },
+        { "m": "87", "p": "Saka", "t": "a", "pen": true },
+        { "m": "90+6", "p": "Dembélé", "t": "h" },
+        { "m": "90+8", "p": "Bellingham", "t": "a" }
+      ]
     },
     {
       "id": 32,
