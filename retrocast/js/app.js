@@ -1,10 +1,12 @@
-/* app.js — orchestration. Builds the unified-graph dashboard for the active location from the
-   day.js SERIES, hydrates the shared MM-DD almanac, and wires switcher / legend-emphasis /
-   refresh / add-location. Legend emphasis re-renders only the graph (all vars stay visible). */
+/* app.js — orchestration. Builds the unified-graph dashboard from the day.js SERIES, keeps a
+   FOCUS offset (which day the 3-day zoom is centered on), and wires switcher / chevron nav /
+   legend-emphasis / refresh / add-location. Day-stepping and emphasis re-render from the
+   in-memory series with NO refetch (the window is fetched wide). */
 (function () {
   var emphasis = null;
+  var focus = 0;            // day offset the zoom is centered on (0 = today)
   var currentSeries = null;
-  var almanacCache = null; // shared across locations (keyed MM-DD only)
+  var almanacCache = null;  // shared across locations (keyed MM-DD only)
 
   function q(id) { return document.getElementById(id); }
 
@@ -22,6 +24,7 @@
     return '<section class="page rc-page">' +
       '<div id="rcSwitch">' + switcherHTML() + '</div>' +
       '<div id="rcHead"><section class="rc-head"><h1 class="rc-lead-line rc-loading">Reading the record\u2026</h1></section></div>' +
+      '<div id="rcNav"></div>' +
       '<div id="rcGraph"></div>' +
       '<div id="rcLegend"></div>' +
       '<div id="rcReadout"></div>' +
@@ -30,20 +33,42 @@
       '</section>';
   }
 
-  function paintGraph() {
-    q("rcGraph").innerHTML = Dashboard.graph(currentSeries, emphasis);
-    q("rcLegend").innerHTML = Dashboard.legend(currentSeries, emphasis);
-    q("rcLegend").querySelectorAll(".rc-leg").forEach(function (b) {
-      b.addEventListener("click", function () { emphasis = b.getAttribute("data-var"); paintGraph(); });
+  /* re-render everything that depends on the focused day (no refetch) */
+  function paintFocus() {
+    var s = currentSeries;
+    q("rcHead").innerHTML = Dashboard.headline(s, focus);
+    q("rcNav").innerHTML = Dashboard.nav(s, focus);
+    q("rcGraph").innerHTML = Dashboard.graph(s, focus, emphasis);
+    q("rcLegend").innerHTML = Dashboard.legend(s, emphasis);
+    q("rcReadout").innerHTML = Dashboard.readout(s, focus);
+    wireNav(); wireLegend();
+  }
+
+  function wireNav() {
+    var host = q("rcNav"); if (!host) return;
+    var b = currentSeries.bounds || { minFocus: -13, maxFocus: 13 };
+    host.querySelectorAll("[data-nav]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var d = btn.getAttribute("data-nav");
+        if (d === "prev") focus = Math.max(b.minFocus, focus - 1);
+        else if (d === "next") focus = Math.min(b.maxFocus, focus + 1);
+        else focus = 0;
+        paintFocus();
+      });
+    });
+  }
+  function wireLegend() {
+    var host = q("rcLegend"); if (!host) return;
+    host.querySelectorAll(".rc-leg").forEach(function (btn) {
+      btn.addEventListener("click", function () { emphasis = btn.getAttribute("data-var"); paintFocus(); });
     });
   }
 
   function renderSeries(s) {
     currentSeries = s;
-    emphasis = (s.headline && s.headline.key) || (s.vars[0] && s.vars[0].key);
-    q("rcHead").innerHTML = Dashboard.headline(s);
-    paintGraph();
-    q("rcReadout").innerHTML = Dashboard.readout(s);
+    focus = 0;
+    emphasis = (DayModel.snapshotAt(s, 0).headline || {}).key || (s.vars[0] && s.vars[0].key);
+    paintFocus();
   }
 
   function renderAlmanac(al) { q("rcAlmanac").innerHTML = Dashboard.almanac(al); }
@@ -67,7 +92,7 @@
   function loadActive() {
     var loc = Store.activeLocation();
     if (!loc) return;
-    renderAlmanac(null); // loading
+    renderAlmanac(null);
     DayModel.buildSeries(loc).then(function (s) {
       renderSeries(s);
       loadAlmanac(s);
@@ -77,8 +102,7 @@
   }
 
   function wireSwitcher() {
-    var host = q("rcSwitch");
-    if (!host) return;
+    var host = q("rcSwitch"); if (!host) return;
     host.querySelectorAll(".rc-loc").forEach(function (b) {
       b.addEventListener("click", function () {
         if (b.getAttribute("data-add")) return addLocationFlow();
