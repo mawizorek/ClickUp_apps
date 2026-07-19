@@ -15,6 +15,20 @@ owner_agents: [closing-clio, memory-maggie, scribe-sana]
 
 ---
 
+## ⚡ NO-ASK EXECUTION — the close JUST FIRES, never ask permission to run it (LOCKED 2026-07-18, Michael)
+
+**When a close is triggered (Michael says "close out" / "session closed" / "wrap it up", or a natural end is reached), EXECUTE the full close procedure end-to-end WITHOUT asking permission for any step of it.** Every step below is already mandatory and already documented. Asking "want me to fire the two channel posts?" / "should I post the session log?" / "do you want the memory audit?" is asking permission to follow the standing procedure — which is itself a failure, not diligence.
+
+- **The decision was made when the procedure was written.** A documented-mandatory step does not get a permission gate at runtime. Run it.
+- **Do not stall a close on a yes/no you already know the answer to.** If the spec says a step is non-negotiable, the answer is always yes; asking just burns a turn and makes Michael repeat himself.
+- **The ONLY thing you surface instead of silently claiming done:** a step that genuinely FAILED or could not run (tool unavailable, bounced write). Report the specific gap and what you did about it. That is different from asking whether to do a required step in the first place.
+- **Litmus:** if the honest phrasing of your question is "do you want me to follow the procedure?", delete the question and follow the procedure. If it's "X failed, here's the fallback I took," that's a valid report.
+- **This generalizes beyond close:** any step that documentation defines as mandatory (session-open gate, scoreboard read, dedup gates, etc.) JUST RUNS. Do not ask permission to do the thing the rules already require.
+
+*(Origin: scored B10 on the Scoreboard 2026-07-18 — asked Michael a variant of "want me to fire the two channel posts?" FOUR times across one close sequence, when the two-channel close was already a hard rule below. Michael: "ofc I want you to complete those tasks to finish out the session close. add documentation that enforces you just getting that done.")*
+
+---
+
 ## Overview
 
 Two posts, two channels, every session. Both follow the same structural rule: **root = tight header only, thread reply = all detail.** The root is what shows in the channel feed; the thread is what you expand when you want the full picture.
@@ -231,6 +245,7 @@ Never just post a bare link as a handoff. The prompt in the task must be self-co
 
 ## Rules (non-negotiable)
 
+0. **NO-ASK EXECUTION (2026-07-18).** Do not ask permission to run any step the close procedure already defines as mandatory. When a close is triggered, execute end-to-end. The only thing you surface mid-close is a step that FAILED (with the fallback you took), never a yes/no on whether to do a required step. See the NO-ASK EXECUTION section up top. Asking "want me to fire the channel posts?" is a scored failure (B10).
 1. **NEVER use `create_as_post: true`.** Posts are for channel-wide announcements, not session logs. Session logs are regular messages with threaded detail.
 2. **NEVER put detail in the root.** The root is the feed-scannable identifier. If someone scrolling the channel can't read your root in under 2 seconds, it's too long.
 3. **ALWAYS thread the detail.** Use `parent_message` pointing at the root message URL you just created.
@@ -250,6 +265,8 @@ Never just post a bare link as a handoff. The prompt in the task must be self-co
 ---
 
 ## Execution Order
+
+**Run all of it, no permission gates (see NO-ASK EXECUTION + Rule 0). Report only failures.**
 
 1. Memory Maggie posts Channel 1 (Memory Audit: root + thread)
 2. Closing Clio posts Channel 2 (Session Log: root + summary thread that links the Agent Activity Board session task as the full transcript, and carries the `Scoreboard (revised at close)` line)
@@ -273,6 +290,7 @@ Never just post a bare link as a handoff. The prompt in the task must be self-co
 
 | Symptom | Root cause | Fix |
 |---------|-----------|-----|
+| Asked permission to run a mandatory close step | Agent treated a documented-required step as a yes/no | NO-ASK EXECUTION: the close just fires; only report steps that FAILED, never ask whether to do a required one (scored B10) |
 | Detail in the root message | Agent forgot to thread | Repost detail as thread reply |
 | Used Post format | Agent confused Posts with messages | Never use `create_as_post: true` |
 | Missing thread reply | Agent posted root then moved on | Always post both root AND thread |
