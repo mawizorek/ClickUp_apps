@@ -1,8 +1,8 @@
 <!doctype html>
 <!-- INFRASTRUCTURE: modular router shell + pages/ partials (hash router, theme spine) +
-     a JS data layer (js/*.js) that binds the dashboard to a unified windowed anomaly SERIES.
-     Pages-hosted only, not file:// capable. Started from template-app/ (gold standard).
-     THEME: composed 4-vector theme `sharp-utility`. resolve.js composes color+typography+forms+spacing. -->
+     a JS data layer (js/*.js) that binds the dashboard to a unified windowed anomaly SERIES,
+     rendered as a 3-day zoom you step with chevrons. Pages-hosted only, not file:// capable.
+     Started from template-app/ (gold standard). THEME: composed 4-vector `sharp-utility`. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -25,8 +25,8 @@
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=6">
-<link rel="stylesheet" href="./objects.css?v=6">
+<link rel="stylesheet" href="./styles.css?v=7">
+<link rel="stylesheet" href="./objects.css?v=7">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -50,14 +50,14 @@
 <!-- THEME SPINE -->
 <script src="../shared/themes/resolve.js"></script>
 <!-- APP CHROME -->
-<script src="./chrome.js?v=6"></script>
+<script src="./chrome.js?v=7"></script>
 <!-- DATA LAYER (order matters): store -> providers -> day; then UI: graph -> dashboard -> app -->
-<script src="./js/store.js?v=6"></script>
-<script src="./js/providers.js?v=6"></script>
-<script src="./js/day.js?v=6"></script>
-<script src="./js/graph.js?v=6"></script>
-<script src="./js/dashboard.js?v=6"></script>
-<script src="./js/app.js?v=6"></script>
+<script src="./js/store.js?v=7"></script>
+<script src="./js/providers.js?v=7"></script>
+<script src="./js/day.js?v=7"></script>
+<script src="./js/graph.js?v=7"></script>
+<script src="./js/dashboard.js?v=7"></script>
+<script src="./js/app.js?v=7"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
