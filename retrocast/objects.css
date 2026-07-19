@@ -1,7 +1,7 @@
 /* objects.css — Retrocast dashboard presentation. Theme-driven (var(--token) from the 4-vector
    sharp-utility theme). Bold instrument composition, NOT a card wall.
    Design laws: NO side-stripe borders anywhere, NO boxed-card-per-item, NO hero-metric template.
-   Hierarchy comes from scale + weight + surface elevation + hairline dividers + VARIED spacing.
+   Hierarchy from scale + weight + surface elevation + hairline dividers + VARIED spacing.
    The library objects (departure hero, range band, ribbon) are recomposed, not one-off'd. */
 
 .rc-page { max-width: 900px; }
@@ -17,32 +17,40 @@
 /* ============ DEPARTURE GAUGE (the one dominant element) ============
    No border, no card. Sits on the page surface; a generous well of space sets it apart.
    The big number is DATA-colored (warm above / cool below) — meaningful, not decorative. */
-.rc-departure { padding: 0 0 var(--s6); margin-bottom: var(--s5); border-bottom: var(--border-w) solid var(--border); }
-.rc-dep-eyebrow { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-faint); margin-bottom: var(--s3); }
+.rc-departure { padding: var(--s2) 0 var(--s6); margin-bottom: var(--s5); border-bottom: var(--border-w) solid var(--border); }
+.rc-dep-eyebrow { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-soft); margin-bottom: var(--s3); }
+.rc-dep-date { font-family: var(--font-mono); font-weight: 500; letter-spacing: 0.02em; color: var(--text-faint); text-transform: none; }
 .rc-dep-read { display: flex; align-items: baseline; gap: var(--s2); flex-wrap: wrap; }
-.rc-dep-num { font-family: var(--font-mono); font-size: clamp(3.6rem, 20vw, 6.5rem); font-weight: 700; line-height: 0.9; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; color: var(--text); }
-.rc-dep-unit { font-family: var(--font-mono); font-size: clamp(1.1rem, 5vw, 1.9rem); font-weight: 500; color: var(--text-soft); }
-.rc-dep-word { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-left: var(--s2); align-self: center; }
-.rc-dep-sub { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-faint); margin-top: var(--s3); letter-spacing: 0; }
-/* data-driven hue: the number + word carry the departure direction (redundant with the word text) */
+.rc-dep-num { font-family: var(--font-mono); font-size: clamp(4rem, 22vw, 7.5rem); font-weight: 700; line-height: 0.85; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; color: var(--text); }
+.rc-dep-unit { font-family: var(--font-mono); font-size: clamp(1.2rem, 5vw, 2.1rem); font-weight: 500; color: var(--text-soft); }
+.rc-dep-word { font-size: 0.84rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-left: var(--s2); align-self: center; }
+/* data-driven hue: number + word + today-marker carry the departure direction */
 .rc-departure[data-dir="up"]   .rc-dep-num, .rc-departure[data-dir="up"]   .rc-dep-word { color: var(--warn); }
 .rc-departure[data-dir="down"] .rc-dep-num, .rc-departure[data-dir="down"] .rc-dep-word { color: var(--info); }
 .rc-departure[data-dir="flat"] .rc-dep-word { color: var(--text-soft); }
 .rc-departure.rc-err .rc-dep-word { color: var(--bad); }
+.rc-departure.rc-err .rc-dep-sub, .rc-dep-sub { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-faint); margin-top: var(--s3); }
 
 /* distribution fused into the gauge as its baseline — today vs the 30-year range for this day */
 .rc-dist { margin-top: var(--s5); }
 .rc-dist-bar { position: relative; height: 6px; border-radius: 999px; background: var(--surface-2); }
-.rc-dist-fill { position: absolute; top: 0; height: 6px; border-radius: 999px; opacity: 0.5; background: var(--text-faint); }
+.rc-dist-fill { position: absolute; top: 0; height: 6px; border-radius: 999px; opacity: 0.45; background: var(--text-faint); }
 .rc-departure[data-dir="up"]   .rc-dist-fill { background: var(--warn); }
 .rc-departure[data-dir="down"] .rc-dist-fill { background: var(--info); }
-.rc-dist-normal { position: absolute; top: -3px; transform: translateX(-50%); width: var(--border-w); height: 12px; background: var(--text-soft); }
-.rc-dist-today { position: absolute; top: -3px; transform: translateX(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--text); border: 2px solid var(--bg); box-shadow: 0 0 0 1px var(--text); }
+.rc-dist-normal { position: absolute; top: -3px; transform: translateX(-50%); width: 2px; height: 12px; background: var(--text-soft); border-radius: 1px; }
+.rc-dist-today { position: absolute; top: -4px; transform: translateX(-50%); width: 14px; height: 14px; border-radius: 50%; background: var(--text); border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--text); }
 .rc-departure[data-dir="up"]   .rc-dist-today { background: var(--warn); box-shadow: 0 0 0 1px var(--warn); }
 .rc-departure[data-dir="down"] .rc-dist-today { background: var(--info); box-shadow: 0 0 0 1px var(--info); }
-.rc-dist-scale { display: flex; justify-content: space-between; gap: var(--s2); margin-top: var(--s2); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
-.rc-dist-mid { color: var(--text-faint); opacity: 0.7; text-align: center; }
-.rc-dep-cred { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); margin-top: var(--s4); letter-spacing: 0; }
+.rc-dist-ends { display: flex; justify-content: space-between; margin-top: var(--s2); font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.rc-dist-legend { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); margin-top: var(--s3); font-size: 0.74rem; color: var(--text-soft); }
+.rc-lg { font-family: var(--font-mono); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 6px; }
+.rc-lg::before { content: ""; display: inline-block; }
+.rc-lg-today::before { width: 10px; height: 10px; border-radius: 50%; background: var(--text); }
+.rc-departure[data-dir="up"]   .rc-lg-today::before { background: var(--warn); }
+.rc-departure[data-dir="down"] .rc-lg-today::before { background: var(--info); }
+.rc-lg-normal::before { width: 2px; height: 12px; background: var(--text-soft); }
+.rc-lg-cap { color: var(--text-faint); font-size: 0.72rem; }
+.rc-dep-cred { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-faint); margin-top: var(--s4); }
 
 /* ============ VARIABLE SELECTOR (segmented control) ============ */
 .rc-vartoggle { display: flex; flex-wrap: wrap; margin-bottom: var(--s5); border: var(--border-w) solid var(--border); border-radius: var(--radius); overflow: hidden; width: fit-content; max-width: 100%; }
@@ -54,15 +62,17 @@
 /* ============ INSTRUMENT STAT STRIP ============
    One panel, hairline-divided cells. No per-cell border, no rail. Reads as a gauge cluster. */
 .rc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); background: var(--surface-1); border: var(--border-w) solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: var(--s6); }
-.rc-stat { padding: var(--s4) var(--s4) calc(var(--s4) + 2px); border-right: var(--border-w) solid var(--border); border-bottom: var(--border-w) solid var(--border); }
+.rc-stat { padding: var(--s4); border-right: var(--border-w) solid var(--border); border-bottom: var(--border-w) solid var(--border); }
 .rc-stat-lab { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); }
-.rc-stat-val { font-family: var(--font-mono); font-size: 1.6rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin: 6px 0 2px; line-height: 1; }
+.rc-stat-val { font-family: var(--font-mono); font-size: 1.7rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin: 6px 0 2px; line-height: 1; }
 .rc-stat-sub { font-size: 0.7rem; color: var(--text-faint); font-family: var(--font-mono); }
+.rc-stat-up .rc-stat-val { color: var(--warn); }
+.rc-stat-down .rc-stat-val { color: var(--info); }
 
 /* ============ ON THIS DAY — a dense FEED, not a card grid ============ */
 .rc-alm { margin-top: var(--s5); }
 .rc-alm-top { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s5); }
-.rc-h2 { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; margin: 0; text-transform: none; color: var(--text); }
+.rc-h2 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; margin: 0; color: var(--text); }
 .rc-alm-note { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-faint); }
 .rc-alm-sec { margin-bottom: var(--s6); }
 .rc-alm-h { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-soft); margin: 0 0 var(--s3); padding-bottom: var(--s2); border-bottom: var(--border-w) solid var(--border); }
@@ -75,7 +85,7 @@
 .rc-feed { list-style: none; margin: 0; padding: 0; }
 .rc-row { display: grid; grid-template-columns: 3.4rem 1fr; gap: var(--s3); padding: var(--s3) 0; border-bottom: var(--border-w) solid var(--border); align-items: baseline; }
 .rc-row:last-child { border-bottom: 0; }
-.rc-row-yr { font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.rc-row-yr { font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem; color: var(--accent); font-variant-numeric: tabular-nums; }
 .rc-row-tx { font-size: 0.88rem; line-height: 1.5; color: var(--text); }
 .rc-alm-empty { padding: var(--s4) 0; }
 
