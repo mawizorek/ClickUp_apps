@@ -1,6 +1,6 @@
 # Object Coverage Contract
 
-**Every theme must be able to style all 39 canonical objects. That is the theme acceptance test.**
+**Every theme must be able to style all 42 canonical objects. That is the theme acceptance test.**
 
 The set is the shared design vocabulary for FileMaker layouts and HTML artifacts: the constrained families that can appear in any layout. A theme isn't "done" until it renders all of them correctly from the theme tokens alone. `preview.html` is the live proof: pick a theme, every object below reskins from the token set; if one looks wrong or a token falls back, that theme fails coverage for that object.
 
@@ -24,7 +24,7 @@ A theme is only real if it can dress the whole object system, not just a hero bu
 - **Forms:** radius, radius-lg, radius-pill, border-w, grad-angle, shadow-out, shadow-in, **elev-1/2/3** (elevation scale), **motion-fast/med, ease, lift** (motion set).
 - **Spacing:** touch, pad-cell, pad-card, gap-xs/md/lg.
 
-## The 39 canonical objects (grouped)
+## The 42 canonical objects (grouped)
 
 ### DISPLAY family
 
@@ -55,6 +55,9 @@ A theme is only real if it can dress the whole object system, not just a hero bu
 | 23 | `viz_pager` | Viewer | base | surface-2, border, accent (hover), font-mono |
 | 24 | `viz_breadcrumb` | Viewer | base | font-mono, text-soft, accent, text |
 | 25 | `viz_legend` | Viewer | base | **data-1..4**, accent |
+| 40 | `card_ribbon` | Data | base | surface-2, accent-2 (top rail), accent (year), text — horizontal scroll-snap card strip |
+| 41 | `stat_hero_departure` | Viewer | up / down | text (number), warn/info (word + side rail), text-faint (sub) — one dominant signed metric; redundant sign+word+rail, never color-only |
+| 42 | `viz_range_band` | Viewer | base | surface-3 (track), text-faint (normal tick), accent (today marker), font-mono (scale) — value vs. historical min–max distribution |
 
 ### INPUT + FEEDBACK family
 
@@ -75,7 +78,7 @@ A theme is only real if it can dress the whole object system, not just a hero bu
 | 38 | `fb_toast` | Feedback | base | surface-3, good, elev-2 |
 | 39 | `fb_empty` | Feedback | empty / error | surface-2, text, text-soft, bad |
 
-> Families 16, 21 render multiple members/states in one card, so the gallery shows more than 39 rendered pieces; the 39 rows above are the canonical objects and are the count of record.
+> The three T4 additions (40–42) are numbered in append order to avoid renumbering the existing set; by family they belong with the DISPLAY group (Data / Viewer). Families 16, 21 render multiple members/states in one card, so the gallery shows more than 42 rendered pieces; the 42 rows above are the canonical objects and are the count of record.
 
 ## The state matrix
 
@@ -85,6 +88,7 @@ A theme is only real if it can dress the whole object system, not just a hero bu
 - **Toggles** — off / on
 - **Portal rows** — standard / alt / selected (accent-2 rail)
 - **Banners / states** — match / warn / bad (or empty / error)
+- **Departure hero** — up / down (warmer / cooler; sign + word + rail carry it together)
 - **Containers / cards / shells** — base (elevation carries depth)
 
 Themes never add states; they only reskin the existing ones.
@@ -113,3 +117,4 @@ This contract is the bridge to the native build: when the FileMaker theme gets b
 ## History
 
 - **2026-07-18** — Expanded 20 → 39 from a real-app audit. T1: added `font-mono` type role + `data-1..4` categorical colors + the neutral **Carbon** theme. T2: added the INPUT + FEEDBACK family (14 tool objects: dropzone, stepper, mapping row, toggle, chip, segmented, icon button, side drawer, banner, flag, KV panel, typed table, toast, empty/error). T3: added the Viewer group (meter, pager, breadcrumb, legend) + `tx_mono_data`. Tool/viewer styles split into `preview.objects.css` to keep files under the 30KB read cap.
+- **2026-07-19** — T4: expanded 39 → 42 from the retrocast build. Added `stat_hero_departure` (one dominant signed metric with redundant sign+word+rail encoding), `viz_range_band` (value vs. historical min–max distribution), and `card_ribbon` (horizontal scroll-snap card strip). Studio styles appended to `preview.objects.css`. ⚠ `preview.data.js` first-paint snapshot still needs the mirror update for these three (flagged — studio renders them live from `_objects.json` regardless).
