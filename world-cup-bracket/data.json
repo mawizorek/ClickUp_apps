@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-18",
+  "version": "2026-07-18b",
   "tournament": "FIFA World Cup 2026",
   "matches": [
     {
@@ -469,9 +469,9 @@
       "time": "5:00 PM",
       "home": "France",
       "away": "England",
-      "hs": null,
-      "as": null,
-      "winner": null,
+      "hs": 4,
+      "as": 6,
+      "winner": "away",
       "venue": "Hard Rock Stadium, Miami Gardens",
       "feedsTo": null
     },
