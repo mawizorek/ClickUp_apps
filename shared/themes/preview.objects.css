@@ -152,3 +152,32 @@
 .olegend .oleg .osw.s3{background:var(--data-3);}
 .olegend .oleg .osw.s4{background:var(--data-4);}
 .olegend .oleg .oln{width:16px;height:0;border-top:2px solid var(--accent);flex:none;}
+
+/* ================= RETROCAST OBJECTS (T4, 2026-07-19) =================
+   Added for retrocast (forecast-vs-history viewer). Theme-driven like the rest.
+   Redundant encoding on the hero: sign + WORD + side rail, never color alone. */
+
+/* ---- Departure hero (stat_hero_departure): oversized signed metric + descriptor + baseline ---- */
+.ohero{width:100%;text-align:center;padding:calc(var(--pad-card,20px) + 10px) var(--pad-card,20px);border:var(--border-w) solid var(--border);border-radius:var(--radius-lg);background:var(--surface-2);box-shadow:var(--elev-1,var(--shadow-out));}
+.ohero .oh-metric{display:flex;align-items:baseline;justify-content:center;gap:4px;}
+.ohero .oh-num{font-family:var(--font-display);font-size:clamp(3rem,14vw,5rem);font-weight:900;letter-spacing:-0.04em;line-height:1;color:var(--text);font-variant-numeric:tabular-nums;}
+.ohero .oh-unit{font-size:clamp(1.2rem,5vw,1.7rem);font-weight:700;color:var(--text-soft);}
+.ohero .oh-word{font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-top:10px;color:var(--text-soft);}
+.ohero .oh-sub{font-size:var(--fs-xs);color:var(--text-faint);margin-top:6px;}
+.ohero[data-dir="up"]{border-left:4px solid var(--warn);}
+.ohero[data-dir="up"] .oh-word{color:var(--warn);}
+.ohero[data-dir="down"]{border-left:4px solid var(--info);}
+.ohero[data-dir="down"] .oh-word{color:var(--info);}
+
+/* ---- Range band strip (viz_range_band): historical min-max with normal tick + today marker ---- */
+.oband{position:relative;height:14px;width:100%;margin-bottom:6px;}
+.oband-track{position:absolute;inset:0;top:5px;height:4px;border-radius:var(--radius-pill);background:var(--surface-3);border:var(--border-w) solid var(--border);}
+.oband-normal{position:absolute;top:0;transform:translateX(-50%);width:2px;height:14px;background:var(--text-faint);}
+.oband-today{position:absolute;top:0;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--accent);}
+.oband-scale{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:var(--fs-xs);color:var(--text-faint);font-variant-numeric:tabular-nums;}
+
+/* ---- Horizontal card ribbon (card_ribbon): scroll-snap row of compact cards ---- */
+.orib{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;width:100%;}
+.orib-card{flex:0 0 220px;scroll-snap-align:start;background:var(--surface-2);border:var(--border-w) solid var(--border);border-top:3px solid var(--accent-2);border-radius:var(--radius-lg);padding:14px;}
+.orib-y{font-family:var(--font-mono);font-weight:700;color:var(--accent);font-size:var(--fs-sm);margin:0 0 8px;}
+.orib-b{font-size:var(--fs-sm);line-height:1.45;color:var(--text);margin:0;}
