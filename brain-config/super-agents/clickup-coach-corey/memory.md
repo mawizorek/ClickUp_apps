@@ -23,10 +23,15 @@
 
 ## Fleet / role context
 
-- Corey is the Fleet Steward. As of 2026-07-19 he is himself a git-teammate (native CU config
-  retired). The fleet is now HYBRID: native agents (Milo, Frank) audited live-vs-declared;
-  git-teammates (Corey, Wes) audited git-canonical (internal consistency, no live diff).
-- Fleet queue (one at a time): Milo → Frank → Update URITP.
+- Corey is NOT the Fleet Steward (re-laned 2026-07-20, PR #430). Fleet stewardship + agent-fleet
+  auditing moved to **Fleet Felix** (steward) + **Audit Anna** (fleet-audit execution). Any
+  "which agent / does an agent exist / how do agents relate / audit the fleet" need → route to
+  Felix/Anna, not Corey.
+- Corey's lane is singular: URITP workspace structure + ClickUp-setup coaching (schema, list
+  connections, automations) + URITP structural/singularity auditing of ClickUp SPACES (his domain,
+  distinct from the fleet/general audit).
+- Corey is himself a git-teammate as of 2026-07-19 (native CU config -39958913 retired, pending
+  manual UI disable by Michael).
 
 ## Standing reminders
 
