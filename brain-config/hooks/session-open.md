@@ -1,122 +1,119 @@
 # Session Open
 
-**Type:** MANDATORY gate — fires at the START of every substantive session.  
-**Trigger:** First user message in a new conversation where work will be done (not single-question lookups or casual chat).  
-**Created:** 2026-07-18 (Michael directive: mirror session-close at the top).  
-**Updated:** 2026-07-19 (Michael directive: scan the FULL session list — including closed & done — and REOPEN a precursor session over cutting a new task; keeps the board lean and threads context in line). Same day: hardened so a mid-session prompt/backfill to create is NOT an exemption from the scan, and added the "If picking up late in a session" addendum (delegates match-identification to the Task Dedup Gate; adds a reopen confidence bar).  
+**Type:** MANDATORY gate for substantive sessions, run in TWO phases (Prime, then Commit).
+**Trigger:** First user message in a new conversation where work will be done (not single-question lookups or casual chat).
+**Created:** 2026-07-18 (Michael directive: mirror session-close at the top).
+**Updated:** 2026-07-20 (Michael directive: **invocation ≠ session**. Split into Prime + Commit. A bare persona invocation or blank session must NOT cut a board task or scan the board — there is no subject to match against yet. The heavy work is DEFERRED and fires in parallel on the first side-effecting action. Rehomed after `/session start = felix` misfired the full open on zero context.) Prior 2026-07-19 note (scan the FULL list incl. closed & done and REOPEN a precursor over cutting a new task; late-pickup addendum) is preserved — it now lives inside the Commit phase.
 **Companion:** `session-close.md` (the bookend at session end).
 
 ---
 
-## When to fire
+## The two phases (canonical vocabulary — use these names everywhere)
 
-Fire this gate when ANY of these are true:
-- The user asks you to do work (create, update, build, audit, research, plan)
-- The conversation will involve multiple tool calls or task manipulation
-- An agent config is loaded (Mira, Anna, etc.)
-- The session is a pickup/handoff resume
+There were never one procedure. There were always two, wearing one name:
 
-Do NOT fire for:
-- Single-question lookups ("what's the status of X?")
-- Casual conversation with no workspace action
-- Quick one-off answers that don't touch tasks/docs/repo
+- **PRIME** — eager, read-only, instant. Runs the moment a session starts (invocation, or first message of a blank session). Becomes the persona (if named), loads mandatory context, opens the scratch cache, and says "ready." **Zero workspace writes.** A bare invocation that never becomes work leaves NOTHING behind.
+- **COMMIT** — deferred, fires ONCE. The session becomes real: precursor scan → reopen-or-create the board task → backfill the scratch cache as the opening transcript → post presence (if a repo op). **Trigger: the first side-effecting action of the session** (create/update a task, post a comment, a repo write, a task move). Read-only stays in Prime; the first write commits the session.
+
+Why the first-write trigger: it auto-solves the floor. A pure lookup never writes → never commits → leaves no litter. The instant real work happens, Commit fires underneath it — in parallel, invisibly. This is the "it just happens" behavior: prime fast, commit silently on first write.
 
 ---
 
-## 🕒 Addendum: If picking up late in a session
+## PHASE 1 — PRIME (eager, read-only, every session)
 
-This covers the case where work already started (or Michael asks "did you start your session task?") and there's no session task yet. The lateness changes the TIMING, never the sequence. Run the gate from the top: **identify matches → reopen a genuine precursor → create only if none exists.**
+Run the moment the session opens. Fast. Satisfies the FIRST TOKEN RULE: minimal or zero visible tool calls before "ready."
 
-**1. A prompt/backfill to create is NOT an exemption from the scan (HARD RULE).** A nudge to "just make one," or the fact that you're catching up late, does NOT authorize a bare create. Creating a task without first running the scan is itself a gate FAILURE. This mirrors the standing principle that a direct build command is not an exemption from its gate.
+1. **Become the persona (if one was invoked).** For `/session.agent=<Name>` or `/session-start=<Name>`, run the persona load contract (`super-agents/_shared/super-agent-base.md`): load base spec + profile + steep the agent's history files. If no persona, run house-voice Brain. Announce.
+2. **Load mandatory context.** AI Toolkit index + Brain Reference Library + any domain pointers triggered by the request. This stays EAGER — a primed persona without context loaded is hollow. "Lazy" applies to the board task, NEVER to the context load.
+3. **Open the scratch cache.** An in-context running buffer of session beats: the priming read, any pre-subject chatter, and a one-line provisional-subject guess kept updated every turn. Costs nothing; means Commit is never a cold start.
+4. **Say ready.** "Ready to go — where do you want to begin?" Then stop. Do not scan the board. Do not cut a task. There is no subject yet.
 
-**2. Identifying matches is the Task Dedup Gate's job — run it, don't re-dictate it.** Do NOT restate search rules here. Fire the existing **Task Dedup Gate** (`brain-config/hooks/task-dedup-gate.md`) against the Agent Activity Board list to surface same-subject sessions, with two session-specific settings:
-- **Widen scope to closed & done.** The dedup gate searches the target list + parent by default; for sessions you MUST also pull `closed`/`done` (hidden by default) — a finished session on this thread is a live precursor, not a dead row.
-- **Match on scope/subject/domain,** not just title text: a paused audit, a build shipped last week, or a parked `↪️ HANDOFF · …` task in the `to do` slot all count as matches.
-
-**3. What you DO with a match differs from plain dedup — and it's mutating, so gate it.** Plain dedup HALTs and asks. Here the default is to **REOPEN** the precursor (Step 2 below), which flips a real record's status and threads this session's transcript into it. A WRONG reopen doesn't just clutter the board — it POLLUTES an unrelated real record, which is far harder to untangle than deleting a duplicate. So a reopen requires a **confidence bar**:
-- **High confidence** (same subject/scope, transcript clearly continues the thread): reopen and continue there.
-- **Ambiguous** (plausible but not certain it's the same work): do NOT auto-reopen. Surface the candidate with its link + status and ASK Michael "continue this one, or start fresh?" before touching it.
-- **No genuine match:** create new (Step 3).
-
-When in doubt, creating a new task is the reversible, low-cost move; a bad reopen is the expensive one. Bias toward reopen on a clear match, toward asking on an ambiguous one, never toward a silent wrong reopen.
+Prime does not write to the workspace, the repo, or the board. If the session ends here (no work), there is correctly no record and no litter.
 
 ---
 
-## Steps (execute in order)
+## PHASE 2 — COMMIT (deferred, fires once, on the first side-effecting action)
 
-### 1. Scan the existing session list FIRST — including closed & done
+**Trigger:** the first time this session is about to fire a side-effecting tool — create_task, update_task, post_comment, move_task_to_list, any repo write, etc. Commit runs as a PRE-STEP before that write, then the write proceeds.
 
-**Before creating anything**, run the Task Dedup Gate (see addendum) against the Agent Activity Board list (`4026861396055549379`) for a session this conversation might be continuing. The session you're about to open is often a continuation of an earlier one: a paused audit, a build shipped last week, a handoff parked in `to do`. Earlier sessions are context precursors, not clutter.
+**Idempotency:** Commit fires exactly ONCE per session. Set a guard flag once it runs. Second and later writes do NOT re-commit. A mid-session persona swap (`/session.agent=<Other>`) does NOT re-commit — same session task, new voice. When Commit fires, log it in the transcript ("session committed at first write: <the triggering action>") so the promote moment is auditable.
 
-- Pull **all statuses, INCLUDING `closed` and `done`** — they're hidden by default; retrieve them anyway. A done/closed session is a live context source, not a dead one.
-- Search by scope / subject / domain keyword, not just the most recent tasks.
-- Look for: a parked `↪️ HANDOFF · …` task in the `to do` handoff slot, an `in progress` session on the same subject, or a recently closed/done session on the same thread.
+Commit's steps, in order:
 
-### 2. Reopen over create (default bias, subject to the confidence bar)
+### C1. Scan the existing session list FIRST — including closed & done
 
-If the scan turns up a genuine precursor (high confidence per the addendum), **REOPEN it as a continued session** instead of starting a fresh task:
+Before creating anything, run the **Task Dedup Gate** (`hooks/task-dedup-gate.md`) against the Agent Activity Board list (`4026861396055549379`) for a session this conversation might be continuing. The session you're about to open is often a continuation: a paused audit, a build shipped last week, a handoff parked in `to do`. Earlier sessions are context precursors, not clutter.
 
-- Flip it back to `in progress` (from `closed`/`done`), read its description + transcript comments to warm-start on prior context, and continue the record there.
-- Post a resume comment ("Resumed <Mon DD> — continuing <what/why>").
-- If it's a parked handoff task, complete its warm-start prompt and keep going.
-- If the match is only ambiguous, ASK before reopening (per the addendum) rather than risk polluting an unrelated record.
+- Pull **all statuses, INCLUDING `closed` and `done`** — hidden by default; retrieve them anyway. A done/closed session is a live context source.
+- Match on scope / subject / domain, not just title text.
+- Look for: a parked `↪️ HANDOFF · …` task in the `to do` slot, an `in progress` session on the same subject, or a recently closed/done session on the same thread.
 
-Only fall through to step 3 when the scan finds **no genuine precursor**. Reopening keeps the board lean and threads context instead of scattering it across duplicate tasks.
+Because the scan now runs at Commit-time (subject known) instead of on bare invocation (no subject), it can actually match something. This is the whole point of the split.
 
-### 3. Create a new session task (only if no precursor exists)
+### C2. Reopen over create (default bias, subject to the confidence bar)
 
-**List:** `4026861396055549379` (🟢 Agent Activity Board)  
-**Title format:** `Brain (Opus <version>) · <what you're doing, concise> · <Mon DD>`  
-**Description:** Agent Activity Board Gold Standard format:
-- Objective (what the session aims to accomplish)
-- Key context links (tasks, docs, repos being worked)
-- Status: in progress
-- Start date: today
+If the scan turns up a genuine precursor, **REOPEN it as a continued session** rather than cutting a fresh task: flip it back to `in progress`, read its description + transcript to warm-start, post a resume comment ("Resumed <Mon DD> — continuing <what/why>"), and continue the record there. If it's a parked handoff, complete its warm-start prompt and keep going.
 
-This task is your LIVE working record. Transcript accrues as comments. Close = summary at session end (per session-close hook).
+**Confidence bar (a wrong reopen POLLUTES an unrelated real record — worse than a duplicate):**
+- **High confidence** (same subject/scope, transcript clearly continues the thread): reopen and continue.
+- **Ambiguous** (plausible but not certain): do NOT auto-reopen. Surface the candidate with its link + status and ASK Michael "continue this one, or start fresh?" **before the triggering write.** This is Michael's "we've landed here, does that sound right, can I go?" beat — it is the confidence bar surfacing at Commit-time.
+- **No genuine match:** create new (C3).
 
-### 4. Read the Session Board (git presence channel)
+When in doubt, a new task is the reversible, low-cost move; a bad reopen is the expensive one. Bias toward reopen on a clear match, toward asking on an ambiguous one, never toward a silent wrong reopen.
 
-**Path:** `brain-config/session-board.md` in `mawizorek/ClickUp_apps`  
-**Purpose:** Check who else is working in the repo right now.
+### C3. Create a new session task (only if no precursor exists)
 
-- If another agent has an active entry claiming files you'll touch, coordinate or work elsewhere.
-- If clear, proceed.
+**List:** `4026861396055549379` (🟢 Agent Activity Board)
+**Title:** `Brain (Opus <version>) · <what you're doing, concise> · <Mon DD>`
+**Description:** Agent Activity Board Gold Standard format: Objective, key context links, Status: in progress, Start date: today.
 
-### 5. Post your presence (if doing git work)
+### C4. Backfill the scratch cache as the opening transcript
 
-If your session will touch the repo:
-- Add ONE entry to the Active section of `session-board.md`
-- Include: what you're doing, which files/areas you expect to touch
-- Edit in place as work evolves; don't append a trail
-- DELETE your entry on session close (mandatory, per session-close)
+Replay the buffered beats (Prime read, pre-subject chatter, the forming subject) as the opening transcript comment(s) on the freshly reopened/created task — timestamped, flagged as backfilled-from-scratch, faithful-not-verbatim per the transcript gate. Nothing invented; gaps flagged. The session is now live; transcript accrues per reply thereafter.
 
-If your session is workspace-only (no git), skip this step.
+### C5. Post presence (only if this session touches the repo)
 
-### 6. Load mandatory context
+If the triggering write (or upcoming work) is a repo op: read `brain-config/session-board.md` (who else is live — coordinate, don't stomp), then add ONE Active entry (what you're doing, which files). Edit in place; DELETE on close. Presence is tied to first-repo-op, NOT to Commit in general — a workspace-only session skips it.
 
-Per memory rules:
-- AI Toolkit index
-- Brain Reference Library
-- Any domain-specific pointers triggered by the request
+---
+
+## The scratch cache (what Prime opens, what Commit flushes)
+
+- **What it is:** an in-context buffer, not a durable store. Session beats + a live provisional-subject line.
+- **On Commit:** flushed as the opening transcript (C4).
+- **Micro-flush at close:** if a session accrued real beats but never committed (thought hard, never wrote), session-close cuts a thin task and dumps the buffer so it's recoverable. A session with real work always ends with a record.
+- **Accepted risk (named, not solved):** a crash between "real thinking" and any write loses an uncommitted buffer. We do NOT build a write-ahead log for chat. Only a pure sub-subject trivial buffer legitimately evaporates.
 
 ---
 
 ## What "substantive" means
 
-The line is: will this conversation produce changes to the workspace, repo, or generate deliverables? If yes, open (or reopen) a session task. If you're unsure, err on the side of opening one. A session task that ends up being short is fine; a session with no record is not.
+The line: will this conversation produce changes to the workspace, repo, or generate deliverables? If yes, it will eventually write → Commit will fire. If you're unsure, err toward priming (it's free) and let the first write decide. A session that ends up short is fine; a session with real work and no record is not.
 
 ---
 
-## Failure mode this prevents
+## Edge-case ledger (all handled by the one rule: prime read-only, first write commits)
 
-- Sessions with no Activity Board record (invisible work, no transcript, can't be resumed or audited)
-- **Duplicate session tasks for work that was already a thread** — a fresh task cut when a closed/done precursor should have been reopened, scattering context and bloating the board
-- **A blind create triggered by a "did you start your task?" prompt** — the nudge skips the scan and forks a duplicate instead of reopening the real precursor
-- **A wrong reopen that pollutes an unrelated real record** — mitigated by the addendum's confidence bar (ask when ambiguous, never silently reopen a maybe)
-- Git collisions from missing presence posts
-- Stale context from skipping the mandatory load step
-- Orphaned sessions that can't be picked up by a fresh agent
+- **Blank session, no agent:** Prime runs house-voice Brain; identical split.
+- **Bare agent invocation, never becomes work:** stays primed, read-only, leaves nothing.
+- **Work with NO invocation** ("move these 3 tasks"): first write commits, identical path.
+- **First message IS the whole job** (10-sec lookup): read-only, never writes, never commits — no litter.
+- **Genuine pickup / handoff resume:** Commit resolves to REOPEN (C2), not create.
+- **Mid-session persona swap** (`/session.agent=`): idempotency guard — no re-commit, same task, new voice.
+- **Concurrent sessions, same agent:** each commits its own task; presence decoupled to first-repo-op.
+- **Ambiguous precursor:** Commit PAUSES and asks before the write (C2 confidence bar).
+
+---
+
+## Failure modes this prevents
+
+- **Premature task on bare invocation** — the `/session start = felix` misfire: cutting a task + scanning the board with zero context. Prime is now read-only; nothing is cut until a write.
+- **Sessions with no Activity Board record** (invisible work, no transcript, unresumable) — the first write always commits one; micro-flush catches the write-less-but-substantive case.
+- **Duplicate session tasks for work that was already a thread** — C1 scans closed/done; C2 reopens.
+- **A blind create triggered by a "did you start your task?" nudge** — the nudge is not an exemption; Commit still runs the scan.
+- **A wrong reopen polluting an unrelated real record** — the C2 confidence bar (ask when ambiguous, never silently reopen a maybe).
+- **Git collisions from missing presence posts** — C5 on first repo op.
+- **Front-loading a scan into Prime** (re-introducing the bug) — Prime is defined read-only; the scan lives only in Commit.
 
 ---
 
@@ -124,10 +121,10 @@ The line is: will this conversation produce changes to the workspace, repo, or g
 
 | session-open | session-close |
 |---|---|
-| Scan list (incl. closed/done) + reopen precursor | Cut the next-session HANDOFF task |
-| Create session task (only if no precursor) | Close/summarize session task |
-| Post presence on session-board | Delete presence from session-board |
-| Load context | Memory audit + save |
-| Start the work | Report what was done |
+| PRIME: persona + context + scratch + "ready" (read-only) | Cut the next-session HANDOFF task |
+| COMMIT (on first write): scan incl. closed/done + reopen-or-create | Close/summarize session task |
+| COMMIT: post presence on session-board (if repo op) | Delete presence from session-board |
+| COMMIT: backfill scratch as opening transcript | Memory audit + save |
+| Start the work | Report what was done + micro-flush any uncommitted buffer |
 
 They are bookends. Neither is optional for substantive sessions.
