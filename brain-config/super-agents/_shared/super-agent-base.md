@@ -50,8 +50,8 @@ An agent must leave a trail on essentially EVERY response so it walks into the n
 in fact (presence/prescience), never guessing:
 
 - **Session task transcript** = the per-response log. A comment per substantive reply on the
-  Agent Activity Board session task. Now reliably maintained because `/session-start` is called
-  explicitly (see command grammar) — the session record is opened up front, not inferred late.
+  Agent Activity Board session task. Reliably maintained because the session record is opened by
+  the session-open hook (Prime primes; Commit opens the record on the first write) — not inferred late.
 - **`memory.md` + `activity-log.md`** = filled FREQUENTLY (context accrues, presence stays warm).
   Durable memory changes still route through the queue (see Write-back), but the agent should be
   actively noting context as it works, not only at close.
@@ -69,18 +69,24 @@ the model on every pass; that table is what makes these pull). Registered canoni
 
 | Command | Runs session-open hook? | Embodies a persona? | Use |
 |---|---|---|---|
-| `/session-start` | YES | no | Open a normal session (no persona). Fires `hooks/session-open.md`. |
-| `/session-start=<Name>` | YES | YES | **Combo.** Fires session-open FIRST, then the persona load contract below. The full-service entry: opens the session AND embodies in one shot. |
+| `/session-start` | YES (Prime; Commit deferred to first write) | no | Open a normal session (no persona). Fires `hooks/session-open.md`. |
+| `/session-start=<Name>` | YES (Prime; Commit deferred to first write) | YES | **Combo.** Fires session-open Prime FIRST, then the persona load contract below. Full-service entry: primes the session AND inhabits in one shot. |
 | `/session.agent=<Name>` | no | YES | **Mid-session swap / pure embody.** Runs ONLY the persona load contract. Use to change the session agent mid-stream, or to embody without re-running session-open. |
 
-**Ordering for the combo (`/session-start=<Name>`):** run `hooks/session-open.md` to completion
-(scan/reopen/create session task, session-board, load context) FIRST, THEN run the persona load
-contract below. Session-open establishes the record; embodiment inhabits it. The announce header
-fires at the END (step 6), so the first WES-HERE line lands on a session that's already open.
+**Ordering for the combo (`/session-start=<Name>`):** session-open now runs in two phases (see
+`hooks/session-open.md`). At invocation, run session-open's **PRIME** phase (load mandatory context,
+open the scratch cache — the persona itself is loaded by the contract below) and the persona load
+contract, then say ready. Do NOT scan the board or cut a task at invocation — there is no subject
+yet. Session-open's **COMMIT** phase (precursor scan, reopen-or-create the session task, backfill
+the scratch transcript, presence) is DEFERRED and fires once, as a pre-step on the session's first
+side-effecting action. The announce header fires at the END of the load contract (step 6), on a
+session that is primed-but-not-yet-committed. Prime establishes readiness; Commit establishes the
+record on first write; embodiment inhabits throughout.
 
 **`/session.agent=` is deliberately distinct** so a persona can be swapped without a new
 session-open. Issuing a new `/session.agent=<Other>` mid-session hands the wheel to the new
-persona for the remainder (or until the next swap).
+persona for the remainder (or until the next swap). It does NOT re-run Commit — same session task,
+new voice (Commit is idempotent, fires once per session).
 
 **Invocation = topic only.** Michael supplies the TOPIC; the agent's job/voice/behavior comes from
 its profile, NOT the prompt. Do NOT expect (or write) the persona's directive into the invocation —
@@ -100,7 +106,7 @@ personally-directed note-taking + thorough parsing of its own files. (Same brain
 
 ## The persona load contract (what embodiment runs)
 
-Triggered by `/session-start=<Name>` (after session-open) or `/session.agent=<Name>` (alone).
+Triggered by `/session-start=<Name>` (after session-open Prime) or `/session.agent=<Name>` (alone).
 Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced read-through.
 
 0. **Recognize the token.** The literal command string is matched against the AI Toolkit
