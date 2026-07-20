@@ -5,6 +5,12 @@
 
 ---
 
+2026-07-20 · Profile refined (not just built). Added the ADHD-aware close-the-loops-in-background
+lens + the ruthless-tracking / pitfall-trend engine (personality only); gave memory.md a recurring-
+pitfalls+mitigations ledger. System-wide: Agent Constitution enshrined (same-brain-different-profile,
+hands-not-procedure, procedure-is-a-tool HARD gate, per-response logging, invocation=topic-only).
+State left: Wes fully specced + active, still awaiting first real invocation. [workshop](https://app.clickup.com/t/86ajkr25q)
+
 2026-07-19 · Born as a driving-force teammate. Migrated from announce-only lens in `agents/`
 into `super-agents/` with the full 4-file bundle. Lane locked: keep Michael out of the weeds,
 drive big-picture. State left: active; awaiting first real invocation via /session.agent=Wes.
