@@ -1,24 +1,37 @@
-# Super-Agent Audit Instruction — v0.3
+# Super-Agent Audit Instruction — v0.4
 
-Canonical procedure a ClickUp Super Agent follows when told "audit yourself against your
-configuration." This file is the source of truth. Do not mirror it into a ClickUp doc — link to it.
+Canonical procedure a ClickUp Super Agent OR git-teammate follows when told "audit yourself
+(or another agent) against your configuration." This file is the source of truth for BOTH audit
+tracks. Do not mirror it into a ClickUp doc — link to it.
 
-STATUS: v0.3 working draft. Michael annotates directly in this file. Bump version + changelog when
+STATUS: v0.4 working draft. Michael annotates directly in this file. Bump version + changelog when
 blessed.
+
+---
+
+## Two tracks (pick by agent type)
+
+| Track | Applies to | Audit model | Checklist |
+|---|---|---|---|
+| **Native full-standard** | ClickUp Super Agents with a LIVE config | **live-vs-declared** drift (config vs `preferences.md` mirror vs golden standard) | Golden-standard checklist v1.0 (below) |
+| **git-teammate** | session-invocable personas in `super-agents/<slug>/` (no live config) | **internal consistency** (no live config to diff) | git-teammate audit DoD v0.1 (below) |
+
+Why two: a native agent has a live ClickUp config that can DRIFT from its declaration, so its audit
+diffs live-vs-declared. A git-teammate is git-canonical — there is nothing live to diff — so its
+audit instead proves the bundle is internally coherent and will load clean cold. Same discipline
+(walk a checklist, classify PASS/PARTIAL/GAP, record via PR); different bar.
 
 ---
 
 ## Purpose
 
-Give every Full-Standard super agent one exact, repeatable procedure to check its LIVE ClickUp
-configuration against its DECLARED configuration in the repo and the current GOLDEN-STANDARD
-version — and to record the result as a version-controlled audit whose PR history is the rollback +
-audit trail.
+Give every super agent / git-teammate one exact, repeatable procedure to verify its configuration
+and record the result as a version-controlled audit whose PR history is the rollback + audit trail.
 
-When an agent is told "audit yourself against your configuration," it knows precisely:
+When an agent is told "audit yourself," it knows precisely:
 1. Which configuration to check  -> its own folder `brain-config/super-agents/<slug>/`.
-2. Which audit instruction to read -> this file.
-3. Where the result goes           -> an audit record committed via PR.
+2. Which track + checklist to run -> this file (native vs git-teammate, table above).
+3. Where the result goes           -> an audit record committed via PR under `<slug>/audits/`.
 
 ---
 
@@ -33,25 +46,23 @@ brain-config/super-agents/
   audit-instruction.md # this file
   <slug>/
     README.md          # pointer only — NO metadata (never mirror superagents.json fields)
-    preferences.md     # NEAR-1:1 VERBATIM MIRROR of the agent's live ClickUp config: a 1-2 line
-                       #   "This is the agent config for <name>, updated <timestamp>" header, then
-                       #   the config top to bottom and nothing else. No changelog, no extra
-                       #   header/footer, no notes. Its whole point is to be an exact, diffable copy
-                       #   the audit checks live config against. Re-sync verbatim whenever the live
-                       #   config changes; update the timestamp each resync.
-    working-notes.md   # next spec / working notes / per-agent revision log (changelog history LIVES
-                       #   HERE, not in preferences.md)
+    preferences.md     # NATIVE track: NEAR-1:1 VERBATIM MIRROR of the agent's live ClickUp config.
+                       #   GIT-TEAMMATE track: the canonical PROFILE (identity + voice + lane +
+                       #   load manifest; behavior only, NO how-to). There is no live config to
+                       #   mirror — the profile IS canonical.
+    memory.md          # git-teammate: accumulated context + pointers to stewarded tools (not process)
+    activity-log.md    # rolling session ledger (newest on top, append-only)
+    decision-log.md    # git-teammate: reasoning about the AGENT ITSELF (topic decisions live on the topic page)
+    working-notes.md   # native: next spec / working notes / per-agent revision log
     audits/<slug>.<YYYY-MM-DD>.md  # dated audit records, one per audit, via PR
 ```
 
 RULE: any structured metadata fact lives ONLY in `superagents.json`. Folder files never restate it.
-`preferences.md` holds the config body only (no metadata block duplicating superagents.json beyond
-what the live config itself contains). Distinct from `brain-config/agents/` (the Brain-session
-council).
+Distinct from `brain-config/agents/` (the Brain-session council lenses).
 
 ---
 
-## Procedure (high level)
+## NATIVE TRACK — procedure (high level)
 
 1. Load the three inputs:
    - LIVE config: the agent's current ClickUp instructions / triggers / tools / knowledge.
@@ -69,9 +80,7 @@ council).
 8. Recommend fixes for the agent's owner/manager. NEVER edit another agent's live config directly.
 9. Commit via PR and merge — the PR is the audit trail. See PR-body standard below.
 
----
-
-## Golden-standard checklist (v1.0)
+### Golden-standard checklist (v1.0) — NATIVE track
 
 Full-Standard agents are checked against these. Task-Specific / Exempt agents skip this.
 
@@ -88,20 +97,53 @@ Full-Standard agents are checked against these. Task-Specific / Exempt agents sk
 
 ---
 
+## GIT-TEAMMATE TRACK — procedure + DoD (v0.1, graduated here 2026-07-21)
+
+Git-teammates have **no live config to diff**, so the native live-vs-declared mirror test does NOT
+apply. The bar is **INTERNAL CONSISTENCY**: will a cold `/session.agent=<Name>` load a coherent,
+non-contradictory agent? *(This DoD was authored inline in `gates/git-teammate-lifecycle-runbook.md`
+as v0.1 and validated on the Audit Anna migration 2026-07-21; graduated into this file as the formal
+track so the runbook POINTS here instead of holding procedure inline. The runbook remains the
+define/migrate spine; the audit bar lives here.)*
+
+**Procedure:** load the agent's bundle (`preferences.md` + `memory.md` + `decision-log.md` +
+`activity-log.md`) + its `superagents.json` and `registry.json` rows. Walk each check below, classify
+PASS / PARTIAL / GAP, record via PR under `<slug>/audits/`.
+
+### git-teammate audit DoD (v0.1)
+
+1. **Base pointer present** — `preferences.md` opens with the `_shared/super-agent-base.md` pointer line.
+2. **Load manifest valid** — the manifest lists real, present files in load order; deep-steep default.
+3. **superagents.json row accurate** — slug/track/status/invocation/lane match reality; `last_audit`
+   + standard version stamped.
+4. **registry.json row present + agreeing** — no contradiction with superagents.json.
+5. **Bundle files present + in-format** — all five exist; each holds ONLY its kind (no procedure in
+   memory; no metadata mirrored into folder files; no topic-decisions in the agent's decision-log).
+6. **No cross-file contradiction** — memory.md, preferences.md, and the manifests tell ONE story.
+   (The classic miss: a stripped role still asserted in memory. Highest-value check.)
+7. **Voice is distinct** — self-announce header + tone do not bleed into another teammate.
+8. **Index mirror fresh** — the AI Toolkit roster/trigger row matches the JSON.
+
+A PARTIAL or GAP holds the agent's Open-Surface Ledger open until resolved. Record the result as a
+dated audit file under `super-agents/<slug>/audits/<slug>.<YYYY-MM-DD>.md` via PR.
+
+---
+
 ## Audit record shape (`audits/<slug>.<date>.md`)
 
 ```
 <slug>: Self-Audit — <YYYY-MM-DD>
 Agent: <Display Name> (<slug>)
-Auditor: <self | Fleet Steward>
-Golden standard: v<X.Y>
+Track: <native | git-teammate>
+Auditor: <self | Audit Anna | Fleet Steward>
+Standard: <golden v1.0 | git-teammate DoD v0.1>
 Overall: <Up to date | Partial | Behind>
 
 Checklist results:
-1. Identity block ....... PASS
+1. <item> ....... PASS
 ...  (per item; one-line note on any PARTIAL/GAP)
 
-Divergences (live vs declaration):
+Divergences / contradictions:
 - <none | specific gap + recommended fix + who fixes it>
 
 Actions recommended:
@@ -129,7 +171,7 @@ The repo PR body and the ClickUp Activity Log thread tell the same story from bo
 ## ClickUp breadcrumb (the only ClickUp footprint)
 
 - Header in the dedicated Activity Log:
-  `🔍 Self-Audit · <Agent> · golden-standard v<X.Y> · Overall: <status> · PR #<n>`
+  `🔍 Self-Audit · <Agent> · <standard> · Overall: <status> · PR #<n>`
 - Threaded reply: mirrors the PR substance — errors/flags + what changed + why + links (PR + the
   triggering chat).
 - No separate ClickUp docs/tasks/dashboards for audits or fleet status.
@@ -138,7 +180,7 @@ The repo PR body and the ClickUp Activity Log thread tell the same story from bo
 
 ## Cadence
 
-- Standard bump -> every Full-Standard agent flips to "needs-re-audit"; work back through them.
+- Standard bump -> every agent on that track flips to "needs-re-audit"; work back through them.
 - New agent     -> superagents.json row + `<slug>/` folder + roster row; audited in its first cycle.
 - Ongoing       -> light periodic self-audits folded into normal runs.
 
@@ -146,6 +188,12 @@ The repo PR body and the ClickUp Activity Log thread tell the same story from bo
 
 ## Changelog
 
+- 2026-07-21: v0.4. GRADUATED the git-teammate audit DoD (v0.1) into a formal track here, per its
+  own graduation note + the Audit Anna migration finding. This file now holds BOTH tracks (native
+  live-vs-declared + git-teammate internal-consistency); the two-track table up top routes by agent
+  type. `gates/git-teammate-lifecycle-runbook.md` now POINTS here for the DoD instead of holding it
+  inline (stops the define-and-hold-procedure smell). Extended the file model + audit-record shape
+  to cover git-teammate bundles.
 - 2026-07-15: v0.3. Defined `preferences.md` as a near-1:1 verbatim mirror of the live config
   (header + config only; changelog/notes moved to working-notes.md). Added the config-vs-mirror
   drift finding to the procedure.
