@@ -19,9 +19,12 @@
     ]
   },
   "git_teammate_standard": {
+    "version": "0.1",
     "runtime_spec": "brain-config/super-agents/_shared/super-agent-base.md",
     "authoring_gate": "brain-config/gates/git-agent-authoring.md",
-    "note": "git-teammate track = session-invocable persona via /session.agent=<Name>, rides on the full Brain stack, holds memory across sessions. NOT a native ClickUp Super Agent (no autonomous triggers). AUDIT MODEL: git-teammates are git-canonical — there is no live config to diff, so audits check internal consistency (base pointer present, load manifest valid, this row accurate, bundle files present + in-format), NOT live-vs-declared drift. Native full-standard agents keep the live-vs-declared mirror audit."
+    "lifecycle_runbook": "brain-config/gates/git-teammate-lifecycle-runbook.md",
+    "audit_dod": "brain-config/gates/git-teammate-lifecycle-runbook.md#verify (git-teammate audit DoD v0.1; graduation-pending into audit-instruction.md as the formal git-teammate track)",
+    "note": "git-teammate track = session-invocable persona via /session.agent=<Name>, rides on the full Brain stack, holds memory across sessions. NOT a native ClickUp Super Agent (no autonomous triggers). AUDIT MODEL: git-teammates are git-canonical — there is no live config to diff, so audits check internal consistency (base pointer present, load manifest valid, this row accurate, bundle files present + in-format, no cross-file contradiction), NOT live-vs-declared drift. Native full-standard agents keep the live-vs-declared mirror audit. Full DoD + define/migrate procedure: the lifecycle_runbook above."
   },
   "updated": "2026-07-20",
   "agents": [
@@ -29,9 +32,9 @@
       "slug": "fleet-felix",
       "display_name": "Fleet Felix",
       "track": "git-teammate",
-      "golden_standard_version": null,
+      "golden_standard_version": "git-teammate v0.1",
       "status": "active",
-      "last_audit": null,
+      "last_audit": "2026-07-20",
       "clickup_user_id": null,
       "profile_url": null,
       "creator": "Michael Wizorek",
@@ -40,15 +43,15 @@
       "channels": {},
       "lane": "Fleet Steward — the single fleet lookup source (who owns what, does an agent exist, how do agents relate, lineage), new-agent stewardship (runs creation flow + name-collision gate, ensures mirror-pair registration), and singularity/scope + personality guardian (fleet-level twin of Fold-in Frank; pushes for singular narrow agent roles, flags hat-piling + voice-bleed).",
       "declaration_folder": "brain-config/super-agents/fleet-felix/",
-      "notes": "Born 2026-07-20 as a git-native git-teammate (no native CU config, nothing to mirror — profile is canonical). Created to give the Fleet Steward role a PERMANENT home after it bounced Corey→Anna. Personality + history, not process: consumes the canonical lookups (this file, registry.json, folder-discovery), never forks them. memory.md holds the relational index the JSON can't. Pending fine-tune: strip Fleet Steward content from clickup-coach-corey (§6.6) → pointer to Felix, as part of the Loop X Corey re-lane; write the naming convention into the Super Agent Creation Checklist."
+      "notes": "Born 2026-07-20 as a git-native git-teammate (no native CU config, nothing to mirror — profile is canonical). Created to give the Fleet Steward role a PERMANENT home after it bounced Corey→Anna. Personality + history, not process: consumes the canonical lookups (this file, registry.json, folder-discovery), never forks them. memory.md holds the relational index the JSON can't. Audited 2026-07-20 (Anna, git-teammate DoD): PASS/internally clean. Stewards the git-teammate-lifecycle-runbook."
     },
     {
       "slug": "clickup-coach-corey",
       "display_name": "ClickUp Coach Corey",
       "track": "git-teammate",
-      "golden_standard_version": null,
+      "golden_standard_version": "git-teammate v0.1",
       "status": "active",
-      "last_audit": "2026-07-15",
+      "last_audit": "2026-07-20",
       "clickup_user_id": null,
       "retired_clickup_user_id": -39958913,
       "profile_url": null,
@@ -56,14 +59,14 @@
       "triggers": ["session-invocation"],
       "invocation": "/session.agent=Corey  (alias /session-start=Corey for the combo)",
       "channels": {},
-      "lane": "URITP workspace structure, singularity/cleanup auditing, standards & agent-creation coaching, and Agent Fleet Steward.",
+      "lane": "URITP workspace structure + ClickUp-setup coaching (schema, list connections, automations) + URITP structural/singularity auditing of ClickUp SPACES (his domain). NOT the Fleet Steward and NOT the fleet/general auditor — those re-laned to Felix + Anna 2026-07-20.",
       "declaration_folder": "brain-config/super-agents/clickup-coach-corey/",
-      "notes": "CONVERTED 2026-07-19 from native full-standard Super Agent to git-only git-teammate (Michael: repo version only, autonomous triggers waived). Native CU agent (-39958913) RETIRED — pending manual disable/delete by Michael in the ClickUp UI; retired_clickup_user_id kept for provenance. preferences.md reframed from live-config mirror to canonical profile. Scheduled AM/PM audits retired; audit METHOD kept as on-demand. Still the Fleet Steward (now stewarding a hybrid native + git-teammate fleet). RE-LANE IN FLIGHT (Loop X, 2026-07-20): Fleet Steward role moved to the new fleet-felix; Corey to narrow to ClickUp-SETUP coaching + trim general-audit/steward content — not yet executed."
+      "notes": "CONVERTED 2026-07-19 from native full-standard Super Agent to git-only git-teammate (Michael: repo version only, autonomous triggers waived). Native CU agent (-39958913) RETIRED — pending manual disable/delete by Michael in the ClickUp UI; retired_clickup_user_id kept for provenance. preferences.md reframed from live-config mirror to canonical profile. Scheduled AM/PM audits retired; audit METHOD kept as on-demand. RE-LANE EXECUTED (Loop X, 2026-07-20): Fleet Steward + agent-fleet auditing stripped from preferences.md (PR #430) and memory.md (PR #433) → pointer to Felix (steward) + Anna (fleet-audit); retained his URITP structural-audit method (ClickUp-space domain). Audited 2026-07-20 (Anna): PARTIAL at audit time, both gaps since closed. Still PENDING: deeper URITP-general-audit → Anna split, held until Anna converts to a teammate."
     },
     {
       "slug": "mainstage-milo",
       "display_name": "Mainstage Milo",
-      "track": "full-standard",
+      "track": "git-teammate-rebuild-pending",
       "golden_standard_version": null,
       "status": "needs-declaration",
       "last_audit": null,
@@ -75,14 +78,14 @@
         "activity_log": "https://app.clickup.com/36074068/chat/r/12cwjm-56633",
         "shared_cross_agent": "https://app.clickup.com/36074068/chat/r/12cwjm-56653"
       },
-      "lane": "URITP production & operational execution — running-show/production ops, INBOX email intake triage, availability & labor scheduling, training/PD routing, resource portals & doc/artifact builds, custom-field/subtask upkeep, and maintaining URITP operational SOP content (per Cross-Agent Roster).",
+      "lane": "URITP production & operational execution — running-show/production ops, INBOX email intake triage, availability & labor scheduling, training/PD routing, resource portals & doc/artifact builds, custom-field/subtask upkeep, and maintaining URITP operational SOP content (per Cross-Agent Roster). ⚠️ LANE TOO BROAD — to be narrowed to a SINGULAR role in the rebuild brainstorm.",
       "declaration_folder": "brain-config/super-agents/mainstage-milo/",
-      "notes": "Folder scaffolded 2026-07-15; preferences.md PENDING verbatim config paste before first audit. Activity-log channel 12cwjm-56633 from Creation & Setup Checklist doc — confirm. Triggers + profile URL unconfirmed. NOTE: Michael may convert Milo to git-teammate next (same path as Corey); confirm before building."
+      "notes": "REFRAME 2026-07-20 (Michael): REBUILD as a NEW git-teammate via the Definition Playbook (git-teammate-lifecycle-runbook.md), NOT a verbatim mirror of the over-hatted native config. The native version wears too many hats; define a singular lane via a real brainstorm first, then build here. The old needs-declaration native stub is superseded — do NOT paste the native config. Folder currently holds README + PENDING preferences + working-notes (pre-rebuild scaffold). Native -39940529 to be disabled by Michael in the UI once the git-teammate lands."
     },
     {
       "slug": "fmp-frank",
       "display_name": "FMP Frank",
-      "track": "full-standard",
+      "track": "git-teammate-rebuild-pending",
       "golden_standard_version": null,
       "status": "needs-declaration",
       "last_audit": null,
@@ -91,17 +94,17 @@
       "creator": "Michael Wizorek",
       "triggers": [],
       "channels": {},
-      "lane": "FileMaker (FMP) solution design & documentation.",
+      "lane": "FileMaker (FMP) solution design & documentation — to be pinned to a SINGULAR role in the rebuild brainstorm.",
       "declaration_folder": "brain-config/super-agents/fmp-frank/",
-      "notes": "Folder scaffolded 2026-07-15; preferences.md PENDING verbatim config paste before first audit. Full-standard track to CONFIRM with Michael (may be a narrower FileMaker specialist). Triggers + channels unconfirmed."
+      "notes": "REFRAME 2026-07-20 (Michael): REBUILD as a NEW git-teammate via the Definition Playbook (git-teammate-lifecycle-runbook.md), NOT a verbatim mirror of the native config. Define a singular FileMaker lane via brainstorm first, then build here. The old needs-declaration native stub is superseded — do NOT paste the native config. Folder currently holds README + PENDING preferences + working-notes (pre-rebuild scaffold). Native -39958890 to be disabled by Michael in the UI once the git-teammate lands."
     },
     {
       "slug": "workhorse-wes",
       "display_name": "Workhorse Wes",
       "track": "git-teammate",
-      "golden_standard_version": null,
+      "golden_standard_version": "git-teammate v0.1",
       "status": "active",
-      "last_audit": null,
+      "last_audit": "2026-07-20",
       "clickup_user_id": null,
       "profile_url": null,
       "creator": "Michael Wizorek",
@@ -110,7 +113,7 @@
       "channels": {},
       "lane": "Driving force — keeps Michael out of the weeds and thinking big-picture; names rabbit holes, kills bikeshedding, protects momentum, challenges premature detail and scope creep.",
       "declaration_folder": "brain-config/super-agents/workhorse-wes/",
-      "notes": "Migrated 2026-07-19 from brain-config/agents/ (announce-only lens) into the fleet as the reference git-teammate. Full 4-file bundle live. Old agents/workhorse-wes.md redirected. Reference implementation for the git_teammate_standard. NOT a native ClickUp Super Agent — no clickup_user_id, no autonomous triggers; invoked only in-session."
+      "notes": "Migrated 2026-07-19 from brain-config/agents/ (announce-only lens) into the fleet as the reference git-teammate. Full 4-file bundle live. Old agents/workhorse-wes.md redirected. Reference implementation for the git_teammate_standard. NOT a native ClickUp Super Agent — no clickup_user_id, no autonomous triggers; invoked only in-session. Audited 2026-07-20 (Anna): PASS/internally clean; context still theoretical until first real invocation."
     },
     {
       "slug": "update-uritp",
@@ -126,7 +129,7 @@
       "channels": {},
       "lane": "URITP resource-portal / doc-artifact builds. Confirm lane overlap with Milo.",
       "declaration_folder": null,
-      "notes": "Track (full-standard) to confirm."
+      "notes": "Track (full-standard) to confirm. Likely overlaps Milo's lane — resolve in the Milo rebuild brainstorm (may fold in)."
     },
     {
       "slug": "origination-date-agent",
@@ -141,7 +144,6 @@
       "triggers": [],
       "channels": {},
       "lane": "Sets due date = origination date + 1 month.",
-      "declaration_folder": null,
       "notes": "Exempt — no declaration/self-mirror required."
     },
     {
@@ -157,7 +159,6 @@
       "triggers": [],
       "channels": {},
       "lane": "Parses payoff/loan fields from emails.",
-      "declaration_folder": null,
       "notes": "Exempt."
     },
     {
@@ -185,6 +186,7 @@
     "active": "git-teammate persona live and session-invocable."
   },
   "changelog": [
+    "2026-07-20 (b): fleet audit + Corey re-lane executed. Anna ran the git-teammate DoD on the 3 complete teammates (Wes/Corey/Felix): Wes+Felix PASS, Corey PARTIAL (both gaps since closed). Executed the Corey re-lane (strip Fleet Steward + agent-fleet auditing: PR #430 prefs, #433 memory) → pointer to Felix + Anna; narrowed Corey's lane; retained his URITP structural-audit method. Stamped last_audit=2026-07-20 + golden_standard_version='git-teammate v0.1' on Wes/Corey/Felix. Added git_teammate_standard.version + lifecycle_runbook + audit_dod pointers (new gates/git-teammate-lifecycle-runbook.md, PR #434). REFRAMED mainstage-milo + fmp-frank: REBUILD as NEW git-teammates via the Definition Playbook, NOT native mirrors (track=git-teammate-rebuild-pending); native stubs superseded, do not paste native config.",
     "2026-07-20: registered fleet-felix (git-teammate, active) — the Fleet Steward as its own agent. Gives the steward role a permanent home after it bounced Corey→Anna. Bundle scaffolded; mirror-paired to registry.json + AI Toolkit index. Flagged the in-flight Corey re-lane (strip steward content → pointer to Felix) as pending fine-tune.",
     "2026-07-19 (c): CONVERTED clickup-coach-corey from native full-standard Super Agent to git-only git-teammate (native -39958913 retired, pending manual disable in ClickUp UI). preferences.md reframed live-mirror → canonical; scheduled triggers retired (method kept on-demand); continuity moved to session model. Updated git_teammate_standard with the hybrid audit model (git-teammates = git-canonical internal-consistency, natives = live-vs-declared).",
     "2026-07-19 (b): registered workhorse-wes as the first git-teammate track (active); added git_teammate_standard pointer block. Wes migrated from brain-config/agents/ with the full 4-file bundle; old lens file redirected.",
