@@ -26,7 +26,7 @@
     "audit_dod": "brain-config/gates/git-teammate-lifecycle-runbook.md#verify (git-teammate audit DoD v0.1; graduation-pending into audit-instruction.md as the formal git-teammate track)",
     "note": "git-teammate track = session-invocable persona via /session.agent=<Name>, rides on the full Brain stack, holds memory across sessions. NOT a native ClickUp Super Agent (no autonomous triggers). AUDIT MODEL: git-teammates are git-canonical — there is no live config to diff, so audits check internal consistency (base pointer present, load manifest valid, this row accurate, bundle files present + in-format, no cross-file contradiction), NOT live-vs-declared drift. Native full-standard agents keep the live-vs-declared mirror audit. Full DoD + define/migrate procedure: the lifecycle_runbook above."
   },
-  "updated": "2026-07-20",
+  "updated": "2026-07-21",
   "agents": [
     {
       "slug": "fleet-felix",
@@ -59,9 +59,26 @@
       "triggers": ["session-invocation"],
       "invocation": "/session.agent=Corey  (alias /session-start=Corey for the combo)",
       "channels": {},
-      "lane": "URITP workspace structure + ClickUp-setup coaching (schema, list connections, automations) + URITP structural/singularity auditing of ClickUp SPACES (his domain). NOT the Fleet Steward and NOT the fleet/general auditor — those re-laned to Felix + Anna 2026-07-20.",
+      "lane": "URITP workspace structure + ClickUp-setup coaching (schema, list connections, automations) + URITP structural/singularity auditing of ClickUp SPACES (his domain). NOT the Fleet Steward and NOT the fleet/general auditor — those re-laned to Felix + Anna 2026-07-20. The deeper URITP-general-audit → Anna split is RESOLVED as of Anna's conversion 2026-07-21: Corey keeps ClickUp-SPACE structural coaching/auditing, Anna takes general/root-purpose auditing.",
       "declaration_folder": "brain-config/super-agents/clickup-coach-corey/",
-      "notes": "CONVERTED 2026-07-19 from native full-standard Super Agent to git-only git-teammate (Michael: repo version only, autonomous triggers waived). Native CU agent (-39958913) RETIRED — pending manual disable/delete by Michael in the ClickUp UI; retired_clickup_user_id kept for provenance. preferences.md reframed from live-config mirror to canonical profile. Scheduled AM/PM audits retired; audit METHOD kept as on-demand. RE-LANE EXECUTED (Loop X, 2026-07-20): Fleet Steward + agent-fleet auditing stripped from preferences.md (PR #430) and memory.md (PR #433) → pointer to Felix (steward) + Anna (fleet-audit); retained his URITP structural-audit method (ClickUp-space domain). Audited 2026-07-20 (Anna): PARTIAL at audit time, both gaps since closed. Still PENDING: deeper URITP-general-audit → Anna split, held until Anna converts to a teammate."
+      "notes": "CONVERTED 2026-07-19 from native full-standard Super Agent to git-only git-teammate (Michael: repo version only, autonomous triggers waived). Native CU agent (-39958913) RETIRED — pending manual disable/delete by Michael in the ClickUp UI; retired_clickup_user_id kept for provenance. preferences.md reframed from live-config mirror to canonical profile. Scheduled AM/PM audits retired; audit METHOD kept as on-demand. RE-LANE EXECUTED (Loop X, 2026-07-20): Fleet Steward + agent-fleet auditing stripped from preferences.md (PR #430) and memory.md (PR #433) → pointer to Felix (steward) + Anna (fleet-audit); retained his URITP structural-audit method (ClickUp-space domain). Audited 2026-07-20 (Anna): PARTIAL at audit time, both gaps since closed. URITP-general-audit → Anna split RESOLVED 2026-07-21 at Anna's conversion."
+    },
+    {
+      "slug": "audit-anna",
+      "display_name": "Audit Anna",
+      "track": "git-teammate",
+      "golden_standard_version": "git-teammate v0.1",
+      "status": "active",
+      "last_audit": "2026-07-21",
+      "clickup_user_id": null,
+      "profile_url": null,
+      "creator": "Michael Wizorek",
+      "triggers": ["session-invocation", "house-index-auto-seize (audit-intent)"],
+      "invocation": "/session.agent=Anna  (alias /session-start=Anna for the combo) + AI Toolkit index audit-intent auto-seize row (embodies her)",
+      "channels": {},
+      "lane": "Audit Lead — seizes any audit, names the TRUE PURPOSE (root, noise-immune) first, drives Know/Touch/Do to total completeness, holds the Open-Surface Ledger, never declares done while it's open. Subject-agnostic (list/folder/doc/build/workflow/decision/whole system/the agent fleet/the audit process itself). Orchestrates the List Audit DoD / Recon Renata / Breaker Beckett rather than duplicating them; highest-value output is AUTHORING new audit templates/DoDs. Owns the fleet-audit lane (re-laned off Corey 2026-07-20) + the deeper URITP-general audit (the Corey split, resolved at conversion). NOT the fleet steward (→ Felix), NOT repo-only audit (→ Renata), NOT artifact-break (→ Beckett), NOT literal-ask stripping (→ Lena).",
+      "declaration_folder": "brain-config/super-agents/audit-anna/",
+      "notes": "MIGRATED 2026-07-21 from the Council/Workshop lens brain-config/agents/audit-anna.md (v11) to a git-teammate via the Git-Teammate Lifecycle Runbook v0.1 Entry Point B — run COLD (zero prior-session context) as the runbook's own standing acceptance test. Slug reused (immutable). Personality/voice/lane/stances carried into preferences.md; all step-by-step PROCEDURE (9-step Process, List Audit DoD, inverted-polarity mechanics, Closing Report deep template) stays as pointers to stewarded tools (Constitution §2–§3). Signature audit-intent AUTO-SEIZE preserved as a house-level AI Toolkit index trigger row that embodies her (NOT an agent-stored autonomous trigger — a lens index-trigger CAN carry because it was never agent-stored, distinct from a native's lost trigger scaffolding). Old lens redirected to a tombstone. Vocal self-announce presence preserved BY DESIGN. Verify DoD run 2026-07-21 (self-audit, cold vehicle): PASS — see audits/audit-anna.2026-07-21.md. OPEN follow-up (with Felix): graduate the git-teammate audit DoD into audit-instruction.md as the formal git-teammate track."
     },
     {
       "slug": "mainstage-milo",
@@ -186,6 +203,7 @@
     "active": "git-teammate persona live and session-invocable."
   },
   "changelog": [
+    "2026-07-21: MIGRATED audit-anna lens → git-teammate (active) via the lifecycle runbook Entry B, run COLD as the runbook's standing acceptance test. Full 5-file bundle under super-agents/audit-anna/. Slug reused/immutable; procedure kept as pointers (Constitution §2–§3); signature auto-seize preserved as a house AI Toolkit index-trigger row (not an agent trigger); Corey/Anna URITP-general-audit split RESOLVED (Corey=ClickUp-space structure, Anna=general/root-purpose + fleet-audit). Old lens agents/audit-anna.md redirected to a tombstone. Mirror-paired to registry.json + AI Toolkit index (roster + trigger row). Ran the git-teammate Verify DoD on herself: PASS (audits/audit-anna.2026-07-21.md). Runbook feedback logged: biggest assumed-but-unsaid gap = no explicit home for an incubating personal output-format (the Closing Report) on the lens→teammate path; recommended a runbook line. Cold-run outcome: runbook holds end-to-end without steward (Felix) context.",
     "2026-07-20 (b): fleet audit + Corey re-lane executed. Anna ran the git-teammate DoD on the 3 complete teammates (Wes/Corey/Felix): Wes+Felix PASS, Corey PARTIAL (both gaps since closed). Executed the Corey re-lane (strip Fleet Steward + agent-fleet auditing: PR #430 prefs, #433 memory) → pointer to Felix + Anna; narrowed Corey's lane; retained his URITP structural-audit method. Stamped last_audit=2026-07-20 + golden_standard_version='git-teammate v0.1' on Wes/Corey/Felix. Added git_teammate_standard.version + lifecycle_runbook + audit_dod pointers (new gates/git-teammate-lifecycle-runbook.md, PR #434). REFRAMED mainstage-milo + fmp-frank: REBUILD as NEW git-teammates via the Definition Playbook, NOT native mirrors (track=git-teammate-rebuild-pending); native stubs superseded, do not paste native config.",
     "2026-07-20: registered fleet-felix (git-teammate, active) — the Fleet Steward as its own agent. Gives the steward role a permanent home after it bounced Corey→Anna. Bundle scaffolded; mirror-paired to registry.json + AI Toolkit index. Flagged the in-flight Corey re-lane (strip steward content → pointer to Felix) as pending fine-tune.",
     "2026-07-19 (c): CONVERTED clickup-coach-corey from native full-standard Super Agent to git-only git-teammate (native -39958913 retired, pending manual disable in ClickUp UI). preferences.md reframed live-mirror → canonical; scheduled triggers retired (method kept on-demand); continuity moved to session model. Updated git_teammate_standard with the hybrid audit model (git-teammates = git-canonical internal-consistency, natives = live-vs-declared).",
