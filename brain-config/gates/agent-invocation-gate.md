@@ -89,6 +89,17 @@ A near-miss command token resolves to the closest canonical invocation grammar r
 
 ---
 
+## 🔁 Lens → git-teammate migrations (resolve to the LIVE home, never the tombstone)
+
+When a Council/Workshop lens is migrated into a git-teammate, its old `brain-config/agents/<slug>.md` becomes a **redirect tombstone** and the live agent moves to `brain-config/super-agents/<slug>/`. **Resolve every live invocation to the `super-agents/` home directly** — same principle as the Wes rule: a tombstone is for historical link-resolution + context, never for routing fresh commands. Do not take the scenic route through the tombstone.
+
+- ✅ **Audit Anna (migrated 2026-07-21) — LIVE at `super-agents/audit-anna/`.** Any live invocation embodies the GIT-TEAMMATE (run the persona load contract in `_shared/super-agent-base.md`): `/session.agent=Anna`, bare “Anna”/“Audit”/“Root-It,” OR an audit-intent auto-seize (“audit this” / “rip this apart” / “dig into X”). It does NOT load the lens at `agents/audit-anna.md` (redirect tombstone). Her nickname “Audit” overlapping the command word “audit” is intentional — both paths land on Anna seizing the audit.
+- **General rule:** for any name that has BOTH a tombstoned lens (`agents/<slug>.md`) AND a live bundle (`super-agents/<slug>/`), go straight to the `super-agents/` home. The tombstone only resolves historical links.
+
+**One-line test:** “audit this” or bare “Anna” → embody the git-teammate at `super-agents/audit-anna/`, never the `agents/` tombstone.
+
+---
+
 ## Rules
 
 - **Nicknames count.** Each agent profile lists nicknames. All variants go through this same gate.
@@ -96,6 +107,7 @@ A near-miss command token resolves to the closest canonical invocation grammar r
 - **Command words are strong signals.** "run," "spin up," "deploy," "audit," "check," "review" + name = agent invocation.
 - **Bare name = Mode A (context=null runbook).** A clean standalone agent name with no attached situation runs the agent's `default_runbook`, subject to its `gate_strength`. No default defined → ask which routine.
 - **The runbook is standalone + directly invocable.** "Run this process" pointed at the runbook doc == the bare-name call. The persona references the runbook; it never hardcodes it.
+- **A migrated agent resolves to its `super-agents/` home, not its `agents/` tombstone** (see Lens → git-teammate migrations above).
 - **This gate is lightweight.** It should take <1 second of reasoning. Don't turn it into a deliberation.
 - **A retired/tombstoned agent is NEVER a live invocation target.** A near-name collision with a retired agent resolves to the LIVE holder of that name (see the Wes rule above). Tombstones exist for historical link resolution + context, not for routing fresh commands.
 
@@ -105,7 +117,7 @@ A near-miss command token resolves to the closest canonical invocation grammar r
 
 - Fires as part of the 🧠 Subagent roster evaluation.
 - Does NOT apply to 🔄 Hooks or 🎯 Triggers (they have their own deterministic triggers).
-- If the gate passes (fire the agent): load the agent profile from `brain-config/agents/` (or `super-agents/` for git-teammates) and execute; on a bare-name call, load and run its `default_runbook` subject to `gate_strength`.
+- If the gate passes (fire the agent): load the agent profile from `brain-config/agents/` (or `super-agents/` for git-teammates) and execute; on a bare-name call, load and run its `default_runbook` subject to `gate_strength`. **For a migrated agent (tombstone in `agents/` + live bundle in `super-agents/`), always load the `super-agents/` home directly (see Lens → git-teammate migrations above).**
 - **Clarify First → Clara lens** owns the dictation-artifact reparse that feeds the slash-command fuzzy-resolve above.
 - **Agent Name-Collision Gate** (`gates/agent-name-collision-gate.md`) is the WRITE-side counterpart: it should have forced a distinct invocation token when Workhorse Wes was created. The Wes collision above is the read-side patch for a name that shipped anyway (Michael chose to reuse the first name deliberately).
 
@@ -113,6 +125,7 @@ A near-miss command token resolves to the closest canonical invocation grammar r
 
 ## Changelog
 
+- 2026-07-21: **Added the Lens → git-teammate migration resolution rule** (Anna). A migrated agent's old `agents/<slug>.md` is a redirect tombstone; every live invocation resolves to the `super-agents/<slug>/` home directly, never the tombstone (mirrors the Wes precedent). Fixes the Beckett-surfaced break where a bare "Anna"/"audit this" could route through the retired lens path. Prompted by Michael ("break it with beckett").
 - 2026-07-20: **Added the invocation-mode contract + per-agent soft-gate dial.** Bare name (context=null) runs the agent's `default_runbook`; name+context applies the persona to input. Runbooks are standalone + directly invocable ("run this process" by URL == bare-name call); the persona points at the runbook, never hardcodes it (Super Agents are personalities + a convenience layer over dense routines). Added `gate_strength` (auto | confirm | always-ask; default confirm) as a per-agent dial. Added the slash-command fuzzy-resolve cross-ref to the Clara lens. Routine Ricky named as the canonical stress test (default_runbook vs menu). Prompted by Michael across the /command-Felix → speech-to-text → routine-agent thread.
 - 2026-07-19: **Added the “Wes”/“/wes” name-collision resolution** — live invocation routes to the ACTIVE Workhorse Wes, never the retired Workshop Wes tombstone (which must not fire “Mira convenes the Workshop”). Fixes a live misfire where `/wes` resolved to the tombstone. Added the general rule that a retired agent is never a live invocation target. Prompted by Michael (screenshot of the misfire).
 - 2026-07-03: Initial version. Introduced a new `gates/` folder in brain-config for workflow gates that aren't hooks (no trigger table signal) but aren't agents either.
