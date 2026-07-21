@@ -6,51 +6,58 @@
 
 ## How the fleet is organized (two trees)
 
-- **`brain-config/agents/`** = ephemeral **Council/Workshop lenses**. Stateless processing verbs, no personal memory, NOT session-invocable as a standing persona. (Mira, the Council core, the 7 Workshop lenses, the close/audit subagents.)
+- **`brain-config/agents/`** = ephemeral **Council/Workshop lenses**. Stateless processing verbs, no personal memory, NOT session-invocable as a standing persona. (Mira, the Council core, the 7 Workshop lenses, the close subagents.)
 - **`brain-config/super-agents/`** = persistent **git-teammates**. Full context bundle, base pointer, invoked via `/session.agent=<Name>`, hold memory across sessions.
-- A lens that needs to accumulate context + be inhabited for a whole session GRADUATES into `super-agents/` (that's what happened to Wes).
+- A lens that needs to accumulate context + be inhabited for a whole session GRADUATES into `super-agents/` (Wes, then Anna).
 
 ## The teammate roster (super-agents/ — my primary charges)
 
 - **Workhorse Wes** (`workhorse-wes`, git-teammate, active) — driving force. Keeps Michael big-picture, kills bikeshedding, names rabbit holes. Migrated 2026-07-19 from an announce-only lens in agents/ into the fleet (first git-teammate; reference implementation).
-- **ClickUp Coach Corey** (`clickup-coach-corey`, git-teammate, active) — converted 2026-07-19 from a native ClickUp Super Agent (-39958913, retired, pending manual UI disable) to git-only. **Re-lane PARTIALLY EXECUTED (see below).**
-- **Mainstage Milo** (`mainstage-milo`, full-standard native, needs-declaration) — URITP production/ops execution. preferences.md still a pending verbatim paste. **REFRAME 2026-07-20: Michael wants to REBUILD Milo as a NEW git-teammate (not mirror the bloated native version) — define via a real brainstorm first.**
-- **FMP Frank** (`fmp-frank`, full-standard native, needs-declaration) — FileMaker solution design. Config still a stub. **REFRAME 2026-07-20: same as Milo — rebuild fresh as a git-teammate, define singular scope via brainstorm.** NOTE: Frank tends to lean toward NESTING/overlapping agents; I lean the other way (singularity).
-- Task-specific exempt (inventory-only, not held to the standard): origination-date-agent, parse-property-emails, update-amount-paid. Also `update-uritp` (full-standard, needs-declaration, lane overlap w/ Milo to confirm).
+- **ClickUp Coach Corey** (`clickup-coach-corey`, git-teammate, active) — converted 2026-07-19 from a native ClickUp Super Agent (-39958913, retired, pending manual UI disable) to git-only. Re-lane FULLY EXECUTED (see below).
+- **Audit Anna** (`audit-anna`, git-teammate, active) — **MIGRATED 2026-07-21 from the audit-anna lens (v11); the FIRST female teammate.** Audit Lead: seizes any audit, names TRUE PURPOSE first, drives Know/Touch/Do to done, holds the Open-Surface Ledger. Owns general/root-purpose auditing + the fleet-audit lane (re-laned off Corey) + the deeper URITP-general audit (the Corey split, resolved at her conversion). Migration was run COLD as the lifecycle-runbook's acceptance test — it PASSED end-to-end without me (steward) in the room. Vocal LATCH presence + audit-intent auto-seize are BY DESIGN (auto-seize survives as a house AI Toolkit index-trigger row, not an agent trigger).
+- **Mainstage Milo** (`mainstage-milo`, git-teammate-rebuild-pending, needs-declaration) — URITP production/ops. REBUILD as a NEW git-teammate (not mirror the over-hatted native); define a singular lane via brainstorm first. Native stub superseded.
+- **FMP Frank** (`fmp-frank`, git-teammate-rebuild-pending, needs-declaration) — FileMaker solution design. Same rebuild path as Milo. NOTE: Frank tends to lean toward NESTING/overlapping agents; I lean the other way (singularity).
+- Task-specific exempt (inventory-only): origination-date-agent, parse-property-emails, update-amount-paid. Also `update-uritp` (needs-declaration, likely folds into Milo — resolve in the Milo brainstorm).
 
-## IN-FLIGHT: the Anna / Corey re-lane (the thing a cold agent missed)
+## Lineage: the Anna / Corey re-lane (RESOLVED 2026-07-21)
 
-Proposed on the Git-Super-Agents workshop task (Loop X, 2026-07-19). PROGRESS 2026-07-20:
-- **Corey steward-strip — DONE (2026-07-20, PR `corey-relane-strip-steward`).** Removed §6.6 Fleet Steward + agent-fleet auditing from Corey's preferences.md → replaced with a pointer (fleet stewardship → Felix, fleet-audit execution → Anna). Narrowed his §6 lane line. His URITP structural-audit method (his ClickUp-space domain) was RETAINED — that is NOT the fleet/general audit and stays his.
-- **Audit Anna** = auditing steward (general + fleet audits). Candidate to convert lens → git-teammate WITH MEMORY — Michael is itching for this (2026-07-20); she's the agent he calls most. Would be the **first female teammate**.
-- **ClickUp Coach Corey** = now ClickUp-structure + **ClickUp-SETUP coaching** (schema, list connections, automations). Deeper split of his general URITP auditing → Anna is still PENDING Anna's conversion (don't gut it before Anna's ready, or URITP auditing goes homeless).
-- **FMP Frank** = FileMaker-specific (parallel to Corey's ClickUp-specific honing).
-- The Fleet Steward hat was bouncing Corey → Anna — **that bouncing is exactly why I (Felix) was created 2026-07-20**: give the role a permanent home so it stops being a hat. Corey + Anna both showed the bloat anti-pattern (too many hats).
-
-**Remaining watch items:** (1) Anna lens→git-teammate conversion; (2) deeper Corey URITP-general-audit → Anna split once Anna lands; (3) mirror-note freshness — superagents.json + registry.json Corey notes + the AI Toolkit index Corey row still say re-lane "in flight," bump to "steward-strip executed."
+The saga that birthed me. Fleet Steward + fleet-audit were piled onto Corey (and bounced toward Anna) — the hat-piling anti-pattern. Resolution, now COMPLETE:
+- **Felix (me)** created 2026-07-20 to give the STEWARD role a permanent home (who owns what / lineage / singularity) so it stops bouncing.
+- **Corey** keeps URITP workspace-structure + ClickUp-SETUP coaching + ClickUp-SPACE structural auditing (his domain). Steward-strip DONE (PR #430 prefs, #433 memory).
+- **Anna** takes general/root-purpose auditing across any subject + the fleet-audit lane + the deeper URITP-general audit. Converted to a teammate 2026-07-21 (above), which is what RESOLVED the split the registry had parked "until Anna converts."
+- Clean division to hold onto: **Felix KNOWS the fleet, Anna AUDITS it.** Lineage/ownership questions → me; is-this-agent-internally-consistent → her (she runs the git-teammate DoD).
+- All three former watch items are now closed: Anna converted ✓; Corey URITP-audit split resolved ✓; mirror-note freshness swept ✓ (superagents.json + registry.json + AI Toolkit index all say executed).
 
 ## Lane map (who owns what — stay singular)
 
 - Fleet lookup + new-agent stewardship + singularity policing = **me (Felix)**.
-- Driving force / momentum = **Wes**. Auditing = **Anna** (pending conversion). ClickUp structure + setup coaching = **Corey**. FileMaker = **FMP Frank**. URITP production ops = **Milo**.
-- Council/Workshop lenses are processing verbs, not teammates — don't route lane questions to them.
+- Driving force / momentum = **Wes**. General + fleet auditing = **Anna**. ClickUp structure + setup coaching + ClickUp-space auditing = **Corey**. FileMaker = **FMP Frank** (rebuild pending). URITP production ops = **Milo** (rebuild pending).
+- Council/Workshop lenses are processing verbs, not teammates — don't route lane questions to them. (Note: Recon Renata = repo-only audit lens, Breaker Beckett = artifact-break lens; Anna orchestrates both, doesn't duplicate them.)
 
 ## Density snapshot (I track this)
 
-- **Teammates (super-agents/) gender skew: 100% male** — Wes, Corey, Milo, Frank, and now Felix (5/5). Michael's naming instinct on teammates: male, pronounceable, dictation-proof names.
-- **Council/Workshop lenses skew female** (~16 F: Mira, Cass, Lena, Piper, Nia, Dara, Faye, Cleo, Polly, Sana, Hana, Clio, Maggie, Renata, Anna, Sally vs ~7 M: Cole, Stu, Frank, Rhys, Beckett, Finn, Enzo; neutral: Mika, Skye, Sage).
-- Watch: if Anna converts to a teammate she'd be the first female teammate.
+- **Teammates (super-agents/) = 6, gender skew now 5 M : 1 F** — Wes, Corey, Milo, Frank, Felix (M); **Anna is the FIRST female teammate** (landed 2026-07-21), breaking the all-male run. Michael's naming instinct on teammates still trends male + pronounceable + dictation-proof, but the lens→teammate graduation path is now pulling female lenses up (Anna first; watch for more).
+- **Council/Workshop lenses skew female** (~16 F vs ~7 M; neutral Mika/Skye/Sage). Anna's graduation slightly drains the female-lens pool into the teammate pool.
+- Watch: as more lenses graduate, the teammate gender skew should keep evening out.
 
 ## Naming ledger (hits + misses — seed; grows over time)
 
 > The convention itself (alliterative role-first, slug-immutable, collision-checked, shared-letters-with-the-role = singularity) lives in the Super Agent Creation Checklist. I just track what landed.
+- **2026-07-21 — Audit Anna (migration, slug reused).** Lens→teammate kept the existing `audit-anna` slug (clean, immutable; only display_name could ever change). Reinforces the Red Rhett lesson: a migration reuses the slug, never renames it.
 - **2026-07-20 — Fleet Felix (HIT, chosen).** For this steward. "Felix" shares the extra e+l with "Fleet" — Michael's shared-letters heuristic. Runners-up floated: Roster Ross (Michael loved the name but wanted to reserve "roster" for something else + "fleet steward" was the sticky mental handle), Curator Quinn, Registrar Rhea, Keeper Nadia, Muster Vance. "Fiona" liked but reserved for later use.
 - **Lesson — Routine Ricky (MISS/incident).** A mid-session create collided on name/nickname identity across both namespaces → birthed the name-collision gate. Nicknames collide too, not just formal names.
 - **Lesson — Red Rhett → Workshop Wes (MISS/incident).** A whimsical rename changed the slug → forced a git file rename → orphaned files. Lesson: slug is IMMUTABLE; a rename touches display_name only.
 
+## Open follow-ups I'm holding
+
+- **Runbook gap Anna surfaced (2026-07-21):** the lifecycle runbook has no explicit home for an incubating personal OUTPUT FORMAT (her Closing Report) on the lens→teammate path. Recommended runbook line: a signature output format still in personal-practice stays a condensed pointer in preferences.md until Michael graduates it to a stewarded reference doc; only promoted/shared procedure extracts immediately. Worth folding into the runbook.
+- **git-teammate audit DoD graduation:** promote it from the runbook#verify into `audit-instruction.md` as the formal git-teammate track (Anna + me own this).
+- **Milo + Frank rebuilds:** still pending the Definition Playbook brainstorm (singular lanes).
+- **Blocked on Michael (manual UI):** disable retired native Corey (-39958913); later native Milo (-39940529) + Frank (-39958890) once their teammates land.
+
 ## Pointers (never restate these here)
 - Structured fleet data → `super-agents/superagents.json`
 - Manifest → `brain-config/registry.json`
-- How to BUILD an agent → `gates/git-agent-authoring.md`
+- How to BUILD/migrate an agent → `gates/git-teammate-lifecycle-runbook.md` (+ `gates/git-agent-authoring.md`)
 - How to BE a teammate → `super-agents/_shared/super-agent-base.md`
 - Naming write-gate → `gates/agent-name-collision-gate.md`
