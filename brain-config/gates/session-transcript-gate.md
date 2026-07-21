@@ -168,13 +168,40 @@ On the first trigger hit (or promotion of a provisional stub), Scribe **immediat
 2. **Ensures the session TASK exists on the 🟢 Agent Activity Board** (list id `901327879922`) and uses its comment stream as the thread. If a task for this session already exists (the common case — Brain maintains the board), use it; if not, create it (title = session topic + date, e.g. `Brain (Opus 4.8) · <topic> · <date>`), status `to do`/`in progress`. Only if a board task genuinely cannot be created does Brain fall back to a #A.I. Prompts thread (https://app.clickup.com/36074068/chat/r/6-901327646617-8). (If a provisional stub already opened silently, promote that same task — don't open a second.)
 3. Begins a **chronological, speaker-labeled, back-and-forth record** in the task's comments, treating the session like a live conversation:
    - `**Michael:**` / `**Brain:**` turn labels, in order.
-   - Verbatim wording ONLY where it matters (decisions, instructions, key phrasing); tight paraphrase everywhere else — a faithful, readable record, NOT a word-perfect court transcript.
+   - Verbatim wording ONLY where it matters (decisions, instructions, key phrasing); tight paraphrase everywhere else — a faithful, readable record, NOT a word-perfect court transcript. **(Hardcode Mode overrides this to true 1:1 verbatim — see Hardcode Mode below.)**
    - Decisions, reasoning, and tradeoffs captured inline as they land — not summarized after the fact.
    - **Agent comments interleaved in their own voices**, formatted per the emoji-badge + full-body standard above and shaped per the two-tier Workshop Post Protocol — the seated council/Workshop voices post here (and ONLY here), so the task reads as the real multi-voice deliberation.
    - Backfill any pre-trigger turns from the session so far, so the record starts from message 1, not from the trigger point.
 4. Keeps appending in real time as the session continues. The comment stream grows turn by turn.
 
 After the one start announcement, Scribe works **quietly in the background.** She does not re-announce, does not narrate each entry, does not interrupt the work, and does not ask permission. One "I've started" up front, then silence until the end.
+
+---
+
+## Hardcode Mode (verbatim 1:1) — `/session-hardcode`
+
+**What it is:** a per-session MODE TOGGLE that flips the capture fidelity from the default **faithful-not-verbatim** posture (see the Faithful-not-verbatim rule) to a **true 1:1, court-reporter transcript**. Default stays the tight, readable, paraphrased record; hardcode is the opt-in heavy mode for the stretches worth a word-perfect record. It changes ONLY fidelity + comment shape — every other rule of this gate (thread lives on the session task, thread-only agent expression, two-tier Workshop protocol, open-then-discard, backfill) is unchanged.
+
+**Commands (canonical grammar in `registry.json` → session_commands):**
+
+- **`/session-hardcode`** — turn hardcode ON. Mid-session invocable: it flips fidelity from the toggle point forward. Already-posted comments are NOT rewritten, and any backfill of pre-toggle turns stays faithful-not-verbatim (you can't reconstruct verbatim after the fact).
+- **`/session-hardcode=off`** — turn hardcode OFF, back to the default faithful-not-verbatim posture. Canonical off form.
+- **`/session-softcode`** — alias for `/session-hardcode=off`.
+
+Toggle freely, any number of times per session. The mode is a **session-scoped in-context flag**; each turn is captured in whichever mode is active when that turn lands. This is NOT a persona/session command — it does not open or embody a session, it only sets the transcript fidelity flag.
+
+**End-prompt gate (WHEN the verbatim comment fires):** hardcode captures Michael's prompt **verbatim, as its own comment, only once he has finished the full thought** — i.e. at the end-prompt boundary, never mid-stream. A multi-message thought is NOT chopped into fragment comments; wait for the complete prompt to land, then post the one verbatim capture. This end-prompt gate is the whole reason the mode is more than "paste every message."
+
+**Per-turn shape under hardcode (TWO comments per turn):**
+
+1. **Verbatim prompt comment** — Michael's completed prompt, word-for-word, typos and all. No cleanup, no summarization, no "helpful" correction, no reflow. Speaker-labeled `**Michael (verbatim):**`. This is the discipline the mode demands: resist the default urge to tidy and paste it raw.
+2. **References / displayed comment** — a companion comment logging what was referenced or shown in that turn's reply: links loaded/emitted, artifacts created, key values displayed, decisions surfaced. The "what was on screen" mirror of the exchange.
+
+Agent deliberation (council/Workshop) still follows the two-tier Workshop Post Protocol unchanged — hardcode governs the Michael↔Brain capture fidelity, not the agent-voice format.
+
+**Close artifact mirrors the mode (LOCKED — Michael, 2026-07-21):** when hardcode was active for a session, the Session Close `.txt` transcript **and its in-chat toggle mirror go full verbatim 1:1 too**, matching the live comment stream — NOT the usual summarized close transcript. The `.txt` and the task comments are the same fidelity by design. If hardcode was toggled partway, the close artifact reflects each turn in the mode that was active when it landed (verbatim turns stay verbatim, faithful turns stay faithful). Default (hardcode never turned on) = the close `.txt` stays the standard summarized transcript. Enforced by the Session Transcript Format spec (see Composes with).
+
+**Cost (named, accepted):** 1:1 roughly doubles the per-turn comment writes and grows the task thread + close `.txt` fast. That is the accepted price of a verbatim record, and exactly why hardcode is opt-in + mid-session toggle-able — flip it on for the stretch worth a court record, leave it off (the default) for routine work.
 
 ---
 
@@ -195,7 +222,7 @@ When Michael requests a close (or at full close), Scribe finalizes the session:
 
 - **Runs the close-time watchdog first:** confirm the session task holds a coherent transcript; if not, backfill a reconstructed one (flagged) before finalizing.
 - Flips the session task's state to done/`complete` (or `partial | handed off`) and ensures the running comment deliberation is intact on it.
-- Produces the dense **close summary** in **#A.I. Prompts** (https://app.clickup.com/36074068/chat/r/6-901327646617-8) per the Session Close hook — that channel holds the permanent, long-standing record of the session (root header + threaded summary) and **points back at the session task** as the full transcript. Per the reframed close hook, this post is a SUMMARY + task pointer, not a re-created full transcript (the transcript lives on the task).
+- Produces the dense **close summary** in **#A.I. Prompts** (https://app.clickup.com/36074068/chat/r/6-901327646617-8) per the Session Close hook — that channel holds the permanent, long-standing record of the session (root header + threaded summary) and **points back at the session task** as the full transcript. Per the reframed close hook, this post is a SUMMARY + task pointer, not a re-created full transcript (the transcript lives on the task). **If Hardcode Mode was active this session, the close `.txt`/toggle go verbatim 1:1 per Hardcode Mode above.**
 - Hands Closing Clio the finalized task + close post for the standard close.
 
 If the gate never fired (session stayed below the bar), discard any provisional stub and close follows the normal path — or a soft close, if Michael called one.
@@ -216,15 +243,17 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 - **First-decision beats the message count.** If a real decision lands on message 1, the record opens on message 1. The 3rd-message rule is the *backstop* for build/work sessions, not a delay.
 - **Backfill to message 1.** When the record opens after the session already started (including a mid-session "create the task"), backfill the earlier turns so it's complete from the top.
 - **Prefer live; backfill rather than lose.** Real-time capture is the goal. But if the record lapsed, reconstruct a faithful (flagged) transcript at close — the retired "never reconstruct from memory" absolute must not be read as "leave it blank."
-- **Faithful, not verbatim.** Quote exactly where wording matters; paraphrase tightly elsewhere. The target is a true, readable record, not a word-perfect transcript.
+- **Faithful, not verbatim (DEFAULT posture).** Quote exactly where wording matters; paraphrase tightly elsewhere. The target is a true, readable record, not a word-perfect transcript. **Hardcode Mode (`/session-hardcode`) overrides this — see below.**
+- **Hardcode Mode is an opt-in fidelity toggle, not a new gate.** `/session-hardcode` ON, `/session-hardcode=off` (alias `/session-softcode`) OFF; mid-session toggle-able, session-scoped flag. ON = true 1:1 verbatim: two comments per turn (`**Michael (verbatim):**` fired at the end-prompt gate + a references/displayed comment), and the close `.txt`/toggle mirror that verbatim fidelity. OFF (default) = faithful-not-verbatim + summarized close `.txt`. Governs capture fidelity ONLY; every other rule of this gate is unchanged. Full spec: the Hardcode Mode section above.
 - **Background after the announce.** Past the single start line, the record is silent. Michael sees it because it's the live session task, not because Brain narrates each entry.
 
 ---
 
 ## Composes with
 
-- **Session Close hook** (`hooks/session-close.md`) — the permanent close post lands in #A.I. Prompts (Channel 2) as a SUMMARY + pointer to the session task; the close hook produces it and points back at the session task where the live deliberation happened.
-- **Scribe Sana** (`agents/scribe-sana.md`) — the owner/operator; her profile carries the behavioral detail incl. the faithful-not-verbatim posture + backfill fallback.
+- **Session Close hook** (`hooks/session-close.md`) — the permanent close post lands in #A.I. Prompts (Channel 2) as a SUMMARY + pointer to the session task; the close hook produces it and points back at the session task where the live deliberation happened. Honors the active Hardcode Mode for the close `.txt`/toggle fidelity.
+- **Session Transcript Format** (ClickUp: *Session Transcript Format — AI Toolkit*) — the `.txt`/in-chat-toggle container spec; carries the rule that the close artifact MIRRORS the active Hardcode Mode fidelity (verbatim 1:1 when hardcode was on, summarized otherwise).
+- **Scribe Sana** (`agents/scribe-sana.md`) — the owner/operator; her profile carries the behavioral detail incl. the faithful-not-verbatim posture + backfill fallback, and now the Hardcode Mode toggle discipline (paste raw, honor the end-prompt gate).
 - **Maestro Mira** (`agents/maestro-mira.md`) — runs the opening "do we have a session task?" check and creates it before seating anyone; posts the Tier-1 Opening Post.
 - **The Council** (`council.md`) — the thread-only expression rule + emoji-badge format + two-tier Workshop Post Protocol + Mira-synthesis-only output + the Standing-agent conduct law are mirrored there.
 - **Agent Activity Board** (🟢, list id `901327879922`, https://app.clickup.com/36074068/v/li/901327879922) — the AI-sessions list Brain maintains; each session task's comment stream is the thread.
@@ -234,6 +263,7 @@ If the gate never fired (session stayed below the bar), discard any provisional 
 
 ## Changelog
 
+- 2026-07-21: **Added Hardcode Mode (`/session-hardcode`).** A per-session opt-in toggle flipping capture from the default faithful-not-verbatim posture to true 1:1 verbatim — two comments per turn (verbatim prompt at the end-prompt gate + a references/displayed comment), mid-session toggle-able (`/session-hardcode=off`, alias `/session-softcode`), and the Session Close `.txt`/toggle mirror the same verbatim fidelity. Command grammar registered in `registry.json` session_commands; mirrored to the AI Toolkit index trigger table + the Session Transcript Format spec. Governs capture fidelity only — every other gate rule unchanged. Prompted by Michael.
 - 2026-07-17 (i): **Added the two-tier Workshop Post Protocol (thread STRUCTURE).** The gate governed how one comment looks (badge + body) but never how the whole deliberation is shaped, so output drifted three ways: lump comment / header+replies / bare summary. Locked the structure: Tier 1 = Mira's Opening Post (parent, copy-block prompt on X/Y/Z), Tier 2 = one threaded reply per seated voice (nested under the parent). Canonical templates live here; `council.md` mirrors a one-line law and profiles carry a pointer (no per-agent copies — the rejected option). Prompted by Michael (decision: 1A · Mira · Ship).
 - 2026-07-17 (h): **Fixed the phantom list id.** `901328269587` referenced no existing list; corrected to the real 🟢 Agent Activity Board `901327879922` (MAW Documents › ClickUp Use, https://app.clickup.com/36074068/v/li/901327879922). Added a Canonical pointers block with direct list + chat-fallback URLs. Prompted by Michael.
 - 2026-07-17 (f): **Retired the "never reconstruct from memory" absolute; added the close-time backfill watchdog + mid-session catch-up.** Real-time stays the goal, but a lapse now degrades to a flagged reconstructed transcript at close rather than a blank task, and a late "create the task" backfills to message 1. Added "create the task" / "start your session task" to the literal trigger list. Added the Faithful-not-verbatim rule. Close section now runs the watchdog first and routes the channel post as a summary + task pointer (per the reframed close hook). Prompted by Michael.
