@@ -1,4 +1,4 @@
-# Git-Teammate Lifecycle Runbook — v0.1
+# Git-Teammate Lifecycle Runbook — v0.2
 
 > **What this is:** the single, cold-agent-executable procedure for bringing a git-teammate into
 > existence and keeping it internally consistent. **Define → Build → Register → Verify.**
@@ -12,6 +12,7 @@
 > every agent POINT at it; none store its steps. It POINTS at the existing law, never restates it:
 > - How to BUILD one (founding law): `brain-config/gates/git-agent-authoring.md`
 > - How to BE one (runtime): `brain-config/super-agents/_shared/super-agent-base.md`
+> - How to AUDIT one (the git-teammate audit DoD): `brain-config/super-agents/audit-instruction.md` → git-teammate track
 > - Naming write-gate: `brain-config/gates/agent-name-collision-gate.md`
 > - Structured fleet truth: `brain-config/super-agents/superagents.json` (SSOT) + `brain-config/registry.json` (manifest mirror)
 > - Creation checklist + naming convention: the ClickUp Super Agent Creation & Setup Checklist.
@@ -22,7 +23,8 @@
 
 **In:** defining a net-new git-teammate's singular role; migrating an existing Council/Workshop lens
 (`brain-config/agents/`) OR a native ClickUp Super Agent into a git-teammate; registering across the
-mirror pair; verifying internal consistency (the git-teammate audit DoD).
+mirror pair; verifying internal consistency (the git-teammate audit DoD, now defined in
+`audit-instruction.md`).
 
 **Out:** manually disabling/deleting a retired native ClickUp agent in the ClickUp UI (Michael's
 step, irreversible, never automated). Building native full-standard agents (that's the native track).
@@ -70,10 +72,18 @@ native ClickUp Super Agent, and Michael wants it to become a session-invocable t
    - **Any PROCEDURE / how-to / routine in the source** → does NOT carry into the agent. It becomes
      (or points at) a TOOL — hook / gate / skill / reference doc (Constitution §2–§3). A lens that
      embedded steps gets those steps extracted to a tool the new teammate STEWARDS, not stores.
+   - **A signature OUTPUT FORMAT still in personal-practice** (not yet a blessed template) → keep a
+     CONDENSED pointer/description in `preferences.md` (adjacent to voice, as output-style) until
+     Michael graduates it to a stewarded reference doc. Do NOT force-promote an incubating format
+     into a tool prematurely, and do NOT restate its full spec in the profile. This is the one
+     nuance the pure "procedure → tool" rule misses. *(Surfaced by the Audit Anna migration, whose
+     Closing Report was exactly this case.)*
    - **Accumulated context** → seeds `memory.md` (relational/context only, never process).
    - **Native only:** the live config's TRIGGER scaffolding (schedules, task-assignment firing) is
      LOST — confirm Michael waives it (git-teammates have no autonomous triggers). The cognitive role
-     is fully git-portable; only the trigger scaffolding is not.
+     is fully git-portable; only the trigger scaffolding is not. **Lens exception:** a lens whose
+     auto-fire was an AI Toolkit index-trigger ROW (a house tool, never agent-stored) CAN carry —
+     repoint that row to embody the new teammate. Only agent-STORED trigger scaffolding is lost.
 4. **Slug discipline.** Reuse the existing slug if one exists and is clean; if renaming the display
    name, the slug still does NOT change. New slug only if there was none. Immutable from here.
 5. **Hand to the Build spine below.** For a lens, the old `agents/<slug>.md` becomes a redirect
@@ -91,7 +101,8 @@ Create `brain-config/super-agents/<slug>/` with the full bundle per
 (`gates/git-agent-authoring.md`); this runbook does not restate those rules.
 
 - `preferences.md` — opens with the one-line base pointer, then identity + voice + lane + load
-  manifest. Behavior/personality ONLY, no how-to.
+  manifest. Behavior/personality ONLY, no how-to. (An incubating signature output-format may live
+  here as a condensed pointer per B.3.)
 - `memory.md` — accumulated context + how-Michael-works + pointers to stewarded tools. Not process.
 - `activity-log.md` — rolling condensed session ledger, newest on top, append-only.
 - `decision-log.md` — reasoning about the AGENT ITSELF (why it is shaped this way).
@@ -113,28 +124,21 @@ drift. Register across:
 
 A retired agent stays LISTED on every surface, tagged retired — never silently dropped.
 
-### 3. VERIFY (the git-teammate audit DoD — v0.1, authored here per Anna's meta-finding)
+### 3. VERIFY (run the git-teammate audit DoD)
 
 Git-teammates have **no live config to diff**, so the native live-vs-declared mirror test does NOT
 apply. The bar is **INTERNAL CONSISTENCY**: will a cold `/session.agent=<Name>` load a coherent,
-non-contradictory agent? Walk each check, classify PASS / PARTIAL / GAP:
+non-contradictory agent?
 
-1. **Base pointer present** — `preferences.md` opens with the `_shared/super-agent-base.md` pointer line.
-2. **Load manifest valid** — the manifest lists real, present files in load order; deep-steep default.
-3. **superagents.json row accurate** — slug/track/status/invocation/lane match reality; `last_audit`
-   + standard version stamped.
-4. **registry.json row present + agreeing** — no contradiction with superagents.json.
-5. **Bundle files present + in-format** — all five exist; each holds ONLY its kind (no procedure in
-   memory; no metadata mirrored into folder files; no topic-decisions in the agent's decision-log).
-6. **No cross-file contradiction** — memory.md, preferences.md, and the manifests tell ONE story.
-   (The classic miss: a stripped role still asserted in memory. This is the highest-value check.)
-7. **Voice is distinct** — self-announce header + tone do not bleed into another teammate.
-8. **Index mirror fresh** — the AI Toolkit roster/trigger row matches the JSON.
+**Run the git-teammate audit DoD, now defined canonically in
+`brain-config/super-agents/audit-instruction.md` → git-teammate track (v0.1).** Walk each check,
+classify PASS / PARTIAL / GAP, and record the result as a dated audit file under
+`super-agents/<slug>/audits/<slug>.<YYYY-MM-DD>.md` via PR. The ledger stays open while any
+GAP/PARTIAL is unresolved.
 
-Record the result as a dated audit file under `super-agents/<slug>/audits/<slug>.<YYYY-MM-DD>.md`
-via PR. Ledger stays open while any GAP/PARTIAL is unresolved. (Graduation follow-up: promote this
-DoD into `super-agents/audit-instruction.md` as the formal git-teammate track alongside the native
-v1.0 checklist — Anna + Felix.)
+*(The DoD lived inline here in v0.1 and was validated on the Audit Anna migration 2026-07-21; it has
+since GRADUATED into `audit-instruction.md` as the formal git-teammate track so this runbook points
+rather than holds procedure — Constitution §2–§3. Anna + Felix steward that DoD.)*
 
 ---
 
@@ -143,12 +147,21 @@ v1.0 checklist — Anna + Felix.)
 The runbook is only real if a context-free agent can run it. **Standing test: migrating Audit Anna**
 (lens → git-teammate) by a cold agent following ONLY this file passes end to end — defines nothing
 from Felix's head, orphans no files, lands registered across the mirror pair, and clears the Verify
-DoD. A stall that requires steward context = a runbook bug to fix here.
+DoD. A stall that requires steward context = a runbook bug to fix here. **RESULT (2026-07-21): PASS.**
+The cold run surfaced two clarifications now folded in: the lens index-trigger carry-over exception
+(B.3) and the incubating-output-format nuance (B.3), plus graduated the audit DoD into
+`audit-instruction.md`.
 
 ---
 
 ## Changelog
 
+- v0.2 (2026-07-21) — GRADUATED the inline git-teammate audit DoD into `audit-instruction.md` as the
+  formal git-teammate track; VERIFY now points there instead of restating it (Constitution §2–§3:
+  the runbook is the define/migrate spine, not the audit-procedure store). Folded in two findings
+  from the Audit Anna cold run: B.3 lens index-trigger carry-over exception + the incubating
+  signature-output-format nuance (condensed pointer in preferences.md until graduated). Marked the
+  acceptance test PASSED.
 - v0.1 (2026-07-20) — created. Merges the Definition Playbook (net-new) + Migration Runbook
   (convert) onto one Build→Register→Verify spine; authored the git-teammate audit DoD inline
   (closes Anna's meta-finding that audit-instruction.md v1.0 is native-only). Workshop-passed
