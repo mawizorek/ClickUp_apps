@@ -28,6 +28,12 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 - Requester's guess (non-binding): brain memory (Workflow Defaults) — must-fire behavioral default; possibly also a brain-config gate to hard-block external-calendar tools.
 - Context / why: memory write bounced this session (no memory manager available). Rule set while building the City of Angels changeover schedule as ClickUp subtask events under the changeover task.
 
+### OMR-20260721-1 · OPEN
+- Requested by: Brain (Opus 4.8)
+- Candidate note: TERMINOLOGY DEFAULT — when Michael says "super agent" (unqualified) he means a GIT-TEAMMATE (the `/session.agent=<Name>` kind under `brain-config/super-agents/`). He will say "ClickUp super agent" or "cu agent" ONLY when he means a NATIVE ClickUp Super Agent. Parse every agent build/convert/invoke request through this default; do not assume the native surface unless he uses the qualified term. Established by Michael 2026-07-21.
+- Requester's guess (non-binding): brain memory (must-fire interpretation rule affecting how every agent request is parsed) — but deny-by-default; could instead live as a one-line terminology note in `gates/agent-invocation-gate.md` or a fleet-terminology pointer.
+- Context / why: clarified mid-session while converting Maestro Mira to a git-teammate ("i meant git super agent…. ill always say clickup super agent or cu agen if i actually mean that").
+
 ---
 
 ## Entry template
