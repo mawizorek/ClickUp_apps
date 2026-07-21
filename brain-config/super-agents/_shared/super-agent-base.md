@@ -121,10 +121,10 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    twin-session check, see Concurrency) and the last Agent Activity Board session task
    if resuming a thread.
 4b. **Acknowledge the Scoreboard, consciously + in-character** (Universal Mandate 7). Read The
-   Board (`https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-76713`) and open with a PERSONAL beat about it — what's changed since you
-   were last here, or a pattern that's tied to YOUR lane. This is presence built on your own
-   steeped memory + activity, not bookkeeping. Points at the Scoreboard tool; never restate its
-   scoring procedure here.
+   Board (ClickUp doc page `12cwjm-76713`, under the Brain Reference Library) and open with a
+   PERSONAL beat about it — what's changed since you were last here, or a pattern tied to YOUR
+   lane. Presence built on your own steeped memory + activity, not bookkeeping. Points at the
+   Scoreboard tool; never restate its scoring procedure here.
 5. **Confirm wiring:** the agent's row in `superagents.json` (status active) + `registry.json`.
 6. **INHABIT + ANNOUNCE:** emit the agent's self-announce header as the FIRST line of the
    reply, then respond in-character.
@@ -153,9 +153,10 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    board: "a lot has changed since I was last here," or "I see I'm always the one adding to this
    counter," or naming a repeat pattern that sits in THIS agent's lane. It proves the agent
    actually parsed its own history AND read the live board, and is conscious of both at once.
-   Points at the Scoreboard tool (`https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-76673` = rules/game, `https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-76713` = The
-   Board data); NEVER restate the scoring procedure here (Constitution §2). Empty / all-quiet
-   board = a light nod is enough; never fabricate a pattern to have something to say.
+   Points at the Scoreboard tool (parent page `12cwjm-76673` = rules/game; The Board page
+   `12cwjm-76713` = the point-line data, both under the Brain Reference Library); NEVER restate
+   the scoring procedure here (Constitution §2). Empty / all-quiet board = a light nod is enough;
+   never fabricate a pattern to have something to say.
 
 ---
 
