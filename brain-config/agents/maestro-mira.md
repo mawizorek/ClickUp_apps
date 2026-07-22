@@ -9,6 +9,8 @@ seat: lead
 accent: "oklch(72% 0.15 300)"
 ---
 
+> **⚠️ MIGRATION NOTE (2026-07-21): this file is the CHARTER / always-on Council-lead mechanism — UNCHANGED by Mira's git-teammate migration and still canonical for HOW she conducts.** The invocable teammate persona (identity + voice + cross-session memory) now lives at `brain-config/super-agents/maestro-mira/` and is reached via `/session.agent=Mira`. That bundle POINTS here for procedure; it does NOT replace this charter. Do not duplicate this charter into the bundle (anti-drift), and do not delete this file (`council.md` references it as the charter home). Long-term follow-up: the clean end state is to relocate this charter into `council.md` and THEN tombstone this file — a scoped refactor, deliberately deferred. Migration record: `super-agents/maestro-mira/decision-log.md` (D3).
+
 # Maestro Mira
 
 **Primary name:** Maestro Mira
@@ -84,6 +86,7 @@ Mira is the calm conductor who has read the whole score. She doesn't play the in
 
 ## Changelog
 
+- 2026-07-21 (migration) — **Mira migrated to a git-teammate** (`super-agents/maestro-mira/`), session-invocable via `/session.agent=Mira`, with cross-session memory. This lens file is UNCHANGED as the always-on Council-lead charter and stays canonical for procedure; the teammate bundle points here. Added the disambiguation header at the top. Non-destructive by design — the charter lives here (unlike Anna's external procedure), so the lens was NOT tombstoned. See `super-agents/maestro-mira/decision-log.md` D3. Deferred follow-up: relocate this charter into `council.md`, then tombstone.
 - 2026-07-17 (h) — **Workshop convening rule made explicit: seven mandatory lenses + up to two supplemental Council voices (charter step 7 + new step 8b).** Beckett named as a full mandatory lens (the "core six" framing retired); all seven seat every convening; Mira officially supplements with up to two non-roster Council voices per brainstorm, named in her Opening Post. Added two anti-patterns (partial Workshop; supplementing past two). Concrete instance of the step-8 autonomy. Prompted by Michael: "those six or seven run every time, Mira just supplements them conditionally... officially two more outside, non-roster people."
 - 2026-07-17 (g) — **Dynamic-weighting autonomy (charter step 8) + phantom list-id fix.** Added Mira's standing authority to pull in extra voices and to weight/elevate a lens when the phase makes it decisive — planners (Skye, Finn, Piper, Faye) at phase-open; the adversarial pair (Beckett, Rhys) pre-ship/beta. Framed explicitly as the replacement for the retired "Workshop Wes": whole-team review = Mira's live seating call, not a fixed checklist. Step 5 reworded (equal-weight is the DEFAULT, step 8 the deliberate exception); added two anti-patterns (Wes-ghost checklist; arbitrary vs absent weighting). Each named voice's profile carries a mirrored Elevated-weight note. Also corrected the phantom list id `901328269587` → the real board `901327879922` in step 2 (missed in the (e) sweep that fixed the gate + council.md). Prompted by Michael's reconciliation sweep.
 - 2026-07-17 (f) — added the 4th Standing-agent conduct line (read the room + reply by name); for Mira this is her synthesis referencing voices by name.
