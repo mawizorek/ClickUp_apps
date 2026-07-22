@@ -6,8 +6,17 @@
 # SECRETS ARE NOT HERE ON PURPOSE. EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, and
 # WRITE_KEY live in the Cloudflare dashboard (Worker > Settings > Variables and
 # Secrets). Never commit them.
+#   WRITE_KEY       = Michael's write key (the original single key; back-compat).
+#   WRITE_KEY_NICK  = OPTIONAL 2nd key for Nick. Set it to give Nick an independent
+#                     key (writes then tag actor "nick"); omit it and Nick just shares
+#                     Michael's key. Add via: `wrangler secret put WRITE_KEY_NICK`.
 #
-# Deploy note: 2026-07-13 ships worker v1.0 (relational API over D1 + R2).
+# BACKUPS: worker v1.4 adds /snapshot, /snapshots, /restore (JSON dumps to R2 snapshots/).
+# The deeper net is D1 Time Travel — point-in-time restore up to 30 days, no code:
+#   wrangler d1 time-travel info    inciardi-market
+#   wrangler d1 time-travel restore inciardi-market --timestamp=<ISO8601>
+#
+# Deploy note: 2026-07-13 ships worker v1.0 (relational API over D1 + R2). 2026-07-22 v1.4.
 
 name = "inciardi-market"
 main = "worker.js"
@@ -30,6 +39,7 @@ database_name = "inciardi-market"
 database_id = "18f3459f-8273-44d6-8380-6971d6173b3e"
 
 # Image bytes: uploaded + scrubbed print images. Served back through GET /img.
+# ALSO holds JSON backups under snapshots/ (see worker v1.4 /snapshot).
 # NOTE: create the bucket once in the Cloudflare dashboard (R2 > Create bucket,
 # name "inciardi-images") then this binding resolves it. Bucket name is editable;
 # the binding name IMAGES is what worker.js references.

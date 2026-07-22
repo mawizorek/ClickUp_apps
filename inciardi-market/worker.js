@@ -1,5 +1,5 @@
 /**
- * Inciardi Mini Print Market Tracker — Cloudflare Worker (v1.2)
+ * Inciardi Mini Print Market Tracker — Cloudflare Worker (v1.4)
  *
  * Relational backend over D1 (catalog / inventory / images / history / machines) + R2 (image bytes),
  * plus the live eBay market feed. This is the API the terminal front-end reads.
@@ -14,7 +14,7 @@
  *   GET /img?key= &w=        serve a stored image from R2 (primary path)
  *   GET /img?u= &w=          allowlisted CDN passthrough (transient preview / pre-store)
  *
- * WRITES (gated: header x-write-key === env.WRITE_KEY):
+ * WRITES (gated: header x-write-key matches WRITE_KEY [michael] or WRITE_KEY_NICK [nick]):
  *   POST /catalog                upsert a print (manual add / edit); dedupe is client-side
  *   POST /catalog/image          upload an image (base64 body) -> R2 -> print_image row
  *   POST /catalog/image/scrub    fetch an allowlisted CDN url server-side -> store in R2
@@ -24,13 +24,20 @@
  *   POST /machines/stock         { machine_id, status, source, notes } flip status + log a machine_event
  *   POST /machines/print         { op: link | unlink, machine_id, print_id, in_stock, last_seen_at } M:N print<->machine
  *
+ * BACKUPS (gated) — the everyday safety net (D1 Time Travel is the deeper 30-day platform restore):
+ *   GET  /snapshots              list saved snapshots (newest first) from R2 snapshots/
+ *   POST /snapshot               dump catalog + aliases + inventory (+ image metadata) to R2 as JSON
+ *   POST /restore  { key }       SOFT restore: full-replace inventory + upsert catalog + add aliases
+ *                                from a snapshot. Never DELETEs catalog (so print_image / machine_print
+ *                                cascades stay intact) and auto-takes a pre-restore snapshot first.
+ *
  * scheduled() cron: banks market_point + print_point + gone_event into D1 each run.
  *
  * STORAGE CAP: R2 has no native write-blocking quota. We enforce our own: every image
  * write checks total stored bytes (tracked in D1) and refuses to cross STORAGE_CAP_BYTES.
  *
  * Bindings: KV 'SNAPSHOTS', D1 'DB', R2 'IMAGES'.
- * Secrets: EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY.
+ * Secrets: EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, WRITE_KEY, (optional) WRITE_KEY_NICK.
  * NOTE: deploy target. NOT served by GitHub Pages.
  */
 // redeploy nonce 2026-07-13: force Workers Builds to rebind IMAGES after the inciardi-images bucket was created.
@@ -81,6 +88,11 @@ export default {
       if (p === "/machines/stock" && request.method === "POST") { gate(request, env); return json(await machineStock(env, await request.json())); }
       if (p === "/machines/print" && request.method === "POST") { gate(request, env); return json(await machinePrint(env, await request.json())); }
 
+      // ---- backups ----
+      if (p === "/snapshots" && request.method === "GET") { gate(request, env); return json(await listSnapshots(env)); }
+      if (p === "/snapshot" && request.method === "POST") { const who = gate(request, env); return json(await createSnapshot(env, who)); }
+      if (p === "/restore" && request.method === "POST") { gate(request, env); return json(await restoreSnapshot(env, await request.json())); }
+
       return json({ error: "not found" }, 404);
     } catch (err) {
       const code = (err && err.status) || 502;
@@ -95,15 +107,100 @@ export default {
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj, null, 2), { status, headers: { "Content-Type": "application/json", ...CORS } });
 }
+// Multi-key auth. Returns the ACTOR name for the supplied key, or throws 401.
+// WRITE_KEY = michael (back-compat: this was the single original key). WRITE_KEY_NICK = nick (optional).
 function gate(request, env) {
-  const supplied = request.headers.get("x-write-key");
-  if (!env.WRITE_KEY || supplied !== env.WRITE_KEY) { const e = new Error("unauthorized: bad or missing x-write-key"); e.status = 401; throw e; }
+  const supplied = request.headers.get("x-write-key") || "";
+  const map = {};
+  if (env.WRITE_KEY) map[env.WRITE_KEY] = "michael";
+  if (env.WRITE_KEY_NICK) map[env.WRITE_KEY_NICK] = "nick";
+  const actor = supplied && map[supplied];
+  if (!actor) { const e = new Error("unauthorized: bad or missing x-write-key"); e.status = 401; throw e; }
+  return actor;
 }
 function uuid() { return (crypto.randomUUID && crypto.randomUUID()) || (Date.now().toString(36) + Math.random().toString(36).slice(2)); }
 function nowISO() { return new Date().toISOString(); }
 function norm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function slug(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || ("print-" + uuid().slice(0, 8)); }
 function extFor(ct) { return ct && ct.includes("png") ? "png" : ct && ct.includes("webp") ? "webp" : ct && ct.includes("gif") ? "gif" : "jpg"; }
+
+/* ================= backups (snapshot / restore) ================= */
+// A snapshot is a JSON export of the owner-authored data (catalog + aliases + inventory + image metadata)
+// written to R2 under snapshots/. It's the everyday, in-app undo for a fat-finger. D1 Time Travel is the
+// deeper platform net (point-in-time restore up to 30 days) and is documented in the README.
+async function createSnapshot(env, actor) {
+  const [cat, alias, inv, img] = await Promise.all([
+    env.DB.prepare("SELECT * FROM catalog").all(),
+    env.DB.prepare("SELECT * FROM catalog_alias").all(),
+    env.DB.prepare("SELECT * FROM inventory").all(),
+    env.DB.prepare("SELECT * FROM print_image").all(),
+  ]);
+  const payload = {
+    version: 1, created_at: nowISO(), by: actor || "unknown",
+    counts: {
+      catalog: (cat.results || []).length, catalog_alias: (alias.results || []).length,
+      inventory: (inv.results || []).length, print_image: (img.results || []).length,
+    },
+    catalog: cat.results || [], catalog_alias: alias.results || [],
+    inventory: inv.results || [], print_image: img.results || [],
+  };
+  const stamp = nowISO().replace(/[:.]/g, "-");
+  const key = `snapshots/${stamp}_${actor || "unknown"}.json`;
+  await env.IMAGES.put(key, JSON.stringify(payload), { httpMetadata: { contentType: "application/json" } });
+  return { ok: true, key, by: payload.by, created_at: payload.created_at, counts: payload.counts };
+}
+async function listSnapshots(env) {
+  const l = await env.IMAGES.list({ prefix: "snapshots/", limit: 200 });
+  const snapshots = (l.objects || [])
+    .map((o) => ({ key: o.key, size: o.size, uploaded: o.uploaded }))
+    .sort((a, b) => (a.key < b.key ? 1 : -1)); // newest first (timestamped keys)
+  return { count: snapshots.length, snapshots };
+}
+// SOFT restore: never DELETE catalog (that would cascade-wipe print_image + machine_print). Instead:
+//  - inventory: full replace (it has no children) = the owned ledger is reinstated exactly.
+//  - catalog: UPSERT every snapshot row = renamed/edited/deleted prints come back, added-since stay.
+//  - catalog_alias: additive.
+// Auto-snapshots the CURRENT state first, so a restore is itself undoable.
+async function restoreSnapshot(env, body) {
+  if (!body || !body.key) throw new Error("restore requires a snapshot key");
+  const obj = await env.IMAGES.get(body.key);
+  if (!obj) throw new Error("snapshot not found: " + body.key);
+  let snap; try { snap = JSON.parse(await obj.text()); } catch (e) { throw new Error("snapshot is not valid JSON"); }
+  if (!snap || !Array.isArray(snap.catalog) || !Array.isArray(snap.inventory)) throw new Error("snapshot payload missing catalog/inventory");
+
+  const safety = await createSnapshot(env, "pre-restore");
+  const now = nowISO();
+  const stmts = [];
+  // full-replace inventory
+  stmts.push(env.DB.prepare("DELETE FROM inventory"));
+  for (const v of snap.inventory) {
+    stmts.push(env.DB.prepare(
+      "INSERT INTO inventory (inv_id,print_id,provisional_label,disposition,condition,framed,qty,acquired_price,acquired_where,acquired_at,sold_price,sold_at,notes,created_at,updated_at) " +
+      "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15)"
+    ).bind(v.inv_id, v.print_id ?? null, v.provisional_label ?? null, v.disposition || "own", v.condition ?? null,
+      v.framed ? 1 : 0, v.qty ?? 1, v.acquired_price ?? null, v.acquired_where ?? null, v.acquired_at ?? null,
+      v.sold_price ?? null, v.sold_at ?? null, v.notes ?? null, v.created_at || now, v.updated_at || now));
+  }
+  // upsert catalog (no delete -> no cascade)
+  for (const r of snap.catalog) {
+    stmts.push(env.DB.prepare(
+      "INSERT INTO catalog (print_id,title,category,exclusive,retail,in_print,pack_of,pack_from,source,locked,notes,created_at,updated_at) " +
+      "VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13) " +
+      "ON CONFLICT(print_id) DO UPDATE SET title=excluded.title, category=excluded.category, exclusive=excluded.exclusive, " +
+      "retail=excluded.retail, in_print=excluded.in_print, pack_of=excluded.pack_of, pack_from=excluded.pack_from, " +
+      "source=excluded.source, locked=excluded.locked, notes=excluded.notes, updated_at=excluded.updated_at"
+    ).bind(r.print_id, r.title, r.category ?? null, r.exclusive ?? null, r.retail ?? null, r.in_print ? 1 : 0,
+      r.pack_of ?? null, r.pack_from ?? null, r.source || "manual", r.locked ? 1 : 0, r.notes ?? null,
+      r.created_at || now, r.updated_at || now));
+  }
+  // aliases additive
+  for (const a of (snap.catalog_alias || [])) {
+    stmts.push(env.DB.prepare("INSERT OR IGNORE INTO catalog_alias (print_id,alias,norm) VALUES (?1,?2,?3)").bind(a.print_id, a.alias, a.norm));
+  }
+  await env.DB.batch(stmts);
+  return { ok: true, from: body.key, restored: snap.counts || null, safety_snapshot: safety.key,
+    note: "inventory full-replaced; catalog upserted (prints added after the snapshot were kept). images & machines untouched." };
+}
 
 /* ================= storage cap (D1-tracked bytes vs R2 ceiling) ================= */
 async function storedBytes(env) {
@@ -338,9 +435,6 @@ async function writeInventory(env, body) {
 }
 
 /* ================= machines (D1 — location layer) ================= */
-// GET /machines            all machines + their linked prints
-// GET /machines?print_id=  machines carrying a given print (reverse filter)
-// GET /machines?state=&city=&status=&collection=  filtered list
 async function readMachines(env, url, base) {
   const printId = url.searchParams.get("print_id");
   if (printId) {
@@ -467,7 +561,7 @@ function normalize(it) {
 function shipCost(opts) { if (!opts || !opts.length) return 0; const c = opts[0].shippingCost; return c ? num(c.value) : 0; }
 function parsePrint(title) {
   const t = title.toLowerCase(); const exclusive = EXCLUSIVE_TOKENS.find((k) => t.includes(k)) || null;
-  let name = null; const m = title.match(/mini print[\s:\u2013-]+([A-Za-z0-9'"&\s]{2,40})/i); if (m) name = m[1].trim();
+  let name = null; const m = title.match(/mini print[\s:\u2013-]+([A-Za-z0-9'\"&\s]{2,40})/i); if (m) name = m[1].trim();
   return { name, exclusive, matched: Boolean(name) };
 }
 async function buildMarket(env) {
