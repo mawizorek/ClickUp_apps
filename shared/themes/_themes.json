@@ -68,6 +68,16 @@
       "forms": "sharp",
       "spacing": "tight",
       "intendedUse": "Neutral-cool tight instrument look; alternative to sharp-utility."
+    },
+    {
+      "slug": "eos",
+      "name": "Eos",
+      "status": "locked",
+      "color": "eos",
+      "typography": "eos",
+      "forms": "eos",
+      "spacing": "eos",
+      "intendedUse": "Lighting/theatrical apps — ETC Eos console grammar (tombstone display: magenta=tracked, blue=intensity-up, green=lower/marked, gold=captured/selected, red=manual). Shared across the LX-notes clone, the Eos Tombstone Teaching Tool, and future lighting tools."
     }
   ]
 }
