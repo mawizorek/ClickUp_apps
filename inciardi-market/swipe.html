@@ -42,6 +42,17 @@
   </div>
 </main>
 
+<dialog id="editSheet"><div class="sheet">
+  <div class="sheet-h"><h2>Edit print</h2><button class="x" id="edClose" aria-label="Back to deck"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="field"><label>Print name</label><input id="ed-name" spellcheck="false" placeholder="e.g. Richard Scarry"></div>
+  <div class="row2">
+    <div class="field"><label>Category</label><select id="ed-cat"><option value="mini">Mini</option><option value="big-riso">Big Risograph</option><option value="linocut">Linocut</option><option value="exclusive">Exclusive</option><option value="pack">Pack</option></select></div>
+    <div class="field"><label>Retail ($)</label><input id="ed-retail" type="number" step="1" placeholder="15"></div>
+  </div>
+  <p style="font-size:0.74rem;color:var(--ink-faint);line-height:1.5">Saving locks this print so the nightly shop sync keeps your title. The old name is kept as a search alias so eBay matching still works.</p>
+  <div style="display:flex;gap:var(--s3);margin-top:var(--s4)"><button class="btn primary" id="ed-save">Save &amp; lock</button><button class="btn ghost" id="ed-back">← Back to deck</button></div>
+</div></dialog>
+
 <dialog id="filters"><div class="sheet">
   <div class="sheet-h"><h2>Filter the deck</h2><button class="x" id="filtClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="field"><label>Category</label><div class="chips" id="catChips"></div></div>
