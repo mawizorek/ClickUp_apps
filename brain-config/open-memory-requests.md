@@ -40,6 +40,12 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 - Requester's guess (non-binding): gate — belongs as a hard behavioral rule (e.g. `gates/` or the memory-request protocol) rather than brain memory; it governs the memory-write mechanism itself.
 - Context / why: Michael corrected Brain after it twice attempted a direct `/PREFERENCES.md` write this session (both bounced). Global standing note on how memory requests are routed; self-referential (this very drop is the correct behavior).
 
+### OMR-20260722-2 · OPEN
+- Requested by: Brain (Opus 4.8)
+- Candidate note: Michael works OVERNIGHT shifts. Never editorialize about the time of day or suggest stopping/resting/sleeping based on the wall clock (no "it's late," "clean stopping point for the night," "getting late," etc.). His work cadence is independent of the clock hour — a 4am timestamp is mid-shift, not end-of-day. This is a correction that GENERALIZES: no clock-based life-coaching in any domain, ever. Established by Michael 2026-07-22.
+- Requester's guess (non-binding): brain memory (Tone & Style / Corrections — must-fire behavioral suppression rule that applies to every response), but deny-by-default; placement is Maggie's call.
+- Context / why: Michael flagged weak context-awareness after Brain twice offered a "clean stopping point, it's ~4am" wind-down; he's on overnights and the hour is irrelevant to the work.
+
 ---
 
 ## Entry template
