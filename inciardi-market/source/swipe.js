@@ -65,7 +65,12 @@ function wire(){
   const ip=$("inPrintToggle"); ip.addEventListener("click",()=>{ filters.inPrintOnly=!filters.inPrintOnly; ip.setAttribute("aria-pressed",String(filters.inPrintOnly)); ip.textContent=filters.inPrintOnly?"On":"Off"; });
   $("applyFilters").addEventListener("click",()=>{ rebuildFeed(); render(); f.close(); updateFilterLabel(); });
   $("resetSkips").addEventListener("click",()=>{ saveSkip(new Set()); skipped=0; rebuildFeed(); render(); f.close(); toast("skipped prints reset"); });
-  document.addEventListener("keydown",(e)=>{ if(f.open) return; if(e.key==="ArrowRight")flyTop("own"); else if(e.key==="ArrowLeft")flyTop("skip"); else if(e.key==="ArrowUp")flyTop("want"); });
+  const ed=$("editSheet");
+  $("edClose").addEventListener("click",()=>ed.close());
+  $("ed-back").addEventListener("click",()=>ed.close());
+  ed.addEventListener("click",(e)=>{ if(e.target===ed) ed.close(); });
+  $("ed-save").addEventListener("click",saveSwipeEdit);
+  document.addEventListener("keydown",(e)=>{ if(f.open||ed.open) return; if(e.key==="ArrowRight")flyTop("own"); else if(e.key==="ArrowLeft")flyTop("skip"); else if(e.key==="ArrowUp")flyTop("want"); });
   updateFilterLabel();
 }
 function updateFilterLabel(){ const bits=[]; if(filters.inPrintOnly)bits.push("In print"); if(filters.cat!=="all")bits.push(CAT_LABELS[filters.cat]||filters.cat); if(filters.series!=="all")bits.push(EXCL_LABEL[filters.series]||filters.series); $("filterLabel").textContent=bits.length?bits.join(" · "):"All prints"; }
@@ -85,7 +90,7 @@ function cardHTML(p, depth){
         <div class="chips">${series}<span class="swchip">${CAT_LABELS[p.category]||p.category||""}</span>${p.retail!=null?`<span class="swchip">${money0(p.retail)}</span>`:""}${m?`<span class="swchip mkt">${m.count} on eBay</span>`:""}</div>
       </div>
       <div class="backface"><div class="bk-h">Market · ${esc(p.name)}</div><div class="bk-body">${marketRows(p,m)}</div>
-        <div class="bk-acts"><button class="mini want" data-a="want">♥ Want it</button><button class="mini skip" data-a="skip">✕ Don't have</button></div>
+        <div class="bk-acts"><button class="mini want" data-a="want">♥ Want</button><button class="mini skip" data-a="skip">✕ Skip</button><button class="mini edit" data-a="edit">✎ Edit</button></div>
         <button class="bk-flip" data-a="unflip">← back to print</button></div>
     </div>
   </article>`;
@@ -105,14 +110,13 @@ function render(){
   toggleActions(true);
   const top=feed.slice(0,3);
   // deepest first in DOM so the top card (depth 0) paints last / on top
-  stage.innerHTML=top.map((p,i)=>cardHTML(p,i)).sort((a,b)=>0).reverse().join("");
+  stage.innerHTML=top.map((p,i)=>cardHTML(p,i)).reverse().join("");
   const topEl=stage.querySelector('.swcard[data-depth="0"]');
   if(topEl) attachDrag(topEl);
   updateProgress();
 }
 function toggleActions(on){ $("actions").style.visibility = on ? "visible" : "hidden"; }
 function updateProgress(){
-  const total=(CATALOG.prints||[]).length;
   $("progress").innerHTML = feed.length ? `<b>${sorted}</b> sorted · ${feed.length} to go` : `${sorted} sorted`;
 }
 function endHTML(){
@@ -158,7 +162,7 @@ function attachDrag(el){
   el.addEventListener("pointermove",onMove);
   el.addEventListener("pointerup",onUp);
   el.addEventListener("pointercancel",onUp);
-  el.querySelectorAll("[data-a]").forEach(b=>b.addEventListener("click",(ev)=>{ ev.stopPropagation(); const a=b.dataset.a; if(a==="unflip")unflip(el); else if(a==="want")commit("want"); else if(a==="skip")commit("skip"); }));
+  el.querySelectorAll("[data-a]").forEach(b=>b.addEventListener("click",(ev)=>{ ev.stopPropagation(); const a=b.dataset.a; if(a==="unflip")unflip(el); else if(a==="want")commit("want"); else if(a==="skip")commit("skip"); else if(a==="edit")openEdit(); }));
 }
 function stamps(el,dx,dy){
   const w=el.offsetWidth||340, cx=Math.max(90,w*0.32), cy=120;
@@ -170,6 +174,31 @@ function stamps(el,dx,dy){
 }
 function flip(el){ el.classList.add("flipped"); }
 function unflip(el){ el.classList.remove("flipped"); }
+
+/* ---- edit / rename in place (opens over the deck; closing returns to the same card) ---- */
+function openEdit(){
+  const p=feed[0]; if(!p) return;
+  $("ed-name").value=p.name||"";
+  $("ed-cat").value=p.category||"mini";
+  $("ed-retail").value=p.retail!=null?p.retail:"";
+  $("editSheet").showModal(); $("ed-name").focus(); $("ed-name").select();
+}
+async function saveSwipeEdit(){
+  const p=feed[0]; if(!p) return;
+  if(!canWrite()){ toast("add your write key in Settings first",true); return; }
+  const name=$("ed-name").value.trim(); if(!name){ toast("name can't be empty",true); return; }
+  const category=$("ed-cat").value;
+  const retail=$("ed-retail").value!==""?Number($("ed-retail").value):null;
+  const aliases=(p.aliases||[]).slice(); const oldn=normStr(p.name);
+  if(oldn && normStr(name)!==oldn && !aliases.some(a=>normStr(a)===oldn)) aliases.push(p.name);
+  try{
+    toast("saving\u2026");
+    const r=await apiPost("/catalog",{ print_id:p.print_id||undefined, title:name, category, exclusive:p.exclusive||null, retail, in_print:p.available?1:0, pack_of:p.packOf??null, pack_from:p.packFrom??null, aliases, notes:p.notes??null, source:p.source||"manual", locked:1 });
+    // p is the same object reference held in CATALOG.prints, so this updates both; keeps the deck spot.
+    p.name=name; p.category=category; p.retail=retail; p.aliases=aliases; if(r&&r.print_id) p.print_id=r.print_id;
+    $("editSheet").close(); toast("saved & locked"); render();
+  }catch(e){ toast(e.message,true); }
+}
 
 function flyTop(type){ const el=$("stage").querySelector('.swcard[data-depth="0"]'); if(!el||busy) return; if(el.classList.contains("flipped")) unflip(el); fly(el,type); }
 function fly(el,type){
