@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0a0e13">
+<meta name="robots" content="noindex, nofollow">
+<title>Swipe · Inciardi Market</title>
+<meta name="description" content="Swipe to build your Inciardi collection: right if you have it, left if you don't.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="source/base.css">
+<link rel="stylesheet" href="source/swipe.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap row">
+  <span class="brand"><span class="dot"></span>Inciardi Market <span class="tk">SWIPE</span></span>
+  <nav class="nav">
+    <a href="terminal.html">Terminal</a>
+    <a href="catalog.html">Catalog</a>
+    <a href="swipe.html" aria-current="page">Swipe</a>
+    <a href="collection.html">Collection</a>
+    <a href="market.html">Market</a>
+  </nav>
+  <button class="gear" id="gear" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+</div></header>
+
+<main class="swwrap">
+  <div class="swhead">
+    <div class="swprogress" id="progress">—</div>
+    <button class="swfilter-btn" id="filterBtn"><svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"/></svg><span id="filterLabel">In print</span></button>
+  </div>
+
+  <div class="stage" id="stage"><div class="swskel"></div></div>
+
+  <div class="swactions" id="actions">
+    <button class="act skip" id="btnSkip" aria-label="Don't have it"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <button class="act undo" id="btnUndo" aria-label="Undo" disabled><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg></button>
+    <button class="act want" id="btnWant" aria-label="Want it"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+    <button class="act have" id="btnHave" aria-label="I have it"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>
+  </div>
+</main>
+
+<dialog id="filters"><div class="sheet">
+  <div class="sheet-h"><h2>Filter the deck</h2><button class="x" id="filtClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="field"><label>Category</label><div class="chips" id="catChips"></div></div>
+  <div class="field"><label>Exclusive series</label><select id="seriesSel"><option value="all">All series</option><option value="nyc">NYC</option><option value="lacma">LACMA</option><option value="grand-central">Grand Central</option><option value="richard-scarry">Richard Scarry</option><option value="holiday">Holiday</option></select></div>
+  <div class="field" style="flex-direction:row;align-items:center;justify-content:space-between"><label style="margin:0">In-print only</label><button class="btn sm" id="inPrintToggle" aria-pressed="true">On</button></div>
+  <div style="display:flex;gap:var(--s3);margin-top:var(--s4)"><button class="btn primary" id="applyFilters">Apply</button><button class="btn ghost" id="resetSkips">Reset skipped</button></div>
+</div></dialog>
+
+<dialog id="settings"><div class="drawer" style="padding:var(--s6)">
+  <div class="drawer-h"><h2>Settings</h2><button class="x" id="settingsClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="field" style="flex-direction:row;align-items:center;justify-content:space-between"><label style="margin:0">Dark terminal</label><button class="btn sm" id="themeToggle" aria-pressed="true">Toggle</button></div>
+  <div class="field"><label>Data source (Worker URL)</label><input id="epInput" placeholder="https://inciardi-market…workers.dev" spellcheck="false"></div>
+  <div class="field"><label>Write key (unlocks saving)</label><input id="wkeyInput" type="password" placeholder="paste to save what you swipe" spellcheck="false"></div>
+  <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Right-swipe saves a print to your Collection as owned; the want path saves it to your wishlist. Both need the write key. “Don’t have” is remembered on this device so you’re not re-shown prints you’ve already cleared.</p>
+</div></dialog>
+
+<script src="source/app-core.js"></script>
+<script src="source/swipe.js"></script>
+</body>
+</html>

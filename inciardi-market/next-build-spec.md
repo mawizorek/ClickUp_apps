@@ -1,136 +1,89 @@
 # Inciardi Mini Print Market Tracker — Build Spec
 
 **App slug:** `inciardi-market` · **Repo:** `mawizorek/ClickUp_apps`
-**Version target:** worker v1.3 (adds the daily catalog-scrub cron)
-**Status:** worker v1.2 live (D1 catalog/image/inventory/machine API + eBay market cron every 6h). This spec adds an UNATTENDED daily harvest of Anastasia's Shopify store into D1.
+**Version target:** front-end **v13** (adds the swipe-to-sort bulk-input page)
+**Status:** front-end v12 live (PR #247 — multi-page: terminal / catalog / collection / market, shared `source/app-core.js`). Worker v1.3 live (D1 catalog/inventory/market + daily harvest crons). The previous next-build (the unattended catalog-scrub cron) SHIPPED; this spec supersedes it.
 
-> It's **Anastasia Inciardi / Inciardi Prints** (Portland, ME). Not "Inciarid."
-
-> **DECISIONS LOCKED (Michael, 2026-07-13):** see the resolved block at the bottom. Cron hour 09:00 UTC · `in_print` always refreshes (live fact) · images scrub via an hourly self-idling cron (faster). This spec is ready to build.
+> It's **Anastasia Inciardi / Inciardi Prints** (Portland, ME).
 
 ---
 
 ## Goal (one line)
 
-Crons on the existing worker that run the Shopify harvest half of `catalog-research-routine.md` automatically — no manual trigger, no write key handed around — upserting the print universe into D1 and converging image coverage over time.
+A mobile-first, Tinder-style **swipe page** (`swipe.html`) that turns the ~200-print catalog into a fast bulk-input funnel for the owned Collection: hero = the print image, **right = "I have this,"** **left = "I don't,"** with a long-press market panel and a want path. Default feed hides what's already sorted so you're never hit with a raw dump.
 
 ---
 
-## Why a cron (not the manual/script path)
+## Decoded decisions (Decision Log, inverted polarity — checked = rejected)
 
-The worker already has `env.DB` (D1) + `env.IMAGES` (R2) bound and a working `scheduled()` handler (banks eBay market history every 6h). Running the catalog harvest IN-worker means it writes straight to D1/R2 with zero auth dance (no `x-write-key`, because it's not crossing the HTTP boundary). Michael wanted "auto cron." This is it.
+**Q1 — what a right-swipe writes:** **thin owned flag only.** `POST /inventory {op:'upsert', print_id, disposition:'own', qty:1, acquired_where:'swipe'}`. No inline cost/condition form (that stays in the Collection tab). Note: *"be open for expansion later"* — keep the write path easy to enrich, don't build the enrichment now. Keeps the page fast and keeps this a clean fold-in.
 
----
+**Q2 — left-swipe behavior:** **persist as a real not-owned/skipped state (suppressed from the default feed next time) AND split "don't have" vs "want."** Note: *"long press market info, other settings."* So:
+- **Left swipe = "don't have"** → persists to a skip set, suppressed from the default feed going forward.
+- **Want path** (the split) → swipe-up (or the long-press panel's "Want it" button) writes `disposition:'want'` to D1.
+- **Long-press = flip to a market-info panel** (live eBay via `marketFor()`), with Want / Skip actions.
 
-## Cron layout (worker v1.3) — THREE triggers, branched on `event.cron`
-
-```toml
-[triggers]
-crons = [
-  "0 */6 * * *",   # EXISTING: eBay market snapshot bank (untouched)
-  "0 9 * * *",     # NEW daily: catalog TEXT harvest (products.json + collections)
-  "0 * * * *"      # NEW hourly: image scrub batch, SELF-IDLING (no-ops when caught up)
-]
-```
-
-```js
-async scheduled(event, env, ctx) {
-  if (event.cron === "0 9 * * *")      ctx.waitUntil(runCatalogScrub(env).catch((e) => console.error("catalog-scrub", e)));
-  else if (event.cron === "0 * * * *") ctx.waitUntil(runImageBackfill(env).catch((e) => console.error("img-backfill", e)));
-  else                                 ctx.waitUntil(runCron(env).catch((e) => console.error("cron", e)));  // existing market bank
-}
-```
-
-Why split text vs images into two crons: the text harvest is cheap + bounded (runs once daily); the image backfill is the expensive part and now runs hourly so the backlog clears in under a day, then idles. Keeping them separate means the daily harvest never competes with image work for the subrequest budget in a single tick.
+**Q3 — default filter:** delegated to the team (*"whatever the team thinks"*). **Conductor call: default = in-print + not-owned + not-skipped for v1** (no schema change). True "recently released" ordering needs a release signal the catalog doesn't store → add `first_seen` on harvest as a fast-follow (see Futures). Filterable by category / exclusive series / in-print.
 
 ---
 
-## Next build
+## ⚠️ Architecture fork — skip persistence (Mira's call, pending Michael veto)
 
-### 1. `runCatalogScrub(env)` — daily text harvest (09:00 UTC)
+Rhys flagged this make-or-break: if "don't have" is client-only, the same ~180 prints re-serve every session. Two options:
+- **A (v1, chosen): localStorage skip set** (`inciardi_skip` = array of print_ids). Persists between sessions on the device, ZERO worker/schema change, keeps `swipe.html` a pure front-end fold-in. Right-swipe (own) and want still write to D1, so the durable ledger is real; only the *skip* memory is device-local.
+- **B (fast-follow): a D1 `seen`/`skip` disposition** (or a small `skip` table) so skips sync cross-device. Requires a worker endpoint + read filter. Deferred unless Michael wants cross-device skips now.
 
-Pages `https://inciardiprints.com/products.json?limit=250&page=N` until `products` is empty. For each product, explode the THREE layers per the routine:
-- **Product level** → one catalog row (title, handle, price→retail, available→in_print, product_type/tags→category).
-- **Variant level** → multi-print products (the 8x10 Riso holds 9 themes); each variant `title` becomes its own print, art from `variant.featured_image.src`.
-- **Mystery-pack contents** → parse `body_html` prose for the embedded print list; set `pack_of`/`pack_from`.
-
-Walk each `/collections/<handle>/products.json` from the routine's collection map for `category` + exclusive detection (`grand-central`, `richard-scarry`, `lacma`, `holiday`). Cache collection→handle membership in one pass; don't re-fetch per print. Record each print's canonical CDN image URL onto the row (source_url) so the image backfill cron has a target.
-
-Upsert each via the harvest-safe path (hard-stop #1), source=`shop-harvest`.
-
-### 2. `runImageBackfill(env)` — hourly, self-idling (FASTER, per Michael)
-
-- Query D1 for prints that have a known `source_url` but NO active `print_image` row. Take the first **`SCRUB_BATCH = 25`**.
-- If that query returns zero → **return immediately (no-op).** Once coverage is complete the hourly tick costs ~one D1 read and exits. Self-healing when new prints land.
-- Otherwise scrub those ≤25 CDN images into R2 (reuse `scrubImage` logic, factored to an internal callable that skips the HTTP gate).
-- Convergence: ~500 images ÷ 25/hr ≈ **fully backfilled in <24h**, vs ~a month on the old daily-15 plan. Then it idles.
+Easily reversible (A → B is additive). Building A.
 
 ---
 
-## 🛑 HARD-STOP #1 — harvest must NOT clobber locked rows (with the in_print carve-out)
+## Feed source
 
-The existing `upsertCatalog()` does an unconditional `ON CONFLICT DO UPDATE SET ...` on EVERY field. Run unattended, it would silently stomp Michael's hand-entered (`locked=1`) prints every night. **Unacceptable for a timer.**
-
-**Fix:** a separate `harvestUpsertCatalog(env, row)` that:
-- If the print_id doesn't exist → plain INSERT (source=`shop-harvest`, locked=0).
-- If it exists and `locked=0` → update freely (harvest owns unlocked rows).
-- If it exists and `locked=1` → **COALESCE-fill only**: populate NULL/empty columns, never overwrite a populated hand-entered value — **EXCEPT `in_print`, which ALWAYS refreshes** (Michael's call: availability is a live fact from the store, not a hand-entered opinion, so the harvest owns it even on locked rows).
-- Always additive on aliases (`INSERT OR IGNORE` into `catalog_alias`), never delete.
-
-The manual `POST /catalog` path keeps its current clobber behavior (a human edit is intentional). This guard is harvest-only.
+`GET /catalog` (D1, seed fallback `catalog.json`) **minus** owned/want print_ids from `GET /inventory` **minus** the localStorage skip set. Default filter: `available === true` (in-print). Multi-variant prints are already exploded to one row per variant → one card each (Domain Dara). Feed order for v1: catalog order (category, title); smart-order is v1.1 (Cleo).
 
 ---
 
-## 🛑 HARD-STOP #2 — image scrub bounded per invocation (subrequest cap)
+## Build order (Finn) — v1 = steps 1–4, layer 5–6
 
-Cloudflare Workers cap subrequests per invocation (50 free / 1000 paid). Scrubbing ~500 images in one tick blows it and the run dies mid-way, non-deterministically.
-
-**Fix (now via the hourly backfill cron above):**
-- The daily text harvest is cheap + bounded (store ~40-60 products = 1-2 pages + ~28 collections ≈ 30 subrequests). Well under any cap.
-- The hourly image cron scrubs a bounded `SCRUB_BATCH = 25` per tick (25 image fetches + a couple D1 reads). Safe under the free cap with margin, and hourly cadence clears the backlog fast without ever fragmenting a single over-cap run.
-- Keep `SCRUB_BATCH` an explicit const so the ceiling is obvious if the plan tier changes; can push higher on paid.
-
----
-
-## Guardrails (carried from the routine)
-
-- **D1 via the worker is store of truth.** These crons write D1/R2 directly (in-worker); `catalog.json` stays a human export, NOT written by the cron.
-- **Never reference/copy Vault (miniprint.io).** Coverage answer-key only.
-- **Official names win**; seller/variant titles fold in as aliases, never new prints.
-- **Provenance:** everything the cron writes is source=`shop-harvest`, locked=0 (so a later human edit + lock always wins — except `in_print`, always live).
-- **Merge, don't delete:** the cron never deletes catalog rows (a product going away = `in_print=0`, not a delete — it's still a real print that trades on eBay).
-- **Machines untouched** by these crons (deferred; hand-seeded in `db/seed-machines.sql`).
+1. **Filtered card feed** reading `/catalog` minus collection minus skip set; write-key prompt up front (the page is useless read-only — nudge to Settings if `!canWrite()`).
+2. **Drag mechanics** — one live card + two peeking behind; pointer/touch drag with `transform: rotate()`; commit threshold; snap-back spring; fly-off on commit.
+3. **Commit-right write** → `POST /inventory` (own, source-tagged) with **optimistic UI + reconcile** (not just hide the card) + an **undo stack** (undo in v1, not polish — Rhys/Finn).
+4. **Left = skip persist** (localStorage), **swipe-up = want** (D1 write), **long-press = market panel** (flip card; Want/Skip actions).
+5. **Filter sheet** — category / exclusive series / in-print toggle.
+6. **End-of-stack summary** — "You added 12 prints 🎉 · skipped 8" with a reset-skips affordance.
 
 ---
 
-## Agent instructions (do / don't)
+## Style (Stu — "glow it up")
 
-**DO:**
-- Edit `worker.js` + `wrangler.toml` only. Fetch fresh blob SHAs before writing (stale-context guard).
-- Branch → PR → self-merge. Bump the worker header comment to v1.3.
-- After merge, wait for Workers Builds, then hit `GET /catalog` and confirm the count grew + images are filling over the next few hours.
-- Add a short honest note to the app Settings drawer: "Catalog auto-refreshes daily from the shop; print images backfill within a day."
+Dark `#0a0e13` ground, full-bleed hero print image edge-to-edge; name + series badge + retail floating bottom-left over a gradient scrim. Space Grotesk display, JetBrains Mono metadata chips (matches the terminal identity). Physical-print feel: subtle paper-grain shadow, slight tilt on the stack behind. **HAVE** stamp in warm terracotta `#c65a3a`, **SKIP** in cool slate. `navigator.vibrate()` on mobile commit. Running progress line "12 sorted · 188 to go."
 
-**DON'T:**
-- DON'T touch the existing `runCron()` market-bank logic or the 6h trigger.
-- DON'T route the harvest through `POST /catalog` (that clobbers locked rows — use the new harvest-safe upsert).
-- DON'T scrub all images in one run (cap death) — use the bounded hourly backfill.
-- DON'T harvest machines here.
-- DON'T write `catalog.json` from the cron.
+**Non-negotiable (Polly):** big ✓ / ✗ buttons under the card for thumb-tapping (not everyone swipes) + the undo button are baseline, not polish.
 
 ---
 
-## Decisions — RESOLVED (Michael, 2026-07-13)
+## Guardrails
 
-1. **Cron hour:** daily catalog harvest at **09:00 UTC** (~4-5am Central). Confirmed.
-2. **`in_print` on locked rows:** **always refresh.** It's a live availability fact from the store, not a hand-entered opinion — the single carve-out to the locked-row no-clobber guard. Everything else on a locked row is still COALESCE-fill-only.
-3. **Image speed:** **go faster** → images move to their own **hourly, self-idling** cron at `SCRUB_BATCH=25`, backfilling ~500 in <24h then idling to ~zero cost. Replaces the once-daily 15/run plan.
+- **Reuse `source/app-core.js`** — `apiGet` / `apiPost` (adds `x-write-key`), `canWrite()`, `proxied()` (route CDN images through the Worker `/img` proxy — never hotlink), `marketFor()`, `toast()`, `initChrome()`. Do NOT re-implement the API client or chrome.
+- **Write key stays in localStorage only** (Enzo) — never in a URL. The page respects the existing `.can-write` gating.
+- **Optimistic writes must reconcile**, not just hide the card (Rhys/Beckett) — on write failure, restore the card + toast the error.
+- **Provenance:** `acquired_where:'swipe'` tags swipe-created holdings so a later considered Collection edit is distinguishable (thin version of Enzo's `source=swipe`; a real `source` column on inventory is a worker fast-follow).
+- **Mobile-safe**, dark default. Add "Swipe" to the nav on all pages.
+- **Edge cases to define before v1 done (Beckett):** right-then-left before the write returns (race → reconcile); rotate mid-drag; two-finger swipe; network kill mid-commit; empty filter result (clean "all caught up," not a dead card); undo after N commits.
+
+---
+
+## Files
+
+**Create:** `swipe.html` (page shell + nav + settings drawer + card-stack container) · `source/swipe.css` · `source/swipe.js`.
+**Edit:** add a `Swipe` nav link to `terminal.html`, `catalog.html`, `collection.html`, `market.html`. Bump `app-core.js` BUILD/PR on ship.
 
 ---
 
 ## Futures (deferred)
 
-- **Stockist machine pull:** one-time harvest of the ~120-machine geo list once the `data-stockist-widget-tag` is captured from the store-locator page source. Could later become its own weekly cron.
-- Machine status/restock enrichment (buy-side drop signal).
-- eBay `unmatched` → auto-research → alias feedback loop.
-- Marketplace Insights sold comps if partner access lands.
+- **B: D1 skip state** for cross-device skip sync (see fork above).
+- **`first_seen` on harvest** → real "recently released" default sort (Q3 proper answer).
+- **Smart-order feed** (Cleo v1.1): surface exclusives + in-print-now first, or cluster by series.
+- **Card-back market value** always-on ("you own this, asking $45"); right-swipe on an exclusive pre-tags a Sell Signal.
+- **Inline enrichment** (cost/condition on swipe) if the thin flag proves too thin (Q1 "open for expansion").

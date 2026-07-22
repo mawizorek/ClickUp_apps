@@ -1,6 +1,6 @@
-/* Inciardi Market v12 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
-const BUILD = "v12";
-const PR = 247; // merged PR that shipped this version
+/* Inciardi Market v13 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
+const BUILD = "v13";
+const PR = 453; // merged PR that shipped this version
 const API_DEFAULT = "https://inciardi-market.mawizorek-online.workers.dev";
 const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fallback can render
 
@@ -69,8 +69,8 @@ function marketFor(MARKET, p){
 
 /* ---- chrome: nav active, gear/drawer, theme, write-key, footer ---- */
 function initTheme(){ const t=$("themeToggle"); if(!t) return;
- if(localStorage.getItem("inciardi_theme")==="light"){ document.documentElement.dataset.theme="light"; t.setAttribute("aria-pressed","false"); } else { t.setAttribute("aria-pressed","true"); }
- t.addEventListener("click",()=>{ const light=document.documentElement.dataset.theme==="light";
+ if(localStorage.getItem("inciardi_theme")=="light"){ document.documentElement.dataset.theme="light"; t.setAttribute("aria-pressed","false"); } else { t.setAttribute("aria-pressed","true"); }
+ t.addEventListener("click",()=>{ const light=document.documentElement.dataset.theme=="light";
  if(light){ delete document.documentElement.dataset.theme; localStorage.setItem("inciardi_theme","dark"); t.setAttribute("aria-pressed","true"); }
  else { document.documentElement.dataset.theme="light"; localStorage.setItem("inciardi_theme","light"); t.setAttribute("aria-pressed","false"); } });
 }
@@ -90,7 +90,7 @@ function buildMobileNav(){
  const drawer = document.createElement("aside");
  drawer.className = "navdrawer"; drawer.id = "navDrawer"; drawer.setAttribute("aria-hidden","true"); drawer.setAttribute("aria-label","Menu");
  const links = Array.from(nav.querySelectorAll("a")).map(a=>{
- const cur = a.getAttribute("aria-current")==="page";
+ const cur = a.getAttribute("aria-current")=="page";
  return `<a href="${a.getAttribute("href")}"${cur?' aria-current="page"':''}>${esc(a.textContent.trim())}</a>`;
  }).join("");
  drawer.innerHTML = `<div class="navdrawer-h"><span class="brand"><span class="dot"></span>Inciardi Market</span><button class="x" id="navClose" aria-label="Close menu"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><nav class="navdrawer-links">${links}</nav>`;
@@ -102,7 +102,7 @@ function buildMobileNav(){
  backdrop.addEventListener("click",close);
  $("navClose").addEventListener("click",close);
  drawer.querySelectorAll("a").forEach(a=>a.addEventListener("click",close));
- document.addEventListener("keydown",(e)=>{ if(e.key==="Escape"&&document.body.classList.contains("nav-open")) close(); });
+ document.addEventListener("keydown",(e)=>{ if(e.key=="Escape"&&document.body.classList.contains("nav-open")) close(); });
 }
 function initChrome(){
  initTheme();
@@ -111,9 +111,9 @@ function initChrome(){
  if(gear&&drawer){
  gear.addEventListener("click",()=>{ drawer.showModal(); gear.setAttribute("aria-expanded","true"); });
  const c=$("settingsClose"); if(c) c.addEventListener("click",()=>drawer.close());
- drawer.addEventListener("click",(e)=>{ if(e.target===drawer) drawer.close(); });
+ drawer.addEventListener("click",(e)=>{ if(e.target==drawer) drawer.close(); });
  drawer.addEventListener("close",()=>gear.setAttribute("aria-expanded","false"));
- document.addEventListener("keydown",(e)=>{ if(e.key==="Escape"&&drawer.open) drawer.close(); });
+ document.addEventListener("keydown",(e)=>{ if(e.key=="Escape"&&drawer.open) drawer.close(); });
  }
  const ep=$("epInput"); if(ep){ ep.value=localStorage.getItem("inciardi_ep")||""; ep.addEventListener("change",()=>{ localStorage.setItem("inciardi_ep",ep.value.trim()); location.reload(); }); }
  const wk=$("wkeyInput"); if(wk){ wk.value=localStorage.getItem("inciardi_wkey")||""; wk.addEventListener("change",()=>{ localStorage.setItem("inciardi_wkey",wk.value.trim()); toast(canWrite()?"Write key saved \u2014 editing unlocked":"Write key cleared"); document.body.classList.toggle("can-write",canWrite()); }); }
@@ -131,8 +131,8 @@ function fileToScaledB64(file, maxDim){
  img.onload=()=>{ URL.revokeObjectURL(url);
  let {width:w,height:h}=img; const m=maxDim||1400; if(Math.max(w,h)>m){ const s=m/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
  const c=document.createElement("canvas"); c.width=w; c.height=h; c.getContext("2d").drawImage(img,0,0,w,h);
- const type = file.type==="image/png" ? "image/png" : "image/jpeg";
- const data=c.toDataURL(type, type==="image/jpeg"?0.86:undefined);
+ const type = file.type=="image/png" ? "image/png" : "image/jpeg";
+ const data=c.toDataURL(type, type=="image/jpeg"?0.86:undefined);
  resolve({ data, content_type:type, width:w, height:h });
  };
  img.onerror=()=>{ URL.revokeObjectURL(url); reject(new Error("bad image")); };
