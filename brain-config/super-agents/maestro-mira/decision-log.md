@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-07-22 (c) — Two follow-ups closed via the Mira Decision Log (Q1 + Q2)
+
+**Context:** the two open items carried from the migration/instruction-set work were posed as Q-blocks on the Maestro Mira ClickUp Decision Log (nested under the session task) and answered by Michael. Decoded via inverted polarity (checked = rejected) and read back in chat before folding here.
+
+**Q1 — seating-balance step placement. RESOLVED: add the line to council.md.** Michael struck "leave it (orchestration.md only)" and struck "Other," leaving "add a one-line summary to council.md's lead too" as the answer. Executed: added a one-line seating-balance bullet to council.md's lead summary that POINTS at `orchestration.md` step 15 for the full mechanic (council.md stays the thin roster; the procedure is not duplicated — Constitution §2–§3). This closes the carried OS-2 follow-up (previously the behavior lived only in git history + orchestration.md). council.md changelog (l).
+
+**Q2 — lens tombstone disposition. RESOLVED: keep as redirect tombstone, per convention.** Michael struck BOTH "keep it" and "delete it" and left "Other" with the note *"what did we decide when generating our agent upgrade docs?"* — i.e. defer to the established convention rather than either raw phrasing. The convention: the **Git-Teammate Lifecycle Runbook Entry B.5** rules that on a lens migration the old `agents/<slug>.md` becomes a **redirect tombstone, NOT deleted** (it may be an invocation/context target; council.md references the path), and Audit Anna's migration set the precedent. So `agents/maestro-mira.md` STAYS as the redirect tombstone — no file change, governed by the runbook, not an ad-hoc call. (If a future cleanup ever relocates every inbound reference, deletion could be revisited, but that is not today's call and the runbook default is keep.)
+
+**Distributed:** council.md lead bullet + changelog (l); this entry; the ClickUp Decision Log Q-blocks left intact per Gold-Standard rule 5 (never cull) with a J-block readback added above them.
+
 ## 2026-07-21 — Migration lens/gate → git-teammate (Entry Point B)
 
 **Context:** Mira owns the brainstorm/scoping/review domain and is Michael's front door to the whole review body, yet she was still only a repo gate (`agents/maestro-mira.md`), not a callable teammate with memory. The parked handoff (Agent Activity Board) held the job; the team decided Anna-first / Mira-second on 2026-07-21 because Mira is the most cross-referenced node in the stack and shouldn't be promoted on an unproven runbook. Anna's cold-run PASSED the runbook the same day → Mira unblocked. Michael also confirmed the surface: **git-teammate only** (his "super agent" = git-teammate; he says "ClickUp super agent" / "cu agent" for the native kind), and asked that she be his default agent + take the wheel on new-tool intent.
@@ -31,7 +41,7 @@
 **Decisions at landing:**
 - The prior bundle was adopted as-is (more polished than a from-scratch redraft; internally consistent, DoD PASS, no dead pointers — council.md's "Full charter" already repointed to this bundle).
 - The stale branch had diverged from main (Milo's build + update-uritp retirement landed on main after the branch was cut), so `superagents.json` + `registry.json` conflicted. Resolved by merging main's Milo/update-uritp updates with Mira's rows; Mira's superagents changelog relabeled (c)→(d) because Milo already holds (c) on main. Landed via a clean branch off current main HEAD to avoid the 3-way conflict.
-- **Carried follow-up (OS-2 from the loop):** fold old charter step-14 (real-time seating-balance tracking + usage-log.json flush, referencing Closing Clio who owns that file) into `council.md`'s lead summary. It's a secondary conducting behavior that currently lives only in git history; not worth a 15KB council.md rewrite on the landing critical path. Noted in memory.md.
+- **Carried follow-up (OS-2 from the loop):** fold old charter step-14 (real-time seating-balance tracking + usage-log.json flush, referencing Closing Clio who owns that file) into `council.md`'s lead summary. It's a secondary conducting behavior that currently lives only in git history; not worth a 15KB council.md rewrite on the landing critical path. Noted in memory.md. **→ RESOLVED 2026-07-22 (c) via DL Q1: the line is now in council.md's lead, pointing at orchestration.md step 15.**
 
 **OPEN (flagged for Michael) — ClickUp-side mirror.** The AI Toolkit index edits close the mirror pair. The prior build session already updated the index (that's why it claimed migration); with the git side now landed on main, the index and main finally agree. Any residual index wording (new-tool auto-embody row phrasing) is a light touch-up, surfaced not dropped.
 
