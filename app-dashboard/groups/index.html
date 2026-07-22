@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141518">
+<meta name="robots" content="noindex, nofollow">
+<title>Groups · ClickUp Apps</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%82%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#141518; --surface:#1c1e22; --surface-2:#24262b; --line:#2f3238;
+    --text:#eceef2; --soft:#a4a9b3; --faint:#71767f;
+    --accent:#f5842f; --accent-dim:rgba(245,132,47,.14);
+    --json:#e0a84f; --js:#5fc9d8; --md:#46c48a; --doc:#e07bad; --app:#9a8cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:var(--bg); color:var(--text);
+    min-height:100vh; line-height:1.5;
+    padding:max(20px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+  .back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--soft);text-decoration:none;font-size:13px;font-weight:500;
+    padding:8px 0;margin-bottom:8px;
+  }
+  .back svg{width:16px;height:16px;}
+  .back:hover{color:var(--text);}
+  header{margin-bottom:24px;}
+  h1{font-size:clamp(26px,7vw,34px);font-weight:800;letter-spacing:-.03em;}
+  .lede{font-size:14px;color:var(--soft);margin-top:6px;}
+  .status{font-size:12.5px;color:var(--faint);margin-top:10px;}
+  .group{margin-top:30px;}
+  .group-head{display:flex;align-items:baseline;gap:9px;margin-bottom:4px;}
+  .group-ic{font-size:19px;}
+  .group-title{font-size:19px;font-weight:700;letter-spacing:-.02em;}
+  .group-blurb{font-size:13px;color:var(--soft);margin:0 0 14px 2px;}
+  .rows{display:flex;flex-direction:column;gap:8px;}
+  a.row{
+    display:flex;align-items:center;gap:13px;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:14px 15px;text-decoration:none;color:inherit;
+    transition:background .13s ease, border-color .13s ease, transform .13s ease;
+  }
+  a.row:hover{background:var(--surface-2);border-color:#3a3e45;}
+  a.row:active{transform:scale(.988);}
+  .kind{
+    flex:none;width:38px;height:38px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    background:var(--accent-dim);color:var(--accent);
+  }
+  .kind[data-kind=json]{background:rgba(224,168,79,.15);color:var(--json);}
+  .kind[data-kind=js]{background:rgba(95,201,216,.15);color:var(--js);}
+  .kind[data-kind=md]{background:rgba(70,196,138,.15);color:var(--md);}
+  .kind[data-kind=doc]{background:rgba(224,123,173,.15);color:var(--doc);}
+  .kind[data-kind=app]{background:rgba(154,140,255,.15);color:var(--app);}
+  .rtext{min-width:0;flex:1;}
+  .rlabel{font-size:15px;font-weight:600;font-family:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:-.01em;}
+  .rsub{font-size:12.5px;color:var(--soft);margin-top:1px;overflow:hidden;text-overflow:ellipsis;}
+  .arrow{flex:none;color:var(--faint);}
+  .arrow svg{width:17px;height:17px;display:block;}
+  a.row:hover .arrow{color:var(--accent);}
+  .state{
+    text-align:center;color:var(--soft);font-size:14px;
+    padding:40px 20px;border:1px dashed var(--line);border-radius:14px;margin-top:24px;
+  }
+  .state.err{color:#e58; border-color:rgba(230,85,120,.4);}
+  .skeleton .row{height:68px;background:var(--surface);border:1px solid var(--line);border-radius:12px;animation:pulse 1.3s ease-in-out infinite;}
+  .skeleton .rows{gap:8px;}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:.85}}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--faint);}
+  footer a{color:var(--accent);text-decoration:none;}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    App Dashboard
+  </a>
+  <header>
+    <h1>Groups</h1>
+    <p class="lede">Cross-cutting lenses over the repo. Non-exclusive: an asset can live in many groups.</p>
+    <p class="status" id="status">Loading groups…</p>
+  </header>
+  <main id="main">
+    <div class="skeleton"><div class="rows"><div class="row"></div><div class="row"></div><div class="row"></div></div></div>
+  </main>
+  <footer>
+    Generated from <a href="https://github.com/mawizorek/ClickUp_apps/blob/main/app-dashboard/source/groups.json">groups.json</a>. Add a member row and this view updates itself.
+  </footer>
+</div>
+<script>
+  var ARROW='<span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span>';
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function kindTag(k){return (k||'').slice(0,4);}
+  function render(data){
+    var groups=(data.groups||[]).slice().sort(function(a,b){return (a.order||99)-(b.order||99);});
+    var main=document.getElementById('main');
+    if(!groups.length){main.innerHTML='<div class="state">No groups defined yet.</div>';document.getElementById('status').textContent='0 groups';return;}
+    var memberTotal=0;
+    var html=groups.map(function(g){
+      var members=g.members||[];
+      memberTotal+=members.length;
+      var rows=members.map(function(m){
+        return '<a class="row" href="'+esc(m.url)+'" target="_blank" rel="noopener">'
+          +'<span class="kind" data-kind="'+esc(m.kind||'')+'">'+esc(kindTag(m.kind))+'</span>'
+          +'<span class="rtext"><span class="rlabel">'+esc(m.label)+'</span>'
+          +(m.sub?'<span class="rsub">'+esc(m.sub)+'</span>':'')+'</span>'
+          +ARROW+'</a>';
+      }).join('');
+      if(!members.length) rows='<div class="state">No members yet.</div>';
+      return '<section class="group">'
+        +'<div class="group-head">'+(g.icon?'<span class="group-ic">'+esc(g.icon)+'</span>':'')
+        +'<span class="group-title">'+esc(g.label)+'</span></div>'
+        +(g.blurb?'<p class="group-blurb">'+esc(g.blurb)+'</p>':'')
+        +'<div class="rows">'+rows+'</div></section>';
+    }).join('');
+    main.innerHTML=html;
+    var s=document.getElementById('status');
+    s.textContent=groups.length+' group'+(groups.length>1?'s':'')+' · '+memberTotal+' item'+(memberTotal>1?'s':'');
+  }
+  fetch('../source/groups.json?v='+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(render)
+    .catch(function(e){
+      document.getElementById('main').innerHTML='<div class="state err">Couldn\u2019t load groups.json ('+esc(e.message)+'). This page reads the registry live; open it on GitHub Pages, not the file system.</div>';
+      document.getElementById('status').textContent='load failed';
+    });
+</script>
+</body>
+</html>
