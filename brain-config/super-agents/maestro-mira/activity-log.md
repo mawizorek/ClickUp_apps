@@ -1,0 +1,9 @@
+# Maestro Mira — Activity Log (newest on top, append-only)
+
+## 2026-07-21 · Migration + birth as a git-teammate
+
+- **Session:** Brain (Opus 4.8) · Maestro Mira lens→git-teammate migration + audit loop · Jul 21 (Agent Activity Board). Fleet Felix stewarding.
+- **What:** migrated from the Council lead-lens/gate `agents/maestro-mira.md` to a git-teammate bundle under `super-agents/maestro-mira/` via the Git-Teammate Lifecycle Runbook v0.2 Entry B. Second lens→teammate conversion, same day as Audit Anna.
+- **Audit loop (AUDIT-LOOP skill, Anna auditor ↔ Mira's Workshop synthesizer):** Pass 1 — Anna audited the draft, PARTIAL, 5 opens (procedure-in-profile, lead-role contradiction, lens-impossible-value, auto-embody trigger, pre-lit index). Workshop Round 1 — Frank first + the seven + Lena; produced v2 (score/conductor frame, anti-drift fence, boundary line). Pass 2 — near-PASS, closed O1–O4, held O5, opened O6 (lens double-load / tombstone). Workshop Round 2 — Beckett + Finn locked O6 handling. Pass 3 — re-audit of the SHIPPED artifact: PASS. Full discourse threaded on the session task.
+- **Key decisions (see decision-log D1–D4):** always-on council-lead role UNCHANGED (stays in council.md + the charter); bundle adds only invocation + memory; procedure stays as pointers + an anti-drift fence; the lens file kept as the charter home with a disambiguation header (NOT tombstoned — my charter isn't external like Anna's, so deletion would lose it); auto-embody stays a house index trigger row.
+- **State left:** 5-file bundle live, registered across superagents.json + registry.json, self/loop audit recorded (audits/maestro-mira.2026-07-21.md). Invocable via `/session.agent=Mira`. Open follow-up: eventual charter relocation into council.md then tombstone the lens (scoped refactor, not this ship).
