@@ -2,6 +2,7 @@
 const CAT_LABELS={mini:"Minis",pack:"Packs","big-riso":"Big Risographs",linocut:"Linocuts",exclusive:"Exclusives"};
 const EXCL_LABEL={nyc:"NYC",lacma:"LACMA",holiday:"Holiday","grand-central":"Grand Central","richard-scarry":"Richard Scarry"};
 const CAT_ORDER=["mini","big-riso","linocut","exclusive","pack"];
+const CAT_EDIT={mini:"Mini","big-riso":"Big Risograph",linocut:"Linocut",exclusive:"Exclusive",pack:"Pack"};
 const THUMB_HUE={mini:72,pack:205,exclusive:305,"big-riso":152,linocut:40};
 
 let CATALOG={prints:[]}, MARKET={listings:[]}, INV={inventory:[]}, fromD1=false;
@@ -15,7 +16,6 @@ async function boot(){
  const [cat, market, inv] = await Promise.all([ apiGet("/catalog", null), apiGet("/market",{listings:[],source:"none"}), apiGet("/inventory",{inventory:[]}) ]);
  if(cat && cat.prints && cat.prints.length){ CATALOG=cat; fromD1=true; } else { CATALOG=await seedCatalog(); fromD1=false; }
  MARKET=market; INV=inv;
- const live=MARKET.source==="ebay-browse"; $("f-src").textContent="market: "+(live?"live \u00b7 eBay":"sample"); $("f-src").className=live?"up":"";
  buildChips(); renderStrip(); render(); wireControls();
  if(location.hash) openDetail(decodeURIComponent(location.hash.slice(1)));
 }
@@ -84,6 +84,7 @@ function cardHTML(p,i,owned){
 
 /* ---- detail + image lifecycle ---- */
 function findPrint(key){ const prints=CATALOG.prints||[]; return prints.find(p=>p.print_id===key)||prints.find(p=>normStr(p.name)===normStr(key)); }
+function catOpts(sel){ return Object.keys(CAT_EDIT).map(k=>`<option value="${k}"${k===sel?" selected":""}>${CAT_EDIT[k]}</option>`).join(""); }
 function openDetail(key){
  const p=findPrint(key); if(!p) return; openPid=p.print_id||null;
  const m=marketFor(MARKET,p);
@@ -94,7 +95,16 @@ function openDetail(key){
  $("detailInner").innerHTML=`
   <div class="dt-hero">${hero}<button class="dt-close" id="dtClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="dt-body">
-   <h2>${esc(p.name)}</h2>
+   <div class="dt-title-row"><h2 id="dtName">${esc(p.name)}</h2><button class="dt-edit write-only" id="dtEditBtn" aria-label="Edit name"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button></div>
+   <form class="dt-edit-form" id="dtEditForm" hidden>
+     <div class="field"><label>Print name</label><input id="ed-name" value="${esc(p.name)}" spellcheck="false"></div>
+     <div class="row2">
+       <div class="field"><label>Category</label><select id="ed-cat">${catOpts(p.category)}</select></div>
+       <div class="field"><label>Retail ($)</label><input id="ed-retail" type="number" step="1" value="${p.retail!=null?p.retail:""}"></div>
+     </div>
+     <div class="ed-row"><button type="button" class="btn primary sm" id="ed-save">Save &amp; lock</button><button type="button" class="btn ghost sm" id="ed-cancel">Cancel</button></div>
+     <p class="ed-hint">Locks this print so the nightly shop sync keeps your title instead of overwriting it. The old name is kept as a search alias so eBay matching still works.</p>
+   </form>
    <div class="dt-tags"><span class="chip">${CAT_LABELS[p.category]||p.category||""}</span>${p.exclusive?`<span class="chip plum">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>`:""}${m?`<span class="chip up">On eBay now</span>`:""}</div>
    <div class="dt-facts">${facts}</div>
    <div id="imgMgr"></div>
@@ -105,9 +115,31 @@ function openDetail(key){
   </div>`;
  $("dtClose").addEventListener("click",()=>$("detail").close());
  const own=$("dtAddOwn"); if(own) own.addEventListener("click",()=>addOwned(p));
+ const eb=$("dtEditBtn"); if(eb) eb.addEventListener("click",()=>{ const f=$("dtEditForm"); f.hidden=!f.hidden; if(!f.hidden){ $("ed-name").focus(); $("ed-name").select(); } });
+ const esv=$("ed-save"); if(esv) esv.addEventListener("click",()=>saveEdit(p));
+ const ecx=$("ed-cancel"); if(ecx) ecx.addEventListener("click",()=>{ $("dtEditForm").hidden=true; });
  document.body.classList.toggle("can-write",canWrite());
  renderImgMgr(p);
  $("detail").showModal();
+}
+
+// Rename / re-categorize a catalogued print. Sends the FULL row back (the worker upsert clobbers every
+// field on conflict) + locked:1 so the nightly harvest treats the edit as source of truth. Old name folds
+// into aliases so the eBay market match survives the rename.
+async function saveEdit(p){
+ if(!canWrite()){ toast("add your write key in Settings first",true); return; }
+ const name=$("ed-name").value.trim(); if(!name){ toast("name can't be empty",true); return; }
+ const category=$("ed-cat").value;
+ const retail=$("ed-retail").value!==""?Number($("ed-retail").value):null;
+ const aliases=(p.aliases||[]).slice();
+ const oldn=normStr(p.name);
+ if(oldn && normStr(name)!==oldn && !aliases.some(a=>normStr(a)===oldn)) aliases.push(p.name);
+ try{
+  toast("saving\u2026");
+  const r=await apiPost("/catalog",{ print_id:p.print_id||undefined, title:name, category, exclusive:p.exclusive||null, retail, in_print:p.available?1:0, pack_of:p.packOf??null, pack_from:p.packFrom??null, aliases, notes:p.notes??null, source:p.source||"manual", locked:1 });
+  toast("saved & locked");
+  await refreshCatalog(r.print_id||p.print_id);
+ }catch(e){ toast(e.message,true); }
 }
 function renderImgMgr(p){
  const box=$("imgMgr"); if(!box) return;
