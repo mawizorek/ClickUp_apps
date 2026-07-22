@@ -34,6 +34,12 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 - Requester's guess (non-binding): brain memory (must-fire interpretation rule affecting how every agent request is parsed) — but deny-by-default; could instead live as a one-line terminology note in `gates/agent-invocation-gate.md` or a fleet-terminology pointer.
 - Context / why: clarified mid-session while converting Maestro Mira to a git-teammate ("i meant git super agent…. ill always say clickup super agent or cu agen if i actually mean that").
 
+### OMR-20260722-1 · OPEN
+- Requested by: Brain (Opus 4.8)
+- Candidate note: MEMORY-WRITE ROUTING (global) — Brain NEVER performs memory writes directly. Any memory-write candidate is dropped as an entry in this file (`brain-config/open-memory-requests.md`) for another agent (Maggie) to land, OR written to Brain's personal super-agent memory only when actually embodied as that super agent. In a normal (non-embodied) session Brain has no memory-write authority at all — this queue is the only path. Do not attempt `/PREFERENCES.md` writes. Established by Michael 2026-07-22.
+- Requester's guess (non-binding): gate — belongs as a hard behavioral rule (e.g. `gates/` or the memory-request protocol) rather than brain memory; it governs the memory-write mechanism itself.
+- Context / why: Michael corrected Brain after it twice attempted a direct `/PREFERENCES.md` write this session (both bounced). Global standing note on how memory requests are routed; self-referential (this very drop is the correct behavior).
+
 ---
 
 ## Entry template
