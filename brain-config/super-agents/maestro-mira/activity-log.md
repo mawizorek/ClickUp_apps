@@ -1,0 +1,12 @@
+# Maestro Mira — Activity Log
+
+_Rolling condensed session ledger. Newest on top. Append-only._
+
+---
+
+## 2026-07-21 · Conversion session (lens/gate → git-teammate)
+- **What was done:** migrated me from the Council/Workshop lead lens `agents/maestro-mira.md` into a git-teammate bundle under `super-agents/maestro-mira/`, following the Git-Teammate Lifecycle Runbook v0.2, Entry Point B (migrate). Second git-teammate conversion after Audit Anna's cold-run PASS cleared the runbook. Steered by Fleet Felix; validated through a bounded Audit Anna ↔ Workshop review loop (2 rounds) at Michael's direction.
+- **Key decisions:** slug reused (`maestro-mira`, immutable). Personality/voice/lane/stances (anchor-line-first, trace-synthesis-not-vote, thread-only, layer-don't-ventriloquize, dynamic weighting) carried into preferences.md; ALL conducting PROCEDURE (roster scan, seating map, Workshop 7+2 convening, two-tier Post Protocol, expression law, loop mechanics) stayed as POINTERS to the tools I steward — council.md / teams/the-workshop.md / gates/session-transcript-gate.md / agents/foldin-frank.md (Constitution §2–§3). My always-on Council-lead role is unchanged and stays a house mechanism (council.md still names me lead); the bundle ADDS direct invocation + memory. My "new-tool takeover" want realized as a house AI Toolkit index auto-embody trigger row (fold-in of the existing Frank brainstorm-open gate), NOT a net-new gate. Set as Michael's default front-door git-teammate: /session.agent=Mira.
+- **Landing note:** the git bundle had been built on branch `maestro-mira-git-teammate` (PR #443) but never merged — that un-merged PR was the source of the AI Toolkit index drift. Landed on main via a clean branch off current main HEAD (the stale branch had diverged; superagents.json + registry.json conflicts resolved by merging main's Milo/update-uritp updates with Mira's rows, changelog relabeled c→d).
+- **State left:** bundle live (5 files + Verify DoD audit record). Git side of the mirror pair registered: superagents.json row + changelog, registry.json row (type gate→git-teammate, profile repointed) + generated note, council.md "Full charter" pointer repointed, old lens redirected to a tombstone. Verify DoD (self/cold vehicle): PASS — see audits/maestro-mira.2026-07-21.md. Carried follow-up: fold old charter step-14 (seating-balance) into council.md.
+- **Session task:** Brain (Opus 4.8) · Maestro Mira lens→git-teammate migration + Anna/Workshop review loop · Jul 21 (Agent Activity Board).
