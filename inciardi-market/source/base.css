@@ -101,6 +101,17 @@ body.nav-open{overflow:hidden}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
 
+/* account + backups block (settings drawer, injected by app-core buildAccountUI) */
+.acct-sep{border:none;border-top:1px solid var(--line);margin:var(--s5) 0}
+.acct-h{font-family:var(--mono);font-size:0.64rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:var(--s3)}
+.acct-who{font-size:0.84rem;color:var(--ink-soft);margin-bottom:var(--s3);line-height:1.5}
+.acct-who b{color:var(--accent)}
+.acct-note{font-size:0.76rem;color:var(--ink-faint);line-height:1.5;margin-bottom:var(--s3)}
+.idrow{display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center}
+.snaplist{margin-top:var(--s3);display:flex;flex-direction:column;gap:6px}
+.snaprow{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding:8px 10px;background:var(--sunk);border:1px solid var(--line-soft);border-radius:8px}
+.snapts{font-family:var(--mono);font-size:0.72rem;color:var(--ink-soft)}
+
 /* dialog / drawer */
 dialog{border:none;padding:0;color:var(--ink);background:transparent}
 dialog::backdrop{background:rgba(6,10,14,0.66);backdrop-filter:blur(2px)}
