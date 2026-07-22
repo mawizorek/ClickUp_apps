@@ -52,3 +52,21 @@
 5. **Nothing structural changed (Cleo + Lena).** This is a role-line change + a lane-widen + a sharpened Felix boundary — same procedure-stays-pointered spine, same always-on-lead-is-a-house-mechanism, same bundle files. No new machine. Front-of-house (me) vs back-of-house (Felix) is the image that carries it.
 
 **Distributed same session:** preferences.md (role/scope/lane rewritten to Orchestrator + the Felix seam + default-not-toll-booth), Felix's preferences.md (the seam from his end), superagents.json + registry.json (Mira lane/role + changelog e), and the two-plane grouping model folded into the fleet-hierarchy task ([task-64](https://app.clickup.com/t/86ajn35qd)). Validated via the Frank + Workshop definition brainstorm on the session task.
+
+## 2026-07-22 (b) — Instruction set built: `orchestration.md` (the memory-vs-procedure call)
+
+**Context:** Michael asked to "get her instruction set built and pointer for her — need her to work seamlessly from before (better than before)" and posed the placement question directly: **"memory or procedure."**
+
+**The gap this surfaced:** at the 2026-07-21 migration the 14-step Charter was DELETED from the `agents/maestro-mira.md` lens (now a redirect tombstone) and was NEVER copied into the teammate profile (correctly — Constitution §2–§3 forbids procedure in an agent's files). But it was also never RELOCATED to a real tool. The profile pointed at `council.md` / `teams/the-workshop.md` / etc., and council.md's lead "charter" pointer resolved back through the tombstone — a circular pointer with no actual how-to home. Her operating contract (roster-scan-first, blind-in/weight-none, historian dial, bounded loop, seating-balance flush) was effectively homeless/scattered. That is why she wouldn't run "seamlessly from before."
+
+**Decision — the answer to "memory or procedure": PROCEDURE, in a dedicated tool.**
+
+1. **Her instruction set is procedure → it lives in a TOOL, not memory.** Built `brain-config/orchestration.md` as the canonical instruction set: the relocated + broadened 14-step operating contract. Memory (`memory.md`) keeps her context/motive/relationships; it holds NO how-to. This is the Constitution §2–§3 answer and the whole "same brain, different profile" architecture: capability lives in the shared tool stack, the agent is context + personality + pointers.
+
+2. **Where it lives: a dedicated `orchestration.md`, NOT folded into council.md.** council.md is explicitly a THIN roster ("never holds a member's instructions"), and the role is now broader than the Council (all verbal interaction, including 1:1). So the honest home is a standalone procedure doc; council.md stays the roster and points at orchestration.md. Frank framing: relocating already-existing charter procedure out of a dead lens into a proper tool + broadening it = FOLD-IN/RELOCATE, not net-new sprawl.
+
+3. **Broadened for the Orchestrator role.** orchestration.md adds the two interaction modes (multi-voice convening vs one-on-one relay), the routing decision, the consult-Felix's-lookup step, and default-not-toll-booth — on top of the relocated 14 steps. Old Charter step-14 (seating-balance flush) is rehomed here, resolving that carried follow-up.
+
+4. **Pointers reconciled (no drift):** preferences.md now names orchestration.md as her instruction-set home (+ Load Manifest step 3); council.md's lead summary points at it; the lens tombstone points at it; superagents.json + registry.json add it to her pointer list. The circular pointer is closed.
+
+**Distributed same session (one PR):** `orchestration.md` (new), preferences.md, council.md, the lens tombstone, this decision-log, superagents.json + registry.json (changelog/source note f). Plus the ClickUp-side AI Toolkit index touch-up (Orchestrator wording). Via a Frank + Workshop pass on the session task.
