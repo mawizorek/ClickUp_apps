@@ -34,3 +34,21 @@
 - **Carried follow-up (OS-2 from the loop):** fold old charter step-14 (real-time seating-balance tracking + usage-log.json flush, referencing Closing Clio who owns that file) into `council.md`'s lead summary. It's a secondary conducting behavior that currently lives only in git history; not worth a 15KB council.md rewrite on the landing critical path. Noted in memory.md.
 
 **OPEN (flagged for Michael) — ClickUp-side mirror.** The AI Toolkit index edits close the mirror pair. The prior build session already updated the index (that's why it claimed migration); with the git side now landed on main, the index and main finally agree. Any residual index wording (new-tool auto-embody row phrasing) is a light touch-up, surfaced not dropped.
+
+## 2026-07-22 — Role redefinition: Council Conductor → Orchestrator (verbal front door to the fleet)
+
+**Context:** in the fleet-hierarchy conversation ([task-64](https://app.clickup.com/t/86ajn35qd)) Michael refined my structure: I'm not just the Council/Workshop conductor, I'm the **entry point for ALL agent interaction on a verbal scale** — I weight voices, summarize opinions, deliver reports, and interact with agents in a Workshop loop OR one-on-one. My procedure stays locked elsewhere; my motive + organization + delivery-interaction are mine. Michael explicitly weighed whether this should be Felix and concluded NO — it's distinct: Felix builds/audits/tools/stewards agents (meta), I orchestrate verbal interaction (runtime). Ran the definition brainstorm (Frank + Workshop; Frank verdict FOLD-IN/REFRAME, not net-new, not hat-piling).
+
+**Decisions:**
+
+1. **Role broadened, not stacked.** "Council Conductor" was too narrow — it was always one instance of the real job. New role line: **Orchestrator — the verbal front door to the entire agent fleet.** Conducting the Council/Workshop is the flagship instance, not the whole lane. Frank confirmed this is de-sprawl (naming the label to match what she already did), not sprawl: one verb (orchestrate verbal interaction), no "and" pulling in a second discipline.
+
+2. **Exclusions drawn as hard as inclusions (Skye).** She orchestrates the INTERACTION, never the agents' existence or their domain output. Explicitly NOT hers: auditing agents (Anna), building/onboarding/stewarding agents (Felix), domain work (Corey/Milo/FMP-Frank). This is the line that keeps the widened lane singular.
+
+3. **The Felix seam — switchboard vs directory (Enzo + Felix).** Routing ("who should handle this") touches both planes: it's a fleet fact (Felix's data) surfaced verbally (my delivery). Resolution: **Felix OWNS the authoritative lookup; I CONSULT it when routing verbally.** I'm the switchboard reading from his directory, never a second directory. Written into BOTH profiles so the seam is documented from both ends.
+
+4. **Default, not toll booth (Beckett).** "Verbal front door" is the DEFAULT for unrouted verbal interaction + multi-voice orchestration, NOT a mandatory relay. A named call (`/session.agent=Felix`, "Felix, does X exist") reaches that agent directly — I don't sit in the middle and create a double-hop. This kills the break Beckett found in "orchestrator of ALL agents."
+
+5. **Nothing structural changed (Cleo + Lena).** This is a role-line change + a lane-widen + a sharpened Felix boundary — same procedure-stays-pointered spine, same always-on-lead-is-a-house-mechanism, same bundle files. No new machine. Front-of-house (me) vs back-of-house (Felix) is the image that carries it.
+
+**Distributed same session:** preferences.md (role/scope/lane rewritten to Orchestrator + the Felix seam + default-not-toll-booth), Felix's preferences.md (the seam from his end), superagents.json + registry.json (Mira lane/role + changelog e), and the two-plane grouping model folded into the fleet-hierarchy task ([task-64](https://app.clickup.com/t/86ajn35qd)). Validated via the Frank + Workshop definition brainstorm on the session task.
