@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "note": "Passive group registry for the app-dashboard grouping system. A GROUP is a cross-cutting lens over repo assets; membership is NON-EXCLUSIVE (an asset may belong to many groups). Two membership sources: (1) explicit `members` here — for curated links and non-app assets like registries + docs; (2) apps that self-tag via a `groups:[]` field in app-dashboard/source/data.js APP_META (wired in a later pass). Group homepages are GENERATED filtered renders of this file — add a member row (or tag an app) and every view updates itself, no render edit. Home: app-dashboard/groups/. Spec: the App Grouping System decision log.",
+  "memberKinds": {
+    "json": "machine-readable registry/manifest agents parse",
+    "js": "JS data module used as a manifest",
+    "md": "markdown coordination file (queue / board / thread) agents read+write",
+    "doc": "ClickUp doc index (human-facing)",
+    "app": "a hosted app folder in this repo"
+  },
+  "groups": [
+    {
+      "id": "indexes-registries",
+      "label": "Indexes & Registries",
+      "blurb": "The machine-readable manifests and coordination files agents parse throughout their workflows.",
+      "icon": "🗂️",
+      "order": 1,
+      "members": [
+        { "label": "registry.json", "sub": "Canonical tool + agent manifest (the runtime layer)", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/registry.json", "kind": "json" },
+        { "label": "superagents.json", "sub": "Git-teammate fleet registry (identity, lane, status)", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/super-agents/superagents.json", "kind": "json" },
+        { "label": "themes / _index.json", "sub": "Theme token contract + role map + theme registry", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/_index.json", "kind": "json" },
+        { "label": "themes / _themes.json", "sub": "Theme join table — the 4-vector name families", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/shared/themes/_themes.json", "kind": "json" },
+        { "label": "app-dashboard / data.js", "sub": "App manifest (APP_META) the dashboard renders from", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/app-dashboard/source/data.js", "kind": "js" },
+        { "label": "usage-log.json", "sub": "Cumulative agent seating tally", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/usage-log.json", "kind": "json" },
+        { "label": "session-board.md", "sub": "Live agent presence (who is working now)", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/session-board.md", "kind": "md" },
+        { "label": "open-thread.md", "sub": "Durable pending work across sessions", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/open-thread.md", "kind": "md" },
+        { "label": "open-memory-requests.md", "sub": "Memory-write queue (Maggie drains it)", "url": "https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/open-memory-requests.md", "kind": "md" }
+      ]
+    }
+  ]
+}
