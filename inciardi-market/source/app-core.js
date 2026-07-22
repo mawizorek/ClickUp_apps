@@ -18,8 +18,8 @@ const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fall
 // identity button (that person just pastes their key manually in the field below instead). If Nick shares
 // Michael's key for now, put the SAME string in both — attribution just both reads "michael" server-side.
 const LOGINS = {
-  michael: "",   // <-- paste Michael's WRITE_KEY here
-  nick:    "",   // <-- paste Nick's key here (set WRITE_KEY_NICK on the Worker), or reuse Michael's
+  michael: "mikey",   // <-- paste Michael's WRITE_KEY here
+  nick:    "nickey",   // <-- paste Nick's key here (set WRITE_KEY_NICK on the Worker), or reuse Michael's
 };
 
 const $ = (id) => document.getElementById(id);
