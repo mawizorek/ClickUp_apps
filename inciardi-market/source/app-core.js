@@ -1,13 +1,43 @@
-/* Inciardi Market v14 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
-const BUILD = "v14";
-const PR = 454; // merged PR that shipped this version
+/* Inciardi Market v15 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
+const BUILD = "v15";
+const PR = 455; // merged PR that shipped this version
 const API_DEFAULT = "https://inciardi-market.mawizorek-online.workers.dev";
 const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fallback can render
+
+// ============================================================ SOFT LOGIN (fill these in once)
+// Michael + Nick clear/refresh browsers constantly, so pasting the write key each time never sticks.
+// Baking the two keys here lets each person tap their name once and stay "signed in" across browser
+// clears (the identity is re-applied from source, not just localStorage).
+//
+// ⚠️ ACCEPTED TRADEOFF (Michael, 2026-07-22): this is a public GitHub Pages site, so anything shipped
+// here is readable in view-source. For a 2-person, no-personal-data print tracker this is a deliberately
+// accepted low risk — worst case is a corrupted catalog/collection, and that's covered by BOTH the in-app
+// Backups below AND D1 Time Travel (30-day point-in-time restore). See the Decision Log.
+//
+// HOW TO FILL: paste each person's write key between the quotes and commit. Leave a value "" to hide that
+// identity button (that person just pastes their key manually in the field below instead). If Nick shares
+// Michael's key for now, put the SAME string in both — attribution just both reads "michael" server-side.
+const LOGINS = {
+  michael: "",   // <-- paste Michael's WRITE_KEY here
+  nick:    "",   // <-- paste Nick's key here (set WRITE_KEY_NICK on the Worker), or reuse Michael's
+};
 
 const $ = (id) => document.getElementById(id);
 function apiBase(){ return (localStorage.getItem("inciardi_ep") || "").trim() || API_DEFAULT; }
 function wkey(){ return (localStorage.getItem("inciardi_wkey") || "").trim(); }
 function canWrite(){ return !!wkey(); }
+function whoami(){ return localStorage.getItem("inciardi_identity") || ""; }
+// Sign in as a named identity: applies that person's baked-in key. Survives browser clears because the
+// value comes from LOGINS (source), not from whatever localStorage happened to keep.
+function setIdentity(name){
+  const key = (LOGINS[name] || "").trim();
+  if(!key){ toast("No key set for "+name+" — paste it in the field below once", true); return false; }
+  localStorage.setItem("inciardi_wkey", key);
+  localStorage.setItem("inciardi_identity", name);
+  document.body.classList.toggle("can-write", true);
+  return true;
+}
+function signOut(){ localStorage.removeItem("inciardi_wkey"); localStorage.removeItem("inciardi_identity"); document.body.classList.toggle("can-write", false); }
 
 async function apiGet(path, fallback){
  const key = "cache:" + path;
@@ -44,6 +74,7 @@ function pct(n){ if(n==null||isNaN(n)) return "\u2014"; return (n>0?"+":"")+Math
 function esc(s){ return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function normStr(s){ return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim(); }
 function fmtDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:"short",day:"numeric"}); }catch(e){ return s; } }
+function fmtDateTime(s){ try{ return new Date(s).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}); }catch(e){ return s; } }
 function initials(n){ return String(n||"?").split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase(); }
 
 /* ---- image URL: route raw CDN images through the Worker /img proxy (edge-cached, same-origin) ---- */
@@ -61,7 +92,7 @@ function proxied(url, w){
 function marketFor(MARKET, p){
  if(!MARKET || !MARKET.listings) return null;
  const names = [normStr(p.name), ...((p.aliases||[]).map(normStr))].filter(Boolean);
- const ls = MARKET.listings.filter(l => { if(l.status==="gone") return false; const n = l.print && l.print.matched && normStr(l.print.name); return n && names.includes(n); });
+ const ls = MARKET.listings.filter(l => { if(l.status=="gone") return false; const n = l.print && l.print.matched && normStr(l.print.name); return n && names.includes(n); });
  if(!ls.length) return null;
  const prices = ls.map(l=>l.landed).filter(x=>x!=null);
  return { count: ls.length, low: prices.length?Math.min(...prices):null, high: prices.length?Math.max(...prices):null };
@@ -104,6 +135,67 @@ function buildMobileNav(){
  drawer.querySelectorAll("a").forEach(a=>a.addEventListener("click",close));
  document.addEventListener("keydown",(e)=>{ if(e.key=="Escape"&&document.body.classList.contains("nav-open")) close(); });
 }
+
+/* ---- account + backups: injected into the #settings drawer so every page gets it from one place ---- */
+function buildAccountUI(){
+ const drawer = document.querySelector("#settings .drawer");
+ if(!drawer || $("acctBlock")) return;
+ const sec = document.createElement("div");
+ sec.id = "acctBlock";
+ const idButtons = Object.keys(LOGINS).filter(n=>(LOGINS[n]||"").trim())
+   .map(n=>`<button class="btn sm idbtn" data-id="${n}">${n[0].toUpperCase()+n.slice(1)}</button>`).join("");
+ sec.innerHTML = `
+  <hr class="acct-sep">
+  <div class="acct-h">Who's using this</div>
+  <div class="acct-who" id="acctWho"></div>
+  ${idButtons?`<div class="idrow">${idButtons}<button class="btn sm ghost" id="signOutBtn">Sign out</button></div>`
+    :`<p class="acct-note">No saved logins yet. Paste a key above once; ask Brain to bake in tap-to-switch logins.</p>`}
+
+  <div class="acct-h" style="margin-top:var(--s5)">Backups</div>
+  <p class="acct-note">A backup saves your whole catalog + collection. Restoring reinstates them if something gets wiped. (Cloudflare also keeps a 30-day auto history behind this.)</p>
+  <div class="idrow"><button class="btn sm primary" id="backupNow">Back up now</button><button class="btn sm" id="backupList">Show backups</button></div>
+  <div id="snapList" class="snaplist"></div>`;
+ drawer.appendChild(sec);
+
+ renderWho();
+ sec.querySelectorAll(".idbtn").forEach(b=>b.addEventListener("click",()=>{ if(setIdentity(b.dataset.id)){ renderWho(); toast("Signed in as "+b.dataset.id); } }));
+ const so=$("signOutBtn"); if(so) so.addEventListener("click",()=>{ signOut(); renderWho(); toast("signed out"); });
+ $("backupNow").addEventListener("click",backupNow);
+ $("backupList").addEventListener("click",loadSnapshots);
+}
+function renderWho(){
+ const el=$("acctWho"); if(!el) return;
+ const who=whoami();
+ el.innerHTML = canWrite()
+   ? `Signed in${who?` as <b>${esc(who[0].toUpperCase()+who.slice(1))}</b>`:" (manual key)"} · editing unlocked`
+   : `Read-only — tap a name or paste a key to edit`;
+}
+async function backupNow(){
+ if(!canWrite()){ toast("sign in first",true); return; }
+ try{ toast("backing up\u2026"); const r=await apiPost("/snapshot",{}); toast(`backed up · ${r.counts?r.counts.inventory:"?"} owned, ${r.counts?r.counts.catalog:"?"} catalog`); loadSnapshots(); }
+ catch(e){ toast(e.message,true); }
+}
+async function loadSnapshots(){
+ const box=$("snapList"); if(!box) return;
+ if(!canWrite()){ box.innerHTML=`<div class="acct-note">Sign in to see backups.</div>`; return; }
+ box.innerHTML=`<div class="acct-note">loading…</div>`;
+ try{
+  const r=await apiGet("/snapshots",{snapshots:[]});
+  const list=(r.snapshots||[]);
+  if(!list.length){ box.innerHTML=`<div class="acct-note">No backups yet. Hit “Back up now.”</div>`; return; }
+  box.innerHTML=list.slice(0,12).map(s=>{
+    const label=fmtDateTime(s.uploaded)+(/_pre-restore\./.test(s.key)?" · auto (pre-restore)":"");
+    return `<div class="snaprow"><span class="snapts">${esc(label)}</span><button class="btn sm restore" data-key="${esc(s.key)}">Restore</button></div>`;
+  }).join("");
+  box.querySelectorAll(".restore").forEach(b=>b.addEventListener("click",()=>restoreSnap(b.dataset.key)));
+ }catch(e){ box.innerHTML=`<div class="acct-note">${esc(e.message)}</div>`; }
+}
+async function restoreSnap(key){
+ if(!confirm("Restore this backup? Your collection is replaced with the backup's, and catalog names/edits are rolled back to it. A safety backup of right-now is taken first.")) return;
+ try{ toast("restoring\u2026"); const r=await apiPost("/restore",{key}); toast(`restored · ${r.restored?r.restored.inventory:"?"} owned back`); setTimeout(()=>location.reload(),900); }
+ catch(e){ toast(e.message,true); }
+}
+
 function initChrome(){
  initTheme();
  buildMobileNav();
@@ -116,8 +208,9 @@ function initChrome(){
  document.addEventListener("keydown",(e)=>{ if(e.key=="Escape"&&drawer.open) drawer.close(); });
  }
  const ep=$("epInput"); if(ep){ ep.value=localStorage.getItem("inciardi_ep")||""; ep.addEventListener("change",()=>{ localStorage.setItem("inciardi_ep",ep.value.trim()); location.reload(); }); }
- const wk=$("wkeyInput"); if(wk){ wk.value=localStorage.getItem("inciardi_wkey")||""; wk.addEventListener("change",()=>{ localStorage.setItem("inciardi_wkey",wk.value.trim()); toast(canWrite()?"Write key saved \u2014 editing unlocked":"Write key cleared"); document.body.classList.toggle("can-write",canWrite()); }); }
+ const wk=$("wkeyInput"); if(wk){ wk.value=localStorage.getItem("inciardi_wkey")||""; wk.addEventListener("change",()=>{ localStorage.setItem("inciardi_wkey",wk.value.trim()); localStorage.removeItem("inciardi_identity"); toast(canWrite()?"Write key saved \u2014 editing unlocked":"Write key cleared"); document.body.classList.toggle("can-write",canWrite()); if($("acctWho")) renderWho(); }); }
  document.body.classList.toggle("can-write",canWrite());
+ buildAccountUI();
  const fb=$("f-build"); if(fb) fb.textContent = `Inciardi Market ${BUILD}${PR?" \u00b7 PR #"+PR:""}`;
 }
 let _toastT;
