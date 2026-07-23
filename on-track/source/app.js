@@ -7,6 +7,41 @@ function toggleSet(set, val, key, el) {
   updateFilterCounts();
   renderSchedule();
 }
+// Series chip tri-state cycle (per series, not global):
+//   off -> 'race' (races only) -> 'all' (+ practice/qualifying) -> off
+// A series with NO session-tier events in the feed skips the middle state and behaves as a
+// plain 2-state toggle (off -> race -> off), so the 3rd click never lands on an identical
+// view. Hero is re-rendered too, so 'on now / up next' respects the new tier immediately.
+function cycleSeries(name, el) {
+  const cur = state.series.get(name);
+  const hasSess = SERIES_WITH_SESSIONS.has(name);
+  let next;
+  if (!cur) next = 'race';
+  else if (cur === 'race') next = hasSess ? 'all' : null;
+  else next = null;
+  if (next) state.series.set(name, next); else state.series.delete(name);
+  saveSeriesState();
+  const tier = state.series.get(name) || 'off';
+  const lb = (SERIES[name] || {}).label || name;
+  el.setAttribute('data-tier', tier);
+  el.setAttribute('aria-pressed', String(tier !== 'off'));
+  el.setAttribute('aria-label', lb + (tier === 'race' ? ' — races only' : tier === 'all' ? ' — races plus practice and qualifying' : ' — off'));
+  updateFilterCounts();
+  renderSchedule();
+  renderHero();
+}
+// One-time discoverability line above the series chips: without it, nobody guesses a 2nd
+// click reveals practice/qualifying. Injected once (guarded by id) so buildChips() rebuilds
+// never duplicate or clobber it.
+function addSeriesHint() {
+  const chips = document.getElementById('seriesChips');
+  if (!chips || document.getElementById('seriesHint')) return;
+  const hint = document.createElement('p');
+  hint.id = 'seriesHint';
+  hint.className = 'series-hint';
+  hint.innerHTML = 'Tap a series: <b>1×</b> races · <b>2×</b> add practice / qualifying <span class="pip-inline">+P</span> · <b>3×</b> off';
+  chips.insertAdjacentElement('beforebegin', hint);
+}
 // Per-dropdown master action: ONE button lives inside EACH filter section, scoped to
 // just that section. Series body gets a Select-all-series / Clear-series button; the
 // Where-to-watch body gets its own for platforms. Shared slot per button: 'Select all X'
@@ -24,17 +59,20 @@ function addFilterBtn(chipsId, setKey, btnId) {
   chips.insertAdjacentElement('afterend', btn);
   btn.addEventListener('click', () => {
     const set = setKey === 'series' ? state.series : state.plats;
-    const store = setKey === 'series' ? 'ontrack_series' : 'ontrack_plats';
     if (set.size) {
       set.clear();
-      localStorage.removeItem(store);
+      localStorage.removeItem(setKey === 'series' ? 'ontrack_series' : 'ontrack_plats');
+    } else if (setKey === 'series') {
+      // Select-all lands every series on 'races only'; pull in sessions per series after.
+      events.forEach(e => state.series.set(e.series, 'race'));
+      saveSeriesState();
     } else {
-      if (setKey === 'series') events.forEach(e => state.series.add(e.series));
-      else events.forEach(e => e.platforms.forEach(p => state.plats.add(p)));
-      localStorage.setItem(store, JSON.stringify(Array.from(set)));
+      events.forEach(e => e.platforms.forEach(p => state.plats.add(p)));
+      localStorage.setItem('ontrack_plats', JSON.stringify(Array.from(state.plats)));
     }
     buildChips();
     renderSchedule();
+    renderHero();
   });
 }
 function buildFilterAction() {
@@ -131,13 +169,13 @@ function wire() {
   let deb;
   $('#search').addEventListener('input', ev => {
     clearTimeout(deb);
-    deb = setTimeout(() => { state.q = ev.target.value.trim().toLowerCase(); renderSchedule(); }, 120);
+    deb = setTimeout(() => { state.q = ev.target.value.trim().toLowerCase(); renderSchedule(); renderHero(); }, 120);
   });
   $('#clrSeries').addEventListener('click', () => {
-    state.series.clear(); localStorage.removeItem('ontrack_series'); buildChips(); renderSchedule();
+    state.series.clear(); localStorage.removeItem('ontrack_series'); buildChips(); renderSchedule(); renderHero();
   });
   $('#clrPlat').addEventListener('click', () => {
-    state.plats.clear(); localStorage.removeItem('ontrack_plats'); buildChips(); renderSchedule();
+    state.plats.clear(); localStorage.removeItem('ontrack_plats'); buildChips(); renderSchedule(); renderHero();
   });
 }
 function render() { renderHero(); renderSchedule(); }
@@ -145,6 +183,7 @@ function boot() {
   hydrate();
   applyTheme();
   buildChips();
+  addSeriesHint();
   buildJump();
   sectionInit();
   buildFilterAction();
@@ -174,7 +213,7 @@ function boot() {
         if (json && Array.isArray(json.events)) {
           DATA = json;
           try { localStorage.setItem('ontrack_data', JSON.stringify(json)); } catch (e) {}
-          hydrate(); buildChips(); buildJump(); buildFilterAction(); render();
+          hydrate(); buildChips(); addSeriesHint(); buildJump(); buildFilterAction(); render();
           const ds = $('#dataStamp'); if (ds) ds.textContent = ' · listings ' + (DATA.version || APP_DATE);
         }
       })
