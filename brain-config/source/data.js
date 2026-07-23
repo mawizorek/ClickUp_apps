@@ -1,7 +1,9 @@
-/* Brain Config Index \u2014 static data tables.
+/* Brain Config Index — static data tables.
    Loaded as a classic script before app.js; these become globals it reads.
    PROSE_HOOKS + TRIGGERS have no repo profile (prose-only in the ClickUp index);
-   BADGES + NICKNAMES decorate the repo-backed tools. */
+   BADGES decorate the repo-backed tools. Nicknames are NOT hard-coded here —
+   app.js reads each tool's `nicknames:` straight from its profile front-matter
+   (the canonical identity source per metadata-schema.md). */
 
 const PROSE_HOOKS = [
   { name: 'De-Slop Pass', purpose: 'Strip AI-sounding filler, hedging, and sign-offs from every response.' },
@@ -40,5 +42,3 @@ const BADGES = {
   'memory-write-relay': 'warn', 'stale-context-reload': 'silent',
   'link-provenance': 'silent', 'multi-edit-batch-gate': 'silent'
 };
-
-const NICKNAMES = { 'recon-renata': 'Repo Renata, Review Renata' };
