@@ -1,7 +1,7 @@
 // On Track — engine: constants, data model, date/format helpers, and all render/paint logic.
 // Loaded before app.js. Classic script (shared global scope with app.js).
-const APP_VERSION = 'v2.0';
-const APP_DATE = '2026-07-13';
+const APP_VERSION = 'v2.1';
+const APP_DATE = '2026-07-23';
 const APP_SLUG = 'on-track';
 const SERIES = {
   'F1':          { label: 'Formula 1',       color: 'var(--s-f1)' },
@@ -26,6 +26,10 @@ const SERIES = {
   'Supercars':   { label: 'Supercars',       color: 'var(--s-supercars)' }
 };
 const seriesColor = s => (SERIES[s] && SERIES[s].color) || 'var(--s-default)';
+// Event tier: a race/sprint/feature (default, always shown) vs a support session
+// (practice / qualifying, tagged `tier:"session"` in data.json). Sessions are hidden by
+// default and opted into per-series via the 2nd chip click. Absent tier = race.
+const tierOf = e => e.tier === 'session' ? 'session' : 'race';
 const FALLBACK_DATA = {
   version: '2026-07-04b',
   events: [
@@ -36,10 +40,37 @@ const FALLBACK_DATA = {
 };
 let DATA = FALLBACK_DATA;
 let events = [];
+// Series that carry at least one session-tier event, recomputed on every hydrate. Drives
+// the chip's 3rd state: a series WITH sessions cycles off -> races -> +sessions -> off; a
+// series with none is a plain 2-state toggle (off -> races -> off).
+let SERIES_WITH_SESSIONS = new Set();
+// Series filter is a tri-state map: seriesName -> 'race' | 'all'. Absent = off. Persisted
+// as an array of [name,tier] pairs. Legacy format (bare array of names) migrates to 'all'
+// so an existing user keeps seeing everything they saw before tiers existed.
+function loadSeriesState() {
+  const raw = localStorage.getItem('ontrack_series');
+  const m = new Map();
+  if (!raw) return m;
+  try {
+    const j = JSON.parse(raw);
+    if (Array.isArray(j)) {
+      j.forEach(item => {
+        if (Array.isArray(item)) m.set(item[0], item[1] === 'all' ? 'all' : 'race');
+        else m.set(item, 'all');
+      });
+    } else if (j && typeof j === 'object') {
+      Object.keys(j).forEach(k => m.set(k, j[k] === 'all' ? 'all' : 'race'));
+    }
+  } catch (e) {}
+  return m;
+}
+function saveSeriesState() {
+  localStorage.setItem('ontrack_series', JSON.stringify(Array.from(state.series)));
+}
 const state = {
   tz: localStorage.getItem('ontrack_tz') || 'ET',
   theme: localStorage.getItem('ontrack_theme') || 'rb',
-  series: new Set(JSON.parse(localStorage.getItem('ontrack_series') || '[]')),
+  series: loadSeriesState(),
   plats: new Set(JSON.parse(localStorage.getItem('ontrack_plats') || '[]')),
   showPast: false,
   q: ''
@@ -78,6 +109,7 @@ function hydrate() {
     const s = new Date(e.start), en = new Date(e.end);
     return Object.assign({}, e, { _i: i, _tbd: false, _s: s, _e: en });
   }).filter(e => !isNaN(e._s.getTime())).sort((a, b) => a._s - b._s);
+  SERIES_WITH_SESSIONS = new Set(events.filter(e => tierOf(e) === 'session').map(e => e.series));
 }
 function stateOf(e, now) {
   // TBD events have no start time, so they can never be "live" and are never a
@@ -87,9 +119,13 @@ function stateOf(e, now) {
   if (e._s > now) return 'upcoming';
   return 'past';
 }
+// The hero, the up-next countdown, and the schedule all read the SAME filtered pool, so a
+// series pinned to 'races only' never lights the hero for its practice, and a filtered
+// view's "on now / up next" tracks exactly what the schedule below is showing.
 function renderHero() {
   const now = new Date();
-  const live = events.filter(e => stateOf(e, now) === 'live');
+  const pool = events.filter(passesFilter);
+  const live = pool.filter(e => stateOf(e, now) === 'live');
   const hero = $('#hero');
   if (live.length) {
     hero.innerHTML =
@@ -109,7 +145,7 @@ function renderHero() {
     return;
   }
   // TBD events are excluded from the up-next countdown: there is no exact time to count to.
-  const next = events.find(e => !e._tbd && e._s > now);
+  const next = pool.find(e => !e._tbd && e._s > now);
   if (next) {
     const diff = next._s - now;
     hero.innerHTML =
@@ -125,7 +161,7 @@ function renderHero() {
       '</div>';
     return;
   }
-  const last = events.slice().reverse().find(e => !e._tbd && e._e <= now);
+  const last = pool.slice().reverse().find(e => !e._tbd && e._e <= now);
   hero.innerHTML =
     '<div class="hero-eyebrow">That\'s a wrap</div>' +
     '<div class="live-title">No sessions live right now.</div>' +
@@ -142,15 +178,22 @@ function fmtDur(ms) {
 }
 function buildChips() {
   const seriesInData = Array.from(new Set(events.map(e => e.series)));
-  $('#seriesChips').innerHTML = seriesInData.map(s =>
-    '<button class="chip" data-series="' + esc(s) + '" aria-pressed="' + state.series.has(s) + '" style="--cc:' + seriesColor(s) + '">' +
-      '<span class="swatch"></span>' + esc((SERIES[s]||{}).label||s) +
-    '</button>').join('');
+  $('#seriesChips').innerHTML = seriesInData.map(s => {
+    const tier = state.series.get(s) || 'off';
+    const hasSess = SERIES_WITH_SESSIONS.has(s);
+    const lb = (SERIES[s]||{}).label||s;
+    const aria = lb + (tier === 'race' ? ' — races only' : tier === 'all' ? ' — races plus practice and qualifying' : ' — off');
+    return '<button class="chip" data-series="' + esc(s) + '" data-tier="' + tier + '" data-hassess="' + hasSess + '" aria-pressed="' + (tier !== 'off') + '" aria-label="' + esc(aria) + '" style="--cc:' + seriesColor(s) + '">' +
+      '<span class="swatch"></span>' +
+      '<span class="chip-lb">' + esc(lb) + '</span>' +
+      (hasSess ? '<span class="tier-pip" aria-hidden="true">+P</span>' : '') +
+    '</button>';
+  }).join('');
   const platsInData = Array.from(new Set(events.reduce((a, e) => a.concat(e.platforms), []))).sort();
   $('#platChips').innerHTML = platsInData.map(p =>
     '<button class="chip plat" data-plat="' + esc(p) + '" aria-pressed="' + state.plats.has(p) + '">' + esc(p) + '</button>').join('');
   $('#seriesChips').querySelectorAll('.chip').forEach(c =>
-    c.addEventListener('click', () => toggleSet(state.series, c.dataset.series, 'ontrack_series', c)));
+    c.addEventListener('click', () => cycleSeries(c.dataset.series, c)));
   $('#platChips').querySelectorAll('.chip').forEach(c =>
     c.addEventListener('click', () => toggleSet(state.plats, c.dataset.plat, 'ontrack_plats', c)));
   updateFilterCounts();
@@ -195,10 +238,24 @@ function sectionInit() {
     setSection(sec, open, false);
   });
 }
+// Tier-aware filter. When NOT searching: no series selected -> show race-tier only
+// (practice/quali hidden globally); a series selected -> show it, and include its sessions
+// only when it's on the 'all' tier. When searching: tier hiding is lifted so a query like
+// "practice" or "qualifying" can find those sessions (series membership still respected).
 function passesFilter(e) {
-  if (state.series.size && !state.series.has(e.series)) return false;
+  const searching = !!state.q;
+  if (!searching) {
+    if (state.series.size) {
+      if (!state.series.has(e.series)) return false;
+      if (state.series.get(e.series) !== 'all' && tierOf(e) === 'session') return false;
+    } else if (tierOf(e) === 'session') {
+      return false;
+    }
+  } else if (state.series.size && !state.series.has(e.series)) {
+    return false;
+  }
   if (state.plats.size && !e.platforms.some(p => state.plats.has(p))) return false;
-  if (state.q) {
+  if (searching) {
     const hay = (e.title + ' ' + (e.detail||'') + ' ' + e.kind + ' ' + ((SERIES[e.series]||{}).label||e.series) + ' ' + e.series + ' ' + e.platforms.join(' ')).toLowerCase();
     if (!hay.includes(state.q)) return false;
   }
@@ -267,14 +324,15 @@ function renderSchedule() {
       ? '<div class="evt-empty"><span class="em-flag">🏁</span>No events scheduled for this day.</div>'
       : evs.map(e => {
           const st = stateOf(e, now);
-          return '<div class="evt ' + (st==='live'?'is-live':'') + ' ' + (st==='past'?'is-past':'') + '" style="--sc:' + seriesColor(e.series) + '">' +
+          const isSession = tierOf(e) === 'session';
+          return '<div class="evt ' + (st==='live'?'is-live':'') + ' ' + (st==='past'?'is-past':'') + (isSession?' is-session':'') + '" style="--sc:' + seriesColor(e.series) + '">' +
             '<div class="evt-time">' + (e._tbd
               ? '<span class="tbd" style="color:var(--text-3);font-weight:700;letter-spacing:0.02em">TBD</span>'
               : fmtTime(e._s) + '<span class="end">' + fmtTime(e._e) + '</span>') + '</div>' +
             '<div class="evt-bar"></div>' +
             '<div class="evt-main">' +
               '<span class="evt-series">' + esc((SERIES[e.series]||{}).label||e.series) + '</span>' +
-              '<span class="evt-kind">' + esc(e.kind) + '</span>' +
+              '<span class="evt-kind' + (isSession?' is-session':'') + '">' + esc(e.kind) + '</span>' +
               (e._tbd
                 ? '<span class="evt-kind" style="border-style:dashed;color:var(--text-3)">Time TBD</span>'
                 : (st==='live' ? '<span class="livepill"><span class="dot-live" style="background:var(--live-ink)"></span>Live</span>' : '')) +
@@ -307,8 +365,9 @@ function tick() {
   $('#clockZone').textContent = tzAbbrev();
   const c = $('#count');
   if (c) {
-    const next = events.find(e => !e._tbd && e._s > now);
-    const live = events.some(e => stateOf(e, now) === 'live');
+    const pool = events.filter(passesFilter);
+    const next = pool.find(e => !e._tbd && e._s > now);
+    const live = pool.some(e => stateOf(e, now) === 'live');
     if (!next || live || now >= next._s) { renderHero(); renderSchedule(); }
     else c.innerHTML = fmtDur(next._s - now);
   } else {
