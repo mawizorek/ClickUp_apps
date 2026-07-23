@@ -5,8 +5,8 @@
    this file tiny so the version bump never risks the bigger modules. Loaded last. */
 (function () {
   'use strict';
-  var BUILD = 'v3.6';
-  var PR = 'PR#32';
+  var BUILD = 'v3.7';
+  var PR = 'PR#457';
   window.BRAIN_CONFIG_BUILD = BUILD;
 
   function stamp() {
