@@ -1,6 +1,7 @@
-/* Brain Config Index \u2014 engine.
+/* Brain Config Index — engine.
  Multi-file build: index.html (shell) + source/styles.css + source/data.js + source/app.js.
- Engine updates: version-bump this file + the shell. Reads PROSE_HOOKS/TRIGGERS/BADGES/NICKNAMES from data.js. */
+ Engine updates: version-bump this file + the shell. Reads PROSE_HOOKS/TRIGGERS/BADGES from data.js;
+ nicknames are parsed per-tool from each profile's front-matter (extractNicknames), not a hard-coded map. */
 
 // ---- Config (top-level constants; change here, nowhere else) ----
 const OWNER = 'mawizorek';
@@ -12,7 +13,7 @@ const CACHE_TTL = 300000; // 5 min
 
 // Launch target for the Run-me button: ClickUp web home (Michael confirmed 2026-07-04).
 // No documented web deep-link prefills a prompt, so the button OPENS Brain and the
-// prompt rides the clipboard \u2014 paste + pick an agent + send.
+// prompt rides the clipboard — paste + pick an agent + send.
 const BRAIN_MAX_URL = 'https://app.clickup.com/home';
 
 const SHELVES = [
@@ -44,6 +45,15 @@ function extractShortcut(content) { return /\*\*Shortcut:\*\*\s*true/i.test(cont
 function extractLaunchPrompt(content) {
  const m = content.match(/\*\*Launch prompt:\*\*\s*\n+```[a-zA-Z]*\n([\s\S]*?)\n```/);
  return m ? m[1].trim() : '';
+}
+// Nicknames are single-sourced from the profile front-matter (`nicknames: [A, B]`),
+// which metadata-schema.md marks as the canonical owner of identity. Returns a
+// comma-joined string (matching the old NICKNAMES map shape) or null when absent.
+function extractNicknames(content) {
+ const m = content.match(/^nicknames:\s*\[(.+?)\]/m);
+ if (!m) return null;
+ const list = m[1].split(',').map(s => s.trim().replace(/^["']|["']$/g, '').trim()).filter(Boolean);
+ return list.length ? list.join(', ') : null;
 }
 
 async function fetchJSON(url) {
@@ -97,7 +107,7 @@ async function loadShelf(shelf) {
  slug, name: slugToName(slug), purpose: extractPurpose(content),
  shelf: shelf.key, url: `${BLOB}/${shelf.folder}/${file.name}`,
  created: extractCreatedDate(content), uses: usageData[slug] || 0,
- badge: BADGES[slug] || null, nicknames: NICKNAMES[slug] || null,
+ badge: BADGES[slug] || null, nicknames: extractNicknames(content),
  shortcut, launchPrompt: shortcut ? extractLaunchPrompt(content) : ''
  });
  }
@@ -235,8 +245,8 @@ function bindLaunch() {
  if (!prompt) return;
  const ok = await copyToClipboard(prompt);
  showToast(ok
- ? 'Prompt copied \u2192 opening Brain. Paste, pick your agent, hit send.'
- : 'Auto-copy blocked here. The prompt is still in this tab \u2014 copy it manually before you switch.');
+ ? 'Prompt copied → opening Brain. Paste, pick your agent, hit send.'
+ : 'Auto-copy blocked here. The prompt is still in this tab — copy it manually before you switch.');
  // The anchor's default action opens BRAIN_MAX_URL in a new tab.
  });
 }
