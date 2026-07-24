@@ -1,13 +1,17 @@
 // On Track — engine: constants, data model, date/format helpers, and all render/paint logic.
 // Loaded before app.js. Classic script (shared global scope with app.js).
-const APP_VERSION = 'v2.3';
+const APP_VERSION = 'v2.4';
 const APP_DATE = '2026-07-24';
 const APP_SLUG = 'on-track';
-// Composed 4-vector theme (shared/themes/_themes.json): red-bull color × racing-archivo
-// typography × soft forms × standard spacing. The chrome (bg/surface/border/text/accent,
-// fonts, radii) flows from the spine; the 20 --s-* series colors below are a LOCAL data
-// layer that rides on top of whatever theme/mode is active (see styles.css).
+// Composed 4-vector theme (shared/themes/_themes.json): the DEFAULT is `on-track`
+// (red-bull color × racing-archivo typography × soft forms × standard spacing). As of v2.4
+// the settings picker lets the user choose ANY theme from _themes.json; APP_THEME is the
+// baked-in fallback used when nothing is stored or a stored slug no longer exists. The
+// chrome (bg/surface/border/text/accent, fonts, radii) flows from the spine; the 20 --s-*
+// series colors below are a LOCAL data layer that rides on top of whatever theme/mode is
+// active (see styles.css).
 const APP_THEME = 'on-track';
+const THEME_DEFAULT = APP_THEME;
 const SERIES = {
   'F1':          { label: 'Formula 1',       color: 'var(--s-f1)' },
   'F2':          { label: 'Formula 2',       color: 'var(--s-f2)' },
@@ -76,8 +80,9 @@ function loadSeriesState() {
 function saveSeriesState() {
   localStorage.setItem('ontrack_series', JSON.stringify(Array.from(state.series)));
 }
-// Light/dark is now the spine's MODE (red-bull ships both ramps). state.mode is On Track's
-// own intent key ('dark'|'light'); it migrates the legacy 'ontrack_theme' (rb|light) once.
+// Light/dark is the spine's MODE (red-bull + most colors ship both ramps). state.mode is
+// On Track's own intent key ('dark'|'light'); it migrates the legacy 'ontrack_theme'
+// (rb|light) once.
 function loadMode() {
   const m = localStorage.getItem('ontrack_mode');
   if (m === 'dark' || m === 'light') return m;
@@ -85,9 +90,18 @@ function loadMode() {
   if (legacy === 'light') return 'light';
   return 'dark';
 }
+// Active composed theme slug (v2.4). The settings picker lets the user pick any theme from
+// _themes.json; the choice persists here. Falls back to the baked-in THEME_DEFAULT when
+// unset; the picker also re-validates against the live theme list once it loads and resets
+// to the default if the stored slug no longer exists in the JSON.
+function loadThemeSlug() {
+  const s = localStorage.getItem('ontrack_theme_slug');
+  return s || THEME_DEFAULT;
+}
 const state = {
   tz: localStorage.getItem('ontrack_tz') || 'local',
   mode: loadMode(),
+  themeSlug: loadThemeSlug(),
   series: loadSeriesState(),
   plats: new Set(JSON.parse(localStorage.getItem('ontrack_plats') || '[]')),
   showPast: false,
@@ -392,13 +406,18 @@ function tick() {
     renderHero();
   }
 }
-// Light/dark now flows through the theme spine: setMode flips red-bull between its dark
-// ramp and its authored light (alt-*) ramp. We keep data-mode on <html> in sync for the
-// early-paint script + the toggle glyph, and repoint the mobile browser chrome color.
+// Light/dark flows through the theme spine: setMode flips the active color between its dark
+// ramp and its light (alt-*) ramp. We keep data-mode on <html> in sync for the early-paint
+// script + the toggle glyph, and repoint the mobile browser chrome color to the LIVE --bg
+// (so it tracks whatever theme is active, not a hardcoded navy).
 function applyMode() {
   if (window.THEMES && THEMES.setMode) { try { THEMES.setMode(state.mode); } catch (e) {} }
   document.documentElement.setAttribute('data-mode', state.mode);
   const btn = $('#themeBtn'); if (btn) btn.textContent = state.mode === 'dark' ? '◑' : '◐';
   const meta = document.querySelector('meta[name=theme-color]');
-  if (meta) meta.setAttribute('content', state.mode === 'dark' ? '#1e2138' : '#f5f6fa');
+  if (meta) {
+    let bg = '';
+    try { bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); } catch (e) {}
+    if (bg) meta.setAttribute('content', bg);
+  }
 }

@@ -94,9 +94,45 @@ function syncFilterAction() {
       : '<span class="fa-lb">Select all ' + label + '</span>';
   });
 }
-// Settings popover: a gear in the masthead housing app chrome — the light/dark toggle and
-// the timezone toggle, plus an honest note about how the app updates. Both control nodes
-// are MOVED (not rebuilt) into the drawer, so the listeners wired in wire() survive intact.
+// Theme picker (v2.4): a live dropdown of every composed theme in shared/themes/_themes.json.
+// PASSIVE LIST — THEMES.listThemes() reads the JSON at runtime, so adding/removing/renaming a
+// theme there updates this menu with ZERO app change. The baked-in default (THEME_DEFAULT =
+// 'on-track') is the fallback: if the stored slug is missing OR no longer exists in the JSON,
+// we reset to it and re-apply. Selecting a theme composes the full 4-vector look at the
+// current light/dark mode and persists the choice. The 20 series colors are a local layer, so
+// they ride unchanged across every theme (only the chrome reskins).
+function buildThemeSelect() {
+  const slot = document.getElementById('themeSelSlot');
+  if (!slot || !window.THEMES || !THEMES.listThemes) return;
+  THEMES.listThemes().then(function (list) {
+    if (!Array.isArray(list) || !list.length) return;
+    if (!list.some(function (t) { return t.slug === state.themeSlug; })) {
+      state.themeSlug = THEME_DEFAULT;
+      localStorage.setItem('ontrack_theme_slug', state.themeSlug);
+      if (THEMES.applyTheme) THEMES.applyTheme(state.themeSlug, { mode: state.mode }).then(applyMode);
+    }
+    const sel = document.createElement('select');
+    sel.id = 'themeSel';
+    sel.className = 'theme-sel';
+    sel.setAttribute('aria-label', 'App theme');
+    sel.innerHTML = list.map(function (t) {
+      return '<option value="' + esc(t.slug) + '"' + (t.slug === state.themeSlug ? ' selected' : '') + '>' + esc(t.name || t.slug) + '</option>';
+    }).join('');
+    slot.innerHTML = '';
+    slot.appendChild(sel);
+    sel.addEventListener('change', function (ev) {
+      state.themeSlug = ev.target.value;
+      localStorage.setItem('ontrack_theme_slug', state.themeSlug);
+      if (window.THEMES && THEMES.applyTheme) {
+        THEMES.applyTheme(state.themeSlug, { mode: state.mode }).then(applyMode);
+      }
+    });
+  }).catch(function () {});
+}
+// Settings popover: a gear in the masthead housing app chrome — the THEME picker (all
+// composed themes from _themes.json), the light/dark (Appearance) toggle, and the timezone
+// toggle, plus an honest note about how the app updates. The toggle + tz control nodes are
+// MOVED (not rebuilt) into the drawer, so the listeners wired in wire() survive intact.
 function buildSettings() {
   const tools = document.querySelector('.mast-tools');
   if (!tools || document.getElementById('settingsWrap')) return;
@@ -116,9 +152,10 @@ function buildSettings() {
   pop.hidden = true;
   pop.innerHTML =
     '<div class="set-title">Settings</div>' +
-    '<div class="set-row"><span class="set-lb">Theme</span><span id="themeSlot"></span></div>' +
+    '<div class="set-row"><span class="set-lb">Theme</span><span id="themeSelSlot"></span></div>' +
+    '<div class="set-row"><span class="set-lb">Appearance</span><span id="themeSlot"></span></div>' +
     '<div class="set-row"><span class="set-lb">Time zone</span><span id="tzSlot"></span></div>' +
-    '<p class="set-note">Countdowns and “on now” update live every second. Listings are refreshed weekly and verified per race weekend, so broadcast times can change last-minute.</p>';
+    '<p class="set-note">Theme sets the whole look; Appearance flips light / dark. Countdowns and “on now” update live every second. Listings are refreshed weekly and verified per race weekend, so broadcast times can change last-minute.</p>';
   wrap.appendChild(btn);
   wrap.appendChild(pop);
   tools.appendChild(wrap);
@@ -182,11 +219,13 @@ function wire() {
 function render() { renderHero(); renderSchedule(); }
 function boot() {
   hydrate();
-  // Compose the 4-vector theme from the spine (color × typography × forms × spacing) at the
+  // Compose the active theme from the spine (color × typography × forms × spacing) at the
   // user's mode, then sync the toggle glyph + data-mode. resolve.js overrides the CSS floor
   // inline; if the spine is missing/offline, the labeled :root FLOOR in styles.css holds.
-  if (window.THEMES && THEMES.applyTheme) { try { THEMES.applyTheme(APP_THEME, { mode: state.mode }); } catch (e) {} }
-  applyMode();
+  if (window.THEMES && THEMES.applyTheme) {
+    try { THEMES.applyTheme(state.themeSlug, { mode: state.mode }).then(applyMode); }
+    catch (e) { applyMode(); }
+  } else { applyMode(); }
   buildChips();
   addSeriesHint();
   buildJump();
@@ -195,6 +234,7 @@ function boot() {
   render();
   wire();
   buildSettings();
+  buildThemeSelect();
   cleanupFooter();
   const vl = $('#verLine'); if (vl) vl.textContent = 'On Track ' + APP_VERSION;
   const ds = $('#dataStamp'); if (ds) ds.textContent = ' · listings ' + (DATA.version || APP_DATE);

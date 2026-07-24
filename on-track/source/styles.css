@@ -1,7 +1,8 @@
 /* =============================================================================
    On Track — presentation. CHROME now flows from the 4-VECTOR THEME
    (color × typography × forms × spacing) applied by ../shared/themes/resolve.js.
-   The app points at the `on-track` theme (see index.html) and CONSUMES its tokens.
+   The app points at a theme slug (default `on-track`, user-selectable via the settings
+   picker as of v2.4) and CONSUMES its tokens.
 
    TWO COLOR LAYERS (by design):
    • Layer A — CHROME: bg / surface / border / text / accent + fonts + radii come from
@@ -150,6 +151,16 @@ body {
   font-size: 0.78rem; line-height: 1.55; color: var(--text-3); margin: 0;
   border-top: var(--border-w) solid var(--border-soft); padding-top: 11px;
 }
+/* Theme picker dropdown (settings). Native chevron kept (no appearance:none) for a clean,
+   dependency-free control. Themed off spine tokens so it reskins with every theme. */
+.theme-sel {
+  background: var(--surface-1); border: var(--border-w) solid var(--border); color: var(--text);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.02em;
+  padding: 7px 10px; border-radius: var(--radius); cursor: pointer; max-width: 190px;
+  transition: border-color .2s var(--ease);
+}
+@media (hover: hover) { .theme-sel:hover { border-color: var(--accent); } }
+.theme-sel:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 /* HERO — v2.3: flattened to a compact DATA strip (hatch removed, tighter padding, mono
    countdown). Less "hero panel," more "instrument readout." */
 .hero {

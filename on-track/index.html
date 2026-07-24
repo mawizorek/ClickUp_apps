@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- INFRASTRUCTURE: multi-file (Pages-hosted). Thin shell + shared/themes spine + source/styles.css + source/render.js + source/app.js + data.json. -->
-<!-- THEME: composed 4-vector `on-track` (red-bull × racing-archivo × soft × standard). Chrome color/type/forms flow from shared/themes; the 20 series colors are a LOCAL data layer in styles.css, on top of any theme. -->
-<!-- Engine edits: edit source/*.js + source/styles.css (each reads whole under the 30KB cap) + version bump. -->
+<!-- THEME: composed 4-vector, DEFAULT `on-track` (red-bull × racing-archivo × soft × standard), USER-SELECTABLE via the settings picker (any theme in shared/themes/_themes.json). Chrome color/type/forms flow from shared/themes; the 20 series colors are a LOCAL data layer in styles.css, on top of any theme. -->
+<!-- Engine edits: edit source/*.js + source/styles.css (each reads whole under the 30KB cap) + bump ?v= + version bump. -->
 <!-- Data edits: commit data.json only. -->
 <!-- BRAND ASSETS (TEMP NAMES): icon = IMG_4698.png, banner = IMG_4689.png. TODO: rename to icon.png / og.png + downsize (see next-build-spec.md). -->
 <html lang="en" data-theme="red-bull" data-mode="dark">
@@ -35,7 +35,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- THEME SPINE: color first-paint spine (shared). resolve.js composes the full 4-vector theme after load. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./source/styles.css?v=23">
+<link rel="stylesheet" href="./source/styles.css?v=24">
 </head>
 <body>
 <noscript>On Track needs JavaScript to compute what's live right now. Please enable it.</noscript>
@@ -119,7 +119,7 @@
 </div>
 <!-- THEME SPINE: defines window.THEMES before the deferred engine runs. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./source/render.js?v=23" defer></script>
-<script src="./source/app.js?v=23" defer></script>
+<script src="./source/render.js?v=24" defer></script>
+<script src="./source/app.js?v=24" defer></script>
 </body>
 </html>
