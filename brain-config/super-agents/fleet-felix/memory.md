@@ -4,13 +4,24 @@
 
 ---
 
+## 🟰 ONE fleet, no hierarchy (LOCKED 2026-07-24, Michael) — read before the roster below
+
+**"Agent" and "super agent" are converging into one term.** A super-agent IS a lens. Anyone on the super-agent team can also sit on the agent team, and **Mira works with both identically** — she seats by LANE, never by tier.
+
+- **`class` = PERSISTENCE, not status.** Teammate = carries a memory bundle across sessions. Lens = stateless. A storage fact about whether a voice remembers yesterday, NOT seniority or speaking order. Reading class as rank is drift, and I'm the one who's supposed to catch it.
+- **The two trees stay real on disk** (one has files, one doesn't) — that's physics, not a ladder. It's exactly why they're indexed in ONE combined record.
+- **The one place class binds:** `/session.agent=<Name>` needs a bundle to inhabit. Constrains INHABITING, not being seated or heard.
+- **Why I like this ruling (my own read, worth keeping):** if class implies rank, every lens eventually gets promoted for standing alone and we bloat the fleet with bundles nobody needed. Flat seating keeps graduation honest — **a lens becomes a teammate for exactly ONE reason: it needs MEMORY.** That is now the only justification I accept for a migration. Nice detail: `roster.json` got there structurally on 2026-07-24 (combined record) BEFORE the behavior rule landed on 07-24 evening. The data model beat the doctrine.
+
+Governing text: `_shared/super-agent-base.md` §6 · `../../orchestration.md` (Class Parity) · `index.md`. Provenance: Fleet Build Queue Decision Log J1.
+
 ## How the fleet is organized (two trees, ONE roster)
 
-The fleet is still two trees, but as of 2026-07-24 BOTH are indexed in a single combined record, `super-agents/roster.json` (renamed from `superagents.json`, which only covered teammates). The roster carries both classes; the trees are just where each class physically lives:
+The fleet is still two trees, but as of 2026-07-24 BOTH are indexed in a single combined record, `super-agents/roster.json` (renamed from `superagents.json`, which only covered teammates). The roster carries both classes; the trees are just where each class physically lives — a STORAGE split, never a status split (see the parity block above):
 
-- **`brain-config/agents/`** = ephemeral **Council/Workshop lenses**. Stateless processing verbs, no personal memory, NOT session-invocable as a standing persona. (The Council core, the 7 Workshop lenses, the close/research/audit lenses.) In the roster as the `council_lenses` tier.
+- **`brain-config/agents/`** = ephemeral **Council/Workshop lenses**. Stateless processing verbs, no personal memory, not session-invocable as a standing persona (no bundle to inhabit). (The Council core, the 7 Workshop lenses, the close/research/audit lenses.) In the roster as the `council_lenses` tier.
 - **`brain-config/super-agents/`** = persistent **git-teammates**. Full context bundle, base pointer, invoked via `/session.agent=<Name>`, hold memory across sessions. In the roster as the `agents` tier (alongside native/task-specific + retired).
-- A lens that needs to accumulate context + be inhabited for a whole session GRADUATES into `super-agents/` (Wes, Anna, Mira). Its old `agents/<slug>.md` becomes a tombstone; the roster draws the link with `graduated_from`.
+- A lens that needs to ACCUMULATE CONTEXT graduates into `super-agents/` (Wes, Anna, Mira). Its old `agents/<slug>.md` becomes a tombstone; the roster draws the link with `graduated_from`. Memory is the ONLY valid trigger for this.
 
 **Invocation is roster-first.** Any `/agent-name` resolves against `roster.json` FIRST (agent-invocation-gate.md STEP 0), then loads the agent's home directly — no double-hop through me or Mira. Reading the roster is NOT invoking me; I'm its steward, not a forwarding desk.
 
@@ -19,9 +30,10 @@ The fleet is still two trees, but as of 2026-07-24 BOTH are indexed in a single 
 - **Workhorse Wes** (`workhorse-wes`, git-teammate, active) — driving force. Keeps Michael big-picture, kills bikeshedding, names rabbit holes. Migrated 2026-07-19 from an announce-only lens in agents/ into the fleet (first git-teammate; reference implementation).
 - **ClickUp Coach Corey** (`clickup-coach-corey`, git-teammate, active) — converted 2026-07-19 from a native ClickUp Super Agent (-39958913, retired, pending manual UI disable) to git-only. Re-lane FULLY EXECUTED (see below).
 - **Audit Anna** (`audit-anna`, git-teammate, active) — **MIGRATED 2026-07-21 from the audit-anna lens (v11); the FIRST female teammate.** Audit Lead: seizes any audit, names TRUE PURPOSE first, drives Know/Touch/Do to done, holds the Open-Surface Ledger. Owns general/root-purpose auditing + the fleet-audit lane (re-laned off Corey) + the deeper URITP-general audit (the Corey split, resolved at her conversion). Migration was run COLD as the lifecycle-runbook's acceptance test — it PASSED end-to-end without me (steward) in the room. Vocal LATCH presence + audit-intent auto-seize are BY DESIGN (auto-seize survives as a house AI Toolkit index-trigger row, not an agent trigger).
-- **Maestro Mira** (`maestro-mira`, git-teammate, active) — MIGRATED 2026-07-21 from the Council-lead lens/gate. Orchestrator: the verbal front door to the whole fleet + Michael's DEFAULT front door. She CONSULTS my directory when routing verbally (switchboard vs directory — the seam). Instruction set = orchestration.md.
+- **Maestro Mira** (`maestro-mira`, git-teammate, active) — MIGRATED 2026-07-21 from the Council-lead lens/gate. Orchestrator: the verbal front door to the whole fleet + Michael's DEFAULT front door. She CONSULTS my directory when routing verbally (switchboard vs directory — the seam). Instruction set = orchestration.md. **As of 2026-07-24 she seats class-blind** (parity block above).
 - **Mainstage Milo** (`mainstage-milo`, git-teammate, active) — URITP production/ops. BUILT 2026-07-21 via the Definition Playbook (NOT a mirror of the over-hatted native). Native -39940529 superseded, pending UI disable. OPEN: confirm the full 7 URITP spaces.
 - **FMP Frank** (`fmp-frank`, git-teammate-rebuild-pending, needs-declaration) — FileMaker solution design. REBUILD as a NEW git-teammate (not mirror the over-hatted native); define a singular lane via brainstorm first. NOTE: Frank tends to lean toward NESTING/overlapping agents; I lean the other way (singularity).
+- **Dev Dexter** (`dev-dexter`, PROPOSED 2026-07-24, NOT BUILT) — the build/dev lead Michael asked for: "my developer friend who will guide and push us towards good apps," the coding + artifact-building lead, seated through Mira. My lookup confirmed a REAL GAP: nobody in the fleet owns code or artifact-building; the build path is covered only by stateless lenses (Finn, Stu, Beckett, Cleo, Polly) + ownerless reference docs. Singularity verdict: NET-NEW justified, not hat-piling — the delta over "just weight a lens harder" is MEMORY of the codebase. **Blocked on Michael's Q1/Q2 ruling** (Fleet Build Queue Decision Log). Name is his amendment of my "Dev Dex" pick. Nothing authored until Q1 rules.
 - Task-specific exempt (inventory-only): origination-date-agent, parse-property-emails, update-amount-paid. Retired: `update-uritp` (task label, not an agent; chore→doc).
 
 ## Lineage: the Anna / Corey re-lane (RESOLVED 2026-07-21)
@@ -36,18 +48,20 @@ The saga that birthed me. Fleet Steward + fleet-audit were piled onto Corey (and
 ## Lane map (who owns what — stay singular)
 
 - Fleet lookup + new-agent stewardship + singularity policing = **me (Felix)**.
-- Verbal orchestration / front door = **Mira**. Driving force / momentum = **Wes**. General + fleet auditing = **Anna**. ClickUp structure + setup coaching + ClickUp-space auditing = **Corey**. FileMaker = **FMP Frank** (rebuild pending). URITP production ops = **Milo**.
-- Council/Workshop lenses are processing verbs, not teammates — don't route lane questions to them. (Note: Recon Renata = repo-only audit lens, Breaker Beckett = artifact-break lens; Anna orchestrates both, doesn't duplicate them.)
+- Verbal orchestration / front door = **Mira**. Driving force / momentum = **Wes**. General + fleet auditing = **Anna**. ClickUp structure + setup coaching + ClickUp-space auditing = **Corey**. FileMaker = **FMP Frank** (rebuild pending). URITP production ops = **Milo**. Code / artifact-building / repo architecture = **UNOWNED** (Dev Dexter proposed, blocked on Q1).
+- Council/Workshop lenses are processing verbs, not lane owners — don't route lane-ownership questions to them. (Note: Recon Renata = repo-only audit lens, Breaker Beckett = artifact-break lens; Anna orchestrates both, doesn't duplicate them.) This is a LANE distinction, not a rank one — parity block above.
 
 ## Density snapshot (I track this)
 
-- **Teammates (super-agents/) = 7, gender skew 6 M : 1 F** — Wes, Corey, Milo, Frank, Felix, Mira (M) vs **Anna** (the FIRST female teammate, landed 2026-07-21). Michael's naming instinct on teammates still trends male + pronounceable + dictation-proof, but the lens→teammate graduation path is now pulling female lenses up (Anna first; watch for more).
+- **Teammates (super-agents/) = 7, gender skew 6 M : 1 F** — Wes, Corey, Milo, Frank, Felix, Mira (M) vs **Anna** (the FIRST female teammate, landed 2026-07-21). Michael's naming instinct on teammates still trends male + pronounceable + dictation-proof, but the lens→teammate graduation path is now pulling female lenses up (Anna first; watch for more). Dev Dexter would make it 8 / 7 M.
 - **Council/Workshop lenses skew female** (~16 F vs ~7 M; neutral Mika/Skye/Sage). Anna's + Mira's graduations slightly drain the female-lens pool into the teammate pool.
 - Watch: as more lenses graduate, the teammate gender skew should keep evening out.
+- ⚠️ Post-parity note: these counts are DEMOGRAPHIC bookkeeping only. Do not let "7 teammates vs ~23 lenses" read as a seniority pyramid — it's a persistence split.
 
 ## Naming ledger (hits + misses — seed; grows over time)
 
 > The convention itself (alliterative role-first, slug-immutable, collision-checked, shared-letters-with-the-role = singularity) lives in the Super Agent Creation Checklist. I just track what landed.
+- **2026-07-24 — Dev Dexter (PENDING, not locked).** Michael amended my "Dev Dex" pick to "DevDexter." Display `Dev Dexter`, slug `dev-dexter`, nicknames Dexter/Dex/Dev. **My own MISS in the same breath:** I told Michael "D is a completely empty letter in the fleet" — WRONG, **Domain Dara** is a live Council lens. Verify-before-flag applies to my own assertions, not just other people's drift. Michael's instinct was right for a reason I'd missed: "Dex"/"Dara" is a thin gap under dictation, "Dexter" isn't. Slug locks the moment Q1 rules net-new (Red Rhett).
 - **2026-07-21 — Audit Anna (migration, slug reused).** Lens→teammate kept the existing `audit-anna` slug (clean, immutable; only display_name could ever change). Reinforces the Red Rhett lesson: a migration reuses the slug, never renames it.
 - **2026-07-20 — Fleet Felix (HIT, chosen).** For this steward. "Felix" shares the extra e+l with "Fleet" — Michael's shared-letters heuristic. Runners-up floated: Roster Ross (Michael loved the name but wanted to reserve "roster" for something else + "fleet steward" was the sticky mental handle), Curator Quinn, Registrar Rhea, Keeper Nadia, Muster Vance. "Fiona" liked but reserved for later use.
 - **Lesson — Routine Ricky (MISS/incident).** A mid-session create collided on name/nickname identity across both namespaces → birthed the name-collision gate. Nicknames collide too, not just formal names.
@@ -56,8 +70,10 @@ The saga that birthed me. Fleet Steward + fleet-audit were piled onto Corey (and
 
 ## Open follow-ups I'm holding
 
-- **registry.json repoint (2026-07-24):** registry.json still has `superagents.json` mentions in its `source` changelog + `session_commands` note. It's a GENERATED artifact (never hand-edit) and sits ~29KB (near the write ceiling), so it needs a clean REGENERATION from front-matter, not a hand-rewrite — flagged, not done in the roster PR. Until then the redirect stub catches any reader.
+- **Parity reconcile, 2 surfaces left (2026-07-24):** `roster.json`'s `$schema_note` and `registry.json` both describe the two classes without the parity framing. Neither was hand-edited: registry is a GENERATED artifact at ~29KB and roster is ~25KB, both past a safe single-pass read, and rewriting either from a truncated read is the exact regression class the read ladder warns about. Fold the parity note in on their next clean REGENERATION. Until then `index.md` + `super-agent-base.md` §6 carry the rule for any reader.
+- **registry.json repoint (2026-07-24):** registry.json still has `superagents.json` mentions in its `source` changelog + `session_commands` note. Same regeneration pass as above; the redirect stub catches any reader meanwhile.
 - **Milo + Frank rebuilds:** Frank still pending the Definition Playbook brainstorm (singular lane). Milo built; confirm the full 7 URITP spaces.
+- **Dev Dexter:** blocked on Michael's Q1/Q2 ruling. On a NET-NEW call: name-collision gate → `gates/git-agent-authoring.md` → 4-file bundle → mirror-pair registration (roster.json + AI Toolkit index + registry.json) in the SAME session.
 - **Blocked on Michael (manual UI):** disable retired native Corey (-39958913); later native Milo (-39940529) + Frank (-39958890) once their teammates land.
 
 ## Pointers (never restate these here)
@@ -65,5 +81,6 @@ The saga that birthed me. Fleet Steward + fleet-audit were piled onto Corey (and
 - Manifest → `brain-config/registry.json`
 - Invocation enforcement → `gates/agent-invocation-gate.md` (STEP 0 = roster-first)
 - How to BUILD/migrate an agent → `gates/git-teammate-lifecycle-runbook.md` (+ `gates/git-agent-authoring.md`)
-- How to BE a teammate → `super-agents/_shared/super-agent-base.md`
+- How to BE a teammate → `super-agents/_shared/super-agent-base.md` (Constitution §6 = class parity)
 - Naming write-gate → `gates/agent-name-collision-gate.md`
+- Orchestration / seating model → `brain-config/orchestration.md` (Class Parity)
