@@ -1,6 +1,6 @@
 // On Track — engine: constants, data model, date/format helpers, and all render/paint logic.
 // Loaded before app.js. Classic script (shared global scope with app.js).
-const APP_VERSION = 'v2.1';
+const APP_VERSION = 'v2.2';
 const APP_DATE = '2026-07-23';
 const APP_SLUG = 'on-track';
 const SERIES = {
@@ -26,10 +26,13 @@ const SERIES = {
   'Supercars':   { label: 'Supercars',       color: 'var(--s-supercars)' }
 };
 const seriesColor = s => (SERIES[s] && SERIES[s].color) || 'var(--s-default)';
-// Event tier: a race/sprint/feature (default, always shown) vs a support session
-// (practice / qualifying, tagged `tier:"session"` in data.json). Sessions are hidden by
-// default and opted into per-series via the 2nd chip click. Absent tier = race.
-const tierOf = e => e.tier === 'session' ? 'session' : 'race';
+// Event tier (data.json `tier` field):
+//   'practice' — the ONLY opt-in tier. Hidden the moment you filter a series to its
+//                'races only' state; revealed on that series' 3rd-state ('all').
+//   'quali'    — qualifying. Its own category, but ALWAYS shown alongside races (never gated).
+//   absent     — a race / sprint / feature. Always shown.
+// Default (no series filter) shows EVERYTHING, practice included; filtering narrows from there.
+const tierOf = e => (e.tier === 'practice' || e.tier === 'quali') ? e.tier : 'race';
 const FALLBACK_DATA = {
   version: '2026-07-04b',
   events: [
@@ -40,10 +43,11 @@ const FALLBACK_DATA = {
 };
 let DATA = FALLBACK_DATA;
 let events = [];
-// Series that carry at least one session-tier event, recomputed on every hydrate. Drives
-// the chip's 3rd state: a series WITH sessions cycles off -> races -> +sessions -> off; a
-// series with none is a plain 2-state toggle (off -> races -> off).
-let SERIES_WITH_SESSIONS = new Set();
+// Series that carry at least one PRACTICE-tier event, recomputed on every hydrate. Drives
+// the chip's 3rd state: a series WITH practice cycles off -> races -> +practice -> off; a
+// series with none is a plain 2-state toggle (off -> races -> off). Qualifying does NOT
+// count here — it's always shown, so it never needs the opt-in 3rd state.
+let SERIES_WITH_PRACTICE = new Set();
 // Series filter is a tri-state map: seriesName -> 'race' | 'all'. Absent = off. Persisted
 // as an array of [name,tier] pairs. Legacy format (bare array of names) migrates to 'all'
 // so an existing user keeps seeing everything they saw before tiers existed.
@@ -68,7 +72,7 @@ function saveSeriesState() {
   localStorage.setItem('ontrack_series', JSON.stringify(Array.from(state.series)));
 }
 const state = {
-  tz: localStorage.getItem('ontrack_tz') || 'ET',
+  tz: localStorage.getItem('ontrack_tz') || 'local',
   theme: localStorage.getItem('ontrack_theme') || 'rb',
   series: loadSeriesState(),
   plats: new Set(JSON.parse(localStorage.getItem('ontrack_plats') || '[]')),
@@ -109,7 +113,7 @@ function hydrate() {
     const s = new Date(e.start), en = new Date(e.end);
     return Object.assign({}, e, { _i: i, _tbd: false, _s: s, _e: en });
   }).filter(e => !isNaN(e._s.getTime())).sort((a, b) => a._s - b._s);
-  SERIES_WITH_SESSIONS = new Set(events.filter(e => tierOf(e) === 'session').map(e => e.series));
+  SERIES_WITH_PRACTICE = new Set(events.filter(e => tierOf(e) === 'practice').map(e => e.series));
 }
 function stateOf(e, now) {
   // TBD events have no start time, so they can never be "live" and are never a
@@ -180,13 +184,13 @@ function buildChips() {
   const seriesInData = Array.from(new Set(events.map(e => e.series)));
   $('#seriesChips').innerHTML = seriesInData.map(s => {
     const tier = state.series.get(s) || 'off';
-    const hasSess = SERIES_WITH_SESSIONS.has(s);
+    const hasPrac = SERIES_WITH_PRACTICE.has(s);
     const lb = (SERIES[s]||{}).label||s;
-    const aria = lb + (tier === 'race' ? ' — races only' : tier === 'all' ? ' — races plus practice and qualifying' : ' — off');
-    return '<button class="chip" data-series="' + esc(s) + '" data-tier="' + tier + '" data-hassess="' + hasSess + '" aria-pressed="' + (tier !== 'off') + '" aria-label="' + esc(aria) + '" style="--cc:' + seriesColor(s) + '">' +
+    const aria = lb + (tier === 'race' ? ' — races and qualifying' : tier === 'all' ? ' — races, qualifying, and practice' : ' — off');
+    return '<button class="chip" data-series="' + esc(s) + '" data-tier="' + tier + '" data-hasprac="' + hasPrac + '" aria-pressed="' + (tier !== 'off') + '" aria-label="' + esc(aria) + '" style="--cc:' + seriesColor(s) + '">' +
       '<span class="swatch"></span>' +
       '<span class="chip-lb">' + esc(lb) + '</span>' +
-      (hasSess ? '<span class="tier-pip" aria-hidden="true">+P</span>' : '') +
+      (hasPrac ? '<span class="tier-pip" aria-hidden="true">+P</span>' : '') +
     '</button>';
   }).join('');
   const platsInData = Array.from(new Set(events.reduce((a, e) => a.concat(e.platforms), []))).sort();
@@ -238,18 +242,18 @@ function sectionInit() {
     setSection(sec, open, false);
   });
 }
-// Tier-aware filter. When NOT searching: no series selected -> show race-tier only
-// (practice/quali hidden globally); a series selected -> show it, and include its sessions
-// only when it's on the 'all' tier. When searching: tier hiding is lifted so a query like
-// "practice" or "qualifying" can find those sessions (series membership still respected).
+// Tier-aware filter. Default (no series selected) shows EVERYTHING — races, qualifying, and
+// practice — then the user narrows. Once a series is selected, practice for that series is
+// gated behind its 'all' tier (2nd click); races + qualifying always show for a selected
+// series. Qualifying is NEVER hidden. When searching, tier gating is lifted so a query like
+// 'practice' or 'qualifying' can find those sessions (series membership still respected).
 function passesFilter(e) {
   const searching = !!state.q;
+  const t = tierOf(e);
   if (!searching) {
     if (state.series.size) {
       if (!state.series.has(e.series)) return false;
-      if (state.series.get(e.series) !== 'all' && tierOf(e) === 'session') return false;
-    } else if (tierOf(e) === 'session') {
-      return false;
+      if (t === 'practice' && state.series.get(e.series) !== 'all') return false;
     }
   } else if (state.series.size && !state.series.has(e.series)) {
     return false;
@@ -324,15 +328,15 @@ function renderSchedule() {
       ? '<div class="evt-empty"><span class="em-flag">🏁</span>No events scheduled for this day.</div>'
       : evs.map(e => {
           const st = stateOf(e, now);
-          const isSession = tierOf(e) === 'session';
-          return '<div class="evt ' + (st==='live'?'is-live':'') + ' ' + (st==='past'?'is-past':'') + (isSession?' is-session':'') + '" style="--sc:' + seriesColor(e.series) + '">' +
+          const t = tierOf(e);
+          return '<div class="evt ' + (st==='live'?'is-live':'') + ' ' + (st==='past'?'is-past':'') + (t==='practice'?' is-practice':'') + (t==='quali'?' is-quali':'') + '" style="--sc:' + seriesColor(e.series) + '">' +
             '<div class="evt-time">' + (e._tbd
               ? '<span class="tbd" style="color:var(--text-3);font-weight:700;letter-spacing:0.02em">TBD</span>'
               : fmtTime(e._s) + '<span class="end">' + fmtTime(e._e) + '</span>') + '</div>' +
             '<div class="evt-bar"></div>' +
             '<div class="evt-main">' +
               '<span class="evt-series">' + esc((SERIES[e.series]||{}).label||e.series) + '</span>' +
-              '<span class="evt-kind' + (isSession?' is-session':'') + '">' + esc(e.kind) + '</span>' +
+              '<span class="evt-kind' + (t==='practice'?' is-practice':(t==='quali'?' is-quali':'')) + '">' + esc(e.kind) + '</span>' +
               (e._tbd
                 ? '<span class="evt-kind" style="border-style:dashed;color:var(--text-3)">Time TBD</span>'
                 : (st==='live' ? '<span class="livepill"><span class="dot-live" style="background:var(--live-ink)"></span>Live</span>' : '')) +

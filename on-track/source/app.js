@@ -8,16 +8,17 @@ function toggleSet(set, val, key, el) {
   renderSchedule();
 }
 // Series chip tri-state cycle (per series, not global):
-//   off -> 'race' (races only) -> 'all' (+ practice/qualifying) -> off
-// A series with NO session-tier events in the feed skips the middle state and behaves as a
-// plain 2-state toggle (off -> race -> off), so the 3rd click never lands on an identical
-// view. Hero is re-rendered too, so 'on now / up next' respects the new tier immediately.
+//   off -> 'race' (races + qualifying) -> 'all' (+ practice) -> off
+// Qualifying always shows on a selected series (it's never gated); only PRACTICE is the
+// opt-in 3rd state. A series with NO practice-tier events skips the middle state and
+// behaves as a plain 2-state toggle (off -> race -> off), so the 3rd click never lands on
+// an identical view. Hero is re-rendered too, so 'on now / up next' respects the new tier.
 function cycleSeries(name, el) {
   const cur = state.series.get(name);
-  const hasSess = SERIES_WITH_SESSIONS.has(name);
+  const hasPrac = SERIES_WITH_PRACTICE.has(name);
   let next;
   if (!cur) next = 'race';
-  else if (cur === 'race') next = hasSess ? 'all' : null;
+  else if (cur === 'race') next = hasPrac ? 'all' : null;
   else next = null;
   if (next) state.series.set(name, next); else state.series.delete(name);
   saveSeriesState();
@@ -25,21 +26,22 @@ function cycleSeries(name, el) {
   const lb = (SERIES[name] || {}).label || name;
   el.setAttribute('data-tier', tier);
   el.setAttribute('aria-pressed', String(tier !== 'off'));
-  el.setAttribute('aria-label', lb + (tier === 'race' ? ' — races only' : tier === 'all' ? ' — races plus practice and qualifying' : ' — off'));
+  el.setAttribute('aria-label', lb + (tier === 'race' ? ' — races and qualifying' : tier === 'all' ? ' — races, qualifying, and practice' : ' — off'));
   updateFilterCounts();
   renderSchedule();
   renderHero();
 }
-// One-time discoverability line above the series chips: without it, nobody guesses a 2nd
-// click reveals practice/qualifying. Injected once (guarded by id) so buildChips() rebuilds
-// never duplicate or clobber it.
+// One-time discoverability line above the series chips. The default view already shows
+// everything (races + qualifying + practice), so this explains how to NARROW: tapping a
+// series filters to it (races + qualifying), a 2nd tap adds its practice (+P), a 3rd clears
+// it. Injected once (guarded by id) so buildChips() rebuilds never duplicate or clobber it.
 function addSeriesHint() {
   const chips = document.getElementById('seriesChips');
   if (!chips || document.getElementById('seriesHint')) return;
   const hint = document.createElement('p');
   hint.id = 'seriesHint';
   hint.className = 'series-hint';
-  hint.innerHTML = 'Tap a series: <b>1×</b> races · <b>2×</b> add practice / qualifying <span class="pip-inline">+P</span> · <b>3×</b> off';
+  hint.innerHTML = 'Showing everything by default. Tap a series to narrow: <b>1×</b> races + qualifying · <b>2×</b> add practice <span class="pip-inline">+P</span> · <b>3×</b> off';
   chips.insertAdjacentElement('beforebegin', hint);
 }
 // Per-dropdown master action: ONE button lives inside EACH filter section, scoped to
@@ -63,7 +65,7 @@ function addFilterBtn(chipsId, setKey, btnId) {
       set.clear();
       localStorage.removeItem(setKey === 'series' ? 'ontrack_series' : 'ontrack_plats');
     } else if (setKey === 'series') {
-      // Select-all lands every series on 'races only'; pull in sessions per series after.
+      // Select-all lands every series on 'races only'; pull in practice per series after.
       events.forEach(e => state.series.set(e.series, 'race'));
       saveSeriesState();
     } else {

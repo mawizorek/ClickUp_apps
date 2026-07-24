@@ -1,5 +1,5 @@
 {
-  "version": "2026-07-23b",
+  "version": "2026-07-23c",
   "events": [
     {
       "series": "NASCAR",
@@ -15,7 +15,7 @@
     {
       "series": "F1",
       "kind": "FP1",
-      "tier": "session",
+      "tier": "practice",
       "title": "Hungarian Grand Prix",
       "detail": "Hungaroring",
       "start": "2026-07-24T07:30:00-04:00",
@@ -27,7 +27,7 @@
     {
       "series": "F1",
       "kind": "FP2",
-      "tier": "session",
+      "tier": "practice",
       "title": "Hungarian Grand Prix",
       "detail": "Hungaroring",
       "start": "2026-07-24T11:00:00-04:00",
@@ -50,7 +50,7 @@
     {
       "series": "F1",
       "kind": "FP3",
-      "tier": "session",
+      "tier": "practice",
       "title": "Hungarian Grand Prix",
       "detail": "Hungaroring",
       "start": "2026-07-25T06:30:00-04:00",
@@ -73,7 +73,7 @@
     {
       "series": "F1",
       "kind": "Qualifying",
-      "tier": "session",
+      "tier": "quali",
       "title": "Hungarian Grand Prix",
       "detail": "Hungaroring",
       "start": "2026-07-25T10:00:00-04:00",
@@ -229,7 +229,7 @@
     {
       "series": "IMSA",
       "kind": "Qualifying",
-      "tier": "session",
+      "tier": "quali",
       "title": "Motul SportsCar Endurance Grand Prix",
       "detail": "Road America",
       "start": "2026-08-01T17:35:00-04:00",
@@ -273,6 +273,54 @@
     },
     {
       "series": "MotoGP",
+      "kind": "FP1",
+      "tier": "practice",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-07T06:45:00-04:00",
+      "end": "2026-08-07T07:30:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Practice",
+      "tier": "practice",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-07T11:00:00-04:00",
+      "end": "2026-08-07T12:00:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "FP2",
+      "tier": "practice",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-08T06:10:00-04:00",
+      "end": "2026-08-08T06:40:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-08T06:50:00-04:00",
+      "end": "2026-08-08T07:30:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
       "kind": "Sprint",
       "title": "British Grand Prix",
       "detail": "Silverstone",
@@ -291,6 +339,18 @@
       "end": "2026-08-08T20:00:00-04:00",
       "platforms": [
         "The CW"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Warm Up",
+      "tier": "practice",
+      "title": "British Grand Prix",
+      "detail": "Silverstone",
+      "start": "2026-08-09T04:40:00-04:00",
+      "end": "2026-08-09T04:50:00-04:00",
+      "platforms": [
+        "Stream"
       ]
     },
     {
@@ -373,7 +433,7 @@
     {
       "series": "F1",
       "kind": "Qualifying",
-      "tier": "session",
+      "tier": "quali",
       "title": "Dutch Grand Prix",
       "detail": "Zandvoort",
       "start": "2026-08-22T09:00:00-04:00",
