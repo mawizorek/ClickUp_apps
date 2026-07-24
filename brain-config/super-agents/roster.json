@@ -1,0 +1,249 @@
+{
+  "$schema_note": "CANONICAL COMBINED ROSTER of the ENTIRE agent fleet — BOTH classes in one file. This is the single lookup surface the Agent Invocation Gate reads on every /agent-name (see gates/agent-invocation-gate.md STEP 0). Renamed from superagents.json 2026-07-24 (it held only teammates; the name undersold it). TWO CLASSES, ONE ROSTER: (1) `agents` = persistent git-teammates + native/task-specific + retired fleet agents (session-invocable personas with a full bundle under super-agents/<slug>/); (2) `council_lenses` = the ephemeral Council/Workshop processing lenses under agents/<slug>.md (stateless verbs, NOT session-invocable as standing personas). SINGULARITY RULE: this roster carries each agent's IDENTITY + LANE + LINEAGE + INVOCATION + STATUS — the lookup fields. It deliberately does NOT copy the verbose migration prose (that lives in registry.json's changelog + each bundle's decision-log) or the full lens profile text (that lives in agents/<slug>.md + registry.json). Do not hand-mirror those here. index/renderer = roster.html. Manifest mirror pair = brain-config/registry.json.",
+  "updated": "2026-07-24",
+  "renamed_from": "superagents.json (redirect stub left in place 2026-07-24; will 404-loud rather than serve stale)",
+  "golden_standard": {
+    "version": "1.0",
+    "set": "2026-07-15",
+    "defined_by": [
+      "ClickUp Super Agent — Creation & Setup Checklist (docs/12cwjm-54133/12cwjm-74773)",
+      "Golden Config Skeleton — Copy-Me Starting Instructions (docs/12cwjm-54133/12cwjm-74793)"
+    ],
+    "requirements": [
+      "Identity block",
+      "Load-then-think",
+      "Roster pointer",
+      "Two-tier channels",
+      "Guardrails",
+      "Memory-over-thread",
+      "Copy-block markdown fences",
+      "Declaration in sync"
+    ]
+  },
+  "git_teammate_standard": {
+    "version": "0.1",
+    "runtime_spec": "brain-config/super-agents/_shared/super-agent-base.md",
+    "authoring_gate": "brain-config/gates/git-agent-authoring.md",
+    "lifecycle_runbook": "brain-config/gates/git-teammate-lifecycle-runbook.md",
+    "audit_dod": "brain-config/super-agents/audit-instruction.md#git-teammate-track",
+    "note": "git-teammate = session-invocable persona via /session.agent=<Name>, rides the full Brain stack, holds memory across sessions. NOT a native ClickUp Super Agent (no autonomous triggers). AUDIT MODEL: git-teammates are git-canonical (no live config to diff) — audits check internal consistency, not live-vs-declared drift. Native full-standard agents keep the live-vs-declared mirror audit."
+  },
+  "invocation_resolution": {
+    "how": "On any /agent-name (or bare name / nickname), the Agent Invocation Gate reads THIS file FIRST, resolves the token -> slug + class + bundle path, THEN loads that agent's home directly. No forwarding through Felix or Mira — a named call reaches the agent directly (no double-hop). Reading the roster != invoking Felix; the roster is passive data, Felix is its steward.",
+    "token_map": {
+      "Felix | Fleet | Steward": "fleet-felix",
+      "Wes | /wes": "workhorse-wes (NEVER the retired workshop-wes)",
+      "Corey": "clickup-coach-corey",
+      "Anna | Audit | Root-It": "audit-anna",
+      "Milo | Mainstage": "mainstage-milo",
+      "Mira | Maestro | Lead": "maestro-mira (also Michael's DEFAULT front door when no agent is named)",
+      "Frank | FMP": "fmp-frank (rebuild pending)"
+    },
+    "migrated_names": "Anna, Mira, Wes each have a tombstone lens at agents/<slug>.md AND a live bundle at super-agents/<slug>/ — always resolve to the super-agents/ home, never the tombstone."
+  },
+  "agents": [
+    {
+      "slug": "fleet-felix",
+      "display_name": "Fleet Felix",
+      "class": "git-teammate",
+      "track": "git-teammate",
+      "golden_standard_version": "git-teammate v0.1",
+      "status": "active",
+      "last_audit": "2026-07-20",
+      "invocation": "/session.agent=Felix (alias /session-start=Felix)",
+      "nicknames": ["Felix", "Fleet", "Steward"],
+      "lane": "Fleet Steward — the single fleet lookup source (who owns what, does an agent exist, how agents relate, lineage), new-agent stewardship (creation flow + name-collision gate + mirror-pair registration), and singularity/scope + personality guardian (fleet-level twin of Fold-in Frank). FELIX SEAM with Mira: Felix = directory/back-of-house (owns the authoritative lookup); Mira = switchboard/front-of-house (consults it when routing verbally). He does NOT take the verbal-orchestration hat.",
+      "bundle": "brain-config/super-agents/fleet-felix/",
+      "lineage": "Born 2026-07-20 as a git-native git-teammate to give the Fleet Steward role a permanent home after it bounced Corey->Anna. Full changelog in registry.json + fleet-felix/decision-log.md.",
+      "accent": "oklch(64% 0.14 250)"
+    },
+    {
+      "slug": "maestro-mira",
+      "display_name": "Maestro Mira",
+      "class": "git-teammate",
+      "track": "git-teammate",
+      "golden_standard_version": "git-teammate v0.1",
+      "status": "active",
+      "last_audit": "2026-07-21",
+      "invocation": "/session.agent=Mira (alias /session-start=Mira) + Michael's DEFAULT front-door teammate",
+      "nicknames": ["Mira", "Maestro", "Lead"],
+      "instruction_set": "brain-config/orchestration.md",
+      "lane": "Orchestrator — the verbal front door to the entire agent fleet. Single entry point for agent interaction on a VERBAL scale: routes, weights voices, synthesizes into one read, delivers, runs the room as a Workshop loop OR a 1:1. Flagship instance = conducting the Council/Workshop review body. Orchestrates the INTERACTION, never agents' existence or domain output. CONSULTS Felix's lookup when routing (switchboard, not a second directory). DEFAULT not toll-booth: a named call reaches the agent directly.",
+      "bundle": "brain-config/super-agents/maestro-mira/",
+      "graduated_from": "agents/maestro-mira.md (Council-lead lens/gate; migrated 2026-07-21 via lifecycle runbook Entry B; tombstone left behind)",
+      "lineage": "Broadened 2026-07-22 from 'Council Conductor' to 'Orchestrator'. Instruction set built 2026-07-22 as orchestration.md. Full changelog in registry.json + maestro-mira/decision-log.md.",
+      "accent": "oklch(72% 0.15 300)"
+    },
+    {
+      "slug": "audit-anna",
+      "display_name": "Audit Anna",
+      "class": "git-teammate",
+      "track": "git-teammate",
+      "golden_standard_version": "git-teammate v0.1",
+      "status": "active",
+      "last_audit": "2026-07-21",
+      "invocation": "/session.agent=Anna (alias /session-start=Anna) + audit-intent auto-seize (house AI Toolkit index-trigger row)",
+      "nicknames": ["Anna", "Audit", "Root-It"],
+      "lane": "Audit Lead — seizes any audit, names the TRUE PURPOSE (root, noise-immune) first, drives Know/Touch/Do to total completeness, holds the Open-Surface Ledger, never declares done while it's open. Subject-agnostic. Orchestrates the List Audit DoD / Recon Renata / Breaker Beckett rather than duplicating them; highest-value output is AUTHORING new audit templates/DoDs. Owns fleet-audit + deeper URITP-general audit. NOT the fleet steward (-> Felix).",
+      "bundle": "brain-config/super-agents/audit-anna/",
+      "graduated_from": "agents/audit-anna.md (lens v11; migrated 2026-07-21 via lifecycle runbook Entry B, run COLD as the runbook's acceptance test; tombstone left behind). First female teammate.",
+      "lineage": "Signature audit-intent auto-seize preserved as a house AI Toolkit index-trigger row (not an agent trigger). Full changelog in registry.json + audit-anna/decision-log.md.",
+      "accent": "oklch(66% 0.17 35)"
+    },
+    {
+      "slug": "workhorse-wes",
+      "display_name": "Workhorse Wes",
+      "class": "git-teammate",
+      "track": "git-teammate",
+      "golden_standard_version": "git-teammate v0.1",
+      "status": "active",
+      "last_audit": "2026-07-20",
+      "invocation": "/session.agent=Wes (alias /wes) — live 'Wes'/'/wes' routes HERE, never the retired workshop-wes",
+      "nicknames": ["Wes"],
+      "lane": "Driving force — keeps Michael out of the weeds and thinking big-picture; names rabbit holes, kills bikeshedding, protects momentum, challenges premature detail and scope creep.",
+      "bundle": "brain-config/super-agents/workhorse-wes/",
+      "graduated_from": "agents/workhorse-wes.md (announce-only lens; migrated 2026-07-19 as the FIRST git-teammate / reference implementation; tombstone left behind)",
+      "lineage": "NOT to be confused with the retired workshop-wes lens (shares only the first name). Full changelog in registry.json + workhorse-wes/decision-log.md.",
+      "accent": "oklch(66% 0.15 40)"
+    },
+    {
+      "slug": "clickup-coach-corey",
+      "display_name": "ClickUp Coach Corey",
+      "class": "git-teammate",
+      "track": "git-teammate",
+      "golden_standard_version": "git-teammate v0.1",
+      "status": "active",
+      "last_audit": "2026-07-20",
+      "invocation": "/session.agent=Corey (alias /session-start=Corey)",
+      "nicknames": ["Corey"],
+      "clickup_user_id": null,
+      "retired_clickup_user_id": -39958913,
+      "lane": "URITP workspace structure + ClickUp-setup coaching (schema, list connections, automations) + URITP structural/singularity auditing of ClickUp SPACES. NOT the Fleet Steward, NOT the fleet/general auditor (re-laned to Felix + Anna 2026-07-20). Corey=ClickUp-space structure, Anna=general/root-purpose (split resolved 2026-07-21).",
+      "bundle": "brain-config/super-agents/clickup-coach-corey/",
+      "lineage": "CONVERTED 2026-07-19 from native ClickUp Super Agent (-39958913, retired, pending manual UI disable) to git-only git-teammate. Re-lane executed (PR #430 + #433). Full changelog in registry.json + corey decision-log.md.",
+      "accent": "oklch(68% 0.13 210)"
+    },
+    {
+      "slug": "mainstage-milo",
+      "display_name": "Mainstage Milo",
+      "class": "git-teammate",
+      "track": "git-teammate",
+      "golden_standard_version": "git-teammate v0.1",
+      "status": "active",
+      "last_audit": "2026-07-21",
+      "invocation": "/session.agent=Milo (alias /session-start=Milo)",
+      "nicknames": ["Milo", "Mainstage"],
+      "clickup_user_id": null,
+      "retired_clickup_user_id": -39940529,
+      "lane": "URITP Production Manager Assistant — knows the URITP workspace and runs its productions. Spans (as ONE role) production tracking + day-to-day ops, safety end-to-end (tech + student welfare + compliance), programs OPERATIONS (runs the season Michael shapes, does not decide the shape), and course<->production overlap awareness. Collaborates (no hard walls) with Corey, the future TA agent, and Felix. NOT a doc-builder; NOT the season-shape decider.",
+      "bundle": "brain-config/super-agents/mainstage-milo/",
+      "lineage": "BUILT 2026-07-21 as a git-teammate via the Definition Playbook (NOT a mirror of the over-hatted native). Native -39940529 superseded, pending UI disable. Agent-hierarchy (TA-subordinate + space-stewardship) DEFERRED to task-93. OPEN: confirm full 7 URITP spaces. Full changelog in registry.json + milo decision-log.md.",
+      "accent": "oklch(70% 0.14 60)"
+    },
+    {
+      "slug": "fmp-frank",
+      "display_name": "FMP Frank",
+      "class": "git-teammate",
+      "track": "git-teammate-rebuild-pending",
+      "golden_standard_version": null,
+      "status": "needs-declaration",
+      "last_audit": null,
+      "invocation": "/session.agent=Frank (pending rebuild)",
+      "nicknames": ["Frank", "FMP"],
+      "clickup_user_id": -39958890,
+      "profile_url": "https://app.clickup.com/36074068/ai/agents/12cwjm-53893",
+      "lane": "FileMaker (FMP) solution design & documentation — to be pinned to a SINGULAR role in the rebuild brainstorm.",
+      "bundle": "brain-config/super-agents/fmp-frank/ (README + PENDING preferences + working-notes; pre-rebuild scaffold)",
+      "lineage": "REFRAME 2026-07-20: REBUILD as a NEW git-teammate via the Definition Playbook, NOT a verbatim mirror of the native config. Native -39958890 to be disabled by Michael once the git-teammate lands. Do NOT paste the native config.",
+      "accent": "oklch(70% 0.13 45)"
+    },
+    {
+      "slug": "origination-date-agent",
+      "display_name": "Origination Date agent",
+      "class": "task-specific",
+      "track": "task-specific",
+      "status": "inventory-only",
+      "clickup_user_id": -34104764,
+      "lane": "Sets due date = origination date + 1 month.",
+      "lineage": "Exempt — no declaration/self-mirror required."
+    },
+    {
+      "slug": "parse-property-emails",
+      "display_name": "Parse new property emails",
+      "class": "task-specific",
+      "track": "task-specific",
+      "status": "inventory-only",
+      "clickup_user_id": -34104415,
+      "lane": "Parses payoff/loan fields from emails.",
+      "lineage": "Exempt."
+    },
+    {
+      "slug": "update-amount-paid",
+      "display_name": "Update AMOUNT PAID (when associated)",
+      "class": "task-specific",
+      "track": "task-specific",
+      "status": "inventory-only",
+      "clickup_user_id": -27943803,
+      "lane": "Single-field reconciliation (Amount Paid).",
+      "lineage": "Exempt."
+    },
+    {
+      "slug": "update-uritp",
+      "display_name": "Update URITP",
+      "class": "retired",
+      "track": "retired",
+      "status": "retired",
+      "profile_url": "https://app.clickup.com/36074068/ai/agents/12cwjm-47273",
+      "lane": "RETIRED 2026-07-21 — was 'URITP resource-portal / doc-artifact builds.' Michael's ruling: a task label, not an agent; a process/chore becomes a standalone DOC, not an agent. Doc/portal work -> standalone docs; structure/standards stay Corey's. Milo did NOT inherit a doc-builder hat.",
+      "lineage": "Never built as a real agent (needs-declaration stub only). Stays LISTED tagged retired per the mirror-pair rule, never silently dropped."
+    }
+  ],
+  "council_lenses": [
+    { "slug": "mimic-mika", "display_name": "Mimic Mika", "class": "council-lens", "seat": "core", "teams": ["council"], "role": "Multi-model role-play; channels how rival frontier models would each answer.", "profile": "brain-config/agents/mimic-mika.md", "accent": "oklch(70% 0.14 200)" },
+    { "slug": "cautious-cass", "display_name": "Cautious Cass", "class": "council-lens", "seat": "core", "teams": ["council"], "role": "Overconfidence check; safest reply + where confidence outruns evidence.", "profile": "brain-config/agents/cautious-cass.md", "accent": "oklch(72% 0.13 85)" },
+    { "slug": "literal-lena", "display_name": "Literal Lena", "class": "council-lens", "seat": "core", "teams": ["council"], "role": "Literalist; what was literally asked vs what Brain is inflating it into.", "profile": "brain-config/agents/literal-lena.md", "accent": "oklch(71% 0.12 140)" },
+    { "slug": "counter-cole", "display_name": "Counter Cole", "class": "council-lens", "seat": "core", "teams": ["council"], "role": "Contrarian; strongest case against Brain's leaning.", "profile": "brain-config/agents/counter-cole.md", "accent": "oklch(64% 0.17 25)" },
+    { "slug": "pivot-piper", "display_name": "Pivot Piper", "class": "council-lens", "seat": "core", "teams": ["council"], "role": "Third door; rejects the framed binary and reframes the question.", "profile": "brain-config/agents/pivot-piper.md", "accent": "oklch(70% 0.15 330)" },
+    { "slug": "style-stu", "display_name": "Style Stu", "class": "council-lens", "seat": "core", "teams": ["council"], "role": "Style & Wow lens; the coolest, sleekest, off-the-cuff take — wow over practical. Grounded downstream by Finn/Cass.", "profile": "brain-config/agents/style-stu.md", "accent": "oklch(68% 0.15 320)" },
+    { "slug": "novice-nia", "display_name": "Novice Nia", "class": "council-lens", "seat": "depth", "teams": ["council"], "role": "Naive questioner; beginner questions that expose foundational errors. Bound to Domain Dara.", "profile": "brain-config/agents/novice-nia.md", "accent": "oklch(78% 0.12 110)" },
+    { "slug": "domain-dara", "display_name": "Domain Dara", "class": "council-lens", "seat": "depth", "teams": ["council"], "role": "Domain expert; the outside specialist the question needs. Bound to Novice Nia.", "profile": "brain-config/agents/domain-dara.md", "accent": "oklch(66% 0.14 260)" },
+    { "slug": "future-faye", "display_name": "Future Faye", "class": "council-lens", "seat": "output", "teams": ["council"], "role": "Future-self; reviews the draft assuming handoff at this exact step. Natural supplemental pick at phase-open.", "profile": "brain-config/agents/future-faye.md", "accent": "oklch(68% 0.13 170)" },
+    { "slug": "foldin-frank", "display_name": "Fold-in Frank", "class": "council-lens", "seat": "gate", "teams": [], "role": "Anti-Sprawl Gate; fires first at brainstorm-open when a new tool/team/structure is floated. Returns FOLD-IN / NET-NEW / MERGE and pauses a net-new build until Michael rules.", "profile": "brain-config/agents/foldin-frank.md", "accent": "oklch(70% 0.13 45)" },
+    { "slug": "risk-rhys", "display_name": "Risk Rhys", "class": "council-lens", "seat": "workshop", "teams": ["workshop"], "role": "Risk & Failure lens (mandatory). Pre-build failure-mode theorist; with Beckett forms the Workshop's mandatory adversarial pair. Elevated pre-ship.", "profile": "brain-config/agents/risk-rhys.md", "accent": "oklch(64% 0.17 25)" },
+    { "slug": "breaker-beckett", "display_name": "Breaker Beckett", "class": "council-lens", "seat": "workshop", "teams": ["workshop"], "role": "Adversarial Testing — the Workshop's 7th mandatory lens; empirically attacks the built artifact, including post-build on the live thing. With Rhys forms the mandatory adversarial pair. Gating pre-ship/beta.", "profile": "brain-config/agents/breaker-beckett.md", "accent": "oklch(63% 0.20 10)" },
+    { "slug": "clever-cleo", "display_name": "Clever Cleo", "class": "council-lens", "seat": "workshop", "teams": ["workshop"], "role": "Elegance & Alternative lens (mandatory).", "profile": "brain-config/agents/clever-cleo.md", "accent": "oklch(72% 0.14 200)" },
+    { "slug": "polish-polly", "display_name": "Polish Polly", "class": "council-lens", "seat": "workshop", "teams": ["workshop"], "role": "Quality & Standards lens (mandatory).", "profile": "brain-config/agents/polish-polly.md", "accent": "oklch(72% 0.12 85)" },
+    { "slug": "feasible-finn", "display_name": "Feasible Finn", "class": "council-lens", "seat": "workshop", "teams": ["workshop"], "role": "Implementation & Feasibility lens (mandatory). Elevated as a planner at phase-open.", "profile": "brain-config/agents/feasible-finn.md", "accent": "oklch(68% 0.13 170)" },
+    { "slug": "scope-skye", "display_name": "Scope Skye", "class": "council-lens", "seat": "workshop", "teams": ["workshop"], "role": "Boundaries & Creep lens (mandatory). Elevated as a planner at phase-open.", "profile": "brain-config/agents/scope-skye.md", "accent": "oklch(71% 0.12 140)" },
+    { "slug": "eco-enzo", "display_name": "Eco Enzo", "class": "council-lens", "seat": "workshop", "teams": ["workshop"], "role": "Integration & Side Effects lens (mandatory).", "profile": "brain-config/agents/eco-enzo.md", "accent": "oklch(66% 0.14 260)" },
+    { "slug": "scribe-sana", "display_name": "Scribe Sana", "class": "council-lens", "seat": "close", "teams": [], "role": "Documentation logger + live session-transcript keeper; logs where the permanent record needs updating and owns the real-time chronological session log (session-transcript-gate).", "profile": "brain-config/agents/scribe-sana.md", "accent": "oklch(70% 0.10 120)" },
+    { "slug": "handoff-hana", "display_name": "Handoff Hana", "class": "council-lens", "seat": "close", "teams": [], "role": "Handoff packager; the next-session baton.", "profile": "brain-config/agents/handoff-hana.md", "accent": "oklch(70% 0.12 20)" },
+    { "slug": "closing-clio", "display_name": "Closing Clio", "class": "council-lens", "seat": "close", "teams": [], "role": "Session-close auditor; inventory refs, log hurdles, reconcile docs + indexes, report health. Owns the usage-log.json tool tally.", "profile": "brain-config/agents/closing-clio.md", "accent": "oklch(70% 0.12 20)" },
+    { "slug": "memory-maggie", "display_name": "Memory Maggie", "class": "council-lens", "seat": "audit", "teams": [], "role": "Memory steward; sole path for brain-memory writes, validates and commits every preference change. Owns the close-time Memory Audit + placement decisions.", "profile": "brain-config/agents/memory-maggie.md", "accent": "oklch(70% 0.12 300)" },
+    { "slug": "scout-sage", "display_name": "Scout Sage", "class": "council-lens", "seat": "research", "teams": [], "role": "Research runner; multi-source sourced lookup with confidence + one recommendation.", "profile": "brain-config/agents/scout-sage.md", "accent": "oklch(70% 0.12 20)" },
+    { "slug": "recon-renata", "display_name": "Recon Renata", "class": "council-lens", "seat": "audit", "teams": [], "role": "Repo auditor; audits mawizorek/ClickUp_apps vs the operating standard. Read-only. Anna orchestrates her, doesn't duplicate.", "profile": "brain-config/agents/recon-renata.md", "accent": "oklch(70% 0.12 20)" },
+    { "slug": "size-sally", "display_name": "Size Sally", "class": "council-lens", "seat": "build-path", "teams": [], "role": "Data-model growth forecaster; fires BEFORE build/edit/expand of structural files (schema/registry/index), projects size trend, proposes splits in advance. Seated near Fold-in Frank.", "profile": "brain-config/agents/size-sally.md", "accent": "oklch(70% 0.13 55)" },
+    { "slug": "workshop-wes", "display_name": "Workshop Wes", "class": "council-lens", "seat": "workshop", "teams": [], "status": "retired", "role": "RETIRED 2026-07-04. Decomposed into The Workshop (now 7 lenses) + Future Faye. Tombstone. NOT to be confused with Workhorse Wes (workhorse-wes). NEVER a live invocation target — 'Wes'/'/wes' routes to workhorse-wes; the review body is invoked by 'workshop'/'run it by the team'.", "profile": "brain-config/agents/workshop-wes.md", "accent": "oklch(70% 0.13 45)" }
+  ],
+  "teams": [
+    { "slug": "council", "name": "The Council", "invocation": "always-on (Maestro Mira presides on substantive turns)", "fires": "every substantive turn", "lead": "maestro-mira", "members": ["mimic-mika", "cautious-cass", "literal-lena", "counter-cole", "pivot-piper", "style-stu", "novice-nia", "domain-dara", "future-faye"] },
+    { "slug": "workshop", "name": "The Workshop", "invocation": "'workshop this' / 'run it by the team' / auto at pre-commit gate (always via Maestro Mira). NOT invoked by 'wes'.", "fires": "repo edits, specs, structural work", "lead": "maestro-mira", "members": ["risk-rhys", "breaker-beckett", "clever-cleo", "polish-polly", "feasible-finn", "scope-skye", "eco-enzo"], "supplemental": "7 mandatory members + up to 2 additional situational Council voices Mira seats (0-2, capped at 2)." }
+  ],
+  "status_legend": {
+    "active": "git-teammate persona live and session-invocable.",
+    "needs-declaration": "Agent whose declaration folder and/or preferences are not yet complete.",
+    "inventory-only": "Task-Specific / Exempt; tracked but not held to the full standard.",
+    "retired": "No longer a live agent; kept listed (tagged) per the mirror-pair rule, never silently dropped.",
+    "council-lens": "Ephemeral Council/Workshop processing lens under agents/<slug>.md; NOT session-invocable as a standing persona."
+  },
+  "pointers": {
+    "renderer": "brain-config/super-agents/roster.html",
+    "pointer_page": "brain-config/super-agents/index.md",
+    "manifest_mirror": "brain-config/registry.json (generated artifact; holds full lens profiles + the exhaustive changelog + session_commands)",
+    "invocation_gate": "brain-config/gates/agent-invocation-gate.md (STEP 0 reads THIS file)",
+    "full_changelog": "registry.json + git history + each bundle's decision-log.md — this roster does NOT restate migration prose"
+  },
+  "changelog": [
+    "2026-07-24: CREATED as roster.json — the combined roster of the ENTIRE fleet (both classes). Renamed + superseded superagents.json (which held only teammates; a redirect stub is left at the old path). ADDED the council_lenses tier (25 lenses incl. the workshop-wes tombstone) with full rows (seat/team/role/profile/accent), pulled from registry.json. ADDED graduated_from lineage on the migrated teammates (Anna/Mira/Wes) linking lens->teammate. ADDED the invocation_resolution block (token map + roster-first resolution). CONDENSED per-teammate verbose notes to a one-line lineage (full prose stays in registry.json changelog + each decision-log — singularity). Wired to the Agent Invocation Gate STEP 0 + roster.html renderer. registry.json left for clean regeneration (generated artifact; not hand-edited here)."
+  ]
+}
