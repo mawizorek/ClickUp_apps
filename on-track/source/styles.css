@@ -272,9 +272,9 @@ body {
 @media (hover: hover) { .chip:hover { border-color: var(--cc, var(--accent)); } }
 .chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .chip.plat[aria-pressed="true"] { background: var(--surface-3); border-color: var(--accent); }
-/* Tier pip: the '+P' affordance on series that carry practice/qualifying. Faint at rest
-   (sessions available), lit + series-colored when the chip is on its 'all' tier (sessions
-   showing). This is what makes the 3rd state discoverable rather than hidden. */
+/* Tier pip: the '+P' affordance on series that carry practice. Faint at rest (practice
+   available), lit + series-colored when the chip is on its 'all' tier (practice showing).
+   This is what makes the 3rd state discoverable rather than hidden. */
 .chip .tier-pip {
   font-family: 'Archivo', sans-serif; font-size: 0.56rem; font-weight: 800;
   letter-spacing: 0.04em; line-height: 1; padding: 2px 5px; border-radius: 5px;
@@ -362,13 +362,21 @@ body {
 .evt:hover { background: var(--surface-1); }
 .evt.is-live { background: color-mix(in oklch, var(--live) 10%, transparent); }
 .evt.is-past { opacity: 0.5; }
-/* Session-tier rows (practice/qualifying) sit a touch quieter than race rows so the race
-   itself stays the headline even when sessions are pulled in. */
-.evt.is-session .evt-title { font-weight: 500; color: var(--text-2); }
-.evt-kind.is-session {
+/* Practice rows sit a touch quieter than races so the race stays the headline even when
+   practice is pulled in on a series' 'all' tier. */
+.evt.is-practice .evt-title { font-weight: 500; color: var(--text-2); }
+.evt-kind.is-practice {
   border-style: dashed;
   color: var(--sc, var(--text-3));
   border-color: color-mix(in oklch, var(--sc, var(--border)) 45%, var(--border-soft));
+}
+/* Qualifying is its own always-shown category: full-strength row (as important as a race),
+   with an accent-tinted solid kind-chip so it reads distinctly from a plain race and from
+   the muted, dashed practice chip. */
+.evt-kind.is-quali {
+  color: var(--sc, var(--accent)); font-weight: 800;
+  border-color: color-mix(in oklch, var(--sc, var(--accent)) 55%, var(--border));
+  background: color-mix(in oklch, var(--sc, var(--accent)) 12%, transparent);
 }
 .evt-empty {
   color: var(--text-3); font-size: 0.88rem; padding: 14px 6px; font-style: italic;
