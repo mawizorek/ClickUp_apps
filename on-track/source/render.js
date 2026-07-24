@@ -1,8 +1,13 @@
 // On Track — engine: constants, data model, date/format helpers, and all render/paint logic.
 // Loaded before app.js. Classic script (shared global scope with app.js).
-const APP_VERSION = 'v2.2';
-const APP_DATE = '2026-07-23';
+const APP_VERSION = 'v2.3';
+const APP_DATE = '2026-07-24';
 const APP_SLUG = 'on-track';
+// Composed 4-vector theme (shared/themes/_themes.json): red-bull color × racing-archivo
+// typography × soft forms × standard spacing. The chrome (bg/surface/border/text/accent,
+// fonts, radii) flows from the spine; the 20 --s-* series colors below are a LOCAL data
+// layer that rides on top of whatever theme/mode is active (see styles.css).
+const APP_THEME = 'on-track';
 const SERIES = {
   'F1':          { label: 'Formula 1',       color: 'var(--s-f1)' },
   'F2':          { label: 'Formula 2',       color: 'var(--s-f2)' },
@@ -71,9 +76,18 @@ function loadSeriesState() {
 function saveSeriesState() {
   localStorage.setItem('ontrack_series', JSON.stringify(Array.from(state.series)));
 }
+// Light/dark is now the spine's MODE (red-bull ships both ramps). state.mode is On Track's
+// own intent key ('dark'|'light'); it migrates the legacy 'ontrack_theme' (rb|light) once.
+function loadMode() {
+  const m = localStorage.getItem('ontrack_mode');
+  if (m === 'dark' || m === 'light') return m;
+  const legacy = localStorage.getItem('ontrack_theme');
+  if (legacy === 'light') return 'light';
+  return 'dark';
+}
 const state = {
   tz: localStorage.getItem('ontrack_tz') || 'local',
-  theme: localStorage.getItem('ontrack_theme') || 'rb',
+  mode: loadMode(),
   series: loadSeriesState(),
   plats: new Set(JSON.parse(localStorage.getItem('ontrack_plats') || '[]')),
   showPast: false,
@@ -378,9 +392,13 @@ function tick() {
     renderHero();
   }
 }
-function applyTheme() {
-  document.documentElement.setAttribute('data-theme', state.theme);
-  $('#themeBtn').textContent = state.theme === 'rb' ? '◑' : '◐';
+// Light/dark now flows through the theme spine: setMode flips red-bull between its dark
+// ramp and its authored light (alt-*) ramp. We keep data-mode on <html> in sync for the
+// early-paint script + the toggle glyph, and repoint the mobile browser chrome color.
+function applyMode() {
+  if (window.THEMES && THEMES.setMode) { try { THEMES.setMode(state.mode); } catch (e) {} }
+  document.documentElement.setAttribute('data-mode', state.mode);
+  const btn = $('#themeBtn'); if (btn) btn.textContent = state.mode === 'dark' ? '◑' : '◐';
   const meta = document.querySelector('meta[name=theme-color]');
-  if (meta) meta.setAttribute('content', state.theme === 'rb' ? '#141d3b' : '#f2f3f7');
+  if (meta) meta.setAttribute('content', state.mode === 'dark' ? '#1e2138' : '#f5f6fa');
 }
