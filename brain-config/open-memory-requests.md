@@ -46,6 +46,12 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 - Requester's guess (non-binding): brain memory (Tone & Style / Corrections — must-fire behavioral suppression rule that applies to every response), but deny-by-default; placement is Maggie's call.
 - Context / why: Michael flagged weak context-awareness after Brain twice offered a "clean stopping point, it's ~4am" wind-down; he's on overnights and the hour is irrelevant to the work.
 
+### OMR-20260724-1 · OPEN
+- Requested by: Brain (Opus 4.8)
+- Candidate note: REPO BOOTSTRAP COORDINATE — brain-config lives at `mawizorek/ClickUp_apps` (PUBLIC repo); read file bodies via the raw path `https://raw.githubusercontent.com/mawizorek/ClickUp_apps/main/<path>` (`githubmcp_get_file_contents` returns metadata/SHA + directory listings only, never the body). `maw-agents` is a COLLABORATOR on this repo, NOT the owner — the GitHub MCP token authenticates AS `maw-agents`, which owns only a bare `references` stub, so any owner-scoped search (`user:maw-agents`) will NOT surface brain-config; always address the repo as `mawizorek/ClickUp_apps` and never cold-guess the owner. Two agent trees: lenses in `brain-config/agents/<slug>.md`, git-teammates in `brain-config/super-agents/<slug>/` — check both before concluding an agent doesn't exist. Established by Michael 2026-07-23.
+- Requester's guess (non-binding): brain memory — the load-then-think line already points at the AI Toolkit index; it should ALSO name the repo coordinate so the very first hop is self-sufficient. The full read-path law already lives canonically in `brain-config/README.md` (Verified Read Path) and was added to the AI Toolkit index top as a projection this session; brain memory needs only the one-line coordinate + raw-read fact, not the full law. Deny-by-default — placement is Maggie's call.
+- Context / why: Brain cold-started this session with no repo coordinate pinned and burned ~6 turns failing to locate brain-config (kept guessing `maw-agents` as owner and hitting 404s / empty searches) before resolving it to `mawizorek/ClickUp_apps`. Root cause: memory's load-then-think line names the index and the `brain-config/...` paths but never the owner/repo or raw-read path, a bootstrap gap. Index top was patched same session; this OMR covers the memory-line half.
+
 ---
 
 ## Entry template
