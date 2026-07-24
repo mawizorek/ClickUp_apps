@@ -1,41 +1,58 @@
-:root[data-theme="rb"] {
-  --bg: oklch(0.19 0.045 264);
-  --surface-1: oklch(0.24 0.05 264);
-  --surface-2: oklch(0.29 0.052 264);
-  --surface-3: oklch(0.34 0.05 264);
-  --border: oklch(0.40 0.045 264);
-  --border-soft: oklch(0.33 0.045 264);
-  --text: oklch(0.98 0.008 264);
-  --text-2: oklch(0.80 0.02 264);
-  --text-3: oklch(0.65 0.025 264);
-  --accent: oklch(0.63 0.23 26);
-  --accent-ink: oklch(0.99 0.01 26);
-  --live: oklch(0.72 0.20 145);
-  --live-ink: oklch(0.16 0.05 145);
-  --hero-grad-a: oklch(0.26 0.075 264);
-  --hero-grad-b: oklch(0.20 0.05 264);
-  --shadow: 0 12px 40px -18px oklch(0.10 0.04 264 / 0.9);
+/* =============================================================================
+   On Track — presentation. CHROME now flows from the 4-VECTOR THEME
+   (color × typography × forms × spacing) applied by ../shared/themes/resolve.js.
+   The app points at the `on-track` theme (see index.html) and CONSUMES its tokens.
+
+   TWO COLOR LAYERS (by design):
+   • Layer A — CHROME: bg / surface / border / text / accent + fonts + radii come from
+     the spine. The :root FLOOR below is a LABELED FIRST-PAINT FALLBACK ONLY: it mirrors
+     the `on-track` theme (red-bull dark × soft × racing-archivo × standard) so first
+     paint == themed (no flash) and the app still renders if the resolver is slow/offline.
+     resolve.js overrides each of these inline after load. The theme is the SOURCE OF
+     TRUTH; this block is a mirror, never the design.
+   • Layer B — SERIES IDENTITY: the 20 --s-* colors are DATA (F1 is red because F1 is
+     red), NOT theme tokens. They live in their own block and ride on top of ANY theme or
+     mode, untouched. Never fold these into the spine (it only carries 4 categorical slots).
+
+   BRIDGE: On Track's historical token names (--text-2/-3, --accent-ink, --border-soft,
+   --live, --live-ink, --shadow) are ALIASED onto spine tokens just below the floor, so the
+   app body keeps reading its familiar names while the values flow from the active theme.
+   Light/dark = the spine's MODE (red-bull ships both ramps); resolve.js swaps it live.
+   ============================================================================= */
+
+/* ---- FLOOR (first-paint mirror of theme `on-track`; resolve.js overrides inline) ---- */
+:root {
+  /* color — red-bull, dark ramp */
+  --bg: #1e2138; --surface-1: #262a48; --surface-2: #2f3455; --surface-3: #363c60;
+  --border: #565d85; --field: #333858;
+  --text: #eef0f8; --text-soft: #a9adca; --text-faint: #797f9e;
+  --accent: #d5493d; --accent-deep: #a4342a; --accent-2: #e9d24f; --accent-soft: #472822; --on-accent: #fceceb;
+  --good: #35c48a; --warn: #e0bd4a; --bad: #d84334; --info: #6fa5e0;
   color-scheme: dark;
+  /* forms — soft */
+  --radius: 8px; --radius-lg: 12px; --radius-pill: 8px; --border-w: 1px;
+  --elev-1: 0 2px 8px rgba(0,0,0,0.26); --elev-2: 0 9px 24px rgba(0,0,0,0.30); --elev-3: 0 22px 50px rgba(0,0,0,0.38);
+  --motion-fast: 150ms; --motion-med: 260ms; --ease: cubic-bezier(.16,1,.3,1); --lift: -3px;
+  /* typography — racing-archivo */
+  --font-display: 'Archivo', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, "SF Mono", Menlo, monospace;
+  --track-tight: -0.02em;
+  /* spacing — standard */
+  --touch: 44px; --pad-cell: 10px; --pad-card: 20px; --gap-xs: 6px; --gap-md: 14px; --gap-lg: 28px;
 }
-:root[data-theme="light"] {
-  --bg: oklch(0.97 0.006 264);
-  --surface-1: oklch(1 0 0);
-  --surface-2: oklch(0.985 0.006 264);
-  --surface-3: oklch(0.955 0.01 264);
-  --border: oklch(0.86 0.012 264);
-  --border-soft: oklch(0.91 0.01 264);
-  --text: oklch(0.24 0.04 264);
-  --text-2: oklch(0.42 0.03 264);
-  --text-3: oklch(0.56 0.025 264);
-  --accent: oklch(0.57 0.23 26);
-  --accent-ink: oklch(0.99 0.01 26);
-  --live: oklch(0.55 0.16 145);
-  --live-ink: oklch(0.99 0.02 145);
-  --hero-grad-a: oklch(0.945 0.028 264);
-  --hero-grad-b: oklch(0.885 0.04 264);
-  --shadow: 0 10px 30px -18px oklch(0.4 0.04 264 / 0.35);
-  color-scheme: light;
+/* ---- ALIAS: historical On Track token names -> spine tokens (Layer A bridge) ---- */
+:root {
+  --text-2: var(--text-soft);
+  --text-3: var(--text-faint);
+  --accent-ink: var(--on-accent);
+  --border-soft: color-mix(in oklch, var(--border) 55%, var(--surface-2));
+  --live: var(--good);
+  --live-ink: var(--bg);
+  --shadow: var(--elev-2);
+  --maxw: 1080px;
 }
+/* ---- LAYER B: SERIES IDENTITY (data, not theme) — rides on top of any theme/mode ---- */
 :root {
   --s-f1: oklch(0.63 0.23 26);
   --s-nascar: oklch(0.79 0.16 85);
@@ -57,13 +74,11 @@
   --s-bsb: oklch(0.60 0.16 258);
   --s-speedway: oklch(0.66 0.16 332);
   --s-default: oklch(0.68 0.03 264);
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --maxw: 1080px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; }
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
@@ -86,7 +101,7 @@ body {
 .brand { display: flex; align-items: center; gap: 12px; }
 .brand .flag { font-size: clamp(26px, 6vw, 34px); line-height: 1; }
 .brand h1 {
-  font-family: 'Archivo', sans-serif; font-weight: 800;
+  font-family: var(--font-display); font-weight: 800;
   font-size: clamp(1.35rem, 4.5vw, 1.85rem); letter-spacing: -0.02em; line-height: 1;
 }
 .brand .sub {
@@ -95,14 +110,14 @@ body {
 }
 .mast-tools { display: flex; align-items: center; gap: 10px; }
 .clock {
-  font-variant-numeric: tabular-nums; font-family: 'Archivo', sans-serif;
+  font-variant-numeric: tabular-nums; font-family: var(--font-display);
   font-weight: 600; font-size: 0.92rem; color: var(--text-2);
   display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2;
 }
 .clock .z { font-size: 0.62rem; color: var(--text-3); letter-spacing: 0.1em; text-transform: uppercase; }
 .themebtn {
-  border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2);
-  width: 40px; height: 40px; border-radius: 10px; cursor: pointer; font-size: 1.1rem;
+  border: var(--border-w) solid var(--border); background: var(--surface-2); color: var(--text-2);
+  width: 40px; height: 40px; border-radius: var(--radius); cursor: pointer; font-size: 1.1rem;
   display: grid; place-items: center; transition: border-color .2s var(--ease), transform .1s var(--ease);
 }
 @media (hover: hover) { .themebtn:hover { border-color: var(--accent); } }
@@ -110,8 +125,8 @@ body {
 .themebtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .settings-wrap { position: relative; display: inline-flex; }
 .settingsbtn {
-  border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2);
-  width: 40px; height: 40px; border-radius: 10px; cursor: pointer;
+  border: var(--border-w) solid var(--border); background: var(--surface-2); color: var(--text-2);
+  width: 40px; height: 40px; border-radius: var(--radius); cursor: pointer;
   display: grid; place-items: center; transition: border-color .2s var(--ease), color .2s var(--ease), transform .1s var(--ease);
 }
 @media (hover: hover) { .settingsbtn:hover { border-color: var(--accent); color: var(--text); } }
@@ -121,37 +136,33 @@ body {
 .settings-pop {
   position: absolute; top: calc(100% + 8px); right: 0; z-index: 40;
   width: max-content; max-width: min(300px, calc(100vw - 28px));
-  background: var(--surface-2); border: 1px solid var(--border); border-radius: 13px;
+  background: var(--surface-2); border: var(--border-w) solid var(--border); border-radius: var(--radius-lg);
   box-shadow: var(--shadow); padding: 14px; display: flex; flex-direction: column; gap: 12px;
 }
 .settings-pop[hidden] { display: none; }
 .set-title {
-  font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.7rem;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.7rem;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3);
 }
 .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .set-lb { font-size: 0.88rem; font-weight: 600; color: var(--text-2); }
 .set-note {
   font-size: 0.78rem; line-height: 1.55; color: var(--text-3); margin: 0;
-  border-top: 1px solid var(--border-soft); padding-top: 11px;
+  border-top: var(--border-w) solid var(--border-soft); padding-top: 11px;
 }
+/* HERO — v2.3: flattened to a compact DATA strip (hatch removed, tighter padding, mono
+   countdown). Less "hero panel," more "instrument readout." */
 .hero {
   position: relative; overflow: hidden;
-  background: linear-gradient(135deg, var(--hero-grad-a), var(--hero-grad-b));
-  border: 1px solid var(--border-soft); border-radius: 18px;
-  padding: clamp(20px, 4vw, 30px); margin-bottom: 22px; box-shadow: var(--shadow);
+  background: var(--surface-1);
+  border: var(--border-w) solid var(--border-soft); border-radius: var(--radius-lg);
+  padding: clamp(14px, 2.5vw, 18px); margin-bottom: 16px; box-shadow: var(--elev-1);
   transition: background .3s var(--ease);
-}
-.hero::before {
-  content: ""; position: absolute; inset: 0;
-  background:
-    repeating-linear-gradient(135deg, transparent 0 22px, color-mix(in oklch, var(--text) 2.5%, transparent) 22px 44px);
-  pointer-events: none;
 }
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--text-3); margin-bottom: 14px;
+  color: var(--text-3); margin-bottom: 10px;
 }
 .dot-live {
   width: 9px; height: 9px; border-radius: 50%; background: var(--live);
@@ -165,52 +176,52 @@ body {
 .hero-live-list { display: flex; flex-direction: column; gap: 12px; position: relative; }
 .live-card {
   display: flex; align-items: flex-start; gap: 14px;
-  background: color-mix(in oklch, var(--text) 5%, transparent); border: 1px solid var(--border);
-  border-radius: 14px; padding: 16px 16px 16px 14px;
+  background: color-mix(in oklch, var(--text) 5%, transparent); border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 16px 16px 14px;
 }
 .live-card .sbar { width: 4px; align-self: stretch; border-radius: 4px; background: var(--sc, var(--s-default)); flex: none; }
 .live-card .body { flex: 1; min-width: 0; }
 .live-title {
-  font-family: 'Archivo', sans-serif; font-weight: 700;
-  font-size: clamp(1.15rem, 4vw, 1.6rem); letter-spacing: -0.015em; line-height: 1.12;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(1.1rem, 3.6vw, 1.45rem); letter-spacing: -0.015em; line-height: 1.12;
   text-wrap: balance;
 }
 .live-meta { color: var(--text-2); font-size: 0.9rem; margin-top: 5px; }
 .live-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .live-flag {
   flex: none; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em;
-  text-transform: uppercase; padding: 5px 9px; border-radius: 7px;
+  text-transform: uppercase; padding: 5px 9px; border-radius: var(--radius);
   background: var(--live); color: var(--live-ink); align-self: flex-start;
   display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
 }
-.next-wrap { position: relative; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.next-wrap { position: relative; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .count {
-  font-family: 'Archivo', sans-serif; font-weight: 800;
-  font-size: clamp(2rem, 9vw, 3.1rem); letter-spacing: -0.02em; line-height: 1;
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: clamp(1.5rem, 5vw, 2.1rem); letter-spacing: -0.01em; line-height: 1;
   font-variant-numeric: tabular-nums; color: var(--text);
 }
-.count .u { font-size: 0.42em; color: var(--text-3); font-weight: 600; margin: 0 2px 0 1px; }
-.next-info { flex: 1; min-width: 220px; }
-.next-info .live-title { font-size: clamp(1.05rem, 3.6vw, 1.35rem); }
+.count .u { font-size: 0.5em; color: var(--text-3); font-weight: 600; margin: 0 2px 0 1px; }
+.next-info { flex: 1; min-width: 200px; }
+.next-info .live-title { font-size: clamp(1rem, 3.4vw, 1.25rem); }
 .controls { margin-bottom: 18px; display: flex; flex-direction: column; gap: 14px; }
 .search-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .search { flex: 1; position: relative; min-width: 200px; }
 .search input {
-  width: 100%; background: var(--surface-1); border: 1px solid var(--border);
+  width: 100%; background: var(--surface-1); border: var(--border-w) solid var(--border);
   color: var(--text); font-size: 0.95rem; font-family: inherit;
-  padding: 12px 14px 12px 40px; border-radius: 11px; transition: border-color .2s var(--ease);
+  padding: 12px 14px 12px 40px; border-radius: var(--radius); transition: border-color .2s var(--ease);
 }
 .search input::placeholder { color: var(--text-3); }
 .search input:focus { outline: none; border-color: var(--accent); }
 .search input:focus-visible { outline: 3px solid color-mix(in oklch, var(--accent) 40%, transparent); outline-offset: 1px; }
 .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-3); }
 .tz-toggle {
-  display: inline-flex; background: var(--surface-1); border: 1px solid var(--border);
-  border-radius: 11px; padding: 3px; flex: none;
+  display: inline-flex; background: var(--surface-1); border: var(--border-w) solid var(--border);
+  border-radius: var(--radius); padding: 3px; flex: none;
 }
 .tz-toggle button {
-  border: none; background: none; color: var(--text-3); font-family: 'Archivo', sans-serif;
-  font-weight: 700; font-size: 0.78rem; padding: 8px 12px; border-radius: 8px; cursor: pointer;
+  border: none; background: none; color: var(--text-3); font-family: var(--font-display);
+  font-weight: 700; font-size: 0.78rem; padding: 8px 12px; border-radius: calc(var(--radius) - 2px); cursor: pointer;
   letter-spacing: 0.03em; transition: color .2s var(--ease), background .2s var(--ease);
 }
 .tz-toggle button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
@@ -218,9 +229,9 @@ body {
 .jump { position: relative; flex: none; }
 .jump select {
   appearance: none; -webkit-appearance: none;
-  background: var(--surface-1); border: 1px solid var(--border); color: var(--text-2);
-  font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.02em;
-  padding: 10px 32px 10px 34px; border-radius: 11px; cursor: pointer; max-width: 200px;
+  background: var(--surface-1); border: var(--border-w) solid var(--border); color: var(--text-2);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.02em;
+  padding: 10px 32px 10px 34px; border-radius: var(--radius); cursor: pointer; max-width: 200px;
   transition: border-color .2s var(--ease);
 }
 @media (hover: hover) { .jump select:hover { border-color: var(--accent); } }
@@ -234,7 +245,7 @@ body {
 }
 .filter-label .clr { color: var(--accent); cursor: pointer; text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 0.72rem; }
 @media (hover: hover) { .filter-label .clr:hover { text-decoration: underline; } }
-.fsection { border: 1px solid var(--border-soft); border-radius: 12px; background: color-mix(in oklch, var(--surface-1) 60%, transparent); overflow: hidden; }
+.fsection { border: var(--border-w) solid var(--border-soft); border-radius: var(--radius-lg); background: color-mix(in oklch, var(--surface-1) 60%, transparent); overflow: hidden; }
 .fsection + .fsection { margin-top: 9px; }
 .fhead {
   display: flex; align-items: center; gap: 9px; width: 100%;
@@ -243,7 +254,7 @@ body {
 }
 .fhead .lb { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
 .fhead .count {
-  font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.6rem;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.6rem;
   background: var(--accent); color: var(--accent-ink); padding: 2px 7px; border-radius: 999px;
   min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; line-height: 1.4;
 }
@@ -256,9 +267,11 @@ body {
 .fbody > .fbody-inner { overflow: hidden; min-height: 0; }
 .fbody .pad { padding: 0 13px 13px; display: flex; flex-direction: column; gap: 8px; }
 .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+/* chips stay full pills (999px) — On Track identity element, deliberately NOT the forms
+   radius-pill (which would square them to rounded-rects). Same-look hold-out. */
 .chip {
-  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-2);
-  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.8rem;
+  border: var(--border-w) solid var(--border); background: var(--surface-1); color: var(--text-2);
+  font-family: var(--font-body); font-weight: 600; font-size: 0.8rem;
   padding: 7px 12px; border-radius: 999px; cursor: pointer; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 7px;
   transition: border-color .18s var(--ease), background .18s var(--ease), color .18s var(--ease);
@@ -273,12 +286,11 @@ body {
 .chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .chip.plat[aria-pressed="true"] { background: var(--surface-3); border-color: var(--accent); }
 /* Tier pip: the '+P' affordance on series that carry practice. Faint at rest (practice
-   available), lit + series-colored when the chip is on its 'all' tier (practice showing).
-   This is what makes the 3rd state discoverable rather than hidden. */
+   available), lit + series-colored when the chip is on its 'all' tier (practice showing). */
 .chip .tier-pip {
-  font-family: 'Archivo', sans-serif; font-size: 0.56rem; font-weight: 800;
+  font-family: var(--font-display); font-size: 0.56rem; font-weight: 800;
   letter-spacing: 0.04em; line-height: 1; padding: 2px 5px; border-radius: 5px;
-  border: 1px solid var(--border-soft); color: var(--text-3); background: transparent;
+  border: var(--border-w) solid var(--border-soft); color: var(--text-3); background: transparent;
   opacity: 0.55; transition: opacity .18s var(--ease), color .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease);
 }
 .chip[data-tier="race"] .tier-pip { opacity: 0.85; }
@@ -292,16 +304,16 @@ body {
 .series-hint { font-size: 0.72rem; line-height: 1.45; color: var(--text-3); margin: 0 0 2px; }
 .series-hint b { color: var(--text-2); font-weight: 700; }
 .series-hint .pip-inline {
-  font-family: 'Archivo', sans-serif; font-size: 0.56rem; font-weight: 800; letter-spacing: 0.04em;
-  padding: 1px 5px; border-radius: 5px; border: 1px solid var(--border-soft); color: var(--text-2);
+  font-family: var(--font-display); font-size: 0.56rem; font-weight: 800; letter-spacing: 0.04em;
+  padding: 1px 5px; border-radius: 5px; border: var(--border-w) solid var(--border-soft); color: var(--text-2);
   background: color-mix(in oklch, var(--accent) 12%, transparent); vertical-align: middle;
 }
 .filter-action {
   width: 100%; margin-top: 2px;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 10px 14px; border-radius: 9px;
-  border: 1px solid var(--border-soft); background: var(--surface-1); color: var(--text-2);
-  font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.8rem; letter-spacing: 0.01em;
+  padding: 10px 14px; border-radius: var(--radius);
+  border: var(--border-w) solid var(--border-soft); background: var(--surface-1); color: var(--text-2);
+  font-family: var(--font-body); font-weight: 500; font-size: 0.8rem; letter-spacing: 0.01em;
   cursor: pointer; min-height: 44px;
   transition: border-color .18s var(--ease), background .18s var(--ease), color .18s var(--ease), transform .1s var(--ease);
 }
@@ -309,7 +321,7 @@ body {
 .filter-action:active { transform: scale(0.99); }
 .filter-action:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .filter-action .fa-ct {
-  font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 0.64rem;
+  font-family: var(--font-display); font-weight: 600; font-size: 0.64rem;
   background: color-mix(in oklch, var(--text) 10%, transparent); color: var(--text-2);
   padding: 1px 7px; border-radius: 999px; min-width: 18px; text-align: center; font-variant-numeric: tabular-nums;
 }
@@ -326,9 +338,9 @@ body {
 }
 .result-note { font-size: 0.82rem; color: var(--text-3); font-variant-numeric: tabular-nums; }
 .pasttoggle {
-  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-2);
-  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.78rem;
-  padding: 7px 12px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+  border: var(--border-w) solid var(--border); background: var(--surface-1); color: var(--text-2);
+  font-family: var(--font-body); font-weight: 600; font-size: 0.78rem;
+  padding: 7px 12px; border-radius: var(--radius); cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
   transition: border-color .18s var(--ease), color .18s var(--ease);
 }
 @media (hover: hover) { .pasttoggle:hover { border-color: var(--accent); color: var(--text); } }
@@ -341,10 +353,10 @@ body {
 .day-head {
   position: sticky; top: 0; z-index: 5;
   background: var(--bg); padding: 10px 0 8px;
-  display: flex; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--border-soft);
+  display: flex; align-items: baseline; gap: 10px; border-bottom: var(--border-w) solid var(--border-soft);
   margin-bottom: 6px;
 }
-.day-head h2 { font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 1.02rem; letter-spacing: -0.01em; }
+.day-head h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.02rem; letter-spacing: -0.01em; }
 .day-head .today {
   font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
   background: var(--accent); color: var(--accent-ink); padding: 3px 8px; border-radius: 6px;
@@ -356,7 +368,7 @@ body {
 .day-head .cnt { font-size: 0.78rem; color: var(--text-3); margin-left: auto; font-variant-numeric: tabular-nums; }
 .evt {
   display: grid; grid-template-columns: 74px 4px 1fr auto; gap: 14px; align-items: center;
-  padding: 13px 6px; border-bottom: 1px solid var(--border-soft);
+  padding: 13px 6px; border-bottom: var(--border-w) solid var(--border-soft);
   transition: background .15s var(--ease);
 }
 .evt:hover { background: var(--surface-1); }
@@ -370,9 +382,8 @@ body {
   color: var(--sc, var(--text-3));
   border-color: color-mix(in oklch, var(--sc, var(--border)) 45%, var(--border-soft));
 }
-/* Qualifying is its own always-shown category: full-strength row (as important as a race),
-   with an accent-tinted solid kind-chip so it reads distinctly from a plain race and from
-   the muted, dashed practice chip. */
+/* Qualifying is its own always-shown category: full-strength row, accent-tinted solid
+   kind-chip so it reads distinctly from a plain race and from the muted dashed practice. */
 .evt-kind.is-quali {
   color: var(--sc, var(--accent)); font-weight: 800;
   border-color: color-mix(in oklch, var(--sc, var(--accent)) 55%, var(--border));
@@ -384,7 +395,7 @@ body {
 }
 .evt-empty .em-flag { opacity: 0.55; font-style: normal; }
 .evt-time {
-  font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.92rem;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.92rem;
   font-variant-numeric: tabular-nums; letter-spacing: -0.01em; text-align: right;
 }
 .evt-time .end { display: block; font-size: 0.72rem; color: var(--text-3); font-weight: 500; }
@@ -396,15 +407,15 @@ body {
 }
 .evt-kind {
   font-size: 0.64rem; font-weight: 700; color: var(--text-3); letter-spacing: 0.06em;
-  text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--border-soft); border-radius: 5px;
+  text-transform: uppercase; padding: 2px 6px; border: var(--border-w) solid var(--border-soft); border-radius: 5px;
 }
 .evt-title { font-weight: 600; font-size: 0.96rem; margin-top: 3px; line-height: 1.3; }
 .evt-title .det { color: var(--text-3); font-weight: 400; }
 .evt-plats { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; }
 .plat-badge {
-  font-family: 'Archivo', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.02em;
+  font-family: var(--font-display); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.02em;
   padding: 4px 8px; border-radius: 6px; background: var(--surface-3); color: var(--text-2);
-  border: 1px solid var(--border-soft); white-space: nowrap;
+  border: var(--border-w) solid var(--border-soft); white-space: nowrap;
 }
 .livepill {
   font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
@@ -413,24 +424,24 @@ body {
 }
 .empty {
   text-align: center; padding: 48px 20px; color: var(--text-3);
-  border: 1px dashed var(--border); border-radius: 14px;
+  border: var(--border-w) dashed var(--border); border-radius: var(--radius-lg);
 }
 .empty .big { font-size: 2rem; margin-bottom: 10px; }
-.empty h3 { font-family: 'Archivo', sans-serif; color: var(--text-2); margin-bottom: 6px; font-size: 1.05rem; }
+.empty h3 { font-family: var(--font-display); color: var(--text-2); margin-bottom: 6px; font-size: 1.05rem; }
 .empty button {
   margin-top: 14px; background: var(--accent); color: var(--accent-ink); border: none;
-  font-family: 'Archivo', sans-serif; font-weight: 700; padding: 9px 16px; border-radius: 9px; cursor: pointer;
+  font-family: var(--font-display); font-weight: 700; padding: 9px 16px; border-radius: var(--radius); cursor: pointer;
 }
 footer {
-  margin-top: 40px; padding: 22px 0 34px; border-top: 1px solid var(--border-soft);
+  margin-top: 40px; padding: 22px 0 34px; border-top: var(--border-w) solid var(--border-soft);
   color: var(--text-3); font-size: 0.8rem;
 }
 .foot-top { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; align-items: center; }
 .foot-src { display: flex; gap: 8px; flex-wrap: wrap; }
 .foot-src button, .foot-src a {
-  font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 600;
-  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-2);
-  padding: 7px 12px; border-radius: 8px; cursor: pointer; text-decoration: none;
+  font-family: var(--font-body); font-size: 0.76rem; font-weight: 600;
+  border: var(--border-w) solid var(--border); background: var(--surface-1); color: var(--text-2);
+  padding: 7px 12px; border-radius: var(--radius); cursor: pointer; text-decoration: none;
   transition: border-color .18s var(--ease); display: inline-flex; align-items: center; gap: 6px;
 }
 @media (hover: hover) { .foot-src button:hover, .foot-src a:hover { border-color: var(--accent); } }

@@ -70,6 +70,16 @@
       "intendedUse": "Neutral-cool tight instrument look; alternative to sharp-utility."
     },
     {
+      "slug": "on-track",
+      "name": "On Track · Racing Bulls",
+      "status": "locked",
+      "color": "red-bull",
+      "typography": "racing-archivo",
+      "forms": "soft",
+      "spacing": "standard",
+      "intendedUse": "The On Track motorsport schedule — navy+red Racing Bulls identity, Archivo display headers, rounded soft chrome. Series identity colors ride on top as a local layer (not theme tokens)."
+    },
+    {
       "slug": "eos",
       "name": "Eos",
       "status": "locked",

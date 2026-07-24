@@ -94,10 +94,9 @@ function syncFilterAction() {
       : '<span class="fa-lb">Select all ' + label + '</span>';
   });
 }
-// Settings popover: a gear in the masthead housing app chrome — the theme (light/dark)
-// toggle and the timezone toggle, plus an honest note about how the app updates. Both
-// control nodes are MOVED (not rebuilt) into the drawer, so the listeners wired in wire()
-// survive intact. This gear + light-mode toggle is the standard chrome home going forward.
+// Settings popover: a gear in the masthead housing app chrome — the light/dark toggle and
+// the timezone toggle, plus an honest note about how the app updates. Both control nodes
+// are MOVED (not rebuilt) into the drawer, so the listeners wired in wire() survive intact.
 function buildSettings() {
   const tools = document.querySelector('.mast-tools');
   if (!tools || document.getElementById('settingsWrap')) return;
@@ -151,8 +150,8 @@ function cleanupFooter() {
 }
 function wire() {
   $('#themeBtn').addEventListener('click', () => {
-    state.theme = state.theme === 'rb' ? 'light' : 'rb';
-    localStorage.setItem('ontrack_theme', state.theme); applyTheme();
+    state.mode = state.mode === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('ontrack_mode', state.mode); applyMode();
   });
   const setTZ = tz => {
     state.tz = tz; localStorage.setItem('ontrack_tz', tz);
@@ -183,7 +182,11 @@ function wire() {
 function render() { renderHero(); renderSchedule(); }
 function boot() {
   hydrate();
-  applyTheme();
+  // Compose the 4-vector theme from the spine (color × typography × forms × spacing) at the
+  // user's mode, then sync the toggle glyph + data-mode. resolve.js overrides the CSS floor
+  // inline; if the spine is missing/offline, the labeled :root FLOOR in styles.css holds.
+  if (window.THEMES && THEMES.applyTheme) { try { THEMES.applyTheme(APP_THEME, { mode: state.mode }); } catch (e) {} }
+  applyMode();
   buildChips();
   addSeriesHint();
   buildJump();
