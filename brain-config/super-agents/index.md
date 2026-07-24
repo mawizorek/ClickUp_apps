@@ -6,11 +6,31 @@
 >
 > Renamed from `superagents.json` / `index.html` on 2026-07-24 (the old name only covered teammates and undersold what the file is). Redirect stubs are left at the old paths and will fail loud rather than serve stale. Do **not** keep a duplicate table here or anywhere else — this page is a pointer only.
 
+## 🟰 The two tiers are STORAGE, not a hierarchy (LOCKED 2026-07-24, Michael)
+
+**Read this before you read the roster.** "Agent" and "super agent" are converging into one term.
+A super-agent IS a lens; anyone on the super-agent team can also sit on the agent team, and
+**Maestro Mira works with both identically** — she seats by LANE, never by tier.
+
+- **`class` means PERSISTENCE, not status.** A teammate carries a memory bundle across sessions; a
+  lens is stateless. That is a fact about whether a voice remembers yesterday. It is NOT seniority,
+  authority, or speaking order. **If you read the two tiers as a ladder, that's drift.**
+- **The tiers exist because one class has files and the other doesn't** — nothing more. That is
+  exactly why they are indexed together in ONE record instead of two.
+- **The one place class binds:** a bare `/session.agent=<Name>` needs a bundle to inhabit, so only a
+  teammate can be worn for a whole session. That constrains INHABITING, not being seated, heard, or
+  weighted. Any voice on this roster can speak AS ITSELF at full volume.
+- **Graduation lens → teammate has exactly one justification: the voice needs MEMORY.** Not stature,
+  not seating frequency. Promoting for standing alone is how a fleet bloats with bundles nobody needed.
+
+Governing text: `_shared/super-agent-base.md` (Constitution §6) + `../orchestration.md` (Class Parity).
+Provenance: Fleet Build Queue Decision Log J1.
+
 ## Why one combined roster
 
 The fleet is two trees of the same roster, and Felix stewards both:
 - **`super-agents/<slug>/`** = persistent **git-teammates** (full bundle, session-invocable via `/session.agent=<Name>`, hold memory across sessions).
-- **`brain-config/agents/<slug>.md`** = ephemeral **Council/Workshop lenses** (stateless processing verbs, NOT session-invocable as standing personas).
+- **`brain-config/agents/<slug>.md`** = ephemeral **Council/Workshop lenses** (stateless processing verbs, NOT session-invocable as standing personas — no bundle to inhabit).
 
 Three names — **Anna, Mira, Wes** — graduated lens → teammate; their `agents/` files are tombstones and the live home is `super-agents/`. The roster draws that lineage with `graduated_from`.
 
@@ -43,6 +63,7 @@ The council lenses themselves live at `brain-config/agents/<slug>.md`; the roste
 
 ## Changelog
 
+- 2026-07-24: **Class parity.** Added the "two tiers are STORAGE, not a hierarchy" section — `class` means persistence (holds a memory bundle), never rank; Mira seats by lane, not tier; graduation requires exactly one justification (the voice needs MEMORY). Michael's ruling, Fleet Build Queue Decision Log J1. Governing text lives in `_shared/super-agent-base.md` §6 + `orchestration.md`; this page points, never restates. ⚠️ Still pending: `roster.json`'s `$schema_note` and `registry.json` both describe the two classes without the parity framing — both need the note folded in on their next clean regeneration (registry is a generated artifact at ~29KB, roster is over the safe single-pass read cap).
 - 2026-07-24: **Combined roster.** `superagents.json` → `roster.json` (renamed + expanded to hold BOTH classes: added the `council_lenses` tier with full rows + `graduated_from` lineage on migrated teammates + the `invocation_resolution` token map). `index.html` → `roster.html` (two-tier renderer). Wired to the Agent Invocation Gate STEP 0 (roster-first resolution). Redirect stubs left at the old paths. `registry.json` left for clean regeneration (generated artifact).
 - 2026-07-21: noted the two audit tracks + corrected the git-teammate file model (preferences is canonical for a teammate, not a live-config mirror; added memory/decision-log to the structure). Prompted by a Beckett doc-drift flag.
 - 2026-07-15: index split into `superagents.json` (data) + `index.html` (renderer); this file reduced to a pointer.
