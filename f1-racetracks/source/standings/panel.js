@@ -11,7 +11,12 @@ function tyreChips(arr){return arr?`<div class="tyres">`+arr.map((c,i)=>`${i>0?'
    qualifying lap times under the qualifying side and this driver's fastest lap
    + tyre strategy under the race side, so each fact sits with its position
    without chopping the journey into separate portals. Detail block is styled
-   inline (reuses CSS vars) so panel.css stays untouched. */
+   inline (reuses CSS vars) so panel.css stays untouched.
+   v6.7: the Race-side Fastest Lap now reads this driver's REAL per-driver
+   fastLap {time,lap} from the store row (backfilled r1-9), showing the lap
+   number, and marks the round fastest-lap holder with a purple pip. Falls back
+   to the round FL time, then to illustrative det.best, only when the row value
+   is absent. */
 function qualiBlock(rd,id,m,det,isFL,il){
   const row=(typeof raceRow==='function')?raceRow(rd,id):null;
   const q=row&&row.qualifying;
@@ -31,11 +36,18 @@ function qualiBlock(rd,id,m,det,isFL,il){
   const line=(k,v,dim)=>`<div style="${lineS}"><span style="${kS}${dim?';color:var(--txt-dim)':''}">${k}</span>${v?`<span class="num" style="${vS}">${v}</span>`:''}</div>`;
   // qualifying-side detail: the Q1/Q2/Q3 lap times
   const qLines=['q1','q2','q3'].map(k=>line(k.toUpperCase(),q[k]||'\u2014')).join('');
-  // race-side detail: this driver's fastest lap + tyre strategy (real FL when this
-  // driver holds the round FL, else illustrative det.best; pits/tyres illustrative)
-  const flTime=(isFL&&rd.fastestLap&&rd.fastestLap.time)?rd.fastestLap.time:(det.best||null);
+  // race-side detail: this driver's REAL fastest lap from the store row
+  // (per-driver fastLap {time,lap}, backfilled r1-9). Falls back to the round FL
+  // time when this driver holds it, then to any illustrative det.best.
+  const rowFL=row.fastLap;
+  const flTime=(rowFL&&rowFL.time)?rowFL.time:((isFL&&rd.fastestLap&&rd.fastestLap.time)?rd.fastestLap.time:(det.best||null));
+  const flLap=(rowFL&&rowFL.lap!=null)?rowFL.lap:null;
   let rLines='';
-  if(flTime)rLines+=line('Fastest Lap',flTime);
+  if(flTime){
+    const lapTag=flLap!=null?` <span class="num" style="color:var(--txt-dim);font-weight:600;font-size:0.7em">L${flLap}</span>`:'';
+    const flPip=isFL?` <span title="Race fastest lap" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--fl,#b388ff);vertical-align:middle;margin-left:4px"></span>`:'';
+    rLines+=line('Fastest Lap',`${flTime}${lapTag}${flPip}`);
+  }
   if(det.pits!=null)rLines+=line('Pit Stops',det.pits);
   if(det.tyres)rLines+=`<div style="${lineS}"><span style="${kS}">Tyres</span>${tyreChips(det.tyres)}</div>`;
   if(!rLines)rLines=line('Race pace TBC','',true);
@@ -66,7 +78,7 @@ function raceBrief(roundNo,id){
   const qb=qualiBlock(rd,id,m,det,isFL,hasIllusFlag(det));
   const noteText=m.note?m.note.text:null;const tagText=(det.story&&det.story.length)?renderStory(det.story,det):[];let storyHtml='';if(noteText||tagText.length){const isMv=!m.note&&m.bigMover;storyHtml=`<div class="story-box ${isMv?'mv':''}"><span class="sdot"></span><div class="stext">${noteText?`<p>${noteText}${m.note.onRoad?` <b>(on road: P${m.note.onRoad})</b>`:''}</p>`:''}${tagText.map(t=>`<p>${t}</p>`).join('')}</div></div>`;}
   const hasIllus=!!det.grid;let stats=`<div class="stat-grid"><div class="stat"><span class="sl">Race Pts</span><span class="sv num">${m.pts}</span></div><div class="stat"><span class="sl">Sprint</span><span class="sv num">${sp?sp.points:'\u2014'}</span></div><div class="stat"><span class="sl">Total</span><span class="sv num">${total}</span></div></div>`;
-  const illusNote=hasIllus?`<div class="illus-note"><b>Preview:</b> grid, lap, pits and tyres are illustrative; verified values (OpenF1) fill these once sourced.</div>`:'';
+  const illusNote=hasIllus?`<div class="illus-note"><b>Note:</b> pit stops and tyre strategy shown here are illustrative; grid, qualifying and fastest lap are verified from the canonical store.</div>`:'';
   return `<div class="panel-head" style="--team:${teamColor(team)}"><div><div class="panel-ey">R${rd.round} \u00B7 ${rd.name}${rd.sprint?' \u00B7 Sprint':''}</div><div class="panel-drv">${name}</div>${teamChip(team)}</div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body">${flow}${badges?`<div class="badges">${badges}</div>`:''}${qb}${storyHtml}${stats}<div class="report">${rd.summary?`<p>${rd.summary}</p>`:''}</div>${illusNote}</div>`;
 }
 function hasIllusFlag(det){return det&&det.grid?'illus':'';}
