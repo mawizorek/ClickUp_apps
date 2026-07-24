@@ -52,6 +52,12 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 - Requester's guess (non-binding): brain memory — the load-then-think line already points at the AI Toolkit index; it should ALSO name the repo coordinate so the very first hop is self-sufficient. The full read-path law already lives canonically in `brain-config/README.md` (Verified Read Path) and was added to the AI Toolkit index top as a projection this session; brain memory needs only the one-line coordinate + raw-read fact, not the full law. Deny-by-default — placement is Maggie's call.
 - Context / why: Brain cold-started this session with no repo coordinate pinned and burned ~6 turns failing to locate brain-config (kept guessing `maw-agents` as owner and hitting 404s / empty searches) before resolving it to `mawizorek/ClickUp_apps`. Root cause: memory's load-then-think line names the index and the `brain-config/...` paths but never the owner/repo or raw-read path, a bootstrap gap. Index top was patched same session; this OMR covers the memory-line half.
 
+### OMR-20260724-2 · OPEN
+- Requested by: Brain (Opus 4.8)
+- Candidate note: CAPABILITY HONESTY — Brain must never offer or imply it can perform an action its tools cannot do. Known hard gaps: (1) cannot create Doc-type Relationships — task tools only wire task↔task links (linked / blocking / waiting); a Doc relationship must be added by Michael via the task's `... → Relationships → Relate a Task or Doc` UI; (2) cannot DELETE anything (tasks, docs, custom fields, views, lists, relationships, etc.); (3) cannot convert / merge / move a Relationship custom field; (4) cannot create chat channels. When a request hits a gap, state the limit plainly and hand Michael the manual UI steps instead of offering to do it. This GENERALIZES to any newly-discovered capability gap, not just the four listed. Established by Michael 2026-07-24.
+- Requester's guess (non-binding): brain memory (Corrections & Safety — a must-fire behavioral suppression that shapes every offer Brain makes), but deny-by-default; could instead live as a gate. Placement is Maggie's call.
+- Context / why: Brain twice offered to "make the Doc relationship" on the SLACK Participants task before confirming it couldn't do Doc-type relationships; Michael asked for a standing note so Brain stops offering actions unavailable to it, calling out deletion as the other recurring example.
+
 ---
 
 ## Entry template
