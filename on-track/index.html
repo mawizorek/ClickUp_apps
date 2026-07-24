@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<!-- INFRASTRUCTURE: multi-file (Pages-hosted). Thin shell + source/styles.css + source/render.js + source/app.js + data.json. -->
-<!-- Engine edits: edit source/*.js + source/styles.css (each reads whole under the 30KB cap, no chunk set needed) + version bump. -->
+<!-- INFRASTRUCTURE: multi-file (Pages-hosted). Thin shell + shared/themes spine + source/styles.css + source/render.js + source/app.js + data.json. -->
+<!-- THEME: composed 4-vector `on-track` (red-bull × racing-archivo × soft × standard). Chrome color/type/forms flow from shared/themes; the 20 series colors are a LOCAL data layer in styles.css, on top of any theme. -->
+<!-- Engine edits: edit source/*.js + source/styles.css (each reads whole under the 30KB cap) + version bump. -->
 <!-- Data edits: commit data.json only. -->
-<!-- Self-contained export: footer Copy/Download/Open re-inline all source at runtime, so exported files still work standalone offline. -->
 <!-- BRAND ASSETS (TEMP NAMES): icon = IMG_4698.png, banner = IMG_4689.png. TODO: rename to icon.png / og.png + downsize (see next-build-spec.md). -->
-<html lang="en" data-theme="rb">
+<html lang="en" data-theme="red-bull" data-mode="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#141d3b">
+<meta name="theme-color" content="#1e2138">
 <meta name="robots" content="noindex, nofollow">
+<script>try{var m=localStorage.getItem('ontrack_mode')||(localStorage.getItem('ontrack_theme')==='light'?'light':'dark');document.documentElement.setAttribute('data-mode',m);}catch(e){}</script>
 <title>On Track — What Motorsport Is On Right Now</title>
 <meta name="description" content="A live, at-a-glance motorsport TV schedule. See what's racing right now, what's next, and where to watch it across every series and platform.">
 <meta property="og:title" content="On Track — What Motorsport Is On Right Now">
@@ -32,7 +33,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./source/styles.css">
+<!-- THEME SPINE: color first-paint spine (shared). resolve.js composes the full 4-vector theme after load. -->
+<link rel="stylesheet" href="../shared/themes/themes.css">
+<link rel="stylesheet" href="./source/styles.css?v=23">
 </head>
 <body>
 <noscript>On Track needs JavaScript to compute what's live right now. Please enable it.</noscript>
@@ -47,7 +50,7 @@
     </div>
     <div class="mast-tools">
       <div class="clock" id="clock" aria-live="off"><span id="clockTime">--:--</span><span class="z" id="clockZone">—</span></div>
-      <button class="themebtn" id="themeBtn" title="Switch theme" aria-label="Switch theme">◑</button>
+      <button class="themebtn" id="themeBtn" title="Switch light / dark" aria-label="Switch light / dark">◑</button>
     </div>
   </header>
   <section class="hero" id="hero" aria-live="polite"></section>
@@ -114,7 +117,9 @@
     </div>
   </footer>
 </div>
-<script src="./source/render.js" defer></script>
-<script src="./source/app.js" defer></script>
+<!-- THEME SPINE: defines window.THEMES before the deferred engine runs. -->
+<script src="../shared/themes/resolve.js"></script>
+<script src="./source/render.js?v=23" defer></script>
+<script src="./source/app.js?v=23" defer></script>
 </body>
 </html>
