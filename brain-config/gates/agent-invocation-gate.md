@@ -1,10 +1,27 @@
 # Agent Invocation Gate
 
-**Purpose:** Disambiguation layer for all subagent invocations. Prevents false-positive fires when Michael mentions a name in conversation that happens to match an agent name (Michael works with real people who may share agent names). **Also carries the invocation-mode contract** (bare name vs name+context) and the per-agent soft-gate dial — see below.
+**Purpose:** Disambiguation layer for all subagent invocations. Prevents false-positive fires when Michael mentions a name in conversation that happens to match an agent name (Michael works with real people who may share agent names). **Also carries the invocation-mode contract** (bare name vs name+context), the per-agent soft-gate dial, and — as of 2026-07-24 — the **roster-first resolution step** (STEP 0 below). See below.
 
 **Mode:** Always-on (deterministic). Fires during the 🧠 Subagent evaluation step of the roster scan.
 
 **Trigger:** Any agent name detected in user input.
+
+---
+
+## 📖 STEP 0 — Read the roster FIRST (LOCKED 2026-07-24, Michael)
+
+**Before resolving ANY `/agent-name`, bare name, or nickname, READ `brain-config/super-agents/roster.json` and resolve the token against it.** This is the load-bearing first move and it is NOT optional. The roster is the single combined lookup for the ENTIRE fleet — both classes in one file: `agents` (git-teammates + native/task-specific + retired) and `council_lenses` (the ephemeral Council/Workshop lenses). Do NOT parse the `agents/` folder or guess from memory; the folder is the lens tree, not the index. **We maintain an index file for exactly this reason — use it.**
+
+Resolution sequence on any invocation:
+
+1. **Read `roster.json`.** (Blob API per the GitHub read standard — never a carried-over copy.)
+2. **Resolve the token** via `invocation_resolution.token_map` → the agent's `slug` + `class` + `bundle`/`profile` path. Nicknames and fuzzy/dictation variants resolve here too.
+3. **Load that agent's home DIRECTLY.** For a git-teammate: its `bundle` under `super-agents/<slug>/` via the persona load contract (`_shared/super-agent-base.md`). For a council lens: its `agents/<slug>.md` profile.
+4. **Then** apply the Pass rules below (name+intent vs narrative), the invocation-mode contract, and the soft gate.
+
+**No forwarding.** Reading the roster is NOT invoking Felix, and a named call does NOT route through a steward. The roster is passive data; Felix is its steward, not a switchboard the traffic flows through. **A named call reaches the agent directly — no double-hop through Felix or Mira.** (Steward consultation is only for UNROUTED asks: structural "does an agent exist / who owns this lane" → Felix; verbal "get me the right voice now" → Mira.)
+
+**Failure rule:** roster read fails → retry the blob API once, then say so. Token not in the roster → do NOT invent an agent; ask or treat as narrative. If the roster and `registry.json` disagree, the roster wins for identity/lane/lineage/invocation; flag the drift.
 
 ---
 
@@ -72,7 +89,7 @@ Before auto-executing a full runbook on a bare-name call, an agent may hold a **
 
 ## 🗣️ Slash-command fuzzy-resolve (voice/dictation aware; cross-ref Clarify First → Clara lens)
 
-A near-miss command token resolves to the closest canonical invocation grammar rather than being read literally as a name. Canonical grammar lives in `registry.json → session_commands`: `/session-start`, `/session-start=<Name>`, `/session.agent=<Name>`. Fuzzy aliases — `/command <Name>`, `/agent <Name>`, `/call <Name>` — route to `/session.agent=<Name>`, resolving `<Name>` via `super-agents/superagents.json`. Proceed with a one-line reading ("reading '/command Felix' as invoke Fleet Felix") when the name resolves; only ask when the token is genuinely unresolvable. *(Michael dictates on every device; a mangled command token is a transcription artifact, not a new agent name — see the 🎙️ Clara lens in Clarify First.)*
+A near-miss command token resolves to the closest canonical invocation grammar rather than being read literally as a name. Canonical grammar lives in `registry.json → session_commands`: `/session-start`, `/session-start=<Name>`, `/session.agent=<Name>`. Fuzzy aliases — `/command <Name>`, `/agent <Name>`, `/call <Name>` — route to `/session.agent=<Name>`, resolving `<Name>` via `super-agents/roster.json` (STEP 0). Proceed with a one-line reading ("reading '/command Felix' as invoke Fleet Felix") when the name resolves; only ask when the token is genuinely unresolvable. *(Michael dictates on every device; a mangled command token is a transcription artifact, not a new agent name — see the 🎙️ Clara lens in Clarify First.)*
 
 ---
 
@@ -91,9 +108,11 @@ A near-miss command token resolves to the closest canonical invocation grammar r
 
 ## 🔁 Lens → git-teammate migrations (resolve to the LIVE home, never the tombstone)
 
-When a Council/Workshop lens is migrated into a git-teammate, its old `brain-config/agents/<slug>.md` becomes a **redirect tombstone** and the live agent moves to `brain-config/super-agents/<slug>/`. **Resolve every live invocation to the `super-agents/` home directly** — same principle as the Wes rule: a tombstone is for historical link-resolution + context, never for routing fresh commands. Do not take the scenic route through the tombstone.
+When a Council/Workshop lens is migrated into a git-teammate, its old `brain-config/agents/<slug>.md` becomes a **redirect tombstone** and the live agent moves to `brain-config/super-agents/<slug>/`. **Resolve every live invocation to the `super-agents/` home directly** — same principle as the Wes rule: a tombstone is for historical link-resolution + context, never for routing fresh commands. Do not take the scenic route through the tombstone. (The roster carries this as `graduated_from` on the teammate row — see STEP 0.)
 
 - ✅ **Audit Anna (migrated 2026-07-21) — LIVE at `super-agents/audit-anna/`.** Any live invocation embodies the GIT-TEAMMATE (run the persona load contract in `_shared/super-agent-base.md`): `/session.agent=Anna`, bare “Anna”/“Audit”/“Root-It,” OR an audit-intent auto-seize (“audit this” / “rip this apart” / “dig into X”). It does NOT load the lens at `agents/audit-anna.md` (redirect tombstone). Her nickname “Audit” overlapping the command word “audit” is intentional — both paths land on Anna seizing the audit.
+- ✅ **Maestro Mira (migrated 2026-07-21) — LIVE at `super-agents/maestro-mira/`.** Also Michael's DEFAULT front door when no agent is named. Tombstone at `agents/maestro-mira.md`.
+- ✅ **Workhorse Wes (migrated 2026-07-19) — LIVE at `super-agents/workhorse-wes/`.** See the Wes rule above for the workshop-wes collision.
 - **General rule:** for any name that has BOTH a tombstoned lens (`agents/<slug>.md`) AND a live bundle (`super-agents/<slug>/`), go straight to the `super-agents/` home. The tombstone only resolves historical links.
 
 **One-line test:** “audit this” or bare “Anna” → embody the git-teammate at `super-agents/audit-anna/`, never the `agents/` tombstone.
@@ -102,29 +121,33 @@ When a Council/Workshop lens is migrated into a git-teammate, its old `brain-con
 
 ## Rules
 
-- **Nicknames count.** Each agent profile lists nicknames. All variants go through this same gate.
+- **Roster first (STEP 0).** Every invocation resolves against `roster.json` before anything else. Never parse the `agents/` folder or resolve from memory.
+- **Nicknames count.** Each agent profile lists nicknames (mirrored in the roster `token_map`). All variants go through this same gate.
 - **Context wins.** If the conversation has been about a real person named [X] for several messages, a bare mention of [X] is almost certainly still about the person.
 - **Command words are strong signals.** "run," "spin up," "deploy," "audit," "check," "review" + name = agent invocation.
 - **Bare name = Mode A (context=null runbook).** A clean standalone agent name with no attached situation runs the agent's `default_runbook`, subject to its `gate_strength`. No default defined → ask which routine.
 - **The runbook is standalone + directly invocable.** "Run this process" pointed at the runbook doc == the bare-name call. The persona references the runbook; it never hardcodes it.
 - **A migrated agent resolves to its `super-agents/` home, not its `agents/` tombstone** (see Lens → git-teammate migrations above).
-- **This gate is lightweight.** It should take <1 second of reasoning. Don't turn it into a deliberation.
+- **No double-hop.** A named call reaches the agent directly; it does not forward through Felix or Mira.
+- **This gate is lightweight.** The roster read + resolution should take <1 second of reasoning. Don't turn it into a deliberation.
 - **A retired/tombstoned agent is NEVER a live invocation target.** A near-name collision with a retired agent resolves to the LIVE holder of that name (see the Wes rule above). Tombstones exist for historical link resolution + context, not for routing fresh commands.
 
 ---
 
 ## Composes with
 
-- Fires as part of the 🧠 Subagent roster evaluation.
+- Fires as part of the 🧠 Subagent roster evaluation (inside the Roster Scan Planner's step 1).
 - Does NOT apply to 🔄 Hooks or 🎯 Triggers (they have their own deterministic triggers).
-- If the gate passes (fire the agent): load the agent profile from `brain-config/agents/` (or `super-agents/` for git-teammates) and execute; on a bare-name call, load and run its `default_runbook` subject to `gate_strength`. **For a migrated agent (tombstone in `agents/` + live bundle in `super-agents/`), always load the `super-agents/` home directly (see Lens → git-teammate migrations above).**
+- If the gate passes (fire the agent): resolve via `roster.json` (STEP 0), then load the agent's home — `super-agents/<slug>/` for a git-teammate (persona load contract) or `agents/<slug>.md` for a council lens — and execute; on a bare-name call, load and run its `default_runbook` subject to `gate_strength`. **For a migrated agent (tombstone in `agents/` + live bundle in `super-agents/`), always load the `super-agents/` home directly.**
 - **Clarify First → Clara lens** owns the dictation-artifact reparse that feeds the slash-command fuzzy-resolve above.
 - **Agent Name-Collision Gate** (`gates/agent-name-collision-gate.md`) is the WRITE-side counterpart: it should have forced a distinct invocation token when Workhorse Wes was created. The Wes collision above is the read-side patch for a name that shipped anyway (Michael chose to reuse the first name deliberately).
+- **`roster.json`** (`super-agents/roster.json`) is the DATA this gate reads; **`roster.html`** renders it; **`registry.json`** is the generated manifest mirror.
 
 ---
 
 ## Changelog
 
+- 2026-07-24: **Added STEP 0 — roster-first resolution.** Every `/agent-name` / bare name / nickname now resolves against `brain-config/super-agents/roster.json` (the combined full-fleet roster — both classes) BEFORE anything else; never parse the `agents/` folder or resolve from memory. Repointed the slash-command fuzzy-resolve + Composes-with from `superagents.json` to `roster.json`. Added the explicit no-double-hop rule (a named call reaches the agent directly, never forwarded through Felix/Mira; reading the roster ≠ invoking the steward). Added Mira + Wes to the migration-resolution list alongside Anna. Prompted by Michael ("how do we ensure that when i invoke any /agent-name that you go and read whatever ROSTER file you maintain") + the repeated folder-parsing misfire this session.
 - 2026-07-21: **Added the Lens → git-teammate migration resolution rule** (Anna). A migrated agent's old `agents/<slug>.md` is a redirect tombstone; every live invocation resolves to the `super-agents/<slug>/` home directly, never the tombstone (mirrors the Wes precedent). Fixes the Beckett-surfaced break where a bare "Anna"/"audit this" could route through the retired lens path. Prompted by Michael ("break it with beckett").
 - 2026-07-20: **Added the invocation-mode contract + per-agent soft-gate dial.** Bare name (context=null) runs the agent's `default_runbook`; name+context applies the persona to input. Runbooks are standalone + directly invocable ("run this process" by URL == bare-name call); the persona points at the runbook, never hardcodes it (Super Agents are personalities + a convenience layer over dense routines). Added `gate_strength` (auto | confirm | always-ask; default confirm) as a per-agent dial. Added the slash-command fuzzy-resolve cross-ref to the Clara lens. Routine Ricky named as the canonical stress test (default_runbook vs menu). Prompted by Michael across the /command-Felix → speech-to-text → routine-agent thread.
 - 2026-07-19: **Added the “Wes”/“/wes” name-collision resolution** — live invocation routes to the ACTIVE Workhorse Wes, never the retired Workshop Wes tombstone (which must not fire “Mira convenes the Workshop”). Fixes a live misfire where `/wes` resolved to the tombstone. Added the general rule that a retired agent is never a live invocation target. Prompted by Michael (screenshot of the misfire).
