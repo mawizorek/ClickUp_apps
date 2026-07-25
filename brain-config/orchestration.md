@@ -73,6 +73,30 @@ Routing decision: unrouted ask → Mira fronts it → is this a divergence probl
 
 ---
 
+## Seating sequences (multi-agent handoff chains)
+
+A seating sequence is an orchestration pattern where the **wheel passes between agents in a defined order**, with a structured handoff artifact at each transition. Each stage has: an owner, an input shape, an output shape, and an exit condition.
+
+Mira seats each transition. The handoff artifact is always a **defined shape** (template), never freeform prose. This distinguishes a seating sequence from ad-hoc collaboration: the transitions are specified and repeatable.
+
+**Instances:**
+
+- **Session close** (`hooks/session-close.md`): Session agent (produces Handoff Artifact) → Closing Clio (executes close, calls Maggie) → Memory Maggie (curation/rotation) → done. The canonical first instance; the Handoff Artifact Template lives in that file.
+- **App build** (New ClickUp App Build Playbook): 6 phases, each led by a different agent/group, stitching existing routers in one named sequence.
+
+A seating sequence is NOT a new tool type, a new folder, or a new category. It is a name for something Mira already does: orchestrating defined multi-step handoffs where each step has a different owner. Documenting it here means future sequences can point here for the concept and define only their own stages.
+
+**What makes a good seating sequence (vs ad-hoc):**
+
+- Each stage has ONE clear owner (not "the team").
+- The handoff artifact shape is FIXED (a template, not prose).
+- The stages fire in ORDER (not a concurrent convening).
+- The pattern repeats (it runs the same way every time, not once).
+
+If it doesn't meet all four, it's normal orchestration (a convening), not a sequence.
+
+---
+
 ## Pointers (deep content lives in the tool, never restated here)
 
 - **Roster + seating map + Expression law** → `council.md` (she is the lead named there).
@@ -82,10 +106,12 @@ Routing decision: unrouted ask → Mira fronts it → is this a divergence probl
 - **Fleet directory she consults when routing** → `super-agents/roster.json` (combined, BOTH classes) + `registry.json` + Fleet Felix (`super-agents/fleet-felix/`).
 - **Her identity / voice / motive** → `super-agents/maestro-mira/preferences.md` (points here for the how-to).
 - **Seating tally file** → `usage-log.json` (owned by Closing Clio).
+- **Session-close seating sequence** → `hooks/session-close.md` (the Handoff Artifact Template + Clio's execution order).
 
 ---
 
 ## Changelog
 
+- 2026-07-25 — **Seating Sequences pattern added.** Named the multi-agent handoff chain pattern (session agent → Clio → Maggie is the first instance). Added to the Pointers list. Companion commit rewrites `hooks/session-close.md` as a seating-sequence contract with the Handoff Artifact Template. Born from a Dev Dexter session on agent memory/close architecture; Frank verdict FOLD-IN (not a new category, this is orchestration).
 - 2026-07-24 — **Class parity locked (Michael).** Added the Class Parity section: Mira seats by LANE, never by tier; teammates and lenses are the same kind of thing to her; `class` means PERSISTENCE (holds memory across sessions), not status. Threaded the rule through step 5 (equal-weight is class-blind), step 8/8b (elevation keys on phase + lane only; a supplement may be either class), step 15 (one combined seating tally, no class split), and a new anti-pattern. Also repaired stale pointers: `super-agents/superagents.json` → `super-agents/roster.json` in the routing-decision paragraph and the Pointers list (file renamed 2026-07-24; the old name only covered teammates). Reconcile surface 1 of 5 from Fleet Build Queue Decision Log J1.
 - 2026-07-22 — created. Built as Mira's canonical instruction set: relocates the old 14-step Charter (which was deleted from the `agents/maestro-mira.md` lens at the 2026-07-21 migration and never copied into her teammate profile — leaving her how-to homeless/scattered) and broadens it for the Orchestrator role (two interaction modes, the routing decision, the Felix-lookup consult, default-not-toll-booth). Rehomes old Charter step-14 (seating-balance) here. `council.md` lead summary + `maestro-mira/preferences.md` now point here for procedure; the lens tombstone points here too. Via a Frank + Workshop pass on the Mira session task (Frank verdict: FOLD-IN/RELOCATE, not net-new). Constitution §2–§3: procedure is a tool, the agent points.
