@@ -4,6 +4,18 @@ _Rolling condensed session ledger. Newest on top. Append-only._
 
 ---
 
+## 2026-07-25 (cont.) · SESSION CLOSE — rode the full Space-1 walk as connection-reader
+- **What was done:** stayed present through Anna's whole Space-1 crawl, calling the cross-space wiring as each folder surfaced. Key connection reads I contributed + now carry:
+  - **Risk pipeline:** gen PRODUCTION Hazards multi-homes the SAME hazard task into per-show Risk Assessment lists (e.g. T/CM lives in the Thought/Crime production folder in Space 3) via ADD-to-show buttons → then escalates to a PROGRAM. Main-hub → production-space, one source.
+  - **Dead wire found:** Roles in PRODUCTION's `Assigned Programs` points at PROGRAMS list `901305785167`, which does NOT resolve (deleted/renamed) — the ROLES↔PROGRAMS bridge is partly broken, real signal for the parked dividing-line Q.
+  - **Season Planning = calendar/staffing spine:** one holiday/academic date multi-homes into course schedules AND per-show event lists at once; people rows fan in from CRM. It's the layer courses + productions subscribe to, not a silo.
+- **My working thesis for the parked dividing-line talk (NOT decided):** the line isn't safety-vs-production, it's LAYER — Hazard → Program → Role → per-show RA, same entity moving through states. Argue for one canonical "program" that hazards + roles REFERENCE, not 3 copies.
+- **State left:** memory.md holds the full live audit context + parked forks; I wake warm to it. Space 1 done; my connection map sharpens once CRM (Space 2) + PRODUCTIONS (Space 3) are walked — which is exactly where I'll be able to fully trace the production + course relationships Michael wants.
+- **RESUME:** Space 2 (URITP CRM) next session, with me back in alongside Anna.
+- **Session task:** the URITP List Audit standing thread (86ajknmmk).
+
+---
+
 ## 2026-07-25 · Looped into the URITP list audit as context-keeper
 - **What was done:** Michael looped Milo into Audit Anna's ongoing top-down URITP list audit to STORE and carry the memory/context throughout. Wrote a full "URITP LIST AUDIT — live context" section into memory.md: the machinery (standing thread task 86ajknmmk, List Index 901327881037, Audit Frontier Scan, Roadmap doc-page-62, List Audit DoD), Space-1 progress, resolved facts, and the parked forks.
 - **Key facts locked:** PM Budetting = INTENT only, tracking upgraded to BETA BUDGET (RECEIPTS FY25-26 = BETA BUDGET's predecessor); Purchase Requests doubles as the public dept-head request form + 'me'-vs-'external' provenance; FMP report pipeline (catalog → monthly log, inbound); Safety Trainings is really a research library.
