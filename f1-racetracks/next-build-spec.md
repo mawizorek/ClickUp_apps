@@ -1,52 +1,117 @@
 # f1-racetracks — Next Build Spec
 
-**Cycle:** v5 (mobile pass, prior) → v6 (Weekend Story mode)
-**Theme:** Add **Story mode** to the Weekend race-detail surface — a Results / Story toggle that brings the same round to life (scrubbable position ladder + starting-grid wheel cards + pit lane + team radio), sharing the one `f1-results/2026/` data load. Option A: one page, one data load, no new lens.
+**Cycle:** v7 (unified shell + theme spine adoption)
+**Prior cycle:** v6 (Story Mode) — chunk set complete, splice parked until this rebuild lands
 
-> Story is NOT a new app and NOT a new lens. It is a **mode of the Weekend surface**. The lens switcher stays Matrix / History / Circuits; you still arrive at a race by drilling into a round. The Results/Story toggle lives in the race mast.
+---
 
-## Source location
+## Directive
 
-- **Edit surface (sanctioned):** `f1-racetracks/source/weekend/` chunk set — each file is readable and under the ~15KB budget. THIS is where Story was authored; the shipped `weekend.html` is reassembled from these.
-- **Chunk set (weekend):** `base.css`, `panels.css`, `story.css` (NEW), `data.js`, `render.js` (UPDATED v2.1), `nav.js`, `story.js` (NEW).
-- **Shipped file:** `f1-racetracks/weekend.html` (assembled artifact, >30KB — do NOT hand-splice blind; reassemble from chunks).
+Rebuild the F1 app into the standard repo object structure so all screens read as one app with one shared theme. Currently 5 separate HTML files with duplicated chrome, hardcoded hue-268 colors, and no connection to the shared theme spine.
 
-## What shipped to the chunk set this cycle
+**Target state:** one `index.html` shell (template-app pattern), `chrome.js` shared chrome, `pages/` partials, all consuming the theme spine via `THEMES.applyTheme('f1')`. The data layer and JS logic modules are preserved unchanged.
 
-1. **`story.js` (NEW)** — Story-mode engine. `window.mountStory(rd,i)` / `window.teardownStory()`.
-   - Derives the position **ladder from the round's own `classification`** (grid order → finishing order, smoothstep + noise), exactly like every Results panel derives from the store. This is the real light-lap layer, no new backend.
-   - Timing tower, position ladder, starting-grid wheel-cards (persistent DOM nodes that slide), pit lane, team-radio group chat, continuous-time scrubber with Lap/Sector/Sec resolution.
-   - **Illustrative / future layers (flagged in-UI):** per-second telemetry (speed/gear/rpm/DRS) is procedural; pit stops derive from `stintsFor(slug)` boundaries when present; radio shows an honest empty state until a `rd.radio[]` feed is archived. Ladder + order + gaps are store-derived.
-2. **`story.css` (NEW)** — Story styles in the weekend hue-268 tokens (sharp corners, 1px lines, Chakra Petch + JetBrains Mono). Includes `.mode-toggle`.
-3. **`render.js` (UPDATED → v2.1)** — adds the Results/Story toggle to the mast, wraps the 8 static panels in `#wk-results`, adds a `#wk-story` mount, and `window.setWeekendMode()` (lazy-mounts story on first entry, tears it down on leave to free the rAF loop).
+---
 
-## Reassembly into shipped `weekend.html` (the remaining step)
+## Pre-build: Schema validation (DO THIS FIRST)
 
-The chunk edits are done and reviewable. To ship, reassemble `weekend.html` from the chunk set. Three insertions vs the current shipped file:
+Before touching any code, validate the README schema section against reality. The FM-style schema (Tables, Fields, Relationships, Screen Contexts) was authored 2026-07-25. It needs to survive a week of Michael looking at it before we build a shell around it.
 
-1. **Styles:** inline `story.css` into the `<style>` block, AFTER `panels.css`'s content (it references the same tokens + fonts already present).
-2. **Logic:** inline `story.js` as a `<script>` BEFORE `nav.js` (so `window.mountStory` exists before boot/route runs) and AFTER `data.js` (it reads `tc`/`last`/`esc`/`el`/`stintsFor` globals). Replace the existing `render.js` block with the v2.1 content.
-3. **No shell/markup change needed** — the mode toggle + `#wk-results`/`#wk-story` containers are injected by `render.js` into the existing `#mast` and `#app`. The topbar/lens switcher (`nav.js`) is untouched.
+**Questions to settle:**
 
-Bump the footer stamp / `APP_VERSION` to v6. Verify: toggle flips cleanly, ladder renders on Story entry, tower/grid/radio tabs work, no rAF leak when switching back to Results, mobile stacks at ≤820px.
+- Does the screen hierarchy (3 lenses → circuit breakdown → weekend detail) still feel right?
+- Should standings remain a satellite or fold into the main router?
+- Is `circuits.html` redundant with the [Circuits] lens? Kill it or keep it?
+- Does live-tracker stay standalone or join the shell?
+- Where does the future tyre analysis page land (its own page in the router, or a mode on the circuit breakdown)?
 
-## Acceptance criteria
+**When these are answered, update the README Screens section and proceed.**
 
-- [ ] Race mast shows a Results / Story toggle; Results is default and unchanged from today.
-- [ ] Story mode: ladder derives from the round's classification; play + scrub (Lap/Sector/Sec) work; tower + grid wheel-cards + pit lane + radio tabs all render.
-- [ ] Switching Results ←→ Story mounts/tears down cleanly (no runaway animation frame).
-- [ ] Illustrative layers (telemetry, pit, radio) are visibly flagged, not passed off as sourced.
-- [ ] Weekend hue-268 tokens throughout; reads as the same app as the Results panels.
-- [ ] Mobile: stacks cleanly at 820px and below, no horizontal overflow at 320px.
-- [ ] Desktop Results layout unchanged.
+---
 
-## Futures (Story)
+## Build plan (after schema is locked)
 
-- **Per-second telemetry (R2 tier):** replace procedural speed/gear/rpm with real OpenF1 car data, one object per race in Cloudflare R2, lazy-loaded per selected driver. The light lap/sector layer stays in the round store.
-- **Archived team radio:** populate `rd.radio[]` in the round file (lap-tagged transcripts, driver/pitwall role, sys events); the feed already renders it. Later: audio clip playback on tap.
-- **Historical ghost overlay:** the ladder ghost toggle is stubbed; wire it to a prior-year same-circuit line from the growing store.
-- **Customizable driver steering wheels (Michael):** per-driver wheel-config (which readouts show, order, skin). Card render is isolated (`buildCards`/`updateGrid`) so the layout is swappable; add a config object when telemetry lands.
+### Phase 1: Shell scaffold
+- New `index.html` following template-app v5 pattern (slim hash-router, `<html data-theme data-mode>`)
+- `chrome.js` with header (lens toggle + nav links), settings drawer (theme picker), footer
+- Link `shared/themes/themes.css` + `resolve.js`
+- Boot with `THEMES.applyTheme('f1')` — compose the F1 theme join from whatever exists in `shared/themes/f1/`
+- `:root` fallback floor = current hue-268 tokens (so a failed theme load doesn't white-screen)
+- **Team colors (the 20-series) are a LOCAL identity layer.** They ride on top of any theme, never inside it. Same pattern as On Track.
 
-## Standing rule (all apps)
+### Phase 2: Port Home Grid
+- Move `09_app_bootstrap_and_home.js` logic into the new shell
+- Split it on the way (it's 26KB, over budget): router logic vs home-grid render vs lens-filter logic
+- Home grid becomes `pages/home.html` or inline in the router (TBD based on size)
+- Lens toggle moves into `chrome.js` header
 
-Every app must be explicitly designed for clean mobile AND desktop. No horizontal overflow at 320px; wrap/stack action bars; touch targets ≥ 44px; fluid `clamp()`/`min()`/`%`; safe-area insets. Test at phone width before shipping.
+### Phase 3: Port Circuit Breakdown
+- `10_track_views_and_profile.js` + `11_weather_and_footer_exports.js` become a `pages/circuit.html` partial
+- Weekend Center (14-17) renders inside the circuit page as before
+- Driver Popup stays as an overlay within the circuit context
+
+### Phase 4: Port Standings
+- `source/standings/` chunk set renders into a `pages/standings.html` partial
+- No longer a separate HTML file; lives in the router
+
+### Phase 5: Port Weekend Race Detail
+- The monolith (`weekend.html`) becomes `pages/weekend.html` partial
+- On this port, the Story Mode splice can happen naturally (it's the same partial, just adding the story chunks)
+- This is where Story Mode v6 finally ships
+
+### Phase 6: Retire satellites
+- Delete `standings.html`, `circuits.html` (if decided to fold), `weekend.html` as top-level files
+- Redirect any external links (app-dashboard, ClickUp tasks) to the new hash routes
+- Update VERSIONS.md to v7
+
+---
+
+## What stays unchanged
+
+- **All data files** (`data.json`, `f1-results/2026/`, `circuits/`, `index_rounds.json`)
+- **All JS logic modules** (09-18) — they get LOADED by the new shell, not rewritten
+- **`live-tracker.html`** — stays standalone (separate context: OpenF1 real-time, no store dependency)
+- **`story-mode-reference.html`** — stays as splice reference until Phase 5 absorbs it
+
+---
+
+## Theme: the F1 join
+
+The theme is a 4-vector: colors × typography × forms × spacing.
+
+| Vector | Current (hardcoded) | Target (spine join) |
+|--------|--------------------|-----------|
+| Colors | hue-268 custom palette | `shared/themes/f1/<color>.json` (to be authored) |
+| Typography | Chakra Petch + Inter + JetBrains Mono | `shared/themes/f1/typography` row in `typography.tsv` or standalone |
+| Forms | sharp corners, 1px lines | `shared/themes/f1/forms` row |
+| Spacing | custom per-file | inherit from spine default (standard spacing) |
+
+**The F1 identity layer (ON TOP of theme):**
+- Team colors (`--t-mercedes`, `--t-ferrari`, etc.) — the 20 named team vars
+- Sector colors (`--s1`, `--s2`, `--s3`)
+- Status colors (purple FL, green personal best, yellow sector)
+- These are LOCAL and never swept into the theme vector
+
+---
+
+## Acceptance criteria (full rebuild)
+
+- [ ] Single `index.html` serves all screens via hash router
+- [ ] `chrome.js` renders shared header/footer/settings on every page
+- [ ] Theme loads from spine (`THEMES.applyTheme('f1')`) — picker in settings works
+- [ ] All current screens render identically (visual diff pass)
+- [ ] Story Mode splice is included in the weekend page (v6 acceptance criteria met)
+- [ ] No horizontal overflow at 320px on any screen
+- [ ] `live-tracker.html` still works standalone
+- [ ] Data refresh procedure unchanged (data-only PRs still work, no shell bump)
+- [ ] Source modules under budget (the 26KB `09` file is split)
+
+---
+
+## Standing rules (carry forward)
+
+- Mobile-first. 320px clean. Touch targets 44px.
+- `var(--token)` everywhere. Zero color literals.
+- Theme goes LAST. Build on `default-theme`, apply the F1 join at the end.
+- Data nests inside its app.
+- Two-artifact ship for over-cap files.
