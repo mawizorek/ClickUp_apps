@@ -1,0 +1,21 @@
+/* Artwork rollup additions — loads after catalog.css. Kept in its OWN file deliberately:
+   catalog.css is where the opacity:0 image gate lived (5 image outages, one of them fatal to
+   three rounds of diagnosis), so new presentation rules land beside it rather than inside it.
+   Smaller blast radius, and a diff on this file can never touch an image visibility rule. */
+
+/* edition count badge on an artwork card */
+.frame .edcount{position:absolute;bottom:8px;right:8px;z-index:2;font-family:var(--mono);font-size:0.54rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;padding:3px 7px;border-radius:3px;background:rgba(10,14,19,0.82);color:var(--ink);border:1px solid var(--line)}
+.card.is-art .frame{box-shadow:inset 0 0 0 1px var(--line-soft)}
+/* stacked-paper hint so an artwork card reads as "more than one" at a glance */
+.card.is-art{position:relative}
+.card.is-art::after{content:"";position:absolute;top:-4px;left:6px;right:6px;height:6px;border-radius:8px 8px 0 0;background:var(--surface-2);border:1px solid var(--line);border-bottom:none;z-index:-1}
+
+/* "#7, #12 sold" line under the card title */
+.card .soldline{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.04em;color:var(--amber);margin-top:4px}
+
+/* edition strip in the detail drawer */
+.edstrip{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:var(--s3)}
+.edchip{font-family:var(--mono);font-size:0.7rem;font-weight:600;letter-spacing:0.02em;padding:6px 11px;border-radius:6px;border:1px solid var(--line);background:var(--sunk);color:var(--ink-soft);cursor:pointer;transition:all .15s var(--ease)}
+.edchip:hover{border-color:var(--ink-faint);color:var(--ink)}
+.edchip.on{background:var(--accent);border-color:var(--accent);color:var(--bg);cursor:default}
+.edchip.gone{text-decoration:line-through;color:var(--ink-faint);opacity:.6;cursor:not-allowed;background:transparent;border-style:dashed}
