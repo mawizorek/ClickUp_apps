@@ -10,6 +10,7 @@
     { "slug": "audit-anna", "name": "Audit Anna", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Anna (+ audit-intent auto-seize)", "aka": ["Anna", "Audit", "Root-It"], "lane": "Audit lead — seizes any audit, names the true purpose first, drives Know/Touch/Do, holds the Open-Surface Ledger.", "home": "super-agents/audit-anna/", "from": "agents/audit-anna.md (tombstone)", "accent": "oklch(66% 0.17 35)" },
     { "slug": "workhorse-wes", "name": "Workhorse Wes", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Wes (alias /wes — never the retired workshop-wes)", "aka": ["Wes"], "lane": "Driving force — keeps Michael big-picture; names rabbit holes, kills bikeshedding, protects momentum.", "home": "super-agents/workhorse-wes/", "from": "agents/workhorse-wes.md (tombstone)", "accent": "oklch(66% 0.15 40)" },
     { "slug": "dev-dexter", "name": "Dev Dexter", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Dexter", "aka": ["Dexter", "Dex", "Dev"], "lane": "Build & engineering lead — architecture + code quality across sessions, enforces repo law, writes code; review folded in.", "home": "super-agents/dev-dexter/", "accent": "oklch(69% 0.15 155)" },
+    { "slug": "memory-maggie", "name": "Memory Maggie", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Maggie (+ auto on any brain-memory write intent; mandatory at session close)", "aka": ["Maggie", "Memory"], "lane": "Memory steward — sole brain-memory write path, placement triage (deny-by-default), the OMR queue, the close-time Memory Audit.", "home": "super-agents/memory-maggie/", "from": "agents/memory-maggie.md (tombstone)", "accent": "oklch(70% 0.12 300)" },
     { "slug": "clickup-coach-corey", "name": "ClickUp Coach Corey", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Corey", "aka": ["Corey"], "lane": "ClickUp structure + setup coaching (schema, list connections, automations) + ClickUp-space auditing.", "home": "super-agents/clickup-coach-corey/", "retired_native_id": -39958913, "accent": "oklch(68% 0.13 210)" },
     { "slug": "mainstage-milo", "name": "Mainstage Milo", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Milo", "aka": ["Milo", "Mainstage"], "lane": "URITP production manager assistant — production tracking, day-to-day ops, safety end-to-end, program operations.", "home": "super-agents/mainstage-milo/", "retired_native_id": -39940529, "accent": "oklch(70% 0.14 60)" },
     { "slug": "fmp-frank", "name": "FMP Frank", "class": "super-agent", "memory": true, "status": "needs-declaration", "invoke": "/session.agent=Frank (pending rebuild)", "aka": ["Frank", "FMP"], "lane": "FileMaker solution design & documentation. Rebuild pending — lane to be pinned singular first.", "home": "super-agents/fmp-frank/", "retired_native_id": -39958890, "accent": "oklch(70% 0.13 45)" },
@@ -35,7 +36,6 @@
     { "slug": "scribe-sana", "name": "Scribe Sana", "class": "agent", "memory": false, "status": "active", "seat": "close", "lane": "Documentation logger + live session-transcript keeper; owns the real-time session log.", "home": "agents/scribe-sana.md", "accent": "oklch(70% 0.10 120)" },
     { "slug": "handoff-hana", "name": "Handoff Hana", "class": "agent", "memory": false, "status": "active", "seat": "close", "lane": "Handoff packager; the next-session baton.", "home": "agents/handoff-hana.md", "accent": "oklch(70% 0.12 20)" },
     { "slug": "closing-clio", "name": "Closing Clio", "class": "agent", "memory": false, "status": "active", "seat": "close", "lane": "Session-close auditor; reconciles docs + indexes, reports health. Owns usage-log.json.", "home": "agents/closing-clio.md", "accent": "oklch(70% 0.12 20)" },
-    { "slug": "memory-maggie", "name": "Memory Maggie", "class": "agent", "memory": false, "status": "active", "seat": "audit", "lane": "Memory steward; the SOLE path for brain-memory writes. Owns placement triage + the close-time Memory Audit.", "home": "agents/memory-maggie.md", "accent": "oklch(70% 0.12 300)" },
     { "slug": "scout-sage", "name": "Scout Sage", "class": "agent", "memory": false, "status": "active", "seat": "research", "lane": "Research runner; multi-source sourced lookup with confidence + one recommendation.", "home": "agents/scout-sage.md", "accent": "oklch(70% 0.12 20)" },
     { "slug": "recon-renata", "name": "Recon Renata", "class": "agent", "memory": false, "status": "active", "seat": "audit", "lane": "Repo auditor; audits mawizorek/ClickUp_apps against the operating standard. Read-only.", "home": "agents/recon-renata.md", "accent": "oklch(70% 0.12 20)" },
 
@@ -54,11 +54,12 @@
       "Anna | Audit | Root-It": "audit-anna",
       "Wes | /wes": "workhorse-wes (NEVER the retired workshop-wes)",
       "Dexter | Dex | Dev": "dev-dexter",
+      "Maggie | Memory": "memory-maggie (also 'open as Memory Maggie' = session operating identity)",
       "Corey": "clickup-coach-corey",
       "Milo | Mainstage": "mainstage-milo",
-      "Frank | FMP": "fmp-frank (rebuild pending)"
+      "Frank | FMP": "fmp-frank (rebuild pending). ⚠️ COLLISION: 'Frank' alone is ambiguous — Fold-in Frank is a live lens. Bare 'Frank' resolves HERE only while fmp-frank stays unbuilt; a rename is queued for Michael (Fleet Build Queue Q6). Say 'Fold-in Frank' in full for the gate."
     },
-    "tombstones": "Anna, Mira, Wes each have a tombstone at agents/<slug>.md AND a live bundle at super-agents/<slug>/ — always resolve to the super-agents/ home."
+    "tombstones": "Anna, Mira, Wes, Maggie each have a tombstone at agents/<slug>.md AND a live bundle at super-agents/<slug>/ — always resolve to the super-agents/ home."
   },
   "pointers": {
     "how_to_BE": "super-agents/_shared/super-agent-base.md",
