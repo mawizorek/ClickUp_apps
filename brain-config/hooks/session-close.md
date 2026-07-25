@@ -9,84 +9,58 @@ owner_agents: [closing-clio, memory-maggie, scribe-sana]
 
 # Session Close Hook
 
-**Fires:** at the end of every Brain session, no exceptions. Even short sessions. Even sessions with no builds or memory changes.
-
-**Canonical source:** this file. Supersedes any prior ClickUp doc version.
+**Fires:** at the end of every Brain session, no exceptions.
+**Canonical source:** this file. ClickUp page is archival only.
+**Decision history:** `brain-config/hooks/session-close.decision-log.md`
 
 ---
 
-## ⚡ NO-ASK EXECUTION — the close JUST FIRES, never ask permission to run it (LOCKED 2026-07-18, Michael)
+## Runtime stance
 
-**When a close is triggered (Michael says "close out" / "session closed" / "wrap it up", or a natural end is reached), EXECUTE the full close procedure end-to-end WITHOUT asking permission for any step of it.** Every step below is already mandatory and already documented. Asking "want me to fire the two channel posts?" / "should I post the session log?" / "do you want the memory audit?" is asking permission to follow the standing procedure — which is itself a failure, not diligence.
-
-- **The decision was made when the procedure was written.** A documented-mandatory step does not get a permission gate at runtime. Run it.
-- **Do not stall a close on a yes/no you already know the answer to.** If the spec says a step is non-negotiable, the answer is always yes; asking just burns a turn and makes Michael repeat himself.
-- **The ONLY thing you surface instead of silently claiming done:** a step that genuinely FAILED or could not run (tool unavailable, bounced write). Report the specific gap and what you did about it. That is different from asking whether to do a required step in the first place.
-- **Litmus:** if the honest phrasing of your question is "do you want me to follow the procedure?", delete the question and follow the procedure. If it's "X failed, here's the fallback I took," that's a valid report.
-- **This generalizes beyond close:** any step that documentation defines as mandatory (session-open gate, scoreboard read, dedup gates, etc.) JUST RUNS. Do not ask permission to do the thing the rules already require.
-
-*(Origin: scored B10 on the Scoreboard 2026-07-18 — asked Michael a variant of "want me to fire the two channel posts?" FOUR times across one close sequence, when the two-channel close was already a hard rule below. Michael: "ofc I want you to complete those tasks to finish out the session close. add documentation that enforces you just getting that done.")*
+When close is triggered, **run the whole procedure without asking permission** for mandatory steps. Only surface actual failures.
 
 ---
 
 ## Overview
 
-Two posts, two channels, every session. Both follow the same structural rule: **root = tight header only, thread reply = all detail.** The root is what shows in the channel feed; the thread is what you expand when you want the full picture.
+Two channel posts, then task shutdown, then durable handoffs, then usage-log commit.
 
-**Transcript-location reframe (2026-07-17):** the live play-by-play transcript now accrues on the session's **Agent Activity Board task** (as comments), NOT in the A.I. Prompts channel. That task is the live working record and functionally replaces the old active session thread. See `Agent Activity Board — Gold Standard` (Brain Reference). Consequently the Channel 2 (Session Log) post is now a **SUMMARY that points back to the session task**, not a re-created full transcript. Do not rebuild a faithful transcript at close — it already accrued on the task, comment-by-comment, as the session ran.
+- **Live transcript:** the Agent Activity Board session task
+- **Channel 1:** Memory Audit
+- **Channel 2:** Session Log summary with pointer to the session task
+- **Handoff:** a real task in the board's `to do` slot, not a chat code block
 
-**The session task did NOT replace the channel close (hard rule, Michael 2026-07-17).** Having an Activity Board task is an ADDITIONAL surface, not a substitute for the two-channel close. When a session ends (or Michael says "session closed"), the FULL close hook still fires: both channel posts happen AND the session task is shut down with a final pointer comment. Do not treat "I updated the task" as a completed close. "Closed out" is only true once both threads are posted, the task carries its final pointer comment, and Michael has been handed the task link.
-
-**Status semantics + handoff-at-close (ELEVATED 2026-07-17, Michael).** An actively-driven session task is `in progress` from the moment it's created (never parked at `to do` — you're doing it this second); the FIRST status (`to do`/New/Open) is repurposed as the HANDOFF/waiting slot, meaning "nobody is driving this yet." At close the warm-start handoff is no longer pasted as a chat code block: the agent CREATES the next-session task in the `to do` handoff slot, pre-loaded with the handoff prompt (Block T6 in the Gold Standard), and chains it to the closing task via a task relationship + pointer comment (Block T7). Michael starts the next session by opening that task and saying "complete the handoff prompt here, let's keep going"; the picking-up agent flips it to `in progress` and runs. See `Agent Activity Board — Gold Standard`.
+The task never replaced the two-channel close.
 
 ---
 
-## Two Modes: Full Close (default) vs Soft Close
+## Modes
 
-**Full Close is the default.** Every session closes with the full procedure below (both channel posts + the usage-log commit) UNLESS Michael explicitly says **"soft close"** / **"let's do a soft close."** The phrase is the only trigger; a generic "let's close" / "wrap it up" is still a full close.
+**Full close** is default. **Soft close** only when Michael explicitly says so.
 
-### Soft Close (lightweight variant)
+### Soft Close
 
-**When:** small, low-narrative sessions where a full summary + memory audit is overkill: uploading photos to a task, a quick single-artifact tweak, a one-off lookup. Michael calls it explicitly.
-
-**What STILL runs (back-end tooling, non-negotiable):**
-
-- **Tool-usage tally + commit** to `brain-config/usage-log.json`. Count every profiled hook/gate/agent that fired this session, increment each count, bump `sessions_logged`.
-- **Agents built/invoked** this session are tracked in the same tally.
-- **Git indexing + closing articulation** committed as normal.
-- **Session Ledger finalize** (see below). Even a soft close finalizes the ledger on the task — the whole point is that a build/creation event is never lost, and a soft close is exactly the session where you'd otherwise skip recording it. If the ledger's Built/changed block is non-empty, the session was probably substantive enough to warrant a full close; reconsider.
-
-**What's SKIPPED:**
-
-- **Channel 1 (Memory Audit):** skipped **only if memory was NOT written this session.** If any memory edit landed (or bounced), the audit STILL fires.
-- **Channel 2 (Session Log):** no session-log summary post on a soft close. (A soft close means the session task never carried substantive work; if a session task WAS opened and accrued real transcript comments, that session was substantive — finalize it as a full close.)
-
-If a soft-close session unexpectedly turned substantive (real decisions, a build), upgrade to a full close.
+Runs: usage-log commit, git-side closing writes, Session Ledger finalize.  
+Skips: Channel 2, and Channel 1 only if memory was untouched.  
+If the session became substantive, upgrade to full close.
 
 ---
 
 ## Channel 1: Brain Max Memory Audit
 
-**URL:** https://app.clickup.com/36074068/chat/r/12cwjm-55833
-**Owner:** Memory Maggie (sole owner of brain-memory file across its lifecycle).
-**Purpose:** Track memory file health over time. Every session leaves a breadcrumb of what changed (or didn't) and current capacity.
+**URL:** https://app.clickup.com/36074068/chat/r/12cwjm-55833  
+**Owner:** Memory Maggie  
+**Purpose:** memory-file health over time
 
-*(Unchanged by the 2026-07-17 reframe.)*
-
-### Root message format (EXACT)
+### Root message format
 
 ```
 ~{tokens} / 2000 ({percent}%)
 ```
 
-One line. No markdown headers, no emoji, no session title. Just the number.
-
-**Correct:** `~1855 / 2000 (93%)`
-**Wrong:** `## Memory Audit — session name` (detail belongs in thread)
+One line only.
 
 ### Thread reply format
-
-Post as a reply to the root. Contains the full audit:
 
 ```
 ## Memory Audit — {date} {session topic}
@@ -112,78 +86,42 @@ Post as a reply to the root. Contains the full audit:
 {Pruning candidates, compression suggestions, health notes, or "No action needed."}
 ```
 
-**Optional sections (include when relevant):**
-
-- `### Issue flagged:` — process gaps or drift caught during the session
-- `### Pending writes:` — if a memory edit bounced/failed and needs retry. **If a write bounced, ALSO drop it in `brain-config/open-memory-requests.md` (see the bounced-write rule below) so a later agent lands it — the audit note alone is not enough.**
+Optional: `Issue flagged`, `Pending writes`
 
 ---
 
-## Bounced / unlanded memory writes — drop them in the open queue (2026-07-17)
+## Durable memory failure handoff
 
-If a memory write was attempted this session but did NOT land (no memory manager available, edit-guard bounce, tool failure), closing the session includes **dropping it into `brain-config/open-memory-requests.md`** (Door 1: append ONE `OMR-<date>-<n>` entry under Open, self-contained, with a non-binding placement guess). Do NOT silently leave it as only a chat mention or an audit footnote — those don't survive into the next session. The open-memory-requests queue is the durable handoff; Memory Maggie drains it in a fresh session. This step runs before the usage-log commit. Michael's directive: "if you have a memory addition request, drop it in the open memory thread in the Git for another agent to pick up later."
-
----
-
-## Open-thread note → also append to open-thread.md (2026-07-17, Michael)
-
-The open-loop / open-thread note for a session is ALREADY posted as a comment on the session's Agent Activity Board task — that's part of the normal in-session workflow and does not change. At close, that SAME note is ALSO appended as the next entry in `brain-config/open-thread.md`.
-
-- **No review required.** Do not gate this on a review pass or ask permission — just post it as the next line/entry, same as any other close step. Michael's directive (2026-07-17): "take the same open-thread note and just post it in the open thread section... we won't require a review of that; just post it as the next line."
-- **Two surfaces, one note, different jobs:** the task comment is the in-session record where the loop was raised; `brain-config/open-thread.md` is the durable cross-session queue a cold agent reads at the Session Open trigger. The append is what carries the loop into the next session — a comment alone doesn't get read at session open.
-- **Format:** follow the existing `open-thread.md` entry shape (heading + `**Added:** YYYY-MM-DD` + the note body). Append; never overwrite existing entries. Repo write, so it goes through the normal branch → PR → self-merge flow like any other close-time commit.
-- Parallel to the bounced-memory-write drop above: both are durable handoffs written at close so nothing that's still open dies inside a single session's chat/comments.
+If a memory write did not land, append one self-contained entry to `brain-config/open-memory-requests.md` before the usage-log commit.
 
 ---
 
-## 🧬 Session Ledger — the browse-without-the-transcript layer (ADDED 2026-07-19, Michael)
+## Durable open-loop handoff
 
-**What it is.** A fixed section in the session task's DESCRIPTION (not the comments) that inventories what the session BUILT, CHANGED, and TOUCHED — a scannable dashboard so a reader can answer "which session did we create tool X in / touch repo Y / edit doc Z" WITHOUT reading the faithful transcript. It accretes live as work happens (Scribe Sana's job) and is FINALIZED at close.
+Append the session's open-thread note, already present on the task, as the next entry in `brain-config/open-thread.md`. Append, never overwrite.
 
-**Why it's distinct from `usage-log.json` (do not conflate).** The usage-log is the CUMULATIVE, machine-side tally of how many times each profiled tool has ever fired (step 7 below). The Session Ledger is the PER-SESSION, human-scannable, provenance-first record living ON THE TASK. The usage-log answers "how often does the Task Dedup Gate fire"; the ledger answers "which session was Style Stu born in." They stack, they don't collide.
+---
 
-**The four blocks (canonical shape — also mirrored in the Gold Standard doc + the 🧪 template task):**
+## 🧬 Session Ledger
 
-```
-## 🧬 Session Ledger — browse-without-the-transcript dashboard
-(accretes live via Scribe Sana; finalized at close)
+Finalize the ledger on the session task before usage-log commit. Canonical shape lives on the Agent Activity Board Gold Standard.
 
-### 🔨 Built / changed   ← the hero · ALWAYS present (write "- none this session" if empty)
-- <agent|hook|gate|spec|app|doc|list|view|field|automation> · <name> · <one-line what + why> · <link>
-
-### 🛠️ Drove the work   (notable tools/agents that RAN; omit the always-on roster · collapse if empty)
-- <name> · <what it did here>
-
-### 📁 Repos touched   (commits/PRs; a file BORN here goes in Built, not here · collapse if empty)
-- <repo/path> · <commit/PR> · <link>
-
-### 📄 CU docs touched   (edited-in-passing; a doc CREATED here goes in Built · collapse if empty)
-- <doc/page> · edited · <link>
-```
-
-**The rules that make it useful cold (Audit Anna, 2026-07-19):**
-
-1. **🔨 Built/changed ALWAYS renders**, even as `- none this session`. It is the ONE non-collapsing block. A deleted-when-empty hero is ambiguous — a browser can't tell "nothing was built" from "agent skipped the ledger." Explicit `none` proves it was considered.
-2. **Every entry carries a link** or it isn't browsable. A ledger you can't click through is just prose. Hard requirement.
-3. **Split by ORIGIN, never double-list.** Born this session → 🔨 Built. Merely edited-in-passing → 📁 Repos / 📄 Docs. A thing appears in exactly one block.
-4. **🛠️ Drove the work omits the always-on roster** (De-Slop, Source & ID Guard, Commit Pre-Flight, etc.) — those fire every session and are noise here; the usage-log already counts them. List only notable/contextual tools + agents that actually shaped the work.
-5. **Collapse empty blocks 2–4** (delete the heading + placeholder). Never leave a placeholder line. Only the 🔨 hero is exempt.
-
-**Filtering:** a ClickUp view can't filter on description text, so the board's browse view gives a clean chronological surface + full-text search finds a name inside the ledger. To HARD-filter "sessions that built something," apply the low-cardinality `🔨 built` tag whenever the hero block is non-empty (added at finalize).
-
-**Finalize at close:** reconcile the ledger against what actually shipped this session (Scribe Sana accreted it live; verify + fill gaps), enforce the 5 rules above, apply the `🔨 built` tag if the hero is non-empty. This runs as part of the session-task shutdown (step 3 below), BEFORE the usage-log commit.
+Minimum rules:
+- `🔨 Built / changed` always renders, even `- none this session`
+- every entry carries a link
+- split by origin, no double-listing
+- omit always-on tools from `Drove the work`
+- collapse empty blocks except the hero block
 
 ---
 
 ## Channel 2: A.I. Prompts (Session Log)
 
-**URL:** https://app.clickup.com/36074068/chat/r/6-901327646617-8
-**Owner:** Closing Clio (session health, ref inventory, hurdles, doc/index reconciliation).
-**Purpose:** Permanent append-only INDEX of every Brain session — a scannable summary + a pointer to the session's Agent Activity Board task, which holds the full live transcript.
+**URL:** https://app.clickup.com/36074068/chat/r/6-901327646617-8  
+**Owner:** Closing Clio  
+**Purpose:** summary index of the session, with pointer to the session task
 
-**Transcript lives on the task, not here (2026-07-17).** The session's Agent Activity Board task accrued the play-by-play live, as comments, throughout the session. At close the channel post is a concise SUMMARY (headlines + decisions + open loops) that **links to that task** as the full record. Do NOT paste a full chronological transcript into the channel and do NOT rebuild one from memory — point to the task instead.
-
-### Root message format (EXACT)
+### Root message format
 
 ```
 ## {Session Topic}
@@ -192,21 +130,9 @@ trigger: {what started the session} | {date range} ET
 status: {complete | partial | handed off}
 ```
 
-Three lines. Header, trigger line, status line. No detail, no bullet points, no refs.
-
-**Correct:**
-```
-## File Chunker v17 — build, ship, repo-commit fumble
-
-trigger: v17 build handoff | 2026-07-01 21:22 ET
-status: v17 built + shipped as artifact; repo commit walked back
-```
-
-**Wrong:** putting the full summary in the root (detail belongs in thread).
+Three lines only.
 
 ### Thread reply format
-
-The thread is a SUMMARY that leads with a pointer to the session task, then the closing structure. No full transcript.
 
 ```
 ## Session Summary
@@ -242,139 +168,69 @@ The thread is a SUMMARY that leads with a pointer to the session task, then the 
 ...
 ```
 
-The `Scoreboard (revised at close)` line is the close-side bookend of the opening transcript comment's `Current scoreboard at:` reading (posted on the session task at open — see the Agent Activity Board — Gold Standard cold-agent path). It states, in one line, whether any scoreboard points were awarded during THIS session, were bumped by someone else while it ran, or the standing is unchanged since open. Pull the current standing from the Scoreboard page.
-
-**Optional sections (include when relevant):**
-
-- `### Commits` — table of repo commits if the session touched GitHub
-- `### Delegated prompts` — handoff blocks for other agents
-- `### Process lesson` — if something went wrong and we learned from it
+Transcript stays on the task, not in this thread.
 
 ---
 
-## Session-task shutdown (the fourth close surface, 2026-07-17)
+## Session-task shutdown
 
-After both channel posts, the session's Agent Activity Board task is CLOSED OUT, not just left open:
-
-1. **Finalize the Session Ledger** on the task description (see the 🧬 Session Ledger section above) — reconcile it against what actually shipped, enforce the 5 rules, apply the `🔨 built` tag if the hero block is non-empty.
-2. **Post the final task comment** — its last comment is a `[CLOSE-POINTER]` that links the two threads you just posted (Memory Audit + Session Log) and states that the task holds the full transcript. It also carries the **scoreboard-revised-at-close line** (🤖 N · 🧑 M + whether points were awarded THIS session, bumped by someone else, or unchanged since open) — the bookend to the opening transcript comment's `Current scoreboard at:` reading. Template `T4` lives in the Agent Activity Board — Gold Standard.
-3. **Flip the task status to `done`.**
-4. **Hand Michael the task link in chat** — the ONE link that matters, since the task now contains the full transcript from open through close, including links out to both channel threads. Template `T5` (the chat close message) lives in the Agent Activity Board — Gold Standard.
-
-The task pointer comment and the channel posts cross-link: the channel Session Log points INTO the task (full transcript); the task's final comment points OUT to the two channel threads.
+After the two channel posts:
+1. finalize Session Ledger
+2. post final `[CLOSE-POINTER]` comment on the task with both thread links and scoreboard delta
+3. flip task to `done`
+4. hand Michael the task link in chat
 
 ---
 
-## Warm-Start Handoff → the next-session handoff TASK (reframed 2026-07-17)
+## Next-session handoff task
 
-**When:** whenever a session has a next step / open loops that continue into the next session. Skip only on a genuinely clean close with no next step.
+If a next step exists:
+- scrub the board first with the Task Dedup Gate, widened to `closed` and `done`
+- clear match: reopen and re-status into `to do`
+- ambiguous: ask before mutating
+- no match: create a new handoff task
 
-**🔎 SCRUB BEFORE YOU CUT — reopen over sloppy-create (ADDED 2026-07-19, Michael).** Cutting a handoff task is a CREATE, so the same reopen-over-create discipline the Session Open gate applies at the TOP of a session applies here at the BOTTOM. Before creating a fresh handoff task, scrub the Agent Activity Board HARD for a session/thread this handoff genuinely continues — especially in a MULTI-LOOP effort where earlier session threads on the same subject already exist. Do NOT re-dictate the search: run the **Task Dedup Gate** (`brain-config/hooks/task-dedup-gate.md`) against the board, widened to `closed`/`done` (hidden by default) and matched on scope/subject/domain, not just title text. Deep multi-loop threads are exactly where a lazy scrub forks a duplicate handoff next to the real one.
-
-- **High-confidence match:** REOPEN that thread and **re-status it into the handoff slot** (`to do`) instead of cutting a brand-new task. Pre-load/refresh its handoff prompt (Block T6) and chain it to the closing task (relationship + pointer comment T7). Re-statusing the existing thread is the lean move; a fresh task scattered beside it is the sloppy one.
-- **Ambiguous match:** do NOT auto-reopen. Re-statusing/reopening is MUTATING, and a wrong one POLLUTES an unrelated real record (far harder to untangle than deleting a duplicate). Surface the candidate with its link + status and ASK "continue this thread as the handoff, or cut a fresh one?" before touching it.
-- **No genuine match:** create the handoff task new (the Delivery flow below).
-
-This is the close-side mirror of the Session Open "If picking up late in a session" addendum: identify matches via the dedup gate, reopen on a clear match, ask when ambiguous, never silently fork or mis-reopen. The confidence bar is the same because the risk is the same — a wrong re-status corrupts a real thread.
-
-**Delivery (CHANGED 2026-07-17).** Do NOT paste the next-session prompt as a bare code block in chat anymore. Instead **create the next-session task on the Agent Activity Board** (or re-status the matched thread per the scrub above), in the FIRST status (`to do` = handoff/waiting slot — no agent is driving it yet), pre-loaded with the handoff prompt in its description (Block T6 in the Gold Standard). Then **chain it to the closing session:** (1) a task **relationship** (follow-up of the closing task) and (2) a **pointer comment** on both tasks (Block T7). Michael triggers the next session by opening that task and saying "complete the handoff prompt here, let's keep going"; the picking-up agent flips it to `in progress`, posts its opening transcript comment (referencing the handoff), and runs. It's fine for a handoff task to sit open and untouched — it's the queue, not debt.
-
-**The handoff prompt content — fixed sections (in order), written into the task description so a cold agent can act without loading prior conversation:**
-
-1. **OBJECTIVE** — what the next session is picking up
-2. **READ FIRST** — repo paths + read-method caveats (raw vs MCP, known truncation risks)
-3. **PROCEDURE** — numbered steps
-4. **CANDIDATES/NEXT** — ranked with status
-5. **GUARDRAILS** — what to avoid / known failure modes
-6. **OPEN THREADS** — anything unresolved
-
-Never just post a bare link as a handoff. The prompt in the task must be self-contained enough that a cold agent can act on it without loading prior conversation.
+The handoff is a task, never an inline chat code block.
 
 ---
 
-## Rules (non-negotiable)
+## Rules
 
-0. **NO-ASK EXECUTION (2026-07-18).** Do not ask permission to run any step the close procedure already defines as mandatory. When a close is triggered, execute end-to-end. The only thing you surface mid-close is a step that FAILED (with the fallback you took), never a yes/no on whether to do a required step. See the NO-ASK EXECUTION section up top. Asking "want me to fire the channel posts?" is a scored failure (B10).
-1. **NEVER use `create_as_post: true`.** Posts are for channel-wide announcements, not session logs. Session logs are regular messages with threaded detail.
-2. **NEVER put detail in the root.** The root is the feed-scannable identifier. If someone scrolling the channel can't read your root in under 2 seconds, it's too long.
-3. **ALWAYS thread the detail.** Use `parent_message` pointing at the root message URL you just created.
-4. **Both channels, every session.** Even if memory didn't change (audit says "no changes, stable at X%"). Even if the session was short.
-5. **The full transcript lives on the Agent Activity Board session task, not the channel.** It accrued live as comments during the session. At close, the channel Session Log is a SUMMARY that links to that task. Rebuilding a faithful transcript in the channel at close is a failure mode, not the procedure — point to the task.
-6. **The session task is CLOSED OUT at close, and the channel close STILL fires.** The task never replaced the two-channel close; both happen. Shut the task (final `[CLOSE-POINTER]` comment + status `done`) AND post both channels AND hand Michael the task link. "Closed out" is false until all of that is done — if any piece is missing, say what's missing instead of claiming closure.
-7. **A bounced/unlanded memory write is dropped in `brain-config/open-memory-requests.md`** as part of close, not left as only a chat mention or audit footnote.
-8. **Closing capacity is MANDATORY in the session-log summary thread.** Every close reports Brain's real context usage (numbers, not vibes) + one honest line on how it feels and what recall is reliable vs hazy.
-9. **Memory audit posts first, then session log summary.** Maggie posts Channel 1; Clio posts Channel 2 (summary + task pointer). Two owners on the posts, both root + thread.
-10. **Root messages are never edited after posting.** Add info by threading.
-11. **Thread replies can have addenda.** If the session continues after initial close (extended session), post an addendum reply in the same thread rather than a new root.
-12. **Usage log commit (after both posts + task shutdown).** Tally which profiled tools (hooks, gates, agents) fired during the session. Commit an update to `brain-config/usage-log.json` incrementing each tool's count and bumping `sessions_logged`. Format: `{ "tools": { "tool-slug": N, ... }, "sessions_logged": N, "last_updated": "YYYY-MM-DD" }`.
-13. **The session's open-thread note is appended to `brain-config/open-thread.md` at close, no review.** It's already a comment on the session task (in-session record); the append is the durable cross-session queue a cold agent reads at Session Open. Append the next entry, never overwrite; commit via the normal branch → PR → self-merge flow.
-14. **The warm-start handoff is a TASK, not a chat code block (2026-07-17).** At close, create the next-session task in the first status (`to do` = handoff/waiting slot), pre-load the handoff prompt (Block T6), and chain it to the closing task (relationship + pointer comment T7). Active session tasks are `in progress` from creation; the first status is reserved for handoff/waiting. Don't paste the next-session prompt inline in chat anymore.
-15. **Every close reports the scoreboard delta (2026-07-18, Michael).** The opening transcript comment carried a `Current scoreboard at: 🤖 N · 🧑 M` reading; the close carries the matching `Scoreboard revised at close:` line in BOTH the Session Log summary thread and the task's `[CLOSE-POINTER]` comment. One line stating whether points were awarded THIS session, bumped by someone else while it ran, or unchanged since open. Open reading and close reading are bookends; never post one without the other.
-16. **Finalize the Session Ledger on the task at close (2026-07-19, Michael).** The task description's 🧬 Session Ledger is reconciled against what actually shipped and finalized as part of the task shutdown (step 1 of Session-task shutdown), BEFORE the usage-log commit. The 🔨 Built/changed block ALWAYS renders (write `- none this session` when empty); every entry carries a link; things are split by ORIGIN and never double-listed; the 🛠️ Drove-the-work block omits the always-on roster; empty blocks 2–4 collapse. Apply the `🔨 built` tag when the hero block is non-empty. This is the browse-without-the-transcript layer; it is DISTINCT from the usage-log (that's the cumulative machine tally, this is the per-session human provenance index) — both run, they don't substitute.
-17. **Scrub before cutting the handoff task — reopen over sloppy-create (2026-07-19, Michael).** Before creating a next-session handoff task, run the Task Dedup Gate against the Agent Activity Board (widened to `closed`/`done`, matched on scope/subject) to find a thread this handoff genuinely continues. High-confidence match → REOPEN it and re-status it into the `to do` handoff slot rather than cutting a fresh task; ambiguous → ASK before touching it (re-status is mutating, a wrong one pollutes a real record); no match → create new. Close-side mirror of the Session Open late-pickup addendum, and it uses the SAME dedup gate + confidence bar (don't re-dictate the search). Especially load-bearing in multi-loop efforts where prior session threads on the same subject already exist.
+0. **No-ask execution.** Run required steps without permission prompts.
+1. **NEVER use `create_as_post: true`.**
+2. **NEVER put detail in the root.**
+3. **ALWAYS thread the detail.**
+4. **Both channels, every session**, except explicit soft close.
+5. **Transcript lives on the Agent Activity Board task.**
+6. **The task is closed out and the channels still fire.**
+7. **Bounced memory writes go to `brain-config/open-memory-requests.md`.**
+8. **Closing capacity is mandatory in the session-log summary thread.**
+9. **Memory audit posts first, then session log summary.**
+10. **Root messages are never edited after posting.**
+11. **Thread replies can have addenda.**
+12. **Usage-log commit lands last.**
+13. **Append the open-thread note to `brain-config/open-thread.md`.**
+14. **Warm-start handoff is a task, not a chat block.**
+15. **Every close reports the scoreboard delta.**
+16. **Finalize the Session Ledger before the usage-log commit.**
+17. **Scrub before cutting the handoff task.**
 
 ---
 
 ## Execution Order
 
-**Run all of it, no permission gates (see NO-ASK EXECUTION + Rule 0). Report only failures.**
-
 1. Memory Maggie posts Channel 1 (Memory Audit: root + thread)
 2. Closing Clio posts Channel 2 (Session Log: root + summary thread that links the Agent Activity Board session task as the full transcript, and carries the `Scoreboard (revised at close)` line)
-3. Session-task shutdown: (a) **finalize the Session Ledger** on the task description (reconcile + enforce the 5 rules + apply the `🔨 built` tag if the hero is non-empty); (b) final `[CLOSE-POINTER]` comment (links both threads + carries the scoreboard-revised-at-close line); (c) flip status to `done`; (d) hand Michael the task link in chat (templates T4/T5)
+3. Session-task shutdown: finalize Session Ledger, post final `[CLOSE-POINTER]`, flip to `done`, hand Michael the task link
 4. Bounced-memory-write drop: if any write didn't land, append an `OMR` entry to `brain-config/open-memory-requests.md`
-5. Open-thread append: take the session's open-thread note (already a comment on the session task) and append it as the next entry in `brain-config/open-thread.md`. No review.
-6. Next-session handoff TASK (if a next step exists): FIRST scrub the board for a thread this handoff continues (Task Dedup Gate, widened to `closed`/`done`, matched on scope) — high-confidence match → reopen + re-status it into the `to do` handoff slot; ambiguous → ASK; no match → create it new on the Agent Activity Board in `to do` (handoff slot). Either way pre-load/refresh the handoff prompt (Block T6) and link it to the closing task as a follow-up (relationship + pointer comment T7). Replaces the old inline chat code block.
+5. Open-thread append
+6. Next-session handoff task: scrub, reopen-or-ask-or-create, then chain it
 7. Usage-log commit to `brain-config/usage-log.json`
 
 ---
 
-## Gold Standard Examples
+## Pointers
 
-**Memory Audit:** root is a bare token line; thread carries full audit structure even when nothing changed.
-
-**Session Log:** root is tight header with trigger/date/status; thread leads with the session-task pointer, then headlines, decisions, refs, open loops. The task holds the transcript.
-
----
-
-## Failure Modes
-
-| Symptom | Root cause | Fix |
-|---------|-----------|-----|
-| Asked permission to run a mandatory close step | Agent treated a documented-required step as a yes/no | NO-ASK EXECUTION: the close just fires; only report steps that FAILED, never ask whether to do a required one (scored B10) |
-| Detail in the root message | Agent forgot to thread | Repost detail as thread reply |
-| Used Post format | Agent confused Posts with messages | Never use `create_as_post: true` |
-| Missing thread reply | Agent posted root then moved on | Always post both root AND thread |
-| Full transcript pasted/rebuilt in the channel | Agent ignored the reframe | Transcript lives on the session task; channel = summary + task pointer |
-| Closed the task but skipped the channel posts | Agent treated the task as a replacement for the channel close | Both fire; the task is an additional surface, not a substitute |
-| Said "closed out" without handing Michael the links | Agent stopped after the task update | Not closed until both threads posted + task shut + task link given |
-| Bounced memory write left as only a chat/audit mention | Agent skipped the durable drop | Append an OMR entry to open-memory-requests.md at close |
-| Open-thread note left only as a task comment | Agent skipped the durable append | Also append it as the next entry in open-thread.md at close (no review) |
-| Warm-start handoff pasted as a chat code block | Agent used the retired inline-prompt path | Create the next-session handoff TASK in `to do`, pre-load the prompt, chain it to the closing task |
-| Cut a fresh handoff task when a live thread already existed | Agent skipped the scrub / re-dictated search instead of running the dedup gate | Scrub the board (dedup gate, incl. closed/done, matched on scope) before cutting; reopen + re-status a high-confidence thread into the handoff slot; ask when ambiguous; never silently fork |
-| Active session task left at `to do` | Agent didn't flip on start | Active work is `in progress` from creation; `to do` = handoff/waiting only |
-| No session task opened, so no transcript exists | Startup gate missed | Open the Agent Activity Board task at session start; comment near-per-prompt |
-| Close missing the scoreboard delta | Agent posted the open reading but skipped the close bookend | Post `Scoreboard revised at close:` in both the Session Log summary and the task `[CLOSE-POINTER]` — awarded this session / bumped by someone else / unchanged |
-| Session Ledger skipped or hero block deleted when empty | Agent treated the ledger as optional or collapsed the hero | Finalize the ledger at close (Rule 16); the 🔨 Built/changed block ALWAYS renders, `- none this session` when empty |
-| Same thing listed in both Built and Repos/Docs | Agent didn't split by origin | Born-here → Built; edited-in-passing → Repos/Docs; one block only |
-| Ledger padded with always-on tools | Agent dumped the roster into Drove-the-work | Omit the always-on roster; the usage-log already counts firings |
-| Audit says "no changes" with no thread | Agent skipped the structure | Still post full audit template with "None" in changes |
-| Multiple roots for same session | Agent posted twice | Use addendum replies in thread |
-| Root too verbose | Agent put summary in root | Root = identifier only |
-
----
-
-## Companion files — reconciled ✅ (verified 2026-07-17, Audit Anna)
-
-The transcript-location reframe touched two companion specs; an audit this session verified BOTH have since been migrated to the session-task model. No open reconciliation remains:
-
-- `gates/session-transcript-gate.md` — reconciled (rev e→i): "the thread" is the session task's comment stream on the 🟢 Agent Activity Board; #A.I. Prompts is demoted to backup + the permanent close-transcript home. Adds the two-tier Workshop Post Protocol.
-- Scribe Sana's agent profile — reconciled (rev e→h): her live-transcript role targets the session task's comments, not the channel thread; canonical board pointer corrected to `901327879922`. **(2026-07-19: Sana also accretes the Session Ledger on the task description live as builds/changes happen; Closing Clio finalizes it at close.)**
-
-*(This note previously read "should be reconciled next repo session" — that was stale; the work had already landed. Corrected to the realized state per the missed-gate/drift protocol.)*
-
----
-
-## Why This Matters
-
-These channels are the institutional memory of our work together. The session task now holds the true, live, comment-by-comment record of a session; the channel Session Log is the scannable index that points to it. A cold agent picking up next week scrolls the channel for the summary, then opens the linked task for the full back-and-forth. The Session Ledger on the task is the fast provenance layer on top — answer "which session built X" at a glance, without reading the transcript. The memory audit channel tracks preference file health over time without loading the full file.
+- Agent Activity Board — Gold Standard: templates and task-side mechanics
+- Session Transcript Gate: thread structure and companion rules
+- `session-close.decision-log.md`: why this hook is shaped this way
