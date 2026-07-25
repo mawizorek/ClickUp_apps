@@ -2,7 +2,7 @@
 
 📋 **Decision Log:** `Inciardi Collection — Decision Log` (ClickUp) — every call about this app, newest on top. **Checkbox polarity is INVERTED: a checked box is a REJECTED option.** Q1–Q3 (answered) live on the predecessor's `Inciardi Market — Rebuild Decision Log`; this app's log starts at **Q4**. Read it before touching anything here.
 
-**Status: DEFINED AND SIGNED OFF (2026-07-25). Nothing is built yet.** The sign-off gate (§7) cleared when Q4–Q7 were answered. Code may start; §8 says in what order. §9 lists what is still open and why it doesn't block.
+**Status: DEFINED AND SIGNED OFF (2026-07-25). Nothing is built yet.** The sign-off gate (§7) cleared when Q4–Q7 were answered; Q8 answered the same day. Code may start; §8 says in what order. §9 holds the one question still open, which doesn't block.
 
 Successor to `inciardi-market/`, which stays live and untouched as a working reference until this replaces it. Clean room on purpose: a day of debugging proved that **inherited state is what fooled us**, so nothing carries over by accident — only by decision.
 
@@ -77,23 +77,25 @@ The registry-in-git idea was reached for as protection against the harvest. **Bu
 
 **Q4 = A. D1 is the source. `registry/artworks.json` is now a one-time SEED plus a generated export.** No loader route, no import path, no write key in a public bundle for imports, and **the 39KB `worker.js` chunk-walk is off the critical path.** This supersedes Q3 (*worker route*), which Michael flagged soft at the time.
 
-### Does the git export earn its place? (Michael's Q4 note)
+### Does the git export earn its place? — DECIDED (Q8 = A + C)
 
-> *"Is the git json really necessary at all? If I can write to D1 from app from phone then that's fine? And that carries some roll-back anyway, doesn't it?"*
+> Michael's Q4 note: *"Is the git json really necessary at all? If I can write to D1 from app from phone then that's fine? And that carries some roll-back anyway, doesn't it?"*
 
 **Partly yes.** D1 ships [Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/): always on, no cost, no setup, restores the database to **any minute within the last 30 days** via automatic bookmarks. That is real point-in-time recovery and it covers the scary cases — a bad migration, an `UPDATE` with no `WHERE`.
 
-Three things it does **not** cover, which is exactly what the export is for:
+Four things it does **not** cover, which is exactly what the export is for:
 
 | Gap | Consequence |
 | --- | --- |
 | **Whole-database only.** | Fat-finger one artwork name, notice three days later, and restoring to fix it discards three days of every *other* entry. There is no per-row recovery. |
 | **The 30-day cliff.** | Beyond 30 days there is no history at all. A binder built over two years cannot answer "what did this row say last spring." |
 | **Same-account single point of failure.** | Time Travel lives inside the same D1 database. If the binding, the database, or the account goes, the backup goes with it. It is not an off-platform copy. |
+| 🔴 **It covers rows, not bytes.** | 177 photographs / 268 MB live in R2, entirely outside it. Losing an image *row* is recoverable. Losing the *object* is permanent, and worse, **silent** — you find out when a tile goes blank. |
 
-So the export survives, **demoted and honest**: a diffable identity ledger, an off-platform copy, and history past 30 days. It is written by a cron job, read by nothing, and hand-edited never. **If it vanished, the app would not notice — that is the test of a real export.** Cut from milestone 1 (§8): there is no data worth exporting yet.
+**Q8 = A + C** (B, drop-it-entirely, was rejected). Two things follow:
 
-**And a fourth gap that the export as currently specced does NOT close: Time Travel covers rows, not bytes.** 177 photographs / 268 MB live in R2, entirely outside it. Losing an image *row* is recoverable; losing the *object* is permanent and silent. Open as **Q9** in §9.
+1. **The export lives, demoted and honest.** Cron-written, read by nothing, hand-edited never. A diffable identity ledger, an off-platform copy, and history past the 30-day cliff. **If it vanished, the app would not notice — that is the test of a real export.** Cut from M1; there is no data worth exporting yet.
+2. **The export carries an R2 image manifest** — key, size, hash, and the `edition_id` it belongs to. It does not save the bytes. It makes their loss *legible*: instead of a blank tile you get a re-shoot list that names the print. It is a `SELECT` in a cron job that already runs, so the cost is near zero. **Required before M1's R2 path counts as finished** — the manifest is worthless if it starts existing after the photographs do.
 
 *(Noted for later: Time Travel restore is a REST endpoint, not wrangler-only, so a "restore to…" control in the Settings drawer is buildable. It needs a Cloudflare API token — broader privilege than the D1 binding — so it is parked, not planned.)*
 
@@ -139,7 +141,7 @@ This app is a **theme-registry consumer from commit one** — Michael's call.
 
 Stu's brief, now binding: *the binder reads as a specimen catalogue — precise, gridded, faintly scientific — because her photographs supply all the warmth the page needs.* **Let the prints be the only soft thing on the page.**
 
-Still open, and Michael sees these before anything lands in `shared/themes/`: the 22-token color row itself, and which `typography × forms × spacing` rows the join points at. A new color row is cheap; a new typography row must justify itself against what already exists.
+Still open, and Michael sees these before anything lands in `shared/themes/`: the 22-token color row itself, and which `typography × forms × spacing` rows the join points at. A new color row is cheap; a new typography row must justify itself against what already exists. **This is the only thing gating M1.**
 
 ### 🔴 A hazard in `resolve.js` to know about before writing that row (Michael's Q5 note)
 
@@ -149,11 +151,11 @@ Read the code rather than guessing. Three cases, and **they do not behave the sa
 
 | Bad reference | Behaviour | Verdict |
 | --- | --- | --- |
-| Unknown **theme** slug (`applyTheme`) | Red fixed banner across the top: `themes: unknown theme "x"`. **Nothing is applied** — no partial theme, no guess. | Correct. Loud. |
+| Unknown **theme** slug (`applyTheme`) | Red fixed banner across the top: `themes: unknown theme "x"`. **Nothing is applied** — no partial theme, no guess, no fallback. | Loud, but harsher than the color path. |
 | Unknown **color** slug (`applyColor`) | Banner, then falls back to `ULT`, the default-theme mid-gray ramp, so the page never white-screens. | Correct. Loud *and* survivable. |
 | Unknown **typography / forms / spacing** slug inside an otherwise-valid join | 🔴 **SILENT.** `applyTheme()` calls each child applier with `silent:true`, so a broken vector pointer applies nothing and says nothing. The page renders half-themed — right colors, default type or geometry — and nobody is told. | **A silent fallback. The exact failure mode outlawed by the Fetch Honesty Law the same day.** |
 
-This is **shared-infrastructure**, not an `inciardi-collection` bug, and it is listed here because `inciardi-prints` is a brand-new four-pointer join — the single most likely place to typo a vector name. Fix and rename-safety options are open as **Q8** in §9.
+This is **shared infrastructure**, not an `inciardi-collection` bug, and it is recorded here because `inciardi-prints` is a brand-new four-pointer join — the single most likely place in the repo to typo a vector name. Fix and rename-safety options are open as **Q9** in §9.
 
 ### Objects
 
@@ -189,13 +191,13 @@ Both are documented in `inciardi-market/README.md` and both apply here:
 
 ## 6. What is deliberately NOT here
 
-Machines layer. Sold comps. Multi-source discovery (Poshmark, Stockist). Per-write actor attribution. eBay until P3. A Time-Travel restore button. All real, all parked, none blocking.
+Machines layer. Sold comps. Multi-source discovery (Poshmark, Stockist). Per-write actor attribution. eBay until P3. A Time-Travel restore button. Byte-level R2 replication (the manifest names losses; it does not prevent them). All real, all parked, none blocking.
 
 ---
 
 ## 7. Sign-off gate — CLEARED 2026-07-25
 
-All four answered on the Decision Log. Decoded, read back, and folded in above.
+All answered on the Decision Log. Decoded, read back, and folded in above.
 
 | Q | Decided | Where it landed |
 | --- | --- | --- |
@@ -203,6 +205,7 @@ All four answered on the Decision Log. Decoded, read back, and folded in above.
 | **Q5 · Theme** | **B · archival / specimen**, slug **`inciardi-prints`**. Palette still to be approved. | §5 |
 | **Q6 · Photo on entry** | **A + B.** Never required, always possible, at entry or after. R2 in milestone 1. | §4 |
 | **Q7 · Predecessor retirement** | **A, deferred.** *"Keep it live for now but we will kill it soon."* Never "indefinitely" (B); the folder is never deleted (C). | §8 |
+| **Q8 · Does the export survive?** | **A + C.** Yes, demoted — **and it carries an R2 image manifest.** | §3 |
 
 ---
 
@@ -210,11 +213,11 @@ All four answered on the Decision Log. Decoded, read back, and folded in above.
 
 Ordered so that **the acceptance test passes at the end of M1** — a working binder that needs no worker alive.
 
-**M1 · The binder works by hand.** `inciardi-prints` theme row → shell + `chrome.js`/`core.js` → schema promoted from `.proposed` and applied → `Enter` (photo optional) → `Binder` sheet with visible gaps → edition detail with photo add → R2 upload + the image ladder. **Exit test: enter a print that exists in no feed, from a phone, with a photo, and see it in its sheet.**
+**M1 · The binder works by hand.** `inciardi-prints` theme row → shell + `chrome.js`/`core.js` → schema promoted from `.proposed` and applied → `Enter` (photo optional) → `Binder` sheet with visible gaps → edition detail with photo add → R2 upload + the image ladder + the image manifest query. **Exit test: enter a print that exists in no feed, from a phone, with a photo, and see it in its sheet.**
 
 **M2 · Volume and coverage.** `Capture` ported from the predecessor. `Index`. Registry seeded as a one-time load. The 54 verified names in.
 
-**M3 · Automation as gravy.** Shopify harvest wired to PROPOSE only. `Adopt` queue. The cron export to `registry/artworks.json`.
+**M3 · Automation as gravy.** Shopify harvest wired to PROPOSE only. `Adopt` queue. The cron export to `registry/artworks.json`, manifest included.
 
 **M4 · The market lens.** eBay per-artwork. Registry-driven, never identity-defining.
 
@@ -224,12 +227,9 @@ Ordered so that **the acceptance test passes at the end of M1** — a working bi
 
 ## 9. Open, but not blocking
 
-Both came out of Michael's own notes on the sign-off questions. Neither gates M1; both are on the Decision Log so they are never held only in chat.
-
 | # | Question | Why it can wait |
 | --- | --- | --- |
-| **Q8** | **Theme rename safety** — record which apps consume which theme, or make renames impossible? Options: `aliases: []` on the join row (a slug is identity, so alias it, never rename it — the Q2 lesson), a generated reverse index, both, or neither. **Bundled with the `resolve.js` silent-vector fix** (§5). | A correct slug works today. The fix matters most the moment a second app consumes `inciardi-prints`. |
-| **Q9** | **R2 has no Time Travel** (§3). Does the export carry an image manifest — keys, sizes, hashes — so a lost photograph is at least *identifiable* rather than discovered as a blank tile? | There are no photographs in the new database yet. Must be answered before M1's R2 upload path is considered finished. |
+| **Q9** | **Theme slug hygiene.** Record which apps consume which theme, or make renames impossible? Options: `aliases: []` on the join row (a slug is identity, so alias it, never rename it — the Q2 lesson), a generated reverse index from an `applyTheme('…')` grep, both, or neither. **Bundled with the `resolve.js` silent-vector fix** (§5). | A correct slug works today. It matters most the moment a second app consumes `inciardi-prints`, or the first time a vector name is typo'd. Shared infrastructure, so it moves to a `shared/themes` container log once one exists. |
 
 ---
 
