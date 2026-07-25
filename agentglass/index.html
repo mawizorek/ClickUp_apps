@@ -8,7 +8,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/styles.css?v=2">
+<link rel="stylesheet" href="source/styles.css?v=3">
+<style>
+  /* v3: the scrub readout is a READOUT, not the headline. The screen's job is answering
+     "what just happened" and the NOW line does that, so the clock stops competing with it.
+     Scoped here rather than in styles.css so the override is visible next to the markup. */
+  .clock time{font-size:1.125rem;font-weight:500;color:var(--txt-lo)}
+  .clock{margin-top:var(--s2);gap:var(--s2)}
+  .clock .meridiem{font-size:0.6875rem}
+</style>
 </head>
 <body>
 <div class="stage">
@@ -52,10 +60,10 @@
   </main>
 </div>
 
-<script src="source/derive.js?v=2"></script>
-<script src="source/core.js?v=2"></script>
-<script src="source/feed.js?v=2"></script>
-<script src="source/transcript.js?v=2"></script>
+<script src="source/derive.js?v=3"></script>
+<script src="source/core.js?v=3"></script>
+<script src="source/feed.js?v=3"></script>
+<script src="source/transcript.js?v=3"></script>
 <script>AG.boot();</script>
 </body>
 </html>
