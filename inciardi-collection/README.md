@@ -2,7 +2,7 @@
 
 📋 **Decision Log:** `Inciardi Collection — Decision Log` (ClickUp) — every call about this app, newest on top. **Checkbox polarity is INVERTED: a checked box is a REJECTED option.** Q1–Q3 (answered) live on the predecessor's `Inciardi Market — Rebuild Decision Log`; this app's log starts at **Q4**. Read it before touching anything here.
 
-**Status: DEFINITION. Nothing is built. No HTML, no worker, no data.** This folder holds the app's definition and its proposed schema. Code starts when §7 is signed off.
+**Status: DEFINED AND SIGNED OFF (2026-07-25). Nothing is built yet.** The sign-off gate (§7) cleared when Q4–Q7 were answered. Code may start; §8 says in what order.
 
 Successor to `inciardi-market/`, which stays live and untouched as a working reference until this replaces it. Clean room on purpose: a day of debugging proved that **inherited state is what fooled us**, so nothing carries over by accident — only by decision.
 
@@ -56,28 +56,44 @@ This falls straight out of Q1 and it is the opposite of the old schema. Each Bro
 
 ---
 
-## 3. Authority model
+## 3. Authority model — DECIDED (Q4 = A)
 
 ```
 app forms / capture     PRIMARY    Michael types it. Where data is BORN.
         ▼
-D1 artwork·edition·copy SOURCE     the live record
+D1 artwork·edition·copy SOURCE     the live record. The only authority.
         │
-        └─► registry/*.json  EXPORT   periodic versioned snapshot → git history
+        └─► registry/*.json  EXPORT   generated snapshot → git history. Read by nothing.
 
 Shopify harvest         PROPOSES   new products, availability, price. NEVER identity.
-eBay                    OBSERVES   queried per-artwork. Shelved until §7.4.
+eBay                    OBSERVES   queried per-artwork. Shelved to P3.
 ```
 
-### 🔴 The correction that matters (and it changes Q3)
+### The correction that settled it
 
-The registry-in-git idea was reached for as protection against the harvest. **But the protection was never "the file lives in git" — it was "the row knows who wrote it."** Those got conflated, understandably.
+The registry-in-git idea was reached for as protection against the harvest. **But the protection was never "the file lives in git" — it was "the row knows who wrote it."** Those got conflated.
 
-`provenance` on every row is what stops the harvest clobbering hand-entered truth. Once that exists, git is no longer needed for *authority* — only for *versioning*, which an export satisfies completely.
+`provenance` on every row is what stops the harvest clobbering hand-entered truth. Once that exists, git is no longer needed for *authority* — only for *versioning*.
 
-So: **D1 is the source, git JSON is a generated snapshot.** Manual input is primary, and you cannot write to git from a phone. This dissolves the loader question rather than answering it: the registry becomes a one-time **seed** plus an ongoing **export**, not a routine import path.
+**Q4 = A. D1 is the source. `registry/artworks.json` is now a one-time SEED plus a generated export.** No loader route, no import path, no write key in a public bundle for imports, and **the 39KB `worker.js` chunk-walk is off the critical path.** This supersedes Q3 (*worker route*), which Michael flagged soft at the time.
 
-**Michael answered Q3 = worker route but flagged it soft and pointed at his Q2 note. This is that note's consequence. It needs his confirmation, not my assumption** — see §7, now open as **Q4** on the Decision Log.
+### Does the git export earn its place? (Michael's Q4 note)
+
+> *"Is the git json really necessary at all? If I can write to D1 from app from phone then that's fine? And that carries some roll-back anyway, doesn't it?"*
+
+**Partly yes.** D1 ships [Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/): always on, no cost, no setup, restores the database to **any minute within the last 30 days** via automatic bookmarks. That is real point-in-time recovery and it covers the scary cases — a bad migration, an `UPDATE` with no `WHERE`.
+
+Three things it does **not** cover, which is exactly what the export is for:
+
+| Gap | Consequence |
+| --- | --- |
+| **Whole-database only.** | Fat-finger one artwork name, notice three days later, and restoring to fix it discards three days of every *other* entry. There is no per-row recovery. |
+| **The 30-day cliff.** | Beyond 30 days there is no history at all. A binder built over two years cannot answer "what did this row say last spring." |
+| **Same-account single point of failure.** | Time Travel lives inside the same D1 database. If the binding, the database, or the account goes, the backup goes with it. It is not an off-platform copy. |
+
+So the export survives, **demoted and honest**: a diffable identity ledger, an off-platform copy, and history past 30 days. It is written by a cron job, read by nothing, and hand-edited never. **If it vanished, the app would not notice — that is the test of a real export.** Cut from milestone 1 (§8): there is no data worth exporting yet.
+
+*(Noted for later: Time Travel restore is a REST endpoint, not wrangler-only, so a "restore to…" control in the Settings drawer is buildable. It needs a Cloudflare API token — broader privilege than the D1 binding — so it is parked, not planned.)*
 
 ---
 
@@ -87,9 +103,9 @@ So: **D1 is the source, git JSON is a generated snapshot.** Manual input is prim
 | --- | --- | --- |
 | **P0** | **Binder** | *What do I have, and what's missing?* Sheet per collection, fixed pockets, visible gaps, `SPRING · 11 / 15` header. The front door. |
 | **P0** | **Enter** | *Add what I own, by hand.* The primary input path. Must accept a print no feed has ever heard of (vending machine, trade, museum shop). |
+| **P1** | **Artwork / Edition detail** | *Everything about this one.* Editions, photos, provenance, history. **Promoted from P2 by Q6** — it is where a photo gets added after entry, so it cannot wait. |
 | **P1** | **Capture** | *Log a lot, fast.* The swipe deck. Ported from `inciardi-market`, not rewritten — drag physics, undo, serialized writes all work. |
 | **P1** | **Index** | *What exists at all?* Every artwork including ones Michael will never own. |
-| **P2** | **Artwork** | *Everything about this one.* Editions, photos, provenance, history. |
 | **P2** | **Adopt** | *What did the shop add that I haven't ruled on?* |
 | **P3** | Market | *What's available right now?* Registry-driven. Last. |
 
@@ -97,14 +113,36 @@ So: **D1 is the source, git JSON is a generated snapshot.** Manual input is prim
 
 **Enter is P0 and that is the whole reframe made concrete.** Capture drops to P1 because bulk state entry is worthless until single-item entry is trustworthy.
 
+### Photo entry — DECIDED (Q6 = A + B, per the note)
+
+> *"I'm fine with just A if the assumption is that I can go to the edition detail menu and input a photo later from day one. I don't want to force a photo on entry from day 1, but I want to be able to add a photo at entry or post entry from day one and the app should be able to handle bare images, yes."*
+
+Three rules fall out, and they are not the same as "A":
+
+1. **A photo is never required.** `Enter` saves with a name and a collection alone. A photo-less row renders as an initials tile (Image Rendering Law rule 7) and is a first-class citizen forever, not a stub.
+2. **A photo is always possible** — optional field on `Enter`, and addable afterwards from edition detail.
+3. **The app accepts a photograph with no source record behind it.** No product, no listing, no feed. Beckett's vending-machine print, satisfied.
+
+⚠️ **Honest consequence: this is not the cheap option.** A is labelled "fastest" because it defers R2 — but the condition attached to it (*add a photo later, from day one*) pulls **R2 upload and an edition-detail surface into milestone 1 anyway.** The saving is one optional field on one form, not a milestone. Named here so nobody later reads "Michael chose A" and plans a text-only first release.
+
 ---
 
 ## 5. Standards target
 
-This app is a **theme-registry consumer from commit one** — Michael's call, and he wants a unique theme set defined for it.
+This app is a **theme-registry consumer from commit one** — Michael's call.
+
+### The theme — DECIDED (Q5 = B) · slug `inciardi-prints`
+
+**Direction: archival / specimen.** Near-neutral warm paper ground, one restrained ink accent, mono type for all data. Riso-ink (A) was rejected precisely because it competes with the photographs, which already carry the terracotta, cobalt and kale. Reusing an existing theme (C) was rejected — this app gets its own identity.
+
+Stu's brief, now binding: *the binder reads as a specimen catalogue — precise, gridded, faintly scientific — because her photographs supply all the warmth the page needs.* **Let the prints be the only soft thing on the page.**
+
+Still open, and Michael sees these before anything lands in `shared/themes/`: the 22-token color row itself, and which `typography × forms × spacing` rows the join points at. A new color row is cheap; a new typography row must justify itself against what already exists.
+
+### Objects
 
 - Links `../shared/themes/themes.css` (static first paint) + `resolve.js` (live switching).
-- **Every color is `var(--token)`.** Zero literals in any stylesheet. `default-theme` until a theme is chosen.
+- **Every color is `var(--token)`.** Zero literals in any stylesheet. `default-theme` until `inciardi-prints` exists.
 - Composes from the **42 canonical objects** (`shared/themes/_objects.json`). The binder needs `cnt_page_shell`, `cnt_filter_bar`, `row_tile_badge`, `viz_meter`, `tx_badge`, `fb_empty`, `panel_drawer`, `fb_toast` — **all eight already exist** with defined tokens and states.
 - One genuinely new object expected: **`pocket_binder`** (owned / missing / wanted / gone-forever). Per `OBJECT-COVERAGE.md` the set is a vocabulary, not a ceiling — but a new object lands in `_objects.json` + `preview.data.js` + the coverage table **in the same pass.**
 - Audited against `template-app/CONFORMANCE.md`. Derived from that shape, not from the predecessor.
@@ -135,18 +173,36 @@ Both are documented in `inciardi-market/README.md` and both apply here:
 
 ## 6. What is deliberately NOT here
 
-Machines layer. Sold comps. Multi-source discovery (Poshmark, Stockist). Per-write actor attribution. eBay until P3. All real, all parked, none blocking.
+Machines layer. Sold comps. Multi-source discovery (Poshmark, Stockist). Per-write actor attribution. eBay until P3. A Time-Travel restore button. All real, all parked, none blocking.
 
 ---
 
-## 7. Sign-off gate — code starts when these four are answered
+## 7. Sign-off gate — CLEARED 2026-07-25
 
-They are open as **Q4–Q7** on `Inciardi Collection — Decision Log`. Answer there, not here. **No file in this folder other than docs changes until all four are decoded and read back.**
+All four answered on the Decision Log. Decoded, read back, and folded in above.
 
-1. **Q4 · Confirm D1-as-source vs registry-as-source** (§3). Michael's Q3 answer predates his own reframe; the reframe appears to supersede it. If D1 is the source, no worker route is needed and the `worker.js` chunk-walk drops out of the critical path entirely.
-2. **Q5 · Theme definition.** He wants a unique set for this app. Needs a name and a direction before the shell is built, because the shell consumes tokens.
-3. **Q6 · Does `Enter` need photo upload on day one,** or is a name-and-collection row enough to start? Decides whether R2 is in the first milestone.
-4. **Q7 · Slug + the predecessor's retirement.** `inciardi-collection` is confirmed as the slug. What remains is when `inciardi-market` stops being live, and how the launcher entry moves.
+| Q | Decided | Where it landed |
+| --- | --- | --- |
+| **Q4 · Where authored truth lives** | **A · D1 is the source, git JSON is an export.** Supersedes Q3. | §3 |
+| **Q5 · Theme** | **B · archival / specimen**, slug **`inciardi-prints`**. Palette still to be approved. | §5 |
+| **Q6 · Photo on entry** | **A + B.** Never required, always possible, at entry or after. R2 in milestone 1. | §4 |
+| **Q7 · Predecessor retirement** | **A, deferred.** *"Keep it live for now but we will kill it soon."* Never "indefinitely" (B); the folder is never deleted (C). | §8 |
+
+---
+
+## 8. Milestones
+
+Ordered so that **the acceptance test passes at the end of M1** — a working binder that needs no worker alive.
+
+**M1 · The binder works by hand.** `inciardi-prints` theme row → shell + `chrome.js`/`core.js` → schema promoted from `.proposed` and applied → `Enter` (photo optional) → `Binder` sheet with visible gaps → edition detail with photo add → R2 upload + the image ladder. **Exit test: enter a print that exists in no feed, from a phone, with a photo, and see it in its sheet.**
+
+**M2 · Volume and coverage.** `Capture` ported from the predecessor. `Index`. Registry seeded as a one-time load. The 54 verified names in.
+
+**M3 · Automation as gravy.** Shopify harvest wired to PROPOSE only. `Adopt` queue. The cron export to `registry/artworks.json`.
+
+**M4 · The market lens.** eBay per-artwork. Registry-driven, never identity-defining.
+
+**Then:** `inciardi-market` retires per Q7 — launcher flips, `status:'retired'` in `app-dashboard`, README becomes a redirect stub, folder kept for the git-blame trail. Michael calls the timing.
 
 ---
 
