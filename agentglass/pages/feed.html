@@ -1,3 +1,11 @@
+<section class="now" id="now">
+  <p class="now-kicker" id="nowKicker">right now</p>
+  <p class="now-line" id="nowLine">Reading the board.</p>
+  <p class="now-last" id="nowLast"></p>
+</section>
+
+<div class="fleet" id="fleet" aria-label="Sessions at the playhead"></div>
+
 <details class="needs" id="needs">
   <summary>
     <span class="count" id="needCount">0</span>
@@ -7,20 +15,20 @@
   <ul id="needList"></ul>
 </details>
 
-<div class="fleet" id="fleet" aria-label="Fleet roster at the playhead"></div>
-
 <div class="feed" id="feed"></div>
 
 <details class="cost">
   <summary>
     <span class="grp est"><span class="lbl">est</span><span class="val" id="est">$0.00</span></span>
     <span class="grp real"><span class="lbl">real</span><span class="val" id="real">$0.00</span></span>
-    <span class="how">how</span>
+    <span class="how" id="mix"></span>
   </summary>
   <p class="note">
-    <strong>Est</strong> is the counterfactual: what this work would have cost billed direct, derived from
-    model (parsed off the session title), turn count and tool-call volume. Nothing self-reported.
-    <strong>Real</strong> is money actually spent. Unverified senders' claimed figures are never summed.
-    A wrong rate table costs an estimate, never the underlying data.
+    <strong>Est</strong> is the counterfactual: what this would have cost billed direct, derived from model,
+    turn count and tool volume. <strong>Real</strong> is money actually spent. Unverified senders' claimed
+    figures are never summed.
+    <br><br>
+    <strong>Capture</strong> counts how each event was picked up. <em>Derived</em> means the agent posted
+    ordinary prose with no telemetry block and was read anyway.
   </p>
 </details>
