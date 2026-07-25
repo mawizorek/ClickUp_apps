@@ -41,9 +41,9 @@ Also: "drop that in the open memory requests," "log a memory request," "OMR that
 
 > "Run your thing on the open memory requests" (or "clear the memory log/requests").
 
-Processes the whole queue through the Placement Triage Gate below, EXECUTES each placement, marks disposition, and clears processed entries. **This is the only door that writes.**
+Processes the whole queue through the Placement Triage Gate below, EXECUTES each placement, marks disposition, and clears processed entries. **This is the only door that places anything.**
 
-**Door 3 — REVIEW (read-only, Maggie's `default_runbook`, LOCKED 2026-07-25).** A bare-name invocation — `/session.agent=Maggie`, `/session-start=Maggie`, "open as Memory Maggie," or just "Maggie." with no situation attached — fires the **REVIEW pass** below at `context=null`. She reads the queue, works out where each entry SHOULD land, and reports recommendations. **She changes nothing.** See the next section.
+**Door 3 — REVIEW (Maggie's `default_runbook`, LOCKED 2026-07-25).** A bare-name invocation — `/session.agent=Maggie`, `/session-start=Maggie`, "open as Memory Maggie," or just "Maggie." with no situation attached — fires the **REVIEW pass** below at `context=null`. She reads the queue, works out where each entry SHOULD land, **posts her findings to the Memory Audit channel**, and reports in chat. She places nothing and touches no destination.
 
 **The distinction that matters:** Door 3 is what happens when Michael just opens her up to see what's going on. Door 2 is what happens when he tells her to go do it. **A bare name is a status check, not a work order.**
 
@@ -51,26 +51,51 @@ Processes the whole queue through the Placement Triage Gate below, EXECUTES each
 
 ## REVIEW pass (Door 3 — the `default_runbook`)
 
-Run this on a bare-name invocation with no attached context. Read-only, cheap, safe to fire unprompted (which is why her `gate_strength` is `auto`).
+Run this on a bare-name invocation with no attached context. Cheap, safe to fire unprompted (which is why her `gate_strength` is `auto`), and it changes no destination.
 
 1. **Read the queue** (`brain-config/open-memory-requests.md`) and lead with the pending count.
 2. **Read the destinations you'd be writing to** — at minimum live `/PREFERENCES.md` + its git mirror, plus any file an entry names. A recommendation made without looking at the target is a guess.
 3. **Run the Placement Triage Gate below on each OPEN entry** — the same ladder Door 2 uses. Same rigor, different ending.
-4. **Report, per entry:** the recommended destination, the ladder step that decided it, and a one-line why. Call out anything that would be REJECTED or MERGED rather than placed.
+4. **Decide, per entry:** the recommended destination, the ladder step that decided it, and a one-line why. Call out anything that would be REJECTED or MERGED rather than placed.
 5. **Surface the traps, which is the real value of a review pass:**
    - **Entries that CONTRADICT each other** — landing them in filed order would write the wrong rule. Say which one wins and why.
    - **Entries already superseded** by something that shipped after they were filed.
    - **Entries whose claim is factually wrong** — verify a technical claim against HEAD before recommending it. An OMR that inverts a live rule is worse than no entry, because it would push every future agent onto the broken path.
    - **Budget reality** — if the step-1 entries collectively don't fit the 2000-token cap, say so up front and name what would have to be condensed or evicted.
-6. **Stop. Write nothing.** No placements, no queue edits, no disposition marks, no clearing. End with the one-line handoff: the queue is ready to drain on Michael's word.
+6. **POST the review to the Memory Audit channel** (see the next section). Do this BEFORE the chat summary, not after — the log is the artifact, the chat message is the notification.
+7. **Stop.** No placements, no queue edits, no disposition marks, no clearing, nothing written to `/PREFERENCES.md` or the mirror. End with the one-line handoff: the queue is ready to drain on Michael's word.
 
-**Why read-only is the right default:** placement is irreversible-ish and opinionated, and the whole point of the gate is that it is Maggie's judgment applied deliberately, not fired by an ambiguous greeting. A review costs nothing and can't be wrong in a way that damages anything; an unrequested batch write into brain memory can. **Michael, 2026-07-25:** a bare name should "run her OMR review and drop recommendations… review it and see what's up."
+**Why it doesn't place:** placement is irreversible-ish and opinionated, and the whole point of the gate is that it is Maggie's judgment applied deliberately, not fired by an ambiguous greeting. A review costs nothing and can't be wrong in a way that damages anything; an unrequested batch write into brain memory can. **Michael, 2026-07-25:** a bare name should "run her OMR review and drop recommendations… review it and see what's up."
+
+---
+
+## Where the review LANDS (LOCKED 2026-07-25, Michael)
+
+**Destination: the Brain Max Memory Audit channel — https://app.clickup.com/36074068/chat/r/12cwjm-55833 — the same channel she already owns for the close-time audit.** Not a new task, not a new doc, not a new channel.
+
+**Michael's requirement:** *"she should log her findings immediately. but in a single consistent reliable source."*
+
+**Why this channel and not a standing task:**
+
+- **It is already hers and already singular.** She owns Channel 1 of session close; this is the same lane and the same reader. A second surface for one agent's output is the duplicate-source pattern that has been collapsed three times in one day (registry/roster, app-index/VERSIONS, rot-sweep/doc-rot-sweep). Do not create a fourth.
+- **It is chronological and permanent.** Interleaving budget snapshots with review proposals turns the channel into the complete timeline of the memory system: what the budget was, what was pending, what was recommended, what actually landed. That is worth more than either record alone.
+- **A review must survive chat compaction.** Findings that live only in a chat reply are gone by the next session — the exact complaint `OMR-20260725-1` was filed about. The post is the durable artifact; the chat reply is just the notification.
+
+**Post shape — root + thread, mirroring the close-time audit but with an UNMISTAKABLY different root** so nothing confuses a review with an audit (the close-time root is a bare `~{tokens} / 2000 ({percent}%)` line and sweeps may key on it):
+
+- **Root (one line):** `🔍 OMR REVIEW · {YYYY-MM-DD} · {N} open · {M} flagged · not placed`
+- **Thread reply:** `## OMR Review — {date}` then, per entry: ID · recommended destination · deciding ladder step · one-line why · disposition it WOULD get (PLACE / MERGE / REJECT). Then a **⚠️ Traps** section (contradictions, superseded, false claims, budget) and a **Recommended drain order** if order matters.
+- Always ends with the standing line: **NOTHING PLACED — this is a proposal. Drain to execute.**
+
+**Empty queue = still post**, one root line, `0 open`. A ledger with gaps is a ledger you can't trust; "I checked and there was nothing" is a finding.
+
+**The session task is NOT the home for this.** If a review session later escalates to a drain, session-open's Commit fires on that first write and a board task gets cut normally, carrying the transcript. A pure review leaves the channel post and nothing else, which is correct — a session that never became work leaves no task behind.
 
 ---
 
 ## When a bare name is NOT a review (Mode B)
 
-If Maggie is invoked **with context attached** — a handoff from another agent, a specific note to place, a question about where something belongs, a memory-write intent, or a session close — that is a normal persona invocation. Apply her to the supplied input; do NOT detour into a queue review first. Mention the pending count in one line if the queue is non-empty, then do the actual job.
+If Maggie is invoked **with context attached** — a handoff from another agent, a specific note to place, a question about where something belongs, a memory-write intent, or a session close — that is a normal persona invocation. Apply her to the supplied input; do NOT detour into a queue review first, and do NOT post a review to the channel. Mention the pending count in one line if the queue is non-empty, then do the actual job.
 
 The default only fires on a genuinely naked invocation. (Invocation-mode contract: `gates/agent-invocation-gate.md` → Mode A vs Mode B.)
 
@@ -112,11 +137,11 @@ Rules that bind the gate:
 ## Processing (what "run your thing" does — Door 2 only)
 
 1. Read `brain-config/open-memory-requests.md`. Take every OPEN entry.
-2. For each: run the Placement Triage Gate and decide the destination.
+2. For each: run the Placement Triage Gate and decide the destination. **If a REVIEW post already exists for this queue state, start from it** — re-verify rather than re-derive, and say where you diverge from your own recommendation.
 3. Execute the placement. Brain-memory destinations go through her normal Memory Edit Guard + Memory Write Relay; everything else goes to the repo. Generalize session-scoped notes into durable rules first, per her standing contract.
 4. Mark the entry's disposition: **PLACED** (destination + link + date), **MERGED** (folded into an existing rule), or **REJECTED** (why).
 5. **Clear processed entries out of the queue** so it never accumulates (like `session-board.md`). The durable record of the decision lives in the destination's changelog / the PR, not the queue.
-6. Report a batch summary: N processed, where each landed, anything flagged for Michael.
+6. Report a batch summary: N processed, where each landed, anything flagged for Michael. Post it to the same Memory Audit channel so the proposal and the outcome sit next to each other.
 
 ---
 
@@ -124,13 +149,14 @@ Rules that bind the gate:
 
 - The queue holds **memory-write candidates only.**
 - **Maggie owns disposition.** Other agents write requests (Door 1); they never self-approve placement into brain memory.
-- **Door 3 never writes.** If a review turns up something urgent, say so and recommend the drain — do not quietly start placing.
+- **Door 3 never PLACES.** Posting her findings to her own audit channel is a LOG, not a placement — it touches no destination, no queue entry, and no memory file. If a review turns up something urgent, say so and recommend the drain; do not quietly start placing.
 - This does not change her session-close Memory Audit; a run may feed it ("N requests placed this session").
 
 ---
 
 ## Changelog
 
-- 2026-07-25 (Door 3 + graduation repoint) — Added the **REVIEW pass** as Maggie's `default_runbook` per the invocation-mode contract: a bare-name invocation runs a READ-ONLY queue review and reports recommendations, writing nothing (`gate_strength: auto`, safe because it is read-only). Named the Mode-B exception (invoked with a handoff or context = do the actual job, don't detour). Added the contradiction/superseded/false-claim/budget traps a review must surface, the verify-a-claim-before-placing rule, and the note that queue entries rot. Repointed the header at her git-teammate home. **Michael's directive:** "make her setting for just name invocation mean that she should run her OMR review and drop recommendations… if she has an actual handoff from an agent to review something that's different."
+- 2026-07-25 (review destination) — **Review findings POST to the Memory Audit channel** (https://app.clickup.com/36074068/chat/r/12cwjm-55833), root + thread, with a deliberately distinct root (`🔍 OMR REVIEW · …`) so nothing confuses a review with a close-time budget audit. Empty queue still posts. Chose the existing channel over a new standing task: it is already hers, already singular, already chronological, and a second surface for one agent's output is the duplicate-source pattern collapsed three times the same day. Clarified that "read-only" means **places nothing** — logging to her own channel is not a placement. Door 2 now starts from an existing review post (re-verify, don't re-derive) and posts its outcome to the same channel. **Michael's directive:** *"she should log her findings immediately. but in a single consistent reliable source."*
+- 2026-07-25 (Door 3 + graduation repoint) — Added the **REVIEW pass** as Maggie's `default_runbook` per the invocation-mode contract: a bare-name invocation runs a queue review and reports recommendations, placing nothing (`gate_strength: auto`). Named the Mode-B exception (invoked with a handoff or context = do the actual job, don't detour). Added the contradiction/superseded/false-claim/budget traps a review must surface, the verify-a-claim-before-placing rule, and the note that queue entries rot. Repointed the header at her git-teammate home. **Michael's directive:** "make her setting for just name invocation mean that she should run her OMR review and drop recommendations… if she has an actual handoff from an agent to review something that's different."
 - 2026-07-17 (created) — Public Open Memory Request queue + batch trigger ("run your thing on the open memory requests") + Placement Triage Gate (deny-by-default for brain memory). Operationalizes the existing "Maggie decides placement, not requester / Edit Guard placement test overrides 'put in memory' framing" doctrine into a standing queue Michael no longer has to hand-copy. (Michael's directive.)
-- 2026-07-17 (two doors) — Named the two invocation phrases explicitly: Door 1 DROP ("add that to the open memory log," any agent, appends to the queue) and Door 2 DRAIN ("open as Memory Maggie" → "run your thing on the open memory requests," fresh session). Opening as Maggie with a non-empty queue surfaces the pending count up front. *(Door 2's "open as Memory Maggie" half was superseded 2026-07-25: that phrase is now the REVIEW door, and the explicit drain phrase is what authorizes writes.)*
+- 2026-07-17 (two doors) — Named the two invocation phrases explicitly: Door 1 DROP ("add that to the open memory log," any agent, appends to the queue) and Door 2 DRAIN ("open as Memory Maggie" → "run your thing on the open memory requests," fresh session). Opening as Maggie with a non-empty queue surfaces the pending count up front. *(Door 2's "open as Memory Maggie" half was superseded 2026-07-25: that phrase is now the REVIEW door, and the explicit drain phrase is what authorizes placement.)*
