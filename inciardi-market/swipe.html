@@ -10,8 +10,11 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/base.css">
-<link rel="stylesheet" href="source/swipe.css">
+<!-- ?v= CACHE-BUST — bump on EVERY change to a file listed here. swipe.js calls thumbSrc/imgLadder/
+     wireImg from app-core.js; a browser holding one stale half of that pair is a ReferenceError and a
+     dead deck. See catalog.html for the full note. -->
+<link rel="stylesheet" href="source/base.css?v=16">
+<link rel="stylesheet" href="source/swipe.css?v=16">
 </head>
 <body>
 <header class="topbar"><div class="wrap row">
@@ -69,7 +72,7 @@
   <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Right-swipe saves a print to your Collection as owned; the want path saves it to your wishlist. Both need the write key. “Don’t have” is remembered on this device so you’re not re-shown prints you’ve already cleared.</p>
 </div></dialog>
 
-<script src="source/app-core.js"></script>
-<script src="source/swipe.js"></script>
+<script src="source/app-core.js?v=16"></script>
+<script src="source/swipe.js?v=16"></script>
 </body>
 </html>
