@@ -4,6 +4,19 @@ _Rolling condensed session ledger. Newest on top. Append-only._
 
 ---
 
+## 2026-07-25 (cont.) · SESSION CLOSE — Space 1 (URITP main hub) Pass-1 walk COMPLETE
+- **What was done:** finished the Space-1 crawl in one long session with Mainstage Milo on the cross-space connections. Walked FMP Tables, Professional Development, PM Budetting, PROGRAMS, Risk Assessments, Season Planning + all 9 loose top-level lists. Every folder (8), subfolder (4), and list now has an Index row + contextualized page (purpose / residency / field census / Pass-2 flags). Ran the space-doc summary pass on doc-page-43.
+- **Confirmed by Michael:** FMP report-pipeline (Report Imports, REPORTs Available, Document TEMPLATES); all 3 Professional Development; all 4 PM Budetting + folder; Production Management; (Summer) Projects; + the 5 pre-confirmed loose lists.
+- **PARKED (purpose not locked, Michael's call):** ROLES cluster + PROGRAMS folder (ROLES↔PROGRAMS entity Q + PROGRAM SPRAWL), Season Planning folder (calendar-sprawl + CRM multi-home forks), and Routines & Recurring / URITP Meetings and Events (confirmed-purpose but entangled in Routines↔Season dividing line + POSTMORTEM SCATTER).
+- **Key findings:** Space 1 is the SOURCE/spine layer (calendars, hazard registers, season staffing project OUT into Productions/Courses/CRM via multi-homing). Pipeline chain: gen PRODUCTION Hazards → per-show Risk Assessment → SAFETY/Production PROGRAM. Money split: PM Budetting = INTENT, tracking upgraded to BETA BUDGET (RECEIPTS = predecessor).
+- **My B8 lesson (logged honestly):** on the first 3 folders I created fresh child Index rows instead of reusing the pre-existing scaffolds — 14 duplicate rows. Caught it at Risk Assessments; reused cleanly there + Season Planning. All 14 dupes deletion-flagged (keepers = audited rows), Michael deletes. Discipline now: CHECK the Index for an existing row before creating.
+- **Archived-list category discovered:** Cum Sales + R&G Budget (0 tasks, not in live sidebar) — Michael's call: KEEP as valuable history, revisit later as their own archived-list category. Re-marked 🗄️, NOT deleted.
+- **State left:** Space 1 folder+list walk COMPLETE. Remaining = Michael's row deletes + eventual un-park/confirm of ROLES/PROGRAMS/Season Planning. Pure Pass 1 — no subject content changed.
+- **RESUME:** Space 2 (URITP CRM, doc-page-72, space 901313786071) — the keystone that resolves the parked ROLES↔PROGRAMS + Season Planning forks + postmortem/availability CRM projections. /session.agent=Anna + bring in Milo; open the standing thread (86ajknmmk) + Audit Frontier Scan.
+- **Session task:** the URITP List Audit standing thread (86ajknmmk).
+
+---
+
 ## 2026-07-25 · URITP audit — FMP Tables folder (Pass 1, lists-first then folder)
 - **What was done:** crawled the whole FMP Tables folder list-by-list per Michael's order (lists first, folder last). Documented + field-censused + built cold-agent List Index rows for all 7 child lists + the ROLES subfolder + the folder itself. Pure Pass-1 — nothing on any subject changed.
 - **Purpose reads:** report pipeline (REPORTs Available to Import = catalog / Report Imports = monthly log, two-way relationship) + Document TEMPLATES (dormant, 1 stale task) were self-evident from the data. The ROLES cluster was NOT — the lists are program definitions (`[X] Program`, live statuses) and `Assigned Programs` on Roles in PRODUCTION wires straight into the PROGRAMS list (901305785167).
