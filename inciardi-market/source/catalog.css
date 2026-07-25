@@ -29,12 +29,23 @@ body.can-write .write-only{display:inline-flex}
 .card{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease);display:flex;flex-direction:column;text-align:left;padding:0;font:inherit;color:inherit;animation:rise .4s var(--ease) both;animation-delay:calc(var(--i,0)*20ms)}
 .card:hover{border-color:var(--ink-faint);transform:translateY(-2px)}
 .frame{position:relative;aspect-ratio:1;background:var(--sunk);overflow:hidden}
-.frame img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s var(--ease)}
+
+/* ⚠️ IMAGES ARE VISIBLE BY DEFAULT. DO NOT RE-ADD AN opacity:0 GATE. (fixed 2026-07-25)
+   This rule used to read `opacity:0` with a `.loaded` class flipping it to 1 on the JS load event —
+   a fade-in. It is the reason "photos flash then vanish" kept coming back with a different root cause
+   each time: ANY break in the JS lifecycle (a listener attached after the load event already fired, a
+   request that hangs without firing `error`, a renderer that replaces innerHTML before the class lands)
+   leaves a fully-downloaded image sitting at zero opacity, indistinguishable from a network failure.
+   A cosmetic fade was gating whether content appeared at all.
+   Now: the image paints as soon as the browser has it, and .ph sits BEHIND it as the fallback. If the
+   image genuinely fails, wireImg() walks its ladder and the placeholder (with initials) shows through.
+   `.loaded` is kept as a harmless no-op hook so existing JS doesn't need to change. */
+.frame img{width:100%;height:100%;object-fit:cover;opacity:1;position:relative;z-index:1}
 .frame img.loaded{opacity:1}
-.frame .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:1.5rem}
-.frame .mkt{position:absolute;top:8px;right:8px;font-family:var(--mono);font-size:0.56rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;padding:3px 7px;border-radius:3px;background:var(--up);color:var(--bg)}
-.frame .excl{position:absolute;top:8px;left:8px;font-family:var(--mono);font-size:0.54rem;font-weight:600;text-transform:uppercase;padding:3px 7px;border-radius:3px;background:var(--plum-bg);color:var(--plum)}
-.frame .owned{position:absolute;bottom:8px;left:8px;font-family:var(--mono);font-size:0.54rem;font-weight:600;text-transform:uppercase;padding:3px 7px;border-radius:3px;background:var(--accent);color:var(--bg)}
+.frame .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:1.5rem;z-index:0}
+.frame .mkt{position:absolute;top:8px;right:8px;z-index:2;font-family:var(--mono);font-size:0.56rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;padding:3px 7px;border-radius:3px;background:var(--up);color:var(--bg)}
+.frame .excl{position:absolute;top:8px;left:8px;z-index:2;font-family:var(--mono);font-size:0.54rem;font-weight:600;text-transform:uppercase;padding:3px 7px;border-radius:3px;background:var(--plum-bg);color:var(--plum)}
+.frame .owned{position:absolute;bottom:8px;left:8px;z-index:2;font-family:var(--mono);font-size:0.54rem;font-weight:600;text-transform:uppercase;padding:3px 7px;border-radius:3px;background:var(--accent);color:var(--bg)}
 .card .body{padding:var(--s3) var(--s3) var(--s4);display:flex;flex-direction:column;gap:3px;flex:1}
 .card .nm{font-size:0.88rem;font-weight:600;line-height:1.25}
 .card .rl{font-family:var(--mono);font-size:0.7rem;color:var(--ink-faint);margin-top:auto;padding-top:var(--s2);display:flex;justify-content:space-between;gap:var(--s2)}
