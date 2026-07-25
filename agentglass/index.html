@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#211a14">
+<title>AgentGlass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="source/styles.css?v=1">
+</head>
+<body>
+<div class="stage">
+  <main class="device">
+
+    <header class="top">
+      <div class="top-row">
+        <span class="wordmark">Agent Activity Board</span>
+        <span class="pill live" id="pill"><i class="dot"></i><span id="pillTxt">live</span></span>
+      </div>
+      <div class="clock">
+        <time id="clock">--:--</time>
+        <span class="meridiem" id="stamp"></span>
+      </div>
+      <p class="roll" id="roll"></p>
+      <nav class="views" role="tablist" aria-label="View">
+        <a class="view-tab" id="tabFeed" href="#/feed" role="tab">Feed</a>
+        <a class="view-tab" id="tabTranscript" href="#/transcript" role="tab">Transcript</a>
+      </nav>
+    </header>
+
+    <div class="viewport" id="viewport" aria-live="polite">
+      <p class="booting">Loading the board.</p>
+    </div>
+
+    <div class="transport">
+      <div class="track" id="track" role="slider" tabindex="0" aria-label="Rewind the fleet">
+        <div class="bubble" id="bubble"></div>
+        <svg id="density" viewBox="0 0 400 44" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="head" id="head"></div>
+        <div class="ticks" id="ticks"></div>
+      </div>
+      <div class="keys">
+        <button type="button" data-jump="start">&#9198; first</button>
+        <button type="button" data-jump="-5">&minus;5m</button>
+        <button type="button" data-jump="5">+5m</button>
+        <button type="button" class="now" id="nowBtn">live &#9197;</button>
+      </div>
+      <p class="hint">Drag the strip. Arrow keys nudge a minute, shift for ten.</p>
+    </div>
+
+  </main>
+</div>
+
+<script src="source/core.js?v=1"></script>
+<script src="source/feed.js?v=1"></script>
+<script src="source/transcript.js?v=1"></script>
+<script>AG.boot();</script>
+</body>
+</html>
