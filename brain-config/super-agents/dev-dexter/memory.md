@@ -42,6 +42,8 @@ From `brain-config/README.md`'s surface map, and it generalizes far past agents.
 
 ## 🎨 Theme contract (the styling law)
 
+> 🔴 **SEQUENCING FIRST: the theme is the LAST thing, never a gate.** The whole reason the spine exists is that a theme is swappable at any time for one pointer and zero CSS edits. Build every app on `default-theme` (or any existing join) and design the real theme whenever. If you ever find yourself writing that a theme blocks a build, you have inverted the architecture — see EARNED 07-25.
+
 17 tokens. **Every color is `var(--token)` — zero color literals** in `styles.css`, `chrome.js`, or pages (sole exception: the neutral black-alpha drawer scrim). Link `shared/themes/themes.css` (static, instant paint) **and** `resolve.js` (live switching); set `<html data-theme data-mode>` for first paint; default `default-theme` until one is chosen. Picker auto-populates from `THEMES.list()`.
 
 **A theme is a 4-vector matrix**, not a color: colors × typography × forms × spacing, joined by one slug in `_themes.json`. Apps request the slug, never a vector.
@@ -49,6 +51,8 @@ From `brain-config/README.md`'s surface map, and it generalizes far past agents.
 **⚠️ The boot trap:** `THEMES.applyTheme(slug)` composes all four vectors — that is the boot. `THEMES.apply(colorSlug)` is **COLOR ONLY**, for the picker's hue swap. Using `apply` as the boot silently drops typography/forms/spacing and the app looks fine while being unthemed. That exact bug is the documented pre-07-19 anti-pattern (apps hand-baked structural CSS to compensate, freezing radii/borders un-swappably). **The `:root` block is a first-paint FALLBACK FLOOR and must be labelled one — the theme is the source of truth, the floor is a mirror, never the design.**
 
 **Adding a theme value has a third step people skip:** TSV row → `_themes.json` entry → **update the embedded snapshot in `preview.data.js`**. A new Forms *column* also needs adding to `FORM_KEYS` in `resolve.js`, or it works in the Studio (which applies columns generically) and is **silently broken in every real app**. Full contract: `shared/themes/THEME-SYSTEM.md`.
+
+**No silent path in `resolve.js` (fixed 07-25, PR #502).** Every unresolved reference — unknown theme, unknown color, unknown or missing typography/forms/spacing pointer, failed grid fetch — records to `THEMES.faults`, console.errors, and banners. `opts.silent` is accepted and IGNORED. `THEMES.validate()` reports every broken join reference without applying: run it after adding a row.
 
 **Two-layer rule (from On Track, generalizes):** Layer A = chrome palette, from the spine. Layer B = app-identity colors (On Track's 20 series colors) stays a LOCAL block riding on top of any theme. **Never sweep identity colors into a theme vector** — F1 stays F1-red on parchment. An unmet color need gets flagged to the steward, never inlined.
 
@@ -65,9 +69,10 @@ From `brain-config/README.md`'s surface map, and it generalizes far past agents.
 - **Base64 armor / DDR Explorer v19.** Readback FLATTENED `innerHTML`-built markup while UUID markers still matched, so an integrity check passed on gutted source. A plaintext HTML chunk is trustworthy only if the read returns literal `<div` / `<svg` intact.
 - **Stale reads clobbering current work (repeatedly).** Branch raw URLs serve cache-frozen copies — verified 07-25: a raw read of `inciardi-market/source/app-core.js` returned v10.1/PR #174 while `main` was on v15/PR #455. **Blob API, base64-decoded, re-fetched before every write.**
 - **Large writes corrupt (07-02, 4× in one session).** >~30KB never goes through `create_or_update_file`.
-- **A helper that silently declines to transform is worse than one that throws** (`inciardi-market`, 3rd image outage, different cause each time). `proxied(url, 360)` is a NO-OP on an R2 `/img?key=` URL — that branch cannot resize — so 268MB of full-res originals got painted into a phone grid, and the error handler then cache-busted the SAME url and hid the element on the second miss.
-- **A unit assumption with no assertion is a silent feature-killer** (same app). `retailFrom()` divided by 100 assuming cents; the storefront returns DOLLARS. All 177 rows read 1/100th, which made the "underpriced" threshold mathematically unreachable — a whole feature could never fire, with no error anywhere.
-- **Changing a key's derivation orphans everything keyed on it** (same app). `print_id` was deliberately left alone because the harvest never DELETEs, so a new slug would strand inventory/image/machine rows.
+- **A helper that silently declines to transform is worse than one that throws** (`inciardi-market`, 3rd image outage). `proxied(url, 360)` is a NO-OP on an R2 `/img?key=` URL — that branch cannot resize — so 268MB of originals got painted into a phone grid, and the error handler then cache-busted the SAME url and hid the element on the second miss.
+- **A unit assumption with no assertion is a silent feature-killer** (same app). `retailFrom()` divided by 100 assuming cents; the storefront returns DOLLARS. All 177 rows read 1/100th, making the "underpriced" threshold mathematically unreachable — a whole feature could never fire, no error anywhere.
+- **Changing a key's derivation orphans everything keyed on it** (same app). `print_id` was left alone because the harvest never DELETEs, so a new slug would strand inventory/image/machine rows.
+- **A cache that fails silently does not degrade gracefully, it lies** (07-25, four instances in one day: HTTP cache, stylesheet cache, localStorage, theme resolver). **All four were added as "resilience" — resilience features are the prime suspects.** Every fallback announces itself in the UI, with an age.
 
 ## What apps exist → **`VERSIONS.md` (repo root). THE single app ledger.**
 
@@ -82,13 +87,14 @@ Apps I have an opinion about (state → the ledger, always):
 - **`retrocast`** — the FIRST spine consumer, and proof that swapping structural feel is one pointer and zero CSS edits. Was in no index at all until 07-25.
 - **`template-app`** — gold-standard baseline. Start here for a new app; change only `APP_THEME`.
 - **`file-chunker`** — generates `/source` chunk sets. Also proved the large-write corruption rule.
-- **`inciardi-market`** — two Cloudflare workers over one D1+R2 store, NOT data-separated. Carries the **Image Rendering Law** + an open security flag.
+- **`inciardi-market`** — two Cloudflare workers over one D1+R2 store, NOT data-separated. Carries the **Image Rendering Law** + the **Fetch Honesty Law** + an open security flag (unrotated write keys).
+- **`inciardi-collection`** — its successor, in DEFINITION as of 07-25. Read its README before writing a line: `artwork → edition → copy`, D1-as-source, manual entry primary, and the acceptance test *"if every worker died tomorrow, could Michael still fully use this app?"*
 - **`agentglass`** — first app with a non-executing `server/` tree; reads a committed seed, labeled SNAPSHOT so it can't imply false currency.
 
 ## How Michael works on builds
 
 - **Dark themes by default.** Don't ask.
-- **Style is seated at PLANNING**, not bolted on. I ground Stu; I don't preempt him.
+- **Style is seated at PLANNING**, not bolted on — but seated ≠ blocking. Stu designs while the build proceeds on defaults. I ground Stu; I don't preempt him.
 - **Two deliveries for any HTML artifact:** markdown link + the raw URL in a bare code block (mobile copy). GitHub source links are always `/blob/` URLs.
 - **Copy-paste content = bare code blocks, no language tag, one link per block.** He's often on a phone.
 - **Feature requests become spec lines** in `next-build-spec.md` (Scratch → Next build/Futures → In review), never chat or task comments. One spec file per app, overwritten each cycle, **version in the header never the filename**.
@@ -97,6 +103,7 @@ Apps I have an opinion about (state → the ledger, always):
 - **He builds by voice a lot** — names and commands must survive dictation.
 - **He collapses duplicates on sight.** Twice on 07-25 he killed a second source of truth rather than syncing it. Never propose a mirror as a solution.
 - **He keeps the reasoning, not just the outcome.** The theme spine carries a 21KB decision log; rejected options and overruled objections stay in the record. Don't tidy away the roads not taken.
+- **He states the directive up front and expects it to hold.** When he says "define schema and pages before we build anything," that IS the scope of the gate. Anything that is not schema or pages does not get to become a blocker, no matter how reasonable it looks in isolation.
 
 ## Who I work with (lanes, not ranks — Constitution §6)
 
@@ -104,14 +111,22 @@ Apps I have an opinion about (state → the ledger, always):
 
 ## EARNED (seen with my own hands, not inherited)
 
+**2026-07-25 · I INVENTED A DEPENDENCY THE ARCHITECTURE EXISTS TO ELIMINATE. 🔴 The one to reread.** I wrote *"the shell consumes tokens, so the theme blocks the shell"* into `inciardi-collection`'s README, made it sign-off question Q5, and left it as the last thing gating milestone 1. Michael: *"why are we talking about theme when i said our whole directive was to plan schema and pages before build… theming should be the lightest thing to change later because we've decided that default structure already. so use defaults for now for all i care cos the whole point is we can change it later."*
+
+He is right and the premise was false. **In a `var(--token)` architecture the shell consumes tokens regardless of which row supplies them** — that is the entire point of the spine, proven by `retrocast` (one pointer, zero CSS edits). So the single artifact in this repo that *cannot* be a build blocker is the theme, and I made it the last blocker standing. **Theme goes LAST. Build on `default-theme`, swap at the end.**
+
+The generalization, which is the part worth carrying: **a solved problem invites re-solving.** Because the theme system is well-built and interesting, it pulled attention it had already earned the right not to need. Watch for the shape — *I am designing the most polished part of the stack while the load-bearing part is undefined* — and ask whether the thing in front of me is genuinely blocking or merely more fun than the schema.
+
 **2026-07-25 · a documented fix had already shipped, and following the doc would have broken the app.** Sent to "restore the dashboard" off a note dated 07-07; both named reverts had landed 07-08 and the feature was rebuilt cleanly after. The note was **32 PRs stale** and executing it would have destroyed 18 days of work. **A remediation instruction rots exactly like a version number — verify the problem still exists at HEAD before executing a fix, especially a destructive one.**
 
-**2026-07-25 · the stale-read trap is recursive.** My first fetch of the live dashboard returned a cache-frozen layout that doesn't exist in the repo. I was one sentence from reporting a regression that wasn't there. **Two independent reads before reporting anything about a live URL** — that same failure is how the phantom note got written.
+**2026-07-25 · the stale-read trap is recursive.** My first fetch of the live dashboard returned a cache-frozen layout that doesn't exist in the repo; I was one sentence from reporting a regression that wasn't there. **Two independent reads before reporting anything about a live URL.**
 
-**2026-07-25 · concurrency is real and the SHA guard works.** A parallel pass edited a file between my read and my write; the write was rejected on a stale SHA. **On a SHA rejection: re-read HEAD and go additive — never re-apply your original body.** That preserved a finding I'd missed. Happened TWICE in one session, second time as a full merge conflict on this very file — where the parallel version was *better* than mine, so I kept theirs and added only what was missing. **A rejected write is information, not an obstacle.**
+**2026-07-25 · concurrency is real and the SHA guard works.** A parallel pass edited a file between my read and my write; the write was rejected on a stale SHA. **On a SHA rejection: re-read HEAD and go additive — never re-apply your original body.** Happened TWICE, the second time as a merge conflict on this very file, where the parallel version was *better* than mine — so I kept theirs and added only what was missing. **A rejected write is information, not an obstacle.**
 
 **2026-07-25 · check whether the job is already done.** Asked to collapse app-index into VERSIONS.md: already collapsed. **"Already satisfied" is a valid and common answer.**
 
-**2026-07-25 · two canonical files crossed unwriteable on the same day** (`roster.json` ~25KB, `VERSIONS.md` 16.4KB). Both had grown because rows became essays. **Assume every hand-maintained index is on a growth curve toward unwriteable; the growth is always prose, never rows; and its own registration/verify flow is what breaks first.**
+**2026-07-25 · two canonical files crossed unwriteable on the same day** (`roster.json` ~25KB, `VERSIONS.md` 16.4KB), both because rows became essays. **Assume every hand-maintained index is on a growth curve toward unwriteable; the growth is always prose, never rows; and its own registration/verify flow is what breaks first.**
 
-**2026-07-25 · a LOCKED doc can be the stale one.** `brain-config/README.md` carried a "Verified read path (LOCKED 2026-07-04)" naming raw githubusercontent as the source of truth for file bodies — contradicted by the GitHub MCP Operating Standard (LOCKED 07-09) and by today's evidence. `next-build-spec.md` carried the same rotted rule. **A lock date is not a freshness guarantee; on two conflicting locks the NEWER one plus live evidence wins. And when a standards doc contradicts a locked standard, fix it in the same pass — don't route around it.** Three rotted instructions found in one day, all of them instructions rather than data: **prescriptive text rots faster than descriptive text, because nobody re-verifies a rule.**
+**2026-07-25 · a LOCKED doc can be the stale one.** `brain-config/README.md` carried a "Verified read path (LOCKED 2026-07-04)" naming raw githubusercontent as the source of truth for file bodies — contradicted by the GitHub MCP Operating Standard (LOCKED 07-09) and by live evidence. `next-build-spec.md` carried the same rotted rule. **A lock date is not a freshness guarantee; on two conflicting locks the NEWER one plus live evidence wins.** Three rotted instructions in one day, all instructions rather than data: **prescriptive text rots faster than descriptive text, because nobody re-verifies a rule.**
+
+**2026-07-25 · `get_file_contents` returns real bodies.** Whatever the AI Toolkit index says. It resolves at an immutable SHA and was the only trustworthy read path all week; the branch raw URL is the liar. Correction filed as `OMR-20260725-3` before the false claim could reach brain memory.
