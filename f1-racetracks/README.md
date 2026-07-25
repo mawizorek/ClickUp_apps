@@ -1,7 +1,7 @@
 # F1 Racetracks
 
 > **The app plan.** Load this at the start of every build session.  
-> One file answers: what pages exist, what data feeds them, what's not done yet.
+> One file answers: what screens exist, what data feeds them, what's not done yet.
 
 **Live:** https://mawizorek.github.io/ClickUp_apps/f1-racetracks/  
 **Source of truth:** this repo folder  
@@ -17,148 +17,76 @@ Not a results table. A race story told through data.
 
 ---
 
-## Page Hierarchy
+## Screens (the Layout tab)
 
-### `index.html` — THE MAIN WINDOW
-
-The app shell. The header toggle at the top switches between three lenses. Each lens changes what the home grid shows. Tapping a round card in any lens drills into that circuit's breakdown.
+What screens exist, what data context each sits on, and how you navigate between them.
 
 ```
-index.html
+index.html — MAIN WINDOW (app shell + router)
 │
-├── HEADER TOGGLE (the 3 lenses — top of app, always visible)
+├── [Matrix] lens (default) ......... Home grid, calendar order, result summaries
+├── [History] lens .................. Home grid, race-history framing, past winners
+├── [Circuits] lens ................. Home grid, technical reference (length/laps/type)
+│       │
+│       └── tap any round card →
+│
+├── Circuit Breakdown (#/<slug>) .... Per-circuit deep view
+│   │   Context: data.json + circuits/<slug>.json + f1-results/2026/<slug>.json
 │   │
-│   ├── [Matrix] (default)
-│   │   24-round card grid, calendar order.
-│   │   Each card = circuit name, date, flag, result summary.
-│   │   Current-round highlight card pinned at top.
+│   ├── Weekend Center .............. Schedule / Live / Replay tabs
+│   │       │
+│   │       └── drill into completed race → weekend.html
 │   │
-│   ├── [History]
-│   │   Same 24 rounds, reframed as race-history cards.
-│   │   Previous winners, podium streaks, notable stats per circuit.
-│   │
-│   └── [Circuits]
-│       Technical circuit reference cards.
-│       Track length, laps, corners, type (street/permanent),
-│       overtaking character, tyre demand.
+│   └── Driver Popup ................ Per-driver detail overlay
+│           🟡 Arc Visualization here (PLANNED)
 │
-├── #/ ..................... Home Grid (renders whichever lens is active)
-│   ├── Current-round highlight card (always top, all lenses)
-│   └── Round cards (content varies by lens above)
+└── Footer
+```
+
+```
+weekend.html — RACE DETAIL
+│   Context: f1-results/2026/<round>.json
+│   Reached from: Circuit Breakdown → Weekend Center
 │
-├── #/<slug> ............... Circuit Breakdown (drill into any round)
-│   ├── Track map + lap profile + sector character
-│   ├── Tyre strategy + overtaking notes
-│   ├── Weather
-│   ├── Race history (podium/winners)
-│   ├── Weekend Center
-│   │   ├── Schedule tab
-│   │   ├── Live tab (OpenF1 hydration during sessions)
-│   │   └── Replay tab (post-race)
-│   └── Driver Popup (tap a driver → per-driver detail)
-│       ├── Position + team + fast lap
-│       ├── Qualifying times
-│       └── 🟡 Arc Visualization (PLANNED: grid→finish spine)
+├── Results mode (default, LIVE) .... 8 static panels + driver popup
+│       🟡 Arc Visualization in popup (PLANNED)
+│       🟡 Race Narrative in popup (PLANNED)
+│       🔒 Strategy row in popup (HELD)
+│       🟡 DNF/gap detail in popup (PLANNED)
 │
-└── Footer (source tools, export, new-tab)
+└── Story mode (IN PROGRESS) ....... Scrubber-driven race replay
+        Ref build: story-mode-reference.html
 ```
 
-**Source:** `app-shell.js`, `09_app_bootstrap_and_home.js`, `10_track_views_and_profile.js`, `11_weather_and_footer_exports.js`, `14-17_weekend_*.js`, `18_home_and_mobile_polish.js`  
-**Data:** `data.json`, `circuits/<slug>.json`, `f1-results/2026/<slug>.json`
-
----
-
-### `weekend.html` — RACE DETAIL (drilldown from Weekend Center)
-
-The deep-dive into a single completed race. Reached from the circuit breakdown's Weekend Center. Self-contained (30KB+ monolith, backed by `source/weekend/` chunk set).
-
 ```
-weekend.html
-├── Race Mast (round name, date, circuit)
-├── Mode Toggle: Results / Story
-│
-├── Results (default, LIVE)
-│   ├── Podium panel
-│   ├── Pole position
-│   ├── Fastest lap
-│   ├── Starting grid
-│   ├── Qualifying tiers (Q1/Q2/Q3 eliminations)
-│   ├── Sprint classification (sprint weekends)
-│   ├── Full race classification (20 cars)
-│   ├── Championship swing
-│   └── Driver Popup → per-driver race detail
-│       ├── Position, grid, qualifying times, fast lap
-│       ├── 🟡 Arc Visualization (PLANNED)
-│       ├── 🟡 Race Narrative: stewardNote + summary (PLANNED)
-│       ├── 🔒 Strategy row: stint chips (Tier 3, HELD)
-│       └── 🟡 DNF/gap detail (Tier 4, PLANNED)
-│
-└── Story (IN PROGRESS)
-    ├── Position ladder (scrubber-driven, continuous-time)
-    ├── Timing tower
-    ├── Starting-grid wheel-cards
-    ├── Pit lane timeline
-    └── Team radio feed
+standings.html — CHAMPIONSHIP STANDINGS (satellite)
+    Context: f1-results/2026/index_rounds.json + all round files
+    Reached from: header nav link
+    Screens: Drivers table, Constructors table
 ```
 
-**Source:** `source/weekend/` (base.css, panels.css, story.css, data.js, render.js, nav.js, story.js)  
-**Data:** `f1-results/2026/<round>.json`  
-**Story ref build:** `story-mode-reference.html` (splice from this, don't reinvent)
-
----
-
-### Satellite Pages (standalone, linked from header/nav)
-
-Separate HTML files with their own rendering. Not views inside index.html.
-
-#### `standings.html` — LIVE
 ```
-standings.html
-├── Drivers Championship (ranked table, cumulative points, delta)
-└── Constructors Championship (team totals, driver splits)
+circuits.html — CIRCUIT DIRECTORY (satellite)
+    Context: data.json
+    Reached from: header nav link
+    Links back to: index.html#/<slug>
 ```
-**Source:** `source/standings/` (chunked)  
-**Data:** `f1-results/2026/index_rounds.json` + all round files
 
-#### `circuits.html` — LIVE
 ```
-circuits.html
-└── Circuit listing (country, length, laps, type)
-    └── Each entry links back to index.html#/<slug>
+live-tracker.html — LIVE SESSION COMPANION (standalone)
+    Context: OpenF1 API (real-time)
+    Reached from: direct link (not in main nav)
 ```
-**Data:** `data.json`  
-Alt-entry to the hash-routed circuit views. Useful as a directory.
 
-#### `live-tracker.html` — LIVE
 ```
-live-tracker.html
-└── OpenF1 companion (timing tower, position changes, session status)
-```
-**Source:** `13_live_session_panel.js`  
-Standalone. Not part of main nav. Used during live sessions for the broader view.
+🟡 Tyre Analysis (FUTURE)
+    Context: tyre-compounds.json (proposed) + Tier 3 data
+    Spec: Data-Story Layer doc §4B
 
----
-
-### Future Pages (no code yet)
-
-#### Tyre Analysis — FUTURE
+🟡 Season History (FUTURE)
+    Context: multi-year f1-results/<year>/ folders
+    Possibly a new lens on home grid rather than a new page
 ```
-(new page TBD)
-└── Compound comparison across weekends
-    ├── C1-C5 characteristics + stint data
-    └── Per-weekend nomination context
-```
-**Needs:** `tyre-compounds.json`, Tier 3 backfill  
-**Spec:** Data-Story Layer doc §4B
-
-#### Season History — FUTURE
-```
-(lens on home grid, or new page TBD)
-└── Cross-year comparison
-    ├── Previous winners per circuit
-    └── Season-over-season performance
-```
-**Needs:** Per-season folder population beyond 2026
 
 ---
 
@@ -166,9 +94,9 @@ Standalone. Not part of main nav. Used during live sessions for the broader view
 
 - **LIVE** = shipped, working
 - **IN PROGRESS** = reference/spec exists, integration not done
-- 🟡 **PLANNED** = data exists, render surface not built
+- 🟡 **PLANNED** = data exists or spec exists, not built
 - 🔒 **HELD** = design locked, execution waiting on Michael's call
-- **FUTURE** = needs new data + new page
+- **FUTURE** = needs new data + new screen
 
 ---
 
