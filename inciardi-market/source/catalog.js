@@ -6,7 +6,11 @@ const CAT_EDIT={mini:"Mini","big-riso":"Big Risograph",linocut:"Linocut",exclusi
 const THUMB_HUE={mini:72,pack:205,exclusive:305,"big-riso":152,linocut:40};
 
 let CATALOG={prints:[]}, MARKET={listings:[]}, INV={inventory:[]}, fromD1=false;
-let state={q:"",cat:"all",ebayOnly:false};
+// Michael collects MINIS. Opening on the full 177-card dump was never the useful view, so the
+// catalog lands on Minis and everything else stays one chip away. Deliberately a DEFAULT FILTER
+// and not a harvest exclusion: pack rows contain minis, category tagging is heuristic and will
+// misfile things, and a row deleted at harvest can't come back without a full re-run.
+let state={q:"",cat:"mini",ebayOnly:false};
 let openPid=null;
 
 initChrome();
@@ -28,8 +32,9 @@ function isOwned(p, set){ return set.has(p.print_id) || set.has(normStr(p.name))
 function buildChips(){
  const prints=CATALOG.prints||[]; const counts={}; prints.forEach(p=>counts[p.category]=(counts[p.category]||0)+1);
  const cats=CAT_ORDER.filter(c=>counts[c]);
- const chips=[`<button class="chip" data-cat="all" aria-pressed="true">All <span class="cnt">${prints.length}</span></button>`]
-  .concat(cats.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="false">${CAT_LABELS[c]||c} <span class="cnt">${counts[c]}</span></button>`));
+ if(state.cat!=="all" && !counts[state.cat]) state.cat="all"; // seed data / empty category -> don't open on nothing
+ const chips=[`<button class="chip" data-cat="all" aria-pressed="${state.cat==="all"}">All <span class="cnt">${prints.length}</span></button>`]
+  .concat(cats.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${state.cat===c}">${CAT_LABELS[c]||c} <span class="cnt">${counts[c]}</span></button>`));
  $("catChips").innerHTML=chips.join("");
  $("catChips").querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>{ state.cat=ch.dataset.cat; $("catChips").querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",String(x===ch))); render(); }));
 }
@@ -61,19 +66,28 @@ function render(){
  const owned=ownedSet();
  let list=(CATALOG.prints||[]).filter(p=>(state.cat==="all"||p.category===state.cat)&&matchQ(p,state.q));
  if(state.ebayOnly) list=list.filter(p=>marketFor(MARKET,p));
- list.sort((a,b)=>(!!b.image-!!a.image)||a.name.localeCompare(b.name));
+ // numeric collation: the shop names mini variants "#1", "#10", "#100" and a plain
+ // localeCompare orders those 1, 10, 100, 11. {numeric:true} counts like a human does.
+ list.sort((a,b)=>(!!b.image-!!a.image)||a.name.localeCompare(b.name,undefined,{numeric:true,sensitivity:"base"}));
  const total=(CATALOG.prints||[]).length;
  $("countLine").innerHTML=`Showing <b>${list.length}</b> of ${total} prints${state.cat!=="all"?" \u00b7 "+(CAT_LABELS[state.cat]||state.cat):""}${fromD1?"":" \u00b7 seed (connect Worker for live catalog)"}`;
  const grid=$("grid");
  if(!list.length){ grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><h3>No prints match</h3><p>Try a different search or clear the filters.</p></div>`; return; }
  grid.innerHTML=list.map((p,i)=>cardHTML(p,i,owned)).join("");
- grid.querySelectorAll(".card").forEach(el=>{ el.addEventListener("click",()=>openDetail(el.dataset.key));
-  const img=el.querySelector("img"); if(img){ if(img.complete&&img.naturalWidth) img.classList.add("loaded"); else{ img.addEventListener("load",()=>img.classList.add("loaded")); img.addEventListener("error",()=>{ if(img.dataset.r){img.style.display="none";return;} img.dataset.r="1"; img.src=img.src+(img.src.includes("?")?"&":"?")+"r="+Date.now(); }); } } });
+ grid.querySelectorAll(".card").forEach((el,i)=>{
+  el.addEventListener("click",()=>openDetail(el.dataset.key));
+  // wireImg owns the load/error lifecycle now (app-core). The old handler retried the SAME
+  // url with a cache-bust, which re-downloaded the multi-MB file that had just failed and
+  // then hid the card outright on the second miss. A retry must move DOWN the ladder.
+  wireImg(el.querySelector("img"), imgLadder(list[i], 360));
+ });
 }
 function phStyle(cat){ const h=THUMB_HUE[cat]||72; return `background:oklch(30% 0.05 ${h});color:oklch(80% 0.11 ${h})`; }
 function cardHTML(p,i,owned){
  const m=marketFor(MARKET,p);
- const img=p.image?`<img src="${esc(proxied(p.image,360))}" alt="${esc(p.name)}" loading="lazy" decoding="async">`:"";
+ // thumbSrc, NOT p.image: p.image is the R2 ARCHIVAL original (1-3MB here). See the Image
+ // Rendering Law in the README — a grid never paints an original.
+ const img=p.image?`<img src="${esc(thumbSrc(p,360))}" alt="${esc(p.name)}" loading="lazy" decoding="async">`:"";
  const ph=`<div class="ph" style="${phStyle(p.category)}">${p.image?"":initials(p.name)}</div>`;
  const key=esc(p.print_id||p.name);
  return `<button class="card" data-key="${key}" style="--i:${i}">
@@ -88,7 +102,8 @@ function catOpts(sel){ return Object.keys(CAT_EDIT).map(k=>`<option value="${k}"
 function openDetail(key){
  const p=findPrint(key); if(!p) return; openPid=p.print_id||null;
  const m=marketFor(MARKET,p);
- const hero=p.image?`<img src="${esc(proxied(p.image,900))}" alt="${esc(p.name)}">`:`<div class="ph" style="${phStyle(p.category)}">${initials(p.name)}</div>`;
+ // The hero is the one place the archival original is the right answer (single image, on demand).
+ const hero=p.image?`<img src="${esc(heroSrc(p,1200))}" alt="${esc(p.name)}" decoding="async">`:`<div class="ph" style="${phStyle(p.category)}">${initials(p.name)}</div>`;
  const facts=[["Retail",p.retail!=null?money(p.retail):"\u2014",false],["Category",CAT_LABELS[p.category]||p.category||"\u2014",false],p.exclusive?["Series",EXCL_LABEL[p.exclusive]||p.exclusive,false]:null,["In print",p.available?"Yes":"Retired / sold out",false],m?["Live on eBay",m.count+" listing"+(m.count>1?"s":""),true]:["Live on eBay","Not listed",false],m&&m.low!=null?["Market low",money(m.low),true]:null].filter(Boolean)
   .map(([k,v,up])=>`<div class="dt-fact"><span class="k">${k}</span><span class="v${up?" up":""}">${esc(v)}</span></div>`).join("");
  const ebayUrl=`https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent("anastasia inciardi "+p.name)}`;
@@ -114,6 +129,7 @@ function openDetail(key){
    </div>
   </div>`;
  $("dtClose").addEventListener("click",()=>$("detail").close());
+ wireImg($("detailInner").querySelector(".dt-hero img"), heroLadder(p,1200));
  const own=$("dtAddOwn"); if(own) own.addEventListener("click",()=>addOwned(p));
  const eb=$("dtEditBtn"); if(eb) eb.addEventListener("click",()=>{ const f=$("dtEditForm"); f.hidden=!f.hidden; if(!f.hidden){ $("ed-name").focus(); $("ed-name").select(); } });
  const esv=$("ed-save"); if(esv) esv.addEventListener("click",()=>saveEdit(p));
@@ -150,7 +166,8 @@ function renderImgMgr(p){
   return;
  }
  const imgs=p.images||[]; const active=imgs.filter(i=>i.status==="active"); const arch=imgs.filter(i=>i.status==="archived");
- const thumb=(i)=>`<div class="thumb ${i.is_primary?"primary":""} ${i.status==="archived"?"arch":""}">${i.url?`<img src="${esc(i.url)}" alt="">`:""}${i.is_primary?`<span class="badge">Main</span>`:""}<div class="thumb-acts">${i.status==="active"?(i.is_primary?"":`<button data-op="primary" data-id="${i.image_id}">Set</button>`)+`<button data-op="archive" data-id="${i.image_id}">Arch</button>`:`<button data-op="restore" data-id="${i.image_id}">Restore</button><button data-op="delete" data-id="${i.image_id}">Del</button>`}</div></div>`;
+ // Same law as the grid: these are ~64px chips, so they get a derivative, never the original.
+ const thumb=(i)=>`<div class="thumb ${i.is_primary?"primary":""} ${i.status==="archived"?"arch":""}">${i.url?`<img src="${esc(imageThumb(i,200))}" alt="" loading="lazy" decoding="async">`:""}${i.is_primary?`<span class="badge">Main</span>`:""}<div class="thumb-acts">${i.status==="active"?(i.is_primary?"":`<button data-op="primary" data-id="${i.image_id}">Set</button>`)+`<button data-op="archive" data-id="${i.image_id}">Arch</button>`:`<button data-op="restore" data-id="${i.image_id}">Restore</button><button data-op="delete" data-id="${i.image_id}">Del</button>`}</div></div>`;
  const seedUrl = p.image && /^https?:/.test(p.image) && p.image.includes("cdn.shopify.com") ? p.image : (p._srcUrl||"");
  box.innerHTML=`
   <div class="dt-sec">Images \u00b7 ${active.length} active${arch.length?` \u00b7 ${arch.length} archived`:""}</div>
@@ -160,6 +177,7 @@ function renderImgMgr(p){
    <label class="btn sm"><input type="file" accept="image/*" id="upIn" hidden>Upload photo</label>
    ${seedUrl?`<button class="btn sm" id="scrubBtn">Scrub &amp; store original</button>`:""}
   </div>`;
+ box.querySelectorAll(".thumbs img").forEach((im,n)=>wireImg(im, imageLadder(imgs.filter(x=>x.status==="active").concat(imgs.filter(x=>x.status==="archived"))[n], 200)));
  box.querySelectorAll(".thumb-acts button").forEach(b=>b.addEventListener("click",()=>imgOp(b.dataset.op,b.dataset.id)));
  const up=$("upIn"); if(up) up.addEventListener("change",()=>uploadImg(p, up.files[0]));
  const sb=$("scrubBtn"); if(sb) sb.addEventListener("click",()=>scrubStore(p, seedUrl));

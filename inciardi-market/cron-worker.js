@@ -1,5 +1,5 @@
 /**
- * Inciardi Mini Print Market Tracker — CATALOG HARVEST CRON WORKER
+ * Inciardi Mini Print Market Tracker — CATALOG HARVEST CRON WORKER (v1.4)
  *
  * A SEPARATE Cloudflare Worker from the main `worker.js`. It shares the SAME
  * D1 database (binding DB) and R2 bucket (binding IMAGES) by ID, so it writes
@@ -23,6 +23,15 @@
  * SHOPIFY 403 (learned 2026-07-13): Shopify + its CDN reject the Worker's default
  * bare User-Agent. All outbound fetches send a browser-like UA via BROWSER_HEADERS.
  *
+ * PRICE UNITS (learned the expensive way 2026-07-25): the STOREFRONT products.json
+ * returns price as a decimal string IN DOLLARS ("25.00"). It is NOT cents. See
+ * retailFrom() for the full post-mortem — the old /100 silently zeroed every price
+ * in the catalog and made Deal Radar mathematically incapable of ever flagging.
+ *
+ * ARCHIVE DERIVATIVES (2026-07-25): the backfill no longer stores raw camera
+ * originals. It asks Shopify's CDN for a width-capped JPEG so (a) HEIC uploads
+ * become renderable outside Safari and (b) R2 stops filling with 2-3MB files.
+ *
  * CRONS (see wrangler-cron.toml):
  *   "0 9 * * *"  daily 09:00 UTC  -> runCatalogScrub  (text harvest of the shop)
  *   "0 * * * *"  hourly           -> runImageBackfill (self-idling image scrub)
@@ -35,6 +44,7 @@ const SCRUB_BATCH = 12;                 // images per hourly tick. 3 subrequests
                                         // (fetch+R2+D1) => 36, safe under the 50 free cap.
 const D1_BATCH = 50;                    // statements per env.DB.batch() round trip
 const STORAGE_CAP_BYTES = 4.5 * 1024 * 1024 * 1024; // mirror worker.js v1.1 cap (4.5GB)
+const ARCHIVE_WIDTH = 1600;             // px cap for the R2 archival copy (see runImageBackfill)
 const IMG_HOST_ALLOW = ["cdn.shopify.com"];
 
 // Shopify + its CDN 403 a bare Worker UA. Present as a real browser.
@@ -68,7 +78,7 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
     const url = new URL(request.url);
     if (url.pathname === "/health" || url.pathname === "/") {
-      return json({ ok: true, worker: "inciardi-market-cron", crons: ["0 9 * * * (harvest)", "0 * * * * (image backfill)"] });
+      return json({ ok: true, worker: "inciardi-market-cron", version: "1.4", crons: ["0 9 * * * (harvest)", "0 * * * * (image backfill)"] });
     }
     if (url.pathname === "/run/harvest") {
       try { return json(await runCatalogScrub(env)); }
@@ -182,7 +192,50 @@ function exclusiveFor(title, handle, sig) {
   if (/\bholiday\b/.test(t)) return "holiday";
   return null;
 }
-function retailFrom(priceStr) { const n = parseFloat(priceStr); return isNaN(n) ? null : Math.round(n) / 100; }
+
+// ⚠️ PRICE UNITS — DO NOT REINTRODUCE A /100. (post-mortem 2026-07-25)
+// Shopify's STOREFRONT products.json (`/products.json`) returns `price` as a decimal
+// string IN DOLLARS: "25.00". The Admin API and Stripe use integer cents, and the two
+// are indistinguishable at a glance in a debugger — that muscle memory put a `/100`
+// here, which turned every $25 print into 0.25 and rendered as "$0" on every card.
+// The damage was not cosmetic: `underpriced` fires at `landed <= 85% of baseline`, so a
+// $0.25 baseline made that condition unreachable and Deal Radar silently could never
+// flag a single buy. The old `Math.round(n)` was a second bug hiding behind the first —
+// it floored $12.50 to $12 before the divide, so even the ratio was wrong.
+// Rows are `locked:0 / source:'shop-harvest'`, so one `/run/harvest` repairs them all.
+function retailFrom(priceStr) {
+  const n = parseFloat(priceStr);
+  return isNaN(n) || n < 0 ? null : n;
+}
+
+// Shopify names mini-print variants numerically — "#1", "10", "1/12" — so a bare
+// `v.title` produced catalog rows literally called "#1". Three problems: the name carries
+// zero information, eBay title-matching can never match on "#1", and a lexical sort orders
+// them #1, #10, #100, #11. Compose the product title in when the variant title is purely
+// numeric so there's a sortable, matchable placeholder. The REAL artwork names don't exist
+// anywhere in the shop's data — that's what the rename+lock tooling (catalog detail pencil /
+// swipe long-press → Edit) is for; a hand-rename sets locked:1 and this harvest then leaves
+// the title alone forever.
+const NUMERIC_VARIANT = /^[\s#]*\d+(\s*\/\s*\d+)?[\s.)-]*$/;
+function variantTitle(product, v, category) {
+  const raw = String(v.title || "").trim();
+  let title = raw || String(product.title || "").trim();
+  if (raw && NUMERIC_VARIANT.test(raw)) title = `${product.title} #${raw.replace(/^#\s*/, "")}`;
+  if (category === "big-riso" && !/risograph/i.test(title)) title = `${title} Risograph`;
+  return title;
+}
+
+// print_id MUST stay derived from the RAW variant title, exactly as it was before the
+// composition above. Deriving it from the new display title would change the slug, and
+// because the harvest never DELETEs, that would mint a parallel set of rows and strand the
+// existing ones — along with every inventory (owned/want), print_image and machine_print row
+// keyed to the old id. Stable id + changed title = the upsert updates the name IN PLACE.
+function variantPrintId(v, category) {
+  let base = String(v.title || "");
+  if (category === "big-riso" && !/risograph/i.test(base)) base = `${base} Risograph`;
+  return slug(base);
+}
+
 function parsePack(bodyHtml) {
   const b = String(bodyHtml || "").replace(/<[^>]+>/g, " ");
   const of = (b.match(/pack of (\d+)/i) || b.match(/assortment of (\d+)/i) || [])[1];
@@ -272,11 +325,14 @@ async function runCatalogScrub(env) {
         retail: retailFrom(firstVariant.price), in_print: variants.some((v) => v.available) }, prodImg);
     } else {
       for (const v of variants) {
-        let title = v.title;
-        if (category === "big-riso" && !/risograph/i.test(title)) title = `${title} Risograph`;
+        const title = variantTitle(product, v, category);
+        const print_id = variantPrintId(v, category); // stable id, see variantPrintId()
         const img = (v.featured_image && v.featured_image.src) || prodImg;
-        addPrint({ print_id: slug(title), title, category, exclusive: exclusiveFor(v.title, product.handle, sig),
-          retail: retailFrom(v.price), in_print: !!v.available, aliases: [v.title] }, img);
+        // Keep the bare variant title as an alias so an existing eBay match (and any
+        // hand-entered reference to "#1") survives the rename.
+        const aliases = [v.title];
+        addPrint({ print_id, title, category, exclusive: exclusiveFor(v.title, product.handle, sig),
+          retail: retailFrom(v.price), in_print: !!v.available, aliases }, img);
       }
     }
   }
@@ -308,6 +364,17 @@ async function runImageBackfill(env) {
   for (const row of rows) {
     let up; try { up = new URL(row.source_url); } catch { failed++; continue; }
     if (up.protocol !== "https:" || !IMG_HOST_ALLOW.includes(up.hostname)) { failed++; continue; }
+    // Ask the CDN for a DERIVATIVE, never the raw upload (2026-07-25):
+    //  - `format=jpg` converts Anastasia's HEIC uploads (the Kristina riso prints) into
+    //    something Chrome/Android can actually decode. Storing raw HEIC bytes under a .jpg
+    //    key rendered fine in Safari and blank everywhere else.
+    //  - `width` caps the archival copy. The originals ran 1-3MB each and put 268MB of R2
+    //    behind 177 prints; the app then tried to paint those full-res files into a phone
+    //    grid, which is what made the catalog images flash and vanish.
+    // The stored content_type is read back off the response, so if the CDN ignores a param
+    // we still record whatever it actually returned. Self-correcting either way.
+    up.searchParams.set("width", String(ARCHIVE_WIDTH));
+    up.searchParams.set("format", "jpg");
     let res; try { res = await fetch(up.toString(), { headers: { Accept: "image/*", ...BROWSER_HEADERS } }); } catch { failed++; continue; }
     if (!res.ok) { failed++; continue; }
     const ct = res.headers.get("Content-Type") || "image/jpeg";

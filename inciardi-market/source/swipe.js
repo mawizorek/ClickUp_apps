@@ -10,8 +10,20 @@ let CATALOG={prints:[]}, MARKET={listings:[]}, INV={inventory:[]}, fromD1=false;
 let feed=[];        // remaining prints to sort (feed[0] = live top card)
 let undoStack=[];   // {type, p, inv_id, ready}
 let sorted=0, added=0, wanted=0, skipped=0;
-let filters={cat:"all", series:"all", inPrintOnly:true};
+// Minis by default — that's the collection. Everything else is one tap away in the filter sheet.
+let filters={cat:"mini", series:"all", inPrintOnly:true};
 let busy=false;     // guards a commit animation in flight
+
+// Serialize D1 writes. Bulk-swiping 50 cards used to fire 50 CONCURRENT POSTs and 50 full
+// /inventory refetches; on flaky mobile the out-of-order reconcile could shove a card back
+// into the middle of the deck. One write at a time, and the refetch is debounced to the end
+// of a burst instead of running per swipe. This is a bulk-input tool — the burst IS the use case.
+let writeChain=Promise.resolve();
+let invT=null;
+function refreshInvSoon(){
+  clearTimeout(invT);
+  invT=setTimeout(async()=>{ try{ INV=await apiGet("/inventory",{inventory:[]}); }catch(_){} }, 1200);
+}
 
 initChrome();
 boot();
@@ -47,8 +59,9 @@ function rebuildFeed(){
 function buildFilterUI(){
   const prints=CATALOG.prints||[]; const counts={}; prints.forEach(p=>counts[p.category]=(counts[p.category]||0)+1);
   const cats=CAT_ORDER.filter(c=>counts[c]);
-  const chips=[`<button class="chip" data-cat="all" aria-pressed="true">All</button>`]
-    .concat(cats.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="false">${CAT_LABELS[c]||c}</button>`));
+  if(filters.cat!=="all" && !counts[filters.cat]) filters.cat="all"; // never open on an empty deck
+  const chips=[`<button class="chip" data-cat="all" aria-pressed="${filters.cat==="all"}">All</button>`]
+    .concat(cats.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${filters.cat===c}">${CAT_LABELS[c]||c}</button>`));
   $("catChips").innerHTML=chips.join("");
   $("catChips").querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>{ $("catChips").querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",String(x===ch))); filters.cat=ch.dataset.cat; }));
 }
@@ -78,7 +91,11 @@ function updateFilterLabel(){ const bits=[]; if(filters.inPrintOnly)bits.push("I
 /* ---- render ---- */
 function phStyle(cat){ const h=THUMB_HUE[cat]||72; return `background:oklch(30% 0.05 ${h});color:oklch(80% 0.11 ${h})`; }
 function cardHTML(p, depth){
-  const img=p.image?`<img src="${esc(proxied(p.image,720))}" alt="${esc(p.name)}" draggable="false">`:"";
+  // thumbSrc, not p.image — p.image is the R2 archival original. Only 3 cards are in the DOM at
+  // a time here, but they're the FIRST thing that paints on a phone and this is the bulk-input
+  // funnel, so a 720px derivative is the difference between an instant deck and a blank one.
+  // See the Image Rendering Law in app-core.js.
+  const img=p.image?`<img src="${esc(thumbSrc(p,720))}" alt="${esc(p.name)}" draggable="false" decoding="async">`:"";
   const ph=`<div class="ph" style="${phStyle(p.category)}">${p.image?"":initials(p.name)}</div>`;
   const m=marketFor(MARKET,p);
   const series=p.exclusive?`<span class="swbadge">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>`:"";
@@ -111,6 +128,12 @@ function render(){
   const top=feed.slice(0,3);
   // deepest first in DOM so the top card (depth 0) paints last / on top
   stage.innerHTML=top.map((p,i)=>cardHTML(p,i)).reverse().join("");
+  // ladder each visible card: a failed derivative falls back to the R2 copy, then the raw CDN
+  // original, then the initials tile. Never a cache-busted retry of the url that just failed.
+  stage.querySelectorAll(".swcard").forEach(el=>{
+    const d=Number(el.dataset.depth)||0;
+    wireImg(el.querySelector("img"), imgLadder(top[d], 720));
+  });
   const topEl=stage.querySelector('.swcard[data-depth="0"]');
   if(topEl) attachDrag(topEl);
   updateProgress();
@@ -221,15 +244,16 @@ async function commit(type){
   if(type==="own") added++; else wanted++;
   const entry={type,p,inv_id:null,ready:null}; undoStack.push(entry); render();
   if(!canWrite()){ showNote("Not saved — add your write key in Settings."); return; }
-  entry.ready=(async()=>{
+  // queued, not fired: writeChain guarantees one in flight at a time (see the note up top).
+  entry.ready = writeChain = writeChain.then(async()=>{
     try{
       const body={op:"upsert", disposition:disp, qty:1, acquired_where:"swipe"};
       if(p.print_id) body.print_id=p.print_id; else body.provisional_label=p.name;
       const r=await apiPost("/inventory", body);
       entry.inv_id = r.inserted || r.updated || null;
-      INV=await apiGet("/inventory",{inventory:[]});
+      refreshInvSoon();
     }catch(e){ reconcileFail(entry, e); }
-  })();
+  });
 }
 function reconcileFail(entry, e){
   // write failed: pull it back out of the ledger counts + re-serve the card
@@ -249,7 +273,12 @@ async function undoLast(){
   if(type==="own") added=Math.max(0,added-1); else wanted=Math.max(0,wanted-1);
   render(); toast("undo");
   if(entry.ready){ try{ await entry.ready; }catch(_){} }
-  if(entry.inv_id && canWrite()){ try{ await apiPost("/inventory",{op:"delete",inv_id:entry.inv_id}); INV=await apiGet("/inventory",{inventory:[]}); }catch(_){} }
+  // the delete rides the same queue, so it can never overtake its own insert
+  if(entry.inv_id && canWrite()){
+    writeChain = writeChain.then(async()=>{
+      try{ await apiPost("/inventory",{op:"delete",inv_id:entry.inv_id}); refreshInvSoon(); }catch(_){}
+    });
+  }
 }
 
 /* ---- misc ---- */
