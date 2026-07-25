@@ -1,0 +1,12 @@
+{
+  "slug": "rot-sweep",
+  "type": "trigger",
+  "name": "Rot Sweep",
+  "status": "active",
+  "purpose": "On-demand sweep checking what our documentation CLAIMS against what HEAD actually IS. Hunts prescriptive rot: instructions, guardrails, and remediation notes that decayed into being wrong.",
+  "invocation": ["/rot-sweep", "run a rot sweep", "sweep the repo for stale docs", "is our documentation still true?", "check for rotted guardrails", "doc rot"],
+  "requires": ["githubmcp_get_file_contents", "fetch_website", "githubmcp_create_or_update_file"],
+  "composedWith": ["source-size-budget-enforcer", "commit-pre-flight", "recon-renata", "audit-anna", "code-review-standard"],
+  "created": "2026-07-25",
+  "shortcut": false
+}

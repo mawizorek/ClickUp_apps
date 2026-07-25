@@ -4,6 +4,24 @@
 
 ---
 
+## 🛑 SUSPENDED — we are NOT using ClickUp Skills yet (set 2026-07-25, active until Michael lifts it)
+
+**Tools live in git only.** Do not create, install, promote, or front any tool with a native ClickUp AI Skill. No Skills Hub records, no skill `/slash-command` front doors, no "thin skill pointing at git" pairs, no linking a git tool to a skill.
+
+A tool declares its trigger **in git**, the way every other hook and trigger does:
+
+1. A `**Trigger:**` line in the tool's own profile with the literal invocation phrases + `/slash-command`, plus a `**Mode:**` line (always-on / contextual / on-demand).
+2. A `<slug>.metadata.json` **trigger instance** beside it (`type: "trigger"`) — see `metadata-schema.md` and `_template-tool/template.metadata.json`.
+3. A row in the AI Toolkit index trigger table pointing at the git path.
+
+**Reference shape:** `hooks/rot-sweep.md` + `hooks/rot-sweep.metadata.json`.
+
+**Why:** on 2026-07-25 a rot-sweep tool shipped with a **DOC-ROT-SWEEP** skill front door. Michael: *"the tools always live in the git only. we are not using CU skills yet."* The skill was retired the same day and the hook's skill linkage stripped. **This generalizes to every tool and every domain**, not just that one.
+
+**Everything below is preserved as the design we will use WHEN the lock lifts.** Read it as future-state, not as an instruction to act. The no-bypass enforcement point is `gates/skill-creation-gate.md`, which now HALTS on every new skill.
+
+---
+
 ## What we discovered (2026-07-18)
 
 ClickUp shipped **AI Skills**: native, workspace-resident instruction playbooks stored in the **Skills Hub** (plus an auto-created Skills Space). A Skill has a name + summary (always visible to Brain) and full instructions (loaded on demand), status Active/Draft/Disabled, a `/slash-command`, install-vs-share semantics, permissions, and description-history versioning.
@@ -20,7 +38,7 @@ ClickUp shipped **AI Skills**: native, workspace-resident instruction playbooks 
 | The AI Toolkit index doc | The **Skills Hub** |
 | The repo | The auto-created **Skills Space** |
 
-Because they are the same shape, the risk is **drift**: the same logic living canonically in two places, edited on one side, stale on the other — the exact failure that stranded agents in the registry↔index mirror pair. The rest of this page is how we prevent that.
+Because they are the same shape, the risk is **drift**: the same logic living canonically in two places, edited on one side, stale on the other — the exact failure that stranded agents in the registry↔index mirror pair.
 
 > ⚠️ Terminology trap: a **Skill** (instruction playbook in the Skills Hub) is NOT the same as a **Super Agent's "Skills"** (its granted *tools*). Two different "Skills" in the same product. When this doc says Skill, it means the instruction playbook.
 
@@ -36,7 +54,9 @@ This is the rule. A Skill owns **when to run** (the trigger signal, carried by i
 
 ### Why a pointer, not a copy
 
-The registry↔index mirror pair is the ONE sanctioned duplication in this system, and it only survives because we reconcile both sides in the same session, every time. Everything else must avoid that burden. If a Skill copied a git gate's steps, the moment someone edited the gate, the Skill would silently serve stale instructions with no error and no flag. Pointing at git means the Skill inherits every git change for free. This mirrors how Brain memory already works: memory holds ONE line pointing at the AI Toolkit index, never a second copy of it.
+If a Skill copied a git gate's steps, the moment someone edited the gate, the Skill would silently serve stale instructions with no error and no flag. Pointing at git means the Skill inherits every git change for free. This mirrors how Brain memory already works: memory holds ONE line pointing at the AI Toolkit index, never a second copy of it.
+
+> ~~*The registry↔index mirror pair is the ONE sanctioned duplication in this system, and it only survives because we reconcile both sides in the same session, every time. Everything else must avoid that burden.*~~ **CORRECTED 2026-07-25:** the mirror pair was **retired**. `registry.json` is now a tombstone, `super-agents/roster.json` is the single flat roster, and the Mirror-Pair Sync Mandate was withdrawn with it. **There is no sanctioned duplication anymore.** Author once; everything else points or is generated (see the surface map in `README.md`).
 
 ---
 
@@ -45,6 +65,8 @@ The registry↔index mirror pair is the ONE sanctioned duplication in this syste
 - **Build a Skill when** the thing needs a native trigger, a shareable/permissioned front door, a `/slash-command`, team-install, or is a self-contained playbook a teammate could run without touching the repo. Skills are strong at: shallow, shareable, single-purpose, discoverable.
 - **Keep it in git when** it needs deterministic multi-step orchestration, deep nesting, PR/revert, cross-referencing, or has real commit-history value. git is strong at: deep, orchestrated, versioned, engine-level.
 - **The common case is BOTH:** a thin Skill (trigger + pattern) fronting a git file (steps). Native discoverability up top, deep engine underneath, single source of truth in the repo.
+
+*(All three are gated by the suspension above: until it lifts, the answer is always git.)*
 
 ### The consumer test (what may live inline in a Skill body) — CORRECTED 2026-07-18
 
@@ -67,19 +89,20 @@ Rule of thumb: if you can imagine writing "per the X standard" in another agent'
 - **`/audit-loop`** (AUDIT-LOOP) — the cleanest expression of the split. The Skill owns the **pattern** (bounded auditor↔synthesizer loop, per-round threading) and the **trigger** ("audit this, review, re-audit"); it points at `agents/audit-anna.md`, `council.md`, and `agents/maestro-mira.md` for the actual **steps**. Skill = pattern + trigger; git = steps.
 - **`/code-review`** (CODE-REVIEW) — pure pointer. The review METHOD lives in git (Breaker Beckett + the Red-Team reviewer + Secrets/PII + Skill-Ban guards), and the severity-report FORMAT lives in git at `code-review-standard.md` precisely because other agents consume it. The skill holds only the trigger + a pointer. This is the build that motivated the consumer-test correction above.
 - **`/question-me`** (QUESTION-ME) — a self-contained interrogation stance. Skill-only by the consumer test (nothing else consults it), so inline is correct here.
+- **`/doc-rot-sweep`** (DOC-ROT-SWEEP) — **RETIRED 2026-07-25.** Created and killed the same day. The steps were always in git (`hooks/rot-sweep.md`); the skill added nothing but a second front door, and it was built while skills were not in use. This is the case that produced the suspension at the top of this page. The counter-lesson: *a thin pointer skill is still a skill, and "it's only a pointer" is not permission to create one.*
 
 ---
 
 ## How this grows with the existing (and expanding) git setup
 
-- **New reusable behavior?** Ask the decision rule + the consumer test. Teammate-facing / triggerable / shareable → Skill (thin, pointing at git for any steps other agents could need). Engine-level / orchestrated / versioned / multi-consumer → git file, optionally fronted by a thin Skill for discoverability.
-- **Promoting an existing git hook to a Skill?** Do NOT copy its steps into the Skill. Create a thin Skill that triggers and points at the existing git file. The git file stays canonical.
-- **Editing a fronted git file?** Nothing to sync on the Skill side, that's the whole point of the pointer. The Skill inherits the change. (Contrast the registry↔index mirror pair, where you MUST reconcile both sides.)
+- **New reusable behavior?** Ask the decision rule + the consumer test. Teammate-facing / triggerable / shareable → Skill (thin, pointing at git for any steps other agents could need). Engine-level / orchestrated / versioned / multi-consumer → git file, optionally fronted by a thin Skill for discoverability. **Under the current suspension: git, always.**
+- **Promoting an existing git hook to a Skill?** Do NOT copy its steps into the Skill. Create a thin Skill that triggers and points at the existing git file. The git file stays canonical. **Suspended: don't promote anything.**
+- **Editing a fronted git file?** Nothing to sync on the Skill side, that's the whole point of the pointer. The Skill inherits the change.
 - **Drift check (standing):** if you ever find a Skill body restating steps/facts that also live canonically in git, OR holding content another agent would need, that's drift — move it to git and replace with a pointer. A Skill should read as "here's when + the shape; the steps live at `brain-config/X`," not as a second copy of X.
-- **AI Toolkit index:** the index remains the deterministic zero-discretion routing layer for Brain's own sessions. Skills add a native, shareable, teammate-facing trigger surface on top. They are complementary layers, not replacements — index for guaranteed in-session firing, Skills for shareable on-demand invocation.
+- **AI Toolkit index:** the index remains the deterministic zero-discretion routing layer for Brain's own sessions. Skills *would* add a native, shareable, teammate-facing trigger surface on top. They are complementary layers, not replacements — index for guaranteed in-session firing, Skills for shareable on-demand invocation. **While suspended, the index + git trigger instances are the only trigger surface.**
 
 ---
 
 ## One-line law
 
-**Skill triggers and shapes; git instructs. Point, never copy. If any other agent could need it, it lives in git. The only sanctioned duplication is the registry↔index mirror pair.**
+**Skill triggers and shapes; git instructs. Point, never copy. If any other agent could need it, it lives in git.** ~~*The only sanctioned duplication is the registry↔index mirror pair.*~~ **There is no sanctioned duplication (corrected 2026-07-25).** And until the suspension lifts: **no skills at all — the tool lives in git, with its trigger declared in git.**

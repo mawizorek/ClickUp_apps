@@ -4,11 +4,31 @@
 
 ---
 
+## 🛑 HALT BY DEFAULT — ClickUp Skills are SUSPENDED (set 2026-07-25, active until Michael lifts it)
+
+**Tools live in git only.** Do not create, install, promote, or front any tool with a native ClickUp AI Skill. No Skills Hub records, no skill `/slash-command` front doors, no "thin skill pointing at git" pairs. **The verdict on any new skill is HALT, before the checks below even run.**
+
+A tool's trigger is declared **in git**, the way every other hook and trigger does it:
+
+1. A `**Trigger:**` line in the tool's own profile naming the literal invocation phrases and the `/slash-command`, plus a `**Mode:**` line (always-on / contextual / on-demand).
+2. A `<slug>.metadata.json` **trigger instance** beside it (`type: "trigger"`) — see `brain-config/metadata-schema.md` and `brain-config/_template-tool/template.metadata.json`.
+3. A row in the AI Toolkit index trigger table, pointing at the git path.
+
+**Reference shape:** `brain-config/hooks/rot-sweep.md` + `rot-sweep.metadata.json`.
+
+**Why:** on 2026-07-25 a rot-sweep tool was shipped with a **DOC-ROT-SWEEP** skill front door. Michael: *"the tools always live in the git only. we are not using CU skills yet."* The skill was retired the same day and the hook's skill linkage stripped. This applies to **every** tool and every domain, not just that one.
+
+**Everything below is preserved as the design we will use WHEN the lock lifts.** Read it as future-state. It is not permission.
+
+---
+
 ## Why this gate exists
 
 AI Skills are the platform-native version of the AI Toolkit index + gate/agent profiles — same shape, so the same-logic-in-two-places drift risk is real (the registry↔index failure class). This gate is the pre-write checkpoint that keeps every new skill on the right side of the governing law before it's built, not after it's already drifting.
 
-**The law (from `skills-integration.md`):** *Skill = TRIGGER + PATTERN, git = STEPS. The skill points at git, never copies it. If any other agent could need it, it lives in git. Only sanctioned duplication is the registry↔index mirror pair.*
+**The law (from `skills-integration.md`):** *Skill = TRIGGER + PATTERN, git = STEPS. The skill points at git, never copies it. If any other agent could need it, it lives in git.*
+
+> ~~*Only sanctioned duplication is the registry↔index mirror pair.*~~ **CORRECTED 2026-07-25:** the registry↔index mirror pair was **retired** (`registry.json` is a tombstone; `super-agents/roster.json` is the single flat roster) and the Mirror-Pair Sync Mandate was withdrawn with it. **There is no sanctioned duplication anymore.** Author once; everything else points or is generated.
 
 ---
 
@@ -30,7 +50,8 @@ AI Skills are the platform-native version of the AI Toolkit index + gate/agent p
 
 ## Verdict
 
-- **PASS** → author the skill: thin pointer if steps live elsewhere OR any other agent could need them; inline only for genuinely skill-only content; volatile facts pointed-at not copied.
+- **HALT (current default, 2026-07-25 → until lifted)** → ClickUp Skills are suspended. Put the tool in git with a `**Trigger:**` line and a trigger-instance sidecar. Do not create the skill.
+- **PASS** *(only once the suspension lifts)* → author the skill: thin pointer if steps live elsewhere OR any other agent could need them; inline only for genuinely skill-only content; volatile facts pointed-at not copied.
 - **HALT** → an existing skill/git file already covers it (extend that), or the body would copy/strand logic another agent could need (put it in git first, then point).
 - **WARN + ask** → near-duplicate or summary-collision risk; confirm with Michael before creating.
 
@@ -38,4 +59,4 @@ AI Skills are the platform-native version of the AI Toolkit index + gate/agent p
 
 ## Standing drift check (post-creation, and on any skill edit)
 
-If a skill body ever restates steps/facts that also live canonically in git, OR holds content another agent would need to consult, that's drift — move it to git and replace with a pointer. A skill should read as "here's WHEN + the SHAPE; the steps live at `brain-config/X`," never as a second copy of X, and never as the sole home of something the wider system needs. The one exception is the sanctioned registry↔index mirror pair, which is reconciled both-sides-same-session by rule.
+If a skill body ever restates steps/facts that also live canonically in git, OR holds content another agent would need to consult, that's drift — move it to git and replace with a pointer. A skill should read as "here's WHEN + the SHAPE; the steps live at `brain-config/X`," never as a second copy of X, and never as the sole home of something the wider system needs. **No exceptions** — the old registry↔index carve-out died with the registry (2026-07-25).
