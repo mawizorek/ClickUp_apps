@@ -3,11 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0b0d">
-<meta name="robots" content="noindex, nofollow">
-<title>Agent Roster · Full Fleet (Teammates + Council Lenses)</title>
-<!-- VIEW = RENDERER: this file holds NO roster data. It fetches ./roster.json and renders it.
-     Edit the DATA in roster.json; this file only formats it. Renamed from index.html 2026-07-24. -->
+<title>Agent Roster · Full Fleet</title>
 <style>
 :root{--canvas:#0b0b0d;--panel:#17181a;--divider:#26272a;--ink:#e8e8ea;--soft:#9a9ba0;--green:#3fb950;--yellow:#d29922;--red:#f85149;--blue:#5b9ae8;--grey:#6e7681;--purple:#8b6df0;}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -18,6 +14,8 @@ h1{font-size:1.35rem;font-weight:700;margin-bottom:4px;}
 h2{font-size:1rem;font-weight:700;margin:26px 0 4px;display:flex;align-items:center;gap:8px;}
 h2 .count{color:var(--soft);font-weight:500;font-size:.8rem;}
 .tier-note{color:var(--soft);font-size:.78rem;margin-bottom:10px;}
+.parity{background:var(--panel);border-left:3px solid var(--purple);border-radius:8px;padding:11px 13px;color:var(--soft);font-size:.79rem;margin-bottom:18px;}
+.parity b{color:var(--ink);}
 table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:8px;}
 th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--divider);vertical-align:top;}
 th{color:var(--soft);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;}
@@ -29,9 +27,9 @@ td .accent{display:inline-block;width:9px;height:9px;border-radius:50%;margin-ri
 .b-blue{background:rgba(91,154,232,.16);color:var(--blue);}
 .b-grey{background:rgba(110,118,129,.18);color:var(--grey);}
 .b-red{background:rgba(248,81,73,.16);color:var(--red);}
-.b-purple{background:rgba(139,109,240,.16);color:var(--purple);}
+.mem{font-size:.72rem;color:var(--soft);}
+.mem.yes{color:var(--green);}
 .lin{color:var(--soft);font-size:.78rem;margin-top:3px;}
-.lin b{color:var(--blue);font-weight:600;}
 .foot{color:var(--soft);font-size:.78rem;margin-top:26px;}
 .err{color:var(--red);background:rgba(248,81,73,.1);border:1px solid var(--red);border-radius:10px;padding:14px;}
 code{background:var(--panel);padding:1px 6px;border-radius:5px;font-size:.8em;}
@@ -39,48 +37,51 @@ code{background:var(--panel);padding:1px 6px;border-radius:5px;font-size:.8em;}
 </head>
 <body>
 <div class="wrap">
-<h1>Agent Roster — Full Fleet</h1>
-<div class="sub">One combined roster, two classes. Data source: <code>roster.json</code> (edit there, not here). The Agent Invocation Gate reads that file first on every <code>/agent-name</code>.</div>
-<div id="content"><p class="sub">Loading <code>roster.json</code>…</p></div>
-<div class="foot" id="foot"></div>
+<h1>Agent Roster &mdash; Full Fleet</h1>
+<p class="sub">ONE flat list. Data source: <code>roster.json</code> (edit there, not here). The Agent Invocation Gate reads that file first on every named call.</p>
+<div class="parity"><b>Class is PERSISTENCE, not rank.</b> A <b>super-agent</b> carries a memory bundle across sessions; an <b>agent</b> is a stateless lens. Same fleet, same room, same volume &mdash; Mira seats by LANE, never by class. An agent is upgraded for exactly one reason: <b>it needs memory</b>. The grouping below is presentational only; the underlying list is flat and never split by class.</div>
+<div id="content">Loading <code>roster.json</code> &hellip;</div>
+<p class="foot" id="foot"></p>
 </div>
 <script>
-function esc(s){return (s==null?"":String(s)).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+function esc(s){return (s==null?"":String(s)).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
 function statusBadge(s){
-  const map={"active":["b-green","✅ active"],"needs-declaration":["b-blue","🆕 needs declaration"],"inventory-only":["b-grey","— inventory"],"retired":["b-red","🪦 retired"]};
-  const b=map[s]||["b-grey",esc(s||"—")];return '<span class="badge '+b[0]+'">'+b[1]+'</span>';
+  var map={"active":["b-green","\u2705 active"],"needs-declaration":["b-blue","\ud83c\udd95 needs declaration"],"inventory-only":["b-grey","\u2014 inventory"],"retired":["b-red","\ud83e\udea6 retired"]};
+  var b=map[s]||["b-grey",esc(s||"\u2014")];
+  return '<span class="badge '+b[0]+'">'+b[1]+'</span>';
 }
 function dot(a){return a?'<span class="accent" style="background:'+esc(a)+'"></span>':'';}
-fetch('./roster.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(d=>{
-  const teammates=(d.agents||[]);
-  const lenses=(d.council_lenses||[]);
-  // Tier 1 — fleet agents (teammates + native + task-specific + retired)
-  const trows=teammates.map(a=>{
-    let lin=esc(a.lane||'');
-    if(a.graduated_from) lin+='<div class="lin"><b>lineage:</b> graduated from '+esc(a.graduated_from)+'</div>';
-    else if(a.lineage) lin+='<div class="lin">'+esc(a.lineage)+'</div>';
-    return '<tr><td class="agent">'+dot(a.accent)+esc(a.display_name)+'<span class="slug">'+esc(a.slug)+'</span></td>'+
-      '<td>'+esc(a.class||a.track||'')+'</td>'+
-      '<td>'+statusBadge(a.status)+'</td>'+
-      '<td>'+esc(a.invocation||'—')+'</td>'+
-      '<td>'+lin+'</td></tr>';
-  }).join('');
-  // Tier 2 — council/workshop lenses
-  const lrows=lenses.map(a=>{
-    return '<tr><td class="agent">'+dot(a.accent)+esc(a.display_name)+'<span class="slug">'+esc(a.slug)+'</span></td>'+
-      '<td>'+esc(a.seat||'')+(a.teams&&a.teams.length?' <span class="slug">'+esc(a.teams.join(', '))+'</span>':'')+'</td>'+
-      '<td>'+statusBadge(a.status||'active')+'</td>'+
-      '<td>'+esc(a.role||'')+'<div class="lin">'+esc(a.profile||'')+'</div></td></tr>';
-  }).join('');
+function row(a){
+  var lane=esc(a.lane||'');
+  if(a.from) lane+='<div class="lin">from '+esc(a.from)+'</div>';
+  if(a.instructions) lane+='<div class="lin">instructions: <code>'+esc(a.instructions)+'</code></div>';
+  var seat=esc(a.seat||'');
+  if(a.teams&&a.teams.length) seat+=(seat?' &middot; ':'')+esc(a.teams.join(', '));
+  return '<tr>'+
+    '<td class="agent">'+dot(a.accent)+esc(a.name)+'<span class="slug">'+esc(a.slug)+'</span></td>'+
+    '<td>'+esc(a.class||'')+'<div class="mem'+(a.memory?' yes':'')+'">'+(a.memory?'holds memory':'stateless')+'</div>'+(seat?'<div class="lin">'+seat+'</div>':'')+'</td>'+
+    '<td>'+statusBadge(a.status)+'</td>'+
+    '<td>'+esc(a.invoke||'\u2014')+'</td>'+
+    '<td>'+lane+'</td>'+
+  '</tr>';
+}
+function group(all,cls){return all.filter(function(a){return (a.class||'')===cls;});}
+function section(title,note,rows){
+  if(!rows.length) return '';
+  return '<h2>'+title+' <span class="count">('+rows.length+')</span></h2>'+
+    '<p class="tier-note">'+note+'</p>'+
+    '<table><thead><tr><th>Agent</th><th>Class</th><th>Status</th><th>Invoke</th><th>Lane</th></tr></thead><tbody>'+
+    rows.map(row).join('')+'</tbody></table>';
+}
+fetch('./roster.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(d){
+  var all=d.agents||[];
   document.getElementById('content').innerHTML=
-    '<h2>🧩 Git-Teammates &amp; Fleet Agents <span class="count">('+teammates.length+')</span></h2>'+
-    '<div class="tier-note">Persistent, session-invocable personas with a full bundle under <code>super-agents/&lt;slug&gt;/</code>, plus native/task-specific + retired fleet agents.</div>'+
-    '<table><thead><tr><th>Agent</th><th>Class</th><th>Status</th><th>Invocation</th><th>Lane / lineage</th></tr></thead><tbody>'+trows+'</tbody></table>'+
-    '<h2>🧠 Council &amp; Workshop Lenses <span class="count">('+lenses.length+')</span></h2>'+
-    '<div class="tier-note">Ephemeral processing lenses under <code>agents/&lt;slug&gt;.md</code>. Stateless verbs, NOT session-invocable as standing personas. Migrated lenses (Anna/Mira/Wes) live as teammates above; their <code>agents/</code> files are tombstones.</div>'+
-    '<table><thead><tr><th>Lens</th><th>Seat / team</th><th>Status</th><th>Role</th></tr></thead><tbody>'+lrows+'</tbody></table>';
-  document.getElementById('foot').innerHTML='Roster updated '+esc(d.updated)+'. Full changelog + lens profiles: <code>registry.json</code> + git history. New agent = add to <code>roster.json</code> (+ a <code>&lt;slug&gt;/</code> bundle for a teammate) and mirror to <code>registry.json</code>.';
-}).catch(e=>{document.getElementById('content').innerHTML='<div class="err">Could not load roster.json: '+esc(e.message)+'. Read the data directly in that file.</div>';});
+    section('\ud83e\udde9 Super-agents','Seated personas with a full bundle under <code>super-agents/&lt;slug&gt;/</code>. Invocable, and they remember across sessions.',group(all,'super-agent'))+
+    section('\ud83e\udde0 Agents (lenses)','Stateless processing lenses under <code>agents/&lt;slug&gt;.md</code>. Same standing as a super-agent in the room &mdash; they just do not carry memory yet.',group(all,'agent'))+
+    section('\u2699\ufe0f Task-specific','Narrow single-job ClickUp automations. Inventory only.',group(all,'task-specific'))+
+    section('\ud83e\udea6 Retired','Tombstones. Listed forever, never silently dropped, never a live invocation target.',group(all,'retired'));
+  document.getElementById('foot').innerHTML='Roster updated '+esc(d.updated)+' &middot; '+all.length+' agents in one flat list. Deep detail lives in each agent\u2019s own files + git history &mdash; this roster stays one line per agent on purpose. New agent = one row here (+ a <code>&lt;slug&gt;/</code> bundle if it needs memory).';
+}).catch(function(e){document.getElementById('content').innerHTML='<div class="err">Could not load <code>roster.json</code>: '+esc(e.message)+'. Read the data directly in that file.</div>';});
 </script>
 </body>
 </html>
