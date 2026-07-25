@@ -21,16 +21,32 @@ Not a results table. A race story told through data.
 
 ### `index.html` — THE MAIN WINDOW
 
-The app shell. Header with lens toggle, router, footer. Everything inside it is a view, not a separate page. This is what you're looking at when the app is open.
+The app shell. The header toggle at the top switches between three lenses. Each lens changes what the home grid shows. Tapping a round card in any lens drills into that circuit's breakdown.
 
 ```
 index.html
-├── Header (lens switcher: Matrix / History / Circuits)
-├── #/ ..................... Home Grid
-│   ├── Current-round highlight card
-│   └── 24-round card grid (filtered by active lens)
 │
-├── #/<slug> ............... Circuit Breakdown
+├── HEADER TOGGLE (the 3 lenses — top of app, always visible)
+│   │
+│   ├── [Matrix] (default)
+│   │   24-round card grid, calendar order.
+│   │   Each card = circuit name, date, flag, result summary.
+│   │   Current-round highlight card pinned at top.
+│   │
+│   ├── [History]
+│   │   Same 24 rounds, reframed as race-history cards.
+│   │   Previous winners, podium streaks, notable stats per circuit.
+│   │
+│   └── [Circuits]
+│       Technical circuit reference cards.
+│       Track length, laps, corners, type (street/permanent),
+│       overtaking character, tyre demand.
+│
+├── #/ ..................... Home Grid (renders whichever lens is active)
+│   ├── Current-round highlight card (always top, all lenses)
+│   └── Round cards (content varies by lens above)
+│
+├── #/<slug> ............... Circuit Breakdown (drill into any round)
 │   ├── Track map + lap profile + sector character
 │   ├── Tyre strategy + overtaking notes
 │   ├── Weather
@@ -258,6 +274,7 @@ What to build next, in order:
 ## Architecture Rules
 
 - **`index.html` is the app shell.** Router + header + footer. Views render inside it.
+- **The 3 lenses (Matrix/History/Circuits) are the primary nav.** They filter the home grid; tapping a card drills into the circuit breakdown.
 - **Satellites are separate HTML files** with their own render, linked from nav.
 - **Data nests inside its app.** `f1-racetracks/f1-results/2026/` — never a loose root folder.
 - **Data-only changes = no shell version bump.**
