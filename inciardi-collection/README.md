@@ -1,5 +1,7 @@
 # Inciardi Collection
 
+📋 **Decision Log:** `Inciardi Collection — Decision Log` (ClickUp) — every call about this app, newest on top. **Checkbox polarity is INVERTED: a checked box is a REJECTED option.** Q1–Q3 (answered) live on the predecessor's `Inciardi Market — Rebuild Decision Log`; this app's log starts at **Q4**. Read it before touching anything here.
+
 **Status: DEFINITION. Nothing is built. No HTML, no worker, no data.** This folder holds the app's definition and its proposed schema. Code starts when §7 is signed off.
 
 Successor to `inciardi-market/`, which stays live and untouched as a working reference until this replaces it. Clean room on purpose: a day of debugging proved that **inherited state is what fooled us**, so nothing carries over by accident — only by decision.
@@ -75,7 +77,7 @@ The registry-in-git idea was reached for as protection against the harvest. **Bu
 
 So: **D1 is the source, git JSON is a generated snapshot.** Manual input is primary, and you cannot write to git from a phone. This dissolves the loader question rather than answering it: the registry becomes a one-time **seed** plus an ongoing **export**, not a routine import path.
 
-**Michael answered Q3 = worker route but flagged it soft and pointed at his Q2 note. This is that note's consequence. It needs his confirmation, not my assumption** — see §7.
+**Michael answered Q3 = worker route but flagged it soft and pointed at his Q2 note. This is that note's consequence. It needs his confirmation, not my assumption** — see §7, now open as **Q4** on the Decision Log.
 
 ---
 
@@ -139,11 +141,13 @@ Machines layer. Sold comps. Multi-source discovery (Poshmark, Stockist). Per-wri
 
 ## 7. Sign-off gate — code starts when these four are answered
 
-1. **Confirm D1-as-source vs registry-as-source** (§3). Michael's Q3 answer predates his own reframe; the reframe appears to supersede it. If D1 is the source, no worker route is needed and the `worker.js` chunk-walk drops out of the critical path entirely.
-2. **Theme definition.** He wants a unique set for this app. Needs a name and a direction before the shell is built, because the shell consumes tokens.
-3. **Does `Enter` need photo upload on day one,** or is a name-and-collection row enough to start? Decides whether R2 is in the first milestone.
-4. **Slug + URL.** `inciardi-collection` is assumed. The launcher entry and the old app's retirement are a separate, later move.
+They are open as **Q4–Q7** on `Inciardi Collection — Decision Log`. Answer there, not here. **No file in this folder other than docs changes until all four are decoded and read back.**
+
+1. **Q4 · Confirm D1-as-source vs registry-as-source** (§3). Michael's Q3 answer predates his own reframe; the reframe appears to supersede it. If D1 is the source, no worker route is needed and the `worker.js` chunk-walk drops out of the critical path entirely.
+2. **Q5 · Theme definition.** He wants a unique set for this app. Needs a name and a direction before the shell is built, because the shell consumes tokens.
+3. **Q6 · Does `Enter` need photo upload on day one,** or is a name-and-collection row enough to start? Decides whether R2 is in the first milestone.
+4. **Q7 · Slug + the predecessor's retirement.** `inciardi-collection` is confirmed as the slug. What remains is when `inciardi-market` stops being live, and how the launcher entry moves.
 
 ---
 
-*Founded 2026-07-25. Definition by Dev Dexter. Entity model from Clever Cleo; `edition_type` semantics from Domain Dara; binder-as-sheet from Style Stu; 7 pre-commit findings from Breaker Beckett; boundaries from Scope Skye. Conducted by Maestro Mira. Decisions: `Inciardi Market — Rebuild Decision Log`. Predecessor's charter: `inciardi-market/REBUILD-CHARTER.md`.*
+*Founded 2026-07-25. Definition by Dev Dexter. Entity model from Clever Cleo; `edition_type` semantics from Domain Dara; binder-as-sheet from Style Stu; 7 pre-commit findings from Breaker Beckett; boundaries from Scope Skye. Conducted by Maestro Mira. Decisions: `Inciardi Collection — Decision Log` (Q4→) and `Inciardi Market — Rebuild Decision Log` (Q1–Q3). Predecessor's charter: `inciardi-market/REBUILD-CHARTER.md`.*
