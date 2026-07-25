@@ -1,0 +1,29 @@
+/* Stale-data banner. Its own file so it can never be lost in a diff to another stylesheet, and so
+   a page that loads app-core gets the styles by adding one line.
+
+   WHY THIS EXISTS: on 2026-07-25 three caching layers each served stale data with no visible signal
+   and cost a full day of misdiagnosis. This banner is the visible signal. It is deliberately loud,
+   deliberately persistent (not a toast — the condition outlasts a toast), and deliberately at the
+   top of the viewport where it cannot be scrolled past unnoticed. See the FETCH HONESTY LAW in
+   app-core.js. Do not soften this into something ignorable. */
+
+.databanner{
+  position:fixed; left:0; right:0; top:0; z-index:80;
+  padding:10px max(14px, env(safe-area-inset-left)) 10px max(14px, env(safe-area-inset-right));
+  font-family:var(--mono); font-size:0.72rem; line-height:1.5;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  border-bottom:1px solid; box-shadow:0 6px 18px rgba(0,0,0,0.35);
+}
+.databanner.warn{ background:var(--amber-bg); border-bottom-color:color-mix(in srgb,var(--amber) 55%,transparent); color:var(--amber); }
+.databanner.err{ background:var(--down-bg); border-bottom-color:color-mix(in srgb,var(--down) 55%,transparent); color:var(--down); }
+.databanner b{ color:var(--ink); }
+.databanner .bnr-btn{
+  margin-left:auto; font-family:var(--mono); font-size:0.68rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:0.05em; cursor:pointer;
+  padding:5px 11px; border-radius:6px; border:1px solid currentColor;
+  background:transparent; color:inherit; flex-shrink:0;
+}
+.databanner .bnr-btn:hover{ background:currentColor; color:var(--bg); }
+/* push the sticky topbar down so the banner never overlaps the nav */
+body:has(.databanner) .topbar{ top:44px; }
+body:has(.databanner) .controls{ top:104px; }
