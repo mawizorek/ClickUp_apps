@@ -1,5 +1,5 @@
-/* Inciardi Market v15 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
-const BUILD = "v15";
+/* Inciardi Market v16 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
+const BUILD = "v16";
 const PR = 455; // merged PR that shipped this version
 const API_DEFAULT = "https://inciardi-market.mawizorek-online.workers.dev";
 const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fallback can render
@@ -13,6 +13,12 @@ const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fall
 // here is readable in view-source. For a 2-person, no-personal-data print tracker this is a deliberately
 // accepted low risk — worst case is a corrupted catalog/collection, and that's covered by BOTH the in-app
 // Backups below AND D1 Time Travel (30-day point-in-time restore). See the Decision Log.
+//
+// 🔴 OPEN ACTION (code review, 2026-07-25): the accepted tradeoff covered baking a key into a public
+// bundle. It did NOT cover a GUESSABLE key. The two values below are short dictionary words, which means
+// the store is writable by anyone who guesses — not merely by anyone who reads the source. Rotate to long
+// random strings: `wrangler secret put WRITE_KEY` + `wrangler secret put WRITE_KEY_NICK`, then paste the
+// new values here and commit. Same exposure model as agreed, minus the drive-by. Michael holds the secrets.
 //
 // HOW TO FILL: paste each person's write key between the quotes and commit. Leave a value "" to hide that
 // identity button (that person just pastes their key manually in the field below instead). If Nick shares
@@ -80,11 +86,89 @@ function initials(n){ return String(n||"?").split(/\s+/).slice(0,2).map(w=>w[0])
 /* ---- image URL: route raw CDN images through the Worker /img proxy (edge-cached, same-origin) ---- */
 // D1-served images already come as absolute .../img?key= or .../img?u= URLs and pass through untouched.
 // Seed/raw cdn.shopify.com URLs get rewritten to /img?u= so they never hotlink (the flash-then-vanish fix).
+// NOTE the asymmetry that bit us: `w` only does anything on the ?u= (CDN) branch. On a ?key= (R2) URL the
+// Worker cannot resize a stored blob, so the width is silently dropped. See the law below.
 function proxied(url, w){
  if(!url) return url;
  if(url.indexOf("/img?") >= 0) return url;
  if(/^https?:\/\/cdn\.shopify\.com/i.test(url)) return apiBase() + "/img?u=" + encodeURIComponent(url) + (w ? "&w=" + w : "");
  return url;
+}
+
+/* ============================================================ IMAGE RENDERING LAW
+   Photos have vanished from this app THREE times now — different cause each time, identical
+   symptom (flash, then blank). These rules are the accumulated fix. Read them before touching
+   any <img> in this codebase. Full write-up lives in inciardi-market/README.md.
+
+   1. NEVER paint an archival original into a list or grid. Originals here run 1-3MB; 177 of them
+      is ~260MB, and a phone will decode a handful (the flash) then purge or time out the rest
+      (the vanish). Grids get a WIDTH-CAPPED DERIVATIVE. Only a detail hero may load the original.
+   2. If an image route accepts a size param, EVERY branch must honor it — or the param is a lie.
+      That was this round's actual bug: the card asked for proxied(url, 360) and was handed the
+      full-res R2 file anyway, because /img?key= ignores `w`. So thumbnails now resolve against the
+      Shopify CDN source_url, where width= genuinely resizes (server-side, edge-cached 7 days).
+   3. An error handler may NEVER retry the same URL with a cache-bust. The old one did exactly that,
+      re-downloading the multi-MB file that had just failed, then hid the element outright on the
+      second miss — turning a slow image into a permanently missing one. A retry moves DOWN the
+      ladder to a DIFFERENT source; only the final rung is allowed to give up.
+   4. Grid images are always loading="lazy" + decoding="async" so the whole set isn't requested at once.
+============================================================================================ */
+
+// The image row the app should treat as "the" picture for a print.
+function primaryImage(p){
+ const imgs=(p&&p.images)||[];
+ return imgs.find(i=>i.is_primary&&i.status=="active") || imgs.find(i=>i.status=="active") || null;
+}
+// Ordered fallback chain for a THUMBNAIL — cheapest and most-likely-to-work first.
+function imgLadder(p, w){
+ if(!p) return [];
+ const im=primaryImage(p);
+ const cdn=(im&&im.source_url) || (/^https?:\/\/cdn\.shopify\.com/i.test(p.image||"") ? p.image : "");
+ const out=[];
+ if(cdn) out.push(proxied(cdn, w)); // resized derivative (~40KB) — the rung that should always win
+ if(im&&im.url) out.push(im.url);   // stored R2 copy, full size
+ if(p.image) out.push(p.image);     // whatever /catalog handed us
+ if(cdn) out.push(cdn);             // bare CDN original, unproxied — last resort
+ return [...new Set(out.filter(Boolean))];
+}
+function thumbSrc(p, w){ return imgLadder(p, w)[0] || ""; }
+
+// Detail hero: here the archival copy IS the right answer (one image, explicitly requested).
+function heroLadder(p, w){
+ if(!p) return [];
+ const im=primaryImage(p);
+ const cdn=(im&&im.source_url) || (/^https?:\/\/cdn\.shopify\.com/i.test(p.image||"") ? p.image : "");
+ const out=[];
+ if(im&&im.url) out.push(im.url);
+ if(p.image) out.push(p.image);
+ if(cdn) out.push(proxied(cdn, w));
+ return [...new Set(out.filter(Boolean))];
+}
+function heroSrc(p, w){ return heroLadder(p, w)[0] || ""; }
+
+// Same rules for a bare print_image row (the image-manager chips in the catalog drawer).
+function imageLadder(i, w){
+ if(!i) return [];
+ const out=[];
+ if(i.source_url && /^https?:\/\/cdn\.shopify\.com/i.test(i.source_url)) out.push(proxied(i.source_url, w));
+ if(i.url) out.push(i.url);
+ if(i.source_url) out.push(i.source_url);
+ return [...new Set(out.filter(Boolean))];
+}
+function imageThumb(i, w){ return imageLadder(i, w)[0] || ""; }
+
+// Own the load/error lifecycle for one <img>: flag it loaded, and walk the ladder on failure.
+function wireImg(img, ladder){
+ if(!img) return;
+ const alts=(ladder||[]).filter(Boolean);
+ let i=0;
+ const done=()=>img.classList.add("loaded");
+ if(img.complete && img.naturalWidth) done(); else img.addEventListener("load",done);
+ img.addEventListener("error",()=>{
+  while(i<alts.length && alts[i]===img.getAttribute("src")) i++;
+  if(i<alts.length){ img.src=alts[i++]; return; } // next rung: a DIFFERENT url, never a cache-bust
+  img.style.display="none";                       // ladder exhausted -> let the initials tile show
+ });
 }
 
 /* ---- market cross-reference (shared) ---- */
