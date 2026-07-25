@@ -31,13 +31,14 @@ index.html — MAIN WINDOW (app shell + router)
 │       └── tap any round card →
 │
 ├── Circuit Breakdown (#/<slug>) .... Per-circuit deep view
-│   │   Context: data.json + circuits/<slug>.json + f1-results/2026/<slug>.json
+│   │   Context: ROUNDS + CIRCUITS (joined on slug)
 │   │
 │   ├── Weekend Center .............. Schedule / Live / Replay tabs
 │   │       │
 │   │       └── drill into completed race → weekend.html
 │   │
 │   └── Driver Popup ................ Per-driver detail overlay
+│           Context: CLASSIFICATIONS (filtered to this round)
 │           🟡 Arc Visualization here (PLANNED)
 │
 └── Footer
@@ -45,7 +46,7 @@ index.html — MAIN WINDOW (app shell + router)
 
 ```
 weekend.html — RACE DETAIL
-│   Context: f1-results/2026/<round>.json
+│   Context: CLASSIFICATIONS (full round, all 20 drivers)
 │   Reached from: Circuit Breakdown → Weekend Center
 │
 ├── Results mode (default, LIVE) .... 8 static panels + driver popup
@@ -60,33 +61,112 @@ weekend.html — RACE DETAIL
 
 ```
 standings.html — CHAMPIONSHIP STANDINGS (satellite)
-    Context: f1-results/2026/index_rounds.json + all round files
+    Context: CLASSIFICATIONS (all rounds, aggregated by driverId/team)
     Reached from: header nav link
-    Screens: Drivers table, Constructors table
 ```
 
 ```
 circuits.html — CIRCUIT DIRECTORY (satellite)
-    Context: data.json
+    Context: ROUNDS (summary fields only)
     Reached from: header nav link
     Links back to: index.html#/<slug>
 ```
 
 ```
 live-tracker.html — LIVE SESSION COMPANION (standalone)
-    Context: OpenF1 API (real-time)
+    Context: OpenF1 API (real-time, external)
     Reached from: direct link (not in main nav)
 ```
 
 ```
 🟡 Tyre Analysis (FUTURE)
-    Context: tyre-compounds.json (proposed) + Tier 3 data
+    Context: COMPOUNDS + STINTS
     Spec: Data-Story Layer doc §4B
 
 🟡 Season History (FUTURE)
-    Context: multi-year f1-results/<year>/ folders
+    Context: ROUNDS (multi-year)
     Possibly a new lens on home grid rather than a new page
 ```
+
+---
+
+## Schema (the Relationship Graph)
+
+### Tables
+
+| Table | Stored as | Records | Key | Role |
+|-------|-----------|---------|-----|------|
+| **ROUNDS** | `data.json` (rounds array) | 24 per season | `slug` | Card-face summary per circuit. Cross-year, persistent. |
+| **CLASSIFICATIONS** | `f1-results/2026/<slug>.json` (classification array) | ~20 per round | `slug` + `driverId` | Per-driver race result. Time-boxed per season. |
+| **CIRCUITS** | `circuits/<slug>.json` | 1 per circuit | `slug` | Track geometry, sectors, character. Static reference. |
+| **INDEX_ROUNDS** | `f1-results/2026/index_rounds.json` | 1 per completed round | `slug` | Season manifest: which rounds have data, version stamps. |
+| 🟡 **COMPOUNDS** | `f1-results/tyre-compounds.json` (proposed) | 7 | `key` (C1-C5, INT, WET) | Tyre reference: hardness, character, use case. Season-keyed. |
+| 🟡 **STINTS** | nested in CLASSIFICATIONS as `tyres.stints[]` | ~2-4 per driver per round | (parent driverId + stint index) | Per-stint compound + lap range. |
+
+### Fields (CLASSIFICATIONS, the main working table)
+
+| Field | Type | Tier | Status |
+|-------|------|------|--------|
+| `pos` | int (null = DNF) | 1 | ✅ |
+| `driverId` | string (ClickUp task ID) | 1 | ✅ |
+| `driver` | string | 1 | ✅ |
+| `team` | string | 1 | ✅ |
+| `status` | enum (FIN/DNF/DNS/DSQ) | 1 | ✅ |
+| `points` | number | 1 | ✅ |
+| `grid` | int or "PL" | 1 | ✅ |
+| `qualifying` | object {pos, q1, q2, q3} | 1 | ✅ |
+| `onRoadPos` | int (only when ≠ pos) | 1 | ✅ |
+| `fastLap` | object {time, lap} | 2 | ⚠️ r9 only |
+| `stewardNote` | string | 1 | ✅ (where relevant) |
+| `tyres` | object {stops, stints[]} | 3 | 🔒 design locked |
+| `dnf` | object {lap, reason} | 4 | 🟡 planned |
+| `finishGap` | string ("+1.611" / "+1 lap") | 4 | 🟡 planned |
+
+### Relationships
+
+```
+ROUNDS ────< CLASSIFICATIONS     (one round has many driver results)
+  key: slug
+
+ROUNDS ───── CIRCUITS            (one round sits on one circuit)
+  key: slug
+
+CLASSIFICATIONS >---< ROUNDS      (same driverId across rounds = season arc)
+  key: driverId (self-join across round files)
+
+CLASSIFICATIONS ──< STINTS       (one driver result has many stints)
+  key: parent record
+
+STINTS >---- COMPOUNDS             (each stint references one compound)
+  key: compound → COMPOUNDS.key
+  Resolved via round-level tyreNomination for display colour
+```
+
+### Screen Contexts (which screens consume which tables)
+
+| Screen | Primary table | Joins |
+|--------|--------------|-------|
+| Home Grid (all 3 lenses) | ROUNDS | none (summary fields only) |
+| Circuit Breakdown | ROUNDS | CIRCUITS (track detail), CLASSIFICATIONS (race results) |
+| Driver Popup | CLASSIFICATIONS | filtered to one round + one driver |
+| Weekend Race Detail | CLASSIFICATIONS | full round (all drivers), joined to ROUNDS for round-level fields |
+| Standings | CLASSIFICATIONS | aggregated across all rounds by driverId and team |
+| Circuits Directory | ROUNDS | summary fields only |
+| Live Tracker | (external: OpenF1) | none |
+| 🟡 Tyre Analysis | COMPOUNDS + STINTS | joined via compound key |
+
+### Compute-once law
+
+Store raw facts, derive everything else at render. A correction to one stored field fixes every derived view.
+
+- **Store:** pos, grid, qualifying, fastLap, compound + laps per stint, tyreNomination (round-level), finishGap, status, points
+- **Derive:** positionsGained (`grid - pos`), stop count (`stints.length - 1`), compound colour (via tyreNomination lookup), stint lengths, cumulative gaps, championship points totals
+
+### The story model (the arc)
+
+**qualifying.pos → grid → onRoadPos → pos**
+
+Four position landmarks per driver per round. The movement between them IS the story. Everything else (fast lap, strategy, DNF, penalties) is texture on that arc.
 
 ---
 
@@ -97,52 +177,6 @@ live-tracker.html — LIVE SESSION COMPANION (standalone)
 - 🟡 **PLANNED** = data exists or spec exists, not built
 - 🔒 **HELD** = design locked, execution waiting on Michael's call
 - **FUTURE** = needs new data + new screen
-
----
-
-## Data Model
-
-### Two data surfaces (by design)
-
-| File | Role | Scope |
-|------|------|-------|
-| `data.json` | Persistent cross-year track reference | All 24 rounds, circuit metadata, maps, podium history, cuTaskId anchors |
-| `f1-results/2026/<slug>.json` | Time-boxed season results | Per-round full classification, one file per completed race |
-| `f1-results/2026/index_rounds.json` | Season manifest | Which rounds have data, version stamps, slugs |
-
-### Per-round schema (enrichment tiers)
-
-| Tier | Fields | Status |
-|------|--------|--------|
-| **1: Spine** | pos, driverId, driver, team, status, points, grid, qualifying {pos, q1, q2, q3}, onRoadPos | ✅ Complete r1-9 |
-| **2: Race Pace** | fastLap {time, lap} per driver | ⚠️ Silverstone only; r1-8 need backfill (Pass A) |
-| **3: Strategy** | tyres {stops, stints: [{compound, laps}]} + round-level tyreNomination | 🔒 Design locked, backfill held (Pass B) |
-| **4: Color** | dnf {lap, reason}, finishGap ("+1.611" / "+1 lap") | Planned, cheap, high narrative payoff |
-
-### The story model
-
-Each driver's weekend is an arc across four position landmarks:
-
-**qualifying.pos → grid → onRoadPos → pos**
-
-- `qualifying.pos` = the slot they earned
-- `grid` = where they started (after penalties)
-- `onRoadPos` = where they crossed the line before post-race penalties (only stored when it differs)
-- `pos` = final classified position
-
-`positionsGained` = `grid - pos`, always DERIVED, never stored.
-
-### Compute-once law
-
-Store raw facts, derive everything else at render. Never hand-store a value computable from what's already in the file.
-
-- **Store:** per-stint compound + laps, round tyreNomination, fastLap {time, lap}, pos/grid/status/points, finishGap
-- **Derive:** positionsGained, stop count, compound colour, stint lengths, cumulative gaps
-
-### Proposed additions (not in repo)
-
-- `f1-results/tyre-compounds.json` — 7 types (C1-C5, INT, WET), season-keyed
-- Round-level `tyreNomination` — per-weekend compound-to-colour mapping
 
 ---
 
@@ -209,6 +243,7 @@ What to build next, in order:
 - **Two-artifact ship for over-cap files.** Running file + `source/` chunk set.
 - **Mobile-first.** No overflow at 320px. Touch targets 44px. Fluid sizing.
 - **Weekend hue-268 tokens.** Chakra Petch + Inter + JetBrains Mono. 1px lines. Race control, not sports news.
+- **No file renames for schema alignment.** The documentation IS the translation layer. `data.json` = ROUNDS, stated once, understood everywhere.
 
 ---
 
