@@ -140,8 +140,11 @@ worth basing decisions on.
 ## Command grammar (session control) — 3 forms
 
 Recognized as literal-string rows in the AI Toolkit Quick-Scan Trigger Table (soft match by
-the model on every pass; that table is what makes these pull). Registered canonically in
-`registry.json` under `session_commands`.
+the model on every pass; that table is what makes these pull). **The canonical grammar is the
+table below plus those index rows.** ~~Registered canonically in `registry.json` under
+`session_commands`.~~ — STRUCK 2026-07-25: `registry.json` is a retired tombstone stub (PR #483),
+so it cannot register anything. Writing session-command grammar back into it would resurrect a
+retired duplicate.
 
 | Command | Runs session-open hook? | Embodies a persona? | Use |
 |---|---|---|---|
@@ -204,7 +207,9 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    PERSONAL beat about it — what's changed since you were last here, or a pattern tied to YOUR
    lane. Presence built on your own steeped memory + activity, not bookkeeping. Points at the
    Scoreboard tool; never restate its scoring procedure here.
-5. **Confirm wiring:** the agent's row in `roster.json` (status active) + `registry.json`.
+5. **Confirm wiring:** the agent's row in `roster.json` (status active) — THE single documented
+   source for every agent. ~~+ `registry.json`~~ STRUCK 2026-07-25: retired tombstone stub
+   (PR #483). One roster, no mirror, no second row to reconcile.
 6. **INHABIT + ANNOUNCE:** emit the agent's self-announce header as the FIRST line of the
    reply, then respond in-character.
 
@@ -271,7 +276,7 @@ The session agent owns the session but does NOT gag the review bodies:
 
 ---
 
-## Concurrency (two live sessions, same agent)
+## Concurrency (two live sessions, same agent OR two agents in one repo)
 
 Supported by design (Letta: many conversations, one persisted store). Rules:
 1. Each session has its own Agent Activity Board session task → per-session narrative never collides.
@@ -280,6 +285,14 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
 3. `activity-log.md` is append-only → concurrent appends merge trivially.
 4. `memory.md` is the real clobber risk → when a twin is detected, BOTH sessions queue durable
    memory changes through the single Maggie/OMR serialization point; reconcile once.
+5. ⚠️ **DIFFERENT agents collide too, and the shared files are the dangerous ones (added
+   2026-07-25 from a live near-miss).** An empty `session-board.md` means "nobody posted," NOT
+   "nobody is here.** On 2026-07-25 a Dexter session rewrote THIS FILE while a Felix session was
+   authoring a new agent bundle against it; the board read "No active sessions" the whole time, so
+   the freshly-audited bundle was in-format at 3:49 PM and out-of-format by 4:09 PM. Posting your
+   presence line protects the OTHER session, not yours — it is the only mechanism that catches a
+   cross-agent edit to `_shared/`, a governing hook, or `roster.json`. If you are editing a file
+   every agent loads, say so on the board BEFORE the write, and name the file.
 
 ---
 
@@ -303,6 +316,13 @@ Revision/what-changed history = git + PR descriptions, never an inline changelog
 
 ## Changelog
 
+- 2026-07-25 (later, Felix) — **Struck two `registry.json` pointers** left behind by the same-day
+  rewrite: the command-grammar "registered canonically in registry.json" line and load-contract
+  step 5's "+ registry.json" wiring check. Registry was retired to a tombstone stub in PR #483
+  hours earlier, so both instructed every agent, on every load, to verify against a dead file —
+  the 5th and 6th instances of that rot found today. Struck, not deleted. Also added Concurrency
+  rule 5: an empty session board means nobody POSTED, not nobody is HERE, written from the live
+  near-miss where this file was rewritten underneath a bundle being audited against it.
 - 2026-07-25 — **Live memory writes + per-reply activity log (LOCKED, Michael).** Rewrote the
   Per-response logging mandate as a HARD NON-NEGOTIABLE three-surface system: (1) session task
   transcript comment per reply, (2) activity-log.md per-reply one-liner (live, not batched at
@@ -314,7 +334,7 @@ Revision/what-changed history = git + PR descriptions, never an inline changelog
   being done."
 - 2026-07-24 — **Constitution §6 added: CLASS PARITY.** "Agent" and "super agent" are converging;
   `class` means PERSISTENCE (holds a memory bundle), never rank. Threaded through "What a git
-  super-agent IS" (not a higher rank than a lens), Universal Mandate 8 (never pull rank on a lens),
+  super-agent IS" (not a higher rank than a lens), Universal Mandate 8 ("never pull rank on a lens"),
   and "Layer, don't suppress" (quiet-by-default is about noise, not standing). Graduation now has
   exactly one justification: the voice needs MEMORY. Also repointed step 5 of the load contract from
   `superagents.json` to `roster.json` (renamed 2026-07-24). Source: Michael, Fleet Build Queue
