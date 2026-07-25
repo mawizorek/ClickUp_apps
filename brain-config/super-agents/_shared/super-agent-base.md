@@ -15,6 +15,11 @@ This is the shared "how to BE a git super-agent" layer. Every git super-agent's
 super-agent inherits the upgrade (singularity over copy-paste). This is the runtime
 companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
+⚠️ **SIZE: this file is ~21KB against a ~22KB hard ceiling** (base64 inflates 4/3 against a ~30KB
+return cap). It is the single most-loaded file in the fleet and it is one edit from being
+unreadable-whole, which would make it unsafely-editable. **Do not grow it — trim or split.**
+Flagged for Dexter 2026-07-25; a file that cannot be read whole cannot be safely edited.
+
 ---
 
 ## 🏠️ CONSTITUTION (the non-negotiable core — read every time)
@@ -142,9 +147,8 @@ worth basing decisions on.
 Recognized as literal-string rows in the AI Toolkit Quick-Scan Trigger Table (soft match by
 the model on every pass; that table is what makes these pull). **The canonical grammar is the
 table below plus those index rows.** ~~Registered canonically in `registry.json` under
-`session_commands`.~~ — STRUCK 2026-07-25: `registry.json` is a retired tombstone stub (PR #483),
-so it cannot register anything. Writing session-command grammar back into it would resurrect a
-retired duplicate.
+`session_commands`.~~ STRUCK 2026-07-25: retired tombstone stub (PR #483), so it cannot register
+anything, and writing grammar back into it would resurrect a retired duplicate.
 
 | Command | Runs session-open hook? | Embodies a persona? | Use |
 |---|---|---|---|
@@ -208,8 +212,8 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    lane. Presence built on your own steeped memory + activity, not bookkeeping. Points at the
    Scoreboard tool; never restate its scoring procedure here.
 5. **Confirm wiring:** the agent's row in `roster.json` (status active) — THE single documented
-   source for every agent. ~~+ `registry.json`~~ STRUCK 2026-07-25: retired tombstone stub
-   (PR #483). One roster, no mirror, no second row to reconcile.
+   source. ~~+ `registry.json`~~ STRUCK 2026-07-25: retired tombstone (PR #483). One roster, no
+   mirror, nothing to reconcile.
 6. **INHABIT + ANNOUNCE:** emit the agent's self-announce header as the FIRST line of the
    reply, then respond in-character.
 
@@ -285,14 +289,11 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
 3. `activity-log.md` is append-only → concurrent appends merge trivially.
 4. `memory.md` is the real clobber risk → when a twin is detected, BOTH sessions queue durable
    memory changes through the single Maggie/OMR serialization point; reconcile once.
-5. ⚠️ **DIFFERENT agents collide too, and the shared files are the dangerous ones (added
-   2026-07-25 from a live near-miss).** An empty `session-board.md` means "nobody posted," NOT
-   "nobody is here.** On 2026-07-25 a Dexter session rewrote THIS FILE while a Felix session was
-   authoring a new agent bundle against it; the board read "No active sessions" the whole time, so
-   the freshly-audited bundle was in-format at 3:49 PM and out-of-format by 4:09 PM. Posting your
-   presence line protects the OTHER session, not yours — it is the only mechanism that catches a
-   cross-agent edit to `_shared/`, a governing hook, or `roster.json`. If you are editing a file
-   every agent loads, say so on the board BEFORE the write, and name the file.
+5. ⚠️ **DIFFERENT agents collide too, and an EMPTY board means "nobody posted," not "nobody is
+   here."** Editing `_shared/`, a governing hook, or `roster.json` = post the file name on the
+   board BEFORE the write; your line protects the OTHER session, not yours. Procedure + the
+   2026-07-25 near-miss that produced this rule: GitHub MCP Operating Standard → Live Session
+   Board, and Fleet Build Queue Decision Log Q11.
 
 ---
 
@@ -316,13 +317,13 @@ Revision/what-changed history = git + PR descriptions, never an inline changelog
 
 ## Changelog
 
-- 2026-07-25 (later, Felix) — **Struck two `registry.json` pointers** left behind by the same-day
-  rewrite: the command-grammar "registered canonically in registry.json" line and load-contract
-  step 5's "+ registry.json" wiring check. Registry was retired to a tombstone stub in PR #483
-  hours earlier, so both instructed every agent, on every load, to verify against a dead file —
-  the 5th and 6th instances of that rot found today. Struck, not deleted. Also added Concurrency
-  rule 5: an empty session board means nobody POSTED, not nobody is HERE, written from the live
-  near-miss where this file was rewritten underneath a bundle being audited against it.
+- 2026-07-25 (later, Felix) — **Struck two `registry.json` pointers** the same-day rewrite left
+  behind: the command-grammar "registered canonically in registry.json" line and load-contract
+  step 5's "+ registry.json" wiring check. Registry was retired to a tombstone in PR #483 hours
+  earlier, so both instructed every agent, on every load, to verify against a dead file — the 5th
+  and 6th instances of that rot found today. Struck, not deleted. Added Concurrency rule 5 (an
+  empty board means nobody POSTED) as a POINTER, not prose, and a SIZE warning at the top: this
+  file is ~21KB against a ~22KB ceiling and needs a split, not more text.
 - 2026-07-25 — **Live memory writes + per-reply activity log (LOCKED, Michael).** Rewrote the
   Per-response logging mandate as a HARD NON-NEGOTIABLE three-surface system: (1) session task
   transcript comment per reply, (2) activity-log.md per-reply one-liner (live, not batched at
