@@ -2,7 +2,7 @@
 
 📋 **Decision Log:** `Inciardi Collection — Decision Log` (ClickUp) — every call about this app, newest on top. **Checkbox polarity is INVERTED: a checked box is a REJECTED option.** Q1–Q3 (answered) live on the predecessor's `Inciardi Market — Rebuild Decision Log`; this app's log starts at **Q4**. Read it before touching anything here.
 
-**Status: DEFINED AND SIGNED OFF (2026-07-25). Nothing is built yet.** The sign-off gate (§7) cleared when Q4–Q7 were answered. Code may start; §8 says in what order.
+**Status: DEFINED AND SIGNED OFF (2026-07-25). Nothing is built yet.** The sign-off gate (§7) cleared when Q4–Q7 were answered. Code may start; §8 says in what order. §9 lists what is still open and why it doesn't block.
 
 Successor to `inciardi-market/`, which stays live and untouched as a working reference until this replaces it. Clean room on purpose: a day of debugging proved that **inherited state is what fooled us**, so nothing carries over by accident — only by decision.
 
@@ -93,6 +93,8 @@ Three things it does **not** cover, which is exactly what the export is for:
 
 So the export survives, **demoted and honest**: a diffable identity ledger, an off-platform copy, and history past 30 days. It is written by a cron job, read by nothing, and hand-edited never. **If it vanished, the app would not notice — that is the test of a real export.** Cut from milestone 1 (§8): there is no data worth exporting yet.
 
+**And a fourth gap that the export as currently specced does NOT close: Time Travel covers rows, not bytes.** 177 photographs / 268 MB live in R2, entirely outside it. Losing an image *row* is recoverable; losing the *object* is permanent and silent. Open as **Q9** in §9.
+
 *(Noted for later: Time Travel restore is a REST endpoint, not wrangler-only, so a "restore to…" control in the Settings drawer is buildable. It needs a Cloudflare API token — broader privilege than the D1 binding — so it is parked, not planned.)*
 
 ---
@@ -138,6 +140,20 @@ This app is a **theme-registry consumer from commit one** — Michael's call.
 Stu's brief, now binding: *the binder reads as a specimen catalogue — precise, gridded, faintly scientific — because her photographs supply all the warmth the page needs.* **Let the prints be the only soft thing on the page.**
 
 Still open, and Michael sees these before anything lands in `shared/themes/`: the 22-token color row itself, and which `typography × forms × spacing` rows the join points at. A new color row is cheap; a new typography row must justify itself against what already exists.
+
+### 🔴 A hazard in `resolve.js` to know about before writing that row (Michael's Q5 note)
+
+> *"What happens if an app uses a theme name that doesn't actually exist in the json theme stack?"*
+
+Read the code rather than guessing. Three cases, and **they do not behave the same way**:
+
+| Bad reference | Behaviour | Verdict |
+| --- | --- | --- |
+| Unknown **theme** slug (`applyTheme`) | Red fixed banner across the top: `themes: unknown theme "x"`. **Nothing is applied** — no partial theme, no guess. | Correct. Loud. |
+| Unknown **color** slug (`applyColor`) | Banner, then falls back to `ULT`, the default-theme mid-gray ramp, so the page never white-screens. | Correct. Loud *and* survivable. |
+| Unknown **typography / forms / spacing** slug inside an otherwise-valid join | 🔴 **SILENT.** `applyTheme()` calls each child applier with `silent:true`, so a broken vector pointer applies nothing and says nothing. The page renders half-themed — right colors, default type or geometry — and nobody is told. | **A silent fallback. The exact failure mode outlawed by the Fetch Honesty Law the same day.** |
+
+This is **shared-infrastructure**, not an `inciardi-collection` bug, and it is listed here because `inciardi-prints` is a brand-new four-pointer join — the single most likely place to typo a vector name. Fix and rename-safety options are open as **Q8** in §9.
 
 ### Objects
 
@@ -203,6 +219,17 @@ Ordered so that **the acceptance test passes at the end of M1** — a working bi
 **M4 · The market lens.** eBay per-artwork. Registry-driven, never identity-defining.
 
 **Then:** `inciardi-market` retires per Q7 — launcher flips, `status:'retired'` in `app-dashboard`, README becomes a redirect stub, folder kept for the git-blame trail. Michael calls the timing.
+
+---
+
+## 9. Open, but not blocking
+
+Both came out of Michael's own notes on the sign-off questions. Neither gates M1; both are on the Decision Log so they are never held only in chat.
+
+| # | Question | Why it can wait |
+| --- | --- | --- |
+| **Q8** | **Theme rename safety** — record which apps consume which theme, or make renames impossible? Options: `aliases: []` on the join row (a slug is identity, so alias it, never rename it — the Q2 lesson), a generated reverse index, both, or neither. **Bundled with the `resolve.js` silent-vector fix** (§5). | A correct slug works today. The fix matters most the moment a second app consumes `inciardi-prints`. |
+| **Q9** | **R2 has no Time Travel** (§3). Does the export carry an image manifest — keys, sizes, hashes — so a lost photograph is at least *identifiable* rather than discovered as a blank tile? | There are no photographs in the new database yet. Must be answered before M1's R2 upload path is considered finished. |
 
 ---
 
