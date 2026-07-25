@@ -2,9 +2,11 @@
 
 📋 **Decision Log:** `Inciardi Collection — Decision Log` (ClickUp) — every call about this app, newest on top. **Checkbox polarity is INVERTED: a checked box is a REJECTED option.** Q1–Q3 (answered) live on the predecessor's `Inciardi Market — Rebuild Decision Log`; this app's log starts at **Q4**. Read it before touching anything here.
 
-**Status: DEFINED AND SIGNED OFF (2026-07-25). Nothing is built yet.** The sign-off gate (§7) cleared when Q4–Q7 were answered; Q8 answered the same day. Code may start; §8 says in what order. §9 holds the one question still open, which doesn't block.
+**Status: DEFINED AND SIGNED OFF (2026-07-25). Nothing is built yet, and nothing is blocking.** The sign-off gate (§7) cleared when Q4–Q8 were answered. §8 is the build order. §9 holds the one open question, which does not block.
 
 Successor to `inciardi-market/`, which stays live and untouched as a working reference until this replaces it. Clean room on purpose: a day of debugging proved that **inherited state is what fooled us**, so nothing carries over by accident — only by decision.
+
+> 🔴 **The directive that governs sequencing, in Michael's words:** *"our whole directive was to plan schema and pages before build… theming should be the lightest thing to change later because we've decided that default structure already. so use defaults for now for all i care cos the whole point is we can change it later."* **Schema and pages are the gate. Nothing else is.**
 
 ---
 
@@ -95,7 +97,7 @@ Four things it does **not** cover, which is exactly what the export is for:
 **Q8 = A + C** (B, drop-it-entirely, was rejected). Two things follow:
 
 1. **The export lives, demoted and honest.** Cron-written, read by nothing, hand-edited never. A diffable identity ledger, an off-platform copy, and history past the 30-day cliff. **If it vanished, the app would not notice — that is the test of a real export.** Cut from M1; there is no data worth exporting yet.
-2. **The export carries an R2 image manifest** — key, size, hash, and the `edition_id` it belongs to. It does not save the bytes. It makes their loss *legible*: instead of a blank tile you get a re-shoot list that names the print. It is a `SELECT` in a cron job that already runs, so the cost is near zero. **Required before M1's R2 path counts as finished** — the manifest is worthless if it starts existing after the photographs do.
+2. **The export carries an R2 image manifest** — key, size, hash, and the `edition_id` it belongs to. It does not save the bytes. It makes their loss *legible*: instead of a blank tile you get a re-shoot list that names the print. It is a `SELECT` in a cron job that already runs, so the cost is near zero. **Required before the R2 path counts as finished** — the manifest is worthless if it starts existing after the photographs do.
 
 *(Noted for later: Time Travel restore is a REST endpoint, not wrangler-only, so a "restore to…" control in the Settings drawer is buildable. It needs a Cloudflare API token — broader privilege than the D1 binding — so it is parked, not planned.)*
 
@@ -127,47 +129,55 @@ Three rules fall out, and they are not the same as "A":
 2. **A photo is always possible** — optional field on `Enter`, and addable afterwards from edition detail.
 3. **The app accepts a photograph with no source record behind it.** No product, no listing, no feed. Beckett's vending-machine print, satisfied.
 
-⚠️ **Honest consequence: this is not the cheap option.** A is labelled "fastest" because it defers R2 — but the condition attached to it (*add a photo later, from day one*) pulls **R2 upload and an edition-detail surface into milestone 1 anyway.** The saving is one optional field on one form, not a milestone. Named here so nobody later reads "Michael chose A" and plans a text-only first release.
+⚠️ **Honest consequence: this is not the cheap option.** A is labelled "fastest" because it defers R2 — but the condition attached to it (*add a photo later, from day one*) pulls **R2 upload and an edition-detail surface into the first milestone anyway.** The saving is one optional field on one form, not a milestone. Named here so nobody later reads "Michael chose A" and plans a text-only first release.
 
 ---
 
 ## 5. Standards target
 
-This app is a **theme-registry consumer from commit one** — Michael's call.
+This app is a **theme-registry consumer from commit one** — which is exactly why the theme itself is not urgent.
 
-### The theme — DECIDED (Q5 = B) · slug `inciardi-prints`
+### 🔴 Sequencing law: the theme goes LAST, and never blocks anything
 
-**Direction: archival / specimen.** Near-neutral warm paper ground, one restrained ink accent, mono type for all data. Riso-ink (A) was rejected precisely because it competes with the photographs, which already carry the terracotta, cobalt and kale. Reusing an existing theme (C) was rejected — this app gets its own identity.
+The reason the spine exists is that a theme is swappable at any time for **one pointer and zero CSS edits** (`retrocast` proved it). Every color being `var(--token)` means the shell consumes tokens *regardless of which row supplies them*.
 
-Stu's brief, now binding: *the binder reads as a specimen catalogue — precise, gridded, faintly scientific — because her photographs supply all the warmth the page needs.* **Let the prints be the only soft thing on the page.**
+So: **build on `default-theme`, swap when the app works.** An earlier draft of this section claimed *"the shell consumes tokens, so this blocks the shell"* and made the theme a sign-off question. That premise was false, and it left the most cosmetic artifact in the stack as the last thing gating the build. Corrected on Michael's call, 2026-07-25. If a future pass finds itself designing the palette before the schema is applied, it has reproduced the same inversion.
 
-Still open, and Michael sees these before anything lands in `shared/themes/`: the 22-token color row itself, and which `typography × forms × spacing` rows the join points at. A new color row is cheap; a new typography row must justify itself against what already exists. **This is the only thing gating M1.**
+### The theme — direction DECIDED (Q5 = B) · palette APPROVED · slug `inciardi-prints` · **PARKED**
 
-### 🔴 A hazard in `resolve.js` to know about before writing that row (Michael's Q5 note)
+**Direction: archival / specimen.** Near-neutral warm paper ground, one restrained ink accent, mono type for all data. Riso-ink (A) was rejected precisely because it competes with the photographs, which already carry the terracotta, cobalt and kale. Reusing an existing theme (C) was rejected — this app gets its own identity eventually.
 
-> *"What happens if an app uses a theme name that doesn't actually exist in the json theme stack?"*
+Stu's brief: *the binder reads as a specimen catalogue — precise, gridded, faintly scientific — because her photographs supply all the warmth the page needs.* **Let the prints be the only soft thing on the page.**
 
-Read the code rather than guessing. Three cases, and **they do not behave the same way**:
+**Michael approved the palette on sight (2026-07-25, "yes this is it").** It is a finished, ready asset — not an open question. Proposed composition:
 
-| Bad reference | Behaviour | Verdict |
+| Vector | Row | Status |
 | --- | --- | --- |
-| Unknown **theme** slug (`applyTheme`) | Red fixed banner across the top: `themes: unknown theme "x"`. **Nothing is applied** — no partial theme, no guess, no fallback. | Loud, but harsher than the color path. |
-| Unknown **color** slug (`applyColor`) | Banner, then falls back to `ULT`, the default-theme mid-gray ramp, so the page never white-screens. | Correct. Loud *and* survivable. |
-| Unknown **typography / forms / spacing** slug inside an otherwise-valid join | 🔴 **SILENT.** `applyTheme()` calls each child applier with `silent:true`, so a broken vector pointer applies nothing and says nothing. The page renders half-themed — right colors, default type or geometry — and nobody is told. | **A silent fallback. The exact failure mode outlawed by the Fetch Honesty Law the same day.** |
+| color | `inciardi-prints` | new · 22 tokens + a complete 11-token `alt-*` dark ramp · ink `#2f4457` · overrides `data-1..4` |
+| typography | `specimen` | new · Newsreader + IBM Plex Mono · all five existing rows are sans-display, none carries a catalogue voice |
+| forms | `specimen` | new · `radius 2px`, hairlines, elevation by surface step · all four existing rows ship dark-chrome shadows that read as grime on paper |
+| spacing | `standard` | **reused** |
 
-This is **shared infrastructure**, not an `inciardi-collection` bug, and it is recorded here because `inciardi-prints` is a brand-new four-pointer join — the single most likely place in the repo to typo a vector name. Fix and rename-safety options are open as **Q9** in §9.
+Open sub-questions, all deferrable to swap day: whether three new rows is one too many, whether it lands `light` or `dark`, and whether overriding `data-1..4` is care or scope creep.
+
+### Theme plumbing worth knowing before swap day
+
+- **Boot with `THEMES.applyTheme(slug)`**, never `THEMES.apply()` — the latter is color-only and silently leaves the app unthemed on three of four vectors.
+- **Adding a row is three steps:** TSV row → `_themes.json` join → the embedded snapshot in `preview.data.js`. A new *forms column* also needs `FORM_KEYS` in `resolve.js`, or it works in the Studio and is broken in every real app.
+- **Run `THEMES.validate()`** after adding the row. It reports every broken join reference across the registry without applying anything.
+- **`resolve.js` no longer has a silent path** (fixed 2026-07-25, PR #502, prompted by Michael's Q5 note). It used to: `applyTheme()` passed `silent:true` to the typography/forms/spacing appliers, so a typo'd vector pointer rendered the page half-themed and announced nothing — while an unknown *theme* slug bannered and applied nothing at all, despite `_index.json` declaring an `ultimateFallback` the resolver never implemented. Now every unresolved reference records to `THEMES.faults`, logs, and banners once; `ultimateFallback` is honoured; and a broken reference is written into the DOM as `data-<vector>="!<slug>"`.
 
 ### Objects
 
 - Links `../shared/themes/themes.css` (static first paint) + `resolve.js` (live switching).
-- **Every color is `var(--token)`.** Zero literals in any stylesheet. `default-theme` until `inciardi-prints` exists.
+- **Every color is `var(--token)`.** Zero literals in any stylesheet. `default-theme` until swap day.
 - Composes from the **42 canonical objects** (`shared/themes/_objects.json`). The binder needs `cnt_page_shell`, `cnt_filter_bar`, `row_tile_badge`, `viz_meter`, `tx_badge`, `fb_empty`, `panel_drawer`, `fb_toast` — **all eight already exist** with defined tokens and states.
 - One genuinely new object expected: **`pocket_binder`** (owned / missing / wanted / gone-forever). Per `OBJECT-COVERAGE.md` the set is a vocabulary, not a ceiling — but a new object lands in `_objects.json` + `preview.data.js` + the coverage table **in the same pass.**
 - Audited against `template-app/CONFORMANCE.md`. Derived from that shape, not from the predecessor.
 
 ### Module layout, decided at founding rather than refactored later
 
-`inciardi-market` grew a single 29KB `app-core.js` doing six jobs, one feature away from crossing the 30KB read cap — the threshold past which **a file cannot be safely rewritten** (the trap `worker.js` at 39KB has been stuck behind all day).
+`inciardi-market` grew a single 29KB `app-core.js` doing six jobs, one feature away from crossing the 30KB read cap — the threshold past which **a file cannot be safely rewritten** (the trap `worker.js` at 39KB is stuck behind).
 
 ```
 index.html     slim router shell + boot constants     < 8KB
@@ -185,7 +195,7 @@ pages/*.html   content partials
 Both are documented in `inciardi-market/README.md` and both apply here:
 
 - **Image Rendering Law** (7 rules, 5 outages). Never paint an archival original into a grid. Never gate visibility on a JS class. A placeholder always carries identifying content.
-- **Fetch Honesty Law.** A cache that fails silently does not degrade gracefully, it lies. Every fallback announces itself in the UI, with an age.
+- **Fetch Honesty Law.** A cache that fails silently does not degrade gracefully, it lies. Every fallback announces itself in the UI, with an age. *(Now enforced in the theme spine too, per PR #502.)*
 
 ---
 
@@ -202,20 +212,30 @@ All answered on the Decision Log. Decoded, read back, and folded in above.
 | Q | Decided | Where it landed |
 | --- | --- | --- |
 | **Q4 · Where authored truth lives** | **A · D1 is the source, git JSON is an export.** Supersedes Q3. | §3 |
-| **Q5 · Theme** | **B · archival / specimen**, slug **`inciardi-prints`**. Palette still to be approved. | §5 |
-| **Q6 · Photo on entry** | **A + B.** Never required, always possible, at entry or after. R2 in milestone 1. | §4 |
+| **Q5 · Theme** | **B · archival / specimen**, slug **`inciardi-prints`**. Palette approved on sight. **Parked, not blocking.** | §5 |
+| **Q6 · Photo on entry** | **A + B.** Never required, always possible, at entry or after. | §4 |
 | **Q7 · Predecessor retirement** | **A, deferred.** *"Keep it live for now but we will kill it soon."* Never "indefinitely" (B); the folder is never deleted (C). | §8 |
 | **Q8 · Does the export survive?** | **A + C.** Yes, demoted — **and it carries an R2 image manifest.** | §3 |
 
 ---
 
-## 8. Milestones
+## 8. Build order
 
-Ordered so that **the acceptance test passes at the end of M1** — a working binder that needs no worker alive.
+**Schema first. It is the thing the whole definition exercise was for.** Everything below runs on `default-theme`.
 
-**M1 · The binder works by hand.** `inciardi-prints` theme row → shell + `chrome.js`/`core.js` → schema promoted from `.proposed` and applied → `Enter` (photo optional) → `Binder` sheet with visible gaps → edition detail with photo add → R2 upload + the image ladder + the image manifest query. **Exit test: enter a print that exists in no feed, from a phone, with a photo, and see it in its sheet.**
+**M1 · The binder works by hand.**
 
-**M2 · Volume and coverage.** `Capture` ported from the predecessor. `Index`. Registry seeded as a one-time load. The 54 verified names in.
+1. **Schema promoted and applied.** `db/schema.proposed.sql` → `db/schema.sql`, applied to a **new** D1 database. Not a migration of the old one; `inciardi-market` keeps its own untouched.
+2. **Shell** — `index.html` router + `chrome.js` + `core.js`, audited against `template-app/CONFORMANCE.md`, `default-theme` in the boot constant.
+3. **`Enter`** (P0) — the form, photo optional, writing straight to D1.
+4. **`Binder`** (P0) — the sheet, the `pocket_binder` object, visible gaps.
+5. **Images** — `images.js` ported from the predecessor, upload at entry and from edition detail, plus the manifest query.
+
+**Exit test: enter a print that exists in no feed, from a phone, with a photo, and see it in its sheet.** No worker needs to be alive.
+
+**M2 · Volume and coverage.** `Capture` ported. `Index`. Registry seeded as a one-time load — the 54 verified names in.
+
+**Theme swap · whenever.** `inciardi-prints` rows land in `shared/themes/`, the boot constant changes, `THEMES.validate()` runs. One pointer, zero CSS edits. **This step never blocks another one** and can happen before, between, or long after any milestone here.
 
 **M3 · Automation as gravy.** Shopify harvest wired to PROPOSE only. `Adopt` queue. The cron export to `registry/artworks.json`, manifest included.
 
@@ -229,8 +249,8 @@ Ordered so that **the acceptance test passes at the end of M1** — a working bi
 
 | # | Question | Why it can wait |
 | --- | --- | --- |
-| **Q9** | **Theme slug hygiene.** Record which apps consume which theme, or make renames impossible? Options: `aliases: []` on the join row (a slug is identity, so alias it, never rename it — the Q2 lesson), a generated reverse index from an `applyTheme('…')` grep, both, or neither. **Bundled with the `resolve.js` silent-vector fix** (§5). | A correct slug works today. It matters most the moment a second app consumes `inciardi-prints`, or the first time a vector name is typo'd. Shared infrastructure, so it moves to a `shared/themes` container log once one exists. |
+| **Q9** | **Theme slug hygiene** — the half of Q9 that is still a question. Should the registry record which apps consume which theme, or make renames impossible? Options: `aliases: []` on the join row (a slug is identity, so alias it rather than rename it — the Q2 lesson), a generated reverse index from an `applyTheme('…')` grep, both, or neither. | A correct slug works today, and the silent-vector half of Q9 already shipped (PR #502). This matters the moment a second app consumes `inciardi-prints`. Shared infrastructure, so it moves to a `shared/themes` container log once one exists. |
 
 ---
 
-*Founded 2026-07-25. Definition by Dev Dexter. Entity model from Clever Cleo; `edition_type` semantics from Domain Dara; binder-as-sheet from Style Stu; 7 pre-commit findings from Breaker Beckett; boundaries from Scope Skye. Conducted by Maestro Mira. Decisions: `Inciardi Collection — Decision Log` (Q4→) and `Inciardi Market — Rebuild Decision Log` (Q1–Q3). Predecessor's charter: `inciardi-market/REBUILD-CHARTER.md`.*
+*Founded 2026-07-25. Definition by Dev Dexter. Entity model from Clever Cleo; `edition_type` semantics from Domain Dara; binder-as-sheet and the specimen palette from Style Stu; 7 pre-commit findings from Breaker Beckett; boundaries from Scope Skye. Conducted by Maestro Mira. Decisions: `Inciardi Collection — Decision Log` (Q4→) and `Inciardi Market — Rebuild Decision Log` (Q1–Q3). Predecessor's charter: `inciardi-market/REBUILD-CHARTER.md`.*
