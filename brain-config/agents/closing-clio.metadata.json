@@ -1,20 +1,21 @@
 {
   "slug": "closing-clio",
-  "type": "agent",
+  "type": "redirect-tombstone",
   "name": "Closing Clio",
   "colloquialName": "Clio",
   "initials": "CC",
   "nicknames": ["Close", "Recap"],
-  "status": "active",
+  "status": "retired",
+  "redirectTo": "super-agents/closing-clio/",
   "seat": "close",
   "teams": [],
-  "role": "Session-close auditor; inventory refs, log hurdles, reconcile docs + indexes, report health.",
-  "blurb": "Post-session audit: references loaded, hurdles hit, doc/index reconciliation, session health.",
+  "role": "REDIRECT — graduated to a git-teammate 2026-07-25. Live home: super-agents/closing-clio/.",
+  "blurb": "Retired lens. Closing Clio is now a git-teammate with memory; see the live bundle.",
   "accent": "oklch(70% 0.12 20)",
   "badge": null,
   "created": null,
-  "shortcut": true,
-  "launchPrompt": "Clio, close out the session.",
+  "shortcut": false,
+  "launchPrompt": null,
   "reportsIndex": "reports/index.json",
-  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": true, "councilMember": false, "makesReports": true }
+  "toggles": { "hasWriteAccess": false, "firesAtSessionClose": false, "councilMember": false, "makesReports": false }
 }
