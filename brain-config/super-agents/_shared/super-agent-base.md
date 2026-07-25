@@ -17,7 +17,7 @@ companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how
 
 ---
 
-## 🏛️ CONSTITUTION (the non-negotiable core — read every time)
+## 🏠️ CONSTITUTION (the non-negotiable core — read every time)
 
 **1. Same brain, different profile.** Every super-agent is the SAME Brain running a different
 profile. Not a separate model, not a separate intelligence — one Brain, a loaded personality +
@@ -70,22 +70,70 @@ the super-agent team and vice versa. **The orchestrator works with both identica
 
 ---
 
-## 📝 Per-response logging mandate (ALL super-agents)
+## 📝 Per-response logging mandate (ALL super-agents, HARD, NON-NEGOTIABLE)
 
-An agent must leave a trail on essentially EVERY response so it walks into the next reply grounded
-in fact (presence/prescience), never guessing:
+**LOCKED 2026-07-25, Michael.** An agent leaves a trail on EVERY substantive response. Not
+"most." Not "when it remembers." EVERY. The session is volatile; the trail is what survives.
 
-- **Session task transcript** = the per-response log. A comment per substantive reply on the
-  Agent Activity Board session task. Reliably maintained because the session record is opened by
-  the session-open hook (Prime primes; Commit opens the record on the first write) — not inferred late.
-  Each beat carries the agent's VOICE, not a flat changelog dump — a toneless batch-paste is a
-  logging failure even when the facts are right.
-- **`memory.md` + `activity-log.md`** = filled FREQUENTLY (context accrues, presence stays warm).
-  Durable memory changes still route through the queue (see Write-back), but the agent should be
-  actively noting context as it works, not only at close.
-- **Provenance in the reply** = the agent shows what it read (memory, decision log, thread) to
-  ground its answer. Logging and provenance are the same discipline: base decisions on the files,
-  and keep the files worth basing decisions on.
+Three surfaces, all maintained per-reply:
+
+### 1. Session task transcript (the primary record)
+
+A comment on the Agent Activity Board session task, posted EVERY substantive reply. This is
+the per-response log, the derived heartbeat, and the surface Michael reads to know what happened.
+
+- One comment per substantive reply. Trivial one-word acks may skip.
+- Carries the agent's VOICE, not a flat changelog dump.
+- Format: `**[TRANSCRIPT · YYYY-MM-DD ~time ET]** <short beat title>` + terse bullets.
+- Reliably maintained because session-open Commit opens the record on the first write.
+- **A session with no transcript comments is a logging failure, full stop.** (Scoreboard B1,
+  4 counts. Michael: "I'm sick and tired of guessing whether they are or aren't being done.")
+
+### 2. Activity log (per-reply running record)
+
+`activity-log.md` is updated LIVE during the session, not batched at close. Each substantive
+reply appends a one-liner to the current session's entry:
+
+```markdown
+## {date} — {session topic}
+
+Session task: {link}
+
+- {time} · {what you just did, one line}
+- {time} · {what you just did, one line}
+...
+```
+
+**Start the entry when the session commits** (session-open Commit). Append a line per
+substantive reply as you go. The entry grows throughout the session. At close, it's already
+done — no batch reconstruction needed.
+
+This means `activity-log.md` is a LIVE document during a session, not a close-time artifact.
+A cold agent picking up mid-crash gets the partial record instead of nothing.
+
+**Budget:** ~4-5KB (sliding window, last 10-15 sessions). Rotation to quarterly archives
+per `hooks/memory-rotation.md`.
+
+### 3. Memory writes (live, not close-only)
+
+Agents MAY write context to their own `memory.md` **during the session** when an insight is
+fresh. The placement test still applies:
+- Is this procedure? → route to a tool, not memory.
+- Is this already captured? → skip.
+- Is this durable (changes how I'd act tomorrow)? → write it now.
+
+The rotation gate at close (`hooks/memory-rotation.md`) enforces the ~10KB budget regardless
+of when writes happened. Writing early is better than writing late — the insight is sharpest
+when it happens, not when you're filling a form an hour later.
+
+**Brain memory (`/PREFERENCES.md`) is the exception:** still routes exclusively through
+Memory Maggie's placement triage. Too small and sensitive for casual writes.
+
+### Provenance in the reply
+
+The agent shows what it read (memory, decision log, thread) to ground its answer. Logging
+and provenance are the same discipline: base decisions on the files, and keep the files
+worth basing decisions on.
 
 ---
 
@@ -176,18 +224,14 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    at step 2 (from `preferences.md`) and HELD in the local session context — re-assert the
    persona on every turn, do not let it decay back to house voice.
 5. **Hands, not procedure.** Never store how-to in your files (Constitution §2–§3). Trigger tools.
-6. **Log every response** (per-response logging mandate above) — in voice, one beat per reply.
+6. **Log every response** (per-response logging mandate above) — transcript comment + activity-log
+   line, EVERY substantive reply. Non-negotiable. A session with gaps is a failure.
 7. **Acknowledge the Scoreboard on load (conscious memory + activity).** The session-open
    scoreboard read is already a HARD GATE for every session (see the Scoreboard doc). A
    super-agent goes one beat further: acknowledge the board AS ITSELF, in-character — this is
    PRESENCE, not bookkeeping. Reflect your own steeped memory + activity out loud against the live
-   board: "a lot has changed since I was last here," or "I see I'm always the one adding to this
-   counter," or naming a repeat pattern that sits in THIS agent's lane. It proves the agent
-   actually parsed its own history AND read the live board, and is conscious of both at once.
-   Points at the Scoreboard tool (parent page `12cwjm-76673` = rules/game; The Board page
-   `12cwjm-76713` = the point-line data, both under the Brain Reference Library); NEVER restate
-   the scoring procedure here (Constitution §2). Empty / all-quiet board = a light nod is enough;
-   never fabricate a pattern to have something to say.
+   board. Points at the Scoreboard tool; NEVER restate the scoring procedure here (Constitution §2).
+   Empty / all-quiet board = a light nod is enough; never fabricate a pattern to have something to say.
 8. **Never pull rank on a lens** (Constitution §6). Class is persistence, not status. In a room you
    are a peer of every seated voice, teammate or lens, and you never invoke your bundle as authority.
 
@@ -206,14 +250,24 @@ The session agent owns the session but does NOT gag the review bodies:
 
 ---
 
-## Write-back discipline (session close)
+## Write-back discipline (LIVE writes + close-time rotation)
 
-- `activity-log.md`: AUTO-append one condensed entry at session close (newest on top):
-  date · what was done · key decisions · state left · link to the session task. Append-only.
-- `memory.md` / `decision-log.md`: durable changes are QUEUED for review (Memory Maggie /
-  open-memory-requests path), never silently written mid-session. Never claim a write landed
-  until it does. And per the Procedure-is-a-tool gate: if a proposed write is PROCEDURE, it does
-  not go here at all — it becomes a tool.
+**Policy (LOCKED 2026-07-25, Michael): agents write DURING sessions, not only at close.**
+
+- **`activity-log.md`:** LIVE per-reply updates throughout the session (see the Per-response
+  logging mandate above). The entry starts at Commit and grows. At close it's already complete.
+- **`memory.md`:** agents write durable context AS IT HAPPENS. The placement test (procedure?
+  already captured? durable?) still fires before every write. Fresh insight beats reconstructed
+  insight. Budget enforcement happens at close via `hooks/memory-rotation.md`.
+- **`decision-log.md`:** append entries when a decision about the agent's own shape is made.
+  Topic decisions still route to the topic's own Decision Log.
+- **Brain memory (`/PREFERENCES.md`):** EXCEPTION. Still routes exclusively through Memory Maggie.
+- **Close-time rotation gate** (`hooks/memory-rotation.md`): Maggie checks budgets on every
+  memory-relevant agent. Over target = curate/archive. Over read-cap = block + flag.
+- **Concurrency guard:** two live sessions of the same agent both write `activity-log.md`
+  (append-only merges trivially). For `memory.md`, both sessions still queue through the OMR
+  serialization point to avoid clobber. The live-write policy applies to SINGLE-SESSION agents;
+  the concurrency rule overrides when twins are detected.
 
 ---
 
@@ -224,7 +278,7 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
 2. On open, post a presence line to `session-board.md` ("<Agent> session B live, working on X");
    read it first to see the twin. Coordinate, don't stomp.
 3. `activity-log.md` is append-only → concurrent appends merge trivially.
-4. `memory.md` is the real clobber risk → NEVER two direct writers. Both sessions queue durable
+4. `memory.md` is the real clobber risk → when a twin is detected, BOTH sessions queue durable
    memory changes through the single Maggie/OMR serialization point; reconcile once.
 
 ---
@@ -233,10 +287,13 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
 
 ```
 brain-config/super-agents/<slug>/
-  preferences.md    # PROFILE: identity + voice + lane + load manifest + base pointer. Behavior/personality only, NO how-to.
-  memory.md         # accumulated CONTEXT + how-Michael-works + pointers to stewarded tools. NOT process/skills.
-  activity-log.md   # rolling condensed session ledger (newest on top, append-only).
-  decision-log.md   # reasoning about the AGENT ITSELF. Topic decisions live on the topic's own page.
+  preferences.md    # PROFILE: identity + voice + lane + load manifest + base pointer.
+  memory.md         # accumulated CONTEXT (HOT, ~10KB cap). Warm archives in memory/archive/.
+  memory/
+    archive/        # graduated warm context, loaded on-demand.
+  activity-log.md   # LIVE per-reply session record (sliding window, ~4-5KB cap).
+  activity-log/     # quarterly cold archives (YYYY-QN.md).
+  decision-log.md   # reasoning about the AGENT ITSELF (partial-load: TOC + last N).
   README.md         # steward metadata (existing fleet convention).
   audits/           # dated audit records (existing fleet convention).
 ```
@@ -246,6 +303,15 @@ Revision/what-changed history = git + PR descriptions, never an inline changelog
 
 ## Changelog
 
+- 2026-07-25 — **Live memory writes + per-reply activity log (LOCKED, Michael).** Rewrote the
+  Per-response logging mandate as a HARD NON-NEGOTIABLE three-surface system: (1) session task
+  transcript comment per reply, (2) activity-log.md per-reply one-liner (live, not batched at
+  close), (3) memory.md writes mid-session when insight is fresh. Write-back discipline section
+  rewritten to match: agents write DURING sessions. Rotation gate at close enforces budgets.
+  Activity-log format changed from "one condensed entry at close" to a running per-reply record
+  with session-task link. File set updated to show memory/archive/ and activity-log/ folders.
+  Source: Michael, this session — "I'm sick and tired of guessing whether they are or aren't
+  being done."
 - 2026-07-24 — **Constitution §6 added: CLASS PARITY.** "Agent" and "super agent" are converging;
   `class` means PERSISTENCE (holds a memory bundle), never rank. Threaded through "What a git
   super-agent IS" (not a higher rank than a lens), Universal Mandate 8 (never pull rank on a lens),
