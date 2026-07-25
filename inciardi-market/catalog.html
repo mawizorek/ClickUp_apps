@@ -14,8 +14,8 @@
      max-age, so without this a browser can hold a stale source/*.js while loading a fresh sibling.
      That's not cosmetic here: catalog.js calls thumbSrc/imgLadder/wireImg, which live in app-core.js —
      a half-stale pair is a ReferenceError and a blank page. app-dashboard learned this in PR #74. -->
-<link rel="stylesheet" href="source/base.css?v=16">
-<link rel="stylesheet" href="source/catalog.css?v=16">
+<link rel="stylesheet" href="source/base.css?v=17">
+<link rel="stylesheet" href="source/catalog.css?v=17">
 </head>
 <body>
 <header class="topbar"><div class="wrap row">
@@ -56,7 +56,7 @@
   <div class="count-line" id="countLine"></div>
   <div class="grid" id="grid"></div>
 
-  <footer class="footer"><span id="f-build">Inciardi Market v16</span><span id="f-src">connecting…</span></footer>
+  <footer class="footer"><span id="f-build">Inciardi Market v17</span><span id="f-src">connecting…</span></footer>
 </main>
 
 <dialog id="detail"><div class="drawer" id="detailInner"></div></dialog>
@@ -84,7 +84,7 @@
   <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Editing the catalog and storing images require the write key. Without it, the catalog is read-only.</p>
 </div></dialog>
 
-<script src="source/app-core.js?v=16"></script>
-<script src="source/catalog.js?v=16"></script>
+<script src="source/app-core.js?v=17"></script>
+<script src="source/catalog.js?v=17"></script>
 </body>
 </html>
