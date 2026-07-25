@@ -1,8 +1,17 @@
-# Milo — Activity Log (rolling session ledger)
+# Mainstage Milo — Activity Log
 
-> Newest on top. One condensed entry per session, appended at close. Append-only.
-> Format: `YYYY-MM-DD · what I did · key decisions · state left · [session task](url)`
+_Rolling condensed session ledger. Newest on top. Append-only._
 
 ---
 
-2026-07-21 · **Born as a git-teammate** — URITP Production Manager Assistant. Defined fresh via the Definition Playbook (not a mirror of the over-hatted native config) through the [Mainstage Milo — Definition Decision Log](https://app.clickup.com/36074068/docs/12cwjm-56933); built the full 5-file bundle; registered across the mirror pair (superagents.json + registry.json + AI Toolkit index). Key decisions: singular role spanning all PM facets; safety owned end-to-end; operates-not-owns the season; collaborates with Corey + future TA (no hard walls); update-uritp retired, not inherited. Agent-hierarchy question DEFERRED to task-93. State left: active, invocable via /session.agent=Milo; awaiting first real invocation. Open: confirm the full 7 URITP spaces (5 known). [session task](https://app.clickup.com/t/86ajmeqzp)
+## 2026-07-25 · Looped into the URITP list audit as context-keeper
+- **What was done:** Michael looped Milo into Audit Anna's ongoing top-down URITP list audit to STORE and carry the memory/context throughout. Wrote a full "URITP LIST AUDIT — live context" section into memory.md: the machinery (standing thread task 86ajknmmk, List Index 901327881037, Audit Frontier Scan, Roadmap doc-page-62, List Audit DoD), Space-1 progress, resolved facts, and the parked forks.
+- **Key facts locked:** PM Budetting = INTENT only, tracking upgraded to BETA BUDGET (RECEIPTS FY25-26 = BETA BUDGET's predecessor); Purchase Requests doubles as the public dept-head request form + 'me'-vs-'external' provenance; FMP report pipeline (catalog → monthly log, inbound); Safety Trainings is really a research library.
+- **Parked (do not lock yet):** ROLES↔PROGRAMS entity question; PROGRAM SPRAWL dividing-line. Michael deferred the dividing-line talk until Milo + Anna + other team members carry more context — Milo is to be ready to bring URITP workspace knowledge to that discussion.
+- **State left:** memory current through the PM Budetting confirm + PROGRAMS park. Anna continues the crawl (Risk Assessments, Season Planning next; loose lists last).
+- **Session task:** the URITP List Audit standing thread (86ajknmmk).
+
+---
+
+## 2026-07-21 · Build session (git-teammate)
+- Built fresh from the Definition Decision Log via the Definition Playbook (not a mirror of the retired over-hatted native config). Identity: URITP Production Manager Assistant, single coherent role. Bundle wired; registered across superagents.json + registry.json.
