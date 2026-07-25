@@ -28,6 +28,28 @@ indentation. Do NOT ask "should I split this?" and do NOT narrate routine splits
 The ONLY time size reaches Michael: no clean seam exists. Seams: styles vs logic,
 render modules by screen, shared state/constants, pure helpers, entry/wiring.
 
+## 📄 README = App Plan (LOCKED 2026-07-25, Michael)
+
+Every app's `README.md` IS its app plan. Not a changelog, not a how-to-use, not a
+secondary file alongside the plan. THE plan. Standard shape:
+
+1. **Page Hierarchy** — ASCII tree showing navigation structure. `index.html` is the
+   main window (shell + router); views nest inside it. Satellites (separate HTML files)
+   listed separately. Planned/future features placed IN the tree where they'll live,
+   marked with status indicators (🟡 PLANNED / 🔒 HELD / FUTURE).
+2. **Data Model** — what feeds the pages, schema tiers, enrichment status.
+3. **Source Modules** — file map with sizes and budget warnings.
+4. **Priority Queue** — ordered list of what to build next.
+5. **Related Docs** — pointer table to detailed specs (with freshness status).
+6. **Architecture Rules** — carry-forward constraints specific to this app.
+
+**What does NOT belong in a README:** version history (git does that), how-to-use
+instructions (the app is self-evident), duplicated spec content (point at it).
+
+**Why this works:** it's the file convention loads first (GitHub renders it, agents
+read it first). One file that makes every session start clean instead of
+rediscovering the app. Reference impl: `f1-racetracks/README.md` (PR #529/#530).
+
 ## 🎯 Canonical / generated / projection
 
 Every surface holding a fact is exactly one of: **CANONICAL** (authored here, wins on
@@ -114,4 +136,6 @@ the fleet. **Corey** owns ClickUp side — my domain stops at the repo boundary.
 - **A lock date is not a freshness guarantee.** On conflicting locks, newer + live
   evidence wins. Prescriptive text rots faster than descriptive text.
 - **`get_file_contents` returns real bodies.** The branch raw URL is the liar.
+- **Four overlapping docs = no entry point.** README IS the plan; consolidate there
+  instead of creating parallel files. (f1-racetracks, 2026-07-25)
 - [Full narratives]: `memory/archive/earned-narratives-2026-07-25.md`
