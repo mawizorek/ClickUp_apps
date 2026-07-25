@@ -1,6 +1,6 @@
-/* Inciardi Market v16 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
-const BUILD = "v16";
-const PR = 455; // merged PR that shipped this version
+/* Inciardi Market v17 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
+const BUILD = "v17";
+const PR = 475; // merged PR that shipped this version
 const API_DEFAULT = "https://inciardi-market.mawizorek-online.workers.dev";
 const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fallback can render
 
@@ -45,6 +45,17 @@ function setIdentity(name){
 }
 function signOut(){ localStorage.removeItem("inciardi_wkey"); localStorage.removeItem("inciardi_identity"); document.body.classList.toggle("can-write", false); }
 
+// ⚠️ NEVER let a data read be cached (learned 2026-07-25, cost hours of false diagnosis).
+// `worker.js` sets NO Cache-Control on its JSON responses, so the browser (and any intermediary)
+// is free to hold one. Symptom: the nightly harvest repaired all 177 retail prices in D1, the
+// worker's /debug proved it, and the app still rendered the OLD prices — same row, two different
+// values depending on who asked. It looks exactly like "the fix didn't deploy," which is the wrong
+// conclusion and sends you re-fixing working code.
+// `cache: "no-store"` forces a real round trip. The right long-term fix is a Cache-Control header
+// on the worker's json() helper; this is the client-side half, and it belongs here regardless
+// because the app must never render a stale ledger.
+const NO_STORE = { cache: "no-store" };
+
 async function apiGet(path, fallback){
  const key = "cache:" + path;
  const ctrl = new AbortController();
@@ -52,12 +63,14 @@ async function apiGet(path, fallback){
  try{
  let d;
  try{
- const r = await fetch(apiBase() + path, { headers:{ Accept:"application/json" }, signal: ctrl.signal });
+ const r = await fetch(apiBase() + path, { headers:{ Accept:"application/json" }, signal: ctrl.signal, ...NO_STORE });
  if(!r.ok) throw 0; d = await r.json(); if(d && d.error) throw 0;
  } finally { clearTimeout(timer); }
  try{ localStorage.setItem(key, JSON.stringify(d)); }catch(e){}
  return d;
  }catch(e){
+ // localStorage copy is an OFFLINE fallback only — reached when the fetch failed outright, never
+ // preferred over a live read. Keep it that way; making it a cache-first path re-creates the bug above.
  const c = localStorage.getItem(key); if(c){ try{ return JSON.parse(c); }catch(_){} }
  return fallback;
  }
@@ -66,7 +79,7 @@ async function apiPost(path, body){
  const ctrl = new AbortController();
  const timer = setTimeout(()=>ctrl.abort(), API_TIMEOUT_MS);
  try{
- const r = await fetch(apiBase() + path, { method:"POST", headers:{ "Content-Type":"application/json", "x-write-key": wkey() }, body: JSON.stringify(body), signal: ctrl.signal });
+ const r = await fetch(apiBase() + path, { method:"POST", headers:{ "Content-Type":"application/json", "x-write-key": wkey() }, body: JSON.stringify(body), signal: ctrl.signal, ...NO_STORE });
  const d = await r.json().catch(()=>({}));
  if(!r.ok || (d && d.error)) throw new Error((d && d.error) || ("HTTP "+r.status));
  return d;
@@ -112,6 +125,11 @@ function proxied(url, w){
       second miss — turning a slow image into a permanently missing one. A retry moves DOWN the
       ladder to a DIFFERENT source; only the final rung is allowed to give up.
    4. Grid images are always loading="lazy" + decoding="async" so the whole set isn't requested at once.
+   5. R2 holds ARCHIVAL bytes and the harvest only writes derivatives GOING FORWARD — it never
+      retroactively shrinks what's already stored. The 177 originals from before 2026-07-25 are
+      still full-res (and three are HEIC bytes under a .jpg key, blank outside Safari). That's why
+      thumbnails resolve to the CDN rather than R2: it makes the grid correct TODAY, independent of
+      a re-scrub that hasn't run. Don't "simplify" thumbs back onto ?key=.
 ============================================================================================ */
 
 // The image row the app should treat as "the" picture for a print.
