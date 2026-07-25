@@ -17,77 +17,142 @@ Not a results table. A race story told through data.
 
 ---
 
-## Pages
+## Page Hierarchy
 
-### Home Grid — LIVE
-- **Route:** `index.html` → `#/`
-- **Does:** 24-round card grid with current-round highlight card and lens switcher (Matrix / History / Circuits)
-- **Source:** `09_app_bootstrap_and_home.js`, `18_home_and_mobile_polish.js`
-- **Data:** `data.json`
+### `index.html` — THE MAIN WINDOW
 
-### Circuit Breakdown — LIVE
-- **Route:** `index.html` → `#/<slug>`
-- **Does:** Per-circuit deep view: track map, lap profile, sectors, tyre/overtaking character, weather, race history. Includes Weekend Center (schedule / live / replay)
-- **Source:** `10_track_views_and_profile.js`, `11_weather_and_footer_exports.js`, `14–17_weekend_*.js`
-- **Data:** `data.json` + `circuits/<slug>.json` + `f1-results/2026/<slug>.json`
+The app shell. Header with lens toggle, router, footer. Everything inside it is a view, not a separate page. This is what you're looking at when the app is open.
 
-### Standings — LIVE
-- **Route:** `standings.html`
-- **Does:** Drivers + Constructors championship tables. Points, position deltas, round-by-round breakdown.
-- **Source:** `source/standings/` (chunked)
-- **Data:** `f1-results/2026/index_rounds.json` + all round files
+```
+index.html
+├── Header (lens switcher: Matrix / History / Circuits)
+├── #/ ..................... Home Grid
+│   ├── Current-round highlight card
+│   └── 24-round card grid (filtered by active lens)
+│
+├── #/<slug> ............... Circuit Breakdown
+│   ├── Track map + lap profile + sector character
+│   ├── Tyre strategy + overtaking notes
+│   ├── Weather
+│   ├── Race history (podium/winners)
+│   ├── Weekend Center
+│   │   ├── Schedule tab
+│   │   ├── Live tab (OpenF1 hydration during sessions)
+│   │   └── Replay tab (post-race)
+│   └── Driver Popup (tap a driver → per-driver detail)
+│       ├── Position + team + fast lap
+│       ├── Qualifying times
+│       └── 🟡 Arc Visualization (PLANNED: grid→finish spine)
+│
+└── Footer (source tools, export, new-tab)
+```
 
-### Circuits Index — LIVE
-- **Route:** `circuits.html`
-- **Does:** Standalone circuit listing (country, length, laps, type). Alternative entry to circuit views.
-- **Data:** `data.json`
-
-### Weekend Race Detail — LIVE
-- **Route:** `weekend.html`
-- **Does:** Full race-detail for a completed round. 8 panels: podium, pole, fastest lap, grid, qualifying tiers, sprint, classification, championship swing. Driver popup with per-driver results.
-- **Source:** `source/weekend/` (chunked)
-- **Data:** `f1-results/2026/<round>.json`
-- **Architecture note:** self-contained monolith (30KB+), now backed by a chunk set for safe edits
-
-### Live Tracker — LIVE
-- **Route:** `live-tracker.html`
-- **Does:** Standalone OpenF1 companion. Timing tower, position changes, session status. Independent of main app routing.
-- **Source:** `13_live_session_panel.js`
+**Source:** `app-shell.js`, `09_app_bootstrap_and_home.js`, `10_track_views_and_profile.js`, `11_weather_and_footer_exports.js`, `14-17_weekend_*.js`, `18_home_and_mobile_polish.js`  
+**Data:** `data.json`, `circuits/<slug>.json`, `f1-results/2026/<slug>.json`
 
 ---
 
-## Golden state (what's not there yet)
+### `weekend.html` — RACE DETAIL (drilldown from Weekend Center)
 
-These are the planned surfaces and upgrades that make this app feel like race control instead of a results browser.
+The deep-dive into a single completed race. Reached from the circuit breakdown's Weekend Center. Self-contained (30KB+ monolith, backed by `source/weekend/` chunk set).
 
-### Story Mode — IN PROGRESS
-- **Where:** Results/Story toggle inside `weekend.html`
-- **Does:** Scrubber-driven position ladder, starting-grid wheel-cards, pit lane timeline, team radio feed. Continuous-time replay of the race as an arc.
-- **Status:** Reference build exists (`story-mode-reference.html`). Weekend chunk set exists. Splice into live `weekend.html` not yet done.
-- **Blocked on:** Reassembly verification (confirm chunks round-trip clean before adding new code)
-- **Spec:** `next-build-spec.md`
+```
+weekend.html
+├── Race Mast (round name, date, circuit)
+├── Mode Toggle: Results / Story
+│
+├── Results (default, LIVE)
+│   ├── Podium panel
+│   ├── Pole position
+│   ├── Fastest lap
+│   ├── Starting grid
+│   ├── Qualifying tiers (Q1/Q2/Q3 eliminations)
+│   ├── Sprint classification (sprint weekends)
+│   ├── Full race classification (20 cars)
+│   ├── Championship swing
+│   └── Driver Popup → per-driver race detail
+│       ├── Position, grid, qualifying times, fast lap
+│       ├── 🟡 Arc Visualization (PLANNED)
+│       ├── 🟡 Race Narrative: stewardNote + summary (PLANNED)
+│       ├── 🔒 Strategy row: stint chips (Tier 3, HELD)
+│       └── 🟡 DNF/gap detail (Tier 4, PLANNED)
+│
+└── Story (IN PROGRESS)
+    ├── Position ladder (scrubber-driven, continuous-time)
+    ├── Timing tower
+    ├── Starting-grid wheel-cards
+    ├── Pit lane timeline
+    └── Team radio feed
+```
 
-### Driver Arc Visualization — PLANNED
-- **Where:** Driver popup (existing, on circuit/weekend pages)
-- **Does:** Qualifying pos → grid → finish as a visual spine. Positions-gained signal. Penalty annotations from grid vs qualifying.pos mismatch. Steward narrative surfaced as headlines.
-- **Status:** Data exists for all 9 rounds (Tier 1 complete). Pure render job, no new schema needed.
-- **Spec:** Data-Story Layer doc §6
+**Source:** `source/weekend/` (base.css, panels.css, story.css, data.js, render.js, nav.js, story.js)  
+**Data:** `f1-results/2026/<round>.json`  
+**Story ref build:** `story-mode-reference.html` (splice from this, don't reinvent)
 
-### Race Narrative Section — PLANNED
-- **Where:** Circuit breakdown and/or weekend detail
-- **Does:** Promotes `summary` and `stewardNote` (already in round JSON) into a visible "what happened and why" section. Race control tells you the story behind the order.
-- **Status:** Data exists. Needs a render surface.
+---
 
-### Tyre Analysis Page — FUTURE
-- **Where:** New standalone page
-- **Does:** Compare compound characteristics across weekends. What actually differs between C3 and C4, with stint-length and degradation data.
-- **Needs:** `tyre-compounds.json` (proposed, not built), Tier 3 data backfill
-- **Spec:** Data-Story Layer doc §4B
+### Satellite Pages (standalone, linked from header/nav)
 
-### Season History View — FUTURE
-- **Where:** TBD (possibly a lens on the home grid)
-- **Does:** Cross-year comparison. Previous winners at each circuit, season-over-season performance.
-- **Needs:** Per-season folder population beyond 2026
+Separate HTML files with their own rendering. Not views inside index.html.
+
+#### `standings.html` — LIVE
+```
+standings.html
+├── Drivers Championship (ranked table, cumulative points, delta)
+└── Constructors Championship (team totals, driver splits)
+```
+**Source:** `source/standings/` (chunked)  
+**Data:** `f1-results/2026/index_rounds.json` + all round files
+
+#### `circuits.html` — LIVE
+```
+circuits.html
+└── Circuit listing (country, length, laps, type)
+    └── Each entry links back to index.html#/<slug>
+```
+**Data:** `data.json`  
+Alt-entry to the hash-routed circuit views. Useful as a directory.
+
+#### `live-tracker.html` — LIVE
+```
+live-tracker.html
+└── OpenF1 companion (timing tower, position changes, session status)
+```
+**Source:** `13_live_session_panel.js`  
+Standalone. Not part of main nav. Used during live sessions for the broader view.
+
+---
+
+### Future Pages (no code yet)
+
+#### Tyre Analysis — FUTURE
+```
+(new page TBD)
+└── Compound comparison across weekends
+    ├── C1-C5 characteristics + stint data
+    └── Per-weekend nomination context
+```
+**Needs:** `tyre-compounds.json`, Tier 3 backfill  
+**Spec:** Data-Story Layer doc §4B
+
+#### Season History — FUTURE
+```
+(lens on home grid, or new page TBD)
+└── Cross-year comparison
+    ├── Previous winners per circuit
+    └── Season-over-season performance
+```
+**Needs:** Per-season folder population beyond 2026
+
+---
+
+## Status Key
+
+- **LIVE** = shipped, working
+- **IN PROGRESS** = reference/spec exists, integration not done
+- 🟡 **PLANNED** = data exists, render surface not built
+- 🔒 **HELD** = design locked, execution waiting on Michael's call
+- **FUTURE** = needs new data + new page
 
 ---
 
@@ -105,8 +170,8 @@ These are the planned surfaces and upgrades that make this app feel like race co
 
 | Tier | Fields | Status |
 |------|--------|--------|
-| **1: Spine** | pos, driverId, driver, team, status, points, grid, qualifying {pos, q1, q2, q3}, onRoadPos | ✅ Complete r1–9 |
-| **2: Race Pace** | fastLap {time, lap} per driver | ⚠️ Silverstone only; r1–8 need backfill (Pass A) |
+| **1: Spine** | pos, driverId, driver, team, status, points, grid, qualifying {pos, q1, q2, q3}, onRoadPos | ✅ Complete r1-9 |
+| **2: Race Pace** | fastLap {time, lap} per driver | ⚠️ Silverstone only; r1-8 need backfill (Pass A) |
 | **3: Strategy** | tyres {stops, stints: [{compound, laps}]} + round-level tyreNomination | 🔒 Design locked, backfill held (Pass B) |
 | **4: Color** | dnf {lap, reason}, finishGap ("+1.611" / "+1 lap") | Planned, cheap, high narrative payoff |
 
@@ -125,15 +190,15 @@ Each driver's weekend is an arc across four position landmarks:
 
 ### Compute-once law
 
-Store raw facts, derive everything else at render. Never hand-store a value computable from what's already in the file. A correction to one raw fact fixes every derived view.
+Store raw facts, derive everything else at render. Never hand-store a value computable from what's already in the file.
 
 - **Store:** per-stint compound + laps, round tyreNomination, fastLap {time, lap}, pos/grid/status/points, finishGap
 - **Derive:** positionsGained, stop count, compound colour, stint lengths, cumulative gaps
 
 ### Proposed additions (not in repo)
 
-- `f1-results/tyre-compounds.json` — 7 types (C1–C5, INT, WET), season-keyed
-- Round-level `tyreNomination` — per-weekend compound-to-colour mapping (store absolute C-number, derive soft/med/hard label)
+- `f1-results/tyre-compounds.json` — 7 types (C1-C5, INT, WET), season-keyed
+- Round-level `tyreNomination` — per-weekend compound-to-colour mapping
 
 ---
 
@@ -160,7 +225,7 @@ Store raw facts, derive everything else at render. Never hand-store a value comp
 - `source/weekend/` — weekend.html chunk set (base.css, panels.css, story.css, data.js, render.js, nav.js, story.js)
 
 ### Budget rule
-~10–12KB target per module. 15KB = split now. Over 30KB = never round-trip through a single read. `09` is the worst offender and the next structural split candidate.
+~10-12KB target per module. 15KB = split now. Over 30KB = never round-trip through a single read. `09` is the worst offender.
 
 ---
 
@@ -168,39 +233,37 @@ Store raw facts, derive everything else at render. Never hand-store a value comp
 
 What to build next, in order:
 
-1. **Pass A: fastLap backfill r1–8** — data-only PR, single source (F1.com /fastest-laps per race page)
-2. **Driver arc visualization** — pure render on existing Tier 1 data, biggest UX upgrade for zero schema work
-3. **Race narrative section** — surface `summary` + `stewardNote` as visible race story, not buried in JSON
+1. **Pass A: fastLap backfill r1-8** — data-only PR, single source (F1.com /fastest-laps)
+2. **Driver arc visualization** — pure render on existing Tier 1 data, biggest UX upgrade
+3. **Race narrative section** — surface summary + stewardNote as visible story
 4. **Tier 4: dnf + finishGap** — cheap data dig, high narrative payoff
-5. **Story Mode splice** — reassemble weekend.html from chunks, verify round-trip, splice reference build
-6. **Tyres Pass B** — when Michael calls it; design locked, execution held
+5. **Story Mode splice** — reassemble weekend.html, verify round-trip, splice reference
+6. **Tyres Pass B** — when Michael calls it
 7. **Source split: 09_app_bootstrap** — structural health, no user-facing change
 
 ---
 
 ## Related Docs
 
-These files carry detail that this README points at but doesn't duplicate:
-
 | File | What it holds | Status |
 |------|---------------|--------|
-| `next-build-spec.md` | Detailed spec for the current build cycle (Story Mode v6) | Needs rewrite to match priority queue |
-| `story-mode-handoff.md` | Story Mode integration spec (toggle mechanism, data derivation, LOD tiers, theme) | Valid spec; blocker language outdated (chunk set now exists) |
-| `schema-shift-handoff.md` | Original JSON-shape brainstorm from Jul 7 | Superseded by Data-Story Layer doc; retain for provenance |
-| `story-mode-reference.html` | Working Story Mode build in weekend.html's exact tokens | Reference to splice from, not to reinvent |
-| Data-Story Layer (ClickUp doc) | Field scope, sources, tyre model, refresh procedure, UI story layer plan | The cleanest and most current data spec |
-| `source/source_index.md` | Source module descriptions | Should be verified against current file list |
+| `next-build-spec.md` | Detailed spec for Story Mode v6 cycle | Needs rewrite to match priority queue |
+| `story-mode-handoff.md` | Story integration spec (toggle, data derivation, LOD, theme) | Valid; blocker language outdated |
+| `schema-shift-handoff.md` | Original JSON-shape brainstorm (Jul 7) | Superseded by Data-Story Layer doc |
+| `story-mode-reference.html` | Working Story Mode in weekend.html's exact tokens | Splice from this |
+| Data-Story Layer (ClickUp doc) | Field scope, sources, tyre model, refresh procedure | Cleanest current data spec |
 
 ---
 
-## Architecture Rules (carry forward)
+## Architecture Rules
 
-- **`index.html` is an INDEX.** Router/shell referencing pages. Never stores a full app.
+- **`index.html` is the app shell.** Router + header + footer. Views render inside it.
+- **Satellites are separate HTML files** with their own render, linked from nav.
 - **Data nests inside its app.** `f1-racetracks/f1-results/2026/` — never a loose root folder.
-- **Data-only changes = no shell version bump.** Refresh the store without touching the app code.
-- **Two-artifact ship for over-cap files.** Running `index.html` + `source/` chunk set.
-- **Mobile-first.** No horizontal overflow at 320px. Touch targets 44px. Fluid clamp/min/%.
-- **Weekend hue-268 tokens throughout.** Chakra Petch + Inter + JetBrains Mono. 1px lines. The aesthetic is race control, not sports news.
+- **Data-only changes = no shell version bump.**
+- **Two-artifact ship for over-cap files.** Running file + `source/` chunk set.
+- **Mobile-first.** No overflow at 320px. Touch targets 44px. Fluid sizing.
+- **Weekend hue-268 tokens.** Chakra Petch + Inter + JetBrains Mono. 1px lines. Race control, not sports news.
 
 ---
 
