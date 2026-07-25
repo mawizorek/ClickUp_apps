@@ -6,9 +6,10 @@
 
 1. Before touching, editing, PR-ing, OR even talking about an app, **read this file first.**
 2. Compare the entry here against the version/state you *think* is current (your cached assumption).
-3. **Mismatch = STOP.** Do not edit or assert. Re-read the app from the repo at HEAD (raw-fetch the real bytes), reconcile, and only then proceed. A stale read is the exact failure this gate exists to catch.
+3. **Mismatch = STOP.** Do not edit or assert. Re-read the app from the repo at HEAD (**via the git blob API — see rule 6**), reconcile, and only then proceed. A stale read is the exact failure this gate exists to catch.
 4. **After any merged app PR, update this file in the same session** (bump the version + note). The index is only trustworthy if it's kept current the instant something ships.
 5. This gate is advisory-blocking on discussion, hard-blocking on edits.
+6. ⚠️ **VERIFY VIA THE BLOB API — NEVER `raw.githubusercontent.com` (added 2026-07-25).** Get the blob SHA from a directory listing, then read `https://api.github.com/repos/<owner>/<repo>/git/blobs/<sha>` and Base64-decode. Content-addressed = immutable = the only trustworthy read. **The raw path is cache-frozen and will hand you a months-old file while reporting success.** *(Rule 3 previously said "raw-fetch the real bytes" — that instruction was itself the trap. On 2026-07-25 a raw fetch of `app-dashboard/index.html` returned a cache-frozen **v2.3 monolith** — `APP_VERSION = 'v2.3'`, `APP_DATE = '2026-07-02'`, the pre-07-06 `EXCLUDED` list — while the blob at HEAD was the real 9,769-byte modular loader. Two files were caught lying via the raw path in a single session. The gate cannot be run on a read path that lies.)*
 
 ⚠️ **The gate cuts BOTH ways (added 2026-07-25).** This file is a claim about reality, not reality itself. On 2026-07-25 its `app-dashboard` row still carried a "main regressed, restore pending" warning from **2026-07-07** — the fix had shipped long before, and the note had gone **32 PRs stale**. An agent nearly ran a destructive revert off it. So: when this file and HEAD disagree, **HEAD wins and this file gets corrected** — never the reverse. Rule 3's "re-read the app at HEAD" is the tiebreaker, and a warning note is exactly as capable of rotting as a version number. Verify before you act on a ⚠️, especially a stale-dated one.
 
@@ -44,4 +45,5 @@ _Not apps (never PR as apps): template-app, brain-config, agent-reports, shared,
 
 **Changelog**
 
+- 2026-07-25 — Rule 3 repointed from `raw.githubusercontent.com` to the **git blob API**, and rule 6 added with the evidence. The verify gate had been instructing agents to verify via the one read path that is known to serve stale bytes; on this date the raw path returned a cache-frozen v2.3 monolith for `app-dashboard/index.html` against a real modular loader at HEAD. A verification rule that names an unreliable read path is worse than none.
 - 2026-07-25 — Reconciled against HEAD by Dev Dexter. Removed the stale `app-dashboard` regression warning (fix shipped, main is v4/PR #72). Stamped `on-track` v2.4 + the theme picker. Flagged On Track's broken brand-asset references. Added the both-ways clause to the verify gate + the version-stamp convention. Flagged the four unversioned rows.
