@@ -10,13 +10,13 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<!-- ?v= CACHE-BUST — bump on EVERY change to a file listed here. Pages serves local assets with a
-     max-age, so without this a browser can hold a stale source/*.js while loading a fresh sibling.
-     That's not cosmetic here: catalog.js calls thumbSrc/imgLadder/wireImg, which live in app-core.js —
-     a half-stale pair is a ReferenceError and a blank page. app-dashboard learned this in PR #74.
-     CSS counts too — v18 is a catalog.css-only fix, and without a bump the phone keeps the old rule. -->
-<link rel="stylesheet" href="source/base.css?v=18">
-<link rel="stylesheet" href="source/catalog.css?v=18">
+<!-- ?v= CACHE-BUST — bump on EVERY change to a file listed here, CSS included. Pages serves local
+     assets with a max-age, so without this a browser can hold a stale source/* while loading a fresh
+     sibling. Not cosmetic: catalog.js calls thumbSrc/imgLadder/wireImg from app-core.js, and a
+     half-stale pair is a ReferenceError and a blank page. app-dashboard learned this in PR #74;
+     v18 re-learned it when a CSS-only fix appeared to fail because the phone kept the old rule. -->
+<link rel="stylesheet" href="source/base.css?v=19">
+<link rel="stylesheet" href="source/catalog.css?v=19">
 </head>
 <body>
 <header class="topbar"><div class="wrap row">
@@ -57,7 +57,13 @@
   <div class="count-line" id="countLine"></div>
   <div class="grid" id="grid"></div>
 
-  <footer class="footer"><span id="f-build">Inciardi Market v18</span><span id="f-src">connecting…</span></footer>
+  <!-- TWO version stamps, deliberately. #f-build is REWRITTEN at runtime by app-core (it reports the
+       JS build), so it CANNOT tell you whether the CSS/HTML you're looking at is fresh — during the
+       v18 debug it read "v17" on a v18 page and sent the diagnosis down the wrong path for a round.
+       #f-assets is plain static HTML that nothing overwrites: if it doesn't say the version you just
+       shipped, the browser is serving stale HTML and no amount of ?v= bumping will help — load the
+       page with a fresh query string. Keep both, and keep them independent. -->
+  <footer class="footer"><span id="f-build">Inciardi Market</span><span id="f-assets">assets v19</span><span id="f-src"></span></footer>
 </main>
 
 <dialog id="detail"><div class="drawer" id="detailInner"></div></dialog>
@@ -85,7 +91,7 @@
   <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Editing the catalog and storing images require the write key. Without it, the catalog is read-only.</p>
 </div></dialog>
 
-<script src="source/app-core.js?v=18"></script>
-<script src="source/catalog.js?v=18"></script>
+<script src="source/app-core.js?v=19"></script>
+<script src="source/catalog.js?v=19"></script>
 </body>
 </html>

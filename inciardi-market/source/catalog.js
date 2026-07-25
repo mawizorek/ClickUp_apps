@@ -66,7 +66,7 @@ function render(){
  const owned=ownedSet();
  let list=(CATALOG.prints||[]).filter(p=>(state.cat==="all"||p.category===state.cat)&&matchQ(p,state.q));
  if(state.ebayOnly) list=list.filter(p=>marketFor(MARKET,p));
- // numeric collation: the shop names mini variants "#1", "#10", "#100" and a plain
+ // numeric collation: the shop names some mini variants "#1", "#10", "#100" and a plain
  // localeCompare orders those 1, 10, 100, 11. {numeric:true} counts like a human does.
  list.sort((a,b)=>(!!b.image-!!a.image)||a.name.localeCompare(b.name,undefined,{numeric:true,sensitivity:"base"}));
  const total=(CATALOG.prints||[]).length;
@@ -76,9 +76,9 @@ function render(){
  grid.innerHTML=list.map((p,i)=>cardHTML(p,i,owned)).join("");
  grid.querySelectorAll(".card").forEach((el,i)=>{
   el.addEventListener("click",()=>openDetail(el.dataset.key));
-  // wireImg owns the load/error lifecycle now (app-core). The old handler retried the SAME
-  // url with a cache-bust, which re-downloaded the multi-MB file that had just failed and
-  // then hid the card outright on the second miss. A retry must move DOWN the ladder.
+  // wireImg owns the load/error lifecycle (app-core). The pre-v16 handler retried the SAME url with
+  // a cache-bust, re-downloading the multi-MB file that had just failed, then hid the card on the
+  // second miss. A retry must move DOWN the ladder to a different source.
   wireImg(el.querySelector("img"), imgLadder(list[i], 360));
  });
 }
@@ -86,9 +86,22 @@ function phStyle(cat){ const h=THUMB_HUE[cat]||72; return `background:oklch(30% 
 function cardHTML(p,i,owned){
  const m=marketFor(MARKET,p);
  // thumbSrc, NOT p.image: p.image is the R2 ARCHIVAL original (1-3MB here). See the Image
- // Rendering Law in the README — a grid never paints an original.
- const img=p.image?`<img src="${esc(thumbSrc(p,360))}" alt="${esc(p.name)}" loading="lazy" decoding="async">`:"";
- const ph=`<div class="ph" style="${phStyle(p.category)}">${p.image?"":initials(p.name)}</div>`;
+ // Rendering Law in app-core.js — a grid never paints an original.
+ //
+ // ⚠️ INLINE opacity:1 IS LOAD-BEARING, NOT REDUNDANT (2026-07-25).
+ // v18 removed an `opacity:0` gate from catalog.css that was hiding every grid image until JS
+ // added a class. The fix was correct but it shipped in a STYLESHEET, and a stylesheet can be
+ // served stale from cache while the HTML and JS around it are fresh — so the bug appeared to
+ // survive its own fix. An inline style beats any cached stylesheet rule, so the image is
+ // visible even on a browser still holding the old CSS. Keep it. Cheap insurance against the
+ // one failure mode that made this bug take four attempts to kill.
+ const img=p.image?`<img src="${esc(thumbSrc(p,360))}" alt="${esc(p.name)}" loading="lazy" decoding="async" style="opacity:1;position:relative;z-index:1">`:"";
+ // Initials render ALWAYS, behind the image — not only when p.image is missing. Before this, a
+ // failed image left a featureless colored square, indistinguishable from "no image on file."
+ // That ambiguity is exactly what made three rounds of diagnosis go to the wrong layer: the
+ // missing initials WERE the tell that an <img> existed, and it was too subtle to read.
+ // Now a broken image degrades to a legible tile and the state is obvious at a glance.
+ const ph=`<div class="ph" style="${phStyle(p.category)}">${initials(p.name)}</div>`;
  const key=esc(p.print_id||p.name);
  return `<button class="card" data-key="${key}" style="--i:${i}">
    <div class="frame">${ph}${img}${p.exclusive?`<span class="excl">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>`:""}${m?`<span class="mkt">${m.count} on eBay</span>`:""}${isOwned(p,owned)?`<span class="owned">Owned</span>`:""}</div>
@@ -115,13 +128,14 @@ function openDetail(key){
      <div class="field"><label>Print name</label><input id="ed-name" value="${esc(p.name)}" spellcheck="false"></div>
      <div class="row2">
        <div class="field"><label>Category</label><select id="ed-cat">${catOpts(p.category)}</select></div>
-       <div class="field"><label>Retail ($)</label><input id="ed-retail" type="number" step="1" value="${p.retail!=null?p.retail:""}"></div>
+       <div class="field"><label>Retail ($)</label><input id="ed-retail" type="number" step="0.01" value="${p.retail!=null?p.retail:""}"></div>
      </div>
      <div class="ed-row"><button type="button" class="btn primary sm" id="ed-save">Save &amp; lock</button><button type="button" class="btn ghost sm" id="ed-cancel">Cancel</button></div>
      <p class="ed-hint">Locks this print so the nightly shop sync keeps your title instead of overwriting it. The old name is kept as a search alias so eBay matching still works.</p>
    </form>
    <div class="dt-tags"><span class="chip">${CAT_LABELS[p.category]||p.category||""}</span>${p.exclusive?`<span class="chip plum">${EXCL_LABEL[p.exclusive]||p.exclusive}</span>`:""}${m?`<span class="chip up">On eBay now</span>`:""}</div>
    <div class="dt-facts">${facts}</div>
+   ${staleRetailNote(p)}
    <div id="imgMgr"></div>
    <div class="dt-actions">
     <a class="btn" href="${ebayUrl}" target="_blank" rel="noopener">Find on eBay</a>
@@ -134,9 +148,33 @@ function openDetail(key){
  const eb=$("dtEditBtn"); if(eb) eb.addEventListener("click",()=>{ const f=$("dtEditForm"); f.hidden=!f.hidden; if(!f.hidden){ $("ed-name").focus(); $("ed-name").select(); } });
  const esv=$("ed-save"); if(esv) esv.addEventListener("click",()=>saveEdit(p));
  const ecx=$("ed-cancel"); if(ecx) ecx.addEventListener("click",()=>{ $("dtEditForm").hidden=true; });
+ const fx=$("fixRetail"); if(fx) fx.addEventListener("click",()=>fixStaleRetail(p));
  document.body.classList.toggle("can-write",canWrite());
  renderImgMgr(p);
  $("detail").showModal();
+}
+
+// A retail under $1 is always the fingerprint of the pre-2026-07-25 `/100` harvest bug (no Inciardi
+// print has ever cost cents). The nightly harvest CANNOT repair these on its own: it only sees
+// products currently published on the shop, so a retired/sold-out print is never revisited and keeps
+// its wrong value forever. Surface it with a one-tap repair instead of leaving a silent bad number,
+// and note WHY it can't self-heal so nobody waits on a cron that will never touch it.
+function isStaleRetail(p){ return p.retail!=null && p.retail > 0 && p.retail < 1; }
+function staleRetailNote(p){
+ if(!isStaleRetail(p)) return "";
+ const real=Math.round(p.retail*100);
+ return `<div class="dedupe-warn">Retail looks off by 100x — almost certainly <b>$${real}</b>, stored before the price fix. This print is retired, so the nightly shop sync can't correct it (it only reads products still listed).<span class="write-only" style="display:block;margin-top:10px"><button class="btn sm primary" id="fixRetail">Set to $${real} &amp; lock</button></span></div>`;
+}
+async function fixStaleRetail(p){
+ if(!canWrite()){ toast("sign in first",true); return; }
+ const real=Math.round(p.retail*100);
+ try{
+  toast("fixing\u2026");
+  // Full row back: the worker upsert clobbers every field on conflict. locked:1 so it sticks.
+  await apiPost("/catalog",{ print_id:p.print_id, title:p.name, category:p.category, exclusive:p.exclusive||null, retail:real, in_print:p.available?1:0, pack_of:p.packOf??null, pack_from:p.packFrom??null, aliases:p.aliases||[], notes:p.notes??null, source:p.source||"manual", locked:1 });
+  toast(`retail set to $${real}`);
+  await refreshCatalog(p.print_id);
+ }catch(e){ toast(e.message,true); }
 }
 
 // Rename / re-categorize a catalogued print. Sends the FULL row back (the worker upsert clobbers every
@@ -166,7 +204,7 @@ function renderImgMgr(p){
   return;
  }
  const imgs=p.images||[]; const active=imgs.filter(i=>i.status==="active"); const arch=imgs.filter(i=>i.status==="archived");
- // Same law as the grid: these are ~64px chips, so they get a derivative, never the original.
+ // Same law as the grid: these are ~82px chips, so they get a derivative, never the original.
  const thumb=(i)=>`<div class="thumb ${i.is_primary?"primary":""} ${i.status==="archived"?"arch":""}">${i.url?`<img src="${esc(imageThumb(i,200))}" alt="" loading="lazy" decoding="async">`:""}${i.is_primary?`<span class="badge">Main</span>`:""}<div class="thumb-acts">${i.status==="active"?(i.is_primary?"":`<button data-op="primary" data-id="${i.image_id}">Set</button>`)+`<button data-op="archive" data-id="${i.image_id}">Arch</button>`:`<button data-op="restore" data-id="${i.image_id}">Restore</button><button data-op="delete" data-id="${i.image_id}">Del</button>`}</div></div>`;
  const seedUrl = p.image && /^https?:/.test(p.image) && p.image.includes("cdn.shopify.com") ? p.image : (p._srcUrl||"");
  box.innerHTML=`
@@ -177,7 +215,8 @@ function renderImgMgr(p){
    <label class="btn sm"><input type="file" accept="image/*" id="upIn" hidden>Upload photo</label>
    ${seedUrl?`<button class="btn sm" id="scrubBtn">Scrub &amp; store original</button>`:""}
   </div>`;
- box.querySelectorAll(".thumbs img").forEach((im,n)=>wireImg(im, imageLadder(imgs.filter(x=>x.status==="active").concat(imgs.filter(x=>x.status==="archived"))[n], 200)));
+ const ordered=imgs.filter(x=>x.status==="active").concat(imgs.filter(x=>x.status==="archived"));
+ box.querySelectorAll(".thumbs img").forEach((im,n)=>wireImg(im, imageLadder(ordered[n], 200)));
  box.querySelectorAll(".thumb-acts button").forEach(b=>b.addEventListener("click",()=>imgOp(b.dataset.op,b.dataset.id)));
  const up=$("upIn"); if(up) up.addEventListener("change",()=>uploadImg(p, up.files[0]));
  const sb=$("scrubBtn"); if(sb) sb.addEventListener("click",()=>scrubStore(p, seedUrl));
