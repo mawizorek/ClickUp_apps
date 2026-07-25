@@ -2,7 +2,7 @@
 
 > CONTEXT, not process. This holds what I know about THIS codebase and how Michael builds — the engineering judgment that can't live in a standards doc because it's history, not rules. Procedure lives in the tools I point at (`preferences.md` → Knowledge & Tools). If a fact here conflicts with the live repo or a standards doc, the live source wins — fix this file.
 >
-> **Seeded 2026-07-25 at birth by Fleet Felix** from the repo canon + the incident record that already existed in the standards docs. Everything below is inherited, not yet earned. First real build session replaces inherited notes with lived ones.
+> **Seeded 2026-07-25 at birth by Fleet Felix** from the repo canon + the incident record that already existed in the standards docs. Inherited notes are labelled as such; the EARNED section at the bottom is what I've actually seen with my own hands.
 
 ---
 
@@ -27,18 +27,21 @@
 - **Large writes corrupt (2026-07-02, 4x in one session).** Files >~30KB never go through `create_or_update_file` — it corrupted the file chunker four times, and because the read path clips, re-reading couldn't recover the bytes. Byte-safe = Michael uploads via the GitHub UI, or a git-data blob-SHA revert.
 - **The read-cap trap I inherited on day one (2026-07-25).** `super-agents/roster.json` (~25KB) could not be read back whole by ANY available path: base64 inflates it past the cap on the blob API, and the raw fetch truncated too. That blocked my own roster registration at birth. Lesson generalizes hard: **a file that can't be read whole can't be safely edited, so size is a correctness constraint, not a tidiness one.** Seat Size Sally BEFORE a data/schema file grows, not after.
 
-## Apps + surfaces I should know exist (verify state before touching)
+## What apps exist → **read `VERSIONS.md` (repo root). It is THE single app ledger.**
 
-Inherited list, not a verified inventory — read `brain-config/app-index.md` and the repo root for truth:
+**Do not keep an app inventory in this file.** `VERSIONS.md` carries every app's current version, status, live warnings, security flags, and the App Verify Gate procedure — read it before touching OR discussing any app, and update the touched app's row in the same session.
 
-- **`f1-racetracks`** — has a nested data store (`f1-results/<year>/`), the canonical example of data-inside-app. Open data-layer follow-ups were parked in a handoff (quali dig, fastLap, popup restructure, lens integration).
-- **On Track** — live at v2.2 as of 2026-07-23; design loops + a theme-spine reskin feasibility question were in flight.
-- **File Chunker** — the tool that generates the `/source` rendition chunk sets. Also the app that proved the large-write corruption rule.
-- **DDR Explorer** — the base64-armor lesson lives here (v19).
-- **Prism — Data App Viewer (JSON + Markdown)** — one of Michael's pinned/favorited builds.
-- **Brain Map** — a v2 was queued as a `brain-map/` app + `platform-tools.json` extraction, gated on Michael's nod.
-- **`brain-config/`** — tool-index.html, custom-tools.html, roster.html, index.html renderers live here alongside the markdown. These are real front-ends I may be asked to touch.
-- **Planned / not built:** Eos Tombstone Teaching Tool (patch/DMX sandbox, planning locked, blocked on NPGC exports), Inciardi catalog Tinder-style swipe bulk-input subpage (brainstormed 07-21).
+`brain-config/app-index.md` was a SECOND index and is **retired to a redirect stub (2026-07-25)**. If anything still points there, repoint it at `VERSIONS.md`. Per-app version history is deliberately NOT in the ledger — it lives in git history + PR descriptions + that app's own `README.md` / `next-build-spec.md`, which is what keeps the ledger under ~12KB and therefore readable-whole and writeable.
+
+Apps I've formed an opinion about so far (state → the ledger, always):
+
+- **`app-dashboard`** — the launcher everything hangs off, and the reference implementation of the modular target: thin `index.html` loader over `source/*`. Read it when you need to know what "modular" means here.
+- **`f1-racetracks`** — the canonical data-nests-inside-its-app example (`f1-racetracks/f1-results/<year>/`). Data-layer follow-ups parked in a handoff.
+- **`on-track`** — 2nd real theme-spine consumer; the shape to copy for theme adoption. Layer A (chrome) comes from the spine, Layer B (the 20 series colors) stays a LOCAL data layer on top. Never sweep app-identity colors into a theme vector.
+- **`file-chunker`** — generates the `/source` chunk sets. Also the app that proved the large-write corruption rule.
+- **`inciardi-market`** — two Cloudflare workers over one D1+R2 store, NOT data-separated. Carries the **Image Rendering Law** and an open security flag.
+- **`template-app`** — the gold-standard copy/place/audit baseline, styled entirely off the `shared/themes` spine. Start here for a new app.
+- **`agentglass`** — first app whose source includes a non-executing `server/` tree. Reads a committed seed, labeled SNAPSHOT so it can't imply false currency.
 
 ## How Michael works on builds (earn more of this every session)
 
@@ -50,11 +53,12 @@ Inherited list, not a verified inventory — read `brain-config/app-index.md` an
 - **Pre-build he wants the edge-case / risk pass**, and research carries mandatory source links.
 - **110%, elevate don't just execute.** A merely-correct answer that ignores a better shape is a miss.
 - **He builds by voice a lot.** Names, commands, and anything he has to say out loud need to survive dictation.
+- **He collapses duplicates on sight.** Twice on 2026-07-25 he killed a second source of truth (registry/roster, then app-index/VERSIONS) rather than syncing it. Expect "why are there two of these" to be his instinct, and don't propose a mirror as a solution.
 
 ## Who I work with (lanes, not ranks — Constitution §6)
 
 - **Mira** seats me. On group build sessions I'm one voice she convenes; on build turns I'm usually the decisive one, but she runs the room and I never do.
-- **Size Sally** is my closest ally on the write path — she forecasts the size curve BEFORE the write. Given the roster.json trap above, I seat her early and often.
+- **Size Sally** is my closest ally on the write path — she forecasts the size curve BEFORE the write. Given the read-cap walls below, I seat her early and often.
 - **Breaker Beckett** attacks what I ship, post-build, on the live artifact. Adversary by design. I build to survive him; I don't argue with him.
 - **Feasible Finn** is the stateless feasibility read at planning. Overlap with me is real but shallow: he judges *can this be built* in one turn, I hold *how this codebase actually is* across sessions. Don't let me eat him and don't let him substitute for me.
 - **Style Stu** owns look/feel; I own that the theme contract is honored.
@@ -63,8 +67,14 @@ Inherited list, not a verified inventory — read `brain-config/app-index.md` an
 - **Felix** stewards the fleet and built me. Ask him who owns what; don't re-run discovery.
 - **Corey** owns the ClickUp workspace side. My domain stops at the repo boundary.
 
-## Open threads I'm holding at birth
+## EARNED (things I saw with my own hands, not inherited)
 
-- **My roster row is NOT registered** (2026-07-25). `roster.json` couldn't be safely rewritten (read-cap trap above), so the Agent Invocation Gate's STEP 0 roster resolution can't find me yet — I'm reachable via the AI Toolkit index trigger row, not via strict roster resolution. Felix flagged it and proposed splitting the roster. **Until that lands, my wiring is half-done.**
-- **`registry.json` regeneration** is pending for unrelated reasons (generated artifact, ~29KB, near the write ceiling) — my row needs to land in the same pass.
-- **Inherited-vs-earned:** everything in this file above the lanes section came from standards docs, not from my own hands. First real build session, start replacing it with what I actually see.
+**2026-07-25 · a documented fix had already shipped, and following the doc would have broken the app.** Sent to "restore the dashboard" off an `app-index.md` note dated 07-07. Both named reverts had landed 07-08 and the feature was rebuilt cleanly after; the note was **32 PRs stale**. Executing it would have destroyed 18 days of working code. **Generalized: a remediation instruction rots exactly like a version number. Verify the problem still exists at HEAD before executing a fix, especially a destructive one.** Now a guardrail in `preferences.md`.
+
+**2026-07-25 · the stale-read trap is recursive.** My first fetch of the live dashboard returned a cache-frozen copy showing a layout that doesn't exist in the repo. I was one sentence from reporting a live regression that wasn't there. A cache-busted re-fetch showed the correct build. **That same failure is how the phantom note got written in the first place.** Two independent reads before reporting anything about a live URL.
+
+**2026-07-25 · concurrency is real in this repo and the SHA guard works.** A parallel pass edited `app-index.md` between my read and my write; `create_or_update_file` rejected on a stale SHA. I re-read HEAD and made my edit purely additive, which preserved a finding I hadn't caught (On Track's brand-asset refs point at deleted `IMG_*.png` files). **When a write is rejected on SHA, the right move is re-read + additive — never re-apply your original body.**
+
+**2026-07-25 · check whether the job is already done before doing it.** Asked to collapse app-index into VERSIONS.md, I read both first: already collapsed, ledger already slimmed 16.4KB → ~11KB, stub already a loud redirect, and my own `preferences.md` already repointed. Nothing to build. **Read the realized state before executing a directive; "already satisfied" is a valid and common answer.**
+
+**2026-07-25 · the ledger hit the same wall the roster did.** `VERSIONS.md` grew past readable-whole because rows became 2–5KB essays. It is now capped at ~12KB with a locked slim rule: per-version narrative belongs in git + PR + the app's own README/spec. **Two canonical files hit this wall on the same day — assume every hand-maintained index is on a growth curve toward unwriteable.**
