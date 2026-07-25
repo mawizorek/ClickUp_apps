@@ -1,8 +1,15 @@
-/* Inciardi Market v17 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
-const BUILD = "v17";
-const PR = 475; // merged PR that shipped this version
+/* Inciardi Market v22 — shared core: API client, chrome, helpers. Loaded before each page's own js. */
+const BUILD = "v22";
+const PR = 483; // merged PR that shipped this version
 const API_DEFAULT = "https://inciardi-market.mawizorek-online.workers.dev";
-const API_TIMEOUT_MS = 6000; // dead/slow Worker must fail fast so the seed fallback can render
+
+// Timeouts are PER-PATH now. A flat 6s was the bug: /catalog returns 177 prints each with a nested
+// image array, and on mobile that legitimately exceeds 6s — so the abort fired on a HEALTHY request
+// and the app fell back to stale localStorage. See the FETCH HONESTY LAW below.
+const API_TIMEOUT_MS = 9000;            // default
+const API_TIMEOUT_HEAVY_MS = 25000;     // /catalog, /market — big payloads, be patient
+const HEAVY_PATHS = ["/catalog", "/market", "/inventory"];
+function timeoutFor(path){ return HEAVY_PATHS.some(p=>path.startsWith(p)) ? API_TIMEOUT_HEAVY_MS : API_TIMEOUT_MS; }
 
 // ============================================================ SOFT LOGIN (fill these in once)
 // Michael + Nick clear/refresh browsers constantly, so pasting the write key each time never sticks.
@@ -45,45 +52,132 @@ function setIdentity(name){
 }
 function signOut(){ localStorage.removeItem("inciardi_wkey"); localStorage.removeItem("inciardi_identity"); document.body.classList.toggle("can-write", false); }
 
-// ⚠️ NEVER let a data read be cached (learned 2026-07-25, cost hours of false diagnosis).
-// `worker.js` sets NO Cache-Control on its JSON responses, so the browser (and any intermediary)
-// is free to hold one. Symptom: the nightly harvest repaired all 177 retail prices in D1, the
-// worker's /debug proved it, and the app still rendered the OLD prices — same row, two different
-// values depending on who asked. It looks exactly like "the fix didn't deploy," which is the wrong
-// conclusion and sends you re-fixing working code.
-// `cache: "no-store"` forces a real round trip. The right long-term fix is a Cache-Control header
-// on the worker's json() helper; this is the client-side half, and it belongs here regardless
-// because the app must never render a stale ledger.
+/* ============================================================ FETCH HONESTY LAW
+   🔴 A CACHE THAT FAILS SILENTLY DOES NOT DEGRADE GRACEFULLY — IT LIES.
+
+   This is the single most expensive lesson in this app's history. On 2026-07-25 three separate
+   caching layers each independently served stale data with no visible signal, and the cost was an
+   entire day of misdiagnosis: fixes shipped, verified correct in the database, and the phone kept
+   showing old values. Every "it's still broken" report was HALF TRUE — the code was fixed, the data
+   was old — which is the most confusing possible failure mode because it makes correct fixes look
+   wrong and sends you re-fixing working code.
+
+   The three layers, all of which I built as "resilience":
+     1. HTTP cache — worker.js sets no Cache-Control. Fixed v17 with cache:"no-store".
+     2. Stylesheet cache — a CSS-only fix was defeated by the cache it was fixing. Fixed v19 with an
+        inline style + a static #f-assets version marker.
+     3. localStorage fallback — THIS ONE. apiGet aborted at a flat 6s and silently substituted an old
+        snapshot. /catalog (177 prints + nested image arrays) legitimately exceeds 6s on mobile, so
+        the abort was firing on HEALTHY requests and the fallback was winning ROUTINELY, not rarely.
+
+   THE LAW, and it generalizes past this app:
+   • Any fallback path MUST announce itself in the UI. Not console. Not a comment. On screen, where
+     the person looking at the wrong number can see WHY it's wrong.
+   • A timeout must be sized to the payload it guards, not to a round number that felt nice.
+   • Cached data must carry its age. "Stale" with no timestamp is unactionable.
+   • Prefer showing NOTHING with an honest error over showing OLD data silently. A blank state sends
+     you to the network; a stale state sends you to re-fix working code.
+   • Corollary from the v18/v19 image saga: this is the same disease as gating visibility on a JS
+     class. Both make a failure invisible. Invisible failures get misattributed to the wrong layer.
+============================================================================================ */
+
 const NO_STORE = { cache: "no-store" };
 
+// Provenance ledger: every read records HOW it resolved. The UI reads this, so the app can never
+// again present cached data as if it were live.
+const FETCH_STATE = {};   // path -> { source:"live"|"cache"|"empty", at:ms, age:ms|null, error:string|null }
+function fetchState(){ return FETCH_STATE; }
+function isStale(){ return Object.values(FETCH_STATE).some(s=>s.source==="cache"); }
+function staleSummary(){
+ const bad=Object.entries(FETCH_STATE).filter(([,s])=>s.source!=="live");
+ if(!bad.length) return null;
+ const oldest=bad.reduce((a,[,s])=>Math.max(a,s.age||0),0);
+ return { paths:bad.map(([p])=>p), oldest, error:(bad.find(([,s])=>s.error)||[])[1]?.error||null };
+}
+
 async function apiGet(path, fallback){
- const key = "cache:" + path;
+ const key = "cache:" + path, stampKey = "cachedAt:" + path;
  const ctrl = new AbortController();
- const timer = setTimeout(()=>ctrl.abort(), API_TIMEOUT_MS);
+ const timer = setTimeout(()=>ctrl.abort(), timeoutFor(path));
  try{
- let d;
- try{
- const r = await fetch(apiBase() + path, { headers:{ Accept:"application/json" }, signal: ctrl.signal, ...NO_STORE });
- if(!r.ok) throw 0; d = await r.json(); if(d && d.error) throw 0;
- } finally { clearTimeout(timer); }
- try{ localStorage.setItem(key, JSON.stringify(d)); }catch(e){}
- return d;
+  let d;
+  try{
+   const r = await fetch(apiBase() + path, { headers:{ Accept:"application/json" }, signal: ctrl.signal, ...NO_STORE });
+   if(!r.ok) throw new Error("HTTP "+r.status);
+   d = await r.json();
+   if(d && d.error) throw new Error(d.error);
+  } finally { clearTimeout(timer); }
+  try{ localStorage.setItem(key, JSON.stringify(d)); localStorage.setItem(stampKey, String(Date.now())); }catch(e){}
+  FETCH_STATE[path] = { source:"live", at:Date.now(), age:0, error:null };
+  renderDataBanner();
+  return d;
  }catch(e){
- // localStorage copy is an OFFLINE fallback only — reached when the fetch failed outright, never
- // preferred over a live read. Keep it that way; making it a cache-first path re-creates the bug above.
- const c = localStorage.getItem(key); if(c){ try{ return JSON.parse(c); }catch(_){} }
- return fallback;
+  // FALLBACK — and it is now LOUD. It still serves the cached copy (offline is a real use case on a
+  // phone in a shop) but it records the provenance and paints a banner, so a wrong number on screen
+  // always comes with the reason it's wrong. Never silent. Never again.
+  const msg = (e && e.name==="AbortError") ? "timed out" : ((e && e.message) || "request failed");
+  const c = localStorage.getItem(key);
+  if(c){
+   try{
+    const parsed = JSON.parse(c);
+    const at = Number(localStorage.getItem(stampKey)) || null;
+    FETCH_STATE[path] = { source:"cache", at, age: at ? Date.now()-at : null, error: msg };
+    renderDataBanner();
+    return parsed;
+   }catch(_){}
+  }
+  FETCH_STATE[path] = { source:"empty", at:Date.now(), age:null, error: msg };
+  renderDataBanner();
+  return fallback;
  }
 }
 async function apiPost(path, body){
  const ctrl = new AbortController();
- const timer = setTimeout(()=>ctrl.abort(), API_TIMEOUT_MS);
+ const timer = setTimeout(()=>ctrl.abort(), timeoutFor(path));
  try{
- const r = await fetch(apiBase() + path, { method:"POST", headers:{ "Content-Type":"application/json", "x-write-key": wkey() }, body: JSON.stringify(body), signal: ctrl.signal, ...NO_STORE });
- const d = await r.json().catch(()=>({}));
- if(!r.ok || (d && d.error)) throw new Error((d && d.error) || ("HTTP "+r.status));
- return d;
+  const r = await fetch(apiBase() + path, { method:"POST", headers:{ "Content-Type":"application/json", "x-write-key": wkey() }, body: JSON.stringify(body), signal: ctrl.signal, ...NO_STORE });
+  const d = await r.json().catch(()=>({}));
+  if(!r.ok || (d && d.error)) throw new Error((d && d.error) || ("HTTP "+r.status));
+  return d;
+ }catch(e){
+  // A write that times out is NOT a write that failed — it may well have landed. Say exactly that
+  // rather than implying it didn't; a false "failed" makes people re-submit and double-write.
+  if(e && e.name==="AbortError") throw new Error("timed out — the save may or may not have landed; reload to check");
+  throw e;
  } finally { clearTimeout(timer); }
+}
+
+// The banner. Fixed to the top, impossible to miss, names the age and the reason.
+// Deliberately NOT a toast: a toast disappears, and this condition persists until a reload succeeds.
+function renderDataBanner(){
+ const s = staleSummary();
+ let el = $("dataBanner");
+ if(!s){ if(el) el.remove(); return; }
+ if(!el){
+  el = document.createElement("div");
+  el.id = "dataBanner"; el.className = "databanner";
+  document.body.appendChild(el);
+ }
+ const anyCache = Object.values(FETCH_STATE).some(x=>x.source==="cache");
+ const ageTxt = s.oldest ? relAge(s.oldest) : null;
+ el.className = "databanner " + (anyCache ? "warn" : "err");
+ el.innerHTML = anyCache
+  ? `<b>Showing saved data${ageTxt?` from ${ageTxt}`:""}</b> — couldn't reach the database (${esc(s.error||"offline")}). Prices and photos may be out of date. <button class="bnr-btn" id="bnrRetry">Retry</button>`
+  : `<b>No data</b> — couldn't reach the database (${esc(s.error||"offline")}). <button class="bnr-btn" id="bnrRetry">Retry</button>`;
+ const b = $("bnrRetry"); if(b) b.addEventListener("click",()=>location.reload());
+}
+function relAge(ms){
+ const m=Math.round(ms/60000);
+ if(m<1) return "moments ago";
+ if(m<60) return m+" min ago";
+ const h=Math.round(m/60); if(h<24) return h+" hr ago";
+ return Math.round(h/24)+" days ago";
+}
+// Nuke every cached payload — the manual escape hatch for "I don't trust what I'm seeing."
+function clearDataCache(){
+ Object.keys(localStorage).filter(k=>k.startsWith("cache:")||k.startsWith("cachedAt:")).forEach(k=>localStorage.removeItem(k));
+ toast("local data cache cleared — reloading");
+ setTimeout(()=>location.reload(),700);
 }
 
 /* ---- formatting ---- */
@@ -109,27 +203,30 @@ function proxied(url, w){
 }
 
 /* ============================================================ IMAGE RENDERING LAW
-   Photos have vanished from this app THREE times now — different cause each time, identical
-   symptom (flash, then blank). These rules are the accumulated fix. Read them before touching
-   any <img> in this codebase. Full write-up lives in inciardi-market/README.md.
+   Photos have vanished from this app FIVE times — five different root causes, one identical symptom.
+   Full incident table in inciardi-market/README.md. Read before touching any <img>.
 
    1. NEVER paint an archival original into a list or grid. Originals here run 1-3MB; 177 of them
       is ~260MB, and a phone will decode a handful (the flash) then purge or time out the rest
       (the vanish). Grids get a WIDTH-CAPPED DERIVATIVE. Only a detail hero may load the original.
    2. If an image route accepts a size param, EVERY branch must honor it — or the param is a lie.
-      That was this round's actual bug: the card asked for proxied(url, 360) and was handed the
-      full-res R2 file anyway, because /img?key= ignores `w`. So thumbnails now resolve against the
-      Shopify CDN source_url, where width= genuinely resizes (server-side, edge-cached 7 days).
+      The card asked for proxied(url, 360) and was handed the full-res R2 file anyway, because
+      /img?key= ignores `w`. Thumbnails resolve against the Shopify CDN source_url, where width=
+      genuinely resizes (server-side, edge-cached 7 days).
    3. An error handler may NEVER retry the same URL with a cache-bust. The old one did exactly that,
       re-downloading the multi-MB file that had just failed, then hid the element outright on the
-      second miss — turning a slow image into a permanently missing one. A retry moves DOWN the
-      ladder to a DIFFERENT source; only the final rung is allowed to give up.
-   4. Grid images are always loading="lazy" + decoding="async" so the whole set isn't requested at once.
-   5. R2 holds ARCHIVAL bytes and the harvest only writes derivatives GOING FORWARD — it never
-      retroactively shrinks what's already stored. The 177 originals from before 2026-07-25 are
-      still full-res (and three are HEIC bytes under a .jpg key, blank outside Safari). That's why
-      thumbnails resolve to the CDN rather than R2: it makes the grid correct TODAY, independent of
-      a re-scrub that hasn't run. Don't "simplify" thumbs back onto ?key=.
+      second miss. A retry moves DOWN the ladder to a DIFFERENT source; only the last rung gives up.
+   4. Grid images are always loading="lazy" + decoding="async".
+   5. R2 holds ARCHIVAL bytes and the harvest only writes derivatives GOING FORWARD — never
+      retroactively. The 177 pre-2026-07-25 originals are still full-res (3 are HEIC under a .jpg
+      key, blank outside Safari). That's why thumbs resolve to the CDN: correct TODAY, independent
+      of a re-scrub that hasn't run. Don't "simplify" thumbs back onto ?key=.
+   6. 🔴 NEVER gate visibility on a JavaScript class. No opacity:0 + .loaded, no fade from invisible.
+      If the mechanism fails the content disappears AND the failure is invisible in every log — it
+      looks exactly like a data problem. Cost three misdiagnoses. Default visible, placeholder behind.
+      Corollary: when content doesn't appear, read the CSS BEFORE the pipeline.
+   7. A placeholder must always carry identifying content (initials, label, alt). A featureless box
+      makes "failed to load" and "nothing to load" indistinguishable — a diagnostic dead end.
 ============================================================================================ */
 
 // The image row the app should treat as "the" picture for a print.
@@ -191,6 +288,11 @@ function wireImg(img, ladder){
 
 /* ---- market cross-reference (shared) ---- */
 // Given a MARKET payload + a print {name,aliases}, return {count, low} of matching live listings.
+// ⚠️ ARCHITECTURALLY DOOMED, kept only until the registry inversion lands (2026-07-25 ruling).
+// This matches listing titles BACKWARDS onto catalog names, so any listing whose title we can't
+// parse is silently invisible. The replacement is registry-driven: one query PER ARTWORK using its
+// real name + aliases, so every result is bound to an artwork by construction. This function gets
+// DELETED then, not fixed.
 function marketFor(MARKET, p){
  if(!MARKET || !MARKET.listings) return null;
  const names = [normStr(p.name), ...((p.aliases||[]).map(normStr))].filter(Boolean);
@@ -253,17 +355,37 @@ function buildAccountUI(){
   ${idButtons?`<div class="idrow">${idButtons}<button class="btn sm ghost" id="signOutBtn">Sign out</button></div>`
     :`<p class="acct-note">No saved logins yet. Paste a key above once; ask Brain to bake in tap-to-switch logins.</p>`}
 
+  <div class="acct-h" style="margin-top:var(--s5)">Data</div>
+  <div class="acct-note" id="dataDiag"></div>
+  <div class="idrow"><button class="btn sm" id="clearCacheBtn">Clear saved data</button></div>
+  <p class="acct-note">The app keeps a local copy of the catalog so it still works offline. If a number looks wrong, clear it and reload to force a fresh read.</p>
+
   <div class="acct-h" style="margin-top:var(--s5)">Backups</div>
-  <p class="acct-note">A backup saves your whole catalog + collection. Restoring reinstates them if something gets wiped. (Cloudflare also keeps a 30-day auto history behind this.)</p>
+  <p class="acct-note">A backup saves your whole catalog + collection. Restoring reinstates them if something gets wiped. (Cloudflare also keeps a 30-day auto history behind this.) Note: backups save the RECORDS of your photos, not the image files themselves.</p>
   <div class="idrow"><button class="btn sm primary" id="backupNow">Back up now</button><button class="btn sm" id="backupList">Show backups</button></div>
   <div id="snapList" class="snaplist"></div>`;
  drawer.appendChild(sec);
 
  renderWho();
+ renderDataDiag();
  sec.querySelectorAll(".idbtn").forEach(b=>b.addEventListener("click",()=>{ if(setIdentity(b.dataset.id)){ renderWho(); toast("Signed in as "+b.dataset.id); } }));
  const so=$("signOutBtn"); if(so) so.addEventListener("click",()=>{ signOut(); renderWho(); toast("signed out"); });
+ const cc=$("clearCacheBtn"); if(cc) cc.addEventListener("click",clearDataCache);
  $("backupNow").addEventListener("click",backupNow);
  $("backupList").addEventListener("click",loadSnapshots);
+}
+// Per-endpoint provenance readout. If you ever wonder "is this live?", this answers it precisely
+// instead of making you infer it from whether the numbers look plausible.
+function renderDataDiag(){
+ const el=$("dataDiag"); if(!el) return;
+ const rows=Object.entries(FETCH_STATE);
+ if(!rows.length){ el.innerHTML=`<span style="color:var(--ink-faint)">no reads yet</span>`; return; }
+ el.innerHTML=rows.map(([p,s])=>{
+  const tag = s.source==="live" ? `<b style="color:var(--up)">live</b>`
+            : s.source==="cache" ? `<b style="color:var(--amber)">saved copy${s.age?` · ${relAge(s.age)}`:""}</b>`
+            : `<b style="color:var(--down)">no data</b>`;
+  return `<div style="display:flex;justify-content:space-between;gap:8px"><code>${esc(p)}</code>${tag}</div>`;
+ }).join("");
 }
 function renderWho(){
  const el=$("acctWho"); if(!el) return;
@@ -303,7 +425,7 @@ function initChrome(){
  buildMobileNav();
  const gear=$("gear"), drawer=$("settings");
  if(gear&&drawer){
- gear.addEventListener("click",()=>{ drawer.showModal(); gear.setAttribute("aria-expanded","true"); });
+ gear.addEventListener("click",()=>{ renderDataDiag(); drawer.showModal(); gear.setAttribute("aria-expanded","true"); });
  const c=$("settingsClose"); if(c) c.addEventListener("click",()=>drawer.close());
  drawer.addEventListener("click",(e)=>{ if(e.target==drawer) drawer.close(); });
  drawer.addEventListener("close",()=>gear.setAttribute("aria-expanded","false"));

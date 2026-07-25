@@ -14,10 +14,13 @@
      assets with a max-age, so without this a browser can hold a stale source/* while loading a fresh
      sibling. Not cosmetic: catalog.js calls thumbSrc/imgLadder/wireImg from app-core.js, and a
      half-stale pair is a ReferenceError and a blank page. app-dashboard learned this in PR #74;
-     v18 re-learned it when a CSS-only fix appeared to fail because the phone kept the old rule. -->
-<link rel="stylesheet" href="source/base.css?v=20">
-<link rel="stylesheet" href="source/catalog.css?v=20">
-<link rel="stylesheet" href="source/catalog-rollup.css?v=20">
+     v18 re-learned it when a CSS-only fix appeared to fail because the phone kept the old rule.
+     ⚠️ And remember: a ?v= token cannot fix a stale copy of the DOCUMENT that contains it. If
+     #f-assets below doesn't show the version you shipped, load the page with ?fresh=1. -->
+<link rel="stylesheet" href="source/base.css?v=22">
+<link rel="stylesheet" href="source/databanner.css?v=22">
+<link rel="stylesheet" href="source/catalog.css?v=22">
+<link rel="stylesheet" href="source/catalog-rollup.css?v=22">
 </head>
 <body>
 <header class="topbar"><div class="wrap row">
@@ -65,7 +68,7 @@
        #f-assets is plain static HTML that nothing overwrites: if it doesn't say the version you just
        shipped, the browser is serving stale HTML and no amount of ?v= bumping will help — load the
        page with a fresh query string. Keep both, and keep them independent. -->
-  <footer class="footer"><span id="f-build">Inciardi Market</span><span id="f-assets">assets v20</span><span id="f-src"></span></footer>
+  <footer class="footer"><span id="f-build">Inciardi Market</span><span id="f-assets">assets v22</span><span id="f-src"></span></footer>
 </main>
 
 <dialog id="detail"><div class="drawer" id="detailInner"></div></dialog>
@@ -93,7 +96,7 @@
   <p style="font-size:0.82rem;color:var(--ink-faint);line-height:1.5">Editing the catalog and storing images require the write key. Without it, the catalog is read-only.</p>
 </div></dialog>
 
-<script src="source/app-core.js?v=20"></script>
-<script src="source/catalog.js?v=20"></script>
+<script src="source/app-core.js?v=22"></script>
+<script src="source/catalog.js?v=22"></script>
 </body>
 </html>
