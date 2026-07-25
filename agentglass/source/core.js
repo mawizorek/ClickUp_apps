@@ -1,51 +1,40 @@
-/* AgentGlass v1 — core.
-   Owns: data load, the time model, the telemetry parser, roster + cost derivation, the router,
-   and the scrub transport. Views register themselves on AG.pages and get called with the state.
+/* AgentGlass v2 — core.
+   Owns: data load, time model, telemetry parser, NOW read, roster + cost derivation, router, transport.
 
    REPO LAW: index.html is a shell. The landing view is the one-line constant below. */
 
 window.AG = (function(){
   "use strict";
 
-  var DEFAULT_VIEW = "feed";          // <- repoint the landing view here, nowhere else
-  var DATA_URL = "data/seed-events.json?v=1";
-  var STALE_MIN = 12;                  // minutes of silence before a `working` agent reads as SILENT
-  var PAD_MIN = 6;                     // dead air kept to the right of the live edge
+  var DEFAULT_VIEW = "feed";           // <- repoint the landing view here, nowhere else
+  var DATA_URL = "data/seed-events.json?v=2";
+  var LIVE_URL = "data/live-events.json";  // written by server/poll.ts or the worker; used if present
+  var STALL_MIN = 25;                  // a session with no successor this long is STALLED
+  var PAD_MIN = 6;
 
-  // $ per 1M tokens [in, out]. Estimation only. Wrong numbers here cost an estimate, never data.
+  // $ per 1M tokens [in, out]. Estimation only.
   var RATES = {
-    "Opus 5":   [15, 75],
-    "Opus 4.8": [15, 75],
-    "Sonnet 4": [3, 15],
-    "GPT-4o":   [2.5, 10],
-    "_default": [10, 50]
+    "Opus 5": [15,75], "Opus 4.8": [15,75], "Sonnet 4": [3,15], "GPT-4o": [2.5,10], "_default": [10,50]
   };
-  var TOKENS_PER_TURN = 14200;         // context replay dominates a Brain turn
-  var TOKENS_PER_TOOL = 5400;
-  var TOKENS_OUT_TURN = 1150;
+  var TOK_TURN = 14200, TOK_TOOL = 5400, TOK_OUT = 1150;
 
-  var S = { data:null, events:[], sessions:{}, tMin:0, tMax:0, tLive:0, T:0, view:DEFAULT_VIEW };
+  var S = { data:null, events:[], sessions:{}, tMin:0, tMax:0, tLive:0, T:0, view:DEFAULT_VIEW, live:false };
   var pages = {};
 
-  /* ───────── telemetry parsing ─────────
-     Shape-agnostic ON PURPOSE. ClickUp delivers a comment as an array of rich-text runs, so the
-     ```json fence is MARKUP, not text, and may never reach text_content. Keying off the fence is a
-     silent zero-match forever. We strip any fence that survives, then brace-match with string
-     awareness and take the LAST valid telemetry object in the body (the hook appends it at the end).
-     Mirrored in server/parse.ts — keep the two in step. */
+  /* ───────── telemetry parsing (unchanged from v1; never fence-match) ───────── */
 
   function matchBrace(s, start){
     var depth = 0, inStr = false, esc = false;
     for(var i = start; i < s.length; i++){
       var c = s.charAt(i);
       if(inStr){
-        if(esc){ esc = false; }
-        else if(c === "\\"){ esc = true; }
-        else if(c === '"'){ inStr = false; }
+        if(esc) esc = false;
+        else if(c === "\\") esc = true;
+        else if(c === '"') inStr = false;
         continue;
       }
-      if(c === '"'){ inStr = true; }
-      else if(c === "{"){ depth++; }
+      if(c === '"') inStr = true;
+      else if(c === "{") depth++;
       else if(c === "}"){ depth--; if(depth === 0) return i; }
     }
     return -1;
@@ -62,7 +51,7 @@ window.AG = (function(){
       try {
         var obj = JSON.parse(clean.slice(i, end + 1));
         if(obj && typeof obj === "object" && obj.agent && obj.status) found = obj;
-      } catch(e){ /* not a telemetry object, keep walking */ }
+      } catch(e){ /* keep walking */ }
       i = end;
     }
     return found;
@@ -70,33 +59,24 @@ window.AG = (function(){
 
   /* ───────── time ───────── */
 
-  function toMin(iso){
-    var d = new Date(iso);
-    return Math.round(d.getTime() / 60000);
-  }
+  function toMin(iso){ return Math.round(new Date(iso).getTime() / 60000); }
   function fmtClock(min){
-    var d = new Date(min * 60000);
-    var h = d.getHours(), m = d.getMinutes();
-    var h12 = h % 12 === 0 ? 12 : h % 12;
-    return h12 + ":" + String(m).padStart(2, "0");
+    var d = new Date(min * 60000), h = d.getHours(), m = d.getMinutes();
+    return (h % 12 === 0 ? 12 : h % 12) + ":" + String(m).padStart(2, "0");
   }
   function fmtStamp(min){
     var d = new Date(min * 60000);
-    var mer = d.getHours() < 12 ? "AM" : "PM";
     var days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
     var mons = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-    return mer + " \u00b7 " + days[d.getDay()] + " " + mons[d.getMonth()] + " " + d.getDate();
+    return (d.getHours() < 12 ? "AM" : "PM") + " \u00b7 " + days[d.getDay()] + " " +
+           mons[d.getMonth()] + " " + d.getDate();
   }
   function ago(m){
-    if(m < 1) return "now";
-    if(m < 60) return m + "m";
+    if(m < 1) return "just now";
+    if(m < 60) return m + "m ago";
     var h = Math.floor(m / 60), r = m % 60;
-    return h + "h" + (r ? String(r).padStart(2, "0") : "");
+    return h + "h" + (r ? String(r).padStart(2,"0") : "") + " ago";
   }
-
-  /* ───────── derivations ─────────
-     Nothing here trusts an agent's own numbers. Status is normalized, silence is inferred from the
-     clock, gaps are inferred from seq, and cost is inferred from observable volume (Decision Log J4). */
 
   function norm(status){
     if(status === "waiting_on_human" || status === "waiting") return "waiting";
@@ -104,35 +84,95 @@ window.AG = (function(){
     return "idle";
   }
 
-  function upTo(t){
-    return S.events.filter(function(e){ return e.min <= t; });
+  function upTo(t){ return S.events.filter(function(e){ return e.min <= t; }); }
+
+  /* ───────── SESSIONS are the unit of liveness ─────────
+
+     v1 got this wrong and it produced a wall of false alarms: it treated every agent as a
+     standing process, so a Workshop lens that spoke ONE line and handed back read as "went quiet
+     mid-work." Frank, Dara and Beckett aren't stuck; they contributed and the room moved on.
+
+     The fix is a rule, not a threshold: YOU CAN ONLY BE SILENT IF YOU ARE THE LAST VOICE IN YOUR
+     SESSION. If someone spoke after you, you handed off. Silence is a property of the SESSION —
+     the thread nobody came back to — and only its last speaker carries it. */
+
+  function sessionStates(t){
+    var by = {};
+    upTo(t).forEach(function(e){ (by[e.session_id] = by[e.session_id] || []).push(e); });
+    return Object.keys(by).map(function(k){
+      var list = by[k].sort(function(a,b){ return (a.min - b.min) || (a.seq - b.seq); });
+      var last = list[list.length - 1];
+      var age = t - last.min;
+      var st = norm(last.status);
+      if(st === "working" && age > STALL_MIN) st = "stalled";
+      return {
+        id: k,
+        meta: S.sessions[k] || { title:k, model:"model unknown" },
+        events: list,
+        last: last,
+        age: age,
+        state: st,                       // working | waiting | idle | stalled
+        voices: list.map(function(e){ return e.agent; })
+                    .filter(function(v,i,a){ return v && a.indexOf(v) === i; })
+      };
+    }).sort(function(a,b){
+      var rank = { working:0, waiting:1, stalled:2, idle:3 };
+      return (rank[a.state] - rank[b.state]) || (a.age - b.age);
+    });
   }
 
+  /* Roster derived FROM sessions, so an agent's state inherits its session's reality. */
   function roster(t){
-    var seen = {}, order = [];
-    upTo(t).forEach(function(e){
-      if(!seen[e.agent]) order.push(e.agent);
-      seen[e.agent] = e;
+    var out = [], seen = {};
+    sessionStates(t).forEach(function(s){
+      s.events.slice().reverse().forEach(function(e){
+        if(!e.agent || seen[e.agent]) return;
+        seen[e.agent] = true;
+        var isLast = e.comment_id === s.last.comment_id;
+        var st;
+        if(isLast) st = s.state;               // carries the session's fate
+        else st = "handed";                     // spoke, then the room moved on. NOT an alarm.
+        out.push({ agent:e.agent, st:st, age:t - e.min, e:e, session:s });
+      });
     });
-    var out = order.map(function(name){
-      var e = seen[name];
-      var st = norm(e.status), age = t - e.min;
-      if(st === "working" && age > STALE_MIN) st = "silent";
-      return { agent:name, st:st, age:age, e:e };
-    });
-    var rank = { working:0, waiting:1, silent:2, idle:3 };
-    out.sort(function(a,b){ return (rank[a.st] - rank[b.st]) || (a.age - b.age); });
-    return out;
+    var rank = { working:0, waiting:1, stalled:2, handed:3, idle:4 };
+    return out.sort(function(a,b){ return (rank[a.st] - rank[b.st]) || (a.age - b.age); });
   }
 
-  // seq gaps, computed per session against what has actually arrived
+  /* THE NOW READ — the one thing v1 had no answer for.
+     Plain language, top of screen, no counting required. */
+  function now(t){
+    var sess = sessionStates(t);
+    var live = sess.filter(function(s){ return s.state === "working"; });
+    var held = sess.filter(function(s){ return s.state === "waiting"; });
+    var stalled = sess.filter(function(s){ return s.state === "stalled"; });
+    var all = upTo(t);
+    var latest = all.length ? all[all.length - 1] : null;
+
+    var mood = live.length ? "working" : (stalled.length ? "stalled" : (held.length ? "waiting" : "idle"));
+    var line;
+    if(!latest) line = "Nothing has happened yet.";
+    else if(live.length === 1) line = live[0].last.agent + " is mid-run on " + live[0].meta.title + ".";
+    else if(live.length > 1) line = live.length + " sessions are running right now.";
+    else if(held.length) line = "Nothing is running. " + held.length +
+         (held.length === 1 ? " session is" : " sessions are") + " waiting on you.";
+    else if(stalled.length) line = "Nothing is running, and " + stalled.length +
+         (stalled.length === 1 ? " session went" : " sessions went") + " quiet mid-work.";
+    else line = "The fleet is idle. Everything finished clean.";
+
+    return {
+      mood: mood, line: line, latest: latest,
+      live: live, held: held, stalled: stalled,
+      sessions: sess,
+      lastAge: latest ? t - latest.min : null
+    };
+  }
+
   function gaps(t){
-    var bySession = {}, out = {};
-    upTo(t).forEach(function(e){
-      (bySession[e.session_id] = bySession[e.session_id] || []).push(e);
-    });
-    Object.keys(bySession).forEach(function(k){
-      var list = bySession[k].slice().sort(function(a,b){ return a.seq - b.seq; });
+    var by = {}, out = {};
+    upTo(t).forEach(function(e){ (by[e.session_id] = by[e.session_id] || []).push(e); });
+    Object.keys(by).forEach(function(k){
+      var list = by[k].slice().sort(function(a,b){ return a.seq - b.seq; });
       for(var i = 1; i < list.length; i++){
         var miss = list[i].seq - list[i-1].seq - 1;
         if(miss > 0) out[list[i].comment_id] = miss;
@@ -144,26 +184,31 @@ window.AG = (function(){
   function money(t){
     var turns = {}, tools = {}, est = 0, real = 0;
     upTo(t).forEach(function(e){
-      if(!e.verified) return;                       // never price a self-attested sender
+      if(!e.verified) return;
       turns[e.session_id] = (turns[e.session_id] || 0) + 1;
       tools[e.session_id] = (tools[e.session_id] || 0) + (e.tools_used || []).length;
     });
     Object.keys(turns).forEach(function(k){
       var sess = S.sessions[k] || {};
       var rate = RATES[sess.model] || RATES._default;
-      var tin = turns[k] * TOKENS_PER_TURN + tools[k] * TOKENS_PER_TOOL;
-      var tout = turns[k] * TOKENS_OUT_TURN;
-      est += (tin / 1e6) * rate[0] + (tout / 1e6) * rate[1];
+      est += ((turns[k]*TOK_TURN + tools[k]*TOK_TOOL)/1e6)*rate[0] + ((turns[k]*TOK_OUT)/1e6)*rate[1];
       real += sess.real_usd || 0;
     });
     return { est:est, real:real };
+  }
+
+  /* Capture mix — how much of what you're seeing needed no telemetry block at all. */
+  function captureMix(t){
+    var m = { tagged:0, derived:0, ambient:0 };
+    upTo(t).forEach(function(e){ m[e.capture || "tagged"] = (m[e.capture || "tagged"] || 0) + 1; });
+    return m;
   }
 
   /* ───────── transport ───────── */
 
   function density(){
     var svg = document.getElementById("density");
-    var W = 400, H = 44, bucket = 4;
+    var W = 400, H = 44, bucket = Math.max(4, Math.round((S.tMax - S.tMin) / 90));
     var n = Math.max(1, Math.ceil((S.tMax - S.tMin) / bucket));
     var counts = new Array(n).fill(0);
     S.events.forEach(function(e){
@@ -173,45 +218,36 @@ window.AG = (function(){
     var max = Math.max.apply(null, counts.concat([1]));
     var bw = W / n, s = "";
     for(var i = 0; i < n; i++){
-      var h = counts[i] ? 5 + (counts[i] / max) * (H - 7) : 2;
-      var x = i * bw + bw * 0.18, w = bw * 0.64;
-      var mid = S.tMin + i * bucket + bucket / 2;
-      s += '<rect class="bar" data-t="' + mid + '" x="' + x.toFixed(2) + '" y="' + (H-h).toFixed(2) +
-           '" width="' + w.toFixed(2) + '" height="' + h.toFixed(2) + '" rx="1.5"></rect>';
+      var h = counts[i] ? 5 + (counts[i]/max)*(H-7) : 2;
+      var x = i*bw + bw*0.18, w = Math.max(1.2, bw*0.64);
+      s += '<rect class="bar" data-t="' + (S.tMin + i*bucket + bucket/2) + '" x="' + x.toFixed(2) +
+           '" y="' + (H-h).toFixed(2) + '" width="' + w.toFixed(2) + '" height="' + h.toFixed(2) + '" rx="1.5"></rect>';
     }
     s += '<line x1="0" y1="43.5" x2="400" y2="43.5" stroke="oklch(31% 0.012 52)" stroke-width="1"/>';
     svg.innerHTML = s;
 
-    var ticks = document.getElementById("ticks"), th = "";
-    for(var k = 0; k < 4; k++){
-      th += "<span>" + fmtClock(Math.round(S.tMin + (S.tMax - S.tMin) * (k / 3))) + "</span>";
-    }
-    ticks.innerHTML = th;
+    var th = "";
+    for(var k = 0; k < 4; k++) th += "<span>" + fmtClock(Math.round(S.tMin + (S.tMax-S.tMin)*(k/3))) + "</span>";
+    document.getElementById("ticks").innerHTML = th;
     paintBars();
   }
 
   function paintBars(){
     var bars = document.querySelectorAll("#density .bar");
     for(var i = 0; i < bars.length; i++){
-      var past = +bars[i].getAttribute("data-t") <= S.T;
-      bars[i].setAttribute("fill", past ? "oklch(62% 0.10 78)" : "oklch(30% 0.016 52)");
+      bars[i].setAttribute("fill", +bars[i].getAttribute("data-t") <= S.T
+        ? "oklch(62% 0.10 78)" : "oklch(30% 0.016 52)");
     }
   }
 
-  function seekTo(t){
-    S.T = Math.max(S.tMin, Math.min(S.tLive, Math.round(t)));
-    render();
-  }
+  function seekTo(t){ S.T = Math.max(S.tMin, Math.min(S.tLive, Math.round(t))); render(); }
 
   function wireTransport(){
-    var track = document.getElementById("track");
-    var bubble = document.getElementById("bubble");
+    var track = document.getElementById("track"), bubble = document.getElementById("bubble");
     var dragging = false;
-
     function fromX(x){
       var r = track.getBoundingClientRect();
-      var p = Math.min(1, Math.max(0, (x - r.left) / r.width));
-      seekTo(S.tMin + p * (S.tMax - S.tMin));
+      seekTo(S.tMin + Math.min(1, Math.max(0, (x - r.left)/r.width)) * (S.tMax - S.tMin));
     }
     track.addEventListener("pointerdown", function(e){
       dragging = true; track.setPointerCapture(e.pointerId);
@@ -228,7 +264,6 @@ window.AG = (function(){
       else if(e.key === "Home"){ seekTo(S.tMin); e.preventDefault(); }
       else if(e.key === "End"){ seekTo(S.tLive); e.preventDefault(); }
     });
-
     var keys = document.querySelectorAll(".keys button");
     for(var i = 0; i < keys.length; i++){
       keys[i].addEventListener("click", function(){
@@ -247,12 +282,15 @@ window.AG = (function(){
     var rewound = S.T < S.tLive;
     document.getElementById("clock").textContent = fmtClock(S.T);
     document.getElementById("stamp").textContent = fmtStamp(S.T);
-    document.getElementById("pill").className = "pill " + (rewound ? "rewound" : "live");
-    document.getElementById("pillTxt").textContent = rewound ? "\u2212" + ago(S.tLive - S.T) : "live";
+    var pill = document.getElementById("pill");
+    pill.className = "pill " + (rewound ? "rewound" : (S.live ? "live" : "snapshot"));
+    document.getElementById("pillTxt").textContent = rewound
+      ? "rewound " + ago(S.tLive - S.T).replace(" ago","")
+      : (S.live ? "live" : "snapshot");
     document.getElementById("nowBtn").disabled = !rewound;
 
-    var head = document.getElementById("head");
     var pct = ((S.T - S.tMin) / (S.tMax - S.tMin)) * 100;
+    var head = document.getElementById("head");
     head.className = "head" + (rewound ? " rewound" : "");
     head.style.left = pct + "%";
     var bubble = document.getElementById("bubble");
@@ -264,15 +302,6 @@ window.AG = (function(){
     track.setAttribute("aria-valuemax", S.tLive);
     track.setAttribute("aria-valuenow", S.T);
     track.setAttribute("aria-valuetext", fmtClock(S.T) + " " + fmtStamp(S.T));
-
-    var R = roster(S.T);
-    var on = R.filter(function(a){ return a.st === "working"; }).length;
-    var held = R.filter(function(a){ return a.st === "waiting"; }).length;
-    var quiet = R.filter(function(a){ return a.st === "silent"; }).length;
-    document.getElementById("roll").innerHTML = R.length
-      ? "<b>" + on + "</b> on air<span class='sep'>\u00b7</span><b>" + held +
-        "</b> held<span class='sep'>\u00b7</span><b>" + quiet + "</b> silent"
-      : "<b>0</b> agents on the board";
 
     document.getElementById("tabFeed").setAttribute("aria-selected", S.view === "feed");
     document.getElementById("tabTranscript").setAttribute("aria-selected", S.view === "transcript");
@@ -288,12 +317,10 @@ window.AG = (function(){
   function route(){
     var want = (location.hash || "").replace(/^#\/?/, "") || DEFAULT_VIEW;
     if(!pages[want]) want = DEFAULT_VIEW;
-    if(want === S.view && document.getElementById("viewport").getAttribute("data-view") === want){
-      render(); return;
-    }
-    S.view = want;
     var vp = document.getElementById("viewport");
-    fetch("pages/" + want + ".html?v=1").then(function(r){
+    if(want === S.view && vp.getAttribute("data-view") === want){ render(); return; }
+    S.view = want;
+    fetch("pages/" + want + ".html?v=2").then(function(r){
       if(!r.ok) throw new Error(r.status);
       return r.text();
     }).then(function(html){
@@ -307,56 +334,65 @@ window.AG = (function(){
     });
   }
 
-  /* ───────── boot ───────── */
+  /* ───────── boot ─────────
+     Tries the live file first. If the poller or worker has written one, this becomes a live board;
+     if not, it falls back to the committed snapshot and SAYS SO in the pill rather than pretending. */
+
+  function ingest(d, isLive){
+    S.data = d; S.live = !!isLive;
+    S.sessions = d.sessions || {};
+    S.events = (d.events || []).map(function(e){
+      var c = Object.assign({}, e);
+      c.min = toMin(e.emitted_at);
+      c.verified = e.verified !== false;
+      c.capture = e.capture || "tagged";
+      return c;
+    }).sort(function(a,b){ return (a.min - b.min) || (a.seq - b.seq); });
+
+    if(!S.events.length){
+      document.getElementById("viewport").innerHTML =
+        '<div class="empty"><h2>No activity captured yet.</h2>' +
+        '<p>Nothing has been ingested. Once the poller runs, sessions appear here.</p></div>';
+      return false;
+    }
+    S.tMin = S.events[0].min;
+    S.tLive = toMin(d.captured_at || S.events[S.events.length - 1].emitted_at);
+    S.tMax = S.tLive + PAD_MIN;
+    S.T = S.tLive;
+    return true;
+  }
+
+  function start(){
+    density();
+    wireTransport();
+    document.getElementById("nowBtn").addEventListener("click", function(){
+      seekTo(S.tLive);
+      document.getElementById("viewport").scrollTop = 0;
+    });
+    window.addEventListener("hashchange", route);
+    route();
+  }
 
   function boot(){
-    fetch(DATA_URL).then(function(r){
-      if(!r.ok) throw new Error(r.status);
-      return r.json();
-    }).then(function(d){
-      S.data = d;
-      S.sessions = d.sessions || {};
-      S.events = (d.events || []).map(function(e){
-        var c = Object.assign({}, e);
-        c.min = toMin(e.emitted_at);
-        c.verified = e.verified !== false;
-        return c;
-      }).sort(function(a,b){ return (a.min - b.min) || (a.seq - b.seq); });
-
-      if(!S.events.length){
-        document.getElementById("viewport").innerHTML =
-          '<div class="empty"><h2>No telemetry yet.</h2><p>Nothing has been ingested. ' +
-          'Once the poller runs, sessions appear here.</p></div>';
-        return;
-      }
-      S.tMin = S.events[0].min;
-      S.tLive = toMin(d.captured_at || S.events[S.events.length - 1].emitted_at);
-      S.tMax = S.tLive + PAD_MIN;
-      S.T = S.tLive;
-
-      density();
-      wireTransport();
-      document.getElementById("nowBtn").addEventListener("click", function(){
-        seekTo(S.tLive);
-        document.getElementById("viewport").scrollTop = 0;
+    fetch(LIVE_URL, { cache: "no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("no live"); return r.json(); })
+      .then(function(d){ if(ingest(d, true)) start(); })
+      .catch(function(){
+        fetch(DATA_URL).then(function(r){ return r.json(); })
+          .then(function(d){ if(ingest(d, false)) start(); })
+          .catch(function(){
+            document.getElementById("viewport").innerHTML =
+              '<p class="err">Could not load any event data.</p>';
+          });
       });
-      window.addEventListener("hashchange", route);
-      route();
-    }).catch(function(){
-      document.getElementById("viewport").innerHTML =
-        '<p class="err">Could not load the event data.</p>';
-    });
   }
 
   var api = {
-    boot: boot,
-    state: S,
+    boot: boot, state: S,
     register: function(name, mod){ pages[name] = mod; },
-    // derivations
-    roster: roster, gaps: gaps, money: money, upTo: upTo, norm: norm,
-    // parsing (exposed so the transcript view can show real parse output)
+    roster: roster, sessionStates: sessionStates, now: now, gaps: gaps, money: money,
+    captureMix: captureMix, upTo: upTo, norm: norm,
     extractTelemetry: extractTelemetry,
-    // formatting
     fmtClock: fmtClock, fmtStamp: fmtStamp, ago: ago,
     seekTo: seekTo, render: render,
     esc: function(s){

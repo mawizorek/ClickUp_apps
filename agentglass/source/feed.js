@@ -1,63 +1,77 @@
-/* AgentGlass v1 — feed view.
-   Priority 1-4 on one screen: liveness, narrative, what-needs-you, shadow cost.
-   Priority 5 (latency percentiles) is deliberately absent. See README before adding it back. */
+/* AgentGlass v2 — feed view.
+   Order on screen IS the priority order: NOW → sessions → what needs you → the stream → cost. */
 
 (function(AG){
   "use strict";
 
-  function chips(R, esc, ago){
-    if(!R.length){
-      return '<span class="agent" data-st="off"><i class="st"></i>fleet dark</span>';
-    }
-    return R.map(function(a){
-      var age = a.st === "silent" ? "silent " + ago(a.age) : ago(a.age);
-      return '<span class="agent" data-st="' + a.st + '"><i class="st"></i>' +
-             esc(a.agent) + '<span class="age">' + age + '</span></span>';
-    }).join("");
-  }
+  var VERB = {
+    working: "running", waiting: "waiting on you", stalled: "went quiet", idle: "done", handed: "handed off"
+  };
 
-  function needs(R, esc, ago){
-    return R.filter(function(a){ return a.st === "waiting" || a.st === "silent"; });
+  function sessionChips(N, esc, ago){
+    if(!N.sessions.length){
+      return '<span class="agent" data-st="off"><i class="st"></i>board dark</span>';
+    }
+    return N.sessions.map(function(s){
+      var who = s.last.agent || "unattributed";
+      return '<span class="agent" data-st="' + s.state + '" title="' + esc(s.meta.title) + '">' +
+             '<i class="st"></i>' + esc(who) +
+             '<span class="age">' + ago(s.age).replace(" ago","") + '</span></span>';
+    }).join("");
   }
 
   function render(api){
     var S = api.state, esc = api.esc, ago = api.ago;
-    var R = api.roster(S.T);
+    var N = api.now(S.T);
     var G = api.gaps(S.T);
 
-    var fleet = document.getElementById("fleet");
-    if(fleet) fleet.innerHTML = chips(R, esc, ago);
-
-    /* what needs you */
-    var N = needs(R);
-    var box = document.getElementById("needs");
-    if(box){
-      box.className = "needs" + (N.length ? "" : " quiet");
-      document.getElementById("needCount").textContent = N.length;
-      document.getElementById("needLabel").textContent = N.length
-        ? (N.length === 1 ? "1 thing needs you" : N.length + " things need you")
-        : "nothing needs you";
-      document.getElementById("needList").innerHTML = N.length
-        ? N.map(function(a){
-            var why = a.st === "silent"
-              ? "went quiet " + ago(a.age) + " ago mid-work. Last seen: " +
-                esc(a.e.action).toLowerCase() + "."
-              : esc(a.e.action).toLowerCase() + " \u2014 parked " + ago(a.age) + " ago.";
-            return '<li><span class="who">' + esc(a.agent) + '</span><span>' + why + '</span></li>';
-          }).join("")
-        : '<li><span>Every agent is either emitting or finished clean.</span></li>';
-      if(N.length && !box.hasAttribute("data-touched")) box.open = true;
+    /* ── NOW ── */
+    var nowEl = document.getElementById("now");
+    if(nowEl){
+      nowEl.setAttribute("data-mood", N.mood);
+      document.getElementById("nowKicker").textContent =
+        S.T < S.tLive ? "at " + api.fmtClock(S.T) : "right now";
+      document.getElementById("nowLine").textContent = N.line;
+      document.getElementById("nowLast").innerHTML = N.latest
+        ? "Last thing that happened: <b>" + esc(N.latest.agent || "someone") + "</b> " +
+          esc(N.latest.action.charAt(0).toLowerCase() + N.latest.action.slice(1)) +
+          ", " + ago(N.lastAge) + "."
+        : "";
     }
 
-    /* event stream, newest first, grouped by session */
+    document.getElementById("fleet").innerHTML = sessionChips(N, esc, ago);
+
+    /* ── what needs you: ONLY held + stalled SESSIONS. A lens that spoke once and handed back is
+       not an alarm — that was v1's false-alarm storm. ── */
+    var items = N.held.concat(N.stalled);
+    var box = document.getElementById("needs");
+    if(box){
+      box.className = "needs" + (items.length ? "" : " quiet");
+      document.getElementById("needCount").textContent = items.length;
+      document.getElementById("needLabel").textContent = items.length
+        ? (items.length === 1 ? "1 thing needs you" : items.length + " things need you")
+        : "nothing needs you";
+      document.getElementById("needList").innerHTML = items.length
+        ? items.map(function(s){
+            var why = s.state === "stalled"
+              ? "no one has posted since " + api.fmtClock(s.last.min) + ". Last beat: " +
+                esc(s.last.action.charAt(0).toLowerCase() + s.last.action.slice(1)) + "."
+              : esc(s.last.action) + ".";
+            return '<li><span class="who">' + esc(s.meta.title) + '</span><span>' + why +
+                   ' <em>' + esc(s.last.agent || "") + " \u00b7 " + ago(s.age) + '</em></span></li>';
+          }).join("")
+        : '<li><span>Nothing is parked and nothing went quiet.</span></li>';
+      if(items.length && !box.hasAttribute("data-touched")) box.open = true;
+    }
+
+    /* ── the stream ── */
     var shown = api.upTo(S.T).slice().reverse();
     var feed = document.getElementById("feed");
     if(!feed) return;
 
     if(!shown.length){
-      feed.innerHTML = '<div class="empty"><h2>Nothing on air yet.</h2>' +
-        '<p>The board was dark before ' + api.fmtClock(S.tMin) +
-        '. Scrub right to watch the fleet wake up.</p></div>';
+      feed.innerHTML = '<div class="empty"><h2>Nothing on air yet.</h2><p>The board was dark before ' +
+        api.fmtClock(S.tMin) + '. Scrub right to watch the fleet wake up.</p></div>';
     } else {
       var html = "", lastS = null;
       shown.forEach(function(e){
@@ -68,40 +82,44 @@
           lastS = e.session_id;
         }
         if(G[e.comment_id]){
-          html += '<div class="breach"><span>seq gap \u00b7 ' + G[e.comment_id] +
-                  ' event' + (G[e.comment_id] > 1 ? "s" : "") +
-                  ' never arrived</span><span class="rule"></span></div>';
+          html += '<div class="breach"><span>seq gap \u00b7 ' + G[e.comment_id] + ' event' +
+                  (G[e.comment_id] > 1 ? "s" : "") + ' never arrived</span><span class="rule"></span></div>';
         }
         var tools = (e.tools_used && e.tools_used.length)
           ? e.tools_used.map(function(t){ return "<span>" + esc(t) + "</span>"; }).join("")
           : '<span class="none">no tools fired</span>';
-        html += '<article class="ev' + (e.verified ? "" : " unverified") +
-                '" data-st="' + api.norm(e.status) + '">' +
+        var cap = e.capture || "tagged";
+        html += '<article class="ev' + (e.verified ? "" : " unverified") + '" data-st="' +
+                  api.norm(e.status) + '">' +
                   '<div class="t">' + api.fmtClock(e.min) + '</div><div>' +
-                    '<div class="who"><i class="st"></i>' + esc(e.agent) +
+                    '<div class="who"><i class="st"></i>' + esc(e.agent || "unattributed") +
+                      '<span class="cap cap-' + cap + '" title="' +
+                      (cap === "derived" ? "read from prose, no telemetry block" :
+                       cap === "ambient" ? "activity with no agent signal" : "telemetry block found") +
+                      '">' + cap + '</span>' +
                       '<span class="seq">#' + e.seq + '</span></div>' +
                     '<div class="act">' + esc(e.action) + '</div>' +
                     '<div class="tgt">' + esc(e.target || "NA") + '</div>' +
                     '<div class="tools">' + tools + '</div>' +
-                    (e.verified ? "" :
-                      '<div class="flag"><span class="m">unverified</span>self-attested sender' +
+                    (e.verified ? "" : '<div class="flag"><span class="m">unverified</span>' +
+                      'self-attested sender' +
                       (e.claimed_usd ? " \u00b7 claims $" + e.claimed_usd.toFixed(3) : "") + '</div>') +
                   '</div></article>';
       });
       feed.innerHTML = html;
     }
 
-    var m = api.money(S.T);
-    var est = document.getElementById("est"), real = document.getElementById("real");
-    if(est) est.textContent = "$" + m.est.toFixed(2);
-    if(real) real.textContent = "$" + m.real.toFixed(2);
+    var m = api.money(S.T), mix = api.captureMix(S.T);
+    document.getElementById("est").textContent = "$" + m.est.toFixed(2);
+    document.getElementById("real").textContent = "$" + m.real.toFixed(2);
+    var mixEl = document.getElementById("mix");
+    if(mixEl) mixEl.textContent = (mix.derived || 0) + " of " +
+      ((mix.tagged||0)+(mix.derived||0)+(mix.ambient||0)) + " derived";
   }
 
-  function mount(api){
+  function mount(){
     var box = document.getElementById("needs");
-    if(box){
-      box.addEventListener("toggle", function(){ box.setAttribute("data-touched", "1"); });
-    }
+    if(box) box.addEventListener("toggle", function(){ box.setAttribute("data-touched","1"); });
   }
 
   AG.register("feed", { render: render, mount: mount });
