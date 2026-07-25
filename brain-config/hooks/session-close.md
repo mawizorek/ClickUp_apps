@@ -24,7 +24,7 @@ itself. It produces a structured artifact and yields the wheel.
 |---|---|---|---|
 | 1. Produce handoff | Session agent | Full session context | Handoff Artifact (template below) |
 | 2. Execute close | Closing Clio (SEATED, takes the wheel) | Handoff Artifact | Channel posts, task shutdown, next-session task |
-| 3. Memory curation | Memory Maggie (called BY Clio) | Handoff Artifact memory candidates | Memory audit post, rotation/placement calls |
+| 3. Memory curation | Memory Maggie (called BY Clio) | Handoff Artifact memory candidates + agents-present table | Memory audit post, bundle rotation, placement calls |
 
 **Why this sequence exists:** the session agent is good at KNOWING what happened (it was
 there). It is bad at running templates, posting to channels, and curating memory (those
@@ -67,6 +67,26 @@ section is not.
 
 ---
 
+### 0. Agents present
+
+{Every agent that was SEATED or INHABITED during this session.
+Maggie reads this to know which bundles to check against budget
+and which agents earned memory-relevant context.}
+
+| Agent | Role this session | Bundle path | Memory-relevant? |
+|---|---|---|---|
+| {name} | {primary / orchestrated / workshopped / close executor / pass-through} | {super-agents/<slug>/ or agents/<slug>.md or "stateless"} | {yes: earned context / no: just routing} |
+...
+
+Rules for this table:
+- List EVERY agent that spoke as itself (including lenses seated in a Workshop).
+- "Memory-relevant" = yes only if the agent EARNED durable context this session
+  (a new scar, a decision about its own shape, a relationship learned).
+  Stateless lenses are always "no". Pass-through routing is always "no".
+- Maggie uses this to scope her rotation pass: she checks the bundle of
+  every "yes" row against its size budget, and skips "no" rows.
+- A mid-session persona swap (/session.agent=X) means BOTH agents appear.
+
 ### 1. Objective (what this session did)
 
 {1-3 sentences. What the session accomplished, stated as work done.}
@@ -95,9 +115,10 @@ section is not.
 
 {Durable knowledge worth persisting beyond this session. NOT procedure
 (that becomes a tool). Context, preferences, scars, relationships,
-corrections only.}
+corrections only. Tag each candidate with the AGENT it belongs to
+(from section 0) so Maggie knows which bundle to target.}
 
-- {candidate, one line, with WHY it is durable}
+- [{agent}] {candidate, one line, with WHY it is durable}
 ...
 (or: none. Everything transient or already captured.)
 
@@ -125,6 +146,8 @@ If no next session needed: "No follow-up required."}
 - Fill EVERY section. "None" is valid; a missing section is not.
 - The Session Ledger is COPIED from the task (already maintained live), not reconstructed.
 - Memory candidates are PROPOSALS, not commits. Maggie decides placement.
+- Memory candidates are TAGGED with their target agent (from section 0).
+- The agents-present table is populated from the session transcript (who spoke as themselves).
 - The next-session prompt is self-contained: a cold agent resumes from it alone.
 - This is the session agent's LAST act. After producing it, the agent is done.
 
@@ -135,13 +158,15 @@ If no next session needed: "No follow-up required."}
 Clio receives the Handoff Artifact and executes in this order. She does NOT ask for
 permission at any step (Rule 0).
 
-### Step 1. Hand memory candidates to Maggie: Channel 1 (Memory Audit)
+### Step 1. Hand memory candidates + agents-present to Maggie: Channel 1 (Memory Audit)
 
-Clio hands section 4 (Memory Candidates) to Maggie. Maggie:
-- Runs placement triage (deny-by-default for brain memory)
-- Executes approved memory writes
-- Runs the memory rotation check (hot memory over budget? curate/archive)
-- Posts Channel 1
+Clio hands section 0 (Agents Present) and section 4 (Memory Candidates) to Maggie. Maggie:
+- Reads the agents-present table to scope her work
+- Runs placement triage on tagged candidates (deny-by-default for brain memory)
+- Executes approved memory writes to the correct agent's bundle
+- Runs the memory rotation check on EACH "memory-relevant: yes" agent's bundle
+  (hot memory over budget? curate/archive per `hooks/memory-rotation.md`)
+- Posts Channel 1 (covering brain memory AND per-agent bundle health)
 
 **Channel 1 URL:** https://app.clickup.com/36074068/chat/r/12cwjm-55833
 
@@ -169,6 +194,14 @@ Clio hands section 4 (Memory Candidates) to Maggie. Maggie:
 1. {section name}
 2. {section name}
 ...
+
+### Agent bundle health:
+
+{One line per "memory-relevant: yes" agent from section 0.}
+- {agent}: {memory.md size}/{cap} {action taken or "no action"}
+- {agent}: {activity-log.md size}/{cap} {rotated N entries or "within budget"}
+...
+(or: no agent bundles touched this session.)
 
 ### Recommendation:
 
@@ -282,6 +315,8 @@ If the session became substantive, upgrade to full close.
 18. The session agent produces the Handoff Artifact as its LAST act. Clio executes after.
 19. Memory candidates are PROPOSALS. Maggie decides placement.
 20. Clio is SEATED (a real persona swap), she takes the wheel, not a sub-call.
+21. Memory candidates are TAGGED with their target agent from the agents-present table.
+22. Maggie checks bundle health for EVERY "memory-relevant: yes" agent, not just brain memory.
 
 ---
 
