@@ -1,17 +1,15 @@
 /**
- * AgentGlass · stage 1 ingest: poll the ClickUp comments API.
+ * AgentGlass · local ingest: poll the ClickUp comments API with Bun.
  *
- * DOES NOT RUN ON GITHUB PAGES. Run locally with Bun:
+ * DOES NOT RUN ON GITHUB PAGES. This is the local-only option — it writes a file on YOUR machine, so
+ * the board is live for you and nobody else. For a genuinely live dashboard use `worker.ts` instead;
+ * see README.md for the comparison.
+ *
  *   export CLICKUP_TOKEN=pk_...
  *   bun run poll.ts
- *
- * Why polling before webhooks (Decision Log Q4): zero infrastructure, nothing to expose, no signature to
- * verify, testable immediately. The webhook + cloudflared tunnel is stage 2, once the parser is proven
- * against real traffic. Latency of a minute is irrelevant for a dashboard whose job is conveying
- * liveness at human reading speed.
  */
 
-import { toEvent, type ParsedEvent } from "./parse";
+import { deriveEvent } from "./derive";
 
 const TOKEN = process.env.CLICKUP_TOKEN ?? "";
 const LIST_ID = process.env.AGENTGLASS_LIST_ID ?? "4026861396055493779"; // Agent Activity Board
@@ -25,9 +23,9 @@ if (!TOKEN) {
   process.exit(1);
 }
 
-const seen = new Set<string>();          // comment_id dedupe. The board also fires taskUpdated.
-const events: ParsedEvent[] = [];
-const sessions: Record<string, { title: string; model: string; task_id: string; real_usd: number }> = {};
+const seen = new Set<string>();          // comment_id dedupe; taskUpdated fires alongside every post
+const events: any[] = [];
+const sessions: Record<string, any> = {};
 
 async function api<T>(path: string): Promise<T> {
   const res = await fetch(API + path, { headers: { Authorization: TOKEN } });
@@ -35,18 +33,13 @@ async function api<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-/** Model comes off the session task title, never off the wire (Decision Log J4). */
 function modelFromTitle(title: string): string | null {
   const m = title.match(/\((Opus|Sonnet|Haiku|GPT)[^)]*\)/i);
   return m ? m[0].replace(/[()]/g, "").trim() : null;
 }
-
-function sessionKey(taskId: string, block: ParsedEvent): string {
-  return block.session_id ?? taskId;   // pre-extension blocks fall back to the task
-}
-
-async function appendRaw(line: unknown): Promise<void> {
-  await Bun.write(RAW_PATH, JSON.stringify(line) + "\n", { createPath: true });
+function agentFromTitle(title: string): string | undefined {
+  const m = title.match(/·\s*([A-Z][a-z]+ [A-Z][a-z]+)/);
+  return m ? m[1] : undefined;
 }
 
 async function sweep(): Promise<void> {
@@ -58,29 +51,45 @@ async function sweep(): Promise<void> {
 
   for (const task of list.tasks) {
     const { comments } = await api<{ comments: any[] }>(`/task/${task.id}/comment`);
+    if (!comments?.length) continue;
 
-    for (const c of comments) {
+    const sessionAgent = agentFromTitle(task.name);
+    let seq = events.filter(e => e.task_id === task.id).length;
+
+    // Oldest-first so seq is monotonic and a gap actually means a dropped event.
+    for (const c of comments.slice().reverse()) {
       const id = String(c.id);
       if (seen.has(id)) continue;
       seen.add(id);
 
-      // RAW FIRST, ALWAYS. The parser must be re-runnable against traffic we already have.
-      await appendRaw({ captured_at: new Date().toISOString(), task_id: task.id, comment: c });
+      // RAW FIRST, ALWAYS. The deriver must stay re-runnable against traffic we already have.
+      await Bun.write(RAW_PATH, JSON.stringify({
+        captured_at: new Date().toISOString(), task_id: task.id, comment: c
+      }) + "\n", { createPath: true });
 
-      const ev = toEvent(c, task.id);
-      if (!ev) continue;               // a comment with no telemetry block is not an error
+      const ev = deriveEvent(c, { sessionAgent, sessionTitle: task.name });
+      if (!ev) continue;
+      seq++;
 
-      const key = sessionKey(task.id, ev);
-      ev.session_id = key;
-      if (!sessions[key]) {
-        sessions[key] = {
-          title: task.name,
+      if (!sessions[task.id]) {
+        sessions[task.id] = {
+          title: task.name.replace(/^(?:↪️|🧭|📋)\s*/, "").replace(/^\[AGENT\]\s*/, ""),
           model: modelFromTitle(task.name) ?? "model unknown",
           task_id: task.id,
           real_usd: 0
         };
       }
-      events.push(ev);
+
+      events.push({
+        ...ev,
+        comment_id: id,
+        task_id: task.id,
+        session_id: task.id,
+        seq,
+        emitted_at: new Date(Number(c.date)).toISOString(),
+        verified: ev.capture !== "tagged",
+        raw: c.text_content ?? ""
+      });
       fresh++;
     }
   }
@@ -90,22 +99,16 @@ async function sweep(): Promise<void> {
   events.sort((a, b) => String(a.emitted_at).localeCompare(String(b.emitted_at)));
 
   await Bun.write(OUT_PATH, JSON.stringify({
-    captured_at: new Date().toISOString(),
-    source: "poll",
-    sessions,
-    events
+    captured_at: new Date().toISOString(), source: "poll", sessions, events
   }, null, 2), { createPath: true });
 
-  console.log(`[${new Date().toLocaleTimeString()}] +${fresh} telemetry events, ${events.length} total`);
+  const derived = events.filter(e => e.capture === "derived").length;
+  console.log(`[${new Date().toLocaleTimeString()}] +${fresh} · ${events.length} total · ${derived} derived from prose`);
 }
 
 async function loop(): Promise<void> {
-  try {
-    await sweep();
-  } catch (err) {
-    // A failed sweep is not fatal. Log it and try again; the next pass re-reads everything.
-    console.error("sweep failed:", err instanceof Error ? err.message : err);
-  }
+  try { await sweep(); }
+  catch (err) { console.error("sweep failed:", err instanceof Error ? err.message : err); }
   setTimeout(loop, INTERVAL_MS);
 }
 
