@@ -1,7 +1,100 @@
-<section class="now" id="now">
-  <p class="now-kicker" id="nowKicker">right now</p>
-  <p class="now-line" id="nowLine">Reading the board.</p>
-  <p class="now-last" id="nowLast"></p>
+<!-- AgentGlass v3 feed — ONE chronological stream, full post bodies, speaker lanes.
+     Session grouping was REMOVED from the stream on purpose (v2 had sticky per-session headers):
+     a feed interrupted every two items by a chapter title reads as a filing cabinet, not a
+     conversation. Session name is now quiet context INSIDE each post. Cleo's call, Workshop Jul 25.
+
+     Styles are scoped here rather than in source/styles.css because this page is injected as a
+     partial; keeping them adjacent to the markup they style means the post shape travels as one unit. -->
+
+<style>
+  .now{padding:var(--s5) var(--s5) var(--s4);border-bottom:1px solid var(--line-soft)}
+  .now .kicker{font-family:var(--mono);font-size:0.625rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--txt-dim)}
+  .now .line{margin:6px 0 0;font-size:1.25rem;line-height:1.3;color:var(--txt-hi);font-weight:400;text-wrap:pretty}
+  .now .last{margin:var(--s3) 0 0;font-size:0.8125rem;color:var(--txt-lo);text-wrap:pretty}
+  .now .last b{color:var(--txt);font-weight:600}
+  .now[data-mood="working"] .kicker{color:var(--air)}
+  .now[data-mood="waiting"] .kicker{color:var(--hold)}
+  .now[data-mood="stalled"] .kicker{color:var(--gap)}
+
+  /* ── the stream ── */
+  .stream{flex:1 1 auto}
+
+  .post{
+    display:grid;
+    grid-template-columns:34px 1fr;
+    gap:0 var(--s3);
+    padding:var(--s4) var(--s5) var(--s4) var(--s4);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .post .avatar{
+    width:32px;height:32px;border-radius:50%;
+    display:grid;place-items:center;
+    font-size:15px;line-height:1;
+    background:var(--ink-2);border:1px solid var(--line-soft);
+    user-select:none;
+  }
+  .post .head{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;min-height:20px}
+  .post .name{font-size:0.9375rem;font-weight:600;color:var(--txt-hi);letter-spacing:0.004em}
+  .post .when{font-family:var(--mono);font-size:0.75rem;color:var(--txt-dim);font-variant-numeric:tabular-nums}
+  .post .dot{color:var(--txt-dim);font-size:0.75rem}
+  .post .where{
+    font-size:0.75rem;color:var(--txt-dim);
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+
+  /* full prose. NO markdown parsing (untrusted input) — plain text, breaks preserved. */
+  .post .body{
+    margin:6px 0 0;
+    font-size:1rem;line-height:1.55;color:var(--txt);
+    white-space:pre-wrap;
+    overflow-wrap:break-word;
+    text-wrap:pretty;
+  }
+  .post .body.clamped{
+    display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .post .more{
+    margin-top:var(--s2);
+    background:none;border:0;padding:6px 0;min-height:32px;
+    font-family:var(--mono);font-size:0.75rem;color:var(--air);
+    cursor:pointer;letter-spacing:0.02em;
+  }
+  .post .more:hover{text-decoration:underline;text-underline-offset:3px}
+  .post .more:focus-visible{outline:2px solid var(--air);outline-offset:3px;border-radius:4px}
+
+  .post .meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:var(--s3);align-items:center}
+  .post .meta span{
+    font-family:var(--mono);font-size:0.6875rem;padding:3px 7px;border-radius:5px;
+    background:var(--ink-2);color:var(--txt-lo);border:1px solid var(--line-soft);
+  }
+  .post .meta .quiet{background:transparent;border-style:dashed;color:var(--txt-dim)}
+  .post .meta .warn{border-color:var(--gap-d);color:var(--gap)}
+
+  /* state accent lives on the avatar ring, never a side stripe */
+  .post[data-st="working"] .avatar{border-color:var(--air-d)}
+  .post[data-st="waiting"] .avatar{border-color:var(--hold-d)}
+
+  /* Michael's lane: his own voice, visibly not an agent */
+  .post.mine{background:oklch(19.5% 0.016 250)}
+  .post.mine .avatar{background:oklch(26% 0.03 250);border-color:var(--hold-d)}
+  .post.mine .name{color:var(--hold)}
+  .post.mine .body{color:var(--txt-hi)}
+
+  .post.unverified{background:oklch(16% 0.008 52)}
+  .post.unverified .name,.post.unverified .body{color:var(--txt-lo)}
+
+  .daymark{
+    padding:var(--s4) var(--s5) var(--s2);
+    font-family:var(--mono);font-size:0.625rem;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--txt-dim);
+  }
+</style>
+
+<section class="now" id="now" data-mood="idle">
+  <div class="kicker" id="nowKicker">right now</div>
+  <p class="line" id="nowLine">Reading the board.</p>
+  <p class="last" id="nowLast"></p>
 </section>
 
 <div class="fleet" id="fleet" aria-label="Sessions at the playhead"></div>
@@ -15,7 +108,7 @@
   <ul id="needList"></ul>
 </details>
 
-<div class="feed" id="feed"></div>
+<div class="stream" id="feed"></div>
 
 <details class="cost">
   <summary>
@@ -24,11 +117,8 @@
     <span class="how" id="mix"></span>
   </summary>
   <p class="note">
-    <strong>Est</strong> is the counterfactual: what this would have cost billed direct, derived from model,
-    turn count and tool volume. <strong>Real</strong> is money actually spent. Unverified senders' claimed
-    figures are never summed.
-    <br><br>
-    <strong>Capture</strong> counts how each event was picked up. <em>Derived</em> means the agent posted
-    ordinary prose with no telemetry block and was read anyway.
+    <strong>Est</strong> is the counterfactual: what this would have cost billed direct, derived from
+    model, turn count and tool volume. Nothing self-reported. <strong>Real</strong> is money actually
+    spent. Unverified senders' claimed figures are never summed.
   </p>
 </details>
