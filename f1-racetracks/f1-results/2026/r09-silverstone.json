@@ -3,8 +3,7 @@
  "pole": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:28.111" },
  "fastestLap": { "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "time": "1:31.777", "lap": 37 },
  "summary": "Leclerc won a chaotic race under the Safety Car, Ferrari's 250th F1 win, from Russell and Hamilton after leader Antonelli suffered a bodywork failure and finished out of the points. Antonelli's title lead cut to 25.",
- "sprint": {
- "classification": [
+ "sprint": { "classification": [
  { "pos": 1, "driverId": "86ae52qvh", "driver": "Andrea Kimi Antonelli", "team": "Mercedes", "status": "FIN", "points": 8 },
  { "pos": 2, "driverId": "86ae52rxg", "driver": "Lewis Hamilton", "team": "Ferrari", "status": "FIN", "points": 7 },
  { "pos": 3, "driverId": "86ae52q76", "driver": "Lando Norris", "team": "McLaren", "status": "FIN", "points": 6 },
@@ -13,8 +12,7 @@
  { "pos": 6, "driverId": "86ae52rym", "driver": "Max Verstappen", "team": "Red Bull", "status": "FIN", "points": 3 },
  { "pos": 7, "driverId": "86ae52q7p", "driver": "Oscar Piastri", "team": "McLaren", "status": "FIN", "points": 2 },
  { "pos": 8, "driverId": "86ae52rye", "driver": "Liam Lawson", "team": "Racing Bulls", "status": "FIN", "points": 1, "stewardNote": "Classified P8 pending a post-race investigation noted at the time." }
- ]
- },
+ ] },
  "classification": [
  { "pos": 1, "driverId": "86ae52rxd", "driver": "Charles Leclerc", "team": "Ferrari", "status": "FIN", "points": 25, "grid": 2, "fastLap": { "time": "1:32.871", "lap": 43 }, "qualifying": { "pos": 2, "q1": "1:29.534", "q2": "1:28.626", "q3": "1:28.286" } },
  { "pos": 2, "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "status": "FIN", "points": 18, "grid": 4, "fastLap": { "time": "1:32.489", "lap": 36 }, "qualifying": { "pos": 4, "q1": "1:29.985", "q2": "1:28.920", "q3": "1:28.481" } },
