@@ -22,7 +22,9 @@ What that changes, concretely:
 |------------------------|-------------------------------------------|--------------------------------------------|------------------------------------|
 | `on-track-refresh.md`  | Every **Wednesday**                       | weekly motorsports TV refresh              | `routines/last-run/on-track.txt`   |
 | `f1-refresh.md`        | **Thu–Sun, session-aware** (see note)     | eligible on EVERY invocation on race-weekend days; refreshes only when a session has finished since last-run | `routines/last-run/f1.txt` |
-| `world-cup-refresh.md` | **inactive**                              | 🏁 RETIRED 2026-07-26 — tournament ended Jul 19, 2026 | `routines/last-run/world-cup.txt`  |
+| `world-cup-refresh.md` | **inactive**                              | 🏁 RETIRED 2026-07-26 · ran through **2026-07-19**, tournament over | `routines/last-run/world-cup.txt`  |
+
+> ⚠️ **VIEWER CONTRACT — do not rephrase these cells casually.** `routines/index.html` parses this table live. It finds the table by the header cell `Routine file`, needs **exactly these four columns in this order**, derives the day-strip by regexing **day names out of the `Cadence` cell**, and decides a routine is retired by matching **`through YYYY-MM-DD`** in the `Window / notes` cell. That is why the World Cup row still says *"ran through 2026-07-19"* rather than a cleaner sentence: drop the phrase and the viewer silently un-retires the card. Express state in the cell text; never add a column, a second table, or a table above this one.
 
 ### 🏁 World Cup stand-down (2026-07-26)
 
@@ -70,5 +72,13 @@ On invocation, for every ACTIVE routine, read its `last-run` file and compare ag
 - Write ONLY the single `last-run/<routine>.txt` file for the routine that just succeeded — never a shared file, never another routine's file.
 - Format: one line, `YYYY-MM-DD HH:MM` ET. Use `never` if it has never successfully run.
 - Changing a cadence/window: edit the `Cadence` cell above (or tell Ricky). Never reschedule by editing a runbook spec, and never by editing the agent.
-- Retiring a routine: mark the row `inactive` with a dated reason. **Do not delete the row and do not delete the runbook.**
-- ⚠️ **`routines/index.html` (the Routines Viewer) parses the table above live.** Keep the four column headers and the row shape exactly as they are; express state in the cell text, not in a new table or a new column.
+- Retiring a routine: mark the row `inactive`, keep a `through YYYY-MM-DD` phrase in the notes (viewer contract), and add a dated reason. **Do not delete the row and do not delete the runbook.**
+
+## 🚨 Known viewer breakage — OPEN, not mine to fix (found 2026-07-26)
+
+`routines/index.html` is app source, so it is a BUILD task (Dexter), not a routine edit. Two live defects, both verified by reading the parser:
+
+1. **The "Current wake window" card is now a lie.** `renderWindow()` does not read this file at all — it hardcodes the wake schedule and prints *"Ricky wakes once daily at 06:00 ET."* **Nothing wakes.** This is the most visible surface in the app and it states the one thing that is no longer true. It also disagreed with this file *before* today (card said 06:00/15:00/21:00/03:00; this file said 06:00/12:00/16:00/00:00), so it has been drifting for a while. The card should be replaced with an invoke-only statement, and the section heading "Scheduled routines" should lose the word Scheduled.
+2. **Every routine has displayed "Last run: never" since 2026-07-05.** `parseLastRun()` expects a TIMESTAMP in column 4, but column 4 became a FILE PATH the day stamps moved per-routine. It parses `routines/last-run/on-track.txt` as a date, gets `NaN`, and renders `never`. **Three weeks of a silently wrong core field**, in the app whose entire job is showing last-run. The fix is small: if the cell looks like a path, fetch it from the raw base and use its contents.
+
+Both are quietly self-inflicted by doc changes that were correct in isolation. **A schedule doc and its renderer are one system; changing the doc's shape is a change to the app.**
