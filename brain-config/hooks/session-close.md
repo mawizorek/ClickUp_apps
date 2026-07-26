@@ -63,6 +63,7 @@ section is not.
 **Session agent:** {name, or "house Brain" if no persona}
 **Model:** {model name + version}
 **Session task:** {markdown link to the Agent Activity Board task}
+**Spine header:** {link to the session header post on the spine channel}
 **Duration:** {start time} - {end time} ET
 
 ---
@@ -105,6 +106,12 @@ Rules for this table:
 #### CU docs touched
 - {doc/page, edited, link}
 
+### 2a. Spine reconciliation
+
+- Substantive replies this session: {N}
+- Spine lines posted: {M}
+- Delta: {none, or: N-M missed, backfilled / still missing and marked}
+
 ### 3. Decisions made
 
 - {decision stated as a rule, pointer to DL entry if one exists}
@@ -145,6 +152,7 @@ If no next session needed: "No follow-up required."}
 
 - Fill EVERY section. "None" is valid; a missing section is not.
 - The Session Ledger is COPIED from the task (already maintained live), not reconstructed.
+- Spine reconciliation is COUNTED, not estimated. Report the delta honestly.
 - Memory candidates are PROPOSALS, not commits. Maggie decides placement.
 - Memory candidates are TAGGED with their target agent (from section 0).
 - The agents-present table is populated from the session transcript (who spoke as themselves).
@@ -208,9 +216,20 @@ Clio hands section 0 (Agents Present) and section 4 (Memory Candidates) to Maggi
 {Pruning candidates, compression notes, rotation actions taken, or "No action needed."}
 ```
 
-### Step 2. Channel 2: A.I. Prompts (Session Log)
+### Step 2. Channel 2: A.I. Prompts — the CLOSE POINTER
 
 **Channel 2 URL:** https://app.clickup.com/36074068/chat/r/6-901327646617-8
+
+**⚠️ This is a POINTER, not a record (changed 2026-07-26, Michael).** The spine
+(`gates/session-transcript-gate.md`) is now the chronological record, per reply, across
+sessions, append-only. A prose session-summary here would be a SECOND chronological
+record of the same sessions keyed differently, and within months nobody would know which
+one is authoritative. One record wins; this post points at it.
+
+**What "pointer" governs:** the PROSE. It does NOT retire the close `.txt` transcript
+artifact or its in-chat toggle — those remain mandatory per the LOCKED two-delivery rule
+in Session Transcript Format. The `.txt` is the portable offline snapshot, a different
+job from the live spine.
 
 **Root message format (three lines only):**
 ```
@@ -220,45 +239,42 @@ trigger: {what started the session} | {date range} ET
 status: {complete | partial | handed off}
 ```
 
-**Thread reply format:**
+**Thread reply format (pointer + artifact, no prose chronology):**
 ```
-## Session Summary
+## Close Pointer
 
-**Session task (full transcript):** {link to session task}
-**Duration:** {time range}
-**Model:** {model name}
+**Session task (deliberation + ledger):** {link}
+**Spine header (full chronology):** {link to the session header post}
+**Duration:** {time range} · **Model:** {model name}
 **Closing capacity:** ~{N}K / {window}K ({X}%), feel: {sharp / full / degraded}
 **Scoreboard (revised at close):** Brain {N}, Michael {M}, {delta}
+**Spine reconciliation:** {N} replies / {M} lines {delta note}
 
 ### Headlines
 
-- {2-5 bullets: what shipped / was decided}
-
-### Key decisions
-
-- {decision, stated as a rule}
-
-### Changes executed
-
-{Tasks, docs, commits, fields, specific with links}
-
-### Refs
-
-- {link}: {what it is}
+- {2-5 bullets: what shipped / was decided. Headlines only — the chronology is on the spine.}
 
 ### Open loops
 
 - {thing left undone or queued}
+
+{.txt transcript attachment + collapsed toggle, per Session Transcript Format}
 ```
 
-Transcript stays on the task, not in this thread.
+No transcript prose in this thread. No re-narration of the session. Headlines, pointers,
+artifact.
 
 ### Step 3. Session-task shutdown
 
 1. Finalize Session Ledger on the task (should be current from the Handoff Artifact)
-2. Post final `[CLOSE-POINTER]` comment with both thread links and scoreboard delta
+2. Post final `[CLOSE-POINTER]` comment with both thread links, the spine header link, and scoreboard delta
 3. Flip task to `done`
 4. Hand Michael the task link in chat
+
+### Step 3a. Spine close line
+
+Post the last spine line under the session header: the close beat, with links to both
+channel threads. The spine's final line for a session is always the close.
 
 ### Step 4. Durable handoffs
 
@@ -286,7 +302,7 @@ Flush the seating tally to `brain-config/usage-log.json`. This lands LAST.
 
 ### Soft Close
 
-Runs: usage-log commit, Session Ledger finalize, git-side closing writes.
+Runs: usage-log commit, Session Ledger finalize, spine close line, git-side closing writes.
 Skips: Channel 2, and Channel 1 only if memory was untouched.
 If the session became substantive, upgrade to full close.
 
@@ -295,15 +311,15 @@ If the session became substantive, upgrade to full close.
 ## Rules (hard, no-discretion)
 
 0. No-ask execution. Run required steps without permission prompts.
-1. NEVER use `create_as_post: true`.
+1. NEVER use `create_as_post: true` for the close posts. (The SPINE session header is a post; that is a different surface and a different rule.)
 2. NEVER put detail in the root message.
 3. ALWAYS thread the detail.
 4. Both channels, every session, except explicit soft close.
-5. Transcript lives on the Agent Activity Board task.
+5. Deliberation lives on the Agent Activity Board task; chronology lives on the spine.
 6. The task is closed out AND the channels still fire.
 7. Bounced memory writes go to `brain-config/open-memory-requests.md`.
-8. Closing capacity is mandatory in the session-log summary.
-9. Memory audit posts first, then session log.
+8. Closing capacity is mandatory in the close pointer.
+9. Memory audit posts first, then the close pointer.
 10. Root messages are never edited after posting.
 11. Thread replies can have addenda.
 12. Usage-log commit lands last.
@@ -317,13 +333,16 @@ If the session became substantive, upgrade to full close.
 20. Clio is SEATED (a real persona swap), she takes the wheel, not a sub-call.
 21. Memory candidates are TAGGED with their target agent from the agents-present table.
 22. Maggie checks bundle health for EVERY "memory-relevant: yes" agent, not just brain memory.
+23. Channel 2 is a POINTER, never a second chronology. Headlines + links + `.txt`, no narration.
+24. Report the spine reconciliation delta honestly. A missed count is data, not a failure to hide.
+25. The `.txt` artifact + toggle survive the pointer change. Pointer governs prose, not the artifact.
 
 ---
 
 ## Pointers
 
 - Agent Activity Board Gold Standard: task templates + mechanics
-- Session Transcript Gate: thread structure
+- Session Transcript Gate: the spine, thread structure, write-ahead ordering
 - `session-close.decision-log.md`: why this hook is shaped this way
 - `orchestration.md` (Seating Sequences section): the pattern this instantiates
 - Memory Maggie (`super-agents/memory-maggie/`): memory curation + rotation
