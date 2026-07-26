@@ -5,14 +5,23 @@ goal: after each 2026 race weekend, the canonical JSON results store reflects th
 targets:
 - **DATA (canonical):** `f1-racetracks/f1-results/2026/` — one file per round + `index.json`. This is the source of truth for results.
 - **MIRROR (slim):** the track task's **"Race History"** text field in ClickUp — ONE frozen year-line, resolved by `cuTaskId`.
+- **STAMP:** `routines/last-run/f1.txt`.
 
 report-to: #A.I. Prompts (thread: F1 refreshes)
 
+> Follows the UNIVERSAL Data-Refresh Discipline in `routines/README.md`. Cadence lives in `routines/schedule.md`, never here.
+
 ## What changed (schema shift, Jul 2026)
 
-Full race data now lives ONLY in the per-round JSON store. **ClickUp no longer stores finishing order.** The old per-year result dropdown/field is RETIRED — do not write to it. Ricky updates the JSON; the ClickUp write is now a single fill-if-blank year-line, nothing more.
+Full race data now lives ONLY in the per-round JSON store. **ClickUp no longer stores finishing order.** The old per-year result dropdown/field is RETIRED — do not write to it. The executor updates the JSON; the ClickUp write is now a single fill-if-blank year-line, nothing more.
 
 > Prereq: the slim **"Race History"** text field must exist on the track tasks. If it isn't there yet, STOP and flag — do not recreate a per-year field or write order anywhere in ClickUp.
+
+## Is there anything to do? (session-aware check — run this FIRST)
+
+Read `routines/last-run/f1.txt`. **If no F1 session (Practice / Qualifying / Sprint / Race) has FINISHED since that timestamp, this is a clean no-op: report "nothing new," write nothing, and do NOT stamp.** Only proceed when a session has actually completed.
+
+This check is why the routine survived the retirement of the scheduler untouched: the *"is there new data?"* decision has always lived here in the runbook rather than in a wake timer, so removing the timer changed nothing. Keep it that way.
 
 ## Steps
 
@@ -29,7 +38,8 @@ Full race data now lives ONLY in the per-round JSON store. **ClickUp no longer s
    - **Fill-if-blank:** if a 2026 line already exists and matches, leave it; if it exists and differs, **STOP-and-flag** — never clobber. Prior years are immutable.
    - Do NOT write finishing order, per-position fields, or the retired dropdown. Full order stays in JSON only.
 6. Commit the JSON to `main` — **data-only, do NOT touch engine / source / render.** Then apply the ClickUp writes.
-7. Post the run report.
+7. **STAMP.** Write `routines/last-run/f1.txt` — one line, `YYYY-MM-DD HH:MM` ET, nothing else. Only this file; never a shared log, never another routine's file. **Stamp only on an actual refresh** (a clean no-op does not stamp), and **leave it untouched on a failed or partial run** so the routine stays overdue and self-heals. *(Added 2026-07-26: this step was missing. Under a wake timer the executor's own mechanics covered it. With no scheduler, the stamp is the ONLY input to the due-math — and here it is doubly load-bearing, because the session-aware check above reads it as its own input.)*
+8. Post the run report.
 
 ## Guardrails (STOP + flag if any is true)
 
@@ -38,8 +48,9 @@ Full race data now lives ONLY in the per-round JSON store. **ClickUp no longer s
 - A `cuTaskId` or `driverId` won't resolve → STOP, never guess or create a filling object.
 - The "Race History" field already has a 2026 line that differs from yours → STOP-and-flag, never overwrite.
 - Any urge to write finishing order into ClickUp → that's the retired pattern. JSON only.
-- The engine/source/render is what needs changing → not a refresh. Ricky never touches engine/source.
+- The engine/source/render is what needs changing → not a refresh. The executor never touches engine/source.
+- You are about to stamp a shared log file instead of `routines/last-run/f1.txt` → STOP, that shape is forbidden (see `schedule.md`).
 
 ## Report format
 
-JSON commit link + live URL (https://mawizorek.github.io/ClickUp_apps/f1-racetracks/) + round added + ClickUp tracks touched (year-line appended / skipped-already-present) + anything unverifiable.
+JSON commit link + live URL (https://mawizorek.github.io/ClickUp_apps/f1-racetracks/) + round added + ClickUp tracks touched (year-line appended / skipped-already-present) + anything unverifiable + **whether this run was a catch-up** (sessions that finished more than one invocation ago).
