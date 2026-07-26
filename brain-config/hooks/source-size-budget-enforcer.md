@@ -8,6 +8,8 @@
 
 **Trigger:** Before committing any source file to `mawizorek/ClickUp_apps`.
 
+**Decision history:** `brain-config/hooks/source-size-budget-enforcer.decision-log.md`
+
 ---
 
 ## ⭐ OPERATING POSTURE (LOCKED 2026-07-04): split automatically, don't narrate it
@@ -34,22 +36,51 @@
 
 **Consequence: the practical hard ceiling is ~22KB of real bytes.** This is the missing arithmetic behind two same-day failures on 2026-07-25 — `super-agents/roster.json` at ~25KB and `VERSIONS.md` at 16.4KB-and-climbing both became **unreadable-whole and therefore unwriteable**, because a safe write requires the complete body and rewriting from a truncated read is the documented regression class. The roster's failure was worse than cosmetic: **it blocked the agent-registration flow the roster exists to serve** (Dev Dexter shipped built-but-unregistered because of it).
 
-**So the 30KB line in the Pass below is a TOOL limit, not a design target.** Anything expected to be read back whole and hand-edited — a roster, a ledger, an index, a schema, an agent profile — should be held at **12KB and treated as hard-failing at 22KB.** Michael's own framing after both incidents: *trim prose, never split the list*, because a split index puts the boundary in the wrong place (it moves with the data).
+**So the 30KB line in the Pass below is a TOOL limit, not a design target.** Anything expected to be read back whole and hand-edited — a roster, a ledger, an index, a schema, an agent profile — should be held as low as the FLOOR RULE below permits, and treated as hard-failing at 22KB. Michael's own framing after both incidents: *trim prose, never split the list*, because a split index puts the boundary in the wrong place (it moves with the data).
 
 **The tell that a hand-maintained index is about to hit this wall:** the growth is always **prose, not rows.** Both casualties grew because individual rows became 400-byte-to-5KB essays, while the row COUNT stayed small (~32 agents, ~18 apps). Per-item narrative belongs in git history + the PR description + that item's own README/spec. An index cites and stops.
+
+---
+
+## 📐 THE FLOOR RULE — a target below the floor is a freeze, not a budget (ADDED 2026-07-26)
+
+The section above gives the CEILING. It never gave the other half, so every canonical file got the same aspirational **12KB** target regardless of how many rows it carries. That number was set by looking at a file on a good day. It is not derivable, and for some files it is not reachable.
+
+**Compute the FLOOR before you state a target.**
+
+> **FLOOR = row count × minimum honest row + fixed header.**
+
+The minimum honest row is the smallest a row can be while still carrying what it exists to carry — for a ledger, the live warnings and security flags; for a roster, the lane and invocation token. **You cannot trim below the floor without deleting rows or deleting truth.** Trimming prose buys you the gap between current size and floor, and not one byte more.
+
+**Three numbers, not one:**
+
+| | What it is | How it's set |
+| --- | --- | --- |
+| **Floor** | The irreducible size at today's row count | Computed, never chosen |
+| **Target** | Floor + honest headroom for expected growth | Chosen, must sit ABOVE the floor |
+| **Ceiling** | ~22KB (base64 wall). Non-negotiable | Physics |
+
+**🚨 A stated target that has never been met is ROT, not aspiration.** This is the enforceable rule and it is the whole point of this section. If a file has never once satisfied its own documented target since that target was locked, the defect is in the TARGET, not in the discipline of whoever keeps missing it. Fix the number. Do not keep trimming toward an impossible line, and above all **do not delete a live warning, a security flag, or a do-not-do rule to hit a byte count** — that trades correctness for tidiness, which inverts the reason the budget exists.
+
+**A target equal to the floor is a freeze.** It permits zero growth. If a file's job is to grow (a roster registers new agents; a ledger indexes new apps), a target at the floor guarantees the next honest addition breaks the rule — and the agent making that addition then either mangles the file or ships a violation. Both happened.
+
+**When you can't fix it yourself:** the number is a judgment call with tradeoffs, so **escalate it in the file, in place** — say the target is unholdable, name the floor, name what a real target would be, and keep the ceiling enforced meanwhile. Route the choice to the decision log. An escalation left visible in the file beats a silent violation, and beats a quiet re-write of a locked number.
+
+**Diagnostic (run it in one line):** *is the target above the floor, and has the file ever actually met it?* No to either = the number is wrong. This is a `doc-rot-sweep` sibling: that hook checks docs against HEAD, this checks a stated budget against arithmetic.
 
 ---
 
 ## Pass
 
 1. Measure the outgoing file size.
-2. Budget: **~10–12KB target**, **15KB split line**, **~22KB practical read ceiling** (base64, see above), **~30KB tool cap** (`create_or_update_file` clips/corrupts past ~30KB).
-3. **Under 12KB:** pass, silent.
-4. **12–15KB:** if a clean concern boundary exists, split now, silently. No flag, no question. If none exists (indivisible unit), note it briefly and carry on — it's not yet at the hard cap.
+2. Budget: **~10–12KB target**, **15KB split line**, **~22KB practical read ceiling** (base64, see above), **~30KB tool cap** (`create_or_update_file` clips/corrupts past ~30KB). For a hand-maintained canonical file, the target is **floor + headroom** per the Floor Rule, not a flat 12KB.
+3. **Under target:** pass, silent.
+4. **Target–15KB:** if a clean concern boundary exists, split now, silently. No flag, no question. If none exists (indivisible unit), note it briefly and carry on — it's not yet at the hard cap.
 5. **Over 15KB:** split by concern into modules, automatically, as part of the same commit pass. This is not a question. **Exception → flag:** if no clean boundary exists and the only way under budget is arbitrary fragmentation of one coherent thing, STOP and ask Michael how to handle (this is the pathological case he wants surfaced).
 6. **Over 22KB on a file that must be read back whole and hand-edited** (index / ledger / roster / schema / profile): treat as FAILING, not warning. Trim prose in the same pass. Do not split a list-shaped canonical file — move narrative out of the rows instead.
 7. **Over 30KB:** must also never round-trip the write tool. Auto-split if cleanly separable; if it's one indivisible over-cap blob, flag for GitHub-UI upload / chunk-set routing.
-8. Confirm `.nojekyll` at repo root on any new-app commit.
+8. **Floor check on any canonical file you are about to bring back under budget:** compute the floor first. If the stated target sits at or below it, the target is the defect — escalate in-file per the Floor Rule instead of trimming into the truth.
+9. Confirm `.nojekyll` at repo root on any new-app commit.
 
 ## Monolith-growth gate (build modular by default)
 
@@ -58,10 +89,11 @@
 - **Reference implementation:** `world-cup-bracket/` post-v3 (thin shell + 6 JS modules + 2 CSS, each <12KB).
 - **Where clean boundaries usually are** (so splits stay natural, not arbitrary): styles vs logic; view/render modules by screen (schedule vs bracket); shared state/constants; pure helpers/util; entry/wiring. Split along these seams and the pieces are coherent, never A/B/C hacks.
 - **Prose-shaped files get the same discipline, different remedy:** a doc/index/ledger over budget is trimmed and re-pointed, not fragmented. The seam in a document is *narrative vs. current state* — push the narrative to git/PR/README and keep the state.
+- **A prose file with real concern seams DOES split** (unlike a list-shaped one). A constitution, standard, or long profile divides cleanly by section; a roster does not. Ask which shape you have before choosing trim-vs-split.
 
-**Output:** Silent for all routine splitting (this is the norm). A brief note only at the 12–15KB indivisible edge. A real FLAG + question ONLY when forced to fragment one coherent unit with no clean seam, or an indivisible >30KB blob needs upload routing. **A canonical hand-edited file crossing 22KB is worth naming out loud** — it is about to stop being editable.
+**Output:** Silent for all routine splitting (this is the norm). A brief note only at the target–15KB indivisible edge. A real FLAG + question ONLY when forced to fragment one coherent unit with no clean seam, or an indivisible >30KB blob needs upload routing. **A canonical hand-edited file crossing 22KB is worth naming out loud** — it is about to stop being editable. **A file whose stated target is below its floor is also worth naming out loud** — the rule is broken, not the file.
 
-**Composes with / overrides:** Runs after Secrets Guard, before the commit. Development team (Persistent Review) watchdogs drift during builds and splits proactively. Defers to the GitHub MCP Operating Standard for split/chunk mechanics.
+**Composes with / overrides:** Runs after Secrets Guard, before the commit. **Size Sally** (`agents/size-sally.md`) is the forecasting counterpart — she seats on the build path with Fold-in Frank and projects the curve ahead; this hook is the reactive per-write gate. `hooks/doc-rot-sweep.md` is the sibling that checks docs against HEAD (this one checks a budget against arithmetic). Defers to the GitHub MCP Operating Standard for split/chunk mechanics.
 
 **Examples:**
 - *Routine (SILENT):* a bracket app's inline `index.html` would hit 16KB on a new feature. → Split into shell + `source/` modules by concern, commit, keep moving. No question, no narration beyond the normal build summary.
@@ -69,9 +101,11 @@
 - *FLAG (the exception Michael wants):* a 20KB file is one giant lookup table with no logical partition. → "This is over budget but it's a single coherent table — splitting it would mean arbitrary `part-A/B/C` chunks with no real boundary. Want it kept whole (accept the size), moved to `data.json`, or chunked?"
 - *FLAG:* a generated 41KB blob can't be cleanly divided. → route to GitHub-UI upload / chunk set; don't push through the write tool.
 - *The 22KB case (2026-07-25, twice):* `roster.json` at ~25KB and `VERSIONS.md` at 16.4KB rising. Both were list-shaped canonical files bloated by per-row prose. → Trimmed the prose (roster 25→14KB, ledger 16.4→11KB), kept the lists whole, capped both at ~12KB. **Splitting either would have been the wrong fix.**
+- *The FLOOR case (2026-07-26) — the same two files, one day later:* `VERSIONS.md` was at 13.7KB and `roster.json` at 19.4KB, both against that ~12KB cap, **neither having met it once since it was locked.** The roster's floor is ~11-12KB at ~38 agents, so its target and its floor were the same number: a freeze on the file whose job is registering new agents. The ledger's floor is ~9-10KB at 24 apps, so its 12KB target left room for roughly six more rows with five unindexed folders already waiting. Correct response was NOT another trim — everything left in both was live warnings, security flags, and lanes. **The target was the defect.** Escalated in-file, ceiling still enforced, number routed to the decision log.
 
 **Changelog:**
-- **v4 (2026-07-25)** — Added the **base64 4/3 multiplier**: the ~30KB cap applies to RETURNED bytes, so the practical ceiling is ~22KB on disk. New step 6 treats >22KB on a hand-edited canonical file as failing. Added the prose-vs-rows growth tell and the trim-don't-split remedy for document-shaped files. Prompted by `roster.json` + `VERSIONS.md` both crossing unwriteable on the same day — the roster's blocking its own registration flow.
+- **v5 (2026-07-26)** — Added the **FLOOR RULE**: a target must be computed as floor + headroom and must sit ABOVE the floor, because floor = rows × minimum honest row is not trimmable without deleting truth. Locked the enforceable half: **a stated target never once met is ROT, not aspiration — fix the number, and never delete a live warning or security flag to hit a byte count.** Added a target-equal-to-floor-is-a-freeze clause, the escalate-in-file remedy, new Pass step 8, the prose-with-seams-does-split note, and the Sally/doc-rot-sweep seam. Prompted by `VERSIONS.md` and `roster.json` both sitting over a 12KB target that had never been met, one day after v4 set it — v4 gave the ceiling and never gave the floor.
+- **v4 (2026-07-25)** — Added the **base64 4/3 multiplier**: the ~30KB cap applies to RETURNED bytes, so the practical ceiling is ~22KB on disk. New step treats >22KB on a hand-edited canonical file as failing. Added the prose-vs-rows growth tell and the trim-don't-split remedy for document-shaped files. Prompted by `roster.json` + `VERSIONS.md` both crossing unwriteable on the same day — the roster's blocking its own registration flow.
 - **v3 (2026-07-04)** — Operating posture locked: **auto-split silently as the default**, stop asking "should I split this?", stop narrating routine splits. Flag ONLY the pathological case — being forced to fragment one coherent unit into arbitrary A/B/C pieces with no clean concern boundary (or an indivisible >30KB blob). Per Michael: modular is just how we build, invisible like indentation.
 - v2 (2026-07-04) — Teeth: 15KB hard stop (was soft flag) + monolith-growth gate. Learned from wc-bracket drifting to 30.4KB.
 - v1 (2026-07-03) — initial. Budget: 10–12KB target / 15KB soft / 30KB hard cap.
