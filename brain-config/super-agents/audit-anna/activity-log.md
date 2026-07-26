@@ -4,6 +4,22 @@ _Rolling condensed session ledger. Newest on top. Append-only._
 
 ---
 
+## 2026-07-25 → 07-26 · SESSION CLOSE — SPACE 2 (URITP CRM) Pass-1 walk COMPLETE
+- **What was done:** opened Space 2 with the Per-Space Pre-Gate and walked it to Pass-1 completion with Mainstage Milo. Built **23 List Index rows** (Sort 100–122 — the space had ZERO at session start, so every row is net-new), **17 documentation pages**, and **5 Decision Logs** (CRM space, STUDENTS, ADULTS, CONTACT SHEETS, ROLES cluster). Resolved four Q-batches with Michael and wrote 11 J-blocks. Nothing on any subject list changed.
+- **Space true purpose (LOCKED by Michael):** CRM is the **identity spine** — a person's relationship to the program is many-to-many and time-sliced, and there was no single row to hang it on. STUDENTS (303) / ADULTS (101) / SHOW ROLES (51) hold the natives; ~30 other surfaces are projections of those records into a context.
+- **Best structure found anywhere in the audit so far:** the CONTACT SHEETS folder. SHOW ROLES is a controlled catalog of 51 role DEFINITIONS and every per-show sheet joins to it by relationship, so a sheet row is a real person × role × show assignment. Deliberately built, not accreted.
+- **⚠️ THREE METHOD ERRORS, all self-caught, all worth carrying:**
+  1. **B15 (scored).** I reported the CRM space page as badly drifted — "no CONTACT SHEETS folder, no ROLES subfolder, Labor doesn't exist" — and spun it into a Decision Log question Michael then ANSWERED. All of it was wrong. I had read a task-residency hierarchy tree as a structure map; that tree only nests HOME locations, so lists with no native tasks are invisible in it. The page was accurate line for line. Nearly retired a live roadmap flag on my bad framing.
+  2. **Same error, opposite direction.** Later told Michael CRM still held "loose lists" (SCENE SHOP, PRO-Staff, MY ROSTERS). None are in CRM — they're in BETA BUDGET ▸ LABOR and URITP Courses. Caught before it became a page claim.
+  3. **Three false "duplicate schema" findings avoided** by checking field IDs first: the weekday availability fields, the contact-sheet contact trio, and `Graduation Year` all looked like duplicate definitions with identical names across levels. All were the SAME field applied in multiple places.
+- **Also:** buried a sub-question under another Q-block, so it had no way to be answered and needed a re-ask. One question per block from now on.
+- **Key findings for later passes:** the ROLES question sharpened to "TWO role-definition catalogs" (CRM SHOW ROLES vs FMP Tables ▸ ROLES) and parked a THIRD time with a FileMaker lean · pre-FY26 company history lives in the Gen-1 per-show label fields (I had flagged those twice for culling — REVERSED, they are the archive) · roadmap flag 1 re-shaped: CRM's `Labor` is empty while BETA BUDGET ▸ LABOR is populated, so the staffing-vs-cost split resolved by default.
+- **State left:** all 23 CRM rows at **Documented**, none Confirmed (Michael's word). DoD steps 10–11 (agent-interaction pages, Workshop 0.75) not run on any CRM list — deliberate, Pass-1 only. Audit Progress & Roadmap doc still says CRM is on hold; needs reconciling.
+- **RESUME:** Space 3 (URITP PRODUCTIONS, `901313768203`). Expect it large — folder-per-production. Three parked threads resolve or sharpen there: ROLES park #3, calendar-surface sprawl, and the two-phase production problem.
+- **Session task:** the URITP List Audit standing thread (86ajknmmk).
+
+---
+
 ## 2026-07-25 (cont.) · SESSION CLOSE — Space 1 (URITP main hub) Pass-1 walk COMPLETE
 - **What was done:** finished the Space-1 crawl in one long session with Mainstage Milo on the cross-space connections. Walked FMP Tables, Professional Development, PM Budetting, PROGRAMS, Risk Assessments, Season Planning + all 9 loose top-level lists. Every folder (8), subfolder (4), and list now has an Index row + contextualized page (purpose / residency / field census / Pass-2 flags). Ran the space-doc summary pass on doc-page-43.
 - **Confirmed by Michael:** FMP report-pipeline (Report Imports, REPORTs Available, Document TEMPLATES); all 3 Professional Development; all 4 PM Budetting + folder; Production Management; (Summer) Projects; + the 5 pre-confirmed loose lists.
