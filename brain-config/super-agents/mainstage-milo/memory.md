@@ -12,53 +12,70 @@
 - Prefers collaborators over hard walls between agents — agents call each other in, they don't gate each other.
 - Decision logs, not prose chat, for questioning/brainstorming. Inverted-polarity checkboxes (checked = rejected). Always read answers back decoded before acting.
 - **Purpose > coverage (audit lens, from the 7/25 audit):** documenting what a list CONTAINS isn't the job; naming what it's FOR is. He'll push back on "done, no questions." A purpose that's trivially readable from data is fine — but say which were trivial vs which needed drilling; don't flatten them.
+- **His v1→v2 pattern (confirmed twice — use it before calling anything duplication).** He builds a mechanism cheaply in custom FIELDS, later graduates it to a real STRUCTURE, and leaves v1 in place as history. RECEIPTS FY25-26 → BETA BUDGET space. Per-show involvement label fields → contact sheets joined to a role catalog. The older copy is usually a PREDECESSOR, not muck.
 
 ## URITP workspace context (standing — grows as Milo works)
 
 - **Spaces Milo stewards (known 5 of a stated 7 — confirm the other 2, never fabricate):** URITP Courses (`901313847910`), URITP (`90131524916`), URITP PRODUCTIONS (`901313768203`), URITP CRM (`901313786071`), URITP Programs (`901313758399`).
 - **Season shape:** recurring P1–P4 slots + a distinct One Acts slot. Michael decides the season's SHAPE; Milo runs the work inside it (operations, not season-design).
 - **URITP Programs** is treated as the reference "good" program pattern (per Corey's structural read).
-- **CRM canonical people lists:** STUDENTS + ADULTS (background — Corey's structural domain; Milo operates against them, doesn't restructure them).
-- (Accumulate: the real production task structures, the sloppy interconnections, where things actually live, as Milo maps them.)
+- **⚠️ Method rule learned the hard way (2026-07-26):** a task/residency hierarchy tree is NOT a structure map — it only nests the HOME location of returned tasks, so lists with no native tasks are invisible in it. **Open the live container** (space → folder → subfolder) before stating what exists. This produced a scored miss (Anna's B15) and nearly a second one. Same discipline for fields: identical field NAMES at different scopes are usually the SAME field applied twice, so check the field id before reporting duplication.
 
-## URITP LIST AUDIT — live context (Anna-led, Milo carries the workspace memory) [added 2026-07-25]
+## 🎯 MY STANDING ASSIGNMENT — the availability-tracking problem (Michael, 2026-07-25)
 
-> Michael looped Milo in to hold the memory/context for the ongoing top-down URITP list audit. This is the durable record so a cold Milo wakes warm to where the audit stands. Audit Anna LEADS the audit (root-purpose, completeness); Milo brings/keeps the URITP workspace knowledge; other agents pulled in as needed. Michael works it WITH the agents in stages.
+Mine to carry and develop options for as the audit proceeds; **Corey** is the call-in for the ClickUp mechanism. Michael's own framing: *"not sure how to track changing availabilities or one-off meeting availability requests."*
+
+**The diagnosis, from the Space-2 walk:** *recurring* weekly availability is **well-built and genuinely shared** — the weekday `availability:` fields on a PRODUCTIONS show list are the SAME fields (verified by id) as the CRM PEOPLE folder's, so data written on a show IS the person's data. What has **no mechanism at all** is the **time-boxed poll**. Every "pick one of these four Tuesday slots" mints a new list plus hard-coded fields naming specific dates (`Option 1: Tue 11:30a - 12:30p`, `MONDAY 12/7 Postmortem`), which then persist forever after the meeting. One write-once dropdown has `CONFRIMED!` frozen into it permanently. Four availability/attendance surfaces exist across THREE spaces as a result.
+
+**My generalized thesis (test it in every remaining space):** across URITP, **steady state is well-built and transient state has no mechanism.** Open position → a placeholder task. Meeting poll → permanent schema. Production phase → a note-task parked as a roster row. Same shape three times; likely ONE missing pattern rather than three problems.
+
+## URITP LIST AUDIT — live context (Anna-led, Milo carries the workspace memory)
+
+> Anna LEADS (root-purpose, completeness); I bring/keep the URITP workspace knowledge. Michael works it WITH us in stages, answers in batches, and parks deliberately.
 
 **Where the audit lives (the machinery):**
-- **Standing thread task** = the ONE ongoing home (reopen every session, never spawn a new session task): `task:86ajknmmk` (🧭 STANDING · URITP List Audit) on the Agent Activity Board. Full per-list transcript accrues there as comments.
-- **List Index** = `901327881037` (in MAW Documents ▸ ClickUp Use). One task-row per list/folder holding queryable audit METADATA (Audit Status Queued→Documented→Confirmed, Vitality, Cadence, Task Residency, Source-of-Truth, Purpose one-liner + locator fields + Doc Page pointer). The **Audit Frontier Scan** table view on it is the canonical resume surface.
-- **Roadmap doc** (`doc-page-62`) = process + frontier SoT. **List Audit DoD** (`12cwjm-76573`) = the 9-step protocol Anna runs.
-- **Data model:** Index row = metadata (queryable); doc page = narrative (prose). Never duplicated. Confirmed is MICHAEL's word only; Documented is the agent ceiling.
+- **Standing thread task** = the ONE ongoing home (reopen every session, never spawn a new session task): `task:86ajknmmk` (🧭 STANDING · URITP List Audit).
+- **List Index** = `901327881037` (MAW Documents ▸ ClickUp Use). One row per list/folder holding queryable audit METADATA + the Doc Page pointer. The **Audit Frontier Scan** table view is the canonical resume surface.
+- **Roadmap doc** (`doc-page-62`) = process + frontier SoT. ⚠️ Its banner has drifted a full sprint before and misled a resume; distrust it against the live Index. **List Audit DoD** (`12cwjm-76573`) = the 9-step protocol.
+- **Data model:** Index row = metadata (queryable); doc page = narrative. Never duplicated. **Confirmed is MICHAEL's word only**; Documented is the agent ceiling.
 
-**Progress as of 2026-07-25 (Space 1 = URITP main hub):**
-- CONFIRMED folders: PRODUCTION RESOURCE PORTALS (all 5 loose lists + FORMS subfolder), INBOX.
-- FMP Tables folder: report-pipeline lists CONFIRMED (Report Imports, REPORTs Available to Import, Document TEMPLATES); ROLES cluster (4 lists + subfolder) PARKED at Documented.
-- Professional Development: all 3 CONFIRMED (Required/MyPath, Safety, Optional).
-- PM Budetting: all 4 CONFIRMED + folder. NOTE it had a hidden undocumented 4th list, RECEIPTS FY25-26 (308 tasks), surfaced this session.
-- PROGRAMS: investigated, PARKED (see forks below), not yet documented-to-completion by Michael's call.
-- Still Queued Space-1 folders: Risk Assessments, Season Planning. Loose lists saved for last (Michael's call).
+**PROGRESS: Space 1 (main hub) and Space 2 (CRM) are both Pass-1 COMPLETE.** Every list/folder/subfolder in both has an Index row + a page. Space-1 detail lives in my activity-log; the short version is that Space 1 is the **source/spine layer** whose calendars, hazard registers and season staffing project OUT into Productions/Courses/CRM.
 
-**Key resolved facts (lock these in as workspace truth):**
-- **PM Budetting = purchasing-INTENT only** (WISH LIST aspirational → Purchase Requests active → Capital Requests big-ticket). Actual purchase/expense TRACKING is upgraded to the **BETA BUDGET space** (or FMP). The `RECEIPTS FY25-26` ledger (308 tasks) is the **predecessor BETA BUDGET grew out of** — legacy origin, not muck.
-- **Purchase Requests is ALSO the public request FORM** — dept-heads without purchasing power submit there (form_response type), plus it's Michael's dump for asks people vocalize to him. The split lets him distinguish a "me" source from an "external" source (provenance of the ask).
-- **The report pipeline (FMP Tables):** REPORTs Available to Import (catalog of what CAN be pulled) → Report Imports (monthly log of what WAS pulled). Inbound: Workday/Nigel(NM)/Katie(KT) → ClickUp. Stays in ClickUp.
-- **Safety Trainings** is really a safety-knowledge research library (51 tasks, mostly 'noted'), not just a cert tracker. **Optional Trainings** carries an accidental PD-spend/reimbursement cluster.
+### Space 2 — URITP CRM (walked 2026-07-25/26, 23 Index rows)
 
-**PARKED forks (Michael deliberately deferred — do NOT lock these purposes until later passes; come back when the audit has read the downstream lists):**
-- **ROLES ↔ PROGRAMS entity question:** the FMP-Tables ROLES lists define roles AS programs (`Assigned Programs` field on Roles in PRODUCTION wires into the PROGRAMS list `901305785167`). Open: is a ROLE and a PROGRAM the same entity in two homes, or two different things? ROLES cluster parked at Documented.
-- **PROGRAM SPRAWL (biggest structural flag):** the "program" concept is duplicated across SAFETY Programs (~88) ↔ Production PROGRAMS (73) — a visible 2025-07-13 bulk-clone batch duplicated dozens; AUDIENCE Program is triple-homed (SAFETY + Production PROGRAMS + Roles in PRODUCTION). Plus an undocumented `Programs in Development` list (14 tasks) and the POLICIES doc set. Open dividing-line question: safety vs production? draft vs published? list vs doc? **Michael parked this until the whole workspace is audited more; the dividing-line discussion happens with Milo + Anna + other team members once memories/configs carry more context.**
+**Space true purpose (LOCKED by Michael):** CRM is the **identity spine**. A person's relationship to the program is many-to-many and time-sliced, and there was no single row to hang it on. It holds the person; every operational surface elsewhere is a **projection** of that record into a context.
 
-**Milo's standing job in the audit:** hold this context, keep it current as the audit advances, and be ready to bring URITP workspace knowledge to the parked-fork discussions (ROLES↔PROGRAMS, program dividing-line) when they're taken up.
+**Live structure (verified by opening containers):** exactly TWO folders. **PEOPLE** ▸ ADULTS · STUDENTS · ROLES (subfolder: THTR MAJORS/MINORS/Cluster-ers/SM CERTIFICATES) · GENERAL AVAILABLITY · Labor · Adjuncts & Guests · UR Staff & Faculty. **CONTACT SHEETS** ▸ FY26 (subfolder) · FY27 (Upcoming) (subfolder) · SHOW ROLES.
+
+**Natives vs projections:** only STUDENTS (303), ADULTS (101) and SHOW ROLES (51) hold native tasks. Everything else is projection — one record was found live in 17 lists at once.
+
+**Key facts to carry:**
+- **PEOPLE folder defines 35 cascading fields** — the contact core, the Mon–Fri availability engine, 13 Gen-1 involvement archive fields, `Lift Certified`. The folder's reason for existing is the CASCADE, not the contents.
+- **THE TWO GENERATIONS (Michael-confirmed).** **Gen 1** (pre-FY26): a show's company was recorded as a **label field on each person**, one field per production. **Gen 2** (FY26+): a **contact-sheet list** joined to the **SHOW ROLES** catalog by relationship. Gen 2 is an upgrade of Gen 1 → the apparent "duplication" is a predecessor relationship. 🗄️ **The Gen-1 label fields ARE the entire pre-FY26 company archive. DO NOT CULL THEM.**
+- **Gen-1 fields split by vintage:** shows ≤S'26 defined at PEOPLE-folder level, shows ≥F'26 at SPACE level. Space-level ones leak onto every CRM list including SHOW ROLES itself.
+- **CONTACT SHEETS is the best-built structure in CRM.** 7 sheets, 263 rows, each joining to SHOW ROLES. `Standard Role` + `Consistent Role` checkboxes on the catalog encode a **staffing-gap calculator** nothing currently reads.
+- **Status on a people list = LIFECYCLE, not workflow.** STUDENTS `complete` = graduated/departed. ADULTS `complete` = **relationship inactive** (the middle state — not "engagement over," not "gone"). Independent of the contact-data pass, which is tracked in description prose.
+- **`URITP Affiliation` (what they are to US) vs `Organization Affiliation` (what body they come FROM)** = two deliberate axes, not duplication.
+- **PM Availablity lives in PRODUCTIONS ▸ The Christians**, NOT CRM. **SCENE SHOP / PRO-Staff live in BETA BUDGET ▸ LABOR.** **MY ROSTERS lives in URITP Courses.** CRM people are multi-homed into all of them.
+
+**🅿️ PARKED / SCHEDULED (do not lock, do not build toward):**
+- **CRM projection-fan shape — OPEN.** Michael: *"I DON'T KNOW HOW WE SHOULD DO THIS… you're seeing growing pains."* Historical layering across several structures; target shape undecided. Never read a verdict into it. The 3 empty PEOPLE lists + the 4 ROLES cohort lists hang off this.
+- **ROLES — parked a THIRD time.** Now: **TWO role-definition catalogs** (CRM SHOW ROLES → contact sheets; FMP Tables ▸ ROLES → PROGRAMS) plus the Gen-1 label copy. Michael **leans FileMaker** but struck it as an answer — lean, NOT commitment. Come-back: the **Space-3 walk**.
+- **📅 Gen-1 going forward = SCHEDULED**, not parked: a working session with **Corey + Fiona**. ⚠️ "Fiona" is unresolved — not in the fleet roster, not previously in the URITP trail.
+- **STUDENTS enrollment fields** = a known stopgap; the replacement is the **FileMaker build**, not a ClickUp restructure.
+- **Roadmap flag 1 re-shaped:** CRM ▸ PEOPLE ▸ `Labor` is EMPTY, BETA BUDGET ▸ LABOR is POPULATED. The staffing-vs-cost split resolved by default. Resolves at Space 7.
+- **PROGRAM SPRAWL** still open from Space 1: SAFETY Programs (~88) ↔ Production PROGRAMS (73), a 2025-07-13 bulk-clone batch, AUDIENCE Program triple-homed. My thesis (undecided): the dividing line isn't safety-vs-production, it's **LAYER** — Hazard → Program → Role → per-show RA, one entity moving through states. Argue for one canonical program that hazards + roles REFERENCE.
+
+**NEXT: Space 3 — URITP PRODUCTIONS (`901313768203`).** My home turf, folder-per-production, and where ROLES park #3 + calendar sprawl + the two-phase production problem all come due.
 
 ## Fleet / role context
 
 - Milo = URITP Production Manager Assistant (git-teammate, built 2026-07-21). Center of gravity: day-to-day production operations + knowing/documenting the messy URITP task structures.
-- **Collaborators, not walls:** Corey (ClickUp hygiene/structure, called-in implementer), future TA agent (teaching delivery; shares the course↔production seam case-by-case), Felix (agent-fleet steward, different domain from Milo's URITP-production stewardship), **Audit Anna (leads the list audit; Milo supplies workspace knowledge to it)**.
+- **Collaborators, not walls:** Corey (ClickUp hygiene/structure, called-in implementer — and my named partner on the availability problem), future TA agent (teaching delivery; shares the course↔production seam case-by-case), Felix (agent-fleet steward), **Audit Anna (leads the list audit; I supply workspace knowledge to it — and my connection reads have produced findings she couldn't reach from list data alone)**.
 - **update-uritp retired** — its doc/portal work → standalone docs; Milo did NOT inherit a doc-builder hat.
-- **OPEN fleet-structure question (NOT settled, do not assume):** an agent HIERARCHY where the future TA agent is Milo's subordinate + Milo formally stewards the URITP spaces. Parked on the Super-Agent Fleet buildout task (task-86). Until Michael rules, Milo + TA are collaborating peers.
+- **OPEN fleet-structure question (NOT settled, do not assume):** an agent HIERARCHY where the future TA agent is Milo's subordinate + Milo formally stewards the URITP spaces. Parked on the Super-Agent Fleet buildout task. Until Michael rules, Milo + TA are collaborating peers.
 
 ## Standing reminders
 
 - Confirm the full 7 URITP spaces (5 known) before treating the set as complete.
-- (empty otherwise — accumulate as sessions run)
+- The SQL `custom_fields` census drops fields intermittently (`availability: MONDAY` omitted 4×). Confirm with the field loader before claiming a field is missing.
