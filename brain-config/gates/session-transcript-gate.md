@@ -34,11 +34,13 @@ Full task-side spec: Agent Activity Board — Gold Standard.
 
 ### Why it exists
 
-Every other surface is siloed per session. Decision logs answer *why* per item; the Ledger answers *what shipped* this session; handoff tasks answer *what next*, one hop. Nothing answered **"what have I already tried across the last twenty sessions,"** which is where repeated work and self-contradiction come from. The spine is that surface.
+**The live chat is VOLATILE. The spine is not.** Context compacts, sessions end, replies get lost on mobile — anything that exists only in the conversation is gone. Every other durable surface is siloed per session: decision logs answer *why* per item, the Session Ledger answers *what shipped* this session, handoff tasks answer *what next*, one hop out. Nothing answered **"what have I already tried across the last twenty sessions,"** which is where repeated work and self-contradiction come from.
+
+So the posture is: **you are a surfacing member of this workspace, not a chat window.** The chat is a view of the record, never the record itself. Post the line, then speak.
 
 ### Arming (this IS the switch)
 
-At session open, post the **session header POST** to the spine channel (root level, `create_as_post: true`, `post_type: update`). The returned message ID is the `parent_message` for every spine line for the rest of the session. There is no flag to remember and nothing to opt into: if the header exists, the target exists.
+At session open, post the **session header POST** to the spine channel (root level, `create_as_post: true`, `post_type: update`). Every spine line for the session threads under it as `parent_message`.
 
 Header post body:
 
@@ -50,6 +52,12 @@ Header post body:
 
 Spine lines thread under this post, one per reply, written ahead of the reply.
 ```
+
+**⚠️ RE-RESOLVE THE HEADER, NEVER TRUST THE CACHE (HARD — the S1 fix).** Hold the header's message ID for convenience, but **the ID is not the source of truth; the channel is.** Before any spine write where the cached ID is not verifiably in hand, re-resolve it: read the channel's recent root posts, find the header whose body names THIS session task, thread under that.
+
+**Why this is non-negotiable:** context compaction silently evicts the cached ID on any long session. The write then **succeeds** as a root-level message instead of a threaded reply — no error, no gap marker, nothing for the never-block rule to catch, because nothing failed. The session's tail silently detaches from its head and the roots-are-the-session-index property dies. **This is the default outcome of any session long enough to need a spine**, so it is the single most likely way the spine breaks. A cheap extra read at the moment the cache is gone is the whole fix.
+
+**Idempotency (HARD).** Before posting a header, check the channel's recent roots for one already naming this session task. Found → thread under it, do NOT post a second header. This covers same-day second sessions and resumed handoffs, where the arming step would otherwise split one session across two roots.
 
 ### Write-ahead ordering (HARD)
 
@@ -63,6 +71,8 @@ That is the only point in a turn where the outcome is known and nothing has been
 
 **Never ahead of the first token.** The FIRST TOKEN RULE wins: emit visible text to Michael before the spine write, always.
 
+**Known limit, stated honestly:** order is **unobservable after the fact** — a line and a reply in the same minute are indistinguishable from a line written afterward. Nothing verifies this rule; it holds on discipline alone, and the close-time count will pass a session that logged in the wrong order. Do not mistake a clean reconciliation for proof the ordering held.
+
 ### Line format (fixed fields, no improvisation)
 
 ```
@@ -71,30 +81,41 @@ MM-DD HH:MM · <session task URL> · <one clause: what happened> · tools: a, b,
 
 - ONE line. Never a paragraph, never bullets. Depth belongs on the task.
 - The date prefix is mandatory: sessions cross midnight and bare `HH:MM` breaks chronology.
+- Two lines inside one minute may carry `HH:MM:SS` to stay individually greppable.
 - Mobile-safe: no fenced blocks, no tables, no line-leading markdown markers.
 - Greppable, not prose. Same field order every time. A spine you cannot grep is a diary.
 
 ### Completeness (HARD)
 
-Every substantive reply gets a line, **including corrections, wrong turns, and walked-back claims.** Those are precisely the turns that cause an agent to walk on top of itself, so a spine that only logs wins is worthless. A trivial turn ("np", a bare lookup) does not need one.
+Every substantive reply gets a line, **including corrections, wrong turns, and walked-back claims.** Those are precisely the turns that cause an agent to walk on top of itself, so a spine that only logs wins is worthless.
+
+**"Substantive" is defined, not judged:** a reply is substantive unless it is a bare acknowledgement ("np", "yep"), a pure lookup with no decision, or a clarifying question that changed nothing. **When in doubt, log it** — the bias is identical to the open-then-discard bias, and for the same asymmetric-cost reason.
 
 ### Never-block (HARD)
 
 A failed spine write **NEVER blocks a reply.** If the write fails: ship the reply anyway with a visible `⚠️ spine write failed` marker, then backfill the line when the surface returns. An unbackfilled gap stays marked — a record that lies about being complete is worse than a visible hole. Capture matters; it does not matter more than answering.
 
+**Scope of the safety net:** never-block catches LOUD failures only. A write that succeeds in the wrong place (see the re-resolve rule) is invisible to it. That is why re-resolve is a hard rule and not an optimization.
+
 ### Backfill
 
 A spine armed late backfills to message 1, flagged `⚠️ BACKFILL — reconstructed, not live`. Arming late never means starting the record at the arming point.
+
+**Backfilled lines land out of post order.** The channel is chronological by post time; the lines are chronological by their own timestamp. After any backfill those two disagree, so **every backfilled line carries the `⚠️ BACKFILL` marker** and a reader trusts the timestamp field, never the scroll position.
 
 ### Hardcode seam
 
 Under `/session-hardcode` the two-comments-per-turn verbatim capture stays on the TASK. The spine keeps its single line, pointing at it. Fidelity on the task, chronology on the spine — so the one-line format survives hardcode instead of breaking under it.
 
+### Shared surface caution
+
+The spine channel is the board's list channel, so humans may post there too. Machine lines thread under session headers; a human root message is not spine content and is never treated as one.
+
 ### Superseded by the spine
 
 - **The per-reply task transcript comment.** The spine REPLACES it, one write per reply, not two. Structural beats (open, pickup, blocker, close) still go on the task.
 - **The A.I. Prompts close summary prose.** Shrinks to a pointer (see `hooks/session-close.md`). The close `.txt` artifact and its toggle are unaffected.
-- **The clickbot task-activity automation on the board channel.** Contentless duplicate of this job; retired.
+- **The clickbot task-activity automation on the board channel.** Contentless duplicate of this job; retired by Michael (manual, admin-gated).
 
 ---
 
@@ -104,7 +125,7 @@ First question of every working session, run by Mira before any voice is seated:
 
 - **Task exists?** Hand its comment stream to the team.
 - **No task?** Create it, then seat agents. No agent speaks before the thread is live.
-- **Spine armed?** Post the header. Do this at open, not at first substantive turn.
+- **Spine armed?** Check for an existing header for this session task; reuse it or post one. Do this at open, not at first substantive turn.
 
 ---
 
@@ -202,8 +223,8 @@ One synthesis to Michael, full formatting, no per-agent recap. She may flag a he
 
 1. **Announce once.** One short upbeat line, then silence for the rest of the session.
 2. **Ensure the task exists** on the board. Reuse if present, promote the stub if one opened silently, create if neither.
-3. **Arm the spine.** Post the session header, hold the message ID.
-4. **Record structural beats + deliberation on the task**; record chronology on the spine, one line per reply, write-ahead. Backfill pre-trigger turns on both.
+3. **Arm the spine.** Reuse an existing header for this session task, or post one.
+4. **Record structural beats + deliberation on the task**; record chronology on the spine, one line per reply, write-ahead, re-resolving the header whenever the cached ID is not in hand. Backfill pre-trigger turns on both.
 5. **Keep appending live.**
 
 After the announcement: no re-announcing, no narrating entries, no asking permission.
@@ -233,7 +254,8 @@ Governs Michael-to-Brain capture fidelity only. Agent deliberation format and th
 
 1. **Close-time watchdog.** At close, if the task or spine holds no coherent record, reconstruct the best faithful version and post it **flagged as reconstructed**.
 2. **Mid-session catch-up.** See above.
-3. **Reply/line reconciliation.** At close, compare substantive reply count to spine line count and report the delta honestly (`14 replies, 14 lines` or `14 replies, 9 lines — 5 missed`). A scoreboard, not a gate. You cannot fix a compliance problem you cannot measure.
+3. **Reply/line reconciliation.** At close, compare substantive reply count to spine line count and report the delta honestly (`14 replies, 14 lines` or `14 replies, 9 lines — 5 missed`). A scoreboard, not a gate.
+4. **Orphan sweep.** At close, check the channel for spine lines sitting at ROOT level that should have threaded under this session's header (the compaction symptom). Found → note them in the close pointer. They cannot be re-parented after the fact, so the record says so rather than pretending the thread is whole.
 
 Live capture is the standard. The fallback makes a lapse recoverable, not acceptable.
 
@@ -241,7 +263,7 @@ Live capture is the standard. The fallback makes a lapse recoverable, not accept
 
 ## Close
 
-- Run the watchdog + the reply/line reconciliation first.
+- Run the watchdog, the reply/line reconciliation, and the orphan sweep first.
 - Flip the task state and confirm the deliberation is intact.
 - Post the close POINTER in #A.I. Prompts per the Session Close hook. Pointer, not a second chronology. Honor hardcode fidelity for the `.txt` artifact if it was active.
 - Hand Closing Clio the finalized task and close post.
@@ -252,15 +274,20 @@ If the gate never fired, discard the provisional stub and close normally.
 
 ## Rules
 
+- The live chat is volatile and is never the record. Post the line, then speak.
 - Deliberation + fidelity live on the session task. Chronology lives on the spine. Chat holds the close pointer.
 - Thread-first: the task exists before any agent speaks.
 - Thread-only: agents express on the task, never live, never in a working doc, never on the spine.
 - Spine is armed by posting the header. The header IS the switch.
+- **Re-resolve the header from the channel whenever the cached ID is not in hand. The channel is the source of truth, not the cache.**
+- One header per session task. Check before posting a second one.
 - Resolve the spine channel by URL/ID, never by name.
 - Write-ahead: spine line before the reply, after the first token.
 - One line per reply, fixed fields, dated, mobile-safe.
-- Log the corrections and the wrong turns, not just the wins.
+- Log the corrections and the wrong turns, not just the wins. When in doubt, log it.
 - A failed spine write never blocks a reply. Mark the gap; backfill it.
+- Never-block catches loud failures only; a misplaced successful write is invisible to it.
+- Backfilled lines are marked and trusted by timestamp, not scroll position.
 - Two-tier protocol governs thread structure. Templates live here only.
 - Live chat gets Mira's synthesis only.
 - Open-then-discard is the default; agent deliberation makes a session non-discardable.
@@ -278,7 +305,7 @@ If the gate never fired, discard the provisional stub and close normally.
 
 ## Composes with
 
-- **Session Close hook** (`hooks/session-close.md`) — close pointer, reply/line reconciliation, honors hardcode fidelity.
+- **Session Close hook** (`hooks/session-close.md`) — close pointer, reply/line reconciliation, orphan sweep, honors hardcode fidelity.
 - **Session Transcript Format** (AI Toolkit) — the close `.txt` artifact container spec.
 - **Scribe Sana** (`agents/scribe-sana.md`) — owner and operator.
 - **Maestro Mira** — runs the opening check, posts the Tier-1 Opening Post.
