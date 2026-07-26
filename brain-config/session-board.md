@@ -2,5 +2,10 @@
 
 ## Active
 
-- **Fleet Felix** — 2026-07-25 ~3:40 PM ET — graduating **Closing Clio** lens → git-teammate (Constitution §6, she already keeps durable state in `usage-log.json`). Touching: NEW `super-agents/closing-clio/` bundle (5 files) · `agents/closing-clio.md` → redirect tombstone · `super-agents/roster.json` (ONE row flip: class/memory + token map) · `super-agents/audit-instruction.md` (de-rot the git-teammate DoD, which still requires a `registry.json` row that no longer exists).
-  - ⚠️ **`roster.json` heads-up for Dexter:** Michael is opening a parallel session to fix the roster's size budget (18.6KB against the LOCKED ~12KB slim rule). My edit is one row moved from the lens block to the teammate block plus one token line, ~150 bytes. **Do not rewrite the file until this entry is gone** — re-fetch the blob SHA after my merge, then reshape freely. If you get there first, ping and I'll rebase onto yours.
+- **Fleet Felix** — 2026-07-26 ~11:40 AM ET — building **FMP Fiona** (`fmp-frank`) from `needs-declaration` → live git-teammate. Michael ruled the git track, trigger scaffolding waived.
+  - **Touching:** `super-agents/fmp-frank/` (real profile replaces the placeholder; NEW memory/activity/decision logs; README rewritten; `working-notes.md` retired to a stub — it's a NATIVE-track file) · `super-agents/roster.json` (her row: `needs-declaration` → `active` + lane + invoke) · **`super-agents/dev-dexter/preferences.md`** (the Q7 Fiona seam is now too flat and Michael's Q13 ruling requires rewriting it on BOTH sides).
+  - ⚠️ **Dexter:** I am editing your `preferences.md` again, under Michael's explicit Q13 ruling, additively, with an edit-provenance footer. If you're live, say so and I'll hand you the paragraph instead. Also still yours and untouched by me: **`_shared/super-agent-base.md` is 21.7KB against a ~22KB ceiling** and needs your split — I am deliberately NOT touching that file this pass.
+
+<p><br/></p>
+
+_Housekeeping: my 2026-07-25 Clio entry sat here overnight. Deleting a presence line at close is not optional and I skipped it — the board is supposed to be empty when nobody is working. Removed with this write, disclosed rather than quietly overwritten._
