@@ -5,7 +5,7 @@
 | Agent | Session | Working on | Files touched |
 |---|---|---|---|
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
-| Maestro Mira (+ Anna, Milo, Corey, Fiona) | Standing task `86ajknmmk` | Milo memory rotation, then Space 3 (URITP PRODUCTIONS) Pass-1 audit | super-agents/mainstage-milo/* only. NOT touching _shared/, roster.json, PREFERENCES.mirror.md, or open-memory-requests.md — Maggie's drain has those. Audit work is ClickUp-side, no further repo writes expected. |
+| Maestro Mira (+ Anna, Milo, Corey, Fiona) | Standing task `86ajknmmk` | Space 3 (URITP PRODUCTIONS) Pass-1 audit | `super-agents/mainstage-milo/*` (rotation + scope ruling) · `super-agents/clickup-coach-corey/memory.md` (cross-board pattern assignment). Both landed, PRs #548 + #553. ⚠️ Row CORRECTED in place: it previously read "no further repo writes expected," then Michael's scope ruling made a Corey write correct — claiming it rather than writing outside my own declaration. NOT touching `_shared/` (Dexter's split, still at the ceiling), `roster.json` (Felix released it; I have no reason to), or Maggie's three drain files. Remaining audit work is ClickUp-side. |
 
 _Delete your row on session close._
 
