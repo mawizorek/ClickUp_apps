@@ -6,6 +6,43 @@
 
 ---
 
+## 2026-07-25/26 · D11 · The Session Spine (write-ahead per-reply log)
+
+**Decision:** a per-reply, cross-session, append-only chronological log lives on the Agent Activity Board CHANNEL (https://app.clickup.com/36074068/chat/r/6-901327879922-8). One header POST per session; one line per reply threaded under it. It REPLACES the per-reply task transcript comment. Write-ahead of the reply.
+
+**The problem, in Michael's words:** "you keep walking on top of yourself, and it would be nice to have one place where each reply is stored."
+
+**Root cause, and it is not what it looked like.** The opening question was about WRITE cost (chat vs task comment vs doc vs git commit). Writes turned out to be a red herring: a chat message and a task comment cost the same, one call, no read. The actual defect was READS. Every existing surface is siloed per session — decision logs answer *why* per item, the Session Ledger answers *what shipped* this session, handoff tasks answer *what next* one hop out. **Nothing answered "what have I already tried across the last twenty sessions,"** which is exactly where self-contradiction comes from. The spine is the first cross-session read surface.
+
+**Swap, not addition (the load-bearing constraint).** Two writes per reply means the cheaper-to-skip one gets skipped, and the spine is the skippable one because nothing downstream breaks without it. Precedent: the `Follow Up` tag and the three Agent Activity Board custom fields, all specced, all live, **0 of 11 tasks populated any of them**. So the spine REPLACES the per-reply task comment rather than joining it. Cost stays flat at one write per turn.
+
+**Write-ahead means ahead of the REPLY, not ahead of the work.** Michael ruled "definitely write-ahead"; Rhys narrowed it. A true WAL logs intent before the mutation, which here would mean logging what the turn is *about to* do — wrong every time a tool fails or the work changes shape. The seam is `anchor line → tool work → spine line → prose reply`: the one point where the outcome is known and nothing has been said yet. Never ahead of the first token (FIRST TOKEN RULE wins).
+
+**Never-block, and it was validated on turn two of real use.** A failed spine write ships the reply anyway with a visible gap marker. Rhys's argument: a log that can refuse writes is a lock, and locks do not belong on the reply path. This fired for real on 07-26 when the original channel went unreachable mid-session — reply shipped, gap marked, line backfilled. Specced one day, proven the next.
+
+**Enforcement is the whole question; three tiers, only two work.** (1) An index row alone is worthless — that is the Follow Up tag's grave. (2) **Self-arming**: posting the session header returns the parent message ID, so the target exists and there is no flag to remember. This is the same property that makes the existing task gate work (opening the task IS the switch). (3) **Make it load-bearing** — the eventual boot-read (v2) turns a missing line from a compliance failure into a visible cold start. Consequence beats discipline. Plus a close-time reply/line count as a scoreboard, because we had been measuring nothing.
+
+**What LOSES to the spine (Enzo's rule: name it before shipping, or you get split-brain).**
+1. **The per-reply task transcript comment** — superseded outright.
+2. **The A.I. Prompts close summary prose** — shrinks to a pointer. It was a second chronological record of the same sessions keyed differently. The `.txt` artifact + toggle SURVIVE: "pointer" governs prose, not the artifact.
+3. **The clickbot task-activity automation on the board channel** — retired. Evidence: 3 days of history, 100 messages, every one an identical contentless `[object_type:task](url)` ping with no verb, no field, no actor, one task firing ~15 times. Same job as the spine, zero information. Michael: "not super helpful."
+
+**Rejected: a dedicated new channel (`ai-sessions-log`).** Built and armed first, then abandoned. Three reasons: it was attached to the wrong parent list (`AME 292 - Acoustics Portfolio`, an unrelated course list); it added a fifth capture surface when the board channel already existed and is list-attached to the actual session list; and **it proved unreliable** — wrote fine at 19:58, then every path (URL, raw ID, read and write) failed the next morning while the board channel accepted a write first try. Frank's self-correction is the lesson: he ruled the CONCEPT a fold-in but let a net-new CONTAINER through without checking for an existing home. **A fold-in check applies to the container, not just the idea.**
+
+**Scar: `Insufficient access permissions` is a lying error.** The chat tool returns it for a channel it cannot RESOLVE BY NAME, not only for one it cannot access. This cost most of a session chasing "private channel" and then "indexing lag," both wrong — the channel was public with a fresh message in it. **Resolve the spine by URL/ID, never by name.** Now a hard rule in the gate.
+
+**Format rulings.** One line, never a paragraph (Polly: the moment an entry becomes three bullets, the channel is unscannable and you are reading transcripts again). Fixed field order, greppable, because the difference between an index and a diary is whether the lines have the same shape (Cleo). Mobile-safe, no fences or wide tables. **Date prefix mandatory** — this very session crossed midnight and the original bare `HH:MM` format broke chronology on day one.
+
+**Session header = a POST, turns = plain threaded messages.** Posts are root-only, titled, and render collapsed-prominent, which makes the channel's ROOT LEVEL a scannable session index. A post per reply would be catastrophic: prominence on every routine turn destroys scannability, and posts cannot thread, so the session grouping would collapse. Named honestly as legibility, not capability.
+
+**Seams held deliberately.** Fidelity on the TASK, chronology on the SPINE — so hardcode's two-comments-per-turn does not break the one-line format. Chronology only, never inventory: the Session Ledger overlaps at ~40% and stays separate; if the spine ever carries built/changed inventory it crosses Frank's 60% merge line and one of them must die.
+
+**Scope fenced (Skye).** v1 = channel + arming + line format + gate edit + close reconciliation. **The boot-read is v2** — Finn showed the read cost is the only thing that grows (writing to a 5,000-message channel is free; reading it back is not), so mitigation is never read the whole spine, read the last N or the header roots only. Building the consumer before the producer has real volume is designing against a guess. Cleo's derive-the-task-transcript-from-the-spine idea is v3 at the earliest, and Sana objected on merit: a stalled session's task must not go blank, because the task-IS-the-record-of-where-it-stalled property is load-bearing.
+
+**Status:** locked. Source: Michael. Workshop: Frank, Rhys, Cleo, Finn, Skye, Enzo, Polly, Sana, conducted by Mira.
+
+---
+
 ## 2026-07-25 · D10 · Runtime gate trimmed; history moved here
 
 **Decision:** the gate is reduced to runtime-critical procedure. Rationale prose, drift post-mortems, rejected options, cost analysis, and the full changelog move into this file.
@@ -74,7 +111,7 @@
 
 **Why:** deliberation belongs where the work is, accruing turn by turn, not in a separate channel that has to be reconciled later. This also defined three words that had been left to guess: session, thread, and chat.
 
-**Status:** locked. Source: Michael.
+**Status:** locked. Source: Michael. *(Partially superseded by D11: per-reply chronology moved to the spine; deliberation stays here.)*
 
 ---
 
