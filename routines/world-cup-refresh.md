@@ -1,5 +1,17 @@
 # World Cup Refresh
 
+> # 🏁 RETIRED — 2026-07-26
+>
+> **The 2026 World Cup ended with the Final on Sun Jul 19, 2026. This routine is stood down and its row in `routines/schedule.md` is marked `inactive`. Do not run it. Do not propose it.**
+>
+> Stood down per this runbook's own **TOURNAMENT END** section (below), seven days late — the instruction was written correctly and there was no longer anything waking up to execute it. That gap is the argument for triage-on-invocation: a stand-down only happens if someone reads the schedule.
+>
+> **Kept, not deleted.** This is the most complete two-surface runbook in the repo (repo data file + keyed ClickUp mirror, facts-only contract, delta-first writes) and it is the template for the next tournament. Retiring the routine does **not** retire the app: **`world-cup-bracket/` stays live** at https://mawizorek.github.io/ClickUp_apps/world-cup-bracket/ and was not touched. `routines/last-run/world-cup.txt` is frozen as the final historical stamp.
+>
+> **Known rot, left in place deliberately** so a future reviver sees it: Step 6 below says to stamp a `last-run` **cell in `routines/schedule.md`**. That has been wrong since 2026-07-05, when stamps moved to per-routine files (`routines/last-run/<routine>.txt`). **If you revive this runbook, fix Step 6 first.** It is annotated rather than silently corrected because a retired file should not read as maintained.
+
+---
+
 goal: keep both World Cup surfaces current — `world-cup-bracket/data.json` (SOURCE OF TRUTH) AND the ClickUp “World Cup” list (thin event mirror for notifications/automations) — each in its own existing schema.
 target:
   - `world-cup-bracket/data.json` (primary data store)
@@ -70,7 +82,7 @@ Whitelisted ClickUp task fields (nothing else may be written):
      - **Due date:** kickoff date + time (ET, `-04:00` offset — see TIMEZONE note) when known; leave prior value if still TBD.
      - **Custom fields:** set Home/Away Team once teams are known; set Hype Level per the HYPE LEVEL rule below; never leave a literal `TBD` in Hype Level on a resolved match.
    - NEVER create, delete, move, or reparent tasks or lists.
-6. **Stamp done + report.** Stamp this routine's `last-run` cell in `routines/schedule.md` to the completion timestamp (`YYYY-MM-DD HH:MM` ET). The `data.json` commit + this stamp define “done”; a failed/stopped run does NOT stamp, so it stays overdue and self-heals next wake. Then post the run report (both surfaces) to the report-to thread.
+6. **Stamp done + report.** ⚠️ **STALE — see the retirement banner.** This step says to stamp a `last-run` cell in `routines/schedule.md`; stamps have lived in `routines/last-run/<routine>.txt` since 2026-07-05. On revival, stamp `routines/last-run/world-cup.txt` (one line, `YYYY-MM-DD HH:MM` ET). The `data.json` commit + the stamp define “done”; a failed/stopped run does NOT stamp, so it stays overdue and self-heals. Then post the run report (both surfaces) to the report-to thread.
 
 ## HYPE LEVEL rule (default — Michael may retune)
 
@@ -81,13 +93,16 @@ Hype Level is a free-form `short_text` field with no value carried in `data.json
 
 ## TIMEZONE note
 
-`-04:00` = US Eastern Daylight Time, valid for the ENTIRE tournament window (through Jul 19, 2026). Do not “correct” it to `-05:00`. If this runbook is ever reused past DST, revisit the offset.
+`-04:00` = US Eastern Daylight Time, valid for the ENTIRE tournament window (through Jul 19, 2026). Do not “correct” it to `-05:00`. **If this runbook is ever reused past DST, revisit the offset** — this note is now load-bearing, since reuse is the whole reason the file was kept.
 
-## TOURNAMENT END (stand-down)
+## TOURNAMENT END (stand-down) — ✅ EXECUTED 2026-07-26
 
-The Final is **Sun Jul 19, 2026**. Once the Final is recorded on both surfaces and its `last-run` is stamped, this routine is DONE for the tournament. On the next wake with the Final already recorded: report “nothing to refresh” and make no commit or write. Flag for stand-down — the routine's row should be retired from `routines/schedule.md` (and the Brain Ops guide + this runbook archived) so the executor stops waking on the World Cup cadence. This runbook and its Brain Ops guide are ephemeral by design.
+The Final was **Sun Jul 19, 2026**. The stand-down this section called for has been carried out: the row in `routines/schedule.md` is marked `inactive`, this runbook carries the retirement banner, and the last-run file is frozen. The Brain Ops guide in ClickUp ("World Cup Refresh — Brain Operations Guide") is ephemeral by design and marked for archive.
+
+**Worth keeping for the next tournament routine:** this section existed, was correct, and named the exact files — and it still went seven days unexecuted, because the thing that was supposed to notice was a wake timer that stopped mattering. **Write the stand-down condition into the SCHEDULE, not only into the runbook.** A date-bounded routine should carry its end date in the row that triage actually reads.
 
 ## Guardrails (STOP + flag if any is true)
+- **The routine is RETIRED — running it at all is the first guardrail violation.** Revival is Michael's call, not an executor's.
 - Target is anything other than `world-cup-bracket/data.json` or the named ClickUp World Cup list.
 - You'd write app source/engine/structure (index.html, JS, CSS), OR create/delete/move/reparent any ClickUp task or list.
 - The executor lacks ClickUp task-write capability → run Steps 1–4, then STOP + flag Step 5 (never silently skip the mirror).
