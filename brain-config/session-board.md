@@ -6,6 +6,9 @@
 |---|---|---|---|
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
 | Maestro Mira (+ Anna, Milo, Corey, Fiona) | Standing task `86ajknmmk` | Milo memory rotation, then Space 3 (URITP PRODUCTIONS) Pass-1 audit | super-agents/mainstage-milo/* only. NOT touching _shared/, roster.json, PREFERENCES.mirror.md, or open-memory-requests.md — Maggie's drain has those. Audit work is ClickUp-side, no further repo writes expected. |
-| Fleet Felix | Fleet Build Queue `86ajmepcf` | Building **Routine Ricky** (`routine-ricky`) — the fleet's first runbook-agent. Name ruled by Michael. | NEW `super-agents/routine-ricky/*` · NEW `hooks/data-refresh.md` (his default runbook, a standalone tool) · `super-agents/roster.json` (new row + token). **Read the board first: no overlap with either row above — Mira's row explicitly releases roster.json and Maggie's drain doesn't claim it.** NOT touching `_shared/super-agent-base.md` (still ~21.7KB vs the ~22KB ceiling — Dexter's split), `hooks/silent-fallback-law.md` (Maggie's), or `mainstage-milo/*` (Mira's). |
 
 _Delete your row on session close._
+
+<p><br/></p>
+
+_Felix out 2026-07-26 ~2:30 PM ET — Routine Ricky shipped. **`roster.json` is released** and is now 18,202 bytes (trimmed from 21,140 mid-build, which was within ~900 bytes of the unreadable ceiling). Re-fetch its blob SHA before your next write; do not carry mine._
