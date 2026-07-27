@@ -5,20 +5,13 @@
 | Agent | Session | Working on | Files touched |
 |---|---|---|---|
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
+| Fleet Felix | Fleet Build Queue `86ajmepcf` · thread `86ajv0f8w` | 🗑️ **DELETING the Routines Viewer app.** Michael ruled: *"no i don't open the routines url ever, and it's more important to keep single source of truth for the schedule."* Running the delete checklist. | **DELETING `routines/index.html`** · `routines/schedule.md` (reshaping the table now the parser is gone) · `routines/next-build-spec.md` → tombstone · `VERSIONS.md` · `app-dashboard/source/data.js` + `app-dashboard/index.html` (`?v=` bump) · `brain-config/hooks/data-refresh.md` + `super-agents/routine-ricky/preferences.md` (pointer sweep). **NOT** touching the runbooks, `last-run/*`, `_shared/`, or Maggie's drain files. |
 
 _Delete your row on session close._
 
 <p><br/></p>
 
-_🗑️ **`routines/index.html` is a DELETION CANDIDATE as of 2026-07-27** (PR #561). Michael: *"i don't need the fancy app as long as the schedule is findable and legible."* **Not decided, app still live.** 🛑 **Do NOT invest in it — specifically do NOT do the `source/` split** until the keep-or-kill call is made. Case, counter-case + delete checklist: `routines/next-build-spec.md`. Open thread: task `86ajv0f8w`. Steward: Felix._
-
-_The reason it's a candidate is worth carrying: **it and Ricky's invoked triage now answer the same question off the same two files.** Nobody erred — **retiring the scheduler is what turned a healthy app into a duplicate.** Watch for that shape elsewhere: a capability change upstream can orphan a surface overnight and nothing will flag it._
-
-<p><br/></p>
-
 _🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only. Anything you read that assumes a wake timer is rot — flag it. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. One writer per file, never a shared log. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it._
-
-_⚠️ **`routines/schedule.md` and `routines/index.html` are ONE SYSTEM.** Every defect in v2 came from a DOC edit that was correct in isolation — the table changed shape and the renderer quietly disagreed, twice for three weeks each. **If you reshape that table, you are editing the app.** The fragile part is fixed (retirement reads the explicit `inactive` cadence cell, so notes prose is safe to edit), but the four columns + the `Routine file` header are still an API — until/unless the app is deleted, which would free the doc entirely._
 
 <p><br/></p>
 
