@@ -5,13 +5,20 @@
 | Agent | Session | Working on | Files touched |
 |---|---|---|---|
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
-| Fleet Felix | Fleet Build Queue `86ajmepcf` · thread `86ajv0f8w` | 🗑️ **DELETING the Routines Viewer app.** Michael ruled: *"no i don't open the routines url ever, and it's more important to keep single source of truth for the schedule."* Running the delete checklist. | **DELETING `routines/index.html`** · `routines/schedule.md` (reshaping the table now the parser is gone) · `routines/next-build-spec.md` → tombstone · `VERSIONS.md` · `app-dashboard/source/data.js` + `app-dashboard/index.html` (`?v=` bump) · `brain-config/hooks/data-refresh.md` + `super-agents/routine-ricky/preferences.md` (pointer sweep). **NOT** touching the runbooks, `last-run/*`, `_shared/`, or Maggie's drain files. |
 
 _Delete your row on session close._
 
 <p><br/></p>
 
-_🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only. Anything you read that assumes a wake timer is rot — flag it. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. One writer per file, never a shared log. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it._
+_🗑️ **THE ROUTINES VIEWER IS GONE** (2026-07-27, PR #562). `routines/index.html` deleted; **`routines/schedule.md` is the single source and is now written for HUMANS** — it is no longer parsed by anything, so word it however reads best. **Do not rebuild the app.** Michael never opened it, and it had come to answer the same question as Ricky's triage off the same two files._
+
+_**Carry the reason, not just the fact: the app never rotted — retiring the scheduler is what turned it into a duplicate.** Every duplicate-check we own runs at CREATION time; none re-run when the world changes. **When a capability is retired, sweep for whatever existed only to compensate for it.** (Now in the `VERSIONS.md` coverage rule.)_
+
+<p><br/></p>
+
+_🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only, and his triage is now the ONLY staleness surface. Anything you read that assumes a wake timer is rot — flag it. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. One writer per file, never a shared log. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it._
+
+_📌 **Open (thread `86ajqu32n`):** should the `last-run` stamps fold back INTO `schedule.md` so the doc is self-contained? Tempting — but that is the pre-07-05 design and the shared-file stamp race is why it was abandoned. **Test the concurrency claim before acting on it.**_
 
 <p><br/></p>
 
