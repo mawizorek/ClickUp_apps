@@ -55,6 +55,24 @@ Do not stamp "schema validated" anywhere on the basis of the screen lock.
 
 ## How each port works
 
+### Baseline parity capture (step 2) — the gate, rewritten 2026-07-27
+
+**What this replaces, and why.** The old step 2 was *"v6.7 screenshots, every screen, 320px + desktop,"* feeding a *"visual diff passes"* acceptance criterion. **An agent cannot execute either one** — there is no screenshot or image-diff capability in this stack. The criterion was written by the party who could not satisfy it, and it sat in front of the rebuild as a blocker that looked like diligence. A gate its owner cannot pass is worse than no gate: it stalls the queue and teaches everyone to route around it.
+
+**What replaces it: a STRUCTURAL baseline, read from source at a pinned SHA.** For each of the four routes plus the Weekend Center and the Driver Popup, capture into `f1-racetracks/baseline-v6.7.md`:
+
+1. **Every field rendered on screen**, by its store key (`pos`, `grid`, `qualifying.q3`, `fastLap.time`, …) — the field list IS the contract.
+2. **Every control**, with what it does (lens buttons, tabs, sort headers, the popup trigger, export tools).
+3. **Every data binding**, as `<source module> → <store path> → <screen element>`.
+4. **Every empty/null path** the screen handles, and what it renders instead — specifically `fastLap` (8 of 9 rounds null) and `onRoadPos` (the absence rule).
+5. **Every outbound link and URL shape**, so redirect stubs can be checked against real targets.
+
+Captured **before** step 3, from source, at a recorded commit SHA. Diffed after each port.
+
+**Why this is better than what it replaces, not just cheaper:** it catches what a port actually breaks — a dropped field, a lost null branch, a binding pointed at a renamed key — and each line either matches or does not. The old criterion could be waved through with "looks the same to me."
+
+🚨 **What it does NOT catch, stated so nobody assumes otherwise:** visual regressions. Spacing, alignment, overflow, color, z-order, anything that renders wrong while binding correctly. **That is Michael's step, not an agent's.** If pixel confidence is wanted, Michael takes screenshots of the four routes at 320px and desktop before step 3 and eyeballs them after step 8. Thirty seconds, and it is genuinely uncapturable from this side. **Do not invent an agent-shaped substitute for it** — that is precisely how the criterion became unfalsifiable the first time.
+
 ### Shell scaffold (step 3)
 
 - New `index.html` on the template-app v5 pattern: slim hash router, `<html data-theme data-mode>`.
@@ -119,13 +137,15 @@ The theme is a 4-vector: colors × typography × forms × spacing.
 
 ## Acceptance criteria
 
-Rewritten 2026-07-26 so each one can actually fail.
+Rewritten 2026-07-26 so each one can actually fail. **Amended 2026-07-27:** the visual-diff criterion was struck because no party to this build can execute it — see Baseline parity capture above.
 
 - [ ] Single `index.html` serves all four routes via hash router
 - [ ] `chrome.js` renders shared header/footer/settings on every route
 - [ ] Theme loads from the spine (`THEMES.applyTheme('f1')`); the settings picker works; **every one of the four theme vectors resolves from a real file** (no silent partial)
-- [ ] **Visual diff passes against the step-2 baseline capture** — not against memory. Every screen, 320px and desktop. *(Unfalsifiable without step 2; that is why step 2 is a gate.)*
-- [ ] No horizontal overflow at 320px on any route
+- [ ] **Structural parity against `baseline-v6.7.md`:** every rendered field, control, binding, null path, and link present before the port is present after it, or its removal is named in the PR. Diffed per route, not in aggregate.
+- [ ] **No null path silently changed behaviour** — specifically `fastLap` (8 of 9 rounds null) and `onRoadPos` (absent means *same as pos*, never *unknown*).
+- [ ] ~~Visual diff passes against the step-2 baseline capture, every screen, 320px and desktop.~~ **STRUCK 2026-07-27: not agent-executable** (no screenshot or image-diff capability exists in this stack). Visual confirmation is Michael's manual step and is deliberately NOT an agent acceptance criterion. Struck rather than deleted so nobody re-adds it in good faith.
+- [ ] No horizontal overflow at 320px on any route *(checkable from source: no fixed widths, no unwrapped tables, no `min-width` above 320 on a container)*
 - [ ] `live-tracker.html` still works standalone AND now resolves the F1 theme
 - [ ] Data refresh procedure unchanged: data-only PRs still work with no shell bump
 - [ ] **All FOUR over-budget modules are under the 15KB line:** `09`, `10`, `standings/panel.js`, `15`. *(The old criterion named only `09`, which would have let v7 ship claiming "under budget" with three violations standing.)*
@@ -133,6 +153,8 @@ Rewritten 2026-07-26 so each one can actually fail.
 - [ ] `.nojekyll` still present at repo root (large inline-JS shells are exactly what silently fails under Jekyll, and a failed build freezes the WHOLE Pages site on the last good version)
 - [ ] `VERSIONS.md` row updated to v7 in the same session as the PR
 - [ ] Story Mode is NOT in this cycle — its absence is intentional, not an oversight
+
+**Standing rule that came out of this amendment:** *do not write an acceptance criterion the party responsible for passing it cannot execute.* Before locking any criterion, name who checks it and with what. If the answer is "a human looks at it," say so and take it off the agent's list rather than dressing it up as a gate.
 
 ---
 

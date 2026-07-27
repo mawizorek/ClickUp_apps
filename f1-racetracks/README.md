@@ -210,7 +210,7 @@ Sizes measured at HEAD 2026-07-26.
 | # | Step | Why here |
 |---|---|---|
 | 1 | **fastLap backfill r1-8** (data-only PR) | Retires the 1-of-9 trap before route 3 bakes in the null path |
-| 2 | **Baseline capture** — v6.7 shots, every screen, 320px + desktop | 🚨 Gate. The visual-diff criterion is unfalsifiable without it: step 8 deletes what you would compare against |
+| 2 | **Baseline parity capture** → `baseline-v6.7.md`: every rendered field, control, binding, null path and link, per route, read from source at a pinned SHA | 🚨 Gate. Step 8 deletes what you would compare against. **Rewritten 2026-07-27** from "take screenshots" — no agent can take one, so that gate could never be passed by its owner. Pixel confirmation is Michael's manual step and is deliberately NOT an agent criterion. See the spec |
 | 3 | **Shell scaffold** — template-app v5, `chrome.js`, theme spine, `:root` fallback floor | Nothing ports until there is somewhere to port to |
 | 4 | **Extract the router from `09`** | ⚠️ Own step. NOT a port — the new shell *replaces* this half |
 | 5 | **Port the home grid** (rest of `09`) + lens control into `chrome.js` | Only safe once the router is out |
@@ -232,7 +232,8 @@ Sizes measured at HEAD 2026-07-26.
 
 | File | What it holds | Status |
 |------|---------------|--------|
-| `next-build-spec.md` | v7 directive, per-step how-to, acceptance criteria, theme join | ✅ Current (rewritten 2026-07-26) |
+| `next-build-spec.md` | v7 directive, per-step how-to, acceptance criteria, theme join | ✅ Current (baseline gate amended 2026-07-27) |
+| `baseline-v6.7.md` | The step-2 structural baseline | ⬜ Not yet captured — step 2 creates it |
 | `story-mode-handoff.md` | Story integration spec (toggle, data derivation, LOD, theme) | Valid; parked to step 12. Blocker language outdated |
 | `story-mode-reference.html` | Working Story Mode in weekend.html's exact tokens | Splice from this at step 12. ⚠️ Token-stale after step 3 |
 | `schema-shift-handoff.md` | Original JSON-shape brainstorm (Jul 7) | Superseded by the Data-Story Layer doc |
@@ -255,6 +256,7 @@ Sizes measured at HEAD 2026-07-26.
 - **Theme goes LAST.** Build on `default-theme`, apply the F1 join at the end. `var(--token)` everywhere, zero color literals.
 - **Team colors (the 20-series), sector colors, and status colors are a LOCAL identity layer.** They ride on top of any theme and are never swept into a theme vector.
 - **No file renames for schema alignment.** The documentation IS the translation layer.
+- **Never write an acceptance criterion the party responsible for passing it cannot execute.** Name who checks it and with what; if the answer is a human looking at it, say so instead of dressing it as a gate. *(2026-07-27, from the struck visual-diff criterion.)*
 - **This file states WHAT; the Decision Log states WHY.** Keep argumentation out of here — it is what pushed this README to 20KB and near the readable-whole ceiling once already.
 
 ---
