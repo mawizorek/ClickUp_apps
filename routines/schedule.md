@@ -24,7 +24,9 @@ What that changes, concretely:
 | `f1-refresh.md`        | **Thu–Sun, session-aware** (see note)     | eligible on EVERY invocation on race-weekend days; refreshes only when a session has finished since last-run | `routines/last-run/f1.txt` |
 | `world-cup-refresh.md` | **inactive**                              | 🏁 RETIRED 2026-07-26 · ran through **2026-07-19**, tournament over | `routines/last-run/world-cup.txt`  |
 
-> ⚠️ **VIEWER CONTRACT — do not rephrase these cells casually.** `routines/index.html` parses this table live. It finds the table by the header cell `Routine file`, needs **exactly these four columns in this order**, derives the day-strip by regexing **day names out of the `Cadence` cell**, and decides a routine is retired by matching **`through YYYY-MM-DD`** in the `Window / notes` cell. That is why the World Cup row still says *"ran through 2026-07-19"* rather than a cleaner sentence: drop the phrase and the viewer silently un-retires the card. Express state in the cell text; never add a column, a second table, or a table above this one.
+> ⚠️ **VIEWER CONTRACT — the table's SHAPE is an API.** `routines/index.html` parses this table live, so **changing its shape is a change to the app.** What it needs: the header cell **`Routine file`** (that is how it finds the table), **these four columns in this order**, day names in the **`Cadence`** cell, and a **path** in the last column. Express state in the cell text; never add a column, a second table, or another table above this one.
+>
+> *Relaxed 2026-07-27 (viewer v2).* Retirement is now read from the **`Cadence`** cell saying literally **`inactive`** — explicit, not inferred. The old rule demanded the phrase `through YYYY-MM-DD` survive verbatim in the notes cell or the viewer would silently **un-retire** a dead routine; that regex remains only as a dated fallback. **Prose in the notes cell is now safe to edit.** Day ranges (`Thu–Sun`) also expand correctly now, where before only the two named endpoints were highlighted.
 
 ### 🏁 World Cup stand-down (2026-07-26)
 
@@ -48,6 +50,8 @@ Each routine's last-run timestamp lives in its OWN tiny file under `routines/las
 
 > ⚠️ **Re-affirmed the hard way, same month.** On 2026-07-26 a shared `brain-config/data-refresh-log.json` was created holding every routine's row in a single file — precisely the shape this rule forbids, and it shipped with an explicit "any agent may stamp it" invitation that made the race *likelier*. It was deleted the same day, never used. Two lessons, both general: **(1) losing the wake timer does NOT make a shared stamp file safe** — concurrent SESSIONS collide exactly as happily as concurrent wakes did, and the fleet has already proven that on the session board. **(2) The rule was findable and wasn't found.** It was searched for in `brain-config/` only, and the silence there was read as proof nothing existed. If you are about to build state for routines, the answer lives in `routines/`.
 
+> ⚠️ **And that same 07-05 split silently broke the viewer for three weeks** — moving stamps out of this file changed the last column from a timestamp to a path, and `index.html` kept date-parsing it and rendering **"never"** for every routine. Correct doc change, unnoticed app breakage. **The renderer is part of this system; see the Viewer section at the bottom before you reshape anything here.**
+
 ## How to decide what to run (all times America/New_York)
 
 On invocation, for every ACTIVE routine, read its `last-run` file and compare against its `Cadence`:
@@ -55,6 +59,7 @@ On invocation, for every ACTIVE routine, read its `last-run` file and compare ag
 - **Day-of-week cadence** ("every Wednesday"): due once per matching day. Due if last-run is older than the most recent occurrence of that day. After success, write now.
 - **Session-aware cadence** (F1, "Thu–Sun"): eligible on those days; the runbook checks whether a session has finished since last-run and refreshes only if so (else clean no-op). Stamp only on an actual refresh.
 - **`never`** means NEVER RUN. Report it as exactly that — never as a huge overdue interval. Rendering an unset stamp as arithmetic is lying with numbers, and it is what a confident cold agent does.
+- **A stamp you could not READ is not `never` either.** Unreadable is its own answer: say "unknown," never substitute a default. *(This is the agent-side twin of the viewer bug above.)*
 - **Idempotency (double-run guard):** a routine whose last-run already covers the current occurrence/session is done — skip it, however many times you are invoked.
 - **Catch-up — now the DEFAULT path, not an edge case.** With no timer, occurrences pass unattended by design. If a due occurrence has passed and last-run is older, it is overdue: run the **latest missed occurrence once** and label it a catch-up. **Never replay every missed day.** A routine overdue by three weeks gets ONE run, flagged as such.
 - **`inactive` routines are never proposed.** Not due, not overdue, not a gap — say nothing about them unless asked directly.
@@ -72,13 +77,19 @@ On invocation, for every ACTIVE routine, read its `last-run` file and compare ag
 - Write ONLY the single `last-run/<routine>.txt` file for the routine that just succeeded — never a shared file, never another routine's file.
 - Format: one line, `YYYY-MM-DD HH:MM` ET. Use `never` if it has never successfully run.
 - Changing a cadence/window: edit the `Cadence` cell above (or tell Ricky). Never reschedule by editing a runbook spec, and never by editing the agent.
-- Retiring a routine: mark the row `inactive`, keep a `through YYYY-MM-DD` phrase in the notes (viewer contract), and add a dated reason. **Do not delete the row and do not delete the runbook.**
+- Retiring a routine: set the **`Cadence`** cell to `inactive` and add a dated reason in the notes. **Do not delete the row and do not delete the runbook.**
 
-## 🚨 Known viewer breakage — OPEN, not mine to fix (found 2026-07-26)
+## Viewer — `routines/index.html` (v2, 2026-07-27)
 
-`routines/index.html` is app source, so it is a BUILD task (Dexter), not a routine edit. Two live defects, both verified by reading the parser:
+The **Routines Viewer** renders this file: https://mawizorek.github.io/ClickUp_apps/routines/ · spec + defect history in `routines/next-build-spec.md` · ledger row in `/VERSIONS.md`.
 
-1. **The "Current wake window" card is now a lie.** `renderWindow()` does not read this file at all — it hardcodes the wake schedule and prints *"Ricky wakes once daily at 06:00 ET."* **Nothing wakes.** This is the most visible surface in the app and it states the one thing that is no longer true. It also disagreed with this file *before* today (card said 06:00/15:00/21:00/03:00; this file said 06:00/12:00/16:00/00:00), so it has been drifting for a while. The card should be replaced with an invoke-only statement, and the section heading "Scheduled routines" should lose the word Scheduled.
-2. **Every routine has displayed "Last run: never" since 2026-07-05.** `parseLastRun()` expects a TIMESTAMP in column 4, but column 4 became a FILE PATH the day stamps moved per-routine. It parses `routines/last-run/on-track.txt` as a date, gets `NaN`, and renders `never`. **Three weeks of a silently wrong core field**, in the app whose entire job is showing last-run. The fix is small: if the cell looks like a path, fetch it from the raw base and use its contents.
+✅ **The two defects flagged here on 2026-07-26 are FIXED in v2**, along with three more found while speccing: the header card no longer hardcodes a wake timetable (it states invoke-only and derives every count from this table), last-run now resolves the per-routine stamp files, day ranges expand, retirement reads the explicit `inactive` cell, and the fake sample-data fallback is gone.
 
-Both are quietly self-inflicted by doc changes that were correct in isolation. **A schedule doc and its renderer are one system; changing the doc's shape is a change to the app.**
+**The rule that came out of it, and the reason this section stays:**
+
+> **Derive, don't declare — and never render a guess as a fact.** Every one of those defects was a confident wrong answer, and a wrong render looks exactly like a right one. *`never` vs unreadable*, *overdue vs never-run*, *retired vs active* — each pair must stay visibly distinct wherever it appears, in the app AND in an agent's triage.
+
+⚠️ **Still open (not defects, but named so they aren't rediscovered):**
+
+1. **`index.html` is ~20.8KB** — well past the 15KB split line, under the 22KB ceiling. **The next change to this app should be the `source/` split, not another inline block.** Seat Size Sally first.
+2. **Timezone.** Stamps are ET; the viewer parses them as viewer-local. Correct for Michael, off by hours elsewhere. Pre-existing, deliberately out of scope.
