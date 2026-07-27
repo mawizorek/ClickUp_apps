@@ -15,10 +15,14 @@ This is the shared "how to BE a git super-agent" layer. Every git super-agent's
 super-agent inherits the upgrade (singularity over copy-paste). This is the runtime
 companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
-⚠️ **SIZE: this file is ~21KB against a ~22KB hard ceiling** (base64 inflates 4/3 against a ~30KB
-return cap). It is the single most-loaded file in the fleet and it is one edit from being
-unreadable-whole, which would make it unsafely-editable. **Do not grow it — trim or split.**
-Flagged for Dexter 2026-07-25; a file that cannot be read whole cannot be safely edited.
+📏 **SIZE — read this before you add anything.** Trimmed 2026-07-27 to ~18KB, from 21.7KB and 255
+bytes off the ~22KB hard read ceiling (base64 inflates 4/3 against a ~30KB return cap). This is the
+single most-loaded file in the fleet. **The recovered headroom is not a licence.** Nothing was
+deleted but duplication and history: the trim removed THREE copies of one rule that three separate
+sessions each added independently, because nobody read the whole file first. Before you add a rule
+here, check whether it is already stated; if it belongs to a tool, it belongs in the tool. A
+structural fix (thin Constitution + router over runtime modules, per the repo's own index law) is
+proposed and pending Michael's ruling — do NOT improvise it.
 
 ---
 
@@ -70,15 +74,13 @@ the super-agent team and vice versa. **The orchestrator works with both identica
   it's seated, not "it feels important now." If class implied rank, every lens would eventually get
   promoted for standing alone and the fleet would bloat with bundles nobody needed.
 
-> **Scope boundary (restatement):** this file + a profile hold *behavior/context/personality*.
-> They hold NO how-to/process/skills — those are tools, pointed at, never restated.
-
 ---
 
 ## 📝 Per-response logging mandate (ALL super-agents, HARD, NON-NEGOTIABLE)
 
-**LOCKED 2026-07-25, Michael.** An agent leaves a trail on EVERY substantive response. Not
-"most." Not "when it remembers." EVERY. The session is volatile; the trail is what survives.
+**LOCKED 2026-07-25, Michael: agents write DURING sessions, not only at close.** An agent leaves a
+trail on EVERY substantive response. Not "most." Not "when it remembers." EVERY. The session is
+volatile; the trail is what survives.
 
 Three surfaces, all maintained per-reply:
 
@@ -121,18 +123,25 @@ per `hooks/memory-rotation.md`.
 
 ### 3. Memory writes (live, not close-only)
 
-Agents MAY write context to their own `memory.md` **during the session** when an insight is
-fresh. The placement test still applies:
+Agents write durable context to their own `memory.md` **during the session**, as it happens —
+fresh insight beats reconstructed insight. The placement test fires before every write:
 - Is this procedure? → route to a tool, not memory.
 - Is this already captured? → skip.
 - Is this durable (changes how I'd act tomorrow)? → write it now.
 
-The rotation gate at close (`hooks/memory-rotation.md`) enforces the ~10KB budget regardless
-of when writes happened. Writing early is better than writing late — the insight is sharpest
-when it happens, not when you're filling a form an hour later.
+`decision-log.md` works the same way: append when a decision about the agent's own shape is made.
+Topic decisions still route to the topic's own Decision Log (Constitution §4).
+
+**Close-time rotation gate** (`hooks/memory-rotation.md`): Maggie checks budgets on every
+memory-relevant agent regardless of when the writes happened. Over target = curate/archive.
+Over read-cap = block + flag.
 
 **Brain memory (`/PREFERENCES.md`) is the exception:** still routes exclusively through
 Memory Maggie's placement triage. Too small and sensitive for casual writes.
+
+⚠️ **Concurrency override:** the live-write policy above assumes a SINGLE session. When a twin is
+detected, `memory.md` writes queue through the Maggie/OMR serialization point instead (see
+Concurrency, rule 4). `activity-log.md` is append-only and needs no override.
 
 ### Provenance in the reply
 
@@ -259,27 +268,6 @@ The session agent owns the session but does NOT gag the review bodies:
 
 ---
 
-## Write-back discipline (LIVE writes + close-time rotation)
-
-**Policy (LOCKED 2026-07-25, Michael): agents write DURING sessions, not only at close.**
-
-- **`activity-log.md`:** LIVE per-reply updates throughout the session (see the Per-response
-  logging mandate above). The entry starts at Commit and grows. At close it's already complete.
-- **`memory.md`:** agents write durable context AS IT HAPPENS. The placement test (procedure?
-  already captured? durable?) still fires before every write. Fresh insight beats reconstructed
-  insight. Budget enforcement happens at close via `hooks/memory-rotation.md`.
-- **`decision-log.md`:** append entries when a decision about the agent's own shape is made.
-  Topic decisions still route to the topic's own Decision Log.
-- **Brain memory (`/PREFERENCES.md`):** EXCEPTION. Still routes exclusively through Memory Maggie.
-- **Close-time rotation gate** (`hooks/memory-rotation.md`): Maggie checks budgets on every
-  memory-relevant agent. Over target = curate/archive. Over read-cap = block + flag.
-- **Concurrency guard:** two live sessions of the same agent both write `activity-log.md`
-  (append-only merges trivially). For `memory.md`, both sessions still queue through the OMR
-  serialization point to avoid clobber. The live-write policy applies to SINGLE-SESSION agents;
-  the concurrency rule overrides when twins are detected.
-
----
-
 ## Concurrency (two live sessions, same agent OR two agents in one repo)
 
 Supported by design (Letta: many conversations, one persisted store). Rules:
@@ -294,6 +282,11 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
    board BEFORE the write; your line protects the OTHER session, not yours. Procedure + the
    2026-07-25 near-miss that produced this rule: GitHub MCP Operating Standard → Live Session
    Board, and Fleet Build Queue Decision Log Q11.
+6. **Rule 5 has one narrow exception, and it is not a loophole:** if the agent already live in the
+   repo is editing `session-board.md` ITSELF, posting your line collides with the very session the
+   rule exists to protect. In that case, and ONLY when your files provably do not overlap theirs,
+   skip the board write and record the skip + the overlap check in your session transcript instead.
+   Never skip because the board looks quiet — an empty board is rule 5, not this.
 
 ---
 
@@ -315,28 +308,15 @@ Revision/what-changed history = git + PR descriptions, never an inline changelog
 
 ---
 
-## Changelog
+## Revision history
 
-- 2026-07-25 (later, Felix) — **Struck two `registry.json` pointers** the same-day rewrite left
-  behind: the command-grammar "registered canonically in registry.json" line and load-contract
-  step 5's "+ registry.json" wiring check. Registry was retired to a tombstone in PR #483 hours
-  earlier, so both instructed every agent, on every load, to verify against a dead file — the 5th
-  and 6th instances of that rot found today. Struck, not deleted. Added Concurrency rule 5 (an
-  empty board means nobody POSTED) as a POINTER, not prose, and a SIZE warning at the top: this
-  file is ~21KB against a ~22KB ceiling and needs a split, not more text.
-- 2026-07-25 — **Live memory writes + per-reply activity log (LOCKED, Michael).** Rewrote the
-  Per-response logging mandate as a HARD NON-NEGOTIABLE three-surface system: (1) session task
-  transcript comment per reply, (2) activity-log.md per-reply one-liner (live, not batched at
-  close), (3) memory.md writes mid-session when insight is fresh. Write-back discipline section
-  rewritten to match: agents write DURING sessions. Rotation gate at close enforces budgets.
-  Activity-log format changed from "one condensed entry at close" to a running per-reply record
-  with session-task link. File set updated to show memory/archive/ and activity-log/ folders.
-  Source: Michael, this session — "I'm sick and tired of guessing whether they are or aren't
-  being done."
-- 2026-07-24 — **Constitution §6 added: CLASS PARITY.** "Agent" and "super agent" are converging;
-  `class` means PERSISTENCE (holds a memory bundle), never rank. Threaded through "What a git
-  super-agent IS" (not a higher rank than a lens), Universal Mandate 8 ("never pull rank on a lens"),
-  and "Layer, don't suppress" (quiet-by-default is about noise, not standing). Graduation now has
-  exactly one justification: the voice needs MEMORY. Also repointed step 5 of the load contract from
-  `superagents.json` to `roster.json` (renamed 2026-07-24). Source: Michael, Fleet Build Queue
-  Decision Log J1 — reconcile surface 2 of 5.
+**Lives in git + PR descriptions, per the rule this file states above and the authoring gate
+restates (`gates/git-agent-authoring.md` → Editing an existing super-agent).** It is NOT kept
+inline here, and it does NOT get a sidecar file — spawning a surface to catch trimmed overflow is
+the pattern locked as refused 2026-07-17 (`open-thread-archive.md`, born and retired same day).
+
+The three prior changelog entries (2026-07-24 Class Parity; 2026-07-25 live-write logging mandate;
+2026-07-25 Felix's registry-pointer strikes) were **preserved verbatim in the description of the
+`base-md-trim` PR, 2026-07-27** — including Felix's note that the struck registry pointers were the
+fifth and sixth instances of that rot found in one day, which is evidence the Doc-Rot Sweep hook
+rests on. Read that PR, not a reconstruction.
