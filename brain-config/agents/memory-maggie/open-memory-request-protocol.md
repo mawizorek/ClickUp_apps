@@ -141,14 +141,20 @@ Rules that bind the gate:
 
 ## Authoring-agent stamp (added 2026-07-27, Michael)
 
-Every disposition record — whether logged to the standing task, committed in a PR description, or written as a drain summary — preserves which agent authored the original request. This serves two purposes:
+Every disposition record — whether logged to the standing task, committed in a PR description, or written as a drain summary — preserves which **seated super agent** authored the original request. This serves two purposes:
 
 1. **Agent memory routing:** if a placement lands in an agent’s own profile or memory, the authoring stamp traces it back to the source session.
-2. **Request-volume tracking:** over time, Maggie can see which agents generate the most OMR traffic and whether any one voice is overloading the queue with content that consistently routes elsewhere.
+2. **Request-volume tracking:** Maggie maintains a running volume ledger in her own `memory.md`, updated each drain. Over time this shows which lanes generate the most memory pressure and whether any one voice consistently files content that routes elsewhere.
 
-The `Requested by:` field in the entry template already carries this data at filing time. The new rule: **preserve it through to disposition.** The drain summary, the standing-task log comment, and any commit message that places an entry must include the authoring agent’s name alongside each disposition line.
+**What to stamp:** the seated super agent at the time of filing. This means:
+- If Mira is at the wheel → `Mira`
+- If Dexter is working → `Dexter`
+- If no agent is embodied (house-voice Brain) → `Brain`
+- NEVER the model version (Opus 4.6, Opus 5, etc.) — the model is irrelevant; the persona is the signal.
 
-Format in disposition logs: `→ PLACED (brain memory) [authored: Brain (Opus 4.6)]` or `→ REJECTED [authored: Mira]`.
+The `Requested by:` field in the entry template carries this at filing time. The rule: **preserve it through to disposition.** The drain summary, the standing-task log comment, and any commit message that places an entry must include the authoring agent alongside each disposition line.
+
+Format in disposition logs: `→ PLACED (brain memory) [authored: Mira]` or `→ REJECTED [authored: Brain]`.
 
 ---
 
@@ -165,21 +171,22 @@ Format in disposition logs: `→ PLACED (brain memory) [authored: Brain (Opus 4.
 
 ```
 ### OMR-<YYYYMMDD>-<n> · OPEN
-- Requested by: <agent name + model if applicable, e.g. "Brain (Opus 4.6)" or "Mira">
+- Requested by: <seated agent name, e.g. "Mira" or "Dexter" or "Brain" (if no agent embodied)>
 - Candidate note: <self-contained, standalone-readable; must make sense with zero session history>
 - Requester’s guess (non-binding): <hook | gate | agent profile | reference doc | brain memory | unsure>
 - Context / why: <one line>
 ```
 
-**The `Requested by` field is MANDATORY and must name the specific agent** (not “Brain” generically when an agent is embodied — use the agent’s name). This is the authoring stamp that carries through to disposition.
+**The `Requested by` field is MANDATORY and must name the SEATED SUPER AGENT** — the persona at the wheel when the entry was filed. If no agent is embodied, use “Brain.” Never use model names (Opus, Gemini, etc.) — the model is not the identity.
 
 ---
 
 ## Changelog
 
-- 2026-07-27 (authoring-agent stamp) — Added the **authoring-agent stamp** requirement: every disposition record preserves which agent filed the original request, carried through to drain summaries, standing-task logs, and commit messages. Entry template `Requested by:` field made MANDATORY with specificity guidance (agent name, not generic “Brain” when embodied). Enables request-volume tracking per agent and traceable routing into agent memories. **Michael’s directive.**
-- 2026-07-26 (phantom ID fix) — Corrected standing task ID from `86ajq14tv` (phantom, never existed) to `86ajq1137` (the real task). Same rot class as D5.
-- 2026-07-25 (review log home) — Named the **single durable home for review findings**: standing ClickUp task `86ajq1137` (🧭 STANDING · Memory Maggie — OMR Review Log), comments = chronological log, description = current queue state, reopen-never-recreate. Added as REVIEW step 6 (log immediately, not at close) and echoed in Door 2 step 2 (read prior findings before draining) + step 6 (log the batch summary). Clarified that logging ≠ placing, so the read-only guarantee holds. **Michael’s directive:** “she should log her findings immediately. but in a single consistent reliable source.”
-- 2026-07-25 (Door 3 + graduation repoint) — Added the **REVIEW pass** as Maggie’s `default_runbook` per the invocation-mode contract: a bare-name invocation runs a READ-ONLY queue review and reports recommendations, writing nothing (`gate_strength: auto`, safe because it is read-only). Named the Mode-B exception (invoked with a handoff or context = do the actual job, don’t detour). Added the contradiction/superseded/false-claim/budget traps a review must surface, the verify-a-claim-before-placing rule, and the note that queue entries rot. Repointed the header at her git-teammate home. **Michael’s directive.**
-- 2026-07-17 (created) — Public Open Memory Request queue + batch trigger (“run your thing on the open memory requests”) + Placement Triage Gate (deny-by-default for brain memory). Operationalizes the existing “Maggie decides placement, not requester / Edit Guard placement test overrides ‘put in memory’ framing” doctrine into a standing queue Michael no longer has to hand-copy.
-- 2026-07-17 (two doors) — Named the two invocation phrases explicitly: Door 1 DROP (“add that to the open memory log,” any agent, appends to the queue) and Door 2 DRAIN (“open as Memory Maggie” → “run your thing on the open memory requests,” fresh session). Opening as Maggie with a non-empty queue surfaces the pending count up front. *(Door 2’s “open as Memory Maggie” half was superseded 2026-07-25: that phrase is now the REVIEW door, and the explicit drain phrase is what authorizes writes.)*
+- 2026-07-27 (authoring-agent stamp, corrected) — **Corrected the stamp to track the SEATED SUPER AGENT**, not the model version. Michael’s directive: “i literally meant which seated super agent: like yourself memory maggie or frank or dex.” The model is irrelevant; the persona is the signal. Updated: stamp section, entry template, disposition format, volume-tracking description. Added volume ledger in `memory.md` (updated each drain, stays in Maggie’s conscious on every steep).
+- 2026-07-27 (authoring-agent stamp, initial) — Added the authoring-agent stamp requirement. Entry template `Requested by:` field made MANDATORY. Enables request-volume tracking per agent and traceable routing into agent memories. **Michael’s directive.**
+- 2026-07-26 (phantom ID fix) — Corrected standing task ID from `86ajq14tv` (phantom) to `86ajq1137` (the real task).
+- 2026-07-25 (review log home) — Named the **single durable home for review findings**: standing ClickUp task `86ajq1137`. **Michael’s directive.**
+- 2026-07-25 (Door 3 + graduation repoint) — Added the **REVIEW pass** as Maggie’s `default_runbook`. **Michael’s directive.**
+- 2026-07-17 (created) — Public Open Memory Request queue + batch trigger + Placement Triage Gate.
+- 2026-07-17 (two doors) — Named DROP + DRAIN invocation phrases.

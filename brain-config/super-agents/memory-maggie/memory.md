@@ -31,8 +31,8 @@
 
 - **An unlanded behavioral rule does not fail safe — it reproduces the mistake it was written to prevent.** `OMR-20260722-1` sat unlanded 4 days; its exact prohibited behavior (direct `/PREFERENCES.md` write) recurred on 07-26. Drain priority = recurrence risk, not arrival order.
 - **A correction entry outranks the entry it corrects regardless of filing date.** `-20260725-3` superseded `-20260724-1`’s read-path clause. Land the correction’s version, not the original.
-- **An entry can rot into the inverse of live law.** `-20260717-1` ("auto-open without asking") was filed 07-17; the 07-20 two-phase session-open rewrite made that exact behavior the named misfire. Age is a defect, not just a delay. REJECTED.
-- **Placement ruling: the SPINE FIRST line earned brain memory on the strictest reading.** It fires unconditionally on every response, has no mechanism-based enforcement (ordering is unobservable after the fact), and Michael explicitly directed it. One of the rare cases where "put it in memory" IS the correct answer.
+- **An entry can rot into the inverse of live law.** `-20260717-1` (“auto-open without asking”) was filed 07-17; the 07-20 two-phase session-open rewrite made that exact behavior the named misfire. Age is a defect, not just a delay. REJECTED.
+- **Placement ruling: the SPINE FIRST line earned brain memory on the strictest reading.** It fires unconditionally on every response, has no mechanism-based enforcement (ordering is unobservable after the fact), and Michael explicitly directed it. One of the rare cases where “put it in memory” IS the correct answer.
 - **Placement ruling: a build-time engineering standard is NOT brain memory.** `OMR-20260725-2` (silent-fallback law) routed to `hooks/silent-fallback-law.md`. It fires at code-review/build time, not every response.
 
 **2026-07-25 — First fleet rotation (Dev Dexter session):**
@@ -43,6 +43,20 @@
 - **Placement ruling: committed-to-git is NOT memory.** DENIED: a fact in a committed file does not ALSO need a memory line.
 - **My scope expanded (LOCKED 2026-07-25, Michael):** I now check agent BUNDLE files at close, not just brain `/PREFERENCES.md`.
 - **Live writes are now the policy.** Agents write their own memory.md and activity-log.md DURING sessions. I still OWN brain memory exclusively; agent bundles I enforce SIZE, not authorship.
+
+---
+
+## Request volume ledger (updated each drain)
+
+Tracks which seated agent filed each OMR entry. "Brain" = house-voice, no agent embodied.
+
+| Agent | Filed | Placed | Rejected | Merged | Route-out (repo/hook/gate) |
+|---|---|---|---|---|---|
+| Brain | 11 | 7 | 1 | 2 | 1 |
+
+**Totals (lifetime):** 11 filed, 7 placed to brain memory, 1 rejected, 2 merged, 1 routed to repo.
+
+*First drain 2026-07-26. All 11 entries were filed during house-voice Brain sessions (no agent embodied). Future drains will show the per-agent breakdown as the fleet starts filing under their own names.*
 
 ---
 
@@ -59,6 +73,7 @@ Brain `/PREFERENCES.md`: **~1987 tokens / 2000 (99.4%)** as of 2026-07-26 drain.
 - Answers structural questions through Decision Logs with INVERTED polarity.
 - Will say “put it in memory” for things that belong in a doc. Route it, tell him where.
 - “I’m sick and tired of guessing whether they are or aren’t being done” (2026-07-25) — drove the live-write enforcement.
+- Expects proactive ownership, not reactive execution. “You’re not an assistant. You’re an active team member.” (2026-07-27)
 
 ---
 
