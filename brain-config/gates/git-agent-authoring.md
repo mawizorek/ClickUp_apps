@@ -33,27 +33,30 @@ persona, that's the smell this gate exists to catch.
 
 ## Two-tree law (know which tree you're in)
 
-- `brain-config/agents/` = ephemeral **Council/Workshop lenses** (Mira, Anna, Cass, Skye, ...).
-  Stateless processing verbs. NO personal memory. NOT session-invocable as a standing persona.
-- `brain-config/super-agents/` = persistent **teammates** (Milo, Corey, Wes, ...). Full context
-  bundle, base pointer, invoked via `/session.agent=<Name>`, hold memory across sessions.
+- `brain-config/agents/` = ephemeral **Council/Workshop lenses** (Rhys, Beckett, Cleo, Polly, Finn,
+  Skye, Enzo, Frank, Sally, Stu, ...). Stateless processing verbs. NO personal memory. NOT
+  session-invocable as a standing persona.
+- `brain-config/super-agents/` = persistent **teammates** (Wes, Corey, Felix, Mira, Anna, Milo,
+  Maggie, Dexter, Sage, Clio, ...). Full context bundle, base pointer, invoked via
+  `/session.agent=<Name>`, hold memory across sessions.
+
+⚠️ **Both lists rot — `roster.json` is authoritative, never these examples.** Mira and Anna were
+named here as lenses long after they graduated (corrected 2026-07-27). Two trees is a STORAGE fact,
+not a hierarchy: `class` means persistence, not rank (base spec Constitution §6). A lens graduates
+for exactly one reason — it needs MEMORY.
 
 A persona that needs to accumulate context and be inhabited for a whole session belongs in
 `super-agents/`. A pure processing lens belongs in `agents/`. Migrating a lens → teammate means
-moving it into `super-agents/` with the full 4-file bundle and redirecting the old lens file.
+moving it into `super-agents/` with the full bundle and redirecting the old lens file to a
+tombstone.
 
 ---
 
 ## Required file set (create ALL)
 
-```
-super-agents/<slug>/
-  preferences.md    # profile: base pointer FIRST line, then identity + voice + lane + load manifest (NO how-to)
-  memory.md         # accumulated context + pointers to stewarded tools (never process/skills)
-  activity-log.md    # rolling session ledger (newest on top, append-only)
-  decision-log.md   # reasoning about the agent itself (topic decisions live on the topic page)
-  README.md         # steward metadata (fleet convention)
-```
+**Canonical list lives in the base spec** (`_shared/super-agent-base.md` → File set) so there is
+ONE description of a bundle. Do not restate it here; it drifted once already (this gate omitted
+`memory/archive/` and `activity-log/` for weeks).
 
 `preferences.md` MUST open with:
 `> Follow the shared base first — brain-config/super-agents/_shared/super-agent-base.md — then personalize below.`
@@ -63,7 +66,7 @@ super-agents/<slug>/
 ## Authoring checklist
 
 1. **Name-collision gate** (`brain-config/gates/agent-name-collision-gate.md`): scan live ClickUp
-   Super Agents + registry + super-agents fleet. A retired/tombstoned agent is NEVER a live
+   Super Agents + `roster.json` + the super-agents fleet. A retired/tombstoned agent is NEVER a live
    invocation target (see B11). Distinguish live invocation tokens from historical prose refs.
 2. **Profile stays behavior-only.** No stored how-to (Founding law §2–§3). Point OUT to tools for process.
 3. **Load manifest = deep by default.** Full memory + full decision-log + long activity window.
@@ -72,11 +75,13 @@ super-agents/<slug>/
    in the base spec; just don't contradict it.
 5. **Slash trigger.** Register `/session.agent=<Name>` as a literal Quick-Scan Trigger Table row
    in the AI Toolkit index → pointing at the base spec load contract.
-6. **Mirror-pair registration (SAME SESSION):** add/update the agent's row in BOTH
-   `super-agents/superagents.json` (fleet record: status, lane, channels, triggers) AND the
-   AI Toolkit index roster + `registry.json` where applicable. One-sided edits are the exact
-   drift that stranded earlier agents. Never hand-mirror per-field metadata into folder files
-   — `superagents.json` is the canonical metadata home.
+6. **Registration (SAME SESSION): add the agent's row to `roster.json`.** ~~Mirror-pair registration
+   into BOTH `superagents.json` AND the AI Toolkit index roster + `registry.json`.~~ STRUCK
+   2026-07-27: the mirror-pair mandate was RETIRED 2026-07-25 and `registry.json` is a tombstone
+   stub (PR #483). **`roster.json` is the single documented source — one flat list, one row per
+   agent.** No pair means no sync obligation, and resurrecting a second manifest to mirror it is the
+   duplication that was retired. Keep the roster under ~12KB (slim rule) and update the AI Toolkit
+   index's behavioral trigger row for the agent in the same pass.
 7. **PR-merge workflow** (GitHub Operating Standard): branch → commit → PR → self-merge → report.
 8. **Session task + transcript** for the authoring session (Agent Activity Board).
 
