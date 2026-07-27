@@ -11,7 +11,7 @@ owner_agents: [closing-clio, memory-maggie]
 
 **Fires:** at the end of every Brain session, no exceptions.
 **Canonical source:** this file. ClickUp page is archival only.
-**Decision history:** `brain-config/hooks/session-close.decision-log.md`
+**Decision history:** `brain-config/hooks/session-close.decision-log.md` — ⚠️ that file is a REPO-resident decision log, which the Decision Logs Gold Standard rule 11 (LOCKED 2026-07-26) says is the wrong surface: inverted-polarity checkboxes are inert in repo markdown, so a `Q` block there cannot be answered. It survives as a known trap pending Meta DL D7. **Do not add new `Q` blocks to it; a new decision about this hook goes to a ClickUp Decision Log.**
 
 ---
 
@@ -48,6 +48,29 @@ actual failures.
 
 ---
 
+## 🧭 Two session shapes (read this BEFORE Steps 3 and 5)
+
+**Added 2026-07-26, Michael** — after the standing-thread deviation fired identically at
+two consecutive closes. A rule broken the same way twice is a spec that does not cover
+the case, not a discipline problem.
+
+| Shape | What the session ran on | How it closes |
+|---|---|---|
+| **A — Session task** (default) | A task cut for THIS session (`Brain (Opus N) · <scope> · <Mon DD>`) | Flip it to `done`. Cut or reopen a separate handoff task for next time. |
+| **B — Standing thread** | An ongoing `🧭 STANDING ·` task that IS the project's permanent home and its own baton | **Do NOT flip to `done`, do NOT cut a parallel handoff task.** Rewrite its description as the warm start and return it to `to do`. |
+
+**How to tell:** the task says so. A standing thread carries `🧭 STANDING ·` in its title
+and/or an explicit *"reopen, don't recreate"* instruction in its description. When in
+doubt, shape A.
+
+**Why B exists:** closing a standing thread would close the project's permanent home, and
+cutting a parallel `↪️ HANDOFF ·` task next to it creates **two claimants on one baton** —
+the duplicate-source pattern Michael collapses on sight. The standing thread already
+satisfies the intent of Rule 14 (the warm start is a task, not a chat block); it is the
+same task every time instead of a new one.
+
+---
+
 ## The Handoff Artifact Template
 
 > **Who produces this:** the session agent, as its LAST responsibility.
@@ -63,6 +86,7 @@ section is not.
 **Session agent:** {name, or "house Brain" if no persona}
 **Model:** {model name + version}
 **Session task:** {markdown link to the Agent Activity Board task}
+**Session shape:** {A - session task | B - standing thread}
 **Spine header:** {link to the session header post on the spine channel}
 **Duration:** {start time} - {end time} ET
 
@@ -145,12 +169,14 @@ corrections only. Tag each candidate with the AGENT it belongs to
 
 {If open threads exist: the warm-start paragraph for the handoff task.
 Written as if addressing a cold agent with zero prior context.
+On a SHAPE B session this text REPLACES the standing thread's description.
 If no next session needed: "No follow-up required."}
 ```
 
 ### Rules for producing the Handoff Artifact
 
 - Fill EVERY section. "None" is valid; a missing section is not.
+- **Declare the session shape** (A or B). Clio branches Steps 3 and 5 on it.
 - The Session Ledger is COPIED from the task (already maintained live), not reconstructed.
 - Spine reconciliation is COUNTED, not estimated. Report the delta honestly.
 - Memory candidates are PROPOSALS, not commits. Maggie decides placement.
@@ -268,7 +294,11 @@ artifact.
 
 1. Finalize Session Ledger on the task (should be current from the Handoff Artifact)
 2. Post final `[CLOSE-POINTER]` comment with both thread links, the spine header link, and scoreboard delta
-3. Flip task to `done`
+3. **Set status — BRANCH ON SESSION SHAPE:**
+   - **Shape A (session task):** flip to `done`.
+   - **Shape B (standing thread):** ⚠️ **do NOT flip to `done`.** Return it to `to do` — the
+     handoff slot, meaning nobody is currently driving it. Closing a standing thread closes
+     the project's permanent home.
 4. Hand Michael the task link in chat
 
 ### Step 3a. Spine close line
@@ -283,7 +313,19 @@ channel threads. The spine's final line for a session is always the close.
 
 ### Step 5. Next-session handoff task
 
-From section 7 (Next-session prompt) of the Handoff Artifact:
+**BRANCH ON SESSION SHAPE FIRST.**
+
+**Shape B (standing thread) — no new task:**
+- **REWRITE the standing thread's description** with section 7 (Next-session prompt) as its
+  new warm start. Rewrite in place; do not append a second warm start under the old one, or
+  the description accumulates stale resume points (the exact drift that has misled resumes
+  on prose banners three times).
+- Keep the durable material the thread carries across sessions — established facts, method
+  rules, parked threads — and **strike-through rather than delete** anything superseded.
+- Status already returned to `to do` in Step 3. **Do not cut a parallel `↪️ HANDOFF ·` task.**
+- Done. Skip the rest of this step.
+
+**Shape A (session task) — cut or reopen a handoff task:**
 - Scrub the board with Task Dedup Gate (widened to closed + done)
 - Clear match: reopen and re-status to `to do`
 - Ambiguous: ask before mutating
@@ -324,7 +366,7 @@ If the session became substantive, upgrade to full close.
 11. Thread replies can have addenda.
 12. Usage-log commit lands last.
 13. Append the open-thread note to `brain-config/open-thread.md`.
-14. Warm-start handoff is a task, not a chat block.
+14. Warm-start handoff is a task, not a chat block. **On a standing thread it is the SAME task every time** (rule 26), not a new one.
 15. Every close reports the scoreboard delta.
 16. Finalize the Session Ledger before the usage-log commit.
 17. Scrub before cutting the handoff task.
@@ -336,6 +378,8 @@ If the session became substantive, upgrade to full close.
 23. Channel 2 is a POINTER, never a second chronology. Headlines + links + `.txt`, no narration.
 24. Report the spine reconciliation delta honestly. A missed count is data, not a failure to hide.
 25. The `.txt` artifact + toggle survive the pointer change. Pointer governs prose, not the artifact.
+26. **A STANDING THREAD IS NEVER CLOSED AND NEVER DUPLICATED (LOCKED 2026-07-26, Michael).** If the session ran on a `🧭 STANDING ·` task, or on any task whose description says *"reopen, don't recreate"*: rewrite its description as the warm start, return it to `to do`, and cut NO parallel handoff task. Flipping it to `done` closes the project's permanent home; cutting a `↪️ HANDOFF ·` beside it creates two claimants on one baton.
+27. **The session agent DECLARES the session shape** (A or B) in the Handoff Artifact. Clio branches Steps 3 and 5 on that declaration rather than inferring it at close.
 
 ---
 
@@ -343,7 +387,24 @@ If the session became substantive, upgrade to full close.
 
 - Agent Activity Board Gold Standard: task templates + mechanics
 - Session Transcript Gate: the spine, thread structure, write-ahead ordering
-- `session-close.decision-log.md`: why this hook is shaped this way
+- `session-close.decision-log.md`: why this hook is shaped this way (⚠️ repo-resident; see the header note)
 - `orchestration.md` (Seating Sequences section): the pattern this instantiates
 - Memory Maggie (`super-agents/memory-maggie/`): memory curation + rotation
-- `hooks/memory-rotation.md`: the rotation algorithm Maggie stewards (TBD)
+- `hooks/memory-rotation.md`: the rotation algorithm Maggie stewards
+
+---
+
+## Changelog
+
+- **2026-07-26 — Standing-thread branch added (rules 26–27), Michael.** The close spec assumed
+  every session ends by closing a session task and cutting a fresh handoff. It had no branch
+  for a standing thread that IS the baton, so Clio reported the same "deviation" at two
+  consecutive closes while doing the correct thing both times. **A rule broken the same way
+  twice is a spec that does not cover the case.** Added the Two Session Shapes table, a
+  `Session shape` field on the Handoff Artifact, explicit branches on Steps 3 and 5, and a
+  rewrite-in-place instruction (do not append a second warm start — that is the accumulating
+  stale-resume-point drift that has misled resumes three times on prose banners). Also flagged
+  `session-close.decision-log.md` as a repo-resident decision log per the Gold Standard's
+  rule 11 trap, pending Meta DL D7. Fold-in, not net-new: this amends the existing hook and
+  creates no new tool.
+- **2026-07-26 (earlier) — Channel 2 became a POINTER**, not a second chronology.
