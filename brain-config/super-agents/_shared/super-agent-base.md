@@ -15,11 +15,12 @@ This is the shared "how to BE a git super-agent" layer. Every git super-agent's
 super-agent inherits the upgrade (singularity over copy-paste). This is the runtime
 companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
-📏 **SIZE (2026-07-27): ~17KB, was 21.7KB and 255 bytes off the ~22KB read ceiling.** Nothing was
+📏 **SIZE (2026-07-27): ~18.7KB, was 21.7KB and 255 bytes off the ~22KB read ceiling.** Nothing was
 cut but duplication and history — including three copies of one rule, each added by a different
-session that hadn't read the whole file. **Headroom is not a licence.** Check before you add; if it
-belongs to a tool, put it in the tool. A structural fix (thin Constitution + router) is proposed
-and pending Michael's ruling — do not improvise it.
+session that hadn't read the whole file. **Headroom (~3.2KB) is not a licence; it is 2-4 more
+locks.** Check before you add; if it belongs to a tool, put it in the tool. The real fix (thin
+Constitution + router over runtime modules, per the repo's own index law) is proposed and pending
+Michael's ruling — do not improvise it. See PR #563.
 
 ---
 
@@ -299,7 +300,7 @@ brain-config/super-agents/<slug>/
 file — spawning a surface to catch trimmed overflow is the pattern refused 2026-07-17.
 
 The three prior changelog entries (2026-07-24 Class Parity; 2026-07-25 live-write logging mandate;
-2026-07-25 Felix's registry-pointer strikes) are preserved verbatim in the **`base-md-trim` PR,
-2026-07-27** — including Felix's note that the struck pointers were the fifth and sixth instances
-of that rot in one day, which is evidence the Doc-Rot Sweep hook rests on. Read the PR, not a
-reconstruction.
+2026-07-25 Felix's registry-pointer strikes) are preserved verbatim in the description of
+**PR #563, 2026-07-27** — including Felix's note that the struck pointers were the fifth and sixth
+instances of that rot in one day, which is evidence the Doc-Rot Sweep hook rests on. Read the PR,
+not a reconstruction.
