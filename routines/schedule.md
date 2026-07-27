@@ -1,95 +1,90 @@
 # Routine Schedule — the WHEN
 
-**Runbooks define the WHAT. This file defines the WHEN.** Timing never lives in a spec or in the agent. Retune by editing a `Cadence` cell here, or just tell Ricky in plain language ("run F1 only Sat + Sun now") and he edits the cell.
+**Runbooks define the WHAT. This file defines the WHEN.** Timing never lives in a spec or in the agent. Retune by editing a `Cadence` cell below, or just tell Ricky in plain language ("run F1 only Sat + Sun now") and he edits it.
 
-**The `last-run` ledger lives in per-routine files, NOT in this file** (see below). That split is deliberate: it's what makes concurrent stamping safe.
+> 📖 **This file is the single source of truth for the routine schedule, and it is meant to be READ BY A HUMAN.** There is no app, no renderer, no dashboard. If something here is hard to read, fix the wording — nothing parses it anymore. *(The Routines Viewer was deleted 2026-07-27; see the bottom of this file before rebuilding anything like it.)*
 
 ## 🚨 THERE IS NO SCHEDULER (LOCKED 2026-07-26, Michael)
 
-**Nothing wakes up. No timer fires.** Routine Ricky is a git-teammate, and git-teammates have **no autonomous triggers** — they run only when a session invokes them. The native ClickUp Super Agent that used to hold the wake timer is being removed, so the wake-window model this file used to describe is **gone**. Do not restore it. Do not write a routine that assumes it.
+**Nothing wakes up. No timer fires.** Routine Ricky is a git-teammate, and git-teammates have **no autonomous triggers** — they run only when a session invokes them. The native ClickUp Super Agent that used to hold the wake timer is gone. Do not restore the wake-window model. Do not write a routine that assumes one.
 
 What that changes, concretely:
 
-- **Cadence is a STALENESS THRESHOLD, not a firing time.** It answers *"how old is too old?"* and it is evaluated the moment someone invokes — never on a clock.
+- **Cadence is a STALENESS THRESHOLD, not a firing time.** It answers *"how old is too old?"*, and it is evaluated the moment someone invokes — never on a clock.
 - **Coverage depends on Michael invoking.** A routine is only as current as the last invocation. That is a real, accepted limitation, not a bug to route around, and **triage must never imply otherwise.**
-- **Every invocation is potentially a catch-up.** Under a timer a missed occurrence was the exception; with no timer it is the normal case. See Catch-up below.
-- **Silence is no longer an acceptable outcome.** A background agent that found nothing due should stay quiet. An **invoked** agent that found nothing due must SAY SO. "All current, nothing due, next up X" is a complete and good answer; saying nothing is a bug.
+- **Every invocation is potentially a catch-up.** Under a timer a missed occurrence was the exception; with no timer it is the normal case.
+- **Silence is not an acceptable outcome.** A background agent that found nothing due should stay quiet. An **invoked** agent that found nothing due must SAY SO.
 - **`last-run` stamps matter MORE now, not less.** They were a double-run guard under a timer. They are now the **only** input to the due-math. An unstamped run is invisible.
 
 ## Routines
 
-| Routine file | Cadence | Window / notes | last-run file |
-|------------------------|-------------------------------------------|--------------------------------------------|------------------------------------|
-| `on-track-refresh.md`  | Every **Wednesday**                       | weekly motorsports TV refresh              | `routines/last-run/on-track.txt`   |
-| `f1-refresh.md`        | **Thu–Sun, session-aware** (see note)     | eligible on EVERY invocation on race-weekend days; refreshes only when a session has finished since last-run | `routines/last-run/f1.txt` |
-| `world-cup-refresh.md` | **inactive**                              | 🏁 RETIRED 2026-07-26 · ran through **2026-07-19**, tournament over | `routines/last-run/world-cup.txt`  |
+| Routine | Cadence — how stale is too stale | Last run is recorded in | Notes |
+|---|---|---|---|
+| **On Track** · `on-track-refresh.md` | Every **Wednesday** | `last-run/on-track.txt` | Weekly motorsports TV listings refresh. |
+| **F1** · `f1-refresh.md` | **Thu–Sun**, session-aware | `last-run/f1.txt` | Eligible on any invocation Thu–Sun, but the runbook decides: it only refreshes if an F1 session has actually finished since the last stamp. Otherwise a clean no-op. |
+| **World Cup** · `world-cup-refresh.md` | 🏁 **RETIRED** 2026-07-26 | `last-run/world-cup.txt` *(frozen)* | Tournament ended Jul 19, 2026. Row kept as the template for the next one. **The bracket APP is still live** — retiring a routine is not retiring an app. |
 
-> ⚠️ **VIEWER CONTRACT — the table's SHAPE is an API.** `routines/index.html` parses this table live, so **changing its shape is a change to the app.** What it needs: the header cell **`Routine file`** (that is how it finds the table), **these four columns in this order**, day names in the **`Cadence`** cell, and a **path** in the last column. Express state in the cell text; never add a column, a second table, or another table above this one.
->
-> *Relaxed 2026-07-27 (viewer v2).* Retirement is now read from the **`Cadence`** cell saying literally **`inactive`** — explicit, not inferred. The old rule demanded the phrase `through YYYY-MM-DD` survive verbatim in the notes cell or the viewer would silently **un-retire** a dead routine; that regex remains only as a dated fallback. **Prose in the notes cell is now safe to edit.** Day ranges (`Thu–Sun`) also expand correctly now, where before only the two named endpoints were highlighted.
+**To check whether anything is stale:** ask Ricky (`/session.agent=Ricky` — a bare call triages and proposes), or read a routine's `last-run` file and compare it to the cadence above yourself.
 
 ### 🏁 World Cup stand-down (2026-07-26)
 
-The 2026 World Cup Final was **Sun Jul 19, 2026**. The routine is retired, seven days late — its own runbook wrote the stand-down instruction ("the routine's row should be retired from `routines/schedule.md`") and there was no longer anything waking up to execute it.
+The Final was **Sun Jul 19, 2026**. The routine is retired, seven days late — its own runbook contained the stand-down instruction and there was no longer anything waking up to execute it.
 
-- The **row stays** and is marked `inactive` rather than deleted. A retired routine is the cheapest available template for the next tournament, and the record of what ran is worth more than the tidiness of a short table.
-- **`routines/last-run/world-cup.txt` is frozen** as the historical final stamp. Do not clear it.
-- **The bracket app stays LIVE.** A finished tournament is still a thing you look at. Nothing in `world-cup-bracket/` was touched, and retiring the routine must never be read as retiring the app.
+- The **row stays**, marked retired rather than deleted. A retired routine is the cheapest template for the next tournament, and the record of what ran beats a tidy table.
+- **`last-run/world-cup.txt` is frozen** as the historical final stamp. Do not clear it.
+- **`world-cup-bracket/` was not touched** and is still live.
 
-### F1 cadence note (session-aware, not once-a-day)
+### Why F1's cadence survived the scheduler's death untouched
 
-F1 used to run once per race-weekend day, which lagged: a race that finished in the morning wouldn't post until the next day. F1 is now **eligible at every invocation Thu–Sun**, and the runbook decides whether there is actually work: if an F1 session (Practice/Qualifying/Sprint/Race) has FINISHED since `last-run/f1.txt`, refresh with that result. If no new session has finished, it is a clean no-op — no rewrite, no stamp.
+F1 used to run once per race-weekend day, which lagged: a race finishing in the morning wouldn't post until the next day. It became *eligible* on any invocation Thu–Sun, with the runbook deciding whether there is actually new data.
 
-**This design survived the scheduler's death completely intact, and the reason is worth copying:** it already handed the *"is there new data?"* decision to the RUNBOOK instead of to a wake timer. Removing the timer changed nothing about it. Build future cadences the same way — the less a routine knows about clocks, the longer it lives.
+**That design handed the *"is there new data?"* decision to the RUNBOOK instead of to a wake timer** — so when the timer died, nothing about it needed to change. **Build future cadences the same way: the less a routine knows about clocks, the longer it lives.**
 
 ## The last-run ledger (per-routine files — READ THIS)
 
-Each routine's last-run timestamp lives in its OWN tiny file under `routines/last-run/` (one line, `YYYY-MM-DD HH:MM` ET, or `never`). Read the relevant file to decide if a routine is due, and after a successful run write ONLY that routine's own file.
+Each routine's last-run timestamp lives in its OWN tiny file under `routines/last-run/` (one line, `YYYY-MM-DD HH:MM` ET, or `never`). Read the relevant file to decide if a routine is due; after a successful run write ONLY that routine's own file.
 
-**Why per-file, not a shared file (LOCKED 2026-07-05, RE-AFFIRMED 2026-07-26):** when several routines stamp close together, each stamp used to rewrite one shared file. A later stamp built from a stale snapshot reverts a sibling's stamp — the classic shared-file race. Real incident: on 2026-07-05 World Cup refreshed + stamped at 03:08, then F1's 06:07 stamp rewrote the shared file off a pre-03:08 snapshot and reverted World Cup to `never`, which skipped World Cup on the next pass and double-ran F1. Per-routine files give each routine a private write target. **One writer per file, always.**
+**Why per-file, not a shared file (LOCKED 2026-07-05, RE-AFFIRMED 2026-07-26):** when several routines stamp close together, each stamp used to rewrite one shared file, and a later stamp built from a stale snapshot would revert a sibling's. Real incident: on 2026-07-05 World Cup refreshed + stamped at 03:08, then F1's 06:07 stamp rewrote the shared file off a pre-03:08 snapshot and reverted World Cup to `never` — which skipped World Cup on the next pass and double-ran F1. **One writer per file, always.**
 
-> ⚠️ **Re-affirmed the hard way, same month.** On 2026-07-26 a shared `brain-config/data-refresh-log.json` was created holding every routine's row in a single file — precisely the shape this rule forbids, and it shipped with an explicit "any agent may stamp it" invitation that made the race *likelier*. It was deleted the same day, never used. Two lessons, both general: **(1) losing the wake timer does NOT make a shared stamp file safe** — concurrent SESSIONS collide exactly as happily as concurrent wakes did, and the fleet has already proven that on the session board. **(2) The rule was findable and wasn't found.** It was searched for in `brain-config/` only, and the silence there was read as proof nothing existed. If you are about to build state for routines, the answer lives in `routines/`.
+> ⚠️ **Re-affirmed the hard way, same month.** On 2026-07-26 a shared `brain-config/data-refresh-log.json` was created holding every routine's row in one file — exactly the shape this rule forbids — and shipped with an explicit "any agent may stamp it" invitation that made the race *likelier*. Deleted the same day, never used. **Losing the wake timer does NOT make a shared stamp file safe:** concurrent SESSIONS collide as happily as concurrent wakes did.
 
-> ⚠️ **And that same 07-05 split silently broke the viewer for three weeks** — moving stamps out of this file changed the last column from a timestamp to a path, and `index.html` kept date-parsing it and rendering **"never"** for every routine. Correct doc change, unnoticed app breakage. **The renderer is part of this system; see the Viewer section at the bottom before you reshape anything here.**
+> 📌 **OPEN QUESTION (2026-07-27):** with the viewer gone, answering *"is anything stale?"* by reading files means opening this file **plus one stamp file per routine**. Folding the stamps back into the table would make this doc fully self-contained — which is what "single source of truth" really wants — **but that was the pre-07-05 design and the race above is why it was abandoned.** There is a real argument it is now safe (SHA-checked writes reject a stale write rather than silently clobbering, proven twice on the session board), but **that must be TESTED, not assumed.** Michael's call; tracked on thread `86ajv0f8w`.
 
 ## How to decide what to run (all times America/New_York)
 
-On invocation, for every ACTIVE routine, read its `last-run` file and compare against its `Cadence`:
+On invocation, for every ACTIVE routine, read its `last-run` file and compare against its cadence:
 
-- **Day-of-week cadence** ("every Wednesday"): due once per matching day. Due if last-run is older than the most recent occurrence of that day. After success, write now.
-- **Session-aware cadence** (F1, "Thu–Sun"): eligible on those days; the runbook checks whether a session has finished since last-run and refreshes only if so (else clean no-op). Stamp only on an actual refresh.
-- **`never`** means NEVER RUN. Report it as exactly that — never as a huge overdue interval. Rendering an unset stamp as arithmetic is lying with numbers, and it is what a confident cold agent does.
-- **A stamp you could not READ is not `never` either.** Unreadable is its own answer: say "unknown," never substitute a default. *(This is the agent-side twin of the viewer bug above.)*
-- **Idempotency (double-run guard):** a routine whose last-run already covers the current occurrence/session is done — skip it, however many times you are invoked.
-- **Catch-up — now the DEFAULT path, not an edge case.** With no timer, occurrences pass unattended by design. If a due occurrence has passed and last-run is older, it is overdue: run the **latest missed occurrence once** and label it a catch-up. **Never replay every missed day.** A routine overdue by three weeks gets ONE run, flagged as such.
-- **`inactive` routines are never proposed.** Not due, not overdue, not a gap — say nothing about them unless asked directly.
-- **Nothing due → say so and stop.** *(Changed 2026-07-26. The old rule read "wake, check, do nothing, no report" — correct for a background sweep, wrong for an invoked one.)*
+- **Day-of-week cadence** ("every Wednesday"): due if last-run is older than the most recent occurrence of that day. After success, write now.
+- **Session-aware cadence** (F1, Thu–Sun): eligible on those days; the runbook checks whether a session finished since last-run and refreshes only if so. Stamp only on an actual refresh.
+- **`never`** means NEVER RUN. Report it as exactly that — never as a huge overdue interval. Rendering an unset stamp as arithmetic is lying with numbers.
+- **A stamp you could not READ is not `never` either.** Unreadable is its own answer: say "unknown," never substitute a default.
+- **Idempotency:** a routine whose last-run already covers the current occurrence/session is done — skip it, however many times you are invoked.
+- **Catch-up — the DEFAULT path, not an edge case.** With no timer, occurrences pass unattended by design. If a due occurrence has passed and last-run is older, run the **latest missed occurrence once** and label it a catch-up. **Never replay every missed day.** A routine three weeks overdue gets ONE run.
+- **Retired routines are never proposed.** Not due, not overdue, not a gap.
+- **Nothing due → say so and stop.**
 
 ## Error posture
 
 - **A failure in one routine never blocks the others.** Flag it, move on, run the rest of what is due.
 - **Best-effort + flag** per the Data-Refresh Discipline in `routines/README.md` (mark `Stream`/`Unknown`, keep the prior value) rather than aborting the whole run.
 - **A failed/stopped run leaves that routine's last-run file untouched** so it stays overdue and retries on the next invocation. Self-healing.
-- **Report failures in the reply, not by DM.** *(Changed 2026-07-26. The old rule — "DM Michael only for a recurring or large problem" — assumed a background agent talking to an absent human. Invocation means he is right there; tell him in the answer.)*
+- **Report failures in the reply, not by DM.** Invocation means Michael is right there.
 
 ## Rules for the ledger
 
 - Write ONLY the single `last-run/<routine>.txt` file for the routine that just succeeded — never a shared file, never another routine's file.
 - Format: one line, `YYYY-MM-DD HH:MM` ET. Use `never` if it has never successfully run.
-- Changing a cadence/window: edit the `Cadence` cell above (or tell Ricky). Never reschedule by editing a runbook spec, and never by editing the agent.
-- Retiring a routine: set the **`Cadence`** cell to `inactive` and add a dated reason in the notes. **Do not delete the row and do not delete the runbook.**
+- Changing a cadence: edit the `Cadence` cell above (or tell Ricky). Never reschedule by editing a runbook spec, and never by editing the agent.
+- Retiring a routine: mark it retired in the table with a dated reason, and **put its end date in the ROW** if it is date-bounded. **Do not delete the row and do not delete the runbook.** *(The World Cup stand-down instruction lived only inside its runbook and went seven days unexecuted.)*
 
-## Viewer — `routines/index.html` (v2, 2026-07-27)
+## 🗑️ The Routines Viewer was deleted — read this before rebuilding it
 
-The **Routines Viewer** renders this file: https://mawizorek.github.io/ClickUp_apps/routines/ · spec + defect history in `routines/next-build-spec.md` · ledger row in `/VERSIONS.md`.
+There used to be an app at `routines/index.html` that rendered this table with status dots and a "days" strip. **Deleted 2026-07-27** (PR #562). Michael: *"i don't need the fancy app as long as the schedule is findable and legible"* and *"no i don't open the routines url ever."*
 
-✅ **The two defects flagged here on 2026-07-26 are FIXED in v2**, along with three more found while speccing: the header card no longer hardcodes a wake timetable (it states invoke-only and derives every count from this table), last-run now resolves the per-routine stamp files, day ranges expand, retirement reads the explicit `inactive` cell, and the fake sample-data fallback is gone.
+**Why it went, in one line: it and Ricky's invoked triage answered the same question off the same two files.** Two claimants on one truth. It was a *good* app when a timer ran routines unattended and a passive glance was the only way to see status without asking — **retiring the scheduler is what turned it into a duplicate.** Nobody erred; the ground moved.
 
-**The rule that came out of it, and the reason this section stays:**
+**What it cost us, honestly:** a phone-openable glance with no agent, and the arithmetic (this file says `2026-07-15` and "every Wednesday"; the app said **`Overdue 5d`**). Michael accepted both, because he never opened it.
 
-> **Derive, don't declare — and never render a guess as a fact.** Every one of those defects was a confident wrong answer, and a wrong render looks exactly like a right one. *`never` vs unreadable*, *overdue vs never-run*, *retired vs active* — each pair must stay visibly distinct wherever it appears, in the app AND in an agent's triage.
+**What it bought:** this file stopped being an API. Every one of that app's six defects came from a **doc** edit that was correct in isolation — the table changed shape, the renderer quietly disagreed, and twice it was wrong for three weeks straight while the markdown was right the whole time. The four-column layout, the `Routine file` header, day names parsed out of a cadence cell, the literal phrase `through YYYY-MM-DD` — all of that was load-bearing. **None of it is anymore. Word this table however reads best.**
 
-⚠️ **Still open (not defects, but named so they aren't rediscovered):**
-
-1. **`index.html` is ~20.8KB** — well past the 15KB split line, under the 22KB ceiling. **The next change to this app should be the `source/` split, not another inline block.** Seat Size Sally first.
-2. **Timezone.** Stamps are ET; the viewer parses them as viewer-local. Correct for Michael, off by hours elsewhere. Pre-existing, deliberately out of scope.
+**If you ever rebuild it, the rule it died holding is still worth inheriting: derive, don't declare — and never render a guess as a fact.** `never` vs unreadable, overdue vs never-run, retired vs active: each pair must stay visibly distinct. Full defect history: `routines/next-build-spec.md` (tombstone) and PRs #560/#562.

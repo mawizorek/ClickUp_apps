@@ -5,7 +5,7 @@ type: runbook
 status: active
 trigger: "/data-refresh · /refresh · \"run the refresh\" · \"what needs refreshing\" · a bare `Ricky` (his default_runbook → TRIAGE) · or pointing any session at this file and saying \"run this process\""
 steward: routine-ricky
-version: 3
+version: 3.1
 added: 2026-07-26
 ---
 
@@ -49,12 +49,15 @@ v1–v2 of this file carried its own poll registry, its own `cadence` column, it
 1. **READ `routines/schedule.md`** (blob API, fresh — never a carried copy) for the routine table and the due-math rules. Then read each ACTIVE routine's `routines/last-run/<routine>.txt`.
 2. **COMPUTE what is due**, using the rules in `schedule.md` — do not re-derive them here. Three cases worth naming because they are the ones that get faked:
    - **`never`** = NEVER RUN. Report it as that, **never** as a giant overdue interval. Rendering an unset stamp as arithmetic is lying with numbers.
-   - **`inactive`** routines are never proposed and never counted as a gap.
+   - **A stamp you could not READ is not `never` either** — say "unknown." *(A renderer conflated those two for three weeks; do not repeat it in prose.)*
+   - **Retired** routines are never proposed and never counted as a gap.
    - **Session-aware routines** (F1) are *eligible*, not *due* — the runbook decides. Say "eligible, runbook will check," not "due."
 3. **PROPOSE, then stop.** One compact readout ending in a real question. **Run nothing yet.**
 4. **On "go" → EXECUTE** the approved runbooks from `routines/`, then **STAMP** each one's own last-run file. Per `routines/README.md`, an approved run is not re-gated mid-flight.
 
 **Why triage is the default:** there is **no scheduler** — git-teammates have no autonomous triggers, and the native agent that held the clock is gone. So a routine is only as current as the last invocation, **every invocation is potentially a catch-up**, and other agents or Michael may have run and stamped something already. Ricky's first job on waking is to find out what the world actually did, not to assume his own last run is the truth.
+
+⚠️ **As of 2026-07-27 this triage is the ONLY staleness surface that exists.** The Routines Viewer app was deleted; there is no dashboard to fall back on and no second opinion. Michael confirmed he never opened it. **Get the arithmetic right and say the boring answer out loud.**
 
 ## The proposal format
 
@@ -109,7 +112,6 @@ The full floor is **Data-Refresh Discipline** in `routines/README.md` (12 rules)
 ## Composes with
 
 - **`routines/`** — ⭐ the canonical framework. README (discipline + contract), `schedule.md` (cadence), the runbooks (procedure), `last-run/` (state).
-- **`routines/index.html`** — the live Routines Viewer, already rendering `schedule.md`. It is the free UI for all of this; it parses the routine table, so keep that table's shape.
 - **`hooks/source-freshness-gate.md`** — fire-always on any fetch. Stewarded by Scout Sage.
 - **`hooks/silent-fallback-law.md`** — never substitute a source and report as if the original answered.
 - **`gates/agent-invocation-gate.md`** — the contract making the three doors equivalent.
@@ -117,6 +119,7 @@ The full floor is **Data-Refresh Discipline** in `routines/README.md` (12 rules)
 
 ## Changelog
 
+- **v3.1 (2026-07-27) — swept the `routines/index.html` pointer; the Routines Viewer app was DELETED (PR #562).** It rendered `schedule.md`, so this file recommended keeping that table's shape for it — **that constraint no longer exists and the doc has been rewritten for human reading.** Michael: *"i don't need the fancy app as long as the schedule is findable and legible."* The app and this triage had converged on the same question off the same two files. **Worth carrying: the app didn't rot, the ground moved — retiring the scheduler is what made it a duplicate.** Also noted that triage is now the only staleness surface, and folded the unreadable-vs-`never` distinction into step 2.
 - **v3 (2026-07-26) — FOLDED INTO `routines/`; the scheduler is gone.** Michael: *"scheduled Ricky can no longer exist since we're removing him from real CU agent."* Deleted this file's duplicate registry, `cadence` column, graduation ladder, and `brain-config/data-refresh-log.json` (deleted from the repo, never used — its single-shared-file shape reintroduced the stamp race that `routines/last-run/*.txt` was locked to prevent on 07-05). What survives is the part that was genuinely new: **invoked triage and the proposal format.** Everything else now points at `routines/`. Also folded the source-freshness gate into the universal Discipline as rule 10, added the missing stamp step to both live runbooks, and stood down the World Cup routine.
 - v2 (2026-07-26) — triage became the default; added the log, cadence column, due-math, proposal format, mandatory stamp, graduation path. *(Most of it duplicated `routines/`; see v3.)*
 - v1 (2026-07-26) — created alongside Routine Ricky, shipped with an empty registry.
