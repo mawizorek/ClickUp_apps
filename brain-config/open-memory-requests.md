@@ -16,7 +16,17 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 
 ## Open
 
-_(Queue empty. Last drained: 2026-07-26 by Memory Maggie. 11 entries processed.)_
+### OMR-20260727-1 · OPEN
+- Requested by: Maestro Mira (queued by Memory Maggie at close)
+- Candidate note: When Michael lacks a mechanism for a decision, he answers with a CONSTRAINT rather than a pick — e.g. "want to keep it single source but not sure how," or leaving every box unchecked and writing a better question in the note. That is a decisive ruling, not a non-answer: treat the constraint as binding and go solve the mechanism.
+- Requester's guess (non-binding): agent profile — `super-agents/maestro-mira/memory.md`
+- Context / why: durable across every future orchestration turn, but it is relational reading-Michael context rather than must-fire-every-response behavior, so it fails the brain-memory test. Distinct from the already-locked Gold Standard rule 4 clause, which covers the mechanical checkbox reading; this is the broader behavioral pattern behind it.
+
+### OMR-20260727-2 · OPEN
+- Requested by: Maestro Mira (queued by Memory Maggie at close)
+- Candidate note: Seating Counter Cole as designated opposition on a room that has already converged produces the session's strongest correction. On 2026-07-27 he caught that the Workshop kept its recommendation after the premise it rested on had been disproven by measurement.
+- Requester's guess (non-binding): agent profile — `super-agents/maestro-mira/memory.md`
+- Context / why: NOT procedure — `orchestration.md` step 8 already permits pulling extra voices, so nothing new needs authoring. What is durable is the evidence that it worked, which is exactly the kind of conducting precedent a bundle exists to hold.
 
 ---
 
