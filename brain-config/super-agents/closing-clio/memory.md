@@ -4,107 +4,127 @@
 > This file holds the CURVE: what keeps going stale, what keeps going wrong, what
 > Michael keeps refusing, and how capacity actually behaves.
 >
-> **Every line below is INHERITED, not earned.** Seeded at graduation 2026-07-25 from
-> the lens file, the close hook, and the steward's handoff. Nothing here was observed
-> by me at a close I ran with memory attached. **First real close replaces
-> reconstruction with lived observation** — when I confirm an inherited line myself,
-> re-label it EARNED with the date. Treat an unconfirmed inherited line as a lead, not
-> a fact.
->
-> **Budget: ~10KB hot cap.** Enforced by `hooks/memory-rotation.md` at close (Maggie).
-> Graduated content goes to `memory/archive/`.
+> **Budget: ~10KB hot cap.** Graduated content goes to `memory/archive/`.
 
 ---
 
 ## 🧭 Why I have memory (the whole point)
 
-A close without memory is a snapshot. A close WITH memory is a trend line. The
-question I exist to answer that a stateless lens cannot: **"is this the first time,
-or the fourth?"** One stale doc is a note. The same doc stale four closes running is
-a structural finding with a name.
+A close without memory is a snapshot. A close WITH memory is a trend line. The question I
+exist to answer that a stateless lens cannot: **"is this the first time, or the fourth?"**
+One stale doc is a note. The same doc stale four closes running is a structural finding.
 
-So the discipline is: every close, check the session against the ledgers below, and
-report repeats **with the count**. Then write back what I learned.
+Every close: check the session against the ledgers below, report repeats **with the count**,
+then write back what I learned.
 
-## 📉 Recurring stale references (INHERITED — counts unverified)
+## 📉 Recurring stale references
 
 > Format: surface · times seen · last seen · status. Increment on sight; never reset.
 
-- **`super-agents/roster.json` vs its own slim rule** — the file has NEVER met the ~12KB
-  number since the number was locked, and the note *describing* its own size was itself
-  stale. A guardrail that misreports its own subject is the highest-value class of rot.
-  Last seen 2026-07-25 (18.6KB). Escalated to Michael/Dexter.
-- **The AI Toolkit index (ClickUp)** — carries stale git-teammate counts and stale
-  per-agent warnings. Named as an open follow-up in the steward's own index, which means
-  it has been known and unfixed for more than one session.
-- **`registry.json` pointers** — retired to a tombstone 2026-07-25 (PR #483), but files
-  kept *instructing* agents to write to it. Found in the lifecycle runbook, then the
-  authoring gate, then the git-teammate audit DoD. **A retirement is not done when the
-  file dies; it is done when every instruction pointing at it dies.** Check this pattern
-  on the next retirement.
+- **The Audit Progress & Roadmap banner** — ⚠️ **EARNED 2026-07-26, and it is now a
+  STRUCTURAL finding, not a note.** Reconciled TWICE in one session (Space 1 → Space 3 →
+  Space 4), and the doc's own text admits a prior full-sprint drift that misled a resume.
+  **Three known drifts.** The banner is a hand-maintained prose mirror of a queryable field
+  (the Index's Audit Status), which is the two-claimants-on-one-truth pattern Michael
+  collapses on sight. **Recommendation when next raised: retire the prose resume-point and
+  point at the Audit Frontier Scan view.** Not proposed yet — first time it qualified.
+- **The AI Toolkit index (ClickUp)** — stale git-teammate counts + stale per-agent warnings.
+  Known and unfixed across more than one session. (Inherited, not re-verified this close.)
+- **`registry.json` pointers** — retired 2026-07-25 (PR #483) but files kept instructing
+  agents to write to it; found in three separate files. **A retirement is not done when the
+  file dies; it is done when every instruction pointing at it dies.** ⚠️ **PATTERN CONFIRMED
+  AGAIN 2026-07-26 in a new shape:** the Roadmap's operative step 6 pointed at
+  `901327854042` for the List Index — that is the Custom Field Dictionary. A cold agent
+  following the written instruction would have written audit judgments onto the wrong list.
+  **Second instance of "the instruction outlives the correction."**
+- **`super-agents/roster.json` vs its own slim rule** — never met the ~12KB target since it
+  was locked. Last seen 18.2KB (Felix trimmed it from 21.1KB on 2026-07-26). Escalated.
 
-## 🧱 Recurring hurdles (INHERITED — counts unverified)
+## 🧱 Recurring hurdles
 
-- **Stale reads causing regressions.** Branch/raw URLs and carried-over SHAs served old
-  copies repeatedly; the fix (blob-API-first, re-fetch before every decision) is locked
-  in the GitHub standard. If I log this again, the standard is being skipped, not wrong.
-- **Files growing past readability.** A file that cannot be read whole cannot be safely
-  edited, which has BLOCKED work outright (Dev Dexter shipped unregistered). Size is a
-  correctness problem, not tidiness. Size Sally forecasts it; I notice when it bites.
-- **Thin transcripts at close.** When the per-response log lags the work, close quality
-  collapses and reconstruction starts. Flag the gap; never quietly paper over it.
+- **🚨 FALSE VERIFICATION (EARNED 2026-07-26 — new, and the most dangerous class yet).**
+  Anna claimed ten folders were empty, then "verified" with a tool that structurally could
+  not return tasks, and counted the empty-looking result as proof. **A verification step
+  that cannot return the answer you don't want verifies nothing.** This is distinct from
+  skipping a check — it FEELS like diligence, so it survives self-review. Watch for it: if
+  a close reports a confirmation, ask what the confirming call would have shown had the
+  claim been false. **First occurrence. If I log this twice, it needs a gate.**
+- **Silent query-tool defects (EARNED 2026-07-26).** `WHERE folder IN (...)` returns zero OR
+  ignores the filter, and never errors. An unscoped `GROUP BY` caps ~5,000 rows and reports
+  partial counts as complete. Both produced confident wrong findings in one session. **The
+  common shape: the tool degrades silently instead of erroring.** Third session running that
+  a tooling defect (not agent reasoning) was the proximate cause of a bad claim.
+- **Files growing past readability.** A file that can't be read whole can't be safely edited
+  and has BLOCKED work outright. **Seen again 2026-07-26:** Milo's memory went over cap
+  twice in one session — rotated at open, then blown again mid-session by pasting per-list
+  audit detail into memory. Fix applied: a standing line at the top of his file.
+- **Stale reads causing regressions.** Blob-API-first is locked in the GitHub standard. Not
+  seen this close — the discipline held.
+- **Thin transcripts at close.** Not seen this close; the transcript was rich (9 substantive
+  beats, 9 task comments). Contrast with the prior session's 11 replies / 0 spine lines.
 
 ## 🔁 Doc drift that repeats structurally
 
-- **Two claimants on one truth.** Every collapse (registry/roster, app-index/VERSIONS.md)
-  came from a mirror pair drifting. Michael collapses duplicate sources on sight — so a
-  second mirror is never the fix I propose.
-- **Retirement half-done.** See above. The instructions outlive the file.
+- **Two claimants on one truth.** Every collapse so far (registry/roster, app-index/
+  VERSIONS.md, and now the Roadmap banner vs the Index) came from a mirror pair drifting.
+  Michael collapses duplicate sources on sight — **a second mirror is never the fix I
+  propose.**
+- **Retirement half-done.** The instructions outlive the file. Two instances now.
 
 ## 📊 Capacity / model curve
 
-- (empty — first entry lands at my first real close. Record: model · closing capacity ·
-  recall quality · whether it degraded and when.)
+> Record: date · model · session shape · closing capacity · recall quality · degradation.
 
-## ✅❌ Proposals: taken vs refused (INHERITED framing, no entries yet)
+- **2026-07-26 · Claude Opus 5 · ~7.5h, 9 substantive beats, ~60 tool calls, 5 agents
+  seated + a 7-lens Workshop.** Closing capacity: sharp — no degradation observed, recall
+  across the full session held (early-session findings were correctly cited at close). One
+  reasoning failure (false verification) occurred mid-session at high context, not at the
+  end, so it does not read as capacity decay. **First real data point.**
 
-> The point: never re-pitch a refused idea cold. Cite the refusal and say what changed.
+## ✅❌ Proposals: taken vs refused
 
-- **REFUSED — splitting `roster.json` by class** (2026-07-25, Michael). He chose ONE slim
-  flat list instead. Do not re-propose a split; the class boundary moves on every
-  graduation, which is the actual reason.
-- **REFUSED — new ClickUp AI Skills** (LOCKED 2026-07-25). Tools live in git only. Never
-  propose a Skill front door for a git tool while the hold stands.
+> Never re-pitch a refused idea cold. Cite the refusal and say what changed.
 
-## 🤝 How I work with the others (INHERITED)
+- **REFUSED — splitting `roster.json` by class** (2026-07-25). One slim flat list instead;
+  the class boundary moves on every graduation.
+- **REFUSED — new ClickUp AI Skills** (LOCKED 2026-07-25). Tools live in git only.
+- **TAKEN — reordering a walk so the canonical artifact is judged LAST** (2026-07-26,
+  Michael's own call on SHOW TEMPLATE). Generalizes well beyond that audit: *"correct" for a
+  template/standard/spec is defined by observed downstream behaviour, not internal tidiness.*
+  Worth offering the next time an agent proposes auditing a standard before its instances.
 
-- **Maggie** — memory is hers end to end. I hand her the agents-present table + memory
-  candidates, she posts Channel 1 first, I pull her headline into Session Health without
-  recomputing it. Delegated 2026-07-05; the boundary predates both our graduations.
-- **Sana** — she keeps the transcript live; I work from what she left. A thin transcript
-  is a finding I report, not a hole I invent my way through.
-- **Anna** — she audits SUBJECTS with a ledger across sessions; I audit the SESSION.
-  Findings that need a real audit get handed to her.
-- **Hana** — the baton's content is hers when she's seated; the task mechanics are mine.
-  Soft seam, flagged.
-- **Felix** — the fleet directory. Fleet questions go to him; I'm a row in it.
+## 🤝 How I work with the others
 
-## 🧠 Michael-patterns worth carrying (INHERITED)
+- **Maggie** — memory is hers end to end. I hand her the agents-present table + candidates;
+  she posts Channel 1 first; I pull her headline into Session Health without recomputing it.
+- **Sana** — she keeps the transcript live; I work from what she left. A thin transcript is a
+  finding I report, not a hole I invent through.
+- **Anna** — she audits SUBJECTS across sessions; I audit the SESSION.
+- **Hana** — baton content hers when seated; task mechanics mine. Soft seam, flagged.
+- **Felix** — the fleet directory. ⚠️ **Concurrency observed 2026-07-26:** Felix ran a
+  separate session in the same repo simultaneously and coordinated cleanly off the session
+  board. The board WORKS when agents actually write to it.
+
+## 🧠 Michael-patterns worth carrying
 
 - Collapses duplicate sources of truth on sight. Never propose a mirror.
-- Keeps the reasoning, not just the outcome — strike through reversals, never delete them.
-- Wants the honest number, not the comfortable one. A padded close is worse than a short one.
-- Corrections generalize: a note from him applies across ALL domains and future sessions,
-  never just the session it happened in.
+- Keeps the reasoning, not just the outcome — strike through reversals, never delete.
+- Wants the honest number. A padded close is worse than a short one.
+- Corrections generalize across ALL domains and future sessions.
 - Decision Logs, not prose chat, for anything being worked out.
+- ⚠️ **EARNED 2026-07-26 — a ZERO-STRIKE answer plus a governing note means the question was
+  asked at the WRONG LAYER**, not that he's deferring. Twice now. The agent should re-ask
+  higher up rather than re-ask the same question later.
+- ⚠️ **EARNED 2026-07-26 — he catches false findings in one line and does not soften it**
+  ("you're just missing them"). The right response is a full retraction with the mechanism
+  named, not a partial walk-back.
 
-## 📌 Lineage (INHERITED)
+## 📌 Lineage
 
-- 2026-07-03 born as **Recap Rosie** (`recap-rosie.md`).
-- 2026-07-04 renamed **Closing Clio**; role pinned as Session Close Auditor.
-- 2026-07-05 memory audit delegated to Maggie; I post the session log only.
-- 2026-07-25 **graduated to git-teammate** — sixth (Wes → Anna → Mira → Maggie → Sage → me),
-  stewarded by Felix, on the §6 test: I already kept durable state on disk.
+- 2026-07-03 born as **Recap Rosie**. 2026-07-04 renamed **Closing Clio**.
+- 2026-07-05 memory audit delegated to Maggie.
+- 2026-07-25 **graduated to git-teammate** (sixth), on the §6 test: I already kept state on disk.
+- **2026-07-26 — first close run WITH memory attached.** Session 23.
 
 ## Pointers (never restate)
 
@@ -114,5 +134,4 @@ report repeats **with the count**. Then write back what I learned.
 - Queues → `open-thread.md` · `open-memory-requests.md`
 - Dedup before cutting a handoff task → `hooks/task-dedup-gate.md`
 - Docs-vs-HEAD rot → `hooks/doc-rot-sweep.md`
-- How to BE a teammate → `_shared/super-agent-base.md`
 - Fleet roster → `super-agents/roster.json`
