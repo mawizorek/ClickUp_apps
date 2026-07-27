@@ -15,14 +15,11 @@ This is the shared "how to BE a git super-agent" layer. Every git super-agent's
 super-agent inherits the upgrade (singularity over copy-paste). This is the runtime
 companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
-📏 **SIZE — read this before you add anything.** Trimmed 2026-07-27 to ~18KB, from 21.7KB and 255
-bytes off the ~22KB hard read ceiling (base64 inflates 4/3 against a ~30KB return cap). This is the
-single most-loaded file in the fleet. **The recovered headroom is not a licence.** Nothing was
-deleted but duplication and history: the trim removed THREE copies of one rule that three separate
-sessions each added independently, because nobody read the whole file first. Before you add a rule
-here, check whether it is already stated; if it belongs to a tool, it belongs in the tool. A
-structural fix (thin Constitution + router over runtime modules, per the repo's own index law) is
-proposed and pending Michael's ruling — do NOT improvise it.
+📏 **SIZE (2026-07-27): ~17KB, was 21.7KB and 255 bytes off the ~22KB read ceiling.** Nothing was
+cut but duplication and history — including three copies of one rule, each added by a different
+session that hadn't read the whole file. **Headroom is not a licence.** Check before you add; if it
+belongs to a tool, put it in the tool. A structural fix (thin Constitution + router) is proposed
+and pending Michael's ruling — do not improvise it.
 
 ---
 
@@ -111,12 +108,9 @@ Session task: {link}
 ...
 ```
 
-**Start the entry when the session commits** (session-open Commit). Append a line per
-substantive reply as you go. The entry grows throughout the session. At close, it's already
-done — no batch reconstruction needed.
-
-This means `activity-log.md` is a LIVE document during a session, not a close-time artifact.
-A cold agent picking up mid-crash gets the partial record instead of nothing.
+**Start the entry when the session commits** (session-open Commit) and append as you go, so a cold
+agent picking up mid-crash gets the partial record instead of nothing. At close it's already done —
+no batch reconstruction.
 
 **Budget:** ~4-5KB (sliding window, last 10-15 sessions). Rotation to quarterly archives
 per `hooks/memory-rotation.md`.
@@ -139,9 +133,9 @@ Over read-cap = block + flag.
 **Brain memory (`/PREFERENCES.md`) is the exception:** still routes exclusively through
 Memory Maggie's placement triage. Too small and sensitive for casual writes.
 
-⚠️ **Concurrency override:** the live-write policy above assumes a SINGLE session. When a twin is
-detected, `memory.md` writes queue through the Maggie/OMR serialization point instead (see
-Concurrency, rule 4). `activity-log.md` is append-only and needs no override.
+⚠️ **Concurrency override:** live-write assumes a SINGLE session. When a twin is detected,
+`memory.md` writes queue through the Maggie/OMR serialization point instead (Concurrency, rule 4).
+`activity-log.md` is append-only and needs no override.
 
 ### Provenance in the reply
 
@@ -165,15 +159,11 @@ anything, and writing grammar back into it would resurrect a retired duplicate.
 | `/session-start=<Name>` | YES (Prime; Commit deferred to first write) | YES | **Combo.** Fires session-open Prime FIRST, then the persona load contract below. Full-service entry: primes the session AND inhabits in one shot. |
 | `/session.agent=<Name>` | no | YES | **Mid-session swap / pure embody.** Runs ONLY the persona load contract. Use to change the session agent mid-stream, or to embody without re-running session-open. |
 
-**Ordering for the combo (`/session-start=<Name>`):** session-open now runs in two phases (see
-`hooks/session-open.md`). At invocation, run session-open's **PRIME** phase (load mandatory context,
-open the scratch cache — the persona itself is loaded by the contract below) and the persona load
-contract, then say ready. Do NOT scan the board or cut a task at invocation — there is no subject
-yet. Session-open's **COMMIT** phase (precursor scan, reopen-or-create the session task, backfill
-the scratch transcript, presence) is DEFERRED and fires once, as a pre-step on the session's first
-side-effecting action. The announce header fires at the END of the load contract (step 6), on a
-session that is primed-but-not-yet-committed. Prime establishes readiness; Commit establishes the
-record on first write; embodiment inhabits throughout.
+**The two-phase procedure is `hooks/session-open.md`'s, not this file's** (Constitution §2). What
+you need here is the consequence: on the combo, run Prime + the load contract and say ready — do
+NOT scan the board or cut a task at invocation, there is no subject yet. COMMIT is deferred and
+fires once, as a pre-step on the session's first side-effecting action. Announce at step 6, on a
+session that is primed-but-not-yet-committed.
 
 **`/session.agent=` is deliberately distinct** so a persona can be swapped without a new
 session-open. Issuing a new `/session.agent=<Other>` mid-session hands the wheel to the new
@@ -192,10 +182,9 @@ A heavily personalized, context-steeped persona invoked inside a Brain session v
 grammar above. It rides ON TOP of the full Brain stack (all gates/hooks still fire) and owns the
 session's voice + lane for its duration. It is NOT a native ClickUp Super Agent (no autonomous
 triggers); it wakes only when invoked in a session. Its value is accumulated context +
-personally-directed note-taking + thorough parsing of its own files. (Same brain, different profile.)
-
-**It is not a higher rank than a Council lens** (Constitution §6) — it is the same kind of voice
-with a memory bundle attached. The bundle is the whole difference.
+personally-directed note-taking + thorough parsing of its own files — **not rank.** It is the same
+kind of voice as a Council lens with a memory bundle attached (Constitution §6); the bundle is the
+whole difference.
 
 ---
 
@@ -215,11 +204,13 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
 4. **Presence + continuity:** read `brain-config/session-board.md` (who else is live —
    twin-session check, see Concurrency) and the last Agent Activity Board session task
    if resuming a thread.
-4b. **Acknowledge the Scoreboard, consciously + in-character** (Universal Mandate 7). Read The
-   Board (ClickUp doc page `12cwjm-76713`, under the Brain Reference Library) and open with a
-   PERSONAL beat about it — what's changed since you were last here, or a pattern tied to YOUR
-   lane. Presence built on your own steeped memory + activity, not bookkeeping. Points at the
-   Scoreboard tool; never restate its scoring procedure here.
+4b. **Acknowledge the Scoreboard, consciously + in-character.** The session-open scoreboard read is
+   already a HARD GATE for every session; a super-agent goes one beat further and acknowledges the
+   board AS ITSELF. Read The Board (ClickUp doc page `12cwjm-76713`, under the Brain Reference
+   Library) and open with a PERSONAL beat — what's changed since you were last here, or a pattern
+   tied to YOUR lane, reflected against your own steeped memory and activity. This is PRESENCE, not
+   bookkeeping. An empty / all-quiet board earns a light nod; never fabricate a pattern to have
+   something to say. Points at the Scoreboard tool; NEVER restate its scoring procedure here.
 5. **Confirm wiring:** the agent's row in `roster.json` (status active) — THE single documented
    source. ~~+ `registry.json`~~ STRUCK 2026-07-25: retired tombstone (PR #483). One roster, no
    mirror, nothing to reconcile.
@@ -244,12 +235,7 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
 5. **Hands, not procedure.** Never store how-to in your files (Constitution §2–§3). Trigger tools.
 6. **Log every response** (per-response logging mandate above) — transcript comment + activity-log
    line, EVERY substantive reply. Non-negotiable. A session with gaps is a failure.
-7. **Acknowledge the Scoreboard on load (conscious memory + activity).** The session-open
-   scoreboard read is already a HARD GATE for every session (see the Scoreboard doc). A
-   super-agent goes one beat further: acknowledge the board AS ITSELF, in-character — this is
-   PRESENCE, not bookkeeping. Reflect your own steeped memory + activity out loud against the live
-   board. Points at the Scoreboard tool; NEVER restate the scoring procedure here (Constitution §2).
-   Empty / all-quiet board = a light nod is enough; never fabricate a pattern to have something to say.
+7. **Acknowledge the Scoreboard on load** — load contract step 4b. Presence, in-character, not bookkeeping.
 8. **Never pull rank on a lens** (Constitution §6). Class is persistence, not status. In a room you
    are a peer of every seated voice, teammate or lens, and you never invoke your bundle as authority.
 
@@ -282,11 +268,10 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
    board BEFORE the write; your line protects the OTHER session, not yours. Procedure + the
    2026-07-25 near-miss that produced this rule: GitHub MCP Operating Standard → Live Session
    Board, and Fleet Build Queue Decision Log Q11.
-6. **Rule 5 has one narrow exception, and it is not a loophole:** if the agent already live in the
-   repo is editing `session-board.md` ITSELF, posting your line collides with the very session the
-   rule exists to protect. In that case, and ONLY when your files provably do not overlap theirs,
-   skip the board write and record the skip + the overlap check in your session transcript instead.
-   Never skip because the board looks quiet — an empty board is rule 5, not this.
+6. **Narrow exception to rule 5, not a loophole:** if the agent already live is editing
+   `session-board.md` ITSELF, your presence write collides with the session the rule protects.
+   Only then, and only if your files provably don't overlap theirs, skip it and record the skip +
+   the overlap check in your transcript. A quiet board is rule 5, never this.
 
 ---
 
@@ -304,19 +289,17 @@ brain-config/super-agents/<slug>/
   README.md         # steward metadata (existing fleet convention).
   audits/           # dated audit records (existing fleet convention).
 ```
-Revision/what-changed history = git + PR descriptions, never an inline changelog in `preferences.md`.
 
 ---
 
 ## Revision history
 
-**Lives in git + PR descriptions, per the rule this file states above and the authoring gate
-restates (`gates/git-agent-authoring.md` → Editing an existing super-agent).** It is NOT kept
-inline here, and it does NOT get a sidecar file — spawning a surface to catch trimmed overflow is
-the pattern locked as refused 2026-07-17 (`open-thread-archive.md`, born and retired same day).
+**Git + PR descriptions**, per the rule this file already states and the authoring gate restates
+(`gates/git-agent-authoring.md` → Editing an existing super-agent). Not inline, and NOT a sidecar
+file — spawning a surface to catch trimmed overflow is the pattern refused 2026-07-17.
 
 The three prior changelog entries (2026-07-24 Class Parity; 2026-07-25 live-write logging mandate;
-2026-07-25 Felix's registry-pointer strikes) were **preserved verbatim in the description of the
-`base-md-trim` PR, 2026-07-27** — including Felix's note that the struck registry pointers were the
-fifth and sixth instances of that rot found in one day, which is evidence the Doc-Rot Sweep hook
-rests on. Read that PR, not a reconstruction.
+2026-07-25 Felix's registry-pointer strikes) are preserved verbatim in the **`base-md-trim` PR,
+2026-07-27** — including Felix's note that the struck pointers were the fifth and sixth instances
+of that rot in one day, which is evidence the Doc-Rot Sweep hook rests on. Read the PR, not a
+reconstruction.
