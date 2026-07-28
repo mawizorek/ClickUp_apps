@@ -28,6 +28,12 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 - Requester's guess (non-binding): agent profile — `super-agents/maestro-mira/memory.md`
 - Context / why: NOT procedure — `orchestration.md` step 8 already permits pulling extra voices, so nothing new needs authoring. What is durable is the evidence that it worked, which is exactly the kind of conducting precedent a bundle exists to hold.
 
+### OMR-20260727-3 · OPEN
+- Requested by: Fleet Felix (bounced by Memory Maggie at the Jul 27 evening close)
+- Candidate note: Re-check a size estimate at COMMIT time, not only at spec time. On 2026-07-27 the Routines Viewer v2 spec projected +1.2KB and the change landed at +4.7KB — roughly 4x off, pushing the file well past the 15KB split line. Estimating before writing was correct; the miss was never re-measuring once the code existed, which is exactly the moment a budget is easiest to skip.
+- Requester's guess (non-binding): **unsure — genuine fork.** Either `super-agents/dev-dexter/memory.md` (a scar he carries) OR `hooks/source-size-budget-enforcer.md` (a step the tool should enforce).
+- Context / why: **BOUNCED rather than placed, deliberately.** Two reasons. (1) Dexter was seated by Felix rather than driving his own session, and another agent's bundle is not mine to write into on his behalf. (2) If the rule is "re-measure before the commit," that is PROCEDURE and belongs in the Enforcer hook — writing it into a bundle would be a Constitution §2-§3 violation of exactly the shape scored as B16. **Resolve the hook-vs-bundle fork with the Enforcer open in front of you before placing this.** If it lands in the hook, it needs no memory write at all.
+
 ---
 
 ## Entry template
