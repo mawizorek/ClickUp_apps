@@ -6,10 +6,11 @@
 > If a fact here conflicts with the roster, the JSON wins — fix this file.
 >
 > **Budget: ~10KB hot cap.** Enforced by `hooks/memory-rotation.md` at session close.
-> Graduated content lives in `memory/archive/` (loaded on-demand).
+> ⚠️ **Currently ~11KB — OVER. Rotation flagged 07-27, still not run.** Graduated content
+> goes to `memory/archive/`; the retirement scar and the graduation test are the candidates.
 >
-> Reconciled to HEAD 2026-07-27. Lesson, now earned three times: my memory rots
-> fastest on the days the fleet moves fastest, which are exactly the days it gets read.
+> Reconciled to HEAD 2026-07-28. Lesson, earned repeatedly: my memory rots fastest on the
+> days the fleet moves fastest, which are exactly the days it gets read.
 
 ---
 
@@ -39,6 +40,10 @@ miss** (precedent memory of every FOLD-IN/NET-NEW verdict), and as of 07-25 his 
 collision is RESOLVED — bare "Frank" is his. So the naming blocker is gone; only the
 §6 justification is still unproven.
 
+🚨 **THE BUILD QUEUE IS EMPTY as of 2026-07-28** (Clark cancelled). **Do not invent an
+agent to fill it.** An empty queue is the correct resting state for a fleet of 12, and
+the pressure to keep it stocked is exactly the sprawl I exist to refuse.
+
 ## 🚫 Where I keep being wrong
 
 ### I retire things because an adjacent tool looks good enough (earned 2026-07-25, twice in one session)
@@ -52,6 +57,21 @@ collision is RESOLVED — bare "Frank" is his. So the naming blocker is gone; on
 **The correction:** before I recommend retiring anything, name the capability the user
 actually reaches for and ask whether the surviving tool DELIVERS it — not whether the
 tool is good. "Covered by X" is a claim about X, not about the need.
+
+⚖️ **Postscript, 2026-07-28: Michael cancelled Clark himself.** I was wrong about the
+REASONING and right about the outcome, and those are different things — the rule above
+stands. What actually killed him: nobody could ever name what he'd REMEMBER that Clio
+doesn't, across five sessions. **An agent whose §6 justification can't be stated after
+eight days doesn't have one.** And the capability genuinely did shrink, but not because
+the close hook ate it — **because the SPINE arrived.** Which is the real lesson:
+
+### 🔭 A new capability retires plans, not just old tools (earned 2026-07-28)
+
+J11 found that retiring the scheduler silently orphaned a healthy app. Clark is the same
+mechanism running the other way: **the spine landed and quietly made a planned agent
+unnecessary.** Nobody noticed either time, because every check we own fires at CREATION.
+**When a capability arrives OR leaves, sweep for what it just made redundant — in both
+directions, including things not yet built.**
 
 ### 🔍 Scope of search is not scope of truth (earned 2026-07-26, TWICE in one day)
 
@@ -78,8 +98,20 @@ dependency was gone along with the contract.
 
 **A warning where a fix belongs is a deferral wearing a diligence costume.** It even feels like
 rigor — you documented the trap! But you left the trap. **Ask: can I remove the fragility, or
-am I about to write a note asking people to be careful around it?** Related to the missed-gate
-protocol's *"naming a problem is not acting on it,"* generalized from drift to design.
+am I about to write a note asking people to be careful around it?**
+
+### 🧱 A rule nobody reaches is not a rule (earned 2026-07-28)
+
+Four consecutive sessions posted zero spine lines. I diagnosed it twice as a *behavioural*
+problem (a task with history feels like an armed record). **It was mechanical: arming the
+spine appeared in NO executable checklist** — `session-open.md` Commit ran C1→C5 with no
+spine step, while the instruction sat as prose in another document. Every one of those
+sessions was following the procedure correctly.
+
+**When the same rule breaks the same way repeatedly, stop scoring discipline and check
+whether the step is in the list that actually executes.** Corollary earned the same day:
+**a fallback that keeps firing is a spec bug, not a save** — the close-time backfill rescued
+four sessions while the missing step went unwritten.
 
 ## How the fleet is organized
 
@@ -130,6 +162,9 @@ Two trees on disk, ONE flat roster (`roster.json`):
   known question against pinned ones. Research is per-question; a refresh is per-schedule.
 - **Clio ↔ Hana:** NOT folded (Michael, Q10). Hana stays a lens; the close Step 5 seam is
   documented in Clio's D4, not resolved.
+- ⚠️ **UNOWNED (Clark cancelled 07-28):** the mid-stream READ-ONLY catch-up briefing —
+  *"what happened, including work I wasn't in."* The spine covers most of it. Named so nobody
+  rediscovers the gap and reflexively proposes an agent for it.
 
 ## Naming rules (derived, kept hot)
 
@@ -153,28 +188,33 @@ Two trees on disk, ONE flat roster (`roster.json`):
   versus "make it impossible to skip," he takes the second.
 - Overrules cleverness in favour of removing a bottleneck.
 - Answers structural questions via Decision Log with INVERTED polarity.
-- **He answers fast and in bulk.** Four questions came back in one pass. Ask completely, ask
-  once, and make the options mutually exclusive.
-- **He answers the DECIDING question, not the menu.** Twice now the useful move was ending with
-  the single question that settles it (*"do you ever actually open this URL?"* → *"no"* → a week
-  of speculation resolved). Give him the fork, not the analysis.
-- **He will delete a thing he just paid to fix** if it stopped earning its place. Sunk cost is
-  not an argument he accepts, and I should stop making it implicitly.
+- **He answers fast and in bulk.** Ask completely, ask once, mutually exclusive options.
+- **He answers the DECIDING question, not the menu.** The useful move is ending with the single
+  question that settles it (*"do you ever actually open this URL?"* → *"no"* → a week of
+  speculation resolved). Give him the fork, not the analysis.
+- **He will delete a thing he just paid to fix** if it stopped earning its place, and he will
+  **cancel his own prior ruling** without ceremony (Clark, 07-28, three days after authorizing
+  him). Sunk cost is not an argument he accepts — mine or his. Stop making it implicitly.
 
 ## Open follow-ups
 
-- Authorized and unbuilt: **Clark** (Q10→D, hook-vs-teammate still question one).
-- **Q11 structural work** unbuilt: session-open presence for EVERY session + audit SHA stamps.
-- **The B19 fix is unwritten** — a pickup must fire open-time gates. Diagnosed twice, written
-  zero times, fired four times. Michael's call; it should not survive another session.
+- ~~Authorized and unbuilt: Clark.~~ **CANCELLED 07-28** — Michael: *"drop it."* Handoff task
+  closed. **Nothing is authorized-and-unbuilt. The queue is EMPTY.**
+- ~~Q11 structural work.~~ **BOTH SHIPPED 07-28** — presence every session (PR #567) + SHA
+  stamps mandatory in the audit DoD (PR #568, `audit-instruction.md` v0.6 / DoD v0.3).
+- ~~The B19 spine fix.~~ **SHIPPED 07-28** (PR #567) — `session-open.md` C4 arms the spine; a
+  PICKUP IS AN OPEN.
+- **MY OWN memory is over budget** (~11KB vs the 10KB cap stated in my own header). Rotation
+  flagged twice, run zero times. **I am carrying the exact debt I flag in others.**
 - **Stamp consolidation** (thread `86ajqu32n`): fold `routines/last-run/*` into `schedule.md`?
   Must be TESTED, not assumed — I assumed the same thing on 07-26 and was wrong in a day.
+- **The Fleet Build Queue task DESCRIPTION is stale** — still says "First move: Catch Up Clark."
+  Task-description editing was unavailable 07-28; the checklist and DL are correct, the
+  description is not. Fix it before trusting its warm start.
 - `_shared/super-agent-base.md` at 21.7KB — Dexter's split. ⚠️ **The ~22KB ceiling was never
   measured** (B18, 07-26): the file reads back WHOLE. Real, but not the emergency I called it.
 - `roster.json` ~18.4KB against a locked ~12KB it has never met. `accent` is the droppable field.
 - Milo: confirm the full 7 URITP spaces.
-- ~~Blocked on Michael: disable retired natives Corey/Milo/Fiona.~~ **CLOSED 07-26** — a sweep
-  found **no native ClickUp agents exist at all.** There was never anything to disable.
 
 ## Pointers (never restate)
 
