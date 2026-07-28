@@ -8,12 +8,30 @@ const DATA_INDEX='index_rounds.json';
 const TEAM_VAR={"Mercedes":"--t-mercedes","Ferrari":"--t-ferrari","McLaren":"--t-mclaren","Red Bull":"--t-redbull","Racing Bulls":"--t-racingbulls","Alpine":"--t-alpine","Aston Martin":"--t-astonmartin","Williams":"--t-williams","Haas":"--t-haas","Audi":"--t-audi","Cadillac":"--t-cadillac"};
 const teamColor=t=>`var(${TEAM_VAR[t]||'--txt-dim'})`;
 
-/* Illustrative per-cell granular detail (grid/best/pits/tyres/story tags).
- NOT in the JSON store yet — flagged 'preview' in the UI until sourced from OpenF1.
- Keyed round:driverId. Story keys resolve against STORY. */
+/* Narrative phrase templates for story tags. Kept: these are copy, not facts.
+ NOTE (2026-07-28): nothing currently supplies `story` keys — the only producer was
+ the DETAIL map deleted below. renderStory is call-guarded everywhere, so this is
+ inert until a real per-round narrative source exists. Do NOT repopulate it by hand. */
 const STORY={"pole-to-win":"Converted pole to a lights-to-flag win.","streak":"Extended the winning streak from the front.","streak-end":"The race that ended the streak.","maiden":"A landmark maiden result.","charge":"Charged from P{grid} to P{finish}.","recovery":"Recovery drive from P{grid}.","lost-lead-rel":"Led before a reliability failure ended it.","reliability":"Retired with a mechanical failure while running strong.","late-sc":"A late safety car reshuffled the finish.","held-podium":"Managed the tyres to hold the podium.","undercut":"Jumped track position with an early stop.","appeal":"Result restored on appeal."};
-const DETAIL={"8:86ae52qva":{grid:1,best:"1:06.983",pits:2,tyres:["M","H"],story:["pole-to-win"]},"8:86ae52rym":{grid:5,best:"1:07.112",pits:2,tyres:["M","H"],story:["charge"]},"5:86ae52qvh":{grid:3,best:"1:13.510",pits:2,tyres:["M","H"],story:["streak"]},"7:86ae52rxg":{grid:2,best:"1:15.880",pits:3,tyres:["S","M","M"],story:["maiden","undercut"]},"7:86ae52qvh":{grid:4,best:"1:15.990",pits:2,tyres:["M","H"],story:["streak-end","reliability"]},"9:86ae52rxd":{grid:6,best:"1:29.440",pits:1,tyres:["M","H"],story:["late-sc"]},"2:86ae52qvh":{grid:1,best:"1:35.275",pits:1,tyres:["M","H"],story:["pole-to-win","maiden"]}};
 const renderStory=(keys,row)=>keys.map(k=>(STORY[k]||k).replace("{grid}",row.grid??"?").replace("{finish}",row.finish??"?"));
+
+/* ⚠️ DELETED 2026-07-28 — the `DETAIL` map (PR: derive gridDelta from the store).
+
+   It was a 7-entry hardcoded object keyed `round:driverId`, carrying grid/best/pits/
+   tyres/story, and `cellMeta` computed the app's core story metric from it:
+   `gridDelta = det.grid - r.pos`. It read det.grid and NEVER r.grid — while the store
+   has carried real per-row `grid` on six of nine rounds all along.
+
+   Two of its five checkable grid values contradicted the store (r05 Antonelli said 3,
+   store says 2; r09 Leclerc said 6, store says 2) and `best` matched a real stored lap
+   in one entry out of seven. Because `bigMover` fires at gridDelta >= 5 and only seven
+   cells existed, the app was blind to every genuine recovery drive in the season —
+   Verstappen P20 → P6 (Albert Park), Alonso P22 → P10 (Monaco), Colapinto P19 → P9
+   (Silverstone) — while rendering a grid Leclerc never started from.
+
+   Replaced by deriveDetail() below, which reads the canonical row. This restores the
+   compute-once law the README already states: positionsGained is DERIVED (grid - pos),
+   never stored. Full finding: F1 Racetracks App — Decision Log, W1 (2026-07-28). */
 
 /* shared mutable state */
 let ROUNDS=[],DRV={},STANDINGS=[],sortMode='champ';
@@ -60,15 +78,36 @@ function leaderPace(){return ROUNDS.map((_,i)=>Math.max(...Object.keys(DRV).map(
 function gapVals(id){const c=cumPoints(id),l=leaderPace();return c.map((v,i)=>v-l[i]);}
 function rankTrajectory(id){const cum={};Object.keys(DRV).forEach(k=>cum[k]=0);const tr=[];ROUNDS.forEach(rd=>{(rd.classification||[]).forEach(r=>cum[r.driverId]+=r.points);if(rd.sprint)rd.sprint.classification.forEach(r=>cum[r.driverId]+=r.points);const board=Object.keys(cum).sort((a,b)=>cum[b]-cum[a]);tr.push(board.indexOf(id)+1);});return tr;}
 
+/* deriveDetail — the per-cell detail object, DERIVED from the canonical row.
+   Replaces the deleted hardcoded DETAIL map. Every value here traces to the store.
+
+   grid  : r.grid verbatim. Number on the enriched rounds, the string 'PL' for a
+           pit-lane start, null on the three rounds that carry no grid data yet
+           (r03 suzuka, r04 miami, r07 catalunya). Consumers already branch on it.
+   best  : this driver's real fastest race lap time (r.fastLap.time, complete r1-9).
+   pits / tyres / story : DELIBERATELY ABSENT. There is no per-stint or pit-stop data
+           in the store (tyres.stints[] is designed but unpopulated), and inventing it
+           is what the DETAIL map did. Panel renderers already guard on these being
+           missing, so they simply do not render. When real data lands, add it HERE —
+           to a derivation off the store — never to a literal map. */
+function deriveDetail(r){
+ if(!r)return null;
+ return{ grid:(r.grid!=null?r.grid:null), best:(r.fastLap&&r.fastLap.time)?r.fastLap.time:null };
+}
+
 function cellMeta(rd,id){
  const r=raceRow(rd,id);if(!r)return null;
- const det=DETAIL[`${rd.round}:${id}`];
+ const det=deriveDetail(r);
  const note=r.stewardNote?{text:r.stewardNote,onRoad:r.onRoadPos}:null;
- const gridDelta=(det&&det.grid&&r.pos)?det.grid-r.pos:null;
- const hasStory=!!(note||(det&&det.story&&det.story.length));
+ // positionsGained, derived: only when the round actually carries a NUMERIC grid.
+ // 'PL' (pit-lane start) has no meaningful numeric delta, and the three flat rounds
+ // have no grid at all — both yield null, and null renders as nothing, never a guess.
+ const gridNum=(typeof r.grid==='number')?r.grid:null;
+ const gridDelta=(gridNum!=null&&r.pos)?gridNum-r.pos:null;
+ const hasStory=!!note;
  const bigMover=gridDelta!==null&&gridDelta>=5;
  const dnfHot=r.status==='DNF'&&note;
- return{r,pos:r.pos,status:r.status,pts:r.points,det,note,gridDelta,hasStory,bigMover,dnfHot,hasDeep:!!det};
+ return{r,pos:r.pos,status:r.status,pts:r.points,det,note,gridDelta,hasStory,bigMover,dnfHot,hasDeep:!!(det&&det.grid!=null)};
 }
 
 function orderedRows(){const rows=[...STANDINGS];if(sortMode==='champ')return rows;if(sortMode==='name')return rows.sort((a,b)=>LAST(a.id).localeCompare(LAST(b.id)));const rd=ROUNDS.find(x=>x.round===sortMode);const rank=id=>{const r=raceRow(rd,id);if(!r)return 999;if(r.status==='DNF')return 900;return r.pos;};return rows.sort((a,b)=>rank(a.id)-rank(b.id)||b.total-a.total);}

@@ -15,8 +15,12 @@ function tyreChips(arr){return arr?`<div class="tyres">`+arr.map((c,i)=>`${i>0?'
    v6.7: the Race-side Fastest Lap now reads this driver's REAL per-driver
    fastLap {time,lap} from the store row (backfilled r1-9), showing the lap
    number, and marks the round fastest-lap holder with a purple pip. Falls back
-   to the round FL time, then to illustrative det.best, only when the row value
-   is absent. */
+   to the round FL time when the row value is absent.
+   2026-07-28: `det` is now DERIVED from the store row (see data.js deriveDetail),
+   so det.best is itself the row's fastLap time — the old third fallback to an
+   illustrative literal is gone along with the DETAIL map. det.pits and det.tyres
+   no longer exist; the guards below are retained so real pit/tyre data can light
+   them up the moment the store carries it. */
 function qualiBlock(rd,id,m,det,isFL,il){
   const row=(typeof raceRow==='function')?raceRow(rd,id):null;
   const q=row&&row.qualifying;
@@ -38,7 +42,7 @@ function qualiBlock(rd,id,m,det,isFL,il){
   const qLines=['q1','q2','q3'].map(k=>line(k.toUpperCase(),q[k]||'\u2014')).join('');
   // race-side detail: this driver's REAL fastest lap from the store row
   // (per-driver fastLap {time,lap}, backfilled r1-9). Falls back to the round FL
-  // time when this driver holds it, then to any illustrative det.best.
+  // time when this driver holds it.
   const rowFL=row.fastLap;
   const flTime=(rowFL&&rowFL.time)?rowFL.time:((isFL&&rd.fastestLap&&rd.fastestLap.time)?rd.fastestLap.time:(det.best||null));
   const flLap=(rowFL&&rowFL.lap!=null)?rowFL.lap:null;
@@ -74,14 +78,25 @@ function raceBrief(roundNo,id){
   const name=DRV[id].name,team=DRV[id].team;const isFL=rd.fastestLap&&rd.fastestLap.driverId===id,isPole=rd.pole&&rd.pole.driverId===id;
   const sp=rd.sprint?rd.sprint.classification.find(x=>x.driverId===id):null;const total=(sp?sp.points:0)+m.pts;
   let badges='';if(isPole)badges+=`<span class="badge">Pole</span>`;if(isFL)badges+=`<span class="badge fl">Fastest Lap</span>`;if(sp)badges+=`<span class="badge spr">Sprint P${sp.pos} \u00B7 +${sp.points}</span>`;
-  let flow;if(det.grid){const gd=m.gridDelta,dcls=gd>0?'up':(gd<0?'down':''),dtxt=gd>0?`\u25B2 +${gd}`:(gd<0?`\u25BC ${gd}`:'\u2013 held');flow=`<div class="flow"><div class="node"><span class="nl">Grid</span><span class="nv num">${det.grid}</span></div><div class="arrow"><span class="delta ${dcls} num">${m.status==='DNF'?'':dtxt}</span><span class="track"></span></div><div class="node"><span class="nl">Finish</span><span class="nv ${finish===1?'win':''} ${m.status==='DNF'?'dnf':''} num">${m.status==='DNF'?'DNF':'P'+finish}</span></div></div>`;}else{flow=`<div class="flow"><div class="node"><span class="nl">Finish</span><span class="nv ${finish===1?'win':''} ${m.status==='DNF'?'dnf':''} num">${m.status==='DNF'?'DNF':'P'+finish}</span></div></div>`;}
+  // Grid → Finish flow. det.grid is the REAL stored grid now, so the delta is real too.
+  // A null gridDelta means the round has no numeric grid (flat round, or a 'PL' start):
+  // render the journey with NO delta rather than an invented "held".
+  let flow;if(det.grid!=null){const gd=m.gridDelta,dcls=gd>0?'up':(gd<0?'down':''),dtxt=gd==null?'':(gd>0?`\u25B2 +${gd}`:(gd<0?`\u25BC ${gd}`:'\u2013 held'));flow=`<div class="flow"><div class="node"><span class="nl">Grid</span><span class="nv num">${det.grid}</span></div><div class="arrow"><span class="delta ${dcls} num">${m.status==='DNF'?'':dtxt}</span><span class="track"></span></div><div class="node"><span class="nl">Finish</span><span class="nv ${finish===1?'win':''} ${m.status==='DNF'?'dnf':''} num">${m.status==='DNF'?'DNF':'P'+finish}</span></div></div>`;}else{flow=`<div class="flow"><div class="node"><span class="nl">Finish</span><span class="nv ${finish===1?'win':''} ${m.status==='DNF'?'dnf':''} num">${m.status==='DNF'?'DNF':'P'+finish}</span></div></div>`;}
   const qb=qualiBlock(rd,id,m,det,isFL,hasIllusFlag(det));
   const noteText=m.note?m.note.text:null;const tagText=(det.story&&det.story.length)?renderStory(det.story,det):[];let storyHtml='';if(noteText||tagText.length){const isMv=!m.note&&m.bigMover;storyHtml=`<div class="story-box ${isMv?'mv':''}"><span class="sdot"></span><div class="stext">${noteText?`<p>${noteText}${m.note.onRoad?` <b>(on road: P${m.note.onRoad})</b>`:''}</p>`:''}${tagText.map(t=>`<p>${t}</p>`).join('')}</div></div>`;}
-  const hasIllus=!!det.grid;let stats=`<div class="stat-grid"><div class="stat"><span class="sl">Race Pts</span><span class="sv num">${m.pts}</span></div><div class="stat"><span class="sl">Sprint</span><span class="sv num">${sp?sp.points:'\u2014'}</span></div><div class="stat"><span class="sl">Total</span><span class="sv num">${total}</span></div></div>`;
+  let stats=`<div class="stat-grid"><div class="stat"><span class="sl">Race Pts</span><span class="sv num">${m.pts}</span></div><div class="stat"><span class="sl">Sprint</span><span class="sv num">${sp?sp.points:'\u2014'}</span></div><div class="stat"><span class="sl">Total</span><span class="sv num">${total}</span></div></div>`;
+  // The illustrative-data disclaimer now keys on whether anything illustrative ACTUALLY
+  // rendered (pit stops / tyres), not on the presence of a grid. Before 2026-07-28 it
+  // fired whenever a grid existed and claimed "grid, qualifying and fastest lap are
+  // verified from the canonical store" — while the grid it sat under came from the
+  // hardcoded DETAIL map. The note was the one place the app asserted provenance, and
+  // it was the assertion that was wrong. With DETAIL gone there is no illustrative data
+  // left, so this renders nowhere; it lights up again by itself if real pit/tyre data lands.
+  const hasIllus=(det.pits!=null)||!!det.tyres;
   const illusNote=hasIllus?`<div class="illus-note"><b>Note:</b> pit stops and tyre strategy shown here are illustrative; grid, qualifying and fastest lap are verified from the canonical store.</div>`:'';
   return `<div class="panel-head" style="--team:${teamColor(team)}"><div><div class="panel-ey">R${rd.round} \u00B7 ${rd.name}${rd.sprint?' \u00B7 Sprint':''}</div><div class="panel-drv">${name}</div>${teamChip(team)}</div><button class="x" aria-label="Close">\u00D7</button></div><div class="panel-body">${flow}${badges?`<div class="badges">${badges}</div>`:''}${qb}${storyHtml}${stats}<div class="report">${rd.summary?`<p>${rd.summary}</p>`:''}</div>${illusNote}</div>`;
 }
-function hasIllusFlag(det){return det&&det.grid?'illus':'';}
+function hasIllusFlag(det){return (det&&((det.pits!=null)||det.tyres))?'illus':'';}
 
 function seasonBrief(id){
   const d=STANDINGS.find(x=>x.id===id),w=wins(id),best=bestFin(id);
