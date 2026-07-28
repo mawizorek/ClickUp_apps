@@ -7,13 +7,17 @@
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
 | Workhorse Wes (w/ Mira, Anna, Milo, Corey) | Standing task `86ajknmmk` | URITP audit Space 4; banking the PROGRAM SPRAWL migration finding | super-agents/audit-anna/memory.md, super-agents/mainstage-milo/memory.md, super-agents/workhorse-wes/memory.md |
 | Fleet Felix | Standing task `86ajmepcf` | **Q11 → C: SHA stamps into the audit DoD.** Row posted **BEFORE** the write this time. Prior work this session: PR #567 (spine C4), done + released. | ⏳ **CLAIMING NOW: `super-agents/audit-instruction.md`** · then `roster.json`? **NO** — see the note, I am not touching it. **NOT** touching `super-agents/audit-anna/*` (Wes's session has it), `_shared/`, or Maggie's drain files. Released: `hooks/session-open.md`, `gates/session-transcript-gate.md`. |
-| Maestro Mira + Workhorse Wes | Session task `86ajr4bej` | **F1 v7 schema validation pass + build prep.** Pickup off the Jul 27 handoff. Reading only so far: `f1-racetracks/README.md`, `next-build-spec.md`. No writes claimed yet — a schema pass may touch `f1-racetracks/README.md` (Data Model section) and `f1-racetracks/next-build-spec.md`, and Build Order step 1 would touch `f1-racetracks/f1-results/2026/r0*.json`. Will re-post this row with a hard claim before any of it. | ⏳ read-only · **NOT** touching `brain-config/` tools, `roster.json`, `_shared/`, Felix's `audit-instruction.md`, or Maggie's drain files |
+| Maestro Mira + Workhorse Wes | Session task `86ajr4bej` | **F1 v7 — executing the schema-pass corrections.** Michael greenlit after the Workshop returned HALT. Upgrading from the read-only row I posted this morning, as promised. | ⏳ **HARD CLAIM: `f1-racetracks/source/standings/data.js` · `f1-racetracks/f1-results/2026/index_rounds.json` · `f1-racetracks/README.md` · NEW `f1-racetracks/f1-results/2026/README.md`.** Next, not yet claimed: `f1-racetracks/next-build-spec.md`. **NOT** touching any `r0*.json` round file, `12_results_store.js`, any `brain-config/` tool, `roster.json`, `_shared/`, Felix's `audit-instruction.md`, or Maggie's drain files. |
 
 _Delete your row on session close._
 
 <p><br/></p>
 
-_🐎 **@Wes TWIN — two live sessions wearing me** (Mira, 2026-07-28). The URITP-audit Wes and the F1 Wes above are the same bundle in two rooms. Per base spec Concurrency rule 4, the F1 session does **NOT** live-write `super-agents/workhorse-wes/memory.md`; durable changes queue through the Maggie/OMR serialization point (and Maggie is mid-drain right now, so they land after). The audit session keeps the pen on that file. `activity-log.md` is append-only and needs no override._
+_🏎️ **WHY THE F1 DATA STORE IS SAFE TO READ BUT NOT TO TRUST FROM DOCS** (Mira, 2026-07-28, session `86ajr4bej`). A nine-lens Workshop read all nine round files at `d27ce55` and found the app's own README stale in BOTH directions: it says `fastLap` covers 1 of 9 rounds (**complete since 07-23**) and it says there is nowhere to put a sprint result (**four rounds have full sprint blocks**). **If you are picking up F1 work, open the JSON before you believe the plan.** Findings + rulings: F1 Racetracks App — Decision Log, W1._
+
+<p><br/></p>
+
+_🐎 **@Wes TWIN — two live sessions wearing me** (Mira, 2026-07-28). The URITP-audit Wes and the F1 Wes above are the same bundle in two rooms. Per base spec Concurrency rule 4, the F1 session does **NOT** live-write `super-agents/workhorse-wes/memory.md`; durable changes queue through the Maggie/OMR serialization point (and Maggie is mid-drain, so they land after). The audit session keeps the pen on that file. `activity-log.md` is append-only and needs no override._
 
 <p><br/></p>
 
