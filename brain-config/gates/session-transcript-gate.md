@@ -3,6 +3,7 @@
 **Purpose:** decides WHEN the live session record opens and WHERE it lives. Capture layer.  
 **Mode:** always-on, deterministic. Re-checked each turn until it fires. Bias hard toward firing.  
 **Owner:** Scribe Sana. Closing Clio finalizes at close.  
+**Ordered open sequence lives in `hooks/session-open.md` (Commit C1–C6), NOT here.** This gate owns WHERE the record lives, the spine FORMAT, and the firing triggers. It does not restate the open sequence — see the note under Opening check.  
 **Decision history:** `brain-config/gates/session-transcript-gate.decision-log.md`
 
 ---
@@ -28,6 +29,8 @@ Full task-side spec: Agent Activity Board — Gold Standard.
 
 **The seam:** fidelity lives on the TASK, chronology lives on the SPINE. The spine carries no inventory (that is the Session Ledger) and no deliberation (that is the task).
 
+🚨 **TWO SURFACES MEANS TWO INDEPENDENT CHECKS.** A task existing tells you the deliberation surface is live. It tells you **nothing** about the chronology surface. Never let finding one satisfy the other — that conflation is exactly how four consecutive sessions ran with zero spine lines (see Opening check).
+
 ---
 
 ## THE SPINE (per-reply, write-ahead)
@@ -42,6 +45,8 @@ So the posture is: **you are a surfacing member of this workspace, not a chat wi
 
 At session open, post the **session header POST** to the spine channel (root level, `create_as_post: true`, `post_type: update`). Every spine line for the session threads under it as `parent_message`.
 
+**Executed as `hooks/session-open.md` → Commit step C4.** That is the ordered home; this section is the format and the rules.
+
 Header post body:
 
 ```
@@ -52,6 +57,10 @@ Header post body:
 
 Spine lines thread under this post, one per reply, written ahead of the reply.
 ```
+
+🚨 **A PICKUP IS AN OPEN. ARM IT ANYWAY (HARD — LOCKED 2026-07-28, Michael).** Opening on a task that already exists — a parked `↪️ HANDOFF ·`, a `🧭 STANDING ·` thread, a reopened session — is a session OPEN and needs its own header for THIS session. **A task carrying twenty prior comments looks exactly like an armed record and is not one.** The standing thread is the worst case: it is deliberately never closed, so it is always open and always full of history.
+
+**Why this is a hard rule and not a nicety:** four consecutive sessions (Jul 25, 26, 27, 27) posted **zero spine lines**, and every one opened by picking up an existing task. Scored B19 twice. The mechanism is a plausible feeling, not laziness — which is why the durable fix was putting the step in the executable list (`session-open.md` C4) and why this clause exists next to the format.
 
 **⚠️ RE-RESOLVE THE HEADER, NEVER TRUST THE CACHE (HARD — the S1 fix).** Hold the header's message ID for convenience, but **the ID is not the source of truth; the channel is.** Before any spine write where the cached ID is not verifiably in hand, re-resolve it: read the channel's recent root posts, find the header whose body names THIS session task, thread under that.
 
@@ -119,13 +128,18 @@ The spine channel is the board's list channel, so humans may post there too. Mac
 
 ---
 
-## Opening check (every session)
+## Opening check (every session) — ⚠️ THE SEQUENCE LIVES IN `session-open.md`
 
-First question of every working session, run by Mira before any voice is seated:
+**Run `hooks/session-open.md` → Commit C1–C6.** Both surfaces are resolved there, in order, as numbered steps: C1–C3 the task, **C4 the spine header**, C5 the backfill, C6 presence.
 
-- **Task exists?** Hand its comment stream to the team.
-- **No task?** Create it, then seat agents. No agent speaks before the thread is live.
-- **Spine armed?** Check for an existing header for this session task; reuse it or post one. Do this at open, not at first substantive turn.
+🚨 **This section used to restate the open sequence as three prose bullets, and that is the defect that was fixed on 2026-07-28.** The bullets read as session-open ceremony, the first one ("task exists? hand its comment stream to the team") fires and *feels* like the record is live, and **the spine bullet was never reached** — while `session-open.md`'s Commit checklist, the list agents actually execute, had no spine step in it at all. So the instruction lived in the document nobody runs step-by-step and was missing from the one they do. **Four consecutive sessions posted zero lines while following the procedure correctly.**
+
+**Two rules survive here because they are about this gate's subject, not about sequencing:**
+
+- **A found task NEVER satisfies "spine armed."** Two surfaces, two independent checks. The one that already exists is the one that fools you.
+- **A PICKUP IS AN OPEN.** Reopening a handoff or a standing thread fires every open-time step, including a fresh header for this session.
+
+**One ordered list, one claimant.** If sequencing and this gate ever disagree, `session-open.md` wins and this pointer gets corrected.
 
 ---
 
@@ -222,10 +236,9 @@ One synthesis to Michael, full formatting, no per-agent recap. She may flag a he
 ## Fire
 
 1. **Announce once.** One short upbeat line, then silence for the rest of the session.
-2. **Ensure the task exists** on the board. Reuse if present, promote the stub if one opened silently, create if neither.
-3. **Arm the spine.** Reuse an existing header for this session task, or post one.
-4. **Record structural beats + deliberation on the task**; record chronology on the spine, one line per reply, write-ahead, re-resolving the header whenever the cached ID is not in hand. Backfill pre-trigger turns on both.
-5. **Keep appending live.**
+2. **Run `session-open.md` Commit C1–C6** — the task (reuse / promote the stub / create), **the spine header (C4)**, the scratch backfill, presence. A reopen runs all of it.
+3. **Record structural beats + deliberation on the task**; record chronology on the spine, one line per reply, write-ahead, re-resolving the header whenever the cached ID is not in hand. Backfill pre-trigger turns on both.
+4. **Keep appending live.**
 
 After the announcement: no re-announcing, no narrating entries, no asking permission.
 
@@ -259,6 +272,8 @@ Governs Michael-to-Brain capture fidelity only. Agent deliberation format and th
 
 Live capture is the standard. The fallback makes a lapse recoverable, not acceptable.
 
+⚠️ **A fallback that keeps firing is a spec bug, not a save.** Four consecutive sessions were rescued by the close-time watchdog while the missing step sat unwritten. **If the same reconciliation delta appears twice, stop backfilling and go fix the sequence.**
+
 ---
 
 ## Close
@@ -276,6 +291,9 @@ If the gate never fired, discard the provisional stub and close normally.
 
 - The live chat is volatile and is never the record. Post the line, then speak.
 - Deliberation + fidelity live on the session task. Chronology lives on the spine. Chat holds the close pointer.
+- **Two surfaces, two independent checks. A found task NEVER satisfies "spine armed."**
+- **A PICKUP IS AN OPEN.** A reopened handoff or standing thread fires every open-time step, including a fresh header.
+- **The ordered open sequence is `hooks/session-open.md` C1–C6. This gate does not restate it.**
 - Thread-first: the task exists before any agent speaks.
 - Thread-only: agents express on the task, never live, never in a working doc, never on the spine.
 - Spine is armed by posting the header. The header IS the switch.
@@ -288,6 +306,7 @@ If the gate never fired, discard the provisional stub and close normally.
 - A failed spine write never blocks a reply. Mark the gap; backfill it.
 - Never-block catches loud failures only; a misplaced successful write is invisible to it.
 - Backfilled lines are marked and trusted by timestamp, not scroll position.
+- **A fallback firing repeatedly is a spec bug. Fix the sequence, don't keep backfilling.**
 - Two-tier protocol governs thread structure. Templates live here only.
 - Live chat gets Mira's synthesis only.
 - Open-then-discard is the default; agent deliberation makes a session non-discardable.
@@ -305,10 +324,11 @@ If the gate never fired, discard the provisional stub and close normally.
 
 ## Composes with
 
+- **Session Open hook** (`hooks/session-open.md`) — ⭐ **owns the ordered open sequence, including C4 ARM THE SPINE.** Read it for WHEN and in what order; read this gate for WHERE and in what format.
 - **Session Close hook** (`hooks/session-close.md`) — close pointer, reply/line reconciliation, orphan sweep, honors hardcode fidelity.
 - **Session Transcript Format** (AI Toolkit) — the close `.txt` artifact container spec.
 - **Scribe Sana** (`agents/scribe-sana.md`) — owner and operator.
-- **Maestro Mira** — runs the opening check, posts the Tier-1 Opening Post.
+- **Maestro Mira** — posts the Tier-1 Opening Post.
 - **The Council** (`council.md`) — mirrors the expression law as one line.
 - **Agent Activity Board** — the board, its channel (the spine), and the Gold Standard.
 - **Decision Log hook** — durable why, distinct from live deliberation.
