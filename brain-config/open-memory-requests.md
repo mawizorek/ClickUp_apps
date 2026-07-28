@@ -12,9 +12,17 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 
 **Neighbors, don't mix:** this = memory-write candidates · `open-thread.md` = durable pending work · `session-board.md` = live presence.
 
+> 🚨 **QUEUE STATE 2026-07-28: 4 open, and one of them is BLOCKED ON CAPACITY, not on placement.** `/PREFERENCES.md` sits at ~99.7% (≈6 tokens free). `OMR-20260728-1` below is the first candidate in weeks to genuinely clear the brain-memory bar, and it cannot land because there is no room. **A memory file at 99.7% does not fail loudly — it fails by silently rejecting the next thing that deserved to be there.** The drain is no longer housekeeping; it is blocking a qualified write.
+
 ---
 
 ## Open
+
+### OMR-20260728-1 · OPEN · 🔴 BLOCKED ON CAPACITY (not on placement)
+- Requested by: Fleet Felix (triaged by Memory Maggie at the Jul 28 close)
+- Candidate note: **Michael pipes long structured output into Prism (the repo's JSON/Markdown viewer) and reads it as a TABLE.** His words, unprompted, 2026-07-28: *"that was incredibly satisfying to feed back into prism and read as a table."* Consequence for composition: dense structured output is not a wall of text to apologize for — it is **input for a viewer he owns**, and consistent parallel structure plus a stable field order are what make that paste render cleanly. Favour uniform, repeated shapes in long replies and reports.
+- Requester's guess (non-binding): **brain memory** — and Maggie CONCURS, which is rare.
+- Context / why: **This PASSES the deny-by-default test on all three counts** and I tried twice to route it elsewhere. (1) **Must-fire-every-response** — it governs how output is COMPOSED on every substantive reply, not what any one agent knows. (2) **Cross-agent** — it applies to the house voice and all twelve teammates equally, so no single bundle is the right home. (3) **Not procedure**, so the Procedure-is-a-tool gate does not catch it; there is no "how to format for Prism" routine, it is a fact about the READER that reframes a judgement call. **It is queued rather than placed solely because there are ~6 tokens of headroom and it needs ~20.** Placing it requires a cut, and a cut is Michael's ruling. **Maggie's picks for that cut, unchanged and now overdue: the Domain Pointers block** (~4 lines of soft routing the AI Toolkit index already owns — memory itself says *"soft routing lives in the index trigger table"*) **or the GitHub MCP pointer's operating detail** (*"cached reads/SHAs burned 12x"* belongs in the operating standard). Either buys room for this and several more.
 
 ### OMR-20260727-1 · OPEN
 - Requested by: Maestro Mira (queued by Memory Maggie at close)
