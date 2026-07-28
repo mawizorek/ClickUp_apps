@@ -10,6 +10,16 @@
   },
   "themes": [
     {
+      "slug": "f1",
+      "name": "Formula One · Race Control",
+      "status": "locked",
+      "color": "f1",
+      "typography": "sharp-racing",
+      "forms": "sharp",
+      "spacing": "tight",
+      "intendedUse": "f1-racetracks v7 shell. The NEUTRAL F1 base: keeps the app's own hue-268 race-control identity rather than adopting a constructor's palette, so a team palette can be swapped ON TOP per context (THEMES.applyColor('<team>', {mode:'dark'})) without the base fighting it. Added 2026-07-28 because the spec, README and acceptance criteria all called THEMES.applyTheme('f1') and no such join existed — shared/themes/f1/ is a COLOR directory of 11 constructor palettes, not a theme. Decision Log Q8."
+    },
+    {
       "slug": "sharp-mclaren",
       "name": "Sharp Racing · McLaren",
       "status": "locked",
