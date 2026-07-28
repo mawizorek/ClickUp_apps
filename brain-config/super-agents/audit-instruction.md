@@ -1,11 +1,44 @@
-# Super-Agent Audit Instruction — v0.5
+# Super-Agent Audit Instruction — v0.6
 
 Canonical procedure a ClickUp Super Agent OR git-teammate follows when told "audit yourself
 (or another agent) against your configuration." This file is the source of truth for BOTH audit
 tracks. Do not mirror it into a ClickUp doc — link to it.
 
-STATUS: v0.5 working draft. Michael annotates directly in this file. Bump version + changelog when
+STATUS: v0.6 working draft. Michael annotates directly in this file. Bump version + changelog when
 blessed.
+
+---
+
+## 🔒 AN AUDIT IS STAMPED OR IT IS WORTHLESS (LOCKED 2026-07-25 as Q11 → C · WRITTEN IN 2026-07-28)
+
+**Every audit record MUST record the SHA of every governing file it was audited against.** Not the
+date. The SHA. This applies to BOTH tracks and it is a required field of the record shape, not a
+courtesy.
+
+**Why, and it is not hypothetical:** on 2026-07-25 Closing Clio's bundle was audited 9/9 PASS at
+3:49 PM. At 4:09 PM a parallel session rewrote `_shared/super-agent-base.md` — the spec she had just
+been audited against. **The audit was true when signed and false twenty minutes later, and nothing
+about the record could reveal that.** A dated audit says *when* someone looked; a stamped audit says
+*what they looked at*, which is the only version of the claim that can be checked later.
+
+**The rule this produces:** a PASS is a claim about a specific set of bytes. Change the bytes and
+the claim is unverified again — not wrong, **unverified**, which is a different and more honest state
+than either PASS or FAIL.
+
+### Staleness re-check (what to DO when a stamped file has moved)
+
+1. **Diff the stamps.** Any stamped SHA ≠ HEAD → the audit is stale-detectable. That is the feature.
+2. **Re-run only the checks the changed file could affect.** Not the whole audit.
+3. **Record an ADDENDUM on the existing record — never reissue it.** The original signature stays
+   with its original stamps. Superseding a signed record in place destroys the evidence that it was
+   ever true, and "the audit was clean" becomes unfalsifiable.
+4. **Check 6 (cross-file contradiction) is the highest-risk re-run** after any same-day change: that
+   is exactly how a bundle ends up half-describing behavior it no longer has.
+
+*Practice ran ahead of this spec by three records — FMP Fiona's birth audit (first stamped), Routine
+Ricky's, and Ricky's same-day addendum after his default was redesigned 14 minutes post-signature.
+The pattern was proven in production for two days while the DoD still did not require it. **A
+convention demonstrated three times and written zero times is one forgetful session from gone.***
 
 ---
 
@@ -13,13 +46,22 @@ blessed.
 
 | Track | Applies to | Audit model | Checklist |
 |---|---|---|---|
-| **Native full-standard** | ClickUp Super Agents with a LIVE config | **live-vs-declared** drift (config vs `preferences.md` mirror vs golden standard) | Golden-standard checklist v1.0 (below) |
-| **git-teammate** | session-invocable personas in `super-agents/<slug>/` (no live config) | **internal consistency** (no live config to diff) | git-teammate audit DoD v0.2 (below) |
+| **Native full-standard** — ⚠️ **DORMANT, see below** | ClickUp Super Agents with a LIVE config | **live-vs-declared** drift (config vs `preferences.md` mirror vs golden standard) | Golden-standard checklist v1.0 (below) |
+| **git-teammate** | session-invocable personas in `super-agents/<slug>/` (no live config) | **internal consistency** (no live config to diff) | git-teammate audit DoD v0.3 (below) |
 
 Why two: a native agent has a live ClickUp config that can DRIFT from its declaration, so its audit
 diffs live-vs-declared. A git-teammate is git-canonical — there is nothing live to diff — so its
 audit instead proves the bundle is internally coherent and will load clean cold. Same discipline
 (walk a checklist, classify PASS/PARTIAL/GAP, record via PR); different bar.
+
+> ⚠️ **THE NATIVE TRACK IS DORMANT AS OF 2026-07-26. There are currently NO native ClickUp agents
+> in this workspace** — a `search_agents` sweep found none at all, and three roster rows carrying
+> `retired_native_id` numbers were pointing at nothing (PR #547). **Everything live is a
+> git-teammate, so in practice the git-teammate track is THE track.** Kept, not deleted: the native
+> model is sound and the class may return. But do not go looking for a live config to diff, and do
+> not read "two tracks" as "choose one" — today there is one live option. Flagged rather than
+> removed because a whole procedure for a class that does not exist is exactly the rot that struck
+> DoD check 4 below.
 
 ---
 
@@ -31,7 +73,8 @@ and record the result as a version-controlled audit whose PR history is the roll
 When an agent is told "audit yourself," it knows precisely:
 1. Which configuration to check  -> its own folder `brain-config/super-agents/<slug>/`.
 2. Which track + checklist to run -> this file (native vs git-teammate, table above).
-3. Where the result goes           -> an audit record committed via PR under `<slug>/audits/`.
+3. Which BYTES it audited         -> the SHA stamps on the record (see the lock at the top).
+4. Where the result goes           -> an audit record committed via PR under `<slug>/audits/`.
 
 ---
 
@@ -54,8 +97,9 @@ brain-config/super-agents/
     memory.md          # git-teammate: accumulated context + pointers to stewarded tools (not process)
     activity-log.md    # rolling session ledger (newest on top, append-only)
     decision-log.md    # git-teammate: reasoning about the AGENT ITSELF (topic decisions live on the topic page)
-    working-notes.md   # native: next spec / working notes / per-agent revision log
-    audits/<slug>.<YYYY-MM-DD>.md  # dated audit records, one per audit, via PR
+    working-notes.md   # native-track ONLY: next spec / working notes / per-agent revision log.
+                       #   A git-teammate does NOT carry one (Fiona's was retired to a stub 07-26).
+    audits/<slug>.<YYYY-MM-DD>.md  # dated audit records, one per audit, via PR. THE last-audit record.
 ```
 
 ~~`superagents.json`~~ **RENAMED to `roster.json` 2026-07-24** (redirect stub left behind).
@@ -69,21 +113,23 @@ Distinct from `brain-config/agents/` (the Brain-session council lenses).
 
 ---
 
-## NATIVE TRACK — procedure (high level)
+## NATIVE TRACK — procedure (high level) · ⚠️ dormant, see the track table
 
 1. Load the three inputs:
    - LIVE config: the agent's current ClickUp instructions / triggers / tools / knowledge.
    - DECLARED config: its `roster.json` row + `<slug>/preferences.md` (the verbatim mirror).
    - GOLDEN STANDARD: current version + requirements (see checklist).
-2. Confirm the golden-standard version being audited against; record it on the result.
+2. Confirm the golden-standard version being audited against; **record its SHA on the result** (see
+   the lock at the top — a version number is not a stamp; a standard can be edited without a bump).
 3. Walk the golden-standard checklist item by item, comparing LIVE vs DECLARED.
 4. Classify each item: PASS | PARTIAL (works but drifts) | GAP (missing/violates).
 5. Record divergences between LIVE config and the declaration explicitly — these are actionable.
    A drift between the LIVE config and the `preferences.md` mirror is itself a finding: either the
    live config changed (re-sync the mirror) or the mirror is stale (fix it).
 6. Write the audit record to `<slug>/audits/<slug>.<YYYY-MM-DD>.md` using the shape below.
-7. Update the agent's row in `roster.json` (status, version, last_audit). If the live config
-   changed, re-sync `preferences.md` to match verbatim and bump its header timestamp.
+7. Update the agent's row in `roster.json` **only if a row FIELD actually changed** (status, lane,
+   invoke). If the live config changed, re-sync `preferences.md` to match verbatim and bump its
+   header timestamp.
 8. Recommend fixes for the agent's owner/manager. NEVER edit another agent's live config directly.
 9. Commit via PR and merge — the PR is the audit trail. See PR-body standard below.
 
@@ -104,7 +150,7 @@ Full-Standard agents are checked against these. Task-Specific / Exempt agents sk
 
 ---
 
-## GIT-TEAMMATE TRACK — procedure + DoD (v0.2)
+## GIT-TEAMMATE TRACK — procedure + DoD (v0.3)
 
 Git-teammates have **no live config to diff**, so the native live-vs-declared mirror test does NOT
 apply. The bar is **INTERNAL CONSISTENCY**: will a cold `/session.agent=<Name>` load a coherent,
@@ -114,15 +160,22 @@ the runbook POINTS here instead of holding procedure inline. The runbook remains
 spine; the audit bar lives here.)*
 
 **Procedure:** load the agent's bundle (`preferences.md` + `memory.md` + `decision-log.md` +
-`activity-log.md`) + its `roster.json` row. Walk each check below, classify PASS / PARTIAL / GAP,
-record via PR under `<slug>/audits/`.
+`activity-log.md`) + its `roster.json` row. **Capture the SHA of every governing file as you read
+it** — base spec, this file, the roster, any gate the bundle points at. Walk each check below,
+classify PASS / PARTIAL / GAP, record via PR under `<slug>/audits/`.
 
-### git-teammate audit DoD (v0.2)
+### git-teammate audit DoD (v0.3)
 
 1. **Base pointer present** — `preferences.md` opens with the `_shared/super-agent-base.md` pointer line.
 2. **Load manifest valid** — the manifest lists real, present files in load order; deep-steep default.
-3. **`roster.json` row accurate** — slug/class/memory/status/invoke/lane match reality; `last_audit`
-   + standard version stamped. ~~superagents.json~~ (renamed 2026-07-24).
+3. **`roster.json` row accurate** — slug / class / memory / status / invoke / lane match reality.
+   ~~`last_audit` + standard version stamped.~~ **STRUCK 2026-07-28 (v0.3): `roster.json` has no
+   `last_audit` field and its own `schema` declaration does not sanction one.** The roster was
+   slimmed to one-line rows on 07-25 and is still ~6KB over its target, so adding per-agent audit
+   metadata back is the wrong direction. **The dated record under `<slug>/audits/` IS the last-audit
+   fact** — its filename carries the date and its stamps carry the version. One claimant.
+   *(Same rot family as struck check 4: a DoD requiring a write to a field that does not exist.
+   Found 2026-07-28 while writing the SHA-stamp rule into this very file.)*
 4. ~~**registry.json row present + agreeing**~~ — **STRUCK 2026-07-25 (v0.2). `registry.json` is a
    retired tombstone stub (PR #483); there is nothing to agree WITH, and an agent that "fixed" this
    GAP would be resurrecting a retired duplicate.** Replacement check: **every PATH the bundle points
@@ -133,7 +186,8 @@ record via PR under `<slug>/audits/`.
 5. **Bundle files present + in-format** — all five exist; each holds ONLY its kind (no procedure in
    memory; no metadata mirrored into folder files; no topic-decisions in the agent's decision-log).
 6. **No cross-file contradiction** — memory.md, preferences.md, and the roster tell ONE story.
-   (The classic miss: a stripped role still asserted in memory. Highest-value check.)
+   (The classic miss: a stripped role still asserted in memory. Highest-value check — and the FIRST
+   one to re-run under the staleness rule at the top.)
 7. **Voice is distinct** — self-announce header + tone do not bleed into another teammate. Also check
    the INVOCATION TOKEN, not just the voice: a first name that collides with, or is a homophone of,
    a live token is a finding (`roster.json` → `invocation.tokens`).
@@ -141,6 +195,11 @@ record via PR under `<slug>/audits/`.
    pointed at a migrated agent's OLD lens path now points at the bundle.
 9. **Inherited memory labelled** — a freshly graduated agent's `memory.md` marks seeded lines
    INHERITED, not earned, so its first real session replaces reconstruction with lived context.
+10. **SHA STAMPS PRESENT — the record names the bytes it audited** *(added 2026-07-28, v0.3; Q11 → C)*.
+    The `Audited against (SHAs)` block is filled, covers every governing file the audit leaned on,
+    and each SHA was read at audit time — **not carried from earlier in the session.** An unstamped
+    audit is an unverifiable audit and this check is a **GAP**, never a PARTIAL. See the lock at the
+    top of this file for the incident and the staleness re-check procedure.
 
 A PARTIAL or GAP holds the agent's Open-Surface Ledger open until resolved. Record the result as a
 dated audit file under `super-agents/<slug>/audits/<slug>.<YYYY-MM-DD>.md` via PR.
@@ -154,8 +213,14 @@ dated audit file under `super-agents/<slug>/audits/<slug>.<YYYY-MM-DD>.md` via P
 Agent: <Display Name> (<slug>)
 Track: <native | git-teammate>
 Auditor: <self | Audit Anna | Fleet Steward>
-Standard: <golden v1.0 | git-teammate DoD v0.2>
+Standard: <golden v1.0 | git-teammate DoD v0.3>
 Overall: <Up to date | Partial | Behind>
+
+Audited against (SHAs) — MANDATORY, one line per governing file:
+- _shared/super-agent-base.md ......... <sha>
+- super-agents/audit-instruction.md ... <sha>
+- super-agents/roster.json ............ <sha>
+- <any gate/hook/runbook this audit leaned on> ... <sha>
 
 Checklist results:
 1. <item> ....... PASS
@@ -167,6 +232,10 @@ Divergences / contradictions:
 Actions recommended:
 - <concrete config edit for owner/manager>
 ```
+
+**Addenda append; they never overwrite.** A staleness re-check adds a dated block below the original
+(`Addendum <YYYY-MM-DD>: <stamped file> moved <old sha> → <new sha>; re-ran checks N, M; result`)
+and leaves the original signature and its stamps untouched.
 
 ---
 
@@ -199,6 +268,8 @@ The repo PR body and the ClickUp Activity Log thread tell the same story from bo
 ## Cadence
 
 - Standard bump -> every agent on that track flips to "needs-re-audit"; work back through them.
+- **Stamped file moves** -> only the audits that stamped it are stale, and the stamps say which.
+  This is the cheap version of a standard bump and it is why the stamps exist.
 - New agent     -> roster.json row + `<slug>/` folder; audited in its first cycle.
 - Ongoing       -> light periodic self-audits folded into normal runs.
 
@@ -206,6 +277,19 @@ The repo PR body and the ClickUp Activity Log thread tell the same story from bo
 
 ## Changelog
 
+- **2026-07-28: v0.6 / DoD v0.3. SHA STAMPS ARE NOW REQUIRED (Q11 → C, authorized 2026-07-25).**
+  New lock at the top of the file + new **DoD check 10** + a mandatory `Audited against (SHAs)`
+  block in the record shape + the **staleness re-check** procedure (re-run only the affected checks;
+  **record an ADDENDUM, never reissue** — overwriting a signed record destroys the evidence it was
+  ever true). Practice had run ahead of the spec by three records (Fiona's birth audit, Ricky's, and
+  Ricky's same-day addendum) for two days: **a convention demonstrated three times and written zero
+  times is one forgetful session from gone.** Also de-rotted while in here: **check 3's `last_audit` +
+  standard-version clause STRUCK** — `roster.json` has no such field and its own `schema` declaration
+  does not sanction one, so the DoD was demanding a write to a phantom, the same family as struck
+  check 4; the dated file under `audits/` is the last-audit fact. **Native track flagged DORMANT** —
+  no native ClickUp agents exist in the workspace as of 07-26 (PR #547), so a whole procedure was
+  describing a class with zero members; kept and labelled rather than deleted. `working-notes.md`
+  clarified as native-track-only.
 - 2026-07-25: v0.5. **De-rotted the git-teammate DoD to v0.2** — it still required a `registry.json`
   row for a file retired the same day (PR #483), so every future git-teammate audit would have failed
   on a phantom check, and an agent "fixing" it would have resurrected a retired duplicate. Check 4 is
