@@ -8,9 +8,8 @@
 > **Budget: ~10KB hot cap.** Enforced by `hooks/memory-rotation.md` at session close.
 > Graduated content lives in `memory/archive/` (loaded on-demand).
 >
-> Reconciled to HEAD 2026-07-25 (evening). Lesson, now earned twice in one day:
-> my memory rots fastest on the days the fleet moves fastest, which are exactly
-> the days it gets read.
+> Reconciled to HEAD 2026-07-27. Lesson, now earned three times: my memory rots
+> fastest on the days the fleet moves fastest, which are exactly the days it gets read.
 
 ---
 
@@ -40,10 +39,9 @@ miss** (precedent memory of every FOLD-IN/NET-NEW verdict), and as of 07-25 his 
 collision is RESOLVED — bare "Frank" is his. So the naming blocker is gone; only the
 §6 justification is still unproven.
 
-## 🚫 Where I keep being wrong (earned 2026-07-25, twice in one session)
+## 🚫 Where I keep being wrong
 
-**I retire things because an adjacent tool looks good enough, and Michael overrules me.**
-Both misses were the same shape:
+### I retire things because an adjacent tool looks good enough (earned 2026-07-25, twice in one session)
 
 - **Ricky:** I argued the invocation contract is proven, so retire him. But *"the thing
   it was built to prove is proven"* retires a **TEST**, not a **CAPABILITY.**
@@ -55,6 +53,34 @@ Both misses were the same shape:
 actually reaches for and ask whether the surviving tool DELIVERS it — not whether the
 tool is good. "Covered by X" is a claim about X, not about the need.
 
+### 🔍 Scope of search is not scope of truth (earned 2026-07-26, TWICE in one day)
+
+I searched `brain-config/` for existing refresh machinery, found none, and treated that
+silence as proof none existed. **It existed — `routines/`, one directory over, three weeks
+old, with a schedule, per-routine stamps, three runbooks and a live renderer.** I then built
+a parallel framework beside it, including a shared stamp log that **reintroduced a race those
+per-routine files were locked to prevent.** Michael caught it in one sentence: *"we should
+already have a schedule and routine stamps, no?"*
+
+The part that matters: **my reasoning was fine, only my search radius was wrong.** A clean
+negative result inside one namespace feels identical to a clean negative result across the
+repo. It is not. **Before building any state, registry, schedule or log: search the whole
+repo tree, not the folder I happen to live in.** Sibling of B12 (research existing state
+first) but distinct — B12 is not looking; this is looking in one place and calling it done.
+
+### 📝 Documenting a fragility is not fixing it (earned 2026-07-27)
+
+I found a load-bearing prose dependency — a renderer inferred "retired" by regexing a phrase
+out of a free-text cell, so rewording the sentence would silently un-retire a dead routine.
+My response was to **write it up as a "viewer contract"** telling future editors not to touch
+the wording. The next day the real fix took one line: read the explicit field instead, and the
+dependency was gone along with the contract.
+
+**A warning where a fix belongs is a deferral wearing a diligence costume.** It even feels like
+rigor — you documented the trap! But you left the trap. **Ask: can I remove the fragility, or
+am I about to write a note asking people to be careful around it?** Related to the missed-gate
+protocol's *"naming a problem is not acting on it,"* generalized from drift to design.
+
 ## How the fleet is organized
 
 Two trees on disk, ONE flat roster (`roster.json`):
@@ -65,7 +91,7 @@ Two trees on disk, ONE flat roster (`roster.json`):
 **Invocation is roster-first.** `/agent-name` resolves at STEP 0
 (`gates/agent-invocation-gate.md`). Reading the roster is NOT invoking me.
 
-## The teammate roster (10, one-line each)
+## The teammate roster (12, one-line each)
 
 - **Wes** — driving force, first teammate (07-19)
 - **Corey** — ClickUp structure + space auditing (07-19)
@@ -76,8 +102,9 @@ Two trees on disk, ONE flat roster (`roster.json`):
 - **Maggie** — memory steward, placement triage (07-25)
 - **Sage** — research runner, READ-ONLY, source-reliability ledger (07-25)
 - **Clio** — session-close executor, health trend ledger (07-25)
+- **Fiona** — FileMaker + the shared object library; slug `fmp-frank` (BUILT 07-26)
+- **Ricky** — runbook runner, invoke-only triage over `routines/` (BUILT 07-26)
 - **Felix** (me) — fleet steward + singularity guardian (07-20)
-- **Fiona** — FileMaker, slug `fmp-frank`, needs-declaration (lane pinned 07-25, build blocked on track)
 - [Full detail + migration stories]: `memory/archive/teammate-detail.md`
 
 ## Lane map (who owns what)
@@ -92,12 +119,15 @@ Two trees on disk, ONE flat roster (`roster.json`):
 - Brain memory + placement = **Maggie**
 - Sourced research (read-only) = **Sage**
 - Session close execution + health trend = **Clio**
-- FileMaker solution design + **the object library** + repo-app CONSULTING = **Fiona** (pending)
-- **Dexter ↔ Fiona seam (REWRITTEN 07-25, Q13):** Dexter BUILDS repo, Fiona BUILDS FileMaker.
+- Data-refresh routines (invoke-only triage) = **Ricky**
+- FileMaker solution design + **the object library** + repo-app CONSULTING = **Fiona**
+- **Dexter ↔ Fiona seam (REWRITTEN 07-26, Q13):** Dexter BUILDS repo, Fiona BUILDS FileMaker.
   Fiona also owns the shared **object library** (cross-runtime vocabulary) and CONSULTS on repo
   apps — **never edits them.** That distinction is load-bearing: consulting accrues comparative
   vocabulary, editing would accrue rival build memory. Michael's why: *"we're going to model our
   repo apps more like our fmp app schema"* — she is the shared vocabulary as a person.
+- **Ricky ↔ Sage seam:** Sage researches a NEW question and finds sources; Ricky RE-CHECKS a
+  known question against pinned ones. Research is per-question; a refresh is per-schedule.
 - **Clio ↔ Hana:** NOT folded (Michael, Q10). Hana stays a lens; the close Step 5 seam is
   documented in Clio's D4, not resolved.
 
@@ -106,8 +136,12 @@ Two trees on disk, ONE flat roster (`roster.json`):
 - A first name IS an invocation token. Check the token map, not just the name field.
 - Two display names sharing a first name = a collision (even with different slugs).
 - **Homophones and one-vowel gaps count** (Clio/Cleo, 07-25). Dictation is the real test.
+- **An UNBUILT agent's name may be a RENAME, not a slip** — ask before authoring, because the
+  slug is immutable the second a file exists (Rocky/Ricky, 07-26; Michael ruled Ricky).
 - Slug is IMMUTABLE. Renames touch display_name only (Red Rhett lesson).
 - Incumbent keeps the token when two names conflict (FMP Frank → Fiona lesson).
+- **NAMES, NEVER NUMBERS** (07-26): identify agents by display name or slug; never store numeric
+  platform IDs, never ask Michael to confirm a value he cannot read.
 - [Full incident stories]: `memory/archive/naming-ledger-incidents.md`
 
 ## Michael-patterns worth carrying
@@ -121,20 +155,26 @@ Two trees on disk, ONE flat roster (`roster.json`):
 - Answers structural questions via Decision Log with INVERTED polarity.
 - **He answers fast and in bulk.** Four questions came back in one pass. Ask completely, ask
   once, and make the options mutually exclusive.
+- **He answers the DECIDING question, not the menu.** Twice now the useful move was ending with
+  the single question that settles it (*"do you ever actually open this URL?"* → *"no"* → a week
+  of speculation resolved). Give him the fork, not the analysis.
+- **He will delete a thing he just paid to fix** if it stopped earning its place. Sunk cost is
+  not an argument he accepts, and I should stop making it implicitly.
 
 ## Open follow-ups
 
-- **Fiona build BLOCKED:** lane pinned (Q13 part 1), name confirmed, but part 3 decoded as
-  "native track" which I believe is a polarity misfire. One line from Michael unblocks.
-- **Fiona's build rewrites the Q7 seam on BOTH sides** + needs two new seams: Fiona↔Anna
-  (she contributes buildability findings, Anna leads audits) and Fiona↔Dexter (she owns the
-  object library/vocabulary, he enforces the contract in repo code).
-- Authorized and unbuilt: **Ricky** (Q12→B), **Clark** (Q10→D, hook-vs-teammate still open).
+- Authorized and unbuilt: **Clark** (Q10→D, hook-vs-teammate still question one).
 - **Q11 structural work** unbuilt: session-open presence for EVERY session + audit SHA stamps.
-- 🚨 `_shared/super-agent-base.md` at 21.7KB against a ~22KB ceiling — I made it worse; needs
-  Dexter's split. `roster.json` at ~19.6KB against a locked ~12KB it has never met.
+- **The B19 fix is unwritten** — a pickup must fire open-time gates. Diagnosed twice, written
+  zero times, fired four times. Michael's call; it should not survive another session.
+- **Stamp consolidation** (thread `86ajqu32n`): fold `routines/last-run/*` into `schedule.md`?
+  Must be TESTED, not assumed — I assumed the same thing on 07-26 and was wrong in a day.
+- `_shared/super-agent-base.md` at 21.7KB — Dexter's split. ⚠️ **The ~22KB ceiling was never
+  measured** (B18, 07-26): the file reads back WHOLE. Real, but not the emergency I called it.
+- `roster.json` ~18.4KB against a locked ~12KB it has never met. `accent` is the droppable field.
 - Milo: confirm the full 7 URITP spaces.
-- Blocked on Michael (manual UI): disable retired natives Corey/Milo/Fiona.
+- ~~Blocked on Michael: disable retired natives Corey/Milo/Fiona.~~ **CLOSED 07-26** — a sweep
+  found **no native ClickUp agents exist at all.** There was never anything to disable.
 
 ## Pointers (never restate)
 
@@ -145,4 +185,5 @@ Two trees on disk, ONE flat roster (`roster.json`):
 - Naming gate → `gates/agent-name-collision-gate.md`
 - Orchestration → `orchestration.md` (Class Parity)
 - Doc-rot sweep → `hooks/doc-rot-sweep.md`
+- Routines framework (NOT `brain-config/`) → `routines/` — README, schedule, runbooks, last-run
 - The object library (Fiona's, real, verified 07-25) → ClickUp doc "FileMaker Canonical Object Library"
