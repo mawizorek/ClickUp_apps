@@ -1,0 +1,159 @@
+<!doctype html>
+<!-- Inciardi Collection — v1. Router shell + pages/ partials. Pages-hosted, not file:// capable.
+     Shape derived from template-app (gold standard v5), NOT from the predecessor.
+
+     ONE DELIBERATE ADDITION vs the template: the template's router injects partials with
+     innerHTML, which does not execute inline <script>. So after injecting we call
+     App.mount(route). Without that hook every page here would be inert markup. -->
+<html lang="en" data-theme="maw-dark-utility" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#333740">
+<meta name="robots" content="noindex, nofollow">
+<script>try{var t=localStorage.getItem("ic_color");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<title>Inciardi Collection</title>
+<meta name="description" content="A digital twin of the mini-print binder: sheets, sides, slots.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
+<link rel="stylesheet" href="../shared/themes/themes.css">
+<link rel="stylesheet" href="./styles.css?v=1">
+</head>
+<body>
+<a class="skip-link" href="#view">Skip to content</a>
+
+<header id="appHeader">
+  <div class="bar">
+    <span class="brand">📕 <b>Inciardi</b> Collection</span>
+    <nav id="nav"></nav>
+    <button id="gear" class="icon-btn" aria-label="Settings" title="Settings">⚙</button>
+  </div>
+  <div id="banner" class="banner" hidden></div>
+</header>
+
+<main id="view" tabindex="-1"></main>
+
+<aside id="settings" class="drawer" hidden aria-label="Settings">
+  <h2>Settings</h2>
+  <label for="apiBase">Worker URL</label>
+  <input id="apiBase" type="url" inputmode="url" autocapitalize="off" autocorrect="off"
+         placeholder="https://inciardi-collection.YOU.workers.dev">
+  <p class="hint">From <code>npx wrangler deploy</code>. Stored on this device only.</p>
+
+  <label for="writeKey">Write key</label>
+  <input id="writeKey" type="password" autocomplete="off" placeholder="the WRITE_KEY secret">
+  <p class="hint">Never shipped in this page. Kept on this device, sent per write.
+     Set it with <code>npx wrangler secret put WRITE_KEY</code>.</p>
+
+  <div class="row">
+    <button id="saveCfg" class="primary">Save</button>
+    <button id="ping">Test connection</button>
+  </div>
+  <pre id="pingOut" class="out" hidden></pre>
+  <button id="closeCfg" class="ghost">Close</button>
+</aside>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<noscript>This app needs JavaScript enabled.</noscript>
+
+<script src="../shared/themes/resolve.js"></script>
+<script src="./core.js?v=1"></script>
+<script src="./app.js?v=1"></script>
+<script>
+(function () {
+  /* ==== APP CONSTANTS ==== */
+  var APP_VERSION = "v1";
+  /* 🔴 THEME: the README says build on `default-theme`. That is a COLOR ROW in colors.tsv,
+     not a JOIN in _themes.json — applyTheme() would fault on it (loudly, since PR #502).
+     `soft-utility` is the documented default for apps copied from template-app, and it is
+     dark. One line changes it on theme-swap day, which is the whole point. */
+  var APP_THEME   = "soft-utility";
+  var DEFAULT_COLOR = "maw-dark-utility";
+  var DEFAULT_PAGE  = "binder";
+  var NAV = [
+    { route: "binder",  label: "Binder" },
+    { route: "enter",   label: "Enter" },
+    { route: "shoebox", label: "Shoe-box" }
+  ];
+  /* ======================= */
+
+  if (window.THEMES && THEMES.applyTheme) {
+    THEMES.applyTheme(APP_THEME).then(function () {
+      var saved = null; try { saved = localStorage.getItem("ic_color"); } catch (e) {}
+      if (saved && THEMES.apply) THEMES.apply(saved);
+    });
+  } else {
+    document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
+  }
+
+  /* ---- nav ---- */
+  var nav = document.getElementById("nav");
+  nav.innerHTML = NAV.map(function (n) {
+    return '<a href="#' + n.route + '" data-route="' + n.route + '">' + n.label + '</a>';
+  }).join("");
+
+  /* ---- settings drawer ---- */
+  var dr = document.getElementById("settings");
+  document.getElementById("gear").addEventListener("click", function () {
+    document.getElementById("apiBase").value = API.base() || "";
+    document.getElementById("writeKey").value = API.key() || "";
+    dr.hidden = false;
+  });
+  document.getElementById("closeCfg").addEventListener("click", function () { dr.hidden = true; });
+  document.getElementById("saveCfg").addEventListener("click", function () {
+    API.setBase(document.getElementById("apiBase").value.trim());
+    API.setKey(document.getElementById("writeKey").value);
+    Core.toast("Saved on this device", "good");
+    checkConfig();
+    render(current());
+  });
+  document.getElementById("ping").addEventListener("click", function () {
+    var out = document.getElementById("pingOut");
+    out.hidden = false; out.textContent = "…";
+    API.get("/health")
+      .then(function (d) { out.textContent = JSON.stringify(d, null, 2); })
+      .catch(function (e) { out.textContent = "FAILED\n" + e.message; });
+  });
+
+  /* ---- config banner: an unset worker URL is VISIBLE, never a silent no-op ---- */
+  function checkConfig() {
+    var b = document.getElementById("banner");
+    if (!API.base()) {
+      b.hidden = false;
+      b.className = "banner warn";
+      b.innerHTML = 'No worker URL set. Open <b>⚙ Settings</b> and paste the URL from <code>wrangler deploy</code>.';
+    } else { b.hidden = true; }
+  }
+
+  /* ---- router: hash -> pages/<route>.html, then MOUNT it ---- */
+  var view = document.getElementById("view");
+  var routes = NAV.map(function (n) { return n.route; });
+  function setActive(route) {
+    [].forEach.call(nav.querySelectorAll("a"), function (a) {
+      a.classList.toggle("on", a.getAttribute("data-route") === route);
+    });
+  }
+  function render(route) {
+    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
+    fetch("./pages/" + route + ".html", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+      .then(function (html) {
+        view.innerHTML = html;
+        setActive(route);
+        window.scrollTo(0, 0);
+        if (window.App && App.mount) App.mount(route);   // <- the hook the template lacks
+      })
+      .catch(function (e) {
+        view.innerHTML = '<section class="page"><h1>Page failed to load</h1>' +
+          '<p class="muted">' + Core.esc(e.message) + '</p></section>';
+      });
+  }
+  function current() { return (location.hash || "").replace(/^#/, "") || DEFAULT_PAGE; }
+  window.addEventListener("hashchange", function () { render(current()); });
+
+  window.ICApp = { version: APP_VERSION, render: render, current: current };
+  checkConfig();
+  render(current());
+})();
+</script>
+</body>
+</html>
