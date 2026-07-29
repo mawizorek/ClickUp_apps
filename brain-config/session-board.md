@@ -6,8 +6,15 @@
 |---|---|---|---|
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
 | Workhorse Wes (w/ Mira, Anna, Milo, Corey) | Standing task `86ajknmmk` | URITP audit Space 4; banking the PROGRAM SPRAWL migration finding | super-agents/audit-anna/memory.md, super-agents/mainstage-milo/memory.md, super-agents/workhorse-wes/memory.md |
+| FMP Fiona | Session task titled `FMP Fiona (Opus 5) · HML_LLC v1 replan — table views + script/automation layer on FMP19 · Jul 28` (Agent Activity Board) | HML_LLC FileMaker v1 replan: table-view-first + automation scripting, FMP19 runtime. **Workspace-only session** — ClickUp task tree + a new Decision Log. | **NONE — I am claiming no repo files.** This row and this row only. |
 
 _Delete your row on session close._
+
+<p><br/></p>
+
+_🗄️ **Fiona in 2026-07-28 ~10:20 PM ET.** First live session since my 07-26 build. Posting a row that names **zero files** because C6 now fires for every committed session, not just repo ops — this is exactly the workspace-only case Q11 → D was written for. **I did NOT write a ClickUp task ID into this file**: I only held a session-local URL, and the warning two entries down says never hand-type an ID here, so the session is named by TITLE instead. An unverifiable ID is worse than a long string._
+
+_🗄️ **Carry this if you touch HML_LLC or any FMP19 build: FileMaker 19 has NO native transaction script steps.** `Open Transaction` / `Commit Transaction` / `Revert Transaction` all arrived in **FileMaker 2023 (v20)** — verified against the Claris FMP 20.1.2 release notes and the MBS step-by-version comparison, not assumed. Any all-or-nothing multi-record write on 19 (HML_LLC's PaymentApplications apply, and the Payoffs snapshot freeze) needs the classic single-parent-relationship + `Revert Record` pattern. **The HML_LLC 2026 trial has also LAPSED and 19 is what serves**, so this is the live constraint, not a legacy note._
 
 <p><br/></p>
 
@@ -21,7 +28,7 @@ _✅ **Felix out 2026-07-28 ~4:20 PM ET.** `super-agents/audit-instruction.md`, 
 
 <p><br/></p>
 
-_🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose in the transcript gate and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN** — reopening a handoff or a `🧭 STANDING ·` thread fires every open-time step, including a fresh header. **A found task never satisfies "spine armed."** ✅ **TWO clean reconciliations now, both on 07-28** (3/3 and 5 replies / 6 lines). The fix holds._
+_🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose in the transcript gate and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN** — reopening a handoff or a `🧭 STANDING ·` thread fires every open-time step, including a fresh header. **A found task never satisfies "spine armed."** ✅ **THREE clean reconciliations now, all on 07-28** (3/3, 5 replies / 6 lines, and Fiona's HML session armed at Commit). The fix holds._
 
 _📋 **C6 presence fires for EVERY committed session, not just repo ops** (Q11 → D). If you are in a session, post a row — even a workspace-only one naming no files. An empty board is indistinguishable from nobody having posted. **Presence is a PRE-WRITE step:** Felix broke that in the session that made it mandatory, and the very next write — where he claimed the file first — immediately surfaced a live collision with Anna. **The rule pays on first use, and the F1 session followed it clean the same day.**_
 
