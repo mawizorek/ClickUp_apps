@@ -63,7 +63,15 @@ CREATE TABLE IF NOT EXISTS artwork (
   name          TEXT NOT NULL,              -- display only; free to change, never identity
   artist        TEXT NOT NULL DEFAULT 'Anastasia Inciardi',  -- Alex · Jana · Jules also appear
   collection_id TEXT REFERENCES collection(collection_id) ON DELETE SET NULL,
-  category      TEXT,                       -- mini | big-riso | linocut | pack
+
+  -- DEFAULTS TO 'mini' (Michael, 2026-07-29). v1 scope is mini prints, so recording a print he just
+  -- picked up must never require saying that it is one. Left NULLABLE rather than NOT NULL: a
+  -- placeholder artwork born from a market sighting may genuinely not know its category, and stamping
+  -- 'mini' on it would be the schema asserting something nobody verified. The default fires on
+  -- omission, which is the whole ask. No CHECK on the value list — the vocabulary will grow, and a
+  -- CHECK here would turn every new category into a table rebuild for no correctness gain.
+  category      TEXT DEFAULT 'mini',        -- mini | big-riso | linocut | pack
+
   exclusive     TEXT,                       -- nyc | lacma | grand-central | richard-scarry | holiday
 
   -- Domain Dara's distinction. "#4" and "7/12" are NOT the same kind of number:
@@ -73,6 +81,10 @@ CREATE TABLE IF NOT EXISTS artwork (
   -- Without this the binder cannot answer "is my Watermelon complete?", the single question a binder
   -- exists to answer. It is ALSO what stops six copies of a one-of-a-kind being recorded — see the
   -- denormalization chain on `edition`.
+  --
+  -- ⚠️ NOT the same field as `category`. A mini print is a SIZE/FORMAT; open vs limited vs unique is
+  -- how many objects exist. Most minis are 'open', but Brooklyn Ginkgo is a mini AND 'unique'. Keeping
+  -- the default 'open' is right for the common case and does not follow from category.
   edition_type  TEXT NOT NULL DEFAULT 'open' CHECK (edition_type IN ('unique','limited','open')),
   edition_of    INTEGER,                    -- known run length; NULL if unknown
 
