@@ -1,43 +1,9 @@
-# SCRIPT: 30_CONTEXT__Select_Property_Context
-# FOLDER: 30_CONTEXT
-# ROLE: set current property, resolve the correct current loan, refresh the hub
-# CALLED BY: hub selector row click ; property picker change ; startup context restore
-# CALLS: 10_UI__Set_Hub_Tab (conditional)
-# INPUTS: $p (JSON) — { "propertyID":<req>, "loanID":<opt>, "tab":<opt> }
-# GLOBALS IN: none
-# RETURNS: { ok, propertyID, loanID, resolution } | { ok:false, error }
-# GLOBALS OUT: g_fkCurrentProperty, g_fkCurrentLoan, optionally g_HubTab
-# SIDE EFFECTS: globals only on GLOBAL_USE_VARIABLES. Creates/edits NO business records.
-#
-# 🥇 STATE: GOLDEN. Rewritten 2026-06-18 to kill the old `loan == property` assumption.
-#   Everything else in the file depends on this resolving correctly, so it is buildOrder 4
-#   (right after the txn_* trio) and it must stay thin.
-#
-# THE ONE THING IT EXISTS TO PREVENT:
-#   Silently choosing the wrong loan. A property can have several loans — fixture PROP-001
-#   has two — so when the caller does not say which, this script must either resolve
-#   UNAMBIGUOUSLY or hand off to a chooser. It must never guess.
-#
-# PREFERRED PATH: if the selector row already knows both property and loan, PASS BOTH.
-#   That skips resolution entirely and is what the live hub should do.
-#
-# GUARD RAILS:
-#   - exit safely if no property is passed
-#   - NEVER set g_fkCurrentLoan equal to the property PK (that was the old bug)
-#   - never silently pick a loan when several are open
-#
-# ⚠️ OPEN — the multi-loan branch is a contract, not code. "Route to a controlled chooser
-#   path" has no chooser behind it yet. Until one exists this script returns
-#   resolution:"ambiguous" with g_fkCurrentLoan left EMPTY, and the hub must handle an
-#   empty loan context rather than assuming one. An empty global is honest; a wrong one
-#   is a payment posted to the wrong note.
-#
-# CHANGELOG:
-#   - 2026-06-18 rewritten loan-aware; loanID became an optional explicit param.
-#   - 2026-07-29 ported from ClickUp into a real per-script body; the ambiguous-return
-#     contract made explicit so callers cannot mistake empty for resolved.
+# 30_CONTEXT__Select_Property_Context
+# Sets the current property, resolves the current loan, refreshes the hub.
+# Param (JSON): { propertyID (req), loanID (opt), tab (opt) }
+# Returns (JSON): { ok, propertyID, loanID, resolution }
+# Writes globals only. Never guesses a loan when several are open.
 
-# --- SETUP ---
 Set Error Capture [ On ]
 Set Variable [ $p ; Value: Get ( ScriptParameter ) ]
 Set Variable [ $propertyID ; Value: JSONGetElement ( $p ; "propertyID" ) ]
@@ -48,17 +14,14 @@ If [ IsEmpty ( $propertyID ) ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "no property" ; JSONString ] ) ]
 End If
 
-# --- WRITE PROPERTY CONTEXT ---
 Set Field [ GLOBAL_USE_VARIABLES::g_fkCurrentProperty ; $propertyID ]
 
-# --- RESOLVE THE LOAN ---
 If [ not IsEmpty ( $loanID ) ]
-	# caller knew it. Trust it. This is the preferred path.
+	# Caller already knew the loan. Trust it.
 	Set Field [ GLOBAL_USE_VARIABLES::g_fkCurrentLoan ; $loanID ]
 	Set Variable [ $resolution ; Value: "explicit" ]
 
 Else
-	# find open loans for this property
 	Go to Layout [ "Loans" (Loans) ]
 	Enter Find Mode [ Pause: Off ]
 	Set Field [ Loans::fkProperty ; $propertyID ]
@@ -71,22 +34,21 @@ Else
 		Set Variable [ $resolution ; Value: "single" ]
 
 	Else If [ Get ( FoundCount ) = 0 ]
-		# a property with no active loan is legitimate (fully paid off collateral)
+		# A property with no active loan is legitimate (paid-off collateral)
 		Set Field [ GLOBAL_USE_VARIABLES::g_fkCurrentLoan ; "" ]
 		Set Variable [ $resolution ; Value: "none" ]
 
 	Else
-		# ⚠️ SEVERAL open loans. Do NOT guess. Leave the loan global EMPTY on purpose.
+		# Several open loans. Leave the loan global EMPTY on purpose.
 		Set Field [ GLOBAL_USE_VARIABLES::g_fkCurrentLoan ; "" ]
 		Set Variable [ $resolution ; Value: "ambiguous" ]
 	End If
 End If
 
-# --- CLEAR STALE ROW SELECTIONS so a tab cannot show the previous loan's row ---
+# Clear stale row selections so a tab cannot show the previous loan's row
 Set Field [ GLOBAL_USE_VARIABLES::g_fkSelectedExpected ; "" ]
 Set Field [ GLOBAL_USE_VARIABLES::g_fkSelectedTransaction ; "" ]
 
-# --- OPTIONAL TAB LANDING ---
 If [ not IsEmpty ( $tab ) ]
 	Perform Script [ "10_UI__Set_Hub_Tab" ; Parameter: Param ( PText ( "tab" ; $tab ) ) ]
 End If
@@ -94,11 +56,3 @@ End If
 Refresh Window [ Flush cached join results ]
 
 Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; True ; JSONBoolean ] ; [ "propertyID" ; $propertyID ; JSONString ] ; [ "loanID" ; $loanID ; JSONString ] ; [ "resolution" ; $resolution ; JSONString ] ) ]
-
-# --- FIXTURE EXPECTATION (fixtures/golden-month) ---
-# PROP-001 has LOAN-001 (Active) and LOAN-003 (Paid Off) -> exactly ONE active,
-#   so resolution:"single" and g_fkCurrentLoan = LOAN-001.
-# PROP-002 has LOAN-002 only -> resolution:"single".
-# ⚠️ NOTHING in the fixture currently produces resolution:"ambiguous". To exercise the
-#   branch that matters most, flip LOAN-003 to Active and confirm the hub survives an
-#   EMPTY loan context instead of silently landing on one of them.
