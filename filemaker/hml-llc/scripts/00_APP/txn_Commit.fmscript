@@ -1,0 +1,67 @@
+# SCRIPT: txn_Commit
+# FOLDER: 00_APP
+# ROLE: close the pseudo-transaction — the ONE place a commit is allowed to happen
+# CALLED BY: every routine that opened with txn_Begin, on the success path
+# CALLS: commitRecord (utilities) for the validation-error message contract
+# INPUTS: none
+# GLOBALS IN: $$TXN_ACTIVE, $$TXN_PARENT_TABLE, $$TXN_PARENT_ID, $$TXN_LABEL
+# RETURNS: { ok } | { ok:false, error, errorCode }
+# GLOBALS OUT: clears $$TXN_*
+# SIDE EFFECTS: commits the parent record AND every related record written since txn_Begin
+#
+# 🚨 THIS IS THE ONLY `Commit Records` ALLOWED BETWEEN txn_Begin AND HERE.
+#   Every other commit in a write routine is a bug. Not a style problem — a bug. A stray
+#   commit ends the transaction early and makes the preceding writes permanent, so a later
+#   failure rolls back only the remainder. The routine still reports success and the ledger
+#   is silently half-written.
+#   ⛔ 60_PAYMENTS__Auto_Apply_Waterfall currently commits TWICE PER APPLIED ROW inside its
+#      loop. That is the single most important thing to strip when it is rewritten.
+#
+# WHY IT FAILS LOUDLY AND NEVER SWALLOWS:
+#   A wrapper that eats an error to keep a routine moving is worse than no wrapper, because
+#   the caller believes the write landed. On any commit error this returns ok:false with the
+#   FileMaker error code and leaves the record UNCOMMITTED so the caller can roll back.
+#   It does not decide for the caller and it does not retry.
+#
+# VALIDATION ERRORS ARE NOT TRANSACTION ERRORS:
+#   507 (validate by calc), 506 (required), 504 (unique) mean the DATA is wrong, not that
+#   the transaction broke. Those route through the shared `commitRecord` helper so the
+#   user-facing wording is single-sourced from MSG_ValueListErrors instead of being
+#   re-invented here. Get(LastError) returns a code, never the field's own message —
+#   which is exactly why that helper exists.
+#
+# 🥇 STATE: GOLDEN — designed, not yet built.
+#
+# CHANGELOG:
+#   - 2026-07-29 designed alongside txn_Begin / txn_Rollback. Michael, DL Q3: rollback and
+#     error catching throughout, not per-routine improvisation.
+
+# --- GUARD: refuse to commit a transaction nobody opened ---
+Set Error Capture [ On ]
+
+If [ $$TXN_ACTIVE <> 1 ]
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "txn_Commit called with no open transaction" ; JSONString ] ) ]
+End If
+
+# --- RETURN TO THE PARENT so the commit lands on the anchor record, not wherever the
+#     routine happened to leave the found set ---
+Go to Layout [ $$TXN_PARENT_TABLE ]
+
+# --- THE COMMIT ---
+Commit Records/Requests [ With dialog: Off ]
+Set Variable [ $err ; Value: Get ( LastError ) ]
+
+If [ $err ]
+	# leave it UNCOMMITTED and hand the decision back. Do not revert here — the caller
+	# owns the rollback so it can log first.
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "commit failed in txn " & $$TXN_LABEL ; JSONString ] ; [ "errorCode" ; $err ; JSONNumber ] ) ]
+End If
+
+# --- CLEAR STATE only after a clean commit ---
+Set Variable [ $$TXN_ACTIVE ; Value: "" ]
+Set Variable [ $$TXN_ID ; Value: "" ]
+Set Variable [ $$TXN_PARENT_TABLE ; Value: "" ]
+Set Variable [ $$TXN_PARENT_ID ; Value: "" ]
+Set Variable [ $$TXN_LABEL ; Value: "" ]
+
+Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; True ; JSONBoolean ] ) ]
