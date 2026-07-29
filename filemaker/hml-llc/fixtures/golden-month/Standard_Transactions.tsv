@@ -1,0 +1,7 @@
+PrimaryKey	Name	value_Category	value_CashDirection	value_AppliedToLayer	sort_order	is_active
+STX-001	Interest Payment	Interest	in	expected	10	1
+STX-002	Principal	Principal	in	expected	20	1
+STX-003	Late Fee	Fee	in	expected	30	1
+STX-004	Origination Points	Fee	in	expected	40	1
+STX-005	Maturation Fee	Fee	in	expected	50	1
+STX-006	Payment Received	Cash	in	actual	60	1
