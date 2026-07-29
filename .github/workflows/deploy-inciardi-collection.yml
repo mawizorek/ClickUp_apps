@@ -1,0 +1,79 @@
+# Deploy the Inciardi Collection worker — from a BUTTON, no terminal.
+#
+# WHY THIS EXISTS: wrangler needs Node and a shell. iOS has neither. Michael works from a
+# phone, so a CLI runbook is a runbook he cannot execute. This moves the deploy onto a
+# surface he actually has: the "Run workflow" button in the GitHub web UI.
+#
+# WHY NOT the Cloudflare dashboard's worker editor (also phone-doable): it puts the worker
+# SOURCE in the dashboard, so git and the running worker become two sources of truth that
+# drift. That is precisely the disease this app was rebuilt to cure. Git stays canonical;
+# CI deploys from it.
+#
+# workflow_dispatch ONLY — deliberately no push trigger:
+#   1. The front-end needs no deploy at all. Pages serves it ~60s after a commit lands.
+#      Only `worker/` changes need this.
+#   2. Unattended auto-deploy of a key-authenticated write API on every commit to main is
+#      not something you want. A deploy should be a decision.
+
+name: Deploy inciardi-collection worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      database_id:
+        description: "D1 database id (leave blank to use the DB_ID repo variable)"
+        required: false
+        type: string
+
+permissions:
+  contents: read          # least privilege: this job reads the repo and nothing else
+
+concurrency:
+  group: deploy-inciardi-collection
+  cancel-in-progress: false   # never race two deploys of the same worker
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The database id is the one thing that would otherwise need a text editor on a
+      # phone. Take it from the run input, or fall back to a repo variable set once in
+      # Settings → Secrets and variables → Variables. Written into wrangler.toml here
+      # rather than committed, so the id never has to be hand-edited on a device.
+      - name: Resolve the D1 database id
+        run: |
+          ID="${{ inputs.database_id }}"
+          if [ -z "$ID" ]; then ID="${{ vars.INCIARDI_DB_ID }}"; fi
+          if [ -z "$ID" ]; then
+            echo "::error::No database id. Pass one when you run this workflow, or set the INCIARDI_DB_ID repo variable. Find it in the D1 dashboard under your database name."
+            exit 1
+          fi
+          sed -i "s|PASTE_DATABASE_ID_HERE|$ID|" inciardi-collection/wrangler.toml
+          echo "Bound to database ${ID:0:8}…"   # truncated: no need to print an id in a public log
+
+      - name: Fail early if the id was not substituted
+        run: |
+          if grep -q PASTE_DATABASE_ID_HERE inciardi-collection/wrangler.toml; then
+            echo "::error::wrangler.toml still holds the placeholder. Refusing to deploy a worker bound to nothing."
+            exit 1
+          fi
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: inciardi-collection
+          command: deploy
+
+      # WRITE_KEY is NOT set here on purpose. Secrets survive a deploy, so it is set once in
+      # the Cloudflare dashboard (Worker → Settings → Variables and Secrets) and never
+      # passes through GitHub. One fewer place it can leak.
+      - name: What to do next
+        run: |
+          echo "Deployed. If this was the first run:"
+          echo "  1. Cloudflare dashboard → your worker → Settings → Variables and Secrets"
+          echo "  2. Add secret WRITE_KEY (a long random string, not a word)"
+          echo "  3. Open the app → gear → paste the worker URL + that key"
