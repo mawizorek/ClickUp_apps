@@ -1,0 +1,222 @@
+# SCRIPT: 70_SCHEDULE__Generate_Expected_Schedule
+# FOLDER: 70_SCHEDULE
+# ROLE: create or refresh the expected collectible rows for the CURRENT LOAN
+# CALLED BY: "Create / Refresh Expected" button on the Schedule tab ; first-time loan setup
+# CALLS: 10_UI__Set_Hub_Tab ; txn_Begin / txn_Commit / txn_Rollback [PENDING]
+# INPUTS: $p (JSON) — { "loanID":<req>, "mode":"create_or_refresh|regenerate_open_only", "source":<opt> }
+# GLOBALS IN: g_fkCurrentLoan (resolved by the hub before the call) ; optional g_fkCurrentProperty
+# RETURNS: { ok, loanID, rowsCreated, rowsUpdated, rowsSkipped, mode, error }
+# GLOBALS OUT: none
+# SIDE EFFECTS: creates/updates ExpectedTransactions; reads Standard_Transactions
+#
+# 🥇 STATE: GOLDEN. Michael reviewed and approved this direction; it is loan-centered and
+#   already correct on the thing that broke the other scripts. Two open items below.
+#
+# WHAT IT GENERATES (first pass only — deliberately small):
+#   1. one Interest Payment row per monthly cycle
+#   2. one Principal / balloon row at maturity
+#   Late-fee rows are NOT generated here. That is 70_SCHEDULE__Assess_Late_Fees.
+#
+# IDEMPOTENCE IS THE WHOLE POINT:
+#   Michael must be able to hit the Schedule button twice without fear. Every generated row
+#   carries a stable ScheduleKey:
+#
+#       fkLoan & "." & fkStandardTransaction & "." & SequenceNumber
+#
+#   That key — not the date, not the amount — is what the script trusts when deciding
+#   whether a row already exists. Interest rows sequence 1..N; the balloon is N+1.
+#
+# DUE-DATE RULE (locked):
+#   The term is treated in WHOLE MONTHS and interest due dates stay anchored to the
+#   day-of-month of OriginationDate. Origination Jun 18 -> Jul 18, Aug 18, Sep 18...
+#   The current date is relevant to UI and reporting; it is NEVER the identity of a row.
+#
+# ⚠️ OPEN 1 — Date() month overflow. `Date ( Month ( $due ) + 1 ; $day ; Year ( $due ) )`
+#   relies on FileMaker rolling month 13 into January, which it does. But a $day of 29/30/31
+#   overflows INTO THE NEXT MONTH on short months: Jan 31 + 1 month yields Mar 3, not Feb 28.
+#   For a loan originated on the 29th-31st this silently produces wrong due dates and
+#   therefore wrong ScheduleKeys. Needs a clamp: Min ( $day ; Day ( Date ( m+1 ; 1 ; y ) - 1 ) ).
+#   Not fixed here because changing date identity changes keys — that is Michael's call.
+#
+# ⚠️ OPEN 2 — status is a placeholder. Both branches say "set status using your real status
+#   resolver." fkStatus must resolve to a real status record PK, never free text pretending
+#   to be a foreign key. Blocked on the status-utility helper.
+#
+# GUARD RAILS:
+#   - do NOT generate by property context alone
+#   - do NOT duplicate rows when the button is run again (ScheduleKey is the defense)
+#   - do NOT overwrite paid / already-applied history in create_or_refresh mode
+#   - regenerate_open_only touches ONLY rows with no applications against them
+#
+# BUTTON CONTRACT FROM h_Hub:
+#   Param ( PText ( "loanID" ; GLOBAL_HUB::g_fkCurrentLoan ) ;
+#           PText ( "mode" ; "create_or_refresh" ) ;
+#           PText ( "source" ; "hub_schedule_button" ) )
+#
+# REQUIRED SOURCE FIELDS ON Loans (reads Loans, NOT PropertySUMMARIES):
+#   PrimaryKey, OriginationDate, MaturityDate, OriginalPrincipal, InterestRateAnnual,
+#   PaymentCadence, GraceDays, LoanNumber, fkLoanStatus
+#
+# CHANGELOG:
+#   - 2026-06-18 rewritten loan-centered; implementation approved by Michael.
+#   - 2026-07-29 ported from ClickUp into a real per-script body. Month-overflow bug found
+#     during the port and flagged rather than silently patched.
+
+# --- SETUP ---
+Set Error Capture [ On ]
+Allow User Abort [ Off ]
+Set Variable [ $p ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $loanID ; Value: JSONGetElement ( $p ; "loanID" ) ]
+Set Variable [ $mode ; Value: Case ( IsEmpty ( JSONGetElement ( $p ; "mode" ) ) ; "create_or_refresh" ; JSONGetElement ( $p ; "mode" ) ) ]
+
+If [ IsEmpty ( $loanID ) ]
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "no loan" ; JSONString ] ) ]
+End If
+
+# --- LOAD LOAN + VALIDATE REQUIRED TERMS ---
+Go to Layout [ "Loans" (Loans) ]
+Enter Find Mode [ Pause: Off ]
+Set Field [ Loans::PrimaryKey ; $loanID ]
+Perform Find [ ]
+
+If [ Get ( FoundCount ) <> 1 ]
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "loan not found" ; JSONString ] ; [ "loanID" ; $loanID ; JSONString ] ) ]
+End If
+
+If [ IsEmpty ( Loans::OriginationDate ) or IsEmpty ( Loans::MaturityDate ) or IsEmpty ( Loans::OriginalPrincipal ) or IsEmpty ( Loans::InterestRateAnnual ) ]
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "missing required loan terms" ; JSONString ] ; [ "loanID" ; $loanID ; JSONString ] ) ]
+End If
+
+Set Variable [ $orig ; Value: GetAsDate ( Loans::OriginationDate ) ]
+Set Variable [ $maturity ; Value: GetAsDate ( Loans::MaturityDate ) ]
+Set Variable [ $principal ; Value: Loans::OriginalPrincipal ]
+Set Variable [ $rate ; Value: Loans::InterestRateAnnual ]
+Set Variable [ $day ; Value: Day ( $orig ) ]
+Set Variable [ $monthlyInterest ; Value: Round ( $principal * ( $rate / 12 ) ; 2 ) ]
+
+# --- RESOLVE Standard_Transactions PKs (fail loudly if the taxonomy is unseeded) ---
+Go to Layout [ "Standard_Transactions" (Standard_Transactions) ]
+Enter Find Mode [ Pause: Off ]
+Set Field [ Standard_Transactions::Name ; "Interest Payment" ]
+Perform Find [ ]
+If [ Get ( FoundCount ) <> 1 ]
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "missing standard transaction: Interest Payment" ; JSONString ] ) ]
+End If
+Set Variable [ $stInterest ; Value: Standard_Transactions::PrimaryKey ]
+
+Enter Find Mode [ Pause: Off ]
+Set Field [ Standard_Transactions::Name ; "Principal" ]
+Perform Find [ ]
+If [ Get ( FoundCount ) <> 1 ]
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "missing standard transaction: Principal" ; JSONString ] ) ]
+End If
+Set Variable [ $stPrincipal ; Value: Standard_Transactions::PrimaryKey ]
+
+# --- COUNTERS ---
+Set Variable [ $rowsCreated ; Value: 0 ]
+Set Variable [ $rowsUpdated ; Value: 0 ]
+Set Variable [ $rowsSkipped ; Value: 0 ]
+
+# --- MONTHLY INTEREST ROWS ---
+Set Variable [ $seq ; Value: 0 ]
+Set Variable [ $due ; Value: Date ( Month ( $orig ) + 1 ; $day ; Year ( $orig ) ) ]
+
+Loop
+	Exit Loop If [ $due > $maturity ]
+	Set Variable [ $seq ; Value: $seq + 1 ]
+	Set Variable [ $scheduleKey ; Value: $loanID & "." & $stInterest & "." & $seq ]
+
+	Go to Layout [ "dev_ExpectedTransactions" (ExpectedTransactions) ]
+	Enter Find Mode [ Pause: Off ]
+	Set Field [ ExpectedTransactions::ScheduleKey ; $scheduleKey ]
+	Perform Find [ ]
+
+	If [ Get ( FoundCount ) = 0 ]
+		New Record/Request
+		Set Field [ ExpectedTransactions::PrimaryKey ; Get ( UUID ) ]
+		Set Field [ ExpectedTransactions::fkLoan ; $loanID ]
+		Set Field [ ExpectedTransactions::fkStandardTransaction ; $stInterest ]
+		Set Field [ ExpectedTransactions::SequenceNumber ; $seq ]
+		Set Field [ ExpectedTransactions::ScheduleKey ; $scheduleKey ]
+		Set Field [ ExpectedTransactions::DueDate ; $due ]
+		Set Field [ ExpectedTransactions::OriginalAmount ; $monthlyInterest ]
+		Set Field [ ExpectedTransactions::AmountAdjusted ; $monthlyInterest ]
+		# ⚠️ OPEN 2: set fkStatus via the real status resolver, not free text
+		Set Field [ ExpectedTransactions::CreationTimestamp ; Get ( CurrentTimestamp ) ]
+		Commit Records/Requests [ With dialog: Off ]
+		Set Variable [ $rowsCreated ; Value: $rowsCreated + 1 ]
+
+	Else If [ $mode = "regenerate_open_only" ]
+		Go to Record/Request/Page [ First ]
+		# only touch rows with nothing applied against them
+		If [ IsEmpty ( ExpectedTransactions::calc_amountPaid ) or ExpectedTransactions::calc_amountPaid = 0 ]
+			Set Field [ ExpectedTransactions::DueDate ; $due ]
+			Set Field [ ExpectedTransactions::OriginalAmount ; $monthlyInterest ]
+			If [ IsEmpty ( ExpectedTransactions::AmountAdjusted ) or ExpectedTransactions::AmountAdjusted = ExpectedTransactions::OriginalAmount ]
+				Set Field [ ExpectedTransactions::AmountAdjusted ; $monthlyInterest ]
+			End If
+			Commit Records/Requests [ With dialog: Off ]
+			Set Variable [ $rowsUpdated ; Value: $rowsUpdated + 1 ]
+		Else
+			Set Variable [ $rowsSkipped ; Value: $rowsSkipped + 1 ]
+		End If
+	Else
+		Set Variable [ $rowsSkipped ; Value: $rowsSkipped + 1 ]
+	End If
+
+	Set Variable [ $due ; Value: Date ( Month ( $due ) + 1 ; $day ; Year ( $due ) ) ]   # ⚠️ OPEN 1: overflows on day 29-31
+End Loop
+
+# --- MATURITY / BALLOON PRINCIPAL ROW ---
+Set Variable [ $seq ; Value: $seq + 1 ]
+Set Variable [ $scheduleKey ; Value: $loanID & "." & $stPrincipal & "." & $seq ]
+
+Go to Layout [ "dev_ExpectedTransactions" (ExpectedTransactions) ]
+Enter Find Mode [ Pause: Off ]
+Set Field [ ExpectedTransactions::ScheduleKey ; $scheduleKey ]
+Perform Find [ ]
+
+If [ Get ( FoundCount ) = 0 ]
+	New Record/Request
+	Set Field [ ExpectedTransactions::PrimaryKey ; Get ( UUID ) ]
+	Set Field [ ExpectedTransactions::fkLoan ; $loanID ]
+	Set Field [ ExpectedTransactions::fkStandardTransaction ; $stPrincipal ]
+	Set Field [ ExpectedTransactions::SequenceNumber ; $seq ]
+	Set Field [ ExpectedTransactions::ScheduleKey ; $scheduleKey ]
+	Set Field [ ExpectedTransactions::DueDate ; $maturity ]
+	Set Field [ ExpectedTransactions::OriginalAmount ; $principal ]
+	Set Field [ ExpectedTransactions::AmountAdjusted ; $principal ]
+	# ⚠️ OPEN 2: real status resolver here too
+	Set Field [ ExpectedTransactions::CreationTimestamp ; Get ( CurrentTimestamp ) ]
+	Commit Records/Requests [ With dialog: Off ]
+	Set Variable [ $rowsCreated ; Value: $rowsCreated + 1 ]
+
+Else If [ $mode = "regenerate_open_only" ]
+	Go to Record/Request/Page [ First ]
+	If [ IsEmpty ( ExpectedTransactions::calc_amountPaid ) or ExpectedTransactions::calc_amountPaid = 0 ]
+		Set Field [ ExpectedTransactions::DueDate ; $maturity ]
+		Set Field [ ExpectedTransactions::OriginalAmount ; $principal ]
+		If [ IsEmpty ( ExpectedTransactions::AmountAdjusted ) or ExpectedTransactions::AmountAdjusted = ExpectedTransactions::OriginalAmount ]
+			Set Field [ ExpectedTransactions::AmountAdjusted ; $principal ]
+		End If
+		Commit Records/Requests [ With dialog: Off ]
+		Set Variable [ $rowsUpdated ; Value: $rowsUpdated + 1 ]
+	Else
+		Set Variable [ $rowsSkipped ; Value: $rowsSkipped + 1 ]
+	End If
+Else
+	Set Variable [ $rowsSkipped ; Value: $rowsSkipped + 1 ]
+End If
+
+# --- RETURN THE USER TO SCHEDULE POSTURE ---
+Perform Script [ "10_UI__Set_Hub_Tab" ; Parameter: Param ( PText ( "tab" ; "Schedule" ) ) ]
+Refresh Window [ Flush cached join results ]
+
+Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; True ; JSONBoolean ] ; [ "loanID" ; $loanID ; JSONString ] ; [ "rowsCreated" ; $rowsCreated ; JSONNumber ] ; [ "rowsUpdated" ; $rowsUpdated ; JSONNumber ] ; [ "rowsSkipped" ; $rowsSkipped ; JSONNumber ] ; [ "mode" ; $mode ; JSONString ] ) ]
+
+# --- FIXTURE EXPECTATION (fixtures/golden-month) ---
+# LOAN-001: 150000.00 at 12% -> monthlyInterest = 1500.00. Matches EXP-001 and EXP-006.
+# LOAN-002:  85000.00 at 12% ->  850.00. Matches EXP-002.
+# LOAN-003:  40000.00 at 14% ->  466.67. Matches EXP-003; balloon = 40000.00 = EXP-005.
+# All three originate on days 15, 10 and 1 — none of them trip OPEN 1, which is exactly
+# why that bug could sit here unnoticed. A loan originated on the 31st would expose it.
