@@ -1,34 +1,8 @@
-# SCRIPT: 10_UI__Set_Hub_Tab
-# FOLDER: 10_UI
-# ROLE: switch the hub's active tab. Thin on purpose.
-# CALLED BY: hub tab buttons ; 30_CONTEXT__Select_Property_Context ; 70_SCHEDULE__Generate_Expected_Schedule
-# CALLS: nothing
-# INPUTS: $p (JSON) — { "tab":<req>, "subtab":<opt> }
-# GLOBALS IN: none
-# RETURNS: { ok, tab } | { ok:false, error }
-# GLOBALS OUT: g_HubTab, optionally g_HubSubTab
-# SIDE EFFECTS: none beyond globals + a window refresh. Writes NO business data.
-#
-# 🥇 STATE: GOLDEN. The 2026-06-18 audit called it "current enough" and it is the only
-#   script that survived that pass unscathed — because it does exactly one thing.
-#
-# THE RULE THAT KEEPS IT USEFUL:
-#   NO heavy data mutation here. Ever. The moment a tab switch starts posting records or
-#   generating schedules, every button on the hub becomes unpredictable and you can no
-#   longer reason about what a click costs. Tab switching is display state.
-#   If a tab needs data prepared, the CALLER prepares it and then calls this.
-#
-# WHY IT VALIDATES THE TAB NAME:
-#   A typo'd tab name would otherwise set a global to garbage and leave the hub on a blank
-#   panel with no error — the layout object just fails to match. Failing loudly on an
-#   unknown tab is cheaper than debugging an empty screen.
-#
-# CHANGELOG:
-#   - 2026-06-18 audited, kept as-is.
-#   - 2026-07-29 ported from ClickUp into a real per-script body; tab-name validation added
-#     because a silent blank panel is the failure mode this script would otherwise have.
+# 10_UI__Set_Hub_Tab
+# Switches the hub's active tab. Display state only, no data mutation.
+# Param (JSON): { tab (req), subtab (opt) }
+# Returns (JSON): { ok, tab }
 
-# --- SETUP ---
 Set Error Capture [ On ]
 Set Variable [ $p ; Value: Get ( ScriptParameter ) ]
 Set Variable [ $tab ; Value: JSONGetElement ( $p ; "tab" ) ]
@@ -38,14 +12,13 @@ If [ IsEmpty ( $tab ) ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "no tab" ; JSONString ] ) ]
 End If
 
-# --- VALIDATE against the known panel set. Keep this list in sync with the hub layout. ---
+# Keep this list in sync with the hub layout's panel names
 Set Variable [ $known ; Value: "Summary¶Schedule¶Ledger¶Receipts¶Payoff¶Documents" ]
 
 If [ not PatternCount ( $known ; $tab ) ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "unknown tab: " & $tab ; JSONString ] ) ]
 End If
 
-# --- SET DISPLAY STATE ---
 Set Field [ GLOBAL_USE_VARIABLES::g_HubTab ; $tab ]
 
 If [ not IsEmpty ( $subtab ) ]

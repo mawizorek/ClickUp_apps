@@ -1,51 +1,19 @@
-# SCRIPT: txn_Rollback
-# FOLDER: 00_APP
-# ROLE: discard every uncommitted write since txn_Begin
-# CALLED BY: any routine that hit an error between txn_Begin and txn_Commit
-# CALLS: nothing
-# INPUTS: $p (JSON, optional) — { "reason":<opt> } for the log line
-# GLOBALS IN: $$TXN_ACTIVE, $$TXN_PARENT_TABLE, $$TXN_PARENT_ID, $$TXN_LABEL
-# RETURNS: { ok, reverted, reason }
-# GLOBALS OUT: clears $$TXN_*
-# SIDE EFFECTS: reverts the parent record and every related record written since txn_Begin
-#
-# HOW ONE REVERT UNDOES MANY RECORDS:
-#   FileMaker holds the open parent AND its related uncommitted records as one editable
-#   state. `Revert Record` on the parent throws all of it away. That is the entire
-#   pre-2023 transaction pattern — no engine transaction, no rollback log, just the
-#   record-locking model used deliberately.
-#
-#   ⚠️ IT ONLY WORKS IF NOTHING COMMITTED IN BETWEEN. If a routine slipped a
-#   `Commit Records` into its loop, those rows are already permanent and this script
-#   CANNOT reach them. It will still report ok:true, because from its position nothing is
-#   pending. **That is why the no-stray-commit rule is the load-bearing part and this
-#   script is only the visible part.**
-#
-# WHY IT IS DELIBERATELY NOT CLEVER:
-#   No compensating deletes, no "find what leaked and clean it up." A repair routine that
-#   hunts down half-written rows is a tool for discovering you already sent a wrong payoff
-#   quote. Prevention only. If the pattern was violated, the correct outcome is a LOUD
-#   failure and a human looking at it — not an automated tidy-up that hides the breach.
-#
-# 🥇 STATE: GOLDEN — designed, not yet built.
-#
-# CHANGELOG:
-#   - 2026-07-29 designed. Option 3 from DL Q3 (accept non-atomic writes + an after-the-fact
-#     repair script) was rejected outright by both Fiona and Dexter, which is why no repair
-#     path exists here by design rather than by omission.
+# txn_Rollback
+# Discards every uncommitted write since txn_Begin by reverting the PARENT record.
+# Param (JSON, optional): { reason }
+# Returns (JSON): { ok, reverted, reason }
+# No repair path by design: if a stray commit leaked rows, this cannot reach them and
+# the correct outcome is a loud failure, not an automated tidy-up.
 
-# --- SETUP ---
 Set Error Capture [ On ]
 Set Variable [ $p ; Value: Get ( ScriptParameter ) ]
 Set Variable [ $reason ; Value: Case ( IsEmpty ( JSONGetElement ( $p ; "reason" ) ) ; "unspecified" ; JSONGetElement ( $p ; "reason" ) ) ]
 
-# --- A rollback with no open transaction is a CALLER BUG, and saying so is the point.
-#     Silently returning ok would hide a routine that thinks it is protected. ---
+# A rollback with no open transaction is a caller bug. Say so.
 If [ $$TXN_ACTIVE <> 1 ]
-	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "txn_Rollback called with no open transaction — caller is not using the wrapper correctly" ; JSONString ] ) ]
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "txn_Rollback called with no open transaction" ; JSONString ] ) ]
 End If
 
-# --- REVERT ON THE PARENT ---
 Go to Layout [ $$TXN_PARENT_TABLE ]
 Enter Find Mode [ Pause: Off ]
 Set Field By Name [ $$TXN_PARENT_TABLE & "::PrimaryKey" ; $$TXN_PARENT_ID ]
@@ -54,8 +22,7 @@ Revert Record/Request [ With dialog: Off ]
 
 Set Variable [ $err ; Value: Get ( LastError ) ]
 
-# --- CLEAR STATE regardless: the transaction is over either way, and leaving $$TXN_ACTIVE
-#     armed would block the next txn_Begin with a phantom "already open". ---
+# Clear state either way, or a phantom open transaction blocks the next txn_Begin
 Set Variable [ $$TXN_ACTIVE ; Value: "" ]
 Set Variable [ $$TXN_ID ; Value: "" ]
 Set Variable [ $$TXN_PARENT_TABLE ; Value: "" ]
@@ -63,13 +30,7 @@ Set Variable [ $$TXN_PARENT_ID ; Value: "" ]
 Set Variable [ $$TXN_LABEL ; Value: "" ]
 
 If [ $err ]
-	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "revert reported error " & $err & " — INSPECT THE DATA MANUALLY" ; JSONString ] ; [ "reason" ; $reason ; JSONString ] ) ]
+	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "revert reported error " & $err & " - INSPECT THE DATA MANUALLY" ; JSONString ] ; [ "reason" ; $reason ; JSONString ] ) ]
 End If
 
 Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; True ; JSONBoolean ] ; [ "reverted" ; True ; JSONBoolean ] ; [ "reason" ; $reason ; JSONString ] ) ]
-
-# --- ACCEPTANCE TEST (run this before trusting the wrapper anywhere) ---
-# Post RCPT-001 (the two-loan check) with a deliberate failure injected after the FIRST
-# PaymentApplications row is written. Correct result: ZERO PaymentApplications rows exist
-# and ZERO AccountTransactions rows exist afterward.
-# If ONE row survives, a stray commit is still in the routine and the wrapper is decorative.

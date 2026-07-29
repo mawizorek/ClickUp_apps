@@ -1,50 +1,11 @@
-# SCRIPT: txn_Begin
-# FOLDER: 00_APP
-# ROLE: open a pseudo-transaction — establish ONE parent record as the write anchor
-# CALLED BY: every routine that writes more than one record
-# CALLS: nothing
-# INPUTS: $p (JSON) — { "parentTable":<req>, "parentID":<req>, "label":<opt> }
-# GLOBALS IN: none
-# RETURNS: { ok, txnID, parentTable, parentID } | { ok:false, error }
-# GLOBALS OUT: $$TXN_ACTIVE, $$TXN_ID, $$TXN_PARENT_TABLE, $$TXN_PARENT_ID, $$TXN_LABEL
-# SIDE EFFECTS: navigates to the parent's layout and isolates the parent record. Writes NO data.
-#
-# 🚨 THERE IS NO ENGINE TRANSACTION UNDERNEATH THIS. READ THAT AGAIN.
-#   FileMaker 19 has no `Open Transaction` step — it arrived in FileMaker 2023 (v20).
-#   Verified against the Claris FMP 20.1.2 release notes and the MBS step-by-version table.
-#   The name `txn_Begin` is a CONVENTION borrowed from databases that really have one.
-#   If you read this name and assume ACID, you will design something that loses money.
-#
-# WHAT ACTUALLY PROVIDES ATOMICITY:
-#   FileMaker holds an uncommitted record and all its RELATED records in one open state
-#   until something commits. So if every write in the routine reaches its table THROUGH
-#   ONE RELATIONSHIP FROM ONE PARENT RECORD, a single `Revert Record` on that parent
-#   discards the entire set. That is the whole mechanism. It is 20 years old and it works.
-#
-# THEREFORE THE TWO RULES THAT MATTER MORE THAN THIS SCRIPT:
-#   1. ONE parent. If a routine legitimately has two parents, it CANNOT be atomic on 19 —
-#      split it, or restructure so the real parent is higher. This is why ReceivedFunds
-#      had to exist before this wrapper: one check across two loans has two Loans parents,
-#      but only ONE receipt.
-#   2. NO `Commit Records` between Begin and Commit. Not one. A stray commit ends the
-#      transaction and makes everything before it permanent — while the wrapper still
-#      reports success. That is the silent-partial-rollback failure, and it is worse than
-#      having no rollback at all, because you believe you were protected.
-#
-# HOW TO USE IT (the shape every write routine takes):
-#   Perform Script [ txn_Begin ; { parentTable:"ReceivedFunds", parentID:$rcptID } ]
-#   ...all writes, through relationships from that parent...
-#   If [ $error ]  Perform Script [ txn_Rollback ]  Exit Script  End If
-#   Perform Script [ txn_Commit ]
-#
-# 🥇 STATE: GOLDEN — designed, not yet built. Build it AFTER tables/ReceivedFunds.md exists.
-#
-# CHANGELOG:
-#   - 2026-07-29 designed. Method ruled by Michael via DL Q3 (rollback + error catching
-#     throughout) with Dexter's call that the mechanism and the wrapper are not
-#     alternatives: build the classic pattern, then wrap it ONCE so no routine improvises.
+# txn_Begin
+# Opens a pseudo-transaction: isolates ONE parent record as the write anchor.
+# There is NO engine transaction in FileMaker 19. Atomicity comes from keeping the
+# parent record uncommitted so Revert Record on it discards every related write.
+# Param (JSON): { parentTable (req), parentID (req), label (opt) }
+# Returns (JSON): { ok, txnID, parentTable, parentID }
+# NO Commit Records between here and txn_Commit. Not one.
 
-# --- SETUP ---
 Set Error Capture [ On ]
 Set Variable [ $p ; Value: Get ( ScriptParameter ) ]
 Set Variable [ $parentTable ; Value: JSONGetElement ( $p ; "parentTable" ) ]
@@ -55,13 +16,11 @@ If [ IsEmpty ( $parentTable ) or IsEmpty ( $parentID ) ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "txn_Begin requires parentTable and parentID" ; JSONString ] ) ]
 End If
 
-# --- REFUSE TO NEST. A nested pseudo-transaction is a lie: the inner Commit would end the
-#     outer one, and the outer Rollback could no longer reach the inner writes. ---
+# Refuse to nest: an inner commit would end the outer transaction
 If [ $$TXN_ACTIVE = 1 ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "transaction already open: " & $$TXN_LABEL ; JSONString ] ) ]
 End If
 
-# --- ISOLATE THE PARENT ---
 Go to Layout [ $parentTable ]
 Enter Find Mode [ Pause: Off ]
 Set Field By Name [ $parentTable & "::PrimaryKey" ; $parentID ]
@@ -71,14 +30,13 @@ If [ Get ( FoundCount ) <> 1 ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "parent not found or not unique" ; JSONString ] ; [ "parentID" ; $parentID ; JSONString ] ) ]
 End If
 
-# --- OPEN THE RECORD so FileMaker starts holding uncommitted state on it ---
+# Open the record so FileMaker begins holding uncommitted state on it
 Open Record/Request
 
 If [ Get ( LastError ) ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "cannot open parent record (locked?) err " & Get ( LastError ) ; JSONString ] ) ]
 End If
 
-# --- ARM THE STATE ---
 Set Variable [ $$TXN_ID ; Value: Get ( UUID ) ]
 Set Variable [ $$TXN_ACTIVE ; Value: 1 ]
 Set Variable [ $$TXN_PARENT_TABLE ; Value: $parentTable ]

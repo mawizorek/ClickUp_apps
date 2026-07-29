@@ -2,273 +2,203 @@
   "_meta": {
     "app": "hml-llc",
     "folder": "scripts",
-    "schemaVersion": "2.2",
+    "schemaVersion": "3.0",
     "generated": "2026-07-29",
-    "model": "ONE master index for the whole Manage Scripts tree. Flat scripts[] array. Rows: name, folder, state, body, calls, scriptRef. The renderer builds the folder tree from each row's `folder` and the CALLS/CALLED-BY graph from `calls[]`; `calledBy` is DERIVED at render time by inverting every row's calls[] and is NEVER stored. Listing is not loading: the tree + graph read only this file; a body is fetched lazily on drill-in.",
+
+    "THREE_FILE_MODEL": "LOCKED 2026-07-29 by Michael: 'every script needs to be known to be hand copied by me into fmp. so no changelogs in the script. less status bullshit in the header.' The split axis is TYPED-vs-NOT-TYPED, not prose-vs-code. (1) <Name>.fmscript = THE COPY TARGET. Select all, copy, dictate into Manage Scripts. Everything in it is meant to be typed: a 4-6 line contract header plus inline # comments that are real script steps. NOTHING else. (2) <Name>.notes.md = status, defects, history, design reasoning, rewrite checklists, fixture expectations. Read on a phone, never typed. (3) this file = machine-readable status + the graph. Full rules: README.md.",
+
+    "whyFileBoundary": "The copy zone must be a WHOLE FILE, never a section above a marker. A `#` line is a valid FileMaker comment step, so over-selecting pastes silently-wrong garbage into a script instead of failing. Whole-file copy is the only version that cannot be got wrong at 2am.",
+
+    "rowProseRule": "Row `note` / `supersededWhy` are ONE-LINERS - the warning that travels with the tree. Detail lives in notesRef and is NOT duplicated here. A long prose note in this manifest is a projection of the sidecar and it is the copy that goes stale.",
+
+    "model": "Flat scripts[] array. The renderer builds the folder tree from each row's `folder` and the CALLS/CALLED-BY graph from `calls[]`; `calledBy` is DERIVED at render time by inverting every row's calls[] and is NEVER stored. Listing is not loading: tree + graph read only this file; a body is fetched lazily on drill-in.",
 
     "bodyValues": {
-      "present": "The .fmscript file EXISTS at scriptRef and contains real content. Safe to drill in.",
-      "pending": "NO FILE EXISTS at scriptRef yet. The row is a tree placeholder. Do NOT link to it as if it were readable."
+      "present": "The .fmscript EXISTS at scriptRef and contains real content. Safe to drill in.",
+      "pending": "NO FILE EXISTS at scriptRef yet. Tree placeholder only. Do NOT link to it as readable."
     },
-    "bodyNote": "⚠️ `body` added 2026-07-29 AFTER A REAL FAILURE, and the failure is the reason the field exists. schemaVersion 2.1 shipped this manifest with 20 rows carrying scriptRef paths, and exactly ONE of those files existed (utilities/commitRecord.fmscript, which predated the commit). The manifest asserted a tree of readable bodies over an almost-empty directory. It is the same defect the README had one commit earlier - a document claiming to mirror something it does not - which makes it the second instance in one PR. A renderer reading 2.1 would have built a full navigable tree where 19 of 20 drill-ins 404. **A pointer is a claim. Never write one for a file you have not created.** Michael, on finding it: 'i'm very confused why scripts doesn't have a per file rendition of each script in the app... not much here is helpful rn.' He was right.",
-
-    "folderTree": ["00_APP", "10_UI", "20_NAV", "30_CONTEXT", "40_BINDER", "50_RECEIPTS", "60_PAYMENTS", "70_SCHEDULE", "80_PAYOFF", "90_ADMIN", "zz_DEV_ARCHIVE"],
-    "folderTreeNote": "CORRECTED 2026-07-29. schemaVersion 2.0 used imports/navigation/triggers/utilities, which matched nothing in the file; README.md carries the struck claim. `utilities` survives as ONE flagged divergence holding the shared commitRecord helper - Michael to confirm whether the live file has that folder.",
-
-    "bodyExtension": ".fmscript",
-    "bodyNature": "DICTATION reference (the exact steps to type into Manage Scripts, narrative as native # comment lines) - NOT paste-round-trippable, because FileMaker's script clipboard is XML. Unlike .fmcalc.",
-    "sourceOfBodies": "Bodies are ported from the ClickUp per-script pages, which held real contracts, step text and in two cases full FMXML. That content was NOT invented here and NOT summarized - it was moved, with defects found during the port flagged inline rather than silently patched.",
-    "keying": "Script names are unique per FileMaker file, so `name` is a safe graph key.",
-    "callsResolution": "calls[] may target a script OR a custom function; the linter resolves against this file first, then functions/_index.json.",
+    "bodyNote": "`body` added 2026-07-29 AFTER A REAL FAILURE. schemaVersion 2.1 shipped 20 rows carrying scriptRef paths when exactly ONE of those files existed. The manifest asserted a tree of readable bodies over an almost-empty directory - the same defect the README had one commit earlier, which made it two instances in one PR. A POINTER IS A CLAIM. Never write one for a file you have not created.",
 
     "stateValues": {
       "golden": "Target design. Build toward it.",
       "built": "Verified present in the FileMaker file on a named date.",
-      "superseded": "DO NOT IMPLEMENT. Written against an older schema. See supersededWhy."
+      "superseded": "DO NOT IMPLEMENT. Written against an older schema."
     },
-    "stateNote": "`state` describes the SCRIPT's standing in the FileMaker file. `body` describes whether DOCUMENTATION exists here. They are independent: a superseded script can have a full body (worth reading, do not build), and a golden script can have no body yet.",
+    "stateNote": "`state` = the SCRIPT's standing in FileMaker. `body` = whether documentation exists here. Independent: a superseded script can have a full body worth reading, and a golden script can have no body yet.",
 
-    "capDiscipline": "Keep rows minimal so this master index stays under the ~30KB read cap. If it crosses, shard by top-level folder behind a pointer - still no renderer change.",
-    "buildOrderNote": "ORDER IS A CORRECTNESS MATTER. On FMP19 there are no native transactions, so atomicity needs every write to flow through ONE relationship from ONE parent record. That parent is the ReceivedFunds receipt. Build the txn_* wrapper before the receipt table exists and the only available parent is Loans - so one check across two loans has TWO parents and Revert Record can only roll back half, shipping a silent partial rollback. Table before wrapper.",
+    "folderTree": ["00_APP", "10_UI", "20_NAV", "30_CONTEXT", "40_BINDER", "50_RECEIPTS", "60_PAYMENTS", "70_SCHEDULE", "80_PAYOFF", "90_ADMIN", "zz_DEV_ARCHIVE"],
+    "folderTreeNote": "CORRECTED 2026-07-29. schemaVersion 2.0 used imports/navigation/triggers/utilities, which matched nothing in the file. `utilities` survives as ONE flagged divergence holding commitRecord - Michael to confirm whether the live file has that folder.",
 
-    "coverage": "7 of 20 bodies present (2026-07-29). Present: txn_Begin, txn_Commit, txn_Rollback, 10_UI__Set_Hub_Tab, 30_CONTEXT__Select_Property_Context, 70_SCHEDULE__Generate_Expected_Schedule, 60_PAYMENTS__Auto_Apply_Waterfall, commitRecord (8 counting the pre-existing helper). Pending bodies still have real content sitting on their ClickUp pages - porting them is mechanical, not a design task."
+    "bodyExtension": ".fmscript",
+    "bodyNature": "DICTATION reference - the exact steps to TYPE into Manage Scripts. NOT paste-round-trippable, because FileMaker's script clipboard is XML. Unlike .fmcalc, which does paste back verbatim. Legibility over round-trip, deliberately - and the copy-target rule is the consequence of that trade.",
+    "sourceOfBodies": "Ported from the ClickUp per-script pages, which held real contracts, step text and in two cases full FMXML. Moved, not invented and not summarized; defects found during the port are flagged in the sidecars rather than silently patched.",
+
+    "keying": "Script names are unique per FileMaker file, so `name` is a safe graph key.",
+    "callsResolution": "calls[] may target a script OR a custom function; the linter resolves against this file first, then functions/_index.json.",
+    "capDiscipline": "Keep rows minimal so this index stays under the ~30KB read cap. Moving prose to the sidecars is what bought the headroom back. If it crosses, shard by top-level folder behind a pointer - still no renderer change.",
+
+    "buildOrderNote": "ORDER IS A CORRECTNESS MATTER. FMP19 has no native transactions, so atomicity needs every write to flow through ONE relationship from ONE parent record. That parent is the ReceivedFunds receipt. Build the txn_* wrapper before the receipt table exists and the only parent available is Loans - so one check across two loans has TWO parents and Revert Record rolls back half, shipping a silent partial rollback. Table before wrapper.",
+
+    "coverage": "7 bodies present of 20 scripts (8 files counting the pre-existing commitRecord). 5 notes sidecars cover those 7 (the txn_* trio shares txn_TRIO.notes.md — one design, three entry points). The 13 pending bodies have real content on their old ClickUp pages; porting is mechanical, not a design task."
   },
   "scripts": [
     {
-      "name": "txn_Begin",
-      "folder": "00_APP",
-      "state": "golden",
-      "body": "present",
-      "buildOrder": 1,
+      "name": "txn_Begin", "folder": "00_APP", "state": "golden", "body": "present", "buildOrder": 1,
       "calls": [],
       "scriptRef": "00_APP/txn_Begin.fmscript",
-      "note": "Isolates ONE parent record as the write anchor and refuses to nest. NO engine transaction underneath - the body says so three times because the name lies."
+      "notesRef": "00_APP/txn_TRIO.notes.md",
+      "note": "Isolates ONE parent as the write anchor. Refuses to nest."
     },
     {
-      "name": "txn_Commit",
-      "folder": "00_APP",
-      "state": "golden",
-      "body": "present",
-      "buildOrder": 2,
+      "name": "txn_Commit", "folder": "00_APP", "state": "golden", "body": "present", "buildOrder": 2,
       "calls": ["commitRecord"],
       "scriptRef": "00_APP/txn_Commit.fmscript",
-      "note": "The ONLY legal Commit Records between Begin and here. Fails loudly and leaves the record uncommitted so the caller owns the rollback."
+      "notesRef": "00_APP/txn_TRIO.notes.md",
+      "note": "The ONLY legal Commit Records in a write routine."
     },
     {
-      "name": "txn_Rollback",
-      "folder": "00_APP",
-      "state": "golden",
-      "body": "present",
-      "buildOrder": 3,
+      "name": "txn_Rollback", "folder": "00_APP", "state": "golden", "body": "present", "buildOrder": 3,
       "calls": [],
       "scriptRef": "00_APP/txn_Rollback.fmscript",
-      "note": "Revert Record on the PARENT discards the whole uncommitted set. Deliberately has NO repair path - prevention only."
+      "notesRef": "00_APP/txn_TRIO.notes.md",
+      "note": "Revert Record on the PARENT discards the whole set. No repair path, by design."
     },
     {
-      "name": "30_CONTEXT__Select_Property_Context",
-      "folder": "30_CONTEXT",
-      "state": "golden",
-      "body": "present",
-      "buildOrder": 4,
+      "name": "30_CONTEXT__Select_Property_Context", "folder": "30_CONTEXT", "state": "golden", "body": "present", "buildOrder": 4,
       "calls": ["10_UI__Set_Hub_Tab"],
       "scriptRef": "30_CONTEXT/30_CONTEXT__Select_Property_Context.fmscript",
-      "note": "Exists to never silently pick the wrong loan. On several open loans it returns resolution:'ambiguous' with the loan global left EMPTY - an empty global is honest, a wrong one is a payment on the wrong note."
+      "notesRef": "30_CONTEXT/30_CONTEXT__Select_Property_Context.notes.md",
+      "note": "Never silently picks a loan. Ambiguous leaves the loan global EMPTY."
     },
     {
-      "name": "10_UI__Set_Hub_Tab",
-      "folder": "10_UI",
-      "state": "golden",
-      "body": "present",
-      "buildOrder": 5,
+      "name": "10_UI__Set_Hub_Tab", "folder": "10_UI", "state": "golden", "body": "present", "buildOrder": 5,
       "calls": [],
       "scriptRef": "10_UI/10_UI__Set_Hub_Tab.fmscript",
-      "note": "Thin by law: NO data mutation. Validates the tab name because a typo would otherwise leave a blank panel with no error."
+      "notesRef": "10_UI/10_UI__Set_Hub_Tab.notes.md",
+      "note": "Thin by law: NO data mutation."
     },
     {
-      "name": "70_SCHEDULE__Generate_Expected_Schedule",
-      "folder": "70_SCHEDULE",
-      "state": "golden",
-      "body": "present",
-      "buildOrder": 6,
+      "name": "70_SCHEDULE__Generate_Expected_Schedule", "folder": "70_SCHEDULE", "state": "golden", "body": "present", "buildOrder": 6,
       "calls": ["10_UI__Set_Hub_Tab", "txn_Begin", "txn_Commit", "txn_Rollback"],
       "scriptRef": "70_SCHEDULE/70_SCHEDULE__Generate_Expected_Schedule.fmscript",
-      "note": "Idempotent via a stable ScheduleKey (fkLoan.fkStandardTransaction.SequenceNumber). ⚠️ TWO OPEN DEFECTS found during the port: Date() month-overflow breaks due dates for loans originated on the 29th-31st, and fkStatus is still a placeholder awaiting the status resolver."
+      "notesRef": "70_SCHEDULE/70_SCHEDULE__Generate_Expected_Schedule.notes.md",
+      "note": "Idempotent via ScheduleKey. TWO OPEN DEFECTS - date overflow on day 29-31, and unset fkStatus. See notes."
     },
     {
-      "name": "50_RECEIPTS__Create_ReceivedFunds_From_Document",
-      "folder": "50_RECEIPTS",
-      "state": "superseded",
-      "body": "pending",
-      "buildOrder": 7,
+      "name": "50_RECEIPTS__Create_ReceivedFunds_From_Document", "folder": "50_RECEIPTS", "state": "superseded", "body": "pending", "buildOrder": 7,
       "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
       "scriptRef": "50_RECEIPTS/50_RECEIPTS__Create_ReceivedFunds_From_Document.fmscript",
-      "supersededWhy": "Mixes the receipt event with ledger posting; property-centered. REWRITE AGAINST ReceivedFunds (Q8 approved 2026-07-29). The irony: this script's own name proves the table was always intended."
+      "supersededWhy": "Mixes the receipt event with ledger posting; property-centered. Rewrite against ReceivedFunds."
     },
     {
-      "name": "60_PAYMENTS__Post_ReceivedFunds_Batch",
-      "folder": "60_PAYMENTS",
-      "state": "superseded",
-      "body": "pending",
-      "buildOrder": 8,
+      "name": "60_PAYMENTS__Post_ReceivedFunds_Batch", "folder": "60_PAYMENTS", "state": "superseded", "body": "pending", "buildOrder": 8,
       "calls": ["60_PAYMENTS__Auto_Apply_Waterfall", "txn_Begin", "txn_Commit", "txn_Rollback"],
       "scriptRef": "60_PAYMENTS/60_PAYMENTS__Post_ReceivedFunds_Batch.fmscript",
-      "supersededWhy": "Allocates across properties instead of loans. Its own doc says it 'does not skip the parent receipt layer' - the sentence that exposed the 9-vs-10 table gap."
+      "supersededWhy": "Allocates across properties instead of loans."
     },
     {
-      "name": "60_PAYMENTS__Auto_Apply_Waterfall",
-      "folder": "60_PAYMENTS",
-      "state": "superseded",
-      "body": "present",
-      "buildOrder": 9,
+      "name": "60_PAYMENTS__Auto_Apply_Waterfall", "folder": "60_PAYMENTS", "state": "superseded", "body": "present", "buildOrder": 9,
       "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
       "scriptRef": "60_PAYMENTS/60_PAYMENTS__Auto_Apply_Waterfall.fmscript",
-      "supersededWhy": "Keys off fkProperty AND commits TWICE PER APPLIED ROW inside its loop. The commits are the worse defect: each one ends the transaction and makes prior rows permanent, so a failure mid-loop leaves the money half-applied while the routine reports success. Full body present - read it, do not build it."
+      "notesRef": "60_PAYMENTS/60_PAYMENTS__Auto_Apply_Waterfall.notes.md",
+      "supersededWhy": "fkProperty-keyed AND commits twice per row inside its loop. Body present - READ it, do not build it."
     },
     {
-      "name": "80_PAYOFF__Create_Payoff_From_Prior_Version",
-      "folder": "80_PAYOFF",
-      "state": "superseded",
-      "body": "pending",
-      "buildOrder": 10,
+      "name": "80_PAYOFF__Create_Payoff_From_Prior_Version", "folder": "80_PAYOFF", "state": "superseded", "body": "pending", "buildOrder": 10,
       "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
       "scriptRef": "80_PAYOFF/80_PAYOFF__Create_Payoff_From_Prior_Version.fmscript",
-      "supersededWhy": "Treats payoff as DOCUMENTS + versions rather than the real Payoffs table under Loans. The snapshot freeze is the second all-or-nothing routine: a partial freeze is a quote that silently changes after it was sent."
+      "supersededWhy": "Treats payoff as DOCUMENTS + versions rather than the real Payoffs table."
     },
     {
-      "name": "80_PAYOFF__Save_Issued_Payoff_To_Binder",
-      "folder": "80_PAYOFF",
-      "state": "superseded",
-      "body": "pending",
-      "buildOrder": 11,
+      "name": "80_PAYOFF__Save_Issued_Payoff_To_Binder", "folder": "80_PAYOFF", "state": "superseded", "body": "pending", "buildOrder": 11,
       "calls": [],
       "scriptRef": "80_PAYOFF/80_PAYOFF__Save_Issued_Payoff_To_Binder.fmscript",
-      "supersededWhy": "Same payoff-as-document assumption; rewrite together with Create_Payoff_From_Prior_Version."
+      "supersededWhy": "Same payoff-as-document assumption; rewrite with its sibling."
     },
     {
-      "name": "40_BINDER__New_Document_From_Capture",
-      "folder": "40_BINDER",
-      "state": "superseded",
-      "body": "pending",
+      "name": "40_BINDER__New_Document_From_Capture", "folder": "40_BINDER", "state": "superseded", "body": "pending",
       "calls": [],
       "scriptRef": "40_BINDER/40_BINDER__New_Document_From_Capture.fmscript",
-      "supersededWhy": "Older binder-ID assumptions; unverified against the locked text-key direction. Documents are OUT of v1 scope, so this waits."
+      "supersededWhy": "Older binder-ID assumptions. Documents are out of v1 scope, so this waits."
     },
     {
-      "name": "20_NAV__Open_Related_Loan_From_Property",
-      "folder": "20_NAV",
-      "state": "superseded",
-      "body": "pending",
+      "name": "20_NAV__Open_Related_Loan_From_Property", "folder": "20_NAV", "state": "superseded", "body": "pending",
       "calls": [],
       "scriptRef": "20_NAV/20_NAV__Open_Related_Loan_From_Property.fmscript",
-      "supersededWhy": "Directionally right but unverified against the newer hub selector behavior."
+      "supersededWhy": "Directionally right but unverified against the newer hub selector."
     },
     {
-      "name": "70_SCHEDULE__Assess_Late_Fees",
-      "folder": "70_SCHEDULE",
-      "state": "golden",
-      "body": "pending",
+      "name": "70_SCHEDULE__Assess_Late_Fees", "folder": "70_SCHEDULE", "state": "golden", "body": "pending",
       "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
       "scriptRef": "70_SCHEDULE/70_SCHEDULE__Assess_Late_Fees.fmscript",
-      "note": "Deferred past the first wave. Must support assessed-then-waived (OriginalAmount vs AdjustedAmount) - fixture row EXP-004 is the test."
+      "note": "Deferred. Must support assessed-then-waived; fixture EXP-004 is the test."
     },
     {
-      "name": "60_PAYMENTS__Reverse_Posted_Payment",
-      "folder": "60_PAYMENTS",
-      "state": "golden",
-      "body": "pending",
+      "name": "60_PAYMENTS__Reverse_Posted_Payment", "folder": "60_PAYMENTS", "state": "golden", "body": "pending",
       "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
       "scriptRef": "60_PAYMENTS/60_PAYMENTS__Reverse_Posted_Payment.fmscript",
-      "note": "Deferred, but MUCH cheaper with ReceivedFunds: void one receipt and its applications cascade, instead of hunting derived rows."
+      "note": "Deferred, but much cheaper with ReceivedFunds: void one receipt, applications cascade."
     },
     {
-      "name": "90_ADMIN__Seed_Standard_Transactions",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Seed_Standard_Transactions", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": [],
       "scriptRef": "90_ADMIN/90_ADMIN__Seed_Standard_Transactions.fmscript",
-      "note": "Cheap helper, but it must settle whether `Payment Received` survives as a type once ReceivedFunds exists - see BUILD-SHEET consequences. Note 70_SCHEDULE hard-fails without this seeded."
+      "note": "70_SCHEDULE hard-fails without this seeded. Must settle whether `Payment Received` survives."
     },
     {
-      "name": "90_ADMIN__Refresh_ClickUp_Field_Catalog_For_Scope",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Refresh_ClickUp_Field_Catalog_For_Scope", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": [],
       "scriptRef": "90_ADMIN/90_ADMIN__Refresh_ClickUp_Field_Catalog_For_Scope.fmscript",
-      "note": "Field-ID utility trio, Option B. Out of v1 scope; indexed so the integration lane stays visible."
+      "note": "Field-ID trio, Option B. Out of v1 scope."
     },
     {
-      "name": "90_ADMIN__Resolve_ClickUp_Field_ID_By_Key",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Resolve_ClickUp_Field_ID_By_Key", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": [],
       "scriptRef": "90_ADMIN/90_ADMIN__Resolve_ClickUp_Field_ID_By_Key.fmscript",
-      "note": "Keeps vendor UUIDs centralized instead of leaking into production scripts."
+      "note": "Keeps vendor UUIDs out of production scripts."
     },
     {
-      "name": "90_ADMIN__Refresh_ClickUp_Field_Map_IDs_For_Target",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Refresh_ClickUp_Field_Map_IDs_For_Target", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": ["90_ADMIN__Resolve_ClickUp_Field_ID_By_Key"],
       "scriptRef": "90_ADMIN/90_ADMIN__Refresh_ClickUp_Field_Map_IDs_For_Target.fmscript",
-      "note": "Batch-repairs one sync target's field maps against the live catalog."
+      "note": "Batch-repairs one sync target's field maps."
     },
     {
-      "name": "90_ADMIN__Push_Property_To_ClickUp_Task",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Push_Property_To_ClickUp_Task", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": ["90_ADMIN__Create_ClickUp_Task"],
       "scriptRef": "90_ADMIN/90_ADMIN__Push_Property_To_ClickUp_Task.fmscript",
-      "note": "v1 publish-first contract: create the base operational task shell from the current property. Was missing from the 2.1 inventory entirely."
+      "note": "Publish-first: create the operational task shell from the current property."
     },
     {
-      "name": "90_ADMIN__Create_ClickUp_Task",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Create_ClickUp_Task", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": [],
       "scriptRef": "90_ADMIN/90_ADMIN__Create_ClickUp_Task.fmscript",
-      "note": "API quartet 1 of 4: create the task shell, return/store the linked task ID. Was missing from 2.1."
+      "note": "API quartet 1 of 4: task shell, return the linked ID."
     },
     {
-      "name": "90_ADMIN__Push_ClickUp_Task_Summary",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Push_ClickUp_Task_Summary", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": [],
       "scriptRef": "90_ADMIN/90_ADMIN__Push_ClickUp_Task_Summary.fmscript",
-      "note": "API quartet 2 of 4: push the readable human summary layer. Was missing from 2.1."
+      "note": "API quartet 2 of 4: the readable human summary layer."
     },
     {
-      "name": "90_ADMIN__Set_ClickUp_Task_Custom_Field",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Set_ClickUp_Task_Custom_Field", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": ["90_ADMIN__Resolve_ClickUp_Field_ID_By_Key"],
       "scriptRef": "90_ADMIN/90_ADMIN__Set_ClickUp_Task_Custom_Field.fmscript",
-      "note": "API quartet 3 of 4: write ONE explicit structured custom-field value. Was missing from 2.1."
+      "note": "API quartet 3 of 4: ONE structured custom-field value."
     },
     {
-      "name": "90_ADMIN__Update_ClickUp_Task_Core_Properties",
-      "folder": "90_ADMIN",
-      "state": "golden",
-      "body": "pending",
+      "name": "90_ADMIN__Update_ClickUp_Task_Core_Properties", "folder": "90_ADMIN", "state": "golden", "body": "pending",
       "calls": [],
       "scriptRef": "90_ADMIN/90_ADMIN__Update_ClickUp_Task_Core_Properties.fmscript",
-      "note": "API quartet 4 of 4: due date, priority, status - a separate lane from custom fields on purpose. Was missing from 2.1."
+      "note": "API quartet 4 of 4: built-in task properties, a separate lane from custom fields."
     },
     {
-      "name": "commitRecord",
-      "folder": "utilities",
-      "state": "built",
-      "body": "present",
+      "name": "commitRecord", "folder": "utilities", "state": "built", "body": "present",
       "calls": ["MSG_ValueListErrors"],
       "scriptRef": "utilities/commitRecord.fmscript",
-      "note": "Shared cross-app standard helper, and the ONLY body that existed before 2026-07-29. FOLDER IS A FLAGGED DIVERGENCE - the documented FMP tree has no `utilities`."
+      "notesRef": "utilities/commitRecord.notes.md",
+      "note": "Shared cross-app helper. FOLDER IS A FLAGGED DIVERGENCE - the documented FMP tree has no `utilities`."
     }
   ]
 }
