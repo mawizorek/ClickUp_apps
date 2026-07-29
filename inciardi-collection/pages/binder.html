@@ -1,0 +1,19 @@
+<section class="page">
+  <h1>Binder</h1>
+  <p class="sub">Nine slots a side, two sides a sheet. Tap any slot to fill or change it.</p>
+
+  <div class="row">
+    <select id="sheetSel" aria-label="Sheet"></select>
+    <button id="newSheet">Add sheet</button>
+  </div>
+
+  <div id="sheetWrap" style="margin-top:var(--gap-lg,20px)"></div>
+
+  <aside id="pickWrap" class="drawer" hidden aria-label="Fill slot"></aside>
+
+  <p class="hint" style="margin-top:1.5rem">
+    <b>Dotted</b> = empty, nothing recorded. <b>Dashed</b> = a print you want but don't own yet.
+    Solid = owned. Owned and wanted are worked out from what you actually have, so they can never
+    disagree with your collection.
+  </p>
+</section>

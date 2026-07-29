@@ -1,0 +1,77 @@
+<section class="page">
+  <h1>Enter a print</h1>
+  <p class="sub">Name is the only thing required. Everything else can come later.</p>
+
+  <form id="enterForm" autocomplete="off">
+    <label for="f_name">Name</label>
+    <input id="f_name" required placeholder="e.g. Luna Moth" autofocus>
+
+    <p class="hint">Stored as <span id="idEcho" class="num">—</span> — permanent identity.
+       The display name can change later; this cannot.</p>
+
+    <label for="f_id">Override the id (rarely)</label>
+    <input id="f_id" placeholder="leave blank unless the derived one is wrong">
+
+    <div class="grid2">
+      <div>
+        <label for="f_category">Category</label>
+        <select id="f_category">
+          <option value="mini" selected>mini print</option>
+          <option value="big-riso">big riso</option>
+          <option value="linocut">linocut</option>
+          <option value="pack">pack</option>
+        </select>
+      </div>
+      <div>
+        <label for="f_edtype">Edition type</label>
+        <select id="f_edtype">
+          <option value="open" selected>open — reprinted freely</option>
+          <option value="limited">limited — a run of N</option>
+          <option value="unique">unique — one of a kind</option>
+        </select>
+      </div>
+    </div>
+    <p class="hint"><b>Category is size, edition type is how many exist.</b> A mini print can be
+       any of the three — Brooklyn Ginkgo is a mini <em>and</em> unique.</p>
+
+    <div class="grid2">
+      <div>
+        <label for="f_collection">Collection</label>
+        <input id="f_collection" placeholder="e.g. spring — optional">
+      </div>
+      <div>
+        <label for="f_retail">Retail</label>
+        <input id="f_retail" type="number" step="0.01" min="0" placeholder="18.00">
+      </div>
+    </div>
+    <p class="hint">Retail is <b>dollars</b>. Not cents.</p>
+
+    <div class="check">
+      <input type="checkbox" id="f_own" checked>
+      <label for="f_own">I have this one</label>
+    </div>
+
+    <div id="qtyWrap" class="grid2">
+      <div>
+        <label for="f_qty">How many</label>
+        <input id="f_qty" type="number" min="1" step="1" value="1">
+      </div>
+      <div>
+        <label for="f_where">Where from</label>
+        <input id="f_where" placeholder="shop · vending machine · trade · gift">
+      </div>
+    </div>
+
+    <label for="f_notes">Notes</label>
+    <textarea id="f_notes" rows="2" placeholder="anything worth remembering"></textarea>
+
+    <div class="row">
+      <button id="enterBtn" type="submit" class="primary">Save print</button>
+    </div>
+  </form>
+
+  <div id="enterOut" class="out" hidden></div>
+
+  <p class="hint" style="margin-top:1.5rem">Saving writes the artwork, and the database creates its
+     edition in the same transaction. Nothing else has to be running for this to work.</p>
+</section>
