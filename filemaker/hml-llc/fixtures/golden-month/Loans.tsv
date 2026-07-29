@@ -1,0 +1,4 @@
+PrimaryKey	fkProperty	fkBorrower	LoanNumber	OriginationDate	PrincipalAmount	InterestRate	LoanTerm_inDays	MaturityDate	ServicingStatus
+LOAN-001	PROP-001	ORG-001	2025-1420-A	2025-10-15	150000.00	0.12	365	2026-10-15	Active
+LOAN-002	PROP-002	ORG-001	2026-0088-A	2026-01-10	85000.00	0.12	180	2026-07-09	Active
+LOAN-003	PROP-001	ORG-001	2025-1420-B	2025-06-01	40000.00	0.14	365	2026-06-01	Paid Off

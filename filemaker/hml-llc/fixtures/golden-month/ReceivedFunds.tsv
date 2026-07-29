@@ -1,0 +1,5 @@
+PrimaryKey	ReceivedDate	Amount	ReceivedMethod	ExternalRef	fkBorrower	ReconciliationStatus	Notes
+RCPT-001	2026-03-12	1966.67	Check	4471	ORG-001	Applied	ONE CHECK TWO LOANS - Elm interest plus Elm-B interest
+RCPT-002	2026-03-14	400.00	Venmo		ORG-001	Partially Applied	Short payment on Ridge Rd interest
+RCPT-003	2026-03-20	40000.00	Wire	FEDWIRE-88214	ORG-001	Applied	Payoff of LOAN-003
+RCPT-004	2026-03-28	850.00	Check	4488		Unassigned	MEMO ILLEGIBLE - cash in hand, loan unknown

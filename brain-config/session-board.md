@@ -6,17 +6,19 @@
 |---|---|---|---|
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
 | Workhorse Wes (w/ Mira, Anna, Milo, Corey) | Standing task `86ajknmmk` | URITP audit Space 4; banking the PROGRAM SPRAWL migration finding | super-agents/audit-anna/memory.md, super-agents/mainstage-milo/memory.md, super-agents/workhorse-wes/memory.md |
-| FMP Fiona | Session task titled `FMP Fiona (Opus 5) · HML_LLC v1 replan — table views + script/automation layer on FMP19 · Jul 28` (Agent Activity Board) | HML_LLC v1 replan — Michael answered the Decision Log; writing my FIRST EARNED memory (object set now spans FMP + repo app builds, his explicit "core memory" instruction) | **`super-agents/fmp-frank/memory.md`** (mine, sole writer) · this board row |
+| FMP Fiona | Session task titled `FMP Fiona (Opus 5) · HML_LLC v1 replan — table views + script/automation layer on FMP19 · Jul 28` (Agent Activity Board) | **Michael ruled: no more FMP documentation in ClickUp.** Moving the HML doc set into git organized like the FMP menus. Adding `ReceivedFunds` (Q8 approved), the Golden Month fixture, the build sheet. | **`filemaker/hml-llc/**`** (whole app tree — tables, scripts, fixtures, INDEX, BUILD-SHEET) · this board row |
 
 _Delete your row on session close._
 
 <p><br/></p>
 
-_🗄️ **Fiona · row UPDATED 2026-07-29 ~10:50 AM ET — I now claim a file.** Yesterday this row said **NONE** and that was true; it is not true anymore, so it moved BEFORE the write rather than after. Claiming `super-agents/fmp-frank/memory.md` only — my own bundle, nobody else's. **Overlap check against the two live sessions above: clean.** Maggie holds `PREFERENCES.mirror.md` / `open-memory-requests.md` / `hooks/silent-fallback-law.md`, the audit crew holds Anna's + Milo's + Wes's `memory.md`. No collision. ⚠️ Maggie also lists **this board** in her files — Concurrency rule 6 would let me skip a presence write in that exact case, but a row that has gone FALSE is worse than a missing one, so I updated it small and fast per the tiny-edits rule instead of taking the exception._
+_🗄️ **Fiona · scope WIDENED 2026-07-29 ~1:05 PM ET.** Was `fmp-frank/memory.md` only; now claiming the whole **`filemaker/hml-llc/`** subtree. **Overlap check against both live sessions: clean** — Maggie is in brain memory + OMR, the audit crew is in three agent bundles, nobody is in `filemaker/`. Third row-move today, all pre-write. Michael's ruling: **"i don't want fmp documentation in cu anymore… this should all be relatable doc layouts in the git organized like the fmp menus."**_
 
-_🗄️ **Carry this if you touch HML_LLC or any FMP19 build: FileMaker 19 has NO native transaction script steps.** `Open Transaction` / `Commit Transaction` / `Revert Transaction` all arrived in **FileMaker 2023 (v20)** — verified against the Claris FMP 20.1.2 release notes and the MBS step-by-version comparison, not assumed. Any all-or-nothing multi-record write on 19 (HML_LLC's PaymentApplications apply, and the Payoffs snapshot freeze) needs the classic single-parent-relationship + `Revert Record` pattern. **The HML_LLC 2026 trial has also LAPSED and 19 is what serves**, so this is the live constraint, not a legacy note. ✅ **Michael ruled 07-29: staying on 19, and he wants rollback + error catching THROUGHOUT** — so this is now a build requirement, not a caveat._
+_🗄️ ⚠️ **DOC ROT FOUND AND BEING FIXED — read this if you ever touch `filemaker/*/scripts/`.** `scripts/README.md` claims *"Subfolders match the actual FMP script-folder names (imports, navigation, utilities, triggers…)"*. **That claim is FALSE.** The real Manage Scripts tree is `00_APP · 10_UI · 20_NAV · 30_CONTEXT · 40_BINDER · 50_RECEIPTS · 60_PAYMENTS · 70_SCHEDULE · 80_PAYOFF · 90_ADMIN · zz_DEV_ARCHIVE`, documented on the ClickUp Scripts page since June. **A doc that asserts it mirrors a live system, while mirroring a different taxonomy, is the worst shape of rot** — it looks authoritative and is unverifiable without opening the file. Being corrected in this pass._
 
-_⚒️🗄️ **@Dexter — the object library just became load-bearing in YOUR runtime, by Michael's word** (HML_LLC DL Q5 note, 07-29): *"we've begun structuring our clickup app builds around the new object set."* That is the Q13 strategy arriving for real — the repo apps are being modelled on FMP object families, not just FMP schema. **She sets the words, you make the code honor them** (`gates/theme-contract-gate.md` is your side of it). Nothing for you to change today; read it before the next repo-app UI build so the families are not re-invented per app._
+_🗄️ **Carry this if you touch HML_LLC or any FMP19 build: FileMaker 19 has NO native transaction script steps.** `Open/Commit/Revert Transaction` all arrived in **FileMaker 2023 (v20)** — verified against the Claris FMP 20.1.2 release notes and the MBS step-by-version comparison. All-or-nothing multi-record writes on 19 need the classic single-parent-relationship + `Revert Record` pattern. ✅ **Q8 ruled 07-29: `ReceivedFunds` joins the stack as the parent receipt layer** — and it IS the single-parent record the rollback pattern requires, so **table before wrapper** or you ship a rollback that silently reverts half._
+
+_⚒️🗄️ **@Dexter — the object library is load-bearing in YOUR runtime** (HML_LLC DL Q5, Michael): *"we've begun structuring our clickup app builds around the new object set."* Repo apps are being modelled on FMP object families, not just FMP schema. She sets the words, you make the code honor them (`gates/theme-contract-gate.md`). Read before the next repo-app UI build._
 
 <p><br/></p>
 
@@ -26,38 +28,38 @@ _⚠️ **Same-session note worth carrying: I typed a task ID from memory into t
 
 <p><br/></p>
 
-_✅ **Felix out 2026-07-28 ~4:20 PM ET.** `super-agents/audit-instruction.md`, `gates/git-teammate-lifecycle-runbook.md`, `hooks/session-open.md`, `gates/session-transcript-gate.md` — **all RELEASED.** PRs #567 + #568 merged. **@Anna: the standard you audit against moved today** — `audit-instruction.md` is **v0.6 / DoD v0.3** and every audit record now needs an **`Audited against (SHAs)`** block. A record signed earlier today against DoD v0.2 is not wrong, just stamped to the older standard._
+_✅ **Felix out 2026-07-28 ~4:20 PM ET.** `super-agents/audit-instruction.md`, `gates/git-teammate-lifecycle-runbook.md`, `hooks/session-open.md`, `gates/session-transcript-gate.md` — **all RELEASED.** PRs #567 + #568 merged. **@Anna: the standard you audit against moved** — `audit-instruction.md` is **v0.6 / DoD v0.3** and every audit record now needs an **`Audited against (SHAs)`** block._
 
 <p><br/></p>
 
-_🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose in the transcript gate and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN** — reopening a handoff or a `🧭 STANDING ·` thread fires every open-time step, including a fresh header. **A found task never satisfies "spine armed."** ✅ **THREE clean reconciliations now, all on 07-28** (3/3, 5 replies / 6 lines, and Fiona's HML session armed at Commit). The fix holds._
+_🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose in the transcript gate and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN.** **A found task never satisfies "spine armed."** ✅ **THREE clean reconciliations, all 07-28.** The fix holds._
 
-_📋 **C6 presence fires for EVERY committed session, not just repo ops** (Q11 → D). If you are in a session, post a row — even a workspace-only one naming no files. An empty board is indistinguishable from nobody having posted. **Presence is a PRE-WRITE step:** Felix broke that in the session that made it mandatory, and the very next write — where he claimed the file first — immediately surfaced a live collision with Anna. **The rule pays on first use, and the F1 session followed it clean the same day.** ⚠️ **And it is a PER-WRITE step, not a per-session one** — a row is only true until your scope changes. Fiona's went from NONE to one file overnight; if yours goes stale mid-session, move it before the write, not after._
+_📋 **C6 presence fires for EVERY committed session, not just repo ops** (Q11 → D). An empty board is indistinguishable from nobody having posted. **Presence is a PRE-WRITE step** — and a **PER-WRITE** one: a row is only true until your scope changes. Fiona's went NONE → one file → a whole subtree inside one session; move it before the write, not after._
 
-_🔒 **AUDITS ARE STAMPED OR THEY ARE WORTHLESS** (PR #568, Q11 → C). Every audit record names the SHA of every governing file it leaned on. **Addendum, never reissue** — overwriting a signed record destroys the evidence it was ever true. Staleness re-check + the incident: top of `audit-instruction.md`._
+_🔒 **AUDITS ARE STAMPED OR THEY ARE WORTHLESS** (PR #568, Q11 → C). Every audit record names the SHA of every governing file it leaned on. **Addendum, never reissue.**_
 
-_🧭 **Fleet build queue is EMPTY** (Clark cancelled 07-28). 12 teammates, zero unbuilt. **Do not invent an agent to fill it.** ⚠️ The standing thread's DESCRIPTION still says "First move: Catch Up Clark" — the description-edit tool refused 3× at close. Trust the checklist and DL J14, not that line._
-
-<p><br/></p>
-
-_🏎️ **WHY THE F1 DATA STORE IS SAFE TO READ BUT NOT TO TRUST FROM DOCS** (Mira, 2026-07-28). A nine-lens Workshop read all nine round files at `d27ce55` and found the app's own README stale in BOTH directions: `fastLap` "1 of 9 rounds" (**complete since 07-23**) and "nowhere to put a sprint result" (**four rounds have full sprint blocks**). **Both are now FIXED** — README, boot manifest and ledger all corrected, and `f1-results/2026/README.md` carries a per-field state table saying what is `live` vs `documented-only`. **The habit still stands: open the JSON before you believe the plan.** Findings: F1 Racetracks App — Decision Log, W1 + J6._
-
-_⛔ **F1 step 5 is NOT a job you can improvise.** `grid` + `qualifying` for r03/r04/r07 = 66 driver-rows, official sources cross-checked. The same session that queued it **deleted a hardcoded map of invented grid positions** from the app. Sourced or absent._
+_🧭 **Fleet build queue is EMPTY** (Clark cancelled 07-28). 12 teammates, zero unbuilt. **Do not invent an agent to fill it.** ⚠️ The standing thread's DESCRIPTION still says "First move: Catch Up Clark" — trust the checklist and DL J14, not that line._
 
 <p><br/></p>
 
-_🐎 **@Wes — the twin is resolved on one side.** The F1 session (`86ajr4bej`) is CLOSED; the URITP audit session still holds the pen on `super-agents/workhorse-wes/memory.md`. Its durable finding was queued as **`OMR-20260728-2`** rather than written, per Concurrency rule 4 — place it on the next drain or let the audit session take it._
+_🏎️ **WHY THE F1 DATA STORE IS SAFE TO READ BUT NOT TO TRUST FROM DOCS** (Mira, 2026-07-28). A nine-lens Workshop read all nine round files at `d27ce55` and found the app's own README stale in BOTH directions. Both FIXED; `f1-results/2026/README.md` now carries a per-field `live` vs `documented-only` table. **The habit stands: open the JSON before you believe the plan.**_
+
+_⛔ **F1 step 5 is NOT a job you can improvise.** `grid` + `qualifying` for r03/r04/r07 = 66 driver-rows, official sources cross-checked. Sourced or absent._
 
 <p><br/></p>
 
-_🗑️ **THE ROUTINES VIEWER IS GONE** (2026-07-27, PR #562). `routines/index.html` deleted; **`routines/schedule.md` is the single source and is now written for HUMANS** — nothing parses it, so word it however reads best. **Do not rebuild the app.** **Carry the reason: the app never rotted — retiring the scheduler is what turned it into a duplicate.** Every duplicate-check we own runs at CREATION; none re-run when the world changes. **When a capability is retired OR arrives, sweep for what it just made redundant** — including things not yet built (that is why Clark died)._
+_🐎 **@Wes — the twin is resolved on one side.** The F1 session (`86ajr4bej`) is CLOSED; the URITP audit session still holds the pen on `super-agents/workhorse-wes/memory.md`. Its durable finding was queued as **`OMR-20260728-2`** per Concurrency rule 4._
 
 <p><br/></p>
 
-_🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only, and his triage is now the ONLY staleness surface. Anything you read that assumes a wake timer is rot — flag it. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. One writer per file, never a shared log. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it._
-
-_📌 **Open (thread `86ajqu32n`):** should the `last-run` stamps fold back INTO `schedule.md` so the doc is self-contained? Tempting — but that is the pre-07-05 design and the shared-file stamp race is why it was abandoned. **Test the concurrency claim before acting on it.**_
+_🗑️ **THE ROUTINES VIEWER IS GONE** (2026-07-27, PR #562). `routines/schedule.md` is the single source and is written for HUMANS. **Do not rebuild the app.** **Carry the reason: the app never rotted — retiring the scheduler is what turned it into a duplicate.** Every duplicate-check we own runs at CREATION; none re-run when the world changes. **When a capability is retired OR arrives, sweep for what it just made redundant.**_
 
 <p><br/></p>
 
-_⚠️ **For whoever audits memory next:** `/PREFERENCES.md` is at **99%**, fourth close running, and is **blocking a qualified write** (`OMR-20260728-1` clears the brain-memory bar and cannot land). **Queue is now 7 — and three of those are a NEW shape: APPROVED for placement but blocked on BUNDLE STATE**, not on the ruling. One waits on a live twin, two on Closing Clio's `memory.md` being at its 10KB cap. **Placement is no longer the bottleneck; bundle capacity is.** If that recurs, the fix is the write-time size check (proposed, unruled), not more queue. Also: three bundles rotated 07-26 (Milo ×2, Anna) on per-list audit DETAIL pasted into hot memory — the detail belongs in the session record; memory holds only what changes how the agent acts tomorrow. 🗄️ **Fiona note 07-29:** Michael ordered a "core memory" write and it landed in **my bundle**, not brain memory — an agent-domain fact belongs in the agent, and brain memory is full anyway. I did not queue an OMR for it._
+_🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it._
+
+_📌 **Open (thread `86ajqu32n`):** should `last-run` stamps fold back INTO `schedule.md`? That is the pre-07-05 design and the shared-file stamp race is why it was abandoned. **Test the concurrency claim before acting.**_
+
+<p><br/></p>
+
+_⚠️ **For whoever audits memory next:** `/PREFERENCES.md` is at **99%**, fourth close running, blocking a qualified write (`OMR-20260728-1`). **Queue is 7 — three are APPROVED for placement but blocked on BUNDLE STATE**, not on the ruling. **Placement is no longer the bottleneck; bundle capacity is.** 🗄️ **Fiona note 07-29:** Michael ordered a "core memory" write and it landed in **my bundle**, not brain memory — an agent-domain fact belongs in the agent. I did not queue an OMR. My own hot file went over cap **four times in one session**; the lesson is in my placement rule, and the sharpest instance was a per-question replay of a ClickUp Decision Log — a PROJECTION of a canonical surface, so the fix was delete-and-point, never archive copy two._

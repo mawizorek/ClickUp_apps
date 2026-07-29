@@ -1,0 +1,5 @@
+PrimaryKey	fkLoan	fkReceivedFunds	fkStandardTransaction	Date	Amount	Description	ReceivedMethod	ExternalRef
+ACCT-001	LOAN-001	RCPT-001	STX-001	2026-03-12	1500.00	Interest payment - March	Check	4471
+ACCT-002	LOAN-003	RCPT-001	STX-001	2026-03-12	466.67	Interest payment - March	Check	4471
+ACCT-003	LOAN-002	RCPT-002	STX-001	2026-03-14	400.00	Partial interest payment - March	Venmo	
+ACCT-004	LOAN-003	RCPT-003	STX-002	2026-03-20	40000.00	Principal payoff	Wire	FEDWIRE-88214

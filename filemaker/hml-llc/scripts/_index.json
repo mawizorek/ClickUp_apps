@@ -2,22 +2,195 @@
   "_meta": {
     "app": "hml-llc",
     "folder": "scripts",
-    "schemaVersion": "2.0",
-    "generated": "2026-07-16",
-    "model": "ONE master index for the whole Manage Scripts tree. Flat scripts[] array (parallels calculations/_index.json). Minimal rows only: name, folder, calls, scriptRef. The renderer builds the folder tree from each row's `folder` and the CALLS/CALLED-BY graph from `calls[]`; `calledBy` is DERIVED at render time by inverting every row's calls[] and is NEVER stored. Listing is not loading: the tree + graph read only this file; a body is fetched lazily, one at a time, on drill-in.",
+    "schemaVersion": "2.1",
+    "generated": "2026-07-29",
+    "model": "ONE master index for the whole Manage Scripts tree. Flat scripts[] array. Minimal rows: name, folder, state, calls, scriptRef. The renderer builds the folder tree from each row's `folder` and the CALLS/CALLED-BY graph from `calls[]`; `calledBy` is DERIVED at render time by inverting every row's calls[] and is NEVER stored. Listing is not loading: the tree + graph read only this file; a body is fetched lazily on drill-in.",
+    "folderTree": ["00_APP", "10_UI", "20_NAV", "30_CONTEXT", "40_BINDER", "50_RECEIPTS", "60_PAYMENTS", "70_SCHEDULE", "80_PAYOFF", "90_ADMIN", "zz_DEV_ARCHIVE"],
+    "folderTreeNote": "CORRECTED 2026-07-29. schemaVersion 2.0 used imports/navigation/triggers/utilities, which matched nothing in the file; README.md carries the struck claim and why that shape of rot is the dangerous kind. `utilities` survives as ONE flagged divergence holding the shared commitRecord helper - Michael to confirm whether the live file has that folder.",
     "bodyExtension": ".fmscript",
-    "bodyNature": "DICTATION reference (the exact steps to type into Manage Scripts, narrative as native # comment lines) — NOT paste-round-trippable, because FileMaker's script clipboard is XML, not plain text. Unlike .fmcalc.",
-    "keying": "Script names are unique per FileMaker file, so `name` is a safe graph key (calc fields needed <Table>__<Field> because they are not unique; scripts are).",
-    "callsResolution": "calls[] may target a script OR a custom function; the linter resolves each against this file first, then functions/_index.json.",
-    "capDiscipline": "Keep rows minimal so this master index stays under the ~30KB read cap (~90 bytes/row). If a solution ever crosses it, shard by top-level folder behind a pointer — still no renderer change.",
-    "status": "Skeleton. Only commitRecord is populated (shared standard helper). Real HML script inventory pending a live-file DDR enumeration pass."
+    "bodyNature": "DICTATION reference (the exact steps to type into Manage Scripts, narrative as native # comment lines) - NOT paste-round-trippable, because FileMaker's script clipboard is XML. Unlike .fmcalc.",
+    "keying": "Script names are unique per FileMaker file, so `name` is a safe graph key.",
+    "callsResolution": "calls[] may target a script OR a custom function; the linter resolves against this file first, then functions/_index.json.",
+    "stateValues": {
+      "golden": "Target design. Build toward it.",
+      "built": "Verified present in the file on a named date.",
+      "superseded": "DO NOT IMPLEMENT. Written against an older schema. See supersededWhy."
+    },
+    "stateNote": "`state` added 2026-07-29. The ClickUp source pages carried a 2026-06-18 self-audit naming 5 scripts as needing rewrite and 2 as needing review, and six weeks passed with nothing moved - because the finding lived in a status table instead of on the object. Now the warning travels with the thing it warns about.",
+    "capDiscipline": "Keep rows minimal so this master index stays under the ~30KB read cap. If it crosses, shard by top-level folder behind a pointer - still no renderer change.",
+    "buildOrderNote": "`buildOrder` reflects the v1 build sequence. ORDER IS A CORRECTNESS MATTER, not a preference: on FMP19 there are no native transactions, so atomicity needs every write in a transaction to flow through ONE relationship from ONE parent record. That parent is the ReceivedFunds receipt. Build the txn_* wrapper before the receipt table exists and the only available parent is Loans - so one check across two loans has TWO parents and Revert Record can only roll back half, shipping a silent partial rollback. Table before wrapper."
   },
   "scripts": [
     {
+      "name": "txn_Begin",
+      "folder": "00_APP",
+      "state": "golden",
+      "buildOrder": 1,
+      "calls": [],
+      "scriptRef": "00_APP/txn_Begin.fmscript",
+      "note": "Set Error Capture [On], establish the single parent context. NO engine transaction underneath - say so in the comments."
+    },
+    {
+      "name": "txn_Commit",
+      "folder": "00_APP",
+      "state": "golden",
+      "buildOrder": 2,
+      "calls": ["commitRecord"],
+      "scriptRef": "00_APP/txn_Commit.fmscript",
+      "note": "The ONLY place Commit Records may appear. A stray commit inside a txn block is the usual silent break."
+    },
+    {
+      "name": "txn_Rollback",
+      "folder": "00_APP",
+      "state": "golden",
+      "buildOrder": 3,
+      "calls": [],
+      "scriptRef": "00_APP/txn_Rollback.fmscript",
+      "note": "Revert Record on the PARENT, discarding the whole uncommitted set. Must fail loudly, never swallow an error to keep a routine moving."
+    },
+    {
+      "name": "30_CONTEXT__Select_Property_Context",
+      "folder": "30_CONTEXT",
+      "state": "golden",
+      "buildOrder": 4,
+      "calls": [],
+      "scriptRef": "30_CONTEXT/30_CONTEXT__Select_Property_Context.fmscript",
+      "note": "Writes g_fkCurrentProperty, resolves g_fkCurrentLoan. Rewritten 2026-06-18 to be loan-aware; everything depends on it."
+    },
+    {
+      "name": "10_UI__Set_Hub_Tab",
+      "folder": "10_UI",
+      "state": "golden",
+      "buildOrder": 5,
+      "calls": [],
+      "scriptRef": "10_UI/10_UI__Set_Hub_Tab.fmscript",
+      "note": "Thin global tab switcher. No heavy data mutation."
+    },
+    {
+      "name": "70_SCHEDULE__Generate_Expected_Schedule",
+      "folder": "70_SCHEDULE",
+      "state": "golden",
+      "buildOrder": 6,
+      "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
+      "scriptRef": "70_SCHEDULE/70_SCHEDULE__Generate_Expected_Schedule.fmscript",
+      "note": "Loan-centered, idempotent create/refresh. Multi-row write, so it goes through the txn wrapper."
+    },
+    {
+      "name": "50_RECEIPTS__Create_ReceivedFunds_From_Document",
+      "folder": "50_RECEIPTS",
+      "state": "superseded",
+      "buildOrder": 7,
+      "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
+      "scriptRef": "50_RECEIPTS/50_RECEIPTS__Create_ReceivedFunds_From_Document.fmscript",
+      "supersededWhy": "Mixes the receipt event with ledger posting; property-centered. REWRITE AGAINST ReceivedFunds (Q8 approved 2026-07-29). Note the irony: this script's own name proves the table was always intended."
+    },
+    {
+      "name": "60_PAYMENTS__Post_ReceivedFunds_Batch",
+      "folder": "60_PAYMENTS",
+      "state": "superseded",
+      "buildOrder": 8,
+      "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
+      "scriptRef": "60_PAYMENTS/60_PAYMENTS__Post_ReceivedFunds_Batch.fmscript",
+      "supersededWhy": "Allocates across properties instead of loans. Its own doc says it 'does not skip the parent receipt layer' - which is the sentence that exposed the 9-vs-10 table gap."
+    },
+    {
+      "name": "60_PAYMENTS__Auto_Apply_Waterfall",
+      "folder": "60_PAYMENTS",
+      "state": "superseded",
+      "buildOrder": 9,
+      "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
+      "scriptRef": "60_PAYMENTS/60_PAYMENTS__Auto_Apply_Waterfall.fmscript",
+      "supersededWhy": "Keys off fkProperty instead of the loan-first spine. THE routine the atomicity requirement exists for: oldest interest, then fees, then principal, writing PaymentApplications. A half-applied payment is corrupt money data."
+    },
+    {
+      "name": "80_PAYOFF__Create_Payoff_From_Prior_Version",
+      "folder": "80_PAYOFF",
+      "state": "superseded",
+      "buildOrder": 10,
+      "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
+      "scriptRef": "80_PAYOFF/80_PAYOFF__Create_Payoff_From_Prior_Version.fmscript",
+      "supersededWhy": "Treats payoff as DOCUMENTS + versions rather than the real Payoffs table under Loans. The snapshot freeze is the second all-or-nothing routine: a partial freeze is a quote that silently changes after it was sent."
+    },
+    {
+      "name": "80_PAYOFF__Save_Issued_Payoff_To_Binder",
+      "folder": "80_PAYOFF",
+      "state": "superseded",
+      "buildOrder": 11,
+      "calls": [],
+      "scriptRef": "80_PAYOFF/80_PAYOFF__Save_Issued_Payoff_To_Binder.fmscript",
+      "supersededWhy": "Same payoff-as-document assumption; rewrite together with Create_Payoff_From_Prior_Version."
+    },
+    {
+      "name": "40_BINDER__New_Document_From_Capture",
+      "folder": "40_BINDER",
+      "state": "superseded",
+      "calls": [],
+      "scriptRef": "40_BINDER/40_BINDER__New_Document_From_Capture.fmscript",
+      "supersededWhy": "Reflects older binder-ID assumptions; unverified against the locked text-key direction. Documents are OUT of v1 scope, so this waits."
+    },
+    {
+      "name": "20_NAV__Open_Related_Loan_From_Property",
+      "folder": "20_NAV",
+      "state": "superseded",
+      "calls": [],
+      "scriptRef": "20_NAV/20_NAV__Open_Related_Loan_From_Property.fmscript",
+      "supersededWhy": "Directionally right but unverified against the newer hub selector behavior."
+    },
+    {
+      "name": "70_SCHEDULE__Assess_Late_Fees",
+      "folder": "70_SCHEDULE",
+      "state": "golden",
+      "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
+      "scriptRef": "70_SCHEDULE/70_SCHEDULE__Assess_Late_Fees.fmscript",
+      "note": "Deferred past the first wave. Must support assessed-then-waived (OriginalAmount vs AdjustedAmount) - fixture row EXP-004 is the test."
+    },
+    {
+      "name": "60_PAYMENTS__Reverse_Posted_Payment",
+      "folder": "60_PAYMENTS",
+      "state": "golden",
+      "calls": ["txn_Begin", "txn_Commit", "txn_Rollback"],
+      "scriptRef": "60_PAYMENTS/60_PAYMENTS__Reverse_Posted_Payment.fmscript",
+      "note": "Deferred, but note it gets MUCH cheaper with ReceivedFunds: void one receipt and its applications cascade, instead of hunting derived rows."
+    },
+    {
+      "name": "90_ADMIN__Seed_Standard_Transactions",
+      "folder": "90_ADMIN",
+      "state": "golden",
+      "calls": [],
+      "scriptRef": "90_ADMIN/90_ADMIN__Seed_Standard_Transactions.fmscript",
+      "note": "Cheap helper. Must settle whether `Payment Received` survives as a type once ReceivedFunds exists - see BUILD-SHEET consequences."
+    },
+    {
+      "name": "90_ADMIN__Refresh_ClickUp_Field_Catalog_For_Scope",
+      "folder": "90_ADMIN",
+      "state": "golden",
+      "calls": [],
+      "scriptRef": "90_ADMIN/90_ADMIN__Refresh_ClickUp_Field_Catalog_For_Scope.fmscript",
+      "note": "Field-ID utility trio, Option B. Out of v1 scope; kept indexed so the integration lane stays visible."
+    },
+    {
+      "name": "90_ADMIN__Resolve_ClickUp_Field_ID_By_Key",
+      "folder": "90_ADMIN",
+      "state": "golden",
+      "calls": [],
+      "scriptRef": "90_ADMIN/90_ADMIN__Resolve_ClickUp_Field_ID_By_Key.fmscript",
+      "note": "Keeps vendor UUIDs centralized instead of leaking into production scripts."
+    },
+    {
+      "name": "90_ADMIN__Refresh_ClickUp_Field_Map_IDs_For_Target",
+      "folder": "90_ADMIN",
+      "state": "golden",
+      "calls": ["90_ADMIN__Resolve_ClickUp_Field_ID_By_Key"],
+      "scriptRef": "90_ADMIN/90_ADMIN__Refresh_ClickUp_Field_Map_IDs_For_Target.fmscript",
+      "note": "Batch-repairs one sync target's field maps against the live catalog."
+    },
+    {
       "name": "commitRecord",
       "folder": "utilities",
+      "state": "built",
       "calls": ["MSG_ValueListErrors"],
-      "scriptRef": "utilities/commitRecord.fmscript"
+      "scriptRef": "utilities/commitRecord.fmscript",
+      "note": "Shared cross-app standard helper. FOLDER IS A FLAGGED DIVERGENCE - see README; the documented FMP tree has no `utilities`."
     }
   ]
 }
