@@ -1,0 +1,2 @@
+PrimaryKey	fkLoan	PayoffVersion	IsCurrent	IssueDate	GoodThroughDate	frozen_PrincipalBalance	frozen_InterestToDate	frozen_PerDiem	frozen_FeesDue	frozen_TotalDue	frozen_PaymentInstructionSnapshot
+PAYOFF-001	LOAN-003	1	1	2026-03-18	2026-03-25	40000.00	466.67	15.34	0.00	40466.67	Mail checks payable to JOSEPH WIZOREK - see PI-001
