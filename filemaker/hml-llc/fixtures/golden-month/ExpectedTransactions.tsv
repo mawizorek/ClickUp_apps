@@ -1,0 +1,7 @@
+PrimaryKey	fkLoan	fkStandardTransaction	DueDate	AmountExpected	OriginalAmount	AdjustedAmount	AdjustmentStatus	AdjustmentReason	SequenceNumber	Notes
+EXP-001	LOAN-001	STX-001	2026-03-15	1500.00	1500.00	1500.00	Normal		6	March interest
+EXP-002	LOAN-002	STX-001	2026-03-10	850.00	850.00	850.00	Normal		3	March interest - PARTIALLY PAID
+EXP-003	LOAN-003	STX-001	2026-03-01	466.67	466.67	466.67	Normal		10	Final interest before payoff
+EXP-004	LOAN-002	STX-003	2026-03-16	42.50	42.50	0.00	Waived	First late payment - courtesy waiver	4	5 percent of 850.00, waived on purpose
+EXP-005	LOAN-003	STX-002	2026-03-20	40000.00	40000.00	40000.00	Normal		11	Principal at payoff
+EXP-006	LOAN-001	STX-001	2026-04-15	1500.00	1500.00	1500.00	Normal		7	April - still outstanding
