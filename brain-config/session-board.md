@@ -11,7 +11,9 @@ _Delete your row on session close._
 
 <p><br/></p>
 
-_✅ **Mira + Wes out 2026-07-28 ~9:30 PM ET.** F1 v7 schema pass closed and handed off. **ALL RELEASED:** `f1-racetracks/source/standings/data.js` · `source/standings/panel.js` · `f1-results/2026/index_rounds.json` · `f1-racetracks/README.md` · `f1-results/2026/README.md` (new) · `VERSIONS.md`. **Never claimed, still untouched:** `f1-racetracks/next-build-spec.md` — it is the next session's first move. PRs #569, #571, #572, #573, #574, #575 merged. Handoff task `86ajr8u9k`._
+_✅ **Mira + Wes out 2026-07-28 ~9:30 PM ET.** F1 v7 schema pass closed and handed off. **ALL RELEASED:** `f1-racetracks/source/standings/data.js` · `source/standings/panel.js` · `f1-results/2026/index_rounds.json` · `f1-racetracks/README.md` · `f1-results/2026/README.md` (new) · `VERSIONS.md`. **Never claimed, still untouched:** `f1-racetracks/next-build-spec.md` — it is the next session's first move. PRs #569, #571, #572, #573, #574, #575 merged. Handoff task `86ajrj6u3`._
+
+_⚠️ **Same-session note worth carrying: I typed a task ID from memory into this file TWICE today** (the session task at open, the handoff task at close) and both were wrong. Both were caught by reading the task back before the PR merged, so neither reached `main` — but two catches is a pattern, not luck. **Never hand-type a ClickUp ID into a durable file; load the task and copy it.**_
 
 <p><br/></p>
 
