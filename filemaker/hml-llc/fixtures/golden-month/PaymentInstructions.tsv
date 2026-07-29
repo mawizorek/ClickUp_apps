@@ -1,0 +1,4 @@
+PrimaryKey	InstructionLabel	PayeeName	DeliveryType	InstructionBody	SortOrder	IsActive
+PI-001	Check by mail	JOSEPH WIZOREK	Mail	Include the property name and month in the memo. Do not require signature for delivery.	10	1
+PI-002	Wire	JOSEPH WIZOREK	Wire	A 10.00 wire transfer fee shall be included.	20	1
+PI-003	Venmo	JJWizorek	Venmo	Include the property name and month in the memo.	30	1
