@@ -1,50 +1,9 @@
-# SCRIPT: 60_PAYMENTS__Auto_Apply_Waterfall
-# FOLDER: 60_PAYMENTS
-# ROLE: apply posted money against outstanding expected rows in the locked waterfall order
-# CALLED BY: 60_PAYMENTS__Post_ReceivedFunds_Batch ; manual reconcile
-# CALLS: txn_Begin, txn_Commit, txn_Rollback  [PENDING — see MIGRATION NOTE]
-# INPUTS: $p = Get ( ScriptParameter ) (JSON) — { "accountTransactionID":<req>, "propertyID":<req> }
-# GLOBALS IN: none (all context arrives as parameters)
-# RETURNS: { ok, applied, unapplied } | { ok:false, error }
-# GLOBALS OUT: none
-# SIDE EFFECTS: creates PaymentApplications rows; rolls ExpectedTransactions::fkStatus to Paid / Partially Paid
-#
-# WATERFALL ORDER (locked, Data Standards): oldest interest -> fees -> principal
-#   Implemented as three passes over the same found set, ranked from the related
-#   Standard_Transactions::Name so display-label changes cannot reorder the money.
-#
-# ⛔ STATE: SUPERSEDED — DO NOT IMPLEMENT AS WRITTEN. Two reasons, both structural:
-#   1. It keys off fkProperty. Loans won that argument in June; the parent is fkLoan.
-#   2. It predates ReceivedFunds (approved DL Q8, 2026-07-29) and it COMMITS MID-LOOP,
-#      twice per applied row. That is the exact pattern the FMP19 rollback design forbids.
-#
-# ⚠️ MIGRATION NOTE — why the commits are the real problem, not the fkProperty rename:
-#   FileMaker 19 has NO native transactions. Atomicity requires every write in one
-#   transaction to flow through ONE relationship from ONE parent record, so Revert Record
-#   on that parent discards the whole set. Every `Commit Records` below ENDS the
-#   transaction early and makes the preceding rows permanent. A failure on application 3
-#   of 5 leaves 2 rows committed and the money half-applied — which is corrupt ledger
-#   data, not a UI glitch. Strip every mid-loop commit; wrap the whole routine in
-#   txn_Begin / txn_Commit / txn_Rollback with ReceivedFunds as the single parent.
-#
-# RELATIONSHIPS THIS NEEDS WIRED:
-#   PaymentApplications_forAccountTransaction  AT 1—n PA via fkAccountTransaction
-#   PaymentApplications_forExpected            ET 1—n PA via fkExpectedTransaction
-#   Standard_Transactions_forExpected          ET::fkStandardTransaction = ST::PrimaryKey
-#
-# GUARD RAILS:
-#   - partial applications are REQUIRED, not an edge case
-#   - fees keep a stable transaction class even if display labels change
-#   - never overwrite history; ADD PaymentApplications rows
-#   - remainder stays unapplied on the posted row rather than being forced somewhere
-#
-# CHANGELOG:
-#   - 2026-06-18 script-contract audit flagged it property-centered.
-#   - 2026-07-29 ported from ClickUp into a real per-script body; marked superseded with
-#     the commit-boundary defect named. Prior state: this file did not exist and the
-#     manifest pointed at it anyway.
+# 60_PAYMENTS__Auto_Apply_Waterfall
+# Applies posted money to open expected rows: oldest interest -> fees -> principal.
+# Param (JSON): { accountTransactionID (req), propertyID (req) }
+# Returns (JSON): { ok, applied, unapplied }
+# Adds PaymentApplications rows. Never edits history.
 
-# --- SETUP ---
 Set Error Capture [ On ]
 Set Variable [ $p ; Value: Get ( ScriptParameter ) ]
 Set Variable [ $atID ; Value: JSONGetElement ( $p ; "accountTransactionID" ) ]
@@ -54,7 +13,7 @@ If [ IsEmpty ( $atID ) or IsEmpty ( $propertyID ) ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; False ; JSONBoolean ] ; [ "error" ; "missing accountTransaction or property" ; JSONString ] ) ]
 End If
 
-# --- HOW MUCH IS LEFT ON THIS POSTED ROW ---
+# How much is still unapplied on this posted row
 Go to Layout [ "AccountTransactions" (AccountTransactions) ]
 Enter Find Mode [ Pause: Off ]
 Set Field [ AccountTransactions::PrimaryKey ; $atID ]
@@ -65,7 +24,7 @@ If [ $available <= 0 ]
 	Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; True ; JSONBoolean ] ; [ "note" ; "nothing to apply" ; JSONString ] ) ]
 End If
 
-# --- OPEN EXPECTED ROWS (OR-find: Outstanding + Partially Paid) ---
+# Open expected rows for this property: Outstanding OR Partially Paid
 Go to Layout [ "dev_ExpectedTransactions" (ExpectedTransactions) ]
 Enter Find Mode [ Pause: Off ]
 Set Field [ ExpectedTransactions::fkProperty ; $propertyID ]
@@ -82,9 +41,8 @@ End If
 Sort Records [ by ExpectedTransactions::DueDate ; ascending ]
 Set Variable [ $applied ; Value: 0 ]
 Set Variable [ $pass ; Value: 1 ]
-# $pass 1 = interest, 2 = fees, 3 = principal
 
-# --- THREE PASSES: interest, then fees, then principal ---
+# Pass 1 = interest, pass 2 = fees, pass 3 = principal
 Loop
 	Exit Loop If [ $pass > 3 or $available <= 0 ]
 	Set Variable [ $rc ; Value: Get ( FoundCount ) ]
@@ -96,7 +54,7 @@ Loop
 		Set Variable [ $rank ; Value: Case ( PatternCount ( $name ; "Interest" ) ; 1 ; PatternCount ( $name ; "Principal" ) ; 3 ; 2 ) ]
 
 		If [ $rank = $pass and $available > 0 ]
-			# base honors a waiver: waived = 0, else AdjustedAmount, else AmountExpected
+			# A waived row collects nothing; otherwise AdjustedAmount wins over AmountExpected
 			Set Variable [ $base ; Value: Case ( ExpectedTransactions::AdjustmentStatus = "Waived" ; 0 ; not IsEmpty ( ExpectedTransactions::AdjustedAmount ) ; ExpectedTransactions::AdjustedAmount ; ExpectedTransactions::AmountExpected ) ]
 			Set Variable [ $remaining ; Value: $base - Sum ( PaymentApplications_forExpected::AmountApplied ) ]
 			Set Variable [ $thisApply ; Value: Min ( $available ; $remaining ) ]
@@ -111,12 +69,12 @@ Loop
 				Set Field [ PaymentApplications::AmountApplied ; $thisApply ]
 				Set Field [ PaymentApplications::AppliedDate ; Get ( CurrentDate ) ]
 				Set Field [ PaymentApplications::CreationTimestamp ; Get ( CurrentTimestamp ) ]
-				Commit Records/Requests [ With dialog: Off ]   # ⛔ REMOVE — breaks the transaction
-				Go to Layout [ "dev_ExpectedTransactions" (ExpectedTransactions) ]   # restores found set + record
+				Commit Records/Requests [ With dialog: Off ]
+				Go to Layout [ "dev_ExpectedTransactions" (ExpectedTransactions) ]
 				Set Variable [ $available ; Value: $available - $thisApply ]
 				Set Variable [ $applied ; Value: $applied + $thisApply ]
 				Set Field [ ExpectedTransactions::fkStatus ; If ( $base - Sum ( PaymentApplications_forExpected::AmountApplied ) <= 0 ; "Paid" ; "Partially Paid" ) ]
-				Commit Records/Requests [ With dialog: Off ]   # ⛔ REMOVE — breaks the transaction
+				Commit Records/Requests [ With dialog: Off ]
 			End If
 		End If
 
@@ -129,9 +87,3 @@ Loop
 End Loop
 
 Exit Script [ Result: JSONSetElement ( "{}" ; [ "ok" ; True ; JSONBoolean ] ; [ "applied" ; $applied ; JSONNumber ] ; [ "unapplied" ; $available ; JSONNumber ] ) ]
-
-# --- FIXTURE EXPECTATION (fixtures/golden-month) ---
-# RCPT-002 / ACCT-003: $400 against EXP-002 ($850 owed) must leave EXP-002 at
-#   "Partially Paid" with 450.00 remaining, NOT flip it to Paid.
-# EXP-004: the waived $42.50 late fee must collect 0.00 and stay visible.
-# Net across the month: 850.00 unapplied, traceable to RCPT-004 alone.
