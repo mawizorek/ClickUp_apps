@@ -1,49 +1,46 @@
 # Fiona — Memory (the schema + correlation precedent ledger)
 
 > CONTEXT, not process. The object library, patterns doc and documentation standard are TOOLS I
-> point at. **Seams and lane are in `preferences.md` — not restated here.**
+> point at. **Seams and lane live in `preferences.md` — not restated here.**
 >
 > **INHERITED vs EARNED labelled per line.** Seeded 2026-07-26 by Fleet Felix; first EARNED lines
 > 2026-07-29. An unconfirmed INHERITED line is a LEAD, not a fact.
 >
-> **~10KB hot cap.** ⚠️ Blown THREE times on 07-29 — see the Placement rule.
+> **~10KB hot cap.** ⚠️ Blown FOUR times on 07-29 — see the Placement rule.
 
 ---
 
-## 🚦 Placement rule for THIS file (EARNED 07-29, the hard way, three times)
+## 🚦 Placement rule for THIS file (EARNED 07-29, the hard way)
 
-I blew the cap three times in one session, and each overflow was a different kind of wrong content:
-
-<br/>
-
-1. **Inherited reference detail** about modules I have never touched → archived.
-2. **A per-question replay of the HML_LLC Decision Log** → that log is CANONICAL in ClickUp, so this
-   was a **projection**. Deleted and pointed, not archived. A second copy is the disease.
-3. **A restatement of my own seams and lane** → already in `preferences.md`. Cut to a pointer.
+Four overflows in one session, each a different kind of wrong content: **inherited reference detail**
+about modules I never touched (→ archived) · **a per-question replay of the HML_LLC Decision Log**
+(→ a PROJECTION of a canonical ClickUp surface; deleted and pointed, never archived as copy two) ·
+**a restatement of my own seams** (→ already in `preferences.md`) · **inherited rules quoted at length**
+(→ one line + pointer).
 
 <br/>
 
-**This file holds GENERALIZATIONS only.** Before writing, ask *"does a Decision Log, my profile, or a
-standard already own this?"* If yes, keep one line about what it changes in how I act, and point.
+**This file holds GENERALIZATIONS only.** Before writing: *does a Decision Log, my profile, or a
+standard already own this?* If yes, keep one line about what it changes in how I act, and point.
 **A memory file that grows in step with a project is mis-scoped, and the growth curve is the tell.**
 
 ## 🧱 The object library — MINE
 
 ✅ **VERIFIED 07-29** (inherited → opened myself): live page is **FileMaker Canonical Object Library**,
-child of the **FileMaker Home** doc page. It does carry what my bundle claimed — families, family
+child of the **FileMaker Home** doc page, carrying what my bundle claimed — families, family
 discipline, minimum-viable set, state matrix, approval test. Families: `cnt_*`, `nav_*`, `tx_*`,
 `btn_*`, `fd_*`, `row_portal_*`, `sum_metric_tile`, `badge_status_*`, `card_modal_standard`.
 
 - **The rule I enforce:** one visual role → one preferred object class. State variants belong to their
   family and must not fork into pseudo-families.
-- **Approval test:** recurring cross-app role? · can no existing family do it without ugly overrides?
-  · does it improve consistency more than it adds maintenance? One YES is enough.
+- **Approval test:** recurring cross-app role? · can nothing existing do it without ugly overrides? ·
+  does it improve consistency more than it adds maintenance? One YES is enough.
 - 🔴 **NO LONGER FILEMAKER-ONLY** (Michael, 07-29): *"we've begun structuring our clickup app builds
   around the new object set."* Repo apps now model FMP **object families**, not just FMP schema.
   (1) the test is judged against **two** runtimes, so an FMP-only family is weaker; (2) a repo-app UI
-  question is mine at the VOCABULARY layer, the CODE stays Dexter's; (3) a one-off costs double now,
-  so the test gets **stricter**.
-- 🔴 **THE LIBRARY IS THE BACKLOG HOME.** Unbuilt families are tracked on the Library page, per family,
+  question is mine at the VOCABULARY layer, the CODE stays Dexter's; (3) a one-off costs double, so
+  the test gets **stricter**.
+- 🔴 **THE LIBRARY IS THE BACKLOG HOME.** Unbuilt families tracked on the Library page, per family,
   never as a checklist under an app build task. Corollary: **a task whose job was to DEFINE a standard
   is done when the definition is done** — leftovers are standard backlog in the wrong container.
 - 🔴 **The real build baseline is NOTHING.** Only fonts were installed + render-tested, and fonts are
@@ -64,9 +61,9 @@ discipline, minimum-viable set, state matrix, approval test. Families: `cnt_*`, 
   rather than added** because a new family changes a standard governing two runtimes. → HML_LLC DL Q7.
   Yes = my first authored family; no = my first refusal.
 - ✅ **FIXED 07-29 · Summary tiles state row restored.** The Library declared `sum_metric_tile` +
-  `_alert` but its state matrix had no Summary tiles row — the one family with a built-in alert
-  variant had no state rule. The row exists verbatim on the superseded HML page. **Lesson: when a
-  standard is MIGRATED, diff it against the old copy — lift-and-shift silently drops rows.**
+  `_alert` but its state matrix had no Summary tiles row — the one family with a built-in alert variant
+  had no state rule. The row exists verbatim on the superseded HML page. **Lesson: when a standard is
+  MIGRATED, diff it against the old copy — lift-and-shift silently drops rows.**
 
 ## 🗄️ HML_LLC (Dad's loan servicing) — my first build
 
@@ -74,10 +71,10 @@ discipline, minimum-viable set, state matrix, approval test. Families: `cnt_*`, 
 
 <br/>
 
-NOT a URITP module — private-lending servicing for Michael's dad. Schema locked June 2026:
-`GLOBAL_USE_VARIABLES` · `PropertySUMMARIES` (collateral) · `Loans` (the true financial parent) ·
-`ExpectedTransactions` · `AccountTransactions` · `PaymentApplications` (join) · `Payoffs` ·
-`PaymentInstructions` · `Standard_Transactions`. `PrimaryKey` UUID everywhere; `fk*`/`calc_`/`g_`.
+NOT a URITP module — private-lending servicing for Michael's dad. Schema locked June 2026 around
+`Loans` as the true financial parent, with `PropertySUMMARIES` demoted to the collateral lens and the
+ledger tables (`ExpectedTransactions`, `AccountTransactions`, `PaymentApplications`, `Payoffs`) hanging
+off `Loans`. `PrimaryKey` UUID everywhere; `fk*`/`calc_`/`g_` enforced.
 
 - ⚠️ **FILEMAKER 19, PERMANENTLY.** Upgrading was explicitly rejected 07-29.
 - 🔴 **FMP19 HAS NO NATIVE TRANSACTIONS.** `Open/Commit/Revert Transaction` are **FileMaker 2023
@@ -85,8 +82,8 @@ NOT a URITP module — private-lending servicing for Michael's dad. Schema locke
   Atomicity on 19: all writes go through **ONE relationship from a single parent record**, so
   `Revert Record` discards the whole set. `Set Error Capture [On]`; check `Get(LastError)` after
   **every** write step; **no `Commit Records` inside the block** (the usual silent break). Wrapped once
-  as `txn_*`, and the names imply an engine transaction that does not exist — **say so in the
-  comments.** Rollback + error catching **throughout** is a requirement, not a preference.
+  as `txn_*`, whose names imply an engine transaction that does not exist — **say so in the comments.**
+  Rollback + error catching **throughout** is a requirement, not a preference.
 - **Must be atomic:** one `AccountTransactions` row applied across N `ExpectedTransactions`, and the
   `Payoffs` snapshot freeze. Half-applied = corrupt money data; partial freeze = a quote that changes
   after it was sent.
@@ -100,10 +97,9 @@ Shape: **FMP construct → repo equivalent → where it holds → where it BREAK
 most; a correlation with no stated limit is a slogan.
 
 - 🔴 **C1 · Object family → repo component token set.** Both exist to stop one job being solved three
-  ways, so the mapping **holds** at intent. **Breaks at STATE:** FMP fakes state with stacked objects
-  + hide-object conditions (one object per state); CSS uses a class on ONE element. Many-state
-  families are cheap in the repo and expensive in FMP — **never let repo state-richness set the FMP
-  family count.**
+  ways, so it **holds** at intent. **Breaks at STATE:** FMP fakes state with stacked objects +
+  hide-object conditions (one object per state); CSS uses a class on ONE element. Many-state families
+  are cheap in the repo, expensive in FMP — **never let repo state-richness set the FMP family count.**
 - 🔴 **C2 · Table view → rendering straight off the data.** FMP table view renders the schema itself,
   no layout objects; the repo analogue renders off the JSON with no view model between. **Holds** as
   the argument that good field/key naming IS the UI in both runtimes. **Breaks** on
@@ -115,16 +111,13 @@ most; a correlation with no stated limit is a slogan.
   read-only by default. Over immutable data the repo version is safe and the FMP version is a footgun.
   **Never assume a safe default transfers across runtimes.**
 
-## ⚠️ Lifecycle SoT rule — must not get backwards (INHERITED)
+## ⚠️ Lifecycle SoT rule (INHERITED)
 
 **Source-of-truth MIGRATES as a module ships.** UNBUILT → the ClickUp planning page is canonical.
-BUILT (live records) → **FileMaker is the source of truth** and ClickUp drops to a POINTER, never a
-maintained mirror. Prevents quoting a plan as if it were live schema. Proposed tell: a per-row **FMP
-Build State** field + a migration trigger at completion. Neither built.
-
-**Inherited stale-fork:** the URITP People known-issues checklist tracks FMP-internal field typos
-(`prefferedFirstName`) as ClickUp checkboxes — fix it in FileMaker and the checklist silently lies.
-**Flag, don't fix another system's internals inside ClickUp.**
+BUILT (live records) → **FileMaker is the source of truth**; ClickUp drops to a POINTER, never a
+maintained mirror. Prevents quoting a plan as if it were live schema. **Inherited stale-fork:** the
+URITP People known-issues checklist tracks FMP-internal field typos as ClickUp checkboxes — **flag,
+don't fix another system's internals inside ClickUp.**
 
 ## 🧠 Michael-patterns worth carrying
 
@@ -138,8 +131,8 @@ Build State** field + a migration trigger at completion. Neither built.
 - Collapses duplicate sources of truth on sight. Never propose a mirror.
 - Prefers the STRUCTURAL fix over another written rule. Keeps reasoning, not just outcomes.
 - **INVERTED polarity** (checked = REJECTED), answered fast and in bulk. ⚠️ **Zero-strikes-plus-a-note
-  is a real answer shape:** the question was WRONG, not unanswered. Re-ask better; never hand the same
-  menu back.
+  is a real answer shape:** the question was WRONG, not unanswered. Re-ask better; never re-hand the
+  same menu.
 
 ## 📌 Lineage
 
@@ -150,8 +143,8 @@ replan.** Reasoning: `decision-log.md` D1–D6 + the archive.
 ## Pointers (never restate)
 
 - My standard → **FileMaker Canonical Object Library** (under the FileMaker Home doc page)
-- ⚠️ A **zARCHIVE** copy of it sits under `zArchive` and still says "keep HML-specific references
-  here" — an archived page cannot be a maintained reference. Don't write to it; diff source only.
+- ⚠️ A **zARCHIVE** copy sits under `zArchive` and still says "keep HML-specific references here" — an
+  archived page cannot be a maintained reference. Don't write to it; diff source only.
 - Domain canon → Patterns + Conventions · Theme System · Documentation Standard · App Index
 - Corey seam doc → FileMaker → ClickUp Sync Mirror Pattern · Open Qs → FileMaker Research Inbox
 - URITP modules + lifecycle SoT → URITP fmp Solutions (list)
