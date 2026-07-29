@@ -1,7 +1,7 @@
--- Inciardi Collection — PROPOSED schema v2 · ③ THE MARKET LENS
+-- Inciardi Collection — schema v2 · ③ THE MARKET LENS
 -- One table. DEFERRED TO M4 — do not apply this while building M1.
 --
--- ⚠️ NOT APPLIED, and further from being applied than the rest. Apply order: `db/_index.md`.
+-- ✅ CANONICAL but NOT part of the M1 apply set. Apply order: `db/_index.md`.
 --
 -- WHY THIS IS ITS OWN FILE: precisely because it is deferred. Keeping a P3 table inside the M1 spine
 -- file is how a deferred concern quietly gets built early — if it is not in the apply set for M1, it
@@ -10,6 +10,7 @@
 -- existence and logging itself, rather than the market defining what's in the catalog"), and the file
 -- layout should make the inversion hard to forget.
 
+-- ⚠️ No-op in D1; load-bearing in local sqlite3. See the note at the top of `schema.sql`.
 PRAGMA foreign_keys = ON;
 
 -- ============================================================ sighting

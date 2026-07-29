@@ -1,7 +1,7 @@
--- Inciardi Collection — PROPOSED schema v2 · ④ THE DERIVED LAYER
+-- Inciardi Collection — schema v2 · ④ THE DERIVED LAYER
 -- Views (rung 1) and the one trigger we actually need (rung 3).
 --
--- ⚠️ NOT APPLIED. Apply LAST, after ① spine, ② binder, ③ market. Full set: `db/_index.md`.
+-- ✅ CANONICAL. Promoted 2026-07-28. Apply LAST, after ① spine, ② binder, ③ market. `db/_index.md`.
 --
 -- ==========================================================================================
 -- WHY THIS FILE IS THE MOST IMPORTANT ONE.
@@ -21,9 +21,9 @@
 -- qty > 1, and it looks correct in testing because almost every row is 1 — a bug that passes review,
 -- passes QA, and is wrong in production.
 --
--- We agreed to record that rule in a DDL comment. Comments do not execute. So: nobody hand-writes
--- this count. Every surface that needs "how many do I own" reads this view. That moves the rule from
--- rung 5 (hope someone read the comment) to rung 1 (the correct query is the only convenient one).
+-- The rule was going to be a DDL comment. Comments do not execute. So: nobody hand-writes this count.
+-- Every surface that needs "how many do I own" reads this view. That moves the rule from rung 5 (hope
+-- someone read the comment) to rung 1 (the correct query is the only convenient one).
 CREATE VIEW IF NOT EXISTS v_owned AS
 SELECT
   e.artwork_id                                        AS artwork_id,
@@ -108,7 +108,9 @@ CROSS JOIN (SELECT 'A' AS side UNION ALL SELECT 'B') sd;
 -- earns a slot.
 --
 -- Derived, like everything else: owned artworks with zero placements. No `location` column, nothing
--- written twice.
+-- written twice. VERIFIED 2026-07-28 with a POSITIVE control — an owned-but-unplaced artwork must
+-- appear by name. (Its first test returned zero rows, which proves nothing: zero rows is also what a
+-- broken view returns.)
 --
 -- ⚠️ INHERITED IMPRECISION, NAMED SO NOBODY REDISCOVERS IT AS A BUG: own six Watermelons, place one,
 -- and Watermelon does NOT appear here — even though five are physically in the box. That is correct
@@ -132,8 +134,8 @@ WHERE o.qty_owned > 0
 
 -- ============================================================ v_sheet_fill
 -- The "SPRING · 11 / 15" header. Two different denominators, deliberately both exposed:
---   slots_filled / 18  → how full the physical sheet is
---   owned / placed     → how much of what is laid out he actually has
+--   slots_used / 18    → how full the physical sheet is
+--   n_owned / n_wanted → how much of what is laid out he actually has
 -- The second is the one that makes a binder worth opening on a day with nothing to buy.
 CREATE VIEW IF NOT EXISTS v_sheet_fill AS
 SELECT
@@ -159,8 +161,11 @@ GROUP BY sh.sheet_id;
 -- inside the same transaction as the INSERT, so the pair is atomic. That is the whole argument.
 --
 -- ⚠️ It fires only when no edition is supplied for the new artwork, so the seed and the manual path
--- both work: `Enter` can create artwork + explicit edition in one transaction and this stays out of the
+-- both work: entry can create artwork + explicit edition in one transaction and this stays out of the
 -- way; anything else gets the implicit edition automatically.
+--
+-- VERIFIED 2026-07-28: inserting an artwork produced exactly one edition, implicit=1, label NULL,
+-- edition_type inherited.
 CREATE TRIGGER IF NOT EXISTS trg_artwork_implicit_edition
 AFTER INSERT ON artwork
 FOR EACH ROW
@@ -185,7 +190,7 @@ END;
 -- changed. Belt and braces, because this is the row every `copy` depends on.
 
 -- ============================================================ what is NOT a view, on purpose
--- No v_market / v_underpriced yet. Market is P3 (③), and the predecessor's underpriced threshold was
+-- No v_market / v_underpriced yet. Market is M4 (③), and the predecessor's underpriced threshold was
 -- unreachable for weeks because of a /100 unit bug nobody could see. When it comes back it gets a test
 -- against known values first, not a view.
 --

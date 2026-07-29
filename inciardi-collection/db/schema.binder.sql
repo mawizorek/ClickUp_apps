@@ -1,8 +1,8 @@
--- Inciardi Collection — PROPOSED schema v2 · ② THE BINDER
+-- Inciardi Collection — schema v2 · ② THE BINDER
 -- binder → sheet → slot. The digital twin of the physical object.
 --
--- ⚠️ NOT APPLIED. Apply AFTER ① spine (`schema.proposed.sql`) — slot has foreign keys into artwork
--- and edition. Full set and order: `db/_index.md`.
+-- ✅ CANONICAL. Promoted 2026-07-28. Apply AFTER ① spine (`schema.sql`) — slot has foreign keys into
+-- artwork and edition. Full set and order: `db/_index.md`.
 --
 -- WHAT THIS IS, in Michael's words:
 --   "I have an existing physical binder of card sheets — 3x3 cards with double sided pages for a real
@@ -20,6 +20,8 @@
 -- it IS the catalog entry surface. A slot card is a gridded "enter or edit one print." Michael: "why
 -- are they so different tho?" They aren't.
 
+-- ⚠️ No-op in D1 (enforcement is on and unswitchable); load-bearing in local sqlite3. See the long
+-- note at the top of `schema.sql` before removing it.
 PRAGMA foreign_keys = ON;
 
 -- ============================================================ binder
@@ -51,8 +53,8 @@ CREATE TABLE IF NOT EXISTS sheet (
   updated_at    TEXT NOT NULL,
 
   -- rung 2: two sheets cannot claim the same position in one binder. Reordering is a transaction of
-  -- updates, not a hope. (Note for the build: reordering needs a temporary negative-offset pass or a
-  -- deferred constraint, because a naive "shift everything down" collides mid-flight.)
+  -- updates, not a hope. ⚠️ BUILD NOTE: reordering needs a temporary negative-offset pass, because a
+  -- naive "shift everything down" collides with this constraint mid-flight.
   UNIQUE (binder_id, sheet_order),
   CHECK (sheet_order >= 0)
 );
@@ -71,7 +73,7 @@ CREATE INDEX IF NOT EXISTS ix_sheet_binder ON sheet(binder_id, sheet_order);
 --            never pre-seed 18 rows per sheet. Absence is legal and meaningful.
 --   OWNED  = derived: slot has an artwork AND that artwork has >=1 copy.
 --   WANTED = derived: slot has an artwork and ZERO copies. The ghosted slot. This IS the visible-gap
---            feature, and it costs no storage.
+--            feature, and it costs no storage. VERIFIED 2026-07-28.
 --   NOTE   = STORED: artwork_id NULL + note text. The only reason artwork_id is nullable.
 --
 -- Marking a slot owned is an INPUT, not a state change: tapping "I have this" writes a `copy` row and
@@ -104,7 +106,7 @@ CREATE TABLE IF NOT EXISTS slot (
   -- edition — two pointers, free to disagree. It LOOKS like it needs a cross-table CHECK, which SQLite
   -- cannot express. It doesn't. By naming the PAIR, an edition belonging to a different artwork is not
   -- a validation failure, it is an UNWRITEABLE ROW. No trigger, no application discipline, no
-  -- integrity sweep. Cost: one redundant unique index on the parent.
+  -- integrity sweep. Cost: one redundant unique index on the parent. VERIFIED 2026-07-28: rejected.
   FOREIGN KEY (edition_id, artwork_id)
     REFERENCES edition (edition_id, artwork_id)
     ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -126,7 +128,8 @@ CREATE INDEX IF NOT EXISTS ix_slot_art   ON slot(artwork_id);
 --    layout and planning surface, and per-object allocation is exactly what Michael cut. The truth
 --    stays one tap away because the card shows owned count AND every placement.
 --    🔴 REQUIREMENT THAT FALLS OUT AND MUST REACH THE UI: that badge reads "own 1 · placed 3", never a
---    bare "3". The imprecision is only acceptable while it is legible.
+--    bare "3". The imprecision is only acceptable while it is legible. `v_slot` returns qty_owned and
+--    placed_count separately for exactly this reason — verified 2026-07-28.
 --
 -- 2. NO CONSTRAINT SAYS A SHEET HAS 18 SLOTS. Sparse rows mean a brand-new sheet has zero rows and is
 --    still a valid nine-up sheet on both sides. The 3x3 grid is a RENDERING fact, enforced by

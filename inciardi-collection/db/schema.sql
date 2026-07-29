@@ -1,16 +1,10 @@
--- Inciardi Collection — PROPOSED schema v2 · ① THE SPINE
+-- Inciardi Collection — schema v2 · ① THE SPINE
 -- artwork → edition → copy. The three entities everything else hangs off.
 --
--- ⚠️ NOT APPLIED. The `.proposed` suffix is load-bearing: a design artifact under review, not a
--- runnable migration. This file is one of four — see `db/_index.md` for the set and the APPLY ORDER,
--- which is FK-significant. Files: ① spine (here) · ② binder · ③ market · ④ views.
---
--- 🔴 PROMOTION IS BLOCKED ON ONE VERIFICATION. SQLite enforces foreign keys PER CONNECTION and has
--- historically defaulted them OFF. Every composite FK here is decorative if D1 is not enforcing, and
--- an unenforced constraint is WORSE than none because it looks like protection — the same failure
--- shape as the silent caches that cost a full day on 2026-07-25. Before promotion: run a deliberate
--- violating INSERT against a live D1 instance and confirm it is REJECTED. If D1 does not enforce,
--- every rung-2 rule demotes to a trigger and these files get rewritten. Do not assume. (J6.)
+-- ✅ CANONICAL. Promoted from `.proposed` 2026-07-28 on Michael's go, after the constraint
+-- gauntlet returned 22/22 (8 positive controls, 13 violating writes rejected, the trigger, the
+-- cascade). This file is one of four — see `db/_index.md` for the set, the APPLY ORDER (which is
+-- FK-significant), and the re-runnable test. Files: ① spine (here) · ② binder · ③ market · ④ views.
 --
 -- ==========================================================================================
 -- THE DESIGN LAW (decision log J6):  DON'T POLICE DISAGREEMENT. MAKE IT UNREPRESENTABLE.
@@ -33,6 +27,13 @@
 --   Q10 → ownership is `copy` rows carrying `qty`, not one row per physical object.
 -- ==========================================================================================
 
+-- ⚠️ READ BEFORE "CLEANING THIS UP": in D1 the next line is a NO-OP — D1 enforces foreign keys on
+-- every query and a user statement CANNOT disable it, because every query runs inside an implicit
+-- transaction (see the Cloudflare docs link in `_index.md`). It is kept anyway because it is NOT a
+-- no-op in plain sqlite3, where it is the only thing standing between the verification suite and
+-- silent non-enforcement. Measured 2026-07-28: with this OFF, 4 of 4 FK-backed rules in this schema
+-- evaporate without error — a slot can point at a nonexistent artwork, and an artwork can be deleted
+-- out from under a copy. CHECK constraints survive; FOREIGN KEY rules do not. Keep the line.
 PRAGMA foreign_keys = ON;
 
 -- ============================================================ collection
@@ -130,10 +131,11 @@ CREATE INDEX IF NOT EXISTS ix_alias_norm ON artwork_alias(norm);
 -- 🔗 THE DENORMALIZATION CHAIN (rung 2). `edition_type` is copied DOWN from artwork here, and again
 -- from here to `copy`. That would be duplication except every link is a COMPOSITE FK with ON UPDATE
 -- CASCADE — so the value cannot be set to anything the parent doesn't already say, and changing
--- `artwork.edition_type` propagates the whole way down on its own. The payoff is on `copy`: a
--- cross-table rule ("a one-of-a-kind cannot be owned six times") collapses into a plain single-table
--- CHECK. Honest cost: two redundant columns, two extra indexes. Worth it, because the alternative was
--- a trigger — rung 3, invisible unless you read the schema.
+-- `artwork.edition_type` propagates the whole way down on its own. VERIFIED 2026-07-28: one UPDATE at
+-- the top reached both children. The payoff is on `copy`: a cross-table rule ("a one-of-a-kind cannot
+-- be owned six times") collapses into a plain single-table CHECK. Honest cost: two redundant columns,
+-- two extra indexes. Worth it, because the alternative was a trigger — rung 3, invisible unless you
+-- read the schema.
 CREATE TABLE IF NOT EXISTS edition (
   edition_id   TEXT PRIMARY KEY,
   artwork_id   TEXT NOT NULL,
@@ -232,9 +234,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_img_primary
 -- in testing because almost every row is 1. That is why `v_owned` exists in ④ views — nobody
 -- hand-writes this count. A comment is not a control; a view is.
 --
--- NOTE: `disposition` no longer has a 'want' value (it did in v1). A wanted print is a SLOT with no
--- copies — J3. Two ways to say "want" is a duplicate source of truth, and duplicate sources of truth
--- are the disease this rebuild exists to cure.
+-- NOTE: `disposition` has no 'want' value. A wanted print is a SLOT with no copies — J3. Two ways to
+-- say "want" is a duplicate source of truth, and duplicate sources of truth are the disease this
+-- rebuild exists to cure.
 CREATE TABLE IF NOT EXISTS copy (
   copy_id        TEXT PRIMARY KEY,
   edition_id     TEXT NOT NULL,
@@ -260,6 +262,7 @@ CREATE TABLE IF NOT EXISTS copy (
 
   -- ⭐ THE PAYOFF: a one-of-a-kind monoprint cannot be owned six times. Because edition_type is
   -- present and provably matches its parent, this cross-table rule collapses into a plain CHECK.
+  -- VERIFIED 2026-07-28: rejected.
   CHECK (qty = 1 OR edition_type <> 'unique'),
 
   -- Per-copy detail (condition, price paid, framed) describes ONE object. On a qty>1 row it is
@@ -277,7 +280,7 @@ CREATE INDEX IF NOT EXISTS ix_copy_disp ON copy(disposition);
 -- ⚠️ ON DELETE RESTRICT above is the schema's one hard refusal. Beckett's requirement: the binder MUST
 -- hold a print no feed has ever heard of (vending-machine finds, trades, museum shops), and RESTRICT
 -- means the app can never delete an artwork out from under something Michael owns. To record an
--- unknown print, `Enter` creates a placeholder artwork (confidence='placeholder', provenance='owned')
+-- unknown print, entry creates a placeholder artwork (confidence='placeholder', provenance='owned')
 -- + its implicit edition, then the copy. Ownership never depends on a feed having seen the thing.
 
 -- ============================================================ what is NOT here, on purpose
@@ -286,6 +289,6 @@ CREATE INDEX IF NOT EXISTS ix_copy_disp ON copy(disposition);
 --                            tracking."
 -- copy.disposition='want'  — a want is a slot with no copies. One way to say it, not two.
 -- machine / machine_print / machine_event — the location layer. 14 seeded rows in the predecessor,
---                            zero UI ever built. Out of scope (README §6); port when a page needs it.
+--                            zero UI ever built. Out of scope (README §7); port when a page needs it.
 -- market_point / print_point / gone_event — the old time-series trio. ③ `sighting` replaces all three.
 -- catalog / inventory      — dead names. They described sources, not things.
