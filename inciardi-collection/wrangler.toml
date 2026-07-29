@@ -1,0 +1,25 @@
+# Inciardi Collection — worker config
+#
+# Deploy:
+#   cd inciardi-collection
+#   npx wrangler secret put WRITE_KEY      # paste a long random string, NOT a word
+#   npx wrangler deploy
+#
+# 🔴 Fill in database_id from `npx wrangler d1 create inciardi-collection` (or the D1
+# dashboard → your database → the id under the name). Left as a placeholder ON PURPOSE:
+# a wrong id here fails loudly at deploy, which is better than a plausible guess that
+# binds the worker to nothing.
+
+name = "inciardi-collection"
+main = "worker/worker.js"
+compatibility_date = "2026-07-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "inciardi-collection"
+database_id = "PASTE_DATABASE_ID_HERE"
+
+# WRITE_KEY is deliberately NOT here. It is a secret:
+#   npx wrangler secret put WRITE_KEY
+# The predecessor shipped "mikey"/"nickey" inside a public JS bundle and they are still
+# unrotated. Not repeating that.
