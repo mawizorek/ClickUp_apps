@@ -1,0 +1,3 @@
+PrimaryKey	PropertyName	StreetAddress	City	State	PostalCode	fkBorrower	PropertyStatus
+PROP-001	1420 Elm St	1420 Elm St	Chattanooga	TN	37408	ORG-001	Active
+PROP-002	88 Ridge Rd	88 Ridge Rd	Chattanooga	TN	37405	ORG-001	Active
