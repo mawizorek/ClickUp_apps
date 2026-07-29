@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       database_id:
-        description: "D1 database id (leave blank to use the DB_ID repo variable)"
+        description: "Override the D1 database id (leave blank — wrangler.toml already has it)"
         required: false
         type: string
 
@@ -38,25 +38,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The database id is the one thing that would otherwise need a text editor on a
-      # phone. Take it from the run input, or fall back to a repo variable set once in
-      # Settings → Secrets and variables → Variables. Written into wrangler.toml here
-      # rather than committed, so the id never has to be hand-edited on a device.
+      # wrangler.toml normally carries the real id, so this step usually does nothing.
+      # It only DEMANDS an id when the file still holds the placeholder — an earlier version
+      # required one unconditionally, which would have failed a deploy whose config was
+      # already correct.
       - name: Resolve the D1 database id
         run: |
+          FILE=inciardi-collection/wrangler.toml
           ID="${{ inputs.database_id }}"
           if [ -z "$ID" ]; then ID="${{ vars.INCIARDI_DB_ID }}"; fi
-          if [ -z "$ID" ]; then
-            echo "::error::No database id. Pass one when you run this workflow, or set the INCIARDI_DB_ID repo variable. Find it in the D1 dashboard under your database name."
-            exit 1
-          fi
-          sed -i "s|PASTE_DATABASE_ID_HERE|$ID|" inciardi-collection/wrangler.toml
-          echo "Bound to database ${ID:0:8}…"   # truncated: no need to print an id in a public log
 
-      - name: Fail early if the id was not substituted
+          if grep -q PASTE_DATABASE_ID_HERE "$FILE"; then
+            if [ -z "$ID" ]; then
+              echo "::error::wrangler.toml holds the placeholder and no id was supplied. Pass one when running this workflow, or set the INCIARDI_DB_ID repo variable. Find it in the D1 dashboard under your database name."
+              exit 1
+            fi
+            sed -i "s|PASTE_DATABASE_ID_HERE|$ID|" "$FILE"
+            echo "Substituted the placeholder."
+          elif [ -n "$ID" ]; then
+            # An explicit override beats the committed value, so a one-off deploy against a
+            # scratch database never needs a commit.
+            sed -i "s|^database_id = .*|database_id = \"$ID\"|" "$FILE"
+            echo "Overrode the committed id for this run."
+          fi
+
+          BOUND=$(grep '^database_id' "$FILE" | sed 's/.*"\(.*\)".*/\1/')
+          echo "Bound to database ${BOUND:0:8}…"
+
+      - name: Refuse to deploy a worker bound to nothing
         run: |
           if grep -q PASTE_DATABASE_ID_HERE inciardi-collection/wrangler.toml; then
-            echo "::error::wrangler.toml still holds the placeholder. Refusing to deploy a worker bound to nothing."
+            echo "::error::wrangler.toml still holds the placeholder. A worker bound to nothing looks like it worked, which is worse than a failed deploy."
             exit 1
           fi
 
