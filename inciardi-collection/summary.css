@@ -7,6 +7,23 @@
  * the 15KB split line. `.chips` lives here rather than in base.css even though the shoe-box now
  * uses it too — it was authored for this screen.
  * 🔴 `.chips` belongs in base.css. Move it the next time base.css is open.
+ *
+ * ============================================================================
+ * 🔴 v12 — THREE BRAND-COLOUR-AS-INK RULES, FIXED LATE, AND THE PATTERN IS THE POINT.
+ *
+ * v10 established the rule: `accent`, `accent-deep` and `accent-2` are BRAND colours, identical
+ * in BOTH modes; only the neutrals and `accent-soft` / `on-accent` are mode-aware. So a brand
+ * colour used as INK is guaranteed to fail contrast on one of the two ramps. Ink is `--text*` or
+ * `--accent-deep`; brand colours fill, they do not letter.
+ *
+ * v10 then applied that rule to exactly the two places named in the screenshot — the card
+ * initials and the wordmark — and left THREE MORE in this file untouched: the strip labels, the
+ * active sort header, and the placement chips, all lettered in `accent-2`. Michael's actual
+ * words were "light mode isn't that good here", and this file is a large part of "here".
+ *
+ * GENERALIZABLE, and it is the same shape as four other findings this week: FIXING THE INSTANCES
+ * IN THE SCREENSHOT IS NOT FIXING THE RULE. When a class of defect is named, grep the class.
+ * ============================================================================
  */
 
 /* ---------- THE WINDOW ----------
@@ -29,8 +46,9 @@
   line-height: 1.1; color: var(--text); }
 /* The denominator rides small and faint inside the number, so "7/36" reads as one fact. */
 .mx-c .v .of { font-size: 0.6em; font-weight: 400; color: var(--text-faint); }
+/* accent-deep, NOT accent-2 — see the v12 block at the top of this file. */
 .mx-c .l { font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--accent-2); margin-top: 2px; }
+  color: var(--accent-deep); margin-top: 2px; }
 .mx-c .s { font-size: 0.6rem; color: var(--text-faint); line-height: 1.2; margin-top: 1px; }
 @media (max-width: 430px) {
   /* The third line goes first: it explains the label, and the label survives without it. */
@@ -84,8 +102,8 @@
 .sortb:hover { color: var(--text); background: var(--surface-2); }
 /* The active sort is marked by COLOUR AND WEIGHT, not an arrow glyph: there is only one
    direction (descending for numbers, A-Z for names), so an arrow would imply a toggle that
-   does not exist. */
-.sortb[aria-pressed="true"] { color: var(--accent-2); font-weight: 600; }
+   does not exist. accent-deep, NOT accent-2 — see the v12 block at the top. */
+.sortb[aria-pressed="true"] { color: var(--accent-deep); font-weight: 600; }
 
 .mxt tbody tr.mrow { cursor: pointer;
   border-bottom: var(--border-w, 1px) solid var(--border); }
@@ -118,7 +136,7 @@
 .mxt td.num.zero { color: var(--text-faint); }
 /* `.na` is stronger than `.zero`: not "none of them" but "this column does not apply." It is
    what a wanted row prints under Own and Box, because a 0 is a quantity and a quantity invites
-   addition — the whole misreading this pass exists to kill. */
+   addition — the whole misreading v11 exists to kill. */
 .mxt td.num.na { color: var(--text-faint); opacity: 0.55; }
 /* A wanted row's slot count. DASHED, like the slot it describes, so the number stays legible as
    a marker rather than as inventory. */
@@ -136,10 +154,11 @@
   padding: 5px 0; }
 .dr-l .tag { flex: 0 0 auto; }
 /* Each placement is a real link into the binder at that sheet and face. Styled as a chip
-   because it is a destination, and sized for a thumb. */
+   because it is a destination, and sized for a thumb. accent-deep, NOT accent-2 — this one is
+   the worst of the three, because it is a LINK and an unreadable link is an unfindable door. */
 .wl { display: inline-flex; align-items: center; min-height: 30px; padding: 3px 8px;
   border-radius: var(--radius, 6px); text-decoration: none;
-  background: var(--surface-3); color: var(--accent-2);
+  background: var(--surface-3); color: var(--accent-deep);
   border: var(--border-w, 1px) solid var(--border);
   font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.02em;
   transition: border-color 140ms var(--ease, ease-out), color 140ms var(--ease, ease-out); }
