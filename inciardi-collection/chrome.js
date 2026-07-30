@@ -1,27 +1,16 @@
 /* Inciardi Collection — APP CHROME. Header, nav drawer, settings drawer, footer.
  *
- * Adopted from `template-app/chrome.js` (gold standard v5) on 2026-07-30. Built ONCE and
- * shared by every route, from a config object.
+ * Adopted from `template-app/chrome.js` (gold standard v5) on 2026-07-30. Built ONCE and shared
+ * by every route, from a config object.
  *
- * ============================================================================
- * WHAT THE TEMPLATE ALREADY SOLVED, AND WE HAD SOLVED WRONG.
+ * WHAT THE TEMPLATE ALREADY SOLVED AND WE HAD SOLVED WRONG: this app put its nav INLINE in the
+ * header, which is why it wrapped to two lines on a phone at v5 and why the app carried a comment
+ * reading "FOUR ITEMS IS THE CEILING." The template's answer is a hamburger and a LEFT DRAWER,
+ * which has no item ceiling. Also adopted: a FOOTER — this app had none, so its version stamp
+ * lived nowhere.
  *
- * This app put its nav INLINE in the header. That is why the header wrapped to two lines on a
- * phone at v5, why a comment in index.html read "FOUR ITEMS IS THE CEILING," and why the next
- * screen was going to need a menu anyway. **The template's answer is a HAMBURGER and a LEFT
- * DRAWER, and it has no item ceiling at all.** We wrote a constraint comment where the
- * standard already had a pattern.
- *
- * Also adopted: **a FOOTER.** This app had none, so its version stamp lived nowhere and the
- * only way to tell which build you were looking at was the diagnostics bundle.
- *
- * Left and right drawers are mirror images: nav on the left, settings on the right, one shared
- * scrim, mutually exclusive, Escape closes, focus returns to whatever opened them.
- * ============================================================================
- *
- * Zero colour literals — every value is var(--token) from the theme spine. The scrim is the
- * documented exception in the template, and here it uses --bg at opacity rather than
- * black-alpha so it inverts correctly in light mode.
+ * Left and right drawers are mirror images, one shared scrim, mutually exclusive, Escape closes,
+ * focus returns to whatever opened them. Zero colour literals.
  */
 (function () {
   var open = { nav: false, settings: false };
@@ -78,12 +67,13 @@
   function toggle(which, trigger) {
     var willOpen = !open[which];
     if (willOpen && trigger) lastTrigger = trigger;
-    // Opening one closes the other, and closes any page-level drawer too — three open panels
-    // stacked over each other is how the v4 UI got confusing.
+    // Opening one closes the other, and any page-level drawer too — three stacked panels is how
+    // the v4 UI got confusing.
     if (window.Drawer) Drawer.closeAll(true);
     setDrawer('nav', which === 'nav' ? willOpen : false);
     setDrawer('settings', which === 'settings' ? willOpen : false);
     $('chromeScrim').hidden = !(open.nav || open.settings);
+    if (open.settings) paintDevice();      // refresh in case the window was resized since
     if (!open.nav && !open.settings) restoreFocus();
   }
 
@@ -150,6 +140,11 @@
 
         '<div class="drawer-hr"></div>' +
 
+        '<label class="drawer-label">This device</label>' +
+        '<p class="drawer-note" id="devNote"></p>' +
+
+        '<div class="drawer-hr"></div>' +
+
         '<label class="drawer-label" for="writeKey">Write key</label>' +
         '<input id="writeKey" type="password" autocomplete="off">' +
         '<p class="drawer-note" id="keyHint"></p>' +
@@ -170,26 +165,35 @@
     document.body.appendChild(d);
     $('setX').addEventListener('click', closeAll);
     initMode();
+    paintDevice();
+  }
+
+  /* Michael asked to track mobile vs desktop. `device.js` owns the answer; this is where a person
+   * can read it, and the footer carries the short version. Re-read on drawer open rather than
+   * cached, because a resized window changes it. */
+  function paintDevice() {
+    var el = $('devNote');
+    if (!el) return;
+    el.textContent = window.Device
+      ? Device.describe()
+      : 'device.js did not load, so layout is falling back to width alone.';
   }
 
   /* ============================================================ LIGHT / DARK
-   * Michael, 2026-07-30: "make the color vector on the home page have a light mode toggle
-   * alternative for the app."
+   * No new colours and no new CSS. Every row in `colors.tsv` ships its default ramp PLUS eleven
+   * `alt-*` columns holding the opposite-mode neutrals, and `mercedes` has a complete set
+   * (verified against the grid). `resolve.js` already exposes setMode / getMode / supportsMode
+   * and swaps the ramp on the same colour row. Brand accent, semantics and data colours are
+   * shared across modes on purpose — a theme should not change identity when the lights come on.
    *
-   * This needed NO new colours and NO new CSS. Every row in `colors.tsv` ships its default
-   * ramp PLUS eleven `alt-*` columns holding the opposite-mode neutrals, and `mercedes` has a
-   * complete set (verified against the grid before writing this). `resolve.js` already
-   * exposes setMode / getMode / supportsMode, and swaps the ramp on the same colour row.
-   * Brand accent, semantics and data colours are shared across modes on purpose — a theme
-   * should not change identity when the lights come on.
+   * 🔴 WHICH IS ALSO THE v10 LESSON: because brand colours are shared, using one as INK fails in
+   * one of the two modes. v9 lettered the card initials and the wordmark in `accent-2` and they
+   * vanished on the light ramp. Fixed by using the mode-aware pair (`accent-soft` ground,
+   * `accent-deep` ink), NOT by adding a light-mode override. If a rule needs `[data-mode]`, the
+   * rule is reaching around the spine.
    *
-   * 🔴 SO THE ONLY WORK HERE IS A TOGGLE. If this had needed a second palette, the theme spine
-   * would have been built wrong. It didn't. That is the spine paying off for the third time
-   * today (Mercedes swap = 3 pointers, this = 1 call).
-   *
-   * Dark stays the default — Michael's standing preference — and the choice persists in
-   * localStorage under the resolver's own key, so it survives a reload without this app
-   * inventing a second place to remember it. */
+   * Dark stays the default. The choice persists under the resolver's own key, so this app never
+   * invents a second place to remember it. */
   function initMode() {
     var note = $('modeNote');
 
@@ -213,19 +217,22 @@
         var mode = this.getAttribute('data-mode');
         THEMES.setMode(mode);          // persists; swaps the ramp on the same colour row
         paint(mode);
-        // The iOS browser chrome is painted by a meta tag, so it has to move with the app or
-        // there is a visible seam between the two.
+        /* The iOS browser chrome is painted by a meta tag, so it has to move with the app or
+         * there is a visible seam between the two. Read the resolved token rather than hardcoding
+         * a hex, so this stays correct if the palette ever changes. */
         var m = document.querySelector('meta[name="theme-color"]');
-        if (m) m.setAttribute('content', mode === 'light' ? '#fdffff' : '#192221');
+        if (m) {
+          var c = getComputedStyle(document.documentElement)
+            .getPropertyValue('--surface-1').trim();
+          if (c) m.setAttribute('content', c);
+        }
       });
     });
 
     paint(THEMES.getMode() || 'dark');
   }
 
-  /* ---------- footer ----------
-   * This app had no footer, so its build stamp had nowhere to live and "which version am I
-   * looking at" was only answerable from the diagnostics bundle. */
+  /* ---------- footer ---------- */
   function buildFooter(cfg) {
     var f = $('appFooter');
     f.innerHTML =
@@ -235,8 +242,17 @@
             return '<a href="' + s.href + '" target="_blank" rel="noopener">' + s.label + '</a>';
           }).join('') +
         '</div>' +
+        '<div class="foot-dev" id="footDev"></div>' +
         '<div class="foot-stamp">' + cfg.appName + ' ' + cfg.version + '</div>' +
       '</div>';
+    paintFootDev();
+    // Keep it honest across a window drag: device.js debounces its own re-read, this follows.
+    window.addEventListener('resize', function () { setTimeout(paintFootDev, 160); });
+  }
+
+  function paintFootDev() {
+    var el = $('footDev');
+    if (el && window.Device) el.textContent = Device.kind();
   }
 
   window.Chrome = {

@@ -1,21 +1,22 @@
 /* Inciardi Collection — BASE. Reset, type, forms, buttons, lists, page drawers, toasts.
  *
- * ZERO COLOUR LITERALS. Every value is var(--token) from the theme spine, which is what made
- * the Mercedes swap three pointers and light mode a single `THEMES.setMode()` call. Check
- * before you paste a hex in here.
+ * ZERO COLOUR LITERALS. Every value is var(--token) from the theme spine, which is what made the
+ * Mercedes swap three pointers and light mode a single `THEMES.setMode()` call.
  *
- * Split from a 30KB `styles.css` on 2026-07-30 — past the 22KB ceiling, so it could not be read
- * back whole, so it could not be safely edited. The set now:
- *   base.css    — this file. Everything not specific to one screen.
- *   chrome.css  — header, nav + settings drawers, footer.
- *   binder.css  — the stage, cards, deck bar, sheet list, legend.
- *   summary.css — the matrix.
+ * The set: base.css (this) · chrome.css · binder.css · sheets.css · summary.css.
  *
- * 🔴 LIGHT MODE WORKS HERE FOR FREE, and that is the point of the token discipline: every rule
- * below reads `--bg`, `--surface-N`, `--text`, so `THEMES.setMode('light')` swaps the eleven
- * neutral tokens on the SAME Mercedes colour row and nothing in this file changes. If a rule
- * ever needs a `@media (prefers-color-scheme)` or a `[data-mode="light"]` override, that rule
- * is reaching around the spine and is the bug.
+ * 🔴 THE TOKEN RULE, and v10 is where it got teeth. `accent`, `accent-deep` and `accent-2` are
+ * BRAND colours, identical in both modes by design. `bg`, the four surfaces, `border`, `field`,
+ * the three text tokens, `accent-soft` and `on-accent` are MODE-AWARE. So:
+ *      ink is --text* or --accent-deep · brand colours FILL, they never letter
+ * v9 broke this twice (card initials and the wordmark in `accent-2`) and both vanished on the
+ * light ramp. The fix is never a `[data-mode="light"]` override — a rule that needs one is
+ * reaching around the spine and is itself the bug.
+ *
+ * 🔴 AND THE OTHER ONE: `--field` is the raised-surface token, and it is the only one that moves
+ * in the RIGHT DIRECTION in both modes (lighter than the page in dark, white against grey in
+ * light). `surface-2` inverts — in the light ramp it is DARKER than the background, which is why
+ * v9's light mode read as grey slabs on a white page. Cards use `--field`.
  */
 
 * { box-sizing: border-box; }
@@ -28,8 +29,8 @@ body {
   font-family: var(--font-body, system-ui, -apple-system, sans-serif);
   font-size: var(--fs-body, 0.95rem);
   /* Light-on-dark loses perceived weight on three axes, so it is compensated on three: leading
-     up, a little tracking, body weight at 350 rather than 400. In LIGHT mode this reads very
-     slightly airy, which is the correct trade — one body rule beats two. */
+     up, a little tracking, body weight 350. Light mode reads very slightly airy at 350, which is
+     the correct trade — one body rule beats two. */
   font-weight: 350;
   line-height: 1.55;
   letter-spacing: 0.01em;
@@ -37,7 +38,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Scrolling routes (Enter, Shoe-box, Summary) keep document flow + room for the home bar. */
+/* Scrolling routes (Enter, Shoe-box, Collection) keep document flow + room for the home bar. */
 body:not(.stage) { padding-bottom: 2rem; }
 
 /* THE STAGE. Binder only: nothing scrolls, the sheet is bounded by the screen.
@@ -47,13 +48,15 @@ body.stage { height: 100dvh; overflow: hidden; display: flex; flex-direction: co
 
 .skip-link { position: absolute; left: -9999px; }
 .skip-link:focus { left: var(--gap-md, 12px); top: var(--gap-md, 12px); z-index: 80;
-  background: var(--surface-3); color: var(--text); padding: var(--gap-xs, 8px); }
+  background: var(--surface-2); color: var(--text); padding: var(--gap-xs, 8px); }
 
-/* ---------- layout ---------- */
+/* ---------- layout ----------
+   65-75ch is the readable measure, so a 900px column on a wide desktop is already generous; the
+   stage overrides this because a binder is an object, not prose. */
 main { max-width: 900px; margin: 0 auto; width: 100%;
   padding: var(--gap-lg, 20px) var(--gap-md, 12px); }
 body.stage main { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
-  padding: 0; }
+  max-width: none; padding: 0; }
 body.stage .page { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
 
 .page > h1 { font-family: var(--font-display, inherit); font-size: var(--fs-lead, 1.15rem);
@@ -72,7 +75,7 @@ body.stage .page { flex: 1 1 auto; min-height: 0; display: flex; flex-direction:
 .banner { padding: var(--gap-xs, 8px) var(--gap-md, 12px); font-size: var(--fs-sm, 0.85rem);
   border-top: var(--border-w, 1px) solid var(--border); }
 .banner.warn { background: var(--warn); color: var(--on-accent); }
-.banner code { background: var(--surface-3); padding: 0 4px; border-radius: 3px; color: var(--text); }
+.banner code { background: var(--surface-2); padding: 0 4px; border-radius: 3px; color: var(--text); }
 
 /* ---------- forms ---------- */
 label { display: block; font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.09em;
@@ -97,13 +100,13 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .check label { margin: 0; text-transform: none; letter-spacing: 0.01em;
   font-size: var(--fs-body, 0.95rem); color: var(--text); }
 
-button { background: var(--surface-2); color: var(--text);
+button { background: var(--field); color: var(--text);
   border: var(--border-w, 1px) solid var(--border);
   border-radius: var(--radius, 6px); padding: 10px 14px; font: inherit; font-weight: 450;
   cursor: pointer; min-height: var(--touch, 44px);
   transition: transform 110ms var(--ease, ease-out), border-color 140ms var(--ease, ease-out),
               background 140ms var(--ease, ease-out); }
-button:hover:not([disabled]) { border-color: var(--accent-2); }
+button:hover:not([disabled]) { border-color: var(--accent); }
 button:active:not([disabled]) { transform: translateY(1px); }
 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 button.primary { background: var(--accent); color: var(--on-accent);
@@ -112,9 +115,9 @@ button.ghost { background: transparent; color: var(--text-soft); }
 button[disabled] { opacity: 0.32; cursor: not-allowed; }
 
 /* ---------- page drawers ----------
-   Distinct from the CHROME drawers (nav + settings, styled in chrome.css): these belong to a
-   route and are rebuilt with it. Bottom sheets under 720px, because a right-hand panel on a
-   phone puts the close control at the furthest point from a thumb. */
+   Distinct from the CHROME drawers (nav + settings, in chrome.css): these belong to a route and
+   are rebuilt with it. Bottom sheets under 720px, because a right-hand panel on a phone puts the
+   close control at the furthest point from a thumb. */
 .page-drawer { position: fixed; inset: 0 0 0 auto; width: min(390px, 92vw); z-index: 50;
   background: var(--surface-1); border-left: var(--border-w, 1px) solid var(--border);
   overflow: auto; box-shadow: var(--elev-3, none);
@@ -129,14 +132,13 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
 @keyframes slideIn { from { transform: translateX(12px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes sheetUp { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-/* The scrim. v4 had none, so a drawer floated over a fully live page with no signal that it was
-   modal and no way to dismiss by tapping away. Uses --bg at opacity rather than black-alpha so
-   it inverts correctly in light mode — a black scrim over a light page reads as a bug. */
+/* The scrim. --bg at opacity rather than black-alpha so it inverts correctly: a black scrim over
+   a light page reads as a bug. */
 .page-scrim { position: fixed; inset: 0; z-index: 45; background: var(--bg); opacity: 0.72;
   border: 0; padding: 0; animation: fade 200ms var(--ease, ease-out); }
 @keyframes fade { from { opacity: 0; } to { opacity: 0.72; } }
 
-.out { background: var(--surface-3); border: var(--border-w, 1px) solid var(--border);
+.out { background: var(--surface-2); border: var(--border-w, 1px) solid var(--border);
   border-radius: var(--radius, 6px); padding: var(--gap-xs, 8px); overflow: auto;
   font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
   max-height: 40vh; white-space: pre-wrap; }
@@ -145,23 +147,24 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
 .list { border-top: var(--border-w, 1px) solid var(--border); }
 .item { display: flex; align-items: center; gap: var(--gap-md, 12px);
   padding: var(--pad-cell, 10px) 0; border-bottom: var(--border-w, 1px) solid var(--border); }
+/* Same accent-soft ground / accent-deep ink pair as the binder card plate, for the same reason:
+   both tokens read in both modes, and neither is a brand colour used as ink. */
 .item .tile { width: 38px; height: 47px; flex: 0 0 auto; display: grid; place-items: center;
-  border-radius: 3px;
-  background: linear-gradient(var(--grad-angle, 135deg), var(--surface-3), var(--surface-2));
+  border-radius: 3px; background: var(--accent-soft);
   font-family: var(--font-display, inherit); font-size: var(--fs-xs, 0.72rem);
-  font-weight: 600; letter-spacing: 0.04em; color: var(--accent-2); }
+  font-weight: 700; letter-spacing: 0.04em; color: var(--accent-deep); }
 .item .body { flex: 1 1 auto; min-width: 0; }
 .item .body .nm { display: block; font-weight: 450; }
 .item .right { flex: 0 0 auto; text-align: right; display: flex; gap: 4px; align-items: center; }
 
 .badge { display: inline-block; font-family: var(--font-mono, ui-monospace, monospace);
   font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.04em; padding: 2px 6px;
-  border-radius: 3px; background: var(--surface-3); color: var(--text-soft);
+  border-radius: 3px; background: var(--surface-2); color: var(--text-soft);
   font-variant-numeric: tabular-nums; white-space: nowrap; }
 .badge.good { background: var(--accent); color: var(--on-accent); }
 .badge.bad  { background: var(--bad);  color: var(--on-accent); }
 
-/* Filter chips, shared by the shoe-box and the summary matrix. */
+/* Filter chips, shared by the shoe-box and the collection matrix. */
 .chips { display: flex; flex-wrap: wrap; gap: var(--gap-xs, 8px); margin-bottom: var(--gap-md, 12px); }
 .chip { min-height: 36px; padding: 6px 11px; display: inline-flex; align-items: center; gap: 6px;
   border-radius: var(--radius-pill, 8px); font-size: var(--fs-sm, 0.85rem); flex: 0 0 auto; }
@@ -170,8 +173,8 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
 .chip .n { font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
   opacity: 0.75; font-variant-numeric: tabular-nums; }
 
-/* Shoe-box groups: "Not in the binder yet" and "Spares" are different facts, so they get their
-   own sections rather than one list with a badge you have to decode. */
+/* Shoe-box groups: "Not in the binder yet" and "Spares" are different facts, so they get their own
+   sections rather than one list with a badge you have to decode. */
 .boxgroup { margin-bottom: var(--gap-lg, 20px); }
 .bg-head { display: flex; align-items: baseline; gap: var(--gap-xs, 8px);
   padding-bottom: 5px; border-bottom: 2px solid var(--text); }
@@ -192,7 +195,7 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
   bottom: max(var(--gap-md, 12px), calc(env(safe-area-inset-bottom) + 4px)); }
 /* On the stage the deck bar owns that space, so toasts sit above it. */
 body.stage .toasts { bottom: calc(58px + max(var(--gap-md, 12px), env(safe-area-inset-bottom))); }
-.toast { background: var(--surface-3); color: var(--text);
+.toast { background: var(--surface-1); color: var(--text);
   border: var(--border-w, 1px) solid var(--border);
   border-radius: var(--radius, 6px); padding: 9px 12px; font-size: var(--fs-sm, 0.85rem);
   box-shadow: var(--elev-2, none);

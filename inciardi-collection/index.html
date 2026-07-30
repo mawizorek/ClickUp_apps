@@ -1,70 +1,71 @@
 <!doctype html>
-<!-- Inciardi Collection — v9. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v10. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
 
      RULE 1 — nothing that must be read back whole exceeds the budget:
-     **~12KB target · 15KB split line · 22KB ceiling · 30KB hard tool cap.** Base64 inflates
-     4/3, so 22KB on disk is ~29KB returned. A file that cannot be read whole cannot be safely
-     edited. Full math: `brain-config/hooks/source-size-budget-enforcer.md`.
+     **~12KB target · 15KB split line · 22KB ceiling · 30KB hard tool cap.** Base64 inflates 4/3,
+     so 22KB on disk is ~29KB returned. A file that cannot be read whole cannot be safely edited.
+     Math: `brain-config/hooks/source-size-budget-enforcer.md`.
 
      RULE 2 — **`index.html` is an INDEX** (architecture lock, 2026-07-08): a thin shell that
-     references pages, never a file storing servable content. This one had grown a ~250-line
-     inline script and hit 20.8KB. The index had become the app. That script is now `boot.js`.
+     references pages, never a file storing servable content.
 
        core.js     9.6KB  API client · Drawer · helpers    → API, Core, Drawer
-       chrome.js  11.5KB  header · nav · settings · footer → Chrome
+       device.js   2.9KB  mobile vs desktop, one owner     → Device
+       chrome.js  11.9KB  header · nav · settings · footer → Chrome
        binder.js  14.2KB  the stage, faces, turning        → Binder
        sheets.js   6.3KB  reorder · rename · add           → Sheets
        picker.js   4.5KB  the slot entry surface           → Picker
        enter.js    8.1KB  entry form + shoe-box            → Enter, Shoebox
        summary.js 10.1KB  the collection matrix            → Summary
-       app.js      4.7KB  routing only                     → App
-       boot.js    12.4KB  config · theme · router · settings
+       app.js      3.1KB  routing only                     → App
+       boot.js    12.6KB  config · theme · router · settings
 
-       base.css   12.3KB  type · forms · lists · toasts
-       chrome.css  8.2KB  header · drawers · footer
-       binder.css 15.2KB  stage · cards · deck bar
+       base.css   12.6KB  type · forms · lists · toasts
+       chrome.css  9.0KB  header · drawers · footer
+       binder.css 13.6KB  stage · cards · deck bar
+       sheets.css  3.5KB  sheet list · legend
        summary.css 9.3KB  the matrix
 
-     Every file under the split line except `binder.css` at 15.2KB, which is at it. ADDING A
-     SCREEN MEANS ADDING A FILE. Never grow one of these back.
+     Every file under the 15KB split line. ADDING A SCREEN MEANS ADDING A FILE.
 
-     🔴 HOW IT WENT WRONG, because the mechanism matters more than the numbers: v4 added the
-     sheet menu, v5 the stage, v6 traversal, v7 the shoe-box split — four reasonable changes,
-     one file, no moment anyone would have called it a problem. `app.js` hit 32.7KB and
-     `styles.css` 30KB. **Size Sally forecasts exactly this and Dev Dexter owns the split law;
-     both are invoke-only and neither was seated across those four versions.** A guardrail that
-     needs remembering is not a guardrail — which is why the answer is a DEFAULT SHAPE (thin
-     router, one module per screen) rather than a fifth gate.
+     🔴 HOW IT WENT WRONG, because the mechanism matters more than the numbers: v4 added the sheet
+     menu, v5 the stage, v6 traversal, v7 the shoe-box split — four reasonable changes, one file,
+     no moment anyone would have called it a problem. `app.js` hit 32.7KB, `styles.css` 30KB.
+     Size Sally forecasts exactly this and Dev Dexter owns the split law; both are invoke-only and
+     neither was seated across those four versions. A guardrail that needs remembering is not a
+     guardrail — which is why the answer is a DEFAULT SHAPE, not a fifth gate.
      ============================================================================
 
-     v9 also: template header/footer pattern (hamburger + left nav drawer, real footer with a
-     build stamp) and a LIGHT MODE toggle — one `THEMES.setMode()` call, because every colour
-     row already ships an alt-* ramp and every rule here reads var(--token). -->
+     v10: MOBILE VS DESKTOP is tracked (`device.js` → `data-device` on <html>, read by CSS, shown
+     in the footer and settings), the stage keeps PORTRAIT cards on a wide screen instead of
+     stretching them landscape, and LIGHT MODE stops lettering in brand colours — see the token
+     rule at the top of base.css. -->
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- Mercedes surface-1. Paints the iOS browser chrome, so chrome.js moves it with the mode
-     toggle — a stale value here is a visible seam against the phone UI. -->
+<!-- Mercedes surface-1. Paints the iOS browser chrome; chrome.js moves it with the mode toggle,
+     reading the resolved token rather than a hardcoded hex. -->
 <meta name="theme-color" content="#192221">
 <meta name="robots" content="noindex, nofollow">
 <title>Inciardi Collection</title>
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=9">
-<link rel="stylesheet" href="./chrome.css?v=9">
-<link rel="stylesheet" href="./binder.css?v=9">
-<link rel="stylesheet" href="./summary.css?v=9">
+<link rel="stylesheet" href="./base.css?v=10">
+<link rel="stylesheet" href="./chrome.css?v=10">
+<link rel="stylesheet" href="./binder.css?v=10">
+<link rel="stylesheet" href="./sheets.css?v=10">
+<link rel="stylesheet" href="./summary.css?v=10">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
 
-<!-- chrome.js fills these three. The nav drawer, settings drawer and scrim are appended to
-     <body> by it, so they are not in this file either. -->
+<!-- chrome.js fills these three. The nav drawer, settings drawer and scrim are appended to <body>
+     by it, so they are not in this file either. -->
 <header id="appHeader"></header>
 <main id="view" tabindex="-1"></main>
 <footer id="appFooter"></footer>
@@ -72,18 +73,19 @@
 <div id="toasts" class="toasts" aria-live="polite"></div>
 <noscript>This app needs JavaScript enabled.</noscript>
 
-<!-- ORDER: core.js first (everything depends on it), boot.js last (it calls Chrome.init and
-     the router). The screen modules between are order-independent — each only registers a
-     window.X, and mounting happens after every file has parsed. -->
+<!-- ORDER: device.js FIRST — it sets `data-device` on <html>, and CSS layout depends on that
+     attribute being present before the stage paints. Then core.js (everything needs it), then the
+     screen modules in any order, then boot.js last because it calls Chrome.init and the router. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./core.js?v=9"></script>
-<script src="./chrome.js?v=9"></script>
-<script src="./binder.js?v=9"></script>
-<script src="./sheets.js?v=9"></script>
-<script src="./picker.js?v=9"></script>
-<script src="./enter.js?v=9"></script>
-<script src="./summary.js?v=9"></script>
-<script src="./app.js?v=9"></script>
-<script src="./boot.js?v=9"></script>
+<script src="./device.js?v=10"></script>
+<script src="./core.js?v=10"></script>
+<script src="./chrome.js?v=10"></script>
+<script src="./binder.js?v=10"></script>
+<script src="./sheets.js?v=10"></script>
+<script src="./picker.js?v=10"></script>
+<script src="./enter.js?v=10"></script>
+<script src="./summary.js?v=10"></script>
+<script src="./app.js?v=10"></script>
+<script src="./boot.js?v=10"></script>
 </body>
 </html>
