@@ -1,15 +1,14 @@
-<!-- The whole collection in one window. Behaviour lives in summary.js and styling in
-     summary.css — both SEPARATE from app.js and styles.css on purpose: those two are already at
-     or past the ~30KB read cap this repo works under, and a fifth screen inside them would have
-     made the app's own source unreadable. See the block at the top of summary.js.
+<!-- The whole collection in one window. Behaviour lives in summary.js, styling in summary.css.
 
-     The <h1> says "Summary" and not "Collection" only because the nav says Summary. A nav label
-     that disagrees with the page title it lands on makes you check whether you clicked the
-     wrong thing. The sub-line carries the better word. -->
+     🔴 NO <h1> HERE (v11). The header centres the PAGE TITLE now and takes it from `nav[].label`
+     in boot.js, so a heading in this file would print the same word twice, one line apart, and
+     give the page two h1s.
+     That also settles a naming split this file used to DOCUMENT instead of fix: the h1 said
+     "Summary", the sub-line said "collection", and the route label said "Collection". Three names
+     for one screen. It is Collection, written once, in boot.js. -->
 <section class="page">
-  <h1>Summary</h1>
-  <p class="sub">The whole collection: what you own, what's in the binder, what's still in the
-     box. Tap any print for the sheets it sits on.</p>
+  <p class="sub">What you own, what's in the binder, what's still in the box. Tap any print for
+     the sheets it sits on.</p>
 
   <div id="sumWrap"></div>
 </section>
