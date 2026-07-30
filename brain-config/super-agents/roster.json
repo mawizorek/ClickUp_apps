@@ -1,11 +1,16 @@
 {
-  "_": "THE resolution index for every agent: what exists, and where to open it. The Agent Invocation Gate resolves every named call against this file first (gates/agent-invocation-gate.md STEP 0). Renderer: roster.html.",
+  "🚨_SUPERSEDED": "THIS FILE IS NO LONGER CANONICAL as of 2026-07-30. The agent index moved to a CLICKUP LIST: 🤖 Agent Index (list 901328216173, MAW Documents ▸ ClickUp Use). Resolve every named agent call against that list. Ruling: Fleet Build Queue Decision Log Q14 → A (REPLACE), Michael: 'it's a table. not a doc.'",
+  "🧊_FROZEN": "DO NOT ADD A ROW HERE. DO NOT EDIT A ROW HERE. A new or changed agent goes in the ClickUp list ONLY. This file is kept live and unretired for exactly one reason: the pointer repoint sweep is INCOMPLETE, so some gates and bundle load-manifests still name it. It is a read-only fallback during that window, NOT a mirror to keep in sync — the 2026-07-25 mirror-pair retirement (registry.json, PR #483) applies here too, and this header is what prevents two files both claiming canonical. Retire this file to a tombstone stub the moment the sweep lands.",
+  "why_it_moved": "A 39-record table was being simulated by a text file that must be read WHOLE — there is no range read, so resolving one agent cost the entire file and every added byte taxed every future resolution. Trimmed SIX times across FIVE commits in FOUR days (PR #483 24.8KB→14.4KB · 5c3a8cc · 66fdb06 · 78d1c92 ×2 · PR #559 18.4KB→13.18KB) and NEVER ONCE under its own ~12KB slim rule since that rule was locked: 14.4 → 21.1 → 18.4 → 13.18 → 13.67KB, regrowing +6.7KB in a single day. At ~25KB it became unreadable-whole and shipped Dev Dexter built-but-unregistered. A ClickUp list has no unbounded free-text area to colonize and can be queried one row at a time, so the size ceiling — and the trim treadmill — stop existing.",
+  "repoint_sweep_TODO": "Known surfaces naming this file (⚠️ UNVERIFIED COUNT — githubmcp_search_code returns 0 results on this repo, so this list is what was read directly, NOT an exhaustive sweep; enumerate by hand before retiring): gates/agent-invocation-gate.md (STEP 0) · gates/agent-name-collision-gate.md (checks 2+5) · gates/git-agent-authoring.md (step 6) · gates/git-teammate-lifecycle-runbook.md (REGISTER + pointers) · super-agents/roster.html (renderer, dies with the file — a ClickUp view IS the renderer) · super-agents/superagents.json (already a redirect stub) · super-agents/index.md · the AI Toolkit ClickUp index · EVERY agent bundle's load manifest (confirmed on mainstage-milo + tutor-tate).",
+  "what_did_NOT_move_to_fields": "Prose that is not per-agent data was re-homed rather than migrated, because pasting it into task descriptions would rebuild the exact problem inside ClickUp: invocation.tokens disambiguation warnings (Clio/Cleo, Rocky→Ricky, Dex/Dara, the fmp-frank slug) → gates/agent-name-collision-gate.md, which is already their real home · tombstones note → gates/git-teammate-lifecycle-runbook.md · pointers block → already duplicated in the runbook + authoring gate · the schema/field_notes commentary → dies, because a list's field set IS its schema.",
+  "_": "[HISTORICAL] THE resolution index for every agent: what exists, and where to open it. The Agent Invocation Gate resolves every named call against this file first (gates/agent-invocation-gate.md STEP 0). Renderer: roster.html.",
   "this_is_an_INDEX": "⚠️ A field belongs here ONLY if you need it to decide WHICH RECORD TO OPEN. Nothing else. A catalogue card that starts containing the book has stopped being a catalogue. THINNED 2026-07-27 (18.4KB → this): lane, accent, from, seat, teams REMOVED because each was a lossy duplicate of a file that says it better. Do not add them back, and do not add a new descriptive field without running that test.",
   "where_the_description_went": "lane + full role → the agent's own preferences.md (super-agent) or agents/<slug>.md (lens) — now the SINGLE authoritative source, which it was not while this file held a second copy · seat + teams → council.md + teams/the-workshop.md + teams/uritp-audit-council.md (the seating maps, always the real source) · from/lineage → git history, where every graduation is a commit · accent → roster.html, which is the only thing that ever used it.",
   "schema": "slug | name | class | memory | status | invoke | aka[] | home | instructions | default_runbook | gate_strength",
   "field_notes": "class = PERSISTENCE not rank (_shared/super-agent-base.md §6) · status gates whether a token resolves at all · default_runbook + gate_strength are READ ON EVERY BARE-NAME CALL and are NOT cosmetic (gates/agent-invocation-gate.md) · rows with NO home file keep a one-line `lane`, because for those it is the only description that exists anywhere.",
   "pointers_for_rules": "naming, tokens, homophones → gates/agent-name-collision-gate.md · invocation modes, the soft gate, the three doors → gates/agent-invocation-gate.md · how to build/graduate → gates/git-teammate-lifecycle-runbook.md · seating → council.md + teams/.",
-  "updated": "2026-07-30",
+  "updated": "2026-07-30 (frozen)",
   "agents": [
     { "slug": "maestro-mira", "name": "Maestro Mira", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Mira", "aka": ["Mira", "Maestro", "Lead"], "home": "super-agents/maestro-mira/", "instructions": "orchestration.md" },
     { "slug": "fleet-felix", "name": "Fleet Felix", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Felix", "aka": ["Felix", "Fleet", "Steward"], "home": "super-agents/fleet-felix/" },
@@ -51,7 +56,7 @@
     { "slug": "update-uritp", "name": "Update URITP", "class": "retired", "memory": false, "status": "retired", "lane": "RETIRED 2026-07-21 — a task label, not an agent. A process/chore becomes a standalone DOC, not an agent." }
   ],
   "invocation": {
-    "how": "A named call (/session.agent=X, /session-start=X, bare name, nickname, or SLUG) resolves against this list, then loads that agent's home DIRECTLY. No double-hop through Felix or Mira. Reading this file is not invoking Felix. Full rules: gates/agent-invocation-gate.md.",
+    "how": "A named call (/session.agent=X, /session-start=X, bare name, nickname, or SLUG) resolves against THE CLICKUP AGENT INDEX LIST (901328216173) as of 2026-07-30, then loads that agent's home DIRECTLY. No double-hop through Felix or Mira. Full rules: gates/agent-invocation-gate.md.",
     "group_calls": "A GROUP token resolves against a seating map in teams/, not against this agent list. It seats several agents at once and is the intended way to call a standing bench. Known groups: /council=uritp-audit (teams/uritp-audit-council.md) · the Workshop, always via Mira (teams/the-workshop.md).",
     "tokens": {
       "Mira | Maestro | Lead": "maestro-mira — also the DEFAULT when no agent is named",
@@ -62,25 +67,26 @@
       "Maggie | Memory": "memory-maggie — bare name = READ-ONLY OMR review; writes need the drain phrase",
       "Sage | Scout": "scout-sage — READ-ONLY; no default_runbook. ⚠️ Distinct from Renata",
       "Clio | Close | Recap": "closing-clio — bare name = READ-ONLY health check. ⚠️ HOMOPHONE of 'Cleo' (clever-cleo); resolve on exact spelling, ASK if spoken and ambiguous",
-      "Ricky | Routine": "routine-ricky — bare name = READ-ONLY TRIAGE of routines/ (schedule + last-run stamps), ending in a proposal; it never executes unasked. ⚠️ INVOKE-ONLY — no scheduler exists, nothing wakes. ⚠️ 'Rocky' is a known dictation variant and resolves HERE (fork raised, Michael ruled 'Ricky' 2026-07-26). ⚠️ Also distinct from Renata + Rhys",
+      "Ricky | Routine": "routine-ricky — bare name = READ-ONLY TRIAGE of routines/, ending in a proposal; it never executes unasked. ⚠️ INVOKE-ONLY — no scheduler exists. ⚠️ 'Rocky' is a known dictation variant and resolves HERE. ⚠️ Also distinct from Renata + Rhys",
       "Corey": "clickup-coach-corey",
       "Milo | Mainstage": "mainstage-milo",
-      "Tate | Tutor | TA": "tutor-tate — course-instruction TA. PEER of Milo: neither reports to the other and the course↔production seam has no owner (ruled 2026-07-30). ⚠️ T is otherwise unused across the roster, so this token is collision-free by design",
+      "Tate | Tutor | TA": "tutor-tate — course-instruction TA. PEER of Milo: neither reports to the other and the course↔production seam has no owner (ruled 2026-07-30)",
       "Fiona | FMP": "fmp-frank — display FMP Fiona; slug immutable. ⚠️ '/session-start=fmp-frank' resolves to HER, never to Fold-in Frank",
       "Frank | Fold-in": "foldin-frank — the anti-sprawl GATE. The FileMaker teammate was renamed precisely so bare 'Frank' lands here",
-      "/council=uritp-audit | /uritp-audit | /audit-council": "GROUP → teams/uritp-audit-council.md — seats the URITP audit bench (Core Four: Mira + Anna + Milo + Corey). ⚠️ NOT super-agents/audit-instruction.md, which is the unrelated agent-self-audit procedure"
+      "/council=uritp-audit | /uritp-audit | /audit-council": "GROUP → teams/uritp-audit-council.md — seats the URITP audit bench (Core Four: Mira + Anna + Milo + Corey). ⚠️ NOT super-agents/audit-instruction.md"
     },
     "tombstones": "Anna, Mira, Wes, Maggie, Sage, Clio each have a tombstone at agents/<slug>.md AND a live bundle at super-agents/<slug>/ — always resolve to the super-agents/ home. Fiona, Ricky and Tate have NO tombstone: none of them was ever a lens."
   },
   "pointers": {
+    "CANONICAL_INDEX": "ClickUp list 🤖 Agent Index (901328216173) — resolve here, not in this file",
     "how_to_BE": "super-agents/_shared/super-agent-base.md",
     "how_to_BUILD": "gates/git-agent-authoring.md + gates/git-teammate-lifecycle-runbook.md",
     "naming_gate": "gates/agent-name-collision-gate.md",
     "invocation_gate": "gates/agent-invocation-gate.md",
     "orchestration": "orchestration.md",
     "council_seating": "council.md + teams/the-workshop.md",
-    "council_uritp_audit": "teams/uritp-audit-council.md — the URITP workspace-audit bench, invoked as a group via /council=uritp-audit",
-    "audit_standard": "super-agents/audit-instruction.md — AGENT self-audits only; unrelated to the URITP workspace audit",
+    "council_uritp_audit": "teams/uritp-audit-council.md",
+    "audit_standard": "super-agents/audit-instruction.md — AGENT self-audits only",
     "steward": "super-agents/fleet-felix/"
   }
 }
