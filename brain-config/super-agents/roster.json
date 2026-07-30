@@ -1,11 +1,11 @@
 {
   "_": "THE resolution index for every agent: what exists, and where to open it. The Agent Invocation Gate resolves every named call against this file first (gates/agent-invocation-gate.md STEP 0). Renderer: roster.html.",
   "this_is_an_INDEX": "⚠️ A field belongs here ONLY if you need it to decide WHICH RECORD TO OPEN. Nothing else. A catalogue card that starts containing the book has stopped being a catalogue. THINNED 2026-07-27 (18.4KB → this): lane, accent, from, seat, teams REMOVED because each was a lossy duplicate of a file that says it better. Do not add them back, and do not add a new descriptive field without running that test.",
-  "where_the_description_went": "lane + full role → the agent's own preferences.md (super-agent) or agents/<slug>.md (lens) — now the SINGLE authoritative source, which it was not while this file held a second copy · seat + teams → council.md + teams/the-workshop.md (the seating map, always the real source) · from/lineage → git history, where every graduation is a commit · accent → roster.html, which is the only thing that ever used it.",
+  "where_the_description_went": "lane + full role → the agent's own preferences.md (super-agent) or agents/<slug>.md (lens) — now the SINGLE authoritative source, which it was not while this file held a second copy · seat + teams → council.md + teams/the-workshop.md + teams/uritp-audit-council.md (the seating maps, always the real source) · from/lineage → git history, where every graduation is a commit · accent → roster.html, which is the only thing that ever used it.",
   "schema": "slug | name | class | memory | status | invoke | aka[] | home | instructions | default_runbook | gate_strength",
   "field_notes": "class = PERSISTENCE not rank (_shared/super-agent-base.md §6) · status gates whether a token resolves at all · default_runbook + gate_strength are READ ON EVERY BARE-NAME CALL and are NOT cosmetic (gates/agent-invocation-gate.md) · rows with NO home file keep a one-line `lane`, because for those it is the only description that exists anywhere.",
-  "pointers_for_rules": "naming, tokens, homophones → gates/agent-name-collision-gate.md · invocation modes, the soft gate, the three doors → gates/agent-invocation-gate.md · how to build/graduate → gates/git-teammate-lifecycle-runbook.md · seating → council.md.",
-  "updated": "2026-07-27",
+  "pointers_for_rules": "naming, tokens, homophones → gates/agent-name-collision-gate.md · invocation modes, the soft gate, the three doors → gates/agent-invocation-gate.md · how to build/graduate → gates/git-teammate-lifecycle-runbook.md · seating → council.md + teams/.",
+  "updated": "2026-07-30",
   "agents": [
     { "slug": "maestro-mira", "name": "Maestro Mira", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Mira", "aka": ["Mira", "Maestro", "Lead"], "home": "super-agents/maestro-mira/", "instructions": "orchestration.md" },
     { "slug": "fleet-felix", "name": "Fleet Felix", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Felix", "aka": ["Felix", "Fleet", "Steward"], "home": "super-agents/fleet-felix/" },
@@ -51,6 +51,7 @@
   ],
   "invocation": {
     "how": "A named call (/session.agent=X, /session-start=X, bare name, nickname, or SLUG) resolves against this list, then loads that agent's home DIRECTLY. No double-hop through Felix or Mira. Reading this file is not invoking Felix. Full rules: gates/agent-invocation-gate.md.",
+    "group_calls": "A GROUP token resolves against a seating map in teams/, not against this agent list. It seats several agents at once and is the intended way to call a standing bench. Known groups: /council=uritp-audit (teams/uritp-audit-council.md) · the Workshop, always via Mira (teams/the-workshop.md).",
     "tokens": {
       "Mira | Maestro | Lead": "maestro-mira — also the DEFAULT when no agent is named",
       "Felix | Fleet | Steward": "fleet-felix",
@@ -64,7 +65,8 @@
       "Corey": "clickup-coach-corey",
       "Milo | Mainstage": "mainstage-milo",
       "Fiona | FMP": "fmp-frank — display FMP Fiona; slug immutable. ⚠️ '/session-start=fmp-frank' resolves to HER, never to Fold-in Frank",
-      "Frank | Fold-in": "foldin-frank — the anti-sprawl GATE. The FileMaker teammate was renamed precisely so bare 'Frank' lands here"
+      "Frank | Fold-in": "foldin-frank — the anti-sprawl GATE. The FileMaker teammate was renamed precisely so bare 'Frank' lands here",
+      "/council=uritp-audit | /uritp-audit | /audit-council": "GROUP → teams/uritp-audit-council.md — seats the URITP audit bench (Core Four: Mira + Anna + Milo + Corey). ⚠️ NOT super-agents/audit-instruction.md, which is the unrelated agent-self-audit procedure"
     },
     "tombstones": "Anna, Mira, Wes, Maggie, Sage, Clio each have a tombstone at agents/<slug>.md AND a live bundle at super-agents/<slug>/ — always resolve to the super-agents/ home. Fiona and Ricky have NO tombstone: neither was ever a lens."
   },
@@ -75,7 +77,8 @@
     "invocation_gate": "gates/agent-invocation-gate.md",
     "orchestration": "orchestration.md",
     "council_seating": "council.md + teams/the-workshop.md",
-    "audit_standard": "super-agents/audit-instruction.md",
+    "council_uritp_audit": "teams/uritp-audit-council.md — the URITP workspace-audit bench, invoked as a group via /council=uritp-audit",
+    "audit_standard": "super-agents/audit-instruction.md — AGENT self-audits only; unrelated to the URITP workspace audit",
     "steward": "super-agents/fleet-felix/"
   }
 }
