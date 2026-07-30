@@ -10,8 +10,14 @@
 # CI deploys from it.
 #
 # workflow_dispatch ONLY — no push trigger. The front-end needs no deploy at all (Pages
-# serves it ~60s after a commit); only `worker/` changes need this. And unattended
-# auto-deploy of a key-authenticated write API on every commit is not something you want.
+# serves it ~60s after a commit); only `worker/` changes need this.
+#
+# ⚠️ AS OF 2026-07-30 THIS ALSO SETS THE WRITE KEY. `WRITE_KEY` is a plain [vars] entry in
+# wrangler.toml (the key is baked into the public bundle by decision, so encrypting the
+# server's copy of a public string bought nothing and cost the ability to read it back).
+# Consequence: **this deploy overwrites the worker's WRITE_KEY every run.** That is the point
+# — the pair in git is the single source of truth — but it also means a dashboard-set secret
+# of that name will be silently replaced. Do not keep one.
 #
 # ============================================================================
 # 🔍 WHY THIS FILE LOOKS LIKE A DIAGNOSTIC HARNESS RATHER THAN A DEPLOY
@@ -121,6 +127,26 @@ jobs:
 
           exit $FAIL
 
+      # Same rule as above, applied to the thing this deploy now carries. The worker returns
+      # 503 on every write when WRITE_KEY is unset, and that state is INVISIBLE from /health
+      # (reads are unauthenticated) — so it has to be asserted here or it is not checked at
+      # all. Never echo the value; the pair is public in the repo, but a CI log is a different
+      # surface and habits generalize.
+      - name: Preflight · does the config actually carry a write key?
+        run: |
+          if ! grep -qE '^WRITE_KEY[[:space:]]*=' wrangler.toml; then
+            echo "::error::wrangler.toml has no WRITE_KEY under [vars]. Deploying would leave the worker refusing every write with a 503, and /health would still look green."
+            echo "- ❌ no \`WRITE_KEY\` in wrangler.toml — writes would 503" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          LEN=$(grep -m1 -E '^WRITE_KEY[[:space:]]*=' wrangler.toml | sed 's/.*"\(.*\)".*/\1/' | tr -d '\n' | wc -c)
+          if [ "$LEN" -lt 16 ]; then
+            echo "::error::WRITE_KEY is only $LEN chars. It ships in a public bundle, so a short or word-like key is guessable by anyone — the exact defect still open in inciardi-market (\"mikey\"/\"nickey\"). Use a long random string."
+            echo "- ❌ \`WRITE_KEY\` is **$LEN chars — too short for a publicly readable key**" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "- ✅ \`WRITE_KEY\` present in config ($LEN chars) — must match \`DEFAULT_KEY\` in core.js" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Resolve the D1 database id
         run: |
           FILE=wrangler.toml
@@ -215,12 +241,14 @@ jobs:
           URL=$(grep -m1 -oE 'https://[a-z0-9.-]*workers\.dev' out.txt)
           {
             echo ""
-            echo "### ✅ Deployed"
+            echo "### ✅ Deployed — and the write key went with it"
             echo ""
             echo "**Worker URL:** \`${URL:-check the log above}\`"
             echo ""
-            echo "Next, once only:"
-            echo "1. Cloudflare dashboard → this worker → Settings → Variables and Secrets"
-            echo "2. Add secret \`WRITE_KEY\` — a long random string, not a word"
-            echo "3. Open the app → ⚙ → paste the worker URL + that key"
+            echo "**Nothing left to do in the Cloudflare dashboard.** \`WRITE_KEY\` ships in"
+            echo "wrangler.toml and was just applied; the app carries the matching key in"
+            echo "\`core.js\`. Open the app and save something — no ⚙ setup, no pasting."
+            echo ""
+            echo "⚠️ \`/health\` passing does NOT prove writes work: reads are unauthenticated."
+            echo "A real save is the only test. A 401 means the two halves of the pair drifted."
           } >> "$GITHUB_STEP_SUMMARY"
