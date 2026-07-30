@@ -1,14 +1,12 @@
 /* Inciardi Collection — the Summary matrix.
  *
- * ZERO COLOR LITERALS, same contract as styles.css: every colour is var(--token) from the
- * theme spine, so the Mercedes palette (or any future one) reaches this screen for free.
+ * ZERO COLOR LITERALS: every colour is var(--token) from the theme spine, so the Mercedes
+ * palette (or any future one) reaches this screen for free.
  *
- * SEPARATE FILE FOR THE SAME REASON summary.js IS ONE: styles.css is already 30KB against a
- * ~30KB read cap and a ~22KB target. Adding a fifth screen's rules to it would have pushed the
- * app's own stylesheet past the point where it can be read back whole and therefore safely
- * edited. `.chips` lives here rather than in styles.css even though the shoe-box now uses it
- * too — it was authored for this screen, and moving it would mean touching the over-cap file.
- * 🔴 When styles.css does get split, `.chips` belongs in the shared half.
+ * SEPARATE FILE FOR THE SAME REASON summary.js IS ONE: one screen, one file, everything under
+ * the 15KB split line. `.chips` lives here rather than in base.css even though the shoe-box now
+ * uses it too — it was authored for this screen.
+ * 🔴 `.chips` belongs in base.css. Move it the next time base.css is open.
  */
 
 /* ---------- THE WINDOW ----------
@@ -16,7 +14,10 @@
    NOT the big-number-plus-label hero template: these are peers on one rule, sized to be
    scanned across rather than admired one at a time. `copies` splits into `in binder` + `box`
    and those two always sum back to it, which is what makes the row readable instead of
-   something to reconcile. */
+   something to reconcile.
+   🔴 v11 — EVERY CELL IN HERE IS A THING YOU OWN. The wishlist used to share `prints` and
+   `slots used`, which made the collection look bigger than it is and the binder look fuller than
+   it is. It now lives on `.mx-want`, outside the box. Do not put a wanted number back in here. */
 .mx { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
   border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
   overflow: hidden; background: var(--surface-1); }
@@ -36,6 +37,19 @@
   .mx-c .s { display: none; }
   .mx-c .l { font-size: 0.6rem; letter-spacing: 0.03em; }
 }
+
+/* ---------- the wishlist line ----------
+   OUTSIDE the strip, DASHED, and it says "not counted above" in as many words. Dashed because
+   that is this app's word for wanted everywhere else (border language, binder.css), and outside
+   the box because a number sitting next to other numbers gets added to them whether you meant it
+   to or not — which is exactly what Michael flagged. */
+.mx-want { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+  margin: 6px 0 0; padding: 6px 8px;
+  border: 1px dashed var(--border); border-radius: var(--radius, 6px);
+  font-size: var(--fs-xs, 0.72rem); line-height: 1.35; color: var(--text-soft);
+  text-wrap: pretty; }
+.mx-want .wtag { margin-left: 0; }
+.mx-want b { color: var(--text); font-weight: 600; }
 
 /* ---------- filter chips ---------- */
 .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: var(--gap-md, 12px) 0; }
@@ -88,7 +102,8 @@
   font-size: var(--fs-sm, 0.85rem); }
 
 /* A wanted print is real collection data, so it is listed — but it is not owned, so it reads
-   quieter and says why. Same logic as the ghosted slot in the binder. */
+   quieter and says why. Same logic as the ghosted slot in the binder. summary.js also sinks
+   these rows below the owned ones in every sort. */
 .mrow.want .nmt { color: var(--text-soft); font-style: italic; }
 .wtag { margin-left: 6px; font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase;
@@ -101,6 +116,15 @@
 /* A zero renders as a middot. Nine literal zeroes down a column is visual noise that competes
    with the numbers that matter, and "none" is exactly what an absent value means here. */
 .mxt td.num.zero { color: var(--text-faint); }
+/* `.na` is stronger than `.zero`: not "none of them" but "this column does not apply." It is
+   what a wanted row prints under Own and Box, because a 0 is a quantity and a quantity invites
+   addition — the whole misreading this pass exists to kill. */
+.mxt td.num.na { color: var(--text-faint); opacity: 0.55; }
+/* A wanted row's slot count. DASHED, like the slot it describes, so the number stays legible as
+   a marker rather than as inventory. */
+.mxt td .mk { display: inline-block; min-width: 1.6em; padding: 0 4px;
+  border: 1px dashed var(--border); border-radius: 3px;
+  color: var(--text-soft); font-size: 0.9em; }
 
 /* ---------- the drill-in ----------
    Michael: "drill in to: placed twice on this page and this page and 4 in shoebox". An inline
@@ -124,34 +148,3 @@
 .wl.flat { background: transparent; color: var(--text-soft); border-style: dashed;
   pointer-events: none; }
 .drow .hint { margin-top: 5px; }
-
-/* ============================================================================
-   ⚠️ RULES BELOW ARE IN THE WRONG FILE, ON PURPOSE, AND SHOULD MOVE.
-
-   These are HEADER rules and they belong in styles.css. They are here because styles.css is
-   30,003 bytes against a ~30KB read cap, and the only way to add four lines to it is to
-   rewrite the whole thing — where a single transcription slip silently breaks every screen.
-   A documented exception in a small file is the lower-risk move; an undocumented one would
-   just be sprawl.
-   🔴 MOVE THESE INTO styles.css THE MOMENT IT IS SPLIT. They load globally today only because
-   index.html links this stylesheet on every route.
-
-   WHY THEY EXIST: v7 took the nav from three items to four (Summary). Measured at 390px, the
-   bar came to ~390px exactly — brand ~80 + nav ~242 + gear ~28 + gaps/padding ~40 — so it was
-   one pixel from wrapping to a second line, which is precisely the v5 bug that cost every page
-   60px of header. Below 400px the nav steps down a size and tightens; below 360px it tightens
-   again. Labels are never abbreviated, because a nav that says "Box" leading to a page titled
-   "Shoe-box" makes you check whether you landed somewhere else.
-   ⚠️ A FIFTH NAV ITEM DOES NOT FIT. Put the next screen behind a menu.
-   ============================================================================ */
-@media (max-width: 440px) {
-  #nav { gap: 1px; }
-  #nav a { padding: 5px 7px; }
-}
-@media (max-width: 400px) {
-  #nav a { padding: 5px 6px; font-size: 0.66rem; letter-spacing: 0; }
-  .brand { font-size: var(--fs-xs, 0.72rem); }
-}
-@media (max-width: 360px) {
-  #nav a { padding: 5px 4px; font-size: 0.62rem; }
-}
