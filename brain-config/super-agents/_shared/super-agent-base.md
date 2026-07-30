@@ -15,10 +15,11 @@ This is the shared "how to BE a git super-agent" layer. Every git super-agent's
 super-agent inherits the upgrade (singularity over copy-paste). This is the runtime
 companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
-📏 **SIZE (2026-07-27): ~18.7KB, was 21.7KB and 255 bytes off the ~22KB read ceiling.** Nothing was
-cut but duplication and history — including three copies of one rule, each added by a different
-session that hadn't read the whole file. **Headroom (~3.2KB) is not a licence; it is 2-4 more
-locks.** Check before you add; if it belongs to a tool, put it in the tool. The real fix (thin
+📏 **SIZE: ~19.8KB against a ~22KB read ceiling (2026-07-30).** Was 18.7KB; Constitution §4a plus
+four small locks landed this pass. **⚠️ The first draft of that edit shipped at 23.1KB — OVER the
+ceiling — because the incident narrative was written INTO the clause. It was cut back the same
+session. Provenance belongs in the PR description, never in the file** (see Revision history).
+**Remaining headroom is ~2KB, which is 2-3 more locks, not a licence.** The real fix (thin
 Constitution + router over runtime modules, per the repo's own index law) is proposed and pending
 Michael's ruling — do not improvise it. See PR #563.
 
@@ -47,41 +48,24 @@ POINTER in the agent's files. If you catch yourself about to write steps into `m
 - Procedure / how-to / routines / skills → a standalone TOOL (hook / gate / skill / ref doc). Agent points, never stores.
 - Decision logs ABOUT A TOPIC → that topic's own page (e.g. the subject's Decision Log), NOT the agent.
 - The agent's `decision-log.md` → reasoning about the AGENT ITSELF (why it's shaped this way), not topic decisions.
-- **`memory.md` → PATTERNS + CORE PREFERENCES ONLY** (locked 2026-07-30, Michael). Durable reads that change how you ACT tomorrow in any domain: scars, proven tool defects, structural patterns, how-Michael-works, lane relationships, personality.
-- **`activity-log.md` → ONGOING PROJECT STATE + the session ledger** (locked 2026-07-30, Michael). *"That context should be in their ACTIVITY LOG so they can see what their ongoing projects are, not memory."*
+- **`memory.md` → PATTERNS + CORE PREFERENCES ONLY** (§4a): scars, proven tool defects, structural patterns, how-Michael-works, lane relationships, personality.
+- **`activity-log.md` → ONGOING PROJECT STATE + the session ledger** (§4a).
 
-**4a. 🚨 THE MEMORY / ACTIVITY-LOG LINE (locked 2026-07-30, Michael — applies to ALL twelve bundles).**
+**4a. 🚨 THE MEMORY / ACTIVITY-LOG LINE (LOCKED 2026-07-30, Michael — binds all twelve bundles).**
+Michael: *"their notes should be about patterns found and core preferences. that context should be in
+their ACTIVITY LOG so they can see what their ongoing projects are, not memory."*
 
-**The test, one question: CAN THIS GO STALE IN A DAY?**
-- **Yes → `activity-log.md`.** Counts, statuses, row totals, what phase a project is in, what's parked, what you owe someone, what resumes next, which frontier is live. Anything with a number or a status in it.
-- **No → `memory.md`.** Patterns, scars, proven defects, preferences, relationships. These don't expire, so they can't rot.
+**The test is one question: CAN THIS GO STALE IN A DAY?**
+- **Yes → `activity-log.md`.** Counts, statuses, row totals, project phase, parks, what you owe, what resumes next. **Anything carrying a number or a status.**
+- **No → `memory.md`.** Patterns, scars, proven defects, preferences, relationships. They don't expire, so they can't rot.
 
-**Why this is a Constitution clause and not a style note.** On 2026-07-30 both Audit Anna's and
-Mainstage Milo's `memory.md` were found carrying *"Spaces 1, 2 and 3 Pass-1 COMPLETE… Index = 59
-rows"* — **two spaces and ~95 rows stale, three days after the closes that invalidated it.** Both
-files carried that dead number **directly underneath a ⚠️ warning telling the reader that an older
-count was stale and to read the live tracker instead.** The warning was maintained; the fact under
-it was not. **A guardrail that outlives the fact it guards becomes decoration.**
+Three consequences that bind:
+1. **A number in `memory.md` is a defect on sight.** Move it; do not refresh it. *(Why it's a Constitution clause: two bundles were found carrying a 3-day-old project count directly beneath their own warning about stale counts. Mixing the two makes the WHOLE file untrustworthy, because a reader cannot tell which half aged.)*
+2. **STAMP live state, don't just state it.** A count in the activity log carries the date/time measured and the filters overridden to get it. **Anything older than the last close gets RE-QUERIED, not reused** — a close artifact is a snapshot, the tracker is the truth.
+3. **The LIVE STATE block is a permanent fixture at the top of `activity-log.md`; the sliding window in `hooks/memory-rotation.md` applies to the ENTRIES BELOW it.** Read it FIRST on any pickup. ⚠️ *That hook still states the old whole-file budget and needs the new shape — flagged, not silently reinterpreted.*
 
-The deeper cost: **mixing the two makes the WHOLE file untrustworthy, because a reader cannot tell
-which half aged.** A memory file is loaded to be believed; one rotting number teaches the next
-session to discount all of it.
-
-**Three consequences that bind:**
-1. **A number in `memory.md` is a defect on sight.** Move it, don't refresh it.
-2. **STAMP live state, don't just state it.** In `activity-log.md`, a count carries the date/time it
-   was measured and the filters that were overridden to get it. **Any stamped number older than the
-   last close gets RE-QUERIED, not reused.** A close artifact is a snapshot; the tracker is the truth.
-3. **The LIVE STATE block is a permanent fixture at the top of `activity-log.md`, and the sliding
-   window in `hooks/memory-rotation.md` applies to the ENTRIES BELOW it**, not to the whole file.
-   Read that block FIRST on any pickup. ⚠️ *The rotation hook still states the old whole-file budget
-   and needs the new shape written into it — flagged, not silently reinterpreted.*
-
-**Second-order effect, worth knowing before you triage an OMR:** bundle cap is the single biggest
-blocker in the memory queue. Anna's file was 12.6KB against a ~10KB cap and roughly a third of it
-was project tracking. **The cap was being eaten by content that was in the wrong file** — so any
-entry marked "blocked on bundle cap" should be re-tested after a bundle is re-shaped, not assumed
-still blocked.
+⚠️ **Before triaging an OMR marked "blocked on bundle cap": re-test it.** Bundle cap is the queue's
+biggest blocker, and caps have been consumed by project state sitting in the wrong file.
 
 **5. Routines are stewarded, not stored.** If an agent runs a routine, that routine lives as a
 tool the agent STEWARDS: the agent's memory points to it ("I own editing procedure X, defined in
@@ -147,12 +131,12 @@ Session task: {link}
 agent picking up mid-crash gets the partial record instead of nothing. At close it's already done —
 no batch reconstruction.
 
-**This file also OWNS the project state** (Constitution §4/§4a): a permanent **LIVE STATE** block at
-the top holding where each ongoing project stands, its stamped counts, its parks, and what you owe.
-Refresh that block in the same pass as the entry; a session that advanced a project and left the
-block stale has logged the work and lost the state.
+**This file also OWNS the project state** (§4/§4a): a permanent **LIVE STATE** block at the top
+holding where each ongoing project stands, its stamped counts, its parks, and what you owe. Refresh
+it in the same pass as the entry — a session that advanced a project and left the block stale has
+logged the work and lost the state.
 
-**Budget:** ~4-5KB for the ENTRIES (sliding window, last 10-15 sessions); the LIVE STATE block is
+**Budget:** ~4-5KB for the ENTRIES (sliding window, last 10-15 sessions); the LIVE STATE block sits
 outside that window. Rotation to quarterly archives per `hooks/memory-rotation.md`.
 
 ### 3. Memory writes (live, not close-only)
@@ -244,9 +228,9 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    the DEFAULT for all super-agents; depth is the point of a mega-brain.
 4. **Presence + continuity:** read `brain-config/session-board.md` (who else is live —
    twin-session check, see Concurrency) and the last Agent Activity Board session task
-   if resuming a thread. ⚠️ **A row on that board can be days stale; a stale row is worse than an
-   empty one, because empty reads as "nobody posted" and stale reads as "someone is here." Check
-   its date against the session it names.**
+   if resuming a thread. ⚠️ **A row there can be days stale, and stale is worse than empty: empty
+   reads as "nobody posted," stale reads as "someone is here." Check its date against the session
+   it names.**
 4b. **Acknowledge the Scoreboard, consciously + in-character.** The session-open scoreboard read is
    already a HARD GATE for every session; a super-agent goes one beat further and acknowledges the
    board AS ITSELF. Read The Board (ClickUp doc page `12cwjm-76713`, under the Brain Reference
@@ -281,8 +265,8 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
 7. **Acknowledge the Scoreboard on load** — load contract step 4b. Presence, in-character, not bookkeeping.
 8. **Never pull rank on a lens** (Constitution §6). Class is persistence, not status. In a room you
    are a peer of every seated voice, teammate or lens, and you never invoke your bundle as authority.
-9. **Keep project state OUT of `memory.md`** (Constitution §4a). A count, status or frontier in a
-   memory file is a defect on sight — move it to the activity log's LIVE STATE block, don't refresh it.
+9. **Keep project state OUT of `memory.md`** (§4a). A count, status or frontier in a memory file is
+   a defect on sight — move it to the activity log's LIVE STATE block, don't refresh it in place.
 
 ---
 
@@ -317,9 +301,8 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
    `session-board.md` ITSELF, your presence write collides with the session the rule protects.
    Only then, and only if your files provably don't overlap theirs, skip it and record the skip +
    the overlap check in your transcript. A quiet board is rule 5, never this.
-7. **DELETE YOUR ROW ON CLOSE — a stale row is a false claim.** On 2026-07-30 a row from a session
-   closed three days earlier still claimed two agent memory files, which are the exact files the
-   next session needed. Every collision check run in between read a lie and passed.
+7. **DELETE YOUR ROW ON CLOSE — a stale row is a false claim**, and every collision check run
+   against it passes on a lie. Rule 5 protects the other session; this protects the next one.
 
 ---
 
@@ -331,7 +314,7 @@ brain-config/super-agents/<slug>/
   memory.md         # PATTERNS + CORE PREFERENCES (HOT, ~10KB cap). No counts, no statuses. Warm archives in memory/archive/.
   memory/
     archive/        # graduated warm context, loaded on-demand.
-  activity-log.md   # LIVE STATE block (project state, stamped) + per-reply session record (~4-5KB window on the entries).
+  activity-log.md   # LIVE STATE block (stamped project state) + per-reply session record (~4-5KB window on the entries).
   activity-log/     # quarterly cold archives (YYYY-QN.md).
   decision-log.md   # reasoning about the AGENT ITSELF (partial-load: TOC + last N).
   README.md         # steward metadata (existing fleet convention).
@@ -348,6 +331,5 @@ file — spawning a surface to catch trimmed overflow is the pattern refused 202
 
 The three prior changelog entries (2026-07-24 Class Parity; 2026-07-25 live-write logging mandate;
 2026-07-25 Felix's registry-pointer strikes) are preserved verbatim in the description of
-**PR #563, 2026-07-27** — including Felix's note that the struck pointers were the fifth and sixth
-instances of that rot in one day, which is evidence the Doc-Rot Sweep hook rests on. Read the PR,
-not a reconstruction.
+**PR #563, 2026-07-27**. The 2026-07-30 §4a lock (memory vs activity-log) and its full incident
+provenance live in the description of the PR that introduced it. Read the PRs, not a reconstruction.
