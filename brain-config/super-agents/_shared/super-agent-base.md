@@ -15,11 +15,13 @@ This is the shared "how to BE a git super-agent" layer. Every git super-agent's
 super-agent inherits the upgrade (singularity over copy-paste). This is the runtime
 companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
-📏 **SIZE: ~19.8KB against a ~22KB read ceiling (2026-07-30).** Was 18.7KB; Constitution §4a plus
-four small locks landed this pass. **⚠️ The first draft of that edit shipped at 23.1KB — OVER the
-ceiling — because the incident narrative was written INTO the clause. It was cut back the same
-session. Provenance belongs in the PR description, never in the file** (see Revision history).
-**Remaining headroom is ~2KB, which is 2-3 more locks, not a licence.** The real fix (thin
+📏 **THIS FILE IS AT ITS ~22KB READ CEILING (2026-07-30).** **MEASURE the live file before you add
+anything; do NOT trust — or write — a byte count in this text.** A hand-maintained size figure here
+went stale TWICE inside the single pass that added §4a: the first draft shipped over the ceiling with
+the old number still in place, and the correction shipped a new number that was wrong on arrival.
+**That is precisely the rot §4a locks a rule against, committed in the file that carries the rule** —
+so the number is gone rather than corrected again. Practical consequence: **assume there is no
+headroom.** If your addition does not clearly fit, it belongs in a tool, not here. The real fix (thin
 Constitution + router over runtime modules, per the repo's own index law) is proposed and pending
 Michael's ruling — do not improvise it. See PR #563.
 
