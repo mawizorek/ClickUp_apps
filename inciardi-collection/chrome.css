@@ -1,19 +1,24 @@
 /* Inciardi Collection — CHROME. Header, nav drawer, settings drawer, footer.
+ * Pattern from `template-app` (gold standard v5). ZERO COLOUR LITERALS.
  *
- * Pattern from `template-app` (gold standard v5). ZERO colour literals.
+ * 🔴 WHY THE HEADER IS A HAMBURGER AND NOT A NAV BAR. The old header put every route inline, so
+ * it had a hard item ceiling: brand + 4 links + gear ran ~355px of a 390px phone. It wrapped at
+ * v5 and the app carried a comment reading "FOUR ITEMS IS THE CEILING." A drawer has no ceiling.
+ * We had written a constraint where the standard already had a pattern.
  *
- * 🔴 WHY THE HEADER IS A HAMBURGER AND NOT A NAV BAR. The old header put every route inline,
- * which meant it had a hard item ceiling: brand + 4 links + gear ran ~355px of a 390px phone,
- * so it wrapped to two lines at v5 and the app carried a comment reading "FOUR ITEMS IS THE
- * CEILING." A drawer has no ceiling. We had written a constraint where the template already had
- * a pattern — check the standard before inventing a limit.
+ * 🔴 v10 LIGHT-MODE RULE, learned the hard way: `accent`, `accent-deep` and `accent-2` are BRAND
+ * colours, shared across both modes by design. `accent-soft` and `on-accent` are mode-aware.
+ * So a brand colour used as INK will fail contrast in one of the two modes — which is exactly
+ * what happened: the wordmark and the card initials were `accent-2` (bright mint), invisible on
+ * the light ramp. Ink is `--text*` or `--accent-deep`; brand colours fill, they do not letter.
  */
 
 /* ---------- header ---------- */
 #appHeader { flex: 0 0 auto; position: sticky; top: 0; z-index: 30;
   background: var(--surface-1); border-bottom: var(--border-w, 1px) solid var(--border); }
 .hd-in { display: flex; align-items: center; gap: var(--gap-xs, 8px);
-  padding: var(--gap-xs, 8px) var(--gap-xs, 8px); }
+  max-width: 900px; margin: 0 auto;
+  padding: var(--gap-xs, 8px); }
 
 .hd-icon { flex: 0 0 auto; min-width: 42px; min-height: 42px; padding: 0;
   display: grid; place-items: center;
@@ -37,19 +42,19 @@
   letter-spacing: var(--track-tight, -0.01em); white-space: nowrap; }
 .hd-logo { flex: 0 0 auto; font-size: 1.05em; }
 .hd-name { overflow: hidden; text-overflow: ellipsis; }
-.hd-name b { color: var(--accent-2); font-weight: 600; }
+/* accent-deep, NOT accent-2 — see the rule at the top of this file. */
+.hd-name b { color: var(--accent-deep); font-weight: 700; }
 .hd-sub { color: var(--text-soft); font-weight: 350; }
 @media (max-width: 420px) { .hd-sub { display: none; } }
 
 /* ---------- chrome drawers: nav LEFT, settings RIGHT ----------
-   Mirror images on purpose. Translated off-screen rather than hidden, so they animate in and
-   out instead of appearing — and `visibility` is what keeps a closed drawer un-tabbable. */
+   Mirror images on purpose. Translated off-screen rather than hidden, so they animate in and out
+   instead of appearing — and `visibility` is what keeps a closed drawer un-tabbable. */
 .drawer { position: fixed; top: 0; bottom: 0; z-index: 60; width: min(330px, 86vw);
   background: var(--surface-1); overflow: auto;
   display: flex; flex-direction: column;
   visibility: hidden; box-shadow: var(--elev-3, none);
-  transition: transform 300ms var(--ease, cubic-bezier(0.22,1,0.36,1)),
-              visibility 300ms; }
+  transition: transform 300ms var(--ease, cubic-bezier(0.22,1,0.36,1)), visibility 300ms; }
 .drawer-left  { left: 0;  transform: translateX(-102%);
   border-right: var(--border-w, 1px) solid var(--border); }
 .drawer-right { right: 0; transform: translateX(102%);
@@ -79,30 +84,30 @@
 .drawer-body details { margin-top: var(--gap-lg, 20px); }
 .drawer-body summary { cursor: pointer; }
 
-/* The nav list. Each row can carry a hint line, which is what makes a drawer worth more than
-   the inline bar it replaced: there was never room for "what is this page for" up there. */
+/* The nav list. Rows carry a hint line, which is what makes a drawer worth more than the inline
+   bar it replaced: there was never room for "what is this page for" up there. */
 .nav-list { display: flex; flex-direction: column; gap: 2px; }
 .nav-link { display: block; padding: 10px var(--gap-xs, 8px); border-radius: var(--radius, 6px);
   text-decoration: none; color: var(--text); }
 .nav-link:hover { background: var(--surface-2); }
 .nav-link .nl-t { display: block; font-size: var(--fs-body, 0.95rem); font-weight: 450; }
 .nav-link .nl-h { display: block; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint); }
-/* The active route gets a filled chip, not a background tint on the row: a tinted row next to
-   plain rows reads as hover state rather than "you are here." */
+/* The active route gets a filled chip, not a background tint: a tinted row next to plain rows
+   reads as hover state rather than "you are here." */
 .nav-link.is-active { background: var(--accent); }
 .nav-link.is-active .nl-t { color: var(--on-accent); font-weight: 600; }
-.nav-link.is-active .nl-h { color: var(--on-accent); opacity: 0.72; }
+.nav-link.is-active .nl-h { color: var(--on-accent); opacity: 0.75; }
 
-/* Chrome's own scrim. Separate element from the page-level one (base.css) because the two live
-   at different z-indexes and either can be open without the other. Same --bg-at-opacity trick,
-   so it inverts properly in light mode. */
+/* Chrome's own scrim. Separate element from the page-level one (base.css) because the two live at
+   different z-indexes and either can be open without the other. --bg at opacity rather than
+   black-alpha, so it inverts properly: a black scrim over a light page reads as a bug. */
 .chrome-scrim { position: fixed; inset: 0; z-index: 55; background: var(--bg); opacity: 0.72;
   border: 0; padding: 0; }
 
 /* ---------- the light / dark segment ----------
-   Same control shape as the binder's Front|Back toggle. Two states, no ambiguity, and it says
-   which one is active rather than which one you can switch to — a toggle labelled with its
-   destination is the single most common way this control gets built wrong. */
+   Same control shape as the binder's Front|Back toggle. It labels the ACTIVE state, not the
+   destination — a toggle labelled with where it will take you is the most common way this
+   control gets built wrong. */
 .seg { display: flex; gap: 2px; padding: 2px;
   background: var(--surface-2); border: var(--border-w, 1px) solid var(--border);
   border-radius: var(--radius-pill, 8px); }
@@ -116,8 +121,8 @@
 
 /* ---------- footer ----------
    This app had none, so its build stamp had nowhere to live and "which version am I looking at"
-   was only answerable from the diagnostics bundle. Hidden on the binder route: the stage owns
-   the full viewport there and the deck bar is already at the bottom. */
+   was only answerable from the diagnostics bundle. Hidden on the binder route: the stage owns the
+   full viewport there and the deck bar is already at the bottom. */
 #appFooter { flex: 0 0 auto; border-top: var(--border-w, 1px) solid var(--border);
   background: var(--surface-1); }
 body.stage #appFooter { display: none; }
@@ -129,7 +134,12 @@ body.stage #appFooter { display: none; }
   min-width: 0; }
 .foot-src a { color: var(--text-soft); font-size: var(--fs-xs, 0.72rem); text-decoration: none;
   border-bottom: 1px solid var(--border); }
-.foot-src a:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+.foot-src a:hover { color: var(--accent-deep); border-bottom-color: var(--accent-deep); }
 .foot-stamp { flex: 0 0 auto; font-family: var(--font-mono, ui-monospace, monospace);
   font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.06em; color: var(--text-faint);
   font-variant-numeric: tabular-nums; }
+/* The device readout beside the stamp. Michael asked to track mobile vs desktop; this is the
+   visible half, and device.js owns the value. */
+.foot-dev { flex: 0 0 auto; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.06em; color: var(--text-faint);
+  text-transform: uppercase; }
