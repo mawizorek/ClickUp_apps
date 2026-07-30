@@ -22,7 +22,7 @@ Born from the **Routine Ricky** incident: an agent was created mid-session, coll
 ## The check (before creating / renaming an agent)
 
 1. **Gather the proposed identity:** formal name + ALL nicknames.
-2. **Scan the namespace: the ClickUp 🤖 Agent Index — https://app.clickup.com/36074068/v/li/901328043244.** Check the task names, the `Slug` field, and the `AKA` field, **including retired and inventory-only rows** (a retired name is still a taken name). Also sweep live ClickUp Super Agents (`search_agents`) — ⚠️ **none exist as of 2026-07-26**, so an empty result there is expected and is NOT evidence the name is free. ~~`super-agents/roster.json`~~ — **STRUCK 2026-07-30:** retired to a tombstone stub; scanning it now returns an empty list and would clear every collision. ~~`registry.json`~~ — struck 2026-07-26.
+2. **Scan the namespace: the ClickUp 🤖 Agent Index** — https://app.clickup.com/36074068/v/li/901328043244 (list id `901328043244`). Check the task names, the `Slug` field, and the `AKA` field, **including retired and inventory-only rows** (a retired name is still a taken name). Also sweep live ClickUp Super Agents (`search_agents`) — ⚠️ **none exist as of 2026-07-26**, so an empty result there is expected and is NOT evidence the name is free. ~~`super-agents/roster.json`~~ — **STRUCK 2026-07-30:** retired to a tombstone stub; scanning it now returns an empty list and would clear every collision. ~~`registry.json`~~ — struck 2026-07-26.
 3. **Verdict:**
    - **Exact match** (name OR nickname OR slug, case-insensitive) = **HALT.** Surface the existing holder + where it lives. Do not create until Michael rules.
    - **Near match** (fuzzy: same first name, one-char off, shared nickname stem) = **WARN + ask.** Show the collision, let Michael decide.
@@ -42,7 +42,7 @@ Born from the **Routine Ricky** incident: an agent was created mid-session, coll
 - **Never ask Michael to confirm a value he cannot read.** If you need to know whether something exists, **go look** and report the NAME. Handing him an opaque ID and asking "does this exist?" outsources your own verification step to the one person who has no way to answer it.
 - **Never store a numeric platform ID as a fact in a data file.** It is unreadable, unverifiable at a glance, and it rots SILENTLY when the thing it points at is deleted — with no visible symptom, because a wrong number looks exactly like a right one.
 - **Precedent:** three roster rows carried a `retired_native_id` for months. A live check on 2026-07-26 found **no native ClickUp agents in the workspace at all** — every one of those numbers had been pointing at nothing, and the field had generated a standing "Michael must disable this in the UI" queue item for work that did not exist.
-- **This generalizes past agents:** the same rule applies to task IDs, field IDs, view IDs, and user IDs in anything Michael reads. Link a name, don't paste an identifier. **This is also why the Agent Index is keyed on name + slug rather than on a record ID.**
+- **This generalizes past agents:** the same rule applies to task IDs, field IDs, view IDs, and user IDs in anything Michael reads. Link a name, don't paste an identifier. **This is also why the Agent Index is keyed on name + slug rather than on a record ID** — the one list id above is a query handle, not an identity.
 
 ## Prefs-as-source-of-truth (the Ricky rule)
 

@@ -71,14 +71,15 @@ ONE description of a bundle. Do not restate it here; it drifted once already (th
    it — it's in the base spec; just don't contradict it.
 5. **Slash trigger.** Register `/session.agent=<Name>` as a literal Quick-Scan Trigger Table row
    in the AI Toolkit index → pointing at the base spec load contract.
-6. **Registration (SAME SESSION): add the agent's row to the ClickUp 🤖 Agent Index —
-   https://app.clickup.com/36074068/v/li/901328043244.** Fill `Slug` (immutable) · `Class` · `Memory` · `Invoke` · `AKA` · `Home`,
-   plus `default_runbook` + `Gate Strength` if it has a bare-name default, plus `Lane` **only** if
-   there is no home file. Set the native status. ~~Mirror-pair registration into `superagents.json`
-   AND the AI Toolkit index roster AND `registry.json`~~ — STRUCK 2026-07-27 (mirror mandate retired).
-   ~~`roster.json` is the single documented source~~ — **STRUCK 2026-07-30: retired to a tombstone
-   stub; the Index is a ClickUp list now.** No pair means no sync obligation, and resurrecting a
-   file to mirror the list is the duplication three retirements have already killed.
+6. **Registration (SAME SESSION): add the agent's row to the ClickUp 🤖 Agent Index** —
+   https://app.clickup.com/36074068/v/li/901328043244 (list id `901328043244`). Fill `Slug` (immutable) · `Class` · `Memory` ·
+   `Invoke` · `AKA` · `Home`, plus `default_runbook` + `Gate Strength` if it has a bare-name
+   default, plus `Lane` **only** if there is no home file. Set the native status.
+   ~~Mirror-pair registration into `superagents.json` AND the AI Toolkit index roster AND
+   `registry.json`~~ — STRUCK 2026-07-27 (mirror mandate retired). ~~`roster.json` is the single
+   documented source~~ — **STRUCK 2026-07-30: retired to a tombstone stub; the Index is a ClickUp
+   list now.** No pair means no sync obligation, and resurrecting a file to mirror the list is the
+   duplication three retirements have already killed.
    > ⚠️ **Registration is the WIRING, not paperwork.** An unregistered agent cannot be resolved no
    > matter how complete its bundle is. Dev Dexter shipped built-but-unregistered on 2026-07-25
    > because the old file could not be written to. That failure class is gone — adding a row costs
