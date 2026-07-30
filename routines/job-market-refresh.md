@@ -7,31 +7,42 @@ steward: routine-ricky
 cadence: see routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
+version: 2
 ---
 
 # Job Market Refresh
 
 **WHAT this does.** The WHEN lives in `routines/schedule.md`. The universal floor lives in `routines/README.md` (Data-Refresh Discipline). Neither is restated here.
 
-> ## 🚨 THE HUNT TRIGGER IS OFF
+> ## ✅ THIS RUNS LIVE. THERE IS NO MODE GATE.
 >
-> **This routine is RESEARCH ONLY. It reads boards and writes ONE comment. It does not create leads, does not draft anything, does not contact anyone.**
+> **The routine has one behavior: walk the boards, capture what matters, and cut a task for anything genuinely worth acting on.** It does not check a flag first.
 >
-> The trigger state lives in the standing ClickUp task, in its title and its State block — not here, and not in memory. **Read it before every run.** If the title still says `hunt trigger OFF`, you are in research mode.
+> **The schedule row IS the switch.** To switch this off, mark the Job Market row **retired** in `routines/schedule.md` with a dated reason (per that file's ledger rules — mark it, never delete the row). No row, no run. One switch, in the one place cadence already lives.
 >
-> Standing task: **`86ajtgbt3`** · <https://app.clickup.com/t/86ajtgbt3> · list: **Applications**
->
-> Michael flips it in plain language ("turn the job hunt on"). Nobody else flips it, and it is never inferred from an interesting posting.
+> ⚠️ **Do not rebuild an OFF/ON gate here.** v1 had one — a mode flag held in a ClickUp task title, read at step 1 of every pass — and Michael cut it the same day: *"don't really need this other gate. if i want it off, ill just have it removed from the schedule md."* **Two switches for one behavior is one switch too many**, and the second one lived in a different system from the schedule, so "is this running?" needed two lookups and could get two different answers. If you feel the urge to add a mode, add a routine instead.
 
-## The two modes (this is the whole design)
+## What a pass produces
 
-| | Trigger OFF (now) | Trigger ON (later) |
-|---|---|---|
-| Output | ONE dated comment on the standing task | Comment **plus** one `Application` task per real lead |
-| Looking for | **patterns** — titles, salary bands, repeat hirers, qualification gaps | **individual postings worth acting on** |
-| Cadence | daily staleness threshold | same, but a miss actually costs something |
+Two things, every time:
 
-**Why patterns and not postings while OFF:** a posting captured today is dead in six weeks, and a list of 200 dead postings is worse than no list. A pattern ("three regionals posted PM roles at $65–75k in one month") stays true and is what actually sharpens the plan.
+1. **ONE dated comment** on the standing thread — the running log. Patterns, salary sightings, repeat hirers, gaps, structural changes.
+2. **An `Application` task per real lead** in the **Applications** list, status `interested`. Only for postings that clear the target profile below.
+
+Standing thread: **`86ajtgbt3`** · <https://app.clickup.com/t/86ajtgbt3>
+Applications list: **`900600097138`** · <https://app.clickup.com/36074068/v/li/900600097138>
+
+**The comment is the thinking; the tasks are the funnel.** Never collapse them into one. A pattern that produced no lead still goes in the comment; a lead still gets summarized in the comment even though it also became a task.
+
+### ⚠️ The bar for cutting a task (this is what replaced the gate)
+
+The gate used to stop task creation wholesale. Nothing does now, so **the quality bar is the only thing standing between this routine and a junk-filled funnel.** A lead earns a task only if ALL of:
+
+- it clears the **target profile** (lane, level, discipline) below;
+- it is **currently open** — a posting past its deadline, or undated on a board that normally dates things, is a comment line at most;
+- it is **not already in the list** — search Applications by company + title first (`Company` field, then title text). A duplicate lead is worse than a missed one because it corrupts the funnel's counts.
+
+**Everything that fails the bar but is still interesting goes in the comment as one line.** That is what the comment is for. **Never cut a task "just to be safe."**
 
 ## Target profile (LOCKED 2026-07-30, Michael)
 
@@ -62,12 +73,13 @@ added: 2026-07-30
 
 ## Steps
 
-1. **Read the standing task first.** Confirm the trigger state. If it flipped, you are in the ON column of the table above.
-2. **Read `routines/last-run/job-market.txt`.** That timestamp is the cutoff: you care about what is NEW since it. `never` means this is the first pass, so establish a baseline instead of a delta.
-3. **Walk Tier 1 in order.** Apply the target profile. Discipline-check every title.
-4. **Note the STRUCTURE, not just the jobs.** A board that died, a paywall that appeared, a filter that moved, a title convention that shifted — that is the most durable thing a pass produces.
-5. **Write ONE comment** on the standing task in the format below. Delta only. If nothing changed, say that in one line.
-6. **Stamp** `routines/last-run/job-market.txt`. One line, `YYYY-MM-DD HH:MM` ET. **An unstamped run did not happen** and the next pass will redo it.
+1. **Read `routines/last-run/job-market.txt`.** That timestamp is the cutoff: you care about what is NEW since it. `never` means this is the first pass, so establish a baseline instead of a delta.
+2. **Walk Tier 1 in order.** Apply the target profile. Discipline-check every title.
+3. **For each candidate lead, apply the task bar** above. Dedupe against Applications BEFORE creating anything.
+4. **Cut the qualifying leads** as `Application`-type tasks in Applications, status `interested`. Populate what the posting actually says: `Company`, `Located`, `Salary Range`, `🌐 Link`, `Industry Interests`. **Leave a field empty rather than guessing it.**
+5. **Note the STRUCTURE, not just the jobs.** A board that died, a paywall that appeared, a filter that moved, a title convention that shifted — that is the most durable thing a pass produces.
+6. **Write ONE comment** on the standing thread in the format below. Delta only.
+7. **Stamp** `routines/last-run/job-market.txt`. One line, `YYYY-MM-DD HH:MM` ET. **An unstamped run did not happen** and the next pass will redo it.
 
 ## Comment format
 
@@ -77,35 +89,39 @@ Terse. A running log, not a report. Short beats complete.
 **YYYY-MM-DD · Entry N**
 
 Boards: <which read, which gated/dead>
+Leads cut: <n> — <title @ org>, ... (or "none")
 
 Patterns: <2-4 lines max, or "nothing new">
 Salary sightings: <real posted numbers only, with the org>
 Repeat hirers: <orgs posting again>
 Gaps: <qualifications that keep appearing that Michael can't claim yet>
+Near-misses: <interesting but failed the bar, one line each>
 Structural: <board/source changes, or omit the line>
 ```
 
-- **"Nothing new" is a complete, good answer.** Say it in one line and stop. Never pad a pass to look productive.
+- **"Nothing new, no leads" is a complete, good answer.** Say it in one line and stop. Never pad a pass to look productive, and never cut a marginal task to make a pass feel worthwhile.
 - **Real numbers or no numbers.** A posted range with the org attached is worth something; a guessed band is worse than silence.
 - **Never assert a stale posting as current.** `hooks/source-freshness-gate.md` is fire-always the moment this fetches.
 
 ## Guardrails
 
-- **READ-ONLY except the comment and the stamp.** No lead tasks, no field edits, no outreach, no drafts while the trigger is OFF.
-- **Never create an `Application` task speculatively.** The Applications list is the funnel; polluting it before the hunt starts is the failure this routine exists to avoid.
+- **Creates tasks; sends nothing.** No outreach, no applications, no emails, no drafts to anyone but Michael. ⚠️ The standing **EMAIL SEND LOCK** applies — surface anything that wants sending, never send it.
+- **Never edit a lead task after the first pass created it.** Once a task exists, it is Michael's working surface. A later pass that sees the same posting does NOTHING (that is what the dedupe check is for).
 - **A gated source is reported as gated.** `hooks/silent-fallback-law.md`: never substitute a board and report as if the pinned one answered.
-- **Catch-up, don't replay.** Overdue by three weeks = ONE pass, labeled a catch-up. Never one pass per missed day.
+- **Catch-up, don't replay.** Overdue by three weeks = ONE pass, labeled a catch-up. Never one pass per missed day. ⚠️ On a long catch-up, be **stricter** on the task bar, not looser — three weeks of backlog is exactly when a funnel gets flooded.
 - **A failed run leaves the stamp untouched** so it stays overdue and self-heals.
 - **Michael's screenshot outranks anything cached.** Re-verify from scratch.
 
 ## Composes with
 
-- **`routines/schedule.md`** — the cadence. Retune there, never here.
+- **`routines/schedule.md`** — the cadence AND the on/off switch. Retune or retire there, never here.
 - **`routines/README.md`** — Data-Refresh Discipline, the 12-rule floor.
+- **`hooks/task-dedup-gate.md`** — the 3-step search. Fires before every lead task, no exceptions.
 - **`hooks/source-freshness-gate.md`** — fire-always on any fetch. Steward: Scout Sage.
 - **`hooks/silent-fallback-law.md`** — no silent source substitution.
 - **Scout Sage** — lane seam: a NEW source or an open market question is hers first; this routine RE-CHECKS pinned sources. Promoting anything out of Tier 3 goes through her.
 
 ## Changelog
 
-- **v1 (2026-07-30)** — created. Geography ANYWHERE + lane NON-ACADEMIC locked by Michael the same day. Sources verified live 2026-07-30; two corrections carried in from the old ClickUp Job Search doc (ARTSEARCH moved hosts, OffStageJobs is `staging.`-only). Trigger OFF at birth: this is the first routine written to be deliberately half-asleep, and the ON/OFF table is the load-bearing part. ⚠️ The standing-task link was hand-typed on the first commit and wrong; corrected against the loaded task in the same session. The session board's rule holds — load the task, copy the ID, never type it.
+- **v2 (2026-07-30, hours after v1) — THE TRIGGER GATE IS GONE. Default is ON.** Michael: *"turn on a default to on. for sure. don't really need this other gate. if i want it off, ill just have it removed from the schedule md."* Deleted the OFF/ON mode table, the trigger callout, and step 1 (read the flag off a ClickUp task title). **What replaced it is a QUALITY BAR, not another gate** — the gate was doing two jobs, "don't run yet" and "don't create junk," and only the first one was actually wanted. Also added the dedupe requirement and the near-misses comment line, both of which the gate had made unnecessary by suppressing task creation entirely. **Worth carrying: a mode flag in a second system is a duplicate switch, and it made "is this on?" a two-lookup question with two possible answers.** The schedule row was always the real switch.
+- **v1 (2026-07-30)** — created. Geography ANYWHERE + lane NON-ACADEMIC locked by Michael the same day. Sources verified live 2026-07-30; two corrections carried in from the old ClickUp Job Search doc (ARTSEARCH moved hosts, OffStageJobs is `staging.`-only). Shipped with a ClickUp-held OFF/ON trigger, retired within the hour (see v2). ⚠️ The standing-task link was hand-typed on the first commit and wrong; corrected against the loaded task in the same session. Load the task, copy the ID, never type it.
