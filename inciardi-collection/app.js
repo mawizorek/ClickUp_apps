@@ -11,7 +11,7 @@
  *      (SUM(qty)), never from a length or a COUNT(*) computed here.
  */
 (function () {
-  var state = { sheets: [], sheetId: null, artworks: [] };
+  var state = { sheets: [], sheetId: null, artworks: [], side: 'A', slots: [] };
 
   /* ---------------------------------------------------------------- ENTER */
   function slugPreview(s) {
@@ -35,7 +35,6 @@
     function echo() {
       var id = idIn.value.trim() || slugPreview(name.value);
       idEcho.textContent = id || '—';
-      idEcho.className = 'num' + (/^[0-9-]*$/.test(id) && id ? ' bad-text' : '');
     }
     name.addEventListener('input', echo);
     idIn.addEventListener('input', echo);
@@ -89,32 +88,56 @@
     return API.get('/artworks').then(function (d) { state.artworks = d.artworks || []; return state.artworks; });
   }
 
-  function slotCell(sheetId, side, pos, row) {
-    var id = 'sl_' + side + pos;
+  /* ONE CARD.
+   *
+   * The v4 card stacked a 4:5 plate, then the name, then two monospace lines. Three across a
+   * 390px phone made each card ~230px tall, so a side was ~700px and nine cards could never
+   * be on screen together. The caption now sits ON the plate as a band: same information,
+   * roughly half the height, and it is the layout that lets a whole side fit the frame.
+   */
+  function slotCell(side, pos, row) {
+    var base = 'data-side="' + side + '" data-pos="' + pos + '"';
+
+    // EMPTY = no row exists. Absence is the state; this is a placeholder, not a record.
     if (!row) {
-      // EMPTY = no row exists. This is a placeholder for a record that isn't there.
-      return '<button class="slot empty" id="' + id + '" data-side="' + side + '" data-pos="' + pos +
-             '" title="Add a print here">+</button>';
+      return '<button class="slot empty" ' + base +
+             ' aria-label="Empty slot ' + (pos + 1) + ', side ' + side + '">+</button>';
     }
-    var st = row.state;                       // derived server-side: owned | wanted | note
-    if (st === 'note') {
-      return '<button class="slot note" id="' + id + '" data-side="' + side + '" data-pos="' + pos +
-             '" data-slot="' + Core.esc(row.slot_id) + '">' +
-             '<span class="nm">' + Core.esc(row.note) + '</span>' +
-             '<span class="meta">note</span></button>';
+
+    var slot = ' data-slot="' + Core.esc(row.slot_id) + '"';
+
+    if (row.state === 'note') {
+      return '<button class="slot note" ' + base + slot + '>' +
+        '<span class="n-lab">note</span>' +
+        '<span class="n-txt">' + Core.esc(row.note) + '</span></button>';
     }
-    // Only a real, non-implicit label ever renders as a badge. An implicit edition must
-    // never show as "#1" (Q1).
-    var badge = (row.edition_label && !row.edition_implicit)
-      ? '<span class="ed">' + Core.esc(row.edition_label) + '</span> ' : '';
-    /* own N · placed M — never a bare number. One owned print placed three times must not
-     * read as three owned; that is the condition Beckett's imprecision was accepted on. */
-    var meta = badge + 'own ' + row.qty_owned + ' · placed ' + row.placed_count;
-    return '<button class="slot ' + st + '" id="' + id + '" data-side="' + side + '" data-pos="' + pos +
-           '" data-slot="' + Core.esc(row.slot_id) + '">' +
-           '<span class="tile">' + Core.esc(Core.initials(row.artwork_name)) + '</span>' +
-           '<span class="nm">' + Core.esc(row.artwork_name) + '</span>' +
-           '<span class="meta">' + meta + '</span></button>';
+
+    /* 🔴 own N · placed M — the locked legibility rule, implemented differently, NOT relaxed.
+     * schema.binder.sql permits one artwork in several slots, on the stated condition that a
+     * card can never read as owning more than you do. v4 met that by printing the string on
+     * every card, which made diagnostics the loudest thing on a nine-card grid.
+     * Here the exact string appears whenever the numbers could mislead — any card where
+     * qty_owned is not 1 or placed_count is not 1 — and the ordinary case says nothing,
+     * because a solid card in a slot already means "owned, and it is here."
+     * `wanted` gets the word instead of "own 0 · placed 1", which is the same fact stated
+     * better: you own none of it. */
+    var sub = '';
+    if (row.state === 'wanted') {
+      sub = 'wanted';
+    } else if (row.qty_owned !== 1 || row.placed_count !== 1) {
+      sub = 'own ' + row.qty_owned + ' · placed ' + row.placed_count;
+    }
+
+    // Only a real, non-implicit label ever renders as a badge. An implicit edition must never
+    // show as "#1" (Q1).
+    var ed = (row.edition_label && !row.edition_implicit)
+      ? '<span class="ed">' + Core.esc(row.edition_label) + '</span>' : '';
+
+    return '<button class="slot ' + row.state + '" ' + base + slot + '>' + ed +
+      '<span class="plate"><span class="ini">' + Core.esc(Core.initials(row.artwork_name)) + '</span></span>' +
+      '<span class="cap"><span class="nm">' + Core.esc(row.artwork_name) + '</span>' +
+      (sub ? '<span class="c-sub">' + Core.esc(sub) + '</span>' : '') +
+      '</span></button>';
   }
 
   function sheetIndex() {
@@ -124,38 +147,39 @@
     return -1;
   }
 
-  function renderSheet(slots) {
+  /* Paint BOTH faces. Both stay in the DOM because the flip needs something to reveal;
+   * backface-visibility keeps the hidden one un-tappable. */
+  function renderFaces() {
     var byKey = {};
-    slots.forEach(function (r) { byKey[r.side + r.position] = r; });
-    var used = slots.length;
-    var ownedN = slots.filter(function (r) { return r.state === 'owned'; }).length;
-    var wantN  = slots.filter(function (r) { return r.state === 'wanted'; }).length;
+    state.slots.forEach(function (r) { byKey[r.side + r.position] = r; });
 
-    var pos = sheetIndex();
-    var sheet = state.sheets[pos] || {};
-    /* Position in the binder, 1-based FOR READING ONLY. Stored sheet_order is 0-based and the
-     * sheet_id may say anything at all — `mini-binder-s1` is the SECOND sheet, because ids
-     * were minted from the 0-based order and are permanent. Never show an id as a position. */
-    var where = pos < 0 ? '' :
-      '<span class="tag">sheet ' + (pos + 1) + ' of ' + state.sheets.length + '</span>';
+    ['A', 'B'].forEach(function (side) {
+      var mine = state.slots.filter(function (r) { return r.side === side; });
+      var used = mine.length;
+      var owned = mine.filter(function (r) { return r.state === 'owned'; }).length;
+      var want = mine.filter(function (r) { return r.state === 'wanted'; }).length;
 
-    var head = '<div class="sheet-head">' +
-      '<span class="name">' + Core.esc(sheet.title || state.sheetId || 'Sheet') + '</span>' +
-      where +
-      '<span class="num">' + used + ' / 18</span>' +
-      '<span class="meter"><span style="width:' + Math.round(used / 18 * 100) + '%"></span></span>' +
-      '<span class="tag">' + ownedN + ' owned · ' + wantN + ' wanted · ' + (18 - used) + ' empty</span>' +
-      '</div>';
-
-    var sides = ['A', 'B'].map(function (side) {
       var cells = '';
-      for (var p = 0; p < 9; p++) cells += slotCell(state.sheetId, side, p, byKey[side + p]);
-      return '<div class="side"><span class="tag">Side ' + side + '</span>' +
-             '<div class="slots">' + cells + '</div></div>';
-    }).join('');
+      for (var p = 0; p < 9; p++) cells += slotCell(side, p, byKey[side + p]);
 
-    document.getElementById('sheetWrap').innerHTML = head + '<div class="sides">' + sides + '</div>';
+      // The side's own tally, stated compactly. Zeroes are omitted rather than printed as
+      // "0 wanted", which is noise dressed as information.
+      var bits = [];
+      if (owned) bits.push(owned + ' owned');
+      if (want) bits.push(want + ' wanted');
+      bits.push((9 - used) + ' open');
 
+      document.getElementById('face' + side).innerHTML =
+        '<div class="face-tag"><span class="n">side <b>' + side + '</b></span>' +
+        '<span class="n">' + bits.join(' &middot; ') + '</span></div>' +
+        '<div class="grid9">' + cells + '</div>';
+    });
+
+    bindSlots();
+    paintDeck();
+  }
+
+  function bindSlots() {
     [].forEach.call(document.querySelectorAll('.slot'), function (b) {
       b.addEventListener('click', function () {
         openPicker(b.getAttribute('data-side'), +b.getAttribute('data-pos'), b.getAttribute('data-slot'));
@@ -163,12 +187,48 @@
     });
   }
 
-  /* Inline picker, deliberately NOT a modal. It does BOTH jobs from one control:
+  function setSide(side) {
+    state.side = side;
+    var fl = document.getElementById('flipper');
+    if (fl) fl.classList.toggle('showB', side === 'B');
+    var a = document.getElementById('sideA'), b = document.getElementById('sideB');
+    if (a) a.setAttribute('aria-pressed', String(side === 'A'));
+    if (b) b.setAttribute('aria-pressed', String(side === 'B'));
+  }
+
+  function paintDeck() {
+    var i = sheetIndex(), n = state.sheets.length, cur = state.sheets[i];
+    var t = document.getElementById('sbTitle');
+    var f = document.getElementById('sbFill');
+    var m = document.getElementById('sbMeter');
+    var w = document.getElementById('deckWhere');
+    var p = document.getElementById('prevSheet'), nx = document.getElementById('nextSheet');
+
+    if (t) t.textContent = cur ? (cur.title || cur.sheet_id) : 'No sheets yet';
+    if (f) f.textContent = cur ? cur.slots_used + '/18' : '';
+    if (m) m.style.width = cur ? Math.round(cur.slots_used / 18 * 100) + '%' : '0';
+    /* Position is 1-BASED FOR READING ONLY. Stored sheet_order is 0-based and a sheet_id can
+     * say anything — `mini-binder-s1` is the SECOND sheet, because ids were minted from the
+     * 0-based order and are permanent. Never show an id as a position. */
+    if (w) w.textContent = n ? 'sheet ' + (i + 1) + ' of ' + n : '';
+    if (p) p.disabled = i <= 0;
+    if (nx) nx.disabled = i < 0 || i >= n - 1;
+  }
+
+  function stepSheet(dir) {
+    var i = sheetIndex() + dir;
+    if (i < 0 || i >= state.sheets.length) return;
+    state.sheetId = state.sheets[i].sheet_id;
+    setSide('A');            // a new sheet always opens at its front, like picking it up
+    refreshSlots();
+  }
+
+  /* Inline picker, deliberately NOT a modal dialog. It does BOTH jobs from one control:
    * choose a known artwork, or type a new name and get artwork + edition + placement in
    * one gesture. That is J2 ruling 4 — a slot card IS the entry surface. */
   function openPicker(side, pos, slotId) {
     var host = document.getElementById('pickWrap');
-    host.hidden = false;
+    openDrawer(host);
     host.innerHTML = '<div class="empty">Loading prints…</div>';
     loadArtworks().then(function (list) {
       var opts = list.map(function (a) {
@@ -176,7 +236,8 @@
                ' — own ' + a.qty_owned + (a.placed_count ? ' · placed ' + a.placed_count : '') + '</option>';
       }).join('');
       host.innerHTML =
-        '<h2>Sheet · side ' + side + ' · slot ' + (pos + 1) + '</h2>' +
+        '<h2>Side ' + side + ' &middot; slot ' + (pos + 1) + '</h2>' +
+        '<p class="hint">Pick a print you know, name a new one, or leave a note.</p>' +
         '<label for="p_pick">Known print</label>' +
         '<select id="p_pick"><option value="">— choose —</option>' + opts + '</select>' +
         '<label for="p_new">…or a print not in the catalog yet</label>' +
@@ -186,14 +247,16 @@
         '<label for="p_note">…or just a note in this slot</label>' +
         '<input id="p_note" placeholder="e.g. save for a trade">' +
         '<div class="row"><button id="p_save" class="primary">Place</button>' +
-        (slotId ? '<button id="p_clear">Clear slot</button>' : '') +
+        (slotId ? '<button id="p_clear">Clear</button>' : '') +
         '<button id="p_cancel" class="ghost">Cancel</button></div>' +
-        '<p class="hint">Placing a print you already have elsewhere is fine — the same print may sit in several slots. Every card reads <b>own N · placed M</b>, so a duplicate placement can never masquerade as a duplicate print.</p>';
+        '<p class="hint">Already have it somewhere else? Place it again — a print can sit in ' +
+        'several slots, and the card will spell out <b>own N &middot; placed M</b> so it can\'t ' +
+        'read as owning more than you do.</p>';
 
-      document.getElementById('p_cancel').addEventListener('click', function () { host.hidden = true; });
+      document.getElementById('p_cancel').addEventListener('click', closeDrawers);
       if (slotId) document.getElementById('p_clear').addEventListener('click', function () {
         API.del('/slot?id=' + encodeURIComponent(slotId)).then(function () {
-          Core.toast('Slot cleared', 'good'); host.hidden = true; refreshSlots();
+          Core.toast('Slot cleared', 'good'); closeDrawers(); refreshSlots();
         }).catch(function (e) { Core.toast(e.message, 'bad'); });
       });
 
@@ -226,7 +289,7 @@
           return;
         }
         chain.then(function () {
-          Core.toast('Placed', 'good'); host.hidden = true; refreshSlots();
+          Core.toast('Placed', 'good'); closeDrawers(); refreshSlots();
         }).catch(function (e) {
           Core.toast(e.message, 'bad');
         }).then(function () { btn.disabled = false; btn.textContent = 'Place'; });
@@ -235,25 +298,48 @@
   }
 
   function refreshSlots() {
-    var wrap = document.getElementById('sheetWrap');
-    Core.busy(wrap, 'Loading sheet…');
     API.get('/slots?sheet=' + encodeURIComponent(state.sheetId))
-      .then(function (d) { renderSheet(d.slots || []); })
-      .catch(function (e) { Core.fail(wrap, e); });
+      .then(function (d) { state.slots = d.slots || []; renderFaces(); })
+      .catch(function (e) {
+        state.slots = [];
+        var st = document.getElementById('stage');
+        if (st) st.innerHTML = '<div class="empty bad"><b>Could not load this sheet.</b><br>' +
+          Core.esc(e.message) + '</div>';
+        Core.toast(e.message, 'bad');
+      });
+  }
+
+  /* ---------------------------------------------------- drawers + scrim
+   * v4 had no scrim, so a drawer floated over a fully live page with no signal that it was
+   * modal and no way to dismiss by tapping away. */
+  function openDrawer(el) {
+    closeDrawers(true);
+    var s = document.getElementById('scrim');
+    if (s) s.hidden = false;
+    el.hidden = false;
+  }
+  function closeDrawers(keepScrim) {
+    ['sheetMenu', 'legend', 'pickWrap'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.hidden = true;
+    });
+    var s = document.getElementById('scrim');
+    if (s && !keepScrim) s.hidden = true;
+    ['sheetMenuBtn', 'legendBtn'].forEach(function (id) {
+      var b = document.getElementById(id);
+      if (b) b.setAttribute('aria-expanded', 'false');
+    });
   }
 
   /* ==================================================== THE SHEET MENU
-   * Replaces a <select> of sheets, and the reason is not decoration: a dropdown can only
-   * ever answer "which sheet am I looking at". Arranging the binder is a different verb and
-   * it had nowhere to live. This panel is that home.
+   * A dropdown could only ever answer "which sheet am I looking at". Arranging the binder is
+   * a different verb and had nowhere to live; this panel is that home.
    *
-   * SHEET stays the canonical word for the physical thing that moves (Q11, locked in
-   * schema.binder.sql). PAGE — one side, derived from sheet order plus A/B — is deliberately
-   * NOT built here yet, and the distinction is what makes it worth waiting for: moving a
-   * SHEET is one integer per row and ZERO slots touched, while moving a PAGE means
-   * re-seating nine prints. One is a reorder, the other is a migration.
-   * `v_binder_spread` already derives the page sequence from sheet_order, so this reorder
-   * renumbers pages for free the moment that view gets surfaced. Nothing to keep in sync.
+   * SHEET stays the canonical word for the thing that physically moves (Q11). PAGE — one
+   * side, numbered from sheet order plus A/B — is deliberately not built: moving a SHEET is
+   * one integer per row and zero slots touched, while moving a PAGE means re-seating nine
+   * prints. `v_binder_spread.side_index` already derives the page sequence, so reordering
+   * renumbers pages for free the moment that view is surfaced.
    */
   var menuBusy = false;
 
@@ -266,22 +352,6 @@
     });
   }
 
-  function paintSheetBtn() {
-    var btn = document.getElementById('sheetMenuBtn');
-    if (!btn) return;
-    var i = sheetIndex();
-    var cur = state.sheets[i];
-    if (!cur) {
-      btn.innerHTML = '<span class="sb-t">No sheets yet</span><span class="sb-c" aria-hidden="true">▾</span>';
-      return;
-    }
-    btn.innerHTML =
-      '<span class="sb-n num">' + (i + 1) + '/' + state.sheets.length + '</span>' +
-      '<span class="sb-t">' + Core.esc(cur.title || cur.sheet_id) + '</span>' +
-      '<span class="sb-f num">' + cur.slots_used + '/18</span>' +
-      '<span class="sb-c" aria-hidden="true">▾</span>';
-  }
-
   function setMenuBusy(on, label) {
     menuBusy = on;
     var host = document.getElementById('sheetMenu');
@@ -289,13 +359,6 @@
     [].forEach.call(host.querySelectorAll('button'), function (b) { b.disabled = on; });
     var s = document.getElementById('sm_status');
     if (s) { s.textContent = on ? (label || 'Saving…') : ''; s.hidden = !on; }
-  }
-
-  function closeSheetMenu() {
-    var host = document.getElementById('sheetMenu');
-    if (host) host.hidden = true;
-    var btn = document.getElementById('sheetMenuBtn');
-    if (btn) btn.setAttribute('aria-expanded', 'false');
   }
 
   function renderSheetMenu() {
@@ -307,24 +370,24 @@
       var on = s.sheet_id === state.sheetId;
       return '<div class="sheetrow' + (on ? ' on' : '') + '">' +
         '<button class="sr-pick" data-pick="' + Core.esc(s.sheet_id) + '">' +
-          '<span class="sr-n num">' + (i + 1) + '</span>' +
-          '<span class="sr-t">' + Core.esc(s.title || s.sheet_id) +
-            (on ? ' <span class="tag">open</span>' : '') + '</span>' +
-          '<span class="sr-f num">' + s.slots_used + '/18</span>' +
+          '<span class="sr-n">' + (i + 1) + '</span>' +
+          '<span class="sr-t">' + Core.esc(s.title || s.sheet_id) + '</span>' +
+          '<span class="sr-f">' + s.slots_used + '/18</span>' +
         '</button>' +
         '<span class="sr-acts">' +
           '<button class="sr-mv" data-mv="' + i + '" data-dir="-1" aria-label="Move up"' +
             (i === 0 ? ' disabled' : '') + '>&#8593;</button>' +
           '<button class="sr-mv" data-mv="' + i + '" data-dir="1" aria-label="Move down"' +
             (i === n - 1 ? ' disabled' : '') + '>&#8595;</button>' +
-          '<button class="sr-re" data-rename="' + Core.esc(s.sheet_id) + '" aria-label="Rename sheet">&#9998;</button>' +
+          '<button class="sr-re" data-rename="' + Core.esc(s.sheet_id) + '" aria-label="Rename">&#9998;</button>' +
         '</span>' +
       '</div>';
     }).join('');
 
     host.innerHTML =
       '<h2>Sheets</h2>' +
-      '<p class="hint">Tap a sheet to open it. <b>&#8593; &#8595;</b> move it through the binder, <b>&#9998;</b> renames it. A sheet always travels with both its sides, so moving one never disturbs a single print inside it.</p>' +
+      '<p class="hint">A sheet always travels with both its sides, so moving one never ' +
+      'disturbs a print inside it.</p>' +
       (n ? '<div class="sheetlist">' + rows + '</div>'
          : '<div class="empty">No sheets yet. <b>Add sheet</b> starts the binder.</div>') +
       '<p id="sm_status" class="hint" hidden></p>' +
@@ -335,7 +398,8 @@
       b.addEventListener('click', function () {
         if (menuBusy) return;
         state.sheetId = b.getAttribute('data-pick');
-        closeSheetMenu(); paintSheetBtn(); refreshSlots();
+        setSide('A');
+        closeDrawers(); refreshSlots();
       });
     });
     [].forEach.call(host.querySelectorAll('.sr-mv'), function (b) {
@@ -346,15 +410,14 @@
     [].forEach.call(host.querySelectorAll('.sr-re'), function (b) {
       b.addEventListener('click', function () { renameSheet(b.getAttribute('data-rename')); });
     });
-    document.getElementById('sm_close').addEventListener('click', closeSheetMenu);
+    document.getElementById('sm_close').addEventListener('click', closeDrawers);
     document.getElementById('sm_new').addEventListener('click', addSheet);
   }
 
   /* One press = one server write = one re-read. Deliberately NOT a local shuffle with a
    * "save order" button: a list reordered on screen while holding an unsaved order is the
    * screen asserting something the database has not agreed to, which is rule 1 at the top of
-   * this file. The cost is a round trip per tap, and the buttons disable while it is in
-   * flight so rapid taps cannot race each other into a scrambled binder. */
+   * this file. Buttons disable in flight so rapid taps cannot race into a scrambled binder. */
   function moveSheet(i, dir) {
     if (menuBusy) return;
     var j = i + dir;
@@ -368,10 +431,7 @@
     // permutation, so a stale list on this device gets REFUSED rather than half-applied.
     API.post('/sheet/reorder', { order: order })
       .then(reloadSheets)
-      .then(function () {
-        renderSheetMenu(); paintSheetBtn();
-        Core.toast('Binder reordered', 'good');
-      })
+      .then(function () { renderSheetMenu(); paintDeck(); Core.toast('Binder reordered', 'good'); })
       .catch(function (e) { Core.toast(e.message, 'bad'); })
       .then(function () { setMenuBusy(false); });
   }
@@ -384,13 +444,7 @@
     setMenuBusy(true, 'Renaming…');
     API.post('/sheet/rename', { sheet_id: id, title: next.trim() })
       .then(reloadSheets)
-      .then(function () {
-        renderSheetMenu(); paintSheetBtn();
-        // The sheet header carries the title too, so it needs repainting or the page keeps
-        // showing the old name until the next navigation.
-        if (id === state.sheetId) refreshSlots();
-        Core.toast('Renamed', 'good');
-      })
+      .then(function () { renderSheetMenu(); paintDeck(); Core.toast('Renamed', 'good'); })
       .catch(function (e) { Core.toast(e.message, 'bad'); })
       .then(function () { setMenuBusy(false); });
   }
@@ -402,54 +456,92 @@
     setMenuBusy(true, 'Adding…');
     API.post('/sheet', { title: title.trim() || null })
       .then(reloadSheets)
-      .then(function () {
-        renderSheetMenu(); paintSheetBtn();
-        Core.toast('Sheet added', 'good');
-      })
+      .then(function () { renderSheetMenu(); paintDeck(); Core.toast('Sheet added', 'good'); })
       .catch(function (e) { Core.toast(e.message, 'bad'); })
       .then(function () { setMenuBusy(false); });
   }
 
   function mountBinder() {
-    var wrap = document.getElementById('sheetWrap');
-    var btn = document.getElementById('sheetMenuBtn');
-    Core.busy(wrap, 'Loading binder…');
+    var stage = document.getElementById('stage');
 
-    btn.addEventListener('click', function () {
+    document.getElementById('sheetMenuBtn').addEventListener('click', function () {
       var host = document.getElementById('sheetMenu');
-      if (!host.hidden) { closeSheetMenu(); return; }
-      renderSheetMenu();
-      host.hidden = false;
-      btn.setAttribute('aria-expanded', 'true');
+      if (!host.hidden) { closeDrawers(); return; }
+      renderSheetMenu(); openDrawer(host);
+      this.setAttribute('aria-expanded', 'true');
     });
-    document.addEventListener('keydown', function (e) {
-      var host = document.getElementById('sheetMenu');
-      if (e.key === 'Escape' && host && !host.hidden && !menuBusy) closeSheetMenu();
+    document.getElementById('legendBtn').addEventListener('click', function () {
+      var host = document.getElementById('legend');
+      if (!host.hidden) { closeDrawers(); return; }
+      openDrawer(host);
+      this.setAttribute('aria-expanded', 'true');
     });
+    document.getElementById('legendClose').addEventListener('click', closeDrawers);
+    document.getElementById('scrim').addEventListener('click', function () {
+      if (!menuBusy) closeDrawers();
+    });
+
+    document.getElementById('sideA').addEventListener('click', function () { setSide('A'); });
+    document.getElementById('sideB').addEventListener('click', function () { setSide('B'); });
+    document.getElementById('prevSheet').addEventListener('click', function () { stepSheet(-1); });
+    document.getElementById('nextSheet').addEventListener('click', function () { stepSheet(1); });
+
+    /* SWIPE TO TURN THE SHEET. The gesture the object implies — and the reason the stage is
+     * bounded rather than scrollable: with no vertical scroll to compete with, a horizontal
+     * drag is unambiguous. Threshold 45px and the horizontal delta must beat the vertical,
+     * so a scroll attempt inside a drawer is never read as a flip. */
+    var sx = 0, sy = 0, tracking = false;
+    stage.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) { tracking = false; return; }
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; tracking = true;
+    }, { passive: true });
+    stage.addEventListener('touchend', function (e) {
+      if (!tracking) return;
+      tracking = false;
+      var t = e.changedTouches[0];
+      var dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
+      setSide(dx < 0 ? 'B' : 'A');
+    }, { passive: true });
+
+    document.addEventListener('keydown', onBinderKeys);
 
     reloadSheets().then(function () {
-      paintSheetBtn();
+      paintDeck();
       if (!state.sheets.length) {
-        wrap.innerHTML = '<div class="empty">No sheets yet. Open the sheet menu above and <b>Add sheet</b> to start the binder.</div>';
+        stage.innerHTML = '<div class="empty">No sheets yet.<br>' +
+          'Open the sheet menu above and <b>Add sheet</b> to start the binder.</div>';
         return;
       }
+      setSide('A');
       refreshSlots();
-    }).catch(function (e) { Core.fail(wrap, e); });
+    }).catch(function (e) { Core.fail(stage, e); });
+  }
+
+  /* Bound at the document because the stage is not focusable, and removed on route change so
+   * the Enter form's own keys are never intercepted. */
+  function onBinderKeys(e) {
+    if (document.body.className.indexOf('stage') < 0) return;
+    var open = ['sheetMenu', 'legend', 'pickWrap'].some(function (id) {
+      var el = document.getElementById(id); return el && !el.hidden;
+    });
+    if (e.key === 'Escape' && open && !menuBusy) { closeDrawers(); return; }
+    if (open) return;                       // never flip the sheet behind an open drawer
+    if (/^(INPUT|SELECT|TEXTAREA)$/.test((e.target.tagName || ''))) return;
+    if (e.key === 'ArrowRight') setSide('B');
+    if (e.key === 'ArrowLeft') setSide('A');
   }
 
   /* -------------------------------------------------------------- SHOEBOX
-   * TWO groups, because they answer two different questions and Michael asked for both
-   * without losing either:
-   *   unhoused → none of this print is in the binder. The ORIGINAL shoe-box question,
-   *              unchanged, so the old meaning is intact.
+   * TWO groups, because they answer two different questions:
+   *   unhoused → none of this print is in the binder. The ORIGINAL shoe-box question.
    *   spare    → one is on a sheet, N more are still in the box.
-   * `spare` is SUBTRACTION (own − placed), not allocation: nothing in the schema records
-   * which physical copy sits where, and nothing needs to. See the /shoebox route comment
-   * for why that needed no schema change, contrary to the old note in views.sql.
+   * `spare` is SUBTRACTION (own − placed), not allocation: nothing records which physical
+   * copy sits where, and nothing needs to. See the /shoebox route comment.
    */
   function boxRow(r) {
     var right = r.box_state === 'spare'
-      ? '<span class="badge good">' + r.spare + ' spare</span> ' +
+      ? '<span class="badge good">' + r.spare + ' spare</span>' +
         '<span class="badge">' + r.placed_count + ' in binder</span>'
       : '<span class="badge good">own ' + r.qty_owned + '</span>';
     return '<div class="item">' +
@@ -486,7 +578,7 @@
       }
       if (spare.length) {
         html += boxGroup('Spares',
-          'These are laid out in the binder already. The count is what is left over in the box.', spare);
+          'These are laid out already. The count is what is left over in the box.', spare);
       }
       wrap.innerHTML = html;
     }).catch(function (e) { Core.fail(wrap, e); });
@@ -494,6 +586,11 @@
 
   window.App = {
     mount: function (route) {
+      /* `body.stage` is what locks the binder to the viewport and kills page scroll. Every
+       * other route keeps normal document flow, so it has to come off on the way out. */
+      document.body.classList.toggle('stage', route === 'binder');
+      if (route !== 'binder') document.removeEventListener('keydown', onBinderKeys);
+
       if (route === 'enter')   return mountEnter();
       if (route === 'binder')  return mountBinder();
       if (route === 'shoebox') return mountShoebox();
