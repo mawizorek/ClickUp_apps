@@ -1,10 +1,16 @@
 <!doctype html>
-<!-- Inciardi Collection — v1. Router shell + pages/ partials. Pages-hosted, not file:// capable.
+<!-- Inciardi Collection — v2. Router shell + pages/ partials. Pages-hosted, not file:// capable.
      Shape derived from template-app (gold standard v5), NOT from the predecessor.
 
      ONE DELIBERATE ADDITION vs the template: the template's router injects partials with
      innerHTML, which does not execute inline <script>. So after injecting we call
-     App.mount(route). Without that hook every page here would be inert markup. -->
+     App.mount(route). Without that hook every page here would be inert markup.
+
+     v2 (2026-07-30): the write key is now BAKED INTO core.js at Michael's instruction, so a
+     fresh browser can write with nothing pasted. Every piece of copy and every banner in this
+     file had to change with it — three separate strings here asserted the key was never in the
+     bundle, and one banner became structurally unable to fire. Wrong copy about security is
+     not cosmetic; it is the reader trusting a guarantee that no longer exists. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -35,12 +41,11 @@
 <aside id="settings" class="drawer" hidden aria-label="Settings">
   <h2>Settings</h2>
 
-  <!-- THE ONLY FIELD THAT MATTERS. The worker URL is built in; this is the one thing that
-       cannot be, because it is a credential. -->
+  <!-- Both fields are now overrides, not requirements: the URL and the key both ship with the
+       app. Neither is something you have to produce to use this thing. -->
   <label for="writeKey">Write key</label>
-  <input id="writeKey" type="password" autocomplete="off" placeholder="paste the WRITE_KEY secret">
-  <p class="hint">Needed to <b>add or change</b> anything. Reading works without it.
-     Kept on this device only, never in the app itself.</p>
+  <input id="writeKey" type="password" autocomplete="off">
+  <p class="hint" id="keyHint"></p>
 
   <div class="row">
     <button id="saveCfg" class="primary">Save</button>
@@ -66,12 +71,12 @@
 <noscript>This app needs JavaScript enabled.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./core.js?v=3"></script>
+<script src="./core.js?v=4"></script>
 <script src="./app.js?v=3"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
-  var APP_VERSION = "v1";
+  var APP_VERSION = "v2";
   /* 🔴 THEME: the README says build on `default-theme`. That is a COLOR ROW in colors.tsv,
      not a JOIN in _themes.json — applyTheme() would fault on it (loudly, since PR #502).
      `soft-utility` is the documented default for apps copied from template-app, and it is
@@ -105,6 +110,8 @@
   var dr = document.getElementById("settings");
   var baseIn = document.getElementById("apiBase");
   var baseHint = document.getElementById("baseHint");
+  var keyIn = document.getElementById("writeKey");
+  var keyHint = document.getElementById("keyHint");
 
   /* Kept for the diagnostics bundle. The LAST FAILURE is retained deliberately: a copy
      button matters most when something broke, and a bundle that only reports the latest
@@ -124,8 +131,23 @@
     }
   }
 
+  /* Same rule as the URL, and it matters more here: NEVER pre-fill this box with the built-in
+     key. Painting the effective value would both lie about what this device saved and put the
+     credential one "show password" tap from any screen someone is looking over. */
+  function paintKey() {
+    if (API.isDefaultKey()) {
+      keyIn.value = "";
+      keyIn.placeholder = "using the built-in key";
+      keyHint.innerHTML = 'Editing is <b>already unlocked</b> — this app ships with its write key, so nothing to paste. ' +
+        'Type one here only to override it on this device.';
+    } else {
+      keyIn.value = API.key();
+      keyHint.innerHTML = 'Overridden on this device. Clear the box and Save to go back to the built-in key.';
+    }
+  }
+
   document.getElementById("gear").addEventListener("click", function () {
-    document.getElementById("writeKey").value = API.key() || "";
+    paintKey();
     paintBase();
     dr.hidden = false;
   });
@@ -135,9 +157,9 @@
   });
   document.getElementById("saveCfg").addEventListener("click", function () {
     API.setBase(baseIn.value.trim());     // blank = fall back to the default
-    API.setKey(document.getElementById("writeKey").value);
+    API.setKey(keyIn.value.trim());       // blank = fall back to the built-in key
     Core.toast("Saved on this device", "good");
-    paintBase(); checkConfig(); render(current());
+    paintKey(); paintBase(); checkConfig(); render(current());
   });
 
   /* RAW JSON, verbatim — Michael pastes it, so the machine output is the point. The verdict
@@ -149,8 +171,10 @@
     API.get("/health").then(function (d) {
       lastPing = d; lastError = null;
       out.textContent =
-        "CONNECTED · " + (API.key() ? "write key set" : "READ-ONLY (no write key on this device)") +
-        "\n\n" + JSON.stringify(d, null, 2);
+        "CONNECTED · " + (API.isDefaultKey() ? "built-in write key" : "write key overridden on this device") +
+        "\n\n" + JSON.stringify(d, null, 2) +
+        "\n\nNOTE: /health is a READ, and reads never need a key — so this passing does not prove" +
+        "\nwrites work. If a save fails with 401, the key here and the one on the worker disagree.";
     }).catch(function (e) {
       lastError = e.message || String(e); lastPing = null;
       out.textContent = "FAILED\n\n" + lastError;
@@ -162,7 +186,10 @@
      browser, and the last failure.
      🔴 NEVER THE KEY ITSELF — only whether one exists and how long it is. This text is built
      to be pasted into a chat, so a credential in here would be a leak with a delivery
-     mechanism attached. */
+     mechanism attached. Still true with a baked key: the bundle names WHICH key is in play,
+     never the string. (Yes, the built-in one is in public source anyway — but a diagnostic
+     that pastes credentials into chat logs is a habit that will eventually meet a key that
+     is not public.) */
   function bundle() {
     var L = [];
     L.push("INCIARDI COLLECTION — DIAGNOSTICS");
@@ -170,7 +197,9 @@
     L.push("app         " + APP_VERSION + "  (theme " + APP_THEME + ")");
     L.push("page        " + location.href);
     L.push("worker      " + API.base() + (API.isDefaultBase() ? "  [built-in default]" : "  [OVERRIDDEN on this device]"));
-    L.push("write key   " + (API.key() ? "present (" + API.key().length + " chars)" : "NOT SET — writes will be refused"));
+    L.push("write key   " + (API.isDefaultKey()
+      ? "built-in (" + API.key().length + " chars, from core.js)"
+      : "OVERRIDDEN on this device (" + API.key().length + " chars)"));
     L.push("browser     " + navigator.userAgent);
     L.push("");
     if (lastAt) L.push("last test   " + lastAt);
@@ -212,16 +241,23 @@
   });
 
   /* ---- banner: report the ACTUAL remaining gap ----
-     This used to check !API.base(), which can never be false now that the URL has a
-     default — so it would have silently stopped firing while a real gap (no write key)
-     went unannounced. A banner that cannot fire is worse than no banner: it reads as an
-     all-clear. */
+     History, kept because it is the whole lesson: this first checked !API.base(), which became
+     permanently false when the URL got a default — a banner that cannot fire reads as an
+     all-clear. v1 fixed it by checking !API.key() instead. v2 baked in a key, which did the
+     exact same thing to that check a second time.
+
+     So there is now NO always-true gap to announce, and the honest move is to announce nothing
+     rather than invent a warning to keep the element busy. The one real remaining gap is a
+     key MISMATCH, which cannot be detected from a read (reads are unauthenticated) — it shows
+     up as a 401 on the first save, where core.js names it precisely. Do not "restore" a
+     read-only banner here; there is no read-only state left to report. */
   function checkConfig() {
     var b = document.getElementById("banner");
     if (!API.key()) {
+      // Only reachable if DEFAULT_KEY is ever emptied in core.js.
       b.hidden = false;
       b.className = "banner warn";
-      b.innerHTML = 'Read-only: no write key on this device. Open <b>⚙</b> to paste it.';
+      b.innerHTML = 'Read-only: no write key available. Open <b>⚙</b> to paste one.';
     } else { b.hidden = true; }
   }
 
