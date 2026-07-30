@@ -16,7 +16,7 @@
   var open = { nav: false, settings: false };
   var lastTrigger = null;      // focus returns here when a drawer closes
   var cfg = null;              // the config object, kept for setActive
-  var titles = {};             // route -> label, built once from cfg.nav
+  var titles = {};             // route -> label, for the header and the tab title
 
   function $(id) { return document.getElementById(id); }
 
@@ -111,8 +111,11 @@
   /* ---------- left: the page menu ----------
    * No item ceiling. A fifth route costs one line of config, where the old inline header would
    * have wrapped.
-   * The head carries the WORDMARK now rather than the word "Menu": the header stopped saying
-   * which app this is when the page title took the centre, and a menu is the natural place for
+   * ⚠️ DRAWN FROM `cfg.nav` ONLY, never from `cfg.hidden`. That is the entire mechanism by which
+   * an unlisted route stays unlisted — there is no "is it secret" flag anywhere else, and adding
+   * one would be a second place for the answer to live.
+   * The head carries the WORDMARK rather than the word "Menu": the header stopped saying which
+   * app this is when the page title took the centre, and a menu is the natural place for
    * identity. The panel is still labelled "Menu" to assistive tech via aria-label. */
   function buildNav(c) {
     var d = document.createElement('aside');
@@ -283,8 +286,12 @@
   window.Chrome = {
     init: function (c) {
       cfg = c;
-      // route -> label, so setActive can retitle without re-walking the nav array every time.
-      c.nav.forEach(function (n) { titles[n.route] = n.label; });
+      /* route -> label, so setActive can retitle without re-walking the config every time.
+       * HIDDEN routes are titled here TOO, and only here. setActive falls back to the app name
+       * for a route it cannot name, so an unlisted page would otherwise open with the wrong
+       * title in both the header and the browser tab — which reads as a half-broken load rather
+       * than a deliberately quiet page. Titled, still never drawn: buildNav takes `c.nav`. */
+      c.nav.concat(c.hidden || []).forEach(function (n) { titles[n.route] = n.label; });
       buildHeader(c); buildScrim(); buildNav(c); buildSettings(); buildFooter(c);
     },
     /* One call per route change, from the router. It marks the nav row AND writes the page title

@@ -1,0 +1,94 @@
+/* Inciardi Collection — THE BACK ROOM. Batch preflight, verdict table, run log.
+ * ZERO COLOUR LITERALS.
+ *
+ * REUSES `.mx` (the number strip) and `.mxt` (the table) from summary.css rather than restating
+ * them. Both already load on every route, and a screen that counts things should count them the
+ * way the Collection screen does — a second visual language for the same idea is how an app
+ * starts feeling assembled rather than designed.
+ *
+ * WHAT IS ACTUALLY NEW HERE: the target line, the block notice, the per-row verdict tag, and the
+ * log. Everything else is borrowed on purpose.
+ *
+ * 🔴 INK RULE, same as everywhere: `accent`, `accent-deep` and `accent-2` are BRAND colours,
+ * identical in both modes. Ink is `--text*` or `--accent-deep`. Brand colours fill, they do not
+ * letter. The semantic tokens (`--bad`, `--warn`) are the exception — they exist to be read and
+ * carry their own contrast on both ramps.
+ */
+
+.br-head { margin-bottom: var(--gap-md, 12px); }
+.br-what { display: flex; flex-direction: column; gap: 1px; margin-bottom: 6px; }
+.br-what b { font-family: var(--font-display, inherit); font-size: var(--fs-lead, 1.1rem);
+  font-weight: 600; letter-spacing: var(--track-tight, -0.02em); }
+.br-what span { font-size: var(--fs-xs, 0.72rem); color: var(--text-faint); }
+
+/* THE TARGET LINE. A screen that writes to a sheet says WHICH sheet, by id, before it does — the
+   difference between a fresh sheet and someone's working one is a single string, and it belongs
+   on screen rather than buried in a data file. */
+.br-target { display: block; margin: var(--gap-xs, 8px) 0 0; padding: 7px 9px;
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
+  background: var(--surface-1);
+  font-size: var(--fs-xs, 0.72rem); line-height: 1.5; color: var(--text-soft);
+  text-wrap: pretty; }
+.br-target b { color: var(--text); font-weight: 600; }
+.br-target code { font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.95em;
+  color: var(--accent-deep); }
+
+/* THE BLOCK NOTICE. Solid left rule in `--bad`, because this is the one state where the app is
+   refusing to do the thing you asked for, and the reason has to be unmissable. */
+.br-stop { margin: var(--gap-md, 12px) 0; padding: 9px 11px;
+  border: var(--border-w, 1px) solid var(--bad, var(--border));
+  border-left-width: 3px; border-radius: var(--radius, 6px);
+  font-size: var(--fs-sm, 0.85rem); line-height: 1.45; color: var(--text-soft);
+  text-wrap: pretty; }
+.br-stop b { color: var(--bad, var(--text)); }
+
+/* ⚠️ THE OVERRIDE ROW IS A <label> WRAPPING AN <input>, AND BOTH INHERIT TRAPS FROM base.css:
+     label → display block, UPPERCASE, 0.09em tracking (it is styled as a field caption)
+     input → width 100%, min-height 44px (styled as a text box)
+   Left alone this renders as a shouted sentence next to a 44px-tall tickbox. `text-transform`
+   and `min-height: 0` are the antidotes — and `.check label` / `.check input` in base.css carry
+   the exact same pair, which is the tell that this is a known trap rather than a one-off.
+   `height` alone does NOT beat an inherited `min-height`; that is the part that bites. */
+.br-ovr { display: flex; align-items: center; gap: 8px; margin-top: 9px;
+  text-transform: none; letter-spacing: 0.01em;
+  font-size: var(--fs-xs, 0.72rem); color: var(--text); cursor: pointer; }
+.br-ovr input { flex: 0 0 auto; width: 18px; height: 18px; min-height: 0; padding: 0;
+  accent-color: var(--bad, var(--accent)); }
+
+/* ---------- the verdict table ----------
+   Three columns: where it goes, what it is, what will happen to it. The third column is the
+   whole point of this screen — a batch importer that shows you a list of names without saying
+   which are new and which get overwritten has told you nothing you could act on. */
+.br-t td { vertical-align: top; }
+.br-pos { white-space: nowrap; width: 1%;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); }
+.br-pos b { color: var(--text-soft); font-variant-numeric: tabular-nums; }
+.br-nm { font-size: var(--fs-sm, 0.85rem); color: var(--text); }
+.br-id { display: block; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6rem; letter-spacing: 0.04em; color: var(--text-faint); }
+.br-st { text-align: right; width: 1%; white-space: nowrap; }
+
+.br-tag { display: inline-block; padding: 1px 6px; border-radius: 3px;
+  border: 1px dashed var(--border);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.58rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); }
+/* SOLID = something is actually being created. Same border grammar as the binder: solid means a
+   real thing, dashed means a marker or a no-op. */
+.br-tag.new { border-style: solid; border-color: var(--accent);
+  background: var(--accent-soft); color: var(--accent-deep); }
+.br-tag.bad { border-style: solid; border-color: var(--bad, var(--border));
+  color: var(--bad, var(--text)); }
+.mxt tbody tr.clash td { background: var(--surface-2); }
+
+/* ---------- run controls + log ---------- */
+.br-go { display: flex; gap: var(--gap-xs, 8px); flex-wrap: wrap;
+  margin: var(--gap-md, 12px) 0 var(--gap-xs, 8px); }
+.br-go button { flex: 0 0 auto; }
+
+/* The log is the receipt. Capped and scrollable rather than growing the page: on a phone a
+   thirty-seven line log would push the button that started it off the bottom of the screen and
+   leave you scrolling to find out whether it had finished. */
+#brLog { max-height: 42vh; overflow: auto; -webkit-overflow-scrolling: touch;
+  white-space: pre-wrap; word-break: break-word;
+  font-size: var(--fs-xs, 0.72rem); line-height: 1.5; }

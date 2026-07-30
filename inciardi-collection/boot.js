@@ -6,8 +6,8 @@
  * quietly become the app, which is the exact drift that lock exists to stop.
  *
  * `APP` below is the one config object. Adding a route is a line there plus a module file.
- * Chrome.setActive() turns `nav[].label` into the centred PAGE TITLE in the header and the
- * browser tab title, so a route's label is written once, here.
+ * Chrome.setActive() turns a route's `label` into the centred PAGE TITLE in the header and the
+ * browser tab title, so a route's name is written once, here.
  */
 (function () {
 
@@ -16,7 +16,7 @@
     appName: 'Inciardi',
     appSub: 'Collection',
     logo: '\uD83D\uDCD5',
-    version: 'v11',
+    version: 'v12',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
@@ -34,12 +34,34 @@
       { route: 'shoebox', label: 'Shoe-box',   hint: 'Owned, not in the binder yet' },
       { route: 'enter',   label: 'Enter',      hint: 'Add a print to the catalog' }
     ],
+
+    /* ============================================================ UNLISTED ROUTES
+     * Routable and titled, NEVER rendered in the nav drawer or the footer. You get here by
+     * knowing the address.
+     *
+     * 🔴 WHY THIS LIST HAS TO EXIST AT ALL: the router below validates the incoming hash against
+     * the known routes and falls back to `defaultPage` for anything it does not recognise. That
+     * is the right behaviour for a typo, but it meant ANY route absent from `nav` was
+     * unreachable — #backroom silently opened the binder instead, which reads as the page being
+     * broken rather than hidden. So hidden routes are a real second list, not an exception
+     * threaded through the router.
+     *
+     * ⚠️ UNLISTED IS NOT PROTECTED, AND THE APP SHOULD NOT PRETEND OTHERWISE. Public repo,
+     * public Pages site, write key baked into core.js by design. Anyone reading the source finds
+     * this, and could already POST to the worker without it. What concealment buys: a screen
+     * that performs thirty-seven writes is not one tap from the menu. The real protections are
+     * the guards inside backroom.js and D1 Time Travel. */
+    hidden: [
+      { route: 'backroom', label: 'Back room' }
+    ],
+
     sources: [
       { label: 'Anastasia Inciardi', href: 'https://www.anastasiainciardi.com/' }
     ]
   };
 
-  var routes = APP.nav.map(function (n) { return n.route; });
+  // Both lists are routable. Only `nav` is ever drawn.
+  var routes = APP.nav.concat(APP.hidden || []).map(function (n) { return n.route; });
   var lastPing = null, lastError = null, lastAt = null;
 
   function $(id) { return document.getElementById(id); }
@@ -212,7 +234,8 @@
     /* WHICH MODULES LOADED. After a split, a 404'd script and a screen with no data look
      * identical — this is the line that tells them apart. */
     L.push('modules     ' +
-      ['Device', 'Chrome', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox', 'Summary', 'App']
+      ['Device', 'Chrome', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox', 'Summary',
+       'Batch', 'Backroom', 'App']
         .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
     L.push('hash        ' + (location.hash || '(none)'));
     L.push('worker      ' + API.base() + (API.isDefaultBase() ? '  [built-in]' : '  [OVERRIDDEN here]'));
