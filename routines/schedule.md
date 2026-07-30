@@ -4,6 +4,8 @@
 
 > 📖 **This file is the single source of truth for the routine schedule, and it is meant to be READ BY A HUMAN.** There is no app, no renderer, no dashboard. If something here is hard to read, fix the wording — nothing parses it anymore. *(The Routines Viewer was deleted 2026-07-27; see the bottom of this file before rebuilding anything like it.)*
 
+> 🎛️ **This table is also the ON/OFF SWITCH (LOCKED 2026-07-30, Michael).** A routine runs because it has a row here; it stops because that row is marked retired. **Do not build a second switch anywhere else** — not a mode flag, not a ClickUp field, not an "enabled: true" in a runbook's frontmatter. Michael, cutting exactly that: *"don't really need this other gate. if i want it off, ill just have it removed from the schedule md."* A second switch in a second system makes *"is this running?"* a two-lookup question that can return two different answers.
+
 ## 🚨 THERE IS NO SCHEDULER (LOCKED 2026-07-26, Michael)
 
 **Nothing wakes up. No timer fires.** Routine Ricky is a git-teammate, and git-teammates have **no autonomous triggers** — they run only when a session invokes them. The native ClickUp Super Agent that used to hold the wake timer is gone. Do not restore the wake-window model. Do not write a routine that assumes one.
@@ -22,7 +24,7 @@ What that changes, concretely:
 |---|---|---|---|
 | **On Track** · `on-track-refresh.md` | Every **Wednesday** | `last-run/on-track.txt` | Weekly motorsports TV listings refresh. |
 | **F1** · `f1-refresh.md` | **Thu–Sun**, session-aware | `last-run/f1.txt` | Eligible on any invocation Thu–Sun, but the runbook decides: it only refreshes if an F1 session has actually finished since the last stamp. Otherwise a clean no-op. |
-| **Job Market** · `job-market-refresh.md` | **Daily** | `last-run/job-market.txt` | Non-academic live-entertainment production roles, geography ANYWHERE. ⚠️ **The hunt trigger is OFF** — research mode only, and the runbook reads that state off ClickUp task `86ajtgbt3` on every run, never off this table. Output while OFF is ONE comment on that task; it creates no lead tasks. See the daily-cadence note below. |
+| **Job Market** · `job-market-refresh.md` | **Daily** | `last-run/job-market.txt` | Non-academic live-entertainment production roles, geography ANYWHERE, level at or above PM. **Runs live:** writes one comment on standing thread `86ajtgbt3` and cuts an `Application` task per qualifying lead. Its only brake is the runbook's quality bar. See the daily-cadence note below. |
 | **World Cup** · `world-cup-refresh.md` | 🏁 **RETIRED** 2026-07-26 | `last-run/world-cup.txt` *(frozen)* | Tournament ended Jul 19, 2026. Row kept as the template for the next one. **The bracket APP is still live** — retiring a routine is not retiring an app. |
 
 **To check whether anything is stale:** ask Ricky (`/session.agent=Ricky` — a bare call triages and proposes), or read a routine's `last-run` file and compare it to the cadence above yourself.
@@ -35,6 +37,7 @@ Job Market is the **first daily routine**, and daily interacts badly with "there
 - **The catch-up rule carries the whole load.** Nine days without an invocation is **ONE** pass labeled a catch-up, never nine passes. This is exactly the rule daily cadences are most tempted to break.
 - **So "daily" here really means "a day old is stale enough to be worth re-reading."** It is a statement about how fast job boards turn over, not a promise about how often anything runs.
 - **The mitigation is the runbook, not the clock** — per the F1 lesson below, Job Market compares against its own last-run stamp and reports the DELTA, so a late pass is still a correct pass. It just covers more days.
+- ⚠️ **Daily + creates-tasks is a new combination for us.** On Track and F1 refresh data in place; Job Market is the first routine whose passes ACCUMULATE work items in a ClickUp list. A long catch-up therefore has a failure mode the others don't — flooding a funnel — which is why its runbook says get *stricter* on a catch-up, not looser.
 
 ### 🏁 World Cup stand-down (2026-07-26)
 
@@ -87,7 +90,8 @@ On invocation, for every ACTIVE routine, read its `last-run` file and compare ag
 - Format: one line, `YYYY-MM-DD HH:MM` ET. Use `never` if it has never successfully run.
 - Changing a cadence: edit the `Cadence` cell above (or tell Ricky). Never reschedule by editing a runbook spec, and never by editing the agent.
 - Retiring a routine: mark it retired in the table with a dated reason, and **put its end date in the ROW** if it is date-bounded. **Do not delete the row and do not delete the runbook.** *(The World Cup stand-down instruction lived only inside its runbook and went seven days unexecuted.)*
-- **A routine can be ACTIVE while the work it feeds is switched off.** Job Market is the first: it runs daily, but a trigger held in ClickUp decides whether the pass produces research notes or actual leads. **Cadence and mode are different questions — never encode a mode in this table**, or the next person retunes a cadence to change a behavior and the table starts lying.
+- **Switching a routine OFF is the same act as retiring it: mark the row.** There is no separate pause mechanism and there should not be one. ⚠️ **Marking the row is the switch — DELETING the row is not.** A deleted row leaves a live runbook with no schedule entry, which reads as "never registered" instead of "deliberately stopped," and the World Cup incident is what that costs.
+- <s>**A routine can be ACTIVE while the work it feeds is switched off.** Job Market is the first: it runs daily, but a trigger held in ClickUp decides whether the pass produces research notes or actual leads. **Cadence and mode are different questions — never encode a mode in this table**, or the next person retunes a cadence to change a behavior and the table starts lying.</s> **REVERSED 2026-07-30, hours after it was written.** Job Market shipped with exactly that ClickUp-held mode flag and Michael cut it the same day. The rule was not wrong about *cadence ≠ mode* — it was wrong that the mode deserved to exist at all. **The honest version is the switch note at the top of this file: one switch, and it is this table.** Kept struck rather than deleted because the reasoning reads plausible and someone will re-derive it.
 
 ## 🗑️ The Routines Viewer was deleted — read this before rebuilding it
 
