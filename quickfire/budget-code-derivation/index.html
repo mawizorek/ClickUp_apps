@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Code → Reporting Derivation · v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground: oklch(97.2% 0.009 65);
+    --ground-2: oklch(94.5% 0.012 65);
+    --paper: oklch(99% 0.005 65);
+    --ink: oklch(23% 0.018 305);
+    --ink-soft: oklch(44% 0.014 305);
+    --ink-faint: oklch(62% 0.012 305);
+    --rule: oklch(87% 0.011 305);
+    --rule-strong: oklch(74% 0.014 305);
+
+    --authored: oklch(43% 0.135 322);
+    --authored-bg: oklch(95% 0.028 322);
+    --authored-line: oklch(66% 0.09 322);
+
+    --derived: oklch(48% 0.085 158);
+    --derived-bg: oklch(95% 0.026 158);
+    --derived-line: oklch(66% 0.07 158);
+
+    --observed: oklch(53% 0.145 44);
+    --observed-bg: oklch(95.5% 0.035 44);
+    --observed-line: oklch(70% 0.11 44);
+
+    --blocked: oklch(50% 0.16 22);
+    --blocked-bg: oklch(95.5% 0.032 22);
+
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px;
+    --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+    --ease: cubic-bezier(0.22,1,0.36,1);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:16px;line-height:1.55;font-optical-sizing:auto;}
+  code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-ligatures:none;}
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif;text-wrap:balance;margin:0;line-height:1.1;}
+  h1{font-size:clamp(2rem,5vw,3.25rem);font-weight:700;letter-spacing:-0.02em;}
+  h2{font-size:clamp(1.4rem,3vw,1.9rem);font-weight:600;letter-spacing:-0.01em;}
+  h3{font-size:1.0625rem;font-weight:600;letter-spacing:-0.005em;
+    font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;}
+  p{margin:0;text-wrap:pretty;}
+  .wrap{max-width:1180px;margin:0 auto;padding:var(--s6) var(--s5) var(--s9);}
+
+  .mast{padding-bottom:var(--s6);border-bottom:2px solid var(--ink);}
+  .eyebrow{font-size:0.6875rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--ink-faint);margin-bottom:var(--s3);}
+  .mast h1{max-width:26ch;}
+  .goal{margin-top:var(--s5);max-width:70ch;font-size:1.0625rem;color:var(--ink-soft);}
+  .goal b{color:var(--ink);font-weight:600;}
+
+  section{margin-bottom:var(--s9);}
+  .sechead{display:flex;align-items:baseline;gap:var(--s3);margin-bottom:var(--s5);}
+  .sechead .num{font-family:"IBM Plex Mono",monospace;font-size:0.75rem;font-weight:600;
+    color:var(--ink-faint);padding-top:0.35em;}
+  .sechead p{margin-top:var(--s2);color:var(--ink-soft);max-width:72ch;font-size:0.9375rem;}
+
+  /* mapping blocks */
+  .maps{margin-top:var(--s6);display:grid;gap:var(--s5);}
+  .map{border:1px solid var(--rule-strong);border-radius:2px;background:var(--paper);overflow:hidden;}
+  .map > header{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s3);
+    padding:var(--s4);border-bottom:1px solid var(--rule);background:var(--derived-bg);}
+  .map > header .la{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:1.0625rem;
+    color:var(--derived);letter-spacing:-0.01em;}
+  .map > header .cnt{font-size:0.8125rem;color:var(--ink-soft);margin-left:auto;}
+  .conf{font-size:0.625rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+    padding:3px 7px;border-radius:2px;}
+  .conf.hard{background:var(--derived);color:oklch(97% 0.01 158);}
+  .conf.soft{background:var(--observed-bg);color:var(--observed);border:1px solid var(--observed-line);}
+  .map .pats{padding:var(--s4);font-size:0.875rem;color:var(--ink-soft);line-height:1.6;
+    border-bottom:1px dashed var(--rule);}
+  .map .pats b{color:var(--ink);font-weight:600;}
+  .ev{width:100%;border-collapse:collapse;font-size:0.8125rem;}
+  .ev th{text-align:left;font-size:0.625rem;font-weight:600;letter-spacing:0.09em;
+    text-transform:uppercase;color:var(--ink-faint);padding:var(--s3) var(--s4) var(--s2);}
+  .ev td{padding:var(--s2) var(--s4);border-top:1px solid var(--rule);vertical-align:top;}
+  .ev .c{font-family:"IBM Plex Mono",monospace;font-weight:600;white-space:nowrap;}
+  .ev .amt{font-family:"IBM Plex Mono",monospace;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .ev .sc{font-family:"IBM Plex Mono",monospace;font-size:0.75rem;color:var(--ink-soft);white-space:nowrap;}
+  .ev tbody tr{transition:background 140ms var(--ease);}
+  .ev tbody tr:hover{background:var(--ground-2);}
+  .ev tr.cross td{background:var(--blocked-bg);}
+  .ev tr.cross .sc{color:var(--blocked);font-weight:600;}
+
+  .callout{border:1px solid var(--blocked);background:var(--blocked-bg);border-radius:2px;
+    padding:var(--s5);margin-top:var(--s5);}
+  .callout h3{margin-bottom:var(--s3);}
+  .callout p{font-size:0.9375rem;color:var(--ink-soft);max-width:74ch;}
+  .callout p + p{margin-top:var(--s3);}
+  .callout b{color:var(--ink);}
+
+  .good{border:1px solid var(--derived-line);background:var(--derived-bg);border-radius:2px;
+    padding:var(--s5);margin-top:var(--s5);}
+  .good h3{margin-bottom:var(--s3);}
+  .good p{font-size:0.9375rem;color:var(--ink-soft);max-width:74ch;}
+  .good p + p{margin-top:var(--s3);}
+  .good b{color:var(--ink);}
+
+  /* op table */
+  .tbl{width:100%;border-collapse:collapse;margin-top:var(--s4);font-size:0.875rem;}
+  .tbl th{text-align:left;font-size:0.6875rem;font-weight:600;letter-spacing:0.09em;
+    text-transform:uppercase;color:var(--ink-faint);padding:0 var(--s3) var(--s2);
+    border-bottom:1px solid var(--ink);}
+  .tbl td{padding:var(--s3);border-bottom:1px solid var(--rule);vertical-align:top;}
+  .tbl .m{font-family:"IBM Plex Mono",monospace;font-size:0.8125rem;white-space:nowrap;}
+  .tbl .arrow{color:var(--ink-faint);text-align:center;width:28px;}
+  .tbl td.pat{color:var(--ink-soft);font-size:0.8125rem;line-height:1.45;}
+  .tbl tbody tr:hover{background:var(--ground-2);}
+
+  /* tree */
+  .tier{display:grid;grid-template-columns:126px 1fr;gap:var(--s5);align-items:start;}
+  .tierlabel{font-size:0.6875rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--ink-faint);padding-top:var(--s3);text-align:right;}
+  .tierlabel span{display:block;font-weight:400;letter-spacing:0.02em;text-transform:none;
+    font-size:0.75rem;margin-top:2px;}
+  .node{border:1px solid var(--rule-strong);background:var(--ground-2);padding:var(--s4);border-radius:2px;}
+  .node .title{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:0.9375rem;}
+  .node .sub{font-size:0.8125rem;color:var(--ink-soft);margin-top:2px;}
+  .node.authored{border-color:var(--authored-line);background:var(--authored-bg);}
+  .node.authored .title{color:var(--authored);}
+  .node.derived{border-color:var(--derived-line);background:var(--derived-bg);}
+  .node.derived .title{color:var(--derived);}
+  .node.observed{border-color:var(--observed-line);background:var(--observed-bg);}
+  .node.observed .title{color:var(--observed);}
+  .connector{height:var(--s5);display:flex;align-items:center;justify-content:center;}
+  .connector svg{display:block;overflow:visible;}
+  .triple{display:grid;gap:var(--s3);grid-template-columns:repeat(3,1fr);}
+  .fieldnode{border:1px solid var(--authored-line);background:var(--authored-bg);
+    border-radius:2px;padding:var(--s4);}
+  .fieldnode .fname{font-family:"IBM Plex Mono",monospace;font-size:0.8125rem;font-weight:600;
+    color:var(--authored);}
+  .fieldnode .fcount{font-family:"Fraunces",serif;font-size:2rem;font-weight:600;line-height:1;
+    margin:var(--s2) 0 var(--s1);}
+  .fieldnode .fnote{font-size:0.8125rem;color:var(--ink-soft);line-height:1.45;}
+  .fieldnode .fex{margin-top:var(--s3);padding-top:var(--s3);border-top:1px solid var(--authored-line);
+    font-family:"IBM Plex Mono",monospace;font-size:0.75rem;color:var(--authored);}
+
+  .lgnd{display:flex;flex-wrap:wrap;gap:var(--s5);margin-top:var(--s5);
+    padding-top:var(--s4);border-top:1px solid var(--rule);}
+  .lgnd div{display:flex;gap:var(--s2);align-items:center;font-size:0.8125rem;color:var(--ink-soft);}
+  .lgnd i{width:11px;height:11px;border-radius:2px;flex:none;}
+
+  .reserves{margin-top:var(--s4);display:grid;gap:var(--s2) var(--s5);
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));padding:0;list-style:none;}
+  .reserves li{font-family:"IBM Plex Mono",monospace;font-size:0.8125rem;display:flex;gap:var(--s2);}
+  .reserves li em{font-family:-apple-system,system-ui,sans-serif;font-style:normal;
+    color:var(--ink-soft);font-size:0.75rem;}
+
+  .seq{margin-top:var(--s5);}
+  .step{display:grid;grid-template-columns:52px 1fr auto;gap:var(--s4);
+    padding:var(--s5) 0;border-top:1px solid var(--rule);align-items:start;}
+  .step:last-child{border-bottom:1px solid var(--rule);}
+  .step .sn{font-family:"Fraunces",serif;font-size:1.75rem;font-weight:600;line-height:0.9;
+    color:var(--ink-faint);}
+  .step .body p{margin-top:var(--s2);color:var(--ink-soft);font-size:0.9375rem;max-width:66ch;}
+  .step .who{font-size:0.6875rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+    padding:4px 9px;border-radius:2px;white-space:nowrap;}
+  .who.mich{background:var(--observed-bg);color:var(--observed);border:1px solid var(--observed-line);}
+  .who.brain{background:var(--derived-bg);color:var(--derived);border:1px solid var(--derived-line);}
+  .step.done .sn{color:var(--derived);}
+
+  footer{margin-top:var(--s8);padding-top:var(--s5);border-top:2px solid var(--ink);
+    font-size:0.8125rem;color:var(--ink-faint);display:flex;flex-wrap:wrap;gap:var(--s3) var(--s5);}
+
+  @media (max-width:820px){
+    .triple{grid-template-columns:1fr;}
+    .tier{grid-template-columns:1fr;gap:var(--s2);}
+    .tierlabel{text-align:left;padding-top:var(--s4);}
+    .ev thead{display:none;}
+    .ev tr{display:grid;grid-template-columns:1fr auto;padding:var(--s2) 0;}
+    .ev td{border-top:none;padding:1px var(--s4);}
+    .ev tbody tr{border-top:1px solid var(--rule);}
+    .step{grid-template-columns:36px 1fr;}
+    .step .who{grid-column:2;justify-self:start;margin-top:var(--s3);}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">URITP Beta Budget · derivation reference · v2 · 30 Jul 2026</div>
+    <h1>Three dropdowns in. Two reporting axes out.</h1>
+    <p class="goal">All 244 codes already carry <b>Domain</b>, <b>Context</b> and <b>Subcategory</b>. Reports derive the operating line and the university expense bucket from those. <b>No new fields.</b> Every mapping below was measured against two real URF0985 exports, not inferred from a spec.</p>
+  </header>
+
+  <section>
+    <div class="sechead">
+      <span class="num">01</span>
+      <div>
+        <h2>Subcategory → ledger account</h2>
+        <p>Many-to-one: roughly 115 subcategories collapse into 9 university buckets. That collapse is the point, it is what lets the department speak their language without renumbering anything. Each rule below carries the real transactions it was measured from.</p>
+      </div>
+    </div>
+
+    <div class="maps">
+
+      <article class="map">
+        <header>
+          <span class="la">60000:Supplies</span>
+          <span class="conf hard">holds</span>
+          <span class="cnt">the bulk of production spend</span>
+        </header>
+        <div class="pats"><b>Departments:</b> Scenery · Paint · Rigging · Props · Costumes · Hair &amp; Makeup · Lighting · Sound · Video. <b>Plus:</b> anything <i>Supplies</i> or <i>Maintenance</i>, Office, Classroom, First Aid, Script Binding. Splits internally into <code>Supplies Office (SC61000)</code> for admin and <code>Supplies Other (SC61200)</code> for everything production.</div>
+        <table class="ev">
+          <thead><tr><th>Code</th><th>What it was</th><th>Spend category</th><th>Amount</th></tr></thead>
+          <tbody>
+            <tr><td class="c">20301</td><td>Thought/Crime scenery · Home Depot</td><td class="sc">SC61200</td><td class="amt">$346.68</td></tr>
+            <tr><td class="c">20303</td><td>Thought/Crime rigging · Full Compass</td><td class="sc">SC61200</td><td class="amt">$564.56</td></tr>
+            <tr><td class="c">20305</td><td>Thought/Crime costumes · Amazon</td><td class="sc">SC61200</td><td class="amt">$845.28</td></tr>
+            <tr><td class="c">20307</td><td>Thought/Crime lighting · Applied Audio</td><td class="sc">SC61200</td><td class="amt">$420.00</td></tr>
+            <tr><td class="c">20401</td><td>The Christians scenery · Matthews &amp; Fields</td><td class="sc">SC61200</td><td class="amt">$1,037.76</td></tr>
+            <tr><td class="c">20404</td><td>The Christians props · Walmart carafes</td><td class="sc">SC61200</td><td class="amt">$30.98</td></tr>
+            <tr><td class="c">10303</td><td>First aid supplies · Cintas</td><td class="sc">SC61000</td><td class="amt">$223.78</td></tr>
+            <tr><td class="c">20108</td><td>Sound · B&amp;H Photo</td><td class="sc">SC61200</td><td class="amt">$52.92</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="map">
+        <header>
+          <span class="la">61400:Travel and Conference</span>
+          <span class="conf hard">holds</span>
+          <span class="cnt">travel + every kind of food</span>
+        </header>
+        <div class="pats">Anything <i>Travel</i>, <i>Accommodation</i>, <i>Car Rental</i>, <i>Gas</i>, <i>Parking</i>, plus Hospitality, Food &amp; Beverage, Concessions, Event Supplies, Entertainment, Gifts. Four sub-buckets: <code>Travel Domestic (SC49750)</code> · <code>Events (SC49650)</code> · <code>Meals and Beverages (SC49470)</code> · <code>Entertainment (SC49500)</code>.</div>
+        <table class="ev">
+          <thead><tr><th>Code</th><th>What it was</th><th>Spend category</th><th>Amount</th></tr></thead>
+          <tbody>
+            <tr><td class="c">20361</td><td>T/C sound designer accommodation · Staybridge</td><td class="sc">SC49750</td><td class="amt">$1,251.00</td></tr>
+            <tr><td class="c">20362</td><td>T/C costume designer accommodation · Staybridge</td><td class="sc">SC49750</td><td class="amt">$447.00</td></tr>
+            <tr><td class="c">10103</td><td>Staff meeting refreshments · Wegmans</td><td class="sc">SC49650</td><td class="amt">$213.65</td></tr>
+            <tr><td class="c">20087</td><td>T/C opening night reception · Savoia Pastry</td><td class="sc">SC49650</td><td class="amt">$248.10</td></tr>
+            <tr><td class="c">20087</td><td>Christians meet &amp; greet pizza · Salvatores</td><td class="sc">SC49470</td><td class="amt">$122.58</td></tr>
+            <tr class="cross"><td class="c">20383</td><td><b>Programs printing</b> · FedEx Office · opening night</td><td class="sc">SC49650 ⚠</td><td class="amt">$868.49</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="map">
+        <header>
+          <span class="la">61500:Professional Services</span>
+          <span class="conf hard">holds</span>
+          <span class="cnt">every fee</span>
+        </header>
+        <div class="pats">Anything <i>Fees</i>, plus Honoraria, Union Dues, Rights &amp; Scripts. Two sub-buckets: <code>Outside Services Other (SC47400)</code> for designers and creatives, <code>Honoraria (SC47000)</code> for one-off speakers and workshops.</div>
+        <table class="ev">
+          <thead><tr><th>Code</th><th>What it was</th><th>Spend category</th><th>Amount</th></tr></thead>
+          <tbody>
+            <tr><td class="c">20028</td><td>Sound design, full season · Obadiah Eaves</td><td class="sc">SC47400</td><td class="amt">$4,500.00</td></tr>
+            <tr><td class="c">20021</td><td>The Christians scenic design · Marcelo Martinez Garcia</td><td class="sc">SC47400</td><td class="amt">$1,000.00</td></tr>
+            <tr><td class="c">20025</td><td>The Christians costume design · Kiyoshi Shaw</td><td class="sc">SC47400</td><td class="amt">$1,000.00</td></tr>
+            <tr><td class="c">10003</td><td>Director's workshops for ENGL320 · Colleen Parent</td><td class="sc">SC47000</td><td class="amt">$1,000.00</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="map">
+        <header>
+          <span class="la">50000:Salaries and Wages</span>
+          <span class="conf hard">holds</span>
+          <span class="cnt">below-the-line staffing</span>
+        </header>
+        <div class="pats">Shop Assistants · Production Stage Managers · Props and Wardrobe Assistants · Head Electricians · AV Engineers · Theatre Office Interns · Box Office Staff · Overhire and Stitchers · Paint Charges. Arrives via <code>Payroll Actual</code> and <code>Payroll Forward Accrual</code>, never as a purchase, and lands in <code>Clerical (SC57400)</code> or <code>Faculty Full Time Salaries (SC57600)</code>.</div>
+        <div class="pats" style="border-bottom:none">🎭 <b>Milo's note:</b> this whole band is the shop and crew staffing that lives in <b>BETA BUDGET ▸ LABOR</b>. It is the one ledger account where the money arrives without anyone typing a budget code, because payroll is the source, not a receipt. So it will never appear in the code-parsing pass and must be summed from the payroll rows directly.</div>
+      </article>
+
+      <article class="map">
+        <header>
+          <span class="la">65300 · 65110 · 65550</span>
+          <span class="conf soft">thin</span>
+          <span class="cnt">the small tail</span>
+        </header>
+        <div class="pats"><code>65300:Interdepartmental Transfers</code> takes Telephone, Off-site Storage and Facilities: recurring internal charges nobody buys. <code>65110:Credit Card Fees</code> is one subcategory. <code>65550:Other Expenses</code> is where the university puts things it cannot classify, which makes it a destination rather than a rule.</div>
+        <table class="ev">
+          <thead><tr><th>Code</th><th>What it was</th><th>Spend category</th><th>Amount</th></tr></thead>
+          <tbody>
+            <tr><td class="c">10703</td><td>Avery Street storage, monthly · recurring journal</td><td class="sc">SC52050</td><td class="amt">$443.00</td></tr>
+            <tr><td class="c">10501</td><td>March voice communications · internal</td><td class="sc">SC49400</td><td class="amt">$111.00</td></tr>
+            <tr><td class="c">10900</td><td>Wells Fargo card fees</td><td class="sc">SC53860</td><td class="amt">$27.07</td></tr>
+            <tr><td class="c">10209</td><td>Mileage, shopping for theatre · Mary Reiser</td><td class="sc">SC56650</td><td class="amt">$170.38</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+    </div>
+
+    <div class="callout">
+      <h3>Three measured counterexamples. The rule is a default, not a truth.</h3>
+      <p><b>20501 · General scenic tools</b> landed in <code>SC61200</code> on a McMaster supplier invoice ($8.43, $31.27) and <code>SC56650 Other Expenses</code> on a Home Depot P-card ($23.56). Same code, same shop, <b>two different ledger accounts, decided by how it was bought.</b></p>
+      <p><b>20383 · Programs printing</b> should be supplies by every reasonable reading. The university filed $868.49 of opening-night programs under <code>Events</code>, inside Travel and Conference.</p>
+      <p><b>10304 · Safety Trainings</b> is a service bought from RIT for $295. It posted as <code>Supplies Other</code>.</p>
+      <p>So: derive the expected bucket, show it, and let the imported ledger row overwrite it. <b>Never treat the derived value as the reported one.</b></p>
+    </div>
+
+    <div class="good">
+      <h3>One invoice can hold two ledger accounts, and that is normal</h3>
+      <p>Supplier invoice <code>SPI06234783</code> to Ismail khalidi carries <b>$3,750 as a creative fee</b> under <code>61500</code> and <b>$421.97 as travel reimbursement</b> under <code>61400</code>. One document, one person, two university buckets.</p>
+      <p>This is why the import unit is the <b>line</b>, not the invoice, and why splits have to be first-class. One <code>Business Document</code> in the March export carried more than thirty separate costume lines.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="num">02</span>
+      <div>
+        <h2>Context → operating line</h2>
+        <p>Exact and one-to-one. Still a mapping: it has to live somewhere to be executed, being trivial does not make it free.</p>
+      </div>
+    </div>
+
+    <table class="tbl">
+      <thead><tr><th>Code Context</th><th class="arrow"></th><th>FAO</th><th>Reads as</th><th>Verified against</th></tr></thead>
+      <tbody>
+        <tr><td class="m">Play 1</td><td class="arrow">→</td><td class="m">OP213141</td><td class="pat">Theater Program Production 1</td><td class="pat">201xx codes</td></tr>
+        <tr><td class="m">Play 2</td><td class="arrow">→</td><td class="m">OP213142</td><td class="pat">Theater Program Production 2</td><td class="pat">202xx codes</td></tr>
+        <tr><td class="m">Play 3</td><td class="arrow">→</td><td class="m">OP213143</td><td class="pat">Theater Program Production 3</td><td class="pat">Thought/Crime, 203xx throughout March</td></tr>
+        <tr><td class="m">Play 4</td><td class="arrow">→</td><td class="m">OP213144</td><td class="pat">Theater Program Production 4</td><td class="pat">The Christians, 204xx throughout March</td></tr>
+        <tr><td class="m">all 18 others</td><td class="arrow">→</td><td class="m">OP211035</td><td class="pat">Academic Yr Theater</td><td class="pat">Program, shared, general, festivals, utility</td></tr>
+      </tbody>
+    </table>
+
+    <div class="good">
+      <h3>Which makes the cross-check free, and it already found money in the wrong place</h3>
+      <p>Because the relationship is one-to-one, the context digit of a code <b>must</b> match the FAO the charge landed on. Two disagreements, both from the March export:</p>
+      <p><code>M&amp;F REFUND 3.10.26 20301</code> charged to <code>OP213144</code>. A <b>Play 3 code on the Play 4 operating line, minus $264.73</b>, sitting between two correctly coded 20401 lumber charges.</p>
+      <p><code>PCT00294867</code> where the memo reads <code>20205</code> and the code column reads <code>20105</code>. Play 1 against Play 2, on costumes.</p>
+      <p>Neither is visible from the university side, because only the department knows what the code was supposed to be. That is the corroboration Sherri cannot run herself.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="num">03</span>
+      <div>
+        <h2>Where the rule stops, on purpose</h2>
+        <p>Eight subcategories resolve an operating line but never an expense bucket.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <h3>A reserve has no expense type</h3>
+      <p>These are reserves and catch-alls. The spend inside them is arbitrary by design. In the March export alone, <b>20310 Contingency</b> bought McMaster safety hardware ($38.03, $34.09, $19.13, $28.24) <b>and</b> front-of-house miscellany ($97.01). Nothing predicts the next one.</p>
+      <ul class="reserves">
+        <li>PRD — Contingency <em>reserve</em></li>
+        <li>PRD — PM Discretionary <em>reserve</em></li>
+        <li>PRD — Miscellaneous <em>catch-all</em></li>
+        <li>PRG — Miscellaneous <em>catch-all</em></li>
+        <li>FST — Production <em>whole-event bucket</em></li>
+        <li>FST — Contingency <em>reserve</em></li>
+        <li>SHR — Other Production Support <em>catch-all</em></li>
+        <li>UTL — Needs to Code <em>undecided by definition</em></li>
+      </ul>
+      <p style="margin-top:var(--s4)">Show them as <code>unassigned</code> until a transaction lands. <b>They are also where the money is least visible</b>, which argues for watching them rather than hiding them. Header rows are a separate class: <code>PRD — Header</code> and its siblings hold no spend at all, so they need no bucket. They are subtotal lines.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="num">04</span>
+      <div>
+        <h2>The tree</h2>
+        <p>Where each field sits, and where storage stops.</p>
+      </div>
+    </div>
+
+    <div class="tier">
+      <div class="tierlabel">Source<span>lives in ClickUp</span></div>
+      <div class="node authored">
+        <div class="title">BUDGET SETUP · 244 tasks</div>
+        <div class="sub">One task per budget code, with a unique number in <code>URITP Budget Code #</code>. All three dropdowns populated on every record.</div>
+      </div>
+    </div>
+    <div class="tier"><div class="tierlabel"></div><div class="connector">
+      <svg width="320" height="24" viewBox="0 0 320 24" aria-hidden="true">
+        <path d="M160 0 V10 M20 10 H300 M20 10 V24 M160 10 V24 M300 10 V24" stroke="var(--authored-line)" stroke-width="1.25" fill="none"/>
+      </svg></div></div>
+
+    <div class="tier">
+      <div class="tierlabel">Authored<span>three dropdowns</span></div>
+      <div class="triple">
+        <div class="fieldnode">
+          <div class="fname">Code Domain</div>
+          <div class="fcount">3</div>
+          <div class="fnote">Program · Production · Utility. Filtering and grouping. Not consumed by either derivation.</div>
+          <div class="fex">Production</div>
+        </div>
+        <div class="fieldnode">
+          <div class="fname">Code Context</div>
+          <div class="fcount">22</div>
+          <div class="fnote">Which production or program area. <b>The OP axis.</b></div>
+          <div class="fex">Play 3</div>
+        </div>
+        <div class="fieldnode">
+          <div class="fname">Code Subcategory</div>
+          <div class="fcount">115</div>
+          <div class="fnote">The expense type. <b>The SC axis.</b> Prefixes are FileMaker filtering artifacts, not data.</div>
+          <div class="fex">PRD — Costumes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier"><div class="tierlabel"></div><div class="connector" style="height:32px">
+      <svg width="320" height="32" viewBox="0 0 320 32" aria-hidden="true">
+        <line x1="0" y1="6" x2="320" y2="6" stroke="var(--rule-strong)" stroke-width="1" stroke-dasharray="3 4"/>
+        <path d="M160 6 V18 M78 18 H242 M78 18 V32 M242 18 V32" stroke="var(--derived-line)" stroke-width="1.25" fill="none"/>
+      </svg></div></div>
+
+    <div class="tier">
+      <div class="tierlabel">Derived<span>never stored</span></div>
+      <div class="triple" style="grid-template-columns:1fr 1fr">
+        <div class="node derived">
+          <div class="title">Operating line · 5</div>
+          <div class="sub">From Context. One to one. <code>OP213143</code></div>
+        </div>
+        <div class="node derived">
+          <div class="title">Ledger account · 9</div>
+          <div class="sub">From Subcategory. Many to one, so it is a summary. <code>60000:Supplies</code></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tier"><div class="tierlabel"></div><div class="connector" style="height:32px">
+      <svg width="320" height="32" viewBox="0 0 320 32" aria-hidden="true">
+        <path d="M78 0 V14 M242 0 V14 M78 14 H242 M160 14 V32" stroke="var(--observed-line)" stroke-width="1.25" fill="none"/>
+      </svg></div></div>
+
+    <div class="tier">
+      <div class="tierlabel">Checked<span>against the ledger</span></div>
+      <div class="node observed">
+        <div class="title">URF0985 import · what actually happened</div>
+        <div class="sub">Every row arrives carrying its real <code>FAO ID</code> and <code>Ledger Account</code>. The derived values are the <b>expectation</b>; the ledger is the truth. Disagreement is the finding, not an error to suppress.</div>
+      </div>
+    </div>
+
+    <div class="lgnd">
+      <div><i style="background:var(--authored)"></i> Authored</div>
+      <div><i style="background:var(--derived)"></i> Derived by rule</div>
+      <div><i style="background:var(--observed)"></i> Observed from the ledger</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead">
+      <span class="num">05</span>
+      <div>
+        <h2>Next</h2>
+        <p>The dropdowns are done. Unique codes are the next sitting, and there are already locked notes for it.</p>
+      </div>
+    </div>
+
+    <div class="seq">
+      <div class="step done">
+        <span class="sn">01</span>
+        <div class="body">
+          <h3>Three dropdowns populated on all 244</h3>
+          <p>Finished. Domain, Context and Subcategory are filled on every code.</p>
+        </div>
+        <span class="who brain">verified</span>
+      </div>
+      <div class="step">
+        <span class="sn">02</span>
+        <div class="body">
+          <h3>Confirm each unique code against the locked number scheme</h3>
+          <p>The <i>Budget Code ClickUp Dropdown Plan</i> already locks it: domain is 1 digit (Program 1, Production 2, Utility 9), context is 2 digits sequential inside its domain, subcategory is 2 digits anchored in tens, and the units digit is reserved for expansion so three codes sharing a grouping render 31, 32, 33 instead of colliding on 30. <b>That is the next session, and the notes exist.</b></p>
+        </div>
+        <span class="who mich">together</span>
+      </div>
+      <div class="step">
+        <span class="sn">03</span>
+        <div class="body">
+          <h3>Audit the 244 against the six rules</h3>
+          <p>Assign an expected ledger account to every code and list every subcategory the rules cannot place. Output is a table, not a schema change.</p>
+        </div>
+        <span class="who brain">mine</span>
+      </div>
+      <div class="step">
+        <span class="sn">04</span>
+        <div class="body">
+          <h3>Run the operating-line cross-check</h3>
+          <p>Context-derived FAO against the FAO actually charged. Two errors already found by hand; the rest is mechanical.</p>
+        </div>
+        <span class="who brain">mine</span>
+      </div>
+      <div class="step">
+        <span class="sn">05</span>
+        <div class="body">
+          <h3>Rename one dropdown option</h3>
+          <p><code>PRG -- Entertainment</code> on code 10104 uses a double hyphen where all 114 siblings use an em dash. Dropdown options are write-once for agents, so this one is yours.</p>
+        </div>
+        <span class="who mich">yours</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Beta Budget FMP · Decision Log J9 – J12</span>
+    <span>Measured against the 11 Jan and 7 Apr 2026 URF0985 exports</span>
+    <span>Nothing in ClickUp was changed to produce this</span>
+  </footer>
+
+</div>
+</body>
+</html>
