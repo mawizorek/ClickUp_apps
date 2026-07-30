@@ -23,7 +23,15 @@
  *   - Empty sleeves had to get quieter, because nine of them at equal weight was most of the
  *     screen shouting about nothing.
  *   - The page title, the sub-line, and the duplicated sheet header are gone. They cost
- *     ~350dvh-points of chrome above the first card and said nothing the header didn't.
+ *     ~350px of chrome around nine cards and said nothing the header didn't.
+ *
+ * 🔴 THE BORDER LANGUAGE IS LOAD-BEARING. Three states, three treatments, and they must stay
+ * distinct because the legend names them:
+ *      SOLID  = owned      DASHED = wanted      DOTTED = empty
+ * A first pass here made empty dashed too, which collided with wanted and would have made the
+ * ghost slot (the visible-gap feature, the whole reason `wanted` exists) indistinguishable
+ * from an untouched sleeve. If you change one, change the legend in pages/binder.html in the
+ * same commit — the swatches there render from these same rules.
  * ============================================================================ */
 
 * { box-sizing: border-box; }
@@ -245,7 +253,7 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
    The locked requirement (schema.binder.sql, two-deliberate-non-constraints #1) is that the
    badge must never read a bare number: one print placed three times must not look like three
    owned. v4 satisfied it by printing the string on EVERY card, in mono, two lines, under
-   every name — which made the noisiest element on a card its diagnostics.
+   every name — which made diagnostics the loudest thing on a nine-card grid.
    v5 keeps the exact string and shows it exactly when it can mislead: any card where
    qty_owned !== 1 or placed_count !== 1. The ordinary own-1-placed-once card says nothing,
    because a solid card in a slot already means "you own this and it is here."
@@ -263,7 +271,7 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
   letter-spacing: 0.04em; padding: 1px 5px; border-radius: 3px;
   background: var(--accent); color: var(--on-accent); }
 
-/* WANTED = the ghost. Dashed, unfilled, italic name. The visible-gap feature, and it costs
+/* WANTED = the ghost. DASHED, unfilled, italic name. The visible-gap feature, and it costs
    no storage — the state is derived from owning zero copies. */
 .slot.wanted { background: transparent; border-style: dashed; }
 .slot.wanted .plate { background: transparent; }
@@ -281,12 +289,14 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
   padding: 2px var(--gap-xs, 8px) var(--gap-xs, 8px);
   font-size: clamp(0.66rem, 9cqi, 0.85rem); line-height: 1.3; color: var(--text-soft); }
 
-/* EMPTY = no row exists. Absence is the state, so this is a placeholder, not a record —
-   and it recedes on purpose. Nine equal-weight dotted boxes were most of the v4 screen,
-   competing with the actual collection for attention. */
-.slot.empty { background: transparent; border-style: dashed; border-color: var(--surface-3);
+/* EMPTY = no row exists. Absence is the state, so this is a placeholder, not a record — and
+   it recedes on purpose. Nine equal-weight boxes were most of the v4 screen, competing with
+   the actual collection for attention.
+   DOTTED, not dashed: dashed is already spoken for by `wanted`, and collapsing the two would
+   erase the difference between "a gap I am tracking" and "a sleeve I have not touched." */
+.slot.empty { background: transparent; border-style: dotted; border-color: var(--border);
   align-items: center; justify-content: center; color: var(--text-faint);
-  font-size: 1rem; opacity: 0.5; }
+  font-size: 1rem; opacity: 0.45; }
 .slot.empty:hover { opacity: 1; border-color: var(--accent-2); }
 
 /* ---------- the bottom bar: flip + step ----------
@@ -355,8 +365,8 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
   border-top: var(--border-w, 1px) solid var(--border); }
 .sheetrow { display: flex; align-items: stretch; gap: 2px;
   border-bottom: var(--border-w, 1px) solid var(--border); }
-/* The open sheet gets a full accent BAR at its number, not a background fill: a filled row
-   sitting next to real buttons reads as disabled. */
+/* The open sheet gets an accent NUMBER CHIP, not a background fill: a filled row sitting next
+   to real buttons reads as disabled. */
 .sheetrow.on .sr-n { background: var(--accent); color: var(--on-accent); }
 .sr-pick { flex: 1 1 auto; display: flex; align-items: center; gap: var(--gap-xs, 8px);
   background: transparent; border: 0; border-radius: 0; text-align: left; min-width: 0;
@@ -432,21 +442,22 @@ body.stage .toasts { bottom: calc(58px + max(var(--gap-md, 12px), env(safe-area-
 .toast.bad  { border-color: var(--bad); }
 /* Exits run at ~75% of the entrance. */
 .toast.out  { opacity: 0; transform: translateY(4px);
-  transition: opacity 180ms var(--ease-in, cubic-bezier(0.7,0,0.84,0)), transform 180ms; }
+  transition: opacity 180ms cubic-bezier(0.7,0,0.84,0), transform 180ms; }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-/* ---------- legend (a popover, not a paragraph) ----------
+/* ---------- legend (a drawer, not a paragraph) ----------
    v4 ended the binder page with five lines of prose explaining dotted vs dashed vs solid.
-   If a layout needs a paragraph to be legible the layout has failed — and worse, it was the
-   last thing on a long scroll, so it was never on screen next to the thing it described.
-   Now it is a `?` next to the sheet title, and each row SHOWS the treatment it names. */
-.legend { display: grid; gap: var(--gap-xs, 8px); margin-top: var(--gap-md, 12px); }
+   If a layout needs a paragraph to be legible the layout has failed — and worse, it sat at the
+   bottom of a long scroll, never on screen next to the thing it described.
+   Now it is a `?` beside the sheet title, and each row SHOWS the treatment it names, which is
+   also why these swatches must track the `.slot` rules above. */
+.legend { display: grid; gap: var(--gap-md, 12px); margin-top: var(--gap-md, 12px); }
 .lg-row { display: flex; align-items: center; gap: var(--gap-md, 12px); }
 .lg-swatch { flex: 0 0 auto; width: 30px; height: 38px; border-radius: 4px;
-  border: var(--border-w, 1px) solid var(--border); background: var(--surface-2); }
+  border: var(--border-w, 1px) solid var(--border);
+  background: linear-gradient(var(--grad-angle, 135deg), var(--surface-3), var(--surface-2)); }
 .lg-swatch.wanted { background: transparent; border-style: dashed; }
-.lg-swatch.empty { background: transparent; border-style: dashed; border-color: var(--surface-3);
-  opacity: 0.5; }
+.lg-swatch.empty { background: transparent; border-style: dotted; opacity: 0.45; }
 .lg-swatch.note { background: var(--surface-3); }
 .lg-row div { min-width: 0; }
 .lg-row b { display: block; font-size: var(--fs-sm, 0.85rem); font-weight: 550; }
@@ -454,6 +465,6 @@ body.stage .toasts { bottom: calc(58px + max(var(--gap-md, 12px), env(safe-area-
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
-  /* The flip is the navigation, so it cannot simply be disabled — it becomes an instant cut. */
+  /* The flip IS the navigation, so it cannot simply be disabled — it becomes an instant cut. */
   .flipper { transition: none !important; }
 }
