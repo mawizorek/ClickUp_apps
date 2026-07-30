@@ -1,23 +1,25 @@
 {
   "STATUS": "🪦 RETIRED 2026-07-30 — THIS FILE IS A TOMBSTONE STUB. DO NOT READ IT FOR RESOLUTION. DO NOT ADD AN AGENT HERE. DO NOT RESTORE IT.",
 
-  "the_single_source": "The ClickUp list 🤖 Agent Index — https://app.clickup.com/36074068/v/li/901328043244 — is THE canonical resolution index for every agent. One task per agent. Resolve a token by querying that list for the row, not by reading a file.",
+  "the_single_source": "The ClickUp list 🤖 Agent Index is THE canonical resolution index for every agent. One task per agent.",
+  "open_it": "https://app.clickup.com/36074068/v/li/901328043244",
+  "query_handle": "list id 901328043244 — the one place a numeric ID is kept deliberately, because a query needs a handle and a name cannot be passed to a filter. Everything an agent READS is keyed on name + slug (NAMES, NEVER NUMBERS).",
 
-  "how_to_resolve_now": "Query the Agent Index list for the ONE row you need (match on task name, the Slug field, or the AKA field) and read its fields: Slug · Class · Memory · Invoke · AKA · Home · Lane · default_runbook · Gate Strength · Instructions. Then load that agent's bundle from `home`, which is still a git path. Full contract: gates/agent-invocation-gate.md STEP 0.",
+  "how_to_resolve_now": "Query the Agent Index for the ONE row you need (match on task name, the Slug field, or the AKA field) and read its fields: Slug · Class · Memory · Invoke · AKA · Home · Lane · default_runbook · Gate Strength · Instructions. Then load that agent's bundle from `home`, which is still a git path. Full contract: gates/agent-invocation-gate.md STEP 0.",
 
-  "why_it_was_retired": "It was a 39-record TABLE being simulated by a text file that had to be read WHOLE on every resolution, with no range read. That forced a ~12KB size ceiling which the file NEVER ONCE met in its entire life: 24.8KB → 14.4 → 21.1 → 18.4 → 13.18 → 13.67. Six trim actions across five commits in four days (PR #483, 5c3a8cc, 66fdb06, 78d1c92 ×2, PR #559), and it regrew +6.7KB in a single day under normal fleet work. Trimming a document does not hold, because a document has an unbounded free-text area and no schema to refuse an essay. A list has fields. Michael, 2026-07-30: 'it's a table. not a doc.'",
+  "why_it_was_retired": "It was a 39-record TABLE being simulated by a text file that had to be read WHOLE on every resolution, with no range read. That forced a ~12KB size ceiling which the file NEVER ONCE met in its entire life: 24.8KB → 14.4 → 21.1 → 18.4 → 13.18 → 13.67. Six trim actions across five commits in four days (PR #483, 5c3a8cc, 66fdb06, 78d1c92 ×2, PR #559), and it regrew +6.7KB in a single day under normal fleet work. Trimming a document does not hold, because a document has an unbounded free-text area and no schema to refuse an essay. A list has fields. Michael, 2026-07-30: 'it is a table. not a doc.'",
 
   "the_failure_this_prevents": "At ~25KB this file could not be read back whole, which is how Dev Dexter shipped BUILT-BUT-UNREGISTERED on 2026-07-25. A file that cannot be read whole cannot be safely edited, and the roster IS the registration surface. The ceiling was not tidiness; it was the bug.",
 
   "where_each_part_went": {
-    "agents[] rows": "→ one task per agent in the Agent Index list. Fields carry identity; the bundle carries the role.",
+    "agents[] rows": "→ one task per agent in the Agent Index. Fields carry identity; the bundle carries the role.",
     "invocation.tokens": "→ the Invoke + AKA fields on each row. The collision WARNINGS that lived alongside them (Clio/Cleo homophones, Rocky→Ricky, Dex/Dara, the immutable fmp-frank slug, Wes never resolving to the tombstone) are RULES, and they live in gates/agent-invocation-gate.md (read side) + gates/agent-name-collision-gate.md (write side), which already held them. This file was the second copy.",
     "invocation.tombstones": "→ gates/git-teammate-lifecycle-runbook.md, which already governs tombstoning.",
     "pointers": "→ already duplicated in gates/git-agent-authoring.md + the lifecycle runbook. Not migrated; it died here.",
     "_, this_is_an_INDEX, where_the_description_went, schema, field_notes": "→ DELETED, deliberately. Self-describing schema commentary is exactly the prose that colonized this file six times. A list's field set IS its schema and needs no essay explaining itself."
   },
 
-  "⚠️_if_a_load_manifest_sent_you_here": "Several agent bundles still list `roster.json` at step 6 of their load manifest. That pointer is STALE but not broken — it lands on this stub, which redirects you. Go to the Agent Index list. Do not conclude the roster is missing, and do not rebuild it.",
+  "⚠️_if_a_load_manifest_sent_you_here": "Several agent bundles still list `roster.json` at step 6 of their load manifest. That pointer is STALE but not broken — it lands on this stub, which redirects you. Go to the Agent Index. Do not conclude the roster is missing, and do not rebuild it.",
 
   "🚫_do_not_recreate_a_second_index": "This is the SECOND manifest retired to a stub (registry.json went 2026-07-25, PR #483). Michael's standing ruling: 'no pair means no sync obligation.' A JSON roster alongside the ClickUp list would be the exact mirror-pair rot both retirements exist to kill. There is ONE index and it is the list.",
 
