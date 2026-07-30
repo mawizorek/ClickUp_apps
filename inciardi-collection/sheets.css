@@ -1,0 +1,54 @@
+/* Inciardi Collection — SHEET LIST + LEGEND. The two panels the binder opens.
+ *
+ * Split out of `binder.css` 2026-07-30 (v10): that file was 15,183 bytes, sitting exactly ON the
+ * 15KB split line, and these rules belong with `sheets.js` rather than with the stage. Module
+ * boundary and file boundary now agree. ZERO COLOUR LITERALS.
+ */
+
+/* ---------- sheet list ---------- */
+.sheetlist { margin-top: var(--gap-md, 12px);
+  border-top: var(--border-w, 1px) solid var(--border); }
+.sheetrow { display: flex; align-items: stretch; gap: 2px;
+  border-bottom: var(--border-w, 1px) solid var(--border); }
+/* The open sheet gets an accent NUMBER CHIP, not a row fill: a filled row next to real buttons
+   reads as disabled. */
+.sheetrow.on .sr-n { background: var(--accent); color: var(--on-accent); }
+.sr-pick { flex: 1 1 auto; display: flex; align-items: center; gap: var(--gap-xs, 8px);
+  background: transparent; border: 0; border-radius: 0; text-align: left; min-width: 0;
+  padding: var(--pad-cell, 10px) 0; }
+.sr-pick:hover { background: var(--surface-2); border-color: transparent; }
+.sr-n { flex: 0 0 auto; width: 1.9em; height: 1.9em; display: grid; place-items: center;
+  border-radius: 3px; background: var(--surface-2); color: var(--text-soft);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  font-variant-numeric: tabular-nums; }
+.sr-t { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--fs-sm, 0.85rem); }
+.sr-f { flex: 0 0 auto; color: var(--text-faint); font-size: var(--fs-xs, 0.72rem);
+  font-family: var(--font-mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; }
+.sr-acts { flex: 0 0 auto; display: flex; align-items: center; }
+.sr-acts button { background: transparent; border: 0; border-radius: var(--radius, 6px);
+  color: var(--text-soft); padding: 0; min-width: 40px; min-height: 40px; font-size: 0.95rem; }
+.sr-acts button:hover:not([disabled]) { background: var(--surface-2); color: var(--accent-deep); }
+/* A disabled arrow is the honest signal for "already first". Hiding it would make rows jump
+   between two layouts as sheets move. */
+.sr-acts button[disabled] { opacity: 0.22; }
+
+/* ---------- legend ----------
+   v4 ended the page with five lines of prose explaining dotted vs dashed vs solid. If a layout
+   needs a paragraph to be legible the layout has failed — and it sat at the bottom of a long
+   scroll, never on screen beside the thing it described. Now each row SHOWS its treatment.
+
+   🔴 THESE SWATCHES MUST TRACK THE `.slot` RULES IN binder.css. They are the same three-state
+   language (solid / dashed / dotted) rendered at 30x38, so a change there without a change here
+   makes the legend describe an app that no longer exists. */
+.legend { display: grid; gap: var(--gap-md, 12px); margin-top: var(--gap-md, 12px); }
+.lg-row { display: flex; align-items: center; gap: var(--gap-md, 12px); }
+.lg-swatch { flex: 0 0 auto; width: 30px; height: 38px; border-radius: 4px;
+  border: var(--border-w, 1px) solid var(--border);
+  background: var(--accent-soft); }
+.lg-swatch.wanted { background: transparent; border-style: dashed; }
+.lg-swatch.empty { background: transparent; border-style: dotted; opacity: 0.5; }
+.lg-swatch.note { background: var(--surface-2); }
+.lg-row div { min-width: 0; }
+.lg-row b { display: block; font-size: var(--fs-sm, 0.85rem); font-weight: 550; }
+.lg-row span { font-size: var(--fs-xs, 0.72rem); color: var(--text-faint); }
