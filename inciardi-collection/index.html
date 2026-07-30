@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v5. Router shell + pages/ partials. Pages-hosted, not file:// capable.
+<!-- Inciardi Collection — v6. Router shell + pages/ partials. Pages-hosted, not file:// capable.
      Shape derived from template-app (gold standard v5), NOT from the predecessor.
 
      ONE DELIBERATE ADDITION vs the template: the template's router injects partials with
@@ -11,14 +11,12 @@
      v3 · Mercedes palette. Three pointers, zero CSS: styles.css has no colour literals.
      v4 · sheet menu (reorder + rename); shoe-box counts spares.
      v5 · DESIGN PASS. The binder is a bounded object, not a scroll — see styles.css. Two
-          fixes live in THIS file:
-            1. The header wrapped to two lines on a phone (brand + 3 nav items + gear beat
-               390px, so "Shoe-box" dropped below and every page lost 60px). "Collection" is
-               now a span that hides under 460px, and #nav can no longer wrap.
-            2. ONE shared scrim at body level. v4's drawers floated over a fully live page
-               with no dimming and no tap-away dismiss. It lives here rather than in
-               binder.html so the Settings drawer gets it too, and so there is exactly one
-               element with that id no matter which route is mounted. -->
+          fixes live in THIS file: the header no longer wraps on a phone, and there is ONE
+          shared scrim at body level so every drawer (including Settings) dims the page and
+          dismisses on a tap away.
+     v6 · FRONT / BACK instead of A / B, and one arrow press turns one face straight through
+          the binder. Labels only — `slot.side` is still CHECK (side IN ('A','B')) and app.js
+          holds the single mapping. See the vocabulary block at the top of app.js. -->
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -28,10 +26,10 @@
 <meta name="theme-color" content="#192221">
 <meta name="robots" content="noindex, nofollow">
 <title>Inciardi Collection</title>
-<meta name="description" content="A digital twin of the mini-print binder: sheets, sides, slots.">
+<meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=5">
+<link rel="stylesheet" href="./styles.css?v=6">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -82,12 +80,12 @@
 <noscript>This app needs JavaScript enabled.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./core.js?v=5"></script>
-<script src="./app.js?v=5"></script>
+<script src="./core.js?v=6"></script>
+<script src="./app.js?v=6"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
-  var APP_VERSION = "v5";
+  var APP_VERSION = "v6";
 
   /* ==== THEME ====
      `soft-mercedes` is a JOIN in shared/themes/_themes.json: color `mercedes` + typography
