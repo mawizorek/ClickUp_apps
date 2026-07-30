@@ -16,7 +16,7 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, sides, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=1">
+<link rel="stylesheet" href="./styles.css?v=2">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -34,30 +34,39 @@
 
 <aside id="settings" class="drawer" hidden aria-label="Settings">
   <h2>Settings</h2>
-  <label for="apiBase">Worker URL</label>
-  <input id="apiBase" type="url" inputmode="url" autocapitalize="off" autocorrect="off"
-         placeholder="https://inciardi-collection.YOU.workers.dev">
-  <p class="hint">From <code>npx wrangler deploy</code>. Stored on this device only.</p>
 
+  <!-- THE ONLY FIELD THAT MATTERS. The worker URL is built in; this is the one thing that
+       cannot be, because it is a credential. -->
   <label for="writeKey">Write key</label>
-  <input id="writeKey" type="password" autocomplete="off" placeholder="the WRITE_KEY secret">
-  <p class="hint">Never shipped in this page. Kept on this device, sent per write.
-     Set it with <code>npx wrangler secret put WRITE_KEY</code>.</p>
+  <input id="writeKey" type="password" autocomplete="off" placeholder="paste the WRITE_KEY secret">
+  <p class="hint">Needed to <b>add or change</b> anything. Reading works without it.
+     Kept on this device only, never in the app itself.</p>
 
   <div class="row">
     <button id="saveCfg" class="primary">Save</button>
     <button id="ping">Test connection</button>
   </div>
   <pre id="pingOut" class="out" hidden></pre>
-  <button id="closeCfg" class="ghost">Close</button>
+
+  <!-- Collapsed on purpose: one correct value, already set. Surfacing it made setup look
+       twice as long as it is. Still reachable for a staging or localhost worker. -->
+  <details style="margin-top:var(--gap-lg,20px)">
+    <summary class="tag" style="cursor:pointer">Advanced · worker URL</summary>
+    <label for="apiBase">Worker URL</label>
+    <input id="apiBase" type="url" inputmode="url" autocapitalize="off" autocorrect="off">
+    <p class="hint" id="baseHint"></p>
+    <button id="resetBase" class="ghost">Use the built-in default</button>
+  </details>
+
+  <button id="closeCfg" class="ghost" style="margin-top:var(--gap-md,12px)">Close</button>
 </aside>
 
 <div id="toasts" class="toasts" aria-live="polite"></div>
 <noscript>This app needs JavaScript enabled.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./core.js?v=1"></script>
-<script src="./app.js?v=1"></script>
+<script src="./core.js?v=2"></script>
+<script src="./app.js?v=2"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
@@ -93,34 +102,73 @@
 
   /* ---- settings drawer ---- */
   var dr = document.getElementById("settings");
+  var baseIn = document.getElementById("apiBase");
+  var baseHint = document.getElementById("baseHint");
+
+  function paintBase() {
+    // Show the OVERRIDE, not the effective value: an input pre-filled with something it
+    // never saved is a small lie about state, and blanking it would then look like erasing.
+    if (API.isDefaultBase()) {
+      baseIn.value = "";
+      baseIn.placeholder = API.defaultBase();
+      baseHint.innerHTML = 'Using the built-in default: <code>' + Core.esc(API.defaultBase()) + '</code>. Leave blank unless you are pointing at a different worker.';
+    } else {
+      baseIn.value = API.base();
+      baseHint.innerHTML = 'Overridden on this device. Built-in default is <code>' + Core.esc(API.defaultBase()) + '</code>.';
+    }
+  }
+
   document.getElementById("gear").addEventListener("click", function () {
-    document.getElementById("apiBase").value = API.base() || "";
     document.getElementById("writeKey").value = API.key() || "";
+    paintBase();
     dr.hidden = false;
+    document.getElementById("writeKey").focus();
   });
   document.getElementById("closeCfg").addEventListener("click", function () { dr.hidden = true; });
+  document.getElementById("resetBase").addEventListener("click", function () {
+    API.setBase(""); paintBase(); Core.toast("Back to the built-in worker", "good");
+  });
   document.getElementById("saveCfg").addEventListener("click", function () {
-    API.setBase(document.getElementById("apiBase").value.trim());
+    API.setBase(baseIn.value.trim());     // blank = fall back to the default
     API.setKey(document.getElementById("writeKey").value);
     Core.toast("Saved on this device", "good");
-    checkConfig();
-    render(current());
+    paintBase(); checkConfig(); render(current());
   });
+
+  /* Interprets the result instead of dumping JSON. "Reads work, writes are ungated" is a
+     DIFFERENT state from "both work," and a wall of JSON makes the reader do that
+     comparison themselves. */
   document.getElementById("ping").addEventListener("click", function () {
     var out = document.getElementById("pingOut");
     out.hidden = false; out.textContent = "…";
-    API.get("/health")
-      .then(function (d) { out.textContent = JSON.stringify(d, null, 2); })
-      .catch(function (e) { out.textContent = "FAILED\n" + e.message; });
+    API.get("/health").then(function (d) {
+      var c = d.counts || {};
+      out.textContent =
+        "CONNECTED\n" +
+        "  artworks  " + c.artworks + "\n" +
+        "  editions  " + c.editions + "\n" +
+        "  owned     " + c.owned + "\n" +
+        "  sheets    " + c.sheets + "\n" +
+        "  slots     " + c.slots + "\n\n" +
+        (API.key()
+          ? "Write key set. Adding should work."
+          : "NO WRITE KEY on this device — reading works, saving will not.");
+    }).catch(function (e) {
+      out.textContent = "FAILED\n" + e.message;
+    });
   });
 
-  /* ---- config banner: an unset worker URL is VISIBLE, never a silent no-op ---- */
+  /* ---- banner: report the ACTUAL remaining gap ----
+     This used to check !API.base(), which can never be false now that the URL has a
+     default — so it would have silently stopped firing while a real gap (no write key)
+     went unannounced. A banner that cannot fire is worse than no banner: it reads as an
+     all-clear. */
   function checkConfig() {
     var b = document.getElementById("banner");
-    if (!API.base()) {
+    if (!API.key()) {
       b.hidden = false;
       b.className = "banner warn";
-      b.innerHTML = 'No worker URL set. Open <b>⚙ Settings</b> and paste the URL from <code>wrangler deploy</code>.';
+      b.innerHTML = 'Read-only: no write key on this device. Open <b>⚙</b> to paste it.';
     } else { b.hidden = true; }
   }
 
