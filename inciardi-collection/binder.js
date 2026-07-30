@@ -32,6 +32,10 @@
   // The ONE seam between the stored value and the word on screen.
   var FACE_LABEL = { A: 'Front', B: 'Back' };
 
+  /* The picker's artwork list is cached, because opening nine slots in a row should not be nine
+   * identical reads. `invalidateArtworks` (exported) is how enter.js tells this module its
+   * cache is a print short after a save — ONE owner of the catalog list, cleared by whoever
+   * changed it, rather than every module keeping its own copy and drifting. */
   function loadArtworks() {
     if (state.artworks.length) return Promise.resolve(state.artworks);
     return API.get('/artworks').then(function (d) { state.artworks = d.artworks || []; return state.artworks; });
@@ -430,7 +434,7 @@
       .then(function () { setMenuBusy(false); });
   }
 
-  /* Bound at the document because the stage is not focusable. app.js removes it on any route
+  /* Bound at the document because the stage is not focusable. app.js detaches it on any route
    * change so the Enter form's own keys are never intercepted — the listener is exported below
    * for exactly that reason. */
   function onBinderKeys(e) {
@@ -514,7 +518,16 @@
     }).catch(function (e) { Core.fail(stage, e); });
   }
 
-  // `keys` is exported so app.js can detach the document-level listener on route change. That
-  // is the one piece of state this module cannot own, because it outlives the route.
-  window.Binder = { mount: mount, keys: onBinderKeys };
+  /* THE EXPORTS, and each one is here for a stated reason rather than convenience:
+   *   mount               — the route entry point (same contract as Summary.mount).
+   *   keys                — app.js must DETACH this document-level listener on route change;
+   *                         it outlives the route, so the module cannot clean it up itself.
+   *   invalidateArtworks  — enter.js calls it after saving a print, because this module owns
+   *                         the cached catalog list and a save makes that cache a print short.
+   *                         One owner, cleared by whoever changed it. */
+  window.Binder = {
+    mount: mount,
+    keys: onBinderKeys,
+    invalidateArtworks: function () { state.artworks = []; }
+  };
 })();
