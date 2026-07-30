@@ -1,23 +1,29 @@
 /* Inciardi Collection — API worker
  *
- * The only write path into D1. Nine routes, one file.
+ * The only write path into D1. Eleven routes, one file.
  *
  * DESIGN NOTES THAT MATTER (decision log J6, ladder rung 4 — "one write path"):
- *   - Every mutation goes through `write()`, so auth, timestamps and error shape are
- *     decided once. A second door is how the two surfaces in the predecessor drifted.
+ *   - Every mutation goes through `write()` or `batch()`, so auth, timestamps and error shape
+ *     are decided once. A second door is how the two surfaces in the predecessor drifted.
  *   - The database does the arguing, not this file. Constraint violations are returned
  *     verbatim rather than pre-validated here, because a JS validator that disagrees with
  *     the schema is a THIRD source of truth. If D1 says no, the answer is no.
  *   - Reads never require a key. The repo is public and the data is which prints Michael
  *     owns. Writes always require one.
  *
- * SECURITY, stated because the predecessor got this wrong and is still wrong:
- *   - WRITE_KEY is a wrangler secret. It is NOT in the shipped bundle. The browser holds it
- *     in localStorage and sends X-Write-Key. `inciardi-market` shipped "mikey"/"nickey"
- *     inside public JS; they remain unrotated.
- *   - An UNSET WRITE_KEY refuses all writes. "No secret configured" must never mean "open."
- *   - CORS is an allowlist, not `*`. A wildcard on a key-authenticated API lets any page
- *     anywhere spend the key it just watched you type.
+ * SECURITY — CORRECTED 2026-07-30. This header used to say "WRITE_KEY is a wrangler secret,
+ * it is NOT in the shipped bundle." That is now FALSE and was false for most of a day before
+ * anyone fixed the comment:
+ *   - The key ships in the public front-end (`core.js` → DEFAULT_KEY) so a freshly-cleared
+ *     browser can write with nothing pasted. Michael's call, exposure stated and accepted.
+ *   - It also ships in `wrangler.toml` under [vars], because a Cloudflare Secret cannot be
+ *     read back and the dashboard did not even list this worker when he went looking.
+ *   - So: ASSUME THE KEY IS PUBLIC. The gate below still matters — it stops accidents and
+ *     crawlers, not a determined reader. The real safety net is D1 Time Travel (30 days).
+ *   - Still true, and still the reason the gate exists at all: AN UNSET WRITE_KEY REFUSES
+ *     ALL WRITES. "No secret configured" must never mean "open."
+ *   - CORS is an allowlist, not `*`. Constrains browsers, not curl — but a wildcard on a
+ *     key-authenticated API lets any page anywhere spend the key it just watched you type.
  */
 
 const ALLOWED_ORIGINS = [
@@ -82,7 +88,7 @@ export default {
     const isWrite = method === 'POST' || method === 'DELETE';
     if (isWrite) {
       if (!env.WRITE_KEY) {
-        return reply({ error: 'server has no WRITE_KEY configured', fix: 'npx wrangler secret put WRITE_KEY' }, 503);
+        return reply({ error: 'server has no WRITE_KEY configured', fix: 'set WRITE_KEY under [vars] in wrangler.toml and re-run the deploy workflow' }, 503);
       }
       const sent = request.headers.get('x-write-key') || '';
       // length check first so a wrong-length key cannot be distinguished by timing
@@ -142,9 +148,63 @@ export default {
             ORDER BY a.name COLLATE NOCASE`) });
       }
 
-      // Derived (J4). Owned, and in no slot yet. No location column anywhere.
+      /* ============================================================ /shoebox
+       * REWRITTEN 2026-07-30 (Michael: "how do we still show '1 placed in binder' and also
+       * '5 in shoebox still' but not cock-up what has no place in the binder yet").
+       *
+       * It used to be `SELECT * FROM v_shoebox`, which answered ONLY "what have I not placed
+       * AT ALL?" — own six Watermelons, place one, and Watermelon vanished from the box even
+       * though five are physically sitting in it. That was documented as accepted imprecision
+       * needing "a schema change (per-copy location)".
+       *
+       * 🔴 THAT DOC NOTE WAS HALF WRONG, and this query is the correction. The COUNT needs no
+       * schema change whatsoever — it is arithmetic over two numbers we already store:
+       *      spare = qty_owned  -  placed_count
+       * What genuinely DOES need per-copy location is IDENTITY: *which* physical copy is in the
+       * sleeve versus the box. Nobody has ever needed that. Do not confuse the two again.
+       *
+       * TWO BOX STATES, kept separate on purpose because Michael asked for exactly that:
+       *   unhoused → placed_count = 0. Nothing of this print is in the binder yet. This is the
+       *              ORIGINAL shoe-box set, unchanged, so the old meaning is not "cocked up".
+       *   spare    → placed_count > 0 AND qty_owned > placed_count. One's on a sheet, the rest
+       *              are in the box.
+       *
+       * HONESTY NOTE — this is an INFERENCE, not a ledger. Placements do not consume copies
+       * anywhere in the schema, so `spare` is subtraction, not allocation. Two consequences,
+       * both correct rather than bugs:
+       *   - Own 1 and place it in 3 slots (legal, J2 ruling 3): spare goes to 0, not -2. You
+       *     have nothing extra. The WHERE clause drops it, which is the honest answer.
+       *   - A `wanted` slot (placed, owned 0) never reaches this query at all, because
+       *     qty_owned > placed_count cannot hold at 0. A wishlist marker is not a print in a box.
+       *
+       * WHY THE SQL LIVES HERE AND NOT IN A VIEW, stated because it deviates from rung 1 (the
+       * app's own rule is that derived facts belong in views): applying DDL to D1 needs a
+       * terminal or the dashboard console, and Michael builds from a phone. A view change would
+       * leave the app broken in the gap between deploying this code and him running a console
+       * step by hand. Worker SQL ships atomically with the deploy, in one button press. It is
+       * still the DATABASE computing it, not JavaScript. If a SECOND consumer ever needs these
+       * numbers, promote this into `v_shoebox` then — one claimant on one truth, always.
+       */
       if (path === '/shoebox' && method === 'GET') {
-        return reply({ shoebox: await all('SELECT * FROM v_shoebox ORDER BY name COLLATE NOCASE') });
+        return reply({ shoebox: await all(
+          `SELECT a.artwork_id, a.name, a.collection_id, a.category, a.confidence,
+                  o.qty_owned,
+                  o.editions_owned,
+                  COALESCE(p.n, 0)                AS placed_count,
+                  o.qty_owned - COALESCE(p.n, 0)  AS spare,
+                  CASE WHEN COALESCE(p.n, 0) = 0 THEN 'unhoused' ELSE 'spare' END AS box_state
+             FROM artwork a
+             JOIN v_owned o ON o.artwork_id = a.artwork_id
+             LEFT JOIN (
+                   SELECT artwork_id, COUNT(*) AS n
+                     FROM slot
+                    WHERE artwork_id IS NOT NULL
+                    GROUP BY artwork_id
+                 ) p ON p.artwork_id = a.artwork_id
+            WHERE a.status = 'active'
+              AND o.qty_owned > COALESCE(p.n, 0)
+            ORDER BY CASE WHEN COALESCE(p.n, 0) = 0 THEN 0 ELSE 1 END,
+                     a.name COLLATE NOCASE`) });
       }
 
       if (path === '/sheets' && method === 'GET') {
@@ -259,6 +319,95 @@ export default {
            body.collection_id || null, order, t, t]);
       }
 
+      /* ============================================================ /sheet/rename
+       * Title only. `title` is free text and deliberately nullable — a sheet with no title
+       * falls back to its id in the UI, so clearing the box is a real choice rather than an
+       * error. Nothing else about the sheet is touched, and NOTHING inside it moves.
+       */
+      if (path === '/sheet/rename' && method === 'POST') {
+        const id = String(body.sheet_id || '').trim();
+        if (!id) return reply({ ok: false, error: 'sheet_id is required' }, 400);
+        const rows = await all('SELECT sheet_id FROM sheet WHERE sheet_id = ?', [id]);
+        if (!rows.length) return reply({ ok: false, error: 'no sheet "' + id + '"' }, 404);
+        const title = body.title == null ? null : String(body.title).trim();
+        return write('UPDATE sheet SET title = ?, updated_at = ? WHERE sheet_id = ?',
+                     [title || null, t, id]);
+      }
+
+      /* ============================================================ /sheet/reorder
+       * Rearrange the binder. Takes the COMPLETE desired order of sheet_ids, not a swap or a
+       * single move.
+       *
+       * WHY A WHOLE-ORDER PAYLOAD: a "move sheet X up one" API has to reason about neighbours
+       * server-side, and every off-by-one lives in that arithmetic. A full permutation is
+       * idempotent, trivially verifiable, and lets the client express any rearrangement —
+       * including a future drag-and-drop — through the same one route.
+       *
+       * 🔴 THE TRAP, AND THE SCHEMA COMMENT THAT WOULD HAVE WALKED ME INTO IT.
+       * `sheet` carries UNIQUE (binder_id, sheet_order), so a naive one-by-one renumber
+       * collides mid-flight. `schema.binder.sql` says to fix that with "a temporary
+       * NEGATIVE-offset pass" — and the very same table has CHECK (sheet_order >= 0), which
+       * makes every negative value UNWRITEABLE. Following the documented remedy would fail
+       * 100% of the time. Corrected there too, 2026-07-30.
+       * So the park pass goes HIGH, not negative: MAX(sheet_order) + 1 and up, which cannot
+       * collide with any live value.
+       *
+       * Both passes go through db.batch(), which D1 runs as ONE transaction. A half-applied
+       * reorder — some sheets parked at 900-something, others renumbered — is not a state this
+       * app is willing to leave behind.
+       *
+       * FREE SIDE EFFECT worth knowing: pass two writes 0..n-1, so any gap in sheet_order
+       * (from a deleted sheet, say) is compacted. And because slots reference sheet_id and
+       * never sheet_order, NOT ONE SLOT ROW IS TOUCHED — a whole sheet travels with both its
+       * sides, which is exactly the physical gesture of lifting it out of the rings.
+       * Downstream, `v_binder_spread` derives side_index/spread_index from sheet_order, so
+       * page numbering renumbers itself. Nothing to keep in sync.
+       */
+      if (path === '/sheet/reorder' && method === 'POST') {
+        const bid = String(body.binder_id || 'mini-binder');
+        const want = Array.isArray(body.order) ? body.order.map(v => String(v)) : null;
+        if (!want || !want.length) {
+          return reply({ ok: false, error: 'order must be a non-empty array of sheet_id, in the desired binder order' }, 400);
+        }
+
+        const have = (await all('SELECT sheet_id FROM sheet WHERE binder_id = ? ORDER BY sheet_order', [bid]))
+                       .map(r => r.sheet_id);
+        if (!have.length) return reply({ ok: false, error: 'binder "' + bid + '" has no sheets' }, 404);
+
+        /* A PERMUTATION CHECK, and it is not pedantry. A SHORT array would renumber the sheets
+         * it names and leave the rest parked wherever they were — a scrambled binder that
+         * still looks entirely plausible on screen. Refuse the write instead, and say which
+         * ids were wrong, because "invalid order" sends you nowhere. */
+        const dupes = [...new Set(want.filter((id, i) => want.indexOf(id) !== i))];
+        if (dupes.length) {
+          return reply({ ok: false, error: 'the same sheet appears more than once in order: ' + dupes.join(', ') }, 400);
+        }
+        const unknown = want.filter(id => !have.includes(id));
+        const missing = have.filter(id => !want.includes(id));
+        if (unknown.length || missing.length) {
+          return reply({ ok: false,
+            error: 'order must list every sheet in this binder exactly once (got ' + want.length + ', binder has ' + have.length + ')',
+            unknown: unknown, missing: missing }, 400);
+        }
+
+        const parked = Number((await all(
+          'SELECT COALESCE(MAX(sheet_order), 0) AS m FROM sheet WHERE binder_id = ?', [bid]))[0].m) + 1;
+
+        const stmts = [];
+        const SQL = 'UPDATE sheet SET sheet_order = ?, updated_at = ? WHERE sheet_id = ? AND binder_id = ?';
+        // pass 1 — park every sheet above the live range so nothing can collide
+        want.forEach((id, i) => stmts.push(db.prepare(SQL).bind(parked + i, t, id, bid)));
+        // pass 2 — land them on their final 0-based positions
+        want.forEach((id, i) => stmts.push(db.prepare(SQL).bind(i, t, id, bid)));
+
+        try {
+          await db.batch(stmts);
+        } catch (e) {
+          return reply({ ok: false, error: String(e.message || e) }, 400);
+        }
+        return reply({ ok: true, order: want, sheets: want.length });
+      }
+
       /* Place something in a slot. artwork_id + OPTIONAL edition_id (Q12 = B).
        * The composite FK makes a mismatched pair unwriteable, so this does not check it —
        * the database refuses and the message comes straight back. */
@@ -288,7 +437,8 @@ export default {
       return reply({ error: 'no route for ' + method + ' ' + path, routes: [
         'GET /health', 'GET /artworks', 'GET /shoebox', 'GET /sheets',
         'GET /slots?sheet=', 'GET /editions?artwork=',
-        'POST /artwork', 'POST /copy', 'POST /sheet', 'POST /slot', 'DELETE /slot?id='
+        'POST /artwork', 'POST /copy', 'POST /sheet', 'POST /sheet/rename',
+        'POST /sheet/reorder', 'POST /slot', 'DELETE /slot?id='
       ] }, 404);
 
     } catch (e) {

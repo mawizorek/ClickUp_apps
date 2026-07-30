@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v3. Router shell + pages/ partials. Pages-hosted, not file:// capable.
+<!-- Inciardi Collection — v4. Router shell + pages/ partials. Pages-hosted, not file:// capable.
      Shape derived from template-app (gold standard v5), NOT from the predecessor.
 
      ONE DELIBERATE ADDITION vs the template: the template's router injects partials with
@@ -12,7 +12,13 @@
 
      v3 (2026-07-30): theme swapped to MERCEDES. Three lines of pointer, zero CSS — styles.css
      holds no color literals, so the palette is entirely a theme-spine concern. Also removed a
-     latent color override; see the theme block below. -->
+     latent color override; see the theme block below.
+
+     v4 (2026-07-30): the sheet menu (reorder + rename) replaces the sheet <select>, and the
+     shoe-box counts spares. ⚠️ v4 NEEDS A WORKER DEPLOY — it calls POST /sheet/reorder and
+     POST /sheet/rename, which do not exist on an older worker. Front-end-only changes ship on
+     Pages in ~60s, but this one is a PAIR: Actions -> "Deploy inciardi-collection worker".
+     Until that runs, the arrows return a 404 with the route list, which is at least legible. -->
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -25,7 +31,7 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, sides, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=3">
+<link rel="stylesheet" href="./styles.css?v=4">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -75,11 +81,11 @@
 
 <script src="../shared/themes/resolve.js"></script>
 <script src="./core.js?v=4"></script>
-<script src="./app.js?v=3"></script>
+<script src="./app.js?v=4"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
-  var APP_VERSION = "v3";
+  var APP_VERSION = "v4";
 
   /* ==== THEME ====
      `soft-mercedes` is a JOIN in shared/themes/_themes.json: color `mercedes` + typography

@@ -86,6 +86,12 @@ LEFT JOIN v_owned o  ON o.artwork_id  = s.artwork_id;
 -- So sides are enumerated as a single ordered sequence across the whole binder: sheet 0 side A, sheet 0
 -- side B, sheet 1 side A… `spread_index` pairs them the way the physical object does — B of sheet N
 -- faces A of sheet N+1. Traversable in both directions, stable under reordering.
+--
+-- ⭐ 2026-07-30: THIS IS ALSO THE PAGE NUMBERING. Michael is reclaiming "page" to mean one side, its
+-- number derived from sheet order plus A/B — which is precisely `side_index`. Nothing needs building
+-- or storing for that, and because POST /sheet/reorder rewrites sheet_order, pages RENUMBER THEMSELVES
+-- when the binder is rearranged. Do not add a stored page number; it would be the second claimant on a
+-- fact this view already owns.
 CREATE VIEW IF NOT EXISTS v_binder_spread AS
 SELECT
   sh.binder_id,
@@ -112,11 +118,35 @@ CROSS JOIN (SELECT 'A' AS side UNION ALL SELECT 'B') sd;
 -- appear by name. (Its first test returned zero rows, which proves nothing: zero rows is also what a
 -- broken view returns.)
 --
--- ⚠️ INHERITED IMPRECISION, NAMED SO NOBODY REDISCOVERS IT AS A BUG: own six Watermelons, place one,
--- and Watermelon does NOT appear here — even though five are physically in the box. That is correct
--- under J3/J4: allocation is exactly what Michael cut. This view answers "what have I not placed AT
--- ALL?", never "how many of these are in the box?" If the second question ever matters, it is a schema
--- change (per-copy location), not a tweak to this view.
+-- ============================================================================================
+-- ⚠️ NO LONGER THE APP'S SHOE-BOX QUERY, AND THE OLD NOTE HERE WAS WRONG. Corrected 2026-07-30.
+--
+-- What this note used to say: "own six Watermelons, place one, and Watermelon does NOT appear here —
+-- even though five are physically in the box… If the second question ever matters, it is a schema
+-- change (per-copy location), not a tweak to this view."
+--
+-- The first half was an accurate description of a real gap. The second half was WRONG and would have
+-- talked a future reader out of a fifteen-minute fix. Michael asked for exactly that second question
+-- on 2026-07-30, and the COUNT needed NO schema change at all — it is subtraction over two numbers
+-- already stored:
+--        spare = qty_owned (this file, v_owned)  -  placed_count (slot rows for that artwork)
+-- What genuinely DOES require per-copy location is IDENTITY: WHICH physical copy is in the sleeve
+-- versus the box. Nobody has ever needed that. The lesson worth keeping: "needs a schema change" is a
+-- claim to verify, not inherit — and a COUNT and an IDENTITY are different questions.
+--
+-- WHERE IT LIVES NOW: `worker/worker.js` → GET /shoebox carries the full query, returning both
+-- box states (`unhoused` = nothing placed at all — the original set this view computes; `spare` = some
+-- placed, extras left over). That is a deliberate deviation from rung 1, and the reason is deployment
+-- physics rather than taste: applying DDL to D1 needs a terminal or the dashboard console, Michael
+-- builds from a phone, and a view migration would leave the app broken in the gap between the code
+-- deploy and a hand-run console step. Worker SQL ships atomically with the worker, in one button press.
+-- It is still the DATABASE computing it, not JavaScript.
+--
+-- THIS VIEW IS NOW UNUSED. It is kept, not dropped, because it is correct, it costs nothing, and it is
+-- the positive-control fixture the 07-28 verification was built on. If a SECOND consumer ever needs the
+-- spare counts, promote the worker's query into this view (DROP + CREATE — `CREATE VIEW IF NOT EXISTS`
+-- will NOT replace an existing one) and point the worker back at it. One claimant on one truth.
+-- ============================================================================================
 CREATE VIEW IF NOT EXISTS v_shoebox AS
 SELECT
   a.artwork_id,
@@ -196,3 +226,6 @@ END;
 --
 -- No materialized anything. A few hundred rows. If a count is ever slow, that is a surprising and
 -- interesting fact worth investigating rather than caching over.
+--
+-- No v_page. "Page" numbering is `v_binder_spread.side_index` — see the ⭐ note there. A separate page
+-- view would be a second name for one calculation.
