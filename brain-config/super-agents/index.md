@@ -2,7 +2,7 @@
 
 > ## 🎯 The ClickUp list **🤖 Agent Index** is THE single source of truth for every agent.
 >
-> **https://app.clickup.com/36074068/v/li/901328043244** — one task per agent. Super-agents, lenses, task-specific automations and retirees all live in the same list, distinguished by the `Class` field and the native status, never by living in different places. The Agent Invocation Gate queries it first on every named call ([STEP 0](../gates/agent-invocation-gate.md)).
+> **Open it: https://app.clickup.com/36074068/v/li/901328043244** (list id `901328043244` — the query handle; everything an agent READS is keyed on name + slug). One task per agent. Super-agents, lenses, task-specific automations and retirees all live in the same list, distinguished by the `Class` field and the native status, never by living in different places. The Agent Invocation Gate queries it first on every named call ([STEP 0](../gates/agent-invocation-gate.md)).
 >
 > - **Data (edit here):** the Agent Index list. Add a row, fill the fields, done.
 > - **Renderer:** a ClickUp view. There is no HTML renderer to maintain any more.
@@ -88,7 +88,7 @@ Lenses live at `../agents/<slug>.md`; the Index points at them. **Nothing duplic
 
 ## Adding an agent (the whole flow)
 
-1. **Name-collision gate** (`../gates/agent-name-collision-gate.md`) — both namespaces, nicknames weighted equally.
+1. **Name-collision gate** (`../gates/agent-name-collision-gate.md`) — the Index namespace, nicknames weighted equally.
 2. **Authoring gate** (`../gates/git-agent-authoring.md`) — full bundle if it needs memory; a single `agents/<slug>.md` if it's a lens.
 3. **One row in the Agent Index.** This is the wiring — without it, STEP 0 can't find it.
 4. **A trigger row in the AI Toolkit index** if it has firing behavior worth routing on.
