@@ -37,10 +37,19 @@
 
   <!-- Thumb zone. &lsaquo; &rsaquo; walk one FACE at a time and flow over the sheet boundary,
        exactly like the arrow keys and a swipe — so they are labelled for turning, not stepping
-       sheets. Position sits between them. -->
+       sheets. Position sits between them.
+
+       🔴 `#deckWhere` IS A BUTTON, NOT A LABEL (Michael, 2026-07-30: "if i click 'sheet 1 of 2'
+       it should open the sheet menu"). It reads "SHEET 1 OF 2", it lives dead centre of the thumb
+       zone, and for five versions it did nothing — the most obviously tappable thing on the
+       screen was inert while the real control was a title 600px away at the top. It opens the
+       same `Sheets.open()` as `#sheetMenuBtn`; two entry points, one panel, no second state.
+       The caret comes from CSS (`.where:not(:empty)::after`) so the JS keeps writing plain text
+       and an empty binder shows no orphan glyph. -->
   <div class="deckbar">
     <button id="prevSheet" class="step" aria-label="Turn back">&#8249;</button>
-    <span class="where" id="deckWhere"></span>
+    <button id="deckWhere" class="where" data-drawer-btn aria-haspopup="true"
+            aria-expanded="false" aria-controls="sheetMenu"></button>
     <div class="sides-seg" role="group" aria-label="Sheet face">
       <button id="sideA" aria-pressed="true">Front</button>
       <button id="sideB" aria-pressed="false">Back</button>
@@ -76,6 +85,8 @@
          straight through the binder.</p>
       <p class="drawer-note">A print can sit in more than one slot. When it does, the card spells
          out <b>own N &middot; placed M</b> so it can never read as owning more than you do.</p>
+      <p class="drawer-note">A <b>wanted</b> slot is a marker, not a holding. It never counts as a
+         slot in use on the Collection screen, because the sleeve is still empty.</p>
     </div>
   </aside>
 
