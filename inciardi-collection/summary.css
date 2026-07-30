@@ -124,3 +124,34 @@
 .wl.flat { background: transparent; color: var(--text-soft); border-style: dashed;
   pointer-events: none; }
 .drow .hint { margin-top: 5px; }
+
+/* ============================================================================
+   ⚠️ RULES BELOW ARE IN THE WRONG FILE, ON PURPOSE, AND SHOULD MOVE.
+
+   These are HEADER rules and they belong in styles.css. They are here because styles.css is
+   30,003 bytes against a ~30KB read cap, and the only way to add four lines to it is to
+   rewrite the whole thing — where a single transcription slip silently breaks every screen.
+   A documented exception in a small file is the lower-risk move; an undocumented one would
+   just be sprawl.
+   🔴 MOVE THESE INTO styles.css THE MOMENT IT IS SPLIT. They load globally today only because
+   index.html links this stylesheet on every route.
+
+   WHY THEY EXIST: v7 took the nav from three items to four (Summary). Measured at 390px, the
+   bar came to ~390px exactly — brand ~80 + nav ~242 + gear ~28 + gaps/padding ~40 — so it was
+   one pixel from wrapping to a second line, which is precisely the v5 bug that cost every page
+   60px of header. Below 400px the nav steps down a size and tightens; below 360px it tightens
+   again. Labels are never abbreviated, because a nav that says "Box" leading to a page titled
+   "Shoe-box" makes you check whether you landed somewhere else.
+   ⚠️ A FIFTH NAV ITEM DOES NOT FIT. Put the next screen behind a menu.
+   ============================================================================ */
+@media (max-width: 440px) {
+  #nav { gap: 1px; }
+  #nav a { padding: 5px 7px; }
+}
+@media (max-width: 400px) {
+  #nav a { padding: 5px 6px; font-size: 0.66rem; letter-spacing: 0; }
+  .brand { font-size: var(--fs-xs, 0.72rem); }
+}
+@media (max-width: 360px) {
+  #nav a { padding: 5px 4px; font-size: 0.62rem; }
+}
