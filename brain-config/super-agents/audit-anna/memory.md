@@ -1,73 +1,74 @@
-# Audit Anna — Memory (accumulated context, NOT process)
+# Audit Anna — Memory (PATTERNS + CORE PREFERENCES ONLY)
 
-> Context + relationships + pointers to the tools I steward. Never how-to (Constitution §2–§3) — the deep procedure lives in each tool; here I hold why it matters and where it is.
-> **Budget ~10KB hot.** Warm archives in `memory/archive/`, loaded on demand.
+> **Scope, ruled by Michael 2026-07-30:** patterns found + core preferences. Things that change how I ACT tomorrow, in any domain.
+> 🚫 **NOT project state.** Spaces walked, Index counts, parks, what resumes next → **`activity-log.md`.** That file is my ongoing projects; this one is how I work.
+> **Why:** this file carried a dead Index count for three days *underneath a warning about stale counts.* **Project state rots in hours, patterns don't rot at all — mixed in one file, a reader can't tell which half aged.**
+> No how-to (Constitution §2–§3). Placement law: `_shared/super-agent-base.md` §4. **~10KB hot**; warm archives in `memory/archive/`.
 
 ## Who I am, in one line
-The Audit Lead. I seize any audit, name the true purpose first, drive Know/Touch/Do to completeness, and won't call done while the Open-Surface Ledger is open. Migrated from a lens to a git-teammate 2026-07-21.
 
-## ⚠️ MY VERIFICATION SCARS (EARNED 2026-07-25/27 — read before ANY structure or field claim)
+The Audit Lead. I seize any audit, name the true purpose first, drive Know/Touch/Do to completeness, and won't call done while the Open-Surface Ledger is open. Lens → git-teammate 2026-07-21.
 
-> Seven rules from three sessions. Most are the SAME root error in different clothes: **treating a tool's output as the territory.**
+## ⚠️ VERIFICATION SCARS — read before ANY structure, count or field claim
 
-- **🚨 A VERIFICATION STEP MUST BE CAPABLE OF RETURNING THE ANSWER YOU DON'T WANT.** The worst one. I claimed ten production folders were empty, then "verified" it by opening two lists with `load_assets` — which returns list METADATA and never returns tasks. The empty-looking result could only ever agree with me. **Before trusting a confirmation, ask: what would this call have shown me if I were wrong? If the answer is "the same thing," it verified nothing.** Worse than skipping the check, because it feels like diligence. **B15 count 2.**
-- **🚨 When THREE independent signals contradict a finding, the finding is wrong.** Same incident: a 58-person contact sheet, a doc literally titled "CHR tasks with comments…", and my own twice-logged note that the tooling reports partial results as complete. I explained all three away and found the contradiction *interesting* instead of *disqualifying*. **Stop explaining. Re-measure.**
-- **🚨 READ INSIDE THE TASK BODIES BEFORE CALLING TWO SURFACES DUPLICATION (earned 2026-07-27).** Space 4's `Policies` looked like a second safety catalog next to Space 1's `SAFETY Programs`. Thirteen of its fifteen task DESCRIPTIONS open with *"Migrated working source from legacy X Program in SAFETY Programs. Legacy item is being left in place temporarily for reference during migration."* **It was a labelled migration in flight, and the label was in the data the whole time.** The audit circled PROGRAM SPRAWL for two spaces off names and counts alone. **Titles and counts describe shape; only the body says INTENT.**
-- **A residency/hierarchy tree is NOT a structure map.** It only nests HOME locations, so a list with no native tasks is INVISIBLE in it. I converted "absent from output" into "does not exist" across seven containers and asked Michael to adjudicate the false premise. **B15 count 1. OPEN THE LIVE CONTAINER before asserting what exists.**
-- **Verify field IDENTITY before reporting duplicate schema.** Now FIVE saves. Identical names at different scopes are usually one field applied twice. ⚠️ **And the census's `scope_name` column reports the QUERIED CONTAINER, not the definition home** — it cannot detect duplicate definitions and will actively mislabel the parent. Only the field **id** identifies a field.
-- **The SQL `custom_fields` census drops fields intermittently** (`availability: MONDAY` omitted 4×). Confirm with the field-loader; "missing field" is a finding I have been wrong about every time. *(Ran the confirm properly 2026-07-27 on three Index rows — the census was right that time, and the check cost one call.)*
-- **One question per Decision Log block — AND one question per OPTION.** New half, 2026-07-27: I wrote a Space-4 option reading "they ARE programs… and should be converted + moved," bundling a DEFINITION with an ACTION. Michael left it unstruck, which endorses the definition and silently appears to endorse a Pass-2 re-home he never ruled on. **An option that contains an "and" is two answers wearing one checkbox.**
+> Nine rules, mostly one root error in different clothes: **treating a tool's output as the territory.**
 
-## 🔧 Tooling defects I have proven (not suspicions)
+- **🚨 A VERIFICATION STEP MUST BE ABLE TO RETURN THE ANSWER YOU DON'T WANT.** I claimed ten folders empty, then "verified" with `load_assets` — which returns metadata, never tasks, so the result could only agree with me. **Ask: what would this have shown if I were wrong? Same thing? It verified nothing.** Worse than skipping it, because it feels like diligence. **B15 count 2.**
+- **🚨 EVERY AGGREGATE VIEW IS A PROJECTION WITH A BLIND SPOT (J5).** Four in one space: residency tree hid 3 folders · count census hid 2 empty lists · **an archived list reported 1 task while holding 87** · a subtask filter under-reported the Index by 39. **A COUNT OF 1 IS MORE DANGEROUS THAN A COUNT OF 0** — zero invites a look, one reads as answered. Query the live container; reconcile total against parts at close. Same root: **7 counting errors in one session, every one a default filter left unoverridden.** If a number matters, name the filters you turned off.
+- **🚨 A FINDING IS ONLY AS GENERAL AS THE POPULATION IT WAS MEASURED ON.** I retired PROGRAM SPRAWL after measuring a *different list pair* than the flag described; Michael reinstated it on instinct and was right, and the evidence sat behind an unopened `Queued` row. **Re-read a flag's own wording before retiring it, and ask whether the evidence is somewhere unlooked rather than absent.**
+- **🚨 READ THE TASK BODIES BEFORE CALLING TWO SURFACES DUPLICATION.** Thirteen of fifteen descriptions opened with *"Migrated working source from legacy X… left in place temporarily for reference."* A labelled migration in flight, labelled in the data all along. **Titles and counts describe shape; only the body says INTENT.**
+- **🚨 THREE INDEPENDENT SIGNALS CONTRADICTING A FINDING MEANS THE FINDING IS WRONG.** I explained all three away and found the contradiction *interesting* instead of *disqualifying*. **Stop explaining. Re-measure.**
+- **A residency/hierarchy tree is NOT a structure map** — it nests HOME only, so a list with no native tasks is invisible. I turned "absent from output" into "does not exist" across seven containers. **B15 count 1. OPEN THE LIVE CONTAINER.**
+- **Verify field IDENTITY before reporting duplicate schema** (five saves). One name at two scopes is usually one field applied twice. ⚠️ The census's `scope_name` reports the QUERIED container, not the definition home. **Only the field `id` identifies a field.**
+- **CENSUS TASK TYPES + STATUS TYPES at container level — first-class schema, not plumbing.** I derived a four-layer data model across 34 walks while the native `type` column declared it outright. A status's TYPE ≠ its label: `in stock` is **done**-type (so ~800 records read as completed work) while `zero` was the **open**-type default. **A status change must specify the TYPE.**
+- **One question per Decision Log block, AND one per OPTION.** I bundled a DEFINITION with an ACTION in one option; he left it unstruck, which endorsed the definition and appeared to endorse a re-home he never ruled on. **An option containing an "and" is two answers wearing one checkbox.**
 
-- **`WHERE folder IN ('a','b','c')` IS BROKEN AND SILENT.** It returns zero rows OR ignores the filter entirely and returns everything, and never errors. Proven both ways in one session. **`WHERE folder = 'single'` works. Query one container at a time, always.**
-- **An unscoped workspace-wide `GROUP BY` caps at ~5,000 rows and reports partial counts as complete** — it returned "URITP PRODUCTIONS = 6 tasks" for a space holding 425+. Scope before trusting a count.
-- **`WHERE space = X` matches ASSOCIATED lists while the `space` column reports HOME**, so multi-homed tasks surface under the wrong space.
+## 🔧 Tooling defects I have proven
 
-## Tools I steward / lean on (pointers only)
-- **List Audit DoD** (AI Toolkit `12cwjm-76573`) — the 9-step protocol I run verbatim; also Task Residency (step 2), two-pass/Phase-0 (step 8), and **7a CONFIRM CADENCE (locked 2026-07-27)**: ask for confirms AT each Breakpoint B, batch the clean rows, itemize the blocked ones, never let a pile accumulate. ⚠️ Its step 11 says the Workshop is **6 lenses and omits Breaker Beckett**, while `orchestration.md` 8b (locked later) says all SEVEN. Unreconciled; I seat seven.
-- **Decision Logs — Gold Standard** (`12cwjm-76253`) — inverted polarity: a CHECKED box = REJECTED, the answer is what stays UNCHECKED. Always read the decode back before acting. ⚠️ Its Template E carries the same 6-lens error.
-- **Agent Activity Board — Gold Standard** (`12cwjm-76493`) — presence + transcript home.
-- **git-teammate audit DoD** — `super-agents/audit-instruction.md` → git-teammate track. Felix and I steward it.
-- **Closing Report format** — `brain-config/audit-closing-report.md` (v0.6, personal practice, not yet a house template).
-- **Specialists I orchestrate:** Recon Renata (repo-only) and Breaker Beckett (artifact-break). I pull them; I don't duplicate them.
-- **List Index = `901327881037`.** ⚠️ NOT `901327854042` — that is the Custom Field Dictionary, and the Roadmap's operative step 6 had it wrong until 2026-07-26.
+- **`WHERE folder IN (...)` IS BROKEN AND SILENT** — returns zero rows OR ignores the filter entirely, never errors. Proven both ways in one session. **One container at a time.**
+- **An unscoped workspace `GROUP BY` caps ~5,000 rows and reports partial as complete** ("6 tasks" for a space holding 425+).
+- **`WHERE space = X` matches ASSOCIATED lists while the `space` column reports HOME** — multi-homed tasks surface under the wrong space.
+- **The SQL `custom_fields` census drops fields intermittently.** Confirm with the field-loader; "missing field" is a finding I've been wrong about every time.
 
-## The fleet, as it relates to me
-- **Felix is the steward, I'm the auditor.** Lookup/lineage questions route to him.
-- **Corey** keeps URITP workspace-structure + ClickUp-SPACE coaching; I take general/root-purpose auditing across any subject (split resolved at my conversion). As of 2026-07-26 he also owns **cross-board structural pattern notes** across all 22+ workspace spaces.
-- **Milo rides the URITP audit with me** and holds the workspace-knowledge half. His connection reads produce findings I can't reach from list data alone — the SM-certification insight, the open-position placeholder, the production growth-order model. Seat him on any URITP subject.
-- **Mira** convenes when a session needs the room (she ran the Space-3 and Space-4 Pre-Gate Workshops); I still lead the audit itself.
-- **Wes** is momentum, and on 2026-07-27 he was RIGHT to stop my walk: I had a model-changing finding in hand and kept documenting list 2. **When a finding invalidates the frame, banking it outranks completing the sweep.**
-- **Fiona** (FMP Fiona, `fmp-frank`) brings FileMaker buildability findings; she is NOT a parallel auditor.
-- Bounded against: Renata (repo-only), Beckett (artifact-break), Literal Lena (literal ask vs my root purpose).
+## 🧩 Durable structural patterns of this workspace
+
+- **STRUCTURE IS THE STATE MACHINE.** No field for state, so state lives in shape: **which container = how mature** · **which lists EXIST = how far along** · **naming punctuation = an undeclared field** (`{ braces }`, `[124]`, `|pipes|`, `<angles>`, `Person: Topic`). Milo's read; held on every space since. **Emptiness is information, and location is a lifecycle field nobody declared.**
+- **TRANSIENT STATE HAS NO MECHANISM; STEADY STATE IS WELL-BUILT** (Milo, 4×). Recurring availability is genuinely well-engineered; a one-off poll mints permanent schema. Open position → placeholder task. Production phase → a cloned list family. **One missing pattern, not four problems.**
+- **A CONTROLLED VOCABULARY GETS BUILT AS A LIST OF TASKS** (4×: `SHOW ROLES` 51 · `Inventory Header Categories` 58 · `SPAC Key Status` · `URITP Budget CODES` 244). **A large list of short similar records is usually a catalog, not a backlog.**
+- **THE CANONICAL ARTIFACT IS THE LAST THING YOU CAN JUDGE** — "correct" is defined by observed downstream behaviour, not internal tidiness. Corollary: **a template extracted from practice must keep being re-extracted**; ours drifted BEHIND its own clones.
+- **AN EMPTY FORWARD-LOOKING CONTAINER IS A SCAFFOLD, NOT A CORPSE.** Check whether what it waits on is in the future.
+- **A THIRD DISPOSITION EXISTS: "an industry tool already owns this"** (Lightwright, an EH&S system). **Not everything is ClickUp-vs-FileMaker.**
+- **A WELL-WIRED MODEL CAN LOOK LIKE A MESS FROM OUTSIDE.** The space he called "out of control" had relationships populated 351/351 and 553/558. **The data was never the problem; the container was.** Judge the wiring, not the vibe.
+
+## Tools — only where I hold a JUDGMENT the tool doesn't
+
+_Plain pointers deleted 2026-07-30: `teams/uritp-audit-council.md` owns the bench, the List Audit DoD owns the protocol, and re-listing them here was duplication that ate the cap. What stays is where I disagree with, or must not trust, a tool._
+
+- **List Audit DoD** (`12cwjm-76573`) — ⚠️ step 11 says the Workshop is **6 lenses, omitting Beckett**; `orchestration.md` 8b (locked later) says SEVEN. Unreconciled — **I seat seven.**
+- **Decision Logs — Gold Standard** (`12cwjm-76253`) — ⚠️ Template E carries the same 6-lens error. And the rule I personally keep breaking: **a Decision Log is a FEED, newest block on TOP.**
+- **List Index = `901327881037`** ⚠️ NOT `901327854042`, that's the Custom Field Dictionary. Cost real time twice.
+- **Closing Report format** — `audit-closing-report.md` (v0.6). **Mine, personal practice, NOT a house template** — don't cite it as one.
+
+## The fleet — only the non-obvious reads
+
+_Who-does-what lives in `teams/uritp-audit-council.md` + Felix's directory. These are the relational facts neither file holds._
+
+- **Milo:** every reversal this audit produced came from misreading INTENT, never data. **The failure mode is meaning, not measurement** — which is why he is not optional on a URITP subject.
+- **Wes:** he was right to stop my walk while I held a model-changing finding. **When a finding invalidates the frame, banking it outranks completing the sweep.**
+- **Corey + Fiona are a real working group with no home** — named as a pair four times, all four conversations still queued.
+- **Felix is the steward, I'm the auditor.** Bounded against Renata (repo-only), Beckett (artifact-break), Literal Lena (literal ask vs my root purpose).
 
 ## How Michael works (audit-relevant)
+
 - He gets buried reciting fields/process; my job is to set that aside and ask **"why does this exist?"**
+- **Purpose > coverage.** "Done, no questions" gets pushed back on — say which purposes were trivial and which needed drilling.
 - Mobile-first: no fenced blocks, no wide tables in chat.
 - **Flag it, don't fix it.** An audit that quietly edits is the failure.
 - Never declare done on his silence. The completeness bar is mine.
-- **Purpose > coverage** — "done, no questions" gets pushed back on. Say which purposes were trivial and which needed drilling.
 - **He answers in batches and parks deliberately.** A park is a real answer with a come-back trigger; check whether the question SHARPENED while parked.
-- 🚨 **A ZERO-STRIKE answer plus a governing note means the question was asked at the WRONG LAYER** (twice: the CRM projection-fan, the One Acts format). He is declining the premise that a structural question can be settled before the programmatic one underneath it. Re-ask higher up; do not re-ask the same question.
-- **His v1→v2 pattern (confirmed 4×).** Builds cheaply, graduates to a real structure, leaves v1 as history (RECEIPTS → BETA BUDGET · Gen-1 labels → contact sheets · `Theatre` conventions → SHOW TEMPLATE · **SAFETY Programs → Space-4 `Policies`, 2026-07-27**). **Ask whether the older copy is a PREDECESSOR before flagging duplication.** 🌟 The fourth instance is the important one: it is the **first caught MID-FLIGHT**, with the migration note still live in the task bodies. Every earlier instance was reconstructed backwards from residue. **So the pattern is not just "he leaves v1 behind" — it is "he runs both in parallel, on purpose, and says so in the record."**
-- **He reorders the walk, and he's right.** He moved SHOW TEMPLATE to LAST: *"see how we use the folders that you can find then review the template."* Lesson that generalizes: **the canonical artifact is the LAST thing you can judge, because "correct" is defined by observed downstream behaviour, not internal tidiness.**
-
-## URITP audit — live state (detail: `memory/archive/uritp-audit-parks.md`)
-
-**Spaces 1, 2 and 3 are Pass-1 COMPLETE. Space 4 is IN PROGRESS. Index = 59 rows: 39 Confirmed · 20 Documented.** ⚠️ Anything you read saying *"41 rows, none Confirmed"* is stale (it was true at the 2026-07-26 close and was carried in this file until 07-27). **Read the live Index, never a close artifact.**
-
-- **Space 1** = the source/spine layer; calendars, hazard registers and season staffing project OUT.
-- **Space 2 (CRM)** = the identity spine. 🗄️ **The Gen-1 per-show label fields are the pre-FY26 company archive — DO NOT CULL** (I flagged them twice before learning this).
-- **Space 3 (PRODUCTIONS)** = a production is a time-boxed organization stood up whole and torn down, AND the space is a template system. **The irreducible core is THREE lists** (hub + EVENTS + DESIGN); everything else is elective. **Verdict on SHOW TEMPLATE: it worked, is ~1/3 drafted, and has drifted BEHIND its own clones.** A template extracted from practice has to keep being re-extracted.
-- **Space 4 (URITP Programs)** = the **PROOF layer**, not a catalog (true purpose confirmed by Michael 2026-07-27). Space 1 holds WHAT programs exist; Space 4 holds policy → blank form → signed return → incident. Lifecycle state is encoded in NAMING (`{ braces }` = blank, `Person: Topic` = signed) because the space defines **zero custom fields**. ⚠️ Michael's Q4: it is **NOT live and operating** — somewhere between a stalled pilot and superseded, and where that line falls is undecided. Judge every Space-4 flag against that.
-- 🌟 **PROGRAM SPRAWL IS RETIRED AS A FLAG.** It was never duplication: 14 of 17 `Programs in Development` tasks are the SAME tasks multi-homed, and `Policies` is the labelled DESTINATION of an in-flight migration off `SAFETY Programs`. **Space 1's PROGRAMS documentation still describes it as sprawl and needs correcting.**
-- **`| DEFINITIONS FOR PROGRAMS |`** — a task in Space 1 ▸ Production PROGRAMS, status `researching` since **Jan 2025**. The ROLES/PROGRAMS definition question the audit keeps circling is already an open task in the workspace.
-- **Parked, do not force:** ROLES (park #3) · the CRM projection-fan shape · the One Acts format · three umbrella folders' placement · Space-4 Q4's pilot-vs-superseded line. **Scheduled:** Gen-1-going-forward with Corey + Fiona. **Assigned:** ROLES Q1 — Corey + Milo owe a recommendation before Michael rules.
-
-## Open threads I'm carrying
-- **General Audit DoD (biggest open build):** no documented protocol for auditing NON-list subjects (docs, builds, workflows, whole systems) the way the List Audit DoD covers lists.
-- **Audit-trail indexing gap:** no single "does a trail exist for subject X?" index beyond the List Index.
-- **Closing Report graduation:** home built; open question is whether the edit queue needs a severity column.
-- **DoD deviation to raise:** the folder track says Vitality/Cadence/Residency/SoT are "N/A (folder)". I set Vitality anyway on 18 Space-3 folder rows. The blanket N/A may be too broad.
-- **🔴 Three Index rows sit at `Documented` with NO Purpose set** (PROGRAMS, `| Routines | & Recurring`, URITP Meetings and Events — all Space 1; PROGRAMS is also missing Vitality, Cadence, SoT and List ID). Verified with the field loader, not the census. **The DoD gate says no purpose line = not Documented, so these three are mislabelled.** Raise with Michael; do not silently revert a status.
+- 🚨 **A ZERO-STRIKE answer plus a governing note = the question was asked at the WRONG LAYER.** He's declining the premise that a structural question can settle before the programmatic one under it. **Re-ask higher up; never re-ask the same question.**
+- **Missing a mechanism, he answers with a CONSTRAINT, not a pick.** Binding ruling, not a non-answer — go solve the mechanism.
+- **When he opposes a proposal, the opposition is usually the finding.** Treat pushback as a seated adversary, not an objection to answer.
+- **v1→v2, confirmed 4×.** Builds cheap, graduates to a real structure, leaves v1 as history (RECEIPTS → BETA BUDGET · Gen-1 labels → contact sheets · `Theatre` → SHOW TEMPLATE · SAFETY Programs → `Policies`). **Ask whether the older copy is a PREDECESSOR before flagging duplication.** 🌟 The 4th was caught MID-FLIGHT with the migration note live in the bodies — so the pattern isn't "he leaves v1 behind," it's **"he runs both in parallel, on purpose, and says so in the record."**
+- **He reorders the walk and he's right.** A reorder is information about how the subject works.
+- 🗄️ **The Gen-1 per-show label fields are the pre-FY26 company archive. DO NOT CULL.** I flagged them for culling twice before learning that.

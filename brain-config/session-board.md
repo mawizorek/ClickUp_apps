@@ -5,10 +5,14 @@
 | Agent | Session | Working on | Files touched |
 |---|---|---|---|
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
-| Workhorse Wes (w/ Mira, Anna, Milo, Corey) | Standing task `86ajknmmk` | URITP audit Space 4; banking the PROGRAM SPRAWL migration finding | super-agents/audit-anna/memory.md, super-agents/mainstage-milo/memory.md, super-agents/workhorse-wes/memory.md |
+| Mira + Anna + Milo + Corey (URITP Audit Council) | Standing task `86ajknmmk` | **REFRESHED 07-30 ~11:30 AM ET.** Pickup session: Space 6 (Courses) + Space 7 (BETA BUDGET). Currently executing Michael's memory-shape ruling BEFORE walking any list. | **`ClickUp_apps`:** `super-agents/audit-anna/memory.md` + `activity-log.md`, `super-agents/mainstage-milo/memory.md` + `activity-log.md`, `open-memory-requests.md`, `session-board.md` |
 | FMP Fiona | Session task titled `FMP Fiona (Opus 5) · HML_LLC v1 replan — table views + script/automation layer on FMP19 · Jul 28` (Agent Activity Board) | **CORRECTED 07-30: FMP documentation moves to `maw-prose` after all.** Standing up `apps/hml-llc/` there + two scoped convention exemptions. Nothing deleted from this repo until verified there. | **TWO REPOS.** `ClickUp_apps`: `filemaker/hml-llc/**` (read + this board row). **`maw-prose`: `apps/**`, `CONVENTIONS.md`, `DECISIONS.md`** |
 
 _Delete your row on session close._
+
+<p><br/></p>
+
+_🗄️ **The URITP audit row above was STALE FOR FOUR DAYS and it was the Space-4 row.** It claimed Anna's and Milo's `memory.md` for a session that closed on 07-27, which means every collision check run between then and now read a false claim — and the files it named are the exact two files this session needed. **A stale presence row is worse than an empty one: an empty board says "nobody posted," a stale row says "someone is here" and is believed.** Rule 5 already says delete your row on close; the enforcement gap is that nothing checks. Refreshed rather than duplicated because it is the same standing task and the same lineage._
 
 <p><br/></p>
 
@@ -69,3 +73,7 @@ _📌 **Open (thread `86ajqu32n`):** should `last-run` stamps fold back INTO `sc
 <p><br/></p>
 
 _⚠️ **For whoever audits memory next:** `/PREFERENCES.md` is at **99%**, fourth close running, blocking a qualified write (`OMR-20260728-1`). **Queue is 7 — three are APPROVED for placement but blocked on BUNDLE STATE**, not on the ruling. **Placement is no longer the bottleneck; bundle capacity is.** 🗄️ **Fiona, 07-30 — the pattern behind three of my misses in two days:** I placed content by the LABEL of the surface I happened to be standing in (ClickUp because the audit was there · `ClickUp_apps` because the files were there · `maw-prose` because its name said "prose"). **Read a surface's PURPOSE, never its name or your own momentum.** Strong brain-memory candidate; not queued as an OMR by me._
+
+<p><br/></p>
+
+_🧠 **BUNDLE CAP IS THE #1 OMR BLOCKER AND MICHAEL JUST CUT ITS ROOT CAUSE (07-30).** Ruling: `memory.md` holds **patterns + core preferences only**; ongoing project state belongs in `activity-log.md`. Anna's file was 12.6KB against a ~10KB cap and roughly a third of it was audit project tracking. **Every "blocked on bundle cap" entry in the OMR queue should be re-tested after the fleet re-shape — the cap was being consumed by content that was in the wrong file.**_
