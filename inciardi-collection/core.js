@@ -14,15 +14,48 @@
  *   changes is not a setting, it is a chore. localStorage now OVERRIDES it (for a staging
  *   or localhost worker) rather than being the only source.
  *
- *   THE WRITE KEY is a CREDENTIAL. It is runtime-only and always will be. It is never in
- *   this bundle, never in the repo, never in a build. `inciardi-market` shipped
- *   "mikey"/"nickey" inside public JS and they are STILL unrotated — that is the whole
- *   reason this file has a comment about it.
+ *   THE WRITE KEY was runtime-only for the first day of this app's life. It no longer is.
+ *   See the block below — this file's own history is the argument, so it is kept.
  */
 (function () {
   /* The deployed worker. Version 4d178160, 2026-07-30. Public endpoint: reads are open, and
-   * every write is gated on a key that lives nowhere near this file. */
+   * every write is gated on the key below. */
   var DEFAULT_BASE = 'https://inciardi-collection.mawizorek-online.workers.dev';
+
+  /* ============================================================ BAKED WRITE KEY
+   * OVERRIDDEN BY MICHAEL, 2026-07-30, knowingly and on the record.
+   *
+   * What this file said this morning: "the write key is a CREDENTIAL, runtime-only and always
+   * will be, never in this bundle." That rule lost to a real-world cost: two people, several
+   * browsers, aggressive cache clearing, and a key that has to be re-pasted every time — which
+   * in practice means the app is read-only exactly when someone is standing in front of the
+   * binder wanting to log a print. A credential nobody can produce at the moment of use is not
+   * security, it is a locked door with the room empty.
+   *
+   * SO, PLAINLY, WHAT THIS COSTS — no euphemism, because a comment that soft-pedals this is
+   * how it gets forgotten:
+   *   • This is a PUBLIC repo on a PUBLIC Pages site. This string is readable in view-source
+   *     and in git history by anyone who looks. Assume it is known.
+   *   • Therefore anyone can POST/DELETE to the worker: add junk artworks, fill or clear slots.
+   *     CORS does not help (it constrains browsers, not curl).
+   *   • What is NOT at risk: there is no personal data, no money, and no third-party
+   *     credential here. The blast radius is "the binder data gets vandalised."
+   *   • The recovery path is real and was checked before accepting this: D1 Time Travel gives
+   *     30-day point-in-time restore, and every write is one row in one table.
+   *
+   * UNLIKE THE PREDECESSOR, THIS IS AT LEAST NOT GUESSABLE. `inciardi-market` shipped "mikey"
+   * and "nickey", which means it was writable by anyone who *guessed*, not merely by anyone
+   * who *read the source*. That is a strictly worse class of exposure and it is still
+   * unrotated over there. Whatever goes here is long and random, always.
+   *
+   * TO ROTATE (do this the moment anything looks off, and it is genuinely a 2-minute job):
+   *   1. Cloudflare dashboard → Workers & Pages → inciardi-collection → Settings →
+   *      Variables and Secrets → edit WRITE_KEY → paste a new long random string.
+   *   2. Paste the same string here, commit. Done — every device picks it up on next load,
+   *      which is the entire point of baking it in.
+   * The device-level override below still exists, so a key typed into Settings beats this one.
+   * ============================================================================== */
+  var DEFAULT_KEY = 'icw_k7Qm4Zt9Rb2Vn6Xw8Ly3Js5Hd4Pg7T';
 
   var K_BASE = 'ic_api_base', K_KEY = 'ic_write_key';
   function ls(k, v) {
@@ -42,8 +75,12 @@
     /* Empty input = fall back to the default, so there is always a way home from a typo. */
     setBase: function (v) { ls(K_BASE, trimSlash(v)); },
 
-    key: function () { return ls(K_KEY) || ''; },
+    key: function () { return (ls(K_KEY) || '').trim() || DEFAULT_KEY; },
     setKey: function (v) { ls(K_KEY, v || ''); },
+    /* Same honesty rule as the base URL: the UI must be able to say WHICH key is in play,
+     * because "writes work" and "writes work because of a value shipped in the bundle" are
+     * different facts and only one of them is rotatable from a phone. */
+    isDefaultKey: function () { return !(ls(K_KEY) || '').trim(); },
 
     req: function (method, path, body) {
       var base = API.base();
@@ -54,6 +91,8 @@
         opts.body = JSON.stringify(body);
       }
       if (method !== 'GET') {
+        // Cannot be empty now that a default exists, but the guard stays: a future rotation
+        // that blanks DEFAULT_KEY must fail loudly here, not send an unauthenticated write.
         if (!API.key()) return Promise.reject(new Error('No write key set. Open Settings (⚙) and paste it.'));
         opts.headers['x-write-key'] = API.key();
       }
@@ -71,6 +110,12 @@
             // reads as "the app is broken" when it means "nobody set the key yet."
             if (r.status === 503 && /WRITE_KEY/.test(data.error || '')) {
               throw new Error('The worker has no WRITE_KEY set yet. Add it in the Cloudflare dashboard: Worker → Settings → Variables and Secrets.');
+            }
+            // 401 with the built-in key means the two halves disagree: the string in this
+            // bundle is not the one on the worker. Name that exactly, because "bad key" on a
+            // device that never typed a key reads as nonsense otherwise.
+            if (r.status === 401 && API.isDefaultKey()) {
+              throw new Error('The built-in write key does not match the worker. Either the Cloudflare WRITE_KEY was rotated without updating core.js, or this page is cached — hard-reload first.');
             }
             throw new Error(data.error || ('HTTP ' + r.status));
           }
