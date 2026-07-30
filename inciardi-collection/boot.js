@@ -1,15 +1,11 @@
 /* Inciardi Collection — BOOT. Config, theme, router, settings wiring, diagnostics.
  *
- * ============================================================================
- * WHY THIS IS A FILE AND NOT A <script> IN index.html.
- *
- * The repo's own architecture lock (2026-07-08) is that **`index.html` is an INDEX**: a thin
- * shell referencing pages, never a file that stores servable content. Ours had grown a
- * ~250-line inline script and reached 20.8KB — the index had quietly become the app, which is
- * the exact drift that lock exists to stop. The shell is now markup + script tags at ~4KB.
+ * WHY THIS IS A FILE AND NOT A <script> IN index.html: the repo's architecture lock (2026-07-08)
+ * is that **`index.html` is an INDEX** — a thin shell referencing pages, never a file storing
+ * servable content. Ours had grown a ~250-line inline script and hit 20.8KB; the index had
+ * quietly become the app, which is the exact drift that lock exists to stop.
  *
  * `APP` below is the one config object. Adding a route is a line there plus a module file.
- * ============================================================================
  */
 (function () {
 
@@ -18,9 +14,9 @@
     appName: 'Inciardi',
     appSub: 'Collection',
     logo: '\uD83D\uDCD5',
-    version: 'v9',
-    /* 🎨 THEME: `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` +
-       typography `grounded` + forms `soft` + spacing `standard`.
+    version: 'v10',
+    /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
+       `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
        colors.tsv and faults here. The `data-theme` attribute in index.html is the opposite: it
        takes a COLOUR slug, because themes.css ships a static block for the pre-JS first paint.
@@ -28,13 +24,13 @@
     theme: 'soft-mercedes',
     color: 'mercedes',          // pre-paint floor; must match the join's colour
     defaultPage: 'binder',
-    /* Hints are why the drawer beats the old inline bar — there was never room to say what a
-       page is FOR up there. */
+    /* Hints are why the drawer beats the old inline bar — there was never room to say what a page
+       is FOR up there. */
     nav: [
-      { route: 'binder',  label: 'Binder',   hint: 'Nine slots a face, front and back' },
+      { route: 'binder',  label: 'Binder',     hint: 'Nine slots a face, front and back' },
       { route: 'summary', label: 'Collection', hint: 'Every print, and where each one is' },
-      { route: 'shoebox', label: 'Shoe-box', hint: 'Owned, not in the binder yet' },
-      { route: 'enter',   label: 'Enter',    hint: 'Add a print to the catalog' }
+      { route: 'shoebox', label: 'Shoe-box',   hint: 'Owned, not in the binder yet' },
+      { route: 'enter',   label: 'Enter',      hint: 'Add a print to the catalog' }
     ],
     sources: [
       { label: 'Anastasia Inciardi', href: 'https://www.anastasiainciardi.com/' }
@@ -50,9 +46,9 @@
   if (window.THEMES && THEMES.applyTheme) {
     THEMES.applyTheme(APP.theme);
   } else {
-    // resolve.js absent: themes.css + the data-theme attribute already painted the Mercedes
-    // ramp, so this only re-asserts it. Colours survive; the other three vectors fall back to
-    // the var() defaults in base.css. Light mode is unavailable and chrome.js says so.
+    // resolve.js absent: themes.css + the data-theme attribute already painted the Mercedes ramp,
+    // so this only re-asserts it. Colours survive; the other three vectors fall back to the var()
+    // defaults in base.css. Light mode is unavailable and chrome.js says so out loud.
     document.documentElement.setAttribute('data-theme', APP.color);
   }
 
@@ -62,10 +58,10 @@
   checkConfig();
 
   /* ---------- router: hash -> pages/<route>.html, then MOUNT ----------
-   * The hash carries PARAMS: `#binder?sheet=sheet-1&side=B` opens that sheet's back, which is
-   * what every link in the Collection matrix points at. Query string rather than a path
-   * (`#binder/sheet-1/B`) because it is order-independent and tolerates a missing value, so an
-   * old link with only `?sheet=` still works. A positional path breaks on the third param. */
+   * The hash carries PARAMS: `#binder?sheet=sheet-1&side=B` opens that sheet's back, which is what
+   * every link in the Collection matrix points at. Query string rather than a path because it is
+   * order-independent and tolerates a missing value, so an old link with only `?sheet=` still
+   * works. A positional path breaks on the third param. */
   function parse() {
     var h = (location.hash || '').replace(/^#/, '');
     var q = h.indexOf('?');
@@ -120,9 +116,9 @@
       }
     }
 
-    /* Same rule, and it matters more here: NEVER pre-fill this box with the built-in key.
-     * Painting the effective value would both lie about what this device saved AND put the
-     * credential one "show password" tap from any screen someone is looking over. */
+    /* Same rule, and it matters more here: NEVER pre-fill this box with the built-in key. Painting
+     * the effective value would both lie about what this device saved AND put the credential one
+     * "show password" tap from any screen someone is looking over. */
     function paintKey() {
       var el = $('writeKey'), hint = $('keyHint');
       if (API.isDefaultKey()) {
@@ -148,8 +144,8 @@
       paintBase(); paintKey(); checkConfig(); go();
     });
 
-    /* RAW JSON, verbatim — Michael pastes it, so the machine output is the point. The verdict
-     * line sits ABOVE it because that costs nothing and answers "can I save yet?" at a glance. */
+    /* RAW JSON, verbatim — Michael pastes it, so the machine output is the point. The verdict line
+     * sits ABOVE it because that costs nothing and answers "can I save yet?" at a glance. */
     $('ping').addEventListener('click', function () {
       var out = $('pingOut');
       out.hidden = false; out.textContent = '\u2026';
@@ -171,8 +167,8 @@
     $('copyDiag').addEventListener('click', function () {
       var txt = bundle(), out = $('pingOut');
       function manual() {
-        /* navigator.clipboard is absent in some iOS configurations and in non-secure contexts.
-         * A copy button that silently does nothing is worse than no copy button. */
+        /* navigator.clipboard is absent in some iOS configurations and in non-secure contexts. A
+         * copy button that silently does nothing is worse than no copy button. */
         out.hidden = false; out.textContent = txt;
         try {
           var r = document.createRange(); r.selectNodeContents(out);
@@ -189,33 +185,34 @@
   }
 
   /* ---------- diagnostics ----------
-   * 🔴 NEVER THE KEY ITSELF — only whether one exists and how long it is. This text is built to
-   * be pasted into a chat, so a credential in here would be a leak with a delivery mechanism
-   * attached. Still true with a baked key: name WHICH key is in play, never the string. (The
-   * built-in one is public anyway, but a diagnostic that pastes credentials into chat logs is a
-   * habit that will eventually meet a key that is not.) */
+   * 🔴 NEVER THE KEY ITSELF — only whether one exists and how long it is. This text is built to be
+   * pasted into a chat, so a credential in here would be a leak with a delivery mechanism
+   * attached. (The built-in one is public anyway, but a diagnostic that pastes credentials into
+   * chat logs is a habit that will eventually meet a key that is not.) */
   function bundle() {
     var d = document.documentElement;
     var L = [];
     L.push('INCIARDI COLLECTION \u2014 DIAGNOSTICS');
     L.push('generated   ' + new Date().toISOString());
     L.push('app         ' + APP.version + '  (theme ' + APP.theme + ')');
-    /* The RESOLVED theme, read off the DOM rather than the constant: if a vector failed to
-     * apply, resolve.js writes "!slug" into the attribute, so this reports what the page is
-     * actually wearing instead of what it intended to wear. */
+    /* The RESOLVED theme, read off the DOM rather than the constant: if a vector failed to apply,
+     * resolve.js writes "!slug" into the attribute, so this reports what the page is actually
+     * wearing instead of what it intended to wear. */
     L.push('theme join  ' + (d.getAttribute('data-theme-join') || '(not applied)') +
            '  color=' + (d.getAttribute('data-theme') || '?') +
            '  mode=' + (d.getAttribute('data-mode') || '?'));
     if (window.THEMES && THEMES.faults && THEMES.faults.length) {
       L.push('theme fault ' + THEMES.faults.length + ': ' + THEMES.faults.join(' | '));
     }
+    /* Mobile vs desktop, from device.js. The layout differs between them, so a screenshot report
+     * that omits this costs a round trip to find out which one it was. */
+    L.push('device      ' + (window.Device ? Device.describe() : '(device.js did not load)'));
     /* WHICH MODULES LOADED. After a split, a 404'd script and a screen with no data look
      * identical — this is the line that tells them apart. */
-    L.push('modules     ' + ['Chrome', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox', 'Summary', 'App']
-      .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
+    L.push('modules     ' +
+      ['Device', 'Chrome', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox', 'Summary', 'App']
+        .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
     L.push('hash        ' + (location.hash || '(none)'));
-    L.push('viewport    ' + window.innerWidth + 'x' + window.innerHeight +
-           ' dpr=' + (window.devicePixelRatio || 1));
     L.push('worker      ' + API.base() + (API.isDefaultBase() ? '  [built-in]' : '  [OVERRIDDEN here]'));
     L.push('write key   ' + (API.isDefaultKey()
       ? 'built-in (' + API.key().length + ' chars, from core.js)'
