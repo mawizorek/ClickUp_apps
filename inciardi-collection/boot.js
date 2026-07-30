@@ -6,6 +6,8 @@
  * quietly become the app, which is the exact drift that lock exists to stop.
  *
  * `APP` below is the one config object. Adding a route is a line there plus a module file.
+ * Chrome.setActive() turns `nav[].label` into the centred PAGE TITLE in the header and the
+ * browser tab title, so a route's label is written once, here.
  */
 (function () {
 
@@ -14,7 +16,7 @@
     appName: 'Inciardi',
     appSub: 'Collection',
     logo: '\uD83D\uDCD5',
-    version: 'v10',
+    version: 'v11',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
@@ -25,7 +27,7 @@
     color: 'mercedes',          // pre-paint floor; must match the join's colour
     defaultPage: 'binder',
     /* Hints are why the drawer beats the old inline bar — there was never room to say what a page
-       is FOR up there. */
+       is FOR up there. `label` is ALSO the page title in the header (v11). */
     nav: [
       { route: 'binder',  label: 'Binder',     hint: 'Nine slots a face, front and back' },
       { route: 'summary', label: 'Collection', hint: 'Every print, and where each one is' },
@@ -87,7 +89,7 @@
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(function (html) {
         $('view').innerHTML = html;
-        Chrome.setActive(at.route);
+        Chrome.setActive(at.route);        // marks the nav row AND writes the page title
         window.scrollTo(0, 0);
         App.mount(at.route, at.params);   // the hook innerHTML injection needs
       })
