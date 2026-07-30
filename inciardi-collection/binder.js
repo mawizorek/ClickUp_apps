@@ -144,8 +144,17 @@
     if (f) f.textContent = cur ? cur.slots_used + '/18' : '';
     if (m) m.style.width = cur ? Math.round(cur.slots_used / 18 * 100) + '%' : '0';
     /* 1-BASED FOR READING ONLY. Stored sheet_order is 0-based and a sheet_id can say anything —
-     * `mini-binder-s1` is the SECOND sheet. Never show an id as a position. */
-    if (w) w.textContent = n ? 'sheet ' + (i + 1) + ' of ' + n : '';
+     * `mini-binder-s1` is the SECOND sheet. Never show an id as a position.
+     * This is also a BUTTON now (see pages/binder.html): it says what the sheet menu is about,
+     * so it opens the sheet menu. Empty binder = nothing to choose from, so it disables rather
+     * than opening a menu of nothing. */
+    if (w) {
+      w.textContent = n ? 'sheet ' + (i + 1) + ' of ' + n : '';
+      w.disabled = !n;
+      w.setAttribute('aria-label', n
+        ? 'Sheet ' + (i + 1) + ' of ' + n + '. Choose a sheet.'
+        : 'No sheets yet');
+    }
 
     /* The step buttons report whether ANY face remains in that direction, not another SHEET.
      * A control that greys out while the equivalent keystroke still works is a lie. */
@@ -232,7 +241,13 @@
   function mount(params) {
     var stage = $('stage');
 
-    $('sheetMenuBtn').addEventListener('click', function () { Sheets.open(); });
+    /* TWO DOORS, ONE ROOM. The sheet TITLE at the top and the POSITION READOUT at the bottom
+     * both open the sheet menu, because both of them name it. Same call, not a copy of the
+     * open logic — a second opener is how two panels end up disagreeing about which is open. */
+    function openSheets() { Sheets.open(); }
+    $('sheetMenuBtn').addEventListener('click', openSheets);
+    $('deckWhere').addEventListener('click', openSheets);
+
     $('legendBtn').addEventListener('click', function () {
       var l = $('legend');
       if (!l.hidden) { Drawer.closeAll(); return; }
