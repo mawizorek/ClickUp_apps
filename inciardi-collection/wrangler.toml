@@ -17,7 +17,34 @@ database_name = "inciardi-collection"
 # reason.
 database_id = "045f1943-dc88-452b-b5d1-f4da81a5a612"
 
-# WRITE_KEY is deliberately NOT here, and never will be. It is a Cloudflare secret, set once
-# in the dashboard (Worker → Settings → Variables and Secrets) so it survives every deploy.
-# The predecessor shipped "mikey"/"nickey" inside a public JS bundle and they are STILL
-# unrotated. That is the whole reason this file has a comment about it.
+# ============================================================ WRITE_KEY
+# This block previously read: "WRITE_KEY is deliberately NOT here, and never will be."
+# That was true for exactly one day. It is now a plain [vars] entry, below, and the reasoning
+# is kept because the reversal is the interesting part.
+#
+# WHY IT MOVED (2026-07-30, Michael):
+#   1. The key is now BAKED INTO THE PUBLIC BUNDLE by decision — `core.js` → DEFAULT_KEY, so
+#      Nick and any freshly-cleared browser can write with nothing pasted. Once the string is
+#      readable in view-source, encrypting the server's copy of that same string protects
+#      nothing. A secret that is already public is not a secret; it is a chore with ceremony.
+#   2. A Cloudflare *Secret* CANNOT BE READ BACK. That is precisely how the first one was
+#      lost inside a day: the dashboard showed dots, nobody could confirm the value, and
+#      checking it against the app meant rotating both halves blind.
+#   3. The dashboard step was ALSO unfindable in practice. On 2026-07-30 this worker was live
+#      and answering /health while the phone dashboard's application list showed only the two
+#      `inciardi-market` workers — so "go set it in the dashboard" was an instruction pointing
+#      at a screen that did not show the worker. A setup step nobody can locate is not a step.
+#   As a [vars] entry the key deploys FROM GIT with the worker, in one button press, and both
+#   halves of the pair are visible in the same repo — which is the only way a mismatch can be
+#   spotted rather than guessed at.
+#
+# ⚠️ THE PAIR MUST MATCH, ALWAYS: this value and `DEFAULT_KEY` in `core.js`. Rotating means
+#   editing BOTH in one commit and re-running the deploy workflow. Rotate one and every write
+#   returns 401 (core.js names that exact case).
+# ⚠️ A [vars] entry OVERWRITES a dashboard secret of the same name on every deploy. So do not
+#   "also" set a WRITE_KEY secret in the dashboard expecting it to win — it will be replaced.
+#   One source of truth, and it is this file.
+# ⚠️ AN UNSET KEY STILL REFUSES EVERY WRITE (worker.js returns 503). Blank never means open.
+# ============================================================================
+[vars]
+WRITE_KEY = "icw_k7Qm4Zt9Rb2Vn6Xw8Ly3Js5Hd4Pg7T"
