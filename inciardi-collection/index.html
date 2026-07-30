@@ -1,57 +1,59 @@
 <!doctype html>
-<!-- Inciardi Collection — v4. Router shell + pages/ partials. Pages-hosted, not file:// capable.
+<!-- Inciardi Collection — v5. Router shell + pages/ partials. Pages-hosted, not file:// capable.
      Shape derived from template-app (gold standard v5), NOT from the predecessor.
 
      ONE DELIBERATE ADDITION vs the template: the template's router injects partials with
      innerHTML, which does not execute inline <script>. So after injecting we call
      App.mount(route). Without that hook every page here would be inert markup.
 
-     v2 (2026-07-30): the write key is BAKED INTO core.js at Michael's instruction, so a fresh
-     browser can write with nothing pasted. Every piece of copy and every banner in this file
-     changed with it.
-
-     v3 (2026-07-30): theme swapped to MERCEDES. Three lines of pointer, zero CSS — styles.css
-     holds no color literals, so the palette is entirely a theme-spine concern. Also removed a
-     latent color override; see the theme block below.
-
-     v4 (2026-07-30): the sheet menu (reorder + rename) replaces the sheet <select>, and the
-     shoe-box counts spares. ⚠️ v4 NEEDS A WORKER DEPLOY — it calls POST /sheet/reorder and
-     POST /sheet/rename, which do not exist on an older worker. Front-end-only changes ship on
-     Pages in ~60s, but this one is a PAIR: Actions -> "Deploy inciardi-collection worker".
-     Until that runs, the arrows return a 404 with the route list, which is at least legible. -->
+     v2 · write key baked into core.js (Michael's call) — every banner and every line of copy
+          in this file changed with it.
+     v3 · Mercedes palette. Three pointers, zero CSS: styles.css has no colour literals.
+     v4 · sheet menu (reorder + rename); shoe-box counts spares.
+     v5 · DESIGN PASS. The binder is a bounded object, not a scroll — see styles.css. Two
+          fixes live in THIS file:
+            1. The header wrapped to two lines on a phone (brand + 3 nav items + gear beat
+               390px, so "Shoe-box" dropped below and every page lost 60px). "Collection" is
+               now a span that hides under 460px, and #nav can no longer wrap.
+            2. ONE shared scrim at body level. v4's drawers floated over a fully live page
+               with no dimming and no tap-away dismiss. It lives here rather than in
+               binder.html so the Settings drawer gets it too, and so there is exactly one
+               element with that id no matter which route is mounted. -->
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- Mercedes surface-1. This paints the iOS browser chrome, so a stale value here is a visible
-     seam between the app and the phone UI even when every token inside is correct. -->
+<!-- Mercedes surface-1. This paints the iOS browser chrome, so a stale value is a visible seam
+     between the app and the phone UI even when every token inside is correct. -->
 <meta name="theme-color" content="#192221">
 <meta name="robots" content="noindex, nofollow">
 <title>Inciardi Collection</title>
 <meta name="description" content="A digital twin of the mini-print binder: sheets, sides, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=4">
+<link rel="stylesheet" href="./styles.css?v=5">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
 
 <header id="appHeader">
   <div class="bar">
-    <span class="brand">📕 <b>Inciardi</b> Collection</span>
+    <span class="brand">&#128213; <b>Inciardi</b> <span class="wm-long">Collection</span></span>
     <nav id="nav"></nav>
-    <button id="gear" class="icon-btn" aria-label="Settings" title="Settings">⚙</button>
+    <button id="gear" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button>
   </div>
   <div id="banner" class="banner" hidden></div>
 </header>
 
 <main id="view" tabindex="-1"></main>
 
+<!-- Shared by every drawer in the app, on every route. -->
+<button class="scrim" id="scrim" hidden aria-label="Close"></button>
+
 <aside id="settings" class="drawer" hidden aria-label="Settings">
   <h2>Settings</h2>
+  <p class="hint">Nothing here needs filling in. Both fields are overrides for this device.</p>
 
-  <!-- Both fields are overrides, not requirements: the URL and the key both ship with the
-       app. Neither is something you have to produce to use this thing. -->
   <label for="writeKey">Write key</label>
   <input id="writeKey" type="password" autocomplete="off">
   <p class="hint" id="keyHint"></p>
@@ -59,59 +61,55 @@
   <div class="row">
     <button id="saveCfg" class="primary">Save</button>
     <button id="ping">Test connection</button>
-    <button id="copyDiag">📋 Copy diagnostics</button>
   </div>
+  <div class="row"><button id="copyDiag" class="ghost">Copy diagnostics</button></div>
   <pre id="pingOut" class="out" hidden></pre>
 
-  <!-- Collapsed on purpose: one correct value, already set. Surfacing it made setup look
-       twice as long as it is. Still reachable for a staging or localhost worker. -->
+  <!-- Collapsed on purpose: one correct value, already set. Surfacing it made setup look twice
+       as long as it is. Still reachable for a staging or localhost worker. -->
   <details style="margin-top:var(--gap-lg,20px)">
-    <summary class="tag" style="cursor:pointer">Advanced · worker URL</summary>
+    <summary class="tag" style="cursor:pointer">Advanced &middot; worker URL</summary>
     <label for="apiBase">Worker URL</label>
     <input id="apiBase" type="url" inputmode="url" autocapitalize="off" autocorrect="off">
     <p class="hint" id="baseHint"></p>
-    <button id="resetBase" class="ghost">Use the built-in default</button>
+    <div class="row"><button id="resetBase" class="ghost">Use the built-in default</button></div>
   </details>
 
-  <button id="closeCfg" class="ghost" style="margin-top:var(--gap-md,12px)">Close</button>
+  <div class="row"><button id="closeCfg" class="ghost">Close</button></div>
 </aside>
 
 <div id="toasts" class="toasts" aria-live="polite"></div>
 <noscript>This app needs JavaScript enabled.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./core.js?v=4"></script>
-<script src="./app.js?v=4"></script>
+<script src="./core.js?v=5"></script>
+<script src="./app.js?v=5"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
-  var APP_VERSION = "v4";
+  var APP_VERSION = "v5";
 
   /* ==== THEME ====
      `soft-mercedes` is a JOIN in shared/themes/_themes.json: color `mercedes` + typography
-     `grounded` + forms `soft` + spacing `standard`. It is soft-utility with one vector
-     swapped, so nothing about density or type changes — only the palette. All four pointers
-     were verified against their grids before this was committed (a bad pointer now paints a
-     red fault banner rather than half-theming in silence).
+     `grounded` + forms `soft` + spacing `standard`. All four pointers were verified against
+     their grids before shipping (a bad pointer paints a red fault banner rather than
+     half-theming in silence).
 
-     🔴 APPLY A JOIN SLUG, NEVER A COLOR SLUG. `mercedes` on its own is a ROW in colors.tsv,
-     not a join — passing it to applyTheme() faults. That exact confusion is why this file
-     used to carry a warning about `default-theme`. The DOM attribute above is different: it
+     🔴 APPLY A JOIN SLUG, NEVER A COLOR SLUG. `mercedes` alone is a ROW in colors.tsv, not a
+     join — passing it to applyTheme() faults. The DOM attribute above is the opposite: it
      takes a COLOR slug, because themes.css ships a static [data-theme="mercedes"] block for
-     the pre-JS first paint. Two different vocabularies, one word apart.
+     the pre-JS first paint. Two vocabularies, one word apart.
 
      🗑️ REMOVED IN v3 — the `ic_color` override. This file used to read an `ic_color` value
-     from localStorage twice: once inline in <head> to set the first-paint attribute, and once
-     AFTER applyTheme() to re-apply that color on top of the resolved theme. **Nothing in this
-     app ever wrote it.** There is no color picker here, so it could only ever hold a value
-     left behind by hand — and if it did, it would silently override the app's own palette,
-     making a correct theme change look like it never shipped. That is the same disease as the
-     banner that could not fire and the cache that lied: a mechanism whose only possible
-     effect is an invisible wrong answer. If a picker is wanted later, `on-track` has the
-     reference implementation (a passive menu built from THEMES.listThemes()) — build it with
-     a visible readout of which theme is active, not a bare localStorage read. */
+     from localStorage twice: inline in <head> for first paint, and again AFTER applyTheme()
+     to re-apply that colour on top of the resolved theme. Nothing in this app ever wrote it;
+     there is no colour picker. Its only reachable effect was a hand-set value silently
+     overriding the palette, making a correct theme change look like it never shipped — the
+     same disease as a banner that cannot fire. If a picker is wanted, `on-track` has the
+     reference implementation (a passive menu off THEMES.listThemes()) — build it with a
+     visible readout of the active theme, not a bare localStorage read. */
   var APP_THEME = "soft-mercedes";
-  var DEFAULT_COLOR = "mercedes";   // pre-paint / no-JS floor, must match the join's color
+  var DEFAULT_COLOR = "mercedes";   // pre-paint / no-JS floor, must match the join's colour
   var DEFAULT_PAGE  = "binder";
   var NAV = [
     { route: "binder",  label: "Binder" },
@@ -124,8 +122,8 @@
     THEMES.applyTheme(APP_THEME);
   } else {
     // resolve.js missing entirely: themes.css + the data-theme attribute already painted the
-    // Mercedes ramp, so this only re-asserts it. Colors survive; the other three vectors fall
-    // back to the var() defaults baked into styles.css.
+    // Mercedes ramp, so this only re-asserts it. Colours survive; the other three vectors
+    // fall back to the var() defaults baked into styles.css.
     document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
   }
 
@@ -137,19 +135,20 @@
 
   /* ---- settings drawer ---- */
   var dr = document.getElementById("settings");
+  var scrim = document.getElementById("scrim");
   var baseIn = document.getElementById("apiBase");
   var baseHint = document.getElementById("baseHint");
   var keyIn = document.getElementById("writeKey");
   var keyHint = document.getElementById("keyHint");
 
-  /* Kept for the diagnostics bundle. The LAST FAILURE is retained deliberately: a copy
-     button matters most when something broke, and a bundle that only reports the latest
-     (successful) call is exactly the one that omits the useful part. */
+  /* Kept for the diagnostics bundle. The LAST FAILURE is retained deliberately: a copy button
+     matters most when something broke, and a bundle that only reports the latest (successful)
+     call is exactly the one that omits the useful part. */
   var lastPing = null, lastError = null, lastAt = null;
 
   function paintBase() {
-    // Show the OVERRIDE, not the effective value: an input pre-filled with something it
-    // never saved is a small lie about state, and blanking it would then look like erasing.
+    // Show the OVERRIDE, not the effective value: an input pre-filled with something it never
+    // saved is a small lie about state, and blanking it would then look like erasing.
     if (API.isDefaultBase()) {
       baseIn.value = "";
       baseIn.placeholder = API.defaultBase();
@@ -167,20 +166,32 @@
     if (API.isDefaultKey()) {
       keyIn.value = "";
       keyIn.placeholder = "using the built-in key";
-      keyHint.innerHTML = 'Editing is <b>already unlocked</b> — this app ships with its write key, so nothing to paste. ' +
-        'Type one here only to override it on this device.';
+      keyHint.innerHTML = 'Editing is <b>already unlocked</b> — this app ships with its write key. Type one here only to override it on this device.';
     } else {
       keyIn.value = API.key();
       keyHint.innerHTML = 'Overridden on this device. Clear the box and Save to go back to the built-in key.';
     }
   }
 
-  document.getElementById("gear").addEventListener("click", function () {
-    paintKey();
-    paintBase();
-    dr.hidden = false;
+  function openSettings() {
+    paintKey(); paintBase();
+    scrim.hidden = false; dr.hidden = false;
+    document.getElementById("gear").setAttribute("aria-expanded", "true");
+  }
+  function closeSettings() {
+    dr.hidden = true; scrim.hidden = true;
+    document.getElementById("gear").setAttribute("aria-expanded", "false");
+  }
+
+  document.getElementById("gear").addEventListener("click", openSettings);
+  document.getElementById("closeCfg").addEventListener("click", closeSettings);
+  // The scrim serves every drawer; only act when Settings is the one that is open, or the
+  // binder's own handler and this one would fight over it.
+  scrim.addEventListener("click", function () { if (!dr.hidden) closeSettings(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !dr.hidden) closeSettings();
   });
-  document.getElementById("closeCfg").addEventListener("click", function () { dr.hidden = true; });
+
   document.getElementById("resetBase").addEventListener("click", function () {
     API.setBase(""); paintBase(); Core.toast("Back to the built-in worker", "good");
   });
@@ -200,38 +211,42 @@
     API.get("/health").then(function (d) {
       lastPing = d; lastError = null;
       out.textContent =
-        "CONNECTED · " + (API.isDefaultKey() ? "built-in write key" : "write key overridden on this device") +
+        "CONNECTED · " + (API.isDefaultKey() ? "built-in write key" : "key overridden on this device") +
         "\n\n" + JSON.stringify(d, null, 2) +
-        "\n\nNOTE: /health is a READ, and reads never need a key — so this passing does not prove" +
-        "\nwrites work. If a save fails with 401, the key here and the one on the worker disagree.";
+        "\n\nNOTE: /health is a READ, and reads never need a key — so this passing does not" +
+        "\nprove writes work. A 401 on a save means the key here and the one on the worker" +
+        "\ndisagree.";
     }).catch(function (e) {
       lastError = e.message || String(e); lastPing = null;
       out.textContent = "FAILED\n\n" + lastError;
     });
   });
 
-  /* Copies a DIAGNOSTIC BUNDLE, not just the JSON. What I need when he pastes is the context
-     the JSON does not carry: version, which worker, whether a key was present, the page, the
-     browser, and the last failure.
+  /* Copies a DIAGNOSTIC BUNDLE, not just the JSON: version, which worker, whether a key is
+     present, the page, the browser, the last failure.
      🔴 NEVER THE KEY ITSELF — only whether one exists and how long it is. This text is built
      to be pasted into a chat, so a credential in here would be a leak with a delivery
-     mechanism attached. Still true with a baked key: the bundle names WHICH key is in play,
-     never the string. */
+     mechanism attached. Still true with a baked key: name WHICH key is in play, never the
+     string. (The built-in one is public anyway, but a diagnostic that pastes credentials into
+     chat logs is a habit that will eventually meet a key that is not.) */
   function bundle() {
     var L = [];
     L.push("INCIARDI COLLECTION — DIAGNOSTICS");
     L.push("generated   " + new Date().toISOString());
     L.push("app         " + APP_VERSION + "  (theme " + APP_THEME + ")");
-    // The RESOLVED theme, read off the DOM — not the constant above. If a vector failed to
-    // apply, resolve.js writes "!slug" into the attribute, so this reports what the page is
-    // actually wearing rather than what it intended to wear.
+    // The RESOLVED theme, read off the DOM — not the constant. If a vector failed to apply,
+    // resolve.js writes "!slug" into the attribute, so this reports what the page is actually
+    // wearing rather than what it intended to wear.
     L.push("theme join  " + (document.documentElement.getAttribute("data-theme-join") || "(not applied)") +
            "  color=" + (document.documentElement.getAttribute("data-theme") || "?") +
            "  mode=" + (document.documentElement.getAttribute("data-mode") || "?"));
     if (window.THEMES && THEMES.faults && THEMES.faults.length) {
       L.push("theme faults " + THEMES.faults.length + ": " + THEMES.faults.join(" | "));
     }
+    L.push("route       " + current());
     L.push("page        " + location.href);
+    L.push("viewport    " + window.innerWidth + "x" + window.innerHeight +
+           " dpr=" + (window.devicePixelRatio || 1));
     L.push("worker      " + API.base() + (API.isDefaultBase() ? "  [built-in default]" : "  [OVERRIDDEN on this device]"));
     L.push("write key   " + (API.isDefaultKey()
       ? "built-in (" + API.key().length + " chars, from core.js)"
@@ -239,19 +254,9 @@
     L.push("browser     " + navigator.userAgent);
     L.push("");
     if (lastAt) L.push("last test   " + lastAt);
-    if (lastError) {
-      L.push("");
-      L.push("LAST FAILURE");
-      L.push(lastError);
-    }
-    if (lastPing) {
-      L.push("");
-      L.push("LAST /health RESPONSE");
-      L.push(JSON.stringify(lastPing, null, 2));
-    }
-    if (!lastAt) {
-      L.push("(Test connection has not been run in this session — no response captured.)");
-    }
+    if (lastError) { L.push(""); L.push("LAST FAILURE"); L.push(lastError); }
+    if (lastPing) { L.push(""); L.push("LAST /health RESPONSE"); L.push(JSON.stringify(lastPing, null, 2)); }
+    if (!lastAt) L.push("(Test connection has not been run in this session — no response captured.)");
     return L.join("\n");
   }
 
@@ -260,8 +265,8 @@
     var out = document.getElementById("pingOut");
     function manual() {
       // navigator.clipboard is absent in some iOS configurations and in non-secure contexts.
-      // A copy button that silently does nothing is worse than no copy button, so fall back
-      // to showing + selecting the text.
+      // A copy button that silently does nothing is worse than no copy button, so fall back to
+      // showing + selecting the text.
       out.hidden = false; out.textContent = txt;
       try {
         var r = document.createRange(); r.selectNodeContents(out);
@@ -282,18 +287,18 @@
      all-clear. v1 fixed it by checking !API.key() instead. v2 baked in a key, which did the
      exact same thing to that check a second time.
 
-     So there is now NO always-true gap to announce, and the honest move is to announce nothing
-     rather than invent a warning to keep the element busy. The one real remaining gap is a
-     key MISMATCH, which cannot be detected from a read (reads are unauthenticated) — it shows
-     up as a 401 on the first save, where core.js names it precisely. Do not "restore" a
-     read-only banner here; there is no read-only state left to report. */
+     So there is NO always-true gap left to announce, and the honest move is to announce
+     nothing rather than invent a warning to keep the element busy. The one real remaining gap
+     is a key MISMATCH, undetectable from a read (reads are unauthenticated) — it surfaces as a
+     401 on the first save, where core.js names it precisely. Do not "restore" a read-only
+     banner here; there is no read-only state left to report. */
   function checkConfig() {
     var b = document.getElementById("banner");
     if (!API.key()) {
       // Only reachable if DEFAULT_KEY is ever emptied in core.js.
       b.hidden = false;
       b.className = "banner warn";
-      b.innerHTML = 'Read-only: no write key available. Open <b>⚙</b> to paste one.';
+      b.innerHTML = 'Read-only: no write key available. Open <b>&#9881;</b> to paste one.';
     } else { b.hidden = true; }
   }
 
@@ -316,6 +321,7 @@
         if (window.App && App.mount) App.mount(route);   // <- the hook the template lacks
       })
       .catch(function (e) {
+        document.body.classList.remove("stage");
         view.innerHTML = '<section class="page"><h1>Page failed to load</h1>' +
           '<p class="muted">' + Core.esc(e.message) + '</p></section>';
       });
