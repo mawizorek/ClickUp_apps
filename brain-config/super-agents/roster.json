@@ -18,6 +18,7 @@
     { "slug": "routine-ricky", "name": "Routine Ricky", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Ricky", "aka": ["Ricky", "Routine"], "home": "super-agents/routine-ricky/", "default_runbook": "TRIAGE (read-only) — reads routines/schedule.md + routines/last-run/*, computes what is DUE, and PROPOSES: 'here's what needs to happen — proceed?' Runs NOTHING until told.", "gate_strength": "auto" },
     { "slug": "clickup-coach-corey", "name": "ClickUp Coach Corey", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Corey", "aka": ["Corey"], "home": "super-agents/clickup-coach-corey/" },
     { "slug": "mainstage-milo", "name": "Mainstage Milo", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Milo", "aka": ["Milo", "Mainstage"], "home": "super-agents/mainstage-milo/" },
+    { "slug": "tutor-tate", "name": "Tutor Tate", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Tate", "aka": ["Tate", "Tutor", "TA"], "home": "super-agents/tutor-tate/" },
     { "slug": "fmp-frank", "name": "FMP Fiona", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Fiona", "aka": ["Fiona", "FMP"], "home": "super-agents/fmp-frank/" },
 
     { "slug": "mimic-mika", "name": "Mimic Mika", "class": "agent", "memory": false, "status": "active", "home": "agents/mimic-mika.md" },
@@ -64,11 +65,12 @@
       "Ricky | Routine": "routine-ricky — bare name = READ-ONLY TRIAGE of routines/ (schedule + last-run stamps), ending in a proposal; it never executes unasked. ⚠️ INVOKE-ONLY — no scheduler exists, nothing wakes. ⚠️ 'Rocky' is a known dictation variant and resolves HERE (fork raised, Michael ruled 'Ricky' 2026-07-26). ⚠️ Also distinct from Renata + Rhys",
       "Corey": "clickup-coach-corey",
       "Milo | Mainstage": "mainstage-milo",
+      "Tate | Tutor | TA": "tutor-tate — course-instruction TA. PEER of Milo: neither reports to the other and the course↔production seam has no owner (ruled 2026-07-30). ⚠️ T is otherwise unused across the roster, so this token is collision-free by design",
       "Fiona | FMP": "fmp-frank — display FMP Fiona; slug immutable. ⚠️ '/session-start=fmp-frank' resolves to HER, never to Fold-in Frank",
       "Frank | Fold-in": "foldin-frank — the anti-sprawl GATE. The FileMaker teammate was renamed precisely so bare 'Frank' lands here",
       "/council=uritp-audit | /uritp-audit | /audit-council": "GROUP → teams/uritp-audit-council.md — seats the URITP audit bench (Core Four: Mira + Anna + Milo + Corey). ⚠️ NOT super-agents/audit-instruction.md, which is the unrelated agent-self-audit procedure"
     },
-    "tombstones": "Anna, Mira, Wes, Maggie, Sage, Clio each have a tombstone at agents/<slug>.md AND a live bundle at super-agents/<slug>/ — always resolve to the super-agents/ home. Fiona and Ricky have NO tombstone: neither was ever a lens."
+    "tombstones": "Anna, Mira, Wes, Maggie, Sage, Clio each have a tombstone at agents/<slug>.md AND a live bundle at super-agents/<slug>/ — always resolve to the super-agents/ home. Fiona, Ricky and Tate have NO tombstone: none of them was ever a lens."
   },
   "pointers": {
     "how_to_BE": "super-agents/_shared/super-agent-base.md",
