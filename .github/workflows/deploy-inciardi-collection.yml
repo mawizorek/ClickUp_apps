@@ -16,21 +16,30 @@
 # ============================================================================
 # 🔍 WHY THIS FILE LOOKS LIKE A DIAGNOSTIC HARNESS RATHER THAN A DEPLOY
 #
-# Runs 1 and 2 both died with "The process '/usr/local/bin/npx' failed with exit code 1",
-# which says nothing. Two separate causes:
+# Three failed runs, and the log tells a story worth keeping:
 #
-#   a) cloudflare/wrangler-action swallows wrangler's real error and reports its own exit
-#      code instead (cloudflare/wrangler-action#360). So the actual message only ever
-#      existed in the raw log. → THE ACTION IS GONE. We call wrangler directly and the
-#      error is ours to capture.
+#   RUN 1+2 — "The process '/usr/local/bin/npx' failed with exit code 1". Says nothing.
+#     cloudflare/wrangler-action swallows wrangler's real error and reports its own exit
+#     code (cloudflare/wrangler-action#360). → THE ACTION IS GONE; wrangler runs directly
+#     so the error is ours to capture.
 #
-#   b) My run-2 "fix" echoed diagnostics to stdout — but the mobile annotation panel only
-#      renders ::error:: and failed actions, and `continue-on-error` suppressed even those.
-#      So run 2 looked identical to run 1 and told him nothing. → EVERYTHING NOW WRITES TO
-#      $GITHUB_STEP_SUMMARY, which renders as a page you can read on a phone.
+#   RUN 2's "fix" — echoed diagnostics to stdout, which the mobile annotation panel does not
+#     render, and `continue-on-error` suppressed even the failures. Run 2 looked identical to
+#     run 1. → EVERYTHING WRITES TO $GITHUB_STEP_SUMMARY, which renders on a phone.
+#     Rule: a diagnostic that reports somewhere the reader cannot see is not a diagnostic.
 #
-# Rule this file now follows: a diagnostic that reports somewhere the reader cannot see is
-# not a diagnostic.
+#   RUN 3 — the real cause, at last: a 50-character CLOUDFLARE_ACCOUNT_ID. An account id is
+#     EXACTLY 32 hex characters, so the deploy called
+#     /accounts/<garbage>/workers/services/... and Cloudflare answered 7003 "perhaps your
+#     object identifier is invalid" + 7000 "no route for that URI".
+#
+#     🔴 AND BOTH PREFLIGHTS PASSED, because neither one CAN catch this:
+#        `whoami` does not use the account id — it asks the token which accounts it can see.
+#        `deploy --dry-run` never contacts the account at all.
+#     Two green checks sat directly above the failing call and were structurally incapable of
+#     detecting the fault. Worse: the secrets step PRINTED "50 chars" and carried a comment
+#     saying 32 was expected. The evidence was emitted and not acted on.
+#     → Rule: AN OBSERVATION IS NOT A CHECK. If a shape is known, assert it.
 # ============================================================================
 
 name: Deploy inciardi-collection worker
@@ -59,37 +68,57 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      # NOTE: no version pin. The previous commit pinned "4.28.1" — a number I invented and
-      # never verified. If that version does not exist, `npx wrangler@4.28.1` fails instantly
-      # with exit code 1, which is exactly the symptom being debugged, so the pin may have
-      # been a second cause stacked on the first. `wrangler@4` tracks the current major
-      # without asserting a specific release exists.
+      # No version pin. An earlier commit pinned "4.28.1", a number I invented and never
+      # verified — and a nonexistent version fails with exit code 1, the same symptom being
+      # debugged. `wrangler@4` tracks the major without asserting a release exists.
       WR: "npx --yes wrangler@4"
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Preflight · secrets present?
+      # 🔴 SHAPE ASSERTIONS, not observations. Run 3 died because a malformed account id was
+      # printed and waved through. Values are never echoed — only lengths and a regex verdict.
+      - name: Preflight · are the credentials the right SHAPE?
         run: |
-          {
-            echo "## Preflight"
-            echo ""
-          } >> "$GITHUB_STEP_SUMMARY"
+          echo "## Preflight" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
           FAIL=0
-          # Lengths only, never values. A ~40-char token and a 32-char hex account id are the
-          # expected shapes; wildly different lengths usually mean the two got swapped.
+
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
             echo "::error::CLOUDFLARE_API_TOKEN is empty or missing."
-            echo "- ❌ \`CLOUDFLARE_API_TOKEN\` **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+            echo "- ❌ token **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
           else
             echo "- ✅ token present (${#CLOUDFLARE_API_TOKEN} chars)" >> "$GITHUB_STEP_SUMMARY"
           fi
+
           if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
             echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or missing."
-            echo "- ❌ \`CLOUDFLARE_ACCOUNT_ID\` **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+            echo "- ❌ account id **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+          elif ! printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | grep -qiE '^[0-9a-f]{32}$'; then
+            # THE CHECK THAT SHOULD HAVE EXISTED ON RUN 1. A wrong-shaped id produces a
+            # confusing 7003/7000 routing error from a URL path, minutes later, with no hint
+            # that the id is the problem.
+            echo "::error::CLOUDFLARE_ACCOUNT_ID is not a valid account id (${#CLOUDFLARE_ACCOUNT_ID} chars; must be exactly 32 hex). Find it at dash.cloudflare.com — Workers & Pages, right sidebar, 'Account ID'. It is NOT your email, your zone id, or the D1 database id."
+            {
+              echo "- ❌ account id is **${#CLOUDFLARE_ACCOUNT_ID} chars — must be exactly 32 hex characters**"
+              echo ""
+              echo "  Fix: **dash.cloudflare.com → Workers & Pages → right sidebar → Account ID** (copy button)."
+              echo "  It is not your email, not a zone id, and not the D1 database id."
+              echo "  Re-save it at Settings → Secrets and variables → Actions → \`CLOUDFLARE_ACCOUNT_ID\`."
+            } >> "$GITHUB_STEP_SUMMARY"
+            FAIL=1
           else
-            echo "- ✅ account id present (${#CLOUDFLARE_ACCOUNT_ID} chars)" >> "$GITHUB_STEP_SUMMARY"
+            echo "- ✅ account id present and correctly shaped (32 hex)" >> "$GITHUB_STEP_SUMMARY"
           fi
+
+          # The common version of this mistake is pasting the two values into each other's
+          # boxes, which leaves a 32-hex "token" and a long "account id".
+          if printf '%s' "$CLOUDFLARE_API_TOKEN" | grep -qiE '^[0-9a-f]{32}$'; then
+            echo "::error::CLOUDFLARE_API_TOKEN looks like an account id (32 hex). The two values may have been swapped."
+            echo "- ⚠️ token looks like an **account id** — check the two secrets are not swapped" >> "$GITHUB_STEP_SUMMARY"
+            FAIL=1
+          fi
+
           exit $FAIL
 
       - name: Resolve the D1 database id
@@ -116,14 +145,10 @@ jobs:
             exit 1
           fi
 
-      # THE DIAGNOSTIC THAT MATTERS. `whoami` prints the token's permission table — the only
-      # thing that separates "bad token" from "token missing a scope" from "config is wrong."
-      # Leading suspect: deploying a worker WITH a D1 binding needs D1 edit permission, and
-      # the Edit-Cloudflare-Workers template has not reliably included it. A dry-run never
-      # touches the account, so it would pass while the real deploy 403s.
-      #
-      # Reports, never blocks — but the output goes somewhere readable this time.
-      - name: Preflight · whoami (token permissions)
+      # ⚠️ KEPT, BUT KNOW WHAT IT IS WORTH: `whoami` passes with a garbage account id, because
+      # it asks the TOKEN which accounts it can see and never uses CLOUDFLARE_ACCOUNT_ID. It
+      # proves the token is real. It proves nothing about the account. Run 3 is the proof.
+      - name: Preflight · whoami (proves the TOKEN only)
         run: |
           set +e
           $WR whoami > who.txt 2>&1
@@ -131,6 +156,7 @@ jobs:
           {
             echo ""
             echo "## \`wrangler whoami\` — exit $RC"
+            echo "_Proves the token is valid. Does NOT check the account id — it isn't used here._"
             echo ""
             echo '```'
             cat who.txt
@@ -141,9 +167,9 @@ jobs:
           fi
           exit 0
 
-      # Validates wrangler.toml, the entrypoint and every binding WITHOUT touching the
-      # account. A config error surfaces HERE with a real message.
-      - name: Preflight · dry-run build
+      # ⚠️ Same caveat: a dry-run never contacts the account. It validates wrangler.toml, the
+      # entrypoint and the bindings locally. Green here says nothing about credentials.
+      - name: Preflight · dry-run build (local only, no account contact)
         run: |
           set +e
           $WR deploy --dry-run > dry.txt 2>&1
@@ -151,18 +177,19 @@ jobs:
           {
             echo ""
             echo "## \`deploy --dry-run\` — exit $RC"
+            echo "_Local build + binding check. Never contacts your account._"
             echo ""
             echo '```'
             tail -40 dry.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ $RC -ne 0 ]; then
-            echo "::error::The config does not build. This is not an auth problem. See the run summary."
+            echo "::error::The config does not build. Not an auth problem. See the run summary."
           fi
           exit 0
 
       # THE DEPLOY, run directly. No wrapper, so wrangler's real error is ours to surface:
-      # tee'd into the summary AND pushed into an annotation.
+      # written to the summary AND pushed into an annotation.
       - name: Deploy
         run: |
           set +e
@@ -178,7 +205,9 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           cat out.txt
           if [ $RC -ne 0 ]; then
-            # First real error line into the annotation panel, which is what shows on mobile.
+            if grep -q '7003\|7000' out.txt; then
+              echo "::error::Cloudflare could not route the request — that is almost always a malformed CLOUDFLARE_ACCOUNT_ID (must be exactly 32 hex characters)."
+            fi
             MSG=$(grep -m1 -E 'ERROR|error|Error' out.txt | head -c 400)
             echo "::error::wrangler deploy failed: ${MSG:-see the run summary}"
             exit $RC
