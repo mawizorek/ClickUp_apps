@@ -2,6 +2,33 @@
 
 **One worked month of one borrower's activity, as importable TSV.** March 2026. Import it and the relationship graph populates with real joins.
 
+---
+
+## 🚨 THIS REPO IS PUBLIC. NO REAL IDENTIFIERS IN THIS FOLDER. EVER.
+
+Every name, address, account, handle and reference number here is **invented**. That is not a courtesy, it is the condition under which loan-servicing fixtures are allowed to exist in `mawizorek/ClickUp_apps` at all — the repo's own access standard says the soft-lock is *"only acceptable because these apps carry NO personal/sensitive info,"* and that constraint is load-bearing.
+
+<br/>
+
+⚠️ **This rule exists because it was broken on the first commit, 2026-07-29.** `PaymentInstructions.tsv` shipped with a **real payee name and a real Venmo handle**, copied out of a ClickUp doc while building the fixture. Scrubbed to `LENDER NAME` / `@lender-handle` the same day.
+
+**The instance was mild. The pattern was not.** The ClickUp source those two fields came from *also* holds a bank routing number and account number, sitting two lines below what got copied. Nothing stopped the next person filling this file in more completely from pasting the wire block too — and **git history is permanent**, so a secret committed once stays committed unless the history is rewritten.
+
+<br/>
+
+**The rule, so it is checkable rather than a vibe:**
+
+- Payees are `LENDER NAME`, borrowers are `BORROWER ORG`. Never a person.
+- Addresses are invented streets. `1420 Elm St` is not a real property.
+- No account numbers, routing numbers, wire instructions, handles, or check numbers that exist.
+- **Real payment instructions live in FileMaker as a record, and in ClickUp behind workspace access. They do not live in a fixture.** That is the RECORDS-vs-SOURCE line doing its job.
+
+<br/>
+
+⚠️ **Not fixed by the scrub:** the original values remain in this repo's git history at commit `eb63e88`. Rewriting history is Michael's call and it is not worth it for a name and a handle — but it is the reason the rule is stated up front rather than learned again.
+
+---
+
 ## Why one month beats nine table samples
 
 Nine isolated sample files prove nothing — any nine files look plausible alone. These files **share the same primary keys**, so they can only join if the keys, the grain AND the parentage are all correct.
@@ -74,13 +101,14 @@ It fails *quietly*: all rows import, no errors, and the portals just come up emp
 
 ---
 
-## The cast
+## The cast (all invented)
 
 - **One borrower** — `ORG-001`, who owns both properties. Realistic for private lending and it is what makes the two-loan check possible.
-- **Two properties** — `PROP-001` (1420 Elm St) and `PROP-002` (88 Ridge Rd).
+- **Two properties** — `PROP-001` (1420 Elm St) and `PROP-002` (88 Ridge Rd). Invented streets.
 - **Three loans** — `LOAN-001` and `LOAN-003` both against Elm St; `LOAN-002` against Ridge Rd. `LOAN-003` pays off mid-month.
 - **Four receipts** — a two-loan check, a short Venmo, a payoff wire, and one mystery check.
 
 ## Changelog
 
-- 2026-07-29: Created. Designed in a full audit → 9-lens Workshop → re-audit loop. The one-month-not-nine-samples shape is Clever Cleo's; the six kill-rows are Breaker Beckett's; the key-override trap is Feasible Finn's catch.
+- **2026-07-29** — Created. Designed in a full audit → 9-lens Workshop → re-audit loop. The one-month-not-nine-samples shape is Clever Cleo's; the six kill-rows are Breaker Beckett's; the key-override trap is Feasible Finn's catch.
+- **2026-07-29 (later)** — Real payee name + handle scrubbed from `PaymentInstructions.tsv`; the no-real-identifiers rule written in at the top.
