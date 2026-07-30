@@ -1,22 +1,24 @@
 <!doctype html>
-<!-- Inciardi Collection — v6. Router shell + pages/ partials. Pages-hosted, not file:// capable.
+<!-- Inciardi Collection — v7. Router shell + pages/ partials. Pages-hosted, not file:// capable.
      Shape derived from template-app (gold standard v5), NOT from the predecessor.
 
      ONE DELIBERATE ADDITION vs the template: the template's router injects partials with
      innerHTML, which does not execute inline <script>. So after injecting we call
-     App.mount(route). Without that hook every page here would be inert markup.
+     App.mount(route, params). Without that hook every page here would be inert markup.
 
-     v2 · write key baked into core.js (Michael's call) — every banner and every line of copy
-          in this file changed with it.
+     v2 · write key baked into core.js (Michael's call).
      v3 · Mercedes palette. Three pointers, zero CSS: styles.css has no colour literals.
      v4 · sheet menu (reorder + rename); shoe-box counts spares.
-     v5 · DESIGN PASS. The binder is a bounded object, not a scroll — see styles.css. Two
-          fixes live in THIS file: the header no longer wraps on a phone, and there is ONE
-          shared scrim at body level so every drawer (including Settings) dims the page and
-          dismisses on a tap away.
-     v6 · FRONT / BACK instead of A / B, and one arrow press turns one face straight through
-          the binder. Labels only — `slot.side` is still CHECK (side IN ('A','B')) and app.js
-          holds the single mapping. See the vocabulary block at the top of app.js. -->
+     v5 · DESIGN PASS. The binder is a bounded object, not a scroll. Header stopped wrapping;
+          one shared scrim at body level.
+     v6 · FRONT / BACK instead of A / B; one arrow press turns one face through the binder.
+     v7 · SUMMARY. The whole collection as a matrix, with drill-in and deep links, plus
+          hash PARAMS so `#binder?sheet=x&side=B` is a real address.
+
+     🔴 SOURCE SIZE. app.js is 32KB and styles.css is 30KB, both at or past the ~30KB read cap
+     this repo works under (~22KB target). Summary therefore shipped as its OWN summary.js +
+     summary.css rather than growing either. That pattern is the fix, not the workaround: the
+     next touch should pull binder and enter out of app.js the same way. -->
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -29,7 +31,8 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=6">
+<link rel="stylesheet" href="./styles.css?v=7">
+<link rel="stylesheet" href="./summary.css?v=7">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -80,12 +83,13 @@
 <noscript>This app needs JavaScript enabled.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./core.js?v=6"></script>
-<script src="./app.js?v=6"></script>
+<script src="./core.js?v=7"></script>
+<script src="./app.js?v=7"></script>
+<script src="./summary.js?v=7"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
-  var APP_VERSION = "v6";
+  var APP_VERSION = "v7";
 
   /* ==== THEME ====
      `soft-mercedes` is a JOIN in shared/themes/_themes.json: color `mercedes` + typography
@@ -98,21 +102,24 @@
      takes a COLOR slug, because themes.css ships a static [data-theme="mercedes"] block for
      the pre-JS first paint. Two vocabularies, one word apart.
 
-     🗑️ REMOVED IN v3 — the `ic_color` override. This file used to read an `ic_color` value
-     from localStorage twice: inline in <head> for first paint, and again AFTER applyTheme()
-     to re-apply that colour on top of the resolved theme. Nothing in this app ever wrote it;
-     there is no colour picker. Its only reachable effect was a hand-set value silently
-     overriding the palette, making a correct theme change look like it never shipped — the
-     same disease as a banner that cannot fire. If a picker is wanted, `on-track` has the
-     reference implementation (a passive menu off THEMES.listThemes()) — build it with a
-     visible readout of the active theme, not a bare localStorage read. */
+     🗑️ REMOVED IN v3 — the `ic_color` override, read from localStorage twice and never
+     written by anything in this app. Its only reachable effect was a hand-set value silently
+     overriding the palette, making a correct theme change look like it never shipped. If a
+     picker is wanted, `on-track` has the reference implementation (a passive menu off
+     THEMES.listThemes()) — build it with a visible readout of the active theme. */
   var APP_THEME = "soft-mercedes";
   var DEFAULT_COLOR = "mercedes";   // pre-paint / no-JS floor, must match the join's colour
   var DEFAULT_PAGE  = "binder";
+  /* ⚠️ FOUR ITEMS IS THE CEILING for this header on a phone. Brand + nav + gear is ~355px at
+     390px wide with these labels; a fifth item, or a longer label than "Shoe-box", overflows
+     and the nav wraps to a second line (which is exactly the v5 bug). Labels match their page
+     titles on purpose — a nav that says "Box" leading to a page titled "Shoe-box" makes the
+     user check whether they went somewhere else. Next screen goes behind a menu, not up here. */
   var NAV = [
     { route: "binder",  label: "Binder" },
     { route: "enter",   label: "Enter" },
-    { route: "shoebox", label: "Shoe-box" }
+    { route: "shoebox", label: "Shoe-box" },
+    { route: "summary", label: "Summary" }
   ];
   /* ======================= */
 
@@ -197,7 +204,7 @@
     API.setBase(baseIn.value.trim());     // blank = fall back to the default
     API.setKey(keyIn.value.trim());       // blank = fall back to the built-in key
     Core.toast("Saved on this device", "good");
-    paintKey(); paintBase(); checkConfig(); render(current());
+    paintKey(); paintBase(); checkConfig(); go();
   });
 
   /* RAW JSON, verbatim — Michael pastes it, so the machine output is the point. The verdict
@@ -221,7 +228,7 @@
   });
 
   /* Copies a DIAGNOSTIC BUNDLE, not just the JSON: version, which worker, whether a key is
-     present, the page, the browser, the last failure.
+     present, the route, the viewport, the browser, the last failure.
      🔴 NEVER THE KEY ITSELF — only whether one exists and how long it is. This text is built
      to be pasted into a chat, so a credential in here would be a leak with a delivery
      mechanism attached. Still true with a baked key: name WHICH key is in play, never the
@@ -241,8 +248,7 @@
     if (window.THEMES && THEMES.faults && THEMES.faults.length) {
       L.push("theme faults " + THEMES.faults.length + ": " + THEMES.faults.join(" | "));
     }
-    L.push("route       " + current());
-    L.push("page        " + location.href);
+    L.push("hash        " + (location.hash || "(none)"));
     L.push("viewport    " + window.innerWidth + "x" + window.innerHeight +
            " dpr=" + (window.devicePixelRatio || 1));
     L.push("worker      " + API.base() + (API.isDefaultBase() ? "  [built-in default]" : "  [OVERRIDDEN on this device]"));
@@ -300,23 +306,52 @@
     } else { b.hidden = true; }
   }
 
-  /* ---- router: hash -> pages/<route>.html, then MOUNT it ---- */
+  /* ---- router: hash -> pages/<route>.html, then MOUNT it ----
+
+     NEW IN v7: the hash carries PARAMS. `#binder?sheet=sheet-1&side=B` opens the binder on
+     that sheet's back, which is what every link in the Summary matrix points at. Parsed here
+     rather than in app.js so there is one place that knows the address format.
+
+     Hash params, not a path (`#binder/sheet-1/B`): a query string is order-independent and
+     tolerates a missing value, so an old link with only `?sheet=` still works. A positional
+     path would break the moment a third parameter was added. */
   var view = document.getElementById("view");
   var routes = NAV.map(function (n) { return n.route; });
+
+  function parse() {
+    var h = (location.hash || "").replace(/^#/, "");
+    var q = h.indexOf("?");
+    var route = (q < 0 ? h : h.slice(0, q)) || DEFAULT_PAGE;
+    var params = {};
+    if (q >= 0) {
+      h.slice(q + 1).split("&").forEach(function (kv) {
+        if (!kv) return;
+        var i = kv.indexOf("=");
+        if (i < 1) return;
+        try {
+          params[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1));
+        } catch (e) { /* a malformed escape is not worth breaking navigation over */ }
+      });
+    }
+    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
+    return { route: route, params: params };
+  }
+
   function setActive(route) {
     [].forEach.call(nav.querySelectorAll("a"), function (a) {
       a.classList.toggle("on", a.getAttribute("data-route") === route);
     });
   }
-  function render(route) {
-    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
-    fetch("./pages/" + route + ".html", { cache: "no-store" })
+
+  function go() {
+    var at = parse();
+    fetch("./pages/" + at.route + ".html", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
       .then(function (html) {
         view.innerHTML = html;
-        setActive(route);
+        setActive(at.route);
         window.scrollTo(0, 0);
-        if (window.App && App.mount) App.mount(route);   // <- the hook the template lacks
+        if (window.App && App.mount) App.mount(at.route, at.params);   // the hook the template lacks
       })
       .catch(function (e) {
         document.body.classList.remove("stage");
@@ -324,12 +359,11 @@
           '<p class="muted">' + Core.esc(e.message) + '</p></section>';
       });
   }
-  function current() { return (location.hash || "").replace(/^#/, "") || DEFAULT_PAGE; }
-  window.addEventListener("hashchange", function () { render(current()); });
+  window.addEventListener("hashchange", go);
 
-  window.ICApp = { version: APP_VERSION, render: render, current: current };
+  window.ICApp = { version: APP_VERSION, go: go, parse: parse };
   checkConfig();
-  render(current());
+  go();
 })();
 </script>
 </body>

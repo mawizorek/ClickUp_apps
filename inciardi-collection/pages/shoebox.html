@@ -1,16 +1,20 @@
 <section class="page">
   <h1>Shoe-box</h1>
-  <p class="sub">Prints you own that aren't in the binder — either not at all, or not all of them.</p>
+  <p class="sub">Prints you own with no place in the binder yet.</p>
 
   <div id="boxWrap"></div>
 
-  <!-- The old caveat here said "own six and place one, and it drops off this list." That was
-       true until 2026-07-30 and is now fixed, so the note had to go rather than sit there
-       describing a limitation the app no longer has. -->
+  <!-- The caveat that used to live here ("own six and place one, and it drops off this list")
+       described a real limitation until 2026-07-30. It is fixed, so the note is gone rather
+       than left describing behaviour the app no longer has.
+
+       The page also used to show unhoused AND spares stacked together, because nothing else
+       could tell you the binder/box split. Summary now owns that arithmetic, so this went back
+       to one question. Spares stay reachable on the second chip: they ARE in the box, and
+       hiding them would make this page quietly disagree with the matrix. -->
   <p class="hint" style="margin-top:1.5rem">
-    Nothing on this page is stored — it's worked out from what you own minus what's placed, so it
-    can't drift from your collection. <b>Spares</b> are arithmetic, not a ledger: the app knows you
-    own six and one is on a sheet, so five are in the box. It does <em>not</em> track <em>which</em>
-    copy is where, and it doesn't need to.
+    Nothing here is stored — it's worked out from what you own minus what's placed, so it can't
+    drift from your collection. For the full picture of the binder versus the box, and which
+    sheets each print sits on, see <a href="#summary">Summary</a>.
   </p>
 </section>

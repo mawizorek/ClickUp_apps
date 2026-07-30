@@ -1,14 +1,20 @@
 /* Inciardi Collection — page mounts.
  *
  * The router injects pages/<route>.html with innerHTML, which does not run inline scripts,
- * so each page's behaviour lives here and is attached by App.mount(route).
+ * so each page's behaviour lives here and is attached by App.mount(route, params).
  *
  * TWO RULES THIS FILE FOLLOWS THROUGHOUT:
- *   1. NO OPTIMISTIC UI. Every write waits for the server, then re-reads. The entire point
- *      of this rebuild is that the screen never claims something the database has not
- *      confirmed. A slot that looks filled because we hoped it worked is the old app.
- *   2. Every count that means "how many do I own" comes from the server's v_owned
- *      (SUM(qty)), never from a length or a COUNT(*) computed here.
+ *   1. NO OPTIMISTIC UI. Every write waits for the server, then re-reads. The screen never
+ *      claims something the database has not confirmed.
+ *   2. Every count that means "how many do I own" comes from the server (v_owned, SUM(qty)),
+ *      never from a length or a COUNT(*) computed here.
+ *
+ * 🔴 THIS FILE IS OVER THE READ CAP — 32KB against a ~30KB hard limit, ~22KB target (GitHub
+ * MCP Operating Standard). A file that cannot be read back whole cannot be safely edited. The
+ * Summary screen was built as its own `summary.js` for exactly this reason, which stopped the
+ * growth but did not fix the debt. NEXT TOUCH: split the binder stage into `binder.js` and the
+ * enter form into `enter.js`, same `window.X.mount()` pattern summary.js uses, leaving this as
+ * a thin router-side dispatcher. Do not add a fifth screen here.
  *
  * ============================================================================
  * VOCABULARY — FRONT / BACK IN THE UI, 'A' / 'B' IN THE DATA. Michael, 2026-07-30.
@@ -17,11 +23,9 @@
  * has. Every value that crosses the wire or lands in a row is still 'A' or 'B':
  *   - `slot.side` carries CHECK (side IN ('A','B')) — a 'FRONT' would be an unwriteable row.
  *   - `v_binder_spread` computes side_index from CASE sd.side WHEN 'A'.
- *   - Six rows already exist keyed on 'A'/'B'.
- * So this is a DISPLAY MAPPING and nothing else. `FACE_LABEL` below is the only place the
- * two vocabularies meet. Do not "finish the rename" by pushing it into the schema: renaming
- * a CHECK constraint's domain means rewriting every row, every view, and the composite FK
- * path, to change a word nobody sees.
+ * So this is a DISPLAY MAPPING and nothing else. `FACE_LABEL` is the only place the two
+ * vocabularies meet. Do not "finish the rename" into the schema: it would mean rewriting every
+ * row, two views and the composite FK path, to change a word nobody sees.
  * ============================================================================ */
 (function () {
   var state = { sheets: [], sheetId: null, artworks: [], side: 'A', slots: [] };
@@ -104,13 +108,9 @@
     return API.get('/artworks').then(function (d) { state.artworks = d.artworks || []; return state.artworks; });
   }
 
-  /* ONE CARD.
-   *
-   * The v4 card stacked a 4:5 plate, then the name, then two monospace lines. Three across a
-   * 390px phone made each card ~230px tall, so a side was ~700px and nine cards could never
-   * be on screen together. The caption now sits ON the plate as a band: same information,
-   * roughly half the height, and it is the layout that lets a whole side fit the frame.
-   */
+  /* ONE CARD. The v4 card stacked a 4:5 plate, then the name, then two mono lines — ~230px
+   * tall, so nine could never share a screen. The caption now sits ON the plate as a band:
+   * same information, half the height, and that is what lets a whole face fit the frame. */
   function slotCell(side, pos, row) {
     var base = 'data-side="' + side + '" data-pos="' + pos + '"';
     var where = FACE_LABEL[side].toLowerCase() + ', slot ' + (pos + 1);
@@ -130,14 +130,12 @@
     }
 
     /* 🔴 own N · placed M — the locked legibility rule, implemented differently, NOT relaxed.
-     * schema.binder.sql permits one artwork in several slots, on the stated condition that a
-     * card can never read as owning more than you do. v4 met that by printing the string on
-     * every card, which made diagnostics the loudest thing on a nine-card grid.
-     * Here the exact string appears whenever the numbers could mislead — any card where
-     * qty_owned is not 1 or placed_count is not 1 — and the ordinary case says nothing,
-     * because a solid card in a slot already means "owned, and it is here."
-     * `wanted` gets the word instead of "own 0 · placed 1", which is the same fact stated
-     * better: you own none of it. */
+     * The schema permits one artwork in several slots on the condition that a card can never
+     * read as owning more than you do. v4 met that by printing the string on every card, which
+     * made diagnostics the loudest thing on the grid. Here the exact string appears whenever
+     * the numbers could mislead — qty_owned not 1, or placed_count not 1 — and the ordinary
+     * case says nothing, because a solid card in a slot already means "owned, and it is here."
+     * `wanted` gets the word instead of "own 0 · placed 1": same fact, stated better. */
     var sub = '';
     if (row.state === 'wanted') {
       sub = 'wanted';
@@ -145,8 +143,8 @@
       sub = 'own ' + row.qty_owned + ' · placed ' + row.placed_count;
     }
 
-    // Only a real, non-implicit label ever renders as a badge. An implicit edition must never
-    // show as "#1" (Q1).
+    // Only a real, non-implicit label renders as a badge. An implicit edition must never show
+    // as "#1" (Q1).
     var ed = (row.edition_label && !row.edition_implicit)
       ? '<span class="ed">' + Core.esc(row.edition_label) + '</span>' : '';
 
@@ -179,8 +177,7 @@
       var cells = '';
       for (var p = 0; p < 9; p++) cells += slotCell(side, p, byKey[side + p]);
 
-      // The side's own tally, stated compactly. Zeroes are omitted rather than printed as
-      // "0 wanted", which is noise dressed as information.
+      // Zeroes are omitted rather than printed as "0 wanted", which is noise dressed as data.
       var bits = [];
       if (owned) bits.push(owned + ' owned');
       if (want) bits.push(want + ' wanted');
@@ -226,37 +223,25 @@
     if (f) f.textContent = cur ? cur.slots_used + '/18' : '';
     if (m) m.style.width = cur ? Math.round(cur.slots_used / 18 * 100) + '%' : '0';
     /* Position is 1-BASED FOR READING ONLY. Stored sheet_order is 0-based and a sheet_id can
-     * say anything — `mini-binder-s1` is the SECOND sheet, because ids were minted from the
-     * 0-based order and are permanent. Never show an id as a position. */
+     * say anything — `mini-binder-s1` is the SECOND sheet. Never show an id as a position. */
     if (w) w.textContent = n ? 'sheet ' + (i + 1) + ' of ' + n : '';
 
-    /* The step buttons now say whether there is ANY face left in that direction, not whether
-     * there is another SHEET. On sheet 1 front, ‹ is dead; on sheet 1 back it steps back to
-     * the front. Matching the arrow keys matters more than matching their own icons: a
-     * control that is disabled while the equivalent keystroke still works is a lie. */
+    /* The step buttons report whether there is ANY face left in that direction, not another
+     * SHEET. A control that greys out while the equivalent keystroke still works is a lie. */
     if (p) p.disabled = !canStep(-1);
     if (nx) nx.disabled = !canStep(1);
   }
 
   /* ---------------------------------------------------- traversal
-   * THE BINDER IS ONE SEQUENCE OF FACES, not sheets-with-a-toggle. Michael: "arrow keys
-   * should cycle through a/b as well."
-   *
-   * The v5 keys were ArrowLeft = front, ArrowRight = back — two absolute jumps that did
-   * nothing once you were already on that face, and could never leave the sheet. Reading a
-   * binder is not like that: you turn one face at a time and eventually you are on the next
-   * sheet without having thought about it.
-   *
-   * So one press = one face, and it flows over the sheet boundary:
+   * THE BINDER IS ONE SEQUENCE OF FACES, not sheets-with-a-toggle. One press = one face,
+   * flowing over the sheet boundary:
    *     sheet 1 front → sheet 1 back → sheet 2 front → sheet 2 back → …
    * which is exactly `v_binder_spread.side_index`, the page order the database already
    * derives. Nothing new is stored; this walks the sequence that was always there.
    *
    * Stepping BACKWARD into a previous sheet lands on its BACK, because that is the face you
-   * would physically see. Only the first and last faces in the whole binder are dead ends,
-   * and no wrap-around: silently looping from the last face to the first would make "where am
-   * I" unanswerable without reading the position line every time.
-   */
+   * would physically see. No wrap-around: silently looping from the last face to the first
+   * would make "where am I" unanswerable without reading the position line every time. */
   function canStep(dir) {
     var i = sheetIndex();
     if (i < 0) return false;
@@ -283,8 +268,8 @@
   }
 
   /* Inline picker, deliberately NOT a modal dialog. It does BOTH jobs from one control:
-   * choose a known artwork, or type a new name and get artwork + edition + placement in
-   * one gesture. That is J2 ruling 4 — a slot card IS the entry surface. */
+   * choose a known artwork, or type a new name and get artwork + edition + placement in one
+   * gesture. That is J2 ruling 4 — a slot card IS the entry surface. */
   function openPicker(side, pos, slotId) {
     var host = document.getElementById('pickWrap');
     openDrawer(host);
@@ -368,9 +353,7 @@
       });
   }
 
-  /* ---------------------------------------------------- drawers + scrim
-   * v4 had no scrim, so a drawer floated over a fully live page with no signal that it was
-   * modal and no way to dismiss by tapping away. */
+  /* ---------------------------------------------------- drawers + scrim */
   function openDrawer(el) {
     closeDrawers(true);
     var s = document.getElementById('scrim');
@@ -391,15 +374,13 @@
   }
 
   /* ==================================================== THE SHEET MENU
-   * A dropdown could only ever answer "which sheet am I looking at". Arranging the binder is
-   * a different verb and had nowhere to live; this panel is that home.
+   * A dropdown could only ever answer "which sheet am I looking at". Arranging the binder is a
+   * different verb and had nowhere to live; this panel is that home.
    *
-   * SHEET stays the canonical word for the thing that physically moves (Q11). PAGE — one
-   * face, numbered from sheet order plus front/back — is deliberately not built: moving a
-   * SHEET is one integer per row and zero slots touched, while moving a PAGE means re-seating
-   * nine prints. `v_binder_spread.side_index` already derives the sequence, which is also
-   * what the arrow traversal above walks.
-   */
+   * SHEET stays the canonical word for the thing that physically moves (Q11). PAGE — one face,
+   * numbered from sheet order plus front/back — is deliberately not built: moving a SHEET is
+   * one integer per row and zero slots touched, while moving a PAGE means re-seating nine
+   * prints. `v_binder_spread.side_index` already derives the sequence the arrows walk. */
   var menuBusy = false;
 
   function reloadSheets() {
@@ -473,10 +454,10 @@
     document.getElementById('sm_new').addEventListener('click', addSheet);
   }
 
-  /* One press = one server write = one re-read. Deliberately NOT a local shuffle with a
-   * "save order" button: a list reordered on screen while holding an unsaved order is the
-   * screen asserting something the database has not agreed to, which is rule 1 at the top of
-   * this file. Buttons disable in flight so rapid taps cannot race into a scrambled binder. */
+  /* One press = one server write = one re-read. NOT a local shuffle with a "save order"
+   * button: a list reordered on screen while holding an unsaved order is the screen asserting
+   * something the database has not agreed to. Buttons disable in flight so rapid taps cannot
+   * race into a scrambled binder. */
   function moveSheet(i, dir) {
     if (menuBusy) return;
     var j = i + dir;
@@ -520,7 +501,10 @@
       .then(function () { setMenuBusy(false); });
   }
 
-  function mountBinder() {
+  /* params: { sheet, side } from a deep link like #binder?sheet=sheet-1&side=B, which is what
+   * the Summary matrix links to. An unknown sheet id falls through to the first sheet rather
+   * than erroring — a stale bookmark should open the binder, not a dead end. */
+  function mountBinder(params) {
     var stage = document.getElementById('stage');
 
     document.getElementById('sheetMenuBtn').addEventListener('click', function () {
@@ -546,11 +530,9 @@
     document.getElementById('prevSheet').addEventListener('click', function () { stepFace(-1); });
     document.getElementById('nextSheet').addEventListener('click', function () { stepFace(1); });
 
-    /* SWIPE TO TURN. The gesture the object implies — and the reason the stage is bounded
-     * rather than scrollable: with no vertical scroll to compete with, a horizontal drag is
-     * unambiguous. Threshold 45px and the horizontal delta must beat the vertical, so a
-     * scroll attempt inside a drawer is never read as a turn. Swipe walks the same face
-     * sequence as the keys and the buttons; three inputs, one model. */
+    /* SWIPE TO TURN. The payoff of a bounded stage: with no vertical scroll competing, a
+     * horizontal drag is unambiguous. 45px threshold and the horizontal delta must beat the
+     * vertical. Swipe walks the same face sequence as the keys and the buttons. */
     var sx = 0, sy = 0, tracking = false;
     stage.addEventListener('touchstart', function (e) {
       if (e.touches.length !== 1) { tracking = false; return; }
@@ -574,7 +556,11 @@
           'Open the sheet menu above and <b>Add sheet</b> to start the binder.</div>';
         return;
       }
-      setSide('A');
+      var want = params && params.sheet;
+      if (want && state.sheets.some(function (s) { return s.sheet_id === want; })) {
+        state.sheetId = want;
+      }
+      setSide(params && params.side === 'B' ? 'B' : 'A');
       refreshSlots();
     }).catch(function (e) { Core.fail(stage, e); });
   }
@@ -591,20 +577,27 @@
     if (/^(INPUT|SELECT|TEXTAREA)$/.test((e.target.tagName || ''))) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;   // leave browser history alone
 
-    // One press, one face, straight through the binder. Up/Down do the same thing as
-    // Left/Right on purpose: on a two-face object there is no second axis to spend them on,
-    // and a key that does nothing reads as broken.
+    // One press, one face, straight through the binder. Up/Down do the same as Left/Right on
+    // purpose: on a two-face object there is no second axis, and a key that does nothing reads
+    // as broken.
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); stepFace(1); }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); stepFace(-1); }
   }
 
   /* -------------------------------------------------------------- SHOEBOX
-   * TWO groups, because they answer two different questions:
-   *   unhoused → none of this print is in the binder. The ORIGINAL shoe-box question.
-   *   spare    → one is on a sheet, N more are still in the box.
-   * `spare` is SUBTRACTION (own − placed), not allocation: nothing records which physical
-   * copy sits where, and nothing needs to. See the /shoebox route comment.
-   */
+   * DEFAULT CHANGED 2026-07-30 (Michael): "shoebox should default to showing what's not in the
+   * binder but owned since the matrix shows how many actually live in shoebox vs binder."
+   *
+   * v4 showed unhoused AND spares stacked together, because at that point nothing else could
+   * tell you the binder/box split. The Summary matrix now owns that arithmetic, so this page
+   * goes back to being one question — WHAT HAS NO PLACE YET — which is also the question the
+   * physical shoe-box asks when you tip it out looking for something to lay down.
+   *
+   * Spares are still one tap away rather than deleted: they ARE in the box, and hiding them
+   * entirely would make this page quietly disagree with the matrix. Two claimants on one truth
+   * is the disease; the same truth at two zoom levels is not. */
+  var boxView = 'unhoused';   // unhoused | spare
+
   function boxRow(r) {
     var right = r.box_state === 'spare'
       ? '<span class="badge good">' + r.spare + ' spare</span>' +
@@ -618,48 +611,62 @@
       '</div>';
   }
 
-  function boxGroup(title, sub, rows) {
-    return '<div class="boxgroup">' +
-      '<div class="bg-head"><span class="name">' + Core.esc(title) + '</span>' +
-      '<span class="num">' + rows.length + '</span></div>' +
-      '<p class="hint">' + sub + '</p>' +
-      '<div class="list">' + rows.map(boxRow).join('') + '</div></div>';
+  function renderBox(rows) {
+    var wrap = document.getElementById('boxWrap');
+    var unhoused = rows.filter(function (r) { return r.box_state === 'unhoused'; });
+    var spare = rows.filter(function (r) { return r.box_state === 'spare'; });
+    var show = boxView === 'spare' ? spare : unhoused;
+
+    var chips = '<div class="chips">' +
+      '<button class="chip" data-v="unhoused" aria-pressed="' + (boxView === 'unhoused') + '">' +
+      'Not placed yet<span class="n num">' + unhoused.length + '</span></button>' +
+      '<button class="chip" data-v="spare" aria-pressed="' + (boxView === 'spare') + '">' +
+      'Spares<span class="n num">' + spare.length + '</span></button>' +
+      '</div>';
+
+    var note = boxView === 'spare'
+      ? '<p class="hint">One of each is already laid out. These counts are the extras still in the box.</p>'
+      : '<p class="hint">Owned, and nowhere in the binder yet. This is the pile to pull from.</p>';
+
+    var list = show.length
+      ? '<div class="list">' + show.map(boxRow).join('') + '</div>'
+      : '<div class="empty">' + (boxView === 'spare'
+          ? 'No duplicates. Every copy you own has its own slot.'
+          : 'Nothing loose. Everything you own is in the binder.') + '</div>';
+
+    wrap.innerHTML = chips + note + list;
+    [].forEach.call(wrap.querySelectorAll('.chip'), function (b) {
+      b.addEventListener('click', function () {
+        boxView = b.getAttribute('data-v'); renderBox(rows);
+      });
+    });
   }
 
   function mountShoebox() {
     var wrap = document.getElementById('boxWrap');
-    Core.busy(wrap, 'Loading shoe-box…');
+    Core.busy(wrap, 'Loading the shoe-box…');
     API.get('/shoebox').then(function (d) {
       var rows = d.shoebox || [];
       if (!rows.length) {
         wrap.innerHTML = '<div class="empty">The box is empty. Every copy you own is in a slot.</div>';
         return;
       }
-      var unhoused = rows.filter(function (r) { return r.box_state === 'unhoused'; });
-      var spare    = rows.filter(function (r) { return r.box_state === 'spare'; });
-      var html = '';
-      if (unhoused.length) {
-        html += boxGroup('Not in the binder yet',
-          'None of these is on a sheet — they have no place in the binder at all.', unhoused);
-      }
-      if (spare.length) {
-        html += boxGroup('Spares',
-          'These are laid out already. The count is what is left over in the box.', spare);
-      }
-      wrap.innerHTML = html;
+      renderBox(rows);
     }).catch(function (e) { Core.fail(wrap, e); });
   }
 
   window.App = {
-    mount: function (route) {
+    mount: function (route, params) {
       /* `body.stage` is what locks the binder to the viewport and kills page scroll. Every
        * other route keeps normal document flow, so it has to come off on the way out. */
       document.body.classList.toggle('stage', route === 'binder');
       if (route !== 'binder') document.removeEventListener('keydown', onBinderKeys);
 
       if (route === 'enter')   return mountEnter();
-      if (route === 'binder')  return mountBinder();
+      if (route === 'binder')  return mountBinder(params);
       if (route === 'shoebox') return mountShoebox();
+      // Summary lives in its own file — see the read-cap note at the top.
+      if (route === 'summary') return window.Summary && Summary.mount();
     }
   };
 })();
