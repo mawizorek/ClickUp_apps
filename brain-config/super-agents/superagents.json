@@ -1,9 +1,6 @@
 {
-  "MOVED": "This file was RENAMED to roster.json on 2026-07-24.",
-  "moved_to": "brain-config/super-agents/roster.json",
-  "why": "The old name covered only git-teammates. The fleet roster now holds BOTH classes in one file (git-teammates + native/task-specific + retired, AND the Council/Workshop lenses). The name 'superagents' undersold it.",
-  "read_instead": "brain-config/super-agents/roster.json",
-  "renderer": "brain-config/super-agents/roster.html",
-  "invocation_gate": "brain-config/gates/agent-invocation-gate.md (STEP 0 resolves against roster.json)",
-  "note": "This stub is intentionally NOT the fleet data. Any tool/agent still reading superagents.json for .agents will fail loud here rather than serve a stale roster — that is by design. Update your pointer to roster.json."
+  "STATUS": "🪦 REDIRECT STUB — twice over. Renamed to roster.json on 2026-07-24; roster.json was itself RETIRED on 2026-07-30.",
+  "go_here": "The ClickUp list 🤖 Agent Index — https://app.clickup.com/36074068/v/li/901328043244 — is THE canonical resolution index for every agent. One task per agent.",
+  "how_to_resolve": "gates/agent-invocation-gate.md → STEP 0.",
+  "do_not": "Do not restore this file, roster.json, or registry.json. Three retired manifests is enough. The index is a list."
 }

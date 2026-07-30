@@ -1,99 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Agent Roster · Full Fleet</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent roster — retired</title>
 <style>
-:root{--canvas:#0b0b0d;--panel:#17181a;--divider:#26272a;--ink:#e8e8ea;--soft:#9a9ba0;--green:#3fb950;--yellow:#d29922;--red:#f85149;--blue:#5b9ae8;--grey:#6e7681;--purple:#8b6df0;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--canvas);color:var(--ink);padding:calc(20px + env(safe-area-inset-top)) 16px 40px;line-height:1.45;}
-.wrap{max-width:1040px;margin:0 auto;}
-h1{font-size:1.35rem;font-weight:700;margin-bottom:4px;}
-.sub{color:var(--soft);font-size:.85rem;margin-bottom:18px;}
-h2{font-size:1rem;font-weight:700;margin:26px 0 4px;display:flex;align-items:center;gap:8px;}
-h2 .count{color:var(--soft);font-weight:500;font-size:.8rem;}
-.tier-note{color:var(--soft);font-size:.78rem;margin-bottom:10px;}
-.parity{background:var(--panel);border-left:3px solid var(--purple);border-radius:8px;padding:11px 13px;color:var(--soft);font-size:.79rem;margin-bottom:12px;}
-.parity b{color:var(--ink);}
-.thin{background:var(--panel);border-left:3px solid var(--blue);border-radius:8px;padding:11px 13px;color:var(--soft);font-size:.79rem;margin-bottom:18px;}
-.thin b{color:var(--ink);}
-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:8px;}
-th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--divider);vertical-align:top;}
-th{color:var(--soft);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;}
-td.agent{font-weight:600;white-space:nowrap;}
-td .slug{display:block;color:var(--soft);font-weight:400;font-size:.74rem;}
-.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:600;white-space:nowrap;}
-.b-green{background:rgba(63,185,80,.16);color:var(--green);}
-.b-blue{background:rgba(91,154,232,.16);color:var(--blue);}
-.b-grey{background:rgba(110,118,129,.18);color:var(--grey);}
-.b-red{background:rgba(248,81,73,.16);color:var(--red);}
-.mem{font-size:.72rem;color:var(--soft);}
-.mem.yes{color:var(--green);}
-.lin{color:var(--soft);font-size:.78rem;margin-top:3px;}
-.foot{color:var(--soft);font-size:.78rem;margin-top:26px;}
-.err{color:var(--red);background:rgba(248,81,73,.1);border:1px solid var(--red);border-radius:10px;padding:14px;}
-code{background:var(--panel);padding:1px 6px;border-radius:5px;font-size:.8em;}
-a{color:var(--blue);text-decoration:none;}
-a:hover{text-decoration:underline;}
-.rb{color:var(--soft);font-size:.76rem;margin-top:4px;border-left:2px solid var(--divider);padding-left:8px;}
-.rb b{color:var(--ink);font-weight:600;}
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; min-height: 100vh;
+    display: grid; place-items: center;
+    background: oklch(13% 0.008 288);
+    color: oklch(95% 0.004 288);
+    font: 350 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    letter-spacing: 0.012em;
+    padding: 32px;
+  }
+  main { max-width: 60ch; }
+  p.eyebrow {
+    font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.11em;
+    text-transform: uppercase; color: oklch(56% 0.008 288); margin: 0 0 12px;
+  }
+  h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 16px; }
+  p { color: oklch(72% 0.007 288); margin: 0 0 16px; text-wrap: pretty; }
+  a { color: oklch(78% 0.13 288); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.875em; }
+  .rule { border: 0; border-top: 1px solid oklch(28% 0.012 288); margin: 32px 0 24px; }
+  .small { font-size: 0.8125rem; color: oklch(56% 0.008 288); }
 </style>
 </head>
 <body>
-<div class="wrap">
-<h1>Agent Roster &mdash; Full Fleet</h1>
-<p class="sub">The resolution index. Data source: <code>roster.json</code> (edit there, not here). The Agent Invocation Gate reads that file first on every named call.</p>
-<div class="parity"><b>Class is PERSISTENCE, not rank.</b> A <b>super-agent</b> carries a memory bundle across sessions; an <b>agent</b> is a stateless lens. Same fleet, same room, same volume &mdash; Mira seats by LANE, never by class. An agent is upgraded for exactly one reason: <b>it needs memory</b>. The grouping below is presentational only; the underlying list is flat and never split by class.</div>
-<div class="thin"><b>This is an index, not a directory.</b> It answers <i>what exists and where to open it</i> &mdash; nothing more. Each agent&rsquo;s <b>lane and full role live in its own file</b> (click the home path), which is now the single authoritative source; <b>seating</b> lives in <code>council.md</code> + <code>teams/the-workshop.md</code>; <b>lineage</b> lives in git history. Those descriptions used to be duplicated here in a lossier form, which is exactly what a catalogue must not do.</div>
-<div id="content">Loading <code>roster.json</code> &hellip;</div>
-<p class="foot" id="foot"></p>
-</div>
-<script>
-function esc(s){return (s==null?"":String(s)).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
-function statusBadge(s){
-  var map={"active":["b-green","\u2705 active"],"needs-declaration":["b-blue","\ud83c\udd95 needs declaration"],"inventory-only":["b-grey","\u2014 inventory"],"retired":["b-red","\ud83e\udea6 retired"]};
-  var b=map[s]||["b-grey",esc(s||"\u2014")];
-  return '<span class="badge '+b[0]+'">'+b[1]+'</span>';
-}
-function homeCell(a){
-  if(!a.home) return '<span class="lin">no file &mdash; inventory row</span>';
-  var raw=String(a.home), path=raw.replace(/ \(tombstone\)$/,''), note=raw!==path?' <span class="lin">(tombstone)</span>':'';
-  var url='https://github.com/mawizorek/ClickUp_apps/blob/main/brain-config/'+path;
-  if(/\/$/.test(path)) url='https://github.com/mawizorek/ClickUp_apps/tree/main/brain-config/'+path;
-  var out='<a href="'+esc(url)+'">'+esc(path)+'</a>'+note;
-  if(a.instructions) out+='<div class="lin">instructions: <code>'+esc(a.instructions)+'</code></div>';
-  return out;
-}
-function row(a){
-  var detail='';
-  if(a.default_runbook) detail+='<div class="rb"><b>bare name &rarr;</b> '+esc(a.default_runbook)+(a.gate_strength?' <i>('+esc(a.gate_strength)+')</i>':'')+'</div>';
-  if(a.lane) detail+='<div class="lin">'+esc(a.lane)+'</div>';
-  return '<tr>'+
-    '<td class="agent">'+esc(a.name)+'<span class="slug">'+esc(a.slug)+'</span></td>'+
-    '<td>'+esc(a.class||'')+'<div class="mem'+(a.memory?' yes':'')+'">'+(a.memory?'holds memory':'stateless')+'</div></td>'+
-    '<td>'+statusBadge(a.status)+'</td>'+
-    '<td>'+esc(a.invoke||'\u2014')+(a.aka&&a.aka.length?'<div class="lin">'+esc(a.aka.join(' \u00b7 '))+'</div>':'')+'</td>'+
-    '<td>'+homeCell(a)+detail+'</td>'+
-  '</tr>';
-}
-function group(all,cls){return all.filter(function(a){return (a.class||'')===cls;});}
-function section(title,note,rows){
-  if(!rows.length) return '';
-  return '<h2>'+title+' <span class="count">('+rows.length+')</span></h2>'+
-    '<p class="tier-note">'+note+'</p>'+
-    '<table><thead><tr><th>Agent</th><th>Class</th><th>Status</th><th>Invoke</th><th>Where it lives</th></tr></thead><tbody>'+
-    rows.map(row).join('')+'</tbody></table>';
-}
-fetch('./roster.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(d){
-  var all=d.agents||[];
-  document.getElementById('content').innerHTML=
-    section('\ud83e\udde9 Super-agents','Seated personas with a full bundle under <code>super-agents/&lt;slug&gt;/</code>. Invocable, and they remember across sessions.',group(all,'super-agent'))+
-    section('\ud83e\udde0 Agents (lenses)','Stateless processing lenses under <code>agents/&lt;slug&gt;.md</code>. Same standing as a super-agent in the room &mdash; they just do not carry memory yet.',group(all,'agent'))+
-    section('\u2699\ufe0f Task-specific','Narrow single-job ClickUp automations. Inventory only &mdash; no file, so their one-line description stays in the index.',group(all,'task-specific'))+
-    section('\ud83e\udea6 Retired','Tombstones. Listed forever, never silently dropped, never a live invocation target.',group(all,'retired'));
-  document.getElementById('foot').innerHTML='Roster updated '+esc(d.updated)+' &middot; '+all.length+' agents in one flat list. This page renders an INDEX: identity, status, how to invoke, and where the record lives. Lane and full role are in each agent\u2019s own file; seating is in <code>council.md</code>. New agent = one row in <code>roster.json</code> (+ a <code>&lt;slug&gt;/</code> bundle if it needs memory).';
-}).catch(function(e){document.getElementById('content').innerHTML='<div class="err">Could not load <code>roster.json</code>: '+esc(e.message)+'. Read the data directly in that file.</div>';});
-</script>
+<main>
+  <p class="eyebrow">Retired 30 July 2026</p>
+  <h1>This renderer has no data left to render.</h1>
+  <p>The agent roster is no longer a JSON file. It is a <strong>ClickUp list</strong>, and a ClickUp view is now its renderer, so this page has nothing to do.</p>
+  <p><a href="https://app.clickup.com/36074068/v/li/901328043244">Open the 🤖 Agent Index</a></p>
+  <hr class="rule">
+  <p class="small">Why: a 39-record table was being simulated by a file that had to be read whole on every lookup. That forced a size ceiling the file never once met across six trims in four days, and at ~25KB it became unreadable-whole, which shipped an agent unregistered. Fields refuse essays; free text does not.</p>
+  <p class="small">Resolution contract: <code>gates/agent-invocation-gate.md</code> → STEP 0. Agent bundles remain in git under <code>super-agents/&lt;slug&gt;/</code>.</p>
+</main>
 </body>
 </html>

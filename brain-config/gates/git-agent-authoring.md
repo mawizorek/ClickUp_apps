@@ -2,8 +2,7 @@
 
 **Fires before authoring or materially editing any agent under `brain-config/super-agents/`, OR
 any tool an agent would run.** This is the "how to BUILD one" authoring standard; the runtime
-"how to BE one" lives in `brain-config/super-agents/_shared/super-agent-base.md`. It is the git
-equivalent of the ClickUp Golden Config Skeleton, adapted for session-invocable git personas.
+"how to BE one" lives in `brain-config/super-agents/_shared/super-agent-base.md`.
 
 ---
 
@@ -18,8 +17,7 @@ equivalent of the ClickUp Golden Config Skeleton, adapted for session-invocable 
 3. **🚦 Procedure-is-a-tool gate (HARD, fires before ANY self-write of memory/procedure OR any new
    agent-embedded step):** ask *"Is this a standalone tool that should be triggered instead?"* The
    answer is YES, always. If you're about to write how-to into an agent's `memory.md` /
-   `preferences.md`, STOP — author it as a tool and leave only a POINTER in the agent. This is the
-   authoring-side twin of the same gate in the runtime base spec.
+   `preferences.md`, STOP — author it as a tool and leave only a POINTER in the agent.
 4. **Routines are stewarded, not stored.** A routine an agent runs lives as a tool the agent OWNS
    editing; the agent's memory points to it, the deep procedure lives in the tool.
 5. **Decision logs by home:** topic decisions → the topic's page; agent-self decisions → the
@@ -33,22 +31,21 @@ persona, that's the smell this gate exists to catch.
 
 ## Two-tree law (know which tree you're in)
 
-- `brain-config/agents/` = ephemeral **Council/Workshop lenses** (Rhys, Beckett, Cleo, Polly, Finn,
-  Skye, Enzo, Frank, Sally, Stu, ...). Stateless processing verbs. NO personal memory. NOT
-  session-invocable as a standing persona.
-- `brain-config/super-agents/` = persistent **teammates** (Wes, Corey, Felix, Mira, Anna, Milo,
-  Maggie, Dexter, Sage, Clio, ...). Full context bundle, base pointer, invoked via
-  `/session.agent=<Name>`, hold memory across sessions.
+- `brain-config/agents/` = ephemeral **Council/Workshop lenses**. Stateless processing verbs. NO
+  personal memory. NOT session-invocable as a standing persona.
+- `brain-config/super-agents/` = persistent **teammates**. Full context bundle, base pointer,
+  invoked via `/session.agent=<Name>`, hold memory across sessions.
 
-⚠️ **Both lists rot — `roster.json` is authoritative, never these examples.** Mira and Anna were
-named here as lenses long after they graduated (corrected 2026-07-27). Two trees is a STORAGE fact,
-not a hierarchy: `class` means persistence, not rank (base spec Constitution §6). A lens graduates
-for exactly one reason — it needs MEMORY.
+⚠️ **Never list example names here — they rot.** This gate once named Mira and Anna as lenses long
+after they graduated (corrected 2026-07-27). **The ClickUp 🤖 Agent Index is authoritative**; filter
+it by `Class` to see either tree. Two trees is a STORAGE fact, not a hierarchy: `Class` means
+persistence, not rank (base spec Constitution §6). A lens graduates for exactly one reason — it
+needs MEMORY.
 
 A persona that needs to accumulate context and be inhabited for a whole session belongs in
 `super-agents/`. A pure processing lens belongs in `agents/`. Migrating a lens → teammate means
-moving it into `super-agents/` with the full bundle and redirecting the old lens file to a
-tombstone.
+moving it into `super-agents/` with the full bundle, flipping its Index row, and redirecting the old
+lens file to a tombstone.
 
 ---
 
@@ -65,23 +62,28 @@ ONE description of a bundle. Do not restate it here; it drifted once already (th
 
 ## Authoring checklist
 
-1. **Name-collision gate** (`brain-config/gates/agent-name-collision-gate.md`): scan live ClickUp
-   Super Agents + `roster.json` + the super-agents fleet. A retired/tombstoned agent is NEVER a live
-   invocation target (see B11). Distinguish live invocation tokens from historical prose refs.
+1. **Name-collision gate** (`brain-config/gates/agent-name-collision-gate.md`): scan the ClickUp
+   Agent Index (names + `Slug` + `AKA`, **including retired rows**) and live ClickUp Super Agents.
+   A retired/tombstoned agent is NEVER a live invocation target (see B11), but its name is still taken.
 2. **Profile stays behavior-only.** No stored how-to (Founding law §2–§3). Point OUT to tools for process.
 3. **Load manifest = deep by default.** Full memory + full decision-log + long activity window.
-4. **Per-response logging wired.** The profile assumes the runtime logging mandate (session-task
-   transcript per reply + frequent memory/activity fills + provenance). Don't re-author it — it's
-   in the base spec; just don't contradict it.
+4. **Per-response logging wired.** The profile assumes the runtime logging mandate. Don't re-author
+   it — it's in the base spec; just don't contradict it.
 5. **Slash trigger.** Register `/session.agent=<Name>` as a literal Quick-Scan Trigger Table row
    in the AI Toolkit index → pointing at the base spec load contract.
-6. **Registration (SAME SESSION): add the agent's row to `roster.json`.** ~~Mirror-pair registration
-   into BOTH `superagents.json` AND the AI Toolkit index roster + `registry.json`.~~ STRUCK
-   2026-07-27: the mirror-pair mandate was RETIRED 2026-07-25 and `registry.json` is a tombstone
-   stub (PR #483). **`roster.json` is the single documented source — one flat list, one row per
-   agent.** No pair means no sync obligation, and resurrecting a second manifest to mirror it is the
-   duplication that was retired. Keep the roster under ~12KB (slim rule) and update the AI Toolkit
-   index's behavioral trigger row for the agent in the same pass.
+6. **Registration (SAME SESSION): add the agent's row to the ClickUp 🤖 Agent Index** —
+   https://app.clickup.com/36074068/v/li/901328043244 (list id `901328043244`). Fill `Slug` (immutable) · `Class` · `Memory` ·
+   `Invoke` · `AKA` · `Home`, plus `default_runbook` + `Gate Strength` if it has a bare-name
+   default, plus `Lane` **only** if there is no home file. Set the native status.
+   ~~Mirror-pair registration into `superagents.json` AND the AI Toolkit index roster AND
+   `registry.json`~~ — STRUCK 2026-07-27 (mirror mandate retired). ~~`roster.json` is the single
+   documented source~~ — **STRUCK 2026-07-30: retired to a tombstone stub; the Index is a ClickUp
+   list now.** No pair means no sync obligation, and resurrecting a file to mirror the list is the
+   duplication three retirements have already killed.
+   > ⚠️ **Registration is the WIRING, not paperwork.** An unregistered agent cannot be resolved no
+   > matter how complete its bundle is. Dev Dexter shipped built-but-unregistered on 2026-07-25
+   > because the old file could not be written to. That failure class is gone — adding a row costs
+   > nothing now — so there is no excuse left for skipping it.
 7. **PR-merge workflow** (GitHub Operating Standard): branch → commit → PR → self-merge → report.
 8. **Session task + transcript** for the authoring session (Agent Activity Board).
 
@@ -92,4 +94,5 @@ ONE description of a bundle. Do not restate it here; it drifted once already (th
 - Stale Context Reload: re-fetch the file via blob API before editing (never a carried SHA).
 - Behavior changes → `preferences.md`. Accumulated context → `memory.md`. Reasoning → `decision-log.md`.
 - Procedure change → the TOOL it lives in, NOT the agent (Founding law §3). Agent keeps only the pointer.
+- Identity/routing change (name, nickname, class, invoke, home) → **the Agent Index row**, same session.
 - What-changed = git history + PR description. Never an inline changelog.

@@ -1,92 +1,29 @@
 {
-  "🚨_SUPERSEDED": "THIS FILE IS NO LONGER CANONICAL as of 2026-07-30. The agent index moved to a CLICKUP LIST: 🤖 Agent Index (list 901328216173, MAW Documents ▸ ClickUp Use). Resolve every named agent call against that list. Ruling: Fleet Build Queue Decision Log Q14 → A (REPLACE), Michael: 'it's a table. not a doc.'",
-  "🧊_FROZEN": "DO NOT ADD A ROW HERE. DO NOT EDIT A ROW HERE. A new or changed agent goes in the ClickUp list ONLY. This file is kept live and unretired for exactly one reason: the pointer repoint sweep is INCOMPLETE, so some gates and bundle load-manifests still name it. It is a read-only fallback during that window, NOT a mirror to keep in sync — the 2026-07-25 mirror-pair retirement (registry.json, PR #483) applies here too, and this header is what prevents two files both claiming canonical. Retire this file to a tombstone stub the moment the sweep lands.",
-  "why_it_moved": "A 39-record table was being simulated by a text file that must be read WHOLE — there is no range read, so resolving one agent cost the entire file and every added byte taxed every future resolution. Trimmed SIX times across FIVE commits in FOUR days (PR #483 24.8KB→14.4KB · 5c3a8cc · 66fdb06 · 78d1c92 ×2 · PR #559 18.4KB→13.18KB) and NEVER ONCE under its own ~12KB slim rule since that rule was locked: 14.4 → 21.1 → 18.4 → 13.18 → 13.67KB, regrowing +6.7KB in a single day. At ~25KB it became unreadable-whole and shipped Dev Dexter built-but-unregistered. A ClickUp list has no unbounded free-text area to colonize and can be queried one row at a time, so the size ceiling — and the trim treadmill — stop existing.",
-  "repoint_sweep_TODO": "Known surfaces naming this file (⚠️ UNVERIFIED COUNT — githubmcp_search_code returns 0 results on this repo, so this list is what was read directly, NOT an exhaustive sweep; enumerate by hand before retiring): gates/agent-invocation-gate.md (STEP 0) · gates/agent-name-collision-gate.md (checks 2+5) · gates/git-agent-authoring.md (step 6) · gates/git-teammate-lifecycle-runbook.md (REGISTER + pointers) · super-agents/roster.html (renderer, dies with the file — a ClickUp view IS the renderer) · super-agents/superagents.json (already a redirect stub) · super-agents/index.md · the AI Toolkit ClickUp index · EVERY agent bundle's load manifest (confirmed on mainstage-milo + tutor-tate).",
-  "what_did_NOT_move_to_fields": "Prose that is not per-agent data was re-homed rather than migrated, because pasting it into task descriptions would rebuild the exact problem inside ClickUp: invocation.tokens disambiguation warnings (Clio/Cleo, Rocky→Ricky, Dex/Dara, the fmp-frank slug) → gates/agent-name-collision-gate.md, which is already their real home · tombstones note → gates/git-teammate-lifecycle-runbook.md · pointers block → already duplicated in the runbook + authoring gate · the schema/field_notes commentary → dies, because a list's field set IS its schema.",
-  "_": "[HISTORICAL] THE resolution index for every agent: what exists, and where to open it. The Agent Invocation Gate resolves every named call against this file first (gates/agent-invocation-gate.md STEP 0). Renderer: roster.html.",
-  "this_is_an_INDEX": "⚠️ A field belongs here ONLY if you need it to decide WHICH RECORD TO OPEN. Nothing else. A catalogue card that starts containing the book has stopped being a catalogue. THINNED 2026-07-27 (18.4KB → this): lane, accent, from, seat, teams REMOVED because each was a lossy duplicate of a file that says it better. Do not add them back, and do not add a new descriptive field without running that test.",
-  "where_the_description_went": "lane + full role → the agent's own preferences.md (super-agent) or agents/<slug>.md (lens) — now the SINGLE authoritative source, which it was not while this file held a second copy · seat + teams → council.md + teams/the-workshop.md + teams/uritp-audit-council.md (the seating maps, always the real source) · from/lineage → git history, where every graduation is a commit · accent → roster.html, which is the only thing that ever used it.",
-  "schema": "slug | name | class | memory | status | invoke | aka[] | home | instructions | default_runbook | gate_strength",
-  "field_notes": "class = PERSISTENCE not rank (_shared/super-agent-base.md §6) · status gates whether a token resolves at all · default_runbook + gate_strength are READ ON EVERY BARE-NAME CALL and are NOT cosmetic (gates/agent-invocation-gate.md) · rows with NO home file keep a one-line `lane`, because for those it is the only description that exists anywhere.",
-  "pointers_for_rules": "naming, tokens, homophones → gates/agent-name-collision-gate.md · invocation modes, the soft gate, the three doors → gates/agent-invocation-gate.md · how to build/graduate → gates/git-teammate-lifecycle-runbook.md · seating → council.md + teams/.",
-  "updated": "2026-07-30 (frozen)",
-  "agents": [
-    { "slug": "maestro-mira", "name": "Maestro Mira", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Mira", "aka": ["Mira", "Maestro", "Lead"], "home": "super-agents/maestro-mira/", "instructions": "orchestration.md" },
-    { "slug": "fleet-felix", "name": "Fleet Felix", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Felix", "aka": ["Felix", "Fleet", "Steward"], "home": "super-agents/fleet-felix/" },
-    { "slug": "audit-anna", "name": "Audit Anna", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Anna (+ audit-intent auto-seize)", "aka": ["Anna", "Audit", "Root-It"], "home": "super-agents/audit-anna/" },
-    { "slug": "workhorse-wes", "name": "Workhorse Wes", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Wes (alias /wes — never the retired workshop-wes)", "aka": ["Wes"], "home": "super-agents/workhorse-wes/" },
-    { "slug": "dev-dexter", "name": "Dev Dexter", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Dexter", "aka": ["Dexter", "Dex", "Dev"], "home": "super-agents/dev-dexter/" },
-    { "slug": "memory-maggie", "name": "Memory Maggie", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Maggie (+ auto on any brain-memory write intent; mandatory at session close)", "aka": ["Maggie", "Memory"], "home": "super-agents/memory-maggie/", "default_runbook": "OMR REVIEW (read-only) — reads the queue, runs placement triage, reports, writes NOTHING. Writes need the explicit drain phrase.", "gate_strength": "auto" },
-    { "slug": "scout-sage", "name": "Scout Sage", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Sage", "aka": ["Sage", "Scout"], "home": "super-agents/scout-sage/" },
-    { "slug": "closing-clio", "name": "Closing Clio", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Clio (+ seated at every session close)", "aka": ["Clio", "Close", "Recap"], "home": "super-agents/closing-clio/", "default_runbook": "MID-SESSION HEALTH CHECK (read-only) — what's been touched, what's drifting, what she'd flag if the session ended now. The full close needs the close trigger.", "gate_strength": "auto" },
-    { "slug": "routine-ricky", "name": "Routine Ricky", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Ricky", "aka": ["Ricky", "Routine"], "home": "super-agents/routine-ricky/", "default_runbook": "TRIAGE (read-only) — reads routines/schedule.md + routines/last-run/*, computes what is DUE, and PROPOSES: 'here's what needs to happen — proceed?' Runs NOTHING until told.", "gate_strength": "auto" },
-    { "slug": "clickup-coach-corey", "name": "ClickUp Coach Corey", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Corey", "aka": ["Corey"], "home": "super-agents/clickup-coach-corey/" },
-    { "slug": "mainstage-milo", "name": "Mainstage Milo", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Milo", "aka": ["Milo", "Mainstage"], "home": "super-agents/mainstage-milo/" },
-    { "slug": "tutor-tate", "name": "Tutor Tate", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Tate", "aka": ["Tate", "Tutor", "TA"], "home": "super-agents/tutor-tate/" },
-    { "slug": "fmp-frank", "name": "FMP Fiona", "class": "super-agent", "memory": true, "status": "active", "invoke": "/session.agent=Fiona", "aka": ["Fiona", "FMP"], "home": "super-agents/fmp-frank/" },
+  "STATUS": "🪦 RETIRED 2026-07-30 — THIS FILE IS A TOMBSTONE STUB. DO NOT READ IT FOR RESOLUTION. DO NOT ADD AN AGENT HERE. DO NOT RESTORE IT.",
 
-    { "slug": "mimic-mika", "name": "Mimic Mika", "class": "agent", "memory": false, "status": "active", "home": "agents/mimic-mika.md" },
-    { "slug": "cautious-cass", "name": "Cautious Cass", "class": "agent", "memory": false, "status": "active", "home": "agents/cautious-cass.md" },
-    { "slug": "literal-lena", "name": "Literal Lena", "class": "agent", "memory": false, "status": "active", "home": "agents/literal-lena.md" },
-    { "slug": "counter-cole", "name": "Counter Cole", "class": "agent", "memory": false, "status": "active", "home": "agents/counter-cole.md" },
-    { "slug": "pivot-piper", "name": "Pivot Piper", "class": "agent", "memory": false, "status": "active", "home": "agents/pivot-piper.md" },
-    { "slug": "style-stu", "name": "Style Stu", "class": "agent", "memory": false, "status": "active", "home": "agents/style-stu.md" },
-    { "slug": "novice-nia", "name": "Novice Nia", "class": "agent", "memory": false, "status": "active", "home": "agents/novice-nia.md" },
-    { "slug": "domain-dara", "name": "Domain Dara", "class": "agent", "memory": false, "status": "active", "home": "agents/domain-dara.md" },
-    { "slug": "future-faye", "name": "Future Faye", "class": "agent", "memory": false, "status": "active", "home": "agents/future-faye.md" },
-    { "slug": "foldin-frank", "name": "Fold-in Frank", "class": "agent", "memory": false, "status": "active", "invoke": "bare 'Frank' resolves HERE as of 2026-07-25", "aka": ["Frank", "Fold-in"], "home": "agents/foldin-frank.md" },
-    { "slug": "risk-rhys", "name": "Risk Rhys", "class": "agent", "memory": false, "status": "active", "home": "agents/risk-rhys.md" },
-    { "slug": "breaker-beckett", "name": "Breaker Beckett", "class": "agent", "memory": false, "status": "active", "home": "agents/breaker-beckett.md" },
-    { "slug": "clever-cleo", "name": "Clever Cleo", "class": "agent", "memory": false, "status": "active", "home": "agents/clever-cleo.md" },
-    { "slug": "polish-polly", "name": "Polish Polly", "class": "agent", "memory": false, "status": "active", "home": "agents/polish-polly.md" },
-    { "slug": "feasible-finn", "name": "Feasible Finn", "class": "agent", "memory": false, "status": "active", "home": "agents/feasible-finn.md" },
-    { "slug": "scope-skye", "name": "Scope Skye", "class": "agent", "memory": false, "status": "active", "home": "agents/scope-skye.md" },
-    { "slug": "eco-enzo", "name": "Eco Enzo", "class": "agent", "memory": false, "status": "active", "home": "agents/eco-enzo.md" },
-    { "slug": "size-sally", "name": "Size Sally", "class": "agent", "memory": false, "status": "active", "home": "agents/size-sally.md" },
-    { "slug": "scribe-sana", "name": "Scribe Sana", "class": "agent", "memory": false, "status": "active", "home": "agents/scribe-sana.md" },
-    { "slug": "handoff-hana", "name": "Handoff Hana", "class": "agent", "memory": false, "status": "active", "home": "agents/handoff-hana.md" },
-    { "slug": "recon-renata", "name": "Recon Renata", "class": "agent", "memory": false, "status": "active", "home": "agents/recon-renata.md" },
+  "the_single_source": "The ClickUp list 🤖 Agent Index is THE canonical resolution index for every agent. One task per agent.",
+  "open_it": "https://app.clickup.com/36074068/v/li/901328043244",
+  "query_handle": "list id 901328043244 — the one place a numeric ID is kept deliberately, because a query needs a handle and a name cannot be passed to a filter. Everything an agent READS is keyed on name + slug (NAMES, NEVER NUMBERS).",
 
-    { "slug": "origination-date-agent", "name": "Origination Date agent", "class": "task-specific", "memory": false, "status": "inventory-only", "lane": "Sets due date = origination date + 1 month. Native-style; not findable in the workspace as of 2026-07-26." },
-    { "slug": "parse-property-emails", "name": "Parse new property emails", "class": "task-specific", "memory": false, "status": "inventory-only", "lane": "Parses payoff/loan fields from emails. Native-style; not findable in the workspace as of 2026-07-26." },
-    { "slug": "update-amount-paid", "name": "Update AMOUNT PAID", "class": "task-specific", "memory": false, "status": "inventory-only", "lane": "Single-field reconciliation (Amount Paid). Native-style; not findable in the workspace as of 2026-07-26." },
+  "how_to_resolve_now": "Query the Agent Index for the ONE row you need (match on task name, the Slug field, or the AKA field) and read its fields: Slug · Class · Memory · Invoke · AKA · Home · Lane · default_runbook · Gate Strength · Instructions. Then load that agent's bundle from `home`, which is still a git path. Full contract: gates/agent-invocation-gate.md STEP 0.",
 
-    { "slug": "workshop-wes", "name": "Workshop Wes", "class": "retired", "memory": false, "status": "retired", "home": "agents/workshop-wes.md (tombstone)", "lane": "RETIRED 2026-07-04 — decomposed into The Workshop (7 lenses) + Future Faye. NEVER a live invocation target: 'Wes'/'/wes' routes to workhorse-wes." },
-    { "slug": "update-uritp", "name": "Update URITP", "class": "retired", "memory": false, "status": "retired", "lane": "RETIRED 2026-07-21 — a task label, not an agent. A process/chore becomes a standalone DOC, not an agent." }
-  ],
-  "invocation": {
-    "how": "A named call (/session.agent=X, /session-start=X, bare name, nickname, or SLUG) resolves against THE CLICKUP AGENT INDEX LIST (901328216173) as of 2026-07-30, then loads that agent's home DIRECTLY. No double-hop through Felix or Mira. Full rules: gates/agent-invocation-gate.md.",
-    "group_calls": "A GROUP token resolves against a seating map in teams/, not against this agent list. It seats several agents at once and is the intended way to call a standing bench. Known groups: /council=uritp-audit (teams/uritp-audit-council.md) · the Workshop, always via Mira (teams/the-workshop.md).",
-    "tokens": {
-      "Mira | Maestro | Lead": "maestro-mira — also the DEFAULT when no agent is named",
-      "Felix | Fleet | Steward": "fleet-felix",
-      "Anna | Audit | Root-It": "audit-anna",
-      "Wes | /wes": "workhorse-wes — NEVER the retired workshop-wes",
-      "Dexter | Dex | Dev": "dev-dexter — ⚠️ 'Dex' vs 'Dara' is thin under dictation; prefer Dexter",
-      "Maggie | Memory": "memory-maggie — bare name = READ-ONLY OMR review; writes need the drain phrase",
-      "Sage | Scout": "scout-sage — READ-ONLY; no default_runbook. ⚠️ Distinct from Renata",
-      "Clio | Close | Recap": "closing-clio — bare name = READ-ONLY health check. ⚠️ HOMOPHONE of 'Cleo' (clever-cleo); resolve on exact spelling, ASK if spoken and ambiguous",
-      "Ricky | Routine": "routine-ricky — bare name = READ-ONLY TRIAGE of routines/, ending in a proposal; it never executes unasked. ⚠️ INVOKE-ONLY — no scheduler exists. ⚠️ 'Rocky' is a known dictation variant and resolves HERE. ⚠️ Also distinct from Renata + Rhys",
-      "Corey": "clickup-coach-corey",
-      "Milo | Mainstage": "mainstage-milo",
-      "Tate | Tutor | TA": "tutor-tate — course-instruction TA. PEER of Milo: neither reports to the other and the course↔production seam has no owner (ruled 2026-07-30)",
-      "Fiona | FMP": "fmp-frank — display FMP Fiona; slug immutable. ⚠️ '/session-start=fmp-frank' resolves to HER, never to Fold-in Frank",
-      "Frank | Fold-in": "foldin-frank — the anti-sprawl GATE. The FileMaker teammate was renamed precisely so bare 'Frank' lands here",
-      "/council=uritp-audit | /uritp-audit | /audit-council": "GROUP → teams/uritp-audit-council.md — seats the URITP audit bench (Core Four: Mira + Anna + Milo + Corey). ⚠️ NOT super-agents/audit-instruction.md"
-    },
-    "tombstones": "Anna, Mira, Wes, Maggie, Sage, Clio each have a tombstone at agents/<slug>.md AND a live bundle at super-agents/<slug>/ — always resolve to the super-agents/ home. Fiona, Ricky and Tate have NO tombstone: none of them was ever a lens."
+  "why_it_was_retired": "It was a 39-record TABLE being simulated by a text file that had to be read WHOLE on every resolution, with no range read. That forced a ~12KB size ceiling which the file NEVER ONCE met in its entire life: 24.8KB → 14.4 → 21.1 → 18.4 → 13.18 → 13.67. Six trim actions across five commits in four days (PR #483, 5c3a8cc, 66fdb06, 78d1c92 ×2, PR #559), and it regrew +6.7KB in a single day under normal fleet work. Trimming a document does not hold, because a document has an unbounded free-text area and no schema to refuse an essay. A list has fields. Michael, 2026-07-30: 'it is a table. not a doc.'",
+
+  "the_failure_this_prevents": "At ~25KB this file could not be read back whole, which is how Dev Dexter shipped BUILT-BUT-UNREGISTERED on 2026-07-25. A file that cannot be read whole cannot be safely edited, and the roster IS the registration surface. The ceiling was not tidiness; it was the bug.",
+
+  "where_each_part_went": {
+    "agents[] rows": "→ one task per agent in the Agent Index. Fields carry identity; the bundle carries the role.",
+    "invocation.tokens": "→ the Invoke + AKA fields on each row. The collision WARNINGS that lived alongside them (Clio/Cleo homophones, Rocky→Ricky, Dex/Dara, the immutable fmp-frank slug, Wes never resolving to the tombstone) are RULES, and they live in gates/agent-invocation-gate.md (read side) + gates/agent-name-collision-gate.md (write side), which already held them. This file was the second copy.",
+    "invocation.tombstones": "→ gates/git-teammate-lifecycle-runbook.md, which already governs tombstoning.",
+    "pointers": "→ already duplicated in gates/git-agent-authoring.md + the lifecycle runbook. Not migrated; it died here.",
+    "_, this_is_an_INDEX, where_the_description_went, schema, field_notes": "→ DELETED, deliberately. Self-describing schema commentary is exactly the prose that colonized this file six times. A list's field set IS its schema and needs no essay explaining itself."
   },
-  "pointers": {
-    "CANONICAL_INDEX": "ClickUp list 🤖 Agent Index (901328216173) — resolve here, not in this file",
-    "how_to_BE": "super-agents/_shared/super-agent-base.md",
-    "how_to_BUILD": "gates/git-agent-authoring.md + gates/git-teammate-lifecycle-runbook.md",
-    "naming_gate": "gates/agent-name-collision-gate.md",
-    "invocation_gate": "gates/agent-invocation-gate.md",
-    "orchestration": "orchestration.md",
-    "council_seating": "council.md + teams/the-workshop.md",
-    "council_uritp_audit": "teams/uritp-audit-council.md",
-    "audit_standard": "super-agents/audit-instruction.md — AGENT self-audits only",
-    "steward": "super-agents/fleet-felix/"
-  }
+
+  "⚠️_if_a_load_manifest_sent_you_here": "Several agent bundles still list `roster.json` at step 6 of their load manifest. That pointer is STALE but not broken — it lands on this stub, which redirects you. Go to the Agent Index. Do not conclude the roster is missing, and do not rebuild it.",
+
+  "🚫_do_not_recreate_a_second_index": "This is the SECOND manifest retired to a stub (registry.json went 2026-07-25, PR #483). Michael's standing ruling: 'no pair means no sync obligation.' A JSON roster alongside the ClickUp list would be the exact mirror-pair rot both retirements exist to kill. There is ONE index and it is the list.",
+
+  "agents": [],
+  "retired": "2026-07-30",
+  "retired_by": "Michael — 'repoint all documentation now and declare this index the sole truth.'"
 }
