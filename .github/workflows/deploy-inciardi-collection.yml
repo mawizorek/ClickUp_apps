@@ -9,18 +9,29 @@
 # drift. That is precisely the disease this app was rebuilt to cure. Git stays canonical;
 # CI deploys from it.
 #
-# workflow_dispatch ONLY — deliberately no push trigger:
-#   1. The front-end needs no deploy at all. Pages serves it ~60s after a commit lands.
-#      Only `worker/` changes need this.
-#   2. Unattended auto-deploy of a key-authenticated write API on every commit to main is
-#      not something you want. A deploy should be a decision.
+# workflow_dispatch ONLY — no push trigger. The front-end needs no deploy at all (Pages
+# serves it ~60s after a commit); only `worker/` changes need this. And unattended
+# auto-deploy of a key-authenticated write API on every commit is not something you want.
 #
-# 🔍 WHY THERE ARE PREFLIGHT STEPS: the first run died with "The process
-# '/usr/local/bin/npx' failed with exit code 1", which says nothing at all. That is a known
-# wrangler-action defect (cloudflare/wrangler-action#360) — the wrapper reports its own exit
-# code and swallows wrangler's real message, which then only exists in the raw log. The
-# preflight steps below drag the actual cause into the step list so nobody has to read raw
-# logs on a phone.
+# ============================================================================
+# 🔍 WHY THIS FILE LOOKS LIKE A DIAGNOSTIC HARNESS RATHER THAN A DEPLOY
+#
+# Runs 1 and 2 both died with "The process '/usr/local/bin/npx' failed with exit code 1",
+# which says nothing. Two separate causes:
+#
+#   a) cloudflare/wrangler-action swallows wrangler's real error and reports its own exit
+#      code instead (cloudflare/wrangler-action#360). So the actual message only ever
+#      existed in the raw log. → THE ACTION IS GONE. We call wrangler directly and the
+#      error is ours to capture.
+#
+#   b) My run-2 "fix" echoed diagnostics to stdout — but the mobile annotation panel only
+#      renders ::error:: and failed actions, and `continue-on-error` suppressed even those.
+#      So run 2 looked identical to run 1 and told him nothing. → EVERYTHING NOW WRITES TO
+#      $GITHUB_STEP_SUMMARY, which renders as a page you can read on a phone.
+#
+# Rule this file now follows: a diagnostic that reports somewhere the reader cannot see is
+# not a diagnostic.
+# ============================================================================
 
 name: Deploy inciardi-collection worker
 
@@ -39,38 +50,48 @@ concurrency:
   group: deploy-inciardi-collection
   cancel-in-progress: false   # never race two deploys of the same worker
 
-env:
-  # PINNED on purpose. `npx wrangler` unpinned installs whatever is latest, and this config
-  # carries compatibility_date 2026-07-01 — a wrangler whose bundled workerd predates that
-  # date hard-fails. One fewer moving part in a deploy that already failed once.
-  WRANGLER_VERSION: "4.28.1"
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: inciardi-collection
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # NOTE: no version pin. The previous commit pinned "4.28.1" — a number I invented and
+      # never verified. If that version does not exist, `npx wrangler@4.28.1` fails instantly
+      # with exit code 1, which is exactly the symptom being debugged, so the pin may have
+      # been a second cause stacked on the first. `wrangler@4` tracks the current major
+      # without asserting a specific release exists.
+      WR: "npx --yes wrangler@4"
+
     steps:
       - uses: actions/checkout@v4
 
-      # A BLANK secret produces exactly the opaque npx failure seen on run 1, and GitHub
-      # masks empty values so the log shows nothing. Assert presence, never print content.
-      - name: Preflight · are the secrets actually set?
-        env:
-          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          ACCT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Preflight · secrets present?
         run: |
+          {
+            echo "## Preflight"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
           FAIL=0
-          if [ -z "$TOKEN" ]; then echo "::error::CLOUDFLARE_API_TOKEN is empty or missing."; FAIL=1; fi
-          if [ -z "$ACCT" ];  then echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or missing."; FAIL=1; fi
-          if [ "$FAIL" = "1" ]; then exit 1; fi
-          echo "Both present. Token length ${#TOKEN}, account id length ${#ACCT}."
-          # Lengths only. A 40-char token and a 32-char account id are the expected shapes;
-          # a wildly different length usually means the two values got pasted into each other.
+          # Lengths only, never values. A ~40-char token and a 32-char hex account id are the
+          # expected shapes; wildly different lengths usually mean the two got swapped.
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is empty or missing."
+            echo "- ❌ \`CLOUDFLARE_API_TOKEN\` **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+          else
+            echo "- ✅ token present (${#CLOUDFLARE_API_TOKEN} chars)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or missing."
+            echo "- ❌ \`CLOUDFLARE_ACCOUNT_ID\` **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+          else
+            echo "- ✅ account id present (${#CLOUDFLARE_ACCOUNT_ID} chars)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit $FAIL
 
-      # wrangler.toml normally carries the real id, so this step usually does nothing.
-      # It only DEMANDS an id when the file still holds the placeholder.
       - name: Resolve the D1 database id
         run: |
           FILE=wrangler.toml
@@ -79,60 +100,98 @@ jobs:
 
           if grep -q PASTE_DATABASE_ID_HERE "$FILE"; then
             if [ -z "$ID" ]; then
-              echo "::error::wrangler.toml holds the placeholder and no id was supplied. Pass one when running this workflow, or set the INCIARDI_DB_ID repo variable."
+              echo "::error::wrangler.toml holds the placeholder and no id was supplied."
               exit 1
             fi
             sed -i "s|PASTE_DATABASE_ID_HERE|$ID|" "$FILE"
-            echo "Substituted the placeholder."
           elif [ -n "$ID" ]; then
             sed -i "s|^database_id = .*|database_id = \"$ID\"|" "$FILE"
-            echo "Overrode the committed id for this run."
+            echo "- ℹ️ overrode the committed database id for this run" >> "$GITHUB_STEP_SUMMARY"
           fi
 
           BOUND=$(grep '^database_id' "$FILE" | sed 's/.*"\(.*\)".*/\1/')
-          echo "Bound to database ${BOUND:0:8}…"
+          echo "- ✅ bound to database \`${BOUND:0:8}…\`" >> "$GITHUB_STEP_SUMMARY"
           if grep -q PASTE_DATABASE_ID_HERE "$FILE"; then
-            echo "::error::Still the placeholder. A worker bound to nothing looks like it worked, which is worse than a failed deploy."
+            echo "::error::Still the placeholder. A worker bound to nothing looks like it worked."
             exit 1
           fi
 
-      # THE DIAGNOSTIC THAT MATTERS. `whoami` prints the token's permission table, which is
-      # the one thing that separates "bad token" from "token missing a scope" from "config is
-      # wrong." Most likely culprit for run 1: deploying a worker WITH a D1 binding needs D1
-      # edit permission, and the Edit-Cloudflare-Workers template has not always included it.
-      # `continue-on-error` because this is here to REPORT, never to block.
-      - name: Preflight · who does this token think it is?
-        continue-on-error: true
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@${WRANGLER_VERSION} whoami
+      # THE DIAGNOSTIC THAT MATTERS. `whoami` prints the token's permission table — the only
+      # thing that separates "bad token" from "token missing a scope" from "config is wrong."
+      # Leading suspect: deploying a worker WITH a D1 binding needs D1 edit permission, and
+      # the Edit-Cloudflare-Workers template has not reliably included it. A dry-run never
+      # touches the account, so it would pass while the real deploy 403s.
+      #
+      # Reports, never blocks — but the output goes somewhere readable this time.
+      - name: Preflight · whoami (token permissions)
+        run: |
+          set +e
+          $WR whoami > who.txt 2>&1
+          RC=$?
+          {
+            echo ""
+            echo "## \`wrangler whoami\` — exit $RC"
+            echo ""
+            echo '```'
+            cat who.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ $RC -ne 0 ]; then
+            echo "::error::whoami failed — the token itself is the problem. See the run summary."
+          fi
+          exit 0
 
       # Validates wrangler.toml, the entrypoint and every binding WITHOUT touching the
-      # account. A config error fails HERE, with a real message, instead of inside the
-      # wrapper that hides it.
-      - name: Preflight · does the config even build?
-        continue-on-error: true
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@${WRANGLER_VERSION} deploy --dry-run
-
-      - name: Deploy
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: inciardi-collection
-          wranglerVersion: "4.28.1"
-          command: deploy
-
-      # WRITE_KEY is NOT set here on purpose. Secrets survive a deploy, so it is set once in
-      # the Cloudflare dashboard (Worker → Settings → Variables and Secrets) and never
-      # passes through GitHub. One fewer place it can leak.
-      - name: What to do next
+      # account. A config error surfaces HERE with a real message.
+      - name: Preflight · dry-run build
         run: |
-          echo "Deployed. If this was the first successful run:"
-          echo "  1. Cloudflare dashboard → your worker → Settings → Variables and Secrets"
-          echo "  2. Add secret WRITE_KEY (a long random string, not a word)"
-          echo "  3. Open the app → gear → paste the worker URL + that key"
+          set +e
+          $WR deploy --dry-run > dry.txt 2>&1
+          RC=$?
+          {
+            echo ""
+            echo "## \`deploy --dry-run\` — exit $RC"
+            echo ""
+            echo '```'
+            tail -40 dry.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ $RC -ne 0 ]; then
+            echo "::error::The config does not build. This is not an auth problem. See the run summary."
+          fi
+          exit 0
+
+      # THE DEPLOY, run directly. No wrapper, so wrangler's real error is ours to surface:
+      # tee'd into the summary AND pushed into an annotation.
+      - name: Deploy
+        run: |
+          set +e
+          $WR deploy > out.txt 2>&1
+          RC=$?
+          {
+            echo ""
+            echo "## \`wrangler deploy\` — exit $RC"
+            echo ""
+            echo '```'
+            cat out.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat out.txt
+          if [ $RC -ne 0 ]; then
+            # First real error line into the annotation panel, which is what shows on mobile.
+            MSG=$(grep -m1 -E 'ERROR|error|Error' out.txt | head -c 400)
+            echo "::error::wrangler deploy failed: ${MSG:-see the run summary}"
+            exit $RC
+          fi
+          URL=$(grep -m1 -oE 'https://[a-z0-9.-]*workers\.dev' out.txt)
+          {
+            echo ""
+            echo "### ✅ Deployed"
+            echo ""
+            echo "**Worker URL:** \`${URL:-check the log above}\`"
+            echo ""
+            echo "Next, once only:"
+            echo "1. Cloudflare dashboard → this worker → Settings → Variables and Secrets"
+            echo "2. Add secret \`WRITE_KEY\` — a long random string, not a word"
+            echo "3. Open the app → ⚙ → paste the worker URL + that key"
+          } >> "$GITHUB_STEP_SUMMARY"
