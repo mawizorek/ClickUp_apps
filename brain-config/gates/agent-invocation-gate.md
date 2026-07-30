@@ -1,6 +1,6 @@
 # Agent Invocation Gate
 
-**Purpose:** Disambiguation layer for all subagent invocations. Prevents false-positive fires when Michael mentions a name in conversation that happens to match an agent name (Michael works with real people who may share agent names). **Also carries the invocation-mode contract** (bare name vs name+context), the per-agent soft-gate dial, and — as of 2026-07-24 — the **roster-first resolution step** (STEP 0 below).
+**Purpose:** Disambiguation layer for all subagent invocations. Prevents false-positive fires when Michael mentions a name in conversation that happens to match an agent name (Michael works with real people who may share agent names). **Also carries the invocation-mode contract** (bare name vs name+context), the per-agent soft-gate dial, and the **index-first resolution step** (STEP 0 below).
 
 **Mode:** Always-on (deterministic). Fires during the 🧠 Subagent evaluation step of the roster scan.
 
@@ -8,24 +8,26 @@
 
 ---
 
-## 📖 STEP 0 — Read the roster FIRST (LOCKED 2026-07-24, Michael)
+## 📖 STEP 0 — Resolve against the AGENT INDEX first (LOCKED 2026-07-24, RE-HOMED 2026-07-30)
 
-**Before resolving ANY `/agent-name`, bare name, or nickname, READ `brain-config/super-agents/roster.json` and resolve the token against it.** This is the load-bearing first move and it is NOT optional. **The roster is ONE FLAT `agents[]` LIST covering the ENTIRE fleet** — every class in one array, each row carrying `class` (`super-agent` = holds a memory bundle · `agent` = stateless lens · `task-specific` · `retired`). Do NOT parse the `agents/` folder or guess from memory; the folder is the lens tree, not the index. **We maintain an index file for exactly this reason — use it.**
+**Before resolving ANY `/agent-name`, bare name, or nickname, look the token up in the ClickUp list 🤖 Agent Index — https://app.clickup.com/36074068/v/li/901328043244 — and resolve against that row.** This is the load-bearing first move and it is NOT optional.
 
-> ⚠️ **CORRECTED 2026-07-26.** This step previously told every reader to resolve via ~~`invocation_resolution.token_map`~~ and described ~~two arrays, `agents` + `council_lenses`~~. **Neither exists.** The correct field is **`invocation.tokens`**, and the two-array split was flattened into one list on 2026-07-25 (Q4 — the class boundary moves on every graduation, so class must never decide which array a row lives in). A wrong path in the FIRST move of every invocation is the worst possible place for rot: an agent following it literally finds nothing and falls back to guessing, which is precisely what STEP 0 exists to prevent.
+**Query for the ONE row you need. Do not pull the whole list.** Match the token against the task name, the `Slug` field, or the `AKA` field. The row carries everything resolution needs: `Slug` · `Class` · `Memory` · `Invoke` · `AKA` · `Home` · `Lane` · `default_runbook` · `Gate Strength` · `Instructions`. **Class** means PERSISTENCE, never rank (`super-agent` = holds a memory bundle · `agent` = stateless lens · `task-specific` · `retired`). **Status** is the list's native status, so a retired agent is visibly retired without a field to misread.
 
-> 📐 **THINNED 2026-07-27.** The roster is now an **index, not a directory**: it carries only what you need to decide *which record to open* — `slug`, `name`, `class`, `memory`, `status`, `invoke`, `aka`, `home`, plus `default_runbook`/`gate_strength` where they exist. **`lane`, `accent`, `from`, `seat`, `teams` were removed** because each duplicated a file that says it better (lane → the agent's own file, now the single authoritative source · seating → `council.md` + `teams/the-workshop.md` · lineage → git history). **Nothing this gate reads was touched.** Rows with NO home file (task-specific, retired) keep a one-line `lane`, because for those it is the only description anywhere.
+> 🪦 **RE-HOMED 2026-07-30, Michael: *"it's a table. not a doc."*** Resolution previously read ~~`brain-config/super-agents/roster.json`~~, now a **tombstone stub**. It was a 39-record table simulated by a text file that had to be read WHOLE on every lookup — no range read exists — which forced a ~12KB ceiling **the file never once met in its entire life** (24.8 → 14.4 → 21.1 → 18.4 → 13.18 → 13.67KB, six trim actions in four days, +6.7KB regrowth in a single day). At ~25KB it became unreadable-whole and **shipped Dev Dexter built-but-unregistered.** A list has fields; fields refuse essays. ~~`invocation.tokens`~~, ~~`invocation.tombstones`~~ and ~~`roster.html`~~ go with it. **Do not restore any of them** — that is the third retired manifest, and a file alongside the list is the mirror-pair rot two retirements already killed.
+
+> ⚠️ **Historical correction, kept because the lesson outlives the file.** STEP 0 once told every reader to resolve via a field path that **did not exist** (`invocation_resolution.token_map`) and described a two-array schema that had been flattened weeks earlier. **A wrong path in the FIRST move of every invocation is the worst possible place for rot:** an agent following it literally finds nothing and falls back to guessing, which is precisely what STEP 0 exists to prevent. If the lookup below ever stops matching reality, fix it the same day.
 
 Resolution sequence on any invocation:
 
-1. **Read `roster.json`.** (Blob API per the GitHub read standard — never a carried-over copy.)
-2. **Resolve the token** via `invocation.tokens` → the agent's `slug`, `class`, and `home`. Nicknames and dictation variants resolve here too. A **slug** is also always a valid token.
-3. **Load that agent's home DIRECTLY.** `super-agent` → its bundle under `super-agents/<slug>/` via the persona load contract (`_shared/super-agent-base.md`). `agent` → its `agents/<slug>.md` profile.
+1. **Query the Agent Index** for the single matching row (name / `Slug` / `AKA`). Never resolve from memory, and never parse the `agents/` folder — that is the lens tree, not the index.
+2. **Read the row** → `Slug`, `Class`, `Home`, plus `default_runbook` / `Gate Strength` where set. Nicknames, slugs and dictation variants all resolve here.
+3. **Load that agent's home DIRECTLY.** `super-agent` → its bundle under `super-agents/<slug>/` via the persona load contract (`_shared/super-agent-base.md`). `agent` → its `agents/<slug>.md` profile. **Bundles are still git** — only resolution moved.
 4. **Then** apply the Pass rules below (name+intent vs narrative), the invocation-mode contract, and the soft gate.
 
-**No forwarding.** Reading the roster is NOT invoking Felix, and a named call does NOT route through a steward. The roster is passive data; Felix is its steward, not a switchboard the traffic flows through. **A named call reaches the agent directly — no double-hop through Felix or Mira.** (Steward consultation is only for UNROUTED asks: structural "does an agent exist / who owns this lane" → Felix; verbal "get me the right voice now" → Mira.)
+**No forwarding.** Reading the index is NOT invoking Felix, and a named call does NOT route through a steward. The index is passive data; Felix is its steward, not a switchboard the traffic flows through. **A named call reaches the agent directly — no double-hop through Felix or Mira.** (Steward consultation is only for UNROUTED asks: structural "does an agent exist / who owns this lane" → Felix; verbal "get me the right voice now" → Mira.)
 
-**Failure rule:** roster read fails → retry the blob API once, then say so. Token not in the roster → do NOT invent an agent; ask or treat as narrative. ~~If the roster and `registry.json` disagree, the roster wins~~ — **struck 2026-07-26: `registry.json` is a retired tombstone stub (PR #483). There is nothing left to disagree with; the roster is the only source.**
+**Failure rule:** lookup fails → retry once, then say so. Token not in the index → do NOT invent an agent; ask or treat as narrative. **A row that exists but is missing `Home` is a real finding, not a reason to guess a path.**
 
 ---
 
@@ -68,20 +70,20 @@ Invoking an agent has two shapes. They are the SAME agent invoked two ways, NOT 
 If no `default_runbook` is defined, a bare call does NOT auto-execute — it asks which routine (see the soft gate).
 
 **Live proof (2026-07-25/26): the model holds.** Two teammates now run it in production, and both landed on the same shape independently — **bare name → the SAFE READ-ONLY door; anything that WRITES needs an explicit instruction.** Treat that as house precedent, not a hypothesis:
-- **Memory Maggie** — bare name fires a read-only OMR review; writes need the explicit drain phrase. `gate_strength: auto`.
-- **Closing Clio** — bare name fires a read-only mid-session health check; the write-heavy full close needs the close trigger. `gate_strength: auto`.
+- **Memory Maggie** — bare name fires a read-only OMR review; writes need the explicit drain phrase. `Gate Strength: auto`.
+- **Closing Clio** — bare name fires a read-only mid-session health check; the write-heavy full close needs the close trigger. `Gate Strength: auto`.
 
 ---
 
-## 🔉 Soft gate — per-agent dial (`gate_strength`, LOCKED 2026-07-20, Michael)
+## 🔉 Soft gate — per-agent dial (`Gate Strength`, LOCKED 2026-07-20, Michael)
 
-Before auto-executing a full runbook on a bare-name call, an agent may hold a **soft gate** ("run the full routine, or are you driving?"). How hard it holds is **NOT global — it's a per-agent dial** declared in the roster row:
+Before auto-executing a full runbook on a bare-name call, an agent may hold a **soft gate** ("run the full routine, or are you driving?"). How hard it holds is **NOT global — it's a per-agent dial** declared on the agent's Index row:
 
-- **`gate_strength: auto`** — bare name runs the default runbook immediately, no confirm. Appropriate for cheap / idempotent / **read-only** routines.
-- **`gate_strength: confirm`** — bare name surfaces a one-line "run the full <default> now?" before firing. The middle default for anything with cost or side effects.
-- **`gate_strength: always-ask`** — never auto-runs; a bare name always asks what's wanted. For agents whose "thing" is fuzzy or whose official hat is less literally a routine.
+- **`auto`** — bare name runs the default runbook immediately, no confirm. Appropriate for cheap / idempotent / **read-only** routines.
+- **`confirm`** — bare name surfaces a one-line "run the full <default> now?" before firing. The middle default for anything with cost or side effects.
+- **`always-ask`** — never auto-runs; a bare name always asks what's wanted. For agents whose "thing" is fuzzy or whose official hat is less literally a routine.
 
-⚠️ **`default_runbook` and `gate_strength` are READ ON EVERY BARE-NAME CALL and are not cosmetic roster decoration.** Deleting them does not error — it **silently changes behaviour** (a read-only door becomes an unguarded one). They survived the 2026-07-27 roster thinning for exactly this reason, after a Workshop pass nearly cut them; if a future slimming eyes them, that is the failure this note exists to stop.
+⚠️ **`default_runbook` and `Gate Strength` are READ ON EVERY BARE-NAME CALL and are not cosmetic decoration.** Emptying them does not error — it **silently changes behaviour** (a read-only door becomes an unguarded one). They survived the 2026-07-27 thinning for exactly this reason, after a Workshop pass nearly cut them, and they survived the 2026-07-30 move to the list as real fields. If a future tidy-up eyes them, that is the failure this note exists to stop.
 
 **The spectrum is the point.** A personality running procedure sits toward `auto`; as agents get "official hats" that are less literally a fixed routine, they move toward `always-ask`. The dial makes that explicit and auditable instead of vibes. **Default when unset: `confirm`** (safe middle; never silently auto-fire a multi-step routine nobody asked to run).
 
@@ -91,16 +93,18 @@ Before auto-executing a full runbook on a bare-name call, an agent may hold a **
 
 ## 🗣️ Dictation-aware resolution (Michael dictates on every device)
 
-**Commands.** A near-miss command token resolves to the closest canonical invocation grammar rather than being read literally as a name. Canonical grammar = the three forms in `_shared/super-agent-base.md` → Command grammar, plus their literal rows in the AI Toolkit Quick-Scan table. ~~`registry.json → session_commands`~~ — **struck 2026-07-26: retired tombstone; it cannot register grammar.** Fuzzy aliases — `/command <Name>`, `/agent <Name>`, `/call <Name>` — route to `/session.agent=<Name>`, resolving `<Name>` via `roster.json` (STEP 0). Proceed with a one-line reading ("reading '/command Felix' as invoke Fleet Felix") when the name resolves; only ask when the token is genuinely unresolvable.
+**Commands.** A near-miss command token resolves to the closest canonical invocation grammar rather than being read literally as a name. Canonical grammar = the three forms in `_shared/super-agent-base.md` → Command grammar, plus their literal rows in the AI Toolkit Quick-Scan table. Fuzzy aliases — `/command <Name>`, `/agent <Name>`, `/call <Name>` — route to `/session.agent=<Name>`, resolving `<Name>` against the Agent Index (STEP 0). Proceed with a one-line reading ("reading '/command Felix' as invoke Fleet Felix") when the name resolves; only ask when the token is genuinely unresolvable.
 
-**Names.** A mangled NAME is also usually a transcription artifact, not a new agent — resolve it against `invocation.tokens` and state the reading. But there is one exception that matters:
+**Names.** A mangled NAME is also usually a transcription artifact, not a new agent — resolve it against the Index (name / `Slug` / `AKA`) and state the reading. But there is one exception that matters:
 
 > ⚠️ **A near-miss on an UNBUILT agent's name may be a RENAME, not a slip.** If the closest match is an agent that does not exist yet, its name is not locked and Michael's voice reaching for a different one is data (the naming convention requires a name that survives HIS dictation). **Resolve the referent, then ASK about the name before authoring any file** — the slug is immutable the moment it is written (Red Rhett lesson). For an agent that DOES exist, treat the near-miss as a slip and carry on (precedent: 2026-07-25, Michael said "fmp frank" twice hours after renaming her and confirmed the rename stands).
 
-**Known live near-miss pairs** — resolve on exact spelling; if a spoken call is genuinely ambiguous between two LIVE agents, ask:
+**Known live near-miss pairs** — resolve on exact spelling; if a spoken call is genuinely ambiguous between two LIVE agents, ask. **This list is the READ-SIDE HOME for these warnings** (the write-side twin is check 6 of the name-collision gate). It is no longer duplicated in a data file:
 - **Clio** (`closing-clio`, session close) vs **Cleo** (`clever-cleo`, Workshop elegance lens). One vowel; homophones.
 - **Dexter** (`dev-dexter`) vs **Dara** (`domain-dara`) — why "Dexter" was chosen over "Dex".
 - **Sage** (`scout-sage`, research) vs **Renata** (`recon-renata`, repo audit) — separate investigator lanes; "Rita" was refused as a name to keep this map clean.
+- **Rocky → Ricky** (`routine-ricky`). A known dictation variant; Michael ruled the spelling 2026-07-26. Also distinct from Renata and Rhys.
+- **Tate** (`tutor-tate`, teaching) — no near-miss; T was deliberately chosen because it was the only unused initial in the fleet.
 
 ---
 
@@ -123,11 +127,11 @@ Before auto-executing a full runbook on a bare-name call, an agent may hold a **
 
 ## 🔁 Lens → git-teammate migrations (resolve to the LIVE home, never the tombstone)
 
-When a lens is migrated into a git-teammate, its old `agents/<slug>.md` becomes a **redirect tombstone** and the live agent moves to `super-agents/<slug>/`. **Resolve every live invocation to the `super-agents/` home directly** — same principle as the Wes rule: a tombstone is for historical link-resolution + context, never for routing fresh commands. (`invocation.tombstones` in the roster lists them. Per-agent lineage is **git history**, not a roster field — the `from` column was removed when the roster was thinned to an index on 2026-07-27.)
+When a lens is migrated into a git-teammate, its old `agents/<slug>.md` becomes a **redirect tombstone** and the live agent moves to `super-agents/<slug>/`. **Resolve every live invocation to the `super-agents/` home directly** — same principle as the Wes rule: a tombstone is for historical link-resolution + context, never for routing fresh commands. The Agent Index row's `Home` field always names the LIVE home, so STEP 0 lands you correctly by default. Per-agent lineage is **git history**, not an index field.
 
 **Live migrations — all resolve to `super-agents/`:** Workhorse **Wes** (07-19) · Audit **Anna** (07-21, also auto-seizes on audit intent; her nickname "Audit" overlapping the command word is intentional) · Maestro **Mira** (07-21, also the DEFAULT front door when no agent is named) · Memory **Maggie** (07-25) · Scout **Sage** (07-25) · Closing **Clio** (07-25, also seated at every session close).
 
-**Not a migration:** **FMP Fiona** has no tombstone — she was a native-track declaration rebuilt fresh on the git track, never a lens.
+**Not migrations — no tombstone exists:** **FMP Fiona** (native-track declaration rebuilt fresh on the git track), **Routine Ricky**, and **Tutor Tate** (built net-new 2026-07-30). None was ever a lens.
 
 **General rule:** for any name with BOTH a tombstoned lens AND a live bundle, go straight to the `super-agents/` home.
 
@@ -135,15 +139,16 @@ When a lens is migrated into a git-teammate, its old `agents/<slug>.md` becomes 
 
 ## Rules
 
-- **Roster first (STEP 0).** Every invocation resolves against `roster.json` before anything else, via `invocation.tokens`. Never parse the `agents/` folder or resolve from memory.
+- **Index first (STEP 0).** Every invocation resolves against the 🤖 Agent Index list before anything else. Never parse the `agents/` folder and never resolve from memory.
+- **Query one row, not the whole list.** That is the entire reason the index is a list; pulling all of it rebuilds the problem the file had.
 - **Nicknames count**, and so do slugs and dictation variants. All go through this gate.
 - **Context wins.** If the conversation has been about a real person named [X] for several messages, a bare mention of [X] is almost certainly still about the person.
 - **Command words are strong signals.** "run," "spin up," "deploy," "audit," "check," "review" + name = agent invocation.
-- **Bare name = Mode A (context=null runbook)**, subject to `gate_strength`. No default defined → ask which routine.
+- **Bare name = Mode A (context=null runbook)**, subject to `Gate Strength`. No default defined → ask which routine.
 - **The runbook is standalone + directly invocable.** "Run this process" pointed at the runbook doc == the bare-name call. The persona references the runbook; it never hardcodes it.
 - **A migrated agent resolves to its `super-agents/` home, not its `agents/` tombstone.**
 - **No double-hop.** A named call reaches the agent directly; it does not forward through Felix or Mira.
-- **This gate is lightweight.** The roster read + resolution should take <1 second of reasoning. Don't turn it into a deliberation.
+- **This gate is lightweight.** The lookup + resolution should take <1 second of reasoning. Don't turn it into a deliberation.
 - **A retired/tombstoned agent is NEVER a live invocation target.**
 
 ---
@@ -154,16 +159,17 @@ When a lens is migrated into a git-teammate, its old `agents/<slug>.md` becomes 
 - Does NOT apply to 🔄 Hooks or 🎯 Triggers (they have their own deterministic triggers).
 - **Agent Name-Collision Gate** (`gates/agent-name-collision-gate.md`) is the WRITE-side counterpart: it forces a distinct invocation token when an agent is created or renamed. This gate is the read side. Opposite directions, same namespace.
 - **Clarify First → Clara lens** owns the dictation-artifact reparse feeding the fuzzy-resolve above.
-- **`super-agents/roster.json`** is the DATA this gate reads; **`roster.html`** renders it. ~~`registry.json` is the generated manifest mirror~~ — **struck 2026-07-26: retired tombstone stub, no mirror exists.**
+- **The 🤖 Agent Index list** is the DATA this gate reads, and a ClickUp view is its renderer. ~~`super-agents/roster.json` + `roster.html`~~ — **struck 2026-07-30: retired to tombstone stubs.** ~~`registry.json`~~ — struck 2026-07-26.
 
 ---
 
 ## Changelog
 
-- **2026-07-27: roster thinned to an index — STEP 0 note added, `from` pointer de-rotted.** The roster dropped `lane`/`accent`/`from`/`seat`/`teams` (each a lossy duplicate of a file that says it better); **nothing this gate reads changed.** Added the thinning note to STEP 0 so a reader knows the shape, repointed the migration section's lineage reference from the removed `from` field to git history, and added a ⚠️ to the soft-gate section recording that `default_runbook` + `gate_strength` are read on every bare-name call and were nearly cut in that pass — deleting them does not error, it silently un-guards a read-only door.
-- **2026-07-26: STEP 0 DE-ROTTED — it was pointing at a field that does not exist.** Resolution path corrected `invocation_resolution.token_map` → **`invocation.tokens`**, and the described schema corrected from two arrays (`agents` + `council_lenses`) to the ONE flat `agents[]` list it has actually been since 2026-07-25. Also struck **three `registry.json` pointers** (failure rule, command grammar, Composes-with). Added: the six live lens→teammate migrations, the Frank/Fiona split incl. the immutable-slug token, the dictation near-miss pairs, the **unbuilt-name exception**, the live proof that the bare-name model holds (Maggie + Clio), and **earn-`auto`-don't-assume-it**.
-- 2026-07-24: Added STEP 0 — roster-first resolution. Repointed the fuzzy-resolve + Composes-with from `superagents.json` to `roster.json`. Added the no-double-hop rule. Prompted by Michael ("how do we ensure that when i invoke any /agent-name that you go and read whatever ROSTER file you maintain").
+- **2026-07-30: STEP 0 RE-HOMED to the ClickUp Agent Index; `roster.json` retired.** Michael: *"it's a table. not a doc"* → *"declare this index the sole truth."* Resolution is now a single-row query instead of a whole-file read, which removes the size ceiling that the roster violated continuously for its entire existence and that once shipped an agent unregistered. Folded the dictation near-miss list into this gate as its **sole** home (it was duplicated in the retired data file), added Rocky→Ricky and Tate, added Ricky + Tate to the never-was-a-lens list, and added the query-one-row rule. `roster.html` retired alongside — a ClickUp view is the renderer now.
+- **2026-07-27: roster thinned to an index — STEP 0 note added, `from` pointer de-rotted.** The roster dropped `lane`/`accent`/`from`/`seat`/`teams` (each a lossy duplicate of a file that says it better); **nothing this gate reads changed.** Added a ⚠️ to the soft-gate section recording that `default_runbook` + `gate_strength` are read on every bare-name call and were nearly cut in that pass — deleting them does not error, it silently un-guards a read-only door.
+- **2026-07-26: STEP 0 DE-ROTTED — it was pointing at a field that does not exist.** Resolution path corrected `invocation_resolution.token_map` → `invocation.tokens`, and the described schema corrected from two arrays to one flat list. Also struck three `registry.json` pointers. Added: the six live lens→teammate migrations, the Frank/Fiona split incl. the immutable-slug token, the dictation near-miss pairs, the **unbuilt-name exception**, the live proof that the bare-name model holds (Maggie + Clio), and **earn-`auto`-don't-assume-it**.
+- 2026-07-24: Added STEP 0 — roster-first resolution. Added the no-double-hop rule. Prompted by Michael ("how do we ensure that when i invoke any /agent-name that you go and read whatever ROSTER file you maintain").
 - 2026-07-21: Added the Lens → git-teammate migration resolution rule (Anna). Prompted by Michael ("break it with beckett").
-- 2026-07-20: Added the invocation-mode contract + per-agent soft-gate dial (`gate_strength`). Runbooks are standalone + directly invocable; the persona points at the runbook, never hardcodes it.
+- 2026-07-20: Added the invocation-mode contract + per-agent soft-gate dial. Runbooks are standalone + directly invocable.
 - 2026-07-19: Added the "Wes"/"/wes" collision resolution. Prompted by Michael (screenshot of the misfire).
 - 2026-07-03: Initial version.
