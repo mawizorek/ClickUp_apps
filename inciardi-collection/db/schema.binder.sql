@@ -16,6 +16,17 @@
 -- and is never used for binder structure — a binder page and an app page in one codebase is a
 -- collision that costs real confusion later.
 --
+-- ⚠️ AMENDMENT 2026-07-30 (Michael), because the reservation above is about to be spent:
+-- SHEET remains the canonical noun for the thing that physically moves and gets shuffled. PAGE is
+-- being reclaimed as a real user-facing concept — a single SIDE, its number DERIVED from sheet_order
+-- plus A/B, never stored. `v_binder_spread` already computes exactly that (side_index / spread_index),
+-- so page numbering is a read model and reordering sheets renumbers pages for free.
+-- THE ASYMMETRY THAT MAKES THIS SAFE TO DEFER: moving a SHEET is one integer per row and zero slots
+-- touched. Moving a PAGE is re-seating nine prints — a migration, not a reorder. Ship the cheap verb
+-- first; that is why /sheet/reorder exists and /page/move does not.
+-- The `pages/*.html` route directory keeps its name. If that collision ever bites, rename the
+-- DIRECTORY, not the binder vocabulary.
+--
 -- AND THE REFRAME THAT MADE THIS TABLE EXIST AT ALL (J2): the binder is not a view over the catalog,
 -- it IS the catalog entry surface. A slot card is a gridded "enter or edit one print." Michael: "why
 -- are they so different tho?" They aren't.
@@ -53,8 +64,24 @@ CREATE TABLE IF NOT EXISTS sheet (
   updated_at    TEXT NOT NULL,
 
   -- rung 2: two sheets cannot claim the same position in one binder. Reordering is a transaction of
-  -- updates, not a hope. ⚠️ BUILD NOTE: reordering needs a temporary negative-offset pass, because a
-  -- naive "shift everything down" collides with this constraint mid-flight.
+  -- updates, not a hope.
+  --
+  -- 🔴 BUILD NOTE — CORRECTED 2026-07-30, AND THE ORIGINAL WOULD HAVE FAILED 100% OF THE TIME.
+  -- This comment used to read: "reordering needs a temporary NEGATIVE-offset pass, because a naive
+  -- 'shift everything down' collides with this constraint mid-flight." The diagnosis was right and
+  -- the prescription was UNWRITEABLE: `CHECK (sheet_order >= 0)`, two lines below, rejects every
+  -- negative value. Anyone implementing the documented remedy would have hit a CHECK violation on
+  -- the first statement and gone looking for the bug in their own code.
+  --   THE ACTUAL REMEDY: park HIGH, not negative. Set every sheet to MAX(sheet_order) + 1 + i, which
+  --   cannot collide with any live value, then write the final 0..n-1 in a second pass. Both passes
+  --   go in ONE transaction (D1: `db.batch()`), because a half-applied reorder leaves sheets parked
+  --   in the 900s and looks like data loss.
+  --   Implemented in `worker/worker.js` → POST /sheet/reorder. It takes the COMPLETE new order and
+  --   refuses anything that is not a full permutation: a partial list would renumber some sheets,
+  --   leave the rest where they were, and produce a scrambled binder that still looks plausible.
+  --   Free side effect: pass two compacts any gaps left by a deleted sheet.
+  -- GENERALIZABLE: a comment prescribing a remedy the schema forbids is worse than no comment. If a
+  -- build note names a specific value, check it against the constraints in the same table.
   UNIQUE (binder_id, sheet_order),
   CHECK (sheet_order >= 0)
 );
@@ -79,6 +106,11 @@ CREATE INDEX IF NOT EXISTS ix_sheet_binder ON sheet(binder_id, sheet_order);
 -- Marking a slot owned is an INPUT, not a state change: tapping "I have this" writes a `copy` row and
 -- the slot fills as a consequence. Minimal singular tracking, nothing recorded twice. This is J2
 -- ruling 4 (a card is an input surface) applied to ownership.
+--
+-- ⚠️ SLOTS REFERENCE sheet_id, NEVER sheet_order. That is what makes reordering the binder free: a
+-- sheet changes position and not one slot row is touched, which is exactly the physical gesture of
+-- lifting a sheet out of the rings with both its sides intact. Do not "denormalise" a position onto
+-- a slot for query convenience.
 CREATE TABLE IF NOT EXISTS slot (
   slot_id    TEXT PRIMARY KEY,
   sheet_id   TEXT NOT NULL REFERENCES sheet(sheet_id) ON DELETE CASCADE,
@@ -130,6 +162,8 @@ CREATE INDEX IF NOT EXISTS ix_slot_art   ON slot(artwork_id);
 --    🔴 REQUIREMENT THAT FALLS OUT AND MUST REACH THE UI: that badge reads "own 1 · placed 3", never a
 --    bare "3". The imprecision is only acceptable while it is legible. `v_slot` returns qty_owned and
 --    placed_count separately for exactly this reason — verified 2026-07-28.
+--    ➕ 2026-07-30: those two numbers turned out to answer a SECOND question for free. own − placed,
+--    floored at zero, is how many copies are still in the shoe-box. See the /shoebox route.
 --
 -- 2. NO CONSTRAINT SAYS A SHEET HAS 18 SLOTS. Sparse rows mean a brand-new sheet has zero rows and is
 --    still a valid nine-up sheet on both sides. The 3x3 grid is a RENDERING fact, enforced by
