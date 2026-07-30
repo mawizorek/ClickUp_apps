@@ -1,41 +1,33 @@
 <!-- The binder. A fixed frame, not a document.
 
-     GONE FROM v4, all deliberate:
-       <h1>Binder</h1>          — the header nav already says Binder. It was 40px of repetition.
-       <p class="sub">          — "Nine slots a side, two sides a sheet" is the legend's job, and
-                                  the layout now demonstrates it.
-       the sheet <select>/button — folded into .sheetbar, which was ALSO printing the title,
-                                  position and fill a second time directly below itself.
-       the closing <p class="hint"> legend paragraph — moved into the ? drawer, where each row
-                                  shows the treatment it describes.
-     Together that was ~350px of chrome around nine cards on a 390px-wide phone.
+     The three panels here are PAGE drawers (`.page-drawer`, styled in base.css): they belong to
+     this route and are rebuilt with it. The nav and settings drawers are CHROME — built once by
+     chrome.js, appended to <body>, and not in any page file. Opening either kind closes the
+     other, so three stacked panels is unreachable.
 
-     The scrim is NOT here: it lives at body level in index.html so the Settings drawer shares
-     it and so exactly one element carries that id no matter which route is mounted.
-
-     ⚠️ VOCABULARY: the buttons say FRONT and BACK, the element ids stay `sideA` / `sideB`.
-     That is deliberate — `slot.side` is CHECK (side IN ('A','B')) in the schema, so 'A'/'B'
-     is the stored value and Front/Back is only the word a person reads. app.js holds the one
-     mapping (FACE_LABEL). Renaming these ids would suggest the data changed; it hasn't. -->
+     ⚠️ VOCABULARY: the buttons say FRONT and BACK; the element ids stay `sideA` / `sideB`.
+     `slot.side` is CHECK (side IN ('A','B')), so 'A'/'B' is the stored value and Front/Back is
+     only the word a person reads. `FACE` in binder.js holds the one mapping. Renaming these ids
+     would imply the data changed. It didn't. -->
 <section class="page">
 
-  <!-- One line, one instance of each fact: what sheet, how full, where in the binder. -->
+  <!-- One line, one instance of each fact: which sheet, how full, and the legend. -->
   <div class="sheetbar">
-    <button id="sheetMenuBtn" class="sb-open" aria-haspopup="true" aria-expanded="false"
-            aria-controls="sheetMenu">
-      <span class="sb-title" id="sbTitle">Loading…</span>
+    <button id="sheetMenuBtn" class="sb-open" data-drawer-btn aria-haspopup="true"
+            aria-expanded="false" aria-controls="sheetMenu">
+      <span class="sb-title" id="sbTitle">Loading&hellip;</span>
       <span class="sb-c" aria-hidden="true">&#9662;</span>
     </button>
     <span class="sb-fill" id="sbFill"></span>
-    <button id="legendBtn" class="icon-btn" aria-haspopup="true" aria-expanded="false"
-            aria-controls="legend" aria-label="What the card styles mean"
-            title="What the card styles mean">?</button>
+    <button id="legendBtn" class="icon-btn" data-drawer-btn aria-haspopup="true"
+            aria-expanded="false" aria-controls="legend"
+            aria-label="What the card styles mean" title="What the card styles mean">?</button>
   </div>
   <div class="sheetbar-meter" aria-hidden="true"><span id="sbMeter" style="width:0"></span></div>
 
-  <!-- THE STAGE. Two faces in one box; the Front/Back control rotates the flipper in 3D. Both
-       faces stay in the DOM so the flip has something to reveal — backface-visibility keeps
-       the hidden one un-tappable, so there is no pointer-events juggling. -->
+  <!-- THE STAGE. Two faces in one box; Front/Back rotates the flipper in 3D. Both faces stay in
+       the DOM so the flip has something to reveal — backface-visibility keeps the hidden one
+       un-tappable, so there is no pointer-events juggling. -->
   <div class="stagewrap" id="stage">
     <div class="flipper" id="flipper">
       <div class="face a" id="faceA"></div>
@@ -43,9 +35,9 @@
     </div>
   </div>
 
-  <!-- Thumb zone. ‹ › walk the binder one FACE at a time and flow over the sheet boundary,
-       exactly like the arrow keys and a swipe — so they are labelled for turning, not for
-       stepping sheets. Position is stated between them. -->
+  <!-- Thumb zone. &lsaquo; &rsaquo; walk one FACE at a time and flow over the sheet boundary,
+       exactly like the arrow keys and a swipe — so they are labelled for turning, not stepping
+       sheets. Position sits between them. -->
   <div class="deckbar">
     <button id="prevSheet" class="step" aria-label="Turn back">&#8249;</button>
     <span class="where" id="deckWhere"></span>
@@ -56,28 +48,37 @@
     <button id="nextSheet" class="step" aria-label="Turn forward">&#8250;</button>
   </div>
 
-  <aside id="sheetMenu" class="drawer" hidden aria-label="Sheets"></aside>
+  <button class="page-scrim" id="pageScrim" hidden aria-label="Close"></button>
 
-  <aside id="legend" class="drawer" hidden aria-label="Card styles">
-    <h2>Reading a sheet</h2>
-    <p class="hint">Nine slots a face, a front and a back to every sheet. Owned and wanted are
-       worked out from what you actually have, so they can never disagree with your collection.</p>
-    <div class="legend">
-      <div class="lg-row"><span class="lg-swatch" aria-hidden="true"></span>
-        <div><b>Owned</b><span>You have it, and it's in this slot.</span></div></div>
-      <div class="lg-row"><span class="lg-swatch wanted" aria-hidden="true"></span>
-        <div><b>Wanted</b><span>Laid out, not yet owned. The visible gap.</span></div></div>
-      <div class="lg-row"><span class="lg-swatch note" aria-hidden="true"></span>
-        <div><b>Note</b><span>A reminder in a slot instead of a print.</span></div></div>
-      <div class="lg-row"><span class="lg-swatch empty" aria-hidden="true"></span>
-        <div><b>Empty</b><span>Nothing recorded. Tap to fill it.</span></div></div>
+  <!-- sheets.js fills this one on open. -->
+  <aside id="sheetMenu" class="page-drawer" hidden aria-label="Sheets"></aside>
+
+  <!-- Static, because every row SHOWS the treatment it names — which is also why these swatches
+       must track the `.slot` rules in binder.css. Change one, change both. -->
+  <aside id="legend" class="page-drawer" hidden aria-label="Card styles">
+    <div class="drawer-head"><h2>Reading a sheet</h2>
+      <button class="drawer-x" id="legendClose" aria-label="Close">&#10005;</button></div>
+    <div class="drawer-body">
+      <p class="drawer-note">Nine slots a face, a front and a back to every sheet. Owned and
+         wanted are worked out from what you actually have, so they can never disagree with your
+         collection.</p>
+      <div class="legend">
+        <div class="lg-row"><span class="lg-swatch" aria-hidden="true"></span>
+          <div><b>Owned</b><span>You have it, and it's in this slot.</span></div></div>
+        <div class="lg-row"><span class="lg-swatch wanted" aria-hidden="true"></span>
+          <div><b>Wanted</b><span>Laid out, not yet owned. The visible gap.</span></div></div>
+        <div class="lg-row"><span class="lg-swatch note" aria-hidden="true"></span>
+          <div><b>Note</b><span>A reminder in a slot instead of a print.</span></div></div>
+        <div class="lg-row"><span class="lg-swatch empty" aria-hidden="true"></span>
+          <div><b>Empty</b><span>Nothing recorded. Tap to fill it.</span></div></div>
+      </div>
+      <p class="drawer-note">Swipe, arrow keys or <b>&#8249; &#8250;</b> turn one face at a time,
+         straight through the binder.</p>
+      <p class="drawer-note">A print can sit in more than one slot. When it does, the card spells
+         out <b>own N &middot; placed M</b> so it can never read as owning more than you do.</p>
     </div>
-    <p class="hint" style="margin-top:var(--gap-md,12px)">Swipe, arrow keys or <b>&#8249; &#8250;</b>
-       turn one face at a time, straight through the binder.</p>
-    <p class="hint">A print can sit in more than one slot. When it does, the card spells out
-       <b>own N &middot; placed M</b> so it can never read as owning more than you do.</p>
-    <div class="row"><button id="legendClose" class="ghost">Close</button></div>
   </aside>
 
-  <aside id="pickWrap" class="drawer" hidden aria-label="Fill slot"></aside>
+  <!-- picker.js fills this one per slot. -->
+  <aside id="pickWrap" class="page-drawer" hidden aria-label="Fill slot"></aside>
 </section>
