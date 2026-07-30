@@ -1,403 +1,89 @@
 <!doctype html>
-<!-- Inciardi Collection — v8. Router shell + pages/ partials. Pages-hosted, not file:// capable.
-     Shape derived from template-app (gold standard v5), NOT from the predecessor.
-
-     ONE DELIBERATE ADDITION vs the template: the template's router injects partials with
-     innerHTML, which does not execute inline <script>. So after injecting we call
-     App.mount(route, params). Without that hook every page here would be inert markup.
-
-     v2 · write key baked into core.js (Michael's call).
-     v3 · Mercedes palette. Three pointers, zero CSS: styles.css has no colour literals.
-     v4 · sheet menu (reorder + rename); shoe-box counts spares.
-     v5 · DESIGN PASS. The binder is a bounded object, not a scroll. Header stopped wrapping;
-          one shared scrim at body level.
-     v6 · FRONT / BACK instead of A / B; one arrow press turns one face through the binder.
-     v7 · SUMMARY. The whole collection as a matrix, with drill-in and deep links, plus
-          hash PARAMS so `#binder?sheet=x&side=B` is a real address.
-     v8 · THE SPLIT. app.js 32.7KB → 4.7KB. Every screen is its own module; app.js routes and
-          nothing else. No behaviour changed.
+<!-- Inciardi Collection — v9. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
-     🔴 THE MODULE MAP — and the rule that produced it.
+     🔴 THE MODULE MAP, and the two rules that produced it.
 
-     Nothing that has to be read back whole may exceed ~30KB (hard cap; ~22KB target), because
-     A FILE THAT CANNOT BE READ WHOLE CANNOT BE SAFELY EDITED. app.js broke that on 07-30 at
-     32,701 bytes, which made the file rendering this app the file least safe to change.
+     RULE 1 — nothing that must be read back whole exceeds the budget:
+     **~12KB target · 15KB split line · 22KB ceiling · 30KB hard tool cap.** Base64 inflates
+     4/3, so 22KB on disk is ~29KB returned. A file that cannot be read whole cannot be safely
+     edited. Full math: `brain-config/hooks/source-size-budget-enforcer.md`.
 
-       core.js     — API client + DOM helpers. Loaded FIRST; everything below needs it.
-       binder.js   — the stage, the flip, the sheet menu       → window.Binder   (26KB ⚠️)
-       enter.js    — the entry form AND the shoe-box           → window.Enter, window.Shoebox
-       summary.js  — the collection matrix + drill-in          → window.Summary
-       app.js      — routing only. Adding a screen = a new file + one line there.
+     RULE 2 — **`index.html` is an INDEX** (architecture lock, 2026-07-08): a thin shell that
+     references pages, never a file storing servable content. This one had grown a ~250-line
+     inline script and hit 20.8KB. The index had become the app. That script is now `boot.js`.
 
-     ⚠️ `binder.js` is 26KB — under the cap, over the target, and the next one to split (the
-     sheet menu is the natural seam). `styles.css` is 30KB and sits AT the cap; summary.css was
-     created rather than growing it, and the same call applies next time.
+       core.js     9.6KB  API client · Drawer · helpers    → API, Core, Drawer
+       chrome.js  11.5KB  header · nav · settings · footer → Chrome
+       binder.js  14.2KB  the stage, faces, turning        → Binder
+       sheets.js   6.3KB  reorder · rename · add           → Sheets
+       picker.js   4.5KB  the slot entry surface           → Picker
+       enter.js    8.1KB  entry form + shoe-box            → Enter, Shoebox
+       summary.js 10.1KB  the collection matrix            → Summary
+       app.js      4.7KB  routing only                     → App
+       boot.js    12.4KB  config · theme · router · settings
 
-     🔴 WHY THIS HAPPENED, which matters more than the fix: the tools to prevent it already
-     existed and neither one ran. Size Sally (`brain-config/agents/size-sally.md`) forecasts a
-     file's size curve BEFORE a write. Dev Dexter (`brain-config/super-agents/dev-dexter/`)
-     owns the modular-split law as a person. Both are INVOKE-ONLY, and nobody seated either
-     across v4, v5, v6 or v7 — four consecutive versions, each adding a screen to one file.
-     A guardrail that depends on someone remembering it is not a guardrail.
-     ============================================================================ -->
+       base.css   12.3KB  type · forms · lists · toasts
+       chrome.css  8.2KB  header · drawers · footer
+       binder.css 15.2KB  stage · cards · deck bar
+       summary.css 9.3KB  the matrix
+
+     Every file under the split line except `binder.css` at 15.2KB, which is at it. ADDING A
+     SCREEN MEANS ADDING A FILE. Never grow one of these back.
+
+     🔴 HOW IT WENT WRONG, because the mechanism matters more than the numbers: v4 added the
+     sheet menu, v5 the stage, v6 traversal, v7 the shoe-box split — four reasonable changes,
+     one file, no moment anyone would have called it a problem. `app.js` hit 32.7KB and
+     `styles.css` 30KB. **Size Sally forecasts exactly this and Dev Dexter owns the split law;
+     both are invoke-only and neither was seated across those four versions.** A guardrail that
+     needs remembering is not a guardrail — which is why the answer is a DEFAULT SHAPE (thin
+     router, one module per screen) rather than a fifth gate.
+     ============================================================================
+
+     v9 also: template header/footer pattern (hamburger + left nav drawer, real footer with a
+     build stamp) and a LIGHT MODE toggle — one `THEMES.setMode()` call, because every colour
+     row already ships an alt-* ramp and every rule here reads var(--token). -->
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- Mercedes surface-1. This paints the iOS browser chrome, so a stale value is a visible seam
-     between the app and the phone UI even when every token inside is correct. -->
+<!-- Mercedes surface-1. Paints the iOS browser chrome, so chrome.js moves it with the mode
+     toggle — a stale value here is a visible seam against the phone UI. -->
 <meta name="theme-color" content="#192221">
 <meta name="robots" content="noindex, nofollow">
 <title>Inciardi Collection</title>
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=8">
-<link rel="stylesheet" href="./summary.css?v=8">
+<link rel="stylesheet" href="./base.css?v=9">
+<link rel="stylesheet" href="./chrome.css?v=9">
+<link rel="stylesheet" href="./binder.css?v=9">
+<link rel="stylesheet" href="./summary.css?v=9">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
 
-<header id="appHeader">
-  <div class="bar">
-    <span class="brand">&#128213; <b>Inciardi</b> <span class="wm-long">Collection</span></span>
-    <nav id="nav"></nav>
-    <button id="gear" class="icon-btn" aria-label="Settings" title="Settings">&#9881;</button>
-  </div>
-  <div id="banner" class="banner" hidden></div>
-</header>
-
+<!-- chrome.js fills these three. The nav drawer, settings drawer and scrim are appended to
+     <body> by it, so they are not in this file either. -->
+<header id="appHeader"></header>
 <main id="view" tabindex="-1"></main>
-
-<!-- Shared by every drawer in the app, on every route. -->
-<button class="scrim" id="scrim" hidden aria-label="Close"></button>
-
-<aside id="settings" class="drawer" hidden aria-label="Settings">
-  <h2>Settings</h2>
-  <p class="hint">Nothing here needs filling in. Both fields are overrides for this device.</p>
-
-  <label for="writeKey">Write key</label>
-  <input id="writeKey" type="password" autocomplete="off">
-  <p class="hint" id="keyHint"></p>
-
-  <div class="row">
-    <button id="saveCfg" class="primary">Save</button>
-    <button id="ping">Test connection</button>
-  </div>
-  <div class="row"><button id="copyDiag" class="ghost">Copy diagnostics</button></div>
-  <pre id="pingOut" class="out" hidden></pre>
-
-  <!-- Collapsed on purpose: one correct value, already set. Surfacing it made setup look twice
-       as long as it is. Still reachable for a staging or localhost worker. -->
-  <details style="margin-top:var(--gap-lg,20px)">
-    <summary class="tag" style="cursor:pointer">Advanced &middot; worker URL</summary>
-    <label for="apiBase">Worker URL</label>
-    <input id="apiBase" type="url" inputmode="url" autocapitalize="off" autocorrect="off">
-    <p class="hint" id="baseHint"></p>
-    <div class="row"><button id="resetBase" class="ghost">Use the built-in default</button></div>
-  </details>
-
-  <div class="row"><button id="closeCfg" class="ghost">Close</button></div>
-</aside>
+<footer id="appFooter"></footer>
 
 <div id="toasts" class="toasts" aria-live="polite"></div>
 <noscript>This app needs JavaScript enabled.</noscript>
 
-<!-- ORDER: core.js first (everything depends on it). After that the screen modules are
-     order-independent — each only registers a `window.X`, and mounting happens below, after
-     every file has parsed. app.js LAST for readability, not necessity. -->
+<!-- ORDER: core.js first (everything depends on it), boot.js last (it calls Chrome.init and
+     the router). The screen modules between are order-independent — each only registers a
+     window.X, and mounting happens after every file has parsed. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./core.js?v=8"></script>
-<script src="./binder.js?v=8"></script>
-<script src="./enter.js?v=8"></script>
-<script src="./summary.js?v=8"></script>
-<script src="./app.js?v=8"></script>
-<script>
-(function () {
-  /* ==== APP CONSTANTS ==== */
-  var APP_VERSION = "v8";
-
-  /* ==== THEME ====
-     `soft-mercedes` is a JOIN in shared/themes/_themes.json: color `mercedes` + typography
-     `grounded` + forms `soft` + spacing `standard`. All four pointers were verified against
-     their grids before shipping (a bad pointer paints a red fault banner rather than
-     half-theming in silence).
-
-     🔴 APPLY A JOIN SLUG, NEVER A COLOR SLUG. `mercedes` alone is a ROW in colors.tsv, not a
-     join — passing it to applyTheme() faults. The DOM attribute above is the opposite: it
-     takes a COLOR slug, because themes.css ships a static [data-theme="mercedes"] block for
-     the pre-JS first paint. Two vocabularies, one word apart.
-
-     🗑️ REMOVED IN v3 — the `ic_color` override, read from localStorage twice and never
-     written by anything in this app. Its only reachable effect was a hand-set value silently
-     overriding the palette, making a correct theme change look like it never shipped. If a
-     picker is wanted, `on-track` has the reference implementation (a passive menu off
-     THEMES.listThemes()) — build it with a visible readout of the active theme. */
-  var APP_THEME = "soft-mercedes";
-  var DEFAULT_COLOR = "mercedes";   // pre-paint / no-JS floor, must match the join's colour
-  var DEFAULT_PAGE  = "binder";
-  /* ⚠️ FOUR ITEMS IS THE CEILING for this header on a phone. Brand + nav + gear is ~355px at
-     390px wide with these labels; a fifth item, or a longer label than "Shoe-box", overflows
-     and the nav wraps to a second line (which is exactly the v5 bug). Labels match their page
-     titles on purpose — a nav that says "Box" leading to a page titled "Shoe-box" makes the
-     user check whether they went somewhere else. Next screen goes behind a menu, not up here. */
-  var NAV = [
-    { route: "binder",  label: "Binder" },
-    { route: "enter",   label: "Enter" },
-    { route: "shoebox", label: "Shoe-box" },
-    { route: "summary", label: "Summary" }
-  ];
-  /* ======================= */
-
-  if (window.THEMES && THEMES.applyTheme) {
-    THEMES.applyTheme(APP_THEME);
-  } else {
-    // resolve.js missing entirely: themes.css + the data-theme attribute already painted the
-    // Mercedes ramp, so this only re-asserts it. Colours survive; the other three vectors
-    // fall back to the var() defaults baked into styles.css.
-    document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
-  }
-
-  /* ---- nav ---- */
-  var nav = document.getElementById("nav");
-  nav.innerHTML = NAV.map(function (n) {
-    return '<a href="#' + n.route + '" data-route="' + n.route + '">' + n.label + '</a>';
-  }).join("");
-
-  /* ---- settings drawer ---- */
-  var dr = document.getElementById("settings");
-  var scrim = document.getElementById("scrim");
-  var baseIn = document.getElementById("apiBase");
-  var baseHint = document.getElementById("baseHint");
-  var keyIn = document.getElementById("writeKey");
-  var keyHint = document.getElementById("keyHint");
-
-  /* Kept for the diagnostics bundle. The LAST FAILURE is retained deliberately: a copy button
-     matters most when something broke, and a bundle that only reports the latest (successful)
-     call is exactly the one that omits the useful part. */
-  var lastPing = null, lastError = null, lastAt = null;
-
-  function paintBase() {
-    // Show the OVERRIDE, not the effective value: an input pre-filled with something it never
-    // saved is a small lie about state, and blanking it would then look like erasing.
-    if (API.isDefaultBase()) {
-      baseIn.value = "";
-      baseIn.placeholder = API.defaultBase();
-      baseHint.innerHTML = 'Using the built-in default: <code>' + Core.esc(API.defaultBase()) + '</code>. Leave blank unless you are pointing at a different worker.';
-    } else {
-      baseIn.value = API.base();
-      baseHint.innerHTML = 'Overridden on this device. Built-in default is <code>' + Core.esc(API.defaultBase()) + '</code>.';
-    }
-  }
-
-  /* Same rule as the URL, and it matters more here: NEVER pre-fill this box with the built-in
-     key. Painting the effective value would both lie about what this device saved and put the
-     credential one "show password" tap from any screen someone is looking over. */
-  function paintKey() {
-    if (API.isDefaultKey()) {
-      keyIn.value = "";
-      keyIn.placeholder = "using the built-in key";
-      keyHint.innerHTML = 'Editing is <b>already unlocked</b> — this app ships with its write key. Type one here only to override it on this device.';
-    } else {
-      keyIn.value = API.key();
-      keyHint.innerHTML = 'Overridden on this device. Clear the box and Save to go back to the built-in key.';
-    }
-  }
-
-  function openSettings() {
-    paintKey(); paintBase();
-    scrim.hidden = false; dr.hidden = false;
-    document.getElementById("gear").setAttribute("aria-expanded", "true");
-  }
-  function closeSettings() {
-    dr.hidden = true; scrim.hidden = true;
-    document.getElementById("gear").setAttribute("aria-expanded", "false");
-  }
-
-  document.getElementById("gear").addEventListener("click", openSettings);
-  document.getElementById("closeCfg").addEventListener("click", closeSettings);
-  // The scrim serves every drawer; only act when Settings is the one that is open, or the
-  // binder's own handler and this one would fight over it.
-  scrim.addEventListener("click", function () { if (!dr.hidden) closeSettings(); });
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !dr.hidden) closeSettings();
-  });
-
-  document.getElementById("resetBase").addEventListener("click", function () {
-    API.setBase(""); paintBase(); Core.toast("Back to the built-in worker", "good");
-  });
-  document.getElementById("saveCfg").addEventListener("click", function () {
-    API.setBase(baseIn.value.trim());     // blank = fall back to the default
-    API.setKey(keyIn.value.trim());       // blank = fall back to the built-in key
-    Core.toast("Saved on this device", "good");
-    paintKey(); paintBase(); checkConfig(); go();
-  });
-
-  /* RAW JSON, verbatim — Michael pastes it, so the machine output is the point. The verdict
-     line sits ABOVE it because that costs nothing and answers "can I save yet?" at a glance. */
-  document.getElementById("ping").addEventListener("click", function () {
-    var out = document.getElementById("pingOut");
-    out.hidden = false; out.textContent = "…";
-    lastAt = new Date().toISOString();
-    API.get("/health").then(function (d) {
-      lastPing = d; lastError = null;
-      out.textContent =
-        "CONNECTED · " + (API.isDefaultKey() ? "built-in write key" : "key overridden on this device") +
-        "\n\n" + JSON.stringify(d, null, 2) +
-        "\n\nNOTE: /health is a READ, and reads never need a key — so this passing does not" +
-        "\nprove writes work. A 401 on a save means the key here and the one on the worker" +
-        "\ndisagree.";
-    }).catch(function (e) {
-      lastError = e.message || String(e); lastPing = null;
-      out.textContent = "FAILED\n\n" + lastError;
-    });
-  });
-
-  /* Copies a DIAGNOSTIC BUNDLE, not just the JSON: version, which worker, whether a key is
-     present, the route, the viewport, the browser, the last failure.
-     🔴 NEVER THE KEY ITSELF — only whether one exists and how long it is. This text is built
-     to be pasted into a chat, so a credential in here would be a leak with a delivery
-     mechanism attached. Still true with a baked key: name WHICH key is in play, never the
-     string. (The built-in one is public anyway, but a diagnostic that pastes credentials into
-     chat logs is a habit that will eventually meet a key that is not.) */
-  function bundle() {
-    var L = [];
-    L.push("INCIARDI COLLECTION — DIAGNOSTICS");
-    L.push("generated   " + new Date().toISOString());
-    L.push("app         " + APP_VERSION + "  (theme " + APP_THEME + ")");
-    // The RESOLVED theme, read off the DOM — not the constant. If a vector failed to apply,
-    // resolve.js writes "!slug" into the attribute, so this reports what the page is actually
-    // wearing rather than what it intended to wear.
-    L.push("theme join  " + (document.documentElement.getAttribute("data-theme-join") || "(not applied)") +
-           "  color=" + (document.documentElement.getAttribute("data-theme") || "?") +
-           "  mode=" + (document.documentElement.getAttribute("data-mode") || "?"));
-    if (window.THEMES && THEMES.faults && THEMES.faults.length) {
-      L.push("theme faults " + THEMES.faults.length + ": " + THEMES.faults.join(" | "));
-    }
-    /* WHICH MODULES ACTUALLY LOADED. New in v8, and it is the diagnostic the split created a
-       need for: a missing script tag or a 404'd module is otherwise indistinguishable from a
-       screen with no data. Names what is present so the answer arrives with the report. */
-    L.push("modules     " + ['Binder', 'Enter', 'Shoebox', 'Summary', 'App'].map(function (m) {
-      return m + (window[m] ? '\u2713' : '\u2717');
-    }).join(' '));
-    L.push("hash        " + (location.hash || "(none)"));
-    L.push("viewport    " + window.innerWidth + "x" + window.innerHeight +
-           " dpr=" + (window.devicePixelRatio || 1));
-    L.push("worker      " + API.base() + (API.isDefaultBase() ? "  [built-in default]" : "  [OVERRIDDEN on this device]"));
-    L.push("write key   " + (API.isDefaultKey()
-      ? "built-in (" + API.key().length + " chars, from core.js)"
-      : "OVERRIDDEN on this device (" + API.key().length + " chars)"));
-    L.push("browser     " + navigator.userAgent);
-    L.push("");
-    if (lastAt) L.push("last test   " + lastAt);
-    if (lastError) { L.push(""); L.push("LAST FAILURE"); L.push(lastError); }
-    if (lastPing) { L.push(""); L.push("LAST /health RESPONSE"); L.push(JSON.stringify(lastPing, null, 2)); }
-    if (!lastAt) L.push("(Test connection has not been run in this session — no response captured.)");
-    return L.join("\n");
-  }
-
-  document.getElementById("copyDiag").addEventListener("click", function () {
-    var txt = bundle();
-    var out = document.getElementById("pingOut");
-    function manual() {
-      // navigator.clipboard is absent in some iOS configurations and in non-secure contexts.
-      // A copy button that silently does nothing is worse than no copy button, so fall back to
-      // showing + selecting the text.
-      out.hidden = false; out.textContent = txt;
-      try {
-        var r = document.createRange(); r.selectNodeContents(out);
-        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-      } catch (e) {}
-      Core.toast("Clipboard blocked — text selected, copy manually", "bad");
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt)
-        .then(function () { Core.toast("Diagnostics copied (no key included)", "good"); })
-        .catch(manual);
-    } else { manual(); }
-  });
-
-  /* ---- banner: report the ACTUAL remaining gap ----
-     History, kept because it is the whole lesson: this first checked !API.base(), which became
-     permanently false when the URL got a default — a banner that cannot fire reads as an
-     all-clear. v1 fixed it by checking !API.key() instead. v2 baked in a key, which did the
-     exact same thing to that check a second time.
-
-     So there is NO always-true gap left to announce, and the honest move is to announce
-     nothing rather than invent a warning to keep the element busy. The one real remaining gap
-     is a key MISMATCH, undetectable from a read (reads are unauthenticated) — it surfaces as a
-     401 on the first save, where core.js names it precisely. Do not "restore" a read-only
-     banner here; there is no read-only state left to report. */
-  function checkConfig() {
-    var b = document.getElementById("banner");
-    if (!API.key()) {
-      // Only reachable if DEFAULT_KEY is ever emptied in core.js.
-      b.hidden = false;
-      b.className = "banner warn";
-      b.innerHTML = 'Read-only: no write key available. Open <b>&#9881;</b> to paste one.';
-    } else { b.hidden = true; }
-  }
-
-  /* ---- router: hash -> pages/<route>.html, then MOUNT it ----
-
-     The hash carries PARAMS. `#binder?sheet=sheet-1&side=B` opens the binder on that sheet's
-     back, which is what every link in the Summary matrix points at. Parsed here rather than in
-     app.js so there is one place that knows the address format.
-
-     Hash params, not a path (`#binder/sheet-1/B`): a query string is order-independent and
-     tolerates a missing value, so an old link with only `?sheet=` still works. A positional
-     path would break the moment a third parameter was added. */
-  var view = document.getElementById("view");
-  var routes = NAV.map(function (n) { return n.route; });
-
-  function parse() {
-    var h = (location.hash || "").replace(/^#/, "");
-    var q = h.indexOf("?");
-    var route = (q < 0 ? h : h.slice(0, q)) || DEFAULT_PAGE;
-    var params = {};
-    if (q >= 0) {
-      h.slice(q + 1).split("&").forEach(function (kv) {
-        if (!kv) return;
-        var i = kv.indexOf("=");
-        if (i < 1) return;
-        try {
-          params[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1));
-        } catch (e) { /* a malformed escape is not worth breaking navigation over */ }
-      });
-    }
-    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
-    return { route: route, params: params };
-  }
-
-  function setActive(route) {
-    [].forEach.call(nav.querySelectorAll("a"), function (a) {
-      a.classList.toggle("on", a.getAttribute("data-route") === route);
-    });
-  }
-
-  function go() {
-    var at = parse();
-    fetch("./pages/" + at.route + ".html", { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
-      .then(function (html) {
-        view.innerHTML = html;
-        setActive(at.route);
-        window.scrollTo(0, 0);
-        if (window.App && App.mount) App.mount(at.route, at.params);   // the hook the template lacks
-      })
-      .catch(function (e) {
-        document.body.classList.remove("stage");
-        view.innerHTML = '<section class="page"><h1>Page failed to load</h1>' +
-          '<p class="muted">' + Core.esc(e.message) + '</p></section>';
-      });
-  }
-  window.addEventListener("hashchange", go);
-
-  window.ICApp = { version: APP_VERSION, go: go, parse: parse };
-  checkConfig();
-  go();
-})();
-</script>
+<script src="./core.js?v=9"></script>
+<script src="./chrome.js?v=9"></script>
+<script src="./binder.js?v=9"></script>
+<script src="./sheets.js?v=9"></script>
+<script src="./picker.js?v=9"></script>
+<script src="./enter.js?v=9"></script>
+<script src="./summary.js?v=9"></script>
+<script src="./app.js?v=9"></script>
+<script src="./boot.js?v=9"></script>
 </body>
 </html>
