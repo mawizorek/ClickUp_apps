@@ -60,6 +60,16 @@
       "intendedUse": "Balanced everyday default for new apps copied from template-app."
     },
     {
+      "slug": "soft-mercedes",
+      "name": "Soft Racing · Mercedes",
+      "status": "locked",
+      "color": "mercedes",
+      "typography": "grounded",
+      "forms": "soft",
+      "spacing": "standard",
+      "intendedUse": "soft-utility's feel with the Mercedes palette — petronas teal accent on a near-black green-tinted ground, silver as the secondary. Built 2026-07-30 for inciardi-collection. A pure COLOR swap: typography/forms/spacing are byte-identical to soft-utility, so anything that reads correctly in one reads correctly in the other."
+    },
+    {
       "slug": "sharp-carbon",
       "name": "Sharp Carbon",
       "status": "locked",
