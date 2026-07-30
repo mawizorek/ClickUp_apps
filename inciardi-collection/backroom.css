@@ -11,8 +11,8 @@
  *
  * 🔴 INK RULE, same as everywhere: `accent`, `accent-deep` and `accent-2` are BRAND colours,
  * identical in both modes. Ink is `--text*` or `--accent-deep`. Brand colours fill, they do not
- * letter. The semantic tokens (`--bad`, `--warn`, `--good`) are the exception — they exist to be
- * read and carry their own contrast in both ramps.
+ * letter. The semantic tokens (`--bad`, `--warn`) are the exception — they exist to be read and
+ * carry their own contrast on both ramps.
  */
 
 .br-head { margin-bottom: var(--gap-md, 12px); }
@@ -33,17 +33,27 @@
 .br-target code { font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.95em;
   color: var(--accent-deep); }
 
-/* THE BLOCK NOTICE. Solid left rule in `--bad`, because this is the state where the app is
-   refusing to do the thing you asked for and the reason has to be unmissable. */
+/* THE BLOCK NOTICE. Solid left rule in `--bad`, because this is the one state where the app is
+   refusing to do the thing you asked for, and the reason has to be unmissable. */
 .br-stop { margin: var(--gap-md, 12px) 0; padding: 9px 11px;
   border: var(--border-w, 1px) solid var(--bad, var(--border));
   border-left-width: 3px; border-radius: var(--radius, 6px);
   font-size: var(--fs-sm, 0.85rem); line-height: 1.45; color: var(--text-soft);
   text-wrap: pretty; }
 .br-stop b { color: var(--bad, var(--text)); }
+
+/* ⚠️ THE OVERRIDE ROW IS A <label> WRAPPING AN <input>, AND BOTH INHERIT TRAPS FROM base.css:
+     label → display block, UPPERCASE, 0.09em tracking (it is styled as a field caption)
+     input → width 100%, min-height 44px (styled as a text box)
+   Left alone this renders as a shouted sentence next to a 44px-tall tickbox. `text-transform`
+   and `min-height: 0` are the antidotes — and `.check label` / `.check input` in base.css carry
+   the exact same pair, which is the tell that this is a known trap rather than a one-off.
+   `height` alone does NOT beat an inherited `min-height`; that is the part that bites. */
 .br-ovr { display: flex; align-items: center; gap: 8px; margin-top: 9px;
+  text-transform: none; letter-spacing: 0.01em;
   font-size: var(--fs-xs, 0.72rem); color: var(--text); cursor: pointer; }
-.br-ovr input { width: 18px; height: 18px; flex: 0 0 auto; accent-color: var(--bad, var(--accent)); }
+.br-ovr input { flex: 0 0 auto; width: 18px; height: 18px; min-height: 0; padding: 0;
+  accent-color: var(--bad, var(--accent)); }
 
 /* ---------- the verdict table ----------
    Three columns: where it goes, what it is, what will happen to it. The third column is the
@@ -76,9 +86,9 @@
   margin: var(--gap-md, 12px) 0 var(--gap-xs, 8px); }
 .br-go button { flex: 0 0 auto; }
 
-/* The log is the receipt. Capped and scrollable rather than growing the page, because on a phone
-   a thirty-seven line log would push the button that started it off the bottom of the screen and
-   leave you scrolling to find out whether it finished. */
+/* The log is the receipt. Capped and scrollable rather than growing the page: on a phone a
+   thirty-seven line log would push the button that started it off the bottom of the screen and
+   leave you scrolling to find out whether it had finished. */
 #brLog { max-height: 42vh; overflow: auto; -webkit-overflow-scrolling: touch;
   white-space: pre-wrap; word-break: break-word;
   font-size: var(--fs-xs, 0.72rem); line-height: 1.5; }
