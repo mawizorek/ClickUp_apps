@@ -1,0 +1,244 @@
+/* Inciardi Collection — THE BINDER SCREEN. Stage, cards, deck bar, sheet list, legend.
+ *
+ * ZERO COLOUR LITERALS. Split out of a 30KB `styles.css` on 2026-07-30.
+ *
+ * ============================================================================
+ * THE CENTRAL DESIGN CALL: A SHEET IS AN OBJECT, NOT A DOCUMENT.
+ *
+ * v4 rendered nine slots for the front, then nine for the back, in one column on a phone — an
+ * 18-cell ribbon about 1400px tall. A SCROLL. You cannot feel a binder by scrolling past it,
+ * and the tell was that nothing was ever fully on screen at once.
+ *
+ * So the binder route does not scroll. `body.stage` (base.css) locks to the viewport, and the
+ * 3x3 grid below is `minmax(0,1fr)` on BOTH axes so it shrinks to the frame instead of pushing
+ * past it. One face fills the screen. You move by TURNING.
+ *
+ * What had to follow: nine cards in ~55dvh means a card cannot stack plate + name + two meta
+ * lines, so the caption moved ONTO the plate as a band. Same information, half the height. That
+ * single change is what makes a face fit.
+ *
+ * 🔴 THE BORDER LANGUAGE IS LOAD-BEARING. Three states, three treatments, and they must stay
+ * distinct because the legend names them and renders its swatches from these same rules:
+ *      SOLID = owned      DASHED = wanted      DOTTED = empty
+ * A first pass made empty dashed too, which collided with wanted and would have erased the
+ * difference between "a gap I am tracking" and "a sleeve I have not touched." Change one, change
+ * the legend in `pages/binder.html` in the same commit.
+ * ============================================================================ */
+
+/* ---------- sheet identity line ----------
+   Replaces BOTH the old `.sheet-head` AND a separate sheet button, which between them printed
+   the title, position and fill TWICE. One line, one instance of each fact. */
+.sheetbar { flex: 0 0 auto; display: flex; align-items: center; gap: var(--gap-xs, 8px);
+  padding: var(--gap-xs, 8px) var(--gap-md, 12px);
+  border-bottom: var(--border-w, 1px) solid var(--border); }
+.sheetbar .sb-open { flex: 1 1 auto; min-width: 0; display: flex; align-items: center;
+  gap: var(--gap-xs, 8px); background: transparent; border: 0; border-radius: var(--radius, 6px);
+  padding: 4px 6px; margin-left: -6px; text-align: left; min-height: 36px; }
+.sheetbar .sb-open:hover { background: var(--surface-2); }
+.sheetbar .sb-title { font-family: var(--font-display, inherit); font-size: var(--fs-body, 0.95rem);
+  font-weight: 600; letter-spacing: var(--track-tight, -0.02em);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sheetbar .sb-c { color: var(--text-faint); font-size: 0.7em; flex: 0 0 auto; }
+.sheetbar .sb-fill { flex: 0 0 auto; font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint);
+  letter-spacing: 0.04em; }
+.sheetbar .icon-btn { flex: 0 0 auto; min-width: 36px; min-height: 36px; padding: 0;
+  display: grid; place-items: center; background: transparent; border: 0;
+  border-radius: var(--radius, 6px); color: var(--text-soft); }
+.sheetbar .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+
+/* Fill meter as a hairline under the bar rather than a widget in it — ambient information, and
+   at 2px it reads without competing with the title. */
+.sheetbar-meter { flex: 0 0 auto; height: 2px; background: var(--surface-2); }
+.sheetbar-meter span { display: block; height: 100%; background: var(--accent);
+  transition: width 320ms var(--ease, cubic-bezier(0.22,1,0.36,1)); }
+
+/* ---------- the 3D frame ---------- */
+.stagewrap { flex: 1 1 auto; min-height: 0; position: relative;
+  perspective: 1600px; padding: var(--gap-md, 12px); }
+.flipper { position: absolute; inset: var(--gap-md, 12px);
+  transform-style: preserve-3d;
+  transition: transform 520ms var(--ease, cubic-bezier(0.22,1,0.36,1)); }
+.flipper.showB { transform: rotateY(180deg); }
+
+/* Both faces occupy the same box. backface-visibility keeps the hidden one un-tappable, so no
+   pointer-events juggling is needed. */
+.face { position: absolute; inset: 0; backface-visibility: hidden;
+  display: flex; flex-direction: column; gap: var(--gap-xs, 8px); }
+.face.b { transform: rotateY(180deg); }
+
+.face-tag { flex: 0 0 auto; display: flex; align-items: baseline; gap: var(--gap-xs, 8px); }
+.face-tag .n { font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-faint); }
+/* FRONT / BACK is the face's name, so it takes the accent and the weight; the tally beside it
+   stays faint. Two facts, one line, clearly ranked. */
+.face-tag .n b { color: var(--accent-2); font-weight: 600; }
+
+/* NINE CARDS, ALWAYS. `minmax(0, 1fr)` on both axes is what makes the grid shrink to the frame
+   instead of overflowing — `1fr` alone has an auto minimum. */
+.grid9 { flex: 1 1 auto; min-height: 0; display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: var(--gap-xs, 8px); }
+
+/* ---------- a slot ----------
+   Container query units let the initials and caption scale with the CARD rather than the
+   viewport, so a 3-up phone and a 3-up tablet both look intentional. */
+.slot { position: relative; container-type: inline-size;
+  display: flex; flex-direction: column; overflow: hidden;
+  min-height: 0; padding: 0; text-align: left;
+  border-radius: var(--radius, 6px);
+  border: var(--border-w, 1px) solid var(--border);
+  background: var(--surface-2);
+  transition: transform 140ms var(--ease, cubic-bezier(0.22,1,0.36,1)),
+              border-color 140ms var(--ease, ease-out); }
+.slot:hover { border-color: var(--accent-2); }
+.slot:active { transform: scale(0.975); }
+.slot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* The plate is where the print goes when images land. Until then it carries the initials —
+   Image Rendering Law rule 7: a placeholder ALWAYS carries identifying content, because a
+   featureless box makes "failed to load" and "nothing to load" indistinguishable.
+   Two explicit stops at the theme's own gradient angle: material, not flat, no colour math. */
+.plate { flex: 1 1 auto; min-height: 0; display: grid; place-items: center;
+  background: linear-gradient(var(--grad-angle, 135deg), var(--surface-3), var(--surface-2)); }
+.plate .ini { font-family: var(--font-display, inherit);
+  font-size: clamp(0.9rem, 22cqi, 2.1rem); font-weight: 600;
+  letter-spacing: 0.06em; color: var(--accent-2); opacity: 0.55; }
+
+/* Caption band ON the plate, not stacked under it. THE change that made nine cards fit. */
+.cap { flex: 0 0 auto; padding: 5px var(--gap-xs, 8px) 6px;
+  background: var(--surface-1);
+  border-top: var(--border-w, 1px) solid var(--border); }
+.cap .nm { display: block; font-size: clamp(0.66rem, 9.5cqi, 0.85rem); line-height: 1.25;
+  font-weight: 450; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 🔴 `own N · placed M` — READ THE COMMENT IN binder.js BEFORE "TIDYING" THIS.
+   The locked rule is that a card must never read as owning more than you do. It is shown only
+   when the numbers could mislead, not on every card. Do not reinstate it everywhere and do not
+   reduce it to a bare count. */
+.cap .c-sub { display: block; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: clamp(0.55rem, 7cqi, 0.68rem); letter-spacing: 0.03em;
+  color: var(--text-faint); font-variant-numeric: tabular-nums;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Edition pip. Only a real, non-implicit label gets one (Q1) — an implicit edition must never
+   render as "#1". */
+.slot .ed { position: absolute; top: 5px; right: 5px; z-index: 1;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.6rem;
+  letter-spacing: 0.04em; padding: 1px 5px; border-radius: 3px;
+  background: var(--accent); color: var(--on-accent); }
+
+/* WANTED = the ghost. DASHED, unfilled, italic name. The visible-gap feature, and it costs no
+   storage — the state is derived from owning zero copies. */
+.slot.wanted { background: transparent; border-style: dashed; }
+.slot.wanted .plate { background: transparent; }
+.slot.wanted .plate .ini { color: var(--text-faint); opacity: 0.4; }
+.slot.wanted .cap { background: transparent; }
+.slot.wanted .cap .nm { color: var(--text-soft); font-style: italic; }
+
+/* NOTE = a written slip, not a failed card. It used to read as a bug: a big empty panel with
+   the word "note" stranded at the bottom. Now the label leads and the text is the content. */
+.slot.note { background: var(--surface-3); border-style: solid; }
+.slot.note .n-lab { flex: 0 0 auto; padding: 6px var(--gap-xs, 8px) 0;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.55rem;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); }
+.slot.note .n-txt { flex: 1 1 auto; min-height: 0; overflow: hidden;
+  padding: 2px var(--gap-xs, 8px) var(--gap-xs, 8px);
+  font-size: clamp(0.66rem, 9cqi, 0.85rem); line-height: 1.3; color: var(--text-soft); }
+
+/* EMPTY = no row exists, and it recedes on purpose: nine equal-weight boxes were most of the v4
+   screen, competing with the actual collection. DOTTED, not dashed — dashed is spoken for. */
+.slot.empty { background: transparent; border-style: dotted; border-color: var(--border);
+  align-items: center; justify-content: center; color: var(--text-faint);
+  font-size: 1rem; opacity: 0.45; }
+.slot.empty:hover { opacity: 1; border-color: var(--accent-2); }
+
+/* ---------- deck bar: turn the sheet ----------
+   In the thumb zone. ‹ › walk one FACE at a time and flow over the sheet boundary, so they are
+   the same verb as a swipe and an arrow key. Position sits between them.
+   ⚠️ TIGHT at 390px: 42px button + position text + segment + 42px button. Measure before adding
+   anything to this row. */
+.deckbar { flex: 0 0 auto; display: flex; align-items: center; gap: 4px;
+  padding: var(--gap-xs, 8px) var(--gap-xs, 8px);
+  padding-bottom: max(var(--gap-xs, 8px), env(safe-area-inset-bottom));
+  border-top: var(--border-w, 1px) solid var(--border); background: var(--surface-1); }
+.deckbar .step { flex: 0 0 auto; min-width: 42px; padding: 8px 8px;
+  background: transparent; color: var(--text-soft); font-size: 1.05rem; }
+.deckbar .step:hover:not([disabled]) { background: var(--surface-2); color: var(--text); }
+.deckbar .where { flex: 1 1 auto; text-align: center; min-width: 0;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Front|Back. Sans rather than mono: these are words, and mono at this tracking made "Front"
+   read as a code rather than a place. Same shape as the light/dark segment in chrome.css. */
+.sides-seg { flex: 0 0 auto; display: flex; padding: 2px; gap: 2px;
+  background: var(--surface-2); border: var(--border-w, 1px) solid var(--border);
+  border-radius: var(--radius-pill, 8px); }
+.sides-seg button { min-height: 34px; padding: 4px 11px; border: 0; background: transparent;
+  border-radius: calc(var(--radius-pill, 8px) - 2px);
+  font-size: var(--fs-xs, 0.72rem); font-weight: 500; letter-spacing: 0.04em;
+  color: var(--text-soft); }
+.sides-seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent);
+  font-weight: 600; }
+
+@media (max-width: 380px) {
+  .deckbar .where { font-size: 0.62rem; letter-spacing: 0.04em; }
+  .sides-seg button { padding: 4px 9px; }
+}
+
+/* ---------- sheet list (inside the sheet drawer) ---------- */
+.sheetlist { margin-top: var(--gap-md, 12px);
+  border-top: var(--border-w, 1px) solid var(--border); }
+.sheetrow { display: flex; align-items: stretch; gap: 2px;
+  border-bottom: var(--border-w, 1px) solid var(--border); }
+/* The open sheet gets an accent NUMBER CHIP, not a row fill: a filled row next to real buttons
+   reads as disabled. */
+.sheetrow.on .sr-n { background: var(--accent); color: var(--on-accent); }
+.sr-pick { flex: 1 1 auto; display: flex; align-items: center; gap: var(--gap-xs, 8px);
+  background: transparent; border: 0; border-radius: 0; text-align: left; min-width: 0;
+  padding: var(--pad-cell, 10px) 0; }
+.sr-pick:hover { background: var(--surface-2); border-color: transparent; }
+.sr-n { flex: 0 0 auto; width: 1.9em; height: 1.9em; display: grid; place-items: center;
+  border-radius: 3px; background: var(--surface-3); color: var(--text-faint);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  font-variant-numeric: tabular-nums; }
+.sr-t { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--fs-sm, 0.85rem); }
+.sr-f { flex: 0 0 auto; color: var(--text-faint); font-size: var(--fs-xs, 0.72rem);
+  font-family: var(--font-mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; }
+.sr-acts { flex: 0 0 auto; display: flex; align-items: center; }
+.sr-acts button { background: transparent; border: 0; border-radius: var(--radius, 6px);
+  color: var(--text-soft); padding: 0; min-width: 40px; min-height: 40px; font-size: 0.95rem; }
+.sr-acts button:hover:not([disabled]) { background: var(--surface-2); color: var(--accent); }
+/* A disabled arrow is the honest signal for "already first". Hiding it would make rows jump
+   between two layouts as sheets move. */
+.sr-acts button[disabled] { opacity: 0.22; }
+
+/* ---------- legend ----------
+   v4 ended the page with five lines of prose explaining dotted vs dashed vs solid. If a layout
+   needs a paragraph to be legible the layout has failed — and it sat at the bottom of a long
+   scroll, never on screen beside the thing it described. Now each row SHOWS its treatment,
+   which is why these swatches must track the `.slot` rules above. */
+.legend { display: grid; gap: var(--gap-md, 12px); margin-top: var(--gap-md, 12px); }
+.lg-row { display: flex; align-items: center; gap: var(--gap-md, 12px); }
+.lg-swatch { flex: 0 0 auto; width: 30px; height: 38px; border-radius: 4px;
+  border: var(--border-w, 1px) solid var(--border);
+  background: linear-gradient(var(--grad-angle, 135deg), var(--surface-3), var(--surface-2)); }
+.lg-swatch.wanted { background: transparent; border-style: dashed; }
+.lg-swatch.empty { background: transparent; border-style: dotted; opacity: 0.45; }
+.lg-swatch.note { background: var(--surface-3); }
+.lg-row div { min-width: 0; }
+.lg-row b { display: block; font-size: var(--fs-sm, 0.85rem); font-weight: 550; }
+.lg-row span { font-size: var(--fs-xs, 0.72rem); color: var(--text-faint); }
+
+/* An empty state inside the stage has to be centred in the frame, not parked at the top. */
+.stagewrap > .empty { position: absolute; inset: var(--gap-md, 12px); display: grid;
+  place-content: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* The flip IS the navigation, so it cannot simply be disabled — it becomes an instant cut. */
+  .flipper { transition: none !important; }
+}

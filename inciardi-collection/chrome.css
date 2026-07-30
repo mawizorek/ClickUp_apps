@@ -1,0 +1,135 @@
+/* Inciardi Collection — CHROME. Header, nav drawer, settings drawer, footer.
+ *
+ * Pattern from `template-app` (gold standard v5). ZERO colour literals.
+ *
+ * 🔴 WHY THE HEADER IS A HAMBURGER AND NOT A NAV BAR. The old header put every route inline,
+ * which meant it had a hard item ceiling: brand + 4 links + gear ran ~355px of a 390px phone,
+ * so it wrapped to two lines at v5 and the app carried a comment reading "FOUR ITEMS IS THE
+ * CEILING." A drawer has no ceiling. We had written a constraint where the template already had
+ * a pattern — check the standard before inventing a limit.
+ */
+
+/* ---------- header ---------- */
+#appHeader { flex: 0 0 auto; position: sticky; top: 0; z-index: 30;
+  background: var(--surface-1); border-bottom: var(--border-w, 1px) solid var(--border); }
+.hd-in { display: flex; align-items: center; gap: var(--gap-xs, 8px);
+  padding: var(--gap-xs, 8px) var(--gap-xs, 8px); }
+
+.hd-icon { flex: 0 0 auto; min-width: 42px; min-height: 42px; padding: 0;
+  display: grid; place-items: center;
+  background: transparent; border: 0; border-radius: var(--radius, 6px);
+  color: var(--text-soft); font-size: 1.05rem; cursor: pointer; }
+.hd-icon:hover { background: var(--surface-2); color: var(--text); }
+.hd-icon:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Three bars from one element: the middle is the box, the outer two are pseudo-elements. Fewer
+   nodes than three spans, and it inherits colour from the button so hover works for free. */
+.hd-bars, .hd-bars::before, .hd-bars::after {
+  display: block; width: 17px; height: 1.5px; background: currentColor; border-radius: 1px; }
+.hd-bars { position: relative; }
+.hd-bars::before, .hd-bars::after { content: ""; position: absolute; left: 0; }
+.hd-bars::before { top: -5px; }
+.hd-bars::after  { top: 5px; }
+
+.hd-brand { flex: 1 1 auto; min-width: 0; display: flex; align-items: baseline; gap: 0.4em;
+  text-decoration: none; color: var(--text); overflow: hidden;
+  font-family: var(--font-display, inherit); font-size: var(--fs-sm, 0.85rem);
+  letter-spacing: var(--track-tight, -0.01em); white-space: nowrap; }
+.hd-logo { flex: 0 0 auto; font-size: 1.05em; }
+.hd-name { overflow: hidden; text-overflow: ellipsis; }
+.hd-name b { color: var(--accent-2); font-weight: 600; }
+.hd-sub { color: var(--text-soft); font-weight: 350; }
+@media (max-width: 420px) { .hd-sub { display: none; } }
+
+/* ---------- chrome drawers: nav LEFT, settings RIGHT ----------
+   Mirror images on purpose. Translated off-screen rather than hidden, so they animate in and
+   out instead of appearing — and `visibility` is what keeps a closed drawer un-tabbable. */
+.drawer { position: fixed; top: 0; bottom: 0; z-index: 60; width: min(330px, 86vw);
+  background: var(--surface-1); overflow: auto;
+  display: flex; flex-direction: column;
+  visibility: hidden; box-shadow: var(--elev-3, none);
+  transition: transform 300ms var(--ease, cubic-bezier(0.22,1,0.36,1)),
+              visibility 300ms; }
+.drawer-left  { left: 0;  transform: translateX(-102%);
+  border-right: var(--border-w, 1px) solid var(--border); }
+.drawer-right { right: 0; transform: translateX(102%);
+  border-left: var(--border-w, 1px) solid var(--border); }
+.drawer.is-open { transform: none; visibility: visible; }
+
+.drawer-head { flex: 0 0 auto; display: flex; align-items: center; gap: var(--gap-xs, 8px);
+  padding: var(--gap-md, 12px) var(--gap-md, 12px) var(--gap-xs, 8px);
+  border-bottom: var(--border-w, 1px) solid var(--border); }
+.drawer-head h2 { flex: 1 1 auto; margin: 0;
+  font-family: var(--font-display, inherit); font-size: var(--fs-lead, 1.15rem);
+  font-weight: 600; letter-spacing: var(--track-tight, -0.02em); }
+.drawer-x { flex: 0 0 auto; min-width: 38px; min-height: 38px; padding: 0;
+  display: grid; place-items: center;
+  background: transparent; border: 0; border-radius: var(--radius, 6px);
+  color: var(--text-soft); font-size: 0.95rem; }
+.drawer-x:hover { background: var(--surface-2); color: var(--text); }
+
+.drawer-body { flex: 1 1 auto; padding: var(--gap-md, 12px);
+  padding-bottom: max(var(--gap-lg, 20px), env(safe-area-inset-bottom)); }
+.drawer-label { display: block; font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--text-soft); margin: var(--gap-md, 12px) 0 5px; }
+.drawer-body > .drawer-label:first-child { margin-top: 0; }
+.drawer-note { font-size: var(--fs-xs, 0.72rem); color: var(--text-faint);
+  text-wrap: pretty; margin: 5px 0 0; }
+.drawer-hr { height: 1px; background: var(--border); margin: var(--gap-lg, 20px) 0; }
+.drawer-body details { margin-top: var(--gap-lg, 20px); }
+.drawer-body summary { cursor: pointer; }
+
+/* The nav list. Each row can carry a hint line, which is what makes a drawer worth more than
+   the inline bar it replaced: there was never room for "what is this page for" up there. */
+.nav-list { display: flex; flex-direction: column; gap: 2px; }
+.nav-link { display: block; padding: 10px var(--gap-xs, 8px); border-radius: var(--radius, 6px);
+  text-decoration: none; color: var(--text); }
+.nav-link:hover { background: var(--surface-2); }
+.nav-link .nl-t { display: block; font-size: var(--fs-body, 0.95rem); font-weight: 450; }
+.nav-link .nl-h { display: block; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint); }
+/* The active route gets a filled chip, not a background tint on the row: a tinted row next to
+   plain rows reads as hover state rather than "you are here." */
+.nav-link.is-active { background: var(--accent); }
+.nav-link.is-active .nl-t { color: var(--on-accent); font-weight: 600; }
+.nav-link.is-active .nl-h { color: var(--on-accent); opacity: 0.72; }
+
+/* Chrome's own scrim. Separate element from the page-level one (base.css) because the two live
+   at different z-indexes and either can be open without the other. Same --bg-at-opacity trick,
+   so it inverts properly in light mode. */
+.chrome-scrim { position: fixed; inset: 0; z-index: 55; background: var(--bg); opacity: 0.72;
+  border: 0; padding: 0; }
+
+/* ---------- the light / dark segment ----------
+   Same control shape as the binder's Front|Back toggle. Two states, no ambiguity, and it says
+   which one is active rather than which one you can switch to — a toggle labelled with its
+   destination is the single most common way this control gets built wrong. */
+.seg { display: flex; gap: 2px; padding: 2px;
+  background: var(--surface-2); border: var(--border-w, 1px) solid var(--border);
+  border-radius: var(--radius-pill, 8px); }
+.seg button { flex: 1 1 0; min-height: 36px; padding: 4px 10px; border: 0; background: transparent;
+  border-radius: calc(var(--radius-pill, 8px) - 2px);
+  font-size: var(--fs-xs, 0.72rem); font-weight: 500; letter-spacing: 0.04em;
+  color: var(--text-soft); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent);
+  font-weight: 600; }
+.seg button[disabled] { opacity: 0.32; }
+
+/* ---------- footer ----------
+   This app had none, so its build stamp had nowhere to live and "which version am I looking at"
+   was only answerable from the diagnostics bundle. Hidden on the binder route: the stage owns
+   the full viewport there and the deck bar is already at the bottom. */
+#appFooter { flex: 0 0 auto; border-top: var(--border-w, 1px) solid var(--border);
+  background: var(--surface-1); }
+body.stage #appFooter { display: none; }
+.foot-in { max-width: 900px; margin: 0 auto; display: flex; align-items: center;
+  gap: var(--gap-md, 12px); flex-wrap: wrap;
+  padding: var(--gap-xs, 8px) var(--gap-md, 12px);
+  padding-bottom: max(var(--gap-xs, 8px), env(safe-area-inset-bottom)); }
+.foot-src { flex: 1 1 auto; display: flex; gap: var(--gap-md, 12px); flex-wrap: wrap;
+  min-width: 0; }
+.foot-src a { color: var(--text-soft); font-size: var(--fs-xs, 0.72rem); text-decoration: none;
+  border-bottom: 1px solid var(--border); }
+.foot-src a:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+.foot-stamp { flex: 0 0 auto; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.06em; color: var(--text-faint);
+  font-variant-numeric: tabular-nums; }
