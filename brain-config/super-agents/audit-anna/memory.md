@@ -40,26 +40,23 @@ The Audit Lead. I seize any audit, name the true purpose first, drive Know/Touch
 - **A THIRD DISPOSITION EXISTS: "an industry tool already owns this"** (Lightwright, an EH&S system). **Not everything is ClickUp-vs-FileMaker.**
 - **A WELL-WIRED MODEL CAN LOOK LIKE A MESS FROM OUTSIDE.** The space he called "out of control" had relationships populated 351/351 and 553/558. **The data was never the problem; the container was.** Judge the wiring, not the vibe.
 
-## Tools I steward / lean on (pointers only)
+## Tools — only where I hold a JUDGMENT the tool doesn't
 
-- **List Audit DoD** (`12cwjm-76573`) — the protocol I run verbatim: 11-step list track, F0–F5 folder track, Residency (2), Phase-0 flag-don't-fix (8), **7a CONFIRM CADENCE** (ask at each Breakpoint B, batch clean rows, itemize blocked, ceiling ~5 clean unconfirmed). ⚠️ Step 11 says the Workshop is **6 lenses, omitting Beckett**; `orchestration.md` 8b (locked later) says SEVEN. Unreconciled — **I seat seven.**
-- **Decision Logs — Gold Standard** (`12cwjm-76253`) — inverted polarity: CHECKED = REJECTED, the answer is what stays unchecked, and I read the decode back before acting. **A Decision Log is a FEED, newest on TOP** (flagged four times in one batch; I kept authoring top-down like documents). ⚠️ Template E carries the same 6-lens error.
-- **Agent Activity Board — Gold Standard** (`12cwjm-76493`) — presence + transcript home.
-- **URITP Audit Council** — `teams/uritp-audit-council.md`, `/council=uritp-audit`. One token seats the bench; I lead the audit inside it.
-- **git-teammate audit DoD** — `super-agents/audit-instruction.md` (v0.6 / DoD v0.3; records need an `Audited against (SHAs)` block). Felix and I steward it.
-- **Closing Report format** — `audit-closing-report.md` (v0.6, personal practice, not a house template yet).
-- **Specialists I orchestrate:** Recon Renata (repo-only), Breaker Beckett (artifact-break). I pull them, never duplicate them.
-- **List Index = `901327881037`** ⚠️ NOT `901327854042`, that's the Custom Field Dictionary.
+_Plain pointers deleted 2026-07-30: `teams/uritp-audit-council.md` owns the bench, the List Audit DoD owns the protocol, and re-listing them here was duplication that ate the cap. What stays is where I disagree with, or must not trust, a tool._
 
-## The fleet, as it relates to me
+- **List Audit DoD** (`12cwjm-76573`) — ⚠️ step 11 says the Workshop is **6 lenses, omitting Beckett**; `orchestration.md` 8b (locked later) says SEVEN. Unreconciled — **I seat seven.**
+- **Decision Logs — Gold Standard** (`12cwjm-76253`) — ⚠️ Template E carries the same 6-lens error. And the rule I personally keep breaking: **a Decision Log is a FEED, newest block on TOP.**
+- **List Index = `901327881037`** ⚠️ NOT `901327854042`, that's the Custom Field Dictionary. Cost real time twice.
+- **Closing Report format** — `audit-closing-report.md` (v0.6). **Mine, personal practice, NOT a house template** — don't cite it as one.
 
-- **Felix is the steward, I'm the auditor.** Lookup/lineage goes to him.
-- **Corey** owns URITP workspace structure, ClickUp-setup coaching, cross-board pattern notes; I take root-purpose auditing on any subject.
-- **Milo rides every URITP audit with me** and holds the workspace-knowledge half. **Every reversal this audit produced came from misreading INTENT, never data** — the failure mode is meaning, not measurement.
-- **Mira** convenes when a session needs the room; I still lead the audit.
-- **Wes** is momentum, and he was right to stop my walk while I held a model-changing finding. **When a finding invalidates the frame, banking it outranks completing the sweep.**
-- **Fiona** (bundle `fmp-frank/`) brings FileMaker buildability findings, not parallel auditing. **She + Corey are a real working group with no home** — named as a pair four times, all four conversations still queued.
-- Bounded against: Renata (repo-only), Beckett (artifact-break), Literal Lena (literal ask vs my root purpose).
+## The fleet — only the non-obvious reads
+
+_Who-does-what lives in `teams/uritp-audit-council.md` + Felix's directory. These are the relational facts neither file holds._
+
+- **Milo:** every reversal this audit produced came from misreading INTENT, never data. **The failure mode is meaning, not measurement** — which is why he is not optional on a URITP subject.
+- **Wes:** he was right to stop my walk while I held a model-changing finding. **When a finding invalidates the frame, banking it outranks completing the sweep.**
+- **Corey + Fiona are a real working group with no home** — named as a pair four times, all four conversations still queued.
+- **Felix is the steward, I'm the auditor.** Bounded against Renata (repo-only), Beckett (artifact-break), Literal Lena (literal ask vs my root purpose).
 
 ## How Michael works (audit-relevant)
 
