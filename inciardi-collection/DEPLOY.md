@@ -1,12 +1,28 @@
-# Deploy — Inciardi Collection v2
+# Deploy — Inciardi Collection
 
-**No terminal needed.** `wrangler` wants Node and a shell, and a phone has neither — so the deploy runs from a **button** in GitHub. Everything below works in a mobile browser.
+**You don't deploy this. It deploys itself.**
 
-The database and schema are already applied, and `wrangler.toml` is already bound to the right database. This stands up the worker (the API the form talks to) **and sets its write key** in the same press.
+A push to `main` that touches `worker/**` or `wrangler.toml` runs the deploy automatically. Front-end changes (`index.html`, `app.js`, `core.js`, `styles.css`, `pages/`) need no deploy at all — GitHub Pages serves them about 60 seconds after a commit.
+
+So in normal use there is **nothing to press**. The manual button survives for forcing a redeploy; everything below is reference for when something breaks.
 
 ---
 
-## One-time setup — two things
+## Why it used to be manual, and why it isn't
+
+The workflow started as button-only, for a real reason: *"unattended auto-deploy of a key-authenticated write API on every commit is not something you want."* True while `WRITE_KEY` lived in the Cloudflare dashboard, outside git — an automatic deploy couldn't touch it, and deploying was a rare deliberate act.
+
+That expired the moment the key moved into `wrangler.toml`. **There is no longer a secret for an automatic deploy to leak** that any reader of this public repo doesn't already have. What was left was a required manual step whose only possible outcome was "apply what `main` already says" — not a safety gate, a chore with a failure mode. Forget it once and the front end is calling routes the worker doesn't have. Which is exactly what v4 did.
+
+**The path filter is the whole point.** It fires only on the worker's own inputs, so a CSS tweak doesn't burn build minutes redeploying an unchanged worker. `db/**` is excluded deliberately: schema files are applied by hand to D1 and are not worker inputs.
+
+⚠️ **The one thing that remains true:** the worker runs the code from its LAST DEPLOY, not from `main`. A merged commit that hasn't deployed isn't live. The trigger closes that gap automatically now, but if the app is behaving like older code, check the Actions tab before you check anything else.
+
+---
+
+## One-time setup — two GitHub secrets
+
+Already done. Here for the record, and for the day a token expires.
 
 ### 1. A Cloudflare API token
 
@@ -14,28 +30,17 @@ The database and schema are already applied, and `wrangler.toml` is already boun
 
 ### 2. Your Cloudflare account id
 
-Any Workers or D1 page in the dashboard — it is in the URL right after `dash.cloudflare.com/`, and in the **Account Details** card at the bottom of Workers & Pages. **Exactly 32 hex characters.** The deploy asserts that shape, because a 50-character paste once burned three runs on a misleading routing error.
+The **Account Details** card at the bottom of Workers & Pages, or in the dashboard URL right after `dash.cloudflare.com/`. **Exactly 32 hex characters** — the deploy asserts that shape, because a 50-character paste once burned three runs on a misleading routing error.
 
-### Put both in GitHub
+Both go in Repo → **Settings → Secrets and variables → Actions → Secrets**, as `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
 
-Repo → **Settings → Secrets and variables → Actions → Secrets** tab:
-
-| Name | Value |
-| --- | --- |
-| `CLOUDFLARE_API_TOKEN` | from step 1 |
-| `CLOUDFLARE_ACCOUNT_ID` | from step 2 |
-
-That's it. The **database id is already committed** in `wrangler.toml` (`045f1943…`) — an id is an identifier, not a credential, so it lives in the repo where you can see what the worker is bound to. Reaching the data still needs the token above.
+The **database id is committed** in `wrangler.toml` (`045f1943…`) — an id is an identifier, not a credential, so it lives in the repo where you can see what the worker is bound to. Reaching the data still needs the token.
 
 ---
 
-## Deploy
+## Forcing a deploy by hand
 
-Repo → **Actions** → **Deploy inciardi-collection worker** → **Run workflow** → **Run**. Leave the input blank.
-
-Green run → open the log → the worker URL is in the deploy step, `https://inciardi-collection.<something>.workers.dev`.
-
-**This is the only step you ever repeat**, and only for changes under `worker/` **or to the write key**. Front-end changes need no deploy at all; Pages serves them about 60 seconds after a commit.
+Repo → **Actions** → **Deploy inciardi-collection worker** → **Run workflow** → **Run**. Leave the input blank. Useful when you've edited `WRITE_KEY` in the Cloudflare dashboard by mistake and want the committed value re-applied.
 
 *(The optional input overrides the committed database id for one run — useful for a scratch database, never needed normally.)*
 
@@ -43,7 +48,7 @@ Green run → open the log → the worker URL is in the deploy step, `https://in
 
 ## The write key — there is NO dashboard step
 
-**`WRITE_KEY` is a plain `[vars]` entry in `wrangler.toml`, and the deploy applies it.** Its twin is `DEFAULT_KEY` in `core.js`, which ships to the browser. **The two must be character-identical.** Rotating = edit both in one commit + re-run the deploy. Rotate one and every write returns 401.
+**`WRITE_KEY` is a plain `[vars]` entry in `wrangler.toml`, and the deploy applies it.** Its twin is `DEFAULT_KEY` in `core.js`, which ships to the browser. **The two must be character-identical.** Rotating = edit both in one commit; the push then deploys itself. Rotate one and every write returns 401.
 
 ### Why it is not a Cloudflare Secret
 
@@ -60,22 +65,20 @@ Three reasons, in the order they were learned:
 - Public repo, public Pages site: **assume the key is known.** Anyone can add junk artworks or clear slots via the API. CORS does not help — it constrains browsers, not `curl`.
 - Not exposed: no personal data, no money, no third-party credential. Blast radius is "the binder data gets vandalised."
 - Recovery is real and was confirmed before accepting this: **D1 Time Travel**, 30-day point-in-time restore.
-- The key is **long and random**, unlike the predecessor's `"mikey"` / `"nickey"` — readable is the accepted tradeoff; *guessable* is a defect, and those are still unrotated in `inciardi-market`. The deploy now refuses a key under 16 characters for exactly this reason.
+- The key is **long and random**, unlike the predecessor's `"mikey"` / `"nickey"` — readable is the accepted tradeoff; *guessable* is a defect, and those are still unrotated in `inciardi-market`. The deploy refuses a key under 16 characters for exactly this reason.
 - **An unset key still refuses every write** (503). Blank never means open.
 
 ---
 
-## Turn the app on
+## Using the app
 
-Open **https://mawizorek.github.io/ClickUp_apps/inciardi-collection/** and use it. Nothing to paste, on any device.
+Open **https://mawizorek.github.io/ClickUp_apps/inciardi-collection/** and use it. Nothing to paste, on any device. Both Settings fields are *overrides* for a staging worker or a different key, and both fall back to the built-in value when left blank.
 
-Both Settings fields are *overrides* for a staging worker or a different key; blank falls back to the built-in value. Health check: **⚙ → Test connection** should show
+Health check: **⚙ → Test connection** should show
 
 ```
-{ "ok": true, "counts": { "artworks": 1, "editions": 1, "owned": 1, "sheets": 1, "slots": 1 } }
+{ "ok": true, "counts": { "artworks": 4, "editions": 4, "owned": 3, "sheets": 2, "slots": 6 } }
 ```
-
-Those numbers should match what you entered by hand in the D1 console — that is the real proof the worker is talking to the right database.
 
 ⚠️ **A green Test connection does not prove writes work.** `/health` is a read, and reads are unauthenticated by design. **The first save is the only real test of the key.**
 
@@ -85,11 +88,13 @@ Those numbers should match what you entered by hand in the D1 console — that i
 
 | Symptom | Cause |
 | --- | --- |
+| The app calls a route the worker doesn't have (404 with a route list) | The worker hasn't deployed since that code merged. **Check the Actions tab** — with the push trigger this should be self-healing, but a failed run leaves exactly this state. |
 | Workflow fails on the deploy step | Almost always the API token: wrong template, or expired. Redo step 1. |
-| Workflow fails: *7003 / 7000, could not route* | Malformed `CLOUDFLARE_ACCOUNT_ID` — must be exactly 32 hex. The preflight now catches this before the deploy. |
+| Workflow fails: *7003 / 7000, could not route* | Malformed `CLOUDFLARE_ACCOUNT_ID` — must be exactly 32 hex. The preflight catches this before the deploy. |
 | Workflow fails: *no WRITE_KEY in wrangler.toml* | Someone removed the `[vars]` entry. Deploying without it would leave the worker refusing writes while `/health` stayed green. |
 | Workflow fails: *bound to nothing* | `wrangler.toml` lost its database id. The job refuses rather than shipping a worker that looks fine and reaches nothing. |
-| `server has no WRITE_KEY configured` (503) | The worker has not been deployed since the key went into config. **Re-run the workflow.** |
+| A front-end change didn't appear | Pages takes ~60s, and `index.html` cache-busts its own assets with `?v=N`. If you edited `app.js` or `styles.css` without bumping that number, you're seeing a cached copy. |
+| `server has no WRITE_KEY configured` (503) | The worker hasn't deployed since the key went into config. Force a run. |
 | `bad or missing write key` (401), nothing pasted on this device | `WRITE_KEY` in `wrangler.toml` and `DEFAULT_KEY` in `core.js` disagree — one half was rotated without the other. Or the page is cached: hard-reload. |
 | `bad or missing write key` (401) after pasting a key | Your device override is wrong. Clear the Settings box and Save to fall back to the built-in key. |
 | Reads work, writes fail | The shape of every key problem. Reads are never gated. |
@@ -102,15 +107,15 @@ Those numbers should match what you entered by hand in the D1 console — that i
 
 ## If you ever are at a desk
 
-Same thing, two commands, since everything the worker needs is in the file:
+Everything the worker needs is in the file:
 
 ```
 cd inciardi-collection
 npx wrangler deploy
 ```
 
-The button path exists because the terminal path assumes hardware you usually don't have, not because the commands are wrong.
+The CI path exists because the terminal path assumes hardware you usually don't have, not because the commands are wrong.
 
 ## Rejected: the dashboard worker editor
 
-Cloudflare lets you paste worker code straight into the dashboard, which is also phone-doable and *sounds* simpler. It isn't, for one reason: the source would then live in the dashboard **and** in git, and two sources of truth for one fact is exactly the failure this app was rebuilt to eliminate. Git stays canonical; CI deploys from it. **The write key just moved for the same reason.**
+Cloudflare lets you paste worker code straight into the dashboard, which is also phone-doable and *sounds* simpler. It isn't, for one reason: the source would then live in the dashboard **and** in git, and two sources of truth for one fact is exactly the failure this app was rebuilt to eliminate. Git stays canonical; CI deploys from it. **The write key moved for the same reason.**

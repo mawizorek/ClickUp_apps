@@ -1,23 +1,48 @@
-# Deploy the Inciardi Collection worker — from a BUTTON, no terminal.
+# Deploy the Inciardi Collection worker.
 #
-# WHY THIS EXISTS: wrangler needs Node and a shell. iOS has neither. Michael works from a
-# phone, so a CLI runbook is a runbook he cannot execute. This moves the deploy onto a
-# surface he actually has: the "Run workflow" button in the GitHub web UI.
+# AUTOMATIC on any push to main that touches the worker. Manual button still available.
+#
+# WHY THE BUTTON EXISTS AT ALL: wrangler needs Node and a shell. iOS has neither. Michael
+# works from a phone, so a CLI runbook is a runbook he cannot execute. The "Run workflow"
+# button was the surface he actually has — and it is still here for a forced redeploy.
 #
 # WHY NOT the Cloudflare dashboard's worker editor (also phone-doable): it puts the worker
 # SOURCE in the dashboard, so git and the running worker become two sources of truth that
 # drift. That is precisely the disease this app was rebuilt to cure. Git stays canonical;
 # CI deploys from it.
 #
-# workflow_dispatch ONLY — no push trigger. The front-end needs no deploy at all (Pages
-# serves it ~60s after a commit); only `worker/` changes need this.
+# ============================================================================
+# 🔴 WHY THIS IS NOW A PUSH TRIGGER, AND WHY THE ORIGINAL REASON EXPIRED
 #
-# ⚠️ AS OF 2026-07-30 THIS ALSO SETS THE WRITE KEY. `WRITE_KEY` is a plain [vars] entry in
-# wrangler.toml (the key is baked into the public bundle by decision, so encrypting the
-# server's copy of a public string bought nothing and cost the ability to read it back).
-# Consequence: **this deploy overwrites the worker's WRITE_KEY every run.** That is the point
-# — the pair in git is the single source of truth — but it also means a dashboard-set secret
-# of that name will be silently replaced. Do not keep one.
+# This started as `workflow_dispatch` ONLY, on this stated reasoning:
+#   "unattended auto-deploy of a key-authenticated write API on every commit is not
+#    something you want."
+#
+# That was sound on 2026-07-29, when WRITE_KEY was a dashboard secret living OUTSIDE git: an
+# auto-deploy could not touch it, and a deploy was a rare, deliberate act.
+#
+# It expired on 2026-07-30, twice over:
+#   1. The key now ships in `wrangler.toml` under [vars] and in the public front-end bundle.
+#      There is no secret for an automatic deploy to leak that a reader of the repo does not
+#      already have. The premise of the caution is gone.
+#   2. Michael, on the third manual run in one afternoon: "why do i hav to keep running the
+#      deploy…?" Every one of those runs shipped code that was ALREADY MERGED TO MAIN. A
+#      required manual step whose only possible outcome is "apply what main already says" is
+#      not a safety gate, it is a chore with a failure mode — because the moment someone
+#      forgets it, the front end is calling routes the worker does not have. Which is exactly
+#      what v4 did.
+#
+# PATH FILTER IS THE WHOLE POINT. This fires ONLY when the worker's own inputs change:
+# `worker/**`, `wrangler.toml`, or this file. Front-end changes (index.html, app.js, core.js,
+# styles.css, pages/) need no deploy — GitHub Pages serves them ~60s after a commit — so
+# firing on those would burn build minutes to redeploy an unchanged worker. `db/**` is
+# deliberately EXCLUDED too: schema files are applied by hand to D1 and are not worker inputs.
+#
+# STILL TRUE, and the reason a redeploy is ever needed: the worker runs the code from its LAST
+# DEPLOY, not from main. A merged commit that has not been deployed is not live. This trigger
+# closes that gap automatically; the button remains for when you want to force one anyway
+# (e.g. re-applying WRITE_KEY after editing it in the dashboard by mistake).
+# ============================================================================
 #
 # ============================================================================
 # 🔍 WHY THIS FILE LOOKS LIKE A DIAGNOSTIC HARNESS RATHER THAN A DEPLOY
@@ -51,6 +76,12 @@
 name: Deploy inciardi-collection worker
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'inciardi-collection/worker/**'
+      - 'inciardi-collection/wrangler.toml'
+      - '.github/workflows/deploy-inciardi-collection.yml'
   workflow_dispatch:
     inputs:
       database_id:
@@ -82,6 +113,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # On an automatic run nobody is watching the log, so the summary has to say WHY it ran.
+      # A deploy that appears in the history with no stated cause is the kind of thing that
+      # gets "cleaned up" by a future reader who cannot tell if it was intentional.
+      - name: Why this ran
+        run: |
+          {
+            echo "## Deploy · ${{ github.event_name }}"
+            echo ""
+            if [ "${{ github.event_name }}" = "push" ]; then
+              echo "Automatic: a push to \`main\` touched the worker, its config, or this workflow."
+              echo "Commit: \`${{ github.sha }}\`"
+            else
+              echo "Manual run from the Actions tab."
+            fi
+            echo ""
+            echo "⚠️ This deploy also (re)applies \`WRITE_KEY\` from wrangler.toml \`[vars]\`, overwriting any dashboard value of the same name."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # 🔴 SHAPE ASSERTIONS, not observations. Run 3 died because a malformed account id was
       # printed and waved through. Values are never echoed — only lengths and a regex verdict.
       - name: Preflight · are the credentials the right SHAPE?
@@ -104,11 +153,11 @@ jobs:
             # THE CHECK THAT SHOULD HAVE EXISTED ON RUN 1. A wrong-shaped id produces a
             # confusing 7003/7000 routing error from a URL path, minutes later, with no hint
             # that the id is the problem.
-            echo "::error::CLOUDFLARE_ACCOUNT_ID is not a valid account id (${#CLOUDFLARE_ACCOUNT_ID} chars; must be exactly 32 hex). Find it at dash.cloudflare.com — Workers & Pages, right sidebar, 'Account ID'. It is NOT your email, your zone id, or the D1 database id."
+            echo "::error::CLOUDFLARE_ACCOUNT_ID is not a valid account id (${#CLOUDFLARE_ACCOUNT_ID} chars; must be exactly 32 hex). Find it at dash.cloudflare.com — Workers & Pages, Account Details card. It is NOT your email, your zone id, or the D1 database id."
             {
               echo "- ❌ account id is **${#CLOUDFLARE_ACCOUNT_ID} chars — must be exactly 32 hex characters**"
               echo ""
-              echo "  Fix: **dash.cloudflare.com → Workers & Pages → right sidebar → Account ID** (copy button)."
+              echo "  Fix: **dash.cloudflare.com → Workers & Pages → Account Details → Account ID** (copy button)."
               echo "  It is not your email, not a zone id, and not the D1 database id."
               echo "  Re-save it at Settings → Secrets and variables → Actions → \`CLOUDFLARE_ACCOUNT_ID\`."
             } >> "$GITHUB_STEP_SUMMARY"
@@ -245,7 +294,7 @@ jobs:
             echo ""
             echo "**Worker URL:** \`${URL:-check the log above}\`"
             echo ""
-            echo "**Nothing left to do in the Cloudflare dashboard.** \`WRITE_KEY\` ships in"
+            echo "**Nothing to do in the Cloudflare dashboard.** \`WRITE_KEY\` ships in"
             echo "wrangler.toml and was just applied; the app carries the matching key in"
             echo "\`core.js\`. Open the app and save something — no ⚙ setup, no pasting."
             echo ""
