@@ -9,9 +9,25 @@
  *      confirmed. A slot that looks filled because we hoped it worked is the old app.
  *   2. Every count that means "how many do I own" comes from the server's v_owned
  *      (SUM(qty)), never from a length or a COUNT(*) computed here.
- */
+ *
+ * ============================================================================
+ * VOCABULARY — FRONT / BACK IN THE UI, 'A' / 'B' IN THE DATA. Michael, 2026-07-30.
+ *
+ * Every label a person reads says FRONT or BACK, because that is what the physical object
+ * has. Every value that crosses the wire or lands in a row is still 'A' or 'B':
+ *   - `slot.side` carries CHECK (side IN ('A','B')) — a 'FRONT' would be an unwriteable row.
+ *   - `v_binder_spread` computes side_index from CASE sd.side WHEN 'A'.
+ *   - Six rows already exist keyed on 'A'/'B'.
+ * So this is a DISPLAY MAPPING and nothing else. `FACE_LABEL` below is the only place the
+ * two vocabularies meet. Do not "finish the rename" by pushing it into the schema: renaming
+ * a CHECK constraint's domain means rewriting every row, every view, and the composite FK
+ * path, to change a word nobody sees.
+ * ============================================================================ */
 (function () {
   var state = { sheets: [], sheetId: null, artworks: [], side: 'A', slots: [] };
+
+  // The ONE seam between the stored value and the word on screen.
+  var FACE_LABEL = { A: 'Front', B: 'Back' };
 
   /* ---------------------------------------------------------------- ENTER */
   function slugPreview(s) {
@@ -97,11 +113,12 @@
    */
   function slotCell(side, pos, row) {
     var base = 'data-side="' + side + '" data-pos="' + pos + '"';
+    var where = FACE_LABEL[side].toLowerCase() + ', slot ' + (pos + 1);
 
     // EMPTY = no row exists. Absence is the state; this is a placeholder, not a record.
     if (!row) {
       return '<button class="slot empty" ' + base +
-             ' aria-label="Empty slot ' + (pos + 1) + ', side ' + side + '">+</button>';
+             ' aria-label="Empty ' + where + '">+</button>';
     }
 
     var slot = ' data-slot="' + Core.esc(row.slot_id) + '"';
@@ -170,7 +187,7 @@
       bits.push((9 - used) + ' open');
 
       document.getElementById('face' + side).innerHTML =
-        '<div class="face-tag"><span class="n">side <b>' + side + '</b></span>' +
+        '<div class="face-tag"><span class="n"><b>' + FACE_LABEL[side] + '</b></span>' +
         '<span class="n">' + bits.join(' &middot; ') + '</span></div>' +
         '<div class="grid9">' + cells + '</div>';
     });
@@ -194,6 +211,7 @@
     var a = document.getElementById('sideA'), b = document.getElementById('sideB');
     if (a) a.setAttribute('aria-pressed', String(side === 'A'));
     if (b) b.setAttribute('aria-pressed', String(side === 'B'));
+    paintDeck();
   }
 
   function paintDeck() {
@@ -211,15 +229,56 @@
      * say anything — `mini-binder-s1` is the SECOND sheet, because ids were minted from the
      * 0-based order and are permanent. Never show an id as a position. */
     if (w) w.textContent = n ? 'sheet ' + (i + 1) + ' of ' + n : '';
-    if (p) p.disabled = i <= 0;
-    if (nx) nx.disabled = i < 0 || i >= n - 1;
+
+    /* The step buttons now say whether there is ANY face left in that direction, not whether
+     * there is another SHEET. On sheet 1 front, ‹ is dead; on sheet 1 back it steps back to
+     * the front. Matching the arrow keys matters more than matching their own icons: a
+     * control that is disabled while the equivalent keystroke still works is a lie. */
+    if (p) p.disabled = !canStep(-1);
+    if (nx) nx.disabled = !canStep(1);
   }
 
-  function stepSheet(dir) {
-    var i = sheetIndex() + dir;
-    if (i < 0 || i >= state.sheets.length) return;
-    state.sheetId = state.sheets[i].sheet_id;
-    setSide('A');            // a new sheet always opens at its front, like picking it up
+  /* ---------------------------------------------------- traversal
+   * THE BINDER IS ONE SEQUENCE OF FACES, not sheets-with-a-toggle. Michael: "arrow keys
+   * should cycle through a/b as well."
+   *
+   * The v5 keys were ArrowLeft = front, ArrowRight = back — two absolute jumps that did
+   * nothing once you were already on that face, and could never leave the sheet. Reading a
+   * binder is not like that: you turn one face at a time and eventually you are on the next
+   * sheet without having thought about it.
+   *
+   * So one press = one face, and it flows over the sheet boundary:
+   *     sheet 1 front → sheet 1 back → sheet 2 front → sheet 2 back → …
+   * which is exactly `v_binder_spread.side_index`, the page order the database already
+   * derives. Nothing new is stored; this walks the sequence that was always there.
+   *
+   * Stepping BACKWARD into a previous sheet lands on its BACK, because that is the face you
+   * would physically see. Only the first and last faces in the whole binder are dead ends,
+   * and no wrap-around: silently looping from the last face to the first would make "where am
+   * I" unanswerable without reading the position line every time.
+   */
+  function canStep(dir) {
+    var i = sheetIndex();
+    if (i < 0) return false;
+    if (dir > 0) return state.side === 'A' || i < state.sheets.length - 1;
+    return state.side === 'B' || i > 0;
+  }
+
+  function stepFace(dir) {
+    var i = sheetIndex();
+    if (i < 0) return;
+
+    if (dir > 0) {
+      if (state.side === 'A') { setSide('B'); return; }        // turn the sheet over
+      if (i >= state.sheets.length - 1) return;                // last face in the binder
+      state.sheetId = state.sheets[i + 1].sheet_id;
+      setSide('A');                                            // next sheet, front first
+    } else {
+      if (state.side === 'B') { setSide('A'); return; }
+      if (i <= 0) return;                                      // first face in the binder
+      state.sheetId = state.sheets[i - 1].sheet_id;
+      setSide('B');            // going back, you see that sheet's BACK
+    }
     refreshSlots();
   }
 
@@ -236,7 +295,7 @@
                ' — own ' + a.qty_owned + (a.placed_count ? ' · placed ' + a.placed_count : '') + '</option>';
       }).join('');
       host.innerHTML =
-        '<h2>Side ' + side + ' &middot; slot ' + (pos + 1) + '</h2>' +
+        '<h2>' + FACE_LABEL[side] + ' &middot; slot ' + (pos + 1) + '</h2>' +
         '<p class="hint">Pick a print you know, name a new one, or leave a note.</p>' +
         '<label for="p_pick">Known print</label>' +
         '<select id="p_pick"><option value="">— choose —</option>' + opts + '</select>' +
@@ -336,10 +395,10 @@
    * a different verb and had nowhere to live; this panel is that home.
    *
    * SHEET stays the canonical word for the thing that physically moves (Q11). PAGE — one
-   * side, numbered from sheet order plus A/B — is deliberately not built: moving a SHEET is
-   * one integer per row and zero slots touched, while moving a PAGE means re-seating nine
-   * prints. `v_binder_spread.side_index` already derives the page sequence, so reordering
-   * renumbers pages for free the moment that view is surfaced.
+   * face, numbered from sheet order plus front/back — is deliberately not built: moving a
+   * SHEET is one integer per row and zero slots touched, while moving a PAGE means re-seating
+   * nine prints. `v_binder_spread.side_index` already derives the sequence, which is also
+   * what the arrow traversal above walks.
    */
   var menuBusy = false;
 
@@ -386,7 +445,7 @@
 
     host.innerHTML =
       '<h2>Sheets</h2>' +
-      '<p class="hint">A sheet always travels with both its sides, so moving one never ' +
+      '<p class="hint">A sheet always travels with both its faces, so moving one never ' +
       'disturbs a print inside it.</p>' +
       (n ? '<div class="sheetlist">' + rows + '</div>'
          : '<div class="empty">No sheets yet. <b>Add sheet</b> starts the binder.</div>') +
@@ -483,13 +542,15 @@
 
     document.getElementById('sideA').addEventListener('click', function () { setSide('A'); });
     document.getElementById('sideB').addEventListener('click', function () { setSide('B'); });
-    document.getElementById('prevSheet').addEventListener('click', function () { stepSheet(-1); });
-    document.getElementById('nextSheet').addEventListener('click', function () { stepSheet(1); });
+    // The step buttons walk FACES, same as the arrow keys, so the two can never disagree.
+    document.getElementById('prevSheet').addEventListener('click', function () { stepFace(-1); });
+    document.getElementById('nextSheet').addEventListener('click', function () { stepFace(1); });
 
-    /* SWIPE TO TURN THE SHEET. The gesture the object implies — and the reason the stage is
-     * bounded rather than scrollable: with no vertical scroll to compete with, a horizontal
-     * drag is unambiguous. Threshold 45px and the horizontal delta must beat the vertical,
-     * so a scroll attempt inside a drawer is never read as a flip. */
+    /* SWIPE TO TURN. The gesture the object implies — and the reason the stage is bounded
+     * rather than scrollable: with no vertical scroll to compete with, a horizontal drag is
+     * unambiguous. Threshold 45px and the horizontal delta must beat the vertical, so a
+     * scroll attempt inside a drawer is never read as a turn. Swipe walks the same face
+     * sequence as the keys and the buttons; three inputs, one model. */
     var sx = 0, sy = 0, tracking = false;
     stage.addEventListener('touchstart', function (e) {
       if (e.touches.length !== 1) { tracking = false; return; }
@@ -501,7 +562,7 @@
       var t = e.changedTouches[0];
       var dx = t.clientX - sx, dy = t.clientY - sy;
       if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
-      setSide(dx < 0 ? 'B' : 'A');
+      stepFace(dx < 0 ? 1 : -1);
     }, { passive: true });
 
     document.addEventListener('keydown', onBinderKeys);
@@ -526,10 +587,15 @@
       var el = document.getElementById(id); return el && !el.hidden;
     });
     if (e.key === 'Escape' && open && !menuBusy) { closeDrawers(); return; }
-    if (open) return;                       // never flip the sheet behind an open drawer
+    if (open) return;                       // never turn the sheet behind an open drawer
     if (/^(INPUT|SELECT|TEXTAREA)$/.test((e.target.tagName || ''))) return;
-    if (e.key === 'ArrowRight') setSide('B');
-    if (e.key === 'ArrowLeft') setSide('A');
+    if (e.metaKey || e.ctrlKey || e.altKey) return;   // leave browser history alone
+
+    // One press, one face, straight through the binder. Up/Down do the same thing as
+    // Left/Right on purpose: on a two-face object there is no second axis to spend them on,
+    // and a key that does nothing reads as broken.
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); stepFace(1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); stepFace(-1); }
   }
 
   /* -------------------------------------------------------------- SHOEBOX

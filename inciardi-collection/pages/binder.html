@@ -11,7 +11,12 @@
      Together that was ~350px of chrome around nine cards on a 390px-wide phone.
 
      The scrim is NOT here: it lives at body level in index.html so the Settings drawer shares
-     it and so exactly one element carries that id no matter which route is mounted. -->
+     it and so exactly one element carries that id no matter which route is mounted.
+
+     ⚠️ VOCABULARY: the buttons say FRONT and BACK, the element ids stay `sideA` / `sideB`.
+     That is deliberate — `slot.side` is CHECK (side IN ('A','B')) in the schema, so 'A'/'B'
+     is the stored value and Front/Back is only the word a person reads. app.js holds the one
+     mapping (FACE_LABEL). Renaming these ids would suggest the data changed; it hasn't. -->
 <section class="page">
 
   <!-- One line, one instance of each fact: what sheet, how full, where in the binder. -->
@@ -28,9 +33,9 @@
   </div>
   <div class="sheetbar-meter" aria-hidden="true"><span id="sbMeter" style="width:0"></span></div>
 
-  <!-- THE STAGE. Two faces in one box; the A/B control rotates the flipper in 3D. Both faces
-       stay in the DOM so the flip has something to reveal — backface-visibility keeps the
-       hidden one un-tappable, so there is no pointer-events juggling. -->
+  <!-- THE STAGE. Two faces in one box; the Front/Back control rotates the flipper in 3D. Both
+       faces stay in the DOM so the flip has something to reveal — backface-visibility keeps
+       the hidden one un-tappable, so there is no pointer-events juggling. -->
   <div class="stagewrap" id="stage">
     <div class="flipper" id="flipper">
       <div class="face a" id="faceA"></div>
@@ -38,23 +43,25 @@
     </div>
   </div>
 
-  <!-- Thumb zone. Sheet steps outside, side toggle inside, position stated between. -->
+  <!-- Thumb zone. ‹ › walk the binder one FACE at a time and flow over the sheet boundary,
+       exactly like the arrow keys and a swipe — so they are labelled for turning, not for
+       stepping sheets. Position is stated between them. -->
   <div class="deckbar">
-    <button id="prevSheet" class="step" aria-label="Previous sheet">&#8249;</button>
+    <button id="prevSheet" class="step" aria-label="Turn back">&#8249;</button>
     <span class="where" id="deckWhere"></span>
-    <div class="sides-seg" role="group" aria-label="Sheet side">
-      <button id="sideA" aria-pressed="true">A</button>
-      <button id="sideB" aria-pressed="false">B</button>
+    <div class="sides-seg" role="group" aria-label="Sheet face">
+      <button id="sideA" aria-pressed="true">Front</button>
+      <button id="sideB" aria-pressed="false">Back</button>
     </div>
-    <button id="nextSheet" class="step" aria-label="Next sheet">&#8250;</button>
+    <button id="nextSheet" class="step" aria-label="Turn forward">&#8250;</button>
   </div>
 
   <aside id="sheetMenu" class="drawer" hidden aria-label="Sheets"></aside>
 
   <aside id="legend" class="drawer" hidden aria-label="Card styles">
     <h2>Reading a sheet</h2>
-    <p class="hint">Owned and wanted are worked out from what you actually have, so they can
-       never disagree with your collection.</p>
+    <p class="hint">Nine slots a face, a front and a back to every sheet. Owned and wanted are
+       worked out from what you actually have, so they can never disagree with your collection.</p>
     <div class="legend">
       <div class="lg-row"><span class="lg-swatch" aria-hidden="true"></span>
         <div><b>Owned</b><span>You have it, and it's in this slot.</span></div></div>
@@ -65,9 +72,10 @@
       <div class="lg-row"><span class="lg-swatch empty" aria-hidden="true"></span>
         <div><b>Empty</b><span>Nothing recorded. Tap to fill it.</span></div></div>
     </div>
-    <p class="hint" style="margin-top:var(--gap-md,12px)">A print can sit in more than one slot.
-       When it does, the card spells out <b>own N &middot; placed M</b> so it can never read as
-       owning more than you do.</p>
+    <p class="hint" style="margin-top:var(--gap-md,12px)">Swipe, arrow keys or <b>&#8249; &#8250;</b>
+       turn one face at a time, straight through the binder.</p>
+    <p class="hint">A print can sit in more than one slot. When it does, the card spells out
+       <b>own N &middot; placed M</b> so it can never read as owning more than you do.</p>
     <div class="row"><button id="legendClose" class="ghost">Close</button></div>
   </aside>
 

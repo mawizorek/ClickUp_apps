@@ -12,9 +12,9 @@
  * scrolling past it, and the tell was that nothing was ever fully on screen at once.
  *
  * So the binder page no longer scrolls at all. `body.stage` locks to the viewport and the
- * 3x3 grid is sized in `dvh` to always fit. One side fills the screen. You move by FLIPPING,
- * not scrolling — the A/B toggle rotates the stage in 3D, which is the actual physical
- * gesture, and sheet steps are ‹ › in the thumb zone.
+ * 3x3 grid is sized in `dvh` to always fit. One face fills the screen. You move by TURNING,
+ * not scrolling — the Front/Back control rotates the stage in 3D, which is the actual
+ * physical gesture, and ‹ › walk the binder in the thumb zone.
  *
  * Consequences that had to follow, all deliberate:
  *   - Nine cards must fit in ~55dvh, so a card cannot stack plate + name + two meta lines.
@@ -207,6 +207,8 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
 .face-tag .n { font-family: var(--font-mono, ui-monospace, monospace);
   font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--text-faint); }
+/* FRONT / BACK is the face's name, so it gets the accent and the weight; the tally beside it
+   stays faint. Two facts, one line, clearly ranked. */
 .face-tag .n b { color: var(--accent-2); font-weight: 600; }
 
 /* NINE CARDS, ALWAYS. `minmax(0, 1fr)` on both axes is what makes the grid shrink to the
@@ -299,31 +301,46 @@ button[disabled] { opacity: 0.32; cursor: not-allowed; }
   font-size: 1rem; opacity: 0.45; }
 .slot.empty:hover { opacity: 1; border-color: var(--accent-2); }
 
-/* ---------- the bottom bar: flip + step ----------
-   In the thumb zone, because these are the two gestures you make constantly. Sheet steps
-   outside, side toggle in the middle, position stated between them. */
-.deckbar { flex: 0 0 auto; display: flex; align-items: center; gap: var(--gap-xs, 8px);
-  padding: var(--gap-xs, 8px) var(--gap-md, 12px);
+/* ---------- the bottom bar: turn the sheet ----------
+   In the thumb zone, because turning is the gesture you make constantly. ‹ › walk the binder
+   one FACE at a time and flow over the sheet boundary, so they are the same verb as a swipe
+   and an arrow key. Position sits between them.
+
+   ⚠️ TIGHT ON A 390px PHONE. The row is: 44px button + position text + segment + 44px button.
+   "Front"/"Back" are words rather than the single letters this was first built for, so the
+   segment grew — hence the reduced padding here and the shortened position text under 380px
+   below. Measure before adding anything else to this row. */
+.deckbar { flex: 0 0 auto; display: flex; align-items: center; gap: 4px;
+  padding: var(--gap-xs, 8px) var(--gap-xs, 8px);
   padding-bottom: max(var(--gap-xs, 8px), env(safe-area-inset-bottom));
   border-top: var(--border-w, 1px) solid var(--border); background: var(--surface-1); }
-.deckbar .step { flex: 0 0 auto; min-width: 44px; padding: 8px 10px;
-  background: transparent; color: var(--text-soft); font-size: 1rem; }
+.deckbar .step { flex: 0 0 auto; min-width: 42px; padding: 8px 8px;
+  background: transparent; color: var(--text-soft); font-size: 1.05rem; }
 .deckbar .step:hover:not([disabled]) { background: var(--surface-2); color: var(--text); }
 .deckbar .where { flex: 1 1 auto; text-align: center; min-width: 0;
   font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
-  letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint);
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* Segmented A|B. One control, two states, no ambiguity about which side you are on. */
+/* Segmented Front|Back. One control, two states, no ambiguity about which face you are on.
+   Sans rather than mono: these are words now, and mono at this tracking made "Front" read as
+   a code rather than a place. */
 .sides-seg { flex: 0 0 auto; display: flex; padding: 2px; gap: 2px;
   background: var(--surface-2); border: var(--border-w, 1px) solid var(--border);
   border-radius: var(--radius-pill, 8px); }
-.sides-seg button { min-height: 34px; padding: 4px 13px; border: 0; background: transparent;
+.sides-seg button { min-height: 34px; padding: 4px 11px; border: 0; background: transparent;
   border-radius: calc(var(--radius-pill, 8px) - 2px);
-  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
-  letter-spacing: 0.1em; color: var(--text-soft); }
+  font-size: var(--fs-xs, 0.72rem); font-weight: 500; letter-spacing: 0.04em;
+  color: var(--text-soft); }
 .sides-seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent);
   font-weight: 600; }
+
+/* Narrowest phones: the position line loses its words before the controls lose their labels,
+   because "Front" is the one you read at a glance and "sheet 2 of 2" is the one you can infer. */
+@media (max-width: 380px) {
+  .deckbar .where { font-size: 0.62rem; letter-spacing: 0.04em; }
+  .sides-seg button { padding: 4px 9px; }
+}
 
 /* ---------- drawers ----------
    On a phone a right-hand panel is a desktop habit: the close control lands top-left, the
