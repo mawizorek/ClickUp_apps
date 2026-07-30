@@ -14,6 +14,13 @@
 #      Only `worker/` changes need this.
 #   2. Unattended auto-deploy of a key-authenticated write API on every commit to main is
 #      not something you want. A deploy should be a decision.
+#
+# 🔍 WHY THERE ARE PREFLIGHT STEPS: the first run died with "The process
+# '/usr/local/bin/npx' failed with exit code 1", which says nothing at all. That is a known
+# wrangler-action defect (cloudflare/wrangler-action#360) — the wrapper reports its own exit
+# code and swallows wrangler's real message, which then only exists in the raw log. The
+# preflight steps below drag the actual cause into the step list so nobody has to read raw
+# logs on a phone.
 
 name: Deploy inciardi-collection worker
 
@@ -32,45 +39,84 @@ concurrency:
   group: deploy-inciardi-collection
   cancel-in-progress: false   # never race two deploys of the same worker
 
+env:
+  # PINNED on purpose. `npx wrangler` unpinned installs whatever is latest, and this config
+  # carries compatibility_date 2026-07-01 — a wrangler whose bundled workerd predates that
+  # date hard-fails. One fewer moving part in a deploy that already failed once.
+  WRANGLER_VERSION: "4.28.1"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: inciardi-collection
     steps:
       - uses: actions/checkout@v4
 
+      # A BLANK secret produces exactly the opaque npx failure seen on run 1, and GitHub
+      # masks empty values so the log shows nothing. Assert presence, never print content.
+      - name: Preflight · are the secrets actually set?
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          FAIL=0
+          if [ -z "$TOKEN" ]; then echo "::error::CLOUDFLARE_API_TOKEN is empty or missing."; FAIL=1; fi
+          if [ -z "$ACCT" ];  then echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or missing."; FAIL=1; fi
+          if [ "$FAIL" = "1" ]; then exit 1; fi
+          echo "Both present. Token length ${#TOKEN}, account id length ${#ACCT}."
+          # Lengths only. A 40-char token and a 32-char account id are the expected shapes;
+          # a wildly different length usually means the two values got pasted into each other.
+
       # wrangler.toml normally carries the real id, so this step usually does nothing.
-      # It only DEMANDS an id when the file still holds the placeholder — an earlier version
-      # required one unconditionally, which would have failed a deploy whose config was
-      # already correct.
+      # It only DEMANDS an id when the file still holds the placeholder.
       - name: Resolve the D1 database id
         run: |
-          FILE=inciardi-collection/wrangler.toml
+          FILE=wrangler.toml
           ID="${{ inputs.database_id }}"
           if [ -z "$ID" ]; then ID="${{ vars.INCIARDI_DB_ID }}"; fi
 
           if grep -q PASTE_DATABASE_ID_HERE "$FILE"; then
             if [ -z "$ID" ]; then
-              echo "::error::wrangler.toml holds the placeholder and no id was supplied. Pass one when running this workflow, or set the INCIARDI_DB_ID repo variable. Find it in the D1 dashboard under your database name."
+              echo "::error::wrangler.toml holds the placeholder and no id was supplied. Pass one when running this workflow, or set the INCIARDI_DB_ID repo variable."
               exit 1
             fi
             sed -i "s|PASTE_DATABASE_ID_HERE|$ID|" "$FILE"
             echo "Substituted the placeholder."
           elif [ -n "$ID" ]; then
-            # An explicit override beats the committed value, so a one-off deploy against a
-            # scratch database never needs a commit.
             sed -i "s|^database_id = .*|database_id = \"$ID\"|" "$FILE"
             echo "Overrode the committed id for this run."
           fi
 
           BOUND=$(grep '^database_id' "$FILE" | sed 's/.*"\(.*\)".*/\1/')
           echo "Bound to database ${BOUND:0:8}…"
-
-      - name: Refuse to deploy a worker bound to nothing
-        run: |
-          if grep -q PASTE_DATABASE_ID_HERE inciardi-collection/wrangler.toml; then
-            echo "::error::wrangler.toml still holds the placeholder. A worker bound to nothing looks like it worked, which is worse than a failed deploy."
+          if grep -q PASTE_DATABASE_ID_HERE "$FILE"; then
+            echo "::error::Still the placeholder. A worker bound to nothing looks like it worked, which is worse than a failed deploy."
             exit 1
           fi
+
+      # THE DIAGNOSTIC THAT MATTERS. `whoami` prints the token's permission table, which is
+      # the one thing that separates "bad token" from "token missing a scope" from "config is
+      # wrong." Most likely culprit for run 1: deploying a worker WITH a D1 binding needs D1
+      # edit permission, and the Edit-Cloudflare-Workers template has not always included it.
+      # `continue-on-error` because this is here to REPORT, never to block.
+      - name: Preflight · who does this token think it is?
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@${WRANGLER_VERSION} whoami
+
+      # Validates wrangler.toml, the entrypoint and every binding WITHOUT touching the
+      # account. A config error fails HERE, with a real message, instead of inside the
+      # wrapper that hides it.
+      - name: Preflight · does the config even build?
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@${WRANGLER_VERSION} deploy --dry-run
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
@@ -78,6 +124,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: inciardi-collection
+          wranglerVersion: "4.28.1"
           command: deploy
 
       # WRITE_KEY is NOT set here on purpose. Secrets survive a deploy, so it is set once in
@@ -85,7 +132,7 @@ jobs:
       # passes through GitHub. One fewer place it can leak.
       - name: What to do next
         run: |
-          echo "Deployed. If this was the first run:"
+          echo "Deployed. If this was the first successful run:"
           echo "  1. Cloudflare dashboard → your worker → Settings → Variables and Secrets"
           echo "  2. Add secret WRITE_KEY (a long random string, not a word)"
           echo "  3. Open the app → gear → paste the worker URL + that key"
