@@ -1,23 +1,26 @@
 <!doctype html>
-<!-- Inciardi Collection — v2. Router shell + pages/ partials. Pages-hosted, not file:// capable.
+<!-- Inciardi Collection — v3. Router shell + pages/ partials. Pages-hosted, not file:// capable.
      Shape derived from template-app (gold standard v5), NOT from the predecessor.
 
      ONE DELIBERATE ADDITION vs the template: the template's router injects partials with
      innerHTML, which does not execute inline <script>. So after injecting we call
      App.mount(route). Without that hook every page here would be inert markup.
 
-     v2 (2026-07-30): the write key is now BAKED INTO core.js at Michael's instruction, so a
-     fresh browser can write with nothing pasted. Every piece of copy and every banner in this
-     file had to change with it — three separate strings here asserted the key was never in the
-     bundle, and one banner became structurally unable to fire. Wrong copy about security is
-     not cosmetic; it is the reader trusting a guarantee that no longer exists. -->
-<html lang="en" data-theme="maw-dark-utility" data-mode="dark">
+     v2 (2026-07-30): the write key is BAKED INTO core.js at Michael's instruction, so a fresh
+     browser can write with nothing pasted. Every piece of copy and every banner in this file
+     changed with it.
+
+     v3 (2026-07-30): theme swapped to MERCEDES. Three lines of pointer, zero CSS — styles.css
+     holds no color literals, so the palette is entirely a theme-spine concern. Also removed a
+     latent color override; see the theme block below. -->
+<html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#333740">
+<!-- Mercedes surface-1. This paints the iOS browser chrome, so a stale value here is a visible
+     seam between the app and the phone UI even when every token inside is correct. -->
+<meta name="theme-color" content="#192221">
 <meta name="robots" content="noindex, nofollow">
-<script>try{var t=localStorage.getItem("ic_color");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <title>Inciardi Collection</title>
 <meta name="description" content="A digital twin of the mini-print binder: sheets, sides, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
@@ -41,7 +44,7 @@
 <aside id="settings" class="drawer" hidden aria-label="Settings">
   <h2>Settings</h2>
 
-  <!-- Both fields are now overrides, not requirements: the URL and the key both ship with the
+  <!-- Both fields are overrides, not requirements: the URL and the key both ship with the
        app. Neither is something you have to produce to use this thing. -->
   <label for="writeKey">Write key</label>
   <input id="writeKey" type="password" autocomplete="off">
@@ -76,13 +79,33 @@
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
-  var APP_VERSION = "v2";
-  /* 🔴 THEME: the README says build on `default-theme`. That is a COLOR ROW in colors.tsv,
-     not a JOIN in _themes.json — applyTheme() would fault on it (loudly, since PR #502).
-     `soft-utility` is the documented default for apps copied from template-app, and it is
-     dark. One line changes it on theme-swap day, which is the whole point. */
-  var APP_THEME   = "soft-utility";
-  var DEFAULT_COLOR = "maw-dark-utility";
+  var APP_VERSION = "v3";
+
+  /* ==== THEME ====
+     `soft-mercedes` is a JOIN in shared/themes/_themes.json: color `mercedes` + typography
+     `grounded` + forms `soft` + spacing `standard`. It is soft-utility with one vector
+     swapped, so nothing about density or type changes — only the palette. All four pointers
+     were verified against their grids before this was committed (a bad pointer now paints a
+     red fault banner rather than half-theming in silence).
+
+     🔴 APPLY A JOIN SLUG, NEVER A COLOR SLUG. `mercedes` on its own is a ROW in colors.tsv,
+     not a join — passing it to applyTheme() faults. That exact confusion is why this file
+     used to carry a warning about `default-theme`. The DOM attribute above is different: it
+     takes a COLOR slug, because themes.css ships a static [data-theme="mercedes"] block for
+     the pre-JS first paint. Two different vocabularies, one word apart.
+
+     🗑️ REMOVED IN v3 — the `ic_color` override. This file used to read an `ic_color` value
+     from localStorage twice: once inline in <head> to set the first-paint attribute, and once
+     AFTER applyTheme() to re-apply that color on top of the resolved theme. **Nothing in this
+     app ever wrote it.** There is no color picker here, so it could only ever hold a value
+     left behind by hand — and if it did, it would silently override the app's own palette,
+     making a correct theme change look like it never shipped. That is the same disease as the
+     banner that could not fire and the cache that lied: a mechanism whose only possible
+     effect is an invisible wrong answer. If a picker is wanted later, `on-track` has the
+     reference implementation (a passive menu built from THEMES.listThemes()) — build it with
+     a visible readout of which theme is active, not a bare localStorage read. */
+  var APP_THEME = "soft-mercedes";
+  var DEFAULT_COLOR = "mercedes";   // pre-paint / no-JS floor, must match the join's color
   var DEFAULT_PAGE  = "binder";
   var NAV = [
     { route: "binder",  label: "Binder" },
@@ -92,11 +115,11 @@
   /* ======================= */
 
   if (window.THEMES && THEMES.applyTheme) {
-    THEMES.applyTheme(APP_THEME).then(function () {
-      var saved = null; try { saved = localStorage.getItem("ic_color"); } catch (e) {}
-      if (saved && THEMES.apply) THEMES.apply(saved);
-    });
+    THEMES.applyTheme(APP_THEME);
   } else {
+    // resolve.js missing entirely: themes.css + the data-theme attribute already painted the
+    // Mercedes ramp, so this only re-asserts it. Colors survive; the other three vectors fall
+    // back to the var() defaults baked into styles.css.
     document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
   }
 
@@ -187,14 +210,21 @@
      🔴 NEVER THE KEY ITSELF — only whether one exists and how long it is. This text is built
      to be pasted into a chat, so a credential in here would be a leak with a delivery
      mechanism attached. Still true with a baked key: the bundle names WHICH key is in play,
-     never the string. (Yes, the built-in one is in public source anyway — but a diagnostic
-     that pastes credentials into chat logs is a habit that will eventually meet a key that
-     is not public.) */
+     never the string. */
   function bundle() {
     var L = [];
     L.push("INCIARDI COLLECTION — DIAGNOSTICS");
     L.push("generated   " + new Date().toISOString());
     L.push("app         " + APP_VERSION + "  (theme " + APP_THEME + ")");
+    // The RESOLVED theme, read off the DOM — not the constant above. If a vector failed to
+    // apply, resolve.js writes "!slug" into the attribute, so this reports what the page is
+    // actually wearing rather than what it intended to wear.
+    L.push("theme join  " + (document.documentElement.getAttribute("data-theme-join") || "(not applied)") +
+           "  color=" + (document.documentElement.getAttribute("data-theme") || "?") +
+           "  mode=" + (document.documentElement.getAttribute("data-mode") || "?"));
+    if (window.THEMES && THEMES.faults && THEMES.faults.length) {
+      L.push("theme faults " + THEMES.faults.length + ": " + THEMES.faults.join(" | "));
+    }
     L.push("page        " + location.href);
     L.push("worker      " + API.base() + (API.isDefaultBase() ? "  [built-in default]" : "  [OVERRIDDEN on this device]"));
     L.push("write key   " + (API.isDefaultKey()
