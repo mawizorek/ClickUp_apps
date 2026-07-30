@@ -1,10 +1,10 @@
 /* Inciardi Collection — API worker
  *
- * The only write path into D1. Eleven routes, one file.
+ * The only write path into D1. Twelve routes, one file.
  *
  * DESIGN NOTES THAT MATTER (decision log J6, ladder rung 4 — "one write path"):
- *   - Every mutation goes through `write()` or `batch()`, so auth, timestamps and error shape
- *     are decided once. A second door is how the two surfaces in the predecessor drifted.
+ *   - Every mutation goes through `write()` or `db.batch()`, so auth, timestamps and error
+ *     shape are decided once. A second door is how the two surfaces in the predecessor drifted.
  *   - The database does the arguing, not this file. Constraint violations are returned
  *     verbatim rather than pre-validated here, because a JS validator that disagrees with
  *     the schema is a THIRD source of truth. If D1 says no, the answer is no.
@@ -148,6 +148,84 @@ export default {
             ORDER BY a.name COLLATE NOCASE`) });
       }
 
+      /* ============================================================ /summary
+       * THE WHOLE COLLECTION IN ONE READ. Michael: "a clean summary of my entire print
+       * collection… total counts, how many are placed, how many are still in shoebox, in a
+       * tight matrix… (eventually with drill in to: placed twice on this page and this page
+       * and 4 in shoebox) with direct links."
+       *
+       * Returns TWO arrays and lets the client join them, rather than one row per artwork
+       * with a GROUP_CONCAT of placements. Deliberate: a concatenated string would have to be
+       * parsed back apart, and a print titled with the delimiter would silently corrupt the
+       * drill-in. Two clean shapes beat one clever one.
+       *
+       * 🔴 THE ARITHMETIC, STATED BECAUSE IT IS EASY TO GET WRONG AND IMPOSSIBLE TO SPOT:
+       *   qty_owned   = SUM(copy.qty) — COPIES. Never COUNT(*) (see v_owned).
+       *   placed      = COUNT(slot rows) — SLOTS, not copies. One print in three slots is
+       *                 placed=3 while owned=1, which is legal (J2 ruling 3).
+       *   in_binder   = MIN(owned, placed) — copies actually in the binder. This is the number
+       *                 that pairs with `spare`; a bare SUM of `placed` across the collection
+       *                 would over-count every duplicate placement.
+       *   spare       = MAX(0, owned - placed) — copies left in the shoe-box.
+       * in_binder + spare == qty_owned, always. That identity is the reason to compute both
+       * here rather than let two surfaces each do their own subtraction.
+       *
+       * Rows include artworks with owned=0 (a `wanted` print placed as a gap marker) so the
+       * matrix can show the wishlist rather than pretending it isn't part of the collection.
+       * The client separates them; the query does not decide that.
+       */
+      if (path === '/summary' && method === 'GET') {
+        const prints = await all(
+          `SELECT a.artwork_id, a.name, a.category, a.collection_id, a.retail, a.confidence,
+                  COALESCE(o.qty_owned, 0)                       AS qty_owned,
+                  COALESCE(o.editions_owned, 0)                  AS editions_owned,
+                  COALESCE(o.qty_sold, 0)                        AS qty_sold,
+                  COALESCE(p.n, 0)                               AS placed,
+                  MIN(COALESCE(o.qty_owned,0), COALESCE(p.n,0))  AS in_binder,
+                  MAX(0, COALESCE(o.qty_owned,0) - COALESCE(p.n,0)) AS spare
+             FROM artwork a
+             LEFT JOIN v_owned o ON o.artwork_id = a.artwork_id
+             LEFT JOIN (
+                   SELECT artwork_id, COUNT(*) AS n
+                     FROM slot
+                    WHERE artwork_id IS NOT NULL
+                    GROUP BY artwork_id
+                 ) p ON p.artwork_id = a.artwork_id
+            WHERE a.status = 'active'
+            ORDER BY a.name COLLATE NOCASE`);
+
+        // Every placement, in binder order, carrying the sheet's TITLE and ORDER so the client
+        // can render "Veggies · front · slot 4" and a deep link without a second round trip.
+        const placements = await all(
+          `SELECT s.slot_id, s.artwork_id, s.sheet_id, s.side, s.position,
+                  sh.title AS sheet_title, sh.sheet_order
+             FROM slot s
+             JOIN sheet sh ON sh.sheet_id = s.sheet_id
+            WHERE s.artwork_id IS NOT NULL
+            ORDER BY sh.sheet_order, s.side, s.position`);
+
+        // Collection-level roll-up. Computed here so the header strip and the rows can never
+        // disagree — the client sums nothing.
+        const tot = await all(
+          `SELECT (SELECT COUNT(*) FROM artwork WHERE status='active') AS prints,
+                  (SELECT COALESCE(SUM(qty),0) FROM copy WHERE disposition='own') AS copies,
+                  (SELECT COUNT(*) FROM slot WHERE artwork_id IS NOT NULL) AS placements,
+                  (SELECT COUNT(*) FROM slot WHERE artwork_id IS NULL AND note IS NOT NULL) AS notes,
+                  (SELECT COUNT(*) FROM sheet) AS sheets`);
+
+        const totals = tot[0] || {};
+        // in_binder / spare roll up from the per-print MIN/MAX, NOT from totals.placements —
+        // see the arithmetic note above. Summing `placed` would count a triple-placed single
+        // print as three copies in the binder.
+        totals.in_binder = prints.reduce((n, r) => n + r.in_binder, 0);
+        totals.spare = prints.reduce((n, r) => n + r.spare, 0);
+        totals.unhoused = prints.filter(r => r.qty_owned > 0 && r.placed === 0).length;
+        totals.wanted = prints.filter(r => r.qty_owned === 0 && r.placed > 0).length;
+        totals.slots = (totals.sheets || 0) * 18;
+
+        return reply({ ok: true, at: t, totals: totals, prints: prints, placements: placements });
+      }
+
       /* ============================================================ /shoebox
        * REWRITTEN 2026-07-30 (Michael: "how do we still show '1 placed in binder' and also
        * '5 in shoebox still' but not cock-up what has no place in the binder yet").
@@ -184,6 +262,9 @@ export default {
        * step by hand. Worker SQL ships atomically with the deploy, in one button press. It is
        * still the DATABASE computing it, not JavaScript. If a SECOND consumer ever needs these
        * numbers, promote this into `v_shoebox` then — one claimant on one truth, always.
+       * (2026-07-30, later: /summary is now that second consumer for the SPARE arithmetic. It
+       * recomputes MIN/MAX rather than calling this route, because it needs the same numbers
+       * for prints this route deliberately excludes. If a third appears, promote to a view.)
        */
       if (path === '/shoebox' && method === 'GET') {
         return reply({ shoebox: await all(
@@ -345,7 +426,7 @@ export default {
        *
        * 🔴 THE TRAP, AND THE SCHEMA COMMENT THAT WOULD HAVE WALKED ME INTO IT.
        * `sheet` carries UNIQUE (binder_id, sheet_order), so a naive one-by-one renumber
-       * collides mid-flight. `schema.binder.sql` says to fix that with "a temporary
+       * collides mid-flight. `schema.binder.sql` said to fix that with "a temporary
        * NEGATIVE-offset pass" — and the very same table has CHECK (sheet_order >= 0), which
        * makes every negative value UNWRITEABLE. Following the documented remedy would fail
        * 100% of the time. Corrected there too, 2026-07-30.
@@ -359,7 +440,7 @@ export default {
        * FREE SIDE EFFECT worth knowing: pass two writes 0..n-1, so any gap in sheet_order
        * (from a deleted sheet, say) is compacted. And because slots reference sheet_id and
        * never sheet_order, NOT ONE SLOT ROW IS TOUCHED — a whole sheet travels with both its
-       * sides, which is exactly the physical gesture of lifting it out of the rings.
+       * faces, which is exactly the physical gesture of lifting it out of the rings.
        * Downstream, `v_binder_spread` derives side_index/spread_index from sheet_order, so
        * page numbering renumbers itself. Nothing to keep in sync.
        */
@@ -416,7 +497,7 @@ export default {
         const side = String(body.side || 'A').toUpperCase();
         const pos = parseInt(body.position, 10);
         if (!sheet) return reply({ ok: false, error: 'sheet_id is required' }, 400);
-        if (!(pos >= 0 && pos <= 8)) return reply({ ok: false, error: 'position must be 0-8 (nine slots a side)' }, 400);
+        if (!(pos >= 0 && pos <= 8)) return reply({ ok: false, error: 'position must be 0-8 (nine slots a face)' }, 400);
         return write(
           `INSERT INTO slot (slot_id,sheet_id,side,position,artwork_id,edition_id,note,created_at,updated_at)
            VALUES (?,?,?,?,?,?,?,?,?)
@@ -435,7 +516,7 @@ export default {
       }
 
       return reply({ error: 'no route for ' + method + ' ' + path, routes: [
-        'GET /health', 'GET /artworks', 'GET /shoebox', 'GET /sheets',
+        'GET /health', 'GET /artworks', 'GET /summary', 'GET /shoebox', 'GET /sheets',
         'GET /slots?sheet=', 'GET /editions?artwork=',
         'POST /artwork', 'POST /copy', 'POST /sheet', 'POST /sheet/rename',
         'POST /sheet/reorder', 'POST /slot', 'DELETE /slot?id='
