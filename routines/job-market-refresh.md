@@ -19,7 +19,7 @@ added: 2026-07-30
 >
 > The trigger state lives in the standing ClickUp task, in its title and its State block — not here, and not in memory. **Read it before every run.** If the title still says `hunt trigger OFF`, you are in research mode.
 >
-> Standing task: <https://app.clickup.com/t/86ajxwvqq> · list: **Applications**
+> Standing task: **`86ajtgbt3`** · <https://app.clickup.com/t/86ajtgbt3> · list: **Applications**
 >
 > Michael flips it in plain language ("turn the job hunt on"). Nobody else flips it, and it is never inferred from an interesting posting.
 
@@ -108,4 +108,4 @@ Structural: <board/source changes, or omit the line>
 
 ## Changelog
 
-- **v1 (2026-07-30)** — created. Geography ANYWHERE + lane NON-ACADEMIC locked by Michael the same day. Sources verified live 2026-07-30; two corrections carried in from the old ClickUp Job Search doc (ARTSEARCH moved hosts, OffStageJobs is `staging.`-only). Trigger OFF at birth: this is the first routine written to be deliberately half-asleep, and the ON/OFF table is the load-bearing part.
+- **v1 (2026-07-30)** — created. Geography ANYWHERE + lane NON-ACADEMIC locked by Michael the same day. Sources verified live 2026-07-30; two corrections carried in from the old ClickUp Job Search doc (ARTSEARCH moved hosts, OffStageJobs is `staging.`-only). Trigger OFF at birth: this is the first routine written to be deliberately half-asleep, and the ON/OFF table is the load-bearing part. ⚠️ The standing-task link was hand-typed on the first commit and wrong; corrected against the loaded task in the same session. The session board's rule holds — load the task, copy the ID, never type it.
