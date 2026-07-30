@@ -1,10 +1,15 @@
-<!-- The whole collection in one window. Behaviour lives in summary.js, which is a SEPARATE
-     file from app.js on purpose: app.js is already past the 30KB read cap this repo works
-     under, and a fifth screen inside it would have made the app's own source unreadable.
-     See the block at the top of summary.js. -->
+<!-- The whole collection in one window. Behaviour lives in summary.js and styling in
+     summary.css — both SEPARATE from app.js and styles.css on purpose: those two are already at
+     or past the ~30KB read cap this repo works under, and a fifth screen inside them would have
+     made the app's own source unreadable. See the block at the top of summary.js.
+
+     The <h1> says "Summary" and not "Collection" only because the nav says Summary. A nav label
+     that disagrees with the page title it lands on makes you check whether you clicked the
+     wrong thing. The sub-line carries the better word. -->
 <section class="page">
-  <h1>Collection</h1>
-  <p class="sub">Every print, what you own, where it sits. Tap a row to see which sheets.</p>
+  <h1>Summary</h1>
+  <p class="sub">The whole collection: what you own, what's in the binder, what's still in the
+     box. Tap any print for the sheets it sits on.</p>
 
   <div id="sumWrap"></div>
 </section>
