@@ -16,7 +16,7 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, sides, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=2">
+<link rel="stylesheet" href="./styles.css?v=3">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -45,6 +45,7 @@
   <div class="row">
     <button id="saveCfg" class="primary">Save</button>
     <button id="ping">Test connection</button>
+    <button id="copyDiag">📋 Copy diagnostics</button>
   </div>
   <pre id="pingOut" class="out" hidden></pre>
 
@@ -65,8 +66,8 @@
 <noscript>This app needs JavaScript enabled.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./core.js?v=2"></script>
-<script src="./app.js?v=2"></script>
+<script src="./core.js?v=3"></script>
+<script src="./app.js?v=3"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
@@ -105,6 +106,11 @@
   var baseIn = document.getElementById("apiBase");
   var baseHint = document.getElementById("baseHint");
 
+  /* Kept for the diagnostics bundle. The LAST FAILURE is retained deliberately: a copy
+     button matters most when something broke, and a bundle that only reports the latest
+     (successful) call is exactly the one that omits the useful part. */
+  var lastPing = null, lastError = null, lastAt = null;
+
   function paintBase() {
     // Show the OVERRIDE, not the effective value: an input pre-filled with something it
     // never saved is a small lie about state, and blanking it would then look like erasing.
@@ -122,7 +128,6 @@
     document.getElementById("writeKey").value = API.key() || "";
     paintBase();
     dr.hidden = false;
-    document.getElementById("writeKey").focus();
   });
   document.getElementById("closeCfg").addEventListener("click", function () { dr.hidden = true; });
   document.getElementById("resetBase").addEventListener("click", function () {
@@ -135,27 +140,75 @@
     paintBase(); checkConfig(); render(current());
   });
 
-  /* Interprets the result instead of dumping JSON. "Reads work, writes are ungated" is a
-     DIFFERENT state from "both work," and a wall of JSON makes the reader do that
-     comparison themselves. */
+  /* RAW JSON, verbatim — Michael pastes it, so the machine output is the point. The verdict
+     line sits ABOVE it because that costs nothing and answers "can I save yet?" at a glance. */
   document.getElementById("ping").addEventListener("click", function () {
     var out = document.getElementById("pingOut");
     out.hidden = false; out.textContent = "…";
+    lastAt = new Date().toISOString();
     API.get("/health").then(function (d) {
-      var c = d.counts || {};
+      lastPing = d; lastError = null;
       out.textContent =
-        "CONNECTED\n" +
-        "  artworks  " + c.artworks + "\n" +
-        "  editions  " + c.editions + "\n" +
-        "  owned     " + c.owned + "\n" +
-        "  sheets    " + c.sheets + "\n" +
-        "  slots     " + c.slots + "\n\n" +
-        (API.key()
-          ? "Write key set. Adding should work."
-          : "NO WRITE KEY on this device — reading works, saving will not.");
+        "CONNECTED · " + (API.key() ? "write key set" : "READ-ONLY (no write key on this device)") +
+        "\n\n" + JSON.stringify(d, null, 2);
     }).catch(function (e) {
-      out.textContent = "FAILED\n" + e.message;
+      lastError = e.message || String(e); lastPing = null;
+      out.textContent = "FAILED\n\n" + lastError;
     });
+  });
+
+  /* Copies a DIAGNOSTIC BUNDLE, not just the JSON. What I need when he pastes is the context
+     the JSON does not carry: version, which worker, whether a key was present, the page, the
+     browser, and the last failure.
+     🔴 NEVER THE KEY ITSELF — only whether one exists and how long it is. This text is built
+     to be pasted into a chat, so a credential in here would be a leak with a delivery
+     mechanism attached. */
+  function bundle() {
+    var L = [];
+    L.push("INCIARDI COLLECTION — DIAGNOSTICS");
+    L.push("generated   " + new Date().toISOString());
+    L.push("app         " + APP_VERSION + "  (theme " + APP_THEME + ")");
+    L.push("page        " + location.href);
+    L.push("worker      " + API.base() + (API.isDefaultBase() ? "  [built-in default]" : "  [OVERRIDDEN on this device]"));
+    L.push("write key   " + (API.key() ? "present (" + API.key().length + " chars)" : "NOT SET — writes will be refused"));
+    L.push("browser     " + navigator.userAgent);
+    L.push("");
+    if (lastAt) L.push("last test   " + lastAt);
+    if (lastError) {
+      L.push("");
+      L.push("LAST FAILURE");
+      L.push(lastError);
+    }
+    if (lastPing) {
+      L.push("");
+      L.push("LAST /health RESPONSE");
+      L.push(JSON.stringify(lastPing, null, 2));
+    }
+    if (!lastAt) {
+      L.push("(Test connection has not been run in this session — no response captured.)");
+    }
+    return L.join("\n");
+  }
+
+  document.getElementById("copyDiag").addEventListener("click", function () {
+    var txt = bundle();
+    var out = document.getElementById("pingOut");
+    function manual() {
+      // navigator.clipboard is absent in some iOS configurations and in non-secure contexts.
+      // A copy button that silently does nothing is worse than no copy button, so fall back
+      // to showing + selecting the text.
+      out.hidden = false; out.textContent = txt;
+      try {
+        var r = document.createRange(); r.selectNodeContents(out);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      } catch (e) {}
+      Core.toast("Clipboard blocked — text selected, copy manually", "bad");
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt)
+        .then(function () { Core.toast("Diagnostics copied (no key included)", "good"); })
+        .catch(manual);
+    } else { manual(); }
   });
 
   /* ---- banner: report the ACTUAL remaining gap ----
