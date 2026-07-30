@@ -1,0 +1,126 @@
+/* Inciardi Collection — the Summary matrix.
+ *
+ * ZERO COLOR LITERALS, same contract as styles.css: every colour is var(--token) from the
+ * theme spine, so the Mercedes palette (or any future one) reaches this screen for free.
+ *
+ * SEPARATE FILE FOR THE SAME REASON summary.js IS ONE: styles.css is already 30KB against a
+ * ~30KB read cap and a ~22KB target. Adding a fifth screen's rules to it would have pushed the
+ * app's own stylesheet past the point where it can be read back whole and therefore safely
+ * edited. `.chips` lives here rather than in styles.css even though the shoe-box now uses it
+ * too — it was authored for this screen, and moving it would mean touching the over-cap file.
+ * 🔴 When styles.css does get split, `.chips` belongs in the shared half.
+ */
+
+/* ---------- THE WINDOW ----------
+   Five numbers that answer "what do I have and where is it" without scrolling. Deliberately
+   NOT the big-number-plus-label hero template: these are peers on one rule, sized to be
+   scanned across rather than admired one at a time. `copies` splits into `in binder` + `box`
+   and those two always sum back to it, which is what makes the row readable instead of
+   something to reconcile. */
+.mx { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
+  overflow: hidden; background: var(--surface-1); }
+.mx-c { padding: var(--gap-xs, 8px) 6px; text-align: center; min-width: 0;
+  border-left: var(--border-w, 1px) solid var(--border); }
+.mx-c:first-child { border-left: 0; }
+.mx-c .v { font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums; font-size: clamp(1rem, 5vw, 1.5rem); font-weight: 600;
+  line-height: 1.1; color: var(--text); }
+/* The denominator rides small and faint inside the number, so "7/36" reads as one fact. */
+.mx-c .v .of { font-size: 0.6em; font-weight: 400; color: var(--text-faint); }
+.mx-c .l { font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent-2); margin-top: 2px; }
+.mx-c .s { font-size: 0.6rem; color: var(--text-faint); line-height: 1.2; margin-top: 1px; }
+@media (max-width: 430px) {
+  /* The third line goes first: it explains the label, and the label survives without it. */
+  .mx-c .s { display: none; }
+  .mx-c .l { font-size: 0.6rem; letter-spacing: 0.03em; }
+}
+
+/* ---------- filter chips ---------- */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: var(--gap-md, 12px) 0; }
+.chips .chip { flex: 0 0 auto; min-height: 34px; padding: 5px 10px;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.02em;
+  background: transparent; color: var(--text-soft);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius-pill, 8px); }
+.chips .chip .n { font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums; color: var(--text-faint); }
+.chips .chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent);
+  border-color: var(--accent-deep); font-weight: 550; }
+.chips .chip[aria-pressed="true"] .n { color: var(--on-accent); opacity: 0.75; }
+
+/* ---------- the matrix ----------
+   A real <table>, because this IS tabular data and Michael asked for a matrix. Four columns
+   only — one flexible name plus three narrow integers — which is what lets it hold together at
+   390px without horizontal scrolling. `.mxt-wrap` still allows overflow as an escape hatch for
+   an unusually long title rather than clipping it. */
+.mxt-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border-top: 2px solid var(--text); }
+.mxt { width: 100%; border-collapse: collapse; }
+
+.mxt thead th { position: sticky; top: 0; z-index: 1;
+  background: var(--bg); padding: 6px 4px; text-align: left;
+  border-bottom: var(--border-w, 1px) solid var(--border); }
+.mxt thead th.num { text-align: right; }
+.sortb { background: transparent; border: 0; padding: 2px 4px; min-height: 30px;
+  border-radius: 3px; color: var(--text-faint);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  letter-spacing: 0.09em; text-transform: uppercase; }
+.sortb:hover { color: var(--text); background: var(--surface-2); }
+/* The active sort is marked by COLOUR AND WEIGHT, not an arrow glyph: there is only one
+   direction (descending for numbers, A-Z for names), so an arrow would imply a toggle that
+   does not exist. */
+.sortb[aria-pressed="true"] { color: var(--accent-2); font-weight: 600; }
+
+.mxt tbody tr.mrow { cursor: pointer;
+  border-bottom: var(--border-w, 1px) solid var(--border); }
+.mxt tbody tr.mrow:hover td { background: var(--surface-2); }
+.mxt tbody tr.mrow.on td { background: var(--surface-2); }
+.mxt td { padding: 7px 4px; vertical-align: middle; }
+
+.nmc { min-width: 0; }
+.nmc .cv { display: inline-block; width: 1em; color: var(--text-faint); font-size: 0.7em;
+  transition: color 140ms var(--ease, ease-out); }
+.mrow.on .cv { color: var(--accent); }
+.nmc .nmt { display: inline-block; max-width: calc(100% - 2.4em); overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;
+  font-size: var(--fs-sm, 0.85rem); }
+
+/* A wanted print is real collection data, so it is listed — but it is not owned, so it reads
+   quieter and says why. Same logic as the ghosted slot in the binder. */
+.mrow.want .nmt { color: var(--text-soft); font-style: italic; }
+.wtag { margin-left: 6px; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-faint); border: 1px dashed var(--border); border-radius: 3px;
+  padding: 0 4px; }
+
+.mxt td.num { text-align: right; font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums; font-size: var(--fs-sm, 0.85rem);
+  padding-right: 8px; }
+/* A zero renders as a middot. Nine literal zeroes down a column is visual noise that competes
+   with the numbers that matter, and "none" is exactly what an absent value means here. */
+.mxt td.num.zero { color: var(--text-faint); }
+
+/* ---------- the drill-in ----------
+   Michael: "drill in to: placed twice on this page and this page and 4 in shoebox". An inline
+   expanded row, not a modal: the row it belongs to stays visible above it, so the numbers and
+   their explanation are on screen together. */
+.drow td { padding: 0 4px var(--gap-md, 12px) 1.4em;
+  border-bottom: var(--border-w, 1px) solid var(--border); background: var(--surface-2); }
+.dr-l { display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 5px 0; }
+.dr-l .tag { flex: 0 0 auto; }
+/* Each placement is a real link into the binder at that sheet and face. Styled as a chip
+   because it is a destination, and sized for a thumb. */
+.wl { display: inline-flex; align-items: center; min-height: 30px; padding: 3px 8px;
+  border-radius: var(--radius, 6px); text-decoration: none;
+  background: var(--surface-3); color: var(--accent-2);
+  border: var(--border-w, 1px) solid var(--border);
+  font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.02em;
+  transition: border-color 140ms var(--ease, ease-out), color 140ms var(--ease, ease-out); }
+.wl:hover { border-color: var(--accent); color: var(--text); }
+/* `.flat` = a count, not a link. It must not look tappable. */
+.wl.flat { background: transparent; color: var(--text-soft); border-style: dashed;
+  pointer-events: none; }
+.drow .hint { margin-top: 5px; }
