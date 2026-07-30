@@ -22,9 +22,19 @@ What that changes, concretely:
 |---|---|---|---|
 | **On Track** · `on-track-refresh.md` | Every **Wednesday** | `last-run/on-track.txt` | Weekly motorsports TV listings refresh. |
 | **F1** · `f1-refresh.md` | **Thu–Sun**, session-aware | `last-run/f1.txt` | Eligible on any invocation Thu–Sun, but the runbook decides: it only refreshes if an F1 session has actually finished since the last stamp. Otherwise a clean no-op. |
+| **Job Market** · `job-market-refresh.md` | **Daily** | `last-run/job-market.txt` | Non-academic live-entertainment production roles, geography ANYWHERE. ⚠️ **The hunt trigger is OFF** — research mode only, and the runbook reads that state off ClickUp task `86ajtgbt3` on every run, never off this table. Output while OFF is ONE comment on that task; it creates no lead tasks. See the daily-cadence note below. |
 | **World Cup** · `world-cup-refresh.md` | 🏁 **RETIRED** 2026-07-26 | `last-run/world-cup.txt` *(frozen)* | Tournament ended Jul 19, 2026. Row kept as the template for the next one. **The bracket APP is still live** — retiring a routine is not retiring an app. |
 
 **To check whether anything is stale:** ask Ricky (`/session.agent=Ricky` — a bare call triages and proposes), or read a routine's `last-run` file and compare it to the cadence above yourself.
+
+### ⚠️ Daily is the most honest-but-brittle cadence we have (added 2026-07-30 with Job Market)
+
+Job Market is the **first daily routine**, and daily interacts badly with "there is no scheduler" in a way weekly does not. Read this before adding a second one.
+
+- **It will read as overdue almost every time.** A Wednesday cadence is satisfied by one invocation a week; a daily cadence is satisfied only by invoking every day, which nobody does. **That is expected, not an alarm.** Triage must report it plainly and must not escalate its tone just because the number is bigger.
+- **The catch-up rule carries the whole load.** Nine days without an invocation is **ONE** pass labeled a catch-up, never nine passes. This is exactly the rule daily cadences are most tempted to break.
+- **So "daily" here really means "a day old is stale enough to be worth re-reading."** It is a statement about how fast job boards turn over, not a promise about how often anything runs.
+- **The mitigation is the runbook, not the clock** — per the F1 lesson below, Job Market compares against its own last-run stamp and reports the DELTA, so a late pass is still a correct pass. It just covers more days.
 
 ### 🏁 World Cup stand-down (2026-07-26)
 
@@ -48,13 +58,14 @@ Each routine's last-run timestamp lives in its OWN tiny file under `routines/las
 
 > ⚠️ **Re-affirmed the hard way, same month.** On 2026-07-26 a shared `brain-config/data-refresh-log.json` was created holding every routine's row in one file — exactly the shape this rule forbids — and shipped with an explicit "any agent may stamp it" invitation that made the race *likelier*. Deleted the same day, never used. **Losing the wake timer does NOT make a shared stamp file safe:** concurrent SESSIONS collide as happily as concurrent wakes did.
 
-> 📌 **OPEN QUESTION (2026-07-27):** with the viewer gone, answering *"is anything stale?"* by reading files means opening this file **plus one stamp file per routine**. Folding the stamps back into the table would make this doc fully self-contained — which is what "single source of truth" really wants — **but that was the pre-07-05 design and the race above is why it was abandoned.** There is a real argument it is now safe (SHA-checked writes reject a stale write rather than silently clobbering, proven twice on the session board), but **that must be TESTED, not assumed.** Michael's call; tracked on thread `86ajv0f8w`.
+> 📌 **OPEN QUESTION (2026-07-27):** with the viewer gone, answering *"is anything stale?"* by reading files means opening this file **plus one stamp file per routine**. Folding the stamps back into the table would make this doc fully self-contained — which is what "single source of truth" really wants — **but that was the pre-07-05 design and the race above is why it was abandoned.** There is a real argument it is now safe (SHA-checked writes reject a stale write rather than silently clobbering, proven twice on the session board), but **that must be TESTED, not assumed.** Michael's call; tracked on thread `86ajv0f8w`. *(2026-07-30: adding Job Market makes this a 4-file read to answer one question. The pressure is now real, not theoretical.)*
 
 ## How to decide what to run (all times America/New_York)
 
 On invocation, for every ACTIVE routine, read its `last-run` file and compare against its cadence:
 
 - **Day-of-week cadence** ("every Wednesday"): due if last-run is older than the most recent occurrence of that day. After success, write now.
+- **Daily cadence** (Job Market): due if last-run is older than today. `never` on a daily routine is still NEVER RUN, not "infinitely overdue" — see below.
 - **Session-aware cadence** (F1, Thu–Sun): eligible on those days; the runbook checks whether a session finished since last-run and refreshes only if so. Stamp only on an actual refresh.
 - **`never`** means NEVER RUN. Report it as exactly that — never as a huge overdue interval. Rendering an unset stamp as arithmetic is lying with numbers.
 - **A stamp you could not READ is not `never` either.** Unreadable is its own answer: say "unknown," never substitute a default.
@@ -76,6 +87,7 @@ On invocation, for every ACTIVE routine, read its `last-run` file and compare ag
 - Format: one line, `YYYY-MM-DD HH:MM` ET. Use `never` if it has never successfully run.
 - Changing a cadence: edit the `Cadence` cell above (or tell Ricky). Never reschedule by editing a runbook spec, and never by editing the agent.
 - Retiring a routine: mark it retired in the table with a dated reason, and **put its end date in the ROW** if it is date-bounded. **Do not delete the row and do not delete the runbook.** *(The World Cup stand-down instruction lived only inside its runbook and went seven days unexecuted.)*
+- **A routine can be ACTIVE while the work it feeds is switched off.** Job Market is the first: it runs daily, but a trigger held in ClickUp decides whether the pass produces research notes or actual leads. **Cadence and mode are different questions — never encode a mode in this table**, or the next person retunes a cadence to change a behavior and the table starts lying.
 
 ## 🗑️ The Routines Viewer was deleted — read this before rebuilding it
 
