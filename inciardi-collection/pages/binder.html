@@ -6,9 +6,12 @@
                                   the layout now demonstrates it.
        the sheet <select>/button — folded into .sheetbar, which was ALSO printing the title,
                                   position and fill a second time directly below itself.
-       the closing <p class="hint"> legend paragraph — moved into the ? popover, where each row
+       the closing <p class="hint"> legend paragraph — moved into the ? drawer, where each row
                                   shows the treatment it describes.
-     Together that was ~350px of chrome above and below nine cards on a 390px-wide phone. -->
+     Together that was ~350px of chrome around nine cards on a 390px-wide phone.
+
+     The scrim is NOT here: it lives at body level in index.html so the Settings drawer shares
+     it and so exactly one element carries that id no matter which route is mounted. -->
 <section class="page">
 
   <!-- One line, one instance of each fact: what sheet, how full, where in the binder. -->
@@ -26,8 +29,8 @@
   <div class="sheetbar-meter" aria-hidden="true"><span id="sbMeter" style="width:0"></span></div>
 
   <!-- THE STAGE. Two faces in one box; the A/B control rotates the flipper in 3D. Both faces
-       are always in the DOM so the flip has something to reveal — backface-visibility keeps
-       the hidden one un-tappable, so there is no pointer-events juggling. -->
+       stay in the DOM so the flip has something to reveal — backface-visibility keeps the
+       hidden one un-tappable, so there is no pointer-events juggling. -->
   <div class="stagewrap" id="stage">
     <div class="flipper" id="flipper">
       <div class="face a" id="faceA"></div>
@@ -46,8 +49,8 @@
     <button id="nextSheet" class="step" aria-label="Next sheet">&#8250;</button>
   </div>
 
-  <button class="scrim" id="scrim" hidden aria-label="Close"></button>
   <aside id="sheetMenu" class="drawer" hidden aria-label="Sheets"></aside>
+
   <aside id="legend" class="drawer" hidden aria-label="Card styles">
     <h2>Reading a sheet</h2>
     <p class="hint">Owned and wanted are worked out from what you actually have, so they can
@@ -67,5 +70,6 @@
        owning more than you do.</p>
     <div class="row"><button id="legendClose" class="ghost">Close</button></div>
   </aside>
+
   <aside id="pickWrap" class="drawer" hidden aria-label="Fill slot"></aside>
 </section>
