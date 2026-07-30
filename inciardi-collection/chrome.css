@@ -13,14 +13,27 @@
  * the light ramp. Ink is `--text*` or `--accent-deep`; brand colours fill, they do not letter.
  */
 
-/* ---------- header ---------- */
+/* ---------- header ----------
+   The gradient is the "looks better" half of v11: surface-1 at the top easing into --bg at the
+   bottom edge, so the bar sits on the page instead of being stuck to it with a hairline. Both
+   ends are tokens, so it inverts correctly in light mode for free. */
 #appHeader { flex: 0 0 auto; position: sticky; top: 0; z-index: 30;
-  background: var(--surface-1); border-bottom: var(--border-w, 1px) solid var(--border); }
-.hd-in { display: flex; align-items: center; gap: var(--gap-xs, 8px);
+  background: linear-gradient(180deg, var(--surface-1), var(--surface-1) 62%, var(--bg));
+  border-bottom: var(--border-w, 1px) solid var(--border); }
+
+/* 🔴 GRID, NOT FLEX, AND THAT IS THE WHOLE POINT (v11). Michael asked for a CENTRED page title.
+   A flex row with `justify-content: center` centres the title in the space LEFT OVER by the two
+   buttons, so it shifts the moment one side is wider than the other — the classic almost-centred
+   header. Three fixed-width columns make the middle one the header's real centre line, and it
+   stays there no matter what the flanks hold.
+   `minmax(0, 1fr)` on the middle column is what lets the title ellipsis instead of pushing the
+   gear off the edge — `1fr` alone has an auto minimum. */
+.hd-in { display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center; gap: var(--gap-xs, 8px);
   max-width: 900px; margin: 0 auto;
   padding: var(--gap-xs, 8px); }
 
-.hd-icon { flex: 0 0 auto; min-width: 42px; min-height: 42px; padding: 0;
+.hd-icon { min-width: 42px; min-height: 42px; padding: 0;
   display: grid; place-items: center;
   background: transparent; border: 0; border-radius: var(--radius, 6px);
   color: var(--text-soft); font-size: 1.05rem; cursor: pointer; }
@@ -36,16 +49,37 @@
 .hd-bars::before { top: -5px; }
 .hd-bars::after  { top: 5px; }
 
-.hd-brand { flex: 1 1 auto; min-width: 0; display: flex; align-items: baseline; gap: 0.4em;
-  text-decoration: none; color: var(--text); overflow: hidden;
-  font-family: var(--font-display, inherit); font-size: var(--fs-sm, 0.85rem);
-  letter-spacing: var(--track-tight, -0.01em); white-space: nowrap; }
-.hd-logo { flex: 0 0 auto; font-size: 1.05em; }
-.hd-name { overflow: hidden; text-overflow: ellipsis; }
-/* accent-deep, NOT accent-2 — see the rule at the top of this file. */
-.hd-name b { color: var(--accent-deep); font-weight: 700; }
-.hd-sub { color: var(--text-soft); font-weight: 350; }
-@media (max-width: 420px) { .hd-sub { display: none; } }
+/* ---------- the centre column: app kicker over page title ----------
+   TWO LINES, ZERO EXTRA HEIGHT. Kicker ~9px + title ~17px = ~26px, which fits inside the 42px
+   the icon buttons already claim. That matters more than it sounds: the binder route is locked
+   to 100dvh, so every pixel this bar takes comes straight out of the cards.
+   The HIERARCHY is deliberately inverted from v10 — the app name is now the small quiet line and
+   the PAGE is the loud one, because you always know which app you opened and rarely know which
+   screen you are on. */
+.hd-mid { min-width: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1px; text-align: center; }
+
+.hd-kicker { display: flex; align-items: center; gap: 0.4em; max-width: 100%;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.56rem;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint);
+  line-height: 1.1; white-space: nowrap; overflow: hidden; }
+.hd-kicker > span { overflow: hidden; text-overflow: ellipsis; }
+.hd-logo { flex: 0 0 auto; font-size: 1.2em; letter-spacing: 0; }
+
+/* The page title. Explicit margin/size because this is an <h1> and base.css styles those for
+   page bodies — a class beats an element selector, but only for the properties it names. */
+.hd-title { margin: 0; max-width: 100%;
+  font-family: var(--font-display, inherit); font-size: var(--fs-lead, 1.1rem);
+  font-weight: 600; line-height: 1.15; letter-spacing: var(--track-tight, -0.02em);
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+@media (max-width: 380px) {
+  /* Tracking goes before size: at 0.56rem the kicker is already at its floor, and cutting the
+     letter-spacing buys more room than shrinking the glyphs. */
+  .hd-kicker { letter-spacing: 0.1em; }
+  .hd-title { font-size: var(--fs-body, 0.95rem); }
+}
 
 /* ---------- chrome drawers: nav LEFT, settings RIGHT ----------
    Mirror images on purpose. Translated off-screen rather than hidden, so they animate in and out
@@ -64,9 +98,13 @@
 .drawer-head { flex: 0 0 auto; display: flex; align-items: center; gap: var(--gap-xs, 8px);
   padding: var(--gap-md, 12px) var(--gap-md, 12px) var(--gap-xs, 8px);
   border-bottom: var(--border-w, 1px) solid var(--border); }
-.drawer-head h2 { flex: 1 1 auto; margin: 0;
+.drawer-head h2 { flex: 1 1 auto; margin: 0; min-width: 0;
   font-family: var(--font-display, inherit); font-size: var(--fs-lead, 1.15rem);
   font-weight: 600; letter-spacing: var(--track-tight, -0.02em); }
+/* The nav drawer's head is the WORDMARK (v11) — the header gave its centre to the page title, so
+   identity lives here. accent-deep, never accent-2: see the ink rule at the top of this file. */
+.drawer-head .dh-logo { font-size: 0.95em; }
+.drawer-head .dh-sub { color: var(--text-soft); font-weight: 350; }
 .drawer-x { flex: 0 0 auto; min-width: 38px; min-height: 38px; padding: 0;
   display: grid; place-items: center;
   background: transparent; border: 0; border-radius: var(--radius, 6px);

@@ -1,12 +1,14 @@
+<!-- 🔴 NO <h1> HERE (v11). The header centres the PAGE TITLE and takes it from `nav[].label` in
+     boot.js. All four routes carry exactly one heading now, and it is written in one place. -->
 <section class="page">
-  <h1>Enter a print</h1>
-  <p class="sub">Name is the only thing required. Everything else can come later.</p>
+  <p class="sub">Add a print to the catalog. Name is the only thing required — everything else can
+     come later.</p>
 
   <form id="enterForm" autocomplete="off">
     <label for="f_name">Name</label>
     <input id="f_name" required placeholder="e.g. Luna Moth" autofocus>
 
-    <p class="hint">Stored as <span id="idEcho" class="num">—</span> — permanent identity.
+    <p class="hint">Stored as <span id="idEcho" class="num">&mdash;</span> &mdash; permanent identity.
        The display name can change later; this cannot.</p>
 
     <label for="f_id">Override the id (rarely)</label>
@@ -25,19 +27,19 @@
       <div>
         <label for="f_edtype">Edition type</label>
         <select id="f_edtype">
-          <option value="open" selected>open — reprinted freely</option>
-          <option value="limited">limited — a run of N</option>
-          <option value="unique">unique — one of a kind</option>
+          <option value="open" selected>open &mdash; reprinted freely</option>
+          <option value="limited">limited &mdash; a run of N</option>
+          <option value="unique">unique &mdash; one of a kind</option>
         </select>
       </div>
     </div>
     <p class="hint"><b>Category is size, edition type is how many exist.</b> A mini print can be
-       any of the three — Brooklyn Ginkgo is a mini <em>and</em> unique.</p>
+       any of the three &mdash; Brooklyn Ginkgo is a mini <em>and</em> unique.</p>
 
     <div class="grid2">
       <div>
         <label for="f_collection">Collection</label>
-        <input id="f_collection" placeholder="e.g. spring — optional">
+        <input id="f_collection" placeholder="e.g. spring &mdash; optional">
       </div>
       <div>
         <label for="f_retail">Retail</label>
@@ -58,7 +60,7 @@
       </div>
       <div>
         <label for="f_where">Where from</label>
-        <input id="f_where" placeholder="shop · vending machine · trade · gift">
+        <input id="f_where" placeholder="shop &middot; vending machine &middot; trade &middot; gift">
       </div>
     </div>
 

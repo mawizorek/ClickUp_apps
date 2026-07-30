@@ -15,20 +15,40 @@
 (function () {
   var open = { nav: false, settings: false };
   var lastTrigger = null;      // focus returns here when a drawer closes
+  var cfg = null;              // the config object, kept for setActive
+  var titles = {};             // route -> label, built once from cfg.nav
 
   function $(id) { return document.getElementById(id); }
 
-  /* ---------- header: hamburger · brand · gear ---------- */
-  function buildHeader(cfg) {
+  /* ---------- header: hamburger · PAGE TITLE · gear ----------
+   * 🔴 v11 — THE HEADER NAMES THE PAGE, NOT THE APP. Michael: "the PAGE TITLE at the top should
+   * be CENTERED." Until now the centre of the header carried the wordmark on all four routes,
+   * left-aligned next to the hamburger. That answered a question nobody had ("which app is
+   * this") and left the real one unanswered ("which page am I on") — the nav drawer knew, but
+   * you had to open it to find out.
+   *
+   * THREE ZONES ON A GRID, not flex. `42px minmax(0,1fr) 42px` makes the middle column
+   * mathematically centred in the header regardless of what the flanking buttons contain.
+   * `justify-content: center` on a flex row would centre the title in the LEFTOVER space, which
+   * shifts it whenever one side is wider — the classic almost-centred header.
+   *
+   * TWO LINES, ZERO EXTRA HEIGHT: kicker ~9px + title ~17px = 26px, inside the 42px the icon
+   * buttons already claim. So the app identity survives above the title and the binder stage
+   * loses nothing — which matters, because that route is height-locked to the viewport.
+   */
+  function buildHeader(c) {
     var h = $('appHeader');
     h.innerHTML =
       '<div class="hd-in">' +
         '<button class="hd-icon" id="navBtn" aria-label="Menu" aria-expanded="false" ' +
           'aria-controls="navDrawer"><span class="hd-bars"></span></button>' +
-        '<a class="hd-brand" href="#' + cfg.nav[0].route + '">' +
-          '<span class="hd-logo" aria-hidden="true">' + (cfg.logo || '\u25C6') + '</span>' +
-          '<span class="hd-name"><b>' + cfg.appName + '</b> ' +
-          '<span class="hd-sub">' + (cfg.appSub || '') + '</span></span></a>' +
+        '<div class="hd-mid">' +
+          '<span class="hd-kicker">' +
+            '<span class="hd-logo" aria-hidden="true">' + (c.logo || '\u25C6') + '</span>' +
+            '<span>' + c.appName + ' ' + (c.appSub || '') + '</span></span>' +
+          '<h1 class="hd-title" id="hdTitle">' +
+            (titles[c.defaultPage] || c.appName) + '</h1>' +
+        '</div>' +
         '<button class="hd-icon" id="gearBtn" aria-label="Settings" aria-expanded="false" ' +
           'aria-controls="settingsDrawer">\u2699</button>' +
       '</div>' +
@@ -90,8 +110,11 @@
 
   /* ---------- left: the page menu ----------
    * No item ceiling. A fifth route costs one line of config, where the old inline header would
-   * have wrapped. */
-  function buildNav(cfg) {
+   * have wrapped.
+   * The head carries the WORDMARK now rather than the word "Menu": the header stopped saying
+   * which app this is when the page title took the centre, and a menu is the natural place for
+   * identity. The panel is still labelled "Menu" to assistive tech via aria-label. */
+  function buildNav(c) {
     var d = document.createElement('aside');
     d.id = 'navDrawer';
     d.className = 'drawer drawer-left';
@@ -100,10 +123,12 @@
     d.setAttribute('aria-modal', 'true');
     d.setAttribute('aria-label', 'Menu');
     d.innerHTML =
-      '<div class="drawer-head"><h2>Menu</h2>' +
+      '<div class="drawer-head"><h2>' +
+          '<span class="dh-logo" aria-hidden="true">' + (c.logo || '\u25C6') + '</span> ' +
+          c.appName + ' <span class="dh-sub">' + (c.appSub || '') + '</span></h2>' +
         '<button class="drawer-x" id="navX" aria-label="Close menu">\u2715</button></div>' +
       '<nav class="drawer-body nav-list" aria-label="Primary">' +
-        cfg.nav.map(function (n) {
+        c.nav.map(function (n) {
           return '<a class="nav-link" data-route="' + n.route + '" href="#' + n.route + '">' +
             '<span class="nl-t">' + n.label + '</span>' +
             (n.hint ? '<span class="nl-h">' + n.hint + '</span>' : '') + '</a>';
@@ -233,17 +258,17 @@
   }
 
   /* ---------- footer ---------- */
-  function buildFooter(cfg) {
+  function buildFooter(c) {
     var f = $('appFooter');
     f.innerHTML =
       '<div class="foot-in">' +
         '<div class="foot-src">' +
-          (cfg.sources || []).map(function (s) {
+          (c.sources || []).map(function (s) {
             return '<a href="' + s.href + '" target="_blank" rel="noopener">' + s.label + '</a>';
           }).join('') +
         '</div>' +
         '<div class="foot-dev" id="footDev"></div>' +
-        '<div class="foot-stamp">' + cfg.appName + ' ' + cfg.version + '</div>' +
+        '<div class="foot-stamp">' + c.appName + ' ' + c.version + '</div>' +
       '</div>';
     paintFootDev();
     // Keep it honest across a window drag: device.js debounces its own re-read, this follows.
@@ -256,13 +281,26 @@
   }
 
   window.Chrome = {
-    init: function (cfg) {
-      buildHeader(cfg); buildScrim(); buildNav(cfg); buildSettings(); buildFooter(cfg);
+    init: function (c) {
+      cfg = c;
+      // route -> label, so setActive can retitle without re-walking the nav array every time.
+      c.nav.forEach(function (n) { titles[n.route] = n.label; });
+      buildHeader(c); buildScrim(); buildNav(c); buildSettings(); buildFooter(c);
     },
+    /* One call per route change, from the router. It marks the nav row AND writes the page title
+     * in the header and the browser tab — one function so the three can never disagree about
+     * which page you are on. An unknown route falls back to the app name rather than blanking:
+     * an empty header reads as a broken load. */
     setActive: function (route) {
       [].forEach.call(document.querySelectorAll('.nav-link'), function (a) {
         a.classList.toggle('is-active', a.getAttribute('data-route') === route);
       });
+      var label = titles[route] || (cfg ? cfg.appName : '');
+      var t = $('hdTitle');
+      if (t) t.textContent = label;
+      if (cfg) {
+        document.title = label + ' \u00b7 ' + cfg.appName + ' ' + (cfg.appSub || '');
+      }
     },
     closeAll: closeAll
   };

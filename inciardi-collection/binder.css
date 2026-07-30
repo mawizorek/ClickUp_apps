@@ -188,10 +188,29 @@ html[data-device="mobile"] .flipper { height: 100%; width: 100%; aspect-ratio: a
 .deckbar .step { flex: 0 0 auto; min-width: 42px; padding: 8px;
   background: transparent; color: var(--text-soft); font-size: 1.05rem; }
 .deckbar .step:hover:not([disabled]) { background: var(--surface-2); color: var(--text); }
-.deckbar .where { flex: 1 1 auto; text-align: center; min-width: 0;
+
+/* 🔴 THE POSITION READOUT IS A BUTTON (v11). It says "SHEET 1 OF 2", it sits dead centre of the
+   thumb zone, and until now it did nothing — the most obviously tappable thing on the screen was
+   inert while the real control was a title at the far top of the page. It opens the sheet menu.
+   Styled to read pressable WITHOUT becoming a third heavy control: no fill and no resting
+   border, because this row is already tight at 390px and a filled chip here would crowd the turn
+   arrows either side of it. A caret, a hover chip, a focus ring — and --text-soft rather than
+   --text-faint, since a control should not be the faintest thing in its own bar.
+   The caret is CSS, not JS, so `paintDeck()` keeps writing plain text and an empty binder (blank
+   textContent) shows no orphan glyph. */
+.deckbar .where { flex: 1 1 auto; min-width: 0; min-height: 34px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45em;
+  padding: 4px 8px; background: transparent; border: 0;
+  border-radius: var(--radius-pill, 8px);
   font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer;
+  transition: background 140ms var(--ease, ease-out), color 140ms var(--ease, ease-out); }
+.deckbar .where:not(:empty)::after { content: "\25BE"; flex: 0 0 auto;
+  font-size: 0.85em; color: var(--text-faint); }
+.deckbar .where:hover:not([disabled]) { background: var(--surface-2); color: var(--text); }
+.deckbar .where:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.deckbar .where[disabled] { opacity: 0.45; cursor: default; }
 
 /* Front|Back. Sans rather than mono: these are words, and mono at this tracking made "Front"
    read as a code rather than a place. */
@@ -206,7 +225,7 @@ html[data-device="mobile"] .flipper { height: 100%; width: 100%; aspect-ratio: a
   font-weight: 600; }
 
 @media (max-width: 380px) {
-  .deckbar .where { font-size: 0.62rem; letter-spacing: 0.04em; }
+  .deckbar .where { font-size: 0.62rem; letter-spacing: 0.04em; padding: 4px 4px; }
   .sides-seg button { padding: 4px 9px; }
 }
 

@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v10. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v11. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
@@ -14,22 +14,29 @@
 
        core.js     9.6KB  API client · Drawer · helpers    → API, Core, Drawer
        device.js   2.9KB  mobile vs desktop, one owner     → Device
-       chrome.js  11.9KB  header · nav · settings · footer → Chrome
-       binder.js  14.2KB  the stage, faces, turning        → Binder
+       chrome.js  14.3KB  header · nav · settings · footer → Chrome
+       binder.js  15.0KB  the stage, faces, turning        → Binder
        sheets.js   6.3KB  reorder · rename · add           → Sheets
        picker.js   4.5KB  the slot entry surface           → Picker
        enter.js    8.1KB  entry form + shoe-box            → Enter, Shoebox
-       summary.js 10.1KB  the collection matrix            → Summary
+       summary.js 14.9KB  the collection matrix            → Summary
        app.js      3.1KB  routing only                     → App
-       boot.js    12.6KB  config · theme · router · settings
+       boot.js    12.5KB  config · theme · router · settings
 
        base.css   12.6KB  type · forms · lists · toasts
-       chrome.css  9.0KB  header · drawers · footer
-       binder.css 13.6KB  stage · cards · deck bar
+       chrome.css 11.5KB  header · drawers · footer
+       binder.css 15.1KB  stage · cards · deck bar
        sheets.css  3.5KB  sheet list · legend
-       summary.css 9.3KB  the matrix
+       summary.css 9.1KB  the matrix
 
-     Every file under the 15KB split line. ADDING A SCREEN MEANS ADDING A FILE.
+     ⚠️ THE FRONT END IS AT THE SPLIT LINE. binder.css, binder.js and summary.js are all within a
+     rounding error of 15KB, so the NEXT feature on any of those three arrives with a split, not
+     as an append. Named seams, ready to use: binder.css → `card.css` (the .slot block is a third
+     of the file); summary.js → `matrix.js` render + `drill.js` for the expanded row.
+     🔴 AND THE REAL OFFENDER IS `worker/worker.js` AT 29.3KB — one byte under the hard read cap,
+     which means every edit to it is a full retype of a file too big to verify. That is the next
+     split in this app, before any new route. Seam: `worker/reads.js` (the six GETs, ~10KB of it
+     is /summary and /shoebox) leaving the shell plus the writes.
 
      🔴 HOW IT WENT WRONG, because the mechanism matters more than the numbers: v4 added the sheet
      menu, v5 the stage, v6 traversal, v7 the shoe-box split — four reasonable changes, one file,
@@ -39,10 +46,9 @@
      guardrail — which is why the answer is a DEFAULT SHAPE, not a fifth gate.
      ============================================================================
 
-     v10: MOBILE VS DESKTOP is tracked (`device.js` → `data-device` on <html>, read by CSS, shown
-     in the footer and settings), the stage keeps PORTRAIT cards on a wide screen instead of
-     stretching them landscape, and LIGHT MODE stops lettering in brand colours — see the token
-     rule at the top of base.css. -->
+     v11: the header CENTRES A PAGE TITLE (three-zone grid, app name demoted to a kicker, route
+     name promoted — see chrome.css), the deck bar's "SHEET 1 OF 2" readout is a BUTTON that opens
+     the sheet menu, and WANTED prints no longer count as collection anywhere in the matrix. -->
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -51,15 +57,17 @@
      reading the resolved token rather than a hardcoded hex. -->
 <meta name="theme-color" content="#192221">
 <meta name="robots" content="noindex, nofollow">
+<!-- Chrome.setActive() rewrites this per route ("Binder · Inciardi Collection"). This is the
+     pre-JS value, so it has to stand alone. -->
 <title>Inciardi Collection</title>
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=10">
-<link rel="stylesheet" href="./chrome.css?v=10">
-<link rel="stylesheet" href="./binder.css?v=10">
-<link rel="stylesheet" href="./sheets.css?v=10">
-<link rel="stylesheet" href="./summary.css?v=10">
+<link rel="stylesheet" href="./base.css?v=11">
+<link rel="stylesheet" href="./chrome.css?v=11">
+<link rel="stylesheet" href="./binder.css?v=11">
+<link rel="stylesheet" href="./sheets.css?v=11">
+<link rel="stylesheet" href="./summary.css?v=11">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -77,15 +85,15 @@
      attribute being present before the stage paints. Then core.js (everything needs it), then the
      screen modules in any order, then boot.js last because it calls Chrome.init and the router. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./device.js?v=10"></script>
-<script src="./core.js?v=10"></script>
-<script src="./chrome.js?v=10"></script>
-<script src="./binder.js?v=10"></script>
-<script src="./sheets.js?v=10"></script>
-<script src="./picker.js?v=10"></script>
-<script src="./enter.js?v=10"></script>
-<script src="./summary.js?v=10"></script>
-<script src="./app.js?v=10"></script>
-<script src="./boot.js?v=10"></script>
+<script src="./device.js?v=11"></script>
+<script src="./core.js?v=11"></script>
+<script src="./chrome.js?v=11"></script>
+<script src="./binder.js?v=11"></script>
+<script src="./sheets.js?v=11"></script>
+<script src="./picker.js?v=11"></script>
+<script src="./enter.js?v=11"></script>
+<script src="./summary.js?v=11"></script>
+<script src="./app.js?v=11"></script>
+<script src="./boot.js?v=11"></script>
 </body>
 </html>
