@@ -1,7 +1,7 @@
 /* Inciardi Collection — A BATCH. Data only, zero behaviour.
  *
  * Sheet 3 of the mini binder, transcribed from two photographs Michael sent on 2026-07-30:
- * one front face, one back face, nine cards each.
+ * nine cards a face, both faces of one sheet.
  *
  * ============================================================================
  * WHY THIS IS A SEPARATE FILE FROM THE THING THAT WRITES IT.
@@ -14,11 +14,25 @@
  * open that file.
  * ============================================================================
  *
- * 🔴 HOW THE NAMES WERE OBTAINED, because it decides `confidence`.
- * Ana hand-writes the title on the lower margin of each card. These are TRANSCRIBED, not
- * inferred from the picture and not matched against a shop listing — so confidence 'named' is
- * honest for all eighteen. If a title had been guessed from the artwork alone it would say
- * 'inferred', and the schema carries that value precisely so the distinction survives.
+ * 🔴 FRONT AND BACK WERE SWAPPED FOR ONE DAY, AND THE INTERESTING PART IS WHY.
+ * Michael, 2026-07-31: "just swap what you called front and back."
+ *
+ * Two photographs arrived in a message. I called the first one the front. Nothing in either
+ * image says which face of the sheet it is — no numbering, no binder rings visible in a
+ * consistent orientation, nothing. It was an ASSUMPTION about message order, and I wrote it into
+ * the data as a fact, in the same file where I had been careful to mark every TITLE as
+ * transcribed-not-inferred.
+ *
+ * So: confidence discipline applied to the field that was written on the card, and skipped
+ * entirely on the field that was not in the photograph at all. The `confidence` column exists
+ * for exactly this and covers names only, because names were the part I was thinking about.
+ * GENERALIZABLE: the fields most likely to be wrong in a transcription are the ones the source
+ * does not contain. Those are the ones to flag, and they are the easiest ones to forget to.
+ *
+ * FIXED BY EDITING THE ROWS, not by adding a `flip: true` flag to the batch. A transform layer
+ * would mean this file no longer says what it means, and the next reader would have to run the
+ * flag in their head to know what is actually going in the binder. A transcript should be
+ * literally true. The array is also reordered so it reads front-then-back, in binder order.
  *
  * 🔴 FOUR FIELD DECISIONS, each of which could have been wrong quietly.
  *
@@ -72,47 +86,50 @@
   /* side · position · id · name · notes.
    * Position is 0-8 in READING ORDER, left to right then top to bottom, matching the 3x3 grid in
    * the photographs. The UI shows position + 1; the data is 0-based (CHECK position BETWEEN 0
-   * AND 8). */
+   * AND 8).
+   * ⚠️ 'A' and 'B' are what the DATABASE stores (CHECK side IN ('A','B')). FRONT and BACK are
+   * what a person reads, and `FACE` in binder.js is the only place the two vocabularies meet.
+   * The swap below moved the letters. It did not rename anything. */
   var PRINTS = [
-    /* ---------- FRONT (side A) — wine, cocktails, one barn ---------- */
-    { side: 'A', position: 0, id: 'wine', name: 'Wine',
-      notes: 'Four bottles in a row. The card is captioned Wine* , asterisk and all; stored as Wine. Signed ANA INC.' },
-    { side: 'A', position: 1, id: 'six-pack', name: 'Six Pack',
-      notes: 'A Corona Extra six-pack in its carrier. Signed ANA INC.' },
-    { side: 'A', position: 2, id: 'champagne-tower', name: 'Champagne Tower',
-      notes: 'A stacked tower of coupe glasses. Signed ANA INC.' },
-    { side: 'A', position: 3, id: 'cocktail-shaker', name: 'Cocktail Shaker',
-      notes: 'A steel three-piece cobbler shaker. Signed ANA INC.' },
-    { side: 'A', position: 4, id: 'the-black-barn', name: 'The Black Barn',
-      notes: 'A dark timber barn, the one non-drink on the sheet. Its title is hand-written VERTICALLY inside the image rather than on the lower margin like every other card here. Signed ANA INC.' },
-    { side: 'A', position: 5, id: 'martini', name: 'Martini',
-      notes: 'A dirty martini, three olives on the pick. Signed AI.' },
-    { side: 'A', position: 6, id: 'topo-chico', name: 'Topo Chico',
-      notes: 'A Topo Chico mineral water bottle. Signed AI.' },
-    { side: 'A', position: 7, id: 'best-friends', name: 'Best Friends!',
-      notes: 'A barley stalk and a hop cone holding hands. Brooklyn Brewery tasting-room collab, May 2024 — the brewery announced the run as containing a sweet meeting between hops and barley, which is this card. Signed AI.' },
-    { side: 'A', position: 8, id: 'bottle-cap', name: 'Bottle Cap',
-      notes: 'A single crimped bottle cap, seen face on. Signed AI.' },
-
-    /* ---------- BACK (side B) — all beer ---------- */
-    { side: 'B', position: 0, id: 'pbr', name: 'PBR',
+    /* ---------- FRONT (side A) — all beer ---------- */
+    { side: 'A', position: 0, id: 'pbr', name: 'PBR',
       notes: 'A Pabst Blue Ribbon can. Signed AI.' },
-    { side: 'B', position: 1, id: 'rainier-beer', name: 'Rainier Beer',
+    { side: 'A', position: 1, id: 'rainier-beer', name: 'Rainier Beer',
       notes: 'A Rainier can. Signed ANA INC.' },
-    { side: 'B', position: 2, id: 'brooklyn-pilsner', name: 'Brooklyn Pilsner',
+    { side: 'A', position: 2, id: 'brooklyn-pilsner', name: 'Brooklyn Pilsner',
       notes: 'A yellow Brooklyn Brewery pilsner can. Brooklyn Brewery tasting-room collab, May 2024 — announced as a teeny Pilsner can. Signed AI.' },
-    { side: 'B', position: 3, id: 'brooklyn-lager', name: 'Brooklyn Lager',
+    { side: 'A', position: 3, id: 'brooklyn-lager', name: 'Brooklyn Lager',
       notes: 'A Brooklyn Lager bottle. Brooklyn Brewery collab. Signed AI.' },
-    { side: 'B', position: 4, id: 'sportini', name: 'Sportini',
+    { side: 'A', position: 4, id: 'sportini', name: 'Sportini',
       notes: 'A martini with a soccer ball and a basketball where the olives go. Signed ANA INC.' },
-    { side: 'B', position: 5, id: 'allagash', name: 'Allagash',
+    { side: 'A', position: 5, id: 'allagash', name: 'Allagash',
       notes: 'An Allagash White can, mountains on the label. Signed ANA INC.' },
-    { side: 'B', position: 6, id: 'lunch-bottle', name: 'Lunch Bottle',
+    { side: 'A', position: 6, id: 'lunch-bottle', name: 'Lunch Bottle',
       notes: 'A Maine Beer Company Lunch IPA bottle. Signed ANA INC.' },
-    { side: 'B', position: 7, id: 'guinness', name: 'Guinness',
+    { side: 'A', position: 7, id: 'guinness', name: 'Guinness',
       notes: 'A pint of Guinness, full head. Signed ANA INC.' },
-    { side: 'B', position: 8, id: 'pony', name: 'Pony',
-      notes: 'A Miller High Life pony bottle. Signed AI.' }
+    { side: 'A', position: 8, id: 'pony', name: 'Pony',
+      notes: 'A Miller High Life pony bottle. Signed AI.' },
+
+    /* ---------- BACK (side B) — wine, cocktails, one barn ---------- */
+    { side: 'B', position: 0, id: 'wine', name: 'Wine',
+      notes: 'Four bottles in a row. The card is captioned Wine* , asterisk and all; stored as Wine. Signed ANA INC.' },
+    { side: 'B', position: 1, id: 'six-pack', name: 'Six Pack',
+      notes: 'A Corona Extra six-pack in its carrier. Signed ANA INC.' },
+    { side: 'B', position: 2, id: 'champagne-tower', name: 'Champagne Tower',
+      notes: 'A stacked tower of coupe glasses. Signed ANA INC.' },
+    { side: 'B', position: 3, id: 'cocktail-shaker', name: 'Cocktail Shaker',
+      notes: 'A steel three-piece cobbler shaker. Signed ANA INC.' },
+    { side: 'B', position: 4, id: 'the-black-barn', name: 'The Black Barn',
+      notes: 'A dark timber barn, the one non-drink on the sheet. Its title is hand-written VERTICALLY inside the image rather than on the lower margin like every other card here. Signed ANA INC.' },
+    { side: 'B', position: 5, id: 'martini', name: 'Martini',
+      notes: 'A dirty martini, three olives on the pick. Signed AI.' },
+    { side: 'B', position: 6, id: 'topo-chico', name: 'Topo Chico',
+      notes: 'A Topo Chico mineral water bottle. Signed AI.' },
+    { side: 'B', position: 7, id: 'best-friends', name: 'Best Friends!',
+      notes: 'A barley stalk and a hop cone holding hands. Brooklyn Brewery tasting-room collab, May 2024 — the brewery announced the run as containing a sweet meeting between hops and barley, which is this card. Signed AI.' },
+    { side: 'B', position: 8, id: 'bottle-cap', name: 'Bottle Cap',
+      notes: 'A single crimped bottle cap, seen face on. Signed AI.' }
   ];
 
   /* Applied to every print. Kept as one object rather than repeated eighteen times: a field that
@@ -132,7 +149,7 @@
     /* Shown on the back-room screen so a person can see WHAT they are about to run before they
      * run it, without reading this file. */
     label: 'Sheet 3 \u00b7 Drinks',
-    source: 'Two photographs, 2026-07-30 \u2014 one front face, one back face.',
+    source: 'Two photographs, 2026-07-30. Beer face is the FRONT (corrected 07-31).',
     sheet: SHEET,
     defaults: DEFAULTS,
     prints: PRINTS,
