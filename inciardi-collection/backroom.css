@@ -1,4 +1,4 @@
-/* Inciardi Collection — THE BACK ROOM. Headline, verdict table, run log.
+/* Inciardi Collection — THE BACK ROOM. Chooser, headline, verdict table, problems, run log.
  * ZERO COLOUR LITERALS.
  *
  * REUSES `.mxt` (the table) from summary.css rather than restating it — a screen that lists
@@ -33,15 +33,48 @@
 
 .br-sub { margin: 4px 0 0; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint);
   text-wrap: pretty; }
+.br-sub code { font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--accent-deep); }
 
-/* THE MECHANICS LINE: calls, rows, and the build stamp. Mono and small — deliberately the same
-   treatment as `.foot-stamp`, because the build number is literally the same fact from the same
-   constant and a reader comparing them should not have to work out whether they are.
+/* THE MECHANICS LINE: calls, rows, batch slug, build stamp. Mono and small — deliberately the
+   same treatment as `.foot-stamp`, because the build number is literally the same fact from the
+   same constant and a reader comparing them should not have to work out whether they are.
    The build number is here rather than nowhere because a stale cache on THIS screen writes wrong
-   data into D1 permanently and logs success. See the block in backroom.js. */
+   data into D1 permanently and logs success. See the block in batch.js. */
 .br-mech { margin: 5px 0 0; font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--text-faint); font-variant-numeric: tabular-nums; text-wrap: pretty; }
+
+/* ---------- the chooser (v16) ----------
+   Borrows `.nav-link`'s shape on purpose: this IS the same gesture, pick one of several things
+   and go there, so it should not invent a second visual language for it. A pushed batch stays
+   listed and dims rather than vanishing — the transcript is the only durable record of those
+   photographs, and a list that silently shrinks makes you wonder what you lost. */
+.br-picks { display: flex; flex-direction: column; gap: 2px; }
+.br-pick { display: block; padding: 10px var(--gap-xs, 8px); min-height: var(--touch, 44px);
+  border-radius: var(--radius, 6px); text-decoration: none; color: var(--text); }
+.br-pick:hover { background: var(--surface-2); }
+.br-pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.br-pick .bp-t { display: block; font-size: var(--fs-body, 0.95rem); font-weight: 450; }
+.br-pick .bp-h { display: block; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-xs, 0.72rem); color: var(--text-faint); }
+/* Dimmed, NOT disabled. You can still open a pushed batch to look at what was written — and the
+   run itself is blocked further in, by the guard that checks the target sheet. */
+.br-pick.done .bp-t { color: var(--text-soft); }
+.br-pick.done { opacity: 0.62; }
+
+/* ---------- the problem list (v16) ----------
+   Left-ruled in `--bad`, same as the block notice below, because both are the app REFUSING and
+   two refusals that look unrelated read as two unrelated systems. Numbered, because the count is
+   in the sentence above it and a reader should be able to check they have seen all of them. */
+.br-probs { margin: var(--gap-md, 12px) 0; padding: 10px 12px 10px 30px;
+  border: var(--border-w, 1px) solid var(--bad, var(--border));
+  border-left-width: 3px; border-radius: var(--radius, 6px);
+  font-size: var(--fs-sm, 0.85rem); line-height: 1.5; color: var(--text-soft);
+  text-wrap: pretty; }
+.br-probs li { margin: 4px 0; }
+.br-probs li::marker { color: var(--bad, var(--text-faint));
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.8em; }
 
 /* THE TARGET LINE. A screen that writes to a sheet says WHICH sheet, by id, before it does — the
    difference between a fresh sheet and someone's working one is a single string, and it belongs
