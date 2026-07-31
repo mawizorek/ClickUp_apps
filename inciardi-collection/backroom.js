@@ -19,7 +19,7 @@
  * curl — a hidden route protected nothing from them yesterday and protects nothing today. All
  * concealment ever bought was that a screen performing thirty-seven writes is not one tap from
  * the main menu, and it still isn't: it is behind the gear, below the fold, under a divider.
- * THE ACTUAL PROTECTIONS ARE THE THREE GUARDS BELOW AND D1 TIME TRAVEL. Never the URL.
+ * THE ACTUAL PROTECTIONS ARE THE GUARDS BELOW AND D1 TIME TRAVEL. Never the URL.
  * ============================================================================
  *
  * WHAT THIS SCREEN REFUSES TO DO:
@@ -118,10 +118,22 @@
     var B = window.Batch;
     var writes = plan.newArts + (plan.sheetExists ? 0 : 1) + B.prints.length;
 
+    /* 🔴 THE BUILD STAMP, AND IT IS NOT DECORATION. On every other screen a stale cache is
+     * cosmetic — you see yesterday's layout, you reload, it is fixed. HERE a stale `batch.js`
+     * writes the WRONG DATA into D1 permanently and the log reports thirty-seven successes,
+     * because this runner faithfully applies whatever payload it was handed and has no way to
+     * know the payload is old. The v14 front/back swap is exactly that shape: identical names,
+     * identical count, identical green log, opposite arrangement.
+     * The footer already carries the version, but the footer is below the fold and the run
+     * button is not. Reads the SAME constant the footer reads — a second copy of a version
+     * number is a version number that will eventually lie. */
+    var stamp = window.ICApp ? ICApp.version : '(version unknown)';
+
     var head =
       '<div class="br-head">' +
         '<div class="br-what"><b>' + esc(B.label) + '</b>' +
-          '<span>' + esc(B.source) + '</span></div>' +
+          '<span>' + esc(B.source) + '</span>' +
+          '<span class="br-build">build ' + esc(stamp) + '</span></div>' +
         '<div class="mx">' +
           cell(B.prints.length, 'cards', 'on the sheet') +
           cell(plan.newArts, 'new', 'not in the catalog') +
@@ -228,7 +240,10 @@
    * is present, which is the desired end state — so they are logged as skips and the run
    * continues. This is also what makes a re-run safe: the artwork insert short-circuits BEFORE
    * the copy insert in the worker, so re-running cannot add a second copy and quietly double an
-   * ownership count. */
+   * ownership count.
+   * ⚠️ NOTE WHAT THIS DOES NOT PROTECT: slots use ON CONFLICT DO UPDATE, so a re-run with a
+   * DIFFERENT arrangement silently re-seats the prints. That is the correct behaviour for fixing
+   * a mistake and it is also why the build stamp above exists. */
   function benign(e) {
     return /already exists|UNIQUE/i.test(e.message || '');
   }
@@ -259,7 +274,8 @@
     $('brRun').disabled = true;
     $('brLog').hidden = false;
     $('brLog').textContent = '';
-    log('', 'Starting \u2014 ' + new Date().toLocaleTimeString() + '\n');
+    log('', 'Starting \u2014 ' + new Date().toLocaleTimeString() +
+            '  \u00b7  build ' + (window.ICApp ? ICApp.version : '?') + '\n');
 
     var steps = [];
 
