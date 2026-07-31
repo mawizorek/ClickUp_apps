@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "description": "Gate config for job-market-refresh. Each entry = one full research loop iteration.",
+    "version": 1,
+    "updated": "2026-07-31"
+  },
+  "global": {
+    "geography": "anywhere",
+    "relocation": true,
+    "include_remote": true,
+    "include_part_time": true,
+    "include_contract": true,
+    "exclude_academic": true,
+    "exclude_overhire": true,
+    "exclude_internships": true
+  },
+  "roles": [
+    {
+      "id": "production-manager",
+      "display": "Production Manager",
+      "lane": "PM",
+      "keywords": [
+        "production manager",
+        "director of production",
+        "VP production",
+        "head of production",
+        "associate production manager",
+        "assistant production manager",
+        "production coordinator",
+        "production supervisor",
+        "operations manager venue"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["manufacturing", "industrial", "logistics", "factory", "warehouse", "supply chain"],
+      "constraints": {}
+    },
+    {
+      "id": "technical-director",
+      "display": "Technical Director",
+      "lane": "TD",
+      "keywords": [
+        "technical director",
+        "associate technical director",
+        "assistant technical director",
+        "production engineer",
+        "facilities manager theatre",
+        "technical manager",
+        "scenic production manager"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["software", "IT director", "engineering director", "CTO", "web"],
+      "constraints": {}
+    },
+    {
+      "id": "stage-manager",
+      "display": "Stage Manager",
+      "lane": "SM",
+      "keywords": [
+        "production stage manager",
+        "stage manager",
+        "assistant stage manager",
+        "deck manager",
+        "PSM",
+        "company manager"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["project manager", "scrum master", "agile"],
+      "constraints": {}
+    },
+    {
+      "id": "electrician",
+      "display": "Master Electrician / Lighting",
+      "lane": "ME",
+      "keywords": [
+        "master electrician",
+        "head electrician",
+        "lighting supervisor",
+        "board operator",
+        "lighting director",
+        "associate lighting designer",
+        "electrics supervisor",
+        "production electrician"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["residential", "commercial electrician", "HVAC", "construction", "lineman"],
+      "constraints": {}
+    }
+  ]
+}
