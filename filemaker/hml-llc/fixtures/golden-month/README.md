@@ -16,16 +16,41 @@ Every name, address, account, handle and reference number here is **invented**. 
 
 <br/>
 
+### 🔴 THE 07-29 SCRUB WAS INCOMPLETE. A second real name survived until 2026-07-31.
+
+`Payoffs.tsv` → `frozen_PaymentInstructionSnapshot` still read *"Mail checks payable to \<real personal name\> - see PI-001"* **two days after the source field was scrubbed.** Scrubbed 2026-07-31.
+
+<br/>
+
+**The cause is structural and it is worth more than the fix.** A frozen snapshot field exists *precisely so that later edits to the source do not propagate* — that is the whole point of `PAYOFF-001` in this fixture, the row whose job is proving the freeze is real. **So the schema feature being demonstrated is the same feature that defeated the remediation.** Fixing the source could not reach the copy, by design.
+
+<br/>
+
+**The rule that generalizes: remediating a value means sweeping every table that SNAPSHOTS it, not just the table that owns it.** Grep the value, never the field. This applies to any future scrub in either repo.
+
+<br/>
+
+⚠️ **And this README's own rule list was part of the failure.** It named payees, borrowers, addresses, account numbers and handles — every one of them a *source* field. It never mentioned frozen snapshots, so a reader checking their work against it would have passed. The list now includes them.
+
+<br/>
+
 **The rule, so it is checkable rather than a vibe:**
 
 - Payees are `LENDER NAME`, borrowers are `BORROWER ORG`. Never a person.
 - Addresses are invented streets. `1420 Elm St` is not a real property.
 - No account numbers, routing numbers, wire instructions, handles, or check numbers that exist.
+- 🔴 **Every `frozen_*` field is a copy of something else and must be scrubbed independently.** A clean source does not mean a clean snapshot.
 - **Real payment instructions live in FileMaker as a record, and in ClickUp behind workspace access. They do not live in a fixture.** That is the RECORDS-vs-SOURCE line doing its job.
+
+---
+
+## ⛔ THIS FOLDER IS MIGRATING TO `maw-prose` (PRIVATE)
+
+Per `maw-prose/CONVENTIONS.md`: *"Sample data, payment instructions and anything account-adjacent belong on this side of the fence."* Two real-name incidents in this folder in three days is the argument settled empirically. The copy at `mawizorek/maw-prose → apps/hml-llc/fixtures/golden-month/` becomes canonical.
 
 <br/>
 
-⚠️ **Not fixed by the scrub:** the original values remain in this repo's git history at commit `eb63e88`. Rewriting history is Michael's call and it is not worth it for a name and a handle — but it is the reason the rule is stated up front rather than learned again.
+⚠️ **Migrating does not remediate history.** The original values remain in this repo's git history and always will unless it is rewritten. Moving the folder prevents the NEXT leak; it does not undo these two.
 
 ---
 
@@ -79,7 +104,7 @@ It fails *quietly*: all rows import, no errors, and the portals just come up emp
 | **`RCPT-004`** | **Cash with no home.** $850, memo illegible, no borrower. Under a loan-parented model this row is *illegal*. It must be a valid resting state, not a data error. |
 | **`APP-003`** | **Partial payment.** $400 against $850 owed. Proves `AmountApplied` must be independent and that `ExpectedTransactions` needs a computed remainder, not a paid/unpaid flag. |
 | **`EXP-004`** | **Late fee assessed then waived.** $42.50 → $0.00 on purpose. If the schema cannot say *"the fee was $42.50, we collected nothing, deliberately"* then `OriginalAmount`/`AdjustedAmount` is the wrong field pair. |
-| **`PAYOFF-001` vs `ACCT-004`** | **The freeze.** Payoff issued 03-18; payment posts 03-20. **The frozen total must not move.** The only way to prove the freeze is real rather than described. |
+| **`PAYOFF-001` vs `ACCT-004`** | **The freeze.** Payoff issued 03-18; payment posts 03-20. **The frozen total must not move.** The only way to prove the freeze is real rather than described. ⚠️ Also the row that proved a frozen field defeats a source scrub — see the top of this file. |
 | **`PROP-001` → 2 loans** | Kills "one property = one loan," which several script pages still assume. |
 | **`LOAN-003` `Paid Off`** | A closed loan still carrying history. Proves status is not a filter that hides truth. |
 
@@ -112,3 +137,4 @@ It fails *quietly*: all rows import, no errors, and the portals just come up emp
 
 - **2026-07-29** — Created. Designed in a full audit → 9-lens Workshop → re-audit loop. The one-month-not-nine-samples shape is Clever Cleo's; the six kill-rows are Breaker Beckett's; the key-override trap is Feasible Finn's catch.
 - **2026-07-29 (later)** — Real payee name + handle scrubbed from `PaymentInstructions.tsv`; the no-real-identifiers rule written in at the top.
+- **2026-07-31** — 🔴 Second real name found and scrubbed, in `Payoffs.tsv` → `frozen_PaymentInstructionSnapshot`. Frozen-field rule added; migration to `maw-prose` opened.
