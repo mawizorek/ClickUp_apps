@@ -4,12 +4,27 @@
 
 | Agent | Session | Working on | Files touched |
 |---|---|---|---|
+| Brain (Opus 5) | Session task `Brain (Opus 4.8) · inciardi collection · brainstorm/plan · July 2026` (Agent Activity Board) | **Claimed 07-31 ~2:45 PM ET, retroactively — see the collision note below.** Fixing the parallel-session collision: new `hooks/collision-check.md`, C6 split into claim-vs-check. Inciardi Collection work (v13→v15) is DONE and released; the Drinks batch is transcribed and unrun, waiting on Michael. | **`ClickUp_apps`:** `hooks/collision-check.md` (new) · `hooks/collision-check.metadata.json` (new) · `hooks/session-open.md` · `session-board.md`. **RELEASED, no longer claimed:** all of `inciardi-collection/**`. |
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
 | Mira + Anna + Milo + Corey (URITP Audit Council) | Standing task `86ajknmmk` | **REFRESHED 07-30 ~11:30 AM ET.** Pickup session: Space 6 (Courses) + Space 7 (BETA BUDGET). Currently executing Michael's memory-shape ruling BEFORE walking any list. | **`ClickUp_apps`:** `super-agents/audit-anna/memory.md` + `activity-log.md`, `super-agents/mainstage-milo/memory.md` + `activity-log.md`, `open-memory-requests.md`, `session-board.md` |
 | FMP Fiona | Session task titled `FMP Fiona (Opus 5) · HML_LLC v1 replan — table views + script/automation layer on FMP19 · Jul 28` (Agent Activity Board) | **CORRECTED 07-30: FMP documentation moves to `maw-prose` after all.** Standing up `apps/hml-llc/` there + two scoped convention exemptions. Nothing deleted from this repo until verified there. | **TWO REPOS.** `ClickUp_apps`: `filemaker/hml-llc/**` (read + this board row). **`maw-prose`: `apps/**`, `CONVENTIONS.md`, `DECISIONS.md`** |
 | ClickUp Coach Corey (Opus 5) | Session task `86ajtmw95` — *Activity Board comment→channel AI narration automation + block spec · Jul 30* | Designing the AI narration automation for the board channel: prompt text + fixed one-line block spec, so each board-task comment posts as its authoring agent's own voice instead of a contentless clickbot task link. **DESIGN ONLY at this row's writing — NO repo files claimed.** Reads only against `gates/session-transcript-gate.md` + `hooks/session-open.md`. ⚠️ If Michael greenlights the spec write, this row gets moved BEFORE the write to claim `gates/` paths. | **`ClickUp_apps`:** none claimed (this board row only). |
 
 _Delete your row on session close._
+
+<p><br/></p>
+
+_🔀 **THIRD COLLISION IN A WEEK, AND THE FIRST WHERE AN ENTIRE FEATURE GOT BUILT TWICE (07-31).** Two sessions independently built the batch-import feature — data-file batches, a loader, a validator, a hook — inside the same hour. Discovered at merge, when mine hit conflicts. **NEITHER SESSION HAD A ROW ON THIS BOARD.** Theirs shipped first and their design was better (a 3×3 grid laid out like the photograph makes a pocket collision unrepresentable, where mine merely validated against it), so mine was closed unmerged — PR #621. About an hour of Michael's money._
+
+_🔧 **FIXED, and the diagnosis is not "someone forgot."** C6 has mandated presence since 07-28, it is numbered, it is inside the sequence that executes, and four other agents were using it correctly on this very page. So the question was why an existing rule was not REACHED. Three design faults, all now addressed in **`hooks/collision-check.md`**:_
+
+_1. **The CHECK rode on the ANNOUNCEMENT.** C6 said "read the board, then add an entry" — one step, two jobs, two different beneficiaries. Reading protects YOU; writing protects everyone else. Welded together, skipping the step lost both, and the cheap self-interested act was gated behind the expensive altruistic one. **They are two steps now.**_
+
+_2. **It fired ONCE, at Commit, when scope is smallest.** My first write today was a task comment about adding a link to a settings panel. A row written then would have been true and useless — the collision came four asks later over files nobody had named yet. Fiona's row moving four times in one session is documented on this page as good practice, which is an admission that a one-shot check needs manual repetition to work. **The check now fires PER WORK ITEM.**_
+
+_3. **The signal that DID fire got explained away.** `create_branch` returned **"Reference already exists"** at ~17:17 for the exact branch name my work needed. I investigated it — and asked the wrong question. I asked "does this branch have content?" when the question was **"who made this and are they still working?"** Their PR merged at 17:19; mine conflicted at 17:28. **A branch you did not create, named for the work you are about to do, is another session's claim.**_
+
+_📏 **MEASURED, not assumed — and it killed my first design: NEITHER GIT SURFACE WORKS AS A BACKSTOP HERE.** Branch list = **100+ branches, never deleted after merge** (a dozen dead `inciardi-collection-*`, `audit-anna-v1` through `v11`); no way to tell live from long-dead. Open PRs = **12, newest six days old, oldest July 7, every one abandoned** — it has the exact shape of a claim ledger and every entry is a lie. **I had drafted the whole check on top of open PRs before pulling the numbers.** What DOES work is `list_commits` with a path filter and `since=today`: self-maintaining, timestamped, cannot go stale, zero noise. ⚠️ **@Michael — the 12 zombie PRs and the branch graveyard are worth a sweep.** Not touched here; closing another agent's PR is destructive and was not mine to do._
 
 <p><br/></p>
 
@@ -47,7 +62,7 @@ _✅ **Felix out 2026-07-28 ~4:20 PM ET.** `super-agents/audit-instruction.md`, 
 
 _🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose in the transcript gate and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN.** **A found task never satisfies "spine armed."**_
 
-_📋 **C6 presence fires for EVERY committed session, not just repo ops** (Q11 → D). An empty board is indistinguishable from nobody having posted. **Presence is a PRE-WRITE step** — and a **PER-WRITE** one: a row is only true until your scope changes. Fiona's went NONE → one file → a subtree → **two repos** inside one session; move it before the write, not after._
+_📋 **C6 presence fires for EVERY committed session, not just repo ops** (Q11 → D). An empty board is indistinguishable from nobody having posted. **Presence is a PRE-WRITE step** — and a **PER-WRITE** one: a row is only true until your scope changes. Fiona's went NONE → one file → a subtree → **two repos** inside one session; move it before the write, not after. ⚠️ **07-31: C6 is now the CLAIM only. The CHECK is `hooks/collision-check.md` and it fires per WORK ITEM.**_
 
 _🔒 **AUDITS ARE STAMPED OR THEY ARE WORTHLESS** (PR #568, Q11 → C). Every audit record names the SHA of every governing file it leaned on. **Addendum, never reissue.**_
 
