@@ -12,28 +12,35 @@
      RULE 2 — **`index.html` is an INDEX** (architecture lock, 2026-07-08): a thin shell that
      references pages, never a file storing servable content.
 
-       core.js      9.6KB  API client · Drawer · helpers    → API, Core, Drawer
-       device.js    2.9KB  mobile vs desktop, one owner     → Device
-       chrome.js   11.7KB  header · nav · scrim · footer    → Chrome
-       settings.js  9.2KB  the settings panel               → Settings
-       binder.js   15.0KB  the stage, faces, turning        → Binder
-       sheets.js    6.3KB  reorder · rename · add           → Sheets
-       picker.js    4.5KB  the slot entry surface           → Picker
-       enter.js     8.1KB  entry form + shoe-box            → Enter, Shoebox
-       summary.js  14.9KB  the collection matrix            → Summary
-       batch.js    10.9KB  loads + VALIDATES a batch file   → Batch
-       arrange.js  ~11KB   WHERE each print sits, editable  → Arrange
-       preview.js  ~11KB   the back room's markup           → Preview
-       backroom.js ~14KB   choose · read · decide · write   → Backroom
-       app.js       4.0KB  routing only                     → App
-       boot.js     14.6KB  config · theme · router · settings wiring · diagnostics
+     ⚠️ EVERY NUMBER BELOW WAS MEASURED AT v17.1, NOT ESTIMATED. The v17 commit shipped this map
+     with guessed sizes and three of them were wrong by 3-5KB — `arrange.js` was written down as
+     ~11KB and is 15.8KB. **A size map with invented numbers is worse than no map, because the whole
+     point of it is deciding when to split, and a guess reads exactly like a measurement.** Re-read
+     the directory listing when you touch this. (This file does not list its own size: a file cannot
+     state its own length without being wrong the moment it says so.)
 
-       base.css    12.6KB  type · forms · lists · toasts
-       chrome.css  13.2KB  header · drawers · footer
-       binder.css  15.1KB  stage · cards · deck bar
+       device.js    2.9KB  mobile vs desktop, one owner     → Device
+       app.js       4.1KB  routing only                     → App
+       picker.js    4.5KB  the slot entry surface           → Picker
+       sheets.js    6.3KB  reorder · rename · add           → Sheets
+       enter.js     8.1KB  entry form + shoe-box            → Enter, Shoebox
+       settings.js  9.2KB  the settings panel               → Settings
+       core.js      9.6KB  API client · Drawer · helpers    → API, Core, Drawer
+       batch.js    10.9KB  loads + VALIDATES a batch file   → Batch
+       chrome.js   11.7KB  header · nav · scrim · footer    → Chrome
+       preview.js  12.9KB  the back room's markup           → Preview
+       boot.js     14.8KB  config · theme · router · settings wiring · diagnostics
+       binder.js   15.0KB  the stage, faces, turning        → Binder
+       arrange.js  15.8KB  WHERE each print sits, editable  → Arrange       ⚠️ over the line
+       backroom.js 16.5KB  choose · read · decide · write   → Backroom      ⚠️ over the line
+
+       styles.css   1.2KB  pointers only, zero colour literals
        sheets.css   3.5KB  sheet list · legend
        summary.css 10.5KB  the matrix
-       backroom.css ~12KB  headline · arrangement grid · validator output · verdict table · log
+       base.css    12.6KB  type · forms · lists · toasts
+       chrome.css  13.2KB  header · drawers · footer
+       binder.css  15.1KB  stage · cards · deck bar                         ⚠️ over the line
+       backroom.css 16.3KB headline · arrangement grid · validator · verdict table · log ⚠️ over
 
        batches/    DATA, NOT CODE. One .json per physical sheet, plus `_index.json` listing them.
                    Fetched at runtime, never bundled, never parsed as JavaScript. The size budget
@@ -57,15 +64,20 @@
      note in `arrange.js`; the short version is that slots are written ON CONFLICT DO UPDATE, so an
      unfixed batch file can silently undo a corrected import on the next run.
 
-     ⚠️ STILL AT THE LINE: binder.css 15.1KB, binder.js 15.0KB, summary.js 14.9KB, boot.js 14.6KB.
-     Named seams, so nobody has to find them under pressure:
+     ⚠️ FOUR FILES ARE NOW OVER THE 15KB SPLIT LINE (marked above) and all four are still under the
+     22KB ceiling, so every one of them can still be read whole and edited safely. That is the line
+     that actually matters; the 15KB mark is the warning, not the wall. Named seams, so nobody has
+     to find them under pressure:
        binder.css  → `card.css` (the .slot block is a third of the file)
+       backroom.css → `arrange.css` (the grid block is self-contained and new)
+       arrange.js  → nothing yet. It is one feature and mostly comments; trim before splitting.
        summary.js  → `matrix.js` + `drill.js`
        boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern)
-       backroom.js → PLAN vs APPLY. ⚠️ STILL OWED, third version running. v15 took the markup and
-                     v17 took the arrangement instead, both because the write path should not be
-                     refactored on a day someone is about to use it. That excuse has now been used
-                     twice, which is how a rule stops being one — take it next.
+       backroom.js → PLAN vs APPLY. ⚠️ DODGED TWICE (v15 took the markup, v17 took the arrangement),
+                     both times because the write path should not be refactored on a day someone is
+                     about to push irreversible writes through it. The reason is real and does not
+                     expire — but it is now propping up the largest JS file in the app. Take it on a
+                     quiet day, before it is three excuses old.
      🔴 AND THE REAL OFFENDER IS `worker/worker.js` AT 29.3KB — one byte under the hard read cap,
      so every edit to it is a full retype of a file too big to verify. That is the next split in
      this app, before any new route. Seam: `worker/reads.js` (the six GETs; /summary and /shoebox
