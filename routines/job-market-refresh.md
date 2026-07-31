@@ -7,8 +7,8 @@ steward: routine-ricky
 cadence: see routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 7
-model: standing-inventory
+version: 8
+model: loop-per-role
 ---
 
 # Job Market Refresh
@@ -26,17 +26,21 @@ model: standing-inventory
 > **🕐 PASSES = DATE AND TIME, NEVER NUMBERED.** (LOCKED 2026-07-31, Michael)
 > Identity is `YYYY-MM-DD HH:MM ET`. Reference previous pass by timestamp + elapsed interval.
 
+> **🔁 LOOP, NOT SUMMARY.** (LOCKED 2026-07-31, Michael)
+> Each role is its own market entity. The routine loops over the role config and produces a SEPARATE, COMPLETE report per role. Shared lane/TSV column does NOT mean shared summary. Every role gets the same depth, the same template, the same treatment. No aggregation across roles in the output.
+
 ## 📍 Architecture
 
-**One task, one conversation, two persistence layers.**
+**One task, one conversation, three persistence layers.**
 
 - **Standing thread:** `86ajtgbt3`
 - **Never create a second research task.** Applications list (`900600097138`) = funnel, not inventory. Listings become tasks there ONLY when Michael says to act.
 
 | Layer | Holds | Read by |
 |-------|-------|--------|
-| `routines/job-market-state.tsv` | Structured index. Every live listing normalized. | Next pass, aggregate queries. |
-| Comment thread | Narrative. Census, verdicts, commentary. | Michael on his phone. |
+| `routines/job-market-roles.json` | **The gate.** Defines which roles to search, with what keywords, on what boards. The loop driver. | Every pass (step 1). |
+| `routines/job-market-state.tsv` | Structured index. Every live listing normalized. | Each role iteration (filtered by lane). |
+| Comment thread | Narrative. One standalone header per role per pass. | Michael on his phone. |
 
 **TSV is source of truth.** Thread is the read surface. TSV wins disagreements.
 
@@ -47,6 +51,35 @@ model: standing-inventory
 - `acted` when Michael says to act and an Application task is created.
 - Uncommitted pass = didn't happen.
 
+## 🚪 The Gate: `routines/job-market-roles.json`
+
+This file IS the loop. It defines:
+
+- **`roles[]`**: ordered list of role objects. The routine iterates this list top to bottom. Every entry gets a full, independent search pass.
+- **Per role:** `id`, `display`, `lane`, `keywords[]`, `levels[]`, `exclude_terms[]`, `constraints{}`
+- **`global{}`**: settings that apply to ALL roles (geography, remote, part-time, contract, academic filter, overhire filter)
+
+### How the gate drives execution
+
+```
+for each role in roles.json:
+    1. filter TSV to this role's lane → known inventory
+    2. walk ALL source boards using this role's keywords + exclude_terms
+    3. apply global constraints (geography, academic, overhire)
+    4. reconcile against known inventory
+    5. update TSV rows for this role
+    6. post standalone comment block for this role
+    7. move to next role
+```
+
+**Single-role invocation:** the routine can also be triggered for ONE specific role (e.g. "do job search for stage manager"). In that case, execute steps 1-6 for that role only, skip the rest. Same template, same depth, same output. The only difference is loop length = 1.
+
+### Adding/removing roles
+
+To add a new role: add an entry to `roles[]` in the JSON. Next pass picks it up automatically.
+To retire a role: remove it from the JSON. Its TSV rows stay until they go `gone` naturally.
+To adjust keywords/filters: edit the role object. Changes take effect next pass.
+
 ## 📊 State file schema (`routines/job-market-state.tsv`)
 
 Tab-separated, header row, one listing per line.
@@ -54,7 +87,8 @@ Tab-separated, header row, one listing per line.
 | Column | Required | Description |
 |--------|----------|-------------|
 | `id` | ✅ | `JM-<BOARD>-<org-slug>-<role-slug>` |
-| `lane` | ✅ | `PM` · `TD` · `SM` · `ME` (see lanes below) |
+| `role_id` | ✅ | Matches `id` field in `job-market-roles.json` |
+| `lane` | ✅ | `PM` · `TD` · `SM` · `ME` |
 | `title` | ✅ | Role title as posted |
 | `org` | ✅ | Organization name |
 | `location` | ✅ | City, State (or Remote) |
@@ -71,6 +105,7 @@ Tab-separated, header row, one listing per line.
 - `url` REQUIRED. No URL = no row. Log as unlinked sighting in NOTABLE.
 - `salary` verbatim or empty.
 - `posted` = board's date. `first_seen` = when routine captured it.
+- `role_id` MUST match an entry in the JSON config. Orphan rows = error.
 
 ## 🔑 Listing IDs
 
@@ -82,93 +117,90 @@ Board codes: `OSJ` OffStageJobs · `USITT` · `PB` Playbill · `ECN` Entertainme
 
 ID is permanent. Title changes don't get new IDs.
 
-## 🎯 Target profile (UPDATED 2026-07-31, Michael)
+## 🎯 Target profile
 
-### Lanes
+**Defined in `job-market-roles.json`.** The JSON is the single source for what roles to search, what keywords to use, and what to exclude. This section is documentation only.
 
-| Code | Lane | Titles scanned |
-|------|------|---------------|
-| `PM` | Production Management | Production Manager, Director of Production, VP Production, Associate PM, Assistant PM, Production Coordinator, Production Supervisor |
-| `TD` | Technical Direction | Technical Director, Associate TD, Assistant TD, Production Engineer, Facilities/Technical Manager |
-| `SM` | Stage Management | Production Stage Manager, Stage Manager, Assistant Stage Manager, Deck Manager |
-| `ME` | Electrician / Lighting | Master Electrician, Associate Lighting Designer, Lighting Supervisor, Board Operator, Head Electrician, Lighting Director |
-
-### Scope
+### Scope (from `global`)
 
 - **Geography: ANYWHERE.** Relocation live. Remote explicitly included.
-- **Lane: NON-ACADEMIC** (deprioritized, not banned). Regional/LORT, commercial/touring, arena/live events, opera, production shops, corporate/broadcast, concert venues, themed entertainment.
-- **Level: ALL except pure overhire/day-call.** Senior, mid, associate, part-time, contract, remote/hybrid, drafting, smaller-scale. The goal is MARKET BREADTH, not top-of-ladder only.
-- **The title trap still applies:** "Production Manager" in manufacturing = different profession. Filter out factory floor roles.
-- **Part-time and contract are IN.** Remote drafting, freelance TD, per-show SM: all qualify.
-- **Scan adjacent titles broadly.** Director of Production, Head of Production, Production Supervisor, Operations Manager (venue), Events Production Manager.
+- **Lane: NON-ACADEMIC** (deprioritized, not banned).
+- **Level: ALL except pure overhire/day-call.** Senior, mid, associate, part-time, contract, remote/hybrid, drafting, smaller-scale.
+- **Part-time and contract are IN.**
 
-### What's OUT
+### What's OUT (from `global` + per-role `exclude_terms`)
 
 - Manufacturing/industrial/logistics
 - Pure crew calls, single-day overhire, internships
 - Academic tenure-track (unless genuine step up)
+- Per-role exclusions defined in each role's `exclude_terms[]`
 
 ## 💬 Comment architecture
 
+**Each role gets its own standalone root comment.** Not threaded under a shared header. Independent blocks, one per role, posted sequentially during the loop.
+
 ```
-📋 PASS HEADER  ← root comment
-   ├─ 🔁 SAME     ← threaded
-   ├─ 🆕 NEW      ← threaded
-   ├─ 🕳️ GONE     ← threaded (even if empty)
-   ├─ 📌 NOTABLE  ← threaded (if content)
-   └─ 🔌 SOURCES  ← threaded (always)
+FOR EACH ROLE:
+  🎯 ROLE HEADER  ← root comment (standalone)
+     ├─ 🔁 SAME     ← threaded under this role's header
+     ├─ 🆕 NEW      ← threaded
+     ├─ 🕳️ GONE     ← threaded
+     └─ 📌 NOTABLE  ← threaded (if content)
+
+AFTER ALL ROLES:
+  📋 PASS SUMMARY  ← root comment (the only cross-role output)
+     └─ 🔌 SOURCES  ← threaded
 ```
 
-SAME, GONE, SOURCES always post. NEW and NOTABLE only if non-empty (header says so).
+**Key rule:** each role's comment block is self-contained. Reading the Production Manager block tells you everything about the PM market without needing to read any other block. Same depth, same template, same treatment for every role regardless of how many listings it has.
 
 ---
 
-# 📐 TEMPLATES (slim, link-heavy, mobile-stacked)
+# 📐 TEMPLATES
 
-## Template 1 · 📋 PASS HEADER
+## Template 1 · 🎯 ROLE HEADER (root comment, one per role)
 
 ```
-## 📋 <YYYY-MM-DD HH:MM> ET
+## 🎯 <ROLE DISPLAY NAME> · <YYYY-MM-DD HH:MM> ET
 
-**Prev:** <timestamp> (<elapsed>) · [TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v7
-
-**Live:** <n> (<±n>) · New: <n> · Gone: <n> · Boards: <n>/<n>
-**By lane:** PM <n> · TD <n> · SM <n> · ME <n>
+**Keywords:** <comma-separated from config>
+**Live:** <n> · New: <n> · Gone: <n>
+💵 Salary range across live: <low>-<high> (or "none posted")
 
 ### Verdict
-<ONE line. Blunt.>
+<ONE line. Blunt. About THIS role's market only.>
 ```
 
-## Template 2 · 🔁 SAME
+## Template 2 · 🔁 SAME (threaded under role header)
 
 ```
 ### 🔁 SAME · <n>
 
 ---
 **[<Role>](<url>)** — <Org>
-`<JM-ID>` · <lane> · <location> · **<n>d**
+`<JM-ID>` · <location> · **<n>d**
 💵 <salary or —>
 
 ---
-<repeat>
+<repeat per listing>
 ```
 
-## Template 3 · 🆕 NEW
+## Template 3 · 🆕 NEW (threaded under role header)
 
 ```
 ### 🆕 NEW · <n>
 
 ---
 **[<Role>](<url>)** — <Org>
-`<JM-ID>` · <lane> · <location>
+`<JM-ID>` · <location>
 💵 <salary or —> · 📅 <posted>
 ✅ <why qualifies, <10 words>
 
 ---
-<repeat>
+<repeat per listing>
 ```
 
-## Template 4 · 🕳️ GONE
+## Template 4 · 🕳️ GONE (threaded under role header)
 
 ```
 ### 🕳️ GONE · <n>
@@ -181,17 +213,28 @@ SAME, GONE, SOURCES always post. NEW and NOTABLE only if non-empty (header says 
 <or: "None. Full inventory carried.">
 ```
 
-## Template 5 · 📌 NOTABLE
+## Template 5 · 📌 NOTABLE (threaded under role header, if content)
 
 ```
 ### 📌 NOTABLE
 
-- <pattern or observation — one line each>
+- <pattern or observation for THIS role only>
 - **Unlinked:** <Role> — <Org> · <board> · <why no URL>
-- **Salary:** <$range> — <org>, <role>
 ```
 
-## Template 6 · 🔌 SOURCES
+## Template 6 · 📋 PASS SUMMARY (root comment, posted AFTER all role loops complete)
+
+```
+## 📋 PASS COMPLETE · <YYYY-MM-DD HH:MM> ET
+
+**Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
+**Prev pass:** <timestamp> (<elapsed>)
+[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v8
+
+Role headers above: <link each>
+```
+
+## Template 7 · 🔌 SOURCES (threaded under pass summary)
 
 ```
 ### 🔌 SOURCES
@@ -204,19 +247,46 @@ SAME, GONE, SOURCES always post. NEW and NOTABLE only if non-empty (header says 
 
 ## Steps
 
-1. **Read `routines/job-market-state.tsv`** — current inventory. Every `status=live` row is expected on boards.
-2. **Read `routines/last-run/job-market.txt`.** `never` = first pass.
-3. **Read most recent PASS HEADER** on thread `86ajtgbt3` for context.
-4. **Walk all source boards.** Apply target profile (ALL lanes). Capture direct URL for every qualifying listing. Verify survival of existing rows.
-5. **Reconcile:** matched = SAME (days-on-board = today - `posted`) · new = NEW (assign `JM-ID`, lane, level) · TSV-but-absent = GONE.
-6. **Update TSV:** append NEW rows (all required columns). GONE → `status=gone`. SAME → update salary if newly found. No empty URLs permitted.
-7. **Post PASS HEADER.** Capture comment ID.
-8. **Post threaded replies:** SAME · NEW · GONE · NOTABLE · SOURCES.
-9. **Commit TSV + stamp in one push:**
-   - `routines/job-market-state.tsv`
-   - `routines/last-run/job-market.txt` (one line: `YYYY-MM-DD HH:MM ET`)
-   - Message: `data(job-market): <timestamp> ET — <n> live, <±n>`
-10. **Report:** census line + verdict. Thread holds detail.
+### Pre-loop
+
+1. **Read `routines/job-market-roles.json`** — the gate. This defines the loop.
+2. **Read `routines/job-market-state.tsv`** — current full inventory.
+3. **Read `routines/last-run/job-market.txt`.** `never` = first pass.
+4. **If single-role invocation:** filter `roles[]` to the requested role only. Loop length = 1.
+
+### The loop (for each role in config)
+
+5. **Filter TSV** to rows matching this role's `role_id`. This is the known inventory for this role.
+6. **Walk ALL source boards** using this role's `keywords[]`. Apply `exclude_terms[]` and `global` constraints. Capture direct URL for every qualifying listing.
+7. **Reconcile:**
+   - Matched to existing TSV row = SAME (compute days-on-board = today - `posted`)
+   - New find with URL = NEW (assign `JM-ID`, set `role_id`, `lane`, `level`)
+   - TSV row not found on boards = GONE
+8. **Stage TSV updates** for this role: append NEW rows, mark GONE rows, update salary if newly found on SAME.
+9. **Post 🎯 ROLE HEADER** as root comment. Capture comment ID.
+10. **Post threaded replies** under role header: SAME · NEW · GONE · NOTABLE (if content).
+11. **Repeat from step 5** for next role.
+
+### Post-loop
+
+12. **Commit TSV + stamp in one push:**
+    - `routines/job-market-state.tsv` (all role updates batched)
+    - `routines/last-run/job-market.txt` (one line: `YYYY-MM-DD HH:MM ET`)
+    - Message: `data(job-market): <timestamp> ET — <n> live, <±n>`
+13. **Post 📋 PASS SUMMARY** as root comment with links to each role header.
+14. **Post 🔌 SOURCES** threaded under summary.
+
+---
+
+## Invocation modes
+
+| Mode | Trigger | Behavior |
+|------|---------|----------|
+| **Full loop** | Scheduled cadence or "run job market refresh" | All roles in config, sequential |
+| **Single role** | "do job search for [role name]" | One role only, same template, same depth |
+| **Add role** | "add [role] to job search" | Edit JSON config, run that role immediately |
+
+All modes produce the same output format. The only variable is loop length.
 
 ## Sources
 
