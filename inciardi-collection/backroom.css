@@ -1,13 +1,16 @@
-/* Inciardi Collection — THE BACK ROOM. Batch preflight, verdict table, run log.
+/* Inciardi Collection — THE BACK ROOM. Headline, verdict table, run log.
  * ZERO COLOUR LITERALS.
  *
- * REUSES `.mx` (the number strip) and `.mxt` (the table) from summary.css rather than restating
- * them. Both already load on every route, and a screen that counts things should count them the
- * way the Collection screen does — a second visual language for the same idea is how an app
- * starts feeling assembled rather than designed.
+ * REUSES `.mxt` (the table) from summary.css rather than restating it — a screen that lists
+ * things should list them the way the Collection screen does.
  *
- * WHAT IS ACTUALLY NEW HERE: the target line, the block notice, the per-row verdict tag, and the
- * log. Everything else is borrowed on purpose.
+ * 🔴 v15 — THE `.mx` NUMBER STRIP IS GONE FROM THIS SCREEN, ON PURPOSE. It rendered four equal
+ * cells: cards, new, known, WRITES. Four numbers on one rule read as four facts of equal
+ * standing, so "37 writes" carried the same weight as "18 cards" — and Michael read the big
+ * number as the size of the job: "it seems like 18 since i gave you two full filled sheets of
+ * 9." The layout caused the misreading as much as the wording did. A confirmation screen needs
+ * ONE loud sentence in the units of the work, and its mechanics quiet underneath.
+ * Do not reinstate a number strip here.
  *
  * 🔴 INK RULE, same as everywhere: `accent`, `accent-deep` and `accent-2` are BRAND colours,
  * identical in both modes. Ink is `--text*` or `--accent-deep`. Brand colours fill, they do not
@@ -16,24 +19,34 @@
  */
 
 .br-head { margin-bottom: var(--gap-md, 12px); }
-.br-what { display: flex; flex-direction: column; gap: 1px; margin-bottom: 6px; }
-.br-what b { font-family: var(--font-display, inherit); font-size: var(--fs-lead, 1.1rem);
-  font-weight: 600; letter-spacing: var(--track-tight, -0.02em); }
-.br-what span { font-size: var(--fs-xs, 0.72rem); color: var(--text-faint); }
 
-/* THE BUILD STAMP. Mono and tabular, deliberately the same treatment as `.foot-stamp`, because
-   it is the same fact from the same constant — a reader comparing the two should not first have
-   to work out whether they are the same kind of thing.
-   It is here because a stale cache on this ONE screen writes wrong data permanently rather than
-   showing a stale layout. See the block in backroom.js. */
-.br-what .br-build { font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--text-faint); font-variant-numeric: tabular-nums; margin-top: 2px; }
+/* THE HEADLINE. Display type, and it is an <h2> because the header already owns the page's h1
+   (v11) — the sentence still needs to be the loudest thing in the content area. `text-wrap:
+   balance` keeps it from breaking to a single orphaned word on a phone. */
+.br-line { margin: 0; font-family: var(--font-display, inherit);
+  font-size: var(--fs-lead, 1.15rem); font-weight: 500; line-height: 1.3;
+  letter-spacing: var(--track-tight, -0.01em); color: var(--text-soft);
+  text-wrap: balance; }
+/* The counts inside the sentence carry the emphasis, so the numbers are what the eye lands on
+   without the sentence shouting. */
+.br-line b { color: var(--text); font-weight: 700; }
+
+.br-sub { margin: 4px 0 0; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint);
+  text-wrap: pretty; }
+
+/* THE MECHANICS LINE: calls, rows, and the build stamp. Mono and small — deliberately the same
+   treatment as `.foot-stamp`, because the build number is literally the same fact from the same
+   constant and a reader comparing them should not have to work out whether they are.
+   The build number is here rather than nowhere because a stale cache on THIS screen writes wrong
+   data into D1 permanently and logs success. See the block in backroom.js. */
+.br-mech { margin: 5px 0 0; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-faint); font-variant-numeric: tabular-nums; text-wrap: pretty; }
 
 /* THE TARGET LINE. A screen that writes to a sheet says WHICH sheet, by id, before it does — the
    difference between a fresh sheet and someone's working one is a single string, and it belongs
    on screen rather than buried in a data file. */
-.br-target { display: block; margin: var(--gap-xs, 8px) 0 0; padding: 7px 9px;
+.br-target { display: block; margin: var(--gap-md, 12px) 0 0; padding: 7px 9px;
   border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
   background: var(--surface-1);
   font-size: var(--fs-xs, 0.72rem); line-height: 1.5; color: var(--text-soft);

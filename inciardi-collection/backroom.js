@@ -1,5 +1,8 @@
 /* Inciardi Collection — THE BACK ROOM. Runs a transcribed batch into the binder.
  *
+ * This file READS, DECIDES and WRITES. The markup is `preview.js` — see its header for why that
+ * seam and not the one the module map names.
+ *
  * HOW YOU GET HERE: `#backroom` is absent from `APP.nav`, so it is in neither the nav drawer nor
  * the page footer. It IS listed at the foot of the settings panel (v13) and reachable by typing
  * the address. The full argument for why concealment is not a defence here lives ONCE, in
@@ -17,10 +20,8 @@
  * `batch.js`. This file never changes when a new photo arrives, which is the entire point of
  * the split — the code that performs irreversible writes should not be edited casually.
  *
- * ⚠️ NAMED SEAM, for whoever adds the next feature here: PLAN vs APPLY. `preflight` / `build` /
- * `render` read and decide; `apply` / `chain` / `log` write. They share only `live` and `plan`.
- * That is where this file splits, and it is close enough to the 15KB line that the next real
- * addition should take it rather than append.
+ * ⚠️ THE REMAINING SEAM, for whoever adds the next feature: PLAN vs APPLY. `preflight` / `build`
+ * read and decide; `apply` / `chain` / `log` write. They share only `live` and `plan`.
  */
 (function () {
   var live = null;        // what the server says right now
@@ -28,7 +29,6 @@
   var running = false;
 
   function $(id) { return document.getElementById(id); }
-  function esc(s) { return Core.esc(s); }
 
   /* ---------------------------------------------------------------- PREFLIGHT
    * READ FIRST, ALWAYS. The batch was written hours ago against a binder that has since been
@@ -66,7 +66,8 @@
   }
 
   /* Compare the batch against live and decide, per row, what will happen. Nothing here sends
-   * anything — this function's whole job is to make the run predictable in advance. */
+   * anything — this function's whole job is to make the run predictable in advance, and it is
+   * the ONLY place any of these numbers are worked out. preview.js decides nothing. */
   function build() {
     var B = window.Batch;
     var sheetExists = !!live.sheets[B.sheet.sheet_id];
@@ -86,6 +87,10 @@
       };
     });
 
+    var newArts = rows.filter(function (r) { return r.artState === 'new'; }).length;
+    var faces = {};
+    B.prints.forEach(function (p) { faces[p.side] = 1; });
+
     return {
       sheetExists: sheetExists,
       occupied: occupied,
@@ -97,102 +102,32 @@
       // by the rule, and so is every sheet he makes tomorrow.
       blocked: sheetExists && occupied > 0,
       rows: rows,
-      newArts: rows.filter(function (r) { return r.artState === 'new'; }).length,
-      haveArts: rows.filter(function (r) { return r.artState === 'have'; }).length,
-      clashes: rows.filter(function (r) { return r.slotState === 'clash'; }).length
+      newArts: newArts,
+      haveArts: rows.length - newArts,
+      faces: Object.keys(faces).length,
+      clashes: rows.filter(function (r) { return r.slotState === 'clash'; }).length,
+      // HTTP calls. NOT the same number as the prints, and NOT the same number as the rows.
+      calls: newArts + (sheetExists ? 0 : 1) + rows.length,
+      /* Rows D1 actually gains. Each POST /artwork writes THREE: the artwork, the implicit
+       * edition its trigger mints (schema.sql — every artwork has at least one edition), and an
+       * ownership row because the batch says `own`. Computed because the old button said "Write
+       * 37 rows" and 37 was the CALL count: wrong in both directions at once. */
+      dbRows: newArts * 3 + (sheetExists ? 0 : 1) + rows.length
     };
   }
 
-  /* ---------------------------------------------------------------- RENDER */
+  /* Build, inject, wire. All three numbers on screen come from `plan`; the markup file works
+   * nothing out for itself, so there is one place deciding what this run will do. */
   function render() {
-    var B = window.Batch;
-    var writes = plan.newArts + (plan.sheetExists ? 0 : 1) + B.prints.length;
-
-    /* 🔴 THE BUILD STAMP IS NOT DECORATION. Everywhere else a stale cache is cosmetic. HERE it
-     * writes the WRONG DATA into D1 permanently and logs thirty-seven successes, because this
-     * runner applies whatever payload it was handed and cannot know the payload is old. The v14
-     * front/back swap is exactly that shape: same names, same count, same green log, opposite
-     * arrangement. Reads the SAME constant the footer reads — a second copy of a version number
-     * is a version number that will eventually lie. */
-    var stamp = window.ICApp ? ICApp.version : '(version unknown)';
-
-    var head =
-      '<div class="br-head">' +
-        '<div class="br-what"><b>' + esc(B.label) + '</b>' +
-          '<span>' + esc(B.source) + '</span>' +
-          '<span class="br-build">build ' + esc(stamp) + '</span></div>' +
-        '<div class="mx">' +
-          cell(B.prints.length, 'cards', 'on the sheet') +
-          cell(plan.newArts, 'new', 'not in the catalog') +
-          cell(plan.haveArts, 'known', 'already there') +
-          cell(writes, 'writes', 'calls to send') +
-        '</div></div>';
-
-    /* THE TARGET, spelled out. A screen that writes to a sheet should say which sheet, by id,
-     * before it does — the difference between a new sheet and someone's working one is a single
-     * string, and it should be on screen rather than in a file. */
-    var target =
-      '<p class="br-target"><span class="tag">target</span> ' +
-      'sheet <code>' + esc(B.sheet.sheet_id) + '</code> \u00b7 titled ' +
-      esc(B.sheet.title) + ' \u00b7 in binder <code>' + esc(B.sheet.binder_id) + '</code>' +
-      (plan.sheetExists
-        ? ' \u2014 <b>already exists</b>, holding ' + plan.occupied + ' slot' +
-          (plan.occupied === 1 ? '' : 's') + '.'
-        : ' \u2014 <b>will be created</b>, landing after your existing sheets.') + '</p>';
-
-    var note = plan.blocked
-      ? '<div class="br-stop"><b>Blocked.</b> That sheet already holds ' + plan.occupied +
-        ' slot' + (plan.occupied === 1 ? '' : 's') + ', so this run would write over work that ' +
-        'is already there. Nothing has been sent.' +
-        '<label class="br-ovr"><input type="checkbox" id="brOverride"> ' +
-        'I know \u2014 overwrite those slots anyway</label></div>'
-      : '';
-
-    var body = plan.rows.map(function (r) {
-      var p = r.p;
-      return '<tr class="' + (r.slotState === 'clash' ? 'clash' : '') + '">' +
-        '<td class="br-pos">' + Binder.face(p.side).toLowerCase() +
-          ' <b>' + (p.position + 1) + '</b></td>' +
-        '<td class="br-nm">' + esc(p.name) +
-          '<span class="br-id">' + esc(p.id) + '</span></td>' +
-        '<td class="br-st">' + tag(r) + '</td>' +
-      '</tr>';
-    }).join('');
-
-    $('brWrap').innerHTML =
-      head + target + note +
-      '<div class="mxt-wrap"><table class="mxt br-t"><thead><tr>' +
-        '<th>Slot</th><th>Print</th><th>What happens</th>' +
-      '</tr></thead><tbody>' + body + '</tbody></table></div>' +
-
-      '<div class="br-go">' +
-        '<button id="brRun" class="primary"' + (plan.blocked ? ' disabled' : '') + '>' +
-          'Write ' + writes + ' rows</button>' +
-        '<button id="brRecheck" class="ghost">Re-read the binder</button>' +
-      '</div>' +
-      '<p class="hint">Order is forced: prints first, then the sheet, then the slots \u2014 a ' +
-      'slot cannot reference an artwork that does not exist yet. Writes go one at a time and ' +
-      'stop at the first real failure, so a bad row leaves the rest unsent rather than half ' +
-      'applied. A print you already own is skipped, never added twice.</p>' +
-      '<pre id="brLog" class="out" hidden></pre>';
-
-    wire();
-  }
-
-  function cell(v, label, sub) {
-    return '<div class="mx-c"><div class="v num">' + v + '</div>' +
-      '<div class="l">' + label + '</div><div class="s">' + sub + '</div></div>';
-  }
-
-  function tag(r) {
-    if (r.slotState === 'clash') {
-      return '<span class="br-tag bad">replaces ' +
-        esc(r.sitting.artwork_name || r.sitting.note || 'what is there') + '</span>';
+    if (!window.Preview) {
+      $('brWrap').innerHTML = '<div class="empty bad"><b>Preview did not load.</b><br>' +
+        '<code>preview.js</code> is missing, so there is no way to show you what would be ' +
+        'written \u2014 and this screen will not write anything it cannot show you first.</div>';
+      return;
     }
-    if (r.slotState === 'same') return '<span class="br-tag">already placed</span>';
-    return r.artState === 'new'
-      ? '<span class="br-tag new">add print + place</span>'
-      : '<span class="br-tag">place only</span>';
+    $('brWrap').innerHTML =
+      Preview.html(window.Batch, plan, window.ICApp ? ICApp.version : '(version unknown)');
+    wire();
   }
 
   function wire() {
@@ -203,7 +138,7 @@
     }
     $('brRun').addEventListener('click', function () {
       if (running) return;
-      // Second confirm, and it names the count. The first click is intent; this is consent.
+      // Second confirm, and it names the sheet. The first click is intent; this is consent.
       if (!window.confirm('Write to ' + window.Batch.sheet.sheet_id + '? This cannot be undone ' +
           'from inside the app.')) return;
       apply();
@@ -230,7 +165,7 @@
    * ownership count.
    * ⚠️ WHAT IT DOES NOT PROTECT: slots use ON CONFLICT DO UPDATE, so a re-run with a DIFFERENT
    * arrangement silently re-seats the prints. Correct behaviour for fixing a mistake, and also
-   * why the build stamp exists. */
+   * why the build stamp is on screen. */
   function benign(e) {
     return /already exists|UNIQUE/i.test(e.message || '');
   }
@@ -268,6 +203,7 @@
 
     // 1. PRINTS FIRST. slot.artwork_id is a foreign key; placing before the artwork exists is an
     //    unwriteable row, not a race. Skip the ones already in the catalog.
+    //    One call, three rows: artwork, its implicit edition (trigger), and the ownership row.
     B.prints.forEach(function (p) {
       if (live.arts[p.id]) return;
       steps.push({

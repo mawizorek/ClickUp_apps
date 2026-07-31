@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v14. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v15. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
@@ -22,7 +22,8 @@
        enter.js     8.1KB  entry form + shoe-box            → Enter, Shoebox
        summary.js  14.9KB  the collection matrix            → Summary
        batch.js    11.2KB  one transcribed sheet, DATA only → Batch
-       backroom.js 14.5KB  the batch runner (unlisted)      → Backroom
+       preview.js   8.8KB  the back room's markup           → Preview
+       backroom.js 11.5KB  read · decide · write            → Backroom
        app.js       3.8KB  routing only                     → App
        boot.js     14.6KB  config · theme · router · settings wiring · diagnostics
 
@@ -31,16 +32,21 @@
        binder.css  15.1KB  stage · cards · deck bar
        sheets.css   3.5KB  sheet list · legend
        summary.css 10.5KB  the matrix
-       backroom.css 6.4KB  batch preflight · verdict table · log
+       backroom.css 7.2KB  headline · verdict table · log
 
-     ⚠️ FIVE FILES AT THE LINE: binder.css 15.1KB, binder.js 15.0KB, summary.js 14.9KB, boot.js
-     14.6KB, backroom.js 14.5KB. The next feature touching any of them arrives as a SPLIT.
+     🔴 v15 TOOK A SPLIT, AND WHICH ONE IS THE INTERESTING PART. backroom.js hit 16.7KB. The seam
+     recorded here was PLAN vs APPLY — and taking it means refactoring the write path on the
+     morning Michael is about to push thirty-seven irreversible writes through it. So a DIFFERENT
+     seam was taken: the preview markup, which is pure string assembly and left apply/chain/log
+     byte-identical. It is also the half that actually churns; every note on this screen so far
+     has been about what it SAYS.
+     ⚠️ PLAN vs APPLY IS STILL OWED. Take it on a day when nobody is mid-import.
+
+     ⚠️ STILL AT THE LINE: binder.css 15.1KB, binder.js 15.0KB, summary.js 14.9KB, boot.js 14.6KB.
      Named seams, so nobody has to find them under pressure:
        binder.css  → `card.css` (the .slot block is a third of the file)
        summary.js  → `matrix.js` + `drill.js`
        boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern)
-       backroom.js → PLAN vs APPLY (preflight/build/render | apply/chain/log; they share only
-                     two variables)
      🔴 AND THE REAL OFFENDER IS `worker/worker.js` AT 29.3KB — one byte under the hard read cap,
      so every edit to it is a full retype of a file too big to verify. That is the next split in
      this app, before any new route. Seam: `worker/reads.js` (the six GETs; /summary and /shoebox
@@ -54,15 +60,11 @@
      guardrail — which is why the answer is a DEFAULT SHAPE, not a fifth gate.
      ============================================================================
 
-     v14: FRONT AND BACK SWAPPED in the Drinks batch — the beer face is the front. I had assumed
-     the first photo was the front and written the assumption in as a fact. See the header in
-     batch.js.
-
-     🔴 THE `?v=` BUMP BELOW IS LOAD-BEARING THIS TIME, NOT HOUSEKEEPING. `batch.js` is DATA that
-     gets written to the database. A phone serving the cached v13 copy would push the OLD
-     arrangement into D1 and log thirty-seven successes — same names, same count, wrong sheet,
-     green all the way. The back room now prints the build stamp beside the run button for the
-     same reason.
+     v15: the back room HEADLINES THE WORK instead of the HTTP calls. It said "Write 37 rows";
+     37 was the call count and the real row count is 73, so the one number on the button was
+     wrong in both directions. Now: "Importing 18 prints into 18 scanned slots over 1 sheet,
+     front and back assumed" — Michael's own sentence, in units he can check against the sheet in
+     his hand.
 
      ⚠️ STILL NOT BUILT: no `manifest.webmanifest`, no `apple-mobile-web-app-capable`. A
      home-screen icon today opens in the browser WITH its address bar, and Android will not offer
@@ -82,12 +84,12 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=14">
-<link rel="stylesheet" href="./chrome.css?v=14">
-<link rel="stylesheet" href="./binder.css?v=14">
-<link rel="stylesheet" href="./sheets.css?v=14">
-<link rel="stylesheet" href="./summary.css?v=14">
-<link rel="stylesheet" href="./backroom.css?v=14">
+<link rel="stylesheet" href="./base.css?v=15">
+<link rel="stylesheet" href="./chrome.css?v=15">
+<link rel="stylesheet" href="./binder.css?v=15">
+<link rel="stylesheet" href="./sheets.css?v=15">
+<link rel="stylesheet" href="./summary.css?v=15">
+<link rel="stylesheet" href="./backroom.css?v=15">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -107,21 +109,24 @@
      ⚠️ settings.js only has to be PARSED before boot.js runs Chrome.init; it sits next to
      chrome.js because the two are halves of one thing. If it 404s, chrome.js builds a drawer that
      says so and boot.js skips its wiring — a missing panel, not a blank app.
-     ⚠️ batch.js BEFORE backroom.js: the runner reads `window.Batch` when it mounts, and app.js
-     names both in NEEDS so a 404 on either one says so out loud instead of rendering blank. -->
+     ⚠️ batch.js + preview.js BEFORE backroom.js: the runner reads `window.Batch` and calls
+     `Preview.html()` when it mounts. app.js names all three in NEEDS, and backroom.js refuses to
+     render without Preview — a batch runner that cannot show you what it would write must not
+     offer to write it. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./device.js?v=14"></script>
-<script src="./core.js?v=14"></script>
-<script src="./chrome.js?v=14"></script>
-<script src="./settings.js?v=14"></script>
-<script src="./binder.js?v=14"></script>
-<script src="./sheets.js?v=14"></script>
-<script src="./picker.js?v=14"></script>
-<script src="./enter.js?v=14"></script>
-<script src="./summary.js?v=14"></script>
-<script src="./batch.js?v=14"></script>
-<script src="./backroom.js?v=14"></script>
-<script src="./app.js?v=14"></script>
-<script src="./boot.js?v=14"></script>
+<script src="./device.js?v=15"></script>
+<script src="./core.js?v=15"></script>
+<script src="./chrome.js?v=15"></script>
+<script src="./settings.js?v=15"></script>
+<script src="./binder.js?v=15"></script>
+<script src="./sheets.js?v=15"></script>
+<script src="./picker.js?v=15"></script>
+<script src="./enter.js?v=15"></script>
+<script src="./summary.js?v=15"></script>
+<script src="./batch.js?v=15"></script>
+<script src="./preview.js?v=15"></script>
+<script src="./backroom.js?v=15"></script>
+<script src="./app.js?v=15"></script>
+<script src="./boot.js?v=15"></script>
 </body>
 </html>
