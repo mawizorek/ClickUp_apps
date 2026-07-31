@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v13. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v14. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
@@ -21,23 +21,26 @@
        picker.js    4.5KB  the slot entry surface           → Picker
        enter.js     8.1KB  entry form + shoe-box            → Enter, Shoebox
        summary.js  14.9KB  the collection matrix            → Summary
-       batch.js    10.0KB  one transcribed sheet, DATA only → Batch
-       backroom.js 13.7KB  the batch runner (unlisted)      → Backroom
+       batch.js    11.2KB  one transcribed sheet, DATA only → Batch
+       backroom.js 14.5KB  the batch runner (unlisted)      → Backroom
        app.js       3.8KB  routing only                     → App
-       boot.js     14.3KB  config · theme · router · settings wiring · diagnostics
+       boot.js     14.6KB  config · theme · router · settings wiring · diagnostics
 
        base.css    12.6KB  type · forms · lists · toasts
        chrome.css  13.2KB  header · drawers · footer
        binder.css  15.1KB  stage · cards · deck bar
        sheets.css   3.5KB  sheet list · legend
        summary.css 10.5KB  the matrix
-       backroom.css 5.8KB  batch preflight · verdict table · log
+       backroom.css 6.4KB  batch preflight · verdict table · log
 
-     ⚠️ AT THE LINE: binder.css 15.1KB, binder.js 15.0KB, summary.js 14.9KB, boot.js 14.3KB. The
-     next feature touching any of them arrives as a SPLIT, not an append. Named seams:
-     binder.css → `card.css` (the .slot block is a third of it); summary.js → `matrix.js` +
-     `drill.js`; boot.js → `diag.js` (the bundle + the ping/copy handlers are a self-contained
-     reporting concern).
+     ⚠️ FIVE FILES AT THE LINE: binder.css 15.1KB, binder.js 15.0KB, summary.js 14.9KB, boot.js
+     14.6KB, backroom.js 14.5KB. The next feature touching any of them arrives as a SPLIT.
+     Named seams, so nobody has to find them under pressure:
+       binder.css  → `card.css` (the .slot block is a third of the file)
+       summary.js  → `matrix.js` + `drill.js`
+       boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern)
+       backroom.js → PLAN vs APPLY (preflight/build/render | apply/chain/log; they share only
+                     two variables)
      🔴 AND THE REAL OFFENDER IS `worker/worker.js` AT 29.3KB — one byte under the hard read cap,
      so every edit to it is a full retype of a file too big to verify. That is the next split in
      this app, before any new route. Seam: `worker/reads.js` (the six GETs; /summary and /shoebox
@@ -51,17 +54,20 @@
      guardrail — which is why the answer is a DEFAULT SHAPE, not a fifth gate.
      ============================================================================
 
-     v13: the unlisted BACK ROOM is now reachable from the settings panel as a quiet text link,
-     because Michael pointed out that a URL-only route stops existing the moment this runs as an
-     installed app with no address bar. Rendered from `APP.hidden`, so that one list drives
-     routing, titling and discovery.
+     v14: FRONT AND BACK SWAPPED in the Drinks batch — the beer face is the front. I had assumed
+     the first photo was the front and written the assumption in as a fact. See the header in
+     batch.js.
 
-     ⚠️ AND THE GAP THAT REQUEST IMPLIES BUT DOES NOT CLOSE: there is no `manifest.webmanifest`
-     and no `apple-mobile-web-app-capable` meta here, so TODAY a home-screen icon still opens in
-     the browser WITH its address bar, and Android will not offer to install this at all. The
-     link above is right regardless — it is correct for a phone in a hurry too — but if the
-     standalone app is actually wanted, it is a manifest, an icon set and a display mode, and it
-     is not built. Do not assume from this comment that it is. -->
+     🔴 THE `?v=` BUMP BELOW IS LOAD-BEARING THIS TIME, NOT HOUSEKEEPING. `batch.js` is DATA that
+     gets written to the database. A phone serving the cached v13 copy would push the OLD
+     arrangement into D1 and log thirty-seven successes — same names, same count, wrong sheet,
+     green all the way. The back room now prints the build stamp beside the run button for the
+     same reason.
+
+     ⚠️ STILL NOT BUILT: no `manifest.webmanifest`, no `apple-mobile-web-app-capable`. A
+     home-screen icon today opens in the browser WITH its address bar, and Android will not offer
+     to install this. If the standalone app is wanted it is a manifest, an icon set, a display
+     mode — and a version check on resume, because standalone has no reload button either. -->
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -76,12 +82,12 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=13">
-<link rel="stylesheet" href="./chrome.css?v=13">
-<link rel="stylesheet" href="./binder.css?v=13">
-<link rel="stylesheet" href="./sheets.css?v=13">
-<link rel="stylesheet" href="./summary.css?v=13">
-<link rel="stylesheet" href="./backroom.css?v=13">
+<link rel="stylesheet" href="./base.css?v=14">
+<link rel="stylesheet" href="./chrome.css?v=14">
+<link rel="stylesheet" href="./binder.css?v=14">
+<link rel="stylesheet" href="./sheets.css?v=14">
+<link rel="stylesheet" href="./summary.css?v=14">
+<link rel="stylesheet" href="./backroom.css?v=14">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -104,18 +110,18 @@
      ⚠️ batch.js BEFORE backroom.js: the runner reads `window.Batch` when it mounts, and app.js
      names both in NEEDS so a 404 on either one says so out loud instead of rendering blank. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./device.js?v=13"></script>
-<script src="./core.js?v=13"></script>
-<script src="./chrome.js?v=13"></script>
-<script src="./settings.js?v=13"></script>
-<script src="./binder.js?v=13"></script>
-<script src="./sheets.js?v=13"></script>
-<script src="./picker.js?v=13"></script>
-<script src="./enter.js?v=13"></script>
-<script src="./summary.js?v=13"></script>
-<script src="./batch.js?v=13"></script>
-<script src="./backroom.js?v=13"></script>
-<script src="./app.js?v=13"></script>
-<script src="./boot.js?v=13"></script>
+<script src="./device.js?v=14"></script>
+<script src="./core.js?v=14"></script>
+<script src="./chrome.js?v=14"></script>
+<script src="./settings.js?v=14"></script>
+<script src="./binder.js?v=14"></script>
+<script src="./sheets.js?v=14"></script>
+<script src="./picker.js?v=14"></script>
+<script src="./enter.js?v=14"></script>
+<script src="./summary.js?v=14"></script>
+<script src="./batch.js?v=14"></script>
+<script src="./backroom.js?v=14"></script>
+<script src="./app.js?v=14"></script>
+<script src="./boot.js?v=14"></script>
 </body>
 </html>
