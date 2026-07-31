@@ -5,6 +5,7 @@
 **Created:** 2026-07-18 (Michael directive: mirror session-close at the top).
 **Updated:** 2026-07-20 (Michael directive: **invocation ≠ session**. Split into Prime + Commit. A bare persona invocation or blank session must NOT cut a board task or scan the board — there is no subject to match against yet. The heavy work is DEFERRED and fires in parallel on the first side-effecting action. Rehomed after `/session start = felix` misfired the full open on zero context.) Prior 2026-07-19 note (scan the FULL list incl. closed & done and REOPEN a precursor over cutting a new task; late-pickup addendum) is preserved — it now lives inside the Commit phase.
 **Updated:** 2026-07-28 (Michael: *"fix those spine hooks so you do the work you're supposed to be doing."* **Arming the spine became a numbered Commit step (C4) — it had never appeared in any executable checklist.** A REOPEN is now explicitly an OPEN. Presence posts for EVERY session, closing Q11 → D. See the Changelog.)
+**Updated:** 2026-07-31 (**C6 split.** It was *read the board, then post your row* — one step, two jobs, two different beneficiaries. The READ moved to `hooks/collision-check.md` and fires **per work item**; C6 keeps the WRITE. Two sessions had just built the same feature simultaneously with neither one reaching C6.)
 **Companion:** `session-close.md` (the bookend at session end).
 
 ---
@@ -95,11 +96,16 @@ When in doubt, a new task is the reversible, low-cost move; a bad reopen is the 
 
 Replay the buffered beats (Prime read, pre-subject chatter, the forming subject) as the opening transcript comment(s) on the freshly reopened/created task — timestamped, flagged as backfilled-from-scratch, faithful-not-verbatim per the transcript gate. Nothing invented; gaps flagged. The session is now live; the spine accrues one line per reply thereafter.
 
-### C6. Post presence on the session board — EVERY session (Q11 → D, LOCKED 2026-07-25, executed 2026-07-28)
+### C6. CLAIM your work on the session board — EVERY session (Q11 → D, LOCKED 2026-07-25, executed 2026-07-28)
 
-Read `brain-config/session-board.md` (who else is live — coordinate, don't stomp), then add ONE Active entry: what you're doing, and **which files** if any. Edit in place; **DELETE on close.**
+Add ONE Active entry to `brain-config/session-board.md`: what you're doing, **which repo**, and **which files** if any. Edit in place; **DELETE on close.**
 
 **This fires for every committed session, not only repo ops.** Previously it was gated on "only if this session touches the repo," and the failure that ruling came from is worth keeping: on 2026-07-25 the board read *"No active sessions"* for 98 minutes while a parallel session rewrote `_shared/super-agent-base.md` underneath a bundle being audited against it. Both agents followed the rule. **An empty board is indistinguishable from nobody having posted** (Concurrency rule 5), so presence exists because a SESSION exists — not because an agent predicted it was about to touch git. A workspace-only session posts a row naming no files; that row is still the signal.
+
+🔴 **C6 IS THE CLAIM. IT IS NO LONGER THE CHECK — see `hooks/collision-check.md` (2026-07-31).** This step used to read *"read the board, THEN add an entry"*: one step doing two jobs, for two different beneficiaries. **Reading protects YOU. Writing protects everyone else.** Welded together, skipping the step lost both — and the cheap self-interested act was gated behind the expensive altruistic one. Worse, C6 fires ONCE, at Commit, when a session's scope is smallest and least predictive of where it will end up. The full reasoning lives in that hook and is not restated here. Two things matter from this file:
+
+- **The check fires PER WORK ITEM, not once at Commit.** A new ask mid-session → check again. Scope grows into files you had not claimed → check again, **and move this row before the write.**
+- **A row is only true until your scope changes.** Fiona's moved four times in one session. That is correct behaviour, not fussiness.
 
 ---
 
@@ -129,6 +135,7 @@ The line: will this conversation produce changes to the workspace, repo, or gene
 - **Mid-session persona swap** (`/session.agent=`): idempotency guard — no re-commit, same task, same spine header, new voice.
 - **Second session on the same task, same day:** C4's idempotency check finds the existing header. Thread under it; do not split one task across two roots.
 - **Concurrent sessions, same agent:** each commits its own task and its own header. Presence is per session (C6).
+- **Michael asks for something NEW mid-session:** Commit does NOT re-fire — but `collision-check` does. A committed session is not a claim on work it had not thought of yet.
 - **Ambiguous precursor:** Commit PAUSES and asks before the write (C2 confidence bar).
 - **Workspace-only session, no repo op:** still posts presence (C6), naming no files.
 
@@ -144,7 +151,8 @@ The line: will this conversation produce changes to the workspace, repo, or gene
 - **Two headers for one session** — C4's idempotency check.
 - **A blind create triggered by a "did you start your task?" nudge** — the nudge is not an exemption; Commit still runs the scan.
 - **A wrong reopen polluting an unrelated real record** — the C2 confidence bar (ask when ambiguous, never silently reopen a maybe).
-- **Git collisions from missing presence posts, and a board that lies by being empty** — C6, now every session.
+- **A board that lies by being empty** — C6, now every session.
+- 🔀 **Two sessions building the same thing** — NOT prevented by anything in this file. C6 is a CLAIM, and a claim only helps someone who looks. **`hooks/collision-check.md` is the looking**, and it fires per work item precisely because this file's Commit fires once, early, when scope is smallest.
 - **Front-loading a scan into Prime** (re-introducing the bug) — Prime is defined read-only; the scan lives only in Commit.
 
 ---
@@ -157,7 +165,7 @@ The line: will this conversation produce changes to the workspace, repo, or gene
 | COMMIT C1–C3: scan incl. closed/done + reopen-or-create | Close the session task (or return a standing thread to `to do`) |
 | **COMMIT C4: arm the spine header** | **Post the spine close line + reconcile replies vs lines** |
 | COMMIT C5: backfill scratch as opening transcript | Finalize the Session Ledger |
-| COMMIT C6: post presence on session-board | Delete presence from session-board |
+| COMMIT C6: claim on session-board | Delete your row from session-board |
 | Start the work | Memory audit + report what was done |
 
 They are bookends. Neither is optional for substantive sessions. **Every open-time step has a close-time counterpart; if you never armed the spine, close has nothing to reconcile and will say so.**
@@ -166,6 +174,7 @@ They are bookends. Neither is optional for substantive sessions. **Every open-ti
 
 ## Changelog
 
+- **2026-07-31 — C6 SPLIT: the claim and the check are two steps now.** Two sessions built the batch-import feature simultaneously and it surfaced only at merge — third collision in a week. C6 already mandated presence and **neither session reached it**, so the diagnosis is not a missing rule. Three design faults, all written up in `hooks/collision-check.md`: the check rode on the announcement (skip one, lose both — and the cheap protective act was gated behind the expensive altruistic one); it fired once at Commit, when scope is smallest and least predictive; and the signal that *did* fire, `create_branch` returning "Reference already exists", was investigated and then explained away. **C6 keeps the write. The read moved out and fires per WORK ITEM.**
 - **2026-07-28 — THE SPINE BECAME A COMMIT STEP (C4).** Michael: *"fix those spine hooks so you do the work you're supposed to be doing."* **Root cause, and it was mechanical rather than behavioural: arming the spine existed only as prose in `gates/session-transcript-gate.md` and appeared in NO executable checklist.** Commit ran C1→C5 with no spine step in it, so four consecutive sessions (Jul 25, 26, 27, 27) posted **zero spine lines while correctly following this hook.** Scored as B19 twice; the second count exists purely because the diagnosis was written and the guard was not. Also: **"a REOPEN is an OPEN"** promoted to a top-level rule plus a C2 clause (every one of those four sessions opened by picking up an existing task, and a task with history is a convincing false signal), Commit declared **a sequence and not a menu**, and the standing-thread + same-day-second-session edge cases named. **The lesson banked above all of it: when the same rule breaks the same way four times, the rule is not being broken — it is not being reached. Put the step in the list that executes.**
 - **2026-07-28 — Q11 → D EXECUTED.** C6 presence now fires for EVERY committed session, not only repo ops. Authorized 2026-07-25 after the board read "No active sessions" for 98 minutes during a live parallel rewrite of the base spec. Done in the same pass because it is one clause in a list already open on the bench.
 - **2026-07-20 — Prime/Commit split.** See the Updated header.
