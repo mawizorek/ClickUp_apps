@@ -1,26 +1,11 @@
 /* Inciardi Collection — THE BACK ROOM. Runs a transcribed batch into the binder.
  *
- * ============================================================================
- * HOW YOU GET HERE, AND WHAT THAT IS AND IS NOT WORTH.
- *
- * `#backroom` is absent from `APP.nav`, so it is absent from the nav drawer and the page footer,
- * and the site is `noindex`. It IS listed at the foot of the settings panel (v13, from
- * `APP.hidden`) and it is reachable by typing the address.
- *
- * ⚠️ THAT SETTINGS LINK IS NEW AND THIS PARAGRAPH USED TO DENY IT. Michael, 2026-07-31: "not url
- * type in case we build this as an app with no url bar" — which is not a convenience note, it is
- * a REACHABILITY BUG. Installed to a home screen and running standalone there is no address bar,
- * so a URL-only route is a route that does not exist in that form of the app. Hiding a page
- * behind an address is fine. Hiding it behind an address nobody can type is losing the page.
- *
- * 🔴 THE THREAT MODEL DID NOT MOVE WHEN THE DOOR DID, AND THAT IS THE WHOLE ARGUMENT. This is a
- * public repo serving a public Pages site with the write key baked into core.js on purpose.
- * Anyone who reads the source finds this route and can already POST to the worker directly with
- * curl — a hidden route protected nothing from them yesterday and protects nothing today. All
- * concealment ever bought was that a screen performing thirty-seven writes is not one tap from
- * the main menu, and it still isn't: it is behind the gear, below the fold, under a divider.
- * THE ACTUAL PROTECTIONS ARE THE THREE GUARDS BELOW AND D1 TIME TRAVEL. Never the URL.
- * ============================================================================
+ * HOW YOU GET HERE: `#backroom` is absent from `APP.nav`, so it is in neither the nav drawer nor
+ * the page footer. It IS listed at the foot of the settings panel (v13) and reachable by typing
+ * the address. The full argument for why concealment is not a defence here lives ONCE, in
+ * settings.js → hiddenRoutes(). Short version: public repo, public site, write key baked into
+ * core.js by design, so anyone who can read the source can already POST to the worker with curl.
+ * THE PROTECTIONS ARE THE GUARDS BELOW AND D1 TIME TRAVEL. Never the URL.
  *
  * WHAT THIS SCREEN REFUSES TO DO:
  *   - Write anything before showing you every row it intends to write.
@@ -31,6 +16,11 @@
  * ONE BATCH AT A TIME. `window.Batch` is the payload; swapping batches means swapping
  * `batch.js`. This file never changes when a new photo arrives, which is the entire point of
  * the split — the code that performs irreversible writes should not be edited casually.
+ *
+ * ⚠️ NAMED SEAM, for whoever adds the next feature here: PLAN vs APPLY. `preflight` / `build` /
+ * `render` read and decide; `apply` / `chain` / `log` write. They share only `live` and `plan`.
+ * That is where this file splits, and it is close enough to the 15KB line that the next real
+ * addition should take it rather than append.
  */
 (function () {
   var live = null;        // what the server says right now
@@ -118,10 +108,19 @@
     var B = window.Batch;
     var writes = plan.newArts + (plan.sheetExists ? 0 : 1) + B.prints.length;
 
+    /* 🔴 THE BUILD STAMP IS NOT DECORATION. Everywhere else a stale cache is cosmetic. HERE it
+     * writes the WRONG DATA into D1 permanently and logs thirty-seven successes, because this
+     * runner applies whatever payload it was handed and cannot know the payload is old. The v14
+     * front/back swap is exactly that shape: same names, same count, same green log, opposite
+     * arrangement. Reads the SAME constant the footer reads — a second copy of a version number
+     * is a version number that will eventually lie. */
+    var stamp = window.ICApp ? ICApp.version : '(version unknown)';
+
     var head =
       '<div class="br-head">' +
         '<div class="br-what"><b>' + esc(B.label) + '</b>' +
-          '<span>' + esc(B.source) + '</span></div>' +
+          '<span>' + esc(B.source) + '</span>' +
+          '<span class="br-build">build ' + esc(stamp) + '</span></div>' +
         '<div class="mx">' +
           cell(B.prints.length, 'cards', 'on the sheet') +
           cell(plan.newArts, 'new', 'not in the catalog') +
@@ -228,7 +227,10 @@
    * is present, which is the desired end state — so they are logged as skips and the run
    * continues. This is also what makes a re-run safe: the artwork insert short-circuits BEFORE
    * the copy insert in the worker, so re-running cannot add a second copy and quietly double an
-   * ownership count. */
+   * ownership count.
+   * ⚠️ WHAT IT DOES NOT PROTECT: slots use ON CONFLICT DO UPDATE, so a re-run with a DIFFERENT
+   * arrangement silently re-seats the prints. Correct behaviour for fixing a mistake, and also
+   * why the build stamp exists. */
   function benign(e) {
     return /already exists|UNIQUE/i.test(e.message || '');
   }
@@ -259,7 +261,8 @@
     $('brRun').disabled = true;
     $('brLog').hidden = false;
     $('brLog').textContent = '';
-    log('', 'Starting \u2014 ' + new Date().toLocaleTimeString() + '\n');
+    log('', 'Starting \u2014 ' + new Date().toLocaleTimeString() +
+            '  \u00b7  build ' + (window.ICApp ? ICApp.version : '?') + '\n');
 
     var steps = [];
 

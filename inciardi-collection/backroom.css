@@ -21,6 +21,15 @@
   font-weight: 600; letter-spacing: var(--track-tight, -0.02em); }
 .br-what span { font-size: var(--fs-xs, 0.72rem); color: var(--text-faint); }
 
+/* THE BUILD STAMP. Mono and tabular, deliberately the same treatment as `.foot-stamp`, because
+   it is the same fact from the same constant — a reader comparing the two should not first have
+   to work out whether they are the same kind of thing.
+   It is here because a stale cache on this ONE screen writes wrong data permanently rather than
+   showing a stale layout. See the block in backroom.js. */
+.br-what .br-build { font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-faint); font-variant-numeric: tabular-nums; margin-top: 2px; }
+
 /* THE TARGET LINE. A screen that writes to a sheet says WHICH sheet, by id, before it does — the
    difference between a fresh sheet and someone's working one is a single string, and it belongs
    on screen rather than buried in a data file. */
