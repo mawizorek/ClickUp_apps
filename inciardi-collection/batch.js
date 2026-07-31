@@ -1,186 +1,258 @@
-/* Inciardi Collection — A BATCH. Data only, zero behaviour.
- *
- * Sheet 3 of the mini binder, transcribed from two photographs Michael sent on 2026-07-30:
- * nine cards a face, both faces of one sheet.
+/* Inciardi Collection — THE BATCH LOADER. Fetches a transcript, validates it, exposes it.
  *
  * ============================================================================
- * WHY THIS IS A SEPARATE FILE FROM THE THING THAT WRITES IT.
+ * WHY THE TRANSCRIPT IS NOT IN THIS FILE ANY MORE.
  *
- * `backroom.js` is machinery: preflight, guards, sequential apply, logging. This is a
- * TRANSCRIPT. They change for completely different reasons and on completely different
- * schedules — the next batch replaces every byte of this file and must not be able to touch a
- * single line of the runner. Keeping them together would mean editing the code that performs
- * irreversible writes every time a new photo arrives, which is the worst possible reason to
- * open that file.
+ * Michael, 2026-07-31: "it should be cold-agentable and ideally jst a reference data file so
+ * they're never actualyl touchuing code."
+ *
+ * Until v16 a batch WAS a JavaScript file — eighteen object literals inside an IIFE. That has
+ * two problems and only one of them is obvious.
+ *
+ *   1. It makes every new sheet a CODE EDIT, performed by whoever happens to be reading
+ *      photographs that day. The job is transcription; the artefact should be a transcript.
+ *
+ *   2. 🔴 THE FAILURE MODE IS CATASTROPHIC AND MISLEADING. One unescaped quote in a print's
+ *      notes and the whole script throws at parse time. `window.Batch` never gets defined, so
+ *      app.js reports "the backroom screen needs batch.js" — a MISSING FILE error for a file
+ *      that is present and one character wrong. Someone would go looking at script tags.
+ *      A malformed .json file cannot do that. It fails inside a fetch, in one place, and this
+ *      file says which file and what is wrong with it.
+ *
+ * WHAT THIS FILE IS NOW: fetch the manifest, fetch the chosen transcript, VALIDATE IT HARD, and
+ * hand `Backroom` something it can trust. The validation is the point — see below.
+ * Procedure for producing a transcript: `brain-config/hooks/binder-sheet-intake.md`.
  * ============================================================================
- *
- * 🔴 FRONT AND BACK WERE SWAPPED FOR ONE DAY, AND THE INTERESTING PART IS WHY.
- * Michael, 2026-07-31: "just swap what you called front and back."
- *
- * Two photographs arrived in a message. I called the first one the front. Nothing in either
- * image says which face of the sheet it is — no numbering, no binder rings visible in a
- * consistent orientation, nothing. It was an ASSUMPTION about message order, and I wrote it into
- * the data as a fact, in the same file where I had been careful to mark every TITLE as
- * transcribed-not-inferred.
- *
- * So: confidence discipline applied to the field that was written on the card, and skipped
- * entirely on the field that was not in the photograph at all. The `confidence` column exists
- * for exactly this and covers names only, because names were the part I was thinking about.
- * GENERALIZABLE: the fields most likely to be wrong in a transcription are the ones the source
- * does not contain. Those are the ones to flag, and they are the easiest ones to forget to.
- *
- * FIXED BY EDITING THE ROWS, not by adding a `flip: true` flag to the batch. A transform layer
- * would mean this file no longer says what it means, and the next reader would have to run the
- * flag in their head to know what is actually going in the binder. A transcript should be
- * literally true. The array is also reordered so it reads front-then-back, in binder order.
- *
- * 🔴 FOUR FIELD DECISIONS, each of which could have been wrong quietly.
- *
- *   retail: 1.00 — SOURCED, not assumed. inciardiprints.com/pages/mini-print-vending-machine-1
- *     states that the Mini Print Vending Machine prices each mini print at one dollar. This is
- *     the ARTWORK's retail. What Michael actually paid is `copy.acquired_price`, and it is left
- *     empty because nobody knows it.
- *
- *   collection_id: null — and this is CORRECT, not a workaround. `artwork.collection_id` is a
- *     real FK into `collection`, D1 enforces it, and there is no POST /collection route — so a
- *     made-up drinks id would be an unwriteable row. But the deeper reason is schema.sql's own
- *     line: a collection is WHAT THE ARTIST RELEASED, a sheet is HOW MICHAEL LAID IT OUT. These
- *     eighteen are an arrangement he made, not a set she dropped. The SHEET carries the
- *     grouping. Do not fix this by inventing a collection.
- *
- *   edition_type: 'open' — including the three Brooklyn Brewery pieces. The brewery called them
- *     a limited edition design, but in this schema 'limited' means A RUN OF N NUMBERED
- *     IMPRESSIONS. Vending machine minis are not numbered. Marketing language is not an edition
- *     type, and writing 'limited' here would put a run length in the data that does not exist.
- *
- *   exclusive: NOT SET, and it should be. Three of these are Brooklyn Brewery tasting-room
- *     exclusives and `artwork.exclusive` is the column for exactly that. POST /artwork does not
- *     accept the field, so the fact lives in `notes` instead. ⚠️ Adding it means editing
- *     worker.js, which is 29.3KB against a 30KB read cap — a full blind retype. Do it in the
- *     same pass that splits the worker, not before.
- *
- * SIGNATURES. Ana signs these two ways: a compact AI monogram, or a stacked ANA INC block. Both
- * appear on this one sheet, so it is not a per-sheet or per-run marker in any obvious way.
- * Recorded per print in `notes` because it is a real, visible property of the object and costs
- * nothing to keep. It describes THE COPY IN THE BINDER, not the artwork in the abstract —
- * strictly it belongs on `copy.notes`, but POST /artwork hardcodes that field to null. Minor.
- *
- * ⚠️ NOT INVENTED: `acquired_where` is left empty on every copy. Vending machine, pop-up, shop
- * and trade are all plausible and none is known. A plausible guess in a data field is worse than
- * a blank, because the blank is honest and the guess is indistinguishable from a fact.
  */
 (function () {
+  var DIR = './batches/';
+  var loaded = null;      // the active batch, after validation
 
-  /* One sheet. `sheet_order` is deliberately ABSENT — the worker computes MAX+1 for the binder,
-   * so this lands after whatever Michael has at the moment it runs, rather than at a position
-   * this file guessed in advance. `sheet_id` is explicit and NON-POSITIONAL on purpose: the
-   * existing `mini-binder-s1` is the SECOND sheet, an id minted from a 0-based order, and that
-   * off-by-one lie is not worth repeating. An id should say what a thing is, not where it sat
-   * on the day it was made. */
-  var SHEET = {
-    sheet_id: 'sheet-drinks',
-    binder_id: 'mini-binder',
-    title: 'Drinks'
-  };
+  function getJSON(path) {
+    /* no-store, same as the router. A CACHED BATCH IS A REAL HAZARD HERE and not a cosmetic
+     * one: this data gets written to a database permanently, so serving yesterday's copy means
+     * importing yesterday's arrangement while the log reports success. */
+    return fetch(path, { cache: 'no-store' }).then(function (r) {
+      if (!r.ok) throw new Error(path + ' \u2014 HTTP ' + r.status);
+      return r.text().then(function (txt) {
+        try { return JSON.parse(txt); }
+        catch (e) {
+          /* Name the FILE and quote the parser. "Unexpected token } in JSON at position 812" is
+           * useless on its own and precise once you know which file. */
+          throw new Error(path + ' is not valid JSON \u2014 ' + e.message);
+        }
+      });
+    });
+  }
 
-  /* side · position · id · name · notes.
-   * Position is 0-8 in READING ORDER, left to right then top to bottom, matching the 3x3 grid in
-   * the photographs. The UI shows position + 1; the data is 0-based (CHECK position BETWEEN 0
-   * AND 8).
-   * ⚠️ 'A' and 'B' are what the DATABASE stores (CHECK side IN ('A','B')). FRONT and BACK are
-   * what a person reads, and `FACE` in binder.js is the only place the two vocabularies meet.
-   * The swap below moved the letters. It did not rename anything. */
-  var PRINTS = [
-    /* ---------- FRONT (side A) — all beer ---------- */
-    { side: 'A', position: 0, id: 'pbr', name: 'PBR',
-      notes: 'A Pabst Blue Ribbon can. Signed AI.' },
-    { side: 'A', position: 1, id: 'rainier-beer', name: 'Rainier Beer',
-      notes: 'A Rainier can. Signed ANA INC.' },
-    { side: 'A', position: 2, id: 'brooklyn-pilsner', name: 'Brooklyn Pilsner',
-      notes: 'A yellow Brooklyn Brewery pilsner can. Brooklyn Brewery tasting-room collab, May 2024 — announced as a teeny Pilsner can. Signed AI.' },
-    { side: 'A', position: 3, id: 'brooklyn-lager', name: 'Brooklyn Lager',
-      notes: 'A Brooklyn Lager bottle. Brooklyn Brewery collab. Signed AI.' },
-    { side: 'A', position: 4, id: 'sportini', name: 'Sportini',
-      notes: 'A martini with a soccer ball and a basketball where the olives go. Signed ANA INC.' },
-    { side: 'A', position: 5, id: 'allagash', name: 'Allagash',
-      notes: 'An Allagash White can, mountains on the label. Signed ANA INC.' },
-    { side: 'A', position: 6, id: 'lunch-bottle', name: 'Lunch Bottle',
-      notes: 'A Maine Beer Company Lunch IPA bottle. Signed ANA INC.' },
-    { side: 'A', position: 7, id: 'guinness', name: 'Guinness',
-      notes: 'A pint of Guinness, full head. Signed ANA INC.' },
-    { side: 'A', position: 8, id: 'pony', name: 'Pony',
-      notes: 'A Miller High Life pony bottle. Signed AI.' },
+  /* ============================================================ VALIDATION
+   * 🔴 THIS IS THE HALF THAT MATTERS, AND IT IS NEW. Moving the transcript to JSON removed the
+   * risk of a batch BREAKING THE APP. It did nothing about the risk of a batch DESCRIBING A
+   * WRONG IMPORT, which is worse, because that one succeeds.
+   *
+   * Everything checked here is something that would otherwise surface as: a silent overwrite
+   * (two prints claiming one pocket — the second wins, the first vanishes, no error anywhere),
+   * a 400 from the worker on call 12 of 37 leaving a half-populated sheet, or a print that
+   * imports fine and is simply not the print in the photograph.
+   *
+   * EVERY MESSAGE NAMES THE ROW. "position must be 0-8" is a puzzle; "print 4 (guinness):
+   * position 9 is not 0-8" is a fix. The person reading this has a photograph in one hand and
+   * no interest in the schema.
+   *
+   * ⚠️ THESE RULES MIRROR THE SCHEMA AND THE WORKER, WHICH MEANS THEY CAN DRIFT FROM THEM. That
+   * is accepted on purpose: the DATABASE is still the authority and will refuse anything this
+   * misses. This is an early, legible NO — not a second source of truth. If they ever disagree,
+   * the database is right and this file is the bug. Sources: schema.binder.sql (side, position,
+   * the UNIQUE on sheet+side+position) and worker.js → badSlug(). */
+  function validate(b, slug) {
+    var errs = [];
+    var E = function (m) { errs.push(m); };
 
-    /* ---------- BACK (side B) — wine, cocktails, one barn ---------- */
-    { side: 'B', position: 0, id: 'wine', name: 'Wine',
-      notes: 'Four bottles in a row. The card is captioned Wine* , asterisk and all; stored as Wine. Signed ANA INC.' },
-    { side: 'B', position: 1, id: 'six-pack', name: 'Six Pack',
-      notes: 'A Corona Extra six-pack in its carrier. Signed ANA INC.' },
-    { side: 'B', position: 2, id: 'champagne-tower', name: 'Champagne Tower',
-      notes: 'A stacked tower of coupe glasses. Signed ANA INC.' },
-    { side: 'B', position: 3, id: 'cocktail-shaker', name: 'Cocktail Shaker',
-      notes: 'A steel three-piece cobbler shaker. Signed ANA INC.' },
-    { side: 'B', position: 4, id: 'the-black-barn', name: 'The Black Barn',
-      notes: 'A dark timber barn, the one non-drink on the sheet. Its title is hand-written VERTICALLY inside the image rather than on the lower margin like every other card here. Signed ANA INC.' },
-    { side: 'B', position: 5, id: 'martini', name: 'Martini',
-      notes: 'A dirty martini, three olives on the pick. Signed AI.' },
-    { side: 'B', position: 6, id: 'topo-chico', name: 'Topo Chico',
-      notes: 'A Topo Chico mineral water bottle. Signed AI.' },
-    { side: 'B', position: 7, id: 'best-friends', name: 'Best Friends!',
-      notes: 'A barley stalk and a hop cone holding hands. Brooklyn Brewery tasting-room collab, May 2024 — the brewery announced the run as containing a sweet meeting between hops and barley, which is this card. Signed AI.' },
-    { side: 'B', position: 8, id: 'bottle-cap', name: 'Bottle Cap',
-      notes: 'A single crimped bottle cap, seen face on. Signed AI.' }
-  ];
+    if (!b || typeof b !== 'object') return ['the file did not contain a JSON object'];
 
-  /* Applied to every print. Kept as one object rather than repeated eighteen times: a field that
-   * is the same for all of them should be stated once, or the seventeenth copy is where the typo
-   * lives. */
-  var DEFAULTS = {
-    category: 'mini',            // size/format. NOT the same axis as edition_type.
-    edition_type: 'open',        // read the header before changing any of these to limited
-    retail: 1.00,                // DOLLARS. Never cents.
-    provenance: 'owned',         // a CHECK-listed value; the one that fits a binder find
-    confidence: 'named',         // the title is written on the card — see the header
-    own: true,                   // photographed in his binder, so he has it
-    qty: 1
-  };
+    /* SLUG AGREEMENT. The filename and the slug inside the file must match, and a mismatch is
+     * refused rather than resolved. Picking one silently would mean the manifest advertises one
+     * batch while the app loads another — and both would look right on screen. */
+    if (b.slug !== slug) {
+      E('the file is named "' + slug + '.json" but its slug says "' + (b.slug || '(missing)') +
+        '" \u2014 they have to match, and guessing which one is right is not this app\'s job');
+    }
+
+    if (!b.label) E('no label \u2014 the preview screen has nothing to call this batch');
+
+    var sh = b.sheet;
+    if (!sh || typeof sh !== 'object') {
+      E('no sheet block');
+    } else {
+      if (!sh.sheet_id || String(sh.sheet_id).length < 2) {
+        E('sheet.sheet_id is missing or too short to be an identity');
+      }
+      if (!sh.binder_id) E('sheet.binder_id is missing');
+      /* Not a fatal error, because the schema allows an untitled sheet and the UI falls back to
+       * the id. Worth saying out loud all the same: an untitled sheet in a menu of sheets reads
+       * as a bug even when it is legal. */
+      if (!sh.title) E('sheet.title is empty \u2014 legal, but the sheet menu will show a raw id');
+    }
+
+    var ps = b.prints;
+    if (!Array.isArray(ps) || !ps.length) return errs.concat(['no prints']);
+    /* Eighteen is the physical maximum: nine pockets, two faces. More than that is not an
+     * ambitious sheet, it is a transcription that lost track of itself. */
+    if (ps.length > 18) E(ps.length + ' prints, but a sheet holds 18 \u2014 nine a face, two faces');
+
+    var seenSlot = {}, seenId = {};
+    ps.forEach(function (p, i) {
+      var who = 'print ' + (i + 1) + ' (' + (p && (p.id || p.name) || 'unnamed') + ')';
+
+      if (!p || typeof p !== 'object') { E(who + ' is not an object'); return; }
+      if (!p.name) E(who + ': no name');
+
+      // --- id: this is IDENTITY and it is permanent, so a bad one is permanently bad.
+      var id = String(p.id || '');
+      if (!id) E(who + ': no id');
+      else if (id.length < 2) E(who + ': id "' + id + '" is too short to be an identity');
+      /* The exact rule from worker.js → badSlug(), and the exact bug that caused the rebuild:
+       * slug("#1") collapses to "1" for every numbered variant, so every one of them collides. */
+      else if (/^[0-9-]+$/.test(id)) {
+        E(who + ': id "' + id + '" is digits only \u2014 "#4" and "7/12" both collapse to numbers, ' +
+          'which is the collision that broke the last app. The worker will reject it.');
+      } else if (!/^[a-z0-9-]+$/.test(id)) {
+        E(who + ': id "' + id + '" has characters outside a-z 0-9 and dash');
+      }
+      if (id && seenId[id]) {
+        /* Legal in the schema — a print CAN sit in several slots — but never what a transcript
+         * means. Two pockets on one sheet holding the same title is a copy-paste that did not
+         * get its id changed, and it would import as one print placed twice. */
+        E(who + ': id "' + id + '" is already used by print ' + seenId[id] +
+          '. Two pockets can legally hold the same print, but on a transcript this is almost ' +
+          'always a copied row with the id left behind.');
+      }
+      if (id) seenId[id] = i + 1;
+
+      // --- side: 'A' or 'B'. The DB stores letters; Front/Back is only what a person reads.
+      var side = String(p.side || '').toUpperCase();
+      if (side !== 'A' && side !== 'B') {
+        E(who + ': side is "' + (p.side == null ? '(missing)' : p.side) +
+          '" \u2014 must be "A" or "B". Front and Back are display words; the data stores letters.');
+      }
+
+      // --- position: 0-8, and an integer. 1-8 typed by a human who counted from one is the
+      //     likeliest mistake here, and it silently shifts eight cards by one pocket.
+      var pos = p.position;
+      if (typeof pos !== 'number' || pos % 1 !== 0) {
+        E(who + ': position must be a whole number 0-8 (top-left is 0, not 1)');
+      } else if (pos < 0 || pos > 8) {
+        E(who + ': position ' + pos + ' is not 0-8. Nine pockets a face, counted from ZERO.');
+      }
+
+      // --- THE COLLISION CHECK. The one that would otherwise be silent: POST /slot is
+      //     ON CONFLICT DO UPDATE, so the second print wins the pocket, the first disappears,
+      //     and every call returns 200. Nothing anywhere would say a card went missing.
+      if ((side === 'A' || side === 'B') && typeof pos === 'number') {
+        var k = side + pos;
+        if (seenSlot[k]) {
+          E(who + ': ' + (side === 'A' ? 'front' : 'back') + ' pocket ' + (pos + 1) +
+            ' is already taken by print ' + seenSlot[k] +
+            '. The later one would silently overwrite the earlier one and both calls would ' +
+            'return success.');
+        }
+        seenSlot[k] = i + 1;
+      }
+    });
+
+    return errs;
+  }
+
+  /* Everything the runner needs, built HERE so the runner never has to know the shape of a
+   * print — it only knows how to send things and read the answer. */
+  function shape(b) {
+    var D = b.defaults || {};
+    var faces = {};
+    b.prints.forEach(function (p) { faces[String(p.side).toUpperCase()] = 1; });
+
+    return {
+      slug: b.slug,
+      label: b.label,
+      /* The source line the preview prints. `faces_confidence` is why it exists: a transcript
+       * should keep admitting which parts were assumed at the moment someone is about to write
+       * them, not only in a file nobody has open. */
+      source: (b.source || '') +
+              (b.faces_confidence === 'assumed' ? '' : ' \u00b7 faces confirmed'),
+      facesAssumed: b.faces_confidence !== 'confirmed',
+      sheet: {
+        sheet_id: b.sheet.sheet_id,
+        binder_id: b.sheet.binder_id,
+        title: b.sheet.title || null
+      },
+      defaults: D,
+      faceCount: Object.keys(faces).length,
+      prints: b.prints.map(function (p) {
+        return {
+          side: String(p.side).toUpperCase(),
+          position: p.position,
+          id: p.id,
+          name: p.name,
+          notes: p.notes || null,
+          // Per-print override. A title read off the card is 'named'; one worked out from the
+          // picture is 'inferred', and the schema carries that distinction on purpose.
+          confidence: p.confidence || D.confidence || 'named'
+        };
+      }),
+
+      artworkBody: function (p) {
+        return {
+          artwork_id: p.id,
+          name: p.name,
+          category: D.category || 'mini',
+          edition_type: D.edition_type || 'open',
+          retail: D.retail == null ? null : D.retail,
+          provenance: D.provenance || 'owned',
+          confidence: p.confidence,
+          notes: p.notes || null,
+          own: D.own !== false,
+          qty: D.qty || 1
+        };
+      },
+
+      /* `edition_id` is deliberately omitted: NULL is the normal case (Q12 = B) and means "this
+       * print is in this pocket" without claiming to know WHICH impression. Naming an edition
+       * here would be inventing a fact about a physical object. */
+      slotBody: function (p) {
+        return {
+          sheet_id: b.sheet.sheet_id,
+          side: p.side,
+          position: p.position,
+          artwork_id: p.id
+        };
+      }
+    };
+  }
 
   window.Batch = {
-    /* Shown on the back-room screen so a person can see WHAT they are about to run before they
-     * run it, without reading this file. */
-    label: 'Sheet 3 \u00b7 Drinks',
-    source: 'Two photographs, 2026-07-30. Beer face is the FRONT (corrected 07-31).',
-    sheet: SHEET,
-    defaults: DEFAULTS,
-    prints: PRINTS,
-
-    /* The body for POST /artwork. Built here rather than in the runner, so the runner never has
-     * to know the shape of a print — it only knows how to send things and read the answer. */
-    artworkBody: function (p) {
-      return {
-        artwork_id: p.id,
-        name: p.name,
-        category: DEFAULTS.category,
-        edition_type: DEFAULTS.edition_type,
-        retail: DEFAULTS.retail,
-        provenance: DEFAULTS.provenance,
-        confidence: DEFAULTS.confidence,
-        notes: p.notes || null,
-        own: DEFAULTS.own,
-        qty: DEFAULTS.qty
-      };
+    /* The picker's list. Drafts are filtered out here rather than hidden in the UI — an
+     * incomplete transcript should not be one tap from a write. */
+    list: function () {
+      return getJSON(DIR + '_index.json').then(function (m) {
+        return (m.batches || []).filter(function (x) { return x.status !== 'draft'; });
+      });
     },
 
-    /* The body for POST /slot. `edition_id` is deliberately omitted: NULL is the normal case
-     * (Q12 = B) and means this print is in this pocket, without claiming to know WHICH
-     * impression. Naming an edition here would be inventing a fact about a physical object. */
-    slotBody: function (p) {
-      return {
-        sheet_id: SHEET.sheet_id,
-        side: p.side,
-        position: p.position,
-        artwork_id: p.id
-      };
-    }
+    /* Load one, validated. Rejects with every problem at once rather than the first — someone
+     * fixing a transcript should get the whole list, not five round trips. */
+    load: function (slug) {
+      return getJSON(DIR + slug + '.json').then(function (raw) {
+        var errs = validate(raw, slug);
+        if (errs.length) {
+          var e = new Error(errs.length + ' problem' + (errs.length === 1 ? '' : 's') +
+                            ' in ' + slug + '.json');
+          e.problems = errs;      // the preview renders these as a list
+          throw e;
+        }
+        loaded = shape(raw);
+        return loaded;
+      });
+    },
+
+    current: function () { return loaded; }
   };
 })();
