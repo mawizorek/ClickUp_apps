@@ -16,11 +16,12 @@
     appName: 'Inciardi',
     appSub: 'Collection',
     logo: '\uD83D\uDCD5',
-    /* ⚠️ THIS STRING IS LOAD-BEARING ON ONE SCREEN. The back room prints it beside the batch it
-       is about to write, because a stale `batch.js` there writes wrong data into D1 permanently
-       and logs success. Bump it on any change that touches a batch, or the stamp certifies a
-       build that is not the one running. */
-    version: 'v15',
+    /* ⚠️ PRINTED ON THE BACK ROOM, BESIDE THE IMPORT BUTTON. Less load-bearing since v16 — the
+       transcript is fetched with cache:'no-store' when that screen opens, so the DATA can no
+       longer be stale independently of the bundle, which was the hazard this was added for.
+       Kept because it still identifies which VALIDATOR ran, and a cached validator against a
+       fresh transcript is a smaller version of the same problem. Bump it on any release. */
+    version: 'v16',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
@@ -52,7 +53,7 @@
      *      design; anyone reading the source finds this and could POST to the worker without it.
      *      The real protections are the guards in backroom.js and D1 Time Travel. */
     hidden: [
-      { route: 'backroom', label: 'Back room', hint: 'Load a transcribed batch of prints' }
+      { route: 'backroom', label: 'Back room', hint: 'Import a transcribed sheet of prints' }
     ],
 
     sources: [
@@ -82,8 +83,8 @@
   checkConfig();
 
   /* ---------- router: hash -> pages/<route>.html, then MOUNT ----------
-   * The hash carries PARAMS: `#binder?sheet=sheet-1&side=B` opens that sheet's back, which is what
-   * every link in the Collection matrix points at. Query string rather than a path because it is
+   * The hash carries PARAMS: `#binder?sheet=sheet-1&side=B` opens that sheet's back, and
+   * `#backroom?batch=drinks` opens one transcript. Query string rather than a path because it is
    * order-independent and tolerates a missing value, so an old link with only `?sheet=` still
    * works. A positional path breaks on the third param. */
   function parse() {
