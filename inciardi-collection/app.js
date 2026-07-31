@@ -14,8 +14,9 @@
     enter:    function ()  { Enter.mount(); },
     shoebox:  function ()  { Shoebox.mount(); },
     summary:  function ()  { Summary.mount(); },
-    // UNLISTED. Reachable only by knowing the address — see the header in backroom.js for what
-    // that is and is not worth. It dispatches like any other route; there is no second router.
+    // UNLISTED. Surfaced only at the foot of the settings panel — see the header in backroom.js
+    // for what that is and is not worth. It dispatches like any other route; there is no second
+    // router.
     backroom: function ()  { Backroom.mount(); }
   };
 
@@ -27,11 +28,12 @@
     enter:   { globals: ['Enter'],   file: 'enter.js' },
     shoebox: { globals: ['Shoebox'], file: 'enter.js' },
     summary: { globals: ['Summary'], file: 'summary.js' },
-    /* `Binder` is a real dependency here, not a leftover: the back room prints slot positions as
-     * front/back, and `FACE` in binder.js is documented as the ONLY place where the UI's
-     * front/back vocabulary and the schema's 'A'/'B' are allowed to meet. Borrowing that map
-     * beats keeping a second copy of it that can drift. */
-    backroom: { globals: ['Backroom', 'Batch', 'Binder'], file: 'backroom.js / batch.js' }
+    /* Four globals, and each is a real dependency:
+     *   Backroom — the runner.  Batch — the payload.  Preview — the markup (v15 split).
+     *   Binder   — `FACE` in binder.js is documented as the ONLY place the UI's front/back
+     *              vocabulary meets the schema's 'A'/'B'. Borrowing it beats a second copy. */
+    backroom: { globals: ['Backroom', 'Batch', 'Preview', 'Binder'],
+                file: 'backroom.js / batch.js / preview.js' }
   };
 
   window.App = {
