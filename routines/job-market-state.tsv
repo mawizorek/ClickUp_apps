@@ -1,17 +1,5 @@
 id	title	org	location	site	url	posted	first_seen	salary	status
-JM-PB-second-stage-dop	Director of Production	Second Stage Theater	New York, NY	PB		2026-07-29	2026-07-30		live
-JM-PB-tuts-pm	Production Manager	Theatre Under The Stars	Houston, TX	PB		2026-07-28	2026-07-30		live
-JM-PB-odc-dop	Director of Production	ODC	San Francisco, CA	PB		2026-07-29	2026-07-30		live
-JM-OSJ-zach-td	Technical Director	Zach Theatre	Austin, TX	OSJ		2026-07-26	2026-07-30	$67,000-80,000	live
-JM-PB-lct3-theater-mgr	Theater Manager, LCT3/Claire Tow	Lincoln Center Theater	New York, NY	PB		2026-07-29	2026-07-30		live
-JM-ECN-shrine-pm	Production Manager, Shrine Auditorium	ASM Global	Los Angeles, CA	ECN		2026-07-20	2026-07-30		live
-JM-ECN-roxian-pm	Production Manager, The Roxian	Live Nation Venues	McKees Rocks, PA	ECN		2026-07-20	2026-07-30		live
-JM-PB-media-theatre-td	Technical Director	The Media Theatre	Media, PA	PB		2026-07-07	2026-07-30	$55,000-60,000	live
-JM-ACG-hanover-vp	VP, Programming & Production	Hanover Theatre & Conservatory	Worcester, MA	ACG		2026-07-07	2026-07-30		live
-JM-PB-met-opera-audio-dir	Broadcast Audio Operations Director	The Metropolitan Opera	New York, NY	PB		2026-07-29	2026-07-30		live
-JM-OSJ-lincoln-center-sr-dir-prod	Senior Director, Production	Lincoln Center for the Performing Arts	New York, NY	OSJ		2026-07-31	2026-07-31	$215,000-250,000	live
-JM-PB-apollo-dop	Director of Production	Apollo Theater Foundation	New York, NY	PB		2026-07-28	2026-07-31		live
-JM-PB-theatre-aspen-td	Technical Director	Theatre Aspen	Aspen, CO	PB		2026-07-23	2026-07-31		live
-JM-ECN-big-ten-studentu-pm	Production Manager, StudentU Program	Big Ten Network	Chicago, IL	ECN		2026-07-21	2026-07-31		live
-JM-PB-est-prod-fac-mgr	Production and Facilities Manager	Ensemble Studio Theatre	New York, NY	PB		2026-07-30	2026-07-31		live
-JM-PB-once-in-lifetime-pm	Production Manager	Once In a Lifetime, Again, LLC	New Canaan, CT	PB		2026-07-24	2026-07-31		live
+JM-PB-tuts-pm	Production Manager	Theatre Under The Stars	Houston, TX	PB	https://playbill.com/job/production-manager/90bf5ad2-5627-4f65-9035-f4663723fc83	2026-07-28	2026-07-30		live
+JM-PB-apollo-dop	Director of Production	Apollo Theater Foundation	New York, NY	PB	https://www.productionondeck.com/apollodop	2026-07-28	2026-07-31	$150,000-170,000	live
+JM-ACG-hanover-vp	VP, Programming & Production	Hanover Theatre & Conservatory	Worcester, MA	ACG	https://artsconsulting.com/opensearches/hanover-theatre-conservatory-seeks-vice-president-programming-production/	2026-07-07	2026-07-30		live
+JM-PB-est-prod-fac-mgr	Production and Facilities Manager	Ensemble Studio Theatre	New York, NY	PB	https://playbill.com/job/production-and-facilities-manager/b5c5a1fa-02b5-440a-9d18-5f202b570d19	2026-07-30	2026-07-31		live
