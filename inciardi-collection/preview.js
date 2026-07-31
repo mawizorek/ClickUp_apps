@@ -21,6 +21,14 @@
  * arrives on `plan`. If this file ever starts working something out for itself, there are two
  * places deciding what a run will do, and they will eventually disagree.
  *
+ * 🔴 v17 — THE ARRANGEMENT BLOCK IS NOT WRITTEN HERE, IT IS ASKED FOR. `Arrange.html(plan)` owns
+ * the 3x3 grids and their controls, because that markup is a direct projection of state this file
+ * is not allowed to hold. Composing it is not deciding anything, so the contract above survives.
+ * WHY IT EXISTS: v16 rendered eighteen rows of `front 1 Ninja Turtle`, and checking a 3x3 against
+ * the sheet in your hand from a flat list means doing position arithmetic in your head — so the
+ * one error in that batch was the one error this screen could not show. Michael: "the preview grid
+ * is only helpful if i can edit it."
+ *
  * FOUR IDS ARE A CONTRACT with backroom.js: `brRun`, `brRecheck`, `brOverride`, and the
  * `.br-pick` class. Renaming one here silently unwires it there, and the symptom is a control
  * that looks fine and does nothing.
@@ -61,13 +69,17 @@
    * MECHANICS: useful for reading the log afterwards, useless for deciding whether to press the
    * button. They go underneath, small.
    *
+   * 🔴 v17 TOOK THAT RULE THE REST OF THE WAY DOWN THE PAGE. The headline spoke in the units of the
+   * work while everything under it still spoke in rows — and the units of a SHEET are a GRID. The
+   * sentence was checkable; the arrangement it described was not.
+   *
    * "FRONT AND BACK ASSUMED" IS HIS PHRASE AND IT STAYS ON SCREEN — and as of v16 it is a real
    * flag in the batch file (`faces_assumed`) rather than something inferred from the shape of
    * the data, so a future batch that KNOWS which face is which can say so and drop the caveat
-   * honestly. */
+   * honestly. The ice-cream sheet is the first to do exactly that. */
   function headline(B, plan, stamp) {
     return '<div class="br-head">' +
-      '<h2 class="br-line">Importing <b>' + plural(B.prints.length, 'print', 'prints') +
+      '<h2 class="br-line">Importing <b>' + plural(plan.printCount, 'print', 'prints') +
         '</b> into <b>' + plural(plan.rows.length, 'scanned slot', 'scanned slots') +
         '</b> over <b>1 sheet</b>' +
         (plan.faces === 2 && B.facesAssumed ? ', front and back assumed' : '') + '.</h2>' +
@@ -81,7 +93,10 @@
 
   /* Non-blocking notes from the validator: a print placed twice (legal, J2 ruling 3, but also
    * what a copy-paste slip looks like) or described and never placed. Shown rather than
-   * swallowed — the whole reason batches are data files is that their mistakes become legible. */
+   * swallowed — the whole reason batches are data files is that their mistakes become legible.
+   * ⚠️ These stay true under the editor and are NOT recomputed: every operation in arrange.js is a
+   * permutation, so the multiset of placed ids cannot change. That invariant is asserted there
+   * after every op rather than assumed here. */
   function warnings(list) {
     if (!list || !list.length) return '';
     return '<ul class="br-warn">' + list.map(function (w) {
@@ -112,9 +127,11 @@
       'I know \u2014 overwrite those slots anyway</label></div>';
   }
 
-  /* The per-row verdict. This column is the entire point of the screen: a batch importer that
+  /* The per-row verdict. This column is the entire point of the TABLE: a batch importer that
    * lists names without saying which are new and which get overwritten has told you nothing you
-   * could act on. */
+   * could act on. The grid above answers WHERE, this answers WHAT HAPPENS — two questions, and
+   * they are not merged because a 3x3 of truncated names cannot carry a verdict, a full name and
+   * an id at once on a phone. */
   function tag(r) {
     if (r.slotState === 'clash') {
       return '<span class="br-tag bad">replaces ' +
@@ -151,28 +168,37 @@
   function controls(B, plan) {
     return '<div class="br-go">' +
         '<button id="brRun" class="primary"' + (plan.blocked ? ' disabled' : '') + '>' +
-          'Import ' + plural(B.prints.length, 'print', 'prints') + '</button>' +
+          'Import ' + plural(plan.printCount, 'print', 'prints') + '</button>' +
         '<button id="brRecheck" class="ghost">Re-read the binder</button>' +
       '</div>' +
       '<p class="hint">Order is forced: prints first, then the sheet, then the slots \u2014 a ' +
       'slot cannot reference an artwork that does not exist yet. Each new print is three rows: ' +
       'the print, its edition, and your copy of it. Writes go one at a time and stop at the ' +
       'first real failure, so a bad row leaves the rest unsent rather than half applied. A print ' +
-      'you already own is skipped, never added twice.</p>' +
+      'you already own is skipped, never added twice. Whatever is in the grid above is what gets ' +
+      'written.</p>' +
       '<pre id="brLog" class="out" hidden></pre>';
   }
 
   window.Preview = {
+    /* ORDER IS AN ARGUMENT: what is being done → where it lands → whether it is refused → THE
+     * ARRANGEMENT → the per-row verdicts → the button. The grid sits above the table because it is
+     * the check a person can actually perform against the object in their hand, and it sits above
+     * the button because the edit has to happen before the consent. */
     html: function (B, plan, files, stamp) {
       return picker(files, B.file) + headline(B, plan, stamp) + warnings(B.warnings) +
-             target(B, plan) + stop(plan) + table(plan) + controls(B, plan);
+             target(B, plan) + stop(plan) + Arrange.html(plan) + table(plan) +
+             controls(B, plan);
     },
 
     /* ⚠️ THE FAILURE SCREEN RENDERS NO RUN BUTTON AT ALL. Not a disabled one — none. A disabled
      * button says "there is a way to make this go"; on a batch whose data does not validate, the
      * only way is to fix the file and push again. Every error is listed at once, because a cold
      * agent fixing them one per round trip waits on a Pages build each time.
-     * The picker still renders, so a broken batch is not a dead end. */
+     * The picker still renders, so a broken batch is not a dead end.
+     * ⚠️ AND NO ARRANGEMENT GRID EITHER, deliberately: the editor can only permute a valid set of
+     * placements, so it has nothing to offer a file whose placements do not parse. Offering it
+     * here would imply these errors are fixable on screen. They are not. */
     invalid: function (res, files) {
       return picker(files, res.file) +
         '<div class="br-head">' +
