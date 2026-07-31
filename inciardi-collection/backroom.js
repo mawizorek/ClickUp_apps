@@ -1,7 +1,7 @@
 /* Inciardi Collection — THE BACK ROOM. Runs a transcribed batch into the binder.
  *
- * This file READS, DECIDES and WRITES. The markup is `preview.js` — see its header for why that
- * seam and not the one the module map names.
+ * This file CHOOSES, READS, DECIDES and WRITES. The markup is `preview.js`; the transcript and
+ * its validation are `batch.js` + `batches/*.json`.
  *
  * HOW YOU GET HERE: `#backroom` is absent from `APP.nav`, so it is in neither the nav drawer nor
  * the page footer. It IS listed at the foot of the settings panel (v13) and reachable by typing
@@ -11,37 +11,92 @@
  * THE PROTECTIONS ARE THE GUARDS BELOW AND D1 TIME TRAVEL. Never the URL.
  *
  * WHAT THIS SCREEN REFUSES TO DO:
+ *   - Load a transcript that does not validate. No run button at all, not a disabled one.
  *   - Write anything before showing you every row it intends to write.
  *   - Touch a sheet that already has prints in it, unless you tick the override.
  *   - Continue past a failure it did not expect.
  *   - Add a second copy of a print you already own. A re-run is a no-op, not a double.
  *
- * ONE BATCH AT A TIME. `window.Batch` is the payload; swapping batches means swapping
- * `batch.js`. This file never changes when a new photo arrives, which is the entire point of
- * the split — the code that performs irreversible writes should not be edited casually.
- *
  * ⚠️ THE REMAINING SEAM, for whoever adds the next feature: PLAN vs APPLY. `preflight` / `build`
  * read and decide; `apply` / `chain` / `log` write. They share only `live` and `plan`.
  */
 (function () {
+  var B = null;           // the loaded, validated batch
   var live = null;        // what the server says right now
   var plan = null;        // what we intend to do about it
   var running = false;
 
   function $(id) { return document.getElementById(id); }
 
+  /* ---------------------------------------------------------------- CHOOSE
+   * A batch used to be a global that was simply THERE. Now it is fetched, so there is a step
+   * before the one this screen used to start with.
+   *
+   * `#backroom?batch=drinks` picks directly. With no parameter: one batch loads itself, several
+   * show a chooser. Auto-loading the only batch matters more than it sounds — a list of one is
+   * a question with one answer, and asking it every time is the kind of friction that makes a
+   * tool feel bureaucratic. */
+  function mount(params) {
+    var host = $('brWrap');
+    Core.busy(host, 'Looking for batches\u2026');
+
+    Batch.list().then(function (all) {
+      if (!all.length) {
+        host.innerHTML = '<div class="empty">No batches to import.<br>' +
+          'A transcript is a file in <code>batches/</code> plus one line in ' +
+          '<code>batches/_index.json</code>.</div>';
+        return;
+      }
+      var want = params && params.batch;
+      if (!want && all.length === 1) want = all[0].slug;
+      if (!want) return choose(all);
+
+      // A named batch that is not in the manifest is a typo or a deleted file. Say which.
+      var known = all.some(function (x) { return x.slug === want; });
+      if (!known) {
+        host.innerHTML = '<div class="empty bad"><b>No batch called "' + Core.esc(want) +
+          '".</b><br>The manifest lists: ' +
+          all.map(function (x) { return '<code>' + Core.esc(x.slug) + '</code>'; }).join(', ') +
+          '</div>';
+        return;
+      }
+      open(want);
+    }).catch(function (e) { Core.fail(host, e); });
+  }
+
+  function choose(all) {
+    $('brWrap').innerHTML = Preview.chooser(all);
+    [].forEach.call(document.querySelectorAll('.br-pick'), function (a) {
+      a.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        open(a.getAttribute('data-slug'));
+      });
+    });
+  }
+
+  function open(slug) {
+    var host = $('brWrap');
+    Core.busy(host, 'Reading the transcript\u2026');
+    Batch.load(slug).then(function (b) {
+      B = b;
+      preflight();
+    }).catch(function (e) {
+      /* 🔴 A VALIDATION FAILURE RENDERS THE PROBLEM LIST AND NO RUN BUTTON. Not a disabled one —
+       * ABSENT. A disabled button invites hunting for the thing that enables it, and there is
+       * nothing on this screen to find: the transcript is wrong and the fix is in the repo.
+       * `e.problems` is every problem at once, because someone correcting a file should get the
+       * whole list rather than five round trips. */
+      if (e.problems) { host.innerHTML = Preview.problems(slug, e.problems); return; }
+      Core.fail(host, e);
+    });
+  }
+
   /* ---------------------------------------------------------------- PREFLIGHT
-   * READ FIRST, ALWAYS. The batch was written hours ago against a binder that has since been
-   * edited from a phone. Everything this screen claims is derived from a read taken seconds
+   * READ FIRST, ALWAYS. The transcript was written hours ago against a binder that has since
+   * been edited from a phone. Everything this screen claims is derived from a read taken seconds
    * before the write, never from an assumption baked into the payload. */
   function preflight() {
     var host = $('brWrap');
-    var B = window.Batch;
-    if (!B) {
-      host.innerHTML = '<div class="empty bad"><b>No batch loaded.</b><br>' +
-        'batch.js did not load, so there is nothing to run.</div>';
-      return;
-    }
     Core.busy(host, 'Reading what is in the binder right now\u2026');
 
     Promise.all([API.get('/artworks'), API.get('/sheets')]).then(function (r) {
@@ -69,7 +124,6 @@
    * anything — this function's whole job is to make the run predictable in advance, and it is
    * the ONLY place any of these numbers are worked out. preview.js decides nothing. */
   function build() {
-    var B = window.Batch;
     var sheetExists = !!live.sheets[B.sheet.sheet_id];
     var occupied = Object.keys(live.slots).length;
 
@@ -88,8 +142,6 @@
     });
 
     var newArts = rows.filter(function (r) { return r.artState === 'new'; }).length;
-    var faces = {};
-    B.prints.forEach(function (p) { faces[p.side] = 1; });
 
     return {
       sheetExists: sheetExists,
@@ -104,13 +156,13 @@
       rows: rows,
       newArts: newArts,
       haveArts: rows.length - newArts,
-      faces: Object.keys(faces).length,
+      faces: B.faceCount,
       clashes: rows.filter(function (r) { return r.slotState === 'clash'; }).length,
       // HTTP calls. NOT the same number as the prints, and NOT the same number as the rows.
       calls: newArts + (sheetExists ? 0 : 1) + rows.length,
       /* Rows D1 actually gains. Each POST /artwork writes THREE: the artwork, the implicit
        * edition its trigger mints (schema.sql — every artwork has at least one edition), and an
-       * ownership row because the batch says `own`. Computed because the old button said "Write
+       * ownership row because the batch says `own`. Computed because the v14 button said "Write
        * 37 rows" and 37 was the CALL count: wrong in both directions at once. */
       dbRows: newArts * 3 + (sheetExists ? 0 : 1) + rows.length
     };
@@ -126,7 +178,7 @@
       return;
     }
     $('brWrap').innerHTML =
-      Preview.html(window.Batch, plan, window.ICApp ? ICApp.version : '(version unknown)');
+      Preview.html(B, plan, window.ICApp ? ICApp.version : '(version unknown)');
     wire();
   }
 
@@ -139,7 +191,7 @@
     $('brRun').addEventListener('click', function () {
       if (running) return;
       // Second confirm, and it names the sheet. The first click is intent; this is consent.
-      if (!window.confirm('Write to ' + window.Batch.sheet.sheet_id + '? This cannot be undone ' +
+      if (!window.confirm('Write to ' + B.sheet.sheet_id + '? This cannot be undone ' +
           'from inside the app.')) return;
       apply();
     });
@@ -191,12 +243,12 @@
   }
 
   function apply() {
-    var B = window.Batch;
     running = true;
     $('brRun').disabled = true;
     $('brLog').hidden = false;
     $('brLog').textContent = '';
     log('', 'Starting \u2014 ' + new Date().toLocaleTimeString() +
+            '  \u00b7  batch ' + B.slug +
             '  \u00b7  build ' + (window.ICApp ? ICApp.version : '?') + '\n');
 
     var steps = [];
@@ -215,7 +267,7 @@
     // 2. THE SHEET. Needs to exist before anything can be placed on it.
     if (!plan.sheetExists) {
       steps.push({
-        label: 'sheet \u00b7 ' + B.sheet.title,
+        label: 'sheet \u00b7 ' + (B.sheet.title || B.sheet.sheet_id),
         run: function () { return API.post('/sheet', B.sheet); }
       });
     }
@@ -231,6 +283,8 @@
 
     chain(steps).then(function () {
       log('', '\nDone. ' + steps.length + ' calls sent.');
+      log('', 'Mark this batch \u201cpushed\u201d in batches/_index.json so the next reader ' +
+              'knows it has run.');
       Core.toast('Batch written', 'good');
       // NO OPTIMISTIC UI: re-read rather than assuming the plan happened. The screen now shows
       // the post-write truth, which is also the proof it worked.
@@ -245,5 +299,5 @@
     });
   }
 
-  window.Backroom = { mount: preflight };
+  window.Backroom = { mount: mount };
 })();
