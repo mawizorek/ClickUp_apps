@@ -2,6 +2,7 @@
   "_readme": "Every batch the back room offers, newest first. A static site cannot list a directory, so this file is the directory. Adding a batch is TWO steps: drop the .json in this folder, then add its filename here. Forgetting the second step is the likeliest mistake there is - the file will sit in the repo, correct and invisible. Full instructions: brain-config/hooks/batch-import.md",
 
   "batches": [
+    "ice-cream.json",
     "drinks.json"
   ]
 }
