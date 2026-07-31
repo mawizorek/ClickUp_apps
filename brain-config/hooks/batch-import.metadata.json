@@ -1,0 +1,29 @@
+{
+  "slug": "batch-import",
+  "type": "procedure",
+  "name": "Batch Import — Inciardi Collection",
+  "status": "active",
+  "purpose": "Turn photographs of a physical binder sheet into a batch file Michael can push through the app's back room, without the transcriber ever touching code.",
+  "invocation": "On demand — photographs of a mini-print sheet arrive, or \"import this sheet\".",
+  "requires": ["githubmcp_get_file_contents", "githubmcp_create_or_update_file", "fetch_website", "search_web"],
+  "produces": [
+    "inciardi-collection/batches/<slug>.json",
+    "inciardi-collection/batches/_index.json"
+  ],
+  "composedWith": ["commit-pre-flight", "post-build-verify", "link-provenance"],
+  "excludes": ["source-size-budget-enforcer"],
+  "created": "2026-07-31",
+  "shortcut": true,
+
+  "_metadata_note": "Added a few hours after the hook itself, which shipped without one. A hook meant to be invoked BY NAME needs this file or it is only discoverable by reading the whole directory — which is the opposite of cold-agentable, and this is the most cold-agentable hook in here.",
+
+  "_excludes_note": "source-size-budget-enforcer does not apply. Batch files are DATA: never read whole in order to be edited safely, and incapable of breaking the app if malformed. The budget exists for source that has to be held in one head at once.",
+
+  "_hard_rule": "DATA ONLY. The agent never edits a .js file and never runs the import. The reachable end state is 'ready for Michael', never 'imported' — the back room preview is the last place a human compares the screen against the physical object, and it is the only check that catches a print named confidently and wrongly.",
+
+  "_known_gaps": [
+    "`own` is a batch-wide default with no per-print override, so a sheet mixing prints Michael owns with wishlist markers he does not cannot be expressed in one batch. Split it, or have him mark the wanted ones afterwards.",
+    "`artwork.exclusive` is a real column and the right home for a Brooklyn Brewery tasting-room piece, but POST /artwork does not accept the field, so that fact lives in `notes` instead. Fixing it means editing the 29.3KB worker — do it in the same pass that splits it.",
+    "The manifest lists filenames only, so the picker cannot show which batches have already been pushed. Harmless today: the back room's own guard blocks a re-run because the target sheet will have slots in it."
+  ]
+}
