@@ -1,0 +1,114 @@
+{
+  "_readme": "A BATCH IS DATA. No code lives in this file and none may. The grids below are laid out exactly like the photograph: three rows of three, reading left to right. Where a print sits in the array IS where it sits on the sheet, so there are no position numbers to get wrong. Full instructions: brain-config/hooks/batch-import.md",
+
+  "id": "books",
+  "label": "Books \u00b7 bookshops + the Richard Scarry collab",
+
+  "source": "Two photographs, 2026-07-31. \ud83d\udd34 BOTH PHOTOGRAPHS WERE SIDEWAYS AND BOTH GRIDS WERE ROTATED 90 CW BEFORE TRANSCRIPTION (hook v2, step 2). Photo A: punch strip along the BOTTOM of the frame. Photo B: punch strip along the TOP. A 9-pocket page's punched edge is a long VERTICAL edge, so a horizontal strip proves rotation before a single card is read. Caption majority agreed on both faces (5 of 9, then 6 of 9 once rotated), and the minority in each case is a LANDSCAPE artwork whose title Ana writes up the card's left edge - the Mr. Softee trap, expected this time rather than fallen for. Direction confirmed against the ice-cream correction, where the same two strip positions both needed 90 CW: Michael holds the phone the same way. FRONT/BACK: photo A (bookshops) is called the front on that same precedent - ice-cream's strip-at-bottom photo was confirmed as its front - but that is one instance of a camera habit, not knowledge, so faces_assumed stays true.",
+
+  "sheet": {
+    "sheet_id": "sheet-books",
+    "binder_id": "mini-binder",
+    "title": "Books"
+  },
+
+  "faces_assumed": true,
+
+  "defaults": {
+    "category": "mini",
+    "edition_type": "open",
+    "retail": 1.00,
+    "provenance": "owned",
+    "confidence": "named",
+    "own": true,
+    "qty": 1
+  },
+
+  "prints": {
+    "paige": {
+      "name": "Paige",
+      "notes": "A squirrel peering out from behind three standing books, printed in a single dark brown. The title is a pun on 'page'. Signed AI."
+    },
+    "peter-rabbit": {
+      "name": "Peter Rabbit",
+      "notes": "A rabbit in a blue jacket sprawled among radishes and greens. Signed AI."
+    },
+    "persephone-book": {
+      "name": "Persephone Book",
+      "notes": "A single closed book seen in three-quarter view, dove-grey-blue boards with a printed white label on the front. Signed AI."
+    },
+    "books-are-magic": {
+      "name": "Books are Magic",
+      "notes": "The corner storefront of Books Are Magic, the Brooklyn bookstore, with its striped awning and the fan-shaped BOOKS ARE MAGIC mural. Signed AI."
+    },
+    "beacon-hill-books": {
+      "name": "Beacon Hill Books",
+      "notes": "The red brick townhouse of Beacon Hill Books & Cafe in Boston, fire escape and window boxes, a blue building alongside. Signed AI."
+    },
+    "goodnight-moon": {
+      "name": "Goodnight Moon",
+      "notes": "The cover of Goodnight Moon - the green room, the fire, the moon through the window. The cover credits to Margaret Wise Brown and Clement Hurd are lettered on the card itself. Signed AI."
+    },
+    "lunch-poems": {
+      "name": "Lunch Poems",
+      "notes": "The City Lights Pocket Poets cover of Frank O'Hara's Lunch Poems, red border around a blue field, lettered NUMBER NINETEEN on the card. Signed AI."
+    },
+    "folklore-bookshop": {
+      "name": "Folklore Bookshop",
+      "notes": "A green-inked book with FOLKLORE lettered across the cover and birds worked into a fanned border. Folklore Book Shop is one of the bookstores hosting an Inciardi machine - credited in People's April 2026 piece on the Richard Scarry resurgence (https://people.com/behind-the-resurgence-for-richard-scarry-busytown-universe-exclusive-11952964). Signed ANA INC."
+    },
+    "reading-glasses": {
+      "name": "All of my glasses are reading glasses",
+      "notes": "Two hands holding an open book, the two pages lettered ALL OF MY GLASSES / ARE READING GLASSES. Longest title on the sheet and it is written out in full on the lower margin. Signed AI."
+    },
+
+    "to-be-read": {
+      "name": "To Be Read",
+      "notes": "Three books - teal, green and red - stacked and fanned open. Signed AI. The only non-Scarry-collab card on this face apart from By Invitation Only."
+    },
+    "by-invitation-only": {
+      "name": "By Invitation Only",
+      "notes": "A hot pink card lettered BY INVITATION ONLY in black. What it refers to is not stated on the card and no source was found, so nothing is claimed. Signed ANA INC."
+    },
+    "pickle-car": {
+      "name": "Pickle Car",
+      "notes": "Richard Scarry collab. A pig in a red cap driving a green pickle car lettered PICKLES. The card carries a printed copyright line, (c)2025 R. Scarry Corp. AG. Signed ANA INC."
+    },
+    "corn-car": {
+      "name": "Corn Car",
+      "notes": "Richard Scarry collab. Three pigs riding a corn-on-the-cob car. Printed (c)2025 R. Scarry Corp. AG. Signed ANA INC."
+    },
+    "soft-drink-truck": {
+      "name": "Soft-drink Truck",
+      "notes": "Richard Scarry collab. A pink SODY-POP delivery truck racked with bottles, driven by a cat in a bottle-shaped cab. Printed (c)2025 R. Scarry Corp. AG. Signed ANA INC."
+    },
+    "fish-truck": {
+      "name": "Fish Truck",
+      "notes": "Richard Scarry collab. A green truck lettered FISH with cats in the back and fish escaping overhead. Printed (c)2025 R. Scarry Corp. AG. Signed ANA INC."
+    },
+    "sail-boat-car": {
+      "name": "Sail Boat Car",
+      "notes": "Richard Scarry collab. A yellow car towing a striped sailboat. Printed (c)2025 R. Scarry Corp. AG. Signed ANA INC."
+    },
+    "pencil-car": {
+      "name": "Pencil Car",
+      "notes": "Richard Scarry collab. Two mice riding a red pencil car, nib forward. Printed (c)2025 R. Scarry Corp. AG. Signed ANA INC."
+    },
+    "delivery-truck": {
+      "name": "Delivery Truck",
+      "notes": "Richard Scarry collab. A pink truck lettered MICHAEL ANGELO SCULPTOR hauling a green statue on a brick flatbed. Printed (c)2025 R. Scarry Corp. AG. Signed ANA INC."
+    }
+  },
+
+  "front": [
+    ["lunch-poems",     "books-are-magic",   "paige"],
+    ["folklore-bookshop", "beacon-hill-books", "peter-rabbit"],
+    ["reading-glasses",  "goodnight-moon",    "persephone-book"]
+  ],
+
+  "back": [
+    ["by-invitation-only", "soft-drink-truck", "to-be-read"],
+    ["pencil-car",         "fish-truck",       "pickle-car"],
+    ["delivery-truck",     "sail-boat-car",    "corn-car"]
+  ]
+}
