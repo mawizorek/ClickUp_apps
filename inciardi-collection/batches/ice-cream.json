@@ -3,7 +3,8 @@
 
   "id": "ice-cream",
   "label": "Sheet 4 \u00b7 Ice Cream",
-  "source": "Two photographs, 2026-07-31. Front/back NOT determined - the sheet was shot loose and neither photo shows which physical face is which. Arrival order was deliberately NOT used as evidence (that is the assumption that was wrong on the Drinks sheet, 07-30).",
+
+  "source": "Two photographs, 2026-07-31. \ud83d\udd34 CORRECTED 2026-07-31 ~17:00 - BOTH GRIDS WERE TRANSCRIBED 90 DEGREES OFF. The sheet was photographed on its side (the punch strip ran HORIZONTALLY across the frame, which is structurally impossible for an upright 9-pocket page), and the grid was read row-wise anyway. Re-shot upright and both faces rotated 90 CW to match. The error was a single rigid rotation, identical on both faces - not a scramble. Front/back was CORRECT and is now confirmed rather than assumed: the truck face is the front.",
 
   "sheet": {
     "sheet_id": "sheet-ice-cream",
@@ -11,7 +12,7 @@
     "title": "Ice Cream"
   },
 
-  "faces_assumed": true,
+  "faces_assumed": false,
 
   "defaults": {
     "category": "mini",
@@ -34,7 +35,7 @@
     },
     "rainbow-sprinkles": {
       "name": "Rainbow Sprinkles",
-      "notes": "A cone shown on its side, the whole scoop buried in rainbow sprinkles. Signed AI."
+      "notes": "A soft-serve cone, the whole scoop buried in rainbow sprinkles. Signed AI."
     },
     "spongebob-pop": {
       "name": "Spongebob Pop",
@@ -42,7 +43,7 @@
     },
     "mr-softee": {
       "name": "Mr. Softee",
-      "notes": "A blue and white Mr. Softee ice cream truck, lettered SHAKES SUNDAES CONES. Its title is hand-written on the lower LEFT margin, unlike every other card on this face. Signed AI."
+      "notes": "A blue and white Mr. Softee ice cream truck, lettered SHAKES SUNDAES CONES. The image is LANDSCAPE, so Ana wrote the title vertically up the card's left edge instead of along the lower margin like every other card on this face. \u26a0\ufe0f This card is what caused the 90-degree transcription error: in the sideways original photo it was the ONE caption that read horizontally, and it got treated as the upright sample while the other eight were written off as quirks. Caption orientation is a MAJORITY VOTE, never a single sample. Signed AI."
     },
     "italian-ice": {
       "name": "Italian Ice",
@@ -50,7 +51,7 @@
     },
     "bubbles": {
       "name": "Bubbles",
-      "notes": "A blonde character-face bar on a blue stick with oversized dark gumball eyes. Card is titled Bubbles. Signed AI."
+      "notes": "A blonde pigtailed character-face bar on a blue stick with oversized dark gumball eyes. Signed AI."
     },
     "snow-cone": {
       "name": "Snow Cone",
@@ -63,11 +64,11 @@
 
     "ice-cream-sandwich": {
       "name": "Ice Cream Sandwich",
-      "notes": "A rectangular ice cream sandwich, dark dimpled wafers around a vanilla centre. Signed AI."
+      "notes": "A rectangular ice cream sandwich, dark dimpled wafers around a vanilla centre. Title written vertically up the card's left edge. Signed AI."
     },
     "chipwich": {
       "name": "Chipwich",
-      "notes": "A chocolate chip cookie ice cream sandwich rolled in chocolate chips, one bite taken out. Signed AI."
+      "notes": "A chocolate chip cookie ice cream sandwich rolled in chocolate chips, one bite taken out. Title written vertically up the card's left edge. Signed AI."
     },
     "erewhon-smoothie": {
       "name": "Erewhon Smoothie",
@@ -75,11 +76,11 @@
     },
     "choco-taco": {
       "name": "Choco Taco",
-      "notes": "A Choco Taco - waffle shell folded around ice cream, chocolate and nut coating, one bite taken. Signed AI."
+      "notes": "A Choco Taco - waffle shell folded around ice cream, chocolate and nut coating, one bite taken. Title written vertically up the card's left edge. Signed AI."
     },
     "klondike-bar": {
       "name": "Klondike Bar",
-      "notes": "A Klondike Original bar in its silver foil wrapper, torn open to show the bar. Signed AI."
+      "notes": "A Klondike Original bar in its silver foil wrapper, torn open to show the bar. Title written vertically up the card's left edge. Signed AI."
     },
     "dels-cup": {
       "name": "Del's Cup",
@@ -87,7 +88,7 @@
     },
     "chocolate-eclair": {
       "name": "Chocolate \u00c9clair",
-      "notes": "A crumb-coated chocolate eclair bar on a wooden stick, one bite taken. Title is written with the accent on the card. Signed AI."
+      "notes": "A crumb-coated chocolate eclair bar on a wooden stick, one bite taken. Title carries the accent on the card. Signed AI."
     },
     "strawberry-shortcake": {
       "name": "Strawberry Shortcake",
@@ -100,14 +101,14 @@
   },
 
   "front": [
-    ["ninja-turtle",  "rocket-pop", "rainbow-sprinkles"],
-    ["spongebob-pop", "mr-softee",  "italian-ice"],
-    ["bubbles",       "snow-cone",  "a-twist"]
+    ["bubbles",   "spongebob-pop", "ninja-turtle"],
+    ["snow-cone", "mr-softee",     "rocket-pop"],
+    ["a-twist",   "italian-ice",   "rainbow-sprinkles"]
   ],
 
   "back": [
-    ["ice-cream-sandwich",   "chipwich",     "erewhon-smoothie"],
-    ["choco-taco",           "klondike-bar", "dels-cup"],
-    ["chocolate-eclair",     "strawberry-shortcake", "red-dip"]
+    ["chocolate-eclair",     "choco-taco",   "ice-cream-sandwich"],
+    ["strawberry-shortcake", "klondike-bar", "chipwich"],
+    ["red-dip",              "dels-cup",     "erewhon-smoothie"]
   ]
 }
