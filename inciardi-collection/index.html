@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v17. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v18. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
@@ -12,7 +12,7 @@
      RULE 2 — **`index.html` is an INDEX** (architecture lock, 2026-07-08): a thin shell that
      references pages, never a file storing servable content.
 
-     ⚠️ EVERY NUMBER BELOW WAS MEASURED AT v17.1, NOT ESTIMATED. The v17 commit shipped this map
+     ⚠️ EVERY NUMBER BELOW WAS MEASURED AT v18, NOT ESTIMATED. The v17 commit shipped this map
      with guessed sizes and three of them were wrong by 3-5KB — `arrange.js` was written down as
      ~11KB and is 15.8KB. **A size map with invented numbers is worse than no map, because the whole
      point of it is deciding when to split, and a guess reads exactly like a measurement.** Re-read
@@ -37,8 +37,8 @@
        styles.css   1.2KB  pointers only, zero colour literals
        sheets.css   3.5KB  sheet list · legend
        summary.css 10.5KB  the matrix
-       base.css    12.6KB  type · forms · lists · toasts
        chrome.css  13.2KB  header · drawers · footer
+       base.css    14.7KB  type · forms · lists · toasts · TOUCH-ACTION (v18, +2.1KB)
        binder.css  15.1KB  stage · cards · deck bar                         ⚠️ over the line
        backroom.css 16.3KB headline · arrangement grid · validator · verdict table · log ⚠️ over
 
@@ -64,38 +64,26 @@
      note in `arrange.js`; the short version is that slots are written ON CONFLICT DO UPDATE, so an
      unfixed batch file can silently undo a corrected import on the next run.
 
-     ⚠️ FOUR FILES ARE NOW OVER THE 15KB SPLIT LINE (marked above) and all four are still under the
-     22KB ceiling, so every one of them can still be read whole and edited safely. That is the line
-     that actually matters; the 15KB mark is the warning, not the wall. Named seams, so nobody has
-     to find them under pressure:
-       binder.css  → `card.css` (the .slot block is a third of the file)
-       backroom.css → `arrange.css` (the grid block is self-contained and new)
-       arrange.js  → nothing yet. It is one feature and mostly comments; trim before splitting.
-       summary.js  → `matrix.js` + `drill.js`
-       boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern)
-       backroom.js → PLAN vs APPLY. ⚠️ DODGED TWICE (v15 took the markup, v17 took the arrangement),
-                     both times because the write path should not be refactored on a day someone is
-                     about to push irreversible writes through it. The reason is real and does not
-                     expire — but it is now propping up the largest JS file in the app. Take it on a
-                     quiet day, before it is three excuses old.
-     🔴 AND THE REAL OFFENDER IS `worker/worker.js` AT 29.3KB — one byte under the hard read cap,
-     so every edit to it is a full retype of a file too big to verify. That is the next split in
-     this app, before any new route. Seam: `worker/reads.js` (the six GETs; /summary and /shoebox
-     are ~10KB between them) leaving the shell plus the writes.
-
-     🔴 HOW IT WENT WRONG, because the mechanism matters more than the numbers: v4 added the sheet
-     menu, v5 the stage, v6 traversal, v7 the shoe-box split — four reasonable changes, one file,
-     no moment anyone would have called it a problem. `app.js` hit 32.7KB, `styles.css` 30KB.
-     Size Sally forecasts exactly this and Dev Dexter owns the split law; both are invoke-only and
-     neither was seated across those four versions. A guardrail that needs remembering is not a
-     guardrail — which is why the answer is a DEFAULT SHAPE, not a fifth gate.
+     🔴 v18 IS ONE CSS RULE, AND THE INTERESTING PART IS THE THREE FIXES IT IS NOT.
+     Speed-tapping the deck-bar turn arrows on a phone triggered iOS double-tap zoom mid-turn.
+     The fix is `touch-action: manipulation` in `base.css` — on interactive elements and on the
+     whole `body.stage`, which does not scroll and has no text to zoom into. NOT DONE, and each
+     for a stated reason recorded there in full: `user-scalable=no` on the viewport tag (iOS
+     Safari has ignored it since iOS 10 — it would have looked like a fix and done nothing), a
+     `gesturestart` preventDefault (kills PINCH everywhere, including the 1800px print carousel
+     the image work is being designed around), and a universal `* { touch-action }` (would reach
+     `.plate` and every image that lands on it — the one surface that must keep pinch).
+     ⚠️ THE VIEWPORT TAG BELOW IS DELIBERATELY UNTOUCHED. If a future session "fixes zoom" by
+     adding `maximum-scale=1` or `user-scalable=no` to it, that is a regression twice over: it
+     does nothing on iOS and it is an accessibility loss on everything else.
      ============================================================================
 
-     ⚠️ THE `?v=` BUMP IS BACK TO BEING HOUSEKEEPING. At v14 it was load-bearing: a cached
-     `batch.js` would have written the WRONG arrangement into D1 and logged thirty-seven
-     successes. Batch data is now fetched `no-store`, so it cannot be served stale at all — the
-     hazard is structurally gone rather than merely labelled. Bump it anyway for the JS, and the
-     build stamp stays on the run screen because it still answers "which CODE is running."
+     ⚠️ THE `?v=` BUMP WAS HOUSEKEEPING AT v17 AND IS LOAD-BEARING AGAIN AT v18, for a new reason:
+     the entire v18 change IS a stylesheet, so a cached `base.css` serves the bug and the build
+     stamp would still read v18. Bump the CSS, not just the JS. (The v14 hazard — a cached
+     `batch.js` writing the WRONG arrangement into D1 — is separately dead: batch data is fetched
+     `no-store` and cannot be served stale at all.) The build stamp stays on the run screen
+     because it still answers "which CODE is running."
 
      ⚠️ STILL NOT BUILT: no `manifest.webmanifest`, no `apple-mobile-web-app-capable`. A
      home-screen icon today opens in the browser WITH its address bar, and Android will not offer
@@ -104,6 +92,9 @@
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
+<!-- ⚠️ DO NOT ADD `maximum-scale` OR `user-scalable=no` HERE. See the v18 block above: the zoom
+     misfire is solved in base.css with `touch-action`, and a viewport scale lock is both
+     ineffective on iOS and an accessibility regression everywhere else. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Mercedes surface-1. Paints the iOS browser chrome; settings.js moves it with the mode toggle,
      reading the resolved token rather than a hardcoded hex. -->
@@ -115,12 +106,12 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=17">
-<link rel="stylesheet" href="./chrome.css?v=17">
-<link rel="stylesheet" href="./binder.css?v=17">
-<link rel="stylesheet" href="./sheets.css?v=17">
-<link rel="stylesheet" href="./summary.css?v=17">
-<link rel="stylesheet" href="./backroom.css?v=17">
+<link rel="stylesheet" href="./base.css?v=18">
+<link rel="stylesheet" href="./chrome.css?v=18">
+<link rel="stylesheet" href="./binder.css?v=18">
+<link rel="stylesheet" href="./sheets.css?v=18">
+<link rel="stylesheet" href="./summary.css?v=18">
+<link rel="stylesheet" href="./backroom.css?v=18">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -144,20 +135,20 @@
      arrange.js and preview.js only need to be parsed before backroom.js mounts; app.js names all
      four in NEEDS, and backroom.js refuses to render without them, naming the missing file. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./device.js?v=17"></script>
-<script src="./core.js?v=17"></script>
-<script src="./chrome.js?v=17"></script>
-<script src="./settings.js?v=17"></script>
-<script src="./binder.js?v=17"></script>
-<script src="./sheets.js?v=17"></script>
-<script src="./picker.js?v=17"></script>
-<script src="./enter.js?v=17"></script>
-<script src="./summary.js?v=17"></script>
-<script src="./batch.js?v=17"></script>
-<script src="./arrange.js?v=17"></script>
-<script src="./preview.js?v=17"></script>
-<script src="./backroom.js?v=17"></script>
-<script src="./app.js?v=17"></script>
-<script src="./boot.js?v=17"></script>
+<script src="./device.js?v=18"></script>
+<script src="./core.js?v=18"></script>
+<script src="./chrome.js?v=18"></script>
+<script src="./settings.js?v=18"></script>
+<script src="./binder.js?v=18"></script>
+<script src="./sheets.js?v=18"></script>
+<script src="./picker.js?v=18"></script>
+<script src="./enter.js?v=18"></script>
+<script src="./summary.js?v=18"></script>
+<script src="./batch.js?v=18"></script>
+<script src="./arrange.js?v=18"></script>
+<script src="./preview.js?v=18"></script>
+<script src="./backroom.js?v=18"></script>
+<script src="./app.js?v=18"></script>
+<script src="./boot.js?v=18"></script>
 </body>
 </html>
