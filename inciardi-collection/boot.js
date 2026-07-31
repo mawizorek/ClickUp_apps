@@ -21,8 +21,19 @@
        ⚠️ AS OF v16 IT CERTIFIES THE CODE ONLY. It used to be the thing standing between a cached
        `batch.js` and thirty-seven successful writes of the wrong arrangement — but batch data is
        JSON fetched `no-store` now, so it cannot go stale and the stamp no longer speaks for it.
-       Still bump it on every ship; it is how a screenshot says which build produced it. */
-    version: 'v16',
+       Still bump it on every ship; it is how a screenshot says which build produced it.
+
+       🔴 IT CARRIES THE MERGED PR NUMBER, NOT JUST THE VERSION. Footer-stamp hard rule
+       (2026-07-06): `<App> v<N> · PR #<number>`, so a glance at the live page confirms Pages is
+       serving the latest merge rather than a stale build. Version bumps on features; the PR
+       number bumps on every merge that ships one.
+
+       ⚠️ AND IT WAS WRONG. This read `v16` through the whole of v17 — the shell said v17, the
+       footer said v16, and nothing reconciled them because the stamp lives here and the version
+       comment lives there. Two places to state one fact, so one of them rotted, which is the
+       same failure this app's Decision Log has now catalogued seven times. If you bump the
+       header comment in `index.html`, bump THIS LINE in the same commit. */
+    version: 'v18 \u00b7 PR #633',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
