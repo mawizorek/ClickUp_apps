@@ -16,7 +16,7 @@
     appName: 'Inciardi',
     appSub: 'Collection',
     logo: '\uD83D\uDCD5',
-    version: 'v12',
+    version: 'v13',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
@@ -35,24 +35,20 @@
       { route: 'enter',   label: 'Enter',      hint: 'Add a print to the catalog' }
     ],
 
-    /* ============================================================ UNLISTED ROUTES
-     * Routable and titled, NEVER rendered in the nav drawer or the footer. You get here by
-     * knowing the address.
+    /* UNLISTED ROUTES. Routable and titled; not in the nav drawer, not in the page footer.
+     * Surfaced only as a quiet text link at the foot of the SETTINGS panel — the mechanism and
+     * the reasoning are in `settings.js` → hiddenRoutes(). Two things to know from here:
      *
-     * 🔴 WHY THIS LIST HAS TO EXIST AT ALL: the router below validates the incoming hash against
-     * the known routes and falls back to `defaultPage` for anything it does not recognise. That
-     * is the right behaviour for a typo, but it meant ANY route absent from `nav` was
-     * unreachable — #backroom silently opened the binder instead, which reads as the page being
-     * broken rather than hidden. So hidden routes are a real second list, not an exception
-     * threaded through the router.
+     *   🔴 THIS ONE LIST DRIVES THREE THINGS: whether the router resolves the route (the
+     *      `routes` line below), what the header and tab call it (chrome.js), and how you find
+     *      it without an address bar (settings.js). Adding a hidden page stays ONE line — and a
+     *      second place to register one is a second place to forget one.
      *
-     * ⚠️ UNLISTED IS NOT PROTECTED, AND THE APP SHOULD NOT PRETEND OTHERWISE. Public repo,
-     * public Pages site, write key baked into core.js by design. Anyone reading the source finds
-     * this, and could already POST to the worker without it. What concealment buys: a screen
-     * that performs thirty-seven writes is not one tap from the menu. The real protections are
-     * the guards inside backroom.js and D1 Time Travel. */
+     *   ⚠️ UNLISTED IS NOT PROTECTED. Public repo, public site, write key baked into core.js by
+     *      design; anyone reading the source finds this and could POST to the worker without it.
+     *      The real protections are the guards in backroom.js and D1 Time Travel. */
     hidden: [
-      { route: 'backroom', label: 'Back room' }
+      { route: 'backroom', label: 'Back room', hint: 'Load a transcribed batch of prints' }
     ],
 
     sources: [
@@ -60,7 +56,7 @@
     ]
   };
 
-  // Both lists are routable. Only `nav` is ever drawn.
+  // Both lists are routable. Only `nav` is ever drawn as a menu.
   var routes = APP.nav.concat(APP.hidden || []).map(function (n) { return n.route; });
   var lastPing = null, lastError = null, lastAt = null;
 
@@ -72,7 +68,7 @@
   } else {
     // resolve.js absent: themes.css + the data-theme attribute already painted the Mercedes ramp,
     // so this only re-asserts it. Colours survive; the other three vectors fall back to the var()
-    // defaults in base.css. Light mode is unavailable and chrome.js says so out loud.
+    // defaults in base.css. Light mode is unavailable and settings.js says so out loud.
     document.documentElement.setAttribute('data-theme', APP.color);
   }
 
@@ -125,6 +121,14 @@
 
   /* ---------- settings ---------- */
   function wireSettings() {
+    /* 🔴 THE GUARD, AND WHY IT IS NOT PARANOIA. The panel is built by `settings.js` as of v13 and
+     * every line below reaches for a field by id. If that script 404s, `$('apiBase').value`
+     * dereferences null and THIS THROWS — before `go()` runs at the bottom of the file, so the
+     * router never starts and the whole app renders blank. One missing script, total blackout,
+     * no message. chrome.js explains inside the empty drawer; this makes sure the app still
+     * boots to it. */
+    if (!$('writeKey') || !$('apiBase')) return;
+
     /* Show the OVERRIDE, not the effective value: an input pre-filled with something it never
      * saved is a small lie about state, and blanking it would then look like erasing. */
     function paintBase() {
@@ -234,8 +238,8 @@
     /* WHICH MODULES LOADED. After a split, a 404'd script and a screen with no data look
      * identical — this is the line that tells them apart. */
     L.push('modules     ' +
-      ['Device', 'Chrome', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox', 'Summary',
-       'Batch', 'Backroom', 'App']
+      ['Device', 'Chrome', 'Settings', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox',
+       'Summary', 'Batch', 'Backroom', 'App']
         .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
     L.push('hash        ' + (location.hash || '(none)'));
     L.push('worker      ' + API.base() + (API.isDefaultBase() ? '  [built-in]' : '  [OVERRIDDEN here]'));

@@ -1,11 +1,18 @@
 <!-- THE BACK ROOM. An unlisted route (`#backroom`) that writes a transcribed batch into the
-     binder. Not in APP.nav, so not in the drawer, not in the footer, not linked from anywhere.
+     binder. Not in the nav drawer, not in the page footer — reachable from the foot of the
+     SETTINGS panel, and by knowing the address.
 
-     🔴 UNLISTED IS NOT PROTECTED. This is a public repo serving a public site with the write key
-     baked into core.js on purpose — anyone reading the source finds this page, and they could
-     already POST to the worker with curl without it. What the address buys is that a screen doing
-     thirty-seven writes is not one tap from the menu. The real protections are the guards in
-     backroom.js and D1 Time Travel. See the header there.
+     ⚠️ THAT SECOND SENTENCE CHANGED AT v13 AND THIS COMMENT ALMOST DIDN'T. It read "not linked
+     from anywhere", which was true for about eighteen hours. Michael asked for a way in that
+     survives an app with no address bar; the link went into settings.js and this file kept
+     asserting the old shape. Same failure as the dead `ic_color` read and the two defeated
+     banner checks: THE STATEMENT OUTLIVED THE THING IT DESCRIBED.
+
+     🔴 UNLISTED IS NOT PROTECTED, and it is now two taps from anywhere rather than a typed URL.
+     Public repo, public site, write key baked into core.js on purpose — anyone reading the source
+     finds this page, and could already POST to the worker with curl without it. Concealment was
+     never the defence, which is precisely why trading some of it for reachability costs nothing.
+     The defences are the guards in backroom.js and D1 Time Travel.
 
      NO <h1> — the header centres the page title from `hidden[].label` in boot.js (v11). -->
 <section class="page">

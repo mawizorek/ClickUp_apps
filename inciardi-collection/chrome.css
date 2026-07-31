@@ -11,6 +11,8 @@
  * So a brand colour used as INK will fail contrast in one of the two modes — which is exactly
  * what happened: the wordmark and the card initials were `accent-2` (bright mint), invisible on
  * the light ramp. Ink is `--text*` or `--accent-deep`; brand colours fill, they do not letter.
+ * ⚠️ v12 found three MORE instances of this still live in summary.css, two versions after the
+ * rule was written down here. When a class of defect is named, grep the class.
  */
 
 /* ---------- header ----------
@@ -121,6 +123,28 @@
 .drawer-hr { height: 1px; background: var(--border); margin: var(--gap-lg, 20px) 0; }
 .drawer-body details { margin-top: var(--gap-lg, 20px); }
 .drawer-body summary { cursor: pointer; }
+
+/* ---------- unlisted routes, at the foot of the settings panel ----------
+   v13. Michael: "surface back room as a footer text link in the setting menu... not url type in
+   case we build this as an app with no url bar." Rendered from `cfg.hidden` — see the block in
+   settings.js for why that list and not a hardcoded one.
+
+   🔴 DELIBERATELY NOT STYLED LIKE A NAV LINK. A `.nav-link` is a place you go; this is a TOOL
+   that writes to the binder in bulk. Giving the two identical treatment would say they carry the
+   same weight, and they do not. So: no hover fill, a dashed underline instead, quieter type.
+   ⚠️ QUIET IS ABOUT VISUAL WEIGHT, NEVER ABOUT HIT AREA. This keeps the full 44px target — an
+   understated control that is also hard to tap is not subtle, it is broken, and on a phone it
+   reads as the app ignoring you. */
+.drawer-foot { margin-top: var(--gap-md, 12px); }
+.foot-link { display: block; padding: 8px 0; min-height: var(--touch, 44px);
+  text-decoration: none; color: var(--text-soft); }
+.foot-link .fl-t { display: inline-block; font-size: var(--fs-sm, 0.85rem); font-weight: 450;
+  border-bottom: 1px dashed var(--border); }
+.foot-link .fl-h { display: block; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint);
+  margin-top: 1px; }
+.foot-link:hover .fl-t { color: var(--text); border-bottom-color: var(--accent); }
+.foot-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px;
+  border-radius: var(--radius, 6px); }
 
 /* The nav list. Rows carry a hint line, which is what makes a drawer worth more than the inline
    bar it replaced: there was never room for "what is this page for" up there. */
