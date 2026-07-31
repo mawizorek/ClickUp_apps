@@ -1,0 +1,77 @@
+{
+  "_note": "A BATCH. Pure data — no code, no logic, nothing executable. Written by whoever transcribes a sheet of photographs; validated and loaded by batch.js. The procedure is brain-config/hooks/binder-sheet-intake.md. Any key starting with _ is a note to a human and is ignored by the loader.",
+
+  "slug": "drinks",
+  "label": "Sheet 3 · Drinks",
+  "source": "Two photographs from Michael, 2026-07-30. One face each.",
+  "captured": "2026-07-30",
+
+  "_faces_note": "WHICH FACE IS THE FRONT IS AN ASSUMPTION unless a photo shows something that settles it. Nothing in these two images does. Beer was called the back on 07-30 and Michael corrected it to the front on 07-31. Keep this honest: 'assumed' makes the preview screen say 'front and back assumed' out loud, right where someone is about to press the button.",
+  "faces_confidence": "assumed",
+
+  "sheet": {
+    "sheet_id": "sheet-drinks",
+    "binder_id": "mini-binder",
+    "title": "Drinks",
+    "_id_note": "NON-POSITIONAL ON PURPOSE. The older `mini-binder-s1` is the SECOND sheet, because its id was minted from a 0-based order and then everything moved. An id should say what a thing IS, not where it sat the day it was made. sheet_order is deliberately absent — the worker computes MAX+1 at run time, so this lands after whatever exists at the moment it runs."
+  },
+
+  "defaults": {
+    "_note": "Applied to every print. Stated once, because the seventeenth copy is where the typo lives.",
+    "category": "mini",
+    "edition_type": "open",
+    "retail": 1.00,
+    "provenance": "owned",
+    "confidence": "named",
+    "own": true,
+    "qty": 1,
+
+    "_retail_note": "SOURCED, not assumed. inciardiprints.com/pages/mini-print-vending-machine-1 states the Mini Print Vending Machine prices each mini print at one dollar. DOLLARS, never cents. This is the ARTWORK's retail; what Michael paid is copy.acquired_price and is left empty because nobody knows it.",
+    "_edition_type_note": "'open' even for the three Brooklyn Brewery pieces. The brewery called them a limited edition design, but in this schema 'limited' means A RUN OF N NUMBERED IMPRESSIONS. Vending machine minis are not numbered. Marketing language is not an edition type.",
+    "_confidence_note": "'named' is honest here ONLY because Ana hand-writes the title on the lower margin of every card, so these were read, not guessed. If a title is inferred from the artwork alone, that print needs its own \"confidence\": \"inferred\" — see the per-print override in the hook.",
+    "_acquired_where_note": "NOT SET, deliberately. Vending machine, pop-up, shop and trade are all plausible and none is known. A plausible guess in a data field is worse than a blank: the blank is honest, the guess is indistinguishable from a fact.",
+    "_collection_note": "There is no collection_id anywhere in this file and that is CORRECT. artwork.collection_id is a real FK, there is no POST /collection route, and more importantly schema.sql draws the line: a collection is WHAT THE ARTIST RELEASED, a sheet is HOW MICHAEL LAID IT OUT. These eighteen are an arrangement. The SHEET carries the grouping."
+  },
+
+  "_prints_note": "side is 'A' or 'B' — what the DATABASE stores (CHECK side IN ('A','B')). Front and Back are what a person reads; binder.js owns that mapping and nothing else should. position is 0-8 in reading order, left to right then top to bottom. The UI shows position + 1.",
+
+  "prints": [
+    { "side": "A", "position": 0, "id": "pbr", "name": "PBR",
+      "notes": "A Pabst Blue Ribbon can. Signed AI." },
+    { "side": "A", "position": 1, "id": "rainier-beer", "name": "Rainier Beer",
+      "notes": "A Rainier can. Signed ANA INC." },
+    { "side": "A", "position": 2, "id": "brooklyn-pilsner", "name": "Brooklyn Pilsner",
+      "notes": "A yellow Brooklyn Brewery pilsner can. Brooklyn Brewery tasting-room collab, May 2024 — announced as a teeny Pilsner can. Signed AI." },
+    { "side": "A", "position": 3, "id": "brooklyn-lager", "name": "Brooklyn Lager",
+      "notes": "A Brooklyn Lager bottle. Brooklyn Brewery collab. Signed AI." },
+    { "side": "A", "position": 4, "id": "sportini", "name": "Sportini",
+      "notes": "A martini with a soccer ball and a basketball where the olives go. Signed ANA INC." },
+    { "side": "A", "position": 5, "id": "allagash", "name": "Allagash",
+      "notes": "An Allagash White can, mountains on the label. Signed ANA INC." },
+    { "side": "A", "position": 6, "id": "lunch-bottle", "name": "Lunch Bottle",
+      "notes": "A Maine Beer Company Lunch IPA bottle. Signed ANA INC." },
+    { "side": "A", "position": 7, "id": "guinness", "name": "Guinness",
+      "notes": "A pint of Guinness, full head. Signed ANA INC." },
+    { "side": "A", "position": 8, "id": "pony", "name": "Pony",
+      "notes": "A Miller High Life pony bottle. Signed AI." },
+
+    { "side": "B", "position": 0, "id": "wine", "name": "Wine",
+      "notes": "Four bottles in a row. The card is captioned Wine* , asterisk and all; stored as Wine. Signed ANA INC." },
+    { "side": "B", "position": 1, "id": "six-pack", "name": "Six Pack",
+      "notes": "A Corona Extra six-pack in its carrier. Signed ANA INC." },
+    { "side": "B", "position": 2, "id": "champagne-tower", "name": "Champagne Tower",
+      "notes": "A stacked tower of coupe glasses. Signed ANA INC." },
+    { "side": "B", "position": 3, "id": "cocktail-shaker", "name": "Cocktail Shaker",
+      "notes": "A steel three-piece cobbler shaker. Signed ANA INC." },
+    { "side": "B", "position": 4, "id": "the-black-barn", "name": "The Black Barn",
+      "notes": "A dark timber barn, the one non-drink on the sheet. Its title is hand-written VERTICALLY inside the image rather than on the lower margin like every other card here. Signed ANA INC." },
+    { "side": "B", "position": 5, "id": "martini", "name": "Martini",
+      "notes": "A dirty martini, three olives on the pick. Signed AI." },
+    { "side": "B", "position": 6, "id": "topo-chico", "name": "Topo Chico",
+      "notes": "A Topo Chico mineral water bottle. Signed AI." },
+    { "side": "B", "position": 7, "id": "best-friends", "name": "Best Friends!",
+      "notes": "A barley stalk and a hop cone holding hands. Brooklyn Brewery tasting-room collab, May 2024 — the brewery announced the run as containing a sweet meeting between hops and barley, which is this card. Signed AI." },
+    { "side": "B", "position": 8, "id": "bottle-cap", "name": "Bottle Cap",
+      "notes": "A single crimped bottle cap, seen face on. Signed AI." }
+  ]
+}
