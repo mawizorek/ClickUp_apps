@@ -1,47 +1,34 @@
 /* Inciardi Collection — THE ARRANGEMENT EDITOR. Owns WHERE each print sits, plus its own surface.
  *
- * ============================================================================
- * 🔴 WHY THIS FILE EXISTS: A CONFIRMATION SCREEN YOU CANNOT CORRECT IS A TRIVIA QUESTION.
+ * WHY IT EXISTS, once: v16's confirm screen listed eighteen rows as `front 1 Ninja Turtle`, and an
+ * entire sheet went into D1 90° out of true past a green validator — because checking a 3x3 from a
+ * flat list means doing position arithmetic in your head against an object in your other hand.
+ * Michael: "the preview grid is only helpful if i can edit it." Full account: PR #630 + the
+ * orientation step in `brain-config/hooks/batch-import.md`. Not restated in three files.
  *
- * Michael, 2026-07-31: "the slots did not line up at all with what's true... or make it editable
- * to me before committing" — then, offered a read-only 3x3 grid: "the preview grid is only helpful
- * if i can edit it."
+ * CONTROLS ARE ORDERED BY THE ERRORS THAT ACTUALLY HAPPENED, and both were RIGID TRANSFORMS of an
+ * otherwise correct reading: `ice-cream` was one 90° rotation on both faces, `drinks` had its two
+ * faces inverted. So rotate / mirror / swap-faces come first and per-pocket swapping is the
+ * fallback — three taps beat eighteen, and eighteen taps is where fresh mistakes come from.
  *
- * He is right, and the reason is mechanical. v16's preview listed eighteen rows as `front 1 Ninja
- * Turtle`. Checking a 3x3 arrangement against the sheet in your hand from a flat list means doing
- * position arithmetic in your head — so the single class of error present in that batch was the
- * one class the screen could not surface. A grid fixes SEEING it. Only editing fixes IT.
+ * 🔴 THE INVARIANT THAT MAKES THIS SAFE: EVERY OPERATION IN HERE IS A PERMUTATION. Rotate, mirror,
+ * swap-faces and pocket-swap all MOVE ids between pockets; none can add, remove or duplicate one.
+ * So everything `batch.js` validated — names present, ids legal, nothing placed twice, nothing
+ * described but never placed — stays true whatever you press, and does not need re-running.
+ * `check()` ASSERTS it after every op instead of trusting it: an editor that quietly dropped a
+ * print would produce a sheet with a hole and a run log that read perfectly clean.
  *
- * WHAT ACTUALLY WENT WRONG, because it dictates which controls come first: the ice-cream sheet was
- * photographed on its side and transcribed row-wise anyway, so all eighteen cards were off by ONE
- * 90-degree rotation, identical on both faces. Not a scramble. The Drinks sheet before it had its
- * two faces inverted. Both are RIGID TRANSFORMS of an otherwise correct reading, which is why
- * rotate / mirror / swap-faces are the primary controls and per-cell swapping is the fallback:
- * three taps beat eighteen, and eighteen taps is where new mistakes come from.
+ * ⚠️ AND THE HAZARD THAT COMES WITH IT: EDITING HERE DOES NOT EDIT THE FILE. `batches/<name>.json`
+ * is static and this app cannot write to the repo, so the moment you correct something and import,
+ * D1 is right and the file is wrong. The dangerous half is LATER: slots are written `ON CONFLICT DO
+ * UPDATE`, so a future import from that unfixed file would silently re-seat every print back into
+ * the wrong pocket and log a clean run doing it. Hence the drift banner and one-tap "Copy corrected
+ * grids". It WARNS rather than BLOCKS — gating a correction behind a clipboard round-trip on a
+ * phone makes the honest path the slow one, and the slow path is the one that gets skipped.
  *
- * 🔴 THE INVARIANT THAT MAKES THIS SAFE: EVERY OPERATION IN HERE IS A PERMUTATION.
- * Rotate, mirror, swap-faces and cell-swap all MOVE ids between pockets. None can add an id,
- * remove one, or duplicate one. So everything batch.js validated — names present, ids legal,
- * nothing placed twice, nothing described but never placed — stays true no matter what you press,
- * and does not need re-running against an edited arrangement. `check()` ASSERTS that after every
- * op instead of trusting it, because an editor that quietly dropped a print would produce a sheet
- * with a hole and a run log that read perfectly clean.
- *
- * ⚠️ AND THE HAZARD THAT ARRIVES WITH IT: EDITING HERE DOES NOT EDIT THE FILE.
- * `batches/<name>.json` is static and this app cannot write to the repo. So the moment you rotate
- * something and import it, D1 is right and the file is wrong — two claimants on one truth, and the
- * dangerous half is LATER: slots are written `ON CONFLICT DO UPDATE`, so a future re-import from
- * that unfixed file would silently re-seat every print back into the wrong pocket and log a clean
- * run while doing it. That is why a dirty arrangement paints a banner, and why "Copy corrected
- * grids" is one tap — the fix has to be as cheap as the mistake. It WARNS rather than BLOCKS:
- * gating a correction behind a clipboard round-trip on a phone would make the honest path the
- * slow one, and the slow path is the one that gets skipped.
- * ============================================================================
- *
- * SEAM: this file owns arrangement STATE and the arrangement SURFACE together, deliberately. The
- * grid markup is a direct projection of the private grids below; splitting them would mean
- * exporting the grid shape purely so another file could loop over it. `preview.js` still composes
- * the page and still decides nothing — it asks for this block and drops it in.
+ * SEAM: state and surface live together on purpose. The grid markup is a direct projection of the
+ * private grids below; splitting them would mean exporting the grid shape purely so another file
+ * could loop it. `preview.js` still composes the page and still decides nothing.
  */
 (function () {
 
@@ -56,9 +43,9 @@
   function clone(g) { return g ? g.map(function (r) { return r.slice(); }) : null; }
   function key(side, pos) { return side + pos; }
 
-  /* The flat list every other file speaks, rebuilt from the grids. Front-then-back in reading
-   * order by construction, which is the order `batch.js` sorted into and the order the run log
-   * comes out in — so a person can follow the log down the physical sheet. */
+  /* The flat list every other file speaks. Front-then-back in reading order by construction — the
+   * order `batch.js` sorted into and the order the run log comes out in, so the log can be followed
+   * down the physical sheet. */
   function flatten(g) {
     var out = [];
     ['A', 'B'].forEach(function (side) {
@@ -79,11 +66,10 @@
     return flatten(g).map(function (p) { return p.id; }).sort().join('|');
   }
 
-  /* 🔴 THE PERMUTATION ASSERTION. Runs after every operation, compares the multiset of placed ids
-   * against what the file declared, and REVERTS the operation if they differ. This can only fire
-   * on a bug in the transforms below — which is exactly why it is here rather than in a comment
-   * claiming they are correct. A dropped or duplicated print is invisible on a 3x3 of short names
-   * and would sail through the run as a clean log. */
+  /* 🔴 THE PERMUTATION ASSERTION. Compares the multiset of placed ids against what the file declared
+   * and REVERTS the operation if they differ. It can only fire on a bug in the transforms below —
+   * which is why it is here rather than in a comment claiming they are correct. A dropped or
+   * duplicated print is invisible on a 3x3 of short names. */
   function check(before, label) {
     if (census(grids) === census(base)) return true;
     grids = before;
@@ -103,8 +89,8 @@
   }
 
   /* ---------------------------------------------------------------- THE TRANSFORMS
-   * Index arithmetic in ONE place, each verified against a worked 3x3 in its own comment. This is
-   * the class of code that is wrong 25% of the time and looks right 100% of the time. */
+   * Index arithmetic in ONE place, each verified against a worked 3x3. This is the class of code
+   * that is wrong 25% of the time and looks right 100% of the time. */
 
   //  a b c        g d a
   //  d e f   →    h e b        new[r][c] = old[2-c][r]
@@ -124,9 +110,9 @@
     return n;
   }
 
-  /* MIRROR EARNS ITS BUTTON, it is not symmetry for its own sake. Turning a binder page over
+  /* MIRROR EARNS ITS BUTTON, it is not symmetry for its own sake: turning a binder page over
    * reverses left and right, so a back face photographed as if it were a front face is
-   * horizontally flipped — a real, likely transcription error with no rotation involved. */
+   * horizontally flipped — a likely error with no rotation in it. */
   function mirror(g) {
     return g.map(function (row) { return row.slice().reverse(); });
   }
@@ -148,15 +134,15 @@
   }
 
   /* Legal on a one-sided sheet too: a lone face photographed as the front when it was the back is
-   * precisely the Drinks mistake, and it moves every print from side A to side B. */
+   * exactly the `drinks` mistake, and it moves every print from side A to side B. */
   function swapFaces() {
     apply('swap front ↔ back', function () {
       var a = grids.A; grids.A = grids.B; grids.B = a;
     });
   }
 
-  /* Two taps, no dragging. Drag-and-drop on a phone competes with page scroll and needs a long
-   * press to disambiguate; tap-select-tap works with one thumb and reads back what it is doing.
+  /* Two taps, no dragging: drag on a phone competes with page scroll and needs a long press to
+   * disambiguate, while tap-select-tap works one-thumbed and reads back what it is doing.
    * Cross-face swaps come free because both grids are on screen at once. */
   function tap(side, pos) {
     if (!grids[side]) return;
@@ -185,6 +171,7 @@
 
   /* ---------------------------------------------------------------- HELPERS */
 
+  /* Binder.face() is the ONE place 'A'/'B' becomes Front/Back (binder.js). Borrowed, never copied. */
   function faceWord(side) {
     return (window.Binder && Binder.face) ? Binder.face(side).toLowerCase()
                                           : (side === 'A' ? 'front' : 'back');
@@ -203,10 +190,9 @@
 
   function dirty() { return JSON.stringify(grids) !== JSON.stringify(base); }
 
-  /* The corrected grids, in the exact shape the batch file wants them pasted back as. Emitting the
+  /* The corrected grids in the exact shape the batch file wants them pasted back as. Emitting the
    * WHOLE file would be worse: it would go stale against every other field the moment anyone edits
-   * a note, and it invites replacing a file wholesale from a screen that only ever knew about
-   * positions. Two keys, nothing else. */
+   * a note, and it invites replacing a file wholesale from a screen that only knows positions. */
   function json() {
     function block(g) {
       if (!g) return null;
@@ -243,33 +229,27 @@
   function face(side, verdicts) {
     if (!grids[side]) return '';
     var cells = '';
-    for (var p = 0; p < 9; p++) {
-      var v = verdicts[key(side, p)];
-      cells += cell(side, p, v);
-    }
+    for (var p = 0; p < 9; p++) cells += cell(side, p, verdicts[key(side, p)]);
+    var w = esc(faceWord(side));
     return '<section class="ar-face">' +
       '<div class="ar-fh">' +
-        '<h3 class="ar-fn">' + esc(faceWord(side)) + '</h3>' +
+        '<h3 class="ar-fn">' + w + '</h3>' +
         '<div class="ar-tools">' +
           '<button type="button" data-ar="ccw" data-side="' + side + '"' +
-            ' title="Rotate this face 90° left" aria-label="Rotate ' + esc(faceWord(side)) +
-            ' left">↺</button>' +
+            ' aria-label="Rotate ' + w + ' 90 degrees left">↺</button>' +
           '<button type="button" data-ar="cw" data-side="' + side + '"' +
-            ' title="Rotate this face 90° right" aria-label="Rotate ' + esc(faceWord(side)) +
-            ' right">↻</button>' +
+            ' aria-label="Rotate ' + w + ' 90 degrees right">↻</button>' +
           '<button type="button" data-ar="flip" data-side="' + side + '"' +
-            ' title="Mirror this face left–right" aria-label="Mirror ' + esc(faceWord(side)) +
-            '">⇄</button>' +
+            ' aria-label="Mirror ' + w + ' left to right">⇄</button>' +
         '</div>' +
       '</div>' +
       '<div class="ar-grid">' + cells + '</div>' +
     '</section>';
   }
 
-  /* The grid is laid out like the sheet, so "is this right" is a glance at the object in your hand
-   * rather than arithmetic. It does NOT replace the verdict table below it: the grid answers WHERE
-   * each print goes, the table answers WHAT HAPPENS to it (new / place only / replaces what is
-   * there) with room for full names and ids. Two questions, two surfaces, on purpose. */
+  /* Laid out like the sheet, so "is this right" is a glance rather than arithmetic. It does NOT
+   * replace the verdict table below: the grid answers WHERE a print goes, the table answers WHAT
+   * HAPPENS to it, with room for a full name and an id. */
   function html(plan) {
     var verdicts = {};
     (plan && plan.rows || []).forEach(function (r) {
@@ -291,10 +271,8 @@
     '</div>';
   }
 
-  /* 🔴 THE DRIFT BANNER. Only ever drawn when the arrangement no longer matches the file, and it
-   * names the consequence rather than the state — "edited" is not information, "the next import
-   * from this file will undo it" is. Lists the ops so the receipt is legible, and hands over the
-   * two JSON keys to paste back. */
+  /* Only drawn when the arrangement no longer matches the file, and it names the CONSEQUENCE rather
+   * than the state — "edited" is not information, "the next import from this file will undo it" is. */
   function drift() {
     if (!dirty()) return '';
     return '<div class="ar-drift">' +
@@ -312,9 +290,9 @@
     '</div>';
   }
 
-  /* Re-wired after every render, because the host replaces its own innerHTML. One delegated
-   * listener on the container rather than nine-plus per face: fewer handles to leak and the cells
-   * are rebuilt on every change anyway. */
+  /* Re-wired after every render, because the host replaces its own innerHTML. ONE delegated listener
+   * rather than a dozen per face: fewer handles to leak, and the cells are rebuilt on every change
+   * anyway. */
   function wire() {
     var host = document.getElementById('brArrange');
     if (!host) return;
@@ -333,10 +311,9 @@
     });
   }
 
-  /* Reveals the text AND tries the clipboard, in that order of trust. `navigator.clipboard` needs
-   * a secure context and can be refused without explanation; a visible <pre> he can select by hand
-   * always works, and this screen's whole premise is not claiming something happened when it may
-   * not have. */
+  /* Reveals the text AND tries the clipboard, in that order of trust. `navigator.clipboard` needs a
+   * secure context and can be refused without explanation; a visible <pre> always works, and this
+   * screen does not claim things happened that may not have. */
   function copy() {
     var pre = document.getElementById('arJson');
     var text = json();
@@ -353,8 +330,8 @@
   }
 
   window.Arrange = {
-    /* Called once per loaded batch, BEFORE the plan is built — everything downstream reads
-     * positions from here, so an unseeded editor would plan against nothing. */
+    /* Called once per loaded batch, BEFORE the plan is built — everything downstream reads positions
+     * from here, so an unseeded editor would plan against nothing. */
     from: function (batch) {
       var g = { A: null, B: null };
       dict = {};

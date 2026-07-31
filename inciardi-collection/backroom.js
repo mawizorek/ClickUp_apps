@@ -18,15 +18,17 @@
  *   - Add a second copy of a print you already own. A re-run is a no-op, not a double.
  *   - v17: write an arrangement other than the one currently on screen.
  *
- * 🔴 v17 — THE ARRANGEMENT IS NO LONGER THE FILE'S TO DICTATE, AND EVERY READ OF IT MOVED.
- * `Arrange.prints()` replaces `B.prints` in `build()` and in BOTH loops of `apply()`. That is the
- * whole integration, and it has to be all three: planning from the grid while writing from the file
- * would show him a corrected sheet and then write the broken one, which is worse than not offering
- * the editor at all. `B` keeps `artworkBody()` / `slotBody()` — they only ever read a print's own
- * fields, so an arranged print passes through them unchanged.
+ * 🔴 v17 — EVERY READ OF THE ARRANGEMENT MOVED TO `Arrange.prints()`: `build()` and BOTH loops of
+ * `apply()`. It has to be all three, because planning from the grid while writing from the file
+ * would show a corrected sheet and then write the broken one — worse than never offering the editor.
+ * `B` keeps `artworkBody()` / `slotBody()`; they only read a print's own fields, so an arranged
+ * print passes through unchanged. Rationale for the editor itself lives in `arrange.js`.
  *
- * ⚠️ THE REMAINING SEAM, for whoever adds the next feature: PLAN vs APPLY. `preflight` / `build`
- * read and decide; `apply` / `chain` / `log` write. They share only `live` and `plan`.
+ * ⚠️ THE REMAINING SEAM: PLAN vs APPLY. `preflight` / `build` read and decide; `apply` / `chain` /
+ * `log` write, sharing only `live` and `plan`. DODGED TWICE NOW (v15 took the markup, v17 took the
+ * arrangement) on the same real reason — do not refactor the write path on a day someone is about
+ * to push irreversible writes through it. That reason does not expire, but the excuse is now load
+ * bearing for a file 1.5KB over the split line. Take it next, on a quiet day.
  */
 (function () {
   var files = [];         // every batch in batches/_index.json
@@ -35,22 +37,21 @@
   var plan = null;        // what we intend to do about it
   var running = false;
   /* ⚠️ THE OVERRIDE SURVIVES A RE-RENDER, and that is a v17 fix rather than a nicety. Editing the
-   * arrangement re-renders the screen, which rebuilds the checkbox unticked — so on the exact sheet
-   * that needs fixing (already imported, therefore occupied, therefore blocked) every single tap
-   * would have silently re-armed the block. The state belongs to the session, not to the node. */
+   * arrangement re-renders, which rebuilds the checkbox unticked — so on the exact sheet that needs
+   * fixing (already imported, therefore occupied, therefore blocked) every tap would have silently
+   * re-armed the block. The state belongs to the session, not to the node. */
   var overridden = false;
 
   function $(id) { return document.getElementById(id); }
 
-  /* WHERE THE PRINTS GO. One call per use, never cached across a render: `arrange.js` is the only
-   * thing that knows, and a stale copy of an arrangement is precisely the bug this screen exists
-   * to catch. */
+  /* WHERE THE PRINTS GO. Never cached across a render: `arrange.js` is the only thing that knows,
+   * and a stale copy of an arrangement is the bug this screen exists to catch. */
   function placed() { return Arrange.prints(); }
 
   /* ---------------------------------------------------------------- MOUNT
-   * A chain now, because the batch lives on disk: list → choose → load → validate → preflight.
-   * Each step can fail in its own way and each says which one it was. "Nothing happened" is not
-   * an acceptable outcome on the screen that performs bulk writes. */
+   * A chain, because the batch lives on disk: list → choose → load → validate → preflight. Each step
+   * can fail in its own way and each says which one it was. "Nothing happened" is not an acceptable
+   * outcome on the screen that performs bulk writes. */
   function mount() {
     var host = $('brWrap');
     var missing = !window.Batch ? 'batch.js' : !window.Preview ? 'preview.js'
@@ -62,9 +63,9 @@
       return;
     }
 
-    /* Any edit to the arrangement re-plans against the SAME server snapshot and repaints. No
-     * refetch: only positions changed, so re-reading the binder would be a slow way to get the
-     * same answer — and "Re-read the binder" is a button he can press when he wants one. */
+    /* An edit re-plans against the SAME server snapshot and repaints. No refetch: only positions
+     * changed, so re-reading the binder would be a slow way to get the same answer — and "Re-read
+     * the binder" is a button he can press when he wants one. */
     Arrange.onChange(function () {
       if (!B || !live) return;
       plan = build();
@@ -85,9 +86,9 @@
     }).catch(function (e) { Core.fail(host, e); });
   }
 
-  /* Load one batch and either preflight it or show why it cannot be run. A validation failure is
-   * a NORMAL outcome here, rendered in full — the whole point of moving batches to data files is
-   * that a transcription mistake becomes a readable list instead of a 400 mid-run. */
+  /* Load one batch and either preflight it or show why it cannot be run. A validation failure is a
+   * NORMAL outcome here, rendered in full — the whole point of batches being data files is that a
+   * transcription mistake becomes a readable list instead of a 400 mid-run. */
   function open(file) {
     var host = $('brWrap');
     Core.busy(host, 'Reading ' + file + '\u2026');
@@ -99,8 +100,8 @@
         return;
       }
       B = res.batch;
-      /* Seed the editor from the file BEFORE anything is planned, and reset the override with it:
-       * consent to overwrite one sheet is not consent to overwrite the next one you pick. */
+      /* Seed the editor BEFORE anything is planned, and reset the override with it: consent to
+       * overwrite one sheet is not consent to overwrite the next one you pick. */
       Arrange.from(B);
       overridden = false;
       preflight();
@@ -138,8 +139,8 @@
   }
 
   /* Compare the arrangement against live and decide, per row, what will happen. Nothing here sends
-   * anything — this function's whole job is to make the run predictable in advance, and it is
-   * the ONLY place any of these numbers are worked out. preview.js decides nothing. */
+   * anything — this function's job is to make the run predictable in advance, and it is the ONLY
+   * place any of these numbers are worked out. preview.js decides nothing. */
   function build() {
     var sheetExists = !!live.sheets[B.sheet.sheet_id];
     var occupied = Object.keys(live.slots).length;
@@ -185,9 +186,9 @@
       // HTTP calls. NOT the same number as the prints, and NOT the same number as the rows.
       calls: newArts + (sheetExists ? 0 : 1) + rows.length,
       /* Rows D1 actually gains. Each POST /artwork writes THREE: the artwork, the implicit
-       * edition its trigger mints (schema.sql — every artwork has at least one edition), and an
-       * ownership row because the batch says `own`. Computed because the old button said "Write
-       * 37 rows" and 37 was the CALL count: wrong in both directions at once. */
+       * edition its trigger mints (schema.sql), and an ownership row because the batch says
+       * `own`. Computed because the old button said "Write 37 rows" and 37 was the CALL count:
+       * wrong in both directions at once. */
       dbRows: newArts * 3 + (sheetExists ? 0 : 1) + rows.length
     };
   }
@@ -285,9 +286,8 @@
             '  \u00b7  ' + B.file + '  \u00b7  build ' +
             (window.ICApp ? ICApp.version : '?') + '\n');
 
-    /* 🔴 THE RECEIPT NAMES THE EDITS. A log that says nothing about the corrections is a log that
-     * cannot later answer "why does D1 disagree with the file" — the one question a drifted
-     * arrangement guarantees somebody eventually asks. */
+    /* 🔴 THE RECEIPT NAMES THE EDITS — otherwise the log cannot later answer "why does D1 disagree
+     * with the file", the one question a drifted arrangement guarantees somebody asks. */
     if (Arrange.dirty()) {
       log('', 'Arrangement EDITED on screen before this run:');
       Arrange.ops().forEach(function (o) { log('', '    \u00b7 ' + o); });
@@ -301,7 +301,6 @@
 
     // 1. PRINTS FIRST. slot.artwork_id is a foreign key; placing before the artwork exists is an
     //    unwriteable row, not a race. Skip the ones already in the catalog.
-    //    One call, three rows: artwork, its implicit edition (trigger), and the ownership row.
     list.forEach(function (p) {
       if (live.arts[p.id]) return;
       steps.push({
