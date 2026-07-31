@@ -1,19 +1,25 @@
 /* Inciardi Collection — THE BACK ROOM. Runs a transcribed batch into the binder.
  *
  * ============================================================================
- * WHY THIS ROUTE IS UNLISTED, AND WHAT THAT IS AND IS NOT WORTH.
+ * HOW YOU GET HERE, AND WHAT THAT IS AND IS NOT WORTH.
  *
- * Michael: make it somewhat secret to get to. So: `#backroom` is absent from APP.nav, absent
- * from the drawer, absent from the footer, and `<meta name=robots>` already says noindex. You
- * reach it by knowing the address.
+ * `#backroom` is absent from `APP.nav`, so it is absent from the nav drawer and the page footer,
+ * and the site is `noindex`. It IS listed at the foot of the settings panel (v13, from
+ * `APP.hidden`) and it is reachable by typing the address.
  *
- * 🔴 THAT IS CONCEALMENT, NOT SECURITY, AND SAYING OTHERWISE WOULD BE A LIE THE APP TELLS
- * ITSELF. This is a public repo serving a public Pages site with the write key baked into
- * core.js on purpose. Anyone who reads the source can find this route and can already POST to
- * the worker directly with curl — a hidden route protects nothing from them. What it DOES buy
- * is real and worth having: a screen that performs thirty-seven writes is not one tap from the
- * menu, and it is not something anyone stumbles into.
- * The actual protections are the three GUARDS below and D1 Time Travel. Not the URL.
+ * ⚠️ THAT SETTINGS LINK IS NEW AND THIS PARAGRAPH USED TO DENY IT. Michael, 2026-07-31: "not url
+ * type in case we build this as an app with no url bar" — which is not a convenience note, it is
+ * a REACHABILITY BUG. Installed to a home screen and running standalone there is no address bar,
+ * so a URL-only route is a route that does not exist in that form of the app. Hiding a page
+ * behind an address is fine. Hiding it behind an address nobody can type is losing the page.
+ *
+ * 🔴 THE THREAT MODEL DID NOT MOVE WHEN THE DOOR DID, AND THAT IS THE WHOLE ARGUMENT. This is a
+ * public repo serving a public Pages site with the write key baked into core.js on purpose.
+ * Anyone who reads the source finds this route and can already POST to the worker directly with
+ * curl — a hidden route protected nothing from them yesterday and protects nothing today. All
+ * concealment ever bought was that a screen performing thirty-seven writes is not one tap from
+ * the main menu, and it still isn't: it is behind the gear, below the fold, under a divider.
+ * THE ACTUAL PROTECTIONS ARE THE THREE GUARDS BELOW AND D1 TIME TRAVEL. Never the URL.
  * ============================================================================
  *
  * WHAT THIS SCREEN REFUSES TO DO:
