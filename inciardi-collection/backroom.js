@@ -29,6 +29,7 @@
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return Core.esc(s); }
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
 
   /* ---------------------------------------------------------------- PREFLIGHT
    * READ FIRST, ALWAYS. The batch was written hours ago against a binder that has since been
@@ -86,6 +87,10 @@
       };
     });
 
+    var newArts = rows.filter(function (r) { return r.artState === 'new'; }).length;
+    var faces = {};
+    B.prints.forEach(function (p) { faces[p.side] = 1; });
+
     return {
       sheetExists: sheetExists,
       occupied: occupied,
@@ -97,36 +102,59 @@
       // by the rule, and so is every sheet he makes tomorrow.
       blocked: sheetExists && occupied > 0,
       rows: rows,
-      newArts: rows.filter(function (r) { return r.artState === 'new'; }).length,
-      haveArts: rows.filter(function (r) { return r.artState === 'have'; }).length,
-      clashes: rows.filter(function (r) { return r.slotState === 'clash'; }).length
+      newArts: newArts,
+      haveArts: rows.length - newArts,
+      faces: Object.keys(faces).length,
+      clashes: rows.filter(function (r) { return r.slotState === 'clash'; }).length,
+      // HTTP calls, which is NOT the same number as either the prints or the database rows.
+      calls: newArts + (sheetExists ? 0 : 1) + rows.length,
+      /* Rows D1 will actually gain. Each POST /artwork writes THREE: the artwork, the implicit
+       * edition its trigger mints (schema.sql — every artwork has at least one edition), and an
+       * ownership row because the batch says `own`. Stated because the old button said "Write 37
+       * rows" and 37 was the CALL count — wrong in both directions at once. */
+      dbRows: newArts * 3 + (sheetExists ? 0 : 1) + rows.length
     };
   }
 
   /* ---------------------------------------------------------------- RENDER */
   function render() {
     var B = window.Batch;
-    var writes = plan.newArts + (plan.sheetExists ? 0 : 1) + B.prints.length;
 
-    /* 🔴 THE BUILD STAMP IS NOT DECORATION. Everywhere else a stale cache is cosmetic. HERE it
-     * writes the WRONG DATA into D1 permanently and logs thirty-seven successes, because this
-     * runner applies whatever payload it was handed and cannot know the payload is old. The v14
-     * front/back swap is exactly that shape: same names, same count, same green log, opposite
-     * arrangement. Reads the SAME constant the footer reads — a second copy of a version number
-     * is a version number that will eventually lie. */
-    var stamp = window.ICApp ? ICApp.version : '(version unknown)';
-
+    /* ============================================================ THE HEADLINE
+     * Michael, 2026-07-31: "its a little misleading to say it as that number cos to me it seems
+     * like 18 since i gave you two full filled sheets of 9... it really should be headlined as
+     * 'importing 18 prints into 18 scanned slots over 1 sheet assumed front/back'."
+     *
+     * 🔴 HE IS RIGHT, AND THE BUTTON WAS WORSE THAN MISLEADING — IT WAS WRONG. It read "Write 37
+     * rows". 37 is the count of HTTP CALLS. The number of DATABASE ROWS is 73, because each
+     * POST /artwork also mints an implicit edition (trigger) and an ownership row. So the single
+     * number on the button was simultaneously too big to describe the work and too small to
+     * describe the writes, and it was the number a person had to press.
+     *
+     * THE RULE: A CONFIRMATION SCREEN HEADLINES THE WORK, IN THE UNITS OF THE THING BEING DONE.
+     * Eighteen prints into eighteen slots on one sheet — that is the sentence someone can check
+     * against the physical object in their hand, which is the only check that matters here. The
+     * call count and the row count are MECHANICS: useful for reading the log afterwards, useless
+     * for deciding whether to press the button, so they go underneath in small type.
+     *
+     * "FRONT AND BACK ASSUMED" IS HIS PHRASE AND IT STAYS ON SCREEN. Even after the v14 swap,
+     * WHICH face is the front remains an assumption — no photograph of a loose sheet says. The
+     * screen should keep admitting that at the moment of writing rather than only in a code
+     * comment nobody reads at 10am. */
     var head =
       '<div class="br-head">' +
-        '<div class="br-what"><b>' + esc(B.label) + '</b>' +
-          '<span>' + esc(B.source) + '</span>' +
-          '<span class="br-build">build ' + esc(stamp) + '</span></div>' +
-        '<div class="mx">' +
-          cell(B.prints.length, 'cards', 'on the sheet') +
-          cell(plan.newArts, 'new', 'not in the catalog') +
-          cell(plan.haveArts, 'known', 'already there') +
-          cell(writes, 'writes', 'calls to send') +
-        '</div></div>';
+        '<h2 class="br-line">Importing <b>' + plural(B.prints.length, 'print', 'prints') +
+          '</b> into <b>' + plural(plan.rows.length, 'scanned slot', 'scanned slots') +
+          '</b> over <b>' + plural(1, 'sheet', 'sheets') + '</b>' +
+          (plan.faces === 2 ? ', front and back assumed' : '') + '.</h2>' +
+        '<p class="br-sub">' + esc(B.label) + ' \u00b7 ' + esc(B.source) + '</p>' +
+        '<p class="br-mech">' +
+          plan.calls + ' calls \u00b7 ' + plan.dbRows + ' database rows \u00b7 ' +
+          plan.newArts + ' new to the catalog' +
+          (plan.haveArts ? ', ' + plan.haveArts + ' already known' : '') +
+          ' \u00b7 build ' + esc(window.ICApp ? ICApp.version : '?') +
+        '</p>' +
+      '</div>';
 
     /* THE TARGET, spelled out. A screen that writes to a sheet should say which sheet, by id,
      * before it does — the difference between a new sheet and someone's working one is a single
@@ -165,23 +193,21 @@
         '<th>Slot</th><th>Print</th><th>What happens</th>' +
       '</tr></thead><tbody>' + body + '</tbody></table></div>' +
 
+      /* The button says the WORK too. "Import 18 prints" is checkable against the sheet in your
+       * hand; "Write 37 rows" was a number only this file could have produced. */
       '<div class="br-go">' +
         '<button id="brRun" class="primary"' + (plan.blocked ? ' disabled' : '') + '>' +
-          'Write ' + writes + ' rows</button>' +
+          'Import ' + plural(B.prints.length, 'print', 'prints') + '</button>' +
         '<button id="brRecheck" class="ghost">Re-read the binder</button>' +
       '</div>' +
       '<p class="hint">Order is forced: prints first, then the sheet, then the slots \u2014 a ' +
-      'slot cannot reference an artwork that does not exist yet. Writes go one at a time and ' +
-      'stop at the first real failure, so a bad row leaves the rest unsent rather than half ' +
-      'applied. A print you already own is skipped, never added twice.</p>' +
+      'slot cannot reference an artwork that does not exist yet. Each print is three rows: the ' +
+      'print itself, its edition, and your copy of it. Writes go one at a time and stop at the ' +
+      'first real failure, so a bad row leaves the rest unsent rather than half applied. A print ' +
+      'you already own is skipped, never added twice.</p>' +
       '<pre id="brLog" class="out" hidden></pre>';
 
     wire();
-  }
-
-  function cell(v, label, sub) {
-    return '<div class="mx-c"><div class="v num">' + v + '</div>' +
-      '<div class="l">' + label + '</div><div class="s">' + sub + '</div></div>';
   }
 
   function tag(r) {
@@ -203,7 +229,7 @@
     }
     $('brRun').addEventListener('click', function () {
       if (running) return;
-      // Second confirm, and it names the count. The first click is intent; this is consent.
+      // Second confirm, and it names the sheet. The first click is intent; this is consent.
       if (!window.confirm('Write to ' + window.Batch.sheet.sheet_id + '? This cannot be undone ' +
           'from inside the app.')) return;
       apply();
@@ -230,7 +256,7 @@
    * ownership count.
    * ⚠️ WHAT IT DOES NOT PROTECT: slots use ON CONFLICT DO UPDATE, so a re-run with a DIFFERENT
    * arrangement silently re-seats the prints. Correct behaviour for fixing a mistake, and also
-   * why the build stamp exists. */
+   * why the build stamp is on screen. */
   function benign(e) {
     return /already exists|UNIQUE/i.test(e.message || '');
   }
@@ -268,6 +294,7 @@
 
     // 1. PRINTS FIRST. slot.artwork_id is a foreign key; placing before the artwork exists is an
     //    unwriteable row, not a race. Skip the ones already in the catalog.
+    //    One call, three rows: artwork, its implicit edition (trigger), and the ownership row.
     B.prints.forEach(function (p) {
       if (live.arts[p.id]) return;
       steps.push({
