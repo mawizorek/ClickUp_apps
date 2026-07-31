@@ -1,0 +1,21 @@
+{
+  "_note": "THE BATCH MANIFEST. Static hosting cannot list a directory, so the app has to be told which files in this folder exist. This is the ONE shared file an intake agent touches, and the only edit is appending an object to `batches`. Procedure: brain-config/hooks/binder-sheet-intake.md",
+
+  "_fields": {
+    "slug": "filename without .json, and must match the slug INSIDE that file — the loader refuses a mismatch rather than guessing which one is right",
+    "label": "what the picker shows",
+    "status": "ready = not yet pushed · pushed = already in D1 · draft = incomplete, will not load",
+    "pushed": "ISO date, set by hand after a successful run. Informational."
+  },
+
+  "_status_note": "A PUSHED BATCH STAYS LISTED. Deleting it would erase the record of what was imported and when, and the file is the only durable transcript of those photographs — the photos themselves live in a chat message. Greyed in the picker, still selectable, and the back room's own guard blocks a re-run anyway because the target sheet will have slots in it.",
+
+  "batches": [
+    {
+      "slug": "drinks",
+      "label": "Sheet 3 · Drinks",
+      "status": "ready",
+      "pushed": null
+    }
+  ]
+}
