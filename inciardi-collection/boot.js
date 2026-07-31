@@ -35,28 +35,18 @@
       { route: 'enter',   label: 'Enter',      hint: 'Add a print to the catalog' }
     ],
 
-    /* ============================================================ UNLISTED ROUTES
-     * Routable and titled. NOT in the nav drawer, NOT in the page footer. Surfaced only as a
-     * quiet text link at the foot of the SETTINGS panel (v13).
+    /* UNLISTED ROUTES. Routable and titled; not in the nav drawer, not in the page footer.
+     * Surfaced only as a quiet text link at the foot of the SETTINGS panel — the mechanism and
+     * the reasoning are in `settings.js` → hiddenRoutes(). Two things to know from here:
      *
-     * 🔴 THIS ONE LIST DRIVES THREE THINGS, and that is the point of it existing:
-     *     1. whether the router will resolve the route at all (the `routes` line below)
-     *     2. what the header and the browser tab call it (chrome.js `titles`)
-     *     3. how you find it without typing an address (settings.js `hiddenRoutes`)
-     *   Adding a hidden page is still ONE line here. A second place to register one is a second
-     *   place to forget one.
+     *   🔴 THIS ONE LIST DRIVES THREE THINGS: whether the router resolves the route (the
+     *      `routes` line below), what the header and tab call it (chrome.js), and how you find
+     *      it without an address bar (settings.js). Adding a hidden page stays ONE line — and a
+     *      second place to register one is a second place to forget one.
      *
-     * 🔴 WHY IT HAS TO BE A REAL LIST AND NOT JUST AN ABSENCE: the router validates the incoming
-     * hash against the known routes and falls back to `defaultPage` for anything it does not
-     * recognise — correct for a typo, but it meant any route missing from `nav` silently opened
-     * the binder instead, which reads as broken rather than quiet.
-     *
-     * ⚠️ UNLISTED IS NOT PROTECTED, AND THE APP SHOULD NOT PRETEND OTHERWISE. Public repo, public
-     * Pages site, write key baked into core.js by design. Anyone reading the source finds this,
-     * and could already POST to the worker without it. As of v13 it is also two taps from any
-     * screen, so there is even less concealment than there was — which costs nothing, because
-     * the address was never the defence. The real protections are the guards inside backroom.js
-     * and D1 Time Travel. */
+     *   ⚠️ UNLISTED IS NOT PROTECTED. Public repo, public site, write key baked into core.js by
+     *      design; anyone reading the source finds this and could POST to the worker without it.
+     *      The real protections are the guards in backroom.js and D1 Time Travel. */
     hidden: [
       { route: 'backroom', label: 'Back room', hint: 'Load a transcribed batch of prints' }
     ],
@@ -131,13 +121,12 @@
 
   /* ---------- settings ---------- */
   function wireSettings() {
-    /* 🔴 THE GUARD, AND WHY IT IS NOT PARANOIA. As of v13 the settings panel is built by
-     * `settings.js`, a separate file. Every line below reaches for a field by id. If that script
-     * 404s or fails to parse, `$('apiBase').value` dereferences null, THIS FUNCTION THROWS, and
-     * it throws BEFORE `go()` is ever called at the bottom of this file — so the router never
-     * runs and the entire app renders as a blank page. One missing script, total blackout, no
-     * message. chrome.js puts an explanation inside the empty drawer; this half makes sure the
-     * rest of the app still boots to it. Two cheap checks for one catastrophic failure mode. */
+    /* 🔴 THE GUARD, AND WHY IT IS NOT PARANOIA. The panel is built by `settings.js` as of v13 and
+     * every line below reaches for a field by id. If that script 404s, `$('apiBase').value`
+     * dereferences null and THIS THROWS — before `go()` runs at the bottom of the file, so the
+     * router never starts and the whole app renders blank. One missing script, total blackout,
+     * no message. chrome.js explains inside the empty drawer; this makes sure the app still
+     * boots to it. */
     if (!$('writeKey') || !$('apiBase')) return;
 
     /* Show the OVERRIDE, not the effective value: an input pre-filled with something it never
