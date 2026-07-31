@@ -18,6 +18,20 @@
  * carry their own contrast on both ramps.
  */
 
+/* ---------- the batch picker ----------
+   Borrows the `.chips` shape from summary.css rather than inventing a fourth selector look for
+   this app. Only rendered when there are two or more batches (preview.js) — a chooser with one
+   choice is furniture, and on the screen that performs bulk writes furniture is worse than
+   nothing. */
+.br-picks { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: var(--gap-md, 12px); }
+.br-pick { flex: 0 0 auto; min-height: 34px; padding: 5px 10px;
+  background: transparent; color: var(--text-soft);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius-pill, 8px);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  letter-spacing: 0.04em; }
+.br-pick.on { background: var(--accent); color: var(--on-accent);
+  border-color: var(--accent-deep); font-weight: 600; }
+
 .br-head { margin-bottom: var(--gap-md, 12px); }
 
 /* THE HEADLINE. Display type, and it is an <h2> because the header already owns the page's h1
@@ -33,15 +47,31 @@
 
 .br-sub { margin: 4px 0 0; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint);
   text-wrap: pretty; }
+.br-sub code { font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--accent-deep); }
 
-/* THE MECHANICS LINE: calls, rows, and the build stamp. Mono and small — deliberately the same
-   treatment as `.foot-stamp`, because the build number is literally the same fact from the same
-   constant and a reader comparing them should not have to work out whether they are.
-   The build number is here rather than nowhere because a stale cache on THIS screen writes wrong
-   data into D1 permanently and logs success. See the block in backroom.js. */
+/* THE MECHANICS LINE: calls, rows, source file, build stamp. Mono and small — deliberately the
+   same treatment as `.foot-stamp`, because the build number is literally the same fact from the
+   same constant and a reader comparing them should not have to work out whether they are. */
 .br-mech { margin: 5px 0 0; font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--text-faint); font-variant-numeric: tabular-nums; text-wrap: pretty; }
+
+/* ---------- validator output ----------
+   ERRORS are `--bad` with a solid left rule and they come with no run button anywhere on the
+   page. WARNINGS are `--warn` and dashed — same border grammar as the binder, where solid means
+   a real thing and dashed means a caveat. Both are lists rather than one paragraph, because a
+   cold agent fixing six problems needs six lines, not a sentence to parse. */
+.br-errs, .br-warn { margin: var(--gap-md, 12px) 0; padding: 8px 11px 8px 26px;
+  border-radius: var(--radius, 6px); font-size: var(--fs-sm, 0.85rem); line-height: 1.5;
+  text-wrap: pretty; }
+.br-errs { border: var(--border-w, 1px) solid var(--bad, var(--border));
+  border-left-width: 3px; color: var(--text); }
+.br-warn { border: 1px dashed var(--warn, var(--border));
+  color: var(--text-soft); font-size: var(--fs-xs, 0.72rem); }
+.br-errs li, .br-warn li { margin: 3px 0; }
+.br-errs li::marker { color: var(--bad, var(--text-faint)); }
+.br-warn li::marker { color: var(--warn, var(--text-faint)); }
 
 /* THE TARGET LINE. A screen that writes to a sheet says WHICH sheet, by id, before it does — the
    difference between a fresh sheet and someone's working one is a single string, and it belongs

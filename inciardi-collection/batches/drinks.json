@@ -1,0 +1,113 @@
+{
+  "_readme": "A BATCH IS DATA. No code lives in this file and none may. The grids below are laid out exactly like the photograph: three rows of three, reading left to right. Where a print sits in the array IS where it sits on the sheet, so there are no position numbers to get wrong. Full instructions: brain-config/hooks/batch-import.md",
+
+  "id": "drinks",
+  "label": "Sheet 3 \u00b7 Drinks",
+  "source": "Two photographs, 2026-07-30. Beer face is the FRONT (corrected 07-31).",
+
+  "sheet": {
+    "sheet_id": "sheet-drinks",
+    "binder_id": "mini-binder",
+    "title": "Drinks"
+  },
+
+  "faces_assumed": true,
+
+  "defaults": {
+    "category": "mini",
+    "edition_type": "open",
+    "retail": 1.00,
+    "provenance": "owned",
+    "confidence": "named",
+    "own": true,
+    "qty": 1
+  },
+
+  "prints": {
+    "pbr": {
+      "name": "PBR",
+      "notes": "A Pabst Blue Ribbon can. Signed AI."
+    },
+    "rainier-beer": {
+      "name": "Rainier Beer",
+      "notes": "A Rainier can. Signed ANA INC."
+    },
+    "brooklyn-pilsner": {
+      "name": "Brooklyn Pilsner",
+      "notes": "A yellow Brooklyn Brewery pilsner can. Brooklyn Brewery tasting-room collab, May 2024 - announced as a teeny Pilsner can. Signed AI."
+    },
+    "brooklyn-lager": {
+      "name": "Brooklyn Lager",
+      "notes": "A Brooklyn Lager bottle. Brooklyn Brewery collab. Signed AI."
+    },
+    "sportini": {
+      "name": "Sportini",
+      "notes": "A martini with a soccer ball and a basketball where the olives go. Signed ANA INC."
+    },
+    "allagash": {
+      "name": "Allagash",
+      "notes": "An Allagash White can, mountains on the label. Signed ANA INC."
+    },
+    "lunch-bottle": {
+      "name": "Lunch Bottle",
+      "notes": "A Maine Beer Company Lunch IPA bottle. Signed ANA INC."
+    },
+    "guinness": {
+      "name": "Guinness",
+      "notes": "A pint of Guinness, full head. Signed ANA INC."
+    },
+    "pony": {
+      "name": "Pony",
+      "notes": "A Miller High Life pony bottle. Signed AI."
+    },
+
+    "wine": {
+      "name": "Wine",
+      "notes": "Four bottles in a row. The card is captioned Wine* , asterisk and all; stored as Wine. Signed ANA INC."
+    },
+    "six-pack": {
+      "name": "Six Pack",
+      "notes": "A Corona Extra six-pack in its carrier. Signed ANA INC."
+    },
+    "champagne-tower": {
+      "name": "Champagne Tower",
+      "notes": "A stacked tower of coupe glasses. Signed ANA INC."
+    },
+    "cocktail-shaker": {
+      "name": "Cocktail Shaker",
+      "notes": "A steel three-piece cobbler shaker. Signed ANA INC."
+    },
+    "the-black-barn": {
+      "name": "The Black Barn",
+      "notes": "A dark timber barn, the one non-drink on the sheet. Its title is hand-written VERTICALLY inside the image rather than on the lower margin like every other card here. Signed ANA INC."
+    },
+    "martini": {
+      "name": "Martini",
+      "notes": "A dirty martini, three olives on the pick. Signed AI."
+    },
+    "topo-chico": {
+      "name": "Topo Chico",
+      "notes": "A Topo Chico mineral water bottle. Signed AI."
+    },
+    "best-friends": {
+      "name": "Best Friends!",
+      "notes": "A barley stalk and a hop cone holding hands. Brooklyn Brewery tasting-room collab, May 2024 - the brewery announced the run as containing a sweet meeting between hops and barley, which is this card. Signed AI."
+    },
+    "bottle-cap": {
+      "name": "Bottle Cap",
+      "notes": "A single crimped bottle cap, seen face on. Signed AI."
+    }
+  },
+
+  "front": [
+    ["pbr",          "rainier-beer", "brooklyn-pilsner"],
+    ["brooklyn-lager", "sportini",   "allagash"],
+    ["lunch-bottle", "guinness",     "pony"]
+  ],
+
+  "back": [
+    ["wine",           "six-pack",       "champagne-tower"],
+    ["cocktail-shaker", "the-black-barn", "martini"],
+    ["topo-chico",     "best-friends",   "bottle-cap"]
+  ]
+}

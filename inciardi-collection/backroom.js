@@ -1,7 +1,7 @@
-/* Inciardi Collection — THE BACK ROOM. Runs a transcribed batch into the binder.
+/* Inciardi Collection — THE BACK ROOM. Loads a transcribed batch and writes it into the binder.
  *
- * This file READS, DECIDES and WRITES. The markup is `preview.js` — see its header for why that
- * seam and not the one the module map names.
+ * This file CHOOSES, READS, DECIDES and WRITES. The batch itself is `batches/<name>.json` (data,
+ * never code — see batch.js) and the markup is `preview.js`.
  *
  * HOW YOU GET HERE: `#backroom` is absent from `APP.nav`, so it is in neither the nav drawer nor
  * the page footer. It IS listed at the foot of the settings panel (v13) and reachable by typing
@@ -12,23 +12,66 @@
  *
  * WHAT THIS SCREEN REFUSES TO DO:
  *   - Write anything before showing you every row it intends to write.
+ *   - Offer to run a batch whose data does not validate.
  *   - Touch a sheet that already has prints in it, unless you tick the override.
  *   - Continue past a failure it did not expect.
  *   - Add a second copy of a print you already own. A re-run is a no-op, not a double.
- *
- * ONE BATCH AT A TIME. `window.Batch` is the payload; swapping batches means swapping
- * `batch.js`. This file never changes when a new photo arrives, which is the entire point of
- * the split — the code that performs irreversible writes should not be edited casually.
  *
  * ⚠️ THE REMAINING SEAM, for whoever adds the next feature: PLAN vs APPLY. `preflight` / `build`
  * read and decide; `apply` / `chain` / `log` write. They share only `live` and `plan`.
  */
 (function () {
+  var files = [];         // every batch in batches/_index.json
+  var B = null;           // the batch currently loaded and validated
   var live = null;        // what the server says right now
   var plan = null;        // what we intend to do about it
   var running = false;
 
   function $(id) { return document.getElementById(id); }
+
+  /* ---------------------------------------------------------------- MOUNT
+   * A chain now, because the batch lives on disk: list → choose → load → validate → preflight.
+   * Each step can fail in its own way and each says which one it was. "Nothing happened" is not
+   * an acceptable outcome on the screen that performs bulk writes. */
+  function mount() {
+    var host = $('brWrap');
+    if (!window.Batch || !window.Preview) {
+      host.innerHTML = '<div class="empty bad"><b>The back room did not fully load.</b><br>' +
+        'Missing <code>' + (!window.Batch ? 'batch.js' : 'preview.js') + '</code>. This screen ' +
+        'will not write anything it cannot first read and show you.</div>';
+      return;
+    }
+    Core.busy(host, 'Looking for batches\u2026');
+
+    Batch.list().then(function (list) {
+      files = list;
+      if (!files.length) {
+        host.innerHTML = '<div class="empty">No batches to import.<br>' +
+          'Drop a <code>.json</code> in <code>batches/</code> and add it to ' +
+          '<code>batches/_index.json</code>.</div>';
+        return;
+      }
+      open(files[0]);
+    }).catch(function (e) { Core.fail(host, e); });
+  }
+
+  /* Load one batch and either preflight it or show why it cannot be run. A validation failure is
+   * a NORMAL outcome here, rendered in full — the whole point of moving batches to data files is
+   * that a transcription mistake becomes a readable list instead of a 400 mid-run. */
+  function open(file) {
+    var host = $('brWrap');
+    Core.busy(host, 'Reading ' + file + '\u2026');
+    Batch.load(file).then(function (res) {
+      if (!res.ok) {
+        B = null;
+        host.innerHTML = Preview.invalid(res, files);
+        wirePicker();
+        return;
+      }
+      B = res.batch;
+      preflight();
+    }).catch(function (e) { Core.fail(host, e); });
+  }
 
   /* ---------------------------------------------------------------- PREFLIGHT
    * READ FIRST, ALWAYS. The batch was written hours ago against a binder that has since been
@@ -36,12 +79,7 @@
    * before the write, never from an assumption baked into the payload. */
   function preflight() {
     var host = $('brWrap');
-    var B = window.Batch;
-    if (!B) {
-      host.innerHTML = '<div class="empty bad"><b>No batch loaded.</b><br>' +
-        'batch.js did not load, so there is nothing to run.</div>';
-      return;
-    }
+    if (!B) return mount();
     Core.busy(host, 'Reading what is in the binder right now\u2026');
 
     Promise.all([API.get('/artworks'), API.get('/sheets')]).then(function (r) {
@@ -69,7 +107,6 @@
    * anything — this function's whole job is to make the run predictable in advance, and it is
    * the ONLY place any of these numbers are worked out. preview.js decides nothing. */
   function build() {
-    var B = window.Batch;
     var sheetExists = !!live.sheets[B.sheet.sheet_id];
     var occupied = Object.keys(live.slots).length;
 
@@ -116,21 +153,13 @@
     };
   }
 
-  /* Build, inject, wire. All three numbers on screen come from `plan`; the markup file works
-   * nothing out for itself, so there is one place deciding what this run will do. */
+  /* Build, inject, wire. Every number on screen comes from `plan`; the markup file works nothing
+   * out for itself, so there is one place deciding what this run will do. */
   function render() {
-    if (!window.Preview) {
-      $('brWrap').innerHTML = '<div class="empty bad"><b>Preview did not load.</b><br>' +
-        '<code>preview.js</code> is missing, so there is no way to show you what would be ' +
-        'written \u2014 and this screen will not write anything it cannot show you first.</div>';
-      return;
-    }
-    $('brWrap').innerHTML =
-      Preview.html(window.Batch, plan, window.ICApp ? ICApp.version : '(version unknown)');
-    wire();
-  }
+    $('brWrap').innerHTML = Preview.html(B, plan, files,
+      window.ICApp ? ICApp.version : '(version unknown)');
+    wirePicker();
 
-  function wire() {
     $('brRecheck').addEventListener('click', preflight);
     var ov = $('brOverride');
     if (ov) {
@@ -139,9 +168,17 @@
     $('brRun').addEventListener('click', function () {
       if (running) return;
       // Second confirm, and it names the sheet. The first click is intent; this is consent.
-      if (!window.confirm('Write to ' + window.Batch.sheet.sheet_id + '? This cannot be undone ' +
+      if (!window.confirm('Write to ' + B.sheet.sheet_id + '? This cannot be undone ' +
           'from inside the app.')) return;
       apply();
+    });
+  }
+
+  /* The picker exists on BOTH the valid and invalid screens, so it is wired separately — a batch
+   * that fails to validate must still let you switch to one that does. */
+  function wirePicker() {
+    [].forEach.call(document.querySelectorAll('.br-pick'), function (b) {
+      b.addEventListener('click', function () { open(b.getAttribute('data-file')); });
     });
   }
 
@@ -164,8 +201,7 @@
    * the copy insert in the worker, so re-running cannot add a second copy and quietly double an
    * ownership count.
    * ⚠️ WHAT IT DOES NOT PROTECT: slots use ON CONFLICT DO UPDATE, so a re-run with a DIFFERENT
-   * arrangement silently re-seats the prints. Correct behaviour for fixing a mistake, and also
-   * why the build stamp is on screen. */
+   * arrangement silently re-seats the prints. Correct behaviour for fixing a mistake. */
   function benign(e) {
     return /already exists|UNIQUE/i.test(e.message || '');
   }
@@ -191,13 +227,13 @@
   }
 
   function apply() {
-    var B = window.Batch;
     running = true;
     $('brRun').disabled = true;
     $('brLog').hidden = false;
     $('brLog').textContent = '';
     log('', 'Starting \u2014 ' + new Date().toLocaleTimeString() +
-            '  \u00b7  build ' + (window.ICApp ? ICApp.version : '?') + '\n');
+            '  \u00b7  ' + B.file + '  \u00b7  build ' +
+            (window.ICApp ? ICApp.version : '?') + '\n');
 
     var steps = [];
 
@@ -215,7 +251,7 @@
     // 2. THE SHEET. Needs to exist before anything can be placed on it.
     if (!plan.sheetExists) {
       steps.push({
-        label: 'sheet \u00b7 ' + B.sheet.title,
+        label: 'sheet \u00b7 ' + (B.sheet.title || B.sheet.sheet_id),
         run: function () { return API.post('/sheet', B.sheet); }
       });
     }
@@ -245,5 +281,5 @@
     });
   }
 
-  window.Backroom = { mount: preflight };
+  window.Backroom = { mount: mount };
 })();
