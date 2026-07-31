@@ -1,4 +1,7 @@
-/* Inciardi Collection — APP CHROME. Header, nav drawer, settings drawer, footer.
+/* Inciardi Collection — APP CHROME. The frame every route shares: header, nav drawer, scrim,
+ * footer. The settings panel is `settings.js`; this file still owns OPENING and CLOSING it,
+ * because drawer state is shared between the two panels and a second owner of that state is how
+ * you end up with both open at once.
  *
  * Adopted from `template-app/chrome.js` (gold standard v5) on 2026-07-30. Built ONCE and shared
  * by every route, from a config object.
@@ -22,7 +25,7 @@
 
   /* ---------- header: hamburger · PAGE TITLE · gear ----------
    * 🔴 v11 — THE HEADER NAMES THE PAGE, NOT THE APP. Michael: "the PAGE TITLE at the top should
-   * be CENTERED." Until now the centre of the header carried the wordmark on all four routes,
+   * be CENTERED." Until then the centre of the header carried the wordmark on all four routes,
    * left-aligned next to the hamburger. That answered a question nobody had ("which app is
    * this") and left the real one unanswered ("which page am I on") — the nav drawer knew, but
    * you had to open it to find out.
@@ -74,6 +77,7 @@
   function setDrawer(which, v) {
     var d = $(which === 'nav' ? 'navDrawer' : 'settingsDrawer');
     var btn = $(which === 'nav' ? 'navBtn' : 'gearBtn');
+    if (!d || !btn) return;
     open[which] = v;
     d.classList.toggle('is-open', v);
     d.setAttribute('aria-hidden', String(!v));
@@ -93,7 +97,8 @@
     setDrawer('nav', which === 'nav' ? willOpen : false);
     setDrawer('settings', which === 'settings' ? willOpen : false);
     $('chromeScrim').hidden = !(open.nav || open.settings);
-    if (open.settings) paintDevice();      // refresh in case the window was resized since
+    // Re-read on open rather than caching: a resized window changes the answer.
+    if (open.settings && window.Settings) Settings.paintDevice();
     if (!open.nav && !open.settings) restoreFocus();
   }
 
@@ -104,7 +109,8 @@
   function closeAll() {
     setDrawer('nav', false);
     setDrawer('settings', false);
-    $('chromeScrim').hidden = true;
+    var s = $('chromeScrim');
+    if (s) s.hidden = true;
     restoreFocus();
   }
 
@@ -112,8 +118,10 @@
    * No item ceiling. A fifth route costs one line of config, where the old inline header would
    * have wrapped.
    * ⚠️ DRAWN FROM `cfg.nav` ONLY, never from `cfg.hidden`. That is the entire mechanism by which
-   * an unlisted route stays unlisted — there is no "is it secret" flag anywhere else, and adding
-   * one would be a second place for the answer to live.
+   * an unlisted route stays out of the menu — there is no "is it secret" flag anywhere else, and
+   * adding one would be a second place for the answer to live. Hidden routes surface in the
+   * SETTINGS panel instead (see the block in settings.js), which is deliberate: quiet, but
+   * reachable without an address bar.
    * The head carries the WORDMARK rather than the word "Menu": the header stopped saying which
    * app this is when the page title took the centre, and a menu is the natural place for
    * identity. The panel is still labelled "Menu" to assistive tech via aria-label. */
@@ -144,120 +152,32 @@
     });
   }
 
-  /* ---------- right: settings ----------
-   * The write-key and worker-URL fields keep their ids so boot.js wires them unchanged. */
-  function buildSettings() {
+  /* ---------- right: settings, built by settings.js ----------
+   * 🔴 THE FALLBACK IS NOT DEFENSIVE PADDING, IT IS THE DIFFERENCE BETWEEN A BROKEN PANEL AND A
+   * BROKEN APP. `boot.js` → wireSettings() reaches straight for `#apiBase` and `#writeKey` by
+   * id. If settings.js 404s and this builds nothing, that call dereferences null, boot throws
+   * before it ever reaches the router, and the ENTIRE app renders blank — a missing settings
+   * panel presenting as a dead white screen, which is the single worst diagnostic this codebase
+   * could offer. So the drawer always exists, and when it is empty it says why and names the
+   * file. (wireSettings guards the same fields on its side; two cheap checks, because this one
+   * failure mode takes down everything.) */
+  function buildSettings(c) {
+    if (window.Settings) { Settings.build(c, closeAll); return; }
     var d = document.createElement('aside');
     d.id = 'settingsDrawer';
     d.className = 'drawer drawer-right';
     d.setAttribute('aria-hidden', 'true');
     d.setAttribute('role', 'dialog');
-    d.setAttribute('aria-modal', 'true');
     d.setAttribute('aria-label', 'Settings');
     d.innerHTML =
       '<div class="drawer-head"><h2>Settings</h2>' +
         '<button class="drawer-x" id="setX" aria-label="Close settings">\u2715</button></div>' +
-      '<div class="drawer-body">' +
-
-        '<label class="drawer-label">Appearance</label>' +
-        '<div class="seg" role="group" aria-label="Light or dark">' +
-          '<button id="modeDark" data-mode="dark" aria-pressed="true">Dark</button>' +
-          '<button id="modeLight" data-mode="light" aria-pressed="false">Light</button>' +
-        '</div>' +
-        '<p class="drawer-note" id="modeNote"></p>' +
-
-        '<div class="drawer-hr"></div>' +
-
-        '<label class="drawer-label">This device</label>' +
-        '<p class="drawer-note" id="devNote"></p>' +
-
-        '<div class="drawer-hr"></div>' +
-
-        '<label class="drawer-label" for="writeKey">Write key</label>' +
-        '<input id="writeKey" type="password" autocomplete="off">' +
-        '<p class="drawer-note" id="keyHint"></p>' +
-        '<div class="row">' +
-          '<button id="saveCfg" class="primary">Save</button>' +
-          '<button id="ping">Test connection</button></div>' +
-        '<div class="row"><button id="copyDiag" class="ghost">Copy diagnostics</button></div>' +
-        '<pre id="pingOut" class="out" hidden></pre>' +
-
-        '<details>' +
-          '<summary class="tag">Advanced \u00b7 worker URL</summary>' +
-          '<label class="drawer-label" for="apiBase">Worker URL</label>' +
-          '<input id="apiBase" type="url" inputmode="url" autocapitalize="off" autocorrect="off">' +
-          '<p class="drawer-note" id="baseHint"></p>' +
-          '<div class="row"><button id="resetBase" class="ghost">Use the built-in default</button></div>' +
-        '</details>' +
-      '</div>';
+      '<div class="drawer-body"><div class="empty bad"><b>Settings did not load.</b><br>' +
+        '<code>settings.js</code> is missing or failed to parse, so appearance, the write key ' +
+        'and diagnostics are unavailable. Check the script tags in <code>index.html</code>. ' +
+        'The rest of the app still works.</div></div>';
     document.body.appendChild(d);
     $('setX').addEventListener('click', closeAll);
-    initMode();
-    paintDevice();
-  }
-
-  /* Michael asked to track mobile vs desktop. `device.js` owns the answer; this is where a person
-   * can read it, and the footer carries the short version. Re-read on drawer open rather than
-   * cached, because a resized window changes it. */
-  function paintDevice() {
-    var el = $('devNote');
-    if (!el) return;
-    el.textContent = window.Device
-      ? Device.describe()
-      : 'device.js did not load, so layout is falling back to width alone.';
-  }
-
-  /* ============================================================ LIGHT / DARK
-   * No new colours and no new CSS. Every row in `colors.tsv` ships its default ramp PLUS eleven
-   * `alt-*` columns holding the opposite-mode neutrals, and `mercedes` has a complete set
-   * (verified against the grid). `resolve.js` already exposes setMode / getMode / supportsMode
-   * and swaps the ramp on the same colour row. Brand accent, semantics and data colours are
-   * shared across modes on purpose — a theme should not change identity when the lights come on.
-   *
-   * 🔴 WHICH IS ALSO THE v10 LESSON: because brand colours are shared, using one as INK fails in
-   * one of the two modes. v9 lettered the card initials and the wordmark in `accent-2` and they
-   * vanished on the light ramp. Fixed by using the mode-aware pair (`accent-soft` ground,
-   * `accent-deep` ink), NOT by adding a light-mode override. If a rule needs `[data-mode]`, the
-   * rule is reaching around the spine.
-   *
-   * Dark stays the default. The choice persists under the resolver's own key, so this app never
-   * invents a second place to remember it. */
-  function initMode() {
-    var note = $('modeNote');
-
-    if (!(window.THEMES && THEMES.setMode)) {
-      // Honest, not silent: the buttons would do nothing, so say why instead of pretending.
-      note.textContent = 'Theme resolver did not load, so light mode is unavailable this session.';
-      ['modeDark', 'modeLight'].forEach(function (id) { $(id).disabled = true; });
-      return;
-    }
-
-    function paint(mode) {
-      $('modeDark').setAttribute('aria-pressed', String(mode !== 'light'));
-      $('modeLight').setAttribute('aria-pressed', String(mode === 'light'));
-      note.textContent = mode === 'light'
-        ? 'Same Mercedes palette, light neutrals. The accent does not change.'
-        : 'Dark is the default for this app.';
-    }
-
-    ['modeDark', 'modeLight'].forEach(function (id) {
-      $(id).addEventListener('click', function () {
-        var mode = this.getAttribute('data-mode');
-        THEMES.setMode(mode);          // persists; swaps the ramp on the same colour row
-        paint(mode);
-        /* The iOS browser chrome is painted by a meta tag, so it has to move with the app or
-         * there is a visible seam between the two. Read the resolved token rather than hardcoding
-         * a hex, so this stays correct if the palette ever changes. */
-        var m = document.querySelector('meta[name="theme-color"]');
-        if (m) {
-          var c = getComputedStyle(document.documentElement)
-            .getPropertyValue('--surface-1').trim();
-          if (c) m.setAttribute('content', c);
-        }
-      });
-    });
-
-    paint(THEMES.getMode() || 'dark');
   }
 
   /* ---------- footer ---------- */
@@ -290,9 +210,9 @@
        * HIDDEN routes are titled here TOO, and only here. setActive falls back to the app name
        * for a route it cannot name, so an unlisted page would otherwise open with the wrong
        * title in both the header and the browser tab — which reads as a half-broken load rather
-       * than a deliberately quiet page. Titled, still never drawn: buildNav takes `c.nav`. */
+       * than a deliberately quiet page. Titled, still not in the MENU: buildNav takes `c.nav`. */
       c.nav.concat(c.hidden || []).forEach(function (n) { titles[n.route] = n.label; });
-      buildHeader(c); buildScrim(); buildNav(c); buildSettings(); buildFooter(c);
+      buildHeader(c); buildScrim(); buildNav(c); buildSettings(c); buildFooter(c);
     },
     /* One call per route change, from the router. It marks the nav row AND writes the page title
      * in the header and the browser tab — one function so the three can never disagree about
