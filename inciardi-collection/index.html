@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v15. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v16. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
@@ -21,9 +21,9 @@
        picker.js    4.5KB  the slot entry surface           → Picker
        enter.js     8.1KB  entry form + shoe-box            → Enter, Shoebox
        summary.js  14.9KB  the collection matrix            → Summary
-       batch.js    11.2KB  one transcribed sheet, DATA only → Batch
-       preview.js   8.8KB  the back room's markup           → Preview
-       backroom.js 11.5KB  read · decide · write            → Backroom
+       batch.js    10.9KB  loads + VALIDATES a batch file   → Batch
+       preview.js  10.7KB  the back room's markup           → Preview
+       backroom.js 13.1KB  choose · read · decide · write   → Backroom
        app.js       3.8KB  routing only                     → App
        boot.js     14.6KB  config · theme · router · settings wiring · diagnostics
 
@@ -32,21 +32,26 @@
        binder.css  15.1KB  stage · cards · deck bar
        sheets.css   3.5KB  sheet list · legend
        summary.css 10.5KB  the matrix
-       backroom.css 7.2KB  headline · verdict table · log
+       backroom.css 9.1KB  headline · validator output · verdict table · log
 
-     🔴 v15 TOOK A SPLIT, AND WHICH ONE IS THE INTERESTING PART. backroom.js hit 16.7KB. The seam
-     recorded here was PLAN vs APPLY — and taking it means refactoring the write path on the
-     morning Michael is about to push thirty-seven irreversible writes through it. So a DIFFERENT
-     seam was taken: the preview markup, which is pure string assembly and left apply/chain/log
-     byte-identical. It is also the half that actually churns; every note on this screen so far
-     has been about what it SAYS.
-     ⚠️ PLAN vs APPLY IS STILL OWED. Take it on a day when nobody is mid-import.
+       batches/    DATA, NOT CODE. One .json per physical sheet, plus `_index.json` listing them.
+                   Fetched at runtime, never bundled, never parsed as JavaScript. The size budget
+                   does not apply — nothing has to read a batch file whole to edit it safely,
+                   because editing one cannot break the app. Procedure for adding one:
+                   `brain-config/hooks/batch-import.md`.
+
+     🔴 v16 MOVED THE RISKIEST INPUT OUT OF CODE. Until now a new sheet meant editing `batch.js`:
+     transcribing a photograph was a JavaScript edit, in the file that feeds an irreversible bulk
+     write, where a stray brace is a parse error. Now the transcript is inert JSON, validated
+     before anything is sent, and the loader is a file nobody has to touch again.
 
      ⚠️ STILL AT THE LINE: binder.css 15.1KB, binder.js 15.0KB, summary.js 14.9KB, boot.js 14.6KB.
      Named seams, so nobody has to find them under pressure:
        binder.css  → `card.css` (the .slot block is a third of the file)
        summary.js  → `matrix.js` + `drill.js`
        boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern)
+       backroom.js → PLAN vs APPLY. ⚠️ STILL OWED — v15 took the markup instead because the write
+                     path should not be refactored on a morning someone is about to use it.
      🔴 AND THE REAL OFFENDER IS `worker/worker.js` AT 29.3KB — one byte under the hard read cap,
      so every edit to it is a full retype of a file too big to verify. That is the next split in
      this app, before any new route. Seam: `worker/reads.js` (the six GETs; /summary and /shoebox
@@ -60,11 +65,11 @@
      guardrail — which is why the answer is a DEFAULT SHAPE, not a fifth gate.
      ============================================================================
 
-     v15: the back room HEADLINES THE WORK instead of the HTTP calls. It said "Write 37 rows";
-     37 was the call count and the real row count is 73, so the one number on the button was
-     wrong in both directions. Now: "Importing 18 prints into 18 scanned slots over 1 sheet,
-     front and back assumed" — Michael's own sentence, in units he can check against the sheet in
-     his hand.
+     ⚠️ THE `?v=` BUMP IS BACK TO BEING HOUSEKEEPING. At v14 it was load-bearing: a cached
+     `batch.js` would have written the WRONG arrangement into D1 and logged thirty-seven
+     successes. Batch data is now fetched `no-store`, so it cannot be served stale at all — the
+     hazard is structurally gone rather than merely labelled. Bump it anyway for the JS, and the
+     build stamp stays on the run screen because it still answers "which CODE is running."
 
      ⚠️ STILL NOT BUILT: no `manifest.webmanifest`, no `apple-mobile-web-app-capable`. A
      home-screen icon today opens in the browser WITH its address bar, and Android will not offer
@@ -84,12 +89,12 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=15">
-<link rel="stylesheet" href="./chrome.css?v=15">
-<link rel="stylesheet" href="./binder.css?v=15">
-<link rel="stylesheet" href="./sheets.css?v=15">
-<link rel="stylesheet" href="./summary.css?v=15">
-<link rel="stylesheet" href="./backroom.css?v=15">
+<link rel="stylesheet" href="./base.css?v=16">
+<link rel="stylesheet" href="./chrome.css?v=16">
+<link rel="stylesheet" href="./binder.css?v=16">
+<link rel="stylesheet" href="./sheets.css?v=16">
+<link rel="stylesheet" href="./summary.css?v=16">
+<link rel="stylesheet" href="./backroom.css?v=16">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -109,24 +114,23 @@
      ⚠️ settings.js only has to be PARSED before boot.js runs Chrome.init; it sits next to
      chrome.js because the two are halves of one thing. If it 404s, chrome.js builds a drawer that
      says so and boot.js skips its wiring — a missing panel, not a blank app.
-     ⚠️ batch.js + preview.js BEFORE backroom.js: the runner reads `window.Batch` and calls
-     `Preview.html()` when it mounts. app.js names all three in NEEDS, and backroom.js refuses to
-     render without Preview — a batch runner that cannot show you what it would write must not
-     offer to write it. -->
+     ⚠️ batch.js is a LOADER now, not data — the batches themselves are JSON fetched at mount. It
+     and preview.js only need to be parsed before backroom.js mounts; app.js names all three in
+     NEEDS, and backroom.js refuses to render without them. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./device.js?v=15"></script>
-<script src="./core.js?v=15"></script>
-<script src="./chrome.js?v=15"></script>
-<script src="./settings.js?v=15"></script>
-<script src="./binder.js?v=15"></script>
-<script src="./sheets.js?v=15"></script>
-<script src="./picker.js?v=15"></script>
-<script src="./enter.js?v=15"></script>
-<script src="./summary.js?v=15"></script>
-<script src="./batch.js?v=15"></script>
-<script src="./preview.js?v=15"></script>
-<script src="./backroom.js?v=15"></script>
-<script src="./app.js?v=15"></script>
-<script src="./boot.js?v=15"></script>
+<script src="./device.js?v=16"></script>
+<script src="./core.js?v=16"></script>
+<script src="./chrome.js?v=16"></script>
+<script src="./settings.js?v=16"></script>
+<script src="./binder.js?v=16"></script>
+<script src="./sheets.js?v=16"></script>
+<script src="./picker.js?v=16"></script>
+<script src="./enter.js?v=16"></script>
+<script src="./summary.js?v=16"></script>
+<script src="./batch.js?v=16"></script>
+<script src="./preview.js?v=16"></script>
+<script src="./backroom.js?v=16"></script>
+<script src="./app.js?v=16"></script>
+<script src="./boot.js?v=16"></script>
 </body>
 </html>
