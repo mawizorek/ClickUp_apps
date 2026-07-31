@@ -7,7 +7,7 @@ steward: routine-ricky
 cadence: see routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 4
+version: 5
 model: standing-inventory
 ---
 
@@ -26,6 +26,8 @@ model: standing-inventory
 > ⚠️ **v1–v3 were table-first and every template in them was a grid.** Those templates are DELETED, not softened. If you find yourself typing a pipe character into a pass, you are running v3 and you are wrong.
 >
 > **Why this will be re-broken if the reason is not written down:** tables look *tidier to the author*. They align in the composer, they feel dense and organized, and the cost lands entirely on the reader on a different device. **The author's screen is not the delivery surface.**
+>
+> ⚠️ **This rule applies to the THREAD, not the TSV.** The state file (`routines/job-market-state.tsv`) is machine state: tab-separated, one row per listing, never rendered on a phone. It exists so the thread doesn't have to be a database. The thread is the narrative; the TSV is the index.
 
 > ## 🏘️ THIS IS A STANDING INVENTORY, NOT A CHANGE LOG (LOCKED 2026-07-30, Michael)
 >
@@ -47,21 +49,60 @@ Michael: *"no need to number the passes. just date and time the pass."*
 - **Reference the previous pass by its timestamp**, e.g. *"prev pass: 2026-07-31 13:45 ET (18 hours ago)."* The elapsed interval is the useful part, not the ordinal.
 - The stamp file already speaks this language, so pass identity and `routines/last-run/job-market.txt` are now the same fact in the same format.
 
-## 📍 One task. One conversation. The thread IS the database.
+## 📍 One task. One conversation. Two persistence layers.
 
 **Everything lives on ONE ClickUp task and nowhere else** (LOCKED, Michael: *"keep it consolidated on the one task... job hunt market research should be treated as a single task and conversation"*).
 
 - **Standing thread:** `86ajtgbt3`
-- **Never create a second research task.** Never spill the inventory into the Applications list, a doc, or a repo state file. `routines/last-run/job-market.txt` holds a TIMESTAMP and nothing else.
+- **Never create a second research task.** Never spill the inventory into the Applications list or a doc.
 - **Applications list** (`900600097138`) stays a **funnel, not an inventory.** A listing becomes a task there ONLY when Michael says to act on it. The routine does not cut lead tasks.
 
-### ⚠️ How state survives with no database (READ THIS — it is the whole trick)
+### The two layers
 
-There is no listings table. **The inventory is reconstructed from the MOST RECENT pass header and its threaded replies.** Which means:
+| Layer | What it holds | Who reads it |
+|-------|--------------|-------------|
+| **`routines/job-market-state.tsv`** | The structured index. Every live listing as a normalized row. | The next pass (primary), aggregate queries, days-on-board math. |
+| **The comment thread** | The narrative. Census, verdicts, org lookups, salary analysis, source problems, near-misses. | Michael on his phone. The human read surface. |
 
-> **Every pass must restate the full inventory, because the next pass will read only YOURS.**
+**The TSV is the source of truth for what listings exist.** The thread is where meaning gets made. Neither replaces the other: the TSV can't carry a retraction or an org lookup, and the thread can't answer "what's the median days-on-board" without walking backwards through months of comments.
 
-A pass that abbreviates ("same as yesterday, see above") **breaks the chain** and forces the next agent to walk backwards through the thread. Full restatement every time is not redundancy; it is the persistence mechanism. This is the single rule most likely to be optimized away by someone trying to be concise. Do not.
+### ⚠️ How state persists
+
+**The TSV is the inventory database.** A pass reads it to know the current market, reconciles against the boards, and writes back. Git history provides the snapshot archive for free: every commit is a dated record of what the market looked like that day.
+
+**The thread still gets the full restatement** — for mobile reading, for the narrative, for the commentary that makes raw listings useful. But the next pass reads the TSV, not the previous comment. This breaks the "comment as API" fragility where reconstruction errors compounded across passes.
+
+**Rules:**
+- A listing enters the TSV the moment it is found (status `live`).
+- A listing moves to `gone` when it disappears from the board. Gone rows stay in the TSV for one full pass after disappearance (so the GONE thread can reference them), then get deleted. Git history preserves them permanently.
+- A listing moves to `acted` when Michael says to act on it and an Application task is created.
+- The TSV is committed as part of the pass. An uncommitted pass did not happen.
+
+## 📊 State file schema (`routines/job-market-state.tsv`)
+
+Tab-separated, header row, one listing per line. **Fully normalized: one fact per column, no compound fields.**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | string | `JM-<BOARD>-<org>-<role>` — the permanent key |
+| `title` | string | Role title as posted |
+| `org` | string | Organization name |
+| `location` | string | City, State (or City, Country for non-US) |
+| `site` | string | Board code where found: `OSJ` `PB` `ECN` `USITT` `AS` `ACG` `TOC` `TAL` `BWW` `SB` `SJ` |
+| `url` | string | Direct link to the posting (empty if not captured yet) |
+| `posted` | date | Date posted on the board (`YYYY-MM-DD`) |
+| `first_seen` | date | Pass date when first found (`YYYY-MM-DD`) |
+| `salary` | string | Posted salary range or empty (never estimated) |
+| `status` | enum | `live` \| `gone` \| `acted` |
+
+**Normalization rules:**
+- One row per listing per board. Cross-posted = two rows, two IDs, same org.
+- `site` is the board code matching the ID prefix. Redundant by design: the column is filterable/sortable without parsing the ID.
+- `url` is the direct link to the individual posting, not the board's index page. Fill it on the pass that finds it; backfill on subsequent passes when a detail page is fetched.
+- `salary` uses the posted range verbatim (e.g. `$67,000-80,000`). Never estimated, never converted.
+- `posted` is the board's own date. `first_seen` is when this routine first captured it. Both are useful: `posted` gives days-on-board, `first_seen` gives coverage gaps.
+
+**Capacity:** ~60 bytes per row average at 10 columns. The practical read ceiling (~22KB) supports ~350+ listings before the file needs pruning. The realistic live market is 15–40, so this is not a constraint.
 
 ## 🔑 Listing IDs (stable keys — assign once, never change)
 
@@ -104,7 +145,7 @@ JM-<BOARD>-<org-slug>-<role-slug>
 
 **Prev pass:** <YYYY-MM-DD HH:MM> ET (<n> <hours/days> ago) · **Model:** standing inventory · **Cadence:** daily
 **Catch-up:** <no · or: YES, covers <n> days>
-**Runbook:** [job-market-refresh.md](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v4
+**Runbook:** [job-market-refresh.md](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v5
 
 ### Census
 
@@ -245,14 +286,30 @@ fixed / unfixed / newly found. A problem carried across passes must say how many
 
 ## Steps (a cold agent can run this with nothing but this file)
 
-1. **Open the standing thread** `86ajtgbt3` and **read the most recent PASS HEADER plus its 🔁 SAME and 🆕 NEW threads.** Those two blocks together ARE the current inventory. Note its timestamp and every `JM-ID` with its first-seen date.
-2. **Read `routines/last-run/job-market.txt`.** `never` = this is the first pass, so there is no prior inventory: everything found is NEW and the SAME block says so explicitly.
-3. **Walk Tier 1 in order** (see SOURCES template). Apply the target profile. Discipline-check every title against the manufacturing trap.
-4. **Reconcile** against the prior inventory: matched → SAME (increment days) · unmatched-new → NEW (assign a `JM-ID`) · prior-but-absent → GONE. **Verify survival by an actual read, and say how you verified it** — an index listing, a detail-page fetch, or a search result. A listing assumed alive is not measured alive.
-5. **Post the PASS HEADER** (Template 1). Capture its comment ID.
-6. **Post the threaded replies** under it, in order: SAME · NEW · GONE · NOTABLE · SOURCES. SAME, GONE and SOURCES go up even if empty.
-7. **Stamp** `routines/last-run/job-market.txt` — one line, `YYYY-MM-DD HH:MM` ET. **An unstamped pass did not happen.**
-8. **Report to Michael in chat:** the census line and the verdict, nothing more. The thread holds the detail; do not re-narrate it.
+1. **Read `routines/job-market-state.tsv`** — this is the current inventory. Every row with `status=live` is a listing you expect to find on the boards. Note each `id`, `posted` date, and `first_seen` date. If the file is empty (header only), this is the first pass and everything found is NEW.
+2. **Read `routines/last-run/job-market.txt`.** `never` = first pass.
+3. **Open the standing thread** `86ajtgbt3` and **read the most recent PASS HEADER** for context (verdict, source problems, open questions). You do NOT need to reconstruct inventory from the thread — the TSV already has it.
+4. **Walk Tier 1 in order** (see SOURCES template). Apply the target profile. Discipline-check every title against the manufacturing trap. **Capture the direct URL for every qualifying listing found.**
+5. **Reconcile** against the TSV inventory: matched → SAME (days-on-board = today minus `posted`) · unmatched-new → NEW (assign a `JM-ID`) · in-TSV-but-absent-from-board → GONE. **Verify survival by an actual read, and say how you verified it** — an index listing, a detail-page fetch, or a search result. A listing assumed alive is not measured alive.
+6. **Update `routines/job-market-state.tsv`:**
+   - NEW listings: append a row with all columns filled. `url` is required if captured; leave empty only if the board doesn't provide a stable direct link.
+   - GONE listings: set `status` to `gone`.
+   - SAME listings: update `url` if newly captured, update `salary` if newly discovered on a detail page. No other fields change.
+   - Backfill: if a prior row has an empty `url` and this pass fetched the detail page, fill it in.
+7. **Post the PASS HEADER** (Template 1). Capture its comment ID.
+8. **Post the threaded replies** under it, in order: SAME · NEW · GONE · NOTABLE · SOURCES. SAME, GONE and SOURCES go up even if empty.
+9. **Commit the TSV + stamp in one push:**
+   - `routines/job-market-state.tsv` — the updated inventory.
+   - `routines/last-run/job-market.txt` — one line, `YYYY-MM-DD HH:MM` ET.
+   - Commit message: `data(job-market): <YYYY-MM-DD HH:MM> ET — <n> live, <±n>`
+   - **An uncommitted pass did not happen.**
+10. **Report to Michael in chat:** the census line and the verdict, nothing more. The thread holds the detail; do not re-narrate it.
+
+### ⚠️ TSV is the source of truth. Thread is the read surface.
+
+The thread still gets the full restatement every pass — Michael reads it on his phone and it needs to stand alone. But the NEXT PASS reads the TSV, not the previous comment. This breaks the "comment as API" fragility where one abbreviated pass could corrupt everything downstream.
+
+If the TSV and the thread ever disagree, **the TSV wins.** Fix the thread to match, not the other way around.
 
 ## Target profile (LOCKED 2026-07-30, Michael)
 
@@ -284,7 +341,7 @@ fixed / unfixed / newly found. A problem carried across passes must say how many
 - **Real posted numbers only** for salary, with the org and the source attached, or not at all.
 - **Never assert a stale posting as current.** `hooks/source-freshness-gate.md` is fire-always the moment this fetches. Use USITT's dates to sanity-check the undated boards.
 - **A gated source is reported gated.** `hooks/silent-fallback-law.md`: never substitute a board and report as if the pinned one answered.
-- **Catch-up, don't replay.** Overdue by three weeks = ONE pass labeled a catch-up in the header. Never one pass per missed day. Days-on-board still computes correctly because it derives from first-seen, not from pass count.
+- **Catch-up, don't replay.** Overdue by three weeks = ONE pass labeled a catch-up in the header. Never one pass per missed day. Days-on-board still computes correctly because it derives from `posted`, not from pass count.
 - **A failed pass leaves the stamp untouched** so it stays overdue and self-heals. Report the failure in the reply, not by DM.
 - **Michael's screenshot outranks anything cached.** Re-verify from scratch.
 - **A conclusion drawn from a thin sample gets RETRACTED in the open when the sample grows**, struck through rather than deleted. The first pass's salary read reversed inside 24 hours on one new datapoint; that reversal is the routine working, and hiding it would make the thread untrustworthy.
@@ -299,6 +356,7 @@ fixed / unfixed / newly found. A problem carried across passes must say how many
 
 ## Changelog
 
+- **v5 (2026-07-31) — TSV STATE FILE IS NOW THE SOURCE OF TRUTH.** Michael: *"i want to implement this... data store so you've got a definitive index... the goal is always full normalization of the table."* Created `routines/job-market-state.tsv` (tab-separated, 10 columns, fully normalized). Seeded with all 16 listings from passes 2026-07-30 14:10 and 2026-07-31 13:45 ET. **The thread is no longer the database** — it is the narrative and the mobile read surface. The TSV is the structured index, and each pass reads it, reconciles, and commits back. Steps rewritten: read TSV first, commit TSV as part of the pass, TSV wins any disagreement with the thread. Added columns `site` (board code) and `url` (direct posting link) per Michael's normalization requirement. Broke the "comment as API" fragility: a pass no longer reconstructs from the previous comment.
 - **v4 (2026-07-31) — DATE-TIME PASS IDS + MOBILE FIRST, TABLES DELETED.** Two corrections from Michael, both arriving after reading a real pass on a phone. (1) *"no need to number the passes. just date and time the pass"* — the ordinal counter is gone; a pass is its timestamp, which also retires the `Pass N.2` same-day convention for free and aligns pass identity with the stamp file. (2) *"assume i'll read on mobile. the tables don't land well,"* sent with a screenshot showing a column cut off at the screen edge and titles sliced mid-word. **All six templates rewritten from grids to stacked blocks; a pass may no longer contain a table at all.** Added the reason both rules exist, because a table looks tidier to the AUTHOR and the cost lands on the reader's device — the failure will be re-introduced by anyone who does not know that. **Also folded in findings the first two passes earned:** scan adjacent titles by default, Playbill's taxonomy is unreliable (2 samples), OSJ filters are not GET params, retained search firms are the top widening candidate, and survival must be verified by an actual read rather than assumed.
 - **v3 (2026-07-30) — STANDING INVENTORY + TEMPLATED COMMENT THREADS.** Michael reframed the whole thing as a housing-market search: re-state the full market every pass, sameness IS the report, dense references over prose, one task and one conversation, header comment + threaded SAME/NEW/GONE/NOTABLE/SOURCES replies. **Deleted the entire delta model.** **Added:** stable `JM-` listing IDs, verbatim templates, the cold-pickup procedure, and the three-flat-passes escape hatch. **Also reversed v2's lead-task creation.** ⚠️ Its templates were all tables and were deleted by v4.
 - **v2 (2026-07-30) — trigger gate removed, default ON.** Michael: *"don't really need this other gate. if i want it off, ill just have it removed from the schedule md."* A mode flag in a second system made "is this on?" a two-lookup question with two possible answers. The schedule row was always the real switch.
