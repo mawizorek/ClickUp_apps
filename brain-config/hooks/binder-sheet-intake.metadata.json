@@ -1,0 +1,13 @@
+{
+  "slug": "binder-sheet-intake",
+  "type": "procedure",
+  "name": "Binder Sheet Intake",
+  "status": "active",
+  "purpose": "Turn photographs of one physical binder sheet into a validated transcript the Inciardi Collection app can import.",
+  "requires": ["githubmcp_get_file_contents", "githubmcp_create_or_update_file", "fetch_website", "search_web"],
+  "produces": ["inciardi-collection/batches/<slug>.json", "inciardi-collection/batches/_index.json"],
+  "composedWith": ["commit-pre-flight", "link-provenance", "doc-rot-sweep"],
+  "created": "2026-07-31",
+  "shortcut": true,
+  "notes": "DATA ONLY. The agent never edits a .js file and never runs the import — Michael presses it from the back room after reading the preview."
+}
