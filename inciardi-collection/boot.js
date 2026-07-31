@@ -20,7 +20,7 @@
        is about to write, because a stale `batch.js` there writes wrong data into D1 permanently
        and logs success. Bump it on any change that touches a batch, or the stamp certifies a
        build that is not the one running. */
-    version: 'v14',
+    version: 'v15',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
@@ -243,7 +243,7 @@
      * identical — this is the line that tells them apart. */
     L.push('modules     ' +
       ['Device', 'Chrome', 'Settings', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox',
-       'Summary', 'Batch', 'Backroom', 'App']
+       'Summary', 'Batch', 'Preview', 'Backroom', 'App']
         .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
     L.push('hash        ' + (location.hash || '(none)'));
     L.push('worker      ' + API.base() + (API.isDefaultBase() ? '  [built-in]' : '  [OVERRIDDEN here]'));
