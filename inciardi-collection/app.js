@@ -28,12 +28,15 @@
     enter:   { globals: ['Enter'],   file: 'enter.js' },
     shoebox: { globals: ['Shoebox'], file: 'enter.js' },
     summary: { globals: ['Summary'], file: 'summary.js' },
-    /* Four globals, and each is a real dependency:
+    /* Five globals, and each is a real dependency:
      *   Backroom — the runner.  Batch — the payload.  Preview — the markup (v15 split).
+     *   Arrange  — WHERE each print sits (v17). Not optional: `build()` and `apply()` both read
+     *              their placements from it, so without it the screen has no arrangement to plan
+     *              against and would fall through to writing nothing at all.
      *   Binder   — `FACE` in binder.js is documented as the ONLY place the UI's front/back
      *              vocabulary meets the schema's 'A'/'B'. Borrowing it beats a second copy. */
-    backroom: { globals: ['Backroom', 'Batch', 'Preview', 'Binder'],
-                file: 'backroom.js / batch.js / preview.js' }
+    backroom: { globals: ['Backroom', 'Batch', 'Preview', 'Arrange', 'Binder'],
+                file: 'backroom.js / batch.js / preview.js / arrange.js' }
   };
 
   window.App = {

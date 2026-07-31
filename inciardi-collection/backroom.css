@@ -1,4 +1,4 @@
-/* Inciardi Collection — THE BACK ROOM. Headline, verdict table, run log.
+/* Inciardi Collection — THE BACK ROOM. Headline, arrangement grid, verdict table, run log.
  * ZERO COLOUR LITERALS.
  *
  * REUSES `.mxt` (the table) from summary.css rather than restating it — a screen that lists
@@ -107,10 +107,120 @@
 .br-ovr input { flex: 0 0 auto; width: 18px; height: 18px; min-height: 0; padding: 0;
   accent-color: var(--bad, var(--accent)); }
 
+/* ============================================================================
+   THE ARRANGEMENT GRID (v17). Two 3x3 grids laid out like the physical sheet, editable in place.
+
+   🔴 WHY IT LOOKS LIKE THE SHEET AND NOT LIKE A LIST. The screen already had a perfectly good
+   table of eighteen rows reading `front 1 Ninja Turtle`, and an entire sheet was imported
+   90 degrees out of true through it, because verifying a 3x3 from a flat list means doing position
+   arithmetic in your head against an object in your other hand. The grid is not decoration — it is
+   the only layout in which the error is visible at a glance.
+
+   ⚠️ EVERY CONTROL IN HERE IS A <button>, AND base.css STYLES BUTTONS AS FULL-WIDTH 44px BLOCKS
+   (same family of trap as `.br-ovr` above, and the reason `.br-go button` needs `flex: 0 0 auto`).
+   So width, min-height and padding are all restated explicitly rather than inherited. A cell that
+   silently went 100% wide would collapse the grid to one column — which on THIS screen would
+   destroy the one property the grid exists to have.
+   ============================================================================ */
+.ar { margin: var(--gap-md, 12px) 0; }
+
+.ar-top { display: flex; flex-wrap: wrap; gap: var(--gap-xs, 8px);
+  align-items: flex-start; justify-content: space-between; margin-bottom: var(--gap-xs, 8px); }
+.ar-lead { flex: 1 1 220px; margin: 0; font-size: var(--fs-xs, 0.72rem);
+  line-height: 1.5; color: var(--text-soft); text-wrap: pretty; }
+.ar-lead b { color: var(--text); font-weight: 600; }
+
+/* Icon-width, not text-width: the three per-face controls have to sit on one line next to a face
+   name on a phone, and a 44px hit area is kept in both axes despite the compact look. */
+.ar-tools { display: flex; flex: 0 0 auto; gap: 6px; flex-wrap: wrap; }
+.ar-tools button { flex: 0 0 auto; width: auto; min-width: 38px; min-height: 38px;
+  padding: 4px 9px; background: transparent; color: var(--text-soft);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  letter-spacing: 0.04em; text-transform: none; line-height: 1; cursor: pointer; }
+.ar-tools button:disabled { opacity: 0.4; cursor: default; }
+.ar-global button { min-width: 0; }
+
+.ar-face { margin-top: var(--gap-xs, 8px); }
+.ar-fh { display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gap-xs, 8px); margin-bottom: 6px; }
+/* The face name is mono/uppercase to match `BACK 9 OWNED · 0 OPEN` on the binder stage — same
+   fact, same voice, so nobody has to work out whether they mean the same thing. */
+.ar-fn { margin: 0; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-xs, 0.72rem); font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent-deep); }
+
+.ar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+
+/* Square rather than card-shaped: three rows of card proportions puts the second face and the
+   Import button off the bottom of a phone, and the point of the grid is comparing it to the sheet
+   without scrolling away from it. */
+.ar-cell { position: relative; display: flex; flex-direction: column; justify-content: flex-end;
+  width: 100%; aspect-ratio: 1 / 1; min-height: 56px; padding: 4px 5px 5px;
+  background: var(--surface-1); color: var(--text);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
+  text-align: left; text-transform: none; letter-spacing: normal; cursor: pointer;
+  overflow: hidden; }
+.ar-n { position: absolute; top: 3px; right: 5px;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.56rem;
+  letter-spacing: 0.06em; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+/* Two lines then clip. A truncated name is fine here because the table underneath carries the
+   full one — this cell only has to be recognisable, not complete. */
+.ar-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; font-size: 0.66rem; line-height: 1.25; color: var(--text);
+  word-break: break-word; }
+
+/* An empty pocket is DASHED and hollow, the same grammar the binder uses for a gap: solid means a
+   real thing, dashed means an absence. It stays tappable, because swapping a print into an empty
+   pocket is a normal correction. */
+.ar-cell.empty { background: transparent; border-style: dashed; }
+.ar-cell.empty .ar-t { color: var(--text-faint); }
+
+/* SELECTED is the loudest state on the grid, and it has to be, because it is the only state that
+   says "your next tap will move something." Filled with the brand colour: a ring alone reads as
+   focus, which is not the same promise. */
+.ar-cell.sel { background: var(--accent); border-color: var(--accent-deep); }
+.ar-cell.sel .ar-t, .ar-cell.sel .ar-n { color: var(--on-accent); }
+
+/* Verdict, carried as a left rule so it never competes with selection for the fill. Mirrors the
+   `.br-tag` vocabulary exactly: solid accent = being created, `--bad` = overwriting something. */
+.ar-cell.v-new  { border-left: 3px solid var(--accent); }
+.ar-cell.v-clash { border-left: 3px solid var(--bad, var(--border)); }
+.ar-cell.v-same { border-left: 3px dashed var(--border); }
+.ar-cell.sel.v-new, .ar-cell.sel.v-clash, .ar-cell.sel.v-same { border-left-color: var(--accent-deep); }
+
+/* 🔴 THE DRIFT BANNER. Warn-coloured and dashed, NOT `--bad`: nothing is broken and nothing is
+   refused — the app is telling you the repo file no longer matches what you are about to write.
+   `--bad` here would read as "this run will fail", which is the wrong instruction entirely. */
+.ar-drift { margin-top: var(--gap-md, 12px); padding: 9px 11px;
+  border: 1px dashed var(--warn, var(--border)); border-left-width: 3px;
+  border-radius: var(--radius, 6px);
+  font-size: var(--fs-xs, 0.72rem); line-height: 1.5; color: var(--text-soft);
+  text-wrap: pretty; }
+.ar-drift p { margin: 0; }
+.ar-drift b { color: var(--text); }
+.ar-drift code { font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--accent-deep); }
+.ar-ops { margin: 7px 0 0; padding-left: 18px; }
+.ar-ops li { margin: 2px 0; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem; letter-spacing: 0.02em; color: var(--text); }
+.ar-ops li::marker { color: var(--warn, var(--text-faint)); }
+.ar-drift .ar-tools { margin-top: 8px; }
+/* Selectable by hand, because `navigator.clipboard` can be refused without explanation and this
+   screen does not claim things happened that may not have. */
+.ar-json { margin-top: 8px; max-height: 30vh; overflow: auto;
+  -webkit-overflow-scrolling: touch; white-space: pre; word-break: normal;
+  font-size: 0.62rem; line-height: 1.45; user-select: all; }
+
 /* ---------- the verdict table ----------
    Three columns: where it goes, what it is, what will happen to it. The third column is the
-   whole point of this screen — a batch importer that shows you a list of names without saying
-   which are new and which get overwritten has told you nothing you could act on. */
+   whole point of this table — a batch importer that shows you a list of names without saying
+   which are new and which get overwritten has told you nothing you could act on.
+   ⚠️ DELIBERATELY NOT MERGED INTO THE GRID ABOVE. The grid answers WHERE a print goes and is the
+   only surface you can check against the object in your hand; this answers WHAT HAPPENS to it,
+   with room for a full name, an id, and the name of whatever it would replace. A 3x3 of clipped
+   two-line labels cannot carry all three on a phone, and trying would cost the grid the very
+   scannability it was added for. */
 .br-t td { vertical-align: top; }
 .br-pos { white-space: nowrap; width: 1%;
   font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
