@@ -1,0 +1,31 @@
+{
+  "slug": "collision-check",
+  "type": "gate",
+  "name": "Collision Check",
+  "status": "active",
+  "mandatory": true,
+  "purpose": "Stop two sessions from building the same thing, or writing the same files, at the same time.",
+  "firesOn": "BEFORE EACH WORK ITEM — not once per session. Also immediately before any merge.",
+  "requires": ["githubmcp_list_commits", "githubmcp_get_file_contents"],
+  "composedWith": ["session-open", "stale-context-reload", "commit-pre-flight"],
+  "created": "2026-07-31",
+  "shortcut": false,
+
+  "_split_note": "This is the READ half of what session-open C6 used to do alone. C6 stays the WRITE half. They were one step, which meant skipping it lost both — and gated the cheap self-interested act (looking) behind the expensive altruistic one (announcing).",
+
+  "_do_not_use": {
+    "branch_list": "100+ branches, never deleted after merge. No way to tell live from long-dead.",
+    "open_prs": "12 open on 2026-07-31, newest six days old, every one abandoned. Has the exact shape of a claim ledger and every entry is a lie. The first draft of this hook was built on it."
+  },
+
+  "_primary_signal": "githubmcp_list_commits with a path filter and since=today. Self-maintaining, timestamped, cannot go stale. Blind to work that has not landed yet — which is why the board is step 2 and the pre-merge re-check is step 4.",
+
+  "_halt_signals": [
+    "create_branch returns 'Reference already exists' — another session named your work. NEVER adopt the branch.",
+    "merge_pull_request returns merge conflicts on a branch cut minutes ago",
+    "create_or_update_file returns 409 or a SHA mismatch",
+    "file content does not match the SHA being held"
+  ],
+
+  "_origin": "Third collision in a week. On 2026-07-31 two sessions built the batch-import feature simultaneously and it surfaced only at merge. C6 already mandated a presence post; neither session reached it. The one signal that fired before any work was wasted was a branch-name collision, and it was investigated and then explained away — the wrong question was asked of it (does this branch have content) instead of the right one (who made it and are they still working)."
+}
