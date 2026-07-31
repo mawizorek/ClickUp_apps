@@ -7,7 +7,7 @@ steward: routine-ricky
 cadence: see routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 8
+version: 9
 model: loop-per-role
 ---
 
@@ -39,7 +39,7 @@ model: loop-per-role
 | Layer | Holds | Read by |
 |-------|-------|--------|
 | `routines/job-market-roles.json` | **The gate.** Defines which roles to search, with what keywords, on what boards. The loop driver. | Every pass (step 1). |
-| `routines/job-market-state.tsv` | Structured index. Every live listing normalized. | Each role iteration (filtered by lane). |
+| `routines/job-market-state.tsv` | Structured index. Every live listing normalized. Also an organic **venue/org index**: the `org` column is growing a theatre directory as a side effect. | Each role iteration (filtered by lane). |
 | Comment thread | Narrative. One standalone header per role per pass. | Michael on his phone. |
 
 **TSV is source of truth.** Thread is the read surface. TSV wins disagreements.
@@ -113,7 +113,7 @@ Tab-separated, header row, one listing per line.
 JM-<BOARD>-<org-slug>-<role-slug>
 ```
 
-Board codes: `OSJ` OffStageJobs · `USITT` · `PB` Playbill · `ECN` EntertainmentCareers.net · `AS` ARTSEARCH · `TAL` TheatreArtLife · `BWW` BroadwayWorld · `SB` StageBoard · `SJ` StageJobsy · `ACG` Arts Consulting Group · `TOC` TOC Arts Partners · `IND` Indeed · `LI` LinkedIn · `FL` Freelancer/Upwork
+Board codes: `OSJ` OffStageJobs · `USITT` · `PB` Playbill · `ECN` EntertainmentCareers.net · `AS` ARTSEARCH · `TAL` TheatreArtLife · `BWW` BroadwayWorld · `SB` StageBoard · `SJ` StageJobsy · `ACG` Arts Consulting Group · `TOC` TOC Arts Partners · `IND` Indeed · `LI` LinkedIn · `FL` Freelancer/Upwork · `LCTJ` League of Chicago Theatres · `APAP` APAP Job Bank
 
 ID is permanent. Title changes don't get new IDs.
 
@@ -229,7 +229,7 @@ AFTER ALL ROLES:
 
 **Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
 **Prev pass:** <timestamp> (<elapsed>)
-[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v8
+[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v9
 
 Role headers above: <link each>
 ```
@@ -292,8 +292,51 @@ All modes produce the same output format. The only variable is loop length.
 
 **Tier 1 (every pass):** OffStageJobs (`staging.offstagejobs.com`) · USITT Job Board · Playbill Jobs · EntertainmentCareers.net · ARTSEARCH (gated, note access)
 
-**Tier 2 (weekly or opportunistic):** Arts Consulting Group · TOC Arts Partners · TheatreArtLife · BroadwayWorld · StageBoard · Indeed (filtered: theatre + production) · LinkedIn Jobs (filtered)
+**Tier 2 (weekly or opportunistic):** Arts Consulting Group · TOC Arts Partners · TheatreArtLife · BroadwayWorld · StageBoard · Indeed (filtered: theatre + production) · LinkedIn Jobs (filtered) · League of Chicago Theatres (`LCTJ`) · APAP Job Bank (`APAP`)
 
-**Tier 3 (monthly sweep):** Freelancer platforms · Remote job boards (filtered for production/event roles) · Regional theatre association boards
+**Tier 3 (monthly sweep):** Freelancer platforms · Remote job boards (filtered for production/event roles) · Regional theatre association boards · AEA job postings (if accessible) · IATSE local union boards (if accessible)
 
-⚠️ **OffStageJobs:** the `staging.` subdomain IS the live site. Not a typo. Filters are not simple GET params; walk the full listing index.
+---
+
+## 📡 Source access notes
+
+Board realities an agent needs to know before scanning:
+
+- **OffStageJobs (`OSJ`):** `staging.offstagejobs.com` IS the live site (not a typo). Filters are not simple GET params. Detail pages sometimes lack org name. If org is unknown, log as NOTABLE/unlinked, do NOT invent a row.
+- **EntertainmentCareers.net (`ECN`):** Paywalled. Listings visible in search but detail/apply requires subscription. URLs are capturable from search results.
+- **ARTSEARCH (`AS`):** Gated behind TCG membership. Listings sometimes surface via Google cache or third-party aggregators.
+- **Indeed (`IND`):** Does NOT surface theatre staff listings reliably through keyword search. Theatre-specific terms get drowned by manufacturing/logistics. Low yield, don't spend excessive time here.
+- **APAP Job Bank (`APAP`):** Listings often lack posted dates. If no date, use `first_seen` for both `posted` and `first_seen`. Log date-absent fact in NOTABLE.
+- **OffStageJobs detail pages:** some use non-GET filters (interactive browsing required). If a listing is visible in the index but the detail URL isn't capturable, log as NOTABLE/unlinked.
+- **Playbill (`PB`) + BroadwayWorld (`BWW`):** Volume sources for mid-level. Reliable URLs via UUID paths (PB) or numeric IDs (BWW). Most productive boards for PM/TD.
+- **League of Chicago Theatres (`LCTJ`):** Clean URLs, Chicago-focused. Good for ME and SM roles specifically.
+
+---
+
+## 🧊 Cold-agent intelligence
+
+Operational knowledge for any agent picking this up cold:
+
+### Where the top-of-market lives
+
+- **Retained search firms (ACG, TOC, MCA/SearchWide Global)** carry ALL the Director+ listings. Check them first when scanning PM lane at senior level.
+- **Playbill + BWW** are the volume sources for mid-level across all lanes.
+- **Regional association boards (LCTJ, APAP)** catch niche postings the big aggregators miss.
+
+### Lane-specific realities
+
+- **SM and ME lanes are THIN on open boards.** Staff-level positions in these lanes mostly fill through union calls (AEA for SM, IATSE for ME) or direct solicitation. Open-board scans will always be sparse here. That's expected, not a failure.
+- **PM lane has the highest open-board volume.** Most theatres post PM roles publicly.
+- **TD lane overlaps PM frequently.** "Technical Director/Production Manager" combo titles are common at smaller houses. Tag to TD lane, cross-reference PM.
+
+### Org/venue data
+
+The TSV's `org` column is building a theatre directory organically. Let it grow. Every new listing adds to the venue knowledge base. Future integration potential: CRM-style company/venue list that feeds constraints back into the search (e.g. "skip orgs we've already applied to"). Not built yet, but the data is accumulating.
+
+### Procedural notes
+
+- Search firms carry top-of-market. Check ACG + TOC FIRST on every pass.
+- Cross-posted listings are common between PB and BWW. Two rows, same org. Not duplicates.
+- If a listing URL goes dead between passes, mark GONE. Don't try to find it elsewhere.
+- APAP dates are unreliable. Use NOTABLE to flag.
+- Never add a row without a working URL. The NOTABLE section exists for unlinked sightings.
