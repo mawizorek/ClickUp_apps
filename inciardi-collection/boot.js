@@ -16,7 +16,11 @@
     appName: 'Inciardi',
     appSub: 'Collection',
     logo: '\uD83D\uDCD5',
-    version: 'v13',
+    /* ⚠️ THIS STRING IS LOAD-BEARING ON ONE SCREEN. The back room prints it beside the batch it
+       is about to write, because a stale `batch.js` there writes wrong data into D1 permanently
+       and logs success. Bump it on any change that touches a batch, or the stamp certifies a
+       build that is not the one running. */
+    version: 'v14',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
