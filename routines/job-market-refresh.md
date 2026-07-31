@@ -7,7 +7,7 @@ steward: routine-ricky
 cadence: see routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 5
+version: 6
 model: standing-inventory
 ---
 
@@ -73,7 +73,7 @@ Michael: *"no need to number the passes. just date and time the pass."*
 **The thread still gets the full restatement** — for mobile reading, for the narrative, for the commentary that makes raw listings useful. But the next pass reads the TSV, not the previous comment. This breaks the "comment as API" fragility where reconstruction errors compounded across passes.
 
 **Rules:**
-- A listing enters the TSV the moment it is found (status `live`).
+- A listing enters the TSV the moment it is found **and its direct URL is captured** (status `live`).
 - A listing moves to `gone` when it disappears from the board. Gone rows stay in the TSV for one full pass after disappearance (so the GONE thread can reference them), then get deleted. Git history preserves them permanently.
 - A listing moves to `acted` when Michael says to act on it and an Application task is created.
 - The TSV is committed as part of the pass. An uncommitted pass did not happen.
@@ -82,23 +82,31 @@ Michael: *"no need to number the passes. just date and time the pass."*
 
 Tab-separated, header row, one listing per line. **Fully normalized: one fact per column, no compound fields.**
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | string | `JM-<BOARD>-<org>-<role>` — the permanent key |
-| `title` | string | Role title as posted |
-| `org` | string | Organization name |
-| `location` | string | City, State (or City, Country for non-US) |
-| `site` | string | Board code where found: `OSJ` `PB` `ECN` `USITT` `AS` `ACG` `TOC` `TAL` `BWW` `SB` `SJ` |
-| `url` | string | Direct link to the posting (empty if not captured yet) |
-| `posted` | date | Date posted on the board (`YYYY-MM-DD`) |
-| `first_seen` | date | Pass date when first found (`YYYY-MM-DD`) |
-| `salary` | string | Posted salary range or empty (never estimated) |
-| `status` | enum | `live` \| `gone` \| `acted` |
+| Column | Required | Type | Description |
+|--------|----------|------|-------------|
+| `id` | ✅ | string | `JM-<BOARD>-<org>-<role>` — the permanent key |
+| `title` | ✅ | string | Role title as posted |
+| `org` | ✅ | string | Organization name |
+| `location` | ✅ | string | City, State (or City, Country for non-US) |
+| `site` | ✅ | string | Board code where found: `OSJ` `PB` `ECN` `USITT` `AS` `ACG` `TOC` `TAL` `BWW` `SB` `SJ` |
+| `url` | ✅ | string | **Direct link to the posting. THE validation gate: no URL = no row.** |
+| `posted` | ✅ | date | Date posted on the board (`YYYY-MM-DD`) |
+| `first_seen` | ✅ | date | Pass date when first found (`YYYY-MM-DD`) |
+| `salary` | optional | string | Posted salary range or empty (never estimated) |
+| `status` | ✅ | enum | `live` \| `gone` \| `acted` |
+
+> ⚠️ **URL IS THE VALIDITY GATE (LOCKED 2026-07-31, Michael)**
+>
+> Michael: *"url for posting is required always. that's the only thing that makes a row valid."*
+>
+> A qualifying listing found on a board **without** a capturable direct link does NOT enter the TSV. It gets logged in the thread under 📌 NOTABLE as an "unlinked sighting" with whatever identifying info was visible. It becomes a real row only when the next pass (or a targeted re-fetch) captures the URL.
+>
+> **Why:** a row without a URL cannot be verified, cannot be clicked through, and cannot be acted on. It is a rumor, not a datum. The TSV is an index of actionable postings, not a list of things that might exist.
 
 **Normalization rules:**
 - One row per listing per board. Cross-posted = two rows, two IDs, same org.
 - `site` is the board code matching the ID prefix. Redundant by design: the column is filterable/sortable without parsing the ID.
-- `url` is the direct link to the individual posting, not the board's index page. Fill it on the pass that finds it; backfill on subsequent passes when a detail page is fetched.
+- `url` is **REQUIRED** for every row. The link must be to the individual posting detail page, not the board's index or search results page. A listing found without a stable direct link does not enter the TSV.
 - `salary` uses the posted range verbatim (e.g. `$67,000-80,000`). Never estimated, never converted.
 - `posted` is the board's own date. `first_seen` is when this routine first captured it. Both are useful: `posted` gives days-on-board, `first_seen` gives coverage gaps.
 
@@ -145,7 +153,7 @@ JM-<BOARD>-<org-slug>-<role-slug>
 
 **Prev pass:** <YYYY-MM-DD HH:MM> ET (<n> <hours/days> ago) · **Model:** standing inventory · **Cadence:** daily
 **Catch-up:** <no · or: YES, covers <n> days>
-**Runbook:** [job-market-refresh.md](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v5
+**Runbook:** [job-market-refresh.md](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v6
 
 ### Census
 
@@ -153,6 +161,7 @@ JM-<BOARD>-<org-slug>-<role-slug>
 - **New this pass:** <n>
 - **Gone since prev:** <n>
 - **Live inventory:** **<n>** (<±n>)
+- **Unlinked sightings (no URL):** <n>
 - **Near-misses logged:** <n>
 - **Boards read:** <n> of <n> Tier 1 <note gated/dead>
 - **Raw scanned:** ~<n>
@@ -253,6 +262,10 @@ JM-<BOARD>-<org-slug>-<role-slug>
 
 **Patterns:** <2-4 bullets max, each with the evidence attached>
 
+**Unlinked sightings** *(qualifying listings found without a direct URL — cannot enter TSV until link is captured)*
+
+- **<Role>** — <Org> · <board> · <city, ST> · <why no URL: gated/index-only/JS-rendered>
+
 **Salary sightings** *(posted numbers only, never estimates)*
 
 - **<$range>** — <org>, <role> — <✅ inventory / near-miss / below level>
@@ -292,10 +305,10 @@ fixed / unfixed / newly found. A problem carried across passes must say how many
 4. **Walk Tier 1 in order** (see SOURCES template). Apply the target profile. Discipline-check every title against the manufacturing trap. **Capture the direct URL for every qualifying listing found.**
 5. **Reconcile** against the TSV inventory: matched → SAME (days-on-board = today minus `posted`) · unmatched-new → NEW (assign a `JM-ID`) · in-TSV-but-absent-from-board → GONE. **Verify survival by an actual read, and say how you verified it** — an index listing, a detail-page fetch, or a search result. A listing assumed alive is not measured alive.
 6. **Update `routines/job-market-state.tsv`:**
-   - NEW listings: append a row with all columns filled. `url` is required if captured; leave empty only if the board doesn't provide a stable direct link.
+   - NEW listings: append a row with all columns filled. **`url` is REQUIRED.** A listing without a verifiable direct URL does not get a row. Log it in the NOTABLE thread as an unlinked sighting.
    - GONE listings: set `status` to `gone`.
-   - SAME listings: update `url` if newly captured, update `salary` if newly discovered on a detail page. No other fields change.
-   - Backfill: if a prior row has an empty `url` and this pass fetched the detail page, fill it in.
+   - SAME listings: update `salary` if newly discovered on a detail page. No other fields change.
+   - **No empty `url` fields are permitted.** If a board renders listings without stable direct links (JS-only, session-gated), report the structural problem in SOURCES and log the sighting in NOTABLE, but do not create a row.
 7. **Post the PASS HEADER** (Template 1). Capture its comment ID.
 8. **Post the threaded replies** under it, in order: SAME · NEW · GONE · NOTABLE · SOURCES. SAME, GONE and SOURCES go up even if empty.
 9. **Commit the TSV + stamp in one push:**
@@ -356,6 +369,7 @@ If the TSV and the thread ever disagree, **the TSV wins.** Fix the thread to mat
 
 ## Changelog
 
+- **v6 (2026-07-31) — URL IS REQUIRED, NOT OPTIONAL (LOCKED).** Michael: *"url for posting is required always. that's the only thing that makes a row valid."* Purged 12 of 16 rows that lacked verifiable direct URLs. Kept 4 with confirmed links (TUTS PM, Apollo DOP, Hanover VP, EST Prod/Fac Mgr). The removed listings will re-enter on the next pass when board-walking captures their URLs. Schema updated: `url` column marked REQUIRED with a validity-gate callout. Added "Unlinked sightings" category to NOTABLE template for qualifying listings found without capturable links. Step 6 rewritten: no-URL = no row, period. Also backfilled Apollo DOP salary ($150,000-170,000) from productionondeck.com.
 - **v5 (2026-07-31) — TSV STATE FILE IS NOW THE SOURCE OF TRUTH.** Michael: *"i want to implement this... data store so you've got a definitive index... the goal is always full normalization of the table."* Created `routines/job-market-state.tsv` (tab-separated, 10 columns, fully normalized). Seeded with all 16 listings from passes 2026-07-30 14:10 and 2026-07-31 13:45 ET. **The thread is no longer the database** — it is the narrative and the mobile read surface. The TSV is the structured index, and each pass reads it, reconciles, and commits back. Steps rewritten: read TSV first, commit TSV as part of the pass, TSV wins any disagreement with the thread. Added columns `site` (board code) and `url` (direct posting link) per Michael's normalization requirement. Broke the "comment as API" fragility: a pass no longer reconstructs from the previous comment.
 - **v4 (2026-07-31) — DATE-TIME PASS IDS + MOBILE FIRST, TABLES DELETED.** Two corrections from Michael, both arriving after reading a real pass on a phone. (1) *"no need to number the passes. just date and time the pass"* — the ordinal counter is gone; a pass is its timestamp, which also retires the `Pass N.2` same-day convention for free and aligns pass identity with the stamp file. (2) *"assume i'll read on mobile. the tables don't land well,"* sent with a screenshot showing a column cut off at the screen edge and titles sliced mid-word. **All six templates rewritten from grids to stacked blocks; a pass may no longer contain a table at all.** Added the reason both rules exist, because a table looks tidier to the AUTHOR and the cost lands on the reader's device — the failure will be re-introduced by anyone who does not know that. **Also folded in findings the first two passes earned:** scan adjacent titles by default, Playbill's taxonomy is unreliable (2 samples), OSJ filters are not GET params, retained search firms are the top widening candidate, and survival must be verified by an actual read rather than assumed.
 - **v3 (2026-07-30) — STANDING INVENTORY + TEMPLATED COMMENT THREADS.** Michael reframed the whole thing as a housing-market search: re-state the full market every pass, sameness IS the report, dense references over prose, one task and one conversation, header comment + threaded SAME/NEW/GONE/NOTABLE/SOURCES replies. **Deleted the entire delta model.** **Added:** stable `JM-` listing IDs, verbatim templates, the cold-pickup procedure, and the three-flat-passes escape hatch. **Also reversed v2's lead-task creation.** ⚠️ Its templates were all tables and were deleted by v4.
