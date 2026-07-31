@@ -16,11 +16,13 @@
     appName: 'Inciardi',
     appSub: 'Collection',
     logo: '\uD83D\uDCD5',
-    /* ⚠️ THIS STRING IS LOAD-BEARING ON ONE SCREEN. The back room prints it beside the batch it
-       is about to write, because a stale `batch.js` there writes wrong data into D1 permanently
-       and logs success. Bump it on any change that touches a batch, or the stamp certifies a
-       build that is not the one running. */
-    version: 'v15',
+    /* Printed in the footer, in the diagnostics bundle, and beside the batch on the back room's
+       run screen.
+       ⚠️ AS OF v16 IT CERTIFIES THE CODE ONLY. It used to be the thing standing between a cached
+       `batch.js` and thirty-seven successful writes of the wrong arrangement — but batch data is
+       JSON fetched `no-store` now, so it cannot go stale and the stamp no longer speaks for it.
+       Still bump it on every ship; it is how a screenshot says which build produced it. */
+    version: 'v16',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
@@ -52,7 +54,7 @@
      *      design; anyone reading the source finds this and could POST to the worker without it.
      *      The real protections are the guards in backroom.js and D1 Time Travel. */
     hidden: [
-      { route: 'backroom', label: 'Back room', hint: 'Load a transcribed batch of prints' }
+      { route: 'backroom', label: 'Back room', hint: 'Import a transcribed sheet of prints' }
     ],
 
     sources: [
