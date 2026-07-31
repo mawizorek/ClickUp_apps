@@ -8,16 +8,18 @@
 (function () {
 
   /* A table rather than an if-chain: adding a screen is one line, and a missing module fails at
-   * exactly one place (below) instead of silently doing nothing. */
+   * exactly one place (below) instead of silently doing nothing.
+   * Every entry takes `p` even when it ignores it — the router parses params for all routes, and
+   * an entry that drops them is a route that cannot be deep-linked later without someone first
+   * noticing this line. `backroom` is exactly that: it ignored params until `?batch=` existed. */
   var SCREENS = {
     binder:   function (p) { Binder.mount(p); },
     enter:    function ()  { Enter.mount(); },
     shoebox:  function ()  { Shoebox.mount(); },
     summary:  function ()  { Summary.mount(); },
     // UNLISTED. Surfaced only at the foot of the settings panel — see the header in backroom.js
-    // for what that is and is not worth. It dispatches like any other route; there is no second
-    // router.
-    backroom: function ()  { Backroom.mount(); }
+    // for what that is and is not worth. It dispatches like any other route; no second router.
+    backroom: function (p) { Backroom.mount(p); }
   };
 
   /* Which global each route needs, and which FILE provides it. A script that 404'd is otherwise
@@ -28,10 +30,13 @@
     enter:   { globals: ['Enter'],   file: 'enter.js' },
     shoebox: { globals: ['Shoebox'], file: 'enter.js' },
     summary: { globals: ['Summary'], file: 'summary.js' },
-    /* Four globals, and each is a real dependency:
-     *   Backroom — the runner.  Batch — the payload.  Preview — the markup (v15 split).
+    /* Four globals, each a real dependency:
+     *   Backroom — the runner.  Batch — the loader + validator.  Preview — the markup.
      *   Binder   — `FACE` in binder.js is documented as the ONLY place the UI's front/back
-     *              vocabulary meets the schema's 'A'/'B'. Borrowing it beats a second copy. */
+     *              vocabulary meets the schema's 'A'/'B'. Borrowing it beats a second copy.
+     * ⚠️ `Batch` is now the LOADER, not a transcript. It is present even when no batch file
+     * exists, so this check no longer says anything about whether there is data to import —
+     * that is `batches/_index.json`, and backroom.js reports an empty manifest itself. */
     backroom: { globals: ['Backroom', 'Batch', 'Preview', 'Binder'],
                 file: 'backroom.js / batch.js / preview.js' }
   };
