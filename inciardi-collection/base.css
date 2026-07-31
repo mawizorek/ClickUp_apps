@@ -22,6 +22,32 @@
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 
+/* ---------- 🔴 DOUBLE-TAP ZOOM IS OFF ON CONTROLS. PINCH-ZOOM IS NOT. (v18) ----------
+ *
+ * Speed-tapping the deck-bar turn arrows on a phone read as two taps in one place, and iOS
+ * answered with a zoom in the middle of the turn. The cause is the ~300ms double-tap-to-zoom
+ * gesture, which every touch browser arms on any element that has not opted out of it.
+ *
+ * `touch-action: manipulation` is "auto MINUS double-tap zoom and other non-standard gestures."
+ * Scrolling survives. Swipe-to-turn survives. **PINCH-ZOOM SURVIVES.** That last one is the whole
+ * reason this is not a viewport change:
+ *
+ *   - `user-scalable=no` / `maximum-scale=1` has been IGNORED by iOS Safari since iOS 10. It
+ *     would have looked like a fix and done nothing, which is worse than no fix.
+ *   - The only thing that DOES kill zoom globally is preventDefault on `gesturestart`, and it
+ *     kills PINCH everywhere — including the 1800px print carousel the image work is being
+ *     designed around (Decision Log J10), where pinching a print is the entire point.
+ *   - Taking zoom away from a whole app is an accessibility regression wearing a bug fix.
+ *
+ * So the gesture is disabled where it is a MISFIRE (controls) and left alone where it is a
+ * FEATURE (content).
+ *
+ * ⚠️ A SELECTOR LIST, NOT `* { }`. A universal rule would reach `.plate` and every image that
+ * lands on it — exactly the surface that has to keep pinch. Add new interactive elements to this
+ * list; do not widen it to everything. */
+button, a, summary, label, .chip, .slot, .item,
+[role="button"], [role="tab"], input, select { touch-action: manipulation; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -43,8 +69,15 @@ body:not(.stage) { padding-bottom: 2rem; }
 
 /* THE STAGE. Binder only: nothing scrolls, the sheet is bounded by the screen.
    `dvh` not `vh` — on iOS Safari `vh` includes the retracted URL bar, so a vh-sized stage runs
-   taller than the visible area and the bottom bar hides under the browser chrome. */
-body.stage { height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+   taller than the visible area and the bottom bar hides under the browser chrome.
+
+   🔴 `touch-action: manipulation` ON THE WHOLE STAGE, not just its buttons. This route does not
+   scroll and has no text to zoom into, so double-tap zoom has no legitimate job anywhere on it —
+   and it is the one route with fast repeated taps (‹ › walk one face at a time, so turning six
+   faces is six taps in the same 42px target). Covering the stage rather than the arrows alone
+   also catches the double-tap that lands half-on a card. Pinch still zooms; see the block above. */
+body.stage { height: 100dvh; overflow: hidden; display: flex; flex-direction: column;
+  touch-action: manipulation; }
 
 .skip-link { position: absolute; left: -9999px; }
 .skip-link:focus { left: var(--gap-md, 12px); top: var(--gap-md, 12px); z-index: 80;
