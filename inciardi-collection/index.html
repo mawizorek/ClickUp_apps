@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v16. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v17. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
@@ -22,9 +22,10 @@
        enter.js     8.1KB  entry form + shoe-box            → Enter, Shoebox
        summary.js  14.9KB  the collection matrix            → Summary
        batch.js    10.9KB  loads + VALIDATES a batch file   → Batch
-       preview.js  10.7KB  the back room's markup           → Preview
-       backroom.js 13.1KB  choose · read · decide · write   → Backroom
-       app.js       3.8KB  routing only                     → App
+       arrange.js  ~11KB   WHERE each print sits, editable  → Arrange
+       preview.js  ~11KB   the back room's markup           → Preview
+       backroom.js ~14KB   choose · read · decide · write   → Backroom
+       app.js       4.0KB  routing only                     → App
        boot.js     14.6KB  config · theme · router · settings wiring · diagnostics
 
        base.css    12.6KB  type · forms · lists · toasts
@@ -32,7 +33,7 @@
        binder.css  15.1KB  stage · cards · deck bar
        sheets.css   3.5KB  sheet list · legend
        summary.css 10.5KB  the matrix
-       backroom.css 9.1KB  headline · validator output · verdict table · log
+       backroom.css ~12KB  headline · arrangement grid · validator output · verdict table · log
 
        batches/    DATA, NOT CODE. One .json per physical sheet, plus `_index.json` listing them.
                    Fetched at runtime, never bundled, never parsed as JavaScript. The size budget
@@ -40,18 +41,31 @@
                    because editing one cannot break the app. Procedure for adding one:
                    `brain-config/hooks/batch-import.md`.
 
-     🔴 v16 MOVED THE RISKIEST INPUT OUT OF CODE. Until now a new sheet meant editing `batch.js`:
+     🔴 v16 MOVED THE RISKIEST INPUT OUT OF CODE. Until then a new sheet meant editing `batch.js`:
      transcribing a photograph was a JavaScript edit, in the file that feeds an irreversible bulk
      write, where a stray brace is a parse error. Now the transcript is inert JSON, validated
      before anything is sent, and the loader is a file nobody has to touch again.
+
+     🔴 v17 GAVE THE TRANSCRIPT A SECOND CHANCE, WHICH IS A DIFFERENT PROBLEM FROM VALIDATING IT.
+     `batch.js` proves a batch is WELL FORMED. Nothing could prove it was TRUE — and the ice-cream
+     sheet imported eighteen cards 90° out of true past a green validator, because the confirm
+     screen listed rows (`front 1 Ninja Turtle`) rather than showing the sheet. `arrange.js` adds
+     the 3x3 grid AND the ability to fix it in place: rotate, mirror, swap faces, swap two pockets.
+     Michael: "the preview grid is only helpful if i can edit it."
+     ⚠️ It edits the RUN, never the FILE — a static site cannot write to the repo. So a dirty
+     arrangement warns, loudly, and hands over the corrected JSON to paste back. Read the hazard
+     note in `arrange.js`; the short version is that slots are written ON CONFLICT DO UPDATE, so an
+     unfixed batch file can silently undo a corrected import on the next run.
 
      ⚠️ STILL AT THE LINE: binder.css 15.1KB, binder.js 15.0KB, summary.js 14.9KB, boot.js 14.6KB.
      Named seams, so nobody has to find them under pressure:
        binder.css  → `card.css` (the .slot block is a third of the file)
        summary.js  → `matrix.js` + `drill.js`
        boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern)
-       backroom.js → PLAN vs APPLY. ⚠️ STILL OWED — v15 took the markup instead because the write
-                     path should not be refactored on a morning someone is about to use it.
+       backroom.js → PLAN vs APPLY. ⚠️ STILL OWED, third version running. v15 took the markup and
+                     v17 took the arrangement instead, both because the write path should not be
+                     refactored on a day someone is about to use it. That excuse has now been used
+                     twice, which is how a rule stops being one — take it next.
      🔴 AND THE REAL OFFENDER IS `worker/worker.js` AT 29.3KB — one byte under the hard read cap,
      so every edit to it is a full retype of a file too big to verify. That is the next split in
      this app, before any new route. Seam: `worker/reads.js` (the six GETs; /summary and /shoebox
@@ -89,12 +103,12 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=16">
-<link rel="stylesheet" href="./chrome.css?v=16">
-<link rel="stylesheet" href="./binder.css?v=16">
-<link rel="stylesheet" href="./sheets.css?v=16">
-<link rel="stylesheet" href="./summary.css?v=16">
-<link rel="stylesheet" href="./backroom.css?v=16">
+<link rel="stylesheet" href="./base.css?v=17">
+<link rel="stylesheet" href="./chrome.css?v=17">
+<link rel="stylesheet" href="./binder.css?v=17">
+<link rel="stylesheet" href="./sheets.css?v=17">
+<link rel="stylesheet" href="./summary.css?v=17">
+<link rel="stylesheet" href="./backroom.css?v=17">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -114,23 +128,24 @@
      ⚠️ settings.js only has to be PARSED before boot.js runs Chrome.init; it sits next to
      chrome.js because the two are halves of one thing. If it 404s, chrome.js builds a drawer that
      says so and boot.js skips its wiring — a missing panel, not a blank app.
-     ⚠️ batch.js is a LOADER now, not data — the batches themselves are JSON fetched at mount. It
-     and preview.js only need to be parsed before backroom.js mounts; app.js names all three in
-     NEEDS, and backroom.js refuses to render without them. -->
+     ⚠️ batch.js is a LOADER, not data — the batches themselves are JSON fetched at mount. It,
+     arrange.js and preview.js only need to be parsed before backroom.js mounts; app.js names all
+     four in NEEDS, and backroom.js refuses to render without them, naming the missing file. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./device.js?v=16"></script>
-<script src="./core.js?v=16"></script>
-<script src="./chrome.js?v=16"></script>
-<script src="./settings.js?v=16"></script>
-<script src="./binder.js?v=16"></script>
-<script src="./sheets.js?v=16"></script>
-<script src="./picker.js?v=16"></script>
-<script src="./enter.js?v=16"></script>
-<script src="./summary.js?v=16"></script>
-<script src="./batch.js?v=16"></script>
-<script src="./preview.js?v=16"></script>
-<script src="./backroom.js?v=16"></script>
-<script src="./app.js?v=16"></script>
-<script src="./boot.js?v=16"></script>
+<script src="./device.js?v=17"></script>
+<script src="./core.js?v=17"></script>
+<script src="./chrome.js?v=17"></script>
+<script src="./settings.js?v=17"></script>
+<script src="./binder.js?v=17"></script>
+<script src="./sheets.js?v=17"></script>
+<script src="./picker.js?v=17"></script>
+<script src="./enter.js?v=17"></script>
+<script src="./summary.js?v=17"></script>
+<script src="./batch.js?v=17"></script>
+<script src="./arrange.js?v=17"></script>
+<script src="./preview.js?v=17"></script>
+<script src="./backroom.js?v=17"></script>
+<script src="./app.js?v=17"></script>
+<script src="./boot.js?v=17"></script>
 </body>
 </html>
