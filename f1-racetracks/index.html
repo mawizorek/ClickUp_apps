@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  F1 2026 — unified app shell (v10).
+  F1 2026 — unified app shell (v10; v17.1 cache-bust).
   REAL one-app: this file is the router/shell, not a stored page. It owns the ONE
   persistent chrome (brand + Matrix / History / Circuits switcher) and a single hash
   router. Each lens is an isolated surface mounted here:
@@ -8,11 +8,19 @@
     - Circuits          -> circuits.html
   Both surfaces are kept warm and cross-faded, so switching never reloads and the chrome
   never unmounts. Isolation is deliberate: the two lenses are classic-script bundles that
-  share (and depend on) their own document's global scope, and their CSS :root token sets
-  clash on purpose (--s1/2/3 mean different things per lens). Separate surfaces = zero
-  collision, no rewrite. The shell is same-origin with both lenses, so app-shell.js ADOPTS
-  each on load (injects chrome-hiding CSS + drives its hash) without editing the lens code.
-  Router: source/app-shell.js. Cache-bust: bump ?v on it per deploy.
+  share (and depend on) their own document's global scope. ⚠️ The old note here said their
+  :root token sets "clash on purpose" — as of v17 that is no longer true; both lenses link
+  source/chrome-tokens.css, which unifies the vocabulary (--txt / --s1 / --s2 / --s3) and
+  aliases circuits' older names onto it. Separate surfaces are still the right call for the
+  global-scope reason; the token clash is gone. The shell is same-origin with both lenses,
+  so app-shell.js ADOPTS each on load (injects chrome-hiding CSS + drives its hash) without
+  editing the lens code.
+  Router: source/app-shell.js.
+
+  🚨 CACHE-BUST: bump ?v on app-shell.js EVERY time its behaviour changes. v17.1 exists
+  partly because it did not get bumped: the shell's chrome-hiding EMBED_CSS gained a
+  selector and a cached app-shell.js would have kept injecting the old list, leaving the
+  duplicate header on screen with the fix already merged.
 
   v10 (iOS scroll fix, PROVEN): the two lens iframes are position:absolute overlays and the
   Circuits one paints on top. When standings is active, the invisible Circuits iframe still
@@ -125,6 +133,6 @@
     <iframe id="lens-standings" title="Championship Matrix" src="standings.html"></iframe>
     <iframe id="lens-circuits" title="Circuit Guide" src="circuits.html"></iframe>
   </main>
-  <script src="source/app-shell.js?v=10"></script>
+  <script src="source/app-shell.js?v=11"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-/* chrome-tokens.css — THE SHARED CHROME SPINE (new 2026-08-01, v17).
+/* chrome-tokens.css — THE SHARED CHROME SPINE (new 2026-08-01, v17; v17.1 embed fix).
 
    WHY THIS FILE EXISTS. Michael, looking at the live app: "why does matrix and history
    feel in a separate shell than Circuits? they have like different header scaling even if
@@ -15,11 +15,17 @@
    stylesheets whole through a write path that has no partial edit — the transcription risk
    refused in Decision Log J12. The cascade does the same job for free.
 
+   🚨 IF YOU ADD CHROME HERE, HIDE IT IN SECTION 6. Every one of these surfaces runs in TWO
+   contexts: standalone (direct link — it owns its chrome) and embedded in the unified shell
+   (index.html, iframes — the SHELL owns the chrome). v17 added the standings lockup and did
+   not hide it, so the shell rendered two brands and two switchers stacked. Six-minute-old
+   regression, caught on the live app. Section 6 is not optional.
+
    ⚠️ THIS IS TRANSITIONAL. Build Order steps 8-13 replace all three shells with one router
    + chrome.js. This file is the vocabulary that consolidation inherits, not a fourth chrome.
    Do NOT grow it into a component library. Tokens, type ramp, brand, lens switcher. Stop.
 
-   Decision Log J16 (the measurement) and J17 (this).
+   Decision Log J16 (the measurement), J17 (the spine), J18 (the embed regression).
 */
 
 /* ===========================================================================
@@ -144,6 +150,23 @@ header.mast h1,.mast .hgp{font-size:var(--fs-mast);line-height:1.02;letter-spaci
 .lens .on{background:var(--s3);color:var(--txt);cursor:default}
 .lens a:hover:not(.on){color:var(--txt);background:var(--s2)}
 @media(max-width:560px){.lens>*{padding:8px 11px;font-size:0.6rem;letter-spacing:0.06em}}
+
+/* ===========================================================================
+   6. 🚨 EMBEDDED MODE — every surface runs in TWO contexts and this is the second one.
+
+   index.html mounts each lens in a same-origin iframe and app-shell.js adds
+   `.shell-embedded` to that document's <html>, because THE SHELL owns the top chrome when
+   embedded. A lens that draws its own brand or switcher must hide it here or the user gets
+   two of each, stacked. That is exactly what v17 shipped for six minutes.
+
+   ⚠️ The rule is ALSO in app-shell.js's EMBED_CSS, injected straight into the iframe. Both,
+   on purpose: this file keeps the hide next to the thing it hides (so the next person to add
+   chrome sees it), and the injected copy holds even if this stylesheet is cached or slow.
+   If you add a row here, add its selector there too.
+   =========================================================================== */
+html.shell-embedded .mast-top{display:none!important}
+html.shell-embedded .topbar .brand,
+html.shell-embedded .topbar .lens{display:none!important}
 
 /* Cross-document view transitions. Declared once here instead of in three <style> blocks,
    and honoured by the reduced-motion guard the app already uses everywhere else. */
