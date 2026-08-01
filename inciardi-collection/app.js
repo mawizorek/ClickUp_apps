@@ -14,6 +14,7 @@
     enter:    function ()  { Enter.mount(); },
     shoebox:  function ()  { Shoebox.mount(); },
     summary:  function ()  { Summary.mount(); },
+    photos:   function ()  { Photos.mount(); },
     // UNLISTED. Surfaced only at the foot of the settings panel — see the header in backroom.js
     // for what that is and is not worth. It dispatches like any other route; there is no second
     // router.
@@ -33,12 +34,19 @@
     enter:   { globals: ['Enter'],   file: 'enter.js' },
     shoebox: { globals: ['Shoebox'], file: 'enter.js' },
     summary: { globals: ['Summary'], file: 'summary.js' },
+    /* ⚠️ CAPTURE IS A REAL DEPENDENCY, NOT A NICETY. The Add photos button calls it directly, so
+     * a missing capture.js gives a page that looks entirely fine until you press the one control
+     * the screen exists for — and then does nothing at all. Naming it here turns that into a
+     * message at mount. */
+    photos:  { globals: ['Photos', 'Capture'], file: 'photos.js / capture.js' },
     /* Binder is a REAL dependency even though this page never renders a sheet: `Binder.face()`
      * is the one place 'A'/'B' becomes Front/Back, and the placement list speaks that
      * vocabulary. artwork.js carries a fallback so a missing binder.js degrades the wording
      * rather than blanking the page — but naming it here is what turns a silent 404 into a
-     * message that says which file to check. */
-    artwork: { globals: ['Artwork', 'Binder'], file: 'artwork.js / binder.js' },
+     * message that says which file to check.
+     * Capture is named for the same reason as on `photos`: the print page grew its own camera
+     * button at v20 (Q15 → A: both surfaces, one module). */
+    artwork: { globals: ['Artwork', 'Binder', 'Capture'], file: 'artwork.js / binder.js / capture.js' },
     /* Five globals, and each is a real dependency:
      *   Backroom — the runner.  Batch — the payload.  Preview — the markup (v15 split).
      *   Arrange  — WHERE each print sits (v17). Not optional: `build()` and `apply()` both read
