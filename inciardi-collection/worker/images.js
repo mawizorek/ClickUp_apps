@@ -71,6 +71,11 @@ const SCOPES = {
 const KEY_PREFIX = 'ed/';
 const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
+/* The paths this module owns. Exact matches; the serve route is matched separately because it
+ * carries an id. Kept beside SCOPES rather than inline so adding a route means editing one
+ * list, not two places that can disagree. */
+const MINE = ['/images', '/image', '/image/assign', '/image/primary', '/image/archive'];
+
 const intOrNull = v => (v == null || v === '' || isNaN(Number(v))) ? null : parseInt(v, 10);
 
 async function sha256Hex(buf) {
@@ -94,11 +99,32 @@ async function linkImage(db, all, imageId, editionId, t) {
 export async function handleImage(ctx) {
   const { request, db, bucket, all, reply, path, url, method, t } = ctx;
 
-  /* ⚠️ EVERY ROUTE EXCEPT /images NEEDS THE BUCKET, and a missing binding is a DEPLOYMENT fact
-   * rather than a bug in this file. Say which, loudly. The plausible cause is a deploy whose
-   * API token had no R2 permission — that fails the deploy, so if you are seeing this at
-   * runtime the running worker is older than you think. */
-  if (path !== '/images' && !bucket) {
+  /* 🔴 CLAIM THE ROUTE FIRST, THEN CHECK THE BUCKET. The ORDER is the fix, and it is the whole
+   * point of this block.
+   *
+   * This guard originally read `if (path !== '/images' && !bucket) return 503` — and worker.js
+   * hands this function EVERY path. So on a worker with no R2 binding, `POST /artwork` would
+   * have been answered "no R2 binding on this worker": the app's primary write, shadowed by a
+   * module it has nothing to do with, blaming a subsystem it never touches. Same for /copy,
+   * /slot, /sheet and the 404 itself.
+   *
+   * ⚠️ THE HEADER OF THIS FILE FORBIDS EXACTLY THAT, three paragraphs up: "A 404 here would
+   * shadow every other write." A guard placed BEFORE the route match IS a 404 for every path
+   * it does not recognise. The rule was written correctly by the same pass that broke it —
+   * which is why it was caught by reading the guard against worker.js's DISPATCH rather than
+   * against its own comment. A comment states intent; the dispatch is evidence.
+   */
+  const isServe = method === 'GET' && path.startsWith('/image/');
+  if (!isServe && !MINE.includes(path)) return null;
+
+  /* Only TWO routes actually touch R2 — the upload and the proxy. assign / primary / archive
+   * are pure D1 and must keep working with no binding at all; losing the ability to re-order
+   * or archive photos because a bucket is unbound would be a self-inflicted outage.
+   *
+   * A missing binding is a DEPLOYMENT fact, not a bug in this file. The plausible cause is a
+   * deploy whose API token had no R2 permission — which fails the deploy, so if you are seeing
+   * this at runtime the running worker is older than you think. */
+  if ((isServe || (path === '/image' && method === 'POST')) && !bucket) {
     return reply({ ok: false, error: 'no R2 binding on this worker',
       fix: 'wrangler.toml needs [[r2_buckets]] binding = "BUCKET", then a redeploy. If it IS already in the file, the last deploy FAILED — check the Actions run rather than editing the config again.' }, 503);
   }
@@ -146,7 +172,7 @@ export async function handleImage(ctx) {
    * bucket stays PRIVATE so this is the only door. A public bucket would be a second read path
    * that cannot 404 an archived row and cannot be rotated (J13).
    */
-  if (method === 'GET' && path.startsWith('/image/')) {
+  if (isServe) {
     const id = decodeURIComponent(path.slice('/image/'.length));
     const rows = await all('SELECT r2_key, source_url, content_type, status FROM image WHERE image_id = ?', [id]);
     if (!rows.length) return reply({ ok: false, error: 'no image "' + id + '"' }, 404);
