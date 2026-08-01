@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v18. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v19. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
@@ -12,35 +12,39 @@
      RULE 2 — **`index.html` is an INDEX** (architecture lock, 2026-07-08): a thin shell that
      references pages, never a file storing servable content.
 
-     ⚠️ EVERY NUMBER BELOW WAS MEASURED AT v18, NOT ESTIMATED. The v17 commit shipped this map
-     with guessed sizes and three of them were wrong by 3-5KB — `arrange.js` was written down as
-     ~11KB and is 15.8KB. **A size map with invented numbers is worse than no map, because the whole
-     point of it is deciding when to split, and a guess reads exactly like a measurement.** Re-read
-     the directory listing when you touch this. (This file does not list its own size: a file cannot
-     state its own length without being wrong the moment it says so.)
+     ⚠️ EVERY NUMBER BELOW WAS MEASURED AT v19 FROM A DIRECTORY LISTING, NOT ESTIMATED. v17
+     shipped this map with guessed sizes and three were wrong by 3-5KB. **A size map with invented
+     numbers is worse than no map, because the whole point of it is deciding when to split, and a
+     guess reads exactly like a measurement.** Re-measure when you touch this. (This file does not
+     list its own size: a file cannot state its own length without being wrong the moment it does.)
 
        device.js    2.9KB  mobile vs desktop, one owner     → Device
-       app.js       4.1KB  routing only                     → App
-       picker.js    4.5KB  the slot entry surface           → Picker
+       app.js       5.1KB  routing only                     → App
+       picker.js    6.6KB  the slot entry surface           → Picker
        sheets.js    6.3KB  reorder · rename · add           → Sheets
        enter.js     8.1KB  entry form + shoe-box            → Enter, Shoebox
        settings.js  9.2KB  the settings panel               → Settings
        core.js      9.6KB  API client · Drawer · helpers    → API, Core, Drawer
+       artwork.js  10.6KB  one print, in full               → Artwork        (v19, new)
        batch.js    10.9KB  loads + VALIDATES a batch file   → Batch
-       chrome.js   11.7KB  header · nav · scrim · footer    → Chrome
+       chrome.js   12.2KB  header · nav · scrim · footer    → Chrome
        preview.js  12.9KB  the back room's markup           → Preview
-       boot.js     14.8KB  config · theme · router · settings wiring · diagnostics
        binder.js   15.0KB  the stage, faces, turning        → Binder
        arrange.js  15.8KB  WHERE each print sits, editable  → Arrange       ⚠️ over the line
        backroom.js 16.5KB  choose · read · decide · write   → Backroom      ⚠️ over the line
+       boot.js     17.7KB  config · theme · router · settings wiring · diagnostics  ⚠️ over
 
        styles.css   1.2KB  pointers only, zero colour literals
        sheets.css   3.5KB  sheet list · legend
+       artwork.css  8.4KB  the print page + the picker's door to it          (v19, new)
        summary.css 10.5KB  the matrix
        chrome.css  13.2KB  header · drawers · footer
-       base.css    14.7KB  type · forms · lists · toasts · TOUCH-ACTION (v18, +2.1KB)
+       base.css    14.7KB  type · forms · lists · toasts · touch-action
        binder.css  15.1KB  stage · cards · deck bar                         ⚠️ over the line
        backroom.css 16.3KB headline · arrangement grid · validator · verdict table · log ⚠️ over
+
+       worker/worker.js 19.6KB  shell · the write gate · seven write routes  (was 29.3KB)
+       worker/reads.js  13.8KB  the seven GET routes                        (v19, new)
 
        batches/    DATA, NOT CODE. One .json per physical sheet, plus `_index.json` listing them.
                    Fetched at runtime, never bundled, never parsed as JavaScript. The size budget
@@ -48,42 +52,56 @@
                    because editing one cannot break the app. Procedure for adding one:
                    `brain-config/hooks/batch-import.md`.
 
-     🔴 v16 MOVED THE RISKIEST INPUT OUT OF CODE. Until then a new sheet meant editing `batch.js`:
-     transcribing a photograph was a JavaScript edit, in the file that feeds an irreversible bulk
-     write, where a stray brace is a parse error. Now the transcript is inert JSON, validated
-     before anything is sent, and the loader is a file nobody has to touch again.
+     🔴 v19 SPLIT THE WORKER, AND THAT WAS THE URGENT HALF. `worker/worker.js` was 29,326 bytes
+     against the ~30KB hard read cap — 674 bytes of headroom — so every edit to the app's ONLY
+     write path was one careless paragraph from becoming a blind full retype. Three consecutive
+     version notes promised this split before the next route. The seam is pure/impure: reads need
+     no auth and share no state, so they left; the writes stayed, because the one-write-path rule
+     belongs in the file called `worker.js`. Nothing else changed — a split commit is exactly
+     where a quiet behavioural edit hides.
 
-     🔴 v17 GAVE THE TRANSCRIPT A SECOND CHANCE, WHICH IS A DIFFERENT PROBLEM FROM VALIDATING IT.
-     `batch.js` proves a batch is WELL FORMED. Nothing could prove it was TRUE — and the ice-cream
-     sheet imported eighteen cards 90° out of true past a green validator, because the confirm
-     screen listed rows (`front 1 Ninja Turtle`) rather than showing the sheet. `arrange.js` adds
-     the 3x3 grid AND the ability to fix it in place: rotate, mirror, swap faces, swap two pockets.
-     Michael: "the preview grid is only helpful if i can edit it."
-     ⚠️ It edits the RUN, never the FILE — a static site cannot write to the repo. So a dirty
-     arrangement warns, loudly, and hands over the corrected JSON to paste back. Read the hazard
-     note in `arrange.js`; the short version is that slots are written ON CONFLICT DO UPDATE, so an
-     unfixed batch file can silently undo a corrected import on the next run.
+     🔴 v19 ALSO BUILT THE PAGE Q6's ANSWER HAS RESTED ON SINCE 2026-07-25. *"I'm fine with just A
+     if the assumption is that I can go to the edition detail menu and input a photo later"* — the
+     answer was recorded as settled and the condition was never built (J11). `#artwork?id=` is
+     that surface. **A conditional answer whose condition is a build step needs that step written
+     down as a step**, or the condition quietly becomes an assumption.
+     ⚠️ It ships WITHOUT photos, on purpose: the carousel and the upload button are blocked on an
+     R2 binding, and a control that 500s is worse than an honest gap. `next-build-spec.md` §5.
 
-     🔴 v18 IS ONE CSS RULE, AND THE INTERESTING PART IS THE THREE FIXES IT IS NOT.
-     Speed-tapping the deck-bar turn arrows on a phone triggered iOS double-tap zoom mid-turn.
-     The fix is `touch-action: manipulation` in `base.css` — on interactive elements and on the
-     whole `body.stage`, which does not scroll and has no text to zoom into. NOT DONE, and each
-     for a stated reason recorded there in full: `user-scalable=no` on the viewport tag (iOS
-     Safari has ignored it since iOS 10 — it would have looked like a fix and done nothing), a
-     `gesturestart` preventDefault (kills PINCH everywhere, including the 1800px print carousel
-     the image work is being designed around), and a universal `* { touch-action }` (would reach
-     `.plate` and every image that lands on it — the one surface that must keep pinch).
-     ⚠️ THE VIEWPORT TAG BELOW IS DELIBERATELY UNTOUCHED. If a future session "fixes zoom" by
-     adding `maximum-scale=1` or `user-scalable=no` to it, that is a regression twice over: it
-     does nothing on iOS and it is an accessibility loss on everything else.
+     🔴 THREE ROUTE CLASSES NOW, and the third exists because the other two are both MENUS.
+     `APP.nav` draws the drawer; `APP.hidden` draws the settings footer link; **`APP.detail` draws
+     nowhere** — a detail route needs a param, so any menu row pointing at one is permanently
+     broken. All three must be listed in boot.js's `routes` or the router silently falls back to
+     the binder, and all three must be titled in chrome.js or the header shows the app name.
+
+     ⚠️ FIVE FILES ARE NOW OVER THE 15KB SPLIT LINE, all still under the 22KB ceiling — so all five
+     read whole and edit safely, which is the line that actually matters. Named seams:
+       boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern).
+                     ⚠️ NEWLY OVER, and by my own hand: v19 added ~2.1KB of comment to it. Same
+                     shape as the v17 `arrange.js` bloat, caught one version later instead of
+                     none. This seam is the most overdue in the front end.
+       binder.css  → `card.css` (the .slot block is a third of the file)
+       backroom.css → `arrange.css` (the grid block is self-contained)
+       arrange.js  → nothing yet. One feature, mostly comment; trim before splitting.
+       backroom.js → PLAN vs APPLY. ⚠️ DODGED THREE TIMES (v15 markup, v17 arrangement, v19 not
+                     touched at all). The stated reason — never refactor the write path on a day
+                     someone is about to use it — is real and does not expire. It is also now the
+                     longest-standing debt in the app.
+
+     🔴 HOW IT WENT WRONG ORIGINALLY, because the mechanism matters more than the numbers: v4 added
+     the sheet menu, v5 the stage, v6 traversal, v7 the shoe-box split — four reasonable changes,
+     one file, no moment anyone would have called it a problem. `app.js` hit 32.7KB, `styles.css`
+     30KB. Size Sally forecasts exactly this and Dev Dexter owns the split law; both are
+     invoke-only and neither was seated across those four versions. A guardrail that needs
+     remembering is not a guardrail — which is why the answer is a DEFAULT SHAPE, not a fifth gate.
      ============================================================================
 
-     ⚠️ THE `?v=` BUMP WAS HOUSEKEEPING AT v17 AND IS LOAD-BEARING AGAIN AT v18, for a new reason:
-     the entire v18 change IS a stylesheet, so a cached `base.css` serves the bug and the build
-     stamp would still read v18. Bump the CSS, not just the JS. (The v14 hazard — a cached
-     `batch.js` writing the WRONG arrangement into D1 — is separately dead: batch data is fetched
-     `no-store` and cannot be served stale at all.) The build stamp stays on the run screen
-     because it still answers "which CODE is running."
+     ⚠️ BUMP `?v=` ON BOTH CSS AND JS. It was housekeeping at v17, load-bearing at v18 (the whole
+     change was a stylesheet), and load-bearing again at v19 for the opposite reason: a cached
+     `boot.js` has no `APP.detail`, so `#artwork?id=` would silently redirect to the binder and
+     read as a dead link rather than a stale cache. The build stamp in the footer is how a
+     screenshot says which code is running — and `boot.js` → `version` must be bumped in the SAME
+     commit as this comment, because v17 shipped with the two disagreeing.
 
      ⚠️ STILL NOT BUILT: no `manifest.webmanifest`, no `apple-mobile-web-app-capable`. A
      home-screen icon today opens in the browser WITH its address bar, and Android will not offer
@@ -92,8 +110,8 @@
 <html lang="en" data-theme="mercedes" data-mode="dark">
 <head>
 <meta charset="utf-8">
-<!-- ⚠️ DO NOT ADD `maximum-scale` OR `user-scalable=no` HERE. See the v18 block above: the zoom
-     misfire is solved in base.css with `touch-action`, and a viewport scale lock is both
+<!-- ⚠️ DO NOT ADD `maximum-scale` OR `user-scalable=no` HERE. See the v18 note in git history: the
+     zoom misfire is solved in base.css with `touch-action`, and a viewport scale lock is both
      ineffective on iOS and an accessibility regression everywhere else. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Mercedes surface-1. Paints the iOS browser chrome; settings.js moves it with the mode toggle,
@@ -106,12 +124,13 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=18">
-<link rel="stylesheet" href="./chrome.css?v=18">
-<link rel="stylesheet" href="./binder.css?v=18">
-<link rel="stylesheet" href="./sheets.css?v=18">
-<link rel="stylesheet" href="./summary.css?v=18">
-<link rel="stylesheet" href="./backroom.css?v=18">
+<link rel="stylesheet" href="./base.css?v=19">
+<link rel="stylesheet" href="./chrome.css?v=19">
+<link rel="stylesheet" href="./binder.css?v=19">
+<link rel="stylesheet" href="./sheets.css?v=19">
+<link rel="stylesheet" href="./summary.css?v=19">
+<link rel="stylesheet" href="./backroom.css?v=19">
+<link rel="stylesheet" href="./artwork.css?v=19">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
@@ -133,22 +152,25 @@
      says so and boot.js skips its wiring — a missing panel, not a blank app.
      ⚠️ batch.js is a LOADER, not data — the batches themselves are JSON fetched at mount. It,
      arrange.js and preview.js only need to be parsed before backroom.js mounts; app.js names all
-     four in NEEDS, and backroom.js refuses to render without them, naming the missing file. -->
+     four in NEEDS, and backroom.js refuses to render without them, naming the missing file.
+     ⚠️ artwork.js is reached by LINK, never by menu, so a 404 on it shows up as a broken tap from
+     the picker rather than a missing nav row. app.js names it in NEEDS for exactly that reason. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./device.js?v=18"></script>
-<script src="./core.js?v=18"></script>
-<script src="./chrome.js?v=18"></script>
-<script src="./settings.js?v=18"></script>
-<script src="./binder.js?v=18"></script>
-<script src="./sheets.js?v=18"></script>
-<script src="./picker.js?v=18"></script>
-<script src="./enter.js?v=18"></script>
-<script src="./summary.js?v=18"></script>
-<script src="./batch.js?v=18"></script>
-<script src="./arrange.js?v=18"></script>
-<script src="./preview.js?v=18"></script>
-<script src="./backroom.js?v=18"></script>
-<script src="./app.js?v=18"></script>
-<script src="./boot.js?v=18"></script>
+<script src="./device.js?v=19"></script>
+<script src="./core.js?v=19"></script>
+<script src="./chrome.js?v=19"></script>
+<script src="./settings.js?v=19"></script>
+<script src="./binder.js?v=19"></script>
+<script src="./sheets.js?v=19"></script>
+<script src="./picker.js?v=19"></script>
+<script src="./enter.js?v=19"></script>
+<script src="./summary.js?v=19"></script>
+<script src="./batch.js?v=19"></script>
+<script src="./arrange.js?v=19"></script>
+<script src="./preview.js?v=19"></script>
+<script src="./backroom.js?v=19"></script>
+<script src="./artwork.js?v=19"></script>
+<script src="./app.js?v=19"></script>
+<script src="./boot.js?v=19"></script>
 </body>
 </html>
