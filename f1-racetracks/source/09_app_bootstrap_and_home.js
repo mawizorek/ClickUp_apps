@@ -1,9 +1,7 @@
 /* Runtime boot + home surface for the circuit guide.
- v6.1 (2026-07-10): PER-CIRCUIT DATA LAYER + PER-YEAR SEASON INDEX. Each circuit is its
- own file circuits/<slug>.json (TIMELESS identity + layout); per-year fields (round/date/
- status/sessions) live in circuits/index_circuits.json keyed by slug. Boot fetches the
- index, loads each circuit file (Promise.all), merges the per-year fields on, assembles
- TRACKS in index order, renders. Completed-race results come from module 12. Soft-fail.
+
+ v6.1 (2026-07-10): per-circuit data layer + a per-year season index living inside the
+ circuits index. SUPERSEDED by v11 below - see git history for the original note.
 
  v8 (2026-07-13): CIRCUITS card + jump restyle (database cards .rcard/.rc-*, jump side
  drawer .jump-*), self-contained here.
@@ -11,7 +9,7 @@
  v9 (2026-07-13): CULL + FILTERS.
  - Header culled: dropped the marketing hero (H1 + paragraph; the shell bar already brands
  the app). Kept a slim eyebrow + the current-round carousel. The standalone legend row is
- gone — the Status filter chips carry the legend (colored dots) now.
+ gone - the Status filter chips carry the legend (colored dots) now.
  - Real top-level FILTER BAR on the home surface (.filters / .chip / .flt-*), all data-
  backed: Continent (derived from cc), Era (Classic/Modern editorial split), Status
  (Completed/Live/Upcoming from index status), Breakdown (report flag). AND across
@@ -20,7 +18,7 @@
  Team-home-race deliberately omitted (ambiguous; needs a curated mapping, not a guess).
 
  v11 (2026-08-01): THREE VECTORS, DERIVED ORDERING. The v6.1 note above is superseded.
- Boot no longer reads the circuits index for per-year data — that index is now a plain
+ Boot no longer reads the circuits index for per-year data - that index is now a plain
  slug -> file map of TIMELESS circuit identity. The season calendar is its own vector at
  season/2026/index_weekends.json (one row per RACE WEEKEND), and round / status / the short
  display date / the current+last round pointers are all DERIVED at boot by source/08_season.js
@@ -31,25 +29,20 @@
  Consequences here: status is re-derived per track in the CIRCUIT'S OWN TIMEZONE (the weekend
  flips live on Friday morning at the track, not at the viewer's midnight), and a weekend whose
  circuit file does not exist yet STILL RENDERS as an upcoming round with report:false, instead
- of vanishing through the old per-file soft-fail. Decision Log J7-J9. */
+ of vanishing through the old per-file soft-fail. Decision Log J7-J9.
 
-const APP_VERSION = "v11";
+ v12 (2026-08-01): THE SEAT VECTOR. Team colour and driver short name are no longer computed
+ here. Both were being derived from DISPLAY STRINGS: TEAM_COLORS was a literal map keyed on the
+ team name out of the round files (it resolved 7 of the 11 teams actually present - Audi, Haas,
+ Cadillac and Aston Martin all silently took the grey fallback, and three of its keys matched
+ nothing at all), and lastName() split a driver's full name on whitespace. Both now resolve from
+ season/2026/index_drivers.json via F1Season. An unknown team warns once instead of failing
+ silently. Decision Log J10. */
+
+const APP_VERSION = "v12";
 const APP_DATE = "2026-08-01";
 const SEASON = "2026";
 const CIRCUITS_BASE = "circuits/";
-
-const TEAM_COLORS = {
- Mercedes: "#6CD3BF",
- Ferrari: "#FF5A60",
- McLaren: "#FF9B3B",
- "Red Bull": "#6EA8FF",
- RedBull: "#6EA8FF",
- Williams: "#7DB6FF",
- Alpine: "#7DE3FF",
- "Racing Bulls": "#C0C8FF",
- AstonMartin: "#66D1A7",
- Aston: "#66D1A7"
-};
 
 /* Continent derived from the circuit's country code (cc). Verified against the circuit
  files, every circuit has a cc, so this maps cleanly with no guessing. */
@@ -63,7 +56,7 @@ const CONTINENT = {
 };
 const CONTINENT_ORDER = ["Europe", "Asia", "Middle East", "N. America", "S. America", "Oceania"];
 // Editorial era split: recently-added / street-era venues = Modern; heritage venues = Classic.
-// NOTE: `sepang` is deliberately absent — it is an editorial call, not a fact, and this pass
+// NOTE: `sepang` is deliberately absent - it is an editorial call, not a fact, and this pass
 // refused to guess one. It currently reads Classic by default.
 const MODERN = new Set(["miami", "las-vegas", "losail", "yas-marina", "cota", "baku", "madring", "marina-bay"]);
 
@@ -94,8 +87,16 @@ const E = (t, a = {}) => {
 };
 
 const esc = s => String(s ?? "").replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-const lastName = name => String(name || "").trim().split(/\s+/).slice(-1)[0] || name || "";
-const teamTone = team => TEAM_COLORS[team] || "#D7DCE4";
+
+/* v12: both of these read the SEAT vector (season/2026/index_drivers.json) instead of picking
+ a value out of a display string. Each keeps its old behaviour as the fallback, so a driverId
+ the vector does not carry, or a failed vector load, degrades to exactly what v11 rendered. */
+const lastName = (name, driverId) => {
+ const seat = driverId && window.F1Season ? window.F1Season.seatFor(driverId) : null;
+ if (seat && seat.short) return seat.short;
+ return String(name || "").trim().split(/\s+/).slice(-1)[0] || name || "";
+};
+const teamTone = team => (window.F1Season ? window.F1Season.teamColor(team) : "#D7DCE4");
 
 function footerText(target) {
  return target
