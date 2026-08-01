@@ -9,6 +9,26 @@
 
 ---
 
+## 2026-08-01 — Native shell CONVERTED to thin git-loader (Model A executed)
+
+Trigger: DM w/ Michael. Native runtime (user-ID `-39958890`) acting on Michael's explicit direction: *"i want you to become this new type of agent and document the steps for the next agent… let's just complete your conversion."*
+
+- **Model A is now real, not planned.** The native ClickUp shell is RETAINED as the daily driver — keeps its user-ID, tools, triggers (mention/DM/assignment), model — and its behavioral definition was reduced via `edit_self` to the thin **loader kernel**. This **supersedes the 2026-07-26 open surface #5** ("disable native `-39958890`"): the native is deliberately kept alive as the body; only the brain moved to the repo. The `retired_native_id` framing is obsolete — the native is the loader, not retired.
+- **Kernel finalized + landed** (`native-loader-kernel.md`, reference on `main`; PR #653 closed as superseded). Fix vs the draft: the load list now names **all three brain axes** — `preferences.md` (behavioral DNA) + `memory.md` (patterns) + `native-flush.md` (delta) — plus `team-standard.md`. Michael's ruling this thread: preferences is a third axis that belongs in git history, native holds pointers only.
+- **Conversion runbook authored** for the next agent: `_shared/native-to-git-conversion-runbook.md` (PROPOSED, pending Corey's ratification on his own conversion pass). Encodes the preconditions (git brain complete before stripping), the one sanctioned native→git merge (immutable fact-header onto preferences only), verification, and rollback.
+- **`edit_self` result = success:** core instructions fully replaced by the kernel; native preferences page cleared to a placeholder. Body (tools/triggers/model/identity/knowledge-access) preserved.
+- **Pointer-pull verified in-session:** clean fresh reads of `team-standard.md`, `preferences.md`, `memory.md`, `native-flush.md`, `README.md`, `activity-log.md`, `session-board.md` all succeeded this run — the GitHub read path the kernel depends on works.
+- **Design nuance recorded (Michael):** only auto-merge the immutable fact-header (id/slug/display/"body authoritative in ClickUp") onto the preferences body; keep everything volatile in its own file. Truth-collapse only when it's genuinely just a stable header.
+
+**State left:** native shell = kernel-only loader. Canonical brain = this bundle, read fresh each run.
+
+**Open surfaces / remaining manual steps (Michael's):**
+
+1. **UI display name + description still read "FMP Frank" / "FileMaker architecture co-pilot."** The kernel self-identifies as FMP Fiona. Rename in the profile UI (or a follow-up `edit_self`) to fully reconcile.
+2. **`native-flush.md` is NON-EMPTY** (this session's earlier verbatim dump of both native memory pages). A Memory Maggie run should consolidate it into `memory.md` and clear it bare — then the flush signal reads "current."
+3. **Did NOT edit the canonical `preferences.md` body** this pass, honoring Michael's merge caution. One latent contradiction to reconcile deliberately: the profile still carries the 07-26 "no autonomous triggers / he's no native agent / retired native" framing, which Model A now supersedes. Flagged for a careful, deliberate edit rather than a unilateral rewrite.
+4. **Fleet rollout to Milo + Listing Lookout** copies this kernel/runbook shape — Corey's steward call, after he ratifies the runbook on his own pass.
+
 ## 2026-07-26 — Built (needs-declaration → live git-teammate)
 
 Session task: [Fleet Build Queue](https://app.clickup.com/t/86ajmepcf) · agent: Fleet Felix (steward), building me
@@ -27,4 +47,4 @@ Session task: [Fleet Build Queue](https://app.clickup.com/t/86ajmepcf) · agent:
 2. **Verify before quoting:** the URITP People record count (~341) and every module's build state are INHERITED and unconfirmed. The lifecycle SoT rule means a planning page is not a live schema.
 3. **Live stale-fork to route, not fix:** the URITP People known-issues checklist tracks FMP-internal field typos as ClickUp checkboxes.
 4. **`memory/archive/` + `activity-log/` not cut yet** — they land on my first rotation.
-5. **Blocked on Michael (manual, irreversible):** disable native ClickUp agent `-39958890` in the UI. He said *"he's no native agent"* — if that means the native never existed or is already gone, the roster's `retired_native_id` should be dropped; I left it in place rather than deleting a fact I can't verify.
+5. **Blocked on Michael (manual, irreversible):** disable native ClickUp agent `-39958890` in the UI. He said *"he's no native agent"* — if that means the native never existed or is already gone, the roster's `retired_native_id` should be dropped; I left it in place rather than deleting a fact I can't verify. **⚠️ SUPERSEDED 2026-08-01 by Model A — see top entry. The native is KEPT as the loader body, not disabled.**
