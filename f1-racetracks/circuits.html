@@ -1,6 +1,6 @@
 <!--
   F1 Racetracks (circuit guide lens)
-  Version: v18 (shell) · one chrome renderer + shared token spine + sequential style band
+  Version: v19 (shell) · forms vector (sharp) + one chrome renderer + shared token spine
   Live: https://mawizorek.github.io/ClickUp_apps/f1-racetracks/circuits.html
   Source: https://github.com/mawizorek/ClickUp_apps/tree/main/f1-racetracks
   INFRASTRUCTURE: slim runtime entrypoint + direct source modules in /source.
@@ -18,12 +18,16 @@
   COLOUR (v16): 08_season.js also reads shared/themes/colors.tsv and injects --t-<team>,
   --t-<team>-2 and --t-<team>-deep onto :root, so team colour has ONE source across the app
   and a two-stop team gradient is expressible. Edit the TSV row, every surface follows.
-  CHROME (v17 + v18): source/chrome-tokens.css is the shared TOKEN spine (vocabulary, type
-  scale, gutter, brand + switcher styling) and source/chrome.js is the one RENDERER. The
-  brand and lens switcher used to be hand-written in this file; they are now a
-  <div data-chrome> mount, and that module is the only place the markup exists in the app.
-  It draws nothing when embedded in the unified shell, so a lens can no longer double the
-  shell's header. Decision Log J16-J19.
+  CHROME (v17 + v18): source/chrome-tokens.css is the shared TOKEN spine and source/chrome.js
+  is the one RENDERER. The brand and lens switcher used to be hand-written in this file; they
+  are now a <div data-chrome> mount, and that module is the only place the markup exists in
+  the app. It draws nothing when embedded in the unified shell.
+  FORMS (v19): chrome-tokens.css carries shared/themes/forms.tsv row `sharp` — radius,
+  border-w, gradient angle, the elevation scale and the motion set — and repoints every
+  hardcoded radius in the app at it. ⚠️ THIS LENS WAS THE ROUND ONE: its cards were 7px, its
+  filter bar 9px, its weekend card 20px, all hand-typed. Corners are 4px from the grid now.
+  To change the whole app's feel, swap the row in forms.tsv; do NOT type a radius here.
+  Decision Log J16-J20.
   STYLE BAND: 02..07 fetched in order below.
   DESIGN SYSTEM: Chakra Petch / JetBrains Mono / Inter + shared oklch (hue 268).
   v7: runs under the unified shell (index.html); chrome.js suppresses this page's own
@@ -59,7 +63,8 @@
     /* FIRST-PAINT FLOOR ONLY. The canonical vocabulary is --txt / --txt-mid / --s1 / --s2 /
        --s3 in source/chrome-tokens.css, which loads after this block and aliases these
        names onto it. Every value here was verified byte-identical to its canonical twin
-       before the aliases were written, so nothing shifts colour. Do not add tokens here. */
+       before the aliases were written, so nothing shifts colour. Do not add tokens here,
+       and do NOT add a radius — corners come from the forms vector (chrome-tokens §7). */
     :root{
       --bg:oklch(0.16 0.012 268);--bg2:oklch(0.195 0.014 268);
       --surface:oklch(0.225 0.015 268);--surface2:oklch(0.265 0.016 268);
@@ -76,13 +81,15 @@
        would still reserve its gap. Collapsing it keeps the jump control flush right. */
     .topbar [data-chrome][data-chrome-state="embedded"]{display:none}
     .nav-jump{display:flex;align-items:center;gap:8px}
-    .nav-jump select{font-family:'JetBrains Mono',monospace;font-size:.74rem;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px 11px;cursor:pointer;max-width:60vw}
+    /* v19: was `border:1px solid` + `border-radius:9px`, both hand-typed. This is the one
+       radius literal in the app small enough to delete at source instead of override. */
+    .nav-jump select{font-family:'JetBrains Mono',monospace;font-size:.74rem;background:var(--surface);color:var(--text);border:var(--border-w,1px) solid var(--line);border-radius:var(--radius,4px);padding:8px 11px;cursor:pointer;max-width:60vw}
   </style>
   <!-- LAST on purpose: the shared spine wins the cascade over the floor above. -->
-  <link rel="stylesheet" href="./source/chrome-tokens.css?v=20260801c">
+  <link rel="stylesheet" href="./source/chrome-tokens.css?v=20260801d">
   <script>
     // Bump this one token on every source/style deploy to guarantee fresh bytes.
-    const BUILD_STAMP = '20260801c';
+    const BUILD_STAMP = '20260801d';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
@@ -126,24 +133,24 @@
     <div id="app"></div>
 
     <footer class="app">
-      <span class="meta-txt" id="foot-meta">F1 Racetracks v18 · loading data…</span>
+      <span class="meta-txt" id="foot-meta">F1 Racetracks v19 · loading data…</span>
       <div class="toolbar">
         <a class="tool" href="./live-tracker.html">Live tracker</a>
       </div>
     </footer>
   </div>
 
-  <script src="./source/chrome.js?v=20260801c"></script>
-  <script src="./source/08_season.js?v=20260801c"></script>
-  <script src="./source/12_results_store.js?v=20260801c"></script>
-  <script src="./source/09_app_bootstrap_and_home.js?v=20260801c"></script>
-  <script src="./source/10_track_views_and_profile.js?v=20260801c"></script>
-  <script src="./source/13_live_session_panel.js?v=20260801c"></script>
-  <script src="./source/11_weather_and_footer_exports.js?v=20260801c"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260801c"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260801c"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260801c"></script>
-  <script src="./source/17_weekend_mount.js?v=20260801c"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260801c"></script>
+  <script src="./source/chrome.js?v=20260801d"></script>
+  <script src="./source/08_season.js?v=20260801d"></script>
+  <script src="./source/12_results_store.js?v=20260801d"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260801d"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260801d"></script>
+  <script src="./source/13_live_session_panel.js?v=20260801d"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260801d"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260801d"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260801d"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260801d"></script>
+  <script src="./source/17_weekend_mount.js?v=20260801d"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260801d"></script>
 </body>
 </html>
