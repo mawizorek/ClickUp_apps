@@ -2,18 +2,23 @@
 slug: job-market-refresh
 display_name: Job Market Refresh
 type: runbook
-status: active
 steward: routine-ricky
-cadence: see routines/schedule.md
+cadence: pointer only — authoritative cadence is the row in routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 12
+version: 13
 model: loop-per-role
 ---
 
+> ⚠️ **Frontmatter is metadata, never a switch.** A `status:` key used to sit here. It was removed 2026-08-01: `routines/schedule.md`'s table is the ONLY on/off switch (LOCKED 2026-07-30, Michael, who cut exactly this kind of second switch the day it shipped). Never decide whether to run this from the header above.
+
 # Job Market Refresh
 
-**WHAT this does.** The WHEN lives in `routines/schedule.md`. The universal floor lives in `routines/README.md`.
+goal:       every pass restates the ENTIRE live market for each configured role — same listings, new listings, disappeared listings — to one standing ClickUp thread, with the TSV as the structured index behind it.
+target:     `routines/job-market-state.tsv` (source of truth) · the standing thread `86ajtgbt3` (read surface) · `routines/last-run/job-market.txt` (stamp). **Creates no tasks and sends nothing.**
+report-to:  DETAIL → the standing thread `86ajtgbt3` (role blocks + pass summary). ROLL-UP → 🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajuhw1d
+
+**WHAT this does.** The WHEN lives in `routines/schedule.md`. The universal floor lives in `routines/README.md` — including **THE STAMP LAW** and **rule 13 (complete loops)**, both of which this routine leans on hard because it is the longest procedure we have.
 
 ## Locked decisions
 
@@ -30,10 +35,13 @@ model: loop-per-role
 > Each role is its own market entity. The routine loops over the role config and produces a SEPARATE, COMPLETE report per role. Shared lane/TSV column does NOT mean shared summary. Every role gets the same depth, the same template, the same treatment. No aggregation across roles in the output.
 
 > **📊 DENSITY FLOOR: 40-60 LIVE LISTINGS PER PASS.** (LOCKED 2026-07-31, Michael)
-> The performing arts market is not sparse. A pass yielding fewer than 40 listings means the sweep was shallow, NOT that the market is thin. If total live drops below 40, the agent MUST: (1) re-sweep all Tier 1 sources with alternate keyword permutations, (2) expand to Tier 2 sources not yet hit, (3) try paginated/filtered views on gated boards. The density floor is a quality gate, not a stretch goal. A pass below 40 is a FAILED pass and must be retried or flagged as incomplete with an explanation of what blocked each source.
+> The performing arts market is not sparse. A pass yielding fewer than 40 listings means the sweep was shallow, NOT that the market is thin. If total live drops below 40, the agent MUST: (1) re-sweep all Tier 1 sources with alternate keyword permutations, (2) expand to Tier 2 sources not yet hit, (3) try paginated/filtered views on gated boards. The density floor is a quality gate, not a stretch goal. **A pass below 40 is a DECLARED FAILURE** — per THE STAMP LAW it does NOT stamp, and it must be retried or reported as incomplete with an explanation of what blocked each source.
 
 > **🗂️ PASS SUMMARY = TABLE OF CONTENTS.** (LOCKED 2026-07-31, Michael)
 > The Pass Summary comment MUST include a comment index with hyperlinks to each ROLE HEADER comment posted during the run (plus the SOURCES comment). Threaded replies under those headers do NOT need individual links. On mobile, threaded comments collapse or get lost. The summary is the reader's navigation layer; direct links to each role header let the reader jump straight to any role's block.
+
+> **🔁 COMPLETE LOOPS — THIS IS THE ROUTINE THAT WILL TEMPT YOU.** (LOCKED 2026-08-01, Michael)
+> This is by far the longest procedure in `routines/`, and length is not a reason to hurry. **Never skip a keyword, a board, a page of pagination, or a template section because the pass feels long.** Finish each ROLE completely — header, SAME, NEW, GONE, NOTABLE — before starting the next one. If you are going to run out of room, stop at a **role boundary**, commit the TSV rows you have, and say exactly which roles were not swept. A shallow sweep is indistinguishable from a thin market, which is the entire reason the density floor exists.
 
 ## 📍 Architecture
 
@@ -237,7 +245,7 @@ AFTER ALL ROLES:
 
 **Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
 **Prev pass:** <timestamp> (<elapsed>)
-[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v12
+[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v13
 
 <Density verdict: one line.>
 
@@ -288,19 +296,37 @@ AFTER ALL ROLES:
 8. **Stage TSV updates** for this role: append NEW rows, mark GONE rows, update salary if newly found on SAME.
 9. **Post 🎯 ROLE HEADER** as root comment. **Capture comment URL.**
 10. **Post threaded replies** under role header: SAME / NEW / GONE / NOTABLE (if content).
-11. **Repeat from step 5** for next role.
+11. **Repeat from step 5** for next role. **Finish each role completely before starting the next** (README rule 13) — a role that got a header but no SAME/NEW/GONE block is a broken loop, not a short one.
 
 ### Post-loop
 
-12. **Density check:** If total live < 40, flag pass as BELOW FLOOR. List which sources were blocked/thin and what retry was attempted. Do NOT silently accept a thin pass.
-13. **Commit TSV + stamp in one push:**
-    - `routines/job-market-state.tsv` (all role updates batched)
-    - `routines/last-run/job-market.txt` (one line: `YYYY-MM-DD HH:MM ET`)
-    - Message: `data(job-market): <timestamp> ET — <n> live, <+-n>`
+12. **Density check:** If total live < 40, this is a **DECLARED FAILURE** (see the density floor above). List which sources were blocked/thin and what retry was attempted. Do NOT silently accept a thin pass, and do NOT stamp it.
+13. **Commit the TSV:** `routines/job-market-state.tsv` (all role updates batched). Message: `data(job-market): <timestamp> ET — <n> live, <+-n>`. **Commit the TSV even on a below-floor pass** — the rows found are real and losing them helps nobody. The stamp is what gets withheld, not the data.
 14. **Post 📋 PASS SUMMARY** as root comment. **Build the 🗂️ Comment index** from the role header URLs captured in step 9 across every role iteration, plus the SOURCES comment URL from step 15. Each role header and the SOURCES comment get a hyperlink. Threaded replies do not.
 15. **Post 🔌 SOURCES** threaded under summary. Capture its URL and include it in the index (post summary may need an edit to add this final link, OR post SOURCES first and then the summary).
+16. **STAMP** — *last write, and only if the pass succeeded.* Write `routines/last-run/job-market.txt`, one line, `YYYY-MM-DD HH:MM` ET. **Per THE STAMP LAW** (`routines/README.md`): a complete pass stamps; a pass where a board was blocked but the inventory still landed is a PARTIAL and stamps with the gap named; **a below-floor pass or an aborted loop does NOT stamp** and stays overdue. *(Moved here 2026-08-01 — the stamp used to be written in step 13, before the pass summary existed. A stamp before the product lands is a lie with a timestamp on it.)*
+17. **Post the roll-up** to 🧭 STANDING · Routine Ricky — Run Reports (https://app.clickup.com/t/86ajuhw1d): one line for this routine, linking the pass summary comment.
 
 > ⚠️ **Ordering note:** Since SOURCES is threaded under the summary, you may either (a) post SOURCES first, capture its URL, then post the summary with all links including SOURCES; or (b) post the summary with role links, then post SOURCES and edit the summary to add the SOURCES link. Either approach is valid. What matters: the final state of the summary comment includes links to all role headers and SOURCES.
+
+---
+
+## Guardrails (STOP + flag if any is true)
+
+*Added 2026-08-01 — this runbook shipped without a Guardrails section, which meant the busiest routine in the framework had no written STOP conditions at the moment a cold agent would need them.*
+
+- **You are about to create a ClickUp TASK.** This routine creates none. Listings become Application tasks ONLY when Michael says to act. A pass that files tasks is the failure mode that killed v2.
+- **You are about to send anything** (email, DM, application). This routine transmits nothing, ever.
+- **You are about to create a second research task or a second thread.** One task, one conversation. `86ajtgbt3` or nothing.
+- **A listing has no working direct URL** → no TSV row. Log it as an unlinked sighting in NOTABLE. Never invent or reconstruct a URL.
+- **A row's `role_id` doesn't match an entry in `job-market-roles.json`** → orphan row, STOP and flag rather than guessing a lane.
+- **Total live is under 40** → DECLARED FAILURE. Re-sweep per the density floor; if still short, report incomplete and do NOT stamp.
+- **You would post output containing a markdown table** → STOP. Mobile-first, stacked blocks only.
+- **You would aggregate roles into one shared block** → STOP. Loop, not summary. Every role gets its own full treatment.
+- **You are tempted to shorten the sweep because the pass is long** → STOP. That is the exact condition rule 13 exists for.
+- **You would replay every missed day on a catch-up** → STOP. A late pass is ONE pass covering more days, never nine passes.
+- **You would edit `job-market-roles.json` mid-pass to make results fit** → STOP. Config changes are a separate, explicit instruction.
+- **You are about to stamp before step 16**, or stamp a below-floor pass → STOP. See THE STAMP LAW.
 
 ---
 
@@ -308,11 +334,11 @@ AFTER ALL ROLES:
 
 | Mode | Trigger | Behavior |
 |------|---------|----------|
-| **Full loop** | Scheduled cadence or "run job market refresh" | All roles in config, sequential |
+| **Full loop** | Cadence is due, or "run job market refresh" | All roles in config, sequential |
 | **Single role** | "do job search for [role name]" | One role only, same template, same depth |
 | **Add role** | "add [role] to job search" | Edit JSON config, run that role immediately |
 
-All modes produce the same output format. The only variable is loop length.
+All modes produce the same output format. The only variable is loop length. *("Scheduled cadence" was removed from the trigger column 2026-08-01 — there is no scheduler; see `routines/schedule.md`.)*
 
 ## Sources
 
@@ -420,3 +446,10 @@ The TSV's `org` column is building a theatre directory organically. Let it grow.
 - Never add a row without a working URL. The NOTABLE section exists for unlinked sightings.
 - **When a board is "gated" or yields few results:** try alternate entry points (category browse, department pages, paginated views, Google site: searches). Log what was attempted. A gated board is a NOTABLE entry explaining the access issue, not a reason to accept low yield across the whole pass.
 - **Keyword exhaustion:** don't stop at the first keyword that returns results. Try ALL keywords in the role config against each board. Different boards index differently. "Production Manager" and "Director of Production" often live in different categories on the same board.
+
+---
+
+## Changelog
+
+- **v13 (2026-08-01)** — brought into the standard runbook shape: added the `goal:` / `target:` / `report-to:` header (it had none, so a cold agent had no way to learn where a run gets reported), added the **Guardrails** section (it had none at all), removed `status: active` from the frontmatter (a second on/off switch, which `schedule.md` forbids), moved the STAMP from step 13 to step 16 so it lands after the pass summary rather than before it, restated the density floor as a *declared failure* that withholds the stamp per THE STAMP LAW, and added the complete-loops lock. No change to sources, templates, IDs, or the TSV schema.
+- v12 (2026-07-31) — loop-per-role, mobile-first, timestamped passes, density floor, comment index.
