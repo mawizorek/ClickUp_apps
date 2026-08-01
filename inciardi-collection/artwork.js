@@ -14,28 +14,26 @@
  * build step needs that step written down AS A STEP**, or the condition quietly becomes an
  * assumption that everything downstream rests on.
  *
- * WHY A ROUTE AND NOT A DRAWER. Michael struck the bottom-sheet option (Q16 C) even though it
- * was the fastest to build, so **linkability beat speed** — consistent with v7's deep links. A
- * print is now addressable: you can send yourself a link to Choco Taco.
+ * ⭐ v20 CLOSED IT. The photo block below is no longer an apology; it is a camera. Six days from
+ * the answer to the surface, and one more version to the control the answer actually promised.
  * ============================================================================
  *
- * 🔴 IT READS `/summary`, AND THAT IS A DESIGN DECISION, NOT LAZINESS.
- * `/summary` already returns every print's counts plus every placement in the binder, and the
- * Collection matrix renders off exactly that response. Giving this page its own route would mean
- * a SECOND query computing owned/placed/spare — and two queries that answer the same question
- * eventually disagree. `worker/reads.js` says the same thing from the other side.
- * The cost is honest and small: it fetches the whole collection to render one print. At 59
- * artworks that is one small JSON. **If it ever gets slow, the fix is a route that SELECTS from
+ * 🔴 IT READS `/summary` AND `/images`, AND ADDS NO ROUTE OF ITS OWN.
+ * `/summary` already returns every print's counts plus every placement, and the Collection
+ * matrix renders off exactly that response. `/images` already returns every photo with the
+ * editions it is attached to. Giving this page its own endpoints would mean SECOND queries
+ * computing the same facts — and two queries that answer one question eventually disagree.
+ * The cost is honest and small: it fetches collection-wide JSON to render one print. At this
+ * size that is one small payload. **If it ever gets slow, the fix is a route that SELECTS from
  * the same view, never a second calculation.**
- *
- * ⚠️ NO PHOTOS HERE YET, DELIBERATELY. The carousel, the filmstrip and the upload button are
- * `next-build-spec.md` steps 5 + 8, and they are blocked on an R2 bucket binding and the image
- * routes. This page ships the empty state INSTEAD OF the button, because a control that 500s is
- * worse than an honest gap — and the gap is where they land, unchanged, when the pipe exists.
  */
 (function () {
 
+  var last = null;      // the params of the current render, so an upload can refresh in place
+  var shots = [];       // this print's photographs, in the order the filmstrip shows them
+
   function esc(s) { return Core.esc(String(s == null ? '' : s)); }
+  function imgUrl(im) { return API.base() + '/image/' + encodeURIComponent(im.image_id); }
 
   /* Binder.face() is the ONE place 'A'/'B' becomes Front/Back. Borrowed, never copied — a second
    * mapping is a second thing to get wrong. The fallback exists only so a missing binder.js
@@ -89,8 +87,7 @@
   /* ---------- editions ----------
    * 🔴 AN IMPLICIT EDITION IS NEVER RENDERED AS A BADGE. schema.sql is explicit: implicit=1 means
    * the row exists because the ARTWORK exists, not because Anastasia numbered anything. Printing
-   * "#1" on Luna Moth is the phantom-badge bug the predecessor shipped. It is named here as
-   * structural, so a reader knows the row is real and the number is not. */
+   * "#1" on Luna Moth is the phantom-badge bug the predecessor shipped. */
   function editions(list) {
     if (!list.length) return '';
     var rows = list.map(function (e) {
@@ -103,22 +100,106 @@
     return '<h2 class="aw-h">Editions</h2><ul class="aw-eds">' + rows + '</ul>';
   }
 
-  /* ---------- photos: the honest gap ----------
-   * Shipping the empty state rather than a disabled button, for the same reason the back room
-   * renders NO run button on an invalid batch: a disabled control says "there is a way to make
-   * this go," and there is not one yet. */
-  function photos() {
+  /* ============================================================ photographs (v20)
+   *
+   * ⭐ THE CAMERA IS HERE AND IN Photos, FROM ONE MODULE — Q15 → A, verbatim. Shooting from a
+   * print's own page attaches the photo the moment it exists, so the whole library step is
+   * skipped for the common case. The library is for the OTHER workflow: thirty prints in one
+   * sitting, filed later.
+   *
+   * 🔴 THE STAR IS SHOWN ONLY WHERE IT IS PROVABLY TRUE, AND THAT IS A REAL LIMITATION.
+   * `/images` returns `is_primary_anywhere` = MAX(is_primary) across EVERY link a photo has. For
+   * a photograph attached to this one print that is exact. For a PACK SHOT attached to nine
+   * prints it says "primary somewhere" and cannot say where — so rendering a star off it would
+   * mark a photo as this print's main picture on the strength of it being another print's.
+   * **A small confident lie is the defect class this entire schema exists to refuse**, so the
+   * star renders only when `links === 1` and is simply absent otherwise. The fix is a
+   * per-edition flag on `/images`; deferred, not pretended.
+   */
+  function photoBlock(eds, imgs) {
+    var edSet = {};
+    eds.forEach(function (e) { edSet[e.edition_id] = true; });
+
+    shots = imgs.filter(function (im) {
+      return String(im.edition_ids || '').split(',').some(function (id) { return edSet[id]; });
+    });
+
+    /* ONE BUTTON PER IMPRESSION when there is more than one, rather than a picker. A Brooklyn
+     * Ginkgo monoprint genuinely needs its own photograph, so which one you are shooting IS the
+     * question — and a print with a single implicit edition gets one button and no question at
+     * all, because a choice with one option is a tap. */
+    var add = (eds.length === 1)
+      ? '<button class="btn" data-shoot="' + esc(eds[0].edition_id) + '">Add a photo</button>'
+      : eds.map(function (e) {
+          return '<button class="btn" data-shoot="' + esc(e.edition_id) + '">Photograph ' +
+            esc(e.implicit ? 'this print' : (e.label || e.edition_id)) + '</button>';
+        }).join('');
+
+    if (!shots.length) {
+      return '<h2 class="aw-h">Photographs</h2>' +
+        '<div class="aw-ph aw-ph-none">' +
+          '<p><b>No photograph of this print yet.</b></p>' +
+          '<p class="aw-note">Take one and it attaches here immediately — nothing to file. ' +
+          'Or attach one you already took from <a href="#photos">Photographs</a>.</p>' +
+          '<div class="aw-ph-acts">' + add + '</div>' +
+        '</div>';
+    }
+
+    var strip = shots.length > 1
+      ? '<div class="aw-strip">' + shots.map(function (im, i) {
+          return '<button class="aw-thumb' + (i === 0 ? ' is-on' : '') + '" data-i="' + i + '">' +
+            '<img src="' + esc(imgUrl(im)) + '" alt="" loading="lazy"></button>';
+        }).join('') + '</div>'
+      : '';
+
     return '<h2 class="aw-h">Photographs</h2>' +
-      '<div class="aw-photos">' +
-        '<p><b>None yet, and there is no way to add one from here.</b></p>' +
-        '<p class="aw-note">The image table is live in D1 and the pipe is designed end to end — ' +
-        'it needs an R2 binding and the upload routes. Scope and order: ' +
-        '<code>next-build-spec.md</code> steps 5 and 8. This block is where the carousel, the ' +
-        'filmstrip and the ⭐ primary toggle land, unchanged.</p>' +
+      '<div class="aw-ph">' +
+        '<div class="aw-ph-main"><img id="awMain" src="' + esc(imgUrl(shots[0])) +
+          '" alt="' + esc(shots[0].caption || 'photograph of this print') + '"></div>' +
+        strip +
+        '<p class="aw-note" id="awShot"></p>' +
+        '<div class="aw-ph-acts">' +
+          '<button class="btn btn-ghost" id="awPrimary" hidden>Use as the main picture</button>' +
+          add +
+        '</div>' +
       '</div>';
   }
 
-  function render(art, sum, places, eds) {
+  /* Swapping the shown photograph is a src change and two class toggles, not a re-render: the
+   * page around it has not changed, and re-rendering would refetch every thumbnail. */
+  function showShot(i) {
+    var im = shots[i];
+    if (!im) return;
+    var main = document.getElementById('awMain');
+    if (main) { main.src = imgUrl(im); main.alt = im.caption || 'photograph of this print'; }
+
+    [].forEach.call(document.querySelectorAll('.aw-thumb'), function (b) {
+      b.classList.toggle('is-on', b.getAttribute('data-i') === String(i));
+    });
+
+    var note = document.getElementById('awShot');
+    if (note) {
+      var bits = [];
+      if (im.shot_at) bits.push('shot ' + im.shot_at);
+      if (im.credit && im.credit !== 'you') bits.push('by ' + im.credit);
+      if (im.kind !== 'upload') bits.push('Anastasia&#39;s shop photo');
+      if (Number(im.links) > 1) bits.push('also on ' + (Number(im.links) - 1) + ' other print' +
+        (Number(im.links) === 2 ? '' : 's'));
+      note.innerHTML = bits.join(' · ');
+    }
+
+    // See the block comment: only unambiguous when this photo has exactly one link.
+    var btn = document.getElementById('awPrimary');
+    if (btn) {
+      var solo = Number(im.links) === 1;
+      var isPrimary = solo && Number(im.is_primary_anywhere) === 1;
+      btn.hidden = isPrimary;
+      btn.setAttribute('data-img', im.image_id);
+      btn.setAttribute('data-ed', String(im.edition_ids || '').split(',')[0] || '');
+    }
+  }
+
+  function render(art, sum, places, eds, imgs) {
     return '<div class="aw">' +
       '<header class="aw-head">' +
         '<h1 class="aw-name">' + esc(art.name) + '</h1>' +
@@ -127,17 +208,17 @@
       counts(sum) +
       '<div class="aw-chips">' +
         chip('', art.category) +
+        chip('', art.medium) +
         chip('', art.edition_type) +
         chip('', art.confidence === 'named' ? null : art.confidence) +
         chip('', art.provenance) +
         (art.retail != null ? chip('$', Number(art.retail).toFixed(2)) : '') +
-        (art.collection_id ? chip('in ', art.collection_id) : '') +
       '</div>' +
       (art.notes ? '<p class="aw-notes">' + esc(art.notes) + '</p>' : '') +
+      photoBlock(eds, imgs) +
       '<h2 class="aw-h">Where it is</h2>' +
       placements(places) +
       editions(eds) +
-      photos() +
       '<p class="aw-back"><a href="#summary">← all prints</a></p>' +
     '</div>';
   }
@@ -170,25 +251,58 @@
       '<p class="aw-back"><a href="#summary">← all prints</a></p></div>';
   }
 
+  function wire(host) {
+    if (shots.length) showShot(0);
+
+    host.addEventListener('click', function (e) {
+      var thumb = e.target.closest('.aw-thumb');
+      if (thumb) { showShot(Number(thumb.getAttribute('data-i'))); return; }
+
+      var shoot = e.target.closest('[data-shoot]');
+      if (shoot) {
+        Capture.shoot({
+          edition_id: shoot.getAttribute('data-shoot'),
+          subject: 'single',
+          onDone: function () { mount(last); }      // refetch: the strip is now stale
+        });
+        return;
+      }
+
+      var prim = e.target.closest('#awPrimary');
+      if (prim) {
+        API.post('/image/primary', {
+          image_id: prim.getAttribute('data-img'),
+          edition_id: prim.getAttribute('data-ed')
+        }).then(function () {
+          Core.toast('That is the main picture now', 'good');
+          mount(last);
+        }).catch(function (err) { Core.toast(err.message || String(err), 'bad'); });
+      }
+    });
+  }
+
   function mount(params) {
     var host = document.getElementById('artWrap');
     if (!host) return;
+    last = params;
 
     var id = (params && params.id) || '';
     if (!id) { host.innerHTML = noId(); return; }
 
-    Core.busy(host, 'Reading the collection\u2026');
+    Core.busy(host, 'Reading the collection…');
 
-    /* Three reads in parallel, and each answers something the others cannot:
-     *   /artworks  the descriptive fields — notes, edition_type, provenance, retail
-     *   /summary   the counts AND every placement (see the header note on why not a new route)
+    /* Four reads in parallel, each answering something the others cannot:
+     *   /artworks  the descriptive fields — notes, medium, edition_type, provenance, retail
+     *   /summary   the counts AND every placement (see the header on why not a new route)
      *   /editions  this print's impressions
+     *   /images    every photograph, with the editions each is attached to
      * Promise.all rather than a chain: they do not depend on each other, and a phone on a slow
-     * connection should pay for one round trip, not three. */
+     * connection should pay for one round trip rather than four. */
     Promise.all([
       API.get('/artworks'),
       API.get('/summary'),
-      API.get('/editions?artwork=' + encodeURIComponent(id))
+      API.get('/editions?artwork=' + encodeURIComponent(id)),
+      API.get('/images?scope=all&assigned=any')
     ]).then(function (r) {
       var list = (r[0] && r[0].artworks) || [];
       var art = null;
@@ -207,7 +321,9 @@
         return p.artwork_id === id;
       });
 
-      host.innerHTML = render(art, sum, places, (r[2] && r[2].editions) || []);
+      host.innerHTML = render(art, sum, places, (r[2] && r[2].editions) || [],
+                              (r[3] && r[3].images) || []);
+      wire(host);
     }).catch(function (e) { Core.fail(host, e); });
   }
 
