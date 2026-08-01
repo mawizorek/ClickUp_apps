@@ -1,0 +1,127 @@
+/* Inciardi Collection — PHOTOS. The library grid, its toolbar, and the assign drawer.
+ *
+ * ZERO COLOUR LITERALS. Every value is a var() token — the theme contract, and the reason a
+ * theme swap in this repo is one pointer and no CSS edits.
+ *
+ * 🔴 THE TILE IS SQUARE ON PURPOSE, AND IT IS THE ONE DECISION HERE THAT MATTERS. A wall of
+ * photographs is scannable only while the eye can track a single grid line. Michael's prints are
+ * shot portrait, Anastasia's product photos are landscape, and honouring both aspect ratios
+ * gives a ragged mosaic that has to be READ rather than scanned. `object-fit: cover` crops to a
+ * square instead — the full frame is one tap away in the drawer, which is where you look when
+ * you actually care what the whole photograph shows.
+ *
+ * ⚠️ `auto-fill minmax(104px, 1fr)` and NO breakpoints: a phone gets three columns and a desktop
+ * gets nine off one rule. A media query here would be a second place for the layout to be
+ * decided, and it would be wrong on the next screen size nobody tested. */
+
+.ph-head { margin-bottom: 12px; }
+.ph-head h1 { margin: 0 0 4px; }
+
+/* ---------- toolbar ---------- */
+.ph-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+  margin: 0 0 12px;
+}
+.ph-tabs {
+  display: flex; gap: 2px; padding: 3px;
+  background: var(--surface-2); border-radius: 999px;
+}
+.ph-tab {
+  appearance: none; border: 0; cursor: pointer;
+  background: transparent; color: var(--text-dim);
+  font: inherit; font-size: .86rem; font-weight: 600;
+  padding: 7px 14px; border-radius: 999px;
+  /* The 44px tap floor is met by padding plus line-height. Stated because a 7px vertical pad
+     reads as too small and someone will eventually correct it upward for no reason. */
+  min-height: 38px;
+}
+.ph-tab.is-on { background: var(--surface-3); color: var(--text); }
+.ph-n { opacity: .6; margin-left: 3px; font-variant-numeric: tabular-nums; }
+
+.ph-check {
+  display: inline-flex; align-items: center; gap: 7px;
+  color: var(--text-dim); font-size: .86rem;
+}
+
+.ph-tools { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 14px; }
+
+/* ---------- the adopt report ---------- */
+.ph-adopt { margin: 0 0 16px; }
+.ph-res {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px;
+  line-height: 1.55;
+}
+.ph-warn { color: var(--warn); }
+
+/* ---------- the grid ---------- */
+.ph-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px;
+}
+
+.ph-tile {
+  position: relative; display: block; padding: 0; cursor: pointer;
+  appearance: none; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface-2); overflow: hidden;
+  aspect-ratio: 1 / 1;
+  /* Kills the double-tap zoom that made speed-tapping jump at v18. Pinch is untouched — this is
+     a tile, not the print itself. */
+  touch-action: manipulation;
+}
+.ph-tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* An attached photo is DIMMED rather than hidden, because the show-assigned view is a view of
+   everything and the eye needs to know instantly which ones still need work. Unassigned is the
+   job; assigned is context. */
+.ph-tile.is-linked img { opacity: .55; }
+
+.ph-cap {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 14px 6px 4px;
+  font-size: .68rem; line-height: 1.2; text-align: left;
+  color: var(--text);
+  /* A gradient rather than a solid bar: the caption must stay legible over an unknown photograph,
+     and a flat strip crops the bottom of every image in the grid. */
+  background: linear-gradient(to top, var(--scrim), transparent);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.ph-badge, .ph-hers {
+  position: absolute; top: 5px;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .66rem; font-weight: 700; border-radius: 999px;
+}
+.ph-badge { right: 5px; background: var(--accent); color: var(--on-accent); }
+.ph-hers  { left: 5px;  background: var(--surface-3); color: var(--text-dim); }
+
+/* ---------- the assign drawer ---------- */
+.ph-drawer .drawer-body { padding: 14px 16px 24px; }
+
+.ph-prev {
+  margin-bottom: 10px; overflow: hidden;
+  background: var(--surface-2); border-radius: var(--radius);
+}
+/* CONTAIN, the opposite of the tile, and deliberately so. The grid exists for scanning, so it
+   crops; this is the one place you are looking AT the photograph, so it must never lie about
+   what was framed. */
+.ph-prev img { display: block; width: 100%; max-height: 46vh; object-fit: contain; }
+
+.ph-meta { margin: 0 0 12px; color: var(--text-dim); font-size: .8rem; word-break: break-word; }
+.ph-note { margin: 10px 0 0; color: var(--text-dim); font-size: .8rem; line-height: 1.5; }
+.ph-lab  { display: block; margin: 14px 0 6px; font-weight: 600; }
+
+.ph-hits { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.ph-hit {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  width: 100%; min-height: 44px; padding: 9px 12px; cursor: pointer;
+  appearance: none; text-align: left; font: inherit;
+  background: var(--surface-2); color: var(--text);
+  border: 1px solid var(--line); border-radius: var(--radius);
+}
+.ph-hit:hover, .ph-hit:focus-visible { background: var(--surface-3); }
+.ph-hid { color: var(--text-dim); font-size: .74rem; font-family: var(--font-mono); }
+
+.ph-acts { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }

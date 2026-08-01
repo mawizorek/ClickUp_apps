@@ -1,0 +1,40 @@
+<!-- Inciardi Collection — the PHOTOS partial.
+     Injected by the router; `photos.js` fills #phBar, #phGrid and the drawer on mount.
+
+     STATIC FRAME ONLY. The headline and the two buttons are here because they never change; the
+     toolbar, the grid and every count are left to the module. Same rule as artwork.html: markup
+     written here paints BEFORE the data arrives and is then replaced, which shows a number that
+     may be wrong for a beat. A wrong number that corrects itself is worse than a spinner.
+
+     ⚠️ #pageScrim is per-page, not global — `Core.Drawer` looks for it by id inside the mounted
+     view. Without it the assign drawer opens with no backdrop and no tap-to-close. -->
+<section class="page" id="phWrap">
+
+  <header class="ph-head">
+    <h1>Photographs</h1>
+    <p class="muted">Everything shot or adopted. <b>Unassigned first</b> — the ones still waiting
+      to be attached to a print.</p>
+  </header>
+
+  <div class="ph-bar" id="phBar"></div>
+
+  <div class="ph-tools">
+    <button class="btn" id="phShoot">Add photos</button>
+    <button class="btn btn-ghost" id="phAdopt">Bring in Anastasia&#39;s shop photos</button>
+  </div>
+  <div class="ph-adopt" id="phAdoptOut" hidden></div>
+
+  <div id="phGrid"></div>
+
+  <!-- The assign drawer. Built empty; photos.js paints it per photograph. -->
+  <aside class="page-drawer ph-drawer" id="phDrawer" hidden role="dialog" aria-modal="true"
+         aria-label="Attach this photograph">
+    <div class="drawer-head">
+      <h2>This photograph</h2>
+      <button class="drawer-x" id="phDrawerX" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="drawer-body" id="phDrawerBody"></div>
+  </aside>
+  <button id="pageScrim" class="page-scrim" hidden aria-label="Close"></button>
+
+</section>
