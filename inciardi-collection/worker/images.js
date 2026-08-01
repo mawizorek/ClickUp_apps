@@ -1,19 +1,24 @@
-/* Inciardi Collection — THE PHOTO PIPE. Eight routes: bytes in, bytes out, links between.
+/* Inciardi Collection — THE PHOTO PIPE. Six routes: bytes in, bytes out, links between.
  *
  * ============================================================================
  * NEW FILE 2026-08-01, and it had to be one. `worker.js` sits at ~21KB against a ~22KB
- * practical ceiling (base64 inflates 4/3 against a ~30KB return cap), and its own header
- * says in capitals that the next route does not go in it. It gains SIX LINES of dispatch
- * from this file and nothing else.
+ * practical ceiling (base64 inflates 4/3 against a ~30KB return cap) and its own header says
+ * in capitals that the next route does not go in it. It gains SIX LINES of dispatch and
+ * nothing else.
+ *
+ * ⚠️ THIS FILE ALSO BROKE THAT CEILING ON ITS FIRST PUSH — 26,603 bytes — and the one-off
+ * routes were split to `worker/adopt.js` before merge. The full write-up is in that file's
+ * header; it is worth reading, because it was comment weight and it is the third instance in
+ * this app in three days.
  *
  * 🔴 WHY THE DISPATCH SITS BEFORE THE BODY PARSE IN worker.js — NOT A STYLE CHOICE.
  * worker.js runs `body = await request.json()` on every write, which CONSUMES THE REQUEST
  * STREAM. An upload's body is BYTES. Dispatched after that line, this file would receive an
- * already-drained body and write a zero-length object to R2 with a perfectly successful
+ * already-drained body and write a zero-length object to R2 behind a perfectly successful
  * response — a silent empty file, which is the worst failure shape this app knows.
- * So: the write-key gate fires first (auth is NOT relocated), then images dispatch, then the
- * JSON parse for everything else. The image routes own their own body because their body is
- * not JSON.
+ * So: the write-key gate fires FIRST (auth is not relocated), then images dispatch, then the
+ * JSON parse for everything else. These routes own their own body because their body is not
+ * JSON.
  *
  * CONTRACT with worker.js, same shape as reads.js: everything needed is handed over, this file
  * reaches for no globals and holds no state. Returns a Response, or `null` meaning "not my
@@ -28,9 +33,9 @@
  * BYTES. There is no delete route in this file and there must never be one: archiving is a
  * `status` flip and the object stays. If you are here to add a cleanup job, don't.
  *
- * ⚠️ WHAT IS DELIBERATELY NOT BUILT, named so the gap is a decision and not an oversight:
+ * ⚠️ WHAT IS DELIBERATELY NOT BUILT, named so each gap is a decision and not an oversight:
  *   - DERIVATIVES. The spec locked three (thumb 480 / full 1800 / re-encoded original, Q14 C)
- *     and then migration 001 gave `image` exactly ONE `r2_key` column. The key scheme for the
+ *     and migration 001 then gave `image` exactly ONE `r2_key` column. The key scheme for the
  *     other two was never decided, so writing them now would mean inventing schema mid-route.
  *     v1 stores ONE image per shot. When the grid crawls, add `-t.jpg` by CONVENTION off the
  *     same key and let rows without one fall back to the full image. No schema change either
@@ -41,22 +46,21 @@
  */
 
 export const IMAGE_ROUTES = [
-  'GET /images?scope=', 'GET /image/:id', 'GET /bucket/peek',
-  'POST /image', 'POST /image/assign', 'POST /image/primary',
-  'POST /image/archive', 'POST /image/adopt?apply=1'
+  'GET /images?scope=', 'GET /image/:id', 'POST /image',
+  'POST /image/assign', 'POST /image/primary', 'POST /image/archive'
 ];
 
 /* Q23 → C. Michael struck A, B, D and Other; C was the only survivor.
  *
  * "Bring in all 177, but hide the non-matches behind a switch." The 177 are Anastasia's SHOP
- * product photographs, and most of them are of prints he has never held — so they are worth
- * keeping as a reference wall and must not be the first thing the Photos screen shows.
+ * product photographs, and most are of prints he has never held — worth keeping as a reference
+ * wall, and wrong as the first thing the Photos screen shows.
  *
  * ⭐ IMPLEMENTED WITH NO NEW COLUMN, because the fact is already stored. `image.kind` is
- * ('upload' | 'scrub' | 'reference') and it already means exactly "whose bytes are these."
- * Adding an `is_reference` flag would have been a SECOND CLAIMANT on a fact `kind` owns — the
- * duplicate-source disease this app exists to cure, and the same shape as reaching for a
- * custom field when a native primitive already carries the value.
+ * ('upload' | 'scrub' | 'reference') and already means exactly "whose bytes are these." An
+ * `is_reference` flag would have been a SECOND CLAIMANT on a fact `kind` owns — the
+ * duplicate-source disease this app exists to cure, and the same shape as reaching for a new
+ * field when a primitive already carries the value.
  */
 const SCOPES = {
   mine:   "i.kind = 'upload'",
@@ -64,9 +68,7 @@ const SCOPES = {
   all:    '1=1'
 };
 
-const KEY_PREFIX = 'ed/';        // ours. content-addressed, written by POST /image
-const LEGACY_PREFIX = 'prints/'; // hers. written by the retired market worker
-
+const KEY_PREFIX = 'ed/';
 const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
 const intOrNull = v => (v == null || v === '' || isNaN(Number(v))) ? null : parseInt(v, 10);
@@ -77,8 +79,8 @@ async function sha256Hex(buf) {
 }
 
 /* Linking is its own function because THREE routes do it, and a copy in each is three places
- * for the sort-order rule to drift. `status` is READ FROM THE ASSET and written onto the link,
- * which the composite FK then refuses to let disagree (Q20 B). */
+ * for the sort rule to drift. `status` is READ FROM THE ASSET and written onto the link, which
+ * the composite FK then refuses to let disagree (Q20 B). */
 async function linkImage(db, all, imageId, editionId, t) {
   const img = await all('SELECT status FROM image WHERE image_id = ?', [imageId]);
   if (!img.length) throw new Error('no image "' + imageId + '"');
@@ -92,49 +94,13 @@ async function linkImage(db, all, imageId, editionId, t) {
 export async function handleImage(ctx) {
   const { request, db, bucket, all, reply, path, url, method, t } = ctx;
 
-  const isImagePath = path === '/images' || path === '/bucket/peek' ||
-                      path === '/image' || path.startsWith('/image/');
-  if (!isImagePath) return null;
-
-  /* ⚠️ EVERY ROUTE BELOW EXCEPT /images NEEDS THE BUCKET, and a missing binding is a
-   * DEPLOYMENT fact rather than a bug in this file. Say which, loudly. The plausible cause is
-   * a deploy whose API token had no R2 permission — that fails the deploy, so if you are
-   * seeing this at runtime the running worker is older than you think. */
+  /* ⚠️ EVERY ROUTE EXCEPT /images NEEDS THE BUCKET, and a missing binding is a DEPLOYMENT fact
+   * rather than a bug in this file. Say which, loudly. The plausible cause is a deploy whose
+   * API token had no R2 permission — that fails the deploy, so if you are seeing this at
+   * runtime the running worker is older than you think. */
   if (path !== '/images' && !bucket) {
     return reply({ ok: false, error: 'no R2 binding on this worker',
       fix: 'wrangler.toml needs [[r2_buckets]] binding = "BUCKET", then a redeploy. If it IS already in the file, the last deploy FAILED — check the Actions run rather than editing the config again.' }, 503);
-  }
-
-  /* ============================================================ GET /bucket/peek
-   * A DIAGNOSTIC, AND IT EXISTS BECAUSE I NEARLY SPENT MICHAEL'S ATTENTION ON A LOOKUP.
-   *
-   * The claim "every legacy object is filed under the print it belongs to" was read out of
-   * `inciardi-market/db/schema.sql`'s comment — INTENT, not observation. I asked him to open
-   * the dashboard and read a filename back to me. Wrong instinct: a fact reachable in fifteen
-   * lines of code is not a fact to delegate to a human.
-   *
-   * ⭐ It also DOUBLES AS THE R2 BINDING TEST, which nothing else in this app is. Binding a
-   * bucket changes nothing observable until something reads it — /health answers identically
-   * bound or not — and that is exactly how migration 001 broke three routes for five hours
-   * behind a green health check. This is the route that touches the altered thing.
-   */
-  if (path === '/bucket/peek' && method === 'GET') {
-    const listed = await bucket.list({ limit: 1000 });
-    const keys = (listed.objects || []).map(o => o.key);
-    const count = p => keys.filter(k => k.startsWith(p)).length;
-    return reply({
-      ok: true,
-      total_listed: keys.length,
-      truncated: !!listed.truncated,
-      prefixes: {
-        'prints/ (hers, legacy)': count(LEGACY_PREFIX),
-        'ed/ (ours)': count(KEY_PREFIX),
-        'snapshots/ (market backups)': count('snapshots/'),
-        other: keys.filter(k => !k.startsWith(LEGACY_PREFIX) && !k.startsWith(KEY_PREFIX) && !k.startsWith('snapshots/')).length
-      },
-      sample: keys.slice(0, 10),
-      note: 'If the sample reads prints/<print-name>/<id>, the key IS the mapping and nothing was lost when the market worker died.'
-    });
   }
 
   /* ============================================================ GET /images
@@ -142,7 +108,7 @@ export async function handleImage(ctx) {
    * thing you see, the same argument that made the shoe-box the shoe-box.
    *
    * Reads no bucket, so it answers even on a worker with no R2 binding. Deliberate: the screen
-   * should render and say "no photos" rather than 503 because of a config fact.
+   * should render and say "no photos" rather than 503 over a config fact.
    */
   if (path === '/images' && method === 'GET') {
     const asked = url.searchParams.get('scope');
@@ -163,7 +129,7 @@ export async function handleImage(ctx) {
         ORDER BY i.created_at DESC`);
 
     /* Counts for the toggle's own label, so the UI never fetches twice to say "show 118 of
-     * hers". Computed HERE for the same reason /summary computes its totals: a client that
+     * hers." Computed HERE for the same reason /summary computes its totals: a client that
      * sums its own filtered page cannot agree with the filter. */
     const tally = await all(
       `SELECT SUM(kind = 'upload') AS mine,
@@ -369,84 +335,6 @@ export async function handleImage(ctx) {
       } catch (e) { return reply({ ok: false, error: String(e.message || e) }, 400); }
       return reply({ ok: true, image_id: imageId, status: restore ? 'active' : 'archived',
                      note: 'the bytes are untouched and always will be' });
-    }
-
-    /* ============================================================ POST /image/adopt
-     * SPEC STEP 12 — bring in the legacy objects Anastasia's shop images left in this bucket.
-     * Q17b D: adopt as a FLOOR. Hers renders until Michael shoots his own; then his becomes
-     * primary and hers stays in the carousel.
-     *
-     * ⭐ THE MAPPING IS THE KEY: `prints/<print_id>/<image_id>`. Which print each photo belongs
-     * to is IN THE FILENAME, so nothing was lost when the market worker died. J18 claimed that
-     * mapping lived only in the market D1 and built a two-day deadline on it; J15, twelve hours
-     * earlier in the same log, said the opposite and was right.
-     *
-     * DRY BY DEFAULT — `?apply=1` writes. A pass that first reports what it WOULD do is the
-     * only honest way to run a 177-row import against a live database once.
-     *
-     * IDEMPOTENT: image_id is derived from the key, so a second run is INSERT OR IGNORE and
-     * changes nothing. Re-running is a diff, not a duplicate.
-     */
-    if (path === '/image/adopt') {
-      const apply = url.searchParams.get('apply') === '1';
-      const listed = await bucket.list({ prefix: LEGACY_PREFIX, limit: 1000 });
-      const objects = listed.objects || [];
-
-      /* Match on the artwork id, then on any recorded ALIAS. `artwork_alias.norm` exists for
-       * exactly this — the market and this app both hand-wrote kebab slugs and they will not
-       * always agree. A miss is not a failure: an unmatched photo still imports (Q23 C) and is
-       * linkable by tapping later, which is what Q17b's rejection of "investigate first" meant. */
-      const known = new Map();
-      for (const r of await all('SELECT artwork_id FROM artwork')) known.set(r.artwork_id, r.artwork_id);
-      for (const r of await all('SELECT artwork_id, norm FROM artwork_alias')) if (!known.has(r.norm)) known.set(r.norm, r.artwork_id);
-
-      const matched = [], unmatched = [], stmts = [];
-      for (const o of objects) {
-        const parts = o.key.split('/');
-        if (parts.length < 3) continue;                     // not prints/<id>/<file>
-        const printId = parts[1];
-        const imageId = 'scrub-' + parts.slice(1).join('-').replace(/[^a-zA-Z0-9-]/g, '-').slice(0, 60);
-        const artworkId = known.get(printId) || known.get(printId.replace(/-/g, '')) || null;
-
-        /* ⚠️ sha256 IS LEFT NULL, DELIBERATELY. R2's etag is NOT a sha256 for a multipart object,
-         * and `ux_image_sha` is a UNIQUE index — writing etags into it would build a
-         * duplicate-detection index that quietly lies. NULL is honest and the partial index
-         * skips it. The cost: a legacy photo later re-uploaded by hand will not dedupe against
-         * its own adopted row. Accepted, and stated rather than discovered. */
-        stmts.push(db.prepare(
-          `INSERT OR IGNORE INTO image (image_id,r2_key,kind,content_type,bytes,
-                                        caption,subject,credit,status,created_at)
-           VALUES (?,?,'scrub',?,?,?,'reference','anastasia','active',?)`
-        ).bind(imageId, o.key, (o.httpMetadata && o.httpMetadata.contentType) || 'image/jpeg',
-               o.size || null, printId, t));
-
-        if (artworkId) {
-          matched.push({ key: o.key, print_id: printId, artwork_id: artworkId });
-          /* Attach to the artwork's IMPLICIT edition, never as primary. Q17b's floor means hers
-           * shows only until his own arrives, and sort 100 puts her behind anything he shoots. */
-          stmts.push(db.prepare(
-            `INSERT OR IGNORE INTO edition_image (edition_id,image_id,status,is_primary,sort,created_at)
-             SELECT edition_id, ?, 'active', 0, 100, ? FROM edition
-              WHERE artwork_id = ? AND implicit = 1`
-          ).bind(imageId, t, artworkId));
-        } else {
-          unmatched.push({ key: o.key, print_id: printId });
-        }
-      }
-
-      if (!apply) {
-        return reply({ ok: true, dry_run: true,
-          found: objects.length, truncated: !!listed.truncated,
-          would_match: matched.length, would_import_unmatched: unmatched.length,
-          matched_sample: matched.slice(0, 15), unmatched_sample: unmatched.slice(0, 15),
-          note: 'NOTHING WAS WRITTEN. Re-POST with ?apply=1 to run it. Unmatched photos still import (Q23 C) — they are hidden behind the Photos toggle, not discarded.' });
-      }
-
-      if (!stmts.length) return reply({ ok: true, applied: true, found: 0, matched: 0, unmatched: 0, note: 'nothing under the prints/ prefix' });
-      await db.batch(stmts);
-      return reply({ ok: true, applied: true, found: objects.length,
-                     matched: matched.length, unmatched: unmatched.length,
-                     note: 'Unmatched rows are kind=scrub and appear only under ?scope=theirs.' });
     }
   }
 
