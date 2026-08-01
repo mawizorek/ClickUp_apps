@@ -7,7 +7,7 @@ steward: routine-ricky
 cadence: see routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 11
+version: 12
 model: loop-per-role
 ---
 
@@ -33,7 +33,7 @@ model: loop-per-role
 > The performing arts market is not sparse. A pass yielding fewer than 40 listings means the sweep was shallow, NOT that the market is thin. If total live drops below 40, the agent MUST: (1) re-sweep all Tier 1 sources with alternate keyword permutations, (2) expand to Tier 2 sources not yet hit, (3) try paginated/filtered views on gated boards. The density floor is a quality gate, not a stretch goal. A pass below 40 is a FAILED pass and must be retried or flagged as incomplete with an explanation of what blocked each source.
 
 > **🗂️ PASS SUMMARY = TABLE OF CONTENTS.** (LOCKED 2026-07-31, Michael)
-> The Pass Summary comment MUST include a comment index with hyperlinks to EVERY comment posted during the run. On mobile, threaded comments collapse or get lost. The summary is the reader's navigation layer; without direct links to every block, the pass is unreadable on a phone.
+> The Pass Summary comment MUST include a comment index with hyperlinks to each ROLE HEADER comment posted during the run (plus the SOURCES comment). Threaded replies under those headers do NOT need individual links. On mobile, threaded comments collapse or get lost. The summary is the reader's navigation layer; direct links to each role header let the reader jump straight to any role's block.
 
 ## 📍 Architecture
 
@@ -57,7 +57,7 @@ model: loop-per-role
 - `acted` when Michael says to act and an Application task is created.
 - Uncommitted pass = didn't happen.
 
-## 🚪 The Gate: `routines/job-market-roles.json`
+## 🔑 The Gate: `routines/job-market-roles.json`
 
 This file IS the loop. It defines:
 
@@ -160,7 +160,7 @@ AFTER ALL ROLES:
 
 **Key rules:**
 - Each role's comment block is self-contained. Reading the Production Manager block tells you everything about the PM market without needing to read any other block.
-- **Every comment URL is captured at post time.** The Pass Summary's comment index links to all of them. This is the navigation layer.
+- **Role header comment URLs are captured at post time.** The Pass Summary's comment index links to each role header and the SOURCES comment. Threaded replies under headers don't need individual links.
 
 ---
 
@@ -237,20 +237,18 @@ AFTER ALL ROLES:
 
 **Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
 **Prev pass:** <timestamp> (<elapsed>)
-[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v11
+[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v12
 
 <Density verdict: one line.>
 
 ### 🗂️ Comment index
 - 🎯 [<Role 1 display>](<role header comment URL>) — <n> live, +<n>
-  - [SAME](<comment URL>) · [NEW](<comment URL>) · [GONE](<comment URL>) · [NOTABLE](<comment URL if posted>)
 - 🎯 [<Role 2 display>](<role header comment URL>) — <n> live, +<n>
-  - [SAME](<comment URL>) · [NEW](<comment URL>) · [GONE](<comment URL>)
 - <repeat for each role>
 - 🔌 [SOURCES](<sources comment URL>)
 ```
 
-⚠️ **The comment index is MANDATORY.** Every comment posted during the run gets a hyperlink here. This is the reader's table of contents. On mobile, threaded comments collapse or require extra taps to reveal. Without this index, the pass summary is a report about comments the reader cannot find.
+⚠️ **The comment index is MANDATORY.** Each role HEADER comment posted during the run gets a hyperlink here, plus the SOURCES comment. Threaded replies (SAME/NEW/GONE/NOTABLE) do NOT need individual links. This index lets the reader jump directly to any role's block from the summary.
 
 ## Template 7: 🔌 SOURCES (threaded under pass summary)
 
@@ -289,7 +287,7 @@ AFTER ALL ROLES:
    - TSV row not found on boards = GONE
 8. **Stage TSV updates** for this role: append NEW rows, mark GONE rows, update salary if newly found on SAME.
 9. **Post 🎯 ROLE HEADER** as root comment. **Capture comment URL.**
-10. **Post threaded replies** under role header: SAME / NEW / GONE / NOTABLE (if content). **Capture comment URL for EVERY reply posted.** All URLs feed the Pass Summary comment index.
+10. **Post threaded replies** under role header: SAME / NEW / GONE / NOTABLE (if content).
 11. **Repeat from step 5** for next role.
 
 ### Post-loop
@@ -299,10 +297,10 @@ AFTER ALL ROLES:
     - `routines/job-market-state.tsv` (all role updates batched)
     - `routines/last-run/job-market.txt` (one line: `YYYY-MM-DD HH:MM ET`)
     - Message: `data(job-market): <timestamp> ET — <n> live, <+-n>`
-14. **Post 📋 PASS SUMMARY** as root comment. **Build the 🗂️ Comment index** from all URLs captured in steps 9-10 across every role iteration, plus the SOURCES comment URL from step 15. Every comment posted during the run MUST appear as a hyperlink in this index. This is the reader's mobile table of contents.
+14. **Post 📋 PASS SUMMARY** as root comment. **Build the 🗂️ Comment index** from the role header URLs captured in step 9 across every role iteration, plus the SOURCES comment URL from step 15. Each role header and the SOURCES comment get a hyperlink. Threaded replies do not.
 15. **Post 🔌 SOURCES** threaded under summary. Capture its URL and include it in the index (post summary may need an edit to add this final link, OR post SOURCES first and then the summary).
 
-> ⚠️ **Ordering note:** Since SOURCES is threaded under the summary, you may either (a) post SOURCES first, capture its URL, then post the summary with all links including SOURCES; or (b) post the summary with role links, then post SOURCES and edit the summary to add the SOURCES link. Either approach is valid. What matters: the final state of the summary comment includes links to ALL comments.
+> ⚠️ **Ordering note:** Since SOURCES is threaded under the summary, you may either (a) post SOURCES first, capture its URL, then post the summary with all links including SOURCES; or (b) post the summary with role links, then post SOURCES and edit the summary to add the SOURCES link. Either approach is valid. What matters: the final state of the summary comment includes links to all role headers and SOURCES.
 
 ---
 
