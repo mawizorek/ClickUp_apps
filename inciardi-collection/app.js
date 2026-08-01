@@ -1,8 +1,8 @@
 /* Inciardi Collection — THE ROUTE DISPATCHER. This file owns nothing but routing.
  *
  * One module per screen, each exporting `window.X.mount()`. Adding a screen is one row in
- * SCREENS below, one row in `boot.js` (APP.nav, or APP.hidden for an unlisted one), and a new
- * file. **Never grow a module.** The full map and the size budget live in the comment at the
+ * SCREENS below, one row in `boot.js` (APP.nav, APP.hidden, or APP.detail), and a new file.
+ * **Never grow a module.** The full map and the size budget live in the comment at the
  * top of `index.html`.
  */
 (function () {
@@ -17,7 +17,12 @@
     // UNLISTED. Surfaced only at the foot of the settings panel — see the header in backroom.js
     // for what that is and is not worth. It dispatches like any other route; there is no second
     // router.
-    backroom: function ()  { Backroom.mount(); }
+    backroom: function ()  { Backroom.mount(); },
+    /* DETAIL (v19). Takes a param and is meaningless without one, so it is in NO menu — not the
+     * nav drawer, not the settings footer. You arrive from a print. `boot.js` → APP.detail is
+     * what makes it routable at all; without that row the router silently falls back to the
+     * binder, which reads as a dead link rather than a missing registration. */
+    artwork:  function (p) { Artwork.mount(p); }
   };
 
   /* Which global each route needs, and which FILE provides it. A script that 404'd is otherwise
@@ -28,6 +33,12 @@
     enter:   { globals: ['Enter'],   file: 'enter.js' },
     shoebox: { globals: ['Shoebox'], file: 'enter.js' },
     summary: { globals: ['Summary'], file: 'summary.js' },
+    /* Binder is a REAL dependency even though this page never renders a sheet: `Binder.face()`
+     * is the one place 'A'/'B' becomes Front/Back, and the placement list speaks that
+     * vocabulary. artwork.js carries a fallback so a missing binder.js degrades the wording
+     * rather than blanking the page — but naming it here is what turns a silent 404 into a
+     * message that says which file to check. */
+    artwork: { globals: ['Artwork', 'Binder'], file: 'artwork.js / binder.js' },
     /* Five globals, and each is a real dependency:
      *   Backroom — the runner.  Batch — the payload.  Preview — the markup (v15 split).
      *   Arrange  — WHERE each print sits (v17). Not optional: `build()` and `apply()` both read
