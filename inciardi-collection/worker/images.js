@@ -1,15 +1,14 @@
 /* Inciardi Collection — THE PHOTO PIPE. Six routes: bytes in, bytes out, links between.
  *
  * ============================================================================
- * NEW FILE 2026-08-01, and it had to be one. `worker.js` sits at ~21KB against a ~22KB
- * practical ceiling (base64 inflates 4/3 against a ~30KB return cap) and its own header says
- * in capitals that the next route does not go in it. It gains SIX LINES of dispatch and
- * nothing else.
+ * NEW FILE 2026-08-01, and it had to be one. `worker.js` sat at ~21KB against a ~22KB practical
+ * ceiling when this was written (base64 inflates 4/3 against a ~30KB return cap) and its own
+ * header says in capitals that the next route does not go in it.
  *
  * ⚠️ THIS FILE ALSO BROKE THAT CEILING ON ITS FIRST PUSH — 26,603 bytes — and the one-off
- * routes were split to `worker/adopt.js` before merge. The full write-up is in that file's
- * header; it is worth reading, because it was comment weight and it is the third instance in
- * this app in three days.
+ * routes were split to `worker/adopt.js` before merge. The write-up is in that file's header;
+ * it is worth reading, because it was comment weight and it is one of three instances in this
+ * app in three days.
  *
  * 🔴 WHY THE DISPATCH SITS BEFORE THE BODY PARSE IN worker.js — NOT A STYLE CHOICE.
  * worker.js runs `body = await request.json()` on every write, which CONSUMES THE REQUEST
@@ -17,8 +16,7 @@
  * already-drained body and write a zero-length object to R2 behind a perfectly successful
  * response — a silent empty file, which is the worst failure shape this app knows.
  * So: the write-key gate fires FIRST (auth is not relocated), then images dispatch, then the
- * JSON parse for everything else. These routes own their own body because their body is not
- * JSON.
+ * JSON parse for everything else. These routes own their own body because it is not JSON.
  *
  * CONTRACT with worker.js, same shape as reads.js: everything needed is handed over, this file
  * reaches for no globals and holds no state. Returns a Response, or `null` meaning "not my
@@ -59,8 +57,7 @@ export const IMAGE_ROUTES = [
  * ⭐ IMPLEMENTED WITH NO NEW COLUMN, because the fact is already stored. `image.kind` is
  * ('upload' | 'scrub' | 'reference') and already means exactly "whose bytes are these." An
  * `is_reference` flag would have been a SECOND CLAIMANT on a fact `kind` owns — the
- * duplicate-source disease this app exists to cure, and the same shape as reaching for a new
- * field when a primitive already carries the value.
+ * duplicate-source disease this app exists to cure.
  */
 const SCOPES = {
   mine:   "i.kind = 'upload'",
@@ -70,6 +67,11 @@ const SCOPES = {
 
 const KEY_PREFIX = 'ed/';
 const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+
+/* The paths this module owns. Exact matches; the serve route is matched separately because it
+ * carries an id. One list, so adding a route means editing one place rather than two that can
+ * disagree. */
+const MINE = ['/images', '/image', '/image/assign', '/image/primary', '/image/archive'];
 
 const intOrNull = v => (v == null || v === '' || isNaN(Number(v))) ? null : parseInt(v, 10);
 
@@ -94,11 +96,32 @@ async function linkImage(db, all, imageId, editionId, t) {
 export async function handleImage(ctx) {
   const { request, db, bucket, all, reply, path, url, method, t } = ctx;
 
-  /* ⚠️ EVERY ROUTE EXCEPT /images NEEDS THE BUCKET, and a missing binding is a DEPLOYMENT fact
-   * rather than a bug in this file. Say which, loudly. The plausible cause is a deploy whose
-   * API token had no R2 permission — that fails the deploy, so if you are seeing this at
-   * runtime the running worker is older than you think. */
-  if (path !== '/images' && !bucket) {
+  /* 🔴 CLAIM THE ROUTE FIRST, THEN CHECK THE BUCKET. The ORDER is the fix.
+   *
+   * This guard originally read `if (path !== '/images' && !bucket) return 503` — and worker.js
+   * hands this function EVERY path. So on a worker with no R2 binding, `POST /artwork` would
+   * have been answered "no R2 binding on this worker": the app's primary write, shadowed by a
+   * module it has nothing to do with, blaming a subsystem it never touches. Same for /copy,
+   * /slot, /sheet and the 404 itself. #662 called a failed R2 deploy non-destructive; this
+   * guard would have made it a total outage.
+   *
+   * ⚠️ THE HEADER OF THIS FILE FORBIDS EXACTLY THAT, three paragraphs up: "A 404 here would
+   * shadow every other write." A guard placed BEFORE the route match IS a 404 for every path
+   * it does not recognise. The rule was written correctly by the same pass that broke it —
+   * which is why it was caught by reading the guard against worker.js's DISPATCH rather than
+   * against this file's own comment. A comment states intent; the dispatch is evidence.
+   */
+  const isServe = method === 'GET' && path.startsWith('/image/');
+  if (!isServe && !MINE.includes(path)) return null;
+
+  /* Only TWO routes actually touch R2 — the upload and the proxy. assign / primary / archive
+   * are pure D1 and must keep working with no binding at all; losing the ability to re-order
+   * or archive photos because a bucket is unbound would be a self-inflicted outage.
+   *
+   * A missing binding is a DEPLOYMENT fact, not a bug in this file. The plausible cause is a
+   * deploy whose API token had no R2 permission — which fails the deploy, so if you are seeing
+   * this at runtime the running worker is older than you think. */
+  if ((isServe || (path === '/image' && method === 'POST')) && !bucket) {
     return reply({ ok: false, error: 'no R2 binding on this worker',
       fix: 'wrangler.toml needs [[r2_buckets]] binding = "BUCKET", then a redeploy. If it IS already in the file, the last deploy FAILED — check the Actions run rather than editing the config again.' }, 503);
   }
@@ -146,7 +169,7 @@ export async function handleImage(ctx) {
    * bucket stays PRIVATE so this is the only door. A public bucket would be a second read path
    * that cannot 404 an archived row and cannot be rotated (J13).
    */
-  if (method === 'GET' && path.startsWith('/image/')) {
+  if (isServe) {
     const id = decodeURIComponent(path.slice('/image/'.length));
     const rows = await all('SELECT r2_key, source_url, content_type, status FROM image WHERE image_id = ?', [id]);
     if (!rows.length) return reply({ ok: false, error: 'no image "' + id + '"' }, 404);
