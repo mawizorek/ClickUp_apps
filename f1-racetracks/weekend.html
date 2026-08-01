@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <!--
-  F1 Race Weekend (weekend lens) — v17 shell.
+  F1 Race Weekend (weekend lens) — v18 shell.
   Per-round race-weekend detail layer, DECOMPOSED to source modules under source/weekend/.
   styles : source/weekend/base.css   (tokens, topbar, drill-through nav, chrome)
            source/weekend/panels.css (all section styling + animations)
            source/weekend/story.css  (Story mode: Results/Story toggle + replay surface)
-           source/chrome-tokens.css  (v17: THE SHARED CHROME SPINE — canonical token
-                                      vocabulary, one type scale, one gutter, the brand
-                                      lockup + lens switcher. Loaded LAST so it wins the
-                                      cascade over this lens's own :root without anything
-                                      being deleted from base.css. Decision Log J16 + J17.)
-  logic  : source/08_season.js       (SEASON DERIVATION — the weekend vector + derived
-                                      round / status / dates / round pointers, plus the
-                                      shared colour vector. SHARED with circuits.html and
-                                      standings.html.)
+           source/chrome-tokens.css  (v17: THE SHARED TOKEN SPINE — canonical vocabulary,
+                                      one type scale, one gutter, brand + switcher styling.
+                                      Loaded LAST so it wins the cascade. J16 + J17.)
+  logic  : source/chrome.js          (v18: THE ONE CHROME RENDERER. nav.js used to build the
+                                      topbar from a template string — one of three hand-written
+                                      copies of the same header. This is the only one now, and
+                                      it renders nothing when embedded in the unified shell.
+                                      Must load BEFORE nav.js, whose boot() calls it. J19.)
+           source/08_season.js       (SEASON DERIVATION — the weekend vector + derived round /
+                                      status / dates / round pointers, plus the shared colour
+                                      vector. SHARED with circuits.html and standings.html.)
            source/weekend/data.js    (store fetch + embed fallback + live swing)
            source/weekend/story.js   (Story mode engine — defines window.mountStory)
            source/weekend/render.js  (section renderers + Results/Story toggle, v2.1)
-           source/weekend/nav.js     (topbar, prev/next, routing, boot)
+           source/weekend/nav.js     (drill-through nav, routing, boot)
   DATA: results derive from the canonical per-round store (f1-results/2026/); the round's
         NUMBER, NAME and DATE derive from the season calendar (season/2026/index_weekends.json)
         via 08_season.js, falling back to the round file's own stored fields when the season
         layer is unreachable. Fails soft to an embedded Canada snapshot off-origin.
-        Championship swing computed live. Story mode derives its position ladder from the
-        round's own classification; per-second telemetry + team radio are illustrative/future
-        (flagged in-UI) until the R2 tier + archived radio land.
-  NAV: Weekend is a DRILL-THROUGH, not a peer tab — switcher is Matrix / History / Circuits.
-       Entered from a History card or a Circuit card (weekend.html#/<slug>); links back to the guide.
-  LOAD ORDER: 08_season.js (window.F1Season) → data.js (globals, awaits it) → story.js
-              (window.mountStory) → render.js (uses mountStory) → nav.js (boots).
-  CACHE-BUST: bump every ?v= token below on each source deploy.
+  NAV: Weekend is a DRILL-THROUGH, not a peer tab — the switcher is Matrix / History / Circuits
+       and none of them is marked current here. Entered from a History card or a Circuit card.
+  LOAD ORDER: chrome.js → 08_season.js (window.F1Season) → data.js (globals, awaits it) →
+              story.js (window.mountStory) → render.js (uses mountStory) → nav.js (boots).
+  🚨 CACHE-BUST: bump every ?v= token below IN THE SAME COMMIT as the change. Twice on
+     2026-08-01 a stale token nearly shipped a fix nobody could see.
 -->
 <html lang="en">
 <head>
@@ -39,11 +39,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/weekend/base.css?v=17">
-<link rel="stylesheet" href="source/weekend/panels.css?v=17">
-<link rel="stylesheet" href="source/weekend/story.css?v=17">
+<link rel="stylesheet" href="source/weekend/base.css?v=19">
+<link rel="stylesheet" href="source/weekend/panels.css?v=19">
+<link rel="stylesheet" href="source/weekend/story.css?v=19">
 <!-- LAST on purpose: the shared spine wins the cascade over this lens's own :root. -->
-<link rel="stylesheet" href="source/chrome-tokens.css?v=17">
+<link rel="stylesheet" href="source/chrome-tokens.css?v=19">
 </head>
 <body>
   <div id="topbar"></div>
@@ -54,10 +54,11 @@
     <span>Race Weekend <b class="num" id="foot-stamp">v6</b> · derived from results store</span>
     <span class="num">f1-results/2026/</span>
   </footer>
-  <script src="source/08_season.js?v=17"></script>
-  <script src="source/weekend/data.js?v=17"></script>
-  <script src="source/weekend/story.js?v=17"></script>
-  <script src="source/weekend/render.js?v=17"></script>
-  <script src="source/weekend/nav.js?v=17"></script>
+  <script src="source/chrome.js?v=19"></script>
+  <script src="source/08_season.js?v=19"></script>
+  <script src="source/weekend/data.js?v=19"></script>
+  <script src="source/weekend/story.js?v=19"></script>
+  <script src="source/weekend/render.js?v=19"></script>
+  <script src="source/weekend/nav.js?v=19"></script>
 </body>
 </html>

@@ -1,21 +1,21 @@
-/* weekend/nav.js — Race Weekend lens, nav + boot (v2.0).
-   Renders the topbar (brand + cross-lens switcher) and the drill-through nav
-   (prev / round-select / next), owns hash routing (#/<slug>), and boots the page.
-   Weekend is NOT a peer tab — the switcher is Matrix / History / Circuits and you
-   arrive here by drilling into a round. Reads bare globals from data.js. */
+/* weekend/nav.js — Race Weekend lens, nav + boot (v2.1).
+   Renders the drill-through nav (prev / round-select / next), owns hash routing
+   (#/<slug>), and boots the page. Weekend is NOT a peer tab — you arrive here by
+   drilling into a round. Reads bare globals from data.js.
+
+   ⚠️ v2.1 (2026-08-01): the topbar is NO LONGER BUILT HERE. It was a template string in
+   this file — one of THREE hand-written copies of the same header across the app, which
+   is what let v17 ship a doubled brand. source/chrome.js is now the only thing that
+   renders chrome anywhere, and it suppresses itself when embedded in the unified shell,
+   so this file cannot get that wrong. Decision Log J19. */
 (function(){
-  const MARK='<span class="mk"><svg viewBox="0 0 24 24" fill="none"><path d="M3 17c4-1 6-9 10-9 3 0 4 3 8 2" stroke="white" stroke-width="2.4" stroke-linecap="round"></path><circle cx="6" cy="16.5" r="1.7" fill="white"></circle></svg></span>';
   const ARROW=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d==='prev'?'<path d="M15 18l-6-6 6-6"/>':'<path d="M9 18l6-6-6-6"/>'}</svg>`;
 
+  /* One line, and the header markup lives in exactly one file. `weekend` marks no tab as
+     current on purpose: it is a drill-through, not a peer lens. */
   function topbar(){
     const t=document.getElementById('topbar');
-    t.innerHTML=`
-      <button class="brand" onclick="location.href='standings.html'">${MARK}<span class="t">F1 2026<small>Race Weekend</small></span></button>
-      <nav class="lens" aria-label="Lens switcher">
-        <a href="standings.html">Matrix</a>
-        <a href="standings.html#history">History</a>
-        <a href="circuits.html">Circuits</a>
-      </nav>`;
+    if(t && window.F1Chrome) F1Chrome.mount(t,{lens:'weekend'});
   }
 
   function wknav(curSlug){
@@ -51,6 +51,6 @@
     await loadSeason();
     route();
     window.addEventListener('hashchange',route);
-    const stamp=document.getElementById('foot-stamp'); if(stamp) stamp.textContent='v2.0';
+    const stamp=document.getElementById('foot-stamp'); if(stamp) stamp.textContent='v2.1';
   })();
 })();
