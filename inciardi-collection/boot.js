@@ -50,11 +50,16 @@
     color: 'mercedes',          // pre-paint floor; must match the join's colour
     defaultPage: 'binder',
     /* Hints are why the drawer beats the old inline bar — there was never room to say what a page
-       is FOR up there. `label` is ALSO the page title in the header (v11). */
+       is FOR up there. `label` is ALSO the page title in the header (v11).
+       ⚠️ FIVE ITEMS NOW (v20), and that is fine in a way it would not have been at v5: the nav
+       used to live INLINE in the header and wrapped to two lines at four, which is why
+       chrome.js's header still carries the sentence "FOUR ITEMS IS THE CEILING" about a
+       component that no longer exists. A left drawer has no item ceiling. */
     nav: [
       { route: 'binder',  label: 'Binder',     hint: 'Nine slots a face, front and back' },
       { route: 'summary', label: 'Collection', hint: 'Every print, and where each one is' },
       { route: 'shoebox', label: 'Shoe-box',   hint: 'Owned, not in the binder yet' },
+      { route: 'photos',  label: 'Photographs', hint: 'Every photo \u2014 unassigned first' },
       { route: 'enter',   label: 'Enter',      hint: 'Add a print to the catalog' }
     ],
 
@@ -282,10 +287,11 @@
      * identical — this is the line that tells them apart.
      * ⚠️ IT IS ONLY TRUE IF IT IS KEPT CURRENT, AND IT WAS NOT: `Arrange` shipped in v17 and was
      * never added, so for two versions the one diagnostic built to catch a missing module was
-     * blind to the newest one. Add every new global here in the same commit that creates it. */
+     * blind to the newest one. Add every new global here in the same commit that creates it.
+     * (v20 added `Capture` and `Photos` in the commit that created them, which is the rule.) */
     L.push('modules     ' +
       ['Device', 'Chrome', 'Settings', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox',
-       'Summary', 'Batch', 'Arrange', 'Preview', 'Backroom', 'Artwork', 'App']
+       'Summary', 'Batch', 'Arrange', 'Preview', 'Backroom', 'Artwork', 'Capture', 'Photos', 'App']
         .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
     L.push('hash        ' + (location.hash || '(none)'));
     L.push('worker      ' + API.base() + (API.isDefaultBase() ? '  [built-in]' : '  [OVERRIDDEN here]'));
