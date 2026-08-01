@@ -1,9 +1,16 @@
 /* matrix.js — renders the leader strip, the drivers points matrix (sortable,
-   rounds inverted recent-first), and the constructors table. Uses globals from data.js. */
+   rounds inverted recent-first), and the constructors table. Uses globals from data.js.
+
+   v13 (2026-08-01): the leader strip's rounds cell used to render `${ROUNDS.length} / 22`.
+   That 22 was a literal, and it went WRONG on 2026-07-26 when Bahrain was reinstated at
+   Sepang and the season became 23 rounds. It reads SEASON_TOTAL (derived from the weekend
+   vector) now, and renders the raced count with NO denominator when the calendar is
+   unavailable — a missing number beats a confidently wrong one. */
 function render(){
   const roundsDesc=[...ROUNDS].sort((a,b)=>b.round-a.round);
   const L=STANDINGS[0],s2=STANDINGS[1];
-  document.getElementById('leaderStrip').innerHTML=`<div class="leader-cell"><span class="k">Leader</span><span class="v" style="color:${teamColor(L.team)}">${LAST(L.id)} <span class="pts num">${L.total}</span></span></div><div class="leader-cell"><span class="k">Margin</span><span class="v num">+${L.total-s2.total}</span></div><div class="leader-cell"><span class="k">Rounds</span><span class="v num">${ROUNDS.length} <span class="pts">/ 22</span></span></div>`;
+  const ofSeason=(typeof SEASON_TOTAL==='number'&&SEASON_TOTAL>0)?` <span class="pts">/ ${SEASON_TOTAL}</span>`:'';
+  document.getElementById('leaderStrip').innerHTML=`<div class="leader-cell"><span class="k">Leader</span><span class="v" style="color:${teamColor(L.team)}">${LAST(L.id)} <span class="pts num">${L.total}</span></span></div><div class="leader-cell"><span class="k">Margin</span><span class="v num">+${L.total-s2.total}</span></div><div class="leader-cell"><span class="k">Rounds</span><span class="v num">${ROUNDS.length}${ofSeason}</span></div>`;
   const stamp=document.getElementById('stamp');if(stamp)stamp.textContent=APP_VERSION;
 
   let head=`<tr><th class="col-pos"><div class="th-pad">#</div></th><th class="col-drv" data-active="${sortMode==='name'?1:0}"><div class="th-pad" data-sort="name">Driver<span class="sicon">\u21C5</span></div></th><th class="col-pts" data-active="${sortMode==='champ'?1:0}"><div class="th-pad" data-sort="champ">PTS<span class="sicon">\u21C5</span></div></th>`;
