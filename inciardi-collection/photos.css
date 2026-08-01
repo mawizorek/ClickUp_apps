@@ -1,0 +1,134 @@
+/* Inciardi Collection — PHOTOS. The grid, the scope bar, the per-photo drawer.
+ *
+ * ZERO COLOUR LITERALS. Every value is a var() off the theme spine, so a theme swap stays one
+ * pointer and zero edits here (theme contract). A hex in this file would be the one tile that
+ * does not follow the rest of the app when the palette moves.
+ */
+
+.ph-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.ph-intro { margin: .25rem 0 1rem; }
+
+.ph-add {
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: var(--radius, .5rem);
+  padding: .55rem .9rem;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ---------- the scope bar (Q23 C) ---------- */
+.ph-bar { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem; }
+
+.ph-chip {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: .35rem .8rem;
+  font: inherit;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.ph-chip[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent, var(--surface-1));
+}
+
+/* ---------- the grid ----------
+ * auto-fill + minmax so the column count follows the viewport with no breakpoint to maintain.
+ * The square aspect box is what stops the page reflowing as photos arrive at different aspect
+ * ratios — the tiles are already the right size before a single image has loaded. */
+.ph-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: .6rem;
+}
+
+.ph-tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--line);
+  border-radius: var(--radius, .5rem);
+  overflow: hidden;
+  background: var(--surface-2);
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ⚠️ THIS IS THE FULL 1800px IMAGE, SCALED BY CSS. Derivatives were deferred (images.js names
+ * why: one `r2_key` column, and the scheme for three was never decided), so a 177-tile grid
+ * downloads 177 full photographs. `loading="lazy"` keeps that off the critical path and the
+ * fixed box stops it reflowing — but this IS the first thing that will hurt, and the fix is a
+ * `-t.jpg` sibling key rather than anything in this file. */
+.ph-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* A tile whose bytes are missing must SAY SO. An empty grey square is indistinguishable from a
+ * photo that has not finished loading, and that ambiguity is the one this app refuses
+ * everywhere else — the worker reports a missing object as a real 502 rather than a 404 for
+ * exactly the same reason. */
+.ph-broken {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  color: var(--muted); font-size: .72rem; text-align: center; padding: .5rem;
+}
+
+.ph-flag {
+  position: absolute; left: .3rem; bottom: .3rem;
+  background: var(--surface-1); color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: .1rem .45rem; font-size: .7rem;
+}
+.ph-flag.is-primary { color: var(--accent); border-color: var(--accent); }
+
+/* ---------- the drawer ----------
+ * Bottom-anchored and capped at 85vh so a tall photo cannot push the actions off the screen —
+ * the buttons are the reason the drawer opened. */
+.ph-drawer {
+  position: fixed; inset: auto 0 0 0;
+  max-height: 85vh; overflow: auto;
+  background: var(--surface-1);
+  border-top: 1px solid var(--line);
+  border-radius: var(--radius, .5rem) var(--radius, .5rem) 0 0;
+  padding: 1rem calc(1rem + env(safe-area-inset-right)) calc(1rem + env(safe-area-inset-bottom)) calc(1rem + env(safe-area-inset-left));
+  z-index: 60;
+}
+.ph-drawer h2 { margin: 0 0 .5rem; font-size: 1.05rem; }
+
+/* `contain`, not `cover`: this is the one place the WHOLE photograph matters. A cropped
+ * preview is how you approve an image whose subject is outside the crop. */
+.ph-shot {
+  width: 100%; max-height: 45vh; object-fit: contain;
+  border-radius: var(--radius, .5rem); background: var(--surface-2);
+}
+
+.ph-meta { font-size: .8rem; color: var(--muted); margin: .5rem 0 .75rem; }
+.ph-meta b { color: var(--text); font-weight: 600; }
+
+.ph-acts { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ph-acts button, .ph-acts select {
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: var(--radius, .5rem);
+  padding: .5rem .75rem;
+  font: inherit; font-size: .9rem;
+  /* 44px is the tap floor the rest of the app holds to; a destructive control that needs two
+     attempts is a destructive control someone eventually hits by accident. */
+  min-height: 2.75rem;
+  cursor: pointer;
+}
+.ph-acts select { flex: 1 1 12rem; min-width: 0; }
+.ph-acts .danger { color: var(--bad, var(--text)); }
+
+.ph-links { list-style: none; margin: .5rem 0 .75rem; padding: 0; font-size: .85rem; }
+.ph-links li { display: flex; align-items: center; gap: .5rem; padding: .3rem 0; }
+.ph-links li > .muted { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ph-links button {
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--text);
+  border-radius: var(--radius, .5rem); padding: .35rem .6rem;
+  font: inherit; font-size: .8rem; min-height: 2.25rem; cursor: pointer;
+}

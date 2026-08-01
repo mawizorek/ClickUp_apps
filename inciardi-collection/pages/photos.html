@@ -1,0 +1,35 @@
+<!-- Inciardi Collection — the PHOTOS partial.
+     Injected by the router; `photos.js` fills #phBar and #phGrid on mount.
+
+     The toolbar markup IS here, unlike artwork.html's bare shell, and the difference is
+     deliberate: none of it depends on which data comes back, so painting it immediately gives
+     the page a shape while the fetch is in flight. The COUNTS inside the bar are filled by JS,
+     because those are data — and a number rendered before its fetch is a number that can lie. -->
+<section class="page">
+  <div class="ph-head">
+    <h1>Photos</h1>
+    <button id="phAdd" class="ph-add" type="button">Add photos</button>
+  </div>
+
+  <p class="muted ph-intro">
+    Shoot a pile of prints in one go and file them later. <b>Unassigned</b> shows first on
+    purpose — the backlog is the point of this screen.
+  </p>
+
+  <div id="phBar" class="ph-bar"></div>
+  <div id="phGrid" class="ph-grid"></div>
+
+  <!-- ⚠️ THE SCRIM IS NOT OPTIONAL, AND ITS ABSENCE WOULD HAVE FAILED SILENTLY. `Drawer.open()`
+       in core.js reaches for `#pageScrim` and guards with `if (s)` — so a page that omits the
+       element gets a drawer with no backdrop and no tap-outside-to-close, on this screen only,
+       with no error anywhere. Same element and same class as binder.html; `.page-scrim` is
+       already styled in base.css, so nothing is invented here. -->
+  <button class="page-scrim" id="pageScrim" hidden aria-label="Close"></button>
+
+  <!-- ONE drawer, reused for whichever photo was tapped. `.page-drawer` is the class
+       `Drawer.closeAll()` looks for, so a route change or any other drawer opening closes this
+       one automatically — which is why it is not a bespoke panel. -->
+  <aside id="phDrawer" class="page-drawer ph-drawer" hidden aria-label="Photo">
+    <div id="phDrawerBody"></div>
+  </aside>
+</section>
