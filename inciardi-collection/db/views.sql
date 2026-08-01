@@ -1,7 +1,18 @@
 -- Inciardi Collection — schema v2 · ④ THE DERIVED LAYER
--- Views (rung 1) and the one trigger we actually need (rung 3).
+-- Views (rung 1) and the triggers we actually need (rung 3).
 --
 -- ✅ CANONICAL. Promoted 2026-07-28. Apply LAST, after ① spine, ② binder, ③ market. `db/_index.md`.
+--
+-- 🔄 Rewritten 2026-08-01 to match the database after migration 001 (spec §5 step 2). The only
+-- structural change is `v_shoebox`, which lost `a.collection_id` when that column was retired.
+--
+-- 🔴 AND THE REASON THAT ONE COLUMN COST A MIGRATION ATTEMPT: SQLite refuses `ALTER TABLE artwork
+-- DROP COLUMN collection_id` while ANY view names the column —
+--     error in view v_shoebox after drop column: no such column: collection_id
+-- The spec's §4 was authored against `schema.sql` and never cross-read against THIS FILE. It measured
+-- every TABLE for emptiness and never asked what else NAMES the column. **A dependency check that
+-- only looks at tables is not a dependency check. Before any future DROP COLUMN in this app, grep the
+-- views.** 001 handles it by dropping and rebuilding the view inside the same atomic pass.
 --
 -- ==========================================================================================
 -- WHY THIS FILE IS THE MOST IMPORTANT ONE.
@@ -118,6 +129,12 @@ CROSS JOIN (SELECT 'A' AS side UNION ALL SELECT 'B') sd;
 -- appear by name. (Its first test returned zero rows, which proves nothing: zero rows is also what a
 -- broken view returns.)
 --
+-- ⚠️ 2026-08-01: `a.collection_id` was REMOVED from the select list by migration 001, which dropped
+-- the column. Nothing else about the view changed — deliberately not "improved" while it was open,
+-- because a rebuild commit is exactly where a quiet behavioural edit hides. If a consumer ever needs
+-- collection membership here, it is a JOIN through `artwork_collection`, and a print can now be in
+-- more than one set, so it fans the rows out. That is a design decision, not a column swap.
+--
 -- ============================================================================================
 -- ⚠️ NO LONGER THE APP'S SHOE-BOX QUERY, AND THE OLD NOTE HERE WAS WRONG. Corrected 2026-07-30.
 --
@@ -134,24 +151,33 @@ CROSS JOIN (SELECT 'A' AS side UNION ALL SELECT 'B') sd;
 -- versus the box. Nobody has ever needed that. The lesson worth keeping: "needs a schema change" is a
 -- claim to verify, not inherit — and a COUNT and an IDENTITY are different questions.
 --
--- WHERE IT LIVES NOW: `worker/worker.js` → GET /shoebox carries the full query, returning both
--- box states (`unhoused` = nothing placed at all — the original set this view computes; `spare` = some
+-- WHERE IT LIVES NOW: `worker/reads.js` → GET /shoebox carries the full query, returning both box
+-- states (`unhoused` = nothing placed at all — the original set this view computes; `spare` = some
 -- placed, extras left over). That is a deliberate deviation from rung 1, and the reason is deployment
 -- physics rather than taste: applying DDL to D1 needs a terminal or the dashboard console, Michael
 -- builds from a phone, and a view migration would leave the app broken in the gap between the code
 -- deploy and a hand-run console step. Worker SQL ships atomically with the worker, in one button press.
 -- It is still the DATABASE computing it, not JavaScript.
+-- ⚠️ Path corrected 2026-08-01: the reads moved out of `worker/worker.js` into `worker/reads.js` at
+-- PR #637 and this note still pointed at the old file.
 --
--- THIS VIEW IS NOW UNUSED. It is kept, not dropped, because it is correct, it costs nothing, and it is
--- the positive-control fixture the 07-28 verification was built on. If a SECOND consumer ever needs the
--- spare counts, promote the worker's query into this view (DROP + CREATE — `CREATE VIEW IF NOT EXISTS`
--- will NOT replace an existing one) and point the worker back at it. One claimant on one truth.
+-- 🟡 THE DEPLOYMENT-PHYSICS ARGUMENT IS NOW WEAKER THAN IT WAS, and it should be re-examined rather
+-- than inherited: as of PR #641 there IS a one-press path for DDL (Actions → Migrate
+-- inciardi-collection D1). The reasoning above was written when the only options were a terminal
+-- Michael does not have and a phone keyboard he should not be typing DROP TABLE into. Not changing it
+-- in this pass — this commit is a truth pass, not a redesign — but the premise moved.
+--
+-- THIS VIEW IS UNUSED. It is kept, not dropped, because it is correct, it costs nothing, and it is the
+-- positive-control fixture the 07-28 verification was built on. ⚠️ It is ALSO the exact thing that
+-- blocked the 001 migration — an unused view is invisible to a reader and fully visible to SQLite. If
+-- a SECOND consumer ever needs the spare counts, promote the worker's query into this view (DROP +
+-- CREATE — `CREATE VIEW IF NOT EXISTS` will NOT replace an existing one) and point the worker back at
+-- it. One claimant on one truth.
 -- ============================================================================================
 CREATE VIEW IF NOT EXISTS v_shoebox AS
 SELECT
   a.artwork_id,
   a.name,
-  a.collection_id,
   a.category,
   a.confidence,
   o.qty_owned,
@@ -182,7 +208,15 @@ FROM sheet sh
 LEFT JOIN v_slot v ON v.sheet_id = sh.sheet_id
 GROUP BY sh.sheet_id;
 
--- ============================================================ the ONE trigger (rung 3)
+-- ============================================================ the triggers (rung 3)
+-- ⚠️ CORRECTED 2026-08-01: this section was headed "the ONE trigger" and there are TWO. The other is
+-- `trg_collection_roster`, in ① `schema.sql`, arrived via migration 000. A file that undercounts its
+-- own siblings is how the next dependency check misses something — the same class of miss that made
+-- 001's DROP COLUMN fail. Both triggers are listed here so this stays the one place you can count them.
+--
+--   ① schema.sql · trg_collection_roster        — a personal collection cannot claim a roster_size
+--   ④ views.sql  · trg_artwork_implicit_edition — every artwork gets at least one edition (below)
+--
 -- Q1 is an invariant no SQL constraint can express: an artwork must never exist without at least one
 -- edition. A CHECK cannot see another table, and a FK points the wrong direction.
 --
@@ -220,6 +254,10 @@ END;
 -- changed. Belt and braces, because this is the row every `copy` depends on.
 
 -- ============================================================ what is NOT a view, on purpose
+-- No v_photos / v_unassigned. The Photos surface's "unassigned" default view is `image` LEFT JOIN
+-- `edition_image` WHERE the link is NULL — one query in the image routes, and it needs to be
+-- parameterised by status and kind, which a view cannot do. Revisit only if a second consumer appears.
+--
 -- No v_market / v_underpriced yet. Market is M4 (③), and the predecessor's underpriced threshold was
 -- unreachable for weeks because of a /100 unit bug nobody could see. When it comes back it gets a test
 -- against known values first, not a view.

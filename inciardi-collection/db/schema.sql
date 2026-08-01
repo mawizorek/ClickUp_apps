@@ -7,6 +7,22 @@
 -- FK-significant), and the re-runnable test. Files: ① spine (here) · ② binder · ③ market · ④ views.
 --
 -- ==========================================================================================
+-- 🔄 SCHEMA STATE — this file describes the database AFTER both migrations. Rewritten 2026-08-01.
+--
+--   000-collection-kind.sql        applied by hand      2026-07-31 23:33 ET
+--   001-photos-and-groupings.sql   applied by workflow  2026-08-01 16:51:55Z  (sha256 in applied.log)
+--
+-- ⚠️ THIS FILE IS THE DESTINATION, NOT THE JOURNEY. Build a fresh database from here; NEVER by
+-- replaying `db/migrations/`. A migration describes a TRANSITION between two specific states and
+-- 000 cannot even be re-run (SQLite has no ADD COLUMN IF NOT EXISTS).
+--
+-- 🔴 WHY THIS REWRITE EXISTS, kept because the failure will recur: between 16:51 and this commit,
+-- this file described a shape the database no longer had. Nothing errored. Nobody was warned. A
+-- canonical file does not announce that it has gone stale — it just keeps answering confidently.
+-- The migration is the only thing that knew the truth, and a migration is not a place you look.
+-- ==========================================================================================
+--
+-- ==========================================================================================
 -- THE DESIGN LAW (decision log J6):  DON'T POLICE DISAGREEMENT. MAKE IT UNREPRESENTABLE.
 --   1. Don't store it — derive it.        (a computed fact cannot disagree with itself)
 --   2. Make it structurally impossible.   (composite FK, UNIQUE, NOT NULL, CHECK)
@@ -25,6 +41,10 @@
 --   Q2  → a row that leaves the authored source is FLAGGED orphaned, never silently kept.
 --   Q4  → D1 is the source of truth; git JSON is a generated export.
 --   Q10 → ownership is `copy` rows carrying `qty`, not one row per physical object.
+--   Q21 → three grouping axes (category · medium · authorship), NONE of them ever required.
+--   Q22 → official and personal sets are the same table, split by `collection.kind`.
+--   J15 → `image` is the ASSET, `edition_image` is the LINK. Two tables, one name reused correctly.
+--   Q20 → an archived photo cannot be a print's primary. Structural, via a composite FK.
 -- ==========================================================================================
 
 -- ⚠️ READ BEFORE "CLEANING THIS UP": in D1 the next line is a NO-OP — D1 enforces foreign keys on
@@ -37,9 +57,9 @@
 PRAGMA foreign_keys = ON;
 
 -- ============================================================ collection
--- A named grouping ("Spring", "Richard Scarry"). NOT the same thing as a binder sheet: a collection is
--- what the artist released, a sheet is how Michael chose to lay it out. Conflating them would force
--- one sheet per collection forever and break "the same print on two sheets" (J2 ruling 3).
+-- A named grouping ("Spring", "Richard Scarry", or a pile you invented). NOT the same thing as a
+-- binder sheet: a collection is a SET, a sheet is how Michael chose to lay one out. Conflating them
+-- would force one sheet per collection forever and break "the same print on two sheets" (J2 ruling 3).
 --
 -- `roster_size` is load-bearing: the denominator in "SPRING · 11 / 15", the number that makes the
 -- binder worth opening on a day when there is nothing to buy.
@@ -51,28 +71,79 @@ CREATE TABLE IF NOT EXISTS collection (
   sort          INTEGER NOT NULL DEFAULT 0,
   notes         TEXT,
   created_at    TEXT NOT NULL,
-  updated_at    TEXT NOT NULL
+  updated_at    TEXT NOT NULL,
+
+  -- Q22a. The official-vs-personal split the table already implied but never named. `roster_size`
+  -- was documented as "how many artworks SHOULD be in the set" — an external truth an official
+  -- release HAS and a pile you invented does NOT. `kind` says that out loud instead of leaving it
+  -- inferred from a NULL.
+  --   release | exclusive | collab  → official. May carry a roster_size. Earns the ✓ badge.
+  --   personal                      → yours. roster_size is meaningless and refused below.
+  kind          TEXT NOT NULL DEFAULT 'personal'
+                CHECK (kind IN ('release','exclusive','collab','personal'))
 );
+
+-- 🔴 A personal collection has no external truth about its size, so it must not be able to claim
+-- one. SQLite cannot ADD a table-level CHECK to an existing table, so this is the trigger-shaped
+-- equivalent — rung 3, used exactly where rung 2 is unavailable rather than as a first resort.
+--
+-- ⚠️ On a FRESH build this could be a plain table-level CHECK, since nothing is being altered. It is
+-- deliberately kept as a trigger so this file and the live database (where it arrived via 000 as a
+-- trigger) describe the SAME OBJECT. A canonical file that is "cleaner" than production is a
+-- canonical file that is wrong.
+CREATE TRIGGER IF NOT EXISTS trg_collection_roster
+BEFORE INSERT ON collection
+WHEN NEW.kind = 'personal' AND NEW.roster_size IS NOT NULL
+BEGIN SELECT RAISE(ABORT, 'a personal collection has no roster_size'); END;
 
 -- ============================================================ artwork
 -- The creative work. ONE row forever, regardless of how many exist or who is selling one.
 -- artwork_id is HAND-WRITTEN and permanent. No generated slugs: `slug("#1")` collapsing to "1" for
 -- every product is the exact bug that made all this necessary.
+--
+-- 🔴 THERE IS NO `collection_id` HERE ANY MORE (001). A print must be able to sit in Richard Scarry
+-- AND in your own trade pile at the same time; a singular FK made the entire ask unbuildable.
+-- Membership lives in `artwork_collection` below.
 CREATE TABLE IF NOT EXISTS artwork (
   artwork_id    TEXT PRIMARY KEY,
   name          TEXT NOT NULL,              -- display only; free to change, never identity
   artist        TEXT NOT NULL DEFAULT 'Anastasia Inciardi',  -- Alex · Jana · Jules also appear
-  collection_id TEXT REFERENCES collection(collection_id) ON DELETE SET NULL,
 
-  -- DEFAULTS TO 'mini' (Michael, 2026-07-29). v1 scope is mini prints, so recording a print he just
-  -- picked up must never require saying that it is one. Left NULLABLE rather than NOT NULL: a
-  -- placeholder artwork born from a market sighting may genuinely not know its category, and stamping
-  -- 'mini' on it would be the schema asserting something nobody verified. The default fires on
-  -- omission, which is the whole ask. No CHECK on the value list — the vocabulary will grow, and a
-  -- CHECK here would turn every new category into a table rebuild for no correctness gain.
-  category      TEXT DEFAULT 'mini',        -- mini | big-riso | linocut | pack
+  -- ⭐ THREE AXES, AND THE RULE THAT KEEPS THEM COMFORTABLE (Q21 → A+B+D, Michael: "i think i want
+  -- it all comfortably"). `category` · `medium` · `authorship` are three DIFFERENT questions that
+  -- were previously fighting over one field. They only stay comfortable if NONE is ever required:
+  -- all nullable, no CHECK on any of them, and ENTRY NEVER ASKS FOR THEM. A print is recorded with
+  -- a name, exactly as it always was. A taxonomy you must complete is a taxonomy you abandon.
 
-  exclusive     TEXT,                       -- nyc | lacma | grand-central | richard-scarry | holiday
+  -- FORMAT ONLY — how big is it. DEFAULTS TO 'mini' (Michael, 2026-07-29): v1 scope is mini prints,
+  -- so recording a print he just picked up must never require saying that it is one. Left NULLABLE
+  -- rather than NOT NULL: a placeholder artwork born from a market sighting may genuinely not know
+  -- its category, and stamping 'mini' on it would be the schema asserting something nobody verified.
+  --
+  -- ⚠️ VOCABULARY, NOT ENFORCEMENT. Q21 narrowed this to `mini | big | pack` and moved `linocut` /
+  -- `big-riso` out to `medium` — but there is no CHECK here (deliberately; the vocabulary will grow
+  -- and a CHECK turns every new value into a table rebuild for no correctness gain), and 001 did NOT
+  -- rewrite any rows. Existing rows may still carry retired values. UNVERIFIED against live data as
+  -- of 2026-08-01; a data pass is owed, and until it runs do not read this comment as a guarantee.
+  category      TEXT DEFAULT 'mini',        -- mini | big | pack
+
+  -- ⭐NEW (001). HOW IT WAS MADE. This is the field `category` was being asked to hold and could not:
+  -- a size field cannot carry a medium. No CHECK — riso, linocut, letterpress, and whatever she tries
+  -- next.
+  medium        TEXT,                       -- linocut | riso | letterpress | ...
+
+  -- ⭐NEW (001). WHOSE DRAWING. Splits the Richard Scarry work from her own on the axis that actually
+  -- differs, which is what stopped `richard-scarry` needing to live in two fields at once.
+  authorship    TEXT,                       -- hers | licensed | collab
+
+  -- DISTRIBUTION — where you can get it. Narrowed by Q21 from the grab-bag it had become.
+  -- 🔴 `richard-scarry` IS NO LONGER A LEGAL VALUE HERE. It appeared under both `exclusive` and the
+  -- old `collection_id`, and the collision is resolved by REMOVAL, not by a rule: Scarry is a
+  -- COLLECTION (kind='collab') plus authorship='licensed'. Two facts, two homes. A rule saying
+  -- "don't put it there" is rung 4; deleting the value from the vocabulary is rung 2.
+  -- ⚠️ Same honesty flag as `category`: no CHECK, no row rewrite in 001, so a legacy row may still
+  -- carry it. Unverified against live data.
+  exclusive     TEXT,                       -- nyc | lacma | grand-central | holiday
 
   -- Domain Dara's distinction. "#4" and "7/12" are NOT the same kind of number:
   --   unique  = monoprint. Each numbered object genuinely differs. "#7 sold" = gone forever.
@@ -97,7 +168,7 @@ CREATE TABLE IF NOT EXISTS artwork (
                 CHECK (provenance IN ('manual','pack-roster','shop-product','owned','market','seed')),
 
   -- Honest uncertainty, rendered rather than hidden. A registry that conceals its own gaps is how the
-  -- harvest earned its distrust. 44 artworks are currently known-to-exist and unnamed.
+  -- harvest earned its distrust.
   confidence    TEXT NOT NULL DEFAULT 'named'
                 CHECK (confidence IN ('named','inferred','placeholder')),
 
@@ -110,7 +181,8 @@ CREATE TABLE IF NOT EXISTS artwork (
   created_at    TEXT NOT NULL,
   updated_at    TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS ix_art_coll   ON artwork(collection_id, status);
+-- ⚠️ `ix_art_coll ON artwork(collection_id, status)` was DROPPED by 001 along with the column.
+-- Its replacement is `ix_ac_coll` on the join table below. Do not resurrect it.
 CREATE INDEX IF NOT EXISTS ix_art_cat    ON artwork(category, status);
 CREATE INDEX IF NOT EXISTS ix_art_handle ON artwork(shop_handle);
 
@@ -129,6 +201,22 @@ CREATE TABLE IF NOT EXISTS artwork_alias (
 );
 CREATE INDEX IF NOT EXISTS ix_alias_norm ON artwork_alias(norm);
 
+-- ============================================================ artwork_collection  (001)
+-- Set membership. THE THIRD INSTANCE of a pattern this app already runs twice — `slot` is the
+-- many-to-many between sheets and artworks, and `edition_image` below is the same move for images.
+-- A fold-in of an established shape, not a net-new concept.
+--
+-- Replaces the singular `artwork.collection_id`, which could not express the actual requirement:
+-- one print in an official release AND in a personal trade pile at the same time.
+CREATE TABLE IF NOT EXISTS artwork_collection (
+  artwork_id    TEXT NOT NULL REFERENCES artwork(artwork_id)       ON DELETE CASCADE,
+  collection_id TEXT NOT NULL REFERENCES collection(collection_id) ON DELETE CASCADE,
+  sort          INTEGER NOT NULL DEFAULT 0,
+  created_at    TEXT NOT NULL,
+  PRIMARY KEY (artwork_id, collection_id)   -- the same print twice in one set: impossible
+);
+CREATE INDEX IF NOT EXISTS ix_ac_coll ON artwork_collection(collection_id, sort);
+
 -- ============================================================ edition
 -- A specific impression or unique object. THE LAYER THAT NEVER EXISTED BEFORE.
 --
@@ -139,6 +227,12 @@ CREATE INDEX IF NOT EXISTS ix_alias_norm ON artwork_alias(norm);
 -- edition is the physical-INSTANCE layer, not a numbering scheme — a thing that exists has at least
 -- one instance whether or not the artist labelled it. That makes copy.edition_id NOT NULL and always
 -- satisfiable: one code path, no polymorphic parent, no nullable dual FK.
+--
+-- ⭐ THIS IS ALSO WHERE A REPRINT LIVES. A 2026 second printing, or an "oops" misprint, is a
+-- genuinely different object from the original — so it is an `edition` with `label = '2nd printing'`
+-- and `implicit = 0`. Zero schema change. ⚠️ `ux_ed_implicit` allows at most ONE implicit edition per
+-- artwork, so a second printing MUST be explicit and labelled; the auto-trigger cannot mint it.
+-- 🚫 The word `release` is reserved for `collection.kind` and must never be spent on this.
 --
 -- 🔗 THE DENORMALIZATION CHAIN (rung 2). `edition_type` is copied DOWN from artwork here, and again
 -- from here to `copy`. That would be duplication except every link is a COMPOSITE FK with ON UPDATE
@@ -204,35 +298,89 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_ed_implicit ON edition(artwork_id) WHERE im
 CREATE UNIQUE INDEX IF NOT EXISTS ux_ed_art_pair    ON edition(edition_id, artwork_id);
 CREATE UNIQUE INDEX IF NOT EXISTS ux_ed_edtype_pair ON edition(edition_id, edition_type);
 
--- ============================================================ edition_image
--- Images attach to the EDITION, not the artwork. The opposite of the predecessor, and it falls
--- straight out of Q1: each Brooklyn Ginkgo edition has its OWN photograph because they are visibly
--- different objects. An open artwork has one implicit edition, so its photo lives there. One rule, no
--- special case: a photograph is of an object, and the object is the edition.
-CREATE TABLE IF NOT EXISTS edition_image (
+-- ============================================================ image  (001) — THE ASSET
+-- J15. A photograph is a THING. It exists the moment it is uploaded, with ZERO links, and that is
+-- the entire point: capture and assignment are decoupled, so 200 prints can be photographed in one
+-- sitting and sorted later.
+--
+-- THE PLACEMENT TEST, and it decides every future field on either table:
+--   does this fact change if the same photo is attached to a DIFFERENT edition?
+--     No  → it belongs here, on the asset.   (bytes, dimensions, caption, who shot it, when)
+--     Yes → it belongs on the link below.    (is it the primary FOR THIS PRINT, sort order)
+--
+-- ⚠️ MUST BE DEFINED ABOVE `edition_image`: the link composite-FKs into it, and this file's order is
+-- FK-significant.
+CREATE TABLE IF NOT EXISTS image (
   image_id     TEXT PRIMARY KEY,
-  edition_id   TEXT NOT NULL REFERENCES edition(edition_id) ON DELETE CASCADE,
-  r2_key       TEXT,                        -- NULL = reference-only, renders via CDN passthrough
-  source_url   TEXT,
+  r2_key       TEXT,                        -- ed/<edition_id>/<sha256>.jpg — content-addressed
+  source_url   TEXT,                        -- NULL r2_key = reference-only, renders via CDN passthrough
   kind         TEXT NOT NULL DEFAULT 'upload' CHECK (kind IN ('upload','scrub','reference')),
   content_type TEXT,
   bytes        INTEGER,
-  sha256       TEXT,                        -- Q8 = A+C: the export's image manifest reads this.
+  sha256       TEXT,
   width        INTEGER,
   height       INTEGER,
-  is_primary   INTEGER NOT NULL DEFAULT 0 CHECK (is_primary IN (0,1)),
+
+  -- yours to edit
+  caption      TEXT,
+  subject      TEXT,     -- single | pack | detail | packaging | in-situ | reference. No CHECK.
+  credit       TEXT,     -- you | anastasia | other
+  -- 🔴 READ FROM EXIF **BEFORE** THE CANVAS RE-ENCODE. The re-encode kills HEIC, fixes rotation and
+  -- strips GPS — and destroys the capture date permanently on the way past. There is no second
+  -- chance at this value and no way to detect afterwards that it was lost.
+  shot_at      TEXT,
+
+  -- 🔴 ARCHIVE, NEVER DELETE. R2 bytes are not covered by D1 Time Travel, so a hard delete is the one
+  -- genuinely unrecoverable action in this app.
   status       TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
-  sort         INTEGER NOT NULL DEFAULT 0,
   created_at   TEXT NOT NULL,
   archived_at  TEXT,
 
-  -- An image row that is neither in R2 nor pointing at a CDN URL renders nothing. Not a record,
-  -- litter.
-  CHECK (r2_key IS NOT NULL OR source_url IS NOT NULL)
+  -- An image neither in R2 nor pointing at a CDN renders nothing. Litter, not a record.
+  CHECK (r2_key IS NOT NULL OR source_url IS NOT NULL),
+
+  -- 🔗 FK TARGET, not a uniqueness claim — image_id is already the PK, so this adds no constraint.
+  -- It exists so the link below can INHERIT status instead of copying it.
+  UNIQUE (image_id, status)
 );
-CREATE INDEX IF NOT EXISTS ix_img_ed ON edition_image(edition_id, status, sort);
+CREATE INDEX IF NOT EXISTS ix_image_status ON image(status, created_at);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_image_sha ON image(sha256) WHERE sha256 IS NOT NULL;
+
+-- ============================================================ edition_image  (001) — THE LINK
+-- Images attach to the EDITION, not the artwork. It falls straight out of Q1: each Brooklyn Ginkgo
+-- edition has its OWN photograph because they are visibly different objects. An open artwork has one
+-- implicit edition, so its photo lives there. One rule, no special case: a photograph is of an
+-- object, and the object is the edition.
+--
+-- ⚠️ THE NAME IS REUSED ON PURPOSE, AND THIS TABLE IS NOT WHAT IT USED TO BE. Before 001 this WAS the
+-- asset (bytes, dimensions, sha256, all of it). `edition_image` was always the right name for a join
+-- table; it was only ever the asset because nothing had forced the question. Anything written against
+-- the pre-001 shape — a route, an export, a query in a notebook — is broken and will not say so.
+CREATE TABLE IF NOT EXISTS edition_image (
+  edition_id TEXT NOT NULL REFERENCES edition(edition_id) ON DELETE CASCADE,
+  image_id   TEXT NOT NULL,
+  status     TEXT NOT NULL,               -- INHERITED. Never set independently.
+  is_primary INTEGER NOT NULL DEFAULT 0 CHECK (is_primary IN (0,1)),
+  sort       INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (edition_id, image_id),
+
+  -- 🔗 Q20 → B, and the whole reason status is duplicated onto the link. The same trick the schema
+  -- already runs on edition_type: the link's status CANNOT disagree with the asset's, and follows it
+  -- on update.
+  FOREIGN KEY (image_id, status)
+    REFERENCES image (image_id, status)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- ⭐ THE GUARD, KEPT STRUCTURAL. A partial index can only see its OWN table's columns — so without
+-- the denormalized `status` above, the `active` half of this predicate would silently stop existing,
+-- and an ARCHIVED photo could remain a print's primary image. Fifth encounter with that defect class
+-- in this app; the first one refused at design time rather than patched afterwards.
 CREATE UNIQUE INDEX IF NOT EXISTS ux_img_primary
   ON edition_image(edition_id) WHERE is_primary = 1 AND status = 'active';
+CREATE INDEX IF NOT EXISTS ix_ei_image ON edition_image(image_id);
+CREATE INDEX IF NOT EXISTS ix_ei_ed    ON edition_image(edition_id, sort);
 
 -- ============================================================ copy  (what Michael owns)
 -- The physical thing he holds. The only layer that is a FACT rather than a claim.
@@ -296,10 +444,15 @@ CREATE INDEX IF NOT EXISTS ix_copy_disp ON copy(disposition);
 -- + its implicit edition, then the copy. Ownership never depends on a feed having seen the thing.
 
 -- ============================================================ what is NOT here, on purpose
+-- artwork.collection_id    — REMOVED by 001. Membership is `artwork_collection`, many-to-many, because
+--                            a print can be in an official release and a personal pile at once.
 -- copy.location            — no per-object allocation. The shoe-box is DERIVED (J4), and Michael
 --                            explicitly cut which-physical-card-is-where as "minimal singular
 --                            tracking."
 -- copy.disposition='want'  — a want is a slot with no copies. One way to say it, not two.
+-- a `release` table        — a printing run is already an `edition` (see the ⭐ note there). The word
+--                            `release` belongs to `collection.kind` and is deliberately not spent here.
+-- image tags / crop / per-image visibility / filenames — J16, out of scope.
 -- machine / machine_print / machine_event — the location layer. 14 seeded rows in the predecessor,
 --                            zero UI ever built. Out of scope (README §7); port when a page needs it.
 -- market_point / print_point / gone_event — the old time-series trio. ③ `sighting` replaces all three.
