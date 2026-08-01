@@ -44,6 +44,27 @@
     return -1;
   }
 
+  /* ---------------------------------------------------------------- THE PLATE (v21)
+   * 🔴 THE INITIALS ARE NOT REPLACED BY THE PHOTO — THE PHOTO SITS ON TOP OF THEM.
+   *
+   * `onerror="this.remove()"` drops the image and the initials are revealed underneath, which is
+   * Image Rendering Law rule 7 doing real work rather than sitting in a comment: a BROKEN photo
+   * and a print with NO photo must not look the same, and neither may look like a card that
+   * failed to render. A grey box would collapse all three into one appearance.
+   *
+   * ⭐ `image_id` IS DERIVED BY THE WORKER, not chosen here (reads.js → displayImage). The client
+   * does not rank photos, exactly as it does not count copies — one ranking, computed once, so
+   * the binder and the Collection matrix can never disagree about which photo a print HAS.
+   */
+  function plate(row) {
+    var ini = '<span class="ini">' + Core.esc(Core.initials(row.artwork_name)) + '</span>';
+    if (!row.image_id) return '<span class="plate">' + ini + '</span>';
+    return '<span class="plate">' + ini +
+      '<img class="pl-img" loading="lazy" alt="" src="' +
+      Core.esc(API.base() + '/image/' + encodeURIComponent(row.image_id)) +
+      '" onerror="this.remove()"></span>';
+  }
+
   /* ---------------------------------------------------------------- ONE CARD
    * The v4 card stacked a 4:5 plate, then the name, then two mono lines — ~230px tall, so nine
    * could never share a screen. The caption sits ON the plate as a band: same information,
@@ -84,8 +105,7 @@
       ? '<span class="ed">' + Core.esc(row.edition_label) + '</span>' : '';
 
     return '<button class="slot ' + row.state + '" ' + at + sid + '>' + ed +
-      '<span class="plate"><span class="ini">' +
-        Core.esc(Core.initials(row.artwork_name)) + '</span></span>' +
+      plate(row) +
       '<span class="cap"><span class="nm">' + Core.esc(row.artwork_name) + '</span>' +
       (sub ? '<span class="c-sub">' + Core.esc(sub) + '</span>' : '') +
       '</span></button>';

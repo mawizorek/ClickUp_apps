@@ -124,6 +124,22 @@ html[data-device="mobile"] .flipper { height: 100%; width: 100%; aspect-ratio: a
   font-size: clamp(0.9rem, 20cqi, 2rem); font-weight: 700;
   letter-spacing: 0.06em; color: var(--accent-deep); }
 
+/* 🔴 v21 — IMAGES LANDED, AND THE INITIALS STAY UNDERNEATH THEM.
+   The comment above has said "until then" since v9. This is then.
+
+   Both children are pinned to the SAME grid cell rather than the image being positioned over
+   the plate: `.plate` was already `display:grid; place-items:center`, so `grid-area: 1/1`
+   stacks them with no `position:absolute`, no new containing block, and nothing that can
+   disturb the 3x3 aspect lock above.
+
+   ⭐ THE STACK IS THE ERROR HANDLING. `binder.js` puts `onerror="this.remove()"` on the img, so
+   a photo whose bytes are missing from R2 falls back to the initials INSTEAD of a grey box —
+   which keeps "failed to load" and "nothing to load" distinguishable from "the card is broken",
+   exactly as rule 7 requires. Replacing the initials rather than covering them would have
+   thrown that away for one line of markup. */
+.plate > * { grid-area: 1 / 1; }
+.plate .pl-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
 /* Caption band ACROSS the card, not a tag hugging its text. It has to be `display:block` with a
    full width: a bare <span> flex item shrink-wraps, which is the little floating label box in
    the v9 screenshots. THE change that made nine cards fit is that this sits ON the plate rather
@@ -158,6 +174,13 @@ html[data-device="mobile"] .flipper { height: 100%; width: 100%; aspect-ratio: a
 .slot.wanted .plate .ini { color: var(--text-faint); }
 .slot.wanted .cap { background: transparent; }
 .slot.wanted .cap .nm { color: var(--text-soft); font-style: italic; font-weight: 400; }
+
+/* 🔴 A WANTED CARD DIMS ITS PHOTO, and this is not decoration. A wanted slot CAN carry an image —
+   Anastasia's reference shot of a print Michael has not bought is exactly that case — and a
+   full-strength photograph inside a dashed ghost would read as a print he owns, undoing the one
+   distinction the whole binder is built on. The border language stays load-bearing only if the
+   fill respects it. */
+.slot.wanted .plate .pl-img { opacity: 0.5; filter: saturate(0.35); }
 
 /* NOTE = a written slip, not a failed card. It used to read as a bug: a big empty panel with the
    word "note" stranded at the bottom. Now the label leads and the text is the content. */
