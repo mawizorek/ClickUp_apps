@@ -1,14 +1,18 @@
-/* Inciardi Collection — THE PHOTO PIPE. Six routes: bytes in, bytes out, links between.
+/* Inciardi Collection — THE PHOTO PIPE. Three routes: bytes in, bytes out, the grid.
  *
  * ============================================================================
  * NEW FILE 2026-08-01, and it had to be one. `worker.js` sat at ~21KB against a ~22KB practical
- * ceiling when this was written (base64 inflates 4/3 against a ~30KB return cap) and its own
- * header says in capitals that the next route does not go in it.
+ * ceiling when this was written and its own header says in capitals that the next route does
+ * not go in it.
  *
- * ⚠️ THIS FILE ALSO BROKE THAT CEILING ON ITS FIRST PUSH — 26,603 bytes — and the one-off
- * routes were split to `worker/adopt.js` before merge. The write-up is in that file's header;
- * it is worth reading, because it was comment weight and it is one of three instances in this
- * app in three days.
+ * ⚠️ AND THIS FILE THEN BROKE THE SAME CEILING TWICE. 26,603 bytes on its first push (the
+ * one-off routes went to `worker/adopt.js` before merge), then 21,455 — ~545 bytes of headroom,
+ * LESS than `worker.js` had on the day that was called an emergency — so the three link writes
+ * went to **`worker/links.js`**. Read that file's header; the seam was named here and in the
+ * module map before it was finally taken.
+ *
+ * WHAT IS LEFT IS THE BYTE LAYER, and that is now the whole rule for this file: **if a route
+ * does not touch R2 or return an image, IT DOES NOT BELONG HERE.**
  *
  * 🔴 WHY THE DISPATCH SITS BEFORE THE BODY PARSE IN worker.js — NOT A STYLE CHOICE.
  * worker.js runs `body = await request.json()` on every write, which CONSUMES THE REQUEST
@@ -16,7 +20,8 @@
  * already-drained body and write a zero-length object to R2 behind a perfectly successful
  * response — a silent empty file, which is the worst failure shape this app knows.
  * So: the write-key gate fires FIRST (auth is not relocated), then images dispatch, then the
- * JSON parse for everything else. These routes own their own body because it is not JSON.
+ * JSON parse for everything else. ⚠️ `links.js` is the OPPOSITE and dispatches AFTER the parse,
+ * because its bodies really are JSON. Two image-ish modules, two positions, one reason.
  *
  * CONTRACT with worker.js, same shape as reads.js: everything needed is handed over, this file
  * reaches for no globals and holds no state. Returns a Response, or `null` meaning "not my
@@ -29,7 +34,8 @@
  * 🔴 THE BYTES ARE THE ONLY UNRECOVERABLE THING IN THIS APP. D1 Time Travel covers the
  * database for 30 days and covers R2 for NOTHING. An export carries image ROWS, not image
  * BYTES. There is no delete route in this file and there must never be one: archiving is a
- * `status` flip and the object stays. If you are here to add a cleanup job, don't.
+ * `status` flip (in `links.js`) and the object stays. If you are here to add a cleanup job,
+ * don't.
  *
  * ⚠️ WHAT IS DELIBERATELY NOT BUILT, named so each gap is a decision and not an oversight:
  *   - DERIVATIVES. The spec locked three (thumb 480 / full 1800 / re-encoded original, Q14 C)
@@ -41,11 +47,14 @@
  *   - EXIF. `shot_at` is accepted as a parameter and never derived here. Reading it is
  *     capture.js's job and it MUST happen BEFORE the canvas re-encode — the re-encode strips
  *     GPS, which is the point, and takes the capture date with it, permanently (J16).
+ *     ✅ VERIFIED ON REAL FILES 2026-08-01: six uploads carried `shot_at` a week older than
+ *     their `created_at`, so the order is PROVEN rather than assumed from the design.
  */
 
+import { linkImage } from './links.js';
+
 export const IMAGE_ROUTES = [
-  'GET /images?scope=', 'GET /image/:id', 'POST /image',
-  'POST /image/assign', 'POST /image/primary', 'POST /image/archive'
+  'GET /images?scope=', 'GET /image/:id', 'POST /image'
 ];
 
 /* Q23 → C. Michael struck A, B, D and Other; C was the only survivor.
@@ -69,28 +78,20 @@ const KEY_PREFIX = 'ed/';
 const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
 /* The paths this module owns. Exact matches; the serve route is matched separately because it
- * carries an id. One list, so adding a route means editing one place rather than two that can
- * disagree. */
-const MINE = ['/images', '/image', '/image/assign', '/image/primary', '/image/archive'];
+ * carries an id.
+ *
+ * 🔴 THIS LIST SHRANK WITH THE SPLIT AND THAT IS LOAD-BEARING, NOT TIDYING. The guard below
+ * claims the route BEFORE checking the bucket (#666), so if the three link paths were still
+ * listed here this file would claim routes it no longer implements, fall past the guard, and
+ * return `null` from the bottom — which is the #666 shadowing bug wearing a different hat.
+ * Each module's list names exactly what that module handles, and nothing else. */
+const MINE = ['/images', '/image'];
 
 const intOrNull = v => (v == null || v === '' || isNaN(Number(v))) ? null : parseInt(v, 10);
 
 async function sha256Hex(buf) {
   const d = await crypto.subtle.digest('SHA-256', buf);
   return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-/* Linking is its own function because THREE routes do it, and a copy in each is three places
- * for the sort rule to drift. `status` is READ FROM THE ASSET and written onto the link, which
- * the composite FK then refuses to let disagree (Q20 B). */
-async function linkImage(db, all, imageId, editionId, t) {
-  const img = await all('SELECT status FROM image WHERE image_id = ?', [imageId]);
-  if (!img.length) throw new Error('no image "' + imageId + '"');
-  const nxt = await all('SELECT COALESCE(MAX(sort)+1,0) AS n FROM edition_image WHERE edition_id = ?', [editionId]);
-  await db.prepare(
-    `INSERT OR IGNORE INTO edition_image (edition_id,image_id,status,is_primary,sort,created_at)
-     VALUES (?,?,?,0,?,?)`
-  ).bind(editionId, imageId, img[0].status, nxt[0].n, t).run();
 }
 
 export async function handleImage(ctx) {
@@ -101,22 +102,21 @@ export async function handleImage(ctx) {
    * This guard originally read `if (path !== '/images' && !bucket) return 503` — and worker.js
    * hands this function EVERY path. So on a worker with no R2 binding, `POST /artwork` would
    * have been answered "no R2 binding on this worker": the app's primary write, shadowed by a
-   * module it has nothing to do with, blaming a subsystem it never touches. Same for /copy,
-   * /slot, /sheet and the 404 itself. #662 called a failed R2 deploy non-destructive; this
-   * guard would have made it a total outage.
+   * module it has nothing to do with, blaming a subsystem it never touches. #662 called a
+   * failed R2 deploy non-destructive; this guard would have made it a total outage.
    *
-   * ⚠️ THE HEADER OF THIS FILE FORBIDS EXACTLY THAT, three paragraphs up: "A 404 here would
-   * shadow every other write." A guard placed BEFORE the route match IS a 404 for every path
-   * it does not recognise. The rule was written correctly by the same pass that broke it —
-   * which is why it was caught by reading the guard against worker.js's DISPATCH rather than
-   * against this file's own comment. A comment states intent; the dispatch is evidence.
+   * ⚠️ THE HEADER OF THIS FILE FORBIDS EXACTLY THAT: "A 404 here would shadow every other
+   * write." A guard placed BEFORE the route match IS a 404 for every path it does not
+   * recognise. The rule was written correctly by the same pass that broke it — which is why it
+   * was caught by reading the guard against worker.js's DISPATCH rather than against this
+   * file's own comment. A comment states intent; the dispatch is evidence.
    */
   const isServe = method === 'GET' && path.startsWith('/image/');
   if (!isServe && !MINE.includes(path)) return null;
 
-  /* Only TWO routes actually touch R2 — the upload and the proxy. assign / primary / archive
-   * are pure D1 and must keep working with no binding at all; losing the ability to re-order
-   * or archive photos because a bucket is unbound would be a self-inflicted outage.
+  /* Only TWO routes actually touch R2 — the upload and the proxy — which after the split is two
+   * of the three routes here. `GET /images` still answers with no binding at all, deliberately:
+   * the Photos screen should render and say "no photos" rather than 503 over a config fact.
    *
    * A missing binding is a DEPLOYMENT fact, not a bug in this file. The plausible cause is a
    * deploy whose API token had no R2 permission — which fails the deploy, so if you are seeing
@@ -129,9 +129,6 @@ export async function handleImage(ctx) {
   /* ============================================================ GET /images
    * The Photos surface. UNASSIGNED IS THE DEFAULT VIEW (Q19 + J15) — the backlog is the first
    * thing you see, the same argument that made the shoe-box the shoe-box.
-   *
-   * Reads no bucket, so it answers even on a worker with no R2 binding. Deliberate: the screen
-   * should render and say "no photos" rather than 503 over a config fact.
    */
   if (path === '/images' && method === 'GET') {
     const asked = url.searchParams.get('scope');
@@ -287,78 +284,6 @@ export async function handleImage(ctx) {
     return reply({ ok: true, image_id: imageId, r2_key: key, bytes: size, sha256: sha,
                    linked_to: link_error ? null : (editionId || null), link_error: link_error },
                  link_error ? 207 : 200);
-  }
-
-  /* ---- the JSON writes. The body is read HERE, once, for the routes that need it. ---- */
-  if (method === 'POST') {
-    let body = {};
-    try { body = await request.json(); } catch (e) { body = {}; }
-
-    /* ============================================================ POST /image/assign
-     * Link or unlink. TWO VERBS (Q20 B): unlink is a plain DELETE of the join row, archive is a
-     * status flip on the asset. Taking a photo off ONE print must never take it off the other
-     * eight — that distinction is the entire reason the asset/link split exists. */
-    if (path === '/image/assign') {
-      const imageId = String(body.image_id || '').trim();
-      const editionId = String(body.edition_id || '').trim();
-      if (!imageId || !editionId) return reply({ ok: false, error: 'image_id and edition_id are both required' }, 400);
-
-      if (body.unlink) {
-        const r = await db.prepare('DELETE FROM edition_image WHERE image_id = ? AND edition_id = ?')
-                          .bind(imageId, editionId).run();
-        return reply({ ok: true, unlinked: r.meta ? r.meta.changes : undefined });
-      }
-      try { await linkImage(db, all, imageId, editionId, t); }
-      catch (e) { return reply({ ok: false, error: String(e.message || e) }, 400); }
-      return reply({ ok: true, image_id: imageId, edition_id: editionId });
-    }
-
-    /* ============================================================ POST /image/primary
-     * 🔴 TWO STATEMENTS IN ONE db.batch(), AND IT CANNOT BE ONE. `ux_img_primary` is UNIQUE on
-     * (edition_id) WHERE is_primary = 1 AND status = 'active', so setting the new primary
-     * before clearing the old one is REJECTED by the index. Batched because D1 runs a batch as
-     * one transaction: a half-applied swap leaves a print with NO primary at all. */
-    if (path === '/image/primary') {
-      const imageId = String(body.image_id || '').trim();
-      const editionId = String(body.edition_id || '').trim();
-      if (!imageId || !editionId) return reply({ ok: false, error: 'image_id and edition_id are both required' }, 400);
-
-      const link = await all('SELECT status FROM edition_image WHERE image_id = ? AND edition_id = ?', [imageId, editionId]);
-      if (!link.length) return reply({ ok: false, error: 'that photo is not attached to that print — assign it first' }, 404);
-      if (link[0].status !== 'active') return reply({ ok: false, error: 'an archived photo cannot be a primary' }, 400);
-
-      try {
-        await db.batch([
-          db.prepare('UPDATE edition_image SET is_primary = 0 WHERE edition_id = ?').bind(editionId),
-          db.prepare('UPDATE edition_image SET is_primary = 1 WHERE edition_id = ? AND image_id = ?').bind(editionId, imageId)
-        ]);
-      } catch (e) { return reply({ ok: false, error: String(e.message || e) }, 400); }
-      return reply({ ok: true, edition_id: editionId, primary: imageId });
-    }
-
-    /* ============================================================ POST /image/archive
-     * Hide everywhere, keep the bytes forever (J9). The composite FK on `edition_image` carries
-     * ON UPDATE CASCADE, so flipping the ASSET's status propagates to every link on its own —
-     * which is exactly why Q20 B denormalized status onto the link. The route does not have to
-     * remember; the database does it. */
-    if (path === '/image/archive') {
-      const imageId = String(body.image_id || '').trim();
-      if (!imageId) return reply({ ok: false, error: 'image_id is required' }, 400);
-      const restore = !!body.restore;
-
-      try {
-        /* Clear the primary flags FIRST when archiving. `ux_img_primary` forbids an archived
-         * primary, so the cascade would otherwise push the link into a state the index rejects
-         * and take the whole batch down. Order is load-bearing, not tidiness. */
-        const stmts = [];
-        if (!restore) stmts.push(db.prepare('UPDATE edition_image SET is_primary = 0 WHERE image_id = ?').bind(imageId));
-        stmts.push(db.prepare('UPDATE image SET status = ?, archived_at = ? WHERE image_id = ?')
-                     .bind(restore ? 'active' : 'archived', restore ? null : t, imageId));
-        await db.batch(stmts);
-      } catch (e) { return reply({ ok: false, error: String(e.message || e) }, 400); }
-      return reply({ ok: true, image_id: imageId, status: restore ? 'active' : 'archived',
-                     note: 'the bytes are untouched and always will be' });
-    }
   }
 
   return null;   // not an image route after all — let worker.js decide what nothing-matched means
