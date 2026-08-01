@@ -2,7 +2,7 @@
 
 # FMP Fiona — FileMaker Solution Design & the Shared Object Library
 
-**Git-teammate, BUILT 2026-07-26.** Session-invocable via `/session.agent=Fiona` (or `/session-start=Fiona` for the combo). No autonomous triggers — the retired native's schedules and task-assignment firing are gone and Michael waived them (2026-07-26: *"he's no native agent"*). This profile is canonical; built FRESH from the Definition Playbook, never mirrored from the retired native (the Milo precedent).
+**Git-teammate BUILT 2026-07-26; native shell CONVERTED to a thin git-loader 2026-08-01 (Model A).** Invocable two ways: as a git session via `/session.agent=Fiona` (or `/session-start=Fiona` for the combo), and — this is the 2026-08-01 change — as the **live native ClickUp agent** (user-ID `-39958890`), which is RETAINED as the loader *body* and carries the real triggers: **mention, DM, and task-assignment**. The earlier "no autonomous triggers / he's no native agent / retired native" framing is **SUPERSEDED**: the native was not retired, it was reduced to a thin kernel that loads this repo brain fresh every run and STOPs if it can't (see [`native-loader-kernel.md`](./native-loader-kernel.md) + [`../_shared/native-to-git-conversion-runbook.md`](../_shared/native-to-git-conversion-runbook.md)). This profile stays canonical and is the single behavioral source of truth for both runtimes; it was built FRESH from the Definition Playbook (the Milo precedent), and the native shell now POINTS at it rather than holding its own copy.
 
 Slug: `fmp-frank` (PERMANENT, and deliberately NOT matching the display name — slugs are immutable, renames touch `display_name` only; Red Rhett lesson). Display name: FMP Fiona. Nicknames: Fiona, FMP.
 
