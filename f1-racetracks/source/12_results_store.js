@@ -1,22 +1,38 @@
 /* 12_results_store.js — canonical results loader for the circuit guide.
-   SINGLE SOURCE OF TRUTH = f1-results/2026/ (index_rounds.json + per-round files).
+   SINGLE SOURCE OF TRUTH for RESULTS = f1-results/2026/ (index_rounds.json + per-round files).
    Builds the raceResults map the track view renders (podium / pole / fastest lap) by
    DERIVING from the round classification at runtime, so nothing is stored twice.
    Replaces the old (dead, undefined) inline raceResults + the retired data.json.
 
-   Loaded before the app bootstrap so the globals exist before the first render;
-   re-renders once the store lands. Fails soft: if the store is unreachable, the
-   circuit guide still renders track breakdowns, just without the result panels. */
+   ⚠️ CHANGED 2026-08-01: this module no longer READS `current_round_slug` /
+   `last_completed_round_slug` off the manifest — those fields are gone, because they were
+   hand-maintained and drifted (one of them pointed at a completed round for a week). They are
+   now DERIVED from the weekend vector by source/08_season.js and hung on `appDataMeta` here,
+   under the exact same key names. Every downstream consumer is unchanged.
+
+   Loaded after 08 and before the app bootstrap so the globals exist before the first render;
+   re-renders once the store lands. Fails soft in both directions: if the results store is
+   unreachable the circuit guide still renders track breakdowns without result panels, and if
+   the season layer is unreachable the results still load without the round pointers. */
 window.raceResults = window.raceResults || {};
 window.historicWinners = window.historicWinners || {};
 window.appDataMeta = window.appDataMeta || {};
 (function(){
   var BASE = 'f1-results/2026/';
+
+  /* Round pointers: derived upstream, mirrored here for consumers that already read them. */
+  var season = (window.F1Season && window.F1Season.ready) || null;
+  if (season) {
+    season.then(function(cal){
+      if (!cal) return;
+      window.appDataMeta.current_round_slug = cal.current_round_slug || null;
+      window.appDataMeta.last_completed_round_slug = cal.last_completed_round_slug || null;
+    }).catch(function(){ /* season layer unreachable: pointers stay null, results still load */ });
+  }
+
   fetch(BASE + 'index_rounds.json', { cache: 'no-cache' })
     .then(function(r){ if(!r.ok) throw 0; return r.json(); })
     .then(function(idx){
-      window.appDataMeta.current_round_slug = idx.current_round_slug || null;
-      window.appDataMeta.last_completed_round_slug = idx.last_completed_round_slug || null;
       var rounds = (idx.rounds || []);
       return Promise.all(rounds.map(function(rd){
         return fetch(BASE + rd.file.replace('./',''), { cache: 'no-cache' })

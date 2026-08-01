@@ -1,15 +1,21 @@
 <!--
   F1 Racetracks (circuit guide lens)
-  Version: v6.2 (shell) · cross-lens switcher + sequential style band
+  Version: v6.3 (shell) · cross-lens switcher + sequential style band
   Live: https://mawizorek.github.io/ClickUp_apps/f1-racetracks/circuits.html
   Source: https://github.com/mawizorek/ClickUp_apps/tree/main/f1-racetracks
   INFRASTRUCTURE: slim runtime entrypoint + direct source modules in /source.
   RESULTS: podium/pole/fastest-lap derive live from the canonical store
   (f1-results/2026/) via source/12_results_store.js.
-  CIRCUIT DATA (v6.1): PER-CIRCUIT files in circuits/<slug>.json hold TIMELESS
-  identity + layout only. PER-YEAR fields (round/date/status/sessions) live in
-  circuits/index_circuits.json keyed by slug; source/09 fetches the index + each
-  circuit file at boot and merges the per-year fields on.
+  DATA (v6.3, 2026-08-01): THREE VECTORS, kept separate and derived.
+    · CIRCUITS  — circuits/<slug>.json, TIMELESS identity + layout only.
+                  circuits/index_circuits.json is a plain slug -> file map.
+    · WEEKENDS  — season/2026/index_weekends.json, the per-year join. One row per RACE
+                  WEEKEND: which circuit, which session dates, sprint or not, cuTaskId.
+    · RESULTS   — f1-results/2026/, a manifest of rounds that have actually been raced.
+  Round number, weekend status, the display date and the current/last round pointers are
+  NOT STORED ANYWHERE — source/08_season.js derives them all from the session dates at boot,
+  so a mid-season cancellation or insertion self-heals. Supersedes the v6.1 layout where the
+  per-year fields lived inside the circuits index and drifted for eight months.
   STYLE BAND: 02..07 fetched in order below.
   DESIGN SYSTEM (v6.2): Chakra Petch / JetBrains Mono / Inter + shared oklch (hue 268).
   SEAMLESS NAV (v6.5): cross-document View Transitions + chrome paints on first byte.
@@ -70,7 +76,7 @@
   </style>
   <script>
     // Bump this one token on every source/style deploy to guarantee fresh bytes.
-    const BUILD_STAMP = '20260713e';
+    const BUILD_STAMP = '20260801a';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
@@ -118,22 +124,23 @@
     <div id="app"></div>
 
     <footer class="app">
-      <span class="meta-txt" id="foot-meta">F1 Racetracks v6.2 · loading data…</span>
+      <span class="meta-txt" id="foot-meta">F1 Racetracks v6.3 · loading data…</span>
       <div class="toolbar">
         <a class="tool" href="./live-tracker.html">Live tracker</a>
       </div>
     </footer>
   </div>
 
-  <script src="./source/12_results_store.js?v=20260713e"></script>
-  <script src="./source/09_app_bootstrap_and_home.js?v=20260713e"></script>
-  <script src="./source/10_track_views_and_profile.js?v=20260713e"></script>
-  <script src="./source/13_live_session_panel.js?v=20260713e"></script>
-  <script src="./source/11_weather_and_footer_exports.js?v=20260713e"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260713e"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260713e"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260713e"></script>
-  <script src="./source/17_weekend_mount.js?v=20260713e"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260713e"></script>
+  <script src="./source/08_season.js?v=20260801a"></script>
+  <script src="./source/12_results_store.js?v=20260801a"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260801a"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260801a"></script>
+  <script src="./source/13_live_session_panel.js?v=20260801a"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260801a"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260801a"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260801a"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260801a"></script>
+  <script src="./source/17_weekend_mount.js?v=20260801a"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260801a"></script>
 </body>
 </html>
