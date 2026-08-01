@@ -151,12 +151,12 @@
       '<p class="muted ph-meta">Captions are not editable yet \u2014 the worker has no route for ' +
       'it. Archiving never deletes the picture.</p>';
 
-    body.querySelectorAll('[data-primary]').forEach(function (b) {
+    [].forEach.call(body.querySelectorAll('[data-primary]'), function (b) {
       b.addEventListener('click', function () {
         act('/image/primary', { image_id: im.image_id, edition_id: b.dataset.primary }, 'Set as the main photo');
       });
     });
-    body.querySelectorAll('[data-unlink]').forEach(function (b) {
+    [].forEach.call(body.querySelectorAll('[data-unlink]'), function (b) {
       b.addEventListener('click', function () {
         act('/image/assign', { image_id: im.image_id, edition_id: b.dataset.unlink, unlink: true }, 'Removed from that print');
       });
@@ -246,6 +246,13 @@
           Capture.pick({ onDone: function () { load(); } });
         });
       }
+      /* ⚠️ THE SCRIM NEEDS ITS OWN HANDLER. core.js's Drawer SHOWS and HIDES `#pageScrim` and
+       * never binds it — each page owns that click, which is easy to miss because declaring the
+       * element is enough to make the backdrop appear. Element without handler = a dimmed screen
+       * you cannot dismiss by tapping, which is worse than no backdrop at all. */
+      var scrim = $('pageScrim');
+      if (scrim) scrim.addEventListener('click', function () { Drawer.closeAll(); });
+
       load();
     },
     reload: load
