@@ -1,6 +1,6 @@
 /* Inciardi Collection — API worker
  *
- * The only write path into D1. Fourteen routes, two files.
+ * The only write path into D1. Twenty routes, four files.
  *
  * ============================================================================
  * 🔴 SPLIT 2026-08-01. The seven GET routes moved to `worker/reads.js`.
@@ -15,10 +15,18 @@
  * here on purpose:** the one-write-path rule (J6 rung 4) should live in the file called
  * `worker.js`, and the dangerous half should be where every reader looks first.
  *
- * 📏 ⚠️ ~21KB AFTER THE 08-01 P0 FIX, against a ~22KB practical ceiling. THE NEXT ROUTE DOES NOT
- * GO IN THIS FILE. The seam is already obvious: `/sheet`, `/sheet/rename` and `/sheet/reorder`
- * are ~6KB of binder mechanics with nothing to do with entering a print — they become
- * `worker/sheets.js` the moment anything else needs to land here.
+ * 📏 ⚠️ ~21KB, against a ~22KB practical ceiling. THE NEXT ROUTE DOES NOT GO IN THIS FILE, and
+ * on 2026-08-01 that rule held: the image routes arrived as `worker/images.js` +
+ * `worker/adopt.js` and this file gained only a dispatch. The seam for whatever comes next is
+ * already obvious: `/sheet`, `/sheet/rename` and `/sheet/reorder` are ~6KB of binder mechanics
+ * with nothing to do with entering a print — they become `worker/sheets.js` the moment anything
+ * else needs to land here.
+ *
+ * THE FOUR FILES:
+ *   worker.js  — the gate, the writes for artwork/copy/sheet/slot, and the dispatch table
+ *   reads.js   — seven GETs, no auth, no mutation
+ *   images.js  — the photo pipe: upload, serve, list, assign, primary, archive
+ *   adopt.js   — the one-off passes: the legacy 177 import and the bucket diagnostic
  * ============================================================================
  *
  * DESIGN NOTES THAT MATTER (decision log J6, ladder rung 4 — "one write path"):
@@ -34,7 +42,7 @@
  * On 2026-08-01 migration 001 dropped `artwork.collection_id` and this file kept inserting it
  * for five hours. Every entry attempt failed. The app looked healthy the whole time because
  * `/health` is the one route that names none of the altered columns. **When the schema moves,
- * grep BOTH worker files for every column the migration touched — and smoke-test a route that
+ * grep EVERY worker file for every column the migration touched — and smoke-test a route that
  * reads the altered table, never the health check.**
  *
  * SECURITY — CORRECTED 2026-07-30. This header used to say "WRITE_KEY is a wrangler secret,
@@ -48,11 +56,16 @@
  *     crawlers, not a determined reader. The real safety net is D1 Time Travel (30 days).
  *   - Still true, and still the reason the gate exists at all: AN UNSET WRITE_KEY REFUSES
  *     ALL WRITES. "No secret configured" must never mean "open."
+ *   - ⚠️ NEW as of the image routes: R2 BYTES ARE NOT COVERED BY TIME TRAVEL. The safety net
+ *     that made a public key tolerable does not extend to the bucket, which is why `images.js`
+ *     has no delete route and archiving never removes an object.
  *   - CORS is an allowlist, not `*`. Constrains browsers, not curl — but a wildcard on a
  *     key-authenticated API lets any page anywhere spend the key it just watched you type.
  */
 
 import { handleRead, READ_ROUTES } from './reads.js';
+import { handleImage, IMAGE_ROUTES } from './images.js';
+import { handleAdopt, ADOPT_ROUTES } from './adopt.js';
 
 const ALLOWED_ORIGINS = [
   'https://mawizorek.github.io',
@@ -132,38 +145,59 @@ export default {
       if (!same) return reply({ error: 'bad or missing write key' }, 401);
     }
 
-    let body = {};
-    if (isWrite) {
-      try { body = await request.json(); } catch (e) { body = {}; }
-    }
-
     const db = env.DB;
     const t = now();
-
-    /* One door for every mutation: same auth, same timestamps, same error shape. */
-    async function write(sql, params) {
-      try {
-        const r = await db.prepare(sql).bind(...params).run();
-        return reply({ ok: true, changes: r.meta ? r.meta.changes : undefined });
-      } catch (e) {
-        // Return the constraint message verbatim. The schema is the authority; this file
-        // does not re-litigate it, and a helpful lie is worse than a blunt truth.
-        return reply({ ok: false, error: String(e.message || e) }, 400);
-      }
-    }
     const all = async (sql, params) => (await db.prepare(sql).bind(...(params || [])).all()).results || [];
 
     try {
       /* ================= READS — worker/reads.js ================= */
       /* Returns null on no match, which is what lets the writes below run. A read module that
        * 404'd for itself would shadow every POST, so the "nothing matched" verdict stays here,
-       * in the one file that can see both halves of the route table. */
+       * in the one file that can see the whole route table. */
       if (method === 'GET') {
         const read = await handleRead({ path, url, all, reply, t });
         if (read) return read;
       }
 
+      /* ================= IMAGES — worker/images.js + worker/adopt.js =================
+       *
+       * 🔴 THIS DISPATCH MUST STAY ABOVE THE BODY PARSE BELOW, AND THAT IS NOT A STYLE CHOICE.
+       * `await request.json()` CONSUMES THE REQUEST STREAM. An upload's body is BYTES, so if
+       * this ran after the parse, `images.js` would receive an already-drained body and write a
+       * ZERO-LENGTH OBJECT to R2 behind a perfectly successful 200. A silent empty file is the
+       * worst failure shape this app knows, and it would look exactly like a working upload.
+       *
+       * The write-key gate above already fired, so auth is NOT relocated by this ordering —
+       * only the body handling is. The image routes parse their own body because their body is
+       * not JSON.
+       *
+       * ⚠️ `env.BUCKET` may be undefined if a deploy failed on R2 permissions. It is passed
+       * through as-is; images.js reports that as a deployment fact and names the Actions run,
+       * rather than throwing a stack trace at a phone. */
+      const ctx = { request, db, bucket: env.BUCKET, all, reply, path, url, method, t };
+      const img = await handleImage(ctx);
+      if (img) return img;
+      const adopted = await handleAdopt(ctx);
+      if (adopted) return adopted;
+
       /* ================= WRITES ================= */
+
+      let body = {};
+      if (isWrite) {
+        try { body = await request.json(); } catch (e) { body = {}; }
+      }
+
+      /* One door for every mutation: same auth, same timestamps, same error shape. */
+      async function write(sql, params) {
+        try {
+          const r = await db.prepare(sql).bind(...params).run();
+          return reply({ ok: true, changes: r.meta ? r.meta.changes : undefined });
+        } catch (e) {
+          // Return the constraint message verbatim. The schema is the authority; this file
+          // does not re-litigate it, and a helpful lie is worse than a blunt truth.
+          return reply({ ok: false, error: String(e.message || e) }, 400);
+        }
+      }
 
       /* Enter a print. ONE call does the whole thing:
        *   artwork row -> trigger mints the implicit edition -> optional copy row.
@@ -395,11 +429,11 @@ export default {
         return write('DELETE FROM slot WHERE slot_id = ?', [id]);
       }
 
-      /* The route list spans two files, so it is CONCATENATED rather than retyped. A hardcoded
+      /* The route list spans FOUR files, so it is CONCATENATED rather than retyped. A hardcoded
        * copy here would be a second claimant on "which routes exist" and would rot the first
-       * time a read is added next door. */
+       * time a route is added next door. */
       return reply({ error: 'no route for ' + method + ' ' + path,
-                     routes: READ_ROUTES.concat(WRITE_ROUTES) }, 404);
+                     routes: READ_ROUTES.concat(WRITE_ROUTES, IMAGE_ROUTES, ADOPT_ROUTES) }, 404);
 
     } catch (e) {
       // Loud, not silent. A 500 that pretends to be an empty result is the failure mode
