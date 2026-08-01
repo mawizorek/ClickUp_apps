@@ -14,6 +14,7 @@
     enter:    function ()  { Enter.mount(); },
     shoebox:  function ()  { Shoebox.mount(); },
     summary:  function ()  { Summary.mount(); },
+    photos:   function ()  { Photos.mount(); },
     // UNLISTED. Surfaced only at the foot of the settings panel — see the header in backroom.js
     // for what that is and is not worth. It dispatches like any other route; there is no second
     // router.
@@ -33,6 +34,11 @@
     enter:   { globals: ['Enter'],   file: 'enter.js' },
     shoebox: { globals: ['Shoebox'], file: 'enter.js' },
     summary: { globals: ['Summary'], file: 'summary.js' },
+    /* Capture is a REAL dependency, not an optional extra: "Add photos" is the reason this
+     * screen exists, and without capture.js the grid would render with a button that silently
+     * does nothing — which is precisely the failure shape this table was built to convert into
+     * a message naming the file. */
+    photos:  { globals: ['Photos', 'Capture'], file: 'photos.js / capture.js' },
     /* Binder is a REAL dependency even though this page never renders a sheet: `Binder.face()`
      * is the one place 'A'/'B' becomes Front/Back, and the placement list speaks that
      * vocabulary. artwork.js carries a fallback so a missing binder.js degrades the wording
