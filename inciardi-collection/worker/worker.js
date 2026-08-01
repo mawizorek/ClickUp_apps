@@ -14,6 +14,11 @@
  * state — the original file already had them under their own banner comment. **The writes stayed
  * here on purpose:** the one-write-path rule (J6 rung 4) should live in the file called
  * `worker.js`, and the dangerous half should be where every reader looks first.
+ *
+ * 📏 ⚠️ ~21KB AFTER THE 08-01 P0 FIX, against a ~22KB practical ceiling. THE NEXT ROUTE DOES NOT
+ * GO IN THIS FILE. The seam is already obvious: `/sheet`, `/sheet/rename` and `/sheet/reorder`
+ * are ~6KB of binder mechanics with nothing to do with entering a print — they become
+ * `worker/sheets.js` the moment anything else needs to land here.
  * ============================================================================
  *
  * DESIGN NOTES THAT MATTER (decision log J6, ladder rung 4 — "one write path"):
@@ -24,6 +29,13 @@
  *     the schema is a THIRD source of truth. If D1 says no, the answer is no.
  *   - Reads never require a key. The repo is public and the data is which prints Michael
  *     owns. Writes always require one.
+ *
+ * 🔴 SCHEMA DRIFT IS THIS FILE'S DOCUMENTED FAILURE MODE — read before editing any SQL here.
+ * On 2026-08-01 migration 001 dropped `artwork.collection_id` and this file kept inserting it
+ * for five hours. Every entry attempt failed. The app looked healthy the whole time because
+ * `/health` is the one route that names none of the altered columns. **When the schema moves,
+ * grep BOTH worker files for every column the migration touched — and smoke-test a route that
+ * reads the altered table, never the health check.**
  *
  * SECURITY — CORRECTED 2026-07-30. This header used to say "WRITE_KEY is a wrangler secret,
  * it is NOT in the shipped bundle." That is now FALSE and was false for most of a day before
@@ -165,15 +177,22 @@ export default {
         const bad = badSlug(id);
         if (bad) return reply({ ok: false, error: 'artwork_id "' + id + '" rejected: ' + bad, hint: 'give an explicit id' }, 400);
 
+        /* 🔴 `collection_id` IS NOT A COLUMN HERE ANY MORE (migration 001). It was still in this
+         * INSERT for five hours after the migration and EVERY entry failed with "table artwork
+         * has no column named collection_id". Membership moved to `artwork_collection`, handled
+         * below — the client's `collection_id` is honoured, not dropped.
+         * `medium` and `authorship` are new in 001 and had no write path at all until now. Both
+         * stay OPTIONAL and entry never asks for them (the "comfortably" rule, schema.sql). */
         try {
           await db.prepare(
-            `INSERT INTO artwork (artwork_id,name,collection_id,category,edition_type,retail,
+            `INSERT INTO artwork (artwork_id,name,category,medium,authorship,edition_type,retail,
                                   provenance,confidence,notes,created_at,updated_at)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?)`
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`
           ).bind(
             id, name,
-            body.collection_id || null,
             body.category || 'mini',              // v1 is mini prints; the column defaults too
+            body.medium || null,
+            body.authorship || null,
             body.edition_type || 'open',
             body.retail === '' || body.retail == null ? null : Number(body.retail),
             body.provenance || 'owned',
@@ -189,6 +208,20 @@ export default {
 
         // The trigger created <id>:e1 inside the same transaction as the artwork.
         const eds = await all('SELECT edition_id, implicit FROM edition WHERE artwork_id = ?', [id]);
+
+        /* Membership, now many-to-many. `enter.js` still sends `collection_id`; honour it as ONE
+         * join row rather than discarding it. Failure is reported, never swallowed — usually it
+         * means the collection does not exist, which is the FK doing its job. */
+        let collection_error = null;
+        if (body.collection_id) {
+          try {
+            await db.prepare(
+              `INSERT OR IGNORE INTO artwork_collection (artwork_id,collection_id,created_at)
+               VALUES (?,?,?)`
+            ).bind(id, String(body.collection_id).trim(), t).run();
+          } catch (e) { collection_error = String(e.message || e); }
+        }
+
         let copy_id = null;
         if (body.own) {
           copy_id = id + '-c1';
@@ -204,8 +237,11 @@ export default {
           } catch (e) {
             // The artwork landed and is canonical; only the ownership claim failed. Say exactly
             // that instead of implying the whole thing rolled back.
-            return reply({ ok: true, artwork_id: id, editions: eds, copy_error: String(e.message || e) }, 207);
+            return reply({ ok: true, artwork_id: id, editions: eds, collection_error: collection_error, copy_error: String(e.message || e) }, 207);
           }
+        }
+        if (collection_error) {
+          return reply({ ok: true, artwork_id: id, editions: eds, copy_id: copy_id, collection_error: collection_error }, 207);
         }
         return reply({ ok: true, artwork_id: id, editions: eds, copy_id: copy_id });
       }
@@ -239,6 +275,10 @@ export default {
           [body.sheet_id || (bid + '-s' + order), bid, body.title || null,
            body.collection_id || null, order, t, t]);
       }
+      /* ⚠️ YES, `sheet.collection_id` IS STILL REAL and the line above is correct. 001 dropped the
+       * column from `artwork`, NOT from `sheet` — a sheet's collection is an optional HINT about
+       * what it holds (schema.binder.sql). Two different columns, one name. Do not "fix" this one
+       * while sweeping for the other. */
 
       /* ============================================================ /sheet/rename
        * Title only. `title` is free text and deliberately nullable — a sheet with no title

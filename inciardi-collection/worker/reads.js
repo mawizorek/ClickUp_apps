@@ -22,6 +22,14 @@
  * nothing rode along — same discipline as the `.proposed` → canonical rename at J8.
  * ============================================================================
  *
+ * 🔴 08-01, LATER THE SAME DAY — THIS FILE TOOK THE APP DOWN AND LOOKED FINE DOING IT.
+ * Migration 001 dropped `artwork.collection_id`. Three of the seven routes below selected it,
+ * so `/artworks`, `/summary` and `/shoebox` all returned 500 for five hours. `/health` does not
+ * name the column, answered perfectly, and was the route used to "verify" the migration.
+ * **A smoke test that predates a change cannot detect that change.** After any migration, hit a
+ * route that reads the ALTERED TABLE. The column is gone from the three selects below; see each
+ * one's note for what replaced it (nothing, deliberately).
+ *
  * CONTRACT with worker.js: it hands over everything this file needs, so this file reaches for
  * no globals and holds no state.
  *   path   the normalized pathname          all(sql, params)  → rows
@@ -42,6 +50,10 @@ export const READ_ROUTES = [
 
 export async function handleRead({ path, url, all, reply, t }) {
 
+  /* ⚠️ /health IS NOT A MIGRATION TEST. It touches only COUNT(*) over five tables and names no
+   * column that any migration has ever altered, which is exactly why it kept answering `ok:true`
+   * while three routes below were throwing. Useful for "is the worker deployed and bound to the
+   * database"; useless for "did the schema change break anything." */
   if (path === '/health') {
     const counts = await all(
       `SELECT (SELECT COUNT(*) FROM artwork)  AS artworks,
@@ -53,9 +65,14 @@ export async function handleRead({ path, url, all, reply, t }) {
     return reply({ ok: true, at: t, counts: counts[0] });
   }
 
+  /* `a.collection_id` REMOVED 2026-08-01 (migration 001). Nothing replaces it here on purpose:
+   * membership is many-to-many now, so the honest shape is an ARRAY per print, and that is the
+   * grouping routes' job (spec §5 step 4) rather than a column swap smuggled into a hotfix.
+   * `artwork.js` renders its collection chip conditionally, so it simply stops rendering — which
+   * is the correct output regardless: `collection` has zero rows and always has. */
   if (path === '/artworks') {
     return reply({ artworks: await all(
-      `SELECT a.artwork_id, a.name, a.category, a.edition_type, a.collection_id,
+      `SELECT a.artwork_id, a.name, a.category, a.medium, a.authorship, a.edition_type,
               a.retail, a.confidence, a.provenance, a.notes,
               COALESCE(o.qty_owned,0)      AS qty_owned,
               COALESCE(o.editions_owned,0) AS editions_owned,
@@ -96,11 +113,14 @@ export async function handleRead({ path, url, all, reply, t }) {
    * ⚠️ THIS IS ALSO WHAT `#artwork?id=` READS (v19). The detail page needs one print's counts
    * plus every placement of it, which is this response filtered client-side — so it deliberately
    * did NOT get a route of its own. A second query returning the same numbers is a second thing
-   * that can disagree with the Collection matrix.
+   * that can disagree with the Collection matrix. Consequence worth knowing: when this route
+   * broke on 08-01, the detail page broke with it, silently and for the same one reason.
+   *
+   * `a.collection_id` removed 2026-08-01 — see the note on /artworks.
    */
   if (path === '/summary') {
     const prints = await all(
-      `SELECT a.artwork_id, a.name, a.category, a.collection_id, a.retail, a.confidence,
+      `SELECT a.artwork_id, a.name, a.category, a.medium, a.authorship, a.retail, a.confidence,
               COALESCE(o.qty_owned, 0)                       AS qty_owned,
               COALESCE(o.editions_owned, 0)                  AS editions_owned,
               COALESCE(o.qty_sold, 0)                        AS qty_sold,
@@ -189,10 +209,15 @@ export async function handleRead({ path, url, all, reply, t }) {
    * (2026-07-30, later: /summary is now that second consumer for the SPARE arithmetic. It
    * recomputes MIN/MAX rather than calling this route, because it needs the same numbers
    * for prints this route deliberately excludes. If a third appears, promote to a view.)
+   * 🟡 2026-08-01: that argument is WEAKER than when it was written — PR #641 shipped a
+   * one-press DDL path (Actions → Migrate inciardi-collection D1). Not revisited in a hotfix,
+   * but the premise it rests on has moved and should not be inherited unexamined.
+   *
+   * `a.collection_id` removed 2026-08-01 — see the note on /artworks.
    */
   if (path === '/shoebox') {
     return reply({ shoebox: await all(
-      `SELECT a.artwork_id, a.name, a.collection_id, a.category, a.confidence,
+      `SELECT a.artwork_id, a.name, a.category, a.medium, a.confidence,
               o.qty_owned,
               o.editions_owned,
               COALESCE(p.n, 0)                AS placed_count,
