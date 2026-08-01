@@ -13,8 +13,11 @@
  * But it also destroys the CAPTURE DATE, permanently, at upload. After the re-encode there is
  * no recovering when a photograph was taken: not later, not from the bytes, not ever, and
  * nothing about the result looks wrong. So `shot_at` is parsed out of the original file's APP1
- * segment BEFORE a canvas ever sees it (J16). If these forty lines are not written on day one,
- * every photo uploaded before someone notices carries a permanently unknown date.
+ * segment BEFORE a canvas ever sees it (J16).
+ *
+ * ✅ VERIFIED ON REAL FILES, 2026-08-01: six uploads came back carrying `shot_at` of
+ * 2026-07-25 11:22:59 → 11:23:21 — the true capture times, a week older than the upload. The
+ * one thing in this feature that could not have been fixed later worked on the first attempt.
  *
  * ⭐ The generalizable shape, worth more than the code: A FIX THAT REMOVES DATA REMOVES ALL OF
  * IT, INCLUDING THE PARTS YOU WANTED. GPS was the target; the timestamp was collateral. When
@@ -36,7 +39,7 @@
 
   /* 1800px long edge, matching the "full" derivative the spec locked (Q14 C). The other two
    * derivatives are deferred — see images.js — so this single image is both the full view and,
-   * scaled by CSS, the thumbnail. */
+   * scaled by CSS, the thumbnail. Confirmed live: every upload lands at 1350x1800. */
   var MAX_EDGE = 1800;
   var QUALITY = 0.86;
 
@@ -191,11 +194,32 @@
       input.style.display = 'none';
       document.body.appendChild(input);
 
+      /* 🔴 THE INPUT LEAKED ON CANCEL (fixed 2026-08-01, first real use).
+       * It was removed inside the `change` handler — which NEVER FIRES if you dismiss the file
+       * dialog. So every cancelled "Add photos" left a hidden <input> in the DOM permanently,
+       * and on desktop Finder cancelling is one Escape key.
+       *
+       * There is no `cancel` event to rely on across browsers, but FOCUS RETURNS TO THE PAGE
+       * either way — pick or cancel. So the fallback is a one-shot focus listener, and `cleanup`
+       * is idempotent so the two paths racing each other cannot double-remove. The timeout lets
+       * `change` win when both fire, since it carries the files. */
+      var gone = false;
+      function cleanup() {
+        if (gone) return;
+        gone = true;
+        if (input.parentNode) input.parentNode.removeChild(input);
+      }
+
       input.addEventListener('change', function () {
         var files = [].slice.call(input.files || []);
-        if (input.parentNode) input.parentNode.removeChild(input);
+        cleanup();
         if (!files.length) return;
         Capture.run(files, opts);
+      });
+
+      window.addEventListener('focus', function onBack() {
+        window.removeEventListener('focus', onBack);
+        setTimeout(cleanup, 800);        // let `change` land first when a file WAS chosen
       });
 
       input.click();
@@ -210,6 +234,13 @@
       var done = 0, dupes = 0, errs = [];
       var total = files.length;
 
+      /* ⚠️ ONE PROGRESS LINE, NOT ONE PER FILE (fixed 2026-08-01). This used to toast
+       * "Uploading N of M" for every single file at ~2.6s each — six photos meant six stacked
+       * notifications for ONE action, which is almost certainly what "a little buggy" named.
+       * A count you cannot read because it is buried under five of its own predecessors is not
+       * progress reporting. One line at the start, one summary at the end. */
+      if (total > 1) Core.toast('Uploading ' + total + ' photos\u2026');
+
       function step(i) {
         if (i >= total) {
           if (errs.length) {
@@ -222,7 +253,6 @@
           if (opts.onDone) opts.onDone(done);
           return;
         }
-        if (total > 1) Core.toast('Uploading ' + (i + 1) + ' of ' + total + '\u2026');
         one(files[i], opts).then(function (d) {
           done++;
           if (d.duplicate) dupes++;
