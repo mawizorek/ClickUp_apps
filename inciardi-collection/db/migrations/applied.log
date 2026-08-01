@@ -1,0 +1,15 @@
+# Applied migrations — inciardi-collection D1
+#
+# 🔴 MACHINE-WRITTEN. The migrate workflow appends a line here after a SUCCESSFUL run and
+# REFUSES any file already listed. Do not hand-edit to "fix" a failed run: a failed run
+# leaves no line, which is correct — it stays un-applied and the button still works.
+#
+# Removing a line to force a re-run is removing a safety guard. 001 contains a DROP TABLE.
+#
+# Format: <ISO8601 UTC> <sha256 of the file> <path>
+#
+# The sha is what makes this honest rather than decorative: if a file is EDITED after being
+# applied, the recorded hash no longer matches it, and the record shows that what ran is not
+# what the repo now says. A filename alone could not tell you that.
+#
+2026-07-31T23:33:00Z applied-by-hand-no-sha inciardi-collection/db/migrations/000-collection-kind.sql
