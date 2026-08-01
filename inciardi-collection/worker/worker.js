@@ -1,32 +1,22 @@
 /* Inciardi Collection — API worker
  *
- * The only write path into D1. Twenty routes, four files.
+ * The gate, the dispatch table, and the writes for artwork / copy / slot.
  *
  * ============================================================================
- * 🔴 SPLIT 2026-08-01. The seven GET routes moved to `worker/reads.js`.
+ * FIVE FILES. This one is the door; the rest are rooms.
  *
- * This file was **29,326 bytes against a ~30KB hard read cap** — 674 bytes of headroom, so it
- * was one careless paragraph away from being unreadable-whole, and a file that cannot be read
- * whole cannot be safely edited. Three consecutive version notes promised this split "before the
- * next route," and `worker/images.js` is the next route.
+ *   worker.js  — CORS, the write-key gate, the dispatch table, artwork/copy/slot writes
+ *   reads.js   — seven GETs. No auth, no mutation, no shared state
+ *   images.js  — the photo pipe: upload, serve, list, assign, set-primary, archive
+ *   adopt.js   — the one-off passes: the legacy 177 import, and the bucket diagnostic
+ *   sheets.js  — binder mechanics: create, rename, reorder a sheet
  *
- * THE SEAM IS PURE/IMPURE, not size-for-size. Reads need no auth, write nothing, and share no
- * state — the original file already had them under their own banner comment. **The writes stayed
- * here on purpose:** the one-write-path rule (J6 rung 4) should live in the file called
- * `worker.js`, and the dangerous half should be where every reader looks first.
- *
- * 📏 ⚠️ ~21KB, against a ~22KB practical ceiling. THE NEXT ROUTE DOES NOT GO IN THIS FILE, and
- * on 2026-08-01 that rule held: the image routes arrived as `worker/images.js` +
- * `worker/adopt.js` and this file gained only a dispatch. The seam for whatever comes next is
- * already obvious: `/sheet`, `/sheet/rename` and `/sheet/reorder` are ~6KB of binder mechanics
- * with nothing to do with entering a print — they become `worker/sheets.js` the moment anything
- * else needs to land here.
- *
- * THE FOUR FILES:
- *   worker.js  — the gate, the writes for artwork/copy/sheet/slot, and the dispatch table
- *   reads.js   — seven GETs, no auth, no mutation
- *   images.js  — the photo pipe: upload, serve, list, assign, primary, archive
- *   adopt.js   — the one-off passes: the legacy 177 import and the bucket diagnostic
+ * 📏 ~16KB against a ~22KB practical ceiling (base64 inflates 4/3 against a ~30KB read cap).
+ * That is real headroom for the first time since v7 — and it was bought twice in one day.
+ * ⚠️ THE RULE THAT KEEPS IT: MEASURE THIS FILE BEFORE YOU WRITE INTO IT. On 2026-08-01 it went
+ * 21,169 → 24,503 bytes purely on comment weight, in the same commit that fixed `images.js` for
+ * the identical mistake. Two breaches, one session, both invisible until the byte count was
+ * read back. A file near the ceiling has room for a dispatch OR a header, never both.
  * ============================================================================
  *
  * DESIGN NOTES THAT MATTER (decision log J6, ladder rung 4 — "one write path"):
@@ -38,27 +28,24 @@
  *   - Reads never require a key. The repo is public and the data is which prints Michael
  *     owns. Writes always require one.
  *
- * 🔴 SCHEMA DRIFT IS THIS FILE'S DOCUMENTED FAILURE MODE — read before editing any SQL here.
- * On 2026-08-01 migration 001 dropped `artwork.collection_id` and this file kept inserting it
+ * 🔴 SCHEMA DRIFT IS THIS APP'S DOCUMENTED FAILURE MODE — read before editing any SQL.
+ * On 2026-08-01 migration 001 dropped `artwork.collection_id` and the code kept inserting it
  * for five hours. Every entry attempt failed. The app looked healthy the whole time because
  * `/health` is the one route that names none of the altered columns. **When the schema moves,
  * grep EVERY worker file for every column the migration touched — and smoke-test a route that
- * reads the altered table, never the health check.**
+ * reads the ALTERED TABLE, never the health check.**
  *
  * SECURITY — CORRECTED 2026-07-30. This header used to say "WRITE_KEY is a wrangler secret,
- * it is NOT in the shipped bundle." That is now FALSE and was false for most of a day before
- * anyone fixed the comment:
+ * it is NOT in the shipped bundle." That is now FALSE and was false for most of a day:
  *   - The key ships in the public front-end (`core.js` → DEFAULT_KEY) so a freshly-cleared
  *     browser can write with nothing pasted. Michael's call, exposure stated and accepted.
  *   - It also ships in `wrangler.toml` under [vars], because a Cloudflare Secret cannot be
  *     read back and the dashboard did not even list this worker when he went looking.
- *   - So: ASSUME THE KEY IS PUBLIC. The gate below still matters — it stops accidents and
- *     crawlers, not a determined reader. The real safety net is D1 Time Travel (30 days).
- *   - Still true, and still the reason the gate exists at all: AN UNSET WRITE_KEY REFUSES
- *     ALL WRITES. "No secret configured" must never mean "open."
- *   - ⚠️ NEW as of the image routes: R2 BYTES ARE NOT COVERED BY TIME TRAVEL. The safety net
- *     that made a public key tolerable does not extend to the bucket, which is why `images.js`
+ *   - So: ASSUME THE KEY IS PUBLIC. The gate below stops accidents and crawlers, not a
+ *     determined reader. The safety net is D1 Time Travel (30 days).
+ *   - ⚠️ AND THAT NET DOES NOT COVER R2. Bytes are not restorable, which is why `images.js`
  *     has no delete route and archiving never removes an object.
+ *   - Still true: AN UNSET WRITE_KEY REFUSES ALL WRITES. "No secret configured" never means open.
  *   - CORS is an allowlist, not `*`. Constrains browsers, not curl — but a wildcard on a
  *     key-authenticated API lets any page anywhere spend the key it just watched you type.
  */
@@ -66,6 +53,7 @@
 import { handleRead, READ_ROUTES } from './reads.js';
 import { handleImage, IMAGE_ROUTES } from './images.js';
 import { handleAdopt, ADOPT_ROUTES } from './adopt.js';
+import { handleSheet, SHEET_ROUTES } from './sheets.js';
 
 const ALLOWED_ORIGINS = [
   'https://mawizorek.github.io',
@@ -112,10 +100,7 @@ function badSlug(id) {
   return null;
 }
 
-const WRITE_ROUTES = [
-  'POST /artwork', 'POST /copy', 'POST /sheet', 'POST /sheet/rename',
-  'POST /sheet/reorder', 'POST /slot', 'DELETE /slot?id='
-];
+const WRITE_ROUTES = ['POST /artwork', 'POST /copy', 'POST /slot', 'DELETE /slot?id='];
 
 const now = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
 
@@ -149,35 +134,44 @@ export default {
     const t = now();
     const all = async (sql, params) => (await db.prepare(sql).bind(...(params || [])).all()).results || [];
 
+    /* One door for every mutation: same auth, same timestamps, same error shape. */
+    async function write(sql, params) {
+      try {
+        const r = await db.prepare(sql).bind(...params).run();
+        return reply({ ok: true, changes: r.meta ? r.meta.changes : undefined });
+      } catch (e) {
+        // Return the constraint message verbatim. The schema is the authority; this file does
+        // not re-litigate it, and a helpful lie is worse than a blunt truth.
+        return reply({ ok: false, error: String(e.message || e) }, 400);
+      }
+    }
+
     try {
-      /* ================= READS — worker/reads.js ================= */
-      /* Returns null on no match, which is what lets the writes below run. A read module that
-       * 404'd for itself would shadow every POST, so the "nothing matched" verdict stays here,
-       * in the one file that can see the whole route table. */
+      /* ================= READS — reads.js ================= */
+      /* Each module returns null on no match, which is what lets the next one run. A module
+       * that 404'd for itself would shadow everything below it, so the "nothing matched"
+       * verdict stays HERE, in the one file that can see the whole route table. */
       if (method === 'GET') {
         const read = await handleRead({ path, url, all, reply, t });
         if (read) return read;
       }
 
-      /* ================= IMAGES — worker/images.js + worker/adopt.js =================
+      /* ================= IMAGES — images.js + adopt.js =================
        *
-       * 🔴 THIS DISPATCH MUST STAY ABOVE THE BODY PARSE BELOW, AND THAT IS NOT A STYLE CHOICE.
-       * `await request.json()` CONSUMES THE REQUEST STREAM. An upload's body is BYTES, so if
-       * this ran after the parse, `images.js` would receive an already-drained body and write a
-       * ZERO-LENGTH OBJECT to R2 behind a perfectly successful 200. A silent empty file is the
-       * worst failure shape this app knows, and it would look exactly like a working upload.
+       * 🔴 THIS DISPATCH MUST STAY ABOVE THE BODY PARSE BELOW. NOT A STYLE CHOICE.
+       * `await request.json()` CONSUMES THE REQUEST STREAM, and an upload's body is BYTES.
+       * Dispatched after the parse, images.js would receive an already-drained body and write a
+       * ZERO-LENGTH OBJECT to R2 behind a perfectly successful 200 — a silent empty file that
+       * looks exactly like a working upload. The write-key gate above already fired, so auth is
+       * NOT relocated by this ordering; only body handling is.
        *
-       * The write-key gate above already fired, so auth is NOT relocated by this ordering —
-       * only the body handling is. The image routes parse their own body because their body is
-       * not JSON.
-       *
-       * ⚠️ `env.BUCKET` may be undefined if a deploy failed on R2 permissions. It is passed
-       * through as-is; images.js reports that as a deployment fact and names the Actions run,
-       * rather than throwing a stack trace at a phone. */
-      const ctx = { request, db, bucket: env.BUCKET, all, reply, path, url, method, t };
-      const img = await handleImage(ctx);
+       * ⚠️ `env.BUCKET` may be undefined if a deploy failed on R2 permissions. Passed through
+       * as-is: images.js reports that as a deployment fact and names the Actions run, rather
+       * than throwing a stack trace at a phone. */
+      const ictx = { request, db, bucket: env.BUCKET, all, reply, path, url, method, t };
+      const img = await handleImage(ictx);
       if (img) return img;
-      const adopted = await handleAdopt(ctx);
+      const adopted = await handleAdopt(ictx);
       if (adopted) return adopted;
 
       /* ================= WRITES ================= */
@@ -187,17 +181,9 @@ export default {
         try { body = await request.json(); } catch (e) { body = {}; }
       }
 
-      /* One door for every mutation: same auth, same timestamps, same error shape. */
-      async function write(sql, params) {
-        try {
-          const r = await db.prepare(sql).bind(...params).run();
-          return reply({ ok: true, changes: r.meta ? r.meta.changes : undefined });
-        } catch (e) {
-          // Return the constraint message verbatim. The schema is the authority; this file
-          // does not re-litigate it, and a helpful lie is worse than a blunt truth.
-          return reply({ ok: false, error: String(e.message || e) }, 400);
-        }
-      }
+      // Binder mechanics — sheets.js. JSON bodies, so this dispatches AFTER the parse.
+      const sheet = await handleSheet({ db, all, write, reply, body, path, method, t });
+      if (sheet) return sheet;
 
       /* Enter a print. ONE call does the whole thing:
        *   artwork row -> trigger mints the implicit edition -> optional copy row.
@@ -297,120 +283,14 @@ export default {
            body.acquired_where || null, body.acquired_at || null, body.notes || null, t, t]);
       }
 
-      if (path === '/sheet' && method === 'POST') {
-        const bid = String(body.binder_id || 'mini-binder');
-        await db.prepare('INSERT OR IGNORE INTO binder (binder_id,name,created_at,updated_at) VALUES (?,?,?,?)')
-          .bind(bid, body.binder_name || 'Mini Prints', t, t).run();
-        const nxt = await all('SELECT COALESCE(MAX(sheet_order)+1,0) AS n FROM sheet WHERE binder_id = ?', [bid]);
-        const order = body.sheet_order == null ? nxt[0].n : parseInt(body.sheet_order, 10);
-        return write(
-          `INSERT INTO sheet (sheet_id,binder_id,title,collection_id,sheet_order,created_at,updated_at)
-           VALUES (?,?,?,?,?,?,?)`,
-          [body.sheet_id || (bid + '-s' + order), bid, body.title || null,
-           body.collection_id || null, order, t, t]);
-      }
-      /* ⚠️ YES, `sheet.collection_id` IS STILL REAL and the line above is correct. 001 dropped the
-       * column from `artwork`, NOT from `sheet` — a sheet's collection is an optional HINT about
-       * what it holds (schema.binder.sql). Two different columns, one name. Do not "fix" this one
-       * while sweeping for the other. */
-
-      /* ============================================================ /sheet/rename
-       * Title only. `title` is free text and deliberately nullable — a sheet with no title
-       * falls back to its id in the UI, so clearing the box is a real choice rather than an
-       * error. Nothing else about the sheet is touched, and NOTHING inside it moves.
-       */
-      if (path === '/sheet/rename' && method === 'POST') {
-        const id = String(body.sheet_id || '').trim();
-        if (!id) return reply({ ok: false, error: 'sheet_id is required' }, 400);
-        const rows = await all('SELECT sheet_id FROM sheet WHERE sheet_id = ?', [id]);
-        if (!rows.length) return reply({ ok: false, error: 'no sheet "' + id + '"' }, 404);
-        const title = body.title == null ? null : String(body.title).trim();
-        return write('UPDATE sheet SET title = ?, updated_at = ? WHERE sheet_id = ?',
-                     [title || null, t, id]);
-      }
-
-      /* ============================================================ /sheet/reorder
-       * Rearrange the binder. Takes the COMPLETE desired order of sheet_ids, not a swap or a
-       * single move.
-       *
-       * WHY A WHOLE-ORDER PAYLOAD: a "move sheet X up one" API has to reason about neighbours
-       * server-side, and every off-by-one lives in that arithmetic. A full permutation is
-       * idempotent, trivially verifiable, and lets the client express any rearrangement —
-       * including a future drag-and-drop — through the same one route.
-       *
-       * 🔴 THE TRAP, AND THE SCHEMA COMMENT THAT WOULD HAVE WALKED ME INTO IT.
-       * `sheet` carries UNIQUE (binder_id, sheet_order), so a naive one-by-one renumber
-       * collides mid-flight. `schema.binder.sql` said to fix that with "a temporary
-       * NEGATIVE-offset pass" — and the very same table has CHECK (sheet_order >= 0), which
-       * makes every negative value UNWRITEABLE. Following the documented remedy would fail
-       * 100% of the time. Corrected there too, 2026-07-30.
-       * So the park pass goes HIGH, not negative: MAX(sheet_order) + 1 and up, which cannot
-       * collide with any live value.
-       *
-       * Both passes go through db.batch(), which D1 runs as ONE transaction. A half-applied
-       * reorder — some sheets parked at 900-something, others renumbered — is not a state this
-       * app is willing to leave behind.
-       *
-       * FREE SIDE EFFECT worth knowing: pass two writes 0..n-1, so any gap in sheet_order
-       * (from a deleted sheet, say) is compacted. And because slots reference sheet_id and
-       * never sheet_order, NOT ONE SLOT ROW IS TOUCHED — a whole sheet travels with both its
-       * faces, which is exactly the physical gesture of lifting it out of the rings.
-       * Downstream, `v_binder_spread` derives side_index/spread_index from sheet_order, so
-       * page numbering renumbers itself. Nothing to keep in sync.
-       */
-      if (path === '/sheet/reorder' && method === 'POST') {
-        const bid = String(body.binder_id || 'mini-binder');
-        const want = Array.isArray(body.order) ? body.order.map(v => String(v)) : null;
-        if (!want || !want.length) {
-          return reply({ ok: false, error: 'order must be a non-empty array of sheet_id, in the desired binder order' }, 400);
-        }
-
-        const have = (await all('SELECT sheet_id FROM sheet WHERE binder_id = ? ORDER BY sheet_order', [bid]))
-                       .map(r => r.sheet_id);
-        if (!have.length) return reply({ ok: false, error: 'binder "' + bid + '" has no sheets' }, 404);
-
-        /* A PERMUTATION CHECK, and it is not pedantry. A SHORT array would renumber the sheets
-         * it names and leave the rest parked wherever they were — a scrambled binder that
-         * still looks entirely plausible on screen. Refuse the write instead, and say which
-         * ids were wrong, because "invalid order" sends you nowhere. */
-        const dupes = [...new Set(want.filter((id, i) => want.indexOf(id) !== i))];
-        if (dupes.length) {
-          return reply({ ok: false, error: 'the same sheet appears more than once in order: ' + dupes.join(', ') }, 400);
-        }
-        const unknown = want.filter(id => !have.includes(id));
-        const missing = have.filter(id => !want.includes(id));
-        if (unknown.length || missing.length) {
-          return reply({ ok: false,
-            error: 'order must list every sheet in this binder exactly once (got ' + want.length + ', binder has ' + have.length + ')',
-            unknown: unknown, missing: missing }, 400);
-        }
-
-        const parked = Number((await all(
-          'SELECT COALESCE(MAX(sheet_order), 0) AS m FROM sheet WHERE binder_id = ?', [bid]))[0].m) + 1;
-
-        const stmts = [];
-        const SQL = 'UPDATE sheet SET sheet_order = ?, updated_at = ? WHERE sheet_id = ? AND binder_id = ?';
-        // pass 1 — park every sheet above the live range so nothing can collide
-        want.forEach((id, i) => stmts.push(db.prepare(SQL).bind(parked + i, t, id, bid)));
-        // pass 2 — land them on their final 0-based positions
-        want.forEach((id, i) => stmts.push(db.prepare(SQL).bind(i, t, id, bid)));
-
-        try {
-          await db.batch(stmts);
-        } catch (e) {
-          return reply({ ok: false, error: String(e.message || e) }, 400);
-        }
-        return reply({ ok: true, order: want, sheets: want.length });
-      }
-
       /* Place something in a slot. artwork_id + OPTIONAL edition_id (Q12 = B).
        * The composite FK makes a mismatched pair unwriteable, so this does not check it —
        * the database refuses and the message comes straight back. */
       if (path === '/slot' && method === 'POST') {
-        const sheet = String(body.sheet_id || '').trim();
+        const sh = String(body.sheet_id || '').trim();
         const side = String(body.side || 'A').toUpperCase();
         const pos = parseInt(body.position, 10);
-        if (!sheet) return reply({ ok: false, error: 'sheet_id is required' }, 400);
+        if (!sh) return reply({ ok: false, error: 'sheet_id is required' }, 400);
         if (!(pos >= 0 && pos <= 8)) return reply({ ok: false, error: 'position must be 0-8 (nine slots a face)' }, 400);
         return write(
           `INSERT INTO slot (slot_id,sheet_id,side,position,artwork_id,edition_id,note,created_at,updated_at)
@@ -418,7 +298,7 @@ export default {
            ON CONFLICT(sheet_id,side,position) DO UPDATE SET
              artwork_id=excluded.artwork_id, edition_id=excluded.edition_id,
              note=excluded.note, updated_at=excluded.updated_at`,
-          [body.slot_id || (sheet + '-' + side.toLowerCase() + pos), sheet, side, pos,
+          [body.slot_id || (sh + '-' + side.toLowerCase() + pos), sh, side, pos,
            body.artwork_id || null, body.edition_id || null, body.note || null, t, t]);
       }
 
@@ -429,11 +309,11 @@ export default {
         return write('DELETE FROM slot WHERE slot_id = ?', [id]);
       }
 
-      /* The route list spans FOUR files, so it is CONCATENATED rather than retyped. A hardcoded
+      /* The route list spans FIVE files, so it is CONCATENATED rather than retyped. A hardcoded
        * copy here would be a second claimant on "which routes exist" and would rot the first
        * time a route is added next door. */
       return reply({ error: 'no route for ' + method + ' ' + path,
-                     routes: READ_ROUTES.concat(WRITE_ROUTES, IMAGE_ROUTES, ADOPT_ROUTES) }, 404);
+                     routes: READ_ROUTES.concat(WRITE_ROUTES, SHEET_ROUTES, IMAGE_ROUTES, ADOPT_ROUTES) }, 404);
 
     } catch (e) {
       // Loud, not silent. A 500 that pretends to be an empty result is the failure mode
