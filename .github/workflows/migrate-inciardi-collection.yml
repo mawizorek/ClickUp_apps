@@ -31,11 +31,54 @@
 # drifts; this one cannot claim a migration ran unless it did.
 # ============================================================================
 #
+# ============================================================================
+# 🔴 WHY `file` IS A DROPDOWN AND NOT A TEXT BOX (learned on run 1)
+#
+# Run 1 failed at the existence preflight, reporting
+#     No such file: inciardi-collection/db/migrations/001-photos-and-groupings.sql
+# while that exact path sat on main at 9,761 bytes. The file was fine. The INPUT was not —
+# a path that must be character-perfect, hand-typed on a phone keyboard with autocorrect,
+# smart punctuation and an eager space bar.
+#
+# The set of legal values is KNOWN AND TINY: it is the contents of one directory. A free-text
+# field for a closed set is rung 5 (validate, then complain). A dropdown is rung 2 — the
+# mistake becomes unrepresentable. Same law the schema itself is built on.
+#
+# ⚠️ HONEST COST: adding migration 002 requires adding one line to `options` below before it
+# can be run. Deliberately NOT softened with a free-text override — an escape hatch that
+# reintroduces the exact failure being fixed is not a fix. And a second place where a new
+# migration must be acknowledged is not the worst property for DDL to have.
+#
+# 🚫 000 IS NOT IN THE LIST, ON PURPOSE. It was applied by hand before this workflow existed
+# and cannot be re-run (SQLite has no ADD COLUMN IF NOT EXISTS). It is in `applied.log`, so
+# the guard would refuse it anyway — but an unrunnable option in a dropdown is a trap, and
+# two independent refusals are better than one.
+# ============================================================================
+#
+# ============================================================================
+# 🔴 WHERE DIAGNOSTICS GO — CORRECTING THE DEPLOY WORKFLOW'S RULE
+#
+# That file records: "everything writes to $GITHUB_STEP_SUMMARY, which renders on a phone,"
+# learned after stdout proved invisible in the mobile annotation panel. True, and INCOMPLETE.
+#
+# Run 1 here printed `ls db/migrations/*.sql` — the listing that answers the failure
+# instantly — into the summary. Michael never saw it: "not sure where to look for summary."
+# The summary renders on a phone BROWSER, but the GitHub mobile APP drops you straight into
+# raw step logs on a failure, with the summary several taps back behind the run title.
+#
+# SO THE RULE IS NOT "USE THE SUMMARY." IT IS:
+#     THE FAILURE REASON GOES IN THE ANNOTATION.
+#     The summary is for the detail you go looking for once you know what broke.
+# Annotations surface at the top of the run in the app. Errors below carry their evidence
+# inline for that reason.
+# ============================================================================
+#
 # ⚠️ WHAT IS NOT PROVEN YET, stated rather than assumed: the repo's CLOUDFLARE_API_TOKEN was
 # created from the "Edit Cloudflare Workers" template. Whether that template carries D1
-# WRITE permission has NOT been verified. If the execute step fails on authorization, that
-# is the first thing to check — the failure branch below says so explicitly rather than
-# leaving a 10000/authentication error to be misread as a bad secret.
+# WRITE permission has NOT been verified — run 1 died before reaching the apply step, so this
+# is still untested. If the execute step fails on authorization, that is the first thing to
+# check; the failure branch says so explicitly rather than leaving a 10000/authentication
+# error to be misread as a bad secret.
 
 name: Migrate inciardi-collection D1
 
@@ -43,9 +86,11 @@ on:
   workflow_dispatch:
     inputs:
       file:
-        description: "Migration file, relative to inciardi-collection/ (e.g. db/migrations/001-photos-and-groupings.sql)"
+        description: "Migration to apply"
         required: true
-        type: string
+        type: choice
+        options:
+          - "db/migrations/001-photos-and-groupings.sql"
       confirm:
         description: "This writes to the LIVE database. Choose 'apply' to proceed."
         required: true
@@ -74,21 +119,17 @@ jobs:
       # version that does not exist fails with exit code 1, the same symptom as everything
       # else. `wrangler@4` tracks the major without asserting a release exists.
       WR: "npx --yes wrangler@4"
-      MIG: ${{ inputs.file }}
+      MIG_RAW: ${{ inputs.file }}
 
     steps:
       - uses: actions/checkout@v4
 
-      # Everything reports to $GITHUB_STEP_SUMMARY, never stdout. Same rule the deploy
-      # workflow had to learn: the mobile Actions view does not render step logs, so a
-      # diagnostic written to stdout is a diagnostic the person holding the phone cannot
-      # read. A diagnostic that reports somewhere the reader cannot see is not a diagnostic.
       - name: Header
         run: |
           {
             echo "## D1 migration · \`$DB_NAME\`"
             echo ""
-            echo "**File:** \`$MIG\`"
+            echo "**File:** \`$MIG_RAW\`"
             echo "**Confirm:** \`${{ inputs.confirm }}\`"
             echo "**Commit:** \`${{ github.sha }}\`"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -122,10 +163,27 @@ jobs:
           fi
           exit $FAIL
 
+      # Belt and braces BEHIND the dropdown. The dropdown should make all of this dead code,
+      # but it costs three lines and it keeps the step honest if the input ever goes back to
+      # free text. Strips: surrounding whitespace · a leading slash · a redundant
+      # `inciardi-collection/` prefix (the natural thing to paste from a file listing).
+      - name: Normalize the path
+        run: |
+          MIG=$(printf '%s' "$MIG_RAW" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+          MIG=${MIG#/}
+          MIG=${MIG#inciardi-collection/}
+          echo "MIG=$MIG" >> "$GITHUB_ENV"
+          if [ "$MIG" != "$MIG_RAW" ]; then
+            echo "- ℹ️ normalized input to \`$MIG\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Preflight · does the migration exist?
         run: |
           if [ ! -f "$MIG" ]; then
-            echo "::error::No such file: inciardi-collection/$MIG"
+            # 🔴 THE EVIDENCE GOES IN THE ANNOTATION, not only the summary. Run 1 put the
+            # available-files listing somewhere the person holding the phone could not reach.
+            AVAIL=$(ls -1 db/migrations/*.sql 2>/dev/null | tr '\n' ' ')
+            echo "::error::No such file: inciardi-collection/$MIG — available migrations are: ${AVAIL:-(none)}"
             {
               echo "- ❌ **no such file:** \`inciardi-collection/$MIG\`"
               echo ""
@@ -146,7 +204,8 @@ jobs:
           LOG=db/migrations/applied.log
           REL="inciardi-collection/$MIG"
           if [ -f "$LOG" ] && grep -qF " $REL" "$LOG"; then
-            echo "::error::$REL is already in applied.log. REFUSED. Migrations are not idempotent — 001 contains DROP TABLE, which is free against an empty table and destroys the photo library against a populated one. If you genuinely need to re-run it, write a NEW numbered migration that does the specific thing you want."
+            WHEN=$(grep -F " $REL" "$LOG" | head -1 | cut -d' ' -f1)
+            echo "::error::REFUSED — $REL was already applied at $WHEN. Migrations are not idempotent: 001 contains DROP TABLE, which is free against an empty table and destroys the photo library against a populated one. To change something, write a NEW numbered migration."
             {
               echo "- 🛑 **REFUSED — already applied**"
               echo ""
@@ -193,13 +252,17 @@ jobs:
           cat out.txt
           if [ $RC -ne 0 ]; then
             # Name the two failures that look like something else, so neither gets misread.
+            # Both carry a line of the real output INTO the annotation — see the diagnostics
+            # rule at the top of this file.
+            WHY=$(grep -m1 -iE 'error|✘' out.txt | head -c 300)
             if grep -qiE 'authent|authoriz|10000|permission' out.txt; then
-              echo "::error::Authorization failure. The API token is from the 'Edit Cloudflare Workers' template, which may NOT carry D1 write permission. Create a token with D1:Edit and re-save CLOUDFLARE_API_TOKEN. This is not a malformed-secret problem."
+              echo "::error::Authorization failure — the API token is from the 'Edit Cloudflare Workers' template, which may NOT carry D1 write permission. Create a token with D1:Edit and re-save CLOUDFLARE_API_TOKEN. This is NOT a malformed-secret problem. Wrangler said: ${WHY}"
+            elif grep -qiE 'no such column|no such table|error in view' out.txt; then
+              echo "::error::The MIGRATION is wrong, not the credentials — a view or index still references something this migration drops. Read db/views.sql before retrying. Wrangler said: ${WHY}"
+            else
+              echo "::error::Migration failed: ${WHY:-see the run summary}"
             fi
-            if grep -qiE 'no such column|no such table|error in view' out.txt; then
-              echo "::error::The migration is wrong, not the credentials. A view or index almost certainly still references something the migration drops — read db/views.sql before retrying."
-            fi
-            echo "::error::Migration FAILED. A D1 batch is atomic, so nothing was applied and applied.log is untouched. Fix the file and press the button again."
+            echo "::error::Nothing was applied — a D1 batch is atomic — and applied.log is untouched. Fix the file and press the button again."
             echo "- ❌ **failed — nothing applied, nothing logged**" >> "$GITHUB_STEP_SUMMARY"
             exit $RC
           fi
@@ -248,3 +311,4 @@ jobs:
             echo ""
             echo "**This file can no longer be run.** The guard will refuse it from now on."
           } >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::Applied $MIG and recorded it in applied.log. This file can no longer be run."
