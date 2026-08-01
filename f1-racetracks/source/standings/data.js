@@ -6,13 +6,19 @@
  ⚠️ v13 (2026-08-01) — THE CALENDAR IS NOT IN THIS STORE. A round's NUMBER, NAME and DATE
  come from the weekend vector (season/2026/index_weekends.json) via source/08_season.js,
  joined BY SLUG. The round file's own stored round/name/date are the FALLBACK, used only when
- the season layer is unreachable — which is what lets those three fields be deleted from the
- round files without this surface changing. Never join on a round number: it is derived from
- calendar position and shifts when a round is inserted or cancelled (Decision Log J9 ruling 4).
+ the season layer is unreachable. Never join on a round number: it is derived from calendar
+ position and shifts when a round is inserted or cancelled (Decision Log J9 ruling 4).
 
- Also fixed here: the manifest used to be ordered with (a,b)=>a.round-b.round, and v11 reduced
- manifest rows to {slug,file}. That comparison has been NaN ever since; it stayed harmless only
- because the rows are written in date order. Ordering now happens after the season join. */
+ ⚠️ v14 (2026-08-01) — THE JOIN CAN NO LONGER EMIT `undefined`. v13's fallback chain ended at
+ the round file, so once those three fields are deleted from the round files the chain resolved
+ to undefined and `codeOf` / panel.js's `rd.name.replace(...)` would have THROWN rather than
+ degraded. withSeasonMeta now terminates in a computed default for round and name, so no
+ consumer downstream of it can observe a missing field — one place to reason about instead of
+ five call sites, and the next call site somebody adds is safe by construction.
+
+ Also fixed in v13: the manifest used to be ordered with (a,b)=>a.round-b.round, and v11 reduced
+ manifest rows to {slug,file}. That comparison had been NaN ever since; it stayed harmless only
+ because the rows are written in date order. Ordering happens after the season join. */
 const APP_VERSION='v6.0';
 const DATA_BASE='f1-results/2026/';
 const DATA_INDEX='index_rounds.json';
@@ -51,7 +57,15 @@ const renderStory=(keys,row)=>keys.map(k=>(STORY[k]||k).replace("{grid}",row.gri
 let ROUNDS=[],DRV={},STANDINGS=[],sortMode='champ',SEASON_TOTAL=null;
 const FIRST=id=>(DRV[id].name).replace("Andrea Kimi ","").split(" ")[0];
 const LAST=id=>{const n=DRV[id].name;return n==="Andrea Kimi Antonelli"?"Antonelli":n.split(" ").slice(-1)[0];};
-const codeOf=rd=>(rd.name.match(/\b([A-Z]{3})\b/)||[])[1]||rd.slug.slice(0,3).toUpperCase();
+
+/* 'gilles-villeneuve' -> 'Gilles Villeneuve'. The terminal fallback for a round label when
+   neither the season vector nor the round file supplies a name. Never pretty, always true —
+   the slug is the one identifier that cannot be missing, because the manifest is keyed on it. */
+const titleFromSlug=s=>String(s||'').split('-').filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+
+/* Three-letter column code. Hardened v14: `.match` is called on a value this helper does not
+   own, so it guards rather than trusting the join. */
+const codeOf=rd=>((rd&&rd.name?String(rd.name):'').match(/\b([A-Z]{3})\b/)||[])[1]||String((rd&&rd.slug)||'').slice(0,3).toUpperCase();
 
 /* The season calendar, or null. Never throws — this lens is the championship table, and a
    calendar outage must cost round LABELS, never the standings themselves. */
@@ -61,16 +75,27 @@ async function seasonCalendar(){
  catch(e){ console.error('[standings] season layer unavailable — round number, name and date fall back to the round file.',e); return null; }
 }
 
-/* Join one round file to its weekend row, by slug. Vector wins, round file is the fallback. */
-function withSeasonMeta(rd,mf,cal){
+/* Join one round file to its weekend row, by slug. Vector wins, round file is the fallback,
+   and v14 adds a terminal default so the result is NEVER undefined:
+
+     round -> vector · stored · manifest position + 1
+     name  -> vector · stored · title derived from the slug
+     date  -> vector · stored · null   (the one field left nullable on purpose: fmtDate and the
+              date cells already render an empty string for null, and an invented date is worse
+              than a blank one)
+
+   `i` is the manifest index, which is in date order, so position+1 is the same ordinal the
+   season layer would have derived. It is a floor, not a claim — and per J9 ruling 4 a derived
+   ordinal is never persisted anywhere, including back into the round file it came from. */
+function withSeasonMeta(rd,mf,cal,i){
  if(!rd) return null;
  const slug=rd.slug||(mf&&mf.slug)||null;
  const w=(cal&&cal.bySlug&&slug)?cal.bySlug[slug]:null;
  return Object.assign({},rd,{
   slug:slug,
-  round:(w&&w.round!=null)?w.round:rd.round,
-  name:(w&&w.name)?w.name:rd.name,
-  date:(w&&w.raceDate)?w.raceDate:rd.date
+  round:(w&&w.round!=null)?w.round:(rd.round!=null?rd.round:(i+1)),
+  name:(w&&w.name)||rd.name||titleFromSlug(slug),
+  date:(w&&w.raceDate)||rd.date||null
  });
 }
 
@@ -80,7 +105,7 @@ async function load(){
  const idx=await fetch(DATA_BASE+DATA_INDEX,{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.json();});
  const manifest=(idx.rounds||[]);
  const loaded=await Promise.all(manifest.map(f=>fetch(DATA_BASE+f.file.replace('./',''),{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.json();})));
- ROUNDS=loaded.map((rd,i)=>withSeasonMeta(rd,manifest[i],cal)).filter(Boolean).sort((a,b)=>(a.round||0)-(b.round||0));
+ ROUNDS=loaded.map((rd,i)=>withSeasonMeta(rd,manifest[i],cal,i)).filter(Boolean).sort((a,b)=>(a.round||0)-(b.round||0));
  SEASON_TOTAL=(cal&&Array.isArray(cal.weekends)&&cal.weekends.length)?cal.weekends.length:null;
  compute();
  render();
