@@ -1,4 +1,4 @@
-/* weekend/data.js — Race Weekend lens, data layer (v13).
+/* weekend/data.js — Race Weekend lens, data layer (v14).
    SINGLE SOURCE OF TRUTH for RESULTS = f1-results/2026/ (index_rounds.json + per-round files).
    SINGLE SOURCE OF TRUTH for the CALENDAR = season/2026/index_weekends.json, read through
    source/08_season.js (window.F1Season). Loads the whole season so the championship swing can
@@ -15,10 +15,15 @@
         {slug, file}, making that NaN on every comparison. It never misordered anything only
         because the rows are written in date order. Ordering is by DERIVED round now.
 
-   Where a round's NUMBER / NAME / DATE come from (v13): the WEEKEND VECTOR, joined by slug.
-   The round file's own stored `round` / `name` / `date` are the FALLBACK, used verbatim when
-   the season layer is unreachable. That fallback is deliberate and load-bearing — it is what
-   lets those three fields be deleted from the round files without this surface noticing.
+   ⚠️ CHANGED v14 (2026-08-01). withSeasonMeta's fallback chain used to END at the round file,
+   so the day round/name/date are deleted from the round files it would resolve to `undefined`
+   rather than to a safe default, and render.js would print "Round undefined". The chain now
+   terminates in a computed value. This is the guard that has to exist BEFORE the strip, and it
+   lives in the join rather than at the render call sites so no consumer — including one added
+   later — can observe a missing field.
+
+   Where a round's NUMBER / NAME / DATE come from: the WEEKEND VECTOR, joined by slug. The round
+   file's own stored fields are the fallback; a computed default is the floor beneath that.
 
    Globals exposed (classic-script scope, read bare by render.js / nav.js):
      ROUNDS  — ascending array of round objects
@@ -33,6 +38,11 @@ const short=s=>String(s||'').replace(' Grand Prix','').replace('-Catalunya','');
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const fmtDate=d=>{if(!d)return'';const dt=new Date(d+'T00:00:00');return isNaN(dt)?d:dt.toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});};
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+
+/* 'gilles-villeneuve' -> 'Gilles Villeneuve'. Terminal fallback for a round label when neither
+   the season vector nor the round file supplies a name. The slug is the one identifier that
+   cannot be missing — the manifest is keyed on it. */
+const titleFromSlug=s=>String(s||'').split('-').filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
 
 /* Illustrative tyre strategy (52-lap Canada shown). NOT in the store yet — flagged
    'illustrative' in the UI, sourced going forward from lap-time data. Keyed by slug. */
@@ -104,17 +114,21 @@ async function seasonCalendar(){
 }
 
 /* Join one round file to its weekend row. Vector wins; the round file's own stored fields are
-   the fallback. Both sides are read by slug — never by round number (a derived ordinal is not
-   a key, see Decision Log J9 ruling 4). */
-function withSeasonMeta(rd,mf,cal){
+   the fallback; a computed value is the floor beneath both (v14), so this never emits undefined.
+   Both sides are read by slug — never by round number (a derived ordinal is not a key, see
+   Decision Log J9 ruling 4). `i` is the manifest index, which is in date order.
+
+   `date` stays nullable on purpose: fmtDate('') already returns an empty string, and a blank
+   date is honest where an invented one is not. */
+function withSeasonMeta(rd,mf,cal,i){
   if(!rd) return null;
   const slug=rd.slug||(mf&&mf.slug)||null;
   const w=(cal&&cal.bySlug&&slug)?cal.bySlug[slug]:null;
   return Object.assign({},rd,{
     slug:slug,
-    round:(w&&w.round!=null)?w.round:rd.round,
-    name:(w&&w.name)?w.name:rd.name,
-    date:(w&&w.raceDate)?w.raceDate:rd.date
+    round:(w&&w.round!=null)?w.round:(rd.round!=null?rd.round:(i+1)),
+    name:(w&&w.name)||rd.name||titleFromSlug(slug),
+    date:(w&&w.raceDate)||rd.date||null
   });
 }
 
@@ -124,7 +138,7 @@ async function loadSeason(){
     const idx=await fetch(BASE+'index_rounds.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.json();});
     const manifest=(idx.rounds||[]);
     const loaded=await Promise.all(manifest.map(f=>fetch(BASE+f.file.replace('./',''),{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null)));
-    ROUNDS=loaded.map((rd,i)=>withSeasonMeta(rd,manifest[i],cal)).filter(Boolean).sort((a,b)=>(a.round||0)-(b.round||0));
+    ROUNDS=loaded.map((rd,i)=>withSeasonMeta(rd,manifest[i],cal,i)).filter(Boolean).sort((a,b)=>(a.round||0)-(b.round||0));
     if(!ROUNDS.length) throw 0;
     META={last_completed_round_slug:(cal&&cal.last_completed_round_slug)||null};
   }catch(e){
