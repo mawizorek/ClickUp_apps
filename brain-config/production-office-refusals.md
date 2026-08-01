@@ -1,107 +1,55 @@
 # The Production Office — INTERIM REFUSAL LIST
 
-**In force from 2026-08-01 until Wave 3 is built.** Waves 1 and 2 are live: **Volt Vinny · Grid
-Gable · Radial Randy · Hazard Hawthorne · A1 Allison · Pixel Pierce · Uplink Ulla.**
-**Four departments do not exist yet.**
+# 🏁 ZERO ROWS REMAIN. ALL ELEVEN HEADS ARE BUILT AND REGISTERED.
 
-> 📉 **Shrunk 2026-08-01 (Wave 2 build).** Safety, audio, video and networking came off this list
-> the moment their heads were built AND registered, per the retirement rule at the bottom. **The
-> file is getting smaller on schedule, which is the only healthy thing a refusal list can do.**
-> 🔴 The safety section — the sharpest gap this document ever carried — is **RESOLVED** and struck
-> below rather than deleted, because the reasoning is why the list works.
+**Volt Vinny · Grid Gable · Radial Randy · Hazard Hawthorne · A1 Allison · Pixel Pierce ·
+Uplink Ulla · Trick Tully · Wardrobe Wren · Callboard Quinn · CoMa Courtney.**
 
----
-
-## Why this list exists, and it is not politeness
-
-The danger of a partial office is **NOT** that a question goes unanswered. It is that **the wrong
-head answers it well enough, and the craft memory for a discipline lands in a sibling's ledger.**
-
-That is unrecoverable in the way that matters: memory is the one thing this fleet has ruled must
-never be split (*"two agents accumulating rival memory of one domain is strictly worse than one,
-because neither ends up holding the whole picture"*). If Randy accrues six months of props
-knowledge before Tully exists, Tully is born into a lane somebody else already remembers, and the
-fix is a migration nobody will do.
-
-**Same failure shape the brainstorm already refused twice:** an electrician plausibly CAN answer a
-network question, so folding networking in produces **a confident near-miss instead of a visible
-gap** (Naming DL Q11). A visible gap gets filled by a person. A near-miss does not.
-
-✅ **It works, and there is now evidence.** At the Wave 1 gate on Thought/Crime (URITP, 2026-08-01)
-Vinny refused a speaker question and a tech-table DATA question in the same breath, **naming
-Allison and Ulla as the missing owners rather than answering.** Both questions survived intact into
-the ledgers of the heads who were built hours later. **That is the entire point of this file,
-demonstrated once.**
+> ⏳ **THIS FILE IS BEING HELD, NOT KEPT.** Its own retirement rule says it is **deleted, not edited
+> down, when Wave 3 PASSES ITS GATE** — and the gate has not run yet. Every row is gone; the file
+> stands for one more step. **Whoever runs the Wave 3 gate deletes this file on the pass.**
+> Leaving it here "just in case" is how a refusal list becomes a rule refusing things that now have
+> owners.
 
 ---
 
-## The rule (one line)
+## What this file did, kept for the record until it goes
 
-> **A built head that is asked an unbuilt department's question NAMES THE MISSING HEAD, ANSWERS
-> NOTHING, AND WRITES NOTHING TO ITS OWN MEMORY.**
+The danger of a partial office was never that a question went unanswered. It was that **the wrong
+head would answer it well enough, and the craft memory for a discipline would land in a sibling's
+ledger** — unrecoverable, because memory is the one thing this fleet has ruled must never be split.
 
-Refusal shape, said out loud:
-*"That's <Head>'s lane and <Head> isn't built yet. I'm not going to guess at it — ask Michael, or
-build the head."*
+**The rule it enforced:**
 
-⚠️ **The memory half is the important half.** A head may THINK about an adjacent question in the
-room; it may not KEEP it. Nothing about an unbuilt department enters a craft ledger, ever, even if
-the head turns out to have been right.
+> A built head asked an unbuilt department's question **NAMES THE MISSING HEAD, ANSWERS NOTHING,
+> AND WRITES NOTHING TO ITS OWN MEMORY.**
 
----
+## ✅ It worked, three times, on the record
 
-## What the office still declines, by department
+1. **Wave 1 gate (Thought/Crime, URITP).** Volt Vinny refused a speaker question and a tech-table
+   **data** question in the same breath, naming Allison and Ulla. **Both questions survived intact
+   into those heads' ledgers as inherited leads hours later** instead of being absorbed and lost.
+2. **Wave 1 gate.** Grid Gable refused to say whether a UL listing survives into a shop-built
+   enclosure, marking it `unverified`. **It became Hazard Hawthorne's first real job.**
+3. **Wave 1 gate.** Radial Randy declined the twelve rolling mirror frames — *"I have a saw, not a
+   jurisdiction"* — **and that object is still unruled, waiting for Tully and Wren to argue it.**
 
-| Unbuilt department | Head (wave) | Declined |
-|---|---|---|
-| **Props** | Trick Tully (3) | Sourcing, fabrication of practicals, period research, breakables, weapons, tracking. ⚠️ **Randy's fabrication border, and it is already live** — see below. |
-| **Costumes** | Wardrobe Wren (3) | Build/buy/rent, fittings, quick-change engineering, stock, maintenance. |
-| **Stage management** | Callboard Quinn (3) | Prompt book, blocking notation, cue standards, rehearsal report practice. ⚠️ Also **comms**, which leaves the RF seam short a voice. |
-| **Company management** | CoMa Courtney (3) | Contracts, housing, travel, per diem, payroll, work rules, hospitality. |
+⚠️ **A fourth, from the Wave 2 gate:** Uplink Ulla refused the console-and-operator question and
+named Callboard Quinn's absence as part of the reason. **It is now sitting in Quinn's ledger.**
 
-### ⚠️ The props border is the live one now
-
-**Radial Randy is standing closest to this hole** and already declined it once, correctly, at the
-Wave 1 gate: twelve rolling mirror frames that actors handle nightly are arguably set pieces and
-arguably props, and **Randy refused to "quietly become the props department because I have a
-saw."** Hold that line. The worn-vs-carried jurisdiction between Tully and Wren is a **deliberately
-live argument** when both exist — it cannot be pre-decided by a third head in their absence.
-
-### ⚠️ The RF seam is short a voice until Quinn exists
-
-Wireless mics (Allison), wireless DMX (Vinny) and **comms (Quinn, unbuilt)** share one spectrum
-with no ruled owner. **Any spectrum plan made before Quinn exists is missing a real stakeholder**
-and must say so rather than settle the question by default.
+**Four refusals, four questions preserved, zero craft memory misfiled.** That is the whole thesis,
+and it is why the file gets deleted proud rather than quietly.
 
 ---
 
-## 🔴 ~~The safety gap is the one that can actually hurt someone~~ — ✅ RESOLVED 2026-08-01
+## What survives this file's deletion (do NOT let these go with it)
 
-~~Hazard Hawthorne does not exist, and Grid Gable is standing closest to the hole.~~
-**Hawthorne is BUILT and REGISTERED.** Kept struck rather than deleted because the reasoning is
-the strongest argument this file contains, and because **the line Gable held in the gap is now the
-line he holds permanently** — it was never a temporary measure:
+These are **permanent**, not gap-era measures, and they live in the heads' own bundles:
 
-- ✅ **Gable answers:** what a point will take, what a capacity IS, what he read and where.
-- 🚫 **Gable does not answer:** whether the show is safe, whether the practice is acceptable, what
-  the standard requires as a verdict. **He never certifies** (`gates/craft-guardrails.md` §2).
-- ✅ **Hawthorne now holds the craft half** — hazard analysis, citation, method, incident memory —
-  and **he does not certify either.** Analysis plus the name of who signs.
-- ✅ **The house safety layer is Milo's and always was:** welfare, compliance, training status and
-  **THE CALL** at URITP, re-cut 2026-08-01 (PR #682, reasoning PR #685) so Hawthorne never went
-  live against a Milo claiming his lane.
-
-⚠️ **One question is outstanding from the gap period and is now Hawthorne's first real job:**
-Gable flagged that **a UL listing on a luminaire may not survive that luminaire being installed
-inside a shop-built, non-listed enclosure** — marked `unverified`, never answered.
-
----
-
-## Retirement of this list
-
-**This file is deleted, not edited down, when Wave 3 passes its gate.** A refusal list that
-outlives its gap becomes a rule refusing things that now have owners — the exact rot shape
-`hooks/doc-rot-sweep.md` hunts (*pointers into retired things*).
-
-Remove a row the moment its head is BUILT AND REGISTERED, not when it is merely scheduled.
-**Done twice now: four rows removed 2026-08-01 at the Wave 2 build.**
+- 🚫 **Nobody certifies.** Gable's line during the safety gap turned out to be his line forever.
+- ⚠️ **The worn/carried border (Tully ↔ Wren) is a PROTECTED LIVE ARGUMENT** and must not be merged
+  away. **The tell that it broke is silence.**
+- ⚠️ **The RF seam** (mics / wireless DMX / comms) is **still unruled** and now has all three
+  stakeholders. **Quinn arrived last and may reopen it.**
+- 🔴 **The Milo seams stand:** house safety vs craft safety (Hawthorne), and the sharpest one —
+  **the PRACTICE travels with Quinn, this show's calls, people and calendar stay with Milo.**
