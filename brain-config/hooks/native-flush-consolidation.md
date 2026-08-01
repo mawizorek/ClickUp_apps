@@ -1,6 +1,8 @@
 # Hook — Native-Flush Consolidation (per-agent memory drain)
 
-**Status: PROPOSED 2026-08-01 (authored by FMP Fiona at Michael's direction) — pending Fleet Steward (ClickUp Coach Corey) ratification before fleet-wide rollout and before wiring into Memory Maggie's bundle.** Pushed to `main` as the live working spec. Reference implementation of the intake side: `super-agents/fmp-frank/native-flush.md`.
+**Status: ✅ RATIFIED 2026-08-01 by Fleet Felix (Fleet Steward). Live for fleet-wide rollout.** Authored by FMP Fiona at Michael's direction. ~~PROPOSED 2026-08-01 … pending Fleet Steward (ClickUp Coach Corey) ratification before fleet-wide rollout and before wiring into Memory Maggie's bundle.~~ ⚠️ **CORRECTED 2026-08-01 (steward edit by Fleet Felix, at Michael's explicit direction): the Fleet Steward is FLEET FELIX.** Corey was re-laned OFF that lane on **2026-07-20 (PR #430)**. This is the THIRD file to carry the same error in one day, all three traceable to one stale native cache (`super-agents/fmp-frank/native-flush.md`, SOURCE PAGE 2) — which is itself the argument for this hook existing. Struck rather than deleted. 🚩 **Still open (Michael's nod):** adding a pointer to this hook inside Memory Maggie's own bundle. Ratifying the shared spec does not entitle the Steward to rewrite another teammate's profile.
+
+Reference implementation of the intake side: `super-agents/fmp-frank/native-flush.md`.
 
 **Type:** Reusable consolidation hook. Any drain-capable run (Memory Maggie by default) follows it to consolidate ONE agent's `native-flush.md` into that agent's canonical `memory.md`. Reusable by design so several agents can be drained in a single Maggie session.
 
@@ -22,9 +24,10 @@ Input: `super-agents/<slug>/native-flush.md` (may be bare, or hold one or more v
 4. Place kept items into `memory.md`, honoring its ~10KB hot cap and rotation (`hooks/memory-rotation.md`). Overflow goes to archive, never into the cap.
 5. **Truncate `native-flush.md` back to bare** — restore its header and an empty dump zone. Clearing is the signal reset; a stale full intake lies exactly the way the shared queue does.
 6. Log the drain in Maggie's own log: which agent, what was placed, what was dropped and why, what was archived.
+7. ⚠️ **Report FLEET-FACT ROT found in the dump, do not just drop it** (added 2026-08-01 by the Steward, earned on the first real drain). A native cache is where stale claims about OTHER agents hide — who the steward is, who owns a lane, who reviews what. Those items fail the memory bar and get dropped, which is correct; but dropping them SILENTLY leaves the same error live in whatever files the dump already fed. Name them in the drain report and route them to the Fleet Steward.
 
 ## Boundaries
 
 - One curator holds the pen on a given agent's `memory.md` at a time (super-agent-base Concurrency rule).
 - Consolidation respects each bundle's own placement rules where it has them (e.g. Fiona's cap-earned placement rule).
-- Rolling `native-flush.md` out to every agent, and wiring this hook into Memory Maggie's bundle, is the Fleet Steward's call. This file is the shared spec they point at, not a change to Maggie's profile.
+- Rolling `native-flush.md` out to every agent, and wiring this hook into Memory Maggie's bundle, is the Fleet Steward's call — **Fleet Felix**. This file is the shared spec they point at, not a change to Maggie's profile.
