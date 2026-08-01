@@ -2,13 +2,15 @@
 
 **The core idea: separate the WHAT from the WHO from the WHEN.** A routine is a repeatable job whose *procedure* lives as a runbook file here. Any agent could execute it by reading the file and following it literally. **Routine Ricky** is simply the agent we point at it. The *schedule* lives in `schedule.md`, never in the runbook. Change a procedure = edit the runbook. Change a cadence = edit `schedule.md` (or just tell Ricky). Change the executor = swap the agent. Three concerns, three homes, none entangled.
 
-> 📌 **Where a finished run gets reported: [🧭 STANDING · Routine Ricky — Run Reports](https://app.clickup.com/t/86ajuhw1d).** One comment per invocation. See **Run reports** below. Added 2026-08-01 because two of the three active runbooks pointed `report-to:` at an "executor's reporting standard" that had never been written.
+> 📌 **Where a finished run gets reported: [🧭 STANDING · Routine Ricky — Run Reports](https://app.clickup.com/t/86ajuhw1d).** One comment per invocation. **The TEMPLATE for that comment is procedure and lives in the repo** — `brain-config/hooks/data-refresh.md` → Output template 2. See **Run reports** below. Added 2026-08-01 because two of the three active runbooks pointed `report-to:` at an "executor's reporting standard" that had never been written.
 
 ## 🚨 INVOKE-ONLY (LOCKED 2026-07-26, Michael)
 
 **No routine runs on its own. There is no timer, no wake, no background sweep.** The executor is a **git-teammate**, which by definition has no autonomous triggers — it runs when a session invokes it and never otherwise. The native ClickUp Super Agent that used to hold the clock is being removed.
 
 This is a real capability loss, stated plainly rather than papered over: **a routine is only as current as the last time Michael asked.** Everything below is written for that world. When reading anything in `routines/` that sounds like it assumes a clock, it is rot — flag it.
+
+**How to invoke** (full table in `brain-config/hooks/data-refresh.md` → Invocation syntax): a bare `Ricky` or `/refresh` **triages**; `/refresh run` executes everything due; `/refresh run -<routine>` executes everything due minus an exclusion; `/refresh run <routine>` executes a named set.
 
 ## Editing an executor agent — REQUIRED CHECK (do this before every executor edit)
 
@@ -25,12 +27,14 @@ This is a rule, not a suggestion. Before adding ANY instruction to an executor a
 
 > ⚠️ **Third sibling, learned 2026-08-01: run it on a RUNBOOK too.** A cross-routine problem fixed inside one runbook is a rule the other routines never inherit. Job Market grew a density floor, a sweep-depth standard and a mobile-output law that every future routine will want — all of them sitting in one file. When a runbook teaches a lesson that is not domain-specific, **promote it here** and leave the domain example behind.
 
+> ⚠️ **Fourth sibling, learned the same day: run it on a CLICKUP SURFACE too.** Procedure does not stop being procedure because it was typed into a task description instead of a file. A template, a format, a step list or a rule parked in a task has **no diff, no history, no review, and no way to be read by an agent that was pointed at the repo** — and it instantly becomes a second claimant on a truth the repo already owns. **ClickUp holds RECORDS (what happened); the repo holds PROCEDURE (how it is done).** Michael, 2026-08-01: *"template should live in repo as procedure notes. not clickup task scratch."*
+
 ## The contract
 
 - **Runbooks are the source of truth for the procedure** (the WHAT), and must be SELF-SUFFICIENT — any agent reads the runbook and knows exactly what to do, without inheriting behavior from a specific executor. Never put procedure in the agent; if it describes what/how the work is done, it lives here.
 - **Schedules live in `schedule.md`** (the WHEN), not in runbook specs.
 - **Stamps live in `routines/last-run/<routine>.txt`** (the STATE) — one file per routine, one writer per file, never a shared log. See `schedule.md` for the incident that locked this and the 2026-07-26 attempt to un-lock it.
-- **Run reports land on the standing thread** (the RECORD) — see Run reports below.
+- **Run reports land on the standing thread** (the RECORD); **their template lives in the repo** (the PROCEDURE) — see Run reports below.
 - ⚠️ **Runbook FRONTMATTER is metadata, never a switch (added 2026-08-01).** A `status:`, `enabled:`, `cadence:` or `last_run:` key in a runbook's YAML header is orientation for a reader and nothing more. **The row in `schedule.md` is the only ON/OFF switch and the only cadence** (LOCKED 2026-07-30). If frontmatter and the schedule table disagree, **the table wins and the frontmatter is rot** — fix it in the same pass. Never decide whether to run something by reading a runbook's own header.
 - **APPROVED DATA SURFACES ONLY.** A routine may only write *data*, never app source, engine, or structure. The rail exists to keep routines away from `index.html`, JS, CSS, README, and repo/list structure — it is NOT a ban on writing data objects that happen to live on another platform. Approved write surfaces:
   - **(a) Repo data files** (e.g. `data.json`, a state `.tsv`) — the primary store.
@@ -68,27 +72,22 @@ The stamp is the **only** input to the due-math. With no scheduler it is the ent
 
 ## 📮 Run reports — WHERE a finished run goes (LOCKED 2026-08-01, Michael)
 
-Two different things, two different homes. Confusing them is why `report-to:` rotted.
+Three different things, three different homes. Confusing them is why `report-to:` rotted.
 
 1. **Per-routine DETAIL** → wherever that runbook says. Job Market restates its whole inventory to its own standing thread; On Track and F1 report through their data commits. The runbook owns its detail surface and always has.
 2. **The ROLL-UP — what fired and how it went** → **[🧭 STANDING · Routine Ricky — Run Reports](https://app.clickup.com/t/86ajuhw1d)**, one comment per invocation. This is the answer to *"what has actually happened on the rounds?"*
+3. **The TEMPLATE for that roll-up** → **`brain-config/hooks/data-refresh.md` → Output template 2.** It is procedure, so it lives in the repo, versioned and reviewable.
 
-**Why a standing ClickUp task and not a repo file:** a ledger file with a row per run is the same single-writer shape that caused the 2026-07-05 stamp race and got rebuilt-and-deleted again on 07-26. Comments are append-only, per-session, phone-readable, and cannot clobber each other. **Do not build a run-log file. Do not create a second report task.**
+**Why a standing ClickUp task and not a repo file, for the RECORD:** a ledger file with a row per run is the same single-writer shape that caused the 2026-07-05 stamp race and got rebuilt-and-deleted again on 07-26. Comments are append-only, per-session, phone-readable, and cannot clobber each other. **Do not build a run-log file. Do not create a second report task.**
 
-**The template lives on the task itself** so it can be edited without a commit. Shape, for orientation only:
+**Why the repo and not the task, for the TEMPLATE:** <s>the template lives on the task itself so it can be edited without a commit.</s> **Reversed 2026-08-01, hours after it was written** — Michael: *"template should live in repo as procedure notes. not clickup task scratch."* "Editable without a commit" is the defect, not the feature: a format with no diff, no history and no review rots invisibly, and a copy in each home makes two claimants on one truth. **Never restate the template in the task description.** If the task and the repo ever disagree, the repo wins and the task is corrected.
 
-```
-🔄 RUN REPORT · <date/time ET> · <n> routines · invoked by <who>
-✅/⚠️/❌/⏭️ <routine> — <one clause> · <link> · stamped <HH:MM>
-Left standing: <due routines not attempted, and why>
-Next due: <routine> — <when>
-Ledger: <source behavior / cadence honesty worth remembering>
-```
+**The split, in one line: ClickUp holds the RECORD, the repo holds the PROCEDURE.**
 
-- **Triage does not post here.** Triage proposes and stops; it is a conversation, not a run. No run, no comment.
+- **Triage does not post to the thread.** Triage proposes and stops; it is a conversation, not a run. No run, no comment.
 - **Every line links to its real artifact.** A count with no link is a rumor.
-- **`Left standing` is mandatory** whenever something due was not attempted. A report listing only what ran implies nothing else was due.
-- **Any agent that runs a routine posts here**, not just Ricky. Same standard, same thread.
+- **`Left standing` is mandatory** whenever something due was not attempted — including anything excluded by the invocation.
+- **Any agent that runs a routine posts there**, not just Ricky. Same template, same thread.
 
 ---
 
