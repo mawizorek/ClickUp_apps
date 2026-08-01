@@ -13,3 +13,4 @@
 # what the repo now says. A filename alone could not tell you that.
 #
 2026-07-31T23:33:00Z applied-by-hand-no-sha inciardi-collection/db/migrations/000-collection-kind.sql
+2026-08-01T16:51:55Z 90c96418985b6f3bccbaa9d668702ef0bfdf8cfd290527549afd2ccc6cf54e5d inciardi-collection/db/migrations/001-photos-and-groupings.sql
