@@ -3,16 +3,16 @@
  * The gate, the dispatch table, and the writes for artwork / copy / slot.
  *
  * ============================================================================
- * FIVE FILES. This one is the door; the rest are rooms.
+ * SIX FILES. This one is the door; the rest are rooms.
  *
  *   worker.js  — CORS, the write-key gate, the dispatch table, artwork/copy/slot writes
  *   reads.js   — seven GETs. No auth, no mutation, no shared state
- *   images.js  — the photo pipe: upload, serve, list, assign, set-primary, archive
+ *   images.js  — the BYTE layer: upload, serve, list. Touches R2
+ *   links.js   — the three JSON writes over `edition_image`: assign, primary, archive
  *   adopt.js   — the one-off passes: the legacy 177 import, and the bucket diagnostic
  *   sheets.js  — binder mechanics: create, rename, reorder a sheet
  *
- * 📏 ~16KB against a ~22KB practical ceiling (base64 inflates 4/3 against a ~30KB read cap).
- * That is real headroom for the first time since v7 — and it was bought twice in one day.
+ * 📏 ~17KB against a ~22KB practical ceiling (base64 inflates 4/3 against a ~30KB read cap).
  * ⚠️ THE RULE THAT KEEPS IT: MEASURE THIS FILE BEFORE YOU WRITE INTO IT. On 2026-08-01 it went
  * 21,169 → 24,503 bytes purely on comment weight, in the same commit that fixed `images.js` for
  * the identical mistake. Two breaches, one session, both invisible until the byte count was
@@ -52,6 +52,7 @@
 
 import { handleRead, READ_ROUTES } from './reads.js';
 import { handleImage, IMAGE_ROUTES } from './images.js';
+import { handleLink, LINK_ROUTES } from './links.js';
 import { handleAdopt, ADOPT_ROUTES } from './adopt.js';
 import { handleSheet, SHEET_ROUTES } from './sheets.js';
 
@@ -156,7 +157,7 @@ export default {
         if (read) return read;
       }
 
-      /* ================= IMAGES — images.js + adopt.js =================
+      /* ================= BYTES — images.js + adopt.js =================
        *
        * 🔴 THIS DISPATCH MUST STAY ABOVE THE BODY PARSE BELOW. NOT A STYLE CHOICE.
        * `await request.json()` CONSUMES THE REQUEST STREAM, and an upload's body is BYTES.
@@ -180,6 +181,16 @@ export default {
       if (isWrite) {
         try { body = await request.json(); } catch (e) { body = {}; }
       }
+
+      /* 🔴 links.js DISPATCHES HERE, AFTER THE PARSE — THE EXACT MIRROR OF images.js ABOVE.
+       * Its bodies really are JSON, so it needs `body`; dispatched early it would be handed an
+       * unread stream, see `{}` on every call, and silently reject every assign as "image_id
+       * and edition_id are both required". One module must run BEFORE the parse because its
+       * body is bytes, one must run AFTER because its body is JSON, and both fail QUIETLY in
+       * the wrong slot. Both headers state their own position rather than leaving it to be
+       * inferred from the order of these lines. */
+      const linked = await handleLink({ db, all, reply, body, path, method, t });
+      if (linked) return linked;
 
       // Binder mechanics — sheets.js. JSON bodies, so this dispatches AFTER the parse.
       const sheet = await handleSheet({ db, all, write, reply, body, path, method, t });
@@ -309,11 +320,12 @@ export default {
         return write('DELETE FROM slot WHERE slot_id = ?', [id]);
       }
 
-      /* The route list spans FIVE files, so it is CONCATENATED rather than retyped. A hardcoded
+      /* The route list spans SIX files, so it is CONCATENATED rather than retyped. A hardcoded
        * copy here would be a second claimant on "which routes exist" and would rot the first
        * time a route is added next door. */
       return reply({ error: 'no route for ' + method + ' ' + path,
-                     routes: READ_ROUTES.concat(WRITE_ROUTES, SHEET_ROUTES, IMAGE_ROUTES, ADOPT_ROUTES) }, 404);
+                     routes: READ_ROUTES.concat(WRITE_ROUTES, SHEET_ROUTES, IMAGE_ROUTES,
+                                                LINK_ROUTES, ADOPT_ROUTES) }, 404);
 
     } catch (e) {
       // Loud, not silent. A 500 that pretends to be an empty result is the failure mode
