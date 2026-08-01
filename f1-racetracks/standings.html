@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <!-- INFRASTRUCTURE: slim loader shell. SEGMENTED app: styling in source/standings/*.css, logic in source/standings/*.js. Every file under the 12KB soft cap. Never inline this back into one file. -->
-<!-- DATA: modules fetch the canonical per-round store at ./f1-results/2026/ (index_rounds.json + round files). No data duplicated here. -->
+<!-- DATA: results come from the canonical per-round store at ./f1-results/2026/ (index_rounds.json + round files). The CALENDAR (round number, name, date, how many rounds the season has) comes from season/2026/index_weekends.json via source/08_season.js. No data duplicated here. -->
 <!-- v6.1: nav model — Weekend is a per-round drill-through, switcher is Matrix / History / Circuits. -->
 <!-- v6.3: cohesion pass — standings palette + ease unified to the shared hue-268 system; shared F1 brand lockup added to the nav appbar; suave stage-reveal on view swap. -->
 <!-- v6.4: matrix density — row/header/type/team-bar/WCC tightened so more drivers show per screen. ?v bumped across modules. -->
 <!-- v6.5: seamless cross-lens nav — cross-document View Transitions (cross-fade instead of hard reload) + persistent F1 brand morph shared with the circuits lens. -->
 <!-- v10 (history feed): history.js restyled into a social/activity feed (timeline + post cards, no side-stripe). Module + css ?v bumped 6.5 -> 6.6 so clients refetch; footer stamp -> v6.6. -->
 <!-- v6.7: driver popup race-pace strip now reads REAL per-driver fastLap {time,lap} from the store (backfilled r1-9) with the lap number + round-FL purple pip; stale illustrative note refreshed. panel.js ?v 6.6 -> 6.7; footer stamp -> v6.7. -->
+<!-- v13 (2026-08-01): SEASON LAYER. source/08_season.js loads FIRST and gives this surface the derived calendar — round numbers, names, dates and the season length — so nothing time-shaped is read out of a round file any more. Fixes a dead NaN sort left by v11 and a hardcoded "/ 22" that went wrong when the season became 23 rounds. All module ?v tokens bumped to 13. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -17,8 +18,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/standings/base.css?v=6.6">
-<link rel="stylesheet" href="source/standings/panel.css?v=6.6">
+<link rel="stylesheet" href="source/standings/base.css?v=13">
+<link rel="stylesheet" href="source/standings/panel.css?v=13">
 <style>
   html{background:oklch(0.16 0.012 268)}
   /* seamless cross-lens navigation: same-origin cross-document view transitions
@@ -64,11 +65,12 @@
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
 
-  <script src="source/standings/data.js?v=6.6"></script>
-  <script src="source/standings/matrix.js?v=6.6"></script>
-  <script src="source/standings/trajectory.js?v=6.6"></script>
-  <script src="source/standings/panel.js?v=6.7"></script>
-  <script src="source/standings/nav.js?v=6.6"></script>
-  <script src="source/standings/history.js?v=6.6"></script>
+  <script src="source/08_season.js?v=13"></script>
+  <script src="source/standings/data.js?v=13"></script>
+  <script src="source/standings/matrix.js?v=13"></script>
+  <script src="source/standings/trajectory.js?v=13"></script>
+  <script src="source/standings/panel.js?v=13"></script>
+  <script src="source/standings/nav.js?v=13"></script>
+  <script src="source/standings/history.js?v=13"></script>
 </body>
 </html>

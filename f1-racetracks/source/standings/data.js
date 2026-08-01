@@ -1,7 +1,18 @@
 /* data.js — fetch the canonical per-round store, compute standings, shared helpers.
  Loaded first; defines globals used by matrix.js, trajectory.js and panel.js. No data
  duplicated: verified results live in ./f1-results/2026/ (nested under the app).
- Index file: index_rounds.json (renamed from index.json 2026-07-09). */
+ Index file: index_rounds.json (renamed from index.json 2026-07-09).
+
+ ⚠️ v13 (2026-08-01) — THE CALENDAR IS NOT IN THIS STORE. A round's NUMBER, NAME and DATE
+ come from the weekend vector (season/2026/index_weekends.json) via source/08_season.js,
+ joined BY SLUG. The round file's own stored round/name/date are the FALLBACK, used only when
+ the season layer is unreachable — which is what lets those three fields be deleted from the
+ round files without this surface changing. Never join on a round number: it is derived from
+ calendar position and shifts when a round is inserted or cancelled (Decision Log J9 ruling 4).
+
+ Also fixed here: the manifest used to be ordered with (a,b)=>a.round-b.round, and v11 reduced
+ manifest rows to {slug,file}. That comparison has been NaN ever since; it stayed harmless only
+ because the rows are written in date order. Ordering now happens after the season join. */
 const APP_VERSION='v6.0';
 const DATA_BASE='f1-results/2026/';
 const DATA_INDEX='index_rounds.json';
@@ -33,17 +44,44 @@ const renderStory=(keys,row)=>keys.map(k=>(STORY[k]||k).replace("{grid}",row.gri
    compute-once law the README already states: positionsGained is DERIVED (grid - pos),
    never stored. Full finding: F1 Racetracks App — Decision Log, W1 (2026-07-28). */
 
-/* shared mutable state */
-let ROUNDS=[],DRV={},STANDINGS=[],sortMode='champ';
+/* shared mutable state. SEASON_TOTAL = how many rounds the CALENDAR holds (23 in 2026), which
+   is not the same as ROUNDS.length (how many have been raced and have a results file). It is
+   null when the season layer is unavailable, and consumers must render nothing rather than a
+   guess in that case. */
+let ROUNDS=[],DRV={},STANDINGS=[],sortMode='champ',SEASON_TOTAL=null;
 const FIRST=id=>(DRV[id].name).replace("Andrea Kimi ","").split(" ")[0];
 const LAST=id=>{const n=DRV[id].name;return n==="Andrea Kimi Antonelli"?"Antonelli":n.split(" ").slice(-1)[0];};
 const codeOf=rd=>(rd.name.match(/\b([A-Z]{3})\b/)||[])[1]||rd.slug.slice(0,3).toUpperCase();
 
+/* The season calendar, or null. Never throws — this lens is the championship table, and a
+   calendar outage must cost round LABELS, never the standings themselves. */
+async function seasonCalendar(){
+ if(!window.F1Season||!window.F1Season.ready) return null;
+ try{ return await window.F1Season.ready; }
+ catch(e){ console.error('[standings] season layer unavailable — round number, name and date fall back to the round file.',e); return null; }
+}
+
+/* Join one round file to its weekend row, by slug. Vector wins, round file is the fallback. */
+function withSeasonMeta(rd,mf,cal){
+ if(!rd) return null;
+ const slug=rd.slug||(mf&&mf.slug)||null;
+ const w=(cal&&cal.bySlug&&slug)?cal.bySlug[slug]:null;
+ return Object.assign({},rd,{
+  slug:slug,
+  round:(w&&w.round!=null)?w.round:rd.round,
+  name:(w&&w.name)?w.name:rd.name,
+  date:(w&&w.raceDate)?w.raceDate:rd.date
+ });
+}
+
 async function load(){
  try{
+ const cal=await seasonCalendar();
  const idx=await fetch(DATA_BASE+DATA_INDEX,{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.json();});
- const files=idx.rounds.sort((a,b)=>a.round-b.round);
- ROUNDS=await Promise.all(files.map(f=>fetch(DATA_BASE+f.file.replace('./',''),{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.json();})));
+ const manifest=(idx.rounds||[]);
+ const loaded=await Promise.all(manifest.map(f=>fetch(DATA_BASE+f.file.replace('./',''),{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.json();})));
+ ROUNDS=loaded.map((rd,i)=>withSeasonMeta(rd,manifest[i],cal)).filter(Boolean).sort((a,b)=>(a.round||0)-(b.round||0));
+ SEASON_TOTAL=(cal&&Array.isArray(cal.weekends)&&cal.weekends.length)?cal.weekends.length:null;
  compute();
  render();
  // Publish that the season is loaded so lenses mounted after this (e.g. history.js)
