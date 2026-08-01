@@ -30,7 +30,8 @@
 
 ### 2026-08-01 — Born
 
-Session task: [Fleet Felix (Opus 5) · Build Realty Riley](https://app.clickup.com/t/86ajul4xm)
+Session task (Agent Activity Board, by TITLE — never a hand-typed id):
+`Fleet Felix (Opus 5) · Build Realty Riley — real-estate business owner + Milo's counterpart · Aug 1`
 
 - ~3:00 PM · Built by Fleet Felix. Lane: real-estate business ops, all of it, as Milo's structural
   counterpart. Scope ruled by Michael the same afternoon.
