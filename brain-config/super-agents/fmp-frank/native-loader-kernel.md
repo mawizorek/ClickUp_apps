@@ -1,8 +1,8 @@
 # native-loader-kernel.md — Thin-Kernel Native Shell Instruction (REFERENCE)
 
-**Status: LANDED 2026-08-01 as the reference conversion (authored by FMP Fiona at Michael's direction).** This is the reference template for converting a native ClickUp agent shell into a thin repo loader — the "brain in the repo, body in ClickUp" pattern. `fmp-frank` is the FIRST fully-converted example; Milo and Listing Lookout copy this shape. Supersedes the DRAFT that was in PR #653.
+**Status: LANDED 2026-08-01 as the reference conversion (authored by FMP Fiona at Michael's direction). ✅ RATIFIED 2026-08-01 by Fleet Felix (Fleet Steward) as the fleet-wide reference template.** This is the reference template for converting a native ClickUp agent shell into a thin repo loader — the "brain in the repo, body in ClickUp" pattern. `fmp-frank` is the FIRST fully-converted example; Milo and Listing Lookout copy this shape. Supersedes the DRAFT that was in PR #653.
 
-**This file is the spec; the live conversion is an `edit_self` / UI change to the native shell.** Fleet rollout beyond `fmp-frank` — and any wiring into other agents' bundles — is the Fleet Steward's (Corey's) call. See the companion procedure: [`../_shared/native-to-git-conversion-runbook.md`](../_shared/native-to-git-conversion-runbook.md).
+**This file is the spec; the live conversion is an `edit_self` / UI change to the native shell.** Fleet rollout beyond `fmp-frank` — and any wiring into other agents' bundles — is the **Fleet Steward's (Fleet Felix's)** call. ~~the Fleet Steward's (Corey's) call~~ ⚠️ **CORRECTED 2026-08-01 (steward edit by Fleet Felix, at Michael's explicit direction):** ClickUp Coach Corey was **re-laned OFF the Fleet Steward lane on 2026-07-20 (PR #430)** and now owns URITP workspace structure + ClickUp-setup coaching. **Fleet Felix has been the Fleet Steward since 2026-07-20.** Struck rather than deleted so the misattribution stays visible — it was inherited from Fiona's own stale cache (`native-flush.md` SOURCE PAGE 2 still names Corey as steward) and it reached three files in one day. See the companion procedure: [`../_shared/native-to-git-conversion-runbook.md`](../_shared/native-to-git-conversion-runbook.md).
 
 ---
 
@@ -55,6 +55,7 @@ The one hard rule of a thin loader is **graceful degradation**: if the brain can
 - **No memory locking.** A native shell has no session-board equivalent; concurrent runs touching the same page are last-write-wins. The repo side has session-board + Concurrency rules; the native side does not get them for free. Mitigation for now: drive the agent one thread at a time.
 - **Context cost.** Reading repo files each run spends budget. Acceptable for a specialist consulting lane; heavier for an orchestration-heavy agent.
 - **Bootstrap brittleness.** The whole pattern rests on the GitHub read succeeding. The STOP rule is the safety valve.
+- ⚠️ **A converted shell inherits a STALE-CACHE hazard on the way IN, not just on the way out.** The very cache this pattern exists to kill is what produced the Corey misattribution above: Fiona's pre-conversion native memory named the 07-15-era steward, and the conversion carried that fact forward into three brand-new files before anyone read it against the fleet. **Precondition #1 (diff the git brain against live native) must be run against FLEET FACTS too — steward, lane owners, seams — not just the agent's own role.**
 
 ---
 
@@ -62,4 +63,4 @@ The one hard rule of a thin loader is **graceful degradation**: if the brain can
 
 - `fmp-frank` is the reference (converted 2026-08-01). Milo and Listing Lookout copy this file's shape, swapping identity + bundle paths.
 - Before any shell is actually reduced to the kernel, its repo brain (`preferences.md` + `memory.md`) must be confirmed current and its `native-flush.md` must exist.
-- Fleet-wide application + any wiring into other agents' bundles is the Fleet Steward's domain.
+- Fleet-wide application + any wiring into other agents' bundles is the **Fleet Steward's (Fleet Felix's)** domain.
