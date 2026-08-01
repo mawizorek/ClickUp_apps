@@ -19,10 +19,17 @@
   <div id="phBar" class="ph-bar"></div>
   <div id="phGrid" class="ph-grid"></div>
 
+  <!-- ⚠️ THE SCRIM IS NOT OPTIONAL, AND ITS ABSENCE WOULD HAVE FAILED SILENTLY. `Drawer.open()`
+       in core.js reaches for `#pageScrim` and guards with `if (s)` — so a page that omits the
+       element gets a drawer with no backdrop and no tap-outside-to-close, on this screen only,
+       with no error anywhere. Same element and same class as binder.html; `.page-scrim` is
+       already styled in base.css, so nothing is invented here. -->
+  <button class="page-scrim" id="pageScrim" hidden aria-label="Close"></button>
+
   <!-- ONE drawer, reused for whichever photo was tapped. `.page-drawer` is the class
        `Drawer.closeAll()` looks for, so a route change or any other drawer opening closes this
-       one automatically — that is why it is not a bespoke panel. -->
-  <div id="phDrawer" class="page-drawer ph-drawer" hidden>
+       one automatically — which is why it is not a bespoke panel. -->
+  <aside id="phDrawer" class="page-drawer ph-drawer" hidden aria-label="Photo">
     <div id="phDrawerBody"></div>
-  </div>
+  </aside>
 </section>
