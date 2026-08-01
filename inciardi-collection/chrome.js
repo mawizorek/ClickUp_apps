@@ -117,11 +117,12 @@
   /* ---------- left: the page menu ----------
    * No item ceiling. A fifth route costs one line of config, where the old inline header would
    * have wrapped.
-   * ⚠️ DRAWN FROM `cfg.nav` ONLY, never from `cfg.hidden`. That is the entire mechanism by which
-   * an unlisted route stays out of the menu — there is no "is it secret" flag anywhere else, and
-   * adding one would be a second place for the answer to live. Hidden routes surface in the
-   * SETTINGS panel instead (see the block in settings.js), which is deliberate: quiet, but
-   * reachable without an address bar.
+   * ⚠️ DRAWN FROM `cfg.nav` ONLY, never from `cfg.hidden` or `cfg.detail`. That is the entire
+   * mechanism by which an unlisted route stays out of the menu — there is no "is it secret" flag
+   * anywhere else, and adding one would be a second place for the answer to live. Hidden routes
+   * surface in the SETTINGS panel instead (see the block in settings.js), which is deliberate:
+   * quiet, but reachable without an address bar. DETAIL routes surface NOWHERE — they need a
+   * param, so a menu row pointing at one would always be broken.
    * The head carries the WORDMARK rather than the word "Menu": the header stopped saying which
    * app this is when the page title took the centre, and a menu is the natural place for
    * identity. The panel is still labelled "Menu" to assistive tech via aria-label. */
@@ -207,11 +208,16 @@
     init: function (c) {
       cfg = c;
       /* route -> label, so setActive can retitle without re-walking the config every time.
-       * HIDDEN routes are titled here TOO, and only here. setActive falls back to the app name
-       * for a route it cannot name, so an unlisted page would otherwise open with the wrong
-       * title in both the header and the browser tab — which reads as a half-broken load rather
-       * than a deliberately quiet page. Titled, still not in the MENU: buildNav takes `c.nav`. */
-      c.nav.concat(c.hidden || []).forEach(function (n) { titles[n.route] = n.label; });
+       * HIDDEN and DETAIL routes are titled here TOO, and only here. setActive falls back to the
+       * app name for a route it cannot name, so an unlisted or detail page would otherwise open
+       * with the wrong title in both the header and the browser tab — which reads as a
+       * half-broken load rather than a deliberately quiet page. Titled, still not in the MENU:
+       * buildNav takes `c.nav` alone.
+       * ⚠️ A DETAIL route's label is GENERIC by necessity — "Print", not the print's name — because
+       * this map is built once at init and cannot know a param. The specific name is the <h1> in
+       * the content area, which is why artwork.js renders one. */
+      c.nav.concat(c.hidden || []).concat(c.detail || [])
+        .forEach(function (n) { titles[n.route] = n.label; });
       buildHeader(c); buildScrim(); buildNav(c); buildSettings(c); buildFooter(c);
     },
     /* One call per route change, from the router. It marks the nav row AND writes the page title
