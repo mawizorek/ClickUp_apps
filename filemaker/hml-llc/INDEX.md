@@ -1,81 +1,37 @@
-# HML_LLC — the file, as a menu
+# ⛔ MOVED — HML_LLC documentation lives in `maw-prose` (private)
 
-**This tree mirrors FileMaker's own *Manage* menu.** Open a folder here and you should be looking at the same thing you see in the IDE. Scrollable on a phone; every folder carries an `_index.json` the viewer reads.
+**Do not edit anything in this folder. Do not treat anything in it as current.**
 
-> 🥇 **START HERE → [BUILD-SHEET.md](./BUILD-SHEET.md)** — the one page to open before a build session.
->
-> **STATE stamps:** every page carries 🥇 GOLDEN (target) · 🔨 BUILT (verified in the file, dated) · ⛔ SUPERSEDED (do not implement). An unstamped page is a bug.
+Live home: **`mawizorek/maw-prose` → `apps/hml-llc/`**. Start at that package's `build-sheet.md`.
 
 ---
 
-## 🗄️ Manage → Database → Tables (`tables/`)
+## Why it moved
 
-| Table | Grain — one record means… | Role | State |
-|---|---|---|---|
-| [GLOBAL_USE_VARIABLES](./tables/GLOBAL_USE_VARIABLES.md) | one record, ever — app state + current selection | singleton | 🔨 |
-| [PropertySUMMARIES](./tables/PropertySUMMARIES.md) | one piece of real collateral. NOT a deal, NOT a loan | collateral | 🔨 |
-| [Loans](./tables/Loans.md) | one note with its own terms — **the financial parent** | servicing-parent | 🔨 |
-| [ExpectedTransactions](./tables/ExpectedTransactions.md) | one thing the borrower **owes**, on a date. A promise | ledger | 🔨 |
-| 🆕 [**ReceivedFunds**](./tables/ReceivedFunds.md) | one **real-world cash event** — what the bank saw. Never split | receipt-parent | 🥇 |
-| [AccountTransactions](./tables/AccountTransactions.md) | one line on a borrower-facing statement. A **projection** | ledger | 🔨 |
-| [PaymentApplications](./tables/PaymentApplications.md) | one act of assigning $X of a receipt to one owed item | join | 🔨 |
-| [Payoffs](./tables/Payoffs.md) | one quote that was **sent to a human**. Frozen | snapshot | 🔨 |
-| [PaymentInstructions](./tables/PaymentInstructions.md) | one reusable "how to pay us" block. Row-based | source | 🥇 |
-| [Standard_Transactions](./tables/Standard_Transactions.md) | one **kind** of money movement. Taxonomy | taxonomy | 🔨 |
-| [Documents](./tables/Documents.md) · [Organizations](./tables/Organizations.md) · [Contacts](./tables/Contacts.md) | — | party / document | 🥇 out of v1 |
+Two reasons, and the second one is not a filing preference.
 
-**`ReceivedFunds` is the tenth table**, approved 2026-07-29 (DL Q8). It closed a six-week disagreement between the locked schema (9 tables) and the locked script order (which required 10), **and** it is the single-parent record the FMP19 rollback pattern needs.
+**The documentation belongs with the documentation.** `maw-prose` is the repo for authored text; this one is for code that runs, gets served, or gets loaded by an agent. A FileMaker schema is neither.
 
-⚠️ **`PropertyExpectations` exists in the live file (~14 calc fields) but is NOT in the stack.** Unconfirmed, likely absorbed into `Loans` calcs. Do not delete, do not build against it. See `tables/_index.json` → `notInStack`.
+🔴 **This repo is PUBLIC and the fixture leaked a real name twice in three days.** On 2026-07-29 a payee name and a payment handle shipped in `PaymentInstructions.tsv`, copied out of a ClickUp doc. On 2026-07-31, during the migration, **the same name was found still live in `Payoffs.tsv` → `frozen_PaymentInstructionSnapshot`** — two days after the source was scrubbed, because a frozen snapshot field exists precisely so that later edits to its source do not propagate. The schema feature being demonstrated is the feature that defeated the remediation.
 
-## 🔗 Manage → Database → Relationships (`relationships/`)
+Both are scrubbed at HEAD. ⚠️ **The original values remain in this repo's git history and always will unless it is rewritten.** Moving the folder prevents the next leak; it does not undo these two.
 
-Loan-first graph. → [relationships/README.md](./relationships/README.md) + `_index.json`
+## What is different over there
 
-⚠️ The transaction relationship for rollback is `ReceivedFunds.PrimaryKey ← AccountTransactions.fkReceivedFunds`. **Every multi-record write flows through it.**
+The machine mirrors did not travel. `schema/*.json` and every `_index.json` are retired — their content folded into the notes that replaced them, because `maw-prose` forbids a viewer and an index nobody reads drifts against the prose until one of them is wrong and you cannot tell which.
 
-## 🧮 Manage → Database → Fields → calculations (`calculations/`)
+`meta/` dissolved; those files sit at package root. **Mirrored folders are the app, root files are prose about the app.**
 
-One `.fmcalc` per calc field — pastes back into the calculation dialog verbatim. → `calculations/_index.json`
+Everything else is the same shape: `tables/`, `scripts/`, `relationships/`, `calculations/`, `functions/`, `layouts/`, `value-lists/`, `fixtures/`.
 
-## 📜 Manage → Scripts (`scripts/`)
+## What stays in ClickUp, permanently
 
-**Eleven folders, matching the real Script Workspace:** `00_APP` · `10_UI` · `20_NAV` · `30_CONTEXT` · `40_BINDER` · `50_RECEIPTS` · `60_PAYMENTS` · `70_SCHEDULE` · `80_PAYOFF` · `90_ADMIN` · `zz_DEV_ARCHIVE` → [scripts/README.md](./scripts/README.md)
+**The HML_LLC FileMaker v1 Decision Log.** Not a holdout — a correctness constraint. The log runs on inverted-polarity checkboxes and in markdown `- [ ]` is inert text, so a question in a repo cannot be answered without hand-editing a file through the GitHub UI. **Do not "finish the migration" by moving it.**
 
-⚠️ **CORRECTED 2026-07-29.** The old tree used `imports/navigation/triggers/utilities` and the README *claimed* those matched the file. They matched nothing. **Seven scripts are now stamped `superseded`** with reasons inline in `scripts/_index.json`.
+## Why these folders are still here
 
-## ƒ Manage → Custom Functions (`functions/`)
+`docs/` and `schema/` are deleted, on Michael's ruling. The rest is left in place rather than swept, because **deleting a source before its replacement is verified is how content actually gets lost** — and the verification here was reading every file during the move rather than trusting a file count.
 
-→ [functions/README.md](./functions/README.md) · [MSG_ValueListErrors](./functions/MSG_ValueListErrors.md)
+That caution earned its keep twice in one pass. `tables.json` turned out to be the **only** home for fifteen calculation-field definitions that both table notes explicitly deferred to; retiring it first would have deleted the loan math silently. And `ReceivedFunds` — the tenth table, approved 07-29 — was **absent from `tables.json` entirely**, so the registry was already wrong before anyone decided to retire it.
 
-## 🖼️ Manage → Layouts (`layouts/`)
-
-→ [layouts/README.md](./layouts/README.md). v1 builds three: **Loan hub** (two portals — the month-of-work screen), **Property hub** (`Loans` portal), **Payoff print** (read-only, no portal).
-
-## 📋 Manage → Value Lists (`value-lists/`)
-
-→ [value-lists/README.md](./value-lists/README.md)
-
----
-
-## 🧪 Fixtures (`fixtures/`)
-
-**[golden-month/](./fixtures/golden-month/)** — one worked month, nine TSVs, keys threading through every file. Referential consistency is the proof; deliberately ugly. **Acceptance test: unapplied cash = exactly $850.00 traceable to `RCPT-004`.**
-
-🔑 Read its README first — an as-is import destroys every FK and **fails quietly**.
-
-## 📝 Meta / narrative (`meta/`)
-
-[design-decisions](./meta/design-decisions.md) · [architecture-notes](./meta/architecture-notes.md) · [data-standards](./meta/data-standards.md) · [calculation-fields](./meta/calculation-fields.md) · [schema-notes](./meta/schema-notes.md) · [import-export-specs](./meta/import-export-specs.md) · [database-graph-log](./meta/database-graph-log.md) · [changelog](./meta/changelog.md)
-
----
-
-## What is NOT here, and why
-
-**Decisions and open questions live in ClickUp** — the *HML_LLC FileMaker v1 — Decision Log*. That is the one deliberate exception to "FMP docs live in git," and it is a correctness constraint, not a preference: the log runs on **inverted-polarity checkboxes** (checked = rejected), and in markdown `- [ ]` is inert text, so a question there literally cannot be answered.
-
-**Everything else moved out of ClickUp 2026-07-29** on Michael's ruling. The old ClickUp pages are pointer stubs; `docs/` here holds legacy stubs so old links don't break.
-
-<br/>
-
-**Open:** `tbl_*` object family for table-view columns (DL Q7) · the `utilities` script-folder divergence · the three-table naming lock (0 of 6).
+Sweeping the rest is a separate call.
