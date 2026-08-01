@@ -1,4 +1,4 @@
-/* 08_season.js — THE SEASON DERIVATION LAYER (new 2026-08-01).
+/* 08_season.js - THE SEASON DERIVATION LAYER (new 2026-08-01).
 
    WHY THIS FILE EXISTS. Round numbers, weekend status, the short display date and the
    current/last round pointers used to be STORED, by hand, in two different files that
@@ -9,8 +9,11 @@
    flexible for per year changes but also mid year... more data in the display should be
    derivable, especially if it has to do with state or time tracking."
 
-   WHAT IT DOES. Loads the two static vectors — the WEEKEND join (season/<year>/index_weekends.json)
-   and the CIRCUIT index (circuits/index_circuits.json) — and derives everything time-shaped:
+   WHAT IT DOES. Loads the static vectors and derives everything time-shaped:
+
+     WEEKENDS  season/<year>/index_weekends.json  - the calendar (one row per race weekend)
+     CIRCUITS  circuits/index_circuits.json       - a slug -> file map of timeless identity
+     SEATS     season/<year>/index_drivers.json   - driver x team x season, plus the team register
 
      round                     = position in date order (1-based)
      status                    = done / active / pending, from the session-date window
@@ -26,7 +29,7 @@
    The stable handles are `slug` and `cuTaskId`.
 
    THE `active` WINDOW (ruled 2026-08-01, Decision Log J9 ruling 3): a weekend is active from
-   00:00 on its FIRST session date to 23:59 on its RACE date, in the CIRCUIT'S OWN TIMEZONE —
+   00:00 on its FIRST session date to 23:59 on its RACE date, in the CIRCUIT'S OWN TIMEZONE -
    so a weekend flips live on Friday morning at the track, not at midnight wherever the viewer
    happens to be. Sessions are stored date-only, so the comparison is done on YYYY-MM-DD
    strings against "today" rendered in that zone. Two passes, one implementation:
@@ -35,20 +38,37 @@
    The zone-less pass can only ever be off by a few hours at a day boundary, and it is never
    the value the user sees on a circuit card.
 
+   THE SEAT VECTOR (added 2026-08-01, Decision Log J10). `teamColor()` and `seatFor()` resolve
+   the two things every surface was previously deriving from display strings: a team's colour
+   (was a hand-keyed literal map inside module 09 that resolved 7 of 11 teams) and a driver's
+   short name (was `name.split(/\s+/).slice(-1)`). Loaded INSIDE `ready` but behind a catch, so
+   a drivers-vector failure costs colour and short names and never the app itself.
+
+   🎨 An unresolved team colour WARNS ONCE and falls back to the neutral tone. It never fails
+   silently - a silent fallback is how four teams rendered grey for months with nothing saying so.
+
    CONSUMERS. 12_results_store.js (current/last round pointers) and 09_app_bootstrap_and_home.js
-   (the whole calendar). Both await F1Season.ready. Fails soft: if either vector is unreachable
-   the promise rejects and the consumers fall back to their own error paths.
+   (the whole calendar, plus teamTone/lastName). Both await F1Season.ready.
 
    Loaded FIRST in circuits.html, before 12 and 09. Everything is wrapped in an IIFE because the
-   source modules are classic scripts sharing one global scope — the ONLY global this file adds
+   source modules are classic scripts sharing one global scope - the ONLY global this file adds
    is `window.F1Season`. */
 (function () {
   'use strict';
 
   var YEAR = '2026';
   var WEEKENDS_URL = 'season/' + YEAR + '/index_weekends.json';
+  var DRIVERS_URL = 'season/' + YEAR + '/index_drivers.json';
   var CIRCUIT_INDEX_URL = 'circuits/index_circuits.json';
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  /* The neutral tone an unresolved team falls back to. Matches the pre-2026-08-01 behaviour
+     exactly, so this change moves WHERE colour comes from without changing what renders. */
+  var NEUTRAL_TONE = '#D7DCE4';
+
+  var teamTones = {};
+  var seatsById = {};
+  var warnedTeams = {};
 
   /* Sorted ISO date strings for a weekend. First = weekend opens, last = the race. */
   function sessionDates(w) {
@@ -88,6 +108,27 @@
     return 'active';
   }
 
+  /* Team colour from the SEAT vector's team register. An unresolved team warns ONCE and takes
+     the neutral tone. Four teams (Aston Martin, Audi, Haas, Cadillac) are null on purpose as of
+     2026-08-01 - see the colour_note on each row; picking brand colours is Michael's call. */
+  function teamColor(team) {
+    var key = String(team || '');
+    var tone = teamTones[key];
+    if (tone) return tone;
+    if (key && !warnedTeams[key]) {
+      warnedTeams[key] = true;
+      console.warn('[F1Season] no colour for team "' + key + '" - using the neutral tone. Add it to season/' + YEAR + '/index_drivers.json ▸ teams.');
+    }
+    return NEUTRAL_TONE;
+  }
+
+  /* The season seat for a driverId: { driverId, driver, short, team }. Null when unknown - a
+     caller that gets null should fall back to what the classification row already carries,
+     never invent one. */
+  function seatFor(driverId) {
+    return seatsById[String(driverId || '')] || null;
+  }
+
   function derive(payload) {
     var rows = (payload && Array.isArray(payload.weekends) ? payload.weekends : []).slice();
 
@@ -121,6 +162,18 @@
     };
   }
 
+  /* Fill the two lookup tables from the seat vector. Only non-null colours are registered, so
+     a null stays a genuine miss and still trips the warning in teamColor(). */
+  function absorbSeats(payload) {
+    if (!payload) return;
+    (payload.teams || []).forEach(function (t) {
+      if (t && t.team && t.color) teamTones[t.team] = t.color;
+    });
+    (payload.seats || []).forEach(function (s) {
+      if (s && s.driverId) seatsById[s.driverId] = s;
+    });
+  }
+
   function getJSON(url) {
     return fetch(url, { cache: 'no-cache' }).then(function (res) {
       if (!res.ok) throw new Error(url + ' ' + res.status);
@@ -128,16 +181,26 @@
     });
   }
 
-  var ready = Promise.all([getJSON(WEEKENDS_URL), getJSON(CIRCUIT_INDEX_URL)])
-    .then(function (both) {
-      var calendar = derive(both[0]);
-      var index = both[1] || {};
+  /* The seat vector is NON-BLOCKING by design: colour and short names are display sugar, the
+     calendar is the app. A rejection here must never take the whole boot with it. */
+  var seatsPromise = getJSON(DRIVERS_URL).catch(function (err) {
+    console.error('[F1Season] seat vector unavailable - team colours and short names fall back.', err);
+    return null;
+  });
+
+  var ready = Promise.all([getJSON(WEEKENDS_URL), getJSON(CIRCUIT_INDEX_URL), seatsPromise])
+    .then(function (all) {
+      var calendar = derive(all[0]);
+      var index = all[1] || {};
+      absorbSeats(all[2]);
       /* slug -> circuit file path. A weekend with no circuit file is NOT an error: the
          calendar is the calendar whether or not the layout data has been dug yet. */
       calendar.circuitFile = (index.circuits || []).reduce(function (acc, c) {
         if (c && c.slug && c.file) acc[c.slug] = c.file;
         return acc;
       }, {});
+      calendar.seats = seatsById;
+      calendar.teamTones = teamTones;
       return calendar;
     });
 
@@ -145,6 +208,8 @@
     ready: ready,
     statusFor: statusFor,
     shortDate: shortDate,
-    todayIn: todayIn
+    todayIn: todayIn,
+    teamColor: teamColor,
+    seatFor: seatFor
   };
 })();
