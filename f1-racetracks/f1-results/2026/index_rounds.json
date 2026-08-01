@@ -1,13 +1,13 @@
 {
  "season": 2026,
- "version": "2026-07-28",
- "last_updated": "2026-07-28T15:55:00-04:00",
+ "version": "2026-08-01",
+ "last_updated": "2026-08-01T01:35:00-04:00",
  "docs": "./README.md — schema, row shape, canon rule, provenance, and the per-field state table. Moved out of this file 2026-07-28: this is the boot payload every consumer fetches first, and ~76% of it was prose the app never reads.",
  "verified_at_commit": "d27ce55",
- "verified_note": "Every claim in ./README.md was checked against all nine round files on 2026-07-28. Re-stamp this pair when you re-verify; a status line nobody re-reads is worse than none.",
- "current_round_slug": "spa",
- "last_completed_round_slug": "silverstone",
- "current_round_note": "current_round_slug is the round UNDERWAY and deliberately has no file until it is complete. It will not resolve against `rounds` below, and that is correct, not a gap. Consumers must not assume it does.",
+ "verified_note": "Every claim in ./README.md was checked against the first NINE round files on 2026-07-28. ⚠️ Rounds 10 (Spa) and 11 (Hungaroring) were added 2026-08-01 and are NOT covered by that check — re-verify and re-stamp this pair. A status line nobody re-reads is worse than none.",
+ "current_round_slug": "zandvoort",
+ "last_completed_round_slug": "hungaroring",
+ "current_round_note": "current_round_slug is the round that has NO results file yet — the one underway, or during a break the next one up. It will not resolve against `rounds` below, and that is correct, not a gap. Consumers must not assume it does. ⚠️ Corrected 2026-08-01: this field read 'spa' on 2026-07-28, a week after Spa had finished and two days after Hungary had, so it was pointing at a completed round. It only stays honest if it is moved in the same pass that adds a round file.",
  "sprint_points_scale": [8, 7, 6, 5, 4, 3, 2, 1],
  "race_points_scale": [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
  "rounds": [
@@ -19,6 +19,8 @@
   { "round": 6, "slug": "monaco", "name": "Monaco Grand Prix", "date": "2026-06-07", "cuTaskId": "86ae52gq4", "sprint": false, "file": "./r06-monaco.json" },
   { "round": 7, "slug": "catalunya", "name": "Barcelona-Catalunya Grand Prix", "date": "2026-06-14", "cuTaskId": "86ae52gq5", "sprint": false, "file": "./r07-catalunya.json" },
   { "round": 8, "slug": "red-bull-ring", "name": "Austrian Grand Prix", "date": "2026-06-28", "cuTaskId": "86ae52gq6", "sprint": false, "file": "./r08-red-bull-ring.json" },
-  { "round": 9, "slug": "silverstone", "name": "British Grand Prix", "date": "2026-07-05", "cuTaskId": "86ae52gq7", "sprint": true, "file": "./r09-silverstone.json" }
+  { "round": 9, "slug": "silverstone", "name": "British Grand Prix", "date": "2026-07-05", "cuTaskId": "86ae52gq7", "sprint": true, "file": "./r09-silverstone.json" },
+  { "round": 10, "slug": "spa", "name": "Belgian Grand Prix", "date": "2026-07-19", "cuTaskId": "86ae52gq8", "sprint": false, "file": "./r10-spa.json" },
+  { "round": 11, "slug": "hungaroring", "name": "Hungarian Grand Prix", "date": "2026-07-26", "cuTaskId": "86ae52gq9", "sprint": false, "file": "./r11-hungaroring.json" }
  ]
 }
