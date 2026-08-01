@@ -22,9 +22,18 @@
  var tabs = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
  var ready = { standings: false, circuits: false };
 
- // Chrome the shell hides inside each embedded lens (its brand + cross-lens switcher).
+ /* Chrome the shell hides inside each embedded lens (its brand + cross-lens switcher).
+
+    🚨 THIS LIST MUST NAME EVERY PIECE OF CHROME A LENS DRAWS FOR ITSELF. v17 added a
+    `.mast-top` row (brand + switcher) to standings.html and did not add it here, so the
+    shell rendered TWO brands and TWO switchers stacked until v17.1. If you add chrome to
+    a lens, add its selector here AND to section 6 of source/chrome-tokens.css.
+
+    Why both: the injected copy below is immune to a cached or slow stylesheet; the
+    stylesheet copy keeps the hide next to the thing it hides, where the next person adding
+    chrome will actually see it. A duplicated header should not rely on one mechanism. */
  var EMBED_CSS = {
- standings: '.xnav{display:none!important}',
+ standings: '.xnav{display:none!important}.mast-top{display:none!important}',
  circuits: '.topbar .brand,.topbar .lens{display:none!important}.topbar{justify-content:flex-end!important}'
  };
 
