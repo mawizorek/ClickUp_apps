@@ -12,6 +12,22 @@
 
 **Established 2026-08-01** by Fleet Felix, at Michael's direction.
 
+📋 **The Known-Drift Register — the list of facts that rot, and what they currently are — lives at [`../super-agents/fleet-known-drift-register.md`](../super-agents/fleet-known-drift-register.md).** Read it before any run. It is DATA (Felix's); this file is PROCEDURE (Anna-led).
+
+---
+
+## 👥 Who runs this (settled 2026-08-01 — read before assuming it is the Steward's)
+
+Michael, on reading v1: *"maybe this is Anna's job."* He was right, and the ruling already existed — **Audit Anna's own profile has said since 2026-07-21: "Felix knows the fleet; Anna audits it."** v1 shipped without naming that seam, which made a fleet-AUDIT tool read as Steward property.
+
+**Three roles, no overlap:**
+
+- 🔍 **Audit Anna LEADS any formal fleet-fact audit.** A deliberate, scoped, reported pass IS an audit, and audit intent seizes to her — the same way she seats the List Audit DoD, Recon Renata, and Breaker Beckett. She owns completeness, the True Purpose read, the Open-Surface Ledger, and the Closing Report. **This sweep is a protocol she runs, not a rival tool**, and her Protocol-FIRST rule points here: a documented trail now exists for fleet-fact subjects, so she follows it instead of free-forming.
+- 🗂️ **Fleet Felix STEWARDS the Register.** Fleet knowledge is the directory, and the directory is his. He maintains rows and adds one when a new drift is observed. **He does not lead the audit** — that would be the hat-piling he exists to flag.
+- 🛠️ **The TOOL is ownerless.** Any agent, mid-task, no persona, no permission — exactly like `doc-rot-sweep.md`. **Requiring Anna to be seated for a one-line verification would kill the habit this hook exists to build.**
+
+**The dividing line:** a CHECK is anyone's, an AUDIT is Anna's, the REGISTER is Felix's. If it produces a report, it is an audit. If it answers one question in passing, it is a check.
+
 ---
 
 ## ⭐ The premise
@@ -32,7 +48,7 @@ FMP Fiona converted her native shell to a thin git loader on 2026-08-01. Her pre
 
 1. **A cache does not only hold stale facts about ITSELF.** Fiona's own role data was fine. What rotted was everything she believed about everyone else.
 2. **A conversion, migration or graduation is a rot AMPLIFIER** — it reads an old snapshot and writes new canonical files from it, at speed, in one sitting.
-3. **The same rot had already been caught once** (Fiona's `decision-log.md` D5, 07-26). Catching a rot class once is a correction; catching it twice means the fix was never turned into a check. This file is the check.
+3. **The same rot had already been caught once** (Fiona's `decision-log.md` D5, 07-26). Catching a rot class once is a correction; catching it twice means the fix was never turned into a check. This is the check.
 4. **Wrong attribution is not cosmetic.** It routes work to the wrong person and stalls work behind approvals that will never come.
 
 ---
@@ -46,7 +62,7 @@ FMP Fiona converted her native shell to a thin git loader on 2026-08-01. Her pre
 
 **The seam:** *"Corey ratifies this"* is a perfectly valid sentence at HEAD — no broken path, no missing file, no contradiction between locked rules. Nothing a HEAD comparison can see is wrong. Only knowing who Corey IS reveals it. The two sweeps miss each other's findings entirely. **Run both.**
 
-Also distinct, do not duplicate: **Recon Renata** (is the repo SHAPED right) · **Audit Anna** (leads a formal audit of a subject; may seat this inside one) · **Agent Invocation Gate** (resolves ONE token, now) · **Name-Collision Gate** (is this NEW name taken — the forward-looking twin) · **Source Freshness Gate** (outside-world facts).
+Also distinct, do not duplicate: **Recon Renata** (is the repo SHAPED right) · **`super-agents/audit-instruction.md`** (is ONE agent internally consistent — this is CROSS-agent) · **Agent Invocation Gate** (resolves ONE token, now) · **Name-Collision Gate** (is this NEW name taken — the forward-looking twin) · **Source Freshness Gate** (outside-world facts). **Audit Anna is not on this list — she is the lead who seats it.**
 
 ---
 
@@ -63,45 +79,11 @@ Also distinct, do not duplicate: **Recon Renata** (is the repo SHAPED right) · 
 
 ---
 
-## 📋 The Known-Drift Register — repeatable notes for a cold agent
-
-**The reusable core of this hook.** These facts rot on a schedule. A cold agent reads this and knows what to distrust before it knows anything else. **Never quote one from memory or from a neighbouring file — go to the ladder.**
-
-**Maintenance:** the CURRENT line is what rots, so it stays thin and dated. Update the row in the same pass as the change. **Never add a row without a real observed drift** — a register padded with hypotheticals stops being read. Steward: Fleet Felix.
-
-**D1 · Who the Fleet Steward is.** Current (2026-07-20, PR #430): **Fleet Felix.** Corey was re-laned OFF it to URITP structure + ClickUp-setup coaching. **Rotted at least four times** (07-25 build stub, 07-26 Fiona D5, three files 08-01). The most-copied wrong fact in the repo. Check any sentence assigning steward duties, ratification, or fleet rollout.
-
-**D2 · What the canonical fleet record is.** Current (2026-07-30): **the 🤖 Agent Index ClickUp list.** Four manifests retired to stubs. **57 files still contain `roster.json`** as of 08-01, most correctly struck through, some not. Only the LIVE pointers are findings.
-
-**D3 · How many agents there are.** Current: **do not write a number, anywhere, ever.** Filter the Index by `Class` and count rows. Every hand-maintained count has gone stale, the last within 48 hours. A count in prose is a finding on sight, even when it is right today.
-
-**D4 · What `Class` means.** Current: **PERSISTENCE** — does this voice hold a memory bundle across sessions. NOT rank, seniority, speaking order or quality. A lens is a peer of every teammate. Text implying a teammate outranks a lens is a finding. (`_shared/super-agent-base.md` §6 + `orchestration.md` Class Parity.)
-
-**D5 · Whether an agent's native ClickUp shell is live, retired, or a loader.** Current: **PER AGENT, and the fastest-moving fact in the fleet.** Three states: never had one · retired (Corey, 07-19) · **KEPT as a thin loader body under Model A** (Fiona, 08-01; Milo + Listing Lookout queued). "Retired native" language written before 08-01 predates Model A. Check the agent's `activity-log.md`.
-
-**D6 · Where a bundle lives.** Current: lens → `agents/<slug>.md` · git-teammate → `super-agents/<slug>/`. Graduated lenses leave a redirect tombstone, so **a path that resolves does not prove it is the live home.** A lookup finding nothing in `agents/` checks `super-agents/` before concluding anything.
-
-**D7 · Who ratifies, reviews, or approves a PROPOSED artifact.** Current: **derive from the LANE at read time, never from the file.** A status line naming a person is a snapshot, and a PROPOSED file is by definition one nobody revisited. Highest-consequence row here: an artifact parked on a stale approver is not merely inaccurate, **it is blocked forever and nobody is waiting for it.**
-
-**D8 · Whether two agents are peers or one reports to the other.** Current: **peer by default**; Michael rules explicitly when it matters. Standing: **Milo ↔ Tate are PEERS** with an unowned seam (07-30) · **Riley reads Fiona's schema but never rules on it** (08-01). Subordination language is a finding unless a dated ruling backs it.
-
-**D9 · Slug vs display name.** Current: **slugs are IMMUTABLE**; a rename touches `display_name` only. Live mismatches: **`fmp-frank` IS FMP Fiona** (and `/session-start=fmp-frank` resolves to HER, never Fold-in Frank) · `memory-maggie` predates her graduation. **Never infer an agent from its slug.**
-
-**D10 · Retired names, homophones, blessed variants.** Current: Workshop Wes is RETIRED and **Workhorse Wes** is live (bare "Wes" → the live one) · **Clio** (session close) vs **Cleo** (Workshop elegance lens) are one vowel apart and homophones in dictation — resolve on exact spelling, ASK if spoken · **"Reality Riley" is a REAL registered token for Realty Riley, not a typo to correct.** A retired name is still TAKEN and still collides.
-
-**D11 · Ledgers that are EMPTY on purpose.** Current: **Tate's Ledger C · Riley's Ledger C · Fiona's object-library refusal ledger.** Each is the ledger that justifies its agent's class. A cold session that finds one empty **says so**. Inventing a pattern to fill it is the exact failure they exist to expose; inherited entries are LEADS, not facts.
-
-**D12 · Routing seams.** Current: **Felix owns the fleet DIRECTORY, Mira CONSULTS it while routing.** Neither is a forwarding desk — a NAMED invocation resolves straight to that agent with **no double-hop**. Reading the Index is not invoking Felix.
-
-**D13 · The repo read path.** Current: **git blob API at the file's current SHA**, or `githubmcp_get_file_contents` pinned to an immutable SHA. NEVER a raw branch URL (cache-frozen; served a file ~280 PRs stale). Re-fetch SHAs before any decision or write. Bodies over ~22KB on disk truncate — if it did not come back whole, STOP.
-
----
-
 ## The pass
 
 **0. Read-path discipline.** As `doc-rot-sweep.md` §0 — pointed at, not restated. A sweep on cached reads compares one snapshot to another.
 
-**1. Load ground truth FIRST, before reading a single claim.** Pull the Agent Index and hold it as the answer key. **Reading claims first anchors you to the consensus you are supposed to be testing.**
+**1. Load ground truth FIRST, before reading a single claim.** Pull the Agent Index and the Register, and hold them as the answer key. **Reading claims first anchors you to the consensus you are supposed to be testing.**
 
 **2. Scope, then inventory.** High-yield surfaces in order: every `super-agents/*/preferences.md` **seams / lane-boundary / "who they are NOT"** section (where cross-agent claims concentrate) · every `memory.md`, especially INHERITED lines and `Pointers` blocks · `_shared/super-agent-base.md`, `orchestration.md`, `council.md`, `teams/*`, `super-agents/index.md` · any `gates/*` or `hooks/*` naming an owner or ratifier · anything marked **PROPOSED / PENDING / DRAFT** · `audits/*` · the AI Toolkit trigger table and each Index row's `Lane`.
 
@@ -109,7 +91,7 @@ Also distinct, do not duplicate: **Recon Renata** (is the repo SHAPED right) · 
 
 **4. Check each against the ladder.** Index first, then the subject's own bundle. **Never against the file next door.** Three outcomes, and the middle one is the point of the sweep: **TRUE** · **TRUE-BUT-UNSOURCED** (right today, copied not verified — flag it and add the pointer) · **FALSE**.
 
-**5. Sweep for general discrepancy too.** The register catches what has already bitten; this catches what is about to:
+**5. Sweep for general discrepancy too.** The Register catches what has already bitten; this catches what is about to:
 
 - **Asymmetric seams** — A's file describes the A↔B boundary one way, B's another. Both are canonical for their own side, so **both are authoritative and they disagree.** The nastiest class, invisible from either file alone.
 - **Orphan claims** — a lane, duty or gate assigned to nobody, or to an agent with no row.
@@ -117,18 +99,19 @@ Also distinct, do not duplicate: **Recon Renata** (is the repo SHAPED right) · 
 - **Index vs bundle drift** — a row's `Lane` and the profile's Role section telling different stories.
 - **Empty authoritative fields** — a blank `Lane` is not "no finding," it is the Index failing at the one question it exists to answer.
 - **Fossilized org charts** — an old audit quoting the fleet as it stood. That is HISTORY and should read as history; if it reads as current, date-stamp it.
+- **Unowned or self-owned tooling** — a gate, hook or standard whose owner is unstated, or is simply whoever wrote it (Register D14).
 
 **6. Triage.** 🔴 **WRONG ATTRIBUTION** (names the wrong owner/steward/ratifier — fix same pass) · 🔴 **BLOCKED ON A GHOST** (a PROPOSED artifact parked on someone who cannot act — fix the attribution AND surface the artifact, it has been stalled since it was written) · 🔴 **LIVE MANIFEST READ** · 🟠 **ASYMMETRIC SEAM** (reconcile if mechanical, flag if it is a genuine lane question) · 🟠 **STALE STATE** · 🟡 **TRUE-BUT-UNSOURCED** (add the pointer) · 🟡 **DANGLING AGENT POINTER** · ⚪ **VERIFIED CURRENT** — name what holds. **A sweep that only reports problems is not trustworthy.**
 
 **7. Fix discipline — and the line is NOT "don't touch other bundles."**
 
-- **Mechanical corrections land in the same pass, in ANY file, including another agent's bundle.** A wrong steward name, a dead manifest pointer, a stale native status, a retired path: factual errors, not lane decisions. The Steward correcting one is stewardship. Mark it with **edit provenance in the file** — who, when, on whose direction — never quietly.
-- **Strike, don't delete.** Keep wrong text struck through with a dated correction. What a fact USED to say teaches the next reader that authority survives decay, and it is how a register row earns its place.
-- **Flag, don't decide:** anything CHANGING a lane, a seam, a stance, or who should own something. Correcting *"Corey is the steward"* is a fix. Deciding *"Corey should be"* is Michael's.
+- **Mechanical corrections land in the same pass, in ANY file, including another agent's bundle.** A wrong steward name, a dead manifest pointer, a stale native status, a retired path: factual errors, not lane decisions. Mark each with **edit provenance in the file** — who, when, on whose direction — never quietly.
+- **Strike, don't delete.** Keep wrong text struck through with a dated correction. What a fact USED to say teaches the next reader that authority survives decay, and it is how a Register row earns its place.
+- **Flag, don't decide:** anything CHANGING a lane, a seam, a stance, or who should own something. ⚠️ **But check for an existing dated ruling first** — applying one already written in the subject's own profile is a FIX, not a decision, and treating it as a decision is just a slower way to leave the error in place.
 - **Never edit another agent's voice, personality, or reasoning.** Facts only. A decision-log entry gets a correction appended or struck, never rewritten into something its author did not conclude.
 - **Additive on conflict.** Rejected write on a stale SHA → re-read HEAD and layer on. Never re-apply your original body.
 
-**8. Report.** Every finding carries the file, the quoted claim, the date it was written, and the ladder source that overrides it.
+**8. Report.** Every finding carries the file, the quoted claim, the date it was written, and the ladder source that overrides it. When Anna leads, this feeds her Closing Report rather than replacing it.
 
 ```
 ## Fleet-Fact Sweep · <scope> · <date>
@@ -158,15 +141,19 @@ Also distinct, do not duplicate: **Recon Renata** (is the repo SHAPED right) · 
 8. **A number about the fleet.** (D3)
 9. **Consensus.** Ten agreeing files with no ladder source is one unverified claim with nine echoes.
 10. **An agent describing why it is NOT something.** Correct at writing, and it silently inverts the day the other agent moves.
+11. **A brand-new file.** The newest text in the repo is the least-verified text in the repo — nobody but its author has read it. This file was a finding twice within four hours of shipping.
+12. **A file describing ITSELF** — its own size, its own status, its own scope. Self-description reads as authoritative and is written by the one party who never re-checks it. This file's v1.2 changelog claimed a size that was wrong by 50%, inside the entry documenting a pattern of wrong size claims.
 
 ---
 
 **Output:** the report above. Fixes land as a PR (branch → commit → PR → self-merge). Never a prose-only list of things someone else should fix.
 
-**Composes with:** `hooks/doc-rot-sweep.md` (orthogonal ground truth — run both) · `gates/agent-invocation-gate.md` · `gates/agent-name-collision-gate.md` · `hooks/source-freshness-gate.md` (origins-not-rows, one domain over) · `_shared/native-to-git-conversion-runbook.md` (precondition #1 requires this discipline) · `super-agents/audit-instruction.md` (per-agent internal consistency; this is cross-agent) · `code-review-standard.md` (severity + evidence format, reused never re-invented).
+**Composes with:** [`../super-agents/fleet-known-drift-register.md`](../super-agents/fleet-known-drift-register.md) (the rows) · `hooks/doc-rot-sweep.md` (orthogonal ground truth — run both) · `super-agents/audit-anna/` (the LEAD on any formal run) · `gates/agent-invocation-gate.md` · `gates/agent-name-collision-gate.md` · `hooks/source-freshness-gate.md` (origins-not-rows, one domain over) · `_shared/native-to-git-conversion-runbook.md` (precondition #1 requires this discipline) · `super-agents/audit-instruction.md` (per-agent internal consistency; this is cross-agent) · `code-review-standard.md` (severity + evidence format, reused never re-invented).
 
-**Guardrails:** read-only until a claim is confirmed against the ladder · never verify a fleet fact from a neighbouring file · never read a retired manifest as data · fix facts freely with provenance, flag every lane and stance call · never rewrite another agent's voice or conclusions · report VERIFIED CURRENT as well as failures · **keep this file well under the ~22KB unreadable-whole ceiling.**
+**Guardrails:** read-only until a claim is confirmed against the ladder · never verify a fleet fact from a neighbouring file · never read a retired manifest as data · fix facts freely with provenance, flag every lane and stance call · never rewrite another agent's voice or conclusions · report VERIFIED CURRENT as well as failures · **no Register rows in this file** (data lives in the Register, procedure lives here) · 🔴 **never write a size, count or status about a file without reading the value back first** — this file broke that rule four times in one session, including once inside the sentence prohibiting it.
 
 **Changelog:**
 
-- **v1 (2026-08-01)** — Established by Fleet Felix at Michael's direction, after one stale native cache put the wrong Fleet Steward into three brand-new canonical files in a single afternoon, two of which parked their own ratification on him. Core insight: **a fleet fact is correct at its source and wrong at every quote site**, so it is invisible to a docs-vs-HEAD sweep and can only be caught by checking cross-agent claims against the Index and the subject's own bundle. Ships with the 13-row Known-Drift Register so a cold agent inherits the list of what to distrust instead of re-deriving it after being burned. ⚠️ **Shipped at 21.4KB — inside the truncation zone it warns about — and the first trim missed its own stated target.** Two size claims made by estimate rather than measurement in one session (see also Maggie's 08-01 drain). The lesson is now a guardrail: read the returned byte count, then write the claim.
+- **v1.2 (2026-08-01)** — Register split out to `super-agents/fleet-known-drift-register.md`. Two reasons: this file had crossed **22,296 bytes, past the ~22KB unreadable-whole ceiling it warns about**, and the v1.1 ownership ruling had just given the Register a different steward than the tool. Procedure vs data, the same split `routines/` uses. Now **16,531 bytes**, measured. ⚠️ **Four size-claim misses on one file in one session** — 21,453 → 19,367 → 18,350 → 22,296 → 16,531, with the stated targets wrong every time. **The last one was wrong by 50% inside the changelog entry documenting the pattern**, which is why tell 12 exists and why the guardrail is now phrased as a prohibition rather than a preference.
+- **v1.1 (2026-08-01)** — Michael: *"maybe this is Anna's job."* Correct, and already on the books (Anna's profile, 07-21: *"Felix knows the fleet; Anna audits it"*). Added **Who runs this**, Register **D14** (the author is not automatically the owner), tell 11, the unowned-tooling check, and the clause that applying an existing dated ruling is a FIX, not a decision.
+- **v1 (2026-08-01)** — Established by Fleet Felix at Michael's direction, after one stale native cache put the wrong Fleet Steward into three brand-new canonical files in a single afternoon, two of which parked their own ratification on him. Core insight: **a fleet fact is correct at its source and wrong at every quote site**, so it is invisible to a docs-vs-HEAD sweep and can only be caught by checking cross-agent claims against the Index and the subject's own bundle.
