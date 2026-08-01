@@ -4,7 +4,6 @@
 
 | Agent | Session | Working on | Files touched |
 |---|---|---|---|
-| Brain (Opus 5) | Session task `Brain (Opus 4.8) · inciardi collection · brainstorm/plan · July 2026` (Agent Activity Board) | **RE-CLAIMED 07-31 ~8:00 PM ET, pre-write, per `hooks/collision-check.md`.** Building `next-build-spec.md` steps **3** (split the 29.3KB worker) and **7** (artwork detail route). Earlier scope this session — v13→v18, batches, `arrange.js`, the spec — is DONE and released. | **`ClickUp_apps`:** `inciardi-collection/worker/worker.js` · `worker/reads.js` (new) · `artwork.js` (new) · `artwork.css` (new) · `pages/artwork.html` (new) · `app.js` · `boot.js` · `picker.js` · `index.html` · `session-board.md`. **RELEASED:** everything else under `inciardi-collection/**`. |
 | Memory Maggie | Standing task `86ajq1137` | OMR drain (11 entries) | PREFERENCES.mirror.md, open-memory-requests.md, hooks/silent-fallback-law.md, session-board.md |
 | Mira + Anna + Milo + Corey (URITP Audit Council) | Standing task `86ajknmmk` | **REFRESHED 07-30 ~11:30 AM ET.** Pickup session: Space 6 (Courses) + Space 7 (BETA BUDGET). Currently executing Michael's memory-shape ruling BEFORE walking any list. | **`ClickUp_apps`:** `super-agents/audit-anna/memory.md` + `activity-log.md`, `super-agents/mainstage-milo/memory.md` + `activity-log.md`, `open-memory-requests.md`, `session-board.md` |
 | FMP Fiona | Session task titled `FMP Fiona (Opus 5) · HML_LLC v1 replan — table views + script/automation layer on FMP19 · Jul 28` (Agent Activity Board) | **CORRECTED 07-30: FMP documentation moves to `maw-prose` after all.** Standing up `apps/hml-llc/` there + two scoped convention exemptions. Nothing deleted from this repo until verified there. | **TWO REPOS.** `ClickUp_apps`: `filemaker/hml-llc/**` (read + this board row). **`maw-prose`: `apps/**`, `CONVENTIONS.md`, `DECISIONS.md`** |
@@ -14,7 +13,13 @@ _Delete your row on session close._
 
 <p><br/></p>
 
-_🔀 **A FOURTH SESSION SHIPPED INTO `inciardi-collection` TODAY WITH NO ROW (07-31 ~7:37 PM ET, v18 `touch-action`, PR #633).** Found by running the check below rather than by colliding: `list_commits` path-filtered to the app, `since` today. It also touched `base.css`, `boot.js` and `index.html` — two of which this session now needs. **The check worked; the claim still did not happen.** Noting it as evidence that `collision-check.md` catches what the board misses, not as a complaint: the same session also fixed a footer stamp that had read `v16` through all of v17._
+_✅ **Brain out 2026-08-01 ~12:30 AM ET.** `inciardi-collection` v13→v19 plus the batches, the arrangement editor, `next-build-spec.md`, the worker split and the artwork detail route. **ALL RELEASED, nothing held:** `worker/worker.js` · `worker/reads.js` (new) · `artwork.js` · `artwork.css` · `pages/artwork.html` (new) · `app.js` · `boot.js` · `chrome.js` · `picker.js` · `index.html` · `next-build-spec.md` · `VERSIONS.md` · `batches/**`. PRs #626, #629, #630, #631, #632, #634, #636, #637, #638. **Next session's first move is `inciardi-collection/next-build-spec.md` §6 — every remaining step is gated on Michael or on one DDL pass, so it is not a code session until the migration is applied.**_
+
+_🔴 **AND THE ONE THING TO CARRY: TWO SESSIONS DESIGNED TWO SCHEMA MIGRATIONS FOR THE SAME EMPTY DATABASE ON 07-31, EACH JUSTIFIED BY THE SAME "the table is empty so it is free today" ARGUMENT.** Neither knew about the other's tables. Merged into ONE pass in the spec §4 before either was applied — but it was caught by reading a decision log, not by any check we own. **`hooks/collision-check.md` compares FILE paths; a schema is not a file, it is a live database two repos' worth of code can reach.** Queued as an OMR; naming it here because the next DDL-shaped idea will hit the same gap._
+
+<p><br/></p>
+
+_🔀 **A FOURTH SESSION SHIPPED INTO `inciardi-collection` ON 07-31 WITH NO ROW** (v18 `touch-action`, PR #633). Found by running `hooks/collision-check.md` — path-filtered `list_commits`, `since` today — rather than by colliding. It touched `base.css`, `boot.js` and `index.html`, two of which the next session then needed. **The check worked where the board did not.** Same session fixed a footer stamp that had read `v16` through all of v17, so this is evidence about the mechanism, not a complaint about the agent._
 
 <p><br/></p>
 
@@ -24,69 +29,57 @@ _🔧 **FIXED, and the diagnosis is not "someone forgot."** C6 has mandated pres
 
 _1. **The CHECK rode on the ANNOUNCEMENT.** C6 said "read the board, then add an entry" — one step, two jobs, two different beneficiaries. Reading protects YOU; writing protects everyone else. Welded together, skipping the step lost both, and the cheap self-interested act was gated behind the expensive altruistic one. **They are two steps now.**_
 
-_2. **It fired ONCE, at Commit, when scope is smallest.** My first write today was a task comment about adding a link to a settings panel. A row written then would have been true and useless — the collision came four asks later over files nobody had named yet. Fiona's row moving four times in one session is documented on this page as good practice, which is an admission that a one-shot check needs manual repetition to work. **The check now fires PER WORK ITEM.**_
+_2. **It fired ONCE, at Commit, when scope is smallest.** My first write that day was a task comment about a settings link. A row written then would have been true and useless — the collision came four asks later over files nobody had named yet. **The check now fires PER WORK ITEM.**_
 
-_3. **The signal that DID fire got explained away.** `create_branch` returned **"Reference already exists"** at ~17:17 for the exact branch name my work needed. I investigated it — and asked the wrong question. I asked "does this branch have content?" when the question was **"who made this and are they still working?"** Their PR merged at 17:19; mine conflicted at 17:28. **A branch you did not create, named for the work you are about to do, is another session's claim.**_
+_3. **The signal that DID fire got explained away.** `create_branch` returned **"Reference already exists"** for the exact branch name my work needed. I asked "does this branch have content?" when the question was **"who made this and are they still working?"** **A branch you did not create, named for the work you are about to do, is another session's claim.**_
 
-_📏 **MEASURED, not assumed — and it killed my first design: NEITHER GIT SURFACE WORKS AS A BACKSTOP HERE.** Branch list = **100+ branches, never deleted after merge** (a dozen dead `inciardi-collection-*`, `audit-anna-v1` through `v11`); no way to tell live from long-dead. Open PRs = **12, newest six days old, oldest July 7, every one abandoned** — it has the exact shape of a claim ledger and every entry is a lie. **I had drafted the whole check on top of open PRs before pulling the numbers.** What DOES work is `list_commits` with a path filter and `since=today`: self-maintaining, timestamped, cannot go stale, zero noise. ⚠️ **@Michael — the 12 zombie PRs and the branch graveyard are worth a sweep.** Not touched here; closing another agent's PR is destructive and was not mine to do._
-
-<p><br/></p>
-
-_🗄️ **The URITP audit row above was STALE FOR FOUR DAYS and it was the Space-4 row.** It claimed Anna's and Milo's `memory.md` for a session that closed on 07-27, which means every collision check run between then and now read a false claim — and the files it named are the exact two files this session needed. **A stale presence row is worse than an empty one: an empty board says "nobody posted," a stale row says "someone is here" and is believed.** Rule 5 already says delete your row on close; the enforcement gap is that nothing checks. Refreshed rather than duplicated because it is the same standing task and the same lineage._
+_📏 **MEASURED, not assumed — and it killed my first design: NEITHER GIT SURFACE WORKS AS A BACKSTOP HERE.** Branch list = **100+ branches, never deleted after merge**; no way to tell live from long-dead. Open PRs = **12, newest six days old, oldest July 7, every one abandoned** — it has the exact shape of a claim ledger and every entry is a lie. What DOES work is `list_commits` with a path filter and `since=today`: self-maintaining, timestamped, cannot go stale. ⚠️ **@Michael — the 12 zombie PRs and the branch graveyard are worth a sweep.** Closing another agent's PR is destructive and was not mine to do._
 
 <p><br/></p>
 
-_🗄️ **Fiona · scope crossed a REPO BOUNDARY 2026-07-30 ~10:40 AM ET.** Now claiming paths in **`maw-prose`** as well as `ClickUp_apps`. Fourth row-move of this session, all pre-write. ⚠️ **Note for the board's own design:** this row had no column for "which repo," because the board lives inside `ClickUp_apps` and implicitly assumed one. It does not any more — **name the repo in your Files column** or a collision check reads clean when it is not._
+_🗄️ **A stale presence row is worse than an empty one: an empty board says "nobody posted," a stale row says "someone is here" and is believed.** The URITP audit row was stale for four days and claimed the exact two files a later session needed. Rule 5 already says delete your row on close; the enforcement gap is that nothing checks._
 
-_🗄️ ⚠️ **`maw-prose` DOES NOT MEAN "ONLY PROSE" — READ THIS BEFORE PLACING ANY DOCUMENTATION.** Michael, 07-30: *"maw-prose was clearly the wrong vibe for you to catch. it doesn't literally mean only prose. it just means all our documentation."* The split is **CODE vs DOCUMENTATION**, not prose-vs-structured. `ClickUp_apps` holds apps, infra and `brain-config`; **`maw-prose` holds documentation of things** — venues, roles, safety programs, and now application schemas. I read the repo's NAME as its specification and reasoned a whole answer off it. **A repo name is a label, not a schema.**_
+_🗄️ **NAME THE REPO IN YOUR FILES COLUMN.** This board lives inside `ClickUp_apps` and implicitly assumed one repo. Fiona's scope crossed into `maw-prose` mid-session; without the repo named, a collision check reads clean when it is not._
 
-_🗄️ **Two `maw-prose` conventions needed scoped exemptions to hold app docs, both hung on the repo's own existing logic** (see its CONVENTIONS.md): (1) the table ban is a rule about NOTES — a field registry is a **register**, and D-018 already exempts numbered registers from the chronological rule, so the repo already distinguishes the two animals; (2) the 3-segment depth cap was derived for notes, but an app doc tree **mirrors an external application's own menu**, so its depth is not a taxonomy choice — and Dexter's countable-set test passes, since FileMaker's Manage menu has a fixed enumerable object set. Both written down, both cheap to reverse._
+_🗄️ ⚠️ **`maw-prose` DOES NOT MEAN "ONLY PROSE" — READ THIS BEFORE PLACING ANY DOCUMENTATION.** Michael, 07-30: *"it doesn't literally mean only prose. it just means all our documentation."* The split is **CODE vs DOCUMENTATION**. `ClickUp_apps` holds apps, infra and `brain-config`; **`maw-prose` holds documentation of things** — venues, roles, safety programs, and now application schemas. **A repo name is a label, not a schema.**_
 
-_🗄️ **Carry this if you touch HML_LLC or any FMP19 build: FileMaker 19 has NO native transaction script steps.** `Open/Commit/Revert Transaction` all arrived in **FileMaker 2023 (v20)** — verified against the Claris FMP 20.1.2 release notes and the MBS step-by-version comparison. All-or-nothing multi-record writes on 19 need the classic single-parent-relationship + `Revert Record` pattern. ✅ **Q8 ruled 07-29: `ReceivedFunds` joins the stack as the parent receipt layer** — and it IS the single-parent record the rollback pattern requires, so **table before wrapper** or you ship a rollback that silently reverts half._
+_🗄️ **Two `maw-prose` conventions needed scoped exemptions to hold app docs, both hung on the repo's own existing logic:** (1) the table ban is a rule about NOTES — a field registry is a **register**, and D-018 already exempts numbered registers; (2) the 3-segment depth cap was derived for notes, but an app doc tree **mirrors an external application's own menu**, so its depth is not a taxonomy choice._
 
-_🗄️ ⚠️ **A `.fmscript` is a COPY TARGET, not a note** (locked 07-29). Everything in one gets hand-typed into FileMaker, so status, changelogs and defect flags live in a `<Name>.notes.md` sidecar. That rule is file-level and survives the repo move intact._
+_🗄️ **Carry this if you touch HML_LLC or any FMP19 build: FileMaker 19 has NO native transaction script steps.** `Open/Commit/Revert Transaction` arrived in **FileMaker 2023 (v20)**. All-or-nothing multi-record writes on 19 need the classic single-parent-relationship + `Revert Record` pattern. ✅ **Q8 ruled 07-29: `ReceivedFunds` IS that single-parent record** — so **table before wrapper** or you ship a rollback that silently reverts half._
 
-_🗄️ ⚠️ **PII: I shipped a real payee name + Venmo handle into the PUBLIC repo in a loan fixture (07-29), scrubbed same day, original values still in history at `eb63e88`.** The ClickUp source also holds a routing + account number two lines below what I copied. **A loan-servicing fixture is the first thing in `ClickUp_apps` capable of breaking the "no personal/sensitive info" constraint the soft-lock rests on.** Rule now written into the fixture README. This is the strongest single argument for the move to a private repo. ⚠️ **07-31: a SECOND instance of the same value was found and scrubbed (PR #635)** — the frozen snapshot row in `Payoffs.tsv`, which by design does not inherit edits to its source. **A remediation must sweep every table that snapshots the value, not just the one that owns it.**_
+_🗄️ ⚠️ **A `.fmscript` is a COPY TARGET, not a note** (locked 07-29). Everything in one gets hand-typed into FileMaker, so status, changelogs and defect flags live in a `<Name>.notes.md` sidecar._
 
-_⚒️🗄️ **@Dexter — the object library is load-bearing in YOUR runtime** (HML_LLC DL Q5, Michael): *"we've begun structuring our clickup app builds around the new object set."* Repo apps are being modelled on FMP object families, not just FMP schema. She sets the words, you make the code honor them (`gates/theme-contract-gate.md`). Read before the next repo-app UI build._
+_🗄️ ⚠️ **PII: a real payee name + Venmo handle shipped into the PUBLIC repo in a loan fixture (07-29), scrubbed same day, original values still in history at `eb63e88`.** ⚠️ **07-31: a SECOND instance of the same value was found and scrubbed (PR #635)** — the frozen snapshot row in `Payoffs.tsv`, which by design does not inherit edits to its source. **A remediation must sweep every table that SNAPSHOTS the value, not just the one that owns it.** Strongest single argument for a private repo._
 
-<p><br/></p>
-
-_✅ **Mira + Wes out 2026-07-28 ~9:30 PM ET.** F1 v7 schema pass closed and handed off. **ALL RELEASED:** `f1-racetracks/source/standings/data.js` · `source/standings/panel.js` · `f1-results/2026/index_rounds.json` · `f1-racetracks/README.md` · `f1-results/2026/README.md` (new) · `VERSIONS.md`. **Never claimed, still untouched:** `f1-racetracks/next-build-spec.md` — it is the next session's first move. PRs #569, #571, #572, #573, #574, #575 merged. Handoff task `86ajrj6u3`._
-
-_⚠️ **Never hand-type a ClickUp ID into a durable file; load the task and copy it.** Two wrong IDs typed from memory into this file in one day (07-28), both caught by reading the task back before the PR merged. Two catches is a pattern, not luck._
-
-_🗄️ ⚠️ **THIRD RECURRENCE, AND THE FIRST ONE THAT ACTUALLY LANDED ON `main` (Corey, 07-30 ~3:22 PM ET).** I wrote `86ajtnv1a` into my own row above for a task whose real id is `86ajtmw95` — invented from the shape of an id I had never been given, because I held the task only as a URL. Caught one commit later by querying the board and corrected in place. **The two 07-28 catches happened PRE-merge; this one did not, so the rule as written ("load the task and copy it") is not the whole guard — the guard is: if you are holding a URL and not an id, you do not have an id, so write the TITLE.** Every other row on this board names its session by title for exactly that reason. Do not commit a row that contains an id you did not read back in the same turn._
+_⚒️🗄️ **@Dexter — the object library is load-bearing in YOUR runtime** (HML_LLC DL Q5, Michael): *"we've begun structuring our clickup app builds around the new object set."* Repo apps are being modelled on FMP object families, not just FMP schema. Read before the next repo-app UI build._
 
 <p><br/></p>
 
-_✅ **Felix out 2026-07-28 ~4:20 PM ET.** `super-agents/audit-instruction.md`, `gates/git-teammate-lifecycle-runbook.md`, `hooks/session-open.md`, `gates/session-transcript-gate.md` — **all RELEASED.** PRs #567 + #568 merged. **@Anna: the standard you audit against moved** — `audit-instruction.md` is **v0.6 / DoD v0.3** and every audit record now needs an **`Audited against (SHAs)`** block._
+_✅ **Mira + Wes out 2026-07-28.** F1 v7 schema pass closed. **ALL RELEASED.** **Never claimed, still untouched:** `f1-racetracks/next-build-spec.md` — it is the next session's first move. PRs #569–#575. Handoff task `86ajrj6u3`._
+
+_⚠️ **Never hand-type a ClickUp ID into a durable file.** Three recurrences, the third of which landed on `main`. **The guard is: if you are holding a URL and not an id, you do not have an id, so write the TITLE.** Every other row on this board names its session by title for exactly that reason._
 
 <p><br/></p>
 
-_🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose in the transcript gate and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN.** **A found task never satisfies "spine armed."**_
+_✅ **Felix out 2026-07-28.** `super-agents/audit-instruction.md`, `gates/git-teammate-lifecycle-runbook.md`, `hooks/session-open.md`, `gates/session-transcript-gate.md` — **all RELEASED.** PRs #567 + #568. **@Anna: the standard you audit against moved** — `audit-instruction.md` is **v0.6 / DoD v0.3** and every audit record now needs an **`Audited against (SHAs)`** block._
 
-_📋 **C6 presence fires for EVERY committed session, not just repo ops** (Q11 → D). An empty board is indistinguishable from nobody having posted. **Presence is a PRE-WRITE step** — and a **PER-WRITE** one: a row is only true until your scope changes. Fiona's went NONE → one file → a subtree → **two repos** inside one session; move it before the write, not after. ⚠️ **07-31: C6 is now the CLAIM only. The CHECK is `hooks/collision-check.md` and it fires per WORK ITEM.**_
+_🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN.** **A found task never satisfies "spine armed."**_
 
-_🔒 **AUDITS ARE STAMPED OR THEY ARE WORTHLESS** (PR #568, Q11 → C). Every audit record names the SHA of every governing file it leaned on. **Addendum, never reissue.**_
+_📋 **C6 presence fires for EVERY committed session, not just repo ops.** Presence is a PRE-WRITE step — and a **PER-WRITE** one: a row is only true until your scope changes. ⚠️ **07-31: C6 is now the CLAIM only. The CHECK is `hooks/collision-check.md` and it fires per WORK ITEM.**_
+
+_🔒 **AUDITS ARE STAMPED OR THEY ARE WORTHLESS** (PR #568). Every audit record names the SHA of every governing file it leaned on. **Addendum, never reissue.**_
 
 _🧭 **Fleet build queue is EMPTY** (Clark cancelled 07-28). 12 teammates, zero unbuilt. **Do not invent an agent to fill it.** ⚠️ The standing thread's DESCRIPTION still says "First move: Catch Up Clark" — trust the checklist and DL J14, not that line._
 
 <p><br/></p>
 
-_🏎️ **WHY THE F1 DATA STORE IS SAFE TO READ BUT NOT TO TRUST FROM DOCS** (Mira, 2026-07-28). A nine-lens Workshop read all nine round files at `d27ce55` and found the app's own README stale in BOTH directions. Both FIXED. **The habit stands: open the JSON before you believe the plan.**_
+_🏎️ **WHY THE F1 DATA STORE IS SAFE TO READ BUT NOT TO TRUST FROM DOCS.** A nine-lens Workshop read all nine round files and found the app's own README stale in BOTH directions. **The habit stands: open the JSON before you believe the plan.**_
 
 _⛔ **F1 step 5 is NOT a job you can improvise.** `grid` + `qualifying` for r03/r04/r07 = 66 driver-rows, official sources cross-checked. Sourced or absent._
 
 <p><br/></p>
 
-_🐎 **@Wes — the twin is resolved on one side.** The F1 session (`86ajr4bej`) is CLOSED; the URITP audit session still holds the pen on `super-agents/workhorse-wes/memory.md`. Its durable finding was queued as **`OMR-20260728-2`** per Concurrency rule 4._
-
-<p><br/></p>
-
-_🗑️ **THE ROUTINES VIEWER IS GONE** (2026-07-27, PR #562). `routines/schedule.md` is the single source and is written for HUMANS. **Do not rebuild the app.** **Carry the reason: the app never rotted — retiring the scheduler is what turned it into a duplicate.** Every duplicate-check we own runs at CREATION; none re-run when the world changes. **When a capability is retired OR arrives, sweep for what it just made redundant.**_
-
-<p><br/></p>
+_🗑️ **THE ROUTINES VIEWER IS GONE** (PR #562). `routines/schedule.md` is the single source and is written for HUMANS. **Do not rebuild the app.** **Carry the reason: the app never rotted — retiring the scheduler is what turned it into a duplicate.** Every duplicate-check we own runs at CREATION; none re-run when the world changes._
 
 _🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it._
 
@@ -94,8 +87,6 @@ _📌 **Open (thread `86ajqu32n`):** should `last-run` stamps fold back INTO `sc
 
 <p><br/></p>
 
-_⚠️ **For whoever audits memory next:** `/PREFERENCES.md` is at **99%**, fourth close running, blocking a qualified write (`OMR-20260728-1`). **Queue is 21 as of 07-31 — three are APPROVED for placement but blocked on BUNDLE STATE**, not on the ruling. **Placement is no longer the bottleneck; bundle capacity is.** 🗄️ **Fiona, 07-30 — the pattern behind three of my misses in two days:** I placed content by the LABEL of the surface I happened to be standing in (ClickUp because the audit was there · `ClickUp_apps` because the files were there · `maw-prose` because its name said "prose"). **Read a surface's PURPOSE, never its name or your own momentum.** Strong brain-memory candidate; not queued as an OMR by me._
+_⚠️ **For whoever audits memory next:** `/PREFERENCES.md` is at **99%**, blocking a qualified write. **Queue is 21 as of 07-31 — three are APPROVED for placement but blocked on BUNDLE STATE**, not on the ruling. 🗄️ **Fiona's pattern, worth generalizing:** content kept getting placed by the LABEL of the surface she happened to be standing in. **Read a surface's PURPOSE, never its name or your own momentum.**_
 
-<p><br/></p>
-
-_🧠 **BUNDLE CAP IS THE #1 OMR BLOCKER AND MICHAEL JUST CUT ITS ROOT CAUSE (07-30).** Ruling: `memory.md` holds **patterns + core preferences only**; ongoing project state belongs in `activity-log.md`. Anna's file was 12.6KB against a ~10KB cap and roughly a third of it was audit project tracking. **Every "blocked on bundle cap" entry in the OMR queue should be re-tested after the fleet re-shape — the cap was being consumed by content that was in the wrong file.**_
+_🧠 **BUNDLE CAP IS THE #1 OMR BLOCKER AND MICHAEL CUT ITS ROOT CAUSE (07-30).** Ruling: `memory.md` holds **patterns + core preferences only**; ongoing project state belongs in `activity-log.md`. **Every "blocked on bundle cap" entry should be re-tested after the fleet re-shape — the cap was being consumed by content in the wrong file.**_
