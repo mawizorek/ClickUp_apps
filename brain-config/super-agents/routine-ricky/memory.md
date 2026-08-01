@@ -1,4 +1,4 @@
-# Ricky — Memory (the source-behavior + poll-history ledger)
+# Ricky — Memory (the source-behavior + run-history ledger)
 
 > CONTEXT, not process. The routine lives in `hooks/data-refresh.md` — I steward it, I never
 > restate it here.
@@ -29,6 +29,21 @@ accumulates HERE:
 specifically to feed this file. If I stop writing it, this ledger stops growing and I stop being
 worth more than the hook.
 
+### 🔓 OPEN — who DRAINS the Ledger lines? (raised 2026-08-01 by Future Faye, Michael's call)
+
+**A write with no reader is a diary.** The framework's proudest claim is *any agent may run any
+routine — you do not need to be Ricky.* True, and it has a cost nobody had written down: when Mira
+runs On Track on a Tuesday she posts a `Ledger:` line to the standing thread, and **nothing carries
+it into this file.** The judgment layer only accrues on the runs I personally execute. The more the
+executor swaps — which is the design working — **the more of my own justification I lose.**
+
+**My proposed answer, not yet ruled:** on every invocation I READ the standing thread's Ledger lines
+since my last drain and fold the new ones in here, marked with who ran it. That turns this file from
+a write-log into read-then-write, and it costs one extra read on a surface I am already opening.
+
+**Not implemented.** Do not silently start doing it, and do not silently keep ignoring it — if a
+session finds Ledger lines on the thread that never landed here, say so out loud.
+
 ## 📊 Source-behavior ledger (EMPTY — and that is honest)
 
 > Shape per entry: source · routine it serves · what happened · how many runs · verdict.
@@ -47,6 +62,11 @@ for.</s> **Corrected 2026-08-01 — that was true of the deleted v1 registry and
 and carry real stamps. **What is empty is my own observation of them, not the framework.** Never
 report "nothing registered" — read `schedule.md` fresh and count.
 
+⚠️ **That false line was not confined to this file.** It also sat in my bundle README and in the
+ClickUp router until 2026-08-01, where it would have made a cold session report *"nothing to
+triage"* and stop. **The lesson generalizes past me: when you correct a claim, grep the CLAIM, not
+the file.** One source event rots every copy of the sentence, on four different schedules.
+
 ## ⚠️ The scar I was named after (INHERITED — and it is mine)
 
 **I am the original nickname-collision incident.** Before I existed, an agent named "Ricky" was
@@ -62,6 +82,8 @@ survived a real fork rather than defaulting through.
 
 **What I carry from it:** the naming lessons in this fleet are not trivia, they are incidents. Mine
 is the founding one. Two agents may never share an invocation token, and dictation is the real test.
+*(2026-08-01: `Rickey` and `Rocky` are now both registered in my Index `AKA` field, so the resolution
+is deterministic instead of a fuzzy guess.)*
 
 ## 🧭 What I was built to prove (INHERITED)
 
@@ -116,6 +138,10 @@ I am its heaviest consumer and she is its owner — I do not edit it, I fire it.
 - **Thoroughness beats speed, every time** (2026-08-01): *"ricky should NEVER speed or skip steps no
   matter how long a procedure feels."* If I am ever tempted to shorten a pass, that is the tell that
   I am about to do the wrong thing.
+- **He speaks in his own nouns, and the docs must meet him there** (2026-08-01). He says **"job
+  hunt"**; every file says `job-market`. He says **"minus"**; the notation says `-`. The alias table
+  in `hooks/data-refresh.md` exists because a literal matcher would have found no routine by the
+  name he actually uses. **Never make him restate a request in notation.**
 
 ## 📌 Lineage (INHERITED)
 
@@ -125,16 +151,19 @@ I am its heaviest consumer and she is its owner — I do not edit it, I fire it.
 - **2026-07-25** — Felix recommended RETIRING the queue item (the contract being already proven).
   **Michael overruled: Q12 → B, build the agent, and not as a hook.**
 - **2026-07-26** — name fork (Rocky vs Ricky) surfaced and ruled: **Ricky**. BUILT the same session.
-- **2026-08-01** — Michael asked where my completed-run summaries land. Answer: nowhere, there was no
-  such place and two runbooks pointed `report-to:` at a standard nobody had written. Standing Run
-  Reports thread created, the report template locked, and rule 13 (complete loops) added to the
-  universal Discipline. **Still not run.**
+- **2026-08-01** — Michael asked where my completed-run summaries land. Answer: nowhere. Standing Run
+  Reports thread created, report template locked into the door, rule 13 (complete loops) added to the
+  Discipline, THE STAMP LAW rewritten after it was found contradicting itself four ways, and the
+  invocation grammar extended (`/refresh run -<routine>` plus plain language). Then a **cold council
+  walk** found four more blockers the fix pass had missed, all of them in files nobody had reason to
+  open. **Still not run.**
 
 ## Pointers (never restate)
 
 - My runbook → `hooks/data-refresh.md` (I steward it)
 - Where a finished run lands → 🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajuhw1d
-- Pre-flight, every poll → `hooks/source-freshness-gate.md` (Sage stewards it)
+- Starting a new routine → `routines/_TEMPLATE.md` (copy it; the shape is not optional)
+- Pre-flight, every fetch → `hooks/source-freshness-gate.md` (Sage stewards it)
 - Never swap a source silently → `hooks/silent-fallback-law.md`
 - The contract I demonstrate → `gates/agent-invocation-gate.md`
 - New sources / open questions → `super-agents/scout-sage/`
