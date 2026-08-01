@@ -1,6 +1,6 @@
 <!--
   F1 Racetracks (circuit guide lens)
-  Version: v6.3 (shell) · cross-lens switcher + sequential style band
+  Version: v17 (shell) · shared chrome spine + cross-lens switcher + sequential style band
   Live: https://mawizorek.github.io/ClickUp_apps/f1-racetracks/circuits.html
   Source: https://github.com/mawizorek/ClickUp_apps/tree/main/f1-racetracks
   INFRASTRUCTURE: slim runtime entrypoint + direct source modules in /source.
@@ -16,6 +16,13 @@
   NOT STORED ANYWHERE — source/08_season.js derives them all from the session dates at boot,
   so a mid-season cancellation or insertion self-heals. Supersedes the v6.1 layout where the
   per-year fields lived inside the circuits index and drifted for eight months.
+  COLOUR (v16): 08_season.js also reads shared/themes/colors.tsv and injects --t-<team>,
+  --t-<team>-2 and --t-<team>-deep onto :root, so team colour has ONE source across the app
+  and a two-stop team gradient is expressible. Edit the TSV row, every surface follows.
+  CHROME (v17): source/chrome-tokens.css is THE SHARED SPINE — canonical token vocabulary,
+  one type scale, one page gutter, the brand lockup + lens switcher, shared with
+  standings.html and weekend.html. It is linked AFTER the inline <style> below so it wins
+  the cascade; the inline :root stays as the first-paint floor. Decision Log J16 + J17.
   STYLE BAND: 02..07 fetched in order below.
   DESIGN SYSTEM (v6.2): Chakra Petch / JetBrains Mono / Inter + shared oklch (hue 268).
   SEAMLESS NAV (v6.5): cross-document View Transitions + chrome paints on first byte.
@@ -25,8 +32,10 @@
   reworked the home cards to a database feel.
   v9: source/09 culls the marketing hero and adds a top-level filter bar (Continent /
   Era / Status / Breakdown). Footer culled here to version meta + a single Live tracker
-  link (the dev/export tools were sloppy under the unified shell). Bytes -> 20260713e.
-  CACHE-BUST: bump BUILD_STAMP below AND the ?v= token on the module <script> tags on every source/style deploy.
+  link (the dev/export tools were sloppy under the unified shell).
+  ⚠️ CACHE-BUST: bump BUILD_STAMP below AND the ?v= token on every module <script> tag on
+  every source/style deploy. It read 20260801a through v12, v13, v14, v15 AND v16 — five
+  versions behind one token, which is how a phone ends up looking at last week's bundle.
   Footer version label lives in source/09 (APP_VERSION). Keep it in sync with this header.
 -->
 <html lang="en-US">
@@ -43,11 +52,12 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
   <style>
     html{background:oklch(0.16 0.012 268)}
-    @view-transition{navigation:auto}
-    ::view-transition-old(root),::view-transition-new(root){animation-duration:.32s;animation-timing-function:cubic-bezier(0.16,1,0.3,1)}
-    @media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
     #app,footer.app{opacity:0}
     body.runtime-ready #app,body.runtime-ready footer.app{opacity:1;transition:opacity .22s cubic-bezier(0.16,1,0.3,1)}
+    /* FIRST-PAINT FLOOR ONLY. The canonical vocabulary is --txt / --txt-mid / --s1 / --s2 /
+       --s3 in source/chrome-tokens.css, which loads after this block and aliases these
+       names onto it. Every value here was verified byte-identical to its canonical twin
+       before the aliases were written, so nothing shifts colour. Do not add tokens here. */
     :root{
       --bg:oklch(0.16 0.012 268);--bg2:oklch(0.195 0.014 268);
       --surface:oklch(0.225 0.015 268);--surface2:oklch(0.265 0.016 268);
@@ -56,27 +66,20 @@
       --red:oklch(0.64 0.21 26);--ease:cubic-bezier(0.16,1,0.3,1);
     }
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',system-ui,sans-serif;font-weight:450;background:var(--bg);color:var(--text);line-height:1.55;letter-spacing:0.006em;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;padding:clamp(16px,3vw,40px) clamp(16px,3.5vw,52px) 0;min-height:100vh}
+    body{font-family:'Inter',system-ui,sans-serif;font-weight:450;background:var(--bg);color:var(--text);line-height:1.55;letter-spacing:0.006em;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;padding-top:clamp(16px,3vw,40px);min-height:100vh}
     .wrap{max-width:1200px;margin:0 auto}
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:26px}
-    .brand{display:flex;align-items:center;gap:11px;cursor:pointer;background:none;border:none;color:inherit;font:inherit;padding:0;view-transition-name:f1-brand}
-    .brand .mark{width:30px;height:30px;border-radius:8px;background:var(--red);display:grid;place-items:center;flex:none;box-shadow:0 6px 18px -6px oklch(0.64 0.21 26/.7)}
-    .brand .mark svg{width:18px;height:18px;display:block}
-    .brand .t{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:-0.01em}
-    .brand .t small{display:block;font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:500;margin-top:2px}
     .topbar-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .nav-jump{display:flex;align-items:center;gap:8px}
     .nav-jump select{font-family:'JetBrains Mono',monospace;font-size:.74rem;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px 11px;cursor:pointer;max-width:60vw}
-    .lens{display:inline-flex;border:1px solid var(--line);background:var(--surface)}
-    .lens>*{font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:transparent;border:0;cursor:pointer;padding:8px 15px;text-decoration:none;display:inline-flex;align-items:center;transition:color .15s var(--ease),background .15s var(--ease)}
-    .lens>*+*{border-left:1px solid var(--line)}
-    .lens .on{background:var(--surface2);color:var(--text);cursor:default}
-    .lens a:hover:not(.on){color:var(--text);background:var(--bg2)}
-    @media (max-width:560px){.lens>*{padding:8px 12px;font-size:.62rem;letter-spacing:.06em}}
   </style>
+  <!-- LAST on purpose: the shared spine wins the cascade over the floor above. It carries
+       the brand lockup, the lens switcher, the type ramp, the gutter and the view
+       transitions that used to be declared separately on each of the three surfaces. -->
+  <link rel="stylesheet" href="./source/chrome-tokens.css?v=20260801b">
   <script>
     // Bump this one token on every source/style deploy to guarantee fresh bytes.
-    const BUILD_STAMP = '20260801a';
+    const BUILD_STAMP = '20260801b';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
@@ -124,23 +127,23 @@
     <div id="app"></div>
 
     <footer class="app">
-      <span class="meta-txt" id="foot-meta">F1 Racetracks v6.3 · loading data…</span>
+      <span class="meta-txt" id="foot-meta">F1 Racetracks v17 · loading data…</span>
       <div class="toolbar">
         <a class="tool" href="./live-tracker.html">Live tracker</a>
       </div>
     </footer>
   </div>
 
-  <script src="./source/08_season.js?v=20260801a"></script>
-  <script src="./source/12_results_store.js?v=20260801a"></script>
-  <script src="./source/09_app_bootstrap_and_home.js?v=20260801a"></script>
-  <script src="./source/10_track_views_and_profile.js?v=20260801a"></script>
-  <script src="./source/13_live_session_panel.js?v=20260801a"></script>
-  <script src="./source/11_weather_and_footer_exports.js?v=20260801a"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260801a"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260801a"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260801a"></script>
-  <script src="./source/17_weekend_mount.js?v=20260801a"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260801a"></script>
+  <script src="./source/08_season.js?v=20260801b"></script>
+  <script src="./source/12_results_store.js?v=20260801b"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260801b"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260801b"></script>
+  <script src="./source/13_live_session_panel.js?v=20260801b"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260801b"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260801b"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260801b"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260801b"></script>
+  <script src="./source/17_weekend_mount.js?v=20260801b"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260801b"></script>
 </body>
 </html>

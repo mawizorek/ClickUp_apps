@@ -1,0 +1,156 @@
+/* chrome-tokens.css — THE SHARED CHROME SPINE (new 2026-08-01, v17).
+
+   WHY THIS FILE EXISTS. Michael, looking at the live app: "why does matrix and history
+   feel in a separate shell than Circuits? they have like different header scaling even if
+   the content and objects are the same." They did, because there were three hand-rolled
+   chromes: circuits styled by an inline <style> in its own HTML, standings by
+   source/standings/base.css, weekend by source/weekend/base.css. Three type scales, two
+   token vocabularies, two page gutters, and a brand lockup on two surfaces out of three.
+
+   WHAT IT IS. One canonical token vocabulary + one type scale + the shared brand lockup and
+   lens switcher. Every surface links it AFTER its own base.css, so it wins on the cascade
+   and nothing has to be deleted from a stylesheet to adopt it. Purely additive.
+
+   WHY ADDITIVE AND NOT A REWRITE. Unifying by editing would mean retyping two ~11.5KB
+   stylesheets whole through a write path that has no partial edit — the transcription risk
+   refused in Decision Log J12. The cascade does the same job for free.
+
+   ⚠️ THIS IS TRANSITIONAL. Build Order steps 8-13 replace all three shells with one router
+   + chrome.js. This file is the vocabulary that consolidation inherits, not a fourth chrome.
+   Do NOT grow it into a component library. Tokens, type ramp, brand, lens switcher. Stop.
+
+   Decision Log J16 (the measurement) and J17 (this).
+*/
+
+/* ===========================================================================
+   1. THE CANONICAL VOCABULARY
+
+   Two of the three surfaces (standings, weekend) already spoke --txt / --s1 / --s2.
+   Circuits alone used --text / --surface / --bg2, declared inline in its HTML. So the
+   canon is not invented here — it is the dialect the majority already used, and circuits
+   gets aliases in section 2 rather than a rewrite.
+
+   TWO VALUES DRIFTED and are resolved to the two-of-three reading:
+     --s3       standings had oklch(0.275 0.018 255); weekend + circuits both had
+                oklch(0.265 0.016 268). The standings hover surface has been 13 hue
+                degrees off the rest of the app for as long as both files existed.
+     --txt-dim  standings had 0.012 chroma, the other two 0.013.
+   =========================================================================== */
+:root{
+  --bg:oklch(0.16 0.012 268);
+  --s1:oklch(0.195 0.014 268);
+  --s2:oklch(0.225 0.015 268);
+  --s3:oklch(0.265 0.016 268);
+  --line:oklch(0.30 0.014 268);
+  --line-soft:oklch(0.25 0.013 268);
+  --txt:oklch(0.95 0.006 268);
+  --txt-mid:oklch(0.74 0.011 268);
+  --txt-dim:oklch(0.56 0.013 268);
+  --red:oklch(0.64 0.21 26);
+  --ease:cubic-bezier(0.16,1,0.3,1);
+
+  /* ONE type ramp. The complaint that opened this file: the brand lockup was a FIXED
+     1.05rem on circuits and 0.94rem on weekend, while the standings <h1> was fluid up to
+     1.8rem — 71% larger on a wide screen, same app, same content. */
+  --fs-eyebrow:0.60rem;
+  --fs-brand:clamp(0.96rem,1.1rem + 0.35vw,1.22rem);
+  --fs-mast:clamp(1.15rem,3.2vw,1.8rem);
+  --track-eyebrow:0.16em;
+
+  /* ONE page gutter. Was clamp(16px,3vw,40px) on circuits and clamp(9px,2vw,20px) on
+     standings — up to 32px apart, which is why the content block sat differently even
+     when the objects inside it matched. */
+  --gutter:clamp(14px,2.6vw,32px);
+}
+
+/* ===========================================================================
+   2. CIRCUITS ALIASES — one-way, and verified by VALUE not by name.
+
+   Every pair below was confirmed byte-identical in the two source files before being
+   aliased, so this changes no colour anywhere. It exists so a rule written against the
+   canon works on circuits too, and so the inline block in circuits.html can eventually
+   be deleted without touching a single rule that reads it.
+   =========================================================================== */
+:root{
+  --text:var(--txt);
+  --muted:var(--txt-mid);
+  --faint:var(--txt-dim);
+  --surface:var(--s2);
+  --surface2:var(--s3);
+  --bg2:var(--s1);
+}
+
+/* ===========================================================================
+   3. THE BRAND LOCKUP — one implementation, three surfaces.
+
+   🔴 The morph has been dead since v6.5. standings.html declared
+   `.brand{view-transition-name:f1-brand}` and contained NO .brand element, while its own
+   header comment claimed a "persistent F1 brand morph shared with the circuits lens."
+   An inert rule cannot morph anything, so crossing lenses cross-faded the entire page —
+   which IS the "separate shell" feeling. The element is added to standings in this PR and
+   styled from here, so neither big stylesheet grows.
+
+   The mark element is `.mark` on circuits and `.mk` on weekend. Both are supported rather
+   than renamed: renaming means editing the markup builders in two JS modules for cosmetics.
+   =========================================================================== */
+.brand{
+  display:flex;align-items:center;gap:10px;
+  background:none;border:0;padding:0;cursor:pointer;color:inherit;font:inherit;
+  text-decoration:none;
+  view-transition-name:f1-brand;
+}
+.brand .mark,.brand .mk{
+  width:30px;height:30px;flex:none;border-radius:8px;
+  background:var(--red);display:grid;place-items:center;
+  box-shadow:0 6px 18px -6px oklch(0.64 0.21 26 / 0.7);
+}
+.brand .mark svg,.brand .mk svg{width:18px;height:18px;display:block}
+.brand .t{
+  font-family:'Chakra Petch',sans-serif;font-weight:700;
+  font-size:var(--fs-brand);line-height:1.05;letter-spacing:-0.01em;text-align:left;
+}
+.brand .t small{
+  display:block;font-family:'JetBrains Mono',monospace;font-weight:500;
+  font-size:0.56rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--txt-dim);margin-top:3px;
+}
+
+/* ===========================================================================
+   4. THE MASTHEAD + GUTTER — the two things that made the surfaces feel unrelated.
+   =========================================================================== */
+body{padding-left:var(--gutter);padding-right:var(--gutter)}
+
+header.mast h1,.mast .hgp{font-size:var(--fs-mast);line-height:1.02;letter-spacing:-0.01em}
+.eyebrow{font-size:var(--fs-eyebrow);letter-spacing:var(--track-eyebrow)}
+
+/* The standings masthead now carries the lockup, so it needs a row above the title.
+   Scoped to .mast-top so no existing standings rule is affected. */
+.mast-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.mast-top .lens{margin-left:auto}
+
+/* ===========================================================================
+   5. THE LENS SWITCHER — identical treatment on all three.
+   Circuits used `.lens>*`, weekend used `.lens a,.lens span`. Both shapes covered.
+   =========================================================================== */
+.lens{display:inline-flex;border:1px solid var(--line);background:var(--s1)}
+.lens>*{
+  font-family:'JetBrains Mono',monospace;font-size:0.66rem;font-weight:600;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--txt-mid);
+  background:transparent;border:0;cursor:pointer;padding:8px 14px;
+  text-decoration:none;display:inline-flex;align-items:center;
+  transition:color .15s var(--ease),background .15s var(--ease);
+}
+.lens>*+*{border-left:1px solid var(--line)}
+.lens .on{background:var(--s3);color:var(--txt);cursor:default}
+.lens a:hover:not(.on){color:var(--txt);background:var(--s2)}
+@media(max-width:560px){.lens>*{padding:8px 11px;font-size:0.6rem;letter-spacing:0.06em}}
+
+/* Cross-document view transitions. Declared once here instead of in three <style> blocks,
+   and honoured by the reduced-motion guard the app already uses everywhere else. */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){
+  animation-duration:.32s;animation-timing-function:cubic-bezier(0.16,1,0.3,1);
+}
+@media(prefers-reduced-motion:reduce){
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
+}

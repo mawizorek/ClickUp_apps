@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <!--
-  F1 Race Weekend (weekend lens) — v13 shell.
+  F1 Race Weekend (weekend lens) — v17 shell.
   Per-round race-weekend detail layer, DECOMPOSED to source modules under source/weekend/.
   styles : source/weekend/base.css   (tokens, topbar, drill-through nav, chrome)
            source/weekend/panels.css (all section styling + animations)
            source/weekend/story.css  (Story mode: Results/Story toggle + replay surface)
+           source/chrome-tokens.css  (v17: THE SHARED CHROME SPINE — canonical token
+                                      vocabulary, one type scale, one gutter, the brand
+                                      lockup + lens switcher. Loaded LAST so it wins the
+                                      cascade over this lens's own :root without anything
+                                      being deleted from base.css. Decision Log J16 + J17.)
   logic  : source/08_season.js       (SEASON DERIVATION — the weekend vector + derived
-                                      round / status / dates / round pointers. SHARED with
-                                      circuits.html and standings.html; added here v13.)
+                                      round / status / dates / round pointers, plus the
+                                      shared colour vector. SHARED with circuits.html and
+                                      standings.html.)
            source/weekend/data.js    (store fetch + embed fallback + live swing)
            source/weekend/story.js   (Story mode engine — defines window.mountStory)
            source/weekend/render.js  (section renderers + Results/Story toggle, v2.1)
@@ -33,9 +39,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/weekend/base.css?v=13">
-<link rel="stylesheet" href="source/weekend/panels.css?v=13">
-<link rel="stylesheet" href="source/weekend/story.css?v=13">
+<link rel="stylesheet" href="source/weekend/base.css?v=17">
+<link rel="stylesheet" href="source/weekend/panels.css?v=17">
+<link rel="stylesheet" href="source/weekend/story.css?v=17">
+<!-- LAST on purpose: the shared spine wins the cascade over this lens's own :root. -->
+<link rel="stylesheet" href="source/chrome-tokens.css?v=17">
 </head>
 <body>
   <div id="topbar"></div>
@@ -46,10 +54,10 @@
     <span>Race Weekend <b class="num" id="foot-stamp">v6</b> · derived from results store</span>
     <span class="num">f1-results/2026/</span>
   </footer>
-  <script src="source/08_season.js?v=13"></script>
-  <script src="source/weekend/data.js?v=13"></script>
-  <script src="source/weekend/story.js?v=13"></script>
-  <script src="source/weekend/render.js?v=13"></script>
-  <script src="source/weekend/nav.js?v=13"></script>
+  <script src="source/08_season.js?v=17"></script>
+  <script src="source/weekend/data.js?v=17"></script>
+  <script src="source/weekend/story.js?v=17"></script>
+  <script src="source/weekend/render.js?v=17"></script>
+  <script src="source/weekend/nav.js?v=17"></script>
 </body>
 </html>
