@@ -1,9 +1,24 @@
-/* weekend/data.js — Race Weekend lens, data layer (v2.0).
-   SINGLE SOURCE OF TRUTH = f1-results/2026/ (index_rounds.json + per-round files).
-   Loads the whole season so the championship swing can be computed LIVE (cumulative
-   WDC after each round). Fails soft to an embedded Canada (r5) snapshot so the page
-   still renders off-origin (local preview). Nothing about results is stored twice —
-   podium/pole/FL/grid/quali/sprint all derive from the round file in render.js.
+/* weekend/data.js — Race Weekend lens, data layer (v13).
+   SINGLE SOURCE OF TRUTH for RESULTS = f1-results/2026/ (index_rounds.json + per-round files).
+   SINGLE SOURCE OF TRUTH for the CALENDAR = season/2026/index_weekends.json, read through
+   source/08_season.js (window.F1Season). Loads the whole season so the championship swing can
+   be computed LIVE (cumulative WDC after each round). Fails soft to an embedded Canada (r5)
+   snapshot so the page still renders off-origin (local preview). Nothing about results is
+   stored twice — podium/pole/FL/grid/quali/sprint all derive from the round file in render.js.
+
+   ⚠️ CHANGED v13 (2026-08-01). Two defects the v11 season restructure left in this file:
+
+     1. `META.last_completed_round_slug` was read straight off index_rounds.json. v11 DELETED
+        that field — it is derived now — so this silently became null and stayed null. It is
+        taken from the season layer below.
+     2. The manifest was ordered with `(a,b)=>a.round-b.round`. v11 reduced manifest rows to
+        {slug, file}, making that NaN on every comparison. It never misordered anything only
+        because the rows are written in date order. Ordering is by DERIVED round now.
+
+   Where a round's NUMBER / NAME / DATE come from (v13): the WEEKEND VECTOR, joined by slug.
+   The round file's own stored `round` / `name` / `date` are the FALLBACK, used verbatim when
+   the season layer is unreachable. That fallback is deliberate and load-bearing — it is what
+   lets those three fields be deleted from the round files without this surface noticing.
 
    Globals exposed (classic-script scope, read bare by render.js / nav.js):
      ROUNDS  — ascending array of round objects
@@ -35,7 +50,9 @@ const STINTS={
 };
 const stintsFor=slug=>STINTS[slug]||null;
 
-/* embedded fallback (off-origin preview): the Canada round only */
+/* embedded fallback (off-origin preview): the Canada round only.
+   It KEEPS round/name/date inline on purpose — it is a self-contained snapshot for the case
+   where no fetch works at all, so it cannot lean on either the store or the season vector. */
 const EMBED={meta:{last_completed_round_slug:'gilles-villeneuve'},rounds:[{
   round:5,slug:'gilles-villeneuve',name:'Canadian Grand Prix',date:'2026-05-24',
   summary:"Antonelli's fourth win in a row after leader Russell retired from the lead battle with a power-unit issue on lap 30. First driver to win each of his first four F1 races in succession.",
@@ -78,14 +95,38 @@ const EMBED={meta:{last_completed_round_slug:'gilles-villeneuve'},rounds:[{
 /* shared season state */
 let ROUNDS=[], META={};
 
+/* The season calendar, or null if the layer is missing/unreachable. Never throws: this lens
+   renders results, and a calendar outage must cost the round LABEL, never the whole page. */
+async function seasonCalendar(){
+  if(!window.F1Season||!window.F1Season.ready) return null;
+  try{ return await window.F1Season.ready; }
+  catch(e){ console.error('[weekend] season layer unavailable — round number, name and date fall back to the round file.',e); return null; }
+}
+
+/* Join one round file to its weekend row. Vector wins; the round file's own stored fields are
+   the fallback. Both sides are read by slug — never by round number (a derived ordinal is not
+   a key, see Decision Log J9 ruling 4). */
+function withSeasonMeta(rd,mf,cal){
+  if(!rd) return null;
+  const slug=rd.slug||(mf&&mf.slug)||null;
+  const w=(cal&&cal.bySlug&&slug)?cal.bySlug[slug]:null;
+  return Object.assign({},rd,{
+    slug:slug,
+    round:(w&&w.round!=null)?w.round:rd.round,
+    name:(w&&w.name)?w.name:rd.name,
+    date:(w&&w.raceDate)?w.raceDate:rd.date
+  });
+}
+
 async function loadSeason(){
+  const cal=await seasonCalendar();
   try{
     const idx=await fetch(BASE+'index_rounds.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.json();});
-    META={last_completed_round_slug:idx.last_completed_round_slug||null};
-    const files=(idx.rounds||[]).slice().sort((a,b)=>a.round-b.round);
-    const loaded=await Promise.all(files.map(f=>fetch(BASE+f.file.replace('./',''),{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null)));
-    ROUNDS=loaded.filter(Boolean).sort((a,b)=>a.round-b.round);
+    const manifest=(idx.rounds||[]);
+    const loaded=await Promise.all(manifest.map(f=>fetch(BASE+f.file.replace('./',''),{cache:'no-cache'}).then(r=>r.ok?r.json():null).catch(()=>null)));
+    ROUNDS=loaded.map((rd,i)=>withSeasonMeta(rd,manifest[i],cal)).filter(Boolean).sort((a,b)=>(a.round||0)-(b.round||0));
     if(!ROUNDS.length) throw 0;
+    META={last_completed_round_slug:(cal&&cal.last_completed_round_slug)||null};
   }catch(e){
     ROUNDS=EMBED.rounds; META=EMBED.meta;
   }
