@@ -17,10 +17,24 @@
  (Completed/Live/Upcoming from index status), Breakdown (report flag). AND across
  dimensions, OR within one; live count + reset + empty state. All markup/CSS injected
  here, scoped, so circuits.html stays a thin shell and it works under the v7 app shell.
- Team-home-race deliberately omitted (ambiguous; needs a curated mapping, not a guess). */
+ Team-home-race deliberately omitted (ambiguous; needs a curated mapping, not a guess).
 
-const APP_VERSION = "v9";
-const APP_DATE = "2026-07-13";
+ v11 (2026-08-01): THREE VECTORS, DERIVED ORDERING. The v6.1 note above is superseded.
+ Boot no longer reads the circuits index for per-year data — that index is now a plain
+ slug -> file map of TIMELESS circuit identity. The season calendar is its own vector at
+ season/2026/index_weekends.json (one row per RACE WEEKEND), and round / status / the short
+ display date / the current+last round pointers are all DERIVED at boot by source/08_season.js
+ from the session dates. Nothing time-shaped is stored any more.
+ Why: two hand-maintained round numberings drifted apart when Bahrain and Saudi Arabia were
+ cancelled mid-season, and stayed wrong for eight months. Michael: "circuits are one vector.
+ weekends are one vector. drivers are one vector. keep things separate and derived."
+ Consequences here: status is re-derived per track in the CIRCUIT'S OWN TIMEZONE (the weekend
+ flips live on Friday morning at the track, not at the viewer's midnight), and a weekend whose
+ circuit file does not exist yet STILL RENDERS as an upcoming round with report:false, instead
+ of vanishing through the old per-file soft-fail. Decision Log J7-J9. */
+
+const APP_VERSION = "v11";
+const APP_DATE = "2026-08-01";
 const SEASON = "2026";
 const CIRCUITS_BASE = "circuits/";
 
@@ -41,7 +55,7 @@ const TEAM_COLORS = {
  files, every circuit has a cc, so this maps cleanly with no guessing. */
 const CONTINENT = {
  AU: "Oceania",
- CN: "Asia", JP: "Asia", SG: "Asia", AZ: "Asia",
+ CN: "Asia", JP: "Asia", SG: "Asia", AZ: "Asia", MY: "Asia",
  QA: "Middle East", AE: "Middle East",
  US: "N. America", CA: "N. America", MX: "N. America",
  BR: "S. America",
@@ -49,6 +63,8 @@ const CONTINENT = {
 };
 const CONTINENT_ORDER = ["Europe", "Asia", "Middle East", "N. America", "S. America", "Oceania"];
 // Editorial era split: recently-added / street-era venues = Modern; heritage venues = Classic.
+// NOTE: `sepang` is deliberately absent — it is an editorial call, not a fact, and this pass
+// refused to guess one. It currently reads Classic by default.
 const MODERN = new Set(["miami", "las-vegas", "losail", "yas-marina", "cota", "baku", "madring", "marina-bay"]);
 
 let TRACKS = [];
@@ -164,6 +180,7 @@ function updateFooterMeta(target) {
 .jd-row:hover{background:var(--surface)}
 .jd-row[aria-current="true"]{background:var(--surface2)}
 .jd-row[data-soon]{opacity:.5}
+.jd-row[data-soon]{cursor:default}
 .jd-rn{font-family:'JetBrains Mono',monospace;font-size:.64rem;font-weight:700;color:var(--faint);letter-spacing:.08em;min-width:30px}
 .jd-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--faint)}
 .jd-dot.done{background:var(--done)}.jd-dot.active{background:var(--active)}
@@ -279,7 +296,7 @@ function buildJump() {
  if (!jumpEls) return;
  jumpEls.list.innerHTML = TRACKS.map(t => {
  const st = t.status === "done" ? "done" : t.status === "active" ? "active" : "pending";
- return `<button class="jd-row" type="button" data-slug="${t.slug}"${t.report ? "" : " data-soon=\"1\""}>`
+ return `<button class="jd-row" type="button" data-slug="${t.slug}"${t.report ? "" : " data-soon=\"1\" disabled"}>`
  + `<span class="jd-rn">R${String(t.round).padStart(2, "0")}</span>`
  + `<span class="jd-dot ${st}"></span>`
  + `<span class="jd-gp">${esc(t.gp)}</span>`
@@ -412,7 +429,7 @@ function renderDataUnavailable(error) {
  </div>
  <div class="card empty-card">
  <div class="panel-b" style="padding:22px 4px">
- <p class="note">Couldn\u2019t load <code>circuits/index_circuits.json</code> (or every circuit file failed). Keep the page on the same origin as the <code>circuits/</code> folder, or reload once the store is reachable.</p>
+ <p class="note">Couldn\u2019t load the season vectors (<code>season/${SEASON}/index_weekends.json</code> + <code>circuits/index_circuits.json</code>). Keep the page on the same origin as those folders, or reload once the store is reachable.</p>
  </div>
  </div>
  </div>
@@ -424,7 +441,7 @@ function renderDataUnavailable(error) {
 
 function router() {
  const slug = (location.hash.replace(/^#\/?/, "") || "").trim();
- if (slug && bySlug[slug]) renderTrack(bySlug[slug]);
+ if (slug && bySlug[slug] && bySlug[slug].report) renderTrack(bySlug[slug]);
  else renderHome();
  highlightJump(bySlug[slug] ? slug : "");
  window.scrollTo(0, 0);
@@ -437,7 +454,7 @@ function router() {
 
 window.addEventListener("hashchange", router);
 
-/* Index of the "current" round: prefer the canonical results-store meta, else first
+/* Index of the "current" round: prefer the canonical derived meta, else first
  active, else first pending. */
 function currentIndex() {
  const meta = appDataMeta || {};
@@ -521,34 +538,63 @@ function renderHome() {
 // before circuit data lands (the list fills in later via buildJump()).
 setupJump();
 
-/* Boot: fetch the per-circuit index, then each circuit file. Merge the per-year fields
- from the index entry onto each circuit. Soft-fail per file. */
+/* Boot (v11): the WEEKEND vector is the calendar. For each weekend, in derived round order,
+ load its circuit file from the CIRCUIT vector and merge the per-year fields on.
+
+ Two deliberate behaviours here, both new:
+ 1. A weekend whose circuit file is MISSING or fails to load still appears, as an upcoming
+ round with report:false. The old boot dropped it silently, which meant a newly-announced
+ round was invisible until someone dug its layout data. The calendar is the calendar.
+ 2. `status` is re-derived per track using the circuit's OWN `tz`, so the weekend goes live
+ on Friday at the track rather than at the viewer's midnight. 08 computed a zone-less
+ baseline; this is the accurate pass. */
 (async function boot() {
  try {
  updateFooterMeta(null);
- const idxRes = await fetch(CIRCUITS_BASE + "index_circuits.json", { cache: "no-cache" });
- if (!idxRes.ok) throw new Error("index_circuits.json " + idxRes.status);
- const idx = await idxRes.json();
- const entries = (idx.circuits || []);
- const loaded = await Promise.all(entries.map(async (e) => {
+ if (!window.F1Season) throw new Error("season layer missing (source/08_season.js)");
+ const calendar = await window.F1Season.ready;
+ const weekends = (calendar && calendar.weekends) || [];
+ if (!weekends.length) throw new Error("no weekends in the season vector");
+ const fileFor = (calendar && calendar.circuitFile) || {};
+
+ const loaded = await Promise.all(weekends.map(async (w) => {
+ let circuit = null;
+ const rel = fileFor[w.slug];
+ if (rel) {
  try {
- const path = CIRCUITS_BASE + String(e.file).replace("./", "");
+ const path = CIRCUITS_BASE + String(rel).replace("./", "");
  const r = await fetch(path, { cache: "no-cache" });
- if (!r.ok) throw new Error(e.slug + " " + r.status);
- const circuit = await r.json();
- return Object.assign(circuit, {
- round: e.round,
- date: e.date,
- status: e.status,
- sessions: e.sessions
- });
+ if (r.ok) circuit = await r.json();
+ else console.error("circuit load failed:", w.slug, r.status);
  } catch (err) {
- console.error("circuit load failed:", e.slug, err);
- return null; // soft-fail: skip this one, keep the rest
+ console.error("circuit load failed:", w.slug, err);
  }
+ } else {
+ console.warn("no circuit file registered for weekend:", w.slug);
+ }
+
+ // Minimal stand-in so an undug circuit is still a visible round on the calendar.
+ const base = circuit || { slug: w.slug, title: w.name || w.slug, loc: "", flag: "\u{1F3C1}", cc: "" };
+
+ return Object.assign(base, {
+ slug: w.slug,
+ // The weekend owns the Grand Prix name; the circuit file's `gp` is the legacy
+ // fallback and gets deleted once every weekend row carries a verified value.
+ gp: w.gp || base.gp || w.name || w.slug,
+ name: w.name || base.gp || w.slug,
+ round: w.round,
+ date: w.date,
+ raceDate: w.raceDate,
+ sprint: !!w.sprint,
+ cuTaskId: w.cuTaskId || null,
+ sessions: w.sessions || [],
+ status: window.F1Season.statusFor(w.firstDate, w.raceDate, base.tz),
+ report: !!base.report
+ });
  }));
+
  const tracks = loaded.filter(Boolean);
- if (!tracks.length) throw new Error("no circuit files loaded");
+ if (!tracks.length) throw new Error("no rounds assembled");
  applyData(tracks);
  if (window.lucide) lucide.createIcons();
  } catch (err) {
