@@ -1,0 +1,117 @@
+/* Inciardi Collection — THE ARTWORK DETAIL. One print, full page.
+ * ZERO COLOUR LITERALS.
+ *
+ * 🔴 INK RULE, same as everywhere: `accent`, `accent-deep` and `accent-2` are BRAND colours,
+ * identical on both ramps. Ink is `--text*` or `--accent-deep`. Brand colours fill, they do not
+ * letter. v10 found three `accent-2`-as-ink rules in summary.css and v12 found three more, so
+ * this file was written with the rule rather than audited into it.
+ */
+
+.aw { padding-bottom: var(--gap-lg, 20px); }
+
+/* ---------- the name ----------
+   Display type and the loudest thing on the page. It is an <h1> because this route's header
+   title is the generic word "Print" — the SPECIFIC name has to live in the content area, or the
+   page never says which print you are looking at above the fold. */
+.aw-head { margin-bottom: var(--gap-md, 12px); }
+.aw-name { margin: 0; font-family: var(--font-display, inherit);
+  font-size: var(--fs-xl, 1.5rem); font-weight: 600; line-height: 1.15;
+  letter-spacing: var(--track-tight, -0.02em); color: var(--text); text-wrap: balance; }
+.aw-id { margin: 4px 0 0; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint);
+  text-wrap: pretty; }
+.aw-id code { font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--accent-deep); }
+
+/* ---------- the counts ----------
+   THREE cells, and the count is deliberate. The back room's number strip was deleted at v15 for
+   rendering four numbers as four facts of equal standing when one of them meant something else
+   entirely. These three are the same KIND of fact — copies of this print — and they add up:
+   in binder + spare = owned. A fourth cell only appears when `placed` exceeds `owned`, which is
+   the genuinely surprising case (one print in three slots) and earns the explanation. */
+.aw-nums { display: flex; gap: var(--gap-xs, 8px); flex-wrap: wrap;
+  margin: var(--gap-md, 12px) 0; }
+.aw-num { flex: 1 1 0; min-width: 72px; padding: 9px 10px;
+  background: var(--surface-1);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
+  text-align: center; }
+.awn-v { display: block; font-family: var(--font-display, inherit);
+  font-size: var(--fs-lg, 1.3rem); font-weight: 700; line-height: 1.1;
+  color: var(--text); font-variant-numeric: tabular-nums; }
+.awn-k { display: block; margin-top: 2px;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.58rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); }
+
+/* ---------- fact chips ----------
+   Borrows the pill shape from `.br-pick` rather than inventing a fifth selector look. These are
+   READ-ONLY facts, never buttons, so no hover state and no pointer cursor — a chip that looks
+   tappable and is not is a small lie the binder already avoids elsewhere. */
+.aw-chips { display: flex; gap: 5px; flex-wrap: wrap; margin: var(--gap-md, 12px) 0; }
+.aw-chip { flex: 0 0 auto; padding: 3px 8px;
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius-pill, 8px);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  letter-spacing: 0.03em; color: var(--text-soft); }
+.aw-chip b { color: var(--text-faint); font-weight: 400; }
+
+.aw-notes { margin: var(--gap-md, 12px) 0; padding: 8px 11px;
+  background: var(--surface-1);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
+  font-size: var(--fs-sm, 0.85rem); line-height: 1.55; color: var(--text-soft);
+  text-wrap: pretty; }
+
+.aw-h { margin: var(--gap-lg, 20px) 0 var(--gap-xs, 8px);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent-deep); }
+
+/* ---------- placements + the did-you-mean list ----------
+   Each row is a real link to a real face. 44px minimum on the ANCHOR, not the <li>: the hit area
+   has to be the thing that navigates, which is the trap `.br-ovr` documents from the other side. */
+.aw-places { list-style: none; margin: 0; padding: 0; }
+.aw-places li { margin: 0 0 5px; }
+.aw-places a { display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gap-xs, 8px); min-height: 44px; padding: 7px 11px;
+  background: var(--surface-1);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
+  text-decoration: none; }
+.awp-sheet { font-size: var(--fs-sm, 0.85rem); color: var(--text); }
+.awp-pos { flex: 0 0 auto;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint);
+  font-variant-numeric: tabular-nums; }
+
+/* DASHED, because it is an absence. Same border grammar as the binder and the back room: solid
+   means a real thing, dashed means a gap or a caveat. */
+.aw-empty { margin: 0; padding: 9px 11px;
+  border: 1px dashed var(--border); border-radius: var(--radius, 6px);
+  font-size: var(--fs-xs, 0.72rem); line-height: 1.5; color: var(--text-soft); }
+.aw-empty a { color: var(--accent-deep); }
+
+/* ---------- editions ---------- */
+.aw-eds { list-style: none; margin: 0; padding: 0; }
+.aw-eds li { display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--gap-xs, 8px); padding: 7px 11px; margin-bottom: 5px;
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px); }
+.aw-lab { font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-sm, 0.85rem); color: var(--text); }
+/* An implicit edition is set in the BODY face, not mono, precisely so it does not read as a
+   label. It has no label; that is the point. */
+.aw-imp { font-size: var(--fs-sm, 0.85rem); color: var(--text-soft); font-style: italic; }
+.aw-note { flex: 0 0 auto; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-faint); }
+
+/* ---------- the photo gap ----------
+   Dashed and quiet. It is not an error and it is not a control — it is a stated absence with a
+   pointer to where the work is scoped. */
+.aw-photos { padding: 11px; border: 1px dashed var(--border);
+  border-radius: var(--radius, 6px); }
+.aw-photos p { margin: 0; font-size: var(--fs-sm, 0.85rem); line-height: 1.5;
+  color: var(--text-soft); text-wrap: pretty; }
+.aw-photos .aw-note { display: block; margin-top: 6px; text-transform: none;
+  letter-spacing: normal; font-family: inherit; font-size: var(--fs-xs, 0.72rem);
+  color: var(--text-faint); }
+.aw-photos code { font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--accent-deep); }
+
+.aw-back { margin: var(--gap-lg, 20px) 0 0; font-size: var(--fs-sm, 0.85rem); }
+.aw-back a { color: var(--accent-deep); text-decoration: none; }
