@@ -45,7 +45,17 @@
    a drivers-vector failure costs colour and short names and never the app itself.
 
    🎨 An unresolved team colour WARNS ONCE and falls back to the neutral tone. It never fails
-   silently - a silent fallback is how four teams rendered grey for months with nothing saying so.
+   silently - a silent fallback is how four teams rendered grey on this surface with nothing
+   saying so. As of v15 all eleven resolve, so that warning firing now means a NEW team has
+   appeared in the results data and nobody has added it to the seat vector's team register.
+
+   ⚠️ THIS IS NOT THE ONLY TEAM-COLOUR TABLE (found v15, Decision Log J13). source/standings/
+   base.css and source/weekend/base.css each declare a full --t-<team> custom-property set, and
+   they disagree with the seat register on every team - on Alpine they disagree in kind (cyan
+   here, pink there). Those two surfaces resolve colour through CSS and never call teamColor().
+   The duplication is structural, not lazy: CSS cannot read JSON at parse time, so unifying means
+   injecting the custom properties at boot from the register. That is an aesthetic change to
+   seven teams and it is Michael's call. Do not "tidy" it in passing.
 
    CONSUMERS. 12_results_store.js (current/last round pointers) and 09_app_bootstrap_and_home.js
    (the whole calendar, plus teamTone/lastName). Both await F1Season.ready.
@@ -108,9 +118,13 @@
     return 'active';
   }
 
-  /* Team colour from the SEAT vector's team register. An unresolved team warns ONCE and takes
-     the neutral tone. Four teams (Aston Martin, Audi, Haas, Cadillac) are null on purpose as of
-     2026-08-01 - see the colour_note on each row; picking brand colours is Michael's call. */
+  /* Team colour from the SEAT vector's team register. Returns whatever string the register
+     holds - hex for seven teams, oklch() for the four resolved on 2026-08-01 (copied verbatim
+     from the stylesheets rather than hand-converted; see that file's colour_format_note). Both
+     are valid CSS and go straight into a style attribute.
+
+     An unresolved team warns ONCE and takes the neutral tone. All eleven currently resolve, so
+     a warning here means the results store has a team the register does not. */
   function teamColor(team) {
     var key = String(team || '');
     var tone = teamTones[key];
@@ -162,8 +176,8 @@
     };
   }
 
-  /* Fill the two lookup tables from the seat vector. Only non-null colours are registered, so
-     a null stays a genuine miss and still trips the warning in teamColor(). */
+  /* Fill the two lookup tables from the seat vector. Only truthy colours are registered, so a
+     null stays a genuine miss and still trips the warning in teamColor(). */
   function absorbSeats(payload) {
     if (!payload) return;
     (payload.teams || []).forEach(function (t) {
