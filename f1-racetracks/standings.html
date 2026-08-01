@@ -9,7 +9,8 @@
 <!-- v6.7: driver popup race-pace strip reads REAL per-driver fastLap {time,lap} from the store (backfilled r1-9) with the lap number + round-FL purple pip. -->
 <!-- v13 (2026-08-01): SEASON LAYER. source/08_season.js loads FIRST and gives this surface the derived calendar — round numbers, names, dates and the season length — so nothing time-shaped is read out of a round file any more. Fixes a dead NaN sort left by v11 and a hardcoded "/ 22" that went wrong when the season became 23 rounds. -->
 <!-- v17 (2026-08-01): CHROME SPINE. source/chrome-tokens.css loads LAST and carries the canonical token vocabulary, one type scale, one page gutter, and the brand + switcher styling shared with the other two surfaces. Decision Log J16 + J17. -->
-<!-- v18 (2026-08-01): ONE CHROME RENDERER. The hand-written .mast-top header v17 added here is GONE — replaced by <div data-chrome>, which source/chrome.js fills. That module is now the ONLY place the brand + switcher markup exists in this app, and it renders NOTHING when embedded in the unified shell, so this page cannot double the shell's header the way v17 did. Decision Log J18 + J19. -->
+<!-- v18 (2026-08-01): ONE CHROME RENDERER. The hand-written .mast-top header v17 added here is GONE — replaced by <div data-chrome>, which source/chrome.js fills. That module is the ONLY place the brand + switcher markup exists in this app, and it renders NOTHING when embedded in the unified shell. Decision Log J18 + J19. -->
+<!-- v19 (2026-08-01): THE FORMS VECTOR. chrome-tokens.css now carries shared/themes/forms.tsv row `sharp` (radius / border-w / elevation / motion) and repoints every hardcoded radius in the app at it. ⚠️ This surface had NO radii of its own — it read as "sharp" only because nobody ever typed one. It is now sharp on purpose. Decision Log J20. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -20,11 +21,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/standings/base.css?v=19">
-<link rel="stylesheet" href="source/standings/panel.css?v=19">
+<link rel="stylesheet" href="source/standings/base.css?v=20">
+<link rel="stylesheet" href="source/standings/panel.css?v=20">
 <!-- LAST on purpose: the shared spine wins the cascade over this surface's own :root,
      which is how three chromes get unified without retyping two 11.5KB stylesheets. -->
-<link rel="stylesheet" href="source/chrome-tokens.css?v=19">
+<link rel="stylesheet" href="source/chrome-tokens.css?v=20">
 <style>
   html{background:oklch(0.16 0.012 268)}
 </style>
@@ -66,13 +67,13 @@
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
 
-  <script src="source/chrome.js?v=19"></script>
-  <script src="source/08_season.js?v=19"></script>
-  <script src="source/standings/data.js?v=19"></script>
-  <script src="source/standings/matrix.js?v=19"></script>
-  <script src="source/standings/trajectory.js?v=19"></script>
-  <script src="source/standings/panel.js?v=19"></script>
-  <script src="source/standings/nav.js?v=19"></script>
-  <script src="source/standings/history.js?v=19"></script>
+  <script src="source/chrome.js?v=20"></script>
+  <script src="source/08_season.js?v=20"></script>
+  <script src="source/standings/data.js?v=20"></script>
+  <script src="source/standings/matrix.js?v=20"></script>
+  <script src="source/standings/trajectory.js?v=20"></script>
+  <script src="source/standings/panel.js?v=20"></script>
+  <script src="source/standings/nav.js?v=20"></script>
+  <script src="source/standings/history.js?v=20"></script>
 </body>
 </html>
