@@ -118,11 +118,24 @@ html[data-device="mobile"] .flipper { height: 100%; width: 100%; aspect-ratio: a
    deep green on dark, pale mint on light. v9 used `accent-2` at 0.55 opacity — a brand colour,
    shared across modes by design, so on the light ramp it became mint-on-white and the initials
    vanished. The lesson is not "add a light override," it is DON'T USE A BRAND COLOUR AS INK. */
-.plate { flex: 1 1 auto; min-height: 0; display: grid; place-items: center;
+.plate { position: relative; flex: 1 1 auto; min-height: 0; display: grid; place-items: center;
   background: var(--accent-soft); }
 .plate .ini { font-family: var(--font-display, inherit);
   font-size: clamp(0.9rem, 20cqi, 2rem); font-weight: 700;
   letter-spacing: 0.06em; color: var(--accent-deep); }
+
+/* 🔴 THE PHOTOGRAPH, STACKED OVER THE INITIALS — NOT INSTEAD OF THEM (v21).
+   `.ini` above is still in the markup underneath every image, and this is positioned on top of
+   it. So a 404, a worker that is down, or a row whose bytes never reached R2 all reveal the
+   letters again rather than an empty grey box. That is rule 7 again, and it costs NO JavaScript
+   and no `onerror` handler precisely because the fallback was never taken away.
+   ⚠️ Do not "optimise" binder.js to skip the initials when an image exists. That deletes the
+   only fallback this card has, to save a span.
+
+   `cover`, not `contain`: a mini print is portrait and this plate is portrait, so cover crops
+   almost nothing — while contain would letterbox every single card against the mint plate. */
+.plate .shot { position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block; }
 
 /* Caption band ACROSS the card, not a tag hugging its text. It has to be `display:block` with a
    full width: a bare <span> flex item shrink-wraps, which is the little floating label box in
@@ -158,6 +171,14 @@ html[data-device="mobile"] .flipper { height: 100%; width: 100%; aspect-ratio: a
 .slot.wanted .plate .ini { color: var(--text-faint); }
 .slot.wanted .cap { background: transparent; }
 .slot.wanted .cap .nm { color: var(--text-soft); font-style: italic; font-weight: 400; }
+
+/* 🔴 AND A WANTED SLOT SHOWS NO PHOTOGRAPH, WHICH IS NOT TIDINESS (v21). A `wanted` card is the
+   visible-gap feature: a print you have LAID OUT and DO NOT OWN. Anastasia's shop photo of that
+   print may well exist and be attached — and rendering it would fill the ghost with a solid,
+   owned-looking image. The wishlist would quietly start looking like the collection, which is
+   the one thing the dashed border exists to prevent, and a photograph shouts louder than a
+   border style. The initials stay; the gap stays visible. */
+.slot.wanted .plate .shot { display: none; }
 
 /* NOTE = a written slip, not a failed card. It used to read as a bug: a big empty panel with the
    word "note" stranded at the bottom. Now the label leads and the text is the content. */
