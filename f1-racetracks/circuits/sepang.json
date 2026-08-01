@@ -1,0 +1,9 @@
+{
+ "slug": "sepang", "flag": "🇲🇾", "report": false,
+ "title": "Sepang International Circuit", "loc": "Kuala Lumpur", "cc": "MY",
+ "length": "5.543", "record": "1:34.080 · VET ’17", "recordNote": true,
+ "tz": "Asia/Kuala_Lumpur",
+ "sub": "A Hermann Tilke design opened in 1999, returning to the Formula 1 calendar in October 2026 after a nine-year absence to host the Bahrain Grand Prix in Malaysia.",
+ "_state": "MINIMAL — SOURCED FIELDS ONLY (added 2026-08-01). Length, first Grand Prix (1999) and the lap record are from formula1.com/en/racing/2026/bahrain; the tz is unambiguous (Malaysia observes a single zone). EVERYTHING ELSE IS DELIBERATELY ABSENT: no turn count, no laps, no lat/lng, no sectors, no corners, no DRS zones, no tyre allocation, no strategy, no geo. Per the store canon rule, an unsourced value is left out rather than invented — this app has already been burned once by a fabricated dataset (Decision Log W1, the DETAIL map). `report` is FALSE, so the grid card is disabled and no breakdown route opens until the layout data is genuinely dug.",
+ "_todo": "Fill from official sources before the October weekend: turns, laps, drsZones, elev, topSpeed, poleRef, lat/lng, profile, sectors, corners, pit, tyres, strat, spots, geo. Also add a `sepang` entry to LIVE_CIRCUIT_ALIASES in source/14_weekend_state_and_data.js (aliases: 'sepang', 'malaysia', 'kuala lumpur', 'bahrain gp') — NOT done in this pass to keep the restructure's blast radius contained."
+}
