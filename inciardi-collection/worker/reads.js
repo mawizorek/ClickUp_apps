@@ -48,6 +48,49 @@ export const READ_ROUTES = [
   'GET /slots?sheet=', 'GET /editions?artwork='
 ];
 
+/* ============================================================ THE DISPLAY PHOTO
+ * 🔴 DERIVED, NEVER STORED — rung 1 of the J6 ladder, and it is MICHAEL'S DESIGN, not mine.
+ *
+ * I proposed a WRITE: the first photo attached to an edition sets `is_primary = 1`. He described
+ * a READ: *"if a photo is the ONLY photo attached, it should be the default render even if not
+ * selected."* His is strictly better and the difference is not stylistic — under a stored scheme,
+ * archiving the primary leaves a print with photos and no picture until a human notices. A
+ * derived one heals itself on the next read.
+ *
+ * So the rule GENERALISES his sentence rather than special-casing it. "Only photo attached" is
+ * the trivial case of an ordering, which means a print that HAS photos can never render as
+ * having none:
+ *
+ *   1. `is_primary DESC`  — an explicit choice always wins. "Make main" stays a real override
+ *      rather than being quietly replaced by cleverness.
+ *   2. ⭐ `link_count ASC` — A PHOTO ATTACHED TO FEWER PRINTS IS MORE SPECIFIC TO THIS ONE.
+ *      This is the whole of the pack workflow, with NO new field: Michael's photos are pack
+ *      shots, deliberately linked to several prints each, and his stated plan is *"sliding them
+ *      into the background carousel once we get standalones in for a particular print."* A pack
+ *      shot on nine prints loses to a standalone on one **the moment the standalone is
+ *      attached** — no `subject` tag to set, no capture-time question, no manual promotion.
+ *   3. `sort ASC` then `created_at ASC` — a deterministic tie-break, so two standalones do not
+ *      swap places between reads. Also what keeps the adopted scrubs (written at sort 100)
+ *      behind anything Michael shoots himself.
+ *
+ * ⚠️ ONE FRAGMENT, THREE ROUTES, interpolated rather than copied. Three copies of a ranking rule
+ * is three chances for the binder, the Collection matrix and the print page to disagree about
+ * which photo a print HAS — and that disagreement would be invisible, because each surface would
+ * look internally consistent. The interpolated value is a fixed column name from this file and
+ * never user input.
+ */
+function displayImage(artworkCol) {
+  return `(SELECT ei.image_id
+             FROM edition_image ei
+             JOIN edition de ON de.edition_id = ei.edition_id
+            WHERE de.artwork_id = ${artworkCol}
+              AND ei.status = 'active'
+            ORDER BY ei.is_primary DESC,
+                     (SELECT COUNT(*) FROM edition_image z WHERE z.image_id = ei.image_id) ASC,
+                     ei.sort ASC, ei.created_at ASC
+            LIMIT 1)`;
+}
+
 export async function handleRead({ path, url, all, reply, t }) {
 
   /* ⚠️ /health IS NOT A MIGRATION TEST. It touches only COUNT(*) over five tables and names no
@@ -60,8 +103,11 @@ export async function handleRead({ path, url, all, reply, t }) {
               (SELECT COUNT(*) FROM edition)  AS editions,
               (SELECT COALESCE(SUM(qty),0) FROM copy WHERE disposition='own') AS owned,
               (SELECT COUNT(*) FROM sheet)    AS sheets,
-              (SELECT COUNT(*) FROM slot)     AS slots`);
+              (SELECT COUNT(*) FROM slot)     AS slots,
+              (SELECT COUNT(*) FROM image WHERE status='active') AS images`);
     // NOTE: owned is SUM(qty), never COUNT(*). See the comment block on `copy`.
+    // `images` added at v21 — /health still is not a migration test, but a photo count is the
+    // cheapest possible answer to "did my uploads land" and it costs one more COUNT.
     return reply({ ok: true, at: t, counts: counts[0] });
   }
 
@@ -77,7 +123,8 @@ export async function handleRead({ path, url, all, reply, t }) {
               COALESCE(o.qty_owned,0)      AS qty_owned,
               COALESCE(o.editions_owned,0) AS editions_owned,
               (SELECT COUNT(*) FROM edition e WHERE e.artwork_id = a.artwork_id) AS editions,
-              (SELECT COUNT(*) FROM slot s WHERE s.artwork_id = a.artwork_id)    AS placed_count
+              (SELECT COUNT(*) FROM slot s WHERE s.artwork_id = a.artwork_id)    AS placed_count,
+              ${displayImage('a.artwork_id')} AS image_id
          FROM artwork a
          LEFT JOIN v_owned o ON o.artwork_id = a.artwork_id
         WHERE a.status = 'active'
@@ -115,6 +162,8 @@ export async function handleRead({ path, url, all, reply, t }) {
    * did NOT get a route of its own. A second query returning the same numbers is a second thing
    * that can disagree with the Collection matrix. Consequence worth knowing: when this route
    * broke on 08-01, the detail page broke with it, silently and for the same one reason.
+   * ⭐ It is also why `image_id` is added HERE rather than in a new route: the print page gets
+   * its photo for free, from the same ranking the binder uses.
    *
    * `a.collection_id` removed 2026-08-01 — see the note on /artworks.
    */
@@ -126,7 +175,8 @@ export async function handleRead({ path, url, all, reply, t }) {
               COALESCE(o.qty_sold, 0)                        AS qty_sold,
               COALESCE(p.n, 0)                               AS placed,
               MIN(COALESCE(o.qty_owned,0), COALESCE(p.n,0))  AS in_binder,
-              MAX(0, COALESCE(o.qty_owned,0) - COALESCE(p.n,0)) AS spare
+              MAX(0, COALESCE(o.qty_owned,0) - COALESCE(p.n,0)) AS spare,
+              ${displayImage('a.artwork_id')}                AS image_id
          FROM artwork a
          LEFT JOIN v_owned o ON o.artwork_id = a.artwork_id
          LEFT JOIN (
@@ -166,6 +216,9 @@ export async function handleRead({ path, url, all, reply, t }) {
     totals.unhoused = prints.filter(r => r.qty_owned > 0 && r.placed === 0).length;
     totals.wanted = prints.filter(r => r.qty_owned === 0 && r.placed > 0).length;
     totals.slots = (totals.sheets || 0) * 18;
+    // How much of the collection has a face yet. The honest denominator for "am I done
+    // photographing this", and free from a list already in memory.
+    totals.with_photo = prints.filter(r => r.image_id).length;
 
     return reply({ ok: true, at: t, totals: totals, prints: prints, placements: placements });
   }
@@ -222,7 +275,8 @@ export async function handleRead({ path, url, all, reply, t }) {
               o.editions_owned,
               COALESCE(p.n, 0)                AS placed_count,
               o.qty_owned - COALESCE(p.n, 0)  AS spare,
-              CASE WHEN COALESCE(p.n, 0) = 0 THEN 'unhoused' ELSE 'spare' END AS box_state
+              CASE WHEN COALESCE(p.n, 0) = 0 THEN 'unhoused' ELSE 'spare' END AS box_state,
+              ${displayImage('a.artwork_id')} AS image_id
          FROM artwork a
          JOIN v_owned o ON o.artwork_id = a.artwork_id
          LEFT JOIN (
@@ -244,13 +298,21 @@ export async function handleRead({ path, url, all, reply, t }) {
     });
   }
 
-  // Slots for one sheet. state (owned/wanted/note) is DERIVED in v_slot — there is no
-  // state column and there must never be one (J3).
+  /* Slots for one sheet. state (owned/wanted/note) is DERIVED in v_slot — there is no
+   * state column and there must never be one (J3).
+   *
+   * ⭐ THE VIEW IS WRAPPED, NOT ALTERED. `SELECT v.*, <subquery> FROM v_slot v` adds the photo
+   * without a single line of DDL, so this ships with the worker in one deploy instead of needing
+   * a migration press. `v_slot` stays exactly what it was; the photo is a decoration on the read,
+   * not a new fact in the derived layer. */
   if (path === '/slots') {
     const sheet = url.searchParams.get('sheet');
+    const img = displayImage('v.artwork_id');
     return reply({ slots: sheet
-      ? await all('SELECT * FROM v_slot WHERE sheet_id = ? ORDER BY side, position', [sheet])
-      : await all('SELECT * FROM v_slot ORDER BY sheet_id, side, position') });
+      ? await all(`SELECT v.*, ${img} AS image_id FROM v_slot v
+                    WHERE v.sheet_id = ? ORDER BY v.side, v.position`, [sheet])
+      : await all(`SELECT v.*, ${img} AS image_id FROM v_slot v
+                    ORDER BY v.sheet_id, v.side, v.position`) });
   }
 
   if (path === '/editions') {
