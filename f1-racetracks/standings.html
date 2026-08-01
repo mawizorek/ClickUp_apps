@@ -9,6 +9,7 @@
 <!-- v6.7: driver popup race-pace strip now reads REAL per-driver fastLap {time,lap} from the store (backfilled r1-9) with the lap number + round-FL purple pip; stale illustrative note refreshed. panel.js ?v 6.6 -> 6.7; footer stamp -> v6.7. -->
 <!-- v13 (2026-08-01): SEASON LAYER. source/08_season.js loads FIRST and gives this surface the derived calendar — round numbers, names, dates and the season length — so nothing time-shaped is read out of a round file any more. Fixes a dead NaN sort left by v11 and a hardcoded "/ 22" that went wrong when the season became 23 rounds. All module ?v tokens bumped to 13. -->
 <!-- v17 (2026-08-01): CHROME SPINE. source/chrome-tokens.css loads LAST and carries the canonical token vocabulary, one type scale, one page gutter, and the brand lockup + lens switcher shared with the other two surfaces. The masthead gains the missing .brand element, so the f1-brand view transition finally has something to morph. Decision Log J16 + J17. -->
+<!-- ⚠️ v17.1 (2026-08-01): THE .mast-top ROW BELOW IS STANDALONE CHROME. Embedded in the unified shell (index.html), the SHELL owns the brand + switcher, so .mast-top is hidden by chrome-tokens.css section 6 AND by app-shell.js's EMBED_CSS. v17 added this row without either, and the shell rendered two brands and two switchers stacked. If you add chrome to this page, hide it in both places. Decision Log J18. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -19,11 +20,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/standings/base.css?v=17">
-<link rel="stylesheet" href="source/standings/panel.css?v=17">
+<link rel="stylesheet" href="source/standings/base.css?v=18">
+<link rel="stylesheet" href="source/standings/panel.css?v=18">
 <!-- LAST on purpose: the shared spine wins the cascade over this surface's own :root,
      which is how three chromes get unified without retyping two 11.5KB stylesheets. -->
-<link rel="stylesheet" href="source/chrome-tokens.css?v=17">
+<link rel="stylesheet" href="source/chrome-tokens.css?v=18">
 <style>
   html{background:oklch(0.16 0.012 268)}
 </style>
@@ -73,12 +74,12 @@
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
 
-  <script src="source/08_season.js?v=17"></script>
-  <script src="source/standings/data.js?v=17"></script>
-  <script src="source/standings/matrix.js?v=17"></script>
-  <script src="source/standings/trajectory.js?v=17"></script>
-  <script src="source/standings/panel.js?v=17"></script>
-  <script src="source/standings/nav.js?v=17"></script>
-  <script src="source/standings/history.js?v=17"></script>
+  <script src="source/08_season.js?v=18"></script>
+  <script src="source/standings/data.js?v=18"></script>
+  <script src="source/standings/matrix.js?v=18"></script>
+  <script src="source/standings/trajectory.js?v=18"></script>
+  <script src="source/standings/panel.js?v=18"></script>
+  <script src="source/standings/nav.js?v=18"></script>
+  <script src="source/standings/history.js?v=18"></script>
 </body>
 </html>
