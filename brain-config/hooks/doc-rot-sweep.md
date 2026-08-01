@@ -35,9 +35,12 @@ A stale *version number* is noise. A stale *instruction* is a live weapon: someo
 | **Recon Renata** (`agents/recon-renata.md`) | Is the repo SHAPED right? Folder structure, file sizes, template conformance, stragglers, commit format. |
 | **Audit Anna** (`super-agents/audit-anna/`) | Leads a formal audit of a SUBJECT, names its true purpose, drives Know/Touch/Do to completeness. |
 | **`code-review-standard.md`** | Is this CODE good? Severity-graded review of a built artifact. |
+| **Fleet-Fact Sweep** (`hooks/fleet-fact-sweep.md`) | Do our files still describe the FLEET correctly? Cross-agent claims — who is steward, who owns a lane, who ratifies — checked against the 🤖 Agent Index and the subject's own bundle. |
 | **THIS sweep** | Is what our docs CLAIM still TRUE at HEAD? Prescriptive rot, contradictions, phantom instructions. |
 
 Renata reads the repo and checks it against the standard. **This sweep reads the standard and checks it against the repo**: the same comparison run in the opposite direction. Run both, they catch different things. If a finding is "this app's folder is wrong," it's Renata's. If it's "this doc is lying," it's this sweep's. Renata's checklist §8 points here. **Audit Anna** may seat this inside a larger audit; it does not replace her lead.
+
+⚠️ **The Fleet-Fact seam is the one this tool is BLIND to, so read it as a real gap and not a courtesy row** (added 2026-08-01, and this file was itself a finding of that sweep's first run). A sentence like *"Corey ratifies this"* passes every test below: the path resolves, the file exists, no locked rule contradicts it, nothing is stale at HEAD. It is still wrong, and only knowing who Corey IS reveals it. **A docs-vs-HEAD comparison cannot see a wrong person.** Run both sweeps.
 
 ---
 
@@ -58,7 +61,8 @@ Name the surfaces in scope before reading any. An unbounded "sweep everything" p
 - `brain-config/README.md`, `CHANGELOG.md`, `metadata-schema.md`, `team-standard.md`, `skills-integration.md`
 - `brain-config/hooks/*`, `gates/*`, `teams/*`, `orchestration.md`, `council.md`, `code-review-standard.md`
 - `brain-config/next-build-spec.md` plus every app's own `next-build-spec.md`
-- `VERSIONS.md` (the app ledger) · `super-agents/roster.json` (the agent roster) · `super-agents/index.md`
+- `VERSIONS.md` (the app ledger)
+- **The 🤖 Agent Index ClickUp list** (list `901328043244`) — the agent record. ⚠️ **CORRECTED 2026-08-01:** ~~`super-agents/roster.json` (the agent roster)~~ — `roster.json`, `roster.html`, `registry.json` and `superagents.json` are ALL retired tombstone stubs (07-25 through 07-30). **A sweep that follows a scope list into an empty stub reads nothing and passes everything silently**, which is strictly worse than not checking at all. `super-agents/index.md` survives as a pointer page, not a record.
 - `template-app/CONFORMANCE.md`, `shared/themes/THEME-SYSTEM.md`
 - Agent and super-agent profiles plus their `memory.md` files
 - The ClickUp side: the AI Toolkit index trigger table and the Brain Reference Library domain pages
@@ -145,12 +149,13 @@ Reuse the severity and evidence discipline from `brain-config/code-review-standa
 7. **A file that grew past readable-whole.** It stopped being editable, so it stopped being corrected. Size is a rot accelerant.
 8. **Index growth in PROSE, not rows.** Both files that went unwriteable had tiny row counts and essay-length rows.
 9. **A tool written twice by two passes on the same day.** Neither pass saw the other; both dated themselves v1. Parallel work duplicates before it drifts.
+10. **A scope list, load manifest, or checklist naming a file that has since been retired.** The most dangerous shape of a dangling pointer, because the reader never opens it to notice — **the empty read looks exactly like a clean pass.** Found in this file's own §1 on 2026-08-01, two days after the file it named was retired.
 
 ---
 
 **Output:** the report above. Fixes land as a PR (branch → commit → PR → self-merge) with the reversals named in the PR body. Never a prose-only list of things someone else should fix.
 
-**Composes with:** `code-review-standard.md` (severity + evidence format, reused never re-invented) · `hooks/source-size-budget-enforcer.md` (test E and F's numbers plus the base64 math) · `agents/recon-renata.md` (shape audit; this is the claims audit) · GitHub MCP Operating Standard (read ladder) · the Missed-Gate / Drift Protocol (same-turn, non-deferrable) · `brain-config/README.md` (canonical/generated/projection model) · Size Sally (forecasts test F before it bites).
+**Composes with:** `code-review-standard.md` (severity + evidence format, reused never re-invented) · `hooks/source-size-budget-enforcer.md` (test E and F's numbers plus the base64 math) · `hooks/fleet-fact-sweep.md` (the cross-agent claims this sweep is structurally blind to) · `agents/recon-renata.md` (shape audit; this is the claims audit) · GitHub MCP Operating Standard (read ladder) · the Missed-Gate / Drift Protocol (same-turn, non-deferrable) · `brain-config/README.md` (canonical/generated/projection model) · Size Sally (forecasts test F before it bites).
 
 **Guardrails:** read-only until a finding is confirmed against HEAD · fix documentation freely, flag structural calls · never execute a documented remediation without re-verifying the problem exists · never claim "verified" off a single cached read.
 
@@ -158,12 +163,13 @@ Reuse the severity and evidence discipline from `brain-config/code-review-standa
 
 - *🔴 Phantom remediation (the founding case):* `app-index.md` said "restore via revert of PR #59 + #57 pending," dated 07-07. Both reverts landed 07-08; the feature was rebuilt cleanly after. The note was **32 PRs stale** and executing it would have destroyed 18 days of work. → Removed the instruction, kept a do-NOT-revert warning in its place, added the both-ways clause to the verify gate.
 - *🔴 Rotted instruction:* `next-build-spec.md` said read file bodies via `raw.githubusercontent`, the exact path the Operating Standard (LOCKED 07-09) forbids and that served a file 280 PRs stale. → Corrected, old text kept struck-through.
-- *🟠 Dueling canonical:* `registry.json` and `roster.json` both claimed to be the agent source of truth; registry was a bootstrap manifest predating the current architecture by 11 days and had become unreadable. → Retired to a stub, one roster survives.
+- *🟠 Dueling canonical:* `registry.json` and `roster.json` both claimed to be the agent source of truth; registry was a bootstrap manifest predating the current architecture by 11 days and had become unreadable. → Retired to a stub, one roster survives. ⚠️ **And then the survivor was retired too** (07-30, to the 🤖 Agent Index list), **while this file's own §1 kept pointing at it for two more days.** Collapsing to one canonical surface does not end the work: every pointer aimed at the loser has to move, including the ones inside the tool that found the duplication.
 - *🟠 Dueling canonical (this tool, v2):* `rot-sweep.md` and `doc-rot-sweep.md`, same premise, same day, same author, written by two parallel passes. → Collapsed here, `rot-sweep.md` retired to a stub, `/rot-sweep` kept as an alias.
 - *🟡 Orphan:* four apps existed in the repo root and in NO index. `retrocast` was the FIRST theme-spine consumer per the ledger's own note, with no row anywhere. → Added, flagged for version stamps.
 - *⚪ Verified current:* the dashboard's modular launcher, `.nojekyll`, and the markdown-viewer retirement all confirmed intact at HEAD, reported as clean rather than silently omitted.
 
 **Changelog:**
 
+- **v2.1 (2026-08-01)** - Fixed by Fleet Felix as the FIRST finding of `hooks/fleet-fact-sweep.md`, run on this file. §1's surface inventory still listed `roster.json` as "the agent roster" two days after it was retired, so a sweep following its own scope list would have read an empty stub and reported a clean pass. Repointed at the 🤖 Agent Index list; added tell 10 (a scope list naming a retired file is the dangerous shape of a dangling pointer, because the empty read looks like a clean pass); extended the dueling-canonical example with what happened AFTER the collapse; added the Fleet-Fact lane row plus the blindness note.
 - **v2 (2026-07-25)** - Michael's correction: **tools live in git only**, no ClickUp Skill linkage. Removed the "Skill front door: DOC-ROT-SWEEP" line and replaced it with a self-contained Invocation + Trigger block matching the anatomy every other hook in this folder uses. Absorbed `hooks/rot-sweep.md` (a same-day parallel-pass duplicate of this file) and its claim-classification table, tells list, and report format. Added tell 9 (parallel passes duplicate before they drift) and test D's self-referential example.
 - **v1 (2026-07-25)** - Established by Dev Dexter after a session that found four rotted instructions in one day (a phantom destructive revert, a forbidden read path recommended in two places, an inverted hand-edit caution, and a stale LOCKED read path in `README.md`). Core insight: prescriptive text rots faster than descriptive text, so instructions get swept first. Lane-separated from Recon Renata: she checks the repo against the standard, this checks the standard against the repo.
