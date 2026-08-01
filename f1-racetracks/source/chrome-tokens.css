@@ -1,4 +1,4 @@
-/* chrome-tokens.css — THE SHARED CHROME SPINE (new 2026-08-01, v17; v17.1 embed fix).
+/* chrome-tokens.css — THE SHARED SPINE (2026-08-01; v17 tokens, v17.1 embed fix, v19 forms).
 
    WHY THIS FILE EXISTS. Michael, looking at the live app: "why does matrix and history
    feel in a separate shell than Circuits? they have like different header scaling even if
@@ -7,13 +7,18 @@
    source/standings/base.css, weekend by source/weekend/base.css. Three type scales, two
    token vocabularies, two page gutters, and a brand lockup on two surfaces out of three.
 
-   WHAT IT IS. One canonical token vocabulary + one type scale + the shared brand lockup and
-   lens switcher. Every surface links it AFTER its own base.css, so it wins on the cascade
-   and nothing has to be deleted from a stylesheet to adopt it. Purely additive.
+   Then: "why is circuits all still round corners and matrix nice and sharp if they're all
+   sharing the same vectors?" Because they were not. The shared system has FOUR vectors —
+   colour x typography x forms x spacing — and this app had only ever read colour. FORMS
+   (radius, border weight, elevation, motion) is wired in section 7 as of v19.
+
+   WHAT IT IS. One canonical token vocabulary, one type scale, one gutter, the shared brand
+   lockup + lens switcher, and the forms vector. Every surface links it AFTER its own CSS,
+   so it wins the cascade and nothing has to be deleted to adopt it. Purely additive.
 
    WHY ADDITIVE AND NOT A REWRITE. Unifying by editing would mean retyping two ~11.5KB
-   stylesheets whole through a write path that has no partial edit — the transcription risk
-   refused in Decision Log J12. The cascade does the same job for free.
+   stylesheets and a 29KB module whole, through a write path that has no partial edit — the
+   transcription risk refused in Decision Log J12. The cascade does the same job for free.
 
    🚨 IF YOU ADD CHROME HERE, HIDE IT IN SECTION 6. Every one of these surfaces runs in TWO
    contexts: standalone (direct link — it owns its chrome) and embedded in the unified shell
@@ -23,9 +28,9 @@
 
    ⚠️ THIS IS TRANSITIONAL. Build Order steps 8-13 replace all three shells with one router
    + chrome.js. This file is the vocabulary that consolidation inherits, not a fourth chrome.
-   Do NOT grow it into a component library. Tokens, type ramp, brand, lens switcher. Stop.
+   Do NOT grow it into a component library. Tokens, type ramp, brand, switcher, forms. Stop.
 
-   Decision Log J16 (the measurement), J17 (the spine), J18 (the embed regression).
+   Decision Log J16 (measurement) · J17 (spine) · J18 (embed regression) · J20 (forms).
 */
 
 /* ===========================================================================
@@ -53,7 +58,6 @@
   --txt-mid:oklch(0.74 0.011 268);
   --txt-dim:oklch(0.56 0.013 268);
   --red:oklch(0.64 0.21 26);
-  --ease:cubic-bezier(0.16,1,0.3,1);
 
   /* ONE type ramp. The complaint that opened this file: the brand lockup was a FIXED
      1.05rem on circuits and 0.94rem on weekend, while the standings <h1> was fluid up to
@@ -89,15 +93,15 @@
 /* ===========================================================================
    3. THE BRAND LOCKUP — one implementation, three surfaces.
 
-   🔴 The morph has been dead since v6.5. standings.html declared
+   🔴 The morph was dead from v6.5 to v17. standings.html declared
    `.brand{view-transition-name:f1-brand}` and contained NO .brand element, while its own
    header comment claimed a "persistent F1 brand morph shared with the circuits lens."
    An inert rule cannot morph anything, so crossing lenses cross-faded the entire page —
-   which IS the "separate shell" feeling. The element is added to standings in this PR and
-   styled from here, so neither big stylesheet grows.
+   which IS the "separate shell" feeling.
 
-   The mark element is `.mark` on circuits and `.mk` on weekend. Both are supported rather
-   than renamed: renaming means editing the markup builders in two JS modules for cosmetics.
+   As of v18 the markup itself comes from source/chrome.js, the ONE renderer; this section
+   only styles it. The mark element is `.mark` on circuits and `.mk` on weekend — both are
+   supported rather than renamed, because renaming means editing markup builders for looks.
    =========================================================================== */
 .brand{
   display:flex;align-items:center;gap:10px;
@@ -106,9 +110,9 @@
   view-transition-name:f1-brand;
 }
 .brand .mark,.brand .mk{
-  width:30px;height:30px;flex:none;border-radius:8px;
+  width:30px;height:30px;flex:none;border-radius:var(--radius);
   background:var(--red);display:grid;place-items:center;
-  box-shadow:0 6px 18px -6px oklch(0.64 0.21 26 / 0.7);
+  box-shadow:var(--elev-2);
 }
 .brand .mark svg,.brand .mk svg{width:18px;height:18px;display:block}
 .brand .t{
@@ -129,7 +133,7 @@ body{padding-left:var(--gutter);padding-right:var(--gutter)}
 header.mast h1,.mast .hgp{font-size:var(--fs-mast);line-height:1.02;letter-spacing:-0.01em}
 .eyebrow{font-size:var(--fs-eyebrow);letter-spacing:var(--track-eyebrow)}
 
-/* The standings masthead now carries the lockup, so it needs a row above the title.
+/* The standings masthead carries the lockup, so it needs a row above the title.
    Scoped to .mast-top so no existing standings rule is affected. */
 .mast-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
 .mast-top .lens{margin-left:auto}
@@ -138,15 +142,15 @@ header.mast h1,.mast .hgp{font-size:var(--fs-mast);line-height:1.02;letter-spaci
    5. THE LENS SWITCHER — identical treatment on all three.
    Circuits used `.lens>*`, weekend used `.lens a,.lens span`. Both shapes covered.
    =========================================================================== */
-.lens{display:inline-flex;border:1px solid var(--line);background:var(--s1)}
+.lens{display:inline-flex;border:var(--border-w) solid var(--line);background:var(--s1)}
 .lens>*{
   font-family:'JetBrains Mono',monospace;font-size:0.66rem;font-weight:600;
   letter-spacing:0.1em;text-transform:uppercase;color:var(--txt-mid);
   background:transparent;border:0;cursor:pointer;padding:8px 14px;
   text-decoration:none;display:inline-flex;align-items:center;
-  transition:color .15s var(--ease),background .15s var(--ease);
+  transition:color var(--motion-fast) var(--ease),background var(--motion-fast) var(--ease);
 }
-.lens>*+*{border-left:1px solid var(--line)}
+.lens>*+*{border-left:var(--border-w) solid var(--line)}
 .lens .on{background:var(--s3);color:var(--txt);cursor:default}
 .lens a:hover:not(.on){color:var(--txt);background:var(--s2)}
 @media(max-width:560px){.lens>*{padding:8px 11px;font-size:0.6rem;letter-spacing:0.06em}}
@@ -159,20 +163,101 @@ header.mast h1,.mast .hgp{font-size:var(--fs-mast);line-height:1.02;letter-spaci
    embedded. A lens that draws its own brand or switcher must hide it here or the user gets
    two of each, stacked. That is exactly what v17 shipped for six minutes.
 
-   ⚠️ The rule is ALSO in app-shell.js's EMBED_CSS, injected straight into the iframe. Both,
-   on purpose: this file keeps the hide next to the thing it hides (so the next person to add
-   chrome sees it), and the injected copy holds even if this stylesheet is cached or slow.
-   If you add a row here, add its selector there too.
+   As of v18 source/chrome.js suppresses itself when embedded, so this is now a NET rather
+   than the mechanism — it still catches a stale cached chrome.js. Keep it.
    =========================================================================== */
 html.shell-embedded .mast-top{display:none!important}
 html.shell-embedded .topbar .brand,
 html.shell-embedded .topbar .lens{display:none!important}
 
+/* ===========================================================================
+   7. 🎛️ THE FORMS VECTOR — row `sharp`, copied VERBATIM from shared/themes/forms.tsv.
+
+   Michael, 2026-08-01: "yes i want to follow the vectors and not have hardcoded. sharp
+   for sure."
+
+   Forms is the vector that owns tactility: corner radius, border weight, the gradient
+   ANGLE, the three-step elevation scale and the motion set. The shared system has had it
+   since 2026-07-18 and this app had never read it — every corner here was a hand-typed
+   literal, ~20 of them across nine files, disagreeing at 3/4/6/7/8/9/10/14/20px.
+
+   🔴 Worth knowing: standings was never "sharp on purpose." Nobody chose sharp there —
+   whoever wrote it simply never typed a radius, and whoever wrote circuits did. Two
+   authors' defaults, frozen into two stylesheets and read later as a design decision.
+
+   ⚠️ TO CHANGE THE WHOLE APP'S FEEL: swap these values for another forms.tsv row (`soft`,
+   `grounded`, `eos`). Do NOT hand-edit an individual radius below — that is the hardcoding
+   this section exists to end. Better still, once the app boots through THEMES.applyTheme()
+   (Build Order step 7), delete this block: resolve.js sets every one of these from the join
+   table and this becomes a first-paint floor. That is the destination.
+   =========================================================================== */
+:root{
+  --radius:4px;
+  --radius-lg:6px;
+  --radius-pill:6px;
+  --border-w:1.5px;
+  --grad-angle:120deg;
+  --shadow-out:0 1px 2px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.35);
+  --shadow-in:inset 0 2px 4px rgba(0,0,0,0.5);
+  --elev-1:0 1px 3px rgba(0,0,0,0.42);
+  --elev-2:0 5px 14px rgba(0,0,0,0.46);
+  --elev-3:0 14px 32px rgba(0,0,0,0.52);
+  --motion-fast:120ms;
+  --motion-med:200ms;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --lift:-2px;
+}
+
+/* ===========================================================================
+   8. THE LITERAL SWEEP — every hardcoded radius that RENDERS, repointed at the vector.
+
+   These selectors are the ~20 call sites found by searching the whole app for
+   `border-radius`. They live in nine files, three of which are too large to retype safely
+   through this write path (module 09 is 29KB; the two base.css files are 11.5KB each), so
+   they are overridden here instead of edited there — the same cascade mechanism section 1
+   uses for tokens, and the reason this file loads last everywhere.
+
+   ⚠️ THIS IS A TRANSITION, NOT THE END STATE. The literals still exist in source; they
+   just no longer render. Each one comes out when its file is next rewritten for a reason
+   that justifies the retype (J12's batching rule). A grep for `border-radius:` outside
+   this file should keep shrinking, never grow.
+
+   ⛔ NOT SWEPT, on purpose: `border-radius:50%` and `999px` on status dots, tyre pips, the
+   history timeline node and the loading spinner. Those are CIRCLES — geometry, not a form
+   preset. A 4px circle is a bug. Note that sharp's own radius-pill is 6px, not 999px: the
+   grid agrees a pill is not a bubble, which is a design position, but a DOT is not a pill.
+   =========================================================================== */
+
+/* circuits — home grid cards, filter bar, jump drawer (module 09's injected block) */
+.rcard,.grid-empty,.filters,.jump-trigger,.jd-x,.jd-search input,
+.chip,.flt-reset,.jump-drawer{border-radius:var(--radius)}
+.rc-tag,.jd-rn{border-radius:var(--radius-pill)}
+
+/* circuits — the style band (source/02..07) */
+.nav-jump select,#app button.race,.classification-card,
+.strat .tg,.rate .meter,.rate .meter i,.cls-pos{border-radius:var(--radius)}
+
+/* circuits — the weekend surface injected by module 15. Was 20px, the roundest corner in
+   the app by 6px and the single biggest reason this lens read as a different design. */
+.current-round-card{border-radius:var(--radius-lg)}
+
+/* standings — history feed posts (injected by history.js) */
+.hx-post{border-radius:var(--radius)}
+
+/* weekend — panel tags */
+.rname .rn .fl,.rname .rn .plflag,.stintlegend i{border-radius:var(--radius)}
+
+/* Borders follow the vector too: sharp is 1.5px, which is what makes it read as technical
+   rather than merely square. Scoped to the container surfaces so table hairlines and
+   1px dividers keep their own weight. */
+.rcard,.filters,.jump-trigger,.classification-card,.hx-post,.state,.scroll-wrap,
+.wcc,.leader-strip,.seg,.strip,.empty{border-width:var(--border-w)}
+
 /* Cross-document view transitions. Declared once here instead of in three <style> blocks,
    and honoured by the reduced-motion guard the app already uses everywhere else. */
 @view-transition{navigation:auto}
 ::view-transition-old(root),::view-transition-new(root){
-  animation-duration:.32s;animation-timing-function:cubic-bezier(0.16,1,0.3,1);
+  animation-duration:.32s;animation-timing-function:var(--ease);
 }
 @media(prefers-reduced-motion:reduce){
   ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
