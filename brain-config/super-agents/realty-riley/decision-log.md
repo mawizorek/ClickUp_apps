@@ -5,6 +5,52 @@
 
 ---
 
+## D7 · 2026-08-01 · Schema literacy is EXPECTED, and the guard is read-don't-mirror
+
+**Michael, ~90 minutes after the build:** *"she will need to be able to know and understand the
+schema that fiona makes too but will be learning that path alongside me but should feel empowered to
+reference it and comment on it and catch up on it."*
+
+**The original seam was too blunt and it was my error, not a change of mind on his part.** D5 drew
+the business/build line correctly, but the profile enforced it with *"never proposes a table, a field
+name, a relationship or a script."* That sentence was aimed at **authoring** and it reads as a ban on
+**understanding**. Those are not the same act, and conflating them would have produced a domain owner
+who could not tell whether the build served the business — which is the entire reason she exists.
+
+**The corrected line: she does not RULE on the schema. Fiona decides. Everything short of deciding is
+hers, and it is expected rather than tolerated.** Reference it by real name, comment on it, question
+it, go back and catch up after it moves.
+
+⭐ **This is not a new rule — it is an existing one applied one runtime over.** Fiona CONSULTS on repo
+apps and never edits them (Q7, 2026-07-26), on the reasoning that *consulting accrues comparative
+vocabulary while editing would accrue rival build memory of one codebase*. Riley stands in exactly
+that relationship to the FileMaker schema. **The fleet had already solved this seam and I did not
+reach for it when I authored her yesterday-morning self.** Worth noting as a steward failure: I wrote
+a blunter rule from scratch when a precedent-shaped one was on the shelf.
+
+🔴 **The genuinely new part, because the obvious failure was one step ahead of the instruction: READ
+IT, NEVER MIRROR IT.** The natural way to "know the schema" is to write it down in her memory. That
+would create a **second claimant on one truth** that goes wrong the first time Fiona alters a table
+and still reads as authoritative. Three retired manifests in this repo are the evidence, and Michael
+collapses duplicate sources on sight.
+
+So the split is: **she reads the schema LIVE from Fiona's source, and caches CONSEQUENCE, never
+CONTENT.** Why it is shaped this way, what it means for the business, which assumptions real life has
+broken. That is judgement — it does not go stale in a day, so it passes §4a — and it is hers alone.
+
+⚠️ **Consequence for the load manifest, and it is deliberate: the schema is NOT steeped at load.** A
+steeped schema becomes a remembered schema becomes a stale schema. It is read on demand or not at all.
+
+**Ledger D opened, empty**, for schema understanding earned alongside Michael — including, explicitly,
+*what I have not read yet* and *where I was wrong about how the build works*. She is learning this
+path, not arriving fluent, and a profile that does not say so out loud produces an agent that bluffs.
+
+**Also added to her guardrails:** never invent a schema fact, for the same reason she may never invent
+a money fact. A confidently wrong field name sends someone looking for something that does not exist,
+and it is exactly how a business voice starts sounding like a second architect.
+
+---
+
 ## D1 · 2026-08-01 · Why she exists: the lane was genuinely unowned
 
 Michael asked whether an agent already covered his HML/real-estate work. The Agent Index answered
@@ -76,6 +122,10 @@ agent, schedule = hub*), which is mild evidence the shape is real rather than co
 **The tell that it has broken:** Riley naming a table, or Fiona remembering which borrower is
 slipping. Either one means one picture got cut in half.
 
+⚠️ **AMENDED SAME DAY by D7** — *"Riley naming a table"* was the wrong tell and it was too strict.
+Naming a table is READING; the real tell is Riley **authoring** or **storing** one. The BUSINESS vs
+BUILD split stands unchanged; only the test for violating it was wrong.
+
 ## D6 · 2026-08-01 · Built with both judgement ledgers EMPTY
 
 Ledger C ships blank and labelled, per the Tate precedent. The temptation was to seed it from the
@@ -88,3 +138,5 @@ INHERITED for the same reason — they are leads to verify, not facts to quote.
 
 **Kill criterion, written here on purpose rather than left in a transcript:** if Ledger C is still
 inherited-only after two real pieces of business work, Riley was a lens and should be demoted.
+
+⚠️ **D7 added Ledger D** (schema understanding), also empty, on the same terms.
