@@ -32,8 +32,14 @@
        footer said v16, and nothing reconciled them because the stamp lives here and the version
        comment lives there. Two places to state one fact, so one of them rotted, which is the
        same failure this app's Decision Log has now catalogued seven times. If you bump the
-       header comment in `index.html`, bump THIS LINE in the same commit. */
-    version: 'v18 \u00b7 PR #633',
+       header comment in `index.html`, bump THIS LINE in the same commit.
+
+       🔴 AND HERE IS HOW TO GET THE NUMBER RIGHT RATHER THAN GUESS IT (v19): you cannot know a
+       PR number before the PR exists, so **push the code, open the PR, then push the stamp** —
+       two commits on one branch, one merge. An invented number is the same defect class as the
+       fabricated wrangler version pin and the hand-typed ClickUp id: a value that looks checked
+       and never was. */
+    version: 'v19 \u00b7 PR #638',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
@@ -68,13 +74,32 @@
       { route: 'backroom', label: 'Back room', hint: 'Import a transcribed sheet of prints' }
     ],
 
+    /* 🔴 DETAIL ROUTES (v19) — A THIRD CLASS, AND IT EXISTS BECAUSE THE OTHER TWO ARE BOTH MENUS.
+     * `nav` is drawn in the drawer; `hidden` is drawn at the foot of settings. A detail route
+     * belongs in NEITHER, because it is meaningless without a param — a menu row pointing at
+     * `#artwork` with no id would be a permanently broken link, and `settings.js` → hiddenRoutes()
+     * would have rendered exactly that if this had been filed under `hidden` for convenience.
+     *
+     * What it still needs: to RESOLVE (the `routes` line below — without it the router silently
+     * falls back to the binder, which reads as a dead tap rather than a missing config line) and
+     * to be TITLED (chrome.js, or the header shows the app name on a print page).
+     *
+     * ⚠️ The label is GENERIC on purpose. This config is read once at init and cannot know which
+     * print you opened, so "Print" is the honest header; the specific name is the <h1> that
+     * `artwork.js` renders in the content area. */
+    detail: [
+      { route: 'artwork', label: 'Print', hint: 'One print, everything known about it' }
+    ],
+
     sources: [
       { label: 'Anastasia Inciardi', href: 'https://www.anastasiainciardi.com/' }
     ]
   };
 
-  // Both lists are routable. Only `nav` is ever drawn as a menu.
-  var routes = APP.nav.concat(APP.hidden || []).map(function (n) { return n.route; });
+  // All three lists are ROUTABLE. Only `nav` is ever drawn as a menu; only `hidden` reaches the
+  // settings footer. Miss a list here and its routes fall back to the default page in silence.
+  var routes = APP.nav.concat(APP.hidden || []).concat(APP.detail || [])
+                 .map(function (n) { return n.route; });
   var lastPing = null, lastError = null, lastAt = null;
 
   function $(id) { return document.getElementById(id); }
@@ -98,7 +123,8 @@
    * The hash carries PARAMS: `#binder?sheet=sheet-1&side=B` opens that sheet's back, which is what
    * every link in the Collection matrix points at. Query string rather than a path because it is
    * order-independent and tolerates a missing value, so an old link with only `?sheet=` still
-   * works. A positional path breaks on the third param. */
+   * works. A positional path breaks on the third param.
+   * As of v19 the same mechanism carries `#artwork?id=<artwork_id>`, so a print is addressable. */
   function parse() {
     var h = (location.hash || '').replace(/^#/, '');
     var q = h.indexOf('?');
@@ -253,10 +279,13 @@
      * that omits this costs a round trip to find out which one it was. */
     L.push('device      ' + (window.Device ? Device.describe() : '(device.js did not load)'));
     /* WHICH MODULES LOADED. After a split, a 404'd script and a screen with no data look
-     * identical — this is the line that tells them apart. */
+     * identical — this is the line that tells them apart.
+     * ⚠️ IT IS ONLY TRUE IF IT IS KEPT CURRENT, AND IT WAS NOT: `Arrange` shipped in v17 and was
+     * never added, so for two versions the one diagnostic built to catch a missing module was
+     * blind to the newest one. Add every new global here in the same commit that creates it. */
     L.push('modules     ' +
       ['Device', 'Chrome', 'Settings', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox',
-       'Summary', 'Batch', 'Preview', 'Backroom', 'App']
+       'Summary', 'Batch', 'Arrange', 'Preview', 'Backroom', 'Artwork', 'App']
         .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
     L.push('hash        ' + (location.hash || '(none)'));
     L.push('worker      ' + API.base() + (API.isDefaultBase() ? '  [built-in]' : '  [OVERRIDDEN here]'));
