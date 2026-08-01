@@ -22,10 +22,63 @@ any tool an agent would run.** This is the "how to BUILD one" authoring standard
    editing; the agent's memory points to it, the deep procedure lives in the tool.
 5. **Decision logs by home:** topic decisions → the topic's page; agent-self decisions → the
    agent's `decision-log.md`. Never store topic procedure in an agent.
+6. **🎯 EVERY AGENT SHIPS WITH THE CONDITION UNDER WHICH IT SHOULD BE KILLED.** See the
+   Retirement Condition section below. It is a build BLOCKER, not a nicety.
 
-These five bind tool authoring too: when building ANY tool, the test is "does capability live in a
+These bind tool authoring too: when building ANY tool, the test is "does capability live in a
 triggerable tool, with agents only pointing at it?" If a capability is getting baked into a
 persona, that's the smell this gate exists to catch.
+
+---
+
+## 🎯 THE RETIREMENT CONDITION (LOCKED 2026-08-01 — fleet-wide, blocking)
+
+**No agent this fleet has ever built shipped with a condition for retiring it.** That is not a
+stylistic gap. It is why **Catch Up Clark sat as the queue's #1 item for eight days** while nobody
+could name what he would remember that Clio did not — the question that should have killed him on
+day one had no place to be written, so it was asked five times and answered never. Three manifests
+and a scheduler have been retired since; each one required somebody to notice, argue, and re-derive
+the case. **A retirement condition is the cheapest thing in this gate and it outlives every roster
+it is written into.**
+
+### The requirement
+
+**Every new agent bundle — teammate or lens — ships with `decision-log.md` **D1** = its retirement
+condition.** D1 is reserved for this. It is written **at BUILD time, by the builder, before the
+agent is registered**, and it is a **PASS/FAIL check in the birth audit** (see
+`super-agents/audit-instruction.md`).
+
+### What makes a valid condition
+
+It must be **falsifiable, observable, and checkable by a cold session with no memory of the build.**
+
+- ✅ *"If Ledger C is still inherited-only after two real pieces of business work, this was a lens."*
+  (Realty Riley D6 — the precedent this rule generalizes.)
+- ✅ *"If this head's craft ledger is still inherited-only after two real productions, it was a
+  lens."* (`_shared/department-head-base.md` §8 — the department-head default.)
+- ✅ *"If the routine registry is still empty after N invocations, this is a hook."*
+- 🚫 *"Retire if no longer useful."* — unfalsifiable, unobservable, means nothing to a cold reader.
+- 🚫 *"Retire when Michael says so."* — that is true of everything and therefore says nothing.
+- 🚫 A condition that only the BUILDER could evaluate. If it needs the build conversation to
+  interpret, it is not a condition, it is a memory.
+
+### The default shape for a MEMORY-justified agent
+
+A lens graduates for exactly one reason: **it needs MEMORY** (base spec §6). So the default
+condition is the inverse of the justification, and it should be the first thing you try to write:
+
+> **If <the specific ledger that justified this bundle> is still inherited-only after <N> real
+> pieces of <the work>, it was a lens.**
+
+### Enforcement
+
+- **No D1 = the build is not done.** Not a partial, not a follow-up — the bundle is incomplete in
+  the same way an unregistered agent is (see step 6 below).
+- **The condition is never quietly deleted.** If it comes due and Michael keeps the agent, the
+  condition is **struck with the reason and re-set with a new bar**, so the next reader sees that
+  it was evaluated rather than forgotten.
+- **It is not a promise to retire.** It is a promise to ASK, on a date, with evidence. Michael
+  rules; the condition just guarantees somebody brings it up.
 
 ---
 
@@ -58,6 +111,12 @@ ONE description of a bundle. Do not restate it here; it drifted once already (th
 `preferences.md` MUST open with:
 `> Follow the shared base first — brain-config/super-agents/_shared/super-agent-base.md — then personalize below.`
 
+**A CRAFT DEPARTMENT HEAD takes a second pointer**, on the line below the first:
+`> Then the department-head supplement — brain-config/super-agents/_shared/department-head-base.md.`
+That file holds the two-axis scope, the craft-ledger / project-log memory split, the hard
+exclusions (no calendar, no inventory, no people), the export-not-source provenance rule, and the
+six-field instantiation delta. **Do not restate any of it in a head's profile.**
+
 ---
 
 ## Authoring checklist
@@ -84,8 +143,10 @@ ONE description of a bundle. Do not restate it here; it drifted once already (th
    > matter how complete its bundle is. Dev Dexter shipped built-but-unregistered on 2026-07-25
    > because the old file could not be written to. That failure class is gone — adding a row costs
    > nothing now — so there is no excuse left for skipping it.
-7. **PR-merge workflow** (GitHub Operating Standard): branch → commit → PR → self-merge → report.
-8. **Session task + transcript** for the authoring session (Agent Activity Board).
+7. **🎯 Retirement condition written as `decision-log.md` D1** (Founding law §6 + the section
+   above). **BLOCKING — no D1, no ship.**
+8. **PR-merge workflow** (GitHub Operating Standard): branch → commit → PR → self-merge → report.
+9. **Session task + transcript** for the authoring session (Agent Activity Board).
 
 ---
 
