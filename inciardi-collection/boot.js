@@ -33,15 +33,16 @@
        comment lives there. Two places to state one fact, so one of them rotted, which is the
        same failure this app's Decision Log has now catalogued seven times. If you bump the
        header comment in `index.html`, bump THIS LINE in the same commit.
-       ⭐ v20 is the first version where that nearly happened again and was caught INSIDE the
-       branch: index.html went to v20 in one commit and this line was still v19 until the next.
+       ⭐ v20 and v21 both nearly repeated it and both were caught INSIDE the branch: index.html
+       moved first, this line one commit later. Two versions running, which is the closest thing
+       to a working guard this fact has — but it is still two files stating one number.
 
        🔴 AND HERE IS HOW TO GET THE NUMBER RIGHT RATHER THAN GUESS IT (v19): you cannot know a
        PR number before the PR exists, so **push the code, open the PR, then push the stamp** —
        two commits on one branch, one merge. An invented number is the same defect class as the
        fabricated wrangler version pin and the hand-typed ClickUp id: a value that looks checked
        and never was. */
-    version: 'v20 \u00b7 PR #670',
+    version: 'v21 \u00b7 PR #672',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
