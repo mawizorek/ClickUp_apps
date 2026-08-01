@@ -1,0 +1,250 @@
+# Apply a D1 migration to inciardi-collection — BY BUTTON, NEVER BY PUSH.
+#
+# Actions → "Migrate inciardi-collection D1" → Run workflow → pick the file → confirm.
+#
+# ============================================================================
+# 🔴 WHY THIS IS A SEPARATE FILE FROM THE DEPLOY WORKFLOW
+#
+# The deploy workflow fires on PUSH. A migration that fires on push is the single worst
+# thing in this design space: merging a .sql file would apply it, and applying it twice
+# would run `DROP TABLE edition_image` against a populated table.
+#
+# Two opposite trigger rules living in one file is how one eventually gets applied to the
+# other by a well-meaning edit. So: `workflow_dispatch` ONLY, in its own file, with no
+# `push:` block to accidentally extend.
+#
+# The deploy workflow's own comment already named this seam — it excludes `db/**` from its
+# path filter because "schema files are applied by hand and are not worker inputs." This is
+# that exclusion growing a door, rather than the exclusion being weakened.
+# ============================================================================
+#
+# ============================================================================
+# 🔴 WHY THE DOUBLE-RUN GUARD IS STRUCTURAL
+#
+# This app's design law (decision log J6) ranks the ways to prevent a contradiction:
+#   1 derive it · 2 make it structurally impossible · 3 trigger · 4 one write path ·
+#   5 detect and announce.
+# A warning in the description is rung 5. So the workflow READS `applied.log` and refuses a
+# file already listed — the second press cannot happen, rather than being asked not to.
+#
+# The log is written BY THIS WORKFLOW after a successful run. A hand-maintained ledger
+# drifts; this one cannot claim a migration ran unless it did.
+# ============================================================================
+#
+# ⚠️ WHAT IS NOT PROVEN YET, stated rather than assumed: the repo's CLOUDFLARE_API_TOKEN was
+# created from the "Edit Cloudflare Workers" template. Whether that template carries D1
+# WRITE permission has NOT been verified. If the execute step fails on authorization, that
+# is the first thing to check — the failure branch below says so explicitly rather than
+# leaving a 10000/authentication error to be misread as a bad secret.
+
+name: Migrate inciardi-collection D1
+
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: "Migration file, relative to inciardi-collection/ (e.g. db/migrations/001-photos-and-groupings.sql)"
+        required: true
+        type: string
+      confirm:
+        description: "This writes to the LIVE database. Choose 'apply' to proceed."
+        required: true
+        default: "no"
+        type: choice
+        options: ["no", "apply"]
+
+permissions:
+  contents: write        # needed ONLY to append applied.log after a successful run
+
+concurrency:
+  group: migrate-inciardi-collection
+  cancel-in-progress: false   # never race two migrations against one database
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: inciardi-collection
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      DB_NAME: inciardi-collection
+      # No version pin. The deploy workflow learned this the expensive way: a pinned
+      # version that does not exist fails with exit code 1, the same symptom as everything
+      # else. `wrangler@4` tracks the major without asserting a release exists.
+      WR: "npx --yes wrangler@4"
+      MIG: ${{ inputs.file }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Everything reports to $GITHUB_STEP_SUMMARY, never stdout. Same rule the deploy
+      # workflow had to learn: the mobile Actions view does not render step logs, so a
+      # diagnostic written to stdout is a diagnostic the person holding the phone cannot
+      # read. A diagnostic that reports somewhere the reader cannot see is not a diagnostic.
+      - name: Header
+        run: |
+          {
+            echo "## D1 migration · \`$DB_NAME\`"
+            echo ""
+            echo "**File:** \`$MIG\`"
+            echo "**Confirm:** \`${{ inputs.confirm }}\`"
+            echo "**Commit:** \`${{ github.sha }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Gate · did you mean it?
+        run: |
+          if [ "${{ inputs.confirm }}" != "apply" ]; then
+            echo "::error::Confirm was not set to 'apply'. Nothing ran. This is the intended outcome of a mis-tap."
+            echo "- 🛑 **not confirmed — nothing ran**" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "- ✅ confirmed" >> "$GITHUB_STEP_SUMMARY"
+
+      # SHAPE ASSERTIONS, not observations. The deploy workflow burned three runs on a
+      # 50-character account id that was PRINTED and waved through: an observation is not a
+      # check. If a shape is known, assert it.
+      - name: Preflight · credential shape
+        run: |
+          FAIL=0
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is empty or missing."
+            echo "- ❌ token **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+          else
+            echo "- ✅ token present (${#CLOUDFLARE_API_TOKEN} chars)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if ! printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | grep -qiE '^[0-9a-f]{32}$'; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID must be exactly 32 hex characters (got ${#CLOUDFLARE_ACCOUNT_ID}). dash.cloudflare.com → Workers & Pages → Account Details."
+            echo "- ❌ account id is **${#CLOUDFLARE_ACCOUNT_ID} chars — must be exactly 32 hex**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+          else
+            echo "- ✅ account id correctly shaped (32 hex)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit $FAIL
+
+      - name: Preflight · does the migration exist?
+        run: |
+          if [ ! -f "$MIG" ]; then
+            echo "::error::No such file: inciardi-collection/$MIG"
+            {
+              echo "- ❌ **no such file:** \`inciardi-collection/$MIG\`"
+              echo ""
+              echo "  Available:"
+              echo '```'
+              ls -1 db/migrations/*.sql 2>/dev/null || echo "(none)"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          SHA=$(sha256sum "$MIG" | cut -d' ' -f1)
+          echo "MIG_SHA=$SHA" >> "$GITHUB_ENV"
+          echo "- ✅ file found ($(wc -c < "$MIG") bytes, sha256 \`${SHA:0:12}…\`)" >> "$GITHUB_STEP_SUMMARY"
+
+      # 🔴 THE GUARD. Rung 2, not rung 5.
+      - name: Guard · has this already been applied?
+        run: |
+          LOG=db/migrations/applied.log
+          REL="inciardi-collection/$MIG"
+          if [ -f "$LOG" ] && grep -qF " $REL" "$LOG"; then
+            echo "::error::$REL is already in applied.log. REFUSED. Migrations are not idempotent — 001 contains DROP TABLE, which is free against an empty table and destroys the photo library against a populated one. If you genuinely need to re-run it, write a NEW numbered migration that does the specific thing you want."
+            {
+              echo "- 🛑 **REFUSED — already applied**"
+              echo ""
+              echo '```'
+              grep -F " $REL" "$LOG"
+              echo '```'
+              echo ""
+              echo "  Migrations are not idempotent. Write a NEW numbered file rather than replaying this one."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "- ✅ not previously applied" >> "$GITHUB_STEP_SUMMARY"
+
+      # The record of WHAT RAN has to live next to the record that it ran. Printed before
+      # execution so it survives even if the execute step dies halfway.
+      - name: Show the SQL
+        run: |
+          {
+            echo ""
+            echo "<details><summary>SQL being applied</summary>"
+            echo ""
+            echo '```sql'
+            cat "$MIG"
+            echo '```'
+            echo ""
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Apply
+        run: |
+          set +e
+          # -y skips the interactive confirmation. If wrangler ever rejects it as an unknown
+          # flag, that is the first thing to drop — it is convenience, not correctness.
+          $WR d1 execute "$DB_NAME" --remote -y --file="$MIG" > out.txt 2>&1
+          RC=$?
+          {
+            echo ""
+            echo "## \`d1 execute\` — exit $RC"
+            echo ""
+            echo '```'
+            tail -60 out.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat out.txt
+          if [ $RC -ne 0 ]; then
+            # Name the two failures that look like something else, so neither gets misread.
+            if grep -qiE 'authent|authoriz|10000|permission' out.txt; then
+              echo "::error::Authorization failure. The API token is from the 'Edit Cloudflare Workers' template, which may NOT carry D1 write permission. Create a token with D1:Edit and re-save CLOUDFLARE_API_TOKEN. This is not a malformed-secret problem."
+            fi
+            if grep -qiE 'no such column|no such table|error in view' out.txt; then
+              echo "::error::The migration is wrong, not the credentials. A view or index almost certainly still references something the migration drops — read db/views.sql before retrying."
+            fi
+            echo "::error::Migration FAILED. A D1 batch is atomic, so nothing was applied and applied.log is untouched. Fix the file and press the button again."
+            echo "- ❌ **failed — nothing applied, nothing logged**" >> "$GITHUB_STEP_SUMMARY"
+            exit $RC
+          fi
+          echo "- ✅ applied" >> "$GITHUB_STEP_SUMMARY"
+
+      # A migration that reports success without showing the resulting shape is asking to be
+      # believed. This makes the outcome READABLE on a phone, which is the whole point of the
+      # button existing.
+      - name: Verify · what the database actually looks like now
+        run: |
+          set +e
+          $WR d1 execute "$DB_NAME" --remote -y \
+            --command="SELECT type, name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' ORDER BY type, name" > shape.txt 2>&1
+          {
+            echo ""
+            echo "<details><summary>Schema after this migration</summary>"
+            echo ""
+            echo '```'
+            tail -120 shape.txt
+            echo '```'
+            echo ""
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+
+      # Only reached on success — every step above uses default failure semantics, so a
+      # failed migration can never be logged as applied.
+      - name: Record it
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "$STAMP $MIG_SHA inciardi-collection/$MIG" >> inciardi-collection/db/migrations/applied.log
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add inciardi-collection/db/migrations/applied.log
+          git commit -m "d1(inciardi-collection): applied $MIG"
+          # Rebase rather than force: another session may have pushed while this ran, and a
+          # migration log is the last file that should ever clobber someone else's commit.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          {
+            echo ""
+            echo "### ✅ Applied and recorded"
+            echo ""
+            echo "\`$STAMP\` · \`${MIG_SHA:0:12}…\` · \`$MIG\`"
+            echo ""
+            echo "**This file can no longer be run.** The guard will refuse it from now on."
+          } >> "$GITHUB_STEP_SUMMARY"
