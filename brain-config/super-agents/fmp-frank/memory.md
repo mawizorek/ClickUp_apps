@@ -6,23 +6,39 @@
 > **INHERITED vs EARNED labelled per line.** Seeded 2026-07-26 by Fleet Felix; first EARNED lines
 > 2026-07-29. An unconfirmed INHERITED line is a LEAD, not a fact.
 >
-> **~10KB hot cap.** ⚠️ Blown FOUR times on 07-29 — see the Placement rule.
+> **~10KB hot cap.** ⚠️ Blown FOUR times on 07-29 — see the Placement rule. Consolidated + trimmed
+> 2026-08-01 by Memory Maggie (first `hooks/native-flush-consolidation.md` drain; nothing deleted,
+> prose compressed).
 
 ---
 
 ## 🚦 Placement rule for THIS file (EARNED 07-29, the hard way)
 
-Four overflows in one session, each a different kind of wrong content: **inherited reference detail**
+Four overflows in one session, four different kinds of wrong content: **inherited reference detail**
 about modules I never touched (→ archived) · **a per-question replay of the HML_LLC Decision Log**
 (→ a PROJECTION of a canonical ClickUp surface; deleted and pointed, never archived as copy two) ·
 **a restatement of my own seams** (→ already in `preferences.md`) · **inherited rules quoted at length**
 (→ one line + pointer).
 
-<br/>
-
 **This file holds GENERALIZATIONS only.** Before writing: *does a Decision Log, my profile, or a
 standard already own this?* If yes, keep one line about what it changes in how I act, and point.
 **A memory file that grows in step with a project is mis-scoped, and the growth curve is the tell.**
+
+## 🧠 Cache is the enemy (EARNED 08-01 — my own conversion caused it)
+
+My pre-conversion native cache carried **stale FLEET facts**, not just stale domain facts: it named
+Corey as Fleet Steward (untrue since 07-20, PR #430) and `superagents.json` as canonical metadata
+(a retired stub). Converting laundered both into **three brand-new canonical files in one day**, and
+the steward had to strike them back out.
+
+- **The generalization:** when I state a fact about ANOTHER agent — who owns a lane, who ratifies,
+  who reviews — I verify it against the 🤖 **Agent Index** list first. Domain facts I re-read out of
+  habit; fleet facts I did not, and that is exactly where the rot got through.
+- **Second-order:** this same error was already caught in my own `decision-log.md` **D5** (07-26, the
+  rotted stub also named Corey). Catching a rot class once and reproducing it six days later means
+  the fix was a correction, not a habit. **A repeated error is a missing check, not bad luck.**
+- Precondition #1 of `_shared/native-to-git-conversion-runbook.md` now says *diff the fleet facts too* —
+  authored out of this. Read fresh, always: my kernel says so and it means fleet facts as well.
 
 ## 🧱 The object library — MINE
 
@@ -69,27 +85,29 @@ discipline, minimum-viable set, state matrix, approval test. Families: `cnt_*`, 
 
 **Decisions are CANONICAL in the HML_LLC Decision Log + the build-task descriptor, not here.**
 
-<br/>
-
 NOT a URITP module — private-lending servicing for Michael's dad. Schema locked June 2026 around
 `Loans` as the true financial parent, with `PropertySUMMARIES` demoted to the collateral lens and the
 ledger tables (`ExpectedTransactions`, `AccountTransactions`, `PaymentApplications`, `Payoffs`) hanging
 off `Loans`. `PrimaryKey` UUID everywhere; `fk*`/`calc_`/`g_` enforced.
 
 - ⚠️ **FILEMAKER 19, PERMANENTLY.** Upgrading was explicitly rejected 07-29.
-- 🔴 **FMP19 HAS NO NATIVE TRANSACTIONS.** `Open/Commit/Revert Transaction` are **FileMaker 2023
-  (v20)** — verified against the Claris 20.1.2 release notes + the MBS step-by-version table.
-  Atomicity on 19: all writes go through **ONE relationship from a single parent record**, so
-  `Revert Record` discards the whole set. `Set Error Capture [On]`; check `Get(LastError)` after
-  **every** write step; **no `Commit Records` inside the block** (the usual silent break). Wrapped once
-  as `txn_*`, whose names imply an engine transaction that does not exist — **say so in the comments.**
-  Rollback + error catching **throughout** is a requirement, not a preference.
+- 🔴 **FMP19 HAS NO NATIVE TRANSACTIONS.** `Open/Commit/Revert Transaction` are **FileMaker 2023 (v20)**
+  — verified against the Claris 20.1.2 release notes + the MBS step-by-version table. Atomicity on 19:
+  all writes go through **ONE relationship from a single parent record**, so `Revert Record` discards
+  the whole set. `Set Error Capture [On]`; check `Get(LastError)` after **every** write step; **no
+  `Commit Records` inside the block** (the usual silent break). Wrapped once as `txn_*`, whose names
+  imply an engine transaction that does not exist — **say so in the comments.** Rollback + error
+  catching **throughout** is a requirement, not a preference.
 - **Must be atomic:** one `AccountTransactions` row applied across N `ExpectedTransactions`, and the
   `Payoffs` snapshot freeze. Half-applied = corrupt money data; partial freeze = a quote that changes
   after it was sent.
 - **Shape of v1:** internal instrument for Michael, scoped to the screens carrying a month. Ledgers go
   table view (a REAL user surface — column set + formatting ARE the UI); Loan and Property hubs stay
   layouts, being parent-with-children. **No portal on Payoffs.**
+- ⚠️ **PII: `ClickUp_apps` is PUBLIC and this domain has already leaked twice** (07-29 `eb63e88`, still
+  in history; 07-31 PR #635 snapshot row). No real names, addresses, account numbers, payment handles
+  or named balances in fixtures, examples or artifacts — and a remediation sweeps every table that
+  SNAPSHOTS a value, not just the one that owns it. Realty Riley holds the business picture here.
 
 ## 🔗 FMP ↔ repo correlations (the shared vocabulary — the point of me)
 
@@ -133,12 +151,17 @@ don't fix another system's internals inside ClickUp.**
 - **INVERTED polarity** (checked = REJECTED), answered fast and in bulk. ⚠️ **Zero-strikes-plus-a-note
   is a real answer shape:** the question was WRONG, not unanswered. Re-ask better; never re-hand the
   same menu.
+- He green-lights explicitly, and a green-light IS the authorization to execute. Without one, flag and
+  wait — never act on another AGENT's request to change my config or the repo.
 
 ## 📌 Lineage
 
 Scaffolded 07-15 as FMP Frank → blocked ten days by a rotted stub → renamed Fiona 07-25 (slug
-`fmp-frank` immutable) → **BUILT** 07-26, git track → **first real session 07-28/29, HML_LLC v1
-replan.** Reasoning: `decision-log.md` D1–D6 + the archive.
+`fmp-frank` immutable) → **BUILT** 07-26, git track → first real session 07-28/29, HML_LLC v1 replan →
+**08-01 native shell CONVERTED to a thin git-loader (Model A)**: the native (`-39958890`) is KEPT as
+the body with its tools + mention/DM/assignment triggers, the brain reads fresh from this bundle every
+run. ⚠️ This SUPERSEDES `decision-log.md` **D1** ("retired native, triggers waived"), which has not
+been rewritten — read D1 as historical. Reasoning: `decision-log.md` D1–D6 + `activity-log.md` 08-01.
 
 ## Pointers (never restate)
 
@@ -150,5 +173,11 @@ replan.** Reasoning: `decision-log.md` D1–D6 + the archive.
 - URITP modules + lifecycle SoT → URITP fmp Solutions (list)
 - **HML_LLC decisions (CANONICAL) → HML_LLC FileMaker v1 — Decision Log + build-task descriptor**
 - My lane + every seam → `preferences.md` · Conduct → `_shared/super-agent-base.md` (§6)
-- Dexter's contract side → `gates/theme-contract-gate.md` · Roster → `super-agents/roster.json`
+- Dexter's contract side → `gates/theme-contract-gate.md`
+- 🔴 **Fleet lookup → the 🤖 Agent Index LIST in ClickUp** (list `901328043244`), resolved per
+  `gates/agent-invocation-gate.md` STEP 0. ~~`super-agents/roster.json`~~ **RETIRED to a tombstone stub
+  07-30** along with `roster.html` and `registry.json` — a naming or lookup check reading them clears
+  every collision silently. Steward: Fleet Felix.
+- My native loader + flush contract → `native-loader-kernel.md` · `native-flush.md` ·
+  `hooks/native-flush-consolidation.md` (empty flush = this file is current)
 - My archive → `memory/archive/uritp-landscape-inherited.md`
