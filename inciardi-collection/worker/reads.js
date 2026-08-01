@@ -48,6 +48,61 @@ export const READ_ROUTES = [
   'GET /slots?sheet=', 'GET /editions?artwork='
 ];
 
+/* ============================================================ CARD_IMAGE
+ * 🔴 WHICH PHOTOGRAPH REPRESENTS A PRINT. One definition, three consumers, zero stored state.
+ *
+ * Until 2026-08-01 this did not exist and the three routes below returned NO image column at
+ * all — so a photo could be uploaded, attached, and confirmed in the database while the binder,
+ * the Collection matrix and the artwork page stayed blank. Attaching a photo appeared to do
+ * nothing because nothing could see it.
+ *
+ * ⭐ MICHAEL'S RULE, AND IT BEAT MINE: *"if a photo is the ONLY photo attached, it should be the
+ * default render even if not selected."*
+ *
+ * I had proposed writing `is_primary = 1` on first attach. His is a DERIVE where mine was a
+ * WRITE — rung 1 against rung 2 of this app's own ladder — and the difference is not taste.
+ * Under a stored first-attach flag, unlink that photo and attach a replacement and the print
+ * goes BLANK until someone taps a button, because the fact was pinned to the row that left. A
+ * derived answer cannot fall out of date with its own inputs.
+ *
+ * The ordering, one step past his rule, to serve the workflow he described in the same breath
+ * (*"pack photos… then sliding them into the background carousel once we get standalones in"*):
+ *
+ *     is_primary DESC   an explicit ⭐ always wins. Nothing overrules a human choice.
+ *     link_count ASC    a photo on ONE print beats a photo on nine.
+ *     created_at DESC   newest of whatever is left.
+ *
+ * ⭐ THE MIDDLE LINE IS THE TRICK AND IT COSTS NO NEW COLUMN. A photo linked to several editions
+ * is STRUCTURALLY a pack shot — being on nine prints is what makes it one. So J16's `subject`
+ * field, invented for precisely this preference and never reachable from any UI, is not needed
+ * here: the fact already lives in the join table. Today the pack photo renders on Pony and PBR
+ * because it is all there is; the day a standalone PBR shot lands it carries link_count 1
+ * against the pack's 2 and takes over by itself, nothing tapped.
+ *
+ * ⚠️ THIS BELONGS IN `v_slot`, NOT IN A WORKER STRING, AND THAT IS OWED DEBT. `views.sql` says
+ * to promote a worker query into a view at the SECOND consumer; this has THREE on day one. It
+ * is here because a view change means migration 002 + three workflow edits + a button press,
+ * and the ask was photos in the binder soon. When 002 happens for any other reason, this goes
+ * with it. Until then: ONE constant, three call sites — never a second copy of the ordering.
+ */
+const CARD_IMAGE = `(
+  SELECT ei.image_id
+    FROM edition_image ei
+    JOIN edition e2 ON e2.edition_id = ei.edition_id
+    JOIN image im   ON im.image_id   = ei.image_id
+   WHERE e2.artwork_id = %A% AND ei.status = 'active' AND im.status = 'active'
+   ORDER BY ei.is_primary DESC,
+            (SELECT COUNT(*) FROM edition_image x WHERE x.image_id = ei.image_id) ASC,
+            ei.created_at DESC
+   LIMIT 1
+)`;
+
+/* The subquery correlates to whatever the outer query calls `artwork`, and the three routes use
+ * three different aliases (`s.artwork_id`, `a.artwork_id`). Substituting the alias keeps ONE
+ * definition instead of three near-copies that can drift — which is the entire failure mode
+ * this app is built to refuse. */
+const cardImage = (aliasExpr, as) => CARD_IMAGE.replace('%A%', aliasExpr) + ' AS ' + as;
+
 export async function handleRead({ path, url, all, reply, t }) {
 
   /* ⚠️ /health IS NOT A MIGRATION TEST. It touches only COUNT(*) over five tables and names no
@@ -60,7 +115,8 @@ export async function handleRead({ path, url, all, reply, t }) {
               (SELECT COUNT(*) FROM edition)  AS editions,
               (SELECT COALESCE(SUM(qty),0) FROM copy WHERE disposition='own') AS owned,
               (SELECT COUNT(*) FROM sheet)    AS sheets,
-              (SELECT COUNT(*) FROM slot)     AS slots`);
+              (SELECT COUNT(*) FROM slot)     AS slots,
+              (SELECT COUNT(*) FROM image WHERE status='active') AS images`);
     // NOTE: owned is SUM(qty), never COUNT(*). See the comment block on `copy`.
     return reply({ ok: true, at: t, counts: counts[0] });
   }
@@ -77,7 +133,8 @@ export async function handleRead({ path, url, all, reply, t }) {
               COALESCE(o.qty_owned,0)      AS qty_owned,
               COALESCE(o.editions_owned,0) AS editions_owned,
               (SELECT COUNT(*) FROM edition e WHERE e.artwork_id = a.artwork_id) AS editions,
-              (SELECT COUNT(*) FROM slot s WHERE s.artwork_id = a.artwork_id)    AS placed_count
+              (SELECT COUNT(*) FROM slot s WHERE s.artwork_id = a.artwork_id)    AS placed_count,
+              ${cardImage('a.artwork_id', 'image_id')}
          FROM artwork a
          LEFT JOIN v_owned o ON o.artwork_id = a.artwork_id
         WHERE a.status = 'active'
@@ -126,7 +183,11 @@ export async function handleRead({ path, url, all, reply, t }) {
               COALESCE(o.qty_sold, 0)                        AS qty_sold,
               COALESCE(p.n, 0)                               AS placed,
               MIN(COALESCE(o.qty_owned,0), COALESCE(p.n,0))  AS in_binder,
-              MAX(0, COALESCE(o.qty_owned,0) - COALESCE(p.n,0)) AS spare
+              MAX(0, COALESCE(o.qty_owned,0) - COALESCE(p.n,0)) AS spare,
+              ${cardImage('a.artwork_id', 'image_id')},
+              (SELECT COUNT(*) FROM edition_image ei2
+                 JOIN edition e3 ON e3.edition_id = ei2.edition_id
+                WHERE e3.artwork_id = a.artwork_id AND ei2.status = 'active') AS photos
          FROM artwork a
          LEFT JOIN v_owned o ON o.artwork_id = a.artwork_id
          LEFT JOIN (
@@ -166,6 +227,9 @@ export async function handleRead({ path, url, all, reply, t }) {
     totals.unhoused = prints.filter(r => r.qty_owned > 0 && r.placed === 0).length;
     totals.wanted = prints.filter(r => r.qty_owned === 0 && r.placed > 0).length;
     totals.slots = (totals.sheets || 0) * 18;
+    // How much of the collection has a picture at all. The one number that says whether the
+    // photo backlog is shrinking, and it is free here.
+    totals.with_photo = prints.filter(r => r.image_id).length;
 
     return reply({ ok: true, at: t, totals: totals, prints: prints, placements: placements });
   }
@@ -222,7 +286,8 @@ export async function handleRead({ path, url, all, reply, t }) {
               o.editions_owned,
               COALESCE(p.n, 0)                AS placed_count,
               o.qty_owned - COALESCE(p.n, 0)  AS spare,
-              CASE WHEN COALESCE(p.n, 0) = 0 THEN 'unhoused' ELSE 'spare' END AS box_state
+              CASE WHEN COALESCE(p.n, 0) = 0 THEN 'unhoused' ELSE 'spare' END AS box_state,
+              ${cardImage('a.artwork_id', 'image_id')}
          FROM artwork a
          JOIN v_owned o ON o.artwork_id = a.artwork_id
          LEFT JOIN (
@@ -244,13 +309,19 @@ export async function handleRead({ path, url, all, reply, t }) {
     });
   }
 
-  // Slots for one sheet. state (owned/wanted/note) is DERIVED in v_slot — there is no
-  // state column and there must never be one (J3).
+  /* Slots for one sheet. state (owned/wanted/note) is DERIVED in v_slot — there is no
+   * state column and there must never be one (J3).
+   *
+   * ⚠️ NO LONGER `SELECT * FROM v_slot`. The view cannot carry the card image (that would be
+   * migration 002 — see CARD_IMAGE), so this selects the view's columns and appends the derived
+   * image beside them. `v.*` keeps the view as the single owner of every column it does define,
+   * so nothing here re-implements `state`, `qty_owned` or `placed_count`. */
   if (path === '/slots') {
     const sheet = url.searchParams.get('sheet');
+    const sql = `SELECT v.*, ${cardImage('v.artwork_id', 'image_id')} FROM v_slot v`;
     return reply({ slots: sheet
-      ? await all('SELECT * FROM v_slot WHERE sheet_id = ? ORDER BY side, position', [sheet])
-      : await all('SELECT * FROM v_slot ORDER BY sheet_id, side, position') });
+      ? await all(sql + ' WHERE v.sheet_id = ? ORDER BY v.side, v.position', [sheet])
+      : await all(sql + ' ORDER BY v.sheet_id, v.side, v.position') });
   }
 
   if (path === '/editions') {
