@@ -83,9 +83,29 @@
     var ed = (row.edition_label && !row.edition_implicit)
       ? '<span class="ed">' + Core.esc(row.edition_label) + '</span>' : '';
 
+    /* 🔴 THE PHOTOGRAPH LAYERS OVER THE INITIALS — IT DOES NOT REPLACE THEM, AND THAT IS THE
+     * ENTIRE IMPLEMENTATION. `.ini` stays in the markup underneath every image; CSS stacks the
+     * <img> on top of it. So a photo that 404s, a worker that is down, or a row whose bytes
+     * never reached R2 all reveal the initials again — never an empty grey square.
+     *
+     * Image Rendering Law rule 7: a placeholder ALWAYS carries identifying content, because a
+     * blank box is how an outage hides. ⚠️ Do not "tidy" this by rendering the initials only
+     * when there is no image; that deletes the fallback and costs nothing to keep. There is no
+     * onerror handler for the same reason — if the image loads it covers the letters, and if it
+     * does not, the letters were never taken away. The degradation is free.
+     *
+     * `image_id` is DERIVED per print by the worker (reads.js → CARD_IMAGE): an explicit ⭐
+     * wins, else a photo on one print beats a photo on nine, else the newest. Michael's rule —
+     * "if a photo is the ONLY photo attached it should be the default render even if not
+     * selected" — is the middle of those three, and the client decides none of it. */
+    var shot = row.image_id
+      ? '<img class="shot" loading="lazy" alt="" src="' +
+        Core.esc(API.base() + '/image/' + encodeURIComponent(row.image_id)) + '">'
+      : '';
+
     return '<button class="slot ' + row.state + '" ' + at + sid + '>' + ed +
       '<span class="plate"><span class="ini">' +
-        Core.esc(Core.initials(row.artwork_name)) + '</span></span>' +
+        Core.esc(Core.initials(row.artwork_name)) + '</span>' + shot + '</span>' +
       '<span class="cap"><span class="nm">' + Core.esc(row.artwork_name) + '</span>' +
       (sub ? '<span class="c-sub">' + Core.esc(sub) + '</span>' : '') +
       '</span></button>';
