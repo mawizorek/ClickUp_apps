@@ -55,6 +55,7 @@
       { route: 'binder',  label: 'Binder',     hint: 'Nine slots a face, front and back' },
       { route: 'summary', label: 'Collection', hint: 'Every print, and where each one is' },
       { route: 'shoebox', label: 'Shoe-box',   hint: 'Owned, not in the binder yet' },
+      { route: 'photos',  label: 'Photos',     hint: 'Every picture, filed and not' },
       { route: 'enter',   label: 'Enter',      hint: 'Add a print to the catalog' }
     ],
 
@@ -282,10 +283,11 @@
      * identical — this is the line that tells them apart.
      * ⚠️ IT IS ONLY TRUE IF IT IS KEPT CURRENT, AND IT WAS NOT: `Arrange` shipped in v17 and was
      * never added, so for two versions the one diagnostic built to catch a missing module was
-     * blind to the newest one. Add every new global here in the same commit that creates it. */
+     * blind to the newest one. Add every new global here in the same commit that creates it.
+     * (v20: `Photos` and `Capture`, added in the commit that created them.) */
     L.push('modules     ' +
       ['Device', 'Chrome', 'Settings', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox',
-       'Summary', 'Batch', 'Arrange', 'Preview', 'Backroom', 'Artwork', 'App']
+       'Summary', 'Batch', 'Arrange', 'Preview', 'Backroom', 'Artwork', 'Photos', 'Capture', 'App']
         .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
     L.push('hash        ' + (location.hash || '(none)'));
     L.push('worker      ' + API.base() + (API.isDefaultBase() ? '  [built-in]' : '  [OVERRIDDEN here]'));
