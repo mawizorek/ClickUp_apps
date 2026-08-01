@@ -2,9 +2,11 @@
 
 goal:       on-track/data.json holds the current week + next ~4 weeks of real US motorsport TV listings, verified and honest, WITHOUT losing series coverage or omitting confirmed events for missing metadata.
 target:     on-track/data.json · routines/last-run/on-track.txt
-report-to:  (per executor's reporting standard)
+report-to:  DETAIL → the data commit (see Report format below). ROLL-UP → 🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajuhw1d
 
-> Follows the UNIVERSAL Data-Refresh Discipline in `routines/README.md` (verify-and-merge, never shrink coverage, Stream vs Unknown, confirmed-event/TBD-time, schema stability, source freshness, stamp-always). The steps below are the On Track specifics on top of that floor.
+> `report-to:` used to read *"(per executor's reporting standard)"* — **a standard that did not exist.** Fixed 2026-08-01; see `routines/README.md` → Run reports.
+
+> Follows the UNIVERSAL Data-Refresh Discipline in `routines/README.md` (verify-and-merge, never shrink coverage, Stream vs Unknown, confirmed-event/TBD-time, schema stability, source freshness, THE STAMP LAW, complete loops). The steps below are the On Track specifics on top of that floor.
 
 ## Steps
 1. **Read the CURRENT on-track/data.json first.** Treat it as the baseline you are EXTENDING and CORRECTING — never a blank slate you rebuild from scratch.
@@ -15,8 +17,8 @@ report-to:  (per executor's reporting standard)
 6. **Platform honesty** (per README rule 6): confirmed streaming-only source → `Stream`; event confirmed but no verified viewing source → `Unknown`. These are distinct; never invent a channel, never collapse one into the other.
 7. Rebuild on-track/data.json in the exact existing schema. Bump the top-level "version" to today (YYYY-MM-DD). Do NOT change the schema (per README rule 7) — if a confirmed-date/TBD-time or `Unknown`-platform event can't be represented cleanly, STOP and flag it as a build task.
 8. Commit on-track/data.json to main. Data-only — do NOT touch index.html or bump the engine version.
-9. **STAMP.** Write `routines/last-run/on-track.txt` — one line, `YYYY-MM-DD HH:MM` ET, nothing else. Only this file; never a shared log, never another routine's file. **On a failed or partial run, leave it untouched** so the routine stays overdue and self-heals on the next invocation. *(Added 2026-07-26: this step was missing. Under a wake timer the executor's own mechanics covered it. With no scheduler, the stamp is the ONLY input to the due-math — an unstamped run is invisible and will be redone.)*
-10. Post the run report.
+9. **STAMP** — *only after step 8 actually landed.* Write `routines/last-run/on-track.txt` — one line, `YYYY-MM-DD HH:MM` ET, nothing else. Only this file; never a shared log, never another routine's file. **A FAILED run does not stamp** (see THE STAMP LAW in `routines/README.md`) so the routine stays overdue and self-heals on the next invocation. A run where the commit landed but a series could not be verified is a PARTIAL — stamp it and name the gap. *(Added 2026-07-26: this step was missing. Under a wake timer the executor's own mechanics covered it. With no scheduler, the stamp is the ONLY input to the due-math — an unstamped run is invisible and will be redone.)*
+10. Post the run report: detail per the format below, plus the one-line roll-up on the standing thread.
 
 ## Guardrails (STOP + flag if any is true)
 - Target is anything other than on-track/data.json (plus its own last-run stamp file).
@@ -24,6 +26,7 @@ report-to:  (per executor's reporting standard)
 - A confirmed event would be dropped solely because platform or exact time is missing (keep it; use `Unknown` / TBD).
 - The event schema would need to change to represent something → STOP, flag as a build session.
 - You are about to stamp a shared log file instead of `routines/last-run/on-track.txt` → STOP, that shape is forbidden (see `schedule.md`).
+- You are about to stamp before the commit has actually landed → STOP. Stamp is step 9 for a reason.
 
 ## Report format
 - Commit link + live URL (https://mawizorek.github.io/ClickUp_apps/on-track/)
