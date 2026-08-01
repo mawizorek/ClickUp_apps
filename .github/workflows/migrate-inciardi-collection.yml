@@ -19,6 +19,44 @@
 # ============================================================================
 #
 # ============================================================================
+# 🔴 WHY THIS USES ITS OWN TOKEN — CLOUDFLARE_D1_TOKEN, NOT CLOUDFLARE_API_TOKEN
+#
+# Run 3 reached the apply step and failed:
+#     A request to the Cloudflare API (/accounts/***/d1/database/045f1943…/import) failed.
+#     Authentication error [code: 10000]
+# The "Edit Cloudflare Workers" template does NOT carry D1 write. Now CONFIRMED, after three
+# PRs carried it as an unverified caveat.
+#
+# 🔴 THE OBVIOUS FIX WAS THE WRONG ONE. "Just re-scope CLOUDFLARE_API_TOKEN to include
+# D1:Edit" works today, and breaks the DEPLOY workflow the moment that replacement token
+# turns out to be D1-only — later, in a different workflow, with no visible connection to the
+# swap. A shared credential means every permission change is a change to every consumer.
+#
+# So this workflow carries its own secret and the deploy path is untouched. Least privilege
+# in both directions: the deploy token cannot write the database, the migration token cannot
+# ship code.
+#
+# 🚫 NO FALLBACK to CLOUDFLARE_API_TOKEN, deliberately. A fallback would make a run "work"
+# using a different credential than the one named — the silent-fallback failure this repo
+# already has a law about (`hooks/silent-fallback-law.md`). It fails loudly with the creation
+# steps instead.
+#
+# ⚠️ THE MISREADING THIS FAILURE INVITES. Wrangler printed, directly under the auth error:
+#       🎢 Membership roles: Super Administrator - All Privileges
+# That is the ACCOUNT MEMBERSHIP OF THE HUMAN the token belongs to. It is NOT the token's
+# scopes. A scoped token is limited no matter how privileged its owner is. Read together the
+# two lines look like a contradiction and send you hunting for a Cloudflare bug.
+#
+# TO CREATE IT (phone-doable):
+#   dash.cloudflare.com/profile/api-tokens → Create Token → Create Custom Token
+#   Permissions:  Account · D1 · Edit
+#   Account Resources: Include · your account
+#   Create, copy it once, then:
+#   repo → Settings → Secrets and variables → Actions → New repository secret
+#   Name: CLOUDFLARE_D1_TOKEN
+# ============================================================================
+#
+# ============================================================================
 # 🔴 WHY THE DOUBLE-RUN GUARD IS STRUCTURAL
 #
 # This app's design law (decision log J6) ranks the ways to prevent a contradiction:
@@ -48,13 +86,13 @@
 # out, and re-picking the displayed value did not release it. 🔴 A required `choice` input
 # with NO `default:` DISPLAYS its first option but REGISTERS no selection — the value you can
 # see is not a value the form has, so it never becomes valid. Hence the explicit `default:`
-# below. It is the same string that was already showing; the fix is that the form now agrees
-# with the screen.
+# below.
 #
-# ⚠️ HONEST COST OF THE DROPDOWN: adding migration 002 requires adding one line to `options`
-# AND deciding whether to move `default`. Deliberately NOT softened with a free-text override —
-# an escape hatch that reintroduces the exact failure being fixed is not a fix. And a second
-# place where a new migration must be acknowledged is not the worst property for DDL to have.
+# ⚠️ HONEST COST OF THE DROPDOWN: adding migration 002 requires adding one line to `options`,
+# one `case` arm below, and a decision about `default`. Deliberately NOT softened with a
+# free-text override — an escape hatch that reintroduces the exact failure being fixed is not
+# a fix. And a second place where a new migration must be acknowledged is not the worst
+# property for DDL to have.
 #
 # 🚫 000 IS NOT IN THE LIST, ON PURPOSE. It was applied by hand before this workflow existed
 # and cannot be re-run (SQLite has no ADD COLUMN IF NOT EXISTS). It is in `applied.log`, so
@@ -83,17 +121,10 @@
 #     The summary is for the detail you go looking for once you know what broke.
 #
 # ⚠️ AND THE GENERAL FORM, now that this has bitten three times in two days (stdout in the
-# deploy workflow, the summary in #650, the FORM here): this is operated from a phone and
+# deploy workflow, the summary in #650, the FORM in #652): this is operated from a phone and
 # from nothing else. "It renders fine on a desktop" is not a passing grade. Labels are short,
 # and every options list leads with the part that must survive truncation.
 # ============================================================================
-#
-# ⚠️ WHAT IS NOT PROVEN YET, stated rather than assumed: the repo's CLOUDFLARE_API_TOKEN was
-# created from the "Edit Cloudflare Workers" template. Whether that template carries D1
-# WRITE permission has NOT been verified — no run has yet reached the apply step, so this is
-# still untested. If it fails on authorization, that is the first thing to check; the failure
-# branch says so explicitly rather than leaving a 10000/authentication error to be misread as
-# a bad secret.
 
 name: Migrate inciardi-collection D1
 
@@ -132,7 +163,8 @@ jobs:
       run:
         working-directory: inciardi-collection
     env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      # 🔴 NOT CLOUDFLARE_API_TOKEN. See the token block at the top of this file.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       DB_NAME: inciardi-collection
       # No version pin. The deploy workflow learned this the expensive way: a pinned
@@ -179,14 +211,28 @@ jobs:
       # SHAPE ASSERTIONS, not observations. The deploy workflow burned three runs on a
       # 50-character account id that was PRINTED and waved through: an observation is not a
       # check. If a shape is known, assert it.
+      #
+      # The D1 token check fires HERE rather than at the API call, so a missing secret costs
+      # two seconds instead of forty seconds of npx install and file upload.
       - name: Preflight · credential shape
         run: |
           FAIL=0
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "::error::CLOUDFLARE_API_TOKEN is empty or missing."
-            echo "- ❌ token **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+            echo "::error::CLOUDFLARE_D1_TOKEN is not set. This workflow deliberately does NOT fall back to CLOUDFLARE_API_TOKEN (that token is Workers-scoped and cannot write D1 — proven by run 3). Create one: dash.cloudflare.com/profile/api-tokens → Create Token → Create Custom Token → Permissions: Account · D1 · Edit → Account Resources: your account. Then repo Settings → Secrets and variables → Actions → New repository secret named CLOUDFLARE_D1_TOKEN."
+            {
+              echo "- ❌ **\`CLOUDFLARE_D1_TOKEN\` is not set**"
+              echo ""
+              echo "  1. dash.cloudflare.com/profile/api-tokens → **Create Token** → **Create Custom Token**"
+              echo "  2. Permissions: **Account · D1 · Edit**"
+              echo "  3. Account Resources: **Include · your account**"
+              echo "  4. Create, copy it (shown once)"
+              echo "  5. Repo → Settings → Secrets and variables → Actions → **New repository secret**, named \`CLOUDFLARE_D1_TOKEN\`"
+              echo ""
+              echo "  ⚠️ Do **not** reuse or re-scope \`CLOUDFLARE_API_TOKEN\` — the deploy workflow depends on it as-is."
+            } >> "$GITHUB_STEP_SUMMARY"
+            FAIL=1
           else
-            echo "- ✅ token present (${#CLOUDFLARE_API_TOKEN} chars)" >> "$GITHUB_STEP_SUMMARY"
+            echo "- ✅ D1 token present (${#CLOUDFLARE_API_TOKEN} chars)" >> "$GITHUB_STEP_SUMMARY"
           fi
           if ! printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | grep -qiE '^[0-9a-f]{32}$'; then
             echo "::error::CLOUDFLARE_ACCOUNT_ID must be exactly 32 hex characters (got ${#CLOUDFLARE_ACCOUNT_ID}). dash.cloudflare.com → Workers & Pages → Account Details."
@@ -270,18 +316,18 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           cat out.txt
           if [ $RC -ne 0 ]; then
-            # Name the two failures that look like something else, so neither gets misread.
-            # Both carry a line of the real output INTO the annotation — see the diagnostics
+            # Name the failures that look like something else, so none gets misread. Each
+            # carries a line of the real output INTO the annotation — see the diagnostics
             # rule at the top of this file.
             WHY=$(grep -m1 -iE 'error|✘' out.txt | head -c 300)
             if grep -qiE 'authent|authoriz|10000|permission' out.txt; then
-              echo "::error::Authorization failure — the API token is from the 'Edit Cloudflare Workers' template, which may NOT carry D1 write permission. Create a token with D1:Edit and re-save CLOUDFLARE_API_TOKEN. This is NOT a malformed-secret problem. Wrangler said: ${WHY}"
+              echo "::error::Authorization failure on CLOUDFLARE_D1_TOKEN — it exists but lacks D1 write on this account. Re-create it with Permissions: Account · D1 · Edit, and Account Resources set to your account. ⚠️ IGNORE wrangler's 'Super Administrator - All Privileges' line: that is your ACCOUNT MEMBERSHIP, not the token's scopes. A scoped token is limited no matter how privileged its owner is."
             elif grep -qiE 'no such column|no such table|error in view' out.txt; then
               echo "::error::The MIGRATION is wrong, not the credentials — a view or index still references something this migration drops. Read db/views.sql before retrying. Wrangler said: ${WHY}"
             else
               echo "::error::Migration failed: ${WHY:-see the run summary}"
             fi
-            echo "::error::Nothing was applied — a D1 batch is atomic — and applied.log is untouched. Fix the file and press the button again."
+            echo "::error::Nothing was applied — a D1 batch is atomic — and applied.log is untouched. Fix and press the button again."
             echo "- ❌ **failed — nothing applied, nothing logged**" >> "$GITHUB_STEP_SUMMARY"
             exit $RC
           fi
