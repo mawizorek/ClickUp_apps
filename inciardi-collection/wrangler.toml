@@ -17,6 +17,35 @@ database_name = "inciardi-collection"
 # reason.
 database_id = "045f1943-dc88-452b-b5d1-f4da81a5a612"
 
+# ============================================================ R2
+# Added 2026-08-01 — spec §5 step 6. Gates the image routes and capture; nothing gated it.
+#
+# THE EXISTING BUCKET, NOT A NEW ONE (Q17a → C). `inciardi-images` already holds 177 objects
+# / 268.74MB — Anastasia's scrub renders, which step 12 adopts as `kind='reference'`. The
+# reason a second worker may safely bind a bucket another worker also writes to: the market
+# app is declared dead, so the two-writer objection dissolved. If market is ever revived, that
+# decision has to be re-opened, not inherited.
+#
+# PREFIX DISCIPLINE: everything this worker writes goes under `ed/<edition_id>/<sha256>.jpg`.
+# The 177 legacy objects live outside that prefix, so "ours" and "hers" stay a clean partition
+# and step 12 is an adoption rather than a reconciliation. A listing scoped to `ed/` can never
+# accidentally enumerate the legacy set.
+#
+# 🔴 NEVER HARD-DELETE FROM THIS BUCKET. D1 Time Travel covers the database for 30 days and
+# covers R2 for nothing at all. Bytes are the only genuinely unrecoverable asset in this app —
+# an export carries image ROWS, not image BYTES. Archiving is a `status` flip on the row; the
+# object stays. There is deliberately no delete route and there must never be one.
+#
+# ⚠️ THE DEPLOY IS THE TEST. This worker deploys on CLOUDFLARE_API_TOKEN (Workers scope);
+# whether that token can also see R2 is a dashboard fact this repo cannot read, and wrangler
+# validates bucket bindings at deploy time. A token without R2 fails the deploy LOUDLY and
+# leaves the worker on its current version. Do NOT resolve that by widening the migrate
+# workflow's CLOUDFLARE_D1_TOKEN to cover everything — a shared credential makes every
+# permission change a change to every consumer, which is exactly what #656 split apart.
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "inciardi-images"
+
 # ============================================================ WRITE_KEY
 # This block previously read: "WRITE_KEY is deliberately NOT here, and never will be."
 # That was true for exactly one day. It is now a plain [vars] entry, below, and the reasoning
@@ -45,6 +74,10 @@ database_id = "045f1943-dc88-452b-b5d1-f4da81a5a612"
 #   "also" set a WRITE_KEY secret in the dashboard expecting it to win — it will be replaced.
 #   One source of truth, and it is this file.
 # ⚠️ AN UNSET KEY STILL REFUSES EVERY WRITE (worker.js returns 503). Blank never means open.
+# ⚠️ THE KEY GATES WRITES, NOT BYTES. Once image routes exist, `GET /image/:id` is an
+#   UNAUTHENTICATED read by design (same rule as every other read: the data is which prints
+#   Michael owns). The bucket itself stays PRIVATE and is only reachable through the worker —
+#   a public bucket would put 268MB behind a URL nobody can rotate.
 # ============================================================================
 [vars]
 WRITE_KEY = "icw_k7Qm4Zt9Rb2Vn6Xw8Ly3Js5Hd4Pg7T"
