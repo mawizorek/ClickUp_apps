@@ -32,9 +32,9 @@
 # ============================================================================
 #
 # ============================================================================
-# 🔴 WHY `file` IS A DROPDOWN AND NOT A TEXT BOX (learned on run 1)
+# 🔴 WHY `file` IS A DROPDOWN, AND WHY IT NEEDS AN EXPLICIT DEFAULT
 #
-# Run 1 failed at the existence preflight, reporting
+# RUN 1 failed at the existence preflight, reporting
 #     No such file: inciardi-collection/db/migrations/001-photos-and-groupings.sql
 # while that exact path sat on main at 9,761 bytes. The file was fine. The INPUT was not —
 # a path that must be character-perfect, hand-typed on a phone keyboard with autocorrect,
@@ -44,15 +44,27 @@
 # field for a closed set is rung 5 (validate, then complain). A dropdown is rung 2 — the
 # mistake becomes unrepresentable. Same law the schema itself is built on.
 #
-# ⚠️ HONEST COST: adding migration 002 requires adding one line to `options` below before it
-# can be run. Deliberately NOT softened with a free-text override — an escape hatch that
-# reintroduces the exact failure being fixed is not a fix. And a second place where a new
-# migration must be acknowledged is not the worst property for DDL to have.
+# RUN 2 never started: the mobile app showed the file value and left "Run Workflow" greyed
+# out, and re-picking the displayed value did not release it. 🔴 A required `choice` input
+# with NO `default:` DISPLAYS its first option but REGISTERS no selection — the value you can
+# see is not a value the form has, so it never becomes valid. Hence the explicit `default:`
+# below. It is the same string that was already showing; the fix is that the form now agrees
+# with the screen.
+#
+# ⚠️ HONEST COST OF THE DROPDOWN: adding migration 002 requires adding one line to `options`
+# AND deciding whether to move `default`. Deliberately NOT softened with a free-text override —
+# an escape hatch that reintroduces the exact failure being fixed is not a fix. And a second
+# place where a new migration must be acknowledged is not the worst property for DDL to have.
 #
 # 🚫 000 IS NOT IN THE LIST, ON PURPOSE. It was applied by hand before this workflow existed
 # and cannot be re-run (SQLite has no ADD COLUMN IF NOT EXISTS). It is in `applied.log`, so
 # the guard would refuse it anyway — but an unrunnable option in a dropdown is a trap, and
 # two independent refusals are better than one.
+#
+# ⚠️ `confirm` KEEPS ITS "no" DEFAULT. It is the only thing between a mis-tap and a DROP TABLE
+# on the live database. Defaulting it to "apply" would save exactly one tap and cost the whole
+# gate. `file` is safe to default precisely BECAUSE confirm is not — naming a file changes
+# nothing on its own.
 # ============================================================================
 #
 # ============================================================================
@@ -69,30 +81,38 @@
 # SO THE RULE IS NOT "USE THE SUMMARY." IT IS:
 #     THE FAILURE REASON GOES IN THE ANNOTATION.
 #     The summary is for the detail you go looking for once you know what broke.
-# Annotations surface at the top of the run in the app. Errors below carry their evidence
-# inline for that reason.
+#
+# ⚠️ AND THE GENERAL FORM, now that this has bitten three times in two days (stdout in the
+# deploy workflow, the summary in #650, the FORM here): this is operated from a phone and
+# from nothing else. "It renders fine on a desktop" is not a passing grade. Labels are short,
+# and every options list leads with the part that must survive truncation.
 # ============================================================================
 #
 # ⚠️ WHAT IS NOT PROVEN YET, stated rather than assumed: the repo's CLOUDFLARE_API_TOKEN was
 # created from the "Edit Cloudflare Workers" template. Whether that template carries D1
-# WRITE permission has NOT been verified — run 1 died before reaching the apply step, so this
-# is still untested. If the execute step fails on authorization, that is the first thing to
-# check; the failure branch says so explicitly rather than leaving a 10000/authentication
-# error to be misread as a bad secret.
+# WRITE permission has NOT been verified — no run has yet reached the apply step, so this is
+# still untested. If it fails on authorization, that is the first thing to check; the failure
+# branch says so explicitly rather than leaving a 10000/authentication error to be misread as
+# a bad secret.
 
 name: Migrate inciardi-collection D1
 
 on:
   workflow_dispatch:
     inputs:
+      # ⚠️ The `default` is load-bearing on mobile — without it the form shows a value it has
+      # not actually selected and the Run button stays disabled. See run 2 above.
+      # The label leads with the NUMBER because the mobile sheet truncates the middle of the
+      # value (`db/mig...ings.sql`), and a label whose unique part gets cut off is not a label.
       file:
-        description: "Migration to apply"
+        description: "Migration"
         required: true
         type: choice
+        default: "001 · photos + groupings"
         options:
-          - "db/migrations/001-photos-and-groupings.sql"
+          - "001 · photos + groupings"
       confirm:
-        description: "This writes to the LIVE database. Choose 'apply' to proceed."
+        description: "Writes to the LIVE database"
         required: true
         default: "no"
         type: choice
@@ -119,17 +139,30 @@ jobs:
       # version that does not exist fails with exit code 1, the same symptom as everything
       # else. `wrangler@4` tracks the major without asserting a release exists.
       WR: "npx --yes wrangler@4"
-      MIG_RAW: ${{ inputs.file }}
+      LABEL: ${{ inputs.file }}
 
     steps:
       - uses: actions/checkout@v4
+
+      # The dropdown carries a HUMAN label; the job needs a PATH. Resolved here, in one
+      # place, with an explicit failure rather than a silent empty string — an unmapped label
+      # would otherwise reach `[ ! -f "" ]` and report "no such file: " with nothing after it.
+      - name: Resolve the label to a path
+        run: |
+          case "$LABEL" in
+            "001 · photos + groupings") MIG="db/migrations/001-photos-and-groupings.sql" ;;
+            *)
+              echo "::error::Unmapped migration label: '$LABEL'. Someone added an option to the dropdown without adding its case here. Both live in .github/workflows/migrate-inciardi-collection.yml."
+              exit 1 ;;
+          esac
+          echo "MIG=$MIG" >> "$GITHUB_ENV"
 
       - name: Header
         run: |
           {
             echo "## D1 migration · \`$DB_NAME\`"
             echo ""
-            echo "**File:** \`$MIG_RAW\`"
+            echo "**File:** \`$MIG\`"
             echo "**Confirm:** \`${{ inputs.confirm }}\`"
             echo "**Commit:** \`${{ github.sha }}\`"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -137,7 +170,7 @@ jobs:
       - name: Gate · did you mean it?
         run: |
           if [ "${{ inputs.confirm }}" != "apply" ]; then
-            echo "::error::Confirm was not set to 'apply'. Nothing ran. This is the intended outcome of a mis-tap."
+            echo "::error::Confirm was left on 'no' — nothing ran. Set the second dropdown to 'apply'. This is the intended outcome of a mis-tap."
             echo "- 🛑 **not confirmed — nothing ran**" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
@@ -162,20 +195,6 @@ jobs:
             echo "- ✅ account id correctly shaped (32 hex)" >> "$GITHUB_STEP_SUMMARY"
           fi
           exit $FAIL
-
-      # Belt and braces BEHIND the dropdown. The dropdown should make all of this dead code,
-      # but it costs three lines and it keeps the step honest if the input ever goes back to
-      # free text. Strips: surrounding whitespace · a leading slash · a redundant
-      # `inciardi-collection/` prefix (the natural thing to paste from a file listing).
-      - name: Normalize the path
-        run: |
-          MIG=$(printf '%s' "$MIG_RAW" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-          MIG=${MIG#/}
-          MIG=${MIG#inciardi-collection/}
-          echo "MIG=$MIG" >> "$GITHUB_ENV"
-          if [ "$MIG" != "$MIG_RAW" ]; then
-            echo "- ℹ️ normalized input to \`$MIG\`" >> "$GITHUB_STEP_SUMMARY"
-          fi
 
       - name: Preflight · does the migration exist?
         run: |
