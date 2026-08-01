@@ -115,3 +115,25 @@
 
 .aw-back { margin: var(--gap-lg, 20px) 0 0; font-size: var(--fs-sm, 0.85rem); }
 .aw-back a { color: var(--accent-deep); text-decoration: none; }
+
+/* ============================================================================
+   THE PICKER'S DOOR TO THIS PAGE. Lives HERE, not in chrome.css, and that is deliberate on two
+   counts:
+     1. It exists only because this route exists. Delete `artwork.js` and this rule should go
+        with it — keeping them in one file is what makes that obvious to whoever does.
+     2. `chrome.css` and `base.css` were both being edited by another session the hour this
+        shipped. Styling a picker element from the file the picker's TARGET owns kept v19 out of
+        two files it had no other reason to touch.
+   ⚠️ It is an <a> styled as a row, inside a drawer. The bottom margin is what stops it colliding
+   with the "Pick a print you know" note directly beneath it.
+   ============================================================================ */
+.p-see { display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gap-xs, 8px); min-height: 44px; margin: 0 0 var(--gap-md, 12px);
+  padding: 8px 11px;
+  background: var(--accent-soft); color: var(--accent-deep);
+  border: var(--border-w, 1px) solid var(--accent); border-radius: var(--radius, 6px);
+  font-size: var(--fs-sm, 0.85rem); text-decoration: none; }
+/* SOLID border + the soft accent fill, because this is a real destination — same grammar the
+   back room uses for `.br-tag.new`. `--accent-deep` is the sanctioned ink token, so this obeys
+   the rule at the top of the file rather than lettering in a brand colour. */
+.p-see b { font-weight: 600; }
