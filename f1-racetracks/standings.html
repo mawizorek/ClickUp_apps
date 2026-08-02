@@ -10,7 +10,8 @@
 <!-- v13 (2026-08-01): SEASON LAYER. source/08_season.js loads FIRST and gives this surface the derived calendar — round numbers, names, dates and the season length — so nothing time-shaped is read out of a round file any more. Fixes a dead NaN sort left by v11 and a hardcoded "/ 22" that went wrong when the season became 23 rounds. -->
 <!-- v17 (2026-08-01): CHROME SPINE. source/chrome-tokens.css loads LAST and carries the canonical token vocabulary, one type scale, one page gutter, and the brand + switcher styling shared with the other two surfaces. Decision Log J16 + J17. -->
 <!-- v18 (2026-08-01): ONE CHROME RENDERER. The hand-written .mast-top header v17 added here is GONE — replaced by <div data-chrome>, which source/chrome.js fills. That module is the ONLY place the brand + switcher markup exists in this app, and it renders NOTHING when embedded in the unified shell. Decision Log J18 + J19. -->
-<!-- v19 (2026-08-01): THE FORMS VECTOR. chrome-tokens.css now carries shared/themes/forms.tsv row `sharp` (radius / border-w / elevation / motion) and repoints every hardcoded radius in the app at it. ⚠️ This surface had NO radii of its own — it read as "sharp" only because nobody ever typed one. It is now sharp on purpose. Decision Log J20. -->
+<!-- v19 (2026-08-01): THE FORMS VECTOR. chrome-tokens.css carries shared/themes/forms.tsv row `sharp` (radius / border-w / elevation / motion) and repoints every hardcoded radius at it. ⚠️ This surface had NO radii of its own — it read as "sharp" only because nobody ever typed one. It is sharp on purpose now. Decision Log J20. -->
+<!-- ⚠️ v19.1 (2026-08-01): CASCADE FIX. history.js and nav.js build their CSS at RUNTIME and document.head.appendChild it, so their literals landed AFTER chrome-tokens.css and won on document order — .hx-post stayed 10px with the sweep already merged. The sweep is !important now. If you add a runtime-injected style block to this page, know that it outranks the shared spine unless the spine flags it. Decision Log J21. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -21,11 +22,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;450;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="source/standings/base.css?v=20">
-<link rel="stylesheet" href="source/standings/panel.css?v=20">
-<!-- LAST on purpose: the shared spine wins the cascade over this surface's own :root,
-     which is how three chromes get unified without retyping two 11.5KB stylesheets. -->
-<link rel="stylesheet" href="source/chrome-tokens.css?v=20">
+<link rel="stylesheet" href="source/standings/base.css?v=21">
+<link rel="stylesheet" href="source/standings/panel.css?v=21">
+<!-- LAST on purpose — but note that "last" only beats other <link> elements. The runtime
+     injectors in history.js / nav.js still land after this; section 8 uses !important. -->
+<link rel="stylesheet" href="source/chrome-tokens.css?v=21">
 <style>
   html{background:oklch(0.16 0.012 268)}
 </style>
@@ -67,13 +68,13 @@
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-label="Profile"></aside>
 
-  <script src="source/chrome.js?v=20"></script>
-  <script src="source/08_season.js?v=20"></script>
-  <script src="source/standings/data.js?v=20"></script>
-  <script src="source/standings/matrix.js?v=20"></script>
-  <script src="source/standings/trajectory.js?v=20"></script>
-  <script src="source/standings/panel.js?v=20"></script>
-  <script src="source/standings/nav.js?v=20"></script>
-  <script src="source/standings/history.js?v=20"></script>
+  <script src="source/chrome.js?v=21"></script>
+  <script src="source/08_season.js?v=21"></script>
+  <script src="source/standings/data.js?v=21"></script>
+  <script src="source/standings/matrix.js?v=21"></script>
+  <script src="source/standings/trajectory.js?v=21"></script>
+  <script src="source/standings/panel.js?v=21"></script>
+  <script src="source/standings/nav.js?v=21"></script>
+  <script src="source/standings/history.js?v=21"></script>
 </body>
 </html>
