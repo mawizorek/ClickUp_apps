@@ -5,7 +5,7 @@ type: hook
 steward: compass-corso
 trigger: after Ricky's job-market-refresh pass completes, OR on manual invocation
 added: 2026-08-02
-version: 1
+version: 2
 ---
 
 # Job Routine Response
@@ -35,12 +35,25 @@ not stored in his profile (Constitution §2-§3).
 - Read the pass summary + the role header comments + their threaded replies
 - If no pass exists yet: say so and offer to review the TSV inventory cold instead
 
-### 2. Load the career portrait
+### 2. Load the evaluation baseline, then the portrait
 
-- Read `super-agents/compass-corso/memory.md` (Ledgers A through D)
-- Note what is KNOWN vs what is still inherited/empty
-- If the portrait is thin: state it up front, and use this debrief to BUILD the portrait
-  (ask Michael about his reactions rather than asserting opinions without basis)
+**Order matters. Load in this sequence:**
+
+1. **`routines/job-market-evaluation.md`** — the STATED baseline. Michael's declared preferences:
+   career thesis, soft filters (pay floor, geo weights, flexibility), evaluation signals (what
+   makes a listing interesting vs noise). This is what a COLD agent knows before any interaction.
+
+2. **`super-agents/compass-corso/memory.md`** (Ledgers A through D) — the EARNED overlay.
+   What Corso has observed through interaction: patterns from reactions, calibration from
+   corrections, the gap between stated and revealed preference.
+
+- Note what is KNOWN vs what is still inherited/empty in memory.md
+- If the portrait is thin: evaluation.md carries you. State that up front, and use this debrief
+  to BUILD the portrait (ask Michael about his reactions rather than asserting opinions without
+  basis)
+- **When evaluation.md and memory.md conflict:** name the tension explicitly. "Your declared
+  floor is $90K but you've flagged three roles at $75K — are we revising the floor, or were
+  those prestige exceptions?" Never silently pick one over the other.
 
 ### 3. Cross-reference: categorize every listing
 
@@ -52,6 +65,10 @@ For each listing in the pass, assign one of:
 | **Stepping-stone** | Reachable now or within 6 months; builds toward aspirational | Score fit, recommend act/watch/pass |
 | **Lateral** | Same level, different org/context; worth it only for specific reasons | Note what it would add (geography, org type, network) |
 | **Skip** | Noise, misfit, or below current trajectory | Name why in one line, move on |
+
+Use the **Evaluation Signals** section of `evaluation.md` to ground categorization decisions.
+Strong positive signals push toward Stepping-stone or Aspirational. Noise signals push toward Skip.
+The prestige exception (fails on comp, passes on institution) gets its own note.
 
 ### 4. Deliver the debrief
 
@@ -91,6 +108,21 @@ Structure:
 - If the sweep surfaced persistent noise: propose an exclude_term
 - If a new role category is emerging from the arc: propose a new role entry
 - Format: clear diff-style proposal, not a direct write. Michael or Ricky approves.
+- **If the debrief surfaces a shift in DECLARED preferences** (not just observed patterns):
+  propose an amendment to `routines/job-market-evaluation.md`. Same approval gate: Michael
+  confirms before the file changes.
+
+---
+
+## Knowledge & Context (files this hook reads)
+
+| File | Role | Loaded at |
+|------|------|-----------|
+| `routines/job-market-evaluation.md` | Stated baseline: declared preferences, career thesis, soft filters | Step 2 (first) |
+| `super-agents/compass-corso/memory.md` | Earned overlay: observed patterns, revealed preference | Step 2 (second) |
+| `routines/job-market-state.tsv` | Structured inventory (read-only for Corso) | Step 1 (if needed) |
+| `routines/job-market-roles.json` | Search config (what Ricky uses) | Step 6 (for proposed edits) |
+| Standing task `86ajtgbt3` | The sweep output and discussion thread | Step 1 |
 
 ---
 
@@ -98,12 +130,15 @@ Structure:
 
 When the portrait is thin or empty:
 
-1. **Observe, don't assert.** Present the listings grouped by apparent fit, but ASK rather than
+1. **evaluation.md carries you.** The declared preferences are enough to deliver a useful first
+   pass. A cold Corso with an empty memory.md but a populated evaluation.md still categorizes
+   listings, still scores fit, still delivers an opinionated take.
+2. **Observe, don't assert.** Present the listings grouped by apparent fit, but ASK rather than
    declare. "This one looks lateral to me — what draws you to it?" beats "skip."
-2. **Build the portrait through the debrief.** Every reaction Michael gives is data. Capture it.
-3. **Name the unknowns.** "I don't yet know why we search four different roles — that's going to
+3. **Build the portrait through the debrief.** Every reaction Michael gives is data. Capture it.
+4. **Name the unknowns.** "I don't yet know why we search four different roles — that's going to
    shape everything once I understand it."
-4. **The first debrief IS the calibration session.** Don't try to be brilliant; try to be curious.
+5. **The first debrief IS the calibration session.** Don't try to be brilliant; try to be curious.
 
 ---
 
@@ -116,6 +151,7 @@ When the portrait is thin or empty:
 - **Source-freshness-gate fires on any volatile external fact** (salary range, org status). Route
   through Sage.
 - **Thread findings when possible.** The standing task is already threaded; respect the architecture.
+- **Never silently override evaluation.md with memory.md.** The tension is the feature, not a bug.
 
 ---
 
