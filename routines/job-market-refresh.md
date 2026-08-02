@@ -6,7 +6,7 @@ steward: routine-ricky
 cadence: pointer only — authoritative cadence is the row in routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 13
+version: 14
 model: loop-per-role
 ---
 
@@ -42,6 +42,9 @@ report-to:  DETAIL → the standing thread `86ajtgbt3` (role blocks + pass summa
 
 > **🔁 COMPLETE LOOPS — THIS IS THE ROUTINE THAT WILL TEMPT YOU.** (LOCKED 2026-08-01, Michael)
 > This is by far the longest procedure in `routines/`, and length is not a reason to hurry. **Never skip a keyword, a board, a page of pagination, or a template section because the pass feels long.** Finish each ROLE completely — header, SAME, NEW, GONE, NOTABLE — before starting the next one. If you are going to run out of room, stop at a **role boundary**, commit the TSV rows you have, and say exactly which roles were not swept. A shallow sweep is indistinguishable from a thin market, which is the entire reason the density floor exists.
+
+> **🧵 THREAD FINDINGS, NEVER FLAT.** (LOCKED 2026-08-02, Michael)
+> The top-level comment thread must be TIGHT: only role headers and the pass summary appear as root comments. ALL listing detail (SAME, NEW, GONE, NOTABLE) is posted as THREADED REPLIES under the relevant role header. A pass that posts SAME/NEW/GONE as root-level comments is STRUCTURALLY BROKEN regardless of content quality. The mechanic: post the role header, capture its comment ID, then use that ID as the parent for every subsequent reply in that role's block. If the comment tool requires a `parent` or `comment_id` parameter to thread, USE IT. A flat dump of 10+ root comments is unreadable on mobile and defeats the entire architecture.
 
 ## 📍 Architecture
 
@@ -151,24 +154,52 @@ ID is permanent. Title changes don't get new IDs.
 
 ## 💬 Comment architecture
 
-**Each role gets its own standalone root comment.** Not threaded under a shared header. Independent blocks, one per role, posted sequentially during the loop.
+> ⚠️ **THE THREADING RULE.** The top-level comment stream on this task must contain ONLY role headers and the pass summary. Nothing else. All listing data lives in threaded replies. This is not a suggestion. A pass that dumps SAME/NEW/GONE as root comments violates a locked decision and must be restructured.
+
+**The top-level thread (what Michael sees when he opens the task):**
 
 ```
-FOR EACH ROLE:
-  🎯 ROLE HEADER  <- root comment (standalone)
-     |-- 🔁 SAME     <- threaded under this role's header
-     |-- 🆕 NEW      <- threaded
-     |-- 🕳️ GONE     <- threaded
-     +-- 📌 NOTABLE  <- threaded (if content)
-
-AFTER ALL ROLES:
-  📋 PASS SUMMARY  <- root comment (the only cross-role output)
-     +-- 🔌 SOURCES  <- threaded
+🎯 Production Manager · 2026-08-02 11:40 ET       <- ROOT
+🎯 Technical Director · 2026-08-02 11:50 ET       <- ROOT
+🎯 Stage Manager · 2026-08-02 11:52 ET            <- ROOT
+🎯 Master Electrician · 2026-08-02 11:55 ET       <- ROOT
+📋 PASS COMPLETE · 2026-08-02 11:55 ET            <- ROOT
 ```
+
+That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, tight.
+
+**Inside each role header's thread (expanded by tapping the header):**
+
+```
+🎯 ROLE HEADER  <- the root comment (contains stats + verdict)
+   ├── 🔁 SAME · <n>       <- reply to header (parent = header comment ID)
+   ├── 🆕 NEW · <n>        <- reply to header
+   ├── 🕳️ GONE · <n>       <- reply to header
+   └── 📌 NOTABLE          <- reply to header (if content)
+```
+
+**Inside the pass summary's thread:**
+
+```
+📋 PASS COMPLETE  <- root comment
+   └── 🔌 SOURCES <- reply to summary
+```
+
+### Threading mechanics (HOW to do this)
+
+1. Post the 🎯 ROLE HEADER as a **new root comment** on task `86ajtgbt3`.
+2. The post_comment response returns a **comment ID** (or URL). CAPTURE IT. This is the parent.
+3. Post SAME as a **reply** to that comment ID (set `parent` / `comment_id` / `notify_all: false`).
+4. Post NEW as a **reply** to that same comment ID.
+5. Post GONE as a **reply** to that same comment ID.
+6. Post NOTABLE (if any) as a **reply** to that same comment ID.
+7. Move to the next role. Repeat.
+
+**If you cannot figure out how to reply to a comment (tool limitation, missing parameter), STOP and flag it.** Do NOT fall back to posting flat root comments. A failed thread is visible; a flat dump looks intentional and confuses the reader.
 
 **Key rules:**
 - Each role's comment block is self-contained. Reading the Production Manager block tells you everything about the PM market without needing to read any other block.
-- **Role header comment URLs are captured at post time.** The Pass Summary's comment index links to each role header and the SOURCES comment. Threaded replies under headers don't need individual links.
+- **Role header comment URLs are captured at post time.** The Pass Summary's comment index links to each role header and the SOURCES comment. Threaded replies under headers do NOT need individual links.
 
 ---
 
@@ -187,7 +218,7 @@ AFTER ALL ROLES:
 <ONE line. Blunt. About THIS role's market only.>
 ```
 
-## Template 2: 🔁 SAME (threaded under role header)
+## Template 2: 🔁 SAME (THREADED REPLY to role header)
 
 ```
 ### 🔁 SAME · <n>
@@ -201,7 +232,7 @@ AFTER ALL ROLES:
 <repeat per listing>
 ```
 
-## Template 3: 🆕 NEW (threaded under role header)
+## Template 3: 🆕 NEW (THREADED REPLY to role header)
 
 ```
 ### 🆕 NEW · <n>
@@ -216,7 +247,7 @@ AFTER ALL ROLES:
 <repeat per listing>
 ```
 
-## Template 4: 🕳️ GONE (threaded under role header)
+## Template 4: 🕳️ GONE (THREADED REPLY to role header)
 
 ```
 ### 🕳️ GONE · <n>
@@ -229,7 +260,7 @@ AFTER ALL ROLES:
 <or: "None. Full inventory carried.">
 ```
 
-## Template 5: 📌 NOTABLE (threaded under role header, if content)
+## Template 5: 📌 NOTABLE (THREADED REPLY to role header, if content)
 
 ```
 ### 📌 NOTABLE
@@ -245,7 +276,7 @@ AFTER ALL ROLES:
 
 **Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
 **Prev pass:** <timestamp> (<elapsed>)
-[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v13
+[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v14
 
 <Density verdict: one line.>
 
@@ -258,7 +289,7 @@ AFTER ALL ROLES:
 
 ⚠️ **The comment index is MANDATORY.** Each role HEADER comment posted during the run gets a hyperlink here, plus the SOURCES comment. Threaded replies (SAME/NEW/GONE/NOTABLE) do NOT need individual links. This index lets the reader jump directly to any role's block from the summary.
 
-## Template 7: 🔌 SOURCES (threaded under pass summary)
+## Template 7: 🔌 SOURCES (THREADED REPLY to pass summary)
 
 ```
 ### 🔌 SOURCES
@@ -294,16 +325,21 @@ AFTER ALL ROLES:
    - New find with URL = NEW (assign `JM-ID`, set `role_id`, `lane`, `level`)
    - TSV row not found on boards = GONE
 8. **Stage TSV updates** for this role: append NEW rows, mark GONE rows, update salary if newly found on SAME.
-9. **Post 🎯 ROLE HEADER** as root comment. **Capture comment URL.**
-10. **Post threaded replies** under role header: SAME / NEW / GONE / NOTABLE (if content).
+9. **Post 🎯 ROLE HEADER** as a ROOT comment on task `86ajtgbt3`. The response gives you a **comment ID**. **STORE this ID in a variable** (e.g. `pm_header_id`). You need it for the next step.
+10. **Post threaded replies using the stored comment ID as parent:**
+    - Post 🔁 SAME as a **reply** to `pm_header_id`.
+    - Post 🆕 NEW as a **reply** to `pm_header_id`.
+    - Post 🕳️ GONE as a **reply** to `pm_header_id`.
+    - Post 📌 NOTABLE (if content) as a **reply** to `pm_header_id`.
+    - ⚠️ Every one of these MUST set the parent/reply-to parameter. If you post without it, the comment lands as a root comment and the thread is broken.
 11. **Repeat from step 5** for next role. **Finish each role completely before starting the next** (README rule 13) — a role that got a header but no SAME/NEW/GONE block is a broken loop, not a short one.
 
 ### Post-loop
 
 12. **Density check:** If total live < 40, this is a **DECLARED FAILURE** (see the density floor above). List which sources were blocked/thin and what retry was attempted. Do NOT silently accept a thin pass, and do NOT stamp it.
 13. **Commit the TSV:** `routines/job-market-state.tsv` (all role updates batched). Message: `data(job-market): <timestamp> ET — <n> live, <+-n>`. **Commit the TSV even on a below-floor pass** — the rows found are real and losing them helps nobody. The stamp is what gets withheld, not the data.
-14. **Post 📋 PASS SUMMARY** as root comment. **Build the 🗂️ Comment index** from the role header URLs captured in step 9 across every role iteration, plus the SOURCES comment URL from step 15. Each role header and the SOURCES comment get a hyperlink. Threaded replies do not.
-15. **Post 🔌 SOURCES** threaded under summary. Capture its URL and include it in the index (post summary may need an edit to add this final link, OR post SOURCES first and then the summary).
+14. **Post 📋 PASS SUMMARY** as ROOT comment. **Capture its comment ID.**
+15. **Post 🔌 SOURCES** as a **reply** to the pass summary comment ID. Capture its URL and include it in the index (post summary may need an edit to add this final link, OR post SOURCES first and then the summary).
 16. **STAMP** — *last write, and only if the pass succeeded.* Write `routines/last-run/job-market.txt`, one line, `YYYY-MM-DD HH:MM` ET. **Per THE STAMP LAW** (`routines/README.md`): a complete pass stamps; a pass where a board was blocked but the inventory still landed is a PARTIAL and stamps with the gap named; **a below-floor pass or an aborted loop does NOT stamp** and stays overdue. *(Moved here 2026-08-01 — the stamp used to be written in step 13, before the pass summary existed. A stamp before the product lands is a lie with a timestamp on it.)*
 17. **Post the roll-up** to 🧭 STANDING · Routine Ricky — Run Reports (https://app.clickup.com/t/86ajuhw1d): one line for this routine, linking the pass summary comment.
 
@@ -315,6 +351,7 @@ AFTER ALL ROLES:
 
 *Added 2026-08-01 — this runbook shipped without a Guardrails section, which meant the busiest routine in the framework had no written STOP conditions at the moment a cold agent would need them.*
 
+- **You are about to post SAME, NEW, GONE, or NOTABLE as a ROOT comment.** These are ALWAYS threaded replies. If you cannot figure out how to reply to a parent comment, STOP and ask. Never dump them flat.
 - **You are about to create a ClickUp TASK.** This routine creates none. Listings become Application tasks ONLY when Michael says to act. A pass that files tasks is the failure mode that killed v2.
 - **You are about to send anything** (email, DM, application). This routine transmits nothing, ever.
 - **You are about to create a second research task or a second thread.** One task, one conversation. `86ajtgbt3` or nothing.
@@ -451,5 +488,6 @@ The TSV's `org` column is building a theatre directory organically. Let it grow.
 
 ## Changelog
 
+- **v14 (2026-08-02)** — added 🧵 THREAD FINDINGS, NEVER FLAT locked decision. Rewrote Comment Architecture section with explicit threading mechanics (capture comment ID, use as parent for replies). Updated Steps 9-10 with mechanical instructions for threading. Added template annotations ("THREADED REPLY to role header"). Added guardrail: posting SAME/NEW/GONE as root = STOP. Prior pass posted all findings flat; this version makes the threading requirement mechanically unambiguous.
 - **v13 (2026-08-01)** — brought into the standard runbook shape: added the `goal:` / `target:` / `report-to:` header (it had none, so a cold agent had no way to learn where a run gets reported), added the **Guardrails** section (it had none at all), removed `status: active` from the frontmatter (a second on/off switch, which `schedule.md` forbids), moved the STAMP from step 13 to step 16 so it lands after the pass summary rather than before it, restated the density floor as a *declared failure* that withholds the stamp per THE STAMP LAW, and added the complete-loops lock. No change to sources, templates, IDs, or the TSV schema.
 - v12 (2026-07-31) — loop-per-role, mobile-first, timestamped passes, density floor, comment index.
