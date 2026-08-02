@@ -17,10 +17,9 @@ companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how
 
 📏 **THIS FILE IS AT ITS ~22KB READ CEILING. ASSUME THERE IS NO HEADROOM.** If your addition does
 not clearly fit, it belongs in a tool, not here. **MEASURE the live file after every write; never
-write a byte count into this text.** Three separate passes have now shipped a size claim here that
-was wrong on arrival — twice in the §4a pass, once on 2026-08-01 — which is exactly the rot §4a
-locks a rule against, committed in the file carrying the rule. The structural fix (thin Constitution
-+ router over runtime modules) is proposed and pending Michael's ruling; do not improvise it. PR #563.
+write a byte count into this text.** Three passes have now shipped a size claim here that was wrong
+on arrival — the last on 2026-08-01, in a commit that claimed "net smaller" and went 1,346 bytes
+over. Structural fix (thin Constitution + router) proposed, pending Michael. PR #563.
 
 ---
 
@@ -80,8 +79,8 @@ the super-agent team and vice versa. **The orchestrator works with both identica
   sessions. `agents/<slug>.md` = stateless. That is a storage fact about whether a voice remembers
   yesterday. It is NOT seniority, authority, or speaking order. Reading class as rank is drift.
 - **The two trees are physics, not a ladder.** They stay separate on disk because one holds files
-  and one doesn't — and the 🤖 **Agent Index** list deliberately indexes BOTH classes in one record
-  so the fleet reads as ONE roster. *(~~`roster.json`~~ held that job until 2026-07-30.)*
+  and one doesn't — and the 🤖 **Agent Index** list indexes BOTH classes in one record so the fleet
+  reads as ONE roster. *(~~`roster.json`~~ held that job until 2026-07-30.)*
 - **The one place class still binds:** a bare `/session.agent=<Name>` needs a bundle to inhabit, so
   only a voice with one can be worn for a whole session. That constrains INHABITING, not being
   seated, heard, or weighted. Any voice in the Index can speak AS ITSELF at full volume.
@@ -208,10 +207,8 @@ session's voice + lane for its duration. Its value is accumulated context + pers
 note-taking + thorough parsing of its own files — **not rank.** It is the same kind of voice as a
 Council lens with a memory bundle attached (Constitution §6); the bundle is the whole difference.
 
-⚠️ **"NOT a native ClickUp agent" is no longer universally true (2026-08-01).** Under **Model A** a
-native shell can be RETAINED as the loader *body* (its user-ID, tools, mention/DM/assignment
-triggers) while this bundle is its *brain*, read fresh each run. **Native status is PER AGENT and
-must be checked, never assumed:** `_shared/native-to-git-conversion-runbook.md` + Register D5.
+⚠️ Whether it ALSO has a live native ClickUp shell is **per agent** and must be checked, never
+assumed (Model A keeps some natives as loader bodies): `_shared/native-to-git-conversion-runbook.md`.
 
 ---
 
@@ -240,12 +237,11 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    tied to YOUR lane, reflected against your own steeped memory and activity. This is PRESENCE, not
    bookkeeping. An empty / all-quiet board earns a light nod; never fabricate a pattern to have
    something to say. Points at the Scoreboard tool; NEVER restate its scoring procedure here.
-5. **Confirm wiring:** the agent's row in the 🤖 **Agent Index** ClickUp list (list `901328043244`) —
-   THE single documented source. Check the row exists and its status is active.
-   ⚠️ **CORRECTED 2026-08-01:** ~~the agent's row in `roster.json`~~ — retired to a tombstone stub
-   **2026-07-30**, so this step had every teammate confirming its wiring against a file returning
-   nothing, and **an empty read is indistinguishable from a clean pass.** ~~+ `registry.json`~~
-   struck 2026-07-25. **Never repoint this at a file** — three manifests are retired; it is a list.
+5. **Confirm wiring:** the agent's row in the 🤖 **Agent Index** ClickUp list (`901328043244`) —
+   THE single documented source. Row exists, status active.
+   ⚠️ **CORRECTED 2026-08-01:** ~~`roster.json`~~ retired to a stub 07-30, so every teammate was
+   confirming its wiring against an empty read — **indistinguishable from a clean pass.**
+   ~~`registry.json`~~ struck 07-25. **Never repoint this at a file;** three manifests are retired.
 6. **INHABIT + ANNOUNCE:** emit the agent's self-announce header as the FIRST line of the
    reply, then respond in-character.
 
@@ -272,9 +268,8 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    are a peer of every seated voice, teammate or lens, and you never invoke your bundle as authority.
 9. **Keep project state OUT of `memory.md`** (§4a). A count, status or frontier in a memory file is
    a defect on sight — move it to the activity log's LIVE STATE block, don't refresh it in place.
-10. **Never state a fact about ANOTHER agent from memory** — who is steward, who owns a lane, who
-   ratifies, whether their native shell is live. Check the 🤖 Agent Index + that agent's own bundle.
-   A fleet fact is correct at its source and wrong at every quote site: `hooks/fleet-fact-sweep.md`.
+10. **Never state a fact about ANOTHER agent from memory** — steward, lane, ratifier, native status.
+   Check the Index + that agent's bundle: `hooks/fleet-fact-sweep.md`.
 
 ---
 
@@ -337,6 +332,6 @@ brain-config/super-agents/<slug>/
 (`gates/git-agent-authoring.md` → Editing an existing super-agent). Not inline, and NOT a sidecar
 file — spawning a surface to catch trimmed overflow is the pattern refused 2026-07-17.
 
-Prior changelog entries (2026-07-24 Class Parity; 2026-07-25 live-write logging mandate; 2026-07-25
-registry-pointer strikes) are preserved verbatim in **PR #563**. The 2026-07-30 §4a lock and the
-2026-08-01 roster repoint live in their own PR descriptions. Read the PRs, not a reconstruction.
+Prior entries (2026-07-24 Class Parity; 2026-07-25 live-write mandate; 2026-07-25 registry strikes)
+are preserved in **PR #563**. The 07-30 §4a lock and the 08-01 roster repoint live in their own PR
+descriptions. Read the PRs, not a reconstruction.
