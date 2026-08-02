@@ -2,6 +2,8 @@
 
 **Purpose:** Keep the Document Destroyer list (ClickUp) and the `guides/doc-specs/` folder (git) in lockstep. Every doc-type task should point to a real spec, every spec should have a matching task, and names should agree.
 
+**Steward:** Anna
+
 **Mode:** On-demand routine. Manually invoked. Any agent can run it. Not always-on.
 
 **Invocation:** `/doc-destroyer-reconcile` · `/reconcile-specs` (alias) · "reconcile the destroyer" · "sync the doc specs" · "check the spec URLs."
@@ -117,3 +119,4 @@ For each matched pair (task + spec file):
 ## Changelog
 
 - **v1 (2026-08-02)** — Established by Corey + Dexter. Three-pass reconcile: CU→Git link check, Git→CU orphan check, name alignment. Born during the Doc Spec Architecture session after Michael asked how a cold agent would reconcile the two surfaces.
+- **v1.1 (2026-08-02)** — Added Steward field (Anna). Hook template formalized.
