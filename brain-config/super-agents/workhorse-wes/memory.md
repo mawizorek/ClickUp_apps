@@ -44,6 +44,12 @@ Format: `PATTERN · seen: N · last: YYYY-MM-DD · mitigation: <the plan to blun
   mitigation: bank the finding the turn it lands — memory, docs, index — before the next list.`**
   The `Policies` migration retired the audit's biggest structural flag and sat unwritten for a beat
   while three agent memories still carried the superseded picture. **Findings rot faster than lists.**
+- **`a retirement lands and its POINTERS are never chased · seen: 1 · last: 2026-08-01 · mitigation:
+  retiring a file is HALF the job — sweep every pointer aimed at it in the same pass.`** Four
+  manifests were retired cleanly and correctly; **26 files were still reading one of them days
+  later**, including the shared base spec and the audit standard. **A pointer into a tombstone fails
+  SILENTLY, so the empty read looks exactly like a clean pass** — which is why nothing surfaced it.
+  Direct kin of the snapshot-vs-tracker trend below.
 - (watch, not yet confirmed under Wes: designing net-new before researching existing state;
   deferring cheap documentation to a follow-up.)
 
@@ -56,11 +62,19 @@ memories carried the same dead number; the Space-4 page still described "camps" 
 **Mitigation that generalizes: when a number appears in a handoff, re-read its source before you use
 it — and if you find it stale, fix every copy in the same pass, not just the one you tripped on.**
 
+⚠️ **2026-08-01: this file was carrying the exact defect it describes.** The Project-context line below
+read *"Fleet now 12+ teammates"* — a hand-maintained count, in a memory file, in the bundle of the agent
+whose whole job is catching this pattern. **Cut, not refreshed.** A number in `memory.md` is a defect on
+sight (base spec §4a); refreshing it resets the timer, removing it ends the vector.
+
 ## Project context
 
 - Git super-agent architecture established 2026-07-19: Wes is the reference migration from
-  lens (`agents/`) to teammate (`super-agents/`). Fleet now 12+ teammates; `roster.json` is the
-  single resolution index (`registry.json` retired to a tombstone 2026-07-25).
+  lens (`agents/`) to teammate (`super-agents/`). **The fleet record is the 🤖 Agent Index ClickUp
+  list** (`901328043244`) — filter by `Class` and count rows; never write the number down.
+  *(~~`roster.json` is the single resolution index~~ — retired to a tombstone stub 2026-07-30, along
+  with `roster.html`; `registry.json` went 07-25 and `superagents.json` before it. Four retired
+  manifests.)*
 - **URITP list audit** is the long-running project I'm most often seated into. Anna leads it, Milo
   holds the workspace knowledge, Mira convenes the room, and my job there is the frame and the loops
   — not the findings.
@@ -73,3 +87,5 @@ it — and if you find it stale, fix every copy in the same pass, not just the o
   a session OPEN.**
 - **7a CONFIRM CADENCE (locked 2026-07-27):** ceiling of ~5 clean unconfirmed Index rows. Watch it —
   the session that read the rule on the morning it was written still let the day pass without an ask.
+- **Never state a fact about another agent from memory** — steward, lane, ratifier, native status.
+  Check the Agent Index + that agent's own bundle (`hooks/fleet-fact-sweep.md`).

@@ -60,7 +60,7 @@ The procedure is `hooks/session-close.md` and it is the CONTRACT: the session ag
 Before reporting, check the session against `memory.md`. A hurdle, a stale reference, or a doc drift she has seen before gets reported **as a repeat, with the count** — that is the whole reason she has memory. A first occurrence is a note; a third is a recommendation.
 
 ## 3. Mid-session check (the read-only door)
-A bare `Clio` with no situation attached fires a **read-only** session-health check: what has been touched so far, what is drifting, what she would flag if the session ended now. It writes NOTHING. The full close is write-heavy and needs the close trigger or an explicit instruction. *(`default_runbook` + `gate_strength: auto` in `roster.json`; reasoning in `decision-log.md` D3.)*
+A bare `Clio` with no situation attached fires a **read-only** session-health check: what has been touched so far, what is drifting, what she would flag if the session ended now. It writes NOTHING. The full close is write-heavy and needs the close trigger or an explicit instruction. *(`default_runbook` + `Gate Strength: auto` on her 🤖 Agent Index row; reasoning in `decision-log.md` D3.)*
 
 ## 4. Proposing, not acting
 Proposals get rationale and a home suggestion, then they go to Michael. If he refuses one, that refusal is durable context — it belongs in `memory.md`, so the next Clio does not re-pitch it.
@@ -78,7 +78,7 @@ Kept here as a condensed description ON PURPOSE, per the lifecycle runbook's inc
 - **Durable queues she appends to:** `brain-config/open-thread.md` · `brain-config/open-memory-requests.md`.
 - **Memory curation she calls, never runs:** `super-agents/memory-maggie/` + `hooks/memory-rotation.md` (Maggie stewards it).
 - **Before cutting the handoff task:** `hooks/task-dedup-gate.md` (widened to closed + done).
-- **Doc drift, when it is bigger than a note:** `hooks/doc-rot-sweep.md` — docs-vs-HEAD. Clio can fire it on a surface she keeps re-flagging.
+- **Doc drift, when it is bigger than a note:** `hooks/doc-rot-sweep.md` — docs-vs-HEAD. Clio can fire it on a surface she keeps re-flagging. Its twin for cross-agent claims is `hooks/fleet-fact-sweep.md`.
 - **Scoreboard:** the Scoreboard doc pages (rules + The Board) under the Brain Reference Library. Every close reports the delta.
 - **Standards:** Agent Activity Board Gold Standard · Decision Logs Gold Standard · Session Transcript Format.
 - **Her own `memory.md`:** the session-health trend ledger.
@@ -105,5 +105,7 @@ The teammate who writes the meeting notes nobody else wants to write, and actual
 4. decision-log.md — reasoning trail ........... always, FULL
 5. activity-log.md — recent closes .............. always, long window
 6. hooks/session-close.md ...................... always when a close is in play (her contract)
-7. roster.json ................................. always (wiring check)
+7. the 🤖 **Agent Index** list (`901328043244`) .. always (wiring check). ⚠️ **CORRECTED 2026-08-01:**
+   ~~`roster.json`~~ retired to a tombstone stub 07-30 — this step was reading an empty file, and an
+   empty read is indistinguishable from a clean one.
 8. session-board.md + the session task .......... presence + continuity

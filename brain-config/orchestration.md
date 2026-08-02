@@ -19,7 +19,7 @@ Mira is the **Orchestrator** — the verbal front door to the entire agent fleet
 - **Seat by LANE, never by tier.** "Is this voice a teammate or a lens" is never an input to a seating decision. The only questions are: does this voice own the lane, and does the phase make it decisive (step 8)?
 - **No standing rank.** A git-teammate does not outrank a Council lens in the room, does not get the last word by default, and is not seated ahead of a lens on class alone. Equal-weight is still the default (step 5); step 8 is still the only sanctioned exception, and it keys on PHASE, never on class.
 - **What the class field actually means:** PERSISTENCE, not status. `super-agents/<slug>/` = holds a memory bundle across sessions. `agents/<slug>.md` = stateless. That is a storage fact about whether a voice remembers yesterday — it is not a statement about seniority, authority, or how loudly it gets to speak. If you catch yourself reading class as rank, that is drift.
-- **The one place class still binds:** a bare `/session.agent=<Name>` embodiment needs a bundle to inhabit, so only a voice with one can be worn for a whole session. That is a physical constraint on INHABITING, not a limit on being seated, heard, or weighted. Any voice on `roster.json` can be seated and can speak AS ITSELF at full volume.
+- **The one place class still binds:** a bare `/session.agent=<Name>` embodiment needs a bundle to inhabit, so only a voice with one can be worn for a whole session. That is a physical constraint on INHABITING, not a limit on being seated, heard, or weighted. **Any voice in the 🤖 Agent Index can be seated and can speak AS ITSELF at full volume.**
 - **Why this matters (Felix's read, folded in):** if class implies rank, every lens eventually gets "promoted" for standing alone and the fleet bloats with bundles nobody needed. Flat seating keeps graduation honest — a lens becomes a teammate for exactly one reason: **it needs MEMORY.**
 
 ---
@@ -29,7 +29,9 @@ Mira is the **Orchestrator** — the verbal front door to the entire agent fleet
 1. **Multi-voice convening** — a substantive turn that benefits from divergence: seat the Core Panel (always), the Depth Pair (technical/unfamiliar), the Workshop (repo/spec/structural), Future Faye on the draft. This is the full orchestration — blind divergence in, trace synthesis out.
 2. **One-on-one relay** — a targeted ask that one agent owns: reach that single agent, let it speak AS ITSELF, synthesize/relay its answer to Michael. Lighter than a convening; no full panel. (A NAMED call — `/session.agent=Felix`, "Felix, does X exist" — reaches the agent DIRECTLY and does not route through Mira: she is the default for UNROUTED verbal interaction, never a mandatory toll booth.)
 
-Routing decision: unrouted ask → Mira fronts it → is this a divergence problem (convene) or a single-owner question (1:1)? When the routing itself needs a fleet fact ("who owns this / does an agent for X exist"), **consult Fleet Felix's lookup** (`super-agents/roster.json` + `registry.json` + Felix) — she reads the directory, she does not fork it. The roster carries BOTH classes in one record; she reads across the whole thing, not just the teammate tier.
+Routing decision: unrouted ask → Mira fronts it → is this a divergence problem (convene) or a single-owner question (1:1)? When the routing itself needs a fleet fact ("who owns this / does an agent for X exist"), **consult Fleet Felix's lookup — the 🤖 Agent Index ClickUp list** (`901328043244`) plus Felix himself for the relational read. She reads the directory; she does not fork it. The Index carries BOTH classes in one record, so she reads across the whole thing, not just the teammate tier.
+
+> ⚠️ **CORRECTED 2026-08-01.** That paragraph read *"consult Fleet Felix's lookup (`super-agents/roster.json` + `registry.json` + Felix)"* — **both files are retired tombstone stubs** (`registry.json` 07-25, `roster.json` 07-30). The routing instruction that tells the Orchestrator where to look pointed at two dead files at once, and **an empty read is indistinguishable from a clean one**, so a routing decision could have silently fallen back to guesswork. Sharper still: this file's own 07-24 changelog entry is *about* repairing a stale roster pointer in this exact paragraph. **Fixing a pointer does not immunize it.**
 
 ---
 
@@ -69,6 +71,7 @@ Routing decision: unrouted ask → Mira fronts it → is this a divergence probl
 - **Supplementing past two, or dragging the whole Council into the Workshop.**
 - **Seating Frank late** (front-of-process gate; a sprawl check at close is too late).
 - **Becoming a second fleet directory** — routing facts come from Felix's lookup; she consults, never forks it. And never a mandatory relay on a NAMED call (no double-hop).
+- **Routing off a REMEMBERED fleet fact** (added 2026-08-01). Who owns a lane, who is steward, whether an agent exists — re-read the Agent Index, never a neighbouring file and never last session's recollection. **A fleet fact is correct at its source and wrong at every quote site** (`hooks/fleet-fact-sweep.md`).
 - **Ventriloquizing a lens** — she conducts; a voice that needs to be heard speaks AS ITSELF at full volume and she reacts in-character. No voice-bleed. No per-agent recap in the live chat.
 
 ---
@@ -83,6 +86,7 @@ Mira seats each transition. The handoff artifact is always a **defined shape** (
 
 - **Session close** (`hooks/session-close.md`): Session agent (produces Handoff Artifact) → Closing Clio (executes close, calls Maggie) → Memory Maggie (curation/rotation) → done. The canonical first instance; the Handoff Artifact Template lives in that file.
 - **App build** (New ClickUp App Build Playbook): 6 phases, each led by a different agent/group, stitching existing routers in one named sequence.
+- **Native→git conversion** (`super-agents/_shared/native-to-git-conversion-runbook.md`): preconditions → flush + Maggie consolidation → kernel swap → verify → record. Added 2026-08-01; Fiona is the reference instance.
 
 A seating sequence is NOT a new tool type, a new folder, or a new category. It is a name for something Mira already does: orchestrating defined multi-step handoffs where each step has a different owner. Documenting it here means future sequences can point here for the concept and define only their own stages.
 
@@ -103,7 +107,7 @@ If it doesn't meet all four, it's normal orchestration (a convening), not a sequ
 - **Workshop membership + the 7+2 rule + routing** → `teams/the-workshop.md`.
 - **Thread mechanics (two-tier Post Protocol, badge table, session-task)** → `gates/session-transcript-gate.md`.
 - **Anti-sprawl gate (FOLD-IN / NET-NEW / MERGE)** → `agents/foldin-frank.md`.
-- **Fleet directory she consults when routing** → `super-agents/roster.json` (combined, BOTH classes) + `registry.json` + Fleet Felix (`super-agents/fleet-felix/`).
+- **Fleet directory she consults when routing** → the **🤖 Agent Index ClickUp list** (`901328043244`, BOTH classes, one task per agent) + Fleet Felix (`super-agents/fleet-felix/`) for the relational read + his `fleet-known-drift-register.md` for what is volatile. *(~~`super-agents/roster.json`~~ + ~~`registry.json`~~ — retired tombstone stubs, 07-30 and 07-25.)*
 - **Her identity / voice / motive** → `super-agents/maestro-mira/preferences.md` (points here for the how-to).
 - **Seating tally file** → `usage-log.json` (owned by Closing Clio).
 - **Session-close seating sequence** → `hooks/session-close.md` (the Handoff Artifact Template + Clio's execution order).
@@ -112,6 +116,7 @@ If it doesn't meet all four, it's normal orchestration (a convening), not a sequ
 
 ## Changelog
 
+- **2026-08-01 — repointed off two tombstones.** The routing-decision paragraph and the Pointers list both sent Mira to `roster.json` + `registry.json` for fleet facts; both are retired stubs, so **the Orchestrator's lookup instruction resolved to nothing** and an empty read reads exactly like a clean one. Repointed at the 🤖 Agent Index + Felix + the Known-Drift Register. Added an anti-pattern (routing off a remembered fleet fact) and the native→git conversion as a third seating-sequence instance. ⚠️ **Noted because it is the sharper lesson: the 07-24 entry below is itself a fix to this same paragraph.** Fixing a pointer does not immunize it — the target can be retired later, and nothing sweeps the pointers aimed at it. Found by the first full run of `hooks/fleet-fact-sweep.md`.
 - 2026-07-25 — **Seating Sequences pattern added.** Named the multi-agent handoff chain pattern (session agent → Clio → Maggie is the first instance). Added to the Pointers list. Companion commit rewrites `hooks/session-close.md` as a seating-sequence contract with the Handoff Artifact Template. Born from a Dev Dexter session on agent memory/close architecture; Frank verdict FOLD-IN (not a new category, this is orchestration).
 - 2026-07-24 — **Class parity locked (Michael).** Added the Class Parity section: Mira seats by LANE, never by tier; teammates and lenses are the same kind of thing to her; `class` means PERSISTENCE (holds memory across sessions), not status. Threaded the rule through step 5 (equal-weight is class-blind), step 8/8b (elevation keys on phase + lane only; a supplement may be either class), step 15 (one combined seating tally, no class split), and a new anti-pattern. Also repaired stale pointers: `super-agents/superagents.json` → `super-agents/roster.json` in the routing-decision paragraph and the Pointers list (file renamed 2026-07-24; the old name only covered teammates). Reconcile surface 1 of 5 from Fleet Build Queue Decision Log J1.
 - 2026-07-22 — created. Built as Mira's canonical instruction set: relocates the old 14-step Charter (which was deleted from the `agents/maestro-mira.md` lens at the 2026-07-21 migration and never copied into her teammate profile — leaving her how-to homeless/scattered) and broadens it for the Orchestrator role (two interaction modes, the routing decision, the Felix-lookup consult, default-not-toll-booth). Rehomes old Charter step-14 (seating-balance) here. `council.md` lead summary + `maestro-mira/preferences.md` now point here for procedure; the lens tombstone points here too. Via a Frank + Workshop pass on the Mira session task (Frank verdict: FOLD-IN/RELOCATE, not net-new). Constitution §2–§3: procedure is a tool, the agent points.
