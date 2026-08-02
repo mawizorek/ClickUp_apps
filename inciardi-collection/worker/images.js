@@ -1,4 +1,4 @@
-/* Inciardi Collection — THE PHOTO PIPE. Three routes: bytes in, bytes out, the grid.
+/* Inciardi Collection — THE PHOTO PIPE. Four routes: bytes in, bytes out, the grid, the print.
  *
  * ============================================================================
  * NEW FILE 2026-08-01, and it had to be one. `worker.js` sat at ~21KB against a ~22KB practical
@@ -12,7 +12,10 @@
  * module map before it was finally taken.
  *
  * WHAT IS LEFT IS THE BYTE LAYER, and that is now the whole rule for this file: **if a route
- * does not touch R2 or return an image, IT DOES NOT BELONG HERE.**
+ * does not touch R2 or return an image, IT DOES NOT BELONG HERE.** ⚠️ `GET /images` is the
+ * standing exception and always was — it returns image ROWS, not bytes, but it is the query
+ * every surface uses to FIND an image before asking for one, so it lives beside the proxy that
+ * serves them.
  *
  * 🔴 WHY THE DISPATCH SITS BEFORE THE BODY PARSE IN worker.js — NOT A STYLE CHOICE.
  * worker.js runs `body = await request.json()` on every write, which CONSUMES THE REQUEST
@@ -44,6 +47,14 @@
  *     v1 stores ONE image per shot. When the grid crawls, add `-t.jpg` by CONVENTION off the
  *     same key and let rows without one fall back to the full image. No schema change either
  *     way, which is what makes deferring it cheap and reversing it cheaper.
+ *     🔴 RE-RULED 2026-08-01 (J25) WITH A TRIGGER, so this stops being an open question: there
+ *     are SIX photographs in this app. A thumbnail pipeline for a grid rendering six images is
+ *     optimising a number nobody has measured. The trigger IS the measurement — the day the
+ *     Photos grid is visibly slow on the phone. The real fork when it arrives is the generation
+ *     POINT (a second canvas encode in capture.js vs on-demand resize here), and the 177 adopted
+ *     legacy rows can never carry a `-t.jpg` under EITHER scheme because their bytes arrived
+ *     already made. So the fallback-to-full-image path is load-bearing whichever wins, and is
+ *     the piece to build first if it is ever built at all.
  *   - EXIF. `shot_at` is accepted as a parameter and never derived here. Reading it is
  *     capture.js's job and it MUST happen BEFORE the canvas re-encode — the re-encode strips
  *     GPS, which is the point, and takes the capture date with it, permanently (J16).
@@ -51,10 +62,10 @@
  *     their `created_at`, so the order is PROVEN rather than assumed from the design.
  */
 
-import { linkImage } from './links.js';
+import { linkImage, photoOrder } from './links.js';
 
 export const IMAGE_ROUTES = [
-  'GET /images?scope=', 'GET /image/:id', 'POST /image'
+  'GET /images?scope=', 'GET /images?artwork=', 'GET /image/:id', 'POST /image'
 ];
 
 /* Q23 → C. Michael struck A, B, D and Other; C was the only survivor.
@@ -114,9 +125,9 @@ export async function handleImage(ctx) {
   const isServe = method === 'GET' && path.startsWith('/image/');
   if (!isServe && !MINE.includes(path)) return null;
 
-  /* Only TWO routes actually touch R2 — the upload and the proxy — which after the split is two
-   * of the three routes here. `GET /images` still answers with no binding at all, deliberately:
-   * the Photos screen should render and say "no photos" rather than 503 over a config fact.
+  /* Only TWO routes actually touch R2 — the upload and the proxy. `GET /images` still answers
+   * with no binding at all, deliberately: the Photos screen and the carousel should render and
+   * say "no photos" rather than 503 over a config fact.
    *
    * A missing binding is a DEPLOYMENT fact, not a bug in this file. The plausible cause is a
    * deploy whose API token had no R2 permission — which fails the deploy, so if you are seeing
@@ -126,9 +137,69 @@ export async function handleImage(ctx) {
       fix: 'wrangler.toml needs [[r2_buckets]] binding = "BUCKET", then a redeploy. If it IS already in the file, the last deploy FAILED — check the Actions run rather than editing the config again.' }, 503);
   }
 
+  /* ============================================================ GET /images?artwork=
+   * ⭐ THE CAROUSEL READ. Added 2026-08-01 (v22, Q25 → A). Every photograph of one print, in
+   * the order the app displays them.
+   *
+   * 🔴 IT IS THE SAME QUERY AS THE BINDER CARD, WITHOUT THE `LIMIT 1`. `reads.js` wraps
+   * `photoOrder()` in a correlated scalar subquery to pick one; this runs it as a list. **That
+   * is what makes the card photo the carousel's FIRST FRAME — structurally, not by agreement.**
+   * If the binder ever shows photo X and this opens on photo Y, someone forked the ordering,
+   * and the fix is to un-fork it rather than to add a rule about keeping them in step.
+   *
+   * 🔴 WHY `?artwork=` AND NOT THE `?edition=` THAT WAS ORIGINALLY LOCKED. Q25 → A, and the
+   * reason is a schema fact that was not in front of anyone when the rule was written: this
+   * ranking correlates on `edition.artwork_id`, so the card is chosen across EVERY printing of
+   * a print, while `edition_image.sort` and the retired `is_primary` are per-PRINTING. The page
+   * asking the question is `#artwork?id=` — an ARTWORK. Key the carousel to the edition and the
+   * day a reprint is entered (J19 says that day is coming) the card can show a photograph the
+   * carousel does not contain. Two surfaces disagreeing about which photograph a print IS is
+   * the exact disease this app was rebuilt to cure. Keyed to the page, it cannot happen.
+   *
+   * ⚠️ NO `?edition=` ALONGSIDE IT, deliberately. A filter with no caller is a fact with no
+   * claimant, and this log carries four separate entries about things that rotted for exactly
+   * that reason. It is one WHERE clause on the day something actually needs it.
+   *
+   * ⭐ AND IT IS THE DEPLOY'S ACCEPTANCE TEST, which the app has needed twice now and lacked
+   * both times. PR #679 was a verbatim move: no live read could distinguish the new worker from
+   * the old one, so "deployed" was unverifiable from outside. This is the first route that
+   * behaves differently. `?artwork=<id>` answering with a `photos` array means the deploy
+   * landed; the old worker ignores the parameter and returns the unassigned grid instead —
+   * which is a visibly different answer, not a subtly different one.
+   *
+   * Returns `edition_id` on every row because attaching, unlinking and starring are all
+   * per-printing writes: the client would otherwise have to look up which printing a photo is
+   * on before it could do anything with it.
+   */
+  if (path === '/images' && method === 'GET' && (url.searchParams.get('artwork') || '').trim()) {
+    const artworkId = url.searchParams.get('artwork').trim();
+    const photos = await all(
+      `SELECT i.image_id, i.caption, i.subject, i.credit, i.shot_at, i.kind,
+              i.content_type, i.width, i.height, i.bytes, i.created_at,
+              ei.edition_id, ei.sort, ei.created_at AS linked_at,
+              e.label AS edition_label, e.implicit AS edition_implicit,
+              (SELECT COUNT(*) FROM edition_image x WHERE x.image_id = ei.image_id) AS links
+         FROM edition_image ei
+         JOIN edition e ON e.edition_id = ei.edition_id
+         JOIN image i   ON i.image_id   = ei.image_id
+        WHERE e.artwork_id = ? AND ei.status = 'active' AND i.status = 'active'
+        ORDER BY ${photoOrder('ei')}`, [artworkId]);
+
+    /* The first row IS the binder card's photo. Named in the response rather than left for the
+     * client to infer from position, so a surface that renders them out of order cannot quietly
+     * disagree with the binder about which one is the print's picture. */
+    return reply({ ok: true, at: t, artwork_id: artworkId, total: photos.length,
+                   card: photos.length ? photos[0].image_id : null, photos: photos });
+  }
+
   /* ============================================================ GET /images
    * The Photos surface. UNASSIGNED IS THE DEFAULT VIEW (Q19 + J15) — the backlog is the first
    * thing you see, the same argument that made the shoe-box the shoe-box.
+   *
+   * ⚠️ `is_primary_anywhere` IS NOW MEANINGLESS AND IS KEPT ONLY BECAUSE `photos.js` READS IT.
+   * Q26 retired `is_primary` from the display ranking in favour of `edition_image.sort`, so this
+   * column can only ever report 0 on anything written since v22. It comes out when photos.js is
+   * next touched, and the column itself goes with migration 002. Do not build on it.
    */
   if (path === '/images' && method === 'GET') {
     const asked = url.searchParams.get('scope');
