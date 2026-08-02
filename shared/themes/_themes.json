@@ -87,7 +87,7 @@
       "typography": "racing-archivo",
       "forms": "soft",
       "spacing": "standard",
-      "intendedUse": "The On Track motorsport schedule — navy+red Racing Bulls identity, Archivo display headers, rounded soft chrome. Series identity colors ride on top as a local layer (not theme tokens)."
+      "intendedUse": "The On Track motorsport schedule — navy+red Racing Bulls identity, Archivo display headers, rounded soft chrome. Series identity colors ride on top as a local layer (not theme tokens). ⚠️ 2026-08-01: the `red-bull` COLOR row's accent moved from red to the can's yellow (the board rework — four teams were sharing one red). This theme's chrome accent therefore changed with it. If On Track wants the old red it is now `accent-2` on the same row, or it gets its own color entity — do NOT add a local override."
     },
     {
       "slug": "eos",
@@ -98,6 +98,16 @@
       "forms": "eos",
       "spacing": "eos",
       "intendedUse": "Lighting/theatrical apps — ETC Eos console grammar (tombstone display: magenta=tracked, blue=intensity-up, green=lower/marked, gold=captured/selected, red=manual). Shared across the LX-notes clone, the Eos Tombstone Teaching Tool, and future lighting tools."
+    },
+    {
+      "slug": "f1-racetracks",
+      "name": "F1 Racetracks",
+      "status": "locked",
+      "color": "paddock",
+      "typography": "sharp-racing",
+      "forms": "sharp",
+      "spacing": "tight",
+      "intendedUse": "THE f1-racetracks app's single point of entry to the theme system (Michael, 2026-08-01). Named for the app on purpose: it is an app identity, not a constructor palette, and no team owns violet. Every pointer reproduces what the app already renders, so adopting it is a swap of a hand-baked layer for one pointer rather than a restyle — `sharp` forms are already copied verbatim into chrome-tokens.css section 7 (J20), `sharp-racing` is already the Chakra Petch / Inter / JetBrains Mono set the brand lockup hardcodes, `tight` matches a dense results board, and `paddock` is the app's own hue-268 ramp. ⚠️ Team colours are NOT in this join and must never be swept into one: a theme applies ONE AT A TIME, the standings matrix renders eleven teams AT ONCE (J14). They stay a local identity layer read from colors.tsv as data."
     }
   ]
 }
