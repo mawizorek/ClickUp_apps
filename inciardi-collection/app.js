@@ -39,12 +39,19 @@
      * does nothing — which is precisely the failure shape this table was built to convert into
      * a message naming the file. */
     photos:  { globals: ['Photos', 'Capture'], file: 'photos.js / capture.js' },
-    /* Binder is a REAL dependency even though this page never renders a sheet: `Binder.face()`
-     * is the one place 'A'/'B' becomes Front/Back, and the placement list speaks that
-     * vocabulary. artwork.js carries a fallback so a missing binder.js degrades the wording
-     * rather than blanking the page — but naming it here is what turns a silent 404 into a
-     * message that says which file to check. */
-    artwork: { globals: ['Artwork', 'Binder'], file: 'artwork.js / binder.js' },
+    /* FOUR globals as of v22, and every one is load-bearing:
+     *   Artwork — the page.
+     *   Binder  — `Binder.face()` is the one place 'A'/'B' becomes Front/Back, and the placement
+     *             list speaks that vocabulary. artwork.js carries a fallback so a missing
+     *             binder.js degrades the WORDING rather than blanking the page — but naming it
+     *             here is what turns a silent 404 into a message saying which file to check.
+     *   Viewer  — the full-screen overlay AND `pickEdition()`. Without it the carousel renders
+     *             perfectly and every thumbnail does nothing when tapped: a screen that LOOKS
+     *             built and is not, which is the worst shape this table exists to prevent.
+     *   Capture — "Photograph this print" is one of the two ways a photo gets here. Same
+     *             argument as the photos route, second surface. */
+    artwork: { globals: ['Artwork', 'Binder', 'Viewer', 'Capture'],
+               file: 'artwork.js / binder.js / viewer.js / capture.js' },
     /* Five globals, and each is a real dependency:
      *   Backroom — the runner.  Batch — the payload.  Preview — the markup (v15 split).
      *   Arrange  — WHERE each print sits (v17). Not optional: `build()` and `apply()` both read
@@ -73,6 +80,10 @@
 
       // Any page-level drawer belongs to the route that built it; a route change orphans it.
       if (window.Drawer) Drawer.closeAll();
+      /* Same argument, one layer up: the viewer is appended to <body> and outlives #view, so a
+       * route change while it is open would leave a full-screen photograph over the new page
+       * with its scroll lock still on. It owns its own teardown; this just calls it. */
+      if (window.Viewer) Viewer.close();
 
       var screen = SCREENS[route];
       if (!screen) return;
