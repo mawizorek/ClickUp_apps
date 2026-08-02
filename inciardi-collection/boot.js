@@ -33,16 +33,17 @@
        comment lives there. Two places to state one fact, so one of them rotted, which is the
        same failure this app's Decision Log has now catalogued seven times. If you bump the
        header comment in `index.html`, bump THIS LINE in the same commit.
-       ⭐ v20 and v21 both nearly repeated it and both were caught INSIDE the branch: index.html
-       moved first, this line one commit later. Two versions running, which is the closest thing
-       to a working guard this fact has — but it is still two files stating one number.
+       ⭐ v20, v21 and v23 all nearly repeated it and all three were caught INSIDE the branch:
+       index.html moved first, this line one or more commits later. Three versions running, which
+       is the closest thing to a working guard this fact has — and note what the guard actually
+       IS: not the instruction above, but someone re-reading the branch before opening the PR.
 
        🔴 AND HERE IS HOW TO GET THE NUMBER RIGHT RATHER THAN GUESS IT (v19): you cannot know a
        PR number before the PR exists, so **push the code, open the PR, then push the stamp** —
        two commits on one branch, one merge. An invented number is the same defect class as the
        fabricated wrangler version pin and the hand-typed ClickUp id: a value that looks checked
        and never was. */
-    version: 'v21 \u00b7 PR #672',
+    version: 'v23 \u00b7 PR #692',
     /* 🎨 `soft-mercedes` is a JOIN in shared/themes/_themes.json — colour `mercedes` + typography
        `grounded` + forms `soft` + spacing `standard`.
        🔴 applyTheme() TAKES A JOIN SLUG, NEVER A COLOUR SLUG. `mercedes` alone is a row in
@@ -284,13 +285,18 @@
     L.push('device      ' + (window.Device ? Device.describe() : '(device.js did not load)'));
     /* WHICH MODULES LOADED. After a split, a 404'd script and a screen with no data look
      * identical — this is the line that tells them apart.
-     * ⚠️ IT IS ONLY TRUE IF IT IS KEPT CURRENT, AND IT WAS NOT: `Arrange` shipped in v17 and was
-     * never added, so for two versions the one diagnostic built to catch a missing module was
-     * blind to the newest one. Add every new global here in the same commit that creates it.
-     * (v20: `Photos` and `Capture`, added in the commit that created them.) */
+     * ⚠️ IT IS ONLY TRUE IF IT IS KEPT CURRENT, AND IT HAS NOW BEEN LATE TWICE. `Arrange` shipped
+     * in v17 and was never added, so for two versions the one diagnostic built to catch a missing
+     * module was blind to the newest one. `PhotoView` shipped four commits before this line, on
+     * this same branch, under a comment saying to add it in the same commit that creates it.
+     * ⭐ Caught inside the branch both times it has been late since — which says the working
+     * guard is a re-read before the PR, not the instruction.
+     * 🔴 IT MATTERS MOST FOR `PhotoView`: a print with no photographs is a LEGITIMATE state that
+     * looks exactly like a 404'd photoview.js. This line is the only thing that separates them. */
     L.push('modules     ' +
       ['Device', 'Chrome', 'Settings', 'Binder', 'Sheets', 'Picker', 'Enter', 'Shoebox',
-       'Summary', 'Batch', 'Arrange', 'Preview', 'Backroom', 'Artwork', 'Photos', 'Capture', 'App']
+       'Summary', 'Batch', 'Arrange', 'Preview', 'Backroom', 'Artwork', 'Photos', 'Capture',
+       'PhotoView', 'App']
         .map(function (m) { return m + (window[m] ? '\u2713' : '\u2717'); }).join(' '));
     L.push('hash        ' + (location.hash || '(none)'));
     L.push('worker      ' + API.base() + (API.isDefaultBase() ? '  [built-in]' : '  [OVERRIDDEN here]'));
