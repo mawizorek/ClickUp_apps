@@ -1,6 +1,6 @@
 <!--
   F1 Racetracks (circuit guide lens)
-  Version: v19 (shell) · forms vector (sharp) + one chrome renderer + shared token spine
+  Version: v19.1 (shell) · forms vector (sharp) + one chrome renderer + shared token spine
   Live: https://mawizorek.github.io/ClickUp_apps/f1-racetracks/circuits.html
   Source: https://github.com/mawizorek/ClickUp_apps/tree/main/f1-racetracks
   INFRASTRUCTURE: slim runtime entrypoint + direct source modules in /source.
@@ -27,8 +27,15 @@
   hardcoded radius in the app at it. ⚠️ THIS LENS WAS THE ROUND ONE: its cards were 7px, its
   filter bar 9px, its weekend card 20px, all hand-typed. Corners are 4px from the grid now.
   To change the whole app's feel, swap the row in forms.tsv; do NOT type a radius here.
-  Decision Log J16-J20.
-  STYLE BAND: 02..07 fetched in order below.
+
+  🔴 CASCADE (v19.1) — THIS LENS IS THE WORST CASE, KNOW IT BEFORE YOU STYLE ANYTHING.
+  Its ENTIRE style band (02..07) is FETCHED AND APPENDED AT RUNTIME by the script below, and
+  source/09 injects a further block (#v9-circuits-css) on top of that. Both land AFTER
+  chrome-tokens.css has parsed, so at equal specificity they WIN on document order — nothing
+  in this lens was ever reachable by plain link-order override. That is why the cards stayed
+  7px with v19 already merged and Michael said "something is still not connected properly."
+  The shared spine's radius sweep carries !important for exactly this reason. Decision Log J21.
+
   DESIGN SYSTEM: Chakra Petch / JetBrains Mono / Inter + shared oklch (hue 268).
   v7: runs under the unified shell (index.html); chrome.js suppresses this page's own
   header when embedded (the shell owns it).
@@ -85,11 +92,12 @@
        radius literal in the app small enough to delete at source instead of override. */
     .nav-jump select{font-family:'JetBrains Mono',monospace;font-size:.74rem;background:var(--surface);color:var(--text);border:var(--border-w,1px) solid var(--line);border-radius:var(--radius,4px);padding:8px 11px;cursor:pointer;max-width:60vw}
   </style>
-  <!-- LAST on purpose: the shared spine wins the cascade over the floor above. -->
-  <link rel="stylesheet" href="./source/chrome-tokens.css?v=20260801d">
+  <!-- LAST of the <link>s — but the style band below is appended at RUNTIME and lands after
+       this, which is why the shared spine's radius sweep needs !important. See the header. -->
+  <link rel="stylesheet" href="./source/chrome-tokens.css?v=20260801e">
   <script>
     // Bump this one token on every source/style deploy to guarantee fresh bytes.
-    const BUILD_STAMP = '20260801d';
+    const BUILD_STAMP = '20260801e';
     const RUNTIME_STYLE_SOURCES = [
       './source/02_styles_foundation_and_layout.css.txt',
       './source/03_styles_panels_tables_footer.css.txt',
@@ -133,24 +141,24 @@
     <div id="app"></div>
 
     <footer class="app">
-      <span class="meta-txt" id="foot-meta">F1 Racetracks v19 · loading data…</span>
+      <span class="meta-txt" id="foot-meta">F1 Racetracks v19.1 · loading data…</span>
       <div class="toolbar">
         <a class="tool" href="./live-tracker.html">Live tracker</a>
       </div>
     </footer>
   </div>
 
-  <script src="./source/chrome.js?v=20260801d"></script>
-  <script src="./source/08_season.js?v=20260801d"></script>
-  <script src="./source/12_results_store.js?v=20260801d"></script>
-  <script src="./source/09_app_bootstrap_and_home.js?v=20260801d"></script>
-  <script src="./source/10_track_views_and_profile.js?v=20260801d"></script>
-  <script src="./source/13_live_session_panel.js?v=20260801d"></script>
-  <script src="./source/11_weather_and_footer_exports.js?v=20260801d"></script>
-  <script src="./source/14_weekend_state_and_data.js?v=20260801d"></script>
-  <script src="./source/15_weekend_surface_render.js?v=20260801d"></script>
-  <script src="./source/16_weekend_live_mode.js?v=20260801d"></script>
-  <script src="./source/17_weekend_mount.js?v=20260801d"></script>
-  <script src="./source/18_home_and_mobile_polish.js?v=20260801d"></script>
+  <script src="./source/chrome.js?v=20260801e"></script>
+  <script src="./source/08_season.js?v=20260801e"></script>
+  <script src="./source/12_results_store.js?v=20260801e"></script>
+  <script src="./source/09_app_bootstrap_and_home.js?v=20260801e"></script>
+  <script src="./source/10_track_views_and_profile.js?v=20260801e"></script>
+  <script src="./source/13_live_session_panel.js?v=20260801e"></script>
+  <script src="./source/11_weather_and_footer_exports.js?v=20260801e"></script>
+  <script src="./source/14_weekend_state_and_data.js?v=20260801e"></script>
+  <script src="./source/15_weekend_surface_render.js?v=20260801e"></script>
+  <script src="./source/16_weekend_live_mode.js?v=20260801e"></script>
+  <script src="./source/17_weekend_mount.js?v=20260801e"></script>
+  <script src="./source/18_home_and_mobile_polish.js?v=20260801e"></script>
 </body>
 </html>
