@@ -108,6 +108,16 @@
       "forms": "sharp",
       "spacing": "tight",
       "intendedUse": "THE f1-racetracks app's single point of entry to the theme system (Michael, 2026-08-01). Named for the app on purpose: it is an app identity, not a constructor palette, and no team owns violet. Every pointer reproduces what the app already renders, so adopting it is a swap of a hand-baked layer for one pointer rather than a restyle — `sharp` forms are already copied verbatim into chrome-tokens.css section 7 (J20), `sharp-racing` is already the Chakra Petch / Inter / JetBrains Mono set the brand lockup hardcodes, `tight` matches a dense results board, and `paddock` is the app's own hue-268 ramp. ⚠️ Team colours are NOT in this join and must never be swept into one: a theme applies ONE AT A TIME, the standings matrix renders eleven teams AT ONCE (J14). They stay a local identity layer read from colors.tsv as data."
+    },
+    {
+      "slug": "papyrus",
+      "name": "Papyrus",
+      "status": "locked",
+      "color": "papyrus",
+      "typography": "papyrus",
+      "forms": "papyrus",
+      "spacing": "tight",
+      "intendedUse": "Warm editorial / HML LLC FileMaker renders and natural-light applications. Gabarito display, IBM Plex Mono, zero-radius base, subtle parchment shadows. Spacing uses tight (shared) — FMP density matches."
     }
   ]
 }
