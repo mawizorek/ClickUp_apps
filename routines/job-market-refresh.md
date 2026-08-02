@@ -6,7 +6,7 @@ steward: routine-ricky
 cadence: pointer only — authoritative cadence is the row in routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 14
+version: 15
 model: loop-per-role
 ---
 
@@ -45,6 +45,9 @@ report-to:  DETAIL → the standing thread `86ajtgbt3` (role blocks + pass summa
 
 > **🧵 THREAD FINDINGS, NEVER FLAT.** (LOCKED 2026-08-02, Michael)
 > The top-level comment thread must be TIGHT: only role headers and the pass summary appear as root comments. ALL listing detail (SAME, NEW, GONE, NOTABLE) is posted as THREADED REPLIES under the relevant role header. A pass that posts SAME/NEW/GONE as root-level comments is STRUCTURALLY BROKEN regardless of content quality. The mechanic: post the role header, capture its comment ID, then use that ID as the parent for every subsequent reply in that role's block. If the comment tool requires a `parent` or `comment_id` parameter to thread, USE IT. A flat dump of 10+ root comments is unreadable on mobile and defeats the entire architecture.
+
+> **📐 SLIM SAME/GONE, RICH NEW.** (LOCKED 2026-08-02, Michael)
+> SAME and GONE blocks use a **single-line-per-listing** format: all info on one line, no separators, no stacking. These blocks should be tiny. NEW listings keep the full stacked template (multi-line, separators, qualification note) because those are the ones worth reading in detail. The density of SAME/GONE is the point: scan 20 listings in 20 lines.
 
 ## 📍 Architecture
 
@@ -218,21 +221,22 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 <ONE line. Blunt. About THIS role's market only.>
 ```
 
-## Template 2: 🔁 SAME (THREADED REPLY to role header)
+## Template 2: 🔁 SAME (THREADED REPLY to role header) — SLIM FORMAT
+
+> One line per listing. No separators, no stacking. The block should be scannable in seconds.
 
 ```
 ### 🔁 SAME · <n>
 
----
-**[<Role>](<url>)** — <Org>
-`<JM-ID>` · <location> · **<n>d**
-💵 <salary or —>
-
----
-<repeat per listing>
+[<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
+[<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
+[<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
+<repeat, one line per listing>
 ```
 
-## Template 3: 🆕 NEW (THREADED REPLY to role header)
+## Template 3: 🆕 NEW (THREADED REPLY to role header) — FULL FORMAT
+
+> NEW listings get the rich stacked template. These are what Michael actually reads.
 
 ```
 ### 🆕 NEW · <n>
@@ -247,17 +251,18 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 <repeat per listing>
 ```
 
-## Template 4: 🕳️ GONE (THREADED REPLY to role header)
+## Template 4: 🕳️ GONE (THREADED REPLY to role header) — SLIM FORMAT
+
+> One line per listing. Same as SAME: dense, fast, no formatting overhead.
 
 ```
 ### 🕳️ GONE · <n>
 
----
-**<Role>** — <Org>
-`<JM-ID>` · lived <n>d · <likely cause>
+**<Role>** — <Org> · `<JM-ID>` · lived <n>d · <likely cause>
+**<Role>** — <Org> · `<JM-ID>` · lived <n>d · <likely cause>
+<repeat, one line per listing>
 
----
-<or: "None. Full inventory carried.">
+<or if none: "None. Full inventory carried.">
 ```
 
 ## Template 5: 📌 NOTABLE (THREADED REPLY to role header, if content)
@@ -276,7 +281,7 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 
 **Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
 **Prev pass:** <timestamp> (<elapsed>)
-[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v14
+[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v15
 
 <Density verdict: one line.>
 
@@ -488,6 +493,7 @@ The TSV's `org` column is building a theatre directory organically. Let it grow.
 
 ## Changelog
 
+- **v15 (2026-08-02)** — added 📐 SLIM SAME/GONE, RICH NEW locked decision. SAME and GONE templates collapsed to single-line-per-listing format (no separators, no stacking, all fields on one line). NEW keeps the full stacked rich template. Net effect: a SAME block with 15 listings is 17 lines instead of 60+. GONE similarly compressed. No info removed, just formatting density.
 - **v14 (2026-08-02)** — added 🧵 THREAD FINDINGS, NEVER FLAT locked decision. Rewrote Comment Architecture section with explicit threading mechanics (capture comment ID, use as parent for replies). Updated Steps 9-10 with mechanical instructions for threading. Added template annotations ("THREADED REPLY to role header"). Added guardrail: posting SAME/NEW/GONE as root = STOP. Prior pass posted all findings flat; this version makes the threading requirement mechanically unambiguous.
 - **v13 (2026-08-01)** — brought into the standard runbook shape: added the `goal:` / `target:` / `report-to:` header (it had none, so a cold agent had no way to learn where a run gets reported), added the **Guardrails** section (it had none at all), removed `status: active` from the frontmatter (a second on/off switch, which `schedule.md` forbids), moved the STAMP from step 13 to step 16 so it lands after the pass summary rather than before it, restated the density floor as a *declared failure* that withholds the stamp per THE STAMP LAW, and added the complete-loops lock. No change to sources, templates, IDs, or the TSV schema.
 - v12 (2026-07-31) — loop-per-role, mobile-first, timestamped passes, density floor, comment index.
