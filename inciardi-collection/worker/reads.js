@@ -39,6 +39,8 @@
  * through to the writes without either file knowing the other's route list.
  */
 
+import { photoOrder } from './links.js';
+
 /* 🔴 EXPORTED SO THE 404 CANNOT LIE. The "no route" reply lists every route the API has, and
  * that list now spans two files — a hardcoded copy in worker.js would be a second source of
  * truth about which routes exist, and it would rot the first time a read is added here. Same
@@ -49,59 +51,45 @@ export const READ_ROUTES = [
 ];
 
 /* ============================================================ CARD_IMAGE
- * 🔴 WHICH PHOTOGRAPH REPRESENTS A PRINT. One definition, three consumers, zero stored state.
+ * 🔴 WHICH PHOTOGRAPH REPRESENTS A PRINT. Three consumers here, zero stored state.
  *
  * Until 2026-08-01 this did not exist and the three routes below returned NO image column at
  * all — so a photo could be uploaded, attached, and confirmed in the database while the binder,
  * the Collection matrix and the artwork page stayed blank. Attaching a photo appeared to do
  * nothing because nothing could see it.
  *
- * ⭐ MICHAEL'S RULE, AND IT BEAT MINE: *"if a photo is the ONLY photo attached, it should be the
- * default render even if not selected."*
+ * 🔴 THE ORDERING IS NOT DEFINED HERE ANY MORE. It is `photoOrder()` in `worker/links.js`,
+ * imported above, and that file carries the full rationale for every term — including why the
+ * first one stopped being `is_primary DESC` on 2026-08-01 (Q26). **Do not inline it back.**
  *
- * I had proposed writing `is_primary = 1` on first attach. His is a DERIVE where mine was a
- * WRITE — rung 1 against rung 2 of this app's own ladder — and the difference is not taste.
- * Under a stored first-attach flag, unlink that photo and attach a replacement and the print
- * goes BLANK until someone taps a button, because the fact was pinned to the row that left. A
- * derived answer cannot fall out of date with its own inputs.
+ * ⚠️ AND HERE IS THE PAIRING THAT MATTERS: this is the TRUNCATED form. `images.js` runs the
+ * same `photoOrder()` with no LIMIT to fill the carousel, so **the card photo IS the carousel's
+ * first frame** — structurally, not because two files were kept in step by hand. If the binder
+ * ever shows photo X and the carousel opens on photo Y, someone forked the ordering.
  *
- * The ordering, one step past his rule, to serve the workflow he described in the same breath
- * (*"pack photos… then sliding them into the background carousel once we get standalones in"*):
- *
- *     is_primary DESC   an explicit ⭐ always wins. Nothing overrules a human choice.
- *     link_count ASC    a photo on ONE print beats a photo on nine.
- *     created_at DESC   newest of whatever is left.
- *
- * ⭐ THE MIDDLE LINE IS THE TRICK AND IT COSTS NO NEW COLUMN. A photo linked to several editions
- * is STRUCTURALLY a pack shot — being on nine prints is what makes it one. So J16's `subject`
- * field, invented for precisely this preference and never reachable from any UI, is not needed
- * here: the fact already lives in the join table. Today the pack photo renders on Pony and PBR
- * because it is all there is; the day a standalone PBR shot lands it carries link_count 1
- * against the pack's 2 and takes over by itself, nothing tapped.
+ * ⚠️ `LIMIT 1` STAYS AND IT IS NOT THE THING TO DELETE. The instruction that produced this work
+ * read "drop LIMIT 1 off the ranking in reads.js" — correct in INTENT, impossible as written:
+ * this is a correlated SCALAR subquery and SQLite requires it to return exactly one row. The
+ * un-truncated ranking is a different query in a different file, and it now exists.
  *
  * ⚠️ THIS BELONGS IN `v_slot`, NOT IN A WORKER STRING, AND THAT IS OWED DEBT. `views.sql` says
- * to promote a worker query into a view at the SECOND consumer; this has THREE on day one. It
- * is here because a view change means migration 002 + three workflow edits + a button press,
- * and the ask was photos in the binder soon. When 002 happens for any other reason, this goes
- * with it. Until then: ONE constant, three call sites — never a second copy of the ordering.
+ * to promote a worker query into a view at the SECOND consumer; this has THREE. It is here
+ * because a view change means migration 002 + three workflow edits + a button press. When 002
+ * happens for any other reason, this goes with it.
+ *
+ * The subquery correlates to whatever the outer query calls `artwork`, and the routes use
+ * different aliases (`a.artwork_id`, `v.artwork_id`), so the alias is a parameter — one
+ * definition instead of three near-copies that can drift.
  */
-const CARD_IMAGE = `(
+const cardImage = (aliasExpr, as) => `(
   SELECT ei.image_id
     FROM edition_image ei
     JOIN edition e2 ON e2.edition_id = ei.edition_id
     JOIN image im   ON im.image_id   = ei.image_id
-   WHERE e2.artwork_id = %A% AND ei.status = 'active' AND im.status = 'active'
-   ORDER BY ei.is_primary DESC,
-            (SELECT COUNT(*) FROM edition_image x WHERE x.image_id = ei.image_id) ASC,
-            ei.created_at DESC
+   WHERE e2.artwork_id = ${aliasExpr} AND ei.status = 'active' AND im.status = 'active'
+   ORDER BY ${photoOrder('ei')}
    LIMIT 1
-)`;
-
-/* The subquery correlates to whatever the outer query calls `artwork`, and the three routes use
- * three different aliases (`s.artwork_id`, `a.artwork_id`). Substituting the alias keeps ONE
- * definition instead of three near-copies that can drift — which is the entire failure mode
- * this app is built to refuse. */
-const cardImage = (aliasExpr, as) => CARD_IMAGE.replace('%A%', aliasExpr) + ' AS ' + as;
+) AS ${as}`;
 
 export async function handleRead({ path, url, all, reply, t }) {
 
@@ -313,7 +301,7 @@ export async function handleRead({ path, url, all, reply, t }) {
    * state column and there must never be one (J3).
    *
    * ⚠️ NO LONGER `SELECT * FROM v_slot`. The view cannot carry the card image (that would be
-   * migration 002 — see CARD_IMAGE), so this selects the view's columns and appends the derived
+   * migration 002 — see cardImage), so this selects the view's columns and appends the derived
    * image beside them. `v.*` keeps the view as the single owner of every column it does define,
    * so nothing here re-implements `state`, `qty_owned` or `placed_count`. */
   if (path === '/slots') {
