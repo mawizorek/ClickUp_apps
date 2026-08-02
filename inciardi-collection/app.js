@@ -43,8 +43,15 @@
      * is the one place 'A'/'B' becomes Front/Back, and the placement list speaks that
      * vocabulary. artwork.js carries a fallback so a missing binder.js degrades the wording
      * rather than blanking the page — but naming it here is what turns a silent 404 into a
-     * message that says which file to check. */
-    artwork: { globals: ['Artwork', 'Binder'], file: 'artwork.js / binder.js' },
+     * message that says which file to check.
+     *
+     * 🔴 PhotoView AND Capture ADDED v23, and PhotoView is the one that matters. A print with no
+     * photographs is a LEGITIMATE state that looks exactly like a 404'd photoview.js: a complete,
+     * correct-looking print page with nothing where the pictures go. Of every silent failure this
+     * table defends against, that is the most convincing one — so it is named rather than left to
+     * be discovered by someone concluding the feature was never built. */
+    artwork: { globals: ['Artwork', 'Binder', 'PhotoView', 'Capture'],
+               file: 'artwork.js / binder.js / photoview.js / capture.js' },
     /* Five globals, and each is a real dependency:
      *   Backroom — the runner.  Batch — the payload.  Preview — the markup (v15 split).
      *   Arrange  — WHERE each print sits (v17). Not optional: `build()` and `apply()` both read
