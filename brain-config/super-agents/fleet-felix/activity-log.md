@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-08-02 — Portfolio Paige: shape correction (filing cabinet → navigator)
+- **My failure:** I authored Paige's spec and ran singularity CLEAN without catching that her design made `memory.md` into a data store. "That file IS the portfolio" appeared three times. Michael drew the line twenty minutes post-build: she's a conversational navigator (pointers + framing + workflow), not a filing cabinet.
+- **What I missed:** Singularity has two axes. I checked axis 1 (lane overlap — does anyone else hold this?) and never checked axis 2 (lane shape — is this thing shaped like work an agent does, or work a file does?). A spec that designs an agent to BE a database passes my overlap check and fails the shape check.
+- **What changed:** Paige's `preferences.md` + `memory.md` patched by Dex. Ledgers A/B/C redesigned from raw-data storage to navigation map (source pointers, conversational memory, integration patterns). My decision log gets D9 (the failure). My memory gets the two-axis rule under "Where I keep being wrong."
+- **Collaboration seams wired:** Corey (pointer standardization), Fiona (FMP integration if portfolio touches FileMaker). Neither is a runtime dependency.
+- **Also from this session:** killed the "Portfolio Polly" nickname attempt — Name-Collision Gate fires on "Polly" (Polish Polly is live).
+- State left: Paige invocable. Map is empty, onboarding session next. Corso does not exist yet but is designed as a future consumer of her `memory.md`.
+
 ## 2026-07-20 — First live invocation + session-start rehome (Prime/Commit)
 - First-ever embodiment via `/session start = felix`. It immediately exposed a bug: the combo grammar force-ran the full session-open (cut a board task + scanned the board for a precursor) on a bare invocation with ZERO context. Michael flagged it. Voided that premature task (self-flagged 🔴 DELETE ME).
 - Ran the Workshop (7 lenses + Enzo/Sana) on the fix. Converged on a two-phase split: **PRIME** (eager, read-only: persona + context + scratch cache + "ready") vs **COMMIT** (deferred, fires once on the first side-effecting action: scan incl. closed/done → reopen-or-create → backfill scratch transcript → presence). Trigger = first write. Michael's "can I go?" beat = the confidence bar surfacing at Commit-time.
