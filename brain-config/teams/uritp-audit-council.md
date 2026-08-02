@@ -14,6 +14,8 @@
 
 **Standing conduct applies unchanged.** Every seated voice follows the four directives in `council.md` (have a personality · actually post · act like a standing agent · read the room and reply by name) and the **thread-only expression law** — deliberation lands as threaded comments on the session task in the 🟢 Agent Activity Board, never in the working chat.
 
+⚠️ **A seating map is a FLEET CLAIM, which means it rots the way fleet claims rot.** Every row below names another agent's lane, and that is exactly the text nobody re-reads (`hooks/fleet-fact-sweep.md`). Before trusting a row, check it against the 🤖 **Agent Index**.
+
 ---
 
 ## The bench
@@ -52,11 +54,11 @@ These are not decoration. Each one cost real audit time.
 
 **1 · ANNOUNCE THE LATCH.** On 2026-07-28 Michael asked whether to seat Wes — and Wes had been driving since **18:35 the previous day**. A seated agent nobody can see is functionally unseated. **State who is holding the wheel, out loud, when it changes.**
 
-**2 · CORREY + FIONA ARE A REAL WORKING GROUP AND IT HAS NO HOME.** Michael has now named that exact pair **four separate times** for structural conversations: the CRM Gen-1-going-forward session, the Inventory Header Categories scheme, the SPAC relay/Lightwright question, and the FMP unit-ledger split. ⚠️ **Four queued conversations for a group that does not exist as a thing.** Flagged here because a seating map is where it becomes visible.
+**2 · COREY + FIONA ARE A REAL WORKING GROUP AND IT HAS NO HOME.** Michael has now named that exact pair **four separate times** for structural conversations: the CRM Gen-1-going-forward session, the Inventory Header Categories scheme, the SPAC relay/Lightwright question, and the FMP unit-ledger split. ⚠️ **Four queued conversations for a group that does not exist as a thing.** Flagged here because a seating map is where it becomes visible.
 
 **3 · MILO IS NOT OPTIONAL AND THE AUDIT PROVED IT BY OMISSION.** Every reversal this audit produced came from misreading *intent*, never from misreading data — a scaffold graded Dead, an archived list read as finished, a placeholder read as a quantity. **Those are all domain-knowledge failures.** Milo is in the Core Four because the audit's failure mode is not measurement, it is meaning.
 
-**4 · THE AUDIT'S OWN BLIND SPOTS ARE TOOL-SHAPED, so seat for them.** Four separate times a default filter hid real content: the residency tree hid 3 folders, a count census hid 2 empty lists, an archived list reported **1 task while holding 87**, and a subtask filter under-reported the Index by 39 rows. **Anna's ledger carries these as standing method rules; the bench exists partly to catch them.**
+**4 · THE AUDIT'S OWN BLIND SPOTS ARE TOOL-SHAPED, so seat for them.** Four separate times a default filter hid real content: the residency tree hid 3 folders, a count census hid 2 empty lists, an archived list reported **1 task while holding 87**, and a subtask filter under-reported the Index by 39 rows. **Anna's ledger carries these as standing method rules; the bench exists partly to catch them.** ⚠️ **A fifth shape, 2026-08-01, and it is the nastiest: a pointer into a RETIRED file returns empty, and an empty read is indistinguishable from a clean pass.** Same family as the four above — the tool degrades silently instead of erroring.
 
 ---
 
@@ -75,11 +77,13 @@ These are not decoration. Each one cost real audit time.
 - **Standing thread:** the STANDING URITP List Audit task on the 🟢 Agent Activity Board — reopen, never recreate
 - **Seating law + conduct:** `council.md`
 - **Workshop routing:** `teams/the-workshop.md`
-- **Resolution index:** `super-agents/roster.json`
+- **Resolution index: the 🤖 Agent Index ClickUp list** (`901328043244`), per `gates/agent-invocation-gate.md` STEP 0. *(~~`super-agents/roster.json`~~ retired to a tombstone stub 2026-07-30.)*
 - **Method rules learned in-flight:** `super-agents/audit-anna/memory.md`
+- **Auditing the fleet claims on THIS page:** `hooks/fleet-fact-sweep.md`
 
 ---
 
 ## Changelog
 
-- **2026-07-30 — created.** Requested by Michael at the Space-5 close: *"which agents do we need to seat each time we audit URITP? can we make that a council in the repo so i can reference them as a group instead of each individually each time?"* **Fold-in Frank verdict: NET-NEW.** The seating facts existed but only as prose inside the ClickUp List Audit hook (*"Audit Anna leads… Milo brings URITP workspace knowledge; Corey for ClickUp structure"*) plus the general bench in `council.md` — **there was no group token, which is precisely what was asked for.** Membership was derived from six spaces of observed practice, not invented: the Core Four are the agents actually seated in every audit session to date; the called-in list is who was actually pulled in and for what. The four hard-learned notes are drawn from real logged misses (Wes's latch visibility, the Corey+Fiona backlog, the intent-vs-data reversal pattern, the four tool blind spots).
+- **2026-08-01 — repointed.** The resolution index pointed at `roster.json`, retired 2026-07-30; added the fleet-claim warning at the top and a fifth tool-blind-spot shape (an empty read from a retired pointer looks exactly like a clean pass). Found by the first full Fleet-Fact Sweep. Also fixed the "CORREY" typo in hard-learned note 2.
+- **2026-07-30 — created.** Requested by Michael at the Space-5 close: *"which agents do we need to seat each time we audit URITP? can we make that a council in the repo so i can reference them as a group instead of each individually each time?"* **Fold-in Frank verdict: NET-NEW.** The seating facts existed but only as prose inside the ClickUp List Audit hook (*"Audit Anna leads… Milo brings URITP workspace knowledge; Corey for ClickUp structure"*) plus the general bench in `council.md` — **there was no group token, which is precisely what was asked for.** Membership was derived from six spaces of observed practice, not invented: the Core Four are the agents actually seated in every audit session to date; the called-in list is who was actually pulled in and for what. The four hard-learned notes are drawn from real logged misses.
