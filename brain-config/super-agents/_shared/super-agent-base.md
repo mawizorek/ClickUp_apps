@@ -15,15 +15,12 @@ This is the shared "how to BE a git super-agent" layer. Every git super-agent's
 super-agent inherits the upgrade (singularity over copy-paste). This is the runtime
 companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
-📏 **THIS FILE IS AT ITS ~22KB READ CEILING (2026-07-30).** **MEASURE the live file before you add
-anything; do NOT trust — or write — a byte count in this text.** A hand-maintained size figure here
-went stale TWICE inside the single pass that added §4a: the first draft shipped over the ceiling with
-the old number still in place, and the correction shipped a new number that was wrong on arrival.
-**That is precisely the rot §4a locks a rule against, committed in the file that carries the rule** —
-so the number is gone rather than corrected again. Practical consequence: **assume there is no
-headroom.** If your addition does not clearly fit, it belongs in a tool, not here. The real fix (thin
-Constitution + router over runtime modules, per the repo's own index law) is proposed and pending
-Michael's ruling — do not improvise it. See PR #563.
+📏 **THIS FILE IS AT ITS ~22KB READ CEILING. ASSUME THERE IS NO HEADROOM.** If your addition does
+not clearly fit, it belongs in a tool, not here. **MEASURE the live file after every write; never
+write a byte count into this text.** Three separate passes have now shipped a size claim here that
+was wrong on arrival — twice in the §4a pass, once on 2026-08-01 — which is exactly the rot §4a
+locks a rule against, committed in the file carrying the rule. The structural fix (thin Constitution
++ router over runtime modules) is proposed and pending Michael's ruling; do not improvise it. PR #563.
 
 ---
 
@@ -211,11 +208,10 @@ session's voice + lane for its duration. Its value is accumulated context + pers
 note-taking + thorough parsing of its own files — **not rank.** It is the same kind of voice as a
 Council lens with a memory bundle attached (Constitution §6); the bundle is the whole difference.
 
-⚠️ **"It is NOT a native ClickUp agent" is no longer universally true (2026-08-01).** Under **Model
-A** a native shell can be RETAINED as the loader *body* — keeping its user-ID, tools and
-mention/DM/assignment triggers — while this bundle is its *brain*, read fresh every run. FMP Fiona
-is the reference conversion. **Native status is now PER AGENT and must be checked, never assumed:**
-`_shared/native-to-git-conversion-runbook.md` + the Known-Drift Register D5.
+⚠️ **"NOT a native ClickUp agent" is no longer universally true (2026-08-01).** Under **Model A** a
+native shell can be RETAINED as the loader *body* (its user-ID, tools, mention/DM/assignment
+triggers) while this bundle is its *brain*, read fresh each run. **Native status is PER AGENT and
+must be checked, never assumed:** `_shared/native-to-git-conversion-runbook.md` + Register D5.
 
 ---
 
@@ -247,10 +243,9 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
 5. **Confirm wiring:** the agent's row in the 🤖 **Agent Index** ClickUp list (list `901328043244`) —
    THE single documented source. Check the row exists and its status is active.
    ⚠️ **CORRECTED 2026-08-01:** ~~the agent's row in `roster.json`~~ — retired to a tombstone stub
-   **2026-07-30**, so this step had every teammate confirming its wiring against a file that returns
-   nothing. **An empty read is indistinguishable from a clean pass**, which made the most
-   widely-executed check in the fleet a no-op for two days. ~~+ `registry.json`~~ struck 2026-07-25.
-   **Never repoint this at a file** — three manifests have been retired; the Index is a list.
+   **2026-07-30**, so this step had every teammate confirming its wiring against a file returning
+   nothing, and **an empty read is indistinguishable from a clean pass.** ~~+ `registry.json`~~
+   struck 2026-07-25. **Never repoint this at a file** — three manifests are retired; it is a list.
 6. **INHABIT + ANNOUNCE:** emit the agent's self-announce header as the FIRST line of the
    reply, then respond in-character.
 
@@ -279,8 +274,7 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    a defect on sight — move it to the activity log's LIVE STATE block, don't refresh it in place.
 10. **Never state a fact about ANOTHER agent from memory** — who is steward, who owns a lane, who
    ratifies, whether their native shell is live. Check the 🤖 Agent Index + that agent's own bundle.
-   A fleet fact is correct at its source and wrong at every quote site: `hooks/fleet-fact-sweep.md`
-   + the Known-Drift Register.
+   A fleet fact is correct at its source and wrong at every quote site: `hooks/fleet-fact-sweep.md`.
 
 ---
 
@@ -308,10 +302,9 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
    memory changes through the single Maggie/OMR serialization point; reconcile once.
 5. ⚠️ **DIFFERENT agents collide too, and an EMPTY board means "nobody posted," not "nobody is
    here."** Editing `_shared/`, a governing hook, or **any shared standard** = post the file name on
-   the board BEFORE the write; your line protects the OTHER session, not yours. *(~~`roster.json`~~
-   was the example here until it was retired 2026-07-30; the rule is about SHARED files, not that
-   one.)* Procedure + the 2026-07-25 near-miss that produced this rule: GitHub MCP Operating
-   Standard → Live Session Board, and Fleet Build Queue Decision Log Q11.
+   the board BEFORE the write; your line protects the OTHER session, not yours. Procedure + the
+   2026-07-25 near-miss that produced this rule: GitHub MCP Operating Standard → Live Session
+   Board, and Fleet Build Queue Decision Log Q11.
 6. **Narrow exception to rule 5, not a loophole:** if the agent already live is editing
    `session-board.md` ITSELF, your presence write collides with the session the rule protects.
    Only then, and only if your files provably don't overlap theirs, skip it and record the skip +
@@ -344,7 +337,6 @@ brain-config/super-agents/<slug>/
 (`gates/git-agent-authoring.md` → Editing an existing super-agent). Not inline, and NOT a sidecar
 file — spawning a surface to catch trimmed overflow is the pattern refused 2026-07-17.
 
-The three prior changelog entries (2026-07-24 Class Parity; 2026-07-25 live-write logging mandate;
-2026-07-25 Felix's registry-pointer strikes) are preserved verbatim in the description of
-**PR #563, 2026-07-27**. The 2026-07-30 §4a lock (memory vs activity-log) and its full incident
-provenance live in the description of the PR that introduced it. Read the PRs, not a reconstruction.
+Prior changelog entries (2026-07-24 Class Parity; 2026-07-25 live-write logging mandate; 2026-07-25
+registry-pointer strikes) are preserved verbatim in **PR #563**. The 2026-07-30 §4a lock and the
+2026-08-01 roster repoint live in their own PR descriptions. Read the PRs, not a reconstruction.
