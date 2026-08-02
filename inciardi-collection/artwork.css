@@ -5,6 +5,9 @@
  * identical on both ramps. Ink is `--text*` or `--accent-deep`. Brand colours fill, they do not
  * letter. v10 found three `accent-2`-as-ink rules in summary.css and v12 found three more, so
  * this file was written with the rule rather than audited into it.
+ *
+ * The full-screen viewer is NOT here — it is `viewer.css`, because the Photos grid opens the
+ * same overlay and a shared component's styles cannot live inside one of its callers.
  */
 
 .aw { padding-bottom: var(--gap-lg, 20px); }
@@ -63,6 +66,71 @@
   font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--accent-deep); }
 
+/* ============================================================================
+   THE PHOTOGRAPHS (v22). The block v19 sized and left empty.
+   ============================================================================ */
+
+.aw-car { margin-bottom: var(--gap-xs, 8px); }
+
+/* 🔴 THE HERO IS HEIGHT-CAPPED, AND THAT IS NOT A TASTE CALL. Every upload lands 1350×1800 —
+   portrait, 4:3 tall. At full width on a phone that is well over a screen, so the filmstrip and
+   both add buttons would sit below the fold and the page would open on a photograph with no
+   visible way to do anything with it. `dvh` for the same reason `body.stage` uses it: `vh`
+   counts the retracted iOS URL bar. */
+.aw-hero { display: block; position: relative; width: 100%; padding: 0; min-height: 0;
+  overflow: hidden; background: var(--surface-2);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px); }
+.aw-hero img { display: block; width: 100%; max-height: 62dvh; object-fit: contain;
+  background: var(--surface-2); }
+
+/* accent-soft ground with accent-deep ink — the same pair the binder card plate and `.p-see`
+   use, and both tokens read on either ramp. NOT `--accent` as ink; see the file header. */
+.aw-heroflag { position: absolute; left: 6px; bottom: 6px;
+  padding: 2px 7px; border-radius: var(--radius-pill, 8px);
+  background: var(--accent-soft); color: var(--accent-deep);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.6rem;
+  letter-spacing: 0.06em; text-transform: uppercase; }
+
+.aw-broken { display: block; padding: var(--gap-lg, 20px); text-align: center;
+  font-size: var(--fs-xs, 0.72rem); color: var(--bad); }
+
+/* ---------- the filmstrip ----------
+   Horizontal scroll rather than a wrapping grid: a strip says "there are more, keep going" in a
+   way a grid does not, and it keeps the hero the tallest thing on the page. `.wrap` flips it for
+   the attach panel, where the whole pool has to be browsable at once. */
+.aw-strip { display: flex; gap: 6px; overflow-x: auto; overscroll-behavior-x: contain;
+  padding: var(--gap-xs, 8px) 0 4px; scrollbar-width: thin; }
+.aw-strip.wrap { flex-wrap: wrap; overflow: visible; max-height: 46dvh; overflow-y: auto; }
+
+.aw-th { position: relative; flex: 0 0 auto; width: 52px; height: 66px; padding: 0;
+  min-height: 0; overflow: hidden; border-radius: 4px;
+  border: var(--border-w, 1px) solid var(--border); background: var(--surface-2); }
+.aw-th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The star sits on frame ZERO because frame zero IS the binder card's photo — the server
+   returned them in display order and position carries the fact. Nothing reads a flag. */
+.aw-thfront { position: absolute; top: 1px; left: 2px; font-size: 0.62rem; line-height: 1; }
+/* How many prints this photo is on. Only drawn when > 0, because "1" on every tile is noise —
+   the number is interesting precisely when it means "this is a pack shot." */
+.aw-thn { position: absolute; right: 2px; bottom: 1px;
+  padding: 0 3px; border-radius: 3px;
+  background: var(--surface-1); color: var(--text-faint);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.55rem;
+  font-variant-numeric: tabular-nums; }
+
+.aw-pmeta { margin: 4px 0 0; font-size: var(--fs-xs, 0.72rem); color: var(--text-faint);
+  text-wrap: pretty; }
+
+.aw-pacts { display: flex; gap: var(--gap-xs, 8px); flex-wrap: wrap;
+  margin-top: var(--gap-xs, 8px); }
+.aw-pacts button { flex: 1 1 auto; font-size: var(--fs-sm, 0.85rem); }
+
+/* The attach panel. An INLINE panel, not a drawer — `core.js`'s Drawer shows `#pageScrim` but
+   never binds it, and a page that declares the scrim without a handler gets a dimmed screen you
+   cannot tap away. An inline panel has no scrim to get wrong. */
+.aw-pick { margin-top: var(--gap-xs, 8px); padding: var(--gap-xs, 8px);
+  background: var(--surface-1);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px); }
+
 /* ---------- placements + the did-you-mean list ----------
    Each row is a real link to a real face. 44px minimum on the ANCHOR, not the <li>: the hit area
    has to be the thing that navigates, which is the trap `.br-ovr` documents from the other side. */
@@ -100,9 +168,11 @@
   font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--text-faint); }
 
-/* ---------- the photo gap ----------
-   Dashed and quiet. It is not an error and it is not a control — it is a stated absence with a
-   pointer to where the work is scoped. */
+/* ---------- the ZERO-photo state ----------
+   ⚠️ KEPT, and it is no longer the only state — it is the empty one. v19 shipped this INSTEAD OF
+   a button because the routes did not exist and a control that 500s is worse than an honest gap.
+   The routes exist now, so the buttons sit beneath it and the gap became an invitation. Dashed
+   and quiet: still a stated absence, not an error. */
 .aw-photos { padding: 11px; border: 1px dashed var(--border);
   border-radius: var(--radius, 6px); }
 .aw-photos p { margin: 0; font-size: var(--fs-sm, 0.85rem); line-height: 1.5;
@@ -110,8 +180,6 @@
 .aw-photos .aw-note { display: block; margin-top: 6px; text-transform: none;
   letter-spacing: normal; font-family: inherit; font-size: var(--fs-xs, 0.72rem);
   color: var(--text-faint); }
-.aw-photos code { font-family: var(--font-mono, ui-monospace, monospace);
-  color: var(--accent-deep); }
 
 .aw-back { margin: var(--gap-lg, 20px) 0 0; font-size: var(--fs-sm, 0.85rem); }
 .aw-back a { color: var(--accent-deep); text-decoration: none; }
