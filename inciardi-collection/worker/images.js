@@ -1,30 +1,32 @@
 /* Inciardi Collection — THE PHOTO PIPE. Four routes: bytes in, bytes out, the grid, the print.
  *
  * ============================================================================
- * NEW FILE 2026-08-01, and it had to be one. `worker.js` sat at ~21KB against a ~22KB practical
- * ceiling when this was written and its own header says in capitals that the next route does
- * not go in it.
+ * NEW FILE 2026-08-01. `worker.js` sat at ~21KB against a ~22KB practical ceiling when this was
+ * written and its own header says in capitals that the next route does not go in it.
  *
- * ⚠️ AND THIS FILE THEN BROKE THE SAME CEILING TWICE. 26,603 bytes on its first push (the
- * one-off routes went to `worker/adopt.js` before merge), then 21,455 — ~545 bytes of headroom,
- * LESS than `worker.js` had on the day that was called an emergency — so the three link writes
- * went to **`worker/links.js`**. Read that file's header; the seam was named here and in the
- * module map before it was finally taken.
+ * ⚠️ AND THIS FILE HAS NOW BROKEN THE SAME CEILING THREE TIMES. 26,603 bytes on its first push
+ * (one-off routes → `worker/adopt.js`), then 21,455 with ~545 of headroom (the three link writes
+ * → `worker/links.js`), then 21,944 on the v22 branch — EVERY ONE OF THEM COMMENT WEIGHT, not
+ * code, and the third one inside a PR about ordering discipline. All three were caught by
+ * reading the byte count in the push response rather than by feel.
  *
- * WHAT IS LEFT IS THE BYTE LAYER, and that is now the whole rule for this file: **if a route
- * does not touch R2 or return an image, IT DOES NOT BELONG HERE.** ⚠️ `GET /images` is the
- * standing exception and always was — it returns image ROWS, not bytes, but it is the query
- * every surface uses to FIND an image before asking for one, so it lives beside the proxy that
- * serves them.
+ * 🔴 THE RULE THAT WOULD HAVE CAUGHT ALL THREE: measure the file you are about to write into,
+ * BEFORE you write. A file at 21KB has room for a route or a paragraph, never both. And when
+ * the reasoning already lives somewhere — the Decision Log, another module's header — a copy of
+ * it here is not documentation, it is weight.
+ *
+ * WHAT BELONGS HERE: **if a route does not touch R2 or return an image, it does not.**
+ * ⚠️ `GET /images` is the standing exception and always was — it returns image ROWS, but it is
+ * the query every surface uses to FIND an image before asking for one.
  *
  * 🔴 WHY THE DISPATCH SITS BEFORE THE BODY PARSE IN worker.js — NOT A STYLE CHOICE.
  * worker.js runs `body = await request.json()` on every write, which CONSUMES THE REQUEST
  * STREAM. An upload's body is BYTES. Dispatched after that line, this file would receive an
  * already-drained body and write a zero-length object to R2 behind a perfectly successful
- * response — a silent empty file, which is the worst failure shape this app knows.
- * So: the write-key gate fires FIRST (auth is not relocated), then images dispatch, then the
- * JSON parse for everything else. ⚠️ `links.js` is the OPPOSITE and dispatches AFTER the parse,
- * because its bodies really are JSON. Two image-ish modules, two positions, one reason.
+ * response — a silent empty file, the worst failure shape this app knows. So: the write-key
+ * gate fires FIRST, then images dispatch, then the JSON parse for everything else.
+ * ⚠️ `links.js` is the OPPOSITE and dispatches AFTER the parse, because its bodies really are
+ * JSON. Two image-ish modules, two positions, one reason.
  *
  * CONTRACT with worker.js, same shape as reads.js: everything needed is handed over, this file
  * reaches for no globals and holds no state. Returns a Response, or `null` meaning "not my
@@ -35,31 +37,16 @@
  * ============================================================================
  *
  * 🔴 THE BYTES ARE THE ONLY UNRECOVERABLE THING IN THIS APP. D1 Time Travel covers the
- * database for 30 days and covers R2 for NOTHING. An export carries image ROWS, not image
- * BYTES. There is no delete route in this file and there must never be one: archiving is a
- * `status` flip (in `links.js`) and the object stays. If you are here to add a cleanup job,
- * don't.
+ * database for 30 days and covers R2 for NOTHING. There is no delete route here and there must
+ * never be one: archiving is a `status` flip (in `links.js`) and the object stays.
  *
- * ⚠️ WHAT IS DELIBERATELY NOT BUILT, named so each gap is a decision and not an oversight:
- *   - DERIVATIVES. The spec locked three (thumb 480 / full 1800 / re-encoded original, Q14 C)
- *     and migration 001 then gave `image` exactly ONE `r2_key` column. The key scheme for the
- *     other two was never decided, so writing them now would mean inventing schema mid-route.
- *     v1 stores ONE image per shot. When the grid crawls, add `-t.jpg` by CONVENTION off the
- *     same key and let rows without one fall back to the full image. No schema change either
- *     way, which is what makes deferring it cheap and reversing it cheaper.
- *     🔴 RE-RULED 2026-08-01 (J25) WITH A TRIGGER, so this stops being an open question: there
- *     are SIX photographs in this app. A thumbnail pipeline for a grid rendering six images is
- *     optimising a number nobody has measured. The trigger IS the measurement — the day the
- *     Photos grid is visibly slow on the phone. The real fork when it arrives is the generation
- *     POINT (a second canvas encode in capture.js vs on-demand resize here), and the 177 adopted
- *     legacy rows can never carry a `-t.jpg` under EITHER scheme because their bytes arrived
- *     already made. So the fallback-to-full-image path is load-bearing whichever wins, and is
- *     the piece to build first if it is ever built at all.
- *   - EXIF. `shot_at` is accepted as a parameter and never derived here. Reading it is
- *     capture.js's job and it MUST happen BEFORE the canvas re-encode — the re-encode strips
- *     GPS, which is the point, and takes the capture date with it, permanently (J16).
- *     ✅ VERIFIED ON REAL FILES 2026-08-01: six uploads carried `shot_at` a week older than
- *     their `created_at`, so the order is PROVEN rather than assumed from the design.
+ * ⚠️ NOT BUILT, each a decision rather than an oversight:
+ *   - DERIVATIVES — deferred with a named trigger (J25). One image per shot; `-t.jpg` by
+ *     convention off the same key when the grid is visibly slow, with rows lacking one falling
+ *     back to the full image. No schema change either way. Full reasoning is in J25; it is not
+ *     repeated here, because that is how this file got to 21,944 bytes.
+ *   - EXIF — `shot_at` is a parameter here and never derived. Reading it is capture.js's job
+ *     and MUST happen BEFORE the canvas re-encode (J16). ✅ VERIFIED ON REAL FILES 2026-08-01.
  */
 
 import { linkImage, photoOrder } from './links.js';
@@ -68,16 +55,12 @@ export const IMAGE_ROUTES = [
   'GET /images?scope=', 'GET /images?artwork=', 'GET /image/:id', 'POST /image'
 ];
 
-/* Q23 → C. Michael struck A, B, D and Other; C was the only survivor.
+/* Q23 → C. "Bring in all 177, but hide the non-matches behind a switch." The 177 are
+ * Anastasia's SHOP product photographs, mostly of prints Michael has never held — worth keeping
+ * as a reference wall, wrong as the first thing the Photos screen shows.
  *
- * "Bring in all 177, but hide the non-matches behind a switch." The 177 are Anastasia's SHOP
- * product photographs, and most are of prints he has never held — worth keeping as a reference
- * wall, and wrong as the first thing the Photos screen shows.
- *
- * ⭐ IMPLEMENTED WITH NO NEW COLUMN, because the fact is already stored. `image.kind` is
- * ('upload' | 'scrub' | 'reference') and already means exactly "whose bytes are these." An
- * `is_reference` flag would have been a SECOND CLAIMANT on a fact `kind` owns — the
- * duplicate-source disease this app exists to cure.
+ * ⭐ NO NEW COLUMN, because the fact is already stored: `image.kind` already means "whose bytes
+ * are these." An `is_reference` flag would have been a SECOND CLAIMANT on a fact `kind` owns.
  */
 const SCOPES = {
   mine:   "i.kind = 'upload'",
@@ -94,8 +77,7 @@ const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
  * 🔴 THIS LIST SHRANK WITH THE SPLIT AND THAT IS LOAD-BEARING, NOT TIDYING. The guard below
  * claims the route BEFORE checking the bucket (#666), so if the three link paths were still
  * listed here this file would claim routes it no longer implements, fall past the guard, and
- * return `null` from the bottom — which is the #666 shadowing bug wearing a different hat.
- * Each module's list names exactly what that module handles, and nothing else. */
+ * return `null` from the bottom — the #666 shadowing bug wearing a different hat. */
 const MINE = ['/images', '/image'];
 
 const intOrNull = v => (v == null || v === '' || isNaN(Number(v))) ? null : parseInt(v, 10);
@@ -113,63 +95,48 @@ export async function handleImage(ctx) {
    * This guard originally read `if (path !== '/images' && !bucket) return 503` — and worker.js
    * hands this function EVERY path. So on a worker with no R2 binding, `POST /artwork` would
    * have been answered "no R2 binding on this worker": the app's primary write, shadowed by a
-   * module it has nothing to do with, blaming a subsystem it never touches. #662 called a
-   * failed R2 deploy non-destructive; this guard would have made it a total outage.
-   *
-   * ⚠️ THE HEADER OF THIS FILE FORBIDS EXACTLY THAT: "A 404 here would shadow every other
-   * write." A guard placed BEFORE the route match IS a 404 for every path it does not
-   * recognise. The rule was written correctly by the same pass that broke it — which is why it
-   * was caught by reading the guard against worker.js's DISPATCH rather than against this
-   * file's own comment. A comment states intent; the dispatch is evidence.
+   * module it has nothing to do with. ⚠️ This file's own header forbids exactly that, three
+   * paragraphs above the code that did it. A guard placed BEFORE the route match IS a 404 for
+   * every path it does not recognise. Caught by reading the guard against worker.js's DISPATCH
+   * rather than against this file's comment: a comment states intent, the dispatch is evidence.
    */
   const isServe = method === 'GET' && path.startsWith('/image/');
   if (!isServe && !MINE.includes(path)) return null;
 
-  /* Only TWO routes actually touch R2 — the upload and the proxy. `GET /images` still answers
-   * with no binding at all, deliberately: the Photos screen and the carousel should render and
-   * say "no photos" rather than 503 over a config fact.
-   *
-   * A missing binding is a DEPLOYMENT fact, not a bug in this file. The plausible cause is a
-   * deploy whose API token had no R2 permission — which fails the deploy, so if you are seeing
-   * this at runtime the running worker is older than you think. */
+  /* Only TWO routes actually touch R2 — the upload and the proxy. `GET /images` answers with no
+   * binding at all, deliberately: the Photos screen and the carousel should render and say "no
+   * photos" rather than 503 over a config fact. A missing binding is a DEPLOYMENT fact; the
+   * plausible cause is a deploy whose token had no R2 permission, which fails the deploy — so
+   * if you are seeing this at runtime the running worker is older than you think. */
   if ((isServe || (path === '/image' && method === 'POST')) && !bucket) {
     return reply({ ok: false, error: 'no R2 binding on this worker',
       fix: 'wrangler.toml needs [[r2_buckets]] binding = "BUCKET", then a redeploy. If it IS already in the file, the last deploy FAILED — check the Actions run rather than editing the config again.' }, 503);
   }
 
   /* ============================================================ GET /images?artwork=
-   * ⭐ THE CAROUSEL READ. Added 2026-08-01 (v22, Q25 → A). Every photograph of one print, in
-   * the order the app displays them.
+   * ⭐ THE CAROUSEL READ (v22, Q25 → A). Every photograph of one print, in display order.
    *
-   * 🔴 IT IS THE SAME QUERY AS THE BINDER CARD, WITHOUT THE `LIMIT 1`. `reads.js` wraps
-   * `photoOrder()` in a correlated scalar subquery to pick one; this runs it as a list. **That
-   * is what makes the card photo the carousel's FIRST FRAME — structurally, not by agreement.**
-   * If the binder ever shows photo X and this opens on photo Y, someone forked the ordering,
-   * and the fix is to un-fork it rather than to add a rule about keeping them in step.
+   * 🔴 IT IS THE BINDER CARD'S QUERY WITHOUT THE `LIMIT 1`. `reads.js` wraps the same
+   * `photoOrder()` in a scalar subquery to pick one; this runs it as a list. **That is what
+   * makes the card photo the carousel's FIRST FRAME — structurally, not by agreement.** If the
+   * binder shows photo X and this opens on photo Y, someone forked the ordering; un-fork it
+   * rather than adding a rule about keeping them in step. Terms are documented once, in
+   * `links.js` → photoOrder.
    *
-   * 🔴 WHY `?artwork=` AND NOT THE `?edition=` THAT WAS ORIGINALLY LOCKED. Q25 → A, and the
-   * reason is a schema fact that was not in front of anyone when the rule was written: this
-   * ranking correlates on `edition.artwork_id`, so the card is chosen across EVERY printing of
-   * a print, while `edition_image.sort` and the retired `is_primary` are per-PRINTING. The page
-   * asking the question is `#artwork?id=` — an ARTWORK. Key the carousel to the edition and the
-   * day a reprint is entered (J19 says that day is coming) the card can show a photograph the
-   * carousel does not contain. Two surfaces disagreeing about which photograph a print IS is
-   * the exact disease this app was rebuilt to cure. Keyed to the page, it cannot happen.
+   * 🔴 `?artwork=`, NOT THE `?edition=` ORIGINALLY LOCKED (Q25 → A). The ranking correlates on
+   * `edition.artwork_id`, so the card is chosen across every PRINTING; `sort` is per-printing;
+   * and the page asking is `#artwork?id=`. Key this to the edition and the day a reprint exists
+   * (J19 says it is coming) the card can show a photo the carousel does not contain. Keyed to
+   * the page, that is unreachable. ⚠️ No `?edition=` alongside it: a filter with no caller is a
+   * fact with no claimant, and it is one WHERE clause on the day something needs it.
    *
-   * ⚠️ NO `?edition=` ALONGSIDE IT, deliberately. A filter with no caller is a fact with no
-   * claimant, and this log carries four separate entries about things that rotted for exactly
-   * that reason. It is one WHERE clause on the day something actually needs it.
+   * ⭐ AND IT IS THE DEPLOY'S ACCEPTANCE TEST. #679 was a verbatim move — no live read could
+   * tell the new worker from the old, so "deployed" was unverifiable. This is the first route
+   * that answers differently: the old worker ignores the parameter and returns the unassigned
+   * grid, which is a visibly different response, not a subtly different one.
    *
-   * ⭐ AND IT IS THE DEPLOY'S ACCEPTANCE TEST, which the app has needed twice now and lacked
-   * both times. PR #679 was a verbatim move: no live read could distinguish the new worker from
-   * the old one, so "deployed" was unverifiable from outside. This is the first route that
-   * behaves differently. `?artwork=<id>` answering with a `photos` array means the deploy
-   * landed; the old worker ignores the parameter and returns the unassigned grid instead —
-   * which is a visibly different answer, not a subtly different one.
-   *
-   * Returns `edition_id` on every row because attaching, unlinking and starring are all
-   * per-printing writes: the client would otherwise have to look up which printing a photo is
-   * on before it could do anything with it.
+   * `edition_id` rides on every row because attaching, unlinking and starring are all
+   * per-printing writes.
    */
   if (path === '/images' && method === 'GET' && (url.searchParams.get('artwork') || '').trim()) {
     const artworkId = url.searchParams.get('artwork').trim();
@@ -196,10 +163,10 @@ export async function handleImage(ctx) {
    * The Photos surface. UNASSIGNED IS THE DEFAULT VIEW (Q19 + J15) — the backlog is the first
    * thing you see, the same argument that made the shoe-box the shoe-box.
    *
-   * ⚠️ `is_primary_anywhere` IS NOW MEANINGLESS AND IS KEPT ONLY BECAUSE `photos.js` READS IT.
-   * Q26 retired `is_primary` from the display ranking in favour of `edition_image.sort`, so this
-   * column can only ever report 0 on anything written since v22. It comes out when photos.js is
-   * next touched, and the column itself goes with migration 002. Do not build on it.
+   * ⚠️ `is_primary_anywhere` IS NOW MEANINGLESS and is kept only because `photos.js` reads it.
+   * Q26 retired `is_primary` from the display ranking in favour of `edition_image.sort`, so it
+   * can only report 0 on anything written since v22. Out when photos.js is next touched; the
+   * column goes with migration 002. Do not build on it.
    */
   if (path === '/images' && method === 'GET') {
     const asked = url.searchParams.get('scope');
