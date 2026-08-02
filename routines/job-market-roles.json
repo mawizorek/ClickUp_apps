@@ -1,8 +1,8 @@
 {
   "_meta": {
     "description": "Gate config for job-market-refresh. Each entry = one full research loop iteration.",
-    "version": 1,
-    "updated": "2026-07-31"
+    "version": 2,
+    "updated": "2026-08-02"
   },
   "global": {
     "geography": "anywhere",
@@ -10,7 +10,7 @@
     "include_remote": true,
     "include_part_time": true,
     "include_contract": true,
-    "exclude_academic": true,
+    "exclude_academic": false,
     "exclude_overhire": true,
     "exclude_internships": true
   },
@@ -28,7 +28,9 @@
         "assistant production manager",
         "production coordinator",
         "production supervisor",
-        "operations manager venue"
+        "operations manager venue",
+        "touring production manager",
+        "event production manager"
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["manufacturing", "industrial", "logistics", "factory", "warehouse", "supply chain"],
@@ -83,6 +85,84 @@
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["residential", "commercial electrician", "HVAC", "construction", "lineman"],
+      "constraints": {}
+    },
+    {
+      "id": "operations-safety",
+      "display": "Operations & Safety",
+      "lane": "OPS",
+      "keywords": [
+        "safety coordinator",
+        "safety manager",
+        "health and safety officer",
+        "venue operations manager",
+        "venue operations director",
+        "facilities director performing arts",
+        "event operations manager",
+        "production safety",
+        "risk manager performing arts",
+        "house manager",
+        "front of house manager"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["construction safety", "mining", "oil and gas", "food safety"],
+      "constraints": {}
+    },
+    {
+      "id": "audio-sound",
+      "display": "Audio / Sound",
+      "lane": "AUD",
+      "keywords": [
+        "audio supervisor",
+        "head of sound",
+        "sound engineer theatre",
+        "A1",
+        "A2",
+        "sound designer",
+        "production audio engineer",
+        "audio technician live events"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["podcast", "recording studio", "music producer", "radio"],
+      "constraints": {}
+    },
+    {
+      "id": "drafting-design",
+      "display": "Drafting / Design Support",
+      "lane": "DFT",
+      "keywords": [
+        "draftsperson",
+        "CAD drafter theatre",
+        "scenic designer assistant",
+        "associate scenic designer",
+        "props master",
+        "scenic artist",
+        "scenic charge",
+        "technical draftsperson",
+        "Vectorworks drafter"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["architectural drafter", "civil", "mechanical CAD", "structural"],
+      "constraints": {}
+    },
+    {
+      "id": "creative-admin",
+      "display": "Creative Administration",
+      "lane": "ADM",
+      "keywords": [
+        "arts administrator",
+        "creative producer",
+        "institutional coordinator",
+        "program manager arts",
+        "managing director theatre",
+        "general manager theatre",
+        "company administrator",
+        "producing director",
+        "executive director performing arts",
+        "development director theatre"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["office administrator", "dental", "medical", "church administrator"],
       "constraints": {}
     }
   ]
