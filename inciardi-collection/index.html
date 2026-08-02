@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Inciardi Collection — v21. THE SHELL. Markup + script tags. Nothing else.
+<!-- Inciardi Collection — v22. THE SHELL. Markup + script tags. Nothing else.
 
      ============================================================================
      🔴 THE MODULE MAP, and the two rules that produced it.
@@ -12,81 +12,83 @@
      RULE 2 — **`index.html` is an INDEX** (architecture lock, 2026-07-08): a thin shell that
      references pages, never a file storing servable content.
 
-     ⚠️ EVERY NUMBER BELOW WAS MEASURED FROM A DIRECTORY LISTING, NOT ESTIMATED. v17 shipped this
-     map with guessed sizes and three were wrong by 3-5KB. **A size map with invented numbers is
-     worse than no map, because the whole point of it is deciding when to split, and a guess reads
-     exactly like a measurement.** Re-measure when you touch this. (This file does not list its
-     own size: a file cannot state its own length without being wrong the moment it does.)
+     ⚠️ EVERY NUMBER BELOW WAS READ FROM A DIRECTORY LISTING, NOT ESTIMATED — and at v22 that
+     stopped being a formality. TWO ENTRIES IN THE v21 MAP WERE ALREADY WRONG: `images.js` was
+     listed at 21.0KB when it was 21,455, and `reads.js` at 19.8KB when it was 20,302. Both
+     understated, both in the direction that DELAYS a split. **A size map with invented numbers
+     is worse than no map, because the whole point of it is deciding when to split, and a guess
+     reads exactly like a measurement.** Re-measure when you touch this. (This file does not list
+     its own size: a file cannot state its own length without being wrong the moment it does.)
 
        device.js    2.9KB  mobile vs desktop, one owner     → Device
-       app.js       5.4KB  routing only                     → App
-       picker.js    6.6KB  the slot entry surface           → Picker
        sheets.js    6.3KB  reorder · rename · add           → Sheets
+       app.js       6.4KB  routing only                     → App
+       picker.js    6.6KB  the slot entry surface           → Picker
        enter.js     8.1KB  entry form + shoe-box            → Enter, Shoebox
        settings.js  9.2KB  the settings panel               → Settings
        core.js      9.6KB  API client · Drawer · helpers    → API, Core, Drawer
-       artwork.js  10.6KB  one print, in full               → Artwork
        batch.js    10.9KB  loads + VALIDATES a batch file   → Batch
-       photos.js   12.5KB  the photo bank, unassigned first → Photos
-       capture.js  11.9KB  shoot · re-encode · upload       → Capture
        chrome.js   12.2KB  header · nav · scrim · footer    → Chrome
+       photos.js   12.5KB  the photo bank, unassigned first → Photos
        preview.js  12.9KB  the back room's markup           → Preview
+       viewer.js   13.4KB  🆕 one photograph, full screen   → Viewer
+       capture.js  14.3KB  shoot · re-encode · upload       → Capture
        arrange.js  15.8KB  WHERE each print sits, editable  → Arrange       ⚠️ over the line
        binder.js   16.4KB  the stage, faces, turning        → Binder         ⚠️ over the line
        backroom.js 16.5KB  choose · read · decide · write   → Backroom      ⚠️ over the line
-       boot.js     17.7KB  config · theme · router · settings wiring · diagnostics  ⚠️ over
+       boot.js     18.2KB  config · theme · router · settings · diagnostics ⚠️ over the line
+       artwork.js  19.6KB  one print, in full + the carousel → Artwork       ⚠️ over the line
 
        styles.css   1.2KB  pointers only, zero colour literals
        sheets.css   3.5KB  sheet list · legend
-       photos.css   5.1KB  the grid · scope chips · photo drawer
-       artwork.css  8.4KB  the print page + the picker's door to it
+       photos.css   5.3KB  the grid · scope chips · photo drawer
+       viewer.css   5.4KB  🆕 the full-screen overlay
        summary.css 10.5KB  the matrix
+       artwork.css 12.7KB  the print page · carousel · filmstrip · attach panel
        chrome.css  13.2KB  header · drawers · footer
        base.css    14.7KB  type · forms · lists · toasts · touch-action
-       backroom.css 16.3KB headline · arrangement grid · validator · verdict table · log ⚠️ over
+       backroom.css 16.3KB headline · arrangement grid · validator · verdict · log ⚠️ over
        binder.css  16.6KB  stage · cards · deck bar · the card photograph  ⚠️ over the line
 
        worker/sheets.js  8.1KB  binder mechanics: create · rename · reorder
-       worker/adopt.js  11.3KB  the legacy 177 import + the bucket diagnostic
-       worker/worker.js 16.7KB  the gate · the dispatch table · artwork/copy/slot writes
-       worker/reads.js  19.8KB  the seven GET routes + CARD_IMAGE            🔴 SEE BELOW
-       worker/images.js 21.0KB  upload · serve · list · assign · primary · archive  🔴 SEE BELOW
+       worker/adopt.js  11.6KB  the legacy 177 import + the bucket diagnostic
+       worker/links.js  16.2KB  attach · put-on-the-card · archive + photoOrder()  ⚠️ over
+       worker/worker.js 17.9KB  the gate · the dispatch table · artwork/copy/slot writes
+       worker/images.js 19.4KB  upload · serve · the grid · the carousel read
+       worker/reads.js  19.4KB  the seven GET routes + the card image
 
-     🔴 TWO WORKER FILES ARE NOW WITHIN TOUCHING DISTANCE OF THE CEILING, AND BOTH GOT THERE ON
-     COMMENT WEIGHT — the fourth and fifth instances of that in this app in three days.
+     ✅ ~~TWO WORKER FILES ARE WITHIN TOUCHING DISTANCE OF THE CEILING~~ — RESOLVED at v22 and
+     struck rather than deleted, because a warning that describes a fixed problem sends the next
+     session to repair something already repaired. `images.js` was 21,455 with ~545 bytes of
+     headroom and is now 19,419; `reads.js` was 20,302 and is now 19,443. Both got there the same
+     way: the ordering rationale that was duplicated across them became ONE exported function
+     (`photoOrder()` in `worker/links.js`) and the long-form reasoning moved to the Decision Log.
+     ⭐ Worth keeping as a technique — the fix for a file that is too big is not always a split.
+     Sometimes it is noticing the file is carrying reasoning that already has a home.
 
-       `worker/images.js` — **21,455 bytes**, ~545 of headroom. The commit that shipped it claimed
-       "~20.6KB", a number estimated rather than read back, in a commit whose subject was
-       repairing a different file for being over the line. Seam: the three JSON writes (`assign`,
-       `primary`, `archive`) share nothing with the byte paths but a route prefix →
-       `worker/links.js`.
+     🔴 v22 — THE CAROUSEL, AND ONE ORDERING WITH ONE OWNER.
+     A print's own page finally shows its photographs: hero, filmstrip, full-screen viewer,
+     camera, and a picker for attaching a photo you already took. **Q16's condition — accepted
+     2026-07-25, unbuilt for seven days — is met.**
+     🔴 THE FIRST FRAME IS THE BINDER CARD'S PHOTO, STRUCTURALLY. `GET /images?artwork=` runs the
+     same `photoOrder()` the card runs, with the `LIMIT 1` taken off. Nothing on the client sorts
+     that list and nothing may start: a client-side ordering is the second claimant that lets two
+     surfaces disagree about which photograph a print IS.
+     🔴 ⭐ IS NOW A VERB, NOT A STATE (Q26, Michael: *"can starring it just push it to top? so its
+     an undoable trigger and not a state? derivable is best"*). `is_primary` is retired from the
+     ranking in favour of `edition_image.sort`; "put on the card" writes MIN(sort)-1 and you undo
+     it by putting a different photo there. The column is not dropped — that is migration 002 —
+     but nothing reads it and nothing writes a 1.
+     ⚠️ `GET /images` still returns `is_primary_anywhere` and it is now MEANINGLESS. `photos.js`
+     reads it; that is the next UI touch, not this one.
+     ⚠️ PINCH-ZOOM: `viewer.js` abandons swipe tracking the instant a second finger appears, and
+     calls `preventDefault` nowhere. J17 protected pinch for exactly this screen; do not undo it
+     from the JavaScript side.
 
-       `worker/reads.js` — **20,302 bytes**, up from 15,824. CARD_IMAGE and its reasoning cost
-       4.5KB. Seam: `/summary` and `/shoebox` are ~9KB of collection-wide arithmetic and share
-       nothing with `/slots` or `/editions` except the helper → `worker/collection-reads.js`.
-
-     **DO NOT ADD A ROUTE TO EITHER FILE WITHOUT MEASURING IT FIRST.** That is the rule two
-     self-caught breaches paid for on 08-01, and it is cheaper than the split that follows it.
-
-     ⚠️ SEVEN FRONT-END FILES ARE OVER THE 15KB SPLIT LINE, all still under the 22KB ceiling — so
-     all seven read whole and edit safely, which is the line that actually matters. Named seams:
-       boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern).
-                     The most overdue split in the front end, and now two versions older.
-       binder.css  → `card.css` (the .slot block is a third of the file)
-       backroom.css → `arrange.css` (the grid block is self-contained)
-       arrange.js  → nothing yet. One feature, mostly comment; trim before splitting.
-       backroom.js → PLAN vs APPLY. ⚠️ DODGED FIVE TIMES (v15, v17, v19, v20, v21). The stated
-                     reason — never refactor the write path on a day someone is about to use it —
-                     is real and does not expire. It is also the longest-standing debt in the app.
-
-     🔴 v21 — THE PHOTOGRAPH REACHES THE BINDER, AND THE RULE BEHIND IT IS MICHAEL'S.
+     🔴 v21 — THE PHOTOGRAPH REACHED THE BINDER, and the rule behind it is Michael's:
      *"if a photo is the ONLY photo attached, it should be the default render even if not
-     selected."* That is a DERIVE where the proposed alternative (write `is_primary` on first
-     attach) was a WRITE — rung 1 against rung 2 — and it cannot fall out of date with its own
-     inputs. Implemented as `CARD_IMAGE` in `worker/reads.js`: explicit ⭐ wins, else a photo on
-     ONE print beats a photo on nine, else the newest. The middle clause makes a pack shot
-     structurally lose to a standalone the moment one is shot, with nothing tapped — which is the
-     workflow he described, automatic, and it needed no new column.
+     selected."* A DERIVE where the proposal was a WRITE — rung 1 against rung 2 — and it cannot
+     fall out of date with its own inputs.
      ⚠️ The card's `<img>` STACKS OVER the initials rather than replacing them, so a failed image
      reveals the letters instead of a grey box. Do not "tidy" that away; it is the only fallback.
      ⚠️ A `wanted` slot renders NO photograph on purpose — see `binder.css`. Filling the ghost
@@ -98,14 +100,27 @@
      ⚠️ `capture.js` reads EXIF `shot_at` BEFORE the canvas re-encode, because the re-encode strips
      GPS — which is the point — and takes the capture date with it, permanently and invisibly
      (J16). ✅ Verified on Michael's first six real uploads: six true 07-25 capture dates.
-     ⚠️ STILL NOT BUILT: the carousel on a print's own page. `artwork.js` is untouched, so
-     `#artwork?id=` still renders the sized empty block v19 left for it.
 
      🔴 THREE ROUTE CLASSES, and the third exists because the other two are both MENUS.
      `APP.nav` draws the drawer; `APP.hidden` draws the settings footer link; **`APP.detail` draws
      nowhere** — a detail route needs a param, so any menu row pointing at one is permanently
      broken. All three must be listed in boot.js's `routes` or the router silently falls back to
      the binder, and all three must be titled in chrome.js or the header shows the app name.
+
+     ⚠️ SEVEN FRONT-END FILES ARE OVER THE 15KB SPLIT LINE, all still under the 22KB ceiling — so
+     all seven read whole and edit safely, which is the line that actually matters. Named seams:
+       boot.js     → `diag.js` (bundle + ping + copy are a self-contained reporting concern).
+                     The most overdue split in the front end, and now three versions older.
+       artwork.js  → `artphotos.js` (the carousel, the filmstrip and the two add paths are
+                     self-contained). NEW at v22 and not urgent at 19.6KB, but it is the file
+                     that grew most this version and the seam is clean.
+       binder.css  → `card.css` (the .slot block is a third of the file)
+       backroom.css → `arrange.css` (the grid block is self-contained)
+       arrange.js  → nothing yet. One feature, mostly comment; trim before splitting.
+       backroom.js → PLAN vs APPLY. ⚠️ DODGED FIVE TIMES (v15, v17, v19, v20, v21). ✅ The
+                     PATTERN is finally decided — Q27 → A ruled two taps, Preview then Import,
+                     for the back room's adopt button — so the next person to open this file has
+                     a house shape to build against instead of a fresh argument.
 
      🔴 HOW IT WENT WRONG ORIGINALLY, because the mechanism matters more than the numbers: v4 added
      the sheet menu, v5 the stage, v6 traversal, v7 the shoe-box split — four reasonable changes,
@@ -117,11 +132,12 @@
 
      ⚠️ BUMP `?v=` ON BOTH CSS AND JS. Housekeeping at v17, load-bearing at v18 (the whole change
      was a stylesheet), at v19 (a cached `boot.js` had no `APP.detail`), at v20 (no `photos`
-     route), and again at v21: a cached `binder.js` has no image render and a cached `binder.css`
-     has no `.shot` rule, so the photograph would simply not appear and would read as a broken
-     feature rather than a stale asset. The build stamp in the footer is how a screenshot says
-     which code is running — and `boot.js` → `version` must be bumped in the SAME commit as this
-     comment, because v17 shipped with the two disagreeing.
+     route), at v21 (a cached `binder.js` had no image render), and again at v22: a cached
+     `artwork.js` has no carousel and a cached `artwork.css` has no `.aw-hero` rule, so the
+     photographs would simply not appear and would read as a broken feature rather than a stale
+     asset. The build stamp in the footer is how a screenshot says which code is running — and
+     `boot.js` → `version` must be bumped in the SAME commit as this comment, because v17 shipped
+     with the two disagreeing.
 
      ⚠️ STILL NOT BUILT: no `manifest.webmanifest`, no `apple-mobile-web-app-capable`. A
      home-screen icon today opens in the browser WITH its address bar, and Android will not offer
@@ -132,7 +148,8 @@
 <meta charset="utf-8">
 <!-- ⚠️ DO NOT ADD `maximum-scale` OR `user-scalable=no` HERE. See the v18 note in git history: the
      zoom misfire is solved in base.css with `touch-action`, and a viewport scale lock is both
-     ineffective on iOS and an accessibility regression everywhere else. -->
+     ineffective on iOS and an accessibility regression everywhere else. As of v22 there is a
+     second reason: the full-screen photo viewer is the surface pinch-zoom exists FOR. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Mercedes surface-1. Paints the iOS browser chrome; settings.js moves it with the mode toggle,
      reading the resolved token rather than a hardcoded hex. -->
@@ -144,20 +161,23 @@
 <meta name="description" content="A digital twin of the mini-print binder: sheets, faces, slots.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128213;</text></svg>">
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./base.css?v=21">
-<link rel="stylesheet" href="./chrome.css?v=21">
-<link rel="stylesheet" href="./binder.css?v=21">
-<link rel="stylesheet" href="./sheets.css?v=21">
-<link rel="stylesheet" href="./summary.css?v=21">
-<link rel="stylesheet" href="./backroom.css?v=21">
-<link rel="stylesheet" href="./artwork.css?v=21">
-<link rel="stylesheet" href="./photos.css?v=21">
+<link rel="stylesheet" href="./base.css?v=22">
+<link rel="stylesheet" href="./chrome.css?v=22">
+<link rel="stylesheet" href="./binder.css?v=22">
+<link rel="stylesheet" href="./sheets.css?v=22">
+<link rel="stylesheet" href="./summary.css?v=22">
+<link rel="stylesheet" href="./backroom.css?v=22">
+<link rel="stylesheet" href="./artwork.css?v=22">
+<link rel="stylesheet" href="./photos.css?v=22">
+<link rel="stylesheet" href="./viewer.css?v=22">
 </head>
 <body>
 <a class="skip-link" href="#view">Skip to content</a>
 
 <!-- chrome.js fills these three. The nav drawer, settings drawer and scrim are appended to <body>
-     by chrome.js and settings.js, so they are not in this file either. -->
+     by chrome.js and settings.js, so they are not in this file either. The full-screen photo
+     viewer appends ITSELF to <body> for the same reason — a route change replaces #view, and an
+     overlay that dies with its parent leaves its scroll lock behind. -->
 <header id="appHeader"></header>
 <main id="view" tabindex="-1"></main>
 <footer id="appFooter"></footer>
@@ -176,29 +196,30 @@
      four in NEEDS, and backroom.js refuses to render without them, naming the missing file.
      ⚠️ artwork.js is reached by LINK, never by menu, so a 404 on it shows up as a broken tap from
      the picker rather than a missing nav row. app.js names it in NEEDS for exactly that reason.
-     ⚠️ capture.js BEFORE photos.js, and it is not alphabetical politeness: `Photos.mount()` wires
-     the Add-photos button straight to `Capture.pick`, and app.js names Capture in the photos
-     route's NEEDS so a 404 on it reports the file instead of rendering a button that does
-     nothing. It is also the shared half — the print page's own camera button will call the same
-     module, which is why it is not folded into photos.js. -->
+     ⚠️ viewer.js AND capture.js BEFORE artwork.js and photos.js, and it is not alphabetical
+     politeness: both screens call straight into them, and app.js names all four in NEEDS so a
+     404 reports the FILE rather than rendering a control that silently does nothing. viewer.js
+     is the shared one — the print page and the Photos grid open the same overlay, which is what
+     Q28's "single source with access across the board" rules out doing twice. -->
 <script src="../shared/themes/resolve.js"></script>
-<script src="./device.js?v=21"></script>
-<script src="./core.js?v=21"></script>
-<script src="./chrome.js?v=21"></script>
-<script src="./settings.js?v=21"></script>
-<script src="./binder.js?v=21"></script>
-<script src="./sheets.js?v=21"></script>
-<script src="./picker.js?v=21"></script>
-<script src="./enter.js?v=21"></script>
-<script src="./summary.js?v=21"></script>
-<script src="./batch.js?v=21"></script>
-<script src="./arrange.js?v=21"></script>
-<script src="./preview.js?v=21"></script>
-<script src="./backroom.js?v=21"></script>
-<script src="./artwork.js?v=21"></script>
-<script src="./capture.js?v=21"></script>
-<script src="./photos.js?v=21"></script>
-<script src="./app.js?v=21"></script>
-<script src="./boot.js?v=21"></script>
+<script src="./device.js?v=22"></script>
+<script src="./core.js?v=22"></script>
+<script src="./chrome.js?v=22"></script>
+<script src="./settings.js?v=22"></script>
+<script src="./binder.js?v=22"></script>
+<script src="./sheets.js?v=22"></script>
+<script src="./picker.js?v=22"></script>
+<script src="./enter.js?v=22"></script>
+<script src="./summary.js?v=22"></script>
+<script src="./batch.js?v=22"></script>
+<script src="./arrange.js?v=22"></script>
+<script src="./preview.js?v=22"></script>
+<script src="./backroom.js?v=22"></script>
+<script src="./viewer.js?v=22"></script>
+<script src="./capture.js?v=22"></script>
+<script src="./artwork.js?v=22"></script>
+<script src="./photos.js?v=22"></script>
+<script src="./app.js?v=22"></script>
+<script src="./boot.js?v=22"></script>
 </body>
 </html>
