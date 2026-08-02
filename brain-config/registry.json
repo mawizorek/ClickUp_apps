@@ -1,16 +1,18 @@
 {
   "_RETIRED": "2026-07-25",
-  "_READ_THIS_INSTEAD": "brain-config/super-agents/roster.json",
-  "_why": "This file was a BOOTSTRAP MANIFEST generated 2026-07-04, hand-authored from agents/*.md front-matter — eleven days before git-teammates existed (super-agents/ landed 2026-07-15). It could not describe the current fleet because the architecture it described predates it. roster.json was then built 2026-07-24 as the canonical combined roster of the ENTIRE fleet, which left TWO files both claiming canonical. Michael's ruling 2026-07-25: ONE documented source. That is roster.json.",
+  "_READ_THIS_INSTEAD": "The ClickUp list 🤖 Agent Index (list id 901328043244) — one task per agent, both classes. Resolve per gates/agent-invocation-gate.md STEP 0.",
+  "_redirect_corrected": "2026-08-01. This field used to read 'brain-config/super-agents/roster.json' — which was ITSELF retired to a tombstone stub on 2026-07-30, five days after this file. A reader obeying both redirects landed nowhere, twice. A tombstone pointing at a tombstone is worse than no tombstone: it looks like a live trail. THE LESSON: when you retire a file, sweep the redirects AIMED at it in the same pass, including the ones inside other tombstones.",
+  "_why": "This file was a BOOTSTRAP MANIFEST generated 2026-07-04, hand-authored from agents/*.md front-matter — eleven days before git-teammates existed (super-agents/ landed 2026-07-15). It could not describe the current fleet because the architecture it described predates it. roster.json was then built 2026-07-24 as the canonical combined roster of the ENTIRE fleet, which left TWO files both claiming canonical. Michael's ruling 2026-07-25: ONE documented source.",
   "_also": "By 2026-07-25 this file had grown to ~29KB and could not be read back whole by ANY path — base64 inflated it past the ~30KB blob-API cap, and the raw path served a cache-frozen ~10KB copy instead of the real blob. It was therefore unreadable, unverifiable, and unsafe to rewrite. A source of truth nobody can open is not a source of truth. Its full pre-retirement content is preserved in git history at the commit before this stub.",
+  "_the_pattern_this_file_is_evidence_of": "FOUR manifests have now been retired for the same reason: registry.json (07-25), superagents.json (renamed 07-24 then retired), roster.json and roster.html (07-30). Every one of them was a table simulated by a text file that had to be read WHOLE on every lookup. The structural fix was not a smaller file, it was a LIST — a list has fields, and fields refuse essays. Do not propose a fifth.",
   "_where_its_contents_went": {
     "lens role text": "agents/<slug>.md front-matter — which THIS file's own header already called canonical",
-    "one-line lane + status + invocation for every agent": "super-agents/roster.json (the single flat list)",
+    "one-line lane + status + invocation for every agent": "the 🤖 Agent Index ClickUp list, one task per agent",
     "teams[] membership": "brain-config/teams/ + council.md",
     "domain_procedures[]": "the AI Toolkit index Quick-Scan trigger table",
     "session_commands": "super-agents/_shared/super-agent-base.md — the command-grammar table",
     "changelog": "git history + PR descriptions (already the standing rule: what-changed history is git + PR, never an inline changelog)"
   },
-  "_mirror_pair_mandate": "RETIRED with this file. The 2026-07-17 Mirror-Pair Sync Mandate required reconciling this file against the AI Toolkit index roster on every touch. There is no pair anymore, so there is no sync obligation: update roster.json, and keep the AI Toolkit index's behavioral trigger rows current. Do not resurrect a second manifest to 'mirror' the roster — that duplication is exactly what was retired here.",
-  "_do_not": "Do not regenerate, extend, or read this file as fleet data. If something still points here, repoint it at roster.json. Kept as a loud stub rather than deleted so a stale pointer fails visibly instead of silently serving a 2026-07-04 view of the world."
+  "_mirror_pair_mandate": "RETIRED with this file. The 2026-07-17 Mirror-Pair Sync Mandate required reconciling this file against the AI Toolkit index roster on every touch. There is no pair anymore, so there is no sync obligation: keep the Agent Index current and keep the AI Toolkit index's behavioral trigger rows current. Do not resurrect a manifest to 'mirror' the list — that duplication is exactly what was retired here.",
+  "_do_not": "Do not regenerate, extend, or read this file as fleet data. If something still points here, repoint it at the Agent Index. Kept as a loud stub rather than deleted so a stale pointer fails visibly instead of silently serving a 2026-07-04 view of the world."
 }
