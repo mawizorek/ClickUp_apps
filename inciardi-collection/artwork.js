@@ -10,13 +10,13 @@
  * was folded into the descriptor as settled and **the condition was never built** — no artwork
  * route, no edition route, no upload control anywhere in the app for six days (J11).
  *
- * The generalizable half, worth more than the page: **a conditional answer whose condition is a
- * build step needs that step written down AS A STEP**, or the condition quietly becomes an
- * assumption that everything downstream rests on.
+ * ✅ AS OF v22 THE CONDITION IS FINALLY MET, seven days after it was accepted. The
+ * generalizable half is still worth more than the page: **a conditional answer whose condition
+ * is a build step needs that step written down AS A STEP**, or the condition quietly becomes an
+ * assumption everything downstream rests on.
  *
  * WHY A ROUTE AND NOT A DRAWER. Michael struck the bottom-sheet option (Q16 C) even though it
- * was the fastest to build, so **linkability beat speed** — consistent with v7's deep links. A
- * print is now addressable: you can send yourself a link to Choco Taco.
+ * was the fastest to build, so **linkability beat speed** — consistent with v7's deep links.
  * ============================================================================
  *
  * 🔴 IT READS `/summary`, AND THAT IS A DESIGN DECISION, NOT LAZINESS.
@@ -28,12 +28,25 @@
  * artworks that is one small JSON. **If it ever gets slow, the fix is a route that SELECTS from
  * the same view, never a second calculation.**
  *
- * ⚠️ NO PHOTOS HERE YET, DELIBERATELY. The carousel, the filmstrip and the upload button are
- * `next-build-spec.md` steps 5 + 8, and they are blocked on an R2 bucket binding and the image
- * routes. This page ships the empty state INSTEAD OF the button, because a control that 500s is
- * worse than an honest gap — and the gap is where they land, unchanged, when the pipe exists.
+ * 🔴 AND THE PHOTOGRAPHS COME FROM `GET /images?artwork=`, WHICH IS THE SAME RULE AGAIN.
+ * That route runs the identical ranking the binder card uses (`photoOrder()` in
+ * `worker/links.js`) with the `LIMIT 1` taken off. **So the first frame of the carousel IS the
+ * photo on the binder card — structurally, not by agreement.** Nothing in this file sorts,
+ * filters or re-orders that list, and nothing in it may start: a client-side ordering here is
+ * the second claimant that would let the binder and this page disagree about which photograph a
+ * print IS. Render what arrives, in the order it arrives.
+ *
+ * ⚠️ SIZE: 17.9KB at v22 — over the 15KB split line, under the 22KB ceiling, so it still reads
+ * whole. If it grows again the seam is the photo block: `photos()`, `strip()` and the two add
+ * paths are self-contained and would go to `artphotos.js`. The full-screen viewer already left
+ * (`viewer.js`), which is what kept this file under the ceiling in the first place.
  */
 (function () {
+
+  /* One print's worth of state, so a write can repaint the photo block alone. Re-running the
+   * page's three other reads to redraw a filmstrip would cost four round trips and scroll the
+   * reader back to the top of a print they were in the middle of looking at. */
+  var cur = { id: '', name: '', editions: [], photos: [] };
 
   function esc(s) { return Core.esc(String(s == null ? '' : s)); }
 
@@ -89,8 +102,7 @@
   /* ---------- editions ----------
    * 🔴 AN IMPLICIT EDITION IS NEVER RENDERED AS A BADGE. schema.sql is explicit: implicit=1 means
    * the row exists because the ARTWORK exists, not because Anastasia numbered anything. Printing
-   * "#1" on Luna Moth is the phantom-badge bug the predecessor shipped. It is named here as
-   * structural, so a reader knows the row is real and the number is not. */
+   * "#1" on Luna Moth is the phantom-badge bug the predecessor shipped. */
   function editions(list) {
     if (!list.length) return '';
     var rows = list.map(function (e) {
@@ -103,21 +115,172 @@
     return '<h2 class="aw-h">Editions</h2><ul class="aw-eds">' + rows + '</ul>';
   }
 
-  /* ---------- photos: the honest gap ----------
-   * Shipping the empty state rather than a disabled button, for the same reason the back room
-   * renders NO run button on an invalid batch: a disabled control says "there is a way to make
-   * this go," and there is not one yet. */
+  /* ============================================================ THE PHOTOGRAPHS (v22)
+   * The block v19 sized and left empty, filled with what it was sized for.
+   *
+   * 🔴 RENDERED IN ARRIVAL ORDER. No sort here, ever. See the file header.
+   */
   function photos() {
-    return '<h2 class="aw-h">Photographs</h2>' +
-      '<div class="aw-photos">' +
-        '<p><b>None yet, and there is no way to add one from here.</b></p>' +
-        '<p class="aw-note">The image table is live in D1 and the pipe is designed end to end — ' +
-        'it needs an R2 binding and the upload routes. Scope and order: ' +
-        '<code>next-build-spec.md</code> steps 5 and 8. This block is where the carousel, the ' +
-        'filmstrip and the ⭐ primary toggle land, unchanged.</p>' +
+    var list = cur.photos || [];
+    var add =
+      '<div class="aw-pacts">' +
+        '<button type="button" class="primary" id="awShoot">\ud83d\udcf7 Photograph this print</button>' +
+        '<button type="button" id="awAttach">Attach one you already took</button>' +
       '</div>';
+
+    if (!list.length) {
+      /* Still an honest empty state, but no longer a dead end — the two controls that fill it
+       * are right there. v19 shipped the gap INSTEAD OF a button because the routes did not
+       * exist; they do now, so the gap becomes an invitation. */
+      return '<h2 class="aw-h">Photographs</h2>' +
+        '<div class="aw-photos"><p><b>No photographs of this print yet.</b></p>' +
+        '<p class="aw-note">Shoot it, or attach something already in Photos — a pack shot can ' +
+        'sit on several prints at once.</p></div>' + add;
+    }
+
+    var hero = list[0];
+    return '<h2 class="aw-h">Photographs</h2>' +
+      '<div class="aw-car">' +
+        '<button type="button" class="aw-hero" data-open="0" aria-label="View full screen">' +
+          '<img alt="" src="' + esc(Viewer.url(hero.image_id)) + '"' +
+          ' onerror="this.outerHTML=\'<span class=&quot;aw-broken&quot;>bytes missing from storage</span>\'">' +
+          '<span class="aw-heroflag">\u2b50 on the card</span>' +
+        '</button>' +
+        (list.length > 1 ? strip(list) : '') +
+        '<p class="aw-pmeta">' + list.length +
+          (list.length === 1 ? ' photograph' : ' photographs') +
+          ' \u00b7 the first is the one on your binder card' +
+          (hero.links > 1 ? ' \u00b7 this one is also on ' + (hero.links - 1) + ' other print' +
+            (hero.links > 2 ? 's' : '') : '') +
+        '</p>' +
+      '</div>' + add;
   }
 
+  /* The filmstrip. Tapping a frame opens the viewer AT that frame rather than swapping the hero
+   * in place: the reason to tap a small picture is to see a big one, and a strip that only
+   * changes the image above it makes you tap twice for the thing you wanted. */
+  function strip(list) {
+    return '<div class="aw-strip">' + list.map(function (p, i) {
+      return '<button type="button" class="aw-th" data-open="' + i + '"' +
+        ' aria-label="Photo ' + (i + 1) + ' of ' + list.length + '">' +
+        '<img loading="lazy" alt="" src="' + esc(Viewer.url(p.image_id)) + '">' +
+        (i === 0 ? '<span class="aw-thfront">\u2b50</span>' : '') + '</button>';
+    }).join('') + '</div>';
+  }
+
+  /* Repaint the photo block ALONE. `#awPhotos` wraps it precisely so a write does not force the
+   * page's other three reads to run again. */
+  function repaint() {
+    var box = document.getElementById('awPhotos');
+    if (!box) return;
+    box.innerHTML = photos();
+    wirePhotos();
+  }
+
+  function reloadPhotos() {
+    return API.get('/images?artwork=' + encodeURIComponent(cur.id)).then(function (d) {
+      cur.photos = (d && d.photos) || [];
+      repaint();
+    }).catch(function (e) { Core.toast(e.message || String(e), 'bad'); });
+  }
+
+  function wirePhotos() {
+    var box = document.getElementById('awPhotos');
+    if (!box) return;
+
+    [].forEach.call(box.querySelectorAll('[data-open]'), function (b) {
+      b.addEventListener('click', function () {
+        Viewer.open({
+          photos: cur.photos,
+          index: parseInt(b.dataset.open, 10) || 0,
+          label: cur.name,
+          onAct: reloadPhotos
+        });
+      });
+    });
+
+    var shoot = document.getElementById('awShoot');
+    if (shoot) {
+      shoot.addEventListener('click', function () {
+        /* 🔴 RESOLVE THE EDITION BEFORE OPENING THE CAMERA, not after. If this print has
+         * explicit printings the question has to be answered while the person still knows why
+         * they are being asked — asking after six photos have uploaded is asking about a thing
+         * they have stopped thinking about. `pickEdition` returns null for "cancelled", which
+         * means write nothing. */
+        var ed;
+        try { ed = Viewer.pickEdition(cur.editions); }
+        catch (e) { return Core.toast(e.message || String(e), 'bad'); }
+        if (!ed) return;
+        /* `capture: true` forces the CAMERA rather than the library. capture.js's own header
+         * names this as what a print's own page wants: you are standing in front of the print. */
+        Capture.pick({ edition_id: ed.edition_id, capture: true, subject: 'single',
+                       onDone: reloadPhotos });
+      });
+    }
+
+    var attach = document.getElementById('awAttach');
+    if (attach) attach.addEventListener('click', openAttach);
+  }
+
+  /* ============================================================ attach an existing photo
+   * Q28 → D, the reverse direction of the attach that already exists. Today a photo is filed
+   * FROM the Photos grid; this lets a print reach back for one.
+   *
+   * ⚠️ AN INLINE PANEL, NOT A DRAWER, and that is deliberate. `core.js`'s Drawer shows and hides
+   * `#pageScrim` but never BINDS it — every page owns that click, and a page that declares the
+   * scrim without a handler gets a dimmed screen you cannot dismiss, which is worse than no
+   * backdrop. That trap has already been found once by reading rather than by tapping. An inline
+   * panel has no scrim to get wrong.
+   */
+  function openAttach() {
+    var box = document.getElementById('awPick');
+    if (!box) return;
+    if (!box.hidden) { box.hidden = true; return; }   // second tap closes it
+    box.hidden = false;
+    Core.busy(box, 'Reading your photos\u2026');
+
+    /* `assigned=any` on purpose: a pack shot already sitting on nine prints is exactly the thing
+     * you want to put on a tenth, and a picker that only offered UNASSIGNED photos would hide
+     * the one workflow this button exists for. */
+    API.get('/images?scope=all&assigned=any').then(function (d) {
+      var all = (d.images || []).filter(function (im) {
+        // Already on this print: offering it again would be a no-op with a success toast.
+        return (cur.photos || []).every(function (p) { return p.image_id !== im.image_id; });
+      });
+      if (!all.length) {
+        box.innerHTML = '<p class="aw-empty">Nothing left to attach — every photo you have is ' +
+          'already on this print.</p>';
+        return;
+      }
+      box.innerHTML = '<p class="aw-pmeta">Newest first. Tap one to put it on this print.</p>' +
+        '<div class="aw-strip wrap">' + all.map(function (im) {
+          return '<button type="button" class="aw-th" data-pick="' + esc(im.image_id) + '">' +
+            '<img loading="lazy" alt="" src="' + esc(Viewer.url(im.image_id)) + '">' +
+            (im.links ? '<span class="aw-thn">' + im.links + '</span>' : '') + '</button>';
+        }).join('') + '</div>';
+
+      [].forEach.call(box.querySelectorAll('[data-pick]'), function (b) {
+        b.addEventListener('click', function () { doAttach(b.dataset.pick); });
+      });
+    }).catch(function (e) { Core.fail(box, e); });
+  }
+
+  function doAttach(imageId) {
+    var ed;
+    try { ed = Viewer.pickEdition(cur.editions); }
+    catch (e) { return Core.toast(e.message || String(e), 'bad'); }
+    if (!ed) return;
+    API.post('/image/assign', { image_id: imageId, edition_id: ed.edition_id })
+      .then(function () {
+        Core.toast('Attached to ' + cur.name, 'good');
+        var box = document.getElementById('awPick');
+        if (box) { box.hidden = true; box.innerHTML = ''; }
+        return reloadPhotos();
+      })
+      .catch(function (e) { Core.toast(e.message || String(e), 'bad'); });
+  }
+
+  /* ---------- the page ---------- */
   function render(art, sum, places, eds) {
     return '<div class="aw">' +
       '<header class="aw-head">' +
@@ -127,24 +290,27 @@
       counts(sum) +
       '<div class="aw-chips">' +
         chip('', art.category) +
+        chip('', art.medium) +
         chip('', art.edition_type) +
         chip('', art.confidence === 'named' ? null : art.confidence) +
         chip('', art.provenance) +
         (art.retail != null ? chip('$', Number(art.retail).toFixed(2)) : '') +
-        (art.collection_id ? chip('in ', art.collection_id) : '') +
       '</div>' +
       (art.notes ? '<p class="aw-notes">' + esc(art.notes) + '</p>' : '') +
+      /* PHOTOGRAPHS FIRST, above "Where it is". v19 put the empty block at the bottom because it
+       * was an apology; a picture of the print is the most useful thing on the page and belongs
+       * directly under its name. */
+      '<div id="awPhotos">' + photos() + '</div>' +
+      '<div id="awPick" class="aw-pick" hidden></div>' +
       '<h2 class="aw-h">Where it is</h2>' +
       placements(places) +
       editions(eds) +
-      photos() +
       '<p class="aw-back"><a href="#summary">← all prints</a></p>' +
     '</div>';
   }
 
   /* A missing id is a link someone typed or a stale bookmark. Offering the nearest names beats a
-   * bare "not found", because the usual cause is a slug that was guessed rather than copied —
-   * the exact failure `badSlug()` exists to prevent one layer down. */
+   * bare "not found", because the usual cause is a slug that was guessed rather than copied. */
   function notFound(id, list) {
     var near = list.filter(function (a) {
       return a.artwork_id.indexOf(String(id).slice(0, 4)) === 0;
@@ -177,18 +343,30 @@
     var id = (params && params.id) || '';
     if (!id) { host.innerHTML = noId(); return; }
 
+    cur = { id: id, name: id, editions: [], photos: [] };
     Core.busy(host, 'Reading the collection\u2026');
 
-    /* Three reads in parallel, and each answers something the others cannot:
-     *   /artworks  the descriptive fields — notes, edition_type, provenance, retail
-     *   /summary   the counts AND every placement (see the header note on why not a new route)
-     *   /editions  this print's impressions
-     * Promise.all rather than a chain: they do not depend on each other, and a phone on a slow
-     * connection should pay for one round trip, not three. */
+    /* FOUR reads in parallel, and each answers something the others cannot:
+     *   /artworks       the descriptive fields — notes, edition_type, provenance, retail
+     *   /summary        the counts AND every placement (see the header on why not a new route)
+     *   /editions       this print's impressions
+     *   /images?artwork the photographs, in the binder card's own order
+     * Promise.all rather than a chain: none depends on another, and a phone on a slow
+     * connection should pay for one round trip rather than four.
+     *
+     * 🔴 THE PHOTO READ CATCHES SEPARATELY. A photo route that 500s must degrade to "could not
+     * load the photographs" underneath a page that still shows the print's name, counts and
+     * placements — never take the whole page down with it. That is the /summary lesson from
+     * 08-01 applied forward: three routes broke together because one column was missing, and
+     * the detail page went with them silently. */
     Promise.all([
       API.get('/artworks'),
       API.get('/summary'),
-      API.get('/editions?artwork=' + encodeURIComponent(id))
+      API.get('/editions?artwork=' + encodeURIComponent(id)),
+      API.get('/images?artwork=' + encodeURIComponent(id)).catch(function (e) {
+        Core.toast('Photographs did not load: ' + (e.message || e), 'bad');
+        return { photos: [] };
+      })
     ]).then(function (r) {
       var list = (r[0] && r[0].artworks) || [];
       var art = null;
@@ -207,7 +385,12 @@
         return p.artwork_id === id;
       });
 
-      host.innerHTML = render(art, sum, places, (r[2] && r[2].editions) || []);
+      cur.name = art.name;
+      cur.editions = (r[2] && r[2].editions) || [];
+      cur.photos = (r[3] && r[3].photos) || [];
+
+      host.innerHTML = render(art, sum, places, cur.editions);
+      wirePhotos();
     }).catch(function (e) { Core.fail(host, e); });
   }
 
