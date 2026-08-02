@@ -45,6 +45,8 @@ table.matrix tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 .meta{font-size:.7rem;color:var(--muted);margin-top:1.5rem;text-align:center}
 #app{max-width:1400px;margin:0 auto}
 .refresh-note{font-size:.7rem;color:var(--muted);margin-top:.5rem}
+.manual-id{display:none;margin-top:.5rem}
+.manual-id.visible{display:block}
 </style>
 </head>
 <body>
@@ -60,6 +62,20 @@ table.matrix tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 const APP_VERSION = '0.1-poc';
 const STORAGE_KEY = 'cast_grid_config';
 const API_BASE = 'https://api.clickup.com/api/v2';
+
+// =============================================================
+// DEFAULT LIST PRESETS
+// Add new lists here as they get created. Format: { id, name, space }
+// =============================================================
+const DEFAULT_LISTS = [
+  { id: '901301209794', name: 'People', space: 'CRM (Space 2)' },
+  { id: '901305724994', name: 'Companies, general', space: 'CRM (Space 2)' },
+  { id: '901326626373', name: 'List (default)', space: 'CRM (Space 2)' },
+];
+// When Show Roles gets its own list, add it here:
+// { id: 'TBD', name: 'Show Roles (assignments)', space: 'CRM (Space 2)' },
+// { id: 'TBD', name: 'Role Definitions', space: 'URITP (Space 1)' },
+// =============================================================
 
 let state = { tasks: [], fields: [], config: loadConfig() };
 
@@ -77,18 +93,46 @@ function render(html) { $('content').innerHTML = html; }
 
 function showSetup() {
   const c = state.config;
+  const listOptions = DEFAULT_LISTS.map(l =>
+    `<option value="${l.id}" ${l.id===c.listId?'selected':''}>${l.name} (${l.space}) [${l.id}]</option>`
+  ).join('');
+
   render(`
     <div class="setup">
       <h2 style="font-size:1.1rem;margin-bottom:.5rem">Configuration</h2>
       <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">Your token stays in localStorage. Never touches a server.</p>
       <label>ClickUp API Token</label>
       <input id="token" type="password" placeholder="pk_..." value="${c.token||''}">
-      <label>List ID (Show Roles / assignments list)</label>
-      <input id="listId" type="text" placeholder="e.g. 901327329300" value="${c.listId||''}">
-      <p style="font-size:.7rem;color:var(--muted);margin-top:.25rem">Find this in the list URL: app.clickup.com/.../list/<b>THIS_NUMBER</b></p>
+      <label>Target List</label>
+      <select id="listSelect" onchange="toggleManualId()">
+        ${listOptions}
+        <option value="__other" ${!DEFAULT_LISTS.find(l=>l.id===c.listId) && c.listId ? 'selected' : ''}>Other (enter ID manually)</option>
+      </select>
+      <div id="manualIdWrap" class="manual-id ${!DEFAULT_LISTS.find(l=>l.id===c.listId) && c.listId ? 'visible' : ''}">
+        <label>Manual List ID</label>
+        <input id="manualListId" type="text" placeholder="e.g. 901327329300" value="${!DEFAULT_LISTS.find(l=>l.id===c.listId) ? (c.listId||'') : ''}">
+        <p style="font-size:.7rem;color:var(--muted);margin-top:.25rem">Find this in the list URL: app.clickup.com/.../list/<b>THIS_NUMBER</b></p>
+      </div>
       <button onclick="startFetch()">Load Data →</button>
     </div>
   `);
+}
+
+function toggleManualId() {
+  const sel = $('listSelect');
+  const wrap = $('manualIdWrap');
+  if (sel.value === '__other') {
+    wrap.classList.add('visible');
+  } else {
+    wrap.classList.remove('visible');
+  }
+}
+
+function getSelectedListId() {
+  const sel = $('listSelect');
+  if (sel && sel.value !== '__other') return sel.value;
+  const manual = $('manualListId');
+  return manual ? manual.value.trim() : '';
 }
 
 async function apiFetch(endpoint, token) {
@@ -101,8 +145,8 @@ async function apiFetch(endpoint, token) {
 
 async function startFetch() {
   const token = $('token')?.value?.trim();
-  const listId = $('listId')?.value?.trim();
-  if (!token || !listId) { alert('Both fields required'); return; }
+  const listId = getSelectedListId();
+  if (!token || !listId) { alert('Both token and list are required'); return; }
   saveConfig({ token, listId });
   render(`<div class="status loading">Fetching tasks from list ${listId}...</div>`);
   try {
@@ -113,7 +157,7 @@ async function startFetch() {
     render(`<div class="status success">Loaded ${tasksData.length} tasks with ${fields.length} custom fields.</div>`);
     setTimeout(() => showFieldMapping(), 500);
   } catch (e) {
-    render(`<div class="status error">Error: ${e.message}</div><button class="btn" onclick="showSetup()">← Back to setup</button>`);
+    render(`<div class="status error">Error: ${e.message}</div><button class="btn" onclick="showSetup()">\u2190 Back to setup</button>`);
   }
 }
 
@@ -154,11 +198,11 @@ function showFieldMapping() {
       <p style="font-size:.8rem;color:var(--muted)">Tell the grid which field is which. Relationship fields auto-detected: <b>${relFields.length}</b></p>
       <div class="field-map">
         <div>
-          <label>ROWS (Role) — group by:</label>
+          <label>ROWS (Role) \u2014 group by:</label>
           <select id="rowField">${noneOpt}${opts(allFields, c.rowField)}</select>
         </div>
         <div>
-          <label>COLUMNS (Production) — pivot on:</label>
+          <label>COLUMNS (Production) \u2014 pivot on:</label>
           <select id="colField">${noneOpt}${opts(allFields, c.colField)}</select>
         </div>
         <div>
@@ -173,9 +217,9 @@ function showFieldMapping() {
           </select>
         </div>
       </div>
-      <button onclick="buildGrid()">Build Matrix →</button>
-      <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">← Config</button>
-      <p class="refresh-note">Found ${state.tasks.length} tasks · ${fields.length} fields (${relFields.length} relationships)</p>
+      <button onclick="buildGrid()">Build Matrix \u2192</button>
+      <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">\u2190 Config</button>
+      <p class="refresh-note">Found ${state.tasks.length} tasks \u00b7 ${fields.length} fields (${relFields.length} relationships)</p>
     </div>
   `);
 }
@@ -208,9 +252,9 @@ function buildGrid() {
   saveConfig({ rowField, colField, cellField, statusMode });
 
   const tasks = state.tasks;
-  const rows = new Map(); // role -> Set of values
+  const rows = new Map();
   const cols = new Set();
-  const grid = new Map(); // "row|||col" -> [{person, status}]
+  const grid = new Map();
 
   for (const t of tasks) {
     const rowVals = rowField ? getFieldValue(t, rowField) : [t.name];
@@ -243,17 +287,17 @@ function buildGrid() {
   if (!sortedRows.length || !sortedCols.length) {
     render(`
       <div class="status error">No data to pivot. Check your field mappings.</div>
-      <button class="btn" onclick="showFieldMapping()">← Remap fields</button>
+      <button class="btn" onclick="showFieldMapping()">\u2190 Remap fields</button>
     `);
     return;
   }
 
   let html = `
     <div class="toolbar">
-      <button class="btn btn-secondary" onclick="showFieldMapping()">⚙ Remap</button>
-      <button class="btn btn-secondary" onclick="startFetch()">↻ Refresh</button>
-      <button class="btn btn-secondary" onclick="showSetup()">🔑 Config</button>
-      <span style="font-size:.75rem;color:var(--muted)">  ${sortedRows.length} roles × ${sortedCols.length} productions · ${tasks.length} assignments</span>
+      <button class="btn btn-secondary" onclick="showFieldMapping()">\u2699 Remap</button>
+      <button class="btn btn-secondary" onclick="startFetch()">\u21bb Refresh</button>
+      <button class="btn btn-secondary" onclick="showSetup()">\ud83d\udd11 Config</button>
+      <span style="font-size:.75rem;color:var(--muted)">  ${sortedRows.length} roles \u00d7 ${sortedCols.length} productions \u00b7 ${tasks.length} assignments</span>
     </div>
     <div class="grid-container">
     <table class="matrix">
@@ -270,7 +314,7 @@ function buildGrid() {
       const key = `${row}|||${col}`;
       const entries = grid.get(key) || [];
       if (!entries.length) {
-        html += `<td><div class="empty-cell">—</div></td>`;
+        html += `<td><div class="empty-cell">\u2014</div></td>`;
       } else {
         html += '<td>';
         for (const e of entries) {
@@ -297,7 +341,8 @@ if (state.config.token && state.config.listId) {
   render(`
     <div class="setup" style="max-width:500px">
       <p style="font-size:.85rem">Config loaded from last session.</p>
-      <button onclick="startFetch()">Load Data →</button>
+      <p style="font-size:.8rem;color:var(--muted)">List: <b>${DEFAULT_LISTS.find(l=>l.id===state.config.listId)?.name || state.config.listId}</b></p>
+      <button onclick="startFetch()">Load Data \u2192</button>
       <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">Change Config</button>
     </div>
   `);
