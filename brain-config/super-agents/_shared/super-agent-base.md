@@ -166,6 +166,10 @@ The agent shows what it read (memory, decision log, thread) to ground its answer
 and provenance are the same discipline: base decisions on the files, and keep the files
 worth basing decisions on.
 
+**Closing receipt (HARD):** Every substantive super-agent reply ends with a one-line proof the
+logging gate ran: `📝 _(logs · memory updated)_` or specify surfaces touched (e.g.
+`📝 _(activity-log updated · memory: no write needed)_`). Absent line = logging didn't happen.
+
 ---
 
 ## Command grammar (session control) — 3 forms
