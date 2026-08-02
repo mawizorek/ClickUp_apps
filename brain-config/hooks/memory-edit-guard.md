@@ -1,6 +1,8 @@
-# Memory Edit Guard
+# Memory Edit Guard · AI Toolkit
 
 **Purpose:** Pre-write gate that validates any proposed memory edit before committing it. Prevents budget overruns, PROTECTED content loss, misplaced content, pointer breakage, architectural drift, and — the most common failure — defaulting behavioral/preference rules into `/PREFERENCES.md` when they belong in the git runtime layer.
+
+**Steward:** Memory Maggie
 
 **Mode:** Always-on (deterministic). Fires on EVERY memory write attempt with zero discretion.
 
@@ -8,9 +10,24 @@
 
 **Invocation:** Automatic. No user phrase needed. Brain runs this internally before executing the write tool.
 
+**Front door: this file, and nothing else.** No ClickUp Skill. Tools live in git only (LOCKED 2026-07-25).
+
+**Established 2026-07-03** by Brain (pre-fleet era). Step 0 added 2026-07-05.
+
 ---
 
-## Pass (ordered checklist, all must clear)
+## Coordinates
+
+| Surface | Location |
+| --- | --- |
+| **Target file** | `/PREFERENCES.md` (brain memory, 2000 token cap) |
+| **Overflow routing** | Extended Memory (`doc-page-72`, 8K cap) or Brain Reference Library |
+| **Memory Maggie bundle** | `super-agents/memory-maggie/` |
+| **OMR queue** | `brain-config/open-memory-requests.md` |
+
+---
+
+## Procedure (ordered checklist, all must clear)
 
 ### 0. Preference-Save Routing (FIRST gate, LOCKED 2026-07-05)
 
@@ -28,7 +45,7 @@
 - Estimate the token count of the file AFTER the proposed edit.
 - Hard cap: 2000 tokens. If the edit would exceed, HALT.
 - Action on halt: propose a trim (identify lowest-priority content to condense or relocate) before retrying.
-- If content is valuable but won't fit: route to Extended Memory (https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-74153, 8K cap) or Brain Reference Library as appropriate.
+- If content is valuable but won't fit: route to Extended Memory (`doc-page-72`, 8K cap) or Brain Reference Library as appropriate.
 
 ### 2. PROTECTED Content
 - Scan for any section marked `(PROTECTED)` or `(PROTECTED, do not trim)` in the current file.
@@ -63,22 +80,24 @@
 
 ### 8. Extended Memory Routing
 - If content is being added that is:
- - Too verbose for memory (would push toward/over budget)
- - Valuable context but not must-fire-every-response
- - Project-specific standing decisions or people/relationship context
-- Route to Extended Memory (https://app.clickup.com/36074068/docs/12cwjm-54133/12cwjm-74153) instead. Propose the move with rationale.
+  - Too verbose for memory (would push toward/over budget)
+  - Valuable context but not must-fire-every-response
+  - Project-specific standing decisions or people/relationship context
+- Route to Extended Memory (`doc-page-72`) instead. Propose the move with rationale.
 
 ---
 
-## Output
+## Guardrails
 
-- **All checks pass:** proceed with the write silently. No extra output needed.
-- **WARN (non-blocking):** surface the warning inline, propose the fix, proceed if fix is accepted or Michael overrides.
-- **HALT (blocking):** do NOT execute the write. Surface the failing check, explain why, propose an alternative that passes.
+- Step 0 (Preference-Save Routing) has HIGHEST priority and fires FIRST. No override except explicit "brain mem" from Michael.
+- A HALT is blocking: do NOT execute the write under any circumstances.
+- Never auto-trim PROTECTED content. Only Michael overrides.
+- This hook has HIGHEST priority among memory-touching operations. No other tool can skip it.
+- See inline constraints in each Pass step for step-specific guardrails.
 
 ---
 
-## Composes with / overrides
+## Composes with
 
 - **Memory Write Relay** (post-failure hook): Guard fires BEFORE the write. If Guard passes and the write still fails (system error, token miscalculation), Relay handles the aftermath. They are sequential, never competing.
 - **Memory Hygiene Review** (periodic trigger): Hygiene proposes edits; those edits still pass through this Guard before executing. Hygiene cannot bypass the Guard.
@@ -112,5 +131,6 @@
 
 ## Changelog
 
-- 2026-07-05: Added Step 0 (Preference-Save Routing) as the FIRST gate: behavioral/tone/format/workflow rules default to the git runtime layer, NOT `/PREFERENCES.md`; memory only on explicit "brain mem" instruction or an approved pitch. Refined Step 3 so a new tone/format refinement is no longer auto-routed to memory. Added Example 0. Authored after Michael flagged the repeated default-to-brain-doc reflex.
-- 2026-07-03: Initial version. Authored during memory consolidation session.
+- **v3 (2026-08-02)** — Header normalized to hook template standard (Audit Anna fix-spec, wave 1). Added Steward (Memory Maggie), Front door, Established, Coordinates, Guardrails section. Renamed "Composes with / overrides" to "Composes with."
+- **v2 (2026-07-05)** — Added Step 0 (Preference-Save Routing) as the FIRST gate: behavioral/tone/format/workflow rules default to the git runtime layer, NOT `/PREFERENCES.md`; memory only on explicit "brain mem" instruction or an approved pitch. Refined Step 3 so a new tone/format refinement is no longer auto-routed to memory. Added Example 0. Authored after Michael flagged the repeated default-to-brain-doc reflex.
+- **v1 (2026-07-03)** — Initial version. Authored during memory consolidation session.
