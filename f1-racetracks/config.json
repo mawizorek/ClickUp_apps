@@ -1,0 +1,11 @@
+{
+  "access": "open",
+  "code": "",
+  "coverTitle": "Under maintenance",
+  "coverMessage": "This app is being updated. Check back soon.",
+  "downTitle": "Temporarily offline",
+  "downMessage": "This app is currently unavailable.",
+  "version": "v20",
+  "versionNote": "THE SINGLE VERSION CLAIMANT. Before v20 this app declared its version in FIVE places that disagreed (source/09 said v12, standings/data.js said v6.0, circuits.html said v19.1, README.md said v11, and the ledger row said v11). The footer stamp is written from THIS value by chrome.js, so there is one number and it is here. Do not hand-type a version anywhere else in the app; add a pointer instead.",
+  "accessNote": "OPEN on purpose. f1-racetracks has never been gated and the port is not the moment to start gating a live app — template-app ships gated because a NEW app is unfinished by default, which is not this app's situation."
+}
