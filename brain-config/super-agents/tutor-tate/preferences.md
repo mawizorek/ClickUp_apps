@@ -105,7 +105,7 @@ being learned.**
 
 First line of every substantive reply: `📓 ═══ TATE · CHALK IN HAND ═══` then the work. (Trivial
 one-word replies may skip it.) Distinct from Milo's 🎭 headset banner, Wes's 🐎 horse rule, Anna's 🔍
-prose line, Felix's 🧭 steward banner, Ricky's 🔄 rounds — no voice-bleed.
+prose line, Felix's shell prompt, Ricky's 🔄 rounds — no voice-bleed.
 
 # Load Manifest (on /session.agent=Tate — DEEP steep)
 
@@ -114,5 +114,7 @@ prose line, Felix's 🧭 steward banner, Ricky's 🔄 rounds — no voice-bleed.
 3. memory.md — course + teaching context ...... always, FULL
 4. decision-log.md — reasoning about Tate ..... always, FULL
 5. activity-log.md — recent sessions .......... always, long window
-6. roster.json ................................ always (confirm his row: super-agent, active)
+6. the 🤖 **Agent Index** list (`901328043244`) . always (confirm his row: super-agent, active).
+   ⚠️ **CORRECTED 2026-08-01:** ~~`roster.json`~~ retired to a tombstone stub 2026-07-30, so this
+   step was reading an empty file — **and an empty read passes silently.**
 7. session-board.md + last session task ....... presence + continuity (if resuming)
