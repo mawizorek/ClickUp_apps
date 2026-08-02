@@ -1,0 +1,144 @@
+/* Inciardi Collection — THE PHOTO SURFACE. Strip, filmstrip, full-screen viewer.
+ * ZERO COLOUR LITERALS. Every value is a var(--token) off the theme spine.
+ *
+ * 🔴 THE ONE LOAD-BEARING LINE IN THIS FILE IS A `touch-action`, AND IT IS NOT COSMETIC.
+ * `.pv-stage { touch-action: pan-y pinch-zoom }` is what lets the swipe handler in photoview.js
+ * contain **zero** preventDefault calls: the browser keeps vertical panning and pinching, and
+ * only the horizontal axis is left for JavaScript. CSS applies that split BEFORE the gesture is
+ * disambiguated; JS would have to guess at an unfinished gesture and would fight the zoom.
+ *
+ * ⚠️ Do not "simplify" it to `touch-action: none` or `manipulation`. `none` kills pinch, which
+ * J17 refused a global zoom fix to protect. `manipulation` keeps pinch but also keeps horizontal
+ * panning, so the browser and the swipe handler would both act on the same drag.
+ *
+ * INK RULE, same as every other stylesheet here: `accent`, `accent-deep` and `accent-2` are
+ * BRAND colours identical on both ramps. Ink is `--text*` or `--accent-deep`; brand colours fill.
+ */
+
+/* ---------- the strip, on a print's own page ---------- */
+
+/* The hero sits on `surface-1`, not on a transparent or grey ground. A photo that 404s then
+ * shows the app's own surface plus its alt text rather than a void — the same reasoning as the
+ * binder card's initials-under-the-photograph fallback, which exists because a blank grey box is
+ * how an outage hides. */
+.pv-hero { position: relative; }
+.pv-heroimg { display: block; width: 100%; padding: 0; overflow: hidden;
+  background: var(--surface-1);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px);
+  min-height: 0; cursor: zoom-in; }
+.pv-heroimg img { display: block; width: 100%; height: auto; max-height: 62dvh;
+  object-fit: contain; }
+
+/* Says which photograph the binder is showing. This label is the whole answer to Q26's "the tap
+ * claims success and nothing changes" — with it, the ordinal write is visible at one photo. */
+.pv-onthecard { margin: 6px 0 0;
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--fs-xs, 0.72rem);
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-deep); }
+
+/* ---------- filmstrip ----------
+ * Horizontal scroll with snap, because a wrapped grid of thumbnails on a phone pushes the
+ * actions below the fold on any print with more than four photographs. */
+.pv-film { display: flex; gap: 6px; overflow-x: auto; padding: var(--gap-xs, 8px) 2px;
+  scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin; }
+/* 44px minimum on the BUTTON, not on a wrapper: the hit area has to be the thing that acts,
+ * which is the trap `.aw-places` documents from the other side. */
+.pv-frame { position: relative; flex: 0 0 auto; width: 68px; height: 88px;
+  min-height: 44px; padding: 0; overflow: hidden; scroll-snap-align: start;
+  background: var(--surface-1);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px); }
+.pv-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* SOLID accent border for the frame the binder is using, a plain border for the rest. The card
+ * photo and the selected photo are different facts, so they get different treatments — a single
+ * highlight for both would make "which one is on the card" unanswerable while selecting. */
+.pv-frame.is-card { border-color: var(--accent); border-width: 2px; }
+.pv-frame.is-sel { outline: 2px solid var(--accent-deep); outline-offset: -2px; }
+
+/* The pack marker. A photo attached to several prints is STRUCTURALLY a pack shot (the
+ * link_count term in photoOrder), so the count is the honest label — no separate flag. */
+.pv-pack { position: absolute; right: 3px; bottom: 3px; min-width: 16px; padding: 0 4px;
+  border-radius: var(--radius-pill, 8px);
+  background: var(--accent); color: var(--on-accent);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.58rem;
+  line-height: 16px; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* ---------- actions ---------- */
+.pv-acts { display: flex; flex-wrap: wrap; gap: var(--gap-xs, 8px);
+  margin-top: var(--gap-md, 12px); }
+.pv-acts button { flex: 1 1 auto; }
+
+/* DASHED, because it is an absence — the same border grammar as `.aw-empty` and the back room:
+ * solid is a real thing, dashed is a gap. ⚠️ Unlike v19's block this one CONTAINS controls, so
+ * it is a gap with a way out rather than a stated dead end. */
+.pv-none { padding: 11px; border: 1px dashed var(--border); border-radius: var(--radius, 6px); }
+.pv-none p { margin: 0; font-size: var(--fs-sm, 0.85rem); color: var(--text-soft);
+  text-wrap: pretty; }
+.pv-hint { margin: 6px 0 0 !important; font-size: var(--fs-xs, 0.72rem) !important;
+  color: var(--text-faint) !important; }
+
+/* ---------- the picker drawer (Q28 D) ---------- */
+.pv-pickhead { display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gap-xs, 8px); padding: var(--gap-md, 12px);
+  border-bottom: var(--border-w, 1px) solid var(--border); }
+.pv-pickhead b { font-size: var(--fs-sm, 0.85rem); }
+.pv-pickhead button { flex: 0 0 auto; }
+.pv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 6px; padding: var(--gap-md, 12px); }
+.pv-cell { position: relative; padding: 0; aspect-ratio: 3 / 4; overflow: hidden;
+  min-height: 44px; background: var(--surface-1);
+  border: var(--border-w, 1px) solid var(--border); border-radius: var(--radius, 6px); }
+.pv-cell img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* The capture date, not the upload date — `shot_at` is the one thing the EXIF read exists to
+ * rescue, and a picker showing "today" for every photo would waste it. */
+.pv-when { position: absolute; left: 3px; bottom: 3px; padding: 0 4px;
+  border-radius: 3px; background: var(--surface-2); color: var(--text-soft);
+  font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.58rem; }
+
+/* ============================================================ FULL SCREEN
+ * Fixed to the viewport and above everything. z-index 75 puts it over the chrome drawers (50)
+ * and the scrim (45) but UNDER the toasts (70)... it does not: toasts are 70, so this sits above
+ * them deliberately. A toast firing behind a full-screen photo would be unreadable and would
+ * look like the action silently failed — so the viewer is closed by any action that toasts.
+ */
+.pv { position: fixed; inset: 0; z-index: 75; display: flex; flex-direction: column;
+  background: var(--bg);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+  animation: fade 180ms var(--ease, ease-out); }
+/* Locks the page behind the viewer so an ignored vertical drag cannot scroll the print page
+ * underneath and leave you somewhere you never navigated to. */
+body.pv-open { overflow: hidden; }
+
+.pv-bar { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gap-xs, 8px); padding: var(--gap-xs, 8px) var(--gap-md, 12px); }
+.pv-x { min-width: 44px; min-height: 44px; padding: 0; background: transparent;
+  border-color: transparent; color: var(--text-soft); font-size: 1.1rem; }
+.pv-count { font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.08em; color: var(--text-faint);
+  font-variant-numeric: tabular-nums; }
+
+/* 🔴 THE PINCH LINE. See the header. `pan-y pinch-zoom` — nothing else. */
+.pv-stage { flex: 1 1 auto; min-height: 0; display: grid; place-items: center;
+  overflow: hidden; touch-action: pan-y pinch-zoom; }
+.pv-img { max-width: 100%; max-height: 100%; object-fit: contain;
+  /* The image itself must NOT inherit `manipulation` from base.css's selector list — it is not
+     an interactive control, it is the content, and pinching it is the entire point of J17. */
+  touch-action: inherit; }
+
+.pv-foot { flex: 0 0 auto; padding: var(--gap-xs, 8px) var(--gap-md, 12px) var(--gap-md, 12px); }
+.pv-cap { margin: 0 0 4px; font-size: var(--fs-sm, 0.85rem); color: var(--text);
+  text-wrap: pretty; }
+.pv-meta { margin: 0; font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--fs-xs, 0.72rem); letter-spacing: 0.04em; color: var(--text-faint); }
+/* Arrow buttons stay for desktop and for anyone who cannot swipe. A carousel reachable ONLY by
+ * gesture is unusable with a keyboard and invisible to a mouse. */
+.pv-nav { display: flex; gap: var(--gap-xs, 8px); margin-top: var(--gap-xs, 8px); }
+.pv-nav button { flex: 1 1 auto; min-height: 44px; font-size: 1.2rem; line-height: 1; }
+
+@media (min-width: 721px) {
+  /* On a wide screen the photograph is the only thing worth the space; the metadata goes beside
+     the count rather than eating a strip of the image. */
+  .pv-foot { display: flex; align-items: baseline; gap: var(--gap-md, 12px); }
+  .pv-nav { margin-top: 0; margin-left: auto; }
+  .pv-nav button { min-width: 64px; }
+}

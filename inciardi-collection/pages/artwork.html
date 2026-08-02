@@ -1,7 +1,22 @@
 <!-- Inciardi Collection — the ARTWORK DETAIL partial.
      Injected by the router; `artwork.js` fills #artWrap on mount. Deliberately bare: every
      heading on this page depends on which print was asked for, so markup written here would
-     paint before the data and then be replaced — a flash of a title that may be wrong. -->
+     paint before the data and then be replaced — a flash of a title that may be wrong.
+
+     🔴 THE DRAWER AND THE SCRIM ARRIVE TOGETHER, AND J23 IS WHY.
+     `Drawer.open()` reaches for `#pageScrim` and guards with `if (s)` — so a page that declares a
+     drawer and forgets the scrim gets a panel with NO backdrop and NO tap-outside-to-close, on
+     that one screen, with no error anywhere. Found by reading `binder.html` rather than by
+     tapping. This page had no drawer at all until v23, so it had no scrim either.
+
+     ⚠️ AND DECLARING THE SCRIM IS NOT ENOUGH. `core.js` shows and hides that element and never
+     BINDS it; each page owns the click. `artwork.js` wires it on mount. An element with no
+     handler is a dimmed screen you cannot dismiss, which is worse than no backdrop. -->
 <section class="page">
   <div id="artWrap"></div>
 </section>
+
+<!-- The "attach an existing photo" drawer (Q28 D). Filled by `photoview.js` on open; empty in the
+     markup for the same reason as #artWrap — its heading counts photos it has not fetched yet. -->
+<aside id="pvPick" class="page-drawer" hidden aria-label="Attach an existing photo"></aside>
+<button id="pageScrim" class="page-scrim" hidden aria-label="Close"></button>

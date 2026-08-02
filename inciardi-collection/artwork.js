@@ -14,6 +14,9 @@
  * build step needs that step written down AS A STEP**, or the condition quietly becomes an
  * assumption that everything downstream rests on.
  *
+ * ⭐ AND AS OF v23 THE CONDITION IS FINALLY MET — twenty-three versions and eight days after it
+ * was accepted as settled. You can now open a print and put a photograph on it from that page.
+ *
  * WHY A ROUTE AND NOT A DRAWER. Michael struck the bottom-sheet option (Q16 C) even though it
  * was the fastest to build, so **linkability beat speed** — consistent with v7's deep links. A
  * print is now addressable: you can send yourself a link to Choco Taco.
@@ -28,10 +31,12 @@
  * artworks that is one small JSON. **If it ever gets slow, the fix is a route that SELECTS from
  * the same view, never a second calculation.**
  *
- * ⚠️ NO PHOTOS HERE YET, DELIBERATELY. The carousel, the filmstrip and the upload button are
- * `next-build-spec.md` steps 5 + 8, and they are blocked on an R2 bucket binding and the image
- * routes. This page ships the empty state INSTEAD OF the button, because a control that 500s is
- * worse than an honest gap — and the gap is where they land, unchanged, when the pipe exists.
+ * 🔴 THIS FILE CONTAINS NO PHOTO LOGIC, AND THAT IS ENFORCED RATHER THAN TIDY.
+ * It does not know what a carousel is, does not build an image URL, does not know which
+ * photograph is on the binder card. It renders `<div id="awPhotos">` and hands `PhotoView` an
+ * artwork id. Q28's note — *"driven from single source with access across the board"* — is what
+ * makes that a REQUIREMENT and not a preference: `photos.js` has to be able to reach the same
+ * component, and it cannot reach a function defined in here.
  */
 (function () {
 
@@ -103,19 +108,19 @@
     return '<h2 class="aw-h">Editions</h2><ul class="aw-eds">' + rows + '</ul>';
   }
 
-  /* ---------- photos: the honest gap ----------
-   * Shipping the empty state rather than a disabled button, for the same reason the back room
-   * renders NO run button on an invalid batch: a disabled control says "there is a way to make
-   * this go," and there is not one yet. */
+  /* ---------- photographs ----------
+   * ⭐ v19 CUT THIS BLOCK TO SHAPE AND SAID SO IN ITS OWN COMMENT: *"this block is where the
+   * carousel, the filmstrip and the ⭐ primary toggle land, unchanged."* They landed, and this
+   * function went from an apology to one empty div.
+   *
+   * The smallness IS the result. A page that has to be rearranged to receive a planned feature
+   * was never actually sized for it, and "we left room" is a claim that only gets tested once.
+   *
+   * ⚠️ It is a MOUNT POINT, not a render. `PhotoView` replaces this element's contents on every
+   * write and never the element itself, which is what lets it hold one delegated listener
+   * instead of rebinding a handler per frame after each edit. */
   function photos() {
-    return '<h2 class="aw-h">Photographs</h2>' +
-      '<div class="aw-photos">' +
-        '<p><b>None yet, and there is no way to add one from here.</b></p>' +
-        '<p class="aw-note">The image table is live in D1 and the pipe is designed end to end — ' +
-        'it needs an R2 binding and the upload routes. Scope and order: ' +
-        '<code>next-build-spec.md</code> steps 5 and 8. This block is where the carousel, the ' +
-        'filmstrip and the ⭐ primary toggle land, unchanged.</p>' +
-      '</div>';
+    return '<h2 class="aw-h">Photographs</h2><div id="awPhotos"></div>';
   }
 
   function render(art, sum, places, eds) {
@@ -134,10 +139,13 @@
         (art.collection_id ? chip('in ', art.collection_id) : '') +
       '</div>' +
       (art.notes ? '<p class="aw-notes">' + esc(art.notes) + '</p>' : '') +
+      /* PHOTOGRAPHS SIT ABOVE "where it is" AS OF v23. The picture is the fastest way to confirm
+       * you are on the right print, and it was below two lists and a table of counts. Placement
+       * changed; nothing else on the page did. */
+      photos() +
       '<h2 class="aw-h">Where it is</h2>' +
       placements(places) +
       editions(eds) +
-      photos() +
       '<p class="aw-back"><a href="#summary">← all prints</a></p>' +
     '</div>';
   }
@@ -174,6 +182,13 @@
     var host = document.getElementById('artWrap');
     if (!host) return;
 
+    /* 🔴 THE SCRIM'S CLICK IS BOUND HERE BECAUSE NOTHING ELSE BINDS IT (J23). `core.js` shows and
+     * hides `#pageScrim` and never attaches a handler — each page owns that. A declared scrim
+     * with no listener is a dimmed screen you cannot dismiss, which is strictly worse than no
+     * backdrop at all. Bound before the fetch so it works even if the read fails. */
+    var scrim = document.getElementById('pageScrim');
+    if (scrim) scrim.addEventListener('click', function () { Drawer.closeAll(); });
+
     var id = (params && params.id) || '';
     if (!id) { host.innerHTML = noId(); return; }
 
@@ -184,7 +199,11 @@
      *   /summary   the counts AND every placement (see the header note on why not a new route)
      *   /editions  this print's impressions
      * Promise.all rather than a chain: they do not depend on each other, and a phone on a slow
-     * connection should pay for one round trip, not three. */
+     * connection should pay for one round trip, not three.
+     * ⚠️ PhotoView makes its own two reads AFTER these land. Deliberately not folded in: it has
+     * to work when a caller other than this page mounts it, and a component whose data only one
+     * caller can supply is not a shared component. Two extra requests on a page already making
+     * three, in exchange for the constraint Q28 actually asked for. */
     Promise.all([
       API.get('/artworks'),
       API.get('/summary'),
@@ -208,6 +227,13 @@
       });
 
       host.innerHTML = render(art, sum, places, (r[2] && r[2].editions) || []);
+
+      /* AFTER the innerHTML, because #awPhotos does not exist until then. A guard rather than an
+       * assumption: photoview.js is reached by link like this whole route, so a 404 on it should
+       * cost the photographs and nothing else — the rest of the page is already painted. */
+      if (window.PhotoView) {
+        PhotoView.mount(document.getElementById('awPhotos'), { artwork: id });
+      }
     }).catch(function (e) { Core.fail(host, e); });
   }
 
