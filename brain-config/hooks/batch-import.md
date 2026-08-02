@@ -1,6 +1,8 @@
-# Batch Import — Inciardi Collection
+# Batch Import · AI Toolkit
 
 **Purpose:** Turn photographs of a physical binder sheet into a batch file Michael can push through the app's back room, without the transcriber ever touching code.
+
+**Steward:** Mainstage Milo (production domain)
 
 **Mode:** Procedural (deterministic) — a fixed sequence with a fixed output shape.
 
@@ -8,22 +10,26 @@
 
 **Trigger:** One or more photographs of a 3×3 sheet of Anastasia Inciardi mini prints, front and/or back.
 
----
+**Front door: this file, and nothing else.** No ClickUp Skill. Tools live in git only (LOCKED 2026-07-25).
 
-## What you produce
-
-**Two files. Both JSON. Neither is code.**
-
-1. `inciardi-collection/batches/<slug>.json` — the sheet
-2. one line added to `inciardi-collection/batches/_index.json`
-
-🔴 **If you find yourself editing a `.js` file, you have gone off the rails.** `batch.js` is a loader that reads and validates your file; it never changes for new data. A batch that needs a code change is a batch with a problem the hook has not anticipated — say so and stop, rather than reaching into the app.
-
-**You do not run the import.** You prepare it; Michael presses the button. The back room shows him every row before anything is sent.
+**Established 2026-07-31** by Brain. v2 same day after the `ice-cream` rotation failure.
 
 ---
 
-## Pass
+## Coordinates
+
+| Surface | Location |
+| --- | --- |
+| **Batch files** | `inciardi-collection/batches/*.json` in `mawizorek/ClickUp_apps` |
+| **Index** | `inciardi-collection/batches/_index.json` |
+| **Live catalog API** | `https://inciardi-collection.mawizorek-online.workers.dev/artworks` |
+| **App (back room)** | GitHub Pages, Settings → Back room |
+
+> *Scope note: this hook is specific to the Inciardi Collection app. "Batch Import" is the procedure; the Inciardi Collection is the current (and only) target.*
+
+---
+
+## Procedure
 
 ### 1. Read the live catalog FIRST
 
@@ -120,7 +126,7 @@ If a title is genuinely unreadable and you are naming the card from its picture,
 | `defaults.edition_type` | `open` unless the run is genuinely **numbered**. Marketing language saying "limited edition" is not an edition type. |
 | `collection_id` | **Do not set it.** No route creates collections, and a sheet is Michael's arrangement, not an artist release. The sheet carries the grouping. |
 
-**🔴 Leave unknowns EMPTY.** Where a print was acquired, what he paid, the edition number — if the photo does not say and no source says, omit it. *A plausible guess in a data field is worse than a blank, because the blank is honest and the guess is indistinguishable from a fact.* This is not hypothetical: on 2026-07-30 the front/back assignment was assumed from the order two photos arrived in, written down as fact, and was wrong.
+🔴 **Leave unknowns EMPTY.** Where a print was acquired, what he paid, the edition number — if the photo does not say and no source says, omit it. *A plausible guess in a data field is worse than a blank, because the blank is honest and the guess is indistinguishable from a fact.* This is not hypothetical: on 2026-07-30 the front/back assignment was assumed from the order two photos arrived in, written down as fact, and was wrong.
 
 ### 5. Research what is cheaply knowable
 
@@ -153,11 +159,15 @@ Since **v17** the confirm screen renders both faces as editable 3×3 grids: rota
 
 **If Michael tells you he fixed an arrangement on screen: get the corrected grids from him and commit them to the batch file in the same session.** Two claimants on one truth is the failure this repo collapses on sight, and here the losing claimant is the one in version control.
 
-🚫 **The editor is not a substitute for step 2.** It can only permute placements that are already there — it cannot invent a name, split a card, or fix a misread title. Handing over a rotation you knew was uncertain and expecting him to sort it out is not a workflow.
+🚧 **The editor is not a substitute for step 2.** It can only permute placements that are already there — it cannot invent a name, split a card, or fix a misread title. Handing over a rotation you knew was uncertain and expecting him to sort it out is not a workflow.
+
+---
 
 ## Output
 
 A merged PR containing exactly two changed files, plus a handoff message covering the four points above. **No writes to the database.** The importer is Michael's to press.
+
+---
 
 ## What the app checks for you
 
@@ -167,9 +177,27 @@ So a mistake costs you a push and a re-read, never a half-applied import. The ba
 
 ⚠️ **What it CANNOT check is whether your transcription is TRUE.** Validation proves a batch is well formed. `ice-cream` was flawless JSON, validated green, and 90° wrong. **The grid on the confirm screen is the only check that catches that, and it only works if someone looks at it next to the physical sheet.** Say so in the handoff.
 
-## Composes with / overrides
+---
 
-Runs before **Commit Pre-flight** and **Post-Build Verify** (both apply to the PR as normal). Does **not** compose with the size-budget enforcer — batch files are data, they are never read whole to be edited safely, and editing one cannot break the app.
+## Guardrails
+
+- 🔴 If you find yourself editing a `.js` file, you have gone off the rails. `batch.js` is a loader; it never changes for new data.
+- 🔴 Leave unknowns EMPTY. A plausible guess in a data field is worse than a blank.
+- 🔴 One card never establishes orientation. Count all nine and take the majority.
+- Never auto-commit a "cleaned" arrangement without confirmation from Michael.
+- A discrepancy you can explain is not a discrepancy you have resolved.
+- `artwork_id` is permanent and global. Collisions are silent data corruption.
+- You do not run the import. You prepare it; Michael presses the button.
+
+---
+
+## Composes with
+
+- `hooks/commit-pre-flight.md` — applies to the PR as normal
+- `hooks/post-build-verify.md` — applies to the PR as normal
+- Does NOT compose with source-size-budget-enforcer — batch files are data, never read whole to be edited safely
+
+---
 
 ## Examples
 
@@ -179,7 +207,10 @@ Runs before **Commit Pre-flight** and **Post-Build Verify** (both apply to the P
 - **A sheet that is only half full.** → `null` in the empty pockets. Sparse is the design; absence *is* the empty slot.
 - **A photo you cannot orient** (no punch strip in frame, captions split 5–4). → transcribe your best reading, say in `source` and in the handoff that orientation is unverified, and point him at the rotate buttons. An unflagged guess is the failure; a flagged one is a two-tap fix.
 
+---
+
 ## Changelog
 
-- v2 (2026-07-31) — **added step 2, ORIENT BEFORE YOU READ.** `ice-cream` was imported 90° out of true because the hook asserted "the grid IS the photograph" without ever establishing which way was up, and the one caption that read horizontally belonged to the one landscape card. Also: caption orientation is a majority vote; a discrepancy explained in `notes` is not a discrepancy resolved; `source` must record the orientation call; and the new v17 on-screen editor comes with an obligation to commit the correction back.
-- v1 (2026-07-31) — initial. Replaces the previous procedure, which was "edit `batch.js`" and made every transcription a code change in the file feeding an irreversible bulk write.
+- **v3 (2026-08-02)** — Header normalized to hook template standard (Audit Anna fix-spec, wave 1). Added Steward (Milo), Front door, Established, Coordinates, Guardrails section. Title normalized (subtitle "Inciardi Collection" moved to scope note in Coordinates).
+- **v2 (2026-07-31)** — **Added step 2, ORIENT BEFORE YOU READ.** `ice-cream` was imported 90° out of true because the hook asserted "the grid IS the photograph" without ever establishing which way was up, and the one caption that read horizontally belonged to the one landscape card. Also: caption orientation is a majority vote; a discrepancy explained in `notes` is not a discrepancy resolved; `source` must record the orientation call; and the new v17 on-screen editor comes with an obligation to commit the correction back.
+- **v1 (2026-07-31)** — Initial. Replaces the previous procedure, which was "edit `batch.js`" and made every transcription a code change in the file feeding an irreversible bulk write.
