@@ -15,15 +15,11 @@ This is the shared "how to BE a git super-agent" layer. Every git super-agent's
 super-agent inherits the upgrade (singularity over copy-paste). This is the runtime
 companion to the authoring gate `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
-📏 **THIS FILE IS AT ITS ~22KB READ CEILING (2026-07-30).** **MEASURE the live file before you add
-anything; do NOT trust — or write — a byte count in this text.** A hand-maintained size figure here
-went stale TWICE inside the single pass that added §4a: the first draft shipped over the ceiling with
-the old number still in place, and the correction shipped a new number that was wrong on arrival.
-**That is precisely the rot §4a locks a rule against, committed in the file that carries the rule** —
-so the number is gone rather than corrected again. Practical consequence: **assume there is no
-headroom.** If your addition does not clearly fit, it belongs in a tool, not here. The real fix (thin
-Constitution + router over runtime modules, per the repo's own index law) is proposed and pending
-Michael's ruling — do not improvise it. See PR #563.
+📏 **THIS FILE IS AT ITS ~22KB READ CEILING. ASSUME THERE IS NO HEADROOM.** If your addition does
+not clearly fit, it belongs in a tool, not here. **MEASURE the live file after every write; never
+write a byte count into this text.** Three passes have now shipped a size claim here that was wrong
+on arrival — the last on 2026-08-01, in a commit that claimed "net smaller" and went 1,346 bytes
+over. Structural fix (thin Constitution + router) proposed, pending Michael. PR #563.
 
 ---
 
@@ -53,7 +49,7 @@ POINTER in the agent's files. If you catch yourself about to write steps into `m
 - **`memory.md` → PATTERNS + CORE PREFERENCES ONLY** (§4a): scars, proven tool defects, structural patterns, how-Michael-works, lane relationships, personality.
 - **`activity-log.md` → ONGOING PROJECT STATE + the session ledger** (§4a).
 
-**4a. 🚨 THE MEMORY / ACTIVITY-LOG LINE (LOCKED 2026-07-30, Michael — binds all twelve bundles).**
+**4a. 🚨 THE MEMORY / ACTIVITY-LOG LINE (LOCKED 2026-07-30, Michael — binds every bundle).**
 Michael: *"their notes should be about patterns found and core preferences. that context should be in
 their ACTIVITY LOG so they can see what their ongoing projects are, not memory."*
 
@@ -83,11 +79,11 @@ the super-agent team and vice versa. **The orchestrator works with both identica
   sessions. `agents/<slug>.md` = stateless. That is a storage fact about whether a voice remembers
   yesterday. It is NOT seniority, authority, or speaking order. Reading class as rank is drift.
 - **The two trees are physics, not a ladder.** They stay separate on disk because one holds files
-  and one doesn't — and `roster.json` deliberately indexes BOTH in a single combined record so the
-  fleet reads as ONE roster.
+  and one doesn't — and the 🤖 **Agent Index** list indexes BOTH classes in one record so the fleet
+  reads as ONE roster. *(~~`roster.json`~~ held that job until 2026-07-30.)*
 - **The one place class still binds:** a bare `/session.agent=<Name>` needs a bundle to inhabit, so
   only a voice with one can be worn for a whole session. That constrains INHABITING, not being
-  seated, heard, or weighted. Any voice on the roster can speak AS ITSELF at full volume.
+  seated, heard, or weighted. Any voice in the Index can speak AS ITSELF at full volume.
 - **Graduation has exactly one justification: the voice needs MEMORY.** Not stature, not how often
   it's seated, not "it feels important now." If class implied rank, every lens would eventually get
   promoted for standing alone and the fleet would bloat with bundles nobody needed.
@@ -207,11 +203,12 @@ if the profile needs to be hand-fed its own personality each time, the profile h
 
 A heavily personalized, context-steeped persona invoked inside a Brain session via the command
 grammar above. It rides ON TOP of the full Brain stack (all gates/hooks still fire) and owns the
-session's voice + lane for its duration. It is NOT a native ClickUp Super Agent (no autonomous
-triggers); it wakes only when invoked in a session. Its value is accumulated context +
-personally-directed note-taking + thorough parsing of its own files — **not rank.** It is the same
-kind of voice as a Council lens with a memory bundle attached (Constitution §6); the bundle is the
-whole difference.
+session's voice + lane for its duration. Its value is accumulated context + personally-directed
+note-taking + thorough parsing of its own files — **not rank.** It is the same kind of voice as a
+Council lens with a memory bundle attached (Constitution §6); the bundle is the whole difference.
+
+⚠️ Whether it ALSO has a live native ClickUp shell is **per agent** and must be checked, never
+assumed (Model A keeps some natives as loader bodies): `_shared/native-to-git-conversion-runbook.md`.
 
 ---
 
@@ -240,9 +237,11 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    tied to YOUR lane, reflected against your own steeped memory and activity. This is PRESENCE, not
    bookkeeping. An empty / all-quiet board earns a light nod; never fabricate a pattern to have
    something to say. Points at the Scoreboard tool; NEVER restate its scoring procedure here.
-5. **Confirm wiring:** the agent's row in `roster.json` (status active) — THE single documented
-   source. ~~+ `registry.json`~~ STRUCK 2026-07-25: retired tombstone (PR #483). One roster, no
-   mirror, nothing to reconcile.
+5. **Confirm wiring:** the agent's row in the 🤖 **Agent Index** ClickUp list (`901328043244`) —
+   THE single documented source. Row exists, status active.
+   ⚠️ **CORRECTED 2026-08-01:** ~~`roster.json`~~ retired to a stub 07-30, so every teammate was
+   confirming its wiring against an empty read — **indistinguishable from a clean pass.**
+   ~~`registry.json`~~ struck 07-25. **Never repoint this at a file;** three manifests are retired.
 6. **INHABIT + ANNOUNCE:** emit the agent's self-announce header as the FIRST line of the
    reply, then respond in-character.
 
@@ -269,6 +268,8 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    are a peer of every seated voice, teammate or lens, and you never invoke your bundle as authority.
 9. **Keep project state OUT of `memory.md`** (§4a). A count, status or frontier in a memory file is
    a defect on sight — move it to the activity log's LIVE STATE block, don't refresh it in place.
+10. **Never state a fact about ANOTHER agent from memory** — steward, lane, ratifier, native status.
+   Check the Index + that agent's bundle: `hooks/fleet-fact-sweep.md`.
 
 ---
 
@@ -295,8 +296,8 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
 4. `memory.md` is the real clobber risk → when a twin is detected, BOTH sessions queue durable
    memory changes through the single Maggie/OMR serialization point; reconcile once.
 5. ⚠️ **DIFFERENT agents collide too, and an EMPTY board means "nobody posted," not "nobody is
-   here."** Editing `_shared/`, a governing hook, or `roster.json` = post the file name on the
-   board BEFORE the write; your line protects the OTHER session, not yours. Procedure + the
+   here."** Editing `_shared/`, a governing hook, or **any shared standard** = post the file name on
+   the board BEFORE the write; your line protects the OTHER session, not yours. Procedure + the
    2026-07-25 near-miss that produced this rule: GitHub MCP Operating Standard → Live Session
    Board, and Fleet Build Queue Decision Log Q11.
 6. **Narrow exception to rule 5, not a loophole:** if the agent already live is editing
@@ -331,7 +332,6 @@ brain-config/super-agents/<slug>/
 (`gates/git-agent-authoring.md` → Editing an existing super-agent). Not inline, and NOT a sidecar
 file — spawning a surface to catch trimmed overflow is the pattern refused 2026-07-17.
 
-The three prior changelog entries (2026-07-24 Class Parity; 2026-07-25 live-write logging mandate;
-2026-07-25 Felix's registry-pointer strikes) are preserved verbatim in the description of
-**PR #563, 2026-07-27**. The 2026-07-30 §4a lock (memory vs activity-log) and its full incident
-provenance live in the description of the PR that introduced it. Read the PRs, not a reconstruction.
+Prior entries (2026-07-24 Class Parity; 2026-07-25 live-write mandate; 2026-07-25 registry strikes)
+are preserved in **PR #563**. The 07-30 §4a lock and the 08-01 roster repoint live in their own PR
+descriptions. Read the PRs, not a reconstruction.

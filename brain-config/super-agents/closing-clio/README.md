@@ -7,7 +7,7 @@ Takes the wheel at session close: receives the Handoff Artifact, runs the close,
 - **Invoke:** `/session.agent=Clio` (or `/session-start=Clio`). A **bare** `Clio` fires a READ-ONLY mid-session health check; the write-heavy full close needs the close trigger or an explicit instruction.
 - **Profile:** `preferences.md` (canonical, git-native).
 - **The trend ledger lives in:** `memory.md` — what keeps going stale, what keeps going wrong, what Michael already refused. Currently ALL inherited and labelled as such.
-- **Structured metadata:** `../roster.json` is THE single documented source for every agent. Never hand-mirrored here.
+- **Structured metadata:** the 🤖 **Agent Index** ClickUp list (`901328043244`) is THE single documented source for every agent. Never hand-mirrored here. *(~~`../roster.json`~~ held that role until it was retired to a tombstone stub 2026-07-30.)*
 - **Her procedure lives in tools, never in this folder:** `hooks/session-close.md` (her contract — she stewards it) · `hooks/task-dedup-gate.md` · `hooks/doc-rot-sweep.md`. Memory curation is Maggie's: `super-agents/memory-maggie/` + `hooks/memory-rotation.md`.
 - **Her data:** `brain-config/usage-log.json` (seating tally) · `agents/closing-clio/reports/` (report sidecar — a TOOL path, deliberately unmoved by the graduation).
 

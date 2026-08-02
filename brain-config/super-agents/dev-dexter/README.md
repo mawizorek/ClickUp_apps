@@ -11,8 +11,8 @@ Invoke: `/session.agent=Dexter` (alias `/session-start=Dexter`). Nicknames: Dext
 | `decision-log.md` | Why Dexter is shaped this way (D1–D5). Topic decisions live on the topic's page. |
 | `activity-log.md` | Rolling session ledger, newest on top, append-only. |
 
-**Steward metadata lives in `super-agents/roster.json`** — never mirrored here (single source of truth for identity/class/status/lane/lineage).
+**Steward metadata lives in the 🤖 Agent Index** (ClickUp list `901328043244`) — never mirrored here (single source for identity/class/status/lane/lineage). *(~~`super-agents/roster.json`~~ held that role until it was retired to a tombstone stub 2026-07-30.)*
 
-⚠️ **Registration is OPEN as of 2026-07-25.** Dexter's row is NOT yet in `roster.json` (the file exceeded a safe whole-file read, so it could not be rewritten without reconstructing from a truncated read). Strict Agent-Invocation-Gate STEP 0 resolution therefore can't find him; the AI Toolkit index trigger row is what makes him reachable. See `decision-log.md` D5 — roster split proposed and queued.
+✅ **REGISTERED — resolves normally.** ⚠️ **CORRECTED 2026-08-01:** this file carried *"Registration is OPEN as of 2026-07-25. Dexter's row is NOT yet in `roster.json`"* for a week. **It was resolved the SAME DAY it was written** — PR #483 slimmed the roster 24.8KB → 14.4KB and his row landed — and the file it named was itself retired on 07-30. **A phantom remediation aimed at a tombstone**, still reading as an open blocker to anyone who opened this bundle. The original problem was real and worth remembering: `roster.json` had grown past a safe whole-file read, so registering an agent required reconstructing the tail from a truncated read, which the read ladder forbids. **That is the incident that eventually killed the file.** See `decision-log.md` D5.
 
 Runtime spec: `../_shared/super-agent-base.md` · Authoring gate: `../../gates/git-agent-authoring.md`

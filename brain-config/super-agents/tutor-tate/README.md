@@ -1,7 +1,8 @@
 # Tutor Tate — bundle README
 
-Pointer/steward metadata only. **This file never mirrors `roster.json` fields** — the roster is the
-resolution index and the single structured source.
+Pointer/steward metadata only. **This file never mirrors 🤖 Agent Index fields** — the Index (ClickUp
+list `901328043244`) is the resolution index and the single structured source. *(~~`roster.json`~~
+held that role until it was retired to a tombstone stub 2026-07-30.)*
 
 - **Home:** `brain-config/super-agents/tutor-tate/`
 - **Class:** git-teammate (persistent memory). Invoke `/session.agent=Tate`. No autonomous triggers.

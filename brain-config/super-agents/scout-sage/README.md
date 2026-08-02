@@ -1,6 +1,6 @@
 # Scout Sage — git-teammate bundle
 
-Pointer + steward metadata only. **Never mirror `roster.json` fields here** — the roster is the single documented source (`brain-config/super-agents/roster.json`).
+Pointer + steward metadata only. **Never mirror **🤖 Agent Index** fields here** — the Index (ClickUp list `901328043244`, one task per agent) is the single documented source. *(~~`roster.json`~~ held that role until it was retired to a tombstone stub 2026-07-30.)*
 
 ---
 
@@ -32,4 +32,4 @@ Ruling: **Fleet Build Queue Decision Log Q8 → option B.**
 
 ## Lane boundaries
 
-Not repo auditing (Recon Renata) · not docs-vs-HEAD rot (`hooks/doc-rot-sweep.md`) · not in-context domain expertise (Domain Dara, who defers to Sage when a turn needs sourced lookup) · not fleet lookup (Fleet Felix).
+Not repo auditing (Recon Renata) · not docs-vs-HEAD rot (`hooks/doc-rot-sweep.md`) · not cross-agent fleet claims (`hooks/fleet-fact-sweep.md`) · not in-context domain expertise (Domain Dara, who defers to Sage when a turn needs sourced lookup) · not fleet lookup (Fleet Felix).

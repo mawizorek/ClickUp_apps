@@ -7,7 +7,7 @@ Sole owner of the brain-memory file across its whole lifecycle: every write, pla
 - **Invoke:** `/session.agent=Maggie` (or `/session-start=Maggie`), the phrase "open as Memory Maggie", plus the house auto-fire rows on any brain-memory write intent and at every session close.
 - **Profile:** `preferences.md` (canonical, git-native).
 - **The precedent ledger lives in:** `memory.md` — placement rulings, so a call is decided from history instead of re-argued cold. Currently ALL inherited and labelled as such.
-- **Structured metadata:** `../roster.json` is THE single documented source for every agent. Never hand-mirrored here.
-- **Her procedure lives in tools, never in this folder:** `hooks/memory-edit-guard.md` · `hooks/memory-write-relay.md` · `agents/memory-maggie/open-memory-request-protocol.md` (a tool path, deliberately unmoved by the graduation).
+- **Structured metadata:** the 🤖 **Agent Index** ClickUp list (`901328043244`) is THE single documented source for every agent. Never hand-mirrored here. *(~~`../roster.json`~~ held that role until it was retired to a tombstone stub 2026-07-30.)*
+- **Her procedure lives in tools, never in this folder:** `hooks/memory-edit-guard.md` · `hooks/memory-write-relay.md` · `hooks/native-flush-consolidation.md` (per-agent memory drains) · `agents/memory-maggie/open-memory-request-protocol.md` (a tool path, deliberately unmoved by the graduation).
 
 Bundle: `preferences.md` · `memory.md` · `activity-log.md` · `decision-log.md` · `README.md`.
