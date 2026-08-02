@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cast Grid v0.1-poc</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--text:#eee;--muted:#888;--success:#4ecca3;--warn:#f39c12;--border:#2a2a4a}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1rem}
+.banner{background:var(--accent);color:#fff;text-align:center;padding:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.05em;border-radius:4px;margin-bottom:1rem}
+h1{font-size:1.4rem;margin-bottom:.5rem}
+.subtitle{color:var(--muted);font-size:.8rem;margin-bottom:1.5rem}
+.setup{background:var(--surface);border-radius:8px;padding:1.5rem;max-width:500px;margin:2rem auto}
+.setup label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:.25rem;margin-top:.75rem}
+.setup input,.setup select{width:100%;padding:.5rem;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text);font-size:.9rem}
+.setup button,.btn{background:var(--accent);color:#fff;border:none;padding:.6rem 1.2rem;border-radius:4px;cursor:pointer;font-weight:600;font-size:.85rem;margin-top:1rem}
+.setup button:hover,.btn:hover{opacity:.85}
+.btn-secondary{background:var(--card);border:1px solid var(--border)}
+.status{padding:.75rem;border-radius:4px;margin:1rem 0;font-size:.8rem}
+.status.loading{background:#1e3a5f;border:1px solid #2980b9}
+.status.error{background:#3d1515;border:1px solid var(--accent)}
+.status.success{background:#1a3d2e;border:1px solid var(--success)}
+.grid-container{overflow-x:auto;margin-top:1rem}
+table.matrix{border-collapse:collapse;width:100%;min-width:600px}
+table.matrix th{background:var(--surface);padding:.6rem .8rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;border:1px solid var(--border);position:sticky;top:0;z-index:2}
+table.matrix th.corner{background:var(--bg);z-index:3}
+table.matrix th.col-header{writing-mode:horizontal-tb;min-width:120px}
+table.matrix td{border:1px solid var(--border);padding:.4rem;vertical-align:top;min-width:120px}
+table.matrix tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.cell-card{background:var(--card);border-radius:4px;padding:.4rem .6rem;margin:.2rem 0;font-size:.75rem;border-left:3px solid var(--muted)}
+.cell-card.offered{border-left-color:var(--warn)}
+.cell-card.accepted{border-left-color:#3498db}
+.cell-card.active{border-left-color:var(--success)}
+.cell-card.wrapped{border-left-color:var(--muted)}
+.cell-card .person{font-weight:600}
+.cell-card .status-badge{font-size:.65rem;opacity:.7;margin-top:.15rem}
+.row-header{font-weight:600;background:var(--surface);white-space:nowrap;font-size:.8rem;position:sticky;left:0;z-index:1}
+.empty-cell{color:var(--muted);font-size:.7rem;font-style:italic;text-align:center;padding:1rem}
+.toolbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem}
+.toolbar select{padding:.4rem;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:.8rem}
+.field-map{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:.75rem 0}
+.field-map label{font-size:.75rem;color:var(--muted)}
+.field-map select{padding:.4rem;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:.8rem;width:100%}
+.meta{font-size:.7rem;color:var(--muted);margin-top:1.5rem;text-align:center}
+#app{max-width:1400px;margin:0 auto}
+.refresh-note{font-size:.7rem;color:var(--muted);margin-top:.5rem}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="banner">⚠️ THIS IS A PROTOTYPE (v0.1-poc) — proof of concept only</div>
+  <h1>🎭 Cast Grid</h1>
+  <p class="subtitle">Roles × Productions → People. Live from ClickUp.</p>
+  <div id="content"></div>
+  <p class="meta">cast-grid v0.1-poc · <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/cast-grid" style="color:var(--accent)">source</a></p>
+</div>
+
+<script>
+const APP_VERSION = '0.1-poc';
+const STORAGE_KEY = 'cast_grid_config';
+const API_BASE = 'https://api.clickup.com/api/v2';
+
+let state = { tasks: [], fields: [], config: loadConfig() };
+
+function loadConfig() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveConfig(c) {
+  state.config = { ...state.config, ...c };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.config));
+}
+
+function $(id) { return document.getElementById(id); }
+function render(html) { $('content').innerHTML = html; }
+
+function showSetup() {
+  const c = state.config;
+  render(`
+    <div class="setup">
+      <h2 style="font-size:1.1rem;margin-bottom:.5rem">Configuration</h2>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">Your token stays in localStorage. Never touches a server.</p>
+      <label>ClickUp API Token</label>
+      <input id="token" type="password" placeholder="pk_..." value="${c.token||''}">
+      <label>List ID (Show Roles / assignments list)</label>
+      <input id="listId" type="text" placeholder="e.g. 901327329300" value="${c.listId||''}">
+      <p style="font-size:.7rem;color:var(--muted);margin-top:.25rem">Find this in the list URL: app.clickup.com/.../list/<b>THIS_NUMBER</b></p>
+      <button onclick="startFetch()">Load Data →</button>
+    </div>
+  `);
+}
+
+async function apiFetch(endpoint, token) {
+  const r = await fetch(`${API_BASE}${endpoint}`, {
+    headers: { 'Authorization': token, 'Content-Type': 'application/json' }
+  });
+  if (!r.ok) throw new Error(`API ${r.status}: ${r.statusText}`);
+  return r.json();
+}
+
+async function startFetch() {
+  const token = $('token')?.value?.trim();
+  const listId = $('listId')?.value?.trim();
+  if (!token || !listId) { alert('Both fields required'); return; }
+  saveConfig({ token, listId });
+  render(`<div class="status loading">Fetching tasks from list ${listId}...</div>`);
+  try {
+    const tasksData = await fetchAllTasks(token, listId);
+    state.tasks = tasksData;
+    const fields = extractFields(tasksData);
+    state.fields = fields;
+    render(`<div class="status success">Loaded ${tasksData.length} tasks with ${fields.length} custom fields.</div>`);
+    setTimeout(() => showFieldMapping(), 500);
+  } catch (e) {
+    render(`<div class="status error">Error: ${e.message}</div><button class="btn" onclick="showSetup()">← Back to setup</button>`);
+  }
+}
+
+async function fetchAllTasks(token, listId) {
+  let all = [], page = 0, more = true;
+  while (more) {
+    const data = await apiFetch(`/list/${listId}/task?page=${page}&include_closed=true&subtasks=true`, token);
+    all = all.concat(data.tasks || []);
+    more = (data.tasks || []).length >= 100;
+    page++;
+  }
+  return all;
+}
+
+function extractFields(tasks) {
+  const fieldMap = new Map();
+  for (const t of tasks) {
+    for (const f of (t.custom_fields || [])) {
+      if (!fieldMap.has(f.id)) fieldMap.set(f.id, { id: f.id, name: f.name, type: f.type });
+    }
+  }
+  return [...fieldMap.values()];
+}
+
+function showFieldMapping() {
+  const fields = state.fields;
+  const relFields = fields.filter(f => f.type === 'list_relationship');
+  const allFields = fields;
+  const c = state.config;
+  const opts = (arr, selected) => arr.map(f =>
+    `<option value="${f.id}" ${f.id===selected?'selected':''}>${f.name} (${f.type})</option>`
+  ).join('');
+  const noneOpt = '<option value="">(none / use task name)</option>';
+
+  render(`
+    <div class="setup" style="max-width:700px">
+      <h2 style="font-size:1rem;margin-bottom:.5rem">Map Your Fields</h2>
+      <p style="font-size:.8rem;color:var(--muted)">Tell the grid which field is which. Relationship fields auto-detected: <b>${relFields.length}</b></p>
+      <div class="field-map">
+        <div>
+          <label>ROWS (Role) — group by:</label>
+          <select id="rowField">${noneOpt}${opts(allFields, c.rowField)}</select>
+        </div>
+        <div>
+          <label>COLUMNS (Production) — pivot on:</label>
+          <select id="colField">${noneOpt}${opts(allFields, c.colField)}</select>
+        </div>
+        <div>
+          <label>CELL LABEL (Person):</label>
+          <select id="cellField">${noneOpt}${opts(allFields, c.cellField)}</select>
+        </div>
+        <div>
+          <label>STATUS coloring:</label>
+          <select id="statusMode">
+            <option value="native" ${c.statusMode==='native'?'selected':''}>Task status</option>
+            <option value="field" ${c.statusMode==='field'?'selected':''}>Custom field</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="buildGrid()">Build Matrix →</button>
+      <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">← Config</button>
+      <p class="refresh-note">Found ${state.tasks.length} tasks · ${fields.length} fields (${relFields.length} relationships)</p>
+    </div>
+  `);
+}
+
+function getFieldValue(task, fieldId) {
+  if (!fieldId) return null;
+  const cf = (task.custom_fields || []).find(f => f.id === fieldId);
+  if (!cf || cf.value === null || cf.value === undefined) return null;
+  if (cf.type === 'list_relationship') {
+    const items = Array.isArray(cf.value) ? cf.value : [cf.value];
+    return items.map(v => (typeof v === 'object' && v !== null) ? (v.name || v.id || JSON.stringify(v)) : String(v));
+  }
+  if (cf.type === 'drop_down' && cf.type_config?.options) {
+    const opt = cf.type_config.options.find(o => o.orderindex === cf.value || o.id === cf.value || o.name === cf.value);
+    return opt ? [opt.name] : [String(cf.value)];
+  }
+  if (cf.type === 'labels' && Array.isArray(cf.value)) {
+    return cf.value.map(v => typeof v === 'object' ? (v.label || v.name || v.id) : String(v));
+  }
+  if (Array.isArray(cf.value)) return cf.value.map(v => typeof v === 'object' ? (v.name || v.username || v.id || JSON.stringify(v)) : String(v));
+  if (typeof cf.value === 'object') return [cf.value.name || cf.value.id || JSON.stringify(cf.value)];
+  return [String(cf.value)];
+}
+
+function buildGrid() {
+  const rowField = $('rowField')?.value || '';
+  const colField = $('colField')?.value || '';
+  const cellField = $('cellField')?.value || '';
+  const statusMode = $('statusMode')?.value || 'native';
+  saveConfig({ rowField, colField, cellField, statusMode });
+
+  const tasks = state.tasks;
+  const rows = new Map(); // role -> Set of values
+  const cols = new Set();
+  const grid = new Map(); // "row|||col" -> [{person, status}]
+
+  for (const t of tasks) {
+    const rowVals = rowField ? getFieldValue(t, rowField) : [t.name];
+    const colVals = colField ? getFieldValue(t, colField) : ['(all)'];
+    const cellVals = cellField ? getFieldValue(t, cellField) : [t.name];
+    const status = t.status?.status || t.status || '';
+
+    if (!rowVals || !rowVals.length) continue;
+    if (!colVals || !colVals.length) continue;
+
+    for (const rv of rowVals) {
+      rows.set(rv, true);
+      for (const cv of colVals) {
+        cols.add(cv);
+        const key = `${rv}|||${cv}`;
+        if (!grid.has(key)) grid.set(key, []);
+        grid.get(key).push({
+          person: cellVals ? cellVals.join(', ') : t.name,
+          status: status,
+          taskName: t.name,
+          url: t.url
+        });
+      }
+    }
+  }
+
+  const sortedRows = [...rows.keys()].sort();
+  const sortedCols = [...cols].sort();
+
+  if (!sortedRows.length || !sortedCols.length) {
+    render(`
+      <div class="status error">No data to pivot. Check your field mappings.</div>
+      <button class="btn" onclick="showFieldMapping()">← Remap fields</button>
+    `);
+    return;
+  }
+
+  let html = `
+    <div class="toolbar">
+      <button class="btn btn-secondary" onclick="showFieldMapping()">⚙ Remap</button>
+      <button class="btn btn-secondary" onclick="startFetch()">↻ Refresh</button>
+      <button class="btn btn-secondary" onclick="showSetup()">🔑 Config</button>
+      <span style="font-size:.75rem;color:var(--muted)">  ${sortedRows.length} roles × ${sortedCols.length} productions · ${tasks.length} assignments</span>
+    </div>
+    <div class="grid-container">
+    <table class="matrix">
+      <thead><tr><th class="corner">Role \\ Production</th>`;
+
+  for (const col of sortedCols) {
+    html += `<th class="col-header">${esc(col)}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  for (const row of sortedRows) {
+    html += `<tr><td class="row-header">${esc(row)}</td>`;
+    for (const col of sortedCols) {
+      const key = `${row}|||${col}`;
+      const entries = grid.get(key) || [];
+      if (!entries.length) {
+        html += `<td><div class="empty-cell">—</div></td>`;
+      } else {
+        html += '<td>';
+        for (const e of entries) {
+          const cls = e.status.toLowerCase().replace(/[^a-z]/g,'');
+          html += `<div class="cell-card ${cls}"><div class="person">${esc(e.person)}</div><div class="status-badge">${esc(e.status)}</div></div>`;
+        }
+        html += '</td>';
+      }
+    }
+    html += '</tr>';
+  }
+
+  html += '</tbody></table></div>';
+  render(html);
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Boot
+if (state.config.token && state.config.listId) {
+  render(`
+    <div class="setup" style="max-width:500px">
+      <p style="font-size:.85rem">Config loaded from last session.</p>
+      <button onclick="startFetch()">Load Data →</button>
+      <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">Change Config</button>
+    </div>
+  `);
+} else {
+  showSetup();
+}
+</script>
+</body>
+</html>
