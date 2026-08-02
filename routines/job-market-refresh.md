@@ -6,7 +6,7 @@ steward: routine-ricky
 cadence: pointer only — authoritative cadence is the row in routines/schedule.md
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 15
+version: 16
 model: loop-per-role
 ---
 
@@ -49,6 +49,21 @@ report-to:  DETAIL → the standing thread `86ajtgbt3` (role blocks + pass summa
 > **📐 SLIM SAME/GONE, RICH NEW.** (LOCKED 2026-08-02, Michael)
 > SAME and GONE blocks use a **single-line-per-listing** format: all info on one line, no separators, no stacking. These blocks should be tiny. NEW listings keep the full stacked template (multi-line, separators, qualification note) because those are the ones worth reading in detail. The density of SAME/GONE is the point: scan 20 listings in 20 lines.
 
+> **💬 ONE COMMENT PER NEW LISTING.** (LOCKED 2026-08-02, Michael)
+> Each NEW listing is posted as its own individual threaded reply under the role header. NOT lumped into a single "🆕 NEW" block. This enables Michael to react (emoji) or reply to each listing independently. A pass with 5 new PM listings = 5 separate threaded comments, each tappable, each reactable. SAME and GONE stay as single compressed blocks (no individual reactions needed for already-seen or disappeared listings).
+
+> **🗳️ REACTION-BASED RATING.** (LOCKED 2026-08-02, Michael)
+> Michael rates individual NEW listings via emoji reactions on their comments. The rating vocabulary: 🔥 = hot/pursuing, 👍 = solid/track it, 👎 = not for me, 🤔 = interesting but questions. Brain reads these reactions on subsequent passes to build preference patterns (geography, salary, org type, role level, contract type). Over multiple passes, these reactions train the Spotlight selection and inform which listings get elevated vs deprioritized in future sweeps.
+
+> **⚡ SPOTLIGHT IN SUMMARY.** (LOCKED 2026-08-02, Michael)
+> The Pass Summary includes a ⚡ Spotlight section: the top 3 listings across ALL roles that are newest + highest-salary + best-fit (informed by accumulated reaction patterns). The spotlight is the "don't miss these" elevator pitch for the whole pass. It lives above the comment index so it's the first thing read.
+
+> **🏷️ FRICTION ICONS ON EVERY LISTING.** (LOCKED 2026-08-02, Michael)
+> Every listing (SAME and NEW) carries an application friction icon: ✅ = direct apply (online form/portal), 📝 = email submission, 🔒 = gated (requires membership, login, or agent). This tells Michael at a glance how hard it is to act on a listing.
+
+> **🔗 BOARD HOMEPAGE LINKS IN SOURCES.** (LOCKED 2026-08-02, Michael)
+> The SOURCES block links every board name to its homepage URL. Board names are never plain text. Format: `[**<Board>**](<homepage-url>) \`CODE\`` so each source is a tap target.
+
 ## 📍 Architecture
 
 **One task, one conversation, three persistence layers.**
@@ -60,7 +75,7 @@ report-to:  DETAIL → the standing thread `86ajtgbt3` (role blocks + pass summa
 |-------|-------|--------|
 | `routines/job-market-roles.json` | **The gate.** Defines which roles to search, with what keywords, on what boards. The loop driver. | Every pass (step 1). |
 | `routines/job-market-state.tsv` | Structured index. Every live listing normalized. Also an organic **venue/org index**: the `org` column is growing a theatre directory as a side effect. | Each role iteration (filtered by lane). |
-| Comment thread | Narrative. One standalone header per role per pass. | Michael on his phone. |
+| Comment thread | Narrative. One standalone header per role per pass. Individual NEW listing comments enable reaction-based rating. | Michael on his phone. |
 
 **TSV is source of truth.** Thread is the read surface. TSV wins disagreements.
 
@@ -70,6 +85,17 @@ report-to:  DETAIL → the standing thread `86ajtgbt3` (role blocks + pass summa
 - `gone` when it disappears. Gone rows stay one pass, then get deleted. Git preserves history.
 - `acted` when Michael says to act and an Application task is created.
 - Uncommitted pass = didn't happen.
+
+### Reaction data
+
+Reactions on individual NEW listing comments are READ by subsequent passes. The agent checks reactions on the previous pass's NEW listings before starting the sweep. Patterns to track:
+- Geography preferences (which cities/regions get 🔥 vs 👎)
+- Salary threshold (lowest-salary listings that still get 👍)
+- Org type affinity (LORT vs touring vs commercial vs dance)
+- Contract type (FT staff vs seasonal vs per-show)
+- Role level (Director vs Manager vs Assistant)
+
+These patterns inform Spotlight selection and, over time, can influence which borderline listings qualify vs get logged as NOTABLE only.
 
 ## 🔑 The Gate: `routines/job-market-roles.json`
 
@@ -119,6 +145,7 @@ Tab-separated, header row, one listing per line.
 | `salary` | optional | Posted range verbatim, never estimated |
 | `level` | yes | `senior` / `mid` / `associate` / `entry` / `contract` |
 | `status` | yes | `live` / `gone` / `acted` |
+| `friction` | yes | `direct` / `email` / `gated` — how to apply |
 
 **Normalization rules:**
 - One row per listing per board. Cross-posted = two rows.
@@ -126,6 +153,7 @@ Tab-separated, header row, one listing per line.
 - `salary` verbatim or empty.
 - `posted` = board's date. `first_seen` = when routine captured it.
 - `role_id` MUST match an entry in the JSON config. Orphan rows = error.
+- `friction` = how the application works. `direct` = online portal/form. `email` = send materials via email. `gated` = requires membership, login, or agent access.
 
 ## 🔑 Listing IDs
 
@@ -175,16 +203,18 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 
 ```
 🎯 ROLE HEADER  <- the root comment (contains stats + verdict)
-   ├── 🔁 SAME · <n>       <- reply to header (parent = header comment ID)
-   ├── 🆕 NEW · <n>        <- reply to header
-   ├── 🕳️ GONE · <n>       <- reply to header
-   └── 📌 NOTABLE          <- reply to header (if content)
+   ├── 🔁 SAME · <n>              <- ONE reply (compressed block)
+   ├── 🆕 <Listing 1 title>       <- individual reply (rich, reactable)
+   ├── 🆕 <Listing 2 title>       <- individual reply (rich, reactable)
+   ├── 🆕 <Listing 3 title>       <- individual reply (rich, reactable)
+   ├── 🕳️ GONE · <n>              <- ONE reply (compressed block)
+   └── 📌 NOTABLE                 <- ONE reply (if content)
 ```
 
 **Inside the pass summary's thread:**
 
 ```
-📋 PASS COMPLETE  <- root comment
+📋 PASS COMPLETE  <- root comment (includes ⚡ Spotlight)
    └── 🔌 SOURCES <- reply to summary
 ```
 
@@ -193,7 +223,7 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 1. Post the 🎯 ROLE HEADER as a **new root comment** on task `86ajtgbt3`.
 2. The post_comment response returns a **comment ID** (or URL). CAPTURE IT. This is the parent.
 3. Post SAME as a **reply** to that comment ID (set `parent` / `comment_id` / `notify_all: false`).
-4. Post NEW as a **reply** to that same comment ID.
+4. Post each NEW listing as a **separate reply** to that same comment ID. One comment per listing.
 5. Post GONE as a **reply** to that same comment ID.
 6. Post NOTABLE (if any) as a **reply** to that same comment ID.
 7. Move to the next role. Repeat.
@@ -203,6 +233,7 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 **Key rules:**
 - Each role's comment block is self-contained. Reading the Production Manager block tells you everything about the PM market without needing to read any other block.
 - **Role header comment URLs are captured at post time.** The Pass Summary's comment index links to each role header and the SOURCES comment. Threaded replies under headers do NOT need individual links.
+- **Individual NEW listing comments are the REACTION surface.** Michael taps emoji on these. Brain reads reactions next pass.
 
 ---
 
@@ -224,32 +255,36 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 ## Template 2: 🔁 SAME (THREADED REPLY to role header) — SLIM FORMAT
 
 > One line per listing. No separators, no stacking. The block should be scannable in seconds.
+> Friction icon included on every line.
 
 ```
 ### 🔁 SAME · <n>
 
-[<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
-[<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
-[<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
+<friction> [<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
+<friction> [<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
+<friction> [<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
 <repeat, one line per listing>
 ```
 
-## Template 3: 🆕 NEW (THREADED REPLY to role header) — FULL FORMAT
+Friction icons: ✅ = direct apply, 📝 = email, 🔒 = gated
 
-> NEW listings get the rich stacked template. These are what Michael actually reads.
+## Template 3: 🆕 NEW (INDIVIDUAL THREADED REPLIES to role header)
+
+> ⚠️ Each NEW listing is posted as its OWN SEPARATE threaded reply. NOT lumped into one block.
+> This enables reaction-based rating: Michael taps 🔥/👍/👎/🤔 on individual listings.
+
+**One comment per listing, format:**
 
 ```
-### 🆕 NEW · <n>
-
----
-**[<Role>](<url>)** — <Org>
+🆕 **[<Role>](<url>)** — <Org>
 `<JM-ID>` · <location>
-💵 <salary or —> · 📅 <posted>
+💵 <salary or —> · 📅 <posted> · <friction>
 ✅ <why qualifies, <10 words>
-
----
-<repeat per listing>
 ```
+
+Friction values: ✅ direct apply · 📝 email · 🔒 gated
+
+Post each as a separate `post_comment` call with `parent_comment` = the role header's comment ID.
 
 ## Template 4: 🕳️ GONE (THREADED REPLY to role header) — SLIM FORMAT
 
@@ -281,9 +316,15 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 
 **Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
 **Prev pass:** <timestamp> (<elapsed>)
-[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v15
+[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v16
 
 <Density verdict: one line.>
+
+### ⚡ Spotlight
+<Top 3 listings across ALL roles: newest + highest-salary + best-fit. One line each, hyperlinked. These are the "don't miss these" picks for the whole pass. Informed by accumulated reaction patterns when available.>
+1. [<Role>](<url>) — <Org> · <location> · 💵 <salary> · <friction>
+2. [<Role>](<url>) — <Org> · <location> · 💵 <salary> · <friction>
+3. [<Role>](<url>) — <Org> · <location> · 💵 <salary> · <friction>
 
 ### 🗂️ Comment index
 - 🎯 [<Role 1 display>](<role header comment URL>) — <n> live, +<n>
@@ -296,11 +337,27 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 
 ## Template 7: 🔌 SOURCES (THREADED REPLY to pass summary)
 
+> ⚠️ Every board name MUST hyperlink to its homepage. No plain-text board names.
+
 ```
 ### 🔌 SOURCES
 
-- **<Board>** `CODE` — ✅/🔒/❌ · <n> qualifying
-<repeat per board>
+- [**OffStageJobs**](https://staging.offstagejobs.com) `OSJ` — ✅/🔒/❌ · <n> qualifying
+- [**Playbill**](https://playbill.com/jobs) `PB` — ✅/🔒/❌ · <n> qualifying
+- [**BroadwayWorld**](https://www.broadwayworld.com/jobs/) `BWW` — ✅/🔒/❌ · <n> qualifying
+- [**StageLync**](https://www.stagelync.com) `SL` — ✅/🔒/❌ · <n> qualifying
+- [**USITT**](https://www.usitt.org/industry-resources/jobs) `USITT` — ✅/🔒/❌ · <n> qualifying
+- [**StageBoard**](https://stageboard.app) `SB` — ✅/🔒/❌ · <n> qualifying
+- [**Arts Consulting Group**](https://artsconsulting.com/opensearches/) `ACG` — ✅/🔒/❌ · <n> qualifying
+- [**TOC Arts Partners**](https://tocartspartners.com) `TOC` — ✅/🔒/❌ · <n> qualifying
+- [**League of Chicago Theatres**](https://chicagoplays.com/jobs/) `LCTJ` — ✅/🔒/❌ · <n> qualifying
+- [**The Stage Jobs**](https://jobs.thestage.co.uk) `TSJ` — ✅/🔒/❌ · <n> qualifying
+- [**Indeed**](https://www.indeed.com) `IND` — ✅/🔒/❌ · <n> qualifying
+- [**Skene Callboard**](https://skene.pub/callboard) `SKN` — ✅/🔒/❌ · <n> qualifying
+- [**HireCulture**](https://www.hireculture.org) `HC` — ✅/🔒/❌ · <n> qualifying
+- [**APAP**](https://www.apap365.org/resources/job-bank) `APAP` — ✅/🔒/❌ · <n> qualifying
+- [**StageLync**](https://www.stagelync.com) `SL` — ✅/🔒/❌ · <n> qualifying
+<repeat per board hit this pass>
 ```
 
 ---
@@ -313,6 +370,7 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 2. **Read `routines/job-market-state.tsv`** — current full inventory.
 3. **Read `routines/last-run/job-market.txt`.** `never` = first pass.
 4. **If single-role invocation:** filter `roles[]` to the requested role only. Loop length = 1.
+4b. **Check reactions on previous pass's NEW listing comments.** Read emoji reactions on the individual listing comments from the last pass. Note any patterns (which listings got 🔥 vs 👎). Use these to inform Spotlight selection in step 14.
 
 ### The loop (for each role in config)
 
@@ -325,25 +383,27 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
    - If a board yields 0 results for all keywords, try adjacent terms and synonyms before marking it dry.
    - **Minimum board coverage per pass:** hit ALL Tier 1 sources and at least 4 Tier 2 sources. A pass that skips sources without explanation is incomplete.
    - Apply `exclude_terms[]` and `global` constraints. Capture direct URL for every qualifying listing.
+   - **Capture friction type** for each listing: ✅ direct (online form), 📝 email, 🔒 gated.
 7. **Reconcile:**
    - Matched to existing TSV row = SAME (compute days-on-board = today - `posted`)
-   - New find with URL = NEW (assign `JM-ID`, set `role_id`, `lane`, `level`)
+   - New find with URL = NEW (assign `JM-ID`, set `role_id`, `lane`, `level`, `friction`)
    - TSV row not found on boards = GONE
 8. **Stage TSV updates** for this role: append NEW rows, mark GONE rows, update salary if newly found on SAME.
 9. **Post 🎯 ROLE HEADER** as a ROOT comment on task `86ajtgbt3`. The response gives you a **comment ID**. **STORE this ID in a variable** (e.g. `pm_header_id`). You need it for the next step.
 10. **Post threaded replies using the stored comment ID as parent:**
-    - Post 🔁 SAME as a **reply** to `pm_header_id`.
-    - Post 🆕 NEW as a **reply** to `pm_header_id`.
-    - Post 🕳️ GONE as a **reply** to `pm_header_id`.
-    - Post 📌 NOTABLE (if content) as a **reply** to `pm_header_id`.
+    - Post 🔁 SAME as a **single reply** to `pm_header_id` (compressed one-line-per-listing format).
+    - Post each 🆕 NEW listing as a **separate individual reply** to `pm_header_id`. One comment per listing. Use Template 3 format.
+    - Post 🕳️ GONE as a **single reply** to `pm_header_id` (compressed format).
+    - Post 📌 NOTABLE (if content) as a **single reply** to `pm_header_id`.
     - ⚠️ Every one of these MUST set the parent/reply-to parameter. If you post without it, the comment lands as a root comment and the thread is broken.
+    - ⚠️ Each NEW listing = its own post_comment call. Do NOT lump them.
 11. **Repeat from step 5** for next role. **Finish each role completely before starting the next** (README rule 13) — a role that got a header but no SAME/NEW/GONE block is a broken loop, not a short one.
 
 ### Post-loop
 
 12. **Density check:** If total live < 40, this is a **DECLARED FAILURE** (see the density floor above). List which sources were blocked/thin and what retry was attempted. Do NOT silently accept a thin pass, and do NOT stamp it.
 13. **Commit the TSV:** `routines/job-market-state.tsv` (all role updates batched). Message: `data(job-market): <timestamp> ET — <n> live, <+-n>`. **Commit the TSV even on a below-floor pass** — the rows found are real and losing them helps nobody. The stamp is what gets withheld, not the data.
-14. **Post 📋 PASS SUMMARY** as ROOT comment. **Capture its comment ID.**
+14. **Post 📋 PASS SUMMARY** as ROOT comment. Include the ⚡ Spotlight (top 3 picks informed by salary, recency, and accumulated reaction patterns). **Capture its comment ID.**
 15. **Post 🔌 SOURCES** as a **reply** to the pass summary comment ID. Capture its URL and include it in the index (post summary may need an edit to add this final link, OR post SOURCES first and then the summary).
 16. **STAMP** — *last write, and only if the pass succeeded.* Write `routines/last-run/job-market.txt`, one line, `YYYY-MM-DD HH:MM` ET. **Per THE STAMP LAW** (`routines/README.md`): a complete pass stamps; a pass where a board was blocked but the inventory still landed is a PARTIAL and stamps with the gap named; **a below-floor pass or an aborted loop does NOT stamp** and stays overdue. *(Moved here 2026-08-01 — the stamp used to be written in step 13, before the pass summary existed. A stamp before the product lands is a lie with a timestamp on it.)*
 17. **Post the roll-up** to 🧭 STANDING · Routine Ricky — Run Reports (https://app.clickup.com/t/86ajuhw1d): one line for this routine, linking the pass summary comment.
@@ -357,6 +417,7 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 *Added 2026-08-01 — this runbook shipped without a Guardrails section, which meant the busiest routine in the framework had no written STOP conditions at the moment a cold agent would need them.*
 
 - **You are about to post SAME, NEW, GONE, or NOTABLE as a ROOT comment.** These are ALWAYS threaded replies. If you cannot figure out how to reply to a parent comment, STOP and ask. Never dump them flat.
+- **You are about to lump multiple NEW listings into a single comment.** Each NEW listing MUST be its own separate threaded reply. If you're about to post a block with multiple `---` separators containing several listings, STOP and split them.
 - **You are about to create a ClickUp TASK.** This routine creates none. Listings become Application tasks ONLY when Michael says to act. A pass that files tasks is the failure mode that killed v2.
 - **You are about to send anything** (email, DM, application). This routine transmits nothing, ever.
 - **You are about to create a second research task or a second thread.** One task, one conversation. `86ajtgbt3` or nothing.
@@ -369,6 +430,7 @@ That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, t
 - **You would replay every missed day on a catch-up** → STOP. A late pass is ONE pass covering more days, never nine passes.
 - **You would edit `job-market-roles.json` mid-pass to make results fit** → STOP. Config changes are a separate, explicit instruction.
 - **You are about to stamp before step 16**, or stamp a below-floor pass → STOP. See THE STAMP LAW.
+- **A board name in SOURCES is plain text (no hyperlink)** → STOP. Every board name must link to its homepage.
 
 ---
 
@@ -493,6 +555,7 @@ The TSV's `org` column is building a theatre directory organically. Let it grow.
 
 ## Changelog
 
+- **v16 (2026-08-02)** — Major interaction design update. (1) ONE COMMENT PER NEW LISTING: each new find is posted as its own individual threaded reply, enabling emoji-reaction-based rating (🔥/👍/👎/🤔). (2) REACTION-BASED RATING: Brain reads reactions from previous pass to build preference patterns. (3) ⚡ SPOTLIGHT: top 3 listings across all roles elevated into pass summary. (4) FRICTION ICONS: ✅ direct / 📝 email / 🔒 gated on every listing. (5) BOARD HOMEPAGE LINKS: source names in SOURCES block hyperlink to their homepages. (6) Added `friction` column to TSV schema. (7) New guardrail: lumping multiple NEW listings into one comment = STOP. Template 3 rewritten for individual comments. Steps 4b and 10 updated.
 - **v15 (2026-08-02)** — added 📐 SLIM SAME/GONE, RICH NEW locked decision. SAME and GONE templates collapsed to single-line-per-listing format (no separators, no stacking, all fields on one line). NEW keeps the full stacked rich template. Net effect: a SAME block with 15 listings is 17 lines instead of 60+. GONE similarly compressed. No info removed, just formatting density.
 - **v14 (2026-08-02)** — added 🧵 THREAD FINDINGS, NEVER FLAT locked decision. Rewrote Comment Architecture section with explicit threading mechanics (capture comment ID, use as parent for replies). Updated Steps 9-10 with mechanical instructions for threading. Added template annotations ("THREADED REPLY to role header"). Added guardrail: posting SAME/NEW/GONE as root = STOP. Prior pass posted all findings flat; this version makes the threading requirement mechanically unambiguous.
 - **v13 (2026-08-01)** — brought into the standard runbook shape: added the `goal:` / `target:` / `report-to:` header (it had none, so a cold agent had no way to learn where a run gets reported), added the **Guardrails** section (it had none at all), removed `status: active` from the frontmatter (a second on/off switch, which `schedule.md` forbids), moved the STAMP from step 13 to step 16 so it lands after the pass summary rather than before it, restated the density floor as a *declared failure* that withholds the stamp per THE STAMP LAW, and added the complete-loops lock. No change to sources, templates, IDs, or the TSV schema.
