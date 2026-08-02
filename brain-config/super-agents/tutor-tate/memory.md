@@ -55,4 +55,7 @@ A cold session that finds this ledger empty should say so rather than invent a p
 - Mapping a task's real shape before acting: `hooks/cross-space-research-gate.md`
 - Auditing a course list: the List Audit DoD (AI Toolkit index → List Audit)
 - Recording a course decision: the Decision Logs Gold Standard
-- Who owns what across the fleet: `super-agents/roster.json` (and Fleet Felix for the relational read)
+- **Who owns what across the fleet: the 🤖 Agent Index ClickUp list** (`901328043244`), and Fleet Felix
+  for the relational read. *(~~`super-agents/roster.json`~~ retired to a tombstone stub 2026-07-30 —
+  reading it returns nothing, and an empty read passes silently.)* ⚠️ **Never state a fact about
+  another agent from a neighbouring file:** `hooks/fleet-fact-sweep.md`.
