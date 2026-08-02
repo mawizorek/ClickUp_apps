@@ -2,15 +2,27 @@
 
 **Purpose:** Verify what our documentation **CLAIMS** against what the repo **IS** at HEAD. Catches stale state, and above all **rotted instructions**: a rule that has decayed into the opposite of the rule it was written to enforce, while still reading as authoritative.
 
+**Steward:** TBD (ownerless by design; any agent fires. Fleet Felix to assign file-maintenance owner)
+
 **Mode:** On-demand routine. Any agent can run it. Not always-on, this is a deliberate pass. Always scopable.
 
 **Invocation:** `/doc-rot-sweep` · `/rot-sweep` (alias) · "run a rot sweep" · "sweep the repo for stale docs" · "is our documentation still true?" · "check for rotted guardrails." Scoped forms are preferred: *"rot sweep the theme docs," "rot sweep brain-config/hooks."*
 
-**Trigger:** Michael asks what's stale · a phantom instruction is caught in the wild · after any structural collapse (retiring a duplicate leaves pointers dangling) · after any session that edited standards docs · before trusting an unfamiliar standards doc · **before executing any documented remediation, especially a destructive one.**
+**Trigger:** Michael asks what’s stale · a phantom instruction is caught in the wild · after any structural collapse (retiring a duplicate leaves pointers dangling) · after any session that edited standards docs · before trusting an unfamiliar standards doc · **before executing any documented remediation, especially a destructive one.**
 
 **Front door: this file, and nothing else.** There is no ClickUp Skill for this tool and there must not be one. **Tools live in git only** (LOCKED 2026-07-25, see `brain-config/skills-integration.md`). Any agent may fire this on itself mid-task; it needs no owner and no registration beyond its AI Toolkit index trigger row.
 
 **Established 2026-07-25** by Dev Dexter, generalized from a live session that found **four rotted instructions in one day**. **v2** the same day, after this tool became the exact duplicate it exists to catch. See Changelog.
+
+---
+
+## Coordinates
+
+| Surface | Location |
+| --- | --- |
+| **Scope** | Any standards document in `mawizorek/ClickUp_apps` and the AI Toolkit ClickUp index |
+| **Report home** | PR to `mawizorek/ClickUp_apps` + session task comment |
+| **Lane seams** | Recon Renata (repo vs standard), Fleet-Fact Sweep (fleet claims), Audit Anna (formal audit lead) |
 
 ---
 
@@ -170,6 +182,7 @@ Reuse the severity and evidence discipline from `brain-config/code-review-standa
 
 **Changelog:**
 
+- **v2.2 (2026-08-02)** - Header normalized to hook template standard: added Steward + Coordinates section (Audit Anna fix-spec, wave 1). Everything else was already compliant.
 - **v2.1 (2026-08-01)** - Fixed by Fleet Felix as the FIRST finding of `hooks/fleet-fact-sweep.md`, run on this file. §1's surface inventory still listed `roster.json` as "the agent roster" two days after it was retired, so a sweep following its own scope list would have read an empty stub and reported a clean pass. Repointed at the 🤖 Agent Index list; added tell 10 (a scope list naming a retired file is the dangerous shape of a dangling pointer, because the empty read looks like a clean pass); extended the dueling-canonical example with what happened AFTER the collapse; added the Fleet-Fact lane row plus the blindness note.
 - **v2 (2026-07-25)** - Michael's correction: **tools live in git only**, no ClickUp Skill linkage. Removed the "Skill front door: DOC-ROT-SWEEP" line and replaced it with a self-contained Invocation + Trigger block matching the anatomy every other hook in this folder uses. Absorbed `hooks/rot-sweep.md` (a same-day parallel-pass duplicate of this file) and its claim-classification table, tells list, and report format. Added tell 9 (parallel passes duplicate before they drift) and test D's self-referential example.
 - **v1 (2026-07-25)** - Established by Dev Dexter after a session that found four rotted instructions in one day (a phantom destructive revert, a forbidden read path recommended in two places, an inverted hand-edit caution, and a stale LOCKED read path in `README.md`). Core insight: prescriptive text rots faster than descriptive text, so instructions get swept first. Lane-separated from Recon Renata: she checks the repo against the standard, this checks the standard against the repo.
