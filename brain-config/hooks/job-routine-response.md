@@ -26,6 +26,20 @@ not stored in his profile (Constitution §2-§3).
 
 ---
 
+## Surfaces
+
+Two surfaces exist on the standing task. Know which one you're writing to:
+
+| Surface | Task | Use for |
+|---------|------|---------|
+| **Ops thread** | Standing task `86ajtgbt3` | Pass results, debriefs, routine feedback, structured output |
+| **Conversational subtask** | [💬 Career Strategy — Corso conversations](https://app.clickup.com/t/86ajut2wq) | Exploratory dialogue, preference sharpening, reactions, Paige onboarding, career thinking |
+
+Debriefs (this hook) post to the **ops thread**. Follow-up questions, calibration chats,
+and anything that's "conversation not procedure" goes to the **conversational subtask**.
+
+---
+
 ## Steps
 
 ### 1. Read the latest pass
@@ -122,7 +136,8 @@ Structure:
 | `super-agents/compass-corso/memory.md` | Earned overlay: observed patterns, revealed preference | Step 2 (second) |
 | `routines/job-market-state.tsv` | Structured inventory (read-only for Corso) | Step 1 (if needed) |
 | `routines/job-market-roles.json` | Search config (what Ricky uses) | Step 6 (for proposed edits) |
-| Standing task `86ajtgbt3` | The sweep output and discussion thread | Step 1 |
+| Standing task `86ajtgbt3` | The sweep output and ops discussion thread | Step 1 |
+| [Conversational subtask](https://app.clickup.com/t/86ajut2wq) | Exploratory career dialogue surface (not read during debrief, but where follow-ups land) | Post-debrief |
 
 ---
 
