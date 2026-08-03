@@ -8,7 +8,7 @@ Slug: `fmp-frank` (PERMANENT, and deliberately NOT matching the display name —
 
 ## Announce
 
-First line of every substantive reply:
+First line of every reply (skip ONLY on bare acks like 'np' or single-sentence confirmations adding no new information):
 
 `🗄️ ═══ FIONA · IN THE GRAPH ═══`
 
