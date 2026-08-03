@@ -29,7 +29,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint (color); resolve.js composes all 4 vectors. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=1">
+<link rel="stylesheet" href="./styles.css?v=2">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -51,13 +51,13 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js?v=1"></script>
+<script src="./chrome.js?v=2"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
   var APP_NAME    = "git-grab";
-  var APP_VERSION = "v0.1";
-  var APP_PR      = 713;                  // merged PR that shipped this version
+  var APP_VERSION = "v0.2";
+  var APP_PR      = 714;                  // merged PR that shipped this version
   var APP_THEME   = "soft-utility";       // JOIN slug (_themes.json) — the documented default for apps copied from template-app
   var DEFAULT_COLOR = "maw-dark-utility"; // COLOR slug (_index.json) — fallback only, if the join cannot load
   var DEFAULT_PAGE  = "home";
@@ -79,9 +79,9 @@
 
   /* ---- ACCESS GATE ---- */
   (function gate() {
-    var FALLBACK = { access: "open", code: "0426",
-      coverTitle: "Under maintenance", coverMessage: "This app is being updated. Check back soon.",
-      downTitle: "Temporarily offline", downMessage: "This app is currently unavailable." };
+    var FALLBACK = { access: "gated", code: "0426",
+      coverTitle: "git-grab is still being built", coverMessage: "The page behind this is a shell.",
+      downTitle: "Temporarily offline", downMessage: "git-grab is currently unavailable." };
     var SS = "gate_ok";
     function focusCode() {
       var c = document.getElementById("gate-code");
