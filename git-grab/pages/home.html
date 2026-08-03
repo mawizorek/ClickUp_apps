@@ -2,81 +2,46 @@
   <h1>Grab a folder</h1>
   <p class="lead">Paste a link to any folder on GitHub. Get back a <code>.zip</code> of that folder and everything inside it.</p>
 
-  <div class="callout">
-    <strong>Not working yet — this is the shell.</strong>
-    The layout, theme and controls are real; the machinery behind them lands next.
-    Everything below is switched off on purpose so the look can be judged before the code exists.
-  </div>
-
   <h2>Pick a folder</h2>
 
   <label class="field">
     <span>Saved locations</span>
-    <select class="select" disabled aria-describedby="presetHelp">
-      <option value="">Choose a saved folder, or paste your own below…</option>
+    <select class="select" id="ggPreset">
+      <option value="">Choose a saved folder, or paste your own below...</option>
       <optgroup label="mawizorek/ClickUp_apps">
-        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/brain-config">brain-config — agent tools, hooks, gates</option>
-        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/shared/themes">shared/themes — the 4-vector theme spine</option>
-        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app">template-app — the gold-standard app baseline</option>
-        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/git-grab">git-grab — this app, grabbing itself</option>
+        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/git-grab">git-grab - this app, grabbing itself</option>
+        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/shared/themes">shared/themes - the 4-vector theme spine</option>
+        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app">template-app - the gold-standard app baseline</option>
+        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/brain-config">brain-config - agent tools, hooks, gates (large)</option>
       </optgroup>
       <optgroup label="maw-agents/uritp-docs">
-        <option value="https://github.com/maw-agents/uritp-docs/tree/main/docs/production">docs/production — production paperwork + inventory</option>
+        <option value="https://github.com/maw-agents/uritp-docs/tree/main/docs/production">docs/production - production paperwork + inventory</option>
       </optgroup>
     </select>
   </label>
-  <p id="presetHelp" class="muted">Saved locations are just shortcuts. Picking one fills the box below; nothing is fetched until you ask for it.</p>
 
   <label class="field">
-    <span>…or paste a GitHub folder URL</span>
-    <input class="mono" type="url" inputmode="url" autocomplete="off" spellcheck="false" disabled
+    <span>...or paste a GitHub folder URL</span>
+    <input class="mono" id="ggUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false"
            placeholder="https://github.com/owner/repo/tree/main/path/to/folder"
            aria-describedby="urlHelp">
   </label>
   <p id="urlHelp" class="muted">
     Open the folder on GitHub and copy the address bar. A <code>/tree/</code> link, a <code>/blob/</code> link to a
-    single file, or a permalink with a long commit hash all work. <strong>Public repositories only</strong> — private
+    single file, or a permalink with a long commit hash all work. <strong>Public repositories only</strong> &mdash; private
     repos need a token, which comes later.
   </p>
 
-  <div class="btn-row">
-    <button class="btn btn-primary" disabled>Show me the files</button>
-    <button class="btn btn-secondary" disabled>Clear</button>
-  </div>
-
-  <h2>What happens next</h2>
-  <p>
-    Nothing downloads straight away. First you get a list of exactly what is about to be packed, with a file
-    count and a total size, so you can see the whole thing before committing to it. Then one button turns it
-    into a zip, in your browser — the files never touch anyone else's server.
-  </p>
-
-  <div class="stepper" aria-label="Progress">
-    <span class="step">1 · read the link</span>
-    <span class="step">2 · list the files</span>
-    <span class="step">3 · download them</span>
-    <span class="step">4 · make the zip</span>
-  </div>
-
-  <h2>The preview</h2>
-  <dl class="kv">
-    <dt>Repo</dt><dd>—</dd>
-    <dt>Branch or tag</dt><dd>—</dd>
-    <dt>Exact commit</dt><dd>—</dd>
-    <dt>Folder</dt><dd>—</dd>
-    <dt>Files found</dt><dd>—</dd>
-    <dt>Total size</dt><dd>—</dd>
-  </dl>
+  <div id="ggOut"></div>
 
   <p class="muted">
-    The file count is the point of this screen. A download is only correct when the number here matches the
-    number of files in the zip and the number GitHub reports — and if anything is deliberately left out
-    (submodules and symlinks cannot be packed, because there is no actual file to fetch), it gets named here
-    rather than quietly dropped. A zip that is silently missing four files is worse than no zip at all.
+    Nothing downloads until you have seen the file list. The count on that list is the point: a download is only
+    correct when it matches the number of files in the zip and the number GitHub reports, and anything that cannot be
+    packed (submodules and symlinks have no real file content to fetch) is named rather than quietly dropped.
   </p>
 
   <p class="muted">
-    Every request goes to <code>github.com</code> and nowhere else, and that is enforced in code rather than
-    promised in a README.
+    Every request goes to <code>github.com</code> and nowhere else, enforced by a hostname allowlist in
+    <code>gh.js</code> rather than promised in a README. Files are zipped in your browser; nothing is uploaded anywhere.
   </p>
 </section>
