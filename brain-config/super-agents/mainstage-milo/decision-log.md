@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-08-02 — FAILED DECISION: volatile instance history committed to canonical repo template
+
+**Context:** Brain (unseated, no Milo gate) committed a Version History section to `maw-prose/guides/doc-specs/info-sheet.md` containing 24 Dropbox links and ClickUp task references for every known info sheet instance across 8 seasons. Michael corrected: that data is workspace garbage, not canonical template content.
+
+**The failure:** Treating volatile, workspace-specific links (individual Dropbox files, ClickUp task URLs) as canonical data that belongs in the repo. The repo should hold ONLY the generalizable template that applies across the board. Instance-specific connections are loose and belong in the ClickUp task that tracks the spec.
+
+**Principle (generalizes):** Repo = tight, universal, portable. ClickUp = volatile, instance-specific, connective. When research produces a pile of links and references, the repo gets the STRUCTURE and the CU task holds the INSTANCES. Never confuse an audit trail for a template.
+
+**Compounding factor:** Brain ran this commit without seating Milo, bypassing the agent gate entirely. A standalone session would have caught both errors (unseated write + wrong-surface decision) at the roster check.
+
+**Resolution:** Version History stripped from repo (commit `2df6732`). Instance links retained in the CU task `[ info-sheet ]` where they belong.
+
+---
+
 ## 2026-08-01 — THE RE-CUT: org-scoping stated, safety split, chair role written
 
 **Context:** The Production Office was scoped in a five-round brainstorm (Naming Decision Log **S2**) — eleven portable CRAFT department heads sitting alongside Milo. That created two problems in Milo's profile that had been correct until the moment they weren't, and Phase 0 item 2 existed to fix them **before** Hazard Hawthorne goes live.
