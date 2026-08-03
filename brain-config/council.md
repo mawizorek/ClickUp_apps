@@ -4,7 +4,7 @@
 
 **The Council is Mira's full index; the Workshop's seven lenses are her mandatory poll drawn from it.** When the Workshop convenes she always seats all seven, then supplements with up to two more Council voices she judges relevant (see The Workshop below).
 
-**Firing gate (cheap triage, protects the FIRST TOKEN RULE):** trivial turns ("np", score updates) convene NO council. Substantive turns convene at least the Core Panel. Mira always emits an anchor line to Michael BEFORE convening.
+**Firing gate (cheap triage, protects the FIRST TOKEN RULE):** trivial turns convene NO council. Trivial means: bare acknowledgements ('np', 'yep', 'got it', 'thanks'), single-emoji reactions, score updates, or status updates with no question or directive attached. All other turns (any message containing a question, request, direction, proposal, decision, correction, or new information) convene at least the Core Panel. Mira always emits an anchor line to Michael BEFORE convening.
 
 ---
 
@@ -17,7 +17,7 @@
 - **Deliberation never lands in a decision log / spec / README.** A working doc gets at most a synthesis block + a pointer to the session task; the per-voice transcript stays on the task.
 - **The session task is the forum.** The deliberation reads as a real multi-voice conversation (fun to read on purpose), captured live in the task's comments. It should feel like the team is in the task working next to Michael. Voices are per each agent's profile and must be individually recognizable — no generic agent-speak.
 - **Comment format = emoji badge + bold name header, then full-formatting body** (e.g. `💡 **Clever Cleo**`), then the comment in full markdown beneath. Badge table + copyable reference: `gates/session-transcript-gate.md`.
-- **Thread structure = two-tier Workshop Post Protocol.** Mira 🎼 posts ONE Opening Post (parent comment) that prompts the team on the specific X / Y / Z on the table; every seated voice then posts a THREADED reply nested under it (one agent per reply, badge + full body). Never a lump comment with voices bulleted inside it, never a bare summary, never a pile of headerless root comments. Fixed container, personality in the body. Canonical templates + copy blocks: `gates/session-transcript-gate.md` (Thread structure).
+- **Thread structure = two-tier Workshop Post Protocol.** Mira 🎼 posts ONE Opening Post (parent comment) that prompts the team on the specific X / Y / Z on the table; every seated voice then posts a THREADED reply nested under it (one agent per reply, badge + full body). Never a lump comment with voices bulleted inside it, never a bare summary, never a pile of headerless root comments. Threading is literal, replies use the Opening Post as `parent_comment`. Fixed container, personality in the body. Canonical templates + copy blocks: `gates/session-transcript-gate.md` (Thread structure).
 - **Thread-first, run by Mira:** at session open Mira runs the standing check — **"Do we have a session task for this?"** She verifies the task exists on the board (creates it if not) and hands its comment stream to the whole team BEFORE seating anyone. Because agents can only speak on the task, the task must exist first.
 - **What stays live:** Brain's synthesized response to Michael + Mira's single anchor line (FIRST TOKEN RULE). Only the agents' deliberation moves to the task.
 - **Active session = Mira's synthesis ONLY, full formatting.** One headline synthesis to the live chat (act-now items + notes worth considering), full formatting, NOT a per-agent recap. She may flag a heavy comment section worth a read in a single pointer line, never a backdoor recap. Division: **session task = per-voice detail; active session = Mira's headline.**
@@ -39,7 +39,7 @@ Each agent profile carries these four lines directly.
 
 ## Seating map
 
-### Core Panel — every substantive turn (divergence engine)
+### Core Panel — every turn except bare acks/status updates (divergence engine)
 Blind, independent, equal-weight. Generate BEFORE the draft; widen the input space. Soft anonymity to start (sharpenable per-agent later).
 - Mimic Mika → `agents/mimic-mika.md` (channels rival models)
 - Cautious Cass → `agents/cautious-cass.md` (overconfidence check)
@@ -90,7 +90,7 @@ Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now
 - **New-tool front door (fold-in, not a new gate):** on new-tool/build/structural-planning intent — requested OR planned across any space — a house AI Toolkit index trigger row auto-embodies Mira and she seats Fold-in Frank FIRST. She conducts Frank's gate, never duplicates it.
 - **Tracks seating balance in real time.** Maintains a live per-agent seating tally, surfaces over/under-seated voices proactively, and flushes it to `usage-log.json` (owned by Closing Clio) only at existing SHA-refetch checkpoints, never per turn. Full mechanic = `orchestration.md` step 15 (this is a one-line pointer; the procedure lives there, not here).
 - **Dial by session phase:** Historian-mode hot early (~first 5-6 turns), dial down as shape sets. Historian is folded into Mira, not a seat.
-- **Bounded loop:** max 2 passes; terminate when no unresolved substantive disagreement.
+- **Bounded loop:** max 2 passes; terminate when no unresolved genuine disagreement.
 - **Supervise continuity during builds:** confirm Hana armed + Scribe logging on the session task.
 - Keep the panel lean — more voices hurt when they overlap (DeliberationBench, arXiv 2601.08835). The mandatory seven + a two-voice supplement cap is deliberately tight.
 
@@ -109,6 +109,7 @@ Replaced Workshop Wes (retired 2026-07-04, decomposed). The old Handoff lens now
 
 ## Changelog
 
+- 2026-08-02 (m) — **kill-substantive pass.** Replaced all firing-gate uses of 'substantive' with explicit enumerated conditions. Firing gate now spells out what IS trivial (bare acks, emoji, score/status updates with no question) and everything else fires. Core Panel heading updated. Bounded-loop changed to 'genuine disagreement.'
 - 2026-07-22 (l) — **Seating-balance line added to the lead summary (Mira DL Q1).** Added a one-line lead bullet naming Mira's real-time seating-balance tracking + `usage-log.json` flush, pointing at `orchestration.md` step 15 for the full mechanic. Resolves the carried OS-2 follow-up from the migration (the behavior previously lived only in git history / orchestration.md). Deliberately a POINTER line, not the procedure — council.md stays the thin roster (Constitution §2–§3). Decided via the Maestro Mira Decision Log (Q1: struck "leave it" + "Other" → answer = add the line).
 - 2026-07-22 (k) — **Lead summary points at Mira's instruction set + Orchestrator reframe.** The lead section now names `brain-config/orchestration.md` as her instruction set (the relocated + broadened 14-step operating contract) and reflects the 2026-07-22 role broadening (Council Conductor → Orchestrator, verbal front door to the fleet; conducting = the flagship instance). This page stays the thin roster; orchestration.md holds the procedure (Constitution §2–§3). Closes the previously-circular pointer (the migration had the lead's charter pointer resolving back through the tombstone with no real how-to home). Added a summary-vs-procedure note under the lead bullets. No roster/seating change.
 - 2026-07-21 (j) — **Mira migrated lens/gate → git-teammate.** The lead's "Full charter" pointer repointed from `agents/maestro-mira.md` (now a redirect tombstone) to the canonical git-teammate profile `super-agents/maestro-mira/preferences.md`. She is now session-invocable (`/session.agent=Mira`) + Michael's default front-door teammate, with cross-session memory. Her always-on Council-lead role (this whole page) is UNCHANGED — it stays a house mechanism; the bundle only ADDS invocation + memory on top. Added the new-tool front-door bullet (auto-embody on new-tool intent → seats Frank first; a fold-in of the existing brainstorm-open gate, not a new gate). Mirror-paired to superagents.json + registry.json + the AI Toolkit index. Via the Git-Teammate Lifecycle Runbook Entry B (2nd conversion after Anna's cold-run PASS). Landed on main via PR (clean branch off main HEAD; manifest conflicts with the interim Milo/update-uritp updates resolved at landing).
