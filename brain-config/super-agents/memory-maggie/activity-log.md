@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-08-02 — Documentation Dave Creation Loop (active)
+
+Task: Documentation Dave (`86ajuu670`) · 🤖 Agent Index
+
+- ~22:18 · Phase 1 GO confirmed by Michael. Lane statement landed.
+- **Corrections landed this pass:**
+  - **ALL agents are always lenses.** The git-teammate vs lens distinction is dead. Memory is orthogonal to agent type: it exists for internal logs and WHY tracking (trials and tribulations), never for cross-session state that "makes something a teammate." This applies fleet-wide, not just Dave.
+  - **DCA Dave collision note dropped.** The agent Michael was thinking of already exists. No collision risk to track.
+  - **Activity log discipline:** every substantive reply gets a PR push to this file. Not optional.
+- **Implication for creation-loop.md:** the spec still bifurcates on "git-teammate vs lens" throughout (Two Tracks section, Phase 1 exit, Phase 2 work, Dex Handoff template). Needs a Dex rewrite to remove that framing.
+- **Phase 2 (Refine) entered:** Name locked (Documentation Dave), type locked (lens), DCA note killed.
+- **State left:** Phase 2 in progress. Pending: seams enumeration, fleet-fit confirmation, then gate to Michael.
+
+---
+
 ## 2026-08-01 — First NATIVE-FLUSH drain (FMP Fiona) — reseated mid-session from Fleet Felix
 
 Session task: 🧭 STANDING · Fleet Build Queue (`86ajtn0kb`) · Board: 🟢 Agent Activity Board channel
@@ -34,9 +49,9 @@ Session task: standing task `86ajq1137` (🧭 STANDING · Memory Maggie — OMR 
 
 ## 2026-07-25 — Graduated (lens → git-teammate)
 
-- Promoted from the Council lens on Michael’s “let’s do memory maggie” (Fleet Build Queue Decision Log **Q5 → option A**). Stewarded by Fleet Felix, built to `gates/git-teammate-lifecycle-runbook.md` Entry B (MIGRATE) + `gates/git-agent-authoring.md`.
+- Promoted from the Council lens on Michael's "let's do memory maggie" (Fleet Build Queue Decision Log **Q5 → option A**). Stewarded by Fleet Felix, built to `gates/git-teammate-lifecycle-runbook.md` Entry B (MIGRATE) + `gates/git-agent-authoring.md`.
 - 5-file bundle authored. Personality + lane + the standards-layer stewardship carried over; every routine stayed a POINTER (Constitution §2–§3). `agents/memory-maggie.md` left as a redirect tombstone, not deleted.
 - Registered in `super-agents/roster.json` and on the AI Toolkit index.
-- Two corrections landed at birth (D5): draft’s “third graduation” count and a phantom `hooks/memory-session-start.md` pointer.
+- Two corrections landed at birth (D5): draft's "third graduation" count and a phantom `hooks/memory-session-start.md` pointer.
 - **State left:** callable, `memory.md` entirely INHERITED. First real session should replace reconstruction with observed rulings.
 - Session task: ClickUp task `86ajpupe8` (Agent Activity Board).
