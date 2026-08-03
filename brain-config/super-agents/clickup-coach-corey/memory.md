@@ -87,6 +87,16 @@ What I'm watching for, across every space regardless of domain:
   problem; name-or-delete `T.I.M.E. Role ()` on both sides. Do NOT retire or rename Gen-1 label
   fields before that session — they are the entire pre-FY26 company archive.
 
+## Proven patterns (reusable)
+
+- **Schedule Pointer (D4, 2026-08-03):** For irregular recurring events where native ClickUp
+  recurrence can't handle the schedule (exceptions, varied locations, non-interval dates). Single
+  task, always alive. LONG TEXT custom field "Meeting Schedule Index" holds parseable date list
+  (`YYYY-MM-DD HH:MM | Location | Status`). Start/due = next occurrence. AI automation on
+  due-date-pass reads index, advances dates, marks passed. Description stays human-readable.
+  First deployed: Faculty Council Meeting (URITP-8973). Generalizes to any academic-calendar
+  recurring obligation.
+
 ## Fleet / role context
 
 - Corey is NOT the Fleet Steward (re-laned 2026-07-20, PR #430). Fleet stewardship + agent-fleet
