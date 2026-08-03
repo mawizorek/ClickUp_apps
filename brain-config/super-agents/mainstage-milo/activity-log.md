@@ -49,13 +49,15 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 ---
 
-## 2026-08-03 · INBOX intake: Faculty Council Meeting Dates 2026-2027
+## 2026-08-03 · INBOX intake: Faculty Council Meeting Dates 2026-2027 — COMPLETE
 
-- **Capture:** URITP-12712, single email from Emily Prinzi (UR Senior Faculty Affairs Officer). Mass announcement listing all Faculty Council meeting dates for the 2026-2027 academic year (8 meetings, monthly first-Wednesday, 4-5pm).
-- **Step 0:** rename clean (automation handled it), mirror done by Scribe Sara.
-- **Disposition:** MOVE proposed → Recurring Academic Events (Season Planning). Lean: external university governance meetings that constrain production scheduling.
-- **Follow-up proposed:** 8 calendar-ready tasks (one per meeting, Sep 2026 – May 2027) for Michael's ClickUp calendar.
-- **Status:** `researching`, plan posted, awaiting greenlight.
+- **Capture:** URITP-8973 (`86aee8dfb`), single email from Emily Prinzi (UR Senior Faculty Affairs Officer). Mass announcement listing all Faculty Council meeting dates for the 2026-2027 academic year (8 meetings, monthly first-Wednesday, 4-5pm).
+- **Disposition:** MOVE executed → Recurring Academic Events (Season Planning). Merge of triage plan task (`86ajv41yu`) into this task complete.
+- **Pattern adopted: SCHEDULE POINTER** — single task, rolling dates, indexed schedule in description (pending custom field migration). No subtask clutter. One entity, always pointing at next occurrence.
+- **Dates set:** Start/due → Wed Sep 9, 2026, 4:00-5:00pm ET (Hawkins Carlson Room). Status reopened to `new`.
+- **Meeting Schedule Index written** (appended to description, 8 dates + locations + zoom + contacts). Pending migration to a dedicated "Meeting Schedule Index" Long Text custom field once created (tool access blocked field creation).
+- **Automation spec (manual setup):** "When due date arrives" → AI Action parses the index, advances start/due to next ☐ date, marks previous ✓.
+- **Corey seated + confirmed** the schedule-pointer pattern as best practice (no native recurrence for irregular date lists with exceptions).
 
 ---
 
