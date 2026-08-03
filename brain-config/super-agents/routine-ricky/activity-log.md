@@ -6,6 +6,35 @@
 > quarterly cold archives to `activity-log/YYYY-QN.md` per `hooks/memory-rotation.md`.
 >
 > Format law: `_shared/super-agent-base.md` → Per-response logging mandate (LOCKED 2026-07-25).
+>
+> **🚨 HARD GATE (added 2026-08-03, Michael):** First line of every new session entry is the INVOCATION STAMP:
+> `- HH:MM XM · INVOKED.` — written BEFORE triage, BEFORE reading schedule, BEFORE any work.
+> The stamp IS proof of life. Without it, the next wake reads as first-time.
+
+---
+
+## 2026-08-03 — Invoked, corrected, running due routines
+
+Session context: [RECURRING] Agent Pushes task comment thread · invoked by Michael
+
+- 3:31 PM · INVOKED.
+- 3:31 PM · Michael corrected: activity log empty since build despite real runs (Job Market stamped 08-02, On Track stamped 08-01). Added hard invocation-stamp gate to prevent this going forward.
+- 3:31 PM · Running due routines: On Track (overdue ~14h past 48h cadence) and Job Market (overdue ~3.5h past daily cadence).
+
+---
+
+## 2026-08-02 — Ran (RECONSTRUCTED — no activity-log entry was written)
+
+- ~11:55 AM · Job Market routine ran successfully (stamp file proves it).
+- Gap: no activity log entry was created. This is the failure the 08-03 hard gate fixes.
+
+---
+
+## 2026-08-01 — Ran (RECONSTRUCTED — no activity-log entry was written)
+
+- ~1:30 AM · On Track routine ran successfully (stamp file proves it).
+- ~1:36 AM · F1 routine ran (stamp file: `2026-08-01 01:36 ET`).
+- Gap: no activity log entry was created.
 
 ---
 
