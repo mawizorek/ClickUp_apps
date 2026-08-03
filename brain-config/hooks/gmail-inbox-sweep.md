@@ -13,7 +13,7 @@
 **A sweep produces exactly one artifact: a rewrite of `inbox-digest-report/data/inbox-state.json`.** The dashboard app (`inbox-digest-report`) is a PURE RENDERER of that file. When you touch the Gmail read tool to run a sweep, the deliverable is the JSON, nothing else.
 
 - **NEVER edit `pages/report.html`, `index.html`, `styles.css`, or any other app file to change what the report shows.** They contain zero email data by design. If you are about to put a sender, subject, bucket, or slop query into HTML, STOP — it goes in the JSON.
-- **The available fields, bucket enum, `state`→pill map, and the locked `in:inbox` slop-query format are dictated in `inbox-digest-report/data/README.md`.** Read that spec before writing the JSON. Do not invent fields.
+- **The available fields, bucket enum, `state`→pill map, and the locked `in:inbox` slop-query format are dictated in `inbox-digest-report/data/README.md`.** Read that spec before writing the JSON.
 - **How to refresh:** rewrite `inbox-state.json` wholesale (it is ROLLING — current inbox only, never an append log), following `data/README.md`. Set `sweep.status` to `PLAN_PENDING_GREENLIGHT` on a fresh plan; `EXECUTED` only after the greenlit actions have run. Build `slop_delete_query` as `in:inbox from:(...)` from the SLOP rows' addresses.
 - This is the ONLY Gmail workflow being built right now. There is no second surface, no parallel report, no hardcoded fallback.
 
@@ -52,14 +52,18 @@ This hook is dictated by Michael and honed deliberately. When updating it, **edi
 1. **Read the active inbox.** Sort signal from slop.
 2. **For each KEEPER:** run the task-dedup-gate → find the right task (existing) or propose a new one. NEVER auto-create a task for slop.
 3. **Write the plan into `inbox-state.json`** (per `data/README.md`): one email record per thread, bucketed, with plan text, destination task, and `state`. This JSON rewrite IS the Plan Comment surface for the sweep. **WAIT for Michael's explicit greenlight.**
-4. **On greenlight:** copy the email content **BYTE-FOR-BYTE as inline comment(s)** per the URITP COMBINE/MOVE Universal Standard (verbatim email first, notes second, backtrack, link, close/relocate), then execute the action items. Update the affected records' `state` in the JSON (e.g. `merge_pending` → `merged`) and flip `sweep.status` to `EXECUTED` when the plan is fully run.
+4. **On greenlight:** execute the planned action per the URITP COMBINE/MOVE Universal Standard:
+   - **COMBINE** (primary path): call `merge_tasks` with source=inbox/capture task, destination=canonical task. Content, comments, and attachments transfer atomically; source task is deleted. Post-merge cull if needed.
+   - **COMBINE** (fallback, when no ClickUp task exists for the email yet or partial merge is needed): copy email content **byte-for-byte as inline comment(s)** per the legacy standard (verbatim email first, notes second, backtrack, link, close/relocate).
+   - **MOVE**: relocate the task to the correct list per the Task Move Impact Gate.
+   Then update the affected records' `state` in the JSON (e.g. `merge_pending` → `merged`) and flip `sweep.status` to `EXECUTED` when the plan is fully run.
 
 ---
 
 ## ATTACHMENT BRANCH
 
 - **Content ALWAYS merges either way.** A forward only adds the files.
-- **No attachments (or files not needed)** → Brain merges content, Michael archives.
+- **No attachments (or files not needed)** → Brain merges content (via `merge_tasks` or manual), Michael archives.
 - **Files needed** → Michael forwards the email to the task's email-in address FIRST (that path carries attachments), THEN archives.
 - Never a blocker, just a branch.
 
@@ -69,7 +73,7 @@ This hook is dictated by Michael and honed deliberately. When updating it, **edi
 
 The report is `inbox-digest-report` rendering `data/inbox-state.json`. You produce it by writing that JSON; the app draws the five buckets. Every header always renders (empty = `none`):
 
-- **TO_MERGE** — keeper → COMBINE/MOVE into a task, then archive.
+- **TO_MERGE** — keeper → COMBINE/MOVE into a task (via `merge_tasks` when both tasks exist), then archive.
 - **NEEDS_REPLY** — draft parked / draft text, then archive.
 - **HAS_ATTACHMENTS** — forward to the task's email-in address for the files, THEN archive.
 - **ALREADY_HANDLED** — nothing to capture; safe to archive now.
@@ -97,13 +101,14 @@ Field definitions and the `state`→pill map live in `inbox-digest-report/data/R
 ## Composes with
 
 - **URITP INBOX Email Intake Triage** — the shared triage mechanics (rename, verbatim mirror, Plan Comment, MOVE/COMBINE universal standards, dedup, backtrack). This hook points at them rather than restating them.
-- **task-dedup-gate** — run before proposing any new task.
+- **task-dedup-gate** — run before proposing any new task. Post-creation dupes resolve via `merge_tasks`.
 - **link-provenance** — backtrack pointers connecting email task ↔ canonical task.
 
 ---
 
 ## Changelog
 
+- 2026-08-03 — **COMBINE is now atomic via `merge_tasks`.** PASS step 4 updated: primary COMBINE path calls `merge_tasks` (source=inbox task, destination=canonical). Legacy byte-for-byte copy retained as fallback for cases where no ClickUp task exists yet or partial content merge is needed. TO_MERGE bucket note updated. Composes-with note updated.
 - 2026-07-17 — added THE SWEEP OUTPUT IS ONE FILE section + folded the data-only rule into PASS, GATES, THE REPORT, and Companion app. The sweep's sole artifact is `inbox-digest-report/data/inbox-state.json` (field spec: that folder's `README.md`); the app is a pure renderer, never edited on a sweep. Matches decision-log 2026-07-17 (v4).
 - 2026-07-16 — added EDIT DISCIPLINE section (edit literally, never improvise; preserve locked pieces; log every change) + companion-app pointer. No change to the procedure itself.
 - 2026-07-16 — created. Personal-Gmail sweep layer over the URITP triage standards; landing list = Home ▸ Gmail INBOX ▸ GMAIL INBOX (`901327875287`).
