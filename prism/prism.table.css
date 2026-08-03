@@ -1,0 +1,111 @@
+/* Prism — Table lens styles.
+   A separate sheet rather than an append to prism.css: that file is 17KB and a
+   full read of it clips, so rewriting it wholesale would be guesswork. This
+   also keeps the base sheet from drifting over its budget. */
+
+:root { --tbl: oklch(0.80 0.11 195); --tbl-dim: oklch(0.48 0.06 195); --th-h: 41px; }
+[data-theme="light"] { --tbl: oklch(0.55 0.12 205); --tbl-dim: oklch(0.80 0.07 195); }
+
+.ext.t { color: var(--tbl); border-color: var(--tbl-dim); }
+
+/* ---- editable cells ---- */
+.t-cell { display: flex; align-items: center; gap: 8px; min-height: 20px; }
+.t-cell.is-dirty { position: relative; }
+.t-cell.is-dirty::after { content: ""; position: absolute; top: -3px; right: -6px; width: 5px; height: 5px; border-radius: 50%; background: var(--tbl); }
+td.editable { cursor: text; }
+td.editable:hover { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--border); }
+td.gate-hex { cursor: default; }
+.t-input { width: 100%; font-family: var(--mono); font-size: 0.78rem; background: var(--bg); color: var(--text); border: 1px solid var(--accent); border-radius: 4px; padding: 3px 6px; outline: none; }
+
+/* ---- gate: hex ---- */
+input[type="color"].sw { width: 20px; height: 20px; flex: none; padding: 0; border: none; background: none; border-radius: 5px; cursor: pointer; transition: transform .12s var(--ease); }
+input[type="color"].sw::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"].sw::-webkit-color-swatch { border: 1px solid var(--border); border-radius: 5px; }
+input[type="color"].sw::-moz-color-swatch { border: 1px solid var(--border); border-radius: 5px; }
+input[type="color"].sw:hover { transform: scale(1.14); }
+.hx { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em; cursor: text; }
+.hx-a { color: var(--warn); text-decoration: underline dotted; }
+
+/* ---- gate: url / empty ---- */
+.t-url { color: var(--tbl); text-decoration: underline; text-underline-offset: 2px; max-width: 34ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+.t-empty { display: inline-block; width: 26px; height: 9px; border-radius: 3px; background: repeating-linear-gradient(135deg, var(--border-soft) 0 3px, transparent 3px 6px); }
+
+/* ---- header: sort + column menu + stats ---- */
+thead th.sortable { cursor: pointer; user-select: none; }
+thead th.sortable:hover { background: var(--surface-3); }
+th .th-in { display: flex; align-items: center; gap: 6px; }
+th .arrow { font-size: 0.62rem; color: var(--tbl); }
+th .colmenu { margin-left: auto; opacity: 0; font-size: 0.9rem; line-height: 1; color: var(--faint); padding: 0 2px; background: none; border: none; }
+th:hover .colmenu, th .colmenu:focus-visible { opacity: 1; }
+th .colmenu:hover { color: var(--text); }
+tr.statrow th { position: sticky; top: var(--th-h); background: var(--surface); font-weight: 500; padding: 4px 13px; border-bottom: 1px solid var(--border); z-index: 1; }
+.cstat { font-family: var(--mono); font-size: 0.64rem; color: var(--faint); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.cstat b { color: var(--tbl); font-weight: 600; }
+
+/* ---- rows ---- */
+tbody tr.sel td { background: var(--surface-3); }
+tbody tr.sel .rownum { background: var(--surface-3); color: var(--tbl); }
+tbody td.rownum { cursor: pointer; }
+tbody tr.tinted td { border-bottom-color: oklch(0.5 0 0 / 0.25); border-right-color: oklch(0.5 0 0 / 0.18); }
+tbody tr.tinted .rownum { background: inherit; }
+tbody tr.tinted:hover td { background: transparent; }
+
+/* ---- popover ---- */
+.pop { position: fixed; z-index: 70; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 4px; min-width: 178px; box-shadow: 0 8px 24px oklch(0.1 0.02 265 / 0.4); }
+.pop button { display: block; width: 100%; text-align: left; padding: 7px 10px; font-size: 0.82rem; background: none; border: none; border-radius: 5px; color: var(--text); }
+.pop button:hover { background: var(--surface-3); }
+.pop button.danger { color: var(--danger); }
+.pop button.armed { background: var(--danger); color: oklch(0.16 0.02 265); font-weight: 600; }
+.pop hr { border: none; border-top: 1px solid var(--border-soft); margin: 4px 0; }
+
+/* ---- swatch bands ---- */
+.bands { display: flex; flex-direction: column; gap: var(--sp-3); }
+.band { border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4); transition: border-color .16s var(--ease); }
+.band:hover { border-color: var(--tbl-dim); }
+.band-head { display: flex; align-items: baseline; gap: var(--sp-3); margin-bottom: 10px; flex-wrap: wrap; }
+.band-name { font-size: 0.98rem; font-weight: 650; letter-spacing: -0.01em; }
+.band-sub { font-family: var(--mono); font-size: 0.7rem; opacity: 0.65; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: flex; align-items: center; gap: 6px; padding: 3px 8px 3px 3px; border-radius: 100px; border: 1px solid oklch(0.5 0 0 / 0.3); background: oklch(0.5 0 0 / 0.09); }
+.chip-k { font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.02em; opacity: 0.8; }
+
+/* ---- diff banner ---- */
+.diffbar { display: flex; align-items: center; gap: 10px; padding: 9px 13px; margin-bottom: var(--sp-4); border: 1px solid var(--tbl-dim); border-radius: var(--r-sm); background: var(--surface-2); font-size: 0.82rem; flex-wrap: wrap; }
+.diffbar b { color: var(--tbl); font-weight: 650; font-variant-numeric: tabular-nums; }
+.diffbar .rt { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.pill-btn { font-size: 0.75rem; padding: 3px 10px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface-3); color: var(--muted); }
+.pill-btn.on { border-color: var(--tbl); color: var(--tbl); }
+body.hl-diff td:not(.has-dirty) .t-cell { opacity: 0.3; }
+body.hl-diff tr.row-added td { box-shadow: inset 0 0 0 1px var(--ok); }
+
+/* ---- export bar: row ops ---- */
+.rowops { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.rbtn { padding: 6px 12px; border-radius: var(--r-sm); font-size: 0.8rem; font-weight: 550; border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); transition: border-color .16s var(--ease), color .16s var(--ease); }
+.rbtn:hover:not([disabled]) { border-color: var(--tbl); color: var(--text); }
+.rbtn.danger:hover:not([disabled]) { border-color: var(--danger); color: var(--danger); }
+.rbtn[disabled] { opacity: 0.35; pointer-events: none; }
+.rowops .hint { font-size: 0.74rem; color: var(--faint); }
+.mini-sel { font-family: var(--sans); font-size: 0.8rem; padding: 6px 9px; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); }
+
+/* ---- paste panel ---- */
+.paste-wrap { margin-top: var(--sp-4); text-align: left; display: none; }
+.paste-wrap.on { display: block; }
+.paste-wrap textarea { width: 100%; height: 116px; font-family: var(--mono); font-size: 0.76rem; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px; resize: vertical; outline: none; }
+.paste-wrap textarea:focus { border-color: var(--accent); }
+.paste-row { display: flex; gap: var(--sp-3); margin-top: var(--sp-2); align-items: center; flex-wrap: wrap; }
+.paste-hint { font-size: 0.74rem; color: var(--faint); }
+
+/* ---- mobile ----
+   prism.mobile.js turns #exportbar into a bottom sheet and stretches every
+   .btn inside it. Row ops use .rbtn so they stay a compact inline cluster
+   instead of three stacked full-width bars pushing Export off-screen. */
+@media (max-width: 820px) {
+  .rowops { width: 100%; gap: 6px; }
+  .rowops .rbtn { flex: 1; text-align: center; padding: 10px 8px; }
+  .rowops .lbl, .rowops .hint { width: 100%; }
+  .exportbar .mini-sel { width: 100%; padding: 11px 10px; font-size: 0.9rem; }
+  .exportbar .toggle { width: 100%; justify-content: space-between; }
+  .tbl-wrap { max-height: calc(100vh - 210px); }
+  .t-url { max-width: 20ch; }
+  .band-head { margin-bottom: 8px; }
+}

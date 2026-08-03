@@ -5,20 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1a1c24">
 <meta name="robots" content="noindex, nofollow">
-<title>Prism: Data App Viewer</title>
-<meta name="description" content="Drop any JSON or Markdown file and view it clean: JSON becomes a human-readable table you can export to CSV or Excel. Runs entirely in your browser.">
-<meta property="og:title" content="Prism: Data App Viewer">
-<meta property="og:description" content="Drop a JSON or Markdown file, get the right view. JSON to readable tables plus CSV/Excel export.">
+<title>Prism: Data App Workbench</title>
+<meta name="description" content="Drop any TSV, CSV, JSON or Markdown file and work on it in the browser: tables become editable, hex codes become live colour swatches, and you export back out in any format. Nothing is uploaded.">
+<meta property="og:title" content="Prism: Data App Workbench">
+<meta property="og:description" content="Drop a data file, get the right lens. Editable tables with live colour swatches, plus TSV/CSV/JSON export.">
 <meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/prism/">
 <meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/prism/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/prism/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%BA%3C/text%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="prism.css?v=4">
+<link rel="stylesheet" href="prism.css?v=5">
+<link rel="stylesheet" href="prism.table.css?v=5">
 <style>
   #access-gate{position:fixed;inset:0;z-index:9999;background:#1a1c24;color:#e7e8ee;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
   #access-gate .box{text-align:center;max-width:340px;padding:32px}
@@ -40,8 +41,8 @@
 
 <header class="mast">
   <div class="brand">
-    <span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 3 20h18L12 3Z" stroke="oklch(0.82 0.13 78)" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 3v17" stroke="oklch(0.75 0.13 300)" stroke-width="1.4"/><path d="M7 14h10" stroke="oklch(0.70 0.014 265)" stroke-width="1.2"/></svg></span>
-    <div><h1>Prism</h1><div class="tag">Data App Viewer</div></div>
+    <span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 3 20h18L12 3Z" stroke="oklch(0.82 0.13 78)" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 3v17" stroke="oklch(0.75 0.13 300)" stroke-width="1.4"/><path d="M7 14h10" stroke="oklch(0.80 0.11 195)" stroke-width="1.2"/></svg></span>
+    <div><h1>Prism</h1><div class="tag">Data App Workbench</div></div>
   </div>
   <span class="lens-pill" id="lensPill"><span class="dot"></span><span id="lensLabel">JSON</span></span>
   <div class="mast-actions">
@@ -55,13 +56,21 @@
     <div class="drop" id="drop">
       <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 16V4m0 0 4 4m-4-4L8 8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" stroke="currentColor" stroke-linecap="round"/></svg></div>
       <h2>Drop a file to refract it</h2>
-      <p>Prism reads the file, detects what it is, and shows the right lens. JSON turns into a human-readable table you can export. Markdown renders clean.</p>
-      <div class="exts"><span class="ext j">.json</span><span class="ext m">.md</span><span class="ext soon">.yaml</span><span class="ext soon">.csv</span><span class="ext soon">.xml</span></div>
+      <p>Prism reads the file, detects what it is, and shows the right lens. Tabular files open in an editable workbench where hex codes become live colour swatches. JSON turns into a readable table. Markdown renders clean.</p>
+      <div class="exts"><span class="ext t">.tsv</span><span class="ext t">.csv</span><span class="ext j">.json</span><span class="ext m">.md</span><span class="ext soon">.yaml</span><span class="ext soon">.xml</span></div>
       <div class="drop-actions">
         <button class="btn primary" id="pickBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M14 3v4a1 1 0 0 0 1 1h4" stroke="currentColor"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z" stroke="currentColor" stroke-linejoin="round"/></svg>Choose a file</button>
-        <input type="file" id="fileInput" accept=".json,.md,.markdown,.txt,application/json,text/markdown" hidden>
+        <button class="btn" id="pasteBtn"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor"/><path d="M4 14V5a2 2 0 0 1 2-2h9" stroke="currentColor"/></svg>Paste data</button>
+        <input type="file" id="fileInput" accept=".tsv,.csv,.tab,.json,.md,.markdown,.txt,text/plain,text/csv,text/tab-separated-values,application/json,text/markdown" hidden>
       </div>
-      <div class="samples">No file handy? Try a sample: <a class="j" id="sampleJson">ClickUp-style JSON export</a> \u00b7 <a class="m" id="sampleMd">a Markdown doc</a></div>
+      <div class="paste-wrap" id="pasteWrap">
+        <textarea id="pasteBox" spellcheck="false" placeholder="Paste rows straight from Excel, Sheets or Numbers, or any TSV / CSV / JSON text."></textarea>
+        <div class="paste-row">
+          <button class="btn primary" id="pasteLoad">Load pasted data</button>
+          <span class="paste-hint">A copied spreadsheet range is already tab-separated.</span>
+        </div>
+      </div>
+      <div class="samples">No file handy? Try <a class="t" id="sampleTsv">a colour-theme TSV</a> · <a class="j" id="sampleJson">a ClickUp-style JSON export</a> · <a class="m" id="sampleMd">a Markdown doc</a></div>
     </div>
   </section>
 
@@ -87,8 +96,9 @@
   <button class="icon-btn close" id="closeDrawer" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.9"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-linecap="round"/></svg></button>
   <div><h2>Settings</h2></div>
   <div class="row"><div><div class="k">Theme</div><div class="d">Persists on this device</div></div><div class="theme-seg" id="themeSeg"><button data-t="dark" class="active">Dark</button><button data-t="light">Light</button></div></div>
-  <div class="row"><div><div class="k">CSV delimiter</div><div class="d">Comma is standard; tab helps with messy data</div></div><div class="theme-seg" id="delimSeg"><button data-d="," class="active">Comma</button><button data-d="\t">Tab</button></div></div>
-  <div class="note">Prism runs entirely in your browser. Nothing you drop is uploaded anywhere.</div>
+  <div class="row"><div><div class="k">Row tint</div><div class="d">Colour table rows by their <code>bg</code> column</div></div><label class="toggle"><input type="checkbox" id="rowTint" checked></label></div>
+  <div class="row"><div><div class="k">CSV delimiter</div><div class="d">Used by the JSON lens export</div></div><div class="theme-seg" id="delimSeg"><button data-d="," class="active">Comma</button><button data-d="	">Tab</button></div></div>
+  <div class="note">Prism runs entirely in your browser. Nothing you drop is uploaded anywhere, and nothing is kept between sessions.</div>
 </aside>
 
 <div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="toastMsg">Done</span></div>
@@ -111,10 +121,13 @@
   fetch("./config.json", { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); }).catch(function () { var cached = null; try { cached = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(cached || FALLBACK); });
 })();
 </script>
-<script>document.getElementById("stamp").textContent = "Prism v2.2 \u00b7 PR #84";</script>
-<script src="prism.json.js?v=4"></script>
-<script src="prism.md.js?v=4"></script>
-<script src="prism.core.js?v=4"></script>
-<script src="prism.mobile.js?v=4"></script>
+<script>document.getElementById("stamp").textContent = "Prism v3 \u00b7 PR #723";</script>
+<script src="prism.table.js?v=5"></script>
+<script src="prism.table.grid.js?v=5"></script>
+<script src="prism.table.panels.js?v=5"></script>
+<script src="prism.json.js?v=5"></script>
+<script src="prism.md.js?v=5"></script>
+<script src="prism.core.js?v=5"></script>
+<script src="prism.mobile.js?v=5"></script>
 </body>
 </html>
