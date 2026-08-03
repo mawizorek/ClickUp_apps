@@ -4,7 +4,7 @@
 
 [![Launch](https://img.shields.io/badge/launch-prism-e8b84b?style=for-the-badge)](https://mawizorek.github.io/ClickUp_apps/prism/)
 
-**Status:** live (v3.1) · **Access:** open (public) · **Live:** https://mawizorek.github.io/ClickUp_apps/prism/ · **Source of truth:** this repo folder.
+**Status:** live (v3.2) · **Access:** open (public) · **Live:** https://mawizorek.github.io/ClickUp_apps/prism/ · **Source of truth:** this repo folder.
 
 ## What it does
 
@@ -32,7 +32,8 @@ As of v3 it is no longer read-only. Tabular files open in an editable workbench.
 | `prism.css` | Base styling (dark + light themes, responsive/mobile chrome, pivot layout) | Version bumps |
 | `prism.table.css` | Table lens styling (gated cells, pinned columns, swatch bands, diff banner, popover, row ops) | Version bumps |
 | `prism.table.js` | Table lens **engine**: parse, data gates, model, diff, sort order, pin order, serialisation, lens registration | Version bumps |
-| `prism.table.grid.js` | Table lens **grid**: cell rendering, in-place patching, inline editing, sort headers, column ops, pin offsets, diff banner | Version bumps |
+| `prism.table.cell.js` | Table lens **cell**: gate → markup, in-place patching, inline editing, per-cell wiring | Version bumps |
+| `prism.table.grid.js` | Table lens **grid**: table assembly, header + sort, column menu/ops, pin offsets, diff banner, view dispatch | Version bumps |
 | `prism.table.panels.js` | Table lens **panels**: swatch bands, structure sidebar, export bar, row ops | Version bumps |
 | `prism.json.js` | `window.JSONLens`: flatten, sheet detection, analysis/flags, table+tree+raw render, CSV/Excel export | Version bumps |
 | `prism.md.js` | `window.MDLens`: markdown parse + render + HTML export | Version bumps |
@@ -43,11 +44,13 @@ As of v3 it is no longer read-only. Tabular files open in an editable workbench.
 
 No `data.json`: Prism is a pure runtime tool (processes user-dropped files), not a data-separated app. Any update is a version bump to the relevant module.
 
-⚠️ **`prism.table.grid.js` is 16,829 B — over the 15KB split line**, under the ~22KB safe-edit ceiling. The clean seam is cell-rendering vs table-assembly. Take it deliberately on the next grid change; do not let a feature PR push it further.
+**Every module is under the 15KB split line** as of v3.2. Largest is `prism.table.js` at 14,373 B; keep an eye on it.
 
 ## Architecture (critical notes)
 
-- **Modular by design.** Slim `index.html` loads two stylesheets and seven JS modules. No monolith.
+- **Modular by design.** Slim `index.html` loads two stylesheets and eight JS modules. No monolith.
+- 🔴 **THE TABLE LENS SEAM IS RENDER vs ASSEMBLE.** `prism.table.cell.js` owns what ONE CELL looks like and how it is edited; `prism.table.grid.js` owns how cells become a TABLE (header, sort, pins, column ops, diff banner, view dispatch). Changing what a *value* looks like is the cell file; changing the *shape around it* is the grid file. The two were one 16,829 B module until v3.2 — over the 15KB line, i.e. heading for a file that could not be read whole and therefore could not be safely edited.
+- ⚠️ **Cross-file calls resolve through the `TB` / `TBUI` namespaces at CALL time, never at LOAD time.** `cell.js` loads before `grid.js` and `panels.js` and still calls `TBUI.paintDiff()` and `TBUI.side()`; that is legal only because nothing runs until a file is open. **Never hoist a cross-file function into a load-time `var`** — it will capture `undefined` and the failure will look like a dead click, not an error.
 - 🔴 **The lens registry is REAL as of v3, and it was a documented lie before it.** v1 through v2.2 of this README claimed *"add a detector branch in `detectType` + a new `*Lens` module. The shell does not change"* — which contradicts itself in its own sentence, because `detectType` is the shell. Routing was a hardcoded `S.type === "json" ? JSONLens : MDLens` ternary in **two** places (`loadContent` and `setView`), so a third lens could not exist without editing core. **If a doc promises an extension point, open the file and confirm the extension point exists.**
 - **How the registry actually works.** A lens is an object:
   ```js
@@ -62,8 +65,9 @@ No `data.json`: Prism is a pure runtime tool (processes user-dropped files), not
 - 🔴 **A sticky cell with a transparent background is a bug, not a style choice** — the scrolling content slides visibly underneath it. Every pinned cell paints. `tbody tr` carries a base background and pinned cells use `background: inherit`, which is also what makes them correct on **tinted** rows: the tint is inline on the `<tr>`, so a pinned cell inherits the row's own colour instead of covering it. The tinted rules sit last in the cascade for that reason.
 - **Pin offsets are measured, not assumed.** `applyPins()` accumulates real `offsetWidth` from the rendered header, starting after the row-number gutter, and writes `style.left` on each pinned `th` and `td`; it re-runs on a debounced resize. Column widths depend on content, so any hardcoded offset drifts the moment a value changes — the same reason `--th-h` is measured rather than the `41px` it started as.
 - **Z-index is a stack and it is written down:** pinned body cell `2` · row-number cell `3` · pinned stat header `3` · pinned name header `4` · row-number header `5`. Cells sticky on **two** axes must sit above cells sticky on one, or they get overlapped at the corner.
-- **Two pin guards, both measured:** a pin is refused if the frozen block would exceed ~55% of the scroll container (past that there is nothing left to scroll), and at least one column must stay unpinned. `patchCell()` preserves the `pin` class and its inline `left`, so editing a pinned cell does not drop it out of the frozen block.
+- **Two pin guards, both measured:** a pin is refused if the frozen block would exceed ~55% of the scroll container (past that there is nothing left to scroll), and at least one column must stay unpinned. ⚠️ **`patchCell()` in `cell.js` carries the `pin` class and its inline `left` across a rebuild** — those are owned by `grid.js` and are not recoverable from the cell file, so dropping them silently ejects the cell from the frozen block.
 - ⚠️ **A commit patches one `<td>`; it never rebuilds `<tbody>`.** A full re-render threw away horizontal scroll, and on a 35-column palette file that is the main path, not an edge case. For the same reason a live picker drag touches only the label and the row tint — replacing the `<input>` mid-pick detaches the OS colour dialog from its anchor.
+- ⚠️ **Tab-to-next-cell re-queries the DOM after the commit.** `patchCell` replaces the `<td>`, so a node captured before committing is detached and `indexOf` would return `-1`.
 - ⚠️ **Display order is frozen between explicit sorts.** It is cached as a list of row ids and invalidated only by a sort click or a row add/remove, so editing a sorted table does not teleport the row out from under the cursor.
 - ⚠️ **Row-op buttons are `.rbtn`, never `.btn`.** `prism.mobile.js` stretches every `.btn` in the export bar to full width and closes the bottom sheet when one is tapped. Add / Duplicate / Delete must do neither.
 - ⚠️ **`prism.css` is 17,183 B and clips on a full read.** Table styles are a **sibling stylesheet**, not an append — rewriting a file from a truncated read is how this repo has broken itself before.
@@ -80,6 +84,7 @@ No `data.json`: Prism is a pure runtime tool (processes user-dropped files), not
 
 Commit history is authoritative.
 
+- **v3.2** — split the 16,829 B `prism.table.grid.js` at the render/assemble seam into `prism.table.cell.js` (6,842 B) + `prism.table.grid.js` (12,731 B). Pure refactor, no behaviour change: same functions, same call sites, routed through `TBUI`. `?v=7`, PR #727.
 - **v3.1** — pinned columns: freeze any column (or several) at the left edge, in pin order, surviving rename and sort. Measured sticky offsets, tint-safe backgrounds, a 55% width budget and a last-unpinned-column guard. Pins never touch export order. `?v=6`, PR #726.
 - **v3** — Table lens (TSV/CSV/flat-JSON, read-write) across three modules + its own stylesheet; the real lens registry; paste import; format-convert export; diff summary; Swatches band view; row tint. Adversarial pass cleared two silent-corruption defects (renamed-column diff, 8-digit hex alpha). `?v=5`, PR #723.
 - **v2.2** — unlocked (access `open`); fixed mobile pivot overflow (long single-record values were clipping off-screen); added footer version/PR stamp + Infrastructure table; dropped `og.png`/`icon.png` icon package; `?v=4`.
@@ -95,7 +100,6 @@ Commit history is authoritative.
 
 ## Roadmap
 
-- Split `prism.table.grid.js` at the render/assemble seam (over the 15KB line).
 - True `.xlsx` export (SheetJS).
 - Virtualised table rendering for very large files.
 - Additional lenses: YAML, XML.
