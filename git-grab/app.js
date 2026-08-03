@@ -11,6 +11,13 @@
    THE PREVIEW IS THE CORRECTNESS MECHANISM, NOT DECORATION. The count is shown before anything
    downloads, and the done state prints files-in-zip against files-GitHub-reported so a short zip
    is visible rather than silent.
+
+   🔴 GENERATION GUARD (v1.2). One record plus async work means a superseded job can write into
+   its successor. Every job start increments `gen`; every async continuation captures the value
+   and bails if it no longer matches. Without it, hitting Enter mid-fetch produced a zip built
+   from one folder's blobs whose count was asserted against a different folder's listing — the
+   count check is the entire product, so comparing two unrelated numbers is the worst available
+   failure. See the Wave 4 PR for the full trace.
 */
 (function () {
   "use strict";
@@ -23,8 +30,8 @@
      (new Writer(total)) while every file body and every deflated copy is still held, so peak
      memory is roughly 2.5x the folder size — and a single contiguous allocation fails well
      before the same number of bytes scattered across many small ones. Mobile Safari gives up far
-     earlier than desktop. Treat these numbers as cautious guesses that are honest about being
-     guesses, and move them once somebody actually measures. */
+     earlier than desktop. Treat these as cautious guesses that are honest about being guesses,
+     and move them once somebody actually measures. */
   var LIMITS = {
     warn:   100 * 1024 * 1024,  // 100 MB — proceed, but say something
     confirm: 250 * 1024 * 1024, // 250 MB — require an explicit tick
@@ -34,14 +41,19 @@
   var job = null;
   var els = {};
 
+  /* Bumped on every job start. An async continuation whose captured value no longer matches has
+     been superseded and must not touch state. */
+  var gen = 0;
+
   /* The one blob URL this app hands out. Minted once per completed job and revoked before the
-     next one, because it pins the entire archive in memory until it is released. */
+     next one, because it pins the entire archive in memory until released. */
   var saveURL = null;
   function dropSaveURL() {
     if (saveURL) { try { URL.revokeObjectURL(saveURL); } catch (e) {} saveURL = null; }
   }
 
   function reset() {
+    gen++;
     dropSaveURL();
     job = { stage: "idle", url: "", listing: null, error: null, done: 0, total: 0, zip: null, acked: false };
     render();
@@ -54,6 +66,10 @@
 
   function fail(e) {
     set({ stage: "error", error: (e && e.message) || String(e) });
+  }
+
+  function busy() {
+    return job.stage === "listing" || job.stage === "fetching" || job.stage === "packing";
   }
 
   function esc(s) {
@@ -71,12 +87,19 @@
   /* ---------------- stages ---------------- */
 
   function look() {
+    /* The buttons are disabled while busy; the URL field's Enter key is not, which is how a
+       second job used to start on top of a running one. Guard the ENTRY too, not just the UI. */
+    if (busy()) return;
+
     var url = (els.url && els.url.value || "").trim();
     if (!url) { fail(new Error("Paste a GitHub folder URL first, or pick a saved one.")); return; }
+
+    var mine = ++gen;
     dropSaveURL();
     set({ stage: "listing", url: url, error: null, listing: null, zip: null, acked: false });
 
     GH.inspect(url).then(function (listing) {
+      if (mine !== gen) return; /* superseded — die quietly */
       if (listing.totalBytes > LIMITS.refuse) {
         throw new Error(
           "That folder is " + GH.humanBytes(listing.totalBytes) + " across " + listing.files.length +
@@ -86,41 +109,49 @@
         );
       }
       set({ stage: "ready", listing: listing, total: listing.files.length, done: 0 });
-    }).catch(fail);
+    }).catch(function (e) {
+      if (mine !== gen) return;
+      fail(e);
+    });
   }
 
   function grab() {
-    if (!job.listing) return;
+    if (!job.listing || busy()) return;
 
     /* Hard confirm above the middle threshold. Not a block — a speed bump with a real number on
        it, which is the whole of Cass's ask. */
-    if (job.listing.totalBytes > LIMITS.confirm && !job.acked) {
-      set({ error: null });
-      return;
-    }
+    if (job.listing.totalBytes > LIMITS.confirm && !job.acked) return;
 
+    var mine = ++gen;
+    var listing = job.listing; /* pin it: comparing against job.listing later is the bug */
     set({ stage: "fetching", done: 0, error: null });
 
-    GH.fetchAll(job.listing, function (done) {
+    GH.fetchAll(listing, function (done) {
+      if (mine !== gen) return;
       /* Progress touches two nodes directly; a full re-render per file would thrash the DOM on a
          large folder for no benefit. */
       job.done = done;
       if (els.meter) els.meter.style.width = Math.round((done / job.total) * 100) + "%";
       if (els.progress) els.progress.textContent = done + " of " + job.total + " files";
     }).then(function (entries) {
+      if (mine !== gen) return;
       set({ stage: "packing" });
       return ZIP.build(entries).then(function (z) {
-        /* Re-assert before offering the download. gh.js checked its own count; this checks what
-           the ZIP actually contains, which is the number that matters. */
-        if (z.entries !== job.listing.files.length) {
+        if (mine !== gen) return;
+        /* Re-assert before offering the download, against the PINNED listing rather than
+           job.listing — which a superseded job could have replaced underneath us. */
+        if (z.entries !== listing.files.length) {
           throw new Error("The zip holds " + z.entries + " files but the listing found " +
-                          job.listing.files.length + ". Refusing to hand you an incomplete archive.");
+                          listing.files.length + ". Refusing to hand you an incomplete archive.");
         }
         dropSaveURL();
         saveURL = URL.createObjectURL(z.blob);
         set({ stage: "done", zip: z });
       });
-    }).catch(fail);
+    }).catch(function (e) {
+      if (mine !== gen) return;
+      fail(e);
+    });
   }
 
   /* ---------------- render ---------------- */
@@ -172,7 +203,7 @@
         "This tool builds the entire archive in memory before handing it to you, so peak usage is " +
         "roughly two and a half times the folder size. It may work; it may also stall the tab. " +
         "<em>That range is an estimate, not a measurement.</em>" +
-        '<p><label><input type="checkbox" id="ggAck"' + (job.acked ? " checked" : "") + "> " +
+        '<p><label class="ack"><input type="checkbox" id="ggAck"' + (job.acked ? " checked" : "") + "> " +
         "I understand, download it anyway</label></p></div>";
     }
     return '<div class="callout"><strong>Heads up: ' + human + ".</strong> " +
@@ -205,7 +236,7 @@
 
   function actions() {
     var s = job.stage;
-    var busy = (s === "listing" || s === "fetching" || s === "packing");
+    var isBusy = busy();
     var out = '<div class="btn-row">';
 
     if (s === "ready") {
@@ -216,12 +247,12 @@
       out += '<a class="btn btn-primary" id="ggSave" href="' + saveURL +
              '" download="' + esc(GH.suggestName(job.listing)) + '">Save the zip</a>';
     } else {
-      out += '<button class="btn btn-primary" id="ggLook"' + (busy ? " disabled" : "") + ">" +
-             (busy ? "Working\u2026" : "Show me the files") + "</button>";
+      out += '<button class="btn btn-primary" id="ggLook"' + (isBusy ? " disabled" : "") + ">" +
+             (isBusy ? "Working\u2026" : "Show me the files") + "</button>";
     }
     /* Start over always exists. Second-download-in-a-row is the most common real session and the
        state everyone forgets to build. */
-    out += '<button class="btn btn-secondary" id="ggReset"' + (busy ? " disabled" : "") + ">Start over</button>";
+    out += '<button class="btn btn-secondary" id="ggReset"' + (isBusy ? " disabled" : "") + ">Start over</button>";
     return out + "</div>";
   }
 
@@ -261,8 +292,15 @@
     var grabBtn = document.getElementById("ggGrab");
     if (grabBtn) grabBtn.addEventListener("click", grab);
 
+    /* The acknowledgement deliberately does NOT go through set(). set() re-renders via innerHTML,
+       which destroys and recreates this very checkbox mid-interaction — focus lost, scroll jumps
+       on mobile. Flip the flag and toggle the one thing it controls. */
     var ack = document.getElementById("ggAck");
-    if (ack) ack.addEventListener("change", function () { set({ acked: this.checked }); });
+    if (ack) ack.addEventListener("change", function () {
+      job.acked = this.checked;
+      var g = document.getElementById("ggGrab");
+      if (g) g.disabled = !this.checked;
+    });
 
     var resetBtn = document.getElementById("ggReset");
     if (resetBtn) resetBtn.addEventListener("click", function () {
