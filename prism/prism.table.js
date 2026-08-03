@@ -1,5 +1,5 @@
 /* Prism — Table lens · ENGINE.
-   Parse, data gates, model, diff, sort order, serialisation, registration.
+   Parse, data gates, model, diff, sort order, pin order, serialisation, registration.
 
    Split three ways by concern; one 30.4KB module blew the source-size budget
    and could not be read whole, which means it could not be safely edited:
@@ -8,7 +8,7 @@
      prism.table.panels.js  — swatch bands, sidebar, export bar
 
    Column identity is a stable key (col.k), NEVER the display name. Renaming a
-   column must not orphan its diff. */
+   column must not orphan its diff — or its pin. */
 (function () {
   "use strict";
 
@@ -92,7 +92,7 @@
       cols: cols, baseSig: TB.sig(cols), rows: rows, orig: orig,
       origIds: rows.map(function (r) { return r.id; }),
       fmt: fmt, delim: delim, sortK: null, sortDir: 0, sel: null,
-      view: "table", hl: false, expSorted: false, order: null
+      pinned: [], view: "table", hl: false, expSorted: false, order: null
     };
   };
   TB.byId = function (id) {
@@ -104,6 +104,27 @@
     var C = TB.T.cols;
     for (var i = 0; i < C.length; i++) if (C[i].k === k) return C[i];
     return null;
+  };
+
+  /* ---------------- pinned columns ----------------
+     A VIEW concern, exactly like sort. `T.cols` stays the canonical export
+     order and is never reordered by a pin; only the grid reads displayCols().
+     Pins are held as stable keys, so renaming a pinned column keeps its pin. */
+  TB.isPinned = function (k) { return TB.T.pinned.indexOf(k) >= 0; };
+  TB.pin = function (k) { if (!TB.isPinned(k)) TB.T.pinned.push(k); };
+  TB.unpin = function (k) {
+    var i = TB.T.pinned.indexOf(k);
+    if (i >= 0) TB.T.pinned.splice(i, 1);
+  };
+  /* Pinned first, in the order they were pinned, then everything else in
+     canonical order. */
+  TB.displayCols = function () {
+    var T = TB.T;
+    if (!T.pinned.length) return T.cols.slice();
+    var head = [];
+    T.pinned.forEach(function (k) { var c = TB.colOf(k); if (c) head.push(c); });
+    var tail = T.cols.filter(function (c) { return !TB.isPinned(c.k); });
+    return head.concat(tail);
   };
 
   /* ---------------- diff ---------------- */
@@ -202,7 +223,9 @@
     return { bg: bg, fg: TB.lum(bg) > 0.5 ? "oklch(0.2 0.02 265)" : "oklch(0.96 0.01 265)" };
   };
 
-  /* ---------------- serialise ---------------- */
+  /* ---------------- serialise ----------------
+     Always walks T.cols, never displayCols(): a pin is a reading aid and must
+     not silently reorder the columns of the file you export. */
   function outRows() { return TB.T.expSorted ? TB.ordered() : TB.T.rows; }
   TB.toDelim = function (d) {
     function q(s) {
