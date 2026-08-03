@@ -1,19 +1,26 @@
-/* styles.css — placed UNFORKED from template-app (PR #300).
-   Everything visual flows from the 4-VECTOR THEME (color x typography x forms x spacing) applied by
-   shared/themes/resolve.js. The app points at a theme (APP_THEME in index.html) and CONSUMES its
-   tokens — nothing is hand-baked. Zero color literals below (sole exception: the neutral black-alpha
-   scrim, which must darken regardless of theme).
+/* styles.css — the template baseline.
+
+   ⚠️ SCOPE (Wave 4): this file holds what came from template-app — chrome, drawers, access gate,
+   base typography, generic cards/tables/buttons. Objects THIS APP added (select, stepper, KV
+   panel, progress meter, file table) live in `app.css`. The split is by ORIGIN, not size: a
+   future template re-sync touches this file, app work touches the other, and neither fights the
+   other for room under the read cap.
+
+   Everything visual flows from the 4-VECTOR THEME (color x typography x forms x spacing) applied
+   by shared/themes/resolve.js. The app points at a theme (APP_THEME in index.html) and CONSUMES
+   its tokens — nothing is hand-baked. Zero colour literals below (sole exception: the neutral
+   black-alpha scrim, which must darken regardless of theme).
 
    The :root block is a LABELED FIRST-PAINT FALLBACK FLOOR ONLY: resolve.js overrides every one of
-   these inline from the composed theme after load. The 4-vector theme is the SOURCE OF TRUTH; treat
-   this block as a mirror, never as the design.
+   these inline from the composed theme after load. The 4-vector theme is the SOURCE OF TRUTH;
+   treat this block as a mirror, never as the design.
 
-   NOTE — deviation 1 from the template: the template's comment on the layout-ramp block contains the
-   literal characters `--gap-*` followed by `/--pad-*`, which closes the CSS comment early and leaks
-   the rest of the sentence into the stylesheet as garbage. Reworded here so the file parses. Still
-   live in `template-app/styles.css`; Michael's call to fix at the source.
+   DEVIATION 1 from the template: the template's comment on the layout-ramp block contains the
+   literal characters `--gap-*` followed by `/--pad-*`, which closes the CSS comment early and
+   leaks the rest of the sentence into the stylesheet as garbage. Reworded here so the file
+   parses. Still live in `template-app/styles.css`; Michael's call to fix at the source.
 
-   NOTE — deviation 2 (v0.2): THE LAYOUT RAMP IS FLOORED. See the block below. */
+   DEVIATION 2 (v0.2): THE LAYOUT RAMP IS FLOORED. See the block below. */
 :root {
   /* --- forms vector (fallback = forms:soft) --- */
   --radius: 8px; --radius-lg: 12px; --radius-pill: 8px; --border-w: 1px;
@@ -26,20 +33,21 @@
   --touch: 44px; --pad-cell: 10px; --pad-card: 20px;
   --gap-xs: 6px; --gap-md: 14px; --gap-lg: 28px;
 
-  /* APP LAYOUT RAMP — derived from the spacing vector so tight/standard/loose/flush all flow.
-     🔴 EVERY STEP CARRIES A FALLBACK, ON PURPOSE (v0.2). A var() chain is only as strong as its
-     weakest link: if any referenced property is unresolved, the ENTIRE declaration using it becomes
-     invalid at computed-value time and falls back to the CSS initial value — for padding, that is 0.
-     It does not degrade gracefully, it vanishes. v0.1 shipped this ramp bare and rendered with no
-     page gutter at all while .card/.callout/.kv (which spell their own fallbacks inline) looked
-     fine. That asymmetry IS the bug signature. Never write a bare var() into this block. */
+  /* APP LAYOUT RAMP — derived from the spacing vector so tight/standard/loose/flush/database all
+     flow. 🔴 EVERY STEP CARRIES A FALLBACK, ON PURPOSE (v0.2). A var() chain is only as strong as
+     its weakest link: if any referenced property is unresolved, the ENTIRE declaration using it
+     becomes invalid at computed-value time and falls back to the CSS initial value — for padding,
+     that is 0. It does not degrade gracefully, it vanishes. v0.1 shipped this ramp bare and
+     rendered with no page gutter at all while .card/.callout (which spell their own fallbacks
+     inline) looked fine. That asymmetry IS the bug signature. Never write a bare var() here. */
   --s1: var(--gap-xs, 6px);   --s2: var(--pad-cell, 10px); --s3: var(--gap-md, 14px);
   --s4: var(--pad-card, 20px); --s5: var(--gap-lg, 28px);
   --s6: calc(var(--gap-lg, 28px) + var(--gap-xs, 6px));
   --s8: calc(var(--gap-lg, 28px) * 1.7);
 
-  /* Hard gutter floor. A spacing vector may go as dense as it likes (see the `flush` row) but text
-     must never touch the viewport edge. max() keeps the theme in charge above the floor. */
+  /* Hard gutter floor. A spacing vector may go as dense as it likes (see the `flush` and
+     `database` rows) but text must never touch the viewport edge. max() keeps the theme in charge
+     above the floor. */
   --gutter: max(var(--s4), 16px);
   --maxw: 860px;
 }
@@ -99,12 +107,6 @@ code { font-family: var(--font-mono); background: var(--surface-2); padding: 1px
 .field input::placeholder { color: var(--text-faint); }
 .field input.mono { font-family: var(--font-mono); font-size: 0.85rem; }
 
-/* ---------- SELECT (fd_dropdown_standard — canonical object #18) ---------- */
-.select { width: 100%; font: inherit; font-family: var(--font-mono); font-size: 0.85rem; background: var(--field); color: var(--text); border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 10px 12px; min-height: var(--touch, 44px); cursor: pointer; appearance: none; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: right 16px center, right 11px center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
-.select:hover { border-color: var(--accent); }
-.select option { background: var(--surface-2); color: var(--text); font-family: var(--font-mono); }
-.select optgroup { background: var(--surface-1); color: var(--text-faint); font-family: var(--font-body); font-style: normal; font-weight: 700; }
-
 .card { background: var(--surface-2); border: var(--border-w) solid var(--border); border-radius: var(--radius-lg); padding: var(--pad-card, 20px); margin-bottom: var(--s4); }
 .card h3 { margin: 0 0 var(--s2); font-size: 1rem; }
 
@@ -120,17 +122,6 @@ code { font-family: var(--font-mono); background: var(--surface-2); padding: 1px
 .tbl th { color: var(--text-soft); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .tbl tbody tr:nth-child(even) { background: var(--surface-2); }
 .tbl td.mono { font-family: var(--font-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
-
-/* ---------- STEPPER (wf_stepper — the four pipeline stages) ---------- */
-.stepper { display: flex; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s4); font-family: var(--font-mono); font-size: 0.75rem; }
-.step { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--radius-pill); background: var(--surface-2); color: var(--text-faint); border: var(--border-w) solid var(--border); }
-.step.is-active { background: var(--accent-soft); color: var(--text); border-color: var(--accent); }
-.step.is-done { color: var(--good); border-color: var(--good); }
-
-/* ---------- KV PANEL (data_kv_panel — repo / ref / sha / count) ---------- */
-.kv { background: var(--surface-1); border: var(--border-w) solid var(--border); border-radius: var(--radius-lg); padding: var(--pad-card, 20px); margin-bottom: var(--s4); display: grid; grid-template-columns: auto 1fr; gap: var(--s1) var(--s3); font-size: 0.85rem; }
-.kv dt { color: var(--text-soft); font-weight: 600; }
-.kv dd { margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; word-break: break-all; }
 
 /* ---------- DRAWERS (left nav + right settings, mirrored) ---------- */
 .drawer { position: fixed; top: 0; height: 100%; width: min(320px, 88vw); background: var(--surface-3); z-index: 120; display: flex; flex-direction: column; transition: transform var(--motion-med, 260ms) var(--ease, cubic-bezier(.2,.8,.2,1)); }

@@ -1,0 +1,77 @@
+/* app.css — objects git-grab adds on top of the template baseline.
+
+   THE SPLIT IS BY ORIGIN, NOT BY SIZE. `styles.css` holds what came from template-app (chrome,
+   drawers, access gate, base typography); this file holds every object this app introduced.
+   A future template re-sync touches that file, app work touches this one, and neither has to
+   fight the other for room under the read cap.
+
+   Same law as everywhere else: every colour is a var(--token) from the theme spine. No literals.
+*/
+
+/* ---------- SELECT (fd_dropdown_standard, canonical object #18) ---------- */
+.select {
+  width: 100%; font: inherit; font-family: var(--font-mono); font-size: 0.85rem;
+  background: var(--field); color: var(--text);
+  border: var(--border-w) solid var(--border); border-radius: var(--radius);
+  padding: 10px 34px 10px 12px; min-height: var(--touch, 44px); cursor: pointer;
+  appearance: none;
+  /* the chevron, drawn from currentColor so it tracks the theme without an asset */
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 16px center, right 11px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.select:hover { border-color: var(--accent); }
+.select option { background: var(--surface-2); color: var(--text); font-family: var(--font-mono); }
+.select optgroup { background: var(--surface-1); color: var(--text-faint); font-family: var(--font-body); font-style: normal; font-weight: 700; }
+
+/* ---------- STEPPER (wf_stepper — the four pipeline stages) ---------- */
+.stepper { display: flex; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s4); font-family: var(--font-mono); font-size: 0.75rem; }
+.step { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--radius-pill); background: var(--surface-2); color: var(--text-faint); border: var(--border-w) solid var(--border); }
+.step.is-active { background: var(--accent-soft); color: var(--text); border-color: var(--accent); }
+.step.is-done { color: var(--good); border-color: var(--good); }
+
+/* ---------- KV PANEL (data_kv_panel — repo / ref / sha / count) ---------- */
+.kv {
+  background: var(--surface-1); border: var(--border-w) solid var(--border);
+  border-radius: var(--radius-lg); padding: var(--pad-card, 20px); margin-bottom: var(--s4);
+  display: grid; grid-template-columns: auto 1fr; gap: var(--s1) var(--s3); font-size: 0.85rem;
+}
+.kv dt { color: var(--text-soft); font-weight: 600; }
+.kv dd { margin: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+/* ---------- PROGRESS METER (viz_meter) ----------
+   Moved out of an inline style attribute in app.js: presentation belongs in a stylesheet, and
+   inline styles cannot be reskinned by a theme. */
+.meter-track { height: 8px; background: var(--surface-3); border-radius: var(--radius-pill); overflow: hidden; }
+.meter-fill { height: 100%; width: 0%; background: var(--accent); transition: width var(--motion-fast, 120ms) linear; }
+
+/* ---------- FILE TABLE (data_typed_table) ----------
+   🐞 Wave 4 / Beckett: a long path forced horizontal scroll at 320px. `anywhere` lets it break,
+   and app.js inserts a zero-width space after each slash so breaks land on path separators
+   rather than mid-word. The size column is fixed so it never gets squeezed to nothing. */
+.tbl-files { table-layout: fixed; width: 100%; }
+.tbl-files td.path { overflow-wrap: anywhere; word-break: break-word; }
+.tbl-files td.num, .tbl-files th:last-child { width: 5.5rem; text-align: right; white-space: nowrap; }
+
+/* ---------- SIZE ACKNOWLEDGEMENT ----------
+   A bare checkbox is a ~13px target. This is a confirmation for a job that can stall the tab, so
+   it gets a real one. */
+.callout label { display: flex; align-items: center; gap: var(--s2); min-height: var(--touch, 44px); cursor: pointer; }
+.callout input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent); flex-shrink: 0; }
+.callout ul { margin: var(--s2) 0 0; padding-left: 1.2em; }
+.callout li { margin-bottom: 4px; overflow-wrap: anywhere; }
+
+/* ---------- 320px ----------
+   Narrowest real phone. Buttons go full width so nothing wraps into a 2px sliver, and the KV
+   panel stacks because a two-column grid with a 40-char commit SHA cannot fit either way. */
+@media (max-width: 380px) {
+  .btn-row { flex-direction: column; align-items: stretch; }
+  .btn-row .btn { width: 100%; text-align: center; }
+  .kv { grid-template-columns: 1fr; gap: 2px var(--s2); }
+  .kv dt { margin-top: var(--s2); }
+  .kv dt:first-child { margin-top: 0; }
+  .tbl-files td.num, .tbl-files th:last-child { width: 4.5rem; }
+  .stepper { font-size: 0.7rem; }
+}
