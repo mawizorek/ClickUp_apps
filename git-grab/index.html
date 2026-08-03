@@ -4,7 +4,8 @@
      If this app needs something the template cannot express, change the TEMPLATE — that is Michael's call, not a local special-case. -->
 <!-- THEME: APP_THEME is a JOIN slug from shared/themes/_themes.json (color x typography x forms x spacing).
      DEFAULT_COLOR is a COLOR slug from shared/themes/_index.json. They are NOT interchangeable:
-     passing a color slug to applyTheme() faults. Nothing here is authored — both values are borrowed. -->
+     passing a color slug to applyTheme() faults. Nothing here is authored — both values are borrowed.
+     TO RESKIN THE WHOLE APP: change APP_THEME to any slug in _themes.json. One line, nothing else. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -29,7 +30,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint (color); resolve.js composes all 4 vectors. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=2">
+<link rel="stylesheet" href="./styles.css?v=3">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -51,18 +52,20 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js?v=2"></script>
+<script src="./chrome.js?v=3"></script>
+<script src="./zip.js?v=3"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
   var APP_NAME    = "git-grab";
-  var APP_VERSION = "v0.2";
-  var APP_PR      = 714;                  // merged PR that shipped this version
-  var APP_THEME   = "soft-utility";       // JOIN slug (_themes.json) — the documented default for apps copied from template-app
-  var DEFAULT_COLOR = "maw-dark-utility"; // COLOR slug (_index.json) — fallback only, if the join cannot load
+  var APP_VERSION = "v0.3";
+  var APP_PR      = 718;                  // merged PR that shipped this version
+  var APP_THEME   = "soft-utility";       // JOIN slug (_themes.json). CHANGE THIS ONE LINE TO RESKIN.
+  var DEFAULT_COLOR = "maw-dark-utility"; // COLOR slug (_index.json) — lightweight fallback if the join cannot load
   var DEFAULT_PAGE  = "home";
   var NAV = [
     { route: "home",  label: "Grab a folder" },
+    { route: "test",  label: "Self test" },
     { route: "about", label: "About" }
   ];
   /* ======================= */
@@ -120,6 +123,41 @@
     sources: [ { label: "Source \u2197", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/git-grab" } ]
   });
 
+  /* ---- PAGE BEHAVIOUR ----
+     The router injects partials with innerHTML, and a <script> inserted that way NEVER executes
+     (HTML spec, not a quirk). So any page needing behaviour gets hooked here, after render.
+     One hook, so the next page does not reinvent the mechanism. */
+  function afterRender(route) {
+    if (route !== "test") return;
+    var btn = document.getElementById("runSelftest");
+    var out = document.getElementById("selftestOut");
+    if (!btn || !out || !window.ZIP) return;
+
+    btn.addEventListener("click", function () {
+      btn.disabled = true;
+      out.innerHTML = '<p class="muted">Running\u2026</p>';
+      ZIP.selftest().then(function (r) {
+        var rows = r.results.map(function (line) {
+          var pass = line.indexOf("PASS") === 0;
+          return '<tr><td>' + (pass ? '<span class="badge good">pass</span>' : '<span class="badge bad">fail</span>') +
+                 '</td><td class="mono">' + line.slice(6).trim().replace(/</g, "&lt;") + '</td></tr>';
+        }).join("");
+        out.innerHTML =
+          '<div class="callout"><strong>' + (r.ok ? "\u2705 All internal checks passed." : "\u274c Something failed \u2014 see below.") +
+          '</strong> Compression: <code>' + r.method + '</code>. Archive: <code>' + r.size + '</code> bytes.</div>' +
+          '<table class="tbl"><thead><tr><th>Result</th><th>Check</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+          '<div class="btn-row"><a class="btn btn-primary" href="' + r.url + '" download="git-grab-selftest.zip">Download the sample zip</a></div>' +
+          '<p class="muted">This is the check that counts. Open it in Finder or Explorer. You should see four files, ' +
+          'with <code>data.txt</code> inside <code>nested/deep/</code> and the caf\u00e9 filename intact.</p>';
+        btn.disabled = false;
+      }).catch(function (e) {
+        out.innerHTML = '<div class="callout"><strong>\u274c The test threw.</strong><br><code>' +
+          String(e && e.message || e).replace(/</g, "&lt;") + '</code></div>';
+        btn.disabled = false;
+      });
+    });
+  }
+
   /* ---- ROUTER: hash -> pages/<route>.html injected into #view ---- */
   var view = document.getElementById("view");
   var routes = NAV.map(function (n) { return n.route; });
@@ -127,7 +165,10 @@
     if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
     fetch("./pages/" + route + ".html", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw 0; return r.text(); })
-      .then(function (html) { view.innerHTML = html; Chrome.setActive(route); view.focus(); window.scrollTo(0, 0); })
+      .then(function (html) {
+        view.innerHTML = html; Chrome.setActive(route); view.focus(); window.scrollTo(0, 0);
+        afterRender(route);
+      })
       .catch(function () {
         view.innerHTML = '<section class="page"><h1>Page not found</h1>' +
           '<p class="muted">No page matches <code>#' + route + '</code>.</p></section>';
