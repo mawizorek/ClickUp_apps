@@ -1,48 +1,82 @@
 <section class="page">
   <h1>Grab a folder</h1>
-  <p class="lead">Paste a public GitHub folder URL and get back a zip of that folder and everything under it.</p>
+  <p class="lead">Paste a link to any folder on GitHub. Get back a <code>.zip</code> of that folder and everything inside it.</p>
 
   <div class="callout">
-    <strong>Wave 0 scaffold — nothing works yet, on purpose.</strong>
-    This page renders the shell so the theme and the object vocabulary can be judged before any
-    pipeline code exists. The field and the button below are inert. Wave 1 builds the zip writer,
-    Wave 2 the listing, Wave 3 wires them together.
+    <strong>Not working yet — this is the shell.</strong>
+    The layout, theme and controls are real; the machinery behind them lands next.
+    Everything below is switched off on purpose so the look can be judged before the code exists.
   </div>
+
+  <h2>Pick a folder</h2>
 
   <label class="field">
-    <span>GitHub folder URL</span>
+    <span>Saved locations</span>
+    <select class="select" disabled aria-describedby="presetHelp">
+      <option value="">Choose a saved folder, or paste your own below…</option>
+      <optgroup label="mawizorek/ClickUp_apps">
+        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/brain-config">brain-config — agent tools, hooks, gates</option>
+        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/shared/themes">shared/themes — the 4-vector theme spine</option>
+        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/template-app">template-app — the gold-standard app baseline</option>
+        <option value="https://github.com/mawizorek/ClickUp_apps/tree/main/git-grab">git-grab — this app, grabbing itself</option>
+      </optgroup>
+      <optgroup label="maw-agents/uritp-docs">
+        <option value="https://github.com/maw-agents/uritp-docs/tree/main/docs/production">docs/production — production paperwork + inventory</option>
+      </optgroup>
+    </select>
+  </label>
+  <p id="presetHelp" class="muted">Saved locations are just shortcuts. Picking one fills the box below; nothing is fetched until you ask for it.</p>
+
+  <label class="field">
+    <span>…or paste a GitHub folder URL</span>
     <input class="mono" type="url" inputmode="url" autocomplete="off" spellcheck="false" disabled
-           placeholder="https://github.com/owner/repo/tree/&lt;ref-or-sha&gt;/path/to/folder"
+           placeholder="https://github.com/owner/repo/tree/main/path/to/folder"
            aria-describedby="urlHelp">
   </label>
-  <p id="urlHelp" class="muted">A <code>/tree/</code> link, a <code>/blob/</code> link, or a commit permalink. Public repos only.</p>
+  <p id="urlHelp" class="muted">
+    Open the folder on GitHub and copy the address bar. A <code>/tree/</code> link, a <code>/blob/</code> link to a
+    single file, or a permalink with a long commit hash all work. <strong>Public repositories only</strong> — private
+    repos need a token, which comes later.
+  </p>
 
   <div class="btn-row">
-    <button class="btn btn-primary" disabled>List files</button>
-    <button class="btn btn-secondary" disabled>Reset</button>
+    <button class="btn btn-primary" disabled>Show me the files</button>
+    <button class="btn btn-secondary" disabled>Clear</button>
   </div>
 
-  <h2>Pipeline</h2>
-  <div class="stepper" aria-label="Pipeline stages">
-    <span class="step">1 · parse</span>
-    <span class="step">2 · list</span>
-    <span class="step">3 · fetch</span>
-    <span class="step">4 · pack</span>
+  <h2>What happens next</h2>
+  <p>
+    Nothing downloads straight away. First you get a list of exactly what is about to be packed, with a file
+    count and a total size, so you can see the whole thing before committing to it. Then one button turns it
+    into a zip, in your browser — the files never touch anyone else's server.
+  </p>
+
+  <div class="stepper" aria-label="Progress">
+    <span class="step">1 · read the link</span>
+    <span class="step">2 · list the files</span>
+    <span class="step">3 · download them</span>
+    <span class="step">4 · make the zip</span>
   </div>
 
-  <h2>What it will show you before it downloads</h2>
+  <h2>The preview</h2>
   <dl class="kv">
     <dt>Repo</dt><dd>—</dd>
-    <dt>Ref</dt><dd>—</dd>
-    <dt>Commit</dt><dd>—</dd>
-    <dt>Path</dt><dd>—</dd>
-    <dt>Files</dt><dd>—</dd>
+    <dt>Branch or tag</dt><dd>—</dd>
+    <dt>Exact commit</dt><dd>—</dd>
+    <dt>Folder</dt><dd>—</dd>
+    <dt>Files found</dt><dd>—</dd>
     <dt>Total size</dt><dd>—</dd>
   </dl>
 
   <p class="muted">
-    The count above is the whole point. A download only counts as correct when the number on this
-    screen matches the number of entries in the zip and the number of files GitHub reports, and
-    anything deliberately excluded (submodules, symlinks) is named rather than dropped quietly.
+    The file count is the point of this screen. A download is only correct when the number here matches the
+    number of files in the zip and the number GitHub reports — and if anything is deliberately left out
+    (submodules and symlinks cannot be packed, because there is no actual file to fetch), it gets named here
+    rather than quietly dropped. A zip that is silently missing four files is worse than no zip at all.
+  </p>
+
+  <p class="muted">
+    Every request goes to <code>github.com</code> and nowhere else, and that is enforced in code rather than
+    promised in a README.
   </p>
 </section>
