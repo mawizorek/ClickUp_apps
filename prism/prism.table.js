@@ -223,6 +223,18 @@
       return o;
     }), null, 2);
   };
+  /* Excel-compatible HTML table, same trick the JSON lens uses. Present so a
+     flat-array .json opened here loses nothing by not going to that lens.
+     A true .xlsx via SheetJS is still the open roadmap item. */
+  TB.toXLS = function () {
+    var C = TB.T.cols;
+    var head = "<tr>" + C.map(function (c) { return "<th>" + esc(c.name) + "</th>"; }).join("") + "</tr>";
+    var body = outRows().map(function (r) {
+      return "<tr>" + C.map(function (c) { return "<td>" + esc(r.c[c.k] == null ? "" : r.c[c.k]) + "</td>"; }).join("") + "</tr>";
+    }).join("");
+    return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">' +
+      '<head><meta charset="utf-8"></head><body><table border="1">' + head + body + "</table></body></html>";
+  };
 
   /* ---------------- detection ---------------- */
   function flatArray(t) {
