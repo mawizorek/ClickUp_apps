@@ -5,7 +5,7 @@
     "color": "entity — the palette (hue only). e.g. maw-dark-utility.",
     "typography": "entity — fonts + size ramp + tracking. e.g. sharp-racing.",
     "forms": "entity — tactility: radii, border weight, shadows, elevation, motion, gradient angle. sharp | soft | grounded.",
-    "spacing": "entity — density: touch target, padding, gaps. tight | standard | loose.",
+    "spacing": "entity — density: touch target, padding, gaps. tight | standard | loose | flush | database.",
     "theme": "JOIN — named combination of exactly one token from each of the four vectors."
   },
   "themes": [
@@ -78,6 +78,16 @@
       "forms": "sharp",
       "spacing": "tight",
       "intendedUse": "Neutral-cool tight instrument look; alternative to sharp-utility."
+    },
+    {
+      "slug": "database",
+      "name": "Database",
+      "status": "draft",
+      "color": "maw-dark-utility",
+      "typography": "sharp-racing",
+      "forms": "sharp",
+      "spacing": "database",
+      "intendedUse": "THE DATABASE LOOK (Michael, 2026-08-03) — maximum row density, gaps collapsed, chrome out of the way. Named for the words he actually uses, so 'give me the database look' resolves in a grep, in this file and in the spacing grid. Deliberately `sharp-utility` with ONE pointer changed (spacing tight -> database) so the two are comparable and any difference is attributable to spacing alone. ⚠️ status DRAFT: composed but never rendered — nothing has consumed it yet, so nobody has looked at it. Promote to locked only after it has been seen. ⚠️ SIBLING, NOT A RIVAL: the `flush` spacing row is the other dense option and it optimises a DIFFERENT axis — flush hugs the viewport EDGE, database maximises ROWS. If nobody can state that difference on sight, retire one rather than letting both drift."
     },
     {
       "slug": "on-track",
