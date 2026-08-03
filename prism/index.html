@@ -18,8 +18,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="prism.css?v=5">
-<link rel="stylesheet" href="prism.table.css?v=5">
+<link rel="stylesheet" href="prism.css?v=6">
+<link rel="stylesheet" href="prism.table.css?v=6">
 <style>
   #access-gate{position:fixed;inset:0;z-index:9999;background:#1a1c24;color:#e7e8ee;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
   #access-gate .box{text-align:center;max-width:340px;padding:32px}
@@ -121,13 +121,13 @@
   fetch("./config.json", { cache: "no-store" }).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); }).catch(function () { var cached = null; try { cached = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(cached || FALLBACK); });
 })();
 </script>
-<script>document.getElementById("stamp").textContent = "Prism v3 \u00b7 PR #723";</script>
-<script src="prism.table.js?v=5"></script>
-<script src="prism.table.grid.js?v=5"></script>
-<script src="prism.table.panels.js?v=5"></script>
-<script src="prism.json.js?v=5"></script>
-<script src="prism.md.js?v=5"></script>
-<script src="prism.core.js?v=5"></script>
-<script src="prism.mobile.js?v=5"></script>
+<script>document.getElementById("stamp").textContent = "Prism v3.1";</script>
+<script src="prism.table.js?v=6"></script>
+<script src="prism.table.grid.js?v=6"></script>
+<script src="prism.table.panels.js?v=6"></script>
+<script src="prism.json.js?v=6"></script>
+<script src="prism.md.js?v=6"></script>
+<script src="prism.core.js?v=6"></script>
+<script src="prism.mobile.js?v=6"></script>
 </body>
 </html>
