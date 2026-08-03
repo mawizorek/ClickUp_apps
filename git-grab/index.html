@@ -6,6 +6,8 @@
      DEFAULT_COLOR is a COLOR slug from shared/themes/_index.json. They are NOT interchangeable:
      passing a color slug to applyTheme() faults. Nothing here is authored — both values are borrowed.
      TO RESKIN THE WHOLE APP: change APP_THEME to any slug in _themes.json. One line, nothing else. -->
+<!-- CSS SPLIT (v1.1): styles.css = the template baseline. app.css = objects this app added.
+     By ORIGIN, not size, so a template re-sync and app work never fight over one file. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -30,7 +32,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint (color); resolve.js composes all 4 vectors. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=4">
+<link rel="stylesheet" href="./styles.css?v=5">
+<link rel="stylesheet" href="./app.css?v=5">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -52,16 +55,16 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js?v=4"></script>
-<script src="./zip.js?v=4"></script>
-<script src="./gh.js?v=4"></script>
-<script src="./app.js?v=4"></script>
+<script src="./chrome.js?v=5"></script>
+<script src="./zip.js?v=5"></script>
+<script src="./gh.js?v=5"></script>
+<script src="./app.js?v=5"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
   var APP_NAME    = "git-grab";
-  var APP_VERSION = "v1.0";
-  var APP_PR      = 719;                  // merged PR that shipped this version
+  var APP_VERSION = "v1.1";
+  var APP_PR      = 720;                  // merged PR that shipped this version
   var APP_THEME   = "soft-utility";       // JOIN slug (_themes.json). CHANGE THIS ONE LINE TO RESKIN.
   var DEFAULT_COLOR = "maw-dark-utility"; // COLOR slug (_index.json) — lightweight fallback if the join cannot load
   var DEFAULT_PAGE  = "home";
@@ -128,7 +131,7 @@
   /* ---- PAGE BEHAVIOUR ----
      The router injects partials with innerHTML, and a script tag inserted that way NEVER executes
      (HTML spec, not a quirk). So any page needing behaviour is hooked here, after render. Two
-     pages use it now, which is why it is one mechanism rather than two copies. */
+     pages use it, which is why it is one mechanism rather than two copies. */
   function afterRender(route) {
     if (route === "home" && window.GRAB) { GRAB.mount(); return; }
     if (route !== "test") return;
