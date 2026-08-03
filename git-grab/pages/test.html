@@ -1,0 +1,32 @@
+<section class="page">
+  <h1>Self test</h1>
+  <p class="lead">Checks the zip writer against itself, then hands you a real archive to open.</p>
+
+  <div class="callout">
+    <strong>Two different kinds of proof, and only one of them happens here.</strong>
+    The checks below build a zip in memory and read it back, which proves the writer is internally
+    consistent. It does <em>not</em> prove your computer can open the file — nothing running in a
+    browser tab can prove that. <strong>Download the sample at the end and double-click it.</strong>
+    That is the real test.
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="runSelftest">Run the test</button>
+  </div>
+
+  <div id="selftestOut"></div>
+
+  <h2>What it packs</h2>
+  <dl class="kv">
+    <dt>readme.txt</dt><dd>plain text, short</dd>
+    <dt>nested/deep/data.txt</dt><dd>long and repetitive — deflate must shrink it</dd>
+    <dt>unicode/café — ✅.txt</dt><dd>non-ASCII filename, proves the UTF-8 flag</dd>
+    <dt>empty.txt</dt><dd>zero bytes, the classic off-by-one</dd>
+  </dl>
+
+  <p class="muted">
+    Nested paths are deliberate: this writer does not emit directory entries, it relies on the
+    slashes in a path implying folders. If <code>nested/deep/</code> comes out flat, that assumption
+    was wrong and the pipeline should not be built on top of it.
+  </p>
+</section>
