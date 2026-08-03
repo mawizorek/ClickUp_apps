@@ -13,7 +13,7 @@
 
 ⚠️ **The gate cuts BOTH ways — this file is a CLAIM about reality, not reality. HEAD wins; this file gets corrected.** Verify before acting on any ⚠️ below; every class of claim here has been measured going stale (taxonomy → the standard).
 
-⚠️ **Never write a version — or a byte count — you have not READ BACK at HEAD.** This includes a claim ABOUT a set of files ("all under the line"), which is a byte count wearing a sentence.
+⚠️ **Never write a version, a byte count, or a claim ABOUT a set of files, that you have not READ BACK at HEAD.**
 
 📐 **Size: target ~16KB, ceiling ~22KB.** Every edit that adds must also trim, in the same commit, and read the size back. Seat Size Sally before growing this file.
 
