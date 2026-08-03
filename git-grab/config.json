@@ -1,9 +1,9 @@
 {
-  "access": "gated",
+  "access": "open",
   "code": "0426",
-  "coverTitle": "git-grab is still being built",
-  "coverMessage": "The page behind this is a shell — the layout is real, the machinery is not. Enter the code if you are here to look at it on purpose.",
+  "coverTitle": "git-grab",
+  "coverMessage": "Enter the code to continue.",
   "downTitle": "Temporarily offline",
   "downMessage": "git-grab is currently unavailable.",
-  "version": "2026-08-03b"
+  "version": "2026-08-03c"
 }
