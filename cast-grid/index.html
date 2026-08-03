@@ -68,13 +68,11 @@ const API_BASE = 'https://api.clickup.com/api/v2';
 // Add new lists here as they get created. Format: { id, name, space }
 // =============================================================
 const DEFAULT_LISTS = [
+  { id: '901327011063', name: 'Show Roles (contact sheets)', space: 'CRM (Space 2)' },
   { id: '901301209794', name: 'People', space: 'CRM (Space 2)' },
   { id: '901305724994', name: 'Companies, general', space: 'CRM (Space 2)' },
   { id: '901326626373', name: 'List (default)', space: 'CRM (Space 2)' },
 ];
-// When Show Roles gets its own list, add it here:
-// { id: 'TBD', name: 'Show Roles (assignments)', space: 'CRM (Space 2)' },
-// { id: 'TBD', name: 'Role Definitions', space: 'URITP (Space 1)' },
 // =============================================================
 
 let state = { tasks: [], fields: [], config: loadConfig() };
@@ -157,7 +155,7 @@ async function startFetch() {
     render(`<div class="status success">Loaded ${tasksData.length} tasks with ${fields.length} custom fields.</div>`);
     setTimeout(() => showFieldMapping(), 500);
   } catch (e) {
-    render(`<div class="status error">Error: ${e.message}</div><button class="btn" onclick="showSetup()">\u2190 Back to setup</button>`);
+    render(`<div class="status error">Error: ${e.message}</div><button class="btn" onclick="showSetup()">← Back to setup</button>`);
   }
 }
 
@@ -198,11 +196,11 @@ function showFieldMapping() {
       <p style="font-size:.8rem;color:var(--muted)">Tell the grid which field is which. Relationship fields auto-detected: <b>${relFields.length}</b></p>
       <div class="field-map">
         <div>
-          <label>ROWS (Role) \u2014 group by:</label>
+          <label>ROWS (Role) — group by:</label>
           <select id="rowField">${noneOpt}${opts(allFields, c.rowField)}</select>
         </div>
         <div>
-          <label>COLUMNS (Production) \u2014 pivot on:</label>
+          <label>COLUMNS (Production) — pivot on:</label>
           <select id="colField">${noneOpt}${opts(allFields, c.colField)}</select>
         </div>
         <div>
@@ -217,9 +215,9 @@ function showFieldMapping() {
           </select>
         </div>
       </div>
-      <button onclick="buildGrid()">Build Matrix \u2192</button>
-      <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">\u2190 Config</button>
-      <p class="refresh-note">Found ${state.tasks.length} tasks \u00b7 ${fields.length} fields (${relFields.length} relationships)</p>
+      <button onclick="buildGrid()">Build Matrix →</button>
+      <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">← Config</button>
+      <p class="refresh-note">Found ${state.tasks.length} tasks · ${fields.length} fields (${relFields.length} relationships)</p>
     </div>
   `);
 }
@@ -287,17 +285,17 @@ function buildGrid() {
   if (!sortedRows.length || !sortedCols.length) {
     render(`
       <div class="status error">No data to pivot. Check your field mappings.</div>
-      <button class="btn" onclick="showFieldMapping()">\u2190 Remap fields</button>
+      <button class="btn" onclick="showFieldMapping()">← Remap fields</button>
     `);
     return;
   }
 
   let html = `
     <div class="toolbar">
-      <button class="btn btn-secondary" onclick="showFieldMapping()">\u2699 Remap</button>
-      <button class="btn btn-secondary" onclick="startFetch()">\u21bb Refresh</button>
-      <button class="btn btn-secondary" onclick="showSetup()">\ud83d\udd11 Config</button>
-      <span style="font-size:.75rem;color:var(--muted)">  ${sortedRows.length} roles \u00d7 ${sortedCols.length} productions \u00b7 ${tasks.length} assignments</span>
+      <button class="btn btn-secondary" onclick="showFieldMapping()">⚙ Remap</button>
+      <button class="btn btn-secondary" onclick="startFetch()">↻ Refresh</button>
+      <button class="btn btn-secondary" onclick="showSetup()">🔑 Config</button>
+      <span style="font-size:.75rem;color:var(--muted)">  ${sortedRows.length} roles × ${sortedCols.length} productions · ${tasks.length} assignments</span>
     </div>
     <div class="grid-container">
     <table class="matrix">
@@ -314,7 +312,7 @@ function buildGrid() {
       const key = `${row}|||${col}`;
       const entries = grid.get(key) || [];
       if (!entries.length) {
-        html += `<td><div class="empty-cell">\u2014</div></td>`;
+        html += `<td><div class="empty-cell">—</div></td>`;
       } else {
         html += '<td>';
         for (const e of entries) {
@@ -342,7 +340,7 @@ if (state.config.token && state.config.listId) {
     <div class="setup" style="max-width:500px">
       <p style="font-size:.85rem">Config loaded from last session.</p>
       <p style="font-size:.8rem;color:var(--muted)">List: <b>${DEFAULT_LISTS.find(l=>l.id===state.config.listId)?.name || state.config.listId}</b></p>
-      <button onclick="startFetch()">Load Data \u2192</button>
+      <button onclick="startFetch()">Load Data →</button>
       <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">Change Config</button>
     </div>
   `);
