@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cast Grid v0.1-poc</title>
+<title>Cast Grid v0.2</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--text:#eee;--muted:#888;--success:#4ecca3;--warn:#f39c12;--border:#2a2a4a}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1rem}
-.banner{background:var(--accent);color:#fff;text-align:center;padding:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.05em;border-radius:4px;margin-bottom:1rem}
+.banner{background:var(--card);color:var(--success);text-align:center;padding:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.05em;border-radius:4px;margin-bottom:1rem;border:1px solid var(--success)}
 h1{font-size:1.4rem;margin-bottom:.5rem}
 .subtitle{color:var(--muted);font-size:.8rem;margin-bottom:1.5rem}
 .setup{background:var(--surface);border-radius:8px;padding:1.5rem;max-width:500px;margin:2rem auto}
@@ -47,25 +47,35 @@ table.matrix tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 .refresh-note{font-size:.7rem;color:var(--muted);margin-top:.5rem}
 .manual-id{display:none;margin-top:.5rem}
 .manual-id.visible{display:block}
+.connection-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .5rem;border-radius:3px;margin-left:.5rem}
+.connection-badge.connected{background:#1a3d2e;color:var(--success);border:1px solid var(--success)}
+.connection-badge.disconnected{background:#3d1515;color:var(--accent);border:1px solid var(--accent)}
+.auto-refresh{font-size:.7rem;color:var(--muted);margin-top:.25rem}
+.auto-refresh select{padding:.2rem .4rem;font-size:.7rem}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="banner">⚠️ THIS IS A PROTOTYPE (v0.1-poc) — proof of concept only</div>
+  <div class="banner">✅ v0.2 — Worker-powered. No token required in browser.</div>
   <h1>🎭 Cast Grid</h1>
-  <p class="subtitle">Roles × Productions → People. Live from ClickUp.</p>
+  <p class="subtitle">Roles × Productions → People. Live from ClickUp via secure proxy.</p>
   <div id="content"></div>
-  <p class="meta">cast-grid v0.1-poc · <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/cast-grid" style="color:var(--accent)">source</a></p>
+  <p class="meta">cast-grid v0.2 · <a href="https://github.com/mawizorek/ClickUp_apps/tree/main/cast-grid" style="color:var(--accent)">source</a></p>
 </div>
 
 <script>
-const APP_VERSION = '0.1-poc';
+const APP_VERSION = '0.2';
 const STORAGE_KEY = 'cast_grid_config';
-const API_BASE = 'https://api.clickup.com/api/v2';
+
+// =============================================================
+// WORKER PROXY URL
+// Replace this with your deployed Cloudflare Worker URL
+// =============================================================
+const WORKER_URL = 'https://cast-grid-proxy.mawizorek.workers.dev';
+// =============================================================
 
 // =============================================================
 // DEFAULT LIST PRESETS
-// Add new lists here as they get created. Format: { id, name, space }
 // =============================================================
 const DEFAULT_LISTS = [
   { id: '901327011063', name: 'Show Roles (contact sheets)', space: 'CRM (Space 2)' },
@@ -75,7 +85,8 @@ const DEFAULT_LISTS = [
 ];
 // =============================================================
 
-let state = { tasks: [], fields: [], config: loadConfig() };
+let state = { tasks: [], fields: [], config: loadConfig(), workerOnline: null };
+let refreshInterval = null;
 
 function loadConfig() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -89,18 +100,36 @@ function saveConfig(c) {
 function $(id) { return document.getElementById(id); }
 function render(html) { $('content').innerHTML = html; }
 
-function showSetup() {
+async function checkWorkerHealth() {
+  try {
+    const r = await fetch(`${WORKER_URL}/health`);
+    const d = await r.json();
+    state.workerOnline = d.status === 'ok';
+  } catch {
+    state.workerOnline = false;
+  }
+}
+
+function connectionBadge() {
+  if (state.workerOnline === null) return '<span class="connection-badge disconnected">checking...</span>';
+  if (state.workerOnline) return '<span class="connection-badge connected">● connected</span>';
+  return '<span class="connection-badge disconnected">● offline</span>';
+}
+
+async function showSetup() {
+  await checkWorkerHealth();
   const c = state.config;
   const listOptions = DEFAULT_LISTS.map(l =>
-    `<option value="${l.id}" ${l.id===c.listId?'selected':''}>${l.name} (${l.space}) [${l.id}]</option>`
+    `<option value="${l.id}" ${l.id===c.listId?'selected':''}>${l.name} (${l.space})</option>`
   ).join('');
 
   render(`
     <div class="setup">
-      <h2 style="font-size:1.1rem;margin-bottom:.5rem">Configuration</h2>
-      <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">Your token stays in localStorage. Never touches a server.</p>
-      <label>ClickUp API Token</label>
-      <input id="token" type="password" placeholder="pk_..." value="${c.token||''}">
+      <h2 style="font-size:1.1rem;margin-bottom:.5rem">Cast Grid Setup ${connectionBadge()}</h2>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">Data flows through your Cloudflare Worker. No token in the browser.</p>
+      <label>Proxy URL</label>
+      <input id="workerUrl" type="text" value="${WORKER_URL}" disabled style="opacity:.6">
+      <p style="font-size:.65rem;color:var(--muted);margin-top:.2rem">Hardcoded to your worker. Edit source to change.</p>
       <label>Target List</label>
       <select id="listSelect" onchange="toggleManualId()">
         ${listOptions}
@@ -109,9 +138,9 @@ function showSetup() {
       <div id="manualIdWrap" class="manual-id ${!DEFAULT_LISTS.find(l=>l.id===c.listId) && c.listId ? 'visible' : ''}">
         <label>Manual List ID</label>
         <input id="manualListId" type="text" placeholder="e.g. 901327329300" value="${!DEFAULT_LISTS.find(l=>l.id===c.listId) ? (c.listId||'') : ''}">
-        <p style="font-size:.7rem;color:var(--muted);margin-top:.25rem">Find this in the list URL: app.clickup.com/.../list/<b>THIS_NUMBER</b></p>
       </div>
-      <button onclick="startFetch()">Load Data →</button>
+      <button onclick="startFetch()" ${state.workerOnline ? '' : 'disabled style="opacity:.5"'}>Load Data →</button>
+      ${!state.workerOnline ? '<p style="font-size:.75rem;color:var(--accent);margin-top:.5rem">⚠️ Worker not responding. Deploy it first (see README).</p>' : ''}
     </div>
   `);
 }
@@ -119,11 +148,8 @@ function showSetup() {
 function toggleManualId() {
   const sel = $('listSelect');
   const wrap = $('manualIdWrap');
-  if (sel.value === '__other') {
-    wrap.classList.add('visible');
-  } else {
-    wrap.classList.remove('visible');
-  }
+  if (sel.value === '__other') { wrap.classList.add('visible'); }
+  else { wrap.classList.remove('visible'); }
 }
 
 function getSelectedListId() {
@@ -133,41 +159,30 @@ function getSelectedListId() {
   return manual ? manual.value.trim() : '';
 }
 
-async function apiFetch(endpoint, token) {
-  const r = await fetch(`${API_BASE}${endpoint}`, {
-    headers: { 'Authorization': token, 'Content-Type': 'application/json' }
-  });
-  if (!r.ok) throw new Error(`API ${r.status}: ${r.statusText}`);
+async function proxyFetch(path) {
+  const r = await fetch(`${WORKER_URL}${path}`);
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({ error: `HTTP ${r.status}` }));
+    throw new Error(err.error || `Proxy error ${r.status}`);
+  }
   return r.json();
 }
 
 async function startFetch() {
-  const token = $('token')?.value?.trim();
   const listId = getSelectedListId();
-  if (!token || !listId) { alert('Both token and list are required'); return; }
-  saveConfig({ token, listId });
-  render(`<div class="status loading">Fetching tasks from list ${listId}...</div>`);
+  if (!listId) { alert('Pick a list first'); return; }
+  saveConfig({ listId });
+  render(`<div class="status loading">Fetching tasks from list ${listId} via worker proxy...</div>`);
   try {
-    const tasksData = await fetchAllTasks(token, listId);
-    state.tasks = tasksData;
-    const fields = extractFields(tasksData);
+    const data = await proxyFetch(`/tasks?list_id=${listId}`);
+    state.tasks = data.tasks || [];
+    const fields = extractFields(state.tasks);
     state.fields = fields;
-    render(`<div class="status success">Loaded ${tasksData.length} tasks with ${fields.length} custom fields.</div>`);
+    render(`<div class="status success">Loaded ${state.tasks.length} tasks with ${fields.length} custom fields.</div>`);
     setTimeout(() => showFieldMapping(), 500);
   } catch (e) {
-    render(`<div class="status error">Error: ${e.message}</div><button class="btn" onclick="showSetup()">← Back to setup</button>`);
+    render(`<div class="status error">Error: ${e.message}</div><button class="btn" onclick="showSetup()">\u2190 Back to setup</button>`);
   }
-}
-
-async function fetchAllTasks(token, listId) {
-  let all = [], page = 0, more = true;
-  while (more) {
-    const data = await apiFetch(`/list/${listId}/task?page=${page}&include_closed=true&subtasks=true`, token);
-    all = all.concat(data.tasks || []);
-    more = (data.tasks || []).length >= 100;
-    page++;
-  }
-  return all;
 }
 
 function extractFields(tasks) {
@@ -295,7 +310,16 @@ function buildGrid() {
       <button class="btn btn-secondary" onclick="showFieldMapping()">⚙ Remap</button>
       <button class="btn btn-secondary" onclick="startFetch()">↻ Refresh</button>
       <button class="btn btn-secondary" onclick="showSetup()">🔑 Config</button>
-      <span style="font-size:.75rem;color:var(--muted)">  ${sortedRows.length} roles × ${sortedCols.length} productions · ${tasks.length} assignments</span>
+      <span style="font-size:.75rem;color:var(--muted)">  ${sortedRows.length} roles × ${sortedCols.length} productions · ${tasks.length} tasks</span>
+      <div class="auto-refresh">
+        <label>Auto-refresh: </label>
+        <select onchange="setAutoRefresh(this.value)">
+          <option value="0">Off</option>
+          <option value="30">30s</option>
+          <option value="60" selected>60s</option>
+          <option value="300">5min</option>
+        </select>
+      </div>
     </div>
     <div class="grid-container">
     <table class="matrix">
@@ -327,6 +351,14 @@ function buildGrid() {
 
   html += '</tbody></table></div>';
   render(html);
+  setAutoRefresh(60);
+}
+
+function setAutoRefresh(seconds) {
+  if (refreshInterval) clearInterval(refreshInterval);
+  if (seconds > 0) {
+    refreshInterval = setInterval(() => startFetch(), seconds * 1000);
+  }
 }
 
 function esc(s) {
@@ -335,18 +367,7 @@ function esc(s) {
 }
 
 // Boot
-if (state.config.token && state.config.listId) {
-  render(`
-    <div class="setup" style="max-width:500px">
-      <p style="font-size:.85rem">Config loaded from last session.</p>
-      <p style="font-size:.8rem;color:var(--muted)">List: <b>${DEFAULT_LISTS.find(l=>l.id===state.config.listId)?.name || state.config.listId}</b></p>
-      <button onclick="startFetch()">Load Data →</button>
-      <button class="btn btn-secondary" onclick="showSetup()" style="margin-left:.5rem">Change Config</button>
-    </div>
-  `);
-} else {
-  showSetup();
-}
+showSetup();
 </script>
 </body>
 </html>
