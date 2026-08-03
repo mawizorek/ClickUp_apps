@@ -2,7 +2,7 @@
 
 **Companion to [`VERSIONS.md`](../VERSIONS.md) at the repo root.** That file is the DATA: one row per app, current state. This file is the PROCEDURE: how the ledger is maintained, why its rules exist, and what has gone wrong.
 
-> **Split 2026-08-03 (Size Sally).** The seam is **read frequency**, not size. `VERSIONS.md` is read on the way IN to every app touch, and the rows are what that read needs. Everything here is read once, argued about occasionally, and never during the read that matters — while consuming roughly a third of a file whose entire job is to be scannable.
+> **Split 2026-08-03 (Size Sally).** The seam is **read frequency**, not size. `VERSIONS.md` is read on the way IN to every app touch, and the rows are what that read needs. Everything here is read once, argued about occasionally, and never during the read that matters — while consuming roughly a quarter of a file whose entire job is to be scannable.
 >
 > ⚠️ **The IMPERATIVE stayed behind.** Only the JUSTIFICATION moved. A procedure relocated to a second file is a procedure people stop running, so `VERSIONS.md` keeps the four numbered steps in full and this file holds the reasoning behind them.
 >
@@ -24,17 +24,27 @@
 
 ⭐ **The 08-03 instance explains the other six: a commit whose message claimed a structural trim shipped +87 B.** It cut ~1.8KB of changelog prose and added ~2KB of new row in the same pass. **The failure is not laziness about trimming — it is that the addition and the trim get judged SEPARATELY, so you feel virtuous about the deletion and never subtract.** Read the size back; the number is the only thing that cannot flatter you.
 
-### The growth curve (Size Sally, 2026-08-03)
+### The growth curve — MEASURED VALUES ONLY
 
-Measured, not estimated: **~20.0KB on 07-28 → 24,140 B on 08-02 → 26,843 B on 08-03 → 23,922 B after a hand trim → 24,637 B hours later.** Roughly **+1.5KB per active build day**, and the additions are **always rows, never prose**.
+| When | Size | Source |
+|---|---|---|
+| 08-02 | **24,140 B** | recorded in the file at the time |
+| 08-03 (after the git-grab row landed) | **26,843 B** | recorded in the commit that trimmed it |
+| 08-03 (after that trim) | **23,922 B** | write response |
+| 08-03 (immediately before the split) | **23,201 B** | root listing at `f1e75e6` |
+| 08-03 (after the split) | **17,509 B** | write response |
 
-**Forecast:** the prose extraction below buys roughly **four active build days** of headroom, not months. **The second seam is already needed and is named below.** A split that is not forecast past its own horizon is a delay, not a fix.
+🐞 **This table was wrong on first publication and the correction is the point.** It originally opened with *"~20.0KB on 07-28"* and included *"24,637 B hours later."* **Neither was measured.** There was no 07-28 reading at all, and the real pre-split size was 23,201 B. I wrote two invented byte counts into the section that exists to forbid exactly that, in the file whose subject is that rule — **the third instance in one session of the same reflex**, alongside a size claim that was false within a day and a "four versions stale" complaint made off a cached read. ⭐ **The generalizable part: a number that FEELS right gets typed with the same confidence as one that was measured, and nothing in the sentence marks the difference.** Only reading it back does.
+
+**Forecast:** one clean day-over-day delta exists — **+2,703 B across 08-02→08-03**, a single active build day. ⚠️ **Sample size one, and an unusually heavy day** (a whole new app row). Against **4,491 B of headroom** to the 22KB ceiling, that is **under two days of comparable building.**
+
+**So the extraction is real but small, and the second seam is already needed.** A split that is not forecast past its own horizon is a delay, not a fix.
 
 ### 🅿️ The second seam — PLANNED, not executed
 
-Two rows (`f1-racetracks`, `inciardi-collection`) are **~5.5KB together, roughly a quarter of the ledger.** Both hold per-app detail that the ledger's own rule assigns to the app README: module maps, route lists, defended-behaviour warnings, data-layer architecture.
+Two rows (`f1-racetracks`, `inciardi-collection`) are **~5.5KB together, roughly a third of the slimmed ledger.** Both hold per-app detail that the ledger's own rule assigns to the app README: module maps, route lists, defended-behaviour warnings, data-layer architecture.
 
-**The move is correct and it is not this session's to make.** Those rows carry load-bearing warnings, and relocating a warning without verifying it landed is how one gets lost — a failure this repo has already measured. When it happens: move the detail into each app's `README.md`, leave a one-line pointer plus the warnings that a *reader of the ledger* needs before touching the app, and **verify each landed before deleting the source.**
+**The move is correct and it is not this session's to make.** Those rows carry load-bearing warnings, and relocating a warning without verifying it landed is how one gets lost — a failure this repo has already measured. When it happens: move the detail into each app's `README.md`, leave a one-line pointer plus only the warnings a *reader of the ledger* needs before touching the app, and **verify each landed before deleting the source.**
 
 ---
 
@@ -67,7 +77,7 @@ Two rows (`f1-racetracks`, `inciardi-collection`) are **~5.5KB together, roughly
 - **Data-separated apps carry TWO version facts:** the *shell* build and the *data* date. A data refresh does NOT bump the shell.
 - **Version stamps** quote a version the app itself declares (`APP_VERSION`, or the `?v=` cache-bust) — **not a PR number, not the word "live."**
 - ⚠️ **When an app declares its version in more than one place, say WHICH ONE the row quotes** and name the others as disagreeing.
-- ⚠️ **Never write a version, or a byte count, you have not READ BACK at HEAD.**
+- ⚠️ **Never write a version, or a byte count, you have not READ BACK at HEAD.** *(See the growth-curve correction above for what ignoring this looks like from the inside.)*
 
 ### Coverage
 
@@ -81,7 +91,7 @@ Two rows (`f1-racetracks`, `inciardi-collection`) are **~5.5KB together, roughly
 
 **Findings live in the PR descriptions; this list cites and stops.**
 
-- **08-03 — the ledger split in two** (Size Sally). Standard extracted here; `VERSIONS.md` keeps the table and the imperative steps.
+- **08-03 — the ledger split in two** (Size Sally). Standard extracted here; `VERSIONS.md` keeps the table and the imperative steps. **23,201 B → 17,509 B.**
 - **08-03 — `git-grab` v0.1 → v1.2**, Waves 0-4 (PRs #713, #714, #718, #719, #720, #722). New app, functional, verified end-to-end by Michael.
 - **08-03 — `shared/themes`: `flush` + `database` spacing rows and the `database` join** (PRs #714, #717).
 - **08-02 — `cast-grid` v0.1-poc added.**
