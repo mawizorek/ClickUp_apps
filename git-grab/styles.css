@@ -8,11 +8,12 @@
    these inline from the composed theme after load. The 4-vector theme is the SOURCE OF TRUTH; treat
    this block as a mirror, never as the design.
 
-   NOTE — one deliberate deviation from the template, and the ONLY one: the template's comment on the
-   layout-ramp block below contains the literal characters `--gap-*/--pad-*`, which closes the CSS
-   comment early and leaks the rest of the sentence into the stylesheet as garbage. Reworded here so
-   the file parses. The same defect is still live in `template-app/styles.css` and is Michael's call
-   to fix at the source; it is NOT fixed locally in the other copies. */
+   NOTE — deviation 1 from the template: the template's comment on the layout-ramp block contains the
+   literal characters `--gap-*` followed by `/--pad-*`, which closes the CSS comment early and leaks
+   the rest of the sentence into the stylesheet as garbage. Reworded here so the file parses. Still
+   live in `template-app/styles.css`; Michael's call to fix at the source.
+
+   NOTE — deviation 2 (v0.2): THE LAYOUT RAMP IS FLOORED. See the block below. */
 :root {
   /* --- forms vector (fallback = forms:soft) --- */
   --radius: 8px; --radius-lg: 12px; --radius-pill: 8px; --border-w: 1px;
@@ -24,11 +25,22 @@
   /* --- spacing vector (fallback = spacing:standard) --- */
   --touch: 44px; --pad-cell: 10px; --pad-card: 20px;
   --gap-xs: 6px; --gap-md: 14px; --gap-lg: 28px;
-  /* app layout ramp DERIVED from the spacing vector, so tight/standard/loose flows.
-     resolve.js sets the gap and pad custom properties inline; these recompute off them at use time. */
-  --s1: var(--gap-xs); --s2: var(--pad-cell); --s3: var(--gap-md);
-  --s4: var(--pad-card); --s5: var(--gap-lg);
-  --s6: calc(var(--gap-lg) + var(--gap-xs)); --s8: calc(var(--gap-lg) * 1.7);
+
+  /* APP LAYOUT RAMP — derived from the spacing vector so tight/standard/loose/flush all flow.
+     🔴 EVERY STEP CARRIES A FALLBACK, ON PURPOSE (v0.2). A var() chain is only as strong as its
+     weakest link: if any referenced property is unresolved, the ENTIRE declaration using it becomes
+     invalid at computed-value time and falls back to the CSS initial value — for padding, that is 0.
+     It does not degrade gracefully, it vanishes. v0.1 shipped this ramp bare and rendered with no
+     page gutter at all while .card/.callout/.kv (which spell their own fallbacks inline) looked
+     fine. That asymmetry IS the bug signature. Never write a bare var() into this block. */
+  --s1: var(--gap-xs, 6px);   --s2: var(--pad-cell, 10px); --s3: var(--gap-md, 14px);
+  --s4: var(--pad-card, 20px); --s5: var(--gap-lg, 28px);
+  --s6: calc(var(--gap-lg, 28px) + var(--gap-xs, 6px));
+  --s8: calc(var(--gap-lg, 28px) * 1.7);
+
+  /* Hard gutter floor. A spacing vector may go as dense as it likes (see the `flush` row) but text
+     must never touch the viewport edge. max() keeps the theme in charge above the floor. */
+  --gutter: max(var(--s4), 16px);
   --maxw: 860px;
 }
 * { box-sizing: border-box; }
@@ -53,7 +65,7 @@ code { font-family: var(--font-mono); background: var(--surface-2); padding: 1px
 
 /* ---------- HEADER ---------- */
 .app-header { position: sticky; top: 0; z-index: 50; background: var(--surface-1); border-bottom: var(--border-w) solid var(--border); }
-.hd-in { max-width: var(--maxw); margin: 0 auto; display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); }
+.hd-in { max-width: var(--maxw); margin: 0 auto; display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--gutter); }
 .hd-brand { display: flex; align-items: center; gap: var(--s2); text-decoration: none; color: var(--text); font-weight: 800; letter-spacing: -0.02em; }
 .hd-logo { display: inline-grid; place-items: center; width: 30px; height: 30px; background: var(--accent); color: var(--on-accent); border-radius: var(--radius); font-size: 1rem; }
 .hd-name { font-family: var(--font-display); font-size: 1.05rem; }
@@ -67,7 +79,7 @@ code { font-family: var(--font-mono); background: var(--surface-2); padding: 1px
 
 /* ---------- MAIN / PAGES ---------- */
 #view { flex: 1 0 auto; outline: none; }
-.page { max-width: var(--maxw); margin: 0 auto; padding: var(--s6) var(--s4) var(--s8); }
+.page { max-width: var(--maxw); margin: 0 auto; padding: var(--s6) var(--gutter) var(--s8); }
 .page h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 900; letter-spacing: -0.03em; margin: 0 0 var(--s3); }
 .page h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-soft); margin: var(--s6) 0 var(--s3); text-transform: uppercase; letter-spacing: 0.05em; }
 .page p { line-height: 1.6; margin: 0 0 var(--s3); max-width: 68ch; }
@@ -82,10 +94,16 @@ code { font-family: var(--font-mono); background: var(--surface-2); padding: 1px
 .btn-row { display: flex; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s4); }
 
 .field { display: block; margin-bottom: var(--s4); }
-.field label { display: block; font-size: 0.8rem; color: var(--text-soft); margin-bottom: 6px; font-weight: 600; }
+.field label, .field > span { display: block; font-size: 0.8rem; color: var(--text-soft); margin-bottom: 6px; font-weight: 600; }
 .field input { width: 100%; font: inherit; background: var(--field); color: var(--text); border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
 .field input::placeholder { color: var(--text-faint); }
 .field input.mono { font-family: var(--font-mono); font-size: 0.85rem; }
+
+/* ---------- SELECT (fd_dropdown_standard — canonical object #18) ---------- */
+.select { width: 100%; font: inherit; font-family: var(--font-mono); font-size: 0.85rem; background: var(--field); color: var(--text); border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 10px 12px; min-height: var(--touch, 44px); cursor: pointer; appearance: none; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: right 16px center, right 11px center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
+.select:hover { border-color: var(--accent); }
+.select option { background: var(--surface-2); color: var(--text); font-family: var(--font-mono); }
+.select optgroup { background: var(--surface-1); color: var(--text-faint); font-family: var(--font-body); font-style: normal; font-weight: 700; }
 
 .card { background: var(--surface-2); border: var(--border-w) solid var(--border); border-radius: var(--radius-lg); padding: var(--pad-card, 20px); margin-bottom: var(--s4); }
 .card h3 { margin: 0 0 var(--s2); font-size: 1rem; }
@@ -155,7 +173,7 @@ code { font-family: var(--font-mono); background: var(--surface-2); padding: 1px
 
 /* ---------- FOOTER ---------- */
 .app-footer { flex-shrink: 0; margin-top: var(--s8); border-top: var(--border-w) solid var(--border); background: var(--surface-1); }
-.foot-in { max-width: var(--maxw); margin: 0 auto; padding: var(--s4); display: flex; justify-content: space-between; align-items: center; gap: var(--s3); flex-wrap: wrap; font-size: 0.74rem; color: var(--text-faint); }
+.foot-in { max-width: var(--maxw); margin: 0 auto; padding: var(--s4) var(--gutter); display: flex; justify-content: space-between; align-items: center; gap: var(--s3); flex-wrap: wrap; font-size: 0.74rem; color: var(--text-faint); }
 .foot-sources { display: flex; gap: var(--s4); flex-wrap: wrap; }
 .foot-sources a { color: var(--text-soft); text-decoration: none; }
 .foot-sources a:hover { color: var(--accent); }
