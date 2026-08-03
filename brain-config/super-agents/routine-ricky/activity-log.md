@@ -13,6 +13,20 @@
 
 ---
 
+## 2026-08-03 (continued) — Job Market full pass
+
+Session context: [RECURRING] Agent Pushes task comment thread · invoked by Michael (second call)
+
+- 3:56 PM · INVOKED. Michael: "pick it up exactly where you left off."
+- 4:00 PM · Job Market full 8-lane sweep started. First pass on 4 new lanes (OPS, AUD, DFT, ADM).
+- 4:20 PM · Pass complete. 69 live, +7 new, 0 gone. Density floor passed (69 > 40).
+- 4:20 PM · TSV committed (SHA 84c8ec8). Friction column added to schema.
+- 4:20 PM · Stamped: `2026-08-03 16:20 ET`.
+- 4:20 PM · Roll-up posted to Run Reports thread.
+- Source notes: Skene Callboard appears retired (editorial-only). Scenic Guild (jobs.scenicguild.org) needs board code for DFT lane. New lanes (OPS, ADM) thin on standard boards, need Indeed/LinkedIn targeted sweeps.
+
+---
+
 ## 2026-08-03 — Invoked, corrected, running due routines
 
 Session context: [RECURRING] Agent Pushes task comment thread · invoked by Michael
