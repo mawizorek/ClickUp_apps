@@ -58,7 +58,7 @@ Header post body:
 Spine lines thread under this post, one per reply, written ahead of the reply.
 ```
 
-🚨 **A PICKUP IS AN OPEN. ARM IT ANYWAY (HARD — LOCKED 2026-07-28, Michael).** Opening on a task that already exists — a parked `↪️ HANDOFF ·`, a `🧭 STANDING ·` thread, a reopened session — is a session OPEN and needs its own header for THIS session. **A task carrying twenty prior comments looks exactly like an armed record and is not one.** The standing thread is the worst case: it is deliberately never closed, so it is always open and always full of history.
+🚨 **A PICKUP IS AN OPEN. ARM IT ANYWAY (HARD — LOCKED 2026-07-28, Michael).** Opening on a task that already exists — a parked `↪️ HANDOFF ·`, a `🧧 STANDING ·` thread, a reopened session — is a session OPEN and needs its own header for THIS session. **A task carrying twenty prior comments looks exactly like an armed record and is not one.** The standing thread is the worst case: it is deliberately never closed, so it is always open and always full of history.
 
 **Why this is a hard rule and not a nicety:** four consecutive sessions (Jul 25, 26, 27, 27) posted **zero spine lines**, and every one opened by picking up an existing task. Scored B19 twice. The mechanism is a plausible feeling, not laziness — which is why the durable fix was putting the step in the executable list (`session-open.md` C4) and why this clause exists next to the format.
 
@@ -96,9 +96,14 @@ MM-DD HH:MM · <session task URL> · <one clause: what happened> · tools: a, b,
 
 ### Completeness (HARD)
 
-Every substantive reply gets a line, **including corrections, wrong turns, and walked-back claims.** Those are precisely the turns that cause an agent to walk on top of itself, so a spine that only logs wins is worthless.
+Every reply gets a line, **including corrections, wrong turns, and walked-back claims.** Those are precisely the turns that cause an agent to walk on top of itself, so a spine that only logs wins is worthless.
 
-**"Substantive" is defined, not judged:** a reply is substantive unless it is a bare acknowledgement ("np", "yep"), a pure lookup with no decision, or a clarifying question that changed nothing. **When in doubt, log it** — the bias is identical to the open-then-discard bias, and for the same asymmetric-cost reason.
+**Skip conditions (exhaustive list):** a reply is logged UNLESS it is:
+1. A bare one-word acknowledgement ('np', 'yep', 'got it', 'thanks') with no additional content.
+2. A pure data lookup that returns results without any decision, recommendation, or action.
+3. A clarifying question that changed nothing and took no action.
+
+**When in doubt, log it** — the bias is identical to the open-then-discard bias, and for the same asymmetric-cost reason. A line you didn't need costs nothing; a missing line costs the next session's context.
 
 ### Never-block (HARD)
 
@@ -147,7 +152,7 @@ The spine channel is the board's list channel, so humans may post there too. Mac
 
 - **Provisional open:** first turn that isn't a clear lookup, open silently, no announcement yet.
 - **Discard:** if the session stayed trivial, delete the stub at close.
-- **Exception:** if any agent posted deliberation, the session is substantive and non-discardable.
+- **Exception:** if any agent posted deliberation, the session is non-discardable by definition and the record survives.
 - **Promote:** on any trigger hit, promote the stub and fire the one announcement.
 
 ---
@@ -186,7 +191,7 @@ Header = emoji badge + bold name. Body = full markdown, not blockquoted, not cod
 | Polish Polly | ✨ | Feasible Finn | 🔧 |
 | Scope Skye | 📐 | Eco Enzo | 🌐 |
 | Scribe Sana | ✍️ | Fold-in Frank | 🧩 |
-| Mimic Mika | 🎭 | Cautious Cass | 🧊 |
+| Mimic Mika | 🎭 | Cautious Cass | 🧶 |
 | Literal Lena | 📏 | Counter Cole | ↩️ |
 | Pivot Piper | 🔀 | Style Stu | 😎 |
 | Novice Nia | 🐣 | Domain Dara | 🎓 |
@@ -267,7 +272,7 @@ Governs Michael-to-Brain capture fidelity only. Agent deliberation format and th
 
 1. **Close-time watchdog.** At close, if the task or spine holds no coherent record, reconstruct the best faithful version and post it **flagged as reconstructed**.
 2. **Mid-session catch-up.** See above.
-3. **Reply/line reconciliation.** At close, compare substantive reply count to spine line count and report the delta honestly (`14 replies, 14 lines` or `14 replies, 9 lines — 5 missed`). A scoreboard, not a gate.
+3. **Reply/line reconciliation.** At close, compare total reply count (excluding bare acks) to spine line count and report the delta honestly (`14 replies, 14 lines` or `14 replies, 9 lines — 5 missed`). A scoreboard, not a gate.
 4. **Orphan sweep.** At close, check the channel for spine lines sitting at ROOT level that should have threaded under this session's header (the compaction symptom). Found → note them in the close pointer. They cannot be re-parented after the fact, so the record says so rather than pretending the thread is whole.
 
 Live capture is the standard. The fallback makes a lapse recoverable, not acceptable.
