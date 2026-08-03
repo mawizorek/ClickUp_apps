@@ -4,6 +4,25 @@
 
 ---
 
+## D4 — "Schedule Pointer" pattern for irregular recurring events (2026-08-03)
+**Decision:** Endorse the schedule pointer pattern: a single persistent task whose start/due dates
+always reflect the NEXT upcoming occurrence, with a LONG TEXT custom field holding the canonical
+date index (parseable format: `YYYY-MM-DD HH:MM | Location | Status`). An AI automation trigger
+on "when due date passes" parses the index and advances start/due to the next occurrence.
+**Why:** ClickUp's native recurrence is interval-based and can't handle a pre-defined list of
+irregular dates (e.g. no January meeting, September in a different room). The alternatives were:
+(a) 8 subtasks cluttering calendar views, or (b) native recurrence with manual exceptions. Both
+violate singularity and create noise. The pointer pattern keeps one entity per concept, shows
+correctly on calendars/My Work, and the index field gives a machine-parseable SOT for automation.
+**Applied to:** Faculty Council Meeting (URITP-8973, merged from URITP-12712). 8 meetings across
+2026-2027 academic year (Sep–May, no January, two All Faculty + six Council-only).
+**Schema:** Task description = human-readable (location, zoom, contacts, standing agenda).
+Custom field = date index (automation reads this). Start/due = next meeting only.
+**Consequence noted:** Pattern generalizes to any irregular recurring obligation. If this works well,
+apply to other academic calendar events (commencement, convocations, etc.).
+
+---
+
 ## D1 — Corey goes git-only; native CU agent retired (2026-07-19)
 **Decision:** Retire the native ClickUp Super Agent (-39958913) and run Corey purely as a
 git-teammate invoked via `/session.agent=Corey`.
