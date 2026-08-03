@@ -1,7 +1,7 @@
 # Clio — Activity Log
 
 > **LIVE per-reply session record.** Start the entry at session Commit, append one line per
-> substantive reply as you go. At close it is already done — no batch reconstruction.
+> qualifying reply (delivers content, answers a question, takes action, makes a decision, or issues a correction) as you go. At close it is already done — no batch reconstruction.
 > Newest session on top, append-only. Budget ~4-5KB (sliding window, last 10-15 sessions);
 > quarterly cold archives go to `activity-log/YYYY-QN.md` per `hooks/memory-rotation.md`.
 >
