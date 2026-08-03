@@ -9,7 +9,7 @@
   /* ---------------- swatch bands ----------------
      One row per band, tinted to its own bg, every hex cell a live picker.
      This is the view that makes a palette file readable as colour rather than
-     as 550 strings. */
+     as several hundred strings. */
   TBUI.bands = function () {
     var T = TB.T;
     var hexCols = T.cols.filter(function (col) {
@@ -122,7 +122,8 @@
       '<label class="toggle"><input type="checkbox" id="expSorted"' + (T.expSorted ? " checked" : "") +
       '><span>Export sorted order</span></label>' +
       '<select class="mini-sel" id="expFmt" aria-label="Export format">' +
-      '<option value="tsv">TSV</option><option value="csv">CSV</option><option value="json">JSON</option></select>' +
+      '<option value="tsv">TSV</option><option value="csv">CSV</option>' +
+      '<option value="json">JSON</option><option value="xls">Excel</option></select>' +
       '<button type="button" class="btn primary" id="expBtn">Export</button>';
 
     $("#expFmt").value = T.fmt === "json" ? "json" : (T.delim === "," ? "csv" : "tsv");
@@ -170,8 +171,9 @@
       var base = (S.fname.replace(/\.[^.]+$/, "") || "data");
       if (f === "json") download(base + ".json", TB.toJSON(), "application/json");
       else if (f === "csv") download(base + ".csv", TB.toDelim(","), "text/csv");
+      else if (f === "xls") download(base + ".xls", TB.toXLS(), "application/vnd.ms-excel");
       else download(base + ".tsv", TB.toDelim("\t"), "text/tab-separated-values");
-      toast(f.toUpperCase() + " exported");
+      toast((f === "xls" ? "Excel" : f.toUpperCase()) + " exported");
     };
   };
 })();
