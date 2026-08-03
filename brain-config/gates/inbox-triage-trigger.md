@@ -6,7 +6,7 @@ kind: routing
 trigger: ANY of — (a) an agent is assigned to a task in URITP ▸ INBOX ▸ Default (list id 901327608568); (b) an agent is @-mentioned or commented on such a task asking to triage/handle/execute; (c) any request naming this list asks to triage/process it; (d) any greenlight/execute signal on a task that already has a Plan Comment. Assignment is NOT required.
 nicknames: [Inbox Trigger, Triage Trigger]
 procedure_source: ClickUp — "INBOX Email Intake Triage — Agent Reference" (Brain Reference Library ▸ URITP). Canonical + only home of the steps.
-version: 6
+version: 7
 added: 2026-07-15
 ---
 
@@ -75,14 +75,14 @@ A **two-beat, human-in-the-loop workflow**, not a one-shot command. Map whatever
 ## Beat 2 detail (the write moment)
 On ANY greenlight/execute signal, run the GREENLIGHT OPENING SEQUENCE (hunt intake → read full follow-up thread → reload doc THIS TURN), then:
 **Execute the named routine verbatim** per the doc's Universal Standard:
-   - **COMBINE** → dedup check (copy only net-new messages; if the thread is already on the destination, fall through to DUPE HANDLING, do NOT re-paste) → full-verbatim-email-first-comment / notes-second / backtrack / linked-tasks relationship / name exact destination by full title + link / close intake to CLOSED-type.
-   - **MOVE** → existence check (if a task already exists in the target list, COMBINE onto it instead) → Task Move Impact Gate BEFORE moving (diff statuses + custom fields, warn on drops) → confirm mirror + Description travel → set fields on arrival → provenance note → do NOT close.
+   - **COMBINE** → `merge_tasks` is now the PRIMARY atomic tool. Identify the source (inbox/intake task) and destination (canonical task). Call `merge_tasks` to atomically transfer content, comments, and attachments from source to destination. The source task is deleted. Post-merge: review the merged content for redundancy and cull if needed. If `merge_tasks` is unavailable or inappropriate (e.g., partial content merge needed), fall back to the legacy manual standard: verbatim-email-first-comment / notes-second / backtrack / linked-tasks relationship / close intake to CLOSED-type.
+   - **MOVE** → existence check (if a task already exists in the target list, COMBINE onto it via `merge_tasks` instead) → Task Move Impact Gate BEFORE moving (diff statuses + custom fields, warn on drops) → confirm mirror + Description travel → set fields on arrival → provenance note → do NOT close.
 Layer addendums on top. Report naming what you appended vs. what was already present.
 
 > Why: without rebuilding context (intake + full thread) and a same-turn doc re-read, agents improvise a thin routine on execution because the procedure and the decision history have fallen out of context. The greenlight is where the destructive writes land, so it needs full-context discipline.
 
 ## Minimize slop (standing intent)
-Capture everything once, cleanly, with zero repetition. Never re-post content already on the destination. COMBINE copies only net-new messages; MOVE avoids creating a duplicate task. When in doubt whether something is already captured, surface it rather than double-posting.
+Capture everything once, cleanly, with zero repetition. Never re-post content already on the destination. `merge_tasks` handles dedup atomically (all content transfers, nothing is duplicated). For manual fallback: COMBINE copies only net-new messages; MOVE avoids creating a duplicate task. When in doubt whether something is already captured, surface it rather than double-posting.
 
 ## Source-of-truth split (LOCKED)
 **The procedure lives ONLY in the ClickUp doc. This file holds ONLY trigger detection + routing + intent mapping + the guards that enforce loading the doc — never the steps themselves.** git and ClickUp never both carry the same instruction. The step summaries above are pointers/reminders of what to reload, NOT the authoritative how-to; if they ever conflict with the doc, the doc wins. If you find full triage STEPS duplicated into this file, delete them and point back to the doc.
@@ -94,6 +94,7 @@ Written to be agent-portable from the start ("any agent assigned to a task in th
 When ANY trigger-detection condition matches, load the ClickUp procedure doc and act on it. On a greenlight you must run the GREENLIGHT OPENING SEQUENCE (hunt intake → read full thread → reload doc) and may not MOVE/COMBINE/close unless you loaded that doc THIS TURN. Never run from memory of what it "probably says" — other agents edit the doc without notice, so the live same-turn read IS the gate.
 
 ## Changelog
+- 2026-08-03 (v7) — **COMBINE is now atomic via `merge_tasks`.** Updated Beat 2 detail: COMBINE's primary path is a single `merge_tasks` call (source=inbox task, destination=canonical). Legacy multi-step copy-and-close retained as fallback for partial-content scenarios. MOVE's existence-check also routes through merge when a target already exists.
 - 2026-07-15 (v6) — added the **GREENLIGHT OPENING SEQUENCE**: on greenlight, before any write, the executing agent must (1) hunt down + read the original intake entirely, (2) read the full follow-up Q&A thread after it, (3) reload the procedure doc for what the named action means, THEN execute. Directly targets the confirmed pattern where Beat 1 plans well but a cold-context Beat 2 agent improvises the execution.
 - 2026-07-15 (v5) — BLANK-CONTEXT GUARD (no triage write unless the doc was loaded THIS TURN) + plan-comment ⚙️ execution footer as greenlight self-anchor + named the three always-surfaced routing points.
 - 2026-07-15 (v4) — broadened trigger detection (assignment no longer a precondition) + defined "the greenlight gate" (policy + re-read).
