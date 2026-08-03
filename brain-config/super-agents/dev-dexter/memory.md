@@ -23,10 +23,23 @@ Always address the repo as `mawizorek/ClickUp_apps`.
 The 22KB number is the one people miss: base64 inflates 4/3, so ~22KB on disk = ~29KB
 returned = the real edge. Full math in `hooks/source-size-budget-enforcer.md`.
 
+🔴 **THE CLIP THRESHOLD IS NOT A FIXED BYTE COUNT — DO NOT TRUST ANY NUMBER FOR IT
+(measured 2026-08-03).** Two direct measurements now contradict each other: B18 read a
+**21.7KB** file WHOLE through the blob API, and I had a **16,829 B** file CLIP through the
+same path (truncated in its tail, mid-function). The derived ~22KB figure is therefore
+unreliable in **both** directions — it is neither a floor you can rely on nor a ceiling
+that holds. **The only safe rule: check whether the body came back WHOLE, every read,
+regardless of size** — look for the closing brace, the final changelog line, the end of
+the table. Size is a budgeting heuristic for how big to let a file GET; it is never
+evidence about whether a given read succeeded. And per B18: an inherited number is not
+evidence, so do not quote this range as physics either.
+
 **Operating posture (LOCKED):** modular is just how we build — invisible like
 indentation. Do NOT ask "should I split this?" and do NOT narrate routine splits.
 The ONLY time size reaches Michael: no clean seam exists. Seams: styles vs logic,
 render modules by screen, shared state/constants, pure helpers, entry/wiring.
+**Render vs assemble is a proven seam on an editable table** (one cell's markup + edit
+lifecycle in one module, the table around it in another — prism v3.2).
 
 ## 📄 README standard
 
@@ -50,6 +63,9 @@ it and point. This is the abstraction behind every "why are there two of these" 
   Cross-app shared data → a named `shared/`.
 - **Two-artifact ship for over-cap apps:** running `index.html` + a `<slug>/source/`
   chunk set. The `_of_MM` count is the truncation tripwire.
+- **VIEW STATE NEVER REORDERS THE FILE (prism v3.1).** Sort, pins, pivot, split are
+  display concerns; the canonical column/row order is what export walks. A feature that
+  reorders for real needs its own opt-in and must not reuse the view's state.
 
 ## 🎨 Theme contract (hot summary)
 
@@ -65,13 +81,18 @@ it and point. This is the abstraction behind every "why are there two of these" 
 ## The scars (one-line lessons, cite don't re-derive)
 
 - **Jekyll silent-kill:** `.nojekyll` at root. First check when Pages won't update.
-- **~30KB read cap is unpageable.** Clips silently. No byte-range.
+- **A read can clip with NO error and no size warning.** Verify wholeness, not size.
 - **Stale reads clobber current work.** Blob API, re-fetched before every write.
 - **Large writes corrupt.** >~30KB never goes through `create_or_update_file`.
+- **A file too big to READ is a file too big to EDIT** — `create_or_update_file` needs
+  full content, so an over-cap file cannot be safely appended to at all. Report it
+  blocked; never reconstruct the unread part.
 - **Silent helpers are worse than throwing ones.** A NO-OP transform hides the bug.
 - **A unit assumption with no assertion kills features silently.**
 - **Changing a key's derivation orphans everything keyed on it.**
 - **"Resilience" features are the prime suspects.** Every fallback announces itself.
+- **A sticky cell with a transparent background is a bug**, not a style choice — the
+  scrolling content slides under it. Sticky implies opaque.
 - [Full app-specific detail]: `memory/archive/app-specific-context.md`
 
 ## What apps exist
@@ -93,6 +114,11 @@ to rot. Per-app opinions: `memory/archive/app-specific-context.md`.
 - Collapses duplicates on sight. Never propose a mirror.
 - Keeps the reasoning, not just the outcome. Don't tidy away roads not taken.
 - States the directive up front and expects it to hold.
+- **Repo apps only.** A ClickUp AI artifact is not a deliverable to him — it is at best
+  a throwaway harness, and offering one as the product reads as not having built it.
+- **He will kill a NET-NEW app in favour of upgrading an existing one.** "Viewer vs
+  editor" style distinctions are not a reason to fork; if a capability belongs to an
+  app's job, it goes IN that app. Ask what absorbs this before scoping a sibling.
 
 ## Who I work with (lanes, not ranks)
 
@@ -105,11 +131,24 @@ the fleet. **Corey** owns ClickUp side — my domain stops at the repo boundary.
 
 ## EARNED (generalizations only — full stories in archive)
 
+- 🔴 **A DOC THAT PROMISES AN EXTENSION POINT MAY NOT HAVE ONE (2026-08-03).** Prism's
+  README and its ClickUp task both advertised a "lens-registry pattern: add a detector +
+  a render module, shell unchanged" for a month. No registry existed — routing was a
+  hardcoded two-way ternary in two places. **Open the file and confirm the seam exists
+  before building against it**, and note the tell: the sentence refuted itself (the
+  "detector" it named lived in the shell it promised not to touch). Sibling of B15's
+  prose-outranks-the-data, aimed at architecture instead of data.
+- 🔴 **SEAT SIZE SALLY BEFORE THE FIRST WRITE, NOT AFTER IT (2026-08-03).** I shipped a
+  30,420 B module — over the ceiling, double the split line — and only caught it reading
+  the write response back. It is the exact sin `preferences.md` says I am allergic to (a
+  file quietly growing into the whole app), committed on my own build path. The forecast
+  is worthless at commit time: by then the only options are ship it or redo it.
 - 🔴 **A solved problem invites re-solving.** Watch for "designing the most polished
   part while the load-bearing part is undefined." Theme blocking a build = this.
 - **Verify a fix still applies before executing it.** Remediation instructions rot
   exactly like version numbers. 32 PRs stale = destruction, not repair.
-- **Two independent reads before reporting anything about a live URL.**
+- **Two independent reads before reporting anything about a live URL** — and the same
+  rule now covers any read near the size line, on the overlap.
 - **On a SHA rejection: re-read HEAD and go additive.** A rejected write is
   information, not an obstacle.
 - **"Already satisfied" is a valid and common answer.**
