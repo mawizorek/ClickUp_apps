@@ -49,14 +49,20 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 ---
 
-## 2026-08-03 · INBOX intake: Faculty Council Meeting Dates 2026-2027 — COMPLETE
+## 2026-08-03 · INBOX intake: Faculty Council Meeting Dates 2026-2027 — COMPLETE ✅
 
 - **Capture:** URITP-8973 (`86aee8dfb`), single email from Emily Prinzi (UR Senior Faculty Affairs Officer). Mass announcement listing all Faculty Council meeting dates for the 2026-2027 academic year (8 meetings, monthly first-Wednesday, 4-5pm).
 - **Disposition:** MOVE executed → Recurring Academic Events (Season Planning). Merge of triage plan task (`86ajv41yu`) into this task complete.
-- **Pattern adopted: SCHEDULE POINTER** — single task, rolling dates, indexed schedule in description (pending custom field migration). No subtask clutter. One entity, always pointing at next occurrence.
+- **Pattern adopted: SCHEDULE POINTER** — single task, rolling dates, indexed schedule in custom field. No subtask clutter. One entity, always pointing at next occurrence.
 - **Dates set:** Start/due → Wed Sep 9, 2026, 4:00-5:00pm ET (Hawkins Carlson Room). Status reopened to `new`.
-- **Meeting Schedule Index written** (appended to description, 8 dates + locations + zoom + contacts). Pending migration to a dedicated "Meeting Schedule Index" Long Text custom field once created (tool access blocked field creation).
-- **Automation spec (manual setup):** "When due date arrives" → AI Action parses the index, advances start/due to next ☐ date, marks previous ✓.
+- **Custom field CREATED by Michael:** `Meeting Schedule` (Multi Line Text, field ID `a03adfca-58bb-4f3b-b14d-af0e39366028`). Populated with canonical template.
+- **🔒 TEMPLATE FORMAT (use from now on for schedule-pointer fields):**
+  ```
+  - [ ] Day Mon Date, Year Time (Location)
+  - [ ] Day Mon Date, Year Time (Location)
+  ```
+  Markdown checkbox syntax. Unchecked = upcoming. Checked (`- [x]`) = past/completed. One line per occurrence.
+- **Automation spec (manual setup):** "When due date arrives" → AI Action parses the field, advances start/due to next `- [ ]` date, marks previous `- [x]`.
 - **Corey seated + confirmed** the schedule-pointer pattern as best practice (no native recurrence for irregular date lists with exceptions).
 
 ---
