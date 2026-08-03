@@ -49,6 +49,16 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 ---
 
+## 2026-08-03 · INBOX intake: Faculty Council Meeting Dates 2026-2027
+
+- **Capture:** URITP-12712, single email from Emily Prinzi (UR Senior Faculty Affairs Officer). Mass announcement listing all Faculty Council meeting dates for the 2026-2027 academic year (8 meetings, monthly first-Wednesday, 4-5pm).
+- **Step 0:** rename clean (automation handled it), mirror done by Scribe Sara.
+- **Disposition:** MOVE proposed → Recurring Academic Events (Season Planning). Lean: external university governance meetings that constrain production scheduling.
+- **Follow-up proposed:** 8 calendar-ready tasks (one per meeting, Sep 2026 – May 2027) for Michael's ClickUp calendar.
+- **Status:** `researching`, plan posted, awaiting greenlight.
+
+---
+
 ## 2026-07-30 · PICKUP, and my memory got re-shaped
 
 - Seated via `/council=uritp-audit` on the 6+7 pickup. Standing thread reopened, not recreated.
