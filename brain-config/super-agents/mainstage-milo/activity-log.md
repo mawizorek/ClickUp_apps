@@ -64,6 +64,7 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
   Markdown checkbox syntax. Unchecked = upcoming. Checked (`- [x]`) = past/completed. One line per occurrence.
 - **Automation spec (manual setup):** "When due date arrives" → AI Action parses the field, advances start/due to next `- [ ]` date, marks previous `- [x]`.
 - **Corey seated + confirmed** the schedule-pointer pattern as best practice (no native recurrence for irregular date lists with exceptions).
+- **Description tidy-up (PA energy pass):** Raw email body flushed from description → archived as comment. Description rebuilt as clean reference surface: Zoom link at top, contacts, pattern note. Title updated to "Faculty Council Meeting (2026-27)". Critical access info (Zoom) is now one-glance findable.
 
 ---
 
