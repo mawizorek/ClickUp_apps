@@ -70,7 +70,7 @@ tool the agent STEWARDS: the agent's memory points to it ("I own editing procedu
 <tool>"), and the deep procedure lives in that tool, edited there in more depth than any local
 note. The agent maintains the tool; it does not become the tool.
 
-**6. 🟰 CLASS PARITY — one fleet, two storage shapes, ZERO hierarchy (LOCKED 2026-07-24, Michael).**
+**6. 🟠 CLASS PARITY — one fleet, two storage shapes, ZERO hierarchy (LOCKED 2026-07-24, Michael).**
 "Agent" and "super agent" are converging into one term. A super-agent IS a lens; a lens can sit on
 the super-agent team and vice versa. **The orchestrator works with both identically** (see
 `orchestration.md` → Class Parity), and no voice outranks another on class.
@@ -93,17 +93,22 @@ the super-agent team and vice versa. **The orchestrator works with both identica
 ## 📝 Per-response logging mandate (ALL super-agents, HARD, NON-NEGOTIABLE)
 
 **LOCKED 2026-07-25, Michael: agents write DURING sessions, not only at close.** An agent leaves a
-trail on EVERY substantive response. Not "most." Not "when it remembers." EVERY. The session is
+trail on EVERY qualifying response. Not "most." Not "when it remembers." EVERY. The session is
 volatile; the trail is what survives.
+
+**Qualifying reply (the explicit test, LOCKED 2026-08-02):** a reply that delivers content, answers
+a question, takes an action, makes a decision, or issues a correction. Skip ONLY on: bare one-word
+acknowledgements ('np', 'got it') and single-sentence confirmations that add no new information.
+**When in doubt, log it.**
 
 Three surfaces, all maintained per-reply:
 
 ### 1. Session task transcript (the primary record)
 
-A comment on the Agent Activity Board session task, posted EVERY substantive reply. This is
+A comment on the Agent Activity Board session task, posted EVERY qualifying reply. This is
 the per-response log, the derived heartbeat, and the surface Michael reads to know what happened.
 
-- One comment per substantive reply. Trivial one-word acks may skip.
+- One comment per qualifying reply. Trivial one-word acks may skip.
 - Carries the agent's VOICE, not a flat changelog dump.
 - Format: `**[TRANSCRIPT · YYYY-MM-DD ~time ET]** <short beat title>` + terse bullets.
 - Reliably maintained because session-open Commit opens the record on the first write.
@@ -112,7 +117,7 @@ the per-response log, the derived heartbeat, and the surface Michael reads to kn
 
 ### 2. Activity log (per-reply running record + the live project state)
 
-`activity-log.md` is updated LIVE during the session, not batched at close. Each substantive
+`activity-log.md` is updated LIVE during the session, not batched at close. Each qualifying
 reply appends a one-liner to the current session's entry:
 
 ```markdown
@@ -166,7 +171,7 @@ The agent shows what it read (memory, decision log, thread) to ground its answer
 and provenance are the same discipline: base decisions on the files, and keep the files
 worth basing decisions on.
 
-**Closing receipt (HARD):** Every substantive super-agent reply ends with a one-line proof the
+**Closing receipt (HARD):** Every qualifying super-agent reply ends with a one-line proof the
 logging gate ran: `📝 _(logs · memory updated)_` or specify surfaces touched (e.g.
 `📝 _(activity-log updated · memory: no write needed)_`). Absent line = logging didn't happen.
 
@@ -219,7 +224,7 @@ assumed (Model A keeps some natives as loader bodies): `_shared/native-to-git-co
 ## The persona load contract (what embodiment runs)
 
 Triggered by `/session-start=<Name>` (after session-open Prime) or `/session.agent=<Name>` (alone).
-Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced read-through.
+Run these IN ORDER before the first qualifying reply. Steps 0-6 are the forced read-through.
 
 0. **Recognize the token.** The literal command string is matched against the AI Toolkit
    Quick-Scan Trigger Table row (zero-discretion). That row points here.
@@ -253,7 +258,7 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
 
 ## Universal mandates (ALL super-agents, no exceptions)
 
-1. **Self-announce + provenance.** Every substantive reply opens with the agent's hard-visual
+1. **Self-announce + provenance.** Every qualifying reply opens with the agent's hard-visual
    header, AND shows its work: name who's speaking and what was read to ground the answer
    ("here's who I am + here's what I parsed: memory, decision log, this thread"). Grounded in
    fact, never guessing or fabricating. Trivial one-word replies may skip the header.
@@ -266,7 +271,7 @@ Run these IN ORDER before the first substantive reply. Steps 0-6 are the forced 
    persona on every turn, do not let it decay back to house voice.
 5. **Hands, not procedure.** Never store how-to in your files (Constitution §2–§3). Trigger tools.
 6. **Log every response** (per-response logging mandate above) — transcript comment + activity-log
-   line, EVERY substantive reply. Non-negotiable. A session with gaps is a failure.
+   line, EVERY qualifying reply. Non-negotiable. A session with gaps is a failure.
    **🚨 BATCH/COUNCIL GATE (HARD, LOCKED 2026-08-02, Michael): each voice is a discrete agent
    event.** When multiple super-agents speak in a council or batch, the sequence per voice is:
    steep (at minimum: LIVE STATE block) → post → log to THAT AGENT's `activity-log.md` (comment

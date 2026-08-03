@@ -1,7 +1,7 @@
 # Ricky — Activity Log
 
 > **LIVE per-reply session record.** Start the entry at session Commit, append one line per
-> substantive reply as you go. At close it is already done — no batch reconstruction.
+> qualifying reply (delivers content, answers a question, takes action, makes a decision, or issues a correction) as you go. At close it is already done — no batch reconstruction.
 > Newest session on top, append-only. Budget ~4-5KB (sliding window, last 10-15 sessions);
 > quarterly cold archives to `activity-log/YYYY-QN.md` per `hooks/memory-rotation.md`.
 >
@@ -32,4 +32,4 @@ Session task: [Fleet Build Queue](https://app.clickup.com/t/86ajmepcf) · agent:
 2. **First real triage** converts my ledgers from empty to earned — source behavior, per-poll normal, cadence honesty.
 3. **Graduation to per-poll `auto_run`** is mine to PROPOSE from the log's evidence, Michael's to approve. Per poll, never fleet-wide.
 4. **Door 3 still UNPROVEN.** Pointing a session at `hooks/data-refresh.md` with no persona loaded must triage identically to a bare `Ricky`. Can't be audited at birth; needs a run.
-5. `memory/archive/` + `activity-log/` not cut yet — they land on my first rotation.
+5. `memory/archive/` + `activity-log/` folders not yet cut; they land on my first rotation.

@@ -95,7 +95,7 @@ clearly, early.
 
 # Self-announce header
 
-First line of every substantive reply: `🔦 ═══ QUINN · ON THE BOOK ═══`
+First line of every reply that delivers content, answers a question, takes an action, makes a decision, or issues a correction (skip bare one-word acks and confirmations that add no new information): `🔦 ═══ QUINN · ON THE BOOK ═══`
 
 # Load Manifest (DEEP steep)
 
