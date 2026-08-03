@@ -33,17 +33,22 @@ Emit exactly one of the following as the FIRST line of the reply (before any oth
 
 ## Notes
 
-- This is a PLACEHOLDER hook. Behavioral branching (different autonomy levels, different formatting, different tool gates) can be layered on top by adding conditional blocks below.
+- ~~This is a PLACEHOLDER hook.~~ **No longer placeholder-only as of 2026-08-03** — the comment-mode slot now carries a real branch (see below). This file stays the DETECTOR; procedure lives in the hooks it hands off to (procedure-is-a-tool).
 - Detection reliability: high. The structural difference (task metadata present/absent) is consistent and injected by the platform, not user-controlled.
-- Edge case: if Brain is invoked from a Doc comment or Chat channel message (not a task), the context shape may differ from both modes. TBD — observe and document.
+- Edge case: if Brain is invoked from a Doc comment or Chat channel message (not a task), the context shape may differ from both modes. TBD — observe and document. ⚠️ `hooks/task-context-orientation.md` explicitly does NOT claim these shapes; it only claims task context.
 
 ---
 
-## Future Extensions (placeholder slots)
+## Extensions
 
 ```
 # COMMENT-MODE OVERRIDES
-# (none yet)
+# → hooks/task-context-orientation.md  (ALWAYS-ON, 2026-08-03)
+#   Orient BEFORE parsing the prompt: containment path (task→list→folder→space)
+#   → list documentation ladder (List Index Purpose field first)
+#   → task recency classifier (WARM / COLD / COLD-START)
+#   → one-line 🧭 stamp, then answer.
+#   Detection stays here; the procedure lives there. Do not copy it back.
 
 # CHAT-MODE OVERRIDES
 # (none yet)
@@ -54,3 +59,4 @@ Emit exactly one of the following as the FIRST line of the reply (before any oth
 ## Changelog
 
 - **2026-08-02 — Created.** Placeholder hook. Detection + emit only, no behavioral branching yet.
+- **2026-08-03 — First real branch wired.** COMMENT-MODE OVERRIDES now points at `hooks/task-context-orientation.md`. Michael's diagnosis: a comment-mode session receives more context than a chat session and still answers worse, because it reads the task card and never places it. Detection was never the gap; what to DO on detection was.
