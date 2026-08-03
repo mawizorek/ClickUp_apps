@@ -1,0 +1,48 @@
+<section class="page">
+  <h1>Grab a folder</h1>
+  <p class="lead">Paste a public GitHub folder URL and get back a zip of that folder and everything under it.</p>
+
+  <div class="callout">
+    <strong>Wave 0 scaffold — nothing works yet, on purpose.</strong>
+    This page renders the shell so the theme and the object vocabulary can be judged before any
+    pipeline code exists. The field and the button below are inert. Wave 1 builds the zip writer,
+    Wave 2 the listing, Wave 3 wires them together.
+  </div>
+
+  <label class="field">
+    <span>GitHub folder URL</span>
+    <input class="mono" type="url" inputmode="url" autocomplete="off" spellcheck="false" disabled
+           placeholder="https://github.com/owner/repo/tree/&lt;ref-or-sha&gt;/path/to/folder"
+           aria-describedby="urlHelp">
+  </label>
+  <p id="urlHelp" class="muted">A <code>/tree/</code> link, a <code>/blob/</code> link, or a commit permalink. Public repos only.</p>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" disabled>List files</button>
+    <button class="btn btn-secondary" disabled>Reset</button>
+  </div>
+
+  <h2>Pipeline</h2>
+  <div class="stepper" aria-label="Pipeline stages">
+    <span class="step">1 · parse</span>
+    <span class="step">2 · list</span>
+    <span class="step">3 · fetch</span>
+    <span class="step">4 · pack</span>
+  </div>
+
+  <h2>What it will show you before it downloads</h2>
+  <dl class="kv">
+    <dt>Repo</dt><dd>—</dd>
+    <dt>Ref</dt><dd>—</dd>
+    <dt>Commit</dt><dd>—</dd>
+    <dt>Path</dt><dd>—</dd>
+    <dt>Files</dt><dd>—</dd>
+    <dt>Total size</dt><dd>—</dd>
+  </dl>
+
+  <p class="muted">
+    The count above is the whole point. A download only counts as correct when the number on this
+    screen matches the number of entries in the zip and the number of files GitHub reports, and
+    anything deliberately excluded (submodules, symlinks) is named rather than dropped quietly.
+  </p>
+</section>

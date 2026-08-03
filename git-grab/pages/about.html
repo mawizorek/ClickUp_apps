@@ -1,0 +1,44 @@
+<section class="page">
+  <h1>About git-grab</h1>
+
+  <p>
+    GitHub will hand you a whole repository as a zip, but not a single folder inside one.
+    git-grab does the folder.
+  </p>
+
+  <h2>Why not just use download-directory.github.io</h2>
+  <p>
+    You can, and it works. The reason this exists is narrower than distrust of its author: the code
+    is open and almost certainly fine today, but <strong>auditing a site you do not control only
+    binds the deploy you audited</strong>. A dependency bump next week is not something you get to
+    re-read. This app sits on an origin Michael controls, so the audit stays true until he changes it.
+  </p>
+
+  <h2>What it touches, and what it refuses to</h2>
+  <p>
+    Two hostnames, enforced by a wrapper rather than by good intentions:
+    <code>api.github.com</code> to resolve the ref and list the tree, and
+    <code>raw.githubusercontent.com</code> to fetch file bodies. Any other host throws.
+    Zipping happens in your browser with the native <code>CompressionStream</code> API, so there is
+    no third-party script to trust at runtime and nothing to keep patched.
+  </p>
+
+  <h2>Public repos only</h2>
+  <p>
+    There is no token field, deliberately. A private-repo gate is designed but not built; when it
+    lands, the token is held in memory by default and only ever sent to <code>api.github.com</code>.
+  </p>
+  <p class="muted">
+    Note on the error messages you may eventually see: GitHub returns <strong>404, not 403</strong>,
+    for a private repo you are not authenticated for. It deliberately refuses to confirm the repo
+    exists at all. So a failure here can never honestly say &quot;this one is private&quot; — only
+    that the path could not be reached.
+  </p>
+
+  <h2>Everything is pinned</h2>
+  <p>
+    Whatever ref you paste is resolved to a commit SHA once, and every request after that uses the
+    SHA. Two people pasting the same permalink get byte-identical zips, and a branch moving under
+    you mid-download cannot happen.
+  </p>
+</section>

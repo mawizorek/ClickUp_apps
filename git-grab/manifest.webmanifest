@@ -1,0 +1,13 @@
+{
+  "name": "git-grab",
+  "short_name": "git-grab",
+  "description": "Paste a public GitHub folder URL, get back a zip of that folder and everything under it.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1b1d22",
+  "theme_color": "#333740",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

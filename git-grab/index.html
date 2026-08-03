@@ -1,0 +1,142 @@
+<!doctype html>
+<!-- INFRASTRUCTURE: modular router shell + pages/ partials (hash router, theme spine). Pages-hosted only, not file:// capable. -->
+<!-- Placed UNFORKED from template-app v5 (PR #300). Everything app-specific rides in through the APP_* constants below.
+     If this app needs something the template cannot express, change the TEMPLATE — that is Michael's call, not a local special-case. -->
+<!-- THEME: APP_THEME is a JOIN slug from shared/themes/_themes.json (color x typography x forms x spacing).
+     DEFAULT_COLOR is a COLOR slug from shared/themes/_index.json. They are NOT interchangeable:
+     passing a color slug to applyTheme() faults. Nothing here is authored — both values are borrowed. -->
+<html lang="en" data-theme="maw-dark-utility" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#333740">
+<meta name="robots" content="noindex, nofollow">
+<!-- EARLY THEME: set the saved color before first paint so a saved non-default color paints instantly. -->
+<script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<title>git-grab</title>
+<meta name="description" content="Paste a public GitHub folder URL, get back a zip of that folder and everything under it.">
+<meta property="og:title" content="git-grab">
+<meta property="og:description" content="Paste a public GitHub folder URL, get back a zip of that folder and everything under it.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/git-grab/">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/git-grab/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="git-grab">
+<meta name="twitter:description" content="Paste a public GitHub folder URL, get back a zip of that folder and everything under it.">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/git-grab/og.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128230;</text></svg>">
+<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<!-- THEME SPINE: static themes.css = instant themed first paint (color); resolve.js composes all 4 vectors. -->
+<link rel="stylesheet" href="../shared/themes/themes.css">
+<link rel="stylesheet" href="./styles.css?v=1">
+</head>
+<body>
+<div id="access-gate" hidden>
+  <div class="gate-card">
+    <h1 id="gate-title">Under maintenance</h1>
+    <p id="gate-msg">This app is being updated. Check back soon.</p>
+    <form id="gate-form">
+      <input id="gate-code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autocorrect="off" autofocus aria-label="Access code" placeholder="0426">
+      <button type="submit">Enter</button>
+    </form>
+  </div>
+</div>
+
+<a class="skip-link" href="#view">Skip to content</a>
+<header id="appHeader"></header>
+<main id="view" tabindex="-1"></main>
+<footer id="appFooter"></footer>
+
+<noscript>This app needs JavaScript enabled to run.</noscript>
+
+<script src="../shared/themes/resolve.js"></script>
+<script src="./chrome.js?v=1"></script>
+<script>
+(function () {
+  /* ==== APP CONSTANTS ==== */
+  var APP_NAME    = "git-grab";
+  var APP_VERSION = "v0.1";
+  var APP_PR      = 713;                  // merged PR that shipped this version
+  var APP_THEME   = "soft-utility";       // JOIN slug (_themes.json) — the documented default for apps copied from template-app
+  var DEFAULT_COLOR = "maw-dark-utility"; // COLOR slug (_index.json) — fallback only, if the join cannot load
+  var DEFAULT_PAGE  = "home";
+  var NAV = [
+    { route: "home",  label: "Grab a folder" },
+    { route: "about", label: "About" }
+  ];
+  /* ======================= */
+
+  /* ---- THEME: the join sets every token inline; the picker overrides COLOR only. ---- */
+  if (window.THEMES && THEMES.applyTheme) {
+    THEMES.applyTheme(APP_THEME).then(function () {
+      var saved = null; try { saved = localStorage.getItem("app_theme"); } catch (e) {}
+      if (saved && THEMES.apply) THEMES.apply(saved, { silent: true });
+    });
+  } else {
+    document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
+  }
+
+  /* ---- ACCESS GATE ---- */
+  (function gate() {
+    var FALLBACK = { access: "open", code: "0426",
+      coverTitle: "Under maintenance", coverMessage: "This app is being updated. Check back soon.",
+      downTitle: "Temporarily offline", downMessage: "This app is currently unavailable." };
+    var SS = "gate_ok";
+    function focusCode() {
+      var c = document.getElementById("gate-code");
+      if (c) { try { c.focus(); c.select(); } catch (e) {} }
+    }
+    function apply(cfg) {
+      var g = document.getElementById("access-gate");
+      if (cfg.access === "open" || sessionStorage.getItem(SS) === "1") { g.remove(); return; }
+      g.hidden = false;
+      var form = document.getElementById("gate-form");
+      if (cfg.access === "down") {
+        document.getElementById("gate-title").textContent = cfg.downTitle || FALLBACK.downTitle;
+        document.getElementById("gate-msg").textContent  = cfg.downMessage || FALLBACK.downMessage;
+        form.style.display = "none"; return;
+      }
+      document.getElementById("gate-title").textContent = cfg.coverTitle || FALLBACK.coverTitle;
+      document.getElementById("gate-msg").textContent  = cfg.coverMessage || FALLBACK.coverMessage;
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (document.getElementById("gate-code").value.trim() === String(cfg.code)) {
+          sessionStorage.setItem(SS, "1"); g.remove();
+        } else { var c = document.getElementById("gate-code"); c.value = ""; c.focus(); }
+      });
+      focusCode(); setTimeout(focusCode, 80);
+    }
+    fetch("./config.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (cfg) { try { localStorage.setItem("app_config", JSON.stringify(cfg)); } catch (e) {} apply(cfg); })
+      .catch(function () { var c = null; try { c = JSON.parse(localStorage.getItem("app_config")); } catch (e) {} apply(c || FALLBACK); });
+  })();
+
+  /* ---- CHROME ---- */
+  Chrome.init({
+    appName: APP_NAME, version: APP_VERSION, pr: APP_PR,
+    nav: NAV, defaultTheme: DEFAULT_COLOR, logo: "\uD83D\uDCE6",
+    sources: [ { label: "Source \u2197", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/git-grab" } ]
+  });
+
+  /* ---- ROUTER: hash -> pages/<route>.html injected into #view ---- */
+  var view = document.getElementById("view");
+  var routes = NAV.map(function (n) { return n.route; });
+  function render(route) {
+    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
+    fetch("./pages/" + route + ".html", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+      .then(function (html) { view.innerHTML = html; Chrome.setActive(route); view.focus(); window.scrollTo(0, 0); })
+      .catch(function () {
+        view.innerHTML = '<section class="page"><h1>Page not found</h1>' +
+          '<p class="muted">No page matches <code>#' + route + '</code>.</p></section>';
+      });
+  }
+  function current() { return (location.hash || "").replace(/^#/, "") || DEFAULT_PAGE; }
+  window.addEventListener("hashchange", function () { render(current()); });
+  render(current());
+})();
+</script>
+</body>
+</html>
