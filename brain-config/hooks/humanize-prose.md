@@ -1,84 +1,175 @@
-# humanize-prose
+# humanize-prose · AI Toolkit
 
-Bare spec. Dex structures this later.
+**Purpose:** Strip AI-generated writing patterns ("slop") from any body of text, making it read like a human wrote it. Sentence-level detection + multi-scale rewrite pipeline.
+
+**Steward:** TBD. Candidate: a dedicated Writing Agent (not yet built) who stewards prose quality across the workspace. Pending `/felix` routing on whether this folds into an existing lane or justifies a net-new teammate.
+
+**Mode:** On-demand, callable. Not always-on. Fires only when invoked or when an agent's output pipeline routes through it.
+
+**Invocation:** `/humanize` · `/de-slop` · "humanize this" · "clean up the AI smell" · "score this for slop" · or applied to any text block passed to Brain.
+
+**Trigger:** Text handed over for humanization · a draft about to ship · a doc page flagged as reading "AI-ish" · a writing agent's output buffer before delivery · explicitly requested on any selection.
+
+**Established 2026-08-02** from Humalingo market research. Combines approaches from NousResearch ANTI-SLOP.md, avoid-ai-writing (MIT), Vortenza's 29-pattern engine, and Humalingo's 4-axis scoring.
 
 ---
 
-## What it is
+## Coordinates
 
-A callable hook that takes any body of text and strips it of AI-generated writing patterns ("slop"), making it read like a human wrote it. Inspired by Humalingo's sentence-level diagnostic approach but built as a local pipeline with no external API dependency.
-
-Invocation: `/humanize`, `/de-slop`, "humanize this", "clean up the AI smell", or applied to any text selection/block passed to Brain.
+| Surface | Location |
+| --- | --- |
+| **Scope** | Any text: task descriptions, doc pages, comment drafts, clipboard, files, agent output buffers |
+| **Report home** | Inline (comment reply or chat), or appended to the source task/doc as a comment |
+| **Lane seams** | De-Slop Pass (the always-on hook: catches obvious slop in Brain's OWN output, lightweight) · This hook (the full diagnostic + rewrite pipeline, invoked on OTHERS' text or Brain's extended drafts) · Document Destroyer (ships prose; this scores it pre-ship) |
 
 ---
 
-## The Pipeline (3 passes)
+## ⭐ The premise
 
-### Pass 1: Sentence Loop (atomic slop removal)
+AI text is detectable because it is **uniform**. Uniform sentence length, uniform paragraph shape, uniform vocabulary, uniform transitions. A human's prose has texture: short punches next to sprawling clauses, silence where an AI would over-explain, specificity where an AI would hedge.
 
-Process every sentence individually. For each sentence:
+The pipeline does not make text "casual." It makes text **varied**. Variation is what reads as human. A formal document can be humanized without becoming informal: you vary its architecture, not its register.
 
-1. DETECT: Score against the slop pattern library (see below). Flag which patterns triggered.
-2. REWRITE: Fix only the flagged patterns. Preserve meaning, tone intent, and domain terminology. Don't over-correct (a sentence with zero flags passes through untouched).
-3. VERIFY: Re-score the rewrite. If it still triggers, iterate once more. If it still fails after 2 attempts, flag it for manual review rather than mangling it.
+**Three scales, three problems:**
+- **Sentence** fixes the WORDS (banned vocabulary, hedge stacking, filler, passive bloat)
+- **Paragraph** fixes the MUSIC (rhythm between rewritten sentences, connective tissue, local repetition)
+- **Document** fixes the ARCHITECTURE (structural repetition across paragraphs, voice drift, density, opening/closing patterns)
 
-What the sentence loop catches:
+Each pass catches things the prior one creates or cannot see at its scale. They are complementary, not redundant. A sentence-clean document can still read as AI if every paragraph is shaped identically.
+
+---
+
+## The confirm-before-edit gate (HARD)
+
+This hook **ALWAYS reports before rewriting.** The default output is the Score-Only Report (below). Edits proceed ONLY when the report is confirmed.
+
+Flow:
+1. Receive text → run detection at all applicable scales → produce the Score-Only Report
+2. Present the report. STOP.
+3. On confirmation ("fix it", "go ahead", "rewrite", or explicit approval): execute the rewrite passes
+4. Return cleaned text + diff summary
+
+Why: a cold writing agent receiving this report can decide what to fix, what to preserve, and what to escalate. The report IS the handoff artifact. A rewrite with no diagnostic is unjustifiable work.
+
+---
+
+## Score-Only Report (the default output)
+
+This is the primary artifact. It must be self-contained: a fresh agent with zero prior context can read it and know exactly what needs fixing, where, why, and how severe.
+
+### Template
+
+```
+## SLOP REPORT: [source title or "inline text"]
+
+**Density:** X% (Y of Z sentences flagged)
+**Verdict:** CLEAN / LIGHT TOUCH / NEEDS WORK / HEAVY REWRITE
+**Dominant issues:** [top 2-3 pattern categories, ranked by frequency]
+
+---
+
+### Headline changes
+
+1. [Category]: [one-line actionable summary with count]
+2. [Category]: [one-line actionable summary with count]
+3. [Category]: [one-line actionable summary with count]
+...
+
+(Example:
+1. Banned vocabulary: 6 instances across 4 sentences ("delve" x2, "landscape" x2, "robust", "leverage")
+2. Hedge stacking: 3 sentences open with double-hedge ("it might be worth noting that perhaps")
+3. Structural repetition: 4 of 6 paragraphs follow statement→3 supports→conclusion shape)
+
+---
+
+### Worst offenders
+
+[Folded per-sentence detail. Each entry is enough for a cold agent to rewrite without asking.]
+
+| # | Sentence | Pattern(s) | Direction |
+|---|---|---|---|
+| 1 | "[quoted sentence]" | [pattern names] | [rewrite direction, not a fixed replacement] |
+| 2 | ... | ... | ... |
+
+### Reasoning
+
+[Brief note on WHY these are the worst: highest pattern density, most jarring to a reader, or structurally load-bearing (a sloppy topic sentence poisons the paragraph below it).]
+
+---
+
+### Paragraph-scale notes (if applicable)
+
+- [Rhythm flatness, transition kills, local repetition between adjacent sentences]
+
+### Document-scale notes (if applicable)
+
+- [Structural repetition across paragraphs, voice drift, density bloat, AI opening/closing patterns]
+```
+
+### Verdict thresholds
+
+| Verdict | Density | Meaning |
+| --- | --- | --- |
+| CLEAN | 0-10% | Leave it. Don't manufacture changes. |
+| LIGHT TOUCH | 11-25% | A few spot fixes. Sentence pass only. |
+| NEEDS WORK | 26-50% | Sentence + paragraph passes warranted. |
+| HEAVY REWRITE | 51%+ | All three passes. Consider whether the text should be rewritten from scratch. |
+
+---
+
+## The Pipeline (3 passes, executed only after report confirmation)
+
+### Pass 1: Sentence Loop
+
+Process every sentence individually:
+
+1. **DETECT:** Score against the pattern library. Flag which patterns triggered.
+2. **REWRITE:** Fix only flagged patterns. Preserve meaning, tone intent, domain terminology. Zero-flag sentences pass through untouched.
+3. **VERIFY:** Re-score the rewrite. If still triggered, iterate once. After 2 attempts, flag for manual review rather than mangling.
+
+What it catches:
 - Banned vocabulary ("delve", "tapestry", "landscape", "utilize", "leverage", "robust", "holistic", "synergy", "paradigm", "furthermore", "moreover", "in conclusion", "it's worth noting", "it's important to note")
-- Em/en dashes used as connectors (replace with colons, commas, or restructure)
-- Hedge stacking ("it might be possible that perhaps" -> commit to a take)
+- Em/en dashes as connectors (replace with colons, commas, or restructure)
+- Hedge stacking ("it might be possible that perhaps" → commit)
 - Filler openers ("In today's fast-paced world", "When it comes to", "In the realm of", "At the end of the day")
 - Passive voice where active is stronger
 - Triple/quadruple adjective stacks
-- Overly uniform sentence length (every sentence 15-20 words = AI cadence)
+- Uniform sentence length (every sentence 15-20 words = AI cadence)
 - Colon-list pattern ("There are three key aspects: X, Y, and Z") when not actually listing
 - Transition word overuse ("however", "additionally", "consequently" every other sentence)
 - Summarizing what was just said ("In other words", "To put it simply", "Essentially")
 
-### Pass 2: Paragraph Loop (local coherence)
+### Pass 2: Paragraph Loop
 
-After all sentences in a paragraph are individually clean, evaluate the paragraph as a unit:
+After all sentences in a paragraph are individually clean, evaluate as a unit:
 
-1. RHYTHM CHECK: Do the rewritten sentences have varied length? (Short. Then a medium one. Then a longer one that builds. Fragment.) If every sentence landed at similar word counts, vary them.
-2. TRANSITION NATURALNESS: After individual rewrites, do sentences still connect? A rewrite might kill a transition word that was actually needed. Restore organic connective tissue where the meaning jump is too abrupt.
-3. PARAGRAPH CADENCE: Does the paragraph open strong and land somewhere? Or does it meander with no point? Tighten.
-4. LOCAL REPETITION: Did two adjacent sentences accidentally reuse the same structure (subject-verb-object, subject-verb-object) after individual rewrites?
+1. **RHYTHM:** Varied sentence lengths? (Short. Medium. Longer build. Fragment.) If uniform, vary them.
+2. **TRANSITIONS:** Did rewrites kill needed connective tissue? Restore organic connections where meaning-jumps are too abrupt.
+3. **CADENCE:** Opens strong? Lands somewhere? Tighten if it meanders.
+4. **LOCAL REPETITION:** Adjacent sentences reusing the same structure (SVO, SVO, SVO) after individual rewrites?
 
-### Pass 3: Document Loop (global coherence)
+### Pass 3: Document Loop
 
 After all paragraphs are individually clean, evaluate the full text:
 
-1. STRUCTURAL REPETITION: Are multiple paragraphs using the same shape? (Statement, three supporting points, conclusion. Statement, three supporting points, conclusion. Over and over.) Vary the architecture.
-2. VOICE DRIFT: Did the rewrites accidentally shift register mid-document? (Casual in para 1, suddenly formal in para 4.) Normalize to the dominant voice.
-3. ARGUMENT FLOW: Does the document build toward something, or does it feel like a list of disconnected paragraphs wearing a trench coat? If the connective logic between paragraphs is weak, strengthen it.
-4. OPENING/CLOSING: AI loves to "set the stage" in the intro and "circle back" in the conclusion. Kill both patterns. Start with the point. End when you're done.
-5. DENSITY: AI text is often 30-50% longer than it needs to be. After all three passes, is there fat left? Cut it.
-
----
-
-## The Pattern Library (sources to combine)
-
-Draw from:
-- NousResearch ANTI-SLOP.md: tiered banned word lists (Tier 1 = always banned, Tier 2 = flagged in high density, Tier 3 = fine alone but suspicious in clusters)
-- avoid-ai-writing (GitHub, 2,545 stars, MIT): voice profiles, structural patterns, the "why" behind each detection
-- Vortenza's 29-pattern engine: em dashes, transitions, passive voice, sentence length uniformity, AI vocabulary density
-- Humalingo's 4-axis scoring: human score, AI score, sentence structure variety, readability
-
-The combined library should be a flat list of patterns, each with:
-- Pattern name
-- Detection regex or heuristic
-- Severity (always-fix vs contextual)
-- Replacement strategy (not a fixed replacement, but a DIRECTION: "restructure as two sentences" or "replace with a concrete verb")
+1. **STRUCTURAL REPETITION:** Multiple paragraphs using the same shape? Vary the architecture.
+2. **VOICE DRIFT:** Register shift mid-document after rewrites? Normalize to dominant voice.
+3. **ARGUMENT FLOW:** Builds toward something, or disconnected paragraphs in a trench coat? Strengthen connective logic.
+4. **OPENING/CLOSING:** AI "sets the stage" and "circles back." Kill both. Start with the point. End when done.
+5. **DENSITY:** AI text runs 30-50% longer than needed. After all passes, cut remaining fat.
 
 ---
 
 ## Modes
 
-| Mode | What it does |
-| --- | --- |
-| `sentence` | Pass 1 only. Fast. Good for a single line or quick check. |
-| `paragraph` | Pass 1 + Pass 2. Good for a block of text. |
-| `full` | All 3 passes. Default when given a whole doc or multi-paragraph input. |
-| `score-only` | Run detection without rewriting. Returns a report: which sentences flagged, which patterns triggered, overall slop density %. |
+| Mode | Passes | Use case |
+| --- | --- | --- |
+| `sentence` | Pass 1 only | Quick check on a single line or short block |
+| `paragraph` | Pass 1 + 2 | A paragraph or short section |
+| `full` | All 3 passes | Default for multi-paragraph input or whole docs |
+| `score-only` | Detection only, no rewrite | DEFAULT. Returns the Score-Only Report. Always runs first regardless of mode. |
+
+All modes produce the Score-Only Report first. The mode determines what happens AFTER confirmation.
 
 ---
 
@@ -87,23 +178,54 @@ The combined library should be a flat list of patterns, each with:
 - Never rewrite domain terminology, proper nouns, or quoted speech.
 - Preserve the POINT of every sentence. Meaning is sacred. Style is what changes.
 - When in doubt, shorter > longer. Cut > rephrase.
-- Don't introduce slang or forced casualness unless the source text's register calls for it. The goal is NATURAL, not CASUAL.
-- A human who uses "however" once isn't sloppy. A document that uses it 8 times is. Frequency matters more than presence.
-- The output should be invisible: a reader shouldn't think "this was cleaned up." They should just think "this is well-written."
-- If the input is already clean (low slop score), say so and don't touch it. Don't manufacture changes.
+- Don't introduce forced casualness unless register calls for it. Goal is NATURAL, not CASUAL.
+- Frequency > presence. One "however" is fine. Eight is slop.
+- Invisible output: reader thinks "well-written," not "cleaned up."
+- If input is already clean (CLEAN verdict), say so. Don't manufacture changes.
+- The Score-Only Report is the HANDOFF ARTIFACT. Write it as if you will never speak to the next agent.
 
 ---
 
-## Integration
+## The Pattern Library (sources)
 
-- Can be called on: any text block, a task description, a doc page, a comment draft, clipboard content, a file.
-- Returns: the cleaned text + a brief diff summary (what changed and why).
-- Optional: before/after slop score comparison.
+Combined from:
+- **NousResearch ANTI-SLOP.md:** tiered banned word lists (Tier 1 always-ban, Tier 2 flagged in density, Tier 3 suspicious in clusters)
+- **avoid-ai-writing (GitHub, MIT):** voice profiles, structural patterns, detection rationale
+- **Vortenza 29-pattern engine:** em dashes, transitions, passive, length uniformity, vocabulary density
+- **Humalingo 4-axis scoring:** human score, AI score, sentence structure variety, readability
+
+Each pattern entry carries: name · detection heuristic · severity (always-fix vs contextual) · replacement DIRECTION (not a fixed swap).
 
 ---
 
-## Open questions for build
+## Integration points
 
-- Do we want a "voice profile" system where the user can define their natural writing style (sentence length preference, vocabulary, formality level) and the hook targets THAT instead of generic "human"?
-- Should it integrate with the Document Destroyer workflow (score text before shipping)?
-- Memory: should it learn from Michael's manual edits over time? ("He always changes X back to Y, stop suggesting X.")
+- **Document Destroyer:** score text pre-ship (if the workflow routes through humanize-prose, the report gates delivery)
+- **Writing Agent (future):** the steward who runs this hook on every piece of prose before it leaves the workspace
+- **De-Slop Pass (existing hook):** the lightweight always-on version that catches Brain's own output. This hook is the full diagnostic; De-Slop is the reflex.
+- **Any agent's output buffer:** can be wired as a post-processing step before delivery
+
+---
+
+## Open design questions
+
+1. Voice profiles: user-defined writing style (sentence length, vocabulary, formality) so the hook targets THAT instead of generic "human"?
+2. Learning from manual edits: "Michael always changes X back to Y, stop suggesting X"?
+3. Stewardship: does this live under a dedicated Writing Agent, or fold into an existing lane? → Route to Felix.
+
+---
+
+## Composes with
+
+`hooks/de-slop-pass` (the always-on reflex, lightweight) · Document Destroyer workflow (pre-ship gate) · `hooks/source-size-budget-enforcer.md` (long rewrites that bloat) · `code-review-standard.md` (severity format reused in the report) · the future Writing Agent's output pipeline.
+
+## Guardrails
+
+Report before rewrite, always. Never rewrite without a confirmed report. Never touch meaning. Never fake a CLEAN verdict to skip work. Never introduce slang to "humanize." A formal doc stays formal; it just stops being uniform.
+
+---
+
+## Changelog
+
+- **v2 (2026-08-02)** - Restructured into canonical hook format (Dex standard). Added: Score-Only Report template as the default output and cold-agent handoff artifact. Added: confirm-before-edit gate. Added: three-scale premise (words/music/architecture). Stewardship TBD, routed to Felix. Writing Agent concept documented as future integration.
+- **v1 (2026-08-02)** - Bare spec from Humalingo market research session. Three-pass pipeline, pattern library sources, modes, behavior rules.
