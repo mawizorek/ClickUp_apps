@@ -30,7 +30,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint (color); resolve.js composes all 4 vectors. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=3">
+<link rel="stylesheet" href="./styles.css?v=4">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -52,14 +52,16 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js?v=3"></script>
-<script src="./zip.js?v=3"></script>
+<script src="./chrome.js?v=4"></script>
+<script src="./zip.js?v=4"></script>
+<script src="./gh.js?v=4"></script>
+<script src="./app.js?v=4"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
   var APP_NAME    = "git-grab";
-  var APP_VERSION = "v0.3";
-  var APP_PR      = 718;                  // merged PR that shipped this version
+  var APP_VERSION = "v1.0";
+  var APP_PR      = 719;                  // merged PR that shipped this version
   var APP_THEME   = "soft-utility";       // JOIN slug (_themes.json). CHANGE THIS ONE LINE TO RESKIN.
   var DEFAULT_COLOR = "maw-dark-utility"; // COLOR slug (_index.json) — lightweight fallback if the join cannot load
   var DEFAULT_PAGE  = "home";
@@ -82,8 +84,8 @@
 
   /* ---- ACCESS GATE ---- */
   (function gate() {
-    var FALLBACK = { access: "gated", code: "0426",
-      coverTitle: "git-grab is still being built", coverMessage: "The page behind this is a shell.",
+    var FALLBACK = { access: "open", code: "0426",
+      coverTitle: "git-grab", coverMessage: "Enter the code to continue.",
       downTitle: "Temporarily offline", downMessage: "git-grab is currently unavailable." };
     var SS = "gate_ok";
     function focusCode() {
@@ -124,11 +126,13 @@
   });
 
   /* ---- PAGE BEHAVIOUR ----
-     The router injects partials with innerHTML, and a <script> inserted that way NEVER executes
-     (HTML spec, not a quirk). So any page needing behaviour gets hooked here, after render.
-     One hook, so the next page does not reinvent the mechanism. */
+     The router injects partials with innerHTML, and a script tag inserted that way NEVER executes
+     (HTML spec, not a quirk). So any page needing behaviour is hooked here, after render. Two
+     pages use it now, which is why it is one mechanism rather than two copies. */
   function afterRender(route) {
+    if (route === "home" && window.GRAB) { GRAB.mount(); return; }
     if (route !== "test") return;
+
     var btn = document.getElementById("runSelftest");
     var out = document.getElementById("selftestOut");
     if (!btn || !out || !window.ZIP) return;
