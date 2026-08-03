@@ -132,7 +132,7 @@ Rules for this table:
 
 ### 2a. Spine reconciliation
 
-- Substantive replies this session: {N}
+- Qualifying replies this session: {N}
 - Spine lines posted: {M}
 - Delta: {none, or: N-M missed, backfilled / still missing and marked}
 
@@ -346,7 +346,7 @@ Flush the seating tally to `brain-config/usage-log.json`. This lands LAST.
 
 Runs: usage-log commit, Session Ledger finalize, spine close line, git-side closing writes.
 Skips: Channel 2, and Channel 1 only if memory was untouched.
-If the session became substantive, upgrade to full close.
+If the session delivered content, answered a question, took action, made a decision, or issued a correction, upgrade to full close.
 
 ---
 
