@@ -2,52 +2,99 @@
 
 **Purpose:** Reassemble a flat Dropbox screenshot dump into the **working sessions it was actually captured during**, so a pile of 200 timestamps becomes a handful of project clusters that can be reasoned about, deduped, and routed as units.
 
-**Steward: Fleet Felix.** He owns the FILE — its correctness, its evolution, and the routing contract in Pass 3 (which is a fleet fact and therefore already his lane). **He does not own running it.** Execution is OWNERLESS, same as the Doc-Rot Sweep and the Fleet-Fact Sweep: any agent fires a pass mid-task with no persona seated. Two further splits: the **destination** doc/task is owned by whoever owns that domain, and a **formal, scoped, reported full-inbox pass IS an audit and SEIZES to Audit Anna**.
+**Steward: Fleet Felix.** He owns the FILE — its correctness, its evolution, and the Pass 3 routing contract (a fleet fact, already his lane). **He does not own running it.** Execution is OWNERLESS, same as the Doc-Rot Sweep: any agent fires a pass mid-task with no persona seated. Two splits: the **destination** doc/task belongs to whoever owns that domain, and a **formal, scoped, reported full-inbox pass IS an audit and SEIZES to Audit Anna**.
 
-⚠️ **The steward does NOT change per space, per Space, or per content type.** The routing DESTINATION changes with the content; the hook's owner does not. If this file ever grows a second steward "for URITP shots" it has become two hooks and one of them will rot.
+⚠️ **The steward does NOT change per space or content type.** The routing DESTINATION changes with the content; the owner does not. A second steward "for URITP shots" means this became two hooks and one will rot.
 
-**Mode:** On-demand routine (batched). Never automatic — a folder that empties itself unattended is a folder Michael stops trusting.
+**Mode:** On-demand, batched, multi-pass. Never automatic.
 
-**Invocation:** `/screenshot-intake` · `/shot-intake` · "sort my screenshots" · "group my screenshots" · "triage the screenshot inbox" · "what's in my screenshots folder"
+**Invocation:** `/screenshot-intake` · `/shot-intake` · "sort my screenshots" · "group my screenshots" · "triage the screenshot inbox"
 
-**Trigger:** Michael names it, OR he references a screenshot he took without attaching it ("the shot I took of the light board") — in which case run a SEARCH-ONLY pass against the inbox and propose nothing.
+**Trigger:** Michael names it, OR he references a screenshot he took without attaching it — in which case run a SEARCH-ONLY pass and propose nothing.
 
 **Front door: this file, and nothing else.** No ClickUp Skill. Tools live in git only (LOCKED 2026-07-25).
 
-**Established 2026-08-04** by Fleet Felix, at Michael's direction, scoped as a **sibling of the INBOX Email Intake Triage** rather than a net-new invention (Fold-in Frank: NET-NEW, sibling shape). Same skeleton, different input: an inbox, a grouping, a routing decision, a mandatory greenlight, a disposition.
+**Companion:** `hooks/screenshot-intake.report-spec.md` — the CLUSTER MAP form. **Load it before reporting. Never invent report structure.**
+
+**Established 2026-08-04** by Fleet Felix, as a **sibling of the INBOX Email Intake Triage** (Fold-in Frank: NET-NEW, sibling shape).
 
 ---
 
-## 🕐 THE TIMESTAMP IS EVIDENCE (MW 2026-08-04 — read before Pass 1)
+## 🚦 THE CAPACITY GATE (MW 2026-08-04 — declare BEFORE working, not after)
 
-**v1 of this file said "a filename tells you nothing." That is FALSE and Michael struck it.** `Screenshot 2026-07-13 at 12.04.25 PM.png` tells you the single most useful thing available before an image is ever opened: **exactly when it was captured.** That is the spine of the whole routine.
-
-<p></p>
-
-What the timestamp gives you, for free, across the entire folder at once:
-
-- **Co-capture.** Two shots 40 seconds apart were almost certainly taken about the same thing. That is a relationship you can see before opening either one.
-- **Working sessions.** A dense run of shots inside one afternoon is a work session. The session, not the file, is the real unit of meaning.
-- **Boundaries.** A multi-hour or multi-day gap is a topic change. Gaps separate clusters as reliably as content does.
-- **Sequence.** Within a cluster, order tells the story: a before, an attempt, an error, a fix. Renaming or reordering destroys that, which is why cluster order is preserved.
-- **Correlation.** A cluster's date range can be matched against what was actually happening then — a task's activity, a build session, a production date, a Decision Log entry. **This is the strongest single signal for identifying the project, and it costs one date comparison.**
+**Yes, 200 images is too many for one pass. No, the fix is not "the first 50."**
 
 <p></p>
 
-**The name is cheap evidence. The image is expensive evidence. Use the cheap evidence first to decide how to spend the expensive kind.** What a filename does NOT tell you is *what the shot shows* — that still requires opening it, and it is still never inferred from the name alone.
+**The index scan is CHEAP and is ALWAYS done WHOLE.** Filenames, timestamps and sizes for the entire folder cost almost nothing, and the time skeleton built from them is what makes everything else tractable. **A partial index scan is never acceptable** — it produces a map with an invisible edge, and the next agent inherits a boundary that came from a budget rather than from the work.
+
+<p></p>
+
+**Images are the expensive resource, and they are spent per CLUSTER, not per file.** A fixed file count is the wrong unit: *cutting at file 50 cuts a working session in half, which destroys the exact thing Pass 1 exists to find.* **Work clusters until the budget is spent, then stop ON A CLUSTER BOUNDARY. Never mid-cluster.**
+
+<p></p>
+
+**Declare capacity BEFORE opening a single image**, in the first reply of the run:
+
+> **Capacity declaration.** `<n>` files in the folder, `<n>` clusters detected from timestamps. Image budget this pass: **`<n>` opens**. That covers clusters `<a>–<b>` (`<n>` files). Remaining `<n>` clusters carry to pass 2 via a handoff task. Proceeding?
+
+<p></p>
+
+**Provisional budget: ~40 image opens per pass. ⚠️ THIS NUMBER IS CALCULATED, NOT MEASURED.** Per the house rule (Breaker Beckett, Source-Size Budget Enforcer J5): *ask whether a number has been MEASURED or only CALCULATED before treating it as real.* **The first live run MUST record what it actually consumed and where it started to degrade, and that measurement replaces this line.** Until then 40 is a guess wearing a decimal point.
+
+<p></p>
+
+**Degradation is a soft signal, not a hard stop.** If descriptions start getting vaguer, or you are pattern-matching filenames instead of looking, **stop at the current cluster boundary and say so out loud.** A pass that admits it thinned out is worth more than one that quietly did.
+
+<p></p>
+
+🚫 **Never silently truncate.** "I did the first 50" without having declared it up front is the failure this gate exists to prevent. The number is announced before the work, not discovered in the report.
+
+---
+
+## ↪️ THE HANDOFF (a real task, not a promise)
+
+A multi-pass job that lives only in chat is a job that gets re-derived from scratch. When a pass ends with clusters remaining:
+
+1. **Open or update a session task** on the 🟢 Agent Activity Board, per its Gold Standard. Name it to the house pattern: `↪️ HANDOFF · <model or "unassigned"> · Screenshot intake pass <N+1> · <date parked>`.
+2. **The full time skeleton travels in the description** — every cluster id, span, file count, and whether it has been worked. **The next pass does NOT recompute it.** Recomputing invites renumbering, and renumbering breaks every reference in the previous map.
+3. **Cluster ids are immutable across passes.** `C07` is `C07` forever.
+4. **Post each pass's CLUSTER MAP as a comment** on that task. The maps accrete; the task is the record.
+5. **Park it at `to do`.** That status means *nobody is driving this yet*, which is exactly true.
+6. **Say what the next pass starts with**, by cluster id, in one line. A handoff that says "continue" is not a handoff.
+
+<p></p>
+
+**Michael triggers pass 2.** It never fires itself.
+
+---
+
+## 🕐 THE TIMESTAMP IS EVIDENCE (MW 2026-08-04)
+
+**v1 said "a filename tells you nothing." That is FALSE and Michael struck it.** `Screenshot 2026-07-13 at 12.04.25 PM.png` tells you exactly when it was captured, which is the spine of the whole routine.
+
+- **Co-capture.** Two shots 40 seconds apart are about the same thing. A relationship visible before opening either.
+- **Working sessions.** A dense run inside one afternoon is a session. The session, not the file, is the unit of meaning.
+- **Boundaries.** A long gap is a topic change. Gaps separate clusters as reliably as content does.
+- **Sequence.** Within a cluster, order tells the story: a before, an attempt, an error, a fix.
+- **Correlation.** A cluster's date range matched against what was actually happening then — task activity, a Decision Log entry, a build session, a production date. **Strongest single project-ID signal, and it costs one date comparison.**
+
+<p></p>
+
+**The name is cheap evidence. The image is expensive evidence. Use the cheap kind to decide how to spend the expensive kind.** What a filename does NOT tell you is *what the shot shows* — still requires opening it, still never inferred from the name.
 
 ---
 
 ## 🔴 THE CULL RULE (MW 2026-08-04)
 
-**Culling is OPT-IN, per run, and Michael opts in. It is never a default, never a tiebreaker, and never volunteered.**
+**Culling is OPT-IN, per run, and Michael opts in. Never a default, never a tiebreaker, never volunteered.**
 
 - A standard pass groups and routes. It does not decide what dies.
-- **HOLD is the default for anything uncertain.** Uncertain means: you cannot tell what it shows, you cannot tell which project it belongs to, or you think it might be redundant. All three resolve to *leave it exactly where it is and say why you were unsure.* Ambiguity is never evidence for removal.
-- **Finding a duplicate is NOT a cull.** Duplicates are *grouped and reported* — that is a finding, and Michael decides what happens to it. Never conflate "these three are the same shot" with "two of these should go."
-- Michael opts in by saying so: `/screenshot-intake --cull`, "flag culls too," "mark the dead ones." **Only then** does the pass propose a cull list, and even then every one is named with a reason and waits for greenlight.
-- Even a greenlit cull is only ever a **rename in place**. Nothing moves. Nothing is deleted. Ever. By anyone but Michael.
-- v1 said "default to CULL on a tie." **Michael struck it within the hour.** Kept struck rather than deleted because the reasoning was seductive and wrong: a tie means the agent does not know, and *an agent that does not know should not be deciding what disappears.*
+- **HOLD is the default for anything uncertain** — cannot tell what it shows, cannot tell which project, might be redundant. All three mean *leave it exactly where it is and say why you were unsure.* Ambiguity is never evidence for removal.
+- **Finding a duplicate is NOT a cull.** Duplicates are grouped and reported; Michael decides. Never conflate "these three are the same" with "two should go."
+- Opt in explicitly: `/screenshot-intake --cull`, "flag culls too." Only then does a cull list exist, and every entry still needs a reason and a greenlight.
+- Even greenlit, a cull is a **rename in place**. Nothing moves. Nothing is deleted. Ever. By anyone but Michael.
+- v1 said "default to CULL on a tie." **Struck within the hour.** Kept struck because the reasoning was seductive and wrong: a tie means the agent does not know, and *an agent that does not know should not be deciding what disappears.*
 
 ---
 
@@ -58,176 +105,164 @@ What the timestamp gives you, for free, across the entire folder at once:
 | **Inbox (drop zone)** | Dropbox `/MAW/zSCREENSHOTS/manual_input` |
 | **Keepers** | Dropbox `/MAW/zSCREENSHOTS/_keep` |
 | **Aged-out keepers** | Dropbox `/MAW/zSCREENSHOTS/_archive` |
-| **Owner resolution** | 🤖 **Agent Index** list — filter by `Lane`. NEVER a hardcoded routing table (see Guardrails). |
+| **Report form** | `hooks/screenshot-intake.report-spec.md` |
+| **Owner resolution** | 🤖 **Agent Index** — filter by `Lane`. NEVER hardcoded here. |
 | **Cluster correlation** | ClickUp task/doc activity + Decision Logs + the Agent Activity Board, matched on the cluster's date range |
-| **Sibling routine** | INBOX Email Intake Triage — Agent Reference (URITP ▸ INBOX) |
-| **Read/write tools** | `dropboxmcp_list_folder` · `dropboxmcp_search` · `dropboxmcp_download_link` · `dropboxmcp_move` (rename = move) |
+| **Handoff / record** | 🟢 Agent Activity Board session task |
+| **Sibling routine** | INBOX Email Intake Triage (URITP ▸ INBOX) |
+| **Tools** | `dropboxmcp_list_folder` · `dropboxmcp_search` · `dropboxmcp_download_link` · `dropboxmcp_move` (rename = move) |
 
 ---
 
-## PASS 1 — CLUSTER (the first pass, and it decides nothing)
+## PASS 1 — CLUSTER (read-only, decides nothing)
 
-**Pass 1 answers ONE question: what belongs with what.** It does not keep, route, cull, rename, or move anything. Its entire output is a map of the folder. Michael's framing, verbatim: *"You aren't necessarily keeping or deleting them, but finding duplicates and lumping them together so that the assignment to other projects is more straightforward."*
+**Pass 1 answers ONE question: what belongs with what.** No keeping, routing, culling, renaming or moving. Michael's framing, verbatim: *"You aren't necessarily keeping or deleting them, but finding duplicates and lumping them together so that the assignment to other projects is more straightforward."*
 
-### 1a — Pull the index, no images yet
+### 1a — Index the WHOLE folder, no images
 
-`list_folder` the inbox, `recursive: false`, paginate to `has_more: false`. You now have every filename, `modified_time`, and size. **This is a real dataset and it is free.** Sort it chronologically and work it before opening a single image.
+`list_folder`, `recursive: false`, paginate to `has_more: false`. Sort chronologically. **This is a real dataset and it is free.**
 
 ### 1b — Separate STRAYS
 
-Anything that is not a screenshot — PDF, zip, tsv, `.crwebloc`, UUID-named file, a real photo — is a routing problem, not a grouping problem. Pull it aside and keep it out of clustering. It still gets reported.
+Not a screenshot (PDF, zip, tsv, `.crwebloc`, UUID-named, a real photo) = a routing problem, not a grouping problem. Set aside, still reported.
 
-### 1c — Build the time skeleton
+### 1c — Build the time skeleton (whole folder)
 
-Walk the sorted list and cut a boundary wherever the gap between consecutive shots is large. Rough, deliberately not a fixed constant:
+Cut a boundary at each large gap:
 
-| Gap to the next shot | Read it as |
+| Gap to next shot | Read as |
 | --- | --- |
 | under ~2 min | **burst** — one action, one screen, one moment |
-| ~2 min to ~2 hrs | same **working session**, still one thread of thought |
-| ~2 hrs to same day | possibly related, possibly a new topic — needs content to decide |
-| next day or later | **different session.** Treat as separate until content says otherwise |
+| ~2 min – ~2 hrs | same **working session** |
+| ~2 hrs – same day | possibly related — needs content to decide |
+| next day or later | **different session** until content says otherwise |
 
-**These are heuristics, not law.** Michael works overnight and across long sessions; a 3-hour gap at 4am is not the same signal as a 3-hour gap on a Tuesday afternoon. **Time proposes the grouping. Content confirms or breaks it.**
+**Heuristics, not law.** Michael works overnight; a 3-hour gap at 4am is not a 3-hour gap on a Tuesday afternoon. **Time proposes; content confirms or breaks.**
 
-### 1d — Open images to confirm the seams, not to catalogue
+### 1d — Declare capacity, then sample
 
-Budget the reads. For each candidate cluster open **the first, the last, and one from the middle** — enough to answer "is this actually one thing?" Only open the rest of a cluster when the samples disagree with each other. This is what makes a 205-file folder tractable inside one pass: you are verifying ~3 images per cluster, not 205.
+Run **THE CAPACITY GATE** now — the skeleton is what makes the declaration honest. Then, per cluster inside budget, open **the first, the last, and one from the middle**. Only open more when the samples disagree. That is what makes 205 files tractable: ~3 opens per cluster, not 205.
 
 <p></p>
 
-Merge two adjacent clusters when the content is obviously continuous across a gap. Split one when the middle sample is plainly a different subject. **Say which clusters you split or merged and why** — that judgement is the most falsifiable thing in the pass.
+Merge adjacent clusters when content is continuous across a gap; split when the middle sample is a different subject. **Say what you split or merged and why** — the most falsifiable judgement in the pass.
 
-### 1e — Name the project
+### 1e — Name the project (ladder, stop at first hit)
 
-For each cluster, identify what it is about. Ladder, stop at the first hit:
+1. **Content** — the images say what they are.
+2. **Date correlation** — match the span against task activity, a Decision Log entry, a build session, a production date. Often decisive alone.
+3. **Adjacency** — an unlabelled cluster wedged minutes between two identified ones is usually the same work.
+4. **UNIDENTIFIED** — a real, acceptable outcome. **Never invent a project to make the map look complete.**
 
-1. **Content** — the images say what they are (a specific app, a light board, a schema, a listing).
-2. **Date correlation** — match the cluster's range against what was actually happening then: task activity, a Decision Log entry, a build session, an Activity Board post, a production date. Often decisive on its own.
-3. **Adjacency** — an unlabelled cluster wedged between two identified ones, minutes apart, is usually the same work.
-4. **UNIDENTIFIED** — a real, acceptable outcome. Say so. Never invent a project to make the map look complete.
+### 1f — Group duplicates (do not judge them)
 
-### 1f — Find duplicates INSIDE and ACROSS clusters
+- **Burst near-dupes** — same screen, seconds apart.
+- **Re-captures** — same subject, different dates. **SIGNAL, not waste:** the thing changed, or it kept coming up. A before/after pair is worth more than either half.
+- **Already-captured** — content already lives in a task, doc, or the repo. Report the pointer. Still not a cull.
 
-Group them, do not judge them. Three kinds, and they are different findings:
+### 1g — Report and STOP
 
-- **Burst near-dupes** — the same screen shot several times in seconds. Usually one keeper's worth of content, but that is Michael's call.
-- **Re-captures** — the same subject shot on different dates. **This is a signal, not waste:** it means the thing changed, or it kept coming up. A before/after pair is worth more than either half.
-- **Already-captured** — the shot's content already lives in a task, doc, or the repo. Report the pointer. **Still not a cull** (see THE CULL RULE).
-
-### 1g — Report the map. STOP.
-
-Pass 1 ends with a **CLUSTER MAP** and nothing else. No renames, no moves, no dispositions, no proposals about anyone's fate. Michael reads the map and says what to do with which clusters.
-
-> **SCREENSHOT CLUSTER MAP**
-> **Scanned:** `<n>` files · `<oldest>` → `<newest>` · **Images opened:** `<n>` of `<n>`
-> **Strays (not screenshots):** `<n>` — listed separately
-> <p></p>
-> **CLUSTER `<n>` · `<project or UNIDENTIFIED>`**
-> `<n>` shots · `<date/time range>` · `<"one 4-minute burst" | "a 3-hour session" | "recurring across 5 weeks">`
-> What it appears to be: `<one line>`
-> Identified by: `content | date correlation → <what it matched> | adjacency | not identified`
-> Duplicates inside: `<n>` — `<burst near-dupes | re-captures on <dates> | already captured on <task/doc + link>>`
-> Likely lane: `<resolved from Agent Index, or "unresolved">`
-> <p></p>
-> **Splits/merges made:** `<what and why, or "none">`
-> **Unresolved:** `<clusters you could not identify and what you'd need to>`
-> Which clusters do you want worked, and how?
+Load `screenshot-intake.report-spec.md` and fill the CLUSTER MAP form verbatim. Post it as a comment on the session task; give Michael the highlights in prose. **No renames, no moves, no dispositions, no proposals about anyone's fate.**
 
 ---
 
 ## PASS 2 — DISPOSITION (only on Michael's instruction, cluster by cluster)
 
-Pass 2 runs **only** on clusters Michael names, and it operates on the **cluster as the unit**, not the file. Buckets:
+Runs **only** on clusters Michael names. The **cluster is the unit**, not the file.
 
 | Bucket | Meaning | Disposition |
 | --- | --- | --- |
-| **KEEP** | Durable reference value (a schema, a rig plot, a rate card, a UI pattern) | → `_keep`, renamed |
-| **ROUTE** | Implies work or a decision (an error state, a quote, a deadline, a bug) | → propose the task/comment on the canonical record FIRST, then `_keep` |
+| **KEEP** | Durable reference (schema, rig plot, rate card, UI pattern) | → `_keep`, renamed |
+| **ROUTE** | Implies work or a decision (error state, quote, deadline, bug) | → propose the task/comment on the canonical record FIRST, then `_keep` |
 | **STRAY** | Not a screenshot | → propose its real home |
-| **HOLD** | Unclear content, unclear project, or possibly redundant | → **stays put**, listed with the reason |
-| **CULL** | *Opt-in only.* Michael asked for cull flagging this run | → renamed in place per the Deletion-Flag Gate; **Michael deletes** |
+| **HOLD** | Unclear content, unclear project, possibly redundant | → **stays put**, with the reason |
+| **CULL** | *Opt-in only* | → renamed in place per the Deletion-Flag Gate; **Michael deletes** |
 
 ---
 
 ## PASS 3 — Resolve the owner (do NOT guess, do NOT hardcode)
 
-Name the domain owner by querying the **Agent Index** `Lane` field at read time. Production ops, FileMaker schema, repo architecture, ClickUp structure, real-estate, course delivery, professional history — each has a live owner and **this file must never state who.** A routing table written here is a fleet fact copied into a neighbouring file: exactly the rot the Known-Drift Register exists to catch (D14).
+Query the **Agent Index** `Lane` field at read time. Production ops, FileMaker schema, repo architecture, ClickUp structure, real-estate, course delivery, professional history — each has a live owner and **this file must never state who.** A routing table written here is a fleet fact copied into a neighbouring file: exactly the rot the Known-Drift Register catches (D14).
 
-If no lane matches, it is a HOLD, not a cull. An unowned cluster is a real finding.
+No lane match = HOLD, not cull. An unowned cluster is a real finding.
 
 ---
 
-## PASS 4 — Rename on promotion (MANDATORY for anything entering `_keep`)
+## PASS 4 — Rename on promotion (MANDATORY into `_keep`)
 
 ```
 YYYY-MM-DD · <project/lane> · <what it actually shows> [· NN of NN].png
 ```
 
-**Preserve the capture date from the ORIGINAL filename**, never today's. **Preserve cluster order** with the trailing `NN of NN` when a sequence tells a story (before → attempt → error → fix); a sequence renamed out of order is a destroyed sequence. Never invent content that is not visibly in the image.
+**Capture date from the ORIGINAL filename**, never today's. **Preserve cluster order** with `NN of NN` when a sequence tells a story; a sequence renamed out of order is a destroyed sequence. Never invent content not visibly in the image.
 
 ---
 
-## PASS 5 — Cull flagging (SKIP ENTIRELY unless Michael opted in this run)
+## PASS 5 — Cull flagging (SKIP unless Michael opted in this run)
 
-Deletion-Flag Gate verbatim: rename to `🔴 DELETE ME — <what it was> (<why>)`. The file stays where it is, so one name-sort surfaces the block for a single sweep. **The agent renames. Michael deletes. Always.**
+Deletion-Flag Gate verbatim: `🔴 DELETE ME — <what it was> (<why>)`, renamed in place so one name-sort surfaces the block. **Agent renames. Michael deletes. Always.**
 
 ---
 
 ## PASS 6 — Plan Comment + MANDATORY GREENLIGHT
 
-Inherited from the sibling routine, non-negotiable, and **separate from the Pass 1 map** (the map is a finding; this is a proposal to change bytes). Post it, then **stop**:
+Separate from the Pass 1 map (that is a finding; this proposes changing bytes). Post it, then **stop**:
 
 > **SCREENSHOT INTAKE PLAN**
-> **Clusters being worked:** `<which, per Michael's instruction>`
+> **Clusters being worked:** `<per Michael's instruction>`
 > **Cull flagging:** `OFF (default)` | `ON (requested)`
 > **→ KEEP:** `<count>` — each with proposed new name + resolved owner
 > **→ ROUTE:** `<count>` — each with the exact destination task/doc, full title + link
 > **→ STRAY:** `<count>` — each with its proposed real home
-> **→ HOLD:** `<count>` — each with the reason it is unresolved
+> **→ HOLD:** `<count>` — each with the reason
 > **→ 🔴 CULL:** `<count or "not requested">` — each with the reason
 > **Watch-outs:** DRIFT / DUPES / PATTERNS — `<or "none">`
 > Greenlight to execute?
 
-**Name every destination explicitly — full title AND link.** Never "the production task." A wrong-destination mishap gets caught in the plan or not at all.
+**Name every destination explicitly — full title AND link.** Never "the production task."
 
 ---
 
 ## PASS 7 — On greenlight, execute
 
-RELOAD this file that turn (the greenlight message is not the procedure), then run Passes 3–5 in order. Batch renames into one `dropboxmcp_move` call where possible. Report what moved, what was renamed, what was left on HOLD, and what was already handled.
+RELOAD this file that turn (the greenlight message is not the procedure), then run Passes 3–5 in order. Batch renames into one `dropboxmcp_move` call where possible. Report what moved, what was renamed, what stayed on HOLD, and update the handoff task.
 
 ---
 
 ## Guardrails
 
-- 🚫 **NEVER delete a file.** Not one, not ever, not on request. Flag and hand it to Michael.
-- 🚫 **NEVER propose a cull unasked.** Uncertainty resolves to HOLD, always. A duplicate is a finding, not a verdict.
-- 🚫 **NEVER let Pass 1 change a byte.** Clustering is a read-only mapping exercise. If a rename happens during Pass 1, the pass was run wrong.
-- 🚫 **NEVER create a shared link on these folders.** `create_shared_link` converts a plain folder into a shared-folder mount and changes its namespace path. Serve `dropbox.com/home/<path>` navigation URLs instead.
+- 🚫 **NEVER delete a file.** Not one, not ever, not on request.
+- 🚫 **NEVER propose a cull unasked.** Uncertainty → HOLD. A duplicate is a finding, not a verdict.
+- 🚫 **NEVER let Pass 1 change a byte.** A rename during Pass 1 means the pass ran wrong.
+- 🚫 **NEVER truncate silently.** Declare capacity before working; stop on a cluster boundary.
+- 🚫 **NEVER partial-scan the index.** Cheap, and a partial map has an invisible edge.
+- 🚫 **NEVER renumber clusters across passes.**
+- 🚫 **NEVER create a shared link on these folders.** `create_shared_link` converts a folder to a mount and changes its namespace path. Use `dropbox.com/home/<path>` navigation URLs.
 - 🚫 **NEVER add topic subfolders.** Clusters are a REPORTING structure, not a filing structure. Three folders is the design.
-- 🚫 **NEVER hardcode the fleet routing table into this file.** Resolve at read time.
-- ⚠️ **Never assert what a screenshot shows without having opened it.** The timestamp tells you when and what-with; only the image tells you what.
-- ⚠️ **Never break a sequence.** Cluster order carries meaning; preserve it in the rename.
-- ⚠️ **Volatile content inside a shot is still volatile.** Hours, prices, availability, staffing go through the Source Freshness Gate — and a screenshot Michael took is often the FRESHEST source, outranking what you already committed to.
-- ⚠️ **PII/credentials.** Screenshots catch inboxes, DMs, student data, and logins by accident. Anything with a credential or identifiable student data never leaves Dropbox into the repo, a public channel, or a shipped artifact.
-- The inbox is allowed to be messy. That is its job. Do not tidy it unasked.
+- 🚫 **NEVER hardcode the fleet routing table here.**
+- ⚠️ **Never assert what a shot shows without opening it.** The timestamp says when and what-with; only the image says what.
+- ⚠️ **Never break a sequence.** Cluster order carries meaning.
+- ⚠️ **Volatile content is still volatile.** Hours, prices, availability, staffing go through the Source Freshness Gate — and a screenshot Michael took is often the FRESHEST source, outranking what you already committed to.
+- ⚠️ **PII/credentials.** Screenshots catch inboxes, DMs, student data and logins by accident. Nothing with a credential or identifiable student data leaves Dropbox into the repo, a public channel, or a shipped artifact.
+- The inbox is allowed to be messy. That is its job.
 
 ---
 
 ## Composes with
 
-- **INBOX Email Intake Triage** — the sibling. Same skeleton, different input. Divergences are deliberate: a clustering pass ahead of disposition, no transcription step, no MOVE/COMBINE binary, no closing, culls opt-in.
-- **Attachment Router** — fires when a shot is pasted into chat. This hook is the FOLDER-scale counterpart; the Router handles one file in flight.
-- **Deletion-Flag Gate** — owns the cull rename format. Pass 5 is a pointer, not a copy.
-- **Task Dedup Gate / Doc Dedup & Placement Gate** — fire before anything routed becomes a new task or page.
-- **Source Freshness Gate** — fires on any volatile fact read off an image.
-- **Secrets / PII Guard** — fires before any shot's content crosses into the repo.
+- **`screenshot-intake.report-spec.md`** — the report form. Load before reporting.
+- **INBOX Email Intake Triage** — the sibling. Deliberate divergences: a clustering pass ahead of disposition, no transcription step, no MOVE/COMBINE binary, no closing, culls opt-in.
+- **Agent Activity Board — Gold Standard** — owns the session/handoff task shape. This hook points, never copies.
+- **Attachment Router** — one file in flight; this is the folder-scale counterpart.
+- **Deletion-Flag Gate** — owns the cull rename format.
+- **Task Dedup Gate / Doc Dedup & Placement Gate** — fire before anything routed becomes a task or page.
+- **Source Freshness Gate** · **Secrets / PII Guard** — as noted in Guardrails.
 
 ---
 
 ## Changelog
 
-- **v3 (2026-08-04)** — **The first pass is now CLUSTERING, and the timestamp is evidence.** Michael: *"Saying that the filename gives us nothing is false; it tells us exactly when the screenshot was taken, which is critical for storytelling."* Struck that line, added THE TIMESTAMP IS EVIDENCE, and restructured the routine into Pass 1 (read-only cluster map: time skeleton → sampled confirmation → project identification → duplicate grouping → STOP) ahead of any disposition. Duplicates are now explicitly a FINDING, never a cull trigger. Renames preserve cluster sequence. Michael picks which clusters get worked; the file is no longer the unit, the session is.
-- **v2 (2026-08-04)** — **Culling demoted to opt-in.** Michael, one hour after v1: *"I also don't want you automatically culling things!"* Struck "default to CULL on a tie," added the HOLD bucket for all uncertainty, added THE CULL RULE at the top. Named **Fleet Felix** steward of the file (execution stays ownerless) and stated the steward does not vary by space or content type.
-- **v1 (2026-08-04)** — Established by Fleet Felix at Michael's direction ("sibling of INBOX triage, write it"). Built against a real 205-file backlog.
+- **v4 (2026-08-04)** — **Capacity gate + real handoff + report spec split out.** Michael: *"Is 200 screenshots too many to assume one path can look at?... how do we build that soft gate and true handoff?"* Answer written in: the index scan is always WHOLE (cheap, and a partial map has an invisible edge), images are budgeted, and a pass stops **on a cluster boundary, never at a file count** — cutting at file 50 halves a working session, destroying what Pass 1 exists to find. Capacity is DECLARED before any image opens. Provisional budget ~40 opens, **explicitly labelled CALCULATED not MEASURED**, with the first live run required to replace it. Handoff is a real Activity Board task carrying the immutable skeleton, not a promise in chat. Report form moved to `screenshot-intake.report-spec.md` so a cold agent copies a form instead of inventing one, and so this file stays under the measured ~22KB read-whole ceiling.
+- **v3 (2026-08-04)** — **First pass is CLUSTERING; the timestamp is evidence.** Michael: *"Saying that the filename gives us nothing is false."* Struck it, added THE TIMESTAMP IS EVIDENCE, restructured into a read-only cluster map ahead of any disposition. Duplicates are a FINDING, never a cull trigger. Renames preserve sequence.
+- **v2 (2026-08-04)** — **Culling demoted to opt-in.** Michael: *"I also don't want you automatically culling things!"* Struck "default to CULL on a tie," added the HOLD bucket, added THE CULL RULE. Named Fleet Felix steward; execution stays ownerless.
+- **v1 (2026-08-04)** — Established by Fleet Felix at Michael's direction. Built against a real 205-file backlog.
