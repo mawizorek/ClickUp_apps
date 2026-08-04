@@ -2,7 +2,7 @@
 
 > **Scope, ruled by Michael 2026-07-30:** patterns I have found, core preferences, and the durable URITP knowledge that makes me useful. Things that change how I ACT tomorrow.
 > 🚫 **NOT project state.** Which spaces are walked, Index counts, what's parked, what I owe him, what resumes next → **`activity-log.md`.** That file is where I see my ongoing projects; this one is how I work.
-> **Why:** this file carried *"Spaces 1, 2 AND 3 PASS-1 COMPLETE… 59 rows"* for three days after Spaces 4 and 5 closed at 154 — **directly under a ⚠️ warning telling the reader that a stale count was stale.** The warning got maintained; the fact under it didn't. **Project state rots in hours; patterns don't rot at all.** I had already learned the smaller version of this on 07-26 (*per-list detail belongs in the thread, not here*) — this is the same lesson one layer up.
+> **Why:** this file carried *"Spaces 1, 2 AND 3 PASS-1 COMPLETE… 59 rows"* for three days after Spaces 4 and 5 closed at 154 — **directly under a ⚠️ warning telling the reader that a stale count was stale.** The warning got maintained; the fact under it didn't. **Project state rots in hours; patterns don't rot at all.** I had already learned the smaller version of this on 07-26 (*per-list detail belongs in the thread, not my memory*) — this is the same lesson one layer up.
 > **always memory. never process.** No how-to (those are TOOLS — point, don't store). Placement law: `_shared/super-agent-base.md` §4. **~10KB hot**, warm archives in `memory/archive/`.
 
 ## How Michael works (standing context)
@@ -33,6 +33,30 @@ The workspace has **22+ spaces**; **mine are the seven URITP-prefixed ones.** Th
 - **A cancelled show leaves residue in its replacement's folder** (Kayfabe → KALI). **An unexplained suffix is a lineage clue, not sloppiness.**
 - **Multi-homing is the house pattern** for cross-departmental sharing (zero copies). ⚠️ Not a substitute for a field when an object has multiple *aspects*.
 - Deep detail lives in `memory/archive/`: `uritp-crm-space2.md`, `uritp-productions-space3.md`.
+
+## Org chart, team composition & budget (confirmed 2026-08-04)
+
+**Michael's direct reports (operational authority, daily work direction):**
+- Charlie Lawler — Technical Director (scene shop, scenic construction, student build crew)
+- Mary Reiser — Props Supervisor (sourcing, fabrication, student props crew, warehouse)
+- Casey McNamara — Company Manager / Production Coordinator
+- Katie — Costume Shop Manager/Supervisor
+
+**Michael's peers (coordinates with, does not supervise):**
+- Sara Penner — Acting & Intimacy Coach (faculty-adjacent, reports to Nigel directly)
+- Chris Schneider — SPAC facility staff (employed by the building, not the program)
+
+**Michael's superior:** Nigel Maister — Artistic Director / Faculty.
+
+**Team scale:** ~9 professional staff · 19-person production leadership team · rotating student crew (25–40 unique positions/year). Standing weekly production meetings coordinate all active shows.
+
+**10 craft disciplines under Michael's coordination:** Electrics, Rigging, TD, Safety, Audio, Video, Props, Costumes, SM, Company Management.
+
+**Budget:** ~$50K/production for materials + student labor (excludes full-time staff and designer fees; includes housing/accommodation). 4–5 shows/year = **$200–250K annual production spend.**
+
+**7 management domains:** production, people, shows, programs/facility, inventory, education, budget. Dual-track: workforce outcomes + educational outcomes simultaneously.
+
+**Role framing:** Title "Production Manager" undersells actual operational scope. Real scope ≈ Director of Production / Associate Managing Director (Production). Full back-of-house institutional operation.
 
 ## 🌟 MY TWO THESES (both upgraded from guesses to readings)
 
