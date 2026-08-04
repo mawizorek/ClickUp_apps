@@ -11,13 +11,41 @@
 |---------|--------|---------------|
 | Onboarding (source discovery) | complete | 2026-08-02 |
 | Ledger A population | complete (83 credits, 9 positions already in lists) | 2026-08-02 |
-| Ledger B calibration | partial (framing patterns confirmed; credentials/certs still have gaps) | 2026-08-02 |
-| Ledger C accumulation | started (3 integration patterns earned) | 2026-08-02 |
+| Ledger B calibration | **complete** (all 4 gaps closed 2026-08-04: budget, direct reports, CAD, certs) | 2026-08-04 |
+| Ledger C accumulation | growing (4 integration patterns earned) | 2026-08-04 |
 | Corso handoff pattern | initiated (first cross-agent intro on Career Strategy task) | 2026-08-02 |
+| The Public Theater portfolio prep | active (role scope framed, cert targets identified, team structure confirmed) | 2026-08-04 |
 
 ---
 
 ## Sessions
+
+### 2026-08-04 · Gap-Closure Session (2:44–3:17 AM ET)
+
+**Surface:** Job Market Research standing task (86ajtgbt3), comment thread 90130300741448+
+
+**What happened:**
+- Paige ran a synthesis of all open gaps from the bench's earlier pass.
+- 4 gaps closed in one thread:
+  1. **Budget:** ~$50K/production × 4–5 shows = $200–250K/yr (materials + student labor, not staff/designers, includes housing/accommodation).
+  2. **Direct reports vs. peers:** Charlie (TD), Mary (Props), Casey (Company Mgr), Katie (Costumes) = direct reports. Sara (Acting Coach), Chris (Facility) = peers. Nigel = superior. Confirmed with zero corrections to bench guess.
+  3. **CAD proficiency:** ASSET. Professional Vectorworks drafter (external contract + U of R productions). Not aspirational.
+  4. **OSHA 30:** Not earned. Target identified: OSHA 30-Hour General Industry (supervisor-level). Also surfaced tier system (10/30/500-level) and General vs. Construction flavor question.
+- **Certification targets identified:** Vectorworks Spotlight Professional Certification (entertainment-specific, on-demand, EDU40 code = 40% off) + OSHA 30-Hour General Industry.
+- **Key reframing confirmed:** Title "Production Manager" undersells scope. Actual operational scope ≈ Director of Production / Associate Managing Director (Production). This is Corso's market-positioning signal.
+- **Doc-tree portfolio flex noted:** Clean VWX documentation structures are a portfolio differentiator (systems thinking, not just drafting).
+- Milo provided the workspace knowledge that made the org-chart guess land correctly.
+
+**Corrections absorbed:**
+1. None. This session was pure gap-closure with zero corrections needed.
+
+**Memory updated:**
+- Ledger A: added org chart + budget source rows (pointing at Milo's memory as SOT).
+- Ledger B: 4 new rows (role scope, CAD, team structure, certifications). Credentials row updated.
+- Ledger C: 1 new pattern (gap-closure via bench).
+- Lane relationships: Milo note updated (he now holds confirmed org chart + budget).
+
+---
 
 ### 2026-08-02 · Onboarding (6:20 PM - 9:51 PM ET)
 
