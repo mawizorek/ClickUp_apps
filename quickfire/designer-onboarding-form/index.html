@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URITP Designer Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: oklch(98% 0.005 270);
+  --surface: oklch(100% 0.003 270);
+  --border: oklch(88% 0.01 270);
+  --border-focus: oklch(55% 0.18 270);
+  --text-primary: oklch(18% 0.01 270);
+  --text-secondary: oklch(45% 0.015 270);
+  --text-muted: oklch(60% 0.01 270);
+  --accent: oklch(55% 0.18 270);
+  --accent-light: oklch(95% 0.04 270);
+  --error: oklch(55% 0.2 25);
+  --radius: 8px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg);
+  padding: var(--space-lg);
+  font-optical-sizing: auto;
+}
+
+.form-wrapper {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.form-header {
+  margin-bottom: var(--space-2xl);
+}
+
+.form-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-sm);
+  color: var(--text-primary);
+}
+
+.form-header p {
+  color: var(--text-secondary);
+  max-width: 55ch;
+}
+
+.form-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--accent-light);
+  color: var(--accent);
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-bottom: var(--space-md);
+}
+
+.form-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+}
+
+.form-section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+}
+
+.field-group {
+  margin-bottom: var(--space-lg);
+}
+
+.field-group:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+label .required {
+  color: var(--error);
+  margin-left: 2px;
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: border-color 150ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px oklch(55% 0.18 270 / 0.12);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.checkbox-item span {
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.radio-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.25, 1, 0.5, 1);
+  user-select: none;
+}
+
+.radio-pill:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.radio-pill input[type="radio"] {
+  display: none;
+}
+
+.radio-pill.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.submit-area {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}
+
+.btn-submit {
+  padding: 12px 32px;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: oklch(100% 0 0);
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn-submit:hover {
+  background: oklch(48% 0.2 270);
+  transform: translateY(-1px);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+.submit-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 600px) {
+  .field-row { grid-template-columns: 1fr; }
+  body { padding: var(--space-md); }
+  .form-section { padding: var(--space-lg); }
+}
+</style>
+</head>
+<body>
+
+<div class="form-wrapper">
+  <div class="form-header">
+    <div class="form-badge">URITP Production</div>
+    <h1>Designer Onboarding</h1>
+    <p>Welcome to the team. Fill this out in your first week so we can get you set up with access, meetings, and contacts. Takes about 3 minutes.</p>
+  </div>
+
+  <!-- Section 1: Identity -->
+  <div class="form-section">
+    <div class="form-section-title">You</div>
+
+    <div class="field-group">
+      <label>Full Name <span class="required">*</span></label>
+      <input type="text" placeholder="Frank Oliva">
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Production <span class="required">*</span></label>
+        <select>
+          <option value="" disabled selected>Select production</option>
+          <option>Big Love (F26)</option>
+          <option>T.I.M.E. Reading (F26)</option>
+          <option>The Secretary (S27)</option>
+          <option>One Acts (F26)</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label>Your Role <span class="required">*</span></label>
+        <select>
+          <option value="" disabled selected>Select role</option>
+          <option>Scenic Designer</option>
+          <option>Costume Designer</option>
+          <option>Lighting Designer</option>
+          <option>Sound Designer</option>
+          <option>Video Designer</option>
+          <option>Director</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Contact -->
+  <div class="form-section">
+    <div class="form-section-title">Contact Info</div>
+
+    <div class="field-group">
+      <label>Email for Dropbox Access <span class="required">*</span></label>
+      <div class="field-hint">We'll share the production folder to this address</div>
+      <input type="email" placeholder="frankjoliva@icloud.com">
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Phone <span class="required">*</span></label>
+        <input type="tel" placeholder="(555) 123-4567">
+      </div>
+
+      <div class="field-group">
+        <label>Preferred Pronouns</label>
+        <input type="text" placeholder="he/him, she/her, they/them, etc.">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Mailing Address</label>
+      <div class="field-hint">For contracts and reimbursements, if applicable</div>
+      <textarea placeholder="Street, City, State, ZIP"></textarea>
+    </div>
+  </div>
+
+  <!-- Section 3: Availability -->
+  <div class="form-section">
+    <div class="form-section-title">Meeting Availability</div>
+
+    <div class="field-group">
+      <label>Which of these weekly windows work for production meetings? <span class="required">*</span></label>
+      <div class="field-hint">Check all that apply. We run weekly full-team meetings from ~4 weeks pre-tech through closing.</div>
+      <div class="checkbox-group">
+        <label class="checkbox-item">
+          <input type="checkbox">
+          <span>Wednesday (any time)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" checked>
+          <span>Thursday after 11:30a</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox">
+          <span>Friday 10:00a - 11:00a</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Preferred day</label>
+      <div class="radio-group">
+        <label class="radio-pill">
+          <input type="radio" name="pref-day" value="wed">
+          Wednesday
+        </label>
+        <label class="radio-pill selected">
+          <input type="radio" name="pref-day" value="thu" checked>
+          Thursday
+        </label>
+        <label class="radio-pill">
+          <input type="radio" name="pref-day" value="fri">
+          Friday
+        </label>
+        <label class="radio-pill">
+          <input type="radio" name="pref-day" value="none">
+          No preference
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Logistics -->
+  <div class="form-section">
+    <div class="form-section-title">Logistics</div>
+
+    <div class="field-group">
+      <label>Do you need housing or travel support? <span class="required">*</span></label>
+      <select>
+        <option value="" disabled selected>Select</option>
+        <option>Yes, I need housing</option>
+        <option>Yes, I need travel reimbursement</option>
+        <option>Yes, both housing and travel</option>
+        <option>No, already arranged</option>
+        <option>N/A (local)</option>
+      </select>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>Arrival Date</label>
+        <input type="text" placeholder="MM/DD/YYYY">
+      </div>
+      <div class="field-group">
+        <label>Departure Date</label>
+        <input type="text" placeholder="MM/DD/YYYY">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>Anything else we should know?</label>
+      <div class="field-hint">Dietary needs, access requirements, scheduling constraints, preferred workspace setup</div>
+      <textarea placeholder=""></textarea>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <button class="btn-submit">Submit</button>
+    <span class="submit-note">Creates your record on the production contact sheet</span>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.radio-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const group = pill.closest('.radio-group');
+    group.querySelectorAll('.radio-pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    pill.querySelector('input').checked = true;
+  });
+});
+</script>
+</body>
+</html>
