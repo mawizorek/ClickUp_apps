@@ -30,6 +30,57 @@ We had never opened the pages.
 
 ---
 
+## 🦺 THE SAFETY SWEEP (added 2026-08-04, by Michael's ruling)
+
+**The safety keywords are NOT dead. We were looking in the wrong place.**
+
+For several passes, `safety coordinator` · `safety manager` · `health and safety officer` ·
+`production safety` · `risk manager performing arts` returned **zero across every board**, and a
+proposal was made to cut them from the config as dead weight. **Michael overruled it:**
+*"are we no longer doing a safety sweep for roles in safety management? It is a very niche thing,
+but that is kind of the point!"*
+
+He is right, and the diagnosis was wrong. **Live event safety is a real, growing discipline with real
+salaried seats — they simply do not post on theatre job boards.** A five-minute check turned up an
+Ocean Center *Event Safety Coordinator* (municipal jobs portal), a Fever *Safety Coordinator* in
+Chicago (corporate careers site), an S.A.F.E. Management *Security & Event Coordinator* (TeamWork
+Online), and a Scottish Event Campus *Event Safety Advisor*. **Not one of those would ever appear on
+Playbill, BroadwayWorld or OffStageJobs.**
+
+> ⚠️ **The generalizable lesson, and it is the second time in one day: a lane returning zero is a
+> statement about our SOURCES, not about the world.** The Department-Index Law above is the same
+> mistake in a different costume. **Before proposing that a keyword be cut, prove the keyword was
+> pointed somewhere it could possibly have succeeded.**
+
+**Where safety roles actually live — sweep these for the safety keywords specifically:**
+
+- [**TeamWork Online**](https://www.teamworkonline.com) `TWO` — arenas, stadiums, venue operators.
+  The single highest-yield source for venue safety, security and event-operations roles. Filter to
+  Arenas & Facilities.
+- [**GovernmentJobs / NEOGOV**](https://www.governmentjobs.com) `GOV` — municipally-owned convention
+  centers, civic auditoriums and PACs. Already the source for the Little Rock PM row. Search the
+  safety keywords plus a venue term.
+- [**Event Safety Alliance**](https://eventsafetyalliance.org) `ESA` — the industry's trade
+  association for live event safety. ⚠️ **It has NO job board** (verified 2026-08-04; `/opportunities`
+  is training, not hiring). Value is as a NAMING source: it tells you what these roles are actually
+  called, which is how you fix keywords. Its own openings post to third-party association boards.
+- **Venue-operator careers pages direct** — ASM Global, Oak View Group, Live Nation, AEG. Large
+  operators staff safety centrally and post in-house.
+- [**Indeed**](https://www.indeed.com) `IND` — normally low-yield here, but for safety it is better
+  than the theatre boards. Pair a safety keyword with `venue`, `arena`, `theater` or `live events`.
+
+**Calibration:** expect **0-3 qualifying safety seats per pass**, and expect many passes to return
+none. **That is a correct result, not a failed sweep.** Report it as swept-and-empty, never omit it —
+an unreported niche looks identical to an abandoned one. The value here is asymmetric: one genuine
+live-event safety seat is worth more to Michael than another Production Manager row, because almost
+nobody is qualified for both sides of it.
+
+**Boundary:** this is SAFETY MANAGEMENT (planning, compliance, crowd management, risk), not security
+guarding. A door-staff or event-security-officer posting is not a match; a role that owns safety
+planning, risk assessment or life-safety compliance for a venue or event is.
+
+---
+
 ## Sources
 
 **Tier 1 (MANDATORY every pass, no exceptions):**
@@ -45,6 +96,8 @@ We had never opened the pages.
 - **StageLync** (`stagelync.com`) `SL` — weekly. Check Production Manager, Stage Management, Technical, Administration separately.
 - **USITT Job Board** `USITT` — all relevant categories.
 - **StageBoard** (`stageboard.app`) `SB` — aggregator, 785+ employers / 39 countries, role-taxonomy search.
+- **TeamWork Online** (`teamworkonline.com`) `TWO` — **required for the OPS lane only.** Venue and arena
+  operations, safety and security. Added 2026-08-04; see the Safety Sweep above.
 
 **Tier 2 (hit at least 4 per pass, rotate through all over multiple passes):**
 
@@ -55,11 +108,13 @@ We had never opened the pages.
 - **APAP Job Bank** `APAP` — performing arts admin and production.
 - **HireCulture** (`hireculture.org`) `HC` — New England arts.
 - **The Stage Jobs** (`jobs.thestage.co.uk`) `TSJ` — UK-heavy, strong backstage/technical. Now the top of the ME lane by pay.
+- **GovernmentJobs / NEOGOV** (`governmentjobs.com`) `GOV` — municipal venues, civic centers, PACs.
 - **StageJobsy** (`stagejobsy.com`) `SJ` · **TheatreArtLife** `TAL` · **EntertainmentCareers.net** `ECN` (paywalled, search results visible)
 - **ARTSEARCH** `AS` — gated (TCG); try `site:artsearch.tcg.org`.
 - **Indeed** (filtered) `IND` · **LinkedIn Jobs** (industry-filtered) `LI` — low yield, one targeted sweep each.
 
-**Tier 3 (monthly, opportunistic):** freelance/remote boards · regional theatre associations · AEA postings · IATSE local boards · SearchWide Global / MCA.
+**Tier 3 (monthly, opportunistic):** venue-operator careers pages (ASM Global, Oak View Group, Live Nation, AEG) ·
+freelance/remote boards · regional theatre associations · AEA postings · IATSE local boards · SearchWide Global / MCA.
 
 ---
 
@@ -74,9 +129,14 @@ We had never opened the pages.
 - **StageLync (`SL`):** clean category browsing, good direct URLs, updated weekly.
 - **StageBoard (`SB`):** normalizes 200+ job titles; filter by Production Management, Technical Direction,
   Stage Management, Lighting/Electrics. May want sign-in for detail; listings browsable.
+- **TeamWork Online (`TWO`):** venue/arena/sports-facility jobs. Browse Arenas & Facilities, and the
+  Event Operations / Security categories. Many postings come from operator groups rather than the venue itself.
+- **GovernmentJobs (`GOV`):** municipal postings are verbose and slow to load but carry exact salary bands
+  and hard closing dates — capture the closing date, it is usually a real deadline.
 - **EntertainmentCareers.net (`ECN`):** paywalled; URLs capturable from search results.
 - **ARTSEARCH (`AS`):** gated behind TCG membership; sometimes surfaces via cache/aggregators.
-- **Indeed (`IND`):** theatre terms drown in manufacturing/logistics. Low yield, one targeted sweep max.
+- **Indeed (`IND`):** theatre terms drown in manufacturing/logistics. Low yield, one targeted sweep max —
+  except for the safety keywords, where it beats the theatre boards.
 - **APAP (`APAP`):** listings often lack posted dates. If no date, use `first_seen` for both and log the fact in NOTABLE.
 - **League of Chicago Theatres (`LCTJ`):** clean URLs, Chicago-focused, good for ME and SM.
 - **The Stage Jobs (`TSJ`):** filter to Backstage & Technical, Management. ⚠️ Many listings carry NO post date —
@@ -98,7 +158,7 @@ baseline. The floor in the runbook (40) is a failure tripwire, not a target.
 > shallow pass wearing a passing grade. Judge depth by SOURCES coverage, not by the total.
 
 Approximate yield by lane (post-08-04 baseline): PM 25-35 · TD 12-18 · SM 18-25 · ME 10-15 · AUD 10-15 ·
-OPS 4-8 · DFT 2-6 · ADM 8-12.
+OPS 4-8 (of which 0-3 safety) · DFT 2-6 · ADM 8-12.
 
 Approximate yield by source when swept properly: OffStageJobs 15-25 · Playbill + BWW 10-18 · StageLync 3-8 ·
 StageBoard 5-10 · retained search (ACG + TOC) 2-5 · regional boards combined 3-8.
@@ -122,12 +182,12 @@ StageBoard 5-10 · retained search (ACG + TOC) 2-5 · regional boards combined 3
 - **ME lane's top of market is now the UK.** Both £-denominated listings out-earn every US electrics posting tracked.
 - **AUD lane is NOT touring-only.** That read came from looking at Playbill alone. Half the lane is resident
   staff at $45-76k, all of it found through the OSJ Sound department.
-- **OPS lane's real name is "venue management," not "safety."** Six of eleven configured keywords
-  (safety coordinator, safety manager, health and safety officer, production safety, risk manager performing
-  arts) have returned **zero across every board, every pass**. US theatres fold safety into PM/TD/ops
-  descriptions. Flagged for a config decision; do not keep re-discovering it.
+- **OPS lane is TWO markets in one config entry.** Venue management (house/ops/facilities) posts on the theatre
+  boards and produces most of the rows. Safety management posts on venue/arena/municipal boards and produces
+  0-3. **Sweep both halves; do not let the first half's volume disguise a skipped second half.**
 - **DFT lane is two organizations.** Every row on 08-04 came from Riverside Theatre and New London Barn.
-  That is not a market, it is two theatres staffing a season. Treat the count with suspicion.
+  That is not a market, it is two theatres staffing a season. Treat the count with suspicion — but the lane
+  stays swept in full (Michael, 2026-08-04).
 
 ### Org/venue data
 
@@ -139,8 +199,13 @@ integration potential: a venue list that feeds constraints back into the search 
 - Cross-posted listings between PB and BWW are common. Two rows, same org. Not duplicates.
 - If a listing URL goes dead between passes, mark GONE. Don't hunt it elsewhere.
 - Never add a row without a working URL. NOTABLE exists for unlinked sightings.
+- **A listing with a URL but no post date is still a row.** Use `first_seen` for both fields and say so in
+  NOTABLE (the APAP precedent). Missing DATE is not missing PROOF; missing URL is.
 - **Keyword exhaustion:** don't stop at the first keyword that returns results. Try ALL keywords in the role
   config against each board — different boards index differently, and "Production Manager" and "Director of
   Production" often live in different categories on the same board.
 - **A gated or thin board is a NOTABLE entry explaining the access issue**, never a reason to accept low yield
   across the whole pass. Log what was attempted.
+- 🚫 **Never propose cutting a keyword because it returned nothing.** First prove it was pointed at a source
+  where it could have succeeded. Both times that proposal has been made, the keyword was fine and the source
+  list was wrong.
