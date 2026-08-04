@@ -32,7 +32,22 @@ The workspace has **22+ spaces**; **mine are the seven URITP-prefixed ones.** Th
 - **A production is a time-boxed organization stood up whole and torn down**, and a finished folder **converts to an archive in place**. **The irreducible core is THREE lists** — hub + EVENTS + DESIGN; everything else is elective. **The growth order:** hub+calendar → rehearsals → paperwork → design → **strike/risk last.** By volume a production folder is **a calendar with an office attached.**
 - **A cancelled show leaves residue in its replacement's folder** (Kayfabe → KALI). **An unexplained suffix is a lineage clue, not sloppiness.**
 - **Multi-homing is the house pattern** for cross-departmental sharing (zero copies). ⚠️ Not a substitute for a field when an object has multiple *aspects*.
+- 🌟 **TEMPLATE ≠ PRODUCTION (confirmed 2026-08-04).** `Show Design (P0)` = the template. `Show Design (BL)` = Big Love's instantiated production workspace. Template tasks define SHAPE; production tasks hold WORK. **Never route active correspondence, real deadlines, or person-specific data to a `(P0)` task.** If a production's version doesn't exist, CREATE it in the production folder. See `_shared/template-production-guardrail.md` for the full rule. ⚠️ **The ADULTS list (CRM) contains CLOSED tasks — mark that in your passive trail so you navigate correctly to live Person records.**
 - Deep detail lives in `memory/archive/`: `uritp-crm-space2.md`, `uritp-productions-space3.md`.
+
+## 🌟 Production task archetypes (confirmed 2026-08-04)
+
+Four distinct task types for any design deliverable. Each has ONE job:
+
+1. **Season Planning / Onboarding** — finite checklist (share Dropbox, get contact, confirm dates). Closes when steps done. NOT an ongoing coordination home.
+2. **Production Cal milestone** — calendar-facing date anchor (type: milestone, in Production Cal list). Marks WHEN. Gets status notes about whether the deadline will be met.
+3. **Show Design work task** — the artifact/deliverable home (in Show Design list, typed PAPERWORK when it's a submission). Tracks WHAT. Gets the email threads, coordination, and file references. **This is where merged inbox items land.**
+4. **CRM Person task** — canonical human record (type: Person, in ADULTS). Holds WHO + contact info + availability fields. Gets recurring availability updates, NOT per-event scheduling.
+
+**Relationship web (standard wiring):**
+- Work task **blocks** → milestone (can't close the deadline until work is done)
+- Work task **linked** → onboarding task (related context, neither gates the other)
+- Work task **linked** → Person task (who is doing the work)
 
 ## Org chart, team composition & budget (confirmed 2026-08-04)
 
@@ -74,6 +89,7 @@ The workspace has **22+ spaces**; **mine are the seven URITP-prefixed ones.** Th
 - **Every aggregate view is a projection with a blind spot. A count of 1 is more dangerous than a count of 0.** An archived list reported 1 task while holding 87.
 - **Census task types and status TYPES** — they declare the data model, and a status's type ≠ its label (`in stock` is a done-type).
 - **Proven defects:** `WHERE folder IN (...)` silently returns zero OR ignores the filter · an unscoped workspace `GROUP BY` caps ~5,000 rows and reports partial as complete · the SQL field census drops fields intermittently.
+- 🌟 **VERIFY LIST IDENTITY before routing (2026-08-04).** When search returns a task, check its `homeListName` and `homeListID`. A task titled "[ SCENIC DESIGN ]" exists in BOTH the template (P0) and the production (BL). **The list name IS the disambiguation. Read it first, act second.**
 
 ## Fleet / role context
 
