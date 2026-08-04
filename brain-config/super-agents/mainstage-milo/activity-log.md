@@ -49,6 +49,22 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 ---
 
+## 2026-08-04 · Cross-session deposit: org chart + team composition confirmed
+
+**Surface:** Job Market Research task (86ajtgbt3), comment thread — Paige-led gap-closure session.
+
+**Deposited to memory.md (not a Milo session, but core URITP knowledge confirmed by Michael):**
+- Org chart split: 4 direct reports (Charlie, Mary, Casey, Katie) · 2 peers (Sara, Chris) · Nigel above.
+- Budget: ~$50K/production × 4–5 shows = $200–250K/year (materials + student labor).
+- Team scale: ~9 staff + 19-person leadership + 25–40 student positions.
+- 10 craft disciplines, 7 management domains, dual-track (workforce + educational).
+- Michael confirmed the split with zero corrections to the bench's guess.
+- Role framing: PM title undersells scope; actual ≈ Director of Production.
+
+**No project state changed. No LIVE STATE updates needed.**
+
+---
+
 ## 2026-08-03 · INBOX intake: Faculty Council Meeting Dates 2026-2027 — COMPLETE ✅
 
 - **Capture:** URITP-8973 (`86aee8dfb`), single email from Emily Prinzi (UR Senior Faculty Affairs Officer). Mass announcement listing all Faculty Council meeting dates for the 2026-2027 academic year (8 meetings, monthly first-Wednesday, 4-5pm).
