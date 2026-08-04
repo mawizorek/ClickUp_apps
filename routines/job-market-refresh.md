@@ -4,137 +4,197 @@ display_name: Job Market Refresh
 type: runbook
 steward: routine-ricky
 cadence: pointer only — authoritative cadence is the row in routines/schedule.md
+state_dir: routines/job-market-state/
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 16
-model: loop-per-role
+version: 17
+model: loop-per-role, commit-per-role
 ---
 
-> ⚠️ **Frontmatter is metadata, never a switch.** A `status:` key used to sit here. It was removed 2026-08-01: `routines/schedule.md`'s table is the ONLY on/off switch (LOCKED 2026-07-30, Michael, who cut exactly this kind of second switch the day it shipped). Never decide whether to run this from the header above.
+> ⚠️ **Frontmatter is metadata, never a switch.** `routines/schedule.md`'s table is the ONLY on/off switch
+> (LOCKED 2026-07-30, Michael). Never decide whether to run this from the header above.
 
 # Job Market Refresh
 
-goal:       every pass restates the ENTIRE live market for each configured role — same listings, new listings, disappeared listings — to one standing ClickUp thread, with the TSV as the structured index behind it.
-target:     `routines/job-market-state.tsv` (source of truth) · the standing thread `86ajtgbt3` (read surface) · `routines/last-run/job-market.txt` (stamp). **Creates no tasks and sends nothing.**
+goal:       every pass restates the ENTIRE live market for each configured role — same listings, new listings, disappeared listings — to one standing ClickUp thread, with per-lane TSV files as the structured index behind it.
+target:     `routines/job-market-state/<role_id>.tsv` (source of truth, one file per lane) · the standing thread `86ajtgbt3` (read surface) · `routines/last-run/job-market.txt` (stamp). **Creates no tasks and sends nothing.**
 report-to:  DETAIL → the standing thread `86ajtgbt3` (role blocks + pass summary). ROLL-UP → 🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajuhw1d
 
-**WHAT this does.** The WHEN lives in `routines/schedule.md`. The universal floor lives in `routines/README.md` — including **THE STAMP LAW** and **rule 13 (complete loops)**, both of which this routine leans on hard because it is the longest procedure we have.
+**This runbook is 1 of 3 files. Read all three before a pass:**
+
+| File | Holds |
+|------|-------|
+| `job-market-refresh.md` | **this file** — locked decisions, architecture, schema, steps, guardrails |
+| `job-market-templates.md` | comment architecture, threading mechanics, output templates 1-8 |
+| `job-market-sources.md` | the source list, board access notes, density expectations, cold-agent intelligence |
+
+*(Split 2026-08-04 at v17: the single runbook had reached 41KB against a ~30KB read cap, which meant the
+file carrying the STOP conditions could not be guaranteed to load whole. Per-concern split, no duplication.)*
+
+**WHAT this does.** The WHEN lives in `routines/schedule.md`. The universal floor lives in `routines/README.md` —
+including **THE STAMP LAW**, **rule 13 (complete loops)** and **rule 14 (commit at the boundary)**.
+
+---
 
 ## Locked decisions
 
+> **💾 COMMIT AT EVERY ROLE BOUNDARY.** (LOCKED 2026-08-04, Michael)
+> A role's state file is committed the moment that role's sweep and comment block are finished — before the
+> next role starts. **State is NEVER handed between sessions as text.** Michael: *"Each session should complete
+> its loop fully and not try to pass TSV data between sessions for exactly the reasons you found."*
+> This resolves a contradiction that had been live since v13: the complete-loops lock said *"stop at a role
+> boundary, commit the rows you have"* while step 13 said commit once, post-loop. Every mid-loop stop fell
+> into that gap. See the CHECKPOINT template — it now carries POSITION only, never DATA.
+
+> **🗂️ ONE STATE FILE PER LANE.** (LOCKED 2026-08-04, Michael)
+> `routines/job-market-state/<role_id>.tsv`, filename == `role_id`, exactly. Adding a role to the config means
+> adding a file with the same stem; there is no mapping table and there must never be one. The combined file is
+> a tombstone. Full design + rationale: `routines/job-market-state/_MIGRATION.md`.
+
+> **🔗 ONE LISTING = ONE ROW = ONE HOME FILE.** (LOCKED 2026-08-04)
+> A listing matching several lanes lives in ONE file and names the others in `also_lanes`. The other lane's
+> block gets an `↔️ ALSO` pointer (Template 2b), never a duplicated row. Two claimants on one row means the day
+> it goes GONE you update one and miss the other. **Home lane = the lane whose keyword produced the find;** on a
+> genuine tie the senior half of the title wins.
+
 > **📱 MOBILE FIRST. NO TABLES.** (LOCKED 2026-07-31, Michael)
-> Markdown tables don't reflow on phones. Every listing is a stacked block of short lines. Nothing in a pass output may be a table. The TSV is machine state; the thread is narrative.
+> Markdown tables don't reflow on phones. Every listing is a stacked block of short lines. Nothing in a pass
+> output may be a table. The TSVs are machine state; the thread is narrative.
 
 > **🏘️ STANDING INVENTORY, NOT A CHANGE LOG.** (LOCKED 2026-07-30, Michael)
-> Every pass restates the entire market. Sameness is a finding. Days-on-board and disappearances are the highest-signal facts.
+> Every pass restates the entire market. Sameness is a finding. Days-on-board and disappearances are the
+> highest-signal facts.
 
 > **🕐 PASSES = DATE AND TIME, NEVER NUMBERED.** (LOCKED 2026-07-31, Michael)
-> Identity is `YYYY-MM-DD HH:MM ET`. Reference previous pass by timestamp + elapsed interval.
+> Identity is `YYYY-MM-DD HH:MM ET`. Reference previous passes by timestamp + elapsed interval.
 
 > **🔁 LOOP, NOT SUMMARY.** (LOCKED 2026-07-31, Michael)
-> Each role is its own market entity. The routine loops over the role config and produces a SEPARATE, COMPLETE report per role. Shared lane/TSV column does NOT mean shared summary. Every role gets the same depth, the same template, the same treatment. No aggregation across roles in the output.
+> Each role is its own market entity, gets a SEPARATE COMPLETE report, the same depth, the same template.
+> No aggregation across roles in the output.
 
-> **📊 DENSITY FLOOR: 40-60 LIVE LISTINGS PER PASS.** (LOCKED 2026-07-31, Michael)
-> The performing arts market is not sparse. A pass yielding fewer than 40 listings means the sweep was shallow, NOT that the market is thin. If total live drops below 40, the agent MUST: (1) re-sweep all Tier 1 sources with alternate keyword permutations, (2) expand to Tier 2 sources not yet hit, (3) try paginated/filtered views on gated boards. The density floor is a quality gate, not a stretch goal. **A pass below 40 is a DECLARED FAILURE** — per THE STAMP LAW it does NOT stamp, and it must be retried or reported as incomplete with an explanation of what blocked each source.
+> **📊 DENSITY FLOOR: 40 LIVE LISTINGS PER PASS.** (LOCKED 2026-07-31, Michael)
+> Below 40 total live is a **DECLARED FAILURE** — per THE STAMP LAW it does NOT stamp. The agent must
+> (1) re-sweep Tier 1 with alternate keyword permutations, (2) expand to unhit Tier 2 sources,
+> (3) try paginated/filtered/department views on gated boards.
+> ⚠️ **Calibration note added v17:** the floor was set against keyword-only sweeps and is now easy to clear.
+> Clearing it is NOT evidence of a good pass. Post-department-index the working baseline is 90-120.
+> **Judge depth by SOURCES coverage, not by the total.** See `job-market-sources.md`.
 
 > **🗂️ PASS SUMMARY = TABLE OF CONTENTS.** (LOCKED 2026-07-31, Michael)
-> The Pass Summary comment MUST include a comment index with hyperlinks to each ROLE HEADER comment posted during the run (plus the SOURCES comment). Threaded replies under those headers do NOT need individual links. On mobile, threaded comments collapse or get lost. The summary is the reader's navigation layer; direct links to each role header let the reader jump straight to any role's block.
+> The summary MUST include a comment index hyperlinking each ROLE HEADER comment plus SOURCES. On mobile,
+> threaded comments collapse; the index is the reader's navigation layer.
 
 > **🔁 COMPLETE LOOPS — THIS IS THE ROUTINE THAT WILL TEMPT YOU.** (LOCKED 2026-08-01, Michael)
-> This is by far the longest procedure in `routines/`, and length is not a reason to hurry. **Never skip a keyword, a board, a page of pagination, or a template section because the pass feels long.** Finish each ROLE completely — header, SAME, NEW, GONE, NOTABLE — before starting the next one. If you are going to run out of room, stop at a **role boundary**, commit the TSV rows you have, and say exactly which roles were not swept. A shallow sweep is indistinguishable from a thin market, which is the entire reason the density floor exists.
+> The longest procedure in `routines/`, and length is not a reason to hurry. Never skip a keyword, a board, a
+> department index, a page of pagination, or a template section. Finish each ROLE completely — header, SAME,
+> ALSO, NEW, GONE, NOTABLE, **commit** — before starting the next. A shallow sweep is indistinguishable from a
+> thin market, which is the entire reason the density floor exists.
 
 > **🧵 THREAD FINDINGS, NEVER FLAT.** (LOCKED 2026-08-02, Michael)
-> The top-level comment thread must be TIGHT: only role headers and the pass summary appear as root comments. ALL listing detail (SAME, NEW, GONE, NOTABLE) is posted as THREADED REPLIES under the relevant role header. A pass that posts SAME/NEW/GONE as root-level comments is STRUCTURALLY BROKEN regardless of content quality. The mechanic: post the role header, capture its comment ID, then use that ID as the parent for every subsequent reply in that role's block. If the comment tool requires a `parent` or `comment_id` parameter to thread, USE IT. A flat dump of 10+ root comments is unreadable on mobile and defeats the entire architecture.
+> Top-level comments are ONLY role headers and the pass summary. ALL listing detail is threaded under the
+> relevant role header. A pass that posts SAME/NEW/GONE as root comments is STRUCTURALLY BROKEN regardless of
+> content quality. If the comment tool requires a `parent_comment` parameter, USE IT.
 
 > **📐 SLIM SAME/GONE, RICH NEW.** (LOCKED 2026-08-02, Michael)
-> SAME and GONE blocks use a **single-line-per-listing** format: all info on one line, no separators, no stacking. These blocks should be tiny. NEW listings keep the full stacked template (multi-line, separators, qualification note) because those are the ones worth reading in detail. The density of SAME/GONE is the point: scan 20 listings in 20 lines.
+> SAME, ALSO and GONE are single-line-per-listing. NEW keeps the full stacked template.
 
 > **💬 ONE COMMENT PER NEW LISTING.** (LOCKED 2026-08-02, Michael)
-> Each NEW listing is posted as its own individual threaded reply under the role header. NOT lumped into a single "🆕 NEW" block. This enables Michael to react (emoji) or reply to each listing independently. A pass with 5 new PM listings = 5 separate threaded comments, each tappable, each reactable. SAME and GONE stay as single compressed blocks (no individual reactions needed for already-seen or disappeared listings).
+> Each NEW listing is its own threaded reply so Michael can react to it individually. 5 new PM listings =
+> 5 separate comments. SAME/ALSO/GONE stay as single compressed blocks.
 
 > **🗳️ REACTION-BASED RATING.** (LOCKED 2026-08-02, Michael)
-> Michael rates individual NEW listings via emoji reactions on their comments. The rating vocabulary: 🔥 = hot/pursuing, 👍 = solid/track it, 👎 = not for me, 🤔 = interesting but questions. Brain reads these reactions on subsequent passes to build preference patterns (geography, salary, org type, role level, contract type). Over multiple passes, these reactions train the Spotlight selection and inform which listings get elevated vs deprioritized in future sweeps.
+> 🔥 = hot/pursuing · 👍 = solid/track it · 👎 = not for me · 🤔 = interesting but questions.
+> Reactions are read on subsequent passes to build preference patterns and train Spotlight selection.
 
 > **⚡ SPOTLIGHT IN SUMMARY.** (LOCKED 2026-08-02, Michael)
-> The Pass Summary includes a ⚡ Spotlight section: the top 3 listings across ALL roles that are newest + highest-salary + best-fit (informed by accumulated reaction patterns). The spotlight is the "don't miss these" elevator pitch for the whole pass. It lives above the comment index so it's the first thing read.
+> Top 3 across ALL roles: newest + highest-salary + best-fit, above the comment index.
 
 > **🏷️ FRICTION ICONS ON EVERY LISTING.** (LOCKED 2026-08-02, Michael)
-> Every listing (SAME and NEW) carries an application friction icon: ✅ = direct apply (online form/portal), 📝 = email submission, 🔒 = gated (requires membership, login, or agent). This tells Michael at a glance how hard it is to act on a listing.
+> ✅ = direct apply (online form/portal) · 📝 = email submission · 🔒 = gated (membership, login, or agent).
 
 > **🔗 BOARD HOMEPAGE LINKS IN SOURCES.** (LOCKED 2026-08-02, Michael)
-> The SOURCES block links every board name to its homepage URL. Board names are never plain text. Format: `[**<Board>**](<homepage-url>) \`CODE\`` so each source is a tap target.
+> Board names are never plain text.
+
+---
 
 ## 📍 Architecture
 
 **One task, one conversation, three persistence layers.**
 
 - **Standing thread:** `86ajtgbt3`
-- **Never create a second research task.** Applications list (`900600097138`) = funnel, not inventory. Listings become tasks there ONLY when Michael says to act.
+- **Never create a second research task.** The Applications list (`900600097138`) is a funnel, not an
+  inventory. Listings become tasks there ONLY when Michael says to act.
 
 | Layer | Holds | Read by |
 |-------|-------|--------|
-| `routines/job-market-roles.json` | **The gate.** Defines which roles to search, with what keywords, on what boards. The loop driver. | Every pass (step 1). |
-| `routines/job-market-state.tsv` | Structured index. Every live listing normalized. Also an organic **venue/org index**: the `org` column is growing a theatre directory as a side effect. | Each role iteration (filtered by lane). |
-| Comment thread | Narrative. One standalone header per role per pass. Individual NEW listing comments enable reaction-based rating. | Michael on his phone. |
+| `routines/job-market-roles.json` | **The gate.** Which roles to search, with what keywords, on what boards. The loop driver. | Every pass (step 1). |
+| `routines/job-market-state/<role_id>.tsv` | Structured index, one file per lane. Also an organic **venue/org index** — the `org` column is growing a theatre directory as a side effect. | All read at pre-loop (step 2); one written per role boundary (step 10). |
+| `routines/job-market-state/_unfiled.tsv` | Qualifying finds with no lane yet. | Pre-loop + post-loop. |
+| Comment thread | Narrative. One header per role per pass, individual NEW comments as the reaction surface. | Michael, on his phone. |
 
-**TSV is source of truth.** Thread is the read surface. TSV wins disagreements.
+**The TSVs are source of truth. The thread is the read surface. The TSVs win disagreements.**
 
 ### State rules
 
-- A listing enters the TSV when found AND its direct URL is captured (`status=live`).
+- A listing enters its lane file when found AND its direct URL is captured (`status=live`).
 - `gone` when it disappears. Gone rows stay one pass, then get deleted. Git preserves history.
 - `acted` when Michael says to act and an Application task is created.
-- Uncommitted pass = didn't happen.
+- **Uncommitted work did not happen.** Under v17 that window is one role long, never a whole pass.
+
+### 🗃️ `_unfiled.tsv`
+
+For a find that **qualifies on merit but has no lane yet.** `role_id = unfiled`, `lane = UNF`, same schema.
+It has no role block, so it is reported in the Pass Summary's Unfiled section.
+
+🚫 **NOT for rejected finds.** Overhire, below-floor, box office, academic-teaching and out-of-industry stay as
+prose in NOTABLE. Miss that distinction and this becomes a junk drawer inside a month.
+
+**Three of a kind in `_unfiled` is evidence to add a role to `job-market-roles.json`** — that routes to Corso's
+feedback loop, it is not the executor's call.
 
 ### Reaction data
 
-Reactions on individual NEW listing comments are READ by subsequent passes. The agent checks reactions on the previous pass's NEW listings before starting the sweep. Patterns to track:
-- Geography preferences (which cities/regions get 🔥 vs 👎)
-- Salary threshold (lowest-salary listings that still get 👍)
-- Org type affinity (LORT vs touring vs commercial vs dance)
-- Contract type (FT staff vs seasonal vs per-show)
-- Role level (Director vs Manager vs Assistant)
+Before sweeping, check emoji reactions on the previous pass's individual NEW listing comments. Patterns to
+track: geography (which cities get 🔥 vs 👎) · salary threshold (lowest-paying listing that still got 👍) ·
+org type (LORT vs touring vs commercial vs dance) · contract type · role level. These inform Spotlight and,
+over time, which borderline listings qualify vs get logged as NOTABLE only.
 
-These patterns inform Spotlight selection and, over time, can influence which borderline listings qualify vs get logged as NOTABLE only.
+---
 
-## 🔑 The Gate: `routines/job-market-roles.json`
+## 🔑 The gate: `routines/job-market-roles.json`
 
-This file IS the loop. It defines:
-
-- **`roles[]`**: ordered list of role objects. The routine iterates this list top to bottom. Every entry gets a full, independent search pass.
-- **Per role:** `id`, `display`, `lane`, `keywords[]`, `levels[]`, `exclude_terms[]`, `constraints{}`
-- **`global{}`**: settings that apply to ALL roles (geography, remote, part-time, contract, academic filter, overhire filter)
-
-### How the gate drives execution
+This file IS the loop. `roles[]` is an ordered list; the routine iterates it top to bottom and every entry gets
+a full, independent pass. Per role: `id`, `display`, `lane`, `keywords[]`, `levels[]`, `exclude_terms[]`,
+`constraints{}`. `global{}` applies to all roles (geography, remote, part-time, contract, academic, overhire).
 
 ```
 for each role in roles.json:
-    1. filter TSV to this role's lane -> known inventory
-    2. walk ALL source boards using this role's keywords + exclude_terms
+    1. read this role's lane file          -> known inventory
+    2. walk ALL source boards with this role's keywords AND department indexes
     3. apply global constraints (geography, academic, overhire)
     4. reconcile against known inventory
-    5. update TSV rows for this role
-    6. post standalone comment block for this role
+    5. post the role's comment block
+    6. COMMIT this lane's file             <- v17: the boundary
     7. move to next role
 ```
 
-**Single-role invocation:** the routine can also be triggered for ONE specific role (e.g. "do job search for stage manager"). In that case, execute steps 1-6 for that role only, skip the rest. Same template, same depth, same output. The only difference is loop length = 1.
+**Single-role invocation:** *"do job search for stage manager"* → filter `roles[]` to that role. Loop length 1,
+same template, same depth, same commit.
 
-### Adding/removing roles
+**Adding a role:** add an entry to `roles[]` AND create `routines/job-market-state/<id>.tsv` with the header row.
+**Retiring a role:** remove it from the JSON; its lane file stays until the rows go `gone` naturally.
 
-To add a new role: add an entry to `roles[]` in the JSON. Next pass picks it up automatically.
-To retire a role: remove it from the JSON. Its TSV rows stay until they go `gone` naturally.
-To adjust keywords/filters: edit the role object. Changes take effect next pass.
+---
 
-## 📊 State file schema (`routines/job-market-state.tsv`)
+## 📊 State file schema
 
-Tab-separated, header row, one listing per line.
+Tab-separated, header row, one listing per line, identical in every lane file.
 
 | Column | Required | Description |
 |--------|----------|-------------|
 | `id` | yes | `JM-<BOARD>-<org-slug>-<role-slug>` |
-| `role_id` | yes | Matches `id` field in `job-market-roles.json` |
-| `lane` | yes | `PM` / `TD` / `SM` / `ME` |
+| `role_id` | yes | Matches `id` in `job-market-roles.json`, and matches the filename |
+| `lane` | yes | `PM` / `TD` / `SM` / `ME` / `AUD` / `OPS` / `DFT` / `ADM` / `UNF` |
 | `title` | yes | Role title as posted |
 | `org` | yes | Organization name |
 | `location` | yes | City, State (or Remote) |
@@ -145,220 +205,46 @@ Tab-separated, header row, one listing per line.
 | `salary` | optional | Posted range verbatim, never estimated |
 | `level` | yes | `senior` / `mid` / `associate` / `entry` / `contract` |
 | `status` | yes | `live` / `gone` / `acted` |
-| `friction` | yes | `direct` / `email` / `gated` — how to apply |
+| `friction` | yes | `direct` / `email` / `gated` |
+| `also_lanes` | optional | Pipe-separated `role_id`s this listing ALSO matches. Added v17. |
 
 **Normalization rules:**
-- One row per listing per board. Cross-posted = two rows.
-- `url` REQUIRED. No URL = no row. Log as unlinked sighting in NOTABLE.
-- `salary` verbatim or empty.
-- `posted` = board's date. `first_seen` = when routine captured it.
-- `role_id` MUST match an entry in the JSON config. Orphan rows = error.
-- `friction` = how the application works. `direct` = online portal/form. `email` = send materials via email. `gated` = requires membership, login, or agent access.
+- One row per listing per board. Cross-posted between boards = two rows (different `site`, different `id`).
+  This is distinct from cross-LANE, which is one row + `also_lanes`.
+- `url` REQUIRED. No URL = no row; log as an unlinked sighting in NOTABLE.
+- `salary` verbatim or empty. Never estimated.
+- `posted` = the board's date. `first_seen` = when the routine captured it.
+- `role_id` MUST match an entry in the JSON and the filename. Orphan rows = STOP and flag.
+- ⚠️ **The schema may only change in a BUILD session, never inside a pass** (`README.md` Discipline rule 7).
 
-## 🔑 Listing IDs
+### Listing IDs
 
 ```
 JM-<BOARD>-<org-slug>-<role-slug>
 ```
 
-Board codes: `OSJ` OffStageJobs / `USITT` / `PB` Playbill / `ECN` EntertainmentCareers.net / `AS` ARTSEARCH / `TAL` TheatreArtLife / `BWW` BroadwayWorld / `SB` StageBoard / `SJ` StageJobsy / `ACG` Arts Consulting Group / `TOC` TOC Arts Partners / `IND` Indeed / `LI` LinkedIn / `FL` Freelancer/Upwork / `LCTJ` League of Chicago Theatres / `APAP` APAP Job Bank / `SL` StageLync / `SKN` Skene Callboard / `TSJ` The Stage Jobs / `HC` HireCulture
+Board codes: `OSJ` OffStageJobs · `USITT` · `PB` Playbill · `ECN` EntertainmentCareers.net · `AS` ARTSEARCH ·
+`TAL` TheatreArtLife · `BWW` BroadwayWorld · `SB` StageBoard · `SJ` StageJobsy · `ACG` Arts Consulting Group ·
+`TOC` TOC Arts Partners · `IND` Indeed · `LI` LinkedIn · `FL` Freelancer/Upwork · `LCTJ` League of Chicago
+Theatres · `APAP` APAP Job Bank · `SL` StageLync · `SKN` Skene Callboard · `TSJ` The Stage Jobs · `HC` HireCulture
 
-ID is permanent. Title changes don't get new IDs.
+**The ID is permanent.** A title change does not get a new ID.
+
+---
 
 ## 🎯 Target profile
 
-**Defined in `job-market-roles.json`.** The JSON is the single source for what roles to search, what keywords to use, and what to exclude. This section is documentation only.
-
-### Scope (from `global`)
+**Defined in `job-market-roles.json`.** That file is the single source for what to search and what to exclude.
+This section is documentation only. Evaluation (what makes a listing INTERESTING rather than QUALIFYING) is a
+separate concern and lives in `routines/job-market-evaluation.md`, read by Corso, not by the executor.
 
 - **Geography: ANYWHERE.** Relocation live. Remote explicitly included.
 - **Lane: NON-ACADEMIC** (deprioritized, not banned).
 - **Level: ALL except pure overhire/day-call.** Senior, mid, associate, part-time, contract, remote/hybrid, drafting, smaller-scale.
 - **Part-time and contract are IN.**
 
-### What's OUT (from `global` + per-role `exclude_terms`)
-
-- Manufacturing/industrial/logistics
-- Pure crew calls, single-day overhire, internships
-- Academic tenure-track (unless genuine step up)
-- Per-role exclusions defined in each role's `exclude_terms[]`
-
-## 💬 Comment architecture
-
-> ⚠️ **THE THREADING RULE.** The top-level comment stream on this task must contain ONLY role headers and the pass summary. Nothing else. All listing data lives in threaded replies. This is not a suggestion. A pass that dumps SAME/NEW/GONE as root comments violates a locked decision and must be restructured.
-
-**The top-level thread (what Michael sees when he opens the task):**
-
-```
-🎯 Production Manager · 2026-08-02 11:40 ET       <- ROOT
-🎯 Technical Director · 2026-08-02 11:50 ET       <- ROOT
-🎯 Stage Manager · 2026-08-02 11:52 ET            <- ROOT
-🎯 Master Electrician · 2026-08-02 11:55 ET       <- ROOT
-📋 PASS COMPLETE · 2026-08-02 11:55 ET            <- ROOT
-```
-
-That's IT at the top level. Five comments for a 4-role pass. Clean, scannable, tight.
-
-**Inside each role header's thread (expanded by tapping the header):**
-
-```
-🎯 ROLE HEADER  <- the root comment (contains stats + verdict)
-   ├── 🔁 SAME · <n>              <- ONE reply (compressed block)
-   ├── 🆕 <Listing 1 title>       <- individual reply (rich, reactable)
-   ├── 🆕 <Listing 2 title>       <- individual reply (rich, reactable)
-   ├── 🆕 <Listing 3 title>       <- individual reply (rich, reactable)
-   ├── 🕳️ GONE · <n>              <- ONE reply (compressed block)
-   └── 📌 NOTABLE                 <- ONE reply (if content)
-```
-
-**Inside the pass summary's thread:**
-
-```
-📋 PASS COMPLETE  <- root comment (includes ⚡ Spotlight)
-   └── 🔌 SOURCES <- reply to summary
-```
-
-### Threading mechanics (HOW to do this)
-
-1. Post the 🎯 ROLE HEADER as a **new root comment** on task `86ajtgbt3`.
-2. The post_comment response returns a **comment ID** (or URL). CAPTURE IT. This is the parent.
-3. Post SAME as a **reply** to that comment ID (set `parent` / `comment_id` / `notify_all: false`).
-4. Post each NEW listing as a **separate reply** to that same comment ID. One comment per listing.
-5. Post GONE as a **reply** to that same comment ID.
-6. Post NOTABLE (if any) as a **reply** to that same comment ID.
-7. Move to the next role. Repeat.
-
-**If you cannot figure out how to reply to a comment (tool limitation, missing parameter), STOP and flag it.** Do NOT fall back to posting flat root comments. A failed thread is visible; a flat dump looks intentional and confuses the reader.
-
-**Key rules:**
-- Each role's comment block is self-contained. Reading the Production Manager block tells you everything about the PM market without needing to read any other block.
-- **Role header comment URLs are captured at post time.** The Pass Summary's comment index links to each role header and the SOURCES comment. Threaded replies under headers do NOT need individual links.
-- **Individual NEW listing comments are the REACTION surface.** Michael taps emoji on these. Brain reads reactions next pass.
-
----
-
-# 📐 TEMPLATES
-
-## Template 1: 🎯 ROLE HEADER (root comment, one per role)
-
-```
-## 🎯 <ROLE DISPLAY NAME> · <YYYY-MM-DD HH:MM> ET
-
-**Keywords:** <comma-separated from config>
-**Live:** <n> · New: <n> · Gone: <n>
-💵 Salary range across live: <low>-<high> (or "none posted")
-
-### Verdict
-<ONE line. Blunt. About THIS role's market only.>
-```
-
-## Template 2: 🔁 SAME (THREADED REPLY to role header) — SLIM FORMAT
-
-> One line per listing. No separators, no stacking. The block should be scannable in seconds.
-> Friction icon included on every line.
-
-```
-### 🔁 SAME · <n>
-
-<friction> [<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
-<friction> [<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
-<friction> [<Role>](<url>) — <Org> · <location> · **<n>d** · 💵 <salary or —>
-<repeat, one line per listing>
-```
-
-Friction icons: ✅ = direct apply, 📝 = email, 🔒 = gated
-
-## Template 3: 🆕 NEW (INDIVIDUAL THREADED REPLIES to role header)
-
-> ⚠️ Each NEW listing is posted as its OWN SEPARATE threaded reply. NOT lumped into one block.
-> This enables reaction-based rating: Michael taps 🔥/👍/👎/🤔 on individual listings.
-
-**One comment per listing, format:**
-
-```
-🆕 **[<Role>](<url>)** — <Org>
-`<JM-ID>` · <location>
-💵 <salary or —> · 📅 <posted> · <friction>
-✅ <why qualifies, <10 words>
-```
-
-Friction values: ✅ direct apply · 📝 email · 🔒 gated
-
-Post each as a separate `post_comment` call with `parent_comment` = the role header's comment ID.
-
-## Template 4: 🕳️ GONE (THREADED REPLY to role header) — SLIM FORMAT
-
-> One line per listing. Same as SAME: dense, fast, no formatting overhead.
-
-```
-### 🕳️ GONE · <n>
-
-**<Role>** — <Org> · `<JM-ID>` · lived <n>d · <likely cause>
-**<Role>** — <Org> · `<JM-ID>` · lived <n>d · <likely cause>
-<repeat, one line per listing>
-
-<or if none: "None. Full inventory carried.">
-```
-
-## Template 5: 📌 NOTABLE (THREADED REPLY to role header, if content)
-
-```
-### 📌 NOTABLE
-
-- <pattern or observation for THIS role only>
-- **Unlinked:** <Role> — <Org> · <board> · <why no URL>
-```
-
-## Template 6: 📋 PASS SUMMARY (root comment, posted AFTER all role loops complete)
-
-```
-## 📋 PASS COMPLETE · <YYYY-MM-DD HH:MM> ET
-
-**Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
-**Prev pass:** <timestamp> (<elapsed>)
-[TSV](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-state.tsv) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v16
-
-<Density verdict: one line.>
-
-### ⚡ Spotlight
-<Top 3 listings across ALL roles: newest + highest-salary + best-fit. One line each, hyperlinked. These are the "don't miss these" picks for the whole pass. Informed by accumulated reaction patterns when available.>
-1. [<Role>](<url>) — <Org> · <location> · 💵 <salary> · <friction>
-2. [<Role>](<url>) — <Org> · <location> · 💵 <salary> · <friction>
-3. [<Role>](<url>) — <Org> · <location> · 💵 <salary> · <friction>
-
-### 🗂️ Comment index
-- 🎯 [<Role 1 display>](<role header comment URL>) — <n> live, +<n>
-- 🎯 [<Role 2 display>](<role header comment URL>) — <n> live, +<n>
-- <repeat for each role>
-- 🔌 [SOURCES](<sources comment URL>)
-```
-
-⚠️ **The comment index is MANDATORY.** Each role HEADER comment posted during the run gets a hyperlink here, plus the SOURCES comment. Threaded replies (SAME/NEW/GONE/NOTABLE) do NOT need individual links. This index lets the reader jump directly to any role's block from the summary.
-
-## Template 7: 🔌 SOURCES (THREADED REPLY to pass summary)
-
-> ⚠️ Every board name MUST hyperlink to its homepage. No plain-text board names.
-
-```
-### 🔌 SOURCES
-
-- [**OffStageJobs**](https://staging.offstagejobs.com) `OSJ` — ✅/🔒/❌ · <n> qualifying
-- [**Playbill**](https://playbill.com/jobs) `PB` — ✅/🔒/❌ · <n> qualifying
-- [**BroadwayWorld**](https://www.broadwayworld.com/jobs/) `BWW` — ✅/🔒/❌ · <n> qualifying
-- [**StageLync**](https://www.stagelync.com) `SL` — ✅/🔒/❌ · <n> qualifying
-- [**USITT**](https://www.usitt.org/industry-resources/jobs) `USITT` — ✅/🔒/❌ · <n> qualifying
-- [**StageBoard**](https://stageboard.app) `SB` — ✅/🔒/❌ · <n> qualifying
-- [**Arts Consulting Group**](https://artsconsulting.com/opensearches/) `ACG` — ✅/🔒/❌ · <n> qualifying
-- [**TOC Arts Partners**](https://tocartspartners.com) `TOC` — ✅/🔒/❌ · <n> qualifying
-- [**League of Chicago Theatres**](https://chicagoplays.com/jobs/) `LCTJ` — ✅/🔒/❌ · <n> qualifying
-- [**The Stage Jobs**](https://jobs.thestage.co.uk) `TSJ` — ✅/🔒/❌ · <n> qualifying
-- [**Indeed**](https://www.indeed.com) `IND` — ✅/🔒/❌ · <n> qualifying
-- [**Skene Callboard**](https://skene.pub/callboard) `SKN` — ✅/🔒/❌ · <n> qualifying
-- [**HireCulture**](https://www.hireculture.org) `HC` — ✅/🔒/❌ · <n> qualifying
-- [**APAP**](https://www.apap365.org/resources/job-bank) `APAP` — ✅/🔒/❌ · <n> qualifying
-- [**StageLync**](https://www.stagelync.com) `SL` — ✅/🔒/❌ · <n> qualifying
-<repeat per board hit this pass>
-```
+**What's OUT:** manufacturing/industrial/logistics · pure crew calls, single-day overhire, internships ·
+academic tenure-track (unless a genuine step up) · per-role `exclude_terms[]`.
 
 ---
 
@@ -367,70 +253,101 @@ Post each as a separate `post_comment` call with `parent_comment` = the role hea
 ### Pre-loop
 
 1. **Read `routines/job-market-roles.json`** — the gate. This defines the loop.
-2. **Read `routines/job-market-state.tsv`** — current full inventory.
+2. **Read ALL lane files in `routines/job-market-state/`, including `_unfiled.tsv`** — one read, the full
+   inventory. You need the whole picture to dedup by URL and to spot cross-lane hits, even though you will
+   only WRITE one file at a time.
 3. **Read `routines/last-run/job-market.txt`.** `never` = first pass.
-4. **If single-role invocation:** filter `roles[]` to the requested role only. Loop length = 1.
-4b. **Check reactions on previous pass's NEW listing comments.** Read emoji reactions on the individual listing comments from the last pass. Note any patterns (which listings got 🔥 vs 👎). Use these to inform Spotlight selection in step 14.
+4. **If single-role invocation:** filter `roles[]` to that role. Loop length = 1.
+5. **Check reactions on the previous pass's NEW listing comments.** Note 🔥 vs 👎 patterns; they inform Spotlight.
 
-### The loop (for each role in config)
+### The loop — for each role in config
 
-5. **Filter TSV** to rows matching this role's `role_id`. This is the known inventory for this role.
-6. **Walk ALL source boards** using this role's `keywords[]`. **Sweep requirements:**
-   - Try EACH keyword from the config independently (not just the first match).
-   - For boards with pagination, go at LEAST 3 pages deep (or until results become irrelevant).
-   - For boards with category/department filters, also browse the relevant department index (e.g. OffStageJobs "Management" department, Playbill "Production" category).
-   - For boards with date sorting, scan both "newest" and "relevance" sorts.
-   - If a board yields 0 results for all keywords, try adjacent terms and synonyms before marking it dry.
-   - **Minimum board coverage per pass:** hit ALL Tier 1 sources and at least 4 Tier 2 sources. A pass that skips sources without explanation is incomplete.
-   - Apply `exclude_terms[]` and `global` constraints. Capture direct URL for every qualifying listing.
-   - **Capture friction type** for each listing: ✅ direct (online form), 📝 email, 🔒 gated.
-7. **Reconcile:**
-   - Matched to existing TSV row = SAME (compute days-on-board = today - `posted`)
-   - New find with URL = NEW (assign `JM-ID`, set `role_id`, `lane`, `level`, `friction`)
-   - TSV row not found on boards = GONE
-8. **Stage TSV updates** for this role: append NEW rows, mark GONE rows, update salary if newly found on SAME.
-9. **Post 🎯 ROLE HEADER** as a ROOT comment on task `86ajtgbt3`. The response gives you a **comment ID**. **STORE this ID in a variable** (e.g. `pm_header_id`). You need it for the next step.
-10. **Post threaded replies using the stored comment ID as parent:**
-    - Post 🔁 SAME as a **single reply** to `pm_header_id` (compressed one-line-per-listing format).
-    - Post each 🆕 NEW listing as a **separate individual reply** to `pm_header_id`. One comment per listing. Use Template 3 format.
-    - Post 🕳️ GONE as a **single reply** to `pm_header_id` (compressed format).
-    - Post 📌 NOTABLE (if content) as a **single reply** to `pm_header_id`.
-    - ⚠️ Every one of these MUST set the parent/reply-to parameter. If you post without it, the comment lands as a root comment and the thread is broken.
-    - ⚠️ Each NEW listing = its own post_comment call. Do NOT lump them.
-11. **Repeat from step 5** for next role. **Finish each role completely before starting the next** (README rule 13) — a role that got a header but no SAME/NEW/GONE block is a broken loop, not a short one.
+6. **Filter to this role's lane file.** That is the known inventory. Also collect every row in OTHER lane files
+   whose `also_lanes` names this role — those are the `↔️ ALSO` pointers, not this lane's rows.
+7. **Walk ALL source boards** per `job-market-sources.md`. Sweep requirements:
+   - Try EACH keyword from the config independently, not just the first that returns hits.
+   - 🔴 **Browse the department/category INDEX pages, not only keyword search.** This is required, not a
+     fallback — see the Department-Index Law in `job-market-sources.md`. Verify the filter actually applied.
+   - Paginated boards: at least 3 pages deep, or until results go irrelevant.
+   - Date-sorted boards: scan both "newest" and "relevance".
+   - 0 results on all keywords → try adjacent terms and synonyms before marking a board dry.
+   - **Minimum coverage:** ALL Tier 1 sources and at least 4 Tier 2. A skipped source without an explanation
+     makes the pass incomplete.
+   - Apply `exclude_terms[]` and `global` constraints. Capture a direct URL and a friction type for every qualifier.
+8. **Reconcile:**
+   - Matched to an existing row = SAME (days-on-board = today − `posted`)
+   - New find with URL = NEW (assign `JM-ID`, `role_id`, `lane`, `level`, `friction`, and `also_lanes` if it spans lanes)
+   - Existing row not found on any board = GONE
+   - Qualifies but no lane fits = a row in `_unfiled.tsv`
+9. **Post the role's comment block** per `job-market-templates.md`: header as ROOT (capture its comment ID),
+   then SAME · ALSO · each NEW individually · GONE · NOTABLE as threaded replies to that ID.
+   If the sweep turned up anything after the header went up, **edit the header's counts.**
+10. 💾 **COMMIT this lane's file now.** `routines/job-market-state/<role_id>.tsv`, message
+    `data(job-market): <timestamp> ET — <role_id>, <n> live, <+-n>`. Re-read the file's SHA immediately before
+    writing; never write from a SHA captured earlier in the pass.
+11. **Repeat from step 6** for the next role. **A role that got a header but no block, or a block but no commit,
+    is a broken loop, not a short one.**
 
 ### Post-loop
 
-12. **Density check:** If total live < 40, this is a **DECLARED FAILURE** (see the density floor above). List which sources were blocked/thin and what retry was attempted. Do NOT silently accept a thin pass, and do NOT stamp it.
-13. **Commit the TSV:** `routines/job-market-state.tsv` (all role updates batched). Message: `data(job-market): <timestamp> ET — <n> live, <+-n>`. **Commit the TSV even on a below-floor pass** — the rows found are real and losing them helps nobody. The stamp is what gets withheld, not the data.
-14. **Post 📋 PASS SUMMARY** as ROOT comment. Include the ⚡ Spotlight (top 3 picks informed by salary, recency, and accumulated reaction patterns). **Capture its comment ID.**
-15. **Post 🔌 SOURCES** as a **reply** to the pass summary comment ID. Capture its URL and include it in the index (post summary may need an edit to add this final link, OR post SOURCES first and then the summary).
-16. **STAMP** — *last write, and only if the pass succeeded.* Write `routines/last-run/job-market.txt`, one line, `YYYY-MM-DD HH:MM` ET. **Per THE STAMP LAW** (`routines/README.md`): a complete pass stamps; a pass where a board was blocked but the inventory still landed is a PARTIAL and stamps with the gap named; **a below-floor pass or an aborted loop does NOT stamp** and stays overdue. *(Moved here 2026-08-01 — the stamp used to be written in step 13, before the pass summary existed. A stamp before the product lands is a lie with a timestamp on it.)*
-17. **Post the roll-up** to 🧭 STANDING · Routine Ricky — Run Reports (https://app.clickup.com/t/86ajuhw1d): one line for this routine, linking the pass summary comment.
+12. **Density check.** Total live under 40 = **DECLARED FAILURE**: name which sources were blocked or thin and
+    what retry was attempted, and do NOT stamp. Lane files already committed stay committed — the rows are real
+    and losing them helps nobody. The stamp is what is withheld, never the data.
+13. **Commit `_unfiled.tsv`** if it gained rows.
+14. **Post 📋 PASS SUMMARY** as a ROOT comment (Template 6), including ⚡ Spotlight and the 🗃️ Unfiled section
+    if any. Capture its comment ID.
+15. **Post 🔌 SOURCES** as a reply to the summary (Template 7), then edit the summary to add the SOURCES link —
+    or post SOURCES first and include the link from the start. Either order; what matters is that the summary's
+    final state links every role header and SOURCES.
+16. **STAMP** — *last write, and only if the pass succeeded.* Write `routines/last-run/job-market.txt`, one line,
+    `YYYY-MM-DD HH:MM` ET. Per THE STAMP LAW: complete pass stamps · a blocked board with the inventory still
+    landed is a PARTIAL and stamps with the gap named · **a below-floor pass or an aborted loop does NOT stamp.**
+17. **Post the roll-up** to 🧭 STANDING · Routine Ricky — Run Reports (https://app.clickup.com/t/86ajuhw1d): one entry for this
+    routine, linking the pass summary comment and the commits.
 
-> ⚠️ **Ordering note:** Since SOURCES is threaded under the summary, you may either (a) post SOURCES first, capture its URL, then post the summary with all links including SOURCES; or (b) post the summary with role links, then post SOURCES and edit the summary to add the SOURCES link. Either approach is valid. What matters: the final state of the summary comment includes links to all role headers and SOURCES.
+### If you must stop mid-loop
+
+Stop at a **role boundary**, never inside one. Every finished lane is already committed, so post a
+⏸️ CHECKPOINT (Template 8) carrying **position only** — roles complete, next role, commit SHA.
+🚫 **Never paste row data into a checkpoint.** If you want the next session to have a row, commit it.
 
 ---
 
 ## Guardrails (STOP + flag if any is true)
 
-*Added 2026-08-01 — this runbook shipped without a Guardrails section, which meant the busiest routine in the framework had no written STOP conditions at the moment a cold agent would need them.*
-
-- **You are about to post SAME, NEW, GONE, or NOTABLE as a ROOT comment.** These are ALWAYS threaded replies. If you cannot figure out how to reply to a parent comment, STOP and ask. Never dump them flat.
-- **You are about to lump multiple NEW listings into a single comment.** Each NEW listing MUST be its own separate threaded reply. If you're about to post a block with multiple `---` separators containing several listings, STOP and split them.
-- **You are about to create a ClickUp TASK.** This routine creates none. Listings become Application tasks ONLY when Michael says to act. A pass that files tasks is the failure mode that killed v2.
+- **You are about to post SAME, ALSO, NEW, GONE or NOTABLE as a ROOT comment.** These are ALWAYS threaded
+  replies. If you cannot reply to a parent, STOP and ask. Never dump them flat.
+- **You are about to lump multiple NEW listings into one comment.** Each is its own reply. Split them.
+- **You are about to leave a role header with no block under it.** Attach the block or correct the header —
+  never leave an orphan, never open a second header for the same role in the same pass.
+- **You are about to start the next role without committing the current one.** That is the v17 boundary. Commit first.
+- **You are about to write a lane file using a SHA read earlier in the pass.** Re-read it. A stale SHA is how
+  a write silently clobbers a sibling's rows.
+- **You are about to put the same listing in two lane files.** One listing = one row = one home file. Use `also_lanes`.
+- **You are about to put a REJECTED find in `_unfiled.tsv`.** Unfiled means qualifies-but-no-lane. Rejects are prose in NOTABLE.
+- **You are about to paste TSV rows into a ClickUp comment for a later session to apply.** Commit them instead.
+- **You are about to change the schema mid-pass.** Not allowed here — that is a build session (README rule 7).
+- **You are about to create a ClickUp TASK.** This routine creates none. Listings become Application tasks ONLY
+  when Michael says to act. A pass that files tasks is the failure mode that killed v2.
 - **You are about to send anything** (email, DM, application). This routine transmits nothing, ever.
-- **You are about to create a second research task or a second thread.** One task, one conversation. `86ajtgbt3` or nothing.
-- **A listing has no working direct URL** → no TSV row. Log it as an unlinked sighting in NOTABLE. Never invent or reconstruct a URL.
-- **A row's `role_id` doesn't match an entry in `job-market-roles.json`** → orphan row, STOP and flag rather than guessing a lane.
-- **Total live is under 40** → DECLARED FAILURE. Re-sweep per the density floor; if still short, report incomplete and do NOT stamp.
+- **You are about to create a second research task or a second thread.** `86ajtgbt3` or nothing.
+- **A listing has no working direct URL** → no row. Log it as an unlinked sighting in NOTABLE. Never invent or
+  reconstruct a URL.
+- **A row's `role_id` doesn't match an entry in the config, or doesn't match its filename** → STOP and flag,
+  never guess a lane.
+- **A listing is flagged "reported for review" on its board** → not admitted. NOTABLE only.
+- **Total live is under 40** → DECLARED FAILURE. Re-sweep per the density floor; if still short, report
+  incomplete and do NOT stamp.
 - **You would post output containing a markdown table** → STOP. Mobile-first, stacked blocks only.
-- **You would aggregate roles into one shared block** → STOP. Loop, not summary. Every role gets its own full treatment.
-- **You are tempted to shorten the sweep because the pass is long** → STOP. That is the exact condition rule 13 exists for.
-- **You would replay every missed day on a catch-up** → STOP. A late pass is ONE pass covering more days, never nine passes.
-- **You would edit `job-market-roles.json` mid-pass to make results fit** → STOP. Config changes are a separate, explicit instruction.
+- **You would aggregate roles into one shared block** → STOP. Loop, not summary.
+- **You are tempted to shorten the sweep because the pass is long** → STOP. That is exactly what rule 13 exists for.
+- **You would skip the department indexes because keyword search already returned plenty** → STOP. Read the
+  Department-Index Law. Volume is not coverage.
+- **You would replay every missed day on a catch-up** → STOP. A late pass is ONE pass covering more days.
+- **You would edit `job-market-roles.json` mid-pass to make results fit** → STOP. Config changes are separate
+  and explicit.
 - **You are about to stamp before step 16**, or stamp a below-floor pass → STOP. See THE STAMP LAW.
-- **A board name in SOURCES is plain text (no hyperlink)** → STOP. Every board name must link to its homepage.
+- **A board name in SOURCES is plain text** → STOP. Every board name links to its homepage.
 
 ---
 
@@ -438,125 +355,36 @@ Post each as a separate `post_comment` call with `parent_comment` = the role hea
 
 | Mode | Trigger | Behavior |
 |------|---------|----------|
-| **Full loop** | Cadence is due, or "run job market refresh" | All roles in config, sequential |
-| **Single role** | "do job search for [role name]" | One role only, same template, same depth |
-| **Add role** | "add [role] to job search" | Edit JSON config, run that role immediately |
+| **Full loop** | "run job market refresh", or the cadence is due | All roles in config, sequential, committed per role |
+| **Single role** | "do job search for [role name]" | One role only, same template, same depth, same commit |
+| **Add role** | "add [role] to job search" | Edit the JSON config, create the lane file, run that role immediately |
 
-All modes produce the same output format. The only variable is loop length. *("Scheduled cadence" was removed from the trigger column 2026-08-01 — there is no scheduler; see `routines/schedule.md`.)*
-
-## Sources
-
-**Tier 1 (MANDATORY every pass, no exceptions):**
-
-- OffStageJobs (`staging.offstagejobs.com`) `OSJ` — THE primary source. Browse department indexes (Management, Electrics, Stage Management) in addition to keyword search. This board alone should produce 10-20 qualifying listings if swept properly.
-- Playbill Jobs (`playbill.com/jobs`) `PB` — Volume source. Browse Production/Management categories.
-- BroadwayWorld Jobs (`broadwayworld.com/jobs`) `BWW` — Volume source. Check multiple category filters.
-- StageLync (`stagelync.com`) `SL` — Updated weekly. Check Production Manager, Stage Management, Technical, and Administration categories separately.
-- USITT Job Board `USITT` — Check all relevant categories.
-- StageBoard (`stageboard.app` or `faizova.com`) `SB` — Aggregator pulling from 785+ employers/39 countries. High-yield if searched properly.
-
-**Tier 2 (hit at least 4 per pass, rotate through all over multiple passes):**
-
-- Arts Consulting Group `ACG` — Retained search, carries Director+ listings.
-- TOC Arts Partners `TOC` — Retained search, senior roles.
-- Skene Callboard (`skene.pub/callboard`) `SKN` — Performing arts positions and open calls.
-- League of Chicago Theatres (`chicagoplays.com/jobs`) `LCTJ` — Regional, strong for ME/SM.
-- APAP Job Bank `APAP` — Performing arts admin and production.
-- HireCulture (`hireculture.org`) `HC` — New England focused arts jobs.
-- The Stage Jobs (`jobs.thestage.co.uk`) `TSJ` — UK-heavy but carries international postings, strong backstage/technical section.
-- StageJobsy (`stagejobsy.com`) `SJ` — Smaller board, quick scan.
-- TheatreArtLife `TAL` — Occasional postings.
-- EntertainmentCareers.net `ECN` — Paywalled but search results visible.
-- ARTSEARCH `AS` — Gated (TCG), check Google cache/aggregators.
-- Indeed (filtered: theatre + production) `IND` — Low yield but worth one targeted sweep.
-- LinkedIn Jobs (filtered) `LI` — Check with theatre/performing arts industry filter.
-
-**Tier 3 (monthly sweep, opportunistic):**
-
-- Freelancer platforms / remote job boards (filtered for production/event)
-- Regional theatre association boards
-- AEA job postings (if accessible)
-- IATSE local union boards (if accessible)
-- SearchWide Global / MCA (retained search firms)
-
----
-
-## 📡 Source access notes
-
-Board realities an agent needs to know before scanning:
-
-- **OffStageJobs (`OSJ`):** `staging.offstagejobs.com` IS the live site (not a typo). **This is the #1 source for behind-the-scenes live entertainment jobs nationally, celebrating 29 years.** Do NOT settle for 3 sightings. Browse the Management, Electrics, Stage Management, and Production department pages directly (`/jobs.php?department=management`, etc.) in addition to keyword search. Detail pages sometimes lack org name. If org is unknown, log as NOTABLE/unlinked, do NOT invent a row. Try multiple entry points: department browse, keyword search, and recent postings. If detail pages are gated on a given visit, log what's visible from index pages (title + org when shown) and flag the access issue, but the INDEX itself should yield titles and orgs for most listings.
-- **StageLync (`SL`):** Clean category-based browsing. Check Production Manager, Stage Management, Technical Director, and Administration/Management categories individually. Updated weekly. Good direct URLs.
-- **StageBoard (`SB`):** Aggregator. Use role taxonomy search (it normalizes 200+ job titles). Filter by Production Management, Technical Direction, Stage Management, Lighting/Electrics. May require sign-in for full details but listings are browsable.
-- **Playbill (`PB`) + BroadwayWorld (`BWW`):** Volume sources for mid-level. Reliable URLs via UUID paths (PB) or numeric IDs (BWW). Most productive boards for PM/TD. Browse multiple categories, not just one keyword.
-- **EntertainmentCareers.net (`ECN`):** Paywalled. Listings visible in search but detail/apply requires subscription. URLs are capturable from search results.
-- **ARTSEARCH (`AS`):** Gated behind TCG membership. Listings sometimes surface via Google cache or third-party aggregators. Try `site:artsearch.tcg.org` Google searches.
-- **Indeed (`IND`):** Does NOT surface theatre staff listings reliably through keyword search. Theatre-specific terms get drowned by manufacturing/logistics. Low yield, one targeted sweep per pass max.
-- **APAP Job Bank (`APAP`):** Listings often lack posted dates. If no date, use `first_seen` for both `posted` and `first_seen`. Log date-absent fact in NOTABLE.
-- **League of Chicago Theatres (`LCTJ`):** Clean URLs, Chicago-focused. Good for ME and SM roles specifically.
-- **Skene Callboard (`SKN`):** Free, open access. Filter by Position type. Covers grants and open calls too (ignore those, positions only).
-- **The Stage Jobs (`TSJ`):** UK-focused but lists international roles. Strong backstage/technical section (34+ listings typical). Filter to Backstage & Technical, Management.
-- **HireCulture (`HC`):** New England arts organizations. Smaller volume but catches roles other boards miss.
-
----
-
-## 🧊 Cold-agent intelligence
-
-Operational knowledge for any agent picking this up cold:
-
-### Density expectations
-
-**The performing arts job market is NOT sparse.** At any given time there are 40-60+ qualifying postings across production management, technical direction, stage management, and electrics at the staff level nationally. If a pass finds fewer than 40, the agent swept too shallowly or too few sources. The fix is ALWAYS more thorough sweeping, never accepting a thin result.
-
-Expected yield by lane (approximate):
-- PM lane: 15-25 listings (highest open-board volume)
-- TD lane: 8-15 listings (overlaps PM frequently)
-- SM lane: 5-10 listings (thinner on open boards, union-heavy)
-- ME lane: 5-10 listings (thinner on open boards, IATSE-heavy)
-
-Expected yield by source (when swept properly):
-- OffStageJobs: 10-20 qualifying (the national source for backstage jobs)
-- Playbill + BWW combined: 8-15 qualifying
-- StageLync: 3-8 qualifying
-- StageBoard: 5-10 qualifying (aggregator, high coverage)
-- Retained search firms (ACG + TOC): 2-5 qualifying (senior/director level)
-- Regional boards (LCTJ, APAP, Skene, HC): 3-8 combined
-
-### Where the top-of-market lives
-
-- **Retained search firms (ACG, TOC, MCA/SearchWide Global)** carry ALL the Director+ listings. Check them first when scanning PM lane at senior level.
-- **OffStageJobs** is the national standard for behind-the-scenes staff positions. 29 years running. If the sweep isn't finding volume here, the approach is wrong.
-- **Playbill + BWW** are the volume sources for mid-level across all lanes.
-- **StageLync** is newer but actively maintained, updated weekly, good category structure.
-- **StageBoard** aggregates across 785+ employers. High signal if filtered correctly.
-- **Regional association boards (LCTJ, APAP, Skene)** catch niche postings the big aggregators miss.
-
-### Lane-specific realities
-
-- **SM and ME lanes are THINNER on open boards** (not absent). Staff-level positions in these lanes often fill through union calls (AEA for SM, IATSE for ME) or direct solicitation. Open-board scans will always be sparser here. That's expected, not a failure. But "sparser" means 5-10, not 0-1.
-- **PM lane has the highest open-board volume.** Most theatres post PM roles publicly.
-- **TD lane overlaps PM frequently.** "Technical Director/Production Manager" combo titles are common at smaller houses. Tag to TD lane, cross-reference PM.
-
-### Org/venue data
-
-The TSV's `org` column is building a theatre directory organically. Let it grow. Every new listing adds to the venue knowledge base. Future integration potential: CRM-style company/venue list that feeds constraints back into the search (e.g. "skip orgs we've already applied to"). Not built yet, but the data is accumulating.
-
-### Procedural notes
-
-- Search firms carry top-of-market. Check ACG + TOC FIRST on every pass.
-- Cross-posted listings are common between PB and BWW. Two rows, same org. Not duplicates.
-- If a listing URL goes dead between passes, mark GONE. Don't try to find it elsewhere.
-- APAP dates are unreliable. Use NOTABLE to flag.
-- Never add a row without a working URL. The NOTABLE section exists for unlinked sightings.
-- **When a board is "gated" or yields few results:** try alternate entry points (category browse, department pages, paginated views, Google site: searches). Log what was attempted. A gated board is a NOTABLE entry explaining the access issue, not a reason to accept low yield across the whole pass.
-- **Keyword exhaustion:** don't stop at the first keyword that returns results. Try ALL keywords in the role config against each board. Different boards index differently. "Production Manager" and "Director of Production" often live in different categories on the same board.
+All modes produce the same output format. The only variable is loop length.
+*("Scheduled cadence" was removed from the trigger column 2026-08-01 — there is no scheduler.)*
 
 ---
 
 ## Changelog
 
-- **v16 (2026-08-02)** — Major interaction design update. (1) ONE COMMENT PER NEW LISTING: each new find is posted as its own individual threaded reply, enabling emoji-reaction-based rating (🔥/👍/👎/🤔). (2) REACTION-BASED RATING: Brain reads reactions from previous pass to build preference patterns. (3) ⚡ SPOTLIGHT: top 3 listings across all roles elevated into pass summary. (4) FRICTION ICONS: ✅ direct / 📝 email / 🔒 gated on every listing. (5) BOARD HOMEPAGE LINKS: source names in SOURCES block hyperlink to their homepages. (6) Added `friction` column to TSV schema. (7) New guardrail: lumping multiple NEW listings into one comment = STOP. Template 3 rewritten for individual comments. Steps 4b and 10 updated.
-- **v15 (2026-08-02)** — added 📐 SLIM SAME/GONE, RICH NEW locked decision. SAME and GONE templates collapsed to single-line-per-listing format (no separators, no stacking, all fields on one line). NEW keeps the full stacked rich template. Net effect: a SAME block with 15 listings is 17 lines instead of 60+. GONE similarly compressed. No info removed, just formatting density.
-- **v14 (2026-08-02)** — added 🧵 THREAD FINDINGS, NEVER FLAT locked decision. Rewrote Comment Architecture section with explicit threading mechanics (capture comment ID, use as parent for replies). Updated Steps 9-10 with mechanical instructions for threading. Added template annotations ("THREADED REPLY to role header"). Added guardrail: posting SAME/NEW/GONE as root = STOP. Prior pass posted all findings flat; this version makes the threading requirement mechanically unambiguous.
-- **v13 (2026-08-01)** — brought into the standard runbook shape: added the `goal:` / `target:` / `report-to:` header (it had none, so a cold agent had no way to learn where a run gets reported), added the **Guardrails** section (it had none at all), removed `status: active` from the frontmatter (a second on/off switch, which `schedule.md` forbids), moved the STAMP from step 13 to step 16 so it lands after the pass summary rather than before it, restated the density floor as a *declared failure* that withholds the stamp per THE STAMP LAW, and added the complete-loops lock. No change to sources, templates, IDs, or the TSV schema.
-- v12 (2026-07-31) — loop-per-role, mobile-first, timestamped passes, density floor, comment index.
+- **v17 (2026-08-04)** — **Per-role commits and per-lane state files.** (1) 💾 COMMIT AT EVERY ROLE BOUNDARY:
+  a lane's file is committed as soon as its block is posted, resolving a v13-era contradiction between the
+  complete-loops lock and the single post-loop commit. (2) 🗂️ State split from one 25KB file into
+  `job-market-state/<role_id>.tsv` — the combined file had passed the ~22KB read-truncation line, where a
+  truncated read + full-file write silently destroys rows; it is now a tombstone. (3) 🔗 `also_lanes` column +
+  the one-row-one-home rule + Template 2b `↔️ ALSO` pointers. (4) 🗃️ `_unfiled.tsv` holding pen with an explicit
+  not-for-rejects rule. (5) ⏸️ CHECKPOINT rewritten to carry POSITION only — the `📋 TSV DELTA` block is deleted
+  and must never return. (6) 🔴 The OffStageJobs Department-Index Law, after three lanes were found to have been
+  under-reported for weeks by keyword-only sweeps. (7) Density floor annotated as a tripwire, not a target;
+  working baseline restated as 90-120. (8) File split into `job-market-refresh.md` + `job-market-templates.md`
+  + `job-market-sources.md` — the runbook had reached 41KB against a ~30KB read cap. Migration record:
+  `routines/job-market-state/_MIGRATION.md`. Promoted upward as universal Discipline rule 14 in `README.md`.
+- **v16 (2026-08-02)** — one comment per NEW listing (reaction surface) · reaction-based rating read forward ·
+  ⚡ Spotlight in the summary · friction icons on every listing · board homepage links in SOURCES ·
+  `friction` column added to the schema.
+- **v15 (2026-08-02)** — 📐 SLIM SAME/GONE, RICH NEW. SAME and GONE collapsed to one line per listing.
+- **v14 (2026-08-02)** — 🧵 THREAD FINDINGS, NEVER FLAT. Explicit threading mechanics; posting findings as root
+  comments became a STOP condition.
+- **v13 (2026-08-01)** — standard runbook header (`goal:`/`target:`/`report-to:`), the first Guardrails section,
+  `status:` removed from frontmatter, STAMP moved from step 13 to after the pass summary, density floor restated
+  as a declared failure, complete-loops lock added.
+- **v12 (2026-07-31)** — loop-per-role, mobile-first, timestamped passes, density floor, comment index.
