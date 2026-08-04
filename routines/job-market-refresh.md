@@ -7,8 +7,8 @@ cadence: pointer only — authoritative cadence is the row in routines/schedule.
 state_dir: routines/job-market-state/
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 17.1
-model: loop-per-role, commit-per-role, resumable
+version: 17.2
+model: loop-per-role, commit-per-role, resumable-by-derivation
 ---
 
 > ⚠️ **Frontmatter is metadata, never a switch.** `routines/schedule.md`'s table is the ONLY on/off switch
@@ -24,64 +24,88 @@ report-to:  DETAIL → the standing thread `86ajtgbt3` (role blocks + pass summa
 
 | File | Holds |
 |------|-------|
-| `job-market-refresh.md` | **this file** — locked decisions, architecture, schema, steps, guardrails |
-| `job-market-templates.md` | comment architecture, threading mechanics, output templates 1-8 |
+| `job-market-refresh.md` | **this file** — the Resume Scan, locked decisions, architecture, schema, steps, guardrails |
+| `job-market-templates.md` | comment architecture, threading mechanics, output templates 1-9 |
 | `job-market-sources.md` | the source list, board access notes, density expectations, cold-agent intelligence |
-
-*(Split 2026-08-04 at v17: the single runbook had reached 41KB against a ~30KB read cap, which meant the
-file carrying the STOP conditions could not be guaranteed to load whole. Per-concern split, no duplication.)*
 
 **WHAT this does.** The WHEN lives in `routines/schedule.md`. The universal floor lives in `routines/README.md` —
 including **THE STAMP LAW**, **rule 13 (complete loops)** and **rule 14 (commit at the boundary)**.
 
 ---
 
-## 🔀 THE RESUME TEST — run this BEFORE anything else
+## 🔀 THE RESUME SCAN — derive where you are, never be told
 
-**This routine does not assume it is starting fresh.** A pass may span several sessions. The FIRST thing any
-invocation does is work out which situation it is in, and the answer is arithmetic on two values, never a vibe
-and never the date on a comment.
+**A pass may span several sessions.** Before anything else, work out whether you are starting one or continuing
+one — **by looking at what actually happened, not by reading a note that says what happened.**
 
-**The two values:**
+> 📌 **The principle is already law in this repo: DERIVE, DON'T DECLARE.** It was written in the Routines Viewer
+> defect history (`routines/next-build-spec.md`) after six bugs, every one caused by a renderer trusting a
+> declared value instead of computing it — including three weeks of *"Last run: never"* on routines that had run
+> fine. **A status written in prose is a snapshot that starts rotting the instant it is saved.** The 2026-08-04
+> `TSV DELTA` incident is the same bug in a comment instead of a parser.
 
-1. **The stamp** — `routines/last-run/job-market.txt`, one line, `YYYY-MM-DD HH:MM` ET (or `never`).
-2. **The newest `⏸️ CHECKPOINT` comment** on the standing thread `86ajtgbt3`, by the timestamp in its heading.
+### The evidence ladder — strongest first
 
-**The test:**
+| # | Evidence | What it proves | Trust |
+|---|----------|----------------|-------|
+| **E1** | **Role header comments** on the standing thread, by pass anchor | which roles were *attempted* in this pass | 🥇 primary |
+| **E2** | **Lane state files** in `routines/job-market-state/` | which roles actually *committed* | 🥇 primary |
+| **E3** | **The stamp** `routines/last-run/job-market.txt` | whether a pass *landed* | 🥈 corroborating |
+| **E4** | **The `⏸️ CHECKPOINT` comment** | a **HINT** left by a previous session | 🥉 **reference only** |
 
-| Condition | Meaning | Do this |
-|---|---|---|
-| No checkpoint exists, or the **stamp is NEWER** than the newest checkpoint | The pass that checkpoint belonged to has since completed and landed. The checkpoint is **spent**. | ▶️ **FRESH PASS.** Start at role 1. |
-| The newest **checkpoint is NEWER** than the stamp | A pass is **mid-flight**. It stopped at a role boundary and never landed, so per THE STAMP LAW it correctly did not stamp. | ⏭️ **RESUME** at the role the checkpoint names. |
-| Stamp is `never` and a checkpoint exists | First pass, mid-flight. | ⏭️ **RESUME.** |
-| Stamp is `never`, no checkpoint | Never run. | ▶️ **FRESH PASS.** |
+🔴 **E4 is never a conditional.** Read it LAST, use it to speed up or sanity-check the answer you already
+derived, and **if it disagrees with E1/E2, the artifacts win and the checkpoint gets corrected.** A checkpoint
+is a courtesy note from a session that no longer exists; it cannot know what happened after it was written.
+This routine must produce the right answer with **no checkpoint at all** — if it can't, the scan is broken.
 
-**Why the stamp is the arbiter and "is the checkpoint from today?" is not:** a checkpoint and its completing
-pass usually share the same calendar day, so a same-day test says RESUME on a pass that already finished. That
-is a live misfire, not a hypothetical — on 2026-08-04 a 13:20 checkpoint sat in the thread after the 16:20
-resume completed and stamped. **The stamp is written only when the product lands, so "stamp newer than
-checkpoint" is exactly the statement "that work is done."** The test composes with THE STAMP LAW for free:
-an aborted pass does not stamp, so its checkpoint stays newer and correctly reads as resume.
+### The scan
 
-**On consuming a checkpoint:** the session that resumes from one **must EDIT that comment** to `✅ CHECKPOINT ·
-<time> — SPENT` with a pointer to the pass that completed it. A spent checkpoint left reading as live is the
-same prose-state defect v17 was written to kill, just wearing a different hat. Belt and braces — the arithmetic
-is the rule, the edit is the courtesy to the next reader.
+1. **Read the standing thread's ROOT comments.** Every role header carries a machine anchor line
+   (Template 1): `` `<role_id>` · pass `<YYYY-MM-DD HH:MM>` ``.
+2. **Identify the CURRENT PASS** = the newest pass anchor found among role headers.
+3. **Is there a `📋 PASS COMPLETE` carrying that same anchor?**
+   - **Yes** → that pass finished. ▶️ **FRESH PASS**, start at role 1.
+   - **No** → a pass is unfinished. Continue.
+4. **List the roles that have a header under the current pass anchor.** Walking `roles.json` in order, the
+   **first role with no header is your resume point.**
+5. **Verify the boundary role** — the last one that DOES have a header. Two checks, because a header is not a
+   finished role:
+   - Does it have its threaded block (SAME / NEW / GONE / NOTABLE) underneath?
+   - Does its lane file in `routines/job-market-state/` contain the rows that block describes?
+   - **If either is missing, THAT role is the resume point**, not the next one. *(This is not hypothetical:
+     on 2026-08-04 three role headers were posted with no children when threading failed mid-pass.)*
+6. **Cross-check the stamp (E3).** If the stamp is NEWER than the current pass anchor, the pass landed but its
+   summary is missing from the thread. **That is a contradiction — say so out loud and ask.** Do not guess.
+7. **Staleness.** If the current pass anchor is older than one cadence interval (>24h for a daily routine), the
+   pass is **ABANDONED, not resumable.** ▶️ **FRESH PASS** — and name the orphaned roles in the report, because
+   half an inventory a day older than the other half is worse than a clean restart.
+8. **Now read the checkpoint (E4)**, if one exists. Agreement → proceed, and it saves you the board list and
+   elapsed time, which are genuinely not derivable. Disagreement → **trust your scan, and edit the checkpoint**
+   (Template 9) so the next reader isn't misled.
 
-🚫 **Never resume from a checkpoint's CONTENT.** It carries position only. What is captured lives in the state
-files; read those.
+**State the outcome in your first line**, with the evidence: *"FRESH — newest pass 2026-08-04 13:20 has a PASS
+COMPLETE and the stamp reads 16:20"* or *"RESUME at `operations-safety` — pass 2026-08-04 13:20 has headers for
+4 of 8 roles, no PASS COMPLETE, no stamp since."* The reader must be able to check your work.
+
+🚫 **Never resume from a checkpoint's CONTENT.** It carries position, not data. What is captured lives in the
+lane files.
 
 ---
 
 ## Locked decisions
 
+> **🔎 DERIVE POSITION, NEVER DECLARE IT.** (LOCKED 2026-08-04, Michael)
+> *"Instead of using them as conditionals, we could use them as references… then check the middle of the routine
+> to see where we are."* The artifacts a pass leaves behind — posted headers, committed lane files, the stamp —
+> ARE the position. A checkpoint is a hint about the position. **The routine must resume correctly with no
+> checkpoint at all.** Anything else makes a prose note load-bearing, which is the exact defect class that
+> produced the TSV-delta incident and, before it, six Routines Viewer bugs.
+
 > **💾 COMMIT AT EVERY ROLE BOUNDARY.** (LOCKED 2026-08-04, Michael)
 > A role's state file is committed the moment that role's sweep and comment block are finished — before the
 > next role starts. **State is NEVER handed between sessions as text.** Michael: *"Each session should complete
 > its loop fully and not try to pass TSV data between sessions for exactly the reasons you found."*
-> This resolves a contradiction that had been live since v13: the complete-loops lock said *"stop at a role
-> boundary, commit the rows you have"* while step 13 said commit once, post-loop. Every mid-loop stop fell
-> into that gap.
+> This is also what makes E2 trustworthy: a committed lane file is proof a role finished.
 
 > **🗂️ ONE STATE FILE PER LANE.** (LOCKED 2026-08-04, Michael)
 > `routines/job-market-state/<role_id>.tsv`, filename == `role_id`, exactly. Adding a role to the config means
@@ -109,7 +133,8 @@ files; read those.
 > **🕐 PASSES = DATE AND TIME, NEVER NUMBERED.** (LOCKED 2026-07-31, Michael)
 > Identity is `YYYY-MM-DD HH:MM ET`. Reference previous passes by timestamp + elapsed interval.
 > ⚠️ **A multi-session pass keeps the timestamp it OPENED with**, on every role header and on the summary, so
-> the whole pass reads as one event. The stamp records when it LANDED. Those two differing is normal.
+> the whole pass reads as one event — **and so the Resume Scan can group headers by pass.** The stamp records
+> when it LANDED. Those two differing is normal and expected.
 
 > **🔁 LOOP, NOT SUMMARY.** (LOCKED 2026-07-31, Michael)
 > Each role is its own market entity, gets a SEPARATE COMPLETE report, the same depth, the same template.
@@ -132,8 +157,8 @@ files; read those.
 > Below 40 total live is a **DECLARED FAILURE** — per THE STAMP LAW it does NOT stamp. The agent must
 > (1) re-sweep Tier 1 with alternate keyword permutations, (2) expand to unhit Tier 2 sources,
 > (3) try paginated/filtered/department views on gated boards.
-> ⚠️ **Calibration note added v17:** the floor was set against keyword-only sweeps and is now easy to clear.
-> Clearing it is NOT evidence of a good pass. Post-department-index the working baseline is 90-120.
+> ⚠️ **Calibration note:** the floor was set against keyword-only sweeps and is now easy to clear. Clearing it
+> is NOT evidence of a good pass. Post-department-index the working baseline is 90-120.
 > **Judge depth by SOURCES coverage, not by the total.** See `job-market-sources.md`.
 
 > **🗂️ PASS SUMMARY = TABLE OF CONTENTS.** (LOCKED 2026-07-31, Michael)
@@ -149,7 +174,8 @@ files; read those.
 > **🧵 THREAD FINDINGS, NEVER FLAT.** (LOCKED 2026-08-02, Michael)
 > Top-level comments are ONLY role headers, checkpoints, and the pass summary. ALL listing detail is threaded
 > under the relevant role header. A pass that posts SAME/NEW/GONE as root comments is STRUCTURALLY BROKEN
-> regardless of content quality. If the comment tool requires a `parent_comment` parameter, USE IT.
+> regardless of content quality. **This is now load-bearing twice over:** a tight root stream is also what makes
+> the Resume Scan cheap and unambiguous.
 
 > **📐 SLIM SAME/GONE, RICH NEW.** (LOCKED 2026-08-02, Michael)
 > SAME, ALSO and GONE are single-line-per-listing. NEW keeps the full stacked template.
@@ -177,17 +203,18 @@ files; read those.
 
 **One task, one conversation, three persistence layers.**
 
-- **Standing thread:** `86ajtgbt3` — the trigger, the read surface, and the checkpoint surface, all one task.
+- **Standing thread:** `86ajtgbt3` — the trigger, the read surface, the checkpoint surface, **and the primary
+  evidence surface for the Resume Scan**, all one task.
 - **Never create a second research task.** The Applications list (`900600097138`) is a funnel, not an
   inventory. Listings become tasks there ONLY when Michael says to act.
 
 | Layer | Holds | Read by |
 |-------|-------|--------|
-| `routines/job-market-roles.json` | **The gate.** Which roles to search, with what keywords, on what boards. The loop driver. | Every pass (step 2). |
-| `routines/job-market-state/<role_id>.tsv` | Structured index, one file per lane. Also an organic **venue/org index** — the `org` column is growing a theatre directory as a side effect. | All read at pre-loop (step 3); one written per role boundary (step 11). |
+| `routines/job-market-roles.json` | **The gate.** Which roles to search, with what keywords. The loop driver, and the ORDER the Resume Scan walks. | Every pass. |
+| `routines/job-market-state/<role_id>.tsv` | Structured index, one file per lane. Also an organic **venue/org index**. **Evidence E2.** | All read at pre-loop; one written per role boundary. |
 | `routines/job-market-state/_unfiled.tsv` | Qualifying finds with no lane yet. | Pre-loop + post-loop. |
-| `routines/last-run/job-market.txt` | The stamp — **and the arbiter of the Resume Test.** | Step 1, and written at step 17. |
-| Comment thread | Narrative + checkpoints. One header per role per pass, individual NEW comments as the reaction surface. | Michael, on his phone. |
+| `routines/last-run/job-market.txt` | The stamp. **Evidence E3.** | Pre-loop, and written at step 18. |
+| Comment thread | Narrative + checkpoints. **Evidence E1 (role headers) and E4 (checkpoint).** | Michael, on his phone. |
 
 **The TSVs are source of truth. The thread is the read surface. The TSVs win disagreements.**
 
@@ -196,7 +223,7 @@ files; read those.
 - A listing enters its lane file when found AND its direct URL is captured (`status=live`).
 - `gone` when it disappears. Gone rows stay one pass, then get deleted. Git preserves history.
 - `acted` when Michael says to act and an Application task is created.
-- **Uncommitted work did not happen.** Under v17 that window is one role long, never a whole pass.
+- **Uncommitted work did not happen** — and under the Resume Scan, it will correctly be re-done.
 
 ### 🗃️ `_unfiled.tsv`
 
@@ -212,34 +239,37 @@ feedback loop, it is not the executor's call.
 ### Reaction data
 
 Before sweeping, check emoji reactions on the previous pass's individual NEW listing comments. Patterns to
-track: geography (which cities get 🔥 vs 👎) · salary threshold (lowest-paying listing that still got 👍) ·
-org type (LORT vs touring vs commercial vs dance) · contract type · role level. These inform Spotlight and,
-over time, which borderline listings qualify vs get logged as NOTABLE only.
+track: geography · salary threshold · org type · contract type · role level. These inform Spotlight and, over
+time, which borderline listings qualify vs get logged as NOTABLE only. *(You are already reading the thread for
+the Resume Scan, so this costs nothing extra.)*
 
 ---
 
 ## 🔑 The gate: `routines/job-market-roles.json`
 
-This file IS the loop. `roles[]` is an ordered list; the routine iterates it top to bottom and every entry gets
-a full, independent pass. Per role: `id`, `display`, `lane`, `keywords[]`, `levels[]`, `exclude_terms[]`,
-`constraints{}`. `global{}` applies to all roles. `_meta._rulings` carries dated provenance for keyword moves —
-read it before proposing a keyword change someone already settled.
+This file IS the loop, **and its `roles[]` ORDER is what the Resume Scan walks** to find the first role with no
+header. Per role: `id`, `display`, `lane`, `keywords[]`, `levels[]`, `exclude_terms[]`, `constraints{}`.
+`global{}` applies to all roles. `_meta._rulings` carries dated provenance for keyword moves — read it before
+proposing a keyword change someone already settled.
+
+⚠️ **Reordering `roles[]` mid-pass would corrupt a resume.** Config changes are a separate, explicit action.
 
 ```
-RESUME TEST -> fresh or resume?
+RESUME SCAN -> fresh, or resume at role N?
 for each role in roles.json (from the resume point):
     1. read this role's lane file          -> known inventory
     2. walk ALL source boards with this role's keywords AND department indexes
     3. apply global constraints (geography, academic, overhire)
     4. reconcile against known inventory
-    5. post the role's comment block
-    6. COMMIT this lane's file             <- the boundary
+    5. post the role's comment block       <- leaves EVIDENCE E1
+    6. COMMIT this lane's file             <- leaves EVIDENCE E2, and is the boundary
     7. move to next role
 ```
 
 **Single-role invocation:** *"do job search for stage manager"* → filter `roles[]` to that role. Loop length 1,
-same template, same depth, same commit. A single-role run does NOT stamp the routine and does NOT satisfy the
-density floor — it is a targeted top-up, not a pass. Say so in the report.
+same template, same depth, same commit. A single-role run does NOT stamp and does NOT satisfy the density floor
+— it is a targeted top-up, not a pass. **Mark its header `top-up` on the anchor line so the Resume Scan does not
+mistake it for an abandoned full pass.**
 
 **Adding a role:** add an entry to `roles[]` AND create `routines/job-market-state/<id>.tsv` with the header row.
 **Retiring a role:** requires Michael. See the no-lane-is-ever-skipped lock above.
@@ -266,7 +296,7 @@ Tab-separated, header row, one listing per line, identical in every lane file.
 | `level` | yes | `senior` / `mid` / `associate` / `entry` / `contract` |
 | `status` | yes | `live` / `gone` / `acted` |
 | `friction` | yes | `direct` / `email` / `gated` |
-| `also_lanes` | optional | Pipe-separated `role_id`s this listing ALSO matches. Added v17. |
+| `also_lanes` | optional | Pipe-separated `role_id`s this listing ALSO matches |
 
 **Normalization rules:**
 - One row per listing per board. Cross-posted between boards = two rows (different `site`, different `id`).
@@ -295,12 +325,12 @@ Theatres · `APAP` APAP Job Bank · `SL` StageLync · `SKN` Skene Callboard · `
 ## 🎯 Target profile
 
 **Defined in `job-market-roles.json`.** That file is the single source for what to search and what to exclude.
-This section is documentation only. Evaluation (what makes a listing INTERESTING rather than QUALIFYING) is a
-separate concern and lives in `routines/job-market-evaluation.md`, read by Corso, not by the executor.
+This section is documentation only. Evaluation (what makes a listing INTERESTING rather than QUALIFYING) lives
+in `routines/job-market-evaluation.md`, read by Corso, not by the executor.
 
 - **Geography: ANYWHERE.** Relocation live. Remote explicitly included.
 - **Lane: NON-ACADEMIC** (deprioritized, not banned).
-- **Level: ALL except pure overhire/day-call.** Senior, mid, associate, part-time, contract, remote/hybrid, drafting, smaller-scale.
+- **Level: ALL except pure overhire/day-call.**
 - **Part-time and contract are IN.**
 
 **What's OUT:** manufacturing/industrial/logistics · pure crew calls, single-day overhire, internships ·
@@ -312,118 +342,109 @@ academic tenure-track (unless a genuine step up) · per-role `exclude_terms[]`.
 
 ### Pre-loop
 
-1. 🔀 **RUN THE RESUME TEST.** Read `routines/last-run/job-market.txt` and the newest `⏸️ CHECKPOINT` on the
-   standing thread. Decide FRESH or RESUME per the table at the top of this file. **Say which, out loud, in the
-   first line of the reply**, with both timestamps — the reader must be able to check your arithmetic.
-2. **Read `routines/job-market-roles.json`** — the gate. This defines the loop. Read `_meta._rulings` too.
+1. 🔀 **RUN THE RESUME SCAN** (top of this file). Read the thread's root comments, derive the current pass and
+   the resume point from E1/E2, corroborate with E3, then read the checkpoint E4 as a hint only.
+   **State FRESH or RESUME-at-`<role_id>` in your first line, with the evidence.**
+2. **Read `routines/job-market-roles.json`** — the gate. Read `_meta._rulings` too.
 3. **Read ALL lane files in `routines/job-market-state/`, including `_unfiled.tsv`** — one read, the full
-   inventory. You need the whole picture to dedup by URL and to spot cross-lane hits, even though you will
-   only WRITE one file at a time.
-4. **If RESUMING:** the checkpoint names the next role. Skip to it — do NOT re-sweep completed lanes, they are
-   already committed and already posted. Keep the ORIGINAL pass timestamp on every remaining header.
-   Edit the checkpoint comment to `✅ … SPENT` once you have consumed it.
-5. **If single-role invocation:** filter `roles[]` to that role. Loop length = 1.
-6. **Check reactions on the previous pass's NEW listing comments.** Note 🔥 vs 👎 patterns; they inform Spotlight.
+   inventory. Needed to dedup by URL, to catch cross-lane hits, and as Resume Scan evidence E2.
+4. **If RESUMING:** start at the derived role. Do NOT re-sweep roles that have a header AND a committed lane
+   file. Keep the ORIGINAL pass anchor on every remaining header. Edit any stale checkpoint to `✅ SPENT`.
+5. **If single-role invocation:** filter `roles[]` to that role and mark the header `top-up`.
+6. **Check reactions** on the previous pass's NEW listing comments; they inform Spotlight.
 
-### The loop — for each role in config
+### The loop — for each role from the resume point
 
 7. **Filter to this role's lane file.** That is the known inventory. Also collect every row in OTHER lane files
    whose `also_lanes` names this role — those are the `↔️ ALSO` pointers, not this lane's rows.
-8. **Walk ALL source boards** per `job-market-sources.md`. Sweep requirements:
+8. **Walk ALL source boards** per `job-market-sources.md`:
    - Try EACH keyword from the config independently, not just the first that returns hits.
-   - 🔴 **Browse the department/category INDEX pages, not only keyword search.** This is required, not a
-     fallback — see the Department-Index Law in `job-market-sources.md`. Verify the filter actually applied.
+   - 🔴 **Browse the department/category INDEX pages, not only keyword search.** Required, not a fallback — see
+     the Department-Index Law. Verify the filter actually applied.
    - Paginated boards: at least 3 pages deep, or until results go irrelevant.
    - Date-sorted boards: scan both "newest" and "relevance".
    - 0 results on all keywords → try adjacent terms and synonyms before marking a board dry. For
      `operations-safety`, also sweep the venue/arena/municipal boards — thin is expected, empty means you
      looked in the wrong place.
-   - **Minimum coverage:** ALL Tier 1 sources and at least 4 Tier 2. A skipped source without an explanation
-     makes the pass incomplete.
-   - Apply `exclude_terms[]` and `global` constraints. Capture a direct URL and a friction type for every qualifier.
-9. **Reconcile:**
-   - Matched to an existing row = SAME (days-on-board = today − `posted`)
-   - New find with URL = NEW (assign `JM-ID`, `role_id`, `lane`, `level`, `friction`, and `also_lanes` if it spans lanes)
-   - Existing row not found on any board = GONE
-   - Qualifies but no lane fits = a row in `_unfiled.tsv`
-10. **Post the role's comment block** per `job-market-templates.md`: header as ROOT (capture its comment ID),
-    then SAME · ALSO · each NEW individually · GONE · NOTABLE as threaded replies to that ID.
-    If the sweep turned up anything after the header went up, **edit the header's counts.**
-11. 💾 **COMMIT this lane's file now.** `routines/job-market-state/<role_id>.tsv`, message
-    `data(job-market): <timestamp> ET — <role_id>, <n> live, <+-n>`. Re-read the file's SHA immediately before
-    writing; never write from a SHA captured earlier in the pass.
-12. **Repeat from step 7** for the next role. **A role that got a header but no block, or a block but no commit,
-    is a broken loop, not a short one.**
+   - **Minimum coverage:** ALL Tier 1 sources and at least 4 Tier 2.
+   - Apply `exclude_terms[]` and `global` constraints. Capture a direct URL and friction type for every qualifier.
+9. **Reconcile:** matched = SAME (days-on-board = today − `posted`) · new find with URL = NEW · existing row not
+   found = GONE · qualifies but no lane fits = `_unfiled.tsv`.
+10. **Post the role's comment block** per `job-market-templates.md`: header as ROOT **including the machine
+    anchor line** (capture its comment ID), then SAME · ALSO · each NEW individually · GONE · NOTABLE as
+    threaded replies. If the sweep turned up more after the header went up, **edit the header's counts.**
+11. 💾 **COMMIT this lane's file now.** Message `data(job-market): <pass anchor> ET — <role_id>, <n> live, <+-n>`.
+    Re-read the file's SHA immediately before writing; never write from a SHA captured earlier in the pass.
+12. **Repeat from step 7.** **A role with a header but no block, or a block but no commit, is a broken loop** —
+    and the Resume Scan will correctly send the next session back to redo it.
 
 ### Post-loop
 
-13. **Density check.** Total live under 40 = **DECLARED FAILURE**: name which sources were blocked or thin and
-    what retry was attempted, and do NOT stamp. Lane files already committed stay committed — the rows are real
-    and losing them helps nobody. The stamp is what is withheld, never the data.
+13. **Density check.** Under 40 total live = **DECLARED FAILURE**: name which sources were blocked or thin and
+    what retry was attempted, and do NOT stamp. Committed lane files stay committed.
 14. **Commit `_unfiled.tsv`** if it gained rows.
-15. **Post 📋 PASS SUMMARY** as a ROOT comment (Template 6), including ⚡ Spotlight and the 🗃️ Unfiled section
-    if any. Capture its comment ID. On a multi-session pass, use the ORIGINAL pass timestamp.
-16. **Post 🔌 SOURCES** as a reply to the summary (Template 7), then edit the summary to add the SOURCES link.
-    On a multi-session pass, SOURCES must cover EVERY session's board coverage, not just this session's.
-17. **STAMP** — *last write, and only if the pass succeeded.* Write `routines/last-run/job-market.txt`, one line,
-    `YYYY-MM-DD HH:MM` ET **of when it landed**, not the pass identity timestamp. Per THE STAMP LAW: complete
-    pass stamps · a blocked board with the inventory still landed is a PARTIAL and stamps with the gap named ·
-    **a below-floor pass or an aborted loop does NOT stamp.** ⚠️ **The stamp is also what retires the pass's
-    checkpoint** under the Resume Test — stamping is what tells the next session not to resume.
-18. **Post the roll-up** to 🧭 STANDING · Routine Ricky — Run Reports (https://app.clickup.com/t/86ajuhw1d): one entry for this
-    routine, linking the pass summary comment and the commits. Include the `Ledger:` line.
+15. **Post 📋 PASS SUMMARY** as a ROOT comment (Template 6) **carrying the pass anchor** — that anchor is what
+    tells the next Resume Scan the pass is closed. Include ⚡ Spotlight and 🗃️ Unfiled if any.
+16. **Post 🔌 SOURCES** as a reply to the summary, then edit the summary to add the link. On a multi-session
+    pass, SOURCES covers EVERY session's coverage, not just the last one's.
+17. **Edit any checkpoint from this pass to `✅ SPENT`** (Template 9).
+18. **STAMP** — *last write, only if the pass succeeded.* `routines/last-run/job-market.txt`, one line,
+    `YYYY-MM-DD HH:MM` ET **of when it landed**. Per THE STAMP LAW: complete pass stamps · a blocked board with
+    the inventory still landed is a PARTIAL and stamps with the gap named · **a below-floor pass or an aborted
+    loop does NOT stamp.**
+19. **Post the roll-up** to 🧭 STANDING · Routine Ricky — Run Reports (https://app.clickup.com/t/86ajuhw1d), linking the pass summary
+    and the commits. Include the `Ledger:` line.
 
 ### If you must stop mid-loop
 
-Stop at a **role boundary**, never inside one. Every finished lane is already committed, so post a
-⏸️ CHECKPOINT (Template 8) carrying **position only** — roles complete, next role, commit SHA.
-**Do not stamp.** The absence of a stamp is precisely what makes the next session resume instead of restart.
+Stop at a **role boundary**, never inside one. Every finished lane is already committed and its header is
+already posted, so **the next session can find its place with or without your note.** Post a ⏸️ CHECKPOINT
+(Template 8) as a courtesy — position, SHA, boards hit, elapsed. **Do not stamp.**
 🚫 **Never paste row data into a checkpoint.** If you want the next session to have a row, commit it.
 
 ---
 
 ## Guardrails (STOP + flag if any is true)
 
-- **You are about to start sweeping without having run the Resume Test.** That is step 1 for a reason: the cost
-  of getting it wrong is either re-sweeping four finished lanes or silently dropping them.
-- **You are about to resume based on a checkpoint being "from today."** Wrong test. Compare it to the STAMP.
+- **You are about to trust a checkpoint instead of deriving position.** E4 is a hint. Derive first, then compare.
+- **You are about to skip the Resume Scan** because a checkpoint looks clear, or because there is no checkpoint
+  at all. The scan runs either way — its whole point is working without one.
+- **Your scan and the checkpoint disagree and you are about to follow the checkpoint.** The artifacts win.
+  Correct the checkpoint.
+- **The stamp is newer than the newest pass anchor** → contradiction. Say so and ask. Never guess.
+- **You are about to resume a pass more than a cadence interval old.** That is ABANDONED. Start fresh and name
+  the orphaned roles.
+- **You are about to re-sweep a role that has a header AND a committed lane file.** That work is done.
+- **You are about to skip a role that has a header but NO block or NO commit.** That work is not done.
 - **You are about to stamp a pass you only partly ran** because it "feels finished." An aborted loop does not
   stamp — that is what makes it resumable.
-- **You are about to post SAME, ALSO, NEW, GONE or NOTABLE as a ROOT comment.** These are ALWAYS threaded
-  replies. If you cannot reply to a parent, STOP and ask. Never dump them flat.
-- **You are about to lump multiple NEW listings into one comment.** Each is its own reply. Split them.
-- **You are about to leave a role header with no block under it.** Attach the block or correct the header —
-  never leave an orphan, never open a second header for the same role in the same pass.
-- **You are about to start the next role without committing the current one.** That is the boundary. Commit first.
-- **You are about to write a lane file using a SHA read earlier in the pass.** Re-read it. A stale SHA is how
-  a write silently clobbers a sibling's rows.
-- **You are about to put the same listing in two lane files.** One listing = one row = one home file. Use `also_lanes`.
-- **You are about to put a REJECTED find in `_unfiled.tsv`.** Unfiled means qualifies-but-no-lane. Rejects are prose in NOTABLE.
-- **You are about to paste TSV rows into a ClickUp comment for a later session to apply.** Commit them instead.
-- **You are about to skip, deprioritise or retire a lane because it is thin.** Not your call, and the answer has
-  already been no twice. Sweep harder and say what you tried.
+- **You are about to post a role header without the machine anchor line.** The next Resume Scan needs it.
+- **You are about to post SAME, ALSO, NEW, GONE or NOTABLE as a ROOT comment.** Always threaded replies. If you
+  cannot reply to a parent, STOP and ask — a flat dump also corrupts the Resume Scan's root-comment evidence.
+- **You are about to lump multiple NEW listings into one comment.** Each is its own reply.
+- **You are about to leave a role header with no block under it.** Attach the block or correct the header.
+- **You are about to start the next role without committing the current one.** That is the boundary.
+- **You are about to write a lane file using a SHA read earlier in the pass.** Re-read it.
+- **You are about to put the same listing in two lane files.** One listing = one row = one home file.
+- **You are about to put a REJECTED find in `_unfiled.tsv`.** Rejects are prose in NOTABLE.
+- **You are about to paste TSV rows into a ClickUp comment** for a later session to apply. Commit them instead.
+- **You are about to reorder or edit `roles.json` mid-pass.** That corrupts a resume. Separate, explicit action.
+- **You are about to skip, deprioritise or retire a lane because it is thin.** Not your call; ruled twice.
 - **You are about to conclude a role "does not exist" because a keyword returned zero.** Zero is a fact about
-  your sources. Name the boards you checked before you draw any conclusion about the world.
-- **You are about to change the schema mid-pass.** Not allowed here — that is a build session (README rule 7).
-- **You are about to create a ClickUp TASK.** This routine creates none. Listings become Application tasks ONLY
-  when Michael says to act. A pass that files tasks is the failure mode that killed v2.
+  your sources. Name the boards you checked first.
+- **You are about to change the schema mid-pass.** Build session only (README rule 7).
+- **You are about to create a ClickUp TASK.** This routine creates none.
 - **You are about to send anything** (email, DM, application). This routine transmits nothing, ever.
-- **You are about to create a second research task or a second thread.** `86ajtgbt3` or nothing.
-- **A listing has no working direct URL** → no row. Log it as an unlinked sighting in NOTABLE. Never invent or
-  reconstruct a URL.
-- **A row's `role_id` doesn't match an entry in the config, or doesn't match its filename** → STOP and flag,
-  never guess a lane.
+- **You are about to create a second research task or thread.** `86ajtgbt3` or nothing.
+- **A listing has no working direct URL** → no row. Unlinked sighting in NOTABLE. Never invent a URL.
+- **A row's `role_id` doesn't match the config or its filename** → STOP and flag.
 - **A listing is flagged "reported for review" on its board** → not admitted. NOTABLE only.
-- **Total live is under 40** → DECLARED FAILURE. Re-sweep per the density floor; if still short, report
-  incomplete and do NOT stamp.
-- **You would post output containing a markdown table** → STOP. Mobile-first, stacked blocks only.
+- **Total live is under 40** → DECLARED FAILURE. Re-sweep; if still short, report incomplete and do NOT stamp.
+- **You would post a markdown table** → STOP. Mobile-first, stacked blocks only.
 - **You would aggregate roles into one shared block** → STOP. Loop, not summary.
-- **You are tempted to shorten the sweep because the pass is long** → STOP. That is exactly what rule 13 exists for.
-- **You would skip the department indexes because keyword search already returned plenty** → STOP. Read the
-  Department-Index Law. Volume is not coverage.
+- **You are tempted to shorten the sweep because the pass is long** → STOP. Rule 13.
+- **You would skip the department indexes** because keyword search returned plenty → STOP. Volume is not coverage.
 - **You would replay every missed day on a catch-up** → STOP. A late pass is ONE pass covering more days.
-- **You would edit `job-market-roles.json` mid-pass to make results fit** → STOP. Config changes are separate
-  and explicit.
 - **A board name in SOURCES is plain text** → STOP. Every board name links to its homepage.
 
 ---
@@ -432,43 +453,40 @@ Stop at a **role boundary**, never inside one. Every finished lane is already co
 
 | Mode | Trigger | Behavior |
 |------|---------|----------|
-| **Pick this up** | "pick this up" / "let's pick this up" on the standing task | **Run the Resume Test first**, then either a fresh full loop or a resume from the checkpointed role. This is the primary door. |
+| **Pick this up** | "pick this up" / "let's pick this up" on the standing task | **Run the Resume Scan first**, then either a fresh full loop or a resume at the derived role. The primary door. |
 | **Full loop** | "run job market refresh", or the cadence is due | All roles in config, sequential, committed per role |
-| **Single role** | "do job search for [role name]" | One role only, same template, same depth, same commit. Does not stamp. |
+| **Single role** | "do job search for [role name]" | One role only, same template and depth. Marked `top-up`; does not stamp. |
 | **Add role** | "add [role] to job search" | Edit the JSON config, create the lane file, run that role immediately |
-
-All modes produce the same output format. The only variable is loop length.
-*("Scheduled cadence" was removed from the trigger column 2026-08-01 — there is no scheduler.)*
 
 ---
 
 ## Changelog
 
-- **v17.1 (2026-08-04)** — **The Resume Test.** (1) 🔀 A deterministic fresh-vs-resume decision as step 1,
-  arbitrated by **stamp vs newest checkpoint** rather than "is the checkpoint from today" — the same-day test
-  misfired live, telling a session to resume from a pass that had already completed and stamped hours earlier.
-  (2) A consumed checkpoint must be edited to `✅ SPENT`. (3) The three 2026-08-04 rulings folded in as the
-  no-lane-is-ever-skipped lock, plus the `also_lanes`-is-not-a-decision note. (4) Multi-session passes keep
-  their opening timestamp; the stamp records landing time. (5) "Pick this up" named as the primary invocation.
-- **v17 (2026-08-04)** — **Per-role commits and per-lane state files.** (1) 💾 COMMIT AT EVERY ROLE BOUNDARY:
-  a lane's file is committed as soon as its block is posted, resolving a v13-era contradiction between the
-  complete-loops lock and the single post-loop commit. (2) 🗂️ State split from one 25KB file into
-  `job-market-state/<role_id>.tsv` — the combined file had passed the ~22KB read-truncation line, where a
-  truncated read + full-file write silently destroys rows; it is now a tombstone. (3) 🔗 `also_lanes` column +
-  the one-row-one-home rule + Template 2b `↔️ ALSO` pointers. (4) 🗃️ `_unfiled.tsv` holding pen with an explicit
-  not-for-rejects rule. (5) ⏸️ CHECKPOINT rewritten to carry POSITION only — the `📋 TSV DELTA` block is deleted
-  and must never return. (6) 🔴 The OffStageJobs Department-Index Law, after three lanes were found to have been
-  under-reported for weeks by keyword-only sweeps. (7) Density floor annotated as a tripwire, not a target;
-  working baseline restated as 90-120. (8) File split into `job-market-refresh.md` + `job-market-templates.md`
-  + `job-market-sources.md` — the runbook had reached 41KB against a ~30KB read cap. Migration record:
+- **v17.2 (2026-08-04)** — **THE RESUME SCAN: derive position, don't read it.** Michael: *"Instead of using them
+  as conditionals, we could use them as references… then check the middle of the routine to see where we are."*
+  (1) Position is now DERIVED from posted role headers + committed lane files, walking `roles[]` order; the
+  checkpoint is demoted from conditional to **hint (E4)**, verified and never obeyed. **The routine now resumes
+  correctly with no checkpoint at all.** (2) Boundary verification added — a header without its block or commit
+  means that role is the resume point, catching the orphan-header failure seen 2026-08-04. (3) Abandoned-pass
+  rule: an unfinished pass older than one cadence interval is a fresh start, not a resume. (4) Contradiction
+  handling: stamp newer than the newest pass anchor = stop and ask. (5) Role headers now carry a machine anchor
+  line (`role_id` + pass) so the scan is exact rather than fuzzy-matching display names. (6) Single-role runs
+  marked `top-up` so they are never mistaken for an abandoned pass.
+- **v17.1 (2026-08-04)** — The Resume Test: a deterministic fresh-vs-resume decision arbitrated by stamp vs
+  newest checkpoint, replacing "is the checkpoint from today" (which misfired live). Superseded within the hour
+  by v17.2, which removed the dependence on the checkpoint entirely. Consumed checkpoints must be edited to
+  `✅ SPENT`; the three 08-04 rulings folded in as the no-lane-is-ever-skipped lock.
+- **v17 (2026-08-04)** — **Per-role commits and per-lane state files.** (1) 💾 COMMIT AT EVERY ROLE BOUNDARY,
+  resolving a v13-era contradiction between the complete-loops lock and the single post-loop commit. (2) 🗂️
+  State split into `job-market-state/<role_id>.tsv`. (3) 🔗 `also_lanes` + the one-row-one-home rule + Template
+  2b. (4) 🗃️ `_unfiled.tsv` with an explicit not-for-rejects rule. (5) ⏸️ CHECKPOINT rewritten to carry POSITION
+  only — the `📋 TSV DELTA` block deleted and never to return. (6) 🔴 The Department-Index Law. (7) Density floor
+  annotated as a tripwire, not a target. (8) File split into runbook + templates + sources. Migration record:
   `routines/job-market-state/_MIGRATION.md`. Promoted upward as universal Discipline rule 14 in `README.md`.
 - **v16 (2026-08-02)** — one comment per NEW listing (reaction surface) · reaction-based rating read forward ·
-  ⚡ Spotlight in the summary · friction icons on every listing · board homepage links in SOURCES ·
-  `friction` column added to the schema.
-- **v15 (2026-08-02)** — 📐 SLIM SAME/GONE, RICH NEW. SAME and GONE collapsed to one line per listing.
-- **v14 (2026-08-02)** — 🧵 THREAD FINDINGS, NEVER FLAT. Explicit threading mechanics; posting findings as root
-  comments became a STOP condition.
-- **v13 (2026-08-01)** — standard runbook header (`goal:`/`target:`/`report-to:`), the first Guardrails section,
-  `status:` removed from frontmatter, STAMP moved from step 13 to after the pass summary, density floor restated
-  as a declared failure, complete-loops lock added.
+  ⚡ Spotlight · friction icons · board homepage links · `friction` column added.
+- **v15 (2026-08-02)** — 📐 SLIM SAME/GONE, RICH NEW.
+- **v14 (2026-08-02)** — 🧵 THREAD FINDINGS, NEVER FLAT, with explicit threading mechanics.
+- **v13 (2026-08-01)** — standard runbook header, first Guardrails section, `status:` removed from frontmatter,
+  STAMP moved after the pass summary, density floor as a declared failure, complete-loops lock.
 - **v12 (2026-07-31)** — loop-per-role, mobile-first, timestamped passes, density floor, comment index.
