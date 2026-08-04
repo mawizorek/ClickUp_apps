@@ -1,8 +1,13 @@
 {
   "_meta": {
-    "description": "Gate config for job-market-refresh. Each entry = one full research loop iteration.",
-    "version": 2,
-    "updated": "2026-08-02"
+    "description": "Gate config for job-market-refresh. Each entry = one full research loop iteration. Each entry MUST have a matching state file at routines/job-market-state/<id>.tsv",
+    "version": 3,
+    "updated": "2026-08-04",
+    "_rulings": [
+      "2026-08-04 (Michael): 'company manager' belongs to creative-admin, NOT stage-manager. Moved. The four live company-manager rows are homed in ADM and their pending also_lanes flags are cleared.",
+      "2026-08-04 (Michael): drafting-design STAYS ACTIVE. It is swept every pass like any other lane; low career value is not a reason to stop looking.",
+      "2026-08-04 (Michael): the safety keywords STAY, and are expanded. 'It is a very niche thing, but that is kind of the point.' Zero returns is a SOURCE problem, not a keyword problem — safety roles post on venue/arena/municipal boards, not theatre boards. See job-market-sources.md."
+    ]
   },
   "global": {
     "geography": "anywhere",
@@ -62,12 +67,12 @@
         "stage manager",
         "assistant stage manager",
         "deck manager",
-        "PSM",
-        "company manager"
+        "PSM"
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["project manager", "scrum master", "agile"],
-      "constraints": {}
+      "constraints": {},
+      "_note": "'company manager' was removed 2026-08-04 and moved to creative-admin by Michael's ruling. Every company-manager hit on every board posts under Administration. If one turns up in an SM sweep, home it in ADM."
     },
     {
       "id": "electrician",
@@ -95,18 +100,25 @@
         "safety coordinator",
         "safety manager",
         "health and safety officer",
+        "production safety",
+        "risk manager performing arts",
+        "event safety coordinator",
+        "event safety manager",
+        "life safety manager venue",
+        "crowd management manager",
+        "guest safety manager",
+        "venue safety director",
         "venue operations manager",
         "venue operations director",
         "facilities director performing arts",
         "event operations manager",
-        "production safety",
-        "risk manager performing arts",
         "house manager",
         "front of house manager"
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["construction safety", "mining", "oil and gas", "food safety"],
-      "constraints": {}
+      "constraints": {},
+      "_note": "KEEP THE SAFETY KEYWORDS (Michael, 2026-08-04). They had returned zero for weeks and were proposed for removal; that proposal was WRONG. Live event safety IS a real discipline with real seats — they just do not post on theatre boards. Sweep the venue/arena/municipal boards named in job-market-sources.md for these six, and expect them to be thin rather than empty. Niche is the point; a rare find in a niche Michael is qualified for is worth more than another Production Manager row."
     },
     {
       "id": "audio-sound",
@@ -136,6 +148,7 @@
         "scenic designer assistant",
         "associate scenic designer",
         "props master",
+        "props supervisor",
         "scenic artist",
         "scenic charge",
         "technical draftsperson",
@@ -143,7 +156,8 @@
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["architectural drafter", "civil", "mechanical CAD", "structural"],
-      "constraints": {}
+      "constraints": {},
+      "_note": "KEEP (Michael, 2026-08-04). Proposed for deprioritisation after one thin pass; overruled. Swept in full every pass like any other lane."
     },
     {
       "id": "creative-admin",
@@ -156,6 +170,8 @@
         "program manager arts",
         "managing director theatre",
         "general manager theatre",
+        "company manager",
+        "assistant company manager",
         "company administrator",
         "producing director",
         "executive director performing arts",
@@ -163,7 +179,8 @@
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["office administrator", "dental", "medical", "church administrator"],
-      "constraints": {}
+      "constraints": {},
+      "_note": "'company manager' + 'assistant company manager' moved here from stage-manager 2026-08-04 by Michael's ruling."
     }
   ]
 }
