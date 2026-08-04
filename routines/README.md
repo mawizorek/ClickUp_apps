@@ -29,6 +29,8 @@ This is a rule, not a suggestion. Before adding ANY instruction to an executor a
 
 > ⚠️ **Fourth sibling, learned the same day: run it on a CLICKUP SURFACE too.** Procedure does not stop being procedure because it was typed into a task description instead of a file. A template, a format, a step list or a rule parked in a task has **no diff, no history, no review, and no way to be read by an agent that was pointed at the repo** — and it instantly becomes a second claimant on a truth the repo already owns. **ClickUp holds RECORDS (what happened); the repo holds PROCEDURE (how it is done).** Michael, 2026-08-01: *"template should live in repo as procedure notes. not clickup task scratch."*
 
+> ⚠️ **Fifth sibling, learned 2026-08-04: run it on a COMMENT too.** A `⏸️ CHECKPOINT` comment carrying nine TSV rows as inline text for the next session to apply is state living in prose. It has no diff, cannot be verified, and goes stale the instant anyone acts on it — which is exactly what happened: the rows were committed by one session, the comment was never corrected, and the resuming session was told they were uncommitted. **If a comment is carrying data that belongs in a file, the fix is to commit the file, not to write a better comment.** See rule 14.
+
 ## The contract
 
 - **Runbooks are the source of truth for the procedure** (the WHAT), and must be SELF-SUFFICIENT — any agent reads the runbook and knows exactly what to do, without inheriting behavior from a specific executor. Never put procedure in the agent; if it describes what/how the work is done, it lives here.
@@ -36,8 +38,9 @@ This is a rule, not a suggestion. Before adding ANY instruction to an executor a
 - **Stamps live in `routines/last-run/<routine>.txt`** (the STATE) — one file per routine, one writer per file, never a shared log. See `schedule.md` for the incident that locked this and the 2026-07-26 attempt to un-lock it.
 - **Run reports land on the standing thread** (the RECORD); **their template lives in the repo** (the PROCEDURE) — see Run reports below.
 - ⚠️ **Runbook FRONTMATTER is metadata, never a switch (added 2026-08-01).** A `status:`, `enabled:`, `cadence:` or `last_run:` key in a runbook's YAML header is orientation for a reader and nothing more. **The row in `schedule.md` is the only ON/OFF switch and the only cadence** (LOCKED 2026-07-30). If frontmatter and the schedule table disagree, **the table wins and the frontmatter is rot** — fix it in the same pass. Never decide whether to run something by reading a runbook's own header.
+- ⚠️ **A runbook may be SPLIT across files, but only by concern, and only one claimant per fact (added 2026-08-04).** When a runbook outgrows what can be read whole (~30KB), split it — procedure/guardrails in the runbook, output shape in a `-templates.md`, source list and domain intelligence in a `-sources.md`. The runbook names its siblings at the top and **never restates their content.** A file carrying STOP conditions that cannot be guaranteed to load whole is the worst file in the repo to leave oversized. Reference case: `job-market-refresh.md` v17.
 - **APPROVED DATA SURFACES ONLY.** A routine may only write *data*, never app source, engine, or structure. The rail exists to keep routines away from `index.html`, JS, CSS, README, and repo/list structure — it is NOT a ban on writing data objects that happen to live on another platform. Approved write surfaces:
-  - **(a) Repo data files** (e.g. `data.json`, a state `.tsv`) — the primary store.
+  - **(a) Repo data files** (e.g. `data.json`, a state `.tsv`, or a DIRECTORY of them) — the primary store.
   - **(b) Designated ClickUp task fields** — only when a runbook explicitly names the list and the whitelisted fields (typically name, status, dates, and named custom fields), and only on *existing* tasks.
   - **(c) A named ClickUp COMMENT THREAD** the runbook designates as its read surface. Comments are additive and non-structural; they are an approved surface. (Job Market is the reference case.)
   - **(d) The routine's own `last-run` stamp file.**
@@ -124,6 +127,13 @@ This is process, not executor behavior — it lives here so ANY agent running AN
  - **Stop at a BOUNDARY, never inside one.** If you are running low on room, budget, or capacity, finish the routine you are in, stamp it, and stop. **Whole finished routines plus their stamps are what the next agent picks up from** — a half-finished routine with no stamp reads to the next triage as never-run, and its partial writes are invisible.
  - **The stamp is the seam.** Sequence, every time: run → land the product → stamp → report → next routine. That is what makes a mid-run failure recoverable instead of ambiguous.
  - **Length is not a reason to hurry.** Job Market's density floor exists precisely because a shallow sweep is indistinguishable from a thin market. A long procedure is long on purpose.
+14. **COMMIT AT THE BOUNDARY — never hand state to another session as text** *(LOCKED 2026-08-04, Michael).* Rule 13 says stop at a boundary; this says what must be TRUE at every boundary. **The committed file is the only handoff.**
+ - **Michael, 2026-08-04:** *"Each session should complete its loop fully and not try to pass TSV data between sessions for exactly the reasons you found."*
+ - **A routine with internal boundaries commits at every one of them**, not once at the end. Job Market commits each role's lane file the moment that role's block is posted. The window in which real work exists only in a session's head is one unit long, never a whole pass.
+ - 🚫 **A checkpoint, handoff or status comment carries POSITION, never DATA.** Roles complete, next unit, commit SHA. **If you are tempted to paste a data row into a comment so the next session can apply it, commit it instead.** The incident: on 2026-08-04 a checkpoint carried nine TSV rows as inline text, another session applied them, the comment was never corrected, and the resuming session was told they were uncommitted. A resume that trusted the note would have double-appended all nine. It only didn't because it read the state file rather than the note about the state file.
+ - **Corollary — read the state, not the note about the state.** Any prose claim about what is committed is a secondary source and may be stale. HEAD is the fact.
+ - **Re-read a file's SHA immediately before writing it.** Across a long multi-commit pass, a SHA captured early is stale by the time you use it, and a stale-SHA write is how one unit silently clobbers another's rows.
+ - **Size the state file so it can always be read whole.** Past roughly 22KB a read can truncate, and a truncated read followed by a full-file write destroys rows with no error. **Split state by natural unit before it gets there** (Job Market: one file per role lane). This also makes per-boundary commits cheap — a whole-file write of a monolith at every boundary is a payload problem that grows every day.
 
 Runbooks may add domain specifics on top of this, but this discipline is the floor for all of them.
 
@@ -161,7 +171,7 @@ N.   Report
 
 These were written when the executor ran unattended, so "auto-commit" meant *without a human in the loop*. **Under invoke-only there is always a human in the loop** — the invocation itself. The tiers now describe what may proceed **once the invoked run is approved**, not what may happen unsupervised:
 
-- **Data-only refresh** → commit to `main` without further confirmation. (All current routines.)
+- **Data-only refresh** → commit to `main` without further confirmation. (All current routines.) **This includes many commits in one pass** — per-boundary commits under rule 14 are the same tier as one commit at the end, and each one is not a fresh gate.
 - **ClickUp task-field refresh** (whitelisted fields on existing tasks, keyed mapping) → same tier — field-scoped and non-structural.
 - **ClickUp comment writes to a runbook-named thread** → same tier. Additive and non-structural.
 - **Anything touching engine/source, or creating/deleting/moving/reparenting tasks or lists** → NOT a routine. Route to a build session.
@@ -185,8 +195,10 @@ Zero agent changes. **If adding a routine requires editing the executor, the fra
 |---------|--------|---------------------------|--------|
 | `on-track-refresh.md` | `on-track/data.json` | every Wednesday | active |
 | `f1-refresh.md` | `f1-racetracks/f1-results/2026/` + ClickUp "Race History" field (slim mirror) | Thu–Sun, session-aware | active |
-| `job-market-refresh.md` | `routines/job-market-state.tsv` + its own ClickUp standing thread (`86ajtgbt3`) | daily | active |
+| `job-market-refresh.md` (+ `-templates.md`, `-sources.md`) | `routines/job-market-state/<role_id>.tsv` (one file per lane, committed per role) + its own ClickUp standing thread (`86ajtgbt3`) | daily | active |
 | `world-cup-refresh.md` | `world-cup-bracket/data.json` + ClickUp "World Cup" list (mirror) | — | 🏁 **RETIRED 2026-07-26** (tournament ended Jul 19; app stays live) |
+
+> 🪦 `routines/job-market-state.tsv` (single combined file) is a **tombstone stub** as of 2026-08-04 — state split per lane. Do not read or write it. See `routines/job-market-state/_MIGRATION.md`.
 
 ## Executor
 
