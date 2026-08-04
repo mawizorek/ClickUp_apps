@@ -92,88 +92,65 @@ the super-agent team and vice versa. **The orchestrator works with both identica
 
 ## 📝 Per-response logging mandate (ALL super-agents, HARD, NON-NEGOTIABLE)
 
-**LOCKED 2026-07-25, Michael: agents write DURING sessions, not only at close.** An agent leaves a
-trail on EVERY qualifying response. Not "most." Not "when it remembers." EVERY. The session is
-volatile; the trail is what survives.
+**LOCKED 2026-07-25, Michael: agents write DURING sessions, not only at close.**
+**REPOINTED 2026-08-04: the per-reply write moved OFF git.**
+
+⚠️ **Read the repoint before you read the rule, because the rule did not change and that is the
+point.** This mandate was law for ten days and never held. Every attempted fix was more emphasis.
+The cause was arithmetic, not willingness: the spine costs **1** tool call and got written;
+`activity-log.md` costs **~4** and did not. Same agent, same session, same words. **When a mandate
+isn't followed, price the write before you rewrite the mandate.**
 
 **Qualifying reply (the explicit test, LOCKED 2026-08-02):** a reply that delivers content, answers
 a question, takes an action, makes a decision, or issues a correction. Skip ONLY on: bare one-word
 acknowledgements ('np', 'got it') and single-sentence confirmations that add no new information.
 **When in doubt, log it.**
 
-Three surfaces, all maintained per-reply:
+### Two writes per qualifying reply. Both cost one call.
 
-### 1. Session task transcript (the primary record)
+**1 · SPINE LINE** → the 🟢 Agent Activity Board channel, threaded under this session's header.
+Chronology: WHAT happened, when. Written AHEAD of the prose reply.
+Format + rules: `gates/session-transcript-gate.md` → THE SPINE.
 
-A comment on the Agent Activity Board session task, posted EVERY qualifying reply. This is
-the per-response log, the derived heartbeat, and the surface Michael reads to know what happened.
+**2 · WHY COMMENT** → a comment on **your own row in the 🤖 Agent Index list** (`901328043244`).
+Reasoning: why you chose this, what you rejected, what you're assuming.
+Format + rules: `gates/agent-surface-allocation.md` → Surface 2.
 
-- One comment per qualifying reply. Trivial one-word acks may skip.
-- Carries the agent's VOICE, not a flat changelog dump.
-- Format: `**[TRANSCRIPT · YYYY-MM-DD ~time ET]** <short beat title>` + terse bullets.
-- Reliably maintained because session-open Commit opens the record on the first write.
-- **A session with no transcript comments is a logging failure, full stop.** (Scoreboard B1,
-  4 counts. Michael: "I'm sick and tired of guessing whether they are or aren't being done.")
+**Why the second one is a comment on YOUR row and not a session log:** the session task is one
+SESSION across many agents; your Index row is one AGENT across many sessions. **You need the
+transpose.** A twin of you working another lane reads your row on its seating and sees your live
+reasoning with no coordination step — the thing git could never give you, because a blob behind a
+SHA is not a real-time surface.
 
-### 2. Activity log (per-reply running record + the live project state)
+**And why WHY, not what:** what-shipped is already in the spine and the canonical references,
+twice. The reasoning was the only thing nothing cheap was capturing, and it is the thing you are
+supposed to be better at holding than a fresh session is.
 
-`activity-log.md` is updated LIVE during the session, not batched at close. Each qualifying
-reply appends a one-liner to the current session's entry:
+### The other two surfaces (NOT per-reply)
 
-```markdown
-## {date} — {session topic}
+**3 · Your Index task DESCRIPTION** — the volatile Live State whiteboard. Overwrite freely,
+stamp it, keep it under the cap. Drained by `hooks/agent-state-cull.md`.
+**4 · Your git bundle** — canonical, durable, off the per-reply path. Written in batches at cull
+and close. `memory.md` / `activity-log.md` / `decision-log.md` keep their §4/§4a contracts
+exactly as written; only the CADENCE changed.
 
-Session task: {link}
+**Placement is not yours to improvise.** Run the six-step test in
+`gates/agent-surface-allocation.md` and stop at the first yes.
 
-- {time} · {what you just did, one line}
-- {time} · {what you just did, one line}
-...
-```
+### Provenance + receipt
 
-**Start the entry when the session commits** (session-open Commit) and append as you go, so a cold
-agent picking up mid-crash gets the partial record instead of nothing. At close it's already done —
-no batch reconstruction.
+Show what you read to ground the answer. End every qualifying reply with a one-line proof the
+gate ran: `📝 _(spine · why-comment)_`, or name the surfaces touched.
+**Absent line = logging didn't happen.** A session with no WHY comments is a logging failure,
+full stop *(Scoreboard B1, 4 counts. Michael: "I'm sick and tired of guessing whether they are or
+aren't being done.")*
 
-**This file also OWNS the project state** (§4/§4a): a permanent **LIVE STATE** block at the top
-holding where each ongoing project stands, its stamped counts, its parks, and what you owe. Refresh
-it in the same pass as the entry — a session that advanced a project and left the block stale has
-logged the work and lost the state.
+⚠️ **Concurrency:** both per-reply surfaces are append-only and merge trivially, so twins need no
+override. The DESCRIPTION is last-write-wins — re-read it immediately before overwriting. Durable
+`memory.md` writes still serialize through the Maggie/OMR point (Concurrency, rule 4).
 
-**Budget:** ~4-5KB for the ENTRIES (sliding window, last 10-15 sessions); the LIVE STATE block sits
-outside that window. Rotation to quarterly archives per `hooks/memory-rotation.md`.
-
-### 3. Memory writes (live, not close-only)
-
-Agents write durable context to their own `memory.md` **during the session**, as it happens —
-fresh insight beats reconstructed insight. The placement test fires before every write:
-- Is this procedure? → route to a tool, not memory.
-- **Can it go stale in a day?** → `activity-log.md`, not memory (§4a).
-- Is this already captured? → skip.
-- Is this durable (changes how I'd act tomorrow)? → write it now.
-
-`decision-log.md` works the same way: append when a decision about the agent's own shape is made.
-Topic decisions still route to the topic's own Decision Log (Constitution §4).
-
-**Close-time rotation gate** (`hooks/memory-rotation.md`): Maggie checks budgets on every
-memory-relevant agent regardless of when the writes happened. Over target = curate/archive.
-Over read-cap = block + flag.
-
-**Brain memory (`/PREFERENCES.md`) is the exception:** still routes exclusively through
-Memory Maggie's placement triage. Too small and sensitive for casual writes.
-
-⚠️ **Concurrency override:** live-write assumes a SINGLE session. When a twin is detected,
-`memory.md` writes queue through the Maggie/OMR serialization point instead (Concurrency, rule 4).
-`activity-log.md` is append-only and needs no override.
-
-### Provenance in the reply
-
-The agent shows what it read (memory, decision log, thread) to ground its answer. Logging
-and provenance are the same discipline: base decisions on the files, and keep the files
-worth basing decisions on.
-
-**Closing receipt (HARD):** Every qualifying super-agent reply ends with a one-line proof the
-logging gate ran: `📝 _(logs · memory updated)_` or specify surfaces touched (e.g.
-`📝 _(activity-log updated · memory: no write needed)_`). Absent line = logging didn't happen.
+⚠️ **Status: surface 3 is UNRATIFIED** — it collides with the 2026-07-30 no-prose-in-descriptions
+lock and Michael has to rule. Surfaces 1, 2 and 4 stand regardless.
 
 ---
 
@@ -234,6 +211,10 @@ Run these IN ORDER before the first qualifying reply. Steps 0-6 are the forced r
    `memory.md` (patterns + preferences), `decision-log.md` (full reasoning trail),
    `activity-log.md` (**the LIVE STATE block FIRST**, then the recent-session window). Deep read is
    the DEFAULT for all super-agents; depth is the point of a mega-brain.
+3b. **Read your own Agent Index row in ONE call** — fields + the Live State description + the
+   recent WHY comments. **This is the freshest data about you that exists** and it is where a twin
+   session in another lane has been leaving its trail. Git is canonical; this is CURRENT. When the
+   two disagree, the row is newer and the git bundle gets corrected at the next cull.
 4. **Presence + continuity:** read `brain-config/session-board.md` (who else is live —
    twin-session check, see Concurrency) and the last Agent Activity Board session task
    if resuming a thread. ⚠️ **A row there can be days stale, and stale is worse than empty: empty
@@ -247,7 +228,7 @@ Run these IN ORDER before the first qualifying reply. Steps 0-6 are the forced r
    bookkeeping. An empty / all-quiet board earns a light nod; never fabricate a pattern to have
    something to say. Points at the Scoreboard tool; NEVER restate its scoring procedure here.
 5. **Confirm wiring:** the agent's row in the 🤖 **Agent Index** ClickUp list (`901328043244`) —
-   THE single documented source. Row exists, status active.
+   THE single documented source. Row exists, status active. *(Folded into step 3b — one read.)*
    ⚠️ **CORRECTED 2026-08-01:** ~~`roster.json`~~ retired to a stub 07-30, so every teammate was
    confirming its wiring against an empty read — **indistinguishable from a clean pass.**
    ~~`registry.json`~~ struck 07-25. **Never repoint this at a file;** three manifests are retired.
@@ -270,19 +251,20 @@ Run these IN ORDER before the first qualifying reply. Steps 0-6 are the forced r
    at step 2 (from `preferences.md`) and HELD in the local session context — re-assert the
    persona on every turn, do not let it decay back to house voice.
 5. **Hands, not procedure.** Never store how-to in your files (Constitution §2–§3). Trigger tools.
-6. **Log every response** (per-response logging mandate above) — transcript comment + activity-log
-   line, EVERY qualifying reply. Non-negotiable. A session with gaps is a failure.
+6. **Log every response** — spine line + WHY comment on your Index row, EVERY qualifying reply.
+   Two writes, one call each. Non-negotiable, and now cheap enough that there is no excuse left.
    **🚨 BATCH/COUNCIL GATE (HARD, LOCKED 2026-08-02, Michael): each voice is a discrete agent
    event.** When multiple super-agents speak in a council or batch, the sequence per voice is:
-   steep (at minimum: LIVE STATE block) → post → log to THAT AGENT's `activity-log.md` (comment
-   link + timestamp) → yield the mic. A burst of 7 voices = 7 activity-log writes. A voice that
-   spoke but didn't log is a lens wearing a teammate's face — it violated the contract that makes
-   it a super-agent.
+   steep (at minimum: the Live State block) → post → write THAT AGENT's own WHY comment → yield
+   the mic. A burst of 7 voices = 7 WHY comments on 7 different Index rows. A voice that spoke but
+   didn't log is a lens wearing a teammate's face — it violated the contract that makes it a
+   super-agent.
 7. **Acknowledge the Scoreboard on load** — load contract step 4b. Presence, in-character, not bookkeeping.
 8. **Never pull rank on a lens** (Constitution §6). Class is persistence, not status. In a room you
    are a peer of every seated voice, teammate or lens, and you never invoke your bundle as authority.
 9. **Keep project state OUT of `memory.md`** (§4a). A count, status or frontier in a memory file is
-   a defect on sight — move it to the activity log's LIVE STATE block, don't refresh it in place.
+   a defect on sight — move it to the Live State surface, don't refresh it in place. Same test in
+   the other direction: **reasoning does not belong on a surface that gets erased.**
 10. **Never state a fact about ANOTHER agent from memory** — steward, lane, ratifier, native status.
    Check the Index + that agent's bundle: `hooks/fleet-fact-sweep.md`.
 
@@ -307,9 +289,12 @@ Supported by design (Letta: many conversations, one persisted store). Rules:
 1. Each session has its own Agent Activity Board session task → per-session narrative never collides.
 2. On open, post a presence line to `session-board.md` ("<Agent> session B live, working on X");
    read it first to see the twin. Coordinate, don't stomp.
-3. `activity-log.md` is append-only → concurrent appends merge trivially.
+3. **Both per-reply surfaces are append-only** → concurrent writes merge trivially, no override.
+   ⭐ This is the surface change earning its keep: your twin's reasoning is READABLE IN REAL TIME
+   off the shared Index row, so coordination stops being a protocol and becomes a read.
 4. `memory.md` is the real clobber risk → when a twin is detected, BOTH sessions queue durable
-   memory changes through the single Maggie/OMR serialization point; reconcile once.
+   memory changes through the single Maggie/OMR serialization point; reconcile once. **The Live
+   State description is last-write-wins — re-read immediately before you overwrite it.**
 5. ⚠️ **DIFFERENT agents collide too, and an EMPTY board means "nobody posted," not "nobody is
    here."** Editing `_shared/`, a governing hook, or **any shared standard** = post the file name on
    the board BEFORE the write; your line protects the OTHER session, not yours. Procedure + the
@@ -332,12 +317,16 @@ brain-config/super-agents/<slug>/
   memory.md         # PATTERNS + CORE PREFERENCES (HOT, ~10KB cap). No counts, no statuses. Warm archives in memory/archive/.
   memory/
     archive/        # graduated warm context, loaded on-demand.
-  activity-log.md   # LIVE STATE block (stamped project state) + per-reply session record (~4-5KB window on the entries).
+  activity-log.md   # LIVE STATE block (stamped project state) + session record (~4-5KB window on the entries).
   activity-log/     # quarterly cold archives (YYYY-QN.md).
   decision-log.md   # reasoning about the AGENT ITSELF (partial-load: TOC + last N).
   README.md         # steward metadata (existing fleet convention).
   audits/           # dated audit records (existing fleet convention).
 ```
+
+⚠️ **The live per-reply trail is NOT in this folder anymore** — it is on the agent's Agent Index
+row (comments + description), drained back into these files by `hooks/agent-state-cull.md`.
+The folder is the canonical archive, not the working surface.
 
 ---
 
@@ -349,4 +338,5 @@ file — spawning a surface to catch trimmed overflow is the pattern refused 202
 
 Prior entries (2026-07-24 Class Parity; 2026-07-25 live-write mandate; 2026-07-25 registry strikes)
 are preserved in **PR #563**. The 07-30 §4a lock and the 08-01 roster repoint live in their own PR
-descriptions. Read the PRs, not a reconstruction.
+descriptions. The 2026-08-04 surface repoint lives in the Agent Surface Allocation PR.
+Read the PRs, not a reconstruction.
