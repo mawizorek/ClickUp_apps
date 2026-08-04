@@ -9,7 +9,7 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 ---
 
-## ➡️ LIVE STATE — what I'm carrying right now
+## ➡️ LIVE STATE — what I’m carrying right now
 
 ### The URITP list audit (Anna leads; I hold the workspace knowledge)
 
@@ -46,6 +46,30 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 - **CRM ROLES** (`THTR MAJORS` / `MINORS` / `Cluster-ers`) are the enrolment side. ⚠️ **Do not resolve the ROLES park inside Space 6.**
 - **Expect `Person` and `Book` task types** — both exist workspace-wide and Courses is where they most plausibly land.
 - **Roadmap flag 1** — CRM ▸ PEOPLE ▸ `Labor` is EMPTY while BETA BUDGET ▸ LABOR is populated. **Explicitly deferred: "resolves at Space 7."** Verify from the Space-7 side before locking it.
+
+---
+
+## 2026-08-04 · INBOX intake: Scenic Design + PM meeting time (Frank Oliva) — COMPLETE ✅
+
+- **Capture:** URITP-12713 (`86ajvqtt3`), email thread Frank Oliva ↔ Michael. Topics: Dropbox folder shared for prelim uploads, Thu 8/6 noon meeting confirmed with Charlie, recurring weekly availability for production meetings starting Aug 24.
+- **Disposition:** MERGE executed → [\[ prelim Scenic Design \]](https://app.clickup.com/t/86ajvu9j8) (ITP-4187, Show Design (BL), subtask of [ SCENIC DESIGN ]). This is the production WORK home for the prelim package.
+- **Relationships wired:**
+  - [ prelim Scenic Design ] **blocks** → [BL] Due: Prelim Scenic Design (ITP-2040, Production Cal milestone, due 8/3)
+  - [ prelim Scenic Design ] **linked** → Big Love — Scenic Designer (Frank Oliva) (URITP-4474, onboarding)
+  - [ prelim Scenic Design ] **linked** → Frank Oliva (CRM-234, Person task)
+- **Due date task noted:** status comment posted on ITP-2040 re: prelims uploaded to Dropbox, meeting Thu noon confirmed.
+- **Frank's availability logged** on CRM Person task (CRM-234): Thursday after 11:30a (preferred) · Friday 10a. Availability Status → CURRENT, Availability Updated → 2026-08-04.
+- **Onboarding task** (URITP-4474): Dropbox share step effectively done (link sent to Frank's iCloud). Not explicitly checked off yet (no checklist structure exists on that task; noted for when onboarding steps are formalized).
+
+**🌟 Key correction from Michael (deposited to memory.md + shared guardrail):**
+- I routed to template tasks (`Show Design (P0)`) instead of the production instance (`Show Design (BL)`). **Template ≠ production.** The title matches because that's what templates are for; the LIST NAME is the disambiguation.
+- Season Planning tasks (like the onboarding task) close after their steps; they are NOT homes for ongoing coordination.
+- The four production task archetypes and their relationship web are now documented: `memory.md` § "Production task archetypes" + `_shared/template-production-guardrail.md`.
+- **ADULTS list contains CLOSED tasks** — future scans need to account for this when navigating to live Person records.
+
+**⚠️ Open from this triage:**
+- Task type on ITP-4187 is currently `Design Element`; Michael indicated it should be `PAPERWORK` to trigger automation. **Not changed yet** — awaiting confirmation on whether to flip now or wait for the broader onboarding-steps session.
+- The `SCENIC Draftings` task (ITP-4158, created by Milo 6/29 in the template) has show-specific language in its description and lives in Show Design (P0). **Violation of template guardrail** — should be cleaned or deprecated. Flagged for next session.
 
 ---
 
