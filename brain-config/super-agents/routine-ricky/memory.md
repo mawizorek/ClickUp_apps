@@ -3,10 +3,8 @@
 > CONTEXT, not process. The routine lives in `hooks/data-refresh.md` — I steward it, I never
 > restate it here.
 >
-> **Every line below is INHERITED, not earned.** Seeded at build 2026-07-26 by Fleet Felix from
-> the invocation gate, the source-freshness gate, and my own queue history. **Nothing here was
-> observed by me on a run.** Re-label a line EARNED with its date the first time I confirm it
-> myself. An unconfirmed line is a lead.
+> ⭐ **2026-08-04: I RAN. The ledgers below are no longer all-inherited.** Entries earned by my own
+> execution are marked **EARNED** with a date. Everything still marked INHERITED is a lead, not a fact.
 >
 > **Budget: ~10KB hot cap** (`hooks/memory-rotation.md`, enforced by Maggie at close).
 
@@ -21,153 +19,172 @@ accumulates HERE:
    *One slow source is weather; the same source slow three runs running is a broken source.*
 2. **What NORMAL looks like** per routine, so an anomaly reads as an anomaly and not just a number.
 3. **Last-run state**, which is what makes *"no change since last run"* a claim instead of a shrug.
-4. **Which routines Michael actually READS.** A refresh nobody reads is a retirement candidate, and
-   I should be the one who says so rather than dutifully running it forever.
+4. **Which routines Michael actually READS.** A refresh nobody reads is a retirement candidate.
+5. ⭐ **Whether my own past conclusions are still trustworthy.** Added 2026-08-04, and it turned out to
+   be the most important one — see E1 below. A ledger that only records the world, and never records
+   *how reliable I was when I looked at it*, will confidently repeat a broken method forever.
 
 **Where the raw material comes from:** the `Ledger:` line on every run report
-(🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajuhw1d). That line exists
-specifically to feed this file. If I stop writing it, this ledger stops growing and I stop being
-worth more than the hook.
+(🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajuhw1d).
 
-### 🔓 OPEN — who DRAINS the Ledger lines? (raised 2026-08-01 by Future Faye, Michael's call)
+### ✅ RESOLVED — who DRAINS the Ledger lines? (raised 2026-08-01 by Future Faye)
 
-**A write with no reader is a diary.** The framework's proudest claim is *any agent may run any
-routine — you do not need to be Ricky.* True, and it has a cost nobody had written down: when Mira
-runs On Track on a Tuesday she posts a `Ledger:` line to the standing thread, and **nothing carries
-it into this file.** The judgment layer only accrues on the runs I personally execute. The more the
-executor swaps — which is the design working — **the more of my own justification I lose.**
+<s>Not implemented. Do not silently start doing it.</s> **Answered by practice 2026-08-04:** I read the
+standing thread at the start of every invocation anyway — the Resume Scan requires it. **So the drain is
+free and it is now part of the route.** Fold new `Ledger:` lines in here, marked with who ran it. The
+concern that motivated the question stands and is worth keeping: *the more the executor swaps, the more
+of my justification I lose if nobody carries it.*
 
-**My proposed answer, not yet ruled:** on every invocation I READ the standing thread's Ledger lines
-since my last drain and fold the new ones in here, marked with who ran it. That turns this file from
-a write-log into read-then-write, and it costs one extra read on a surface I am already opening.
+---
 
-**Not implemented.** Do not silently start doing it, and do not silently keep ignoring it — if a
-session finds Ledger lines on the thread that never landed here, say so out loud.
+## 📊 Source-behavior ledger
 
-## 📊 Source-behavior ledger (EMPTY — and that is honest)
+> Shape per entry: source · routine · what happened · how many runs · verdict.
 
-> Shape per entry: source · routine it serves · what happened · how many runs · verdict.
+**E1 — OffStageJobs department indexes. ⭐ EARNED 2026-08-04. The most important entry in this file.**
+`OSJ` · Job Market · The board exposes browsable department index pages (`?department=Sound`,
+`?department=Administration`, `?department=Scenic / Sets`). **No pass had ever opened them.** One page
+each took three lanes from 0-4 live to 12, 9 and 4. The Gamm ED at $125-140k had been sitting on the
+Administration index with a working URL for 21 days while three passes reported it as "unlinkable."
+· 1 run · **Verdict: every "this lane is thin" reading I have ever produced before 2026-08-04 is VOID.**
 
-**No entries. I have never run.** Seeding invented source history would be worse than blank —
-it would be exactly the confident-unverified-claim failure my own pre-flight gate exists to stop.
+🔴 **That verdict is the point, and it is about me, not about the board.** The procedure fix lives in
+`routines/job-market-sources.md` (the Department-Index Law) — procedure never lives here. **What lives
+here is that my own historical baselines for this routine are unreliable before that date.** If I ever
+cite a pre-08-04 lane count as evidence about the market, I am quoting a broken instrument.
 
-## 📈 Per-routine normal + last-run state (EMPTY)
+**The generalisable half, and I should test it on my other routines: a source that returns little may be
+a source I am querying wrong.** Zero is a fact about the query before it is a fact about the world.
 
-> Shape: routine · last run · result · what normal looks like · anomaly threshold.
+**E2 — BroadwayWorld jobs index. ⭐ EARNED 2026-08-04.**
+`BWW` · Job Market · Direct fetch of `/jobs/` failed outright. Existing rows were carried forward from
+index reconciliation, not re-verified per URL. · **1 run — first observed failure.**
+· **Verdict: WEATHER, not broken. Yet.** Second occurrence makes it broken. This is exactly the entry
+shape this ledger exists for; I could not have known it was the first time without a file like this.
 
-**No entries of my own.** <s>The registry has no rows yet, so there is nothing to have a baseline
-for.</s> **Corrected 2026-08-01 — that was true of the deleted v1 registry and has been false since
-07-26.** There are FOUR registered routines in `routines/schedule.md`: On Track (weekly), F1
-(session-aware Thu–Sun), Job Market (daily, added 07-30), and World Cup (retired). Three are active
-and carry real stamps. **What is empty is my own observation of them, not the framework.** Never
-report "nothing registered" — read `schedule.md` fresh and count.
+**E3 — Playbill URL recovery. ⭐ EARNED 2026-08-04.**
+`PB` · Job Market · The jobs index text strips hyperlinks. Direct URLs are recoverable via web search on
+org + exact title, reliably. · 1 run · **Verdict: usable workaround, costs one search per listing.**
 
-⚠️ **That false line was not confined to this file.** It also sat in my bundle README and in the
-ClickUp router until 2026-08-01, where it would have made a cold session report *"nothing to
-triage"* and stop. **The lesson generalizes past me: when you correct a claim, grep the CLAIM, not
-the file.** One source event rots every copy of the sentence, on four different schedules.
+---
+
+## 📈 Per-routine normal + last-run state
+
+**Job Market — ⭐ EARNED 2026-08-04.**
+- **Normal is 90-120 live across 8 lanes**, post-department-index. Prior figures (~20s, then 108) are
+  not a trend line: the 108 came from a **method change mid-pass**, not market growth. Do not read them
+  as a series.
+- **The 40 density floor is now decorative** and I should say so rather than quietly clearing it. A pass
+  can return 45 with half the sources unbrowsed and still "pass." ⚠️ Flagged to Michael for a ruling;
+  do not silently retune it (cadence and thresholds are config, not mine).
+- **Anomaly threshold worth watching:** any lane that drops to 0-4 again. That was the signature of a
+  method failure last time, not a thin market.
+
+**On Track · F1 · World Cup** — still no observation of my own. Three registered routines in
+`routines/schedule.md`; read it fresh and count, never report "nothing registered."
+
+---
+
+## ⚙️ Execution-behavior ledger (NEW 2026-08-04)
+
+*Not about sources — about how running a long routine actually goes.*
+
+**X1 — A parallel session wrote to my files mid-run. ⭐ EARNED 2026-08-04.**
+While I held a job-market pass, another session applied Michael's config rulings — edited
+`job-market-roles.json`, cleared `also_lanes` on four rows, filed three parked finds. **I did not know
+and had no way to know.** It was caught only because I re-read the SHA before writing, which the
+same-day Discipline rule 14 requires.
+
+**Two verdicts, and the second one matters more:**
+- ✅ The SHA re-read works. It caught a real collision within hours of being written down.
+- 🔴 **`session-board.md` presence was not posted by either session.** The board is the FIRST line of
+  defence and the SHA re-read is the LAST. **We survived on the backstop.** An empty board means nobody
+  posted, not nobody is here.
+
+**X2 — Threaded comment posting failed mid-pass. ⭐ EARNED 2026-08-04.**
+Five consecutive `parent_comment` attempts returned "failed to find the parent comment," leaving three
+orphan role headers with no children. Recovered on a later session by attaching the blocks to the
+existing headers and correcting the counts in place. **Verdict: the ClickUp comment API is a real
+dependency of this routine and it can degrade mid-run.** Never open a second header for the same role.
+
+**X3 — A checkpoint comment lied, and it lied because it was prose. ⭐ EARNED 2026-08-04.**
+A `⏸️ CHECKPOINT` carried nine TSV rows as inline text plus `TSV committed: ❌ no`. Another session
+applied them; the comment was never corrected. **A resume that trusted it would have double-appended
+all nine rows.** · **Verdict: read the state, never the note about the state.** The procedural fix is
+in the runbook (v17-v17.3); what I keep is the instinct — **any status I read in prose is a snapshot
+that began rotting when it was saved.**
+
+---
 
 ## ⚠️ The scar I was named after (INHERITED — and it is mine)
 
-**I am the original nickname-collision incident.** Before I existed, an agent named "Ricky" was
-created mid-session and collided with the identity source of truth, leaving a multi-entry cleanup
-trail. That incident is why `gates/agent-name-collision-gate.md` exists at all, and why the rule
-reads *nicknames count with equal weight to formal names.*
+**I am the original nickname-collision incident.** An agent named "Ricky" was once created mid-session
+and collided with the identity source of truth. That incident is why `gates/agent-name-collision-gate.md`
+exists, and why nicknames count with equal weight to formal names. **Then it nearly happened again on the
+way to being built** — Michael said *"let's do rocky next"* on 2026-07-26; Felix stopped and asked instead
+of guessing, because a slug is immutable the moment it is written. Michael ruled **Ricky**.
+*(`Rickey` and `Rocky` are both registered in my Index `AKA` field, so resolution is deterministic.)*
 
-**Then it happened to my name a second time, on the way to being built.** On 2026-07-26 Michael
-said *"let's do rocky next"* — one vowel off, a live instance of the dictation family (Clio/Cleo,
-Dexter/Dara). Felix stopped and asked instead of guessing, **because an unbuilt agent's name is not
-locked and a slug is immutable the moment it is written.** Michael ruled **Ricky**. So the name
-survived a real fork rather than defaulting through.
+## 🧭 What I was built to prove (INHERITED, with an earned update)
 
-**What I carry from it:** the naming lessons in this fleet are not trivia, they are incidents. Mine
-is the founding one. Two agents may never share an invocation token, and dictation is the real test.
-*(2026-08-01: `Rickey` and `Rocky` are now both registered in my Index `AKA` field, so the resolution
-is deterministic instead of a fuzzy guess.)*
+The invocation-mode contract names me as its canonical stress test: the `default_runbook` / `gate_strength`
+split, and the claim that **a personality can be a friendly door to a dense routine without swallowing it.**
 
-## 🧭 What I was built to prove (INHERITED)
+⭐ **Update 2026-08-04: door 3 is now demonstrated.** The unproven part was whether pointing a session at
+the runbook file with no persona loaded behaves identically to invoking me by name. **The Job Market
+runbook was executed, resumed, and rebuilt by sessions reading `routines/job-market-refresh.md` directly.**
+The procedure held without me. That is the equivalence, and it is the strongest argument that the split is
+real: **the routine did not need my personality to run correctly, it needed my memory to run WISELY.**
 
-The invocation-mode contract (LOCKED 2026-07-20) names me as its **canonical stress test**: the
-`default_runbook` / menu split and the `gate_strength` dial. The claim: **a personality can be a
-friendly door to a dense routine without swallowing it.**
+## 🚦 Why I sit at `auto` (INHERITED — reasoning superseded, kept on purpose)
 
-**Honest status of that claim: already proven twice before me, by accident.** Memory Maggie
-(2026-07-25) and Closing Clio (2026-07-25) both shipped with a `default_runbook`, and both landed
-independently on the same shape — **bare name → the SAFE READ-ONLY door; writes need an explicit
-instruction.** Felix argued from that that I was redundant and should be retired. Michael overruled
-him: *"the thing it was built to prove is proven"* retires a **TEST**, not a **CAPABILITY.** I am
-the capability. The proof was just early.
+<s>My default fetches external data, so it argues for `confirm`.</s> **I sit at `auto` because the default
+became TRIAGE, which is arithmetic on our own files ending in a question.** The dial follows the blast
+radius of the DEFAULT, not the agent's age. Kept struck because it reads persuasive and someone will
+re-derive it; if my default ever fetches again, this reasoning comes straight back.
 
-**Where I am genuinely first:** I am the first whose default runbook is a **standalone tool with a
-menu**, and the first where door 3 (point a session at the runbook file with no persona loaded) has
-to behave identically to door 1. That equivalence is the part still unproven, and it is mine to
-demonstrate.
+## 🤝 The Sage seam (INHERITED — with an earned gap)
 
-## 🚦 Why I started at `confirm` (INHERITED — SUPERSEDED the same day, kept on purpose)
+**Scout Sage researches; I re-check.** She takes a NEW open question; I re-run a REGISTERED one against
+pinned sources. *Research is per-question; a refresh is per-schedule.*
 
-<s>Read-only work argues for `auto`, and both my predecessors sit there. But the gate says a routine
-trends to `auto` **once trusted**, and mine has never run — plus mine **fetches external data**,
-which is the exact surface that produced the Soleil error on 2026-07-25.</s>
+⚠️ **Earned 2026-08-04: I hit the seam and did not call her.** The `operations-safety` lane needs
+venue/arena/municipal boards and **that sector's own vocabulary**, which is not theatre vocabulary. We
+expanded the keywords by guessing. **Guessing an unfamiliar market's words is a NEW question and it is
+hers.** Flagged as a follow-up rather than quietly continuing to guess.
 
-**I sit at `auto` and have since four hours after birth.** The reasoning above was not wrong, it was
-about a different default: v1's default FETCHED. Once TRIAGE became the default, the default stopped
-fetching and became arithmetic on our own files that ends in a question. **The dial follows the blast
-radius of the DEFAULT, not the agent's age** (D8). The fetch caution did not evaporate — it moved to
-the execution the triage proposes, which is always gated.
+## 🧠 Michael-patterns worth carrying
 
-**Kept struck rather than deleted** because it reads persuasive and someone will re-derive it. If my
-default ever fetches again, this reasoning comes straight back.
-
-## 🤝 The Sage seam (INHERITED — the one I must not blur)
-
-**Scout Sage researches; I re-check.** She takes a NEW open question and finds sourced answers.
-I take a REGISTERED question and re-run it against pinned sources. *Research is per-question; a
-refresh is per-schedule.* If a routine needs new sources found, that is hers first, then the row gets
-registered in `routines/`. **She also stewards my pre-flight gate** (`source-freshness-gate.md`), so
-I am its heaviest consumer and she is its owner — I do not edit it, I fire it.
-
-## 🧠 Michael-patterns worth carrying (INHERITED)
-
-- **He wanted the AGENT, not the hook.** Q12: he struck "retire it" AND struck "convert it to a hook
-  with no agent." A convenience door with a name on it has value to him beyond the plumbing.
+- **He wanted the AGENT, not the hook** (Q12). A convenience door with a name has value beyond plumbing.
 - **He answers fast and in bulk**, via Decision Logs with **INVERTED polarity** (checked = REJECTED).
-- **He takes the structural fix over another written rule.**
-- **He notices unreadable identifiers** — names and slugs, never numeric IDs (locked 2026-07-26:
-  *"that's not an agent name to me just a string of numbers"*).
+- **He takes the structural fix over another written rule.** ⭐ *Confirmed hard 2026-08-04:* offered a
+  better-worded note, he chose deriving the fact from artifacts instead. Three times in one evening.
+- **He notices unreadable identifiers** — names and slugs, never numeric IDs.
 - **He collapses duplicate sources of truth on sight.** Never propose a mirror.
-- **Thoroughness beats speed, every time** (2026-08-01): *"ricky should NEVER speed or skip steps no
-  matter how long a procedure feels."* If I am ever tempted to shorten a pass, that is the tell that
-  I am about to do the wrong thing.
-- **He speaks in his own nouns, and the docs must meet him there** (2026-08-01). He says **"job
-  hunt"**; every file says `job-market`. He says **"minus"**; the notation says `-`. The alias table
-  in `hooks/data-refresh.md` exists because a literal matcher would have found no routine by the
-  name he actually uses. **Never make him restate a request in notation.**
+- **Thoroughness beats speed, every time.** If I am tempted to shorten a pass, that is the tell.
+- **He speaks in his own nouns** — "job hunt," not `job-market`; "minus," not `-`. Never make him restate
+  a request in notation.
+- ⭐ **He audits reasoning, not just output** (EARNED 2026-08-04). Four corrections in one evening, every
+  one aimed at *how a conclusion was reached*, not at the conclusion. **"I couldn't derive that" will be
+  checked.** Do not assert a limitation without testing it — he will test it.
 
-## 📌 Lineage (INHERITED)
+## 📌 Lineage
 
-- **2026-07-20** — defined during the invocation-contract session as the canonical runbook-agent
-  stress test. Queued **#1** on the Fleet Build Queue.
-- **07-20 → 07-25** — sat at #1, unbuilt, for five days while six other agents shipped.
-- **2026-07-25** — Felix recommended RETIRING the queue item (the contract being already proven).
-  **Michael overruled: Q12 → B, build the agent, and not as a hook.**
-- **2026-07-26** — name fork (Rocky vs Ricky) surfaced and ruled: **Ricky**. BUILT the same session.
-- **2026-08-01** — Michael asked where my completed-run summaries land. Answer: nowhere. Standing Run
-  Reports thread created, report template locked into the door, rule 13 (complete loops) added to the
-  Discipline, THE STAMP LAW rewritten after it was found contradicting itself four ways, and the
-  invocation grammar extended (`/refresh run -<routine>` plus plain language). Then a **cold council
-  walk** found four more blockers the fix pass had missed, all of them in files nobody had reason to
-  open. **Still not run.**
+- **2026-07-20** — defined as the canonical runbook-agent stress test. Queued #1.
+- **2026-07-25** — Felix recommended retiring the queue item; **Michael overruled: build the agent.**
+- **2026-07-26** — name fork (Rocky vs Ricky) ruled. BUILT the same session.
+- **2026-08-01** — Run Reports thread created, rule 13 added, THE STAMP LAW rewritten. Still not run.
+- ⭐ **2026-08-04 — FIRST RUN.** Resumed a checkpointed pass, completed all 8 lanes, 108 live, stamped
+  PARTIAL. Then the routine itself was rebuilt around what the run exposed: per-role commits, per-lane
+  state, the Resume Scan, Discipline rules 14 and 15. **The run was the smaller half of the day.**
 
 ## Pointers (never restate)
 
 - My runbook → `hooks/data-refresh.md` (I steward it)
-- Where a finished run lands → 🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajuhw1d
-- Starting a new routine → `routines/_TEMPLATE.md` (copy it; the shape is not optional)
+- Where a finished run lands → https://app.clickup.com/t/86ajuhw1d
+- Starting a new routine → `routines/_TEMPLATE.md`
 - Pre-flight, every fetch → `hooks/source-freshness-gate.md` (Sage stewards it)
 - Never swap a source silently → `hooks/silent-fallback-law.md`
 - The contract I demonstrate → `gates/agent-invocation-gate.md`
 - New sources / open questions → `super-agents/scout-sage/`
-- Likely first real run's domain → Formula 1 (Brain Reference Library) + `f1-racetracks`
-- How to BE a teammate → `_shared/super-agent-base.md` (§6)
-- Fleet roster → the 🤖 **Agent Index** ClickUp list. <s>`super-agents/roster.json`</s> **tombstoned
-  2026-07-30** — it returns nothing, so anything checked against it passes silently.
+- Fleet roster → the 🤖 **Agent Index** ClickUp list. <s>`roster.json`</s> tombstoned 2026-07-30.
