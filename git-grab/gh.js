@@ -20,6 +20,13 @@
    RATE LIMITS, unauthenticated: 60/hr on api.github.com. A job spends 1-3 calls (resolve the
    ref, list the tree). Bodies come from raw.githubusercontent.com, which does NOT count against
    that budget. So roughly 20-30 downloads an hour, which is not a real constraint.
+
+   ⚠️ v1.3 — TWO NAMES PER FILE, AND THEY MUST NOT BE CONFUSED:
+     f.path — the true path in the repo. Fetching reads THIS and only this.
+     f.rel  — the name relative to the grabbed folder. The original, never written to.
+     f.out  — what the ZIP ENTRY is called, set by names.js. Packing reads this.
+   The rename layer touches `out` alone. If a future edit ever fetches by `out` or asserts a
+   count against it, the transform stops being cosmetic and starts being a correctness bug.
 */
 (function () {
   "use strict";
@@ -203,7 +210,9 @@
         if (seen[key]) { skipped.push({ path: e.path, why: 'case-folded duplicate of "' + seen[key] + '"' }); return; }
         seen[key] = rel;
 
-        files.push({ path: e.path, rel: rel, size: e.size || 0, sha: e.sha });
+        /* `out` starts as `rel` so every consumer has a valid entry name even if names.js never
+           runs. The transform is an override, never a prerequisite. */
+        files.push({ path: e.path, rel: rel, out: rel, size: e.size || 0, sha: e.sha });
       });
 
       if (!files.length) {
@@ -233,7 +242,10 @@
   /* ---------------- fetching bodies ----------------
      raw.githubusercontent.com pinned to the COMMIT SHA, never a branch name (which can move
      mid-download and is cache-frozen far more often). Does not count against the API limit.
-     Concurrency 8: fast, polite, not enough to look like a scraper. */
+     Concurrency 8: fast, polite, not enough to look like a scraper.
+
+     ⚠️ FETCH BY `path`, PACK BY `out`. Those are different strings the moment a rename toggle is
+     on, and swapping them is the one edit that would turn this feature into a 404 storm. */
   function rawURL(job, file) {
     return RAW + "/" + job.owner + "/" + job.repo + "/" + job.sha + "/" +
            file.path.split("/").map(encodeURIComponent).join("/");
@@ -265,7 +277,9 @@
             .then(function () { return grabOne(job, f, token); });
         })
         .then(function (ab) {
-          out[i] = { name: f.rel, data: new Uint8Array(ab) };
+          /* The ONLY place the transformed name enters the pipeline. Falls back to `rel` so this
+             layer keeps working with names.js absent entirely. */
+          out[i] = { name: f.out || f.rel, data: new Uint8Array(ab) };
           done++;
           if (onProgress) onProgress(done, files.length, f.rel);
           return pump();
@@ -277,7 +291,10 @@
 
     return Promise.all(lanes).then(function () {
       /* THE ASSERTION THE WHOLE APP IS BUILT AROUND. If the blobs we hold do not equal the count
-         the listing promised, refuse rather than zip what we happen to have. */
+         the listing promised, refuse rather than zip what we happen to have.
+
+         Renaming cannot affect this: names.js never removes a file, it only changes what one is
+         called, and a rename it cannot perform is skipped rather than dropped. */
       var got = out.filter(Boolean);
       if (got.length !== files.length) {
         throw new Error("Only " + got.length + " of " + files.length + " files came back. Refusing to build an incomplete zip.");
@@ -286,9 +303,12 @@
     });
   }
 
-  function suggestName(job) {
+  /* The download filename. `plan` is optional: when a rename ran, a marker keeps two exports of
+     the same folder from colliding in ~/Downloads. */
+  function suggestName(job, plan) {
     var leaf = (job.path ? job.path.split("/").filter(Boolean).pop() : job.repo) || job.repo;
-    return (job.repo + "-" + leaf + "-" + job.sha.slice(0, 7) + ".zip").replace(/[^\w.\-]+/g, "-");
+    var mark = (window.NAMES && NAMES.suffix) ? NAMES.suffix(plan) : "";
+    return (job.repo + "-" + leaf + mark + "-" + job.sha.slice(0, 7) + ".zip").replace(/[^\w.\-]+/g, "-");
   }
 
   function humanBytes(n) {

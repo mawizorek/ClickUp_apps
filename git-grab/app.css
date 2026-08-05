@@ -49,7 +49,7 @@
 
 /* ---------- FILE TABLE (data_typed_table) ----------
    🐞 Wave 4 / Beckett: a long path forced horizontal scroll at 320px. `anywhere` lets it break,
-   and app.js inserts a zero-width space after each slash so breaks land on path separators
+   and view.js inserts a zero-width space after each slash so breaks land on path separators
    rather than mid-word. The size column is fixed so it never gets squeezed to nothing. */
 .tbl-files { table-layout: fixed; width: 100%; }
 .tbl-files td.path { overflow-wrap: anywhere; word-break: break-word; }
@@ -63,6 +63,34 @@
 .callout ul { margin: var(--s2) 0 0; padding-left: 1.2em; }
 .callout li { margin-bottom: 4px; overflow-wrap: anywhere; }
 
+/* ---------- NAME TRANSFORM (v1.3) ----------
+   The rename controls plus the second line inside a path cell showing what a file will be
+   CALLED in the archive. Deliberately built out of the objects already here (card, checkbox,
+   muted text) rather than a new one: the transform is a property of the file table, not a new
+   surface, and this app authors zero new canonical objects. */
+.namebox { margin-bottom: var(--s4); }
+.namebox h3 { margin: 0 0 var(--s2); font-size: 0.95rem; }
+.namebox p { margin: 0 0 var(--s2); }
+.opt {
+  display: flex; align-items: flex-start; gap: var(--s2);
+  min-height: var(--touch, 44px); cursor: pointer; line-height: 1.35;
+}
+.opt input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+.name-sum { font-size: 0.85rem; }
+
+/* Row picker. The checkbox rides INSIDE the path cell rather than in a column of its own —
+   a third column at 320px squeezes the path to a sliver, and the label makes the whole path a
+   touch target instead of a 13px box. */
+.tbl-files td.path label { display: flex; align-items: flex-start; gap: var(--s2); cursor: pointer; }
+.tbl-files .rowpick { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; }
+/* Non-markdown rows get a spacer, not a disabled box: an unusable control invites a click. */
+.rowpick-gap { width: 18px; flex-shrink: 0; }
+.pathtxt { min-width: 0; }
+
+.out { display: block; margin-top: 2px; font-size: 0.78rem; overflow-wrap: anywhere; }
+.out-new { color: var(--good); }
+.out-blocked { color: var(--text-soft); }
+
 /* ---------- 320px ----------
    Narrowest real phone. Buttons go full width so nothing wraps into a 2px sliver, and the KV
    panel stacks because a two-column grid with a 40-char commit SHA cannot fit either way. */
@@ -74,4 +102,5 @@
   .kv dt:first-child { margin-top: 0; }
   .tbl-files td.num, .tbl-files th:last-child { width: 4.5rem; }
   .stepper { font-size: 0.7rem; }
+  .out { font-size: 0.74rem; }
 }
