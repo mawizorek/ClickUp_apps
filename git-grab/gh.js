@@ -203,7 +203,9 @@
         if (seen[key]) { skipped.push({ path: e.path, why: 'case-folded duplicate of "' + seen[key] + '"' }); return; }
         seen[key] = rel;
 
-        files.push({ path: e.path, rel: rel, size: e.size || 0, sha: e.sha });
+        /* THREE NAMES: fetch by `path`, plan by `rel`, pack by `out`. names.js overrides `out`
+           only — seeding it here means the rename layer is optional, never a prerequisite. */
+        files.push({ path: e.path, rel: rel, out: rel, size: e.size || 0, sha: e.sha });
       });
 
       if (!files.length) {
@@ -265,7 +267,8 @@
             .then(function () { return grabOne(job, f, token); });
         })
         .then(function (ab) {
-          out[i] = { name: f.rel, data: new Uint8Array(ab) };
+          /* The only line in this file that READS `out`. */
+          out[i] = { name: f.out || f.rel, data: new Uint8Array(ab) };
           done++;
           if (onProgress) onProgress(done, files.length, f.rel);
           return pump();
@@ -277,7 +280,8 @@
 
     return Promise.all(lanes).then(function () {
       /* THE ASSERTION THE WHOLE APP IS BUILT AROUND. If the blobs we hold do not equal the count
-         the listing promised, refuse rather than zip what we happen to have. */
+         the listing promised, refuse rather than zip what we happen to have. Renaming cannot
+         move this number: names.js changes what a file is called, never whether it exists. */
       var got = out.filter(Boolean);
       if (got.length !== files.length) {
         throw new Error("Only " + got.length + " of " + files.length + " files came back. Refusing to build an incomplete zip.");
@@ -286,9 +290,10 @@
     });
   }
 
-  function suggestName(job) {
+  function suggestName(job, plan) {
     var leaf = (job.path ? job.path.split("/").filter(Boolean).pop() : job.repo) || job.repo;
-    return (job.repo + "-" + leaf + "-" + job.sha.slice(0, 7) + ".zip").replace(/[^\w.\-]+/g, "-");
+    var mark = (window.NAMES && NAMES.suffix) ? NAMES.suffix(plan) : "";
+    return (job.repo + "-" + leaf + mark + "-" + job.sha.slice(0, 7) + ".zip").replace(/[^\w.\-]+/g, "-");
   }
 
   function humanBytes(n) {

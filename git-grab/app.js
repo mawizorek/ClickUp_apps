@@ -1,4 +1,4 @@
-/* app.js — the job reducer and the render.
+/* app.js — the job reducer, the stages, and the event wiring.
 
    ONE RECORD, ONE RENDER. Every stage takes the job and returns the job; the UI is a pure
    function of it. No second source of truth, no isLoading flag sitting next to stage waiting to
@@ -18,6 +18,13 @@
    from one folder's blobs whose count was asserted against a different folder's listing — the
    count check is the entire product, so comparing two unrelated numbers is the worst available
    failure. See the Wave 4 PR for the full trace.
+
+   v1.3 — TWO CHANGES:
+     1. The markup moved to `view.js` at the reducer/render seam. This file was 14,841 B against
+        a 15KB split line and the rename UI would have pushed it over.
+     2. `job.names` + `job.plan` hold the export-name transform. The plan is recomputed by
+        `names.js` on every toggle — synchronous, no network, no re-listing. A rename NEVER drops
+        a file, so the count assertions below are untouched by it.
 */
 (function () {
   "use strict";
@@ -40,6 +47,7 @@
 
   var job = null;
   var els = {};
+  var wired = false;
 
   /* Bumped on every job start. An async continuation whose captured value no longer matches has
      been superseded and must not touch state. */
@@ -52,10 +60,19 @@
     if (saveURL) { try { URL.revokeObjectURL(saveURL); } catch (e) {} saveURL = null; }
   }
 
+  function freshNames() {
+    /* rows is the per-file override map, keyed by the ORIGINAL name. A master toggle empties it,
+       which is why the panel copy promises exactly that. */
+    return { md: false, idx: false, rows: Object.create(null) };
+  }
+
   function reset() {
     gen++;
     dropSaveURL();
-    job = { stage: "idle", url: "", listing: null, error: null, done: 0, total: 0, zip: null, acked: false };
+    job = {
+      stage: "idle", url: "", listing: null, error: null, done: 0, total: 0, zip: null, acked: false,
+      names: freshNames(), plan: null
+    };
     render();
   }
 
@@ -72,16 +89,12 @@
     return job.stage === "listing" || job.stage === "fetching" || job.stage === "packing";
   }
 
-  function esc(s) {
-    return String(s).replace(/[&<>"]/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
-    });
-  }
-
-  /* Break a long path so it wraps instead of forcing horizontal scroll at 320px.
-     A zero-width space after each slash: invisible, copies clean, no CSS hack needed. */
-  function wrapPath(p) {
-    return esc(p).replace(/\//g, "/\u200B");
+  /* Idempotent by construction — names.js derives everything from f.rel and never from f.out —
+     so calling this defensively before a pack costs nothing and guarantees the zip matches the
+     table the user was looking at. */
+  function replan() {
+    job.plan = (job.listing && window.NAMES) ? NAMES.plan(job.listing, job.names) : null;
+    return job.plan;
   }
 
   /* ---------------- stages ---------------- */
@@ -96,7 +109,7 @@
 
     var mine = ++gen;
     dropSaveURL();
-    set({ stage: "listing", url: url, error: null, listing: null, zip: null, acked: false });
+    set({ stage: "listing", url: url, error: null, listing: null, zip: null, acked: false, plan: null });
 
     GH.inspect(url).then(function (listing) {
       if (mine !== gen) return; /* superseded — die quietly */
@@ -108,6 +121,12 @@
           "telling you why. Grab a subfolder instead, or clone the repo."
         );
       }
+      /* A new folder starts with the toggles off and no per-file choices: choices made about the
+         last folder's filenames mean nothing here. Plan before the first render so the table
+         never paints names it is about to change. */
+      job.listing = listing;
+      job.names = freshNames();
+      replan();
       set({ stage: "ready", listing: listing, total: listing.files.length, done: 0 });
     }).catch(function (e) {
       if (mine !== gen) return;
@@ -124,6 +143,7 @@
 
     var mine = ++gen;
     var listing = job.listing; /* pin it: comparing against job.listing later is the bug */
+    replan();                  /* the entry names are exactly what the table last showed */
     set({ stage: "fetching", done: 0, error: null });
 
     GH.fetchAll(listing, function (done) {
@@ -139,7 +159,11 @@
       return ZIP.build(entries).then(function (z) {
         if (mine !== gen) return;
         /* Re-assert before offering the download, against the PINNED listing rather than
-           job.listing — which a superseded job could have replaced underneath us. */
+           job.listing — which a superseded job could have replaced underneath us.
+
+           Renaming cannot move this number. names.js changes what an entry is CALLED and never
+           whether it EXISTS; a rename it cannot perform is skipped, not dropped. So a mismatch
+           here still means exactly what it always meant: a short zip. */
         if (z.entries !== listing.files.length) {
           throw new Error("The zip holds " + z.entries + " files but the listing found " +
                           listing.files.length + ". Refusing to hand you an incomplete archive.");
@@ -154,134 +178,43 @@
     });
   }
 
+  /* ---------------- name transform wiring ----------------
+     A tick must NOT go through set(). set() re-renders via innerHTML, which destroys the very
+     checkbox being clicked — focus lost, scroll jumped, and on a 300-row table that is the whole
+     interaction ruined. Same lesson as the size acknowledgement in Wave 4, now applied to 300
+     more controls. So: recompute the plan, then patch the two things that can change.
+
+     EVERY rendered row is refreshed, not just the one clicked, because one tick can change
+     another row: opting a file out frees the name it wanted, which can let a previously blocked
+     rename through. */
+  function repaintNames() {
+    var plan = replan();
+    if (!plan) return;
+
+    var sum = document.getElementById("ggNameSum");
+    if (sum) sum.innerHTML = VIEW.nameSummary(plan);
+
+    var rows = els.out ? els.out.querySelectorAll("tr[data-rel]") : [];
+    for (var i = 0; i < rows.length; i++) {
+      var tr = rows[i];
+      var f = plan.byRel[tr.getAttribute("data-rel")];
+      if (!f) continue;
+
+      var box = tr.querySelector(".rowpick");
+      if (box) box.checked = !!f.on;
+
+      /* view.js guarantees exactly one .out node per row, present even when empty, so this
+         selector cannot drift onto a different element. */
+      var out = tr.querySelector(".out");
+      if (out) out.outerHTML = VIEW.outCell(f);
+    }
+  }
+
   /* ---------------- render ---------------- */
-
-  function stepper() {
-    var order = ["idle", "listing", "ready", "fetching", "packing", "done"];
-    var at = order.indexOf(job.stage);
-    var steps = [
-      { label: "1 \u00b7 read the link",  active: ["listing"],  doneAt: 2 },
-      { label: "2 \u00b7 list the files", active: ["listing"],  doneAt: 2 },
-      { label: "3 \u00b7 download them",  active: ["fetching"], doneAt: 4 },
-      { label: "4 \u00b7 make the zip",   active: ["packing"],  doneAt: 5 }
-    ];
-    return '<div class="stepper" aria-label="Progress">' + steps.map(function (s) {
-      var cls = "step";
-      if (s.active.indexOf(job.stage) >= 0) cls += " is-active";
-      else if (at >= s.doneAt) cls += " is-done";
-      return '<span class="' + cls + '">' + s.label + "</span>";
-    }).join("") + "</div>";
-  }
-
-  function previewPanel() {
-    var l = job.listing;
-    var row = function (k, v) { return "<dt>" + k + "</dt><dd>" + v + "</dd>"; };
-    if (!l) {
-      return '<dl class="kv">' + row("Repo", "&mdash;") + row("Branch or tag", "&mdash;") +
-             row("Exact commit", "&mdash;") + row("Folder", "&mdash;") +
-             row("Files found", "&mdash;") + row("Total size", "&mdash;") + "</dl>";
-    }
-    return '<dl class="kv">' +
-      row("Repo", esc(l.owner + "/" + l.repo)) +
-      row("Branch or tag", wrapPath(l.ref)) +
-      row("Exact commit", esc(l.sha.slice(0, 10))) +
-      row("Folder", wrapPath(l.path || "(whole repo)")) +
-      row("Files found", l.files.length) +
-      row("Total size", GH.humanBytes(l.totalBytes)) +
-      "</dl>";
-  }
-
-  function sizePanel() {
-    var l = job.listing;
-    if (!l || job.stage !== "ready") return "";
-    var b = l.totalBytes;
-    if (b <= LIMITS.warn) return "";
-
-    var human = GH.humanBytes(b);
-    if (b > LIMITS.confirm) {
-      return '<div class="callout"><strong>\u26a0\ufe0f ' + human + " is a lot to hold in a browser tab.</strong> " +
-        "This tool builds the entire archive in memory before handing it to you, so peak usage is " +
-        "roughly two and a half times the folder size. It may work; it may also stall the tab. " +
-        "<em>That range is an estimate, not a measurement.</em>" +
-        '<p><label class="ack"><input type="checkbox" id="ggAck"' + (job.acked ? " checked" : "") + "> " +
-        "I understand, download it anyway</label></p></div>";
-    }
-    return '<div class="callout"><strong>Heads up: ' + human + ".</strong> " +
-      "Large enough to take a moment and use real memory, but it should be fine.</div>";
-  }
-
-  function skippedPanel() {
-    var l = job.listing;
-    if (!l || !l.skipped.length) return "";
-    /* NAMED, never dropped quietly. This block existing at all is the point of the app. */
-    return '<div class="callout"><strong>' + l.skipped.length + " item" + (l.skipped.length === 1 ? "" : "s") +
-      " cannot be packed and were left out:</strong><ul>" +
-      l.skipped.map(function (s) { return "<li><code>" + wrapPath(s.path) + "</code> &mdash; " + esc(s.why) + "</li>"; }).join("") +
-      '</ul><p class="muted">A submodule is a pointer to another repository, and a symlink\u2019s stored content is just ' +
-      "the path it points at &mdash; neither has real file content here to download.</p></div>";
-  }
-
-  function fileTable() {
-    var l = job.listing;
-    if (!l) return "";
-    var rows = l.files.slice(0, 300).map(function (f) {
-      return '<tr><td class="mono path">' + wrapPath(f.rel) + '</td><td class="mono num">' + GH.humanBytes(f.size) + "</td></tr>";
-    }).join("");
-    var more = l.files.length > 300
-      ? '<p class="muted">Showing the first 300 of ' + l.files.length + ". All of them will be in the zip.</p>"
-      : "";
-    return "<h2>Files</h2>" + more +
-      '<table class="tbl tbl-files"><thead><tr><th>Path</th><th>Size</th></tr></thead><tbody>' + rows + "</tbody></table>";
-  }
-
-  function actions() {
-    var s = job.stage;
-    var isBusy = busy();
-    var out = '<div class="btn-row">';
-
-    if (s === "ready") {
-      var needsAck = job.listing.totalBytes > LIMITS.confirm && !job.acked;
-      out += '<button class="btn btn-primary" id="ggGrab"' + (needsAck ? " disabled" : "") + ">Download " +
-             job.listing.files.length + " file" + (job.listing.files.length === 1 ? "" : "s") + " as a zip</button>";
-    } else if (s === "done") {
-      out += '<a class="btn btn-primary" id="ggSave" href="' + saveURL +
-             '" download="' + esc(GH.suggestName(job.listing)) + '">Save the zip</a>';
-    } else {
-      out += '<button class="btn btn-primary" id="ggLook"' + (isBusy ? " disabled" : "") + ">" +
-             (isBusy ? "Working\u2026" : "Show me the files") + "</button>";
-    }
-    /* Start over always exists. Second-download-in-a-row is the most common real session and the
-       state everyone forgets to build. */
-    out += '<button class="btn btn-secondary" id="ggReset"' + (isBusy ? " disabled" : "") + ">Start over</button>";
-    return out + "</div>";
-  }
-
-  function statusPanel() {
-    if (job.stage === "error") {
-      return '<div class="callout"><strong>\u274c ' + esc(job.error) + "</strong></div>";
-    }
-    if (job.stage === "fetching") {
-      return '<div class="card"><p id="ggProgress" class="mono">0 of ' + job.total + ' files</p>' +
-             '<div class="meter-track"><div id="ggMeter" class="meter-fill"></div></div></div>';
-    }
-    if (job.stage === "packing") {
-      return '<div class="card"><p class="mono">Building the archive\u2026</p></div>';
-    }
-    if (job.stage === "done") {
-      var n = job.zip.entries, promised = job.listing.files.length;
-      return '<div class="callout"><strong>\u2705 ' + n + " file" + (n === 1 ? "" : "s") +
-        " packed, " + GH.humanBytes(job.zip.bytes.length) + " (" + job.zip.method + ").</strong><br>" +
-        "GitHub reported " + promised + ", the zip contains " + n +
-        (n === promised ? " \u2014 they match." : " \u2014 THEY DO NOT MATCH.") + "</div>";
-    }
-    return "";
-  }
 
   function render() {
     if (!els.out) return;
-    els.out.innerHTML =
-      stepper() + statusPanel() + sizePanel() + actions() + skippedPanel() +
-      "<h2>The preview</h2>" + previewPanel() + fileTable();
+    els.out.innerHTML = VIEW.html(job, { limits: LIMITS, saveURL: saveURL, busy: busy() });
 
     els.progress = document.getElementById("ggProgress");
     els.meter = document.getElementById("ggMeter");
@@ -292,22 +225,42 @@
     var grabBtn = document.getElementById("ggGrab");
     if (grabBtn) grabBtn.addEventListener("click", grab);
 
-    /* The acknowledgement deliberately does NOT go through set(). set() re-renders via innerHTML,
-       which destroys and recreates this very checkbox mid-interaction — focus lost, scroll jumps
-       on mobile. Flip the flag and toggle the one thing it controls. */
-    var ack = document.getElementById("ggAck");
-    if (ack) ack.addEventListener("change", function () {
-      job.acked = this.checked;
-      var g = document.getElementById("ggGrab");
-      if (g) g.disabled = !this.checked;
-    });
-
     var resetBtn = document.getElementById("ggReset");
     if (resetBtn) resetBtn.addEventListener("click", function () {
       if (els.url) els.url.value = "";
       if (els.preset) els.preset.value = "";
       reset();
     });
+  }
+
+  /* Every checkbox in the surface, on ONE delegated listener bound once to a container that
+     render() never replaces. Nothing in here re-renders; each branch patches what it owns. */
+  function onChange(e) {
+    var t = e.target;
+    if (!t) return;
+
+    if (t.id === "ggAck") {
+      job.acked = t.checked;
+      var g = document.getElementById("ggGrab");
+      if (g) g.disabled = !t.checked;
+      return;
+    }
+
+    if (t.id === "ggOptMd" || t.id === "ggOptIdx") {
+      /* A master toggle CLEARS the per-file choices. The alternative is a table where a row's
+         state has an invisible origin — inherited or overridden, no way to tell them apart — and
+         the copy in the panel promises this behaviour out loud. */
+      job.names.rows = Object.create(null);
+      if (t.id === "ggOptMd") job.names.md = t.checked;
+      else job.names.idx = t.checked;
+      repaintNames();
+      return;
+    }
+
+    if (t.className && String(t.className).indexOf("rowpick") >= 0) {
+      job.names.rows[t.getAttribute("data-rel")] = t.checked;
+      repaintNames();
+    }
   }
 
   /* ---------------- mount ----------------
@@ -318,6 +271,10 @@
     els.preset = document.getElementById("ggPreset");
     els.out = document.getElementById("ggOut");
     if (!els.out) return;
+
+    /* #ggOut survives every render (only its innerHTML is replaced), so one delegated listener
+       outlives them all. Guarded because the router can mount this page more than once. */
+    if (!wired) { els.out.addEventListener("change", onChange); wired = true; }
 
     if (els.preset) {
       els.preset.addEventListener("change", function () {
