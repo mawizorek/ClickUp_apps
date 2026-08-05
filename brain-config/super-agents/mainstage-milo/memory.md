@@ -34,6 +34,7 @@ The workspace has **22+ spaces**; **mine are the seven URITP-prefixed ones.** Th
 - **Multi-homing is the house pattern** for cross-departmental sharing (zero copies). ⚠️ Not a substitute for a field when an object has multiple *aspects*.
 - 🌟 **TEMPLATE ≠ PRODUCTION.** `Show Design (P0)` = the template. `Show Design (BL)` = Big Love's instantiated workspace. **Never route active correspondence, real deadlines, or person-specific data to a `(P0)` task.** See `_shared/template-production-guardrail.md`. ⚠️ **The ADULTS list contains CLOSED tasks.**
 - 🌟 **THE COURSE CANON NOW LIVES IN THE REPO (2026-08-04).** `mawizorek/uritp-doc-archive` → `02-courses/`, with `course-index.tsv` canonical. **ClickUp `Course List` is the CURRENT-TERM surface, not the definition home.** Course questions seat **Tutor Tate**, not me.
+- 🌟 **`BEGIN`/`END` ARE A FROZEN MIRROR OF START/DUE (Michael, 2026-08-05).** The folder-scoped `BEGIN`/`END` date fields on PRODUCTIONS ▸ CALENDARS hold a **hard-coded copy** of the task's native start_date / due_date, **time component included**. Native dates move when a schedule slips; the mirror does not — that is the whole point, it is the stable value exports, GCal pushes and printed calendars read. **Fill them on create AND on every reschedule**; a calendar task with a start date and an empty `BEGIN` is incomplete. No source date → leave the mirror empty, never invent one. ⚠️ **There is no bulk path:** the task SQL tool rejects both `SET "custom:BEGIN" = start_date` and a `CASE id WHEN…` map on a date custom field (*"must be a constant value"*), so a backfill is **one write per task** — 64 of them across the KALI 🌐 Calendar view. Mechanism side (an automation so this stops being manual) is **Corey's**.
 - Deep detail lives in `memory/archive/`: `uritp-crm-space2.md`, `uritp-productions-space3.md`.
 
 ## 🌟 Production task archetypes (confirmed 2026-08-04)
@@ -74,7 +75,7 @@ Four distinct task types for any design deliverable. Each has ONE job:
 - **Read the task BODY before calling anything duplication.** **Titles and counts describe shape; only the body says intent.**
 - **Every aggregate view is a projection with a blind spot. A count of 1 is more dangerous than a count of 0.**
 - **Census task types and status TYPES** — a status's type ≠ its label (`in stock` and `cancelled` are done-types).
-- **Proven defects:** `WHERE folder IN (...)` silently returns zero OR ignores the filter · an unscoped workspace `GROUP BY` caps ~5,000 rows and reports partial as complete · the SQL field census drops fields intermittently.
+- **Proven defects:** `WHERE folder IN (...)` silently returns zero OR ignores the filter · an unscoped workspace `GROUP BY` caps ~5,000 rows and reports partial as complete · the SQL field census drops fields intermittently · **a date CUSTOM FIELD cannot be `UPDATE`d from another column or via a `CASE` map — constants only, so per-task writes.**
 - 🌟 **VERIFY LIST IDENTITY before routing.** Check `homeListName` — the list name IS the disambiguation.
 
 ## Fleet / role context

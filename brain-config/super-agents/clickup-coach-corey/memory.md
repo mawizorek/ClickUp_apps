@@ -96,6 +96,20 @@ What I'm watching for, across every space regardless of domain:
   due-date-pass reads index, advances dates, marks passed. Description stays human-readable.
   First deployed: Faculty Council Meeting (URITP-8973). Generalizes to any academic-calendar
   recurring obligation.
+- **Frozen Date Mirror (D5, 2026-08-05, Michael's standing preference):** Where a calendar list
+  must publish dates that survive rescheduling (GCal sync, exports, printed calendars), pair the
+  native `start_date`/`due_date` with folder-scoped DATE custom fields — **`BEGIN` mirrors start,
+  `END` mirrors due** — holding a HARD-CODED copy, time component included. Native dates stay
+  live and movable; the mirror is the stable published value. **Fill on create and on every
+  reschedule.** Empty source date → empty mirror, never a substituted value. First deployed:
+  URITP PRODUCTIONS ▸ CALENDARS (`BEGIN` = `f3abf7f3-287a-40e2-9916-59bb8b9066ea`, `END` =
+  `8bea38fd-7e19-4291-9903-a9ad5e957e43`), backfilled 64 tasks across the KALI 🌐 Calendar view.
+  ⚠️ **NO BULK PATH EXISTS — this is the mechanism gap and it is mine.** The task SQL tool
+  rejects both `SET "custom:BEGIN" = start_date` and a `CASE id WHEN…` map on a date custom field
+  (*"must be a constant value"*), so any backfill is one write per task. **A list adopting this
+  pattern needs an automation (on task create / on date change) or the mirror silently drifts** —
+  same shape as the time-boxed-poll gap above: a value that must track another value, with no
+  native mechanism to keep it tracking.
 
 ## Fleet / role context
 
@@ -122,3 +136,5 @@ What I'm watching for, across every space regardless of domain:
   complete** — it returned "URITP PRODUCTIONS = 6 tasks" for a space holding 425+. Scope to a
   space before trusting any count. Also: `WHERE space = X` matches ASSOCIATED lists while the
   `space` column reports HOME, so multi-homed tasks appear under the wrong space.
+- **A date CUSTOM FIELD is constants-only on `UPDATE`** — no column-to-column copy, no `CASE`
+  map. Any "mirror this date into a field" ask is per-task writes or an automation. (D5 above.)
