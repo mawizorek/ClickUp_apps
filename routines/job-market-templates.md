@@ -30,6 +30,35 @@ without its anchor is invisible to the next session, which will re-sweep that ro
 
 ---
 
+## 🧮 WHAT IS DERIVABLE — read this before writing any status into prose
+
+**Corrected 2026-08-04 (Michael).** An earlier version of this file claimed elapsed time and boards-hit "are
+not derivable" and used that to justify a checkpoint comment. **That was wrong on both counts**, and the error
+is worth keeping because it is the same instinct that produced every other prose-state defect in this routine:
+*reaching for a note when the data was already sitting there.*
+
+Michael, 2026-08-04: *"Literally all these comments have metadata tagged about when they were posted... You can
+absolutely derive both of those things."*
+
+| Fact | Derivable? | From what |
+|------|-----------|-----------|
+| Which roles are done | ✅ yes | role-header anchors + committed lane files |
+| Whether the pass closed | ✅ yes | a `PASS COMPLETE` anchor / the stamp |
+| **Elapsed time** | ✅ **yes** | **every comment carries a posted-at timestamp.** First role header of the pass → newest comment → now. Session gaps show up as gaps between comments. |
+| **Time since last activity** | ✅ **yes** | newest comment timestamp vs now — this is what decides ABANDONED vs resumable |
+| **Which boards YIELDED** | ✅ **yes** | the `site` column on rows whose `first_seen` = the pass anchor date. Every row names the board it came from. |
+| Rows captured per role | ✅ yes | the lane file |
+| **Which boards were swept and returned ZERO** | ❌ **no** | **a sweep that finds nothing leaves no artifact.** This is the one genuine gap. |
+
+🔴 **The only non-derivable fact is a negative result.** Everything else is already written down somewhere
+better than a comment. So the fix is not "write a better note" — it is **make the negative result leave an
+artifact too**, which is what the ZERO-YIELD line below does.
+
+**The generalizable rule: before you write a status into prose, ask what artifact already implies it.** If one
+does, the prose is a second claimant and it will rot. Only absence of evidence needs to be stated explicitly.
+
+---
+
 ## 💬 Comment architecture
 
 > ⚠️ **THE THREADING RULE.** The top-level comment stream on the standing task must contain ONLY role headers,
@@ -42,7 +71,7 @@ without its anchor is invisible to the next session, which will re-sweep that ro
 ```
 🎯 Production Manager · 2026-08-02 11:40 ET       <- ROOT
 🎯 Technical Director · 2026-08-02 11:40 ET       <- ROOT (same anchor: same pass)
-⏸️ CHECKPOINT · 2026-08-02 11:51 ET               <- ROOT (only if the pass stops here)
+⏸️ CHECKPOINT · 2026-08-02 11:51 ET               <- ROOT (optional courtesy)
 🎯 Stage Manager · 2026-08-02 11:40 ET            <- ROOT (resumed session, SAME anchor)
 🎯 Master Electrician · 2026-08-02 11:40 ET       <- ROOT
 📋 PASS COMPLETE · 2026-08-02 11:40 ET            <- ROOT (closes the pass)
@@ -51,7 +80,7 @@ without its anchor is invisible to the next session, which will re-sweep that ro
 **Inside each role header's thread (expanded by tapping the header):**
 
 ```
-🎯 ROLE HEADER  <- the root comment (stats + verdict + anchor)
+🎯 ROLE HEADER  <- the root comment (stats + verdict + zero-yield + anchor)
    ├── 🔁 SAME · <n>              <- ONE reply (compressed block)
    ├── ↔️ ALSO IN THIS LANE · <n> <- ONE reply (if any; cross-lane pointers)
    ├── 🆕 <Listing 1 title>       <- individual reply (rich, reactable)
@@ -69,7 +98,7 @@ without its anchor is invisible to the next session, which will re-sweep that ro
 
 ### Threading mechanics (HOW to do this)
 
-1. Post the 🎯 ROLE HEADER as a **new root comment**, anchor line included.
+1. Post the 🎯 ROLE HEADER as a **new root comment**, zero-yield and anchor lines included.
 2. The post_comment response returns a **comment ID / URL**. CAPTURE IT. This is the parent.
 3. Post SAME as a **reply** to that comment ID (`parent_comment`).
 4. Post ALSO (if any) as a **reply** to that same comment ID.
@@ -86,14 +115,7 @@ Do NOT fall back to posting flat root comments. A failed thread is visible; a fl
 > comment"* on five consecutive attempts, leaving three orphan headers with no children. The correct recovery is
 > what happened on the resume: **attach the missing blocks to the existing header, and correct the header's
 > counts in place.** Never leave an orphan header, never open a second header for the same role in one pass.
-> ⚠️ **The Resume Scan now treats "header with no block" as NOT DONE** and sends the next session back to it —
-> which is correct, and is why the recovery above matters.
-
-**Key rules:**
-- Each role's comment block is self-contained. Reading the Production Manager block tells you everything about
-  the PM market without reading any other block.
-- **Role header comment URLs are captured at post time** for the summary's comment index.
-- **Individual NEW listing comments are the REACTION surface.** Michael taps 🔥/👍/👎/🤔 on these.
+> ⚠️ **The Resume Scan now treats "header with no block" as NOT DONE** and sends the next session back to it.
 
 ---
 
@@ -107,6 +129,7 @@ Do NOT fall back to posting flat root comments. A failed thread is visible; a fl
 **Keywords:** <comma-separated from config>
 **Live:** <n> · New: <n> · Gone: <n>
 💵 Salary range across live: <low>-<high> (or "none posted")
+🚫 Swept, zero yield: <board codes, comma-separated>  (or "none — every board swept returned something")
 
 ### Verdict
 <ONE line. Blunt. About THIS role's market only.>
@@ -116,12 +139,19 @@ Do NOT fall back to posting flat root comments. A failed thread is visible; a fl
 
 ⚠️ **The anchor line is mandatory.** Without it the next Resume Scan cannot see that this role was done.
 
+🚫 **The zero-yield line is mandatory too, and it is the ONLY fact in this whole routine that nothing else
+records.** Boards that produced a row are already named in the `site` column of the lane file; boards that were
+swept and came back empty leave no trace anywhere. Omit this line and the next session cannot distinguish
+*"swept, nothing there"* from *"never looked."* That distinction is the entire lesson of the safety-keyword
+error (`job-market-sources.md` → the Department-Index Law).
+
 ⚠️ **The counts are written BEFORE the block is posted and are the easiest thing in this routine to get wrong.**
 If the sweep turns up anything after the header goes up, **edit the header** — do not let a stale count stand.
 Three headers were understated on 2026-08-04 and had to be corrected on a later session.
 
 ⚠️ **On a multi-session pass, every role header carries the timestamp the PASS OPENED**, not the time that
-session ran. The pass is one event, and the shared anchor is what proves it.
+session ran. The pass is one event, and the shared anchor is what proves it. *(Wall-clock progress is not lost —
+the comment's own posted-at metadata records when this header actually went up.)*
 
 ## Template 2: 🔁 SAME (THREADED REPLY to role header) — SLIM FORMAT
 
@@ -188,9 +218,9 @@ Use ⚠️ instead of ✅ on the qualification line when the listing qualifies b
 
 NOTABLE is where REJECTED finds live, as prose. They never become rows, and they never go in `_unfiled.tsv`.
 
-⚠️ **If a lane came back thin, NOTABLE is where you say what you TRIED** — which boards, which keyword
-permutations, which department indexes. "Thin" with no method statement is indistinguishable from a lazy sweep,
-and the reader cannot tell whether the market or the sweep was the problem.
+⚠️ **If a lane came back thin, NOTABLE is where you say what you TRIED** — which keyword permutations, which
+department indexes, which alternate entry points. The header's zero-yield line names WHICH boards came back
+empty; NOTABLE explains HOW hard you looked. "Thin" with neither is indistinguishable from a lazy sweep.
 
 ## Template 6: 📋 PASS SUMMARY (root comment, AFTER all role loops complete)
 
@@ -199,8 +229,8 @@ and the reader cannot tell whether the market or the sweep was the problem.
 
 **Roles searched:** <n> · **Total live:** <n> · **Total new:** <n> · **Total gone:** <n>
 **Prev pass:** <timestamp> (<elapsed>)
-**Sessions:** <n> (<if >1: opened <time>, landed <time>>)
-[State files](https://github.com/mawizorek/ClickUp_apps/tree/main/routines/job-market-state) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v17.2
+**Sessions:** <n> · opened <time>, landed <time> (<elapsed>)
+[State files](https://github.com/mawizorek/ClickUp_apps/tree/main/routines/job-market-state) · [Roles config](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-roles.json) · [Runbook](https://github.com/mawizorek/ClickUp_apps/blob/main/routines/job-market-refresh.md) v17.3
 
 <Density verdict: one line.>
 
@@ -224,61 +254,64 @@ and the reader cannot tell whether the market or the sweep was the problem.
 
 ⚠️ **Two mandatory lines here.** The **comment index** (every role header + SOURCES, hyperlinked) is the
 reader's navigation layer. The **anchor line** is what tells the next Resume Scan this pass is closed — without
-it, the next session will see 8 role headers and no completion and try to resume a finished pass.
+it, the next session sees 8 role headers and no completion and tries to resume a finished pass.
+
+📌 **`Sessions` and both elapsed figures are COMPUTED, not remembered** — first role header's posted-at, this
+comment's posted-at, and the gaps between comments. Never carry them forward in a note.
 
 ## Template 7: 🔌 SOURCES (THREADED REPLY to pass summary)
 
 > ⚠️ Every board name MUST hyperlink to its homepage. No plain-text board names.
-> Mark honestly: ✅ swept · ⚠️ degraded/partial · ❌ not hit this pass. **`❌ not hit` is a required
-> admission, not an omission** — a source silently skipped reads as a source that returned nothing.
-> ⚠️ On a multi-session pass this block covers **every session's** coverage, not just the last one's.
+> Mark honestly: ✅ swept, yielded · ⚪ swept, zero yield · ⚠️ degraded/blocked · ❌ not hit this pass.
+> **`⚪` and `❌` are different facts and collapsing them is the failure this routine keeps making.**
+> ⚠️ On a multi-session pass this block covers **every session's** coverage. Roll up each role header's
+> zero-yield line rather than recalling it — that is what those lines are for.
 
 ```
 ### 🔌 SOURCES
 
-- [**OffStageJobs**](https://staging.offstagejobs.com) `OSJ` — ✅/⚠️/❌ · <n> qualifying · <note>
-- [**Playbill**](https://playbill.com/jobs) `PB` — ✅/⚠️/❌ · <n> qualifying
-- [**BroadwayWorld**](https://www.broadwayworld.com/jobs/) `BWW` — ✅/⚠️/❌ · <n> qualifying
-- [**StageLync**](https://www.stagelync.com) `SL` — ✅/⚠️/❌ · <n> qualifying
-- [**USITT**](https://www.usitt.org/industry-resources/jobs) `USITT` — ✅/⚠️/❌ · <n> qualifying
-- [**StageBoard**](https://stageboard.app) `SB` — ✅/⚠️/❌ · <n> qualifying
-- [**Arts Consulting Group**](https://artsconsulting.com/opensearches/) `ACG` — ✅/⚠️/❌ · <n> qualifying
-- [**TOC Arts Partners**](https://tocartspartners.com) `TOC` — ✅/⚠️/❌ · <n> qualifying
-- [**League of Chicago Theatres**](https://chicagoplays.com/jobs/) `LCTJ` — ✅/⚠️/❌ · <n> qualifying
-- [**The Stage Jobs**](https://jobs.thestage.co.uk) `TSJ` — ✅/⚠️/❌ · <n> qualifying
-- [**Skene Callboard**](https://skene.pub/callboard) `SKN` — ✅/⚠️/❌ · <n> qualifying
-- [**HireCulture**](https://www.hireculture.org) `HC` — ✅/⚠️/❌ · <n> qualifying
-- [**APAP**](https://www.apap365.org/resources/job-bank) `APAP` — ✅/⚠️/❌ · <n> qualifying
-- [**Indeed**](https://www.indeed.com) `IND` — ✅/⚠️/❌ · <n> qualifying
+- [**OffStageJobs**](https://staging.offstagejobs.com) `OSJ` — ✅/⚪/⚠️/❌ · <n> qualifying · <note>
+- [**Playbill**](https://playbill.com/jobs) `PB` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**BroadwayWorld**](https://www.broadwayworld.com/jobs/) `BWW` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**StageLync**](https://www.stagelync.com) `SL` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**USITT**](https://www.usitt.org/industry-resources/jobs) `USITT` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**StageBoard**](https://stageboard.app) `SB` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**Arts Consulting Group**](https://artsconsulting.com/opensearches/) `ACG` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**TOC Arts Partners**](https://tocartspartners.com) `TOC` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**League of Chicago Theatres**](https://chicagoplays.com/jobs/) `LCTJ` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**The Stage Jobs**](https://jobs.thestage.co.uk) `TSJ` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**Skene Callboard**](https://skene.pub/callboard) `SKN` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**HireCulture**](https://www.hireculture.org) `HC` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**APAP**](https://www.apap365.org/resources/job-bank) `APAP` — ✅/⚪/⚠️/❌ · <n> qualifying
+- [**Indeed**](https://www.indeed.com) `IND` — ✅/⚪/⚠️/❌ · <n> qualifying
 <repeat per board, including the venue/arena/municipal boards swept for operations-safety>
 ```
 
-## Template 8: ⏸️ CHECKPOINT (root comment, only when stopping mid-loop) — **A HINT, NOT AN INSTRUCTION**
+## Template 8: ⏸️ CHECKPOINT (root comment, optional) — **A HUMAN COURTESY, NOTHING MORE**
 
-> 🔴 **DEMOTED at v17.2, and this is the important part.** A checkpoint is **evidence E4: the weakest rung on
-> the ladder.** The next session DERIVES its position from posted headers and committed lane files, then reads
-> this as a cross-check. **If this comment and the artifacts disagree, the artifacts win and this comment gets
-> corrected.** Write it as a courtesy to a human, not as an instruction to an agent.
+> 🔴 **Reduced to near-nothing at v17.3, and the reduction is the point.** Every field this comment used to
+> justify itself turned out to be derivable:
 >
-> **Why it was demoted:** at v17 it carried row data (deleted), and at v17.1 it was still the conditional that
-> decided fresh-vs-resume. Both made a prose note load-bearing. Michael, 2026-08-04: *"Instead of using them as
-> conditionals, we could use them as references."*
+> | Field it carried | Where it actually lives |
+> |---|---|
+> | roles complete | role-header anchors + committed lane files |
+> | next role | first role in `roles.json` order without a header |
+> | commit SHA | git log on the lane files |
+> | ~~elapsed~~ | **comment posted-at metadata** |
+> | ~~boards hit~~ | **`site` column on rows with this pass's `first_seen`** |
+> | boards swept with ZERO yield | **the role header's zero-yield line** (added v17.3) |
 >
-> **What it is still genuinely good for:** boards already hit, elapsed time, and anything a human would want to
-> know that **cannot be derived** from the thread or the repo.
+> **Nothing is left that only this comment knows.** Write it so a human scrolling on a phone can see the pass
+> is paused. Do not write it so an agent can resume — the agent derives.
 
 ```
-## ⏸️ CHECKPOINT · <YYYY-MM-DD HH:MM> ET  ·  reference only, verify before trusting
+## ⏸️ CHECKPOINT · <YYYY-MM-DD HH:MM> ET  ·  reference only — DERIVE, don't obey
 
 **Pass anchor:** <original pass timestamp> ET
-**Roles complete and COMMITTED:** <list> (<commit SHA>)
-**Believed next role:** `<role_id>`  ← *derive this yourself; this line is a hint*
-**Boards hit so far:** <list>   ← *not derivable, this is the real value of this comment*
-**Elapsed:** <time>
+**Paused after:** `<role_id>` (committed)
+**Believed next:** `<role_id>`  ← *a hint. Run the Resume Scan; if it disagrees, IT is right.*
+**Why it stopped:** <context — capacity, a blocked board, an open question. THIS is the part worth writing.>
 **Stamp:** NOT written — deliberate. An unfinished pass must not stamp.
-
-**For the next session:** run the Resume Scan against the role headers and lane files. If your scan disagrees
-with the line above, **your scan is right** — follow it and edit this comment.
 ```
 
 🚫 **A checkpoint never carries row data.** If you are tempted to paste a row into a comment so the next session
@@ -286,6 +319,9 @@ can apply it, commit it instead.
 
 🚫 **Never stamp when you post a checkpoint.** An unfinished pass that stamps tells every later reader — human
 and agent — that it finished.
+
+📌 **A pass that stops WITHOUT a checkpoint is still fully resumable.** That is the acceptance test for this
+whole design. If a missing checkpoint ever breaks a resume, the Resume Scan is broken, not the note.
 
 ## Template 9: ✅ SPENT (an EDIT to a checkpoint, not a new comment)
 
