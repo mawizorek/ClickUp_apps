@@ -8,6 +8,9 @@
      TO RESKIN THE WHOLE APP: change APP_THEME to any slug in _themes.json. One line, nothing else. -->
 <!-- CSS SPLIT (v1.1): styles.css = the template baseline. app.css = objects this app added.
      By ORIGIN, not size, so a template re-sync and app work never fight over one file. -->
+<!-- JS SPLIT (v1.3): zip.js = the container writer. gh.js = the network. names.js = export-name
+     transforms (pure). view.js = every rendered string. app.js = the job reducer + listeners.
+     Each is a lane, and each stays under the 15KB line on its own. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -32,8 +35,8 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <!-- THEME SPINE: static themes.css = instant themed first paint (color); resolve.js composes all 4 vectors. -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css?v=6">
-<link rel="stylesheet" href="./app.css?v=6">
+<link rel="stylesheet" href="./styles.css?v=7">
+<link rel="stylesheet" href="./app.css?v=7">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -55,16 +58,18 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="./chrome.js?v=6"></script>
-<script src="./zip.js?v=6"></script>
-<script src="./gh.js?v=6"></script>
-<script src="./app.js?v=6"></script>
+<script src="./chrome.js?v=7"></script>
+<script src="./zip.js?v=7"></script>
+<script src="./gh.js?v=7"></script>
+<script src="./names.js?v=7"></script>
+<script src="./view.js?v=7"></script>
+<script src="./app.js?v=7"></script>
 <script>
 (function () {
   /* ==== APP CONSTANTS ==== */
   var APP_NAME    = "git-grab";
-  var APP_VERSION = "v1.2";
-  var APP_PR      = 722;                  // merged PR that shipped this version (read back, not guessed)
+  var APP_VERSION = "v1.3";
+  var APP_PR      = 745;                  // merged PR that shipped this version (read back, not guessed)
   var APP_THEME   = "soft-utility";       // JOIN slug (_themes.json). CHANGE THIS ONE LINE TO RESKIN.
   var DEFAULT_COLOR = "maw-dark-utility"; // COLOR slug (_index.json) — lightweight fallback if the join cannot load
   var DEFAULT_PAGE  = "home";
@@ -143,18 +148,30 @@
     btn.addEventListener("click", function () {
       btn.disabled = true;
       out.innerHTML = '<p class="muted">Running\u2026</p>';
+
+      /* TWO SUITES, ONE BUTTON. NAMES is synchronous and pure; ZIP is async and builds a real
+         archive. "Run the self test" has to mean all of it — a second button is a second thing
+         to forget, and the rename layer is exactly the kind of quiet logic that needs the check
+         to be one click away. */
+      var nm = (window.NAMES && NAMES.selftest) ? NAMES.selftest() : { ok: true, results: [] };
+
       ZIP.selftest().then(function (r) {
-        var rows = r.results.map(function (line) {
-          var pass = line.indexOf("PASS") === 0;
-          return '<tr><td>' + (pass ? '<span class="badge good">pass</span>' : '<span class="badge bad">fail</span>') +
+        var all = nm.results.concat(r.results);
+        var pass = nm.ok && r.ok;
+        var rows = all.map(function (line) {
+          var good = line.indexOf("PASS") === 0;
+          return '<tr><td>' + (good ? '<span class="badge good">pass</span>' : '<span class="badge bad">fail</span>') +
                  '</td><td class="mono">' + line.slice(6).trim().replace(/</g, "&lt;") + '</td></tr>';
         }).join("");
         out.innerHTML =
-          '<div class="callout"><strong>' + (r.ok ? "\u2705 All internal checks passed." : "\u274c Something failed \u2014 see below.") +
-          '</strong> Compression: <code>' + r.method + '</code>. Archive: <code>' + r.size + '</code> bytes.</div>' +
+          '<div class="callout"><strong>' + (pass ? "\u2705 All internal checks passed." : "\u274c Something failed \u2014 see below.") +
+          '</strong> ' + nm.results.length + ' name checks, ' + r.results.length + ' zip checks. ' +
+          'Compression: <code>' + r.method + '</code>. Archive: <code>' + r.size + '</code> bytes.</div>' +
           '<table class="tbl"><thead><tr><th>Result</th><th>Check</th></tr></thead><tbody>' + rows + '</tbody></table>' +
           '<div class="btn-row"><a class="btn btn-primary" href="' + r.url + '" download="git-grab-selftest.zip">Download the sample zip</a></div>' +
-          '<p class="muted">This is the check that counts. Open it in Finder or Explorer. You should see four files, ' +
+          '<p class="muted">The name checks above are the whole truth about renaming: they run in memory ' +
+          'and either pass or fail. The zip checks are not \u2014 nothing in a tab can prove an OS extractor ' +
+          'accepts a file. Open the sample in Finder or Explorer. You should see four files, ' +
           'with <code>data.txt</code> inside <code>nested/deep/</code> and the caf\u00e9 filename intact.</p>';
         btn.disabled = false;
       }).catch(function (e) {
