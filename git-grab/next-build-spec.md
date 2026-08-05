@@ -17,7 +17,19 @@ Michael, 2026-08-04: *"GitGrab is no longer just a straight download; it's an ac
 
 What changed is the Refused-list preamble — *"one input, one output; if a feature needs the word 'also', it is not this app."* That was written when the app was a downloader. It is now a **naming workbench**: a place you decide what an archive is called before you commit to it.
 
-**What did NOT change, and gets stronger:** every byte in the zip came out of the repo unaltered. A sandbox over NAMES is not a sandbox over CONTENT. See `naming-workbench.md` ▸ *Does this make it Prism* for the full answer — short version, **no**, and the test is one sentence: *does the app need to know what is inside the file?* git-grab never has and must never start.
+**What did NOT change, and gets stronger:** every byte in the zip came out of the repo unaltered. A sandbox over NAMES is not a sandbox over CONTENT.
+
+### 🔴 The one-sentence test, and it settles every version of this question
+
+> **Does the app need to know what is INSIDE the file?**
+
+**git-grab: never.** `fetchAll()` hands `zip.js` a `Uint8Array` straight off an `arrayBuffer`. There is no parser for any format, nothing is ever decoded, and **it could pack a format that has not been invented yet.** Everything v1.4 adds operates on *a string that happens to be a filename*.
+
+**Prism: always.** Parsing content is the entire job.
+
+**git-grab is a sandbox over NAMES. Prism is a sandbox over CONTENT.** Merging them costs both: Prism would gain a fetch layer and a ZIP writer it cannot use (`prism.css` is 17,183 B and already **clips on a full read**), and git-grab would gain parsers plus the vendored dependency its existence is a protest against. The correct relationship is `shared/gh-fetch.js`, extracted the day Prism gets an "open from a GitHub URL" adapter: **git-grab gets it out of GitHub, Prism opens it up.**
+
+⚠️ **This test has now been applied three times in one evening** (convert-on-export · sandbox reframe · marker-strip) and it held each time. Apply it before designing, not after.
 
 ---
 
@@ -34,9 +46,41 @@ What changed is the Refused-list preamble — *"one input, one output; if a feat
 9. 🔴 **The preview IS the correctness mechanism, not decoration.** Anything that changes a filename must change it **before the file table renders**, or the screen shows names the archive does not contain.
 10. 🔴 **The generation counter in `app.js` (v1.2) is load-bearing.** Every async continuation captures `gen` and bails if superseded. Removing it lets one folder's zip be asserted against another folder's listing.
 11. 🔴 **A rename never removes a file** (v1.3). `f.out` changes; `f.path` and the file's existence do not. The moment a transform can DROP something, both count assertions become meaningless and the app loses the only property it was built for.
-12. 🔴 **git-grab RENAMES. IT DOES NOT CONVERT.** ⚠️ **There is no back end to "handle it on"** — every line of this app runs in the tab, which IS the security claim. Moving a conversion "into the code" does not change what a conversion is: rewriting bytes the repo does not contain.
+12. 🔴 **git-grab RENAMES. IT DOES NOT CONVERT — AND IT DOES NOT READ.** ⚠️ **There is no back end to "handle it on"** — every line runs in the tab, which IS the security claim. **The app never decodes a file it packs**, so it cannot inspect, scan, lint, strip or clean one. See the marker-strip ruling below: the moment it decodes, the one-sentence test above stops returning *never*.
 13. 🔴 **NOTHING IS AUTOMATIC. EVERY TRANSFORM IS OPT-IN AND SHIPS OFF.** A folder you grab without touching a control comes back byte-for-byte, name-for-name, as the repo has it. ⚠️ **A control being AVAILABLE is not a transform FIRING** — the v1.4 editable field is always present and changes nothing until you type in it.
 14. 🔴 **THE PATH IS THE ONLY THING GUARANTEED UNIQUE.** Two files can share a name; they cannot share a path. Every flatten, every append, every collision guarantee in v1.4 rests on this and on nothing else.
+
+---
+
+## 🔴 RULED 2026-08-04 · marker detection + stripping — NOT HERE, and it is already built elsewhere
+
+> Michael: *"a flag that parses any TSV, CSV, or data file … to see if any cells contain the existing marker tags we know. Then offer to strip those marker tags if they are present."*
+
+**The instinct is right and the destination is wrong. This would be the THIRD implementation of one transform**, and the other two are further along than this one would be.
+
+| # | Where | State |
+|---|---|---|
+| 1 | **`docrender/cells.py` → `cells.plain()`** (9,660 B, `doc-render-engine`) | **Written, in production, tested.** Extracts a marked cell's plaintext. Exists because `sort:` needed to order rows without markup reordering the sheet. |
+| 2 | **`docrender/clean.py`** — emit `<name>.clean.tsv` beside every marked TSV | **Scoped, step 2 of the sequence** in `prism/next-build-spec.md`. Its entry says, in Michael's own architecture: ***"Wraps `cells.plain()`, which already exists. Do not write a stripper."*** |
+| 3 | git-grab, in JS | ⛔ this ask |
+
+### Three reasons, any one sufficient
+
+**1. It breaks the one-sentence test, in the same evening it was written.** Detection is not a lighter version of stripping — **both require decoding the file.** git-grab has never decoded anything it packs. The moment it parses cells to look for markers, *does it need to know what is inside the file* stops answering *never*, and the Prism boundary argued four sections up evaporates.
+
+**2. The vocabulary does not live here, and a copy of it would rot.** Marker classes are declared in `theme/marker-classes.tsv` + `theme/markers.tsv`, and reserved prefixes are **derived** by `docrender/prefixes.py` from `prefixes.claim(...)` at import — *derive it, never type it* (J8). A marker list hand-typed into `names.js` is a **fourth hand-maintained copy of a vocabulary whose entire architecture exists to prevent copies.** It would be wrong the first time a class is added, and nothing would fail loudly when it was.
+
+⚠️ **The interesting nuance, stated because it is the strongest counter-argument and it still loses:** the proposed `dialect.json` would live in a public repo, so `raw.githubusercontent.com` *is* on git-grab's allowlist and it **could** legitimately fetch the vocabulary. That solves reason 2 outright. It does nothing for reason 1 or 3.
+
+**3. A JS reimplementation will disagree with the Python one the first time a marker nests** — already recorded as the strongest call in the Prism fold-in. Two implementations of one design is a bug with a delay on it.
+
+### 🔴 The actual answer: fix it UPSTREAM and git-grab needs ZERO new code
+
+`clean.py` emits the stripped sibling **at build time**. The clean file is then **a real file in the repo** — so it appears in the listing, in the file table, in the count, and in the zip, with no new capability in this app at all. **You grab the folder and both versions are already there.** The transform happens where the vocabulary is derived, once, in the language that owns it.
+
+⭐ **That is also why the sibling was specced as a distinct filename rather than a stripped download under the existing link:** `01-utility/automatic-revision-log.md` promises in Michael's own words that the table and the download *"cannot disagree."* A silent strip on the way out breaks that promise. A distinct filename makes the transform visible.
+
+**Demand signal worth acting on:** he has now asked for marker-stripping twice in one day, in two different apps. `clean.py` is step 2 of Prism's sequence and is explicitly *"independent of Prism"* — **it can ship on its own, before any of the rest.** That is the thing to build.
 
 ---
 
@@ -81,9 +125,10 @@ The seam is already in place: `ghFetch()` takes an optional token argument and t
 
 ## Refused — do not add these without a real wall to point at
 
-⚠️ **The old preamble (*"one input, one output"*) was retired 2026-08-04.** The governing line is now at the top of this file: **anything to a filename, nothing to a file.** Every refusal below survives that change; two got sharper.
+⚠️ **The old preamble (*"one input, one output"*) was retired 2026-08-04.** The governing line is now at the top of this file: **anything to a filename, nothing to a file.** Every refusal below survives that change; three got sharper.
 
 - **Converting file CONTENT — any format, any direction, any implementation.** Guardrail 12. This is the load-bearing refusal and everything else is detail.
+- **READING file content — parsing, scanning, linting, marker detection, stripping.** ⚠️ **Not a lighter version of converting: it is the same door.** Detection requires decoding, and the app's boundary is that it never decodes. Full ruling above; the transform belongs in `docrender/clean.py` where the vocabulary is derived.
 - **Vendoring any third-party library, for any reason.** `zip.js` was written by hand rather than imported and its header says why. The first `<script src="https://cdn...">` deletes the app's entire justification. (True `.xlsx` needs SheetJS. That is the whole argument.)
 - **Repo browsing** — a folder tree with expand/collapse. ⚠️ **The v1.4 editable field is NOT this.** The flat table is the browser; making its names editable does not make it a tree.
 - **A general find-and-replace rename box.** An arbitrary regex has an unbounded collision surface and no preview strong enough to defend it. ⚠️ **A typed name on ONE row is not this either** — a regex acts on files you never looked at, a typed name acts on the row in front of you.
