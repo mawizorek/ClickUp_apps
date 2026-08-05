@@ -1,7 +1,7 @@
 # git-grab — next build spec
 
 **Current:** **v1.3** (`APP_VERSION` + `?v=7`), PR #745. Waves 0-4 + the name-transform stage shipped.
-**Next:** nothing scheduled. The v2 private-repo gate is the only approved-shape item left.
+**Next:** the **export options menu** below — ⚠️ SCOPED, NOT GREENLIT. Three rulings open.
 
 Decision history: the ClickUp APPS task's **git-grab — Decision Log** subpage. Open questions get answered there (a checkbox in markdown is inert), resolved findings stay here.
 
@@ -20,6 +20,108 @@ Decision history: the ClickUp APPS task's **git-grab — Decision Log** subpage.
 9. 🔴 **The preview IS the correctness mechanism, not decoration.** Anything that changes a filename must change it **before the file table renders**, or the screen shows names the archive does not contain.
 10. 🔴 **The generation counter in `app.js` (v1.2) is load-bearing.** Every async continuation captures `gen` and bails if superseded. Removing it lets one folder's zip be asserted against another folder's listing.
 11. 🔴 **A rename never removes a file** (v1.3). `f.out` changes; `f.path` and the file's existence do not. The moment a transform can DROP something, both count assertions become meaningless and the app loses the only property it was built for.
+12. 🔴 **git-grab RENAMES. IT DOES NOT CONVERT.** Every byte in the zip came out of the repo unaltered. See the ruling below — this is the line the export menu is built against, and it is the reason the app can promise anything at all.
+
+---
+
+## Next build — the export options menu
+
+⚠️ **SCOPED, NOT GREENLIT.** Michael, 2026-08-04: *"Is it possible for our app to understand those as prose text types and provide a dropdown menu rather than a checkbox... a 'pick your export option' menu rather than just a checkbox."*
+
+He is right about the control and right about the generalisation. **The checkbox was always a degenerate dropdown** — it worked only because markdown happens to have exactly two destinations (`.txt`, or leave it). The instant a family has three, the checkbox breaks. Building the dropdown now is cheaper than building it later, and the registry underneath it is the part that actually matters.
+
+But the same request bundles two operations that are NOT the same thing, and the whole design turns on separating them.
+
+### 🔴 The line: RENAME vs CONVERT
+
+| | Tier A · RENAME | Tier B · CONVERT |
+|---|---|---|
+| Example | `.md` → `.txt` | `.tsv` → `.csv` / `.json` / `.xlsx` |
+| Bytes | **identical** | **rewritten** |
+| Reversible | rename it back | maybe, maybe not |
+| In the zip | the repo's file | a file that does not exist in the repo |
+| Can it lose data | no | yes, and quietly |
+
+v1.3 is entirely Tier A, and that is why it was safe to ship in an afternoon.
+
+**RECOMMENDATION: git-grab offers Tier A only. Tier B is Prism's lane.** Three independent reasons, any one of which is sufficient:
+
+**1. It breaks the app's founding premise.** `zip.js` is ~250 hand-written lines with a comment explaining exactly why: *"this app exists because Michael did not want to hand a third party's page a GitHub token. Vendoring a zip library would satisfy that on a technicality while re-introducing a supply chain."* True `.xlsx` needs SheetJS. Adding it puts back precisely the dependency the app was built to eliminate — and it would be the only third-party code in the bundle.
+
+**2. It breaks the correctness bar.** The promise is *the zip is what the repo has, and the count proves it.* A rename preserves that: same bytes, different label. A conversion does not — the archive now holds derived artifacts, and `zip entries == listing count` stops being a statement about completeness and starts being a coincidence. **Guardrail 11 was written for exactly this pressure.**
+
+**3. Excel's type coercion is a silent data destroyer**, and silent corruption is the one thing this app is religious about. Leading zeros stripped (`00742` → `742`). Dates reformatted to the machine locale. Long numbers to scientific notation. A cell starting with `=` becomes a formula. `TRUE`/`FALSE` become booleans. Every one of those is invisible until the file matters. **Shipping a quiet corrupter inside the app whose entire thesis is "no quiet corruption" is backwards.**
+
+⚠️ **And a fact worth having before anyone says "just do what Prism does":** Prism's Excel export is **an HTML table with an `.xls` extension**, not a real workbook. *True `.xlsx` via SheetJS* has been open on its roadmap since v1 and is still open at v3.2. So the shortcut is to ship a fake xlsx from a second app.
+
+**⏳ RULING NEEDED.** Tier A only (recommended), or does git-grab grow a converter?
+
+### 🔴 "Prose" is the wrong family. The predicate is PLAIN-READABLE.
+
+Michael grouped *"Markdown, RTF, or other generic text files."* **RTF does not belong in that group, and it is the most useful thing to catch before building.**
+
+The test is not *is this text-ish*. It is: **does the file read correctly with no renderer at all?**
+
+- **Markdown passes**, and that IS the premise. `# Heading` and `**bold**` are readable as-is; markdown is prose that happens to carry markup.
+- `.rst`, `.txt`, `.json`, `.yaml`, `.xml`, `.csv`, `.tsv` pass. Ugly in places, never unreadable.
+- 🔴 **RTF FAILS.** A `.rtf` opens as `{\rtf1\ansi\deff0{\fonttbl{\f0 Times;}}\par\f0\fs24` wrapped around the words. It is the **inverse** of markdown: markup that happens to contain prose. Renaming it to `.txt` takes a file that opens correctly in TextEdit, Word and Pages *today* and turns it into a screenful of control words. **That is a downgrade dressed as a convenience.**
+- `.docx`, `.odt`, `.pages`, `.ipynb` fail harder — they are zips or JSON containers. Renaming one to `.txt` yields binary noise.
+
+So the family is **`plain-readable`**, and the predicate is one line that anyone can apply to a new extension without asking. It also explains v1.3's index rule as a general case rather than a special one: **code is not plain-readable in the sense that matters, because its correctness depends on its name.**
+
+### The registry — the actual architectural change
+
+`names.js` currently hardcodes two regexes. Replace them with a table. **Adding RTF, or `.adoc`, or anything else, becomes a ROW rather than a function**, and the reasoning travels with the data:
+
+| Family | Extensions | Offered | Why |
+|---|---|---|---|
+| `plain-readable` | `.md` `.markdown` `.rst` `.adoc` `.org` | leave as-is · `.txt` | reads fine with no renderer |
+| `already-plain` | `.txt` `.text` | leave as-is | nothing to offer |
+| `structured-text` | `.json` `.yaml` `.yml` `.xml` `.toml` | leave as-is · `.txt` | readable, but the extension is load-bearing for tooling — **offered, not defaulted** |
+| `tabular` | `.tsv` `.csv` `.psv` | leave as-is | Tier B lives here. See the ruling. |
+| `rich-text` | `.rtf` `.docx` `.odt` `.pages` | **leave as-is, no options** | renaming produces garbage |
+| `code` | `.html` `.js` `.py` `.css` `.ts` `.rb` `.go` … | **leave as-is, no options, ever** | the name is part of how it runs |
+| `binary` | everything else | **leave as-is, no options** | — |
+
+**An empty option list is a real answer, not a gap.** Three families have one deliberately, and each carries its sentence.
+
+### 🔴 Format and naming are two different decisions and must not share a control
+
+The v1.3 index rename is **not** a format option. It changes what a file is CALLED for disambiguation; it says nothing about what the file IS. Folding it into a format dropdown is a category error that will confuse every future reader.
+
+So the panel has two sections:
+
+- **Format** — one dropdown per family *actually present in this listing*. A folder of md + tsv + js shows two dropdowns and no control on the js rows. Zero families with options = **no panel at all**, exactly as v1.3 already does when a folder holds no markdown.
+- **Naming** — checkboxes, cross-cutting. `index.md` → `<folder>_index` lives here, and any future naming rule joins it.
+
+### Inheritance has to be VISIBLE, and this is where the dropdown is harder than the checkbox
+
+v1.3 sidestepped it: flipping a master wipes the per-row overrides, because a two-state row whose state has an invisible origin is confusing. With *n* options that dodge stops being enough.
+
+**The fix is in the option label, not in more UI.** A row's select reads `Same as above (.txt)` as its first option rather than showing a blank or a duplicate. Inheriting and overriding then LOOK different at a glance, and the master's current value is legible from any row without scrolling back up. Keep the wipe-on-master-change too: it is honest and it is already documented on screen.
+
+### What generalises for free (why this is cheaper than it sounds)
+
+- **The two-round collision planner is already name-based.** Any transform that produces a target name feeds it unchanged. This is the reusable part of v1.3 and it is the reason the expansion is mostly a data change.
+- **`plan()` already takes an options bag and derives everything from `f.rel`.** `rows[rel] = true|false` becomes `rows[rel] = "<target-ext>"|null`. Same idempotence, same zero-network toggling.
+- **`f.out` is already the single seam.** One line in `gh.js` reads it. Nothing else in the pipeline needs to know this feature exists.
+- **`NAMES.selftest()` extends by table** rather than by hand-written case, once families are data.
+
+### ⏳ The only shape in which Tier B could ever live here
+
+Recorded because it is genuinely defensible and someone will re-derive it later: **a converted file could be an ADDITION rather than a replacement.** `data.tsv` AND `data.csv` both in the zip. Nothing from the repo is altered or lost, so guardrail 12 survives — but the done panel then needs a third number, *"142 from GitHub, 142 in the zip, plus 3 generated,"* and the repo count still has to match exactly on its own.
+
+It works. It is still not recommended, because reasons 1 and 3 above are untouched by it: a real `.xlsx` still needs a vendored library, and Excel still eats leading zeros whether the original file is next to it or not.
+
+### ⏳ RULINGS NEEDED
+
+1. **Tier A only?** (recommended) Or does git-grab convert?
+2. **RTF** — accept the `rich-text` family with no options? (recommended) Or force it into `plain-readable` and accept that `.txt` shows control words?
+3. **`structured-text`** (`.json`, `.yaml`, `.xml`) — offer `.txt` at all? It is readable, so the predicate says yes, but the extension is load-bearing for editors and tooling in a way markdown's is not. Offered-but-never-defaulted is the middle path.
+
+### If the answer to #1 is "convert"
+
+Then it does not belong in git-grab, and the shape is a **handoff, not a feature**. Prism is already the workbench that reads TSV/CSV/JSON and writes the others; it is honest about being an editor, which git-grab is not. The seam is named in Scratch below: `shared/gh-fetch.js` is *"deliberately not built — one consumer is not a shared module."* **A Prism "open from a GitHub URL" source adapter is the second consumer, and that is the moment the extraction is justified.** Cheapest useful version in the meantime is one line under a tabular file: *need this as CSV or Excel? Open it in Prism* — zero code, correct routing, and it teaches the app matrix.
 
 ---
 
@@ -72,14 +174,16 @@ Specs removed rather than archived, because a Futures block describing running c
 - **A caching layer.** You download a folder twice a month.
 - **Repo browsing, file preview, multi-folder zips, download history, globs.** One input, one output. If a feature needs the word "also," it is not this app.
 - **A general find-and-replace rename box.** The two v1.3 transforms are named, bounded, reversible and previewed. An arbitrary regex over entry names has an unbounded collision surface and no preview strong enough to defend it.
-- **Renaming anything that is not markdown.** See the safety rule above. This is the one refusal on this list that can destroy what somebody downloaded.
+- **Renaming anything that is not markdown.** See the safety rule above. This is the one refusal on this list that can destroy what somebody downloaded. ⚠️ The export menu above would REPLACE this line with the family registry — the rule survives, the mechanism changes.
+- **Vendoring any third-party library, for any reason.** `zip.js` was written by hand rather than imported, and the header says why. The first `<script src="https://cdn...">` in this app deletes its entire justification.
 
 ---
 
 ## Scratch intake
 
 - **Per-file ticks stop at the 300-row render cap.** Rows past it follow the master toggles and the table says so. Nobody has asked to lift it; virtualising the table to do so would cost more than the problem.
-- `shared/gh-fetch.js` extraction — **named, deliberately not built.** If Prism ever gets an "open from a GitHub URL" source adapter, it needs exactly this fetch layer, and that is the moment to extract. Not before: one consumer is not a shared module. `gh.js` stays DOM-free so the extraction is a file move rather than surgery.
+- `shared/gh-fetch.js` extraction — **named, deliberately not built.** If Prism ever gets an "open from a GitHub URL" source adapter, it needs exactly this fetch layer, and that is the moment to extract. Not before: one consumer is not a shared module. `gh.js` stays DOM-free so the extraction is a file move rather than surgery. ⚠️ **The export-menu ruling above may create that second consumer.**
 - **`names.js` is a candidate for the same treatment** and for the same reason it should not move yet. It is pure, dependency-free and would drop into any app that hands a user a file. One consumer.
+- **`gh.js` is 15,216 B** — a hair over the 15KB split line, self-caught on read-back during the v1.3 ship after two comment trims. Next split candidate. The clean seam is **resolve/list** (parseURL, resolveRef, listTree) vs **fetch** (rawURL, grabOne, fetchAll) — and that second half is exactly what `shared/gh-fetch.js` would be, so the split and the extraction are the same cut made once.
 - The zipball-and-extract shortcut (`api.github.com/.../zipball` → unzip → filter → re-zip) was **struck during planning**, not tested. It rested on an untested CORS assumption about `codeload.github.com`. If rate limits ever actually bite, test it before designing it in.
 - **`og.png` still does not exist** though the head tags point at it. Binary files cannot go through the agent write path; drop a 1200×630 PNG at the app root via the GitHub UI.
