@@ -20,10 +20,6 @@
    RATE LIMITS, unauthenticated: 60/hr on api.github.com. A job spends 1-3 calls (resolve the
    ref, list the tree). Bodies come from raw.githubusercontent.com, which does NOT count against
    that budget. So roughly 20-30 downloads an hour, which is not a real constraint.
-
-   ⚠️ THREE NAMES PER FILE (v1.3): `path` is the repo path and is the ONLY thing fetched by;
-   `rel` is the original relative name and is never written to; `out` is the zip entry name,
-   set by names.js. Fetch by path, pack by out. Full rules: README ▸ Three names per file.
 */
 (function () {
   "use strict";
@@ -207,7 +203,8 @@
         if (seen[key]) { skipped.push({ path: e.path, why: 'case-folded duplicate of "' + seen[key] + '"' }); return; }
         seen[key] = rel;
 
-        /* `out` seeded to `rel`: names.js is an override, never a prerequisite. */
+        /* THREE NAMES: fetch by `path`, plan by `rel`, pack by `out`. names.js overrides `out`
+           only — seeding it here means the rename layer is optional, never a prerequisite. */
         files.push({ path: e.path, rel: rel, out: rel, size: e.size || 0, sha: e.sha });
       });
 
@@ -270,9 +267,7 @@
             .then(function () { return grabOne(job, f, token); });
         })
         .then(function (ab) {
-          /* ⚠️ The ONE place the renamed entry name enters the pipeline — and note it is the
-             only line in this file that reads `out`. Falls back to `rel` so this layer still
-             works with names.js absent entirely. */
+          /* The only line in this file that READS `out`. */
           out[i] = { name: f.out || f.rel, data: new Uint8Array(ab) };
           done++;
           if (onProgress) onProgress(done, files.length, f.rel);
@@ -295,7 +290,6 @@
     });
   }
 
-  /* `plan` is optional; when a rename ran, its marker keeps two exports of one folder apart. */
   function suggestName(job, plan) {
     var leaf = (job.path ? job.path.split("/").filter(Boolean).pop() : job.repo) || job.repo;
     var mark = (window.NAMES && NAMES.suffix) ? NAMES.suffix(plan) : "";
