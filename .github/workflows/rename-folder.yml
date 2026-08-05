@@ -1,0 +1,246 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# RENAME A FOLDER — standing cross-repo utility. Manual dispatch only.
+#
+# Point it at a repo, browse down to a folder, give it a new name. Everything
+# underneath moves in ONE commit with rename history intact.
+#
+# WHY THIS EXISTS AS A RUNNER AND NOT AS API CALLS: the GitHub contents API cannot
+# move a file. It can only write a new path and delete the old one, which means
+# reading and re-pushing every byte of every file, one commit each, rename history
+# destroyed, and a half-migrated tree if anything fails midway. `git mv` moves a
+# 54-file folder without opening a single file. Born 2026-08-05 from the one-shot
+# 02-courses -> courses runner, generalized on the same dispatch.
+#
+# ───────────────────────────────────────────────────────────────────────────────
+# 🔴 TWO LIMITS. BOTH REAL. NEITHER IS A BUG.
+#
+# 1 · A DROPDOWN CANNOT BE POPULATED FROM AN API. `workflow_dispatch` choice inputs
+#     are a STATIC list baked into this file. GitHub offers no mechanism to fill one
+#     at dispatch time. So:
+#       · the REPO list below is hand-maintained. Add a repo by editing this file.
+#       · the FOLDER cannot be a dropdown at all — a repo has arbitrarily many, and
+#         they change constantly.
+#     `browse` mode is the answer to that, not a workaround for it: it prints the
+#     folders at any level with their file counts, so you drill down one dispatch at
+#     a time instead of scrolling a list of a hundred.
+#
+# 2 · CROSS-REPO WRITES NEED A PAT. The automatic GITHUB_TOKEN is scoped to THIS
+#     repo only, so it cannot push to uritp-docs or anywhere else. Add a fine-grained
+#     PAT with Contents: read+write on the target repos as the repository secret
+#     REPO_OPS_TOKEN. Without it the job fails on step one with instructions rather
+#     than half-running.
+#
+# ───────────────────────────────────────────────────────────────────────────────
+# ⚠️ WHAT A RENAME ACTUALLY BREAKS, so plan mode can tell you before apply does:
+#     Internal @-refs in the docs family resolve on `id`, never on path — those are
+#     SAFE. What changes is the PUBLISHED URL of every page underneath, which is the
+#     one property of a page that cannot be corrected later without breaking every
+#     bookmark pointing at it.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+name: Rename a folder
+
+run-name: "${{ inputs.mode }} · ${{ inputs.repo }} · ${{ inputs.path }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: "Repo"
+        required: true
+        type: choice
+        options:
+          - uritp-docs
+          - ClickUp_apps
+          - doc-render-engine
+          - maw-themes
+          - maw-prose
+          - template-docs
+      mode:
+        description: "browse = look around, no writes · plan = dry run · apply = do it"
+        required: true
+        default: browse
+        type: choice
+        options:
+          - browse
+          - plan
+          - apply
+      path:
+        description: "Folder path. Blank = repo root. In browse mode this is where you look; in plan/apply it is what gets renamed."
+        required: false
+        default: ""
+      new_name:
+        description: "New name — LEAF ONLY, no slashes (e.g. courses). Ignored in browse mode."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  folder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the token exists
+        env:
+          TOKEN: ${{ secrets.REPO_OPS_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TOKEN}" ]; then
+            echo "::error::Secret REPO_OPS_TOKEN is not set. This runner writes to OTHER repos, and the automatic GITHUB_TOKEN cannot. Add a fine-grained PAT with Contents read+write on the target repos as REPO_OPS_TOKEN in this repo's secrets, then dispatch again. Nothing was changed."
+            exit 1
+          fi
+          echo "Token present."
+
+      - name: Check out the target repo
+        uses: actions/checkout@v4
+        with:
+          repository: mawizorek/${{ inputs.repo }}
+          token: ${{ secrets.REPO_OPS_TOKEN }}
+          path: target
+          fetch-depth: 0
+
+      - name: Browse
+        if: inputs.mode == 'browse'
+        working-directory: target
+        run: |
+          set -euo pipefail
+          BASE="${{ inputs.path }}"
+          BASE="${BASE%/}"
+          if [ -z "$BASE" ]; then BASE="."; fi
+
+          if [ ! -d "$BASE" ]; then
+            echo "::error::'$BASE' is not a folder in ${{ inputs.repo }}. Browse the level above it first."
+            exit 1
+          fi
+
+          {
+            echo "## Browsing \`${{ inputs.repo }}\` at \`$BASE\`"
+            echo ""
+            echo "| Folder | Files (recursive) | Subfolders |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          FOUND=0
+          while IFS= read -r d; do
+            FOUND=1
+            CLEAN="${d#./}"
+            NFILES=$(git ls-files "$d" | wc -l | tr -d ' ')
+            NSUBS=$(find "$d" -mindepth 1 -maxdepth 1 -type d -not -name '.git' | wc -l | tr -d ' ')
+            echo "| \`$CLEAN\` | $NFILES | $NSUBS |" >> "$GITHUB_STEP_SUMMARY"
+          done < <(find "$BASE" -mindepth 1 -maxdepth 1 -type d -not -name '.git' | sort)
+
+          if [ "$FOUND" -eq 0 ]; then
+            echo "| _no subfolders — this is a leaf_ | | |" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          {
+            echo ""
+            echo "### Next"
+            echo ""
+            echo "- **Go deeper:** dispatch again with \`path\` set to one of the folders above."
+            echo "- **Rename one:** dispatch with \`mode: plan\`, that folder as \`path\`, and the new leaf name in \`new_name\`."
+            echo ""
+            echo "Read-only. Nothing was changed."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Plan or apply
+        if: inputs.mode == 'plan' || inputs.mode == 'apply'
+        working-directory: target
+        run: |
+          set -euo pipefail
+          SRC="${{ inputs.path }}"
+          SRC="${SRC%/}"
+          NEW="${{ inputs.new_name }}"
+          MODE="${{ inputs.mode }}"
+
+          # ── Guards. Every one of these has to pass before anything moves. ──
+
+          if [ -z "$SRC" ] || [ "$SRC" = "." ]; then
+            echo "::error::path is empty. You cannot rename the repo root from here."
+            exit 1
+          fi
+          if [ -z "$NEW" ]; then
+            echo "::error::new_name is empty. Nothing to rename to."
+            exit 1
+          fi
+          case "$SRC" in
+            *..*) echo "::error::path contains '..'. Refusing."; exit 1 ;;
+            .git|.git/*|.github|.github/*) echo "::error::'$SRC' is repo plumbing. Refusing."; exit 1 ;;
+          esac
+          case "$NEW" in
+            */*) echo "::error::new_name '$NEW' contains a slash. This renames a folder IN PLACE — give the leaf name only, not a path. To move a folder somewhere else, that is a different operation and this runner will not guess at it."; exit 1 ;;
+            .*)  echo "::error::new_name '$NEW' starts with a dot. Refusing to create a hidden folder."; exit 1 ;;
+          esac
+          if [ ! -e "$SRC" ]; then
+            echo "::error::'$SRC' does not exist in ${{ inputs.repo }}. Run browse mode to find it."
+            exit 1
+          fi
+          if [ -f "$SRC" ]; then
+            echo "::error::'$SRC' is a FILE. This runner renames folders only, by design."
+            exit 1
+          fi
+          if [ ! -d "$SRC" ]; then
+            echo "::error::'$SRC' is not a folder."
+            exit 1
+          fi
+
+          PARENT=$(dirname "$SRC")
+          if [ "$PARENT" = "." ]; then DEST="$NEW"; else DEST="$PARENT/$NEW"; fi
+
+          if [ "$SRC" = "$DEST" ]; then
+            echo "::error::'$SRC' is already named '$NEW'. Nothing to do."
+            exit 1
+          fi
+          if [ -e "$DEST" ]; then
+            echo "::error::'$DEST' already exists. Refusing to merge two trees — that is a different operation and it is not reversible by accident."
+            exit 1
+          fi
+
+          NFILES=$(git ls-files "$SRC" | wc -l | tr -d ' ')
+          NDIRS=$(find "$SRC" -mindepth 1 -type d | wc -l | tr -d ' ')
+
+          {
+            echo "## ${MODE} · \`${{ inputs.repo }}\`"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| From | \`$SRC\` |"
+            echo "| To | \`$DEST\` |"
+            echo "| Files moving | **$NFILES** |"
+            echo "| Subfolders moving | $NDIRS |"
+            echo ""
+            echo "\`git mv $SRC $DEST\` — one commit, no file contents read or rewritten."
+            echo ""
+            echo "⚠️ Internal \`@\`-refs resolve on \`id\` and are safe. The **published URL** of every"
+            echo "page underneath changes, and that is the part no later edit can undo cleanly."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$MODE" = "plan" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Dry run. Nothing was changed.** Dispatch again with \`mode: apply\` and the same inputs." >> "$GITHUB_STEP_SUMMARY"
+            echo "Plan only. All guards passed. $NFILES files would move."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git mv "$SRC" "$DEST"
+          git commit -m "Rename $SRC -> $DEST" \
+                     -m "$NFILES files moved with git mv, contents untouched, rename history intact." \
+                     -m "Dispatched via the Rename a folder runner in ClickUp_apps."
+          git push
+
+          # Read it back rather than trusting the push.
+          test -d "$DEST"
+          test ! -d "$SRC"
+          AFTER=$(git ls-files "$DEST" | wc -l | tr -d ' ')
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$AFTER" != "$NFILES" ]; then
+            echo "::error::Count mismatch after the move: expected $NFILES, found $AFTER."
+            echo "🔴 **Count mismatch: expected $NFILES, found $AFTER.**" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "✅ **Applied and verified.** \`$DEST\` holds $AFTER files. \`$SRC\` is gone." >> "$GITHUB_STEP_SUMMARY"
+          echo "Applied. $AFTER files verified at the destination."
