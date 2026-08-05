@@ -1,6 +1,6 @@
 # Session Open
 
-**Type:** MANDATORY gate for substantive sessions, run in TWO phases (Prime, then Commit).
+**Type:** MANDATORY gate for sessions that will produce workspace writes or deliverables, run in TWO phases (Prime, then Commit).
 **Trigger:** First user message in a new conversation where work will be done (not single-question lookups or casual chat).
 **Created:** 2026-07-18 (Michael directive: mirror session-close at the top).
 **Updated:** 2026-07-20 (**invocation ≠ session**. Split into Prime + Commit; a bare invocation must not cut a task or scan the board. Rehomed after `/session start = felix` misfired the full open on zero context.)
@@ -59,7 +59,7 @@ Before creating anything, run the **Task Dedup Gate** (`hooks/task-dedup-gate.md
 
 - Pull **all statuses, INCLUDING `closed` and `done`** — hidden by default; retrieve them anyway. A done/closed session is a live context source.
 - Match on scope / subject / domain, not just title text.
-- Look for: a parked `↪️ HANDOFF · …` task in the `to do` slot, a `🧭 STANDING ·` thread on the subject, an `in progress` session on the same subject, or a recently closed/done session on the same thread.
+- Look for: a parked `↪️ HANDOFF · …` task in the `to do` slot, a `🧧 STANDING ·` thread on the subject, an `in progress` session on the same subject, or a recently closed/done session on the same thread.
 
 Because the scan now runs at Commit-time (subject known) instead of on bare invocation (no subject), it can actually match something. This is the whole point of the split.
 
@@ -67,7 +67,7 @@ Because the scan now runs at Commit-time (subject known) instead of on bare invo
 
 If the scan turns up a genuine precursor, **REOPEN it as a continued session** rather than cutting a fresh task: flip it back to `in progress`, read its description + transcript to warm-start, post a resume comment ("Resumed <Mon DD> — continuing <what/why>"), and continue the record there. If it's a parked handoff, complete its warm-start prompt and keep going.
 
-🚨 **A REOPEN IS AN OPEN. Continue to C4 and arm the spine.** The resume comment lands on a task that already has a transcript, which is the single most convincing false signal in this whole procedure — it *feels* like the record is live because half of it is. **A `🧭 STANDING ·` thread is the highest-risk case:** it is deliberately never closed, so it always looks open and always has history. It still needs a fresh spine header for THIS session.
+🚨 **A REOPEN IS AN OPEN. Continue to C4 and arm the spine.** The resume comment lands on a task that already has a transcript, which is the single most convincing false signal in this whole procedure — it *feels* like the record is live because half of it is. **A `🧧 STANDING ·` thread is the highest-risk case:** it is deliberately never closed, so it always looks open and always has history. It still needs a fresh spine header for THIS session.
 
 **Confidence bar (a wrong reopen POLLUTES an unrelated real record — worse than a duplicate):**
 - **High confidence** (same subject/scope, transcript clearly continues the thread): reopen and continue.
@@ -123,9 +123,12 @@ Add ONE Active entry to `brain-config/session-board.md`: **your branch**, what y
 
 ---
 
-## What "substantive" means
+## When this gate fires (explicit conditions)
 
-The line: will this conversation produce changes to the workspace, repo, or generate deliverables? If yes, it will eventually write → Commit will fire. If you're unsure, err toward priming (it's free) and let the first write decide. A session that ends up short is fine; a session with real work and no record is not.
+The question: will this conversation produce changes to the workspace, repo, or generate deliverables? Specifically:
+- **FIRES (Commit triggers):** the session is about to create/update a task, post a comment, write to a repo, move a task, create a doc, or produce any persistent artifact.
+- **DOES NOT FIRE:** single-question lookups, casual chat, bare acknowledgements, sessions that stay read-only from start to finish.
+- **If unsure:** err toward priming (it's free) and let the first write decide. A session that ends up short is fine; a session with real work and no record is not.
 
 ---
 
@@ -136,7 +139,7 @@ The line: will this conversation produce changes to the workspace, repo, or gene
 - **Work with NO invocation** ("move these 3 tasks"): first write commits, identical path.
 - **First message IS the whole job** (10-sec lookup): read-only, never writes, never commits — no litter.
 - **Genuine pickup / handoff resume:** Commit resolves to REOPEN (C2), **and still runs C4–C6.** A pickup is an open.
-- **Standing thread** (`🧭 STANDING ·`, never closed): always looks open, always has history. Reopen it, and **still arm a fresh spine header for this session.**
+- **Standing thread** (`🧧 STANDING ·`, never closed): always looks open, always has history. Reopen it, and **still arm a fresh spine header for this session.**
 - **Mid-session persona swap** (`/session.agent=`): idempotency guard — no re-commit, same task, same spine header, new voice. ⚠️ **The board row still moves if the scope does.**
 - **Second session on the same task, same day:** C4's idempotency check finds the existing header. Thread under it; do not split one task across two roots.
 - **Concurrent sessions, same agent:** each commits its own task, its own header, and **its own row naming its own branch.** Two Felix sessions collided on 08-01 precisely here.
@@ -173,12 +176,13 @@ The line: will this conversation produce changes to the workspace, repo, or gene
 | **COMMIT C6: claim on session-board (gate: re-claim on every write)** | **Delete your row from session-board** |
 | Start the work | Memory audit + report what was done |
 
-They are bookends. Neither is optional for substantive sessions. **Every open-time step has a close-time counterpart; if you never armed the spine, close has nothing to reconcile and will say so.**
+They are bookends. Neither is optional for sessions that produce workspace writes or deliverables. **Every open-time step has a close-time counterpart; if you never armed the spine, close has nothing to reconcile and will say so.**
 
 ---
 
 ## Changelog
 
+- **2026-08-02 — kill-substantive pass.** Replaced 'substantive' throughout with explicit conditions. Type header now states what fires this gate (workspace writes or deliverables). The old "What 'substantive' means" section replaced with "When this gate fires" using explicit enumerated conditions. Relationship table updated.
 - **2026-08-01 — C6 BECAME A HARD PRE-WRITE GATE.** Michael: *"make the board row a hard pre-write gate."* Fourth collision, and the first one v1's fixes could not have caught: two Fleet Felix sessions ran the same 16-file remediation thirteen seconds apart while **both had board rows — for different, already-merged work.** The check fired, the claim existed, and the claim was about something else. So the enforcement moved from the session (fires once) and the work item (a judgement call) to **the write tool** (a tool invocation with a path in it), and a row must now name its **BRANCH** so staleness is testable in one call. Contract: `hooks/collision-check.md` → THE HARD GATE.
 - **2026-07-31 — C6 SPLIT: the claim and the check are two steps.** Two sessions built batch-import simultaneously; surfaced only at merge. C6 already mandated presence and **neither session reached it**, so the diagnosis was not a missing rule. Three design faults, written up in `hooks/collision-check.md`: the check rode on the announcement; it fired once at Commit when scope is smallest; and the `create_branch` "Reference already exists" signal was investigated and explained away. **C6 kept the write; the read moved out and fires per work item.**
 - **2026-07-28 — THE SPINE BECAME A COMMIT STEP (C4).** Root cause was mechanical, not behavioural: arming the spine existed only as prose in `gates/session-transcript-gate.md` and appeared in NO executable checklist, so four consecutive sessions posted **zero spine lines while correctly following this hook.** Also: **"a REOPEN is an OPEN"** promoted to a top-level rule, Commit declared **a sequence and not a menu**, and the standing-thread + same-day-second-session edge cases named. **The lesson banked above all of it: when the same rule breaks the same way four times, the rule is not being broken — it is not being reached. Put the step in the list that executes.**

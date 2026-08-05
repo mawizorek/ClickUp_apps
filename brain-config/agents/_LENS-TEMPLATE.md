@@ -34,12 +34,14 @@ If you need two paragraphs, you are describing two agents.]
 ## Fires when
 
 [Trigger conditions. When Mira seats this voice, or when it fires
-autonomously. Format:
-- "Auto: every substantive turn (Core Panel)" OR
+autonomously. EXPLICIT conditions, never interpretation. Format:
+- "Auto: every turn (Core Panel; suppressed only on bare acks, single-emoji reactions, or status updates with no question or directive)" OR
 - "Auto: when the Workshop convenes" OR
-- "Auto: <specific condition>" OR
+- "Auto: <specific condition with explicit suppress list>" OR
 - "On-demand: invoked by name"
-One line for simple triggers; a short list for multi-trigger workers.]
+One line for simple triggers; a short list for multi-trigger workers.
+NEVER use 'substantive' or any other word that requires agent judgment
+to determine firing. Spell out what fires it and what suppresses it.]
 
 ## Bounded against
 
@@ -78,13 +80,15 @@ The following apply to ALL lenses equally and are NOT restated inside individual
 
 3. **Bounded-against is the anti-sprawl mechanism.** Every profile names its neighbors BY NAME and draws a HARD line. Soft phrasing ("overlaps with", "pairs with") is insufficient; the section must say "does NOT do X (that is Y's job)." This is how scope creep is caught before it ships.
 
-4. **Fires-when determines class.** A lens that fires every substantive turn is Core. One that fires when the Workshop convenes is Workshop. One that fires on-demand is a worker. The trigger IS the classification; it must match the `seat` in front-matter.
+4. **Fires-when determines class.** A lens that fires every turn (suppressed only on bare acks/status updates) is Core. One that fires when the Workshop convenes is Workshop. One that fires on-demand is a worker. The trigger IS the classification; it must match the `seat` in front-matter.
 
 5. **Output keeps the voice tight.** The declared output shape is a CONTRACT. An agent whose Output section says "one line" does not get to post three paragraphs. The shape constrains the behavior at runtime.
 
 6. **Graduation signal (the §6 test).** If a lens keeps needing to REMEMBER things across sessions (reliability precedent, health trends, a running ledger), it is a teammate candidate. The template does not change for that; a graduated lens deletes its profile here and moves to `super-agents/<slug>/`.
 
 7. **Front-matter is the resolution layer.** Names, nicknames, slug, seat: all live ONCE in front-matter. The body never restates them in a redundant header block. Front-matter is machine-readable; the body is human-readable.
+
+8. **Firing conditions must be explicit, never interpretive (LOCKED 2026-08-02, Michael).** The word 'substantive' is banned from firing conditions. Every trigger must spell out exactly what fires it and exactly what suppresses it. An agent must never be left to JUDGE whether a condition is met; it reads the condition and the answer is deterministic.
 
 ---
 
@@ -115,8 +119,9 @@ A profile PASSES if:
 5. Bounded-against names at least one neighbor by display name and draws a hard line.
 6. Output specifies shape + length.
 7. No redundant prose sections (no repeated name block, no standing-conduct copy, no personality paragraph separate from the opener).
+8. Fires-when uses explicit conditions with a defined suppress list. No interpretive words ('substantive', 'significant', 'meaningful', 'important').
 
-A profile FAILS on: missing sections, wrong heading names, bloat beyond the five, soft "overlaps with" phrasing in bounded-against, or an opener that could describe two agents interchangeably.
+A profile FAILS on: missing sections, wrong heading names, bloat beyond the five, soft "overlaps with" phrasing in bounded-against, an opener that could describe two agents interchangeably, or a Fires-when that requires the agent to JUDGE whether the condition is met.
 
 ---
 
@@ -126,3 +131,4 @@ A profile FAILS on: missing sections, wrong heading names, bloat beyond the five
 - Pattern source: emergent across 22 active lens profiles (all carry Purpose/When-seated/Output/Composes in some form)
 - Fleet-steward input: Fleet Felix (singularity, anti-sprawl, voice-bleed detection)
 - Relationship to `_template.md`: this is the LEAN successor. `_template.md` remains as historical reference until profiles are migrated.
+- Updated: 2026-08-02, kill-substantive pass. Added design principle 8 (explicit firing conditions, interpretive words banned). Updated conformance check.

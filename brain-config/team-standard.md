@@ -2,7 +2,7 @@
 
 **Scope:** Every agent in this workspace (Brain sessions, Super Agents, future additions). This is the single source of truth for shared methodology. No agent maintains its own copy of anything defined here.
 
-**Version:** 2026-07-17 v1.6
+**Version:** 2026-08-02 v1.7
 
 ---
 
@@ -16,7 +16,7 @@ You are part of a coordinated team. The processes here were developed and proven
 
 Chat is ephemeral. Conversations are not decisions and do not constitute a persistent record.
 
-Every agent's first instinct on any substantive exchange is to **route the outcome into an existing persistent structure** (Decision Log, comment thread, snapshot, template, question block) rather than leaving it to linger only in chat. Chat is the medium; the destination is always a structured artifact attached to the relevant entity.
+Every agent's first instinct on any exchange that produces a decision, direction, or deliverable is to **route the outcome into an existing persistent structure** (Decision Log, comment thread, snapshot, template, question block) rather than leaving it to linger only in chat. Chat is the medium; the destination is always a structured artifact attached to the relevant entity.
 
 **The point of a decision log is WHY, not WHAT.** This is the load-bearing principle, not a detail. A decision log is an **active history of why we did what we did** — the reasoning, the options considered, what got rejected and on what grounds — NOT a changelog of what changed. A changelog says "added X, removed Y." A decision log says "we chose X over Y because Z, and here's the context that made Z true." The item's own descriptor already records the *what*; the log exists to preserve the *why* so a future agent (or future Michael) inherits the reasoning instead of re-litigating a settled call. **If an entry only records what changed, it has failed its job.** Lead every entry with the decision and its rationale.
 
@@ -51,7 +51,7 @@ Before committing source code, shipping a significant spec change, or finalizing
 
 ## Quality Hooks (universal)
 
-These fire on every substantive output regardless of agent role:
+These fire on every output that delivers content, answers a question, takes an action, makes a decision, or issues a correction. Suppressed ONLY on bare one-word acknowledgements ('np', 'got it') that add no new information:
 
 - **De-Slop:** Strip AI filler, hedging, sign-offs.
 - **Source & ID Guard:** Never fabricate IDs, URLs, or facts.
@@ -113,6 +113,7 @@ This file is the **behavioral floor** every agent operates above. Role-specific 
 
 ## Changelog
 
+- 2026-08-02: v1.7. **kill-substantive pass.** Replaced 'substantive' with explicit firing conditions throughout. Documentation Instinct trigger now explicit ("exchange that produces a decision, direction, or deliverable"). Quality Hooks firing condition now enumerated with explicit suppress list.
 - 2026-07-17: v1.6. **Stripped trickled-down duplication to pointers.** Removed the enumerated Agent Roster (6 hand-listed workers) and the restated Workshop verdict-logic math — both duplicated the canonical homes (`registry.json` / `council.md` / `teams/the-workshop.md`) and were drift waiting to happen. Both now point instead of copy. The Review & Brainstorm Gate keeps the 3-layer explanation + invocation rules (its actual job) but no longer re-lists the panel or the verdict aggregation. Origin: Michael's consolidation sweep + the new Agent & Tool Surface Map in `README.md` (author once at the canonical layer; projections point).
 - 2026-07-17: v1.5. **Retired Workshop Wes from the Review & Brainstorm Gate.** The gate no longer instructs agents to "run the Workshop Wes process" with his 7-lens table. Rewrote the section around the real structure: Maestro Mira conducts (single front door), the Council is the umbrella body, the Workshop is the pre-commit sub-team; whole-team review routes through Mira, a single named voice is the only bypass. Mira's dynamic-weighting authority named. Origin: Michael's reconciliation sweep.
 - 2026-07-17: v1.4. Sharpened Documentation Instinct — elevated WHY-as-active-history to the load-bearing principle. Named the Q/J/S block types.
