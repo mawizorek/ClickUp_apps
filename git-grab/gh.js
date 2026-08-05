@@ -21,12 +21,9 @@
    ref, list the tree). Bodies come from raw.githubusercontent.com, which does NOT count against
    that budget. So roughly 20-30 downloads an hour, which is not a real constraint.
 
-   ⚠️ v1.3 — TWO NAMES PER FILE, AND THEY MUST NOT BE CONFUSED:
-     f.path — the true path in the repo. Fetching reads THIS and only this.
-     f.rel  — the name relative to the grabbed folder. The original, never written to.
-     f.out  — what the ZIP ENTRY is called, set by names.js. Packing reads this.
-   The rename layer touches `out` alone. If a future edit ever fetches by `out` or asserts a
-   count against it, the transform stops being cosmetic and starts being a correctness bug.
+   ⚠️ THREE NAMES PER FILE (v1.3): `path` is the repo path and is the ONLY thing fetched by;
+   `rel` is the original relative name and is never written to; `out` is the zip entry name,
+   set by names.js. Fetch by path, pack by out. Full rules: README ▸ Three names per file.
 */
 (function () {
   "use strict";
@@ -210,8 +207,7 @@
         if (seen[key]) { skipped.push({ path: e.path, why: 'case-folded duplicate of "' + seen[key] + '"' }); return; }
         seen[key] = rel;
 
-        /* `out` starts as `rel` so every consumer has a valid entry name even if names.js never
-           runs. The transform is an override, never a prerequisite. */
+        /* `out` seeded to `rel`: names.js is an override, never a prerequisite. */
         files.push({ path: e.path, rel: rel, out: rel, size: e.size || 0, sha: e.sha });
       });
 
@@ -242,10 +238,7 @@
   /* ---------------- fetching bodies ----------------
      raw.githubusercontent.com pinned to the COMMIT SHA, never a branch name (which can move
      mid-download and is cache-frozen far more often). Does not count against the API limit.
-     Concurrency 8: fast, polite, not enough to look like a scraper.
-
-     ⚠️ FETCH BY `path`, PACK BY `out`. Those are different strings the moment a rename toggle is
-     on, and swapping them is the one edit that would turn this feature into a 404 storm. */
+     Concurrency 8: fast, polite, not enough to look like a scraper. */
   function rawURL(job, file) {
     return RAW + "/" + job.owner + "/" + job.repo + "/" + job.sha + "/" +
            file.path.split("/").map(encodeURIComponent).join("/");
@@ -277,8 +270,9 @@
             .then(function () { return grabOne(job, f, token); });
         })
         .then(function (ab) {
-          /* The ONLY place the transformed name enters the pipeline. Falls back to `rel` so this
-             layer keeps working with names.js absent entirely. */
+          /* ⚠️ The ONE place the renamed entry name enters the pipeline — and note it is the
+             only line in this file that reads `out`. Falls back to `rel` so this layer still
+             works with names.js absent entirely. */
           out[i] = { name: f.out || f.rel, data: new Uint8Array(ab) };
           done++;
           if (onProgress) onProgress(done, files.length, f.rel);
@@ -291,10 +285,8 @@
 
     return Promise.all(lanes).then(function () {
       /* THE ASSERTION THE WHOLE APP IS BUILT AROUND. If the blobs we hold do not equal the count
-         the listing promised, refuse rather than zip what we happen to have.
-
-         Renaming cannot affect this: names.js never removes a file, it only changes what one is
-         called, and a rename it cannot perform is skipped rather than dropped. */
+         the listing promised, refuse rather than zip what we happen to have. Renaming cannot
+         move this number: names.js changes what a file is called, never whether it exists. */
       var got = out.filter(Boolean);
       if (got.length !== files.length) {
         throw new Error("Only " + got.length + " of " + files.length + " files came back. Refusing to build an incomplete zip.");
@@ -303,8 +295,7 @@
     });
   }
 
-  /* The download filename. `plan` is optional: when a rename ran, a marker keeps two exports of
-     the same folder from colliding in ~/Downloads. */
+  /* `plan` is optional; when a rename ran, its marker keeps two exports of one folder apart. */
   function suggestName(job, plan) {
     var leaf = (job.path ? job.path.split("/").filter(Boolean).pop() : job.repo) || job.repo;
     var mark = (window.NAMES && NAMES.suffix) ? NAMES.suffix(plan) : "";
