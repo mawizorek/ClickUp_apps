@@ -74,7 +74,7 @@
       if (p && p.renamed) {
         extra = "<br>" + p.renamed + " entr" + (p.renamed === 1 ? "y was" : "ies were") + " renamed on the way in" +
                 (p.blocked.length ? ", and " + p.blocked.length + " kept " + (p.blocked.length === 1 ? "its" : "their") +
-                 " original name" + (p.blocked.length === 1 ? "" : "s") + " \u2014 listed below." : ".");
+                 " original name" + (p.blocked.length === 1 ? "" : "s") + " \u2014 marked in the table below." : ".");
       }
       return '<div class="callout"><strong>\u2705 ' + n + " file" + (n === 1 ? "" : "s") +
         " packed, " + GH.humanBytes(job.zip.bytes.length) + " (" + job.zip.method + ").</strong><br>" +
@@ -113,7 +113,9 @@
       " cannot be packed and were left out:</strong><ul>" +
       l.skipped.map(function (s) { return "<li><code>" + wrapPath(s.path) + "</code> &mdash; " + esc(s.why) + "</li>"; }).join("") +
       '</ul><p class="muted">A submodule is a pointer to another repository, and a symlink\u2019s stored content is just ' +
-      "the path it points at &mdash; neither has real file content here to download.</p></div>";
+      "the path it points at &mdash; neither has real file content here to download.</p>" +
+      '<p class="muted">This is different from a skipped RENAME below: those files are all in the zip, ' +
+      "they just kept the name they arrived with.</p></div>";
   }
 
   /* ---------------- preview ---------------- */
@@ -138,7 +140,7 @@
   /* ---------------- name transform ---------------- */
 
   /* The one-line verdict under the toggles. Patched in place on every tick rather than
-     re-rendered with the panel, so a checkbox never gets destroyed mid-interaction. */
+     re-rendered with the panel, so a checkbox is never destroyed mid-interaction. */
   function nameSummary(p) {
     if (!p) return "";
     if (!p.active) {
@@ -154,16 +156,22 @@
     return out;
   }
 
-  /* The second line inside a path cell: what this file will be called in the archive. */
+  /* The second line inside a path cell: what this file will be called in the archive.
+
+     ⚠️ ALWAYS RETURNS A <span class="out">, even when there is nothing to say. app.js patches
+     this node by outerHTML on every tick, so it has to EXIST to be found — an element that
+     appears and disappears would need a positional selector, and a positional selector into a
+     nested label is exactly the kind of thing that silently starts matching the wrong node after
+     an unrelated markup edit. The empty one is inline and unstyled, so it costs nothing. */
   function outCell(f) {
     if (f.blocked) {
-      return '<span class="out out-blocked" title="' + esc(f.blocked.holder) + ' is already here">\u21b3 stays ' +
-             wrapPath(leaf(f.rel)) + " (" + wrapPath(leaf(f.blocked.holder)) + " already exists)</span>";
+      return '<span class="out out-blocked" title="' + esc(f.blocked.holder) + ' is already in this folder">' +
+             "\u21b3 stays " + wrapPath(leaf(f.rel)) + " \u2014 " + wrapPath(leaf(f.blocked.holder)) + " is already here</span>";
     }
     if (f.renamed) {
       return '<span class="out out-new">\u21b3 ' + wrapPath(leaf(f.out)) + "</span>";
     }
-    return "";
+    return '<span class="out"></span>';
   }
 
   function nameControls(job) {
@@ -176,7 +184,7 @@
       '<p class="muted">Markdown has no guaranteed handler \u2014 on a machine without a markdown editor a ' +
       "double-click is a coin flip. <code>.txt</code> opens the same way everywhere, and renaming one back " +
       "to <code>.md</code> restores the rendering. Only markdown is touched: <code>index.html</code> and " +
-      "<code>index.js</code> are left alone because renaming those breaks what you downloaded.</p>" +
+      "<code>index.js</code> are left alone, because renaming those breaks the thing you downloaded.</p>" +
       '<label class="opt"><input type="checkbox" id="ggOptMd"' + (n.md ? " checked" : "") + "> " +
       "Convert every markdown file to <code>.txt</code></label>" +
       '<label class="opt"><input type="checkbox" id="ggOptIdx"' + (n.idx ? " checked" : "") + "> " +
@@ -194,15 +202,16 @@
     var pickable = !!(p && p.markdown && job.stage === "ready");
 
     var rows = l.files.slice(0, CAP).map(function (f) {
+      var inner = '<span class="pathtxt">' + wrapPath(f.rel) + outCell(f) + "</span>";
       var cell;
       if (pickable && f.md) {
         cell = '<label><input type="checkbox" class="rowpick" data-rel="' + esc(f.rel) + '"' +
-               (f.on ? " checked" : "") + ' aria-label="Convert ' + esc(f.rel) + '">' +
-               "<span>" + wrapPath(f.rel) + outCell(f) + "</span></label>";
+               (f.on ? " checked" : "") + ' aria-label="Convert ' + esc(f.rel) + '">' + inner + "</label>";
       } else if (pickable) {
-        cell = '<label><span class="rowpick-gap"></span><span>' + wrapPath(f.rel) + "</span></label>";
+        /* A spacer, not a disabled checkbox: an unusable control invites a click. */
+        cell = '<label><span class="rowpick-gap"></span>' + inner + "</label>";
       } else {
-        cell = wrapPath(f.rel) + outCell(f);
+        cell = inner;
       }
       return '<tr data-rel="' + esc(f.rel) + '"><td class="mono path">' + cell +
              '</td><td class="mono num">' + GH.humanBytes(f.size) + "</td></tr>";

@@ -22,8 +22,8 @@
    v1.3 — TWO CHANGES:
      1. The markup moved to `view.js` at the reducer/render seam. This file was 14,841 B against
         a 15KB split line and the rename UI would have pushed it over.
-     2. `job.names` + `job.plan` hold the export-name transform. The plan is recomputed on every
-        toggle from `names.js` — synchronous, no network, no re-listing. The rename NEVER drops
+     2. `job.names` + `job.plan` hold the export-name transform. The plan is recomputed by
+        `names.js` on every toggle — synchronous, no network, no re-listing. A rename NEVER drops
         a file, so the count assertions below are untouched by it.
 */
 (function () {
@@ -60,15 +60,18 @@
     if (saveURL) { try { URL.revokeObjectURL(saveURL); } catch (e) {} saveURL = null; }
   }
 
+  function freshNames() {
+    /* rows is the per-file override map, keyed by the ORIGINAL name. A master toggle empties it,
+       which is why the panel copy promises exactly that. */
+    return { md: false, idx: false, rows: Object.create(null) };
+  }
+
   function reset() {
     gen++;
     dropSaveURL();
     job = {
       stage: "idle", url: "", listing: null, error: null, done: 0, total: 0, zip: null, acked: false,
-      /* rows is the per-file override map, keyed by the ORIGINAL name. A master toggle empties
-         it, which is why the panel copy says so out loud. */
-      names: { md: false, idx: false, rows: Object.create(null) },
-      plan: null
+      names: freshNames(), plan: null
     };
     render();
   }
@@ -86,8 +89,8 @@
     return job.stage === "listing" || job.stage === "fetching" || job.stage === "packing";
   }
 
-  /* Idempotent by construction — names.js derives everything from f.rel, never from f.out — so
-     calling this defensively before a pack costs nothing and guarantees the zip matches the
+  /* Idempotent by construction — names.js derives everything from f.rel and never from f.out —
+     so calling this defensively before a pack costs nothing and guarantees the zip matches the
      table the user was looking at. */
   function replan() {
     job.plan = (job.listing && window.NAMES) ? NAMES.plan(job.listing, job.names) : null;
@@ -118,9 +121,11 @@
           "telling you why. Grab a subfolder instead, or clone the repo."
         );
       }
-      /* Plan before the first render so the table never paints names it is about to change. */
+      /* A new folder starts with the toggles off and no per-file choices: choices made about the
+         last folder's filenames mean nothing here. Plan before the first render so the table
+         never paints names it is about to change. */
       job.listing = listing;
-      job.names = { md: false, idx: false, rows: Object.create(null) };
+      job.names = freshNames();
       replan();
       set({ stage: "ready", listing: listing, total: listing.files.length, done: 0 });
     }).catch(function (e) {
@@ -138,7 +143,7 @@
 
     var mine = ++gen;
     var listing = job.listing; /* pin it: comparing against job.listing later is the bug */
-    replan();                  /* the entry names are whatever the table last showed */
+    replan();                  /* the entry names are exactly what the table last showed */
     set({ stage: "fetching", done: 0, error: null });
 
     GH.fetchAll(listing, function (done) {
@@ -157,8 +162,8 @@
            job.listing — which a superseded job could have replaced underneath us.
 
            Renaming cannot move this number. names.js changes what an entry is CALLED and never
-           whether it EXISTS; a collision keeps the original name rather than dropping the file.
-           So a mismatch here still means exactly what it always meant: a short zip. */
+           whether it EXISTS; a rename it cannot perform is skipped, not dropped. So a mismatch
+           here still means exactly what it always meant: a short zip. */
         if (z.entries !== listing.files.length) {
           throw new Error("The zip holds " + z.entries + " files but the listing found " +
                           listing.files.length + ". Refusing to hand you an incomplete archive.");
@@ -176,11 +181,12 @@
   /* ---------------- name transform wiring ----------------
      A tick must NOT go through set(). set() re-renders via innerHTML, which destroys the very
      checkbox being clicked — focus lost, scroll jumped, and on a 300-row table that is the whole
-     interaction ruined. Same lesson as the size acknowledgement in Wave 4, applied to 300 more
-     controls. So: recompute the plan, then patch the cells that changed, in place.
+     interaction ruined. Same lesson as the size acknowledgement in Wave 4, now applied to 300
+     more controls. So: recompute the plan, then patch the two things that can change.
 
-     One tick CAN change another row (a freed name lets a blocked rename through), so every
-     rendered row is refreshed from the new plan rather than just the one that was clicked. */
+     EVERY rendered row is refreshed, not just the one clicked, because one tick can change
+     another row: opting a file out frees the name it wanted, which can let a previously blocked
+     rename through. */
   function repaintNames() {
     var plan = replan();
     if (!plan) return;
@@ -197,12 +203,10 @@
       var box = tr.querySelector(".rowpick");
       if (box) box.checked = !!f.on;
 
-      var span = tr.querySelector("td.path span:last-child");
-      if (!span) continue;
-      var old = span.querySelector(".out");
-      if (old) old.parentNode.removeChild(old);
-      var markup = VIEW.outCell(f);
-      if (markup) span.insertAdjacentHTML("beforeend", markup);
+      /* view.js guarantees exactly one .out node per row, present even when empty, so this
+         selector cannot drift onto a different element. */
+      var out = tr.querySelector(".out");
+      if (out) out.outerHTML = VIEW.outCell(f);
     }
   }
 
@@ -230,7 +234,7 @@
   }
 
   /* Every checkbox in the surface, on ONE delegated listener bound once to a container that
-     render() never replaces. Nothing here re-renders; each branch patches what it owns. */
+     render() never replaces. Nothing in here re-renders; each branch patches what it owns. */
   function onChange(e) {
     var t = e.target;
     if (!t) return;
@@ -244,8 +248,8 @@
 
     if (t.id === "ggOptMd" || t.id === "ggOptIdx") {
       /* A master toggle CLEARS the per-file choices. The alternative is a table where a row's
-         state has an invisible origin — inherited or overridden, no way to tell — and the copy
-         in the panel promises this behaviour. */
+         state has an invisible origin — inherited or overridden, no way to tell them apart — and
+         the copy in the panel promises this behaviour out loud. */
       job.names.rows = Object.create(null);
       if (t.id === "ggOptMd") job.names.md = t.checked;
       else job.names.idx = t.checked;
@@ -269,7 +273,7 @@
     if (!els.out) return;
 
     /* #ggOut survives every render (only its innerHTML is replaced), so one delegated listener
-       outlives them all. Guarded because the router can mount the page more than once. */
+       outlives them all. Guarded because the router can mount this page more than once. */
     if (!wired) { els.out.addEventListener("change", onChange); wired = true; }
 
     if (els.preset) {
