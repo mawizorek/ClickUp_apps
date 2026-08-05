@@ -45,6 +45,14 @@ and the vast majority will have a new number too."*
 
 ### Traps I have hit or verified myself
 
+- 🔴 **I MISUSED A MARKER CLASS FOR A WHOLE SESSION BECAUSE I NEVER OPENED ITS DEFINITION.**
+  `{.conf}` means **CONFIRMED** — *"double-checked against the real thing, trust it,"* and it paints
+  green. I used it to mean *conflict*, so every disputed cell was telling the reader to TRUST the
+  value that was in dispute. ⚠️ **The documentation was correct the whole time** (`theme/markers.tsv`
+  and the Markers authoring page both say so plainly) — **I worked from what the word sounded like.**
+  **Read the vocabulary at HEAD before using it, every time. A marker is a claim about trust, so a
+  wrong one is worse than none.** The six: `tbc` unchecked · `verify` re-measure on site · `gap`
+  known absence · `conf` confirmed · `est` approximate · `was` superseded.
 - ⚠️ **A source document can be internally wrong.** The Sept 2025 `NEW Theater Course Numbers.Final
   Draft.xlsx` has its `Old ENGL #` column **misaligned by several rows** and contradicts its own
   second sheet. **Cross-check a crosswalk against three origins.** I took a wrong mapping from that
@@ -68,6 +76,10 @@ and the vast majority will have a new number too."*
 - **Empty beats plausible.** He wants blanks left visibly blank for the conversation that fills them.
 - **He normalizes toward one canonical vector.** A second copy of a fact gets deleted on sight, even
   a useful-looking one.
+- ⚠️ **He audits WHERE a lesson was written, not just whether it was learned.** *"Whose repo, agent,
+  decision store, backlog or memory did you write each of those into?"* **A correction that lives
+  only in a session transcript is lost** — the transcript is not read on a cold start. Place every
+  correction where the next agent will trip over it, and expect to be asked.
 - Notes live IN the task. Decision logs, inverted polarity, read back before acting.
 
 ## Ledger C — Teaching patterns (EARNED — the ledger that justifies my class)
@@ -91,8 +103,8 @@ and the vast majority will have a new number too."*
 - Being a teammate: `_shared/super-agent-base.md` · Mapping before acting:
   `hooks/cross-space-research-gate.md` · Recording a decision: Decision Logs Gold Standard.
 - **Course decisions:** the `Course List — Decision Log` page (under the `COURSES | LAB` folder page).
-- **Authoring contract:** the gold standard on `template-docs` — seven-key header, and the list of
-  fields that are NOT header keys.
+- **Authoring contract:** the gold standard on `template-docs` — seven-key header, the marker set,
+  and the list of fields that are NOT header keys.
 - **Fleet facts:** the 🤖 Agent Index list (`901328043244`) + `hooks/fleet-fact-sweep.md`.
 - **Milo seam:** peers, no hierarchy. Production owns the EVENT, the course borrows it; a genuine
   conflict goes to Michael, never settled sideways (Courses log J9).
