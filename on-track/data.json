@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-03",
+  "version": "2026-08-06",
   "events": [
     {
       "series": "MotoGP",
@@ -364,6 +364,18 @@
       ]
     },
     {
+      "series": "IMSA",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "Michelin GT Challenge at VIR",
+      "detail": "VIRginia International Raceway",
+      "start": "2026-08-22T16:45:00-04:00",
+      "end": "2026-08-22T17:25:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "F1",
       "kind": "Race",
       "title": "Dutch Grand Prix",
@@ -408,6 +420,17 @@
       ]
     },
     {
+      "series": "IMSA",
+      "kind": "Race",
+      "title": "Michelin GT Challenge at VIR",
+      "detail": "VIRginia International Raceway (2h40m \u2014 ET start unverified)",
+      "timeTBD": true,
+      "date": "2026-08-23",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
       "series": "NASCAR",
       "kind": "Race",
       "title": "Dollar Tree 301",
@@ -430,6 +453,30 @@
       ]
     },
     {
+      "series": "MotoGP",
+      "kind": "FP1",
+      "tier": "practice",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "start": "2026-08-28T04:45:00-04:00",
+      "end": "2026-08-28T05:30:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Practice",
+      "tier": "practice",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "start": "2026-08-28T09:00:00-04:00",
+      "end": "2026-08-28T10:00:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "NASCAR",
       "kind": "Xfinity Race",
       "title": "Wawa 250",
@@ -438,6 +485,41 @@
       "end": "2026-08-28T22:00:00-04:00",
       "platforms": [
         "The CW"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "FP2",
+      "tier": "practice",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "start": "2026-08-29T04:10:00-04:00",
+      "end": "2026-08-29T04:40:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "start": "2026-08-29T04:50:00-04:00",
+      "end": "2026-08-29T05:30:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Sprint",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "start": "2026-08-29T09:00:00-04:00",
+      "end": "2026-08-29T09:45:00-04:00",
+      "platforms": [
+        "Stream"
       ]
     },
     {
@@ -485,6 +567,51 @@
       ]
     },
     {
+      "series": "MotoGP",
+      "kind": "Warm Up",
+      "tier": "practice",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "start": "2026-08-30T03:40:00-04:00",
+      "end": "2026-08-30T03:50:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "Moto3",
+      "kind": "Race",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "start": "2026-08-30T05:00:00-04:00",
+      "end": "2026-08-30T05:45:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "Moto2",
+      "kind": "Race",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n (start time unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-08-30",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Race",
+      "title": "Grand Prix of Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n",
+      "start": "2026-08-30T08:00:00-04:00",
+      "end": "2026-08-30T08:50:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "IndyCar",
       "kind": "Race 2",
       "title": "Milwaukee Mile Race 2",
@@ -507,10 +634,135 @@
       ]
     },
     {
+      "series": "F1",
+      "kind": "FP1",
+      "tier": "practice",
+      "title": "Italian Grand Prix",
+      "detail": "Monza",
+      "start": "2026-09-04T06:30:00-04:00",
+      "end": "2026-09-04T07:30:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "FP2",
+      "tier": "practice",
+      "title": "Italian Grand Prix",
+      "detail": "Monza",
+      "start": "2026-09-04T10:00:00-04:00",
+      "end": "2026-09-04T11:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F3",
+      "kind": "Sprint Race",
+      "title": "Monza (Round 8)",
+      "detail": "Autodromo Nazionale Monza",
+      "start": "2026-09-05T03:30:00-04:00",
+      "end": "2026-09-05T04:15:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "FP3",
+      "tier": "practice",
+      "title": "Italian Grand Prix",
+      "detail": "Monza",
+      "start": "2026-09-05T06:30:00-04:00",
+      "end": "2026-09-05T07:30:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F2",
+      "kind": "Sprint Race",
+      "title": "Monza (Round 10)",
+      "detail": "Autodromo Nazionale Monza",
+      "start": "2026-09-05T08:15:00-04:00",
+      "end": "2026-09-05T09:05:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "Italian Grand Prix",
+      "detail": "Monza",
+      "start": "2026-09-05T10:00:00-04:00",
+      "end": "2026-09-05T11:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Race 1",
+      "title": "Acerbis French Round",
+      "detail": "Circuit de Nevers Magny-Cours (session times unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-05",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F3",
+      "kind": "Feature Race",
+      "title": "Monza (Round 8 \u2014 season finale)",
+      "detail": "Autodromo Nazionale Monza",
+      "start": "2026-09-06T02:15:00-04:00",
+      "end": "2026-09-06T03:05:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F2",
+      "kind": "Feature Race",
+      "title": "Monza (Round 10)",
+      "detail": "Autodromo Nazionale Monza",
+      "start": "2026-09-06T03:45:00-04:00",
+      "end": "2026-09-06T04:50:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "Race",
+      "title": "Italian Grand Prix",
+      "detail": "Monza",
+      "start": "2026-09-06T09:00:00-04:00",
+      "end": "2026-09-06T11:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
       "series": "WEC",
       "kind": "Race",
       "title": "Lone Star Le Mans",
       "detail": "Circuit of the Americas",
+      "timeTBD": true,
+      "date": "2026-09-06",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Race 2",
+      "title": "Acerbis French Round",
+      "detail": "Circuit de Nevers Magny-Cours (session times unverified this pass)",
       "timeTBD": true,
       "date": "2026-09-06",
       "platforms": [
