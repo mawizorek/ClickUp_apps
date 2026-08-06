@@ -84,12 +84,12 @@ On invocation, for every ACTIVE routine, read its `last-run` file and compare ag
 
 **An unfinished pass from a PREVIOUS CALENDAR DAY is never resumed. The next invocation starts at step one and runs the whole routine.** Michael, ruling it as standard practice for every routine: *"Don't pick up yesterday's failed attempt. Start fresh with a full pull from today and set that as standard practice. Even though it failed yesterday, you still need to start fresh today from ground one!"*
 
-- **The unit is the CALENDAR DAY, not a rolling interval.** A rolling "more than 24 hours old" test makes resumability depend on what time of day the abort happened: a pass that died at 9am yesterday is resumable at 4pm today (31h — wait, no) while one that died at 6pm yesterday is not, and nobody can defend that line to a human. **"Was it yesterday?" is answerable at a glance and cannot be computed two ways.**
+- **The unit is the CALENDAR DAY, not a rolling interval.** A rolling "older than 24 hours" test makes inheritance depend on what hour the abort happened. A pass that died at 6pm yesterday is 22h old at 4pm today and reads RESUMABLE; one that died at 9am yesterday is 31h old and reads ABANDONED. **Same mess, opposite verdict, and the only difference is a clock.** *"Was it yesterday?"* is answerable at a glance and cannot be computed two ways.
 - ⚠️ **"Ground one" means the LOOP restarts. It does NOT mean state is wiped.** Committed data files are the standing inventory and are never emptied, deleted or reset to honour this rule — a fresh pass RE-VERIFIES them, which is the verify-and-merge floor (`README.md` rule 1). Reading "from ground one" as "clear the files" would invert the most basic rule in the framework.
 - **Yesterday's committed work stays committed and gets re-verified**, arriving in today's output as SAME rather than NEW. Nothing is thrown away; it is checked again.
 - **Name the orphans.** An unfinished pass leaves artifacts — a role header with no pass summary, a partial coverage list. Say in the report which ones were orphaned and which pass they belonged to, so the record does not read as though today's pass produced them.
 - **Same-day resumption is untouched and still correct.** Stopping at a boundary and picking up an hour later is exactly what `README.md` rule 13 asks for. This rule only kills the OVERNIGHT handoff.
-- **Why it is right, in one line: half an inventory a day staler than the other half is worse than a clean restart.** A stitched-together pass reports a single market snapshot that never existed at any moment in time. The boards move overnight; the whole point of a daily routine is a coherent picture of one day.
+- **Why it is right, in one line: half an inventory a day staler than the other half is worse than a clean restart.** A stitched-together pass reports a single market snapshot that never existed at any moment in time. The boards move overnight, and the whole point of a daily routine is a coherent picture of one day.
 
 ### Inheritors, audited in the same pass (per `README.md` → sixth sibling)
 
@@ -101,7 +101,7 @@ Promoting a rule without checking who now has to obey it creates silent debt, so
 
 ### The correction that produced this rule
 
-The 2026-08-06 triage reported Job Market as *"a RESUME of the parked 08-05 pass"* and repeated it in the run report. **That was wrong on the runbook's own terms:** the 08-05 pass's newest comment was ~31h old at the time, past the >24h abandoned test, so the correct reading was already FRESH. The scan was not run against the clock, it was inferred from the shape of the story ("a pass stopped mid-way, so pick it up"). **Worth keeping because the failure was not a missing rule — the rule existed and was not applied.** Michael's ruling replaces a threshold that has to be computed with one that has to be noticed.
+The 2026-08-06 triage reported Job Market as *"a RESUME of the parked 08-05 pass"* and repeated it in the run report. **That was wrong on the runbook's own terms:** the 08-05 pass's newest comment was ~31h old at the time, past the >24h abandoned test, so the correct reading was already FRESH. The scan was not run against the clock; it was inferred from the shape of the story — *a pass stopped mid-way, so pick it up.* **Worth keeping because the failure was not a missing rule. The rule existed and was not applied.** Michael's ruling replaces a threshold that has to be computed with one that has to be noticed.
 
 ## Error posture
 
