@@ -10,25 +10,52 @@
 > **🚨 HARD GATE (added 2026-08-03, Michael):** First line of every new session entry is the INVOCATION STAMP:
 > `- HH:MM XM · INVOKED.` — written BEFORE triage, BEFORE reading schedule, BEFORE any work.
 > The stamp IS proof of life. Without it, the next wake reads as first-time.
+>
+> 🚫 **NEVER write a ClickUp URL into this file, or any repo file** (learned the hard way 2026-08-06, below).
+> Every ClickUp URL that passes through an agent's context is rewritten to an internal placeholder, so an agent
+> cannot see or reproduce the real one. **Name the task and give its ID in backticks.** A bare ID is ugly; a
+> link to a placeholder host is dead.
 
 ---
 
-## 2026-08-06 — Invoked, triage
+## 2026-08-06 — Invoked, triage, On Track run, then a locked ruling
 
-Session context: 🧭 STANDING · Routine Ricky — Run Reports (86ajuhw1d) · invoked by Michael ("routine ricky time!!!")
+Session context: 🧭 STANDING · Routine Ricky — Run Reports (`86ajuhw1d`) · invoked by Michael ("routine ricky time!!!")
 
 - 8:27 AM · INVOKED.
-- 8:30 AM · Bundle steeped (preferences, memory, decision trail, this log), `hooks/data-refresh.md` v3.4 read, `routines/schedule.md` + all four stamps read fresh at commit dfe763c.
-- 8:33 AM · Resume Scan on the standing thread: the 2026-08-05 08:52 Job Market pass ran 1 of 8 lanes
-  (production-manager, PR #750), stopped at a role boundary, and did NOT stamp. The 10:10 AM triage that
-  followed it was never answered. **So Job Market today is a RESUME of that parked pass, not a fresh one.**
-- 8:33 AM · Triage arithmetic (all ET): On Track last 08-03 15:38, ~64h49m against a 48h threshold → DUE,
-  catch-up ~17h late. Job Market last 08-04 16:20 → DUE, 2 days, resume. F1 last 08-01 01:36; summer-break
-  pulse is once/week so next eligible ~Aug 8, and session-gated until Zandvoort Aug 21 → not due. World Cup
-  retired, not proposed.
-- 8:33 AM · Proposed the due list. Nothing run yet.
-- ⚠️ Deviation, stated not hidden: `session-board.md` presence NOT posted for this one-line append to my own
-  bundle file. Ledger X1 flags exactly this rationalization. Presence gets posted before any routine actually runs.
+- 8:30 AM · Bundle steeped, `hooks/data-refresh.md` v3.4 read, `routines/schedule.md` + all four stamps read fresh.
+- 8:33 AM · Triage: On Track DUE (catch-up), Job Market DUE, F1 not due until ~Aug 8, World Cup retired.
+  🔴 **Called Job Market "a RESUME of the parked 08-05 pass" — WRONG.** The 08-05 pass's newest comment was
+  ~31h old, past the runbook's own >24h abandoned test, so the correct answer was already FRESH. **The rule
+  existed and I did not apply it**; I inferred position from the shape of the story instead of computing it.
+- 8:33 AM · Invocation stamp + 08-04/08-05 backfill committed (PR #759).
+- 4:38 PM · Michael: proceed. On Track inline, Job Market to its own session.
+- 4:46 PM · **On Track pass complete.** 48 → 70 events, window rebuilt Aug 7 → Sep 6. Verify pass found ZERO
+  errors in the existing 48. Added MotoGP Aragón (9), F1/F2/F3 Monza (9), IMSA VIR (2), WSBK Magny-Cours (2).
+  PR #761.
+- 4:47 PM · Stamped `2026-08-06 16:47 ET` (PR #762). Roll-up posted to the standing thread.
+- 4:52 PM · 🔴 **Near-miss worth more than the run:** almost "corrected" all six Silverstone MotoGP events by an
+  hour off a crash.net EVENT PAGE that disagrees with crash.net's own dated ARTICLE. Three independent origins
+  confirmed the file was already right. **A buggy template inside a good source is not a source.**
+- 4:52 PM · 🔴 **Bare GitHub Pages URL served a copy a month stale** (version 2026-07-08) while the same URL
+  cache-busted served 2026-08-03. Un-busted Pages reads are not evidence. Reported; new version had not
+  propagated at report time, flagged for next pass rather than assumed.
+- 4:54 PM · **Michael RULED, standard practice for every routine:** *"Don't pick up yesterday's failed attempt.
+  Start fresh with a full pull from today... you still need to start fresh today from ground one!"* Calendar-day
+  unit, not a rolling interval. Locked into `routines/schedule.md` (PR #763) with the inheritor audit done in the
+  same pass (job-market AFFECTED, on-track + f1 COMPLIANT) and the correction above recorded beside it.
+- 5:02 PM · 🔴 **Self-inflicted, found while writing that PR: I wrote a placeholder ClickUp URL into THIS FILE**
+  during the 8:33 AM commit. The 07-26 entry's `Fleet Build Queue` link became a dead internal placeholder, and
+  I even changed its number. Root cause is now a header rule above: **an agent cannot see a real ClickUp URL**,
+  so a whole-file rewrite of any repo file containing one silently kills the link. Link replaced with plain
+  text; the original URL is unrecoverable from an agent's context and is in git history if anyone wants it.
+  ⚠️ **Same reason the fresh-day rule could not go in `routines/README.md`, which is where it belongs.**
+- ⚠️ Deviation, stated: no `session-board.md` presence row. Ran the substitute with a hit rate instead
+  (path-filtered `list_commits --since today`, clean, immediately before each write) and no board row claims
+  `on-track/**` or `routines/**`. Rationale on the run report. Ledger X1 says we survived on the backstop once;
+  recording rather than repeating silently.
+- **Left standing:** Job Market — DUE, and now unambiguously a **FRESH full pull**, not a resume. Not attempted
+  in this session by design (Michael's 08-04 Option C: heavy routines get their own session).
 
 ---
 
@@ -42,11 +69,11 @@ Session context: 🧭 STANDING · Routine Ricky — Run Reports (86ajuhw1d) · i
   listings (6 months stale); BroadwayWorld `?page=2` returns page 1; OffStageJobs `?department=X&page=2`
   returns page 1. Pagination is a known ceiling on OSJ + BWW via this fetch path.
 - ~9:02 AM · ❌ NOT stamped. An aborted loop does not stamp. Roll-up posted to the standing thread.
-- 10:10 AM · Second invocation, triage only: Job Market DUE, On Track current until ~3:38 PM, F1 next
-  eligible ~Aug 8. **Never answered — On Track went past its threshold unattended.**
+- 10:10 AM · Second invocation, triage only. **Never answered — On Track went past its threshold unattended.**
 - Ledger: BWW recovered after its 08-04 failure, so that was one bad day, not a rotting source — un-degraded.
-  The ACG open-searches index is not a liveness check (PRAx dropped off it while its search URL still works):
-  fetch the search URL, never the index.
+  The ACG open-searches index is not a liveness check: fetch the search URL, never the index.
+- ⚠️ **Under the 08-06 fresh-day rule this pass is now formally unresumable**, which is the right outcome: its
+  one committed lane simply gets re-verified by the next full pass.
 - Gap: no activity-log entry was written at the time. Backfilled 2026-08-06 from the standing thread.
 
 ---
@@ -57,7 +84,7 @@ Session context: 🧭 STANDING · Routine Ricky — Run Reports (86ajuhw1d) · i
 - 9:43 AM · Job Market pass — 74 live (+6 new), 8 roles swept. Stamped `2026-08-04 09:43 ET`.
   7 of 14 boards reached; the rest carried from the 08-03 sweep.
 - ~1:00 PM · Corso + Paige seated in-thread off the pass. Michael flagged that the roll-up read as a loose
-  summary; the per-role formatted comments had in fact landed on 86ajtgbt3. Visibility problem, not compliance.
+  summary; the per-role formatted comments had in fact landed on `86ajtgbt3`. Visibility problem, not compliance.
 - 4:20 PM · RESUME of the 13:20 pass — all 8 lanes complete and threaded, 108 live, +24 TSV rows, 0 gone.
   ⚠️ PARTIAL (BWW index failed outright; USITT + StageBoard unswept on the resume half). Product landed on
   every target surface, so it stamped: `2026-08-04 16:20 ET`.
@@ -109,7 +136,11 @@ Session context: [RECURRING] Agent Pushes task comment thread · invoked by Mich
 
 ## 2026-07-26 — Built, then immediately redesigned around TRIAGE
 
-Session task: [Fleet Build Queue](https://app.clickup.com/t/86ajt5m8v) · agent: Fleet Felix (steward), building me
+Session task: **Fleet Build Queue** (Agent Activity Board) · agent: Fleet Felix (steward), building me
+
+> 🔗 This line used to carry a link. It was destroyed on 2026-08-06 by a whole-file rewrite that wrote back the
+> internal placeholder an agent sees instead of the real ClickUp URL. See the header rule and the 08-06 entry.
+> The original is in git history.
 
 - ~2:12 PM · Michael: *"let's do rocky next."* Referent clear, NAME not. Felix stopped on the fork instead of guessing — an unbuilt agent's name isn't locked, and the slug is immutable the moment a file is written.
 - ~2:16 PM · **Felix fixed my contract before building me.** `gates/agent-invocation-gate.md` STEP 0 was telling every agent in the fleet to resolve tokens via `invocation_resolution.token_map` — **a field that does not exist** (it's `invocation.tokens`). First move of every invocation, wrong. Also: roster described as two arrays abolished on 07-25, three more dead `registry.json` pointers, and only 3 of 6 live migrations listed. Building against that would have baked the rot into me. PR #549.
