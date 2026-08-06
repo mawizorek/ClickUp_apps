@@ -1,49 +1,55 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# RENAME OR MOVE A FOLDER — standing cross-repo utility. Manual dispatch only.
+# MOVE A FOLDER — standing cross-repo utility. Manual dispatch only.
 #
-# Point it at a repo, browse down to a folder, then rename it, move it, or both.
-# Everything underneath travels in ONE commit with rename history intact.
+# ⭐ THERE IS ONE OPERATION HERE AND IT IS A MERGE. Michael, 2026-08-06: "move is
+# just merge without anything in the starting point." He is right, and this file
+# was built the other way round until then -- move was the operation and merge was
+# a refusal, which is why the collision handling landed at the wrong granularity.
 #
-#   new_name only ........ rename in place.      guides/pm/old -> guides/pm/new
-#   dest_parent only ..... move, keep the leaf.  guides/pm/old -> archive/old
-#   both ................. move and rename.      guides/pm/old -> archive/new
+#   rename ... merge into a sibling path that does not exist yet. 0 collisions.
+#   move ..... merge into another parent that does not exist yet. 0 collisions.
+#   merge .... the same walk, into somewhere that already has files in it.
 #
-# WHY THIS EXISTS AS A RUNNER AND NOT AS API CALLS: the GitHub contents API cannot
-# move a file. It can only write a new path and delete the old one, which means
-# reading and re-pushing every byte of every file, one commit each, rename history
-# destroyed, and a half-migrated tree if anything fails midway. `git mv` moves a
-# 54-file folder without opening a single file. Born 2026-08-05 from the one-shot
-# 02-courses -> courses runner; MOVE added 2026-08-06.
+# So the engine is: walk the tracked files under the source, compute each one's
+# target, move them individually. Everything else is which inputs you filled in.
+#
+#   new_name only ........ guides/pm/old -> guides/pm/new
+#   dest_parent only ..... guides/pm/old -> archive/old
+#   both ................. guides/pm/old -> archive/new
+#   destination exists ... a merge, and on_collision decides what happens
+#
+# 🚫 NO WHOLE-FOLDER `git mv` FAST PATH, DELIBERATELY. It would be a second code
+# path for the zero-collision case, and a second code path is precisely where the
+# two operations drift apart again -- that drift is what this commit is undoing.
+# It also was not buying what its commit messages claimed: GIT STORES NO RENAME
+# RECORDS. A rename is INFERRED from content similarity at diff time, so moving
+# 54 files one at a time preserves exactly as much history as moving the
+# directory in one call. The shortcut was faster to type and nothing else.
+#
+# WHY A RUNNER AND NOT API CALLS: the GitHub contents API cannot move a file. It
+# writes a new path and deletes the old one, which means reading and re-pushing
+# every byte, one commit each, and a half-migrated tree if anything fails midway.
+# Born 2026-08-05 from the one-shot 02-courses runner.
 #
 # ───────────────────────────────────────────────────────────────────────────────
 # 🔴 TWO LIMITS. BOTH REAL. NEITHER IS A BUG.
 #
 # 1 · A DROPDOWN CANNOT BE POPULATED FROM AN API. `workflow_dispatch` choice inputs
-#     are a STATIC list baked into this file. GitHub offers no mechanism to fill one
-#     at dispatch time. So:
-#       · the REPO list below is hand-maintained. Add a repo by editing this file.
-#       · the FOLDER cannot be a dropdown at all — a repo has arbitrarily many, and
-#         they change constantly.
-#     `browse` mode is the answer to that, not a workaround for it: it prints the
-#     folders at any level with their file counts, so you drill down one dispatch at
-#     a time instead of scrolling a list of a hundred.
+#     are a STATIC list baked into this file, so the REPO list is hand-maintained
+#     and the FOLDER cannot be a dropdown at all. `browse` mode is the answer to
+#     that, not a workaround for it.
 #
-# 2 · CROSS-REPO WRITES NEED A PAT. The automatic GITHUB_TOKEN is scoped to THIS
-#     repo only, so it cannot push to uritp-docs or anywhere else. Add a fine-grained
-#     PAT with Contents: read+write on the target repos as the repository secret
-#     REPO_OPS_TOKEN. Without it the job fails on step one with instructions rather
-#     than half-running.
+# 2 · CROSS-REPO WRITES NEED A PAT in the REPO_OPS_TOKEN secret, on THIS repo.
+#     The automatic GITHUB_TOKEN is scoped to its own repo and cannot push to
+#     uritp-docs. Step one fails with instructions rather than half-running.
 #
-# ───────────────────────────────────────────────────────────────────────────────
-# ⚠️ WHAT A MOVE ACTUALLY BREAKS, so plan can tell you before apply does:
-#     Internal @-refs in the docs family resolve on `id`, never on path — SAFE.
-#     What changes is the PUBLISHED URL of every page underneath, which is the one
-#     property of a page that cannot be corrected later without breaking every
-#     bookmark pointing at it. plan now also greps the repo for the old path, so a
-#     hardcoded reference in a workflow or a script shows up BEFORE the move.
+# ⚠️ AND THE ONE THIS TOOL CANNOT FIX: a collision handled by suffix leaves TWO
+#    files claiming one `id:` in their frontmatter. The renderer reports
+#    duplicate_id, the build SUCCEEDS, and last writer wins silently for every
+#    inbound link. Renaming a file does not rename what is inside it.
 # ═══════════════════════════════════════════════════════════════════════════════
 
-name: Rename a folder
+name: Move a folder
 
 run-name: "${{ inputs.mode }} · ${{ inputs.repo }} · ${{ inputs.path }}"
 
@@ -71,25 +77,26 @@ on:
           - plan
           - apply
       path:
-        description: "The folder. Full path from the repo root. Blank = root (browse only)."
+        description: "The folder to move. Full path from the repo root."
         required: false
         default: ""
       new_name:
-        description: "New leaf name, no slashes. Leave blank to keep the current name."
+        description: "New leaf name, no slashes. Blank = keep the current name."
         required: false
         default: ""
       dest_parent:
-        description: "MOVE: the folder to move it INTO. Must already exist. Blank = stay put."
+        description: "The folder to move it INTO. Must already exist. Blank = stay put."
         required: false
         default: ""
       on_collision:
-        description: "If the destination exists: refuse (safe) or suffix (adds _moved)"
+        description: "Per FILE, if the destination already has one: refuse · suffix (original stays, incoming lands as NAME_moved.EXT) · skip (leave it behind)"
         required: false
         default: refuse
         type: choice
         options:
           - refuse
           - suffix
+          - skip
 
 permissions:
   contents: read
@@ -122,8 +129,7 @@ jobs:
         working-directory: target
         run: |
           set -euo pipefail
-          BASE="${{ inputs.path }}"
-          BASE="${BASE%/}"
+          BASE="${{ inputs.path }}"; BASE="${BASE%/}"
           if [ -z "$BASE" ]; then BASE="."; fi
 
           if [ ! -d "$BASE" ]; then
@@ -157,12 +163,12 @@ jobs:
             echo ""
             echo "### Next"
             echo ""
-            echo "- **Go deeper:** dispatch again with \`path\` set to one of the folders above."
-            echo "- **Rename one:** \`mode: plan\`, that folder as \`path\`, new leaf in \`new_name\`."
-            echo "- **Move one:** \`mode: plan\`, that folder as \`path\`, target parent in \`dest_parent\`."
+            echo "- **Deeper:** dispatch again with \`path\` set to one of the folders above."
+            echo "- **Rename:** \`mode: plan\`, that folder as \`path\`, new leaf in \`new_name\`."
+            echo "- **Move or merge:** \`mode: plan\`, that folder as \`path\`, target parent in \`dest_parent\`."
             echo ""
             echo "⚠️ **untracked** means git has no committed files under it. Git does not store"
-            echo "empty directories, so there is nothing there to move and this runner will say so."
+            echo "empty directories, so there is nothing there to move."
             echo ""
             echo "Read-only. Nothing was changed."
           } >> "$GITHUB_STEP_SUMMARY"
@@ -172,49 +178,36 @@ jobs:
         working-directory: target
         run: |
           set -euo pipefail
-          SRC="${{ inputs.path }}"; SRC="${SRC%/}"; SRC="${SRC#./}"
+          SRC="${{ inputs.path }}";        SRC="${SRC%/}";               SRC="${SRC#./}"
           NEW="${{ inputs.new_name }}"
           PARENT_IN="${{ inputs.dest_parent }}"; PARENT_IN="${PARENT_IN%/}"; PARENT_IN="${PARENT_IN#./}"
           COLLIDE="${{ inputs.on_collision }}"
           MODE="${{ inputs.mode }}"
 
-          # ── Guards. Every one of these passes before anything moves. ──
+          # ── Guards. All of these pass before anything moves. ──
 
           if [ -z "$SRC" ] || [ "$SRC" = "." ]; then
-            echo "::error::path is empty. You cannot rename or move the repo root from here."
-            exit 1
+            echo "::error::path is empty. You cannot move the repo root."; exit 1
           fi
           if [ -z "$NEW" ] && [ -z "$PARENT_IN" ]; then
-            echo "::error::Both new_name and dest_parent are empty, so this is a no-op. Give a new_name to rename in place, a dest_parent to move, or both."
-            exit 1
+            echo "::error::Both new_name and dest_parent are empty, so this is a no-op."; exit 1
           fi
-          case "$SRC$PARENT_IN" in
-            *..*) echo "::error::A path contains '..'. Refusing."; exit 1 ;;
-          esac
-          case "$SRC" in
-            .git|.git/*|.github|.github/*) echo "::error::'$SRC' is repo plumbing. Refusing."; exit 1 ;;
-          esac
+          case "$SRC$PARENT_IN" in *..*) echo "::error::A path contains '..'. Refusing."; exit 1 ;; esac
+          case "$SRC" in .git|.git/*|.github|.github/*) echo "::error::'$SRC' is repo plumbing. Refusing."; exit 1 ;; esac
           case "$NEW" in
-            */*) echo "::error::new_name '$NEW' contains a slash. new_name is the LEAF only — to put the folder somewhere else, use dest_parent. That is what it is for."; exit 1 ;;
+            */*) echo "::error::new_name '$NEW' is the LEAF only. To put the folder somewhere else use dest_parent."; exit 1 ;;
             .*)  echo "::error::new_name '$NEW' starts with a dot. Refusing to create a hidden folder."; exit 1 ;;
           esac
-
           if [ ! -e "$SRC" ]; then
-            echo "::error::'$SRC' does not exist in ${{ inputs.repo }}. Run browse mode to find it."
-            exit 1
+            echo "::error::'$SRC' does not exist in ${{ inputs.repo }}. Run browse mode to find it."; exit 1
           fi
           if [ -f "$SRC" ]; then
-            echo "::error::'$SRC' is a FILE. This runner moves folders only, by design."
-            exit 1
-          fi
-          if [ ! -d "$SRC" ]; then
-            echo "::error::'$SRC' is not a folder."
-            exit 1
+            echo "::error::'$SRC' is a FILE. This runner moves folders only, by design."; exit 1
           fi
 
           NFILES=$(git ls-files "$SRC" | wc -l | tr -d ' ')
           if [ "$NFILES" = "0" ]; then
-            echo "::error::'$SRC' contains no tracked files. Git does not store empty directories — a folder exists only as the paths of the files inside it — so there is literally nothing here to move. If you expected files, they are untracked or ignored. Nothing was changed."
+            echo "::error::'$SRC' contains no tracked files. Git does not store empty directories -- a folder exists only as the paths of the files inside it -- so there is nothing here to move. If you expected files, they are untracked or ignored."
             exit 1
           fi
 
@@ -223,62 +216,98 @@ jobs:
           if [ -n "$PARENT_IN" ]; then
             DEST_PARENT="$PARENT_IN"
             if [ ! -d "$DEST_PARENT" ]; then
-              echo "::error::dest_parent '$DEST_PARENT' does not exist. This runner will not create a folder tree on the way past — browse to confirm the destination first."
-              exit 1
+              echo "::error::dest_parent '$DEST_PARENT' does not exist. This runner will not build a folder tree on the way past."; exit 1
             fi
-            case "$DEST_PARENT/" in
-              "$SRC"/*) echo "::error::dest_parent '$DEST_PARENT' is inside '$SRC'. A folder cannot be moved into itself."; exit 1 ;;
-            esac
+            case "$DEST_PARENT/" in "$SRC"/*) echo "::error::dest_parent is inside the source. A folder cannot be moved into itself."; exit 1 ;; esac
           else
             DEST_PARENT=$(dirname "$SRC")
           fi
 
-          LEAF="$NEW"
-          if [ -z "$LEAF" ]; then LEAF=$(basename "$SRC"); fi
+          LEAF="$NEW"; [ -n "$LEAF" ] || LEAF=$(basename "$SRC")
           if [ "$DEST_PARENT" = "." ]; then DEST="$LEAF"; else DEST="$DEST_PARENT/$LEAF"; fi
 
           if [ "$SRC" = "$DEST" ]; then
-            echo "::error::'$SRC' is already exactly that. Nothing to do."
-            exit 1
+            echo "::error::'$SRC' is already exactly that. Nothing to do."; exit 1
           fi
+
+          # ── Case-only rename. The ONE case that cannot go through the file walk. ──
+          # `courses` -> `Courses` is two paths on this Linux runner and ONE path on any
+          # macOS or Windows checkout. Moving file-by-file would move each file onto
+          # itself. Git handles it through a temp name and nothing else does.
+          if [ "$(echo "$SRC" | tr 'A-Z' 'a-z')" = "$(echo "$DEST" | tr 'A-Z' 'a-z')" ]; then
+            {
+              echo "## ${MODE} · case-only rename · \`${{ inputs.repo }}\`"
+              echo ""
+              echo "\`$SRC\` → \`$DEST\` · **$NFILES** files"
+              echo ""
+              echo "⚠️ Same path on a case-insensitive filesystem, so this goes through a temp"
+              echo "name in two commits. A direct move works here and breaks any macOS clone."
+            } >> "$GITHUB_STEP_SUMMARY"
+            if [ "$MODE" = "plan" ]; then
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo "**Dry run. Nothing was changed.**" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git mv "$SRC" "${DEST}.case-tmp"
+            git commit -q -m "Case rename 1/2: $SRC -> ${DEST}.case-tmp"
+            git mv "${DEST}.case-tmp" "$DEST"
+            git commit -q -m "Case rename 2/2: -> $DEST" -m "Two steps: a direct case-only move is invisible to a case-insensitive filesystem."
+            git push
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ **Applied.** \`$DEST\`" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # ── THE ENGINE. One walk. A move is this with an empty destination. ──
+
+          MOVES=$(mktemp); COLLISIONS=$(mktemp); SKIPS=$(mktemp)
+          NCOL=0
+
+          while IFS= read -r f; do
+            REL="${f#$SRC/}"
+            TARGET="$DEST/$REL"
+
+            if [ -e "$TARGET" ]; then
+              NCOL=$((NCOL + 1))
+              case "$COLLIDE" in
+                skip)
+                  printf '%s\n' "$f" >> "$SKIPS"
+                  continue ;;
+                suffix)
+                  BASE=$(basename "$TARGET"); DIR=$(dirname "$TARGET")
+                  case "$BASE" in
+                    ?*.*) STEM="${BASE%.*}"; EXT=".${BASE##*.}" ;;
+                    *)    STEM="$BASE";      EXT="" ;;
+                  esac
+                  [ -n "$STEM" ] || { STEM="$BASE"; EXT=""; }
+                  SUFFIXED="$DIR/${STEM}_moved${EXT}"
+                  if [ -e "$SUFFIXED" ]; then
+                    echo "::error::'$TARGET' exists AND so does '$SUFFIXED'. Two collisions deep on one file is somebody losing track -- resolve it by hand. Nothing was changed."
+                    exit 1
+                  fi
+                  printf '%s\t%s\n' "$f" "$SUFFIXED" >> "$MOVES"
+                  printf '%s\t%s\n' "$TARGET" "$SUFFIXED" >> "$COLLISIONS"
+                  continue ;;
+                *)
+                  echo "::error::'$TARGET' already exists. Refusing to overwrite. Dispatch with on_collision: suffix to land the incoming file as NAME_moved.EXT beside the original, or skip to leave it behind. Nothing was changed."
+                  exit 1 ;;
+              esac
+            fi
+
+            printf '%s\t%s\n' "$f" "$TARGET" >> "$MOVES"
+          done < <(git ls-files "$SRC")
+
+          NMOVE=$(wc -l < "$MOVES" | tr -d ' ')
+          NSKIP=0; [ -s "$SKIPS" ] && NSKIP=$(wc -l < "$SKIPS" | tr -d ' ')
 
           OP="rename"
-          if [ -n "$PARENT_IN" ] && [ -n "$NEW" ]; then OP="move + rename"
+          if [ -d "$DEST" ]; then OP="MERGE"
+          elif [ -n "$PARENT_IN" ] && [ -n "$NEW" ]; then OP="move + rename"
           elif [ -n "$PARENT_IN" ]; then OP="move"; fi
 
-          # ── Case-only rename. Closed 2026-08-06. ──
-          # On this Linux runner `courses` and `Courses` are different paths, so every
-          # guard above passes and `git mv` succeeds. On any macOS or Windows checkout
-          # the filesystem is case-insensitive, the two names ARE one path, and the
-          # clone breaks. Git handles it if you go through a temp name; nothing else
-          # does.
-          CASE_ONLY=0
-          if [ "$(echo "$SRC" | tr '[:upper:]' '[:lower:]')" = "$(echo "$DEST" | tr '[:upper:]' '[:lower:]')" ]; then
-            CASE_ONLY=1
-          fi
-
-          # ── Collision. ──
-          COLLISION_NOTE=""
-          if [ "$CASE_ONLY" = "0" ] && [ -e "$DEST" ]; then
-            if [ "$COLLIDE" = "suffix" ]; then
-              DEST="${DEST}_moved"
-              if [ -e "$DEST" ]; then
-                echo "::error::'$DEST' also exists. Two collisions deep is somebody losing track — resolve it by hand."
-                exit 1
-              fi
-              COLLISION_NOTE="suffixed"
-            else
-              echo "::error::The destination already exists. Refusing to merge two trees — that is a different operation and it is not reversible by accident. Dispatch with on_collision: suffix to land it alongside as '_moved' instead."
-              exit 1
-            fi
-          fi
-
-          NDIRS=$(find "$SRC" -mindepth 1 -type d | wc -l | tr -d ' ')
-
-          # ── Blast radius. Closed 2026-08-06. ──
-          # plan used to report the file COUNT and nothing about what POINTS at this
-          # path. The 02-courses rename was only safe because a human grepped for
-          # references first, and the next one will not get that for free.
+          # ── Blast radius: what hardcodes the old path. ──
           HITS=$(grep -rIl --exclude-dir=.git -- "$SRC" . 2>/dev/null | grep -v "^./$SRC/" | sort || true)
           NHITS=$(printf '%s' "$HITS" | grep -c . || true)
 
@@ -288,25 +317,36 @@ jobs:
             echo "| | |"
             echo "|---|---|"
             echo "| From | \`$SRC\` |"
-            echo "| To | \`$DEST\` |"
-            echo "| Tracked files moving | **$NFILES** |"
-            echo "| Subfolders moving | $NDIRS |"
+            echo "| To | \`$DEST\`$( [ -d "$DEST" ] && echo ' — **already exists, this is a merge**' ) |"
+            echo "| Tracked files | **$NFILES** |"
+            echo "| Moving | $NMOVE |"
+            echo "| Colliding | $NCOL |"
+            echo "| Left behind | $NSKIP |"
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ "$CASE_ONLY" = "1" ]; then
-            echo "⚠️ **Case-only rename.** Done as two commits through a temp name — a direct" >> "$GITHUB_STEP_SUMMARY"
-            echo "move works here and then breaks any case-insensitive checkout (macOS, Windows)." >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          if [ "$COLLISION_NOTE" = "suffixed" ]; then
+          if [ -s "$COLLISIONS" ]; then
             {
-              echo "🔴 **The destination existed. Landing alongside it as \`$DEST\` instead.**"
+              echo "### 🔴 Collisions — original stays, incoming file suffixed"
               echo ""
-              echo "⚠️ A filename suffix does **not** resolve a duplicate \`id\`. An id lives in"
-              echo "frontmatter and travels with the file, so if two pages now declare the same one,"
-              echo "the renderer reports \`duplicate_id\` and **last writer wins silently** for every"
-              echo "inbound link. Fix the id, not just the name."
+              echo "| Already there | Incoming lands as |"
+              echo "|---|---|"
+              while IFS=$'\t' read -r a b; do echo "| \`$a\` | \`$b\` |"; done < "$COLLISIONS"
+              echo ""
+              echo "⚠️ **A suffix fixes the FILENAME and not the \`id:\` inside it.** Two pages"
+              echo "declaring one id make the renderer report \`duplicate_id\`, the build still"
+              echo "SUCCEEDS, and last writer wins silently for every inbound link. Fix the id."
+              echo ""
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ -s "$SKIPS" ]; then
+            {
+              echo "### ⏭️ Left behind"
+              echo ""
+              while IFS= read -r f; do echo "- \`$f\`"; done < "$SKIPS"
+              echo ""
+              echo "⚠️ These stay put, so \`$SRC\` survives the move holding only them."
               echo ""
             } >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -319,57 +359,52 @@ jobs:
             echo "Nothing in this repo mentions that path. ✅" >> "$GITHUB_STEP_SUMMARY"
           else
             {
-              echo "🔴 **$NHITS file(s) mention it as a literal string.** Each one is a hardcoded"
-              echo "path that this move will NOT update:"
+              echo "🔴 **$NHITS file(s) mention it as a literal string** and this move will not update them:"
               echo ""
               printf '%s\n' "$HITS" | sed 's|^\./|- `|; s|$|`|'
-              echo ""
             } >> "$GITHUB_STEP_SUMMARY"
           fi
-
           {
             echo ""
             echo "⚠️ Internal \`@\`-refs resolve on \`id\` and are safe. The **published URL** of"
-            echo "every page underneath changes, and that is the part no later edit can undo cleanly."
-            echo "🔎 This grep covers **this repo only** — a sibling repo hardcoding the path is invisible here."
+            echo "every page underneath changes, and no later edit undoes that cleanly."
+            echo "🔎 This grep covers **this repo only**."
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "$MODE" = "plan" ]; then
-            {
-              echo ""
-              echo "**Dry run. Nothing was changed.** Dispatch again with \`mode: apply\` and the same inputs."
-            } >> "$GITHUB_STEP_SUMMARY"
-            echo "Plan only. All guards passed. $NFILES files would move. $NHITS literal references found."
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Dry run. Nothing was changed.** Dispatch again with \`mode: apply\` and the same inputs." >> "$GITHUB_STEP_SUMMARY"
+            echo "Plan only. $NMOVE would move, $NCOL collide, $NSKIP left behind, $NHITS literal references."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if [ "$CASE_ONLY" = "1" ]; then
-            TMP="${DEST}.case-rename-tmp"
-            git mv "$SRC" "$TMP"
-            git commit -q -m "Case rename step 1/2: $SRC -> $TMP"
-            git mv "$TMP" "$DEST"
-            git commit -q -m "Case rename step 2/2: $TMP -> $DEST" \
-                          -m "Two steps on purpose: a direct case-only move is invisible to a case-insensitive filesystem and breaks the clone."
-          else
-            git mv "$SRC" "$DEST"
-            git commit -q -m "$OP: $SRC -> $DEST" \
-                          -m "$NFILES files moved with git mv, contents untouched, rename history intact." \
-                          -m "Dispatched via the Rename a folder runner in ClickUp_apps."
+          while IFS=$'\t' read -r from to; do
+            mkdir -p "$(dirname "$to")"
+            git mv "$from" "$to"
+          done < "$MOVES"
+
+          # Tracked files are gone; the empty shells git never stored can go too.
+          if [ "$(git ls-files "$SRC" | wc -l | tr -d ' ')" = "0" ] && [ -d "$SRC" ]; then
+            find "$SRC" -type d -empty -delete 2>/dev/null || true
           fi
+
+          git commit -q -m "$OP: $SRC -> $DEST" \
+                        -m "$NMOVE files moved, $NCOL collisions ($COLLIDE), $NSKIP left behind." \
+                        -m "Dispatched via the Move a folder runner in ClickUp_apps."
           git push
 
-          # Read it back rather than trusting the push.
-          test -d "$DEST"
-          if [ "$CASE_ONLY" = "0" ]; then test ! -d "$SRC"; fi
-          AFTER=$(git ls-files "$DEST" | wc -l | tr -d ' ')
+          # Verify every intended destination actually exists in the index.
+          MISSING=0
+          while IFS=$'\t' read -r from to; do
+            git ls-files --error-unmatch "$to" >/dev/null 2>&1 || { echo "::error::missing after move: $to"; MISSING=$((MISSING + 1)); }
+          done < "$MOVES"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          if [ "$AFTER" != "$NFILES" ]; then
-            echo "::error::Count mismatch after the move: expected $NFILES, found $AFTER."
-            echo "🔴 **Count mismatch: expected $NFILES, found $AFTER.**" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$MISSING" != "0" ]; then
+            echo "🔴 **$MISSING file(s) are not at their destination.**" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          echo "✅ **Applied and verified.** \`$DEST\` holds $AFTER files." >> "$GITHUB_STEP_SUMMARY"
-          echo "Applied. $AFTER files verified at the destination."
+          echo "✅ **Applied and verified.** $NMOVE file(s) confirmed at \`$DEST\`." >> "$GITHUB_STEP_SUMMARY"
+          echo "Applied. $NMOVE verified."
