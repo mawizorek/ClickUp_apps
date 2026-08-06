@@ -76,8 +76,32 @@ On invocation, for every ACTIVE routine, read its `last-run` file and compare ag
 - **A stamp you could not READ is not `never` either.** Unreadable is its own answer: say "unknown," never substitute a default.
 - **Idempotency:** a routine whose last-run already covers the current occurrence/session is done — skip it, however many times you are invoked. ⚠️ **This is about not re-running the same occurrence, NOT about staying silent when a source hasn't changed.** Job Market deliberately re-reports an unchanged market; that is its product, not a wasted pass.
 - **Catch-up — the DEFAULT path, not an edge case.** With no timer, occurrences pass unattended by design. If a due occurrence has passed and last-run is older, run the **latest missed occurrence once** and label it a catch-up. **Never replay every missed day.** A routine three weeks overdue gets ONE run.
+- 🔴 **A NEW DAY IS A FRESH PASS — never resume an unfinished pass from a previous calendar day** (LOCKED 2026-08-06, Michael). Full rule in the next section. This is a different question from catch-up: catch-up asks *how many occurrences do I run*, this asks *do I inherit yesterday's half-finished work*. The answers are ONE and NO.
 - **Retired routines are never proposed.** Not due, not overdue, not a gap.
 - **Nothing due → say so and stop.**
+
+## 🔴 A new day is a fresh pass (LOCKED 2026-08-06, Michael)
+
+**An unfinished pass from a PREVIOUS CALENDAR DAY is never resumed. The next invocation starts at step one and runs the whole routine.** Michael, ruling it as standard practice for every routine: *"Don't pick up yesterday's failed attempt. Start fresh with a full pull from today and set that as standard practice. Even though it failed yesterday, you still need to start fresh today from ground one!"*
+
+- **The unit is the CALENDAR DAY, not a rolling interval.** A rolling "older than 24 hours" test makes inheritance depend on what hour the abort happened. A pass that died at 6pm yesterday is 22h old at 4pm today and reads RESUMABLE; one that died at 9am yesterday is 31h old and reads ABANDONED. **Same mess, opposite verdict, and the only difference is a clock.** *"Was it yesterday?"* is answerable at a glance and cannot be computed two ways.
+- ⚠️ **"Ground one" means the LOOP restarts. It does NOT mean state is wiped.** Committed data files are the standing inventory and are never emptied, deleted or reset to honour this rule — a fresh pass RE-VERIFIES them, which is the verify-and-merge floor (`README.md` rule 1). Reading "from ground one" as "clear the files" would invert the most basic rule in the framework.
+- **Yesterday's committed work stays committed and gets re-verified**, arriving in today's output as SAME rather than NEW. Nothing is thrown away; it is checked again.
+- **Name the orphans.** An unfinished pass leaves artifacts — a role header with no pass summary, a partial coverage list. Say in the report which ones were orphaned and which pass they belonged to, so the record does not read as though today's pass produced them.
+- **Same-day resumption is untouched and still correct.** Stopping at a boundary and picking up an hour later is exactly what `README.md` rule 13 asks for. This rule only kills the OVERNIGHT handoff.
+- **Why it is right, in one line: half an inventory a day staler than the other half is worse than a clean restart.** A stitched-together pass reports a single market snapshot that never existed at any moment in time. The boards move overnight, and the whole point of a daily routine is a coherent picture of one day.
+
+### Inheritors, audited in the same pass (per `README.md` → sixth sibling)
+
+Promoting a rule without checking who now has to obey it creates silent debt, so this was checked immediately rather than left owed:
+
+- **`job-market-refresh.md` — AFFECTED, and it already half-agreed.** Its Resume Scan step 7 and matching guardrail already declare a pass ABANDONED when the newest comment is older than one cadence interval (>24h for a daily routine). **Same intent, wrong unit.** ⚠️ **That file could not be corrected in the same pass — it is 34.6KB, over the hard 30KB `create_or_update_file` cap (`GitHub MCP — Operating Standard`), so an agent cannot safely rewrite it.** Until it is corrected by a route that can, **THIS section is the rule and it supersedes the rolling-interval wording there.** 🔻 **OWED: replace step 7's rolling test with the calendar-day test, and split the runbook back under the write cap.**
+- **`on-track-refresh.md` — COMPLIANT, nothing to change.** It has no resume mechanism at all; every invocation rebuilds the whole window from the current data file, which is already this rule's behaviour.
+- **`f1-refresh.md` — COMPLIANT, nothing to change.** Its session-aware check reads its own stamp and decides refresh-or-no-op fresh each time. It never carries position across sessions.
+
+### The correction that produced this rule
+
+The 2026-08-06 triage reported Job Market as *"a RESUME of the parked 08-05 pass"* and repeated it in the run report. **That was wrong on the runbook's own terms:** the 08-05 pass's newest comment was ~31h old at the time, past the >24h abandoned test, so the correct reading was already FRESH. The scan was not run against the clock; it was inferred from the shape of the story — *a pass stopped mid-way, so pick it up.* **Worth keeping because the failure was not a missing rule. The rule existed and was not applied.** Michael's ruling replaces a threshold that has to be computed with one that has to be noticed.
 
 ## Error posture
 
