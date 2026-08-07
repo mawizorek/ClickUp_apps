@@ -12,7 +12,31 @@
 
 **Front door: this file, and nothing else.** No ClickUp Skill. Tools live in git only (LOCKED 2026-07-25).
 
-**Established 2026-08-02** by Mira (creation loop) + Dexter (handoff).
+**Established 2026-08-02** by Mira (creation loop) + Dexter (handoff). **Spec source repointed 2026-08-07.**
+
+---
+
+## 🔴 SPEC SOURCE — READ THIS BEFORE THE COORDINATES TABLE
+
+**The canonical spec home is `mawizorek/uritp-docs` → `doc-specs/{type}.md`.** Ruled by Michael, 2026-08-07: *"The one inside URITP docs is definitely the one I want to keep. The one in MAW pros is functionally dead."*
+
+~~`mawizorek/maw-prose` → `guides/doc-specs/`~~ **RETIRED as a claimant.** This hook pointed there from v1 (2026-08-02) until 2026-08-07, which means **every audit run in that window compared production documents against a spec in a repo Michael considers dead.** A freshness tool reading a stale source reports clean and is worse than no tool.
+
+⚠️ **The retirement is NOT yet executed and the two trees are NOT equivalent.** As of 2026-08-07:
+
+| | `uritp-docs/doc-specs/` (canonical) | `maw-prose/guides/doc-specs/` (dead) |
+|---|---|---|
+| info-sheet | ✅ 3,081 b | 2,828 b — superseded |
+| brochure-review | ✅ | — |
+| vectorworks/ | ✅ | — |
+| **contact-sheet** | ❌ **absent** | present |
+| **crew-call** | ❌ **absent** | present, substantial |
+| **letterhead** | ❌ **absent** | present |
+| **production-calendar** | ❌ **absent** | present |
+
+🚫 **Four spec types exist ONLY in the dead repo and have no counterpart in the canonical one.** Until they are migrated, an audit of a contact sheet, crew call, letterhead or production calendar **has no spec to audit against.** **Say so and stop. Do not silently fall back to `maw-prose`** — falling back is how a retired source stays load-bearing forever.
+
+**Authoritative tiebreak, per doc type:** the `Spec URL` custom field on the doc-type task in `Document TEMPLATES` (list `901319214267`). ⚠️ **Those fields may still point at `maw-prose`. A `Spec URL` is data, not truth — if it points at the dead repo, flag it rather than following it.**
 
 ---
 
@@ -20,11 +44,13 @@
 
 | Surface | Location |
 | --- | --- |
-| **Spec source** | `mawizorek/maw-prose` → `guides/doc-specs/{type}.md` (resolved via the canonical task's `Spec URL` custom field) |
+| **Spec source** | **`mawizorek/uritp-docs` → `doc-specs/{type}.md`** (cross-check the canonical task's `Spec URL`) |
 | **Canonical task list** | Document TEMPLATES (Document Destroyer) · list `901319214267` |
 | **Instance files** | Dropbox: `/PRODUCTIONS/URITP {YY-YY}/{slot} {title}/` |
 | **CU events** | Sibling tasks in the same production list/folder as the info-sheet paperwork task |
 | **Relevant field** | `Spec URL` (URL custom field on each doc-type task → points to the git spec) |
+
+⚠️ **`uritp-docs` is a PRIVATE repo** (verified 2026-08-07) while `ClickUp_apps` is public. Never carry a visibility assumption between them — see `gates/repo-referent-gate.md` R4.
 
 ---
 
@@ -35,7 +61,7 @@
 Given a production name (or "all current"):
 
 1. Locate the production's **info-sheet paperwork task** in ClickUp (the per-production CU mirror, e.g. `Paperwork (BL)`).
-2. From that task or its parent canonical doc-type task (`[ info-sheet ]`), read the **`Spec URL`** custom field.
+2. From that task or its parent canonical doc-type task (`[ info-sheet ]`), read the **`Spec URL`** custom field. **If it resolves to `maw-prose`, STOP and flag it** — that is a stale pointer, not a spec location.
 3. Identify the **Dropbox instance file** (linked in the canonical task's description or the production paperwork task).
 4. Identify the **production's event list** (sibling tasks in the same folder/list as the paperwork task).
 
@@ -47,6 +73,8 @@ Fetch the git spec at HEAD using blob API (not cached). Parse it into a structur
 - Required fields per section ("always present" roles/dates)
 - Variant rules (OA, Development, Mainstage)
 - Formatting rules (ALL CAPS, date format, TBD handling, filename convention)
+
+**No spec in the canonical repo = NO AUDIT.** Report `NO SPEC` for that doc type and move on.
 
 ### 2. Read instance
 
@@ -137,7 +165,7 @@ Output a standardized diff report (see Report Format below).
 
 ### Summary
 
-**Overall:** {CURRENT | PARTIALLY VALID | OUTDATED | WRONG FILE}
+**Overall:** {CURRENT | PARTIALLY VALID | OUTDATED | WRONG FILE | NO SPEC}
 
 **Immediate fixes needed:**
 - {bullet list of actionable items}
@@ -159,6 +187,7 @@ Output a standardized diff report (see Report Format below).
 | ❌ **UNBUILT** | Info sheet declares a date with no corresponding CU event | Build the event OR remove from sheet |
 | 🚩 **FLAGGED** | CU event itself is marked OUT OF DATE | Resolve the CU event first, then re-audit |
 | 🔴 **WRONG FILE** | Instance is from a completely different semester/production | Rewrite from scratch |
+| ⬜ **NO SPEC** | No spec exists in the canonical repo for this doc type | Migrate or author the spec first. **Never fall back to `maw-prose`.** |
 
 ---
 
@@ -178,18 +207,20 @@ The audit MUST detect which variant applies (from the production's metadata or h
 
 - **Read-only.** This hook reports drift. It does NOT update the Dropbox file, create CU events, or modify any task. Fixes are a separate action requiring explicit operator approval.
 - **Blob API for spec reads.** Always fetch at HEAD, never from cache. Same discipline as doc-destroyer-reconcile.
+- 🔴 **State the repo coordinate before the first read** (`gates/repo-referent-gate.md` R1). This hook's whole v1 defect was a spec source nobody re-derived.
 - **Dropbox MCP for instance reads.** Do not assume file content from prior sessions; always re-read.
-- **Scope to production docs only.** This hook handles docs that have a spec in `guides/doc-specs/` with date/personnel fields that correspond to CU events. Non-production docs (e.g. syllabi, contracts) are out of scope unless they get their own spec.
+- **Scope to production docs only.** Non-production docs (syllabi, contracts) are out of scope unless they get their own spec.
 - **One production at a time OR batch.** When "all current" is requested, iterate and produce one report per production, then a summary rollup.
-- **Don't assess CU event correctness.** If a CU event says Oct 21 and the info sheet says Oct 20, this hook flags the disagreement. It does NOT determine which is right. That's the operator's call.
+- **Don't assess CU event correctness.** If a CU event says Oct 21 and the info sheet says Oct 20, flag the disagreement. Do NOT determine which is right. That's the operator's call.
 
 ---
 
 ## Composes With
 
-- `hooks/doc-destroyer-reconcile.md` — Registry-level sync (spec↔task links). This hook checks instances, not registry entries.
-- `hooks/source-freshness-gate.md` — Git-level freshness. Complementary: that gate checks whether the spec itself is stale; this hook checks whether a downstream artifact matches its spec.
-- `hooks/stale-context-reload.md` — Re-fetch before writing. This hook should invoke stale-context-reload discipline on all reads.
+- `gates/repo-referent-gate.md` — **the gate this hook violated for five days.** Fire it before the first spec read.
+- `hooks/doc-destroyer-reconcile.md` — Registry-level sync (spec↔task links). ⚠️ **It may also carry the `maw-prose` coordinate — check it.**
+- `hooks/source-freshness-gate.md` — checks whether the spec itself is stale; this hook checks whether a downstream artifact matches its spec.
+- `hooks/stale-context-reload.md` — re-fetch before writing.
 - Future: **Doc Dave** (formatter agent) for the fix step downstream of this audit.
 - Future: Automation trigger (CU event date changed → flag info-sheet task field to OUT OF DATE).
 
@@ -197,4 +228,5 @@ The audit MUST detect which variant applies (from the production's metadata or h
 
 ## Changelog
 
-- **v1 (2026-08-02)** — Established by Mira (creation loop) + Dexter (handoff). Two-pass audit: structural compliance against git spec, data freshness against CU events. Scoped to production docs with date/personnel fields. Born from the info-sheet audit thread on task `86ajurbxz`.
+- **v1.1 (2026-08-07)** — **Spec source repointed `maw-prose` → `uritp-docs`** on Michael's ruling. Added the `NO SPEC` verdict and the explicit no-fallback rule, because four spec types (contact-sheet, crew-call, letterhead, production-calendar) exist only in the retired repo and a silent fallback would keep it load-bearing forever. Added the repo-referent-gate pointer and the private/public visibility warning. Found during the misplaced-docs sweep that followed the safety-pipeline wrong-repo write.
+- **v1 (2026-08-02)** — Established by Mira (creation loop) + Dexter (handoff). Two-pass audit: structural compliance against git spec, data freshness against CU events. Born from the info-sheet audit thread on task `86ajurbxz`.
