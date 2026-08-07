@@ -46,9 +46,11 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 **3 · The ARCHIVE verb (new, 2026-08-04).** The three-system model (repo = definition · ClickUp = current term · FileMaker = history) has three nouns and **no verb**: nothing moves an offering from current to archived. **Unowned and untriggered, that is how the nine enrollment fields happen again** — every one of them was "just this term" once. Michael deferred it deliberately.
 
-**4 · THE PRELIM DESIGN REVIEW TOOL (new, 2026-08-06). PROPOSED, NOT BUILT.** There is no standing procedure for a submitted design package anywhere in the workspace — see the 08-06 entry. I offered a repo hook twice and Michael has neither greenlit nor refused. **The ten gates and the safety content are written into the 08-06 entry below so the next session does not re-derive them.** Procedure-is-a-tool: it belongs in `hooks/`, never in `memory.md`.
+**4 · THE PRELIM DESIGN REVIEW TOOL (new, 2026-08-06). PROPOSED, NOT BUILT.** There is no standing procedure for a submitted design package anywhere in the workspace — see the 08-06 entry. I offered a repo hook twice and Michael has neither greenlit nor refused. **The ten gates and the safety content are written into the 08-06 entry below so the next session does not re-derive them.** Procedure-is-a-tool: it belongs in `hooks/`, never in `memory.md`. 🌟 **08-06 late: Reynolds Ch.7 (Figs 7.4–7.6) is the published version of exactly this tool, and its upstream sources are free — see the late entry. If the hook gets greenlit, it should be built ON that method, not from scratch.**
 
 **5 · Transcript speaker attribution (new, 2026-08-06).** Reconstructed 5 speakers over a diarization-free transcript and the derivation method worked well enough that Michael kept it. **Also a tool, also unbuilt.** Method recorded in the 08-06 entry.
+
+**6 · Reynolds source set (new, 2026-08-06 late). AWAITING MICHAEL'S SIT-DOWN PASS.** Free-source haul posted to MAWLIB-1038; a real content pass on Ch.7 → URITP application is scheduled by Michael, not by me. **Nothing built off it yet.**
 
 ### 🅿️ Parked / scheduled — carry, do not force
 
@@ -62,12 +64,61 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 - **`| DEFINITIONS FOR PROGRAMS |`** — a real task in Space 1 ▸ Production PROGRAMS at `researching` since **Jan 2025.**
 - 🔴 **`cancelled` is a DONE-type status on `Course List`.** Blocks any automated archive step — a cut course would file as completed history. Corey's to fix.
 - **`memory.md` is at ~12KB against a ~10KB hot target after the 08-06 additions.** A condense pass is owed; nothing culled without Michael.
+- **No near-miss / incident-reporting surface exists anywhere in URITP** (named 2026-08-06 late, off Reynolds Fig. 7.9). Transient-state thesis again. Not raised as a proposal yet.
+
+---
+
+## 2026-08-06 (late, ~10:30p) · Reynolds Ch.7 — recovering a paywalled chapter from its own front matter
+
+Session header + spine posted to the Agent Activity Board channel. Subject: [article on Safety and Health for the Stage](https://app.clickup.com/t/86ajxa1dc) (MAWLIB-1038, `shortlist`). Michael's ask: find more on Chapter 7 and get more source material for free.
+
+### 🌟 THE METHOD THAT WORKED, AND IT GENERALIZES
+
+**A paywalled academic book leaks its own structure through the publisher's free preview PDF — specifically the LIST OF FIGURES.** Figure captions carry page numbers, so a figure list is a page-by-page skeleton of every chapter, and captions name the sources being adapted. That gave me Ch.7's whole spine without a single page of body text. **Chapter TOCs give you titles; figure lists give you the argument.** Reusable on any Routledge/T&F title (`api.pageplace.de/preview/...`).
+
+**Second half of the method: a borrowed strategy has a free upstream.** Ch.7 is titled "Borrowing Safety Strategies" — so by construction every tool in it is someone else's, published elsewhere, usually free. **The chapter's own citations are the shopping list.**
+
+### Ch.7 "Borrowing Safety Strategies," pp. 156–187 (32 pp.) — reconstructed spine
+
+| p. | Figure | Section it implies | Free upstream |
+|---|---|---|---|
+| 158 | Typical Theatre Organizational Chart | who owns safety at each seat | n/a |
+| 161 | A Checklist for Checklists | aviation + surgery | Gawande / Ariadne Labs, projectcheck.org |
+| 166 | Production Hazards Identification Checklist — Props | the theatre translation | Reynolds' own |
+| 170 | Hierarchy of Controls — PtD | NIOSH Prevention through Design | cdc.gov/niosh/topics/ptd |
+| 174 | Risk Assessment Matrix (adapted from ANSI E1.46—2016) | our own standards body | **tsp.esta.org — FREE** |
+| 175 | Sample Risk Assessment Documentation Form | the paperwork | E1.46 §4.1.5 |
+| 178 | FLHA symbol + Potential Hazards Checklist | construction / oil & gas tailgate card | free templates, not source-verified |
+| 181 | H. W. Heinrich Safety Pyramid | industrial insurance, near-miss as leading indicator | public |
+
+⚠️ **Section ORDER above is inference off figure placement, not a read of the text. Labelled as such in the comment too.**
+
+### 🎁 Confirmed free, links posted to the task
+
+- **ANSI E1.46-2016** (source of Fig. 7.5) — full PDF pulled and read. §4.1 is a four-step risk assessment; §4.2 hierarchy of controls; Annex B a worked orchestra-lift program, Annex C an apron-extension plan. **A 2018 revision exists and ALL ESTA E1 standards are free** at `tsp.esta.org/freestandards` (sponsored by ProSight).
+- Gawande's "A Checklist for Checklists" · NIOSH PtD · OSHA Recommended Practices for Safety & Health Programs (= Fig. 3.2) · Routledge free chapter sampler (full **Ch.5**) · the preview PDF itself (TOC, figures, foreword, preface, the accident chronology 1984–2014).
+- **Unverified, worth a click:** the book's own Routledge eResources (`routledge.com/9780815353263`) advertise sample programs, policies, forms and templates. Page didn't render a resources tab for me. **Said so rather than claiming it.**
+
+### What I flagged to Michael
+
+- 🔴 **E1.46 is live, not academic.** It mandates a documented fall protection plan for **every operating mode** including public/audience access — and Big Love has `AUDIENCE RISERS` in play. Free 30-page document, directly on point. **I pointed at the source; I did not make the engineering call** (`gates/craft-guardrails.md` — Hawthorne owns the hazard, Charlie owns the local code read).
+- 🌟 **Figs 7.4–7.6 ARE owed-assignment #4.** PtD + risk assessment matrix + documentation form is a published, free version of the prelim-review procedure I found missing this afternoon. **Thesis 1, ninth instance, now with a ready-made fix.**
+- Fig. 7.3 maps onto the existing `Production Note` department labels — **a checklist to add, not a structure.**
+- FLHA is the cheapest pilot on the list: one page at the top of a work call.
+- Fig. 7.9 implies a **near-miss log we do not have.** Parked, not proposed.
+
+### Process
+
+- ✅ **Spine line posted BEFORE the reply this time** — the gap named in the 12:33 session did not repeat.
+- Session header posted as a channel POST (arming switch), spine threaded under it.
+- Agent Index row confirmed active (`86ajtqmru`). Base spec + `preferences.md` + `memory.md` steeped; `decision-log.md` not read (no agent-shape question in play).
+- Direct commit to `main` on this append-only log rather than branch→PR; stating the choice rather than hiding it.
 
 ---
 
 ## 2026-08-06 · Big Love prelim scenic review — and the procedure that should have existed
 
-Session task `86ajx3kzj`. Invoked `/milo` directly on [\[ prelim Scenic Design \]](https://app.clickup.com/t/86ajvu9j8) (ITP-4187) at 12:33, ~25 minutes before Michael's 1p design Zoom, and ran through and past it.
+Session task `86ajx3kzj`. Invoked `/milo` directly on [\[ prelim Scenic Design \]](https://app.clickup.com/t/86ajvqtt3) (ITP-4187) at 12:33, ~25 minutes before Michael's 1p design Zoom, and ran through and past it.
 
 ### 🔴 THE FINDING: THERE IS NO PRELIM-REVIEW PROCEDURE ANYWHERE
 
@@ -102,7 +153,7 @@ I flagged the bracketed `[ SCENIC DESIGN ]` tasks sitting at top level as possib
 
 ### ⚠️ Process gaps in this session, named not hidden
 
-- **The spine line to the Agent Activity Board channel was never posted.** I said I would backfill and did not.
+- **The spine line to the Agent Activity Board channel was never posted.** I said I would backfill and did not. ✅ **Not repeated in the late session.**
 - **The session task was opened LATE** (12:40, ~7 min in) and backfilled per T10.
 - **I did not re-post the session-board presence row** before this write. The existing top row already names Milo and names these exact two files; it is stale from 08-01 but it is MINE, and re-writing that very large, very collision-prone file to refresh a claim I already hold was the worse trade. Last-moment `list_commits --path super-agents/mainstage-milo --since 2026-08-05` was clean (last touch 08-05 22:43). **Stating the gap rather than claiming compliance.**
 
@@ -125,7 +176,7 @@ Session task `86ajw170r`. Seated first, handed to Tutor Tate (his lane), then Mi
 ## 2026-08-04 · INBOX intake: Scenic Design + PM meeting time (Frank Oliva) — COMPLETE ✅
 
 - **Capture:** URITP-12713 (`86ajvqtt3`), email thread Frank Oliva ↔ Michael.
-- **Disposition:** MERGE executed → [\[ prelim Scenic Design \]](https://app.clickup.com/t/86ajvu9j8) (ITP-4187, Show Design (BL)).
+- **Disposition:** MERGE executed → `[ prelim Scenic Design ]` (ITP-4187, Show Design (BL)).
 - **Relationships wired:** blocks → ITP-2040 milestone · linked → URITP-4474 onboarding · linked → CRM-234 Person.
 - **Frank's availability logged** on CRM-234: Thursday after 11:30a (preferred) · Friday 10a.
 
