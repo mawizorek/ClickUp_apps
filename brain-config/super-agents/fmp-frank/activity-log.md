@@ -9,6 +9,19 @@
 
 ---
 
+## 2026-08-06 — Seated on the URITP risk assessment architecture (Michael: "seat Corey and Fiona")
+
+Seated by Milo in session [MAWLIB-1038](https://app.clickup.com/t/36074068/86ajxa1dc). Question: should URITP risk assessments move to FileMaker, and how do ClickUp and FMP coordinate?
+
+- **My answer is not "move it."** The three-system treaty already rules this (`Course List` DL J3, 2026-08-04): repo = permanently true · ClickUp = true now · FileMaker = what WAS true. Applied here: hazard **library** = definition · **active** assessment = ClickUp, where the work happens · **closed-out** assessment for a struck show = FileMaker. A live risk assessment in FileMaker would be a schema serving nobody — the people filling it in are standing in a theatre with a phone.
+- 🔴 **The real seam is the ARCHIVE VERB, and it does not exist in either domain.** Three nouns, no verb; nothing moves a record from current to historical. It is already on Milo's owed list from the course architecture, unowned and untriggered. **Second domain, same hole — that promotes it from a course-side gap to a general one.** Answering "should this go to FileMaker" before the verb exists is answering a question whose implementation is undeliverable, which is why I backed Q4 option D as legitimate rather than a dodge.
+- **Schema read (Corey's live query, not mine to re-run):** 20 scoring fields at folder scope, 85 hazard records across 6 seasons, show-applicability expressed BOTH as a `URITP Productions` multi-select AND as a multi-home. **In FMP terms that is a join table and a repeating field solving the same relationship** — exactly the family-discipline failure my object library exists to refuse. I would not port that shape to FileMaker; I would make Michael pick one side first. **Fixing the duplication is a precondition of any migration, not a step in it.**
+- ⚠️ **Naming, since a name is a contract:** `gen PRODUCTION Hazards` and `GENERAL Shop Hazards` are the same word in two casings and two positions, and `Motorized Hoist Risk Assessment` is a third scoping model (equipment) wearing the same folder. If this ever becomes an FMP table set, the naming gets settled first.
+
+**🌟 First entry for my CORRELATION LEDGER, which has been empty since I was built** — the seam is real and I now have a case: *ClickUp multi-home ↔ FMP join table*. It holds for many-to-many show↔hazard; **it breaks on the archive boundary**, because a multi-home has no lifecycle state and a join row can carry one. That belongs in `memory.md` on my next write, not here.
+
+**State left:** advisory only, zero schema touched, zero repo edits (consult-never-edit intact). Logged as Q4 on the [Risk Assessment CU Notes — Decision Log](https://app.clickup.com/36074068/docs/12cwjm-39553/12cwjm-80553). **Awaiting Michael. Do not begin an FMP build off this thread.**
+
 ## 2026-08-01 — Native shell CONVERTED to thin git-loader (Model A executed)
 
 Trigger: DM w/ Michael. Native runtime (user-ID `-39958890`) acting on Michael's explicit direction: *"i want you to become this new type of agent and document the steps for the next agent… let's just complete your conversion."*
@@ -43,7 +56,7 @@ Session task: [Fleet Build Queue](https://app.clickup.com/t/86ajmepcf) · agent:
 
 **Open surfaces:**
 
-1. **My correlation ledger is empty** — first real session with Dexter starts filling it. Shape: FMP construct → repo equivalent → where it holds → **where it breaks.**
+1. ~~**My correlation ledger is empty**~~ ✅ **First case logged 2026-08-06** (ClickUp multi-home ↔ FMP join table; breaks on the archive boundary). Shape confirmed: FMP construct → repo/ClickUp equivalent → where it holds → **where it breaks.**
 2. **Verify before quoting:** the URITP People record count (~341) and every module's build state are INHERITED and unconfirmed. The lifecycle SoT rule means a planning page is not a live schema.
 3. **Live stale-fork to route, not fix:** the URITP People known-issues checklist tracks FMP-internal field typos as ClickUp checkboxes.
 4. **`memory/archive/` + `activity-log/` not cut yet** — they land on my first rotation.
