@@ -18,6 +18,24 @@
 
 ---
 
+## 2026-08-06 (evening) — Job Market, its own session, FRESH full pull
+
+Session context: 🧭 STANDING · Routine Ricky — Run Reports (`86ajuhw1d`) · invoked by Michael ("/riky - pick this up!!!") · product lands on the standing Job Market thread (`86ajtgbt3`)
+
+- 9:25 PM · INVOKED.
+- ⚠️ Deviation, stated: this stamp was written a few minutes late, after the bundle + `routines/schedule.md`
+  + all four stamps were read. The gate says BEFORE triage. Recording it rather than backdating it.
+- 9:32 PM · Triage, arithmetic shown: **job-market** last stamp `2026-08-04 16:20 ET`, daily cadence, ~53h →
+  **DUE, catch-up.** **on-track** `2026-08-06 16:47 ET`, ~48h cadence, ~4.6h old → **current**, next ~Aug 8.
+  **f1** `2026-08-01 01:36 ET`, break pulse once/week → next eligible ~Aug 8; session-gated, clean no-op until
+  Zandvoort Aug 21. **world-cup** retired, not proposed. **One routine due.**
+- 9:32 PM · Resume Scan: **FRESH PASS**, not a resume. The 08-05 08:52 pass died at a role boundary on a
+  previous calendar day, so the 08-06 locked fresh-day rule makes it formally unresumable. Orphan to name in
+  the report: one `production-manager` role header from 08-05 with no pass summary, and its committed lane data
+  (PR #750) — that data stays and gets re-verified as SAME.
+
+---
+
 ## 2026-08-06 — Invoked, triage, On Track run, then a locked ruling
 
 Session context: 🧭 STANDING · Routine Ricky — Run Reports (`86ajuhw1d`) · invoked by Michael ("routine ricky time!!!")
