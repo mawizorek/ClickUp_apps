@@ -9,6 +9,20 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 ## ➡️ LIVE STATE — what I'm carrying right now
 
+### 🦺 SAFETY PROGRAM BUILD-OUT — Phase 1 LIVE, Phases 2–4 documented and CLOSED to discussion
+
+**Roadmap documented 2026-08-06** as a comment on MAWLIB-1038 (`86ajxa1dc`), derived from Reynolds Ch.7. ⚠️ **Michael read PHASE 1 ONLY and said so explicitly.** Phases 2–4 are written down at his request but **NOT open** — *"that is all I am ready to talk about right now."* **Do not re-litigate or re-propose them in a later session. Wait for him to open them.**
+
+- **Phase 1 (now → Big Love opening):** create `Risk Assessment (BL)`, multi-home the applicable general hazards, write the prelim-receipt trigger, retrofit the current package. Output doubles as EH&S / fire marshal documentation.
+- **Phase 2 (strike → One Acts, Oct–Dec):** post-mortem the pilots; audit the hazard library against Reynolds' department framing; 🔴 **stand up the near-miss log — hardest item, needs a Corey-built surface AND a stated no-blame policy, ship neither without the other.**
+- **Phase 3 (spring):** Prevention through Design. Not a form — it lives on the design meeting agenda. Highest value, third because it needs the credibility Phases 1–2 buy. Tate seam.
+- **Phase 4 (summer):** roll up into the written safety and health program (Reynolds Ch.3, not Ch.7).
+- **Deliberately skipped: Fig 7.1 org chart.** Michael established the ownership map himself on 08-06.
+
+🔴 **PHASE 1 WAS REVISED FROM "BUILD" TO "FIRE" — see the near-miss in the late 08-06 entry. The matrix already exists.**
+
+**Phase 1 open items:** `Risk Assessment (BL)` does not exist (Corey call-in for list mechanics; hazard selection is mine + Michael's) · [Steps in Audience Seating](https://app.clickup.com/t/86a5fbfqz) (URITP-1580) not multi-homed to Big Love · prelim-receipt trigger still unwritten.
+
 ### 🎭 Big Love (F26) — the scenic package is MID-REDESIGN as of 2026-08-06
 
 **Prelims received 8/6** (Frank Oliva, rev 4 AUG 2026, 3 plates, stamped FOR BID ONLY / DO NOT BUILD). Reviewed at a 1p Zoom with Frank + Charlie Lawlor + Kevaughn Harvey + Mary Reiser. **The package did not survive the meeting.**
@@ -18,13 +32,19 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 - ✅ **Agreed direction: SEAM IT AND MAKE THE SEAMS A DESIGN ELEMENT.** Charlie's words, and it is the one constructive path everyone accepted.
 - ✅ **WATER IS STRUCK.** No bathtub, no plinth removal. Michael proposed, Kevaughn and Frank agreed.
 - **Frank is redesigning now**, floating cutting ALL exterior walls for a bowl/amphitheater and one fabric piece instead of two. Charlie proposing a Zoom walkthrough with **Devon** (role unconfirmed on my end).
-- **Budget: $5,500, in-house build — URITP IS THE BIDDER.** ⚠️ **The number was never said out loud in the meeting.** Charlie said "too big" and "most of our budget"; he never said $5,500, so Frank is redesigning against a feeling. **Michael declined to send the follow-up when I offered.**
+- 📅 **8/7 FULL DESIGN TEAM MEETING is the real gate** — Seth (LX, wants lights under the risers) and Padra (sound) join. Riser decision genuinely in play after Mary floated using house risers and chairs. ⚠️ **Michael's prediction, 08-06: *"I bet we are going to lose the audience seating in some way."*** If that lands, the 100 psf occupancy problem and most of the ADA scoping go with it. **Record hazards designed OUT, don't just delete them — that is PtD and it is the cheapest entry in the log.**
+- **Budget: $5,500, in-house build — URITP IS THE BIDDER.** ⚠️ **The number was never said out loud in the meeting.** Charlie said "too big" and "most of our budget"; he never said $5,500, so Frank is redesigning against a feeling. **Michael declined to send the follow-up when I offered on 08-06 afternoon; by that evening he had reframed it as the Budget at a Glance document — see below.**
 - 🔴 **Seat count unresolved: 92 logged vs 108 counted** (12+40+8+14+14+8+12). The 16-seat gap is what the four corner returns are worth — the classic four-sided double-count/drop. Owed from Frank in writing, or from a symbol count in the `.vwx`.
 - **ADA is settled and hardcoded** on ITP-4187: 51–150 band → **4 wheelchair spaces + 4 companion seats**, 5% of aisle seats, 36″/33″, one space per bank. Sourced to 2010 ADA Standards §221/§802.
-- ⚠️ **EH&S and the fire marshal have not been engaged once**, across two meetings. Occupant load must be recalculated (audience on built platforming = **100 psf**, not the 50 we deck at) and that changes posted house capacity → AHJ signoff before tickets go on sale. Charlie owns the NY State / ICC A117.1 read. **I do not certify.**
-- **Tomorrow (8/7) is the real gate:** full design team meeting with Seth (LX, wants lights under the risers) and Padra (sound). The riser decision is genuinely in play after Mary floated using the house risers and chairs.
+- ⚠️ **EH&S and the fire marshal have not been engaged once**, across two meetings. Occupant load must be recalculated (audience on built platforming = **100 psf**, not the 50 we deck at) and that changes posted house capacity → AHJ signoff before tickets go on sale. **🌟 CODE LANE IS MICHAEL'S as of 08-06 — I supply citation, edition, section, link and paper trail; he makes the call.** Charlie remains the shop-side buildability read, which is a different question.
 
 **The element tree, standing as of 8/6** — 9 standalone Design Elements in `Show Design (BL)`: `EXTERIOR WALLS` · `AUDIENCE RISERS` · `ACTING PLATFORM` (Michael cut these three) · `CEILING` · `ENTRANCES + WALKWAYS` · `MASKING + BACKSTAGE` · `REP RISER PARK POSITION` · `EXIT SIGNS + AISLE LIGHTING` · `PSM CAMERA` (mine). All carry inline notes + `Production Note` departments. Plus `PSM calling position?` under ITP-4187.
+
+### 💵 Budget at a Glance — task enriched 2026-08-06, artifact still not produced
+
+[`| budget at a glance |`](https://app.clickup.com/t/86ah4r5r1) (ITP-3243, `Paperwork (BL)`) existed empty since 04-27 and is now a full reference surface: canonical master `/PROGRAM/Guest Artist Documents/BUDGETS-At-a-Glance.Template.F22.doc`, seven precedent per-show PDFs mapped, destination `/PRODUCTIONS/URITP 26-27/1 Big Love/` confirmed live. **Michael's framing: this document IS how the $5,500 gets communicated — not an email.** ⚠️ Filename convention drifted between seasons (`BUDGETS-At-a-Glance` → `Budget-at-a-glance`); **26-27 needs one picked.** Siblings still empty: `| purchase request form |`, `end of show | budget spent summary |`.
+
+**Also owed by Michael (his own, noted not tracked by me):** share **Rebecca** into the Dropbox to unblock costumes. Prelim Costume was due 7/27 and is open while Final Costume + Props List are due 8/10.
 
 ### The URITP list audit (Anna leads; I hold the workspace knowledge)
 
@@ -46,14 +66,15 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 **3 · The ARCHIVE verb (new, 2026-08-04).** The three-system model (repo = definition · ClickUp = current term · FileMaker = history) has three nouns and **no verb**: nothing moves an offering from current to archived. **Unowned and untriggered, that is how the nine enrollment fields happen again** — every one of them was "just this term" once. Michael deferred it deliberately.
 
-**4 · THE PRELIM DESIGN REVIEW TOOL (new, 2026-08-06). PROPOSED, NOT BUILT.** There is no standing procedure for a submitted design package anywhere in the workspace — see the 08-06 entry. I offered a repo hook twice and Michael has neither greenlit nor refused. **The ten gates and the safety content are written into the 08-06 entry below so the next session does not re-derive them.** Procedure-is-a-tool: it belongs in `hooks/`, never in `memory.md`. 🌟 **08-06 late: Reynolds Ch.7 (Figs 7.4–7.6) is the published version of exactly this tool, and its upstream sources are free — see the late entry. If the hook gets greenlit, it should be built ON that method, not from scratch.**
+**4 · 🔴 THE PRELIM-RECEIPT TRIGGER. STILL UNBUILT, AND NOW IT IS THE WHOLE OF PHASE 1.** Michael confirmed the gap in his own words 08-06: *"I should have opened a risk assessment as soon as I got those prelims; that is where I should have centered a bunch of my notes."* **The tool it fires already exists** (see the near-miss below) — what is missing is the trigger plus the ten gates. Gates recorded in the 08-06 afternoon entry. Procedure-is-a-tool: belongs in `hooks/`, never in `memory.md`. **Michael has still neither greenlit nor refused the hook; I offered a third time on 08-06 late.**
 
-**5 · Transcript speaker attribution (new, 2026-08-06).** Reconstructed 5 speakers over a diarization-free transcript and the derivation method worked well enough that Michael kept it. **Also a tool, also unbuilt.** Method recorded in the 08-06 entry.
+**5 · Transcript speaker attribution (new, 2026-08-06).** Reconstructed 5 speakers over a diarization-free transcript and the derivation method worked well enough that Michael kept it. **Also a tool, also unbuilt.** Method recorded in the 08-06 afternoon entry.
 
-**6 · Reynolds source set (new, 2026-08-06 late). AWAITING MICHAEL'S SIT-DOWN PASS.** Free-source haul posted to MAWLIB-1038; a real content pass on Ch.7 → URITP application is scheduled by Michael, not by me. **Nothing built off it yet.**
+**6 · `Risk Assessment (BL)` does not exist (new, 2026-08-06 late).** T/CM and CHR have one; Big Love does not, five weeks from load-in, with audience on built platforming. **Corey call-in for the list mechanics; hazard selection is mine and Michael's.** First multi-home should be URITP-1580.
 
 ### 🅿️ Parked / scheduled — carry, do not force
 
+- **Reynolds Phases 2–4** — documented, explicitly NOT open. Michael opens them, not me.
 - **CRM projection-fan shape — OPEN.** *"you're seeing growing pains."* **Never read a verdict into it.**
 - **ROLES — park #3.** Q1 above is the live thread.
 - **📅 Gen-1 going forward = SCHEDULED:** a session with **Corey + FMP Fiona** (bundle `fmp-frank`). Four queued conversations, no home.
@@ -63,56 +84,63 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 - **Calendar-surface sprawl** (6 surfaces) · the **Routines ↔ Season Planning dividing line** · **access control across 5 surfaces / 3 spaces.**
 - **`| DEFINITIONS FOR PROGRAMS |`** — a real task in Space 1 ▸ Production PROGRAMS at `researching` since **Jan 2025.**
 - 🔴 **`cancelled` is a DONE-type status on `Course List`.** Blocks any automated archive step — a cut course would file as completed history. Corey's to fix.
-- **`memory.md` is at ~12KB against a ~10KB hot target after the 08-06 additions.** A condense pass is owed; nothing culled without Michael.
-- **No near-miss / incident-reporting surface exists anywhere in URITP** (named 2026-08-06 late, off Reynolds Fig. 7.9). Transient-state thesis again. Not raised as a proposal yet.
+- 🔴 **`memory.md` is ~19KB against a ~10KB hot target** after the 08-06 additions. **This is now well past "owed" and into a defect.** A condense pass is required; nothing culled without Michael.
 
 ---
 
-## 2026-08-06 (late, ~10:30p) · Reynolds Ch.7 — recovering a paywalled chapter from its own front matter
+## 2026-08-06 (late, ~10:30p–11:20p) · Reynolds Ch.7 → a roadmap, and a tool I nearly rebuilt
 
-Session header + spine posted to the Agent Activity Board channel. Subject: [article on Safety and Health for the Stage](https://app.clickup.com/t/86ajxa1dc) (MAWLIB-1038, `shortlist`). Michael's ask: find more on Chapter 7 and get more source material for free.
+Session header + spine posted to the Agent Activity Board channel. Subject: [article on Safety and Health for the Stage](https://app.clickup.com/t/86ajxa1dc) (MAWLIB-1038, `shortlist`).
 
-### 🌟 THE METHOD THAT WORKED, AND IT GENERALIZES
+### 🌟 THE RESEARCH METHOD THAT WORKED, AND IT GENERALIZES
 
-**A paywalled academic book leaks its own structure through the publisher's free preview PDF — specifically the LIST OF FIGURES.** Figure captions carry page numbers, so a figure list is a page-by-page skeleton of every chapter, and captions name the sources being adapted. That gave me Ch.7's whole spine without a single page of body text. **Chapter TOCs give you titles; figure lists give you the argument.** Reusable on any Routledge/T&F title (`api.pageplace.de/preview/...`).
+**A paywalled academic book leaks its own structure through the publisher's free preview PDF — specifically the LIST OF FIGURES.** Figure captions carry page numbers, so a figure list is a page-by-page skeleton of every chapter, and the captions name the sources being adapted. That gave me Ch.7's whole spine without a single page of body text. **Chapter TOCs give you titles; figure lists give you the argument.** Reusable on any Routledge/T&F title (`api.pageplace.de/preview/...`).
 
-**Second half of the method: a borrowed strategy has a free upstream.** Ch.7 is titled "Borrowing Safety Strategies" — so by construction every tool in it is someone else's, published elsewhere, usually free. **The chapter's own citations are the shopping list.**
+**Second half: a borrowed strategy has a free upstream.** Ch.7 is literally titled "Borrowing Safety Strategies" — so by construction every tool in it is someone else's, published elsewhere, usually free. **The chapter's own citations are the shopping list.** Confirmed free: ANSI E1.46 (ESTA TSP, source of Fig 7.5) · Gawande's Checklist for Checklists · NIOSH PtD · OSHA Recommended Practices (= Fig 3.2) · Routledge's full Ch.5 sampler.
 
-### Ch.7 "Borrowing Safety Strategies," pp. 156–187 (32 pp.) — reconstructed spine
+⚠️ **Honest limits stated to Michael:** the section ORDER I gave is inference off figure placement, not a read of the text. And **there is no separate "ANSI form"** — E1.46 §4.1 is a method, not a template; Reynolds adapted it.
 
-| p. | Figure | Section it implies | Free upstream |
-|---|---|---|---|
-| 158 | Typical Theatre Organizational Chart | who owns safety at each seat | n/a |
-| 161 | A Checklist for Checklists | aviation + surgery | Gawande / Ariadne Labs, projectcheck.org |
-| 166 | Production Hazards Identification Checklist — Props | the theatre translation | Reynolds' own |
-| 170 | Hierarchy of Controls — PtD | NIOSH Prevention through Design | cdc.gov/niosh/topics/ptd |
-| 174 | Risk Assessment Matrix (adapted from ANSI E1.46—2016) | our own standards body | **tsp.esta.org — FREE** |
-| 175 | Sample Risk Assessment Documentation Form | the paperwork | E1.46 §4.1.5 |
-| 178 | FLHA symbol + Potential Hazards Checklist | construction / oil & gas tailgate card | free templates, not source-verified |
-| 181 | H. W. Heinrich Safety Pyramid | industrial insurance, near-miss as leading indicator | public |
+### 🔴 THE NEAR-MISS: I RECOMMENDED BUILDING A TOOL URITP BUILT IN OCTOBER 2024
 
-⚠️ **Section ORDER above is inference off figure placement, not a read of the text. Labelled as such in the comment too.**
+Before documenting the roadmap I went looking for where a risk assessment matrix would live. **It is already there, and it exceeds the book.**
 
-### 🎁 Confirmed free, links posted to the task
+**`URITP ▸ Risk Assessments`** (folder `90139938724`) holds **`gen PRODUCTION Hazards`** (`901323016889`, ~27 hazards) and **`GENERAL Shop Hazards`** (`901305768314`, ~13). Per-show **`Risk Assessment (T/CM)`** (`901325418552`) and **`Risk Assessment (CHR)`** (`901325828190`) multi-home from those libraries and add show-specific hazards. Task type `Hazard`; mitigations nest as `Task` subtasks.
 
-- **ANSI E1.46-2016** (source of Fig. 7.5) — full PDF pulled and read. §4.1 is a four-step risk assessment; §4.2 hierarchy of controls; Annex B a worked orchestra-lift program, Annex C an apron-extension plan. **A 2018 revision exists and ALL ESTA E1 standards are free** at `tsp.esta.org/freestandards` (sponsored by ProSight).
-- Gawande's "A Checklist for Checklists" · NIOSH PtD · OSHA Recommended Practices for Safety & Health Programs (= Fig. 3.2) · Routledge free chapter sampler (full **Ch.5**) · the preview PDF itself (TOC, figures, foreword, preface, the accident chronology 1984–2014).
-- **Unverified, worth a click:** the book's own Routledge eResources (`routledge.com/9780815353263`) advertise sample programs, policies, forms and templates. Page didn't render a resources tab for me. **Said so rather than claiming it.**
+**The list-scoped schema IS Reynolds Figs 7.5 + 7.6:** `Probability` (1–5) × `Risk Level` (1–5) → `Hazard Rating` in five bands (1-3 Acceptable / 4-6 Monitor / 7-10 Tolerable / 11-16 Avoid / 17-25 Unacceptable). Plus `Controls`, `Control End` (MINIMIZE…), `Description`, `Consequence`, `Who's Affected`, `Area of Risk`, `Who's Responsible`, `Implemented`, `Further Program, Documentation requirements`. **And a full POST-CONTROL RE-SCORE** — `Controlled Probability` / `Controlled Risk Level` / `Controlled Hazard Rating` / `Residual Harm`. **That re-score is the part Reynolds argues hardest for and most programs never build.**
 
-### What I flagged to Michael
+**`gen PRODUCTION Hazards` is Fig 7.3** (Production Hazards Identification Checklist) as a reusable library rather than a paper form.
 
-- 🔴 **E1.46 is live, not academic.** It mandates a documented fall protection plan for **every operating mode** including public/audience access — and Big Love has `AUDIENCE RISERS` in play. Free 30-page document, directly on point. **I pointed at the source; I did not make the engineering call** (`gates/craft-guardrails.md` — Hawthorne owns the hazard, Charlie owns the local code read).
-- 🌟 **Figs 7.4–7.6 ARE owed-assignment #4.** PtD + risk assessment matrix + documentation form is a published, free version of the prelim-review procedure I found missing this afternoon. **Thesis 1, ninth instance, now with a ready-made fix.**
-- Fig. 7.3 maps onto the existing `Production Note` department labels — **a checklist to add, not a structure.**
-- FLHA is the cheapest pilot on the list: one page at the top of a work call.
-- Fig. 7.9 implies a **near-miss log we do not have.** Parked, not proposed.
+**Lesson, and it is the memory rule I already hold, failing in a new direction:** I checked whether a PROCEDURE existed (it didn't) and never checked whether the ARTIFACT the procedure produces existed (it did). **"There is no process for X" does not license "there is no X."** Caught before it reached him, but only because I went looking for a home before writing.
+
+**So the gap is the TRIGGER, not the tool — thesis 1, tenth instance.** Michael independently said the same thing in the same hour: *"I should have opened a risk assessment as soon as I got those prelims."*
+
+### 🔴 The three live Phase-1 gaps
+
+1. **No `Risk Assessment (BL)`.** T/CM has one, CHR has one, Big Love does not — five weeks from load-in, with audience on built platforming.
+2. **Nothing fires the apparatus at prelim receipt.** Excellent machine, manual ignition.
+3. **[Steps in Audience Seating](https://app.clickup.com/t/86a5fbfqz) (URITP-1580) is already scored and already relevant and is NOT on Big Love.** Description *"Seating is on risers with steps"* · Consequence *"slip hazard"* · Controls *"railings on all walkways, stair edges visible at all times"* · P2 × RL3 → Monitor, dropping to Acceptable controlled. Multi-homed to T/CM and CHR. **The argument for the railings is pre-written and one multi-home away from the 8/7 meeting.**
+
+### Delivered
+
+- **Four-phase roadmap** documented as a comment on MAWLIB-1038, with the Phase 1 revision from build→fire.
+- **ANSI links** with the honest caveat, plus what §4.1 contains mapped 1:1 onto the existing fields, plus §3.4.1.3 (plan must cover EVERY operating mode incl. public/audience access) and §3.4.1.1 (duty sits on management, in writing) flagged for his code lane. Annexes B and C named as copyable worked models.
+- **FLHA explained from grounded sources** — what it is, why it differs from a risk assessment (manager-in-advance vs crew-on-the-day), why it suits rotating student crews, four template links, and a proposed URITP cut: front = call/tasks/hazards/signatures, **back = a hazard checklist pulled straight out of `gen PRODUCTION Hazards`. The back of the card is a library query.**
+- 🌟 **Michael's response to FLHA: *"I love the visibility factor!"*** — the signature-line point (a nineteen-year-old invited to say "I'm not comfortable," with a form behind them) is what landed. **Lead with that framing when it gets built.**
+
+### Michael's two corrections this session
+
+**1 · The CODE LANE IS HIS.** *"I would like to be the code guy through support and documentation from you."* My line — "Charlie owns the code read and I don't certify" — was two statements about MY authority that read as a verdict on his. Filed to `memory.md`. **When I name a guardrail, say whose it is.**
+
+**2 · He wanted a ROADMAP, not a triage.** I answered "what do we prioritize" as a two-week critical path; he meant implementation strategy off the material we had just gathered, and said he'd have opened with the global timeline. Filed as a pattern: **a near-term question can be a strategy question wearing a deadline.**
 
 ### Process
 
-- ✅ **Spine line posted BEFORE the reply this time** — the gap named in the 12:33 session did not repeat.
-- Session header posted as a channel POST (arming switch), spine threaded under it.
+- ✅ **Spine posted BEFORE the reply on every turn** — the gap named in the afternoon session did not repeat.
+- Session header posted as a channel POST (arming switch); spine threaded under it; 4 spine lines this session.
 - Agent Index row confirmed active (`86ajtqmru`). Base spec + `preferences.md` + `memory.md` steeped; `decision-log.md` not read (no agent-shape question in play).
-- Direct commit to `main` on this append-only log rather than branch→PR; stating the choice rather than hiding it.
+- ⚠️ **New tooling defect found:** `search_workspace` silently scoped itself to the focused task when a request-scope was set, returning the focus task three times for a workspace-wide query. Filed to `memory.md` defects. **Use `query_tasks` or an app-native search for anything workspace-wide.**
+- Direct commits to `main` on append-only files rather than branch→PR; stating the choice rather than hiding it.
+- ⚠️ **`memory.md` grew again this session and is now ~19KB against a ~10KB target.** Named, not silently accepted.
 
 ---
 
@@ -124,7 +152,7 @@ Session task `86ajx3kzj`. Invoked `/milo` directly on [\[ prelim Scenic Design \
 
 Michael's opening question was *"what notes have I taken in the past about what to do and what to look out for when a new scenic design or prelim is submitted."* I swept the URITP Operations Manual SOP tree, `Paperwork (BL)`, `Show Design (BL)` and `(P0)`, and my own bundle. **Nothing.** The only prelim-review procedure that exists in the workspace is the comment **Michael wrote himself at 11:16 that morning**, ninety minutes before the meeting, from scratch.
 
-**This is my transient-state thesis again, ninth instance, and in a new place: the DELIVERABLE ARRIVES REPEATEDLY and there is no mechanism for RECEIVING it.** Due-date tasks exist. Artifact tasks exist. The act of reviewing what showed up is improvised every single time, by the busiest person in the building, in the last hour.
+⚠️ **AMENDED 08-06 late: the PROCEDURE is missing; the RISK ASSESSMENT APPARATUS IS NOT.** See the late entry. I checked for a process and concluded there was no tool. Those are different questions.
 
 **The ten gates, recorded here so they are not re-derived** (they belong in a `hooks/` file, which is owed assignment #4): 1 provenance · 2 completeness-for-costing · 3 occupancy + load · 4 egress + fire · 5 electrical · 6 trip/slip/marking · 7 overhead · 8 accessibility · 9 operations · 10 money + schedule. **Every gate closes as open / resolved / N-A with a NAME attached, or it does not close.**
 
