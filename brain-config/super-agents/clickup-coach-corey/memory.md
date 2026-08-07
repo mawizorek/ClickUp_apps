@@ -2,7 +2,7 @@
 
 > Context + how-Michael-works. NOT process/skills (those live in preferences.md + the AI Toolkit).
 > Durable changes are QUEUED via Memory Maggie / open-memory-requests, never written silently mid-session.
-> Budget: ~10KB hot (`hooks/memory-rotation.md`).
+> Budget: ~10KB hot (`hooks/memory-rotation.md`). ⚠️ **MEASURE after every write; never estimate.**
 
 ## How Michael works (standing context)
 
@@ -72,7 +72,9 @@ What I'm watching for, across every space regardless of domain:
   URITP BETA BUDGET (holds ▸ LABOR with the shop/crew staffing lists).
 - URITP Programs is the reference "good" program pattern.
 - CRM canonical people lists: STUDENTS + ADULTS. Lean-down = field/workflow/record design inside
-  them, NOT moving people between people lists.
+  them, NOT moving people between people lists. ⚠️ **Two home Lists FORCE two relationship fields;
+  no merge collapses them.** Never hunt that structural fix — it cannot exist here (why: Derived
+  Field Pattern page).
 - Season Planning = slot-planning (P1–P4 + a distinct One Acts slot) + season-operations, not a
   show-selection list.
 - **URITP PRODUCTIONS is folder-per-production AND a template system** (Michael, 07-26: "it's
@@ -81,7 +83,7 @@ What I'm watching for, across every space regardless of domain:
 - **I'm the named call-in on Milo's availability-tracking problem** — recurring availability is
   well-built and genuinely shared (same field ids across spaces); a TIME-BOXED POLL has no
   mechanism, so every poll mints a new list plus hard-coded date fields that persist forever.
-  The mechanism side is mine when he brings it.
+  The mechanism side is mine when he brings it. **(Derived Field Pattern, instance 1.)**
 - **Scheduled working session: Gen-1-going-forward, me + FMP Fiona.** Whether a new show still
   gets a Gen-1 label field; stop cloning option lists from the previous show; the two-phase
   problem; name-or-delete `T.I.M.E. Role ()` on both sides. Do NOT retire or rename Gen-1 label
@@ -89,27 +91,26 @@ What I'm watching for, across every space regardless of domain:
 
 ## Proven patterns (reusable)
 
-- **Schedule Pointer (D4, 2026-08-03):** For irregular recurring events where native ClickUp
-  recurrence can't handle the schedule (exceptions, varied locations, non-interval dates). Single
-  task, always alive. LONG TEXT custom field "Meeting Schedule Index" holds parseable date list
-  (`YYYY-MM-DD HH:MM | Location | Status`). Start/due = next occurrence. AI automation on
-  due-date-pass reads index, advances dates, marks passed. Description stays human-readable.
-  First deployed: Faculty Council Meeting (URITP-8973). Generalizes to any academic-calendar
-  recurring obligation.
-- **Frozen Date Mirror (D5, 2026-08-05, Michael's standing preference):** Where a calendar list
-  must publish dates that survive rescheduling (GCal sync, exports, printed calendars), pair the
-  native `start_date`/`due_date` with folder-scoped DATE custom fields — **`BEGIN` mirrors start,
-  `END` mirrors due** — holding a HARD-CODED copy, time component included. Native dates stay
-  live and movable; the mirror is the stable published value. **Fill on create and on every
-  reschedule.** Empty source date → empty mirror, never a substituted value. First deployed:
-  URITP PRODUCTIONS ▸ CALENDARS (`BEGIN` = `f3abf7f3-287a-40e2-9916-59bb8b9066ea`, `END` =
-  `8bea38fd-7e19-4291-9903-a9ad5e957e43`), backfilled 64 tasks across the KALI 🌐 Calendar view.
-  ⚠️ **NO BULK PATH EXISTS — this is the mechanism gap and it is mine.** The task SQL tool
-  rejects both `SET "custom:BEGIN" = start_date` and a `CASE id WHEN…` map on a date custom field
-  (*"must be a constant value"*), so any backfill is one write per task. **A list adopting this
-  pattern needs an automation (on task create / on date change) or the mirror silently drifts** —
-  same shape as the time-boxed-poll gap above: a value that must track another value, with no
-  native mechanism to keep it tracking.
+- **🔗 DERIVED FIELD PATTERN (named 2026-08-07) — the umbrella over the entry below.** *A field on
+  record A must hold a value that lives on record B, and keep holding it.* ClickUp has no native
+  mechanism; named after the THIRD instance in six weeks, each re-diagnosed cold as if new.
+  🚦 **Load the page before answering ANY "can the field just pull from…" / "keep it in sync
+  with…" / "mirror the…" ask** — blockers, the Q1–Q4 decision, ranked mechanisms, the FMP
+  contrast, the instance register all live there: **Derived Field Pattern — when a value must
+  track another value** (Brain Reference Library ▸ ClickUp Automation). **The line I keep skipping
+  is Q1: STORED, or only SEEN?** ⚠️ **Add an instance row every time it fires.**
+- **Schedule Pointer (D4, 2026-08-03):** irregular recurring events that native ClickUp recurrence
+  cannot express (exceptions, varied locations, non-interval dates). ONE task, always alive; LONG
+  TEXT field "Meeting Schedule Index" holds a parseable list (`YYYY-MM-DD HH:MM | Location |
+  Status`); start/due = next occurrence; AI automation on due-date-pass advances it and marks
+  passed. Description stays human-readable. First deployed: Faculty Council Meeting (URITP-8973).
+  **NOT a Derived Field case** — it derives from a schedule it OWNS, not from another record.
+- **Frozen Date Mirror (D5, 2026-08-05):** an INSTANCE of the umbrella, kept here only for what the
+  page does not own — it is the one case where Q2 is deliberately **never re-drive**, because
+  surviving a reschedule IS the feature. Folder-scoped DATE fields `BEGIN`/`END` hard-copy native
+  start/due (time included), filled on create and on every reschedule; empty source → empty mirror.
+  Live in URITP PRODUCTIONS ▸ CALENDARS (`BEGIN` `f3abf7f3-287a-40e2-9916-59bb8b9066ea`, `END`
+  `8bea38fd-7e19-4291-9903-a9ad5e957e43`). ⚠️ **No automation yet, so it drifts.**
 
 ## Fleet / role context
 
@@ -120,8 +121,8 @@ What I'm watching for, across every space regardless of domain:
 - Corey's lane is singular: URITP workspace structure + ClickUp-setup coaching (schema, list
   connections, automations) + URITP structural/singularity auditing of ClickUp SPACES (his domain,
   distinct from the fleet/general audit) — **plus the cross-board pattern-notes assignment above.**
-- **FMP Fiona** owns FileMaker structure; my "schema" is ClickUp fields, hers is FileMaker. We
-  meet at the FileMaker → ClickUp sync/mirror pattern, and at the Gen-1 session.
+- **FMP Fiona** owns FileMaker structure; my "schema" is ClickUp fields, hers is FileMaker. We meet
+  at the sync/mirror pattern, the Gen-1 session, and the Derived Field Pattern's FMP section (hers).
 - Corey is himself a git-teammate as of 2026-07-19 (native CU config -39958913 retired; verified
   2026-07-26 that no native ClickUp agent for him exists).
 
@@ -136,5 +137,5 @@ What I'm watching for, across every space regardless of domain:
   complete** — it returned "URITP PRODUCTIONS = 6 tasks" for a space holding 425+. Scope to a
   space before trusting any count. Also: `WHERE space = X` matches ASSOCIATED lists while the
   `space` column reports HOME, so multi-homed tasks appear under the wrong space.
-- **A date CUSTOM FIELD is constants-only on `UPDATE`** — no column-to-column copy, no `CASE`
-  map. Any "mirror this date into a field" ask is per-task writes or an automation. (D5 above.)
+- **A CUSTOM FIELD is constants-only on `UPDATE`** — no column-to-column copy, no `CASE` map — so
+  every mirror or backfill is one write per task. Blocker set: Derived Field Pattern page.
