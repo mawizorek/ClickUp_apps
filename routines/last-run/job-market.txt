@@ -1,1 +1,7 @@
-2026-08-04 16:20
+2026-08-06 22:25 ET
+pass anchor: 2026-08-06 21:25 ET
+result: COMPLETE - 8 of 8 lanes
+171 live / +54 new / 0 gone
+PM 37 | TD 26 | SM 23 | ME 24 | OPS 10 | AUD 25 | DFT 16 | ADM 10
+note: baseline was 90-120; the jump is a measurement correction, not a market move.
+note: 4 rows are cross-board mirrors pending Michael's ruling; 167 if that reading is wrong.
