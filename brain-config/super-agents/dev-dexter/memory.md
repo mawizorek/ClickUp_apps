@@ -6,6 +6,8 @@
 >
 > **Budget: ~10KB hot cap.** Enforced by `hooks/memory-rotation.md` at session close.
 > Graduated content lives in `memory/archive/` (loaded on-demand).
+> ⚠️ **OVER CAP (~12KB) as of 08-08 and flagged for rotation since 08-03.** The theme
+> summary and the older EARNED tail are the archive candidates.
 
 ---
 
@@ -16,6 +18,12 @@ slug. Live at `https://mawizorek.github.io/ClickUp_apps/<slug>/` (Pages, ~60s la
 Root = apps + infra only. `brain-config/` is Brain's config tree in the same repo.
 The MCP token authenticates as **`maw-agents`** — a COLLABORATOR, not the owner.
 Always address the repo as `mawizorek/ClickUp_apps`.
+
+⚠️ **MY LANE IS NO LONGER ONE REPO (08-08).** I built in **`mawizorek/doc-render-engine`**
+— a Python/MkDocs engine with its own instance model, its own workflows and no relation
+to the apps repo's laws. `preferences.md` still says "the repo," singular. **Before
+applying an apps-repo rule anywhere else, check that it is a rule of THAT repo.** The
+size budget, `.nojekyll` and the two-artifact ship are apps-repo facts, not physics.
 
 ## 📐 The numbers I enforce
 
@@ -34,12 +42,36 @@ the table. Size is a budgeting heuristic for how big to let a file GET; it is ne
 evidence about whether a given read succeeded. And per B18: an inherited number is not
 evidence, so do not quote this range as physics either.
 
+🔴 **AND I APPLIED THAT RULE IN THE SAFE DIRECTION ONLY (08-08).** I refused to edit a
+**27KB** workflow, told Michael it was past my cap, and handed him a manual edit. He
+pushed back. **It read whole on the first attempt.** "Size is not evidence a read
+succeeded" cuts both ways: it is equally not evidence a read will FAIL. **Attempt the
+read, then judge the body.** Refusing on a number is caution that functions as refusing
+work — and it produced a wrong claim to Michael, which is worse than the risk it dodged.
+
 **Operating posture (LOCKED):** modular is just how we build — invisible like
 indentation. Do NOT ask "should I split this?" and do NOT narrate routine splits.
 The ONLY time size reaches Michael: no clean seam exists. Seams: styles vs logic,
 render modules by screen, shared state/constants, pure helpers, entry/wiring.
 **Render vs assemble is a proven seam on an editable table** (one cell's markup + edit
 lifecycle in one module, the table around it in another — prism v3.2).
+
+## 📝 Comment budget — prose is a size problem too (EARNED 08-08)
+
+**A config file that is 70% rationale cannot be read whole, and the one thing that must
+stay safely editable becomes the thing nobody can safely edit.** `publish.yml` hit 27KB
+against ~40 lines of actual steps. Cut to 10.2KB with every step byte-identical.
+
+- **The split:** rationale → a sibling `<file>-dl.md`. Mechanism stays in the file, with a
+  one-line `⚠️` on genuinely dangerous lines plus a `§ section` pointer for the why.
+- **Same shape as the rules I already hold** — procedure lives in a tool and the agent
+  points at it; a decision log sits beside a descriptor, not inside it. **The size budget
+  applies to comments, not just code.**
+- ⚠️ **The failure mode of the cut itself:** the first extraction left every line carrying
+  its `#` prefix, so markdown rendered each one as a heading and the file was unreadable
+  as a document. **Re-read the extracted file AS the format it now is.**
+- Struck reasoning stays struck, never deleted — a silently rewritten comment teaches
+  nobody why it rotted.
 
 ## 📄 README standard
 
@@ -54,6 +86,12 @@ conflict), **GENERATED** (mechanically derived, never hand-edit), or **PROJECTIO
 **Consolidation principle:** author once at the canonical layer; everything else points.
 If the same authored fact lives in two non-mirror places, one is trickle-down — delete
 it and point. This is the abstraction behind every "why are there two of these" collapse.
+
+⭐ **INDEPENDENTLY CONFIRMED CROSS-RUNTIME (08-08).** Fiona reached the same three-layer
+taxonomy from FileMaker — canonical / projection / archive — with the sharper corollary:
+**a flag meaning "this row is not real" is the schema saying the row should not exist.**
+That is my "never hand-edit a generated surface," stated as a smell you can grep for.
+**The taxonomy is the shared vocabulary between our runtimes; use her words for it.**
 
 ## Architecture locks
 
@@ -86,7 +124,8 @@ it and point. This is the abstraction behind every "why are there two of these" 
 - **Large writes corrupt.** >~30KB never goes through `create_or_update_file`.
 - **A file too big to READ is a file too big to EDIT** — `create_or_update_file` needs
   full content, so an over-cap file cannot be safely appended to at all. Report it
-  blocked; never reconstruct the unread part.
+  blocked; never reconstruct the unread part. ⚠️ **But establish that it IS too big by
+  attempting the read** (08-08), not by reading its byte count off a listing.
 - **Silent helpers are worse than throwing ones.** A NO-OP transform hides the bug.
 - **A unit assumption with no assertion kills features silently.**
 - **Changing a key's derivation orphans everything keyed on it.**
@@ -114,6 +153,11 @@ to rot. Per-app opinions: `memory/archive/app-specific-context.md`.
 - Collapses duplicates on sight. Never propose a mirror.
 - Keeps the reasoning, not just the outcome. Don't tidy away roads not taken.
 - States the directive up front and expects it to hold.
+- **He pushes from VS Code mid-conversation (08-08).** Two of my merges hit conflicts on
+  reads that were seconds old. **Re-fetch immediately before the write, not before the
+  branch** — and expect his version to be the better one when they disagree.
+- 🔴 **"Such prose is classic YOU SLOP" (08-08).** Length is a defect he names directly.
+  Rationale is welcome; rationale living where the mechanism lives is not.
 - **Repo apps only.** A ClickUp AI artifact is not a deliverable to him — it is at best
   a throwaway harness, and offering one as the product reads as not having built it.
 - **He will kill a NET-NEW app in favour of upgrading an existing one.** "Viewer vs
@@ -128,9 +172,21 @@ turn; I hold how the codebase actually IS across sessions. **Style Stu** owns
 look/feel; I own theme-contract compliance. **Scope Skye** checks me expanding.
 **Recon Renata** = repo audit lens. **Anna** leads formal audits. **Felix** stewards
 the fleet. **Corey** owns ClickUp side — my domain stops at the repo boundary.
+**Fiona** is the cross-runtime partner: she consults on repo apps and never edits them,
+and her canonical/projection/archive vocabulary is now shared with mine.
 
 ## EARNED (generalizations only — full stories in archive)
 
+- 🔴 **READ THE DIRECTORY BEFORE CREATING A FILE IN IT (2026-08-08).** I authored a fresh
+  `.github/workflows/README.md` to hold rationale — and `publish-dl.md` was already there
+  doing exactly that, written by Michael. Caught it only because I listed the folder to
+  verify a byte count. **Fifth second-claimant instance in one session and the only one an
+  agent committed.** The check is one call and it is cheaper than the merge. Sibling of the
+  consolidation principle, aimed at my own hands instead of at the repo.
+- 🔴 **CHECK WHETHER THE CONTENT ALREADY SPEAKS THE FORMAT (2026-08-08).** Michael had been
+  authoring `maw-prose` in engine dialect for weeks with no instance to render it. The
+  work was three config files, not an engine change. **Before scoping work to teach a
+  system a format, verify it is not already being written in it.**
 - 🔴 **A DOC THAT PROMISES AN EXTENSION POINT MAY NOT HAVE ONE (2026-08-03).** Prism's
   README and its ClickUp task both advertised a "lens-registry pattern: add a detector +
   a render module, shell unchanged" for a month. No registry existed — routing was a
@@ -153,7 +209,10 @@ the fleet. **Corey** owns ClickUp side — my domain stops at the repo boundary.
   information, not an obstacle.
 - **"Already satisfied" is a valid and common answer.**
 - **Every hand-maintained index is on a growth curve toward unwriteable.** The growth
-  is always prose, never rows; its own registration flow breaks first.
+  is always prose, never rows; its own registration flow breaks first. ⚠️ **And a
+  platform can force one:** a `workflow_dispatch` `choice` list cannot be computed,
+  because inputs are read before any job starts. That one is a limit, not a decision —
+  so it gets a loud comment instead of a refactor.
 - **A lock date is not a freshness guarantee.** On conflicting locks, newer + live
   evidence wins. Prescriptive text rots faster than descriptive text.
 - **`get_file_contents` returns real bodies.** The branch raw URL is the liar.
