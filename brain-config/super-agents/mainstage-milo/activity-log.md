@@ -44,6 +44,17 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 [`| budget at a glance |`](https://app.clickup.com/t/86ah4r5r1) (ITP-3243, `Paperwork (BL)`) is now a full reference surface: master at `/PROGRAM/Guest Artist Documents/BUDGETS-At-a-Glance.Template.F22.doc`, seven precedent PDFs mapped, destination `/PRODUCTIONS/URITP 26-27/1 Big Love/` confirmed. ⚠️ **Filename convention drifted between seasons; 26-27 needs one picked.** Also owed by Michael: **share Rebecca into Dropbox** to unblock costumes (Prelim Costume was due 7/27 and is open while Final Costume + Props List were due 8/10).
 
+### 🗄️ PRODUCTION MAWSTER — the calendar app is being REBUILT (new 2026-08-08, not mine to build)
+
+Michael and **FMP Fiona** spent ~4h on the v1 schema of a fresh FileMaker app that replaces `ProductionCalendarFormat`. **This is MY operational surface** — the 11×17 production calendars and the contact sheets — so I carry the state even though the build is hers.
+
+- 🔴 **The legacy calendar app holds exactly ONE production at a time.** `SETUP` was 20 fields / 1 record / almost entirely GLOBAL storage, with six hardcoded scripts swapping the globals per show. **Every calendar I have ever printed came out of a file that could not hold two shows.**
+- **Docs live in the REPO** (`mawizorek/maw-prose` → `apps/production-mawster/`), decisions in *Production MAWster FMP — Decision Log*. Not a ClickUp-canonical build.
+- 🔴 **Two doc-page corrections owed on** [URITP Production Calendars FMP](https://app.clickup.com/36074068/docs/12cwjm-52833/12cwjm-61333): it says **11 tables (it is 9)** and claims multi-production support via SETUP records (**false**). I have quoted that page.
+- 🔴 **Five live bugs found in the RUNNING file, reported not fixed.** The one that matters operationally: `RGB ( $R ; $G ; $R )` appears in two scripts, so **blue takes red's value and every status colour on every calendar I have printed is wrong.** Also three overlap-flag scripts with no resolution, a shipped debug dialog, `One Acts INFO` carrying TIME's course number, two `<Missing Field>` entries in the import map.
+- ⚠️ **Q5 on that DL is a fold-in question in MY domain:** is Production MAWster the same app as [URITP Production Build FMP](https://app.clickup.com/36074068/docs/12cwjm-52833/12cwjm-80793), which was spec'd and LOCKED 08-07 to the same scope and never started? **Two pages, one app.** Michael's ruling owed.
+- ⚠️ **Relevant to the calendar-surface sprawl park below** — this is a sixth+ surface unless it absorbs others.
+
 ### The URITP list audit (Anna leads; I hold the workspace knowledge)
 
 🌟 **ALL SEVEN SPACES PASS-1 COMPLETE.** **Index: 236 rows**, verified **2026-08-04 2:58 PM ET** against `901327881037`. 🔴 **This block said 154 for five days and I quoted it as fact** — a stamp proves WHEN, not that it is still true. **Re-query before quoting.**
@@ -66,18 +77,33 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 
 **6 · `Risk Assessment (BL)`** — ✅ **CLOSED 08-07: deliberately not built** (Q6). Reopens when the package locks.
 
+**7 · 🆕 CREW CALLS — a document that does not exist anywhere** (surfaced 08-08 in the Production MAWster schema session, and it is MINE). **A call carries person, role, call time, report LOCATION and who called it. A calendar event drops all but the time.** So it is a library-vs-instance question of exactly the shape I already argued for hazards: third document, or a view of the production calendar? ⚠️ **The FMP build has deliberately left room for it** — `WORKDAYS` is not closed as the only day surface, and `LOCATIONS` now exists so a report location can resolve. **Nothing is blocked on it, which is why it will keep not happening.** Owed: a recommendation, not a build.
+
 ### 🅿️ Parked / scheduled — carry, do not force
 
 - **Reynolds Phases 2–4** — documented, explicitly NOT open. **Michael opens them, not me.**
 - **CRM projection-fan shape — OPEN.** *"you're seeing growing pains."* Never read a verdict into it.
-- **📅 Gen-1 going forward = SCHEDULED:** a session with **Corey + FMP Fiona**. Four queued conversations, no home.
-- **One Acts format** + **the three umbrella folders' placement** → Pass 2 by decision.
+- **📅 Gen-1 going forward = SCHEDULED:** a session with **Corey + FMP Fiona**. Four queued conversations, no home. ⚠️ **08-08: Michael ran a Corey-and-Fiona-shaped session WITHOUT me in it** (Production MAWster). Neither was formally seated — both were consulted by profile — so this is not the Gen-1 session, but it is evidence the pairing happens whether or not it is scheduled.
+- **One Acts format** + **the three umbrella folders' placement** → Pass 2 by decision. ⚠️ **08-08 ruling, narrow but real:** `One Acts F26` is simply the production's NAME — season-in-title is intentional, not drift. Does not settle the grain question.
 - **SHOW TEMPLATE Q7 open:** three fields (`Department`, `Phase`, `Venue`) no production uses.
 - **Space-4 Q4:** where the stalled-pilot / superseded line falls.
 - **Calendar-surface sprawl** (6 surfaces) · **Routines ↔ Season Planning line** · **access control across 5 surfaces / 3 spaces.**
 - **`| DEFINITIONS FOR PROGRAMS |`** — `researching` since **Jan 2025.**
 - 🔴 **`cancelled` is a DONE-type status on `Course List`.** Blocks any automated archive step. Corey's.
 - 🔴 **`memory.md` is ~21KB against a ~10KB hot target.** Past owed, into defect. Condense pass required; nothing culled without Michael.
+
+---
+
+## 2026-08-08 · Production MAWster — consulted, not seated; one owed item earned
+
+Not my session. Fiona drove the v1 schema of the production calendar rebuild ([task](https://app.clickup.com/t/86ajy1neb)) with Michael building the FMP file in parallel. **My profile was read in so the production-convention half could be weighed, and two findings landed in my lane.** Full state in the LIVE STATE block above.
+
+- **What I contributed, via the consult:** the One Acts grain concern (ruled moot — the season is in the name on purpose) and **crew calls**, which became standing assignment 7. The crew-call shape is the same library-vs-instance argument I made for hazards, one domain over.
+- 🔴 **The operational headline: every production calendar I have printed came out of a single-production file with a colour bug.** `RGB ( $R ; $G ; $R )` in two scripts means blue renders with red's value. Nobody noticed because nobody had a reason to check a colour against a spec that was never written down — the calendars have no legend.
+- ⚠️ **Two doc-page facts I have quoted are wrong** (11 tables, multi-production support). Corrections owed on *URITP Production Calendars FMP*.
+- ⚠️ **A locked spec in my domain named a blocker that was already cleared:** Production Build FMP step 0 says Corey owes `calls` and `R` on the Contact Sheet list; Michael's correction was flat — they exist. **A locked page recorded work as OWED and nobody was watching whether it had been done.**
+
+**State left:** nothing built, nothing changed on my surfaces. Crew calls is a recommendation I owe.
 
 ---
 
