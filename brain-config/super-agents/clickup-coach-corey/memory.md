@@ -15,6 +15,8 @@
   builds a mechanism cheaply, later graduates it to a real structure, leaves v1 in place as history.
   RECEIPTS FY25-26 → BETA BUDGET · Gen-1 per-show label fields → contact sheets joined to a role
   catalog · the older `Theatre` template/naming conventions → the current SHOW TEMPLATE.
+- 🔴 **WHEN HE IS BUILDING, HE IS NOT READING** (2026-08-08, observed via consult). Two or three lines,
+  one finding, no restating. Same floor as `team-standard.md` v1.8's DO NOT RESTATE.
 
 ## 🗺️ WORKSPACE SCOPE MAP (Michael's ruling, 2026-07-26 — load this before any cross-space claim)
 
@@ -88,6 +90,9 @@ What I'm watching for, across every space regardless of domain:
   gets a Gen-1 label field; stop cloning option lists from the previous show; the two-phase
   problem; name-or-delete `T.I.M.E. Role ()` on both sides. Do NOT retire or rename Gen-1 label
   fields before that session — they are the entire pre-FY26 company archive.
+  ⚠️ **2026-08-08: Michael ran a Corey-and-Fiona-shaped session without either of us seated**
+  (Production MAWster — both consulted by profile). Not the Gen-1 session, but evidence the pairing
+  happens whether or not it is scheduled.
 
 ## Proven patterns (reusable)
 
@@ -111,6 +116,44 @@ What I'm watching for, across every space regardless of domain:
   start/due (time included), filled on create and on every reschedule; empty source → empty mirror.
   Live in URITP PRODUCTIONS ▸ CALENDARS (`BEGIN` `f3abf7f3-287a-40e2-9916-59bb8b9066ea`, `END`
   `8bea38fd-7e19-4291-9903-a9ad5e957e43`). ⚠️ **No automation yet, so it drifts.**
+
+## 🔴 A MULTI-SELECT LABEL FIELD IS NOT AN INTEGRATION KEY (EARNED 2026-08-08)
+
+`URITP Productions` is a **labels** field, so one task can carry two shows and **no export view can
+reliably scope to one production.** Harmless while everything is read inside ClickUp; the moment a
+downstream system imports off a view, the ambiguity becomes that system's problem — one row that
+legitimately belongs to two shows, meeting a receiving key that assumes one.
+
+- The FMP side mitigated it with **per-production export views + a compound key** (`TaskID` +
+  `fkProduction`). That works, and it costs **one hand-maintained view per show** plus a new view
+  before any new show's first import.
+- 🚦 **Michael wants ONE view with the production passed as a runtime parameter — that is API-ONLY.**
+  A CSV export is a static file with nothing to pass, so per-show views are the CSV-era stopgap.
+- ⚠️ **MINE TO VERIFY, still unverified:** do CSV multi-value labels come back comma-separated inside
+  one quoted cell, and does any show title contain a comma?
+- **The generalization:** before a ClickUp field becomes an integration key, ask whether it can hold
+  MORE THAN ONE VALUE. A multi-select is a good human affordance and a bad join.
+
+## ⚠️ A LOCKED PAGE CAN RECORD WORK AS OWED TO ME AFTER I HAVE DONE IT (EARNED 2026-08-08)
+
+The Production Build FMP spec named **step 0 as my blocker** — create `calls` and `R` on the Contact
+Sheet list. Michael's correction was flat: **they exist.** The spec's only named blocker was stale, and
+anyone reading it cold believed a whole pipeline was blocked on me.
+
+🔴 **This is the wrong-PERSON blind spot the Doc-Rot Sweep structurally cannot see** — the path
+resolves, the file exists, no locked rule contradicts it. Fleet-Fact-Sweep shape, but inside a DOMAIN
+spec rather than a fleet file. **When a page assigns me work, the ledger of whether it is done is mine,
+not the page's.**
+
+## 🧭 Sometimes the right answer is NOT a ClickUp field (2026-08-08)
+
+Michael declined a CU-side canonical event-type dropdown; classification moved to a **FileMaker
+crosswalk with an unmatched queue** that learns instead of guessing. And ClickUp does not emit a
+LOCATION on an event task, so that stayed out of v1 as a future upgrade rather than a gap.
+
+Worth holding beside the native-primitive instinct: reaching for the native ClickUp primitive is
+usually right, but **"which system should carry this at all" comes first**, and the answer is sometimes
+the other runtime. Michael reaches for the fewest moving parts, not for my domain.
 
 ## Fleet / role context
 
