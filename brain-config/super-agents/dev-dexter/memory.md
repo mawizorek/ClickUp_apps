@@ -51,7 +51,7 @@ entry/wiring. **Render vs assemble is a proven seam on an editable table** (pris
 whole is a file nobody edits safely, so the one thing that must stay editable becomes the thing that
 cannot be.
 
-| Stays in the file | Moves to `<file>-dl.md` |
+| Stays in the file | Moves to the sibling |
 |---|---|
 | the steps, values, conditions | why a step exists at all |
 | a one-line `§ section` pointer | the incident that created the rule |
@@ -60,9 +60,9 @@ cannot be.
 Same rule this repo already applies elsewhere: procedure lives in a tool and the agent points at it; a
 decision log sits beside the descriptor, not inside it. **Result: 27KB → 10.2KB, zero behaviour change.**
 
-🔴 **AND I NEARLY SHIPPED A RIVAL.** `publish-dl.md` already existed — Michael had started the split —
-and I was one merge away from adding a `README.md` next to it holding the same rationale. **Before
-creating a rationale/ADR/notes file, list the directory and check for the sibling that already owns
+🔴 **THE SUFFIX IS `<file>-dl.md` AND IT IS MICHAEL'S, NOT MINE.** I invented `README.md` for the same
+job and was one merge from shipping it beside `publish-dl.md`, which he had already created. **Before
+creating a rationale / ADR / notes file, list the directory and look for the sibling that already owns
 it.** Fifth second-claimant near-miss surfaced that session and the only one that was mine.
 
 ## 🎯 Canonical / generated / projection
@@ -79,6 +79,13 @@ projection / **archive**, arrived at from a print-config move rather than from d
 bucket differs because a database has append-only history and a static site does not. **Two runtimes,
 two authors, one model: that is the shared vocabulary Michael is pulling the repo toward, and it is now
 demonstrated rather than asserted.** Her side: `super-agents/fmp-frank/memory.md` C5.
+
+## 🔢 SEQUENCE NUMBERS GO IN TENS (EARNED 2026-08-08)
+
+Agents wrote `02-tables`, `07-scripts`, `09-file-imports-temp`. Michael renamed all three to **`20-`,
+`70-`, `90-`** and immediately used the gap (`10-user-experience`, `11-runtime`). **Units leave no room
+to insert; tens do.** A sequence number is an ordering INTERFACE, not a count — same reason BASIC line
+numbers went by tens. Applies to folders, ordered docs, and `order:` front-matter.
 
 ## 📄 README standard
 
@@ -140,9 +147,15 @@ not keep an inventory here — that's a third index waiting to rot.
 - Builds by voice — names/commands must survive dictation.
 - Collapses duplicates on sight. Never propose a mirror.
 - Keeps the reasoning, not just the outcome. Don't tidy away roads not taken.
-- 🔴 **HE IS OFTEN EDITING THE SAME FILES WHILE I WRITE.** Three merge conflicts in one session
+- 🔴 **HE IS OFTEN EDITING THE SAME FILES WHILE I WRITE.** Five merge conflicts in one session
   (2026-08-08) from his local pushes landing mid-PR. **Re-read HEAD and rebuild on top of his version;
   never merge over him.** His renames were better than mine every time.
+- 🔴 **THE DIFF IS THE STYLE GUIDE, AND IT IS THE CHEAPEST ONE AVAILABLE (2026-08-08).** He asked Dave,
+  Fiona and me to *"review the pushes i made during this session and see what I EDITED from what you
+  made."* **He does not describe his preferences; he rewrites the file.** So after any session where he
+  edited over agent output, diffing his version against ours is a free style extraction — it produced
+  eight conventions in one pass. **Read the diff before asking him what he wants.** Full ledger:
+  `super-agents/documentation-dave/memory.md` B3–B12 (form is Dave's lane, not mine).
 - 🔴 **"CLASSIC YOU SLOP" is about PROSE VOLUME, not quality.** He will tell me the actual content is
   right and the wrapper is bloat. Short, one finding, no restating.
 - **Repo apps only.** A ClickUp AI artifact is not a deliverable — offering one as the product reads as
@@ -157,7 +170,9 @@ attacks what I ship. **Feasible Finn** judges buildability in one turn; I hold h
 IS across sessions. **Style Stu** owns look/feel; I own theme-contract compliance. **Scope Skye** checks
 me expanding. **Recon Renata** = repo audit lens. **Anna** leads formal audits. **Felix** stewards the
 fleet. **Corey** owns ClickUp side. **Fiona** owns FileMaker and the object library — she consults on my
-builds and never edits them, and C5 above is the seam paying off.
+builds and never edits them, and C5 above is the seam paying off. **Documentation Dave** owns the FORM
+of a prose document and the house-style ledger — **code files are mine, prose documents are his, and a
+README is prose.** He is the one who should have owned the `-dl.md` suffix question I got wrong.
 
 ## EARNED (generalizations only — full stories in archive)
 
