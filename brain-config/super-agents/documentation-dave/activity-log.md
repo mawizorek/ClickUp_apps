@@ -4,6 +4,50 @@ LIVE STATE. Newest at the top. Read this before assuming anything about what Dav
 
 ---
 
+## 2026-08-08 · SECOND SESSION · the diff as the style guide (no stamp taken)
+
+Seated at the very end of the Production MAWster schema session
+([task](https://app.clickup.com/t/86ajy1neb)) — Michael named me alongside Fiona and Dexter:
+*"you and DEX should review the pushes i made during this session and see what I EDITED from
+what you made to begin getting a sense of how to write better."*
+
+**⭐ The method is the finding, and it is mine to keep.** Eleven table docs and six prose pages
+were drafted by agents and then rewritten IN PLACE by Michael, five times, mid-session.
+**Reading that diff produced eight concrete conventions in one pass** — and Ledger B2 already
+says he names benchmarks by pointing at an artifact rather than describing a preference. **So
+the diff is a better source than any interview would have been.** Filed as B3–B12.
+
+**What the diff said, in one line each:** folder numbers go in TENS not units · **the first tsv
+column is a CONFIRMATION STATE (`{.conf}`), not a sort ordinal** · field names carry a
+lowercase type prefix (`date_`, `bool_`, `cu`) · the tsv mirrors FMP's own field dialog column
+for column · case distinguishes the pair (`PRODUCTIONS.tsv` / `productions.md`) · sections are
+bare singular rows closed by `- EOF -` · audit fields are spelled out rather than pointed at ·
+a field name states the concept, never the format (`PDF_Path` → `ExportPath`).
+
+🔴 **The biggest single miss was B4.** Agents read the first column as sort order and wrote
+`1, 2, 3…`; it is actually *"has this field been confirmed against the live build."* **A `.tsv`
+in this tree is a build tracker, not a static list** — which changes what the document is FOR,
+not merely how it looks. Shape carrying meaning is exactly my lane and I would have missed it
+too if I had only been handed the finished files.
+
+🔴 **And one near-miss was an agent's, not his: B11.** Dexter invented `README.md` to hold
+relocated rationale while `publish-dl.md` — Michael's own convention for the same job — already
+sat in that directory. Caught pre-merge. **`<file>-dl.md` is the house suffix. List the
+directory before creating a rationale file.**
+
+**No stamp was taken and that is correct.** Michael asked for a READ, not a ship, and I was
+seated after the merges rather than last-before-them. **Per instruction 1, stamping after
+someone else has written is void** — so this session produced ledger entries only.
+
+⚠️ **`apps/production-mawster/data-standards.md` is provably STALE against B5**: it documents
+`calc_`, `g_` and `fk` while his live practice adds `date_`, `bool_` and `cu`. Reported, not
+fixed — the content is Fiona's domain.
+
+**Owed:** D3 — whether B3–B10 belong in a person's memory at all, or get promoted to an FMP
+app-doc standard. **Placement is Maggie's call. Not self-authorized.**
+
+---
+
 ## 2026-08-05 · BUILT
 
 Bundle created. Graduated from an `inventory-only` Agent Index row. Five files, standard
