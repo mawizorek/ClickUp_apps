@@ -1,98 +1,6 @@
 {
-  "version": "2026-08-06",
+  "version": "2026-08-09",
   "events": [
-    {
-      "series": "MotoGP",
-      "kind": "FP1",
-      "tier": "practice",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-07T06:45:00-04:00",
-      "end": "2026-08-07T07:30:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "Practice",
-      "tier": "practice",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-07T11:00:00-04:00",
-      "end": "2026-08-07T12:00:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "FIM Speedway",
-      "kind": "World Cup Semi-Final 2",
-      "title": "FIM Speedway World Cup \u2014 Riga",
-      "detail": "Bikernieki, Riga",
-      "timeTBD": true,
-      "date": "2026-08-07",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "FP2",
-      "tier": "practice",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-08T06:10:00-04:00",
-      "end": "2026-08-08T06:40:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "Qualifying",
-      "tier": "quali",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-08T06:50:00-04:00",
-      "end": "2026-08-08T07:30:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "Sprint",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-08T11:00:00-04:00",
-      "end": "2026-08-08T11:45:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "FIM Speedway",
-      "kind": "Grand Prix",
-      "title": "Speedway GP of Latvia",
-      "detail": "Bikernieki, Riga",
-      "timeTBD": true,
-      "date": "2026-08-08",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Xfinity Race",
-      "title": "HyVee Perks 250",
-      "detail": "Iowa Speedway",
-      "start": "2026-08-08T17:00:00-04:00",
-      "end": "2026-08-08T20:00:00-04:00",
-      "platforms": [
-        "The CW"
-      ]
-    },
     {
       "series": "MotoGP",
       "kind": "Warm Up",
@@ -141,7 +49,7 @@
     {
       "series": "NASCAR",
       "kind": "Race",
-      "title": "Iowa Corn 350",
+      "title": "Iowa Corn 350 Powered by Ethanol",
       "detail": "Iowa Speedway",
       "start": "2026-08-09T15:30:00-04:00",
       "end": "2026-08-09T19:00:00-04:00",
@@ -162,9 +70,9 @@
     },
     {
       "series": "NASCAR",
-      "kind": "Truck Race",
-      "title": "Truck Series at Richmond",
-      "detail": "Richmond Raceway",
+      "kind": "Support Race",
+      "title": "Black's Tire 250 presented by BTS Rewards",
+      "detail": "Richmond Raceway (O'Reilly Auto Parts or Truck Series \u2014 series unconfirmed this pass)",
       "start": "2026-08-14T19:30:00-04:00",
       "end": "2026-08-14T22:00:00-04:00",
       "platforms": [
@@ -186,7 +94,7 @@
       "series": "Formula E",
       "kind": "Race",
       "title": "London E-Prix (Round 16)",
-      "detail": "ExCeL London Circuit",
+      "detail": "ExCeL London Circuit \u2014 season finale double-header",
       "timeTBD": true,
       "date": "2026-08-15",
       "platforms": [
@@ -208,7 +116,7 @@
       "series": "MotoAmerica",
       "kind": "Superbike Race 1",
       "title": "MotoAmerica Superbikes at Virginia",
-      "detail": "VIRginia International Raceway",
+      "detail": "VIRginia International Raceway (Aug 14\u201316 weekend; Superbike tripleheader reported, third race unverified)",
       "timeTBD": true,
       "date": "2026-08-15",
       "platforms": [
@@ -265,7 +173,7 @@
       "series": "Formula E",
       "kind": "Race",
       "title": "London E-Prix (Round 17)",
-      "detail": "ExCeL London Circuit",
+      "detail": "ExCeL London Circuit \u2014 season finale",
       "timeTBD": true,
       "date": "2026-08-16",
       "platforms": [
@@ -342,8 +250,19 @@
       ]
     },
     {
+      "series": "MXGP",
+      "kind": "Qualifying Race",
+      "title": "MXGP of The Netherlands",
+      "detail": "Arnhem (Round 16)",
+      "timeTBD": true,
+      "date": "2026-08-22",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "Supercars",
-      "kind": "Races 1 & 2",
+      "kind": "Races 26 & 27",
       "title": "Century Batteries Ipswich Super 440",
       "detail": "Queensland Raceway (AEST race day \u2014 ET window TBD)",
       "timeTBD": true,
@@ -369,8 +288,19 @@
       "tier": "quali",
       "title": "Michelin GT Challenge at VIR",
       "detail": "VIRginia International Raceway",
-      "start": "2026-08-22T16:45:00-04:00",
-      "end": "2026-08-22T17:25:00-04:00",
+      "start": "2026-08-22T16:50:00-04:00",
+      "end": "2026-08-22T17:35:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "Supercars",
+      "kind": "Race 28",
+      "title": "Century Batteries Ipswich Super 440",
+      "detail": "Queensland Raceway \u2014 Sprint Cup finale (3:20 PM AEST)",
+      "start": "2026-08-23T01:20:00-04:00",
+      "end": "2026-08-23T03:00:00-04:00",
       "platforms": [
         "Stream"
       ]
@@ -387,17 +317,6 @@
       ]
     },
     {
-      "series": "Supercars",
-      "kind": "Race 3",
-      "title": "Century Batteries Ipswich Super 440",
-      "detail": "Queensland Raceway (AEST race day \u2014 ET window TBD)",
-      "timeTBD": true,
-      "date": "2026-08-23",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
       "series": "SailGP",
       "kind": "Race Day 2",
       "title": "ROCKWOOL Germany Sail Grand Prix",
@@ -406,6 +325,17 @@
       "date": "2026-08-23",
       "platforms": [
         "CBS Sports Network"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "MXGP Race 2",
+      "title": "MXGP of The Netherlands",
+      "detail": "Arnhem (Round 16)",
+      "timeTBD": true,
+      "date": "2026-08-23",
+      "platforms": [
+        "Stream"
       ]
     },
     {
@@ -423,9 +353,9 @@
       "series": "IMSA",
       "kind": "Race",
       "title": "Michelin GT Challenge at VIR",
-      "detail": "VIRginia International Raceway (2h40m \u2014 ET start unverified)",
-      "timeTBD": true,
-      "date": "2026-08-23",
+      "detail": "VIRginia International Raceway (2h40m)",
+      "start": "2026-08-23T12:10:00-04:00",
+      "end": "2026-08-23T14:50:00-04:00",
       "platforms": [
         "Unknown"
       ]
@@ -480,7 +410,7 @@
       "series": "NASCAR",
       "kind": "Xfinity Race",
       "title": "Wawa 250",
-      "detail": "Daytona International Speedway",
+      "detail": "Daytona International Speedway (NASCAR O'Reilly Auto Parts Series)",
       "start": "2026-08-28T19:30:00-04:00",
       "end": "2026-08-28T22:00:00-04:00",
       "platforms": [
@@ -534,6 +464,17 @@
       ]
     },
     {
+      "series": "FIM Speedway",
+      "kind": "World Cup Final",
+      "title": "BOLL FIM Speedway World Cup Final",
+      "detail": "PGE Narodowy, Warsaw (racing starts 7:00 PM CEST)",
+      "start": "2026-08-29T13:00:00-04:00",
+      "end": "2026-08-29T16:00:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "IndyCar",
       "kind": "Race 1",
       "title": "Milwaukee Mile Race 1",
@@ -545,21 +486,10 @@
       ]
     },
     {
-      "series": "FIM Speedway",
-      "kind": "World Cup Final",
-      "title": "FIM Speedway World Cup Final",
-      "detail": "PGE Narodowy, Warsaw",
-      "timeTBD": true,
-      "date": "2026-08-29",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
       "series": "NASCAR",
       "kind": "Race",
       "title": "Coke Zero Sugar 400",
-      "detail": "Daytona International Speedway",
+      "detail": "Daytona International Speedway \u2014 regular season finale",
       "start": "2026-08-29T19:30:00-04:00",
       "end": "2026-08-29T23:00:00-04:00",
       "platforms": [
@@ -638,7 +568,7 @@
       "kind": "FP1",
       "tier": "practice",
       "title": "Italian Grand Prix",
-      "detail": "Monza",
+      "detail": "Monza (session times carried forward, unverified this pass)",
       "start": "2026-09-04T06:30:00-04:00",
       "end": "2026-09-04T07:30:00-04:00",
       "platforms": [
@@ -650,11 +580,23 @@
       "kind": "FP2",
       "tier": "practice",
       "title": "Italian Grand Prix",
-      "detail": "Monza",
+      "detail": "Monza (session times carried forward, unverified this pass)",
       "start": "2026-09-04T10:00:00-04:00",
       "end": "2026-09-04T11:00:00-04:00",
       "platforms": [
         "Apple TV"
+      ]
+    },
+    {
+      "series": "WEC",
+      "kind": "Free Practice 1",
+      "tier": "practice",
+      "title": "Lone Star Le Mans",
+      "detail": "Circuit of the Americas (session times TBC by promoter)",
+      "timeTBD": true,
+      "date": "2026-09-04",
+      "platforms": [
+        "Unknown"
       ]
     },
     {
@@ -673,7 +615,7 @@
       "kind": "FP3",
       "tier": "practice",
       "title": "Italian Grand Prix",
-      "detail": "Monza",
+      "detail": "Monza (session times carried forward, unverified this pass)",
       "start": "2026-09-05T06:30:00-04:00",
       "end": "2026-09-05T07:30:00-04:00",
       "platforms": [
@@ -696,7 +638,7 @@
       "kind": "Qualifying",
       "tier": "quali",
       "title": "Italian Grand Prix",
-      "detail": "Monza",
+      "detail": "Monza (session times carried forward, unverified this pass)",
       "start": "2026-09-05T10:00:00-04:00",
       "end": "2026-09-05T11:00:00-04:00",
       "platforms": [
@@ -707,7 +649,7 @@
       "series": "WSBK",
       "kind": "Race 1",
       "title": "Acerbis French Round",
-      "detail": "Circuit de Nevers Magny-Cours (session times unverified this pass)",
+      "detail": "Circuit de Nevers Magny-Cours (Round 9, Sep 4\u20136; session times unverified this pass)",
       "timeTBD": true,
       "date": "2026-09-05",
       "platforms": [
@@ -715,10 +657,21 @@
       ]
     },
     {
+      "series": "MXGP",
+      "kind": "Qualifying Race",
+      "title": "MXGP of T\u00fcrkiye",
+      "detail": "Afyonkarahisar (Round 17)",
+      "timeTBD": true,
+      "date": "2026-09-05",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "F3",
       "kind": "Feature Race",
-      "title": "Monza (Round 8 \u2014 season finale)",
-      "detail": "Autodromo Nazionale Monza",
+      "title": "Monza (Round 8)",
+      "detail": "Autodromo Nazionale Monza (penultimate round \u2014 season ends at Madrid, Sep 11\u201313)",
       "start": "2026-09-06T02:15:00-04:00",
       "end": "2026-09-06T03:05:00-04:00",
       "platforms": [
@@ -751,7 +704,7 @@
       "series": "WEC",
       "kind": "Race",
       "title": "Lone Star Le Mans",
-      "detail": "Circuit of the Americas",
+      "detail": "Circuit of the Americas (6 Hours; start time TBC by promoter)",
       "timeTBD": true,
       "date": "2026-09-06",
       "platforms": [
@@ -770,10 +723,21 @@
       ]
     },
     {
+      "series": "MXGP",
+      "kind": "MXGP Race 2",
+      "title": "MXGP of T\u00fcrkiye",
+      "detail": "Afyonkarahisar (Round 17)",
+      "timeTBD": true,
+      "date": "2026-09-06",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "IndyCar",
       "kind": "Race",
       "title": "Grand Prix of Monterey",
-      "detail": "WeatherTech Raceway Laguna Seca",
+      "detail": "WeatherTech Raceway Laguna Seca \u2014 season finale",
       "start": "2026-09-06T14:30:00-04:00",
       "end": "2026-09-06T17:00:00-04:00",
       "platforms": [
@@ -789,6 +753,18 @@
       "end": "2026-09-06T21:00:00-04:00",
       "platforms": [
         "USA Network"
+      ]
+    },
+    {
+      "series": "NHRA",
+      "kind": "Final Eliminations",
+      "title": "Cornwell Quality Tools NHRA U.S. Nationals",
+      "detail": "Lucas Oil Indianapolis Raceway Park \u2014 regular season finale (Labor Day Monday)",
+      "start": "2026-09-07T12:00:00-04:00",
+      "end": "2026-09-07T17:00:00-04:00",
+      "platforms": [
+        "FS1",
+        "FOX"
       ]
     }
   ]
