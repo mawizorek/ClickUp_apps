@@ -5,7 +5,7 @@ type: runbook
 status: active
 trigger: "/data-refresh · /refresh (TRIAGE) · /refresh run (execute everything DUE) · /refresh run -<routine> (execute DUE minus an exclusion) · /refresh run <routine> [<routine>] (execute a named set) · ANY plain-language equivalent of those (see Plain language below — 'ricky refresh minus job hunt' is a contract, not a lucky parse) · \"run the refresh\" · \"what needs refreshing\" · a bare `Ricky` (his default_runbook → TRIAGE) · or pointing any session at this file and saying \"run this process\""
 steward: routine-ricky
-version: 3.4
+version: 3.5
 added: 2026-07-26
 ---
 
@@ -55,8 +55,22 @@ v1–v2 of this file carried its own poll registry, its own `cadence` column, it
 - **A named routine that is RETIRED does not run** even if you name it explicitly. Revival is Michael's call.
 - **A named routine with no runbook does not run.** Say so; never improvise a pull.
 - **Exclusions never apply to the stamp or the report.** Everything that DID run stamps and reports normally.
+- 🔢 **RUN ORDER IS LIGHTEST FIRST, HEAVIEST LAST — AND JOB MARKET IS ALWAYS LAST** (LOCKED 2026-08-09, Michael: *"do job market last tho and make that standard"*). See the next section. This is a property of the RUN, not of any one routine, so it lives here and not in `schedule.md` or in a runbook.
 
 > **Why the exclusion syntax exists (2026-08-01):** Job Market is daily and therefore reads as due on almost every invocation, so "run the set but not that one" is the common case, not an edge case. Before this, the only way to express it was to triage and then reply in prose. That worked, but it made the fast path a two-turn conversation.
+
+## 🔢 Run order — heaviest last (LOCKED 2026-08-09, Michael)
+
+**In any multi-routine run, execute in ascending order of weight and finish with the heaviest. Job Market is always last.**
+
+The reasoning, because the rule is worth re-deriving rather than obeying blindly:
+
+- **Rule 13 says stop at a routine BOUNDARY. Run order decides how many boundaries you get to.** Running the heaviest routine first means the one thing most likely to exhaust a session is also the thing standing between you and every cheap, fast win behind it. Reversed, the light routines are already finished and stamped before the risk arrives.
+- **The failure this prevents is asymmetric.** A session that dies inside Job Market having already landed On Track costs one unfinished routine. The same session in the other order costs one unfinished routine *plus* two that were never attempted and now read as untouched to the next triage.
+- **Weight is measured in BOUNDARIES, not minutes.** Job Market is last because it is 8 lanes with per-lane commits, not because it is slow. A routine with internal commit boundaries is heavy by definition — it is the one that can end mid-way and leave orphans.
+- **Current order:** On Track → F1 → Job Market. F1 sits second because it is usually a clean no-op that resolves in one read, and a no-op costs nothing wherever you put it.
+- ⚠️ **This is not a cadence and not an on/off switch.** It never goes in `schedule.md`'s table — that table answers *whether and how often*, never *in what sequence*. Sequencing is a property of the RUN, which is what this file owns.
+- ⚠️ **An explicitly named set still runs in this order.** `run f1 job-market on-track` executes On Track → F1 → Job Market. The naming picks the set, not the sequence. If Michael genuinely wants a specific order he will say so, and a stated order always wins.
 
 ## 🗣️ Plain language works, and that is a CONTRACT (LOCKED 2026-08-01, Michael)
 
@@ -64,7 +78,7 @@ v1–v2 of this file carried its own poll registry, its own `cadence` column, it
 
 **Resolve any invocation in three reads, in this order:**
 
-1. **Who** — a name token (`Ricky`, `/ricky`, `Rickey`, `/rickey`, `routine`) resolves through the Agent Index per `gates/agent-invocation-gate.md` STEP 0. **A misspelling is a transcription artifact, not a new agent** — resolve it and state the reading in one clause.
+1. **Who** — a name token (`Ricky`, `/ricky`, `Rickey`, `routine`) resolves through the Agent Index per `gates/agent-invocation-gate.md` STEP 0. **A misspelling is a transcription artifact, not a new agent** — resolve it and state the reading in one clause.
 2. **Mode** — is there a run verb? `run` · `go` · `do it` · `fire` · `execute` · `refresh them` → **RUN.** No verb, or an asking verb (`what's due`, `check`, `status`, `anything stale`) → **TRIAGE.** ⚠️ **Ambiguous → TRIAGE.** Triage is read-only and ends in a question, so guessing wrong costs one turn; guessing wrong toward RUN spends real work Michael did not ask for.
 3. **Scope** — everything after the mode is a routine list. See the two tables below.
 
@@ -112,7 +126,7 @@ v1–v2 of this file carried its own poll registry, its own `cadence` column, it
    - **Session-aware routines** (F1) are *eligible*, not *due* — the runbook decides. Say "eligible, runbook will check," not "due."
    - ⚠️ **Never decide a routine is on or off by reading its own frontmatter.** `schedule.md`'s table is the only switch (LOCKED 2026-07-30). A `status:` key in a runbook header is orientation, and if it disagrees with the table it is rot to fix, not a signal to obey.
 3. **PROPOSE, then stop.** One compact readout ending in a real question. **Run nothing yet.**
-4. **On "go" → EXECUTE** the approved runbooks from `routines/` **in complete loops** (README rule 13), **STAMP** each one's own last-run file per THE STAMP LAW, then **post ONE run report** to the standing thread. Per `routines/README.md`, an approved run is not re-gated mid-flight.
+4. **On "go" → EXECUTE** the approved runbooks from `routines/` **in complete loops** (README rule 13) **and in the run order above**, **STAMP** each one's own last-run file per THE STAMP LAW, then **post ONE run report** to the standing thread. Per `routines/README.md`, an approved run is not re-gated mid-flight.
 
 **Why triage is the default:** there is **no scheduler** — git-teammates have no autonomous triggers, and the native agent that held the clock is gone. So a routine is only as current as the last invocation, **every invocation is potentially a catch-up**, and other agents or Michael may have run and stamped something already. Ricky's first job on waking is to find out what the world actually did, not to assume his own last run is the truth.
 
@@ -206,6 +220,7 @@ The full floor is **Data-Refresh Discipline** in `routines/README.md` (13 rules)
 - **Registered routines only** — a routine is real when it has a runbook in `routines/` and a row in `schedule.md`. No improvised pulls. **A spoken scope word that matches nothing is not a routine** — say so, never invent one.
 - **Never assert a stale fact to complete the routine.** Incomplete and honest beats complete and wrong.
 - **Never skip or compress a step to finish faster.** README rule 13. A long procedure is long on purpose.
+- **Never reorder the run to finish faster either.** The order is lightest-first for a reason, and it is the one sequencing decision that is NOT the executor's to improvise.
 - **An exclusion is never a switch.** One invocation only; the schedule table is the switch.
 - **Never make Michael restate a request in notation.** State your reading in one clause and go.
 - **A screenshot from Michael outranks anything cached.** Re-verify from scratch.
@@ -222,6 +237,7 @@ The full floor is **Data-Refresh Discipline** in `routines/README.md` (13 rules)
 
 ## Changelog
 
+- **v3.5 (2026-08-09) — RUN ORDER became a written rule.** Michael, mid-run: *"do job market last tho and make that standard."* Added the **Run order** section (lightest first, heaviest last, Job Market always last) plus a bullet in the RUN rules and a matching guardrail. **Why it belongs HERE and not in `schedule.md`:** that table answers *whether and how often*, and it has already been fenced twice against absorbing things that are not cadence (a mode flag, 2026-07-30; an output contract, same day). Sequencing is a property of the RUN, and the RUN is what this file owns. **The rule's real content is that weight is measured in BOUNDARIES, not minutes** — Job Market goes last because it is 8 lanes with per-lane commits and is therefore the only routine that can end mid-way and leave orphans, which is precisely what rule 13 asks an executor to avoid. Ordering it last converts the worst case from *one unfinished routine plus two never attempted* into *one unfinished routine*.
 - **v3.4 (2026-08-01) — plain language promoted from "probably parses" to CONTRACT.** Michael asked whether the casual form (*"/rickey refresh minus job market"*) would work. It almost certainly would have — **and that was the problem:** it worked by model goodwill, not by written rule, so the next session could quietly answer differently. Added the **Plain language** section: the three-read resolution order (who → mode → scope), the exclusion-word list (`minus` / `except` / `but not` / `without` / `skip`), an **ambiguous-means-TRIAGE** rule, the stop-and-ask cases, and a **routine-alias table**. That table is the real find: Michael says **"job hunt,"** which appears nowhere in the runbook, the schedule row, or the state file — all of which say `job-market` — so a literal matcher would have found no such routine.
 - **v3.3 (2026-08-01) — the template moved OFF the ClickUp task and into this file, and the subset-run invocation was added.** Michael: *"template should live in repo as procedure notes. not clickup task scratch."* v3.2 had parked the full run-report template in the standing task's description with the reasoning *"so it can be tuned without a commit"* — **which is exactly the defect, not a feature:** a format with no diff, no history and no review is how a spec rots invisibly, and it also split one truth across two homes. The task is now purely the record surface. Also added the **Invocation syntax** table, including `/refresh run -<routine>` — because Job Market is daily and therefore reads as due nearly every invocation, so "the set minus that one" is the common case and previously took two turns to say.
 - **v3.2 (2026-08-01) — the RUN REPORT half was missing, and the stamp rule contradicted itself.** Added Output shape 2 (run report) and pointed it at the new standing thread, because `report-to:` in two of three active runbooks named an "executor's reporting standard" that had never been written and the third named a chat channel. Corrected the stamping section: success + partial stamp, failure + no-op do not (the old "stamp including a failure" wording disagreed with its own body, with `routines/README.md`, and with Ricky's profile). Folded in README rule 13 (complete loops) and the frontmatter-is-not-a-switch rule.
