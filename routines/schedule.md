@@ -25,6 +25,7 @@ What that changes, concretely:
 | **On Track** · `on-track-refresh.md` | Every **other day** (~48h stale) | `last-run/on-track.txt` | Motorsports TV listings refresh. Upgraded from weekly (Wednesday) 2026-08-02 per Michael. |
 | **F1** · `f1-refresh.md` | **Thu–Sun**, session-aware | `last-run/f1.txt` | Eligible on any invocation Thu–Sun, but the runbook decides: it only refreshes if an F1 session has actually finished since the last stamp. Otherwise a clean no-op. **Summer break through Aug 21 (Dutch GP Zandvoort, sprint weekend).** During break: eligible once/week (any day) as a pulse; still session-gated so always a clean no-op until sessions resume. |
 | **Job Market** · `job-market-refresh.md` | **Daily** | `last-run/job-market.txt` | Non-academic live-entertainment production roles, geography ANYWHERE, level at or above PM. **STANDING INVENTORY model** (v3): every pass re-states the whole market to one ClickUp thread (`86ajtgbt3`) as a templated header + SAME/NEW/GONE/NOTABLE/SOURCES replies. **Sameness is the report** — a flat pass is a real finding, never a no-op. Creates no tasks and sends nothing. See the daily-cadence note below. |
+| **Agent Memory Report** · `agent-memory-report.md` | **Weekly** (any day) | `last-run/agent-memory-report.txt` | Fleet-wide memory bundle health diagnostic. Read-only: measures sizes against rotation budgets, flags who needs Maggie's attention. References `_shared/bundle-measurement-spec.md` + `routines/agent-memory-watchlist.md`. Output: comment on standing task thread. |
 | **World Cup** · `world-cup-refresh.md` | 🏁 **RETIRED** 2026-07-26 | `last-run/world-cup.txt` *(frozen)* | Tournament ended Jul 19, 2026. Row kept as the template for the next one. **The bracket APP is still live** — retiring a routine is not retiring an app. |
 
 **To check whether anything is stale:** ask Ricky (`/session.agent=Ricky` — a bare call triages and proposes), or read a routine's `last-run` file and compare it to the cadence above yourself.
@@ -71,6 +72,7 @@ On invocation, for every ACTIVE routine, read its `last-run` file and compare ag
 - **Day-of-week cadence** ("every Wednesday"): due if last-run is older than the most recent occurrence of that day. After success, write now.
 - **Every-other-day cadence** (On Track): due if last-run is older than ~48 hours. Same catch-up logic as daily: one pass covers any gap, labeled a catch-up if the gap exceeds one period.
 - **Daily cadence** (Job Market): due if last-run is older than today. `never` on a daily routine is still NEVER RUN, not "infinitely overdue" — see below.
+- **Weekly cadence** (Agent Memory Report): due if last-run is older than 7 days. One pass covers any gap.
 - **Session-aware cadence** (F1, Thu–Sun): eligible on those days; the runbook checks whether a session finished since last-run and refreshes only if so. Stamp only on an actual refresh.
 - **`never`** means NEVER RUN. Report it as exactly that — never as a huge overdue interval. Rendering an unset stamp as arithmetic is lying with numbers.
 - **A stamp you could not READ is not `never` either.** Unreadable is its own answer: say "unknown," never substitute a default.
