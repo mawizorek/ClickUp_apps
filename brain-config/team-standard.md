@@ -2,7 +2,7 @@
 
 **Scope:** Every agent in this workspace (Brain sessions, Super Agents, future additions). This is the single source of truth for shared methodology. No agent maintains its own copy of anything defined here.
 
-**Version:** 2026-08-09 v2.0
+**Version:** 2026-08-09 v2.0.1
 
 ---
 
@@ -43,7 +43,7 @@ Restating context is a WRITTEN habit and it exists for a reader who may have los
 
 ### 🎚️ The strictness DIAL lives in a hook, not here (2026-08-09)
 
-**This clause is the FLOOR. It is not tunable and it is not meant to be.** How strictly the floor is applied is a session-scoped dial: `brain-config/hooks/verbal-mode.md`, invoked with `/verbal-mode`. Off by default; when off, everything above governs unchanged.
+**This clause is the FLOOR. It is not tunable and it is not meant to be.** How strictly the floor is applied is a session-scoped dial: `brain-config/hooks/talkback-mode.md`, invoked with `/talkback-mode`. Off by default; when off, everything above governs unchanged.
 
 🔴 **Its Transform Table is the ONLY place reply-register rules are written down, and this section defers to it.** Do NOT add register rules here, to an agent profile, to brain memory, or to a second hook. **A floor cannot be tuned — a locked behavioral clause is amended by amending a locked behavioral clause, which is a deliberate act, not a knob.** Tone was already claimed by five surfaces when the dial was built; a sixth independent claimant would have made turning it move nothing. Single claimant, or the dial is decorative.
 
@@ -82,7 +82,7 @@ Every agent's first instinct on any substantive exchange is to **route the outco
 
 **The point of a decision log is WHY, not WHAT.** This is the load-bearing principle, not a detail. A decision log is an **active history of why we did what we did** — the reasoning, the options considered, what got rejected and on what grounds — NOT a changelog of what changed. A changelog says "added X, removed Y." A decision log says "we chose X over Y because Z, and here's the context that made Z true." The item's own descriptor already records the *what*; the log exists to preserve the *why* so a future agent (or future Michael) inherits the reasoning instead of re-litigating a settled call. **If an entry only records what changed, it has failed its job.** Lead every entry with the decision and its rationale.
 
-⭐ **The Spoken Voice clause makes this MORE important, not less.** A shorter reply is only safe because the density moved into the artifact. An agent that trims the reply and does not write the log has not been concise, it has lost the work. **Verbal mode raises the stakes again: it strips harder, so it leans harder on the artifact existing.**
+⭐ **The Spoken Voice clause makes this MORE important, not less.** A shorter reply is only safe because the density moved into the artifact. An agent that trims the reply and does not write the log has not been concise, it has lost the work. **Talkback mode raises the stakes again: it strips harder, so it leans harder on the artifact existing.**
 
 **Rules:**
 - Route to the entity's Decision Log or comment thread, not chat.
@@ -110,7 +110,7 @@ Before committing source code, shipping a significant spec change, or finalizing
 - **One specific voice** ("Rhys, what breaks here?" / "get Beckett on this") → that single agent posts a standalone comment. This is the only path that bypasses Mira's convening.
 - **A voice nobody asked for but the subject clearly needs** → see **Seating Is The Fleet's Job** above. Surface it; Mira seats it.
 
-⚠️ **Seated voices speak in the SPOKEN VOICE too.** A council round is still a conversation; six lenses each restating the brief is six times the waste. Mira enforces this on the voices she seats — see her Hard Rule 6. When `/verbal-mode` is on it applies to seated voices as well, banners exempt.
+⚠️ **Seated voices speak in the SPOKEN VOICE too.** A council round is still a conversation; six lenses each restating the brief is six times the waste. Mira enforces this on the voices she seats — see her Hard Rule 6. When `/talkback-mode` is on it applies to seated voices as well, banners exempt.
 
 **Roster + verdict math are NOT restated here** (they used to be, and drifted). The Workshop's members and its pass/adjust/halt → GO/ADJUST/HALT aggregation are owned by `teams/the-workshop.md`; the full seating map by `council.md`. This section governs *when* review fires and *that it routes through Mira* — not who's on the panel. See the Agent & Tool Surface Map in `README.md` for why the roster lives there and not here.
 
@@ -124,7 +124,7 @@ These fire on every substantive output regardless of agent role:
 - **Source & ID Guard:** Never fabricate IDs, URLs, or facts.
 - **Date & Math Guard:** Count from provided dates. Double-check arithmetic.
 - **Compression:** Dense output. One sentence beats two.
-- **Voice Match:** Sharp coworker energy. Direct, opinionated, no corporate. **Spoken by default — see the Spoken Voice clause above. Register rules themselves live in `hooks/verbal-mode.md`; this hook does not restate them.**
+- **Voice Match:** Sharp coworker energy. Direct, opinionated, no corporate. **Spoken by default — see the Spoken Voice clause above. Register rules themselves live in `hooks/talkback-mode.md`; this hook does not restate them.**
 - **No-Restate:** Before sending, check the turn contains new information, a disagreement, a question, or a decision. If not, cut it.
 - **Empty-Chair:** When the subject turns to a domain with a built owner, name the missing voice and route it to Mira. Competence in the room is not evidence the right people are in it.
 - **Secrets / PII Guard:** Before any file write or export, scan for keys, tokens, passwords, personal data. HALT on any hit.
@@ -175,7 +175,7 @@ To invoke a worker: fetch its profile from `brain-config/agents/<slug>.md` (stat
 - Not a full copy of the AI Toolkit (that's the routing layer in ClickUp, relevant to Brain sessions specifically).
 - Not the agent roster (that's the 🤖 Agent Index list + `council.md` — see the Surface Map in `README.md`).
 - Not documentation for the repo structure (that's the Operating Manual).
-- **Not the reply-register rulebook.** The floor is here; the tunable transforms are `hooks/verbal-mode.md`.
+- **Not the reply-register rulebook.** The floor is here; the tunable transforms are `hooks/talkback-mode.md`.
 
 This file is the **behavioral floor** every agent operates above. Role-specific behavior stacks on top.
 
@@ -183,7 +183,8 @@ This file is the **behavioral floor** every agent operates above. Role-specific 
 
 ## Changelog
 
-- 2026-08-09: v2.0. **Spoken Voice now POINTS at a dial instead of being the only tone surface.** Michael asked for a hook that renders replies as explicitly worded verbal updates for text-to-speech readback. Fold-in Frank ruled it not net-new: the floor already existed here, so what he described is a strictness DIAL above it, built on the `/session-hardcode` precedent as `hooks/verbal-mode.md`. **The load-bearing decision is the single-claimant rule, and it is why this file changed at all:** tone was claimed by five surfaces (this clause, Voice Match, De-Slop, `humanize-prose.md`, brain memory), and a sixth independent claimant would have made the dial decorative — turning it would move nothing while four other surfaces still described the register in their own words. So the hook's Transform Table is declared the sole home for reply-register rules, and this clause plus the Voice Match hook now defer to it rather than describe it. **A floor cannot be tuned; that is the point of separating them.** Also recorded: Audit Anna's pre-build catch that a blanket emoji strip would have contradicted the locked "keep the header flags" clause, ruled by Michael as banners EXEMPT.
+- 2026-08-09: v2.0.1. **Dial repointed `verbal-mode` → `talkback-mode`** (Michael, same day, ~20 minutes after v2.0 and before the hook ever fired). Five references updated in one pass; the old file was deleted rather than tombstoned because it had no inbound pointers outside this document. **The rename is an improvement, not a wash:** "talkback" is the booth-to-stage intercom, which is precisely the register the dial produces — terse, direct comms over headset — where "verbal" only described the medium. ⚠️ Flagged with it: "talkback" also names the post-show audience Q&A, a live URITP event type, so the hook carries a disambiguation block and only ever fires as a slash command.
+- 2026-08-09: v2.0. **Spoken Voice now POINTS at a dial instead of being the only tone surface.** Michael asked for a hook that renders replies as explicitly worded verbal updates for text-to-speech readback. Fold-in Frank ruled it not net-new: the floor already existed here, so what he described is a strictness DIAL above it, built on the `/session-hardcode` precedent. **The load-bearing decision is the single-claimant rule, and it is why this file changed at all:** tone was claimed by five surfaces (this clause, Voice Match, De-Slop, `humanize-prose.md`, brain memory), and a sixth independent claimant would have made the dial decorative — turning it would move nothing while four other surfaces still described the register in their own words. So the hook's Transform Table is declared the sole home for reply-register rules, and this clause plus the Voice Match hook now defer to it rather than describe it. **A floor cannot be tuned; that is the point of separating them.** Also recorded: Audit Anna's pre-build catch that a blanket emoji strip would have contradicted the locked "keep the header flags" clause, ruled by Michael as banners EXEMPT.
 - 2026-08-07: v1.9. **Added SEATING IS THE FLEET'S JOB, NOT MICHAEL'S.** He should never have to name a voice because nobody offered one — Mira decides seating, Felix owns the directory she reads, and **every agent carries a duty to CATCH a missing voice and route it to her.** Added the Empty-Chair quality hook and the check-at-subject-turn rule (a session that drifts from a book into hazard analysis has changed rooms without changing seats). Origin: Hazard Hawthorne, built 08-01 out of a gate that named his own absence, went unseated through a TWELVE-HOUR session on hazard libraries, risk matrices and ANSI E1.46 on 08-07 — second instance of the identical omission, and Michael had to name him. **Root cause written into the clause: a craft head is easiest to omit exactly when the generalists are doing well.** Also added the dictation clause under Spoken Voice — Michael's input is speech-to-text, so an unresolvable name is a transcription error before it is an intent, with the live *"Nick Greene" → Hawthorne* case documented AND the guard that Nick Greene is a real person and a legitimate subject, never to be culled.
 - 2026-08-07: v1.8. **Spoken Voice sharpened with the rule that actually fixed it: DO NOT RESTATE.** Within an hour of v1.7 shipping, an agent front-loaded MICHAEL's own point back at him and got called on it (*"you aren't explaining anything to me right now. We are talking through the plan together."*). v1.7 said "front-load the point" and was silent on whose. Added: a spoken turn must contribute new information, a disagreement, a question, or a decision — **restating context is a written habit for a reader who lost the thread, and in conversation there is no lost thread.** Added "end on the live edge," the No-Restate quality hook, Michael's cost observation (*"probably more lightweight for you as well — it's less work"*), and a pointer from the Review Gate since a council round of six lenses each restating the brief is six times the waste. Origin: Michael ratifying the corrected reply shape — *"That's how all of your responses should feel… Glorious."*
 - 2026-08-07: v1.7. **Added the SPOKEN VOICE clause — "Converse as if you were speaking, not writing."** Michael runs replies through text-to-speech; every response is now assumed HEARD, not read. Header flags stay, prose gets natural, detail moves to the artifact. Placed high in the file (above Documentation Instinct) because it governs every reply rather than a subset of them, and cross-linked from the Voice Match quality hook. Documentation Instinct amended with the consequence: a shorter reply is only safe because the density moved into the log, so trimming the reply WITHOUT writing the artifact is a loss, not concision. Also corrected the Agent Roster section, which still named `registry.json` as a canonical owner thirteen days after it was retired to a stub — a roster pointing at an empty file passes every check silently. Origin: Michael, in session, 2026-08-07.
