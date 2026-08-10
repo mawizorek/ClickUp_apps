@@ -27,12 +27,20 @@
 - **Where things live:** schema + script docs in `mawizorek/uritp-docs` 🔒 PRIVATE →
   `production-mawster/`. ⚠️ **NOT `maw-prose`** — that tree is stale and the published site still
   renders from it. Collapsing the three doc trees is open.
-- **Owed by me:** nothing outstanding as of this write.
-- **Blocked ON MICHAEL, and both block real work:**
+- **`70-scripts/` as of 2026-08-10 00:20:** 12 pages, all carrying `status:`, all reporting markers.
+  Four specs rewritten, four retired verbatim, three scripts still unread by anyone and deliberately
+  unspecced (`00App_onFirstWindowOpen`, `00App_Mark_Setup_Complete`, `00App_Set_Setup_State`).
+- **Owed by me:** nothing outstanding. ⚠️ **But `memory.md` is 19,740 B against its ~10KB hot cap**
+  and needs a Maggie rotation, not another append — see the open surface below.
+- **Blocked ON MICHAEL, and all three block real work:**
   1. 🔴 `APP_SESSIONS` vs `UTILITY_LOGS` — a second claimant that reverses J13 with no written
-     reversal. `FILE · Open` cannot be entered until it is settled.
+     reversal. `FILE · Open` cannot be entered until it is settled. **Posed as Q2 on the Decision
+     Log 2026-08-10.**
   2. 🔴 Two scripts named `goto_view_UTILITY_LOGS`. Needs a DDR script-reference read before either
      is deleted.
+  3. 🔴 **TWO Decision Logs exist for this app, identically named, with colliding J-series.** J1–J14
+     on one, J15–J18 on the other. Both banner-flagged 2026-08-10, neither merged. **Read both
+     before treating any question as open.**
 - **Next three moves:** fresh DDR and diff it · fix-queue items 1–4 (correctness) · the
   conditional-formatting capability test, which is load-bearing under the whole theme model and has
   still never been run.
@@ -49,8 +57,9 @@ FileMaker 19 permanently, so atomicity is hand-built. Build detail is archived, 
 
 ## 2026-08-09 → 08-10 — Production MAWster, the file's FIRST SCRIPTS
 
-Session [Production MAWster — DDR fix order](https://app.clickup.com/t/36074068/86ajy56v3), reopened ~21:35 after the afternoon
-handoff. Michael building in FileMaker, me documenting. **Two PRs merged in `uritp-docs` (#72, #78).**
+Session [Production MAWster — DDR fix order](https://app.clickup.com/t/86ajy56v3), reopened ~21:35
+after the afternoon handoff. Michael building in FileMaker, me documenting. **Three PRs merged in
+`uritp-docs` (#72, #78, #79); two Decision Log blocks written (J14, Q2).**
 
 - 🔴 **Caught a live file-locking defect on script #1, before it shipped.** His close handler had no
   `Exit Script`, and ended on a call to the backup script, which exits with a text result when the
@@ -72,13 +81,30 @@ handoff. Michael building in FileMaker, me documenting. **Two PRs merged in `uri
 - 🔴 **Found a worse defect while fixing that one: six pages shipped with no `status:` key.** The
   report classes those as NOT BUILT, the id never registers, and every link into them dies silently.
   Would have taken the whole `_retired/` archive offline while looking immaculate in the repo.
+- **PR #79 finished the pass** on the three UTIL/FILE pages that predated it — leaving them was the
+  two-conventions defect I had just ruled against one layer up. 12 of 12 pages now report.
+- 🔴 **The default-that-is-a-real-value defect runs through the ENTIRE logging spine**, not just the
+  retired script that made it obvious. `Run Start` defaults `vl_Kind` to `"script"`; **`Run End`
+  defaults `vl_Status` to `"ok"`, so a failed script logs a SUCCESS.** Ranked in the docs by damage:
+  a wrong LABEL costs a grouping, a wrong OUTCOME costs the reason the log exists. Not changed —
+  contract change against existing callers, Michael's call.
+- 🔴 **TWO DECISION LOGS EXIST FOR THIS APP AND NOBODY KNEW.** Identical titles, same parent,
+  colliding series: J1–J14 on one, J15–J18 on the other. The Aug 9 close comment reads *"Decision Log
+  finally exists, J1–J7 backfilled"* — **it already existed.** The cost is live: the orphaned page
+  holds J18, where Michael corrected Brain on portal sliding, plus an unanswered iPad home-menu fork.
+  **I built a script taxonomy all night without those in view.** Both pages banner-flagged, nothing
+  renumbered, nothing culled, nothing merged.
 - ⚠️ **I deferred my own activity-log write three replies running**, announcing it as owed each time.
   Naming a debt is not paying it — the same shape as the missed-gate protocol. Written now, with the
   LIVE STATE block that should have existed since 07-30.
 
-**Open surfaces:** the two forks in LIVE STATE above · `@script:` link resolution is reasoned from
+**Open surfaces:** the three forks in LIVE STATE above · `@script:` link resolution is reasoned from
 `markerlinks.py` and **not yet observed on a real build** — read the first build report · the
-misspelled `70-scripts/90-Utlity/` folder with two zero-byte files is flagged for Michael's deletion.
+misspelled `70-scripts/90-Utlity/` folder with two zero-byte files is flagged for Michael's deletion ·
+⚠️ **`memory.md` is 19,740 B against a ~10KB hot cap and a ~22KB read ceiling.** It grew ~4.5KB today.
+Tonight's durable patterns were deliberately NOT appended — **a file already twice over budget needs a
+rotation, not a tenth entry**, and appending would push it toward the point where it cannot be read
+whole and therefore cannot be safely edited.
 
 ## 2026-08-08 — Production MAWster v1 schema · my first build I DROVE end to end
 
@@ -94,7 +120,7 @@ Session [Fiona + Wes (Opus 5) · Production MAWster v1 schema](https://app.click
 
 ## 2026-08-06 — Seated on the URITP risk assessment architecture (Michael: "seat Corey and Fiona")
 
-Seated by Milo in session [MAWLIB-1038](https://app.clickup.com/t/36074068/86ajxa1dc). Question: should URITP risk assessments move to FileMaker, and how do ClickUp and FMP coordinate?
+Seated by Milo in session [MAWLIB-1038](https://app.clickup.com/t/86ajxr8t2). Question: should URITP risk assessments move to FileMaker, and how do ClickUp and FMP coordinate?
 
 - **My answer is not "move it."** The three-system treaty already rules this (`Course List` DL J3, 2026-08-04): repo = permanently true · ClickUp = true now · FileMaker = what WAS true. Applied here: hazard **library** = definition · **active** assessment = ClickUp, where the work happens · **closed-out** assessment for a struck show = FileMaker. A live risk assessment in FileMaker would be a schema serving nobody — the people filling it in are standing in a theatre with a phone.
 - 🔴 **The real seam is the ARCHIVE VERB, and it does not exist in either domain.** Three nouns, no verb; nothing moves a record from current to historical. It is already on Milo's owed list from the course architecture, unowned and untriggered. **Second domain, same hole — that promotes it from a course-side gap to a general one.**
