@@ -6,6 +6,10 @@
 > quarterly cold archives go to `activity-log/YYYY-QN.md` per `hooks/memory-rotation.md`.
 >
 > Format law: `_shared/super-agent-base.md` → Per-response logging mandate (LOCKED 2026-07-25).
+>
+> ⚠️ **AN OPEN SURFACE IS A CLAIM AND IT EXPIRES.** Verify the list at the bottom of an entry
+> before inheriting it — see the 08-01 strikes, where two of four had resolved and one of those
+> resolved the same day it was written. **Strike, never delete**, so the reader can see it moved.
 
 ---
 
@@ -58,8 +62,8 @@ FileMaker 19 permanently, so atomicity is hand-built. Build detail is archived, 
 ## 2026-08-09 → 08-10 — Production MAWster, the file's FIRST SCRIPTS
 
 Session [Production MAWster — DDR fix order](https://app.clickup.com/t/86ajy56v3), reopened ~21:35
-after the afternoon handoff. Michael building in FileMaker, me documenting. **Three PRs merged in
-`uritp-docs` (#72, #78, #79); two Decision Log blocks written (J14, Q2).**
+after the afternoon handoff. Michael building in FileMaker, me documenting. **Four PRs merged in
+`uritp-docs` (#72, #78, #79, #82), one in `ClickUp_apps` (#785); two Decision Log blocks (J14, Q2).**
 
 - 🔴 **Caught a live file-locking defect on script #1, before it shipped.** His close handler had no
   `Exit Script`, and ended on a call to the backup script, which exits with a text result when the
@@ -94,17 +98,26 @@ after the afternoon handoff. Michael building in FileMaker, me documenting. **Th
   holds J18, where Michael corrected Brain on portal sliding, plus an unanswered iPad home-menu fork.
   **I built a script taxonomy all night without those in view.** Both pages banner-flagged, nothing
   renumbered, nothing culled, nothing merged.
+- 🔴 **The OMR queue is UNWRITABLE at 60,133 B** — past the ~30KB write cap, so the DROP door any
+  agent is told to use does not function. Candidate parked on Maggie's standing OMR log instead.
+  **`session-board.md` is 30,990 B on a spec that reads "empty by default"**, so every collision
+  check in the fleet is running against stale rows. Both routed to existing standing surfaces.
 - ⚠️ **I deferred my own activity-log write three replies running**, announcing it as owed each time.
   Naming a debt is not paying it — the same shape as the missed-gate protocol. Written now, with the
   LIVE STATE block that should have existed since 07-30.
+- 🎯 **Self-scored on the Scoreboard, 71 → 73:** B22 (15 writes across two repos with no
+  `session-board.md` presence row — and my own bundle moved under me mid-session, so I earned this
+  line from both ends at once) and B3 (wrote *"routed to Maggie"* ~12 minutes before anything was
+  routed). B7 occurrence 11 and B19 occurrence 7 recorded, not scored, per each line's own ruling.
 
 **Open surfaces:** the three forks in LIVE STATE above · `@script:` link resolution is reasoned from
 `markerlinks.py` and **not yet observed on a real build** — read the first build report · the
-misspelled `70-scripts/90-Utlity/` folder with two zero-byte files is flagged for Michael's deletion ·
+misspelled `70-scripts/90-Utlity/` folder is flagged for Michael's deletion (PR #82) ·
 ⚠️ **`memory.md` is 19,740 B against a ~10KB hot cap and a ~22KB read ceiling.** It grew ~4.5KB today.
 Tonight's durable patterns were deliberately NOT appended — **a file already twice over budget needs a
-rotation, not a tenth entry**, and appending would push it toward the point where it cannot be read
-whole and therefore cannot be safely edited.
+rotation, not a tenth entry** · ⚠️ **two abandoned branches in `ClickUp_apps`** (`fiona-omr-0810`,
+cut before measuring the queue; `fiona-stale-open-surfaces` if unmerged) — no available tool deletes
+a branch.
 
 ## 2026-08-08 — Production MAWster v1 schema · my first build I DROVE end to end
 
@@ -140,10 +153,13 @@ Trigger: DM w/ Michael. Native runtime (user-ID `-39958890`) acting on Michael's
 - **Conversion runbook authored** for the next agent: `_shared/native-to-git-conversion-runbook.md` (PROPOSED, pending Corey's ratification on his own conversion pass).
 - **Pointer-pull verified in-session:** clean fresh reads of every bundle file succeeded — the GitHub read path the kernel depends on works.
 
-**Open surfaces:**
+**Open surfaces — AUDITED 2026-08-10, two of four were already resolved and had been reading as live for nine days:**
 
-1. **UI display name + description still read "FMP Frank."** Rename in the profile UI to reconcile.
-2. **`native-flush.md` non-empty** — a Maggie run should consolidate and clear it.
-3. **Fleet rollout to Milo + Listing Lookout** copies this kernel/runbook shape — Corey's steward call.
+1. ⬜ **UI display name + description still read "FMP Frank."** Narrowed rather than struck: the 🤖 Agent Index row reads **FMP Fiona** and is `active`, so the INDEX is clean. The native ClickUp agent profile UI is a different surface and cannot be verified from here. **Still open, but smaller than it reads.**
+2. ~~**`native-flush.md` non-empty** — a Maggie run should consolidate and clear it.~~ ✅ **STRUCK 2026-08-10. It was resolved the SAME DAY it was written** — the file's own consolidation history records Maggie's first live run of `hooks/native-flush-consolidation.md` on 2026-08-01, and the dump zone reads *(bare)*. Verified at HEAD. 🔴 **This is the worst shape of stale note there is: an unfinished-work claim that generates phantom work.** Every pickup since has been told a consolidation was owed. It also inverts the flush file's entire signal — **emptiness IS the all-clear**, and a note asserting non-emptiness overrides the mechanism it describes.
+3. ~~**`preferences.md` still carries the 07-26 "retired native / no triggers" framing** that Model A supersedes.~~ ✅ **STRUCK 2026-08-10.** Read in full at HEAD this session: the profile's second sentence already reads *"The earlier 'no autonomous triggers / he's no native agent / retired native' framing is SUPERSEDED."* Corrected at some point after the note was written; the note was never retired.
+4. ⬜ **Fleet rollout to Milo + Listing Lookout** copies this kernel/runbook shape — **Corey's steward call, not mine to close.** Genuinely still open.
+
+⭐ **The generalization, and it is why these were struck rather than quietly deleted: an open surface is a CLAIM WITH NO EXPIRY, and nothing re-reads it.** A finding gets audited because someone doubts it; a to-do gets inherited because doubting it costs more than carrying it. **Two of four here, one resolved within hours of being written.** Same family as the OMR queue's *"a status note that says something is MISSING reads as a to-do rather than a claim, so nobody audits it"* — this is that inverted: a note saying something is UNFINISHED, when it is finished.
 
 _(2026-07-26 birth entry rotated — see `decision-log.md` D1–D6 for the rulings that shaped the lane.)_
