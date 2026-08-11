@@ -1,6 +1,6 @@
-# Meeting Transcript Attribution — hook
+# Meeting Transcription — attribution + threading hook
 
-**Invocation:** `/attribute-transcript` · `/transcript-attribution` · "rewrite this as a per-person transcription" · "who said what" · "attribute this transcript"
+**Invocation:** `/transcription` · `/attribute-transcript` · `/transcript-attribution` · "rewrite this as a per-person transcription" · "who said what" · "attribute this transcript"
 
 **Trigger (auto):** a task or event carries raw transcription comments all authored by ONE ClickUp user (the recorder) but containing MULTIPLE speakers, AND the invoking message names the room. Canonical trigger phrasing, ruled by Michael 2026-08-11:
 
@@ -22,14 +22,16 @@ The failure this exists to prevent: a full attributed transcript dumped inline a
 
 ## The shape (LOCKED — this is the template)
 
-One **HEADER comment** per topic. The verbatim turns **thread behind it** as replies. When the speaker moves to a new subject, cut a new header.
+One **HEADER comment** per subject. The verbatim turns **thread behind it** as replies. When the speaker moves to a new subject, cut a new header.
 
 **Header (root comment):**
 
 ```
-🎙️ **TOPIC · <Speaker> — <topic in one clause>**
+🎙️ **<Speaker> — <subject in one clause>**
 _<Meeting name> · <Day M/D/YY> · <time> ET_
 ```
+
+⚠️ **No `TOPIC ·` prefix.** Struck 2026-08-11 by Michael on sight of the first real run: the 🎙️ already says what the comment is, and a label repeated 18 times down a task is noise. The variant labels below survive because they carry information the emoji does not.
 
 **Body (threaded reply under that header):**
 
@@ -41,7 +43,7 @@ _<Meeting name> · <Day M/D/YY> · <time> ET_
 ⚠️ _Milo note: <what was corrected, what did not resolve, what needs a confirm>_
 ```
 
-Variants: `🎙️ **SIDEBAR ·**` for a tangent worth keeping but not an agenda item. `🎙️ **DECISION ·**` when the topic closes on one (and the decision itself still routes to the entity's Decision Log — the comment is a pointer, never the record).
+Variants: `🎙️ **SIDEBAR · <Speaker> — ...**` for a tangent worth keeping but not an agenda item. `🎙️ **DECISION · <Speaker> — ...**` when the subject closes on one (and the decision itself still routes to the entity's Decision Log — the comment is a pointer, never the record).
 
 ---
 
@@ -62,7 +64,7 @@ Variants: `🎙️ **SIDEBAR ·**` for a tangent worth keeping but not an agenda
 1. Speaker names themselves or is addressed by name in the turn.
 2. Content is lane-exclusive (scenic → TD; props → prop supervisor; season/casting → artistic director; facilities/production ops → PM).
 3. The meeting's own agenda block in the task description — speaker headers there ARE the running order.
-4. Prior meetings in the same chain: recurring speakers keep recurring topics.
+4. Prior meetings in the same chain: recurring speakers keep recurring subjects.
 5. Nothing hit → `**⚠️ Unattributed:**`. Never guess a person into the room.
 
 **Nobody outside the declared roster may be attributed a turn.** The absentee named in the trigger gets zero lines, ever.
