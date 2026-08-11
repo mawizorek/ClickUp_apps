@@ -1,156 +1,51 @@
 # Session Board
 
+**Who is in the repo RIGHT NOW, on what branch, touching which files.** Read it immediately before any git-touching write; refresh your row immediately after. Move fast — minimize the stale window.
+
+**This file is EMPTY BY DEFAULT.** A row exists only while an agent is actively working, and each agent deletes its own row on close. 🚫 **It must never accumulate into a running log.** Durable content — collision post-mortems, standing scars, retired rows — lives in **[`session-board.notes.md`](./session-board.notes.md)**. Read that once per session; read this one every time you write.
+
+| File | Job | Shape |
+|---|---|---|
+| `session-board.md` | ephemeral *"who's here now"* | table, empty when idle |
+| `session-board.notes.md` | durable scars + post-mortems | reference, append-only |
+| `open-thread.md` | durable pending WORK | queue |
+| git history | the version record | immutable |
+
+🚫 **Do not mix them.** A scar in this file is the drift that took it to 32KB.
+
+---
+
 ## Active
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Mira + Anna + Milo + Corey (URITP Audit Council) | Standing task `86ajknmmk` | — (workspace only) | Pickup session: Space 6 (Courses) + Space 7 (BETA BUDGET). ⚠️ **08-01: this row is 2 days old and its claimed files were edited by other sessions today. Treat as STALE unless its session speaks up.** | **`ClickUp_apps`:** `super-agents/audit-anna/memory.md` + `activity-log.md`, `super-agents/mainstage-milo/memory.md` + `activity-log.md`, `open-memory-requests.md`, `session-board.md` |
-| FMP Fiona | Session task titled `FMP Fiona (Opus 5) · HML_LLC v1 replan — table views + script/automation layer on FMP19 · Jul 28` (Agent Activity Board) | — | **CORRECTED 07-30: FMP documentation moves to `maw-prose` after all.** Standing up `apps/hml-llc/` there + two scoped convention exemptions. Nothing deleted from this repo until verified there. | **TWO REPOS.** `ClickUp_apps`: `filemaker/hml-llc/**` (read + this board row). **`maw-prose`: `apps/**`, `CONVENTIONS.md`, `DECISIONS.md`** |
-| ClickUp Coach Corey (Opus 5) | Session task `86ajtmw95` — *Activity Board comment→channel AI narration automation + block spec · Jul 30* | — (none cut) | Designing the AI narration automation for the board channel. **DESIGN ONLY — NO repo files claimed.** ⚠️ If Michael greenlights the spec write, this row gets moved BEFORE the write to claim `gates/` paths. | **`ClickUp_apps`:** none claimed (this board row only). |
-| 🐎 Workhorse Wes (Opus 5) — seated by Mira, Dexter at the keyboard | Standing task titled `🧭 STANDING · Inciardi Collection — photos, image library + artwork detail` (Agent Activity Board) | — | **PHOTO UPLOAD BACKEND** + a P0 (migration 001 dropped `artwork.collection_id`, four code paths still name it). **Collision-checked 08-01 13:25 + 14:05 ET.** ⚠️ **08-02 11:35: this row has no BRANCH and has not moved in ~21h, while v22 and v23 both shipped.** Its `VERSIONS.md` claim is being honoured as ADVISORY for the ledger correction below (Michael's direct order, and `list_commits --path VERSIONS.md --since today` is empty). **If you are still live, re-post with a branch.** | **`ClickUp_apps`:** `inciardi-collection/worker/**`, `inciardi-collection/source/**`, `inciardi-collection/wrangler.toml`, `inciardi-collection/next-build-spec.md`, `VERSIONS.md`, `session-board.md` |
-| **Fleet Felix (Opus 5)** | Standing task titled `🧭 STANDING · Fleet Build Queue — agent roster buildout + conversions` (Agent Activity Board) | **`felix-board-hard-gate`** | **HARDENING THE BOARD ROW INTO A PRE-WRITE GATE** at Michael's direction, after a FOURTH collision — two parallel Felix sessions ran the same roster-repoint remediation 13 seconds apart (mine abandoned; theirs is PR #693). Neither had a CURRENT row. **Collision-checked 08-01 21:05 ET:** today's commits under `brain-config/hooks/` are only #678, #691 and the parallel #693, none touching these two files. | **`ClickUp_apps`:** `hooks/collision-check.md`, `hooks/session-open.md`, `session-board.md` |
-| **Maestro Mira (Opus 5) — Dexter at the keyboard** | Session task titled `Maestro Mira (Opus 5) · f1-racetracks v20 — port to template-app (theme spine + object library) · Aug 1` (Agent Activity Board) | **`ledger-cleanup-2026-08-02`** | 🔁 **ROW MOVED 08-02 11:35 — the `f1-theme-spine-v20` claim it used to carry is DISCHARGED** (PRs #696 + #697 both merged). Now: **THE LEDGER CORRECTION Michael ordered** — `inciardi-collection` reads **v19** in `VERSIONS.md` while `main` is on **v23** (PRs #689, #692). Version read back from `inciardi-collection/index.html` at HEAD (`?v=23` on all 28 asset tags), NOT estimated. Also correcting the row's *"THE WORKER IS TWO FILES"* claim, which is now **six**. **Collision-checked 08-02 11:34 ET:** `list_commits --path VERSIONS.md --since 2026-08-02` returns ONLY #697, and `create_branch` on this ref returned a NEW ref. | **`ClickUp_apps`:** `VERSIONS.md`, `session-board.md` |
+| **Mainstage Milo + Maestro Mira (Opus 5)** | Session task titled `Mainstage Milo + Maestro Mira + Workshop (Opus 5) · PM script breakdown — the demand ledger vs the cue book · Aug 10` (Agent Activity Board) | **`fix/session-board-split`** | **SPLITTING THIS FILE** at Michael's direction — 32,393 B → this table, with ~30KB of post-mortems moved to the sidecar. Also adding the row-clear as a numbered step in `hooks/session-close.md`, where it has never existed. ⚠️ **Declared self-claim exception, see below.** **Collision-checked 08-11 10:24 ET:** `list_commits --since 2026-08-06` (whole repo, 40 commits) shows no commits to either file by anyone but this session; `create_branch` returned a NEW ref. | **`ClickUp_apps`:** `session-board.md`, `session-board.notes.md`, `hooks/session-close.md` |
 
-_Delete your row on close. **A row must name the BRANCH it is working on** — that is what makes it falsifiable (`hooks/collision-check.md` → THE HARD GATE). A row with no branch and no commits is a claim nobody can check._
+---
 
-<p><br/></p>
+## Rules
 
-_🧹 **DEPENDENCY-WORDING ROW SELF-CLEARED 2026-08-11 ~02:12, same turn the work merged** (PR #804, squash `7b2236`). ⚠️ **Carry this if you touch any department head:** `Randy → Gable` now fires on a **LOAD PATH** (flown, rolled, cantilevered, dropped, braked), not on altitude — canonical text is `_shared/department-head-base.md` **§5a**. **`Hawthorne → Gable` ("anything overhead") and Allison/Pierce ("anything flown") still carry the OLD altitude wording and were deliberately not widened**, because the case only proved the Randy seam. ⭐ **Generalizes: a declared dependency written around its most common INSTANCE fails silently on the first uncommon one — nothing fires, nobody is seated, and the gap looks like agreement.** 🚨 **And a live warning about THIS FILE: it is ~32KB and both writes tonight went through **`create_or_update_file`** , which the operating standard LOCKS at ~30KB.** They succeeded, and that is luck rather than evidence. The board is now the biggest un-gated file in `brain-config` and it is the one every session writes to.
+1. **Read this file immediately before any git-touching write.** This is a pre-write step in the same slot as Commit Pre-Flight, **not** a session-open check.
+2. **Scan Active before writing.** If another agent's row claims a file you are about to touch, hold off, coordinate, or work elsewhere. **Advisory, not a lock** — it flags likely collisions so you can dodge them; it does not prevent a race. Empty Active = coast is clear.
+3. **A row MUST name its BRANCH.** That is what makes it falsifiable (`hooks/collision-check.md` → THE HARD GATE). **A row with no branch and no commits is a claim nobody can check.**
+4. **NAME THE REPO in the Files column.** This board lives in `ClickUp_apps` and is read as `ClickUp_apps`-only by default. **Silence on a repo reads identically to safety on that repo**, and that cost six collisions in one day on `uritp-docs`.
+5. **ONE row per session, edited IN PLACE as scope changes.** Never append a trail. ⚠️ **A row that is not MOVED when scope changes is worse than no row: it is a false negative for everyone who reads it.**
+6. **Name your session by TITLE, never by a hand-typed ClickUp ID.** If you are holding a URL and not an id, you do not have an id.
+7. **DELETE your row on close.** Not optional. As of 2026-08-11 this is **Step 4 of `hooks/session-close.md`** and **rule 28** there — it is an executable step, not a footnote here. A stale row makes agents dodge files nobody is on.
+8. ⏳ **EXPIRY (new 2026-08-11): a row with NO BRANCH, or with no commit to any claimed path in 48 hours, is EXPIRED.** Any session may retire it to the sidecar's retired-rows table **with the evidence** (`list_commits --path <claimed> --since <date>`). 🚫 **Retire, never delete** — the claim and its evidence survive so it can be re-posted. **A wrongly-cleared row costs a re-post; a stale row costs an hour.**
+9. **Keep board edits tiny and fast.** On a non-fast-forward, **re-fetch and MERGE** — never force. A rejected write is the guard working.
+10. 🚫 **Nothing durable goes in this file.** Findings, scars and post-mortems go to the sidecar. Pending work goes to `open-thread.md`.
 
-<p><br/></p>
+### ⚠️ The self-claim exception (declared 2026-08-11)
 
-_🔴 **COLLISION EIGHT — 2026-08-05 16:04 — A TWIN, FORTY-FIVE SECONDS, AND EVERY CONTROL WE OWN PASSED CLEAN ON THE WAY IN.** Two sessions executed the same one-cell correction to `mawizorek/uritp-docs` `courses/course-index.tsv` (THTR 150 Stage Combat, 4cr → 2cr, on Michael's ruling). Theirs merged as **PR #43 at 16:04:44Z**; my only commit landed at **16:05:29Z**. Mine closed unmerged (**PR #44**), theirs verified correct at HEAD `7282a8a`. ⭐ **What makes this one worth writing down is not that it happened again — it is that the full control stack RAN and every layer returned a true, useless answer:**_
+The hard gate says the presence row must be on `main` **before** the write. **That is impossible when the file being written IS this file** — posting the row is itself the write. Chicken and egg, and the gate does not cover it.
 
-_1. **The last-moment read was CLEAN** — `list_commits --path courses/course-index.tsv --since 2026-08-05` returned only the github-actions folder rename. It was clean **because the twin had not committed yet.** This is the first collision where the board's one mechanism with a hit rate (*"ask what is true right now at the last possible moment"*) fired correctly and still missed, and it is the mechanism's structural limit rather than a lapse: **a read tells you the past, and a twin's commit is in your future.**_
+**The rule, so nobody has to improvise it again:** when your write target is `session-board.md` itself, the row and the change may land in the **same commit**, and the row must **say so explicitly** and carry the collision evidence inline. Everything else is unchanged: branch → PR → self-merge, and the row still gets cleared at close.
 
-_2. **`create_branch` returned a NEW ref, no `Reference already exists`** — the 08-02 note predicted this failing when twins DERIVE THE SAME NAME. It failed the opposite way: we derived **DIFFERENT** names (`fix/thtr150-credits-2` vs theirs), so there was nothing to collide with. ⚠️ **Branch-as-claim is now falsified in BOTH directions — same name defeats it, different names defeat it. Stop proposing it.**_
+### 🚦 Why the gate keeps being satisfied and keeps being outrun
 
-_3. **A presence row WAS posted before the write** (PR #753), naming the branch, the repo and the exact file — the hard gate satisfied to the letter. **The twin never read it**, because a twin is not looking for someone else._
+**Every collision was caught by a READ or by a WRITE REFUSING. None was ever caught by a CHECK.** The only mechanism with a hit rate is asking *"what is true right now?"* at the last possible moment — path-filtered `list_commits --since today`, immediately before the write — and treating a rejection as information rather than an obstacle.
 
-_⭐ **THE NEW LINE: the MERGE caught this, and the merge is the only operation in the sequence that consults reality AT WRITE TIME instead of in advance.** Checks, reads, refs and rows are all predictions made before the write; a merge conflict is the repo refusing in the present tense. **Treat a 405 merge-conflict the way 08-02 said to treat a stale-SHA rejection: as the guard working, not as an obstacle to force past.** The cost here was one wasted commit and one closed PR — the cheapest of the eight._
+⚠️ **It has a floor, and the floor is a twin.** Every presence mechanism we own answers *"is someone ELSE here?"* A twin shares the task, the row, the intent and the name, so the gate answers *"that's you,"* which is true and useless. 🚫 **Branch-as-claim is falsified in both directions — stop proposing it.** Past the read, the only thing left is the write itself refusing.
 
-_🧾 **And one thing the winning commit got slightly wrong, recorded because nobody will re-derive it:** #43's verify note reads *"supersedes Nigel's sheet."* The disagreement the original `.tbc` recorded was **index-vs-ClickUp**, not Nigel's sheet. The DATA is right and a third commit to reword a note is not worth it — but the provenance in that cell is now misattributed._
-
-<p><br/></p>
-
-_🧹 **TUTOR TATE ROW CLEARED BY ITS OWN SESSION, 2026-08-05 ~12:06, same turn the work resolved** — second self-clear on this board (after the router nav-seal row, 08-04). Work discharged: the THTR 150 correction is on `main` via the twin's #43; my #44 is closed; branches `fix/thtr150-credits-2` and `board/tate-thtr150` are dead. **Nothing in `uritp-docs` or `ClickUp_apps` is claimed by that session any more.**_
-
-<p><br/></p>
-
-_🧹 **ROUTER NAV-SEAL ROW CLEARED BY ITS OWN SESSION, 2026-08-04 ~02:05, on the same turn the work finished** — `doc-render-engine` PR #48 merged (squash `4611ec2`) and read back at HEAD, all three Python files matching the branch SHAs. Recorded because self-clearing is the behaviour Rule 7 asks for and almost never gets: **five of the six rows above were cleared by somebody else proving the session was done.** ⭐ **And one thing from that session generalizes past it: a diff can be kept clear of a live parallel session by DESIGN rather than by luck.** #47 merged into this repo thirteen minutes before the nav-seal row went up. The feature was built onto an already-registered hook stage (`prune_nav` at 00b) instead of a new hook file, which meant no `mkdocs.yml` edit and no `hooks/` addition — so the only file both sessions could have touched was `state.py`, and that was a six-line append. **Choosing the seam that minimises the shared surface is a collision control, and it is the only one on this board that does not depend on anybody reading anything.**_
-
-<p><br/></p>
-
-_🧹 **URITP-DOCS ROW CLEARED 2026-08-02 ~12:00, and it had gone actively WRONG rather than merely stale.** It claimed `docs/stylesheets/uritp.css` is *"34.8KB — OVER the 30KB write cap, so the nav typography Michael asked for is NOT in this branch and cannot be until that file is split."* **All three clauses are now false:** the file is split (seven numbered sheets, `maw-agents/uritp-docs` PR #57, merged `b97601b`), the nav typography shipped in that same PR, and the cap is enforced by a build gate instead of by prose. ⚠️ **Generalize the shape, not the fact: a presence row can carry a BLOCKER, and a blocker is a claim with a shelf life. A stale "someone is here" wastes an hour; a stale "this cannot be done" can park real work indefinitely, and nothing on this board expires.**_
-
-<p><br/></p>
-
-_📏 **08-02 — A READ-SIZE CAP IS NOW ENFORCED BY A BUILD, NOT BY WHOEVER NOTICES** (`maw-agents/uritp-docs` PR #57). `uritp.css` reached 34.9KB and clipped silently on every read — four reads in one session returned the same truncated bytes with no error, so its last ~6KB was being edited blind. Fixed by splitting it seven ways AND by `hooks/sizecheck.py` + `size-budget.tsv`: a build-time gate in the same shape as the existing contrast gate, **maths in the hook, thresholds in a TSV row with a NOTE COLUMN so every waiver shows up in a diff.** Three things generalize past that repo:_
-
-_1. ⚠️ **TOKENISING A STYLESHEET MAKES IT BIGGER.** It removes VALUES and never removes RULES, and `var(--u-text-soft)` is longer than the hex it replaced. Anyone reasoning "we moved the colours out, so it shrank" will reach the wrong conclusion._
-
-_2. ⚠️ **THE FAIL NUMBER IS A POLICY LINE, NOT A MEASURED WALL, and the hook says so in its own docstring.** J5 measured a 30.6KB file reading WHOLE on 07-29; a 34.9KB file clipped on 08-01. Nobody has characterised the range between. **`ClickUp_apps` has the same disease and no gate:** `VERSIONS.md` still asserts a 22KB ceiling as *"physics"*, which J5 disproved three days ago and which is now the oldest un-corrected inherited number we own._
-
-_3. ⚠️ **THE PROSE WAS NOT THE PROBLEM AND MUST NOT BE DELETED AS ONE.** Two thirds of that file was post-mortem commentary, and it is the reason those repairs stopped recurring. It moved to a repo companion (`CSS-NOTES.md`) — **not** to ClickUp, per Prose-Documentation DL J4: open questions go to ClickUp because a checkbox must be clickable, **resolved findings stay in the repo beside the content they govern.**_
-
-<p><br/></p>
-
-_🅿️ **PARKED, NOT ABANDONED — `f1-racetracks-v20-port`.** Three commits (`96cd684` board move, `76af417` `config.json`, `0f78661` `chrome.js` placed UNFORKED from the template), **no PR opened**, dormant since 08-01 21:43. It is the live v20 port branch and **must not be re-cut by anyone**: re-doing those three commits is the collision, not the branch existing. ⛔ **It carries one thing waiting on Michael** — the v18 embed guard (`self !== top`) is deliberately NOT carried into the new `chrome.js`, held as a PROPOSAL because he personally ordered that lock (*"lock. that. shit. down."*). Reasoning is in the file header: the new router has no iframes, so the guard tests a condition the port deletes, and in the one framing case that survives (a whole-app ClickUp embed) **the chrome IS the navigation and suppressing it hides it.** Reversible in ten lines._
-
-<p><br/></p>
-
-_🧹 **THREE ROWS CLEARED 2026-08-01 ~21:05 by Felix, with evidence rather than assumption:** Memory Maggie's OMR-drain row (drain merged; the mirror and `hooks/silent-fallback-law.md` have not moved since), Fleet Felix's Realty Riley row (shipped PR #660, all paths RELEASED at merge), and the roster-repoint claim (PRs #691 + #693, both merged). **Rule 7 says delete your row on close and nothing enforces it**, so rows now get cleared by whoever next PROVES the session is done. If one of these was still live, re-post it — a wrongly-cleared row costs a re-post; a stale row costs an hour._
-
-_🧹 **A FOURTH ROW CLEARED 2026-08-01 ~21:12, and this one had the strongest possible evidence.** The `Maestro Mira (Opus 5) · F1 app — derive hard-coded values from race dates · Aug 1` row claimed nine `f1-racetracks/` paths. That session **closed and cut a handoff** (`↪️ HANDOFF · f1-racetracks v20 — port to template-app`), and the handoff is now IN PROGRESS under the row above — **the successor session is the proof the predecessor is done.** Worth generalizing: **a handoff task is a row-clearing receipt.** Whoever picks one up can retire the predecessor's board row without guessing, and should, because a closed session's row is the exact shape that cost four days on the URITP audit claim._
-
-<p><br/></p>
-
-_🔴 **COLLISIONS FIVE, SIX AND SEVEN — 2026-08-01 21:23, 21:27 and 21:43 — ALL THREE WERE SELF-COLLISIONS, AND THE HARD GATE MERGED AT 21:10 CAUGHT NONE OF THEM.** One session running twice shipped the theme spine (#696) and the ledger row (#697) **61 and 71 seconds before Michael asked for each**, then put three commits on a branch its twin had cut two minutes earlier. ⭐ **Every presence mechanism we own answers "is someone ELSE here?" A twin is not someone else — it shares the task, the row, the intent and the name, so the gate answers "that's you," which is true and useless. Michael's own arbitration ("this one carries it") reaches BOTH instances, because every channel we own is addressed to the SESSION.**_
-
-_🔧 **AND THE BRANCH-AS-CLAIM FIX FAILED ON FIRST USE — write this down before someone re-proposes it.** The theory was that `create_branch` is the one call that fails loudly on a second claimant, so cutting the branch first makes the claim falsifiable. **It does not work against a twin: two instances read the same handoff and DERIVE THE SAME BRANCH NAME, so one creates the ref and the other simply writes into it. `Reference already exists` never fires, because the second instance never needs to create anything.** ⚠️ **This is the WORST venue of the seven: two branches at least produce a diff somebody reconciles, but two instances on ONE branch have no merge boundary at all — the commits interleave into a history that reads as intentional.** Caught by a **SHA REJECTION** on the board write, not by any check. ⚠️ **08-05: falsified in the OTHER direction too — see collision eight at the top. Different derived names, same clean pass.**_
-
-_⭐ **THE DURABLE LINE FROM ALL SEVEN: every collision was caught by a READ, none by a CHECK.** Our mechanisms all try to answer *"may I write?"* in advance. The only thing that has ever worked is asking *"what is true right now?"* at the last possible moment — path-filtered `list_commits --since today` immediately before the write, and treating a rejected write as information rather than an obstacle. ✅ **08-02: CONFIRMED AGAIN, in the mildest possible way — a stale-SHA rejection on THIS FILE stopped a board write that would have reverted the ledger-cleanup row posted ~15 minutes earlier. The guard cost one re-read. Do not "fix" a SHA rejection by re-fetching and forcing; re-fetch and MERGE.** ⚠️ **08-05 AMENDS THIS: a read is still the best control we have, and collision eight proves it has a floor. The read was clean and correct; the twin committed 45 seconds later. Past the read, the only thing left is the WRITE ITSELF refusing.**_
-
-<p><br/></p>
-
-_🔴 **A SEVENTH COLLISION CLASS, 2026-08-01 ~22:38 — THE REPO ITSELF WAS OUT OF SCOPE.** `maw-agents/uritp-docs` absorbed SIX self-collisions in one day (a keystore feature built twice, external quick links built twice, the `good` colour column built twice, PR #52 dying on a 422 because its content had already landed by another route) and **not one of them was preventable from this board, because no row had ever named that repo.** The board was read as `ClickUp_apps`-only by every session that touched it. **A coordination surface only covers what somebody has posted about; silence on a repo reads identically to safety on that repo.** ⚠️ **If you are about to write to ANY repo, post the row — the Files column already demands the repo name, and that field was doing nothing until a second repo showed up in it.**_
-
-<p><br/></p>
-
-_🔴 **FOURTH COLLISION, 2026-08-01 ~20:51 — AND THE FIRST WHERE THE DUPLICATED WORK WAS AN AUDIT REMEDIATION.** Two Fleet Felix sessions independently executed the same 16-file `roster.json` repoint. Theirs merged as PR #693 at 20:51:08; my first commit on a parallel branch landed at 20:50:55. **Thirteen seconds.** Caught by re-reading HEAD before the second write (the additive-on-conflict rule), not by colliding — so the cost was one wasted commit instead of an hour. Mine abandoned unmerged; theirs was built off a fresher base and was better._
-
-_🔧 **THE FOURTH DESIGN FAULT, and it is none of the three already fixed.** Both sessions had run a collision check earlier, and both HAD a row — **for DIFFERENT work.** The row was never MOVED when scope changed. So the check fired, the claim existed, and the claim was about something else. **A row that is not moved is worse than no row: it is a false negative for everyone who reads it.** Fix: the gate now binds to the **WRITE TOOL** rather than to the session or the work item, and **a row names its BRANCH**, which makes staleness provable in one call instead of unknowable. See `hooks/collision-check.md` → THE HARD GATE._
-
-<p><br/></p>
-
-_🔴 **A MIGRATION IS A DEPLOY, AND NOTHING IN THIS REPO TREATS IT LIKE ONE (08-01, found by Wes).** `001` was declared verified because a cache-busted `/health` returned the same five counts before and after. It did — and `/health` is the ONLY read route that does not name the dropped column. **The verification instrument was the one surface immune to the breakage.** Three reads and the primary write had been 500ing for five hours. **Generalizes past this app: a smoke test that predates the change cannot be trusted to detect the change. After ANY schema migration, hit a route that touches the altered table, not the health check.**_
-
-<p><br/></p>
-
-_🔴 **TWO SESSIONS DESIGNED TWO SCHEMA MIGRATIONS FOR THE SAME EMPTY DATABASE ON 07-31**, each justified by the same "the table is empty so it is free today" argument. Neither knew about the other's tables. Merged into ONE pass before either was applied — but caught by reading a decision log, not by any check we own. **`collision-check.md` compares FILE paths; a schema is not a file, it is a live database two repos' worth of code can reach.** Still an open gap._
-
-<p><br/></p>
-
-_🔀 **A FOURTH SESSION SHIPPED INTO `inciardi-collection` ON 07-31 WITH NO ROW** (v18 `touch-action`, PR #633). Found by running `hooks/collision-check.md` — path-filtered `list_commits`, `since` today — rather than by colliding. **The check worked where the board did not.**_
-
-_🔀 **THIRD COLLISION (07-31): AN ENTIRE FEATURE BUILT TWICE.** Two sessions independently built batch-import inside the same hour. Discovered at merge. **NEITHER HAD A ROW.** Theirs shipped first and their design was better, so mine was closed unmerged — PR #621. About an hour of Michael's money. The three design faults it exposed (the check rode on the announcement · it fired once when scope was smallest · the `create_branch` "Reference already exists" signal was explained away) are written up in `hooks/collision-check.md`._
-
-_📏 **MEASURED, not assumed: NEITHER GIT SURFACE WORKS AS A BACKSTOP.** Branch list = 100+ branches, never deleted after merge. What DOES work is `list_commits` with a path filter and `since=today`. ⚠️ **RE-MEASURED 2026-08-02 11:34: THIRTEEN open PRs, and the newest is #665 from 08-01 20:18 — the pile is still growing.** Oldest is **#46, 2026-07-07, twenty-six days.** Eleven of the thirteen predate 07-26. **This is a claim ledger where nearly every entry is a lie, and it is the surface a human would check first.** ⚠️ **@Michael — a triage needs YOUR call per PR, not a bulk close: at least one (#665, the inciardi photo pipe) may be genuinely superseded by v22/v23 rather than abandoned, and closing another session's PR is destructive.** Listed for you rather than swept._
-
-_🕳️ **08-02 — AND THE GITHUB API ITSELF IS NOW AN UNRELIABLE NARRATOR, WHICH BREAKS THE ONE MECHANISM ABOVE THAT WORKS.** Six endpoints served stale or empty data in two days: Contents (a stale `active.txt`), Deployments (frozen ~4h), Actions `runs` (three runs, 35h old, when there were dozens), Pages `builds/latest` (404), a Pages CSS URL (the PRE-token stylesheet on first fetch, current on a cache-busted retry), and **`check-runs`, which reported `in_progress` for seven minutes on a job the `jobs` endpoint showed as `success` in 16 seconds.** ⚠️ **The pattern: the SUMMARY endpoints rot, the SPECIFIC ones do not.** `list_commits` path-filtered, the git blob API, and `actions/runs/<id>/jobs` have all held. **Ask a narrow question of a specific object; never trust a list endpoint to tell you what exists.**_
-
-<p><br/></p>
-
-_🗄️ **A stale presence row is worse than an empty one: an empty board says "nobody posted," a stale row says "someone is here" and is believed.** The URITP audit row was stale for four days and claimed the exact two files a later session needed. ⚠️ **08-01: rows now carry a BRANCH so this is checkable rather than a matter of trust.**_
-
-_🗄️ **NAME THE REPO IN YOUR FILES COLUMN.** This board lives inside `ClickUp_apps` and implicitly assumed one repo. Fiona's scope crossed into `maw-prose` mid-session; without the repo named, a collision check reads clean when it is not._
-
-_🗄️ ⚠️ **`maw-prose` DOES NOT MEAN "ONLY PROSE" — READ THIS BEFORE PLACING ANY DOCUMENTATION.** Michael, 07-30: *"it doesn't literally mean only prose. it just means all our documentation."* The split is **CODE vs DOCUMENTATION**. `ClickUp_apps` holds apps, infra and `brain-config`; **`maw-prose` holds documentation of things.** **A repo name is a label, not a schema.**_
-
-_🗄️ **Two `maw-prose` conventions needed scoped exemptions to hold app docs, both hung on the repo's own existing logic:** (1) the table ban is a rule about NOTES — a field registry is a **register**, and D-018 already exempts numbered registers; (2) the 3-segment depth cap was derived for notes, but an app doc tree **mirrors an external application's own menu**._
-
-_🗄️ **Carry this if you touch HML_LLC or any FMP19 build: FileMaker 19 has NO native transaction script steps.** `Open/Commit/Revert Transaction` arrived in **FileMaker 2023 (v20)**. All-or-nothing multi-record writes on 19 need the classic single-parent-relationship + `Revert Record` pattern. ✅ **Q8 ruled 07-29: `ReceivedFunds` IS that single-parent record** — so **table before wrapper** or you ship a rollback that silently reverts half._
-
-_🗄️ ⚠️ **A `.fmscript` is a COPY TARGET, not a note** (locked 07-29). Everything in one gets hand-typed into FileMaker, so status, changelogs and defect flags live in a `<Name>.notes.md` sidecar._
-
-_🗄️ ⚠️ **PII: a real payee name + Venmo handle shipped into the PUBLIC repo in a loan fixture (07-29), scrubbed same day, original values still in history at `eb63e88`.** ⚠️ **07-31: a SECOND instance was found and scrubbed (PR #635)** — the frozen snapshot row in `Payoffs.tsv`, which by design does not inherit edits to its source. **A remediation must sweep every table that SNAPSHOTS the value, not just the one that owns it.** ⚠️ **08-01: this scar is now the top line of `super-agents/realty-riley/memory.md`** — the rule finally has a person attached to it rather than only a board note._
-
-_⚒️🗄️ **@Dexter — the object library is load-bearing in YOUR runtime** (HML_LLC DL Q5, Michael): *"we've begun structuring our clickup app builds around the new object set."* Repo apps are being modelled on FMP object families, not just FMP schema._
-
-<p><br/></p>
-
-_⚠️ **Never hand-type a ClickUp ID into a durable file.** Four recurrences, the third of which landed on `main`. **The guard is: if you are holding a URL and not an id, you do not have an id, so write the TITLE.** Every row on this board names its session by title for exactly that reason. **Four instances means the guard is not being reached at write time** — it lives in a board footnote and in no checklist, which is precisely the B19 shape._
-
-<p><br/></p>
-
-_🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN.** **A found task never satisfies "spine armed."**_
-
-_📋 **C6 presence fires for EVERY committed session, not just repo ops.** ⚠️ **07-31: C6 is the CLAIM only; the CHECK is `hooks/collision-check.md`.** ⚠️ **08-01: the claim is now a HARD PRE-WRITE GATE bound to the write tool — no row naming your branch, no write.** ⚠️ **08-02: the gate is BLIND to a twin, and a branch ref does not fix it. See the fifth design fault above — the last-moment read is the only mechanism with a hit rate.** ⚠️ **08-02: violated once more, on uritp-docs PR #57 — the collision CHECK ran (path-filtered, clean) and the ROW did not go up until after the first writes. Same B19 shape as the ClickUp-ID guard: the rule is prose inside a hook file and appears in no executable step, so it is reached by memory or not at all.** ✅ **08-05: the gate was satisfied to the letter — row posted before the write, naming branch, repo and file — and collision eight happened anyway. The gate is not being violated any more; it is being OUTRUN.** ✅ **08-11: satisfied again and it cost TWO extra PRs to do honestly — the row must be on `main` BEFORE the write, and everything goes through a branch, so a one-PR change becomes three (row up · work · row down). Recorded because the next session will be tempted to skip it on exactly that arithmetic.**_
-
-_🔒 **AUDITS ARE STAMPED OR THEY ARE WORTHLESS** (PR #568). Every audit record names the SHA of every governing file it leaned on. **Addendum, never reissue.** ⚠️ **08-01: a stamp proves WHICH BYTES, not that the bytes say anything** — three signed records stamp `roster.json`, retired 07-30, so those checks passed on an empty read._
-
-_🧭 **THE STANDING GUARD HOLDS: do not invent an agent to fill an empty queue.** ⚠️ **Do not put a fleet COUNT in this note.** Filter the 🤖 Agent Index by `Class` and count the rows; that is the only number that cannot rot. ⚠️ **08-01: the URITP department-head Workshop shipped its whole roster tonight (Waves 1–3, PRs #687/#688) while a fleet audit was mid-flight — so an audit's scope can go stale under it.** The standing thread's DESCRIPTION also still says "First move: Catch Up Clark" — still wrong, still unfixed, trust the checklist and DL J14._
-
-<p><br/></p>
-
-_🏎️ **WHY THE F1 DATA STORE IS SAFE TO READ BUT NOT TO TRUST FROM DOCS.** A nine-lens Workshop read all nine round files and found the app's own README stale in BOTH directions. **Open the JSON before you believe the plan.** ⚠️ **08-01: the inverse also happened — the README carried the correct Sepang fact while BOTH data stores carried the wrong one. Nothing in this app ever compares the two directions.**_
-
-_⛔ **F1 step 5 is NOT a job you can improvise.** `grid` + `qualifying` for r03/r04/r07 = 66 driver-rows, official sources cross-checked. Sourced or absent._
-
-_🎨 **08-01 — `colors.tsv` IS A SHARED STANDARD AND IT NOW HAS A MEASURED FAILURE MODE.** Its `accent` column is a **theme** accent: the actionable colour inside ONE team's own theme, where nothing competes with it. Eleven of them rendered at once on a standings matrix is a use it was never designed for, and the result was measurable — Ferrari, Red Bull, Audi and Haas sat within **1.1 hue degrees and 0.011 lightness of each other**, two of them byte-identical. **Generalizes: when a design built for singular use is adopted for plural use, the failure is never in the values — it is in the assumption that distinctness was ever a property being maintained.** The board now holds one hue family per team; **if you add a twelfth row, check it against the other eleven in oklch, not by eye.**_
-
-_🧩 **08-01 — `template-app/chrome.js` IS A COPY BASELINE, NOT A SHARED RUNTIME.** 10,617 B of full app chrome (header, left nav drawer, right settings drawer with a live theme picker, JS-written footer stamp), with **no embed/iframe awareness**. Every app that copies it owns a fork, so **a fix in one app's copy reaches no other app** — the J19 four-copies shape, one level up. **Place it UNFORKED and let everything app-specific ride in through `cfg`;** if you need something the template cannot express, change the TEMPLATE. ⚠️ **Do not edit `template-app/` to fix your app** — that is a structural change to the gold standard and it is Michael's call._
-
-<p><br/></p>
-
-_🗑️ **THE ROUTINES VIEWER IS GONE** (PR #562). `routines/schedule.md` is the single source and is written for HUMANS. **Do not rebuild the app.** **Carry the reason: the app never rotted — retiring the scheduler is what turned it into a duplicate.** Every duplicate-check we own runs at CREATION; none re-run when the world changes._
-
-_🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it._
-
-_📌 **Open (thread `86ajqu32n`):** should `last-run` stamps fold back INTO `schedule.md`? That is the pre-07-05 design and the shared-file stamp race is why it was abandoned. **Test the concurrency claim before acting.**_
-
-<p><br/></p>
-
-_⚠️ **For whoever audits memory next:** `/PREFERENCES.md` is at effectively zero headroom, blocking qualified writes, and the OMR queue is jammed behind Michael's capacity ruling — **DROP works, DRAIN is blocked.** 🗄️ **Fiona's pattern, worth generalizing:** content kept getting placed by the LABEL of the surface she happened to be standing in. **Read a surface's PURPOSE, never its name or your own momentum.**_
-
-_🧠 **BUNDLE CAP IS THE #1 OMR BLOCKER AND MICHAEL CUT ITS ROOT CAUSE (07-30).** Ruling: `memory.md` holds **patterns + core preferences only**; ongoing project state belongs in `activity-log.md`. **Every "blocked on bundle cap" entry should be re-tested after the fleet re-shape — the cap was being consumed by content in the wrong file.**_
+**Nine collisions, the evidence, and every standing scar: [`session-board.notes.md`](./session-board.notes.md).**

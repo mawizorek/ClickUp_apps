@@ -136,6 +136,12 @@ Rules for this table:
 - Spine lines posted: {M}
 - Delta: {none, or: N-M missed, backfilled / still missing and marked}
 
+### 2b. Session board state
+
+- Row posted this session? {yes, naming branch {X} | no - no git-touching write}
+- Row cleared? {yes, PR {link} | N/A}
+- Expired rows retired to the sidecar: {list with evidence, or none}
+
 ### 3. Decisions made
 
 - {decision stated as a rule, pointer to DL entry if one exists}
@@ -179,6 +185,7 @@ If no next session needed: "No follow-up required."}
 - **Declare the session shape** (A or B). Clio branches Steps 3 and 5 on it.
 - The Session Ledger is COPIED from the task (already maintained live), not reconstructed.
 - Spine reconciliation is COUNTED, not estimated. Report the delta honestly.
+- **Section 2b is COUNTED too.** If the session wrote to any repo, it had a row; say what happened to it.
 - Memory candidates are PROPOSALS, not commits. Maggie decides placement.
 - Memory candidates are TAGGED with their target agent (from section 0).
 - The agents-present table is populated from the session transcript (who spoke as themselves).
@@ -311,6 +318,41 @@ channel threads. The spine's final line for a session is always the close.
 - **Bounced memory writes:** append to `brain-config/open-memory-requests.md`
 - **Open-thread note:** append to `brain-config/open-thread.md`
 
+### 🧹 Step 4a. CLEAR THE SESSION BOARD ROW (added 2026-08-11 — rule 28)
+
+**If this session posted a row to `brain-config/session-board.md`, DELETE IT NOW.**
+
+⚠️ **This step exists because the rule did not.** "Delete your row on close" lived in the
+GitHub MCP Operating Standard and in the board's own footer and **in zero executable steps**
+for the whole life of the board. Result: **three self-clears against six rows cleared by
+somebody else**, and a file that reached 32KB carrying rows dormant for up to two weeks.
+This is the same fault as the spine (prose-only rule, reached by memory or not at all) and
+it gets the same fix: **a numbered step.**
+
+1. **Read section 2b of the Handoff Artifact.** No row posted → skip to step 4b.
+2. **Re-fetch `session-board.md` fresh** (blob API; never a carried-over SHA).
+3. **Remove this session's row.** Leave every other row alone.
+4. **Carry anything durable OUT first, into `session-board.notes.md`** — a scar, a
+   collision, a warning the next session needs. 🚫 **Never leave it in the board row and
+   never delete it.** The board is presence; the sidecar is memory.
+5. **Branch → PR → self-merge**, like any other write. Commit message:
+   `session-board: self-clear <scope> row (PR #NNN merged)`.
+6. **On a non-fast-forward: re-fetch and MERGE, never force.** Another session posted while
+   you were closing, and clobbering their row is the exact damage this board exists to stop.
+
+### ⏳ Step 4b. Retire EXPIRED rows (same pass)
+
+While you are in the file, scan the other rows. **A row with no branch, or with no commit to
+any claimed path in 48 hours, is EXPIRED** (board rule 8).
+
+- **Prove it, do not assume it:** `list_commits --path <claimed path> --since <date>`.
+- **Move it to the retired-rows table in `session-board.notes.md`** with the evidence and the
+  last-movement date. 🚫 **Retire, never delete.**
+- **A wrongly-cleared row costs a re-post; a stale row costs an hour** — and a stale BLOCKER
+  can park real work indefinitely.
+- Nothing wakes on a schedule (the scheduler was retired 2026-07-26), so **this pass is the
+  only cleanup the board will ever get.** If you skip it, nobody does it.
+
 ### Step 5. Next-session handoff task
 
 **BRANCH ON SESSION SHAPE FIRST.**
@@ -344,9 +386,13 @@ Flush the seating tally to `brain-config/usage-log.json`. This lands LAST.
 
 ### Soft Close
 
-Runs: usage-log commit, Session Ledger finalize, spine close line, git-side closing writes.
-Skips: Channel 2, and Channel 1 only if memory was untouched.
+Runs: usage-log commit, Session Ledger finalize, spine close line, git-side closing writes,
+**and Step 4a (the board row clear) — always.**
+Skips: Channel 2, Step 4b (expired-row retirement), and Channel 1 only if memory was untouched.
 If the session delivered content, answered a question, took action, made a decision, or issued a correction, upgrade to full close.
+
+⚠️ **Step 4a never gets skipped by a mode.** A soft close that leaves a row behind produces
+exactly the stale claim the board is designed to prevent, and it is a two-minute write.
 
 ---
 
@@ -380,6 +426,7 @@ If the session delivered content, answered a question, took action, made a decis
 25. The `.txt` artifact + toggle survive the pointer change. Pointer governs prose, not the artifact.
 26. **A STANDING THREAD IS NEVER CLOSED AND NEVER DUPLICATED (LOCKED 2026-07-26, Michael).** If the session ran on a `🧭 STANDING ·` task, or on any task whose description says *"reopen, don't recreate"*: rewrite its description as the warm start, return it to `to do`, and cut NO parallel handoff task. Flipping it to `done` closes the project's permanent home; cutting a `↪️ HANDOFF ·` beside it creates two claimants on one baton.
 27. **The session agent DECLARES the session shape** (A or B) in the Handoff Artifact. Clio branches Steps 3 and 5 on that declaration rather than inferring it at close.
+28. 🧹 **THE SESSION BOARD ROW IS CLEARED AT EVERY CLOSE, INCLUDING SOFT (added 2026-08-11, Michael).** Step 4a, not a footnote. It is reported in section 2b of the Handoff Artifact and it is COUNTED, not asserted. Durable content comes OUT of the row into `session-board.notes.md` before the row dies. **There is no scheduled sweep of anything — the scheduler was retired 2026-07-26 — so if the close does not clear the row, nothing ever will.**
 
 ---
 
@@ -391,11 +438,23 @@ If the session delivered content, answered a question, took action, made a decis
 - `orchestration.md` (Seating Sequences section): the pattern this instantiates
 - Memory Maggie (`super-agents/memory-maggie/`): memory curation + rotation
 - `hooks/memory-rotation.md`: the rotation algorithm Maggie stewards
+- `session-board.md`: the presence table Step 4a clears (rules, expiry, the self-claim exception)
+- `session-board.notes.md`: where durable content goes when a row dies (collisions, scars, retired rows)
 
 ---
 
 ## Changelog
 
+- **2026-08-11 — Board clear became an EXECUTABLE STEP (Step 4a + 4b, rule 28, Handoff section 2b), Michael.**
+  Michael asked whether anything cleans the session board. Nothing did: this hook ran **6 steps and
+  27 rules without mentioning the board once**, so *"delete your row on close"* existed only as prose
+  in the GitHub MCP standard and in the board's own footer. Measured cost: **three self-clears against
+  six rows cleared by somebody else**, a file at **32,393 B** against a spec that said *"empty by
+  default,"* and five rows dormant 5–14 days. **Same fault as the spine** (PR #567 — a rule that lives
+  in prose and appears in no checklist is reached by memory or not at all) and the **same fix**.
+  Step 4b adds expired-row retirement WITH EVIDENCE, because the scheduler is gone and close is the
+  only cleanup that will ever run. Board split to a slim table + `session-board.notes.md` in the same
+  pass. Fold-in, not net-new: amends this hook, creates no new tool.
 - **2026-07-26 — Standing-thread branch added (rules 26–27), Michael.** The close spec assumed
   every session ends by closing a session task and cutting a fresh handoff. It had no branch
   for a standing thread that IS the baton, so Clio reported the same "deviation" at two
