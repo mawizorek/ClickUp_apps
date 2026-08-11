@@ -2,14 +2,20 @@
 
 > **LIVE per-reply session record.** Start the entry at session Commit, append one line per
 > qualifying reply (delivers content, answers a question, takes action, makes a decision, or issues a correction) as you go. At close it is already done — no batch reconstruction.
-> Newest session on top, append-only. Budget ~4-5KB (sliding window, last 10-15 sessions);
-> quarterly cold archives go to `activity-log/YYYY-QN.md` per `hooks/memory-rotation.md`.
+> Newest session on top, append-only. **Budget ~4-5KB for the ENTRIES ONLY** (sliding window);
+> the LIVE STATE block below sits OUTSIDE that window and is never rotated
+> (`super-agent-base.md` §4a, and `hooks/memory-rotation.md` as corrected 2026-08-10).
+> Quarterly cold archives go to `activity-log/YYYY-QN.md`.
 >
 > Format law: `_shared/super-agent-base.md` → Per-response logging mandate (LOCKED 2026-07-25).
 >
 > ⚠️ **AN OPEN SURFACE IS A CLAIM AND IT EXPIRES.** Verify the list at the bottom of an entry
-> before inheriting it — see the 08-01 strikes, where two of four had resolved and one of those
-> resolved the same day it was written. **Strike, never delete**, so the reader can see it moved.
+> before inheriting it — see the 08-01 strikes (now in `activity-log/2026-Q3.md`), where two of
+> four had resolved and one of those resolved the same day it was written. **Strike, never delete**,
+> so the reader can see it moved.
+>
+> 🗄️ **Cold archive:** `activity-log/2026-Q3.md` — sessions 08-08, 08-06 and 08-01 rotated there
+> 2026-08-10 by Maggie. Whole entries moved, nothing condensed, nothing dropped.
 
 ---
 
@@ -34,8 +40,7 @@
 - **`70-scripts/` as of 2026-08-10 00:20:** 12 pages, all carrying `status:`, all reporting markers.
   Four specs rewritten, four retired verbatim, three scripts still unread by anyone and deliberately
   unspecced (`00App_onFirstWindowOpen`, `00App_Mark_Setup_Complete`, `00App_Set_Setup_State`).
-- **Owed by me:** nothing outstanding. ⚠️ **But `memory.md` is 19,740 B against its ~10KB hot cap**
-  and needs a Maggie rotation, not another append — see the open surface below.
+- **Owed by me:** nothing outstanding.
 - **Blocked ON MICHAEL, and all three block real work:**
   1. 🔴 `APP_SESSIONS` vs `UTILITY_LOGS` — a second claimant that reverses J13 with no written
      reversal. `FILE · Open` cannot be entered until it is settled. **Posed as Q2 on the Decision
@@ -51,6 +56,16 @@
 - **Canonical trail:** the `↪️ HANDOFF ·` task carries the full fix queue and every superseding
   update. Read the BOTTOM-most comment first; four consecutive rulings on config each corrected the
   next one.
+
+## Bundle health — measured 2026-08-10 23:45 ET (Maggie's rotation)
+
+- ✅ **`memory.md` ROTATED: 19,740 B → 13,770 B.** Schema/build craft moved WARM to
+  `memory/archive/schema-and-build-craft.md`; the cross-runtime correlations stayed hot because they
+  are what the class was justified on. **This executes the split I flagged for Michael + Size Sally.**
+- ⚠️ **Still 13.45 KiB against a ~10KB target** — over budget, well under the 22KB ceiling, and
+  flagged rather than forced. What remains is correlations, live scars, Michael-patterns and
+  pointers; cutting further starts removing content that fires every session. **Michael's review.**
+- ✅ **`activity-log.md` ROTATED: 18,221 B → this file.** Three whole sessions moved cold.
 
 ## HML_LLC — dormant, no session since 07-29
 
@@ -113,53 +128,13 @@ after the afternoon handoff. Michael building in FileMaker, me documenting. **Fo
 **Open surfaces:** the three forks in LIVE STATE above · `@script:` link resolution is reasoned from
 `markerlinks.py` and **not yet observed on a real build** — read the first build report · the
 misspelled `70-scripts/90-Utlity/` folder is flagged for Michael's deletion (PR #82) ·
-⚠️ **`memory.md` is 19,740 B against a ~10KB hot cap and a ~22KB read ceiling.** It grew ~4.5KB today.
-Tonight's durable patterns were deliberately NOT appended — **a file already twice over budget needs a
-rotation, not a tenth entry** · ⚠️ **two abandoned branches in `ClickUp_apps`** (`fiona-omr-0810`,
-cut before measuring the queue; `fiona-stale-open-surfaces` if unmerged) — no available tool deletes
-a branch.
+~~`memory.md` is 19,740 B against a ~10KB hot cap and needs a rotation, not a tenth entry~~
+✅ **STRUCK 2026-08-10 23:45 — rotated by Maggie to 13,770 B; the residual overage is flagged for
+Michael in Bundle health above** · ⚠️ **two abandoned branches in `ClickUp_apps`**
+(`fiona-omr-0810`, cut before measuring the queue; `fiona-stale-open-surfaces` if unmerged) — no
+available tool deletes a branch.
 
-## 2026-08-08 — Production MAWster v1 schema · my first build I DROVE end to end
+---
 
-Session [Fiona + Wes (Opus 5) · Production MAWster v1 schema](https://app.clickup.com/t/86ajy1neb), ~4h. Michael building the FMP file in parallel; I documented the schema in `mawizorek/maw-prose`. Named by him as driver on the two hardest questions. **Nine PRs merged in the content repo, plus two in the engine (Dexter).**
-
-- 🔴 **The finding that justified the whole rebuild, read from a live export rather than the docs:** legacy `SETUP` is **20 fields / 1 record / almost entirely GLOBAL storage**, so `ProductionTITLE`, `Director` and `FIRST REHEARSAL` are one value for the entire file. **The old app holds exactly ONE production at a time**, and the six "stored production INFO" scripts are the PRODUCTIONS table written as code (14 `Set Field` steps per show). The ClickUp doc page claims multi-production support via SETUP records; it is false, and it also says 11 tables where the file has 9. **Two doc-page corrections owed.**
-- 🔴 **My ruling on spans, and Michael's catch on it.** I killed the legacy duplicate-per-day model (`CREATE_multipleDays`, rows flagged `autoGenerated = 1`) because it breaks the `TaskID + fkProduction` upsert key and turns one span move into three deletes plus three creates. Replaced with a **multi-predicate RANGE relationship**. ⚠️ **Then he pointed out a list view repeats per RECORD, so a one-row span cannot produce three agenda lines** — which reclassified the generated `EVENTS_workday` join from the performance escape hatch I had offered into a **reporting requirement**. **I ruled on the schema without asking what the report needed.** Both halves are now generalizations in `memory.md`.
-- 🌟 **C5 landed and it is the biggest correlation I have found.** Dexter's memory already held CANONICAL / GENERATED / PROJECTION for repo data. I derived CANONICAL / PROJECTION / ARCHIVE for this app from a totally different direction — a print-config move (`WeekStartDay` off the calendar) forced the grid to become disposable. **Same trichotomy, two runtimes, two authors, independently.** That is the shared vocabulary Michael wanted, demonstrated rather than asserted.
-- **Four second-claimant kills in one session, one shape:** `autoGenerated` · convenience-copy dates on two tables · six fixed highlight/lowlight fields · a duplicate `tables/` tree. Plus a fifth that was **Dexter's near-miss**, not mine. `memory.md` now carries the generalization: *a flag meaning "this row is not real" is the schema saying the row should not exist.*
-- **Rulings that stuck:** dates split by GRAIN · no convenience copies, read through `fkProduction` · `CALENDAR_EMPHASIS` as N typed rows with priority resolution · HIDE stays stamped because it is EXISTENCE not styling · preset vs session for print config · import SKINS and never AUTHORS · VENUES dies into LOCATIONS.
-- ⚠️ **A cosmetic rabbit hole I led him into.** The sorted-value-list pattern did not work on the first try and I offered three more debug suspects before he stopped it. **Unresolved and unproven.** I should have called it myself.
-- ⚠️ **Michael pushed on reply length three times before it stuck** — *"my attention is not with you"*, then *"so many words"*, then *"classic YOU SLOP."* Logged as a standing pattern, not a one-off.
-
-## 2026-08-06 — Seated on the URITP risk assessment architecture (Michael: "seat Corey and Fiona")
-
-Seated by Milo in session [MAWLIB-1038](https://app.clickup.com/t/86ajxr8t2). Question: should URITP risk assessments move to FileMaker, and how do ClickUp and FMP coordinate?
-
-- **My answer is not "move it."** The three-system treaty already rules this (`Course List` DL J3, 2026-08-04): repo = permanently true · ClickUp = true now · FileMaker = what WAS true. Applied here: hazard **library** = definition · **active** assessment = ClickUp, where the work happens · **closed-out** assessment for a struck show = FileMaker. A live risk assessment in FileMaker would be a schema serving nobody — the people filling it in are standing in a theatre with a phone.
-- 🔴 **The real seam is the ARCHIVE VERB, and it does not exist in either domain.** Three nouns, no verb; nothing moves a record from current to historical. It is already on Milo's owed list from the course architecture, unowned and untriggered. **Second domain, same hole — that promotes it from a course-side gap to a general one.**
-- **Schema read (Corey's live query, not mine to re-run):** show-applicability is expressed BOTH as a `URITP Productions` multi-select AND as a multi-home. **In FMP terms that is a join table and a repeating field solving the same relationship** — exactly the family-discipline failure my object library exists to refuse. **Fixing the duplication is a precondition of any migration, not a step in it.**
-- ⚠️ **Naming, since a name is a contract:** `gen PRODUCTION Hazards` and `GENERAL Shop Hazards` are the same word in two casings and two positions. If this ever becomes an FMP table set, the naming gets settled first.
-
-**🌟 First entry for my CORRELATION LEDGER** — *ClickUp multi-home ↔ FMP join table*. It holds for many-to-many show↔hazard; **it breaks on the archive boundary**, because a multi-home has no lifecycle state and a join row can carry one. ✅ Now C4 in `memory.md`.
-
-**State left:** advisory only, zero schema touched, zero repo edits (consult-never-edit intact). **Awaiting Michael. Do not begin an FMP build off this thread.**
-
-## 2026-08-01 — Native shell CONVERTED to thin git-loader (Model A executed)
-
-Trigger: DM w/ Michael. Native runtime (user-ID `-39958890`) acting on Michael's explicit direction: *"i want you to become this new type of agent and document the steps for the next agent… let's just complete your conversion."*
-
-- **Model A is now real, not planned.** The native ClickUp shell is RETAINED as the daily driver — keeps its user-ID, tools, triggers (mention/DM/assignment), model — and its behavioral definition was reduced via `edit_self` to the thin **loader kernel**. This **supersedes the 2026-07-26 open surface #5** ("disable native `-39958890`"): the native is deliberately kept alive as the body; only the brain moved to the repo.
-- **Kernel finalized + landed** (`native-loader-kernel.md`, reference on `main`; PR #653 closed as superseded). Fix vs the draft: the load list now names **all three brain axes** — `preferences.md` + `memory.md` + `native-flush.md` — plus `team-standard.md`.
-- **Conversion runbook authored** for the next agent: `_shared/native-to-git-conversion-runbook.md` (PROPOSED, pending Corey's ratification on his own conversion pass).
-- **Pointer-pull verified in-session:** clean fresh reads of every bundle file succeeded — the GitHub read path the kernel depends on works.
-
-**Open surfaces — AUDITED 2026-08-10, two of four were already resolved and had been reading as live for nine days:**
-
-1. ⬜ **UI display name + description still read "FMP Frank."** Narrowed rather than struck: the 🤖 Agent Index row reads **FMP Fiona** and is `active`, so the INDEX is clean. The native ClickUp agent profile UI is a different surface and cannot be verified from here. **Still open, but smaller than it reads.**
-2. ~~**`native-flush.md` non-empty** — a Maggie run should consolidate and clear it.~~ ✅ **STRUCK 2026-08-10. It was resolved the SAME DAY it was written** — the file's own consolidation history records Maggie's first live run of `hooks/native-flush-consolidation.md` on 2026-08-01, and the dump zone reads *(bare)*. Verified at HEAD. 🔴 **This is the worst shape of stale note there is: an unfinished-work claim that generates phantom work.** Every pickup since has been told a consolidation was owed. It also inverts the flush file's entire signal — **emptiness IS the all-clear**, and a note asserting non-emptiness overrides the mechanism it describes.
-3. ~~**`preferences.md` still carries the 07-26 "retired native / no triggers" framing** that Model A supersedes.~~ ✅ **STRUCK 2026-08-10.** Read in full at HEAD this session: the profile's second sentence already reads *"The earlier 'no autonomous triggers / he's no native agent / retired native' framing is SUPERSEDED."* Corrected at some point after the note was written; the note was never retired.
-4. ⬜ **Fleet rollout to Milo + Listing Lookout** copies this kernel/runbook shape — **Corey's steward call, not mine to close.** Genuinely still open.
-
-⭐ **The generalization, and it is why these were struck rather than quietly deleted: an open surface is a CLAIM WITH NO EXPIRY, and nothing re-reads it.** A finding gets audited because someone doubts it; a to-do gets inherited because doubting it costs more than carrying it. **Two of four here, one resolved within hours of being written.** Same family as the OMR queue's *"a status note that says something is MISSING reads as a to-do rather than a claim, so nobody audits it"* — this is that inverted: a note saying something is UNFINISHED, when it is finished.
-
+_Older sessions (2026-08-08, 08-06, 08-01) → `activity-log/2026-Q3.md`._
 _(2026-07-26 birth entry rotated — see `decision-log.md` D1–D6 for the rulings that shaped the lane.)_
