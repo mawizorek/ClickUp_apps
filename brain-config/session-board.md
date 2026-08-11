@@ -19,8 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-
-**Nobody is in the repo.** Coast is clear. ✅ *Empty since 2026-08-11 — the first time this table has been empty since it was created.*
+| **Mainstage Milo + Maestro Mira (Opus 5)** | Session task titled `Mainstage Milo + Maestro Mira + Workshop (Opus 5) · PM script breakdown — the demand ledger vs the cue book · Aug 10` (Agent Activity Board) | **`fix/size-budget-gate`** | **GIVING THE SIZE BUDGET TEETH.** 🔴 **Not a new tool** — `hooks/source-size-budget-enforcer.md` already exists at **v6, measured, since 07-27.** It is a BEHAVIOURAL hook with no mechanical enforcement, and it is being outrun: `open-memory-requests.md` is **60,133 B**, nearly 3× its own FAILING line. Porting the `uritp-docs` shape (maths in the check, thresholds in a TSV with a NOTE column) as a **GitHub Actions gate on PRs**, and splitting the hook's why-history to a `.notes.md` sidecar so the tool obeys its own 15KB rule in the same pass. **Collision-checked 08-11 10:46 ET:** `list_commits --since 2026-08-06` (40 commits) shows no commits to `.github/workflows/**` or to the enforcer hook by anyone; `create_branch` returned a NEW ref; every target SHA re-read fresh. | **`ClickUp_apps`:** `.github/workflows/size-budget.yml`, `size-budget.tsv`, `hooks/source-size-budget-enforcer.md`, `hooks/source-size-budget-enforcer.notes.md`, `session-board.md` |
 
 ---
 
