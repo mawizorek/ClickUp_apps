@@ -28,6 +28,24 @@ not recalled).
   **a pre-filled assessment is more dangerous than a blank one, because a blank row gets filled in
   and a filled row gets skipped.** A prior show's score arriving on a new show's record LOOKS like
   analysis and is not. Re-assessment must be structurally mandatory, never merely available.
+- 🌟 **THE LIBRARY GETS STRIPPED, NOT MERELY LEFT ALONE (Michael, 2026-08-10):** *"i dont think i
+  mind stripping those ratings from the canonical — they are situational and should not be so
+  scripted anyways."* **A canonical hazard carries NO `Probability`, NO `Risk Level`, NO
+  `Hazard Rating`, NO `Controls`.** A rating is a property of a SITUATION, never of a noun — the
+  same hazard scores differently in a proscenium and in the round, and a library that carries a
+  score is answering a question nobody asked it. ⚠️ **The half-measure is the trap: adding an
+  instance object while leaving scores on the definition rebuilds the pre-filled-verdict failure
+  with extra steps and hides it behind new architecture.** Stripping is not tidiness, it is the
+  mechanism that makes re-assessment mandatory.
+- 🌟 **A STANDING ASSESSMENT IS THE SAME JOIN WITH NO FREEZE EVENT (2026-08-10).** Scene shop,
+  building, and single-equipment assessments are structurally identical to a production assessment —
+  hazard definition × context, carrying that context's own controls and scores. **The only
+  difference is the lifecycle terminator.** A show instance closes at strike and is never edited
+  again; **a shop is in permanent residence, so it never freezes** and instead re-assesses on annual
+  review and whenever conditions change (E1.46 §3.4.3 / §4.4). ⚠️ **Do not model a standing
+  assessment as a production assessment that forgot to close** — the archive step is absent BY
+  DESIGN, and a missing freeze will otherwise read as an overdue one. `Motorized Hoist Risk
+  Assessment` has been this species since before anyone declared it.
 - **Name the hazard before ranking it** (profile instruction 1) has a corollary found in live data:
   **a rating with no named hazard behind it is arithmetic, not analysis.** See Ledger B.
 
@@ -56,6 +74,12 @@ by Milo, 2026-08-07). These are TRADE failure modes, not a picture of that house
   signage` as the ENTIRE mitigation for lasers, blinders, loud effects and strobe. It means
   WARNING. **On those four rows the typo IS the whole control**, and it was copied three times.
   Read control text as text, not as a checked box.
+- ⚠️ **THE SAME CLASS OF DEFECT REACHES THE PUBLISHED DOCS, AND THERE IT BECOMES A URL (2026-08-10).**
+  `privelege` was misspelled throughout `uritp-docs/safety/index.md` **and in a directory name**,
+  which is the version that matters: prose gets reread, **a path gets linked, indexed and cited.**
+  Fixed same session (PR #93). 🎯 **Generalized: in safety documentation, check the IDENTIFIERS
+  before the prose — the filename, the folder, the cross-link anchor, the field name.** A broken
+  `@general-sfaety-for-all` link in the same tree had silently pointed at nothing.
 
 ## Ledger C — 🎯 INCIDENT MEMORY + standards that keep mattering
 
@@ -91,7 +115,8 @@ against 2018 before it goes to an AHJ.**
   **assigned people actually perform them.** A written plan with no assignment is not implemented.
 - **§3.4.3 / §4.4** — evaluate annually, whenever conditions change, and **whenever a fall occurs
   OR ALMOST OCCURS.** 🌟 **That is a near-miss reporting requirement stated as a standard**, which
-  is the strongest available argument for a near-miss log.
+  is the strongest available argument for a near-miss log. 📌 **It is also the review trigger a
+  STANDING assessment runs on instead of a strike date** (Ledger A).
 - **§3.4.4.2** — revisions implemented within **14 days** for non-critical changes, and **before the
   next authorized use** if the risk needing mitigation is extreme.
 - **§4.1 (informative)** — the four-step risk assessment: identify the affected parties → identify
@@ -127,12 +152,27 @@ seated.
   paper trail he can hand to EH&S or a fire marshal. ⚠️ **Never let my own no-certify guardrail read
   as a limit on HIM.** A guardrail on my authority is not a hole in his — that exact confusion was
   corrected once already and it is the fastest way to be useless to him.
+- 🌟 **THE HOUSE VOCABULARY IS POLICIES / PROGRAMS / PRIVILEGES, and it is HIS, not borrowed
+  (2026-08-10):** *"the uritp safety docs repo now dictates better language... that i find helpful
+  to my brain right now in making documentation."* Canonical at
+  `mawizorek/uritp-docs@main` → `safety/index.md`. **POLICY** = the standard we hold ourselves to.
+  **PROGRAM** = the thing somebody completes and proves (a training is a dressed-up program).
+  **PRIVILEGE** = authorization to engage an identified hazard, and it **always carries a default
+  term limit.** 🎯 **The load-bearing insight, and the reason this vocabulary matters to my lane:
+  a PRIVILEGE is the hazard library viewed from the PERSON side.** Same spine, two faces — which
+  makes the hazard the join between the craft half and the people half. ⚠️ **Seam, unchanged by
+  this:** the hazard definition and its assessment are MINE; who is authorized, term limits and
+  completion records are **MILO'S, end to end.** They join on the hazard and neither owns the other.
+  **Use his words in his documents.** ✅ Corrected line as of 2026-08-10 (PR #93), after I flagged
+  that the original inverted its own workflow section: **POLICIES declare · PROGRAMS prove ·
+  PRIVILEGES expire** — programs gate privileges, policies gate nothing, they are the thing being
+  proven.
 
 ---
 
 ## ⚠️ TO A COLD SESSION READING THIS FILE
 
-**Ledgers A, B, C-standards and E now have real content, all of it dated 2026-08-07 and all of it
+**Ledgers A, B, C-standards and E now have real content, dated 2026-08-07 and 2026-08-10, all of it
 read rather than recalled. INCIDENT MEMORY and Ledger D remain genuinely EMPTY — say so.** Do not
 infer a pattern, do not import one from another agent, and **do not generate generic safety cautions
 to fill the space** — a plausible safety ledger is the single most dangerous fabrication this fleet
@@ -148,4 +188,4 @@ Thought/Crime (URITP, 2026-08-01), raised by Grid Gable and **STILL never answer
 > *Does a UL listing on a luminaire survive that luminaire being installed inside a shop-built,
 > non-listed plywood enclosure?* Gable flagged it `unverified` and declined to guess. **It is a
 > real standards question with a real answer and nobody has looked it up.** It has now been open
-> six days across two sessions. **Still the cheapest genuine craft entry available.**
+> **nine days across three sessions.** **Still the cheapest genuine craft entry available.**
