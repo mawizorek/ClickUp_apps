@@ -1,0 +1,86 @@
+# brain-config/size-budget.tsv — the ONLY place the size-budget numbers live.
+#
+# MATHS IN THE WORKFLOW, THRESHOLDS HERE. Ported from uritp-docs (PR #57, 2026-08-02).
+# Enforced by .github/workflows/size-budget.yml. Documented by hooks/source-size-budget-enforcer.md.
+#
+# WHY A TSV AND NOT CONSTANTS IN THE SCRIPT: every threshold change and every waiver
+# then shows up as a ROW IN A DIFF, with a note saying who allowed it and why.
+# A number buried in a script is changed silently; a number in a reviewed row is not.
+#
+# 🚫 DO NOT add a threshold to the workflow file. Add a row here.
+#
+# ------------------------------------------------------------------------------
+# SECTION 1 — LIMITS. kind=limit
+# ------------------------------------------------------------------------------
+# ⚠️ THESE ARE POLICY LINES, NOT MEASURED WALLS, AND THE DIFFERENCE MATTERS.
+# Measured facts, both real: a 21.7KB file read back WHOLE through the blob API
+# (2026-07-26, super-agent-base.md, changelog intact to the final line). A ~25KB
+# file truncated (2026-07-25, roster.json). A 34.9KB file clipped silently with NO
+# ERROR across four reads in one session (2026-08-01, uritp.css) — its last ~6KB was
+# being edited blind. Nobody has characterised the range between 21.7 and 25.
+# The blob API returns BASE64, which inflates 4/3, so the ~30KB return cap lands
+# near ~22KB on disk. That is where `read_ceiling` comes from.
+#
+# 🔬 Beckett's rule, and it is why this block cites its sources: a ceiling asserted
+# repeatedly without ever being measured is a superstition. VERSIONS.md still calls
+# 22KB "physics". It is not. It is the best line we have, drawn around two data points.
+#
+#kind	name	kb	note
+limit	target	12	Aim here. Under it, the gate is silent.
+limit	split_line	15	WARN. Split by concern in the same pass — silently, per the hook's locked posture. Do not ask.
+limit	read_ceiling	22	FAIL. Past this a hand-edited file cannot be read back whole, so it cannot be safely edited, so it becomes UNWRITEABLE. That is the real stake, not tidiness.
+limit	write_cap	30	FAIL HARD. create_or_update_file clips or corrupts past here. Route through the GitHub UI or a chunk set.
+#
+# ------------------------------------------------------------------------------
+# SECTION 2 — WHAT IS BUDGETED. kind=scope
+# ------------------------------------------------------------------------------
+# A file is budgeted when it is HAND-MAINTAINED AND MUST BE READ WHOLE TO BE EDITED.
+#
+# 🚫 A DATA FILE IS NOT SOURCE AND IS NOT BUDGETED. A 40KB TSV is a big
+# spreadsheet, not an unreadable module — nothing edits it from a partial read,
+# because nothing edits it by hand at all. Budgeting content would turn a size
+# gate into an opinion about how much documentation somebody is allowed to have.
+#
+# 🚫 APP RUNTIME FILES ARE NOT BUDGETED EITHER, and this is not an oversight.
+# The GitHub MCP Operating Standard already governs them with a DIFFERENT and
+# older mechanism: an over-cap app ships a <app>/source/ chunk set plus _index.md
+# so it can be read back in pieces. Two mechanisms aiming at one file would
+# contradict within a month. Apps have theirs; this gate covers governance prose.
+#
+#kind	pattern	mode	note
+scope	brain-config/**/*.md	include	Hooks, gates, standards, agent bundles. The hand-edited governance tree — the actual failure surface.
+scope	routines/**/*.md	include	Runbooks are read whole and followed literally.
+scope	brain-config/**/*.html	exclude	Renderers and generated index pages. Not hand-maintained prose.
+scope	brain-config/**/*.json	exclude	Data and manifests. Opt a hand-edited index IN with a kind=watch row instead.
+scope	**/source/**	exclude	Chunk renditions exist BECAUSE a file is over cap. Budgeting them inverts the mechanism.
+#
+# ------------------------------------------------------------------------------
+# SECTION 3 — WAIVERS. kind=waiver
+# ------------------------------------------------------------------------------
+# A waiver downgrades FAIL to WARN for one path. Every row needs a real note.
+#
+# ⚠️ A WAIVER IS A DEBT, NOT A DECISION. It says "we know, and not in this PR."
+# 🚫 NEVER waive a file by deleting a live warning, a security flag or a
+# do-not-do rule to hit a byte count. That trades correctness for tidiness and
+# inverts the whole reason the budget exists.
+#
+# THE HONEST STATE, 2026-08-11: this section is EMPTY, and that is deliberate.
+# Six files in brain-config are over the read ceiling right now (worst:
+# open-memory-requests.md at 60,133 B, nearly 3× the line). None is waived,
+# because the gate only fails on files a PR actually TOUCHES — so pre-existing
+# debt does not block unrelated work and does not need laundering through a
+# waiver row. It is printed as a warning inventory on every run instead, which
+# keeps it visible and shrinking. A waiver is for when you touch an over-cap
+# file and genuinely cannot fix it in that pass.
+#
+#kind	path	expires	note
+#waiver	brain-config/example.md	2026-09-01	Why this is allowed, and what will fix it.
+#
+# ------------------------------------------------------------------------------
+# SECTION 4 — WATCH. kind=watch
+# ------------------------------------------------------------------------------
+# Opt a specific file in even if the scope rules exclude it. Use for a
+# hand-edited index that happens to be .json or .tsv.
+#
+#kind	path	note
+watch	VERSIONS.md	Hand-maintained ledger, read whole on every app PR. It crossed the line once already (16.4KB, 2026-07-25) and still asserts 22KB is "physics".
