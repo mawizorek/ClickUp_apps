@@ -17,7 +17,7 @@
 > cannot see or reproduce the real one. **Name the task and give its ID in backticks.** A bare ID is ugly; a
 > link to a placeholder host is dead.
 >
-> 🗄️ **Cold archive:** `activity-log/2026-Q3.md` — the build session and the 08-01/08-02/08-03 runs
+> 🗄️ **Cold archive:** `activity-log/2026-Q3.md` — the build session plus the 08-01 → 08-05 runs
 > rotated there 2026-08-11 by Maggie. Whole entries moved, nothing condensed, nothing dropped.
 
 ---
@@ -56,12 +56,13 @@
 - ⬜ **A debrief on the 173-listing pass is sitting on the board** (Compass Corso + Portfolio Paige,
   08-07). **Read it before drawing any Job Market band** — someone may already have explained the jump.
 
-## Bundle health — measured 2026-08-11 00:38 ET (Maggie's rotation)
+## Bundle health — measured 2026-08-11 00:40 ET (Maggie's rotation)
 
 - ✅ **`memory.md` ROTATED: 15,613 B → 11,741 B.** Origins + contract reasoning → `memory/archive/origins-and-contract.md`.
   ⚠️ Still 11.47 KiB against ~10KB — **flagged, not forced.** What remains is the source ledger, the
   execution scars and how-Michael-works, all of which fire on a run.
-- ✅ **`activity-log.md` ROTATED: 13,791 B → this file**, five sessions moved cold, LIVE STATE added.
+- ✅ **`activity-log.md` ROTATED: 13,791 B → this file.** Seven sessions moved cold, LIVE STATE added,
+  entries now under the ~5KB window.
 - ⚠️ **`decision-log.md` 14,115 B** — no file cap, partial-load by TOC. Informational.
 - 🔴 **`preferences.md` is 16,821 B — the largest file in this bundle**, exempt from rotation, read
   FULL on every seating, and measured by nothing. **Second bundle in a row where the profile outweighs
@@ -117,51 +118,15 @@ Session context: 🧭 STANDING · Routine Ricky — Run Reports (`86ajuhw1d`) ·
   during the 8:33 AM commit. The 07-26 entry's `Fleet Build Queue` link became a dead internal placeholder, and
   I even changed its number. Root cause is now a header rule above: **an agent cannot see a real ClickUp URL**,
   so a whole-file rewrite of any repo file containing one silently kills the link. Link replaced with plain
-  text; the original URL is unrecoverable from an agent's context and is in git history if anyone wants it.
+  text; the original is in git history.
   ⚠️ **Same reason the fresh-day rule could not go in `routines/README.md`, which is where it belongs.**
 - ⚠️ Deviation, stated: no `session-board.md` presence row. Ran the substitute with a hit rate instead
   (path-filtered `list_commits --since today`, clean, immediately before each write) and no board row claims
-  `on-track/**` or `routines/**`. Rationale on the run report. Ledger X1 says we survived on the backstop once;
-  recording rather than repeating silently.
+  `on-track/**` or `routines/**`. Ledger X1 says we survived on the backstop once; recording rather than
+  repeating silently.
 - **Left standing:** Job Market — DUE, and now unambiguously a **FRESH full pull**, not a resume. Not attempted
   in this session by design (Michael's 08-04 Option C: heavy routines get their own session).
 
 ---
 
-## 2026-08-05 — Job Market, aborted at a role boundary (RECONSTRUCTED from the standing thread)
-
-- 8:52 AM · INVOKED (`/ricky refresh`).
-- 8:52 AM · Resume Scan: FRESH PASS, nothing to resume. 16h 32m since the 08-04 pass landed.
-- ~9:00 AM · job-market-refresh v17.3 — ran 1 of 8 lanes. production-manager: 34 live, +4 new, 0 gone.
-  Posted, threaded, committed (PR #750).
-- ~9:02 AM · STOPPED at role boundary. Three board defects: Playbill `?category=` served Jan/Feb 2026
-  listings (6 months stale); BroadwayWorld `?page=2` returns page 1; OffStageJobs `?department=X&page=2`
-  returns page 1. Pagination is a known ceiling on OSJ + BWW via this fetch path.
-- ~9:02 AM · ❌ NOT stamped. An aborted loop does not stamp. Roll-up posted to the standing thread.
-- 10:10 AM · Second invocation, triage only. **Never answered — On Track went past its threshold unattended.**
-- Ledger: BWW recovered after its 08-04 failure, so that was one bad day, not a rotting source — un-degraded.
-  The ACG open-searches index is not a liveness check: fetch the search URL, never the index.
-- ⚠️ **Under the 08-06 fresh-day rule this pass is now formally unresumable**, which is the right outcome: its
-  one committed lane simply gets re-verified by the next full pass.
-- Gap: no activity-log entry was written at the time. Backfilled 2026-08-06 from the standing thread.
-
----
-
-## 2026-08-04 — Job Market, resumed and landed PARTIAL (RECONSTRUCTED from the standing thread)
-
-- 8:56 AM · INVOKED. Triage: Job Market the only routine due.
-- 9:43 AM · Job Market pass — 74 live (+6 new), 8 roles swept. Stamped `2026-08-04 09:43 ET`.
-  7 of 14 boards reached; the rest carried from the 08-03 sweep.
-- ~1:00 PM · Corso + Paige seated in-thread off the pass. Michael flagged that the roll-up read as a loose
-  summary; the per-role formatted comments had in fact landed on `86ajtgbt3`. Visibility problem, not compliance.
-- 4:20 PM · RESUME of the 13:20 pass — all 8 lanes complete and threaded, 108 live, +24 TSV rows, 0 gone.
-  ⚠️ PARTIAL (BWW index failed outright; USITT + StageBoard unswept on the resume half). Product landed on
-  every target surface, so it stamped: `2026-08-04 16:20 ET`.
-- Ledger (the big one): OffStageJobs department indexes had never been opened by any pass. Three lanes that
-  had read 0-4 for weeks jumped to 12, 9 and 4 off one page each. Every prior "thin lane" verdict is void.
-  Also: the 13:20 checkpoint comment lied about TSV state — read the state file, never the note about it.
-- Gap: no activity-log entry was written at the time. Backfilled 2026-08-06 from the standing thread.
-
----
-
-_Older sessions (2026-08-03 ×2, 08-02, 08-01, 07-26 build) → `activity-log/2026-Q3.md`._
+_Older sessions (2026-08-05, 08-04, 08-03 ×2, 08-02, 08-01, 07-26 build) → `activity-log/2026-Q3.md`._
