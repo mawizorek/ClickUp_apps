@@ -1,0 +1,37 @@
+# Size budget gate.
+#
+# Thresholds live in brain-config/size-budget.tsv. Maths lives in
+# .github/scripts/size_budget.py. This file only decides WHEN it runs.
+# Rule it enforces: brain-config/hooks/source-size-budget-enforcer.md
+#
+# ⚠️ NO PATH FILTER, DELIBERATELY. The obvious move is `paths: [brain-config/**]`
+# so the job skips unrelated PRs. Do not add it. The standing-debt inventory is
+# the half of this gate that keeps 60KB of existing over-cap files VISIBLE, and
+# a filtered job prints that inventory only on the PRs least likely to need
+# reminding. It is a ~10 second job. Let it run every time.
+
+name: size budget
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The gate diffs against the base, so it needs both sides.
+          # A shallow clone makes `git diff base HEAD` fail outright rather
+          # than return an empty list, which is the good failure: an empty
+          # diff would pass every PR silently.
+          fetch-depth: 0
+
+      - name: check size budget
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 .github/scripts/size_budget.py
