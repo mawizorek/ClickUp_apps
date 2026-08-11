@@ -69,8 +69,7 @@ that stays hot. Everything else is archive.
 - Anything where a one-line pointer would serve as well as the full entry
 
 **Archive location:** `<agent-slug>/memory/archive/<topic-slug>.md`
-
-Example: `dev-dexter/memory/archive/inciardi-market-scars.md`
+(e.g. `dev-dexter/memory/archive/inciardi-market-scars.md`)
 
 **Rotation mechanic:**
 1. After all memory writes land, measure `memory.md` size.
@@ -98,11 +97,10 @@ is small enough that deep-steeping the whole file on session open is fast.
 
 ⚠️ **CORRECTED 2026-08-10 against Constitution \S4a (LOCKED 07-30).** ~~Stated as a whole-file
 budget.~~ **The LIVE STATE block is permanent, sits at the top, and is OUTSIDE the window** —
-never rotated, never archived, never counted. `_shared/super-agent-base.md` \S4a flagged this
-file as carrying the old shape and nothing actioned it. **Measuring the file whole overstates
-every agent carrying a real LIVE STATE block**, which is the agents doing the most project work.
-Re-measure entries-only before calling an activity log over budget, and re-test any OMR marked
-"blocked on bundle cap" against it.
+never rotated, never archived, never counted. \S4a flagged this file as carrying the old shape
+and nothing actioned it. **Measuring the file whole overstates every agent carrying a real LIVE
+STATE block**, which is the agents doing the most project work. Re-measure entries-only before
+calling an activity log over budget, and re-test any OMR marked "blocked on bundle cap" against it.
 
 **What stays:** the LIVE STATE block (outside budget) + the most recent 10-15 session entries
 (date, what, key decisions, state left, session task link).
@@ -137,22 +135,12 @@ retrieve if needed, but shouldn't cost load time every session.
   keyword), load it individually.
 
 **Why no rotation:** decision logs are reasoning about the agent's own shape.
-  They don't grow fast (one entry per decision, not per session), and old
-  decisions stay relevant longer than old activity entries. Partial loading
-  solves the read-cap problem without losing the record.
+They don't grow fast (one entry per decision, not per session), and old
+decisions stay relevant longer than old activity entries. Partial loading
+solves the read-cap problem without losing the record.
 
-**TOC format (maintained at the top of the file):**
-```markdown
-## Table of Contents
-
-| ID | Date | One-line summary |
-|---|---|---|
-| D5 | 2026-07-25 | Born half-wired, roster registration open |
-| D4 | 2026-07-25 | Seated through Mira, class-blind |
-| D3 | 2026-07-24 | Name: Dev Dexter |
-| D2 | 2026-07-25 | Primarily engineer, writes code |
-| D1 | 2026-07-24 | NET-NEW teammate for build lane |
-```
+**TOC format:** a `## Table of Contents` markdown table at the top of the file,
+columns `ID | Date | One-line summary`, newest first.
 
 **Maintenance:** when a new entry is added, add a TOC row. When the decision
 log is first loaded, if no TOC exists, generate one from the entries present.
@@ -178,9 +166,9 @@ still seems hot). Flag it, report it in Channel 1, but do NOT delete
 content without Michael's review. Close proceeds with the flag.
 
 ⚠️ **The ~22KB ceiling is a WORKING MARGIN, not a measured cliff** (2026-08-10):
-`_shared/super-agent-base.md` at 23,444 B read back whole and unflattened. Treat over-22KB as
-urgent because the margin is gone — but **never report a file unreadable without attempting the
-read.** A predicted failure stated as an observed one is the same defect as a false save.
+`_shared/super-agent-base.md` at 23,444 B read back whole and unflattened. Over-22KB is urgent
+because the margin is gone — but **never report a file unreadable without attempting the read.**
+A predicted failure stated as an observed one is the same defect as a false save.
 
 ---
 
@@ -192,11 +180,11 @@ Same mechanics as the close pass. Five differences.
    the tiered list and the recommended order. It is a punch list, not a suggestion.
 2. **Re-measure before cutting; never trust the report's number.** It is a snapshot that may be
    days old and agents write their own files live. Fresh listing, fresh SHA, then cut.
-3. **Run the \S4a sweep FIRST on every bundle, before archiving anything for age.** `memory.md`
-   holds patterns and preferences ONLY; anything that can go stale in a day belongs in the LIVE
-   STATE block. **A count or status in `memory.md` is a defect on sight — move it, don't refresh
-   it.** Caps get consumed by project state in the wrong file, so a bundle can come under budget by
-   relocation alone. Skip this and you archive real judgment to make room for a stale row count.
+3. **Run the \S4a sweep FIRST, before archiving anything for age.** `memory.md` holds patterns and
+   preferences ONLY; anything that can go stale in a day belongs in the LIVE STATE block. **A count
+   or status in `memory.md` is a defect on sight — move it, don't refresh it.** A bundle can come
+   under budget by relocation alone. Skip this and you archive real judgment to make room for a
+   stale row count.
 4. **`_shared/` is IN SCOPE.** Shared specs live outside every agent folder, so a per-bundle sweep
    never sees them — and they cost load budget on every seating in the fleet, which makes them the
    highest-leverage bytes there are.
@@ -271,11 +259,9 @@ brain-config/super-agents/<slug>/
   memory/
     archive/
       <topic-slug>.md        # WARM: on-demand
-      <topic-slug>-2.md      # WARM: shard overflow
   activity-log.md            # LIVE STATE block (outside budget) + SLIDING WINDOW (~5KB entries)
   activity-log/
     2026-Q3.md               # COLD: quarterly archive
-    2026-Q4.md
   decision-log.md            # PARTIAL LOAD (TOC + last N)
   preferences.md             # identity/voice/lane (not rotated)
   README.md                  # steward metadata (not rotated)
@@ -301,9 +287,8 @@ brain-config/super-agents/<slug>/
 ## Invocation + Trigger
 
 ~~This hook is NOT independently invocable. It fires ONLY as part of the session-close
-seating sequence (Clio calls Maggie, Maggie runs this). There is no `/memory-rotation`
-command. If an agent needs an ad-hoc rotation mid-session (unlikely), it queues the
-request for close.~~
+seating sequence. There is no `/memory-rotation` command. If an agent needs an ad-hoc
+rotation mid-session (unlikely), it queues the request for close.~~
 
 🔴 **STRUCK 2026-08-10, Michael.** That clause made the second half of the Agent Memory Report's
 own two-phase model illegal, and it is the mechanical cause of run one's headline: rotation had
@@ -321,10 +306,10 @@ Kept struck because why it was wrong outlives its absence. Full reasoning: PR #7
 ## Changelog
 
 - 2026-08-10 - **AMENDED (Maggie), PR #798.** Standalone invocation authorized · activity-log
-  budget corrected to entries-only per \S4a (the LIVE STATE block sits outside the window) ·
-  `_shared/` added to scope · \S4a misplacement sweep added ahead of age-based archiving ·
-  the ~22KB ceiling recorded as a working margin, not a measured cliff. All five surfaced by
-  CONSUMING Ricky's first Agent Memory Report as the downstream agent, not by auditing this file.
+  budget corrected to entries-only per \S4a · `_shared/` added to scope · \S4a misplacement sweep
+  added ahead of age-based archiving · the ~22KB ceiling recorded as a working margin, not a
+  measured cliff. All five surfaced by CONSUMING Ricky's first Agent Memory Report as the
+  downstream agent, not by auditing this file.
 - 2026-07-25 - created. Born from a Dev Dexter session on agent memory
   architecture. Design: hot/warm/cold tiering, per-file budgets, rotation
   as a gate on close. Fills the TBD pointer in session-close.md and
