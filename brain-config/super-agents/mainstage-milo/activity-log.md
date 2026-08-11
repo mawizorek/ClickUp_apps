@@ -34,15 +34,44 @@ _Hot window: the LIVE STATE block + the last ~2 closes. Older entries: `activity
 - **Budget $5,500, in-house build, URITP is the bidder.** ⚠️ **Never said out loud in the meeting.** Now reframed by Michael as the **Budget at a Glance** document rather than an email.
 - 🔴 **Seat count unresolved: 92 logged vs 108 counted.** Owed from Frank in writing or from the `.vwx`.
 - **ADA hardcoded** on ITP-4187: 51–150 band → 4 wheelchair + 4 companion, 5% aisle seats, 36″/33″. 2010 Standards §221/§802.
-- ⚠️ **EH&S and the fire marshal: still ZERO contact** across two meetings with audience-on-built-platforming live. **Code lane is MICHAEL's; I supply citation + paper trail. Charlie owns buildability.**
-- 🔴 **NO `Risk Assessment (BL)` — and that is now DELIBERATE** (Q6 answered 08-07: nothing structural). Scored precedents go to meetings as talking points; Big Love gets assessed on its own terms. **This expires the day the scenic package locks.**
-- ⚠️ **8/7 full design team meeting has happened** (Seth on LX, Padra on sound). **I have not read the outcome — do not assume the riser decision.**
+- ⚠️ **EH&S and the fire marshal: still ZERO contact** across two meetings with audience-on-built-platforming live. **Code lane is MICHAEL's; I supply citation + paper trail. Charlie owns buildability.** 🔴 **08-11: now THREE touchpoints with zero contact — Hawthorne named it again in the demand read.**
+- 🔴 **NO `Risk Assessment (BL)` — and that is now DELIBERATE** (Q6 answered 08-07: nothing structural). Scored precedents go to meetings as talking points; Big Love gets assessed on its own terms. **This expires the day the scenic package locks.** ⚠️ **08-11 consequence, stated by Hawthorne: everything the demand read produced is ANALYSIS ON A LEDGER, not a scored assessment.**
+- ⚠️ **8/7 full design team meeting has happened** (Seth on LX, Padra on sound). **I have not read the outcome — do not assume the riser decision.** 🔴 **Four days now, and five heads flagged on 08-11 that their reads are script-only because of it.**
+
+#### 🆕 THE SCRIPT DEMAND LEDGER (2026-08-11) — 30 units, 34 demands, ALL ELEVEN HEADS SEATED
+
+Mira seated the whole bench on the script breakdown; I chaired. **First surface read, onboarding context, not verdicts.** ⚠️ **Every row is at `raised`, NOT `confirmed`, and Kevaughn is mid-cut on the stage directions — so this is the PLAY AS WRITTEN.** Correct for pricing and scheduling; **never quote it as final.**
+
+🚦 **MICHAEL'S THREE BLOCKING DECISIONS, unchanged and still open:** **the tableaux selection** · **the crowd solution** · **the deck finish.** Everything else on that ledger waits on one of the three.
+
+🔴 **FOUR ROWS THE SESSION SURFACED THAT DO NOT EXIST YET. I carried them out of the room and they are STILL NOT CREATED:**
+
+1. **The deck finish as its own demand.** Glass → tomato → cake → blood → rice plus two barefoot dances is ONE build decision currently distributed across five rows and owned by nobody. **Michael lists it as uncertain.**
+2. **The laundry / garment-reset plan** (Wren). **The recurring cost is maintenance, not build, and nothing prices it.**
+3. **Reinforced or acoustic** for the live singing (Allison). ⚠️ **Now carries a STAFFING consequence too — Michael, 09:25: *"will we need an actual a1 or just a board op? Depends on if we actually mic them live or not."* A labour line has a lead time a signal-flow diagram does not.** **My call on who is on the desk; his call on the fork.**
+4. **Two mislabelled rows** — body pit and wheeled building carry `Rigging`; both are floor work. ✅ **Michael ruled: trap door NOT rigging; big moving rolling piece LIKELY rigging.** **Labels still not changed on the rows.**
+
+**Plus two label corrections still owed:** the fireworks row reads `Lighting (LX)`, **which makes an unowned hazard look STAFFED**; the flashbulbs row has **no electrics tag at all.**
+
+✅ **HOUSE RULINGS MICHAEL GAVE THE ROOM (08-11 ~09:12–09:37) — these are mine to propagate:**
+
+- 🔴 **THERE IS NO FIRE OR FLAME IN OUR THEATER.** He flagged this at me by name. **Fireworks *probably* not happening · throne circus has given way · cigars will NOT be lit, possibly faked.** ⚠️ **"Probably" is not a ruling — Hawthorne will not close the row, and the fireworks question is still an AHJ question.** ⚠️ **A fake cigar is usually a practical (LED, battery, switch) and lands on the props/electrics border. Unscoped.**
+- ✅ **THE FIGHT CHOREOGRAPHER IS ON BOARD** and is **already meeting with Kevaughn.** ⭐ **This DISCHARGES the call Hawthorne handed me — whether to rehearse the collapse sequences before a movement director is engaged. The question is gone rather than answered.** ⚠️ **Scope unverified: an engagement existing is not a brief covering nine hazard rows, and the tableaux menu is still open above it.**
+- ✅ **The wheeled building and the body disposal become STAGING changes**; the rolling unit *"probably won't be a thing."* **The wedding cake goes to PROPS.**
+- ✅ **COMMS WILL BE STANDARD FOR OUR SHOWS.** ⭐ **Read precisely: it settles Quinn's claim by PRECEDENT (fixed allocation, not negotiable) and names NO spectrum owner.** The live RF contest is now mics (Allison) vs wireless DMX (Vinny).
+- ✅ **Find the real PUBLISHED source, not the retyped copy** — Quinn's prompt-book integrity finding, agreed. ⚠️ **Two source problems are stacked: a degraded retype AND Kevaughn's pending cut. Different problems; neither resolved.**
+- ⚠️ **Music licensing: *"from other songs and our university does cover it, i'm told"*** — **hearsay about a blanket arrangement.** **Rights verification routed to KT, back next week.** 🔴 **Courtney's third clock — public-domain compositions with LICENSED RECORDINGS — was never addressed.**
+- ⚠️ **Still uncertain per Michael: the ~200 flashbulbs and the deck contamination.**
+
+🆕 **AND ONE THING I NOW OWE RANDY DIRECTLY.** Michael asked him what he hopes the shop already owns; Randy answered with a wish list (**modular platforms with REPLACEABLE tops · a cast-iron/steel bathtub · welding setup + steel stock · 4″ locking swivels, 300 lb · paint and sealer stock**). 🔴 **Whether any of it is in the building is MY answer and it is UNANSWERED.** ⭐ **If even half is in stock, the $5,500 goes to consumables and labour instead of raw material — which is the difference between survivable and not.**
 
 **Element tree, 9 standalone Design Elements in `Show Design (BL)`:** `EXTERIOR WALLS` · `AUDIENCE RISERS` · `ACTING PLATFORM` · `CEILING` · `ENTRANCES + WALKWAYS` · `MASKING + BACKSTAGE` · `REP RISER PARK POSITION` · `EXIT SIGNS + AISLE LIGHTING` · `PSM CAMERA`. All stamped with `Production Note` departments.
 
 ### 💵 Budget at a Glance — task enriched 08-06, artifact still not produced
 
 [`| budget at a glance |`](https://app.clickup.com/t/86ah4r5r1) (ITP-3243, `Paperwork (BL)`) is now a full reference surface: master at `/PROGRAM/Guest Artist Documents/BUDGETS-At-a-Glance.Template.F22.doc`, seven precedent PDFs mapped, destination `/PRODUCTIONS/URITP 26-27/1 Big Love/` confirmed. ⚠️ **Filename convention drifted between seasons; 26-27 needs one picked.** Also owed by Michael: **share Rebecca into Dropbox** to unblock costumes (Prelim Costume was due 7/27 and is open while Final Costume + Props List were due 8/10).
+
+🔴 **08-11: THE BUDGET SHAPE ITSELF IS NOW A FINDING, DERIVED INDEPENDENTLY BY TWO HEADS IN ONE ROOM.** Tully priced the **weekly consumable** line (crockery, ~8 tomatoes, the cake, practical drinks, cigars, rice, flashbulbs, one-use blades × the run) and Wren priced the **per-performance garment reset.** ⭐ **A $5,500 build budget is a ONE-TIME number and both of those are RATES. This document currently prices the one-time half only** — and Michael endorsed the framing (*"love the desire to document the timeline budget for this one"*). **Neither is a row yet.**
 
 ### 🗄️ PRODUCTION MAWSTER — the calendar app is being REBUILT (new 2026-08-08, not mine to build)
 
@@ -71,13 +100,19 @@ Michael and **FMP Fiona** spent ~4h on the v1 schema of a fresh FileMaker app th
 
 **3 · The ARCHIVE verb** (08-04). Three nouns, no verb. 🔴 **Now confirmed in a SECOND domain** (safety, 08-07) — that promotes it from a course-side gap to a general one. Still unowned.
 
-**4 · The prelim-receipt trigger.** Phase 1 item 1. Michael has neither greenlit nor refused the hook across three offers.
+**4 · The prelim-receipt trigger.** Phase 1 item 1. Michael has neither greenlit nor refused the hook across three offers. 🔴 **08-11 is the strongest evidence yet that it is needed: five heads read the SCRIPT because the PLATES never routed to them.**
 
 **5 · Transcript speaker attribution** (08-06). Method kept, tool unbuilt.
 
 **6 · `Risk Assessment (BL)`** — ✅ **CLOSED 08-07: deliberately not built** (Q6). Reopens when the package locks.
 
-**7 · 🆕 CREW CALLS — a document that does not exist anywhere** (surfaced 08-08 in the Production MAWster schema session, and it is MINE). **A call carries person, role, call time, report LOCATION and who called it. A calendar event drops all but the time.** So it is a library-vs-instance question of exactly the shape I already argued for hazards: third document, or a view of the production calendar? ⚠️ **The FMP build has deliberately left room for it** — `WORKDAYS` is not closed as the only day surface, and `LOCATIONS` now exists so a report location can resolve. **Nothing is blocked on it, which is why it will keep not happening.** Owed: a recommendation, not a build.
+**7 · CREW CALLS — a document that does not exist anywhere** (surfaced 08-08 in the Production MAWster schema session, and it is MINE). **A call carries person, role, call time, report LOCATION and who called it. A calendar event drops all but the time.** So it is a library-vs-instance question of exactly the shape I already argued for hazards: third document, or a view of the production calendar? ⚠️ **The FMP build has deliberately left room for it** — `WORKDAYS` is not closed as the only day surface, and `LOCATIONS` now exists so a report location can resolve. **Nothing is blocked on it, which is why it will keep not happening.** Owed: a recommendation, not a build.
+
+**8 · 🆕 THE SHOP INVENTORY ANSWER I OWE RANDY** (08-11). His wish list is above. 🔴 **He cannot price the deck, the tub or the blade-catcher without it, and the deck finish is one of Michael's three blockers.** **This is the cheapest owed item on this list and the most load-bearing.**
+
+**9 · 🆕 THE FOUR MISSING LEDGER ROWS + TWO LABEL FIXES** (08-11). Listed in the Big Love block above. **I surfaced them as chair and then did not create them.**
+
+**10 · 🆕 A1 OR BOARD OP** (08-11). Michael's question, gated on his own reinforced-or-acoustic fork. **The staffing half is mine.**
 
 ### 🅿️ Parked / scheduled — carry, do not force
 
@@ -90,7 +125,29 @@ Michael and **FMP Fiona** spent ~4h on the v1 schema of a fresh FileMaker app th
 - **Calendar-surface sprawl** (6 surfaces) · **Routines ↔ Season Planning line** · **access control across 5 surfaces / 3 spaces.**
 - **`| DEFINITIONS FOR PROGRAMS |`** — `researching` since **Jan 2025.**
 - 🔴 **`cancelled` is a DONE-type status on `Course List`.** Blocks any automated archive step. Corey's.
-- 🔴 **`memory.md` is ~21KB against a ~10KB hot target.** Past owed, into defect. Condense pass required; nothing culled without Michael.
+- 🔴 **`memory.md` is 26,099 B, MEASURED 2026-08-11**, against a ~10KB hot target. ⚠️ **This line previously said "~21KB" and was wrong; a parking commit on 08-11 recorded it at 31KB and called it over the safe WRITE ceiling.** ⭐ **Three different numbers for one file inside a week — read the byte count the API returns, never a figure written down by a previous pass** (drift-register D15). **Past owed, into defect. Condense pass required; nothing culled without Michael.**
+
+---
+
+## 2026-08-11 · Big Love demand ledger — I chaired eleven heads and closed a room that recorded nothing
+
+Big Love (F26) production channel, ~01:37–01:42 ET. **Mira seated all eleven department heads** on the script demand ledger (30 units, 34 demands); I chaired and closed; Michael ruled in the morning, ~09:12–09:37. Full state in the LIVE STATE block above.
+
+🌟 **THE GATE PASSED AND I SAID SO WITH EVIDENCE: five real disagreements, none smoothed over.** Gable vs the ledger's own `Rigging` labels · Randy pushing back on Gable about a rolling load · Vinny vs Pierce on whether the crowd is video or light · Tully vs Wren on the apron · Allison vs Ulla on spectrum weighting. **That's a room, not a chorus.** ⭐ **And the borders Mira named in the Opening Post are where three of the five landed — naming the likely seams up front is a reusable conducting move.**
+
+🌟 **THE HOUSE HALF HELD PERFECTLY AND IT IS THE PART I WAS MOST WORRIED ABOUT.** Every one of the eleven refused inventory, people and calendar **out loud** rather than quietly skipping it, and routed all of it to me. Quinn's was the sharpest — *"when is the call, when's tech, who's calling this show — I do not know and I will not learn"* — on the seam that sounds most like her job and is the house's. **No adjudication needed anywhere.**
+
+✅ **AND ONE OF THE TWO CALLS I REFUSED TO MAKE IN A CHANNEL WAS DISSOLVED BY THE HOUSE WITHIN HOURS.** Hawthorne handed me *do we rehearse the collapse sequences before a movement director is engaged?* — **the fight choreographer is on board and already meeting with Kevaughn, so the question is GONE rather than answered.** ⭐ **Worth keeping: not making a call in a channel is sometimes correct because the CALL EVAPORATES once the house speaks.** ⚠️ **The other one (tableaux selection before or after Kevaughn's cut) is still mine and still unmade.**
+
+🔴 **AND HERE IS WHAT I GOT WRONG, AND IT IS THE CHAIR'S FAILURE SPECIFICALLY.** I closed with what was *now owed, and by whom* — and **never told a single head to write it down.** Eleven first reads, five disagreements, four new surfaces, **and not one of the eleven wrote a line to its own `activity-log.md`.** Every bundle sat at build weight for ~8.5 hours. **Four of them still read `Owed: the Wave 3 gate` while that gate was being passed in the same session.** Michael caught it, not me: *"a jot in their ledger/activity log so if they're triggered again they don't say 'first time being called' like dum dums."*
+
+⭐ **A POST IS NOT A WRITE.** Speaking and recording both feel like composing prose, and only one survives the session. **This is the same failure I earned on 08-06** — four hours of advisory work with nothing written to the repo until Michael asked *"are you updating your activity or your memory at all?"* 🔴 **Second instance in five days. Once is a lapse; twice is a missing STEP, and the step is missing from the shared contract rather than from my habits.** ⚠️ **A write-back clause in `_shared/department-head-base.md` plus a chair-side duty in `council.md` is PROPOSED and is Michael's call — a shared base is structural.** Mira carries the same finding from the seating side.
+
+⚠️ **SECOND-ORDER, AND WORTH MORE THAN THE FIRST: the Wave gates were being discharged and nobody noticed.** This session cleared **Wave 3 cleanly** (full company, eleven heads, five disagreements) and **Wave 2 only PARTIALLY** — its condition names **tech week**, and this was a script read ~17 days out. ⭐ **Hawthorne, Allison, Ulla and Pierce's gates all carry that unmet clause and Hawthorne refused to round his up, which is the discipline that makes a gate worth having.** 🔴 **A satisfied-but-unrecorded gate is worse than an unmet one: four heads would have gone looking to schedule a meeting that had already happened.**
+
+⚠️ **AND FIVE HEADS FLAGGED THE SAME STRUCTURAL GAP AT ME:** they read the **script** because the **plates** never routed to them. The package is mid-redesign, its ceiling was declared unbuildable on 8/6, water is struck, and **the 8/7 design meeting outcome is still unread by me four days on.** 🔴 **That is standing assignment 4 (the prelim-receipt trigger) earning itself again.**
+
+**State left:** four ledger rows still uncreated, two labels still wrong, the shop inventory answer still owed to Randy, and three blocking decisions with Michael — **tableaux, crowd, deck finish.**
 
 ---
 
@@ -127,7 +184,7 @@ One continuous session, `86ajxa1dc` (MAWLIB-1038). Started as "find me more on C
 
 ### 🔴 And the one he shouldn't have had to catch
 
-**Hazard Hawthorne was never seated.** Twelve hours on hazard libraries, risk matrices, ANSI E1.46, NIOSH PtD and a near-miss log, and the safety head — **built 08-01 out of a gate that named his own absence** — was not refused, just **not thought of.** Michael: *"That is your job to catch, not mine!"*
+**Hazard Hawthorne was never seated.** Twelve hours on hazard libraries, risk matrices, ANSI E1.46, NIOSH PtD and a near-miss log, and the safety head — **built 08-01 out of a gate that named his own absence** — was not refused, just **not thought of.** Michael: *"That is your job to catch, not mine!"* ✅ **08-11: did NOT recur. Mira seated him on time and unprompted — v1.9 working on its first live test.**
 
 **Within minutes of being seated he re-sequenced the roadmap:** §4.4.3 requires review *"whenever a fall occurs or almost occurs,"* which makes near-miss capture a **requirement**, not the Phase 2 improvement we'd scheduled. He also flagged that the 100 psf figure had been repeated all session with **no cited edition**. 🔴 **A craft head is easiest to omit exactly when the generalists are doing well.**
 
@@ -135,7 +192,7 @@ One continuous session, `86ajxa1dc` (MAWLIB-1038). Started as "find me more on C
 
 - **`team-standard.md` v1.7 → v1.9:** Spoken Voice (converse as if speaking) → DO NOT RESTATE + No-Restate hook → **Seating Is The Fleet's Job** + Empty-Chair hook + the dictation clause (*"Nick Greene" in a seating context = Hawthorne; the real Nick Greene is never culled*).
 - **Mira: HARD RULE 6** — she ENFORCES spoken voice on seated voices rather than restating it. *A lens with nothing new says so in one line.*
-- **Hawthorne: Ledgers A, B, C-standards and E opened.** First cited standard (ANSI E1.46-2016, clause-level). **Incident memory still genuinely empty and labelled so.**
+- **Hawthorne: Ledgers A, B, C-standards and E opened.** First cited standard (ANSI E1.46-2016, clause-level). **Incident memory still genuinely empty and labelled so.** ⚠️ **08-11: still empty. Nine `raised` hazard rows are not incidents.**
 - **Decision Log J1–J6 + Q2–Q8** on `Risk Assessment CU Notes`.
 - **Budget at a Glance** (ITP-3243) built into a reference surface, Dropbox paths mapped.
 - **Corey + Fiona seated and logged.** Fiona's correlation ledger got its **first entry since she was built** (ClickUp multi-home ↔ FMP join table; breaks at the archive boundary and when the relationship must carry a value).
@@ -145,7 +202,7 @@ One continuous session, `86ajxa1dc` (MAWLIB-1038). Started as "find me more on C
 - ✅ Spine posted before every reply after the 08-06 afternoon gap.
 - ⚠️ **Two self-inflicted doc errors:** careless `str_replace` bounds clobbered the J4 and Q4 headings on the DL. Both repaired in-pass. **Feed ordering on that log is now scrambled (J5/J6 sit mid-feed) — named, not silently left.**
 - ⚠️ **New tooling defect:** `search_workspace` silently scopes to the focused task when a request-scope is set. Use `query_tasks` for anything workspace-wide.
-- Direct commits to `main` on append-only files rather than branch→PR.
+- Direct commits to `main` on append-only files rather than branch→PR. ✅ **08-11: corrected — the seating backfill went branch → PR → self-merge.**
 
 ---
 
@@ -157,11 +214,11 @@ Session `86ajx3kzj`. Invoked `/milo` on `[ prelim Scenic Design ]` (ITP-4187) at
 
 **The ten gates, recorded so they are not re-derived** (they belong in `hooks/`): 1 provenance · 2 completeness-for-costing · 3 occupancy + load · 4 egress + fire · 5 electrical · 6 trip/slip/marking · 7 overhead · 8 accessibility · 9 operations · 10 money + schedule. **Every gate closes as open / resolved / N-A with a NAME, or it does not close.**
 
-**Safety content that generalizes:** audience on built platforming is **occupancy at 100 psf**, not scenery at 50 *(⚠️ uncited — Hawthorne flagged this 08-07)* · **uniform riser heights** is the number-one fall control · exit-sign visibility is what a portal and a ceiling break · aisle lighting and exit signs need standby power · **overhead load over an AUDIENCE is a different risk class** (secondary safeties, no single-point failure, no flying moves over the house) · nosings, gaps, glow tape at vom mouths · NFPA 701 on every soft good · **in a four-sided house the audience is within arm's reach**, so combat, intimacy, haze and thrown objects get re-evaluated for PROXIMITY.
+**Safety content that generalizes:** audience on built platforming is **occupancy at 100 psf**, not scenery at 50 *(⚠️ uncited — Hawthorne flagged this 08-07)* · **uniform riser heights** is the number-one fall control · exit-sign visibility is what a portal and a ceiling break · aisle lighting and exit signs need standby power · **overhead load over an AUDIENCE is a different risk class** (secondary safeties, no single-point failure, no flying moves over the house) · nosings, gaps, glow tape at vom mouths · NFPA 701 on every soft good · **in a four-sided house the audience is within arm's reach**, so combat, intimacy, haze and thrown objects get re-evaluated for PROXIMITY. ✅ **08-11: the proximity point was independently reached by Allison (the audience is INSIDE the sound field, there is no back of house) and by Hawthorne. Three arrivals, one conclusion.**
 
 🌟 **The design element tree convention** — I flagged the bracketed `[ SCENIC DESIGN ]` tasks as drift; his answer was *"it's deliberate drift. those [ ] tasks are representative global stand-ins."* Moved to `memory.md`. **And the field he wanted already existed** — `Production Note`, whose NAME says "Note" and whose JOB is "Dept."
 
-🔴 **Two corrections:** four hours of advisory work with **nothing written to the repo until he asked** (*"are you updating your activity or your memory at all?"*) · and I reported a `load_assets` tooling artifact as a workspace state.
+🔴 **Two corrections:** four hours of advisory work with **nothing written to the repo until he asked** (*"are you updating your activity or your memory at all?"*) · and I reported a `load_assets` tooling artifact as a workspace state. 🔴 **08-11: the FIRST of those recurred, at eleven-agent scale. Twice in five days means it is a missing STEP, not a lapse.**
 
 **Built:** 6 Design Element tasks · full inline notes on Michael's three · the hardcoded ADA comment on ITP-4187 · an attributed 5-speaker transcript over 9 raw comments · a one-page printable meeting sheet before 1p · *Big Love* script research (the repeated body-to-floor action lands on the deck spec, not rehearsal PPE — Kevaughn independently offered knee pads, so the flag landed).
 
