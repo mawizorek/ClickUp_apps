@@ -9,13 +9,10 @@ owner_agents: [memory-maggie]
 
 # Memory Rotation Hook
 
-**Fires: two ways.**
-
-1. **At session close**, called by Closing Clio as part of Step 1 of the session-close
-   seating sequence. Scope: the agents in that close's agents-present table.
-2. **As a standalone pass**, Maggie-led, on `/memory-rotation` or a named handoff from the
-   Agent Memory Report. Scope: whoever the report or Michael names. Added 2026-08-10 —
-   see Invocation + Trigger for why the old close-only clause had to go.
+**Fires two ways.** (1) **At session close**, called by Closing Clio in Step 1 of the
+seating sequence; scope = that close's agents-present table. (2) **As a standalone pass**,
+Maggie-led, on `/memory-rotation` or a handoff from the Agent Memory Report; scope = whoever
+the report or Michael names. Mode 2 added 2026-08-10 (see Invocation + Trigger).
 
 **Canonical source:** this file.
 **Steward:** Memory Maggie (`super-agents/memory-maggie/`).
@@ -77,9 +74,8 @@ Example: `dev-dexter/memory/archive/inciardi-market-scars.md`
 
 **Rotation mechanic:**
 1. After all memory writes land, measure `memory.md` size.
-2. **Run the §4a sweep FIRST** (see the standalone pass below): relocate project state,
-   counts and statuses to the activity log's LIVE STATE block before archiving anything
-   for age. A bundle can come under budget by relocation alone.
+2. **Run the \S4a sweep FIRST** (see the standalone pass): relocate project state, counts and
+   statuses to the activity log's LIVE STATE block before archiving anything for age.
 3. If still over ~10KB: identify entries that are resolved, encoded elsewhere, or
    replaceable by a pointer. Move them to the appropriate archive file
    (create it if new; append if existing).
@@ -100,39 +96,28 @@ is small enough that deep-steeping the whole file on session open is fast.
 
 **Budget:** ~4-5KB **for the ENTRIES ONLY** (roughly 10-15 session entries).
 
-⚠️ **CORRECTED 2026-08-10 against Constitution §4a (LOCKED 2026-07-30).**
-~~Budget: ~4-5KB (roughly 10-15 session entries)~~ — stated as a WHOLE-FILE budget, which is
-no longer the file's shape. **The LIVE STATE block is a permanent fixture at the top of
-`activity-log.md` and sits OUTSIDE the window.** It is never rotated, never archived, and
-never counted against the ~5KB. The sliding window applies to the entries BELOW it.
+⚠️ **CORRECTED 2026-08-10 against Constitution \S4a (LOCKED 07-30).** ~~Stated as a whole-file
+budget.~~ **The LIVE STATE block is permanent, sits at the top, and is OUTSIDE the window** —
+never rotated, never archived, never counted. `_shared/super-agent-base.md` \S4a flagged this
+file as carrying the old shape and nothing actioned it. **Measuring the file whole overstates
+every agent carrying a real LIVE STATE block**, which is the agents doing the most project work.
+Re-measure entries-only before calling an activity log over budget, and re-test any OMR marked
+"blocked on bundle cap" against it.
 
-**Why this matters beyond bookkeeping:** `_shared/super-agent-base.md` §4a flagged this file
-as carrying the old shape and the flag went unactioned. Measuring a bundle's activity log
-whole against ~5KB **overstates every agent carrying a real LIVE STATE block** — which is
-exactly the agents doing the most project work. Re-measure entries-only before calling an
-activity log over budget, and re-test any OMR marked "blocked on bundle cap" against it.
+**What stays:** the LIVE STATE block (outside budget) + the most recent 10-15 session entries
+(date, what, key decisions, state left, session task link).
 
-**What stays in the window:**
-- The LIVE STATE block (permanent, outside the budget).
-- The most recent 10-15 session entries (one condensed entry per session:
-  date, what, key decisions, state left, session task link).
+**What rotates to cold:** oldest entries. **Never the LIVE STATE block.**
 
-**What rotates to cold:**
-- Oldest entries, moved to quarterly archive files. **Never the LIVE STATE block.**
-
-**Archive location:** `<agent-slug>/activity-log/YYYY-QN.md`
-
-Example: `dev-dexter/activity-log/2026-Q3.md`
+**Archive location:** `<agent-slug>/activity-log/YYYY-QN.md` (e.g. `dev-dexter/activity-log/2026-Q3.md`)
 
 **Rotation mechanic:**
 1. After appending the current session's entry (newest on top), measure the entries
    below the LIVE STATE block.
 2. If over ~5KB: move the OLDEST entries (from the bottom) to the current
    quarter's archive file. Move enough to bring the entries under budget.
-3. Archive files are append-only and never re-read unless explicitly resuming
-   old work.
-4. The main file always has the LIVE STATE block plus the most recent sessions.
-   It never has gaps.
+3. Archive files are append-only and never re-read unless explicitly resuming old work.
+4. The main file always has the LIVE STATE block plus the most recent sessions. It never has gaps.
 
 **Why a sliding window:** the activity log's job is "what did I do recently?"
 Anything older than ~15 sessions is cold context that a specific lookup can
@@ -192,11 +177,10 @@ the read cap by automated curation (e.g. a memory.md where everything
 still seems hot). Flag it, report it in Channel 1, but do NOT delete
 content without Michael's review. Close proceeds with the flag.
 
-⚠️ **The ~22KB ceiling is a WORKING MARGIN, not a measured cliff** (2026-08-10).
-`_shared/super-agent-base.md` at 23,444 bytes read back whole and unflattened on a
-normal file read. Treat a file over 22KB as urgent because the margin is gone and one
-append can tip it — but **never report it as unreadable without attempting the read.**
-A predicted failure stated as an observed one is the same defect as a false save.
+⚠️ **The ~22KB ceiling is a WORKING MARGIN, not a measured cliff** (2026-08-10):
+`_shared/super-agent-base.md` at 23,444 B read back whole and unflattened. Treat over-22KB as
+urgent because the margin is gone — but **never report a file unreadable without attempting the
+read.** A predicted failure stated as an observed one is the same defect as a false save.
 
 ---
 
@@ -204,33 +188,26 @@ A predicted failure stated as an observed one is the same defect as a false save
 
 Same mechanics as the close pass. Five differences.
 
-1. **The roster comes from the report, not the close.** The 🧭 STANDING · Agent Memory
-   Report task (`86ajy5acn`) carries the tiered list and the recommended order. Work it
-   top-down; it is a punch list, not a suggestion.
-2. **Re-measure before cutting. Never trust the report's byte count.** It is a snapshot
-   from a read-only pass that may be days old, and agents write their own files live.
-   Fresh directory listing, fresh SHA, then cut.
-3. **Run the §4a sweep FIRST on every bundle, before archiving anything for age.**
-   Constitution §4a: `memory.md` holds patterns and preferences ONLY, and anything that can
-   go stale in a day belongs in the activity log's LIVE STATE block. **A count or a status
-   in `memory.md` is a defect on sight — move it, do not refresh it.** Caps have been
-   consumed by project state sitting in the wrong file, so a bundle can come under budget by
+1. **The roster comes from the report.** 🧭 STANDING · Agent Memory Report (`86ajy5acn`) carries
+   the tiered list and the recommended order. It is a punch list, not a suggestion.
+2. **Re-measure before cutting; never trust the report's number.** It is a snapshot that may be
+   days old and agents write their own files live. Fresh listing, fresh SHA, then cut.
+3. **Run the \S4a sweep FIRST on every bundle, before archiving anything for age.** `memory.md`
+   holds patterns and preferences ONLY; anything that can go stale in a day belongs in the LIVE
+   STATE block. **A count or status in `memory.md` is a defect on sight — move it, don't refresh
+   it.** Caps get consumed by project state in the wrong file, so a bundle can come under budget by
    relocation alone. Skip this and you archive real judgment to make room for a stale row count.
-4. **`_shared/` is IN SCOPE.** The shared specs every agent deep-loads live outside every
-   agent folder, so a per-bundle sweep never sees them — and they cost load budget on every
-   seating in the fleet, which makes them the highest-leverage bytes there are. Measure them
-   in the same pass.
-5. **One agent, one PR, in full.** Finish and verify a bundle before opening the next. A
-   half-rotated bundle is worse than an un-rotated one, because the next reader cannot tell
-   which half is current. Stop on an agent boundary, never mid-bundle.
+4. **`_shared/` is IN SCOPE.** Shared specs live outside every agent folder, so a per-bundle sweep
+   never sees them — and they cost load budget on every seating in the fleet, which makes them the
+   highest-leverage bytes there are.
+5. **One agent, one PR, in full.** A half-rotated bundle is worse than an un-rotated one: the next
+   reader cannot tell which half is current. Stop on an agent boundary, never mid-bundle.
 
-**Report every cut with the measured before/after byte count taken from the write response,
-never an estimate** (earned 2026-08-01: a commit claiming "trimmed under cap" on a file that
-had grown 26%).
+**Report every cut with the measured before/after byte count from the write response, never an
+estimate** (earned 2026-08-01: a commit claiming "trimmed under cap" on a file that grew 26%).
 
 **The two-phase split holds in both modes: the agent that MEASURES is not the agent that CUTS.**
-Ricky measures read-only and never edits an agent's files; Maggie cuts. An agent that wants its
-own bundle rotated queues the request rather than trimming itself.
+An agent wanting its own bundle rotated queues the request rather than trimming itself.
 
 ---
 
@@ -248,7 +225,7 @@ This is the PROCEDURE Maggie runs. She reads it from here (Constitution
    b. **Process any tagged memory candidates** from section 4 of the
       Handoff Artifact. Run placement triage:
       - Is this procedure? -> route to a tool, not memory.
-      - Can it go stale in a day? -> the activity log's LIVE STATE block (\S4a), not memory.
+      - Can it go stale in a day? -> the LIVE STATE block (\S4a), not memory.
       - Is this already captured? -> skip (dedupe).
       - Is this durable? -> write it to the agent's `memory.md`.
       - Deny-by-default for brain `/PREFERENCES.md`.
@@ -328,36 +305,26 @@ seating sequence (Clio calls Maggie, Maggie runs this). There is no `/memory-rot
 command. If an agent needs an ad-hoc rotation mid-session (unlikely), it queues the
 request for close.~~
 
-🔴 **STRUCK 2026-08-10, Michael.** That clause made the second half of the Agent Memory
-Report's own two-phase model illegal: the standing task hands Maggie a punch list and tells
-her to run rotation per this file, and this file told her she could not.
-
-**It is also the mechanical cause of the report's headline finding.** Run one found rotation
-had fired for six of twenty-eight agents, ever — because a close-scoped gate only ever reaches
-agents sitting in that close's agents-present table. The other twenty-two were never eligible.
-**The budgets were not being ignored. They were unreachable.** Kept struck rather than deleted
-because the reason it was wrong is more useful than its absence.
-
-**Live grammar:**
+🔴 **STRUCK 2026-08-10, Michael.** That clause made the second half of the Agent Memory Report's
+own two-phase model illegal, and it is the mechanical cause of run one's headline: rotation had
+fired for six of twenty-eight agents ever, because a close-scoped gate only reaches agents sitting
+in that close's agents-present table. **The budgets were not being ignored. They were unreachable.**
+Kept struck because why it was wrong outlives its absence. Full reasoning: PR #798.
 
 | Token | Who | Scope |
 |---|---|---|
-| `/memory-rotation` · `/rotation-sweep` · "run the rotation" | Maggie — seat her first | Standalone pass; scope named at invocation or taken from the report. |
+| `/memory-rotation` · `/rotation-sweep` · "run the rotation" | Maggie — seat her first | Standalone; scope named at invocation or taken from the report. |
 | session close | Clio calls Maggie | Close-scoped, unchanged. |
 
 ---
 
 ## Changelog
 
-- 2026-08-10 - **AMENDED (Maggie).** Three fixes, all surfaced by consuming Routine Ricky's
-  first Agent Memory Report as the downstream agent rather than by auditing this file.
-  (1) **Standalone invocation authorized** — the old close-only clause made the report's own
-  handoff illegal and was the mechanical cause of "rotation has fired for 6 of 28 agents, ever."
-  (2) **activity-log budget corrected to entries-only** per Constitution \S4a; the LIVE STATE
-  block sits outside the window. \S4a had flagged this file eleven days earlier and the flag went
-  unactioned, so every activity-log tier in run one was measured against the wrong shape.
-  (3) **`_shared/` added to scope** and the \S4a misplacement sweep added AHEAD of age-based
-  archiving. Also recorded: the ~22KB ceiling is a working margin, not a measured cliff.
+- 2026-08-10 - **AMENDED (Maggie), PR #798.** Standalone invocation authorized · activity-log
+  budget corrected to entries-only per \S4a (the LIVE STATE block sits outside the window) ·
+  `_shared/` added to scope · \S4a misplacement sweep added ahead of age-based archiving ·
+  the ~22KB ceiling recorded as a working margin, not a measured cliff. All five surfaced by
+  CONSUMING Ricky's first Agent Memory Report as the downstream agent, not by auditing this file.
 - 2026-07-25 - created. Born from a Dev Dexter session on agent memory
   architecture. Design: hot/warm/cold tiering, per-file budgets, rotation
   as a gate on close. Fills the TBD pointer in session-close.md and
