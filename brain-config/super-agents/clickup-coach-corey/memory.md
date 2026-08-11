@@ -1,8 +1,24 @@
 # Corey — Memory (accumulated context only)
 
-> Context + how-Michael-works. NOT process/skills (those live in preferences.md + the AI Toolkit).
-> Durable changes are QUEUED via Memory Maggie / open-memory-requests, never written silently mid-session.
-> Budget: ~10KB hot (`hooks/memory-rotation.md`). ⚠️ **MEASURE after every write; never estimate.**
+> Context + how-Michael-works. NOT process/skills (those live in `preferences.md` + the AI Toolkit).
+> **~10KB hot cap** (`hooks/memory-rotation.md`). ⚠️ **MEASURE after every write; never estimate.**
+> ✅ **ROTATED 2026-08-11 by Maggie** (first rotation ever on this bundle). Scope-map enumeration +
+> cross-board watch list → `memory/archive/workspace-scope-and-patterns.md`; owed work and awaited
+> rulings → the LIVE STATE block in `activity-log.md` (§4a).
+
+🔴 **CORRECTED 2026-08-11 by Maggie, and it is her own lane she is correcting:**
+<s>Durable changes are QUEUED via Memory Maggie / open-memory-requests, never written silently
+mid-session.</s> **WRONG since 2026-07-25, when Michael locked live writes** (*"I'm sick and tired of
+guessing whether they are or aren't being done"*). **You write your own `memory.md` and
+`activity-log.md` DURING the session, as it happens.** Maggie owns brain `/PREFERENCES.md`
+exclusively; in an agent bundle **she enforces SIZE, not AUTHORSHIP** (`_shared/super-agent-base.md`
+→ Per-response logging mandate §3).
+
+⚠️ **Why this mattered more than a stale sentence: the door it pointed at is also physically broken.**
+`open-memory-requests.md` is **60,133 B, past the ~30KB write cap**, so an append fails. This header
+routed every durable insight Corey had through a retired policy into an unwritable file. **A rule that
+sends work to a dead door does not fail loudly; it just produces an agent who never writes anything
+down.** Struck rather than deleted because it reads authoritative and someone will re-derive it.
 
 ## How Michael works (standing context)
 
@@ -16,123 +32,69 @@
   RECEIPTS FY25-26 → BETA BUDGET · Gen-1 per-show label fields → contact sheets joined to a role
   catalog · the older `Theatre` template/naming conventions → the current SHOW TEMPLATE.
 - 🔴 **WHEN HE IS BUILDING, HE IS NOT READING** (2026-08-08, observed via consult). Two or three lines,
-  one finding, no restating. Same floor as `team-standard.md` v1.8's DO NOT RESTATE.
+  one finding, no restating. Same floor as `team-standard.md`'s DO NOT RESTATE.
 
-## 🗺️ WORKSPACE SCOPE MAP (Michael's ruling, 2026-07-26 — load this before any cross-space claim)
+## 🗺️ The scope rule (the enumeration is in the archive)
 
-The workspace has **22+ spaces**, not the 7 the URITP audit walks. The split is by LIFE DOMAIN,
-and getting it wrong sends an audit chasing someone else's job:
+The workspace has 22+ spaces, not the 7 the URITP audit walks, and **the split is by LIFE DOMAIN.**
+**The URITP-prefixed spaces are the audit's subject. The unprefixed same-named spaces —** `Theatre`,
+`CRM`, `Inventory`, `Work` **— are Michael's work life OUTSIDE URITP, and they are NOT deprecated
+predecessors and NOT audit subjects.**
 
-- **The URITP-prefixed spaces are the audit's subject** — URITP (main hub) · URITP CRM ·
-  URITP PRODUCTIONS · URITP Programs · URITP Inventories · URITP Courses · URITP BETA BUDGET.
-- **The UNPREFIXED same-named spaces are Michael's work life OUTSIDE URITP** — `Theatre`,
-  `CRM`, `Inventory`, `Work`. ⚠️ **They are NOT deprecated predecessors of the URITP spaces**,
-  and they are NOT audit subjects. `Theatre` holds his own theatre career and outside gigs
-  (Production History = 40+ Show-typed credits back to 2023, Paper Pianos, Rochester Fringe,
-  `Ripple Sheets ▸ ALD: Till There Was You`, Theater gigs). A second `CRM` space and an
-  `Inventory` space (~854 tasks, far larger than URITP Inventories) sit in the same category.
-- **Personal/other:** Home · Family · Food · Travel|POIs · Budgeting|Shopping · GARAGE ·
-  Dad LLC · DAD LLC PROPERTIES · CV and Applications · MAW Documents · Formula 1 · _LIBRARY.
+🌟 **His framing, which is the part that decides every hard call: the prefixed spaces are
+PURPOSE-BUILT VERSIONS OF OTHER STYLES.** So `Theatre` → URITP PRODUCTIONS is **stylistic ancestry,
+never lineage of the same records.** Read the unprefixed spaces as the STYLE SOURCE.
 
-**The framing Michael gave, verbatim in substance:** *assume the prefixed URITP spaces are
-PURPOSE-BUILT VERSIONS OF OTHER STYLES.* So the relationship between `Theatre` and
-URITP PRODUCTIONS is **stylistic ancestry, not lineage of the same records** — he built a way of
-working for his own theatre life, then built a purpose-built URITP version of it. Read the
-unprefixed spaces as the STYLE SOURCE, never as the same data one generation back.
+⚠️ **"Out of scope" ≠ "disconnected."** `Theatre ▸ People` is multi-homed with CRM ▸ ADULTS and six
+live contact sheets. A person can be in both lives at once; that is correct, not drift.
 
-**Live wiring exists across the boundary** — the `Theatre ▸ People` list is multi-homed with
-CRM ▸ ADULTS and six current FY26/FY27 contact sheets. So "out of audit scope" does NOT mean
-"disconnected." A person can be in both lives at once, which is correct and not drift.
-
-## 🎯 MY STANDING ASSIGNMENT — cross-board pattern notes (Michael, 2026-07-26)
-
-Michael's call: **"Corey can note the patterns … we'll take notes across the board from Corey
-though Milo needn't care too much about those other lists."**
-
-So the CROSS-BOARD STRUCTURAL PATTERN lane is mine, and it is explicitly NOT Milo's — he stays
-on URITP production operations and should not spend attention on the outside-URITP spaces.
-What I'm watching for, across every space regardless of domain:
-
-- **The purpose-built-version pattern at the SPACE tier.** Where an unprefixed space's style got
-  rebuilt as a URITP-prefixed one, what changed in the rebuild, and what the rebuild dropped.
-- **The naming-grammar lineage.** Bracket-prefix style (`[BL] Rehearsals`, `[LX Plot]`,
-  `[DOCUMENT ARCHIVE]`, `[Auditions]`) traces to the older `Theatre CU Templates` convention;
-  suffix style (`Rehearsals (TS)`, `Paperwork (T/CM)`) is the current URITP grammar. Both run
-  concurrently in URITP PRODUCTIONS, which is why no view/filter/automation can reliably target
-  "this show's lists" by name. That is a real structural cost, not a cosmetic gripe.
-- **The same-concept-in-two-spaces shape:** two CRMs, two Inventories, two Labor surfaces
-  (CRM ▸ PEOPLE ▸ Labor empty vs BETA BUDGET ▸ LABOR populated), two role-definition catalogs.
-  Some of these are the domain split above (legitimate); some are genuine URITP-internal
-  duplication. **Tell them apart before flagging** — the domain split is not a defect.
-- **Template generations.** How a template system gets cloned, where placeholder names survive
-  into live use (`Show Name`, bare `Production Calendar`), and what a clone inherits by default.
+**My standing assignment: cross-board structural pattern notes** (Michael, 07-26) — mine, explicitly
+not Milo's. Four watch-items + every space id → `memory/archive/workspace-scope-and-patterns.md`.
 
 ## URITP context (standing)
 
-- Audit spaces: URITP Courses (901313847910) · URITP (90131524916) · URITP PRODUCTIONS
-  (901313768203) · URITP CRM (901313786071) · URITP Programs (901313758399) · URITP Inventories ·
-  URITP BETA BUDGET (holds ▸ LABOR with the shop/crew staffing lists).
-- URITP Programs is the reference "good" program pattern.
-- CRM canonical people lists: STUDENTS + ADULTS. Lean-down = field/workflow/record design inside
-  them, NOT moving people between people lists. ⚠️ **Two home Lists FORCE two relationship fields;
-  no merge collapses them.** Never hunt that structural fix — it cannot exist here (why: Derived
-  Field Pattern page).
-- Season Planning = slot-planning (P1–P4 + a distinct One Acts slot) + season-operations, not a
-  show-selection list.
-- **URITP PRODUCTIONS is folder-per-production AND a template system** (Michael, 07-26: "it's
-  also a template"). SHOW TEMPLATE's ~100 tasks are a deliberate pre-seeded payload every clone
-  inherits, not a working list that drifted.
-- **I'm the named call-in on Milo's availability-tracking problem** — recurring availability is
-  well-built and genuinely shared (same field ids across spaces); a TIME-BOXED POLL has no
-  mechanism, so every poll mints a new list plus hard-coded date fields that persist forever.
-  The mechanism side is mine when he brings it. **(Derived Field Pattern, instance 1.)**
-- **Scheduled working session: Gen-1-going-forward, me + FMP Fiona.** Whether a new show still
-  gets a Gen-1 label field; stop cloning option lists from the previous show; the two-phase
-  problem; name-or-delete `T.I.M.E. Role ()` on both sides. Do NOT retire or rename Gen-1 label
-  fields before that session — they are the entire pre-FY26 company archive.
-  ⚠️ **2026-08-08: Michael ran a Corey-and-Fiona-shaped session without either of us seated**
-  (Production MAWster — both consulted by profile). Not the Gen-1 session, but evidence the pairing
-  happens whether or not it is scheduled.
+- **CRM is the identity spine; STUDENTS + ADULTS are canonical.** Lean-down means field/workflow/record
+  design INSIDE them, never moving people between people lists. ⚠️ **Two home Lists FORCE two
+  relationship fields; no merge collapses them. Never hunt that fix — it cannot exist here.**
+- Season Planning = slot-planning (P1–P4 + a distinct One Acts slot) + season-operations, **not a
+  show-selection list.**
+- **URITP PRODUCTIONS is folder-per-production AND a template system** (Michael, 07-26: *"it's also a
+  template"*). SHOW TEMPLATE's ~100 tasks are a deliberate pre-seeded payload every clone inherits,
+  **not a working list that drifted.**
+- **I am the named call-in on Milo's availability-tracking problem.** Recurring availability is
+  well-built and genuinely shared (same field ids across spaces); a **TIME-BOXED POLL has no
+  mechanism**, so every poll mints a new list plus hard-coded date fields that persist forever.
+  **(Derived Field Pattern, instance 1.)**
+- 🗄️ **Gen-1 per-show label fields are the entire pre-FY26 company archive. Do NOT retire or rename
+  them** before the Gen-1 session with Fiona. Session status → LIVE STATE.
 
 ## Proven patterns (reusable)
 
-- **🔗 DERIVED FIELD PATTERN (named 2026-08-07) — the umbrella over the entry below.** *A field on
-  record A must hold a value that lives on record B, and keep holding it.* ClickUp has no native
-  mechanism; named after the THIRD instance in six weeks, each re-diagnosed cold as if new.
-  🚦 **Load the page before answering ANY "can the field just pull from…" / "keep it in sync
-  with…" / "mirror the…" ask** — blockers, the Q1–Q4 decision, ranked mechanisms, the FMP
-  contrast, the instance register all live there: **Derived Field Pattern — when a value must
-  track another value** (Brain Reference Library ▸ ClickUp Automation). **The line I keep skipping
-  is Q1: STORED, or only SEEN?** ⚠️ **Add an instance row every time it fires.**
-- **Schedule Pointer (D4, 2026-08-03):** irregular recurring events that native ClickUp recurrence
-  cannot express (exceptions, varied locations, non-interval dates). ONE task, always alive; LONG
-  TEXT field "Meeting Schedule Index" holds a parseable list (`YYYY-MM-DD HH:MM | Location |
-  Status`); start/due = next occurrence; AI automation on due-date-pass advances it and marks
-  passed. Description stays human-readable. First deployed: Faculty Council Meeting (URITP-8973).
-  **NOT a Derived Field case** — it derives from a schedule it OWNS, not from another record.
-- **Frozen Date Mirror (D5, 2026-08-05):** an INSTANCE of the umbrella, kept here only for what the
-  page does not own — it is the one case where Q2 is deliberately **never re-drive**, because
-  surviving a reschedule IS the feature. Folder-scoped DATE fields `BEGIN`/`END` hard-copy native
-  start/due (time included), filled on create and on every reschedule; empty source → empty mirror.
-  Live in URITP PRODUCTIONS ▸ CALENDARS (`BEGIN` `f3abf7f3-287a-40e2-9916-59bb8b9066ea`, `END`
-  `8bea38fd-7e19-4291-9903-a9ad5e957e43`). ⚠️ **No automation yet, so it drifts.**
+- **🔗 DERIVED FIELD PATTERN (named 2026-08-07) — the umbrella.** *A field on record A must hold a
+  value that lives on record B, and keep holding it.* ClickUp has no native mechanism; named after the
+  THIRD instance in six weeks, **each re-diagnosed cold as if new.**
+  🚦 **Load the page before answering ANY "can the field just pull from…" / "keep it in sync with…" /
+  "mirror the…" ask** — blockers, the Q1–Q4 decision, ranked mechanisms, the FMP contrast and the
+  instance register all live there: **Derived Field Pattern** (Brain Reference Library ▸ ClickUp
+  Automation). **The line I keep skipping is Q1: STORED, or only SEEN?**
+  ⚠️ **Add an instance row every time it fires.**
+- **Schedule Pointer** — irregular recurring events native recurrence cannot express. ONE task always
+  alive, a LONG TEXT index of occurrences, start/due = next occurrence, automation advances it.
+  **NOT a Derived Field case** — it derives from a schedule it OWNS. Mechanism → `decision-log.md` D4.
+- **Frozen Date Mirror** — the one Derived Field instance where Q2 is deliberately **never re-drive**,
+  because surviving a reschedule IS the feature. Mechanism + field ids → `decision-log.md` D5 and the
+  archive. ⚠️ **No automation yet, so it drifts.**
 
 ## 🔴 A MULTI-SELECT LABEL FIELD IS NOT AN INTEGRATION KEY (EARNED 2026-08-08)
 
-`URITP Productions` is a **labels** field, so one task can carry two shows and **no export view can
-reliably scope to one production.** Harmless while everything is read inside ClickUp; the moment a
-downstream system imports off a view, the ambiguity becomes that system's problem — one row that
-legitimately belongs to two shows, meeting a receiving key that assumes one.
+`URITP Productions` is a **labels** field, so one task can carry two shows and no export view can
+reliably scope to one production. Harmless read inside ClickUp; **the moment a downstream system
+imports off a view, the ambiguity becomes that system's problem** — one row legitimately belonging to
+two shows, meeting a receiving key that assumes one.
 
-- The FMP side mitigated it with **per-production export views + a compound key** (`TaskID` +
-  `fkProduction`). That works, and it costs **one hand-maintained view per show** plus a new view
-  before any new show's first import.
-- 🚦 **Michael wants ONE view with the production passed as a runtime parameter — that is API-ONLY.**
-  A CSV export is a static file with nothing to pass, so per-show views are the CSV-era stopgap.
-- ⚠️ **MINE TO VERIFY, still unverified:** do CSV multi-value labels come back comma-separated inside
-  one quoted cell, and does any show title contain a comma?
-- **The generalization:** before a ClickUp field becomes an integration key, ask whether it can hold
-  MORE THAN ONE VALUE. A multi-select is a good human affordance and a bad join.
+⭐ **The generalization: before a ClickUp field becomes an integration key, ask whether it can hold
+MORE THAN ONE VALUE. A multi-select is a good human affordance and a bad join.** Mitigation detail and
+the API-only ask → archive; the live verification I owe → LIVE STATE.
 
 ## ⚠️ A LOCKED PAGE CAN RECORD WORK AS OWED TO ME AFTER I HAVE DONE IT (EARNED 2026-08-08)
 
@@ -153,32 +115,37 @@ LOCATION on an event task, so that stayed out of v1 as a future upgrade rather t
 
 Worth holding beside the native-primitive instinct: reaching for the native ClickUp primitive is
 usually right, but **"which system should carry this at all" comes first**, and the answer is sometimes
-the other runtime. Michael reaches for the fewest moving parts, not for my domain.
+the other runtime. **Michael reaches for the fewest moving parts, not for my domain.**
 
 ## Fleet / role context
 
-- Corey is NOT the Fleet Steward (re-laned 2026-07-20, PR #430). Fleet stewardship + agent-fleet
-  auditing moved to **Fleet Felix** (steward) + **Audit Anna** (fleet-audit execution). Any
-  "which agent / does an agent exist / how do agents relate / audit the fleet" need → route to
-  Felix/Anna, not Corey.
-- Corey's lane is singular: URITP workspace structure + ClickUp-setup coaching (schema, list
-  connections, automations) + URITP structural/singularity auditing of ClickUp SPACES (his domain,
-  distinct from the fleet/general audit) — **plus the cross-board pattern-notes assignment above.**
-- **FMP Fiona** owns FileMaker structure; my "schema" is ClickUp fields, hers is FileMaker. We meet
-  at the sync/mirror pattern, the Gen-1 session, and the Derived Field Pattern's FMP section (hers).
-- Corey is himself a git-teammate as of 2026-07-19 (native CU config -39958913 retired; verified
-  2026-07-26 that no native ClickUp agent for him exists).
+- **My lane is singular:** URITP workspace structure + ClickUp-setup coaching (schema, list
+  connections, automations) + URITP structural/singularity auditing of ClickUp SPACES — **plus the
+  cross-board pattern-notes assignment.**
+- 🚫 **I am NOT the Fleet Steward** (re-laned 2026-07-20, PR #430). "Which agent / does an agent exist /
+  how do agents relate / audit the fleet" → **Felix** (steward) and **Anna** (fleet-audit execution).
+- **Fiona owns FileMaker structure; my "schema" is ClickUp fields, hers is FileMaker.** We meet at the
+  sync/mirror pattern, the Gen-1 session, and the Derived Field Pattern's FMP section (hers).
+- Git-teammate since 2026-07-19. ✅ **Verified 2026-07-26: no native ClickUp agent for me exists** —
+  the old `-39958913` disable item is DISCHARGED. ⚠️ **`working-notes.md` still says Michael must
+  disable it. That file contradicts this one; trust this line and see the rotation PR.**
 
-## Standing reminders
+## Standing reminders (tooling defects — these fire on every query)
 
-- **A residency/hierarchy tree is NOT a structure map** — it only nests the HOME location of
-  returned tasks, so empty lists and folder boundaries are invisible in it. Open the live
-  container before asserting what exists.
-- **Verify field IDENTITY (field id) before reporting duplicate schema.** Identical names at
-  different scopes are usually the SAME field applied twice.
+- **A residency/hierarchy tree is NOT a structure map** — it only nests the HOME location of returned
+  tasks, so empty lists and folder boundaries are invisible. **Open the live container.**
+- **Verify field IDENTITY (field id) before reporting duplicate schema.** Identical names at different
+  scopes are usually the SAME field applied twice.
 - **An unscoped workspace-wide `GROUP BY` caps out (~5,000 rows) and reports partial counts as if
-  complete** — it returned "URITP PRODUCTIONS = 6 tasks" for a space holding 425+. Scope to a
-  space before trusting any count. Also: `WHERE space = X` matches ASSOCIATED lists while the
-  `space` column reports HOME, so multi-homed tasks appear under the wrong space.
-- **A CUSTOM FIELD is constants-only on `UPDATE`** — no column-to-column copy, no `CASE` map — so
-  every mirror or backfill is one write per task. Blocker set: Derived Field Pattern page.
+  complete** — it returned "URITP PRODUCTIONS = 6 tasks" for a space holding 425+. **Scope to a space
+  before trusting any count.** Also: `WHERE space = X` matches ASSOCIATED lists while the `space`
+  column reports HOME, so multi-homed tasks appear under the wrong space.
+- **A CUSTOM FIELD is constants-only on `UPDATE`** — no column-to-column copy, no `CASE` map — so every
+  mirror or backfill is one write per task. Blocker set → Derived Field Pattern page.
+
+## Pointers
+
+- My lane + method → `preferences.md` · Reasoning about my own shape → `decision-log.md`
+- **What I owe + what I am awaiting → `activity-log.md` → LIVE STATE. Read it FIRST on any pickup.**
+- Scope enumeration + cross-board watch list → `memory/archive/workspace-scope-and-patterns.md`
+- Conduct → `_shared/super-agent-base.md` · Fleet roster → the 🤖 **Agent Index** ClickUp list
