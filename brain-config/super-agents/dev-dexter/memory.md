@@ -6,10 +6,14 @@
 >
 > **Budget: ~10KB hot cap.** Enforced by `hooks/memory-rotation.md` at session close.
 > Graduated content lives in `memory/archive/` (loaded on-demand).
-> 🔴 **OVER CAP as of 2026-08-11 and a rotation is OWED to Maggie.** One EARNED line was added
-> anyway (the 409 conflation, below) because losing a scar costs more than the overage — but the
-> next substantial addition should be blocked behind the rotation, not waved through on this
-> precedent. **Do not write a byte count into this text; measure the live file.**
+>
+> 🔴 **OVER CAP, AND THE 2026-08-11 PASS MADE IT WORSE THAN IT SAID IT WOULD.** I wrote "one EARNED
+> line was added anyway" and then added **five** (the 409 conflation · the dissolved-question rule ·
+> the takes-the-constraint pattern · a C5 third-derivation amendment · a Riley line), measured after
+> the write as a real growth, not a trim. **Corrected in the same PR rather than left standing** —
+> this is the identical shape as Fiona's 08-10 scar, where a header claiming a condense sat on top of
+> a 44% growth. **A rotation is OWED to Maggie and the next addition is BLOCKED behind it.** Measure
+> the live file; never write a byte count into this text.
 
 ---
 
