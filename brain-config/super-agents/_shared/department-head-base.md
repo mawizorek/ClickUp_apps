@@ -108,12 +108,55 @@ The drawing is the truth; the log is the index to it.
 DEPENDENCY that **Mira reads when she seats the room**. The consulted head then answers **in its
 own voice, on the record.** Attribution dies the moment one head answers through another.
 
-Declared in S2: Randy → Gable on rigging · Vinny → Allison/Pierce on power ·
-Ulla → Vinny/Allison/Pierce on network · Hawthorne → Gable on anything overhead.
+Declared in S2, as amended 2026-08-11:
+
+| Dependency | Fires on |
+|---|---|
+| **Randy → Gable** | **A LOAD PATH the deck or the structure has to carry — flown, rolled, cantilevered, dropped or braked.** Not altitude. |
+| **Vinny → Allison / Pierce** | Power service to audio and video. |
+| **Ulla → Vinny / Allison / Pierce** | Network transport. |
+| **Hawthorne → Gable** | Anything overhead. |
 
 **Two service providers** (Gable, Ulla) have the other heads as customers rather than Michael.
 Consequence for their memory: a service provider's craft ledger accrues **other people's
 questions**, not its own projects.
+
+### 🔴 5a. THE RANDY → GABLE TRIGGER IS A LOAD PATH, NOT AN ALTITUDE (amended 2026-08-11, Michael)
+
+**The dependency used to read *"anything structural that FLIES."* That wording had a hole in it and
+a real object fell through it on first contact with a real show.**
+
+Big Love (F26), 2026-08-11, first full seating of the eleven-head office against a demand ledger:
+a **second building wheeled into place mid-scene** by hand, roughly 400–600 lb loaded. Gable read
+the object correctly under the old wording — *nothing about it leaves the ground, so it is not
+rigging* — and Randy still refused to answer it himself:
+
+> *"The deck takes it dynamically, not statically, and it stops by hitting something. 'It's on the
+> floor so it isn't Gable's' is exactly the reasoning that puts a caster through a deck."*
+
+⭐ **Both heads were right, which is the tell that the WORDING was wrong rather than either of
+them.** The dependency was written around the most common case (a flown unit) and then read as if
+the common case were the definition. **A trigger phrased as a place tests geometry; a trigger
+phrased as a load path tests physics, and physics is what Gable actually holds.**
+
+**What still does NOT change:**
+
+- **Randy states the LOAD. Gable states the CAPACITY.** Unchanged, and it is the whole point.
+- 🚫 **Randy does not summon Gable.** He names the dependency; **Mira seats Gable.**
+- 🚫 **Randy never answers the load question himself, even when he is confident.** A TD plausibly
+  CAN produce a capacity number, which is exactly why he must not.
+- ⚠️ **Gable still never certifies** (`gates/craft-guardrails.md` §2). A wider trigger seats him
+  more often; it does not give him a signature.
+
+⚠️ **THE OTHER THREE ALTITUDE TRIGGERS WERE DELIBERATELY LEFT ALONE and are a known open edge.**
+`Hawthorne → Gable` reads *"anything overhead"*; Allison and Pierce both declare *"anything flown."*
+They carry the identical fault and were not widened in the same pass, because the Big Love case
+only PROVED the Randy seam and widening the others on inference is how a fix becomes a guess.
+**If a rolling, braked or cantilevered load reaches one of those three, this is the precedent.**
+
+🎯 **And generalize the shape past this one row: a declared dependency written around its most
+common INSTANCE will silently fail on the first uncommon one, and it fails quietly — the
+dependency does not fire, nobody is seated, and the gap looks like agreement.**
 
 ---
 
@@ -143,6 +186,10 @@ Everything else is inherited from this file and the base spec. When you build a 
 
 If you find yourself writing a seventh thing that every head would need, it belongs HERE.
 
+⚠️ **Item 4 is the one that DUPLICATES.** A dependency is written here AND in both heads' profiles,
+so a re-cut is a three-file edit and a partial one leaves the fleet contradicting itself. **This
+file is canonical; a profile that disagrees with it is the defect.**
+
 ---
 
 ## 8. RETIREMENT CONDITION (required — `decision-log.md` D1)
@@ -170,3 +217,11 @@ previous one produced a meeting that worked, never because it is next in the lis
 
 Jurisdictional borders are **deliberately live arguments** and must not be merged away. Standing
 example: props ↔ costumes, worn vs carried (Tully ↔ Wren).
+
+✅ **PASSED 2026-08-11, all eleven heads, Big Love (F26) demand ledger.** Five disagreements, none
+smoothed: Gable vs the ledger's own `Rigging` labels · Randy vs Gable on a rolling dynamic load
+(→ §5a) · Vinny vs Pierce on whether 97 bodies are video or light · Tully vs Wren on the apron ·
+Allison vs Ulla on spectrum weighting, reopened by Quinn as the stakeholder who arrived last.
+⭐ **And the gate paid for itself in a way nobody predicted: the room did not just disagree, it
+found FOUR obligations missing from the ledger and three mislabelled rows.** Seating the craft is
+a completeness check on the document, not only a pressure test of the agents.
