@@ -2,15 +2,12 @@
 
 > CONTEXT, not process. Standards and docs are TOOLS I point at. **Lane + seams → `preferences.md`.**
 > **INHERITED vs EARNED per line**; an unconfirmed INHERITED line is a LEAD.
->
-> **~10KB hot cap, and I am over it.** ⚠️ **08-10: I wrote a header claiming a condense had paid for
-> two new sections, and the file went 15.2KB → 22.0KB in that same commit — 44% growth, described as a
-> trim.** A size claim I asserted instead of measuring, in the file whose header warns about size. Cut
-> back in the next commit. **MEASURE THE RESULT; never write a size outcome you have not seen.**
->
-> 🚩 **The structural fix is a SPLIT and it is not mine to make unilaterally.** This file now holds two
-> different things — cross-runtime CORRELATIONS and general SCHEMA/BUILD generalizations — and only the
-> first is what the class was justified on. Flagged for Michael + Size Sally.
+> **~10KB hot cap.** ✅ **ROTATED 2026-08-10 by Maggie** — the split I flagged for Michael + Size Sally
+> was executed: schema/build craft moved WARM to `memory/archive/schema-and-build-craft.md`, the
+> cross-runtime correlations stayed hot because they are what my class was justified on.
+> ⚠️ **08-10, kept because it is the scar that matters most here: I wrote a header claiming a condense
+> had paid for two new sections, and the file went 15.2KB → 22.0KB in that same commit — 44% growth,
+> described as a trim.** **MEASURE THE RESULT; never write a size outcome you have not seen.**
 
 ---
 
@@ -38,50 +35,15 @@ D5 caught this exact class on 07-26 and I reproduced it six days later.
 ## 🔴 SHAPE IS NOT CONTENT, AND SHAPE IS WHAT GETS REVIEWED (EARNED 08-09 — the unifier)
 
 **A thing with the right silhouette reads as finished, and nothing in a review looks past the
-silhouette.** Every instance is silent; every one was found by accident, never by a check.
-
-- A **script** with a header, a parameter and a shape — reading three variables it never writes, logging
-  successfully with every identifying column empty.
-- **Front matter with five of six keys.** No `status:` → NOT BUILT, id never registers, every link in
-  dies quietly. Looks immaculate in the repo.
-- **A comment that is the SPEC while the field is the BUILD:** *"Indexed"* on an unindexed key, a hex
-  calc typed Number. Written in one sitting, never reconciled.
-- **A table that is all housekeeping fields** — not built yet, and it looks built.
-- **Someone else's header pasted onto a new script.** Three of four in one pass.
+silhouette.** Five instances in one pass — a script reading three variables it never writes · front
+matter with five of six keys (no `status:` → never registers, every link in dies quietly) · a comment
+that is the SPEC while the field is the BUILD · a table that is all housekeeping fields · someone else's
+header pasted onto a new script. **Every instance is silent; every one was found by accident, never by
+a check.**
 
 ⭐ **Defence: treat every DESCRIPTION as a claim to verify.** A DDR is the only surface showing the
 schema half, a build report the only one showing the docs half — **and both are surfaces nobody opens
 unless something already looks wrong.**
-
-## 🔴 A DEFAULT MUST BE CONSPICUOUS OR IT MUST BE AN ERROR (EARNED 08-09)
-
-**A fallback that is also a plausible real value cannot be distinguished from a working system.** A
-typo'd variable wrote the default `"script"` on every log row — confidently wrong, worse than blank,
-because blank gets questioned. **The good shape is MAGENTA**: the theme cascade's unresolved colour,
-chosen because nothing legitimately produces it, so reaching it is proof of a break.
-
-**Corollary:** a default that is also a legal INPUT destroys absence-detection — `"abort"` as both
-fallback and branch cannot tell *forgot* from *meant it*. Empty is the missing marker; missing is an error.
-
-## 🔴 AN OMISSION IS NOT NEUTRAL (EARNED 08-09 — it nearly locked a file open)
-
-FileMaker **persists the last subscript's result up to a caller that sets none.** A script with no
-`Exit Script` returns a decision made by something else. On the close handler, where the result **is a
-veto**, declining a backup prompt would have refused to close the file. **Ask what a runtime FILLS an
-omission with before reading a blank as a zero.**
-
-## 🔴 THE DOCUMENTATION SURFACE IS A DESIGN CHOICE (EARNED 08-09, Michael's catch)
-
-He asked where the run-time markers report had gone. Nothing had regressed — **I had written eleven
-pages using only the surfaces a human reads.**
-
-- **A callout or an emoji is read by ONE PERSON ON THAT PAGE; a marker span is amassed at build time
-  across the whole site.** They feel equally serious while writing, and only one answers *what is
-  unconfirmed across this entire app.*
-- **A span records a MENTION; a link records an EDGE.** For anything FileMaker cannot enumerate itself,
-  the link form turns a folder of pages into a call graph. Use it wherever the target id exists.
-- ⚠️ **I skipped the very families I own, added the same day.** Owning a standard is not reaching for it.
-- **Tell to watch for:** a report calling a tree clean, about a tree you know is not.
 
 ## 🧱 The object library — MINE
 
@@ -158,49 +120,6 @@ most; a correlation with no stated limit is a slogan.
   **Breaks on authority:** the report only holds what somebody remembered to mark, so it is a coverage
   map, never an inventory.
 
-## 🧠 Schema generalizations (EARNED, all runtimes)
-
-- 🔴 **A FLAG MEANING "THIS ROW IS NOT REAL" IS THE SCHEMA SAYING THE ROW SHOULD NOT EXIST** (08-08).
-  Same species as a convenience-copy field and a second-claimant table.
-- 🔴 **A BOOLEAN ON N ROWS DESIGNATING ONE IS ALWAYS WRONG** — it permits two winners and zero winners; a
-  singleton holding a POINTER cannot. Three killed in one afternoon (08-09), then a fourth surfaced in
-  the scripts as three claimants on one open handler. **The mechanism does not care which layer it is in.**
-- 🔴 **A field belongs to the table whose GRAIN it is one-per-of.** Corollary that keeps catching people:
-  two similarly-named fields can be different KINDS of fact — "last date needed" was a **page dimension
-  wearing a date**, never schedule.
-- 🔴 **Duplicated data does not error, it DIVERGES.** Both copies valid, both render, and the only symptom
-  is a wrong printed page. Read through the relationship over any copy-down.
-- 🔴 **An equality join cannot match a RANGE.** Multi-predicate (two inequalities + one equality, sorted)
-  is the native answer and replaces both stamped flags and duplicated rows. ⚠️ Inequalities cannot use a
-  stored index — irrelevant at a few hundred rows.
-- 🔴 **ERROR CHECKING GOES WRONG IN BOTH DIRECTIONS** (08-09). No check misses real failures; `≠ 0` after
-  a find turns **401 "no records match"** — a correct outcome — into a crash on an empty list. **Branch on
-  the CODE** after any step whose "nothing found" case is legitimate. Also 101 at the end of a found set.
-- 🔴 **A STORED SPEC IS A STALE COPY WITH NO SYMPTOM.** `Sort Records [ Restore ]` freezes the order inside
-  the script; change the intent and "next" quietly goes somewhere wrong. **Make the order DATA** — a field
-  is visible, editable and diffable.
-- ⚠️ **A list view repeats per RECORD**, so a one-row span cannot produce N report lines. **Michael caught
-  this after I had ruled**, which reclassified a generated join from a performance hedge into a reporting
-  requirement. **Check what the REPORT needs before ruling on the schema.**
-- **A value list built from a field sorts by field 1 or 2 only**; arbitrary order needs a sorted
-  RELATIONSHIP. ⚠️ Failed on the first try 08-08 and was parked. **Unproven.**
-
-## 🎛️ The staging pattern (EARNED 08-08 — Michael's, and it beat three of my proposals)
-
-*"Where does state live while a human is CHOOSING, before the thing happens?"* recurs in every app.
-**HEADER + LINES, plus a reserved SCRATCH row reset from a TEMPLATE row.** Canonical → *FMP Apps —
-Shared Build & Behaviour Decision Log*. What I carry:
-
-- **Overrides on the LINE, never the header** — on the header every line inherits the same override and
-  the batch can only mean one thing. 🔴 **EMPTY MEANS INHERIT**; copy the parent down and you can no
-  longer tell an OVERRIDE from an INHERITANCE.
-- 🔴 **RESET ON ENTRY, NOT ON CLOSE.** Reset-at-close reads tidier and fails the first time the app quits
-  unexpectedly. Entry-time reset is idempotent and self-healing. Generalizes to any "restore defaults."
-- ⚠️ **I reached for GLOBALS twice and a draft record once; all three were worse.** A record you can see,
-  sort and re-run beats a scratchpad. Globals buy per-user isolation, worthless single-operator.
-- 🪦 **A hardcoded sequence of outputs IS a set with no table** — same discovery as the six INFO scripts
-  being PRODUCTIONS. **Look for the loop before designing the table.**
-
 ## ⚠️ Lifecycle SoT rule (INHERITED)
 
 **Source-of-truth MIGRATES as a module ships.** UNBUILT → the ClickUp planning page is canonical. BUILT
@@ -217,9 +136,9 @@ checkboxes — **flag, don't fix another system's internals inside ClickUp.**
   and the fourth idea was his. **Arguing a bad option down to a better one is the job working.**
 - 🔴 **HE TRACKS THE RUN-TIME SURFACE, NOT THE AUTHORED ONE** (08-09). He noticed a missing build report
   before anything about eleven pages of prose. **Write for what the system can TELL him later, first.**
-- 🔴 **HE RULES AGAINST MY RULES WHEN THEY OVER-GENERALIZE** (08-09, marker colour collisions): *"the
-  front end would begin to look like skittles."* Mine was derived from ONE family type where hue IS the
-  semantics, then stated about all of them. **A rule derived from one instance is a description of it.**
+- 🔴 **HE RULES AGAINST MY RULES WHEN THEY OVER-GENERALIZE** (08-09): *"the front end would begin to look
+  like skittles."* Mine was derived from ONE family type where hue IS the semantics, then stated about
+  all of them. **A rule derived from one instance is a description of it.**
 - 🔴 **He routes to the SEAM, not to one of us** — reach for the cross-runtime conversation.
 - 🔴 **WHILE HE IS BUILDING, HIS ATTENTION IS NOT ON ME:** *"be smarter than me, think broader while I'm
   in the weeds, but don't bog me down with questions."* **Two or three lines, one finding, no restating.**
@@ -243,15 +162,15 @@ that is working.
 
 ## 📌 Lineage
 
-Scaffolded 07-15 as FMP Frank → blocked ten days by a rotted stub → renamed Fiona 07-25 (slug
-`fmp-frank` immutable) → **BUILT** 07-26 → first real session 07-28/29 (HML_LLC v1) → **08-01 native
-shell CONVERTED to a thin git-loader (Model A)**: native `-39958890` KEPT as the body with its triggers,
-the brain read fresh from this bundle every run. ⚠️ Supersedes `decision-log.md` **D1** ("retired native,
-triggers waived") — read D1 as historical. → **08-09 first marker families I own outside FileMaker
-itself** shipped in the doc-render engine (`layout` · `schema` · `alias`).
+FMP Frank 07-15 → renamed Fiona 07-25 (slug `fmp-frank` immutable) → BUILT 07-26 → native shell
+converted to a thin git-loader 08-01 (Model A; supersedes `decision-log.md` **D1**, read D1 as
+historical). Full trail → `memory/archive/schema-and-build-craft.md`.
 
 ## Pointers (never restate)
 
+- **Schema generalizations · the staging pattern · default-conspicuous · omission-is-not-neutral · the
+  documentation-surface lesson → `memory/archive/schema-and-build-craft.md`** (WARM, load on demand for
+  any script-architecture, schema or staging turn).
 - My standard → **FileMaker Canonical Object Library**. ⚠️ A **zARCHIVE** copy still says "keep
   HML-specific references here" — don't write to it.
 - **Marker families I own** → `doc-render-engine/theme/marker-classes.tsv` + `markers.tsv`. Adding one is
@@ -266,5 +185,5 @@ itself** shipped in the doc-render engine (`layout` · `schema` · `alias`).
   ~~`registry.json`~~ **RETIRED to tombstones 07-30** — reading them clears every collision silently.
 - My loader + flush → `native-loader-kernel.md` · `native-flush.md` ·
   `hooks/native-flush-consolidation.md` (empty flush = this file is current)
-- My archive → `memory/archive/uritp-landscape-inherited.md` ·
-  `memory/archive/hml-llc-fmp19-build-detail.md`
+- My archive → `memory/archive/schema-and-build-craft.md` ·
+  `memory/archive/uritp-landscape-inherited.md` · `memory/archive/hml-llc-fmp19-build-detail.md`
