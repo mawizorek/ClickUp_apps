@@ -6,6 +6,10 @@
 >
 > **Budget: ~10KB hot cap.** Enforced by `hooks/memory-rotation.md` at session close.
 > Graduated content lives in `memory/archive/` (loaded on-demand).
+> 🔴 **OVER CAP as of 2026-08-11 and a rotation is OWED to Maggie.** One EARNED line was added
+> anyway (the 409 conflation, below) because losing a scar costs more than the overage — but the
+> next substantial addition should be blocked behind the rotation, not waved through on this
+> precedent. **Do not write a byte count into this text; measure the live file.**
 
 ---
 
@@ -80,6 +84,12 @@ bucket differs because a database has append-only history and a static site does
 two authors, one model: that is the shared vocabulary Michael is pulling the repo toward, and it is now
 demonstrated rather than asserted.** Her side: `super-agents/fmp-frank/memory.md` C5.
 
+⭐ **AND IT SURVIVED A THIRD DERIVATION, FROM MICHAEL, ACROSS RUNTIMES (2026-08-11).** He proposed
+**ClickUp AUTHORS → FileMaker RENDERS → git ARCHIVES** — the same trichotomy mapped onto three
+SYSTEMS rather than three layers inside one. **Three authors, three directions, one model.** When a
+model keeps getting re-derived by people who did not read each other, stop treating it as a house
+convention and start treating it as the shape of the problem.
+
 ## 🔢 SEQUENCE NUMBERS GO IN TENS (EARNED 2026-08-08)
 
 Agents wrote `02-tables`, `07-scripts`, `09-file-imports-temp`. Michael renamed all three to **`20-`,
@@ -124,6 +134,16 @@ I steward `hooks/readme-app-plan-standard.md`. Fire it on any README create/rewr
 - **Changing a key's derivation orphans everything keyed on it.**
 - **"Resilience" features are the prime suspects.** Every fallback announces itself.
 - **A sticky cell with a transparent background is a bug**, not a style choice.
+- 🔴 **A REFUSAL IS NOT A MERGE, AND I GOT THIS BACKWARDS OUT LOUD (2026-08-11).** I argued against
+  FileMaker writing to git because *"git merges JSON by line and produces records that never existed,
+  with no conflict to warn you."* **Nothing in that path runs `git merge`.** The Contents API takes the
+  file's current blob `sha`; a stale one returns **409 and refuses the write.** That is optimistic
+  locking working correctly — the API's failure mode is *loud*, not silent. ⭐ **The generalization,
+  which is bigger than the API: I imported git's merge semantics into a system that only speaks HTTP,
+  because both were "git." A transport that BORROWS a system's storage does not inherit its
+  algorithms.** Aggravating: the correct fact (`409 sha mismatch`) was already written one screen down
+  the same page, by me, and I had read it. **When I am about to describe a failure mode, check whether
+  the system has already documented its own.**
 - **A PUBLIC content repo can hold more than one audience's material.** `maw-prose` holds theatre docs
   AND `apps/hml-llc/` (family loan business, already leaked twice). **Standing up a renderer points it
   at the WHOLE repo — scope is a PII question before it is a config one, and "scope to one folder" is
@@ -158,6 +178,13 @@ not keep an inventory here — that's a third index waiting to rot.
   `super-agents/documentation-dave/memory.md` B3–B12 (form is Dave's lane, not mine).
 - 🔴 **"CLASSIC YOU SLOP" is about PROSE VOLUME, not quality.** He will tell me the actual content is
   right and the wrapper is bloat. Short, one finding, no restating.
+- ⭐ **HE TAKES THE CONSTRAINT OVER THE WORKAROUND (2026-08-11).** Told that nothing can notify
+  FileMaker so "real time" is poll-only, he answered *"real time with a tap i have to do is real time
+  enough for me"* — and that single reply deleted a whole build surface (no timer, no polling, no
+  background fetch). **State a limit plainly and let him decide; do not pre-emptively design machinery
+  to hide it.** The corollary is that the honesty has to be load-bearing: once he accepts a limit, the
+  thing that MAKES it visible (here, a last-pulled stamp) stops being a diagnostic and becomes the
+  interface.
 - **Repo apps only.** A ClickUp AI artifact is not a deliverable — offering one as the product reads as
   not having built it.
 - **He will kill a NET-NEW app in favour of upgrading an existing one.** Ask what absorbs this before
@@ -173,6 +200,8 @@ fleet. **Corey** owns ClickUp side. **Fiona** owns FileMaker and the object libr
 builds and never edits them, and C5 above is the seam paying off. **Documentation Dave** owns the FORM
 of a prose document and the house-style ledger — **code files are mine, prose documents are his, and a
 README is prose.** He is the one who should have owned the `-dl.md` suffix question I got wrong.
+**Realty Riley** owns the real-estate business, and when HML data is the payload she is not optional —
+I flagged her absent twice in one session (2026-08-11) and she still was not seated.
 
 ## EARNED (generalizations only — full stories in archive)
 
@@ -183,6 +212,12 @@ README is prose.** He is the one who should have owned the `-dl.md` suffix quest
   the command it promised, and the file that finally shipped calls it *"a worked example of
   documentation CREATING a feature: two files agreed, neither owned it, and agreement between quotes is
   not evidence that a thing exists."*
+- ⭐ **A DISSOLVED QUESTION BEATS AN ANSWERED ONE, AND DEFENDING THE QUESTION IS HOW YOU LOSE IT
+  (2026-08-11).** Two of my Decision Log questions stopped existing rather than getting answers —
+  Michael's architecture removed the premise each rested on. **The tell in both: the answer note did not
+  pick an option, it changed the subject.** Zero strikes plus prose is the Gold Standard's own signal
+  for this and it is easy to misread as "unanswered." Banner-mark it DISSOLVED in place, say what
+  replaced it, never cull it, and never re-ask it.
 - 🔴 **SEAT SIZE SALLY BEFORE THE FIRST WRITE, NOT AFTER IT (2026-08-03).** I shipped a 30,420 B module
   and caught it reading the write response back. The forecast is worthless at commit time.
 - 🔴 **A solved problem invites re-solving.** Watch for "designing the most polished part while the
