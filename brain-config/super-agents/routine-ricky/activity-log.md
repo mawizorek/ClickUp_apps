@@ -2,8 +2,9 @@
 
 > **LIVE per-reply session record.** Start the entry at session Commit, append one line per
 > qualifying reply (delivers content, answers a question, takes action, makes a decision, or issues a correction) as you go. At close it is already done — no batch reconstruction.
-> Newest session on top, append-only. Budget ~4-5KB (sliding window, last 10-15 sessions);
-> quarterly cold archives to `activity-log/YYYY-QN.md` per `hooks/memory-rotation.md`.
+> Newest session on top, append-only. **Budget ~4-5KB for the ENTRIES ONLY** (sliding window);
+> the LIVE STATE block sits OUTSIDE that window and is never rotated (`super-agent-base.md` §4a;
+> `hooks/memory-rotation.md` as corrected 2026-08-10). Quarterly cold archives → `activity-log/YYYY-QN.md`.
 >
 > Format law: `_shared/super-agent-base.md` → Per-response logging mandate (LOCKED 2026-07-25).
 >
@@ -15,6 +16,56 @@
 > Every ClickUp URL that passes through an agent's context is rewritten to an internal placeholder, so an agent
 > cannot see or reproduce the real one. **Name the task and give its ID in backticks.** A bare ID is ugly; a
 > link to a placeholder host is dead.
+>
+> 🗄️ **Cold archive:** `activity-log/2026-Q3.md` — the build session and the 08-01/08-02/08-03 runs
+> rotated there 2026-08-11 by Maggie. Whole entries moved, nothing condensed, nothing dropped.
+
+---
+
+# 🔴 LIVE STATE — read this FIRST on any pickup
+
+> Permanent fixture, OUTSIDE the sliding window. Every number carries the moment it was measured.
+> **Anything older than the last close gets RE-QUERIED, never reused.**
+>
+> ⚠️ **This block did not exist until 2026-08-11**, and most of what is in it was sitting in
+> `memory.md` — where nothing re-reads it for expiry. Moved by Maggie's §4a sweep.
+> 🔴 **THE STAMPS ARE NOT HERE AND NEVER WILL BE.** `routines/last-run/<routine>.txt` is the only
+> home for last-run state, one file per routine, one writer. Anything below is a NOTE about a run,
+> not the run's state. **Read the stamp files at triage; never trust a number on this page.**
+
+## Routine standing — as of the 2026-08-09 pass
+
+- **Job Market** · daily · last full pass 08-06 closed COMPLETE at **173 live**; the 08-04 pass landed
+  108 PARTIAL. Left standing at a boundary on 08-09 by design (run order: heavy last).
+- **On Track** · ~48h · 08-09 pass took the window 70 → **67 events** across ~19 series (5 added,
+  8 aged out, 4 corrections).
+- **F1** · session-aware · 08-09 was a clean verified NO-OP. Summer break runs to the Dutch GP 08-21,
+  so expect no-ops until then.
+- **World Cup** · retired. Never propose it.
+
+## Open flags — all four need someone, none are mine to close alone
+
+- 🔴 **The 40-listing density floor is decorative.** A pass can return 45 with half the sources
+  unbrowsed and still "pass." Flagged to Michael 08-04, re-flagged 08-09, **still unruled.**
+  Do not silently retune it — thresholds are config.
+- ⬜ **The `operations-safety` lane needs that sector's own vocabulary**, which is not theatre
+  vocabulary, and we expanded keywords by guessing. **That is a NEW question and it is Sage's.**
+  Earned 08-04, still not handed over.
+- ⬜ **The On Track registry says 18 series; the data file has ~19** (SailGP is in the file and not in
+  the registry). Harmless, carried forward, **but one of them should move.**
+- ⬜ **A debrief on the 173-listing pass is sitting on the board** (Compass Corso + Portfolio Paige,
+  08-07). **Read it before drawing any Job Market band** — someone may already have explained the jump.
+
+## Bundle health — measured 2026-08-11 00:38 ET (Maggie's rotation)
+
+- ✅ **`memory.md` ROTATED: 15,613 B → 11,741 B.** Origins + contract reasoning → `memory/archive/origins-and-contract.md`.
+  ⚠️ Still 11.47 KiB against ~10KB — **flagged, not forced.** What remains is the source ledger, the
+  execution scars and how-Michael-works, all of which fire on a run.
+- ✅ **`activity-log.md` ROTATED: 13,791 B → this file**, five sessions moved cold, LIVE STATE added.
+- ⚠️ **`decision-log.md` 14,115 B** — no file cap, partial-load by TOC. Informational.
+- 🔴 **`preferences.md` is 16,821 B — the largest file in this bundle**, exempt from rotation, read
+  FULL on every seating, and measured by nothing. **Second bundle in a row where the profile outweighs
+  the memory file.** Flagged for Michael.
 
 ---
 
@@ -113,62 +164,4 @@ Session context: 🧭 STANDING · Routine Ricky — Run Reports (`86ajuhw1d`) ·
 
 ---
 
-## 2026-08-03 (continued) — Job Market full pass
-
-Session context: [RECURRING] Agent Pushes task comment thread · invoked by Michael (second call)
-
-- 3:56 PM · INVOKED. Michael: "pick it up exactly where you left off."
-- 4:00 PM · Job Market full 8-lane sweep started. First pass on 4 new lanes (OPS, AUD, DFT, ADM).
-- 4:20 PM · Pass complete. 69 live, +7 new, 0 gone. Density floor passed (69 > 40).
-- 4:20 PM · TSV committed (SHA 84c8ec8). Friction column added to schema.
-- 4:20 PM · Stamped: `2026-08-03 16:20 ET`.
-- 4:20 PM · Roll-up posted to Run Reports thread.
-- Source notes: Skene Callboard appears retired (editorial-only). Scenic Guild (jobs.scenicguild.org) needs board code for DFT lane. New lanes (OPS, ADM) thin on standard boards, need Indeed/LinkedIn targeted sweeps.
-
----
-
-## 2026-08-03 — Invoked, corrected, running due routines
-
-Session context: [RECURRING] Agent Pushes task comment thread · invoked by Michael
-
-- 3:31 PM · INVOKED.
-- 3:31 PM · Michael corrected: activity log empty since build despite real runs (Job Market stamped 08-02, On Track stamped 08-01). Added hard invocation-stamp gate to prevent this going forward.
-- 3:31 PM · Running due routines: On Track (overdue ~14h past 48h cadence) and Job Market (overdue ~3.5h past daily cadence).
-
----
-
-## 2026-08-02 — Ran (RECONSTRUCTED — no activity-log entry was written)
-
-- ~11:55 AM · Job Market routine ran successfully (stamp file proves it).
-- Gap: no activity log entry was created. This is the failure the 08-03 hard gate fixes.
-
----
-
-## 2026-08-01 — Ran (RECONSTRUCTED — no activity-log entry was written)
-
-- ~1:30 AM · On Track routine ran successfully (stamp file proves it).
-- ~1:36 AM · F1 routine ran (stamp file: `2026-08-01 01:36 ET`).
-- Gap: no activity log entry was created.
-
----
-
-## 2026-07-26 — Built, then immediately redesigned around TRIAGE
-
-Session task: **Fleet Build Queue** (Agent Activity Board) · agent: Fleet Felix (steward), building me
-
-> 🔗 This line used to carry a link. It was destroyed on 2026-08-06 by a whole-file rewrite that wrote back the
-> internal placeholder an agent sees instead of the real ClickUp URL. See the header rule and the 08-06 entry.
-> The original is in git history.
-
-- ~2:12 PM · Michael: *"let's do rocky next."* Referent clear, NAME not. Felix stopped on the fork instead of guessing — an unbuilt agent's name isn't locked, and the slug is immutable the moment a file is written.
-- ~2:16 PM · **Felix fixed my contract before building me.** `gates/agent-invocation-gate.md` STEP 0 was telling every agent in the fleet to resolve tokens via `invocation_resolution.token_map` — **a field that does not exist** (it's `invocation.tokens`). First move of every invocation, wrong. Also: roster described as two arrays abolished on 07-25, three more dead `registry.json` pointers, and only 3 of 6 live migrations listed. Building against that would have baked the rot into me. PR #549.
-- ~2:19 PM · Michael ruled: **Ricky.** The name survived a real challenge rather than defaulting through.
-- ~2:20 PM · Board presence posted BEFORE any write — and the write **collided**, which is the system working: Memory Maggie mid-OMR-drain, Maestro Mira on a group Milo session. Felix re-fetched rather than forcing, confirmed no file overlap, and appended a row in THEIR new table format instead of clobbering it.
-- ~2:21 PM · `hooks/data-refresh.md` **v1** authored FIRST, before the profile pointing at it (the Maggie phantom-pointer lesson). Registry EMPTY on purpose.
-- ~2:22 PM · Bundle authored. `gate_strength: confirm` — read-only argued for auto, but v1's default FETCHED EXTERNAL DATA and the Soleil miss was one day old.
-- ~2:30 PM · Shipped. PR #552. `roster.json` came out **net 1,572 bytes SMALLER** despite gaining my registration (it had touched 21,140 mid-build — ~900 from unreadable).
-- ~2:35 PM · **Michael redesigned my default before I ever ran.** *"Check the refresh log, determine what needs to be run based on timestamp last run... we externally maintain schedule and other agents may do updates via timestamp... for now just say 'here's what needs to happen — proceed?'"*
-- ~2:38 PM · `hooks/data-refresh.md` **v2**: TRIAGE is now the default. NEW `brain-config/data-refresh-log.json` (shared state, **any** agent may stamp it), `cadence` added to the registry as CONFIG while timestamps stay STATE in the log, mandatory stamp-after-run (**including failures**), and a written three-stage graduation path toward auto.
-- ~2:41 PM · **`gate_strength` reversed `confirm` → `auto`** four hours after birth. Not a flip-flop: my default no longer fetches anything, it does arithmetic on our own log and ends in a question. **The dial tracks the blast radius of the default, not my age** (D8). The fetch caution moved to per-poll `auto_run`.
-
-**State left:** callable via `/session.agent=Ricky`. Announce `🔄 ═══ RICKY · ON THE ROUNDS ═══`. A bare call now TRIAGES and proposes; it never runs a poll unasked.
+_Older sessions (2026-08-03 ×2, 08-02, 08-01, 07-26 build) → `activity-log/2026-Q3.md`._
