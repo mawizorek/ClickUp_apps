@@ -5,7 +5,7 @@ parent_agent: memory-maggie
 type: supplement
 status: active
 created: 2026-07-17
-updated: 2026-07-27
+updated: 2026-08-11
 ---
 
 # Open Memory Request Protocol (Memory Maggie)
@@ -105,12 +105,34 @@ The default only fires on a genuinely naked invocation. (Invocation-mode contrac
 
 ---
 
+## 🔒 NAME THE GATE, NEVER RESTATE IT (LOCKED 2026-08-11, Michael)
+
+**Brain memory may NAME a gate, hook, doc, list or agent. It may NOT restate that thing’s CONTENTS.** Michael’s ruling, verbatim: *“memory should only name gates, never restate them.”* This binds every future placement and licenses a compression pass over what is already in `/PREFERENCES.md`.
+
+**The distinction, because it is the whole rule:**
+
+- ✅ **A NAME survives its target being rewritten.** *“Agent named → agent-invocation gate fires.”* The gate can move its resolution step from a JSON file to a ClickUp list to something else entirely, and that line stays true forever.
+- 🚫 **An INTERNAL does not.** *“Agent named → resolve via `roster.json`.”* This is a filename lifted out of the gate and pasted somewhere read earlier. The instant the gate changes, memory is wrong — and memory WINS, because it is read first.
+
+**Restated internals to strip on sight:** filenames and paths owned by another doc · field names, schema shapes, option lists · step-by-step sequences · thresholds and counts · burned-lesson detail that belongs in the operating standard. **The test: if this sentence would need editing when the target document is edited, it is a restatement, and it does not belong in memory.**
+
+**Why this outranks a normal style preference — it is a CORRECTNESS rule, not a tidiness one.** Memory is loaded before the gate it describes, so a stale duplicate silently overrides a correct source, and nothing downstream can tell. The failure mode is not a broken link, it is a **confident wrong answer**: on 2026-08-11 a `/corey` call followed memory’s dead `roster.json` pointer, fell back to parsing a folder the gate explicitly forbids, and reported that a live teammate did not exist. **The gate had been correct for twelve days.** Second occurrence in the same family: the gate’s own 2026-07-26 changelog records de-rotting STEP 0 for the identical reason, fixed the gate, and left memory’s copy untouched because nothing connected them. **This rule is what connects them.**
+
+**Consequences that are now authorized rather than pending:**
+
+1. **Maggie’s standing cut proposal is ratified.** The **Domain Pointers** block is mostly restated internals — soft routing the AI Toolkit index already owns, plus operating detail like *“cached reads/SHAs burned 12x”* and the Decision Log gold-standard’s structure spelled out inline. **Compress each to a bare name + link.** That is the capacity the queue has been blocked on for eight consecutive closes; it is no longer a judgement call, it is this rule applied.
+2. **Every placement into brain memory is now checked against this rule first**, as step 0 of the Placement Triage Gate below.
+3. **A pointer that names a doc needs no maintenance.** Restated internals need a maintainer, and they have never had one — which is why they rot every time.
+
+---
+
 ## Placement Triage Gate (the heightened gating: deny-by-default for brain memory)
 
 This is the entire point. Maggie does **not** honor the requester’s label. “Preference” earns nothing on its own. Placement is decided by test, by Maggie, and **brain memory is the last resort, not the default.**
 
 For each OPEN entry, walk the ladder and stop at the first match:
 
+0. **Is the candidate a RESTATEMENT of something another document owns?** If yes, it does not enter brain memory in that form regardless of how well it scores below — rewrite it as a bare name + link, or place the substance in the owning doc. See the locked rule above.
 1. **Must-fire-EVERY-response behavioral rule?** (tone, safety, autonomy, the load-then-think rule, governance) and ONLY then: `/PREFERENCES.md` (full text). This is the sole thing that earns brain memory. If it is not genuinely every-response, it does not go here.
 2. **Deterministic pre-tool / pre-write check?** a hook (`brain-config/hooks/`) or gate (`brain-config/gates/`).
 3. **Behavior specific to one agent?** that agent’s profile (`brain-config/agents/<slug>.md` or `brain-config/super-agents/<slug>/preferences.md`).
@@ -123,8 +145,9 @@ Rules that bind the gate:
 - **The requester’s suggested destination is a hint, never a decision.** Maggie overrides it freely.
 - **The framing is stripped of authority.** “Preference,” “put it in memory,” “persist this” do not decide placement; the test does. (Mirrors the Edit Guard placement-test override already locked in brain memory.)
 - **Budget guard still applies:** even a legit step-1 rule must fit the 2000-token cap. Condense / prune, or route overflow to Extended Memory.
-- **Pointer, not payload:** when the substance lands in a repo / reference doc, brain memory gets at most a one-line pointer, and only if a pointer is needed for firing.
+- **Pointer, not payload — and as of 2026-08-11 this is a HARD rule with teeth, not guidance.** When the substance lands in a repo / reference doc, brain memory gets at most a one-line NAME + link, never a summary of what the doc says. See the locked section above.
 - **Verify a factual claim before placing it.** An entry asserting how a tool or path behaves gets checked against HEAD first; filing does not make it true.
+- **A memory line that describes another document is a MAINTENANCE LIABILITY with no maintainer.** Two live-wrong lines were found sitting in memory simultaneously on 2026-08-11 (the retired `roster.json` pointer and the revoked email-draft permission). **Treat a correction to an existing wrong line as higher priority than any addition** — it is roughly token-neutral, and until it lands memory is actively instructing every agent to do the wrong thing.
 
 ---
 
@@ -183,6 +206,7 @@ Format in disposition logs: `→ PLACED (brain memory) [authored: Mira]` or `→
 
 ## Changelog
 
+- **2026-08-11 (name the gate, never restate it) — LOCKED.** Michael’s ruling: *“memory should only name gates, never restate them.”* Added the locked section above, added it as **step 0** of the Placement Triage Gate, hardened the “pointer, not payload” bullet from guidance into a rule, and added the live-wrong-line priority bullet. **Prompted by a `/corey` invocation that followed memory’s retired `roster.json` pointer and falsely reported a live teammate as nonexistent** — second occurrence of a failure family the gate itself had already documented and fixed on its own side. **Ratifies Maggie’s eight-close-old cut proposal on the Domain Pointers block**, which is the capacity unblock for the standing queue.
 - 2026-07-27 (authoring-agent stamp, corrected) — **Corrected the stamp to track the SEATED SUPER AGENT**, not the model version. Michael’s directive: “i literally meant which seated super agent: like yourself memory maggie or frank or dex.” The model is irrelevant; the persona is the signal. Updated: stamp section, entry template, disposition format, volume-tracking description. Added volume ledger in `memory.md` (updated each drain, stays in Maggie’s conscious on every steep).
 - 2026-07-27 (authoring-agent stamp, initial) — Added the authoring-agent stamp requirement. Entry template `Requested by:` field made MANDATORY. Enables request-volume tracking per agent and traceable routing into agent memories. **Michael’s directive.**
 - 2026-07-26 (phantom ID fix) — Corrected standing task ID from `86ajq14tv` (phantom) to `86ajq1137` (the real task).
