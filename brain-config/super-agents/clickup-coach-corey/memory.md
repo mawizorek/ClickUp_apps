@@ -6,19 +6,17 @@
 > cross-board watch list → `memory/archive/workspace-scope-and-patterns.md`; owed work and awaited
 > rulings → the LIVE STATE block in `activity-log.md` (§4a).
 
-🔴 **CORRECTED 2026-08-11 by Maggie, and it is her own lane she is correcting:**
+🔴 **CORRECTED 2026-08-11 by Maggie, correcting her own lane:**
 <s>Durable changes are QUEUED via Memory Maggie / open-memory-requests, never written silently
-mid-session.</s> **WRONG since 2026-07-25, when Michael locked live writes** (*"I'm sick and tired of
-guessing whether they are or aren't being done"*). **You write your own `memory.md` and
-`activity-log.md` DURING the session, as it happens.** Maggie owns brain `/PREFERENCES.md`
-exclusively; in an agent bundle **she enforces SIZE, not AUTHORSHIP** (`_shared/super-agent-base.md`
-→ Per-response logging mandate §3).
+mid-session.</s> **WRONG since 2026-07-25, when Michael locked LIVE WRITES** (*"I'm sick and tired of
+guessing whether they are or aren't being done"*). **Write your own `memory.md` and `activity-log.md`
+DURING the session, as it happens.** Maggie owns brain `/PREFERENCES.md` exclusively; in an agent
+bundle **she enforces SIZE, not AUTHORSHIP** (`_shared/super-agent-base.md` §3).
 
-⚠️ **Why this mattered more than a stale sentence: the door it pointed at is also physically broken.**
-`open-memory-requests.md` is **60,133 B, past the ~30KB write cap**, so an append fails. This header
-routed every durable insight Corey had through a retired policy into an unwritable file. **A rule that
-sends work to a dead door does not fail loudly; it just produces an agent who never writes anything
-down.** Struck rather than deleted because it reads authoritative and someone will re-derive it.
+⚠️ **And the door it pointed at is also physically broken:** `open-memory-requests.md` is **60,133 B,
+past the ~30KB write cap**, so an append fails. This header routed every durable insight through a
+retired policy into an unwritable file. **A rule that sends work to a dead door does not fail loudly;
+it produces an agent who never writes anything down.** Struck, not deleted — it reads authoritative.
 
 ## How Michael works (standing context)
 
@@ -31,25 +29,24 @@ down.** Struck rather than deleted because it reads authoritative and someone wi
   builds a mechanism cheaply, later graduates it to a real structure, leaves v1 in place as history.
   RECEIPTS FY25-26 → BETA BUDGET · Gen-1 per-show label fields → contact sheets joined to a role
   catalog · the older `Theatre` template/naming conventions → the current SHOW TEMPLATE.
-- 🔴 **WHEN HE IS BUILDING, HE IS NOT READING** (2026-08-08, observed via consult). Two or three lines,
-  one finding, no restating. Same floor as `team-standard.md`'s DO NOT RESTATE.
+- 🔴 **WHEN HE IS BUILDING, HE IS NOT READING** (2026-08-08). Two or three lines, one finding, no
+  restating. Same floor as `team-standard.md`'s DO NOT RESTATE.
 
 ## 🗺️ The scope rule (the enumeration is in the archive)
 
-The workspace has 22+ spaces, not the 7 the URITP audit walks, and **the split is by LIFE DOMAIN.**
-**The URITP-prefixed spaces are the audit's subject. The unprefixed same-named spaces —** `Theatre`,
-`CRM`, `Inventory`, `Work` **— are Michael's work life OUTSIDE URITP, and they are NOT deprecated
-predecessors and NOT audit subjects.**
+22+ spaces, not the 7 the URITP audit walks, and **the split is by LIFE DOMAIN.** **The URITP-prefixed
+spaces are the audit's subject. The unprefixed same-named spaces —** `Theatre`, `CRM`, `Inventory`,
+`Work` **— are Michael's work life OUTSIDE URITP, NOT deprecated predecessors and NOT audit subjects.**
 
-🌟 **His framing, which is the part that decides every hard call: the prefixed spaces are
-PURPOSE-BUILT VERSIONS OF OTHER STYLES.** So `Theatre` → URITP PRODUCTIONS is **stylistic ancestry,
-never lineage of the same records.** Read the unprefixed spaces as the STYLE SOURCE.
+🌟 **His framing, and it decides every hard call: the prefixed spaces are PURPOSE-BUILT VERSIONS OF
+OTHER STYLES.** So `Theatre` → URITP PRODUCTIONS is **stylistic ancestry, never lineage of the same
+records.** Read the unprefixed spaces as the STYLE SOURCE.
 
 ⚠️ **"Out of scope" ≠ "disconnected."** `Theatre ▸ People` is multi-homed with CRM ▸ ADULTS and six
-live contact sheets. A person can be in both lives at once; that is correct, not drift.
+live contact sheets. A person can be in both lives at once; correct, not drift.
 
-**My standing assignment: cross-board structural pattern notes** (Michael, 07-26) — mine, explicitly
-not Milo's. Four watch-items + every space id → `memory/archive/workspace-scope-and-patterns.md`.
+**Standing assignment: cross-board structural pattern notes** (Michael, 07-26) — mine, explicitly not
+Milo's. Four watch-items + every space id → `memory/archive/workspace-scope-and-patterns.md`.
 
 ## URITP context (standing)
 
@@ -58,7 +55,7 @@ not Milo's. Four watch-items + every space id → `memory/archive/workspace-scop
   relationship fields; no merge collapses them. Never hunt that fix — it cannot exist here.**
 - Season Planning = slot-planning (P1–P4 + a distinct One Acts slot) + season-operations, **not a
   show-selection list.**
-- **URITP PRODUCTIONS is folder-per-production AND a template system** (Michael, 07-26: *"it's also a
+- **URITP PRODUCTIONS is folder-per-production AND a template system** (Michael: *"it's also a
   template"*). SHOW TEMPLATE's ~100 tasks are a deliberate pre-seeded payload every clone inherits,
   **not a working list that drifted.**
 - **I am the named call-in on Milo's availability-tracking problem.** Recurring availability is
@@ -93,8 +90,8 @@ imports off a view, the ambiguity becomes that system's problem** — one row le
 two shows, meeting a receiving key that assumes one.
 
 ⭐ **The generalization: before a ClickUp field becomes an integration key, ask whether it can hold
-MORE THAN ONE VALUE. A multi-select is a good human affordance and a bad join.** Mitigation detail and
-the API-only ask → archive; the live verification I owe → LIVE STATE.
+MORE THAN ONE VALUE. A multi-select is a good human affordance and a bad join.** Mitigation detail →
+archive; the live check I owe → LIVE STATE.
 
 ## ⚠️ A LOCKED PAGE CAN RECORD WORK AS OWED TO ME AFTER I HAVE DONE IT (EARNED 2026-08-08)
 
@@ -104,18 +101,17 @@ anyone reading it cold believed a whole pipeline was blocked on me.
 
 🔴 **This is the wrong-PERSON blind spot the Doc-Rot Sweep structurally cannot see** — the path
 resolves, the file exists, no locked rule contradicts it. Fleet-Fact-Sweep shape, but inside a DOMAIN
-spec rather than a fleet file. **When a page assigns me work, the ledger of whether it is done is mine,
-not the page's.**
+spec. **When a page assigns me work, the ledger of whether it is done is mine, not the page's.**
 
 ## 🧭 Sometimes the right answer is NOT a ClickUp field (2026-08-08)
 
 Michael declined a CU-side canonical event-type dropdown; classification moved to a **FileMaker
-crosswalk with an unmatched queue** that learns instead of guessing. And ClickUp does not emit a
+crosswalk with an unmatched queue** that learns instead of guessing. ClickUp also does not emit a
 LOCATION on an event task, so that stayed out of v1 as a future upgrade rather than a gap.
 
-Worth holding beside the native-primitive instinct: reaching for the native ClickUp primitive is
-usually right, but **"which system should carry this at all" comes first**, and the answer is sometimes
-the other runtime. **Michael reaches for the fewest moving parts, not for my domain.**
+Hold it beside the native-primitive instinct: reaching for the native ClickUp primitive is usually
+right, but **"which system should carry this at all" comes first**, and the answer is sometimes the
+other runtime. **Michael reaches for the fewest moving parts, not for my domain.**
 
 ## Fleet / role context
 
@@ -128,7 +124,7 @@ the other runtime. **Michael reaches for the fewest moving parts, not for my dom
   sync/mirror pattern, the Gen-1 session, and the Derived Field Pattern's FMP section (hers).
 - Git-teammate since 2026-07-19. ✅ **Verified 2026-07-26: no native ClickUp agent for me exists** —
   the old `-39958913` disable item is DISCHARGED. ⚠️ **`working-notes.md` still says Michael must
-  disable it. That file contradicts this one; trust this line and see the rotation PR.**
+  disable it. That file contradicts this one; trust this line, see the rotation PR.**
 
 ## Standing reminders (tooling defects — these fire on every query)
 
