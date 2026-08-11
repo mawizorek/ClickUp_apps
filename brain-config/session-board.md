@@ -19,7 +19,8 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| **Mainstage Milo + Maestro Mira (Opus 5)** | Session task titled `Mainstage Milo + Maestro Mira + Workshop (Opus 5) · PM script breakdown — the demand ledger vs the cue book · Aug 10` (Agent Activity Board) | **`fix/session-board-split`** | **SPLITTING THIS FILE** at Michael's direction — 32,393 B → this table, with ~30KB of post-mortems moved to the sidecar. Also adding the row-clear as a numbered step in `hooks/session-close.md`, where it has never existed. ⚠️ **Declared self-claim exception, see below.** **Collision-checked 08-11 10:24 ET:** `list_commits --since 2026-08-06` (whole repo, 40 commits) shows no commits to either file by anyone but this session; `create_branch` returned a NEW ref. | **`ClickUp_apps`:** `session-board.md`, `session-board.notes.md`, `hooks/session-close.md` |
+
+**Nobody is in the repo.** Coast is clear. ✅ *Empty since 2026-08-11 — the first time this table has been empty since it was created.*
 
 ---
 
@@ -31,16 +32,16 @@
 4. **NAME THE REPO in the Files column.** This board lives in `ClickUp_apps` and is read as `ClickUp_apps`-only by default. **Silence on a repo reads identically to safety on that repo**, and that cost six collisions in one day on `uritp-docs`.
 5. **ONE row per session, edited IN PLACE as scope changes.** Never append a trail. ⚠️ **A row that is not MOVED when scope changes is worse than no row: it is a false negative for everyone who reads it.**
 6. **Name your session by TITLE, never by a hand-typed ClickUp ID.** If you are holding a URL and not an id, you do not have an id.
-7. **DELETE your row on close.** Not optional. As of 2026-08-11 this is **Step 4 of `hooks/session-close.md`** and **rule 28** there — it is an executable step, not a footnote here. A stale row makes agents dodge files nobody is on.
-8. ⏳ **EXPIRY (new 2026-08-11): a row with NO BRANCH, or with no commit to any claimed path in 48 hours, is EXPIRED.** Any session may retire it to the sidecar's retired-rows table **with the evidence** (`list_commits --path <claimed> --since <date>`). 🚫 **Retire, never delete** — the claim and its evidence survive so it can be re-posted. **A wrongly-cleared row costs a re-post; a stale row costs an hour.**
+7. **DELETE your row on close.** Not optional. As of 2026-08-11 this is **Step 4a of `hooks/session-close.md`** and **rule 28** there — it is an executable step, not a footnote here. A stale row makes agents dodge files nobody is on.
+8. ⏳ **EXPIRY: a row with NO BRANCH, or with no commit to any claimed path in 48 hours, is EXPIRED.** Any session may retire it to the sidecar's retired-rows table **with the evidence** (`list_commits --path <claimed> --since <date>`). Step 4b of the close hook does this as a matter of course. 🚫 **Retire, never delete** — the claim and its evidence survive so it can be re-posted. **A wrongly-cleared row costs a re-post; a stale row costs an hour.**
 9. **Keep board edits tiny and fast.** On a non-fast-forward, **re-fetch and MERGE** — never force. A rejected write is the guard working.
 10. 🚫 **Nothing durable goes in this file.** Findings, scars and post-mortems go to the sidecar. Pending work goes to `open-thread.md`.
 
-### ⚠️ The self-claim exception (declared 2026-08-11)
+### ⚠️ The self-claim exception
 
 The hard gate says the presence row must be on `main` **before** the write. **That is impossible when the file being written IS this file** — posting the row is itself the write. Chicken and egg, and the gate does not cover it.
 
-**The rule, so nobody has to improvise it again:** when your write target is `session-board.md` itself, the row and the change may land in the **same commit**, and the row must **say so explicitly** and carry the collision evidence inline. Everything else is unchanged: branch → PR → self-merge, and the row still gets cleared at close.
+**The rule, so nobody has to improvise it:** when your write target is `session-board.md` itself, the row and the change may land in the **same commit**, and the row must **say so explicitly** and carry the collision evidence inline. Everything else is unchanged: branch → PR → self-merge, and the row still gets cleared at close.
 
 ### 🚦 Why the gate keeps being satisfied and keeps being outrun
 
