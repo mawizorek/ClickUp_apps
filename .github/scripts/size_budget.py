@@ -37,6 +37,14 @@ A data file is not source -- nothing hand-edits it from a partial read.
 And apps already have an older, locked mechanism for being over cap: a
 <app>/source/ chunk set plus _index.md. Two mechanisms aiming at one file
 contradict each other within a month. Reasoning lives in the TSV's scope rows.
+
+⚠️ AN UNGATED RUN SAYS SO OUT LOUD (added after the first test pass).
+A `workflow_dispatch` run has no base commit, so the diff is empty and NOTHING
+is checked. The first version printed "No file this PR touched is over budget"
+in that case, which is a fallback wearing a pass's clothes -- exactly what
+`hooks/silent-fallback-law.md` exists to stop. It now names itself an
+INVENTORY-ONLY RUN. Found by testing the gate against fixtures before merging
+it, which is the only reason it is not a live defect.
 """
 
 from __future__ import annotations
@@ -92,7 +100,8 @@ def _to_regex(pattern: str) -> re.Pattern[str]:
     'brain-config/**/*.md' would silently miss 'brain-config/README.md'
     while looking like it covered it. An unenforced rule that looks enforced
     is the exact failure this whole gate exists to stop, so the matcher is
-    written out rather than borrowed.
+    written out rather than borrowed. Verified against that case and six
+    others before merge.
     """
     out = []
     i = 0
@@ -161,6 +170,7 @@ def main() -> int:
               for c in _rows("waiver") if c}
 
     failures, warnings, summary = [], [], []
+    gated = bool(os.environ.get("BASE_SHA", "").strip())
 
     # ---- 1. THE GATE: only files this PR touched. -------------------------
     for path in _changed():
@@ -232,7 +242,16 @@ def main() -> int:
         summary.append("### Warnings (" + str(len(warnings)) + ")")
         summary += ["- " + m for m in warnings]
         summary.append("")
-    if not failures and not warnings:
+    if not gated:
+        # A fallback that reads as a pass is the failure mode
+        # hooks/silent-fallback-law.md exists to stop. Name it.
+        summary.append(
+            "⚠️ **INVENTORY-ONLY RUN.** No base commit was given (BASE_SHA "
+            "empty), so NOTHING WAS GATED. The standing-debt list below is "
+            "still true."
+        )
+        summary.append("")
+    elif not failures and not warnings:
         summary.append("No file this PR touched is over budget.")
         summary.append("")
 
