@@ -43,6 +43,56 @@ specified `keywords` for every page it generates and carried none itself.
 **A9 · Sparseness means the ASK, not the bytes.** How many decisions the template forces on
 an author. A file can grow while getting sparser, because rules are not blanks.
 
+**A10 · 🔴 NO EMOJI IN REPO DOCUMENTATION. HARD LINE.** *(Michael, 2026-08-14: "We need to
+stop putting emojis in the documentation that goes into the repo. That needs to be a hard
+line because it just looks gross! We have callouts for a reason, and they already have SVG
+markers.")*
+
+Emphasis in a rendered doc has exactly **two** sanctioned mechanisms, and both ship their
+own art:
+
+1. **Callouts** — `!!! danger` · `warning` · `failure` · `note` · `tip` · `abstract`.
+   Block-level. Material renders an SVG icon per type.
+2. **Inline marker spans** — `{.conf}` `{.tbc}` `{.gap}` `{.verify}` `{.hi}` `.calc` `.rel`
+   `.script` `.global` `.portal` `.button` `.field` `.vl` `.alias`, defined in
+   `doc-render-engine/theme/markers.tsv`. Rendered as chips from generated CSS **and counted
+   in the build report.**
+
+⭐ **The argument is structural, not aesthetic, which is why it generalizes:** a literal
+emoji is a **THIRD CLAIMANT on emphasis**, duplicating two mechanisms that already exist —
+the same defect class this fleet has deleted five times elsewhere. It is also strictly worse
+than either. A callout states *what kind* of warning; a marker span is *queryable*; `⚠️` is
+neither, and it renders as a coloured picture that a reader cannot filter, count or click.
+
+🔴 **ROOT CAUSE, and the reason this is not a taste dispute: the emoji were standing in for
+structure the author did not reach for.** Same root as the 2026-08-09 defect where eleven
+pages shipped carrying literal `⬜`/`🔴` and **zero** marker spans, so the build report
+called the tree clean. **That was caught as a REPORTING failure; this was caught as an
+AESTHETIC one. One cause, two symptoms, five days apart** — which is what promotes it from
+a preference to a rule.
+
+**Conversion table (reference implementation:
+`uritp-docs/production-mawster/print-first-runbook.md`, PR #98):**
+
+| Was | Now |
+|---|---|
+| `🔴` hard stop | `!!! danger` |
+| `⚠️` caution | `!!! warning` |
+| `🚫` prohibition | `!!! failure` |
+| `⭐` insight | promoted into the callout it belonged in, or plain bold |
+| `✅` decided | nothing — `{.conf}` already says it |
+| `⬜` open | nothing — `{.tbc}` / `{.gap}` say it AND report it |
+| emoji in a heading | plain heading |
+
+⚠️ **SCOPE IS REPO DOCS, and do not widen it without a ruling.** NOT ClickUp comments, NOT
+Decision Logs (whose Gold Standard uses emoji as a documented convention), NOT agent announce
+headers, NOT chat. Different surfaces, different rules, and Michael ruled on one of them.
+**This file is itself outside the scope** — it is an agent bundle, not rendered documentation.
+
+⭐ **The tell that a page needs this pass: an emoji immediately followed by a bold sentence.**
+That is a callout that never got written. Converting it usually makes the rule read *harder*,
+not softer, which is the argument for the change rather than against it.
+
 ---
 
 ## Ledger B — Michael's revealed preferences (observed, NOT ruled)
@@ -139,6 +189,13 @@ is invented by an agent while the human's own convention already exists in the t
 `README.md`-vs-`publish-dl.md` near-miss (08-08) and the `keywords`-keyword incident (08-05,
 logged in the guardrails). **Third sighting promotes it to C1.**
 
+⚠️ **Second candidate, two sightings, 2026-08-09 and 2026-08-14:** *an author reaches for a
+literal emoji instead of the structural mechanism that exists* — once surfacing as a silent
+reporting failure (zero marker spans across eleven pages), once as Michael's aesthetic
+objection. Filed here rather than promoted because both sightings are the same author on the
+same project. **A third sighting by a different agent, or in a different tree, promotes it to
+C1** — and if it does, the fix is a pre-write check, not another ledger line. See A10.
+
 ---
 
 ## Ledger D — open questions Dave owes Michael
@@ -150,8 +207,22 @@ everything makes it routine, and routine is how A3 dies. Unruled.
 bundle. If it becomes a tool it belongs in `hooks/`, not in a person. **Procedure-is-a-tool
 gate applies and has not been run on it.**
 
-**D3 · 🆕 Should B3–B10 be promoted out of Dave and into the FMP app-doc standard?** They are
+**D3 · Should B3–B10 be promoted out of Dave and into the FMP app-doc standard?** They are
 conventions for a DOCUMENT TYPE (an FMP table doc), which sounds like Fiona's documentation
 standard or `data-standards.md`, not a person's memory. ⚠️ **`data-standards.md` is already
 provably stale against B5**, so promoting them would also fix that. **Placement is Maggie's
 call, the content is Fiona's domain, the FORM is mine. Unruled — do not self-authorize.**
+
+**D4 · 🆕 🔴 A10 HAS NO FIRING SURFACE, AND THAT IS THE WHOLE PROBLEM WITH IT LIVING HERE.**
+Dave has **no autonomous triggers** and is *"seated, usually last"* — so a rule that exists
+only in this ledger does not fire when another agent writes a page at 2am unseated, **which
+is exactly how the 08-13 runbook shipped covered in emoji.** A10 is filed here because Ledger
+A is the precedent-matched home (A4 is the identical class of rule) and because a hard line
+unwritten is not a line. **But precedent-matched is not the same as load-bearing.**
+
+The fork, stated so it is not re-derived: leave A10 here and accept it only fires when Dave
+is seated · **or** promote it to a pre-write check that fires on every repo doc write, which
+by the procedure-is-a-tool gate means a `hooks/` file with a pointer left here. The second is
+probably right and is **a net-new tool, so it needs Fold-in Frank and Michael's yes** rather
+than Dave's own judgment. ⚠️ **Until that is ruled, A10 is a convention an unseated agent can
+miss without anything catching it** — say so rather than implying the line is enforced.
