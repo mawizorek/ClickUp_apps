@@ -2,7 +2,7 @@
 
 **Purpose:** Strip AI-generated writing patterns ("slop") from any body of text, making it read like a human wrote it. Sentence-level detection + multi-scale rewrite pipeline.
 
-**Steward:** TBD. Candidate: a dedicated Writing Agent (not yet built) who stewards prose quality across the workspace. Pending `/felix` routing on whether this folds into an existing lane or justifies a net-new teammate.
+**Steward:** TBD. Candidate: a dedicated Writing Agent (not yet built) who stewards prose quality across the workspace. Pending `/felix` routing on whether this folds into an existing lane or justifies a net-new teammate. ⚠️ **Still TBD as of 2026-08-14** — open since 2026-08-02, and the `de-slop-pass` build did NOT resolve it (that hook is deliberately ownerless).
 
 **Mode:** On-demand, callable. Not always-on. Fires only when invoked or when an agent's output pipeline routes through it.
 
@@ -20,7 +20,9 @@
 | --- | --- |
 | **Scope** | Any text: task descriptions, doc pages, comment drafts, clipboard, files, agent output buffers |
 | **Report home** | Inline (comment reply or chat), or appended to the source task/doc as a comment |
-| **Lane seams** | De-Slop Pass (the always-on hook: catches obvious slop in Brain's OWN output, lightweight) · This hook (the full diagnostic + rewrite pipeline, invoked on OTHERS' text or Brain's extended drafts) · Document Destroyer (ships prose; this scores it pre-ship) |
+| **Lane seams** | `hooks/de-slop-pass.md` (the always-on reflex on Brain's OWN prose at write time — **built 2026-08-14**, ownerless) · This hook (the full diagnostic + rewrite pipeline, invoked on OTHERS' text or Brain's extended drafts) · Document Destroyer (ships prose; this scores it pre-ship) |
+
+🔴 **THE SEAM IS AN AXIS, NOT A WEIGHT CLASS.** This file called de-slop-pass "the lightweight version" in three places for twelve days while the file did not exist. They ask different questions: **de-slop-pass asks *does the reader already know this*** (domain-expert reader, cut the explanation) — **this hook asks *does this read like AI*** (uniformity, vocabulary, rhythm). A document can pass one and fail the other. Never collapse them into heavy/light modes of one tool.
 
 ---
 
@@ -201,8 +203,8 @@ Each pattern entry carries: name · detection heuristic · severity (always-fix 
 ## Integration points
 
 - **Document Destroyer:** score text pre-ship (if the workflow routes through humanize-prose, the report gates delivery)
-- **Writing Agent (future):** the steward who runs this hook on every piece of prose before it leaves the workspace
-- **De-Slop Pass (existing hook):** the lightweight always-on version that catches Brain's own output. This hook is the full diagnostic; De-Slop is the reflex.
+- **Writing Agent (future):** the steward who runs this hook on every piece of prose before it leaves the workspace. ⚠️ **Not authorized by the de-slop-pass build** — that hook is ownerless by design and is not evidence a Writing Agent is warranted.
+- **`hooks/de-slop-pass.md`:** the always-on reflex on Brain's own prose. **Registered in the AI Toolkit trigger table 2026-08-14.** Different axis, not a lighter mode of this. See the seam note under Coordinates.
 - **Any agent's output buffer:** can be wired as a post-processing step before delivery
 
 ---
@@ -211,13 +213,13 @@ Each pattern entry carries: name · detection heuristic · severity (always-fix 
 
 1. Voice profiles: user-defined writing style (sentence length, vocabulary, formality) so the hook targets THAT instead of generic "human"?
 2. Learning from manual edits: "Michael always changes X back to Y, stop suggesting X"?
-3. Stewardship: does this live under a dedicated Writing Agent, or fold into an existing lane? → Route to Felix.
+3. Stewardship: does this live under a dedicated Writing Agent, or fold into an existing lane? → Route to Felix. **Still open 2026-08-14.**
 
 ---
 
 ## Composes with
 
-`hooks/de-slop-pass` (the always-on reflex, lightweight) · Document Destroyer workflow (pre-ship gate) · `hooks/source-size-budget-enforcer.md` (long rewrites that bloat) · `code-review-standard.md` (severity format reused in the report) · the future Writing Agent's output pipeline.
+`hooks/de-slop-pass.md` (the always-on reflex, different axis) · Document Destroyer workflow (pre-ship gate) · `hooks/source-size-budget-enforcer.md` (long rewrites that bloat) · `code-review-standard.md` (severity format reused in the report) · the future Writing Agent's output pipeline.
 
 ## Guardrails
 
@@ -227,5 +229,6 @@ Report before rewrite, always. Never rewrite without a confirmed report. Never t
 
 ## Changelog
 
+- **2026-08-14** - Resolved three dead references to `hooks/de-slop-pass`, which did not exist for the first twelve days this file cited it as existing. Reframed the seam as an AXIS (reader-knows-it vs reads-like-AI) rather than heavy/light modes. Restated that stewardship is still TBD and that the Writing Agent is not authorized by the de-slop build.
 - **v2 (2026-08-02)** - Restructured into canonical hook format (Dex standard). Added: Score-Only Report template as the default output and cold-agent handoff artifact. Added: confirm-before-edit gate. Added: three-scale premise (words/music/architecture). Stewardship TBD, routed to Felix. Writing Agent concept documented as future integration.
 - **v1 (2026-08-02)** - Bare spec from Humalingo market research session. Three-pass pipeline, pattern library sources, modes, behavior rules.
