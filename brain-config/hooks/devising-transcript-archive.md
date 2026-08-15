@@ -25,9 +25,9 @@ Fidelity is guaranteed MECHANICALLY, not by asking the model to "be faithful." T
 | Phase | File | Who | What it is |
 | --- | --- | --- | --- |
 | **1 · RAW** | `<YYMMDD>_<NAME>.txt` | ANY agent | The `transcribe_media` output committed VERBATIM. No name fixes, no reflow, no frontmatter, no attribution. Source-of-record. **This phase is complete on its own** — commit it and the workflow for that recording is done. |
-| **2 · READABLE** | `<YYMMDD>_<NAME>.md` | **Milo** (seated separately) | A clean, attributed, HTML-renderable rendering BUILT FROM the `.txt`. Folder-grounded name fixes + speaker labels + simple frontmatter applied HERE, never in Phase 1. |
+| **2 · READABLE** | `<YYMMDD>_<NAME>.md` | **Milo** (seated separately) | A clean, HTML-renderable rendering BUILT FROM the `.txt`. Folder-grounded name fixes + the locked frontmatter/participants template applied HERE, never in Phase 1. |
 
-**Why two phases:** the biggest source of "liberties" is one agent transcribing AND cleaning in the same pass — it silently smooths grammar, drops false starts, guesses names. Freezing the verbatim `.txt` FIRST means every later edit is diffable against an immutable source. Phase 2 is allowed to make it readable precisely because Phase 1 preserved the truth.
+**Why two phases:** the biggest source of "liberties" is one agent transcribing AND cleaning in the same pass — it silently smooths grammar, drops false starts, guesses names. Freezing the verbatim `.txt` FIRST means every later edit is diffable against an immutable source. Phase 2 is allowed to make it presentable precisely because Phase 1 preserved the truth.
 
 ---
 
@@ -63,32 +63,32 @@ Builds the human-facing document FROM the frozen `.txt`. Milo owns this pass.
  - ⚠️ Folder/photo can disagree with the info-sheet PDF (Bill: folder `Tegtmeyer` vs PDF `Tegmeyer`) — on conflict ASK Michael, never silently pick. The info-sheet PDFs are handwritten scans; their OCR is garbage, do not trust the PDF body.
  - **Apply the correct spelling everywhere the name appears** — the subject AND every other subject they mention (Leroy's "Helena" is really `Halina Reszitnyk`; fix it in Leroy's `.md` too so files cross-reference).
  - **Correct ONLY names groundable against the folder.** Mis-heard place names / employers / schools with no folder source (Bill's Kansas college town, Leroy's Florida town / steel mill, Halina's employer) STAY AS TRANSCRIBED — do not invent a spelling. Uncertainty with no ground truth is left alone.
-7. **Render into our own simple template** (deliberately NOT the Otter export format — keep it lean, HTML-renderable via the standard frontmatter→render pipeline). Frontmatter block then a readable body:
+7. **Render into our own template** (deliberately NOT the Otter export format — keep it lean, HTML-renderable via the standard frontmatter→render pipeline). EXACT shape (LOCKED, Michael 2026-08-15):
 
 ```
 ---
-subject: Bill Tegtmeyer
-age: 79
-recording_date: 2026-08-14
-session: ST Intro Session
-location: Seneca Towers
-production: TIM-D (T.I.M.E. Development)
-source_audio: 260814_123200_TrLR.WAV
-raw_transcript: 260814_BILL.txt
+title: Arline intro, 14 Aug 2026
+id: transcription-260814-arline
+type: page
+status: public
+nav: hidden
+revised: 14 Aug 2026
 ---
 
-# Bill Tegtmeyer — TIM-D Intro Session
+Location: Seneca Towers
+Participants: Nigel, Arline
 
-**Q:** <interviewer question, lightly cleaned for readability>
-
-**Bill:** <subject answer — words verbatim from the .txt, merged into readable prose, false starts may be trimmed for flow>
-
-...
+[00:00] Now it's recording. I'm an idiot. What can I say.
 ```
 
- - Speaker labels: `**Q:**` for the interviewer, the subject's first name for answers. Two-voice interviews only; if a third voice appears, label by folder name or `**Q2:**`.
- - Phase 2 MAY merge segments into readable paragraphs and lightly trim filler FOR READABILITY — that is the point of it being separate from the `.txt`. It may NOT change meaning, add words, or invent content. The `.txt` remains the arbiter; anything ambiguous, defer to it.
- - Keep the frontmatter lean. Omit fields you can't ground (don't invent an interviewer name). `raw_transcript` MUST point at the Phase 1 `.txt` so the pair stays linked.
+ - **Frontmatter fields, all required, in this order:**
+   - `title:` — `<Subject first name> intro, <D Mon YYYY>` (e.g. `Arline intro, 14 Aug 2026`). Human-readable date, no leading zero on the day.
+   - `id:` — `transcription-<YYMMDD>-<name>` (name lowercase, folder-grounded spelling; matches the file stem, last-initial disambiguation carries over → `transcription-260814-arlineh`).
+   - `type: page` · `status: public` · `nav: hidden` — constants, do not vary.
+   - `revised:` — the date this `.md` was last rendered/edited, `D Mon YYYY`.
+ - **Then a blank line, then the metadata block:** `Location: <venue>` and `Participants: <interviewer>, <subject>`. Interviewer for TIM-D intro sessions is **Nigel** (Nigel Maister — the info-sheet contact); confirm per session, never hardcode blindly. Subject name folder-grounded.
+ - **Then a blank line, then the transcript body: KEEP THE `[mm:ss]` TIMESTAMPED LINES** — same segmented shape as the `.txt`, NOT Q/A speaker labels. Phase 2's ONLY body edit is the folder-grounded NAME fixes; it MUST NOT merge, reflow, paraphrase, reword, or add. The `.txt` is the arbiter; anything ambiguous, defer to it.
+ - Omit nothing from the frontmatter. If the interviewer can't be confirmed, write the subject in Participants and FLAG the missing interviewer — never invent a name.
 8. **File name `<YYMMDD>_<NAME>.md`** — same stem as the `.txt`, `.md` extension. Commit via PR-Merge, never straight to `main`. Report file + PR link.
 
 ---
@@ -96,7 +96,7 @@ raw_transcript: 260814_BILL.txt
 ## Guardrails
 
 - **Phase 1 is verbatim, full stop.** No paraphrase, no reflow, no name fixes, no frontmatter. If the `.txt` isn't a faithful copy of the tool output, Phase 1 failed.
-- **All corrections and rendering live in Phase 2**, and even there: NAMES are folder-grounded, everything else stays as heard. Un-groundable place/employer names are never guessed.
+- **Phase 2 body = raw body + folder-grounded name fixes, nothing else.** The frontmatter/participants block is the only ADDED structure. No merging into paragraphs, no rewording. Un-groundable place/employer names are never guessed.
 - **One recording per PR**, each phase its own commit — easier to review, easier to revert one bad transcription.
 - **Split before you degrade** on a timeout (Phase 1, step 2b).
 - **Multiple files do NOT require separate chat sessions.** Process dozens back-to-back once each compressed file is handed over. Only friction is the local compression step.
@@ -117,4 +117,5 @@ raw_transcript: 260814_BILL.txt
 - **v1 (2026-08-14)** — Established. Single-subject recordings → raw timestamped `.md` in `uritp-docs/production/<CODE>/transcriptions/`. First file: `260814_ARLINE.md` (TIM-D, Seneca Towers).
 - **v2 (2026-08-14)** — Registered on the AI Toolkit index. Added the split-file transcription fallback. Logged the direct-to-`main` commit slip. Added the private-repo/PII guardrail.
 - **v3 (2026-08-14)** — Names come from the SOURCE FOLDER, not the audio (hard pre-commit step). Old "correct nothing" rule had shipped seven residents' names wrong while the folder held the right spellings. Narrowed no-correction to: folder-grounded names fixed, un-groundable places left as heard.
-- **v4 (2026-08-15)** — **Split into two phases** on Michael's design. Phase 1 `<YYMMDD>_<NAME>.txt` = verbatim tool output, any agent, the fidelity guarantee (commit the output, never re-key it). Phase 2 `<YYMMDD>_<NAME>.md` = readable, Milo-seated, folder-grounded name fixes + speaker attribution + our own simple HTML-renderable frontmatter template (NOT the Otter format). This kills the "transcribe-and-clean-in-one-pass takes liberties" failure mechanically: the `.txt` is frozen before anything is cleaned. Naming convention changed `.md`-only → `.txt` (raw) + `.md` (readable) as a linked pair.
+- **v4 (2026-08-15)** — Split into two phases. Phase 1 `<YYMMDD>_<NAME>.txt` = verbatim tool output, any agent, the fidelity guarantee (commit the output, never re-key it). Phase 2 `<YYMMDD>_<NAME>.md` = readable, Milo-seated. Kills the transcribe-and-clean-in-one-pass liberties failure mechanically. Naming changed to a `.txt` (raw) + `.md` (readable) linked pair.
+- **v5 (2026-08-15)** — Locked the Phase 2 `.md` template (Michael): frontmatter `title / id: transcription-<YYMMDD>-<name> / type: page / status: public / nav: hidden / revised`, then a `Location:` + `Participants:` block, then the `[mm:ss]` timestamped body (NOT Q/A labels). Replaced the v4 subject/age/source frontmatter and the Q/A rendering. Phase 2's only body edit is folder-grounded name fixes — no merging or rewording. TIM-D interviewer confirmed as Nigel (Maister).
