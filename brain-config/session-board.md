@@ -19,7 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/mewp-ppp-example` | MEWP program/policy/privilege/form vertical slice | **uritp-docs:** safety/programs/mewp-program.md · safety/policies/mewp.md + index.md · safety/privileges-hazards/mewp.md + index.md · safety/forms/mewp-authorization.md |
+| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/policy-external-founding` | Founding the MEWP policy on EH&S + the external-policy principle in the safety index | **uritp-docs:** safety/policies/mewp.md · safety/index.md |
 
 ---
 
