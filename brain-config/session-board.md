@@ -19,7 +19,8 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/prepublish-fixups` | Pre-publish fixups: F1 (chemical-hazards stale links to its privilege+form) + all section indexes → public | **uritp-docs:** safety/programs/chemical-hazards.md · safety/privileges-hazards/index.md |
+
+**Nobody is in the repo.** Coast is clear.
 
 ---
 
