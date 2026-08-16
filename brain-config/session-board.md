@@ -19,7 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/general-safety-bundle` | Building the GENERAL SAFETY FOR ALL bundle page (awareness floor + hazard awareness-slice roll-up, one acknowledgment) + programs index | **uritp-docs:** safety/programs/general-safety.md · safety/programs/index.md |
+| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/hazard-programs-harvest` | Harvesting the next two hazard programs — Working at Height (ladders/scaffold/catwalk umbrella; MEWP separate) + Chemical Hazards/HazCom (founded on EH&S CHP/HazCom/PPE) | **uritp-docs:** safety/programs/working-at-height.md · safety/programs/chemical-hazards.md · safety/programs/index.md |
 
 ---
 
