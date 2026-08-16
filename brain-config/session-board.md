@@ -19,7 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/mewp-content-harvest` | Harvesting REAL MEWP content (JLG R2632 + Genie, 8 rules, MyPath pathway, calls) into the program + policy pages, links out to PDFs | **uritp-docs:** safety/programs/mewp-program.md · safety/policies/mewp.md |
+| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/general-safety-bundle` | Building the GENERAL SAFETY FOR ALL bundle page (awareness floor + hazard awareness-slice roll-up, one acknowledgment) + programs index | **uritp-docs:** safety/programs/general-safety.md · safety/programs/index.md |
 
 ---
 
