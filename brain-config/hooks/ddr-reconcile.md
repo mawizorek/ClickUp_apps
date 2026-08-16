@@ -16,6 +16,35 @@
 
 ---
 
+## 🔴 TWO CLASSES OF REPO FILE — the distinction this whole hook rests on
+
+Michael, 2026-08-16: *"once the transcription has happened, the audit can happen against the actual repo notes and not the DDR?"* **Yes — with one substitution that must never blur.**
+
+After `ddr-reaudit` runs, the app's repo holds **two kinds of file, and they are not interchangeable:**
+
+| Class | Files | Role |
+|---|---|---|
+| 🔎 **EVIDENCE** | the `<NN>-<SECTION>/_ide/` mirrors | A **verbatim copy of the export.** Faithful, dated, provenance-stamped. This is what you anchor TO. |
+| 📝 **CLAIMS** | every hand-written page — `index.md`, section indexes, `build-sheet.*`, handoffs, Decision Logs | A **human describing the file from memory.** This is what goes ON TRIAL. |
+
+✅ **So the anchor moves DDR → mirrors. The anchor NEVER moves to the notes.** The mirrors stand in for the export because they are a transcription of it; the notes cannot, because they are the thing being tested. **A reconcile anchored to the notes is a document agreeing with itself.**
+
+⚠️ **The trap is that both classes live in the same tree, one folder apart.** `70-scripts/index.md` is a CLAIM; `70-scripts/_ide/index.md` is EVIDENCE. One `_ide` in a path is the entire difference between an audit and a tautology. **Every mirror carries `provenance:` front matter for exactly this reason — if a file has no provenance chain back to a dated export, it is a claim, whatever folder it sits in.**
+
+---
+
+## 🔴 COVERAGE GATE — mirrors bound what is verifiable
+
+**A mirror is only evidence for the sections that were actually captured.** `ddr-reaudit` may scope a section OUT by ruling, and the tombstone log records what was skipped.
+
+🔴 **An uncaptured section is `🔵 CANNOT VERIFY`. It is NEVER `⚪ VERIFIED CURRENT`.** Silence in the mirrors is not agreement; it is absence of evidence. Reporting a clean bill on a section that was never transcribed is the same failure as reading a handoff's silence as confirmation.
+
+**Live example, and it is not hypothetical:** Layout Objects were deliberately not captured from `2608151650` (Michael: *"dont need the loayout objects yet"*). Consequently **no claim about field placement, print geometry, portal geometry or anchoring is checkable from the mirrors.** `print-geometry.md` and `print-first-runbook.md` cannot be reconciled against that anchor at all — they need a fresh export or FileMaker itself.
+
+**Procedure:** read the tombstone log's coverage table BEFORE scoping the pass, and **declare uncovered sections in the report HEADER, not a footnote.** A reader who learns halfway down that print geometry was never checked has already trusted the summary.
+
+---
+
 ## 🔴 SEAM WITH `hooks/ddr-reaudit.md` — read this BEFORE running either
 
 **Added 2026-08-16.** `ddr-reaudit` was authored a day after this hook, **from the same DDR and the same chunk set (`7534bbed` / `2608151650`)**, without Fold-in Frank firing. **They are not duplicates and neither is retired** — they are two verbs on one noun:
@@ -27,13 +56,15 @@
 | **Asks** | *Do the docs still match the file?* | *What does the file actually contain?* |
 | **Outlives the DDR?** | ❌ No — needs the export or a mirror of it | ✅ Yes — that is its whole point |
 
-🔴 **THE DEPENDENCY RUNS ONE WAY, AND IT IS SHARP: `ddr-reaudit` Phase 7 DELETES the export this hook needs.** Fired after that, this pass has no anchor at all.
+🔴 **THE DEPENDENCY RUNS ONE WAY, AND IT IS SHARP: `ddr-reaudit` Phase 7 DELETES the export this hook needs.** Fired after that, this pass has no anchor at all **unless the mirrors exist** — which is precisely why capture runs first.
 
 **✅ RUN ORDER, LOCKED:**
 
 1. `ddr-reaudit` Phases 0-6 — capture the export into mirrors while it exists.
 2. **THIS HOOK, at `ddr-reaudit` Phase 6.5** — diff the hand-written docs against **the MIRRORS**, not the raw export. ⭐ **The mirrors are the durable anchor; that substitution is the whole point of the seam.** They are verbatim, so Pass A counts and Pass B gap-claims are equally checkable against them, and unlike the export they still exist next month.
 3. `ddr-reaudit` Phase 7 — tombstone and delete, only after this pass has run.
+
+⭐ **A consequence worth stating: this hook becomes RE-RUNNABLE.** Anchored to the export it could only ever run once, in the window before deletion. Anchored to the mirrors it can run any time a doc changes — the evidence is now permanent. **That is the real prize of the seam, not just tidier ownership.**
 
 **Findings from this pass feed the app's EXISTING punch list.** 🔴 **Never open a second one** — `ddr-reaudit` Phase 6 supersedes in place, and two lists means neither is trusted.
 
@@ -48,9 +79,9 @@
 | Surface | Location |
 | --- | --- |
 | **DDR raw paste** | the app's `90-file-imports-temp/DDR_imports/<YYMMDDHHMM>/` (chunk set + `raw.txt`) |
-| **⭐ Mirrors (the durable anchor)** | the app's `<NN>-<SECTION>/_ide/` trees — written by `ddr-reaudit`. **Use these when the export is gone.** |
-| **Tombstone log** | the staging folder's own `README.md` — carries the deleted export's recovery SHA and coverage table |
-| **App docs under test** | the app's tree in `mawizorek/uritp-docs` (e.g. `production-mawster/`): `index.md`, `20-tables/`, `30-RELATIONSHIPS/`, `50-LAYOUTS/`, `70-scripts/`, `60-custom-functions/`, `build-sheet.*`, `ddr-punch-list.*` |
+| **⭐ Mirrors (the durable anchor — EVIDENCE)** | the app's `<NN>-<SECTION>/_ide/` trees — written by `ddr-reaudit`. **Use these when the export is gone.** |
+| **Tombstone log** | the staging folder's own `README.md` — carries the deleted export's recovery SHA **and the coverage table the Coverage Gate reads** |
+| **App docs under test (CLAIMS)** | the app's tree in `mawizorek/uritp-docs` (e.g. `production-mawster/`): `index.md`, `20-tables/`, `30-RELATIONSHIPS/`, `50-LAYOUTS/`, `70-scripts/`, `60-custom-functions/`, `build-sheet.*`, `ddr-punch-list.*` — **everything NOT under an `_ide/`** |
 | **Handoffs + session record** | the 🟢 Agent Activity Board list + the app's ClickUp descriptor page and its Decision Log |
 | **Report home** | PR to the DOC repo (`uritp-docs` for URITP apps) + session task comment |
 | **Lane seams** | `ddr-reaudit` (capture half) · Doc-Rot Sweep (docs vs HEAD) · Fleet-Fact Sweep (fleet claims) · Audit Anna (formal audit lead) |
@@ -78,22 +109,25 @@ The founding case: a cold agent reading the `get ONE page to print` handoff (`0 
 
 All four run the same skeleton (scope → classify claims → verify against a source of truth → flag, don't silently fix) against a **different anchor**. Doc-Rot's anchor is the repo; Fleet-Fact's is the Index; this one's is the DDR export. **The DDR can itself be stale** the moment the file is edited after export — so a reconcile is only as fresh as its DDR, and the run must state the DDR's export timestamp up front. When "the doc is wrong" is really "the repo moved," that is Doc-Rot's. When it is "the doc and the repo agree but neither matches the actual .fmp12," that is THIS tool's. When there is **no doc at all** for something the file contains, that is `ddr-reaudit`'s.
 
+⚠️ **One subtlety once mirrors exist: a mirror is a repo file, so Doc-Rot Sweep can read it — but a mirror is EVIDENCE and Doc-Rot tests CLAIMS.** Doc-Rot should verify that a mirror's provenance chain still resolves (does the tombstone log exist, does the SHA still work) and stop there. **It must never "fix" a mirror's content to match a doc.**
+
 ---
 
 ## Pass
 
 ### 0. Anchor discipline (non-negotiable)
 
-- **State the DDR's export timestamp and chunk-set UUID before reading any doc.** A reconcile against a week-old DDR reports week-old truth. If the file has been edited since export, say so and treat findings as provisional.
-- 🔴 **If the export is GONE, say which mirror you are anchored to and cite the tombstone log's recovery SHA.** An anchor you cannot name is not an anchor. Never silently substitute a hand-written doc for the evidence — that inverts the whole pass.
-- **Read the DDR whole, gated if chunked.** Follow the chunk set's own index rules (UUID-verify each part, in order). A partial DDR read produces a partial count and a false contradiction.
+- **State your anchor before reading a single doc:** either the export's timestamp + chunk-set UUID, **or** the mirror path + the tombstone log's recovery SHA. A reconcile against a week-old anchor reports week-old truth. If the `.fmp12` has been edited since, say so and treat findings as provisional.
+- 🔴 **An anchor you cannot name is not an anchor. Never silently substitute a hand-written doc for the evidence** — that inverts the whole pass into a document agreeing with itself. See Two Classes above.
+- 🔴 **Run the Coverage Gate before scoping.** Read the tombstone log's coverage table; anything uncaptured is `🔵 CANNOT VERIFY` and is declared in the report header.
+- **Read the DDR whole, gated if chunked.** Follow the chunk set's own index rules (UUID-verify each part, in order). A partial DDR read produces a partial count and a false contradiction. **When anchored to mirrors instead, read each section index whole** — they carry the counts and the reconciliation arithmetic.
 - **Repo read-path law still applies** to the docs side: blob API, base64-decoded, re-fetched before any write (GitHub MCP Operating Standard). Never rewrite from a truncated read.
 
 ### 1. Reconcile the counts (Pass A — the canonical catch)
 
-Pull the DDR's Overview block and diff every structural count against what the docs/handoffs claim:
+Pull the Overview counts (from the DDR, or from the mirror section indexes which transcribe them) and diff every structural count against what the docs/handoffs claim:
 
-| Count | DDR Overview | Docs / handoff claim | Verdict |
+| Count | DDR / mirror | Docs / handoff claim | Verdict |
 | --- | --- | --- | --- |
 | Tables | | | |
 | Relationships | | | |
@@ -108,7 +142,9 @@ Any mismatch is a finding. **A `0` in a handoff against a non-zero DDR is the hi
 
 ### 2. Verify every `{.gap}` / "not built" / "blocked" claim (Pass B)
 
-Walk each doc claim that something is missing, gapped, blocked, or not started, and check the DDR. The founding example: the scripts index called the JSON param custom-function family a `{.gap}` "must be installed first" — the DDR shows all 10 CFs built with full definitions. **A claimed gap that the DDR fills is rot, flag it.** The inverse also counts: a doc claiming something is DONE that the DDR shows absent or stubbed (e.g. a `goto_view_VALUES` with an empty body).
+Walk each doc claim that something is missing, gapped, blocked, or not started, and check the evidence. The founding example: the scripts index called the JSON param custom-function family a `{.gap}` "must be installed first" — the DDR shows all 10 CFs built with full definitions. **A claimed gap that the evidence fills is rot, flag it.** The inverse also counts: a doc claiming something is DONE that the evidence shows absent or stubbed (e.g. a `goto_view_VALUES` with an empty body).
+
+⚠️ **A gap claim about an UNCAPTURED section resolves to `🔵 CANNOT VERIFY`, not "gap confirmed."**
 
 ### 3. Log as-built bugs, do NOT fix them (Pass C)
 
@@ -119,18 +155,20 @@ The DDR will surface real defects in the live file: mis-targeted Set Fields, par
 ### 4. Flag drift in place, never silently correct (Pass D)
 
 - App docs get **flagged**, proposed, reported — this hook is **PROPOSE-ONLY** and never rewrites the curated doc tree, exactly like `gcal-reconcile` and `doc-destroyer-reconcile`.
-- When a doc is factually wrong about a count or a gap, the finding names the file, the quoted claim, its date, and what the DDR shows. Correcting it is a follow-up pass Michael greenlights.
+- When a doc is factually wrong about a count or a gap, the finding names the file, the quoted claim, its date, and what the evidence shows. Correcting it is a follow-up pass Michael greenlights.
 - **Structural calls stay Michael's:** which as-built name wins, whether a table is retired, whether a fork is resolved.
+- 🔴 **Never edit a mirror to resolve a conflict.** A mirror is evidence; changing it destroys the record. If a mirror is genuinely wrong, that is a `ddr-reaudit` re-transcription, not a reconcile fix.
 
 ### 5. Triage vocabulary
 
-- 🔴 **COUNT CONTRADICTION**: a doc/handoff structural count disagrees with the DDR. A `0`-vs-nonzero is always 🔴.
-- 🔴 **PHANTOM GAP**: doc claims something unbuilt/blocked that the DDR shows built.
-- 🟠 **PHANTOM DONE**: doc claims something built that the DDR shows absent or stubbed.
-- 🟠 **STALE STATE**: a described state (record counts, statuses) no longer matches the DDR. ⚠️ Row counts are **state, not schema** — see gotchas.
+- 🔴 **COUNT CONTRADICTION**: a doc/handoff structural count disagrees with the evidence. A `0`-vs-nonzero is always 🔴.
+- 🔴 **PHANTOM GAP**: doc claims something unbuilt/blocked that the evidence shows built.
+- 🟠 **PHANTOM DONE**: doc claims something built that the evidence shows absent or stubbed.
+- 🟠 **STALE STATE**: a described state (record counts, statuses) no longer matches. ⚠️ Row counts are **state, not schema** — see gotchas.
 - 🟡 **AS-BUILT BUG**: a real defect in the live file, logged not fixed.
-- 🟡 **NAMING DRIFT**: docs and DDR disagree on an object's name (the `MAWnster` gotcha).
-- ⚪ **VERIFIED CURRENT**: doc and DDR agree, said out loud so the pass is auditable.
+- 🟡 **NAMING DRIFT**: docs and evidence disagree on an object's name (the `MAWnster` gotcha).
+- 🔵 **CANNOT VERIFY**: the section was never captured, so no verdict is possible. 🔴 **Not a pass. Declared in the header.**
+- ⚪ **VERIFIED CURRENT**: doc and evidence agree, said out loud so the pass is auditable.
 
 ### 6. Report
 
@@ -140,13 +178,17 @@ Reuse the severity + evidence discipline from `code-review-standard.md`. Do not 
 ## DDR Reconcile · <app> · <date>
 
 **Anchor:** <chunk-set UUID> exported <timestamp> | or <mirror path> @ <tombstone SHA>
-**Docs read:** <n> · **Findings:** <n> (🔴 n / 🟠 n / 🟡 n)
+**Coverage:** verifiable <sections> · 🔵 CANNOT VERIFY <uncaptured sections + why>
+**Docs read:** <n> · **Findings:** <n> (🔴 n / 🟠 n / 🟡 n / 🔵 n)
 
 ### 🔴 Count contradictions + phantom gaps
-- <doc/handoff> claims "<quote>" (dated <when>) — DDR shows <reality>
+- <doc/handoff> claims "<quote>" (dated <when>) — evidence shows <reality>
 
 ### 🟠 Phantom done + stale state
 ### 🟡 As-built bugs (logged, not fixed) + naming drift
+### 🔵 Cannot verify
+- <doc> makes claims about <section>, which was not captured. Needs a fresh export.
+
 ### ⚪ Verified current
 - <what was checked and holds>
 
@@ -154,7 +196,7 @@ Reuse the severity + evidence discipline from `code-review-standard.md`. Do not 
 - <as-built name winners, table retirements, forks>
 ```
 
-**Clean bill → say what was checked.** "I diffed all six counts and the CF family and they hold" is a real result.
+**Clean bill → say what was checked.** "I diffed all six counts and the CF family and they hold" is a real result. 🔴 **A clean bill must state its coverage** — "nothing found" across a partially-captured anchor is not a clean bill.
 
 👥 **When this pass runs inside a full re-audit, the report to Michael is FIONA's** (`ddr-reaudit` Phase 8): Anna's diff says *what is different*, Fiona says *what it means for the build*. A standalone one-off reconcile reports itself.
 
@@ -164,16 +206,17 @@ Reuse the severity + evidence discipline from `code-review-standard.md`. Do not 
 
 1. **The filename is `Production_MAWnster.fmp12` — extra `n` — while every doc says `MAWster`.** Whether that is a typo in the file or in the docs is Michael's call; the reconcile FLAGS it and never assumes. A cold agent that "corrects" the DDR to match the docs is corrupting the evidence. ⭐ **Confirmed twice over 08-16:** the DDR's own Base Directories block reads `Production_MAWster/` (no `n`) while the file is `Production_MAWnster.fmp12`. **Both spellings are in one export.**
 2. **DDR record counts are STATE, not SCHEMA.** `IMPORT_EVENTS` carrying 5,290 rows is not a design fact — it smells like accumulated test imports. Never treat a row count as a structural claim; it belongs in 🟠 stale-state at most, and often is just noise. ⭐ **Proven:** that table went 345 → 5,290 rows in a single day.
-3. **A DDR is a snapshot.** It goes stale the instant the file is edited post-export. The reconcile is only as trustworthy as its DDR timestamp — always state it. ⭐ **Proven hard:** the 08-14 export was superseded 18 hours later by one with +8 scripts, +3 relationships, and Value Lists and Custom Functions going 0 → 14 and 0 → 10.
+3. **A DDR is a snapshot.** It goes stale the instant the file is edited post-export. The reconcile is only as trustworthy as its anchor's date — always state it. ⭐ **Proven hard:** the 08-14 export was superseded 18 hours later by one with +8 scripts, +3 relationships, and Value Lists and Custom Functions going 0 → 14 and 0 → 10. ⚠️ **A mirror inherits its export's date and does NOT refresh** — anchoring to a mirror means anchoring to the day it was captured, not to today.
 4. **The DDR lists table OCCURRENCES separately from base tables.** A count of occurrences is not a count of tables; read the Overview block, not the relationship graph, for the table count.
 5. 🔴 **A `0` in the Overview is a FACT, not an omission.** `Value Lists 0` / `Custom Functions 0` was dismissed as a DDR gap on 08-14 because scripts were visibly calling `Param` and `PText`. The next export proved the objects genuinely did not exist — **the scripts were calling functions that were not installed.** Report zeros as findings.
+6. 🔴 **One `_ide` in a path is the whole difference between evidence and a claim.** `70-scripts/index.md` is a CLAIM; `70-scripts/_ide/index.md` is EVIDENCE. They sit one folder apart and read similarly. **Check the `provenance:` front matter, not the neighbourhood.**
 
 ---
 
 ## Composes with
 
 - 🔴 **`hooks/ddr-reaudit.md`** — the CAPTURE half of this family. **Read the seam section above.** This hook runs at its Phase 6.5, and its Phase 7 deletes the export this hook depends on.
-- `hooks/doc-rot-sweep.md` — the docs-vs-HEAD sibling; run it too, it catches repo drift this pass is blind to.
+- `hooks/doc-rot-sweep.md` — the docs-vs-HEAD sibling; run it too, it catches repo drift this pass is blind to. ⚠️ It may read a mirror but must only check that its provenance chain resolves — **never edit mirror content to match a doc.**
 - `hooks/fleet-fact-sweep.md` — the fleet-claims sibling; same skeleton, third anchor.
 - `code-review-standard.md` — severity + evidence format, reused never re-invented.
 - `hooks/gcal-reconcile.md` · `hooks/doc-destroyer-reconcile.md` — the propose-only reconciler pattern this follows.
@@ -185,17 +228,19 @@ Reuse the severity + evidence discipline from `code-review-standard.md`. Do not 
 ## Guardrails
 
 - **PROPOSE-ONLY.** Reports and flags; never rewrites the curated doc tree and never edits the .fmp12.
-- Read-only until a finding is confirmed against the DDR **and** re-checked against the doc's live HEAD.
-- **Never "correct" the DDR to match a doc.** The DDR is the evidence; the doc is the claim under test.
+- Read-only until a finding is confirmed against the evidence **and** re-checked against the doc's live HEAD.
+- **Never "correct" the DDR or a mirror to match a doc.** The evidence is the evidence; the doc is the claim under test.
 - As-built bugs are LOGGED, not fixed. Repair is a separate greenlit build pass.
 - Structural calls (name winners, retirements, forks) are flagged for Michael, not decided.
 - A formal scoped full-app pass is an audit → Anna leads; Fiona is the domain voice.
 - 🔴 **Never run this AFTER `ddr-reaudit` Phase 7 without naming your anchor.** The export is gone by then; anchor to the mirrors and cite the tombstone SHA, or do not run.
+- 🔴 **Never report ⚪ VERIFIED CURRENT on an uncaptured section.** Absence of evidence is `🔵 CANNOT VERIFY`.
 - 🔴 **Never open a second punch list.** Findings supersede into the app's existing one.
 
 ---
 
 ## Changelog
 
+- **v1.2 (2026-08-16)** — 🔴 **Two Classes of Repo File** section added, answering Michael directly (*"once the transcription has happened, the audit can happen against the actual repo notes and not the DDR?"*): **yes, the anchor moves DDR → mirrors, but it NEVER moves to the notes.** Mirrors are EVIDENCE, hand-written pages are CLAIMS, they sit one folder apart, and `provenance:` front matter is the test — a reconcile anchored to the notes is a document agreeing with itself. 🔴 **COVERAGE GATE added:** a mirror is only evidence for what was captured, so an uncaptured section is new triage code `🔵 CANNOT VERIFY`, declared in the report HEADER, never `⚪ VERIFIED CURRENT`. Live case: Layout Objects were scoped out of `2608151650`, so `print-geometry.md` and `print-first-runbook.md` are not reconcilable against that anchor at all. ⭐ Also records the real prize of the seam: **anchored to mirrors this hook becomes RE-RUNNABLE**, where anchored to an export it could only ever run once. New gotcha 6 (one `_ide` in a path is the difference between evidence and a claim) and a Doc-Rot boundary note (it may verify a mirror's provenance chain, never edit its content).
 - **v1.1 (2026-08-16)** — 🔴 **Reciprocal seam with `hooks/ddr-reaudit.md` written**, after discovering that hook was authored 08-16 from the SAME DDR and chunk set without Fold-in Frank firing. Run order LOCKED (reaudit capture → this pass against the MIRRORS → reaudit tombstone+delete); mirrors + tombstone log added to Coordinates as the durable anchor; Pass 0 gains an anchor-naming rule for a deleted export; voice position stated (Sana captures · Anna diffs, this hook is her instrument · Fiona reports). Gotchas 1-3 upgraded from predictions to **proven**, and new gotcha 5 (a `0` is a fact) added from the 08-14 misread. ✅ **Struck the v1 note claiming its AI Toolkit index row still needed adding** — ~~"Needs its AI Toolkit index trigger row added in the same wave"~~ **that row is live; the line was rot in a file whose own job is catching rot.**
 - **v1 (2026-08-15)** — Established by Maestro Mira + FMP Fiona out of the Production MAWster DDR walk. Third member of the reconcile/sweep family (Doc-Rot = repo, Fleet-Fact = Index, this = DDR export). Founding contradiction: DDR `37 tables / 15 relationships / 54 layouts / 10 CFs` vs handoffs' `0 relationships / 0 layouts` and a `{.gap}` on an already-built custom-function family.
