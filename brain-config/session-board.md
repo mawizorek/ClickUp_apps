@@ -19,7 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/policy-external-founding` | Founding the MEWP policy on EH&S + the external-policy principle in the safety index | **uritp-docs:** safety/policies/mewp.md · safety/index.md |
+| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/mewp-content-harvest` | Harvesting REAL MEWP content (JLG R2632 + Genie, 8 rules, MyPath pathway, calls) into the program + policy pages, links out to PDFs | **uritp-docs:** safety/programs/mewp-program.md · safety/policies/mewp.md |
 
 ---
 
