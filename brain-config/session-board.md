@@ -19,7 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/hazard-programs-harvest` | Harvesting the next two hazard programs — Working at Height (ladders/scaffold/catwalk umbrella; MEWP separate) + Chemical Hazards/HazCom (founded on EH&S CHP/HazCom/PPE) | **uritp-docs:** safety/programs/working-at-height.md · safety/programs/chemical-hazards.md · safety/programs/index.md |
+| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/height-chem-privileges` | Breaking out WaH sub-programs (scaffold, fall-protection, catwalk) + building privilege/hazard + authorization-form pages for Working at Height and Chemical | **uritp-docs:** safety/programs/{scaffold,fall-protection,catwalk}.md · safety/privileges-hazards/{working-at-height,chemical}.md + index.md · safety/forms/{height,chemical}-authorization.md · safety/programs/working-at-height.md |
 
 ---
 
