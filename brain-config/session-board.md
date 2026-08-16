@@ -19,8 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-
-**Nobody is in the repo.** Coast is clear.
+| Milo + Hawthorne + Mira + Corey | Safety doc canonicalization — MEWP P/P/P example set | `safety/workflow-trail` | Committing the PM↔scene-shop safety workflow trail (the 8-step loop + repo/ClickUp split) as canonical workflow.md | **uritp-docs:** safety/workflow.md (new) · safety/index.md (link) |
 
 ---
 
