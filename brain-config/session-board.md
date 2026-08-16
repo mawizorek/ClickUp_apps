@@ -19,7 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/height-chem-privileges` | Breaking out WaH sub-programs (scaffold, fall-protection, catwalk) + building privilege/hazard + authorization-form pages for Working at Height and Chemical | **uritp-docs:** safety/programs/{scaffold,fall-protection,catwalk}.md · safety/privileges-hazards/{working-at-height,chemical}.md + index.md · safety/forms/{height,chemical}-authorization.md · safety/programs/working-at-height.md |
+| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/prepublish-fixups` | Pre-publish fixups: F1 (chemical-hazards stale links to its privilege+form) + all section indexes → public | **uritp-docs:** safety/programs/chemical-hazards.md · safety/privileges-hazards/index.md |
 
 ---
 
