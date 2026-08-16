@@ -19,7 +19,8 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `spec/draft-watermark` | Speccing the DRAFT status + watermark feature (spec only, no engine code) | **doc-render-engine:** specs/draft-watermark.md (new) · next-build-spec.md (index row) |
+
+**Nobody is in the repo.** Coast is clear.
 
 ---
 
