@@ -19,8 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-
-**Nobody is in the repo.** Coast is clear.
+| Milo + Hawthorne | Safety doc canonicalization — MEWP P/P/P example set | `safety/mewp-ppp-example` | MEWP program/policy/privilege/form vertical slice | **uritp-docs:** safety/programs/mewp-program.md · safety/policies/mewp.md + index.md · safety/privileges-hazards/mewp.md + index.md · safety/forms/mewp-authorization.md |
 
 ---
 
