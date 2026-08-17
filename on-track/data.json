@@ -1,207 +1,6 @@
 {
-  "version": "2026-08-09",
+  "version": "2026-08-17",
   "events": [
-    {
-      "series": "MotoGP",
-      "kind": "Warm Up",
-      "tier": "practice",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-09T04:40:00-04:00",
-      "end": "2026-08-09T04:50:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "Moto3",
-      "kind": "Race",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-09T05:00:00-04:00",
-      "end": "2026-08-09T05:45:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "Moto2",
-      "kind": "Race",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-09T06:15:00-04:00",
-      "end": "2026-08-09T07:05:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "MotoGP",
-      "kind": "Race",
-      "title": "British Grand Prix",
-      "detail": "Silverstone",
-      "start": "2026-08-09T08:00:00-04:00",
-      "end": "2026-08-09T08:50:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Race",
-      "title": "Iowa Corn 350 Powered by Ethanol",
-      "detail": "Iowa Speedway",
-      "start": "2026-08-09T15:30:00-04:00",
-      "end": "2026-08-09T19:00:00-04:00",
-      "platforms": [
-        "USA Network"
-      ]
-    },
-    {
-      "series": "IndyCar",
-      "kind": "Race",
-      "title": "OnlyBulls Grand Prix of Portland",
-      "detail": "Portland International Raceway",
-      "start": "2026-08-09T16:00:00-04:00",
-      "end": "2026-08-09T18:30:00-04:00",
-      "platforms": [
-        "FOX"
-      ]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Support Race",
-      "title": "Black's Tire 250 presented by BTS Rewards",
-      "detail": "Richmond Raceway (O'Reilly Auto Parts or Truck Series \u2014 series unconfirmed this pass)",
-      "start": "2026-08-14T19:30:00-04:00",
-      "end": "2026-08-14T22:00:00-04:00",
-      "platforms": [
-        "FS1"
-      ]
-    },
-    {
-      "series": "MXGP",
-      "kind": "Qualifying Race",
-      "title": "MXGP of Sweden",
-      "detail": "Uddevalla",
-      "timeTBD": true,
-      "date": "2026-08-15",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "Formula E",
-      "kind": "Race",
-      "title": "London E-Prix (Round 16)",
-      "detail": "ExCeL London Circuit \u2014 season finale double-header",
-      "timeTBD": true,
-      "date": "2026-08-15",
-      "platforms": [
-        "The Roku Channel"
-      ]
-    },
-    {
-      "series": "British Superbike",
-      "kind": "Race 1",
-      "title": "Round 7 \u2014 Thruxton",
-      "detail": "Thruxton Circuit",
-      "start": "2026-08-15T11:10:00-04:00",
-      "end": "2026-08-15T11:50:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "MotoAmerica",
-      "kind": "Superbike Race 1",
-      "title": "MotoAmerica Superbikes at Virginia",
-      "detail": "VIRginia International Raceway (Aug 14\u201316 weekend; Superbike tripleheader reported, third race unverified)",
-      "timeTBD": true,
-      "date": "2026-08-15",
-      "platforms": [
-        "Vice TV",
-        "MotoAmerica Live+"
-      ]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Race",
-      "title": "Cook Out 400",
-      "detail": "Richmond Raceway",
-      "start": "2026-08-15T19:00:00-04:00",
-      "end": "2026-08-15T22:30:00-04:00",
-      "platforms": [
-        "USA Network"
-      ]
-    },
-    {
-      "series": "British Superbike",
-      "kind": "Race 2",
-      "title": "Round 7 \u2014 Thruxton",
-      "detail": "Thruxton Circuit",
-      "start": "2026-08-16T08:00:00-04:00",
-      "end": "2026-08-16T08:40:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "MXGP",
-      "kind": "MXGP Race 2",
-      "title": "MXGP of Sweden",
-      "detail": "Uddevalla",
-      "timeTBD": true,
-      "date": "2026-08-16",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "MotoAmerica",
-      "kind": "Superbike Race 2",
-      "title": "MotoAmerica Superbikes at Virginia",
-      "detail": "VIRginia International Raceway",
-      "timeTBD": true,
-      "date": "2026-08-16",
-      "platforms": [
-        "Vice TV",
-        "MotoAmerica Live+"
-      ]
-    },
-    {
-      "series": "Formula E",
-      "kind": "Race",
-      "title": "London E-Prix (Round 17)",
-      "detail": "ExCeL London Circuit \u2014 season finale",
-      "timeTBD": true,
-      "date": "2026-08-16",
-      "platforms": [
-        "The Roku Channel"
-      ]
-    },
-    {
-      "series": "British Superbike",
-      "kind": "Race 3",
-      "title": "Round 7 \u2014 Thruxton",
-      "detail": "Thruxton Circuit",
-      "start": "2026-08-16T11:15:00-04:00",
-      "end": "2026-08-16T11:55:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "IndyCar",
-      "kind": "Race",
-      "title": "Grand Prix of Markham",
-      "detail": "Streets of Markham",
-      "start": "2026-08-16T12:00:00-04:00",
-      "end": "2026-08-16T14:30:00-04:00",
-      "platforms": [
-        "FOX"
-      ]
-    },
     {
       "series": "F1",
       "kind": "FP1",
@@ -238,18 +37,6 @@
       ]
     },
     {
-      "series": "F1",
-      "kind": "Qualifying",
-      "tier": "quali",
-      "title": "Dutch Grand Prix",
-      "detail": "Zandvoort",
-      "start": "2026-08-22T10:00:00-04:00",
-      "end": "2026-08-22T11:00:00-04:00",
-      "platforms": [
-        "Apple TV"
-      ]
-    },
-    {
       "series": "MXGP",
       "kind": "Qualifying Race",
       "title": "MXGP of The Netherlands",
@@ -280,6 +67,18 @@
       "date": "2026-08-22",
       "platforms": [
         "CBS Sports Network"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "Dutch Grand Prix",
+      "detail": "Zandvoort",
+      "start": "2026-08-22T10:00:00-04:00",
+      "end": "2026-08-22T11:00:00-04:00",
+      "platforms": [
+        "Apple TV"
       ]
     },
     {
@@ -453,17 +252,6 @@
       ]
     },
     {
-      "series": "British Superbike",
-      "kind": "Race 1",
-      "title": "Round 8 \u2014 Cadwell Park",
-      "detail": "Cadwell Park",
-      "timeTBD": true,
-      "date": "2026-08-29",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
       "series": "FIM Speedway",
       "kind": "World Cup Final",
       "title": "BOLL FIM Speedway World Cup Final",
@@ -542,6 +330,17 @@
       ]
     },
     {
+      "series": "British Superbike",
+      "kind": "Race 1",
+      "title": "Round 8 \u2014 Cadwell Park",
+      "detail": "Cadwell Park \u2014 'Party in the Park' bank holiday round (Sat 29 \u2013 Mon 31 Aug)",
+      "start": "2026-08-30T11:10:00-04:00",
+      "end": "2026-08-30T11:50:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "IndyCar",
       "kind": "Race 2",
       "title": "Milwaukee Mile Race 2",
@@ -554,11 +353,22 @@
     },
     {
       "series": "British Superbike",
-      "kind": "Races 2 & 3",
+      "kind": "Race 2",
       "title": "Round 8 \u2014 Cadwell Park",
-      "detail": "Cadwell Park",
-      "timeTBD": true,
-      "date": "2026-08-30",
+      "detail": "Cadwell Park \u2014 bank holiday Monday",
+      "start": "2026-08-31T08:00:00-04:00",
+      "end": "2026-08-31T08:40:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "British Superbike",
+      "kind": "Race 3",
+      "title": "Round 8 \u2014 Cadwell Park",
+      "detail": "Cadwell Park \u2014 bank holiday Monday",
+      "start": "2026-08-31T11:15:00-04:00",
+      "end": "2026-08-31T11:55:00-04:00",
       "platforms": [
         "Stream"
       ]
@@ -568,7 +378,7 @@
       "kind": "FP1",
       "tier": "practice",
       "title": "Italian Grand Prix",
-      "detail": "Monza (session times carried forward, unverified this pass)",
+      "detail": "Monza",
       "start": "2026-09-04T06:30:00-04:00",
       "end": "2026-09-04T07:30:00-04:00",
       "platforms": [
@@ -580,7 +390,7 @@
       "kind": "FP2",
       "tier": "practice",
       "title": "Italian Grand Prix",
-      "detail": "Monza (session times carried forward, unverified this pass)",
+      "detail": "Monza",
       "start": "2026-09-04T10:00:00-04:00",
       "end": "2026-09-04T11:00:00-04:00",
       "platforms": [
@@ -615,7 +425,7 @@
       "kind": "FP3",
       "tier": "practice",
       "title": "Italian Grand Prix",
-      "detail": "Monza (session times carried forward, unverified this pass)",
+      "detail": "Monza",
       "start": "2026-09-05T06:30:00-04:00",
       "end": "2026-09-05T07:30:00-04:00",
       "platforms": [
@@ -634,26 +444,26 @@
       ]
     },
     {
+      "series": "WSBK",
+      "kind": "Race 1",
+      "title": "Acerbis French Round",
+      "detail": "Circuit de Nevers Magny-Cours (Round 9)",
+      "start": "2026-09-05T09:30:00-04:00",
+      "end": "2026-09-05T10:10:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
       "series": "F1",
       "kind": "Qualifying",
       "tier": "quali",
       "title": "Italian Grand Prix",
-      "detail": "Monza (session times carried forward, unverified this pass)",
+      "detail": "Monza",
       "start": "2026-09-05T10:00:00-04:00",
       "end": "2026-09-05T11:00:00-04:00",
       "platforms": [
         "Apple TV"
-      ]
-    },
-    {
-      "series": "WSBK",
-      "kind": "Race 1",
-      "title": "Acerbis French Round",
-      "detail": "Circuit de Nevers Magny-Cours (Round 9, Sep 4\u20136; session times unverified this pass)",
-      "timeTBD": true,
-      "date": "2026-09-05",
-      "platforms": [
-        "Unknown"
       ]
     },
     {
@@ -665,6 +475,17 @@
       "date": "2026-09-05",
       "platforms": [
         "Stream"
+      ]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 1",
+      "title": "Spain Sail Grand Prix",
+      "detail": "Valencia (added this pass from a July 2026 source; not on the original season announcement \u2014 confirm before relying on it)",
+      "timeTBD": true,
+      "date": "2026-09-05",
+      "platforms": [
+        "CBS Sports Network"
       ]
     },
     {
@@ -685,6 +506,28 @@
       "detail": "Autodromo Nazionale Monza",
       "start": "2026-09-06T03:45:00-04:00",
       "end": "2026-09-06T04:50:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Superpole Race",
+      "title": "Acerbis French Round",
+      "detail": "Circuit de Nevers Magny-Cours",
+      "start": "2026-09-06T05:10:00-04:00",
+      "end": "2026-09-06T05:30:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Race 2",
+      "title": "Acerbis French Round",
+      "detail": "Circuit de Nevers Magny-Cours (revised Sunday timetable \u2014 Race 2 earlier than the series norm)",
+      "start": "2026-09-06T08:00:00-04:00",
+      "end": "2026-09-06T08:40:00-04:00",
       "platforms": [
         "Unknown"
       ]
@@ -712,17 +555,6 @@
       ]
     },
     {
-      "series": "WSBK",
-      "kind": "Race 2",
-      "title": "Acerbis French Round",
-      "detail": "Circuit de Nevers Magny-Cours (session times unverified this pass)",
-      "timeTBD": true,
-      "date": "2026-09-06",
-      "platforms": [
-        "Unknown"
-      ]
-    },
-    {
       "series": "MXGP",
       "kind": "MXGP Race 2",
       "title": "MXGP of T\u00fcrkiye",
@@ -731,6 +563,17 @@
       "date": "2026-09-06",
       "platforms": [
         "Stream"
+      ]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 2",
+      "title": "Spain Sail Grand Prix",
+      "detail": "Valencia (added this pass from a July 2026 source \u2014 confirm before relying on it)",
+      "timeTBD": true,
+      "date": "2026-09-06",
+      "platforms": [
+        "CBS Sports Network"
       ]
     },
     {
@@ -748,7 +591,7 @@
       "series": "NASCAR",
       "kind": "Race",
       "title": "Cook Out Southern 500",
-      "detail": "Darlington Raceway",
+      "detail": "Darlington Raceway \u2014 Chase race 1 of 10",
       "start": "2026-09-06T17:00:00-04:00",
       "end": "2026-09-06T21:00:00-04:00",
       "platforms": [
@@ -765,6 +608,457 @@
       "platforms": [
         "FS1",
         "FOX"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "FP1",
+      "tier": "practice",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli (Round 14)",
+      "start": "2026-09-11T04:45:00-04:00",
+      "end": "2026-09-11T05:30:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "FP1",
+      "tier": "practice",
+      "title": "Spanish Grand Prix",
+      "detail": "MADRING, Madrid \u2014 new circuit debut",
+      "start": "2026-09-11T07:30:00-04:00",
+      "end": "2026-09-11T08:30:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Practice",
+      "tier": "practice",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli",
+      "start": "2026-09-11T09:00:00-04:00",
+      "end": "2026-09-11T10:00:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "FP2",
+      "tier": "practice",
+      "title": "Spanish Grand Prix",
+      "detail": "MADRING, Madrid",
+      "start": "2026-09-11T11:00:00-04:00",
+      "end": "2026-09-11T12:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "FP2",
+      "tier": "practice",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli",
+      "start": "2026-09-12T04:10:00-04:00",
+      "end": "2026-09-12T04:40:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli",
+      "start": "2026-09-12T04:50:00-04:00",
+      "end": "2026-09-12T05:30:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "FP3",
+      "tier": "practice",
+      "title": "Spanish Grand Prix",
+      "detail": "MADRING, Madrid",
+      "start": "2026-09-12T06:30:00-04:00",
+      "end": "2026-09-12T07:30:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Sprint",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli",
+      "start": "2026-09-12T09:00:00-04:00",
+      "end": "2026-09-12T09:45:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "Spanish Grand Prix",
+      "detail": "MADRING, Madrid",
+      "start": "2026-09-12T10:00:00-04:00",
+      "end": "2026-09-12T11:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F3",
+      "kind": "Sprint Race",
+      "title": "Madrid (Round 9)",
+      "detail": "MADRING \u2014 expanded season finale (extra qualifying + second feature race); session times TBC",
+      "timeTBD": true,
+      "date": "2026-09-12",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F3",
+      "kind": "Feature Race 1",
+      "title": "Madrid (Round 9)",
+      "detail": "MADRING \u2014 session times TBC",
+      "timeTBD": true,
+      "date": "2026-09-12",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F2",
+      "kind": "Sprint Race",
+      "title": "Madrid (Round 11)",
+      "detail": "MADRING \u2014 session times TBC",
+      "timeTBD": true,
+      "date": "2026-09-12",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "FIM Speedway",
+      "kind": "Grand Prix",
+      "title": "Deluxe Homeart FIM Speedway GP of Denmark",
+      "detail": "Vojens Speedway Center (Round 9; some sources list Sep 11)",
+      "timeTBD": true,
+      "date": "2026-09-12",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "Qualifying Race",
+      "title": "MXGP of China",
+      "detail": "Shanghai (Round 18)",
+      "timeTBD": true,
+      "date": "2026-09-12",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoAmerica",
+      "kind": "Superbike Race 1",
+      "title": "MotoAmerica Superbikes at Texas",
+      "detail": "Circuit of The Americas (Round 8; session times unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-12",
+      "platforms": [
+        "Vice TV",
+        "MotoAmerica Live+"
+      ]
+    },
+    {
+      "series": "NASCAR",
+      "kind": "Xfinity Race",
+      "title": "Nu Way 225 Sauced by Blues Hog",
+      "detail": "World Wide Technology Raceway (NASCAR O'Reilly Auto Parts Series)",
+      "start": "2026-09-12T19:30:00-04:00",
+      "end": "2026-09-12T22:00:00-04:00",
+      "platforms": [
+        "The CW"
+      ]
+    },
+    {
+      "series": "Supercars",
+      "kind": "Race",
+      "title": "AirTouch 500 at The Bend",
+      "detail": "The Bend Motorsport Park, Tailem Bend \u2014 Ryco Enduro Cup opener (1:45 PM ACST)",
+      "start": "2026-09-13T00:15:00-04:00",
+      "end": "2026-09-13T03:00:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Warm Up",
+      "tier": "practice",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli",
+      "start": "2026-09-13T03:40:00-04:00",
+      "end": "2026-09-13T03:50:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "F3",
+      "kind": "Feature Race 2",
+      "title": "Madrid (Round 9)",
+      "detail": "MADRING \u2014 season finale",
+      "start": "2026-09-13T03:55:00-04:00",
+      "end": "2026-09-13T04:45:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "Moto3",
+      "kind": "Race",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli",
+      "start": "2026-09-13T05:00:00-04:00",
+      "end": "2026-09-13T05:45:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "F2",
+      "kind": "Feature Race",
+      "title": "Madrid (Round 11)",
+      "detail": "MADRING",
+      "start": "2026-09-13T05:25:00-04:00",
+      "end": "2026-09-13T06:30:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "Moto2",
+      "kind": "Race",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli (start time unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-13",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Race",
+      "title": "San Marino Grand Prix",
+      "detail": "Misano World Circuit Marco Simoncelli",
+      "start": "2026-09-13T08:00:00-04:00",
+      "end": "2026-09-13T08:50:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "Race",
+      "title": "Spanish Grand Prix",
+      "detail": "MADRING, Madrid \u2014 first F1 race in Madrid in over 45 years",
+      "start": "2026-09-13T09:00:00-04:00",
+      "end": "2026-09-13T11:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "MXGP Race 2",
+      "title": "MXGP of China",
+      "detail": "Shanghai (Round 18)",
+      "timeTBD": true,
+      "date": "2026-09-13",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoAmerica",
+      "kind": "Superbike Race 2",
+      "title": "MotoAmerica Superbikes at Texas",
+      "detail": "Circuit of The Americas (session times unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-13",
+      "platforms": [
+        "Vice TV",
+        "MotoAmerica Live+"
+      ]
+    },
+    {
+      "series": "NASCAR",
+      "kind": "Race",
+      "title": "Enjoy Illinois 300",
+      "detail": "World Wide Technology Raceway \u2014 Chase race 2 of 10 (2:00 PM CT)",
+      "start": "2026-09-13T15:00:00-04:00",
+      "end": "2026-09-13T18:00:00-04:00",
+      "platforms": [
+        "USA Network"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Sprint",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg (Round 15; session times unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-19",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "British Superbike",
+      "kind": "Race 1",
+      "title": "Round 9 \u2014 Assen",
+      "detail": "TT Circuit Assen \u2014 Showdown opener (session times unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-19",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 1",
+      "title": "Switzerland Sail Grand Prix",
+      "detail": "Lake Geneva \u2014 final European event of the season",
+      "timeTBD": true,
+      "date": "2026-09-19",
+      "platforms": [
+        "CBS Sports Network"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "Qualifying Race",
+      "title": "MXGP of Australia",
+      "detail": "Hidden Valley Motorsports Complex, Darwin (Round 19)",
+      "timeTBD": true,
+      "date": "2026-09-19",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "NASCAR",
+      "kind": "Race",
+      "title": "Bass Pro Shops Night Race",
+      "detail": "Bristol Motor Speedway \u2014 Chase race 3 of 10",
+      "start": "2026-09-19T19:30:00-04:00",
+      "end": "2026-09-19T23:00:00-04:00",
+      "platforms": [
+        "USA Network"
+      ]
+    },
+    {
+      "series": "Moto3",
+      "kind": "Race",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg (start time unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-20",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "Moto2",
+      "kind": "Race",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg (start time unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-20",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Race",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg (start time unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-20",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "British Superbike",
+      "kind": "Races 2 & 3",
+      "title": "Round 9 \u2014 Assen",
+      "detail": "TT Circuit Assen (session times unverified this pass)",
+      "timeTBD": true,
+      "date": "2026-09-20",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "SailGP",
+      "kind": "Race Day 2",
+      "title": "Switzerland Sail Grand Prix",
+      "detail": "Lake Geneva",
+      "timeTBD": true,
+      "date": "2026-09-20",
+      "platforms": [
+        "CBS Sports Network"
+      ]
+    },
+    {
+      "series": "MXGP",
+      "kind": "MXGP Race 2",
+      "title": "MXGP of Australia",
+      "detail": "Hidden Valley Motorsports Complex, Darwin \u2014 season finale",
+      "timeTBD": true,
+      "date": "2026-09-20",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "IMSA",
+      "kind": "Race",
+      "title": "TireRack.com Battle on the Bricks",
+      "detail": "Indianapolis Motor Speedway \u2014 start ~3:10 PM ET unconfirmed; race DURATION disputed (venue page says 6 hours, other sources say 2h40m)",
+      "timeTBD": true,
+      "date": "2026-09-20",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "NHRA",
+      "kind": "Final Eliminations",
+      "title": "NHRA Great Lakes Nationals",
+      "detail": "U.S. 131 Motorsports Park, Martin, MI \u2014 inaugural event, Countdown to the Championship opener",
+      "timeTBD": true,
+      "date": "2026-09-20",
+      "platforms": [
+        "Unknown"
       ]
     }
   ]
