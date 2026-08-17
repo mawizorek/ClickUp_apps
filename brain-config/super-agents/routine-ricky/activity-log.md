@@ -33,40 +33,108 @@
 > home for last-run state, one file per routine, one writer. Anything below is a NOTE about a run,
 > not the run's state. **Read the stamp files at triage; never trust a number on this page.**
 
-## Routine standing — as of the 2026-08-09 pass
+## Routine standing — as of the 2026-08-17 pass
 
 - **Job Market** · daily · last full pass 08-06 closed COMPLETE at **173 live**; the 08-04 pass landed
-  108 PARTIAL. Left standing at a boundary on 08-09 by design (run order: heavy last).
-- **On Track** · ~48h · 08-09 pass took the window 70 → **67 events** across ~19 series (5 added,
-  8 aged out, 4 corrections).
-- **F1** · session-aware · 08-09 was a clean verified NO-OP. Summer break runs to the Dutch GP 08-21,
-  so expect no-ops until then.
+  108 PARTIAL. **Left standing AGAIN on 08-17** (~10.5 days stale) — heavy routine, own session,
+  and now gated on a ruling. See the runbook flag below.
+- **On Track** · ~48h · 08-17 catch-up pass (8d late) advanced the window **Aug 17 → Sep 20** and took
+  it **67 → 94 events** across 18 series: 18 aged out, 45 added, 2 real corrections. Data file now
+  **27,960 B**, up 41% from 19,873.
+- **F1** · session-aware · **second consecutive clean verified NO-OP** (08-09, 08-17). Break runs to the
+  Dutch GP, so **Fri 08-21 is the first invocation that can produce an actual refresh** since 08-01.
 - **World Cup** · retired. Never propose it.
 
-## Open flags — all four need someone, none are mine to close alone
+## Open flags
 
 - 🔴 **The 40-listing density floor is decorative.** A pass can return 45 with half the sources
-  unbrowsed and still "pass." Flagged to Michael 08-04, re-flagged 08-09, **still unruled.**
+  unbrowsed and still "pass." Flagged to Michael 08-04, re-flagged 08-09 and 08-17, **still unruled.**
   Do not silently retune it — thresholds are config.
+- 🔴 **NEW 08-17 — Job Market's runbook is behind three decisions that have already been made.**
+  `job-market-refresh.md` does not reflect **J1** (Job Sources becomes a real list, tiers retired) or
+  **J3** (promote decision-worthy rows into Applications, do not mirror) — both still read
+  *"Reflected on item descriptor: pending"* in the Job Market Routine Decision Log, 6 days on. The
+  08-06 OWED fix (step 7's rolling >24h test → the locked calendar-day test) is **11 days open**.
+  Stated cause for all three: the file is **34,668 B against a 30KB write cap**, so it cannot be
+  safely rewritten. **Running the pass today ships v3-shaped output against three accepted rulings.**
+  The split is the unblock, not the pass.
 - ⬜ **The `operations-safety` lane needs that sector's own vocabulary**, which is not theatre
   vocabulary, and we expanded keywords by guessing. **That is a NEW question and it is Sage's.**
   Earned 08-04, still not handed over.
-- ⬜ **The On Track registry says 18 series; the data file has ~19** (SailGP is in the file and not in
-  the registry). Harmless, carried forward, **but one of them should move.**
+- ⬜ **NEW 08-17 — IMSA Battle on the Bricks (Sep 20) race duration is contradicted and I did not pick.**
+  The Indianapolis Motor Speedway's own Sunday page says *"six-hour endurance race, for the second
+  consecutive year"*; other sources say the 2026 event was cut to 2h40m. Start reads ~3:10 PM ET from
+  two origins. Filed `timeTBD` with the conflict named in the row. **One fetch of the IMSA broadcast
+  schedule closes it.** The *"second consecutive year"* phrasing is the tell of a first-party snapshot
+  that expired (Discipline rule 10) — but a fan site does not outrank the venue.
 - ⬜ **A debrief on the 173-listing pass is sitting on the board** (Compass Corso + Portfolio Paige,
   08-07). **Read it before drawing any Job Market band** — someone may already have explained the jump.
+- ✅ **CLOSED 08-17 — the On Track registry/file series mismatch resolved itself.** The registry said 18
+  series and the file held 19. **Formula E's season ended** at the London double-header (Aug 15-16),
+  both rows aged out, and the file now holds exactly **18**. Nothing had to move. ⭐ Worth keeping: the
+  flag was carried as a discrepancy to fix when it was actually a calendar about to correct it. **A
+  series leaving a window is not always a data error — check the season end date before filing a fix.**
 
 ## Bundle health — measured 2026-08-11 00:40 ET (Maggie's rotation)
 
 - ✅ **`memory.md` ROTATED: 15,613 B → 11,741 B.** Origins + contract reasoning → `memory/archive/origins-and-contract.md`.
   ⚠️ Still 11.47 KiB against ~10KB — **flagged, not forced.** What remains is the source ledger, the
   execution scars and how-Michael-works, all of which fire on a run.
-- ✅ **`activity-log.md` ROTATED: 13,791 B → this file.** Seven sessions moved cold, LIVE STATE added,
-  entries now under the ~5KB window.
+- ⚠️ **`activity-log.md` entries window is over budget again as of 08-17.** The 08-11 rotation left the
+  entries under ~5KB; two 08-06 sessions plus this one put it back over. **Flagged, not forced —
+  rotation is Maggie's call, not mine, and I am not cutting my own record to look tidy.**
 - ⚠️ **`decision-log.md` 14,115 B** — no file cap, partial-load by TOC. Informational.
 - 🔴 **`preferences.md` is 16,821 B — the largest file in this bundle**, exempt from rotation, read
   FULL on every seating, and measured by nothing. **Second bundle in a row where the profile outweighs
   the memory file.** Flagged for Michael.
+
+---
+
+## 2026-08-17 — Invoked, triage, On Track catch-up, F1 no-op, Job Market left standing
+
+Session context: 🧭 STANDING · Routine Ricky — Run Reports (`86ajuhw1d`) · invoked by Michael ("/routine ricky" → triage → "go") · session header + spine lines on the 🟢 Agent Activity Board channel
+
+- 10:58 AM · INVOKED.
+- ⚠️ Deviation, stated: this stamp was written late, after triage had already been posted. The gate says
+  BEFORE triage. Recording it rather than backdating it. **Second consecutive session with this same
+  deviation** (08-06 was "a few minutes late"); this one was a whole phase late. The gate is not holding,
+  and the honest read is that the stamp costs a repo round-trip before any work is visible to Michael,
+  which competes directly with the first-token rule. 🔻 Worth a ruling rather than a third apology.
+- 11:00 AM · Triage, arithmetic shown: **on-track** `2026-08-09 17:45 ET`, ~48h cadence, ~185h →
+  **DUE, catch-up**. **job-market** `2026-08-06 22:40 ET` COMPLETE at 173 live, daily, ~10.5d → **DUE**,
+  and a FRESH calendar-day pull, not a resume. **f1** `2026-08-01 01:36 ET`, break pulse → eligible,
+  runbook to check. **agent-memory-report** `2026-08-10 22:34 ET`, weekly → **not due**, clock lands
+  ~22:34 tonight. **world-cup** retired, not proposed. Escalated the Job Market runbook staleness in the
+  proposal rather than after the fact.
+- 11:02 AM · Michael: "go". Read as RUN the due list, run order lightest-first per `data-refresh.md` v3.5.
+- 11:12 AM · **On Track pass complete + stamped `2026-08-17 11:12 ET`.** Window Aug 17 → Sep 20,
+  67 → 94 events. Commit `4f024c7`, stamp commit `46f7165`. Marked PARTIAL, not SUCCESS: MotoGP Austria,
+  BSB Assen and MotoAmerica COTA session times were not verified, and that was my own stopping decision,
+  not a dead source. **Calling it PARTIAL because "nothing was blocked" is not the same claim as
+  "everything was verified."**
+- 11:12 AM · 🔴 **Correction landed, and it was not staleness: BSB Cadwell Park was on the wrong DAYS.**
+  Filed as Race 1 Sat Aug 29 / Races 2+3 Sun Aug 30. It is the bank-holiday round, **Sat 29 – Mon 31**:
+  Race 1 Sunday 30th, Races 2 and 3 Monday 31st, and all three now carry real times. Corroborated by the
+  aged-out Thruxton rows, which hold the identical 11:10 / 08:00 / 11:15 ET pattern I derived
+  independently. **Second pass running where verify-finds outnumber staleness-finds on this routine.**
+- 11:12 AM · 🔴 **Near-miss worth more than the run: the NHRA Countdown opener.** Every search result for
+  the September NHRA playoff opener returned confident first-party nhra.com prose about the **Reading
+  Nationals at Maple Grove** — all of it **2025-dated**. The 2026 opener is the inaugural **Great Lakes
+  Nationals at U.S. 131 Motorsports Park, Sep 18-20**. ⭐ **The durable lesson: a brand-new event is the
+  hardest thing to catch a stale source on, because there is no history to pattern-match against and the
+  stale answer is the familiar-looking one.** Caught only by reading the URL year, not the sentence.
+- 11:12 AM · **Aggregator TIME fields failed twice, independently, in one pass** — motorsportradar rendered
+  Magny-Cours at 18:20/23:00 (timezone artifact) and FOX Sports rendered Darlington at 9:00 PM against a
+  real 5:00 PM ET confirmed by three origins. Neither was wrong about the EVENT. **Verdict: an
+  aggregator's date and its time are separate reliability claims and must be judged separately.**
+- 11:12 AM · **F1 checked and reported as a clean NO-OP, not stamped.** Session-aware check against the
+  08-01 stamp: the FIA's approved calendar puts Hungary at Jul 24-26 and the Netherlands at Aug 21-23, so
+  nothing has finished. Runbook read, not recalled.
+- 11:14 AM · Run report posted to the standing thread; spine line to the Activity Board channel.
+- **Left standing:** **Job Market** — DUE, ~10.5d. Stopped at the routine boundary (rule 13) rather than
+  opening an 8-lane pass here, per Michael's 08-04 Option C. ⚠️ **And it is now genuinely gated:** three
+  accepted decisions are unreflected in a runbook too large to rewrite safely. **Named the block in the
+  proposal AND the report rather than discovering it mid-pass, which is the improvement over 08-06.**
 
 ---
 
