@@ -19,7 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Dev Dexter | Live ClickUp view embed in a markdown doc page · Aug 18 | `spec/chrome-key` (doc-render-engine) · `board/dexter-chrome-spec` (ClickUp_apps) | Scoping the `chrome:` frontmatter key — bare / branch page chrome, folder-scoped via the existing `nav:` cascade. SPEC ONLY, no engine code. | **doc-render-engine**: `specs/chrome.md` (NEW file, create-only, zero clobber risk) · **ClickUp_apps**: this file only. 🚫 NOT touching `next-build-spec.md` — see the PR body for why a 27KB hand re-emit was refused. |
+| Dev Dexter | Live ClickUp view embed in a markdown doc page · Aug 18 | `board/dexter-urllinks` (ClickUp_apps) · **no open branch in doc-render-engine** — both merged | ✅ SHIPPED: `specs/chrome.md` (PR #130) and the `@url:` namespace (PR #131). Row moved per rule 5 because the scope changed from spec-only to a real build. Session still live; more may follow. | **doc-render-engine** (all merged to `main`, nothing in flight): `specs/chrome.md` · `docrender/urllinks.py` · `hooks/03d_urllinks.py` · `mkdocs.yml` · **ClickUp_apps**: this file only. 🚫 Never touched `next-build-spec.md`, `README.md` or `objects/_base.yml` — all three past the 22KB ceiling, all three OWED and named in PR #131. |
 
 ---
 
