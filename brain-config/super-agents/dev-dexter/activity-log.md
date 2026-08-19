@@ -9,6 +9,13 @@
 > Permanent fixture (§4a). Everything with a number or a status lives HERE, never in `memory.md`. **Re-query anything older than the last close; a snapshot is not a tracker.**
 > ⚠️ **Added 2026-08-11 — this block did not exist before, which is why my project state kept leaking into session prose.** Same defect Fiona logged on herself 08-10.
 
+**uritp-safety publish** · 🔥 ACTIVE, stamped 2026-08-19 15:20 ET
+- Session: [uritp-safety publish — housekeeping page diagnosis](https://app.clickup.com/t/86ak33c27)
+- Diagnosis DELIVERED, **nothing written to either repo.** `safety/policies/general/housekeeping.md` is not failing to build — its body was deleted in `3882b7f` (+2 / −40, GitHub web UI, direct to `main`, Aug 18 23:23 ET).
+- **OPEN, higher severity than what he asked about:** four dangling `@id` refs after `proper-attire.md` + `reporting-emergency-contacts.md` were deleted the same night — `safety/policies/index.md` and `safety/programs/general-safety.md` each reference both.
+- **UNVERIFIED:** whether `docrender` hard-errors on an unresolvable `@id` or degrades to a dead link. That decides whether the whole site breaks or four links do. Not read; declared rather than guessed.
+- **Awaiting Michael:** restore verbatim from `3882b7f`'s parent vs re-author; and whether the two deleted policies come back or their referrers get rewritten.
+
 **FMP ↔ git data store** · 🔥 ACTIVE, stamped 2026-08-11 17:00 ET
 - Session: [FMP app globalization](https://app.clickup.com/t/86ajy2hfj) — reopened Aug 11, originally Aug 8.
 - Architecture LOCKED by Michael: **ClickUp AUTHORS → FileMaker RENDERS → git ARCHIVES.**
@@ -19,12 +26,29 @@
 - 🚫 Nothing built. No repo created, no schema touched, no data moved.
 
 **Standing blockers, not mine to fix**
-- `brain-config/session-board.md` ≈ 31KB — past the edit ceiling AND the write cap, on a file spec'd to be empty. **The pre-write presence gate is non-compliable.** Reported at every write since 08-10 (Scoreboard B22 count 3). Sits on the Size Sweep handoff.
+- `brain-config/session-board.md` ≈ 31KB — past the edit ceiling AND the write cap, on a file spec'd to be empty. **The pre-write presence gate is non-compliable.** Reported at every write since 08-10 (Scoreboard B22 count 3, +1 on 08-19). Sits on the Size Sweep handoff.
 - `memory.md` is over its ~10KB hot cap and needs a Maggie rotation before it takes anything substantial.
 
-**Lane question still unruled** (raised 08-08, unchanged): my profile says my domain is `ClickUp_apps`, and Michael has since routed `doc-render-engine` work to me twice. Needs his ruling, not my drift.
+**Lane question still unruled** (raised 08-08): my profile says my domain is `ClickUp_apps`, and Michael has now routed doc-site work to me **three times** — twice building in `doc-render-engine` (08-08) and once diagnosing across `uritp-docs` + an engine instance (08-19). The third was read-only, which is the weakest possible version of the drift, and it still counts. **Needs his ruling, not my drift.**
 
 ---
+
+## 2026-08-19 — uritp-safety: the page that compiles fine and has nothing in it
+
+Michael opened cold with `/dexter` and *"why is my policy-housekeeping page in uritp/safety repo not compiling in the publish?"* **Read-only session. Two repos read, nothing written to either.**
+
+- **The referent was wrong in the question and it mattered.** There is no `uritp/safety` repo. `safety/` is a tree in `mawizorek/uritp-docs` (🔒 PRIVATE) and `uritp-safety` is an **instance** in `doc-render-engine`. Stated `owner/repo@branch` before the first call per the repo-referent gate; if I had let "the repo" resolve to the highest-availability token I would have gone hunting in `ClickUp_apps`.
+- 🔴 **THE PREMISE WAS FALSE AND SAYING SO WAS THE ANSWER.** The page is not failing to compile. It compiles correctly and renders almost nothing, because `3882b7f` deleted 40 lines of it: the `What this is` section, the entire verbatim procedure body (clutter/slip-fall, flammables cabinet, clear egress, gaffed cables, battery tools) and the whole `## Storage of materials {#storage}` section with the OSHA 2236 clearances and the *Known things not to block* warning. **A silent empty render reads exactly like a failed build from the outside.** New instance of an old class: the symptom named in the question is not always the mechanism.
+- **The `-->` moved.** One admonition survived the delete — the EH&S battery-tools note — and the closing terminator now sits *below* it, so the last standing paragraph of real content is inside the HTML comment. The comment is balanced, which is why nothing errors.
+- **Diffed against a sibling instead of theorising.** `phone-use.md` is the same template and closes its `<!-- VERBATIM ... -->` on one line, with the bold rule text outside it. That comparison is what made the moved terminator obvious in about ten seconds. **Cheapest diagnostic available on a templated doc tree: read the one next to it.**
+- 🔴 **FOUND THE BIGGER THING HE DID NOT ASK ABOUT.** `proper-attire.md` and `reporting-emergency-contacts.md` were deleted at 23:19 and 23:20, four minutes before the housekeeping edit, and `safety/policies/index.md` + `safety/programs/general-safety.md` **still `@`-reference both.** Four dangling object refs. If the engine hard-errors on an unresolvable `@id`, that breaks the *site*, not a page — which would be the actual answer to "not compiling." Confirmed by code search across the repo, not inferred from the deletions.
+- **Declared the unverified bit instead of ranking by vibe.** I have not read `docrender`'s reference resolver, so I said the engine's behaviour on a dead `@id` is unknown rather than asserting which of my two findings is the publish-breaker. *(Same discipline as the 08-11 `409` scar, run the right way round this time: check whether the system documents its own failure mode before describing it.)*
+- **Collateral the delete left behind:** housekeeping's own `Still open` block still cites the OSHA 2236 clearances and the dimmers/Todd/Smith do-not-block list, both of which are no longer on the page, and the `{#storage}` anchor is gone so any `@housekeeping#storage` deep link is dead.
+- **Presence gate skipped again**, `session-board.md` still unwritable. Fourth consecutive report.
+
+**State left:** diagnosis delivered, recovery not attempted. The deleted text is recoverable **verbatim** from `3882b7f`'s parent, which is the cheapest possible fix and is his call to make. **Nothing written.**
+
+**Owed:** still the *FileMaker Patterns + Conventions* pass from 08-11, untouched. And the lane question now has a third data point.
 
 ## 2026-08-11 — FMP ↔ git: the data store, the tokens, and two questions that dissolved
 
