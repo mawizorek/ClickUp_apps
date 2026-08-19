@@ -19,8 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-
-**Nobody is in the repo.** Coast is clear.
+| Dev Dexter | Live ClickUp view embed in a markdown doc page · Aug 18 | `spec/chrome-key` (doc-render-engine) · `board/dexter-chrome-spec` (ClickUp_apps) | Scoping the `chrome:` frontmatter key — bare / branch page chrome, folder-scoped via the existing `nav:` cascade. SPEC ONLY, no engine code. | **doc-render-engine**: `specs/chrome.md` (NEW file, create-only, zero clobber risk) · **ClickUp_apps**: this file only. 🚫 NOT touching `next-build-spec.md` — see the PR body for why a 27KB hand re-emit was refused. |
 
 ---
 
