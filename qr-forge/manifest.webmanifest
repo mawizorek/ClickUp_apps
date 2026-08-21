@@ -1,0 +1,14 @@
+{
+  "name": "QR Forge",
+  "short_name": "QR Forge",
+  "description": "Static QR codes encoded in the browser. No shortener, no redirect, nothing to expire.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#211d14",
+  "theme_color": "#211d14",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
