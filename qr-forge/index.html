@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
-<link rel="stylesheet" href="./source/app.css?v=1">
+<link rel="stylesheet" href="./source/app.css?v=2">
 </head>
 <body>
 <!-- INFRASTRUCTURE: modular. Slim shell + source/ modules. No data.json — this app
@@ -207,7 +207,12 @@
 <script>
 /* 3-state access gate. One flag in config.json, flippable in a one-line commit.
    Cosmetic soft-lock, never security: this repo is public and the code is in plain
-   sight. Acceptable here only because the app holds no data at all. */
+   sight. Acceptable here only because the app holds no data at all.
+
+   ⚠️ This script hides and shows #cover via the `hidden` attribute, which only
+   works because app.css carries `[hidden] { display: none !important }`. Without
+   that rule `.cover`'s own `display: grid` wins and the gate screen covers the app
+   permanently, no matter what config.json says. That was the v1.0 bug. */
 (function () {
   var FALLBACK = { access: 'open', code: '' };
   var CK = 'qrforge.cfg', SK = 'qrforge.unlocked';
@@ -240,12 +245,12 @@
     }).catch(function () {});
 })();
 </script>
-<script defer src="./source/build.js?v=1"></script>
-<script defer src="./source/qr-gf.js?v=1"></script>
-<script defer src="./source/qr-core.js?v=1"></script>
-<script defer src="./source/qr-render.js?v=1"></script>
-<script defer src="./source/qr-selftest.js?v=1"></script>
-<script defer src="./source/app.js?v=1"></script>
-<script defer src="./source/batch.js?v=1"></script>
+<script defer src="./source/build.js?v=2"></script>
+<script defer src="./source/qr-gf.js?v=2"></script>
+<script defer src="./source/qr-core.js?v=2"></script>
+<script defer src="./source/qr-render.js?v=2"></script>
+<script defer src="./source/qr-selftest.js?v=2"></script>
+<script defer src="./source/app.js?v=2"></script>
+<script defer src="./source/batch.js?v=2"></script>
 </body>
 </html>
