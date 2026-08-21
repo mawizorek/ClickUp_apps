@@ -49,6 +49,23 @@
 
 * { box-sizing: border-box; }
 
+/* 🔴 LOAD-BEARING, v1.1 — DO NOT REMOVE, AND DO NOT "CLEAN UP" THE !important.
+   The `hidden` attribute hides an element only through the user-agent rule
+   [hidden] { display: none }, which sits at the BOTTOM of the cascade. ANY author
+   rule that sets `display` on the same element beats it, and the element stays
+   visible with the attribute still sitting right there in the DOM, reading as
+   correct in devtools and in the markup.
+
+   That shipped in v1.0 and took out FIVE elements at once, because every one of
+   them is a flex or grid container that starts life hidden: `.cover` (which
+   blanketed the whole app in the access-gate screen at z-index 90 while
+   config.json said `open`, so the app looked gated and the JSON looked like it
+   was lying), `.cover-form`, `.drawer`, `.batch`, `.readout` and `.acts`.
+
+   Every `hidden` toggle in app.js and batch.js depends on this rule. It is the
+   contract that makes `el.hidden = true/false` mean anything in this app. */
+[hidden] { display: none !important; }
+
 html.locked { overflow: hidden; }
 
 body {
@@ -63,7 +80,7 @@ body {
 .mono, .in.mono, code { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 
-/* ── masthead ─────────────────────────────────────────────── */
+/* ── masthead ────────────────────────────────────────────── */
 .mast {
   display: flex; align-items: center; justify-content: space-between; gap: var(--pad-3, 14px);
   padding: var(--pad-4, 20px) clamp(0.875rem, 3vw, 2.5rem) var(--pad-3, 14px);
@@ -127,7 +144,7 @@ main { padding: clamp(1.25rem, 3.5vw, 2.5rem) clamp(0.875rem, 3vw, 2.5rem) var(-
   .stage { position: sticky; top: var(--pad-4, 20px); }
 }
 
-/* ── controls ─────────────────────────────────────────────── */
+/* ── controls ────────────────────────────────────────────── */
 .controls { display: grid; gap: var(--pad-4, 20px); order: 2; }
 @media (min-width: 900px) { .controls { order: 0; } }
 .fld { display: grid; gap: var(--pad-2, 10px); }
@@ -303,6 +320,8 @@ select.in {
 }
 .noscript { padding: var(--pad-4, 20px) clamp(0.875rem, 3vw, 2.5rem); color: var(--dim); }
 
+/* ⚠️ Both of these set `display` and both start life with the `hidden` attribute,
+   so they depend entirely on the [hidden] rule at the top of this file. */
 .cover { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: var(--bg); padding: var(--pad-4, 20px); }
 .cover-in { width: min(100%, 24rem); text-align: center; }
 .cover-h { margin: 0; font-size: 19px; font-weight: 700; }
