@@ -1,0 +1,5 @@
+{
+  "access": "open",
+  "code": "",
+  "note": "open | gated | down. Flip this one value to change access; no index.html edit, no rebuild. Shipped open because the app holds and transmits nothing, and gating a tool used at a print station is friction with no payoff."
+}

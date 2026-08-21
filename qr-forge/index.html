@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#211d14">
+<meta name="robots" content="noindex, nofollow">
+<title>QR Forge — permanent static QR codes</title>
+<meta name="description" content="Encodes a link straight into the QR module pattern, in the browser. No shortener, no account, no third-party redirect that can expire. Vector SVG and PNG out, plus a labelled print sheet for tags.">
+<meta property="og:title" content="QR Forge">
+<meta property="og:description" content="Static QR codes with the link encoded into the pattern itself. Nothing to expire, nobody to depend on.">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/qr-forge/">
+<meta property="og:image" content="https://mawizorek.github.io/ClickUp_apps/qr-forge/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="QR Forge">
+<meta name="twitter:description" content="Static QR codes, encoded in the browser. No third party in the chain.">
+<meta name="twitter:image" content="https://mawizorek.github.io/ClickUp_apps/qr-forge/og.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 fill=%22%23211d14%22/><g fill=%22%23f0b429%22><rect x=%223%22 y=%223%22 width=%229%22 height=%229%22/><rect x=%2220%22 y=%223%22 width=%229%22 height=%229%22/><rect x=%223%22 y=%2220%22 width=%229%22 height=%229%22/><rect x=%2217%22 y=%2217%22 width=%224%22 height=%224%22/><rect x=%2224%22 y=%2224%22 width=%225%22 height=%225%22/></g></svg>">
+<link rel="apple-touch-icon" href="./icon.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="QR Forge">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="./source/app.css?v=1">
+</head>
+<body>
+<!-- INFRASTRUCTURE: modular. Slim shell + source/ modules. No data.json — this app
+     stores nothing and fetches nothing at runtime except config.json for the gate. -->
+
+<div id="cover" class="cover" hidden>
+  <div class="cover-in">
+    <p class="cover-h">Under maintenance</p>
+    <p class="cover-p">This page is being worked on.</p>
+    <form id="cover-form" class="cover-form" hidden>
+      <label class="lbl" for="cover-code">Access code</label>
+      <input id="cover-code" class="in" type="password" inputmode="numeric" autocomplete="off">
+      <button class="btn btn-p" type="submit">Enter</button>
+      <p id="cover-err" class="cover-err" role="alert" hidden>Not that one.</p>
+    </form>
+  </div>
+</div>
+
+<header class="mast">
+  <div class="mast-id">
+    <span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <div>
+      <h1>QR Forge</h1>
+      <p class="tag">The link lives in the pattern. Nothing to expire.</p>
+    </div>
+  </div>
+  <button id="gear" class="gear" type="button" aria-expanded="false" aria-controls="drawer">
+    <span aria-hidden="true">⚙</span><span class="vh">Settings</span>
+  </button>
+</header>
+
+<aside id="drawer" class="drawer" hidden aria-label="Settings">
+  <div class="drawer-row">
+    <span class="lbl">Appearance</span>
+    <div class="seg" id="theme-seg" role="group" aria-label="Theme">
+      <button type="button" data-theme-set="dark">Dark</button>
+      <button type="button" data-theme-set="light">Light</button>
+    </div>
+  </div>
+  <div class="drawer-note">
+    <p>Every code is generated in this tab. The URL you type is encoded into the module
+    pattern itself, so the code resolves to that exact address forever — there is no
+    shortener, no redirect service and no account behind it. Nothing is uploaded and
+    nothing is stored.</p>
+    <p>The flip side: a static code cannot be repointed. If the destination URL ever
+    changes, every printed copy of that code is dead. For anything you expect to
+    outlive its link, encode a redirect you control rather than the final address.</p>
+    <p>Error correction is a real tradeoff, not a quality setting. Higher levels survive
+    more scuffing and ink loss but pack more modules into the same square, which makes
+    small prints harder to read. Q is the default for that reason.</p>
+  </div>
+  <div class="drawer-row">
+    <span class="lbl">Encoder</span>
+    <button id="selftest" class="btn btn-s" type="button">Run self test</button>
+  </div>
+  <p id="selftest-out" class="drawer-out" hidden></p>
+</aside>
+
+<nav class="tabs" role="tablist" aria-label="Mode">
+  <button role="tab" id="t-one" aria-selected="true" aria-controls="p-one" type="button">One code</button>
+  <button role="tab" id="t-batch" aria-selected="false" aria-controls="p-batch" type="button">Batch sheet</button>
+</nav>
+
+<main>
+  <section id="p-one" role="tabpanel" aria-labelledby="t-one" class="work">
+
+    <form class="controls" id="controls" autocomplete="off" novalidate>
+      <div class="fld">
+        <label class="lbl" for="payload">Destination link</label>
+        <textarea id="payload" class="in mono" rows="3" spellcheck="false" placeholder="https://"></textarea>
+        <p class="hint" id="payload-hint"></p>
+      </div>
+
+      <div class="fld">
+        <label class="lbl" for="label">Label <span class="lbl-x">printed under the code, used in filenames</span></label>
+        <input id="label" class="in" type="text" placeholder="Incident report form">
+      </div>
+
+      <hr class="rule">
+
+      <div class="fld">
+        <span class="lbl">Error correction</span>
+        <div class="seg seg-4" id="ecl-seg" role="group" aria-label="Error correction level">
+          <button type="button" data-ecl="L">L</button>
+          <button type="button" data-ecl="M">M</button>
+          <button type="button" data-ecl="Q" aria-pressed="true">Q</button>
+          <button type="button" data-ecl="H">H</button>
+        </div>
+        <p class="hint" id="ecl-hint"></p>
+        <label class="chk"><input id="boost" type="checkbox" checked> Spend leftover room on stronger correction</label>
+      </div>
+
+      <hr class="rule">
+
+      <div class="fld fld-2">
+        <div>
+          <label class="lbl" for="width">Print width <span class="lbl-x">mm</span></label>
+          <input id="width" class="in" type="number" min="8" max="300" step="1" value="30">
+        </div>
+        <div>
+          <label class="lbl" for="quiet">Quiet zone <span class="lbl-x">modules</span></label>
+          <input id="quiet" class="in" type="number" min="0" max="8" step="1" value="4">
+        </div>
+      </div>
+      <p class="hint" id="width-hint"></p>
+
+      <div class="fld">
+        <label class="lbl" for="scale">PNG resolution <span class="lbl-x"><span id="scale-out">8</span> px per module</span></label>
+        <input id="scale" class="rng" type="range" min="2" max="32" step="1" value="8">
+      </div>
+
+      <details class="adv">
+        <summary>Advanced</summary>
+        <div class="fld">
+          <label class="lbl" for="mask">Mask pattern</label>
+          <select id="mask" class="in">
+            <option value="-1">Auto (lowest penalty)</option>
+            <option value="0">0</option><option value="1">1</option>
+            <option value="2">2</option><option value="3">3</option>
+            <option value="4">4</option><option value="5">5</option>
+            <option value="6">6</option><option value="7">7</option>
+          </select>
+        </div>
+        <label class="chk"><input id="transparent" type="checkbox"> Transparent background in the SVG</label>
+        <p class="hint">A transparent code only scans on a light surface. Leave this off for print.</p>
+      </details>
+    </form>
+
+    <div class="stage">
+      <figure class="paper" id="paper">
+        <div class="paper-art" id="art">
+          <p class="empty">Paste a link to see the code.</p>
+        </div>
+        <figcaption class="paper-cap" id="cap" hidden></figcaption>
+      </figure>
+
+      <p class="notice" id="notice" role="alert" hidden></p>
+
+      <dl class="readout" id="readout" hidden></dl>
+
+      <div class="acts" id="acts" hidden>
+        <a class="btn btn-p" id="dl-svg" download>Download SVG</a>
+        <a class="btn btn-s" id="dl-png" download>Download PNG</a>
+        <button class="btn btn-g" id="copy-svg" type="button">Copy SVG markup</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-batch" role="tabpanel" aria-labelledby="t-batch" class="batch" hidden>
+    <div class="fld">
+      <label class="lbl" for="rows">One per line — <code>Label | https://link</code></label>
+      <textarea id="rows" class="in mono" rows="9" spellcheck="false" placeholder="Incident report | https://forms.example.com/incident&#10;Shop vac 02 | https://app.clickup.com/t/abc123"></textarea>
+      <p class="hint">Lines without a pipe are treated as a bare link with no label.</p>
+    </div>
+    <div class="fld fld-2">
+      <div>
+        <label class="lbl" for="cols">Codes across the sheet</label>
+        <select id="cols" class="in"><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+      </div>
+      <div>
+        <label class="lbl" for="bwidth">Code width <span class="lbl-x">mm</span></label>
+        <input id="bwidth" class="in" type="number" min="10" max="120" step="1" value="34">
+      </div>
+    </div>
+    <div class="acts">
+      <a class="btn btn-p" id="sheet" target="_blank" rel="noopener">Open print sheet</a>
+      <span class="hint" id="batch-sum">Nothing parsed yet.</span>
+    </div>
+    <div id="batch-tbl"></div>
+  </section>
+</main>
+
+<footer class="foot"><span id="stamp" class="mono"></span></footer>
+
+<noscript>
+  <p class="noscript">QR Forge builds every code in the browser, so it needs JavaScript on.
+  Nothing is sent anywhere either way.</p>
+</noscript>
+
+<script>
+/* 3-state access gate. One flag in config.json, flippable in a one-line commit.
+   Cosmetic soft-lock, never security: this repo is public and the code is in plain
+   sight. Acceptable here only because the app holds no data at all. */
+(function () {
+  var FALLBACK = { access: 'open', code: '' };
+  var CK = 'qrforge.cfg', SK = 'qrforge.unlocked';
+  var cover = document.getElementById('cover');
+  var form = document.getElementById('cover-form');
+  var err = document.getElementById('cover-err');
+  function apply(cfg) {
+    if (!cfg || cfg.access === 'open') return;
+    if (cfg.access === 'gated' && sessionStorage.getItem(SK) === '1') return;
+    cover.hidden = false;
+    document.documentElement.classList.add('locked');
+    if (cfg.access !== 'gated') return;
+    form.hidden = false;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (document.getElementById('cover-code').value === String(cfg.code)) {
+        sessionStorage.setItem(SK, '1');
+        cover.hidden = true;
+        document.documentElement.classList.remove('locked');
+      } else { err.hidden = false; }
+    });
+  }
+  var cached = null;
+  try { cached = JSON.parse(localStorage.getItem(CK)); } catch (e) {}
+  apply(cached || FALLBACK);
+  fetch('./config.json', { cache: 'no-store' }).then(function (r) { return r.json(); })
+    .then(function (cfg) {
+      try { localStorage.setItem(CK, JSON.stringify(cfg)); } catch (e) {}
+      if (!cached || cached.access !== cfg.access) { cover.hidden = true; apply(cfg); }
+    }).catch(function () {});
+})();
+</script>
+<script defer src="./source/build.js?v=1"></script>
+<script defer src="./source/qr-gf.js?v=1"></script>
+<script defer src="./source/qr-core.js?v=1"></script>
+<script defer src="./source/qr-render.js?v=1"></script>
+<script defer src="./source/qr-selftest.js?v=1"></script>
+<script defer src="./source/app.js?v=1"></script>
+<script defer src="./source/batch.js?v=1"></script>
+</body>
+</html>
