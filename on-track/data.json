@@ -1,30 +1,6 @@
 {
-  "version": "2026-08-17",
+  "version": "2026-08-22",
   "events": [
-    {
-      "series": "F1",
-      "kind": "FP1",
-      "tier": "practice",
-      "title": "Dutch Grand Prix",
-      "detail": "Zandvoort",
-      "start": "2026-08-21T06:30:00-04:00",
-      "end": "2026-08-21T07:30:00-04:00",
-      "platforms": [
-        "Apple TV"
-      ]
-    },
-    {
-      "series": "F1",
-      "kind": "Sprint Qualifying",
-      "tier": "quali",
-      "title": "Dutch Grand Prix",
-      "detail": "Zandvoort",
-      "start": "2026-08-21T10:30:00-04:00",
-      "end": "2026-08-21T11:14:00-04:00",
-      "platforms": [
-        "Apple TV"
-      ]
-    },
     {
       "series": "F1",
       "kind": "Sprint",
@@ -62,7 +38,7 @@
       "series": "SailGP",
       "kind": "Race Day 1",
       "title": "ROCKWOOL Germany Sail Grand Prix",
-      "detail": "Sassnitz, R\u00fcgen",
+      "detail": "Sassnitz, R\u00fcgen (one trade source lists Aug 23\u201324; Sat\u2013Sun retained \u2014 same source misread the Spanish round)",
       "timeTBD": true,
       "date": "2026-08-22",
       "platforms": [
@@ -174,7 +150,7 @@
       "series": "NHRA",
       "kind": "Final Eliminations",
       "title": "Brainerd Nationals",
-      "detail": "Brainerd International Raceway",
+      "detail": "Brainerd International Raceway (8:30 PM ET; broadcaster still unannounced on the FOX Sports NHRA schedule)",
       "start": "2026-08-23T20:30:00-04:00",
       "end": "2026-08-23T23:30:00-04:00",
       "platforms": [
@@ -481,7 +457,7 @@
       "series": "SailGP",
       "kind": "Race Day 1",
       "title": "Spain Sail Grand Prix",
-      "detail": "Valencia (added this pass from a July 2026 source; not on the original season announcement \u2014 confirm before relying on it)",
+      "detail": "Valencia \u2014 debut event, CONFIRMED (three-year deal from 2026; replaces C\u00e1diz)",
       "timeTBD": true,
       "date": "2026-09-05",
       "platforms": [
@@ -569,7 +545,7 @@
       "series": "SailGP",
       "kind": "Race Day 2",
       "title": "Spain Sail Grand Prix",
-      "detail": "Valencia (added this pass from a July 2026 source \u2014 confirm before relying on it)",
+      "detail": "Valencia \u2014 CONFIRMED (racing window not yet published)",
       "timeTBD": true,
       "date": "2026-09-06",
       "platforms": [
@@ -602,7 +578,7 @@
       "series": "NHRA",
       "kind": "Final Eliminations",
       "title": "Cornwell Quality Tools NHRA U.S. Nationals",
-      "detail": "Lucas Oil Indianapolis Raceway Park \u2014 regular season finale (Labor Day Monday)",
+      "detail": "Lucas Oil Indianapolis Raceway Park \u2014 regular season finale (Labor Day Monday; FS1 from noon, FOX from 2:00 PM)",
       "start": "2026-09-07T12:00:00-04:00",
       "end": "2026-09-07T17:00:00-04:00",
       "platforms": [
@@ -754,7 +730,7 @@
       "series": "FIM Speedway",
       "kind": "Grand Prix",
       "title": "Deluxe Homeart FIM Speedway GP of Denmark",
-      "detail": "Vojens Speedway Center (Round 9; some sources list Sep 11)",
+      "detail": "Vojens Speedway Center (Round 9 \u2014 Sep 12 confirmed on the series' own round page)",
       "timeTBD": true,
       "date": "2026-09-12",
       "platforms": [
@@ -920,11 +896,59 @@
     },
     {
       "series": "MotoGP",
+      "kind": "FP1",
+      "tier": "practice",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg (Round 15)",
+      "start": "2026-09-18T04:45:00-04:00",
+      "end": "2026-09-18T05:30:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Practice",
+      "tier": "practice",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg",
+      "start": "2026-09-18T09:00:00-04:00",
+      "end": "2026-09-18T10:00:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "FP2",
+      "tier": "practice",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg",
+      "start": "2026-09-19T04:10:00-04:00",
+      "end": "2026-09-19T04:40:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg",
+      "start": "2026-09-19T04:50:00-04:00",
+      "end": "2026-09-19T05:30:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "MotoGP",
       "kind": "Sprint",
       "title": "Austrian Grand Prix",
-      "detail": "Red Bull Ring, Spielberg (Round 15; session times unverified this pass)",
-      "timeTBD": true,
-      "date": "2026-09-19",
+      "detail": "Red Bull Ring, Spielberg",
+      "start": "2026-09-19T09:00:00-04:00",
+      "end": "2026-09-19T09:45:00-04:00",
       "platforms": [
         "Stream"
       ]
@@ -933,7 +957,7 @@
       "series": "British Superbike",
       "kind": "Race 1",
       "title": "Round 9 \u2014 Assen",
-      "detail": "TT Circuit Assen \u2014 Showdown opener (session times unverified this pass)",
+      "detail": "TT Circuit Assen \u2014 Showdown opener, Sep 18\u201320 (session times unverified this pass)",
       "timeTBD": true,
       "date": "2026-09-19",
       "platforms": [
@@ -943,7 +967,7 @@
     {
       "series": "SailGP",
       "kind": "Race Day 1",
-      "title": "Switzerland Sail Grand Prix",
+      "title": "Rolex Switzerland Sail Grand Prix",
       "detail": "Lake Geneva \u2014 final European event of the season",
       "timeTBD": true,
       "date": "2026-09-19",
@@ -974,6 +998,18 @@
       ]
     },
     {
+      "series": "MotoGP",
+      "kind": "Warm Up",
+      "tier": "practice",
+      "title": "Austrian Grand Prix",
+      "detail": "Red Bull Ring, Spielberg",
+      "start": "2026-09-20T03:40:00-04:00",
+      "end": "2026-09-20T03:50:00-04:00",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
       "series": "Moto3",
       "kind": "Race",
       "title": "Austrian Grand Prix",
@@ -999,9 +1035,9 @@
       "series": "MotoGP",
       "kind": "Race",
       "title": "Austrian Grand Prix",
-      "detail": "Red Bull Ring, Spielberg (start time unverified this pass)",
-      "timeTBD": true,
-      "date": "2026-09-20",
+      "detail": "Red Bull Ring, Spielberg",
+      "start": "2026-09-20T08:00:00-04:00",
+      "end": "2026-09-20T08:50:00-04:00",
       "platforms": [
         "Stream"
       ]
@@ -1020,7 +1056,7 @@
     {
       "series": "SailGP",
       "kind": "Race Day 2",
-      "title": "Switzerland Sail Grand Prix",
+      "title": "Rolex Switzerland Sail Grand Prix",
       "detail": "Lake Geneva",
       "timeTBD": true,
       "date": "2026-09-20",
@@ -1040,12 +1076,206 @@
       ]
     },
     {
+      "series": "NHRA",
+      "kind": "Final Eliminations",
+      "title": "NHRA Great Lakes Nationals",
+      "detail": "U.S. 131 Motorsports Park, Martin, MI \u2014 inaugural event, Countdown opener (end time is a broadcast-window estimate)",
+      "start": "2026-09-20T14:00:00-04:00",
+      "end": "2026-09-20T17:00:00-04:00",
+      "platforms": [
+        "FS1"
+      ]
+    },
+    {
       "series": "IMSA",
       "kind": "Race",
       "title": "TireRack.com Battle on the Bricks",
-      "detail": "Indianapolis Motor Speedway \u2014 start ~3:10 PM ET unconfirmed; race DURATION disputed (venue page says 6 hours, other sources say 2h40m)",
+      "detail": "Indianapolis Motor Speedway \u2014 2h40m, per IMSA's own event schedule (the venue page's '6 hours' is an expired claim)",
+      "start": "2026-09-20T15:10:00-04:00",
+      "end": "2026-09-20T17:50:00-04:00",
+      "platforms": [
+        "Peacock"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "FP1",
+      "tier": "practice",
+      "title": "Azerbaijan Grand Prix",
+      "detail": "Baku City Circuit \u2014 THU\u2013SAT weekend, shifted one day earlier for a national day",
+      "start": "2026-09-24T04:30:00-04:00",
+      "end": "2026-09-24T05:30:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "FP2",
+      "tier": "practice",
+      "title": "Azerbaijan Grand Prix",
+      "detail": "Baku City Circuit",
+      "start": "2026-09-24T08:00:00-04:00",
+      "end": "2026-09-24T09:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "FP3",
+      "tier": "practice",
+      "title": "Azerbaijan Grand Prix",
+      "detail": "Baku City Circuit",
+      "start": "2026-09-25T04:30:00-04:00",
+      "end": "2026-09-25T05:30:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "Qualifying",
+      "tier": "quali",
+      "title": "Azerbaijan Grand Prix",
+      "detail": "Baku City Circuit \u2014 FRIDAY qualifying",
+      "start": "2026-09-25T08:00:00-04:00",
+      "end": "2026-09-25T09:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "F2",
+      "kind": "Sprint Race",
+      "title": "Baku (Round 12)",
+      "detail": "Baku City Circuit \u2014 round is Sep 24\u201326; F2's own event page lists sessions a further day earlier (Sep 23\u201325) and marks them TBC. Day placement UNRESOLVED",
       "timeTBD": true,
-      "date": "2026-09-20",
+      "date": "2026-09-25",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "WEC",
+      "kind": "Free Practice 1",
+      "tier": "practice",
+      "title": "6 Hours of Fuji",
+      "detail": "Fuji Speedway (session times TBC by promoter)",
+      "timeTBD": true,
+      "date": "2026-09-25",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F1",
+      "kind": "Race",
+      "title": "Azerbaijan Grand Prix",
+      "detail": "Baku City Circuit \u2014 SATURDAY race, 3:00 PM local (moved off Sunday for a national day)",
+      "start": "2026-09-26T07:00:00-04:00",
+      "end": "2026-09-26T09:00:00-04:00",
+      "platforms": [
+        "Apple TV"
+      ]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Race 1",
+      "title": "EICMA Italian Round",
+      "detail": "Cremona Circuit (Round 10)",
+      "start": "2026-09-26T09:30:00-04:00",
+      "end": "2026-09-26T10:10:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "F2",
+      "kind": "Feature Race",
+      "title": "Baku (Round 12)",
+      "detail": "Baku City Circuit \u2014 day placement UNRESOLVED (see Sprint Race note)",
+      "timeTBD": true,
+      "date": "2026-09-26",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "MotoAmerica",
+      "kind": "Superbike Race 1",
+      "title": "MotoAmerica Superbikes at New Jersey",
+      "detail": "New Jersey Motorsports Park, Millville (Round 9 \u2014 season finale; session times not yet published)",
+      "timeTBD": true,
+      "date": "2026-09-26",
+      "platforms": [
+        "Vice TV",
+        "MotoAmerica Live+"
+      ]
+    },
+    {
+      "series": "FIM Speedway",
+      "kind": "Grand Prix",
+      "title": "DEWALT FIM Speedway GP of Poland",
+      "detail": "Marian Rose Motoarena, Torun (Round 10 \u2014 season finale; racing timetable not yet published)",
+      "timeTBD": true,
+      "date": "2026-09-26",
+      "platforms": [
+        "Stream"
+      ]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Superpole Race",
+      "title": "EICMA Italian Round",
+      "detail": "Cremona Circuit",
+      "start": "2026-09-27T05:10:00-04:00",
+      "end": "2026-09-27T05:30:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "WSBK",
+      "kind": "Race 2",
+      "title": "EICMA Italian Round",
+      "detail": "Cremona Circuit (back to the series norm \u2014 later than Magny-Cours' revised slot)",
+      "start": "2026-09-27T09:30:00-04:00",
+      "end": "2026-09-27T10:10:00-04:00",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "WEC",
+      "kind": "Race",
+      "title": "6 Hours of Fuji",
+      "detail": "Fuji Speedway (6 Hours; a Sunday JST start lands SATURDAY evening ET \u2014 ET date not yet confirmable)",
+      "timeTBD": true,
+      "date": "2026-09-27",
+      "platforms": [
+        "Unknown"
+      ]
+    },
+    {
+      "series": "MotoAmerica",
+      "kind": "Superbike Races 2 & 3",
+      "title": "MotoAmerica Superbikes at New Jersey",
+      "detail": "New Jersey Motorsports Park \u2014 Sunday doubleheader closes the 50th anniversary Superbike season",
+      "timeTBD": true,
+      "date": "2026-09-27",
+      "platforms": [
+        "Vice TV",
+        "MotoAmerica Live+"
+      ]
+    },
+    {
+      "series": "NASCAR",
+      "kind": "Race",
+      "title": "Hollywood Casino 400",
+      "detail": "Kansas Speedway \u2014 Chase race 4 of 10 (broadcaster not verified this pass)",
+      "start": "2026-09-27T15:00:00-04:00",
+      "end": "2026-09-27T18:30:00-04:00",
       "platforms": [
         "Unknown"
       ]
@@ -1053,12 +1283,12 @@
     {
       "series": "NHRA",
       "kind": "Final Eliminations",
-      "title": "NHRA Great Lakes Nationals",
-      "detail": "U.S. 131 Motorsports Park, Martin, MI \u2014 inaugural event, Countdown to the Championship opener",
-      "timeTBD": true,
-      "date": "2026-09-20",
+      "title": "NHRA Nationals at The Rock",
+      "detail": "Rockingham Dragway, NC \u2014 inaugural national event, Countdown race 16 of 20 (end time is a broadcast-window estimate)",
+      "start": "2026-09-27T15:00:00-04:00",
+      "end": "2026-09-27T18:00:00-04:00",
       "platforms": [
-        "Unknown"
+        "FS1"
       ]
     }
   ]
