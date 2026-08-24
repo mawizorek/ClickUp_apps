@@ -1,11 +1,11 @@
 {
  "season": 2026,
- "version": "2026-08-01b",
- "last_updated": "2026-08-01T12:40:00-04:00",
+ "version": "2026-08-24",
+ "last_updated": "2026-08-24T09:25:00-04:00",
  "vector": "RESULTS — a manifest of which rounds have a results file, nothing more. It is NOT the season calendar and must never become one again. The calendar (which rounds exist, in what order, on what dates, with what sessions) is the WEEKEND vector at ../../season/2026/index_weekends.json. Join by SLUG.",
  "docs": "./README.md — schema, row shape, canon rule, provenance, and the per-field state table.",
  "verified_at_commit": "d27ce55",
- "verified_note": "Every claim in ./README.md was checked against the first NINE round files on 2026-07-28. ⚠️ Rounds 10 (Spa) and 11 (Hungaroring) were added 2026-08-01 and are NOT covered by that check — re-verify and re-stamp this pair. A status line nobody re-reads is worse than none.",
+ "verified_note": "Every claim in ./README.md was checked against the first NINE round files on 2026-07-28. ⚠️ Rounds 10 (Spa), 11 (Hungaroring) and 12 (Zandvoort) are NOT covered by that check — re-verify and re-stamp this set. A status line nobody re-reads is worse than none. ⚠️ Round 12 also introduced two shapes the README predates and that a re-verify must rule on: (a) a classification row carrying BOTH a finishing position and status DNF (Albon, classified 17th after retiring on lap 66) — recorded verbatim from formula1.com rather than normalised, and (b) a sprint block holding the FULL classification (22 rows) where rounds 9 and 11 hold only the eight points-scoring positions. Neither is a schema change; both are coverage decisions made deliberately and reversible in one edit.",
  "moved_out_2026_08_01": "`round`, `date`, `name`, `sprint` and `cuTaskId` left this file for the weekend vector, and `current_round_slug` / `last_completed_round_slug` are now DERIVED at boot by source/08_season.js. Reason: this file can only ever list rounds that have already been RACED, so it structurally cannot be the calendar — and while it was treated as one, two hand-maintained round numberings drifted apart and stayed wrong for eight months. Decision Log J7-J8. ⚠️ RICKY: the weekly refresh runbook writes `cuTaskId` and advances `current_round_slug`. The first no longer lives here; the second no longer exists. Adding a round is now: write the round file, add ONE {slug, file} row below, done.",
  "filename_note": "The r<NN> prefix on round files is a LABEL, not a claim. Round numbers are derived from calendar position, so a filename ordinal can only stay true because insertions and cancellations always land in the FUTURE while files only exist for the PAST. That is safe by construction, not by design — never rename a past round file to chase a renumber, and never read the ordinal out of a filename.",
  "sprint_points_scale": [8, 7, 6, 5, 4, 3, 2, 1],
@@ -21,6 +21,7 @@
  { "slug": "red-bull-ring", "file": "./r08-red-bull-ring.json" },
  { "slug": "silverstone", "file": "./r09-silverstone.json" },
  { "slug": "spa", "file": "./r10-spa.json" },
- { "slug": "hungaroring", "file": "./r11-hungaroring.json" }
+ { "slug": "hungaroring", "file": "./r11-hungaroring.json" },
+ { "slug": "zandvoort", "file": "./r12-zandvoort.json" }
  ]
 }
