@@ -1,168 +1,12 @@
 {
-  "version": "2026-08-22",
+  "version": "2026-08-24",
   "events": [
-    {
-      "series": "F1",
-      "kind": "Sprint",
-      "title": "Dutch Grand Prix",
-      "detail": "Zandvoort",
-      "start": "2026-08-22T06:00:00-04:00",
-      "end": "2026-08-22T07:00:00-04:00",
-      "platforms": [
-        "Apple TV"
-      ]
-    },
-    {
-      "series": "MXGP",
-      "kind": "Qualifying Race",
-      "title": "MXGP of The Netherlands",
-      "detail": "Arnhem (Round 16)",
-      "timeTBD": true,
-      "date": "2026-08-22",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "Supercars",
-      "kind": "Races 26 & 27",
-      "title": "Century Batteries Ipswich Super 440",
-      "detail": "Queensland Raceway (AEST race day \u2014 ET window TBD)",
-      "timeTBD": true,
-      "date": "2026-08-22",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "SailGP",
-      "kind": "Race Day 1",
-      "title": "ROCKWOOL Germany Sail Grand Prix",
-      "detail": "Sassnitz, R\u00fcgen (one trade source lists Aug 23\u201324; Sat\u2013Sun retained \u2014 same source misread the Spanish round)",
-      "timeTBD": true,
-      "date": "2026-08-22",
-      "platforms": [
-        "CBS Sports Network"
-      ]
-    },
-    {
-      "series": "F1",
-      "kind": "Qualifying",
-      "tier": "quali",
-      "title": "Dutch Grand Prix",
-      "detail": "Zandvoort",
-      "start": "2026-08-22T10:00:00-04:00",
-      "end": "2026-08-22T11:00:00-04:00",
-      "platforms": [
-        "Apple TV"
-      ]
-    },
-    {
-      "series": "IMSA",
-      "kind": "Qualifying",
-      "tier": "quali",
-      "title": "Michelin GT Challenge at VIR",
-      "detail": "VIRginia International Raceway",
-      "start": "2026-08-22T16:50:00-04:00",
-      "end": "2026-08-22T17:35:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "Supercars",
-      "kind": "Race 28",
-      "title": "Century Batteries Ipswich Super 440",
-      "detail": "Queensland Raceway \u2014 Sprint Cup finale (3:20 PM AEST)",
-      "start": "2026-08-23T01:20:00-04:00",
-      "end": "2026-08-23T03:00:00-04:00",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "F1",
-      "kind": "Race",
-      "title": "Dutch Grand Prix",
-      "detail": "Zandvoort",
-      "start": "2026-08-23T09:00:00-04:00",
-      "end": "2026-08-23T11:00:00-04:00",
-      "platforms": [
-        "Apple TV"
-      ]
-    },
-    {
-      "series": "SailGP",
-      "kind": "Race Day 2",
-      "title": "ROCKWOOL Germany Sail Grand Prix",
-      "detail": "Sassnitz, R\u00fcgen",
-      "timeTBD": true,
-      "date": "2026-08-23",
-      "platforms": [
-        "CBS Sports Network"
-      ]
-    },
-    {
-      "series": "MXGP",
-      "kind": "MXGP Race 2",
-      "title": "MXGP of The Netherlands",
-      "detail": "Arnhem (Round 16)",
-      "timeTBD": true,
-      "date": "2026-08-23",
-      "platforms": [
-        "Stream"
-      ]
-    },
-    {
-      "series": "IndyCar",
-      "kind": "Race",
-      "title": "Freedom 250",
-      "detail": "Streets of Washington, D.C.",
-      "start": "2026-08-23T11:30:00-04:00",
-      "end": "2026-08-23T14:00:00-04:00",
-      "platforms": [
-        "FOX"
-      ]
-    },
-    {
-      "series": "IMSA",
-      "kind": "Race",
-      "title": "Michelin GT Challenge at VIR",
-      "detail": "VIRginia International Raceway (2h40m)",
-      "start": "2026-08-23T12:10:00-04:00",
-      "end": "2026-08-23T14:50:00-04:00",
-      "platforms": [
-        "Unknown"
-      ]
-    },
-    {
-      "series": "NASCAR",
-      "kind": "Race",
-      "title": "Dollar Tree 301",
-      "detail": "New Hampshire Motor Speedway",
-      "start": "2026-08-23T15:00:00-04:00",
-      "end": "2026-08-23T18:30:00-04:00",
-      "platforms": [
-        "USA Network"
-      ]
-    },
-    {
-      "series": "NHRA",
-      "kind": "Final Eliminations",
-      "title": "Brainerd Nationals",
-      "detail": "Brainerd International Raceway (8:30 PM ET; broadcaster still unannounced on the FOX Sports NHRA schedule)",
-      "start": "2026-08-23T20:30:00-04:00",
-      "end": "2026-08-23T23:30:00-04:00",
-      "platforms": [
-        "Unknown"
-      ]
-    },
     {
       "series": "MotoGP",
       "kind": "FP1",
       "tier": "practice",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "detail": "MotorLand Arag\u00f3n (Round 13) \u2014 times CONFIRMED against motogp.com's published time schedule",
       "start": "2026-08-28T04:45:00-04:00",
       "end": "2026-08-28T05:30:00-04:00",
       "platforms": [
@@ -174,7 +18,7 @@
       "kind": "Practice",
       "tier": "practice",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "detail": "MotorLand Arag\u00f3n (Round 13)",
       "start": "2026-08-28T09:00:00-04:00",
       "end": "2026-08-28T10:00:00-04:00",
       "platforms": [
@@ -197,7 +41,7 @@
       "kind": "FP2",
       "tier": "practice",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "detail": "MotorLand Arag\u00f3n (Round 13)",
       "start": "2026-08-29T04:10:00-04:00",
       "end": "2026-08-29T04:40:00-04:00",
       "platforms": [
@@ -209,7 +53,7 @@
       "kind": "Qualifying",
       "tier": "quali",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "detail": "MotorLand Arag\u00f3n (Round 13)",
       "start": "2026-08-29T04:50:00-04:00",
       "end": "2026-08-29T05:30:00-04:00",
       "platforms": [
@@ -220,7 +64,7 @@
       "series": "MotoGP",
       "kind": "Sprint",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "detail": "MotorLand Arag\u00f3n (Round 13) \u2014 11 laps",
       "start": "2026-08-29T09:00:00-04:00",
       "end": "2026-08-29T09:45:00-04:00",
       "platforms": [
@@ -242,7 +86,7 @@
       "series": "IndyCar",
       "kind": "Race 1",
       "title": "Milwaukee Mile Race 1",
-      "detail": "Milwaukee Mile",
+      "detail": "Milwaukee Mile (Round 16)",
       "start": "2026-08-29T14:30:00-04:00",
       "end": "2026-08-29T17:00:00-04:00",
       "platforms": [
@@ -253,7 +97,7 @@
       "series": "NASCAR",
       "kind": "Race",
       "title": "Coke Zero Sugar 400",
-      "detail": "Daytona International Speedway \u2014 regular season finale",
+      "detail": "Daytona International Speedway \u2014 regular season finale, race 26 of 36 (160 laps)",
       "start": "2026-08-29T19:30:00-04:00",
       "end": "2026-08-29T23:00:00-04:00",
       "platforms": [
@@ -265,7 +109,7 @@
       "kind": "Warm Up",
       "tier": "practice",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "detail": "MotorLand Arag\u00f3n (Round 13)",
       "start": "2026-08-30T03:40:00-04:00",
       "end": "2026-08-30T03:50:00-04:00",
       "platforms": [
@@ -276,7 +120,7 @@
       "series": "Moto3",
       "kind": "Race",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n (provisional circuit timetable)",
+      "detail": "MotorLand Arag\u00f3n \u2014 17 laps",
       "start": "2026-08-30T05:00:00-04:00",
       "end": "2026-08-30T05:45:00-04:00",
       "platforms": [
@@ -287,9 +131,9 @@
       "series": "Moto2",
       "kind": "Race",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n (start time unverified this pass)",
-      "timeTBD": true,
-      "date": "2026-08-30",
+      "detail": "MotorLand Arag\u00f3n \u2014 19 laps; start time RESOLVED this pass (was TBD) from motogp.com's published time schedule",
+      "start": "2026-08-30T06:15:00-04:00",
+      "end": "2026-08-30T07:00:00-04:00",
       "platforms": [
         "Stream"
       ]
@@ -298,7 +142,7 @@
       "series": "MotoGP",
       "kind": "Race",
       "title": "Grand Prix of Arag\u00f3n",
-      "detail": "MotorLand Arag\u00f3n",
+      "detail": "MotorLand Arag\u00f3n \u2014 23 laps",
       "start": "2026-08-30T08:00:00-04:00",
       "end": "2026-08-30T08:50:00-04:00",
       "platforms": [
@@ -320,7 +164,7 @@
       "series": "IndyCar",
       "kind": "Race 2",
       "title": "Milwaukee Mile Race 2",
-      "detail": "Milwaukee Mile",
+      "detail": "Milwaukee Mile (Round 17)",
       "start": "2026-08-30T13:00:00-04:00",
       "end": "2026-08-30T15:30:00-04:00",
       "platforms": [
@@ -446,7 +290,7 @@
       "series": "MXGP",
       "kind": "Qualifying Race",
       "title": "MXGP of T\u00fcrkiye",
-      "detail": "Afyonkarahisar (Round 17)",
+      "detail": "Afyonkarahisar (Round 17) \u2014 round order CONFIRMED against mxgp.com's own calendar this pass (Flanders is R14 and already past; there is no R17 on Aug 29\u201330)",
       "timeTBD": true,
       "date": "2026-09-05",
       "platforms": [
@@ -831,7 +675,7 @@
       "series": "Moto2",
       "kind": "Race",
       "title": "San Marino Grand Prix",
-      "detail": "Misano World Circuit Marco Simoncelli (start time unverified this pass)",
+      "detail": "Misano World Circuit Marco Simoncelli (start time unverified this pass \u2014 Misano timetable not yet published)",
       "timeTBD": true,
       "date": "2026-09-13",
       "platforms": [
@@ -990,7 +834,7 @@
       "series": "NASCAR",
       "kind": "Race",
       "title": "Bass Pro Shops Night Race",
-      "detail": "Bristol Motor Speedway \u2014 Chase race 3 of 10",
+      "detail": "Bristol Motor Speedway \u2014 Chase race 3 of 10; 7:30 PM ET on USA CONFIRMED on the speedway's own release",
       "start": "2026-09-19T19:30:00-04:00",
       "end": "2026-09-19T23:00:00-04:00",
       "platforms": [
@@ -1013,7 +857,7 @@
       "series": "Moto3",
       "kind": "Race",
       "title": "Austrian Grand Prix",
-      "detail": "Red Bull Ring, Spielberg (start time unverified this pass)",
+      "detail": "Red Bull Ring, Spielberg (start time unverified this pass \u2014 timetable not yet published)",
       "timeTBD": true,
       "date": "2026-09-20",
       "platforms": [
@@ -1024,7 +868,7 @@
       "series": "Moto2",
       "kind": "Race",
       "title": "Austrian Grand Prix",
-      "detail": "Red Bull Ring, Spielberg (start time unverified this pass)",
+      "detail": "Red Bull Ring, Spielberg (start time unverified this pass \u2014 timetable not yet published)",
       "timeTBD": true,
       "date": "2026-09-20",
       "platforms": [
@@ -1068,7 +912,7 @@
       "series": "MXGP",
       "kind": "MXGP Race 2",
       "title": "MXGP of Australia",
-      "detail": "Hidden Valley Motorsports Complex, Darwin \u2014 season finale",
+      "detail": "Hidden Valley Motorsports Complex, Darwin \u2014 season finale (Round 19 of 19)",
       "timeTBD": true,
       "date": "2026-09-20",
       "platforms": [
@@ -1273,7 +1117,7 @@
       "series": "NASCAR",
       "kind": "Race",
       "title": "Hollywood Casino 400",
-      "detail": "Kansas Speedway \u2014 Chase race 4 of 10 (broadcaster not verified this pass)",
+      "detail": "Kansas Speedway \u2014 Chase race 4 of 10; 2:00 PM CDT CONFIRMED on the speedway's own event page. Broadcaster still unconfirmed \u2014 one undated secondary schedule lists USA, not verified against a NASCAR or network source this pass",
       "start": "2026-09-27T15:00:00-04:00",
       "end": "2026-09-27T18:30:00-04:00",
       "platforms": [
