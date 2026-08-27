@@ -2,7 +2,7 @@
 
 **Purpose:** Strip AI-generated writing patterns ("slop") from any body of text, making it read like a human wrote it. Sentence-level detection + multi-scale rewrite pipeline.
 
-**Steward:** TBD. The original candidate was a dedicated Writing Agent that was never built. ⭐ **Now-live candidate as of 2026-08-27: Documentation Dave** — he is "house style as a person," already owns the no-emoji line and the ship-time stamp, and a prose-quality lane sits squarely in his role. This is a lead, NOT a ruling: assigning a steward is a stance shift and needs Michael's yes. Route the decision through `/felix`. The `de-slop-pass` build did NOT resolve this (that hook is deliberately ownerless), and neither does this research fold-in.
+**Steward: Documentation Dave** (ruled 2026-08-27 by Michael, routed through Felix; resolves the question open since 2026-08-02). He is "house style as a person," already owns the no-emoji line and the ship-time stamp, so a prose-quality lane sits squarely in his role — it is a lane he already has, not a new hat. This hook is an instrument he runs at ship, and its Score-Only Report feeds his stamp. ⚠️ **Two seams the ruling does NOT touch:** `de-slop-pass` stays deliberately ownerless (different axis — see below), and the Polly seam is unchanged (Polly argues what the standard should be on a draft; Dave records what it became and enforces it next time).
 
 **Mode:** On-demand, callable. Not always-on. Fires only when invoked or when an agent's output pipeline routes through it.
 
@@ -253,8 +253,8 @@ Each pattern entry carries: name · detection heuristic · severity (always-fix 
 ## Integration points
 
 - **Document Destroyer:** score text pre-ship (if the workflow routes through humanize-prose, the report gates delivery)
-- **Documentation Dave:** now-live stewardship candidate (see the Steward line). If Michael rules him in, this hook becomes an instrument Dave runs at ship, and its report feeds his stamp. Not yet ruled — do not self-authorize.
-- **`hooks/de-slop-pass.md`:** the always-on reflex on Brain's own prose. **Registered in the AI Toolkit trigger table 2026-08-14.** Different axis, not a lighter mode of this. See the seam note under Coordinates.
+- **Documentation Dave (STEWARD):** he runs this hook at ship and its Score-Only Report feeds his stamp. He owns the hook's evolution — pattern-library updates, verdict tiers, the open "learn Michael's reverts" question. He does NOT rewrite meaning (his standing shape-not-substance rule holds here too).
+- **`hooks/de-slop-pass.md`:** the always-on reflex on Brain's own prose. **Registered in the AI Toolkit trigger table 2026-08-14.** Different axis, not a lighter mode of this, and OWNERLESS by design — Dave's stewardship here does not extend to it. See the seam note under Coordinates.
 - **Any agent's output buffer:** can be wired as a post-processing step before delivery
 
 ---
@@ -262,14 +262,14 @@ Each pattern entry carries: name · detection heuristic · severity (always-fix 
 ## Open design questions
 
 1. Voice profiles: user-defined writing style (sentence length, vocabulary, formality) so the hook targets THAT instead of generic "human"? — partly addressed 2026-08-27 by the writing-sample-overrides rule; a stored per-user profile is still open.
-2. Learning from manual edits: "Michael always changes X back to Y, stop suggesting X"?
-3. Stewardship: dedicated agent or fold into an existing lane? ⭐ **Documentation Dave is now the leading candidate** (he did not exist as a built teammate when this question opened). Still needs Michael's yes; route through Felix. **Open, but no longer ownerless-by-default.**
+2. Learning from manual edits: "Michael always changes X back to Y, stop suggesting X"? — now Dave's to carry as steward; a candidate for his house-style ledger.
+3. ~~Stewardship: dedicated agent or fold into an existing lane?~~ **RESOLVED 2026-08-27: Documentation Dave, ruled by Michael, routed through Felix.** He did not exist as a built teammate when this question opened 2026-08-02.
 
 ---
 
 ## Composes with
 
-`hooks/de-slop-pass.md` (the always-on reflex, different axis) · Document Destroyer workflow (pre-ship gate) · `hooks/source-size-budget-enforcer.md` (long rewrites that bloat) · `code-review-standard.md` (severity format reused in the report) · Documentation Dave's ship-time stamp (if ruled steward).
+`hooks/de-slop-pass.md` (the always-on reflex, different axis) · Document Destroyer workflow (pre-ship gate) · `hooks/source-size-budget-enforcer.md` (long rewrites that bloat) · `code-review-standard.md` (severity format reused in the report) · Documentation Dave's ship-time stamp (steward).
 
 ## Guardrails
 
@@ -279,6 +279,7 @@ Report before rewrite, always. Never rewrite without a confirmed report. Never t
 
 ## Changelog
 
+- **2026-08-27 (steward)** - Documentation Dave ruled steward by Michael, routed through Felix. Resolves the stewardship question open since 2026-08-02. de-slop-pass stays ownerless (different axis); Polly seam unchanged.
 - **2026-08-27** - Research fold-in against [blader/humanizer](https://github.com/blader/humanizer) and [conorbronsdon/avoid-ai-writing](https://github.com/conorbronsdon/avoid-ai-writing). Added the Wikipedia "Signs of AI writing" taxonomy as the pattern spine; the Tier 1A/1B evidence-vs-clarity split; the "Signals, not proof" false-positive section; ~14 new catch categories (inflated legacy, name-dropping, shallow -ing, sales language, vague sources, formulaic outlook, the full "not X but Y" family, false ranges, chatbot artifacts, cutoff disclaimers, agreeable openers, generic endings, deeper-truth, next-point announcing); the writing-sample-override and never-invent-a-fact rules; and flag-don't-fix exemptions for quotes/code/tables. Named Documentation Dave as the now-live stewardship candidate (not ruled).
 - **2026-08-14** - Resolved three dead references to `hooks/de-slop-pass`, which did not exist for the first twelve days this file cited it as existing. Reframed the seam as an AXIS (reader-knows-it vs reads-like-AI) rather than heavy/light modes. Restated that stewardship is still TBD and that the Writing Agent is not authorized by the de-slop build.
 - **v2 (2026-08-02)** - Restructured into canonical hook format (Dex standard). Added: Score-Only Report template as the default output and cold-agent handoff artifact. Added: confirm-before-edit gate. Added: three-scale premise (words/music/architecture). Stewardship TBD, routed to Felix. Writing Agent concept documented as future integration.
