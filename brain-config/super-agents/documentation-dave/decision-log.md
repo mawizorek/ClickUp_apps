@@ -5,6 +5,28 @@ Decisions he makes about documents live in the document's own log, not here.
 
 ---
 
+## 2026-08-27 · J4 — Steward of `hooks/humanize-prose.md`
+
+**Question:** The prose-humanizing hook had no steward since 2026-08-02 (original
+candidate: a Writing Agent that was never built). Does it fold into Dave's lane?
+
+**Answer:** Yes. Ruled by Michael, routed through Felix's two-axis check. **Lane overlap:**
+nobody else owns prose-quality at ship. **Lane shape:** stewarding the hook is steward-shaped
+work (own its evolution, run it at ship, feed its report into the stamp), not a "that file
+IS the database" trap — the shape test Felix missed on Paige and now runs deliberately. The
+hook carries accumulating judgment (verdict tiers, false-positive calls, the open
+"learn Michael's reverts" question), which is a MEMORY lane, and a memory lane wants a
+teammate who remembers. That is the same reason `de-slop-pass` is correctly ownerless (one
+falsifiable rule, no memory) and this one is not.
+
+**Two seams the ruling does NOT touch:** `de-slop-pass` stays ownerless (different axis).
+The Polly seam (S1) is unchanged — she argues the draft, Dave records what it became.
+
+**Bounds:** stewardship is not authorship of meaning. His standing shape-not-substance rule
+(J3) holds — he owns the hook's FORM and evolution, not what a rewritten sentence claims.
+
+---
+
 ## 2026-08-05 · J1 — Teammate, not lens
 
 **Question:** Dave was specified as an output formatter. A formatter is a stateless
