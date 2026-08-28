@@ -51,7 +51,7 @@ Production short codes are fixed vocabulary — see `hooks/trip-triage.md`.
 
 | Field | Type | Note |
 | --- | --- | --- |
-| `Unit ID` | short text | `BL-U01`. **Immutable, never renumbered, never reused.** Separate from the task name so a rename cannot break it. |
+| `Unit ID` | short text | `BL-01`. **Immutable, never renumbered, never reused.** Separate from the task name so a rename cannot break it. |
 | `Page Number` | number | Start page only. The next unit's start implies this one's end. |
 | `On Stage` | labels | One option per CHARACTER, from the CAST SHEET not the script's cast list. |
 | status | native | `active` / `cut`. No custom set for a lookup table. |
@@ -94,7 +94,7 @@ Task name = the human label (`the tomato monologue`). `Unit ID` is the handle.
 - ⚠️ **Accept the size spread.** Strict produces 2-line units and 15-page units in the same list. That is correct. **The spine does not show you where the work is; the demands do.**
 - 🚫 **No minimum unit size.** Folding a 2-line unit means deciding by feel where a unit is "big enough" — exactly the judgement strict exists to remove. A minimum is a RULE CHANGE and gets logged as one.
 
-**Create `<CODE>-U00 · PRODUCTION` first**, page 0, no characters. Production-wide demands hang there; an empty relationship reads as an error, a deliberate row reads as a decision.
+**Create `<CODE>-00 · PRODUCTION` first**, page 0, no characters. Production-wide demands hang there; an empty relationship reads as an error, a deliberate row reads as a decision.
 
 **Each unit body carries three things:** boundary IN · what happens · boundary OUT. A unit whose boundary out is unknown (the part file ended) says so explicitly and gets closed on the next pass.
 
@@ -157,4 +157,5 @@ Two more views, free once the data exists: **By Department** (group by `Producti
 
 ## Changelog
 
+- **v1.1 (2026-08-28)** — `Unit ID` format swept from `BL-U##` to `BL-##` (Michael's ruling; live Big Love list reformatted `BL-00`–`BL-29` the same day, and the `S## ·` director-scene prefix was stripped from beat task names). ⚠️ **A FORMAT change is not a RENUMBER — unit 01 is still unit 01.** The immutability rule above governs the NUMBER and its binding to a unit, not how it is rendered; re-rendering every ID at once is safe, reassigning one is not. 🪦 Struck the `<CODE>-U00` production pseudo-unit token in Procedure §1 in favour of `<CODE>-00`. Sibling layers added to Big Love the same day and NOT yet generalized into this hook: a `Scenes (<CODE>)` list carrying the DIRECTOR's scene numbering (coarser than the spine — 17 scenes over 29 beats, every scene boundary landing on an existing beat boundary) and a `Characters (<CODE>)` list joined by a `Characters Needed` relationship, which supersedes the `On Stage` labels field. **Promote those to this hook only after a second production proves them.**
 - **v1 (2026-08-11)** — Established by Mainstage Milo, ClickUp Coach Corey and Maestro Mira's Workshop (7 lenses + Domain Dara + Style Stu), after a full end-to-end run on Big Love (F26): 30 spine units across 99 pages. Strict entrances/exits locked by Michael; the stage-picture variant considered and rejected.
