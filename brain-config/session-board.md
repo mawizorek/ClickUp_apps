@@ -19,6 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
+| Dev Dexter | Embedding a ClickUp TABLE VIEW in a doc-renderer page · Aug 28-29 | `spec/view-embed-usecase` (doc-render-engine) · `board/dexter-view-embed-usecase` (ClickUp_apps) | Appending §10 to the BUILD 7 spec: the real use case is a PUBLIC index of completion forms replacing a hand-maintained TSV. **Read the live Programs (canonical) list and found four defects in six rows plus two URL shapes for one site — recording them, not fixing them.** Row re-posted after being cleared at 00:15; same session lineage. | **doc-render-engine**: `specs/view-embed.md` (§10 append only, 13,708 B → ~18–19 KB). 🚫 Not touching `docrender/*`, `mkdocs.yml`, or `next-build-spec.md` (32,840 B, over write cap — still OWED). 🚫 **No writes to `uritp-safety` or the ClickUp list** — the four data defects are Michael's to rule on; a program-ID collision is a compliance fact, not a typo I get to fix. |
 
 ---
 
