@@ -19,7 +19,6 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Dev Dexter | Embedding a ClickUp TABLE VIEW in a doc-renderer page · Aug 28 | `spec/view-embed` (doc-render-engine) · `board/dexter-view-embed` (ClickUp_apps) | Scoping BUILD 7 — a `views:` registry folded into `docrender/forms.py`, so a page NAMES a shared ClickUp view and the engine builds the iframe. **SPEC ONLY, no engine code this pass** — the allow-list host cannot be derived from this chair and is ruling 1. ⚠️ Prior row (Aug 22, `board/dexter-cap-recheck`) MOVED in place per rule 5, same agent, same lineage: it was EXPIRED under rule 8 (no commit to any claimed path since Aug 22) and its write-cap finding is Michael's ruling to make, not a blocker here. | **doc-render-engine**: `specs/view-embed.md` (NEW) · `next-build-spec.md` (index row 7 + delete the stale hand-kept count, per that file's own instruction). **ClickUp_apps**: this file. 🅿️ **`VERSIONS.md` still OWED from the Aug 22 row** — deliberately not a ride-along, and doc-render-engine is not in that ledger anyway. 🚫 Not touching `docrender/*` or `mkdocs.yml` (28,158 B at HEAD, past ceiling) — no hook registration, which is half the reason for the fold. |
 
 ---
 
