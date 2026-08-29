@@ -19,6 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
+| Dev Dexter | Embed ANY ClickUp view in a doc-renderer page · Aug 29 | `spec/view-embed-tool` (doc-render-engine) · `board/dexter-view-embed-tool` (ClickUp_apps) | **Michael corrected the scope: build the TOOL, he decides what gets rendered.** Rewriting `specs/view-embed.md` — generalized to any view type, host moved to a declared instance key so nothing blocks on a pasted string, surface-choice ruling REMOVED, the program-index argument demoted to a recorded note. Same session lineage; row re-posted. | **doc-render-engine**: `specs/view-embed.md` (rewrite in place, 21,357 B → target under 22KB). 🚫 Not touching `docrender/*`, `mkdocs.yml`, `instance.py` (23,047 B, past ceiling), or `next-build-spec.md` (32,840 B, over write cap — still OWED). 🚫 No writes to `uritp-safety` or any ClickUp list. |
 
 ---
 
