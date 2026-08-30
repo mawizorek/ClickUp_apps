@@ -19,7 +19,6 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Dev Dexter | Embed ANY ClickUp view in a doc-renderer page · Aug 30 | `feature/view-collapsed` (doc-render-engine) · `board/dexter-view-collapsed` (ClickUp_apps) | Adding **`collapsed:`** to the `views:` registry — the same script-free `<details>` + fragment mechanism `forms.py` already proves. ⚠️ Taking the file-size instruction I wrote into the spec myself: history moves to a **`views-dl.md`** sidecar (the pattern Michael set with `forms-dl.md`) so the module SHRINKS while gaining a feature. 🔴 The summary label comes ONLY from the author's `text:` — no engine-authored default, which is the caption lesson applied one day later. Same session lineage; row re-posted. | **doc-render-engine**: `docrender/views-dl.md` (NEW) · `docrender/views.py` (slim + `collapsed:`) · `assets/flow.css` (selector list extension only, NO new block — it is 23,188 B, past ceiling) · `specs/view-embed.md`. 🚫 NOT touching `forms.py` — **Michael is actively editing it** (22,059 B at HEAD, up from 18,934, plus he cut `forms-dl.md`). 🚫 NOT `assets.py` (32,684 B) or `mkdocs.yml` (28,158 B), both past the write cap. |
 
 ---
 
