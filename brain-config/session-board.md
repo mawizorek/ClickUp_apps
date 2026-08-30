@@ -19,6 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
+| Dev Dexter | Embed ANY ClickUp view in a doc-renderer page · Aug 30 | `fix/view-print-hide` (doc-render-engine) · `board/dexter-view-print` (ClickUp_apps) | Michael: the embedded view prints as a sloppy rendered frame; hide it like the forms. 🔴 **CAUSE CONFIRMED AT SOURCE, not guessed:** `print-flow.css` sets `.md-typeset details > *:not(summary) { display: revert !important }`, and his view is `collapsed: true`, so the frame is a DIRECT CHILD of the `<details>` — importance beats specificity, so `flow.css`'s plain `.dr-view iframe { display: none }` LOSES. **Identical to the forms regression fixed hours earlier in the same feature; second instance of one defect.** Fix: inline `@media print` block emitted once per page from `views.py`, every `display` `!important`, on forms.py's own precedent. ⚠️ WeasyPrint cannot reproduce this (it discards `revert` as invalid) — verify in Chrome print preview. | **doc-render-engine**: `docrender/views.py` (13,699 B, has room) · `docrender/views-dl.md`. 🚫 NOT `assets/flow.css` — 23,163 B, past the read ceiling, which is the whole reason these rules go inline; its now-superseded plain `.dr-view iframe` rule is left as recorded debt for the split. 🚫 NOT `forms.py` (Michael edits it) · NOT `assets.py`/`mkdocs.yml`/`qr.py` (all past the write cap). 🚫 No `uritp-safety` write — his page fixes itself on merge. |
 
 ---
 
