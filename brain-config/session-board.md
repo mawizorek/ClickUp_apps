@@ -19,6 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
+| Dev Dexter | Embed ANY ClickUp view in a doc-renderer page · Aug 30 | `feature/view-embed` (doc-render-engine) · `board/dexter-views-build` (ClickUp_apps) | **BUILDING BUILD 7.** Michael supplied a real embed code, which settled all three unknowns: host is `sharing.clickup.com`, ClickUp emits NO `clickup-dynamic-height` for a view (so a declared height, never the CDN helper), and the view is LIST-scoped with a working public share — which kills the Everything-level claim outright. ⚠️ **DEVIATION FROM THE SPEC, driven by measurement:** `forms.py` is **17,360 B** at HEAD, not the 11,740 the spec forecast (Michael's PR #197 added the dead-marker work yesterday). Folding views in would land ~21KB, past the warn line. So `views.py` is its own module and `forms.py` DELEGATES to it — still ONE hook, so `mkdocs.yml` (28,158 B, unreadable-whole) stays shut. | **doc-render-engine**: `docrender/views.py` (NEW) · `docrender/forms.py` (two surgical edits: `_dead` takes a label, hook delegates) · `specs/view-embed.md`. 🚫 NOT touching `mkdocs.yml` or `instance.py` — both past ceiling, and the design exists to avoid them. 🚫 No `instances/*` write — which SITE gets `view_hosts:` is Michael's call and the engine refuses-and-reports until he says. 🅿️ `next-build-spec.md` row 7 still OWED (32,840 B, over write cap). Collision evidence: `list_commits --path docrender/forms.py --since 2026-08-29` → one commit, PR #197, merged. |
 
 ---
 
