@@ -19,7 +19,6 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Dev Dexter | Embed ANY ClickUp view in a doc-renderer page · Aug 30 | `fix/view-host-default` (doc-render-engine) · `board/dexter-views-default-host` (ClickUp_apps) | **Michael pushed back on per-site config and he is right.** `sharing.clickup.com` is a ClickUp-wide fact, not a site fact — requiring `view_hosts:` in all six `instances/*/site.yml` made a new site fail silently. Making it an engine DEFAULT (same shape as `_FORM_HOST`), with `view_hosts:` demoted to an optional ADDITIVE extension. Zero config, works anywhere. Same session lineage; row re-posted after the BUILD 7 clear. | **doc-render-engine**: `docrender/views.py` (the `_hosts()` resolver + docstring) · `specs/view-embed.md`. 🚫 NOT touching `instances/*` — the whole point is that no site file needs an edit. 🚫 NOT `assets.py` (32,684 B) or `mkdocs.yml` (28,158 B), both past the write cap. 🅿️ Two debts still open from PR #198: `flow.css` at 23,485 B past the read ceiling, and `next-build-spec.md` row 7. |
 
 ---
 
