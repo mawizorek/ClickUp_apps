@@ -19,6 +19,7 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
+| Dev Dexter | Embed ANY ClickUp view in a doc-renderer page · Aug 30 | `content/rehearsal-view-embed` (uritp-safety) · `board/dexter-safety-view` (ClickUp_apps) | **ONE content edit**, at Michael's instruction: finish the view embed on the rehearsal report page. He already wrote the `views:` block himself; this drops the dead `caption:` key, adds `collapsed: true`, and removes a `!!! form "recent-notes"` directive naming a slot that does not exist. 🔴 **HE IS ACTIVELY IN THIS FILE** — ten commits today, last at 11:43 ET, 35 min before this row. Read HEAD at `3585432` and building on his version; a 409 on the write is the guard working and means re-read, never force. | **uritp-safety**: `40-forms/rehearsal-report.md` — ONE file, ONE commit. 🚫 NOT touching the two `!!! qr` directives (one under the Notes heading points at the REPORT form and carries `align=center align=right`) — flagged to Michael, his content, his call. 🚫 No engine change: PR #206 already shipped `collapsed:`. **ClickUp_apps**: this file. |
 
 ---
 
