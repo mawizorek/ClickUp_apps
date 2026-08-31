@@ -30,6 +30,14 @@ What you MAY add (this is form and connection, not content):
 
 What you MUST NOT add: new sentences, paraphrase, summaries in the body, "Related" footers the author never wrote, emoji, normalized pronouns, dropped author asides, cleaned-up typos (unless told). **A transcription that silently improves the source is not a transcription.** The reader must be able to hold the rendered page next to the original and find only: page splits, frontmatter, grounded markers, and links around existing references.
 
+### 🔴 THE SLOP LEAKS THROUGH THE FRONTMATTER — GUARD THE TWO SLOTS THAT AREN'T THE SOURCE
+
+Michael, 2026-08-31, on catching an invented lede in the SECOND sentence he read: *"there is already content that i KNOW is not from the original handbook. DO NOT EMBELLISH. and if you HAVE to put a summary in - keep it much much much tighter."* The verbatim law is easy to hold in the body and easy to VIOLATE in the two places the source doesn't supply words:
+
+- **`summary:` is not a place to write.** The engine requires one for search, so it is the one unavoidable authored string. Keep it a **bare factual tag** — a few words naming what the section is (`"The audition and casting process."`, `"The three cardinal rules."`). NOT a flavor sentence, NOT "why it matters," NOT "who needs it." If it reads like marketing or like a lede, it is too long. When in doubt, restate the title.
+- **Index pages carry LINKS, not prose.** A chapter/section `index.md` gets its child links (and the migration checklist on the handbook root) and nothing else. 🚩 **Do NOT write a descriptive body paragraph under the H1** — that paragraph is pure invention, it is not in the source, and on an index page it renders right under the `summary:` as a second authored blurb (the exact double-slop Michael caught: a flowery `summary` lede AND a body paragraph, neither Nigel's). `contents: auto` already lists children; the explicit link list is connection, a paragraph about them is content.
+- The rule generalizes: **any string the source did not supply is suspect.** Frontmatter tags, index links, and grounded markers are the ONLY authored text allowed. Everything a reader sees as prose must be traceable to the original.
+
 ---
 
 ## Phases
@@ -67,6 +75,7 @@ What you MUST NOT add: new sentences, paraphrase, summaries in the body, "Relate
 ## Guardrails
 
 - 🔴 **Content is frozen; only form/connection/structure move.** The one law above.
+- 🔴 **Summaries are bare tags; index pages are links, not prose.** The two frontmatter/index slots are where invented content sneaks in — keep `summary:` to a few factual words and never write a descriptive body paragraph on an index page. (See the frontmatter-slop section above.)
 - 🔴 **Broken forward links are an INTENTIONAL FLAG, not a bug** (Michael, 2026-08-31: *"that is literally the point of the broken link."*). Wiring `@id` links to not-yet-built pages minimizes later work and marks the gap visibly. Do NOT hold off linking known-planned pages.
 - **Markers are opt-in from the SOURCE.** A `!!! tip` is legal only where the author wrote "Tip!". Never sprinkle callouts for flavor.
 - **Preserve verbatim quirks** — typos, stray parens, ALL-CAPS headings, author pronouns, "(video)"/"(article)" tags. Ask before cleaning anything. Default is leave it.
@@ -80,6 +89,7 @@ What you MUST NOT add: new sentences, paraphrase, summaries in the body, "Relate
 
 - `gates/repo-referent-gate.md` — which repo, decided by audience.
 - `hooks/devising-transcript-archive.md` — sibling verbatim-import routine (audio → text); same "archive raw, never editorialize" DNA, different input/output.
+- `hooks/de-slop-pass.md` — the general anti-embellishment sweep; this hook's frontmatter-slop rule is its doc-import-specific application.
 - `GitHub MCP — Operating Standard` — PR-Merge, commit format, blob-first reads.
 - doc-render-engine authoring contract (`uritp-docs/00-authoring/`, `template-docs/_template.md`) — frontmatter, `@id`, `@img:`, folder-naming.
 
@@ -87,4 +97,5 @@ What you MUST NOT add: new sentences, paraphrase, summaries in the body, "Relate
 
 ## Changelog
 
+- **v2 (2026-08-31)** — Added the frontmatter-slop rule after Michael caught an invented lede + descriptive index body on the Intro page ("already content that i KNOW is not from the original handbook"). `summary:` = bare factual tag only; index pages carry links, never a descriptive paragraph; any string the source didn't supply is suspect. Added a Guardrail line + `de-slop-pass.md` to Composes-with.
 - **v1 (2026-08-31)** — Established by Milo during the URITP Stage Manager's Handbook migration. Captures the one law (form/connection/structure yes, content no), the TOC-as-checklist scaffold, page-per-line/folder-per-chapter, pilot-one-chapter-first, forward-links-are-an-intentional-flag, markers-only-where-signaled, verbatim-quirks-preserved, credentials-ask, and drift-flag-not-fix. Named the reusable pattern so future paperwork migrations (the Emergency Handbook next) route here without Michael re-explaining.
