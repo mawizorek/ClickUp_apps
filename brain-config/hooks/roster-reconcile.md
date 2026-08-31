@@ -37,6 +37,7 @@
 | **The join (junction table)** | Enrollments list · `901327636843` (URITP Courses ▸ ROSTERS) |
 | **The class-this-term (what is OFFERED F26)** | COURSE x SEMESTER list · `901328228189` (URITP Courses ▸ SCHEMA) — rows shaped `{THTR###}{TERM}` |
 | **The course catalog (titles + codes + active/cancelled)** | Course List · `901305646914` (URITP Courses ▸ SCHEMA) — resolves a code to a title and confirms it runs |
+| **The source email chains** | URITP ▸ INBOX ▸ Default — permanent one-task-per-chain replica; chains are LINKED, never moved |
 | **Batch import session home** | Report Imports (Workday, NM, KT, etc) · `901324196217` (URITP ▸ FMP Tables) |
 | **Report FORMAT (all three reports)** | `hooks/roster-reconcile.report-spec.md` — load before reporting |
 | **Upstream prep** | `hooks/roster-reconcile-prep.md` (Milo sweeps the messy inbox into a clean candidate report) |
@@ -65,6 +66,7 @@ This is a **foreign-key sync a database would do with a trigger.** STUDENTS is t
   - **A how-does-this-work INQUIRY whose title is indistinguishable from a real permission request** — no Workday override filed, so the student is invisible on every roster surface and a title-only pass files them as pending approval.
   - **A thread whose COURSE was only knowable from the subject matter in the body** (the student wrote entirely about lighting and never named a code).
   - **A signed time-conflict resolution form naming TWO courses**, where the student already holds one of them — the form exists to ADD the other. A title-only read proposes a duplicate row for the course they are already in.
+- 🔴 **A TITLE FILTER IS NOT A SCOPE.** Selecting candidate chains by a course string in the subject silently drops every chain that never names the course — which was **a third of them** on the first run, and included the highest-stakes items. This failed TWICE in one session (once picking candidates, once picking which chains to stamp). Scope by the CANDIDATE SET you built in step 2, never by a name match.
 - **When in doubt, open MORE, not less.** The cost of an extra read is nothing; the cost of a title-only guess is a wrong write.
 
 ### 1. Intake + normalize
@@ -134,20 +136,40 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 
 **Graduated trust:** greenlight EVERY run for now. Once matching proves reliable on real batches, it earns silent writes on the unambiguous buckets (NEW / MATCH / UPDATE / CROSS-SEM) and only surfaces WITHDRAWN? and CONFLICT. Start at the gate; earn the autonomy (gcal-reconcile / INBOX-triage precedent).
 
+### 3.5. 🔗 LINK OUTWARD — a REQUIRED WRITE, not a sentence in the description
+
+**Every Enrollment row gets a real task relationship to the email chain(s) that produced it.** A provenance line in the description is a citation, not a join: it is unsearchable, unwalkable, and invisible from the other end.
+
+- **One relationship per source chain, MANY-TO-ONE where a student has several.** A single enrollment commonly has two or three chains behind it (the Workday notification, the student's own email, a follow-up). Attach them all to the one row — that IS the consolidation, and it works precisely because it keys on the join rather than on a subject-line filter.
+- **Prose provenance stays** (source + confidence tier + which session), but it is the human note. **The link is the mechanism.**
+- **The linked COURSE x SEMESTER row becomes the passive collation point** — one place showing the whole class, its people, and every conversation behind it, permanently, with no filter to maintain. That is the answer to *"can these related emails collate on their own"*: no automation exists, and none is needed once the join is real.
+- 🔴 **This step is what makes closing the intake chains safe** (below). Close before linking and you file the trail away with nothing pointing at it.
+
+> 🩹 Born of the first live run: 8 enrollment rows shipped citing their chains in **prose only**. The join was one-directional and text-based — you could not walk from a course to its emails, nor from a row back to the email that made it. Michael caught it by asking whether the related emails collate passively. **A join that only a human can follow is not a join.**
+
+### 3.6. Closing the source chains (Michael's ruling, 2026-08-31)
+
+**CLOSE IF LINKED.** Once a chain's outward link exists and its work is tracked elsewhere, flip it to the intake list's dormant status and stamp it processed. Dormant is not deleted: a chain reopens the moment a reply lands, and chain-canonical only bars **moving** a chain out of the list, never closing it.
+
+- 🔴 **The link is the precondition, not the triage stamp.** A stamped-but-unlinked chain is not closable — the stamp says a pass happened, the link says the work has a home.
+- **No link generated → stays open.** A `drop` signal or an unresolved item has no enrollment row, so nothing links, so it stays visible.
+- ⚠️ **STATE THE CONSEQUENCE when you close a batch:** the queue MOVES. Approvals that were legible as unread email are now legible only as `GRADING Status` on the roster. Say so in the receipt, or the human loses a queue without being told.
+- Michael's words when he overruled a proposal to hold them open: *"not enough reason to hold them open. close the emails if the link has been generated."*
+
 ### 4. Report — load the report spec
 
 🔴 **`hooks/roster-reconcile.report-spec.md` carries all three report forms. Load it before reporting; never invent report structure and never restate the format here.** One claimant, so the format cannot drift.
 
-- **Report 2 — write receipt:** counts block + a table of every row written, with GRADING values explained in this workspace's terms, and an explicit statement of what you did NOT write.
+- **Report 2 — write receipt:** counts block + a table of every row written, with GRADING values explained in this workspace's terms, and an explicit statement of what you did NOT write. **Count the links and the closes too** — they are writes.
 - **Report 3 — per-course before/after (⭐ Michael asked for this one by name):** for EVERY course the pass touched — previously enrolled count, added (linked enrollment rows), currently enrolled count — then a totals line and a one-or-two-line reading. **Recount from the live rows; never `previous + added` arithmetic**, which hides a row that failed to write. Untouched courses never appear.
 
 ### 5. Document (three surfaces, and the path depends on batch size)
 
-**Person stays CLEAN.** The permanent human record gets no per-run stamp; its history is reconstructable by walking its Enrollment rows back to their sessions.
+**Person stays CLEAN.** The permanent human record gets no per-run stamp; its history is reconstructable by walking its Enrollment rows back to their sessions — and, since 3.5, back to the actual emails.
 
 | Surface | What lands |
 | --- | --- |
-| **Enrollment row** | provenance stamp: source + confidence tier + which session/thread made it |
+| **Enrollment row** | provenance stamp (source + confidence tier + session) **AND the outward links** |
 | **Import Session** (batch only) | attached raw source + the greenlighted plan + conflict log + write receipt |
 | **Person** | nothing per-run — clean |
 
@@ -163,8 +185,10 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 ## Guardrails
 
 - 🔒 **NEVER put a student in this file.** No name, email, URID, Student ID, major or schedule — not in a step, an example, or a changelog. De-identify by SHAPE and point at the INBOX chain. `ClickUp_apps` is PUBLIC and history outlives a scrub. Full rule + the failure that produced it: the PII RULE section at the top.
-- 🔴 **OPEN THE SOURCE IN FULL — never classify off a title.** When in doubt, open more, not less. The body carries the email, pronouns, URID, referral, legal-vs-preferred name, request-vs-inquiry status, and the course. A title-only pass writes the wrong bucket.
-- 🔴 **Resolve the course against the LIVE catalog** (COURSE x SEMESTER offered-this-term + Course List titles). Explicit code → infer-with-reason → flag-and-ask. Never guess a student into a real class. **This file names no course numbers** — a hardcoded catalog line was struck after it transposed two courses on the first run.
+- 🔴 **OPEN THE SOURCE IN FULL — never classify off a title,** and **never scope a batch by a title filter.** Scope by the candidate set. A title filter dropped a third of the chains, twice, in one session.
+- 🔗 **LINK OUTWARD is a required write.** Prose provenance is not a join. Every enrollment row links every chain that produced it; the course row is the collation point that makes it worth doing.
+- 🔴 **Close only if linked.** No link generated → the chain stays open. And when a batch closes, STATE that the queue moved.
+- 🔴 **Resolve the course against the LIVE catalog** (COURSE x SEMESTER offered-this-term + Course List titles). Explicit code → infer-with-reason → flag-and-ask. Never guess a student into a real class. **This file names no course numbers.**
 - 🔴 **Read the Enrollments field/status set LIVE from the list every run.** Never enumerate it in this file. The list is the schema truth.
 - 🔴 **Report format comes from `roster-reconcile.report-spec.md`.** Load it; report in PRESENT/ADD/MAKE/HELD, never in the internal bucket names; recount current enrollment from the rows.
 - 🔴 **Never write in the analyze pass.** Plan first, greenlight second, write third.
@@ -172,7 +196,7 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 - 🔴 **WITHDRAWN? and CONFLICT are FLAG-only** until Michael rules. An export's silence is not proof of a drop; disagreeing keys are not an auto-pick; an unresolved course is a CONFLICT, not a best guess. A `cancelled` catalog row with live enrollments is also a CONFLICT.
 - 🔴 **A conflict-resolution form is an ADD, not a duplicate.** Check which of its two courses the student already holds before proposing anything.
 - 🔴 **Person stays clean** — no per-run stamp on the human record.
-- **Single student → local comment, no Import Session.** Batch → Import Session in Report Imports. Batch artifacts are not a per-run mandate.
+- **Single student → local comment, no Import Session.** Batch → Import Session in Report Imports.
 - **Graduated trust:** greenlight every run now; silent writes on unambiguous buckets are earned on proven reliability, not assumed.
 - Email is identity; Student ID confirms. A name-string difference with agreeing keys is normalized, not flagged.
 
@@ -181,16 +205,19 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 ## Composes with
 
 - `hooks/roster-reconcile.report-spec.md` — the display format for all three reports. Load before reporting. Shared with the prep hook; one claimant so it cannot drift.
-- `hooks/roster-reconcile-prep.md` — Milo's upstream hook (**v3; no longer a stub**): sweeps the messy Default Inbox into a clean candidate report fed INTO this tool. Two verbs, clean seam — do not merge. (Prep now also opens bodies and resolves courses; this hook re-verifies both before writing.)
-- `EMAIL-TRIAGE` skill — the inbox front door a single-student reconcile often starts from.
+- `hooks/roster-reconcile-prep.md` — Milo's upstream hook (**v3**): sweeps the messy Default Inbox into a clean candidate report fed INTO this tool. Two verbs, clean seam — do not merge.
+- `EMAIL-TRIAGE` skill — the inbox front door a single-student reconcile often starts from; its chain-canonical model is why chains are LINKED and never moved.
+- ⚠️ `hooks/reconcile-engine.md` — **UNRESOLVED SEAM, flagged 2026-08-31, deliberately not acted on in this pass.** An engine + manifest refactor of the reconcile family landed the same day and its family list reads *"ddr / doc-destroyer / gcal / contact"* — **this hook is not named in it at all**, despite being a reconcile born the same day. Either roster reconcile is a fifth manifest candidate or it is genuinely outside the family (it CREATES relational records rather than comparing surfaces, which is a real difference). **Somebody must rule; do not migrate on assumption, and do not let the omission stand unexamined.** Fold-in Frank + Michael.
 - `hooks/commit-pre-flight.md` / `secrets-pii-guard.md` — ⚠️ student data is FERPA-sensitive; STUDENTS/Enrollments detail never leaves the workspace into the public repo, an artifact, or a channel. **This file violated that on day one; see the PII RULE at the top.**
-- `hooks/batch-import.md` — sibling shape (propose-then-press), different domain (Inciardi prints). Its scars apply: leave unknowns empty; a discrepancy you can explain is not one you have resolved; a silent conflict-update re-writes stale data with a clean-looking run.
+- `hooks/task-dedup-gate.md` — before creating any Person or Enrollment row.
+- `hooks/batch-import.md` — sibling shape (propose-then-press), different domain. Its scars apply: leave unknowns empty; a discrepancy you can explain is not one you have resolved.
 
 ---
 
 ## Changelog
 
-- **v4 (2026-08-31)** — Report formats EXTRACTED to `roster-reconcile.report-spec.md`, which also carries the **NEW per-course before/after report Michael specified by name** (previously enrolled / added / currently enrolled, per touched course, recounted from the rows rather than added up). Step 4 is now a report step that points at the spec; the three inline templates are gone. Also folded in from the same run: the **conflict-form ADD case** in Step 0 and the guardrails (a signed time-conflict form names two courses and the student usually already holds one — proposing a row for that one is a duplicate), the internal-buckets-are-not-report-vocabulary note, and the preferred-name field in the write step.
-- **v3 (2026-08-31)** — 🔒 **FERPA SCRUB.** v1/v2 shipped with two real student names and a real legal-vs-preferred name split as Step 0 and changelog examples, in a PUBLIC repo, against this file's own FERPA line (Michael: *"never put specifics like student names in the hook"*). All examples de-identified by shape; **new PII RULE section at the TOP**, because the guardrail that failed was written at the bottom where an author never reads it before writing. Also this pass: struck the hardcoded course-number pair (it had already transposed once — the catalog is read live and this file now names no course numbers), added the two-live-lighting-courses ambiguity as a CONFLICT case, added the `cancelled`-row-with-live-enrollments conflict observed the same day, and fixed the stale `🚧 stub` pointer to `roster-reconcile-prep.md` (built to v1 hours after v1 of this file). ⚠️ HEAD is clean; the original values persist in git history at the PR #877 commit.
-- **v2 (2026-08-31)** — First live run exposed two gaps, folded in the same day. (1) Added **Step 0: OPEN THE SOURCE IN FULL** — the sweep had classified off titles and missed the reconcile key, a legal-vs-preferred name split, and a not-yet-filed request. When in doubt, open more. (2) Added **Step 1a: Resolve the course** — the canonical source is COURSE x SEMESTER (offered this term) + Course List (catalog), read LIVE, with an explicit-→infer-with-reason-→flag ladder; an unresolved course is now a CONFLICT. Fixed a course-number transposition from the first run. CROSS-SEM widened to cover another-course (not just prior-term).
-- **v1 (2026-08-31)** — Established by Brain, specced live with Michael on the first day of F26 classes. Scale-invariant intake (thin email ↔ full Workday export), two-level lookup (Person, then Enrollment), six buckets with UPDATE as the join-staying-live case, greenlight gate with graduated trust, and the single-vs-batch documentation split (local comment vs Import Session in Report Imports). Person record stays clean. Field/status set documented on the Enrollments list and read live, never enumerated here.
+- **v5 (2026-08-31)** — 🔗 **LINK OUTWARD promoted to a required write step (3.5)** after the first live run shipped 8 enrollment rows whose source chains were cited in the DESCRIPTION only. The join was text-only and one-directional; Michael caught it by asking whether the related emails collate passively. Added: many-to-one chain linking, the course row as the passive collation point, **step 3.6 CLOSE IF LINKED** with his ruling verbatim and the state-that-the-queue-moved rule, and a hard **no-title-filter-as-scope** guardrail (a title filter dropped a third of the chains TWICE in one session). Also flagged the unresolved `reconcile-engine.md` seam — that same-day refactor's family list omits this hook entirely.
+- **v4 (2026-08-31)** — Report formats EXTRACTED to `roster-reconcile.report-spec.md`, which also carries the per-course before/after report Michael specified by name (previously enrolled / added / currently enrolled, recounted from the rows rather than added up). Step 4 became a report step pointing at the spec. Also folded in: the conflict-form ADD case in Step 0, the internal-buckets-are-not-report-vocabulary note, and the preferred-name field in the write step.
+- **v3 (2026-08-31)** — 🔒 **FERPA SCRUB.** v1/v2 shipped with two real student names and a real legal-vs-preferred name split as Step 0 and changelog examples, in a PUBLIC repo, against this file's own FERPA line (Michael: *"never put specifics like student names in the hook"*). All examples de-identified by shape; **new PII RULE section at the TOP**, because the guardrail that failed was written at the bottom where an author never reads it before writing. Also: struck the hardcoded course-number pair (it had already transposed once), added the two-live-lighting-courses ambiguity as a CONFLICT case, added the `cancelled`-row-with-live-enrollments conflict, and fixed the stale stub pointer to the prep hook. ⚠️ HEAD is clean; the original values persist in git history at the PR #877 commit.
+- **v2 (2026-08-31)** — First live run exposed two gaps, folded in the same day. (1) Added **Step 0: OPEN THE SOURCE IN FULL** — the sweep had classified off titles and missed the reconcile key, a legal-vs-preferred name split, and a not-yet-filed request. (2) Added **Step 1a: Resolve the course** — canonical source is COURSE x SEMESTER + Course List, read LIVE, with an explicit-→infer-with-reason-→flag ladder; an unresolved course is now a CONFLICT. Fixed a course-number transposition. CROSS-SEM widened to cover another-course.
+- **v1 (2026-08-31)** — Established by Brain, specced live with Michael on the first day of F26 classes. Scale-invariant intake, two-level lookup, six buckets with UPDATE as the join-staying-live case, greenlight gate with graduated trust, single-vs-batch documentation split. Person record stays clean. Field/status set read live, never enumerated here.
