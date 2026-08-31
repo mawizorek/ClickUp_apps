@@ -86,7 +86,30 @@ record.** Free-text names re-drift the instant an email or spelling changes; the
 normalized join that makes the person canonical once and the role-row point at it. This is the
 reconcile's highest-value output, not an extra.
 
-**Person lives in ONE of two directories; the row links via the field scoped to THAT list:**
+### 🧭 HOW THIS LIST ACTUALLY WORKS — read BEFORE you touch a link (born from a real cold-agent miss, 2026-08-31)
+
+**The link is the POINT of the master, and on an established show it is LARGELY ALREADY DONE.** A
+cold agent's job is to find the GAP (filled rows whose person link is still empty), not to re-link
+what is already wired. The reconcile is a diff, never a rebuild.
+
+🔴 **THE TRAP THAT ACTUALLY HAPPENED (do not repeat it):** an agent concluded Big Love was "36 rows
+to link" — it was almost fully linked. Two false signals caused it, and BOTH are noise:
+
+1. **Activity history is FULL of `set Contact Sheet to null`.** That is NOT evidence the link is
+   empty. The `Relate Role` button + the `Relate ROLE` / `Connecting Production STUDENT Emails`
+   automations cycle that field, so the log churns while the live value stays populated. **NEVER
+   infer link state from history — the history lies about this field.**
+2. **A `query_tasks` SELECT cannot cleanly return the link.** THREE custom fields are all named
+   `"Contact Sheet"` (the STUDENTS, ADULTS, and SHOW-ROLES relationships share the display name), so
+   `SELECT "custom:Contact Sheet"` is ambiguous and a role-view query silently omits it. A row that
+   looks blank in a query is NOT a blank link.
+
+✅ **The ONLY reliable read: LOAD THE TASK and inspect `populatedCustomFields` by FIELD ID**
+(`fd65d68f…` = STUDENTS, `bb073d11…` = ADULTS). A row is `LINKED` if either id carries a value.
+Verify the live field per row before proposing ANY link write — reading the field IS the gate, and
+it is exactly the step that was skipped.
+
+### Where the person lives — route by DIRECTORY, not by role
 
 | Person is a… | Directory list | `Contact Sheet` relationship field (subcategory-scoped) |
 |---|---|---|
@@ -96,11 +119,13 @@ reconcile's highest-value output, not an extra.
 
 ⚠️ **Route by where the PERSON lives, not by their role** — Lena Spivak (Asst Director) and the SM
 team are STUDENTS records; guest designers are ADULTS. Check the directory, don't assume from the
-role header.
+role header. ⚠️ The SHOW-ROLES link (`80b46457…`) is set on essentially every row already and is
+NOT the assignment — do not mistake its presence for a person link.
 
-**Procedure (engine P3 finding + P5 write):** for each row with a `Contact Name`, find the ONE
-matching person record → populate the correct relationship field with `add: [personId]` via
-`update_task` (list_relationship is NOT writable through `query_tasks` UPDATE — one call per row).
+**Procedure (engine P3 finding + P5 write):** for each GAP row (filled `Contact Name`, no person
+link per the reliable read above), find the ONE matching person record → populate the correct
+relationship field with `add: [personId]` via `update_task` (list_relationship is NOT writable
+through `query_tasks` UPDATE — one call per row).
 🔴 **Matching rules, because the directories are full of near-collisions** (`Wang` ×12, two
 `Segal`s — Dahlia vs Melody, several `Clark`/`Clarke`): match on FULL NAME, and an ambiguous or
 multi-hit name is a FINDING (`⚠️ AMBIGUOUS LINK`), never a guess. 🚫 **NEVER auto-create a missing
@@ -115,9 +140,10 @@ Founding flag: Big Love Movement Director **Darren Stevenson** had no record in 
 - **Person reconciliation** — per named person: `ALIGNED` · `SPELLING` · `ROLE MISMATCH` ·
   `MASTER MISSING PERSON` · `MASTER MISSING ROW` · `STALE ON <surface>`. Direction per the SoT
   declaration + per-item stamps.
-- **🔗 Assignment link** — per filled row: `LINKED` (already points at the person) · `TO LINK`
-  (name resolves to one record, propose the link) · `⚠️ AMBIGUOUS LINK` (multiple hits, flag) ·
-  `NO PERSON RECORD` (flag, never create). This is finding 2's relational half.
+- **🔗 Assignment link** — per filled row: `LINKED` (already points at the person — the COMMON case
+  on an established show) · `TO LINK` (name resolves to one record, propose the link) ·
+  `⚠️ AMBIGUOUS LINK` (multiple hits, flag) · `NO PERSON RECORD` (flag, never create). This is
+  finding 2's relational half, and the pass reports it as a GAP diff, never a re-link of everyone.
 - **Master field gaps** — blank `Contact Email` the PDF can fill, `PM STATUS = NEED` on someone
   clearly onboard per a dated sheet, missing `Pay Status`. Propose; the write is gated.
 - **Surface orphans (finding 2)** — on a sheet, no master presence at all: Kelly Quinn (Emotional
@@ -129,6 +155,7 @@ Founding flag: Big Love Movement Director **Darren Stevenson** had no record in 
 1. One real sample (2026-08-31): BL + BC had contact sheets; TS/TIME/OA Info-Sheet only; TIM-D per
    participant. 2. TIM-D participant files unmodeled (overlay flags it). 3. No join key beyond
    name+role BETWEEN surfaces (the person-record link is the join WITHIN ClickUp — see the
-   Assignment Link). 4. ✅ RESOLVED 2026-08-31 — the `Contact Sheet` relationship fields are the
-   assignment link and are now core (Michael reversed the earlier "nulling them / out of scope"
-   stance). Prior BL nulls were the un-normalized state this step fixes.
+   Assignment Link). 4. ✅ RESOLVED 2026-08-31 — the `Contact Sheet` relationship fields ARE the
+   assignment link and are core. ⚠️ CORRECTED same day: an earlier note here called BL's link state
+   "un-normalized" — WRONG, BL was already largely linked. The `set…to null` history is automation
+   churn, not an empty link (see 🧭 HOW THIS LIST ACTUALLY WORKS). The pass links only the true GAP.
