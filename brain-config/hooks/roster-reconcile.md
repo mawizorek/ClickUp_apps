@@ -22,11 +22,12 @@
 | --- | --- |
 | **The human (person table)** | STUDENTS list · `901305646880` (URITP CRM ▸ PEOPLE) — task type `Person` |
 | **The join (junction table)** | Enrollments list · `901327636843` (URITP Courses ▸ ROSTERS) |
-| **The class-this-term** | COURSE x SEMESTER list · `901328228189` (URITP Courses ▸ SCHEMA) |
+| **The class-this-term (what is OFFERED F26)** | COURSE x SEMESTER list · `901328228189` (URITP Courses ▸ SCHEMA) — rows shaped `{THTR###}{TERM}` |
+| **The course catalog (titles + codes + active/cancelled)** | Course List · `901305646914` (URITP Courses ▸ SCHEMA) — resolves a code to a title and confirms it runs |
 | **Batch import session home** | Report Imports (Workday, NM, KT, etc) · `901324196217` (URITP ▸ FMP Tables) |
-| **Upstream prep (later)** | `hooks/roster-reconcile-prep.md` (Milo parses the messy inbox into a clean report) |
+| **Upstream prep** | `hooks/roster-reconcile-prep.md` (Milo sweeps the messy inbox into a clean candidate report) |
 
-> 🔴 **Read the field/status set LIVE from the Enrollments list at run time — this hook NEVER enumerates it.** The dropdown values, statuses, and relationships are documented ON the list itself so every agent reads one truth. Baking the schema into this file guarantees it rots the first time a field is added. Same law as routing-by-Lane-at-read-time.
+> 🔴 **Read the field/status set LIVE from the Enrollments list at run time — this hook NEVER enumerates it.** The dropdown values, statuses, and relationships are documented ON the list itself so every agent reads one truth. Baking the schema into this file guarantees it rots the first time a field is added. Same law as routing-by-Lane-at-read-time — and it applies to the COURSE catalog too: read the F26 offerings LIVE, never hardcode a course list here.
 
 ---
 
@@ -40,18 +41,41 @@ This is a **foreign-key sync a database would do with a trigger.** STUDENTS is t
 
 ## Procedure
 
+### 0. 🔴 OPEN THE SOURCE IN FULL — never classify off a title
+
+**Read the actual thread/export body before you decide anything. A subject line is a lead, not the content.** The title tells you a student and maybe a course; the BODY carries the email address, the pronouns, the URID, the referral, the legal-vs-preferred name, whether they have actually filed the Workday request yet, and which course they mean when the title doesn't say. A pass that classifies off titles will file the wrong bucket, miss the reconcile key, and never see the name split.
+
+- Open every candidate thread and read it end to end — including the mirrored email-chain comments and Michael's replies, not just the description.
+- Proven failures this rule exists to stop (2026-08-31 first run): "Zoe Dziubla" in a from-line who signs "Ren" (legal vs preferred, invisible from the title); Rilind Sadiku asking HOW the course works and **not having filed the Workday request yet** (title looked identical to a real request); a "Request to Join Your Course" thread whose course was only knowable from the lighting talk in the body.
+- **When in doubt, open MORE, not less.** The cost of an extra read is nothing; the cost of a title-only guess is a wrong write.
+
 ### 1. Intake + normalize
 
 Classify the drop on the **completeness spectrum** — where it lands sets the record's confidence tier:
 
 | Drop | Carries | Course identity | Record tier |
 | --- | --- | --- | --- |
-| **Thin** (professor email, permission thread) | names, emails, maybe pronouns | Michael/context names it (ask if unclear) | ⚠️ BARE RECORD — needs a Workday pull |
+| **Thin** (professor email, permission thread) | names, emails, maybe pronouns | resolve per step 1a | ⚠️ BARE RECORD — needs a Workday pull |
 | **Full export** (Workday) | Student ID, major/minor, registration status, section | read from the file | complete |
 
 **Reconcile key: email is identity, Student ID confirms.** On a full export, match on BOTH; a row where email and Student ID disagree is a **CONFLICT** (surface it, never silently pick).
 
 **Normalization runs seamless and surfaces conflicts ONLY** (Phase-1 behavior, to be bolstered later). A name-string difference (Workday legal name vs the name a kid goes by) is NOT a conflict when the keys agree: keep legal name as the identity field, capture the preferred name alongside, and only stop when the KEYS themselves disagree.
+
+### 1a. 🎓 Resolve the course (canonical source + ladder)
+
+Every enrollment needs a course, and the source often will not state it cleanly. **The canonical source is two lists, read LIVE:**
+
+- **COURSE x SEMESTER** (`901328228189`) = what is actually OFFERED this term (`{THTR###}{F26}` rows). This is the set an enrollment can point at — if a course is not here, it is not running this term.
+- **Course List** (`901305646914`) = the catalog: code → full title, and whether it is active or cancelled. Use it to turn "lighting" into a code and to confirm the course actually runs.
+
+**Resolution ladder — stop at the first rung that lands:**
+
+1. **Explicit code in the body.** Workday emails literally say `THTR 120-01 - Production Experience` → map straight to the `{THTR120}{F26}` row. Section suffix (`-01`) is noted, not a separate course.
+2. **Infer from context against the live catalog.** No code stated → resolve from what the body DOES say, tested against COURSE x SEMESTER + Course List: subject matter (a student writing about **lighting** → `THTR123 Intro to Lighting for the Stage`, the only lighting course live F26; **sound** → `THTR124`), the meeting time/place Michael named, who referred them, the prior thread in the chain. **State the candidate AND the reason** ("course inferred: THTR123, student's whole email is about lighting and it's the only F26 lighting course").
+3. **Genuinely ambiguous / no F26 match** → `⚠️ couldn't resolve the course`, surface it, ask Michael. **Never guess a student into a real class.** A wrong course is a wrong enrollment.
+
+🔴 **THTR123 = Lighting, THTR124 = Sound** — do not transpose them (a first-run mislabel). But do not trust this line either: read the titles LIVE from Course List, because the catalog is the truth and this note rots.
 
 ### 2. Analyze + plan (NO WRITES)
 
@@ -67,9 +91,9 @@ The cross product is the bucket set. 🔴 **When the student is already found, t
 | **NEW** | no Person match | create Person + Enrollment |
 | **MATCH** | Person + Enrollment exist, data identical | no-op |
 | **UPDATE** | Person + Enrollment exist, but status differs (e.g. row `Unregistered`, export now registered) | flip GRADING Status (the join staying live) |
-| **CROSS-SEM** | Person exists (prior term), no Enrollment this term | add Enrollment only — do NOT touch the Person |
+| **CROSS-SEM** | Person exists (prior term OR another course), no Enrollment for THIS course+term | add Enrollment only — do NOT touch the Person |
 | **WITHDRAWN?** | in Enrollments this term, ABSENT from this export | 🚩 FLAG only, never auto-write — an export is not proof of a drop |
-| **CONFLICT** | email ↔ Student ID disagree | 🚩 hold for Michael |
+| **CONFLICT** | email ↔ Student ID disagree, OR course unresolved | 🚩 hold for Michael |
 
 > First day of classes / a fresh pull: expect the bulk to be **MATCH** and **UPDATE** (Unregistered → Active), not NEW — most Persons already exist from a prior backfill. UPDATE is a real write; show whose status is changing before greenlight.
 
@@ -80,11 +104,11 @@ The cross product is the bucket set. 🔴 **When the student is already found, t
 Greenlight granularity depends on batch size (see Documentation). On approval, per row:
 
 1. Find or create the **Person** in STUDENTS (`Legal First Name`, `Last Name`, `Primary Email`; `Student ID` / `Graduation Year` / `Major` when the export carries them — blank on a thin drop, flagged for Workday pull).
-2. Create the **Enrollment** row; link `Student` → the Person and `Enrollment` → the COURSE x SEMESTER row.
-3. Set **GRADING Status** from registration status, and **UPDATE it as it goes** (e.g. Active → Withdrawn when a prior row is confirmed dropped — only ever off explicit evidence, never off an export's silence).
+2. Create the **Enrollment** row; link `Student` → the Person and `Enrollment` → the resolved COURSE x SEMESTER row (step 1a).
+3. Set **GRADING Status** from registration status, and **UPDATE it as it goes** (e.g. Active → Withdrawn when a prior row is confirmed dropped — only ever off explicit evidence, never off an export's silence). A permission request that is not yet approved is `Considering`/`Unregistered`, not `Active`.
 4. Read the exact field/status names LIVE from the list; never from this file.
 
-🔴 **Leave unknowns EMPTY.** A plausible guess in a data field is worse than a blank — the blank is honest, the guess is indistinguishable from a fact (batch-import's founding scar). Never invent a Student ID, grad year, major, or registration status.
+🔴 **Leave unknowns EMPTY.** A plausible guess in a data field is worse than a blank — the blank is honest, the guess is indistinguishable from a fact (batch-import's founding scar). Never invent a Student ID, grad year, major, registration status, or course.
 
 **Graduated trust:** greenlight EVERY run for now. Once matching proves reliable on real batches, it earns silent writes on the unambiguous buckets (NEW / MATCH / UPDATE / CROSS-SEM) and only surfaces WITHDRAWN? and CONFLICT. Start at the gate; earn the autonomy (gcal-reconcile / INBOX-triage precedent).
 
@@ -111,7 +135,7 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 
 ```
 🎓 ROSTER RECONCILE · single · <COURSE> (<TERM>)
-source: this inbox thread · key: email
+source: this inbox thread · key: email · course: <stated / inferred: why>
 
 <Name> · <email>
   → <BUCKET> (<one-line why>)
@@ -135,9 +159,9 @@ source: Workday export <date> (attached) · keys: email + Student ID · <n> rows
 ● NEW          <n>   create Person + Enrollment
 ● MATCH        <n>   already current · no-op
 ● UPDATE       <n>   status change (e.g. Unregistered → Active)
-● CROSS-SEM    <n>   known human (prior term) · new Enrollment only
+● CROSS-SEM    <n>   known human (prior term/other course) · new Enrollment only
 ⚡ WITHDRAWN?   <n>   in Enrollments, absent from export · FLAG only
-! CONFLICT      <n>   email ↔ ID disagree · needs you
+! CONFLICT      <n>   email ↔ ID disagree / course unresolved · needs you
 
 <per-bucket row detail>
 
@@ -151,7 +175,7 @@ greenlight writes NEW + UPDATE + CROSS-SEM · MATCH skipped · WITHDRAWN?/CONFLI
 ✓ WRITTEN     <n>   <x> new People · <y> Enrollment rows · <z> status updates
 – SKIPPED     <n>   already current
 ⚡ FLAGGED     <n>   possible withdrawals (not touched)
-! UNRESOLVED   <n>   conflicts parked for your call
+! UNRESOLVED   <n>   conflicts / unresolved courses parked for your call
 📎 source attached · 🔗 all written rows stamped to this session
 ```
 
@@ -159,10 +183,12 @@ greenlight writes NEW + UPDATE + CROSS-SEM · MATCH skipped · WITHDRAWN?/CONFLI
 
 ## Guardrails
 
+- 🔴 **OPEN THE SOURCE IN FULL — never classify off a title.** When in doubt, open more, not less. The body carries the email, pronouns, URID, referral, legal-vs-preferred name, request-vs-inquiry status, and the course. A title-only pass writes the wrong bucket.
+- 🔴 **Resolve the course against the LIVE catalog** (COURSE x SEMESTER offered-this-term + Course List titles). Explicit code → infer-with-reason → flag-and-ask. Never guess a student into a real class. THTR123 = Lighting, THTR124 = Sound (verify live).
 - 🔴 **Read the Enrollments field/status set LIVE from the list every run.** Never enumerate it in this file. The list is the schema truth.
 - 🔴 **Never write in the analyze pass.** Plan first, greenlight second, write third.
-- 🔴 **Leave unknowns EMPTY.** Never invent a Student ID, registration status, grad year, or major.
-- 🔴 **WITHDRAWN? and CONFLICT are FLAG-only** until Michael rules. An export's silence is not proof of a drop; disagreeing keys are not an auto-pick.
+- 🔴 **Leave unknowns EMPTY.** Never invent a Student ID, registration status, grad year, major, or course.
+- 🔴 **WITHDRAWN? and CONFLICT are FLAG-only** until Michael rules. An export's silence is not proof of a drop; disagreeing keys are not an auto-pick; an unresolved course is a CONFLICT, not a best guess.
 - 🔴 **Person stays clean** — no per-run stamp on the human record.
 - **Single student → local comment, no Import Session.** Batch → Import Session in Report Imports. Batch artifacts are not a per-run mandate.
 - **Graduated trust:** greenlight every run now; silent writes on unambiguous buckets are earned on proven reliability, not assumed.
@@ -172,7 +198,7 @@ greenlight writes NEW + UPDATE + CROSS-SEM · MATCH skipped · WITHDRAWN?/CONFLI
 
 ## Composes with
 
-- `hooks/roster-reconcile-prep.md` — Milo's upstream hook: parses the messy Default Inbox into a clean student/enrollment report fed INTO this tool (stub; build later). Two verbs, clean seam — do not merge.
+- `hooks/roster-reconcile-prep.md` — Milo's upstream hook: sweeps the messy Default Inbox into a clean candidate report fed INTO this tool. Two verbs, clean seam — do not merge. (Prep now also opens bodies and resolves courses; this hook re-verifies both before writing.)
 - `EMAIL-TRIAGE` skill — the inbox front door a single-student reconcile often starts from.
 - `hooks/commit-pre-flight.md` / `secrets-pii-guard.md` — ⚠️ student data is FERPA-sensitive; STUDENTS/Enrollments detail never leaves the workspace into the public repo, an artifact, or a channel.
 - `hooks/batch-import.md` — sibling shape (propose-then-press), different domain (Inciardi prints). Its scars apply: leave unknowns empty; a discrepancy you can explain is not one you have resolved; a silent conflict-update re-writes stale data with a clean-looking run.
@@ -181,4 +207,5 @@ greenlight writes NEW + UPDATE + CROSS-SEM · MATCH skipped · WITHDRAWN?/CONFLI
 
 ## Changelog
 
+- **v2 (2026-08-31)** — First live run exposed two gaps, folded in the same day. (1) Added **Step 0: OPEN THE SOURCE IN FULL** — the sweep had classified off titles and missed the reconcile key, the legal-vs-preferred name ("Zoe"/Ren Dziubla), and a not-yet-filed request (Rilind Sadiku). When in doubt, open more. (2) Added **Step 1a: Resolve the course** — the canonical source is COURSE x SEMESTER (offered this term) + Course List (catalog), read LIVE, with an explicit-→infer-with-reason-→flag ladder; an unresolved course is now a CONFLICT. Fixed the THTR123-Lighting / THTR124-Sound transposition from the first run. CROSS-SEM widened to cover another-course (not just prior-term).
 - **v1 (2026-08-31)** — Established by Brain, specced live with Michael on the first day of F26 classes. Scale-invariant intake (thin email ↔ full Workday export), two-level lookup (Person, then Enrollment), six buckets with UPDATE as the join-staying-live case, greenlight gate with graduated trust, and the single-vs-batch documentation split (local comment vs Import Session in Report Imports). Person record stays clean. Field/status set documented on the Enrollments list and read live, never enumerated here.
