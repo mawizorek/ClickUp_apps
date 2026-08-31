@@ -62,19 +62,38 @@ Michael, 2026-08-31, on catching an invented lede in the SECOND sentence he read
 
 8. One PR per chapter. Verbatim body, frontmatter per repo contract, markers only where the source signals them, forward `@id` links wired as you go.
 
+### 🔴 Phase 3½ — THE VERIFICATION GATE (MANDATORY, before every chapter PR merges)
+
+⭐ **This is the step that makes the care survive a cold start.** "Be faithful" is a vibe and it does not survive a fresh session; a **diff you have to run and report** is a mechanical control that does. It exists because on 2026-08-31 the body text was in fact clean, but nobody could PROVE it until Michael pushed for a word-level diff — the proof was optional, so the trust was too. This gate makes the proof a required artifact, the same shape as the spine line or the orientation stamp on sibling hooks: **no diff report = the gate did not fire, and the chapter does not merge.**
+
+For **every page** committed in the chapter, diff the committed BODY against the source extract at the WORD level and report the result:
+
+1. **Extract the source** for the page's span (`pdftotext -f <start> -l <end>`), strip the running page-headers/footers.
+2. **Normalize both sides** to a bare word stream: strip frontmatter, unwrap `[text](@id)` links to their text, drop `!!! marker` lines, remove markdown symbols (`* # ` `` ` `` ` >`), unify curly quotes/dashes, lowercase, one word per line.
+3. **`diff` the two streams.** Every surviving difference MUST fall into one of these KNOWN-BENIGN classes, and you NAME which one each is:
+   - running-header/footer leakage (`ur international theatre program`, the document's own title line, bare page numbers)
+   - `tip` / `note` / `warning` present only on the source side = a marker you converted (approved form)
+   - apostrophe/possessive splits from normalization (`asm's` → `asm` + `s`, `full-time` → `full` + `time`)
+   - a heading phrase that only MOVED position (inline in source → `##` subhead), same words
+4. **🔴 ANY word-level difference that is NOT one of those classes is CONTENT DRIFT — halt, fix, re-diff.** An added adjective, a smoothed clause, a dropped aside, a "helpfully" rephrased sentence: zero tolerance. A benign class you cannot name is not benign.
+5. **Report the diff verdict in the PR body** — per page, either `verbatim ✓ (only <named benign classes>)` or the exact drift found and fixed. The report is the receipt; a chapter PR without it is not ready.
+
+⚠️ The gate checks the BODY only. `summary:` and index prose are authored strings the diff cannot police — those are held by the frontmatter-slop rule above, not here. The two mechanisms are complementary: this proves the body IS the source; that proves nothing was invented where the source is silent.
+
 ### Phase 4 — ASSETS & LINK CLOSE-OUT
 
 9. Extract diagrams/figures as `@img:` assets. Confirm every forward `@id` now resolves. Wire supporting-doc / template references if they have real targets.
 
 ### Phase 5 — DRIFT REVIEW (flag, never silently fix)
 
-10. The source will contain stale facts (old room names, retired policy, dated logins). Migrate them FAITHFULLY and queue a separate drift list for the document's owner (and original author) to rule on. 🔴 Translating is not the moment to correct the source.
+10. The source will contain stale facts (old room names, retired policy, dated logins). Migrate them FAITHFULLY and queue a separate drift list for the document's owner (and original author) to rule on. 🔴 Translating is not the moment to correct the source. (Distinct from Phase 3½: that proves you copied faithfully; this flags where the faithful copy is now WRONG about the world. Never conflate a verbatim win with a factual one.)
 
 ---
 
 ## Guardrails
 
 - 🔴 **Content is frozen; only form/connection/structure move.** The one law above.
+- 🔴 **Every chapter PR carries a word-level diff receipt** (Phase 3½). No diff report = the gate did not fire = do not merge. The proof is mandatory, not a favor asked for after the fact.
 - 🔴 **Summaries are bare tags; index pages are links, not prose.** The two frontmatter/index slots are where invented content sneaks in — keep `summary:` to a few factual words and never write a descriptive body paragraph on an index page. (See the frontmatter-slop section above.)
 - 🔴 **Broken forward links are an INTENTIONAL FLAG, not a bug** (Michael, 2026-08-31: *"that is literally the point of the broken link."*). Wiring `@id` links to not-yet-built pages minimizes later work and marks the gap visibly. Do NOT hold off linking known-planned pages.
 - **Markers are opt-in from the SOURCE.** A `!!! tip` is legal only where the author wrote "Tip!". Never sprinkle callouts for flavor.
@@ -97,5 +116,6 @@ Michael, 2026-08-31, on catching an invented lede in the SECOND sentence he read
 
 ## Changelog
 
+- **v3 (2026-08-31)** — Added the MANDATORY Phase 3½ verification gate: every page's committed body is word-level diffed against the source, differences must be named benign classes or halt-and-fix, verdict reported in the PR body. Makes the fidelity PROVABLE rather than asserted — the control that survives a cold start, because it does not rely on the next agent caring. Answers Michael's question "how do you follow that care from a cold start." Guardrail line added.
 - **v2 (2026-08-31)** — Added the frontmatter-slop rule after Michael caught an invented lede + descriptive index body on the Intro page ("already content that i KNOW is not from the original handbook"). `summary:` = bare factual tag only; index pages carry links, never a descriptive paragraph; any string the source didn't supply is suspect. Added a Guardrail line + `de-slop-pass.md` to Composes-with.
 - **v1 (2026-08-31)** — Established by Milo during the URITP Stage Manager's Handbook migration. Captures the one law (form/connection/structure yes, content no), the TOC-as-checklist scaffold, page-per-line/folder-per-chapter, pilot-one-chapter-first, forward-links-are-an-intentional-flag, markers-only-where-signaled, verbatim-quirks-preserved, credentials-ask, and drift-flag-not-fix. Named the reusable pattern so future paperwork migrations (the Emergency Handbook next) route here without Michael re-explaining.
