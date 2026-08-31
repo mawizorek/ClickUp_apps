@@ -16,6 +16,19 @@
 
 ---
 
+## 🔒 PII RULE — READ BEFORE YOU EDIT THIS FILE
+
+**Never write a student's name, email, URID, Student ID, major, schedule or any other identifying detail into this file, or any file in any repo.** Not in a procedure step, not in an example, not in a changelog, not "just as the case that proves the rule."
+
+- `ClickUp_apps` is **PUBLIC.** A student example committed here is a FERPA disclosure, and git history keeps it after HEAD is cleaned.
+- **De-identify by SHAPE, always.** "A from-line whose legal first name differs from the signature" teaches the whole lesson; the student's actual name teaches nothing a cold agent can use. If a rule needs a real case to be believed, the rule is badly written.
+- Live cases live in the **INBOX ▸ Default chain** they came from, which is inside the workspace where the data already legitimately sits. Point at the chain, never copy the person into the repo.
+- Same rule for professors, guest artists and staff, and it holds in `uritp-docs` (🔒 private) too — private is not a licence, it is a smaller blast radius.
+
+> 🩹 Born of this file's own failure: v1 and v2 shipped 2026-08-31 with two real students named in Step 0 and in the changelog, in the public repo, while the FERPA line at the bottom of this very file forbade exactly that. **A guardrail written at the bottom did not stop the author at the top.** Scrubbed same day on Michael's catch; the originals persist in history at the PR #877 commit.
+
+---
+
 ## Coordinates
 
 | Surface | Location |
@@ -46,7 +59,10 @@ This is a **foreign-key sync a database would do with a trigger.** STUDENTS is t
 **Read the actual thread/export body before you decide anything. A subject line is a lead, not the content.** The title tells you a student and maybe a course; the BODY carries the email address, the pronouns, the URID, the referral, the legal-vs-preferred name, whether they have actually filed the Workday request yet, and which course they mean when the title doesn't say. A pass that classifies off titles will file the wrong bucket, miss the reconcile key, and never see the name split.
 
 - Open every candidate thread and read it end to end — including the mirrored email-chain comments and Michael's replies, not just the description.
-- Proven failures this rule exists to stop (2026-08-31 first run): "Zoe Dziubla" in a from-line who signs "Ren" (legal vs preferred, invisible from the title); Rilind Sadiku asking HOW the course works and **not having filed the Workday request yet** (title looked identical to a real request); a "Request to Join Your Course" thread whose course was only knowable from the lighting talk in the body.
+- Proven failure SHAPES this rule exists to stop (2026-08-31 first run, de-identified per the PII rule above — the live chains are in INBOX ▸ Default):
+  - **A from-line whose legal first name differs from the name the student signs**, so Workday and the mail account disagree and the title shows neither. Keep the legal name as identity, carry the preferred name alongside.
+  - **A how-does-this-work INQUIRY whose title is indistinguishable from a real permission request** — no Workday override filed, so the student is invisible on every roster surface and a title-only pass files them as pending approval.
+  - **A thread whose COURSE was only knowable from the subject matter in the body** (the student wrote entirely about lighting and never named a code).
 - **When in doubt, open MORE, not less.** The cost of an extra read is nothing; the cost of a title-only guess is a wrong write.
 
 ### 1. Intake + normalize
@@ -72,10 +88,12 @@ Every enrollment needs a course, and the source often will not state it cleanly.
 **Resolution ladder — stop at the first rung that lands:**
 
 1. **Explicit code in the body.** Workday emails literally say `THTR 120-01 - Production Experience` → map straight to the `{THTR120}{F26}` row. Section suffix (`-01`) is noted, not a separate course.
-2. **Infer from context against the live catalog.** No code stated → resolve from what the body DOES say, tested against COURSE x SEMESTER + Course List: subject matter (a student writing about **lighting** → `THTR123 Intro to Lighting for the Stage`, the only lighting course live F26; **sound** → `THTR124`), the meeting time/place Michael named, who referred them, the prior thread in the chain. **State the candidate AND the reason** ("course inferred: THTR123, student's whole email is about lighting and it's the only F26 lighting course").
+2. **Infer from context against the live catalog.** No code stated → resolve from what the body DOES say, tested against COURSE x SEMESTER + Course List: subject matter (a student writing about **lighting** → the F26 intro lighting course; **sound** → the F26 intro sound course), the meeting time/place Michael named, who referred them, the prior thread in the chain. **State the candidate AND the reason** ("course inferred: the intro lighting course, the student's whole email is about lighting"). ⚠️ **Two live lighting courses can be offered in one term** (an intro lecture and a design course) — subject matter alone does not separate them, so an intro-vs-advanced read that you cannot ground is a CONFLICT, not a pick.
 3. **Genuinely ambiguous / no F26 match** → `⚠️ couldn't resolve the course`, surface it, ask Michael. **Never guess a student into a real class.** A wrong course is a wrong enrollment.
 
-🔴 **THTR123 = Lighting, THTR124 = Sound** — do not transpose them (a first-run mislabel). But do not trust this line either: read the titles LIVE from Course List, because the catalog is the truth and this note rots.
+🔴 **Read the code→title map LIVE from Course List every run.** An earlier version of this file hardcoded two course numbers here and transposed them on its first run; the pair was struck rather than corrected, because a hardcoded catalog line is wrong the next time the catalog moves. **The catalog is the truth; this file names no course numbers.**
+
+⚠️ **A `cancelled` catalog row with live enrollments is a CONFLICT, not a cull.** Observed 2026-08-31: two courses read `cancelled` in Course List while carrying live F26 enrollment rows between them. Flag it for Michael; never resolve it by deleting enrollments or by trusting either surface alone.
 
 ### 2. Analyze + plan (NO WRITES)
 
@@ -183,12 +201,13 @@ greenlight writes NEW + UPDATE + CROSS-SEM · MATCH skipped · WITHDRAWN?/CONFLI
 
 ## Guardrails
 
+- 🔒 **NEVER put a student in this file.** No name, email, URID, Student ID, major or schedule — not in a step, an example, or a changelog. De-identify by SHAPE and point at the INBOX chain. `ClickUp_apps` is PUBLIC and history outlives a scrub. Full rule + the failure that produced it: the PII RULE section at the top.
 - 🔴 **OPEN THE SOURCE IN FULL — never classify off a title.** When in doubt, open more, not less. The body carries the email, pronouns, URID, referral, legal-vs-preferred name, request-vs-inquiry status, and the course. A title-only pass writes the wrong bucket.
-- 🔴 **Resolve the course against the LIVE catalog** (COURSE x SEMESTER offered-this-term + Course List titles). Explicit code → infer-with-reason → flag-and-ask. Never guess a student into a real class. THTR123 = Lighting, THTR124 = Sound (verify live).
+- 🔴 **Resolve the course against the LIVE catalog** (COURSE x SEMESTER offered-this-term + Course List titles). Explicit code → infer-with-reason → flag-and-ask. Never guess a student into a real class. **This file names no course numbers** — a hardcoded catalog line was struck after it transposed two courses on the first run.
 - 🔴 **Read the Enrollments field/status set LIVE from the list every run.** Never enumerate it in this file. The list is the schema truth.
 - 🔴 **Never write in the analyze pass.** Plan first, greenlight second, write third.
 - 🔴 **Leave unknowns EMPTY.** Never invent a Student ID, registration status, grad year, major, or course.
-- 🔴 **WITHDRAWN? and CONFLICT are FLAG-only** until Michael rules. An export's silence is not proof of a drop; disagreeing keys are not an auto-pick; an unresolved course is a CONFLICT, not a best guess.
+- 🔴 **WITHDRAWN? and CONFLICT are FLAG-only** until Michael rules. An export's silence is not proof of a drop; disagreeing keys are not an auto-pick; an unresolved course is a CONFLICT, not a best guess. A `cancelled` catalog row with live enrollments is also a CONFLICT.
 - 🔴 **Person stays clean** — no per-run stamp on the human record.
 - **Single student → local comment, no Import Session.** Batch → Import Session in Report Imports. Batch artifacts are not a per-run mandate.
 - **Graduated trust:** greenlight every run now; silent writes on unambiguous buckets are earned on proven reliability, not assumed.
@@ -198,14 +217,15 @@ greenlight writes NEW + UPDATE + CROSS-SEM · MATCH skipped · WITHDRAWN?/CONFLI
 
 ## Composes with
 
-- `hooks/roster-reconcile-prep.md` — Milo's upstream hook: sweeps the messy Default Inbox into a clean candidate report fed INTO this tool. Two verbs, clean seam — do not merge. (Prep now also opens bodies and resolves courses; this hook re-verifies both before writing.)
+- `hooks/roster-reconcile-prep.md` — Milo's upstream hook (**v1, built out the same day; no longer a stub**): sweeps the messy Default Inbox into a clean candidate report fed INTO this tool. Two verbs, clean seam — do not merge. (Prep now also opens bodies and resolves courses; this hook re-verifies both before writing.)
 - `EMAIL-TRIAGE` skill — the inbox front door a single-student reconcile often starts from.
-- `hooks/commit-pre-flight.md` / `secrets-pii-guard.md` — ⚠️ student data is FERPA-sensitive; STUDENTS/Enrollments detail never leaves the workspace into the public repo, an artifact, or a channel.
+- `hooks/commit-pre-flight.md` / `secrets-pii-guard.md` — ⚠️ student data is FERPA-sensitive; STUDENTS/Enrollments detail never leaves the workspace into the public repo, an artifact, or a channel. **This file violated that on day one; see the PII RULE at the top.**
 - `hooks/batch-import.md` — sibling shape (propose-then-press), different domain (Inciardi prints). Its scars apply: leave unknowns empty; a discrepancy you can explain is not one you have resolved; a silent conflict-update re-writes stale data with a clean-looking run.
 
 ---
 
 ## Changelog
 
-- **v2 (2026-08-31)** — First live run exposed two gaps, folded in the same day. (1) Added **Step 0: OPEN THE SOURCE IN FULL** — the sweep had classified off titles and missed the reconcile key, the legal-vs-preferred name ("Zoe"/Ren Dziubla), and a not-yet-filed request (Rilind Sadiku). When in doubt, open more. (2) Added **Step 1a: Resolve the course** — the canonical source is COURSE x SEMESTER (offered this term) + Course List (catalog), read LIVE, with an explicit-→infer-with-reason-→flag ladder; an unresolved course is now a CONFLICT. Fixed the THTR123-Lighting / THTR124-Sound transposition from the first run. CROSS-SEM widened to cover another-course (not just prior-term).
+- **v3 (2026-08-31)** — 🔒 **FERPA SCRUB.** v1/v2 shipped with two real student names and a real legal-vs-preferred name split as Step 0 and changelog examples, in a PUBLIC repo, against this file's own FERPA line (Michael: *"never put specifics like student names in the hook"*). All examples de-identified by shape; **new PII RULE section at the TOP**, because the guardrail that failed was written at the bottom where an author never reads it before writing. Also this pass: struck the hardcoded course-number pair (it had already transposed once — the catalog is read live and this file now names no course numbers), added the two-live-lighting-courses ambiguity as a CONFLICT case, added the `cancelled`-row-with-live-enrollments conflict observed the same day, and fixed the stale `🚧 stub` pointer to `roster-reconcile-prep.md` (built to v1 hours after v1 of this file). ⚠️ HEAD is clean; the original values persist in git history at the PR #877 commit.
+- **v2 (2026-08-31)** — First live run exposed two gaps, folded in the same day. (1) Added **Step 0: OPEN THE SOURCE IN FULL** — the sweep had classified off titles and missed the reconcile key, a legal-vs-preferred name split, and a not-yet-filed request. When in doubt, open more. (2) Added **Step 1a: Resolve the course** — the canonical source is COURSE x SEMESTER (offered this term) + Course List (catalog), read LIVE, with an explicit-→infer-with-reason-→flag ladder; an unresolved course is now a CONFLICT. Fixed a course-number transposition from the first run. CROSS-SEM widened to cover another-course (not just prior-term).
 - **v1 (2026-08-31)** — Established by Brain, specced live with Michael on the first day of F26 classes. Scale-invariant intake (thin email ↔ full Workday export), two-level lookup (Person, then Enrollment), six buckets with UPDATE as the join-staying-live case, greenlight gate with graduated trust, and the single-vs-batch documentation split (local comment vs Import Session in Report Imports). Person record stays clean. Field/status set documented on the Enrollments list and read live, never enumerated here.
