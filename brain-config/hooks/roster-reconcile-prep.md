@@ -16,6 +16,19 @@
 
 ---
 
+## 🔒 PII RULE — READ BEFORE YOU EDIT THIS FILE, AND BEFORE YOU REPORT
+
+**Never write a student's name, email, URID, Student ID, major or schedule into this file, or any file in any repo.** Not in a procedure step, not in an example, not in a changelog, not as the real case that proves a rule.
+
+- `ClickUp_apps` is **PUBLIC**, and git history keeps a name after HEAD is scrubbed.
+- **De-identify by SHAPE.** "A from-line whose legal first name differs from the signature" is the entire lesson; the student's actual name teaches a cold agent nothing.
+- This is the hook that READS student mail, which makes it the likeliest place a real name gets pasted in as evidence. It is clean today. Keep it that way.
+- Sibling rule in `hooks/roster-reconcile.md` → PII RULE, added after that file shipped with two real students named in it.
+
+🔴 **The RUN OUTPUT obeys the same rule, and it is easier to break.** The candidate report lives on a workspace task or comment ONLY. It never goes to the repo, an artifact, or a **chat channel** — including the Agent Activity Board. A spine line naming five students was written to that channel on 2026-08-31 and scrubbed the same day: the report was correctly workspace-only, and the SUMMARY of it leaked. Summarize by count and course, never by name.
+
+---
+
 ## Coordinates
 
 | Surface | Location |
@@ -31,7 +44,7 @@
 
 **PREP collects and classifies; RECONCILE reconciles and writes.** Prep never touches STUDENTS or Enrollments, never sets a GRADING Status, never creates a Person. Its entire output is a REPORT: here are the enrollment-bearing threads I found, here's who and what course each points at, here's the signal (requesting vs enrolled vs dropped), here's my confidence. Michael reads it, picks which candidates to run, and the reconcile hook does the actual work one candidate at a time (single-student path) or as a batch.
 
-> 🔴 A candidate is a LEAD, not a record. Prep proposing "Jane Doe → Intro to Sound, permission request" does NOT mean Jane exists, is enrolled, or should be written. It means: a thread mentions her and a course. Reconcile decides the rest.
+> 🔴 A candidate is a LEAD, not a record. Prep proposing "a student → the intro sound course, permission request" does NOT mean that person exists in STUDENTS, is enrolled, or should be written. It means: a thread mentions them and a course. Reconcile decides the rest.
 
 ---
 
@@ -40,6 +53,8 @@
 ### 1. Scope the sweep
 
 Name what you are reading before you read it: the Default Inbox, current open chains (closed/archived chains out of scope unless Michael says otherwise). Say how many threads are in scope. An unbounded "read everything" produces a shallow pass — bound it.
+
+🔴 **Scope the WHOLE open inbox, not just today's captures.** A sweep scoped to fresh arrivals structurally cannot see the enrollment thread that has been sitting for four weeks, and the oldest thread is usually the most urgent one (a graduation-credit or registration-blocked ask does not re-announce itself). Proven 2026-08-31: a pass scoped to same-day captures missed the highest-stakes candidate in the list — a student who could not register in Workday and needed a course to graduate.
 
 ### 2. Classify each thread (enrollment-bearing or not)
 
@@ -51,6 +66,7 @@ For every thread, one fast read: does it carry a student + a course signal? Keep
 | **Professor class list** | many students, one course | `roster` (professor's own list) |
 | **Add/drop / withdrawal notice** | a student leaving or joining | `add` / `drop` |
 | **Registrar / Workday forward** | structured enrollment data | route to a full export path, not this |
+| **Degree-audit / graduation-credit thread** | one student, several courses, a requirement gap | `requesting` — treat as enrollment-bearing; these carry the course the student MUST get into |
 
 Everything else (general email, production talk, non-enrollment) is dropped from the candidate set and NOT reported — a candidate list padded with noise is worse than a short honest one.
 
@@ -68,16 +84,16 @@ For each enrollment-bearing thread, pull what the thread actually says:
 
 ### 4. Emit ONE clean report (no writes)
 
-One consolidated block, grouped by course, each candidate one line. This IS the structured input `roster-reconcile.md` step 1 expects. It proposes NOTHING to the roster — it hands Michael a queue to pick from.
+One consolidated block, grouped by course, each candidate one line. This IS the structured input `roster-reconcile.md` step 1 expects. It proposes NOTHING to the roster — it hands Michael a queue to pick from. **Workspace surface only** (see the PII RULE).
 
 ```
 📬 ROSTER RECONCILE PREP · Default Inbox · <date>
 threads scanned: <n> · enrollment-bearing: <n> · candidates: <n>
 
-── Intro to Sound (course inferred from prof name) ──
+── <COURSE> (course inferred from prof name) ──
   • <Name> · <email> · requesting · [thread] · grounded
   • <Name> · (no email in thread) · requesting · [thread] · grounded
-── THTR 120 (course stated) ──
+── <COURSE> (course stated) ──
   • <Name> · <email> · roster · [thread] · grounded
 ── ⚠️ couldn't resolve a course ──
   • <Name> · <email> · [thread] · needs Michael to name the class
@@ -93,24 +109,28 @@ Michael picks which candidates to reconcile. Each chosen one is then run through
 
 ## Guardrails
 
+- 🔒 **NEVER put a student in this file** — no name, email, URID, Student ID, major or schedule, in any step, example or changelog. De-identify by shape. Full rule: the PII RULE at the top.
+- 🔴 **The report is workspace-only, and so is every summary of it.** Never the repo, an artifact, or a chat channel — the Agent Activity Board included. Summarize by count and course, never by name.
 - 🔴 **PROPOSE-ONLY.** Reads email; writes nothing to STUDENTS/Enrollments; cuts no tasks. The report is the entire deliverable.
 - 🔴 **A candidate is a lead, not a record.** Prep never asserts a student exists, is enrolled, or should be written — reconcile decides that.
+- 🔴 **Sweep the whole open inbox, not just recent captures.** The oldest enrollment thread is usually the most urgent.
 - 🔴 **Transcribe, do not infer.** Inferred course = marked inferred. Missing email = empty, never guessed.
 - 🔴 **Drop the noise.** Non-enrollment threads never enter the candidate list.
-- ⚠️ **FERPA:** student data read from the inbox never leaves the workspace into the PUBLIC repo, an artifact, or a channel. The report lives on a workspace task/comment only.
 - Unresolvable course → `⚠️ couldn't resolve`, surfaced for Michael to name; never guessed into a real class.
 
 ---
 
 ## Composes with
 
-- `hooks/roster-reconcile.md` — the executor this feeds. Prep prepares structured input; reconcile reconciles and writes. Two verbs, one seam.
+- `hooks/roster-reconcile.md` — the executor this feeds. Prep prepares structured input; reconcile reconciles and writes. Two verbs, one seam. Its PII RULE is the sibling of the one above.
 - `EMAIL-TRIAGE` skill — the Default Inbox operator method (how chains are read; INBOX ▸ Default is a permanent replica, nothing leaves).
 - `hooks/meeting-scratch-triage.md` — sibling propose-only inbox-style sweep (that resolves shorthand; this resolves enrollment leads).
+- `hooks/secrets-pii-guard.md` — the repo-write guard this file's PII RULE localizes.
 
 ---
 
 ## Changelog
 
+- **v2 (2026-08-31)** — 🔒 Added the **PII RULE at the top** (mirror of the one added to `roster-reconcile.md` after that file shipped with real student names in a PUBLIC repo) plus a hard guardrail line; the correction generalizes and this is the hook that reads student mail. Made the report-surface rule explicit about **chat channels**, after a spine line naming five students went to the Agent Activity Board and was scrubbed the same day. Also folded in two first-run findings: **scope the whole open inbox, not just today's captures** (a same-day-only sweep missed a registration-blocked graduation candidate sitting four weeks), and degree-audit/graduation-credit threads added as an enrollment-bearing species.
 - **v1 (2026-08-31)** — Built out from the v0 stub the same day (Michael: "arm it and make it a thing"). Real procedure: scope → classify enrollment-bearing threads → extract per candidate (transcribe, don't infer) → emit one clean grouped report → hand off. PROPOSE-ONLY, FERPA-guarded, feeds `roster-reconcile.md`. Armed with an AI Toolkit index trigger row.
 - **v0 (2026-08-31)** — Stub created by Brain. Seam documented; build deferred — lifted same day on Michael's call to run it against the live inbox.
