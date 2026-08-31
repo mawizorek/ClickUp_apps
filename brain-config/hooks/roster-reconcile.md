@@ -24,6 +24,7 @@
 - **De-identify by SHAPE, always.** "A from-line whose legal first name differs from the signature" teaches the whole lesson; the student's actual name teaches nothing a cold agent can use. If a rule needs a real case to be believed, the rule is badly written.
 - Live cases live in the **INBOX ▸ Default chain** they came from, which is inside the workspace where the data already legitimately sits. Point at the chain, never copy the person into the repo.
 - Same rule for professors, guest artists and staff, and it holds in `uritp-docs` (🔒 private) too — private is not a licence, it is a smaller blast radius.
+- ⚠️ **A full Workday export is the highest-risk artifact this hook touches** — it carries names, Student IDs, majors and registration status for a whole department. It is attached to a workspace task, NEVER committed, NEVER pasted into a channel, NEVER quoted in a report beyond counts and roles.
 
 > 🩹 Born of this file's own failure: v1 and v2 shipped 2026-08-31 with two real students named in Step 0 and in the changelog, in the public repo, while the FERPA line at the bottom of this very file forbade exactly that. **A guardrail written at the bottom did not stop the author at the top.** Scrubbed same day on Michael's catch; the originals persist in history at the PR #877 commit.
 
@@ -82,6 +83,64 @@ Classify the drop on the **completeness spectrum** — where it lands sets the r
 
 **Normalization runs seamless and surfaces conflicts ONLY** (Phase-1 behavior, to be bolstered later). A name-string difference (Workday legal name vs the name a kid goes by) is NOT a conflict when the keys agree: keep legal name as the identity field, capture the preferred name alongside, and only stop when the KEYS themselves disagree.
 
+### 1b. 📦 Reading a COLD full export — what to expect, and the STATUS DECISION RULE
+
+**Why this section exists.** Michael, 2026-08-31: *"write in your hook what those fields do and what to expect if you ever get a cold export like this in the future so you don't have to infer."* The first run set every status by inference from email evidence with no written rule, so the next pass would have re-derived it from scratch and probably differently.
+
+<p></p>
+
+🔴 **THE DISTINCTION THAT RESOLVES THIS FILE'S OWN CONTRADICTION — read it before you edit either half.** This hook is forbidden from enumerating the field set (see Coordinates), and that rule stands. It is not violated here, because two different things are being separated:
+
+| | Lives where | Why |
+| --- | --- | --- |
+| **The VALUE LIST** (which options exist, their exact spelling) | 🔴 the Enrollments list, read LIVE every run | It is SCHEMA. It changes when Corey adds an option, and a copy here would rot silently. |
+| **The DECISION RULE** (which evidence justifies which value) | ✅ this file | It is PROCEDURE. It does not rot when a field is added — a new option needs a new rule, which is a deliberate edit, not decay. |
+
+**Never write the option list here. Always write the reasoning here.** A cold agent that reads the live list gets the vocabulary; it needs this file for the judgement.
+
+#### The status ladder — evidence → value
+
+Read the exact option spellings live, then map by **how far along the registration pipeline the evidence actually places the student.** The ladder, from least to most committed:
+
+1. **A student has expressed interest but filed NOTHING in Workday.** They emailed, or they came to an event, or they were referred. There is no override request, so they are invisible to the registrar. → the least-committed "they're thinking about it" option.
+2. **An override request EXISTS and is awaiting Michael's Approve/Deny.** The Workday notification says the request is live. Michael has not ruled. → the awaiting-a-decision option.
+3. **Approved and/or on the registrar's roster but NOT registered for credit.** This is the state the *unregistered workflow* describes and it is the one most likely to be misread — see the caution below.
+4. **Registered for credit, the enrollment is real.** → the active option.
+5. **Was enrolled, has left.** → the withdrawn option. 🔴 Only ever off EXPLICIT evidence.
+6. **Term finished, grade in.** → the complete option, set at end of term, never by an intake pass.
+
+⚠️ **The pipeline is NOT linear and the export will prove it.** A student can be approved and never register, register and never attend, or attend with no request on file at all. **Do not infer position from a neighbouring fact** — attendance is not registration, approval is not enrollment, and an email saying "see you Tuesday" is not a registrar state.
+
+#### 🔴 UNVERIFIED as of 2026-08-31 — the honest edge, do not paper over it
+
+The ladder above is a **workspace-side** model, built from email evidence during the first run. **No full Workday export has been read against it yet.** Specifically unknown:
+
+- **What the registrar's own status vocabulary is**, and whether it maps 1:1 onto the ladder or crosses it. It may be finer-grained (an approved-not-registered state distinct from a requested state) or coarser.
+- **What the "unregistered workflow" rows actually represent** — Michael flagged it as *"tells the story of unregistering too, to be determined."* Treat that phrase as the open question it is: unregistered may mean never-registered, dropped-before-census, or an in-flight registrar process. **These are three different facts and only the export can separate them.**
+- Whether one student appears MULTIPLE times per course (a request, then a registration) — which would make row count ≠ student count.
+
+🔴 **On the first real export: read it, state the mapping you derived, and get Michael's ruling BEFORE writing status at volume.** Then record the settled mapping in a **Decision Log**, not in this file — semantics of a registrar's vocabulary is a decision with a why, and it belongs where decisions live. Update this ladder only if the RULE changes.
+
+#### What a cold export carries — and what it can never carry
+
+| Expect it to CARRY | Expect it to be SILENT on |
+| --- | --- |
+| legal name, Student ID, the course + section, registration status, major/minor, term | the name a student actually goes by |
+| every enrolled student, not just the ones who emailed | WHY anyone is in a given state |
+| rows for courses outside this pass's scope (a THTR-wide pull covers the department) | anyone who never entered the pipeline — 🔴 **the export cannot see the student who only emailed** |
+| a snapshot timestamp | whether a missing person dropped or was never there |
+
+⚠️ **A long export is not a complete picture.** The people this hook found by reading email are exactly the people an export structurally omits. **Never treat an export as the full roster of humans** — it is the full roster of *registrar records*.
+
+#### The two buckets that ONLY a full export can fire
+
+- **UPDATE** — the first pass wrote nearly everything at the low end of the ladder because email is all it had. A registrar export is the first evidence that can legitimately advance a row. Expect **UPDATE to be the bulk of a first cold export**, and it is a real write on existing rows, so name whose status changes before touching anything.
+- **WITHDRAWN?** — comparing a full export against existing rows makes absence visible for the first time. 🔴 **Absence is a FLAG, never a write.** An export's silence has at least four innocent explanations (never registered, out of the export's scope, name/key mismatch, export truncation) before it means anyone dropped.
+
+⚠️ **Reconcile the counts and state the denominator.** Rows in the export, students in the export, rows already in Enrollments, and the per-bucket totals must all account for each other. A gap means a filter lied — usually the closed/subtask default, which excludes both unless told otherwise.
+
+⚠️ **A cold export is a SNAPSHOT and goes stale the moment registration moves.** Always state its export timestamp in the report; a first-week export ages in days, not weeks (the DDR family learned this the hard way — one of theirs was superseded in 18 hours).
+
 ### 1a. 🎓 Resolve the course (canonical source + ladder)
 
 Every enrollment needs a course, and the source often will not state it cleanly. **The canonical source is two lists, read LIVE:**
@@ -97,7 +156,7 @@ Every enrollment needs a course, and the source often will not state it cleanly.
 
 🔴 **Read the code→title map LIVE from Course List every run.** An earlier version of this file hardcoded two course numbers here and transposed them on its first run; the pair was struck rather than corrected, because a hardcoded catalog line is wrong the next time the catalog moves. **The catalog is the truth; this file names no course numbers.**
 
-⚠️ **A `cancelled` catalog row with live enrollments is a CONFLICT, not a cull.** Observed 2026-08-31: two courses read `cancelled` in Course List while carrying live F26 enrollment rows between them. Flag it for Michael; never resolve it by deleting enrollments or by trusting either surface alone.
+⚠️ **A `cancelled` catalog row with live enrollments is a CONFLICT, not a cull.** Observed 2026-08-31: two courses read `cancelled` in Course List while carrying live F26 enrollment rows between them. Flag it for Michael; never resolve it by deleting enrollments or by trusting either surface alone. 🔴 A cold export naming a course the catalog calls cancelled is the same conflict arriving from the other direction — same rule, still not a cull.
 
 ### 2. Analyze + plan (NO WRITES)
 
@@ -112,12 +171,12 @@ The cross product is the bucket set. 🔴 **When the student is already found, t
 | --- | --- | --- |
 | **NEW** | no Person match | create Person + Enrollment |
 | **MATCH** | Person + Enrollment exist, data identical | no-op |
-| **UPDATE** | Person + Enrollment exist, but status differs (e.g. row `Unregistered`, export now registered) | flip GRADING Status (the join staying live) |
+| **UPDATE** | Person + Enrollment exist, but status differs | advance GRADING Status per the 1b ladder (the join staying live) |
 | **CROSS-SEM** | Person exists (prior term OR another course), no Enrollment for THIS course+term | add Enrollment only — do NOT touch the Person |
 | **WITHDRAWN?** | in Enrollments this term, ABSENT from this export | 🚩 FLAG only, never auto-write — an export is not proof of a drop |
 | **CONFLICT** | email ↔ Student ID disagree, OR course unresolved | 🚩 hold for Michael |
 
-> First day of classes / a fresh pull: expect the bulk to be **MATCH** and **UPDATE** (Unregistered → Active), not NEW — most Persons already exist from a prior backfill. UPDATE is a real write; show whose status is changing before greenlight.
+> First day of classes / a fresh pull: expect the bulk to be **MATCH** and **UPDATE**, not NEW — most Persons already exist from a prior backfill. UPDATE is a real write; show whose status is changing before greenlight.
 
 ⚠️ **These bucket names are INTERNAL.** They are how you decide; they are not how you report. The report vocabulary is `PRESENT` / `ADD` / `MAKE` / `HELD` per the report spec.
 
@@ -129,7 +188,7 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 
 1. Find or create the **Person** in STUDENTS (`Legal First Name`, `Last Name`, `Primary Email`; the preferred-name field when the student signs differently; `Student ID` / `Graduation Year` / `Major` when the export carries them — blank on a thin drop, flagged for Workday pull).
 2. Create the **Enrollment** row; link `Student` → the Person and `Enrollment` → the resolved COURSE x SEMESTER row (step 1a).
-3. Set **GRADING Status** from registration status, and **UPDATE it as it goes** (e.g. Active → Withdrawn when a prior row is confirmed dropped — only ever off explicit evidence, never off an export's silence). A permission request that is not yet approved is not `Active`; a student with no request on file is a further step back again.
+3. Set **GRADING Status** per the **1b ladder**, and **UPDATE it as it goes** as evidence arrives.
 4. Read the exact field/status names LIVE from the list; never from this file.
 
 🔴 **Leave unknowns EMPTY.** A plausible guess in a data field is worse than a blank — the blank is honest, the guess is indistinguishable from a fact (batch-import's founding scar). Never invent a Student ID, grad year, major, registration status, or course.
@@ -143,6 +202,7 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 - **One relationship per source chain, MANY-TO-ONE where a student has several.** A single enrollment commonly has two or three chains behind it (the Workday notification, the student's own email, a follow-up). Attach them all to the one row — that IS the consolidation, and it works precisely because it keys on the join rather than on a subject-line filter.
 - **Prose provenance stays** (source + confidence tier + which session), but it is the human note. **The link is the mechanism.**
 - **The linked COURSE x SEMESTER row becomes the passive collation point** — one place showing the whole class, its people, and every conversation behind it, permanently, with no filter to maintain. That is the answer to *"can these related emails collate on their own"*: no automation exists, and none is needed once the join is real.
+- ⚠️ **On a batch/export row there may be NO email chain to link** — an export row is its own provenance. Link it to the **Import Session** task instead; every row still walks back to a source.
 - 🔴 **This step is what makes closing the intake chains safe** (below). Close before linking and you file the trail away with nothing pointing at it.
 
 > 🩹 Born of the first live run: 8 enrollment rows shipped citing their chains in **prose only**. The join was one-directional and text-based — you could not walk from a course to its emails, nor from a row back to the email that made it. Michael caught it by asking whether the related emails collate passively. **A join that only a human can follow is not a join.**
@@ -162,6 +222,7 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 
 - **Report 2 — write receipt:** counts block + a table of every row written, with GRADING values explained in this workspace's terms, and an explicit statement of what you did NOT write. **Count the links and the closes too** — they are writes.
 - **Report 3 — per-course before/after (⭐ Michael asked for this one by name):** for EVERY course the pass touched — previously enrolled count, added (linked enrollment rows), currently enrolled count — then a totals line and a one-or-two-line reading. **Recount from the live rows; never `previous + added` arithmetic**, which hides a row that failed to write. Untouched courses never appear.
+- 📦 **On a cold export, also report the export's own timestamp, its row count vs student count, and the UNVERIFIED status-mapping question** until Michael has ruled on it.
 
 ### 5. Document (three surfaces, and the path depends on batch size)
 
@@ -184,20 +245,23 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 
 ## Guardrails
 
-- 🔒 **NEVER put a student in this file.** No name, email, URID, Student ID, major or schedule — not in a step, an example, or a changelog. De-identify by SHAPE and point at the INBOX chain. `ClickUp_apps` is PUBLIC and history outlives a scrub. Full rule + the failure that produced it: the PII RULE section at the top.
+- 🔒 **NEVER put a student in this file.** No name, email, URID, Student ID, major or schedule — not in a step, an example, or a changelog. De-identify by SHAPE and point at the INBOX chain. `ClickUp_apps` is PUBLIC and history outlives a scrub. A full export is the highest-risk artifact here: attach it, never commit or paste it. Full rule: the PII RULE at the top.
 - 🔴 **OPEN THE SOURCE IN FULL — never classify off a title,** and **never scope a batch by a title filter.** Scope by the candidate set. A title filter dropped a third of the chains, twice, in one session.
-- 🔗 **LINK OUTWARD is a required write.** Prose provenance is not a join. Every enrollment row links every chain that produced it; the course row is the collation point that makes it worth doing.
+- 📦 **The VALUE LIST is schema (read live); the DECISION RULE is procedure (step 1b).** Never enumerate options here, never re-infer the ladder there.
+- 📦 **An export is the full roster of REGISTRAR RECORDS, not of humans.** It structurally cannot see the student who only emailed. Never treat it as complete.
+- 🔗 **LINK OUTWARD is a required write.** Prose provenance is not a join. Export rows with no email chain link to the Import Session instead.
 - 🔴 **Close only if linked.** No link generated → the chain stays open. And when a batch closes, STATE that the queue moved.
-- 🔴 **Resolve the course against the LIVE catalog** (COURSE x SEMESTER offered-this-term + Course List titles). Explicit code → infer-with-reason → flag-and-ask. Never guess a student into a real class. **This file names no course numbers.**
-- 🔴 **Read the Enrollments field/status set LIVE from the list every run.** Never enumerate it in this file. The list is the schema truth.
-- 🔴 **Report format comes from `roster-reconcile.report-spec.md`.** Load it; report in PRESENT/ADD/MAKE/HELD, never in the internal bucket names; recount current enrollment from the rows.
+- 🔴 **Resolve the course against the LIVE catalog.** Explicit code → infer-with-reason → flag-and-ask. **This file names no course numbers.**
+- 🔴 **Read the Enrollments field/status set LIVE from the list every run.**
+- 🔴 **Report format comes from `roster-reconcile.report-spec.md`.** Report in PRESENT/ADD/MAKE/HELD; recount from the rows; state the export timestamp and the denominator.
 - 🔴 **Never write in the analyze pass.** Plan first, greenlight second, write third.
 - 🔴 **Leave unknowns EMPTY.** Never invent a Student ID, registration status, grad year, major, or course.
-- 🔴 **WITHDRAWN? and CONFLICT are FLAG-only** until Michael rules. An export's silence is not proof of a drop; disagreeing keys are not an auto-pick; an unresolved course is a CONFLICT, not a best guess. A `cancelled` catalog row with live enrollments is also a CONFLICT.
-- 🔴 **A conflict-resolution form is an ADD, not a duplicate.** Check which of its two courses the student already holds before proposing anything.
+- 🔴 **WITHDRAWN? and CONFLICT are FLAG-only** until Michael rules. An export's silence is not proof of a drop; disagreeing keys are not an auto-pick; an unresolved course is a CONFLICT. A `cancelled` course with live enrollments is a CONFLICT from either direction.
+- 🔴 **Attendance is not registration; approval is not enrollment.** Never advance a status off an adjacent fact.
+- 🔴 **A conflict-resolution form is an ADD, not a duplicate.** Check which of its two courses the student already holds.
 - 🔴 **Person stays clean** — no per-run stamp on the human record.
-- **Single student → local comment, no Import Session.** Batch → Import Session in Report Imports.
-- **Graduated trust:** greenlight every run now; silent writes on unambiguous buckets are earned on proven reliability, not assumed.
+- **Single student → local comment.** Batch → Import Session in Report Imports.
+- **Graduated trust:** greenlight every run now; silent writes are earned, not assumed.
 - Email is identity; Student ID confirms. A name-string difference with agreeing keys is normalized, not flagged.
 
 ---
@@ -205,19 +269,20 @@ Greenlight granularity depends on batch size (see Documentation). On approval, p
 ## Composes with
 
 - `hooks/roster-reconcile.report-spec.md` — the display format for all three reports. Load before reporting. Shared with the prep hook; one claimant so it cannot drift.
-- `hooks/roster-reconcile-prep.md` — Milo's upstream hook (**v3**): sweeps the messy Default Inbox into a clean candidate report fed INTO this tool. Two verbs, clean seam — do not merge.
+- `hooks/roster-reconcile-prep.md` — Milo's upstream hook (**v3**): sweeps the messy Default Inbox into a clean candidate report fed INTO this tool. Two verbs, clean seam — do not merge. 📦 Its output and a cold export are COMPLEMENTARY, not redundant: prep finds the people the registrar cannot see, the export finds the people email never mentioned.
 - `EMAIL-TRIAGE` skill — the inbox front door a single-student reconcile often starts from; its chain-canonical model is why chains are LINKED and never moved.
-- ⚠️ `hooks/reconcile-engine.md` — **UNRESOLVED SEAM, flagged 2026-08-31, deliberately not acted on in this pass.** An engine + manifest refactor of the reconcile family landed the same day and its family list reads *"ddr / doc-destroyer / gcal / contact"* — **this hook is not named in it at all**, despite being a reconcile born the same day. Either roster reconcile is a fifth manifest candidate or it is genuinely outside the family (it CREATES relational records rather than comparing surfaces, which is a real difference). **Somebody must rule; do not migrate on assumption, and do not let the omission stand unexamined.** Fold-in Frank + Michael.
-- `hooks/commit-pre-flight.md` / `secrets-pii-guard.md` — ⚠️ student data is FERPA-sensitive; STUDENTS/Enrollments detail never leaves the workspace into the public repo, an artifact, or a channel. **This file violated that on day one; see the PII RULE at the top.**
+- `hooks/batch-import.md` — the closest sibling for the EXPORT path (propose-then-press over a bulk file, different domain). Its scars apply directly: leave unknowns empty; a discrepancy you can explain is not one you have resolved; a silent conflict-update re-writes stale data with a clean-looking run.
+- `hooks/commit-pre-flight.md` / `secrets-pii-guard.md` — ⚠️ student data is FERPA-sensitive. **This file violated that on day one; see the PII RULE at the top.**
 - `hooks/task-dedup-gate.md` — before creating any Person or Enrollment row.
-- `hooks/batch-import.md` — sibling shape (propose-then-press), different domain. Its scars apply: leave unknowns empty; a discrepancy you can explain is not one you have resolved.
+- ~~`hooks/reconcile-engine.md` — unresolved seam, possible fifth manifest~~ **STRUCK 2026-08-31 by Michael the same day it was raised: "that's a different reconcile project."** Roster reconcile is NOT an engine manifest candidate and its absence from that family list is correct, not an omission. The structural reason it does not fit, recorded so nobody re-opens this: the engine COMPARES existing surfaces and proposes; this hook CREATES relational records from an intake source. Different verb.
 
 ---
 
 ## Changelog
 
-- **v5 (2026-08-31)** — 🔗 **LINK OUTWARD promoted to a required write step (3.5)** after the first live run shipped 8 enrollment rows whose source chains were cited in the DESCRIPTION only. The join was text-only and one-directional; Michael caught it by asking whether the related emails collate passively. Added: many-to-one chain linking, the course row as the passive collation point, **step 3.6 CLOSE IF LINKED** with his ruling verbatim and the state-that-the-queue-moved rule, and a hard **no-title-filter-as-scope** guardrail (a title filter dropped a third of the chains TWICE in one session). Also flagged the unresolved `reconcile-engine.md` seam — that same-day refactor's family list omits this hook entirely.
-- **v4 (2026-08-31)** — Report formats EXTRACTED to `roster-reconcile.report-spec.md`, which also carries the per-course before/after report Michael specified by name (previously enrolled / added / currently enrolled, recounted from the rows rather than added up). Step 4 became a report step pointing at the spec. Also folded in: the conflict-form ADD case in Step 0, the internal-buckets-are-not-report-vocabulary note, and the preferred-name field in the write step.
-- **v3 (2026-08-31)** — 🔒 **FERPA SCRUB.** v1/v2 shipped with two real student names and a real legal-vs-preferred name split as Step 0 and changelog examples, in a PUBLIC repo, against this file's own FERPA line (Michael: *"never put specifics like student names in the hook"*). All examples de-identified by shape; **new PII RULE section at the TOP**, because the guardrail that failed was written at the bottom where an author never reads it before writing. Also: struck the hardcoded course-number pair (it had already transposed once), added the two-live-lighting-courses ambiguity as a CONFLICT case, added the `cancelled`-row-with-live-enrollments conflict, and fixed the stale stub pointer to the prep hook. ⚠️ HEAD is clean; the original values persist in git history at the PR #877 commit.
-- **v2 (2026-08-31)** — First live run exposed two gaps, folded in the same day. (1) Added **Step 0: OPEN THE SOURCE IN FULL** — the sweep had classified off titles and missed the reconcile key, a legal-vs-preferred name split, and a not-yet-filed request. (2) Added **Step 1a: Resolve the course** — canonical source is COURSE x SEMESTER + Course List, read LIVE, with an explicit-→infer-with-reason-→flag ladder; an unresolved course is now a CONFLICT. Fixed a course-number transposition. CROSS-SEM widened to cover another-course.
-- **v1 (2026-08-31)** — Established by Brain, specced live with Michael on the first day of F26 classes. Scale-invariant intake, two-level lookup, six buckets with UPDATE as the join-staying-live case, greenlight gate with graduated trust, single-vs-batch documentation split. Person record stays clean. Field/status set read live, never enumerated here.
+- **v6 (2026-08-31)** — 📦 **Added Step 1b: reading a COLD full export + the GRADING Status DECISION RULE**, on Michael's instruction (*"so you don't have to infer"*) ahead of the first full Workday THTR export. Resolves a real contradiction in this file rather than papering over it: the **VALUE LIST is schema** and stays on the list read-live, the **DECISION RULE is procedure** and belongs here, because a rule does not rot when a field is added. Carries the six-rung evidence→value ladder, what an export carries vs is silent on, the two buckets only an export can fire (UPDATE at volume, WITHDRAWN? for the first time), and an explicit **UNVERIFIED** block — no export has been read yet, the registrar's own vocabulary is unknown, and Michael's *"unregistered ... to be determined"* is preserved as the open question it is, to be settled in a Decision Log rather than guessed. Also: `attendance is not registration, approval is not enrollment`, export rows link to the Import Session when no email chain exists, and the export-is-a-snapshot timestamp rule. **Struck the `reconcile-engine.md` seam flag** — Michael ruled it a different project; the structural reason is recorded so it is not re-opened.
+- **v5 (2026-08-31)** — 🔗 **LINK OUTWARD promoted to a required write step (3.5)** after the first live run shipped 8 enrollment rows whose source chains were cited in the DESCRIPTION only. Michael caught it by asking whether the related emails collate passively. Added many-to-one chain linking, the course row as the passive collation point, **step 3.6 CLOSE IF LINKED** with his ruling verbatim, and a hard **no-title-filter-as-scope** guardrail (that failure fired TWICE in one session).
+- **v4 (2026-08-31)** — Report formats EXTRACTED to `roster-reconcile.report-spec.md`, which also carries the per-course before/after report Michael specified by name. Step 4 became a report step pointing at the spec. Also: the conflict-form ADD case, the internal-buckets-are-not-report-vocabulary note, and the preferred-name field in the write step.
+- **v3 (2026-08-31)** — 🔒 **FERPA SCRUB.** v1/v2 shipped with two real student names in a PUBLIC repo, against this file's own FERPA line (Michael: *"never put specifics like student names in the hook"*). All examples de-identified by shape; **new PII RULE section at the TOP**, because the guardrail that failed was written at the bottom where an author never reads it. Also struck the hardcoded course-number pair (already transposed once), added the two-live-lighting-courses ambiguity and the cancelled-row-with-live-enrollments conflict. ⚠️ HEAD is clean; originals persist in history at the PR #877 commit.
+- **v2 (2026-08-31)** — First live run exposed two gaps. (1) **Step 0: OPEN THE SOURCE IN FULL** — the sweep had classified off titles and missed the reconcile key, a name split, and a not-yet-filed request. (2) **Step 1a: Resolve the course** against the live catalog with an explicit-→infer-→flag ladder. Fixed a course-number transposition. CROSS-SEM widened to another-course.
+- **v1 (2026-08-31)** — Established by Brain, specced live with Michael on the first day of F26 classes. Scale-invariant intake, two-level lookup, six buckets with UPDATE as the join-staying-live case, greenlight gate with graduated trust, single-vs-batch documentation split. Person record stays clean.
