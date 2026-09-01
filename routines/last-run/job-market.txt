@@ -1,5 +1,5 @@
-2026-08-06 22:40 ET
-pass anchor: 2026-08-06 21:25
+2026-09-01 18:31 ET
+pass anchor: 2026-09-01 01:34
 lanes: 8 of 8 complete
-live: 173
-result: COMPLETE
+live: 216
+result: PARTIAL - inventory landed, sweep uneven, OSJ unreachable all three days (ME/AUD/DFT starved), 4 of ~20 boards productively swept
