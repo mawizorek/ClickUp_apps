@@ -1,12 +1,13 @@
 {
   "_meta": {
     "description": "Gate config for job-market-refresh. Each entry = one full research loop iteration. Each entry MUST have a matching state file at routines/job-market-state/<id>.tsv",
-    "version": 3,
-    "updated": "2026-08-04",
+    "version": 4,
+    "updated": "2026-09-02",
     "_rulings": [
       "2026-08-04 (Michael): 'company manager' belongs to creative-admin, NOT stage-manager. Moved. The four live company-manager rows are homed in ADM and their pending also_lanes flags are cleared.",
       "2026-08-04 (Michael): drafting-design STAYS ACTIVE. It is swept every pass like any other lane; low career value is not a reason to stop looking.",
-      "2026-08-04 (Michael): the safety keywords STAY, and are expanded. 'It is a very niche thing, but that is kind of the point.' Zero returns is a SOURCE problem, not a keyword problem — safety roles post on venue/arena/municipal boards, not theatre boards. See job-market-sources.md."
+      "2026-08-04 (Michael): the safety keywords STAY, and are expanded. 'It is a very niche thing, but that is kind of the point.' Zero returns is a SOURCE problem, not a keyword problem — safety roles post on venue/arena/municipal boards, not theatre boards. See job-market-sources.md.",
+      "2026-09-02 (Michael): producing-artistic lane (PRD) CREATED. Three rows surfaced in the 09-01 pass with no lane home. Corso proposed; Michael confirmed. 'DEFINITELY want producer.'"
     ]
   },
   "global": {
@@ -181,6 +182,27 @@
       "exclude_terms": ["office administrator", "dental", "medical", "church administrator"],
       "constraints": {},
       "_note": "'company manager' + 'assistant company manager' moved here from stage-manager 2026-08-04 by Michael's ruling."
+    },
+    {
+      "id": "producing-artistic",
+      "display": "Producing / Artistic Leadership",
+      "lane": "PRD",
+      "keywords": [
+        "associate artistic director",
+        "assistant artistic director",
+        "artistic director theatre",
+        "associate producer theatre",
+        "associate producer performing arts",
+        "line producer performing arts",
+        "artistic producer",
+        "director of programming performing arts",
+        "programming director theatre",
+        "curator performing arts"
+      ],
+      "levels": ["senior", "mid", "associate", "entry", "contract"],
+      "exclude_terms": ["film producer", "television producer", "music producer", "podcast producer", "video producer", "content producer", "content creator"],
+      "constraints": {},
+      "_note": "Created 2026-09-02 by Michael's ruling. Three rows surfaced in the 09-01 pass with no lane home: Paper Mill AAD ($85-95K), PAC NYC Associate Producer ($70-77K, rowed in ADM on 'creative producer'), PCLO/PPT President & Executive Producer ($175-200K). ADM retains 'creative producer' and 'producing director' for existing rows; PRD captures the artistic-leadership and producing titles that ADM's management-heavy keywords miss."
     }
   ]
 }
