@@ -1,7 +1,7 @@
 ---
 id: morning-briefing
 kind: hook
-version: 1.1
+version: 1.2
 status: LIVE (phase 1 — manual fire, no scheduler exists)
 steward: Mainstage Milo (URITP is his organization; the brief is his house report)
 execution: ownerless — any agent in a session may run it (Doc-Rot-Sweep precedent)
@@ -13,7 +13,8 @@ report-to: 🟢 Agent Activity Board — a run comment, same shape as a Ricky ru
 # Morning Briefing — the URITP production wake-up
 
 The one prompt Michael runs to start a day. It reports the **state of his
-productions**, catches what slid, and hands him a batch already primed for work.
+productions**, catches what slid, hands him the cheap things only he can unblock,
+and gives him a batch already primed for work.
 
 **Invocation:** `/morning` · `/wake` · `/briefing` · "morning briefing" ·
 "wake me up" · "what's the state of the shows."
@@ -51,6 +52,72 @@ report generator satisfying a spec.**
 applies to every hook, every runbook and every report surface in this repo, not
 just this one.
 
+### 🔴 v1.2 — AND HERE IS WHAT "RELEVANT" MEANS, BECAUSE THE FIRST RUN GOT IT WRONG
+
+**RELEVANCE IS NOT MAGNITUDE.** It is **consequence × whether Michael is the only
+person who can unblock it.** Never size, never how impressive the item sounds.
+
+⚠️ **The founding failure, and it happened on the very first dry run:** given
+judgement by v1.1, the brief immediately used it to filter by importance-as-size.
+It surfaced the costume plot and the scenic build, then wrote *"deliberately left
+out: pens, tissues, hole-punch"* as if that were discipline. **Michael pushed
+back in the next turn and he was right.** Verbatim:
+
+> *"those things you deliberately left out—like the purchase requests—are actually
+> a high priority. Since I am the gatekeeper of purchases, those are easy things to
+> get checked off and ordered. That is the exact kind of thing I tend to slip up on
+> and forget because I am busy thinking about the big production requests and the
+> work we still haven't even dug into. If I need to hop on Staples and order pens
+> real quick, that is exactly what you should be reminding me when we sit down to
+> begin work in the morning!"*
+
+⭐ **The lesson, stated so no cold session re-derives it:** a two-minute task that
+**only Michael can close** outranks a large task that cannot move today. The big
+production problems are the ones he is *already* thinking about — they do not need
+a reminder. **The brief's unique value is the cheap, closeable, easily-forgotten
+thing with somebody waiting on the other end of it.**
+
+🚫 **"Too small to mention" is not a category this hook recognizes.** The only test
+is whether it is closeable and whether anyone is blocked. A crew without pens is
+blocked. Trivia is what nobody is waiting on.
+
+---
+
+## 🛒 THE GATEKEEPER BLOCK — cheap, closeable, only-Michael
+
+**Its own block, and it ships near the TOP of the brief, not the bottom.** These
+are the items where Michael is the sole gate and the close is minutes.
+
+**What qualifies:**
+
+- **Purchase Requests** — he is the gatekeeper of purchases, full stop. Every open
+  row is a decision only he can make.
+- **Approvals and sign-offs** waiting on him specifically.
+- Anything where the next action is literally *place the order / say yes / send the
+  form* and no one else in the building can do it.
+
+**How to present it — this block breaks the one-line rule ON PURPOSE:**
+
+- **GROUP BY ERRAND, not by task.** "Six Staples-able rows, one order" is one
+  decision; six separate lines is six decisions and he will make none of them.
+  This is the one place where collapsing beats enumerating, and it is still LINKS —
+  every row in the group is hyperlinked, just gathered under one action.
+- **Lead with the errand and the elapsed age.** *"One Staples run clears five rows,
+  oldest 12 days."*
+- **Separate the errands that are genuinely different.** An office-supply order, a
+  capital request (Mary's iMac), and a safety-stock item are three errands, not one.
+- **Say what is blocked downstream** when something is: tape measures during a
+  scenic build, ice packs during rehearsals, a first-aid kit at all.
+- **Sort by age within the group.** An item aging quietly is the whole point.
+
+⚠️ **This is the block most likely to rot into a nag.** Guard: it names the ERRAND
+and the AGE, never "any update on this?" And when a row has been open for months
+with no downstream block, the honest move is to ask whether it should exist — the
+same kill question the slide block asks.
+
+🚫 **The brief never orders anything, never spends money, never marks a request
+approved.** It puts the errand in front of him. He is the gate; that is the point.
+
 ---
 
 ## 🔴 RULE 0 — LINKS, NOT PROSE
@@ -66,6 +133,7 @@ tasks, cos that'll be the brunt of the update."*
   is a task he has to go find, which is the exact work this hook exists to remove.
 - **One line per task. Max.** `[name](url) · <status> · <the one fact that makes it
   actionable>`. No second sentence. No "this suggests."
+  ✅ **Documented exception: the Gatekeeper Block groups by errand** (above).
 - **Prose is capped at the section headers plus the closing question.** Nothing else.
 - ⚠️ **This inverts the house Spoken Voice floor and does so deliberately.** The
   floor says converse as if speaking; a scannable link list is the ONE surface
@@ -81,7 +149,8 @@ tasks, cos that'll be the brunt of the update."*
 **IN:** the URITP spaces. Productions, their calendars, their people, their
 paperwork, the building, welfare and training status. Michael's own dated tasks
 across the workspace, because he smashes active thoughts into days around today
-and that habit IS the input signal.
+and that habit IS the input signal. **Plus every surface where he is the sole
+gate** — Purchase Requests, approvals, FACILITIES tickets he owns.
 
 **OUT, and each for a reason:**
 
@@ -93,6 +162,11 @@ and that habit IS the input signal.
 - **Season shape.** Michael decides what a season is. The brief reports what is
   happening inside it.
 - **Anything requiring a decision the brief then acts on.** See Authority below.
+
+⚠️ **"Small" is NOT an exclusion criterion.** See the Prime Directive § v1.2. The
+WISH LIST is the honest edge case: it is a someday-shelf, not a gate, so it does
+not ship as gatekeeper work — but an item on it that a live production needs this
+week does.
 
 ---
 
@@ -113,8 +187,11 @@ workspace. Every condition below is a named failure that already happened here.
    - **The EVERYTHING WEEK calendar view is not readable** (access denied,
      verified 2026-09-02). The dated tasks beneath it read fine, and that is the
      data that matters — but say so rather than implying the view was consulted.
-   - **Activity reads cap at 7 days per call** and silently truncate. The brief
-     DECLARES its lookback window. An undeclared window reads as total coverage.
+   - 🔴 **Activity reads cap at 7 days per call AND TRUNCATE FURTHER WITHOUT
+     WARNING.** Measured on the first dry run: a 7-day request returned **2.5
+     days**. At that width the 2-move slide threshold is unprovable — everything
+     shows one move. **CHAIN 2-3 CALLS** to reach a usable window, and **DECLARE
+     the width you actually got**, never the width you asked for.
 3. **Every line carries a next action or an owner.** Otherwise it is a diary entry.
 4. **"Nothing to report" is a SUCCESSFUL run** and ships as one. A brief that
    manufactures content to look useful trains him to skip it.
@@ -135,6 +212,12 @@ gap two days old is already a problem if the designer starts Monday.
 
 **So: pressure = distance from the item to the milestone it feeds.** Read the
 show's milestone spine FIRST, then judge everything against it.
+
+⭐ **CHAIN THE DEPENDENCIES, because that is the finding no single list can show.**
+The first dry run's best catch was a pair, not an item: prelim costume design was
+37 days overdue while first costume fittings were due that same day. **You cannot
+fit costumes that were never designed.** Hunt that shape deliberately — a
+deliverable overdue upstream of an event already on the calendar.
 
 **Verified spine state, 2026-09-02 (re-verify, never quote this):**
 
@@ -175,9 +258,10 @@ split it two ways.
 **THRESHOLD, ruled by Michael 2026-09-02: TWO moves with no status change QUALIFIES
 for a callout.** Not three. Two is already a pattern.
 ⚠️ **Qualifying is not the same as belonging in the brief.** Per the Prime
-Directive, the threshold decides what is *eligible*; relevance decides what ships.
-A slide on something that genuinely does not matter this week is noise wearing a
-pattern's clothes — hold it, do not pad with it.
+Directive, the threshold decides what is *eligible*; relevance decides what ships —
+and relevance means consequence × sole-gatekeeper, not size.
+⚠️ **A one-move slide is a CANDIDATE, labelled as one.** Say the window was too
+narrow to prove a pattern rather than promoting it or silently dropping it.
 
 **Carry the SLIDE COUNT on every one you do surface**, because the count is the
 whole message: two is a pattern, four is a decision he has not made yet.
@@ -191,7 +275,8 @@ question that unblocks it is the one that lets him kill it.
 
 **Founding-run examples (illustrative, will be stale):** `coordinate ECM calls for
 load-in and strike` and `get new roadcases for lustrs and D40s` both slid 8/31 →
-9/2. `Biometric Screening` and `Online Health Surveys` both pushed ~6 days.
+9/2. `Biometric Screening` and `Online Health Surveys` both pushed ~6 days. All
+four showed ONE move at the 2.5-day width actually returned.
 
 🚫 **Never mark a slide off a date you did not read this run.** A cleared date is
 not a slide. A date set for the first time is not a slide.
@@ -207,10 +292,11 @@ bump their next steps'."*
 **This is the hook's one WRITE, and it is authorized.** Order matters:
 
 1. **Pick the tasks worth drilling — 5-10 is the usual shape, not a quota.**
-   Selection rule, in order: closest to a milestone → highest slide count →
-   blocking somebody else → oldest unowned. **Never a random sample, and never a
-   filler pick to reach a number.** Four real ones beat ten with six passengers,
-   because a batch with passengers teaches him to skim the block.
+   Selection rule, in order: closest to a milestone → **sole-gatekeeper items he
+   can close today** → highest slide count → blocking somebody else → oldest
+   unowned. **Never a random sample, and never a filler pick to reach a number.**
+   Four real ones beat ten with six passengers, because a batch with passengers
+   teaches him to skim the block.
 2. **Post ONE comment per task, BEFORE reporting.** Past tense in the brief
    ("already commented") must be TRUE when he reads it.
 3. **The comment names the next step and who owns it.** One or two lines. It is a
@@ -238,8 +324,8 @@ write never blocks the report.
 
 🚫 **NEVER:** create a task · send anything (the email send lock stands) · touch
 any external calendar (scheduling is ClickUp tasks with start/due dates, always)
-· change a date · decide a season · adjudicate a craft disagreement · declare
-something safe to proceed.
+· change a date · place an order or approve a purchase · decide a season ·
+adjudicate a craft disagreement · declare something safe to proceed.
 
 ⚠️ **A date change by an agent is indistinguishable from one by Michael**, which is
 exactly why this hook does not make them: it would manufacture its own slide
@@ -249,18 +335,20 @@ signal and corrupt the next run's arithmetic.
 
 ## Output shape
 
-Header line: date · lookback window · days since last brief · source health.
-Then these blocks, **omitting any that are empty**, each a bare list of links:
+Header line: date · lookback window ACTUALLY RETURNED · days since last brief ·
+source health. Then these blocks, **omitting any that are empty**:
 
 1. **🎭 TODAY** — what is on the boards, what is called tonight, what is due.
-2. **⏰ INSIDE THE WINDOW** — dated items landing before the next milestone,
-   grouped by show. Pressure order, not date order.
-3. **🔴 SLID** — the anti-complacency block, with slide counts and the one question.
-4. **🕳️ GAPS** — unowned, unassessed, undated things that a milestone is about to
-   need. TIM-D's missing critical path lives here until it is fixed.
-5. **🎯 DRILL BATCH** — the already-commented tasks. Always last, because it is the
-   block he acts on.
-6. **Routines** — one line. Count due, link to Ricky's thread. Never more.
+2. **🛒 GATEKEEPER** — cheap, closeable, only-Michael. Grouped by errand, aged.
+   **High in the brief on purpose:** it is the block he forgets and the fastest
+   value in the whole report.
+3. **⏰ PRESSURE** — dated items landing before the next milestone, grouped by show,
+   pressure order not date order. Chained dependencies called out as pairs.
+4. **🔴 SLID** — slide counts and the one question. Candidates labelled as such.
+5. **🕳️ GAPS** — unowned, unassessed, undated things a milestone is about to need.
+6. **🎯 DRILL BATCH** — the already-commented tasks. Last, because it is the block
+   he acts on.
+7. **Routines** — one line. Count due, link to Ricky's thread. Never more.
 
 Close with ONE question. Not a summary, not a recommendation list.
 
@@ -271,27 +359,35 @@ SLID block and that is a clean brief, not an incomplete one.
 
 ## Known limits, stated because a cold session will not find them
 
-- **Generalized from ZERO live runs.** v1 was scoped in conversation and grounded
-  against real workspace state, but never fired end to end. A session that finds
-  no prior run report SAYS SO instead of assuming this works.
+- **ONE dry run, zero fired runs.** The 2026-09-02 preview produced findings and
+  two corrections but posted no comments. A session that finds no prior run report
+  SAYS SO instead of assuming this works.
 - It cannot see a conversation. Only artifacts.
 - It cannot read ClickUp automations. Any automation behaviour is testimony.
 - It cannot tell a task with no date from a task that does not need one.
+- **It cannot know what Michael already has in his head**, which is precisely why
+  it must not filter for the impressive-sounding items: those are the ones he is
+  already carrying.
 - **It cannot make a slide matter.** Same limit the Task-Context Orientation Gate
   names about itself: the hook can surface the pattern; only Michael can break it.
 
 ## Provenance
 
-Scoped 2026-09-02 08:16-08:55 ET, Mainstage Milo seated, QUESTION-ME loaded.
+Scoped 2026-09-02 08:16-09:10 ET, Mainstage Milo seated, QUESTION-ME loaded.
 **Fold-in verdict: FOLD-IN, not net-new** — the Routine Ricky standing task
 (`86ajuhw1d`) already carried *"save the ONE prompt Michael can run once a day to
 kickstart procedures and routines and agents and comments and threads"* with one
 unticked checklist item open since 2026-08-01. That task is a RECORD surface by
 its own law, so the spec landed here and the checklist item became a pointer.
 
-Five rulings by Michael, each traceable to a turn: **URITP production management,
+Six rulings by Michael, each traceable to a turn: **URITP production management,
 not a cross-tool digest** ("you're my uritp guy") · **links over prose, 20-40
 tasks** · **two slides qualifies for a callout** · **the brief pre-comments the
-drill batch** · **v1.1: the numbers are scale and scope, NOT a checklist** — given
-one turn after the numbers themselves, which is why the Prime Directive sits above
-Rule 0 rather than inside it.
+drill batch** · **v1.1: the numbers are scale and scope, NOT a checklist** ·
+**v1.2: relevance is CONSEQUENCE × SOLE-GATEKEEPER, never magnitude** — earned by
+pushback on the first dry run, where the brief used its new judgement to discard
+exactly the work Michael most needs reminding of.
+
+⭐ **The two corrections are a matched pair and belong read together:** v1.1 stopped
+the brief padding to a number; v1.2 stopped it filtering by size. Both are the same
+underlying error — substituting a proxy for judgement.
