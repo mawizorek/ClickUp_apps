@@ -1,7 +1,7 @@
 ---
 id: morning-briefing
 kind: hook
-version: 1
+version: 1.1
 status: LIVE (phase 1 — manual fire, no scheduler exists)
 steward: Mainstage Milo (URITP is his organization; the brief is his house report)
 execution: ownerless — any agent in a session may run it (Doc-Rot-Sweep precedent)
@@ -23,14 +23,45 @@ at 4am. It never assumes yesterday ran.
 
 ---
 
-## 🔴 RULE 0 — LINKS, NOT PROSE. This is the rule the whole file exists to protect.
+## 🔴 THE PRIME DIRECTIVE — read this before any number below
+
+Michael, verbatim, 2026-09-02, one turn after giving the numbers:
+
+> *"I'm giving you these estimated numbers and ranges, but I don't want you to feel
+> like you just have to checklist everything. This is supposed to be you acting as
+> my assistant and surfacing what's relevant. I'm just giving you scale and scope,
+> not a checklist!"*
+
+**EVERY NUMBER IN THIS FILE IS A SCALE CUE, NOT A QUOTA.** 20-40, 5-10, 2 slides,
+cap 10 — all of them describe the *shape* of a useful brief. None of them is a
+target to hit.
+
+**RELEVANCE OUTRANKS EVERY THRESHOLD IN THIS DOCUMENT.** When the honest answer is
+11 tasks, the brief is 11 tasks. When three things genuinely matter, it is three
+things and it is a **better** brief than a padded one.
+
+⚠️ **This clause exists because v1 was one turn from the exact opposite failure of
+Rule 0.** Rule 0 kills prose bloat; unchecked, it invites *list* bloat — padding
+to 20-40, filling the batch to 10, dumping every 2-move slide. A brief that hits
+its numbers and buries the one thing that mattered has failed just as hard as a
+brief made of paragraphs. **The job is an assistant exercising judgement, not a
+report generator satisfying a spec.**
+
+🔥 **GENERALIZES:** a range from Michael is scope-setting, never a checklist. This
+applies to every hook, every runbook and every report surface in this repo, not
+just this one.
+
+---
+
+## 🔴 RULE 0 — LINKS, NOT PROSE
 
 Michael, verbatim, 2026-09-02: *"the update i'm going to want is going to be far
 LESS prose from you and more LINKS to tasks. so i don't mind hearing about 20-40
 tasks, cos that'll be the brunt of the update."*
 
-- **20-40 linked tasks is the TARGET, not the ceiling.** A brief with 6 tasks and
-  four paragraphs of analysis has failed even if every sentence is true.
+- **20-40 linked tasks describes the expected WEIGHT of a normal day**, so a brief
+  that size is not too long. 🚫 It is not a floor and not a ceiling. See the Prime
+  Directive.
 - **Every task named is a markdown hyperlink.** A task mentioned without a link
   is a task he has to go find, which is the exact work this hook exists to remove.
 - **One line per task. Max.** `[name](url) · <status> · <the one fact that makes it
@@ -141,11 +172,15 @@ split it two ways.
   belonged in the brief.
 - 🔴 **A date moved with ZERO status change = A SLIDE.** This is the signal.
 
-**THRESHOLD, ruled by Michael 2026-09-02: TWO moves with no status change earns a
-callout.** Not three. Two is already a pattern.
+**THRESHOLD, ruled by Michael 2026-09-02: TWO moves with no status change QUALIFIES
+for a callout.** Not three. Two is already a pattern.
+⚠️ **Qualifying is not the same as belonging in the brief.** Per the Prime
+Directive, the threshold decides what is *eligible*; relevance decides what ships.
+A slide on something that genuinely does not matter this week is noise wearing a
+pattern's clothes — hold it, do not pad with it.
 
-**Carry the SLIDE COUNT on every one**, because the count is the whole message:
-two is a pattern, four is a decision he has not made yet.
+**Carry the SLIDE COUNT on every one you do surface**, because the count is the
+whole message: two is a pattern, four is a decision he has not made yet.
 
 **Ask ONE blunt question, never a list of gentle observations:**
 > *is this actually happening, or are we killing it?*
@@ -171,9 +206,11 @@ bump their next steps'."*
 
 **This is the hook's one WRITE, and it is authorized.** Order matters:
 
-1. **Pick 5-10 tasks** from what the brief just surfaced. Selection rule, in order:
-   closest to a milestone → highest slide count → blocking somebody else → oldest
-   unowned. Never a random sample.
+1. **Pick the tasks worth drilling — 5-10 is the usual shape, not a quota.**
+   Selection rule, in order: closest to a milestone → highest slide count →
+   blocking somebody else → oldest unowned. **Never a random sample, and never a
+   filler pick to reach a number.** Four real ones beat ten with six passengers,
+   because a batch with passengers teaches him to skim the block.
 2. **Post ONE comment per task, BEFORE reporting.** Past tense in the brief
    ("already commented") must be TRUE when he reads it.
 3. **The comment names the next step and who owns it.** One or two lines. It is a
@@ -183,8 +220,9 @@ bump their next steps'."*
 4. **Report the batch as links**, with what each comment asked for.
 5. **Close with the invitation:** *drill these now?*
 
-⚠️ **Cap the batch at 10.** Eleven is a work session, not a brief, and a batch he
-cannot finish trains him to ignore the whole block.
+⚠️ **Never exceed 10.** Eleven is a work session, not a brief, and a batch he
+cannot finish trains him to ignore the whole block. This one IS a hard ceiling —
+it bounds his effort, not the brief's completeness.
 ⚠️ **If a comment write fails, say so on that line and keep the brief.** A failed
 write never blocks the report.
 
@@ -220,11 +258,14 @@ Then these blocks, **omitting any that are empty**, each a bare list of links:
 3. **🔴 SLID** — the anti-complacency block, with slide counts and the one question.
 4. **🕳️ GAPS** — unowned, unassessed, undated things that a milestone is about to
    need. TIM-D's missing critical path lives here until it is fixed.
-5. **🎯 DRILL BATCH** — the 5-10 already-commented tasks. Always last, because it
-   is the block he acts on.
+5. **🎯 DRILL BATCH** — the already-commented tasks. Always last, because it is the
+   block he acts on.
 6. **Routines** — one line. Count due, link to Ricky's thread. Never more.
 
 Close with ONE question. Not a summary, not a recommendation list.
+
+⚠️ **The block list is the ORDER, not a form to fill.** A day with no slides has no
+SLID block and that is a clean brief, not an incomplete one.
 
 ---
 
@@ -241,13 +282,16 @@ Close with ONE question. Not a summary, not a recommendation list.
 
 ## Provenance
 
-Scoped 2026-09-02 08:16-08:50 ET, Mainstage Milo seated, QUESTION-ME loaded.
+Scoped 2026-09-02 08:16-08:55 ET, Mainstage Milo seated, QUESTION-ME loaded.
 **Fold-in verdict: FOLD-IN, not net-new** — the Routine Ricky standing task
 (`86ajuhw1d`) already carried *"save the ONE prompt Michael can run once a day to
 kickstart procedures and routines and agents and comments and threads"* with one
 unticked checklist item open since 2026-08-01. That task is a RECORD surface by
 its own law, so the spec landed here and the checklist item became a pointer.
 
-Four rulings by Michael, each traceable to a turn: **URITP production management,
+Five rulings by Michael, each traceable to a turn: **URITP production management,
 not a cross-tool digest** ("you're my uritp guy") · **links over prose, 20-40
-tasks** · **two slides earns a callout** · **the brief pre-comments the drill batch**.
+tasks** · **two slides qualifies for a callout** · **the brief pre-comments the
+drill batch** · **v1.1: the numbers are scale and scope, NOT a checklist** — given
+one turn after the numbers themselves, which is why the Prime Directive sits above
+Rule 0 rather than inside it.
