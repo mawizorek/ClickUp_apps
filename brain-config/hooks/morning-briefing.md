@@ -1,12 +1,13 @@
 ---
 id: morning-briefing
 kind: hook
-version: 1.2
+version: 1.3
 status: LIVE (phase 1 — manual fire, no scheduler exists)
 steward: Mainstage Milo (URITP is his organization; the brief is his house report)
 execution: ownerless — any agent in a session may run it (Doc-Rot-Sweep precedent)
 born: 2026-09-02
 repo: mawizorek/ClickUp_apps@main (brain-config, PUBLIC)
+sidecar: brain-config/hooks/morning-briefing.orientation.md — LOAD IT TOO
 report-to: 🟢 Agent Activity Board — a run comment, same shape as a Ricky run report
 ---
 
@@ -15,6 +16,14 @@ report-to: 🟢 Agent Activity Board — a run comment, same shape as a Ricky ru
 The one prompt Michael runs to start a day. It reports the **state of his
 productions**, catches what slid, hands him the cheap things only he can unblock,
 and gives him a batch already primed for work.
+
+🔴 **LOAD THE SIDECAR: `morning-briefing.orientation.md`.** This file holds the
+MECHANICS. The sidecar holds **what the brief IS** — THE REFRAME (it is a VARIANCE
+report, not a status report: predict, read, report the delta with a sign, own the
+miss) and THE ROOM block (weather-as-consequence, schedule collisions,
+theatre-of-note). **Running this hook without the sidecar produces a competent query
+result instead of an assistant getting oriented.** Split as a sidecar, not folded in,
+because this file was 20,858 B and the ~22KB editability ceiling is real.
 
 **Invocation:** `/morning` · `/wake` · `/briefing` · "morning briefing" ·
 "wake me up" · "what's the state of the shows."
@@ -105,10 +114,22 @@ are the items where Michael is the sole gate and the close is minutes.
 - **Lead with the errand and the elapsed age.** *"One Staples run clears five rows,
   oldest 12 days."*
 - **Separate the errands that are genuinely different.** An office-supply order, a
-  capital request (Mary's iMac), and a safety-stock item are three errands, not one.
+  capital request, and a safety-stock item are three errands, not one.
 - **Say what is blocked downstream** when something is: tape measures during a
   scenic build, ice packs during rehearsals, a first-aid kit at all.
 - **Sort by age within the group.** An item aging quietly is the whole point.
+
+⭐ **PROVEN 2026-09-02, first fire:** a StageBug DI row that had sat blank since 8/31
+became an errand Michael ran on his commute the same morning, purely because the
+research landed before he left the house. **That is the block's entire thesis.**
+
+🔴 **AND THE SECOND HALF OF THE LESSON, EARNED THE SAME MORNING: DO THE RESEARCH.**
+Michael: *"I need you to do the research and provide the links rather than just
+telling me 'Michael, you have to do this.' Be an assistant!"* **A flag with no
+research attached is homework, not help.** A gatekeeper row that is blank gets
+specced — real options, real prices, real links, and the one question that actually
+decides the purchase. 🚫 Never invent a product URL; use a search link or a
+first-party page.
 
 ⚠️ **This is the block most likely to rot into a nag.** Guard: it names the ERRAND
 and the AGE, never "any update on this?" And when a row has been open for months
@@ -133,7 +154,8 @@ tasks, cos that'll be the brunt of the update."*
   is a task he has to go find, which is the exact work this hook exists to remove.
 - **One line per task. Max.** `[name](url) · <status> · <the one fact that makes it
   actionable>`. No second sentence. No "this suggests."
-  ✅ **Documented exception: the Gatekeeper Block groups by errand** (above).
+  ✅ **Documented exceptions: the Gatekeeper Block groups by errand, and THE ROOM
+  (sidecar) is prose by design.**
 - **Prose is capped at the section headers plus the closing question.** Nothing else.
 - ⚠️ **This inverts the house Spoken Voice floor and does so deliberately.** The
   floor says converse as if speaking; a scannable link list is the ONE surface
@@ -219,25 +241,17 @@ The first dry run's best catch was a pair, not an item: prelim costume design wa
 fit costumes that were never designed.** Hunt that shape deliberately — a
 deliverable overdue upstream of an event already on the calendar.
 
-**Verified spine state, 2026-09-02 (re-verify, never quote this):**
-
-- **Big Love (F26)** — spine is STRONG. ~35 dated rows built in May, running Meet
-  & Greet → costume fittings → prelim/final LX + SND plots → designer run 9/14 →
-  hang 9/25-27 → tech setup → put-ins → dress → ASL performance → performances
-  → strike 10/19. Home: Production Cal (BL) + Info Sheet (BL). **This is the
-  model spine. Judge against it.**
-- **The November show** — spine present: load-ins 11/2-11/6, hangs, focus 11/8,
-  tech and dress 11/8-12, performances 11/13-15, strike 11/16.
-- 🔴 **TIM-D — spine is THIN and this is a real gap, not a briefing feature.** Four
-  dated rows: Meet & Greet + First Rehearsal both 10/20, designers in residence,
-  stage reading 12/6. **`[TIME] ?TECH?` carries question marks in the task name
-  itself and `[TIME] Strike` has NO DATE.** A devised show 7 weeks out with no
-  critical path. Surface it until it is fixed; do not silently treat absence of
-  dates as absence of pressure.
+**Where the spines live:** each production's Production Cal + Info Sheet lists.
+🚫 **Do NOT quote a spine snapshot from this file or any other — READ IT LIVE.** A
+dated snapshot of "where the show is" rots within the week, and every hand-copied
+state in this repo has rotted. Judge strength by whether the spine actually runs
+from first rehearsal through strike with real dates.
 
 ⚠️ **A show with no spine cannot be assessed for staleness at all.** Say that
-plainly. Never substitute clock-staleness as a fallback — it produces confident
-nonsense, which is worse than the gap.
+plainly, and treat the missing critical path as the finding. Never substitute
+clock-staleness as a fallback — it produces confident nonsense, which is worse than
+the gap. ⚠️ **A task name carrying question marks, or a strike with no date, IS the
+signal** — do not read absence of dates as absence of pressure.
 
 ---
 
@@ -273,11 +287,6 @@ whole message: two is a pattern, four is a decision he has not made yet.
 laziness. It is a task that never had a real owner or a real next action. The
 question that unblocks it is the one that lets him kill it.
 
-**Founding-run examples (illustrative, will be stale):** `coordinate ECM calls for
-load-in and strike` and `get new roadcases for lustrs and D40s` both slid 8/31 →
-9/2. `Biometric Screening` and `Online Health Surveys` both pushed ~6 days. All
-four showed ONE move at the 2.5-day width actually returned.
-
 🚫 **Never mark a slide off a date you did not read this run.** A cleared date is
 not a slide. A date set for the first time is not a slide.
 
@@ -299,7 +308,8 @@ bump their next steps'."*
    teaches him to skim the block.
 2. **Post ONE comment per task, BEFORE reporting.** Past tense in the brief
    ("already commented") must be TRUE when he reads it.
-3. **The comment names the next step and who owns it.** One or two lines. It is a
+3. **The comment names the next step and who owns it.** One or two lines — unless
+   the row is blank and needs research, in which case it carries the spec. It is a
    bump, not an essay, and it is the thing he would otherwise have typed himself.
    🚫 Never a status request, never "any update on this?" — that is noise wearing
    a work costume.
@@ -336,8 +346,11 @@ signal and corrupt the next run's arithmetic.
 ## Output shape
 
 Header line: date · lookback window ACTUALLY RETURNED · days since last brief ·
-source health. Then these blocks, **omitting any that are empty**:
+**the variance sign per show (sidecar)** · source health. Then these blocks,
+**omitting any that are empty**:
 
+0. **🎭 THE ROOM** — orientation, weather-as-consequence, schedule collisions, at most
+   one theatre-of-note item. **Spec lives in the sidecar.** First, and short.
 1. **🎭 TODAY** — what is on the boards, what is called tonight, what is due.
 2. **🛒 GATEKEEPER** — cheap, closeable, only-Michael. Grouped by errand, aged.
    **High in the brief on purpose:** it is the block he forgets and the fastest
@@ -359,9 +372,9 @@ SLID block and that is a clean brief, not an incomplete one.
 
 ## Known limits, stated because a cold session will not find them
 
-- **ONE dry run, zero fired runs.** The 2026-09-02 preview produced findings and
-  two corrections but posted no comments. A session that finds no prior run report
-  SAYS SO instead of assuming this works.
+- **ONE dry run and ONE partial live fire (2026-09-02).** Gatekeeper is proven;
+  THE ROOM, the variance sign and the full block sequence are not. A session that
+  finds no prior run report SAYS SO instead of assuming this works.
 - It cannot see a conversation. Only artifacts.
 - It cannot read ClickUp automations. Any automation behaviour is testimony.
 - It cannot tell a task with no date from a task that does not need one.
@@ -373,21 +386,22 @@ SLID block and that is a clean brief, not an incomplete one.
 
 ## Provenance
 
-Scoped 2026-09-02 08:16-09:10 ET, Mainstage Milo seated, QUESTION-ME loaded.
+Scoped 2026-09-02 08:16-10:20 ET, Mainstage Milo seated, QUESTION-ME loaded.
 **Fold-in verdict: FOLD-IN, not net-new** — the Routine Ricky standing task
 (`86ajuhw1d`) already carried *"save the ONE prompt Michael can run once a day to
 kickstart procedures and routines and agents and comments and threads"* with one
 unticked checklist item open since 2026-08-01. That task is a RECORD surface by
 its own law, so the spec landed here and the checklist item became a pointer.
 
-Six rulings by Michael, each traceable to a turn: **URITP production management,
+Seven rulings by Michael, each traceable to a turn: **URITP production management,
 not a cross-tool digest** ("you're my uritp guy") · **links over prose, 20-40
 tasks** · **two slides qualifies for a callout** · **the brief pre-comments the
 drill batch** · **v1.1: the numbers are scale and scope, NOT a checklist** ·
-**v1.2: relevance is CONSEQUENCE × SOLE-GATEKEEPER, never magnitude** — earned by
-pushback on the first dry run, where the brief used its new judgement to discard
-exactly the work Michael most needs reminding of.
+**v1.2: relevance is CONSEQUENCE × SOLE-GATEKEEPER, never magnitude** · **v1.3: do
+the research, and the brief is Milo getting ORIENTED rather than reporting** (see
+the sidecar).
 
-⭐ **The two corrections are a matched pair and belong read together:** v1.1 stopped
-the brief padding to a number; v1.2 stopped it filtering by size. Both are the same
-underlying error — substituting a proxy for judgement.
+⭐ **The corrections are a matched set and belong read together:** v1.1 stopped the
+brief padding to a number; v1.2 stopped it filtering by size; v1.3 stopped it being
+a report at all. All three are the same underlying error — substituting a proxy for
+judgement.
