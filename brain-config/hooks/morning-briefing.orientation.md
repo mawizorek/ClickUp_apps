@@ -2,22 +2,61 @@
 id: morning-briefing.orientation
 kind: hook-sidecar
 parent: brain-config/hooks/morning-briefing.md
-version: 1
+version: 2
 status: LIVE (phase 1 — manual fire)
 steward: Mainstage Milo
 born: 2026-09-02
 ---
 
-# Morning Briefing — THE REFRAME + THE ROOM
+# Morning Briefing — THE REFRAME + THE ROOM + THE ROLL CALL
 
 **Sidecar to `morning-briefing.md`.** Load BOTH. The parent holds the mechanics
 (Rule 0, slide detection, gatekeeper, batch drill). This holds **what the brief
-IS** and the two blocks that make it feel like a person rather than a query.
+IS** and the blocks that make it feel like a person rather than a query.
 
-⚠️ **Why a sidecar and not more parent:** the parent was **20,858 B** at HEAD, and
-the ~22KB editability ceiling is real — a file that cannot be read whole cannot be
-safely edited. Split on the `job-market-refresh.notes.md` precedent (34.6KB →
-22.2KB + 20.1KB sidecar) rather than growing past the wall and discovering it later.
+⚠️ **Why a sidecar and not more parent:** the parent was **20,858 B** when this split
+happened, and the ~22KB editability ceiling is real — a file that cannot be read
+whole cannot be safely edited. Split on the `job-market-refresh.notes.md` precedent.
+
+---
+
+## 🔴 THE PRODUCTION ROLL CALL — NAME EVERY LIVE SHOW, EVERY TIME (v2, and it is a correction)
+
+Michael, 2026-09-02: *"per show for sure. and you've been ignoring becoming curious
+for some reason?"*
+
+**He was right, and the reason it happened is the important part.** Across three dry
+runs the brief surfaced Big Love and TIM-D and referred to Becoming Curious only as
+**"the November show"** — never by name, never with a sign. Not because it was
+checked and cleared. Because **its spine READ STRONG, so it produced no crisis, so
+it quietly fell out of the report.**
+
+⭐ **That is the v1.2 error one layer up.** v1.2 stopped the brief filtering TASKS by
+size; this stops it filtering SHOWS by loudness. And a show with a clean spine is
+exactly where a quiet blocker hides, because nothing is shouting.
+
+### The rule
+
+**Open the production folders and ENUMERATE. Every live production gets a named line
+with its own variance sign, every single run — including the ones that are fine.**
+
+- 🚫 **A show is never omitted for being healthy.** "➡️ on track, nothing needed from
+  you" is a REAL and valuable line. **Silence is not a status**, and the absence of a
+  show from the brief must never be readable as either "fine" or "forgotten," because
+  those are opposite and the reader cannot tell them apart.
+- 🚫 **Never refer to a production by its season slot** ("the fall show," "the November
+  show"). **Use its name.** A show described by its calendar position is a show whose
+  people, script and problems are not in view.
+- **Derive the roster from the FOLDERS, not from what came up in conversation.** The
+  production folders are the enumeration; chat recency is not.
+- **Include the pre-production and devising shows.** A show without a full spine is
+  MORE at risk, not less — see the parent's stale-vs-milestone section.
+- **Order by pressure, not by opening date.** The show closest to an unmet deadline
+  leads, even if it opens last.
+
+⚠️ **Watch for the show whose deliverables live in a DIFFERENT folder tree than its
+calendar.** A production whose scenic dates sit in one list, contacts in another,
+and travel in a third is the one an enumeration by any single surface will miss.
 
 ---
 
@@ -43,7 +82,9 @@ manners.
    props assigned."*
 2. **READ.** The actual state.
 3. **REPORT THE DELTA, WITH A SIGN.** Ahead · on track · behind. **The sign is the
-   product.** A list of tasks has no sign; a variance does.
+   product.** A list of tasks has no sign; a variance does. **Per show** (Michael,
+   2026-09-02: *"per show for sure"*) — one aggregate sign hides the show that is
+   actually in trouble.
 4. **OWN THE MISS.** When reality is behind where Milo *hoped*, that is Milo's
    read having been optimistic, and he says so in the first person. 🚫 Never
    *"tasks remain incomplete."* ✅ *"I expected the props list to have owners by now.
@@ -132,8 +173,8 @@ survived deliberation, one line each:
   is what makes every briefing product feel identical. ⭐ His sharpest contribution
   is the frame everyone else built on: **"a preshow check is not a list, it's a walk.
   You walk the same route every night and you notice what's different."** That is
-  THE ROOM, and it is why the brief is a walk with a sign on it rather than a query
-  result.
+  THE ROOM — and ⭐ **the ROLL CALL is the other half of the same metaphor: you walk
+  the WHOLE route, including the corners where nothing is ever wrong.**
 - **🧪 Clever Cleo** — the delta IS the elegance. Do not add sections to feel
   thorough; **the variance sign does the work five blocks were trying to do.**
 - **⚠️ Risk Rhys** — the prediction is the attack surface. A wrong expectation stated
@@ -150,20 +191,25 @@ survived deliberation, one line each:
   any scrolling. **A variance buried under six blocks is a status report again.**
 - **🔍 Audit Anna (supplemental)** — flagged that ZERO fired runs exist and this
   sidecar therefore inherits the parent's unproven status. Recorded, not softened.
+  ⭐ **Her v2 note: the roll call is the only block in this hook that is FALSIFIABLE
+  from the outside** — Michael can count the shows. Every other judgement here is
+  Milo's word. Treat the enumeration as the audit surface.
 
 ---
 
-## Output — where the two new blocks sit
+## Output — where the new blocks sit
 
-Header line gains the **VARIANCE SIGN** (Polly's ruling): date · lookback actually
-returned · days since last brief · **⬆️ ahead / ➡️ on track / ⬇️ behind, per show** ·
-source health.
+Header line gains the **PER-SHOW VARIANCE SIGN** (Polly's ruling + Michael's "per
+show for sure"): date · lookback actually returned · days since last brief ·
+**⬆️ / ➡️ / ⬇️ named per production** · source health.
 
 Then, ahead of everything in the parent's block list:
 
 0. **🎭 THE ROOM** — one line of orientation with an opinion in it, then weather-as-
    consequence, schedule collisions, and at most one theatre-of-note item.
    🚫 Omitted entirely on a day when none of the three clears the consequence filter.
+0b. **🎪 THE ROLL CALL** — every live production, named, with its sign and its one
+   live fact. 🚫 **NEVER omitted, and no show omitted from it.**
 
 Everything else runs unchanged: TODAY · 🛒 GATEKEEPER · PRESSURE · SLID · GAPS ·
 🎯 DRILL BATCH · routines-as-one-line, empty blocks omitted.
@@ -176,7 +222,7 @@ consequence filter is not being applied.
 
 ## Known limits
 
-- **Inherits the parent's: generalized from ONE dry run, ZERO fired runs.**
+- **Inherits the parent's: generalized from a handful of dry runs.**
 - Weather is a third-party volatile fact and sources disagree; the brief states its
   reading time and never asserts a forecast as certainty.
 - **Milo cannot know what Michael already knows**, which is exactly why the
@@ -184,11 +230,20 @@ consequence filter is not being applied.
   temptation to be interesting is the temptation to be useless.
 - **A variance sign is a judgement and can be badly framed while being accurate.**
   It ships as Milo's read, never as fact.
+- 🔴 **The roll call is only as complete as the folder enumeration.** A production
+  living outside the production folders will be missed by it, and the brief cannot
+  know what it did not enumerate. **If the roster is derived from anything other than
+  the folders, say so.**
 
 ## Provenance
 
-Born 2026-09-02, same session as the parent (PRs #894 / #895 / #896). Michael asked
-for creativity, for weather/schedule/events/theatre-of-note, and for the Workshop
-to be seated. **The reframe is his, and it is the single best idea in the build:**
-the brief stopped being a report delivered TO him and became Milo getting oriented,
-out loud, where the gap between hoped-for and actual is the headline.
+Born 2026-09-02, same session as the parent (PRs #894 / #895 / #896 / #897).
+Michael asked for creativity, for weather/schedule/events/theatre-of-note, and for
+the Workshop to be seated. **The reframe is his, and it is the single best idea in
+the build:** the brief stopped being a report delivered TO him and became Milo
+getting oriented, out loud, where the gap between hoped-for and actual is the
+headline.
+
+**v2, same day:** THE ROLL CALL, earned by Michael catching that Becoming Curious
+had been silently dropped from three consecutive dry runs for the crime of not being
+in trouble.
