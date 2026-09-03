@@ -1,0 +1,11 @@
+{
+  "slug": "scan-intake",
+  "type": "trigger",
+  "name": "Scan Intake",
+  "status": "active",
+  "purpose": "Normalize a multifunction-printer scan PDF (split tabloid spreads to letter, fix orientation, drop blank pages), rename the scan task, and surface the clean PDF.",
+  "requires": ["execute_bash", "post_comment", "update_task", "load_assets"],
+  "composedWith": ["attachment-router", "task-context-orientation", "de-slop-pass"],
+  "created": "2026-09-03",
+  "shortcut": true
+}
