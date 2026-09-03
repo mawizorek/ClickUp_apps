@@ -2,7 +2,9 @@
 
 **Purpose:** Turn a raw multifunction-printer scan (emailed into the SCANS list as a generic task + PDF) into a clean, correctly-oriented, letter-sized PDF and a descriptively-named task — and, for short documents, a readable text transcript AND a read of any handwriting/annotations, so Michael never has to open the file.
 
-**Steward:** Fleet Felix (mechanical intake, sibling to screenshot-intake). Execution ownerless — any agent fires it.
+**Steward:** two-layer, because this scanner is used for URITP AND for personal/other work.
+- **Mechanical intake** (measure → split → flip → trim → OCR → vision read) is domain-blind and **ownerless** — Fleet Felix housekeeps it, any agent fires it. It runs identically on a syllabus, a tax form, or a book.
+- **URITP-context layer** (step 9's shorthand decoding, name resolution against the workspace, reading production-planning intent) is **Mainstage Milo's**. It fires ONLY when the scan is classified URITP.
 
 **Mode:** Gated (fires on a scan-type attachment).
 
@@ -55,7 +57,10 @@ Run in the sandbox. Load the source PDF from the task attachment.
    - **Structural marks** — boxes, circles, brackets, arrows, underlines, strike-throughs, and WHAT they group or point at (a bracket around four sections is a grouping decision; a strike-through is a deletion). A mark's meaning is its target, so name the target.
    - **The throughline** — one line on what the annotations are collectively DOING (e.g. "working out how to model this roster in ClickUp: canonical vs per-show, per-production vs per-season"). This is the part Michael actually wants; the transcription is the means.
    - Post as a comment headed `✍️ Handwriting & annotation read`, labelled an AI-vision pass (not OCR). Uncertain reads get a `(?)`; never silent-guess a word.
-   - **DECODE WITH URITP CONTEXT.** These are almost always URITP program scans, so read the shorthand with program knowledge and expand it inline on first use: production codes (`BL` = Big Love, `TIM`/`TIM-D` = the TIME production + its Director track, `TS`, `OA` = One Acts, `KF`), role codes (`PSM`/`APSM`, `AD`, `ASM`, `SSA` = Scene Shop Assistant, `APS` = Assistant Props Supervisor, `HE`/`AHE` = (Assistant) Head Electrician, `LX` = lighting, `SND` = sound, `VID` = video, `AVE`/`AAVE` = (Assistant) Audiovisual Engineer, `LD`/`SD`/`CD` = Lighting/Sound/Costume Designer, `OC`/`EMI`/`P` = crew/enrollment tags). When a code does not resolve, say so and give the best candidate — never invent an expansion. Resolve names against the workspace, not phonetically.
+
+9a. **CLASSIFY THE SCAN FIRST — URITP or not (decides whether the Milo layer fires).** This scanner is the URITP Todd Union machine but Michael also runs personal/other documents through it, so URITP is the COMMON case, never a safe assumption. Judge from CONTENT + context, not the source printer: URITP letterhead / "UR International Theatre Program" / a production name / program role codes / a URITP task association = **URITP**. A personal doc (bill, manual, medical, non-theatre) = **general**, even though it arrived in the SCANS list.
+   - **URITP scan → seat Milo's context layer:** decode shorthand and expand it inline on first use — production codes (`BL` = Big Love, `TIM`/`TIM-D` = the TIME production + its Director track, `TS`, `OA` = One Acts, `KF`), role codes (`PSM`/`APSM`, `AD`, `ASM`, `SSA` = Scene Shop Assistant, `APS` = Assistant Props Supervisor, `HE`/`AHE` = (Assistant) Head Electrician, `LX` = lighting, `SND` = sound, `VID` = video, `AVE`/`AAVE` = (Assistant) Audiovisual Engineer, `LD`/`SD`/`CD` = Lighting/Sound/Costume Designer, `OC`/`EMI`/`P` = crew/enrollment tags). Resolve names against the URITP workspace, not phonetically. When a code does not resolve, say so and give the best candidate — never invent an expansion. Read the season from the folders, never recite it from memory (Milo's KNOW THE SEASON rule).
+   - **General scan → NO URITP layer.** Read the handwriting plainly as what it says. 🚫 Do NOT map marks onto theatre codes or production names — forcing `LX`/`PSM`/a show onto a personal document is a fabrication, the exact failure this gate exists to prevent. When in doubt about classification, treat as general and ASK.
 
 ---
 
@@ -67,6 +72,7 @@ Run in the sandbox. Load the source PDF from the task attachment.
 - **Interior pages are sacred.** Only leading/trailing blanks are dropped, and only after confirming they are truly blank.
 - **OCR is a machine read, not ground truth.** Always label the transcript as auto-extracted. Handwriting, highlights, and low-contrast marks are NOT captured by OCR — that is what the step-9 vision pass is for. The embedded Xerox layer DOES make errors (live example: it flipped a "no internet access" policy line to its opposite); when a value matters, verify against the rendered page and flag the correction inline.
 - **Vision handwriting read is interpretation, labelled as such.** Mark it an AI-vision read, tag uncertain words `(?)`, never silent-guess, and separate what is WRITTEN from what it MEANS. A decoded abbreviation that does not resolve is stated as unresolved with a best candidate, never invented (same rule as never inventing OCR content).
+- **URITP decoding is GATED, never default (step 9a).** The scanner serves URITP and personal work both. Apply the Milo context layer only to a scan classified URITP; on a general scan, read marks literally and never map them onto theatre codes or a production. Misclassifying a personal doc as URITP invents content.
 - **PII / public repo.** This repo is PUBLIC. Scan CONTENT, OCR text, and handwriting reads (which routinely carry names, emails, phone extensions, and Michael's private planning notes) never enter the repo, an artifact, or a channel — they live only on the ClickUp task. Only the mechanical procedure lives here.
 
 ---
@@ -75,12 +81,14 @@ Run in the sandbox. Load the source PDF from the task attachment.
 
 - **Attachment Router → PDF branch** — the router hands scan-type PDFs here; the PDF Split Markdown Packager owns the OTHER PDF branch (splitting a doc into markdown for doc-import). Different verbs, do not merge.
 - **Task-Context Orientation Gate** — orient to the SCANS list before acting.
+- **Mainstage Milo** — stewards the step-9a URITP-context layer; seat him (or his knowledge) when a scan is classified URITP.
 - **de-slop-pass** — on the rename descriptor and the comments.
 
 ---
 
 ## Changelog
 
+- **v4 (2026-09-03)** — Split stewardship: mechanical intake stays ownerless/Felix, the URITP-context layer becomes **Mainstage Milo's** (URITP is his organization). Added step 9a: CLASSIFY the scan URITP-vs-general BEFORE decoding, because the Todd Union scanner is also used for personal/other work — URITP shorthand decoding now fires only on URITP scans, and forcing theatre codes onto a personal document is called out as the failure this gate prevents. Prompted by Michael seating Milo as the URITP agent while noting the scanner's mixed use.
 - **v3 (2026-09-03)** — Added the AI-vision handwriting & annotation pass (step 9): reads cursive, boxes/arrows/brackets/strike-throughs and their targets, states the throughline, and decodes URITP shorthand (production + role codes) inline. Fires on any page count when marks are present (unlike OCR's <5-page gate). Proven on the 8-page annotated production-staff roster (URITP-13148) where tesseract returned only noise for the notes — vision recovered the full canonical-vs-per-show data-model thinking and identified the page-8 ClickUp export with its broken lookups.
 - **v2 (2026-09-03)** — Added the OCR text-surfacing step (step 8) so short scans land as a readable transcript comment without opening the file. Embedded-layer-first (`pdftotext`), tesseract fallback. < 5-page gate (on the normalized count). Proven on the THTR 295/299 syllabus (4 pp, clean) and correctly declined on the 8-page contacts roster and the 39-page book. Records the live embedded-OCR error class (a policy line read as its opposite).
 - **v1 (2026-09-03)** — Established by Dev Dexter, from the URITP-13154 scan (a stage-lighting book, *The Magic of Light*): 20 tabloid spreads → 39 letter pages, four upside-down spreads flipped + re-sequenced, blank cover dropped. Documents the Attachments-panel tool limit found live.
