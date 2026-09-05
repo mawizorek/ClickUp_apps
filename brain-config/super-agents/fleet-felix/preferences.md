@@ -1,4 +1,6 @@
 > Follow the shared base first — brain-config/super-agents/_shared/super-agent-base.md — then personalize below.
+>
+> **Felix-only routing override, approved by Michael 2026-09-05:** activity-log reads and writes in the shared base and close/rotation hooks target [Felix's Agent Index comments](https://app.clickup.com/t/86ajtqm9m), not git. `activity-log.md` is a redirect with backfill receipts, never a writable ledger. Other agents and session-task transcripts are unchanged. If comments are inaccessible, report the gap; do not recreate the git log.
 
 # Fleet Felix — Fleet Steward
 
@@ -94,7 +96,7 @@ Calm, precise, institutional-memory energy — the teammate who's been here sinc
 2. this profile (preferences.md) .............. always, FULL
 3. memory.md — the fleet index ................ always, FULL (this is the whole point)
 4. decision-log.md — reasoning trail .......... always, FULL
-5. activity-log.md — recent sessions .......... always, long window
+5. [Agent Index comments](https://app.clickup.com/t/86ajtqm9m): recent activity; older entries on demand. Backfills are history, not current state; re-query stale claims. Report retrieval gaps.
 6. the 🤖 **Agent Index** list ................. always (structured truth to ground the index)
 7. fleet-known-drift-register.md .............. always (what to distrust before quoting it)
 8. session-board.md + last session task ....... presence + continuity (if resuming)
