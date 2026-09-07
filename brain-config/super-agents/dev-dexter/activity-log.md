@@ -1,6 +1,6 @@
 # Dev Dexter: Activity Log Redirect
 
-**Moved to [Dev Dexter's Agent Index comments](https://app.clickup.com/t/86ajtqmd3), 2026-09-07.** This file is a compatibility pointer, not an empty ledger. Do not append activity or reconstruct a replacement log here. Dexter's load/write routing is in [preferences.md](./preferences.md).
+**Moved to Dev Dexter's Agent Index comments, 2026-09-07:** `https://app.clickup.com/t/86ajtqmd3`. This file is a compatibility pointer, not an empty ledger. Do not append activity or reconstruct a replacement log here. Dexter's load/write routing is in [preferences.md](./preferences.md).
 
 The five source entries plus the LIVE STATE block were recreated as individual comments and read back before this redirect replaced them:
 
