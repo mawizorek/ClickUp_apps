@@ -1,6 +1,11 @@
 # Dev Dexter: Activity Log Redirect
 
-**Moved to Dev Dexter's Agent Index comments, 2026-09-07:** `https://app.clickup.com/t/86ajtqmd3`. This file is a compatibility pointer, not an empty ledger. Do not append activity or reconstruct a replacement log here. Dexter's load/write routing is in [preferences.md](./preferences.md).
+**Moved to Dev Dexter's row in the ClickUp 🤖 Agent Index, 2026-09-07.** The log now lives as COMMENTS on that row.
+
+- Agent Index row: task id `86ajtqmd3` (list `901328043244`) — resolve it with the ClickUp task tools, never by name search.
+- Direct link: `https://app.clickup.com/t/86ajtqmd3`
+
+This file is a compatibility pointer, not an empty ledger. Do not append activity or reconstruct a replacement log here. Dexter's load/write routing is in [preferences.md](./preferences.md).
 
 The five source entries plus the LIVE STATE block were recreated as individual comments and read back before this redirect replaced them:
 
@@ -11,6 +16,6 @@ The five source entries plus the LIVE STATE block were recreated as individual c
 - 2026-08-19: uritp-safety, the page that compiles fine and has nothing in it
 - LIVE STATE snapshot through 2026-08-19, posted as history and labelled STALE
 
-Original event dates are in the comment headings; ClickUp posting timestamps are the backfill date. Historical states are not verified current work: the uritp-safety and FMP items were ACTIVE at snapshot time and must be re-verified before action. No activity archive directory existed at migration.
+Original event dates are in the comment headings; ClickUp posting timestamps are the backfill date. Historical states are not verified current work — the uritp-safety and FMP items were ACTIVE at snapshot time and must be re-verified before action. No activity archive directory existed at migration.
 
 **Recovery:** [complete original log at the pre-migration commit](https://github.com/mawizorek/ClickUp_apps/blob/961b09c253f6566a15ccdf9bcbf74bafaadf97ab/brain-config/super-agents/dev-dexter/activity-log.md). History is preserved, not condensed into this pointer.
