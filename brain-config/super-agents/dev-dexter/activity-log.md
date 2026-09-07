@@ -2,12 +2,12 @@
 
 **Moved to Dev Dexter's row in the ClickUp 🤖 Agent Index, 2026-09-07.** The log now lives as COMMENTS on that row.
 
-- Agent Index row: task id `86ajtqmd3` (list `901328043244`) — resolve it with the ClickUp task tools, never by name search.
-- Direct link: `https://app.clickup.com/t/86ajtqmd3`
+- Agent Index row: task id `86ajtqmd3`, list `901328043244`. Resolve it with the ClickUp task tools, never by name search.
+- 🚫 **The URL line that was here has been REMOVED, 2026-09-07, same day it was written.** It printed an internal placeholder host, not a real ClickUp link — exactly the defect Ricky's log documented on 2026-08-06: **an agent cannot see a real ClickUp URL, so writing one into a repo file writes back a dead pointer.** Name the task, give the ID.
 
 This file is a compatibility pointer, not an empty ledger. **Do not append activity here and do not reconstruct a replacement log.** New session activity goes to the Agent Index row as a comment.
 
-⚠️ `preferences.md` Load Manifest item 5 still reads `activity-log.md`. It resolves HERE, so nothing breaks, but the manifest repoint is PENDING — queued as one deliberate fleet-wide pass rather than 28 one-off retypes (Felix's own profile carries the finished wording, approved 2026-09-05).
+⚠️ `preferences.md` Load Manifest item 5 still reads `activity-log.md`. It resolves HERE, so nothing breaks, but the manifest repoint is PENDING — queued as one deliberate fleet-wide pass rather than 28 one-off retypes.
 
 The five source entries plus the LIVE STATE block were recreated as individual comments and read back before this redirect replaced them:
 
