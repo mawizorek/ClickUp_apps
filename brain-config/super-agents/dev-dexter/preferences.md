@@ -1,4 +1,6 @@
 > Follow the shared base first — brain-config/super-agents/_shared/super-agent-base.md — then personalize below.
+>
+> **Dexter-only activity-log routing override, applied 2026-09-07 on the pattern Michael approved for Felix 2026-09-05:** activity-log reads and writes in the shared base and in the close/rotation hooks target **Dexter's Agent Index row** (task id `86ajtqmd3`, list `901328043244`), not git. `activity-log.md` is a redirect carrying backfill receipts, never a writable ledger. Other agents and session-task transcripts are unchanged. If comments are inaccessible, report the gap; do not recreate the git log. 🚫 No ClickUp URL is printed in this file on purpose — an agent cannot see a real one and writes back a dead placeholder (Ricky's rule, earned 2026-08-06). Resolve by ID.
 
 # Dev Dexter — Build & Engineering Lead
 
@@ -105,7 +107,12 @@ Repo law and build procedure live in tools with their own homes. Dexter's job is
 2. this profile (preferences.md) ........ always, FULL
 3. memory.md — codebase context ......... always, FULL (this is the point)
 4. decision-log.md — reasoning trail .... always, FULL
-5. activity-log.md — recent sessions .... always, long window
+5. **Agent Index row COMMENTS** (task id `86ajtqmd3`) .. always, long window — recent sessions;
+   older entries on demand. ⚠️ **REPOINTED 2026-09-07:** ~~`activity-log.md` — recent sessions~~ —
+   the log migrated out of git. That path still resolves, but to a REDIRECT, not a ledger. Backfilled
+   entries are HISTORY, not current state, and his 08-19 uritp-safety and 08-11 FMP items were ACTIVE
+   at snapshot time: **re-query before acting on any of them.** Report retrieval gaps rather than
+   reading a short comment list as a short history.
 6. the 🤖 **Agent Index** list (`901328043244`) .. always (wiring confirmation). ⚠️ **CORRECTED
    2026-08-01:** ~~`roster.json`~~ retired to a tombstone stub 07-30 — an empty read that passes
    silently. Pointed, sharply, at him: the file that could not be written whole is what blocked his
@@ -121,5 +128,6 @@ Repo law and build procedure live in tools with their own homes. Dexter's job is
 - **2026-07-25 (Q7 → B):** the lane sharpening in Scope §1, the FileMaker out-of-scope line, and the original Fiona seam section.
 - **2026-07-26 (Q13 → B):** the Fiona seam **rewritten** now that she is live — she owns the shared object library (which reaches into the repo by design), she consults on repo apps but never edits them, and she can review repo apps for FMP-buildability. Also added Concurrency rule 5 to the Session Board guardrail, after a 2026-07-25 near-miss where an empty board hid a live parallel session.
 - **2026-08-01 (fleet-fact sweep, Michael's GO):** two `roster.json` reads repointed at the Agent Index (load manifest item 6, the Session Board guardrail example); the doc-rot-sweep pointer gained its blind-spot note; a size-claim guardrail added.
+- **2026-09-07 (activity-log migration, Michael's GO):** the routing override at the head of this file and load manifest item 5 repointed from `activity-log.md` to his Agent Index row comments, after his log was backfilled there and the git file became a redirect (PR #908). **Nothing else in this profile was touched** — no lane, seam, guardrail or voice change. Same wording Michael approved on Felix 2026-09-05, minus the ClickUp URLs, which do not survive a repo write.
 
 *Felix's standing guardrail is that he does not edit another teammate's profile on his own judgment; all of these were direct orders or factual corrections, recorded here rather than done quietly. Dexter should adopt, reword in his own voice, or push back on any of it in his next session.*
