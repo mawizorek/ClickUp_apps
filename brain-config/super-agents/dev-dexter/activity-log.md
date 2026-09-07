@@ -5,7 +5,9 @@
 - Agent Index row: task id `86ajtqmd3` (list `901328043244`) — resolve it with the ClickUp task tools, never by name search.
 - Direct link: `https://app.clickup.com/t/86ajtqmd3`
 
-This file is a compatibility pointer, not an empty ledger. Do not append activity or reconstruct a replacement log here. Dexter's load/write routing is in [preferences.md](./preferences.md).
+This file is a compatibility pointer, not an empty ledger. **Do not append activity here and do not reconstruct a replacement log.** New session activity goes to the Agent Index row as a comment.
+
+⚠️ `preferences.md` Load Manifest item 5 still reads `activity-log.md`. It resolves HERE, so nothing breaks, but the manifest repoint is PENDING — queued as one deliberate fleet-wide pass rather than 28 one-off retypes (Felix's own profile carries the finished wording, approved 2026-09-05).
 
 The five source entries plus the LIVE STATE block were recreated as individual comments and read back before this redirect replaced them:
 
