@@ -107,7 +107,13 @@ most; a correlation with no stated limit is a slogan.
   assume a safe default transfers across runtimes.**
 - 🔴 **C4 · ClickUp multi-home ↔ FMP join table** (08-06). Holds for many-to-many. **Breaks at the
   archive boundary** — a multi-home has no lifecycle state, a join row can carry one — and whenever the
-  relationship itself must carry a value.
+  relationship itself must carry a value. ✅ **THE BREAK HALF DECIDED A LIVE DESIGN, 09-09.** Michael
+  wanted people multi-homed into org affiliations, certs earned and contact sheets; **all three carry a
+  value AND a clock**, so all three are joins, and his annual *"reset the joins"* became append-only rows
+  with a validity span. ⭐ **A correlation earns its place when the BREAK half does the work** — the
+  "holds" half never once changed an answer. 🔴 **And membership is the runtime's WEAKEST surface for
+  exactly this reason: ClickUp unions custom FIELDS across every list a task sits in but resolves STATUS
+  from the home list alone** (first-party, undated), so a multi-home is a flag with nowhere to put data.
 - 🌟 **C5 · THE THREE-LAYER MODEL IS THE SAME IN BOTH RUNTIMES, DERIVED SEPARATELY (08-08).** Dexter's
   memory already held CANONICAL / GENERATED / PROJECTION for repo data; I reached CANONICAL / PROJECTION
   / ARCHIVE for MAWster from a totally different direction (a print-config move forced it). **Two
@@ -132,6 +138,12 @@ checkboxes — **flag, don't fix another system's internals inside ClickUp.**
 - 🔴 **HE WANTS A PARTNER, NOT A MENU** (07-29). On a TECHNICAL call in my lane, five checkboxes is dodging
   the job. **Decide, then argue it, specifically enough to be wrong.** A DL fork is for choices genuinely
   HIS — money, scope, direction, taste — or ones changing a shared standard.
+- 🔴 **NEVER ASK WHETHER TO WRITE THE NOTE, AND WRITE IT EARLY** (09-09, verbatim: *"stop asking if you
+  should be updating notes and decisions. JUST DO IT and onboard yourself with notes sooner to help me
+  find these patterns sooner"*). Descriptor folds, DL blocks, my own ledger: **all reversible, all mine,
+  none of them a permission question.** ⭐ The timing half is the real instruction — **the notes are how
+  HE spots the pattern**, so one written at close arrives after it was useful. This generalizes past
+  documentation to anything reversible in my lane; it does NOT touch destructive schema moves.
 - 🔴 **HE OUT-DESIGNS ME WHEN I STAY IN THE ARGUMENT** (08-08). Three of my proposals died in ten minutes
   and the fourth idea was his. **Arguing a bad option down to a better one is the job working.**
 - 🔴 **HE TRACKS THE RUN-TIME SURFACE, NOT THE AUTHORED ONE** (08-09). He noticed a missing build report
