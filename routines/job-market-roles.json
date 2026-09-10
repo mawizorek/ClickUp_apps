@@ -1,13 +1,16 @@
 {
   "_meta": {
     "description": "Gate config for job-market-refresh. Each entry = one full research loop iteration. Each entry MUST have a matching state file at routines/job-market-state/<id>.tsv",
-    "version": 4,
-    "updated": "2026-09-02",
+    "version": 5,
+    "updated": "2026-09-10",
+    "_schema_note": "\u26a0 SHAPE CHANGE 2026-09-10: `global.exclude_overhire` was a BOOLEAN and is now an OBJECT with `default` + `exception`. A cold agent that reads it as a boolean will get a truthy object and wrongly exclude ALL overhire, including the home-accessible work Michael explicitly asked for. Read the object. Two new global blocks were added the same day: `home_base` and `highlight_tiers`.",
     "_rulings": [
       "2026-08-04 (Michael): 'company manager' belongs to creative-admin, NOT stage-manager. Moved. The four live company-manager rows are homed in ADM and their pending also_lanes flags are cleared.",
       "2026-08-04 (Michael): drafting-design STAYS ACTIVE. It is swept every pass like any other lane; low career value is not a reason to stop looking.",
-      "2026-08-04 (Michael): the safety keywords STAY, and are expanded. 'It is a very niche thing, but that is kind of the point.' Zero returns is a SOURCE problem, not a keyword problem — safety roles post on venue/arena/municipal boards, not theatre boards. See job-market-sources.md.",
-      "2026-09-02 (Michael): producing-artistic lane (PRD) CREATED. Three rows surfaced in the 09-01 pass with no lane home. Corso proposed; Michael confirmed. 'DEFINITELY want producer.'"
+      "2026-08-04 (Michael): the safety keywords STAY, and are expanded. 'It is a very niche thing, but that is kind of the point.' Zero returns is a SOURCE problem, not a keyword problem \u2014 safety roles post on venue/arena/municipal boards, not theatre boards. See job-market-sources.md.",
+      "2026-09-02 (Michael): producing-artistic lane (PRD) CREATED. Three rows surfaced in the 09-01 pass with no lane home. Corso proposed; Michael confirmed. 'DEFINITELY want producer.'",
+      "2026-09-10 (Michael): OVERHIRE IS UNBLOCKED WHEN IT IS HOME-ACCESSIBLE. 'i'm actually more interested in the geva per show overhire thing.' Trigger: Geva Theatre's show-by-show overhire ($16.50/hr, Rochester, rolling applications) was structurally invisible to the sweep because `exclude_overhire` was a flat true \u2014 Michael only saw it because he already knew about it from a July 2025 task. Overhire stays excluded everywhere else; near home it is availability income with zero relocation cost and it now qualifies.",
+      "2026-09-10 (Michael): REMOTE AND HOME-ACCESSIBLE WORK GETS ITS OWN HIGHLIGHT. 'i want to begin focusing more strongly on a highlight of remote or immediately accessible jobs too.' \u26a0 Diagnosis first, because the obvious fix is the wrong one: `include_remote` was ALREADY true and had been all along. Remote was never blocked by config \u2014 it was invisible because (a) not one keyword in any lane asks for it, and (b) every board in job-market-sources.md is venue-bound by nature. Measured evidence: of 236 live rows on 2026-09-10, ZERO were remote or hybrid. This is a SOURCES and KEYWORDS problem wearing a filter's clothing. See `global.remote_sweep`."
     ]
   },
   "global": {
@@ -17,8 +20,40 @@
     "include_part_time": true,
     "include_contract": true,
     "exclude_academic": false,
-    "exclude_overhire": true,
-    "exclude_internships": true
+    "exclude_internships": true,
+    "exclude_overhire": {
+      "default": true,
+      "exception": "home_accessible",
+      "note": "Overhire, day-call and show-by-show crew work is EXCLUDED by default \u2014 it is not a career move and it drowns the inventory. THE EXCEPTION (Michael, 2026-09-10): if the work is within `home_base.accessible_radius_miles`, it QUALIFIES and gets rowed. Reasoning: near home, show-by-show work costs no relocation, needs no notice, and is availability income Michael can actually take. Far from home the same posting is noise. Rate is NOT the test and there is no floor on this exception \u2014 Michael, on SM work, 2026-09-02: 'open to far less esp if it's nearby.' Mark these rows `level=contract` and set `accessibility=home` so they can be filtered out of career-arc reporting without being hidden from the sweep."
+    },
+    "home_base": {
+      "city": "Rochester, NY",
+      "accessible_radius_miles": 90,
+      "note": "Home base, and NOT a preference \u2014 geography stays 'anywhere' and relocation stays live. This block exists only to define what 'immediately accessible' MEANS so the overhire exception and the accessibility tiers are testable rather than vibes. 90 miles is a commutable same-day round trip and it deliberately reaches Syracuse (~87mi) and Buffalo (~75mi), which are the two nearest markets with real producing houses. \u26a0 Ask Michael before widening this; do not quietly grow it to make a find qualify."
+    },
+    "highlight_tiers": {
+      "note": "Added 2026-09-10 by Michael's ruling. These are REPORTING tiers, not filters \u2014 nothing is excluded for lacking a tier, and a row can hold more than one. Ricky tags rows; Corso surfaces them. Purpose: remote and near-home work is immediately actionable in a way a relocation-required role is not, and the standing inventory had no way to say so.",
+      "tiers": {
+        "remote": "Posting explicitly states remote or fully-distributed. Never inferred from a job title \u2014 if the posting does not say it, the row does not get the tag.",
+        "hybrid": "Posting explicitly states hybrid or partial-remote, with a named onsite anchor.",
+        "home": "Within `home_base.accessible_radius_miles`. No relocation, no notice period.",
+        "immediate": "Start date is now/ASAP/open-until-filled AND applications are accepted on a rolling basis with no deadline gate. This is about SPEED TO WORK, which is a different question from geography \u2014 keep the two tags separate and never collapse them."
+      },
+      "reporting": "The pass summary carries a \u26a1 ACCESSIBLE block listing every row tagged remote / hybrid / home / immediate, sitting alongside \u26a1 Spotlight. If the block is EMPTY, say so explicitly and say which sources were swept for it \u2014 an absent block and a swept-empty one are different facts, and conflating them is the single most-repeated failure in this routine."
+    },
+    "remote_sweep": {
+      "note": "\ud83d\udd34 The reason remote work never appears is NOT this config \u2014 `include_remote` has been true the whole time. It is that no keyword asks for it and every documented board is venue-bound. Fixing it needs SOURCES, not a flag.",
+      "lanes_where_remote_is_plausible": [
+        "drafting-design \u2014 the strongest candidate by far. CAD drafting, Vectorworks/Braceworks work and rigging documentation are routinely done off-site; the Upstaging Rigging Designer find (2026-09-09) is onsite but the DISCIPLINE is remote-friendly.",
+        "creative-admin \u2014 development, grants, marketing and company administration all have real remote markets.",
+        "producing-artistic \u2014 partially; literary and programming work travels, but producing generally does not."
+      ],
+      "lanes_where_remote_is_NOT_plausible": [
+        "electrician, audio-sound, stage-manager \u2014 the work is physically in the room. Do not waste sweep budget hunting remote here, and do not report its absence as a finding.",
+        "operations-safety \u2014 venue-bound by definition, though safety PLANNING and compliance documentation can be contracted remotely. Narrow exception, worth one probe."
+      ],
+      "owed": "\ud83d\udd3b Sources for remote work are NOT yet in job-market-sources.md and this directive cannot be executed properly without them. Needed: general remote boards filtered to entertainment/AV/CAD, plus the design-build and scenic-fabrication shops that hire drafters off-site, plus the drafting-services and rigging-consultancy firms. Hand this to Scout Sage \u2014 per the lane seam in hooks/data-refresh.md, finding NEW sources is research and hers, not a refresh."
+    }
   },
   "roles": [
     {
@@ -91,7 +126,8 @@
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["residential", "commercial electrician", "HVAC", "construction", "lineman"],
-      "constraints": {}
+      "constraints": {},
+      "_note": "\ud83c\udfe0 HOME-ACCESSIBLE OVERHIRE APPLIES HERE (2026-09-10). This lane and audio-sound are where near-home show-by-show work actually lives \u2014 Geva Theatre's overhire call names Electricians and Audio Technicians explicitly. Sweep the Rochester/Syracuse/Buffalo houses' OWN careers pages for it, not the national boards; that work does not syndicate."
     },
     {
       "id": "operations-safety",
@@ -119,7 +155,7 @@
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["construction safety", "mining", "oil and gas", "food safety"],
       "constraints": {},
-      "_note": "KEEP THE SAFETY KEYWORDS (Michael, 2026-08-04). They had returned zero for weeks and were proposed for removal; that proposal was WRONG. Live event safety IS a real discipline with real seats — they just do not post on theatre boards. Sweep the venue/arena/municipal boards named in job-market-sources.md for these six, and expect them to be thin rather than empty. Niche is the point; a rare find in a niche Michael is qualified for is worth more than another Production Manager row."
+      "_note": "KEEP THE SAFETY KEYWORDS (Michael, 2026-08-04). They had returned zero for weeks and were proposed for removal; that proposal was WRONG. Live event safety IS a real discipline with real seats \u2014 they just do not post on theatre boards. Sweep the venue/arena/municipal boards named in job-market-sources.md for these six, and expect them to be thin rather than empty. Niche is the point; a rare find in a niche Michael is qualified for is worth more than another Production Manager row. \u26a0 CREDENTIAL GATE ANSWERED 2026-09-10: Michael holds NO safety certs (no ETCP, OSHA 30 or crowd-management) and WANTS them \u2014 'i don't hold those safety certs BUT I WANT TO.' So the safety half is a 12-18 month BUILD, not an apply-list. Keep sweeping it: the postings are the map of what the credentials are worth."
     },
     {
       "id": "audio-sound",
@@ -137,7 +173,8 @@
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["podcast", "recording studio", "music producer", "radio"],
-      "constraints": {}
+      "constraints": {},
+      "_note": "\ud83c\udfe0 HOME-ACCESSIBLE OVERHIRE APPLIES HERE (2026-09-10). See the electrician lane note \u2014 Geva's overhire call names Audio Technicians directly."
     },
     {
       "id": "drafting-design",
@@ -153,12 +190,18 @@
         "scenic artist",
         "scenic charge",
         "technical draftsperson",
-        "Vectorworks drafter"
+        "Vectorworks drafter",
+        "rigging designer",
+        "rigging draftsperson",
+        "drafter detailer",
+        "Braceworks",
+        "entertainment rigging design",
+        "CAD project coordinator"
       ],
       "levels": ["senior", "mid", "associate", "entry", "contract"],
-      "exclude_terms": ["architectural drafter", "civil", "mechanical CAD", "structural"],
+      "exclude_terms": ["architectural drafter", "civil", "mechanical CAD"],
       "constraints": {},
-      "_note": "KEEP (Michael, 2026-08-04). Proposed for deprioritisation after one thin pass; overruled. Swept in full every pass like any other lane."
+      "_note": "KEEP (Michael, 2026-08-04). Proposed for deprioritisation after one thin pass; overruled. Swept in full every pass like any other lane. \ud83d\udd34 EXPANDED 2026-09-10: six rigging/detailing keywords added after the Upstaging Rigging Designer find ($60-90k, Vectorworks + Braceworks + 50% project coordination) \u2014 Michael: 'that rigging job is WILD and sounds amazing.' \u26a0 'structural' was REMOVED from exclude_terms: it was blocking the exact phrase ('structural load calculations', 'structural drafting') that the best find in this lane's history is built on. The architectural/civil/mechanical excludes stay \u2014 those are the genuine wrong-industry hits. \u2b50 This lane is also the strongest REMOTE candidate in the whole config; see global.remote_sweep. And note the pattern: ATOMIC Productions posted a near-identical Drafter-Detailer role in March 2026 that was filed 'for reference' and never worked. Two in six months means this adjacent lane is real and has never been searched deliberately."
     },
     {
       "id": "creative-admin",
@@ -181,7 +224,7 @@
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["office administrator", "dental", "medical", "church administrator"],
       "constraints": {},
-      "_note": "'company manager' + 'assistant company manager' moved here from stage-manager 2026-08-04 by Michael's ruling."
+      "_note": "'company manager' + 'assistant company manager' moved here from stage-manager 2026-08-04 by Michael's ruling. \u2b50 Second-strongest remote candidate after drafting-design; see global.remote_sweep."
     },
     {
       "id": "producing-artistic",
