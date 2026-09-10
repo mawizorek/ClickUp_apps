@@ -10,7 +10,8 @@
       "2026-08-04 (Michael): the safety keywords STAY, and are expanded. 'It is a very niche thing, but that is kind of the point.' Zero returns is a SOURCE problem, not a keyword problem \u2014 safety roles post on venue/arena/municipal boards, not theatre boards. See job-market-sources.md.",
       "2026-09-02 (Michael): producing-artistic lane (PRD) CREATED. Three rows surfaced in the 09-01 pass with no lane home. Corso proposed; Michael confirmed. 'DEFINITELY want producer.'",
       "2026-09-10 (Michael): OVERHIRE IS UNBLOCKED WHEN IT IS HOME-ACCESSIBLE. 'i'm actually more interested in the geva per show overhire thing.' Trigger: Geva Theatre's show-by-show overhire ($16.50/hr, Rochester, rolling applications) was structurally invisible to the sweep because `exclude_overhire` was a flat true \u2014 Michael only saw it because he already knew about it from a July 2025 task. Overhire stays excluded everywhere else; near home it is availability income with zero relocation cost and it now qualifies.",
-      "2026-09-10 (Michael): REMOTE AND HOME-ACCESSIBLE WORK GETS ITS OWN HIGHLIGHT. 'i want to begin focusing more strongly on a highlight of remote or immediately accessible jobs too.' \u26a0 Diagnosis first, because the obvious fix is the wrong one: `include_remote` was ALREADY true and had been all along. Remote was never blocked by config \u2014 it was invisible because (a) not one keyword in any lane asks for it, and (b) every board in job-market-sources.md is venue-bound by nature. Measured evidence: of 236 live rows on 2026-09-10, ZERO were remote or hybrid. This is a SOURCES and KEYWORDS problem wearing a filter's clothing. See `global.remote_sweep`."
+      "2026-09-10 (Michael): REMOTE AND HOME-ACCESSIBLE WORK GETS ITS OWN HIGHLIGHT. 'i want to begin focusing more strongly on a highlight of remote or immediately accessible jobs too.' \u26a0 Diagnosis first, because the obvious fix is the wrong one: `include_remote` was ALREADY true and had been all along. Remote was never blocked by config \u2014 it was invisible because (a) not one keyword in any lane asks for it, and (b) every board in job-market-sources.md is venue-bound by nature. Measured evidence: of 236 live rows on 2026-09-10, ZERO were remote or hybrid. This is a SOURCES and KEYWORDS problem wearing a filter's clothing. See `global.remote_sweep`.",
+      "\ud83d\udd34 2026-09-10 CORRECTION, same day, self-caught: an earlier entry in this file claimed 'Michael holds NO safety certs.' THAT WAS WRONG and it was written without reading his CV. Corrected against the primary source (MAW CV FEB2026): he holds **Introduction to Safety and Health Management, OSHA Training Institute Education Center at RIT, Feb 2026** and **Principles of Emergency Planning for Live Events, Risky Business Resources, Oct 2025**. What he said was 'i don't hold those safety certs' about ETCP / OSHA-30 / crowd-management specifically \u2014 and a narrow true statement got generalised into a broad false one. \u2b50 The lesson generalises past this field: a person's own offhand phrasing about themselves is not a substitute for the document. Read the CV."
     ]
   },
   "global": {
@@ -53,6 +54,18 @@
         "operations-safety \u2014 venue-bound by definition, though safety PLANNING and compliance documentation can be contracted remotely. Narrow exception, worth one probe."
       ],
       "owed": "\ud83d\udd3b Sources for remote work are NOT yet in job-market-sources.md and this directive cannot be executed properly without them. Needed: general remote boards filtered to entertainment/AV/CAD, plus the design-build and scenic-fabrication shops that hire drafters off-site, plus the drafting-services and rigging-consultancy firms. Hand this to Scout Sage \u2014 per the lane seam in hooks/data-refresh.md, finding NEW sources is research and hers, not a refresh."
+    },
+    "candidate_credentials": {
+      "note": "\u2b50 ADDED 2026-09-10 after a self-caught factual error. This block exists so no future session guesses at Michael's qualifications again. Source of truth is his CV (MAW CV FEB2026), NOT his conversational phrasing about himself. Update it only from a CV read.",
+      "education": "BS Audio and Music Engineering (2023) + BA English: Theatre (2023), University of Rochester",
+      "software": "Vectorworks \u2014 Spotlight, 3D drafting, AND Braceworks calculations \u00b7 ETC Eos \u00b7 Lightwright 6 \u00b7 KiCad \u00b7 Logic Pro \u00b7 Mainstage \u00b7 C/C++ \u00b7 3D print design",
+      "safety_training_HELD": [
+        "Introduction to Safety and Health Management \u2014 OSHA Training Institute Education Center, Rochester Institute of Technology, Feb 2026",
+        "Principles of Emergency Planning for Live Events \u2014 Risky Business Resources, Oct 2025"
+      ],
+      "safety_credentials_NOT_held_but_wanted": "ETCP \u00b7 OSHA 30 \u00b7 formal crowd-management certification. Michael, 2026-09-10: 'i don't hold those safety certs BUT I WANT TO.'",
+      "\u26a0_implication_for_OPS_lane": "He is NOT starting from zero. Two pieces of real, dated safety coursework plus documented practice \u2014 his own CV credits him with having 'established safety practices and began clear records of active trainings and trainees' at URITP. So an entry-level venue-safety posting is a PLAUSIBLE APPLICATION TODAY, not purely a 12-18 month build. The full ETCP/OSHA-30 stack is the build. Do not conflate the two.",
+      "\ud83d\udd11_braceworks": "He ALREADY HAS Braceworks. Any posting offering Braceworks training is offering him something he does not need \u2014 that is a differentiator to lead with, not a gap to apologise for."
     }
   },
   "roles": [
@@ -127,7 +140,7 @@
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["residential", "commercial electrician", "HVAC", "construction", "lineman"],
       "constraints": {},
-      "_note": "\ud83c\udfe0 HOME-ACCESSIBLE OVERHIRE APPLIES HERE (2026-09-10). This lane and audio-sound are where near-home show-by-show work actually lives \u2014 Geva Theatre's overhire call names Electricians and Audio Technicians explicitly. Sweep the Rochester/Syracuse/Buffalo houses' OWN careers pages for it, not the national boards; that work does not syndicate."
+      "_note": "\ud83c\udfe0 HOME-ACCESSIBLE OVERHIRE APPLIES HERE (2026-09-10). This lane and audio-sound are where near-home show-by-show work actually lives \u2014 Geva Theatre's overhire call names Electricians and Audio Technicians explicitly. Sweep the Rochester/Syracuse/Buffalo houses' OWN careers pages for it, not the national boards; that work does not syndicate. \u2b50 Note also that this is Michael's own deepest hands-on lane: Production Electrician at Ogunquit Playhouse across 14 productions, custom pixel-light construction and mapping, LED tape, a DMX-controlled clock, overnight rig installs on changeovers."
     },
     {
       "id": "operations-safety",
@@ -155,7 +168,7 @@
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["construction safety", "mining", "oil and gas", "food safety"],
       "constraints": {},
-      "_note": "KEEP THE SAFETY KEYWORDS (Michael, 2026-08-04). They had returned zero for weeks and were proposed for removal; that proposal was WRONG. Live event safety IS a real discipline with real seats \u2014 they just do not post on theatre boards. Sweep the venue/arena/municipal boards named in job-market-sources.md for these six, and expect them to be thin rather than empty. Niche is the point; a rare find in a niche Michael is qualified for is worth more than another Production Manager row. \u26a0 CREDENTIAL GATE ANSWERED 2026-09-10: Michael holds NO safety certs (no ETCP, OSHA 30 or crowd-management) and WANTS them \u2014 'i don't hold those safety certs BUT I WANT TO.' So the safety half is a 12-18 month BUILD, not an apply-list. Keep sweeping it: the postings are the map of what the credentials are worth."
+      "_note": "KEEP THE SAFETY KEYWORDS (Michael, 2026-08-04). They had returned zero for weeks and were proposed for removal; that proposal was WRONG. Live event safety IS a real discipline with real seats \u2014 they just do not post on theatre boards. Sweep the venue/arena/municipal boards named in job-market-sources.md for these six, and expect them to be thin rather than empty. Niche is the point; a rare find in a niche Michael is qualified for is worth more than another Production Manager row. \ud83d\udd34 CREDENTIAL NOTE CORRECTED 2026-09-10 \u2014 an earlier version of this note said 'Michael holds NO safety certs' and that was FALSE, written without reading his CV. He HOLDS: OSHA Training Institute 'Introduction to Safety and Health Management' (RIT, Feb 2026) and 'Principles of Emergency Planning for Live Events' (Risky Business Resources, Oct 2025), and his CV credits him with establishing safety practices and training records at URITP. He does NOT hold ETCP, OSHA 30, or formal crowd-management certification, and wants them. \u26a0 So this lane is BOTH: entry and mid venue-safety postings are genuinely applicable now, while the full credential stack is a 12-18 month build. See `global.candidate_credentials`."
     },
     {
       "id": "audio-sound",
@@ -174,7 +187,7 @@
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["podcast", "recording studio", "music producer", "radio"],
       "constraints": {},
-      "_note": "\ud83c\udfe0 HOME-ACCESSIBLE OVERHIRE APPLIES HERE (2026-09-10). See the electrician lane note \u2014 Geva's overhire call names Audio Technicians directly."
+      "_note": "\ud83c\udfe0 HOME-ACCESSIBLE OVERHIRE APPLIES HERE (2026-09-10). See the electrician lane note \u2014 Geva's overhire call names Audio Technicians directly. \u2b50 Note Michael holds a BS in Audio and Music Engineering, which makes this lane a credentialed fit and not merely an adjacent one \u2014 worth weighting higher than it has been."
     },
     {
       "id": "drafting-design",
@@ -201,7 +214,7 @@
       "levels": ["senior", "mid", "associate", "entry", "contract"],
       "exclude_terms": ["architectural drafter", "civil", "mechanical CAD"],
       "constraints": {},
-      "_note": "KEEP (Michael, 2026-08-04). Proposed for deprioritisation after one thin pass; overruled. Swept in full every pass like any other lane. \ud83d\udd34 EXPANDED 2026-09-10: six rigging/detailing keywords added after the Upstaging Rigging Designer find ($60-90k, Vectorworks + Braceworks + 50% project coordination) \u2014 Michael: 'that rigging job is WILD and sounds amazing.' \u26a0 'structural' was REMOVED from exclude_terms: it was blocking the exact phrase ('structural load calculations', 'structural drafting') that the best find in this lane's history is built on. The architectural/civil/mechanical excludes stay \u2014 those are the genuine wrong-industry hits. \u2b50 This lane is also the strongest REMOTE candidate in the whole config; see global.remote_sweep. And note the pattern: ATOMIC Productions posted a near-identical Drafter-Detailer role in March 2026 that was filed 'for reference' and never worked. Two in six months means this adjacent lane is real and has never been searched deliberately."
+      "_note": "KEEP (Michael, 2026-08-04). Proposed for deprioritisation after one thin pass; overruled. Swept in full every pass like any other lane. \ud83d\udd34 EXPANDED 2026-09-10: six rigging/detailing keywords added after the Upstaging Rigging Designer find ($60-90k, Vectorworks + Braceworks + 50% project coordination) \u2014 Michael: 'that rigging job is WILD and sounds amazing.' \u26a0 'structural' was REMOVED from exclude_terms: it was blocking the exact phrase ('structural load calculations', 'structural drafting') that the best find in this lane's history is built on. The architectural/civil/mechanical excludes stay \u2014 those are the genuine wrong-industry hits. \u2b50 This lane is also the strongest REMOTE candidate in the whole config; see global.remote_sweep. \ud83d\udd11 AND THE KEY FACT: Michael's CV lists Braceworks calculations as an existing skill. This lane is not a stretch \u2014 it is a credentialed match that was under-keyworded for months. And note the pattern: ATOMIC Productions posted a near-identical Drafter-Detailer role in March 2026 that was filed 'for reference' and never worked. Two in six months means this adjacent lane is real and has never been searched deliberately."
     },
     {
       "id": "creative-admin",
