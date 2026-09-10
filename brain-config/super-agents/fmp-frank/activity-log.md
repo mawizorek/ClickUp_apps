@@ -33,7 +33,8 @@
 ## Production MAWster — ACTIVE, my primary build
 
 - **Measured 2026-08-09 16:43 ET** (DDR `202608091643`): 36 tables · **0 relationships · 0 layouts**.
-  Scripts went 0 → ~11 that evening, entered by Michael directly.
+  Scripts went 0 → ~11 that evening, entered by Michael directly. ⚠️ **A MONTH STALE as of 09-09 and
+  therefore not usable** — re-query before quoting any of it.
 - **Where things live:** schema + script docs in `mawizorek/uritp-docs` 🔒 PRIVATE →
   `production-mawster/`. ⚠️ **NOT `maw-prose`** — that tree is stale and the published site still
   renders from it. Collapsing the three doc trees is open.
@@ -41,7 +42,8 @@
   Four specs rewritten, four retired verbatim, three scripts still unread by anyone and deliberately
   unspecced (`00App_onFirstWindowOpen`, `00App_Mark_Setup_Complete`, `00App_Set_Setup_State`).
 - **Owed by me:** nothing outstanding.
-- **Blocked ON MICHAEL, and all three block real work:**
+- **Blocked ON MICHAEL, and all three block real work** — ⚠️ **all three are 08-10 claims, unverified
+  since; check before inheriting:**
   1. 🔴 `APP_SESSIONS` vs `UTILITY_LOGS` — a second claimant that reverses J13 with no written
      reversal. `FILE · Open` cannot be entered until it is settled. **Posed as Q2 on the Decision
      Log 2026-08-10.**
@@ -57,20 +59,75 @@
   update. Read the BOTTOM-most comment first; four consecutive rulings on config each corrected the
   next one.
 
-## Bundle health — measured 2026-08-10 23:45 ET (Maggie's rotation)
+## Bundle health — measured 2026-09-09 20:20 ET (from the write responses, not a listing)
 
-- ✅ **`memory.md` ROTATED: 19,740 B → 13,770 B.** Schema/build craft moved WARM to
-  `memory/archive/schema-and-build-craft.md`; the cross-runtime correlations stayed hot because they
-  are what the class was justified on. **This executes the split I flagged for Michael + Size Sally.**
-- ⚠️ **Still 13.45 KiB against a ~10KB target** — over budget, well under the 22KB ceiling, and
-  flagged rather than forced. What remains is correlations, live scars, Michael-patterns and
-  pointers; cutting further starts removing content that fires every session. **Michael's review.**
-- ✅ **`activity-log.md` ROTATED: 18,221 B → this file.** Three whole sessions moved cold.
+- 🔴 **`memory.md` GREW: 13,770 B → 15,077 B** (+1,307) adding the C4 09-09 finding and the
+  write-the-note-early Michael-pattern. **Measured from the commit response, per the 08-10 scar.**
+  Now **14.7 KiB against a ~10KB hot cap** — worse than the post-rotation overage Maggie already
+  flagged for Michael, still well under the 22KB read ceiling. **Both additions fire every session,
+  which is the class that earns hot space; the file nonetheless needs a second rotation, not a
+  third append.** Not forced — Michael's + Size Sally's call.
+- **`activity-log.md`:** this write. Entries are again ONE long session plus this one; the ~4-5KB
+  entry window is over budget the moment the 08-09 block stays. **Rotation candidate.**
+- ✅ 08-10 rotation history: `memory.md` 19,740 → 13,770 B, `activity-log.md` 18,221 → 10,167 B
+  (Maggie). Schema/build craft went WARM to `memory/archive/schema-and-build-craft.md`.
 
 ## HML_LLC — dormant, no session since 07-29
 
 FileMaker 19 permanently, so atomicity is hand-built. Build detail is archived, not hot —
 `memory/archive/hml-llc-fmp19-build-detail.md`, read before touching a script.
+
+---
+
+## 2026-09-09 — multi-list membership vs joins: the annual-reset ruling
+
+Co-invoked with Milo earlier in the day (budget FUNDING SOURCES); reopened ~20:08 on a different
+subject entirely. Michael asked how ClickUp multi-list membership actually works, how agents parse
+home lists, and pushed back that joins feel like endless task creation. **Read-only in the repo
+until this write; all rulings landed in ClickUp.**
+
+- **Ruled against his framing and he confirmed it.** Multi-home is a membership FLAG with nowhere to
+  put data, so org affiliation, certs earned and contact-sheet presence are all joins — each carries
+  a value AND a clock. **C4's "breaks at the archive boundary" clause did the whole job**, which is
+  the first time that correlation decided anything; logged to `memory.md`.
+- 🔴 **Corrected his word rather than his model.** *"Reset the joins each year"* → **append-only with a
+  validity span**: close last year's rows, generate this year's, never clear. A wiped join destroys
+  the history Access Tracking J2's de-provisioning requirement runs on, silently, once a year, when
+  nobody is reading last year's rows. → **J9** on the ClickUp-as-FileMaker log.
+- ⭐ **Answered a three-week-old open question sideways.** ClickUp's own Tasks-in-Multiple-Lists FAQ
+  says *"tasks inherit the Custom Fields from their locations"* — **that is Q4a answered UNION by the
+  runtime we are modelling.** The asymmetry is the real find: **fields union across memberships,
+  status resolves from the home list alone**, which narrows `isHome` to exactly one job and
+  vindicates J3's severity escalation. → **J8**. ⚠️ Both help articles are UNDATED — first-party but
+  unstamped, logged as current-as-read. Q4b is still unanswered by anyone but Asana.
+- 🔴 **Named the compounding pattern: three holes in this sketch, all STATE TRANSITIONS, none
+  structural** — membership depth (J4), value orphaning (Q4), cohort rollover (J9). **S1 predicted
+  the class on 08-17 and the third instance arrived unhunted three weeks later.** Written into the
+  session task descriptor, because that is the surface a cold agent reads.
+- **Ruled Access Tracking Q3 instead of leaving it hanging** (→ **J5** there): grants are STANDING
+  person×target rows with a validity span, the TARGET sets the span, `Production` is provenance only.
+  ⭐ **"Hybrid" was never a third design — it is what a validity span gives you free.** Q3 left
+  unstruck per never-cull. ⚠️ **Named what is NOT ruled: closing a span does not revoke a Dropbox
+  share.** Schema cannot de-provision; that is policy plus a manual sweep.
+- 🔴 **CORRECTION TAKEN, and it generalizes past documentation:** *"stop asking if you should be
+  updating notes and decisions. JUST DO IT and onboard yourself with notes sooner to help me find
+  these patterns sooner."* Three closing questions in three replies, each asking permission for a
+  reversible write in my own lane. **The timing half is the sharper instruction** — notes are how he
+  spots the pattern, so one written at close arrives after it was useful. Logged as a
+  Michael-pattern.
+- ⚠️ **Repo coordinate stated LATE**, on the third call rather than before the first. The
+  repo-referent gate wants it in visible text before ANY GitHub call. Recorded, not excused.
+- ⚠️ **`preferences.md` + `memory.md` read FULL this session**; `decision-log.md` and this log were
+  read late, and the 14:56 turn earlier today ran on `preferences.md` alone — declared in the spine
+  at the time.
+
+**Open surfaces:** `memory.md` at 15,077 B needs a SECOND rotation (Bundle health above) · the three
+Production MAWster forks in LIVE STATE, all unverified for a month · **Access Tracking has no
+descriptor to fold J5 into — the ACCESS GRANTS list does not exist yet**, so that block says pending
+by fact, not by neglect · the OMR queue is **64,829 B measured 09-09** and therefore STILL past the
+~30KB write cap, so the documented memory-candidate door remains non-functional for every agent ·
+⚠️ **two abandoned branches in `ClickUp_apps`** (`fiona-omr-0810`, `fiona-stale-open-surfaces`) — no
+available tool deletes a branch, and this session adds `fiona-join-lifecycle-0909` to be merged.
 
 ---
 
@@ -117,6 +174,8 @@ after the afternoon handoff. Michael building in FileMaker, me documenting. **Fo
   agent is told to use does not function. Candidate parked on Maggie's standing OMR log instead.
   **`session-board.md` is 30,990 B on a spec that reads "empty by default"**, so every collision
   check in the fleet is running against stale rows. Both routed to existing standing surfaces.
+  ✅ **`session-board.md` re-measured 09-09 at 6,302 B** — that one got cleaned up; the OMR queue did
+  not (64,829 B, worse).
 - ⚠️ **I deferred my own activity-log write three replies running**, announcing it as owed each time.
   Naming a debt is not paying it — the same shape as the missed-gate protocol. Written now, with the
   LIVE STATE block that should have existed since 07-30.
@@ -130,9 +189,9 @@ after the afternoon handoff. Michael building in FileMaker, me documenting. **Fo
 misspelled `70-scripts/90-Utlity/` folder is flagged for Michael's deletion (PR #82) ·
 ~~`memory.md` is 19,740 B against a ~10KB hot cap and needs a rotation, not a tenth entry~~
 ✅ **STRUCK 2026-08-10 23:45 — rotated by Maggie to 13,770 B; the residual overage is flagged for
-Michael in Bundle health above** · ⚠️ **two abandoned branches in `ClickUp_apps`**
-(`fiona-omr-0810`, cut before measuring the queue; `fiona-stale-open-surfaces` if unmerged) — no
-available tool deletes a branch.
+Michael in Bundle health above** ⚠️ **and re-opened 09-09 at 15,077 B** · ⚠️ **two abandoned branches
+in `ClickUp_apps`** (`fiona-omr-0810`, cut before measuring the queue; `fiona-stale-open-surfaces` if
+unmerged) — no available tool deletes a branch.
 
 ---
 
