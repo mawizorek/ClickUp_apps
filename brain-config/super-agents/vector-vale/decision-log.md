@@ -4,19 +4,31 @@
 
 ---
 
-## D1 — 🎯 RETIREMENT CONDITION (written at build, per the authoring gate)
+## D7 — The venue package was overcorrection, not just misfiling, and that is the more useful reading (2026-09-10)
 
-> **If Ledger A is still inherited-only after TWO real VWX working sessions — a library-planning pass or a show-file build — Vale was a lens.**
+**Michael:** *"all that other shit is slop that I think you put in the first place."* ✅ **Verified rather than accepted: he is right.** `maw-prose/venues/smith-theatre/` was authored by MAW Agents, PRs #3 and #5, 2026-07-29.
 
-**Why this is the right bar:** Vale graduated for exactly one reason, that the conventions need to ACCUMULATE somewhere. Ledger A is where a ruled convention lands. If two real sessions pass and nothing has been ruled into it, then either the conventions are not actually being decided or they are living somewhere else — and in both cases a stateless lens would have done the same work without a bundle to maintain.
+🔴 **The part worth keeping is WHY it was written.** Hours earlier that same day, the Prose DL scored **B24** — shipping the governance layer without the reference layer, *"documentation about documentation."* The correction was *ship the reference content, the layer list, the class list, the load limits.* **PR #3's own commit message is literally "the reference content that should have shipped first."** So the venue package was a session **fixing** a real, named failure — and it overshot the target by filing venue facts into a craft-standards repo.
 
-**What does NOT count toward the two:** a session that only answers a question, only fetches an outside fact, or only reorganizes documentation. The condition is about RULINGS accruing, not about Vale being seated.
+⭐ **Generalized, and it is the reason this is a decision-log entry rather than a memory line: a correction has a direction, and direction has no natural stopping point.** "Ship concrete reference, not process prose" says nothing about WHERE the concrete reference belongs, so the fix ran until it ran out of content. **The remedy is not to write less reference; it is to ask, at the moment of writing, who reads this** — which is the repo-referent gate's own test, available the whole time and never fired on prose.
 
-⚠️ **A session that finds this condition due brings it to Michael with the evidence.** It is a promise to ASK, not a promise to retire. If he keeps Vale, this entry gets STRUCK with the reason and re-set with a new bar, never quietly deleted.
+**Second-order, and it cost five weeks:** Michael then pruned the overshoot himself, twice, silently (`the-room.md` deleted 08-04; `layers.md` commented out 08-17). **A quiet delete is a ruling with no prose attached**, and I read both as decay for three days before running `list_commits`. Now in Ledger C1 as a retraction and in the how-Michael-works notes.
 
-🔴 **Known counting hazard, from the fleet's own scars:** a working session that happens and is never written down does not count toward the two, so a logging failure silently RESETS this condition and keeps Vale alive on a technicality. The log is the evidence.
+## D1 — 🎯 RETIREMENT CONDITION — ✅ CLEARED BY EVIDENCE 2026-09-10 (struck, re-set below)
 
-🔴 **STATUS 2026-09-08: DUE, and it is being brought to Michael rather than acted on.** Two real sessions have now run (09-07 library-planning read, 09-08 mechanics walk) and **Ledger A is still empty**. ⚠️ **But the honest reading is that the bar measured the wrong thing.** Both sessions produced substantial durable knowledge into Ledger B and C and both ended with rulings *offered and declined* — four mutually-exclusive candidates were put to him on 09-08 and he asked more questions instead. **That is not a lens failing to accumulate; that is a domain where the mechanism had to be understood before anything could be ruled.** The bar assumed rulings arrive early. In this domain they arrive after the vendor behaviour is mapped, which is exactly what Ledger B now holds. Michael decides: strike and re-set (candidate new bar — *Ledger A non-empty after the next session in which a decision is actually put to him in Q/J/S form*), or retire. **Not struck unilaterally.**
+> ~~**If Ledger A is still inherited-only after TWO real VWX working sessions — a library-planning pass or a show-file build — Vale was a lens.**~~
+
+🔴 **CAME DUE 2026-09-08** after two real sessions with an empty Ledger A, and was brought to Michael rather than acted on, per the promise-to-ASK clause. **CLEARED 2026-09-10:** the third session produced **A1** (the VWX notes are about Vectorworks; venue information goes to the URITP notes) and **A2** (the venue package was agent-authored slop). Ledger A is no longer inherited-only.
+
+⚠️ **Struck WITH the reason rather than deleted, and the reason matters more than the outcome: the bar measured the wrong thing.** It assumed rulings arrive early. In this domain the first two sessions were spent discovering that a substantial standards package already existed, that its three organizing decisions were self-labelled unratified, and that the vendor mechanics contradicted parts of it. **A1 was only available once that was mapped** — and when it came, it arrived in one sentence and reorganized every surface at once.
+
+⭐ **What actually produced the ruling is worth recording, because it was not persistence:** Michael asked a question back (*"what would be private info about vwx file structure?"*) that dissolved a public/private framing I had inherited from the Prose DL and never tested. **The ruling came from him rejecting my premise, not from me putting better options in front of him.** A retirement bar keyed on ledger growth cannot see that, and a bundle that had been retired on 09-09 would have lost the memory that made the question answerable.
+
+### 🎯 NEW BAR (set 2026-09-10)
+
+> **If Ledger A has not grown beyond A1/A2 after the class tree, the layer list and sheet numbering are ratified — the three items parked at Prose DL J9 since 2026-07-29 — Vale was a lens.**
+
+**Why this one is better:** it is keyed to **named, already-parked decisions with a known author**, not to a count of sessions. Those three ARE the substance of the lane; if they get ratified and nothing durable accrues, the conventions are genuinely living somewhere else and a stateless lens would have done it. 🔴 **Same counting hazard still applies:** a session that happens and is never logged does not count, so a logging failure silently resets this. The log is the evidence.
 
 ## D2 — Born on the migrated activity shape, not given a git log to move later
 
@@ -46,6 +58,8 @@ Slug is IMMUTABLE from here. Only the display name may ever change, and a rename
 
 ✅ **Tested live 2026-09-08** and the seam held: a bridle question was answered as *file structure and paperwork mechanism* (assembly diagrams, parts inventory, class prefixes) with the structural half routed to Gable and Hawthorne untouched. **The seam is easy to honour on a documentation question and will be hardest on a question phrased as "is this rig fine"** — the wording will look like drafting and the answer will not be.
 
+✅ **Tested again 2026-09-10, and this time on a PUBLISHING question:** asked whether the VWX tree should be public, the load-limits half was named and handed to Gable/Hawthorne rather than answered, because *"should capacities be published under Michael's name"* is authority and liability, not privacy. **A2 now removes the venue content from Vale's repo entirely, which retires most of the exposure by scoping rather than by judgment.**
+
 ## D5 — The Fiona seam is a consult, and it is the seam worth protecting
 
 **Decision:** Vale consults FMP Fiona on library architecture and never edits her object library; she never rules on VWX structure.
@@ -65,4 +79,4 @@ Slug is IMMUTABLE from here. Only the display name may ever change, and a rename
 
 ⚠️ **Ruled for Vale, in a Vale session.** It reads like it should generalise across the fleet, and it probably should — but a fleet-wide logging cadence is a Fold-in Frank question and a base-spec edit, not a per-agent decision-log entry. **Do not cite D6 as the fleet rule.** If Michael wants it fleet-wide it belongs in `super-agents/_shared/super-agent-base.md`.
 
-⚠️ **Known cost, stated at ruling time:** continuous writes grew `memory.md` past its ~10KB hot cap in the first session under the rule (19.9KB). **Rotation is now due** (`hooks/memory-rotation.md`), and the graduation candidate is the Ledger B package-summary block, which restates a document that is already canonical in `maw-prose`. Logging as we go and a hot cap are in genuine tension, and the resolution is rotation, never writing less.
+⚠️ **Known cost, stated at ruling time:** continuous writes grew `memory.md` past its ~10KB hot cap in the first session under the rule (19.9KB). ✅ **DISCHARGED 2026-09-10:** rotation run, the Ledger B package summary and the vendor-mechanics block graduated to `memory/archive/vwx-reference-2026-09.md`. **The tension was real and the resolution was rotation, never writing less** — and it took two sessions of being owed before it was paid, which is the honest cost of the rule.
