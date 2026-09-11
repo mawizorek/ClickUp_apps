@@ -2,7 +2,7 @@
 id: morning-briefing.orientation
 kind: hook-sidecar
 parent: brain-config/hooks/morning-briefing.md
-version: 2
+version: 3
 status: LIVE (phase 1 — manual fire)
 steward: Mainstage Milo
 born: 2026-09-02
@@ -17,6 +17,48 @@ IS** and the blocks that make it feel like a person rather than a query.
 ⚠️ **Why a sidecar and not more parent:** the parent was **20,858 B** when this split
 happened, and the ~22KB editability ceiling is real — a file that cannot be read
 whole cannot be safely edited. Split on the `job-market-refresh.notes.md` precedent.
+
+---
+
+## Calendar publication queue: required per-show check (v3, 2026-09-11)
+
+Run this during EVERY invoked morning briefing, alongside the production roll call.
+This is a fold-in to the existing read, not a scheduler or background watcher.
+Michael's correction: a manual is useful only if the agent actually reads it.
+The queue check therefore lives here in the required routine, not in Milo's personal memory.
+
+Before working production calendars, resolve the show's List Index row and read its
+Doc Page. The current shared manual is ClickUp page `12cwjm-78093`, LIVE PRODUCTIONS,
+under the URITP Operations Manual. Its **Production calendar update contract** governs
+edits: native ClickUp start/due are the editing surface; Michael updates Google Calendar
+manually using `GCal STATUS`. Do not write Google Calendar. Date edits should make the
+existing automation flip CURRENT to OUTDATED; read back to verify, never force the flag
+or claim success without evidence. Observed on four hang events, 2026-09-11; automation
+configuration was not inspected. The morning routine itself still makes NO date edits.
+
+1. Read the live production event tasks and their `GCal STATUS`, including subtasks and
+   closed tasks. Resolve scope from the actual production/calendar hierarchy and home
+   lists; deduplicate multi-homed tasks by identity. Discover the field's live options.
+2. Compare with the last saved morning-run snapshot by TASK ID, not just count. Report
+   newly OUTDATED events, the still-OUTDATED backlog, and previously outstanding events
+   now CURRENT. Keep NEW/unpublished work separate from OUTDATED corrections. Other
+   non-current states retain their live labels, not an invented interpretation.
+3. Put linked items in the existing GATEKEEPER block, grouped by show, nearest event
+   first: Michael's next action is to update Google Calendar. Report returned-to-CURRENT
+   items as recorded queue progress, not independently verified Google Calendar sync.
+   If an item disappeared, became N/A, or became unreadable, do NOT count it as cleared.
+4. Save the read timestamp, covered lists, task IDs, event dates and exact field values
+   in the existing morning run record, with task links. No new registry, personal-memory
+   copy, or parallel tracker. Use the normal run-report posting authorization; if a
+   report cannot be saved, say the comparison baseline was not persisted.
+5. No prior snapshot means BASELINE ONLY, never invented deltas. A missing field or
+   unreadable scope is UNVERIFIABLE, never zero. Complete pagination before giving
+   totals; otherwise label partial coverage. All-clear is earned by a complete read.
+
+Do not set CURRENT because ClickUp dates were corrected. Do not use CLOSED (N/A) to
+silence a real event awaiting publication. The field is Michael's update queue, not
+proof of Google Calendar contents. No new outbound notification mechanism is installed:
+these updates appear when the existing morning routine is invoked.
 
 ---
 
@@ -213,6 +255,8 @@ Then, ahead of everything in the parent's block list:
 
 Everything else runs unchanged: TODAY · 🛒 GATEKEEPER · PRESSURE · SLID · GAPS ·
 🎯 DRILL BATCH · routines-as-one-line, empty blocks omitted.
+The GATEKEEPER block now includes the calendar publication queue read above:
+newly OUTDATED, still waiting, and returned to CURRENT, grouped by production.
 
 ⚠️ **THE ROOM goes FIRST and stays SHORT.** It is the walk before the work. If it
 ever runs longer than the Gatekeeper Block, it has become a newsletter and the
@@ -234,6 +278,8 @@ consequence filter is not being applied.
   living outside the production folders will be missed by it, and the brief cannot
   know what it did not enumerate. **If the roster is derived from anything other than
   the folders, say so.**
+- The calendar queue delta has not yet had a morning-run test. Field transitions
+  were observed on four edited tasks; whole-season queue comparison remains untested.
 
 ## Provenance
 
@@ -247,3 +293,9 @@ headline.
 **v2, same day:** THE ROLL CALL, earned by Michael catching that Becoming Curious
 had been silently dropped from three consecutive dry runs for the crime of not being
 in trouble.
+
+**v3, 2026-09-11:** Michael confirmed the ClickUp-first calendar update pattern and
+requested shared cold-agent documentation plus morning queue deltas. He also caught
+that the event-editing session had not first read the live production manual.
+The required check is here; the shared manual and production-folder index pointers
+supply the editing contract. No Google Calendar writes or background monitoring added.
