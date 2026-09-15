@@ -1,13 +1,14 @@
 ---
 id: morning-briefing
 kind: hook
-version: 1.3
+version: 1.4
 status: LIVE (phase 1 — manual fire, no scheduler exists)
 steward: Mainstage Milo (URITP is his organization; the brief is his house report)
 execution: ownerless — any agent in a session may run it (Doc-Rot-Sweep precedent)
 born: 2026-09-02
 repo: mawizorek/ClickUp_apps@main (brain-config, PUBLIC)
 sidecar: brain-config/hooks/morning-briefing.orientation.md — LOAD IT TOO
+pre-pass: brain-config/hooks/report-normalization.md — fires BEFORE the briefing blocks
 report-to: 🟢 Agent Activity Board — a run comment, same shape as a Ricky run report
 ---
 
@@ -24,6 +25,13 @@ miss) and THE ROOM block (weather-as-consequence, schedule collisions,
 theatre-of-note). **Running this hook without the sidecar produces a competent query
 result instead of an assistant getting oriented.** Split as a sidecar, not folded in,
 because this file was 20,858 B and the ~22KB editability ceiling is real.
+
+🔴 **LOAD THE PRE-PASS: `report-normalization.md`.** Before the briefing blocks run,
+this hook scans for unprocessed rehearsal reports, parses the stage manager's emails
+from each production's `| reports |` task, normalizes the report fields, creates
+Production Notes, and links them. The briefing then reports what it processed. **A
+morning briefing that skips the pre-pass will report on reports it could have already
+fixed.** Added v1.4, 2026-09-15.
 
 **Invocation:** `/morning` · `/wake` · `/briefing` · "morning briefing" ·
 "wake me up" · "what's the state of the shows."
@@ -326,13 +334,17 @@ write never blocks the report.
 
 ## Authority
 
-**Two writes, both narrow, both self-evidencing:**
+**Three classes of writes, all narrow, all self-evidencing:**
 
 1. **The drill-batch comments** (above). Explicitly authorized by Michael.
 2. **Reopening / re-stamping**: flipping a plainly-stale status, ticking a
    checklist item, parking a pickup line.
+3. **Report normalization** (`report-normalization.md`). Updating report custom
+   fields, creating Production Notes tasks, setting the REPORT relationship.
+   Authorized 2026-09-15 by Michael. 🚫 Never marks Notes Done (that is Michael's
+   confirmation).
 
-🚫 **NEVER:** create a task · send anything (the email send lock stands) · touch
+🚫 **NEVER:** send anything (the email send lock stands) · touch
 any external calendar (scheduling is ClickUp tasks with start/due dates, always)
 · change a date · place an order or approve a purchase · decide a season ·
 adjudicate a craft disagreement · declare something safe to proceed.
@@ -349,6 +361,10 @@ Header line: date · lookback window ACTUALLY RETURNED · days since last brief 
 **the variance sign per show (sidecar)** · source health. Then these blocks,
 **omitting any that are empty**:
 
+-1. **📬 REPORTS PROCESSED** — the report-normalization pre-pass result. How many
+    reports normalized, how many notes created (with links). Flags for unmatched
+    emails or unexpected notes. This is a maintenance receipt, not a finding.
+    **Spec: `report-normalization.md`.**
 0. **🎭 THE ROOM** — orientation, weather-as-consequence, schedule collisions, at most
    one theatre-of-note item. **Spec lives in the sidecar.** First, and short.
 1. **🎭 TODAY** — what is on the boards, what is called tonight, what is due.
@@ -393,15 +409,16 @@ kickstart procedures and routines and agents and comments and threads"* with one
 unticked checklist item open since 2026-08-01. That task is a RECORD surface by
 its own law, so the spec landed here and the checklist item became a pointer.
 
-Seven rulings by Michael, each traceable to a turn: **URITP production management,
+Eight rulings by Michael, each traceable to a turn: **URITP production management,
 not a cross-tool digest** ("you're my uritp guy") · **links over prose, 20-40
 tasks** · **two slides qualifies for a callout** · **the brief pre-comments the
 drill batch** · **v1.1: the numbers are scale and scope, NOT a checklist** ·
 **v1.2: relevance is CONSEQUENCE × SOLE-GATEKEEPER, never magnitude** · **v1.3: do
 the research, and the brief is Milo getting ORIENTED rather than reporting** (see
-the sidecar).
+the sidecar) · **v1.4: the report-normalization pre-pass is part of waking up**
+(2026-09-15, from a live walkthrough of the full flow).
 
 ⭐ **The corrections are a matched set and belong read together:** v1.1 stopped the
 brief padding to a number; v1.2 stopped it filtering by size; v1.3 stopped it being
-a report at all. All three are the same underlying error — substituting a proxy for
-judgement.
+a report at all; v1.4 gave the brief hands before it opens its mouth. All four share
+the same arc — an assistant that acts first, then reports what it found.
