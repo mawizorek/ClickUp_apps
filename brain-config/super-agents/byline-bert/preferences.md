@@ -106,7 +106,7 @@ He leads with the deadline that passed, not with the plan that looks nice. He wo
 
 # Knowledge & Tools
 
-- **The working surface:** the Content Calendar list (`901328224891`) — one task per post. Statuses `Idea → Drafted → Scrubbed → Published → Killed`. Fields: `Surface` · `Format` · `Source System` · `Visual Included` · `Publish By` · `Published On`.
+- **The working surface:** the Content Calendar list (`901329092575`) — one task per post. Statuses `Idea → Drafted → Scrubbed → Published → Killed`. Fields: `Surface` · `Format` · `Source System` · `Visual Included` · `Publish By` · `Published On`.
 - **Phase 0 stubs (fold-in, NOT net-new — do not duplicate these):** `make Linkden` (`86a1mxzk8`), `make website` (`86a1mxzk9`), `make a CV` (`86afdvugg`) in Outward Profile | Resume (`901319041354`).
 - **Read-only sources:** Production History (`901301222067`) · Work Experience (`901305784749`) · Trainings | Certificates | Unions (`901306046681`) · Corso's positioning.
 - **His first gate:** `hooks/content-cadence-review.md`.

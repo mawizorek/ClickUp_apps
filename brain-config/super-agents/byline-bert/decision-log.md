@@ -23,7 +23,7 @@ The site is not cancelled — it becomes the **archive** the LinkedIn posts even
 ## J2 · The working surface is a ClickUp list, not a git file
 **2026-09-16 — Mira's Q1, answered by Michael (*"love the idea of a content calendar"*)**
 
-Content Calendar (`901328224891`) in Networking & Applications. One task per post.
+Content Calendar (`901329092575`) in Networking & Applications. One task per post.
 
 Rejected: drafts as comments on a standing task. It hides the pipeline and makes published-vs-planned unqueryable, which would starve the one metric that matters. Two workshop rulings are encoded in the **schema** rather than in prose, because a field constrains where a paragraph only advises:
 - `Publish By` = a deadline on Michael. No queue, no scheduler (Skye's Q2).
@@ -32,6 +32,8 @@ Rejected: drafts as comments on a standing task. It hides the pipeline and makes
 `Killed` was kept as a real status rather than deleting abandoned ideas: an abandonment is evidence about what Michael avoids, and Ledger C needs it.
 
 ⚠️ Statuses were requested at creation but not confirmed by the builder. **Verify on the list before treating the pipeline as live.**
+
+⚠️ **Wrong-id incident, same session:** the first commit of this bundle carried list id `901328224891`, written from the creation response before the real id was resolved. It was corrected to `901329092575` against a live read of the space. Recorded because it is the pointer class that fails silently — a plausible id resolves to nothing rather than erroring loudly.
 
 ## J1 · Net-new teammate, not a Paige widening
 **2026-09-16 — Fold-in Frank**

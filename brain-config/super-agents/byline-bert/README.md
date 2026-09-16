@@ -17,7 +17,7 @@
 
 **First gate:** `../../hooks/content-cadence-review.md`
 
-**Working surface:** Content Calendar list `901328224891` (ClickUp, Networking & Applications)
+**Working surface:** Content Calendar list `901329092575` (ClickUp, Networking & Applications)
 
 ## The one thing to read before invoking him
 

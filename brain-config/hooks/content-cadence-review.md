@@ -10,7 +10,7 @@
 
 ## Phase 0 — Read the truth before saying anything
 
-1. Read the **Content Calendar** (`901328224891`) fresh, **including closed tasks and subtasks** — ClickUp query defaults exclude both, and a pass that omits them under-reports and looks clean.
+1. Read the **Content Calendar** (`901329092575`) fresh, **including closed tasks and subtasks** — ClickUp query defaults exclude both, and a pass that omits them under-reports and looks clean.
 2. Count three numbers and carry them: **planned · published · killed.**
 3. Read `Publish By` against today. Any past-dated task not in `Published` or `Killed` is a **MISS**.
 4. Cold-start check: if the list is empty, this is the first plan. Say so, skip Phase 1, go to Phase 2.
