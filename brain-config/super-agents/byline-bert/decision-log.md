@@ -4,6 +4,23 @@
 
 ---
 
+## J7 · Borrowed-account content does NOT count toward published-vs-planned
+**2026-09-16 — Bert's ruling, forced by the 9/25 Instagram takeover**
+
+Michael has an employer obligation to run a day of the URITP Instagram takeover relay on **Fri 9/25** (LX + SND hang day). It is real publishing, it is on-topic for the systems lane, and it is **not** what Bert measures.
+
+**The distinction, which is the whole ruling:** satisfying an obligation on someone else's account is not evidence that Michael publishes under his own name. If the takeover counted, Bert's retirement condition could be satisfied by an assignment Michael was going to do anyway, and Cole's dissent would go untested. **That would be the exact failure the condition exists to catch, dressed as a pass.**
+
+**So the split:**
+- **Obligation** → `LX + SND hang day takeover (URITP Instagram)`, Surface `Other`, `Publish By 2026-09-25`. Bert plans it, produces it, scrubs it. **Excluded from the ratio.**
+- **Outcome** → `First LinkedIn post: the plot is the product`, Surface `LinkedIn`, `Publish By 2026-09-27`. **This is what the clock measures.**
+
+The takeover is the RAW MATERIAL, not the result. Clip 3 (the plot held up against the pipe it describes) is the visual the LinkedIn post reuses, which is why the two dates sit 48 hours apart: the footage and the memory are both still warm.
+
+⚠️ **Generalizes:** any future content Michael produces on an account he does not own is planned by Bert and excluded from the ratio, unless Michael rules otherwise in a logged decision.
+
+⚠️ **A second-order risk to watch, stated now so it is not discovered later:** the takeover is the easier, lower-stakes, externally-mandated version of the thing Michael avoids. It is entirely possible to complete it, feel published, and never post to LinkedIn at all. **If 9/25 lands and 9/27 slips, that is not a scheduling problem, it is H1 confirming itself.**
+
 ## J6 · The 30-day clock must be STAMPED, in two places
 **2026-09-16 — Mira's ruling, from Audit Anna's onboarding finding**
 
@@ -17,6 +34,8 @@ Her reasoning, which is the part worth keeping: *a retirement condition nobody c
 
 Two surfaces on purpose: the clock then exists as data twice and depends on nobody's memory. **Audit Anna owns the first evaluation.**
 
+✅ **SATISFIED 2026-09-16.** `CLOCK STARTED: 2026-09-16 · J4 evaluation due 2026-10-16` is in LIVE STATE, mirrored as `Publish By 2026-09-27` on the LinkedIn task.
+
 ## J5 · Profile ownership: Bert holds the always-on surface, Corso holds the tailored cut
 **2026-09-16 — Mira's ruling, from a collision Corso raised at onboarding**
 
@@ -28,6 +47,8 @@ Corso's claim was legitimate — his own spec item 9 covers portfolio and resume
 
 **Corso's accepted condition:** he holds a **standing right of comment** on profile copy when it is costing Michael on a listing he is evaluating. Bert takes the note; Michael decides ties. Corso does not file into a void.
 
+⚠️ **Now urgent, not theoretical:** the 9/27 post needs a profile to sit on, and `make Linkden` has never been started. Phase 0 is on the critical path.
+
 ## J4 · Retirement condition: 30 days to a first published post
 **2026-09-16 — Bert's call, delegated; proposed by Counter Cole, seconded by Breaker Beckett**
 
@@ -37,7 +58,7 @@ The clock starts at the **first plan**, not at build, so an unopened Bert does n
 
 **Cole's dissent stands on the record and is not resolved by this ruling:** building Bert risks converting *"I haven't posted"* into *"I have a sophisticated system for not posting,"* which feels better and produces the same zero. This condition is the falsifiable test of that dissent, not a rebuttal of it.
 
-⚠️ See **J6** — as written, this condition was not measurable. Anna caught it at onboarding, hours after it was authored, which is itself the argument for stamping rather than describing.
+⚠️ See **J6** — as written, this condition was not measurable. Anna caught it at onboarding, hours after it was authored, which is itself the argument for stamping rather than describing. See **J7** for what does and does not count as a satisfying publish.
 
 ## J3 · First surface: LinkedIn, site later
 **2026-09-16 — Bert's call, delegated**
@@ -74,15 +95,10 @@ Fold-in claimed rather than duplicated: the three Outward Profile stubs are **Be
 
 ---
 
-## Q3 · Does URITP have its own public comms voice?
-**Open — Michael's to answer. Raised by Mainstage Milo at onboarding.**
-
-If the program posts about its own season while Michael posts about the systems behind it, the two can collide in tone even when neither is wrong. Michael granted permission to document the method (2026-09-16); **that is not the same as knowing there is no comms person who would be surprised.**
-
-Not a blocker for a post carrying no visual and no program-facing claim. It IS a blocker for anything that reads as speaking for the program.
-
 ## Q2 · Does Bert ever get a schedule trigger?
 **Open, and deliberately unanswered at build.** A weekly cadence-review nudge is the obvious upgrade and it is also the thing most likely to become noise Michael tunes out. Requires at least one manual cycle of evidence before it earns a trigger.
+
+⚠️ The 9/27 deadline is the first real test of whether a manual cadence holds. Do not settle this before it resolves.
 
 ## Q1 · The site: real build, or a hosted service?
 **Open.** J3 defers it. Dexter's input at onboarding sharpened the fork rather than closing it:
@@ -90,3 +106,18 @@ Not a blocker for a post carrying no visual and no program-facing claim. It IS a
 - If the site is meant to **demonstrate that he builds systems**, it has to be built — a template site actively undercuts the claim.
 
 Dexter's ruling on ownership: *"that's a strategy call, which makes it yours."* Not decided at zero published posts.
+
+---
+
+## ✅ CLOSED
+
+### Q3 · Does URITP have its own public comms voice? — YES, and it is a routing rule, not a prohibition
+**Closed 2026-09-16 by Michael (*"yes we can publish them"*) plus the 9/15 staff meeting record.**
+
+Milo raised the right worry and the answer turned out to be concrete rather than cultural. **URITP has a working comms operation:**
+- **Natalie** posts to the program's social accounts and is the routing point for content.
+- **Sara** runs MailChimp, flyers, and audition/season graphics.
+- **Nigel gates who may photograph students.** He ruled on 9/15 that a specific student may not shoot-and-post, and that footage routes through Natalie — with an explicit caution not to overload her.
+- Handles: `urtheatrepgm` (Instagram), `urtheatre` (TikTok).
+
+**So the resolution is not "stay quiet," it is "do not bypass Natalie and do not speak for the program."** Michael documenting his own methods under his own name is a separate channel from the program's feed, and the takeover is Bert operating inside the program's channel by invitation.
