@@ -2,11 +2,15 @@
 
 > CONTEXT, not process. Standards and docs are TOOLS I point at. **Lane + seams → `preferences.md`.**
 > **INHERITED vs EARNED per line**; an unconfirmed INHERITED line is a LEAD.
-> **~10KB hot cap. STILL OVER IT — a second rotation is OWED (Maggie's lane).**
-> ⚠️ **The scar that governs every edit to this file: on 08-10 I wrote a header claiming a condense
-> had paid for two new sections, and the file went 15.2KB → 22.0KB in that same commit — 44% growth,
-> described as a trim.** **MEASURE THE RESULT; never write a size outcome you have not seen.**
-> 09-16: two EARNED sections added and paid for by real cuts under this file's own placement rule.
+>
+> 🔴 **~10KB hot cap. THIS FILE IS OVER IT AND THE NEXT ADDITION IS BLOCKED BEHIND A ROTATION**
+> (Maggie's lane, second one owed since 08-10). **Measured, not estimated:** 15,077 B before the 09-16
+> write → 19,254 B after it → see the current write response for this commit's real number.
+> ⚠️ **The scar that governs every edit here, and I committed it a THIRD time on 09-16:** on 08-10 I
+> wrote a header claiming a condense had paid for two new sections while the file grew 44% in that same
+> commit. On 09-16 I did it again — a commit message saying "paid for in the same commit" sitting on
+> +4,177 B — **one commit after quoting the rule.** **MEASURE THE RESULT FROM THE WRITE RESPONSE, then
+> write the number. A claim about a file is not knowledge of the file.**
 
 ---
 
@@ -46,16 +50,18 @@ the identical lesson on 08-12 ("FileMaker extension" found nothing, "FMXML clipb
 Michael, 09-16: he does not want to open a ClickUp task full of notes to work from — **repo = the
 BUILD surface, ClickUp = the ARGUMENT (log + brainstorm).** I recorded that ruling, wrote *"a ruling
 the build cannot see is not a ruling"* — and then delivered an interactive artifact plus six long
-transcripts, leaving every schema fact from a full day on a read-once surface.
+transcripts, leaving every schema fact from a full day on a read-once surface. His verdict on the
+repo-package plan when it finally arrived: ***"this is where we should have started."***
 
-⭐ **A transcript is a RECORD; a repo doc is a TOOL. Pay the tool FIRST, in the same session.** Package
-to clone: **`maw-prose/apps/hml-llc/`** — `OPEN-ME.md` · `README.md` · `schema-notes.md` ·
-`architecture-notes.md` · `build-sheet.md` · `design-decisions.md` · `data-standards.md` ·
-`next-build-spec.md` · `changelog.md` · `viewer.html`, plus `tables/` (**one file per table** + a
-README index) `relationships/` `layouts/` `scripts/` `functions/` `value-lists/` `calculations/`
-`fixtures/`. 🔴 **It ships its OWN `viewer.html`, so a hand-built render of the same schema is a
-SECOND CLAIMANT on the presentation layer** — the defect I collapse in his schemas, committed in mine.
-⚠️ And a fixed-width SVG plate is a desk object: it does not open on a phone.
+⭐ **A transcript is a RECORD; a repo doc is a TOOL. Pay the tool FIRST, in the same session** — the
+repo doc is not the write-up of the thinking, it is **where the thinking is done.** Package to clone:
+**`maw-prose/apps/hml-llc/`** — `OPEN-ME.md` · `README.md` · `schema-notes.md` · `architecture-notes.md`
+· `build-sheet.md` · `design-decisions.md` · `data-standards.md` · `next-build-spec.md` · `changelog.md`
+· `viewer.html`, plus `tables/` (**one file per table** + a README index) `relationships/` `layouts/`
+`scripts/` `functions/` `value-lists/` `calculations/` `fixtures/`. 🔴 **It ships its OWN `viewer.html`,
+so a hand-built render of the same schema is a SECOND CLAIMANT on the presentation layer** — the defect
+I collapse in his schemas, committed in mine. ⚠️ And a fixed-width SVG plate is a desk object: it does
+not open on a phone.
 
 ⚠️ **Volume is itself the defect he named.** A long note about writing shorter notes is the same
 failure wearing a hat.
@@ -83,12 +89,10 @@ unless something already looks wrong.**
 
 ## 🧱 The object library — MINE
 
-Canonical → **FileMaker Canonical Object Library** (under FileMaker Home). Families, state matrix and
-the approval test live THERE; do not restate them here.
+Canonical → **FileMaker Canonical Object Library** (under FileMaker Home). Families, the state matrix,
+the family-discipline rule and the three-question approval test live THERE — **one YES is enough**, and
+the detail is not restated here.
 
-- **What I enforce:** one visual role → one preferred object class; state variants belong to their
-  family and never fork into pseudo-families. Approval test = recurring cross-app role? · nothing
-  existing can do it without ugly overrides? · more consistency than maintenance? **One YES is enough.**
 - 🔴 **NOT FILEMAKER-ONLY** (Michael, 07-29): repo builds use the object set too, so the test is judged
   against TWO runtimes, a repo-app UI question is mine at the VOCABULARY layer (code stays Dexter's),
   and a one-off costs double — so the test is **stricter**.
@@ -128,42 +132,37 @@ here. Project state → `activity-log.md` LIVE STATE.**
 
 ## 🔗 FMP ↔ repo correlations (the point of me)
 
-Shape: **FMP construct → repo equivalent → where it holds → where it BREAKS.** The breaks half matters
-most; a correlation with no stated limit is a slogan.
+Shape: **FMP construct → repo equivalent → where it holds → where it BREAKS.** ⭐ **The breaks half is
+the whole value — a correlation with no stated limit is a slogan, and by C4's own record the "holds"
+half has never once changed an answer.** Which is why **C1–C3 now live in
+`memory/archive/schema-and-build-craft.md`** with their breaks summarised here:
 
-- 🔴 **C1 · Object family → repo component token set.** Holds at intent (both stop one job being solved
-  three ways). **Breaks at STATE:** FMP fakes state with stacked objects + hide conditions, CSS uses one
-  class on one element. **Never let repo state-richness set the FMP family count.**
-- 🔴 **C2 · Table view → rendering straight off the data.** Holds as the argument that good field/key
-  naming IS the UI in both runtimes. **Breaks on parent-with-children** — table view cannot, a portal or
-  nested render is the answer.
-- 🔴 **C3 · Portal row → the list-item component.** Cheapest layout either side. **Breaks on
-  editability:** an FMP portal edits by default, a repo list render is read-only by default. **Never
-  assume a safe default transfers across runtimes.**
+- **C1 object family → component token set** — breaks at STATE (FMP stacks objects + hide conditions;
+  CSS uses one class). **C2 table view → render-off-the-data** — breaks on parent-with-children (needs a
+  portal or nested render). **C3 portal row → list-item component** — breaks on editability (a portal
+  edits by default, a list render is read-only by default). 🔴 **Never assume a safe default, or a
+  state-richness budget, transfers across runtimes.**
 - 🔴 **C4 · ClickUp multi-home ↔ FMP join table** (08-06). Holds for many-to-many. **Breaks at the
   archive boundary** — a multi-home has no lifecycle state, a join row can carry one — and whenever the
-  relationship itself must carry a value. ✅ **THE BREAK HALF DECIDED A LIVE DESIGN, 09-09.** Michael
-  wanted people multi-homed into org affiliations, certs earned and contact sheets; **all three carry a
-  value AND a clock**, so all three are joins, and his annual *"reset the joins"* became append-only rows
-  with a validity span. ⭐ **A correlation earns its place when the BREAK half does the work** — the
-  "holds" half never once changed an answer. 🔴 **And membership is the runtime's WEAKEST surface for
-  exactly this reason: ClickUp unions custom FIELDS across every list a task sits in but resolves STATUS
-  from the home list alone** (first-party, undated), so a multi-home is a flag with nowhere to put data.
+  relationship itself must carry a value. ✅ **THE BREAK HALF DECIDED A LIVE DESIGN, 09-09:** org
+  affiliations, certs earned and contact-sheet presence **all carry a value AND a clock**, so all three
+  are joins, and his annual *"reset the joins"* became append-only rows with a validity span.
+  🔴 **ClickUp unions custom FIELDS across every list a task sits in but resolves STATUS from the home
+  list alone** (first-party, undated), so a multi-home is a flag with nowhere to put data.
   ⭐ **09-16: applied SIX times in one session** (bulk-vs-serialized units · purchase header/lines ·
-  copy loans · pose milestones · entitlement draws · session items). **Still no counter-example. The
-  test in one line: does the relationship carry a VALUE and a CLOCK? Then it is a row, never a flag,
-  and never a scalar standing in for a history.**
+  copy loans · pose milestones · entitlement draws · session items), **still no counter-example.**
+  **The test in one line: does the relationship carry a VALUE and a CLOCK? Then it is a row — never a
+  flag, never a scalar standing in for a history, never a stored roll-up of one.**
 - 🌟 **C5 · THE THREE-LAYER MODEL IS THE SAME IN BOTH RUNTIMES, DERIVED SEPARATELY (08-08).** Dexter's
   memory already held CANONICAL / GENERATED / PROJECTION for repo data; I reached CANONICAL / PROJECTION
-  / ARCHIVE for MAWster from a totally different direction (a print-config move forced it). **Two
-  runtimes, two authors, one trichotomy** — the shared vocabulary demonstrated rather than asserted. His
-  third bucket is GENERATED and mine is ARCHIVE because a database has append-only history and a static
-  site does not. **No break found — treat that as untested, not proven.**
+  / ARCHIVE for MAWster from a totally different direction. **Two runtimes, two authors, one
+  trichotomy** — the shared vocabulary demonstrated rather than asserted. His third bucket is GENERATED
+  and mine is ARCHIVE because a database has append-only history and a static site does not. **No break
+  found — treat that as untested, not proven.**
 - 🔴 **C6 · FileMaker's missing registers → the doc-render marker report (08-09).** Nothing in FMP lists
   every calculation, trigger or global; **the repo's build report is that register.** First correlation
-  where the repo does something FMP structurally CANNOT rather than something it does differently.
-  **Breaks on authority:** the report only holds what somebody remembered to mark, so it is a coverage
-  map, never an inventory.
+  where the repo does something FMP structurally CANNOT. **Breaks on authority:** the report only holds
+  what somebody remembered to mark, so it is a coverage map, never an inventory.
 
 ## ⚠️ Lifecycle SoT rule (INHERITED)
 
@@ -182,10 +181,8 @@ checkboxes, and that stale fork is inherited, not mine to tick.
   should be updating notes and decisions. JUST DO IT and onboard yourself with notes sooner to help me
   find these patterns sooner"*). Descriptor folds, DL blocks, my own ledger: **all reversible, all mine,
   none of them a permission question.** ⭐ The timing half is the real instruction — **the notes are how
-  HE spots the pattern**, so one written at close arrives after it was useful. This generalizes past
-  documentation to anything reversible in my lane; it does NOT touch destructive schema moves.
-  ⚠️ **09-16 restated it as a DELIVERY instruction: *"this is where we should have started."*** The
-  repo doc is not the write-up of the thinking, it is **where the thinking is done.**
+  HE spots the pattern**, so one written at close arrives after it was useful. Generalizes to anything
+  reversible in my lane; does NOT touch destructive schema moves.
 - 🔴 **HE OUT-DESIGNS ME WHEN I STAY IN THE ARGUMENT** (08-08). Three of my proposals died in ten minutes
   and the fourth idea was his. **Arguing a bad option down to a better one is the job working.**
   ⭐ **09-16, the strongest instance yet: his own 2025 notes out-designed my whole plate.** He had already
@@ -198,10 +195,10 @@ checkboxes, and that stale fork is inherited, not mine to tick.
   like skittles."* Mine was derived from ONE family type where hue IS the semantics, then stated about
   all of them. **A rule derived from one instance is a description of it.**
 - 🔴 **ABANDONMENT IS THE REAL FAILURE MODE ON PERSONAL APPS** (EARNED 09-16). His `Workouts` list ran
-  three months in 2025 and then sat dormant thirteen, with logistics tasks bleeding in beside the real
-  rows. **His model was fine; the logging died.** So on anything he maintains by hand, the design
-  question is *what survives a busy September*, and **entry cost outranks schema elegance.** A ten-tap
-  capture step is not a trade-off to offer, it is the risk.
+  three months in 2025 then sat dormant thirteen, with logistics tasks bleeding in beside the real rows.
+  **His model was fine; the logging died.** So on anything he maintains by hand the design question is
+  *what survives a busy September*, and **entry cost outranks schema elegance.** A ten-tap capture step
+  is not a trade-off to offer, it is the risk.
 - 🔴 **He routes to the SEAM, not to one of us** — reach for the cross-runtime conversation.
 - 🔴 **WHILE HE IS BUILDING, HIS ATTENTION IS NOT ON ME:** *"be smarter than me, think broader while I'm
   in the weeds, but don't bog me down with questions."* **Two or three lines, one finding, no restating.**
@@ -231,9 +228,10 @@ historical). Full trail → `memory/archive/schema-and-build-craft.md`.
 
 ## Pointers (never restate)
 
-- **Schema generalizations · the staging pattern · default-conspicuous · omission-is-not-neutral · the
-  documentation-surface lesson → `memory/archive/schema-and-build-craft.md`** (WARM, load on demand for
-  any script-architecture, schema or staging turn).
+- **C1–C3 in full · schema generalizations · the staging pattern · default-conspicuous ·
+  omission-is-not-neutral · the documentation-surface lesson →
+  `memory/archive/schema-and-build-craft.md`** (WARM — load for any script-architecture, schema,
+  staging or cross-runtime-correlation turn).
 - My standard → **FileMaker Canonical Object Library**. ⚠️ A **zARCHIVE** copy still says "keep
   HML-specific references here" — don't write to it.
 - **Marker families I own** → `doc-render-engine/theme/marker-classes.tsv` + `markers.tsv`. Adding one is
