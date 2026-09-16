@@ -30,11 +30,30 @@
 > the handoff task instead of from my own bundle. Its absence was invisible because a log full of
 > real entries reads as a log that is working.
 
+## MAW Workouts — NEW 2026-09-16, unbuilt, design only
+
+- **Runtime RULED by Michael: custom FMP, own file**, integration deferred. Not a MAW Documents
+  fold-in (shares only People, and per-app People was ruled 08-07).
+- **Prior art that MUST be read before any further design** — both found by Michael after I declared
+  the module net-new: the **`Workouts` list** (`901306666511`, `_LIBRARY`, sibling to `JOURNAL`) and
+  the **Midtown `Account` task** (`86a5t5hmq`, Home ▸ Accounts). 🔴 His bracket convention in that
+  list IS the format-vs-attendance split; the coach is free text inside the task NAME, which is why
+  the coach-attribution report he wants is impossible today.
+- 🔴 **PII: that Account task holds live credentials, a home address and a card last-four.** Nothing
+  from it reaches either PUBLIC repo, and no real coach names — they are employees of a real club.
+- **Blocked ON MICHAEL:** go/no-go on cutting `maw-prose/apps/maw-workouts/` (mirroring
+  `apps/hml-llc/`) and on creating the module's Decision Log. Both net-new, both waiting on his word.
+  ⚠️ **Every ruling from 09-16 currently lives ONLY in session-task transcripts** — no Decision Log,
+  no repo package. That is the delivery defect he named, not yet discharged.
+- **Artifact cut:** `12cwjm-64333` v2, a relationship plate. ⚠️ It is a DESK object (fixed-width SVG,
+  does not render on his phone) and it duplicates the `viewer.html` the hml-llc package already
+  ships. Superseded by the repo package the moment that is cut; do not extend it.
+
 ## Production MAWster — ACTIVE, my primary build
 
 - **Measured 2026-08-09 16:43 ET** (DDR `202608091643`): 36 tables · **0 relationships · 0 layouts**.
-  Scripts went 0 → ~11 that evening, entered by Michael directly. ⚠️ **A MONTH STALE as of 09-09 and
-  therefore not usable** — re-query before quoting any of it.
+  Scripts went 0 → ~11 that evening, entered by Michael directly. 🔴 **OVER FIVE WEEKS STALE as of
+  09-16 and unusable** — re-query before quoting any of it.
 - **Where things live:** schema + script docs in `mawizorek/uritp-docs` 🔒 PRIVATE →
   `production-mawster/`. ⚠️ **NOT `maw-prose`** — that tree is stale and the published site still
   renders from it. Collapsing the three doc trees is open.
@@ -42,8 +61,8 @@
   Four specs rewritten, four retired verbatim, three scripts still unread by anyone and deliberately
   unspecced (`00App_onFirstWindowOpen`, `00App_Mark_Setup_Complete`, `00App_Set_Setup_State`).
 - **Owed by me:** nothing outstanding.
-- **Blocked ON MICHAEL, and all three block real work** — ⚠️ **all three are 08-10 claims, unverified
-  since; check before inheriting:**
+- **Blocked ON MICHAEL, and all three block real work** — 🔴 **all three are 08-10 claims, STILL
+  unverified as of 09-16 across two sessions; check before inheriting:**
   1. 🔴 `APP_SESSIONS` vs `UTILITY_LOGS` — a second claimant that reverses J13 with no written
      reversal. `FILE · Open` cannot be entered until it is settled. **Posed as Q2 on the Decision
      Log 2026-08-10.**
@@ -59,23 +78,93 @@
   update. Read the BOTTOM-most comment first; four consecutive rulings on config each corrected the
   next one.
 
-## Bundle health — measured 2026-09-09 20:20 ET (from the write responses, not a listing)
+## Bundle health — measured 2026-09-16 from the write responses, not a listing
 
-- 🔴 **`memory.md` GREW: 13,770 B → 15,077 B** (+1,307) adding the C4 09-09 finding and the
-  write-the-note-early Michael-pattern. **Measured from the commit response, per the 08-10 scar.**
-  Now **14.7 KiB against a ~10KB hot cap** — worse than the post-rotation overage Maggie already
-  flagged for Michael, still well under the 22KB read ceiling. **Both additions fire every session,
-  which is the class that earns hot space; the file nonetheless needs a second rotation, not a
-  third append.** Not forced — Michael's + Size Sally's call.
-- **`activity-log.md`:** this write. Entries are again ONE long session plus this one; the ~4-5KB
-  entry window is over budget the moment the 08-09 block stays. **Rotation candidate.**
+🔴 **TIER: 🟠 ACTION** per `_shared/bundle-measurement-spec.md` — two files over target, none over the
+~22KB CRITICAL read ceiling.
+
+| File | Size | Budget | Read |
+|---|---|---|---|
+| `memory.md` | see this commit's response | ~10KB hot cap | 🟠 ~2× over. Went 13,770 → 15,077 (09-09) → 19,254 (09-16 add) → 18,961 (09-16 correction) → this commit. |
+| `activity-log.md` | see this commit's response | ~5KB on the ENTRIES | 🟠 well over. Two prior session entries plus 09-16. |
+| `decision-log.md` | 9,786 B | none (flag >15KB) | ✅ under the heavy flag. ⚠️ **No TOC**, though the base specifies partial-load by TOC + last N. |
+| `preferences.md` | 13,234 B | none (identity) | ✅ not rotated by design. |
+| `native-flush.md` | 2,566 B | bare = healthy | ⚠️ Declared bare at 09-16 seating; **not re-read this turn.** |
+| `native-loader-kernel.md` | 7,101 B | — | ⚠️ **Not in the shared file set.** Model A, legitimate; the SPEC is what needs the row. |
+| `working-notes.md` | 2,507 B | — | 🪦 Retired stub, also outside the file set. Keep-or-kill is Michael's. |
+
+- ✅ **Structural signals both healthy:** `memory/archive/` exists (rotation has fired) and
+  `activity-log/` exists (quarterly drain has fired, `2026-Q3.md`).
+- 🔴 **AGGREGATE LOAD COST, and no budget in the fleet governs it.** My load manifest reads, on EVERY
+  seating: the shared base (23,444 B) + `preferences.md` FULL + `memory.md` FULL + `decision-log.md`
+  FULL + the `activity-log.md` long window + `native-flush.md`. **That is ~83KB of forced reading
+  before any work begins.** Per-file caps exist; **a bundle-total cap does not.** Mira flagged the
+  same class on her own bundle 08-11 (`preferences.md` largest file, read FULL, not rotated by the
+  hook). Two agents, same finding, no owner — **Felix + Maggie's joint call, not mine.**
+- 🔴 **Second `memory.md` rotation still OWED since 08-10** and now blocking the next addition.
+  Maggie's lane; her default runbook is READ-ONLY, so a rotation needs Michael's explicit drain
+  phrase. **Reported, never seized.**
 - ✅ 08-10 rotation history: `memory.md` 19,740 → 13,770 B, `activity-log.md` 18,221 → 10,167 B
   (Maggie). Schema/build craft went WARM to `memory/archive/schema-and-build-craft.md`.
+- ⚠️ **`audits/` holds ONE record, `fmp-frank.2026-07-26.md` (birth).** No audit pass since — so
+  every compliance claim about this bundle between birth and 09-16 was unverified.
 
 ## HML_LLC — dormant, no session since 07-29
 
 FileMaker 19 permanently, so atomicity is hand-built. Build detail is archived, not hot —
 `memory/archive/hml-llc-fmp19-build-detail.md`, read before touching a script.
+
+---
+
+## 2026-09-16 — MAW Workouts schema design, two search failures, and a compliance audit of my own bundle
+
+Session [FMP Fiona · URITP Inventory — MAWster integration + ClickUp prototype plan](https://app.clickup.com/t/86akjxex5).
+Seated 13:03 on inventory; the subject turned five times and ended on my own files. **Written in one
+pass at 19:0x after an audit found this log empty for the whole session — which is itself the entry's
+worst finding, recorded rather than smoothed over.**
+
+- 13:06 · URITP Inventory plan: found J3 and the June-14 schema conflict on whether 1,050 unit rows
+  survive as rows. Declined to cut the artifact until the grain is ruled.
+- 14:5x · Personal library schema: struck the two-join `PEOPLE_JOINS` chain; **the table NAME had
+  manufactured the structure.** J5.
+- 15:0x · Purchase ledger: header+lines ruled; the request settled the open copies-vs-titles question
+  by implication. J6, and one org authority collapsed out of three claimants.
+- 15:1x · Parties: **one rule (a role lives on the relationship) answered publishers, vendors,
+  borrowers and libraries at once.** J7. Two self-corrections of my own same-session rulings.
+- 16:2x · J9 + J10: repo = BUILD surface, ClickUp = ARGUMENT. J3 naming confirmed; the rival FMP
+  documentation standard's naming section marked SUPERSEDED in place, not deleted.
+- 16:41 · Workout tracker: header+lines again, ONE `Exercises` table with a prerequisite self-join,
+  **yoga progression is AUTHORED / lift progression is MEASURED.** 🔴 Declared the module net-new on
+  two keyword sweeps — **wrong.**
+- 16:5x · Prior art: Hevy's shipped schema matches the ruling; wger stores progression as append-only
+  per-iteration rows. Refused the repo-app build (four grounds, incl. the `routines/` tombstone) and
+  named FMP mobile as structurally wrong until hosting exists.
+- 17:0x · Coach-attribution report: answered **NO against my own spec** — a header-only yoga row has
+  no pose rows, so the grain that made level one cheap makes the report impossible.
+- 17:1x · 🔴 **FIRST SEARCH FAILURE, found by Michael:** the Midtown `Account` task. His 2025 notes
+  already contained the coach-attribution question in prose and the expected-vs-actual coach problem
+  in real data. Added `Entitlements` + `EntitlementDraws`; killed my booking assumption.
+- 18:0x · 🔴 **SECOND SEARCH FAILURE, also found by Michael:** the `Workouts` list. Root cause is
+  method — I searched TOPIC KEYWORDS twice and never ENUMERATED. Plate v2 cut with a translation
+  table. **Named the abandonment finding: the list died after a few months, so entry cost outranks
+  schema elegance.**
+- 18:3x · Took his delivery critique. The artifact does not render on his phone and duplicates
+  `viewer.html`; the repo package is the deliverable. Proposed it, asked go/no-go.
+- 18:4x · Wrote both search lessons to `memory.md` — then **committed the 08-10 size scar a third
+  time** (commit message claimed "paid for"; the file grew 4,177 B). Corrected in a second commit.
+- 19:0x · Compliance audit at Michael's request, Anna leading, Felix + Maggie seated. 🔴 **It found
+  this log empty for a ~12-reply session and byte counts sitting in `memory.md` in violation of
+  §4a.** Both fixed in this commit rather than reported as owed.
+
+**Open surfaces:** MAW Workouts has **no Decision Log and no repo package**, so a full day of rulings
+lives only in transcripts · the three Production MAWster forks, unverified since 08-10 across two
+sessions · second `memory.md` rotation owed and now blocking · **the aggregate load-cost gap has no
+owner** · `native-loader-kernel.md` and `working-notes.md` sit outside the shared file set ·
+`decision-log.md` claims partial-load with no TOC · the OMR queue **64,829 B measured 09-09**, still
+past the ~30KB write cap, so the documented memory-candidate door remains non-functional · ⚠️ **two
+abandoned branches in `ClickUp_apps`** (`fiona-omr-0810`, `fiona-stale-open-surfaces`) — no available
+tool deletes a branch · ⚠️ **I committed directly to `main` five times this session with no
+`session-board.md` presence row** (B22's shape), on my own bundle files only; declared, not excused.
 
 ---
 
@@ -121,13 +210,17 @@ until this write; all rulings landed in ClickUp.**
   read late, and the 14:56 turn earlier today ran on `preferences.md` alone — declared in the spine
   at the time.
 
-**Open surfaces:** `memory.md` at 15,077 B needs a SECOND rotation (Bundle health above) · the three
-Production MAWster forks in LIVE STATE, all unverified for a month · **Access Tracking has no
-descriptor to fold J5 into — the ACCESS GRANTS list does not exist yet**, so that block says pending
-by fact, not by neglect · the OMR queue is **64,829 B measured 09-09** and therefore STILL past the
-~30KB write cap, so the documented memory-candidate door remains non-functional for every agent ·
-⚠️ **two abandoned branches in `ClickUp_apps`** (`fiona-omr-0810`, `fiona-stale-open-surfaces`) — no
-available tool deletes a branch, and this session adds `fiona-join-lifecycle-0909` to be merged.
+**Open surfaces:** ~~`memory.md` at 15,077 B needs a SECOND rotation~~ ⚠️ **still owed 09-16, and now
+worse — see Bundle health** · the three Production MAWster forks in LIVE STATE, all unverified for a
+month · **Access Tracking has no descriptor to fold J5 into — the ACCESS GRANTS list does not exist
+yet**, so that block says pending by fact, not by neglect · the OMR queue is **64,829 B measured
+09-09** and therefore STILL past the ~30KB write cap · ⚠️ **two abandoned branches in `ClickUp_apps`**
+(`fiona-omr-0810`, `fiona-stale-open-surfaces`).
+
+---
+
+_Older sessions (2026-08-09–10, 08-08, 08-06, 08-01) → `activity-log/2026-Q3.md` and the entry below._
+_(2026-07-26 birth entry rotated — see `decision-log.md` D1–D6 for the rulings that shaped the lane.)_
 
 ---
 
@@ -186,14 +279,4 @@ after the afternoon handoff. Michael building in FileMaker, me documenting. **Fo
 
 **Open surfaces:** the three forks in LIVE STATE above · `@script:` link resolution is reasoned from
 `markerlinks.py` and **not yet observed on a real build** — read the first build report · the
-misspelled `70-scripts/90-Utlity/` folder is flagged for Michael's deletion (PR #82) ·
-~~`memory.md` is 19,740 B against a ~10KB hot cap and needs a rotation, not a tenth entry~~
-✅ **STRUCK 2026-08-10 23:45 — rotated by Maggie to 13,770 B; the residual overage is flagged for
-Michael in Bundle health above** ⚠️ **and re-opened 09-09 at 15,077 B** · ⚠️ **two abandoned branches
-in `ClickUp_apps`** (`fiona-omr-0810`, cut before measuring the queue; `fiona-stale-open-surfaces` if
-unmerged) — no available tool deletes a branch.
-
----
-
-_Older sessions (2026-08-08, 08-06, 08-01) → `activity-log/2026-Q3.md`._
-_(2026-07-26 birth entry rotated — see `decision-log.md` D1–D6 for the rulings that shaped the lane.)_
+misspelled `70-scripts/90-Utlity/` folder is flagged for Michael's deletion (PR #82).

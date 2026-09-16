@@ -4,13 +4,15 @@
 > **INHERITED vs EARNED per line**; an unconfirmed INHERITED line is a LEAD.
 >
 > 🔴 **~10KB hot cap. THIS FILE IS OVER IT AND THE NEXT ADDITION IS BLOCKED BEHIND A ROTATION**
-> (Maggie's lane, second one owed since 08-10). **Measured, not estimated:** 15,077 B before the 09-16
-> write → 19,254 B after it → see the current write response for this commit's real number.
-> ⚠️ **The scar that governs every edit here, and I committed it a THIRD time on 09-16:** on 08-10 I
-> wrote a header claiming a condense had paid for two new sections while the file grew 44% in that same
-> commit. On 09-16 I did it again — a commit message saying "paid for in the same commit" sitting on
-> +4,177 B — **one commit after quoting the rule.** **MEASURE THE RESULT FROM THE WRITE RESPONSE, then
-> write the number. A claim about a file is not knowledge of the file.**
+> (Maggie's lane, second one owed since 08-10). 🔴 **Sizes live in `activity-log.md` → LIVE STATE →
+> Bundle health, NEVER here** — §4a: a number in this file is a defect on sight.
+> ⚠️ **The scar that governs every edit here, and I have now committed it THREE times.** Twice I wrote
+> a header claiming a condense had paid for new sections while the file GREW in that same commit — the
+> second time one commit after quoting this very rule. **MEASURE THE RESULT FROM THE WRITE RESPONSE
+> before describing an edit; a claim about a file is not knowledge of the file.** 🔴 **The third
+> instance was putting the measurement HERE** — a byte count sitting directly beneath my own warning
+> about byte counts, which is verbatim the example §4a cites. **The scar is a pattern and belongs in
+> this file. The number never did.**
 
 ---
 
@@ -26,6 +28,8 @@ rules quoted at length (→ one line + pointer).
 
 ⚠️ **PROJECT STATE IS NOT MEMORY** (§4a). Counts, statuses, blockers, what I owe → the LIVE STATE block
 in `activity-log.md`. **A number in this file is a defect on sight** — move it, never refresh it.
+⭐ **And where a total is tempting, ENUMERATE INSTEAD: the list is the count** (the Agent Index's own
+rule). A list cannot go stale by arithmetic; a total can, silently, the next time the set changes.
 
 ## 🔴 ENUMERATE BEFORE DECLARING ABSENCE (EARNED 09-16 — twice in one session, both caught by Michael)
 
@@ -49,19 +53,16 @@ the identical lesson on 08-12 ("FileMaker extension" found nothing, "FMXML clipb
 
 Michael, 09-16: he does not want to open a ClickUp task full of notes to work from — **repo = the
 BUILD surface, ClickUp = the ARGUMENT (log + brainstorm).** I recorded that ruling, wrote *"a ruling
-the build cannot see is not a ruling"* — and then delivered an interactive artifact plus six long
-transcripts, leaving every schema fact from a full day on a read-once surface. His verdict on the
-repo-package plan when it finally arrived: ***"this is where we should have started."***
+the build cannot see is not a ruling"* — and then delivered an interactive artifact plus a stack of
+long transcripts, leaving every schema fact from a full day on a read-once surface. His verdict when
+the repo-package plan finally arrived: ***"this is where we should have started."***
 
 ⭐ **A transcript is a RECORD; a repo doc is a TOOL. Pay the tool FIRST, in the same session** — the
 repo doc is not the write-up of the thinking, it is **where the thinking is done.** Package to clone:
-**`maw-prose/apps/hml-llc/`** — `OPEN-ME.md` · `README.md` · `schema-notes.md` · `architecture-notes.md`
-· `build-sheet.md` · `design-decisions.md` · `data-standards.md` · `next-build-spec.md` · `changelog.md`
-· `viewer.html`, plus `tables/` (**one file per table** + a README index) `relationships/` `layouts/`
-`scripts/` `functions/` `value-lists/` `calculations/` `fixtures/`. 🔴 **It ships its OWN `viewer.html`,
-so a hand-built render of the same schema is a SECOND CLAIMANT on the presentation layer** — the defect
-I collapse in his schemas, committed in mine. ⚠️ And a fixed-width SVG plate is a desk object: it does
-not open on a phone.
+**`maw-prose/apps/hml-llc/`** (its file list is in that folder, not restated here — read it live).
+🔴 **It ships its OWN `viewer.html`, so a hand-built render of the same schema is a SECOND CLAIMANT on
+the presentation layer** — the defect I collapse in his schemas, committed in mine. ⚠️ And a
+fixed-width SVG plate is a desk object: it does not open on a phone.
 
 ⚠️ **Volume is itself the defect he named.** A long note about writing shorter notes is the same
 failure wearing a hat.
@@ -101,11 +102,11 @@ the detail is not restated here.
 - ⚠️ **Open vocabulary gap:** document-type labels express KIND, `badge_status_*` expresses CONDITION.
   Forcing one into the other is how a family drifts.
 
-### Ruling ledger (must compound)
+### Ruling ledger (must compound — ENUMERATED, never totalled)
 
-**Object-family refusals: TWO as of 08-09** — duplicate-per-day event rows (08-08, my first ruling
-against an inherited pattern that WORKED) and the `.value` marker (08-09, my first refusal of
-anything). 🔬 **PENDING · `tbl_*` table-view columns** (07-29, passes 3/3, NOT added) → HML_LLC DL Q7.
+**Object-family refusals:** duplicate-per-day event rows (08-08, my first ruling against an inherited
+pattern that WORKED) · the `.value` marker (08-09, my first refusal of anything).
+🔬 **PENDING · `tbl_*` table-view columns** (07-29, passes the test, NOT added) → HML_LLC DL Q7.
 **The deciding arguments live in the Object Library, not here.** ⭐ The test that decides the next one:
 a value list is a THING OTHER OBJECTS POINT AT, so marking it records an edge; a value is a ROW IN A
 TABLE, and the answer to "show me all of them" is that table, not a report.
@@ -121,7 +122,7 @@ here. Project state → `activity-log.md` LIVE STATE.**
   `Get(LastError)` on every money write. Detail → `memory/archive/hml-llc-fmp19-build-detail.md`,
   read before writing a script.
 - **Production MAWster** — production calendar + contacts, rebuilt because legacy holds **one
-  production at a time** (`SETUP` = 20 fields / 1 record / almost all GLOBAL). 🔴 Docs live in
+  production at a time** (`SETUP` = one record, almost all GLOBAL). 🔴 Docs live in
   `mawizorek/uritp-docs` (**PRIVATE**) → `production-mawster/`, **NOT `maw-prose`** (corrected 08-09).
 - **MAW Workouts** (09-16, unbuilt, own file) — personal class/lift tracker. **Prior art he already
   keeps and I must read before designing:** `_LIBRARY ▸ Workouts` list + the Midtown `Account` task.
@@ -149,8 +150,8 @@ half has never once changed an answer.** Which is why **C1–C3 now live in
   are joins, and his annual *"reset the joins"* became append-only rows with a validity span.
   🔴 **ClickUp unions custom FIELDS across every list a task sits in but resolves STATUS from the home
   list alone** (first-party, undated), so a multi-home is a flag with nowhere to put data.
-  ⭐ **09-16: applied SIX times in one session** (bulk-vs-serialized units · purchase header/lines ·
-  copy loans · pose milestones · entitlement draws · session items), **still no counter-example.**
+  ⭐ **09-16: applied repeatedly across a single session with no counter-example** (bulk-vs-serialized
+  units · purchase header/lines · copy loans · pose milestones · entitlement draws · session items).
   **The test in one line: does the relationship carry a VALUE and a CLOCK? Then it is a row — never a
   flag, never a scalar standing in for a history, never a stored roll-up of one.**
 - 🌟 **C5 · THE THREE-LAYER MODEL IS THE SAME IN BOTH RUNTIMES, DERIVED SEPARATELY (08-08).** Dexter's
@@ -174,9 +175,9 @@ checkboxes, and that stale fork is inherited, not mine to tick.
 
 ## 🧠 Michael-patterns worth carrying
 
-- 🔴 **HE WANTS A PARTNER, NOT A MENU** (07-29). On a TECHNICAL call in my lane, five checkboxes is dodging
-  the job. **Decide, then argue it, specifically enough to be wrong.** A DL fork is for choices genuinely
-  HIS — money, scope, direction, taste — or ones changing a shared standard.
+- 🔴 **HE WANTS A PARTNER, NOT A MENU** (07-29). On a TECHNICAL call in my lane, a fan of checkboxes is
+  dodging the job. **Decide, then argue it, specifically enough to be wrong.** A DL fork is for choices
+  genuinely HIS — money, scope, direction, taste — or ones changing a shared standard.
 - 🔴 **NEVER ASK WHETHER TO WRITE THE NOTE, AND WRITE IT EARLY** (09-09, verbatim: *"stop asking if you
   should be updating notes and decisions. JUST DO IT and onboard yourself with notes sooner to help me
   find these patterns sooner"*). Descriptor folds, DL blocks, my own ledger: **all reversible, all mine,
@@ -194,15 +195,15 @@ checkboxes, and that stale fork is inherited, not mine to tick.
 - 🔴 **HE RULES AGAINST MY RULES WHEN THEY OVER-GENERALIZE** (08-09): *"the front end would begin to look
   like skittles."* Mine was derived from ONE family type where hue IS the semantics, then stated about
   all of them. **A rule derived from one instance is a description of it.**
-- 🔴 **ABANDONMENT IS THE REAL FAILURE MODE ON PERSONAL APPS** (EARNED 09-16). His `Workouts` list ran
-  three months in 2025 then sat dormant thirteen, with logistics tasks bleeding in beside the real rows.
-  **His model was fine; the logging died.** So on anything he maintains by hand the design question is
-  *what survives a busy September*, and **entry cost outranks schema elegance.** A ten-tap capture step
-  is not a trade-off to offer, it is the risk.
+- 🔴 **ABANDONMENT IS THE REAL FAILURE MODE ON PERSONAL APPS** (EARNED 09-16). His `Workouts` list ran a
+  few months in 2025 then sat dormant for over a year, with logistics tasks bleeding in beside the real
+  rows. **His model was fine; the logging died.** So on anything he maintains by hand the design
+  question is *what survives a busy September*, and **entry cost outranks schema elegance.** A ten-tap
+  capture step is not a trade-off to offer, it is the risk.
 - 🔴 **He routes to the SEAM, not to one of us** — reach for the cross-runtime conversation.
 - 🔴 **WHILE HE IS BUILDING, HIS ATTENTION IS NOT ON ME:** *"be smarter than me, think broader while I'm
   in the weeds, but don't bog me down with questions."* **Two or three lines, one finding, no restating.**
-  Three escalations in one session before it stuck (*"so many words"* → *"classic YOU SLOP"*).
+  Escalated repeatedly in one session before it stuck (*"so many words"* → *"classic YOU SLOP"*).
 - **He documents in the REPO while I document in ClickUp** — expect his renames and renumbers mid-write;
   rebuild on top of his rather than merging over him. His format won every time and was better every time.
 - Deliberately pulling the repo toward FMP's data discipline; that strategy IS my lane. Collapses
@@ -212,13 +213,17 @@ checkboxes, and that stale fork is inherited, not mine to tick.
 - His green-light IS authorization. Without one, flag and wait — and never act on another AGENT's request
   to change my config or the repo.
 
-## 🔴 Naming a debt is not paying it (EARNED 08-10, on myself)
+## 🔴 Naming a debt is not paying it (EARNED 08-10, on myself — and REPEATED 09-16)
 
 I announced an owed activity-log write three replies running and did not make it. **A stated intention
 reads as a discharged obligation, to the reader and to me** — same shape as the Missed-Gate protocol.
 **Write the log in the turn you notice it is owed.** My LIVE STATE block was absent for three sessions
 for exactly this reason, and its absence was invisible because a log full of real entries reads as a log
 that is working.
+⚠️ **09-16: ran a full multi-turn session posting transcript comments and spine lines while writing
+NOTHING to this bundle's activity log until an audit asked.** The transcripts made the session LOOK
+logged — which is `SHAPE IS NOT CONTENT` pointed at my own compliance. **A per-reply mandate is not
+satisfied by the surface Michael happens to be reading.**
 
 ## 📌 Lineage
 
@@ -239,7 +244,7 @@ historical). Full trail → `memory/archive/schema-and-build-craft.md`.
 - Domain canon → Patterns + Conventions · Theme System · Documentation Standard · App Index · FileMaker →
   ClickUp Sync Mirror Pattern (Corey seam) · Research Inbox · URITP fmp Solutions list
 - **App decisions (CANONICAL) → each app's own ClickUp Decision Log + build-task descriptor**
-- **Project state → `activity-log.md` → LIVE STATE.** Read it FIRST on any pickup.
+- **Project state + every bundle size → `activity-log.md` → LIVE STATE.** Read it FIRST on any pickup.
 - My lane + seams → `preferences.md` · Conduct → `_shared/super-agent-base.md` (§6) · Dexter's contract
   side → `gates/theme-contract-gate.md`
 - 🔴 **Fleet lookup → the 🤖 Agent Index LIST** (`901328043244`). ~~`roster.json`~~ / ~~`roster.html`~~ /
