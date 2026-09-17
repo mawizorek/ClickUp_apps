@@ -1,14 +1,15 @@
 # Scan Intake · AI Toolkit
 
-**Purpose:** Turn a raw multifunction-printer scan (emailed into the SCANS list as a generic task + PDF) into a clean, correctly-oriented, letter-sized PDF and a descriptively-named task — and, for short documents, a readable text transcript AND a read of any handwriting/annotations, so Michael never has to open the file.
+**Purpose:** Turn a raw multifunction-printer scan (emailed into the SCANS list as a generic task + PDF) into a clean, correctly-oriented, letter-sized PDF and a descriptively-named task — and, for short documents, a readable text transcript AND a read of any handwriting/annotations, so Michael never has to open the file. **Then get it OUT of the list** (see Sweep Mode).
 
 **Steward:** two-layer, because this scanner is used for URITP AND for personal/other work.
 - **Mechanical intake** (measure → split → flip → trim → OCR → vision read) is domain-blind and **ownerless** — Fleet Felix housekeeps it, any agent fires it. It runs identically on a syllabus, a tax form, or a book.
 - **URITP-context layer** (step 9's shorthand decoding, name resolution against the workspace, reading production-planning intent) is **Mainstage Milo's**. It fires ONLY when the scan is classified URITP.
+- **Sweep mode** (disposition of the standing list) is **Milo's** — it is a routing judgement about where URITP work belongs.
 
-**Mode:** Gated (fires on a scan-type attachment).
+**Mode:** Gated (fires on a scan-type attachment) + **SWEEP (v5, fires from the morning briefing).**
 
-**Invocation:** `/scan-intake` · "normalize this scan" · "split this scan" · automatic via the Attachment Router PDF branch when a PDF reads as a copier scan (Xerox/AltaLink producer, tabloid two-up spreads, or upside-down pages).
+**Invocation:** `/scan-intake` · "normalize this scan" · "split this scan" · automatic via the Attachment Router PDF branch when a PDF reads as a copier scan (Xerox/AltaLink producer, tabloid two-up spreads, or upside-down pages). **Sweep:** `/scan-sweep` · "sweep the scans" · "what's sitting in scans" · or as a pointer line from `hooks/morning-briefing.md`.
 
 **Trigger:** A PDF attachment on a task in URITP ▸ INBOX ▸ SCANS (or any task handed over as "a scan"), especially ones titled "Scanned from a Xerox Multifunction Printer."
 
@@ -22,8 +23,10 @@
 
 | Surface | Location |
 | --- | --- |
-| SCANS list | URITP ▸ INBOX ▸ SCANS (list `4026855573866409995`) |
+| SCANS list | URITP ▸ INBOX ▸ SCANS (list `901327231551`) |
 | Founding task | "Scanned from a Xerox Multifunction Printer" (URITP-13154) |
+| Report-import landing (data reports) | `REPORTs Available to Import` (`901327637710`) · `Report Imports (Workday, NM, KT, etc)` (`901324196217`), both in URITP ▸ FMP Tables |
+| Report-instance landing (rehearsal/performance reports) | `Production Reports` (`901328331141`) via `hooks/report-normalization.md` |
 | Tooling | `pdfinfo` / `pypdf` / `pdftoppm` / `ghostscript` / `pdftotext` (poppler) / `tesseract-ocr`, all in the sandbox. Handwriting read uses the agent's own VISION on rendered page images — not a sandbox binary. |
 
 ---
@@ -64,15 +67,72 @@ Run in the sandbox. Load the source PDF from the task attachment.
 
 ---
 
+## 🔴 SWEEP MODE — THE DISPOSITION SWEEP (v5, 2026-09-17)
+
+**Steps 1-9 make a scan READABLE. This makes it LEAVE.** Added because normalization was running well and the list was still growing: 138 tasks, 70 of them sitting in `new`, as of 2026-09-17.
+
+### 🎯 THE MODEL: SCANS IS A TRANSIT LIST, NOT A HOME
+
+Michael, 2026-09-17, and this is the whole design:
+
+> *"Scans are different because I generally don't want them to live here. Once a scan is closed, it's out of the way, and I don't need to look at it anymore. I prefer to merge tasks out or, if it's a new report that needs to be imported, it should land in the report import to get the appropriate normalization... Sometimes the information can just be linked out; we capture the data, put it where it needs to be, and close the scan. It can also just live in this task list, which is fine for some things!"*
+
+🚫 **THE PROPOSAL THIS KILLS, recorded because it was wrong in a specific and instructive way:** a `Links OUT` relationship field on the SCANS list, proposed earlier the same session on the reasoning that ~40 normalized scans had no outbound wire and were therefore "orphans by construction."
+
+⭐ **They are not orphans. They are IN TRANSIT.** A scan does not need an outbound relationship because **the task itself goes away** — it merges into its destination, moves out of the list, or closes once its content has landed somewhere. Adding a relationship field would have built a permanent home for something designed to be temporary, and every filled field would have been a scan that failed to leave.
+
+🔁 **The analyst error is worth more than the fix:** Milo's own `memory.md` thesis 2 says **CONTAINER = MATURITY STATE — a thing MOVES BETWEEN CONTAINERS AS IT MATURES, location is a lifecycle field nobody declared, and emptiness is information.** That thesis describes this list exactly. **A pattern in memory that does not fire is worth nothing**, and this one had to be corrected by Michael in the turn after it was quoted. Same species as the ONE ACTS roll-call miss: *writing a rule is not obeying it.*
+
+### The four dispositions
+
+Every scan resolves to exactly one. **The sweep PROPOSES; Michael rules.**
+
+| # | Disposition | When | Mechanism |
+|---|---|---|---|
+| 1 | **MERGE OUT** | The scan IS a document that belongs to an existing canonical task (a receipt for a purchase request, a plot for a Show Design element, paperwork for a `Paperwork (<SHOW>)` row). | `merge_tasks` into the canonical task. 🔴 **DESTRUCTIVE — the source scan task is deleted.** Attachments and comments carry over. Michael's stated preference and the most common right answer. |
+| 2 | **MOVE OUT to report import** | The scan is a NEW REPORT that needs normalizing. | Move to the correct report surface. ⚠️ **TWO destinations, do not conflate:** a **data report** (Workday, budget, FOA, roster export) → `REPORTs Available to Import` / `Report Imports`. A **rehearsal or performance report** → `Production Reports` via `hooks/report-normalization.md`, which is a different normalization entirely. |
+| 3 | **LINK OUT + CLOSE** | The scan's INFORMATION is what matters, not the file. Capture the data into its real home, then close. | Write the value into the destination (a field, a task body, a note), link the destination, set the scan `library`. **The scan becomes evidence, not work.** |
+| 4 | **STAY** | Legitimately fine for some things — reference material with no better home. | Leave it. 🚫 **This is a real answer, not a failure to decide** — but say WHY it stays, or it is indistinguishable from a scan nobody triaged. |
+
+### What CLOSED means here
+
+**`library` = out of the way, handled, not to be looked at again.** 🚫 **A closed scan is NEVER a finding.** Do not resurface it, do not audit it for missing links, do not count it as backlog. The whole point of the disposition is that it ends.
+
+⚠️ **Known limit, stated rather than solved:** `library` does not record WHICH disposition happened, so a linked-out-and-closed scan is indistinguishable from a stays-here scan. Both are correct outcomes and Michael has ruled both acceptable, so **this is not worth a field.** Read the comments if provenance matters.
+
+### The sweep, per run
+
+1. **Read the OPEN scans only** (`new`, `researching`, `working`). Closed is done.
+2. **Skip anything not yet normalized** — a task still carrying the raw printer title needs steps 1-9 first. Normalization is a prerequisite for disposition, not part of it.
+3. **Classify URITP vs general** (step 9a). A general scan's disposition is almost always STAY or a personal-surface link; **never route a personal document into a production surface.**
+4. **Propose ONE disposition per scan** with its destination named and linked. Group by destination — six receipts heading for the same Purchase Request row is one decision, not six.
+5. **Report as links.** Cap the proposal set at ~10 per run; a longer list is a work session, not a sweep (same ceiling as the briefing's drill batch).
+
+### 🚫 Authority
+
+**PROPOSE-ONLY. The sweep executes NOTHING on its own.**
+
+- 🔴 **MERGE DELETES THE SOURCE TASK.** It is irreversible, it is Michael's call every time, and it goes through the standard preview-then-confirm flow. **Never merge on inference about where a scan belongs.**
+- **MOVE** crosses lists with different statuses and fields — fires the Task Move Impact Gate first.
+- **CLOSE** is only correct once the content has verifiably landed somewhere else. **Closing a scan whose data went nowhere is data loss wearing a tidy list.**
+- The sweep MAY write the normalization products of steps 1-9 (rename, transcript comment, vision read) unprompted, per the existing hook. **Disposition is a different class of write and is gated.**
+
+### Morning-briefing integration
+
+ONE pointer line, in the REPORTS PROCESSED block: how many open scans, how many are un-normalized, and how many have an obvious destination. 🚫 **Never enumerate the scan list in the brief** — that is Ricky's-data-routines-eating-the-brief shaped, and Rule 0's threshold fix applies (raise the bar, do not compress the writing).
+
+---
+
 ## Guardrails
 
-- **Never destroy the source.** The original scan PDF stays on the task; the normalized file is additive.
+- **Never destroy the source.** The original scan PDF stays on the task; the normalized file is additive. *(Disposition #1 deliberately deletes the TASK after merging its contents — that is Michael's ruling, executed only on his confirmation, and is not a licence to drop an attachment.)*
 - **Measure, don't guess.** Split / flip / trim decisions come from actual geometry plus a rendered inspection pass, never from the file name.
 - **Confirm the rename shape once.** `SCAN · date · descriptor` is the default; if Michael wants a different shape it's set once and reused. Rename is reversible, so apply it and let him veto.
 - **Interior pages are sacred.** Only leading/trailing blanks are dropped, and only after confirming they are truly blank.
 - **OCR is a machine read, not ground truth.** Always label the transcript as auto-extracted. Handwriting, highlights, and low-contrast marks are NOT captured by OCR — that is what the step-9 vision pass is for. The embedded Xerox layer DOES make errors (live example: it flipped a "no internet access" policy line to its opposite); when a value matters, verify against the rendered page and flag the correction inline.
 - **Vision handwriting read is interpretation, labelled as such.** Mark it an AI-vision read, tag uncertain words `(?)`, never silent-guess, and separate what is WRITTEN from what it MEANS. A decoded abbreviation that does not resolve is stated as unresolved with a best candidate, never invented (same rule as never inventing OCR content).
 - **URITP decoding is GATED, never default (step 9a).** The scanner serves URITP and personal work both. Apply the Milo context layer only to a scan classified URITP; on a general scan, read marks literally and never map them onto theatre codes or a production. Misclassifying a personal doc as URITP invents content.
+- 🔴 **A SCAN LEAVING THE LIST IS THE SYSTEM WORKING.** Do not measure the health of SCANS by how much is in it, and never treat an emptying list as lost data. The backlog metric is **open scans with no disposition**, nothing else.
 - **PII / public repo.** This repo is PUBLIC. Scan CONTENT, OCR text, and handwriting reads (which routinely carry names, emails, phone extensions, and Michael's private planning notes) never enter the repo, an artifact, or a channel — they live only on the ClickUp task. Only the mechanical procedure lives here.
 
 ---
@@ -81,13 +141,17 @@ Run in the sandbox. Load the source PDF from the task attachment.
 
 - **Attachment Router → PDF branch** — the router hands scan-type PDFs here; the PDF Split Markdown Packager owns the OTHER PDF branch (splitting a doc into markdown for doc-import). Different verbs, do not merge.
 - **Task-Context Orientation Gate** — orient to the SCANS list before acting.
-- **Mainstage Milo** — stewards the step-9a URITP-context layer; seat him (or his knowledge) when a scan is classified URITP.
+- **Mainstage Milo** — stewards the step-9a URITP-context layer AND sweep mode; seat him (or his knowledge) when a scan is classified URITP.
+- **`hooks/report-normalization.md`** — disposition #2's rehearsal/performance-report branch hands off to it. ⚠️ Its `[XX] | reports |` intake is the CANONICAL source for emailed reports; a SCANNED report is a different arrival path to the same Production Reports list.
+- **Task Move Impact Gate** — fires before disposition #2.
 - **de-slop-pass** — on the rename descriptor and the comments.
+- 🚫 **NOT `hooks/sweep-for-links.md`.** NAME COLLISION, recorded because it is a live trap: that hook hyperlinks entity names inside a composed REPLY before posting. It has nothing to do with linking tasks to each other or with this list. Different verb, different object.
 
 ---
 
 ## Changelog
 
+- **v5 (2026-09-17)** — Added **SWEEP MODE** and the four dispositions (MERGE OUT / MOVE OUT to report import / LINK OUT + CLOSE / STAY), from Michael's ruling that **SCANS is a transit list and he does not want scans living there.** Kills the same session's earlier proposal to add a `Links OUT` relationship field — recorded in place, with the reason: a scan needs no outbound wire because the TASK leaves. Records the analyst error (Milo's own thesis 2, CONTAINER = MATURITY STATE, already described this list and did not fire), the two distinct report-import destinations (data reports vs rehearsal reports), and the `hooks/sweep-for-links.md` name collision. PROPOSE-ONLY; merge is destructive and gated. Backlog measured at 138 tasks / 70 open on the day.
 - **v4 (2026-09-03)** — Split stewardship: mechanical intake stays ownerless/Felix, the URITP-context layer becomes **Mainstage Milo's** (URITP is his organization). Added step 9a: CLASSIFY the scan URITP-vs-general BEFORE decoding, because the Todd Union scanner is also used for personal/other work — URITP shorthand decoding now fires only on URITP scans, and forcing theatre codes onto a personal document is called out as the failure this gate prevents. Prompted by Michael seating Milo as the URITP agent while noting the scanner's mixed use.
 - **v3 (2026-09-03)** — Added the AI-vision handwriting & annotation pass (step 9): reads cursive, boxes/arrows/brackets/strike-throughs and their targets, states the throughline, and decodes URITP shorthand (production + role codes) inline. Fires on any page count when marks are present (unlike OCR's <5-page gate). Proven on the 8-page annotated production-staff roster (URITP-13148) where tesseract returned only noise for the notes — vision recovered the full canonical-vs-per-show data-model thinking and identified the page-8 ClickUp export with its broken lookups.
 - **v2 (2026-09-03)** — Added the OCR text-surfacing step (step 8) so short scans land as a readable transcript comment without opening the file. Embedded-layer-first (`pdftotext`), tesseract fallback. < 5-page gate (on the normalized count). Proven on the THTR 295/299 syllabus (4 pp, clean) and correctly declined on the 8-page contacts roster and the 39-page book. Records the live embedded-OCR error class (a policy line read as its opposite).
