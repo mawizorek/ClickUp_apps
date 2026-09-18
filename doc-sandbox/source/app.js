@@ -8,7 +8,13 @@
  * status line always names which site resolved and which did not.
  */
 import { render, LIMITS } from './drmd.js';
-import { loadSites, readHead, buildDoc, extractContent, paint, SCHEMES } from './sites.js';
+/* THE ?v= ON THIS IMPORT IS LOAD-BEARING, NOT DECORATION. An ES module imported by
+ * another module does NOT inherit the parent's query string, so bumping
+ * `app.js?v=` in index.html re-fetches this file and then happily reuses a CACHED
+ * sites.js. v1.1 is a fix INSIDE sites.js, so without this the fixed build serves
+ * the broken module -- the `qr-forge` scar, arriving through the module graph
+ * instead of a stylesheet. Bump this whenever sites.js changes. */
+import { loadSites, readHead, buildDoc, extractContent, paint, SCHEMES } from './sites.js?v=2';
 
 const $ = (id) => document.getElementById(id);
 const DEBOUNCE_MS = 150;
