@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Doc Sandbox — render one page locally</title>
+<meta name="description" content="Render a single doc-render-format page with the real published look, and print it.">
+<!-- THIN SHELL. The app is source/*.js; this file is structure plus one theme line.
+     Spec: doc-sandbox/next-build-spec.md -->
+<link rel="stylesheet" href="app.css?v=1">
+<script src="../shared/themes/resolve.js"></script>
+<script>
+  /* APP_THEME — one line reskins this app's own chrome.
+     A JOIN slug, never a COLOUR slug. applyTheme() takes a join; handing it a
+     colour faults and paints a red banner, a trap logged twice upstream
+     (inciardi-collection, f1-racetracks). 'soft-utility' is verified present in
+     shared/themes/_themes.json, status locked, colour maw-dark-utility (dark), and
+     is that file's declared "balanced everyday default for new apps". */
+  var APP_THEME = 'soft-utility';
+  if (window.THEMES) { THEMES.applyTheme(APP_THEME); }
+</script>
+</head>
+<body>
+
+<header class="bar">
+  <h1>Doc&nbsp;Sandbox</h1>
+  <label>Site
+    <select id="site"><option value="">loading…</option></select>
+  </label>
+  <label>Scheme
+    <select id="scheme"></select>
+  </label>
+  <span class="modes">
+    <label><input type="radio" name="mode" value="paste" checked> Paste markdown</label>
+    <label><input type="radio" name="mode" value="upload"> Uploaded page</label>
+  </span>
+  <button id="print" type="button" class="go">Print preview</button>
+</header>
+
+<p id="status" class="status status--busy">starting…</p>
+
+<main class="panes">
+  <section class="editor" id="editor">
+    <div id="pane-paste">
+      <label class="lbl" for="src">Markdown <span class="hint">renders as you type</span></label>
+      <textarea id="src" spellcheck="false" autocomplete="off"></textarea>
+    </div>
+
+    <div id="pane-upload" hidden>
+      <p class="lbl">Uploaded page</p>
+      <p class="hint">An already-rendered page keeps full fidelity — only the skin is re-applied.
+         Save any page from a doc site and open it here.</p>
+      <p id="upload-name" class="hint">nothing uploaded yet</p>
+    </div>
+
+    <p class="file">
+      <label for="file">Open a file</label>
+      <input id="file" type="file" accept=".md,.markdown,.txt,.html,.htm">
+      <span class="hint">or drop one anywhere in this pane — <code>.md</code> goes to paste mode, <code>.html</code> to upload mode</span>
+    </p>
+
+    <p id="stats" class="stats"></p>
+    <p class="limits"><strong>Known limits:</strong> <span id="limits"></span></p>
+  </section>
+
+  <section class="preview">
+    <p id="banner" class="banner" hidden></p>
+    <!-- The preview is an IFRAME on purpose. Material's sheets style `body`, `:root`
+         and document-level attributes, so injecting them here would restyle this
+         app's own chrome. An iframe is a separate document: full isolation, and
+         printing it prints ONLY the preview, which is this app's primary job. -->
+    <iframe id="preview" title="Rendered preview"></iframe>
+  </section>
+</main>
+
+<script type="module" src="source/app.js?v=1"></script>
+</body>
+</html>
