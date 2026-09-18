@@ -1,0 +1,19 @@
+{
+  "note": "The six doc-render-engine instances, as {name, url}. DELIBERATELY THIN: everything else about a site -- its theme, palette, print rules, site.css overrides -- is resolved LIVE by reading its published <head>. docrender/assets.py loads each instance's own theme.css LAST, after the print group, because 'a site keeps the final word on its own look', so one read gets all of it. Duplicating any of it here would be a second claimant.",
+  "names": "Taken from each live page's <title>, not from the instance slug.",
+  "verified": "2026-09-18",
+  "sites": [
+    { "slug": "template", "name": "Doc Family Template", "url": "https://mawizorek.github.io/doc-render-engine/", "verified": true },
+    { "slug": "uritp", "name": "URITP Production Resources", "url": "https://mawizorek.github.io/uritp-docs/", "verified": true },
+    { "slug": "uritp-safety", "name": "URITP Safety", "url": "https://mawizorek.github.io/uritp-safety/", "verified": true },
+    { "slug": "theatre", "name": "Theatre Notes", "url": "https://mawizorek.github.io/theatre-docs/", "verified": true },
+    { "slug": "hml", "name": "HML_LLC", "url": "https://mawizorek.github.io/hml-docs/", "verified": true },
+    {
+      "slug": "mawprose",
+      "name": "Prose Documentation (unverified)",
+      "url": "https://mawizorek.github.io/maw-prose/",
+      "verified": false,
+      "note": "NOT REACHABLE 2026-09-18. instances/mawprose/ exists in the engine, but this URL did not serve. Cause unknown and NOT diagnosed here -- Pages may be off on the content repo, or the tree may hold no buildable pages (the maw-prose markdown sampled for this app's test fixtures carried NO frontmatter, and the engine refuses to build a page with no status:). Kept in the list on purpose: the app reports an unreachable site plainly, and removing the row would hide a real gap instead of surfacing it."
+    }
+  ]
+}

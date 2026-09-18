@@ -1,0 +1,127 @@
+/* app.css — THIS APP'S OWN CHROME ONLY.
+ *
+ * NOTHING HERE STYLES THE PREVIEW. The preview is an iframe wearing the selected
+ * site's real published stylesheets; a rule here could not reach it and must not try.
+ * The seam between this file and that document is the whole architecture.
+ *
+ * Tokens come from shared/themes/resolve.js, which sets BARE names (--bg, --text,
+ * --accent), not --dr-* ones. EVERY var() CARRIES A FALLBACK, and that is
+ * load-bearing rather than tidy: template-app's --s1 through --s8 ramp uses bare
+ * var() and one unresolved token silently zeroes every gutter in every app copied
+ * from it, because an unresolved var() invalidates the WHOLE declaration. It does
+ * not degrade; it vanishes.
+ */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg, #16181c);
+  color: var(--text, #e8e8ea);
+  font-family: var(--font-body, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif);
+  font-size: 15px;
+}
+
+/* ---- top bar ---- */
+.bar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--gap-md, 14px);
+  padding: var(--pad-card, 12px) var(--pad-card, 14px);
+  background: var(--surface-1, #1d2026);
+  border-bottom: var(--border-w, 1px) solid var(--border, #2e333c);
+}
+.bar h1 {
+  margin: 0; font-size: 1rem; letter-spacing: var(--track-tight, .02em);
+  font-family: var(--font-display, inherit); white-space: nowrap;
+}
+.bar label { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--text-soft, #b6bac2); }
+.bar select, .bar input[type=file] {
+  font: inherit; font-size: .82rem;
+  color: var(--text, #e8e8ea); background: var(--field, #23272f);
+  border: var(--border-w, 1px) solid var(--border, #2e333c);
+  border-radius: var(--radius, 6px);
+  padding: 5px 8px; min-height: var(--touch, 32px);
+}
+.modes { display: inline-flex; gap: var(--gap-md, 12px); }
+.modes label { cursor: pointer; }
+.go {
+  font: inherit; font-weight: 600; cursor: pointer; margin-left: auto;
+  color: var(--on-accent, #fff);
+  background: var(--accent-grad, var(--accent, #4a7fd0));
+  border: 0; border-radius: var(--radius, 6px);
+  padding: 8px 16px; min-height: var(--touch, 34px);
+  transition: filter var(--motion-fast, 120ms) var(--ease, ease);
+}
+.go:hover { filter: brightness(1.12); }
+.go:focus-visible { outline: 2px solid var(--accent-2, #7aa3d4); outline-offset: 2px; }
+
+/* ---- status: never silent, never ambiguous ---- */
+.status {
+  margin: 0; padding: 7px var(--pad-card, 14px);
+  font-size: .78rem; font-family: var(--font-mono, ui-monospace, Menlo, monospace);
+  border-bottom: var(--border-w, 1px) solid var(--border, #2e333c);
+}
+.status--busy { color: var(--text-faint, #8b909a); }
+.status--ok   { color: var(--good, #57b384); }
+.status--warn { color: var(--warn, #d2a03c); }
+.status--bad  { color: var(--bad, #d3564b); background: color-mix(in oklch, var(--bad, #d3564b) 12%, transparent); }
+
+/* ---- panes ---- */
+.panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); height: calc(100% - 96px); }
+.editor {
+  display: flex; flex-direction: column; min-width: 0;
+  gap: var(--gap-xs, 8px); padding: var(--pad-card, 14px);
+  border-right: var(--border-w, 1px) solid var(--border, #2e333c);
+  overflow: auto;
+}
+.editor.drop { outline: 2px dashed var(--accent, #4a7fd0); outline-offset: -6px; }
+#pane-paste { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 6px; }
+.lbl { margin: 0; font-size: .78rem; font-weight: 600; color: var(--text-soft, #b6bac2); }
+.hint { margin: 0; font-size: .74rem; color: var(--text-faint, #8b909a); }
+.hint code, .limits code { font-family: var(--font-mono, ui-monospace, monospace); }
+textarea {
+  flex: 1; min-height: 240px; resize: vertical;
+  font-family: var(--font-mono, ui-monospace, Menlo, monospace); font-size: .8rem; line-height: 1.55;
+  color: var(--text, #e8e8ea); background: var(--field, #1a1d23);
+  border: var(--border-w, 1px) solid var(--border, #2e333c);
+  border-radius: var(--radius, 6px); padding: 10px; tab-size: 4;
+}
+textarea:focus-visible { outline: 2px solid var(--accent, #4a7fd0); outline-offset: 1px; }
+.file { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .78rem; }
+.stats, .limits {
+  margin: 0; font-size: .72rem; color: var(--text-faint, #8b909a);
+  font-family: var(--font-mono, ui-monospace, monospace); line-height: 1.5;
+}
+.limits { border-top: var(--border-w, 1px) solid var(--border, #2e333c); padding-top: 8px; }
+
+.preview { display: flex; flex-direction: column; min-width: 0; }
+/* The fidelity banner is in the UI rather than a README on purpose: a gap named
+ * where nobody is looking is a gap nobody knows about. */
+.banner {
+  margin: 0; padding: 7px var(--pad-card, 14px); font-size: .74rem;
+  color: var(--text-soft, #b6bac2);
+  background: color-mix(in oklch, var(--warn, #d2a03c) 14%, transparent);
+  border-bottom: var(--border-w, 1px) solid var(--border, #2e333c);
+}
+.banner--full { background: color-mix(in oklch, var(--good, #57b384) 14%, transparent); }
+iframe { flex: 1; width: 100%; border: 0; background: #fff; }
+
+/* ---- mobile: preview FIRST ---- */
+@media (max-width: 900px) {
+  .panes { grid-template-columns: 1fr; height: auto; }
+  .preview { order: -1; }
+  iframe { min-height: 60vh; }
+  .editor { border-right: 0; border-top: var(--border-w, 1px) solid var(--border, #2e333c); }
+  .go { margin-left: 0; }
+}
+
+/* ---- print ----
+ * Printing goes through the IFRAME's own print(), so this block is a guard for
+ * somebody hitting Ctrl+P on the app shell rather than the mechanism. It hides the
+ * chrome so a stray print is blank-ish instead of a screenshot of an editor. */
+@media print {
+  .bar, .status, .editor, .banner { display: none !important; }
+  .panes { display: block; height: auto; }
+  iframe { height: auto; min-height: 0; }
+}
