@@ -73,6 +73,9 @@
   </section>
 </main>
 
-<script type="module" src="source/app.js?v=1"></script>
+<!-- v1.1: bumped so the body-attribute fix cannot be served from cache. The
+     matching bump on the sites.js IMPORT lives inside app.js, because a module
+     does not inherit its parent's query string. -->
+<script type="module" src="source/app.js?v=2"></script>
 </body>
 </html>
