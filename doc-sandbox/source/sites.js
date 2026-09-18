@@ -32,6 +32,10 @@
  * logged twice upstream. */
 export const SCHEMES = { slate: 'Dark (slate)', default: 'Light (default)' };
 
+/* The body attributes a rendered page declares, reproduced rather than assumed.
+ * Read off a real page on gh-pages, not remembered. */
+const BODY_ATTRS = ['dir', 'data-md-color-scheme', 'data-md-color-primary', 'data-md-color-accent'];
+
 export async function loadSites(url = './source/instances.json') {
   const r = await fetch(url, { cache: 'no-store' });
   if (!r.ok) throw new Error('instances.json HTTP ' + r.status);
@@ -39,8 +43,19 @@ export async function loadSites(url = './source/instances.json') {
   return Array.isArray(j.sites) ? j.sites : [];
 }
 
+function readBodyAttrs(doc) {
+  const out = {};
+  const body = doc.body;
+  if (!body) return out;
+  for (const name of BODY_ATTRS) {
+    const v = body.getAttribute(name);
+    if (v) out[name] = v;
+  }
+  return out;
+}
+
 /* Read one published page and report what it links, in document order.
- * Returns { stylesheets, inline, scheme, title, pageUrl }. */
+ * Returns { stylesheets, inline, bodyAttrs, scheme, title, pageUrl }. */
 export async function readHead(pageUrl) {
   const r = await fetch(pageUrl, { cache: 'no-store' });
   if (!r.ok) throw new Error('HTTP ' + r.status + ' from ' + pageUrl);
@@ -56,11 +71,35 @@ export async function readHead(pageUrl) {
     if (href) stylesheets.push(new URL(href, pageUrl).href);
   }
 
-  const served = doc.documentElement.getAttribute('data-md-color-scheme');
+  /* THE BODY ATTRIBUTES ARE LOAD-BEARING AND v1 HAD THEM WRONG.
+   * A real rendered page (read off gh-pages, not remembered) opens its body:
+   *
+   *   <body dir="ltr" data-md-color-scheme="slate"
+   *         data-md-color-primary="black" data-md-color-accent="teal">
+   *
+   * Two things follow, and both were live defects in v1:
+   *
+   * 1. `dir` IS NOT DECORATION. Material 9.7 ships DIRECTION-SCOPED rules for
+   *    directional properties -- `[dir=ltr] ... { padding-left: ... }` -- so a
+   *    document with no `dir` matches none of them. That is what put the callout
+   *    icon on top of its own title: the title lost its left padding and the
+   *    absolutely-positioned ::before landed on the first letter. It is also why
+   *    PRINT was unaffected -- the engine's own print sheets set their geometry
+   *    with plain properties, so they never needed the attribute.
+   * 2. THE SCHEME LIVES ON THE BODY, NOT THE HTML ELEMENT. v1 read
+   *    documentElement, which never carries it, so detection always failed and the
+   *    scheme picker could not move the rendered scheme.
+   *
+   * So they are READ from the source page rather than assumed -- which also picks
+   * up data-md-color-primary / -accent, whose palette rules v1 never matched. */
+  const bodyAttrs = readBodyAttrs(doc);
+  const served = bodyAttrs['data-md-color-scheme'];
+
   return {
     pageUrl,
     stylesheets,
     inline,
+    bodyAttrs,
     scheme: Object.hasOwn(SCHEMES, served || '') ? served : null,
     title: (doc.querySelector('title')?.textContent || '').trim(),
   };
@@ -87,28 +126,48 @@ export function buildDoc({ bodyHtml, head, scheme, extraCss = '' }) {
   const links = (head?.stylesheets || []).map((h) => '<link rel="stylesheet" href="' + h + '">').join('');
   const styles = (head?.inline || []).map((c) => '<style>' + c + '</style>').join('');
   const baseHref = head?.pageUrl ? '<base href="' + head.pageUrl + '">' : '';
-  return '<!DOCTYPE html><html lang="en" data-md-color-scheme="' + (scheme || 'slate') + '">' +
+  const sch = scheme || 'slate';
+
+  /* Rebuild the body tag from what the source page actually declared, with the
+   * picker overriding only the scheme. `dir` defaults to ltr rather than being
+   * omitted: a missing dir IS the icon-overlap bug, so the floor matters more here
+   * than the fidelity. The scheme is written on BOTH html and body -- body because
+   * that is where Material puts it and where its palette rules expect it, html
+   * because that is what the verified-white print sheet was produced with, and a
+   * proven result does not get removed to tidy away a duplicate. */
+  const attrs = Object.assign({ dir: 'ltr' }, head?.bodyAttrs || {});
+  attrs['data-md-color-scheme'] = sch;
+  const bodyTag = '<body ' + Object.entries(attrs)
+    .map(([k, v]) => k + '="' + String(v).replace(/"/g, '&quot;') + '"').join(' ') + '>';
+
+  return '<!DOCTYPE html><html lang="en" dir="' + (attrs.dir || 'ltr') + '" data-md-color-scheme="' + sch + '">' +
     '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     baseHref + links + styles +
     // Only ever layout nudges for the frame itself. Never a colour, a radius, a
     // font or a spacing value: those belong to the site's own resolved theme, and a
     // local override here would be invisibly disagreeing with it.
     '<style>html,body{margin:0}.md-main__inner{margin-top:0}' + extraCss + '</style>' +
-    '</head><body>' + shell(bodyHtml) + '</body></html>';
+    '</head>' + bodyTag + shell(bodyHtml) + '</body></html>';
 }
 
 /* Upload mode: pull the content column out of an already-rendered page. No parser
- * involved, so fidelity is whatever the engine already produced. */
+ * involved, so fidelity is whatever the engine already produced.
+ *
+ * Returns bodyAttrs too, for the same reason readHead does: an uploaded page
+ * carries its own dir and scheme on the body, and dropping them would reintroduce
+ * the icon overlap on the one path that is supposed to be full fidelity. */
 export function extractContent(htmlString) {
   const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+  const bodyAttrs = readBodyAttrs(doc);
   const node = doc.querySelector('.md-content__inner') || doc.querySelector('article') ||
     doc.querySelector('.md-content') || doc.querySelector('main') || doc.body;
-  if (!node) return { html: '', found: null };
+  if (!node) return { html: '', found: null, bodyAttrs };
   for (const kill of node.querySelectorAll('script,.md-source-file,.md-content__button,form')) kill.remove();
   return {
     html: node.innerHTML,
     found: node.className || node.tagName.toLowerCase(),
-    scheme: doc.documentElement.getAttribute('data-md-color-scheme') || null,
+    bodyAttrs,
+    scheme: bodyAttrs['data-md-color-scheme'] || null,
   };
 }
 
