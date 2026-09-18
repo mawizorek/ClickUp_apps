@@ -1,5 +1,29 @@
-2026-09-09 08:56 ET
-pass anchor: 2026-09-09 08:35
+2026-09-18 22:40 ET
+pass anchor: 2026-09-18 17:35
 lanes: 9 of 9 complete
-live: 227
-result: PARTIAL - inventory landed, all 9 lanes swept via search-first discovery rather than full department-index board walk; OSJ/USITT/LCTJ/ACG/SKN/GOV/TSJ not individually re-probed this pass
+live: 340 (was 242, +98) | new 136 | gone 39 with evidence | carried unverified 51
+schema: FIRST PASS WITH THE 16th COLUMN, `accessibility`. All nine lane files migrated.
+accessibility: 13 home | 7 remote | 6 hybrid | 10 immediate. Zero remote/hybrid existed on 09-10.
+result: PARTIAL - the inventory landed in full and every standing row was individually
+  re-verified rather than carried on a stale `live`, but four gaps stand:
+  (1) 51 rows carry `live` UNVERIFIED - StageLync premium paywalls, OSJ detail shells, and
+      BroadwayWorld which served a stale cache again today. Unreachable is not dead, so they
+      stay, but they are a claim and not a fact.
+  (2) The OSJ `?department=Scenic` filter returned 612 of 612, i.e. it did NOT apply. The
+      Scenic/Sets index is therefore effectively UNBROWSED this pass, and that is the single
+      most important index for the drafting lane's theatrical half. Caught by count
+      verification, which is exactly what that law is for.
+  (3) creative-admin's REMOTE half is unswept, not empty - it has no documented remote
+      sources at all.
+  (4) Cross-lane duplicate unresolved: JM-PB-pclo-ppt-pres (ADM) and
+      JM-PB-confluence-president-ep (PRD) are the same Playbill URL. Needs Michael's
+      home-lane ruling; not the executor's call to cull either.
+owed: eleven verified remote sources still not written into job-market-sources.md;
+  job-market-refresh.md schema section still needs its narrow edit, after which
+  job-market-schema.md reduces to a tombstone pointer; the standing thread's root comments
+  are unreadable, which blocks the Resume Scan's primary evidence.
+cost of the gap: 9 days late. University at Buffalo Scene Shop Supervisor, $57,500-61,500,
+  75 miles from home, deadline passed 2026-09-12. Reported, not hidden.
+headline: the drafting lane's "two organizations, not a market" verdict is dead. 14 of its 37
+  live rows are EXPERIENTIAL, from sources that did not exist in this routine this morning.
+  And the overhire ruling fired for the first time: Geva Rochester, $16.50/hr, home|immediate.
