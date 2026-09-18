@@ -8,6 +8,14 @@
 > page, and reported it as doc rot — while the correct documented URL was live the whole time. **Read the
 > template; never derive a board URL from memory.** If you need a URL and Template 7 lacks it, add it THERE.
 
+> 🧩 **THIS FILE HAS A SIBLING SEGMENT — READ IT TOO: `routines/job-market-sources-experiential.md`**
+> (added 2026-09-18). It covers the **experiential / brand-experience / trade-show / themed-entertainment**
+> market, which none of the boards listed below index: specialist boards, an employer map split by CAD
+> platform, the drafting-service subcontract route, verbatim pay evidence, and the rule that an ATS job ID
+> absent from the employer's live feed is CLOSED however current a mirror looks. It is a SEGMENT of this
+> source list, not an optional appendix — it exists as its own file only because this one is too large to
+> rewrite safely, and it is the primary source set for the DFT lane's remote/freelance half.
+
 ---
 
 ## 🔴 THE DEPARTMENT-INDEX LAW (LOCKED 2026-08-04 — read this before anything else)
@@ -276,6 +284,9 @@ freelance/remote boards · regional theatre associations · AEA postings · IATS
 - **The Stage Jobs (`TSJ`):** filter to Backstage & Technical, Management. ⚠️ Many listings carry NO post date —
   liveness unverified means no row. A dedicated verification sweep of its PM shelf (RSC, Oxford, RCS, E1) is outstanding.
 - **HireCulture (`HC`):** smaller volume, catches New England roles other boards miss.
+- **Experiential / trade-show / themed-entertainment boards:** NOT listed here. See the sibling segment
+  `job-market-sources-experiential.md` — it holds the board list, the employer map, and the access notes
+  for that market, including the CAD-platform split that decides which employers are reachable at all.
 
 ---
 
@@ -334,6 +345,9 @@ StageBoard 5-10 · retained search (ACG + TOC) 2-5 · regional boards combined 3
 - **DFT lane is two organizations.** Every row on 08-04 came from Riverside Theatre and New London Barn.
   That is not a market, it is two theatres staffing a season. Treat the count with suspicion — but the lane
   stays swept in full (Michael, 2026-08-04).
+  🔴 **2026-09-18: that diagnosis was a SOURCE artifact, same as the safety lane's.** The drafting market is
+  largely EXPERIENTIAL, not theatrical, and none of the boards above index it. The lane's real source set is
+  the sibling segment `job-market-sources-experiential.md`. **Sweep it before calling this lane thin.**
 
 ### Org/venue data
 
