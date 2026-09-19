@@ -8,13 +8,26 @@
 > page, and reported it as doc rot — while the correct documented URL was live the whole time. **Read the
 > template; never derive a board URL from memory.** If you need a URL and Template 7 lacks it, add it THERE.
 
-> 🧩 **THIS FILE HAS A SIBLING SEGMENT — READ IT TOO: `routines/job-market-sources-experiential.md`**
-> (added 2026-09-18). It covers the **experiential / brand-experience / trade-show / themed-entertainment**
-> market, which none of the boards listed below index: specialist boards, an employer map split by CAD
-> platform, the drafting-service subcontract route, verbatim pay evidence, and the rule that an ATS job ID
-> absent from the employer's live feed is CLOSED however current a mirror looks. It is a SEGMENT of this
-> source list, not an optional appendix — it exists as its own file only because this one is too large to
-> rewrite safely, and it is the primary source set for the DFT lane's remote/freelance half.
+> 🧩 **THIS FILE HAS TWO SIBLING SEGMENTS, AND IT IS ONLY THE THEATRE/VENUE THIRD OF THE SOURCES FAMILY.**
+> The family is split by CONCERN because this file outgrew safe whole-file editing. **A sweep that reads
+> only this file is structurally incomplete no matter how thorough it is within it.**
+>
+> 🌐 **`routines/job-market-sources-remote.md`** (added 2026-09-19) — REMOTE-FIRST routes, organised by work
+> arrangement rather than industry. Ten sources verified live with named roles and salaries as evidence.
+> Its headline is ASYMMETRIC and changes how two lanes get swept: **remote `creative-admin` work
+> (development, grants, donor communications, arts marketing) is a real, reusable market that this routine
+> had NEVER swept** — that half was unswept, not thin. Remote AV/CAD is genuine but scarce, and the
+> physical lanes have no remote market at all. It also carries **verbatim requirement language** (CTS,
+> AutoCAD, Revit, MailChimp, grants-management software) that no state-file column can hold.
+>
+> 🧩 **`routines/job-market-sources-experiential.md`** (added 2026-09-18). It covers the **experiential /
+> brand-experience / trade-show / themed-entertainment** market, which none of the boards listed below
+> index: specialist boards, an employer map split by CAD platform, the drafting-service subcontract route,
+> verbatim pay evidence, and the rule that an ATS job ID absent from the employer's live feed is CLOSED
+> however current a mirror looks. It is the primary source set for the DFT lane's remote/freelance half.
+>
+> ⚠️ **Several experiential boards are also remote-friendly, so a remote drafting sweep must read BOTH
+> siblings.** They do not overlap: one is organised by industry, the other by work arrangement.
 
 ---
 
@@ -46,6 +59,9 @@ We had never opened the pages.
    **8,613**. The filter did not apply, the response was a plausible-looking wall of jobs, and the only
    thing that caught it was comparing the count to the known total. **Know the unfiltered count before
    you filter, so you can tell whether anything happened.**
+   ✅ **SOLVED for OSJ on 2026-09-19 and the working query strings are in Template 7.** The label is
+   lowercase with the slash encoded: `?department=scenic+%2F+sets` returns 339 of 602. `?department=Scenic`
+   returns the whole board. **Read Template 7; do not re-derive it.**
 
 ---
 
@@ -149,6 +165,11 @@ right and the original diagnosis would have deleted the keyword that found it.**
 for a crowd-management contractor, which was itself hiring for the same niche. **In a small discipline,
 one departure is often two openings.** When a safety seat turns up, check where the last person went.
 
+✅ **VINDICATED AGAIN, HARDER, 2026-09-18:** the safety half produced **FIVE manager-level seats in one
+pass** — above its own documented 0-3 band — from Regions Arena, Target Center, SNHU Arena and Delta
+Center alongside the standing Colonial Life Arena row. **The keyword set that was proposed for deletion is
+now the lane's most productive half.**
+
 **Where safety roles actually live — sweep these for the safety keywords specifically:**
 
 - [**TeamWork Online**](https://www.teamworkonline.com) `TWO` — arenas, stadiums, venue operators.
@@ -193,6 +214,10 @@ is IN; a *P/T Safety and Security Officer* or *Event Security* posting at the sa
   (re-tested twice, 7.5h apart; a known-live detail page hard-failed too). First observed outage of the
   primary source — if it repeats, this file needs a plan for a pass without OSJ, because nothing else
   covers what it covers.
+  ⚠️ **Its pagination is broken past page 2** (verified 2026-09-19: Scenic/Sets advertises 17 pages, pages
+  3-17 return page-1 content). **Every OSJ department harvest is structurally partial.** And the board is
+  **not snapshot-consistent** — two correct requests minutes apart returned 310 of 612 and 339 of 602, so
+  **a changed count between passes is not market movement.**
 - **Playbill Jobs** (`playbill.com/jobs`) `PB` — volume source. Browse Technical + Administrative categories.
   ⚠️ The index text often strips hyperlinks; recover a direct URL with a web search on org + exact title.
   ⚠️ Hard-failed 2026-08-31.
@@ -200,6 +225,8 @@ is IN; a *P/T Safety and Security Officer* or *Event Security* posting at the sa
   ⚠️ Direct fetch of `/jobs/` **failed on 2026-08-04**. First observed failure; if it repeats it is broken, not unlucky.
   🕐 **2026-08-31: reachable but served a 26-DAY-STALE CACHE.** See the fifth-source-state section above.
   **Do not capture from this board without solving for its render date first.**
+  🕐 **Stale AGAIN on 2026-09-18.** Two occurrences a fortnight apart: treat staleness as this board's
+  normal condition and check the render date every single time.
 - **StageLync** (`stagelync.com`) `SL` — weekly. Check Production Manager, Stage Management, Technical, Administration separately.
 - **USITT Job Board** `USITT` — all relevant categories. ⚠️ Hard-failed 2026-08-31.
 - **TeamWork Online** (`teamworkonline.com`) `TWO` — **required for the OPS lane only.** Venue and arena
@@ -237,6 +264,9 @@ is IN; a *P/T Safety and Security Officer* or *Event Security* posting at the sa
 **Tier 3 (monthly, opportunistic):** venue-operator careers pages (ASM Global, Oak View Group, Live Nation, AEG) ·
 freelance/remote boards · regional theatre associations · AEA postings · IATSE local boards · SearchWide Global / MCA.
 
+> 🌐 **"freelance/remote boards" above is no longer a vague gesture.** Ten remote routes are named and
+> live-verified in `job-market-sources-remote.md`. Sweep that file rather than improvising a remote search.
+
 > ⚠️ **On 2026-08-31, seven of the boards above hard-failed in one afternoon while three were fully live.**
 > The dead ones were the THEATRE boards; the live ones were the VENUE/ARENA boards. **Do not report that
 > shape as "the sources are down"** — it is a split, and it means a pass can still legitimately complete
@@ -252,13 +282,16 @@ freelance/remote boards · regional theatre associations · AEA postings · IATS
   admitted; flag it in NOTABLE instead (live case: an Ampa Events rendering-artist post at $50-60k).
   ⚠️ Its department indexes paginate hard (`Displaying 310 of 612`, page 1 of 16) — **an OSJ disappearance
   is undetectable from page 1**, so OSJ rows can only ever be confirmed live, never proved GONE.
+  ✅ **Working department query strings live in Template 7** (verified 2026-09-19). Use them; do not guess.
 - **Playbill (`PB`) + BroadwayWorld (`BWW`):** reliable URLs (PB uses UUID paths, BWW numeric IDs). Cross-posts
   between them are common — two rows, same org, NOT duplicates. ⚠️ **The cross-posting is useful in one
   direction:** a BWW copy of a PB row often publishes a close date the PB listing does not.
 - **StageLync (`SL`):** clean category browsing, updated weekly. ⚠️ **Detail pages went premium-gated during
   the 08-07 pass** and the index gives no hyperlinks, so treat every SL hit as a sighting needing recovery
   (see the recovery procedure above). ⚠️ Heavily weighted to performer casting calls — the backstage and
-  technical shelves are a small fraction of what it lists.
+  technical shelves are a small fraction of what it lists. 🔴 **It is the single largest source of carried
+  UNVERIFIED rows in the inventory** — of the 51 rows carrying an unverified `live` after the 09-18 pass,
+  the majority are SL paywalls. A paywall is not a dead posting, but it is not a verified one either.
 - **StageBoard (`SB`):** normalizes 200+ job titles; filter by Production Management, Technical Direction,
   Stage Management, Lighting/Electrics. ⚠️ See DEGRADED above — four straight failures.
 - **TeamWork Online (`TWO`):** venue/arena/sports-facility jobs. Browse Arenas & Facilities, the
@@ -287,6 +320,10 @@ freelance/remote boards · regional theatre associations · AEA postings · IATS
 - **Experiential / trade-show / themed-entertainment boards:** NOT listed here. See the sibling segment
   `job-market-sources-experiential.md` — it holds the board list, the employer map, and the access notes
   for that market, including the CAD-platform split that decides which employers are reachable at all.
+- **Remote-first boards and arts-admin remote routes:** NOT listed here either. See
+  `job-market-sources-remote.md` — ten verified routes with access friction noted, plus the warning that
+  **"remote" in this industry rarely means location-free** (required states, travel, in-person rehearsals)
+  and that remote-job SEO mirrors inflate the apparent count more than anywhere else.
 
 ---
 
@@ -302,8 +339,19 @@ baseline. The floor in the runbook (40) is a failure tripwire, not a target.
 > is no longer evidence of a good pass. A pass that returns 45 with the department indexes unbrowsed is a
 > shallow pass wearing a passing grade. Judge depth by SOURCES coverage, not by the total.
 
+> 🔴 **THE 90-120 BASELINE IS NOW ITSELF OBSOLETE, and it was obsolete for the same reason as the 40 floor.**
+> The 2026-09-18 pass landed **345 live across nine lanes** — roughly triple the baseline — with no change in
+> the market. It re-verified every standing row individually instead of carrying stale `live` values, and it
+> swept two source segments that did not previously exist. **Every density figure in this file measures our
+> sweep, not the world.** Judge a pass by whether it verified what it claims and named what it could not
+> reach, never by whether it hit a number.
+
 Approximate yield by lane (post-08-04 baseline): PM 25-35 · TD 12-18 · SM 18-25 · ME 10-15 · AUD 10-15 ·
 OPS 4-8 (of which 0-3 safety) · DFT 2-6 · ADM 8-12.
+
+> ⚠️ **Post-09-18 actuals, for contrast, and note every lane exceeded its band:** PM 59 · TD 50 · SM 48 ·
+> AUD 45 · DFT 44 · ME 33 · ADM 31 · OPS 25 (20 venue / 5 safety) · PRD 10. **Do not treat the bands above
+> as targets or ceilings.** They were measured on shallower sweeps.
 
 Approximate yield by source when swept properly: OffStageJobs 15-25 · Playbill + BWW 10-18 · StageLync 3-8 ·
 StageBoard 5-10 · retained search (ACG + TOC) 2-5 · regional boards combined 3-8.
@@ -324,6 +372,10 @@ StageBoard 5-10 · retained search (ACG + TOC) 2-5 · regional boards combined 3
 - **Venue operator groups (Legends Global, Oak View Group, ASM Global) are the top of the OPS market**, and
   they out-pay the theatre boards for the same work: Navy Pier Director of Event Operations at
   $114,000-134,000 is the highest-paid OPS row this routine has tracked.
+- 🔻 **KNOWN KEYWORD GAP, recorded 2026-09-19:** **no lane asks for `CEO`, `President`, `COO` or `Chief`.**
+  So the highest-paying row ever tracked — LA Master Chorale *President & CEO*, **$275,000-350,000** — was
+  found by accident on a source browse, not by the config. Michael declined a dedicated c-suite lane
+  (*"it is just a filter of existing things in a tab"*), so this stays a **keyword** gap, not a lane gap.
 
 ### Lane-specific realities
 
@@ -336,18 +388,26 @@ StageBoard 5-10 · retained search (ACG + TOC) 2-5 · regional boards combined 3
   stands with Michael about a compensation floor — see the 08-07 NOTABLE. **Not the executor's call.**
 - **ME lane's top of market is now the UK.** Both £-denominated listings out-earn every US electrics posting tracked.
 - **AUD lane is NOT touring-only.** That read came from looking at Playbill alone. Half the lane is resident
-  staff at $45-76k, all of it found through the OSJ Sound department.
+  staff at $45-76k, all of it found through the OSJ Sound department. ✅ Re-confirmed 09-18: 21 resident-staff
+  versus 24 touring/contract.
 - **OPS lane is TWO markets in one config entry.** Venue management (house/ops/facilities) posts on the theatre
   boards and produces most of the rows. Safety management posts on venue/arena/municipal boards and produces
   0-3. **Sweep both halves; do not let the first half's volume disguise a skipped second half.**
   🔴 **And the two halves fail INDEPENDENTLY** — proven 08-31, when every theatre board was down and every
   venue board was up. **Report the halves separately or a half-swept lane reads as a full one.**
+- **ADM lane has a REMOTE half that was never swept**, which is different from thin. 🌐 Its sources now exist
+  in `job-market-sources-remote.md` (Arts Admin Jobs, Philanthropy News Digest, Idealist, AFP, Remote
+  Impact). ⭐ And the barrier there is **TOOL FLUENCY, not certification** — postings name MailChimp, Canva,
+  WordPress, Monday.com, donor databases and grants-management software, all learnable in days. That is a
+  fundamentally different build from the ETCP stack the technical lanes demand.
 - **DFT lane is two organizations.** Every row on 08-04 came from Riverside Theatre and New London Barn.
   That is not a market, it is two theatres staffing a season. Treat the count with suspicion — but the lane
   stays swept in full (Michael, 2026-08-04).
   🔴 **2026-09-18: that diagnosis was a SOURCE artifact, same as the safety lane's.** The drafting market is
   largely EXPERIENTIAL, not theatrical, and none of the boards above index it. The lane's real source set is
   the sibling segment `job-market-sources-experiential.md`. **Sweep it before calling this lane thin.**
+  ✅ Proven the same day: the lane went 23 → 44 live, **14 of them experiential**, and the two genuine remote
+  CAD employers (ASG, Compass/Waveguide) came from the remote segment. **Three files, one lane.**
 
 ### Org/venue data
 
@@ -377,3 +437,10 @@ integration potential: a venue list that feeds constraints back into the search 
 - ⏰ **The cost of not running shows up as expired deadlines, and it should be reported.** The 24-day gap
   before 08-31 cost a $43,750-50,000 in-lane venue-management seat whose deadline passed by ONE day. Name
   those in NOTABLE. A catch-up pass that hides what it missed is selling the routine as more current than it is.
+  ⏰ **Again on 09-18, at nine days:** University at Buffalo Scene Shop Supervisor, $57,500-61,500, **75 miles
+  from home**, deadline passed by six days. **Proximity does not survive a gap.**
+- 🔴 **A cross-lane duplicate is one listing in two LANES, which is a defect. A cross-POSTED listing is one
+  job on two BOARDS, which is correct and stays as two rows.** Do not conflate them. Two cross-lane
+  duplicates were resolved by Michael's rulings on 09-19 (Confluence President & EP, PAC NYC Associate
+  Producer — both homed in `producing-artistic` with an ADM pointer). **Precedent: an artistic or producing
+  title rowed in ADM homes in PRD.**
