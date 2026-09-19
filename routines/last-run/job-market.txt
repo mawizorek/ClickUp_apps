@@ -1,29 +1,45 @@
-2026-09-18 22:40 ET
+2026-09-18 22:40 ET  [AMENDED 2026-09-19 09:10 ET - see FOLLOW-UP below]
 pass anchor: 2026-09-18 17:35
 lanes: 9 of 9 complete
-live: 340 (was 242, +98) | new 136 | gone 39 with evidence | carried unverified 51
+live: 345 (was 242, +103) | new 143 | gone 39 with evidence | carried unverified 51
+  ^ revised from 340 on 09-19: +7 OSJ Scenic rows, -2 cross-lane duplicates removed.
 schema: FIRST PASS WITH THE 16th COLUMN, `accessibility`. All nine lane files migrated.
 accessibility: 13 home | 7 remote | 6 hybrid | 10 immediate. Zero remote/hybrid existed on 09-10.
 result: PARTIAL - the inventory landed in full and every standing row was individually
-  re-verified rather than carried on a stale `live`, but four gaps stand:
-  (1) 51 rows carry `live` UNVERIFIED - StageLync premium paywalls, OSJ detail shells, and
-      BroadwayWorld which served a stale cache again today. Unreachable is not dead, so they
+  re-verified rather than carried on a stale `live`. Of the four gaps recorded at stamp time,
+  TWO ARE NOW CLOSED and two stand:
+  (1) STANDS. 51 rows carry `live` UNVERIFIED - StageLync premium paywalls, OSJ detail shells,
+      and BroadwayWorld which served a stale cache again. Unreachable is not dead, so they
       stay, but they are a claim and not a fact.
-  (2) The OSJ `?department=Scenic` filter returned 612 of 612, i.e. it did NOT apply. The
-      Scenic/Sets index is therefore effectively UNBROWSED this pass, and that is the single
-      most important index for the drafting lane's theatrical half. Caught by count
-      verification, which is exactly what that law is for.
-  (3) creative-admin's REMOTE half is unswept, not empty - it has no documented remote
+  (2) PARTLY CLOSED 09-19, and read the caveat. The OSJ Scenic/Sets filter is SOLVED:
+      `?department=scenic+%2F+sets` returns 339 of 602, provably filtered. The broken form was
+      `?department=Scenic`, which returns the whole board. Working strings for all six
+      departments plus expected filtered counts are now in job-market-templates.md Template 7
+      (3be26f0), so this cannot cost a third pass. Harvest: +7 rows (99605f7).
+      ⚠ BUT NOT FULLY CLOSED: the board advertises 17 pages and only 2 distinct pages are
+      readable - pages 3-17 return page-1 content. The index is therefore STRUCTURALLY
+      PARTIAL, roughly 15 pages remain unread, and the drafting lane must still be assumed
+      under-reported. A solved filter is not a complete browse.
+  (3) STANDS. creative-admin's REMOTE half is unswept, not empty - no documented remote
       sources at all.
-  (4) Cross-lane duplicate unresolved: JM-PB-pclo-ppt-pres (ADM) and
-      JM-PB-confluence-president-ep (PRD) are the same Playbill URL. Needs Michael's
-      home-lane ruling; not the executor's call to cull either.
+  (4) CLOSED 09-19 by Michael's rulings. Both cross-lane duplicates resolved: Confluence
+      President & EP and PAC NYC Associate Producer both home in producing-artistic with
+      also_lanes=creative-admin pointers; the ADM standalone rows are removed
+      (ae09488, 23ef8d9, 420704c, a49eb7d). No known same-URL-two-lanes pair remains.
+      Precedent set: an artistic or producing title rowed in ADM homes in PRD.
 owed: eleven verified remote sources still not written into job-market-sources.md;
   job-market-refresh.md schema section still needs its narrow edit, after which
   job-market-schema.md reduces to a tombstone pointer; the standing thread's root comments
-  are unreadable, which blocks the Resume Scan's primary evidence.
+  are unreadable, which blocks the Resume Scan's primary evidence; ~15 unread pages of the
+  OSJ Scenic/Sets index.
+also ruled 09-19, recorded because a refusal is worth as much as an approval:
+  NO c-suite lane (Michael: "it is just a filter of existing things in a tab"), and Director
+  of Production rows STAY in production-manager. But the finding that prompted the proposal
+  stands as a known KEYWORD GAP: no lane asks for CEO, President, COO or Chief, which is why
+  the highest-paying row in the inventory - LA Master Chorale President & CEO, $275-350k - was
+  found by accident on a source browse rather than by the config.
 cost of the gap: 9 days late. University at Buffalo Scene Shop Supervisor, $57,500-61,500,
   75 miles from home, deadline passed 2026-09-12. Reported, not hidden.
-headline: the drafting lane's "two organizations, not a market" verdict is dead. 14 of its 37
-  live rows are EXPERIENTIAL, from sources that did not exist in this routine this morning.
+headline: the drafting lane's "two organizations, not a market" verdict is dead. 14 of its
+  live rows are EXPERIENTIAL, from sources that did not exist in this routine before 09-18.
   And the overhire ruling fired for the first time: Geva Rochester, $16.50/hr, home|immediate.
