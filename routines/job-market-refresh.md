@@ -7,7 +7,7 @@ cadence: pointer only — authoritative cadence is the row in routines/schedule.
 state_dir: routines/job-market-state/
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 18
+version: 19
 model: search-first, loop-per-role, commit-per-role, resumable-by-derivation
 ---
 
@@ -154,10 +154,10 @@ template, same depth, same commit. Does NOT stamp and does NOT satisfy the densi
 
 ## 📊 State file schema
 
-Tab-separated, header row, one listing per line, identical in every lane file.
+Tab-separated, header row, one listing per line, identical in every lane file. **17 columns.**
 
 `id` · `role_id` · `lane` · `title` · `org` · `location` · `site` · `url` · `posted` · `first_seen` ·
-`salary` · `level` · `status` · `friction` · `also_lanes`
+`salary` · `level` · `status` · `friction` · `also_lanes` · `accessibility` · `requirements`
 
 - **`url` is THE validity gate. No URL = no row** — log an unlinked sighting in NOTABLE instead.
 - `id` = `JM-<BOARD>-<org-slug>-<role-slug>`, **permanent**; a title change does not get a new ID.
@@ -167,8 +167,37 @@ Tab-separated, header row, one listing per line, identical in every lane file.
   `first_seen` for both and say so in NOTABLE (the APAP precedent).
 - `level` = `senior`/`mid`/`associate`/`entry`/`contract` · `status` = `live`/`gone`/`acted` ·
   `friction` = `direct`/`email`/`gated`.
+- **`accessibility`** (col 16, added 2026-09-18) — pipe-separated tiers, or empty. The TESTS live in
+  `roles.json` `global.highlight_tiers`, which is the single claimant; what follows is a pointer.
+  - `remote` — the posting SAYS remote. 🔴 **NEVER inferred**, and the words get quoted in NOTABLE. A
+    board metadata card reading "(Remote)" over a body reading "Work Location: In-office" is REFUSED.
+  - `hybrid` — the posting SAYS hybrid. Same rule. Never inferred.
+  - `home` — inside 90mi of Rochester NY, which reaches Syracuse (~87mi) and Buffalo (~75mi). **The one
+    derivable tier**, because geography is arithmetic rather than a claim.
+  - `immediate` — rolling, ongoing or start-now calls. This tier is SPEED TO WORK. 🚫 **Never collapse
+    it into geography**; a remote rolling call is `remote|immediate`.
+  - Michael's 09-10 ruling: home-accessible and remote work gets its own highlight, which is the ⚡
+    ACCESSIBLE block in Template 6 — **mandatory even when empty**, and an empty one must name which
+    sources were swept for it.
+- **`requirements`** (col 17, added 2026-09-19, approved by Michael) — what the posting DEMANDS:
+  credentials, named software platforms, years-of-experience floors, degrees. Semicolon-separated, or
+  empty. Until this column existed the schema had nowhere to hold a credential, so across 345 rows and
+  143 new finds **zero requirements data was ever captured.**
+  - ⭐ **Quote, never paraphrase.** `CTS preferred (or commitment to achieve certification within 12
+    months)` is a materially lower barrier than `CTS required`, and a paraphrase destroys the difference.
+  - **Name the PLATFORM, not the category:** `AutoCAD; Revit`, never `CAD software`. Michael's 09-18
+    AutoCAD deferral is a filter someone downstream applies, and it can only fire if AutoCAD is named.
+  - **Tool fluency IS a requirement.** The creative-admin lane gates on tooling (MailChimp, Canva,
+    WordPress, Monday.com, donor databases), not certification — a finding worth nothing unless a column
+    can hold it.
+  - Empty means **NOT CAPTURED**. It never means *none required*. Absence of evidence only.
+  - Consumers: Portfolio Paige's credential roadmap and Compass Corso's path reverse-engineering. Her
+    open 2026-08-02 question — how to hold posting requirement language — is what this column answers.
 - One row per listing per board. Cross-posted between boards = two rows. Cross-LANE = one row + `also_lanes`.
 - ⚠️ **The schema may only change in a BUILD session, never inside a pass** (README rule 7).
+- 📖 **Column-count drift mid-migration is EXPECTED, not corruption.** A lane file last rewritten before
+  a column shipped carries fewer columns; it is a file awaiting its next pass. New columns are always
+  **appended LAST** so no existing column index ever shifts.
 
 Board codes: `OSJ` · `USITT` · `PB` · `ECN` · `AS` · `TAL` · `BWW` · `SB` · `SJ` · `ACG` · `TOC` · `IND` ·
 `LI` · `FL` · `LCTJ` · `APAP` · `SL` · `SKN` · `TSJ` · `HC` · `TWO` · `GOV`
@@ -219,6 +248,8 @@ defect v18 fixes.
      header and it is the only fact in this routine no artifact records for you.
    - Capture a **direct URL** and friction type for every qualifier. Recover gated/unlinked URLs per the
      recovery procedure in `job-market-sources.md`.
+   - 🏷️ **Capture `accessibility` and `requirements` AT THE SOURCE, while the posting is open in front of
+     you.** Neither can be reconstructed later from a lane file, and `remote` cannot be inferred at all.
 7. **NOW read this role's lane file** — the known inventory you are comparing against. Also collect every
    row in OTHER lane files whose `also_lanes` names this role; those are the `↔️ ALSO` pointers.
 8. **Apply `exclude_terms[]` and `global` constraints.**
@@ -294,6 +325,10 @@ posted, so **the next session can find its place with or without your note.** A 
   or to let "carried" wear a ✅. Four distinct states, four distinct marks.
 - **You are about to mark a row GONE because a board was unreachable or a cache was stale.** Carry it,
   mark it unverified, name the reason.
+- **You are about to tag `remote` or `hybrid` from anything other than the posting's own words.** Those
+  two tiers are never inferred, and a metadata card is not the posting. Quote it or drop it.
+- **You are about to fold `immediate` into a geography tier**, or to treat an empty `requirements` cell
+  as evidence that a job asks for nothing. Empty means not captured.
 - **You are about to stamp a pass you only partly ran**, or a single-role top-up. Neither stamps.
 - **You are about to post SAME, ALSO, NEW, GONE or NOTABLE as a ROOT comment.** Always threaded replies.
 - **You are about to lump multiple NEW listings into one comment.** Each is its own reply.
