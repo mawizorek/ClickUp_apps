@@ -116,6 +116,12 @@ Do NOT fall back to posting flat root comments. A failed thread is visible; a fl
 > what happened on the resume: **attach the missing blocks to the existing header, and correct the header's
 > counts in place.** Never leave an orphan header, never open a second header for the same role in one pass.
 > ⚠️ **The Resume Scan now treats "header with no block" as NOT DONE** and sends the next session back to it.
+> 🔴 **RECURRED 2026-09-18, on the CHAT CHANNEL rather than the task:** three separate spine-line replies to a
+> board session header failed with the same *"failed to find the parent message"* across three ID forms (message
+> URL, prefixed `comment:<id>`, bare id). Recovery was to post at channel ROOT carrying an explicit
+> `⚠️ thread write failed` marker naming every attempt, so it could not read as a silent flat-post defect.
+> **Two surfaces, same failure, fourteen months apart: assume threading can fail at any moment and always leave
+> the failure visible.**
 
 ---
 
@@ -240,6 +246,24 @@ empty; NOTABLE explains HOW hard you looked. "Thin" with neither is indistinguis
 2. ...
 3. ...
 
+### ⚡ ACCESSIBLE
+<MANDATORY, and mandatory EVEN WHEN EMPTY. Every row tagged remote / hybrid / home / immediate in the
+`accessibility` column (added 2026-09-18). Tiers are defined in job-market-roles.json → global.highlight_tiers,
+which is the single claimant for their tests.>
+- 💻 `remote` · [<Role>](<url>) — <Org> · 💵 <salary> · *"<exact quoted words from the posting body>"*
+- 🏠 `home` · [<Role>](<url>) — <Org> · <location, ~<n>mi> · 💵 <salary>
+- ⚡ `immediate` · [<Role>](<url>) — <Org> · <why: rolling / open until filled>
+
+<If NOTHING qualified, say so explicitly AND name which sources were swept for it. An absent block and a
+swept-empty one are different facts, and conflating them is the single most-repeated failure in this routine.>
+```
+
+🔴 **`remote` and `hybrid` must carry the QUOTED WORDS that justify them.** Never inferred, never taken from a
+board's metadata card over a posting body. Live case, 2026-09-18: a card read *"Washington, DC (Remote)"* while
+the body read *"Work Location: In-office."* Two more the same day advertised "Remote" on the card while the
+employer feeds said Kansas City and Denver. **All three were refused. The body wins.**
+
+```
 ### 🗃️ Unfiled
 <Only if _unfiled.tsv gained rows this pass. One line each. Omit the section entirely if none.>
 - [<Role>](<url>) — <Org> · <location> · 💵 <salary> · <why no lane fits>
@@ -286,6 +310,47 @@ comment's posted-at, and the gaps between comments. Never carry them forward in 
 - [**Indeed**](https://www.indeed.com) `IND` — ✅/⚪/⚠️/❌ · <n> qualifying
 <repeat per board, including the venue/arena/municipal boards swept for operations-safety>
 ```
+
+### 🔍 THE OSJ DEPARTMENT-INDEX QUERY STRINGS (added 2026-09-19 — this file is their claimant too)
+
+**Browsing these indexes is REQUIRED every pass** (`job-market-sources.md` → the Department-Index Law). The
+exact query strings live HERE, because a wrong one fails UPWARD: it silently returns the unfiltered board
+formatted exactly like a successful department browse.
+
+```
+https://staging.offstagejobs.com/jobs.php?department=scenic+%2F+sets
+https://staging.offstagejobs.com/jobs.php?department=lighting+%2F+electrics
+https://staging.offstagejobs.com/jobs.php?department=sound
+https://staging.offstagejobs.com/jobs.php?department=management
+https://staging.offstagejobs.com/jobs.php?department=administration
+https://staging.offstagejobs.com/jobs.php?department=properties
+```
+
+🔴 **THE BROKEN FORM, AND IT HAS COST TWO PASSES: `?department=Scenic`.** It returns the ENTIRE BOARD — 612 of
+612 on 2026-09-18 — and nothing about the response looks wrong. The label is **lowercase**, the slash is
+**`%2F`**, and spaces are **`+`**. Truncating `scenic / sets` to `Scenic` is the specific mistake.
+
+**Expected filtered counts, so a future agent can verify a filter applied WITHOUT first establishing a
+baseline.** If your filtered count is ~600, the filter did not apply:
+
+| Department | Filtered | Unfiltered | Observed |
+|---|---|---|---|
+| Scenic / Sets | **339** | 602 | 2026-09-19 |
+| Lighting / Electrics | 142 | 601 | 2026-09-18 |
+| Sound | 95 | 635 | 2026-09-18 |
+| Management | 112 | 614 | 2026-09-18 |
+| Administration | 51 | 612 | 2026-09-18 |
+| Properties | 38 | 615 | 2026-09-18 |
+
+⚠️ **Two board defects found the same day, both of which limit what a sweep can honestly claim:**
+
+1. **Pagination is broken past page 2.** Scenic / Sets advertises **17 pages**; requests for pages 3-17 return
+   page-1 content repeatedly. So an OSJ department harvest is **structurally partial** and must be reported as
+   such. This compounds the existing rule that an OSJ row can be confirmed live but **never proved GONE** by
+   absence from an index.
+2. **The board is NOT snapshot-consistent.** Two correctly-encoded requests minutes apart returned
+   *310 of 612* and *339 of 602*. Both prove filtering; **neither is authoritative on totals.** Do not treat a
+   changed count between passes as market movement.
 
 ## Template 8: ⏸️ CHECKPOINT (root comment, optional) — **A HUMAN COURTESY, NOTHING MORE**
 
