@@ -95,10 +95,29 @@ All five carried a claim on the board. `list_commits --since 2026-08-06` (whole 
 
 **How rows got cleared before this:** by whoever next PROVED the session was done. Only **three** self-clears in the file's history (router nav-seal 08-04 · Tutor Tate 08-05 · dependency-wording 08-11), against six rows cleared by someone else. **Rule 7 said delete your row on close and nothing enforced it.** As of 2026-08-11 the clear is **Step 4 of `hooks/session-close.md`** and a numbered rule, which is the fix for that.
 
+---
+
+## 🅿️ Row retired 2026-09-20 with evidence — Vector Vale, Sep 10
+
+| Session | Claimed | Last movement | Evidence |
+|---|---|---|---|
+| Vector Vale · VWX docs cleanup + standards ratification + publication plan · Sep 10 · `vale/a3-stop-litigating-visibility` | **`ClickUp_apps`**: `super-agents/vector-vale/memory.md` + its own row. Content-repo claims already self-RELEASED in the row text. | **2026-09-10 21:57:07Z** | `list_commits --path brain-config/super-agents/vector-vale/memory.md --since 2026-09-10` → two commits, newest `23223e7` (PR #917, the A3 write), then **nothing for ten days.** Rule 8 expiry met four times over. |
+
+✅ **The claimed work LANDED** — A3 is in `memory.md`, PR #917 merged the same evening. **This is a clean close that never cleared its row**, not abandoned work. 🔁 Re-post with a branch if anything here is still live.
+
+⚠️ **Worth recording, because it is a NEW shape of stale row.** The five rows retired on 08-11 were dormant *work*. **This row's work finished and the row outlived it by ten days** — so the board said *"Vale is in `memory.md`"* during the exact period Vale was flagging his own unwritten memory batch as overdue. **The surface that exists to say who is working claimed he was, while the thing it claimed he was doing was the thing not happening.** A stale row does not just misdirect other sessions; **it can also read as evidence that a debt is being serviced.**
+
+⭐ **And the root cause is the one this file already names:** the clear is Step 4 of `hooks/session-close.md`, and **a session that ends without running the close hook never reaches it.** Five of Vale's sessions (09-12 → 09-19) ran and closed without ever touching the board or the git bundle. **The step exists; the close is what was skipped.** Same fault shape as the spine's four zero-line sessions.
+
+🔴 **SEPARATE EXPIRY CANDIDATE, flagged not swept:** **Dev Dexter's row is dated Sep 17** and claims `uritp-safety` `01-utility/**` plus `index.md`. That is past the 48-hour expiry on its face, **but its claims are in another repo this file cannot cheaply verify**, and rule 8 wants evidence per claimed path. Left in place deliberately rather than cleared on a guess — **a wrongly-cleared row costs a re-post; clearing it without the `uritp-safety` evidence would be exactly the guess rule 8 forbids.**
+
+---
+
 ### Two shapes of stale row, and the second one is worse
 
 - **A stale presence row** says *"someone is here"* and is believed. The URITP audit row was stale four days and claimed the exact two files a later session needed. **An empty board says "nobody posted"; a stale row lies.**
 - 🔴 **A stale BLOCKER can park real work indefinitely.** The `uritp-docs` row claimed `uritp.css` is *"34.8KB — OVER the write cap, so the nav typography CANNOT be done until that file is split."* All three clauses went false in one PR (#57): file split seven ways, typography shipped, cap enforced by a build gate. **A blocker is a claim with a shelf life, and nothing on this board expires** — which is why the board now has an expiry rule.
+- 🔴 **A row that OUTLIVES ITS OWN COMPLETED WORK reads as a debt being paid.** Vale, 09-10 → 09-20 (above). **Neither of the other two shapes covers it, because the work was not dormant and the claim was not false when written.**
 
 ---
 
@@ -166,6 +185,7 @@ Six endpoints served stale or empty data in two days: Contents (a stale `active.
 
 - ⚠️ `/PREFERENCES.md` is at effectively zero headroom, blocking qualified writes, and the OMR queue is jammed behind Michael's capacity ruling — **DROP works, DRAIN is blocked.**
 - 🧠 **BUNDLE CAP WAS THE #1 OMR BLOCKER AND MICHAEL CUT ITS ROOT CAUSE (07-30).** Ruling: `memory.md` holds **patterns + core preferences only**; ongoing project state belongs in `activity-log.md`. **Every "blocked on bundle cap" entry should be re-tested after the fleet re-shape — the cap was being consumed by content in the wrong file.**
+- 🔴 **A DEFERRED MEMORY BATCH IS A COMPOUNDING DEBT, and the agent flagging it is not the same as the agent paying it** (Vale, 09-12 → 09-19). Eleven items were marked `WRITE-READY, batched for one git commit` across five sessions; the batch was self-flagged *"overdue,"* then *"overdue past the point where flagging it is enough,"* then *"the next thing I do, not the next thing I mention"* — **and it still did not happen until a different session was told to clean him up.** ⭐ **Batching is correct; batching without a trigger is a queue with no consumer.** ⚠️ Cost was measurable: a second agent (Vellum Victoria) had its lane boundary defined against Vale's, and half of Vale's lane existed only in ClickUp comments at the time. **A seam drawn against an unwritten ledger is drawn against testimony.**
 
 ### App-specific, carried because it keeps biting
 
@@ -188,4 +208,5 @@ Six endpoints served stale or empty data in two days: Contents (a stale `active.
 
 ## Changelog
 
+- **2026-09-20 — Vale's Sep 10 row retired with evidence**, plus a third shape of stale row named (a row that outlives its own completed work) and a memory scar recorded about deferred batches. Dexter's Sep 17 row flagged as an expiry candidate, **not** swept — its claims live in `uritp-safety` and rule 8 wants per-path evidence.
 - **2026-08-11 — Sidecar created.** `session-board.md` split at Michael's direction: **32,393 B → a slim table**, with all post-mortems, scars and retired rows moved here. Board gained an **expiry rule** and a declared **self-claim exception**; the row clear became **Step 4 + rule 28** of `hooks/session-close.md`. Nothing deleted.
