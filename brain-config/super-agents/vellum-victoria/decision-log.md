@@ -9,6 +9,52 @@ Vale?"*
 
 ---
 
+## D7 · 2026-09-20 · Groundplan reading RULED SETTLED · badge collision CONFIRMED and fixed
+
+Two closures within hours of birth, and they pulled in opposite directions — one open item retired, one
+flagged risk proven real. **Both are worth keeping because the pattern is the same: a flag is a
+prediction, and predictions resolve.**
+
+**1. ✅ GROUNDPLAN READING — CLOSED BY MICHAEL.** Verbatim: *"we know you can read groundplans. move
+on."* This retires the Production Office ballot's longest-standing open item (opened 2026-08-01,
+described there as *"a five-minute test, and the panel's headline capability rests on it"*) and
+**supersedes D6 below.**
+
+⚠️ **Recorded as HIS RULING, not as a test this session ran.** No session has demonstrated a
+groundplan read end to end; Michael asserted the capability from his own experience, which is
+testimony and is sufficient for him to rule on. **The honest framing matters because the two are not
+the same evidence class**, and a later session must not cite this as "tested 2026-09-20."
+
+⭐ **What the ruling settles and what it does not.** It settles CAPABILITY and kills the hedging. It
+does NOT touch PROVENANCE, which stays binding forever: say what she actually read, never imply she
+inspected a drawing she was not given, carry the issue date. **Michael answered "can she?" — he did
+not answer "did she?", and only the second one is ever a lie.** That distinction is now in her
+profile as a standing rule rather than a caveat.
+
+⚠️ **And a note on how the item died:** it sat open for seven weeks as a *five-minute test*, then was
+closed by ruling in four words. **A cheap open item is not cheap to carry — it is cheap to RESOLVE,
+and nobody resolved it.** Worth remembering the next time something gets parked as trivial.
+
+**2. 🔴 BADGE COLLISION — the birth flag fired on the FIRST check.** She shipped announcing with 📐 and
+her profile flagged, at birth, that this *"may collide with Vale's 📐 — flagged rather than discovered
+later."* ✅ **It collided.** 📐 is Vale's option in the workspace `Agent Assignee` labels field.
+**Corrected to 📜 (rolled drawings)**, verified clean against all 28 existing options.
+
+⭐ **Why this one is worth a log entry rather than a silent fix:** two agents sharing an announce
+header is bad anywhere, and **worst on the two halves of ONE seam whose names are already a one-vowel
+gap.** The badge was the last visual disambiguator left after `Vellum`/`Vale` was accepted. Losing it
+would have meant the only reliable way to tell them apart was reading four syllables of first name.
+✅ **The flag-at-birth habit paid for itself inside four hours.** Flag the thing you suspect, in the
+file, at the moment you suspect it.
+
+**Also recorded: `Agent Assignee` is a WORKSPACE-scoped labels field** (28 options at her birth),
+format `<emoji> <Full Display Name>`. 🔴 **No agent tool can add an option to an existing labels
+field**, so her label is Michael's manual step. Until it exists, `hooks/agent-task-scan.md` (load
+contract step 5b) returns empty for her — **and empty reads as "no work assigned," which is
+indistinguishable from a clean pass.** Same failure shape as the retired-manifest reads.
+
+---
+
 ## D1 · 2026-09-20 · RETIREMENT CONDITION (written before she ever ran)
 
 **No agent in this fleet had a retirement condition until the Production Office set the precedent.
@@ -118,16 +164,15 @@ not fenced). First name **`Victoria`** is his ruling over Felix's objection.
 
 ---
 
-## D6 · 2026-09-20 · She ships on an UNTESTED headline capability, and it is declared
+## D6 · 2026-09-20 · She shipped on an UNTESTED headline capability — ✅ SUPERSEDED BY D7 the same day
 
-The Production Office ballot has carried this open item since 2026-08-01: *"Can we actually read a
-real groundplan? Unanswered across five rounds. A five-minute test, and the panel's headline
-capability rests on it."*
+⚠️ **Kept, not deleted** (reversals stay struck rather than vanishing, per the Doc-Rot Sweep rule).
+**D7 closes this by Michael's ruling.**
 
-🔴 **Seven weeks later it is still open, and Victoria's entire lane is drawings.** Rather than block
-her, the capability is **fenced in her profile**: she works from what is written down about the set,
-never from claimed visual inspection of a drawing she was not shown, and she never implies she read
-one she did not open.
+The Production Office ballot carried this open item since 2026-08-01: *"Can we actually read a real
+groundplan? Unanswered across five rounds. A five-minute test, and the panel's headline capability
+rests on it."* At her birth it was still open, so the capability was **fenced** in her profile rather
+than blocking her: work from what is written down, never claim inspection of an unseen drawing.
 
-⚠️ **This is a known, stated limitation, not a discovered one.** A session that runs the test should
-write the result into Ledger A and amend this block.
+✅ **Michael ruled it settled hours later.** The fence on PROVENANCE survives and is now a standing
+rule; the fence on CAPABILITY is gone.
