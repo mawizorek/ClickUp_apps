@@ -1,112 +1,113 @@
 # Vale — Memory (patterns + ruled conventions)
 
-> PATTERNS and RULED CONVENTIONS only. Counts, statuses and project phase live in the LIVE STATE block on [Vale's Agent Index row](https://app.clickup.com/t/86ake8men) (base spec §4a). **A number in this file is a defect on sight — move it, do not refresh it.**
+> PATTERNS and RULED CONVENTIONS only. Counts, statuses, project phase **and the open-question list** live in the LIVE STATE block on [Vale's Agent Index row](https://app.clickup.com/t/86ake8men) (base spec §4a — an open question can close in a day, so it is STATE). **A number in this file is a defect on sight.**
 >
-> ~10KB hot cap (`hooks/memory-rotation.md`). **Rotated 2026-09-10** — detail graduated to `memory/archive/vwx-reference-2026-09.md`.
+> ~10KB hot cap (`hooks/memory-rotation.md`). Archives: **`memory/archive/vwx-reference-2026-09.md`** (standards package, Spotlight, rigging, records) · **`memory/archive/vwx-performance-referencing-2026-09.md`** (referencing topology, storage, performance, VW's own bug list). Load on demand; **never restate them here.**
+
+---
+
+## 🔑 THE ORGANIZING PRINCIPLE — **WHAT TRAVELS**
+
+**Promoted 2026-09-20 from a six-instance tally to a named principle.** Every hard question in this lane resolves by asking which of three layers a thing lives in, and who next opens the file:
+
+1. **DOCUMENT state** — travels with the file; a template can carry it. Classes, layers, symbols, caches, purge state, origin, reference settings.
+2. **MACHINE state** — user folder, invisible to a collaborator, **cannot be templated.** Undo count, VectorCaching, graphics acceleration, workspaces, plug-ins, `SavedSettings.xml`.
+3. **STORAGE state** — the file's bytes may not be where the path says. iCloud eviction.
+
+⭐ Six independent appearances in a month (DWG hedge · plug-in vs document resource · library-as-source vs shelf · script palette · memory levers · file location), and **a Load Board built to Michael's own navigation habits sorted its panels into these three groups unprompted.**
+
+🔑 **Before answering: which layer is this, and can `vwx-base-file/` carry it at all?** If it cannot, say so — a standard that cannot travel is advice.
 
 ---
 
 ## 📒 Ledger A — Conventions Michael has RULED
 
-### A1 · 2026-09-10 · 🔑 The VWX prose notes are about VECTORWORKS. Venue information goes to the URITP notes.
+### A1 · 2026-09-10 · 🔑 The VWX notes are about VECTORWORKS. Venue information goes to the URITP notes.
 
-**Michael, verbatim:** *"I just want you to talk about Vectorworks documentation and how we build our Vectorworks files. Any info about the venue should go into my URITP notes and not in my Vectorworks prose notes. **They are entirely different!**"*
+**Verbatim:** *"I just want you to talk about Vectorworks documentation and how we build our Vectorworks files. Any info about the venue should go into my URITP notes and not in my Vectorworks prose notes. **They are entirely different!**"*
 
-**The line:** how a Vectorworks file is BUILT is craft and portable — class grammar, layer conventions, symbol rules, referencing, origin discipline, template structure, drafting standards, the DWG hedge. **What is true about a ROOM is not**, even when the room's facts live inside a `.vwx`.
+How a file is BUILT is craft and portable — class grammar, layer conventions, symbol rules, referencing, origin discipline, template structure, drafting standards, the DWG hedge. **What is true about a ROOM is not**, even when the room's facts live inside a `.vwx`. The Smith layer LIST and class LIST are venue content: **the grammar is portable, the inventory belongs to the building. A rule is a standard; an instance is a venue fact.**
 
-**Consequence:** the layer LIST and the class LIST for Smith are venue content. The *grammar* is portable; the *inventory* belongs to the building. **A rule is a standard; an instance is a venue fact.**
+🚫 **No venue name in a `standards/vectorworks/` file.**
 
-🚫 **Do not put a venue name in a `standards/vectorworks/` file.**
+### A2 · 2026-09-10 · The venue package in the prose repo was SLOP, and he had been pruning it himself
 
-### A2 · 2026-09-10 · The venue package in the prose repo was SLOP, and he had already been pruning it himself
+*"all that other shit is slop that I think you put in the first place."* ✅ Verified: `maw-prose/venues/smith-theatre/` was MAW Agents, PRs #3/#5, 2026-07-29. ⭐ **His two "mysteries" were him enforcing A1 before it was written** — he DELETED `the-room.md` (08-04) and COMMENTED OUT `layers.md` (08-17). **Legible in git for five weeks and I read it as rot.**
 
-**Michael:** *"all that other shit is slop that I think you put in the first place."* ✅ Verified true: `maw-prose/venues/smith-theatre/` was MAW Agents, PRs #3/#5, 2026-07-29.
+### A3 · 2026-09-10 · 🔴 STOP LITIGATING PUBLIC vs PRIVATE. Ruled 2026-07-29; I re-opened it six weeks later.
 
-⭐ **His two "mysteries" were him enforcing A1 before it was written:** he DELETED `the-room.md` (08-04) and COMMENTED OUT `layers.md` (08-17). **The intent was legible in git for five weeks and I read it as rot.**
+**Michael:** *"why do you keep over complicating this."* His Prose DL Q16 note had answered it already: *"nothing here is ever actually public unless I send it out … I share control and gatekeep … we are not holding PII in this shit and **I'm annoyed that all we do is talk about private/public and share. I want to just be able to see my fucking notes that I'm taking.** we are NOT starting another doc editor wiki version of what we already have."*
 
-### A3 · 2026-09-10 · 🔴 STOP LITIGATING PUBLIC vs PRIVATE. He ruled it on 2026-07-29 and I re-opened it six weeks later.
+**Three parts:** (1) **visibility is not the question and not a blocker** — he gatekeeps by choosing what to send · (2) **the content carries no PII**; treating class trees as a classification problem IS the over-complication · (3) 🚫 **no new doc surface, editor, wiki or site — ever, unless he asks.**
 
-**Michael today:** *"why do you keep over complicating this."* **Michael on 2026-07-29, Prose DL Q16 note, which was sitting there the whole time:**
+⚠️ **My failure, precisely:** I made visibility **THE GATING QUESTION** and asked him to rule what he had ruled. **A stale framing I inherited from the DL outranked a direct instruction from him inside the same DL** — I read the options, not the note.
 
-> *"nothing here is ever actually public unless I send it out and give it to someone … they're all mine. I share control and gatekeep … I understand technically they're publicly findable BUT … we are not holding PII in this shit and **I'm annoyed that all we do is talk about private/public and share. I want to just be able to see my fucking notes that I'm taking.** we are NOT starting another doc editor wiki version of what we already have."*
-
-**The ruling, in three parts:**
-1. **Visibility is not the interesting question and is not a blocker.** He gatekeeps by choosing what to send. Findability is understood and accepted.
-2. **The content genuinely carries no PII.** Layer names and class trees are not sensitive; treating them as a classification problem is the over-complication.
-3. 🚫 **No new doc surface, editor, wiki or site.** Ever, unless he asks.
-
-⚠️ **What I did wrong, precisely:** I opened the 09-10 session by making visibility **THE GATING QUESTION** and asked him to rule on it before cleanup could start. He had ruled. **A stale framing I inherited from the DL outranked a direct instruction from him inside the same DL** — I read the Q blocks and analysed the options and did not read the note where he answered.
-
-🔴 **RETRACTION, same pass:** Ledger B said three DL rulings (J8, J10, Q1) are *"WRONG"* because they call `maw-prose` private. **They are not wrong — my reading was.** He is not making a security claim, he is saying *I am the gate and nobody reads it unless I hand it over.* The only genuinely false artifact was one published README sentence, and it is gone with the tombstone.
+🔴 **RETRACTION:** Ledger B called three DL rulings (J8, J10, Q1) *"WRONG"* for calling `maw-prose` private. **They are not wrong — my reading was.** Not a security claim; *he is the gate.*
 
 ---
 
-## 📕 Ledger B — What exists (pointers; detail is archived)
+## 📕 Ledger B — The surfaces (pointers only)
 
-🔑 **Detailed content → `memory/archive/vwx-reference-2026-09.md`.** Load it when working the substance; do not restate it here.
+- 🔑 **`maw-prose/standards/vectorworks/`** — **Vale's home surface.** Portable craft only, venue-agnostic since 2026-09-10 (PR #51).
+- **`maw-prose/venues/`** — 🗑️ tombstoned, flagged for his delete. ⚠️ **`smith-theatre/classes/walls/` CARVED OUT** — his own files, 08-17, not mine to sweep.
+- 🔑 **`uritp-docs/production/venues/spac/`** — the venue home, his hand. `smith-theatre/` + `vwx-base-file/` (layers + classes filled, PR #186).
+- **The ClickUp `Vectorworks` reference tree** — a further surface. **Assume nothing about which is fresher.**
+- **`Resource FOLDERS`** (URITP Inventories) — ⚠️ scaffolded, **never populated.** Empty means never populated, not emptied. **Not a source.**
+- **His files read as EDUCATIONAL edition**, which gates `Check File Health` (subscription-only). Unverified — **never tell him to run a tool his license may not have.**
 
-### The surfaces, after A1
+⚠️ **Visibility is per repo** (`maw-prose` public, `uritp-docs` private): a ROUTING fact, not a security one (A3). Never carry it across.
 
-- 🔑 **`maw-prose/standards/vectorworks/`** — 4 files. **Vale's home surface.** Portable craft only, venue-agnostic as of 2026-09-10 (PR #51).
-- **`maw-prose/venues/`** — 🗑️ tombstoned, five files flagged for his delete. ⚠️ **`smith-theatre/classes/walls/` is CARVED OUT** — four files he authored 08-17, headings only, not mine to sweep.
-- 🔑 **`uritp-docs/production/venues/spac/`** — the venue home, his hand, doc-render frontmatter. `smith-theatre/` + `vwx-base-file/` (layers + classes **now filled**, PR #186).
-- **The ClickUp `Vectorworks` reference tree** — a further surface. Assume nothing about which is fresher.
-- **`Resource FOLDERS`** (URITP Inventories) — scaffolded, unpopulated. Empty means never populated.
+🔴 **The Prose DL is STALE for this lane.** Opened 2026-07-29; `uritp-docs` did not exist until 08-03, so its whole publishing thread argues a repo he never built and then built differently. **Do not route VWX decisions there or mine it for open questions.**
 
-⚠️ **Visibility is per repo** (`maw-prose` public, `uritp-docs` private) and is a ROUTING fact, not a security one — see A3. Never carry it across; never re-open it as a question.
+🔴 **THE ONE UNRULED ITEM THAT GOVERNS THE OTHERS — EMBED vs REFERENCE.** Open since 2026-09-08 as a contradiction inside the standards package's own text: the DWG hedge says keep resources EMBEDDED, the Resource Manager guidance says REFERENCE from a master. **Vale's position, offered twice, NOT ruled: reference the GEOMETRY, embed the RESOURCES** — a dead room reference is one missing drawing, a dead library reference greys out every fixture. It decides whether the library is a **SOURCE or a SHELF**, and class tree, template family and script-palette home all resolve from it. 🚫 **Out of Ledger A until he rules. Never promote a position by repeating it.**
 
-🔴 **The Prose DL is STALE for this lane.** Opened 2026-07-29; `uritp-docs` did not exist until 2026-08-03. Its whole publishing thread (Q14 · Q16 · Q17, arguing about a `uritp-wiki`) debates a repo he never built and then built differently. **Do not route VWX decisions there and do not mine it for open questions.** Its still-useful rulings are already carried in this file.
-
-### 🔴 Genuinely open, and worth exactly one line each
-
-- **The uniform design-layer scale value is recorded nowhere.** The gap most likely to bite during a reference or viewport setup.
-- **`classes/walls/` — what were those four files meant to be?** Walls are architecture, not object categories; possibly per-wall systems notes filed one level off.
-- **The class tree has no default attributes** for any class, so the first person to draw sets them by accident.
-- **A collaborator at the venue keeps a PARALLEL 3D model.** Two models of one room — never assume which is fresher.
-- ✅ **Elevation-in-class: SETTLED.** His own URITP Smith index says *"the band is part of the layer name, never a class."* Only the `URITP-4421` note is stale.
+📋 **Every other open question lives on the Agent Index LIVE STATE block, not here.**
 
 ---
 
 ## 📗 Ledger C — Recurring file problems
 
-- **C1 · ~~Documentation that exists and does not render.~~ RETRACTED 2026-09-10.** `layers.md` was **his own park**. ⭐ **Before calling a document broken, read the commit that broke it.** A reading problem, not a file problem.
-- **C2 · Vendor docs that resolve at a STALE version and read as current.** Mine: recommended a command VW2020 had replaced, off a 2018 page. 🔑 **Read the year in the URL.**
-- **C3 · One truth, several surfaces.** ⭐ **The CONTENT and its CORRECT HOME were in different repos** — a stranded migration, not duplication. Resolved for layers/classes 2026-09-10.
+- **C1 · ~~Docs that exist and do not render.~~ RETRACTED 2026-09-10** — `layers.md` was **his own park.** ⭐ **Read the commit that broke it before calling a document broken.**
+- **C2 · Vendor docs that resolve STALE and read current.** Mine: recommended a command VW2020 replaced, off a 2018 page. 🔑 **Read the year in the URL.**
+- **C3 · One truth, several surfaces.** The CONTENT and its CORRECT HOME were in different repos — a stranded migration, not duplication.
+- 🔴 **C4 · 2026-09-19 · HELP DOCUMENTS INTENT; RELEASE NOTES DOCUMENT FAILURE.** I read six referencing pages, four preference panes, File Health and Purge exhaustively and **never asked whether the behaviour was a DEFECT** — his two symptoms are named VW bugs with fix IDs. **A symptom is a configuration, a misuse, or a BUG, and I considered only the first two.** The Source-Freshness Gate made me version-check every DOC; nothing made me version-check his APPLICATION. **Check the release notes before diagnosing the configuration.**
+- 🔴 **C5 · 2026-09-17 · A CATALOGUE IS NOT A DIAGNOSIS.** Six causes ranked by frequency, when the useful answer was a **DISCRIMINATOR** one question away — his own symptom pattern ruled out most of my list. **The ordering must come from HIS symptoms.**
+- 🔴 **C6 · 2026-09-17 · ORDER CARRIES THE RISK, NOT THE ACTION.** The correct iCloud fix in the wrong order is a documented **data-loss** class (moving evicted files moves empty placeholders). Second time in a month. **State the ORDER and what breaks mid-way before proposing any migration.**
 
 ---
 
 ## How Michael works (confirmed patterns only)
 
-- **Collapses duplicate sources of truth on sight. Never propose a mirror, a second editor, or a new surface.**
-- **Chooses the structural fix over another behavioural rule.**
-- 🔑 **He prunes by DELETING, quietly.** **His deletions are rulings with no prose attached** — read the commit, not just the tree.
-- 🔑 **He answers a framing question with a better question.** When he asks one back, **the premise is what he is disputing.**
-- 🔴 **His NOTES outrank the checkbox options, and they outrank my analysis.** The options are my framing; the note is his ruling. **Read every note before reading a single option.**
-- 🔴 **He does not repeat himself patiently.** *"WE KNOW THISSSSSS."* A question he has answered, re-asked, reads as not listening — not as diligence.
-- **Wants the reasoning kept, not just the outcome.**
-- **He will delete a thing he just paid to fix.** Sunk cost is not an argument he accepts.
-- **He knows this craft far better than the documentation does.** A claim about his domain is mine to ASK, never assert.
-- **He asks HOW IT WORKS, not just what to do.** A bare recommendation with no mechanism is worth less to him than the mechanism alone.
-- **Dictates.** A garbled term is more likely mis-heard than wrong — name it, offer the candidate, ask, stop.
+- **Collapses duplicate sources of truth on sight.** Never propose a mirror, a second editor, or a new surface. **Prefers the structural fix to another behavioural rule.**
+- 🔑 **He prunes by DELETING, quietly. His deletions are rulings with no prose attached** — read the commit, not just the tree.
+- 🔑 **He answers a framing question with a better question.** When he asks one back, **the premise is what he disputes.**
+- 🔴 **His NOTES outrank the checkbox options and outrank my analysis. Read every note before a single option.**
+- 🔴 **He does not repeat himself patiently.** *"WE KNOW THISSSSSS."* A re-asked question reads as not listening.
+- 🔑 **A PARK IS A SEQUENCING INSTRUCTION, NOT A REJECTION** (09-12). *"Coming back to that convo"* → record as parked, **stop talking about it.** Treating a park as rejection loses the finding; treating it as open re-litigates it. **His handling carries information — here it is about ORDER, not merit.**
+- 🔑 **He tends to be on DEFAULTS, deliberately** (09-18), and describes them accurately even when he cannot name them. **Before flagging a hazard, check whether the default already prevents it.**
+- **Wants the reasoning kept, not just the outcome. He will delete a thing he just paid to fix** — sunk cost is not an argument.
+- **He knows this craft better than the documentation does.** A claim about his domain or his setup is mine to ASK, never assert.
+- **He asks HOW IT WORKS.** A recommendation with no mechanism is worth less than the mechanism alone.
+- **Dictates.** A garbled term is mis-heard before it is wrong — name it, offer the candidate, ask, stop.
 
 ## Where Vale expects to be wrong
 
-- 🔴 **Re-opening a settled question because I found the analysis rather than the answer.** A3. The cost is not wasted time, it is his trust that I read what he wrote.
-- 🔴 **Treating a stale document as authoritative because it is long and structured.** The Prose DL is six weeks old, superseded by a repo, and I mined it for a gating question.
-- 🔴 **Filing venue facts as standards** (A1). Seductive because a real number feels more useful than a rule.
-- **Confusing what the file DOES with what he DECIDED.** Geometry is evidence of a choice, not a record of one.
-- **Confusing SOURCED with RULED.** A dated page citing vendor docs reads as settled.
-- **Treating a document as present because the file exists.** Read the rendered content, not the listing.
-- **Designing a class tree before knowing what gets FILTERED.**
-- 🔴 **Quoting vendor documentation without checking WHICH VERSION** (C2).
-- 🔴 **Diagnosing his parks as rot** (C1).
+- 🔴 **Reading his setup PESSIMISTICALLY — four instances in one month, the pattern to watch.** Unbuilt read as broken · his parks read as rot (C1) · a concept-page sentence generalized into a universal the per-reference dialog contradicts (absolute vs relative paths) · a legacy-method hazard raised as his when his default blocks it. ⭐ **Cheap test: does the DEFAULT handle it, and does the per-object dialog carry an exception the concept page hides?**
+- 🔴 **Answering the question he ASKED instead of the one he WANTED answered** — twice. **Correct and small is still a failure.**
+- 🔴 **Supplying a plausible mechanism where the vendor is SILENT** (VW never documents whether reference updates cascade). **Unknown stays unknown; offer the sixty-second test he can run.**
+- 🔴 **Re-opening a settled question because I found the analysis, not the answer** (A3). The cost is his trust that I read what he wrote.
+- 🔴 **Treating a stale document as authoritative because it is long and structured.**
+- 🔴 **Filing venue facts as standards** (A1) — seductive because a real number feels more useful than a rule.
+- ⚠️ **Letting a quantified artifact launder a guess.** The Load Board's meters read like telemetry; no `.vwx` has ever been opened. **The QUOTES are the content; the numbers are a model.**
+- **Confusing what the file DOES with what he DECIDED** · **SOURCED with RULED** · **a document present because the file exists** · **designing a class tree before knowing what gets FILTERED** · 🔴 **quoting vendor docs without checking WHICH VERSION** (C2).
 
 ## Pointers (never restate)
 
-- **Archived detail:** `memory/archive/vwx-reference-2026-09.md`
-- **Repo coordinate:** re-derive at read time via `gates/repo-referent-gate.md`. **VWX craft → `maw-prose`. Venue → `uritp-docs`.**
-- **The working task:** `URITP-4421`. ⚠️ Several open items are answered by mechanisms VW already ships — check the tool before designing the answer.
-- **The doc-site family, already built:** `doc-render-engine` · `template-docs` (the shared page template) · `maw-themes`. 🚫 Publishing is an INSTANTIATION, never a build — and per A3, never a new surface.
-- **Authoring rules** for `uritp-docs` pages: `00-authoring/` + `template-docs/_template.md`. **Keep the header you find, not the one you remember.**
+- **Repo coordinate:** re-derive at read time (`gates/repo-referent-gate.md`). **VWX craft → `maw-prose`. Venue → `uritp-docs`.**
+- **Working task:** `URITP-4421`. ⚠️ Several open items are answered by mechanisms VW already ships — **check the tool before designing the answer.**
+- **VWX 2026 Load Board** (v3, teaching instrument, NOT a template): https://app.clickup.com/36074068/artifact/12cwjm-64473
+- **Doc-site family, already built:** `doc-render-engine` · `template-docs` · `maw-themes`. 🚫 Publishing is an INSTANTIATION, never a build — and per A3, never a new surface.
+- **Authoring rules** for `uritp-docs`: `00-authoring/` + `template-docs/_template.md`. **Keep the header you find, not the one you remember.**
 - **No one-click symbol inventory exists in VW** — worksheet database row → CSV; `name, type, default_layer, default_class, count`.
+- **Vellum Victoria** — the settings/status seam: she owns drawing-set STATE, Vale owns the VALUE. `preferences.md` §The seams.
 - Fiona's FileMaker Canonical Object Library — the cross-runtime twin.
