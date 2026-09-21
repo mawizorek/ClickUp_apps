@@ -19,7 +19,8 @@
 
 | Agent | Session | Branch | Working on | Files touched |
 |---|---|---|---|---|
-| Dev Dexter | Dexter (Opus 5) · Workshop the policy write-once / packet-print architecture · Sep 17 | `utility-build-report` (uritp-safety) · `dexter/board-0917-utility` (ClickUp_apps) | **Row MOVED IN PLACE, second scope change** (rule 5). The 15 `status:` flips are DONE and merged (uritp-safety #9 + #10) — **those policy-file claims are RELEASED.** Now: creating `01-utility/` (folder index + a `build-report.md` carrying `!!! report`) and adding ONE quick-link line to the root `index.md`, so this site finally has a reader for its own build report — `uritp-docs` has had one since 2026-08-07 and this site never got one. Explicitly authorised by Michael 2026-09-17 16:34 against that repo's EDIT LAW, which is why an agent is authoring a page here at all; the page is ENGINE MACHINERY, not safety prose, and no safety content is authored. ⚠️ Michael has pushed to this repo 6+ times today (14:03–14:59) including the folder I am editing — re-read HEAD immediately before every write and rebuild on his version, never merge over him. ⏳ **EXPIRY CANDIDATE flagged 2026-09-20** (rule 8, dated Sep 17): left in place rather than cleared because its claims are in `uritp-safety` and rule 8 wants per-path evidence this session did not gather. | **`uritp-safety`**: `01-utility/index.md` (NEW) · `01-utility/build-report.md` (NEW) · `index.md` (one link line) — **`ClickUp_apps`**: this row only |
+
+*Empty — the documented default. Last row retired 2026-09-21 (Dev Dexter, Sep 17, expired with per-path evidence; see the sidecar).*
 
 ---
 
@@ -36,6 +37,7 @@
 9. **Keep board edits tiny and fast.** On a non-fast-forward, **re-fetch and MERGE** — never force. A rejected write is the guard working.
 10. 🚫 **Nothing durable goes in this file.** Findings, scars and post-mortems go to the sidecar. Pending work goes to `open-thread.md`.
 11. 📏 **This file is BUDGETED and the budget is now enforced by a build.** `.github/workflows/size-budget.yml` fails a PR that pushes a governance file past the read ceiling. If you are about to paste a post-mortem in here, the gate will catch you — but the sidecar is the right answer either way.
+12. 🧰 **A MISSING TOOL IS A DISCOVERY FAILURE UNTIL YOU HAVE PROVEN OTHERWISE (added 2026-09-21).** "No `create_branch` in this session's kit" was declared in eight commit bodies in one night and it was **false every time** — the tool was one lookup away. 🚫 **Never narrate a capability gap you have not tried to close.** Rules 3 and 9 are unreachable without a branch, so a wrong belief about your own toolset silently repeals half this file. Look the tool up, then write the row.
 
 ### ⚠️ The self-claim exception
 
@@ -48,5 +50,7 @@ The hard gate says the presence row must be on `main` **before** the write. **Th
 **Every collision was caught by a READ or by a WRITE REFUSING. None was ever caught by a CHECK.** The only mechanism with a hit rate is asking *"what is true right now?"* at the last possible moment — path-filtered `list_commits --since today`, immediately before the write — and treating a rejection as information rather than an obstacle.
 
 ⚠️ **It has a floor, and the floor is a twin.** Every presence mechanism we own answers *"is someone ELSE here?"* A twin shares the task, the row, the intent and the name, so the gate answers *"that's you,"* which is true and useless. 🚫 **Branch-as-claim is falsified in both directions — stop proposing it.** Past the read, the only thing left is the write itself refusing.
+
+⚠️ **And there is a floor BELOW that one: a session that never posts a row at all.** The gate cannot be outrun by a twin if it was never armed. Measured 2026-09-21: eight commits, sixteen hours, zero rows, zero pre-write reads — see rule 12 and the sidecar.
 
 **Nine collisions, the evidence, and every standing scar: [`session-board.notes.md`](./session-board.notes.md).**
