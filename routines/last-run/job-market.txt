@@ -1,11 +1,11 @@
-2026-09-20 21:05 ET
+2026-09-20 21:05 ET  [AMENDED 2026-09-21 01:30 ET - three owed items discharged, see AMENDMENT below]
 pass anchor: 2026-09-20 21:05
 lanes: 9 of 9 complete
 live: 448 (was 345, +113) | new 113 | gone 0 | carried unverified ~200
-schema: FIRST PASS WITH THE 17th COLUMN, `requirements`. ⚠️ EIGHT of nine lane files
-  migrated. `producing-artistic.tsv` is STILL ON 16 COLUMNS - it banked zero new rows so
-  rule 14 blocked its commit, and the migration went with it. Any reader of that file must
-  expect 16 fields. THIS IS THE FIRST OWED ITEM OF THE NEXT PASS.
+schema: FIRST PASS WITH THE 17th COLUMN, `requirements`. ✅ ALL NINE lane files now carry it
+  (producing-artistic migrated 2026-09-21, commit 7fec502 - it banked zero new rows so rule 14
+  blocked its commit during the pass, and the migration went with it). No reader needs to
+  special-case any lane file.
 method: rule 1 honoured - nine search-only subagents, each forbidden from reading its own
   lane file, reconciled against the lane files only afterwards. No lane saw its own priors.
 result: PARTIAL. The inventory landed in full and the new column landed with it, but this
@@ -14,7 +14,7 @@ result: PARTIAL. The inventory landed in full and the new column landed with it,
       every standing row; this pass spent its budget on breadth and the new column instead.
       `gone: 0` is therefore NOT a finding that nothing closed - it is the absence of a
       liveness sweep. Do not read 0 GONE as market stability. Next pass owes a verification
-      sweep, not another breadth sweep.
+      sweep, not another breadth sweep. THIS IS THE LARGEST OUTSTANDING DEBT.
   (2) 🔴 THREE OF NINE THREAD WRITES FAILED (technical-director, electrician, drafting-design).
       11 attempts across two ID forms and two distinct error shapes. Those three lanes' rows
       are LUMPED into root comments carrying `⚠️ THREAD WRITE FAILED`, which breaks
@@ -26,15 +26,26 @@ result: PARTIAL. The inventory landed in full and the new column landed with it,
       department harvest remains STRUCTURALLY PARTIAL (~15 unread pages on Scenic/Sets).
   (4) 🔴 ONE LIVE MISS TO VERIFY, not a refusal: Clark State College GM Venue Operations was
       refused by a lane as "closed 9/21 5:00 PM ET" - a date AFTER this anchor. It was live
-      when refused. Recover it.
+      when refused. Recover it. Rule now written into job-market-sources.md: a future close
+      date is the most actionable state a row can have, never a reason to refuse it.
 sources: 🔴 LCTJ IS NOT DEAD - `job-market-sources.md` pointed at the wrong host for four
   passes. `chicagoplays.com/jobs` is a broken door; the live board is
   `jobs.leagueofchicagotheatres.org`. Three lanes logged it unreachable while the SM lane
   enumerated it freely off the correct host. Every LCTJ hard-fail on record is a WRONG-URL
-  artifact, not an outage. Fixed in the sources file this pass.
+  artifact, not an outage. ✅ FIXED in the sources file 2026-09-21 (commit 7548fbb), and the
+  generalization is written in as a SIXTH SOURCE STATE - WRONG DOOR: a board that fails for
+  every agent except one is not flaky, it is two different URLs. ⚠️ Template 7 in
+  job-market-templates.md may still carry the dead host - check it next pass.
   StageBoard: fifth consecutive failure, and the cause is now known - it is behind a profile
-  wall. Retirement decision surfaced to Michael, not taken by the executor.
-  ~22 new source names written into job-market-sources.md this pass.
+  wall (reachable surface at faizova.com), not an outage. Retirement or authentication is
+  Michael's call; surfaced, unresolved. Until he rules: one attempt per pass, one line.
+  ✅ The owed sources are written in (commit 7548fbb) and the shape of them is the finding:
+  the +113 came disproportionately from ATS FAMILIES and FIRST-PARTY PORTALS, which are not
+  boards at all. Recognition patterns for Workday, Oracle HCM, SmartRecruiters, PageUp,
+  Paylocity, ApplyToJob/JazzHR, iCIMS and JobTarget are now documented, plus MCA (third
+  retained-search firm), HERC, NYFA, Dance/NYC, Jobs-in-the-Valley and LVI Associates.
+  New rule: when a board row and an ATS row describe the same seat, THE ATS URL IS THE ROW'S
+  URL - it carries the requisition ID, so a re-post is detectable and a close is provable.
 headline: the inventory finally has a REQUIREMENTS column, and it immediately answered the
   question the career file could not: both verified remote CAD seats (ASG $70-100k,
   Compass/Waveguide $65-75k) require AutoCAD, which Michael deferred to ~summer 2027. The
@@ -52,20 +63,37 @@ headline: the inventory finally has a REQUIREMENTS column, and it immediately an
   live two months on. The niche-craft exception holds: rare + technically deep + already-tooled
   beats broad + certified.
 owed, carried into the next pass:
-  - `producing-artistic.tsv` 17th-column migration (see schema above). FIRST item.
-  - the ~200-row verification sweep that this pass did not run (gap 1).
+  - the ~200-row verification sweep that this pass did not run (gap 1). FIRST item now.
   - three near-home URL recoveries: Syracuse University Event & Technical Services Coordinator
     ($28.93-31.68/hr), Seneca Niagara Production Services Technician, Argyle Theatre's two
-    Mary Poppins electrician cards.
+    Mary Poppins electrician cards. Procedure is documented; these are the named targets.
   - Clark State College GM Venue Operations recovery (gap 4).
+  - append `technical-director` to JM-GOV-rancho-tps's also_lanes in production-manager.tsv.
+    ⚠️ DELIBERATELY DEFERRED 2026-09-21, and the reasoning is the precedent: a one-field edit
+    to a 70-row TSV requires a full-file rewrite by hand, and the risk of silently corrupting
+    69 good rows outweighs the value of one cross-lane pointer. Do it on the next pass that
+    rewrites that file anyway. Recorded in job-market-sources.md under the TD lane so it
+    cannot be lost.
+  - check whether Template 7 still carries the dead LCTJ host.
 open rulings for Michael, none of them the executor's call:
   - Cornish: one requisition described twice, or two seats? Both an hourly DFT row and a
     salaried Seattle U/Cornish TD row hashed to the same JM-ID. Patched in place by renaming
     the DFT row `JM-OSJ-cornish-td-hourly`; the underlying question is unanswered.
   - Joshua Warner Studios home-lane: title says PM, duties read TD.
   - Pepperdine ATPM home-lane: rowed AUD, reads ME.
-  - StageBoard retirement after five failures behind a profile wall.
+  - StageBoard: retire, or authenticate through the profile wall?
   - whether to add CEO/President/COO/Chief to the creative-admin KEYWORDS (not a lane - that
     was already declined 09-19). The gap has now produced evidence across TWO consecutive
     passes: LA Master Chorale CEO $275-350k on 09-19, and this pass's Seaview COO $150-225k,
     found only by hand-sweeping the very keywords the config does not ask for.
+
+AMENDMENT 2026-09-21 01:30 ET - what changed and what did not:
+  DISCHARGED: (a) producing-artistic 17th-column migration, so schema is 9 of 9 (7fec502);
+  (b) the owed source names written into job-market-sources.md together with the LCTJ host
+  correction and the StageBoard profile-wall finding (7548fbb).
+  STILL OWED: everything under `owed` above. The ~200-row verification sweep is the debt that
+  matters; the rest is bookkeeping.
+  ⚠️ NOT DISCHARGED AND NOT FORGOTTEN: the rancho also_lanes append, deferred on purpose with
+  the reasoning recorded above. A deliberate deferral with a written reason is a decision. An
+  undocumented skip is a defect. These are not the same thing and this stamp is not hiding one
+  as the other.
