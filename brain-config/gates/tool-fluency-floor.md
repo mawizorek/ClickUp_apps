@@ -31,6 +31,20 @@ Agents POINT here. 🚫 **None of them stores this text** (Constitution §2–§
 
 ⭐ **The tell that you are about to violate this: your answer would be equally useful to a stranger.** If nothing in it is specific to what HE is doing, it is documentation, and he can read documentation faster than he can read you.
 
+### 1a. 🔴 A PROHIBITION IS NOT ENOUGH. EACH LANE THAT REPEATS THIS OWES A **BASELINE**.
+
+**This gate merged at ~06:5x on 2026-09-21 and the identical failure shipped at ~07:12 — 75 minutes later, with this gate and its originating ruling both in context.** Recorded here rather than quietly, because a gate that has already been outrun once should say so in its own text.
+
+🔑 **The mechanism, and it is the useful part: everything above is a DISPOSITION.** Applying it requires a judgment at write time — *does he already know this?* — and **under uncertainty the cheap default is to explain.** So the second instance was not a session that failed to read the rule. It was a session that read the rule, could not answer the question the rule poses, and resolved the doubt in the direction that costs nothing to write and everything to read.
+
+✅ **The fix is a LOOKUP, not more prohibition.** A lane that has burned this twice keeps a **fluency baseline** beside its `memory.md`: what he has DEMONSTRATED (with the evidence — a dated quote, a file he produced, a citation), what is merely UNDECIDED or UNASKED, and where the vendor is genuinely silent. **If a fact is on the demonstrated list, he has it, and stating it IS the failure. Check it; do not feel for it.**
+
+🔑 **And the finding that generalizes past any one lane: there is almost no *"doesn't know."* There is UNDECIDED and there is UNASKED, and neither is ignorance.** A decision is not a gap — put the trade-off and the consequence in front of him and stop. ⭐ **Explaining the tool around a decision he is capable of making is the condescension, in its exact mechanism.**
+
+- **First instance:** `super-agents/vector-vale/memory/michael-vwx-fluency.md` (Vectorworks), born the same morning **on his instruction** — *"get yourself caught up… familairze yourself with wht i know and don't kwo bot vwx."* ⭐ **He named the missing artifact; the session that had just written this gate did not.**
+- 🚫 **A baseline is per-lane FACTS and never a copy of this gate.** Two lanes' baselines share no text, which is why this stays a pointer and not a template.
+- ⚠️ **Do not open one speculatively.** It is earned by a repeat, and an empty baseline is the kind of file that looks like coverage.
+
 ---
 
 ## 2. 🔴 A LICENCE TIER, AN EDITION OR A WATERMARK IS NOT A CAPABILITY CEILING
@@ -67,15 +81,17 @@ One agent's bundle names this as *"the pattern to watch"* and has **five logged 
 3. **Is this a known DEFECT rather than a configuration?** Help documents intent; release notes document failure.
 4. 🆕 **Am I about to ask him to PROVE a capability instead of assuming it?** If yes, stop.
 
+⚠️ **And the vocabulary corollary, added 2026-09-21: a gap in his VOCABULARY is not a gap in his PRACTICE.** He has described a feature's behaviour exactly right while unable to produce the vendor's label for it. **Supply the name in three words and go to the judgment.** Reading a missing label as a missing concept is how a correct answer turns into a lecture.
+
 ---
 
 ## 4. 📏 REGISTER IS PART OF THE ANSWER, NOT PACKAGING ON IT
 
 **A correct, sourced, version-checked answer pitched at a beginner is a FAILED answer.** Not a good answer with a tone problem — a failed one, because the deliverable was judgment and what arrived was documentation.
 
-⚠️ **And the rule that fails here is usually a rule the agent already read.** In the originating instance the bundle already said *"he knows this craft better than the documentation does"* and *"he asks HOW IT WORKS"* — **both lines were loaded in the same pass that ignored them.** 🔑 That is why this is a GATE with a firing condition rather than another aspirational line in a profile: **a rule that gets read and not applied is not a missing rule, it is an unenforced one.**
+⚠️ **And the rule that fails here is usually a rule the agent already read.** In the originating instance the bundle already said *"he knows this craft better than the documentation does"* and *"he asks HOW IT WORKS"* — **both lines were loaded in the same pass that ignored them.** 🔑 That is why this is a GATE with a firing condition rather than another aspirational line in a profile: **a rule that gets read and not applied is not a missing rule, it is an unenforced one.** ⚠️ **And §1a is the same lesson one turn later, aimed at this gate: being a gate was not sufficient either.**
 
-Related standing rules, not restated: he will not read a wall of text (findings go to the artifact, the reply is a receipt) and he does not repeat himself patiently.
+Related standing rules, not restated: he will not read a wall of text (findings go to the artifact, the reply is a receipt) and he does not repeat himself patiently. ⚠️ **A re-EXPLAINED tool reads exactly like a re-asked question.**
 
 ---
 
@@ -97,6 +113,8 @@ Related standing rules, not restated: he will not read a wall of text (findings 
 
 The pointer belongs in `_shared/super-agent-base.md` (every agent loads it at step 1). At authoring time **Fleet Felix held a live `session-board.md` claim on that exact file**, marked *"EDITING A GOVERNING STANDARD"* — so board rule 2 applied and the write was **held, not raced.** Deferred to Michael to sequence.
 
+⚠️ **Re-checked 2026-09-21 ~07:2x, one scope-turn later: the claim was STILL LIVE and the deferral had to be repeated.** 🔑 **A deferred wiring step with nobody watching the blocker clear is a step that quietly becomes permanent** — and §1a is what the gap cost in the meantime.
+
 🔑 **This repo has already paid for the unwired version of this mistake:** `hooks/agent-task-scan.md` existed for four days with **no invocation at all**, could therefore never be called or tested on purpose, and went unrun while looking clean. **Do not assume this gate is live because the file exists.**
 
 **To finish the wiring, one line, in one of these two places:**
@@ -111,3 +129,4 @@ The pointer belongs in `_shared/super-agent-base.md` (every agent loads it at st
 ## Changelog
 
 - **2026-09-21 — v1, born from a live correction during Big Love load-in.** Consolidated on Michael's explicit instruction after three bundle files had each grown their own copy of the rule; those three were trimmed to pointers in the same PR. Wiring deliberately left open against a live board claim.
+- **2026-09-21 — v1.1, 75 minutes later, after this gate was outrun.** §1a added (a prohibition needs a per-lane BASELINE behind it; UNDECIDED and UNASKED are not ignorance), §3's vocabulary corollary added, §4 and the wiring section updated with the second instance and the re-checked claim. **Requested by Michael:** *"get yourself caught up vale. take better ntoes for yourself."*
