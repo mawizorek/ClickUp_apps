@@ -102,6 +102,7 @@ Health check: **⚙ → Test connection** should show
 | `no such table: artwork` | The worker is bound to the wrong database. |
 | Browser console: CORS | Only `mawizorek.github.io` and localhost are allowed. Deliberate: a wildcard on a key-authenticated API lets any page anywhere spend your key. |
 | An unexpected constraint error | Read it. The schema refuses contradictions by design — a slot naming one artwork while pointing at another's edition is *unwriteable*, not merely discouraged. |
+| Reads are stale by up to a day | **A bare worker URL has served 24-hour-stale reads.** Add `?nocache=<timestamp>`. |
 
 ---
 
@@ -119,3 +120,32 @@ The CI path exists because the terminal path assumes hardware you usually don't 
 ## Rejected: the dashboard worker editor
 
 Cloudflare lets you paste worker code straight into the dashboard, which is also phone-doable and *sounds* simpler. It isn't, for one reason: the source would then live in the dashboard **and** in git, and two sources of truth for one fact is exactly the failure this app was rebuilt to eliminate. Git stays canonical; CI deploys from it. **The write key moved for the same reason.**
+
+---
+
+## Ledger detail (moved from `VERSIONS.md` 2026-09-21, PR #952)
+
+**Why it is here:** the ledger reached its hard read limit (22,363 B → 29,820 base64 chars against a ~30,720 cap) and this app's row was its second biggest at ~2.8KB. ⚠️ **The ledger standard prescribes the app README as the destination, but `inciardi-collection/README.md` is 23,389 B — itself past safe-edit — so this file received the detail instead.** `VERSIONS.md` now points here for anything worker- or key-related.
+
+✅ **The write-key story was NOT copied down, because this file already owned it** — see *The write key* above, which is more complete than the ledger row ever was. That row was a second claimant on a fact documented better here; deleting it removed a duplicate, not information.
+
+### 🔴 The worker is six files
+
+| File | Owns |
+| --- | --- |
+| `worker.js` | gate + dispatch |
+| `reads.js` | GET |
+| `images.js` | upload / serve / carousel |
+| `links.js` | attach / archive — **and `photoOrder()`, the single ordering authority** |
+| `adopt.js` | the legacy 177 import |
+| `sheets.js` | binder mechanics |
+
+⚠️ **For sizes, read `index.html`'s module map. Re-measure; never estimate.**
+
+### ⚠️ Stale reads
+
+**Bare worker URLs have served 24-hour-stale reads.** Append `?nocache=<timestamp>`. Also in the troubleshooting table above.
+
+### 🐞 Known doc rot, unfixed
+
+**`inciardi-collection/README.md` still claims the write key is never bundled.** It is bundled, deliberately — `core.js` → `DEFAULT_KEY`, Michael's call 2026-07-30. The README is 23,389 B and past safe-edit, which is why the claim is flagged here rather than corrected in place. **On disagreement, THIS file wins.**
