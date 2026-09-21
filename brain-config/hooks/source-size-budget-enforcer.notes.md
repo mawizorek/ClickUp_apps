@@ -6,6 +6,58 @@ Split out 2026-08-11 in the same pass that gave the rule a mechanical gate. ⚠�
 
 ---
 
+## 🔴 The 2026-09-21 finding: the gate was never DISABLED. It was never WAITED FOR.
+
+One night, five governance writes to `_shared/`. Replayed against the live TSV thresholds by
+`.github/scripts/pre_write_size.py --selftest`:
+
+| Write | Direction | Verdict |
+|---|---|---|
+| `super-agent-base.md` pass 1 | **GREW 5,385 B** (23,734 → 29,119) | 🔴 FAIL, 6,591 B over ceiling |
+| `super-agent-base.md` pass 2 | SHRANK 1,170 B | 🔴 FAIL, 36 B over |
+| `house-layer-base.md` | **GREW 5,400 B** | 🟡 WARN |
+| `designer-base.md` (new, parallel session) | 16,960 B | 🟡 WARN |
+| `department-head-base.md` | **GREW 3,580 B** | 🟡 WARN |
+
+**Five for five. Two hard FAILs. Zero caught, and all five merged.** The workflow fires on
+`pull_request`; every PR was opened and squash-merged inside ~2 minutes, and nothing requires the
+check to pass. ⭐ **A post-hoc gate cannot refuse a write that already landed** — which is the same
+shape as v7's finding one layer out: v7 fixed *"the rule was in prose"*; v8 fixes *"the gate ran too
+late."*
+
+🔑 **Root cause of the wrong claims, and it is mechanical, not moral: the commit message is written
+BEFORE the write response exists.** Commit `150d00b` says **"Net SHRINK"** on the pass that grew the
+file 5,385 B, in the same diff that added a paragraph congratulating itself on freeing headroom.
+**Fix: a size DIRECTION may never appear in a commit message.** Direction goes in the PR body, after
+the number. Fourth wrong claim in this file's history; the 2026-08-01 one said *"net smaller"* and
+went 1,346 B over.
+
+⚠️ **Arithmetic footnote that cost a fifth wrong number the same night:** the report called a
+22,564 B file *"~564 B over."* KB means 1024, so the ceiling is **22,528** and it was **36 B** over —
+the error landed inside the sentence apologising for size errors. **Let the script do the sums.**
+
+### 🔴 The recursive form of the defect, which is the finding worth keeping
+
+The session wrote the **post-mortem of its own size failure INTO the size banner it was apologising
+about.** That paragraph was 783 B of narrative in a file 36 B over its ceiling.
+
+⭐ **So the bloat was never the correction — it was the NARRATIVE ABOUT the correction.** Moving that
+block here (and leaving a 307 B pointer) took `super-agent-base.md` to **22,020 B: under its own
+ceiling for the first time since 2026-08-11**, when it was already listed as standing debt.
+
+**The test, one line, added to the hook:** *would a cold agent's behaviour change without this
+paragraph?* No → it is a SCAR and it belongs here. 🚫 **The scar is not deleted** — same law as the
+sidecar case below: it moves, it does not die.
+
+⚠️ **Known tension, stated not resolved:** `super-agent-base.md`'s own revision-history section
+refuses *"a sidecar file — spawning a surface to catch trimmed overflow is the pattern refused
+2026-07-17."* That refusal was about **revision history**, and this hook's remedy table blesses a
+`.notes.md` for **why-history**. They are close enough to collide. **This pass used an EXISTING
+sidecar rather than spawning one for that file**, which sidesteps the clash; a real ruling is owed if
+anyone proposes `super-agent-base.notes.md`.
+
+---
+
 ## 🔬 THE CEILING — measured, not calculated
 
 **The ~30KB cap applies to bytes the read tool RETURNS, not bytes on disk.** The trustworthy read path is the git blob API, which returns **base64**, inflating by **4/3**:
@@ -71,6 +123,7 @@ A correctly-shaped index has a floor so small the ceiling is irrelevant forever.
 - **The FLOOR case (2026-07-26):** same two files, over a ~12KB target **neither had met once since it was locked.** Everything left in both was live warnings and security flags, so another trim would have cut truth. **The TARGET was the defect** → `VERSIONS.md` reset to ~16KB, paid for by dropping a duplicate column.
 - **The SHAPE case (2026-07-27) — why the floor rule got demoted:** `roster.json` was trimmed **three times in three days** and kept coming back. Its floor (~11–12KB at 38 agents) had reached its target, which is a freeze, not a budget. The real defect: it carried `lane`, `seat`, `teams`, `from` — **a lossy duplicate of 38 files that each said it better.** Deleted those (kept `lane` only on the 5 rows with no file, where it is the only description that exists) → **18.4KB → 12.3KB, floor ~2KB, and the file did not come back.** No format change, no new surface, nothing moved. ⭐ ***Trimming a wrong-shaped file is a remedy you have to keep re-applying — which is the definition of a symptom.***
 - **The SIDECAR case (2026-08-11), three times in two days:** `trip-triage.md` (PR #793), `session-board.md` 32,393 B → 4,953 B (PR #808), and this hook. All three were prose-shaped files whose overage was **why-history**, not procedure. ⭐ **The seam in a document is narrative vs current state**, and it is now the first thing to look for. ⚠️ **The prose was never the problem and must not be deleted as one** — it is why those failures stopped recurring. It moves; it does not die.
+- **The SCAR case (2026-09-21), fourth sidecar move:** `super-agent-base.md` 22,564 → **22,020 B**, under its ceiling for the first time since it appeared on the standing-debt list. The 783 B moved was a post-mortem of the same session's size failure, written into the size banner. ⭐ **Narrative-vs-state is not enough of a seam on its own; the sharper cut is RULE vs SCAR.**
 
 ---
 
@@ -95,6 +148,8 @@ Six files over a FAILING line, one of them nearly 3× it, under a rule that had 
 
 ⭐ **The generalization, and it is the third instance in one week:** **a rule that lives in prose and appears in no executable step is reached by memory or not at all.** The spine (PR #567) was fixed by becoming numbered step C4. The board clear (PR #808) was fixed by becoming Step 4a. This one is fixed by `.github/workflows/size-budget.yml`. **Behavioural hooks are for judgement; mechanical gates are for numbers. A number in a prose file is a wish.**
 
+⚠️ **And the 2026-09-21 sequel is above: an executable step still has to be REACHED FOR.** A gate wired to run after the write is a record, not a refusal.
+
 ### Why the gate only fails on files the PR touched
 
 A gate that failed every PR on day one over debt nobody in that PR created **would be switched off inside a week**, and then the rule would have exactly the teeth it had before: none. Blame belongs to the diff that causes it.
@@ -107,11 +162,13 @@ The debt is not hidden to buy that. It is printed as a **standing-debt inventory
 - 🚫 **App runtime files are not budgeted.** The GitHub MCP Operating Standard already governs them with an older, locked mechanism: an over-cap app ships a `<app>/source/` chunk set plus `_index.md`. **Two mechanisms aiming at one file contradict each other within a month.**
 - ⚠️ **`.html` in `brain-config` is excluded** as renderers and generated pages. `tool-index.html` is 16KB and nobody hand-maintains it prose-wise. If that stops being true, add a `watch` row.
 - ⚠️ **The gate cannot see a file that grows on `main` without a PR.** Direct-to-main is already banned (GitHub MCP standard, LOCKED 2026-07-06), so the hole is closed by a different rule — but it is closed by a rule, not by this gate.
+- 🔴 **The gate does not BLOCK a merge** (added v8). Nothing requires the check to pass, so a fast squash-merge outruns it. The pre-write script is the answer; branch protection would be the other one, and that is Michael's to set.
 
 ---
 
 ## Changelog
 
+- **v8 (2026-09-21) — MEASURE BEFORE THE WRITE.** Added `.github/scripts/pre_write_size.py` (same TSV thresholds, exits 3 rather than guessing if the TSV is unreadable). Two mechanical rules: run it on the candidate, and **never put a size DIRECTION in a commit message** — that message is written before the number exists. Sharpened the sidecar seam from narrative-vs-state to **RULE vs SCAR**, with a one-line test. 🔴 Prompted by five `_shared/` writes in one night tripping this gate (2 FAIL, 3 WARN) and **all five merging**, plus a commit that said *"net SHRINK"* while growing a file 5,385 B. Michael: *"this is a trend where you 'shrink' a file and end up adding lines and lines of bloat."*
 - **v7 (2026-08-11) — THE RULE GAINED A MECHANICAL GATE, and this sidecar was created to pay for it.** Michael: *"spec it add it and actually build it and send it so it works."* Added `.github/workflows/size-budget.yml` + `.github/scripts/size_budget.py` + `brain-config/size-budget.tsv`, ported from the `uritp-docs` shape (PR #57): **maths in the checker, thresholds in a TSV with a NOTE column so every waiver shows up in a diff.** No new numbers — it enforces v6's. Fails only on files the PR touched; prints standing debt every run. 🔴 **Prompted by finding six brain-config files over the FAILING line, worst at 60,133 B, under a rule locked since 07-27.** Hook split to procedure + this sidecar because the amendment would have pushed it past its own 15KB split line. **Fold-in, not net-new: no second size tool was created** — `rot-sweep` / `doc-rot-sweep` (two v1s of one tool in one day, 07-25) is the precedent for why that matters.
 - **v6 (2026-07-27)** — **Floor Rule DEMOTED from budget formula to SHAPE DIAGNOSTIC.** Folds in Sally's conceded miss (a floor is a function of row count, not a constant). Kept as independently-binding: never-met-target-is-rot, and never-cut-a-live-warning-for-bytes. **Ceiling MEASURED for the first time** (21.7KB reads whole); added Beckett's measured-vs-calculated rule. New third remedy for INDEX-shaped files: **give the content back to the records** (Dara's test). New Pass step 8 (shape check before trimming).
 - **v5 (2026-07-26)** — Added the FLOOR RULE. Prompted by `VERSIONS.md` + `roster.json` sitting over a 12KB target one day after v4 set it — v4 gave the ceiling and never gave the floor.

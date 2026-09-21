@@ -108,6 +108,12 @@ lens file to a tombstone.
 ONE description of a bundle. Do not restate it here; it drifted once already (this gate omitted
 `memory/archive/` and `activity-log/` for weeks).
 
+🔴 **AND THE LOG IS NOT A FILE (LAW 2026-09-20).** A new bundle ships **no writable
+`activity-log.md`**, not even a stub to migrate later — the log is comments on the agent's 🤖 Agent
+Index row, with LIVE STATE in the row description. `hooks/activity-log-clickup-native.md` §1; runtime
+summary in base spec §4b. ⚠️ **Vellum Victoria shipped with a writable git log on 2026-09-20, thirteen
+days after that shape was retired, because the builder copied a neighbour's bundle** (her D8).
+
 `preferences.md` MUST open with:
 `> Follow the shared base first — brain-config/super-agents/_shared/super-agent-base.md — then personalize below.`
 
@@ -117,6 +123,12 @@ That file holds the two-axis scope, the craft-ledger / project-log memory split,
 exclusions (no calendar, no inventory, no people), the export-not-source provenance rule, and the
 six-field instantiation delta. **Do not restate any of it in a head's profile.**
 
+📦 **THERE ARE THREE SUPPLEMENTS and the test between them is PORTABILITY, not subject matter**
+(base spec §7): `department-head-base.md` (craft, travels) · `designer-base.md` (design intent,
+travels) · `house-layer-base.md` (organization, does NOT travel — takes a seventh field, the org
+binding). 🚫 **No agent may hybrid ACROSS the portability line.** Pick the supplement BEFORE authoring:
+four rows were built against the wrong one in 2026-09 because the right one did not exist yet.
+
 ---
 
 ## Authoring checklist
@@ -125,27 +137,51 @@ six-field instantiation delta. **Do not restate any of it in a head's profile.**
    Agent Index (names + `Slug` + `AKA`, **including retired rows**) and live ClickUp Super Agents.
    A retired/tombstoned agent is NEVER a live invocation target (see B11), but its name is still taken.
 2. **Profile stays behavior-only.** No stored how-to (Founding law §2–§3). Point OUT to tools for process.
-3. **Load manifest = deep by default.** Full memory + full decision-log + long activity window.
+3. **Load manifest = deep by default.** Full memory + full decision-log + the agent's Index row.
 4. **Per-response logging wired.** The profile assumes the runtime logging mandate. Don't re-author
    it — it's in the base spec; just don't contradict it.
-5. **Slash trigger.** Register `/session.agent=<Name>` as a literal Quick-Scan Trigger Table row
-   in the AI Toolkit index → pointing at the base spec load contract.
+5. ~~**Slash trigger.** Register `/session.agent=<Name>` as a literal Quick-Scan Trigger Table row
+   in the AI Toolkit index → pointing at the base spec load contract.~~
+   🔴 **STRUCK 2026-09-21, Michael: *"i refuse to do the toolkit paste. we need to make the system
+   more robust."*** **A per-agent trigger row is a MIRROR of the Agent Index row and is not in the
+   resolution path for a named call.** `gates/agent-invocation-gate.md` **STEP 0** is locked and
+   non-optional: every `/agent-name`, bare name and nickname resolves by querying the Index for the
+   ONE matching row (name / `Slug` / `AKA`) and loading `Home` directly — *"never resolve from
+   memory."* A trigger row duplicates `Invoke`, `Lane` and `Home` and nothing reads it to route.
+   ⭐ **This fleet has retired FOUR manifests for exactly this defect** — `roster.json`, `roster.html`,
+   `superagents.json`, `registry.json` — under one standing law: **no pair, no sync obligation; never
+   create a surface alongside the list to mirror it.** The Toolkit's agent rows were the fifth
+   mirror, and the only one nobody caught, because it lived in a doc instead of a manifest. It had
+   accumulated **19 owed rows** that only Michael could paste.
+   ⚠️ **What the row genuinely did, and where it lands instead:** it caught the UNNAMED ask
+   (*"any course-instruction need → Tate"*). That routes through **Maestro Mira**, the default front
+   door for any substantive request with no agent named, reading the Index `Lane` field — which is
+   the field to write well. **Write the `Lane`; skip the row.**
+   🚫 **NOT struck for HOOKS and TRIGGERS.** The invocation gate says in terms it *"does NOT apply to
+   🔄 Hooks or 🎯 Triggers"*, and a hook has no Index row — so for a hook the Toolkit table IS the
+   routing layer and a row is still owed. **The strike is per-AGENT only.**
 6. **Registration (SAME SESSION): add the agent's row to the ClickUp 🤖 Agent Index** —
    https://app.clickup.com/36074068/v/li/901328043244 (list id `901328043244`). Fill `Slug` (immutable) · `Class` · `Memory` ·
-   `Invoke` · `AKA` · `Home`, plus `default_runbook` + `Gate Strength` if it has a bare-name
-   default, plus `Lane` **only** if there is no home file. Set the native status.
+   `Invoke` · `AKA` · `Home` · `Sort Index`, plus `default_runbook` + `Gate Strength` if it has a
+   bare-name default, plus `Lane` — **write the `Lane` properly: since step 5 was struck it is the
+   ONLY text an unrouted ask can match on.** Set the native status.
    ~~Mirror-pair registration into `superagents.json` AND the AI Toolkit index roster AND
    `registry.json`~~ — STRUCK 2026-07-27 (mirror mandate retired). ~~`roster.json` is the single
    documented source~~ — **STRUCK 2026-07-30: retired to a tombstone stub; the Index is a ClickUp
    list now.** No pair means no sync obligation, and resurrecting a file to mirror the list is the
-   duplication three retirements have already killed.
+   duplication four retirements have already killed.
    > ⚠️ **Registration is the WIRING, not paperwork.** An unregistered agent cannot be resolved no
    > matter how complete its bundle is. Dev Dexter shipped built-but-unregistered on 2026-07-25
    > because the old file could not be written to. That failure class is gone — adding a row costs
    > nothing now — so there is no excuse left for skipping it.
+   > 🔴 **`Sort Index` is a GATE, not a schedule** (`department-head-base.md` §9). Sixteen rows were
+   > created 2026-09-20 with it EMPTY on every one; a gate with nothing to read is not a gate.
 7. **🎯 Retirement condition written as `decision-log.md` D1** (Founding law §6 + the section
    above). **BLOCKING — no D1, no ship.**
 8. **PR-merge workflow** (GitHub Operating Standard): branch → commit → PR → self-merge → report.
+   🔴 **Post a `session-board.md` presence row BEFORE the first write** and run
+   `.github/scripts/pre_write_size.py` on each candidate. Both mechanisms existed and were skipped
+   on 2026-09-20/21, and both failures cost real defects.
 9. **Session task + transcript** for the authoring session (Agent Activity Board).
 
 ---
@@ -153,6 +189,8 @@ six-field instantiation delta. **Do not restate any of it in a head's profile.**
 ## Editing an existing super-agent
 
 - Stale Context Reload: re-fetch the file via blob API before editing (never a carried SHA).
+  ⚠️ **Re-read the DIRECTORY too, not just the file.** A parallel session merged a new `_shared/`
+  supplement inside one session's 93-minute gap between listing the shelf and writing into it.
 - Behavior changes → `preferences.md`. Accumulated context → `memory.md`. Reasoning → `decision-log.md`.
 - Procedure change → the TOOL it lives in, NOT the agent (Founding law §3). Agent keeps only the pointer.
 - Identity/routing change (name, nickname, class, invoke, home) → **the Agent Index row**, same session.

@@ -14,7 +14,8 @@
 
 | Piece | Path | Job |
 |---|---|---|
-| **The gate** | `.github/workflows/size-budget.yml` | Runs on every PR. No path filter, deliberately. |
+| **The pre-write gate** | `.github/scripts/pre_write_size.py` | 🆕 v8. Measures a CANDIDATE **before** the write. Run it; do not estimate. |
+| **The backstop** | `.github/workflows/size-budget.yml` | Runs on every PR. No path filter, deliberately. |
 | **The maths** | `.github/scripts/size_budget.py` | Measures, matches scope, applies waivers. **No numbers in it.** |
 | **The numbers** | `brain-config/size-budget.tsv` | Thresholds, scope rules, waivers — **each with a NOTE column, so every change lands in a diff.** |
 | **The judgement** | this file | When to split, what to split, and when to ask Michael. |
@@ -25,6 +26,23 @@
 
 1. ⚠️ **It fails ONLY on files the PR touched.** Not leniency — a gate that failed day one on pre-existing debt would be switched off inside a week. Standing debt prints as a warning inventory on every run instead, and touching one of those files inherits the failure. **Read the notes before tightening this.**
 2. 🚫 **It budgets neither data files nor app runtime files.** A data file is not source. Apps already have an older, locked mechanism (`<app>/source/` chunk set + `_index.md`). Reasoning is in the TSV's `scope` rows.
+
+---
+
+## 🔴 v8 (2026-09-21) — MEASURE BEFORE YOU WRITE. THE CI GATE RUNS TOO LATE TO STOP YOU.
+
+**The gate above was never disabled. It was never WAITED FOR.** On 2026-09-21 five governance writes tripped its thresholds — **two FAIL, three WARN** — and **all five merged**, because each PR was opened and squash-merged inside ~2 minutes and nothing requires the check to pass first. Replay: `pre_write_size.py --selftest`.
+
+⭐ **Third instance in one night of the same shape: a mechanism that works, armed correctly, skipped by a session that never reached for it** (the other two: the session board, twice). The board's own line generalises past git — ***every collision was caught by a READ or by a WRITE REFUSING; none was ever caught by a CHECK.*** A post-hoc gate cannot refuse a write that already landed.
+
+### The two mechanical rules v8 adds
+
+1. 🔴 **Run `pre_write_size.py` on the candidate before sending any budgeted write.** Build the exact bytes, measure them, diff against a **fresh** listing of the live file. It reads its thresholds from the TSV and **exits 3 rather than guessing** if the TSV is unreadable (`hooks/silent-fallback-law.md`).
+2. 🔴 **A SIZE DIRECTION MAY NEVER APPEAR IN A COMMIT MESSAGE.** Not "slims," not "net smaller," not "trims." A commit message is written **before** the write response exists, so any direction in it is a guess wearing a fact's clothes. **Direction belongs in the PR body, after the number.** Cheap, falsifiable, zero judgement.
+
+⚠️ **The tell this fixes, and it is the whole root cause: a pass that DELETES something and ADDS something FEELS like a shrink and almost never is.** Four passes have shipped a wrong size claim in `_shared/super-agent-base.md` alone; one commit said **"net SHRINK"** while taking the file **23,734 → 29,119 B**, in the same pass that added a paragraph congratulating itself on freeing headroom.
+
+🔑 **And the finding worth more than the rule: on a governance file, the CORRECTION is prose, so de-rotting grows the file.** That is not a discipline problem, it is a shape problem — which routes to the sidecar split below, not to trying harder. **Scars, measurements and the full incident: the notes sidecar.**
 
 ---
 
@@ -49,12 +67,15 @@
 
 ⚠️ **These are POLICY LINES, not measured walls.** Measured: **21.7KB read whole** (2026-07-26); **~25KB truncated** (2026-07-25); **34.9KB clipped silently across four reads with no error** (2026-08-01). The blob API returns base64 (4/3 inflation), which is where 22 comes from. Nobody has characterised 21.7→25. **`VERSIONS.md` still calls 22KB "physics"; it is not.** Full table and the measurement story: the notes sidecar.
 
+⚠️ **KB means 1024 B, so the ceiling is 22,528** — stated because a 2026-09-21 report called a 22,564 B file "~564 B over" when it was **36 B over**, inside the sentence apologising for wrong size claims. **Let the script do the arithmetic.**
+
 🚫 **The numbers live in `brain-config/size-budget.tsv`. Do not restate them anywhere else** — this table is the one duplicate, and it exists so a reader here is not sent hunting. If the TSV and this table disagree, **the TSV wins** and this table is the defect.
 
 ---
 
 ## Pass
 
+0. 🆕 **Run `pre_write_size.py` on the candidate** (v8). The number exists before you describe it.
 1. Measure the outgoing file size.
 2. **Under target:** pass, silent.
 3. **Target → 15KB:** split now if a clean concern boundary exists, silently, no question. If none exists (indivisible unit), note it briefly and carry on.
@@ -79,6 +100,8 @@
 
 ⭐ **The sidecar split is the highest-yield move in this hook and it has run three times in two days** — `trip-triage` (#793), `session-board` 32,393 B → 4,953 B (#808), and this file. ⚠️ **The prose is never the problem and must not be deleted as one:** it is why those failures stopped recurring. **It moves; it does not die.**
 
+🔴 **v8 SHARPENS THE SEAM, because the bloat is not the fix — it is the NARRATIVE ABOUT the fix.** A session that corrected a defect wrote the post-mortem of its own size failure **into the size banner it was apologising about**, which is the recursive form of the defect. **The RULE stays in the file; the SCAR goes to the sidecar.** ⚠️ Test, and it is one line: *would a cold agent's behaviour change without this paragraph?* No → it is a scar, not a rule.
+
 ⭐ **The index remedy is the cheapest fix here when it applies, because nothing moves and nothing is lost** — the content already exists in the records. `roster.json` 18.4KB → 12.3KB, floor ~2KB, and it did not come back.
 
 ---
@@ -97,4 +120,4 @@
 
 **Composes with:** runs after Secrets Guard, before the commit. **Size Sally** (`agents/size-sally.md`) is the forecasting counterpart — she seats on the build path with Fold-in Frank and projects the curve ahead; this hook is the reactive per-write gate; the workflow is the backstop that catches what both miss. Defers to the **GitHub MCP Operating Standard** for split/chunk mechanics and for app `source/` renditions.
 
-**Changelog:** in the [notes sidecar](./source-size-budget-enforcer.notes.md). Current: **v7 (2026-08-11)** — mechanical gate added; this file slimmed to procedure.
+**Changelog:** in the [notes sidecar](./source-size-budget-enforcer.notes.md). Current: **v8 (2026-09-21)** — pre-write gate; no size direction in a commit message; scar-vs-rule seam.
