@@ -37,6 +37,9 @@
   ⚠️ **2026-08-08: Michael ran a Corey-and-Fiona-shaped session without either of us seated** (both
   consulted by profile only). Not the Gen-1 session, but evidence the pairing happens whether or not
   it is scheduled.
+- ⬜ **BINDERS instance-register row + the Q1 ruling** (added 2026-09-20, see that entry). The Derived
+  Field Pattern page owes an instance row for the binder-instance tracking case, and **Q1 (STORED or
+  only SEEN) is unanswered**, which leaves the freeze semantics undefined rather than decided.
 
 ## What I am AWAITING from Michael (recommendation delivered, ruling open)
 
@@ -59,6 +62,59 @@
   rotation PR. Not edited by this pass.
 
 ---
+
+2026-09-20 · **CONSULTED, not seated** — Milo pulled me into Michael's BINDERS schema question
+(four lists in `901319523514`: `BINDER SPECS` `901327667428`, `Docs in Binders (not instances)`
+`901329124740`, `SPECIFIC BUILD PUBLICATIONS` `901329125304`, `DOCS in SPECIFIC PUBLICATIONS`
+`901329125305`). Michael's ask was where to DOCUMENT the binder/binder-instance distinction so other
+agents understand what owning one entails. His tracking ruling: *"depends on the status of the
+instance. if a current model, then YES should track - but if closed (done, complete) then probably
+not."*
+
+🚦 **MY GATE FIRES ON THAT SENTENCE AND NOBODY LOADED IT.** *"Should track"* is the Derived Field
+Pattern ask, verbatim — a value on record A that must hold and keep holding a value living on record
+B. My own `memory.md` says load that page before answering ANY such question, and **the line I keep
+skipping is Q1: STORED, or only SEEN?** It decides this entire question and it is still unasked:
+
+- **Only SEEN** (a `list_relationship` rendered live) → tracking is FREE, costs nothing, and **freezing
+  is IMPOSSIBLE.** A closed instance would silently show the canonical document's later revisions.
+- **STORED** → freezing is the DEFAULT and tracking is the expensive half, requiring a re-driver.
+  ⚠️ **Q2 is the one that bites:** a re-driver scoped to `created` but not to `field changes` looks live
+  and is silently wrong for every row it never sees. **The ROLE join proved it at 41 of 49 rows empty.**
+
+So Michael's status ruling is not implementable as stated until Q1 is answered. **A status cannot
+freeze a live relationship** — it only describes an intent the wiring may not honour.
+
+**Second finding, my lane exactly:** this folder is explicitly the *"precursor layer before full
+FileMaker normalization"* (BINDER SPECS' own description). So **"which system should carry this at
+all" comes before any field design** — the archive/freeze semantics are append-only history, which is
+Fiona's runtime, not mine. Michael already declined a CU-side canonical event-type dropdown for the
+same reason and moved classification to an FMP crosswalk. **He reaches for the fewest moving parts,
+not for my domain.**
+
+**Third, a caution rather than a finding:** `BINDER SPECS` was created 2026-06-24; the other three
+lists were created TODAY. That is his documented **v1→v2 pattern** (build cheap, graduate later, leave
+v1 in place as history), now confirmed a fourth time. Its description is genuinely stale — it predates
+the instance layer entirely — but **check for a predecessor before calling anything rot.**
+
+⚠️ **A multi-select field is a good human affordance and a bad join.** If binder ownership or
+production scoping ever becomes the integration key into FileMaker, a labels field cannot scope to one
+value. Same shape as my open Q5 on `URITP Productions`. Not a problem yet; it is a problem the moment
+an export view feeds a receiving key.
+
+🔴 **FALSIFIED CLAIM IN MY OWN `memory.md` HEADER, flagged not edited.** It states
+`open-memory-requests.md` is *"60,133 B, past the ~30KB write cap, so an append fails,"* and warns that
+**"a rule that sends work to a dead door produces an agent who never writes anything down."** Milo
+appended to that file successfully tonight; it is now 68,711 B and the write returned clean. **So the
+door is not dead and the header is now the thing doing the damage it warns about.** This is Dexter's
+scar exactly: *never refuse a read or write on size alone — attempt it, judge the result.* My file, my
+correction to make; recorded here so it is not lost if I am not seated again soon.
+
+**State left:** nothing created, no fields touched, no structural change. Recommendation: the binder
+distinction does NOT want a new doc — it wants the **Derived Field Pattern instance row** (mine) plus
+the four missing **List Index rows** (rung 1 of the orientation ladder, currently empty for all four
+lists, which is why every cold agent infers from siblings). Owed items → LIVE STATE. Session task:
+`86akmgxhv`.
 
 2026-08-08 · **CONSULTED, not seated** — my profile was read into Fiona's Production MAWster schema
 session (task `86ajxk8ex`) so my ClickUp-side findings could be weighed. Two things came back at me:
