@@ -1,0 +1,104 @@
+# brain-config/index/tool-index-measurement.2026-09-21.tsv
+# PHASE 0 of the tool-index port. MEASURED 2026-09-21 by reading all 96 routable primaries in hooks/ + gates/ at main.
+# Sidecars (.notes/.report-spec/.metadata.json/.continuity/.teammate/.BLOCKER/.naming/.orientation/.decision-log/.next-build-spec/.roster-artifact), _HOOK-TEMPLATE.md, _AUDIT-FIX-SPEC.md and gates/README.md are EXCLUDED: 27 files, never routing targets.
+# kind: SIGNAL fires on Michael's language. ACTION fires on the agent's own behaviour. TOMBSTONE is a retired stub.
+# mode_norm: ABSENT means the file declares no Mode field at all. PROSE means it declares one that is not always-on/on-demand/gated.
+# host_wired: does the file state it is invoked as a numbered step from another NAMED file. Answered for ACTION only.
+# 🚫 DATA FILE, NOT SOURCE. Not size-budgeted (size-budget.tsv Section 2). Verbatim Mode/Invocation/Trigger/Steward prose deliberately NOT copied here - it lives in the 96 files and a second copy would rot.
+path	bytes	kind	tokens	mode_norm	host_wired	steward	signals	defect
+brain-config/gates/agent-name-collision-gate.md	7323	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/craft-guardrails.md	5173	ACTION	no	ABSENT	no	no	—	header block missing entirely
+brain-config/gates/doc-dedup-placement-gate.md	2287	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/git-agent-authoring.md	13404	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/git-teammate-lifecycle-runbook.md	19607	ACTION	no	ABSENT	—	no	—	header block missing entirely
+brain-config/gates/list-creation-gate.md	883	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/multi-home-gate.md	900	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/repo-referent-gate.md	10807	ACTION	no	ABSENT	no	yes	—	
+brain-config/gates/roster-scan-planner.md	3927	ACTION	no	always-on	no	no	—	
+brain-config/gates/skill-creation-gate.md	4843	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/task-move-impact-gate.md	1046	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/theme-contract-gate.md	4526	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/time-entry-gate.md	749	ACTION	no	ABSENT	no	no	—	
+brain-config/gates/tool-fluency-floor.md	9304	ACTION	no	ABSENT	no	no	—	header block missing entirely
+brain-config/gates/view-sprawl-gate.md	714	ACTION	no	ABSENT	no	no	—	header block missing entirely
+brain-config/hooks/admin-task-template.md	960	ACTION	no	ABSENT	no	no	—	header block missing entirely
+brain-config/hooks/agent-activity-push.md	3542	ACTION	no	always-on	no	yes	—	
+brain-config/hooks/artifact-ship-paperwork.md	2852	ACTION	no	always-on	no	no	—	
+brain-config/hooks/collision-check.md	15596	ACTION	no	ABSENT	no	no	—	
+brain-config/hooks/commit-pre-flight.md	3971	ACTION	no	always-on	no	no	—	
+brain-config/hooks/course-number-era-gate.md	3875	ACTION	no	ABSENT	—	no	—	header block missing entirely
+brain-config/hooks/cross-space-research-gate.md	4045	ACTION	no	ABSENT	no	no	—	
+brain-config/hooks/custom-field-gate.md	3892	ACTION	no	ABSENT	no	no	—	
+brain-config/hooks/ddr-family.md	8234	ACTION	no	ABSENT	—	no	—	header block missing entirely
+brain-config/hooks/de-slop-pass.md	3539	ACTION	no	always-on	no	yes	—	
+brain-config/hooks/decision-elicitation-gate.md	7387	ACTION	no	always-on	no	yes	—	
+brain-config/hooks/decision-log.md	2491	ACTION	no	ABSENT	no	no	—	
+brain-config/hooks/doc-render-authoring.md	10894	ACTION	yes	always-on	yes:verbatim-doc-import.md	yes	/doc-authoring; /authoring-check	
+brain-config/hooks/invocation-context.md	2804	ACTION	no	ABSENT	no	no	—	
+brain-config/hooks/link-provenance.md	2862	ACTION	no	always-on	no	no	—	
+brain-config/hooks/memory-edit-guard.md	10114	ACTION	no	ABSENT	no	no	—	
+brain-config/hooks/multi-edit-batch-gate.md	3413	ACTION	no	always-on	no	no	—	
+brain-config/hooks/naming-proposal-guard.md	4820	ACTION	no	PROSE	no	no	—	
+brain-config/hooks/post-build-verify.md	2182	ACTION	yes	PROSE	no	no	"""verify the build"""	
+brain-config/hooks/secrets-pii-guard.md	3082	ACTION	yes	PROSE	no	yes	"""scan for secrets"""	
+brain-config/hooks/session-close.md	22470	ACTION	no	ABSENT	no	no	—	
+brain-config/hooks/session-open.md	19948	ACTION	no	ABSENT	—	no	—	
+brain-config/hooks/silent-fallback-law.md	1661	ACTION	no	ABSENT	no	yes	—	
+brain-config/hooks/skill-ban-guard.md	2412	ACTION	yes	PROSE	no	no	scan for skill bans	
+brain-config/hooks/source-freshness-gate.md	8994	ACTION	yes	always-on	no	yes	"/source-check; /freshness-check; ""how fresh is that""; ""where did you get that""; ""verify that source."""	
+brain-config/hooks/source-size-budget-enforcer.md	12219	ACTION	yes	PROSE	no	no	"""check the size budget"""	Mode says any repo write; Trigger says source file only
+brain-config/hooks/stale-context-reload.md	2579	ACTION	no	always-on	no	no	—	
+brain-config/hooks/sweep-for-links.md	4410	ACTION	no	always-on	no	no	—	
+brain-config/hooks/task-dedup-gate.md	4510	ACTION	no	always-on	no	no	—	
+brain-config/gates/agent-invocation-gate.md	19969	SIGNAL	no	always-on	—	no	—	
+brain-config/gates/deletion-flag-gate.md	1966	SIGNAL	yes	ABSENT	—	no	"""flag""; ""mark""; ""nominate"""	
+brain-config/gates/derived-value-gate.md	10298	SIGNAL	yes	ABSENT	—	yes	"/derived-value-gate; /derived-value; ""run the derived value gate"""	
+brain-config/gates/inbox-triage-trigger.md	13504	SIGNAL	yes	ABSENT	—	no	triage; handle; execute; greenlight	
+brain-config/gates/intent-check.md	3382	SIGNAL	no	always-on	—	no	—	
+brain-config/gates/session-transcript-gate.md	21487	SIGNAL	yes	always-on	—	yes	take notes; run it by the team; log this; start a decision log; decision log; pencil it in; capture this; tear it apart;	
+brain-config/hooks/activity-log-clickup-native.md	11735	SIGNAL	yes	ABSENT	—	no	/log-migrate; /migrate-activity-log	
+brain-config/hooks/agent-task-scan.md	21341	SIGNAL	yes	always-on	—	yes	"/agent-task-scan;/agent-scan;""what's assigned to me"";""do I have any assignments"";""check my agent assignments"";""scan my t"	
+brain-config/hooks/audit-fix-pipeline.md	7534	SIGNAL	yes	on-demand	—	yes	"/audit-fix-pipeline; /compliance-pipeline; /audit-fix; ""run the audit-fix pipeline on X""; ""Anna audit this, Dexter fix i"	
+brain-config/hooks/batch-import.md	14264	SIGNAL	yes	PROSE	—	yes	"""import this sheet"""	
+brain-config/hooks/contact-reconcile.md	10336	SIGNAL	yes	ABSENT	—	yes	"/contact-reconcile;/reconcile-contacts;/contact-sheet-reconcile;--show BL;--all;""reconcile the contact sheets"";""producti"	
+brain-config/hooks/content-cadence-review.md	4546	SIGNAL	no	ABSENT	—	yes	—	
+brain-config/hooks/creation-loop.md	8031	SIGNAL	yes	gated	—	yes	"/creation-loop; ""run the creation loop""; ""what's next in the loop""; NET-NEW"	
+brain-config/hooks/data-refresh.md	26635	SIGNAL	yes	ABSENT	—	yes	"/data-refresh;/refresh (TRIAGE);/refresh run;/refresh run -<routine>;/refresh run <routine> [<routine>];""run the refresh"	
+brain-config/hooks/ddr-reaudit.md	21027	SIGNAL	yes	gated	—	yes	"/ddr-reaudit; /ddr; ""re-audit the DDR""; ""capture this DDR""; ""transcribe the DDR""; ""ANY ddr ofc."""	
+brain-config/hooks/ddr-reconcile.md	16423	SIGNAL	yes	on-demand	—	yes	"/ddr-reconcile; /reconcile-ddr; ""reconcile the DDR""; ""does the DDR match the docs?""; ""is the app doc still true?""; ""ddr-"	
+brain-config/hooks/devising-transcript-archive.md	15093	SIGNAL	yes	on-demand	—	yes	"transcribe this for TIM-D; ""add this to the devising transcripts"""	
+brain-config/hooks/doc-destroyer-reconcile.md	4960	SIGNAL	yes	on-demand	—	yes	"/doc-destroyer-reconcile; /reconcile-specs; ""reconcile the destroyer""; ""sync the doc specs""; ""check the spec URLs."""	
+brain-config/hooks/doc-rot-sweep.md	19427	SIGNAL	yes	on-demand	—	yes	"/doc-rot-sweep; /rot-sweep; ""run a rot sweep""; ""sweep the repo for stale docs""; ""is our documentation still true?""; ""che"	
+brain-config/hooks/doc-schema-import.md	13936	SIGNAL	yes	ABSENT	—	yes	"/reconcile standards; /standards currency; /doc-schema-import; ""are our standards current""; ""check the standards against"	
+brain-config/hooks/email-chain-parse.md	4353	SIGNAL	yes	ABSENT	—	no	/email-chain-parse	
+brain-config/hooks/fleet-fact-sweep.md	17252	SIGNAL	yes	on-demand	—	yes	"/fleet-fact-sweep; /fleet-sweep; ""sweep for stale fleet facts""; ""is our fleet documentation still true""; ""who does the r"	
+brain-config/hooks/gmail-inbox-sweep.md	9245	SIGNAL	yes	on-demand	—	no	"""sweep my inbox""; ""triage my gmail"""	
+brain-config/hooks/humanize-prose.md	22647	SIGNAL	yes	on-demand	—	yes	"/humanize; /de-slop; ""humanize this""; ""clean up the AI smell""; ""score this for slop"""	
+brain-config/hooks/job-routine-response.md	8491	SIGNAL	yes	ABSENT	—	yes	"/job-debrief;compass-corso/debrief;""what do you think of the current listings?"";""debrief the sweep"""	
+brain-config/hooks/know-the-season.md	10400	SIGNAL	yes	always-on	—	yes	"/know-the-season; /season; ""what are we producing""; ""what shows are live""; ""name the season"""	
+brain-config/hooks/meeting-scratch-triage.md	7729	SIGNAL	yes	on-demand	—	yes	"/scratch-triage; ""triage my meeting notes""; ""clean up my scratch""; ""triage today's staff meeting notes"""	
+brain-config/hooks/meeting-transcript-attribution.md	7300	SIGNAL	yes	ABSENT	—	no	"/transcription; /attribute-transcript; /transcript-attribution; ""rewrite this as a per-person transcription""; ""who said "	
+brain-config/hooks/memory-rotation.md	15136	SIGNAL	yes	ABSENT	—	yes	/memory-rotation	
+brain-config/hooks/memory-write-relay.md	2592	SIGNAL	yes	PROSE	—	no	give me the memory block	
+brain-config/hooks/morning-briefing.md	23122	SIGNAL	yes	ABSENT	—	yes	"/morning; /wake; /briefing; ""morning briefing""; ""wake me up""; ""what's the state of the shows."""	
+brain-config/hooks/native-flush-consolidation.md	4389	SIGNAL	yes	ABSENT	—	no	run the native-flush on <agent>	
+brain-config/hooks/native-memory-flush.md	5848	SIGNAL	no	ABSENT	—	no	—	
+brain-config/hooks/new-agent-onboard.md	8194	SIGNAL	yes	on-demand	—	yes	/new-agent-onboard	
+brain-config/hooks/parts-assembly.md	11897	SIGNAL	yes	gated	—	yes	"/parts-assembly; /assemble-parts; /compile-parts; ""combine these subtasks""; ""make one final doc from these parts""; ""comp"	
+brain-config/hooks/prod-cal-reconcile.md	9063	SIGNAL	yes	ABSENT	—	yes	"/prod-cal-reconcile; /gcal-reconcile; /cal-reconcile; /reconcile-calendar; ""reconcile the calendar""; ""what’s out of sync"	
+brain-config/hooks/production-doc-audit.md	11647	SIGNAL	yes	on-demand	—	yes	"/audit-doc {production}; /production-doc-audit; ""audit the info sheet for [production]""; ""which info sheets are outdated"	
+brain-config/hooks/readme-app-plan-standard.md	4324	SIGNAL	yes	ABSENT	—	no	write/rewrite/audit a README;new app scaffolding	
+brain-config/hooks/reconcile-engine.md	10224	SIGNAL	no	ABSENT	—	yes	—	header block missing entirely
+brain-config/hooks/report-normalization.md	18335	SIGNAL	yes	ABSENT	—	yes	/morning	status says not standalone; trigger permits direct invocation
+brain-config/hooks/roster-reconcile-prep.md	12719	SIGNAL	yes	on-demand	—	yes	"roster reconcile prep; /roster-reconcile-prep; ""parse the inbox for roster reconcile students""; ""collect the roster reco"	
+brain-config/hooks/roster-reconcile.md	34374	SIGNAL	yes	on-demand	—	yes	"roster reconcile; /roster-reconcile; ""reconcile this roster""; ""reconcile the enrollments"""	
+brain-config/hooks/scan-intake.md	21141	SIGNAL	yes	gated	—	yes	"/scan-intake;""normalize this scan"";""split this scan"";/scan-sweep;""sweep the scans"";""what's sitting in scans"""	
+brain-config/hooks/screenshot-intake.md	15596	SIGNAL	yes	on-demand	—	yes	"/screenshot-intake; /shot-intake; ""sort my screenshots""; ""group my screenshots""; ""triage the screenshot inbox"""	
+brain-config/hooks/script-breakdown.md	12432	SIGNAL	yes	on-demand	—	yes	"/script-breakdown; /breakdown; ""break down the script""; ""dictate units from part N""; ""start the demand ledger for <SHOW>"	
+brain-config/hooks/talkback-mode.md	26498	SIGNAL	yes	gated	—	yes	/talkback-mode;/talkback;/talkback-mode=off;/conversational	
+brain-config/hooks/task-context-orientation.md	11693	SIGNAL	yes	always-on	—	yes	/orient	
+brain-config/hooks/team-loop.md	7874	SIGNAL	yes	ABSENT	—	no	"/team-loop; /build-loop; /review-loop; ""loop it with the team""; ""run it through the teams""; ""pass it through prebuild/bu"	
+brain-config/hooks/trip-triage.md	13184	SIGNAL	yes	on-demand	—	yes	"/trip-triage; /trips; ""triage the trips""; ""fill in the trip dates""; ""who is this trip for""; ""triage the Big Love trips"""	
+brain-config/hooks/verbatim-doc-import.md	13102	SIGNAL	yes	on-demand	—	yes	"convert/translate/migrate this handbook; ""bring this PDF into the repo as pages""; ""render this paperwork""; /doc-import; "	
+brain-config/hooks/gcal-reconcile.md	928	TOMBSTONE	no	ABSENT	—	no	—	header block missing entirely; retired/superseded tombstone
+brain-config/hooks/rot-sweep.md	1320	TOMBSTONE	no	ABSENT	—	no	—	Retired stub; live procedure moved to doc-rot-sweep.md.
