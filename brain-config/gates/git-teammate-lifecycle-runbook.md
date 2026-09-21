@@ -1,4 +1,4 @@
-# Git-Teammate Lifecycle Runbook — v0.5
+# Git-Teammate Lifecycle Runbook — v0.6
 
 > **What this is:** the single, cold-agent-executable procedure for bringing a git-teammate into
 > existence and keeping it internally consistent. **Define → Build → Register → Verify.**
@@ -77,7 +77,14 @@ feeds the Build spine. Do not skip to building — an undefined agent becomes a 
    forever after (Red Rhett lesson: a rename orphans files; only the display name may ever change).
    **An UNBUILT agent's name is not locked yet** — a near-miss on one may be a RENAME rather than a
    slip, so ask before authoring (Rocky/Ricky, 07-26).
-5. **Hand the definition to the Build spine below.**
+5. **Pick the SUPPLEMENT before building.** 📦 Three exist and the test is **PORTABILITY, not subject
+   matter** (base spec §7): `_shared/department-head-base.md` (craft, travels) ·
+   `_shared/designer-base.md` (design intent, travels) · `_shared/house-layer-base.md` (organization,
+   does NOT travel — seventh field, the org binding). 🚫 **No hybrid across the portability line.**
+   ⚠️ **Four rows were built against the wrong supplement in 2026-09 because the right one did not
+   exist yet** — when several builds make the same "wrong" choice, check whether the right choice was
+   AVAILABLE before correcting the builders.
+6. **Hand the definition to the Build spine below.**
 
 ---
 
@@ -135,7 +142,7 @@ native ClickUp Super Agent, and Michael wants it to become a session-invocable t
 
 ## SHARED SPINE — Build → Register → Verify
 
-### 1. BUILD (the 5-file bundle)
+### 1. BUILD (the bundle)
 
 Create `brain-config/super-agents/<slug>/` with the full bundle per
 `_shared/super-agent-base.md` → "File set". Author to the authoring gate
@@ -146,16 +153,24 @@ Create `brain-config/super-agents/<slug>/` with the full bundle per
   identity, and Universal Mandate 1 requires one). (An incubating signature output-format may live
   here as a condensed pointer per B.3.)
 - `memory.md` — accumulated context + how-Michael-works + pointers to stewarded tools. Not process.
-- `activity-log.md` — rolling condensed session ledger, newest on top, append-only.
-- `decision-log.md` — reasoning about the AGENT ITSELF (why it is shaped this way).
+- `decision-log.md` — reasoning about the AGENT ITSELF (why it is shaped this way). **D1 = the
+  retirement condition. BLOCKING.**
 - `README.md` — pointer/steward metadata only; **NEVER mirror Agent Index fields**.
+
+🔴 **NO `activity-log.md`. The LOG IS NOT A FILE (LAW 2026-09-20).** ~~`activity-log.md` — rolling
+condensed session ledger, newest on top, append-only~~ **STRUCK 2026-09-20.** A new bundle ships
+**no writable git log, not even a stub** — activity is comments on the agent's 🤖 Agent Index row,
+with **LIVE STATE in the row description**. Governing: `hooks/activity-log-clickup-native.md` §1;
+runtime summary: base spec §4b. ⚠️ **Vellum Victoria shipped with one anyway on 2026-09-20, thirteen
+days after the shape was retired, because the builder copied a neighbour's bundle instead of reading
+the law** (her `decision-log.md` D8).
 
 Revision history = git + PR descriptions. No inline changelog in `preferences.md`.
 
-### 2. REGISTER (the Index + the AI Toolkit, same session)
+### 2. REGISTER (the Index — one surface, not two)
 
 **Registration is the WIRING, not paperwork. An unregistered agent CANNOT BE RESOLVED, no matter how
-complete its bundle is.** Register across:
+complete its bundle is.**
 
 1. **The ClickUp 🤖 Agent Index — https://app.clickup.com/36074068/v/li/901328043244 (list id `901328043244`).** Create ONE task,
    named with the agent's display name. Fill: `Slug` (immutable) · `Class`
@@ -163,27 +178,51 @@ complete its bundle is.** Register across:
    `Memory` · `Invoke` (`/session.agent=<Name>`) · `AKA` · `Home` (the repo path to the bundle) ·
    `Sort Index`. Add `default_runbook` + `Gate Strength` **only** if it has a bare-name default —
    ⚠️ these are read on every bare-name call and are **not decoration** (emptying them silently
-   un-guards a read-only door). Add `Lane` **only** if there is no home file, where it is the sole
-   description that exists anywhere. Set the native status. Keep the task description to ONE line.
+   un-guards a read-only door). Set the native status. Keep the task description to ONE line.
    **A graduation is a field flip, not a new row** — that is why one list holds every class.
+   > 🔴 **WRITE THE `Lane`, AND WRITE IT WELL (2026-09-21).** It was previously "only if there is no
+   > home file." Since the Toolkit trigger row was struck (below), **`Lane` is the only text an
+   > UNROUTED ask can match on** — Mira is the default front door for any substantive request with no
+   > agent named, and she reads this field. Still ONE line.
    > ⚠️ **`Lane` is ONE LINE, hard rule, and no long-form description field may be added here.**
    > The file this replaced was trimmed SIX times in four days and never once met its own size cap,
    > because a document has an unbounded free-text area and no schema to refuse an essay. A list
    > refuses essays only as long as nobody adds a field that accepts one.
-2. The **AI Toolkit index** (ClickUp doc) — the Quick-Scan trigger-table row Brain reads every pass,
+   > 🔴 **`Sort Index` is a GATE, not a schedule** (`department-head-base.md` §9). Sixteen rows were
+   > created 2026-09-20 with it EMPTY on every one, plus five already-built agents carrying the same
+   > blank. **A gate with nothing to read is not a gate.**
+   > ⚠️ **The one-line rule now COLLIDES with the log law**, which puts a LIVE STATE block in the row
+   > description. The law is newer and wins; this clause governs everything else in the description.
+   > Ruling owed, and it is Michael's.
+2. ~~The **AI Toolkit index** (ClickUp doc) — the Quick-Scan trigger-table row Brain reads every pass,
    plus any existing rows that pointed at the old lens path. Do it or explicitly surface it; never
-   drop it silently.
+   drop it silently.~~
+   🔴 **STRUCK 2026-09-21, Michael: *"i refuse to do the toolkit paste. we need to make the system
+   more robust."*** **A per-agent trigger row MIRRORS the Index row and is not in the resolution
+   path.** `gates/agent-invocation-gate.md` STEP 0 is locked: resolve by querying the Index for the
+   ONE matching row and load `Home` directly. ⭐ **Fifth mirror pair after four retired manifests**
+   (`roster.json`, `roster.html`, `superagents.json`, `registry.json`), under one standing law:
+   **no pair, no sync obligation.** It had accumulated **19 owed rows** only Michael could paste —
+   i.e. **a mandatory registration surface no agent can write to**, which guarantees a growing queue
+   of unregisterable agents. Full reasoning: `gates/git-agent-authoring.md` step 5.
+   🚫 **NOT struck for a MIGRATED LENS whose auto-fire WAS an index-trigger row** (B.3) — that row is
+   a house tool for a HOOK-shaped trigger, and repointing it is still owed. 🚫 **Not struck for hooks
+   or triggers generally:** the invocation gate does not cover them, they have no Index row, so for
+   them the Toolkit table IS the routing layer.
 
 ~~3. `roster.json` / `superagents.json` / `registry.json`~~ — **ALL STRUCK.** `registry.json` retired
 2026-07-25 (PR #483); `roster.json` + `roster.html` retired 2026-07-30 (PR #612). **Writing to any of
 them is a no-op at best and the resurrection of a retired duplicate at worst.** The Mirror-Pair Sync
 Mandate died with the first one: **no pair, no sync obligation.** 🚫 Do not create a file to mirror
-the list. Three retirements is the pattern, not a coincidence.
+the list. Four retirements is the pattern, not a coincidence.
 
-> 🩹 **Why this step was urgent (2026-07-30):** for sixteen hours after the Index went live, this
+> 🩹 **Why step 2 was urgent in v0.5 (2026-07-30):** for sixteen hours after the Index went live, this
 > runbook still told a cold agent to register into `roster.json` — by then a tombstone whose
 > `agents[]` array is empty. A guardrail that instructs you to write to a tombstone is the exact rot
 > class this fleet keeps getting burned by, and it sat in the file that governs how agents are born.
+> ⭐ **v0.6 note: the step rotted a THIRD time, in a new way.** It was not pointing at a dead file —
+> it was pointing at a live surface that duplicated another live surface. **A mirror does not error;
+> it just quietly needs maintaining forever.**
 
 A retired agent stays LISTED on the Index, status `retired` — never silently dropped.
 
@@ -205,6 +244,10 @@ Full rule, the incident behind it, and the staleness re-check (addendum, never r
 of `audit-instruction.md`. This matters most at BIRTH: a bundle audited the same day it was built is
 the likeliest thing to have its base spec move underneath it. ⚠️ **The Index row has no SHA** — stamp
 the date and the row's `Slug` instead, and re-query rather than trusting a carried copy.
+
+⚠️ **DoD check 8 reads "Index row + trigger row fresh." The trigger-row half is struck for agents**
+(REGISTER step 2). Amendment owed in `audit-instruction.md`; until then, treat the Index row as the
+whole of check 8 for an agent, and keep the trigger half for hooks.
 
 ---
 
@@ -233,10 +276,26 @@ file was retired, so the very next agent to follow this runbook would have writt
 **whenever the index moves, this step is the thing that rots, and it rots silently because writing to
 a stub does not error.**
 
+🔴 **Sixth live run (2026-09-20, Vellum Victoria): FAILED ITS OWN PREMISE — this runbook was never
+opened.** The build ran off a neighbouring bundle instead, which is how it shipped a retired log shape
+and skipped the trigger row. Michael: *"how dare you just be building by riffing. we have agent build
+instructions and you're just not."* ⭐ **The bundle still scored 8 of 9 on a checklist nobody read,
+which is the finding: conformance reached by imitation is luck with good manners.** Post-hoc audit:
+`super-agents/vellum-victoria/audits/vellum-victoria.2026-09-20.md`. ⚠️ **The cold-start property was
+never the problem — REACHING FOR THE FILE was.** Nothing fires this runbook on build intent.
+
 ---
 
 ## Changelog
 
+- **v0.6 (2026-09-21) — REGISTER IS ONE SURFACE AGAIN, and BUILD stopped naming a retired file.**
+  Step 2 (AI Toolkit trigger row) **struck** on Michael's ruling: it mirrors the Index row, nothing
+  reads it to resolve a named call, and it had banked 19 owed rows only he could paste. `Lane` is
+  promoted in step 1 to carry the unrouted-ask job the row was doing. BUILD no longer lists
+  `activity-log.md` (log law, 2026-09-20) and now names D1 as blocking. Added A.5 (pick the
+  supplement — three exist, portability is the test), the sixth-run failure, and the DoD check-8
+  amendment owed. ⚠️ Also records the one-line-description clause now colliding with the log law's
+  LIVE STATE block.
 - **v0.5 (2026-07-30) — REGISTER writes to the ClickUp Agent Index.** `roster.json` retired to a
   tombstone (PR #612), so the previous instruction sent cold agents to write into an empty file that
   fails silently. Full field list spelled out, with the one-line-`Lane` rule and the no-new-text-field
@@ -256,7 +315,7 @@ a stub does not error.**
   step 0 (the §6 "needs MEMORY" justification), the do-not-invent-a-tool-path rule, the
   label-inherited-memory convention, the sidecar-tool-stays-put rule, the announce-header build
   requirement, and a token-collision check in DEFINE step 4. Found while running this runbook on
-  Maggie — the file that governs graduations was telling agents to write to a tombstone.
+  Maggie — **the file that governs graduations was telling agents to write to a tombstone.**
 - v0.2 (2026-07-21) — GRADUATED the inline git-teammate audit DoD into `audit-instruction.md`;
   VERIFY now points there instead of restating it. Folded in two findings from the Audit Anna cold
   run. Marked the acceptance test PASSED.
