@@ -32,7 +32,38 @@ because the outer half verifies) · quoting a remembered edition as current.
 
 ## Ledger D — Questions he keeps getting asked (the service-provider ledger)
 
-**EMPTY.** This is the one that should fill fastest if he is real.
+✅ **OPENED 2026-09-21. This was the first real question put to him, fourteen days short of the two-production D1 deadline.**
+
+### D-1 · Big Love (F26) · *"Get the motor labels, truss labels and pick-point floor labels together."*
+
+**Asked 01:14. Owed 10:00. The same morning the scenery load-in started.** The truss drawing it
+names had been sitting at rev A since 14 SEP, and the naming question had been answerable for a
+week. ⭐ **Per this ledger's own shape, the lateness IS the entry** — the question was not hard, it
+was simply asked nine hours before it was due instead of at the design meeting.
+
+🔑 **THE CRAFT FINDING, and it is the reason this is a ledger entry and not a log line: A LABEL IS
+NOT A RIGGING QUESTION.** Naming twenty-one points requires **zero capacities** — a name is not a
+rating, so the entire label deliverable can be produced without him and without a single load
+number. ⚠️ **And he still gets seated, for the inverse reason: a label sheet is precisely where an
+unsourced number gets written down.** Somebody labelling a pick point is one keystroke from putting
+a working load beside it.
+
+🎯 **So his actual function on a labelling task is to police what must NOT appear, not to supply
+what must.** That is a genuinely different posture from the one the dependency table implies, and it
+will recur on every paperwork deliverable this trade touches.
+
+⭐ **THE STRUCTURAL FIX WORTH CARRYING FORWARD, proposed by the file-discipline teammate in the same
+session:** put **`Source Plate` as a FIELD on the record**, beside the token, rather than as a note
+in prose. **A worksheet shows an empty cell; prose hides a missing sentence.** 🔑 That converts
+*"never state a capacity you did not read"* from a **discipline that depends on somebody
+remembering** into a **column that is visibly blank when the source is missing** — and Michael's own
+pattern is to prefer the structural fix to another behavioural rule. **Ask for this field on any
+schedule that will carry a rigging number.**
+
+⚠️ **Open at time of writing, and his to answer, not Gable's:** the bridle count needed against the
+four already in usable stock. **A count is a house-inventory fact and does not belong in this file**
+— recorded here only as *the shape of question that arrived attached to a labelling request*, which
+is the pattern: **a paperwork ask usually has a materials decision hiding inside it.**
 
 ## Ledger E — What Michael has refused to change
 
@@ -42,9 +73,21 @@ because the outer half verifies) · quoting a remembered edition as current.
 
 ## ⚠️ TO A COLD SESSION READING THIS FILE
 
-**Every ledger is genuinely empty. Say so.** Do not infer, do not import from another head, do not
-fill a ledger to have something to say. On a rigging agent specifically, an invented pattern is not
-just a documentation defect — **a plausible capacity is a hazard with a decimal point.**
+**Ledgers A, B, C and E are genuinely empty. Say so.** Do not infer, do not import from another
+head, do not fill a ledger to have something to say. On a rigging agent specifically, an invented
+pattern is not just a documentation defect — **a plausible capacity is a hazard with a decimal
+point.**
+
+⚠️ **Ledger D now has ONE entry and one entry is not a memory.** It does not license a claim about
+what "usually" gets asked, who asks most, or when. It licenses exactly two things: **a label task is
+not a capacity task**, and **ask for the `Source Plate` field.**
+
+🔑 **And read D-1's own register lesson before answering anything, because it was learned expensively
+in the same session:** Michael owns his tools and knows this craft better than the documentation
+does. **Answer at the level of the judgment, never by defining the thing.** A correct answer pitched
+at a beginner is still a failed answer.
 
 🎯 **Kill criterion, `decision-log.md` D1: if Ledger D is still empty after two real productions,
 nobody was actually consulting him, and a service provider nobody consults is not an agent.**
+✅ **D1 is no longer at risk of firing on an empty ledger — but one question in seven weeks is a
+weak pulse, not a clean bill of health.**
