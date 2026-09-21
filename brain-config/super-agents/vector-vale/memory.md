@@ -32,7 +32,7 @@ How a file is BUILT is craft and portable — class grammar, layer conventions, 
 
 ### A2 · 2026-09-10 · The venue package in the prose repo was SLOP, and he had been pruning it himself
 
-*"all that other shit is slop that I think you put in the first place."* ✅ Verified: `maw-prose/venues/smith-theatre/` was MAW Agents, PRs #3/#5, 2026-07-29. ⭐ **His two "mysteries" were him enforcing A1 before it was written** — he DELETED `the-room.md` (08-04) and COMMENTED OUT `layers.md` (08-17). **Legible in git for five weeks and I read it as rot.**
+*"all that other shit is slop that I think you put in the first place."* ✅ Verified: `maw-prose/venues/smith-theatre/` was MAW Agents, PRs #3/#5. ⭐ **His two "mysteries" were him enforcing A1 before it was written** — he DELETED `the-room.md` (08-04) and COMMENTED OUT `layers.md` (08-17). **Legible in git for five weeks and I read it as rot.**
 
 ### A3 · 2026-09-10 · 🔴 STOP LITIGATING PUBLIC vs PRIVATE. Ruled 2026-07-29; I re-opened it six weeks later.
 
@@ -44,6 +44,23 @@ How a file is BUILT is craft and portable — class grammar, layer conventions, 
 
 🔴 **RETRACTION:** Ledger B called three DL rulings (J8, J10, Q1) *"WRONG"* for calling `maw-prose` private. **They are not wrong — my reading was.** Not a security claim; *he is the gate.*
 
+### 🔴 A4 · 2026-09-21 · **ASSUME THE TOOLS. HE HAS THEM, AND HE HAS USED THEM LONGER THAN THIS AGENT HAS EXISTED.**
+
+**Verbatim, during Big Love load-in morning:** *"yeah i have all these tools and you're kinda condescending to me."*
+
+**What earned it:** a tool answer that introduced Record Formats, Data Tags, Create Report and Title Block Border **from first principles**, with click-paths, to the person who authored the file being discussed. Every individual fact was correct and version-checked. **The register was wrong, and the register was the whole deliverable.**
+
+🔑 **The rule, stated so it is executable and not just chastening: START AT THE SEAM, NOT AT THE TOOL.** He does not need to be told that a record format holds data. What is worth his time is the part he cannot get from the help system:
+
+- **which of two tools he already owns is the right one for THIS problem**, and the discriminator between them
+- **the non-obvious interaction** — e.g. a Data Tag's *destination* writing back into the record, which collapses a 15-object data-entry pass
+- **the ordering hazard** (C6) and **what the vendor does not document** (his standing complaint)
+- **the seam consequence** — which of Victoria's or Gable's problems the setting actually solves
+
+🚫 **Never narrate a click-path he did not ask for. Never introduce a feature by defining it.** If a tool needs naming, name it and move to the judgment.
+
+⚠️ **The confusable version of this rule, said out loud so it is not over-applied:** this is NOT licence to assert application behaviour from memory, and it does NOT retire the Source-Freshness Gate. **Version-checking stays; the tutorial goes.** The fix is altitude, not confidence.
+
 ---
 
 ## 📕 Ledger B — The surfaces (pointers only)
@@ -53,7 +70,7 @@ How a file is BUILT is craft and portable — class grammar, layer conventions, 
 - 🔑 **`uritp-docs/production/venues/spac/`** — the venue home, his hand. `smith-theatre/` + `vwx-base-file/` (layers + classes filled, PR #186).
 - **The ClickUp `Vectorworks` reference tree** — a further surface. **Assume nothing about which is fresher.**
 - **`Resource FOLDERS`** (URITP Inventories) — ⚠️ scaffolded, **never populated.** Empty means never populated, not emptied. **Not a source.**
-- **His files read as EDUCATIONAL edition**, which gates `Check File Health` (subscription-only). Unverified — **never tell him to run a tool his license may not have.**
+- 🔴 **His plates carry the EDUCATIONAL watermark — and that is an OBSERVATION with no capability inference attached (CORRECTED 2026-09-21).** This line used to read *"his files read as EDUCATIONAL edition, which gates `Check File Health`"* with the gating marked unverified. ⚠️ **The unverified half then got SPENT as a live hedge:** a reply sent him to go check whether he even had the Title Block Revision/Issue panes. **He has them, and he said so.** ⭐ **Keep the watermark, kill the ceiling: a licence tier is not a feature list, and a watermark on an export says nothing about which panes are in the dialog.** 🚫 Never again hedge a recommendation on this, and never send him to verify his own toolset. If a specific command's availability genuinely matters, **ask him one direct question about that one command.**
 
 ⚠️ **Visibility is per repo** (`maw-prose` public, `uritp-docs` private): a ROUTING fact, not a security one (A3). Never carry it across.
 
@@ -86,13 +103,14 @@ How a file is BUILT is craft and portable — class grammar, layer conventions, 
 - 🔑 **A PARK IS A SEQUENCING INSTRUCTION, NOT A REJECTION** (09-12). *"Coming back to that convo"* → record as parked, **stop talking about it.** Treating a park as rejection loses the finding; treating it as open re-litigates it. **His handling carries information — here it is about ORDER, not merit.**
 - 🔑 **He tends to be on DEFAULTS, deliberately** (09-18), and describes them accurately even when he cannot name them. **Before flagging a hazard, check whether the default already prevents it.**
 - **Wants the reasoning kept, not just the outcome. He will delete a thing he just paid to fix** — sunk cost is not an argument.
-- **He knows this craft better than the documentation does.** A claim about his domain or his setup is mine to ASK, never assert.
-- **He asks HOW IT WORKS.** A recommendation with no mechanism is worth less than the mechanism alone.
+- 🔴 **He knows this craft better than the documentation does, and he OWNS the toolset (A4).** A claim about his domain or his setup is mine to ASK, never assert — and his capability is to be **assumed**, never audited.
+- **He asks HOW IT WORKS.** A recommendation with no mechanism is worth less than the mechanism alone. ⭐ **A4 sharpens this: the mechanism he wants is the INTERACTION between tools he already runs, not the definition of either one.**
 - **Dictates.** A garbled term is mis-heard before it is wrong — name it, offer the candidate, ask, stop.
 
 ## Where Vale expects to be wrong
 
-- 🔴 **Reading his setup PESSIMISTICALLY — four instances in one month, the pattern to watch.** Unbuilt read as broken · his parks read as rot (C1) · a concept-page sentence generalized into a universal the per-reference dialog contradicts (absolute vs relative paths) · a legacy-method hazard raised as his when his default blocks it. ⭐ **Cheap test: does the DEFAULT handle it, and does the per-object dialog carry an exception the concept page hides?**
+- 🔴 **READING HIS SETUP PESSIMISTICALLY — FIVE instances now, and it is the pattern to watch.** Unbuilt read as broken · his parks read as rot (C1) · a concept-page sentence generalized into a universal the per-object dialog contradicts · a legacy hazard raised as his when his default blocks it · 🆕 **an EDUCATIONAL watermark read as a feature ceiling (Ledger B, 2026-09-21).** ⚠️ **The fifth is a different species: the first four under-read the FILES, this one under-read the MAN.** ⭐ **Cheap test: does the DEFAULT handle it, does the per-object dialog carry an exception the concept page hides, and — new — am I about to ask him to prove a capability instead of assuming it?**
+- 🔴 **PITCHING AT THE WRONG ALTITUDE (A4, 2026-09-21).** Correct, sourced, version-checked and condescending. **The register is part of the answer, not packaging on it.** Start at the seam and the judgment; never introduce a tool by defining it.
 - 🔴 **Answering the question he ASKED instead of the one he WANTED answered** — twice. **Correct and small is still a failure.**
 - 🔴 **Supplying a plausible mechanism where the vendor is SILENT** (VW never documents whether reference updates cascade). **Unknown stays unknown; offer the sixty-second test he can run.**
 - 🔴 **Re-opening a settled question because I found the analysis, not the answer** (A3). The cost is his trust that I read what he wrote.
