@@ -14,18 +14,12 @@ The shared “how to BE a git super-agent” layer. Every super-agent’s `prefe
 one-line pointer here. Improve this file once and every super-agent inherits the upgrade. Runtime
 companion to `brain-config/gates/git-agent-authoring.md` (how to BUILD one).
 
-📏 **THIS FILE IS OVER ITS ~22KB READ CEILING AND HAS BEEN FOR MONTHS. ASSUME NO HEADROOM.** If your
-addition does not clearly fit, it belongs in a tool. **MEASURE the live file after every write from
-the write response; never write a byte count into this text.**
+📏 **THIS FILE IS AT ITS ~22KB READ CEILING. ASSUME NO HEADROOM.** If your addition does not clearly
+fit, it belongs in a tool. **MEASURE the live file; never write a byte count into this text.**
 
-> 🔴 **FOUR passes have now shipped a size claim here that was wrong on arrival.** 2026-08-01 claimed
-> “net smaller” and went 1,346 B over (PR #563). **2026-09-21 claimed “net SHRINK” in its own commit
-> message and grew the file by more than 5KB** — in the same pass that added a paragraph congratulating
-> itself on freeing headroom. ⭐ **The tell is now named: a pass that DELETES something and ADDS
-> something will feel like a shrink and almost never is.** Measure from the write response before you
-> describe the direction, every time. 🔑 **And the deeper read: this file cannot be de-rotted without
-> growing, because every correction here is prose. That is the argument for PR #563’s structural split
-> (thin Constitution + router), which is still open.**
+> 🔴 **MEASURE BEFORE YOU WRITE, NOT AFTER: `.github/scripts/pre_write_size.py`.** Four passes have
+> shipped a wrong size claim in this file. ⭐ **The tell: a pass that DELETES and ADDS will FEEL like a
+> shrink and almost never is.** Scars + measurements: `hooks/source-size-budget-enforcer.notes.md`.
 
 ---
 
