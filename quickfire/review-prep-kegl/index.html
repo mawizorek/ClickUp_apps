@@ -29,7 +29,6 @@
   .lbl{font-family:'Cutive Mono',monospace;font-size:12.5px;letter-spacing:.1em;
     text-transform:uppercase;color:var(--soft)}
 
-  /* title block — stacks on phone, never scrolls sideways */
   .tb{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);background:var(--bg2)}
   .tb div{padding:8px 11px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
   .tb div:nth-child(2n){border-right:none}
@@ -38,19 +37,31 @@
   .tb .go{background:var(--violet)}
   .tb .go .lbl,.tb .go .v{color:#fff}
 
-  h1{font-size:clamp(33px,9vw,52px);letter-spacing:-.01em;margin-top:var(--s3)}
+  h1{font-size:clamp(31px,8.4vw,50px);letter-spacing:-.01em;margin-top:var(--s3)}
   h2{font-size:clamp(25px,6.4vw,34px);letter-spacing:-.005em}
   section{margin-top:var(--s7)}
   .lede{font-size:18px;color:var(--soft);margin-top:var(--s4)}
   .lede b,.lede strong{color:var(--ink);font-weight:700}
 
+  /* contract facts: stacked label/value rows */
+  .facts{border:1px solid var(--line);margin-top:var(--s4)}
+  .facts .f{padding:var(--s3) var(--s4);border-top:1px solid var(--line)}
+  .facts .f:first-child{border-top:none}
+  .facts .f:nth-child(2n){background:var(--bg2)}
+  .facts .fv{font-family:'Khand',sans-serif;font-size:23px;line-height:1.05;margin-top:2px}
+  .facts .fn{font-size:15.5px;color:var(--soft);margin-top:3px;line-height:1.35}
+
   .box{border:1px solid var(--line);border-left:4px solid var(--amber);
     background:var(--card);padding:var(--s4);margin-top:var(--s3)}
-  .fork{display:grid;gap:var(--s3)}
-  .fork .t{font-family:'Khand',sans-serif;font-size:26px;line-height:1.08;margin-top:2px}
+  .box.red{border-left-color:var(--fire)}
   hr{height:1px;background:var(--line);border:0;margin:var(--s4) 0}
 
-  /* bars: label above, bar below. no axis cramming. */
+  .gap{margin-top:var(--s4)}
+  .gap .g{padding:var(--s3) 0;border-top:1px solid var(--line)}
+  .gap .gt{font-family:'Khand',sans-serif;font-size:21px;line-height:1.1;color:var(--fire)}
+  .gap .gb{font-size:16.5px;color:var(--soft);margin-top:4px}
+  .gap .gb b{color:var(--ink)}
+
   .bar{margin-bottom:var(--s5)}
   .bar .hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:7px;margin-bottom:6px}
   .bar .nm{font-family:'Khand',sans-serif;font-size:21px}
@@ -60,6 +71,7 @@
   .track{position:relative;height:32px;background:var(--bg2);border:1px solid var(--line)}
   .fill{position:absolute;top:0;bottom:0}
   .med{position:absolute;top:-4px;bottom:-4px;width:2px;background:#fff}
+  .you{position:absolute;top:-6px;bottom:-6px;width:3px;background:var(--fire)}
   .num{position:absolute;top:7px;font-family:'Cutive Mono',monospace;font-size:12.5px;
     color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9);white-space:nowrap}
   .axis{position:relative;height:18px;margin-top:-10px;margin-bottom:var(--s4)}
@@ -70,7 +82,6 @@
   .kpi .b{font-family:'Khand',sans-serif;font-size:40px;line-height:.95}
   .kpi .c{font-size:15.5px;color:var(--soft);margin-top:3px}
 
-  /* comps: definition rows, not a table. tables die on phones. */
   .comp{border:1px solid var(--line);margin-top:var(--s3)}
   .comp .r{padding:var(--s3) var(--s4);border-top:1px solid var(--line)}
   .comp .r:first-child{border-top:none}
@@ -90,6 +101,8 @@
   .q .n{font-family:'Khand',sans-serif;font-size:32px;line-height:.9;color:var(--moss)}
   .q .t{font-family:'Khand',sans-serif;font-size:24px;line-height:1.1}
   .q p{margin-top:5px;color:var(--soft);font-size:16.5px}
+  .q .cite{font-family:'Cutive Mono',monospace;font-size:12px;color:var(--moss);
+    margin-top:5px;letter-spacing:.04em}
 
   .scope{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
     border:1px solid var(--line);margin-top:var(--s4)}
@@ -107,8 +120,9 @@
     .tb{grid-template-columns:repeat(4,1fr)}
     .tb div{border-bottom:none;border-right:1px solid var(--line)}
     .tb div:last-child{border-right:none}
-    .fork{grid-template-columns:1fr 1fr;gap:var(--s5)}
     .kpis{grid-template-columns:repeat(3,1fr)}
+    .facts{display:grid;grid-template-columns:1fr 1fr}
+    .facts .f{border-top:1px solid var(--line)}
     .comp .r{display:grid;grid-template-columns:1fr auto;gap:var(--s4);align-items:baseline}
     .comp .rt{display:block;text-align:right;white-space:nowrap;margin-top:0}
     .comp .rt .k{display:block;margin-top:2px}
@@ -127,47 +141,91 @@
   </div>
 
   <section style="margin-top:var(--s6)">
-    <div class="lbl" style="color:var(--salmon)">cue 1 — the frame</div>
-    <h1>Today is not the negotiation.<br>It writes <span style="color:var(--salmon)">the rules of it.</span></h1>
-    <p class="lede">Rosemary asked to “go over the steps for your review process, including what you
-    need to submit.” That is procedural, and procedural meetings are where the criteria get set.
-    <b>Whatever the dossier is allowed to contain is what gets reviewed.</b> Spend the 45 minutes
-    on the container, not on a number.</p>
+    <div class="lbl" style="color:var(--fire)">cue 1 — the real question</div>
+    <h1>Ask which document<br>governs this review.<br><span style="color:var(--fire)">Nobody has said.</span></h1>
+    <p class="lede">Your contract is Senior Lecturer, which is <b>teaching track</b>. The University's
+    detailed reappointment machinery (Appendix II, Section II) is written for the <b>instructional</b>
+    ranks: assistant, associate and full Professor of Instruction. Teaching track appears separately,
+    described as limited-term, <b>with no equivalent procedure anywhere</b> in either Appendix II or
+    the Faculty Handbook. Your offer letter just says "renewable."</p>
+    <p class="lede" style="font-size:16.5px">So every deadline, every required document, and every
+    criterion depends on an answer no one has given you yet. <b>Get it in the first five minutes</b>,
+    because the rest of the meeting changes shape around it.</p>
   </section>
 
   <section>
-    <div class="lbl" style="color:var(--amber)">cue 2 — the fork</div>
-    <div class="box">
-      <div class="fork">
-        <div><div class="lbl">UR’s own staff directory</div>
-          <div class="t" style="color:var(--amber)">Senior Lecturer /<br>Production Manager</div></div>
-        <div><div class="lbl">your email signature</div>
-          <div class="t" style="color:var(--soft)">Production Manager,<br>UR ITP</div></div>
-      </div>
-      <hr>
-      <p style="font-size:17.5px">You are carrying an academic appointment you are not using, and the
-      department executive is running your review. <strong>Senior Lecturer re-appointment and staff
-      re-appointment are different processes with different rubrics.</strong> Ask which one this is
-      first — every other question changes shape after the answer.</p>
-      <p style="font-size:16px;color:var(--soft);margin-top:var(--s3)">Across 43 peer programs,
-      <strong style="color:var(--ink)">22 give the production lead an academic appointment</strong>:
-      Skidmore’s artist-in-residence, Macalester’s assistant professor, WashU’s teaching professor,
-      Case Western’s adjunct lecturer. The hybrid is normal. Holding the title and being described by
-      half of it is not.</p>
+    <div class="lbl" style="color:var(--amber)">cue 2 — what the contract actually says</div>
+    <h2 style="margin-top:var(--s3)">Signed 3 June 2025. Supersedes everything earlier.</h2>
+    <div class="facts">
+      <div class="f"><div class="lbl">title</div><div class="fv">Senior Lecturer</div>
+        <div class="fn">Non-tenure track. Teaching track, not instructional.</div></div>
+      <div class="f"><div class="lbl">term ends</div><div class="fv">30 June 2028</div>
+        <div class="fn">Began 1 July 2025. Renewable pending satisfactory annual reviews.</div></div>
+      <div class="f"><div class="lbl">salary at appointment</div><div class="fv">$65,000</div>
+        <div class="fn">Earned Aug 1–May 31 (10 months), paid in 12. Re-set each spring, so pay is a
+        separate conversation from renewal.</div></div>
+      <div class="f"><div class="lbl">review timing</div><div class="fv">One year prior</div>
+        <div class="fn">The letter's own words: review for renewal past June 2028 happens a year
+        before. Roughly June 2027 — you are early, not late.</div></div>
+      <div class="f"><div class="lbl">prof. development fund</div><div class="fv">$2,000 / yr</div>
+        <div class="fn">Carryover to $4,000. Two years may be sitting unspent. OSHA-30 is the single
+        credential gating a $125–130K PSM lane.</div></div>
+      <div class="f"><div class="lbl">duties, as formal terms</div><div class="fv">The whole operation</div>
+        <div class="fn">Two courses per semester, oversight of all production areas and facilities,
+        management of all processes, supervision of staff, artists, students and faculty, on time and
+        on budget, evenings and weekends.</div></div>
+    </div>
+    <div class="box red" style="margin-top:var(--s5)">
+      <p style="font-size:17.5px"><strong>The leverage is inside your own letter.</strong> Appendix II
+      says teaching-track faculty are hired to teach <em>"without expectation of other service to the
+      department or University."</em> Your letter then assigns you the entire production operation as
+      <strong>formal terms of the appointment</strong>. The contract and the track's own policy
+      disagree about what your job is.</p>
+      <p style="font-size:16px;color:var(--soft);margin-top:var(--s3)">On the instructional track,
+      service is one of three evaluation pillars, and it explicitly counts <em>"improving program
+      quality, reputation and operational efficiency."</em> Senior Lecturer converts straight to
+      <strong style="color:var(--ink)">Associate Professor of Instruction</strong>, skipping assistant.
+      Conversion is administrative, not a national search. It does not carry a raise automatically;
+      that gets justified separately, which is what the market data below is for.</p>
     </div>
   </section>
 
   <section>
-    <div class="lbl" style="color:var(--violet);filter:brightness(1.4)">cue 3 — 52 live postings</div>
-    <h2 style="margin-top:var(--s3)">Your sector pays the least for the job you already do.</h2>
+    <div class="lbl" style="color:var(--fire)">cue 3 — three gaps, in writing</div>
+    <h2 style="margin-top:var(--s3)">What neither document gives you.</h2>
+    <div class="gap">
+      <div class="g"><div class="gt">No reappointment process</div>
+        <div class="gb">Appendix II Section II covers the instructional ranks. Section IV calls
+        teaching-track appointments limited-term and stops. The Handbook's own appointment-and-
+        reappointment section covers <b>instructor and assistant professor only</b>.</div></div>
+      <div class="g"><div class="gt">No notification guarantee</div>
+        <div class="gb">Handbook IV.A.1 promises written notice a year out to <b>an instructor,
+        assistant professor, associate professor, or professor without tenure</b>. Lecturer and senior
+        lecturer are not on that list. Your letter's renewal sentence is the protection you actually
+        hold.</div></div>
+      <div class="g"><div class="gt">A definition that doesn't fit</div>
+        <div class="gb">The Handbook's only substantive description of senior lecturer (IV.B.6) sits
+        under <b>Part-Time</b> titles. You are full-time. Appendix II calls it full-time teaching
+        track. Two documents, two framings, no procedure in either.</div></div>
+    </div>
+    <p class="mono" style="font-size:12.5px;color:var(--soft);margin-top:var(--s4)">One principle does
+    apply to you: the Handbook says renewable non-tenure-eligible term appointments should be reviewed
+    periodically so they are not continued unreasonably. An obligation to review, with no procedure
+    attached.</p>
+  </section>
+
+  <section>
+    <div class="lbl" style="color:var(--violet);filter:brightness(1.4)">cue 4 — 52 live postings</div>
+    <h2 style="margin-top:var(--s3)">$65,000 sits under the floor of your own sector.</h2>
     <p class="mono" style="font-size:12.5px;color:var(--soft);margin:var(--s2) 0 var(--s5)">
-      bar = posted band · white line = median · annualised, mixed appointment lengths</p>
+      bar = posted band · white line = median · red line = your salary · mixed appointment lengths</p>
 
     <div class="bar">
       <div class="hd"><span class="nm">Academic theatre production</span>
         <span class="mt">n=16</span><span class="here">you are here</span></div>
       <div class="track"><div class="fill" style="left:2%;width:31.4%;background:var(--violet)"></div>
-        <div class="med" style="left:14.1%"></div><div class="num" style="left:calc(14.1% + 8px)">$67,388</div></div>
+        <div class="med" style="left:14.1%"></div><div class="num" style="left:calc(14.1% + 8px)">$67,388</div>
+        <div class="you" style="left:13.3%"></div></div>
     </div>
     <div class="bar">
       <div class="hd"><span class="nm">Campus venue / events</span><span class="mt">n=5 · same employer</span></div>
@@ -202,10 +260,13 @@
       <div class="kpi"><div class="b">$77,125</div>
         <div class="c">top quartile of your own market</div></div>
     </div>
+    <p class="mono" style="font-size:12.5px;color:var(--soft);margin-top:var(--s4)">Your $65,000 is a
+    10-month figure against mostly 12-month comps, so the gap on a rate basis is wider than the bar
+    shows. Say that out loud before anyone else annualises it for you.</p>
   </section>
 
   <section>
-    <div class="lbl">the eight you can say out loud</div>
+    <div class="lbl">the nine you can say out loud</div>
     <div class="comp">
       <div class="r paid"><span><a href="https://www.umsalary.info/titlesearch.php?Title=arts&amp;Year=0">Univ. of Michigan · Arts Production Manager</a><span class="n">named incumbent, 2025-26 payroll</span></span>
         <span class="rt"><span class="fig">$105,000</span><span class="k">ACTUALLY PAID</span></span></div>
@@ -219,7 +280,7 @@
         <span class="rt"><span class="fig">$82,500–95,000</span><span class="k">offer band</span></span></div>
       <div class="r"><span><a href="https://hr.harvard.edu/salary-ranges">Harvard · Production Manager, grade 056</a><span class="n">FY26 grade band, not an incumbent</span></span>
         <span class="rt"><span class="fig">$68,100–111,500</span><span class="k">offer band</span></span></div>
-      <div class="r"><span><a href="https://up.yalecollege.yale.edu/position-available-technical-director-start-aug-2026">Yale · Technical Director, Undergraduate Production</a><span class="n">10-month — do not compare dollar for dollar</span></span>
+      <div class="r"><span><a href="https://up.yalecollege.yale.edu/position-available-technical-director-start-aug-2026">Yale · Technical Director, Undergraduate Production</a><span class="n">10-month — the one true apples-to-apples row here</span></span>
         <span class="rt"><span class="fig">$70,000–79,000</span><span class="k">offer band</span></span></div>
       <div class="r"><span><a href="https://www.ubjobs.buffalo.edu/postings/56916">Univ. at Buffalo · Technical Director (SL4)</a><span class="n">NY public floor</span></span>
         <span class="rt"><span class="fig">$63,000–67,000</span><span class="k">offer band</span></span></div>
@@ -232,31 +293,40 @@
   </section>
 
   <section>
-    <div class="lbl" style="color:var(--moss);filter:brightness(1.35)">cue 4 — the standby list</div>
-    <h2 style="margin:var(--s3) 0 var(--s5)">Five questions, in this order.</h2>
-    <div class="q"><div class="n">01</div><div><div class="t">Which track is this review on?</div>
-      <p>The public directory lists you as Senior Lecturer / Production Manager. Faculty review and
-      staff review have different criteria, readers and outcomes. Everything depends on this.</p></div></div>
-    <div class="q"><div class="n">02</div><div><div class="t">What are the criteria, and who reads the file?</div>
+    <div class="lbl" style="color:var(--moss);filter:brightness(1.35)">cue 5 — the standby list</div>
+    <h2 style="margin:var(--s3) 0 var(--s5)">Five asks, in this order.</h2>
+    <div class="q"><div class="n">01</div><div><div class="t">Which document governs this review?</div>
+      <p>Appendix II Section II, the offer letter's renewal clause, or something the department holds.
+      If it is Section II, that section is written for the instructional ranks and you are teaching
+      track — so which is it.</p></div></div>
+    <div class="q"><div class="n">02</div><div><div class="t">Can I have the department's written governance rules?</div>
+      <p>If a process for a senior lecturer exists anywhere, it lives there. You are entitled to a
+      copy, not a summary.</p>
+      <div class="cite">Handbook § II.F — every academic unit "should have a set of written rules and
+      procedures for its governance, with copies available to each faculty member"</div></div></div>
+    <div class="q"><div class="n">03</div><div><div class="t">What are the criteria, and who reads the file?</div>
       <p>A teaching-shaped rubric cannot see a production operation. If the readers are English
-      faculty, the dossier has to explain the operation, not assume it.</p></div></div>
-    <div class="q"><div class="n">03</div><div><div class="t">Can the production scope go in as reviewable work?</div>
-      <p>Four direct reports, ten craft disciplines, six production units this season. If it is not
-      in the file it was not reviewed.</p></div></div>
-    <div class="q"><div class="n">04</div><div><div class="t">Is a business-title change in scope here?</div>
-      <p>UR HR runs five career streams and twelve job levels and permits a school or program
-      business title over the system title. The mechanism exists. Ask where it lives.</p></div></div>
-    <div class="q"><div class="n">05</div><div><div class="t">Deadline, format, who else signs?</div>
-      <p>The boring question that decides your actual runway. Get it in writing before you leave.</p></div></div>
+      faculty, the dossier has to explain the operation rather than assume it. And ask whether the
+      production scope goes in as reviewable work at all — if it is not in the file, it was not
+      reviewed.</p></div></div>
+    <div class="q"><div class="n">04</div><div><div class="t">Is conversion to the instructional track on the table?</div>
+      <p>Senior Lecturer converts directly to Associate Professor of Instruction. Administrative
+      process, chair's recommendation required, no automatic raise. It moves you onto a track that has
+      a written procedure — which is the whole problem above, solved.</p></div></div>
+    <div class="q"><div class="n">05</div><div><div class="t">Deadline, format, who signs, and may I review my file?</div>
+      <p>The boring questions that decide your runway. Get the deadline in writing before you leave,
+      and put the file request in writing separately.</p>
+      <div class="cite">Handbook § IV.I — written request, chair for department files, dean for school
+      files. Confidential material is removed and indexed.</div></div></div>
   </section>
 
   <section>
-    <div class="lbl" style="color:var(--salmon)">cue 5 — scope, verified</div>
+    <div class="lbl" style="color:var(--salmon)">cue 6 — scope, verified</div>
     <h2 style="margin-top:var(--s3)">The program advertises four productions. You are running six.</h2>
-    <p class="lede" style="font-size:16.5px">URITP’s public About page says “four major productions
-    every year.” The live folders hold <b>Big Love</b>, <b>Becoming Curious</b>, <b>T.I.M.E.</b>
+    <p class="lede" style="font-size:16.5px">URITP's public About page says "four major productions
+    every year." The live folders hold <b>Big Love</b>, <b>Becoming Curious</b>, <b>T.I.M.E.</b>
     (both semesters), <b>One Acts</b>, <b>The Secretary</b>, and <b>Songs for a New World</b> as an
-    external booking. Your own program’s copy understates you. Fix it in the dossier before anyone
+    external booking. Your own program's copy understates you. Fix it in the dossier before anyone
     reads it.</p>
     <div class="scope">
       <div><div class="lbl">direct reports</div><div class="v">4</div><div class="s">TD · Props · Company Mgr · Costumes</div></div>
@@ -264,22 +334,23 @@
       <div><div class="lbl">students</div><div class="v">25–40</div><div class="s">per year</div></div>
       <div><div class="lbl">craft disciplines</div><div class="v">10</div><div class="s">scenery through wardrobe</div></div>
       <div><div class="lbl">prod. envelope</div><div class="v">$200–250K</div><div class="s">~$50K × 4–5 shows · re-verify before submitting</div></div>
-      <div><div class="lbl">teaching load</div><div class="v">2 courses</div><div class="s">every semester · lighting design + tech</div></div>
+      <div><div class="lbl">teaching load</div><div class="v">2 courses</div><div class="s">every semester · contractual</div></div>
     </div>
   </section>
 
   <div class="thin">
     <div class="lbl" style="color:var(--fire)">what this does not know</div>
     <ul>
-      <li>Your current salary and UR’s internal grade. Nothing public exposes either, so no figure here is a gap calculation.</li>
+      <li>Whether your salary moved since the $65,000 in the 2025 letter. It is re-set every spring and nobody has told me the current number.</li>
+      <li>UR's internal grade or career-stream level for this appointment. Nothing public exposes it.</li>
+      <li>Whether annual activity reports or course evaluations exist for this appointment. That is question 5, and the answer decides how much runway you have.</li>
       <li>No SeeThroughNY incumbent row for a SUNY theatre production title. The NY numbers are offer bands, not what anyone is paid.</li>
       <li>CUPA-HR and TCG salary tables are gated. No survey median was read, so none is quoted.</li>
-      <li>Purchase College’s band is from 2023. Yale is a 10-month appointment, not annualised.</li>
-      <li>The production envelope and staff counts come from an Aug 2026 confirmation and are Milo’s out-of-lane. Pull from BETA BUDGET before submitting.</li>
+      <li>The production envelope and staff counts come from an Aug 2026 confirmation and are Milo's out-of-lane. Pull from BETA BUDGET before submitting.</li>
     </ul>
   </div>
 
-  <footer>52 live postings · 43 peer programs · 23 sourced comp records · compiled 21 Sep 2026</footer>
+  <footer>Signed offer letter 02 Jun 2025 · Appendix II · Faculty Handbook Jan 2025 · 52 live postings · 43 peer programs · rebuilt 21 Sep 2026 09:10</footer>
 
 </div>
 </body>
