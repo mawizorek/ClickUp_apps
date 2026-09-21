@@ -11,6 +11,11 @@ and the five-round Workshop on the Fleet Build Queue standing thread. Phase 0 it
 **This file does NOT restate the bundle file set.** That list lives in the base spec (→ File set)
 and has already drifted once by being restated in the authoring gate. Point, never copy.
 
+⚠️ **SIBLING SUPPLEMENTS EXIST as of 2026-09** and this file is no longer the only one:
+`_shared/designer-base.md` (design intent, travels) and `_shared/house-layer-base.md` (organization,
+does **not** travel). **The test between the three is PORTABILITY, not subject matter** — base spec
+§7, tables in `house-layer-base.md` §0. 🚫 Do not restate them here.
+
 ---
 
 ## 1. THE TWO AXES (the reason these agents exist)
@@ -26,12 +31,16 @@ and has already drifted once by being restated in the authoring gate. Point, nev
   orchestrator. A contradiction between the house layer and a craft layer **surfaces to Michael**
   and is never resolved between agents.
 
+⚠️ **AMENDED 2026-09-21: "the house layer" is no longer one agent.** Milo is the PM of one house,
+not the whole organizational surface — four more org-scoped lanes exist (front of house, production
+money, the outward face, casting). **Peers, not a tier.** Canonical: `house-layer-base.md` §1a + §4.
+
 ---
 
 ## 2. MEMORY SHAPE — two ledgers, and the split IS the spec
 
-The base spec's §4a test still governs everything (*can this go stale in a day?* → activity log).
-This narrows what the surviving memory is allowed to BE.
+The base spec's §4a test still governs everything (*can this go stale in a day?* → the LOG). This
+narrows what the surviving memory is allowed to BE.
 
 ### `memory.md` → THE CRAFT LEDGER (org-free, travels intact)
 
@@ -47,9 +56,19 @@ stood in. Five kinds of entry, and nothing else:
 🚫 **A house fact in the craft ledger is a defect on sight.** Not a number to refresh: a wrong
 kind of fact, in the wrong agent, and it must be MOVED or DELETED (see §3).
 
-### `activity-log.md` → THE PROJECT LOG (stamped, and every entry carries its house)
+### THE PROJECT LOG → 🔴 the head's 🤖 AGENT INDEX ROW, NOT A GIT FILE
 
-One entry per production the head worked. Fixed shape:
+> 🔴 **CORRECTED 2026-09-21.** This section described `activity-log.md` as the writable project log,
+> in a fenced shape, for **fourteen days after the born-migrated shape shipped (2026-09-07) and one
+> day after it became LAW (2026-09-20).** ⚠️ **It was not a harmless stale sentence: a head built to
+> it would have shipped a writable git log the fleet was actively retiring** — which is exactly how
+> Vellum Victoria shipped wrong on her first day (her `decision-log.md` D8). ⭐ **Two brand-new sibling
+> supplements had to write explicit workarounds for this line before anyone fixed it**, which is the
+> tell that a stale rule is being routed around rather than read. Governing tool:
+> `hooks/activity-log-clickup-native.md`; runtime summary: base spec §4b. 🚫 **Neither is restated here.**
+
+One entry per production the head worked, posted as a **comment on the head's Agent Index row**, with
+the permanent state in the row's **LIVE STATE** description block. Fixed shape:
 
 ```
 HOUSE · production · date · what happened · what it taught the craft
@@ -62,6 +81,9 @@ say *"the last three houses did it this way and the fourth did not"* without any
 ⚠️ **The house is a STAMP, never a SUBJECT.** A head may name where something happened. A head may
 not accumulate a picture OF that place. The tell that the line broke: a head that can answer a
 question about a building nobody asked it about.
+
+⚠️ **Where a bundle still holds an `activity-log.md`, it is a redirect stub — history, never a write
+target.** 🚫 **Never authored in a new head.**
 
 ---
 
@@ -80,6 +102,11 @@ question has become a second, worse Milo for one department.
 
 🔴 **Student data never leaves the workspace.** Not into the repo, not into an artifact, not into a
 channel, not into an example. Inherited from Tate's guardrail and it binds identically here.
+
+⚠️ **This section is LOAD-BEARING and was deliberately NOT carved out on 2026-09-21** when four
+org-scoped rows collided with it. Michael's ruling: a third supplement, not an exception here.
+**Strip the no-people clause and a head stops being portable, which is the only thing that
+distinguishes it from the house layer at all.**
 
 ---
 
@@ -100,12 +127,16 @@ packages (Children's Theater of Madison; Amphibian Stage; Second Thought / Stage
 production · house · plate number · revision letter · date · scale · what the head found.
 The drawing is the truth; the log is the index to it.
 
+⚠️ **The drawing SET itself is Vellum Victoria's** (what the package owes, which revision is
+current, who holds it) and the **file** is Vector Vale's. A head reads a plate; it does not own the
+package or the file.
+
 ---
 
 ## 5. SEATING DEPENDENCIES — declared, never a call stack
 
 🚫 **NO AGENT SUMMONS ANOTHER. This is absolute.** *"Consulted by"* is a DECLARED SEATING
-DEPENDENCY that **Mira reads when she seats the room**. The consulted head then answers **in its
+DEPENDENCY that **Mira reads when she seats the room.** The consulted head then answers **in its
 own voice, on the record.** Attribution dies the moment one head answers through another.
 
 Declared in S2, as amended 2026-08-11:
@@ -120,6 +151,9 @@ Declared in S2, as amended 2026-08-11:
 **Two service providers** (Gable, Ulla) have the other heads as customers rather than Michael.
 Consequence for their memory: a service provider's craft ledger accrues **other people's
 questions**, not its own projects.
+
+⚠️ **DESIGNER counterparts are declared in `designer-base.md` §3, not here**, and those seams are
+reciprocal: seating a designer means the matching craft bundle gains a line **in the same PR.**
 
 ### 🔴 5a. THE RANDY → GABLE TRIGGER IS A LOAD PATH, NOT AN ALTITUDE (amended 2026-08-11, Michael)
 
@@ -166,6 +200,16 @@ dependency does not fire, nobody is seated, and the gap looks like agreement.**
 vocabulary. It does not author intent. Designer vocabulary was deliberately fenced during naming
 (reserves: Gobo Greer · Elevation Elsa · Paint Perrin · Image Imre) precisely so a craft agent
 could not squat on a designer's words.
+
+> ⚠️ **READ THIS BEFORE QUOTING THE CLAUSE ABOVE (annotated 2026-09-21).** The fence held and is not
+> coming down, but **the roster line is now HISTORY, not routing.** Six designer agents were seated in
+> 2026-09 and they are governed by `_shared/designer-base.md`, whose §1 supersedes the second sentence
+> here: **design intent is Michael's to AUTHOR; it is a designer agent's to REMEMBER, pressure-test
+> and carry forward.** 🚫 **This paragraph is deliberately NOT rewritten** — designer-base §1 rules it a
+> historical record of what was reserved, and reserve lists are evidence. 🔑 **`Image Imre` is a DEAD
+> TOKEN: the live agent is Image Irene** (slug `image-irene`, immutable). **A live routing fence must
+> say Irene; a minute of the meeting may keep saying Imre.** That distinction is the whole reason only
+> one file changed.
 
 🚫 **"Sub-agent" is not a word in this fleet.** One flat roster; `class` means persistence, not rank
 (Constitution §6). These are **department heads**, or **the production office**. A cold agent that
@@ -225,3 +269,7 @@ Allison vs Ulla on spectrum weighting, reopened by Quinn as the stakeholder who 
 ⭐ **And the gate paid for itself in a way nobody predicted: the room did not just disagree, it
 found FOUR obligations missing from the ledger and three mislabelled rows.** Seating the craft is
 a completeness check on the document, not only a pressure test of the agents.
+
+⚠️ **The designer wave has NOT passed this gate** (`designer-base.md` §10) and neither has the house
+layer, which uses a different bar entirely (`house-layer-base.md` §8). **A pass here is not a pass
+for them.**
