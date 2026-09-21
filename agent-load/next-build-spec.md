@@ -10,6 +10,21 @@
 
 ---
 
+## 0 🔴 BLOCKER — THIS APP CANNOT BE LEDGERED YET
+
+**`VERSIONS.md` measured 22,363 B at HEAD 2026-09-21** (root listing, `agent-load-spec` branch). Its own stated budget is *"target ~16KB, ceiling ~22KB"*. **It is AT its ceiling with ~165 B of headroom.**
+
+Consequences, both real:
+
+1. **A full read clips.** 22,363 B base64-inflates to ~29.8KB against a ~30KB return cap — the exact trap the ledger documents (*"a blob-API read CLIPPED a 16,829 B file on 08-03"*). A read of it during this session returned a table **missing `audio-compressor` and `doc-sandbox`**, both live root folders. Either the read clipped or the coverage rule is already breached. **Do not rewrite that file from a single read; that is how content gets silently deleted.**
+2. **So the `agent-load` row is OWED BUT NOT WRITTEN.** The coverage rule (*every root folder is in the table or on the not-apps line*) is unsatisfied for this folder, deliberately and visibly, rather than satisfied by a risky whole-file rewrite.
+
+**Unblock, in this order:** take one of the two parked row-moves (`f1-racetracks` ~2.7KB or `inciardi-collection` ~2.8KB → their app READMEs) → re-measure → reconcile the two missing folders → then add this app's row. **That is a ledger maintenance task, not part of this build, and it needs Michael.**
+
+⚠️ **Any future session that builds this app must still satisfy §6's ship gate item 4. It cannot, until the above is done.** This is the honest state, recorded rather than worked around.
+
+---
+
 ## 1 · Precedent (follow it, do not reinvent it)
 
 **`inbox-digest-report`.** A pure renderer over a `data/*.json` the app never writes. Its `data/README.md` is the field spec. Copy that shape.
@@ -173,7 +188,7 @@ Each row is a defect that actually shipped in the deleted `routines` app. **The 
 1. 🔴 **A COMMITTED UGLY-STATE FIXTURE** — `data/_fixture-ugly.json`: non-zero unassigned, a populated unmapped bucket, an old stamp. **It must be a committed FILE, not a runtime flag** (a flag is a code path that rots; a fixture is data that either renders or does not). **Reason it is mandatory: the live folder is at zero-unassigned, so the app's normal state has NEVER been rendered against anything else, and every status board breaks first in a state it has never rendered.**
 2. 🔴 **VERIFY MUST SEE FIRST PAINT.** Render the real JSON and the fixture, on screen, before ship. *`qr-forge` v1.0's ship check fetched `config.json` and never a rendered page — a verify that cannot see first paint is not a verify.*
 3. Confirm `applyTheme('eos')` resolves and all four vectors applied.
-4. `VERSIONS.md` row updated **in the same session as the PR.**
+4. `VERSIONS.md` row updated **in the same session as the PR** — 🔴 **currently BLOCKED, see §0.**
 
 ---
 
@@ -199,8 +214,8 @@ Today they are genuinely distinct. The moment the Wake Up is wired, **two surfac
 
 ## 9 · Open, for Michael
 
-1. **Slug + Pages URL** — `agent-load` assumed. Confirm or rename before a folder is populated.
-2. **`VERSIONS.md` trim** — the ledger is over its ~16KB target with two parked row-moves owed. This spec's row is ~250 B and **the trim is still owed, deliberately not taken here** rather than silently migrating another app's README uninvited.
+1. 🔴 **The `VERSIONS.md` ceiling — §0.** Needs a trim decision before this app can be ledgered, and the two missing root folders (`audio-compressor`, `doc-sandbox`) need reconciling. **The biggest open item, and it is not about this app.**
+2. **Slug + Pages URL** — `agent-load` assumed. Confirm or rename before a folder is populated.
 3. **Second production** — deferred, not refused. The answer should be *copy the file*, never *build an index*.
 
 ---
