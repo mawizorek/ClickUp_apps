@@ -9,6 +9,53 @@ Vale?"*
 
 ---
 
+## D9 · 2026-09-20 · 🔴 SHE WAS BUILT WITHOUT THE BUILD INSTRUCTIONS, AND HER STEWARD WAS NEVER SEATED
+
+**Michael:** *"how dare you just be building by riffing. we have agent build instructions and you're
+just not.... i guess felix hasn't even been involved."* **Both halves are true and neither is
+arguable.**
+
+**What happened.** `gates/git-agent-authoring.md` (the founding law, *"how to BUILD one"*) and
+`gates/git-teammate-lifecycle-runbook.md` v0.5 (the Define → Build → Register → Verify spine) were
+**never opened** by the session that built her. Both are named, by path, in
+`_shared/super-agent-base.md` — the file the build DID read. **Fleet Felix**, whose profile carries
+*new-agent stewardship* as lane item 2 and whose instruction 2 spells out the exact four-step
+stewardship of a new build, was used for **one** of those four steps: the name-collision scan. He was
+treated as a spell-checker for a job that is explicitly his.
+
+⭐ **THE FINDING THAT MATTERS, and it is not a comfortable one: the bundle scored 8 of 9 on a
+checklist nobody read.** D1 was a valid retirement condition. The collision gate ran. The profile
+stored no procedure. The PR flow held. **That is not exoneration — it is the diagnosis.** Every mark
+was hit by **carrying patterns off neighbouring bundles**, which is the identical method that produced
+D8 eleven hours earlier. A carried pattern can be carried WRONG, and **from inside the build there is
+no way to tell which kind you are carrying.** ⚠️ **Conformance reached by imitation is luck with good
+manners**, and it fails silently the first time the fleet changes shape — which is precisely what D8
+was.
+
+**What it actually cost** (full walk: `audits/vellum-victoria.2026-09-20.md`):
+- 🔴 **Her Quick-Scan Trigger Table row was never registered** — authoring gate step 5, runbook
+  REGISTER step 2, which says in terms: *do it or explicitly surface it; never drop it silently.*
+  Nine other teammates have that row. She does not. **The Index resolves a NAMED call; the trigger row
+  is what makes an unnamed drafting ask reach her at all** — and catching drafting debt Michael has
+  not thought to ask about is her entire reason for existing.
+- 🟡 **No dated audit file** under `audits/`, so Anna's birth PASS lived in a chat comment. An audit
+  outside the ledger cannot stay open on a finding.
+- 🟡 **The birth audit was unstamped.** It could not have stamped the governing files, **because
+  nobody had read them** — the missing stamps were a symptom of the missing read.
+
+⭐ **The generalizable lesson, and it is the same shape as D8 one entry down: the standard existed, was
+documented, was pointed at from the file the builder DID read, and still did not fire.** D8's pattern
+had been proven five times and never promoted to law. This one IS law and has no trigger. **There is a
+Quick-Scan row for *about to create a view* and *about to log time*, and none for *build an agent* —
+the heaviest build in this repo.** A gate that fires only when the builder remembers it exists is a
+document, not a gate. 🔑 **Twice in twelve hours is not bad luck, it is a missing trigger.**
+
+⚠️ **Recorded against the BUILD, not against her.** Nothing in this entry says the agent is wrong;
+the audit found no founding-law violation in her files. It says **the method that produced her was
+unverifiable**, and that the next agent built the same way will not be so lucky.
+
+---
+
 ## D8 · 2026-09-20 · 🔴 SHE WAS BUILT ON THE RETIRED SHAPE — a writable git activity log
 
 **Michael:** *"why tf did victoria get built that way. MAJOR error. she's not a pilot migration. we have
@@ -125,6 +172,9 @@ this a live test, not a formality.
 ⚠️ **A1 moved this bar in both directions** (see `memory.md`): reading a package requires
 per-department judgment a saved view cannot supply, **but** the completeness half now depends on
 per-department prose notes that do not exist yet.
+
+✅ **Audited 2026-09-20 and confirmed VALID** against the authoring gate's four tests (falsifiable ·
+observable · cold-readable · not builder-dependent) — `audits/vellum-victoria.2026-09-20.md`.
 
 ---
 
