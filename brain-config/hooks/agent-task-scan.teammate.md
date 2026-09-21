@@ -146,13 +146,42 @@ seating alone (the status quo, which is what left 93 unread) and an auto-loop on
 a cadence (**nothing periodic exists** — the scheduler was retired 2026-07-26,
 so an auto-loop would have to be invented, not configured).
 
-⏳ **Room-scoped roll call is PENDING Michael's build** (J5): entering an
-office/workshop and convening its members. Until that list exists, roll call is
-**field-scoped only.** 🚫 Do not build the room list, its rooms, or its
-memberships — he said *"I'll build offices/workspaces."*
-
 ⚠️ **Generalized from ZERO live runs.** A session that finds no prior roll-call
 report SAYS SO rather than assuming this works.
+
+### Room-scoped roll call
+
+**The room list EXISTS as of 2026-09-21 07:07**, built by Michael:
+`MEETINGS | WORKSHOPS | OFFICES`, list **`901329128254`**, in MAW Documents ▸
+ClickUp Use ▸ **AGENTS**, beside the 🤖 Agent Index. List Index row filed same
+day. First two rooms: *Brainstorming Team*, *URITP Production Team*.
+
+Entering a room and convening its members is a **second scope** for this
+procedure: read the room row, resolve its `Agents` relationship to Index rows,
+and run steps 2-5 against that membership instead of the whole field. Everything
+else is unchanged. ⚠️ **Field-scoped roll call remains the default** — a room is
+a narrower sweep, never a replacement for the fleet sweep.
+
+🔴 **`Agent Assignee` STAYS EMPTY ON ROOM ROWS. Membership lives in the `Agents`
+relationship, and only there.** The field is inherited workspace-wide, so it is
+*available* on that list and will look like the obvious place to record who is in
+a room. It is not. **A tagged room enters step 1's field sweep as an assignment**,
+which means every seated agent's stamp counts a room it was never asked to do
+work on, and `/roll-call` starts reporting rooms as work. ⭐ Same class as the
+existing *session tasks are not assignments* guardrail — a wrapper object wearing
+the work field — and the second instance, which makes it a pattern: **an object
+that GROUPS agents must never carry the field that ASSIGNS them.** Caught latent
+on 2026-09-21 before any room was tagged, not after.
+
+⚠️ Room rows are currently typed **`Venue`**, a type shared with 20+ real
+buildings (Todd Theatre, SPAC, Kodak Hall, Blue Cross Arena). No hook filters on
+that type today, so this is a naming smell rather than a defect — but **a
+`type = 'Venue'` query crosses rooms and buildings**, so scope room reads by LIST
+id, never by task type.
+
+🚫 **No agent creates a room or writes a membership.** Michael built the list and
+owns its contents (J5, and his *"I'll build offices/workspaces"*). An agent reads
+it, reports findings about it, and proposes — it does not populate it.
 
 ---
 
@@ -168,6 +197,7 @@ report SAYS SO rather than assuming this works.
 
 ## Changelog
 
+- **v1.1 (2026-09-21)** — Michael built the room list (`901329128254`) 90 minutes after v1 locked the ruling that it should exist, so the PENDING block became a real Room-scoped roll call section, and a List Index row was filed for it. Carries one new hard rule found latent in the audit: 🔴 **`Agent Assignee` stays empty on room rows** — the field is inherited workspace-wide onto that list, and a tagged room would enter the field sweep as a fake assignment and inflate every seated agent's stamp. Second instance of a wrapper object wearing the work field (session tasks were the first), which is what promotes it from a note to a pattern: **an object that GROUPS agents must never carry the field that ASSIGNS them.** Also recorded: room rows are typed `Venue`, shared with 20+ real buildings, so room reads scope by list id and never by task type.
 - **v1 (2026-09-21)** — Split out of `agent-task-scan.md` v5 at draft time, before the oversized version was ever committed: parent + these two sections measured 25,837 B against a ~22KB ceiling. Carries Michael's three rulings from the 09-21 initiation-standard session — THE TWO SURFACES (J3), ROLL CALL at 12-15 seats with per-turn cadence (J4), and the room-list boundary (J5).
 
 ⚠️ **Written DIRECT TO MAIN** — no `create_branch` in this session's kit, only
