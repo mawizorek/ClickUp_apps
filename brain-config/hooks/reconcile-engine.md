@@ -130,9 +130,17 @@ A manifest is DATA, not procedure — it never restates the passes or guardrails
    canonical overlay (participant files ≠ a company sheet).
 
 **Live manifests:** `prod-cal-reconcile.md` (calendar: ClickUp · Google · Info Sheet) ·
-`contact-reconcile.md` (contacts: master matrix · contact-sheet PDF · Info Sheet). The ddr and
+`contact-reconcile.md` (contacts: master matrix · contact-sheet PDF · Info Sheet) ·
+`doc-schema-import.md` (standards collection: ESTA TSP published library · SCHEMA
+documents/versions/joins · archived legacy list). The ddr and
 doc-destroyer reconciles remain standalone for now (their surfaces are a FileMaker DDR and a repo
 tree — candidates to migrate once this engine is proven; deliberately NOT converted in this pass).
+
+⚠️ **A PORT IS NOT A RECONCILE, and `doc-schema-import.md` is the case that proved it.** A one-way
+migration's job is to CREATE counterparts, which this engine's guardrails forbid outright. That
+manifest therefore declares its port as CLOSED HISTORY and only its ongoing currency check as a
+reconcile surface. **A manifest may not smuggle a bulk-create pass in under the engine's
+read-only-needs-no-permission rule.**
 
 ---
 
@@ -154,3 +162,6 @@ tree — candidates to migrate once this engine is proven; deliberately NOT conv
    a bloated overlay. Watch it.
 4. The manifest is a NEW data-model file class — doc-rot-sweep + fleet-fact-sweep must now police
    it (Enzo). Added to this pass; verify on next sweep.
+5. **No manifest has yet declared an EXTERNAL WEB surface** until `doc-schema-import.md` (ESTA TSP).
+   The propose-only guardrail already covers it, but the freshness model does not: a web page has
+   no export stamp, so "how stale is this snapshot" is currently answered by the read time alone.
