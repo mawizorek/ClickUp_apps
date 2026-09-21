@@ -19,8 +19,10 @@ it is always-on for any agent doing work.
 
 **Decision history:** `Agent Index as the Interaction Surface ("Offices") — Decision Log`
 (ClickUp doc page) — **J3** two surfaces, **J4** roll call + cadence, **J5** rooms
-ship as a list. Per Decision-Log Gold Standard rule 11 the log is a ClickUp page
-and this is the pointer.
+ship as a list, **J6** room list built + `Agent Assignee` stays empty on room
+rows, **J7** agents MAY write memberships / may NOT create rooms. Per
+Decision-Log Gold Standard rule 11 the log is a ClickUp page and this is the
+pointer.
 
 ---
 
@@ -82,12 +84,22 @@ comments run **2-4KB of essay each.** Those are the thing being replaced. A line
 carries the verb, the object, the delta and the id — nothing else. No preamble,
 no restating what Michael already knows, no closing summary.
 
+⚠️ **The same brevity law governs CHAT, corrected 2026-09-21:** Michael, *"sooooo
+much prose when you write."* Chat gets a scannable report summary or a direct
+link so he can greenlight from there; the ENTITY keeps the full record. **Long
+prose in chat is not thoroughness, it is substance written to the wrong surface**
+— the same defect THE TWO SURFACES already names, arriving through the reply
+instead of through the row.
+
 🔴 **NEVER WRITE AN ID A TOOL DID NOT RETURN THIS PASS.** Recorded twice in
 Milo's row inside two days: fabricated task ids, and a spine line carrying a
 made-up session-task link, both written to make a log look properly attributed.
 **If the id did not come back from a tool this pass, write the name and the URL
 and stop.** A fabricated id is worse than a missing one — the next session loads
-it and gets nothing, or worse, gets something else.
+it and gets nothing, or worse, gets something else. ⭐ **This law paid for itself
+on 2026-09-21:** Ledger Elio and House Hollis were held only as URLs when the
+first membership write came due, were re-queried rather than reconstructed, and
+the write landed correct.
 
 ### Precedence among the three write surfaces
 
@@ -154,7 +166,9 @@ report SAYS SO rather than assuming this works.
 **The room list EXISTS as of 2026-09-21 07:07**, built by Michael:
 `MEETINGS | WORKSHOPS | OFFICES`, list **`901329128254`**, in MAW Documents ▸
 ClickUp Use ▸ **AGENTS**, beside the 🤖 Agent Index. List Index row filed same
-day. First two rooms: *Brainstorming Team*, *URITP Production Team*.
+day. Two rooms live and seated as of 07:40: *Brainstorming Team* (Deliberation,
+**12** lens voices) and *URITP Production Team* (Working, **15** labelled
+teammates).
 
 Entering a room and convening its members is a **second scope** for this
 procedure: read the room row, resolve its `Agents` relationship to Index rows,
@@ -179,9 +193,43 @@ that type today, so this is a naming smell rather than a defect — but **a
 `type = 'Venue'` query crosses rooms and buildings**, so scope room reads by LIST
 id, never by task type.
 
-🚫 **No agent creates a room or writes a membership.** Michael built the list and
-owns its contents (J5, and his *"I'll build offices/workspaces"*). An agent reads
-it, reports findings about it, and proposes — it does not populate it.
+#### `Room Kind` — READ IT BEFORE REPORTING A ZERO
+
+Dropdown on the room list, created 2026-09-21. Two values, and the distinction is
+load-bearing:
+
+- **`Deliberation`** — holds UNLABELLED lens voices (Council / Workshop). Nothing
+  in the room is assignable, so a sweep returning **zero tasks is the CORRECT
+  result, permanently.** Convene it to argue, not to move work.
+- **`Working`** — holds LABELLED teammates. Convene it to move real tasks, and a
+  zero here is worth a second look.
+
+🔴 **Without this field a Deliberation zero reads as a broken sweep**, and the
+first agent to roll-call *Brainstorming Team* files a bug against a working
+system. ⭐ It is not metadata: it is the difference between *"nothing to do"* and
+*"something is broken."* This traces straight to J4's boundary — **labelable =
+teammate you assign; unlabelled = lens you seat** — which is a deliberate design
+line, not a gap in the label field.
+
+#### Who may write what
+
+✅ **An agent MAY write a membership** into the `Agents` relationship (J7, Michael
+lifting the J5 restriction: *"I write the memberships"*). ✅ It may set
+`Room Kind`. 🚫 **An agent may NOT create a room.** Room creation is Michael's
+(J5, and his *"I'll build offices/workspaces"*).
+
+⭐ **The line is SCHEMA vs DATA, not room vs agent.** Creating a room invents a
+container, and containers invented by agents are exactly how three manifests got
+tombstoned (**D2**). Writing a membership only points at Index rows Michael
+already approved, through a field already scoped to `901328043244` — **the
+relationship cannot smuggle a new entity into existence**, which is why J5 chose
+it over a Labels field to begin with.
+
+⚠️ **When a ruling is narrowed or reversed, patch every document that quoted the
+old version IN THE SAME TURN.** This section previously read *"No agent creates a
+room or writes a membership"* and sat contradicting live permission for the
+length of one turn. **Grep for the quote; do not trust memory of where it
+landed** — a cold agent reads the repo, not the decision log.
 
 ---
 
@@ -197,6 +245,7 @@ it, reports findings about it, and proposes — it does not populate it.
 
 ## Changelog
 
+- **v1.2 (2026-09-21)** — Michael lifted the J5 no-agent-writes rule for memberships (**J7**), so the 🚫 line that forbade both room creation AND membership writes is **narrowed to creation only**, with the reasoning recorded: the boundary is SCHEMA vs DATA, and a list-scoped relationship cannot invent an entity. Adds the **`Room Kind`** dropdown section (`Deliberation` / `Working`) because a Deliberation room sweeping zero tasks is the correct answer forever and without the field it reads as a defect. Both rooms now seated (12 / 15) with `Agent Assignee` empty. Also folds Michael's chat-brevity correction into FORMAT: long prose in chat is substance written to the wrong surface. New generalized instruction: **a narrowed ruling must patch every document that quoted the old version in the same turn.**
 - **v1.1 (2026-09-21)** — Michael built the room list (`901329128254`) 90 minutes after v1 locked the ruling that it should exist, so the PENDING block became a real Room-scoped roll call section, and a List Index row was filed for it. Carries one new hard rule found latent in the audit: 🔴 **`Agent Assignee` stays empty on room rows** — the field is inherited workspace-wide onto that list, and a tagged room would enter the field sweep as a fake assignment and inflate every seated agent's stamp. Second instance of a wrapper object wearing the work field (session tasks were the first), which is what promotes it from a note to a pattern: **an object that GROUPS agents must never carry the field that ASSIGNS them.** Also recorded: room rows are typed `Venue`, shared with 20+ real buildings, so room reads scope by list id and never by task type.
 - **v1 (2026-09-21)** — Split out of `agent-task-scan.md` v5 at draft time, before the oversized version was ever committed: parent + these two sections measured 25,837 B against a ~22KB ceiling. Carries Michael's three rulings from the 09-21 initiation-standard session — THE TWO SURFACES (J3), ROLL CALL at 12-15 seats with per-turn cadence (J4), and the room-list boundary (J5).
 
