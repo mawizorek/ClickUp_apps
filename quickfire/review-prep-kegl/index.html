@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Prep · Kegl · 21 Sep</title>
+<meta name="theme-color" content="#1a1419">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Khand:wght@500;600;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Cutive+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:oklch(20.6% 0.011 321); --bg2:oklch(17.2% 0.010 321);
+    --card:oklch(23.4% 0.015 321); --line:oklch(31% 0.018 321);
+    --ink:oklch(92% 0.009 321); --soft:oklch(74% 0.024 321);
+    --violet:#8a4d97; --fire:#e05450; --amber:#ea7428; --salmon:#e2998a; --moss:#17916f;
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:22px; --s6:32px; --s7:46px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Alegreya Sans',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.kh{font-family:'Khand',system-ui,sans-serif;font-weight:600;margin:0;line-height:1.08}
+  .mono{font-family:'Cutive Mono',ui-monospace,monospace}
+  p{margin:0;text-wrap:pretty}
+  a{color:var(--salmon);text-underline-offset:3px}
+  .wrap{max-width:760px;margin:0 auto;padding:var(--s4) var(--s4) var(--s7)}
+  .lbl{font-family:'Cutive Mono',monospace;font-size:12.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--soft)}
+
+  /* title block — stacks on phone, never scrolls sideways */
+  .tb{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);background:var(--bg2)}
+  .tb div{padding:8px 11px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .tb div:nth-child(2n){border-right:none}
+  .tb div:nth-last-child(-n+2){border-bottom:none}
+  .tb .v{font-family:'Khand',sans-serif;font-size:19px;font-weight:600}
+  .tb .go{background:var(--violet)}
+  .tb .go .lbl,.tb .go .v{color:#fff}
+
+  h1{font-size:clamp(33px,9vw,52px);letter-spacing:-.01em;margin-top:var(--s3)}
+  h2{font-size:clamp(25px,6.4vw,34px);letter-spacing:-.005em}
+  section{margin-top:var(--s7)}
+  .lede{font-size:18px;color:var(--soft);margin-top:var(--s4)}
+  .lede b,.lede strong{color:var(--ink);font-weight:700}
+
+  .box{border:1px solid var(--line);border-left:4px solid var(--amber);
+    background:var(--card);padding:var(--s4);margin-top:var(--s3)}
+  .fork{display:grid;gap:var(--s3)}
+  .fork .t{font-family:'Khand',sans-serif;font-size:26px;line-height:1.08;margin-top:2px}
+  hr{height:1px;background:var(--line);border:0;margin:var(--s4) 0}
+
+  /* bars: label above, bar below. no axis cramming. */
+  .bar{margin-bottom:var(--s5)}
+  .bar .hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:7px;margin-bottom:6px}
+  .bar .nm{font-family:'Khand',sans-serif;font-size:21px}
+  .bar .mt{font-family:'Cutive Mono',monospace;font-size:12.5px;color:var(--soft)}
+  .bar .here{font-family:'Cutive Mono',monospace;font-size:11.5px;letter-spacing:.09em;
+    text-transform:uppercase;background:var(--violet);color:#fff;padding:2px 7px}
+  .track{position:relative;height:32px;background:var(--bg2);border:1px solid var(--line)}
+  .fill{position:absolute;top:0;bottom:0}
+  .med{position:absolute;top:-4px;bottom:-4px;width:2px;background:#fff}
+  .num{position:absolute;top:7px;font-family:'Cutive Mono',monospace;font-size:12.5px;
+    color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9);white-space:nowrap}
+  .axis{position:relative;height:18px;margin-top:-10px;margin-bottom:var(--s4)}
+  .axis span{position:absolute;font-family:'Cutive Mono',monospace;font-size:12px;color:var(--soft)}
+
+  .kpis{display:grid;gap:var(--s2);margin-top:var(--s5)}
+  .kpi{background:var(--card);border:1px solid var(--line);padding:var(--s3) var(--s4)}
+  .kpi .b{font-family:'Khand',sans-serif;font-size:40px;line-height:.95}
+  .kpi .c{font-size:15.5px;color:var(--soft);margin-top:3px}
+
+  /* comps: definition rows, not a table. tables die on phones. */
+  .comp{border:1px solid var(--line);margin-top:var(--s3)}
+  .comp .r{padding:var(--s3) var(--s4);border-top:1px solid var(--line)}
+  .comp .r:first-child{border-top:none}
+  .comp .r:nth-child(2n){background:var(--bg2)}
+  .comp .r > span{display:block}
+  .comp a,.comp .org{display:block;font-size:16.5px;line-height:1.3}
+  .comp .n{display:block;font-family:'Cutive Mono',monospace;font-size:12.5px;
+    color:var(--soft);margin-top:3px;line-height:1.35}
+  .comp .rt{display:flex;align-items:baseline;gap:8px;margin-top:7px}
+  .comp .fig{font-family:'Khand',sans-serif;font-size:25px;line-height:1}
+  .comp .paid .fig{color:var(--salmon)}
+  .comp .k{font-family:'Cutive Mono',monospace;font-size:11.5px;letter-spacing:.08em;color:var(--soft)}
+
+  .q{display:grid;grid-template-columns:38px 1fr;gap:var(--s3);
+    padding-bottom:var(--s4);margin-bottom:var(--s4);border-bottom:1px solid var(--line)}
+  .q:last-child{border-bottom:none;margin-bottom:0}
+  .q .n{font-family:'Khand',sans-serif;font-size:32px;line-height:.9;color:var(--moss)}
+  .q .t{font-family:'Khand',sans-serif;font-size:24px;line-height:1.1}
+  .q p{margin-top:5px;color:var(--soft);font-size:16.5px}
+
+  .scope{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+    border:1px solid var(--line);margin-top:var(--s4)}
+  .scope div{background:var(--card);padding:var(--s3)}
+  .scope .v{font-family:'Khand',sans-serif;font-size:29px;line-height:1}
+  .scope .s{font-size:14.5px;color:var(--soft);line-height:1.3}
+
+  .thin{border:1px dashed var(--line);padding:var(--s4);margin-top:var(--s6)}
+  .thin ul{margin:var(--s2) 0 0;padding-left:19px;color:var(--soft);font-size:16px}
+  .thin li+li{margin-top:6px}
+  footer{margin-top:var(--s6);padding-top:var(--s3);border-top:1px solid var(--line);
+    font-family:'Cutive Mono',monospace;font-size:12px;color:var(--soft)}
+
+  @media (min-width:620px){
+    .tb{grid-template-columns:repeat(4,1fr)}
+    .tb div{border-bottom:none;border-right:1px solid var(--line)}
+    .tb div:last-child{border-right:none}
+    .fork{grid-template-columns:1fr 1fr;gap:var(--s5)}
+    .kpis{grid-template-columns:repeat(3,1fr)}
+    .comp .r{display:grid;grid-template-columns:1fr auto;gap:var(--s4);align-items:baseline}
+    .comp .rt{display:block;text-align:right;white-space:nowrap;margin-top:0}
+    .comp .rt .k{display:block;margin-top:2px}
+    .scope{grid-template-columns:repeat(3,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="tb">
+    <div><div class="lbl">sheet</div><div class="v">REVIEW PREP</div></div>
+    <div><div class="lbl">with</div><div class="v">R. KEGL</div></div>
+    <div><div class="lbl">date</div><div class="v">09.21.26</div></div>
+    <div class="go"><div class="lbl">go</div><div class="v">14:00</div></div>
+  </div>
+
+  <section style="margin-top:var(--s6)">
+    <div class="lbl" style="color:var(--salmon)">cue 1 — the frame</div>
+    <h1>Today is not the negotiation.<br>It writes <span style="color:var(--salmon)">the rules of it.</span></h1>
+    <p class="lede">Rosemary asked to “go over the steps for your review process, including what you
+    need to submit.” That is procedural, and procedural meetings are where the criteria get set.
+    <b>Whatever the dossier is allowed to contain is what gets reviewed.</b> Spend the 45 minutes
+    on the container, not on a number.</p>
+  </section>
+
+  <section>
+    <div class="lbl" style="color:var(--amber)">cue 2 — the fork</div>
+    <div class="box">
+      <div class="fork">
+        <div><div class="lbl">UR’s own staff directory</div>
+          <div class="t" style="color:var(--amber)">Senior Lecturer /<br>Production Manager</div></div>
+        <div><div class="lbl">your email signature</div>
+          <div class="t" style="color:var(--soft)">Production Manager,<br>UR ITP</div></div>
+      </div>
+      <hr>
+      <p style="font-size:17.5px">You are carrying an academic appointment you are not using, and the
+      department executive is running your review. <strong>Senior Lecturer re-appointment and staff
+      re-appointment are different processes with different rubrics.</strong> Ask which one this is
+      first — every other question changes shape after the answer.</p>
+      <p style="font-size:16px;color:var(--soft);margin-top:var(--s3)">Across 43 peer programs,
+      <strong style="color:var(--ink)">22 give the production lead an academic appointment</strong>:
+      Skidmore’s artist-in-residence, Macalester’s assistant professor, WashU’s teaching professor,
+      Case Western’s adjunct lecturer. The hybrid is normal. Holding the title and being described by
+      half of it is not.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="lbl" style="color:var(--violet);filter:brightness(1.4)">cue 3 — 52 live postings</div>
+    <h2 style="margin-top:var(--s3)">Your sector pays the least for the job you already do.</h2>
+    <p class="mono" style="font-size:12.5px;color:var(--soft);margin:var(--s2) 0 var(--s5)">
+      bar = posted band · white line = median · annualised, mixed appointment lengths</p>
+
+    <div class="bar">
+      <div class="hd"><span class="nm">Academic theatre production</span>
+        <span class="mt">n=16</span><span class="here">you are here</span></div>
+      <div class="track"><div class="fill" style="left:2%;width:31.4%;background:var(--violet)"></div>
+        <div class="med" style="left:14.1%"></div><div class="num" style="left:calc(14.1% + 8px)">$67,388</div></div>
+    </div>
+    <div class="bar">
+      <div class="hd"><span class="nm">Campus venue / events</span><span class="mt">n=5 · same employer</span></div>
+      <div class="track"><div class="fill" style="left:5.1%;width:37.5%;background:var(--salmon)"></div>
+        <div class="med" style="left:16.7%"></div><div class="num" style="left:calc(16.7% + 8px)">$72,500</div></div>
+    </div>
+    <div class="bar">
+      <div class="hd"><span class="nm">Scenic fabrication PM</span><span class="mt">n=5 · Vectorworks is the ticket</span></div>
+      <div class="track"><div class="fill" style="left:15.4%;width:28.2%;background:var(--moss)"></div>
+        <div class="med" style="left:25.6%"></div><div class="num" style="left:calc(25.6% + 8px)">$90,000</div></div>
+    </div>
+    <div class="bar">
+      <div class="hd"><span class="nm">Venue operator ops</span><span class="mt">n=5 · arenas, PACs</span></div>
+      <div class="track"><div class="fill" style="left:16.7%;width:48.7%;background:var(--amber)"></div>
+        <div class="med" style="left:25.6%"></div><div class="num" style="left:calc(25.6% + 8px)">$90,000</div></div>
+    </div>
+    <div class="bar">
+      <div class="hd"><span class="nm">Regional / presenting</span><span class="mt">n=18 · same job, no campus</span></div>
+      <div class="track"><div class="fill" style="left:13.3%;width:85.4%;background:var(--fire)"></div>
+        <div class="med" style="left:34%"></div><div class="num" style="left:calc(34% + 8px)">$106,250</div></div>
+    </div>
+    <div class="axis">
+      <span style="left:0">$40k</span><span style="left:30.8%">$100k</span>
+      <span style="left:61.5%">$160k</span><span style="right:0">$220k</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="b" style="color:var(--fire)">58%</div>
+        <div class="c">premium for the same job outside academia</div></div>
+      <div class="kpi"><div class="b" style="color:var(--salmon)">$120,000</div>
+        <div class="c">median where the title says Director of Production</div></div>
+      <div class="kpi"><div class="b">$77,125</div>
+        <div class="c">top quartile of your own market</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="lbl">the eight you can say out loud</div>
+    <div class="comp">
+      <div class="r paid"><span><a href="https://www.umsalary.info/titlesearch.php?Title=arts&amp;Year=0">Univ. of Michigan · Arts Production Manager</a><span class="n">named incumbent, 2025-26 payroll</span></span>
+        <span class="rt"><span class="fig">$105,000</span><span class="k">ACTUALLY PAID</span></span></div>
+      <div class="r paid"><span><a href="https://texascollegesalaries.com/institution/the-university-of-texas-at-austin/department/texas-performing-arts">UT Austin · Director of Production, Texas Performing Arts</a><span class="n">public salary database</span></span>
+        <span class="rt"><span class="fig">$120,000</span><span class="k">ACTUALLY PAID</span></span></div>
+      <div class="r paid"><span><a href="https://www.umsalary.info/titlesearch.php?Title=arts&amp;Year=0">Univ. of Michigan · Arts Production Manager ×2</a><span class="n">Duderstadt Center, 2025-26</span></span>
+        <span class="rt"><span class="fig">$87,200</span><span class="k">ACTUALLY PAID</span></span></div>
+      <div class="r"><span><a href="https://www.showbizjobs.com/jobs/the-performing-arts-center-at-purchase-college-director-of-production-in-purchase/jid-g66n19">Purchase College SUNY · Director of Production, PAC</a><span class="n">four venues · 2023 posting</span></span>
+        <span class="rt"><span class="fig">$93,026–95,026</span><span class="k">offer band</span></span></div>
+      <div class="r"><span><a href="https://hiringcafe.com/job/ctd-technical-director-production-manager-for-center-series-community-oq5dz73l9dhu2n01">Williams College · Technical Director / Production Manager</a><span class="n">closest structural twin in the live market</span></span>
+        <span class="rt"><span class="fig">$82,500–95,000</span><span class="k">offer band</span></span></div>
+      <div class="r"><span><a href="https://hr.harvard.edu/salary-ranges">Harvard · Production Manager, grade 056</a><span class="n">FY26 grade band, not an incumbent</span></span>
+        <span class="rt"><span class="fig">$68,100–111,500</span><span class="k">offer band</span></span></div>
+      <div class="r"><span><a href="https://up.yalecollege.yale.edu/position-available-technical-director-start-aug-2026">Yale · Technical Director, Undergraduate Production</a><span class="n">10-month — do not compare dollar for dollar</span></span>
+        <span class="rt"><span class="fig">$70,000–79,000</span><span class="k">offer band</span></span></div>
+      <div class="r"><span><a href="https://www.ubjobs.buffalo.edu/postings/56916">Univ. at Buffalo · Technical Director (SL4)</a><span class="n">NY public floor</span></span>
+        <span class="rt"><span class="fig">$63,000–67,000</span><span class="k">offer band</span></span></div>
+      <div class="r"><span><span class="org">SUNY Brockport · Technical Director</span><span class="n">teaches Stagecraft every semester</span></span>
+        <span class="rt"><span class="fig">$58,369</span><span class="k">offer band</span></span></div>
+    </div>
+    <p class="mono" style="font-size:12.5px;color:var(--soft);margin-top:var(--s3)">Never average a
+    payroll record against an offer band. They measure different things — quote them separately or
+    lose the argument on method.</p>
+  </section>
+
+  <section>
+    <div class="lbl" style="color:var(--moss);filter:brightness(1.35)">cue 4 — the standby list</div>
+    <h2 style="margin:var(--s3) 0 var(--s5)">Five questions, in this order.</h2>
+    <div class="q"><div class="n">01</div><div><div class="t">Which track is this review on?</div>
+      <p>The public directory lists you as Senior Lecturer / Production Manager. Faculty review and
+      staff review have different criteria, readers and outcomes. Everything depends on this.</p></div></div>
+    <div class="q"><div class="n">02</div><div><div class="t">What are the criteria, and who reads the file?</div>
+      <p>A teaching-shaped rubric cannot see a production operation. If the readers are English
+      faculty, the dossier has to explain the operation, not assume it.</p></div></div>
+    <div class="q"><div class="n">03</div><div><div class="t">Can the production scope go in as reviewable work?</div>
+      <p>Four direct reports, ten craft disciplines, six production units this season. If it is not
+      in the file it was not reviewed.</p></div></div>
+    <div class="q"><div class="n">04</div><div><div class="t">Is a business-title change in scope here?</div>
+      <p>UR HR runs five career streams and twelve job levels and permits a school or program
+      business title over the system title. The mechanism exists. Ask where it lives.</p></div></div>
+    <div class="q"><div class="n">05</div><div><div class="t">Deadline, format, who else signs?</div>
+      <p>The boring question that decides your actual runway. Get it in writing before you leave.</p></div></div>
+  </section>
+
+  <section>
+    <div class="lbl" style="color:var(--salmon)">cue 5 — scope, verified</div>
+    <h2 style="margin-top:var(--s3)">The program advertises four productions. You are running six.</h2>
+    <p class="lede" style="font-size:16.5px">URITP’s public About page says “four major productions
+    every year.” The live folders hold <b>Big Love</b>, <b>Becoming Curious</b>, <b>T.I.M.E.</b>
+    (both semesters), <b>One Acts</b>, <b>The Secretary</b>, and <b>Songs for a New World</b> as an
+    external booking. Your own program’s copy understates you. Fix it in the dossier before anyone
+    reads it.</p>
+    <div class="scope">
+      <div><div class="lbl">direct reports</div><div class="v">4</div><div class="s">TD · Props · Company Mgr · Costumes</div></div>
+      <div><div class="lbl">prof. staff</div><div class="v">~9</div><div class="s">+ 19-person leadership team</div></div>
+      <div><div class="lbl">students</div><div class="v">25–40</div><div class="s">per year</div></div>
+      <div><div class="lbl">craft disciplines</div><div class="v">10</div><div class="s">scenery through wardrobe</div></div>
+      <div><div class="lbl">prod. envelope</div><div class="v">$200–250K</div><div class="s">~$50K × 4–5 shows · re-verify before submitting</div></div>
+      <div><div class="lbl">teaching load</div><div class="v">2 courses</div><div class="s">every semester · lighting design + tech</div></div>
+    </div>
+  </section>
+
+  <div class="thin">
+    <div class="lbl" style="color:var(--fire)">what this does not know</div>
+    <ul>
+      <li>Your current salary and UR’s internal grade. Nothing public exposes either, so no figure here is a gap calculation.</li>
+      <li>No SeeThroughNY incumbent row for a SUNY theatre production title. The NY numbers are offer bands, not what anyone is paid.</li>
+      <li>CUPA-HR and TCG salary tables are gated. No survey median was read, so none is quoted.</li>
+      <li>Purchase College’s band is from 2023. Yale is a 10-month appointment, not annualised.</li>
+      <li>The production envelope and staff counts come from an Aug 2026 confirmation and are Milo’s out-of-lane. Pull from BETA BUDGET before submitting.</li>
+    </ul>
+  </div>
+
+  <footer>52 live postings · 43 peer programs · 23 sourced comp records · compiled 21 Sep 2026</footer>
+
+</div>
+</body>
+</html>
