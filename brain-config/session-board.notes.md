@@ -11,11 +11,13 @@ The board is a **presence surface**: who is in the repo right now, what branch, 
 
 **Precedent:** `uritp-docs` `CSS-NOTES.md` (2026-08-02) and `hooks/trip-triage.notes.md` (2026-08-10). ⚠️ **The prose was never the problem and must not be deleted as one** — it is the reason these failures stopped recurring. It moves; it does not die.
 
+⚠️ **THIS FILE HAS NOW REACHED THE LINE THE BOARD CROSSED.** It closed 2026-09-21 at **~31KB** — the sidecar that exists *because* a governance file outgrew its ~30KB write cap is now at that cap itself. A second split is a **structural change and therefore Michael's call**, so it is flagged rather than performed. Until then: **additions must be tight**, and anything that belongs in `open-thread.md` must not land here.
+
 ---
 
-## 🚨 The nine collisions — what each one proved
+## 🚨 The collisions — what each one proved
 
-Eight recorded through 2026-08-05, plus the write-cap near-miss on 08-11.
+Eight recorded through 2026-08-05, the write-cap near-miss on 08-11, and the close-vs-live-row conflict on 09-21.
 
 ### ⭐ THE DURABLE LINE, FIRST, BECAUSE IT IS THE ONLY GENERALIZATION THAT HAS HELD
 
@@ -70,6 +72,21 @@ Two sessions made the same one-cell correction to `uritp-docs` `courses/course-i
 
 Two 32KB writes to `session-board.md` through a tool LOCKED at ~30KB. Both succeeded. **The file that exists to prevent damage was one byte-count away from being the damage**, and it was the single most-written file in `brain-config`. This split is the fix.
 
+### Collision 10 (2026-09-21, 05:33–05:41Z) — the CLOSE collided with a live row, and the refusal was the only honest layer
+
+A session running `hooks/session-close.md` step 4a/4b cut `milo/board-close-0921` from `f5ec734d`, **emptied the Active table**, and opened PR #937. Merge returned **405, merge conflicts**. Re-fetching `main` showed why: **Compass Corso + Portfolio Paige had posted a row after the branch cut** — and their row cites `f5ec734d` itself among its evidence commits, so they landed *seconds* on the far side of that base.
+
+🔴 **Emptying the table would have erased a claim that was live at that moment.** Not a stale row, not a twin — a real concurrent session mid-write on its own bundles.
+
+✅ **Nothing detected this except the merge refusing.** The pre-write read was clean when taken; the branch name collided with nothing; the close hook's own step 4a says *"remove this session's row, leave every other row alone"* and the session was removing a DIFFERENT session's expired row, which is step 4b and legitimate. **Every layer was individually correct and the composite was wrong.**
+
+🔧 **Two things this adds that the file did not have:**
+
+1. **A close is not a privileged write.** Step 4a/4b arrives at the end of a session, when the board is most likely to have moved and the closing agent is least likely to re-read it. **The close is the single most collision-prone board write there is, and it is the one that felt safest.**
+2. **A resolution step for a non-mergeable hunk.** Rebuilding the branch on their version did **not** clear the conflict — a 3-way merge of a diverged table hunk is not resolvable with `create_or_update_file` alone, and two merge attempts both took 405. ⭐ **The answer is to cut a FRESH branch from current `main` and re-apply, then supersede the old PR. That is still merging, not forcing** — the distinction is whether the other session's lines survive, and they did, verbatim.
+
+⚠️ Recorded with its cost: **two branches, one superseded PR (#937), five extra calls** — against the alternative, which was deleting a live claim and never knowing.
+
 ### 🚦 Gate status, stated honestly
 
 - **07-31:** rows were simply absent.
@@ -77,6 +94,8 @@ Two 32KB writes to `session-board.md` through a tool LOCKED at ~30KB. Both succe
 - **08-02:** violated once more on `uritp-docs` PR #57 — the CHECK ran clean and the ROW went up *after* the first writes.
 - **08-05:** **the gate is no longer being violated. It is being OUTRUN.**
 - **08-11:** satisfied twice, and it cost TWO extra PRs to do honestly — the row must be on `main` before the write and everything goes through a branch, so a one-PR change becomes three (row up · work · row down). **Recorded because the next session will be tempted to skip it on exactly that arithmetic.**
+- 🔴 **09-20/21: the gate was never ARMED.** Eight commits, sixteen hours, no row, no pre-write read, by a session that had read this file. **Not outrun — absent.** A regression past the 07-31 baseline. See the toolset scar under Process.
+- ✅ **09-21, same session, closing:** gate armed properly, branch named, and the **merge still refused twice** — collision 10. The mechanism worked exactly as designed the moment it was actually used.
 
 ---
 
@@ -109,15 +128,28 @@ All five carried a claim on the board. `list_commits --since 2026-08-06` (whole 
 
 ⭐ **And the root cause is the one this file already names:** the clear is Step 4 of `hooks/session-close.md`, and **a session that ends without running the close hook never reaches it.** Five of Vale's sessions (09-12 → 09-19) ran and closed without ever touching the board or the git bundle. **The step exists; the close is what was skipped.** Same fault shape as the spine's four zero-line sessions.
 
-🔴 **SEPARATE EXPIRY CANDIDATE, flagged not swept:** **Dev Dexter's row is dated Sep 17** and claims `uritp-safety` `01-utility/**` plus `index.md`. That is past the 48-hour expiry on its face, **but its claims are in another repo this file cannot cheaply verify**, and rule 8 wants evidence per claimed path. Left in place deliberately rather than cleared on a guess — **a wrongly-cleared row costs a re-post; clearing it without the `uritp-safety` evidence would be exactly the guess rule 8 forbids.**
+---
+
+## 🅿️ Row retired 2026-09-21 with evidence — Dev Dexter, Sep 17
+
+| Session | Claimed | Last movement | Evidence |
+|---|---|---|---|
+| Dev Dexter · Workshop the policy write-once / packet-print architecture · Sep 17 · `utility-build-report` (`uritp-safety`) + `dexter/board-0917-utility` (`ClickUp_apps`) | **`uritp-safety`**: `01-utility/index.md` (NEW), `01-utility/build-report.md` (NEW), `index.md` (one link line). **`ClickUp_apps`**: its own row only. The 15 `status:` flips were already merged (`uritp-safety` #9 + #10) and **self-RELEASED in the row text**. | **2026-09-17 20:39:36Z** | `list_commits --repo uritp-safety --path 01-utility/index.md --since 2026-09-17` → **one** commit, `5653af03d9ffb4743e28742d39b5ce993e218842`, PR #11 *"01-utility: a build report page, and a quick link to it from home"* — then **nothing for 76 hours** against a 48-hour line. |
+
+✅ **The claimed work LANDED and this is a clean-close-that-never-cleared, the same shape as Vale's row.** PR #11 created the folder index, created the build report and added the home quick link — all three claims, in one commit, the evening the row was posted. 🔁 Re-post with a branch if anything here is still live.
+
+⭐ **The 09-20 pass was RIGHT to leave this row standing.** It flagged the expiry on the row's face and refused to sweep it, because *"its claims are in another repo this file cannot cheaply verify, and rule 8 wants evidence per claimed path."* That restraint is the behaviour to copy.
+
+⚠️ **But the premise was wrong, and that is the transferable part.** The evidence was **not** expensive: it was **one `list_commits` call with a `repo` argument**, the same call the pass had already made twice against this repo. **"Another repo" was treated as a different class of question when it is the same call with one more parameter.** The row sat four extra days on a cost estimate nobody checked — 🚫 **and "defer to a session that can verify" means defer to nobody, because nothing wakes on a schedule.** Rule 8 now says this out loud.
 
 ---
 
-### Two shapes of stale row, and the second one is worse
+### Shapes of stale row, worst last
 
 - **A stale presence row** says *"someone is here"* and is believed. The URITP audit row was stale four days and claimed the exact two files a later session needed. **An empty board says "nobody posted"; a stale row lies.**
 - 🔴 **A stale BLOCKER can park real work indefinitely.** The `uritp-docs` row claimed `uritp.css` is *"34.8KB — OVER the write cap, so the nav typography CANNOT be done until that file is split."* All three clauses went false in one PR (#57): file split seven ways, typography shipped, cap enforced by a build gate. **A blocker is a claim with a shelf life, and nothing on this board expires** — which is why the board now has an expiry rule.
-- 🔴 **A row that OUTLIVES ITS OWN COMPLETED WORK reads as a debt being paid.** Vale, 09-10 → 09-20 (above). **Neither of the other two shapes covers it, because the work was not dormant and the claim was not false when written.**
+- 🔴 **A row that OUTLIVES ITS OWN COMPLETED WORK reads as a debt being paid.** Vale, 09-10 → 09-20; Dexter, 09-17 → 09-21. **Neither of the first two shapes covers it, because the work was not dormant and the claim was not false when written.** Two instances now, so this is the COMMON case, not the exotic one — and both were produced by the same cause: a session that finished without running its close.
+- 🔴 **AND THE FOURTH SHAPE IS NO ROW AT ALL (2026-09-21).** Every shape above assumes a row exists and asks whether it still tells the truth. **A session that never posts one is invisible to all of them** — nothing to go stale, nothing to expire, nothing for a later pass to retire, and the Active table reads *"coast is clear"* while eight commits land. **This is the cheapest failure to commit and the only one with no detection surface whatsoever.** ⚠️ It is also the only shape that cannot be found by auditing this file, because the evidence of it is somewhere else entirely: in `list_commits`.
 
 ---
 
@@ -126,6 +158,8 @@ All five carried a claim on the board. `list_commits --since 2026-08-06` (whole 
 Three commits (`96cd684` board move · `76af417` `config.json` · `0f78661` `chrome.js` placed UNFORKED from the template), **no PR opened**, dormant since 08-01 21:43. It is the live v20 port branch and **must not be re-cut**: re-doing those three commits is the collision, not the branch existing.
 
 ⛔ **One thing waits on Michael.** The v18 embed guard (`self !== top`) is deliberately NOT carried into the new `chrome.js`, held as a PROPOSAL because he personally ordered that lock (*"lock. that. shit. down."*). Reasoning is in the file header: the new router has no iframes, so the guard tests a condition the port deletes, and in the one framing case that survives (a whole-app ClickUp embed) **the chrome IS the navigation and suppressing it hides it.** Reversible in ten lines.
+
+🅿️ **Also parked, 2026-09-21:** `milo/board-close-0921` and PR #937 — **superseded, not abandoned.** Its content landed via `milo/board-close-0921b` after two 405 conflicts (collision 10). 🚫 Do not re-merge #937; it would re-empty the Active table.
 
 ---
 
@@ -142,8 +176,8 @@ A **30.6KB** file read whole on 07-29. A **34.9KB** file clipped silently on 08-
 ### Which git surfaces actually work as a backstop
 
 - ❌ **Branch list:** 100+ branches, never deleted after merge. Useless.
-- ❌ **Open PRs:** re-measured 08-02 — **thirteen** open, oldest **#46 from 07-07**, eleven predating 07-26. **A claim ledger where nearly every entry is a lie, and it is the surface a human checks first.** ⚠️ **@Michael — triage needs YOUR call per PR, not a bulk close:** #665 (inciardi photo pipe) may be genuinely superseded by v22/v23 rather than abandoned, and closing another session's PR is destructive.
-- ✅ **`list_commits` with a path filter and `since=today`.** The one that holds.
+- ❌ **Open PRs:** re-measured 08-02 — **thirteen** open, oldest **#46 from 07-07**, eleven predating 07-26. **A claim ledger where nearly every entry is a lie, and it is the surface a human checks first.** ⚠️ **@Michael — triage needs YOUR call per PR, not a bulk close:** #665 (inciardi photo pipe) may be genuinely superseded by v22/v23 rather than abandoned, and closing another session's PR is destructive. 🅿️ #937 joins this list as a KNOWN supersede — see the parked section.
+- ✅ **`list_commits` with a path filter and `since=today`.** The one that holds. ⭐ **And it works ACROSS REPOS for the cost of one argument** — that is what closed Dexter's row after a pass parked it as too expensive to verify.
 
 ### 🕳️ The GitHub API is an unreliable narrator, which attacks the one mechanism above that works
 
@@ -175,9 +209,10 @@ Six endpoints served stale or empty data in two days: Contents (a stale `active.
 ### Process
 
 - 🌿 **THE SPINE IS A NUMBERED STEP** (PR #567). `hooks/session-open.md` → **Commit C4 = ARM THE SPINE.** Root cause of four consecutive zero-line sessions: the step existed only as prose and appeared in **NO executable checklist**. **A PICKUP IS AN OPEN. A found task never satisfies "spine armed."** ⭐ This is the same fault the board-clear had until 08-11, and the same fix.
+- 🔴 **"THE TOOL ISN'T IN MY KIT" IS A CLAIM, AND IT WAS FALSE EIGHT TIMES IN ONE NIGHT (2026-09-21).** A session declared *"no `create_branch` in this session's kit, only `create_pull_request` / `merge_pull_request`"* in **eight commit bodies and four spine lines**, and committed straight to `main` each time. It then found the tool **in one lookup** while running its own close. ⚠️ **The damage is not the eight commits — it is that a wrong belief about your own toolset SILENTLY REPEALS every rule built on it.** Board rules 3 and 9 (*name your branch*, *re-fetch and merge*) are unreachable without a branch, so believing the branch tool was gone deleted the presence discipline, the merge discipline and the row itself, **without a single rule being consciously broken.** ⭐ **Generalizes past git: an agent's model of its own capabilities is a SURFACE, and it rots like any other surface in these files.** The session declared the gap honestly every single time, which felt like integrity and functioned as a **self-issued waiver.** 🚫 **Declaring a limitation is not the same as testing it. Test first, then declare.** Now board rule 12.
 - 🔒 **AUDITS ARE STAMPED OR THEY ARE WORTHLESS** (PR #568). Every audit record names the SHA of every governing file it leaned on. **Addendum, never reissue.** ⚠️ **A stamp proves WHICH BYTES, not that the bytes say anything** — three signed records stamp `roster.json`, retired 07-30, so those checks passed on an empty read.
 - 🧭 **Do not invent an agent to fill an empty queue.** ⚠️ **Do not put a fleet COUNT anywhere in these files.** Filter the 🤖 Agent Index by `Class` and count rows; that is the only number that cannot rot. The Fleet Build Queue thread's description still says *"First move: Catch Up Clark"* — wrong, unfixed, trust the checklist and DL J14.
-- 🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it. ⚠️ **Consequence for this board: there is definitionally no periodic sweep of anything.** Cleanup happens at session close or not at all.
+- 🚨 **THE SCHEDULER IS GONE** (2026-07-26). Nothing wakes; Ricky is invoke-only. **Any agent can run a routine:** read the runbook in `routines/`, follow it literally, stamp `routines/last-run/<routine>.txt`. `brain-config/data-refresh-log.json` was DELETED — ignore any note pointing at it. ⚠️ **Consequence for this board: there is definitionally no periodic sweep of anything.** Cleanup happens at session close or not at all — **and "leave it for a session that can verify" is therefore the same sentence as "leave it forever."**
 - 🗑️ **THE ROUTINES VIEWER IS GONE** (PR #562). `routines/schedule.md` is the single source and is written for HUMANS. **Do not rebuild the app.** ⭐ **Carry the reason: the app never rotted — retiring the scheduler is what turned it into a duplicate. Every duplicate-check we own runs at CREATION; none re-run when the world changes.**
 - 📌 **Open (thread `86ajqu32n`):** should `last-run` stamps fold back INTO `schedule.md`? That is the pre-07-05 design and the shared-file stamp race is why it was abandoned. **Test the concurrency claim before acting.**
 
@@ -204,9 +239,12 @@ Six endpoints served stale or empty data in two days: Contents (a stale `active.
 
 **A diff can be kept clear of a live parallel session by DESIGN rather than by luck**, and this is the only control on the list that works while everyone involved is ignoring the board.
 
+⚠️ **It does not extend to this file or to `session-board.md`.** Those have exactly one shared surface — the Active table — and every session must write it. Collision 10 is what that looks like: no seam to choose, so the merge refusal is the whole control.
+
 ---
 
 ## Changelog
 
+- **2026-09-21 — Dexter's Sep 17 row retired with per-path evidence** (`uritp-safety` PR #11, `5653af0`, 76 hours dormant), closing the candidate the 09-20 pass parked for want of exactly that evidence — which cost one `list_commits` call with a `repo` argument. Three additions: **collision 10** (the close's own PR took two 405s and the refusal was the only layer that saw a live row posted after the branch cut, plus the fresh-branch resolution for a non-mergeable hunk); a **fourth shape of stale row — no row at all**, since every prior shape assumed a row exists; and a process scar on **"the tool isn't in my kit" as an untested claim**, after a session declared `create_branch` unavailable in eight commit bodies and found it in one lookup while closing. New **board rules 12**, plus additions to rules 8 and 9. Flagged at the top that **this sidecar has now reached the write cap that created it** — a second split is Michael's call.
 - **2026-09-20 — Vale's Sep 10 row retired with evidence**, plus a third shape of stale row named (a row that outlives its own completed work) and a memory scar recorded about deferred batches. Dexter's Sep 17 row flagged as an expiry candidate, **not** swept — its claims live in `uritp-safety` and rule 8 wants per-path evidence.
 - **2026-08-11 — Sidecar created.** `session-board.md` split at Michael's direction: **32,393 B → a slim table**, with all post-mortems, scars and retired rows moved here. Board gained an **expiry rule** and a declared **self-claim exception**; the row clear became **Step 4 + rule 28** of `hooks/session-close.md`. Nothing deleted.
