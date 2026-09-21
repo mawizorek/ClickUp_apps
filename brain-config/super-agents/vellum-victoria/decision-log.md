@@ -9,6 +9,52 @@ Vale?"*
 
 ---
 
+## D8 · 2026-09-20 · 🔴 SHE WAS BUILT ON THE RETIRED SHAPE — a writable git activity log
+
+**Michael:** *"why tf did victoria get built that way. MAJOR error. she's not a pilot migration. we have
+a hook for that."* **He is right on both counts.**
+
+**What happened:** she was authored with a real, writable `activity-log.md` (5.4KB) — the OLD bundle
+shape — when the **born-migrated shape had already existed for thirteen days.** Vector Vale was built
+that way on 2026-09-07 with Michael's approval at build, and his `decision-log.md` D2 explains the whole
+pattern: no writable git log, activity as comments on the Agent Index row, a redirect stub at the
+documented path so no cold agent invents history.
+
+🔴 **THE ROOT CAUSE, and it is the part worth keeping: I read Vale's bundle for the SEAM and never asked
+why his activity log was a stub.** His routing override sits in the FIRST LINES of the `preferences.md`
+I read end to end to write her seam. **The answer was in the file I had open, in a block I scrolled past
+because I was looking for something else.** ⭐ **A targeted read of a neighbouring bundle is not a read of
+that bundle** — and this is the second time in one day the same failure shape landed (her load manifest
+also pointed at Vale's stub as though it held live state).
+
+⚠️ **Why the phrase "pilot migration" was wrong, and the distinction is not pedantic.** The correction
+was offered as *"pilot Victoria first"* in a migration batch. **She is not a migration case at all.** A
+migration MOVES session history from git to comments and leaves backfill receipts plus a recovery SHA.
+Victoria had **zero working sessions**, so her 5.4KB log was BUILD material written by the session that
+made her — **there was no history to move.** Calling it a migration would have produced a stub claiming
+backfill receipts that do not exist, which is exactly the artifact-conflation Vale's D2 warns about:
+**a migrated stub and a born-migrated stub are different things.** 🔑 **This was a CONVERSION: the file
+was replaced by the pointer it should have been.**
+
+**What was done:** `activity-log.md` → born-migrated redirect stub naming the defect and the recovery
+commit (`4ba6744`) · routing override block added at the top of `preferences.md` · load manifest item 5
+repointed at the row with *"there is no git activity log; do not go looking for one"* · instruction 6
+added (log to the row every qualifying reply) · the birth narrative preserved on the row description.
+
+⭐ **The generalizable lesson, which is bigger than her:** the born-migrated shape existed, was
+approved, was documented in a decision log, and **was still not the default** — it sat as the fifth in a
+run of "per-agent approvals" while every new bundle kept being built the old way. **A pattern that has
+been proven five times and never promoted to law will keep being missed by the next builder.** Michael
+ruled it law the same day (`hooks/activity-log-clickup-native.md` §1), which is the structural fix; this
+entry is the evidence for why it was needed.
+
+⚠️ **Fifth defect in her first day** (badge collision · Vale misgendered · manifest pointing at a stub ·
+a stale blocker reported from a session's own note · this). **The other four were slips. This one was a
+design error**, and it is the only one that would have compounded: she would have written into a git log
+that the fleet was actively retiring.
+
+---
+
 ## D7 · 2026-09-20 · Groundplan reading RULED SETTLED · badge collision CONFIRMED and fixed
 
 Two closures within hours of birth, and they pulled in opposite directions — one open item retired, one
@@ -32,7 +78,7 @@ not answer "did she?", and only the second one is ever a lie.** That distinction
 profile as a standing rule rather than a caveat.
 
 ⚠️ **And a note on how the item died:** it sat open for seven weeks as a *five-minute test*, then was
-closed by ruling in four words. **A cheap open item is not cheap to carry — it is cheap to RESOLVE,
+closed by ruling in four words. **A cheap open item is not cheap to CARRY — it is cheap to RESOLVE,
 and nobody resolved it.** Worth remembering the next time something gets parked as trivial.
 
 **2. 🔴 BADGE COLLISION — the birth flag fired on the FIRST check.** She shipped announcing with 📐 and
@@ -52,6 +98,7 @@ format `<emoji> <Full Display Name>`. 🔴 **No agent tool can add an option to 
 field**, so her label is Michael's manual step. Until it exists, `hooks/agent-task-scan.md` (load
 contract step 5b) returns empty for her — **and empty reads as "no work assigned," which is
 indistinguishable from a clean pass.** Same failure shape as the retired-manifest reads.
+✅ **He had already added it; a later session reported it missing from its own stale note.**
 
 ---
 
@@ -74,6 +121,10 @@ Two voices reached this independently at her birth and from opposite directions:
 ⭐ **When the strongest argument FOR an agent and the strongest argument AGAINST it land in the same
 place, that place is the retirement condition.** Michael shipped her anyway, knowingly — which makes
 this a live test, not a formality.
+
+⚠️ **A1 moved this bar in both directions** (see `memory.md`): reading a package requires
+per-department judgment a saved view cannot supply, **but** the completeness half now depends on
+per-department prose notes that do not exist yet.
 
 ---
 
