@@ -1,45 +1,71 @@
-2026-09-18 22:40 ET  [AMENDED 2026-09-19 09:10 ET - see FOLLOW-UP below]
-pass anchor: 2026-09-18 17:35
+2026-09-20 21:05 ET
+pass anchor: 2026-09-20 21:05
 lanes: 9 of 9 complete
-live: 345 (was 242, +103) | new 143 | gone 39 with evidence | carried unverified 51
-  ^ revised from 340 on 09-19: +7 OSJ Scenic rows, -2 cross-lane duplicates removed.
-schema: FIRST PASS WITH THE 16th COLUMN, `accessibility`. All nine lane files migrated.
-accessibility: 13 home | 7 remote | 6 hybrid | 10 immediate. Zero remote/hybrid existed on 09-10.
-result: PARTIAL - the inventory landed in full and every standing row was individually
-  re-verified rather than carried on a stale `live`. Of the four gaps recorded at stamp time,
-  TWO ARE NOW CLOSED and two stand:
-  (1) STANDS. 51 rows carry `live` UNVERIFIED - StageLync premium paywalls, OSJ detail shells,
-      and BroadwayWorld which served a stale cache again. Unreachable is not dead, so they
-      stay, but they are a claim and not a fact.
-  (2) PARTLY CLOSED 09-19, and read the caveat. The OSJ Scenic/Sets filter is SOLVED:
-      `?department=scenic+%2F+sets` returns 339 of 602, provably filtered. The broken form was
-      `?department=Scenic`, which returns the whole board. Working strings for all six
-      departments plus expected filtered counts are now in job-market-templates.md Template 7
-      (3be26f0), so this cannot cost a third pass. Harvest: +7 rows (99605f7).
-      ⚠ BUT NOT FULLY CLOSED: the board advertises 17 pages and only 2 distinct pages are
-      readable - pages 3-17 return page-1 content. The index is therefore STRUCTURALLY
-      PARTIAL, roughly 15 pages remain unread, and the drafting lane must still be assumed
-      under-reported. A solved filter is not a complete browse.
-  (3) STANDS. creative-admin's REMOTE half is unswept, not empty - no documented remote
-      sources at all.
-  (4) CLOSED 09-19 by Michael's rulings. Both cross-lane duplicates resolved: Confluence
-      President & EP and PAC NYC Associate Producer both home in producing-artistic with
-      also_lanes=creative-admin pointers; the ADM standalone rows are removed
-      (ae09488, 23ef8d9, 420704c, a49eb7d). No known same-URL-two-lanes pair remains.
-      Precedent set: an artistic or producing title rowed in ADM homes in PRD.
-owed: eleven verified remote sources still not written into job-market-sources.md;
-  job-market-refresh.md schema section still needs its narrow edit, after which
-  job-market-schema.md reduces to a tombstone pointer; the standing thread's root comments
-  are unreadable, which blocks the Resume Scan's primary evidence; ~15 unread pages of the
-  OSJ Scenic/Sets index.
-also ruled 09-19, recorded because a refusal is worth as much as an approval:
-  NO c-suite lane (Michael: "it is just a filter of existing things in a tab"), and Director
-  of Production rows STAY in production-manager. But the finding that prompted the proposal
-  stands as a known KEYWORD GAP: no lane asks for CEO, President, COO or Chief, which is why
-  the highest-paying row in the inventory - LA Master Chorale President & CEO, $275-350k - was
-  found by accident on a source browse rather than by the config.
-cost of the gap: 9 days late. University at Buffalo Scene Shop Supervisor, $57,500-61,500,
-  75 miles from home, deadline passed 2026-09-12. Reported, not hidden.
-headline: the drafting lane's "two organizations, not a market" verdict is dead. 14 of its
-  live rows are EXPERIENTIAL, from sources that did not exist in this routine before 09-18.
-  And the overhire ruling fired for the first time: Geva Rochester, $16.50/hr, home|immediate.
+live: 448 (was 345, +113) | new 113 | gone 0 | carried unverified ~200
+schema: FIRST PASS WITH THE 17th COLUMN, `requirements`. ⚠️ EIGHT of nine lane files
+  migrated. `producing-artistic.tsv` is STILL ON 16 COLUMNS - it banked zero new rows so
+  rule 14 blocked its commit, and the migration went with it. Any reader of that file must
+  expect 16 fields. THIS IS THE FIRST OWED ITEM OF THE NEXT PASS.
+method: rule 1 honoured - nine search-only subagents, each forbidden from reading its own
+  lane file, reconciled against the lane files only afterwards. No lane saw its own priors.
+result: PARTIAL. The inventory landed in full and the new column landed with it, but this
+  pass did NOT re-verify what 09-18 re-verified. Gaps, all four of them real:
+  (1) 🔴 ~200 CARRIED ROWS WERE NOT RE-VERIFIED THIS PASS. 09-18 individually re-checked
+      every standing row; this pass spent its budget on breadth and the new column instead.
+      `gone: 0` is therefore NOT a finding that nothing closed - it is the absence of a
+      liveness sweep. Do not read 0 GONE as market stability. Next pass owes a verification
+      sweep, not another breadth sweep.
+  (2) 🔴 THREE OF NINE THREAD WRITES FAILED (technical-director, electrician, drafting-design).
+      11 attempts across two ID forms and two distinct error shapes. Those three lanes' rows
+      are LUMPED into root comments carrying `⚠️ THREAD WRITE FAILED`, which breaks
+      one-comment-per-listing and costs per-listing reactions for a third of the pass.
+      ⭐ NEW DEFECT LAW, and it saved 8 wasted retries once learned: a role header that
+      refuses ONE parent_comment reply refuses EVERY reply, permanently. Do not retry past
+      the first refusal - fall back to a marked root post immediately.
+  (3) STANDS, unchanged from 09-18. OSJ pagination is still broken past page 2, so every
+      department harvest remains STRUCTURALLY PARTIAL (~15 unread pages on Scenic/Sets).
+  (4) 🔴 ONE LIVE MISS TO VERIFY, not a refusal: Clark State College GM Venue Operations was
+      refused by a lane as "closed 9/21 5:00 PM ET" - a date AFTER this anchor. It was live
+      when refused. Recover it.
+sources: 🔴 LCTJ IS NOT DEAD - `job-market-sources.md` pointed at the wrong host for four
+  passes. `chicagoplays.com/jobs` is a broken door; the live board is
+  `jobs.leagueofchicagotheatres.org`. Three lanes logged it unreachable while the SM lane
+  enumerated it freely off the correct host. Every LCTJ hard-fail on record is a WRONG-URL
+  artifact, not an outage. Fixed in the sources file this pass.
+  StageBoard: fifth consecutive failure, and the cause is now known - it is behind a profile
+  wall. Retirement decision surfaced to Michael, not taken by the executor.
+  ~22 new source names written into job-market-sources.md this pass.
+headline: the inventory finally has a REQUIREMENTS column, and it immediately answered the
+  question the career file could not: both verified remote CAD seats (ASG $70-100k,
+  Compass/Waveguide $65-75k) require AutoCAD, which Michael deferred to ~summer 2027. The
+  deferral IS the gate on the remote half of the drafting lane.
+  And the SM lane broke its ceiling: Magic Mike Live NYC PSM, $125,000-130,000 SALARIED,
+  requires OSHA-30 - a credential he wants and does not hold. Two of the pass's best rows are
+  gated by one missing cert each. That is a plan, not a disappointment.
+  🛟 OPS composition 39 venue / 6 safety - the safety half's best pass ever, and the one pure
+  safety seat (London Stadium Safety Coordinator, £30,784-33,000) names NO OSHA-30, NO ETCP
+  and NO degree floor in its body. The niche is enterable as-is.
+  🏠 Best home-accessible hourly in the whole inventory: SUNY Niagara technical-assistant pool,
+  $22.52-24.76/hr, open-until-filled - but the posting dates to 2022 and it is a POOL, not a
+  fresh vacancy. Rowed with that caveat attached.
+  ⭐ Upstaging Rigging Designer ($60-90k, Vectorworks + Braceworks, AutoCAD NOT named) is still
+  live two months on. The niche-craft exception holds: rare + technically deep + already-tooled
+  beats broad + certified.
+owed, carried into the next pass:
+  - `producing-artistic.tsv` 17th-column migration (see schema above). FIRST item.
+  - the ~200-row verification sweep that this pass did not run (gap 1).
+  - three near-home URL recoveries: Syracuse University Event & Technical Services Coordinator
+    ($28.93-31.68/hr), Seneca Niagara Production Services Technician, Argyle Theatre's two
+    Mary Poppins electrician cards.
+  - Clark State College GM Venue Operations recovery (gap 4).
+open rulings for Michael, none of them the executor's call:
+  - Cornish: one requisition described twice, or two seats? Both an hourly DFT row and a
+    salaried Seattle U/Cornish TD row hashed to the same JM-ID. Patched in place by renaming
+    the DFT row `JM-OSJ-cornish-td-hourly`; the underlying question is unanswered.
+  - Joshua Warner Studios home-lane: title says PM, duties read TD.
+  - Pepperdine ATPM home-lane: rowed AUD, reads ME.
+  - StageBoard retirement after five failures behind a profile wall.
+  - whether to add CEO/President/COO/Chief to the creative-admin KEYWORDS (not a lane - that
+    was already declined 09-19). The gap has now produced evidence across TWO consecutive
+    passes: LA Master Chorale CEO $275-350k on 09-19, and this pass's Seaview COO $150-225k,
+    found only by hand-sweeping the very keywords the config does not ask for.
