@@ -14,6 +14,7 @@
 | Show credits (83) | Production History list in Networking & Apps space | Query tasks including closed; fields: position, venue, dates | 2026-08-02 |
 | Employment history (9 positions) | Employment History list in Networking & Apps space | Query all statuses | 2026-08-02 |
 | Professional development (10 items) | Professional Development list in Networking & Apps space | Mostly aspirational targets from job postings; verify earned vs. goal | 2026-08-02 |
+| 🔴 **Credentials — CONTESTED, two claimants** | Professional Development list (my Ledger A) **vs** `routines/job-market-roles.json` → `global.candidate_credentials` | **They disagree.** The JSON holds two EARNED safety credentials absent from my map (see Ledger B). Escalated 2026-09-21, unruled. **Cite the JSON for search purposes; never assert "not earned" from either surface alone.** | 2026-09-21 |
 | Portfolio / narrative | Portfolio list in Networking & Apps space | 3 tasks: CV, LinkedIn, website | 2026-08-02 |
 | Job search funnel | Applications list in Networking & Apps space | Corso's lane, not Paige's | 2026-08-02 |
 | Resume PDFs (5 versions) | Attachments on Portfolio Paige agent task (86ajurr21) | Load attachments; .docx files don't render text | 2026-08-02 |
@@ -24,6 +25,7 @@
 | Networking & Apps space (home base) | app.clickup.com/36074068/v/s/90131716605 | Private space; all personal career data lives here | 2026-08-02 |
 | Org chart + team composition | Milo's memory.md (confirmed 2026-08-04) | 4 direct reports, 2 peers, 1 superior. See Ledger B for framing. | 2026-08-04 |
 | Budget (production spend) | Milo's memory.md (confirmed 2026-08-04) | ~$50K/production × 4–5 shows = $200–250K/yr | 2026-08-04 |
+| 🔴 **Braceworks proficiency** | **UNMAPPED — no pointer exists** | `roles.json` lists it as held software; my map has no row and the Vectorworks row does not imply it (Braceworks is the structural-load module, held separately). **Asked Michael 2026-09-21; a live listing already requires it.** | 2026-09-21 |
 
 ---
 
@@ -34,7 +36,7 @@
 | Professional identity | Blend of two frames: "production leader who came up through every department" + "technical specialist who scaled into leadership" | Full-stack + engineering-first angles together | The "theatre maker who moved into management" (artist-administrator) angle |
 | Career arc | Three phases: Performer (2013-2019) → Engineer/Designer (2020-2022) → Production Leadership (2023-present) | The progression and breadth | Early performance credits (treats as backstory, not current identity) |
 | Teaching | Only taught at Rochester (UR/ITP). Courses: lighting design/technology (2 per semester) | Scale of production management + team coordination | Does NOT lead with artistic design decisions |
-| Credentials | OSHA 30 target (not yet earned); VWX Spotlight cert identified. Most Professional Development items are aspirational targets pulled from job postings, not earned certs | What he's aiming for alongside what he has | N/A |
+| Credentials | **AMENDED 2026-09-21.** Two safety credentials are EARNED and were never in my map: OSHA Training Institute *Introduction to Safety and Health Management* (RIT, Feb 2026) and *Principles of Emergency Planning for Live Events* (Oct 2025). Still TARGETS, not earned: OSHA 30-Hour, Vectorworks Spotlight Professional, ETCP, formal crowd-management. | What he's aiming for alongside **what he already holds** — and the held pair is stronger than my map represented for nine months | Inflating aspirational certs as earned (hard line, his) |
 | Correction (hard rule) | Never attribute Fredonia or Alabama teaching to him | Those syllabi in workspace are reference examples from other schools, not his courses | N/A |
 | Data philosophy | "ClickUp holds NOW. FileMaker holds OVER TIME." Career archive = over-time data. | Structured, queryable lists in ClickUp as interim; FMP eventual | Prose in markdown (DL Q1: rejected git bundle AND task descriptions for data) |
 | Role scope (confirmed 2026-08-04) | Full back-of-house institutional operation: 7 management domains, 10 craft disciplines, $200–250K/yr production spend, 4 direct reports + 25–40 student crew | **"Director of Production" framing over "Production Manager"** — title undersells scope. Real scope ≈ DoP / Assoc. Managing Director (Production) | The academic side of the dual-track (leads with production leadership, not teaching) |
@@ -54,14 +56,18 @@
 | CRM vs personal career space | Mid-session correction | CRM = URITP operational (Show Roles tracks current assignments). Personal professional history = Networking & Apps space. Different audiences, different scopes. |
 | Research before interrogation | Phase 0 correction (patched into new-agent-onboard hook) | Always parse existing workspace content before asking Michael questions. "Do your homework first." |
 | Gap-closure via bench (2026-08-04) | Job Market Research task thread | Milo + Paige + the full bench closed 4 gaps in one session: budget, direct reports, CAD, OSHA. The bench (especially Milo) guessed correctly from workspace context; Michael confirmed with minimal correction. |
+| 🔴 **My map's blind spot is the TOOLING layer** (2026-09-21) | Corso's debrief handed me `roles.json` credentials I had never seen | I built this map from resumes, ClickUp lists and Dropbox trees — the places a person would file a career. **Career facts also live in ROUTINE CONFIG, because a search config has to describe the candidate to search for him.** Two of those facts were nine months old and absent from my map. **Workflow change: when asked "does he have it," check the routine config alongside the lists.** A config is not an archive, but it is a claimant. |
+| ⚠️ **A second claimant is a drift risk, not a bonus** (2026-09-21) | Same finding | Two surfaces answering "what has he earned" is a mirror pair, and the drift direction is the dangerous one: a stale "not yet earned" **understates** him to exactly the employers who screen on keywords. Placement is Maggie's ruling, the ClickUp side is Corey's. **My job is to name it and refuse to pick.** |
+| ✅ Requirement language is per-row as of 2026-09-21 | The 09-20 sweep | I flagged on 09-19 that the state files had no schema slot for what a listing ASKS FOR. The `requirements` column now exists in 9 of 9 lane files, verbatim quotes only. **I can now answer "where is the proof" against a quote instead of against a summary.** |
 
 ---
 
 ## Lane Relationships
 
-- **Corso** loads Ledgers A + B + C for navigation + framing context when assessing market fit. He is a consumer, not a dependency.
+- **Corso** loads Ledgers A + B + C for navigation + framing context when assessing market fit. He is a consumer, not a dependency. ✅ **Handoff pattern v0 exercised for real 2026-09-21:** he asked "does he have it?", I returned one confirmed asset with located evidence (Vectorworks → plots in the show folders and the Dropbox archives) plus two honest map gaps. **The seam held — he evaluated, I navigated, neither crossed.**
 - **Milo** holds URITP production ops context. Paige discovers show credits through his operational surface. **Also now holds the confirmed org chart + budget data** (his memory.md, deposited 2026-08-04).
 - **Tate** holds classroom memory. Same show event, different lens. Paige's map may point AT his context for the "learning" dimension.
-- **Corey** collaborates on pointer/naming standardization as the map grows.
+- **Corey** collaborates on pointer/naming standardization as the map grows. ⚠️ **Owed a question:** should the Professional Development list absorb the two earned safety credentials and become the single claimant?
+- **Maggie** rules where a contested fact LIVES. The credential mirror pair is hers to place.
 - **Fiona** is the integration layer IF portfolio data touches FileMaker.
 - **Application tasks** pull from Paige for navigation guidance (which sources to tap, how Michael frames things).

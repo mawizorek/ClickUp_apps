@@ -7,18 +7,65 @@
 
 ## LIVE STATE
 
+*Stamped 2026-09-21 01:42 ET.*
+
 | Project | Status | Last touched |
 |---------|--------|---------------|
 | Onboarding (source discovery) | complete | 2026-08-02 |
-| Ledger A population | complete (83 credits, 9 positions already in lists) | 2026-08-02 |
-| Ledger B calibration | **complete** (all 4 gaps closed 2026-08-04: budget, direct reports, CAD, certs) | 2026-08-04 |
-| Ledger C accumulation | growing (4 integration patterns earned) | 2026-08-04 |
-| Corso handoff pattern | initiated (first cross-agent intro on Career Strategy task) | 2026-08-02 |
+| Ledger A population | complete (83 credits, 9 positions already in lists) — **+2 rows 09-21, both of them gaps rather than finds** | 2026-09-21 |
+| Ledger B calibration | complete (4 gaps closed 08-04) — **credentials row AMENDED 09-21: two earned safety creds were missing from my map for nine months** | 2026-09-21 |
+| Ledger C accumulation | growing — **9 integration patterns** (3 added 09-21) | 2026-09-21 |
+| Corso handoff pattern | **v0 exercised for real 09-21** and it held: he asked "does he have it," I returned 1 located asset + 2 named gaps, neither of us crossed the seam | 2026-09-21 |
+| 🔴 OPEN — Braceworks pointer | **UNMAPPED.** `roles.json` says held; I have no evidence location. Asked Michael 09-21. A live Upstaging row already requires it, so this one has a cost. | 2026-09-21 |
+| 🔴 OPEN — credential mirror pair | **Two claimants on "what has he earned"** (Professional Development list vs `job-market-roles.json`). Escalated to Michael 09-21; placement is Maggie's ruling, list side is Corey's. **Unruled.** | 2026-09-21 |
 | The Public Theater portfolio prep | active (role scope framed, cert targets identified, team structure confirmed) | 2026-08-04 |
+| 📏 memory.md budget | ~8KB, **under the 10KB hot cap with room.** No curation needed this write. | 2026-09-21 |
 
 ---
 
 ## Sessions
+
+### 2026-09-21 · Job-market 09-20 debrief — credential navigation (01:40 AM ET)
+
+**Surface:** [💬 Career Strategy — Corso conversations](https://app.clickup.com/t/86ajut2wq), comment https://app.clickup.com/t/86ajut2wq?comment=90130323268498
+**Session task:** [Compass Corso + Portfolio Paige (Opus 5) · Job-market 09-20 pass](https://app.clickup.com/t/86akmu9ch)
+**Seated alongside:** 🧭 Compass Corso, on Michael's instruction. First session in 48 days.
+
+**What happened:**
+- Corso's debrief found that the two best-shaped rows in a 448-row inventory are each gated by one
+  credential. He asked my half of the seam: **does he have it, and where is the proof?**
+- **Answered clean on Vectorworks.** Held, professional, external contract work plus U of R
+  productions, deliverables locatable in the URITP PRODUCTIONS show folders and the `ur dropbox (kham)`
+  archives, credits in Production History (83, query including closed). Handed over his own framing line
+  from Ledger B rather than writing a new one.
+- 🔴 **Two map gaps reported instead of tidied:**
+  1. **Braceworks has no pointer.** `roles.json` lists it as held; my map has no row, and the
+     Vectorworks row does not cover it. A live listing (Upstaging Rigging Designer) requires it.
+  2. **Two claimants on credential truth.** `roles.json` carries two EARNED safety credentials — OSHA
+     Training Institute *Intro to Safety and Health Management* (RIT, Feb 2026) and *Principles of
+     Emergency Planning for Live Events* (Oct 2025) — that appear nowhere in my map. The Oct 2025 one
+     **predates my onboarding by nine months**, so this is not a missed update, it is a source I never
+     reached.
+- Logged my 09-19 blocker as **discharged**: the `requirements` column now exists in 9 of 9 lane files,
+  so requirement language is per-row and quotable.
+- Refused to rank, recommend, or strategize. Corso's debrief is upthread and that half is his.
+
+**Corrections absorbed:**
+1. None from Michael. **One self-correction that matters:** I built this map from the places a *person*
+   files a career — resumes, lists, show folders — and never considered that **routine config also
+   describes the candidate.** That is a structural blind spot, not an oversight, and it is now a Ledger C
+   pattern rather than a one-off fix.
+
+**Memory updated:**
+- Ledger A: 2 new rows (contested credentials, unmapped Braceworks); the Professional Development row
+  now carries the conflict pointer.
+- Ledger B: credentials row amended — held vs target split explicitly.
+- Ledger C: 3 new patterns (the tooling-layer blind spot, second-claimant drift risk, requirements
+  column now per-row).
+- Lane relationships: Corso's row records the first real handoff; Corey and Maggie now carry owed
+  questions.
+
+---
 
 ### 2026-08-04 · Gap-Closure Session (2:44–3:17 AM ET)
 
@@ -62,6 +109,7 @@
 - DL Q1 answered: data lives in ClickUp lists (not git, not task descriptions).
 - DL Q2 answered: narrative framing = blend of "production leader who came up through every department" + "technical specialist who scaled into leadership."
 - Unresolved at session end: earned credentials (what's actually completed vs. aspirational), full course list taught at Rochester, gap period May 2023 - Summer 2024.
+  ⚠️ **The first of those three is still open 50 days later, and 09-21 showed why: I was looking in the wrong kind of container.**
 
 **Corrections absorbed:**
 1. Research first, interrogate second (Phase 0)
