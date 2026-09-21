@@ -167,3 +167,37 @@ Rewritten 2026-07-26 so each one can actually fail. **Amended 2026-07-27:** the 
 - Two-artifact ship for over-cap files.
 - Retiring a top-level file = delete **plus** a redirect stub.
 - Read source through the git blob API at a fresh SHA. Never build an edit on a branch raw read.
+
+---
+
+## Ledger detail (moved from `VERSIONS.md` 2026-09-21, PR #952)
+
+**Why it is here:** the ledger reached its hard read limit (22,363 B → 29,820 base64 chars against a ~30,720 cap). Its row for this app was its biggest at ~2.7KB. ⚠️ **The ledger standard prescribes the app README as the destination, but `f1-racetracks/README.md` is 26,076 B — itself past safe-edit — so this file received the detail instead.** Nothing below is new; it is the row's former content.
+
+### 🔴 Five version claimants, all disagreeing
+
+| Claimant | Claims |
+| --- | --- |
+| `source/09` | v12 |
+| `standings/data.js` | v6.0 |
+| `circuits.html` | v19.1 |
+| `README.md` | v11 |
+| the `VERSIONS.md` row | the shell, v19.1 |
+
+**The fix is the v20 port** — one `config.json`, footer written from it — **NOT five hand-edits.** `source/09` is **29,446 B** and `README.md` is **26,076 B**, both past the safe-edit ceiling, and the port rewrites both anyway.
+
+### ⚠️ Open defects
+
+- **`grid` + `qualifying` absent on r03 / r04 / r07** — 66 driver-rows. SOURCED or absent; **do not improvise.**
+- Sprint arc **documented-never-built**.
+- Sprint `sess` labels disagree with the authoritative boolean on **5 circuits**.
+- No `sepang` in `LIVE_CIRCUIT_ALIASES`.
+- **FOUR source modules over the 15KB line** — `09`, `10`, `standings/panel.js`, `15` (same four named in the acceptance criteria above).
+
+### Sepang / Bahrain
+
+**Sepang hosts the *Bahrain* GP, 2-4 Oct.** Its circuit file is deliberately MINIMAL, sourced-only, `report:false`.
+
+### What stayed in the ledger
+
+The live prohibitions, because they must be read before any edit: the four-vector data layer, **never persist a derived ordinal**, team colour as a local identity layer, `applyTheme` resolving but uncalled, the parked `f1-racetracks-v20-port` branch, `live-tracker.html` standalone by design, and the Ricky note.
