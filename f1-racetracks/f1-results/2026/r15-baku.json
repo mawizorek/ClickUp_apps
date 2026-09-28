@@ -1,0 +1,30 @@
+{
+ "season": 2026, "round": 15, "slug": "baku", "name": "Azerbaijan Grand Prix", "date": "2026-09-26", "cuTaskId": "86ae52gqg", "version": "2026-09-28",
+ "pole": { "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "time": "1:42.526" },
+ "fastestLap": { "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "time": "1:44.916", "lap": 49 },
+ "summary": "George Russell converted pole into victory in Baku, holding off Max Verstappen by 0.196s. Isack Hadjar completed the podium for Red Bull. Six drivers were classified as not classified after retiring; Valtteri Bottas was classified P16 despite a DNF after 49 laps. Gabriel Bortoleto received a post-race 10-second penalty for overtaking under yellow flags and dropped from P13 to P15.",
+ "classification": [
+ { "pos": 1, "driverId": "86ae52qva", "driver": "George Russell", "team": "Mercedes", "status": "FIN", "points": 25, "grid": 1, "qualifying": { "pos": 1, "q1": "1:43.615", "q2": "1:43.462", "q3": "1:42.526" } },
+ { "pos": 2, "driverId": "86ae52rym", "driver": "Max Verstappen", "team": "Red Bull", "status": "FIN", "points": 18, "grid": 8, "qualifying": { "pos": 8, "q1": "1:44.041", "q2": "1:43.706", "q3": "1:44.081" } },
+ { "pos": 3, "driverId": "86ae52ryt", "driver": "Isack Hadjar", "team": "Red Bull", "status": "FIN", "points": 15, "grid": 4, "qualifying": { "pos": 4, "q1": "1:44.161", "q2": "1:43.880", "q3": "1:43.500" } },
+ { "pos": 4, "driverId": "86ae52rxd", "driver": "Charles Leclerc", "team": "Ferrari", "status": "FIN", "points": 12, "grid": 2, "qualifying": { "pos": 2, "q1": "1:44.360", "q2": "1:43.780", "q3": "1:43.363" } },
+ { "pos": 5, "driverId": "86ae52qvh", "driver": "Kimi Antonelli", "team": "Mercedes", "status": "FIN", "points": 10, "grid": 16, "qualifying": { "pos": 16, "q1": "1:45.504", "q2": null, "q3": null } },
+ { "pos": 6, "driverId": "86ae52rxg", "driver": "Lewis Hamilton", "team": "Ferrari", "status": "FIN", "points": 8, "grid": 6, "qualifying": { "pos": 6, "q1": "1:44.260", "q2": "1:44.037", "q3": "1:43.858" } },
+ { "pos": 7, "driverId": "86aj1ra31", "driver": "Arvid Lindblad", "team": "Racing Bulls", "status": "FIN", "points": 6, "grid": 15, "qualifying": { "pos": 15, "q1": "1:45.381", "q2": "1:45.106", "q3": null } },
+ { "pos": 8, "driverId": "86ae52rxu", "driver": "Esteban Ocon", "team": "Haas", "status": "FIN", "points": 4, "grid": 13, "qualifying": { "pos": 14, "q1": "1:45.039", "q2": "1:45.016", "q3": null } },
+ { "pos": 9, "driverId": "86ae52rxv", "driver": "Oliver Bearman", "team": "Haas", "status": "FIN", "points": 2, "grid": 10, "qualifying": { "pos": 11, "q1": "1:45.228", "q2": "1:44.775", "q3": null } },
+ { "pos": 10, "driverId": "86ae52rqj", "driver": "Carlos Sainz", "team": "Williams", "status": "FIN", "points": 1, "grid": 14, "qualifying": { "pos": 9, "q1": "1:45.104", "q2": "1:44.629", "q3": "1:44.566" } },
+ { "pos": 11, "driverId": "86ae52rqw", "driver": "Nico Hulkenberg", "team": "Audi", "status": "FIN", "points": 0, "grid": 18, "qualifying": { "pos": 18, "q1": "1:45.920", "q2": null, "q3": null } },
+ { "pos": 12, "driverId": "86ae52rye", "driver": "Liam Lawson", "team": "Racing Bulls", "status": "FIN", "points": 0, "grid": 11, "qualifying": { "pos": 12, "q1": "1:45.535", "q2": "1:44.860", "q3": null } },
+ { "pos": 13, "driverId": "86ae52q7p", "driver": "Oscar Piastri", "team": "McLaren", "status": "FIN", "points": 0, "grid": 3, "qualifying": { "pos": 3, "q1": "1:45.014", "q2": "1:43.814", "q3": "1:43.364" } },
+ { "pos": 14, "driverId": "86aj1ra1z", "driver": "Sergio Perez", "team": "Cadillac", "status": "FIN", "points": 0, "grid": 20, "qualifying": { "pos": 20, "q1": "1:46.658", "q2": null, "q3": null } },
+ { "pos": 15, "driverId": "86ae52rqp", "driver": "Gabriel Bortoleto", "team": "Audi", "status": "FIN", "points": 0, "grid": 17, "qualifying": { "pos": 17, "q1": "1:45.799", "q2": null, "q3": null }, "stewardNote": "Received a 10-second post-race penalty for overtaking under yellow flags; the penalty dropped him from P13 to P15." },
+ { "pos": 16, "driverId": "86aj1ra1g", "driver": "Valtteri Bottas", "team": "Cadillac", "status": "DNF", "points": 0, "grid": 19, "qualifying": { "pos": 22, "q1": "1:48.290", "q2": null, "q3": null }, "stewardNote": "Classified P16 after completing 49 laps; the official result records DNF." },
+ { "pos": null, "driverId": "86aj1ra0h", "driver": "Franco Colapinto", "team": "Alpine", "status": "DNF", "points": 0, "grid": 9, "qualifying": { "pos": 10, "q1": "1:45.106", "q2": "1:44.683", "q3": "1:44.963" } },
+ { "pos": null, "driverId": "86ae52rq4", "driver": "Pierre Gasly", "team": "Alpine", "status": "DNF", "points": 0, "grid": 7, "qualifying": { "pos": 7, "q1": "1:44.489", "q2": "1:44.106", "q3": "1:44.047" } },
+ { "pos": null, "driverId": "86ae52q76", "driver": "Lando Norris", "team": "McLaren", "status": "DNF", "points": 0, "grid": 5, "qualifying": { "pos": 5, "q1": "1:44.571", "q2": "1:44.020", "q3": "1:43.672" } },
+ { "pos": null, "driverId": "86ae52rqc", "driver": "Alexander Albon", "team": "Williams", "status": "DNF", "points": 0, "grid": 12, "qualifying": { "pos": 13, "q1": "1:45.031", "q2": "1:45.001", "q3": null } },
+ { "pos": null, "driverId": "86ae52rq8", "driver": "Fernando Alonso", "team": "Aston Martin", "status": "DNF", "points": 0, "grid": 21, "qualifying": { "pos": 19, "q1": "1:46.593", "q2": null, "q3": null } },
+ { "pos": null, "driverId": "86ae52rqa", "driver": "Lance Stroll", "team": "Aston Martin", "status": "DNF", "points": 0, "grid": 22, "qualifying": { "pos": 21, "q1": "1:47.337", "q2": null, "q3": null } }
+ ]
+}
