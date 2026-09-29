@@ -24,3 +24,14 @@ owed:
   - PASS COMPLETE comment index: SOURCES link still reads 'threaded below' (edit pending)
   - checkpoint comment not yet edited to SPENT
   - next pass: open the PM/ME/PRD boards named above first
+
+top-up: 2026-09-29 08:30 ET  gap-fill  (same pass anchor 2026-09-28 20:20; NOT a new pass)
+  boards hit: OSJ (7 dept doors, p2 + sort variants, site-scoped + region doors), BWW (category pages), PB (~30 bodies), SL (public pages, ~16 bodies), AS (public ARTSEARCH, ~18 bodies), USITT, SB, ACG, TOC, LCTJ (correct host), TSJ, SKN, APAP, TWO, GOV, HEJ, AAJ, NYFA, HC, RCO, UR (Workday), IDL, PND
+  swept zero in-scope: OSJ, BWW, PB, SL, USITT, ACG, TOC, LCTJ, TSJ, SKN, APAP, TWO, GOV, NYFA, HC, IDL, PND
+  yielded: AS (Kate Taylor, already held), HEJ, AAJ, RCO, UR
+  still unreachable: SB (homepage + site-scoped search dead); TCG sign-in walled but moot (public ARTSEARCH route works)
+  ADM top-up commit 87a7528: 83 live, +3 (Interlochen Admission Ops, YoungArts Anthology Coordinator, UR Leadership Program Assistant), TATI Comms revived gone->live (body: considered until filled)
+  held, not rowed: Qualified Health Commercial Ops Coordinator (remote, $100-120k) - healthcare, not live entertainment; Michael's call
+  totals after top-up: 567 live | new 50 | gone 39
+  gaps above: CLOSED for PM/ME/PRD/ADM board coverage. Residual: SB unreachable; OSJ pagination past p2 still structurally partial; carried-row re-verify still NOT claimed. Stamp stays PARTIAL for those three only.
+  discharged: checkpoint comment edited to SPENT (09-28). LCTJ dead host re-confirmed 09-29; Template 7 fix still owed.
