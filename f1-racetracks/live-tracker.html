@@ -184,13 +184,16 @@
 
   <script>
     const REFRESH_MS = 20000;
+    // 2026-10-02: + sepang (the Bahrain GP weekend held in Malaysia). Its OpenF1 meeting_name
+    // says "Bahrain" while the track is Sepang, so it keys on the CIRCUIT and the COUNTRY, never
+    // on "bahrain" (that alias would misroute if the race ever returns to Sakhir).
     const CIRCUIT_ALIASES = {
       'albert-park': ['albert park', 'melbourne'], shanghai: ['shanghai'], suzuka: ['suzuka'], miami: ['miami'],
       'gilles-villeneuve': ['gilles villeneuve', 'montreal', 'canada'], monaco: ['monaco'],
       catalunya: ['barcelona', 'catalunya', 'spanish gp'], 'red-bull-ring': ['red bull ring', 'spielberg'],
       silverstone: ['silverstone', 'british gp'], spa: ['spa', 'spa francorchamps', 'belgian gp'],
       hungaroring: ['hungaroring', 'hungary'], zandvoort: ['zandvoort'], monza: ['monza'], madring: ['madrid', 'madring'],
-      baku: ['baku', 'azerbaijan'], 'marina-bay': ['marina bay', 'singapore'], cota: ['cota', 'circuit of the americas', 'united states'],
+      baku: ['baku', 'azerbaijan'], sepang: ['sepang', 'malaysia'], 'marina-bay': ['marina bay', 'singapore'], cota: ['cota', 'circuit of the americas', 'united states'],
       mexico: ['mexico city', 'hermanos rodriguez'], interlagos: ['interlagos', 'sao paulo', 'são paulo'],
       'las-vegas': ['las vegas'], losail: ['losail', 'qatar'], 'yas-marina': ['yas marina', 'abu dhabi']
     };
@@ -210,10 +213,13 @@
       return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
     }
 
+    // WHOLE-WORD match (2026-10-02). The old raw substring test let the 'spa' alias match
+    // "SPAnish" and "SPAin", so the Madrid round linked to the Belgian circuit page. Both sides
+    // are space-padded so an alias only matches on word boundaries.
     function matchCircuitSlug(session) {
-      const haystack = [session?.circuit_short_name, session?.meeting_name, session?.country_name].map(normalize).join(' ');
+      const haystack = ' ' + [session?.circuit_short_name, session?.meeting_name, session?.country_name].map(normalize).join(' ') + ' ';
       for (const [slug, aliases] of Object.entries(CIRCUIT_ALIASES)) {
-        if (aliases.some(alias => haystack.includes(normalize(alias)))) return slug;
+        if (aliases.some(alias => haystack.includes(' ' + normalize(alias) + ' '))) return slug;
       }
       return null;
     }
