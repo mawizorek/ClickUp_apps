@@ -11,20 +11,7 @@
 
 ## §0 LIVE WORK FIRST, ACTIVITY POINTER SECOND (Michael, 2026-10-02)
 
-**Scope:** every repo-defined agent working in ClickUp, including stateless lenses with Agent Index rows. This is shared procedure, not a per-agent preference or a new agent. It applies to individual work and multi-agent deliberation.
-
-**Precedence:** this ruling supersedes older instructions in `gates/session-transcript-gate.md`, `council.md`, `orchestration.md`, and `super-agents/_shared/super-agent-base.md` that require deliberation ONLY on an Activity Board session task or require its transcript to be copied onto the agent row. Those files should point here rather than duplicate this procedure. Other session tracking, memory placement, LIVE STATE and permission rules remain in force.
-
-1. **Resolve the working surface first.** For a room-scoped session, use that room task: rooms exist to hold the working conversation. An explicitly designated work-item thread remains its own working surface. Use an Activity Board session task only when no room or work-item thread is established; do not create a parallel deliberation home merely to satisfy an older session-task-only clause. Keep any session record linked to the actual working thread.
-2. **Post as the work happens.** Open the topic thread on the working task, then post each agent's substantive contribution as its own named reply, in that agent's voice. Read preceding contributions before responding. Post the contribution when made, before presenting the synthesis; never collect the whole debate in a file and ask afterward whether to post it. The chair/convenor follows the same rule. A named review lens is an analytical role, not proof that a separate autonomous agent sent a message.
-3. **Immediately link from the contributing agent's own activity row.** After the working comment succeeds, take its exact returned comment URL and post ONE short Markdown link on THAT agent's Agent Index row: `[<topic / contribution>](<exact comment URL>)`. No copied transcript, recap, or second opinion. Link to the specific comment, not merely its task or the opening post. Resolve the correct row from the Agent Index; never put everyone's receipts on the chair's row.
-4. **Keep the record single and honest.** One activity pointer per distinct working contribution; no extra pointer per tool call or per chat synthesis of the same contribution. Multiple agents each get their own pointer. Do not change permissions or expose private content to make a pointer work; use a non-sensitive label and respect destination access. Link-only logging does not replace a required LIVE STATE update when project state changes, nor a durable memory write when warranted.
-5. **Handle partial writes explicitly.** No successful working comment means no success pointer. If the working comment lands but the activity pointer fails, keep its URL, report the missing receipt and retry only the pointer. Check for an existing matching comment/receipt before retrying an uncertain result. Never repost the substantive contribution just because its receipt failed. Missing agent row or unavailable room is a named gap, not permission to invent a target.
-6. **Late capture is backfill, never live.** Label reconstructed prior deliberation as backfill and link to the backfilled comments. Do not fabricate timestamps, independent conversations, or a live posting history. This procedure authorizes no unrelated task-field edit, repo repair, or new autonomous schedule.
-
-**Permissions seam:** an instruction to run a room discussion establishes the intended working destination. Obtain any approval required by the executing platform BEFORE that posting batch; do not treat this standing procedure as a bypass of system-level message or bulk-write confirmation. Once approved, post in real time rather than asking again after deliberation. Never claim logging complete without the actual successful comment and pointer receipts.
-
-**Acceptance:** room contribution exists → its author has an exact-comment link on their own row → synthesis points to the room thread. A summary-only attachment or a promise to post later does not satisfy this procedure.
+**Required procedure: [Workspace Agent Deliberation](./workspace-agent-deliberation.md).** Load it before repo-agent work in ClickUp. Working contributions belong in the room/work-item thread as they happen; each contributing agent's own Agent Index row gets a simple link to its exact comment, not a duplicate transcript. The procedure owns destination precedence, ordering, permissions, partial-write recovery and backfill. This applies to persistent teammates AND stateless lenses with Index rows. Older session-task-only and transcript-on-row wording is superseded on these points; see that file's integration status.
 
 ---
 
@@ -167,7 +154,7 @@ removes it.** Same bloat, one surface over.
 
 ## §6 ⚠️ OWED, and stated rather than quietly skipped
 
-**2026-10-02 integration note:** §0 is the current precedence rule for room-first work and link-only receipts. Older direct wording in the session-transcript gate, Council, orchestration and shared base still needs pointer-only reconciliation. Orchestration and the shared base were claimed by an active Oct 2 repo session at the pre-write check; this change deliberately does not overwrite them. Do not describe every referencing file as patched. The historical migration findings below are retained as history, not newly verified blockers.
+**2026-10-02 integration note:** §0's linked procedure owns room-first work and link-only receipts, including precedence over older wording. Its integration-status section lists reader updates still owed. The historical migration findings below are retained as history, not newly verified blockers.
 
 1. 🔴 **`super-agents/_shared/super-agent-base.md` still describes `activity-log.md` as a real git file**
    (§File set, §Per-response logging mandate item 2, and the load contract's step 3). **It measures
