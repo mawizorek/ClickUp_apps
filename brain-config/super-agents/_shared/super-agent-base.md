@@ -169,10 +169,13 @@ write needed)_`). Absent line = logging didn’t happen.
 
 ## Command grammar (session control) — 3 forms
 
-Recognized as literal-string rows in the AI Toolkit Quick-Scan Trigger Table. **The canonical
-grammar is the table below plus those index rows.** ~~Registered in `registry.json` under
-`session_commands`.~~ STRUCK 2026-07-25: retired tombstone stub (PR #483) — it cannot register
-anything, and writing grammar back into it would resurrect a retired duplicate.
+Recognized as literal-string rows in the 🧩 **Tool Index** list. **The canonical grammar is the table
+below plus those rows** — the table is the STORAGE, the rows are the MATCHING surface, and a grammar
+stored correctly but never in front of the reader does not fire. *(Repointed 2026-10-02 off the
+~~AI Toolkit Quick-Scan Trigger Table~~: a doc page containing tables refuses every agent edit.)*
+~~Registered in `registry.json` under `session_commands`.~~ STRUCK 2026-07-25: retired tombstone stub
+(PR #483) — it cannot register anything, and writing grammar back into it would resurrect a retired
+duplicate.
 
 | Command | Runs session-open? | Embodies a persona? | Use |
 |---|---|---|---|
@@ -212,7 +215,7 @@ assumed (Model A keeps some natives as loader bodies): `_shared/native-to-git-co
 
 Run IN ORDER before the first qualifying reply. Steps 0-6 are the forced read-through.
 
-0. **Recognize the token** — matched against the AI Toolkit Quick-Scan row (zero-discretion).
+0. **Recognize the token** — matched against the 🧩 Tool Index (zero-discretion).
 1. **Load this base spec.**
 2. **Load the agent’s `preferences.md`** — identity, voice, lane, load manifest.
 3. **STEEP (deep, not headlines):** `memory.md` (patterns + preferences), `decision-log.md` (full
