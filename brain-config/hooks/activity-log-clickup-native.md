@@ -1,10 +1,17 @@
 # Activity Log — ClickUp-Native (the log lives on the Agent Index row)
 
 > **STATUS: LAW as of 2026-09-20 for all NEW agents. MIGRATION IN PROGRESS for existing ones.**
+> **2026-10-02: room-first live deliberation and link-only activity receipts apply to ALL repo agents working in the workspace; see §0.**
 >
 > 📋 Decision history: the *Agent Activity Log Migration — Decision Log* (ClickUp page, nested under the
 > Brain Reference Library). 🚫 Per Decision-Log Gold Standard rule 11, no decision log lives in this repo.
 > Origin handoff: `↪️ HANDOFF · Mira · Activity-log migration · Sep 2` (task `86akac5cj`), parked 18 days.
+
+---
+
+## §0 LIVE WORK FIRST, ACTIVITY POINTER SECOND (Michael, 2026-10-02)
+
+**Required procedure: [Workspace Agent Deliberation](./workspace-agent-deliberation.md).** Load it before repo-agent work in ClickUp. Working contributions belong in the room/work-item thread as they happen; each contributing agent's own Agent Index row gets a simple link to its exact comment, not a duplicate transcript. The procedure owns destination precedence, ordering, permissions, partial-write recovery and backfill. This applies to persistent teammates AND stateless lenses with Index rows. Older session-task-only and transcript-on-row wording is superseded on these points; see that file's integration status.
 
 ---
 
@@ -14,14 +21,14 @@
 
 **Fires automatically when:**
 
+- **A repo agent works or deliberates in the workspace:** apply §0 for the live contribution and activity pointer.
 - 🔴 **A NEW super-agent is being authored.** The bundle ships with **NO writable git activity log** — see
   §1. This is the single most important trigger and it is not optional.
 - An existing agent's `activity-log.md` is about to be edited and has not yet been migrated → migrate it
   in that same pass rather than growing it further.
 - Any session touching `hooks/memory-rotation.md`, `hooks/session-close.md`, or a bundle's load manifest.
 
-🚫 **Does NOT fire on:** stateless lenses in `agents/<slug>.md`. They have no bundle and no log. Their
-activity, when it matters, is a threaded reply on a session task per the session-transcript gate.
+**Stateless lenses:** §0 applies to their workspace contributions and Agent Index pointers too. They have no memory bundle or git log to migrate, so §3 does not apply to them.
 
 ---
 
@@ -36,16 +43,16 @@ build exclusively to new model and dictate into their CU task regularly."*
    not even as a stub to migrate later. ⚠️ **Vector Vale (2026-09-07) is the founding example of the
    born-migrated shape** and his `decision-log.md` D2 explains why a born-migrated stub differs from a
    migrated one: it carries no backfill receipts, because there was never a git log.
-3. 🔴 **DICTATE REGULARLY, not at close.** Every qualifying reply posts its transcript comment to the row
-   in the agent's own voice. The per-response logging mandate is unchanged; **only its destination moved.**
+3. 🔴 **RECORD REGULARLY, not at close.** Follow §0: substantive work lives in the working thread; the
+   agent's row receives its exact-comment pointer. The former transcript-on-row wording is superseded.
 4. ⚠️ **This is now the FLEET RULING, superseding five per-agent approvals** (Felix 09-05, then Milo,
    Dexter, Ricky, Vale). 🚫 Those five are no longer "exceptions" and must stop being described as such.
 
-### The four-way placement boundary (unchanged by this ruling, restated because it is the point)
+### The four-way placement boundary (log payload amended by §0)
 
 | What | Where | Why |
 |---|---|---|
-| **LOG** — what happened, chronological, append-only, never read whole | 🆕 **Agent Index row COMMENTS** | Cheap to write, naturally chronological, no commit ceremony |
+| **LOG** — chronological pointers to work, append-only, never read whole | **Agent Index row COMMENTS** | Exact-comment links to the working thread, not duplicate transcripts |
 | **MEMORY** — what the agent LEARNED that changes future behaviour | **git `memory.md`**, small, curated | Durable, diffable, read in full on every load |
 | **PREFERENCES** — who the agent IS | **git `preferences.md`**, near-static | The identity contract |
 | **LOCATION KNOWLEDGE** — facts about a list/space/production ANY agent needs | **List Index row** (`901327881037`) or its Agent Interaction subpage | 🔴 **Never a private agent file** |
@@ -79,6 +86,8 @@ private file is why the file grew and why nobody else benefited.**
 ---
 
 ## §3 MIGRATION — five steps per agent, in this order
+
+**Historical log migration only.** Existing historical entries below may be backfilled intact; new workspace contributions follow §0's link-only receipts. Do not rewrite or erase old row comments to enforce the new payload shape.
 
 🔴 **ORDER IS LOAD-BEARING. Step 4 before step 3 leaves a broken load contract; step 5 before step 2
 destroys history.** (The 2026-09-17 iCloud precedent: a correct fix in the wrong order is a data-loss
@@ -126,11 +135,7 @@ warns you when the window starts clipping.
 **2 · A CHEAPER LOG INVITES MORE LOGGING.** ⚠️ **The size cap was an accidental brake, and this ruling
 removes it.** Same bloat, one surface over.
 
-> **THE CADENCE RULE THAT REPLACES THE SIZE CAP (written at migration time, per the handoff's demand
-> that it not be deferred): ONE comment per qualifying reply. Not one per tool call, not one per
-> thought.** The qualifying test is unchanged from the base spec — a reply that delivers content, answers
-> a question, takes an action, makes a decision, or issues a correction. 🚫 **A second comment on the same
-> reply is a defect.** And the LIVE STATE block is **edited in place, never appended to.**
+> **CADENCE:** §0 replaces transcript duplication with ONE exact-comment pointer per distinct working contribution. Not per tool call, not per thought, not an extra receipt for a chat synthesis of work already linked. LIVE STATE remains **edited in place, never appended to**. The qualifying test remains substantive content, an answer, action, decision or correction.
 
 ---
 
@@ -140,13 +145,16 @@ removes it.** Same bloat, one surface over.
   placement test (§4a: *can this go stale in a day?*) are untouched. **The log moved; memory did not.**
 - 🚫 **`decision-log.md` stays in git.** Reasoning about the agent's own shape is durable and diffable.
 - 🚫 **`/PREFERENCES.md`** still routes exclusively through Memory Maggie's placement triage.
-- 🚫 **The session-transcript gate is unchanged.** Session tasks on the 🟢 Agent Activity Board and the
-  spine line are separate surfaces with separate jobs. **This hook governs the AGENT's log, not the
-  SESSION's record.** ⚠️ A session task is per-session and shared; an Index row is per-agent and durable.
+- **Session chronology and agent history remain distinct.** §0 changes the deliberation destination
+  and the agent-row payload, not the spine's chronology role or structural session tracking. A session
+  record links to the working room/thread instead of duplicating its deliberation. An Index row is
+  per-agent and durable; a room holds the actual working conversation.
 
 ---
 
 ## §6 ⚠️ OWED, and stated rather than quietly skipped
+
+**2026-10-02 integration note:** §0's linked procedure owns room-first work and link-only receipts, including precedence over older wording. Its integration-status section lists reader updates still owed. The historical migration findings below are retained as history, not newly verified blockers.
 
 1. 🔴 **`super-agents/_shared/super-agent-base.md` still describes `activity-log.md` as a real git file**
    (§File set, §Per-response logging mandate item 2, and the load contract's step 3). **It measures
@@ -179,3 +187,5 @@ migration report for an agent **says so** rather than assuming the pattern is pr
 
 **Born 2026-09-20.** Michael's ruling on an 18-day-parked handoff, during the session that built Vellum
 Victoria and cleared Vale's overdue git pass — **the two events that supplied the evidence.**
+
+**Amended 2026-10-02.** Michael directed real-time deliberation on room tasks and simple exact-comment links on each contributing repo agent's own activity row. Applied forward; prior missing deliberation is backfill, not live capture.
