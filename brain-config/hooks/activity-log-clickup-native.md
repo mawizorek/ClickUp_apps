@@ -1,10 +1,30 @@
 # Activity Log — ClickUp-Native (the log lives on the Agent Index row)
 
 > **STATUS: LAW as of 2026-09-20 for all NEW agents. MIGRATION IN PROGRESS for existing ones.**
+> **2026-10-02: room-first live deliberation and link-only activity receipts apply to ALL repo agents working in the workspace; see §0.**
 >
 > 📋 Decision history: the *Agent Activity Log Migration — Decision Log* (ClickUp page, nested under the
 > Brain Reference Library). 🚫 Per Decision-Log Gold Standard rule 11, no decision log lives in this repo.
 > Origin handoff: `↪️ HANDOFF · Mira · Activity-log migration · Sep 2` (task `86akac5cj`), parked 18 days.
+
+---
+
+## §0 LIVE WORK FIRST, ACTIVITY POINTER SECOND (Michael, 2026-10-02)
+
+**Scope:** every repo-defined agent working in ClickUp, including stateless lenses with Agent Index rows. This is shared procedure, not a per-agent preference or a new agent. It applies to individual work and multi-agent deliberation.
+
+**Precedence:** this ruling supersedes older instructions in `gates/session-transcript-gate.md`, `council.md`, `orchestration.md`, and `super-agents/_shared/super-agent-base.md` that require deliberation ONLY on an Activity Board session task or require its transcript to be copied onto the agent row. Those files should point here rather than duplicate this procedure. Other session tracking, memory placement, LIVE STATE and permission rules remain in force.
+
+1. **Resolve the working surface first.** For a room-scoped session, use that room task: rooms exist to hold the working conversation. An explicitly designated work-item thread remains its own working surface. Use an Activity Board session task only when no room or work-item thread is established; do not create a parallel deliberation home merely to satisfy an older session-task-only clause. Keep any session record linked to the actual working thread.
+2. **Post as the work happens.** Open the topic thread on the working task, then post each agent's substantive contribution as its own named reply, in that agent's voice. Read preceding contributions before responding. Post the contribution when made, before presenting the synthesis; never collect the whole debate in a file and ask afterward whether to post it. The chair/convenor follows the same rule. A named review lens is an analytical role, not proof that a separate autonomous agent sent a message.
+3. **Immediately link from the contributing agent's own activity row.** After the working comment succeeds, take its exact returned comment URL and post ONE short Markdown link on THAT agent's Agent Index row: `[<topic / contribution>](<exact comment URL>)`. No copied transcript, recap, or second opinion. Link to the specific comment, not merely its task or the opening post. Resolve the correct row from the Agent Index; never put everyone's receipts on the chair's row.
+4. **Keep the record single and honest.** One activity pointer per distinct working contribution; no extra pointer per tool call or per chat synthesis of the same contribution. Multiple agents each get their own pointer. Do not change permissions or expose private content to make a pointer work; use a non-sensitive label and respect destination access. Link-only logging does not replace a required LIVE STATE update when project state changes, nor a durable memory write when warranted.
+5. **Handle partial writes explicitly.** No successful working comment means no success pointer. If the working comment lands but the activity pointer fails, keep its URL, report the missing receipt and retry only the pointer. Check for an existing matching comment/receipt before retrying an uncertain result. Never repost the substantive contribution just because its receipt failed. Missing agent row or unavailable room is a named gap, not permission to invent a target.
+6. **Late capture is backfill, never live.** Label reconstructed prior deliberation as backfill and link to the backfilled comments. Do not fabricate timestamps, independent conversations, or a live posting history. This procedure authorizes no unrelated task-field edit, repo repair, or new autonomous schedule.
+
+**Permissions seam:** an instruction to run a room discussion establishes the intended working destination. Obtain any approval required by the executing platform BEFORE that posting batch; do not treat this standing procedure as a bypass of system-level message or bulk-write confirmation. Once approved, post in real time rather than asking again after deliberation. Never claim logging complete without the actual successful comment and pointer receipts.
+
+**Acceptance:** room contribution exists → its author has an exact-comment link on their own row → synthesis points to the room thread. A summary-only attachment or a promise to post later does not satisfy this procedure.
 
 ---
 
@@ -14,14 +34,14 @@
 
 **Fires automatically when:**
 
+- **A repo agent works or deliberates in the workspace:** apply §0 for the live contribution and activity pointer.
 - 🔴 **A NEW super-agent is being authored.** The bundle ships with **NO writable git activity log** — see
   §1. This is the single most important trigger and it is not optional.
 - An existing agent's `activity-log.md` is about to be edited and has not yet been migrated → migrate it
   in that same pass rather than growing it further.
 - Any session touching `hooks/memory-rotation.md`, `hooks/session-close.md`, or a bundle's load manifest.
 
-🚫 **Does NOT fire on:** stateless lenses in `agents/<slug>.md`. They have no bundle and no log. Their
-activity, when it matters, is a threaded reply on a session task per the session-transcript gate.
+**Stateless lenses:** §0 applies to their workspace contributions and Agent Index pointers too. They have no memory bundle or git log to migrate, so §3 does not apply to them.
 
 ---
 
@@ -36,16 +56,16 @@ build exclusively to new model and dictate into their CU task regularly."*
    not even as a stub to migrate later. ⚠️ **Vector Vale (2026-09-07) is the founding example of the
    born-migrated shape** and his `decision-log.md` D2 explains why a born-migrated stub differs from a
    migrated one: it carries no backfill receipts, because there was never a git log.
-3. 🔴 **DICTATE REGULARLY, not at close.** Every qualifying reply posts its transcript comment to the row
-   in the agent's own voice. The per-response logging mandate is unchanged; **only its destination moved.**
+3. 🔴 **RECORD REGULARLY, not at close.** Follow §0: substantive work lives in the working thread; the
+   agent's row receives its exact-comment pointer. The former transcript-on-row wording is superseded.
 4. ⚠️ **This is now the FLEET RULING, superseding five per-agent approvals** (Felix 09-05, then Milo,
    Dexter, Ricky, Vale). 🚫 Those five are no longer "exceptions" and must stop being described as such.
 
-### The four-way placement boundary (unchanged by this ruling, restated because it is the point)
+### The four-way placement boundary (log payload amended by §0)
 
 | What | Where | Why |
 |---|---|---|
-| **LOG** — what happened, chronological, append-only, never read whole | 🆕 **Agent Index row COMMENTS** | Cheap to write, naturally chronological, no commit ceremony |
+| **LOG** — chronological pointers to work, append-only, never read whole | **Agent Index row COMMENTS** | Exact-comment links to the working thread, not duplicate transcripts |
 | **MEMORY** — what the agent LEARNED that changes future behaviour | **git `memory.md`**, small, curated | Durable, diffable, read in full on every load |
 | **PREFERENCES** — who the agent IS | **git `preferences.md`**, near-static | The identity contract |
 | **LOCATION KNOWLEDGE** — facts about a list/space/production ANY agent needs | **List Index row** (`901327881037`) or its Agent Interaction subpage | 🔴 **Never a private agent file** |
@@ -79,6 +99,8 @@ private file is why the file grew and why nobody else benefited.**
 ---
 
 ## §3 MIGRATION — five steps per agent, in this order
+
+**Historical log migration only.** Existing historical entries below may be backfilled intact; new workspace contributions follow §0's link-only receipts. Do not rewrite or erase old row comments to enforce the new payload shape.
 
 🔴 **ORDER IS LOAD-BEARING. Step 4 before step 3 leaves a broken load contract; step 5 before step 2
 destroys history.** (The 2026-09-17 iCloud precedent: a correct fix in the wrong order is a data-loss
@@ -126,11 +148,7 @@ warns you when the window starts clipping.
 **2 · A CHEAPER LOG INVITES MORE LOGGING.** ⚠️ **The size cap was an accidental brake, and this ruling
 removes it.** Same bloat, one surface over.
 
-> **THE CADENCE RULE THAT REPLACES THE SIZE CAP (written at migration time, per the handoff's demand
-> that it not be deferred): ONE comment per qualifying reply. Not one per tool call, not one per
-> thought.** The qualifying test is unchanged from the base spec — a reply that delivers content, answers
-> a question, takes an action, makes a decision, or issues a correction. 🚫 **A second comment on the same
-> reply is a defect.** And the LIVE STATE block is **edited in place, never appended to.**
+> **CADENCE:** §0 replaces transcript duplication with ONE exact-comment pointer per distinct working contribution. Not per tool call, not per thought, not an extra receipt for a chat synthesis of work already linked. LIVE STATE remains **edited in place, never appended to**. The qualifying test remains substantive content, an answer, action, decision or correction.
 
 ---
 
@@ -140,13 +158,16 @@ removes it.** Same bloat, one surface over.
   placement test (§4a: *can this go stale in a day?*) are untouched. **The log moved; memory did not.**
 - 🚫 **`decision-log.md` stays in git.** Reasoning about the agent's own shape is durable and diffable.
 - 🚫 **`/PREFERENCES.md`** still routes exclusively through Memory Maggie's placement triage.
-- 🚫 **The session-transcript gate is unchanged.** Session tasks on the 🟢 Agent Activity Board and the
-  spine line are separate surfaces with separate jobs. **This hook governs the AGENT's log, not the
-  SESSION's record.** ⚠️ A session task is per-session and shared; an Index row is per-agent and durable.
+- **Session chronology and agent history remain distinct.** §0 changes the deliberation destination
+  and the agent-row payload, not the spine's chronology role or structural session tracking. A session
+  record links to the working room/thread instead of duplicating its deliberation. An Index row is
+  per-agent and durable; a room holds the actual working conversation.
 
 ---
 
 ## §6 ⚠️ OWED, and stated rather than quietly skipped
+
+**2026-10-02 integration note:** §0 is the current precedence rule for room-first work and link-only receipts. Older direct wording in the session-transcript gate, Council, orchestration and shared base still needs pointer-only reconciliation. Orchestration and the shared base were claimed by an active Oct 2 repo session at the pre-write check; this change deliberately does not overwrite them. Do not describe every referencing file as patched. The historical migration findings below are retained as history, not newly verified blockers.
 
 1. 🔴 **`super-agents/_shared/super-agent-base.md` still describes `activity-log.md` as a real git file**
    (§File set, §Per-response logging mandate item 2, and the load contract's step 3). **It measures
@@ -179,3 +200,5 @@ migration report for an agent **says so** rather than assuming the pattern is pr
 
 **Born 2026-09-20.** Michael's ruling on an 18-day-parked handoff, during the session that built Vellum
 Victoria and cleared Vale's overdue git pass — **the two events that supplied the evidence.**
+
+**Amended 2026-10-02.** Michael directed real-time deliberation on room tasks and simple exact-comment links on each contributing repo agent's own activity row. Applied forward; prior missing deliberation is backfill, not live capture.
