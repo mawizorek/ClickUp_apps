@@ -8,7 +8,7 @@ targets:
 - **MIRROR (slim):** the track task's **"Race History"** text field in ClickUp — ONE frozen year-line, resolved by `cuTaskId`. Plus the derived `Round` number field and any `(Round N)` text in the task description, both repointed from the calendar.
 - **STAMP:** `routines/last-run/f1.txt`.
 
-report-to: DETAIL → the JSON commit + the touched track tasks (see Report format). ROLL-UP → 🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajue7ff
+report-to: DETAIL → the JSON commit + the touched track tasks (see Report format). ROLL-UP → 🧭 STANDING · Routine Ricky — Run Reports · https://app.clickup.com/t/86ajuhw1d
 
 > `report-to:` used to read `#A.I. Prompts (thread: F1 refreshes)`. **Repointed 2026-08-01:** run records belong on the standing thread where triage can find them, not scattered across chat. Chat is a banner-pointer surface, never the record. See `routines/README.md` → Run reports.
 
@@ -36,7 +36,7 @@ Runs before the session-aware check, because a calendar change (an inserted, can
 4. **Orphans:** a race task in F1 Races with no calendar row (cancelled round) → clear its `Round` field and report it. Never delete or close it.
 5. A repoint alone does NOT stamp. It is not a refresh.
 
-⚠️ The ClickUp `Round` field is a MIRROR of a derived value. It exists for ClickUp views and sorting; nothing reads it as truth. **Never read it back as authoritative — derive from the calendar.** Why this step exists: on 2026-08-01 sepang was inserted between baku and marina-bay and seven ClickUp Round values sat one off for two months because the repoint was nobody's step.
+⚠️ The ClickUp `Round` field is a MIRROR of a derived value. It exists for ClickUp views and sorting; nothing reads it as truth. **Never read it back as authoritative — derive from the calendar.** Why this step exists: on 2026-08-01 sepang was inserted between baku and marina-bay and seven ClickUp Round values sat one off for two months because the repoint was nobody's step. First run of this step: 2026-10-03, 8 tasks repointed.
 
 ## Is there anything to do? (session-aware check — run this after Step 0)
 
@@ -50,7 +50,7 @@ This check is why the routine survived the retirement of the scheduler untouched
 
 1. Read the CURRENT `index_rounds.json` + the most recent round file in `f1-racetracks/f1-results/2026/` to learn the exact schema. Match it precisely — do NOT redesign. A schema change is a build session, not a refresh → STOP.
 2. Research the weekend: full classification (P1 → last + DNFs), pole, fastest lap, the sprint block if it was a sprint round, **and the race story**: every retirement's cause, Safety Cars / VSCs / red flags, penalties, the big recoveries and drops. Read at least two full race reports, not just a results table.
-3. **Verify EVERY finishing position against a primary source** (formula1.com / FIA). Do NOT trust any existing value. (Three silent errors were found pre-shift, all favoring one narrative — stay suspicious.)
+3. **Verify EVERY finishing position against a primary source** (formula1.com / FIA). Do NOT trust any existing value. (Three silent errors were found pre-shift, all favoring one narrative — stay suspicious. The 2026-10-03 story pass found three more, on r06-r08.)
 4. Add the round to JSON:
    - Create `f1-racetracks/f1-results/2026/r<NN>-<slug>.json` in the existing round schema: `points` on every classification row; `sprint` as an optional block reusing the classification shape.
    - **Write the race story per `f1-racetracks/f1-results/2026/README.md` → Race story standard.** Round `summary` + a `stewardNote` on every row the standard requires (every non-finisher with its cause word, the podium, every penalty, every ±5-place mover) + the `sources_<date>` provenance key. **A round with a bare DNF row is an incomplete refresh**, not a style choice.
@@ -69,7 +69,7 @@ This check is why the routine survived the retirement of the scheduler untouched
 
 - You'd have to invent a JSON field or change the schema → STOP, build session.
 - A result/standing can't be primary-source verified → don't guess, flag it.
-- A race-story fact (a retirement cause, a penalty) can't be sourced → leave that note absent and list it as unsourced. Never fill it from inference.
+- A race-story fact (a retirement cause, a penalty) can't be sourced → use `Retired.` / leave that note absent and list it as unsourced. Never fill it from inference.
 - A `cuTaskId` or `driverId` won't resolve → STOP, never guess or create a filling object. *(Exception: Step 0.2, a calendar row with NO `cuTaskId` at all, is a missing task and gets created.)*
 - The "Race History" field already has a 2026 line that differs from yours → STOP-and-flag, never overwrite.
 - Any urge to write finishing order into ClickUp → that's the retired pattern. JSON only.
