@@ -167,6 +167,7 @@ Rewritten 2026-07-26 so each one can actually fail. **Amended 2026-07-27:** the 
 - Two-artifact ship for over-cap files.
 - Retiring a top-level file = delete **plus** a redirect stub.
 - Read source through the git blob API at a fresh SHA. Never build an edit on a branch raw read.
+- **Derived values are repointed by the refresh hook, silently.** Round numbers, `cuTaskId`s, "(Round N)" text: Step 0 of `routines/f1-refresh.md` recomputes them from the calendar every run. Never a ClickUp formula, never a question to Michael.
 
 ---
 
@@ -191,8 +192,11 @@ Rewritten 2026-07-26 so each one can actually fail. **Amended 2026-07-27:** the 
 - **`grid` + `qualifying` absent on r03 / r04 / r07** — 66 driver-rows. SOURCED or absent; **do not improvise.**
 - Sprint arc **documented-never-built**.
 - Sprint `sess` labels disagree with the authoritative boolean on **5 circuits**.
-- No `sepang` in `LIVE_CIRCUIT_ALIASES`.
 - **FOUR source modules over the 15KB line** — `09`, `10`, `standings/panel.js`, `15` (same four named in the acceptance criteria above).
+- **`stewardNote` is a legacy name.** It now carries the per-row race story (cause of every DNF, podium gaps, penalties, big movers), not just steward rulings. Rename to `note` in the v20 port, renderer and data together; **until then keep writing `stewardNote`.** Standard: `f1-results/2026/README.md` ▸ Race stories.
+- **Silverstone (r09) P12-P20 order** wants a primary-source re-dig (FIA classification PDF). Flagged in `f1-results/2026/README.md`; do not reorder from secondary sources.
+- **Race stories not yet backfilled on r01-r05.** Same standard applies; run it as a story pass, not a results edit.
+- ~~No `sepang` in `LIVE_CIRCUIT_ALIASES`.~~ **Closed 2026-10-02, PR #958** (alias added, whole-word matching).
 
 ### Sepang / Bahrain
 
