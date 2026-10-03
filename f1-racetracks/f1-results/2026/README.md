@@ -2,7 +2,7 @@
 
 > The prose that used to live inside `index_rounds.json`. It was moved here 2026-07-28 because that file is the **boot payload every consumer fetches first** and roughly 76% of it was documentation the app never reads.
 >
-> **Everything below was verified against all nine round files at commit `d27ce55` on 2026-07-28** unless a section carries its own later date. If you change the data, re-verify and re-stamp `verified_at_commit` in the manifest. A status line nobody re-reads is worse than none — that is exactly how this store came to be described wrongly by its own metadata.
+> **✅ Verified 2026-10-03: every round r01-r15 checked row by row against the FIA final race classification, final starting grid and final qualifying classification, cross-checked with formula1.com (data at commit `7ccc347`).** Earlier stamp: all nine round files at `d27ce55`, 2026-07-28. If you change the data, re-verify and re-stamp `verified_at_commit` in the manifest. A status line nobody re-reads is worse than none — that is exactly how this store came to be described wrongly by its own metadata.
 
 ---
 
@@ -48,7 +48,7 @@ Numbers come from official sources (FIA timing sheets, formula1.com) cross-check
 | every **non-finisher** (`DNF` / `DNS` / `DSQ`) | **Opens with exactly one cause word**, then what happened (when, where, consequence). |
 | the **podium** (P1-P3) | How they got there. P1 opens `Won by X.XXXs.`; P2/P3 open with their gap `+X.XXXs.` when sourced. |
 | any **penalty** (grid or time), **pit-lane start**, or `onRoadPos` ≠ `pos` | What the penalty was for and what it cost. |
-| any **mover** with \|grid − pos\| ≥ 5 (numeric `grid` only) | How the places were won or lost. |
+| any **mover** with \|grid − pos\| ≥ 5 (numeric `grid` only) | How the places were won or lost. With no sourced story, a factual derived line is fine: `Gained N places from PX on the grid to PY.` |
 
 **Optional:** any other real story (team-mate fights, first points, last-lap passes, a stand-in driver).
 
@@ -70,7 +70,7 @@ Numbers come from official sources (FIA timing sheets, formula1.com) cross-check
 - **Sources disagree on a lap or corner number → omit the number.** Never pick one.
 - Quotes: verbatim, short, published only.
 - **Never invent.** An absent note costs nothing.
-- A story pass **never changes result data** (pos, grid, points, status, times). If a number looks wrong, flag it in the run report. Correcting results is a separate, primary-sourced data fix (precedent: the 2026-10-03 Monaco correction below).
+- A story pass **never changes result data** (pos, grid, points, status, times). If a number looks wrong, flag it in the run report. Correcting results is a separate, primary-sourced data fix (precedent: the 2026-10-03 verification pass below).
 
 ### 4. House style
 
@@ -109,7 +109,7 @@ Each entry in a round's `classification` (and `sprint.classification`) is ONE dr
 | `points` | number | |
 | `grid` | int, or the string `'PL'` | where they STARTED, post-penalty. `'PL'` = pit-lane start and has **no meaningful numeric delta** |
 | `onRoadPos` | int, **absent when equal to `pos`** | see the absence rule below |
-| `qualifying` | `{ pos, q1, q2, q3 }` | `pos` is the grid slot earned in the session; lap times are strings, `null` when not set or eliminated earlier |
+| `qualifying` | `{ pos, q1, q2, q3 }` | `pos` is the position in the FIA final qualifying classification (before grid penalties); lap times are strings, `null` when not set or eliminated earlier. `pos: null` = no time set |
 | `fastLap` | `{ time, lap }` or `null` | THIS driver's best race lap. `null` = no representative lap (early DNS/DNF) |
 | `stewardNote` | string | **the row's race-story one-liner** — see Race story standard (legacy name) |
 | `tyres` | `{ stops, stints[] }` | designed, **not populated anywhere** |
@@ -118,11 +118,13 @@ Each entry in a round's `classification` (and `sprint.classification`) is ONE dr
 
 **🚨 The absence rule (`onRoadPos`).** Stored ONLY when it differs from `pos`. **Its absence is MEANINGFUL: missing means "same as pos," never "unknown."** Every consumer reads it as `onRoadPos ?? pos`.
 
+**📏 `fastLap.lap` convention (2026-10-03).** Lap numbers follow the **formula1.com fastest-laps table**. The FIA timing sheet often reads one lap (sometimes two) lower for the same lap time. Both are official; they count differently. **Do not "correct" between the two conventions.** Times always match.
+
 All new fields are optional and degrade to dashes, so a round entered without qualifying still renders.
 
 ### Round level
 
-`pole { driverId, driver, team, time }` and `fastestLap { driverId, driver, team, time, lap }` are the **official single-seat credits** — the headline awards — distinct from the per-driver `qualifying` / `fastLap` fields. Both may be present. The round-level `fastestLap` driver always equals the P1 row of the official F1.com per-race fastest-laps table. `summary` is the race story (required, see above); `sources_<date>` is story provenance.
+`pole { driverId, driver, team, time }` and `fastestLap { driverId, driver, team, time, lap }` are the **official single-seat credits** — the headline awards — distinct from the per-driver `qualifying` / `fastLap` fields. Both may be present. The round-level `fastestLap` driver always equals the P1 row of the official F1.com per-race fastest-laps table (checked against the minimum per-row `fastLap` on every round, 2026-10-03). `summary` is the race story (required, see above); `sources_<date>` is story provenance.
 
 ---
 
@@ -130,17 +132,17 @@ All new fields are optional and degrade to dashes, so a round entered without qu
 
 **`live`** = present in the data and verified · **`live, partial`** = present on some rounds only, rounds named · **`documented-only`** = described in a schema and present in **no file** · **`planned`** = designed, not built.
 
-A field with no state here has not been audited. States verified at `d27ce55`, 2026-07-28, except where a row carries a later date.
+States verified 2026-10-03 across r01-r15.
 
 | Field | State | Detail |
 |---|---|---|
-| `pos` · `driverId` · `driver` · `team` · `status` · `points` | **live** | all rounds, every row |
-| `fastLap { time, lap }` | **live** | r1-9 complete since 2026-07-23. Backfilled from the official per-race FL tables. `null` only for genuine no-lap retirements |
-| `grid` | **live, partial** | **absent on r03 suzuka, r04 miami, r07 catalunya** |
-| `qualifying { pos, q1, q2, q3 }` | **live, partial** | same three rounds absent — **and uneven within the rest**, see below |
+| `pos` · `driverId` · `driver` · `team` · `status` · `points` | **live** | all rounds, every row; verified against FIA final classifications 2026-10-03 |
+| `fastLap { time, lap }` | **live** | r01-r15 complete (r13-r15 backfilled 2026-10-03). `null` only for genuine no-lap rows (DNS, lap-one retirements, Leclerc at Monza) |
+| `grid` | **live** | r01-r15 complete (r03, r04, r07 backfilled 2026-10-03); pit-lane starts stored as `'PL'` |
+| `qualifying { pos, q1, q2, q3 }` | **live** | r01-r15 complete against FIA final qualifying classifications. One known gap: r04 Hadjar `q1` (qualifying DSQ; sheet not reconciled) |
 | `onRoadPos` | **live** | correctly sparse by design. Also honoured inside a sprint block (r04 Miami, Antonelli) |
-| `summary` | **live, r06-r15** (2026-10-03) | race-story standard. r01-r05 not yet backfilled |
-| `stewardNote` | **live, r06-r15 to standard** (2026-10-03) | every non-finisher carries a cause word on r06-r15; r01-r05 sparse |
+| `summary` | **live, r01-r15** (2026-10-03) | race-story standard |
+| `stewardNote` | **live, r01-r15 to standard** (2026-10-03) | every non-finisher carries a cause word; every podium, penalty, pit-lane start and ≥5-place mover carries a note |
 | `sprint.classification` | **live** | every sprint round run, top 8 scoring |
 | `sprintQualifying { pos, sq1, sq2, sq3 }` | **documented-only** | described in the old row schema, present in **no file**. Ruled 2026-07-28 (Q10): sprint gets its own full treatment as a distinct activity entry within the weekend — this is now **planned**, with the shape settled before any backfill |
 | sprint `grid` | **planned** | same ruling |
@@ -148,29 +150,25 @@ A field with no state here has not been audited. States verified at `d27ce55`, 2
 | `tyres.stints[]` | **planned** | designed; nothing reads or writes it. It is a nested repeating FIELD, **not a table** (ruled 2026-07-28) |
 | `dnf { lap, reason }` · `finishGap` | **planned** | Tier 4. Until then the cause word + note carry the reason |
 
-### ⚠️ Qualifying completeness is a spectrum, not a binary
+### Qualifying completeness (resolved 2026-10-03)
 
-The old status line said three rounds were flat and implied the rest were complete. They are not. Within the six enriched rounds:
+The 2026-07-28 audit found qualifying uneven: r02 rows with `pos` and no times, r05 Q3 times with null Q1/Q2, r01 and r06 partial. All of it is now filled from the FIA final qualifying classifications, and a structural sweep passes on every round (top 10 carry Q2, P11-P16 carry Q2 and no Q3, P17+ carry Q1 only, each segment sorts by lap time). Legitimate exceptions: drivers who set no time in a segment they reached (e.g. Bortoleto at Monaco after his Q1 crash, Antonelli at Baku). `null` now means "not set," not "not dug."
 
-| Round | State |
-|---|---|
-| r09 silverstone · r08 red-bull-ring | near-complete Q1/Q2/Q3 |
-| r06 monaco · r01 albert-park | mixed — several rows carry `pos` with partial or no lap times |
-| r02 shanghai | **9 of 22 rows** carry `qualifying.pos` with all three lap times `null` |
-| r05 gilles-villeneuve | **4 drivers** (Leclerc, Hadjar, Colapinto, Lindblad) carry a **Q3 time with null Q1 and Q2** — a partial dig wearing the shape of a complete record |
+### Open data flags
 
-**Why it matters:** `null` currently means two different things. A driver eliminated in Q1 legitimately has null Q2/Q3. A driver whose Q1 was never dug also has null Q1. `q.q1 ?? '—'` renders both identically, and a render path built against r09 never exercises the shapes in between.
+- **r04 miami:** Hadjar's `qualifying.q1` is null while his Q2/Q3 times are stored (qualifying DSQ). Reconcile against the FIA sheet.
+- **r13 monza:** Audi lodged an appeal over the stewards' ruling on Tsunoda's extra formation lap. No outcome published as of 2026-10-03; the classification is unchanged until one is.
 
-**Ruled 2026-07-28 (Q12):** dig it AND render the difference — with the **completeness data pass assigned to Routine Ricky as a later job**, not a v7 blocker.
+### Resolved 2026-10-03 (verification pass, r01-r15)
 
-### Known single-round gaps + open data flags
-
-- **r07 catalunya:** round-level `pole` has `driverId` / `driver` / `team` and **no `time`**. `12_results_store.js` guards this (`data.pole.time || 'TBC'`), so it renders as TBC rather than breaking.
-- **r06 monaco (CORRECTED 2026-10-03):** the FIA International Court of Appeal reinstated Gasly's two pit-lane penalties on 2026-09-04. Final order is Hadjar P3 · Piastri P4 · Lawson P5 · Lindblad P6 · Gasly P7 (on-road P3); points re-scored, total unchanged at 101.
-- **r07 catalunya (CORRECTED 2026-10-03):** Bearman `FIN` → `DNF` per the FIA final classification (classified P17).
-- **r08 red-bull-ring (CORRECTED 2026-10-03):** Alonso `DNF` → P18 `FIN` (68 laps) per the FIA final classification.
-- **r09 silverstone (OPEN):** the 2026-10-03 story pass found the stored order disagrees with the FIA final classification below the points (Sainz P17 not P12 after his penalty lap, Antonelli P15 not P16, Verstappen DNF not P20). Points are unaffected. Needs a full primary-sourced re-dig of P12-P20 before anything moves.
-- **r11 hungaroring (OPEN, unconfirmed):** round-level `fastestLap` reads Leclerc 1:22.000; one research pass disputed it. Verify against the official FL table before changing.
+- **r01-r02-r05 DNS:** Piastri and Hulkenberg (r01), Norris, Piastri, Bortoleto and Albon (r02), Lindblad (r05) corrected `DNF` → `DNS`.
+- **r03 suzuka:** Stroll and Bearman not classified (`DNF`, `pos: null`); P16-P20 reordered to the FIA result.
+- **r06 monaco:** FIA International Court of Appeal reinstated Gasly's two pit-lane penalties on 2026-09-04. Final order Hadjar P3 · Piastri P4 · Lawson P5 · Lindblad P6 · Gasly P7 (on-road P3).
+- **r07 catalunya:** pole time 1:14.679 added; Bearman `DNF` (classified P17) confirmed.
+- **r08 red-bull-ring:** Alonso P18 `FIN` (68 laps) confirmed.
+- **r09 silverstone:** P12-P17 reordered to the FIA final classification after Sainz's one-lap penalty (Sainz P17, onRoadPos 12); Verstappen `DNF`, classified P20.
+- **r11 hungaroring:** Leclerc 1:22.000 fastest lap confirmed by FIA and formula1.com.
+- **Grid:** about 30 slots corrected across r01, r02, r05, r06, r12, r13, r14 and pit-lane starts set to `'PL'`.
 
 ---
 
@@ -178,15 +176,15 @@ The old status line said three rounds were flat and implied the rest were comple
 
 | Pass | State |
 |---|---|
-| Tier 1 spine (`pos` / `driverId` / `status` / `points`) | ✅ all rounds |
-| Per-driver `fastLap` | ✅ r1-9, complete 2026-07-23 |
-| `grid` + `qualifying` | ⚠️ **r03, r04, r07 outstanding** |
-| Qualifying lap-time completeness within the enriched rounds | ⚠️ uneven — assigned to Routine Ricky |
-| **Race story (`summary` + notes to standard)** | ✅ **r06-r15** (2026-10-03, r15 on 10-02) · ⬜ r01-r05 |
+| Tier 1 spine (`pos` / `driverId` / `status` / `points`) | ✅ all rounds, FIA-verified 2026-10-03 |
+| Per-driver `fastLap` | ✅ r01-r15 (r13-r15 added 2026-10-03) |
+| `grid` + `qualifying` | ✅ r01-r15 (r03, r04, r07 added 2026-10-03; one r04 gap flagged above) |
+| Qualifying lap-time completeness | ✅ resolved 2026-10-03 |
+| **Race story (`summary` + notes to standard)** | ✅ **r01-r15** (2026-10-03, r15 on 10-02) |
 | Sprint arc (`sprintQualifying` + sprint grid) | 🟡 planned, shape ruled 2026-07-28 |
 | Tyre strategy (Tier 3) · Tier 4 colour | ⬜ not dug |
 
-**Provenance:** finishing positions and points re-verified against the ClickUp race tasks (2026-07-09), and r06-r08 corrected against FIA final classifications (2026-10-03). **This store is canonical for RESULTS and for the race STORY.**
+**Provenance:** finishing positions and points re-verified against the ClickUp race tasks (2026-07-09), then every round r01-r15 verified against FIA final classifications, starting grids and qualifying classifications (2026-10-03, PR #966 plus follow-up commits). **This store is canonical for RESULTS and for the race STORY.**
 
 ---
 
@@ -198,4 +196,4 @@ The old status line said three rounds were flat and implied the rest were comple
 
 ## Size
 
-Round files ran 4.2KB to 7.6KB before the story pass and 6.6KB to 12KB after it (r12 zandvoort, with a sprint block, is the largest). All are well under the proven read cap (≥26,175 bytes, measured 2026-07-27), **fetched per round, never whole.** Flat per file, linear in count — this per-round split is the fix for the 36KB `2026.json` monolith retired 2026-07-07. ⚠️ The story layer roughly doubles a file; a round that passes ~20KB should trim its notes, not split.
+Round files ran 4.2KB to 7.6KB before the story pass and 7.7KB to 12.2KB after the 2026-10-03 verification pass (r12 zandvoort, with a sprint block, is the largest). All are well under the proven read cap (≥26,175 bytes, measured 2026-07-27), **fetched per round, never whole.** Flat per file, linear in count — this per-round split is the fix for the 36KB `2026.json` monolith retired 2026-07-07. ⚠️ The story layer roughly doubles a file; a round that passes ~20KB should trim its notes, not split.
