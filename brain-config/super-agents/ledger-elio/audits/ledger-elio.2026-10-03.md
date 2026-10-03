@@ -60,3 +60,21 @@ Additional blocking birth check: **D1 PASS**. Observable two-production/inherite
 Local checks measure exact UTF-8 bytes and git-blob hashes, inspect pointers and scan outgoing text for credentials, private financial detail and accidental ledger figures. The loaded size-gate functions run locally against all effective TSV rows; the local runner omits the unused historical self-test. No claim of CI completion, independent cold-session execution or exercised accounting automation is made.
 
 The prior financial catch-up is explicitly reconstructed in ClickUp, not an earned Elio work history. Activity pointers are exact-comment links. The Workshop discussion remains on the existing working room, not in this audit.
+
+## Addendum: publication and registration verified, 2026-10-03 19:49 EDT
+
+Build PR #968 merged at `be805ef75570cdaefae276c3a9a8da60f51a35a0`. Main-branch directory reads returned the exact locally measured blobs:
+
+- `preferences.md`: `a95b7a02f074600ba94f8ed24a881f9d8f768ffc`, 3073 bytes.
+- `memory.md`: `c3020f41c7234adf11c95c46f94654e2acd0d5c3`, 1028 bytes.
+- `decision-log.md`: `3dc51ef6083d2f2810b06af87cd90059a5b38fdb`, 2093 bytes.
+- `README.md`: `11a13309e477e61f535e21d58ac4f717d661744b`, 362 bytes.
+- Original signed audit before this addendum: `e07b6ce04f43d1373fa7a0824defb4a39a61026f`, 6176 bytes.
+
+The published profile was also read in full. No writable git activity log exists in the published directory.
+
+Existing Agent Index row `86akmj64r` was updated only after publication. A fresh List-scoped query verified `active`, Home `brain-config/super-agents/ledger-elio/`, slug `ledger-elio`, class `super-agent`, Memory true, invocation `/session.agent=Elio`, preserved aliases and Sort Index, and the unchanged money-only Lane. Description readback confirmed the dated LIVE STATE, reconstructed-catch-up context, evidence/approval distinction and next-write boundary.
+
+Checks 3, 4 and 8 now **PASS for the bounded build**. Checks 2, 5 and 6 are supported by published-byte identity and registration readback rather than candidates alone. Birth configuration is published and registered. The shared-standard and neighboring-profile findings above remain open integration debt; this addendum does not claim a clean fleet, independent cold-session test or completed CI.
+
+Activity: all seven Workshop contributions and the opening/synthesis have exact-comment receipts on their own existing Agent Index rows. Elio's reconstructed catch-up also has its own exact-comment receipt. Financial source details remain in ClickUp.
