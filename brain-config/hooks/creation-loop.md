@@ -21,9 +21,12 @@
 | Surface | Location |
 | --- | --- |
 | **Agent Index** | 🤖 Agent Index list (`901328043244`) |
+| **Tool Index** | 🧩 Tool Index list (`901329128393`) — `Signals` / `Path` / `Kind`. **Where a new tool gets registered** (Phase 4). Read via its table-free projection page *Tool Index — Signal Routing*. |
 | **Authoring gate** | `brain-config/gates/git-agent-authoring.md` |
 | **Onboarding hook** | `brain-config/hooks/new-agent-onboard.md` |
 | **Team Loop** | `brain-config/hooks/team-loop.md` (Build Loop variant) |
+
+> ⚠️ **REPOINTED 2026-10-02/03.** This file said *"trigger-table row"*, meaning the Quick-Scan table on the ClickUp AI Toolkit index page. **No agent can write to that page** — it contains tables, and a table-bearing doc page refuses every text edit (4 refusals measured against 1 success on a table-free page with identical data). **Length was never the cause.** So an author following Phase 4 faithfully would have tried to register a new tool on the one surface that refuses writes. Registration now lands in the 🧩 Tool Index list, which is writeable by any agent.
 
 ---
 
@@ -35,7 +38,9 @@ The same phases, different weight. Both tracks share Phases 1–5. They diverge 
 |---|---|---|
 | Phases | All 7 | Phases 1–5 only (no persona to smoke-test or orient) |
 | Dex Handoff artifact | Full agent spec (lane, scope, seams, memory justification, retirement condition, naming collision check) | Slim spec (purpose, trigger, procedure sketch, composes-with, steward) |
-| Build deliverable | Full bundle/file + registration + trigger-table row | Single file + trigger-table row |
+| Build deliverable | Full bundle/file + Agent Index registration | Single file + a 🧩 **Tool Index row** |
+
+> 🔑 **The two registrations are different surfaces and neither substitutes for the other.** An AGENT registers in the 🤖 Agent Index (that is what the invocation gate reads at STEP 0). A TOOL registers in the 🧩 Tool Index (that is what routes a signal to a path). ~~A per-agent `/session.agent=` trigger row~~ was **struck 2026-09-21** on Michael's ruling — *"i refuse to do the toolkit paste"* — because it MIRRORED the Agent Index row and sat outside the resolution path. ⚠️ **That strike is about agents, not tools.** An audit misread it as removing tool registration entirely; it does not. **A tool still owes its row.**
 
 ---
 
@@ -93,15 +98,17 @@ The same phases, different weight. Both tracks share Phases 1–5. They diverge 
 ### Phase 4 — Build (Owner: Dev Dexter)
 
 **Entry:** Phase 3 GO from Michael.
-**Work:** Dex builds per the handoff artifact + the existing authoring gate (`gates/git-agent-authoring.md` for agents; standard file creation for hooks). The authoring gate's 9-step checklist is Dex's build procedure for agents. For hooks: write the file, add trigger-table row, test invocation.
-**Exit:** Artifact exists in repo on a branch. PR ready (or committed to main for simple hooks).
+**Work:** Dex builds per the handoff artifact + the existing authoring gate (`gates/git-agent-authoring.md` for agents; standard file creation for hooks). The authoring gate's 9-step checklist is Dex's build procedure for agents. **For hooks: write the file, add its 🧩 Tool Index row (`Signals` · `Path` · `Kind`), test invocation.**
+**Exit:** Artifact exists in repo on a branch, AND its Tool Index row exists. PR ready (or committed to main for simple hooks).
 **Seam with authoring gate:** The creation loop INVOKES the authoring gate at this phase. It does not duplicate it. The authoring gate IS Phase 4 for agents.
+
+> ⚠️ **`Kind` is a real decision, not a label.** `SIGNAL` = fires on something said or typed, and it **must** carry `Signals` phrases. `ACTION` = fires on a condition inside a procedure (a repo write, a commit, a session close) or is only ever invoked through something else — an empty `Signals` field is CORRECT for these. `TOMBSTONE` = retired. 🔴 **A `SIGNAL` row with an empty `Signals` field can never be matched**, which makes the tool invisible no matter how good the file is. Five rows carried that defect until 2026-10-03; three were mis-typed ACTIONs whose empty field was telling the truth, two were genuinely missing phrases their own files already stated.
 
 ### Phase 5 — Review (Owner: Anna + Workshop)
 
 **Entry:** Build complete.
 **Work:** Anna audits the built artifact against the Dex Handoff spec (does it serve the stated purpose?). The Workshop reviews (all 7 mandatory lenses). Findings posted. Dex addresses anything flagged.
-**Exit:** Anna declares PASS (open-surface ledger empty). Workshop has no blocking objections.
+**Exit:** Anna declares PASS (open-surface ledger empty). Workshop has no blocking objections. **Anna's PASS includes confirming the Tool Index row exists and its `Kind` matches the file's stated Mode** — an unregistered tool is invisible, and that has cost real sessions.
 **🚦 GATE: Anna PASS required. Michael may also review.**
 
 ### Phase 6 — Dry Test (Owner: Michael + Dex) [Agents only]
@@ -142,7 +149,7 @@ Complex agents (git-teammates with full bundles) will span multiple sessions. Ha
 | --- | --- |
 | **Fold-in Frank** | PRE-GATE. Frank fires BEFORE the creation loop. His NET-NEW verdict is the trigger. |
 | **git-agent-authoring gate** | INVOKED AT Phase 4. The authoring gate IS the build procedure for agents. |
-| **new-agent-onboard hook** | POST-LOOP. Fires after the creation loop completes, handles fleet integration (trigger-table, announcements, etc.). |
+| **new-agent-onboard hook** | POST-LOOP. Fires after the creation loop completes, handles fleet integration (Index rows, announcements, etc.). |
 | **team-loop (Build Loop)** | PARALLEL. The team loop's build variant may be active during Phase 4; the creation loop is the outer lifecycle container. |
 
 ---
@@ -150,3 +157,5 @@ Complex agents (git-teammates with full bundles) will span multiple sessions. Ha
 ## Meta-note
 
 This hook was itself built by running the creation loop on the creation loop (2026-08-02). The recursion resolved cleanly: Frank said NET-NEW, the Workshop reviewed, Anna audited, Dex wrote. First instance validates the pattern.
+
+⭐ **And it was vindicated by an audit that came for it, 2026-10-03.** Anna's closing report named *"registration is now unowned"* as its headline finding, reasoning that Michael's 09-21 strike of the agent trigger-row step had left nothing requiring a tool to register. **She was wrong, and this file is why** — it already required the row at Phase 4 and gated Phase 5 behind her own PASS. She retracted it. 🔑 **The residual was real but narrow: this file was right about the requirement and stale about the destination**, which is the more common shape of rot and the harder one to see, because nothing about it reads as broken.
