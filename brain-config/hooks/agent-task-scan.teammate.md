@@ -20,9 +20,10 @@ it is always-on for any agent doing work.
 **Decision history:** `Agent Index as the Interaction Surface ("Offices") — Decision Log`
 (ClickUp doc page) — **J3** two surfaces, **J4** roll call + cadence, **J5** rooms
 ship as a list, **J6** room list built + `Agent Assignee` stays empty on room
-rows, **J7** agents MAY write memberships / may NOT create rooms. Per
-Decision-Log Gold Standard rule 11 the log is a ClickUp page and this is the
-pointer.
+rows, **J7** agents MAY write memberships / may NOT create rooms, **J8** a room
+built on instruction is not the rule being lifted, **J11** person rows join the
+room list. Per Decision-Log Gold Standard rule 11 the log is a ClickUp page and
+this is the pointer.
 
 ---
 
@@ -166,9 +167,12 @@ report SAYS SO rather than assuming this works.
 **The room list EXISTS as of 2026-09-21 07:07**, built by Michael:
 `MEETINGS | WORKSHOPS | OFFICES`, list **`901329128254`**, in MAW Documents ▸
 ClickUp Use ▸ **AGENTS**, beside the 🤖 Agent Index. List Index row filed same
-day. Two rooms live and seated as of 07:40: *Brainstorming Team* (Deliberation,
-**12** lens voices) and *URITP Production Team* (Working, **15** labelled
-teammates).
+day. 🚫 **Do not write a room count or a seat count here** — same law as **D3**,
+and this section has already carried a stale one. **Read the list.** Rooms live
+at the time of writing include *Brainstorming Team* (Deliberation, lens voices),
+*URITP Production Team* (Working), *Fleet Ops* (Working, chaired by Felix),
+*Agent Build Shop* (Working, the agent-construction apparatus), plus `Person`
+rows for seated humans.
 
 Entering a room and convening its members is a **second scope** for this
 procedure: read the room row, resolve its `Agents` relationship to Index rows,
@@ -195,14 +199,17 @@ id, never by task type.
 
 #### `Room Kind` — READ IT BEFORE REPORTING A ZERO
 
-Dropdown on the room list, created 2026-09-21. Two values, and the distinction is
-load-bearing:
+Dropdown on the room list, created 2026-09-21. **Three values** as of J11, and
+the distinction is load-bearing:
 
 - **`Deliberation`** — holds UNLABELLED lens voices (Council / Workshop). Nothing
   in the room is assignable, so a sweep returning **zero tasks is the CORRECT
   result, permanently.** Convene it to argue, not to move work.
 - **`Working`** — holds LABELLED teammates. Convene it to move real tasks, and a
   zero here is worth a second look.
+- **`Person`** — a seated human, linking the agents that stand in for that
+  human's combined roles (J11). Not a room you convene; a container that answers
+  *which agents wear this person's hats.* A sweep here is meaningless.
 
 🔴 **Without this field a Deliberation zero reads as a broken sweep**, and the
 first agent to roll-call *Brainstorming Team* files a bug against a working
@@ -211,25 +218,59 @@ system. ⭐ It is not metadata: it is the difference between *"nothing to do"* a
 teammate you assign; unlabelled = lens you seat** — which is a deliberate design
 line, not a gap in the label field.
 
+##### Deliberately unlabelled agents — RULED, do not "fix"
+
+🔴 **Maestro Mira and Closing Clio are absent from the `Agent Assignee` Labels
+field ON PURPOSE.** Michael, 2026-10-04: *"we made mira and clio not in the list
+intentionally."* You invoke the switchboard and you invoke the closer; you do not
+hand either of them a task. **Their absence is the J4 boundary working, not an
+oversight, and an agent must never propose adding them.**
+
+⚠️ This is written HERE, on the operational surface that reads the field, and
+**deliberately not duplicated into the Known-Drift Register** — one truth, one
+home. The register's job is facts that drift; this one is a ruling that holds.
+
+✅ **Pavel and Sawyer are now labelled** (`🪛 Pinout Pavel`, `🎛️ Syntax Sawyer`,
+added by Michael 2026-10-04), so a scan returning zero for either is now clean
+rather than unverified. ⚠️ The general rule stands for any FUTURE agent: a zero
+from a label that does not exist yet is **unverified, not clean**, and no tool can
+add an option to a live Labels field.
+
 #### Who may write what
 
 ✅ **An agent MAY write a membership** into the `Agents` relationship (J7, Michael
 lifting the J5 restriction: *"I write the memberships"*). ✅ It may set
-`Room Kind`. 🚫 **An agent may NOT create a room.** Room creation is Michael's
-(J5, and his *"I'll build offices/workspaces"*).
+`Room Kind`. ✅ **An agent MAY create a room WHEN MICHAEL ASKS FOR ONE** — Michael
+narrowed this on **2026-10-04**: *"that note is a bit extreme — i'm going to ask
+you to make agent rooms to add to that index list."* 🚫 **An agent still may NOT
+invent a room on its own judgment.**
+
+🔴 **The surviving test is J8's, and it is one question: WHO DECIDED THIS
+CONTAINER SHOULD EXIST?** Michael → the agent is the hands, and building it is
+execution. The agent → it is a violation no matter how good the idea is. ⭐ This
+is not a new rule; it is the rule J8 already demonstrated when *Fleet Ops* was
+built on instruction one hour after the prohibition was written. **What changed on
+2026-10-04 is only the wording here, which read as an absolute ban and was being
+quoted as one.**
 
 ⭐ **The line is SCHEMA vs DATA, not room vs agent.** Creating a room invents a
 container, and containers invented by agents are exactly how three manifests got
 tombstoned (**D2**). Writing a membership only points at Index rows Michael
 already approved, through a field already scoped to `901328043244` — **the
 relationship cannot smuggle a new entity into existence**, which is why J5 chose
-it over a Labels field to begin with.
+it over a Labels field to begin with. ⚠️ An instructed room is still a schema act,
+so it carries schema obligations: name it as Michael named it, set `Room Kind`,
+leave `Agent Assignee` empty, and **state in the row's description who asked for
+it** — that sentence is what lets the next audit tell execution from invention.
 
 ⚠️ **When a ruling is narrowed or reversed, patch every document that quoted the
 old version IN THE SAME TURN.** This section previously read *"No agent creates a
 room or writes a membership"* and sat contradicting live permission for the
 length of one turn. **Grep for the quote; do not trust memory of where it
-landed** — a cold agent reads the repo, not the decision log.
+landed** — a cold agent reads the repo, not the decision log. ⭐ **That instruction
+paid for itself on 2026-10-04:** a grep for `"create a room"` across
+`brain-config` returned exactly ONE file, this one, which is the whole reason the
+patch could be complete rather than hopeful.
 
 ---
 
@@ -239,16 +280,19 @@ landed** — a cold agent reads the repo, not the decision log.
 - **`gates/session-transcript-gate.md` → THE SPINE** — surface 3 in the precedence order.
 - **`hooks/morning-briefing.md` → THE BATCH DRILL** — the same sticky-note behaviour, already proven on another surface, capped at 10.
 - **`super-agents/fleet-known-drift-register.md`** — **D2** (never a second agent index, which is what bounds Michael's room list), **D3** (never write a fleet count), **D14** (author is not owner).
+- **`hooks/new-agent-onboard.md`** — what a newly built agent does on first activation; its onboarding conversation lives on the agent's own Index row thread.
 - **`QUESTION-ME`** (skill) — the interview discipline a seated agent owes a tagged task before executing on it.
 
 ---
 
 ## Changelog
 
+- **v1.3 (2026-10-04)** — Michael narrowed the room-creation ban: an agent MAY create a room **when he asks for one**, and may still never invent one. The surviving test is **J8's one question — who decided this container should exist** — which means nothing about the permission actually changed, only this file's absolutist wording, which was being quoted as a ban. Found by grep per this file's own instruction: exactly one file in `brain-config` carried the quote. Adds the obligations that come with an instructed room (name it as he named it, set `Room Kind`, leave `Agent Assignee` empty, and record who asked for it in the description). Also corrects two live drifts: `Room Kind` has carried a third value **`Person`** since **J11** while this file said "two values," and the room roster was asserted as a count that had already gone stale — replaced with a read-the-list instruction. New subsection records Michael's ruling that **Mira and Clio are unlabelled on purpose**, written here and deliberately not duplicated into the register.
 - **v1.2 (2026-09-21)** — Michael lifted the J5 no-agent-writes rule for memberships (**J7**), so the 🚫 line that forbade both room creation AND membership writes is **narrowed to creation only**, with the reasoning recorded: the boundary is SCHEMA vs DATA, and a list-scoped relationship cannot invent an entity. Adds the **`Room Kind`** dropdown section (`Deliberation` / `Working`) because a Deliberation room sweeping zero tasks is the correct answer forever and without the field it reads as a defect. Both rooms now seated (12 / 15) with `Agent Assignee` empty. Also folds Michael's chat-brevity correction into FORMAT: long prose in chat is substance written to the wrong surface. New generalized instruction: **a narrowed ruling must patch every document that quoted the old version in the same turn.**
 - **v1.1 (2026-09-21)** — Michael built the room list (`901329128254`) 90 minutes after v1 locked the ruling that it should exist, so the PENDING block became a real Room-scoped roll call section, and a List Index row was filed for it. Carries one new hard rule found latent in the audit: 🔴 **`Agent Assignee` stays empty on room rows** — the field is inherited workspace-wide onto that list, and a tagged room would enter the field sweep as a fake assignment and inflate every seated agent's stamp. Second instance of a wrapper object wearing the work field (session tasks were the first), which is what promotes it from a note to a pattern: **an object that GROUPS agents must never carry the field that ASSIGNS them.** Also recorded: room rows are typed `Venue`, shared with 20+ real buildings, so room reads scope by list id and never by task type.
 - **v1 (2026-09-21)** — Split out of `agent-task-scan.md` v5 at draft time, before the oversized version was ever committed: parent + these two sections measured 25,837 B against a ~22KB ceiling. Carries Michael's three rulings from the 09-21 initiation-standard session — THE TWO SURFACES (J3), ROLL CALL at 12-15 seats with per-turn cadence (J4), and the room-list boundary (J5).
 
-⚠️ **Written DIRECT TO MAIN** — no `create_branch` in this session's kit, only
-`create_pull_request` / `merge_pull_request`. The branch→PR→self-merge rule was
-not waived, just unexecutable. Declared rather than hidden.
+⚠️ **v1 and v1.2 were written DIRECT TO MAIN** — no `create_branch` in that
+session's kit, only `create_pull_request` / `merge_pull_request`. The
+branch→PR→self-merge rule was not waived, just unexecutable. Declared rather than
+hidden. **v1.3 went branch → PR → self-merge as the rule requires.**
