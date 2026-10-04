@@ -1,8 +1,8 @@
 // views.js: HTML for every screen. Pure functions of data, no fetching.
-import { esc, inline, block } from './md.js?v=1';
-import { fmType, issueCount } from './parse.js?v=1';
-import { blobUrl, editUrl, commitUrl } from './github.js?v=1';
-import { KINDS } from './repo.js?v=1';
+import { esc, inline, block } from './md.js?v=2';
+import { fmType, issueCount } from './parse.js?v=2';
+import { blobUrl, editUrl, commitUrl } from './github.js?v=2';
+import { KINDS } from './repo.js?v=2';
 
 const enc = encodeURIComponent;
 const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
@@ -35,10 +35,10 @@ const badge = n => n ? '<span class="badge" title="' + plural(n, 'spec issue') +
 
 export function tablesTab(app, tables) {
   if (!tables.length) return '<p class="empty">No table notes in apps/' + esc(app.slug) + '/tables/ yet.</p>';
-  const rows = tables.map(t => '<a class="row row--t" role="row" href="#/' + enc(app.slug) + '/fields/' + enc(t.name) + '">' +
+  const rows = tables.map(t => '<a class="row row--t" role="row" href="#/' + enc(app.slug) + '/fields/' + enc(t.file) + '">' +
     '<span class="c-name">' + esc(t.name) + '</span><span class="c-num">' + (t.fieldsFound ? t.fields.length : '—') + '</span>' +
     '<span class="c-grain">' + (t.grain ? inline(t.grain, t.path, { noLinks: true }) : '<em class="faint">no grain stated</em>') + '</span>' +
-    '<span class="c-flag">' + badge(issueCount(t)) + '</span></a>').join('');
+    '<span class="c-flag">' + (t.notices.length ? '<span class="dot-amber" title="' + esc(t.notices.join(' ')) + '"></span>' : '') + badge(issueCount(t)) + '</span></a>').join('');
   return '<div class="list list--t" role="table"><div class="row row--h row--t" role="row"><span>Table Name</span><span class="c-num">Fields</span><span>One record means</span><span></span></div>' + rows + '</div>';
 }
 
@@ -55,47 +55,63 @@ function fieldRow(app, t, f, on) {
   if (f.to) chips.push('<span class="chip' + (f.toMissing ? ' chip--bad' : '') + '">→ ' + esc(f.to) + '</span>');
   if (f.href) chips.push('<span class="chip">calc file</span>');
   if (f.flag) chips.push('<span class="chip chip--flag">' + inline(f.flag, t.path, { noLinks: true }) + '</span>');
-  return '<a class="row row--f' + (on ? ' is-sel' : '') + '" role="row" data-field="' + esc(f.name) + '" href="#/' + enc(app.slug) + '/fields/' + enc(t.name) + '/' + enc(f.name) + '">' +
+  if (f.group) chips.push('<span class="chip chip--group">' + inline(f.group, t.path, { noLinks: true }) + '</span>');
+  return '<a class="row row--f' + (on ? ' is-sel' : '') + '" role="row" data-field="' + esc(f.name) + '" href="#/' + enc(app.slug) + '/fields/' + enc(t.file) + '/' + enc(f.name) + '">' +
     '<span class="c-name">' + esc(f.name) + badge(f.defects.length) + '</span>' +
     '<span class="c-type">' + esc(ty.label) + (ty.detail ? '<small>' + esc(ty.detail) + '</small>' : '') + '</span>' +
-    '<span class="c-opt">' + (f.comment ? '<span>' + inline(f.comment, t.path, { noLinks: true }) + '</span>' : '<em class="faint">no comment</em>') + chips.join('') + '</span></a>';
+    '<span class="c-opt">' + optText(t, f) + chips.join('') + '</span></a>';
 }
 
+// FileMaker's own column is "Options / Comments": options first, then the comment.
+function optText(t, f) {
+  const parts = [f.options, f.comment].filter(Boolean).map(x => inline(x, t.path, { noLinks: true }));
+  return parts.length ? '<span>' + parts.join(' <b class="sep">/</b> ') + '</span>' : '<em class="faint">no comment</em>';
+}
+
+const noticeList = d => d.length ? '<ul class="notices">' + d.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '';
 const defectList = d => d.length ? '<ul class="defects">' + d.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '';
 
 function fieldDetail(app, t, f) {
   const ty = fmType(f.type), rows = [
-    ['Type', esc(ty.label) + (ty.detail ? ' · ' + esc(ty.detail) : '') + ' <code>' + esc(f.type || 'blank') + '</code>'],
-    ['Comment', f.comment ? inline(f.comment, t.path) : '<em class="faint">none</em>']
+    ['Type', esc(ty.label) + (ty.detail ? ' · ' + esc(ty.detail) : '') + (f.type && f.type !== ty.label ? ' <code>' + esc(f.type) + '</code>' : '')],
+    ['Comment', f.comment ? inline(f.comment, t.path, { ids: app.ids }) : '<em class="faint">none</em>']
   ];
+  if (f.options) rows.splice(1, 0, ['Options', inline(f.options, t.path, { ids: app.ids })]);
+  if (f.group) rows.push(['Group', inline(f.group, t.path)]);
   if (f.to) rows.push(['Points at', f.toMissing ? '<span class="bad">' + esc(f.to) + ', no table note</span>' : '<a href="#/' + enc(app.slug) + '/fields/' + enc(f.to) + '">' + esc(f.to) + '</a>']);
   if (f.flag) rows.push(['Flag', inline(f.flag, t.path)]);
   if (f.href) rows.push(['Calculation', '<a href="' + esc(blobUrl(f.href)) + '" target="_blank" rel="noopener">' + esc(f.href.split('/').pop()) + ' ↗</a>']);
   return '<p class="side__kicker">Field in ' + esc(t.name) + '</p><h2 class="side__h">' + esc(f.name) + '</h2>' + defectList(f.defects) +
     '<dl class="dl">' + rows.map(r => '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>').join('') + '</dl>' +
-    '<p class="side__links"><a class="btn" href="#/' + enc(app.slug) + '/fields/' + enc(t.name) + '">Table notes</a> ' + noteLinks(t) + '</p>';
+    '<p class="side__links"><a class="btn" href="#/' + enc(app.slug) + '/fields/' + enc(t.file) + '">Table notes</a> ' + noteLinks(t) + '</p>';
 }
 
 const noteLinks = t => '<a class="btn" href="' + esc(blobUrl(t.path)) + '" target="_blank" rel="noopener">Open note ↗</a> <a class="btn" href="' + esc(editUrl(t.path)) + '" target="_blank" rel="noopener">Edit ↗</a>';
 
-function tableDetail(t) {
-  return '<p class="side__kicker">Table</p><h2 class="side__h">' + esc(t.name) + '</h2>' + defectList(t.defects) +
-    (t.grain ? '<p class="grain"><span>One record means</span>' + inline(t.grain, t.path) + '</p>' : '') +
-    (t.notes ? '<div class="md">' + block(t.notes, t.path) + '</div>' : '') +
-    '<p class="side__links">' + noteLinks(t) + '</p>';
+function tableDetail(app, t) {
+  const o = { ids: app.ids };
+  const meta = [t.id && 'id ' + t.id, t.order != null && 'order ' + t.order, t.revised && 'revised ' + t.revised, t.status && t.status].filter(Boolean);
+  const reg = t.register ? '<a class="btn" href="' + esc(blobUrl(t.register)) + '" target="_blank" rel="noopener">' + esc(t.register.split('/').pop()) + ' ↗</a> ' : '';
+  return '<p class="side__kicker">Table</p><h2 class="side__h">' + esc(t.name) + '</h2>' +
+    (t.summary ? '<p class="lede">' + inline(t.summary, t.path, o) + '</p>' : '') +
+    (meta.length ? '<p class="meta">' + meta.map(esc).join(' · ') + '</p>' : '') +
+    defectList(t.defects) + noticeList(t.notices) +
+    (t.grain ? '<p class="grain"><span>One record means</span>' + inline(t.grain, t.path, o) + '</p>' : '') +
+    (t.notes ? '<div class="md">' + block(t.notes, t.path, o) + '</div>' : '') +
+    '<p class="side__links">' + reg + noteLinks(t) + '</p>';
 }
 
 export function fieldsTab(app, tables, t, sel, sort) {
-  const opts = tables.map(x => '<option value="' + esc(x.name) + '"' + (x === t ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('');
+  const opts = tables.map(x => '<option value="' + esc(x.file) + '"' + (x === t ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('');
   const ctl = '<div class="ctl"><label>Table <select id="tblsel">' + opts + '</select></label>' +
     '<span class="ctl__count">' + plural(t.fields.length, 'field') + ' defined in table “' + esc(t.name) + '”</span>' +
     '<label class="ctl__sort">View by <select id="sortby">' + SORTS.map(s => '<option' + (s === sort ? ' selected' : '') + '>' + s + '</option>').join('') + '</select></label></div>';
   const list = t.fieldsFound
     ? '<div class="list list--f" role="table"><div class="row row--h row--f" role="row"><span>Field Name</span><span>Type</span><span>Options / Comments</span></div>' +
       sortFields(t.fields, sort).map(f => fieldRow(app, t, f, f.name === sel)).join('') + '</div>'
-    : '<p class="empty">This note has no “## Fields” table, so there is nothing to list.</p>';
+    : '<p class="empty">This note has no field register yet, so there is nothing to list.</p>';
   const f = t.fields.find(x => x.name === sel);
-  return ctl + '<div class="split"><div class="split__main">' + list + '</div><aside class="side' + (f ? ' side--field' : '') + '">' + (f ? fieldDetail(app, t, f) : tableDetail(t)) + '</aside></div>';
+  return ctl + '<div class="split"><div class="split__main">' + list + '</div><aside class="side' + (f ? ' side--field' : '') + '">' + (f ? fieldDetail(app, t, f) : tableDetail(app, t)) + '</aside></div>';
 }
 
 export function foot(tree) {
