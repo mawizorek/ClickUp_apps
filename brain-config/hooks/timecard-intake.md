@@ -24,6 +24,7 @@
 - **One hire per person per job.** Two distinct Kronos assignment labels on one card = two different hires, even if only one is ours. Make the second Hirable Position + join anyway so those hours are flagged as worked in a different job.
 - **Credit-basis hires produce no cards.** A person on payroll doing a role for credit is not "missing." Only chase missing cards for Hourly hires.
 - 🔴 **Shift times live in the CUSTOM fields `Shift START Date timestamp` / `Shift END Date timestamp`.** 🚫 **NEVER ClickUp's native Start date / Due date.** (2026-10-04: the agent substituted native dates when the custom fields would not show time. Michael rejected it outright. Substituting a different field because the right one is hard is not a fix.)
+- ⏱️ **Speed matters.** Michael's bar: this must beat hand-typing. One staged preview, one confirm, then the bulk write with the verified path. No exploratory round-trips on a run that follows this file.
 
 ---
 
@@ -39,7 +40,7 @@
 | Employees (person-level payroll facts, multi-homed PEOPLE) | Setup (`901329206841`) |
 | Payroll Periods | `901328256601` |
 | OP Lines (Funding Sources) | `901329043281` |
-| Tooling | `pdftotext -layout` (poppler) FIRST, `pdftoppm` + `tesseract` fallback, agent vision last. Python/pandas for staging. |
+| Tooling | `pdftotext -layout` (poppler) FIRST, `pdftoppm` + `tesseract` fallback, agent vision last. Python/pandas for staging and for generating the write statements. |
 
 ### Hours Worked fields
 
@@ -79,17 +80,21 @@ Person-level match key: **UR Employee ID** on Employees (`c78e2307-1143-4f80-97b
 
 6. **Pay Period** = the Payroll Periods row containing the shift date.
 
-7. **Stage, then write.** Build a staging CSV (person, date, in, out, hours, assignment label, pay code, worker join, confidence, note). Show the counts and the Question rows. Michael confirms. Then write.
+7. **Stage, then write.** Build a staging CSV (person, date, in, out, hours, assignment label, pay code, worker join, confidence, note). Show the counts and the Question rows. Michael confirms ONCE. Then write.
    - Name: `YYYY-MM-DD · Surname · H.HHh` + ` · <Assignment tag>` when not the primary job + ` · <Pay code>` when not Worked.
    - Description: link to the source SCAN task + the question text when ❓.
+   - Create rows with Worker, Hours, Pay Period, Pay Code, Entry Confidence. **Do NOT set shift times in create**; step 8 writes them.
 
 8. **Timestamp rules.**
    1. Clock-in → **Shift START Date timestamp**, clock-out → **Shift END Date timestamp**. Full datetime, America/New_York, **time shown in the column**. Never date-only. 🚫 Never native Start/Due.
    2. No-punch pay-code rows: START = date only, END blank, say why in the description.
    3. Overnight: Out earlier than In → END date is the next day.
    4. Hours worked = card value. Sanity check |(END − START) − Hours| ≤ 0.02 h, else flag ❓.
-   5. **Write ONE row, then confirm the TIME is visible in the custom-field COLUMN in a List view** (Michael eyeballs it) before bulk. API read-back is not proof; it showed correct times while the column showed date-only and mis-dated afternoon punches by +1 day.
-   6. **Write path (see Tool limits):** the per-task create/update `with_time` flag did NOT turn on the custom field's time display. Use the path that passed step 8.5 and record it here when verified.
+   5. **Write ONE row, then confirm the TIME is visible in the custom-field COLUMN in a List view** (Michael eyeballs it) before bulk. API read-back is not proof.
+   6. ✅ **VERIFIED WRITE PATH (2026-10-04, Michael confirmed in the column):** bulk SQL, one constant per statement:
+      `UPDATE tasks SET "custom:<START or END field id>" = 'YYYY-MM-DDTHH:MM:00-04:00' WHERE id IN ('<id>', ...)` → `APPLY UPDATE <token>`.
+      Generate the statements in the sandbox from the staging CSV, **grouping rows that share an identical timestamp into one `WHERE id IN (...)`** to cut the call count. Use `-04:00` in EDT, `-05:00` after the November switch.
+      🚫 `create_task` / `update_task` with `with_time: true` does NOT turn on the column's time display. Do not use it for these fields.
 
 9. **Confidence rubric.**
    - `✅ Confident`: clean read, ties to the card, person and hire matched.
@@ -120,11 +125,13 @@ Person-level match key: **UR Employee ID** on Employees (`c78e2307-1143-4f80-97b
 
 ## ⚠️ Tool limits found live (2026-10-04)
 
-- **Custom date fields: time display.** `create_task` / `update_task` with `with_time: true` stored the correct timestamp but the column still showed date-only (no "include time" toggle), and afternoon punches displayed on the NEXT day. Bulk SQL `UPDATE tasks SET "custom:<date field>" = '<ISO datetime>'` is the alternate path under test (one constant per statement). Record the verified path in rule 8.6.
-- **Bulk SQL can't set per-row custom values** (`CASE` rejected for custom fields): one statement or call per row.
+- **Custom date fields: time display.** Per-task create/update `with_time` stores the timestamp but leaves the column date-only, and afternoon punches then display on the NEXT day. **Bulk SQL `UPDATE … SET "custom:<date field>" = '<ISO datetime>'` shows the time correctly** (rule 8.6).
+- **Bulk SQL can't set per-row custom values** (`CASE` rejected for custom fields): one constant per statement; group identical values.
+- **Bulk SQL can't clear native start/due** (`= NULL` rejected); per-task `"none"` works.
 - **Relationship fields** are writable only through per-task create/update, not bulk SQL.
 - **Aggregates over custom fields** read as blank/0; verify by loading tasks.
 - **Rollup fields** can't be created by the agent; Michael adds them in the UI.
+- **View column edits** failed (view not resolvable by the view tool); Michael adjusts columns.
 
 ---
 
@@ -139,5 +146,6 @@ Person-level match key: **UR Employee ID** on Employees (`c78e2307-1143-4f80-97b
 
 ## Changelog
 
-- **v1.1 (2026-10-04)**: 🔴 Corrected v1, which told agents to put shift times in native Start/Due. **Shift START / END custom fields are canonical; native dates are never used.** Added the no-substitution guardrail, the per-task `with_time` limit, and the alternate SQL write path under test.
+- **v1.2 (2026-10-04)**: Recorded the VERIFIED shift-timestamp write path (bulk SQL UPDATE, grouped by identical value) after Michael confirmed times in the column; create step no longer sets times; added the speed bar (must beat hand-typing).
+- **v1.1 (2026-10-04)**: 🔴 Corrected v1, which told agents to put shift times in native Start/Due. Shift START / END custom fields are canonical; native dates are never used. Added the no-substitution guardrail.
 - **v1 (2026-10-04)**: Established by Ledger Elio + ClickUp Coach Corey from the first live run (FY27 Period 06: 11 cards → 60 rows, ties to card totals). Layout-first extraction, tie-out before write, Employee-ID matching, one-hire-per-job rule, credit hires have no cards, Entry Confidence flag, timestamp rules.
