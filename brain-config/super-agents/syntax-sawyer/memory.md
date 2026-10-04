@@ -36,19 +36,47 @@ own sACN levels**, so a patched address self-fires on every cue that takes it up
 100, equal priority merges HTP. **Pulse, never park** — sACNView's **Channel Check blink** is the control;
 a fader is a latch. ✅ Priority 100 confirmed on live house hardware.
 
+### A2 · 2026-10-04 · 🚫 NO SOFTWARE ON UNIVERSITY-MANAGED MACHINES — applies to EVERY design, forever
+
+Michael, verbatim: *"never gonna happen. that device is locked down and not ours to edit. wrong idea."*
+The SM Cue View Mac Mini is IT-managed. **Nothing I propose may require installing, editing, or
+auto-starting software on a machine the department does not administer.** This kills, by default:
+Bitfocus Companion · QLab plugins · ETCLabs OSCRouter · LaunchAgents and login items · any
+brain-on-a-Mac pattern. Only lifted if he names a box the department actually owns.
+
+🔑 **ASK WHO ADMINISTERS A MACHINE BEFORE DESIGNING ONTO IT.** Being on the network is not permission.
+🔴 Which of the 11 networked records the department controls is UNKNOWN — Ledger D.
+
+### A3 · 2026-10-04 · The SM running timer is Eos's own INTERNAL TIMECODE clock — native, zero external
+
+Forced by A2 and **better than what it replaced**: no external machine, no OSC, no network config,
+nothing installed anywhere. Not built yet, but fully specced.
+
+- **Empty event list**: `Event 99 / Enter`, `{Type} {SMPTE}`, `{Internal}` ON, `{External}` OFF, `{FPS} 30`,
+  First `00:00:00:00`, Last `23:59:59:29`. 🔑 **Zero events in it, forever** — then the stopwatch can never
+  fire a cue. List 99 keeps it away from real show control.
+- **Two macros, Background mode:** `Event 99 / Internal Enable#` + `Event 99 / Internal Time 0#` starts it
+  **from zero every run** · `Event 99 / Internal Disable#` freezes it.
+- **Cue External Links:** opening → start macro, closing → stop macro, act breaks → both.
+- **Sheet:** a `Timecode` object on list 99. **`Timecode Status` is display-only; `Timecode Widget` adds
+  CONTROL options** — Status for the SM, Widget for the board, unless the caller wants the handle.
+- ⚠️ **`SMPTE Time Code RX` must be ENABLED in Setup ▸ System ▸ Show Control or the internal clock does
+  not tick.** Verified forum answer; the setting reads as external-only and is not. Costs an hour if unknown.
+- **The cost, stated:** display is `HH:MM:SS:FF` — frames included, no formatting control.
+- ⚠️ Macros return, so Target returns, but softer: Background mode, no command line touched. Verify the
+  clock shows on all three devices when fired untargeted.
+
 ## 🧪 Ledger B — Candidates and open forks (offered, NOT ruled)
 
 - **The trigger universe number.** Open since 2026-10-04. A1 cannot become a standard without it.
 - **The macro Target for the trigger** — device, user, or untargeted. New, unruled.
 - **The SM magic sheet, SCOPED by him 2026-10-04.** IN: `Cue - Active`, `Cue - Pending`, a native **Clock**,
-  and one **Command-target box** carrying the OSC timer string — the ticking timer IS the connection
-  indicator, because a stale box looks live and a moving clock cannot lie. 🚫 **Video streams are OUT.**
-  Verbatim: *"i don't ened to stream video no no no. too much"* — native, supported, and declined. **Do not
-  re-pitch unprompted.** 🔴 Still unruled: **which machine is the stopwatch brain** (Eos has no native
-  stopwatch; QLab primary is already on the net, Bitfocus Companion is an unverified candidate), OSC TX in
-  `Setup ▸ System ▸ Show Control`, and the **Target** for the start/stop macros now that the wing is User
-  ID 2. Opening cue External Link starts it, closing cue stops it, act-break cues should fire both so the
-  SM report writes itself. **Build it with the actual caller; dry run at a work call, never a dress.**
+  and the **A3 timecode stopwatch**. 🚫 **Video streams are OUT.** Verbatim: *"i don't ened to stream video
+  no no no. too much"* — native, supported, and declined. **Do not re-pitch unprompted.**
+  **Build it with the actual caller; dry run at a work call, never a dress.**
+- **The OSC script build, PARKED 2026-10-04 by A2, not deleted.** A tested `sm_timer.py` + LaunchAgent +
+  INSTALL.md exist on the session task. 🔑 Its one advantage over A3 is a clean `HH:MM:SS` with no frames.
+  Revive only if the department gets a box it administers.
 - **The iPad fork, PARKED 2026-10-04.** **ETC iRFR** fires macros natively (my pick for hand-firing) ·
   **sACNView iOS** exists but its own store text says not for show-critical use and has no blink ·
   **Luminair 4** is the maintained iPad-as-sACN-source. 🚫 Do not re-raise unprompted.
@@ -89,24 +117,32 @@ the `About: Device` photo IS that wing's brain: `ETCPUCK-D2BE4D7` · `Assigned A
 The Ion xe20 record, the 11 networked devices, the five named SPAC networks, and the Sensor/CEM3 dimming
 note were established 2026-10-03 from his own inventory and now live in
 `memory/archive/rig-established-2026-10-03.md`. **Read that file before diagnosing anything on the wire.**
-There is also an **SM client computer** on the system, confirmed by him 2026-10-04 — the magic sheet runs
-there.
+🔑 **The SM display machines are `SM Cue View (x2 Mac Minis)` — TWO machines under ONE inventory row with
+ONE name and no IPs, and they are IT-LOCKED (A2).** The magic sheet runs there. That row needs splitting;
+propose-only per J9.
 
 ## ❓ Ledger D — The ask list (answer these before diagnosing anything)
 
-1. **The Eos point release** — one uncropped About shot now answers BOTH devices.
+1. **The Eos point release** — one uncropped About shot now answers BOTH devices. Three reasons now:
+   multi-console version match · the 3.3.5 Clock-in-Lockout fix · video-stream floor.
 2. **Which universe becomes the trigger universe**, and **what the trigger macro TARGETS** (blocks A1).
 3. 🔴 **Does any of the five SPAC networks have an access point?** Ulla's, unanswered.
 4. **Which named network is `10.101.x.x` and which is `192.168.0.x`?**
 5. **What else is on the system the inventory does not know about?** The Puck proves the list is
    incomplete; `User ID: 2` implies at least one other ID in use.
 6. **Is the wing meant to be a backup?** It cannot be as a Client, and that may be a surprise.
-7. **Which machine holds the SM stopwatch**, and is OSC TX already enabled in Show Control?
+7. 🔴 **WHICH MACHINES DOES THE DEPARTMENT ACTUALLY ADMINISTER?** Blocks every design that needs a host (A2).
 8. **Output method + universe count per space** · **show-file custody** · **cue-only vs tracking** ·
    **palette / magic-sheet convention** · **patch numbering** (Ledger B).
 
 ## 🧱 Lane patterns
 
+- ⭐ **EARNED 2026-10-04, the expensive one: ASK WHO OWNS THE MACHINE BEFORE DESIGNING ONTO IT.** I shipped
+  a tested script, a LaunchAgent and an install guide for a Mac he cannot legally touch. The code was fine;
+  the **host was never available**, and one question would have found that. **Infrastructure permission is
+  a prerequisite, not a deployment detail.** 🔑 And the sequel matters as much: the constraint did not cost
+  the feature — **the NATIVE path (internal timecode) existed the whole time.** When a constraint lands,
+  look for what the desk can do by itself BEFORE looking for another host.
 - ⭐ **EARNED 2026-10-04: when he cuts scope, the cut is the DECISION — record it, do not mourn it.** He
   declined video streaming the moment it read as too much. A declined capability that stays unwritten gets
   re-pitched by the next cold session, which reads as not listening. **Park it with his words attached.**
