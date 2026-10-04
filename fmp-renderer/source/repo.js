@@ -1,12 +1,19 @@
 // repo.js: what exists in maw-prose apps/, derived from the file list alone.
 // Every count here is a fact about the REPO (what has been written), never a
 // claim about a FileMaker file. Nothing is maintained by hand, so nothing rots.
+//
+// Folder names are read through kindOf(), so the doc-render shape (tables/)
+// and the older numbered shape (20-tables/) both land in the same bucket while
+// the moves into apps/ are in flight (maw-prose D-041).
 
 export const KINDS = [
   ['tables', 'Tables'], ['relationships', 'Relationships'], ['layouts', 'Layouts'],
-  ['scripts', 'Scripts'], ['value-lists', 'Value lists'], ['calculations', 'Calculations']
+  ['scripts', 'Scripts'], ['value-lists', 'Value lists'], ['custom-functions', 'Functions'], ['calculations', 'Calculations']
 ];
-const isDoc = n => !/^readme\.md$/i.test(n) && !/\.notes\.md$/i.test(n) && !n.startsWith('.');
+const ALIAS = { functions: 'custom-functions' };
+export const kindOf = dir => { const k = dir.toLowerCase().replace(/^\d+[-_]/, ''); return ALIAS[k] || k; };
+const isIndex = n => /^(readme|index)\.md$/i.test(n);
+const isDoc = n => !isIndex(n) && !/\.notes\.md$/i.test(n) && !/\.tsv$/i.test(n) && !n.startsWith('.');
 
 export function appsFrom(paths) {
   const map = new Map();
@@ -14,19 +21,22 @@ export function appsFrom(paths) {
     const m = p.match(/^apps\/([^/]+)\/(.+)$/);
     if (!m || /^[._]/.test(m[1])) continue;
     if (!map.has(m[1])) map.set(m[1], { slug: m[1], title: '', counts: {}, tablePaths: [], readme: '', tablesReadme: '' });
-    const a = map.get(m[1]), seg = m[2].split('/'), leaf = seg[seg.length - 1];
-    if (seg.length === 1 && /^readme\.md$/i.test(leaf)) a.readme = p;
-    if (seg.length === 2 && seg[0] === 'tables' && /^readme\.md$/i.test(leaf)) a.tablesReadme = p;
-    if (seg.length > 1 && KINDS.some(k => k[0] === seg[0]) && isDoc(leaf)) a.counts[seg[0]] = (a.counts[seg[0]] || 0) + 1;
-    if (seg.length === 2 && seg[0] === 'tables' && /\.md$/i.test(leaf) && isDoc(leaf)) a.tablePaths.push(p);
+    const a = map.get(m[1]), seg = m[2].split('/'), leaf = seg[seg.length - 1], kind = seg.length > 1 ? kindOf(seg[0]) : '';
+    if (seg.length === 1 && isIndex(leaf) && (!a.readme || /^index/i.test(leaf))) a.readme = p;
+    if (seg.length === 2 && kind === 'tables' && isIndex(leaf) && (!a.tablesReadme || /^index/i.test(leaf))) a.tablesReadme = p;
+    if (kind && KINDS.some(k => k[0] === kind) && isDoc(leaf)) a.counts[kind] = (a.counts[kind] || 0) + 1;
+    if (seg.length === 2 && kind === 'tables' && /\.md$/i.test(leaf) && isDoc(leaf)) a.tablePaths.push(p);
   }
   return [...map.values()].sort((x, y) => x.slug.localeCompare(y.slug));
 }
 
-export const titleOf = md => { const m = String(md).match(/^#\s+(.+)$/m); return m ? m[1].replace(/[*`]/g, '').trim() : ''; };
+export const titleOf = md => {
+  const s = String(md), fm = s.match(/^---\n[\s\S]*?\ntitle:\s*["']?(.+?)["']?\s*\n[\s\S]*?\n---/);
+  if (fm) return fm[1].trim();
+  const m = s.match(/^#\s+(.+)$/m); return m ? m[1].replace(/[*`]/g, '').trim() : '';
+};
 
-// A tables/README that links its notes in order ("the way the money moves")
-// sets the Tables tab order. Anything it does not mention sorts after, A to Z.
+// A tables index that links its notes in order sets the Tables tab order.
 export function orderFrom(readme) {
   const order = [], re = /\]\(\.?\/?([^)/#\s]+\.md)\)/g;
   let m;
@@ -34,7 +44,10 @@ export function orderFrom(readme) {
   return order;
 }
 
+// Sort: front-matter order: first (the doc renderer's rule), then the index's
+// link order, then A to Z.
 export function sortTables(tables, order) {
   const at = t => { const i = order.indexOf(t.path.split('/').pop()); return i < 0 ? 1e6 : i; };
-  return tables.slice().sort((a, b) => at(a) - at(b) || a.name.localeCompare(b.name));
+  const ord = t => (typeof t.order === 'number' ? t.order : 1e9);
+  return tables.slice().sort((a, b) => ord(a) - ord(b) || at(a) - at(b) || a.name.localeCompare(b.name));
 }
