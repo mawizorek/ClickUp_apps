@@ -28,7 +28,7 @@ release level before asserting): the threshold is a **rising edge through 50% / 
 re-arms only after dropping back below · **the console includes its own sACN levels**, so a patched address
 self-fires on every cue that takes it up · priority 1-200, default 100, equal priority merges HTP.
 **Pulse, never park** — on desktop sACNView the **Channel Check blink button** is the correct control and a
-fader is a latch.
+fader is a latch. ✅ Priority 100 is now CONFIRMED on live house hardware — see Ledger C.
 
 ## 🧪 Ledger B — Candidates and open forks (offered, NOT ruled)
 
@@ -43,65 +43,80 @@ fader is a latch.
 
 ## 🏛️ Ledger C — The rig and the room
 
+### 🔑 Read off a live `About: Device` display, 2026-10-04 (photo Michael sent, cropped)
+
+- 🔴 **There is an ETC PUCK on this system and it is NOT in the inventory.** `Device Name:
+  ETCPUCK-D2BE4D7` · `Assigned As: Client` · `User ID: 2` · `Defined Parameters: 1406 of 12288`. The
+  `NETWORK (IP) Devices` list has 11 rows and **no Puck in any of them**, and the LX Inventory's only
+  console record is the Ion xe20. **A second Eos device exists, runs the software, holds a User ID, and is
+  invisible to the workspace.** ⚠️ PROPOSE-ONLY (house rule J9): the missing inventory row is Michael's to
+  create; do not create it.
+- ✅ **`Priority: sACN=100`** on a live device — the house really is on the sACN default, so A1's
+  equal-priority HTP merge is the live condition, not a hypothetical.
+- 🔑 **Dual-homed, and these are the FIRST real addresses on any of the five named SPAC networks:**
+  `Port 1: 10.101.185.101` · `Port 2: 192.168.0.91`. That matches his own lecture habit — `10.x` on the
+  lighting side, `192.x` for computers/consoles. ⚠️ Which port maps to which NAMED network (LX NET,
+  CONTROL NET, UR NET…) is NOT established; two addresses are not a topology.
+- ⚠️ **Eos `Version 3.3`, point release CROPPED OUT of the photo** — and this is the Puck's About display,
+  **not the Ion's**. Eos devices on one system must run matching software to connect, so the Ion being on
+  the same 3.3 line is a **strong inference, not a verified fact.** The docs I have cited all session are
+  **v3.3.6**, which is inside that line. 🔴 Closing it needs `About` on the Ion itself, or an uncropped
+  shot of the right-hand column.
+
 ### ✅ Established 2026-10-03 from his own inventory (sources named, values not measured)
 
 - **Primary console: ETC Ion xe20**, `in stock`, **OWNER: SPAC**, **STORAGE LOCATION: SPAC**, purchase
   note **2020**, `IP Device Type: PRIMARY, CONSOLE`. Source: URITP Inventories ▸ INVENTORY ITEMS ▸ LX
   Inventory, task `ITPINV-919` / `86af6nf1j`.
-- 🔴 **It is the ONLY console in the inventory.** No second desk, no RPU, no backup, no Nomad record, and
-  **no field anywhere in the inventory records a SOFTWARE VERSION.** The Eos release level cannot be
-  derived from the workspace — it is his to state, and guardrail 1 therefore bites on nearly every
-  behaviour question. ⚠️ Whether Todd has its own desk or the Ion travels is UNANSWERED.
+- 🔴 **No field anywhere in the inventory records a SOFTWARE VERSION**, so release level is never derivable
+  from the workspace. ⚠️ Whether Todd has its own desk or the Ion travels is UNANSWERED.
 - **Networked gear, 11 records** (`NETWORK (IP) Devices`, list `901326711635` — a saved filter built as a
   list, zero native records): the Ion · LX Mac Mini · Designer RVI · Sloan Mac Mini (QLab primary) ·
   Sloan Mac Mini (recording rack) · Sloan MacBook Pro (QLab remote) · SM Cue View (x2 Mac Minis) · SND
   iPad · SPAC\_Yam\_QL5 · Utility iMac · VOR iMac. **The desk shares its world with QLab, a QL5 and two
   SM cue-view machines** — every one of those is a plausible trigger partner.
-- **FIVE named networks at SPAC**, from `SPAC DATA NETWORKS` (list `901329167006`, URITP Inventories ▸
-  SPAC Details ▸ NETWORKS & CABLE PATHS, created 2026-09-26): **CONTROL NET · DANTE PRIMARY · DANTE
-  SECONDARY · LX NET · UR NET.** 🔴 **All five are status `zero` with EMPTY descriptions.** The names are
-  real; the documentation does not exist yet. Do not infer a topology from five titles.
+- **FIVE named networks at SPAC**, from `SPAC DATA NETWORKS` (list `901329167006`, created 2026-09-26):
+  **CONTROL NET · DANTE PRIMARY · DANTE SECONDARY · LX NET · UR NET.** 🔴 **All five are status `zero`
+  with EMPTY descriptions.** The names are real; the documentation does not exist yet.
 - **Todd dimming: CEM3 in both Sensor racks** (LX Fixtures, `86ak89jh1`), control input sACN / Art-Net /
-  DMX. That is Vinny's gear, relevant here only as the thing the desk talks to.
-- **House addressing habit, from his own lecture rather than a config read:** computers and consoles on
-  `192.x.x.x`, **LX Net on `10.x.x.x`** — and he wrote *"why?"* next to it himself, so it is a convention
-  in use, not a ruled standard.
+  DMX. Vinny's gear; relevant here only as the thing the desk talks to.
 
 ### ⚠️ Inherited and still unverified
 
 - An ETC reference page exists in the Brain Reference Library (*UpdaterAtor, Concert & Selador/S4 LED
   Firmware*). Mostly **fixture firmware** — Vinny's side of the seam.
-- Students program on this rig. Teaching convention and show convention may differ, and the difference is
-  exactly what gets re-litigated every semester.
+- Students program on this rig. Teaching convention and show convention may differ.
 
 ## ❓ Ledger D — The ask list (answer these before diagnosing anything)
 
-1. 🔴 **Eos release level** (Help ▸ About, or the shell). Console model is ANSWERED; the software is not,
-   and the inventory structurally cannot tell us.
+1. 🔴 **The Ion's own Eos release level** — 3.3-something is inferred from the Puck, not read from the Ion.
 2. **Which universe becomes the trigger universe** (blocks A1 becoming a standard).
-3. 🔴 **Does any of the five SPAC networks have an access point on it?** Ulla's question, raised
-   2026-10-04, unanswered — and every wireless-remote road dies without one.
-4. **Output method + universe count per space**, and which of the five networks carries what.
-5. **Show-file custody** — where it lives, who saves, whether students work in a copy.
-6. **Cue-only vs tracking** as house practice, and whether it is taught the way it is run.
-7. **Palette / preset naming convention**; whether magic sheets carry season to season.
-8. **Patch convention** — how plot numbering maps to the desk (see Ledger B).
+3. 🔴 **Does any of the five SPAC networks have an access point on it?** Ulla's question, unanswered —
+   every wireless-remote road dies without one.
+4. **Which of the five named networks is `10.101.185.x` and which is `192.168.0.x`?** Two live addresses
+   exist now; the mapping does not.
+5. **What else is on the system that the inventory does not know about?** The Puck proves the list is
+   incomplete, and `User ID: 2` implies at least one other user ID in use.
+6. **Output method + universe count per space.**
+7. **Show-file custody** · **cue-only vs tracking** · **palette / magic-sheet convention** · **patch
+   numbering** (see Ledger B).
 
 ## 🧱 Lane patterns
 
-- ⭐ **THE DECIDING QUESTION BEATS THE SURVEY, and it paid out on day one.** The whole sACN-vs-OSC-vs-MIDI
-  fork collapsed on one question — *what can that software actually SEND?* — answered in two words
-  ("sACN Viewer software"). **Ask the one question that eliminates branches; do not rank the branches.**
-  First live payout of the catalogue-is-not-a-diagnosis rule inherited from the Vectorworks lane.
-- ⭐ **BORN WITH ONE:** a catalogue is not a diagnosis. Six causes ranked by frequency is worse than one
-  discriminating question.
+- ⭐ **EARNED 2026-10-04: a photo he called useless carried four facts and an inventory gap.** He sent an
+  `About: Device` shot for the version number, the version column was cropped, and he wrote it off. The
+  **left** column held a device nobody had recorded, the first two real IPs in the lane, and live
+  confirmation of the sACN priority that A1's merge arithmetic depends on. **Read the whole artifact, not
+  the field you asked for** — and tell him when his own evidence beat his question.
+- ⭐ **THE DECIDING QUESTION BEATS THE SURVEY.** The sACN-vs-OSC-vs-MIDI fork collapsed on *what can that
+  software actually SEND?*, answered in two words. **Eliminate branches; do not rank them.**
+- ⭐ **BORN WITH ONE:** a catalogue is not a diagnosis.
 - ⭐ **Check whether the behaviour is a DEFECT before building a configuration story.** Release notes, not
   the manual.
-- ⭐ **EARNED 2026-10-03: the answer to "what do we run" was already written down, by him.** Console, 11 IP
-  devices, five network names and a full show-control lecture all existed before this seat did.
-  **Read his writing before asking him anything.**
+- ⭐ **EARNED 2026-10-03: the answer to "what do we run" was already written down, by him.** Read his
+  writing before asking him anything.
 - ⭐ **EARNED 2026-10-04: he is often asking to be REMINDED, not taught.** Full treatment in
-  `memory/michael-eos-fluency.md` — it changes the shape of the answer, so read it there.
+  `memory/michael-eos-fluency.md`.
 
 ## 🔌 Seams, as written in the profile
 
