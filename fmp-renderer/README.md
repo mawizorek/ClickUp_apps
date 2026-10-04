@@ -12,15 +12,15 @@ Live: https://mawizorek.github.io/ClickUp_apps/fmp-renderer/
 
 ## Data contract: the table note
 
-`apps/<app>/tables/<Table>.md`, no front matter (D-030):
+`apps/<app>/tables/<Table>.md` in maw-prose. Two shapes read; the first is the target (maw-prose D-041).
 
-    # Table
-    Manage → Database → Tables → Table
-    Grain: what one record means.
-    ## Fields
-    | Field | Type | FMP Comment | TO | ⚠️ |
+**Doc-renderer shape** (Production MAWster's): template-docs front matter (`id`, `title`, `status`, `type`, `summary`, optional `order`, `revised`, `data`), a `!!! abstract "Grain"` callout, and the field register as a sibling `.tsv` declared under `data:` and placed with `!!! data "<slot>"`. TSV columns by header name: `Field_Name`, `Type`, `Options`, `Notes`, `status` (a field GROUP, never build state). `name::type.role` header declarations are ignored for matching; `- EOF -` rows are skipped.
 
-Columns are matched by header name, not position. Types: `text`, `text-uuid`, `number`, `date`, `time`, `timestamp`, `container`, `(c→Number)` calc, `(s→…)` summary. A field name linked to `../calculations/*.fmcalc` gets a calc-file link. `tables/README.md` links set the Tables order; unlisted notes sort after, A to Z.
+**Older shape** (still renders, amber notice): no front matter, a `Grain:` line, and a markdown table under `## Fields` (Field | Type | FMP Comment | TO | ⚠️).
+
+Types: `text`, `text-uuid`, `number`, `date`, `time`, `timestamp`, `container`, `(c→Number)` calc, `(s→…)` summary. Sort: `order:`, then the tables index's link order, then A to Z. Routes use the file stem. `[text](@id)` links resolve in-app when the id is a table in the same app; `[text]{.marker}` renders as a marker chip; `!!!` callouts render.
+
+**Red** = a spec problem (no grain, missing or unnamed register rows, unknown type, duplicate field, a TO with no table note, an unquoted `: ` in the header that drops the page from the doc site). **Amber** = old shape or missing header keys.
 
 ## Seams
 
@@ -28,8 +28,9 @@ Columns are matched by header name, not position. Types: `text`, `text-uuid`, `n
 |---|---|
 | `source/github.js` | the only network code. 2 API calls per load (commit, tree), cached 5 min; bodies from raw, pinned to the commit SHA |
 | `source/repo.js` | apps and counts from the file list |
-| `source/parse.js` | one note in, data out; validation |
-| `source/md.js` | just enough markdown for note prose |
+| `source/front.js` | the template-docs header, just far enough |
+| `source/parse.js` | one note in, data out (both shapes, TSV registers); validation |
+| `source/md.js` | just enough markdown for note prose, plus callouts, markers, `@id` links |
 | `source/views.js` | HTML for every screen, pure |
 | `source/app.js` | routing (`#/<app>/fields/<Table>/<Field>`), events |
 

@@ -3,10 +3,10 @@
 //   #/<app>/tables              Manage Database, Tables tab
 //   #/<app>/fields/<Table>      Fields tab
 //   #/<app>/fields/<Table>/<F>  Fields tab with one field open
-import { loadTree, loadFile } from './github.js?v=1';
-import { appsFrom, titleOf, orderFrom, sortTables } from './repo.js?v=1';
-import { parseTable, validate, issueCount } from './parse.js?v=1';
-import * as V from './views.js?v=1';
+import { loadTree, loadFile } from './github.js?v=2';
+import { appsFrom, titleOf, orderFrom, sortTables } from './repo.js?v=2';
+import { parseTable, fieldsFromTsv, validate, issueCount } from './parse.js?v=2';
+import * as V from './views.js?v=2';
 
 const $ = id => document.getElementById(id);
 const S = { tree: null, apps: [], tables: new Map(), run: 0 };
@@ -48,7 +48,15 @@ async function loadApp(app) {
     ...app.tablePaths.map(p => loadFile(sha, p).then(md => parseTable(md, p)))
   ]);
   if (!app.title && app.readme) app.title = titleOf(await loadFile(sha, app.readme).catch(() => ''));
+  // v2: a note that declares a TSV register gets its fields from that file.
+  const have = new Set(S.tree.paths);
+  await Promise.all(notes.filter(t => t.register).map(t => {
+    if (!have.has(t.register)) { t.registerMissing = true; return null; }
+    return loadFile(sha, t.register).then(tsv => fieldsFromTsv(tsv, t)).catch(() => { t.registerMissing = true; });
+  }));
   const tables = validate(sortTables(notes, orderFrom(readme)));
+  app.ids = {};
+  tables.forEach(t => { if (t.id) app.ids[t.id] = '#/' + encodeURIComponent(app.slug) + '/fields/' + encodeURIComponent(t.file); });
   S.tables.set(app.slug, tables);
   return tables;
 }
@@ -78,14 +86,16 @@ async function route() {
   let body, sel = '';
   if (tab === 'tables') body = V.tablesTab(app, tables);
   else {
-    const t = tables.find(x => x.name === parts[2] || x.file === parts[2]) || tables[0];
-    sel = t.name;
+    // Routes use the FILE stem (stable, no spaces); names and ids still resolve.
+    const want = String(parts[2] || '').toLowerCase();
+    const t = tables.find(x => x.file.toLowerCase() === want) || tables.find(x => x.name.toLowerCase() === want || x.id === parts[2]) || tables[0];
+    sel = t.file;
     body = V.fieldsTab(app, tables, t, parts[3], sortPref());
   }
   const keep = keepScroll();
   $('view').innerHTML = V.dialog(app, tab, sel, body, summary);
   keep();
-  document.title = (sel ? sel + ' · ' : '') + (app.title || app.slug) + ' · FMP Renderer';
+  document.title = (sel ? (tables.find(x => x.file === sel) || {}).name + ' · ' : '') + (app.title || app.slug) + ' · FMP Renderer';
   status(issues ? issues + ' spec issue' + (issues === 1 ? '' : 's') + ' shown in place, marked in red' : 'no spec issues found', issues ? 'warn' : 'ok');
 }
 
