@@ -1,6 +1,6 @@
 # Timecard Intake · AI Toolkit
 
-**Purpose:** Turn a scanned stack of Kronos timecard printouts into one Hours Worked row per shift, each wired to the right hire (Worker → Shop Role Assignment), pay period, and pay code, with real clock-in / clock-out timestamps and an explicit confidence flag, so FMP can pull raw hours and do every calculation itself.
+**Purpose:** Turn a scanned stack of Kronos timecard printouts into one Hours Worked row per shift, each wired to the right hire (Worker → Shop Role Assignment), pay period, and pay code, with real clock-in / clock-out timestamps in the **Shift START / Shift END custom fields** and an explicit confidence flag, so FMP can pull raw hours and do every calculation itself.
 
 **Steward:** 💰 Ledger Elio (labor money trail, payroll reconciliation). 🏗️ ClickUp Coach Corey owns the ClickUp write mechanics in steps 6-9. 🎭 Mainstage Milo owns URITP name/role resolution.
 
@@ -23,6 +23,7 @@
 - **Job comes from relationships, never a field on the shift.** Hours Worked → Worker (Shop Role Assignment) → Hired Position (Hirable Positions) → Hirable Role Level (WORKDAY Roles).
 - **One hire per person per job.** Two distinct Kronos assignment labels on one card = two different hires, even if only one is ours. Make the second Hirable Position + join anyway so those hours are flagged as worked in a different job.
 - **Credit-basis hires produce no cards.** A person on payroll doing a role for credit is not "missing." Only chase missing cards for Hourly hires.
+- 🔴 **Shift times live in the CUSTOM fields `Shift START Date timestamp` / `Shift END Date timestamp`.** 🚫 **NEVER ClickUp's native Start date / Due date.** (2026-10-04: the agent substituted native dates when the custom fields would not show time. Michael rejected it outright. Substituting a different field because the right one is hard is not a fix.)
 
 ---
 
@@ -44,14 +45,14 @@
 
 | Field | ID | Rule |
 | --- | --- | --- |
-| **Start date** (native) | task `start_date` | **Clock-in, with time.** See Timestamp rules. |
-| **Due date** (native) | task `due_date` | **Clock-out, with time.** |
+| **Shift START Date timestamp** | `a9e4f6d4-e939-4988-b8a1-74b341b04327` | **Clock-in, date + TIME.** See Timestamp rules. |
+| **Shift END Date timestamp** | `c6b70f36-0cdd-4421-b532-d6564c3f0184` | **Clock-out, date + TIME.** |
 | Worker | `5e22fd3f-088e-45a5-84fa-7c0c4e122db9` | → Shop Role Assignments row for THIS person + THIS job |
 | Hours worked | `74ef6a01-7e44-4414-9b32-6ba0284424b1` | Card's stated shift amount. Never computed. |
 | Pay Period | `b0d56142-2ece-48bd-875f-4d98060470af` | → Payroll Periods row whose BEGIN/END contains the date |
 | Pay Code | `69a20757-d64a-4269-a71a-e8ff16bfdd3a` | `Worked` / `UR Sick` |
 | Entry Confidence | `02da494a-9761-4c48-bb6f-d991b4eda476` | `✅ Confident` / `❓ Question` |
-| ~~Shift START / END Date timestamp~~ | `a9e4f6d4…` / `c6b70f36…` | 🚫 **DEPRECATED 2026-10-04.** Do not write. See Tool limits. |
+| 🚫 native Start date / Due date | task-level | **Not used. Leave empty.** |
 
 Person-level match key: **UR Employee ID** on Employees (`c78e2307-1143-4f80-97bd-4f39915cabbc`). Name aliases (Workday vs ClickUp vs preferred name) live on the person records in ClickUp, never in this public file.
 
@@ -82,12 +83,13 @@ Person-level match key: **UR Employee ID** on Employees (`c78e2307-1143-4f80-97b
    - Name: `YYYY-MM-DD · Surname · H.HHh` + ` · <Assignment tag>` when not the primary job + ` · <Pay code>` when not Worked.
    - Description: link to the source SCAN task + the question text when ❓.
 
-8. **Timestamp rules (the part that went wrong first).**
-   1. Clock-in → **native Start date**, clock-out → **native Due date**, both `withTime: true`, America/New_York. Never date-only.
-   2. No-punch pay-code rows: Start = date only, Due blank, say why in the description.
-   3. Overnight: Out earlier than In → Due date is the next day.
-   4. Hours worked = card value. Sanity check |(Due − Start) − Hours| ≤ 0.02 h, else flag ❓.
-   5. **Write ONE row, then check it in a List-view COLUMN in the UI** (or have Michael eyeball it) before bulk. API read-back is not proof; it showed correct times while the column showed date-only.
+8. **Timestamp rules.**
+   1. Clock-in → **Shift START Date timestamp**, clock-out → **Shift END Date timestamp**. Full datetime, America/New_York, **time shown in the column**. Never date-only. 🚫 Never native Start/Due.
+   2. No-punch pay-code rows: START = date only, END blank, say why in the description.
+   3. Overnight: Out earlier than In → END date is the next day.
+   4. Hours worked = card value. Sanity check |(END − START) − Hours| ≤ 0.02 h, else flag ❓.
+   5. **Write ONE row, then confirm the TIME is visible in the custom-field COLUMN in a List view** (Michael eyeballs it) before bulk. API read-back is not proof; it showed correct times while the column showed date-only and mis-dated afternoon punches by +1 day.
+   6. **Write path (see Tool limits):** the per-task create/update `with_time` flag did NOT turn on the custom field's time display. Use the path that passed step 8.5 and record it here when verified.
 
 9. **Confidence rubric.**
    - `✅ Confident`: clean read, ties to the card, person and hire matched.
@@ -109,6 +111,7 @@ Person-level match key: **UR Employee ID** on Employees (`c78e2307-1143-4f80-97b
 - **Never compute hours from times.** The card's Amount is the paid value.
 - **Stage + confirm before bulk.** 5+ rows always go through a staged preview.
 - **Test row first, UI-verified** (rule 8.5).
+- 🚫 **Never substitute a different field** when the specified one is hard to write. Say the limit, test another write path on ONE row, and ask.
 - **PII stays in ClickUp.** This repo is PUBLIC: no names, Employee IDs, hours, or alias tables here. Only the procedure.
 - 🔒 **No email send.** If a missing card or mis-punch needs the administrator, draft only and surface to Michael.
 - **Don't decide which job is "ours."** Payroll decides.
@@ -117,8 +120,8 @@ Person-level match key: **UR Employee ID** on Employees (`c78e2307-1143-4f80-97b
 
 ## ⚠️ Tool limits found live (2026-10-04)
 
-- **Custom date fields lose the time.** The write tool stores the correct timestamp but cannot set ClickUp's per-value "include time" toggle on custom date fields. Columns show date-only and afternoon punches render on the NEXT day. Fix: native Start/Due dates, which keep the time. Custom Shift START/END are deprecated for that reason.
-- **Bulk SQL can't set per-row custom values** (`CASE` rejected for custom fields): one update call per row.
+- **Custom date fields: time display.** `create_task` / `update_task` with `with_time: true` stored the correct timestamp but the column still showed date-only (no "include time" toggle), and afternoon punches displayed on the NEXT day. Bulk SQL `UPDATE tasks SET "custom:<date field>" = '<ISO datetime>'` is the alternate path under test (one constant per statement). Record the verified path in rule 8.6.
+- **Bulk SQL can't set per-row custom values** (`CASE` rejected for custom fields): one statement or call per row.
 - **Relationship fields** are writable only through per-task create/update, not bulk SQL.
 - **Aggregates over custom fields** read as blank/0; verify by loading tasks.
 - **Rollup fields** can't be created by the agent; Michael adds them in the UI.
@@ -136,4 +139,5 @@ Person-level match key: **UR Employee ID** on Employees (`c78e2307-1143-4f80-97b
 
 ## Changelog
 
-- **v1 (2026-10-04)**: Established by Ledger Elio + ClickUp Coach Corey from the first live run (FY27 Period 06: 11 cards → 60 rows, ties to card totals). Records: layout-first extraction, tie-out before write, Employee-ID matching, one-hire-per-job rule (second Kronos label = second hire), credit hires have no cards, Entry Confidence flag, and the timestamp rules after custom date fields displayed date-only and mis-dated afternoon shifts. Native Start/Due replace the custom Shift START/END fields.
+- **v1.1 (2026-10-04)**: 🔴 Corrected v1, which told agents to put shift times in native Start/Due. **Shift START / END custom fields are canonical; native dates are never used.** Added the no-substitution guardrail, the per-task `with_time` limit, and the alternate SQL write path under test.
+- **v1 (2026-10-04)**: Established by Ledger Elio + ClickUp Coach Corey from the first live run (FY27 Period 06: 11 cards → 60 rows, ties to card totals). Layout-first extraction, tie-out before write, Employee-ID matching, one-hire-per-job rule, credit hires have no cards, Entry Confidence flag, timestamp rules.
