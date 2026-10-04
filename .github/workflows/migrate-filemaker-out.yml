@@ -1,0 +1,36 @@
+# ONE-SHOT. Runs only on migrate/filemaker-out and is deleted before that
+# branch merges. Removes each FileMaker spec package from filemaker/ ONLY if
+# maw-prose apps/<app>/ holds a byte-identical copy (sha1 of every file).
+# Any mismatch stops the job with nothing removed for that app.
+name: retire filemaker copies (one-shot, D-041)
+on:
+  push:
+    branches: ['migrate/filemaker-out']
+    paths: ['.github/workflows/migrate-filemaker-out.yml']
+permissions:
+  contents: write
+jobs:
+  retire:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: migrate/filemaker-out
+      - name: Clone the new home
+        run: git clone --depth 1 https://github.com/mawizorek/maw-prose.git /tmp/dst
+      - name: Verify then remove
+        run: |
+          set -euo pipefail
+          DST=$(git -C /tmp/dst rev-parse --short HEAD)
+          for app in maw-budget uritp-global-setup uritp-people; do
+            ( cd "filemaker/$app" && find . -type f ! -name .DS_Store -exec sha1sum {} + | sort -k2 ) > /tmp/a.txt
+            ( cd "/tmp/dst/apps/$app" && find . -type f -exec sha1sum {} + | sort -k2 ) > /tmp/b.txt
+            diff /tmp/a.txt /tmp/b.txt
+            echo "$app: $(wc -l < /tmp/a.txt) files identical in maw-prose@${DST}"
+            git rm -r -q "filemaker/$app"
+          done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Remove filemaker/{maw-budget,uritp-global-setup,uritp-people}: now in maw-prose apps/ (D-041)" -m "Every file verified byte-identical in maw-prose@${DST} before removal."
+          git push origin HEAD:migrate/filemaker-out
