@@ -19,8 +19,6 @@
 
 ⚠️ **A blob read CLIPPED a 16,829 B file on 08-03.** Near the line, cross-verify a second read path; never rewrite from a truncated read.
 
-🅿️ Row-moves done 2026-09-21 (PR #952): detail went to `next-build-spec.md` / `DEPLOY.md`, since those app READMEs are past safe-edit.
-
 ---
 
 ## Ledger
@@ -56,7 +54,7 @@ Live URL pattern: `https://mawizorek.github.io/ClickUp_apps/<slug>/`. Unmarked r
 | `Vectorworks` | ⚠️ **unverified, never indexed** | Found 2026-07-25. Also the ONLY capitalized folder in a kebab-case repo — needs a naming decision alongside its stamp. |
 | `world-cup-bracket` | shell v5.4 · data 2026-07-07 | PRs #76/#77. Data-separated. **⚠️ Its refresh ROUTINE is retired (tournament ended Jul 19) — the APP is not. Still live, do not retire it.** |
 | `f1-results` | ⚠️ **NOT AN APP** (tombstone) | Kept so the phantom isn't re-added: this is f1-racetracks' **nested data store**, never a root app. |
-| `filemaker` | unverified (reference) | FileMaker app docs; runs in FMP, not on Pages. Verify on next touch. |
+| `filemaker` | reference | Not an app. **FMP specs moved to maw-prose `apps/` (D-041)**; its `hml-llc` is superseded. Stays: HTML layout renders + build tools. |
 
 **Non-app infra (never PR as an app):** `brain-config`, `agent-reports`, `shared`, `quickfire`, `template-app`.
 
