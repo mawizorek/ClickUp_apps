@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FMP Renderer</title>
+<meta name="description" content="Browse the FileMaker specs in maw-prose the way FileMaker's Manage Database dialog shows them.">
+<!-- THIN SHELL. Code is source/*.js. Specs are read live from mawizorek/maw-prose
+     apps/<app>/ and this app holds none of them (maw-prose D-040). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="app.css?v=1">
+<script src="../shared/themes/resolve.js"></script>
+<script>
+  /* APP_THEME: a JOIN slug, never a colour slug. 'database' is mercedes x
+     sharp-racing x sharp x database spacing, the dense row look. This app is
+     its first consumer; _themes.json still marks it draft until it is seen. */
+  var APP_THEME = 'database';
+  if (window.THEMES) { THEMES.applyTheme(APP_THEME); }
+</script>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#/">FMP&nbsp;Renderer</a>
+  <span class="stamp">Spec: the target we build toward, not a survey of the live file</span>
+</header>
+<p id="status" class="status status--busy" role="status">reading maw-prose…</p>
+<main id="view"></main>
+<footer id="foot" class="foot"></footer>
+<script type="module" src="source/app.js?v=1"></script>
+</body>
+</html>
