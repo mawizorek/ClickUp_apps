@@ -1,10 +1,9 @@
 # Sawyer — Memory (the desk's house practice)
 
-> **~10KB hot cap — ⚠️ APPROACHING IT. Next substantive addition splits Ledger C's
-> established-facts block to `memory/archive/`.** Measure from the write response, never estimate.
-> Vendor-documented Eos behaviour does NOT live here — it lives behind a citation, read at its correct
-> release level. **This file holds what ETC does not document: how THIS house drives the desk.**
-> Michael's own fluency is a separate file (`memory/michael-eos-fluency.md`) and it is read first.
+> **~10KB hot cap.** Measure from the write response, never estimate. Cold detail lives in
+> `memory/archive/`. Vendor-documented Eos behaviour does NOT live here — it lives behind a citation, read
+> at its correct release level. **This file holds what ETC does not document: how THIS house drives the
+> desk.** Michael's own fluency is a separate file (`memory/michael-eos-fluency.md`), read first.
 
 ---
 
@@ -41,6 +40,15 @@ a fader is a latch. ✅ Priority 100 confirmed on live house hardware.
 
 - **The trigger universe number.** Open since 2026-10-04. A1 cannot become a standard without it.
 - **The macro Target for the trigger** — device, user, or untargeted. New, unruled.
+- **The SM magic sheet, SCOPED by him 2026-10-04.** IN: `Cue - Active`, `Cue - Pending`, a native **Clock**,
+  and one **Command-target box** carrying the OSC timer string — the ticking timer IS the connection
+  indicator, because a stale box looks live and a moving clock cannot lie. 🚫 **Video streams are OUT.**
+  Verbatim: *"i don't ened to stream video no no no. too much"* — native, supported, and declined. **Do not
+  re-pitch unprompted.** 🔴 Still unruled: **which machine is the stopwatch brain** (Eos has no native
+  stopwatch; QLab primary is already on the net, Bitfocus Companion is an unverified candidate), OSC TX in
+  `Setup ▸ System ▸ Show Control`, and the **Target** for the start/stop macros now that the wing is User
+  ID 2. Opening cue External Link starts it, closing cue stops it, act-break cues should fire both so the
+  SM report writes itself. **Build it with the actual caller; dry run at a work call, never a dress.**
 - **The iPad fork, PARKED 2026-10-04.** **ETC iRFR** fires macros natively (my pick for hand-firing) ·
   **sACNView iOS** exists but its own store text says not for show-critical use and has no blink ·
   **Luminair 4** is the maintained iPad-as-sACN-source. 🚫 Do not re-raise unprompted.
@@ -76,18 +84,13 @@ the `About: Device` photo IS that wing's brain: `ETCPUCK-D2BE4D7` · `Assigned A
   fixture library, matching language AND keyboard-language settings, a physical switch (not a daisy chain).
   Any one of those blocks a sync and the symptom is "the wing won't connect."
 
-### ✅ Established 2026-10-03 from his own inventory (sources named, values not measured)
+### The rest of the rig
 
-- **ETC Ion xe20** — `in stock`, OWNER + STORAGE **SPAC**, purchase note **2020**, `IP Device Type:
-  PRIMARY, CONSOLE`. Task `ITPINV-919` / `86af6nf1j`. 🔴 **No inventory field records a SOFTWARE VERSION
-  anywhere**, and 🔴 **the Puck is in NO inventory list** (propose-only per J9 — Michael's row to create).
-- **11 networked records** (`NETWORK (IP) Devices`, `901326711635`, zero native): Ion · LX Mac Mini ·
-  Designer RVI · Sloan Mac Mini (QLab primary) · Sloan Mac Mini (recording rack) · Sloan MacBook Pro
-  (QLab remote) · SM Cue View (x2) · SND iPad · SPAC\_Yam\_QL5 · Utility iMac · VOR iMac.
-- **FIVE named SPAC networks** (`901329167006`): CONTROL NET · DANTE PRIMARY · DANTE SECONDARY · LX NET ·
-  UR NET — 🔴 all `zero`, all descriptions EMPTY.
-- **Todd dimming: CEM3 in both Sensor racks** (`86ak89jh1`), control input sACN / Art-Net / DMX — Vinny's.
-- Students program on this rig; teaching convention and show convention may differ.
+The Ion xe20 record, the 11 networked devices, the five named SPAC networks, and the Sensor/CEM3 dimming
+note were established 2026-10-03 from his own inventory and now live in
+`memory/archive/rig-established-2026-10-03.md`. **Read that file before diagnosing anything on the wire.**
+There is also an **SM client computer** on the system, confirmed by him 2026-10-04 — the magic sheet runs
+there.
 
 ## ❓ Ledger D — The ask list (answer these before diagnosing anything)
 
@@ -98,16 +101,19 @@ the `About: Device` photo IS that wing's brain: `ETCPUCK-D2BE4D7` · `Assigned A
 5. **What else is on the system the inventory does not know about?** The Puck proves the list is
    incomplete; `User ID: 2` implies at least one other ID in use.
 6. **Is the wing meant to be a backup?** It cannot be as a Client, and that may be a surprise.
-7. **Output method + universe count per space** · **show-file custody** · **cue-only vs tracking** ·
+7. **Which machine holds the SM stopwatch**, and is OSC TX already enabled in Show Control?
+8. **Output method + universe count per space** · **show-file custody** · **cue-only vs tracking** ·
    **palette / magic-sheet convention** · **patch numbering** (Ledger B).
 
 ## 🧱 Lane patterns
 
-- ⭐ **EARNED 2026-10-04: a photo he called useless carried four facts and an inventory gap.** He sent an
-  `About: Device` shot for the version, the version column was cropped, and he wrote it off. The **left**
-  column held an unrecorded device, the lane's first two real IPs, and live confirmation of the sACN
-  priority A1 depends on. **Read the whole artifact, not the field you asked for**, and say so when the
-  user's own evidence beats the user's question.
+- ⭐ **EARNED 2026-10-04: when he cuts scope, the cut is the DECISION — record it, do not mourn it.** He
+  declined video streaming the moment it read as too much. A declined capability that stays unwritten gets
+  re-pitched by the next cold session, which reads as not listening. **Park it with his words attached.**
+- ⭐ **EARNED 2026-10-04: a photo he called useless carried four facts and an inventory gap.** The column he
+  wanted was cropped; the other column held an unrecorded device, the lane's first two real IPs, and live
+  confirmation of the sACN priority A1 depends on. **Read the whole artifact, not the field you asked
+  for**, and say so when the user's own evidence beats the user's question.
 - ⭐ **THE DECIDING QUESTION BEATS THE SURVEY.** The sACN-vs-OSC-vs-MIDI fork collapsed on *what can that
   software actually SEND?* **Eliminate branches; do not rank them.**
 - ⭐ **BORN WITH ONE:** a catalogue is not a diagnosis.
@@ -120,7 +126,8 @@ the `About: Device` photo IS that wing's brain: `ETCPUCK-D2BE4D7` · `Assigned A
 ## 🔌 Seams
 
 Greer = the look · Vinny = power + pin patch + fixture firmware · Ulla = the wire · Dexter = software
-generally · Milo = the production and THE CALL. **Swap-the-desk test settles ambiguity.**
+generally · Milo = the production and THE CALL · Quinn = the callboard and what the SM actually needs.
+**Swap-the-desk test settles ambiguity.**
 
 ## 📝 Activity
 
