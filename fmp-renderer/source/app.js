@@ -3,13 +3,16 @@
 //   #/<app>/tables              Manage Database, Tables tab
 //   #/<app>/fields/<Table>      Fields tab
 //   #/<app>/fields/<Table>/<F>  Fields tab with one field open
+//   #/<app>/scripts             Script Workspace
+//   #/<app>/scripts/<folder/S>  Script Workspace with one script open
 import { loadTree, loadFile } from './github.js?v=2';
-import { appsFrom, titleOf, orderFrom, sortTables } from './repo.js?v=2';
+import { appsFrom, titleOf, orderFrom, sortTables, scriptsFrom } from './repo.js?v=3';
 import { parseTable, fieldsFromTsv, validate, issueCount } from './parse.js?v=2';
-import * as V from './views.js?v=2';
+import { toSnippet, pasteCommand } from './fmscript.js?v=3';
+import * as V from './views.js?v=3';
 
 const $ = id => document.getElementById(id);
-const S = { tree: null, apps: [], tables: new Map(), run: 0 };
+const S = { tree: null, apps: [], tables: new Map(), run: 0, cmd: '' };
 const SORT_KEY = 'fmpr.sort';
 
 function status(msg, kind) { const s = $('status'); s.textContent = msg; s.className = 'status status--' + (kind || 'ok'); }
@@ -75,6 +78,7 @@ async function route() {
   }
   const app = S.apps.find(a => a.slug === parts[0]);
   if (!app) { status('No app folder named “' + parts[0] + '” in maw-prose apps/.', 'warn'); $('view').innerHTML = V.launch(S.apps); return; }
+  if (parts[1] === 'scripts') return scriptsRoute(app, parts.slice(2).join('/'), run);
   if (!S.tables.has(app.slug)) status('reading ' + app.tablePaths.length + ' table notes from ' + app.slug + '…', 'busy');
   let tables;
   try { tables = await loadApp(app); } catch (e) { if (run === S.run) status(e.message, 'bad'); return; }
@@ -99,6 +103,36 @@ async function route() {
   status(issues ? issues + ' spec issue' + (issues === 1 ? '' : 's') + ' shown in place, marked in red' : 'no spec issues found', issues ? 'warn' : 'ok');
 }
 
+// Script Workspace: read one .fmscript, translate it in memory, offer the command.
+async function scriptsRoute(app, want, run) {
+  const scripts = scriptsFrom(app), s = scripts.find(x => x.rel === want) || null;
+  let res = null;
+  S.cmd = '';
+  if (s) {
+    status('reading ' + s.name + '…', 'busy');
+    try { res = toSnippet(await loadFile(S.tree.sha, s.path)); } catch (e) { if (run === S.run) status(e.message, 'bad'); return; }
+    if (run !== S.run) return;
+    S.cmd = pasteCommand(res.xml);
+  }
+  const summary = scripts.length + ' script' + (scripts.length === 1 ? '' : 's');
+  $('view').innerHTML = V.dialog(app, 'scripts', '', V.scriptsTab(app, scripts, s, res, S.cmd), summary);
+  document.title = (s ? s.name + ' · ' : 'Scripts · ') + (app.title || app.slug) + ' · FMP Renderer';
+  if (!s) status(summary + ' in ' + app.slug, 'ok');
+  else status(res.hand.length ? res.hand.length + ' step' + (res.hand.length === 1 ? '' : 's') + ' will paste as TYPE BY HAND comments, marked in red' : 'every step translates', res.hand.length ? 'warn' : 'ok');
+}
+
+async function copyCommand() {
+  if (!S.cmd) return;
+  try {
+    await navigator.clipboard.writeText(S.cmd);
+    status('Copied. Paste into Terminal, press Enter, then ⌘V in an empty FileMaker script.', 'ok');
+  } catch (e) {
+    const box = $('cmdbox');
+    if (box) { box.closest('details').open = true; box.focus(); box.select(); }
+    status('The browser blocked the clipboard. The command is selected below: press ⌘C.', 'warn');
+  }
+}
+
 // Opening a field re-renders the screen; keep the list where the reader left it.
 function keepScroll() {
   const l = document.querySelector('.list--f'), top = l ? l.scrollTop : 0, y = window.scrollY;
@@ -112,6 +146,7 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('click', e => {
   if (e.target.id === 'refresh' || e.target.id === 'retry') boot(true);
+  if (e.target.id === 'copyfm') copyCommand();
 });
 // Up/Down walks the field list, the way it does in FileMaker.
 document.addEventListener('keydown', e => {

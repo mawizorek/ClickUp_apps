@@ -2,7 +2,7 @@
 import { esc, inline, block } from './md.js?v=2';
 import { fmType, issueCount } from './parse.js?v=2';
 import { blobUrl, editUrl, commitUrl } from './github.js?v=2';
-import { KINDS } from './repo.js?v=2';
+import { KINDS } from './repo.js?v=3';
 
 const enc = encodeURIComponent;
 const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
@@ -23,10 +23,12 @@ export function launch(apps) {
 export function dialog(app, tab, sel, body, summary) {
   const t = (id, label, href) => '<a role="tab" class="tab' + (tab === id ? ' is-on' : '') + '" aria-selected="' + (tab === id) + '" href="' + href + '">' + label + '</a>';
   const root = '#/' + enc(app.slug);
+  const title = (tab === 'scripts' ? 'Script Workspace for “' : 'Manage Database for “') + esc(app.title || app.slug) + '”';
   return '<section class="dlg"><div class="dlg__bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
-    '<span class="dlg__title">Manage Database for “' + esc(app.title || app.slug) + '”</span></div>' +
+    '<span class="dlg__title">' + title + '</span></div>' +
     '<nav class="tabs" role="tablist">' + t('tables', 'Tables', root + '/tables') + t('fields', 'Fields', root + '/fields' + (sel ? '/' + enc(sel) : '')) +
-    '<span class="tab is-off" role="tab" aria-disabled="true" title="Not built yet. The relationship notes exist; the graph is the next screen.">Relationships</span></nav>' +
+    '<span class="tab is-off" role="tab" aria-disabled="true" title="Not built yet. The relationship notes exist; the graph is the next screen.">Relationships</span>' +
+    t('scripts', 'Scripts', root + '/scripts') + '</nav>' +
     '<div class="dlg__body">' + body + '</div>' +
     '<div class="dlg__foot"><a class="btn" href="#/">All apps</a><span>' + summary + '</span></div></section>';
 }
@@ -112,6 +114,36 @@ export function fieldsTab(app, tables, t, sel, sort) {
     : '<p class="empty">This note has no field register yet, so there is nothing to list.</p>';
   const f = t.fields.find(x => x.name === sel);
   return ctl + '<div class="split"><div class="split__main">' + list + '</div><aside class="side' + (f ? ' side--field' : '') + '">' + (f ? fieldDetail(app, t, f) : tableDetail(app, t)) + '</aside></div>';
+}
+
+// Script Workspace. The XML is built in the browser from the .fmscript each
+// time the script is opened; nothing generated is stored anywhere.
+export function scriptsTab(app, scripts, s, res, cmd) {
+  if (!scripts.length) return '<p class="empty">No .fmscript files in apps/' + esc(app.slug) + '/scripts/ yet.</p>';
+  const rows = scripts.map(x => '<a class="row row--t' + (s && x.rel === s.rel ? ' is-sel' : '') + '" role="row" href="#/' + enc(app.slug) + '/scripts/' + enc(x.rel) + '">' +
+    '<span class="c-name">' + esc(x.name) + '</span><span class="c-num"></span><span class="c-grain">' + esc(x.folder || '(top level)') + '</span><span class="c-flag"></span></a>').join('');
+  const list = '<div class="list list--t" role="table"><div class="row row--h row--t" role="row"><span>Script</span><span class="c-num"></span><span>Folder</span><span></span></div>' + rows + '</div>';
+  return '<div class="split"><div class="split__main">' + list + '</div><aside class="side">' + (s && res ? scriptDetail(s, res, cmd) : scriptHelp()) + '</aside></div>';
+}
+
+const scriptHelp = () => '<p class="side__kicker">Scripts</p><h2 class="side__h">Pick a script</h2>' +
+  '<p class="lede">Each script is read from its .fmscript and turned into FileMaker’s clipboard format right here. Nothing generated is stored.</p>' +
+  '<p class="meta">Copy for FileMaker, paste into Terminal, press Enter, then click into an empty script and press ⌘V.</p>';
+
+function scriptDetail(s, res, cmd) {
+  const n = res.steps.filter(x => x.kind !== 'comment').length, hand = res.hand;
+  const handList = hand.length ? '<ul class="defects">' + hand.map(h => '<li>Line ' + h.n + ', ' + esc(h.name || 'step') + ': ' + esc(h.why) + '. It pastes as a TYPE BY HAND comment.</li>').join('') + '</ul>' : '';
+  const code = res.steps.map(x => {
+    const line = '    '.repeat(x.depth) + x.text;
+    return x.kind === 'hand' ? '<span class="bad">' + esc(line) + '</span>' : esc(line);
+  }).join('\n');
+  return '<p class="side__kicker">' + esc(s.folder || 'Script') + '</p><h2 class="side__h">' + esc(s.name) + '</h2>' +
+    '<p class="meta">' + plural(n, 'step') + (hand.length ? ' · ' + plural(hand.length, 'step') + ' to type by hand' : ' · every step translates') + '</p>' + handList +
+    '<p class="side__links"><button id="copyfm" class="btn" type="button">Copy for FileMaker</button> ' +
+    '<a class="btn" href="' + esc(blobUrl(s.path)) + '" target="_blank" rel="noopener">Open .fmscript ↗</a> <a class="btn" href="' + esc(editUrl(s.path)) + '" target="_blank" rel="noopener">Edit ↗</a></p>' +
+    '<p class="meta">Then paste into Terminal, press Enter, click into an empty script in FileMaker and press ⌘V.</p>' +
+    '<details><summary>The Terminal command</summary><textarea id="cmdbox" readonly rows="4" spellcheck="false" style="width:100%;font-family:var(--font-mono,monospace)">' + esc(cmd) + '</textarea></details>' +
+    '<div class="md"><pre><code>' + code + '</code></pre></div>';
 }
 
 export function foot(tree) {

@@ -20,12 +20,14 @@ export function appsFrom(paths) {
   for (const p of paths) {
     const m = p.match(/^apps\/([^/]+)\/(.+)$/);
     if (!m || /^[._]/.test(m[1])) continue;
-    if (!map.has(m[1])) map.set(m[1], { slug: m[1], title: '', counts: {}, tablePaths: [], readme: '', tablesReadme: '' });
+    if (!map.has(m[1])) map.set(m[1], { slug: m[1], title: '', counts: {}, tablePaths: [], scriptPaths: [], readme: '', tablesReadme: '' });
     const a = map.get(m[1]), seg = m[2].split('/'), leaf = seg[seg.length - 1], kind = seg.length > 1 ? kindOf(seg[0]) : '';
     if (seg.length === 1 && isIndex(leaf) && (!a.readme || /^index/i.test(leaf))) a.readme = p;
     if (seg.length === 2 && kind === 'tables' && isIndex(leaf) && (!a.tablesReadme || /^index/i.test(leaf))) a.tablesReadme = p;
     if (kind && KINDS.some(k => k[0] === kind) && isDoc(leaf)) a.counts[kind] = (a.counts[kind] || 0) + 1;
     if (seg.length === 2 && kind === 'tables' && /\.md$/i.test(leaf) && isDoc(leaf)) a.tablePaths.push(p);
+    // A script is its .fmscript, at any depth under scripts/ (folders mirror Script Workspace).
+    if (kind === 'scripts' && /\.fmscript$/i.test(leaf)) a.scriptPaths.push(p);
   }
   return [...map.values()].sort((x, y) => x.slug.localeCompare(y.slug));
 }
@@ -50,4 +52,13 @@ export function sortTables(tables, order) {
   const at = t => { const i = order.indexOf(t.path.split('/').pop()); return i < 0 ? 1e6 : i; };
   const ord = t => (typeof t.order === 'number' ? t.order : 1e9);
   return tables.slice().sort((a, b) => ord(a) - ord(b) || at(a) - at(b) || a.name.localeCompare(b.name));
+}
+
+// Scripts as the Script Workspace lists them: by folder, then name.
+export function scriptsFrom(app) {
+  return app.scriptPaths.map(p => {
+    const rel = p.replace(/^apps\/[^/]+\/scripts\//, '').replace(/\.fmscript$/i, '');
+    const cut = rel.lastIndexOf('/');
+    return { path: p, rel, name: rel.slice(cut + 1), folder: cut < 0 ? '' : rel.slice(0, cut) };
+  }).sort((a, b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name));
 }
