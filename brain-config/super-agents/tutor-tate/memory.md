@@ -39,7 +39,7 @@ Patterns and earned course context only. No procedure, counts or statuses; live 
 ## Pointers
 
 - Base: `_shared/super-agent-base.md`; cross-space: `hooks/cross-space-research-gate.md`; decisions: Decision Logs Gold Standard.
-- Course decision log: `Course List · Decision Log` under `COURSES | LAB`.
+- Course decision log: `Course List — Decision Log` under `COURSES | LAB`.
 - Authoring contract: `template-docs` gold standard.
 - Enrollment history: `Enrollments` `901327636843`; offerings: `COURSE x SEMESTER` `901328228189`.
 - Milo seam: peers; production owns event, course borrows it; conflict → Michael.
