@@ -1,6 +1,0 @@
-{
-  "STATUS": "🪦 REDIRECT STUB — twice over. Renamed to roster.json on 2026-07-24; roster.json was itself RETIRED on 2026-07-30.",
-  "go_here": "The ClickUp list 🤖 Agent Index — https://app.clickup.com/36074068/v/li/901328043244 — is THE canonical resolution index for every agent. One task per agent.",
-  "how_to_resolve": "gates/agent-invocation-gate.md → STEP 0.",
-  "do_not": "Do not restore this file, roster.json, or registry.json. Three retired manifests is enough. The index is a list."
-}

@@ -1,47 +1,18 @@
-# 🪡 Pinout Pavel — memory.md
+# Pavel · bench memory
 
-**What this file is:** pointers, verified-vs-assumed facts, measured values from OUR hardware, and the parts we own. **Never procedure** (that is `hooks/bench-build-method.md`). **Never raw data copied from a source** (point at the source).
+- Pointers, verified vs assumed facts, measured OUR hardware values and owned parts. No procedure or copied source data. Ledger C measured values is empty by design; say so.
 
-⚠️ **Ledger C is EMPTY ON PURPOSE** and will stay empty until something is metered. A cold session finding it empty must SAY SO rather than infer a value.
+## Pinouts and warnings
 
----
+- Clear-Com XLR-4M: 1 mic low, 2 mic high, 3 earphone low, 4 earphone high, vendor verified not OUR measurement.
+- Clear-Com RS-701: 0.5 × VCC DC between pin 4 and 1, vendor datasheet verified.
+- Clear-Com 3-pin: 1 common, 2 +28-30V power, 3 duplex audio +11-15V call signal, verified from Solution Finder/manuals.
+- Pro Intercom BP-1/BP-2 headset jack following Clear-Com is ASSUMED, not verified. Pull Pro Intercom Headset & Handset Pinouts at `https://prointercomllc.com/technical-information` before first solder joint.
+- Pro Intercom MS301 program input: 3-pin XLR pins 1 + 2 or 1/4 inch tip + sleeve, unbalanced; DIP line +4dB or mic -20dB, verified.
+- MS301 warning: pin 1 grounded outside MS301 causes serious problem; pin 1/3 reversal on gender change; a miswire can pass mic test yet kill intercom. Clear-Com guide contradicts pin 2/3; trust Solution Finder and measure. CCI-22 needs Eclipse matrix frame, not standalone.
 
-## Ledger A — Verified vs assumed pinouts
+## OUR hardware and market
 
-| Device | Fact | Status | Source |
-| --- | --- | --- | --- |
-| Clear-Com XLR-4M headset connector | 1 mic low · 2 mic high · 3 earphone low · 4 earphone high | **VERIFIED from vendor docs**, NOT measured on our units | Clear-Com V-Series headset connectors page; Solution Finder XLR-4 pinout |
-| Clear-Com RS-701 beltpack | `0.5 × VCC` DC sits between **pin 4 and pin 1** — on the earphone pin | **VERIFIED from the model datasheet** | RS-701 datasheet |
-| Clear-Com analog partyline, 3-pin | 1 common · 2 +28-30V DC power · 3 duplex audio **plus 11-15V DC call signalling** | VERIFIED | Clear-Com Solution Finder call-signal spec; Encore + PL-Pro install manuals |
-| **Pro Intercom BP-1 / BP-2 headset jack** | Assumed to follow the Clear-Com convention because Pro Intercom advertises "Clear-Com® compatible" | 🔴 **ASSUMED — NOT VERIFIED.** The Pro Intercom *Headset & Handset Pinouts* doc has not been pulled, and *compatible* is not *identical*. **This gates the first solder joint.** | https://prointercomllc.com/technical-information |
-| Pro Intercom MS301 program input | 3-pin XLR **pins 1 & 2**, or 1/4" **tip & sleeve**, unbalanced; rear DIP selects line (+4dB) or mic (−20dB) | VERIFIED | MS301 instructions |
-
-## Ledger B — Vendor docs that were wrong, and manufacturer warnings that matter
-
-- 🔴 **Pro Intercom MS301 instructions, verbatim:** *"If Pin 1 is grounded anywhere other than in the MS301 it will create a serious problem."* Also warns that **pin 1/3 reversals happen easily when switching connector gender**, and that a miswire which still passes a microphone test will render an intercom system useless. This is why isolation on a partyline tap is a vendor requirement, not a preference.
-- ⚠️ **Clear-Com's own Comprehensive Partyline Guide contradicts itself**: one line reads *"the DC voltage is applied to the XLR3 pin-2 audio conductor"* while every other page (and the same guide one paragraph earlier) has pin 2 = power, pin 3 = audio. Trust the Solution Finder pinout and measure.
-- ⚠️ **Clear-Com CCI-22 cannot run standalone** — it needs an Eclipse matrix frame (IMF-3 / IMF-102). Do not price it as a standalone interface.
-
-## Ledger C — Measured values from OUR hardware
-
-**EMPTY.** Nothing metered yet. First readings owed: DC pin 4 → pin 1 and pin 4 → pin 3 on a URITP **BP-1**; pin 1 → pin 3 resistance on a live circuit (expect ~4-5kΩ if correctly terminated); DC on pin 3 at rest and with CALL pressed.
-
-## Ledger D — Parts and stock
-
-**EMPTY.** No transformers, connectors or enclosures confirmed on hand.
-
-## Ledger E — The hardware we have (pointer, not a copy)
-
-URITP / SPAC wired comms is **Pro Intercom**, not Clear-Com: PS301 supply · MS301 3-channel master · 8 × BP-1 · 4 × BP-2 · DMH920 headsets · HH10A handsets. Clear-Com badging is on CC-110 headsets, 3 × KB-702GM speaker stations and the HME DX210 wireless. **Rail is 24VDC.** Source of record: *SPAC Tech Spec v4 AUDIO.pdf*, attached in ClickUp under URITP ▸ Production Management ▸ [INVENTORIES]. ⚠️ Do not re-type that inventory into this file; read it there.
-
-## Ledger F — Market equivalents already priced (so the comparison is never re-run cold)
-
-| Product | What it is | Price |
-| --- | --- | --- |
-| Pro Intercom **AD903** | Line-powered 2-to-4-wire I/O adapter, transformer isolated both ways, mic-to-line pots, sidetone null | ~$408 MAP |
-| AVLifesavers **Combo Intercom Audio Interface** | Taps the 3-pin partyline, audio in OR out, level trim, no power | $185 |
-| AVLifesavers **Beltpack Breakout Box** | Taps the 4-pin headset jack, simultaneous in AND out, no trim | $175 |
-| AVLifesavers **output-only interface** | Listen-only, stripped | 🔴 unpublished — needs a quote, and ask whether it keeps an output trim |
-| Studio Technologies **46A / 47A** | 1RU dual 2-channel hybrids, auto-null, can power the PL | broadcast rack pricing, not quoted |
-
-⭐ Standing read: every commercial option pays for a **hybrid with sidetone nulling**, which only matters if you talk back. Listen-only has no send to null.
+- URITP/SPAC is Pro Intercom: PS301, MS301 3-channel master, 8 BP-1, 4 BP-2, DMH920, HH10A. Clear-Com items: CC-110, 3 KB-702GM, HME DX210. Rail 24VDC. Source: `SPAC Tech Spec v4 AUDIO.pdf` in ClickUp URITP ▸ Production Management ▸ `[INVENTORIES]`; read source, do not duplicate inventory.
+- Parts/stock empty. First measurements owed: BP-1 pin 4→1 and 4→3 DC; live pin 1→3 resistance, expected ~4-5kΩ if terminated; pin 3 DC idle/CALL.
+- Priced comparisons: Pro Intercom AD903 ~$408 MAP; AVLifesavers Combo $185; Beltpack Breakout $175; output-only unpublished, ask if output trim retained; Studio Technologies 46A/47A broadcast rack pricing. Commercial options pay for send/return hybrid and sidetone null; listen-only has no send.

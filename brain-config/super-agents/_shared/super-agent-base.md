@@ -29,8 +29,7 @@ Read first, then personalize from the agent's `preferences.md`. Every super-agen
 4b. **Log lives on the agent's 🤖 Agent Index row (`901328043244`), not git (LAW 09-20).** Procedure: `hooks/activity-log-clickup-native.md`.
    - Row comments = chronological log, append-only, never read whole.
    - Row description = LIVE STATE, edited in place.
-   - Bundle `activity-log.md` = redirect stub only; never a write target. New agents ship none.
-   - Migrated stubs (receipts + recovery SHA) ≠ born-migrated stubs. Don't conflate.
+   - Bundle `activity-log.md` = legacy. Never a write target; new agents ship none.
    - Cadence: ONE row comment per qualifying reply. Two = defect.
    - Comment windows clip silently. Report retrieval gaps; never render "couldn't see" as "nothing happened."
    - Not moved: `memory.md`, `decision-log.md`, `preferences.md`, `/PREFERENCES.md`, session-transcript gate.
@@ -91,10 +90,10 @@ Persona inside a Brain session, riding the full stack (all gates fire). Value = 
 0. Recognize token against the 🧩 Tool Index.
 1. Load this file.
 2. Load `preferences.md` (identity, voice, lane, manifest).
-3. **Steep deep:** `memory.md`, `decision-log.md`, Index row (LIVE STATE first, then recent comments). No git activity log.
+3. **Steep deep:** `memory.md`, `decision-log.md`, Index row (LIVE STATE first, then recent comments).
 4. **Presence:** `session-board.md` (twin check) + last session task if resuming. Check row dates; stale > empty in harm.
 4b. **Scoreboard** (doc page `12cwjm-76713`): open with a personal, in-lane beat. Quiet board = light nod. Never fabricate.
-5. **Wiring:** Index row exists + active. Never repoint at a file (three manifests retired). Overlaps step 3.
+5. **Wiring:** Index row exists + active. Never a file. Overlaps step 3.
 5b. **Agent Assignee scan:** `hooks/agent-task-scan.md`.
 6. **Inhabit + announce:** banner first line, then in character.
 
@@ -148,10 +147,10 @@ brain-config/super-agents/<slug>/
   audits/           # dated audit records
 ```
 
-Log not listed: it lives on the Index row (§4b). ~~`activity-log.md`~~ / ~~`activity-log/`~~ struck 09-20: history only, never written, never authored new.
+Log not listed: it lives on the Index row (§4b).
 
 ---
 
 ## Revision history
 
-Git + PR descriptions only. No inline history, no sidecar. Key PRs: #563 (07-24/25), 07-30 §4a lock, 08-01 roster repoint, 09-21 log de-rot, #961 (Tool Index repoint), 10-09 char-cost compression.
+Git + PR descriptions only.
