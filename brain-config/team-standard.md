@@ -2,7 +2,7 @@
 
 **Scope:** every agent here (Brain sessions, Super Agents, future). Single source for shared method; no agent keeps a copy.
 
-**Version:** 2026-10-09 v3.0
+**Version:** 2026-10-09 v3.1
 
 You're on a coordinated team. These processes were proven in Brain sessions, then promoted. Not suggestions.
 
@@ -115,7 +115,7 @@ Seated voices follow the talkback law; six lenses restating the brief = 6x waste
 
 ## Agent roster
 
-Not here, by design. Source: 🤖 Agent Index list (`901328043244`), plus `council.md` + `teams/the-workshop.md`. ~~`registry.json`~~ tombstone since 07-25. Invoke a worker: `agents/<slug>.md` (lens) or `super-agents/<slug>/` (teammate). Review → Mira.
+Not here, by design. Source: 🤖 Agent Index list (`901328043244`), plus `council.md` + `teams/the-workshop.md`. Invoke a worker: `agents/<slug>.md` (lens) or `super-agents/<slug>/` (teammate). Review → Mira.
 
 ## Not this file
 
@@ -123,18 +123,8 @@ Per-agent role instructions · the AI Toolkit · the roster · repo structure do
 
 ---
 
-## Changelog (newest first; detail in PRs)
+## Changelog
 
-- **v3.0 (10-09)** Char-cost compression (Michael: every character is labor). Spoken Voice trimmed to floor + pointer; "talk in beats / no nested bullets" removed (now talkback T0b/T5). Talkback is always on, all surfaces. Whole file rewritten to the law. Mira path fixed (`agents/maestro-mira.md` → `super-agents/maestro-mira/`).
-- **v2.0.1 (08-09)** Dial repointed `verbal-mode` → `talkback-mode`.
-- **v2.0 (08-09)** Spoken Voice points at the talkback dial; single-claimant rule; banners exempt.
-- **v1.9 (08-07)** Seating is the fleet's job; Empty-Chair hook; dictation clause + Nick Greene guard.
-- **v1.8 (08-07)** Don't restate; No-Restate hook; end on live edge.
-- **v1.7 (08-07)** Spoken Voice clause; Documentation Instinct consequence; roster pointer fixed.
-- **v1.6 (07-17)** Roster + verdict math → pointers.
-- **v1.5 (07-17)** Workshop Wes retired; Mira conducts.
-- **v1.4 (07-17)** DL = why, not what; Q/J/S named.
-- **v1.3 (07-17)** Documentation Instinct.
-- **v1.2 (07-16)** Newest-first log ordering.
-- **v1.1 (07-13)** Embrace the Fuss.
-- **v1 (07-04)** Extracted from proven Brain workflows.
+- **v3.1 (10-09)** Delete-never-strike (talkback T17).
+- **v3.0 (10-09)** Char-cost compression; Spoken Voice → floor + pointer.
+- Earlier: git history.
