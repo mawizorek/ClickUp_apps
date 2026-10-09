@@ -18,6 +18,8 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 >
 > 🔴 **2026-08-11: `OMR-20260811-1` IS A SECOND LIVE-WRONG LINE, and it sits in the FIRST move of every agent invocation.** Memory routes agent resolution through `super-agents/roster.json`, retired to a tombstone stub on 2026-07-30. **Two live-wrong pointers in memory at once is no longer a coincidence; see that entry's closing note on whether memory should be permitted to restate a gate's contents at all.**
 >
+> 🔴 **2026-10-09: `OMR-20261009-1` = THIRD live-wrong line, in STEP ZERO of every reply.** Memory loads the retired AI Toolkit page. Place with `-20260811-1` + `-20260731-2` in one pass; all three are replacements, no cut needed.
+>
 > 📱 **THE OUTPUT-FORMAT FAMILY IS NOW FIVE ENTRIES AND MUST BE PLACED AS ONE BLOCK:** `OMR-20260728-1` (Prism / uniform structure) · `OMR-20260729-1` (prose over tables in authored docs, no YAML front matter) · `OMR-20260731-1` (always hyperlink locations) · `OMR-20260731-4` (mobile-first, no wide tables) · **`OMR-20260804-1` (never hand-write a count of what exists)**. **Landing them one at a time will read as each overriding the last.** They reconcile cleanly — *uniform structure for pasteable reports, prose for authored documents, stacked-not-gridded for anything he reads on a phone, links on every location, and no inventory numbers anywhere* — but only if written together.
 >
 > ⚠️ **The three blocker shapes, unchanged:** CAPACITY (needs Michael's cut — ten entries now) · BUNDLE CAP (needs rotation — Clio ×4, Fiona now over cap too) · UNREAD BUNDLE (needs nothing but running the load manifest properly — four entries). **Only the first requires a ruling.**
@@ -27,6 +29,16 @@ _Public queue for memory-write candidates that an agent cannot or should not lan
 ---
 
 ## Open
+
+### OMR-20261009-1 · OPEN · 🔴 EXPLICIT INSTRUCTION · LIVE-WRONG LINE · REPLACEMENT, NET CUT
+- Requested by: Michael via Brain (Oct 9 compression session). Verbatim: *"Ask Maggie to repoint memory off the AI Toolkit page"*
+- Candidate note: memory STEP ZERO says load the **AI Toolkit index** page every reply. Dead duplicate since 2026-10-02 (PR #961): routing = **🧩 Tool Index list** (ClickUp list `901329128393`), projected by the **Tool Index — Signal Routing** doc page. Replacements:
+  - LOAD-THEN-THINK: `Load AI Toolkit index (...) + Brain Reference Library (...)` … `Index IS the routing layer.` → `Load Tool Index Signal Routing page (canonical = 🧩 Tool Index list) + Brain Reference Library before ANY response. Attachment = Router fires; domain keyword = pointer fires. Never compose from memory alone.`
+  - Heading `## AI Toolkit (execution)` → `## Tool Index (execution)`.
+  - Domain Pointers header: `index trigger table` → `Tool Index`.
+  - Fold `OMR-20260811-1` same pass: `resolve via roster.json` → `resolve via 🤖 Agent Index list (901328043244); never parse agents/`.
+- Requester's guess (non-binding): brain memory, replacement.
+- Context / why: memory reads first, so the stale copy beats the live router. Name the surface, never its internals (`-20260811-1` rule). Not landed 10-09: memory write refused in-session. After landing: sync `PREFERENCES.mirror.md`; Michael moves the 10 subpages off the AI Toolkit page, then deletes it.
 
 ### OMR-20260920-1 · OPEN · 🔴 EXPLICIT INSTRUCTION — BEHAVIORAL STANCE, HOOK HALF ALREADY LANDED
 - Requested by: Mainstage Milo (mid-session, Sep 20 load-in-eve session)
