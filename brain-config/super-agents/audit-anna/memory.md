@@ -1,74 +1,43 @@
-# Audit Anna — Memory (PATTERNS + CORE PREFERENCES ONLY)
+# Audit Anna | Durable audit patterns
 
-> **Scope, ruled by Michael 2026-07-30:** patterns found + core preferences. Things that change how I ACT tomorrow, in any domain.
-> 🚫 **NOT project state.** Spaces walked, Index counts, parks, what resumes next → **`activity-log.md`.** That file is my ongoing projects; this one is how I work.
-> **Why:** this file carried a dead Index count for three days *underneath a warning about stale counts.* **Project state rots in hours, patterns don't rot at all — mixed in one file, a reader can't tell which half aged.**
-> No how-to (Constitution §2–§3). Placement law: `_shared/super-agent-base.md` §4. **~10KB hot**; warm archives in `memory/archive/`.
+Patterns and core preferences only. No project state, counts, status, or provenance narratives.
 
-## Who I am, in one line
+## Verification
 
-The Audit Lead. I seize any audit, name the true purpose first, drive Know/Touch/Do to completeness, and won't call done while the Open-Surface Ledger is open. Lens → git-teammate 2026-07-21.
+- A verification step must be able to return the answer you do not want. If the tool output could only agree with the hypothesis, it verified nothing.
+- Every aggregate is a projection with a blind spot. Name filters turned off, query the live container, and reconcile total against parts at close.
+- A finding is only as general as its measured population. Re-read the flag's wording before retiring it.
+- Read bodies before calling surfaces duplicate. Titles and counts show shape; intent is in the body.
+- Three independent contradictions disqualify a finding. Stop explaining; re-measure.
+- Residency trees are not structure maps. Open the live container; empty lists and folder boundaries can be invisible.
+- Verify field identity by field ID before reporting duplicate schema.
+- Census task and status types at container level. Status type is not status label.
+- Decision Log: one question per block and per option.
 
-## ⚠️ VERIFICATION SCARS — read before ANY structure, count or field claim
+## Structural patterns
 
-> Nine rules, mostly one root error in different clothes: **treating a tool's output as the territory.**
+- Structure is a state machine: container, existing lists, and naming punctuation encode lifecycle.
+- Transient state lacks a mechanism; steady state can be sound. A recurring pattern may deserve a single durable structure instead of a new poll/list.
+- Controlled vocabularies often appear as lists of short similar tasks.
+- Judge canonical artifacts by downstream behavior, not internal tidiness; re-extract templates from practice as clones drift.
+- An empty forward-looking container is a scaffold, not a corpse.
+- A third disposition exists: an industry tool may own the data.
+- A well-wired model can look messy. Judge wiring, not vibe.
 
-- **🚨 A VERIFICATION STEP MUST BE ABLE TO RETURN THE ANSWER YOU DON'T WANT.** I claimed ten folders empty, then "verified" with `load_assets` — which returns metadata, never tasks, so the result could only agree with me. **Ask: what would this have shown if I were wrong? Same thing? It verified nothing.** Worse than skipping it, because it feels like diligence. **B15 count 2.**
-- **🚨 EVERY AGGREGATE VIEW IS A PROJECTION WITH A BLIND SPOT (J5).** Four in one space: residency tree hid 3 folders · count census hid 2 empty lists · **an archived list reported 1 task while holding 87** · a subtask filter under-reported the Index by 39. **A COUNT OF 1 IS MORE DANGEROUS THAN A COUNT OF 0** — zero invites a look, one reads as answered. Query the live container; reconcile total against parts at close. Same root: **7 counting errors in one session, every one a default filter left unoverridden.** If a number matters, name the filters you turned off.
-- **🚨 A FINDING IS ONLY AS GENERAL AS THE POPULATION IT WAS MEASURED ON.** I retired PROGRAM SPRAWL after measuring a *different list pair* than the flag described; Michael reinstated it on instinct and was right, and the evidence sat behind an unopened `Queued` row. **Re-read a flag's own wording before retiring it, and ask whether the evidence is somewhere unlooked rather than absent.**
-- **🚨 READ THE TASK BODIES BEFORE CALLING TWO SURFACES DUPLICATION.** Thirteen of fifteen descriptions opened with *"Migrated working source from legacy X… left in place temporarily for reference."* A labelled migration in flight, labelled in the data all along. **Titles and counts describe shape; only the body says INTENT.**
-- **🚨 THREE INDEPENDENT SIGNALS CONTRADICTING A FINDING MEANS THE FINDING IS WRONG.** I explained all three away and found the contradiction *interesting* instead of *disqualifying*. **Stop explaining. Re-measure.**
-- **A residency/hierarchy tree is NOT a structure map** — it nests HOME only, so a list with no native tasks is invisible. I turned "absent from output" into "does not exist" across seven containers. **B15 count 1. OPEN THE LIVE CONTAINER.**
-- **Verify field IDENTITY before reporting duplicate schema** (five saves). One name at two scopes is usually one field applied twice. ⚠️ The census's `scope_name` reports the QUERIED container, not the definition home. **Only the field `id` identifies a field.**
-- **CENSUS TASK TYPES + STATUS TYPES at container level — first-class schema, not plumbing.** I derived a four-layer data model across 34 walks while the native `type` column declared it outright. A status's TYPE ≠ its label: `in stock` is **done**-type (so ~800 records read as completed work) while `zero` was the **open**-type default. **A status change must specify the TYPE.**
-- **One question per Decision Log block, AND one per OPTION.** I bundled a DEFINITION with an ACTION in one option; he left it unstruck, which endorsed the definition and appeared to endorse a re-home he never ruled on. **An option containing an "and" is two answers wearing one checkbox.**
+## Tool cautions
 
-## 🔧 Tooling defects I have proven
+- `WHERE folder IN (...)` is silent and unreliable: query one container at a time.
+- Unscoped workspace GROUP BY can report partial results as complete.
+- `WHERE space = X` can include associated lists while `space` reports home.
+- Custom-field census may drop fields; confirm with the field loader.
 
-- **`WHERE folder IN (...)` IS BROKEN AND SILENT** — returns zero rows OR ignores the filter entirely, never errors. Proven both ways in one session. **One container at a time.**
-- **An unscoped workspace `GROUP BY` caps ~5,000 rows and reports partial as complete** ("6 tasks" for a space holding 425+).
-- **`WHERE space = X` matches ASSOCIATED lists while the `space` column reports HOME** — multi-homed tasks surface under the wrong space.
-- **The SQL `custom_fields` census drops fields intermittently.** Confirm with the field-loader; "missing field" is a finding I've been wrong about every time.
+## Working rules
 
-## 🧩 Durable structural patterns of this workspace
+Purpose > coverage. Mobile-first. Flag, do not fix. Never declare done on silence. A park is an answer only with a return trigger. A zero-strike answer plus a governing note means the question was asked at the wrong layer; re-ask higher. Constraints are binding rulings, not non-answers. Treat opposition as a finding. Check whether older v1 is a deliberate predecessor before flagging duplication. Do not cull the Gen-1 per-show label archive.
 
-- **STRUCTURE IS THE STATE MACHINE.** No field for state, so state lives in shape: **which container = how mature** · **which lists EXIST = how far along** · **naming punctuation = an undeclared field** (`{ braces }`, `[124]`, `|pipes|`, `<angles>`, `Person: Topic`). Milo's read; held on every space since. **Emptiness is information, and location is a lifecycle field nobody declared.**
-- **TRANSIENT STATE HAS NO MECHANISM; STEADY STATE IS WELL-BUILT** (Milo, 4×). Recurring availability is genuinely well-engineered; a one-off poll mints permanent schema. Open position → placeholder task. Production phase → a cloned list family. **One missing pattern, not four problems.**
-- **A CONTROLLED VOCABULARY GETS BUILT AS A LIST OF TASKS** (4×: `SHOW ROLES` 51 · `Inventory Header Categories` 58 · `SPAC Key Status` · `URITP Budget CODES` 244). **A large list of short similar records is usually a catalog, not a backlog.**
-- **THE CANONICAL ARTIFACT IS THE LAST THING YOU CAN JUDGE** — "correct" is defined by observed downstream behaviour, not internal tidiness. Corollary: **a template extracted from practice must keep being re-extracted**; ours drifted BEHIND its own clones.
-- **AN EMPTY FORWARD-LOOKING CONTAINER IS A SCAFFOLD, NOT A CORPSE.** Check whether what it waits on is in the future.
-- **A THIRD DISPOSITION EXISTS: "an industry tool already owns this"** (Lightwright, an EH&S system). **Not everything is ClickUp-vs-FileMaker.**
-- **A WELL-WIRED MODEL CAN LOOK LIKE A MESS FROM OUTSIDE.** The space he called "out of control" had relationships populated 351/351 and 553/558. **The data was never the problem; the container was.** Judge the wiring, not the vibe.
+## Ownership pointers
 
-## Tools — only where I hold a JUDGMENT the tool doesn't
-
-_Plain pointers deleted 2026-07-30: `teams/uritp-audit-council.md` owns the bench, the List Audit DoD owns the protocol, and re-listing them here was duplication that ate the cap. What stays is where I disagree with, or must not trust, a tool._
-
-- **List Audit DoD** (`12cwjm-76573`) — ⚠️ step 11 says the Workshop is **6 lenses, omitting Beckett**; `orchestration.md` 8b (locked later) says SEVEN. Unreconciled — **I seat seven.**
-- **Decision Logs — Gold Standard** (`12cwjm-76253`) — ⚠️ Template E carries the same 6-lens error. And the rule I personally keep breaking: **a Decision Log is a FEED, newest block on TOP.**
-- **List Index = `901327881037`** ⚠️ NOT `901327854042`, that's the Custom Field Dictionary. Cost real time twice.
-- **Closing Report format** — `audit-closing-report.md` (v0.6). **Mine, personal practice, NOT a house template** — don't cite it as one.
-
-## The fleet — only the non-obvious reads
-
-_Who-does-what lives in `teams/uritp-audit-council.md` + Felix's directory. These are the relational facts neither file holds._
-
-- **Milo:** every reversal this audit produced came from misreading INTENT, never data. **The failure mode is meaning, not measurement** — which is why he is not optional on a URITP subject.
-- **Wes:** he was right to stop my walk while I held a model-changing finding. **When a finding invalidates the frame, banking it outranks completing the sweep.**
-- **Corey + Fiona are a real working group with no home** — named as a pair four times, all four conversations still queued.
-- **Felix is the steward, I'm the auditor.** Bounded against Renata (repo-only), Beckett (artifact-break), Literal Lena (literal ask vs my root purpose).
-
-## How Michael works (audit-relevant)
-
-- He gets buried reciting fields/process; my job is to set that aside and ask **"why does this exist?"**
-- **Purpose > coverage.** "Done, no questions" gets pushed back on — say which purposes were trivial and which needed drilling.
-- Mobile-first: no fenced blocks, no wide tables in chat.
-- **Flag it, don't fix it.** An audit that quietly edits is the failure.
-- Never declare done on his silence. The completeness bar is mine.
-- **He answers in batches and parks deliberately.** A park is a real answer with a come-back trigger; check whether the question SHARPENED while parked.
-- 🚨 **A ZERO-STRIKE answer plus a governing note = the question was asked at the WRONG LAYER.** He's declining the premise that a structural question can settle before the programmatic one under it. **Re-ask higher up; never re-ask the same question.**
-- **Missing a mechanism, he answers with a CONSTRAINT, not a pick.** Binding ruling, not a non-answer — go solve the mechanism.
-- **When he opposes a proposal, the opposition is usually the finding.** Treat pushback as a seated adversary, not an objection to answer.
-- **v1→v2, confirmed 4×.** Builds cheap, graduates to a real structure, leaves v1 as history (RECEIPTS → BETA BUDGET · Gen-1 labels → contact sheets · `Theatre` → SHOW TEMPLATE · SAFETY Programs → `Policies`). **Ask whether the older copy is a PREDECESSOR before flagging duplication.** 🌟 The 4th was caught MID-FLIGHT with the migration note live in the bodies — so the pattern isn't "he leaves v1 behind," it's **"he runs both in parallel, on purpose, and says so in the record."**
-- **He reorders the walk and he's right.** A reorder is information about how the subject works.
-- 🗄️ **The Gen-1 per-show label fields are the pre-FY26 company archive. DO NOT CULL.** I flagged them for culling twice before learning that.
+- List Audit DoD: `12cwjm-76573`
+- Decision Logs Gold Standard: `12cwjm-76253`
+- List Index: `901327881037`; Custom Field Dictionary is `901327854042`.
+- Closing format: `audit-closing-report.md`, personal practice, not house template.
