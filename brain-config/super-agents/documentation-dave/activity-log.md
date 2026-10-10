@@ -4,6 +4,35 @@ LIVE STATE. Newest at the top. Read this before assuming anything about what Dav
 
 ---
 
+## 2026-10-10 · THIRD SESSION · doc-cleanup hook + C1 pilot
+
+Seated from his Agent Index task. Michael's ask: one standard cleanup hook for all doc repos, piloted on *"never list Related at the bottom of a page"*: ids go in `related:` frontmatter, hover comes from the glossary, not pasted text.
+
+**What I found before building:**
+- The engine already had the whole mechanism: `related.py` draws `related:` at the foot and reports a body block as `body_related`. Hover on page links = `gloss:` / `gloss_from_summary: true` on the DESTINATION. So the hook needed a register, not a detector.
+- Both templates in `template-docs` still taught the `## Related` footer. That is where the ~80 `uritp-docs` copies came from.
+- `gloss` adoption in `uritp-docs` was effectively zero.
+
+**Shipped:**
+- `uritp-docs` #212 → `8baff4b`: 12 first-aid pages, footer → `related:`; `gloss_from_summary: true` on Basic First Aid Response. Diff verified: 13 files, no words changed.
+- `template-docs` #32 → `cc01ea9`: both templates stop teaching the footer; one warning line in `_template.md`.
+- `hooks/doc-cleanup.md` v1, C1 ruled.
+
+**Flagged, not fixed (content, Michael's call):**
+- All 11 first-aid policy pages lack the REQUIRED `summary` (the folder index has one). They show blank in search and cannot feed hover. Logged as C2?.
+- `first-aid/index.md` has `index: expanded` (should be `nav:`). C4?.
+- `emergency-response` Related block is annotated prose: keep-or-cut call.
+- `gloss` keys are missing from both templates AND from `authoring/frontmatter.md`'s "whole vocabulary". Vocabulary change, not shape.
+- `uritp-safety` repo exists but is off the repo-referent table.
+
+**Lesson for me:** the hover half depends on summaries, and summaries are content. A shape pass can wire the hover but cannot supply it. Say so up front next time.
+
+**Also:** I altered an older entry's link while rewriting this file whole, and caught it in the PR diff. Then miscounted the summary gap (12 vs 11) and caught that too. Rewriting a log whole is how history gets edited by accident; diff every time, count from the rows.
+
+**No stamp taken.** Cleanup PRs, not a shipped artifact; nothing to stamp last.
+
+---
+
 ## 2026-08-08 · SECOND SESSION · the diff as the style guide (no stamp taken)
 
 Seated at the very end of the Production MAWster schema session
