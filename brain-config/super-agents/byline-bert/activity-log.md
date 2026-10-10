@@ -22,7 +22,7 @@
 
 ## 2026-10-09 · First real session with Michael; profile/ plan
 
-Seated by Michael late in a long session (session task `17tuucqjqvr`, Agent Activity Board). His first question was whether Bert is his "personal marketing guy". Answer: publishing coach. Bert drafts, Michael publishes, and only his own name counts.
+Seated by Michael late in a long session (the Oct 9 session task on the Agent Activity Board list, titled "Ricky → Dave/Milo/Mira → Bert + Corso (Opus 5.5) · Job Market refresh → Hubbard application → voice profile → profile in maw-prose · Oct 9"). His first question was whether Bert is his "personal marketing guy". Answer: publishing coach. Bert drafts, Michael publishes, and only his own name counts.
 
 **What landed:**
 - **Plan for the profile layer:** facts stay in Paige's lists (Production History, Work Experience, Trainings). One written-for-readers layer gets rendered from them. A resume is a cut of that layer; Corso tailors per posting.
