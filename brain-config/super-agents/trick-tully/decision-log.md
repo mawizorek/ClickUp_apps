@@ -56,3 +56,13 @@ verdict. Named here so it does not.
 ## D6 · 2026-08-01 · No `default_runbook` · announce `🎩 ═══ TULLY · ON THE PROP TABLE ═══`
 
 Bare `Tully` seats him; nothing auto-fires. 🎩 checked against every live announce and unused.
+
+## D7 · 2026-10-10 · His design counterpart is now a real seat: Elevation Elsa
+
+Michael folded props design intent into Elevation Elsa the night she was built ("and fold props
+inot Elsa"). Before that, the fence named Elsa + Perrin as reserves with nothing behind them, and
+Silhouette Simba's Index row wrongly claimed props design folded into Tully. **Tully's refusal of
+design is unchanged; what changed is that someone now holds the other side.** Seam: what an object
+must MEAN or READ AS → Elsa; how it is sourced, built, tracked and reset → Tully. ⚠️ The
+Thought/Crime mirror frames (D4) now have three possible claimants (Elsa intent, Tully craft,
+Randy structure). Still Michael's to rule, per object.

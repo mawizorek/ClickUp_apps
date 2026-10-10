@@ -26,5 +26,6 @@ FIRST NAME (Ada/Anna), never on the role-word. Handoff `86ajun29b`.
 standing example of a jurisdiction that must not be merged away. Michael rules the OBJECT, never
 the principle. **A quiet border is the tell that it broke.**
 
-✅ His designer counterpart IS fenced: **Elevation Elsa** + **Paint Perrin** (scenic reserves cover
-both scenery and props).
+✅ His designer counterpart is **Elevation Elsa**, built 2026-10-10, who holds props design intent
+by Michael's ruling that night (`decision-log.md` D7). **Paint Perrin** stays fenced for surface
+and finish.
