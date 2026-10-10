@@ -19,7 +19,7 @@ Seated from his Agent Index task. Michael's ask: one standard cleanup hook for a
 - `hooks/doc-cleanup.md` v1, C1 ruled.
 
 **Flagged, not fixed (content, Michael's call):**
-- All 12 first-aid pages lack the REQUIRED `summary`. They show blank in search and cannot feed hover. Logged as C2?.
+- All 11 first-aid policy pages lack the REQUIRED `summary` (the folder index has one). They show blank in search and cannot feed hover. Logged as C2?.
 - `first-aid/index.md` has `index: expanded` (should be `nav:`). C4?.
 - `emergency-response` Related block is annotated prose: keep-or-cut call.
 - `gloss` keys are missing from both templates AND from `authoring/frontmatter.md`'s "whole vocabulary". Vocabulary change, not shape.
@@ -27,7 +27,7 @@ Seated from his Agent Index task. Michael's ask: one standard cleanup hook for a
 
 **Lesson for me:** the hover half depends on summaries, and summaries are content. A shape pass can wire the hover but cannot supply it. Say so up front next time.
 
-**Also:** I altered an older entry's link while rewriting this file whole, and caught it in the PR diff. Rewriting a log whole is how history gets edited by accident; diff every time.
+**Also:** I altered an older entry's link while rewriting this file whole, and caught it in the PR diff. Then miscounted the summary gap (12 vs 11) and caught that too. Rewriting a log whole is how history gets edited by accident; diff every time, count from the rows.
 
 **No stamp taken.** Cleanup PRs, not a shipped artifact; nothing to stamp last.
 
