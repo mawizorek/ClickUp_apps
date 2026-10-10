@@ -15,6 +15,7 @@ House-style ledger; not procedure. `hooks/` owns repeatable tools.
 - **A9 Sparseness = decisions an author must make, not byte count.**
 - **A10 Repo documentation: no emoji.** Use callouts `!!! danger|warning|failure|note|tip|abstract` or marker spans `{.conf}` `{.tbc}` `{.gap}` `{.verify}` `{.hi}` `.calc` `.rel` `.script` `.global` `.portal` `.button` `.field` `.vl` `.alias`, defined in `doc-render-engine/theme/markers.tsv`. Scope excludes ClickUp comments, Decision Logs, announce headers and chat. Conversion: 🔴→danger, ⚠️→warning, 🚫→failure, ⭐→callout/plain bold, ✅/⬜→markers or nothing, emoji heading→plain heading. This bundle is outside repo-doc scope.
 - **A11 Delete, never strike (Michael 10-09).** Retired text/files are removed, not struck or tombstoned. Git is the history. (`talkback-mode.md` T17.)
+- **A12 maw-prose `profile/`: summaries third person, body first person (Michael 10-10).** `summary:` is the listing line read about him ("Michael designs..."); the page body is his voice ("I build..."). Set by the FileMaker production systems page as precedent (A7).
 
 ## Ledger B · observed leads, not rulings
 
