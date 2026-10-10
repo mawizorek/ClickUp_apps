@@ -1,108 +1,107 @@
 # humanize-prose · voice profile: Michael
 
-**Purpose:** Michael's own writing, measured, so every prose hook targets HIS voice instead of generic "human." This is the writing sample that `humanize-prose.md` says overrides the generic rules ("A writing sample overrides the generic rules"), and it closes that file's open design question 1 for one user.
+**Purpose:** Michael's own writing, measured, so every prose hook targets HIS voice instead of generic "human." This is the writing sample that `humanize-prose.md` says overrides the generic rules, closing that file's open design question 1 for one user.
 
-**Steward:** Documentation Dave (steward of `humanize-prose.md`). Shape, never substance.
+**Steward:** Documentation Dave (steward of `humanize-prose.md`) until Michael rules otherwise; Byline Bert proposed as content steward (see `routines/voice-refresh.md`). Shape, never substance.
 
-**Invocation:** `/humanize --voice=michael` · "in my voice" · "make it sound like me" · ANY prose shipped under Michael's name to a human outside the fleet (cover letters, emails, bios, student-facing course text). Does NOT apply to agent-to-agent text, decision logs or repo docs.
+**Invocation:** `/humanize --voice=michael` · "in my voice" · "make it sound like me" · ANY prose drafted for Michael to send or publish to a human outside the fleet. Does NOT apply to agent-to-agent text, decision logs or repo docs.
 
-**Born 2026-10-09** from 23 human-written samples (3 cover letters, 4 emails, 2 bios, 9 dictations, 5 teaching/production notes, 2024-08 to 2026-10). Sample manifest with links: Hubbard Street application task, comment thread. Samples were filtered against agent-authored text posted under his account; AI redrafts of his letters were excluded.
+**Measured from** 23 human-written samples (2024-08 to 2026-10) plus the 2026-09 Default Inbox mats/supplier chains. Refreshed by `routines/voice-refresh.md`; the sample ledger lives in ClickUp, never here.
 
-> PII rule: this repo is PUBLIC. This file quotes short phrases only. No phone numbers, emails, or third-party names.
+> PII rule: this repo is PUBLIC. Short phrases only. No phone numbers, emails, student or third-party names.
 
 ---
 
-## Two registers, never blended
+## Pick the register FIRST
 
-| Register | Where | Shape |
+Most of what gets drafted for Michael is working email. Do not default to the formal register; it is the rarest one.
+
+| Register | How often | Where |
 |---|---|---|
-| **Formal** | cover letters, bios, emails to strangers, student-facing course text | long multi-clause sentences, one short punch line, a humor parenthetical, Oxford commas, gratitude-forward close |
-| **Dictation** | his messages to Brain and to close colleagues | lowercase, `....` ellipses, CAPS for stress, "lol", `!!` and `?!?`, typos, run-ons |
-
-The hooks only ever WRITE in Formal. Dictation is input; never imitate it in an outgoing artifact, and never "fix" it when quoting him.
-
----
-
-## The Formal voice, measured
-
-**Openers.** He opens on a scene or a reaction, never on "I am writing to apply."
-- "The moment I saw your posting..., I knew I could waste no time in responding."
-- "Anytime that I attend a live performance for the first time, about forty percent of my focus..." ending on "The other ten percent? Probably thinking about dinner."
-- Emails: "Hey <Name> - " (spaced hyphen), "Hi <Name>!", "Hello!".
-
-**Rhythm.** A long, layered sentence, then a short one that lands: "And it never stops." Then a list that escalates: "There is always a new stitch, a unique practical, the 'first time that's been done' - the next production."
-
-**Punctuation he actually uses.**
-- Oxford comma, every time, in formal text ("processes, lexicon, and techniques").
-- Spaced hyphen ` - ` as his dash. Never an em or en dash.
-- Semicolons to join two related clauses.
-- Parentheses for asides that carry humor or a concrete detail: "(and with a little style)", "(and more recently: live dashboards)", the isomalt-vases-during-the-matinee story.
-- Contractions: moderate. "I've", "doesn't" are fine; he un-contracts when he wants weight.
-
-**Signature vocabulary.** Curious/curiosity · paperwork · knowledge base · documentation and archiving · "style points" / "with a little style" · "next time around" · "eliminate guess-work" · "digital-hoarder instinct" · "notoriously fleeting industry" · "Stay curious." Use at most one per piece. A signature repeated is a tic.
-
-**Proof style.** One concrete anecdote beats three adjectives. He proves a claim with a specific moment (rebuilding props mid-matinee), a count, or a system he built.
-
-**Closings.** Gratitude first, then the ask: "I would greatly appreciate the opportunity to meet with you." · "Thank you for your time and consideration." · Emails: "Best," / "Thanks for your time," / "Thank you,". Signature: `Michael A Wizorek (he/him)`.
-
-**Practical emails.** Short. Apologize briefly for a delay if there was one. Give availability as a plain list of windows. Bullet the technical specifics.
+| **A. Working email** | most frequent | colleagues, vendors, partners, staff, quick replies |
+| **B. Student-facing** | weekly in term | course emails, crew calls, enrollment notes, assignments |
+| **C. Notes and paperwork** | as needed | checklists, prep notes, production paperwork |
+| **D. Formal** | rare | cover letters, bios, first contact with a stranger |
+| **Dictation** | input only | his messages to Brain. Never imitate it in outgoing text, never "fix" it when quoting him |
 
 ---
 
-## His own tells (the hooks still fix these, in his voice)
+## A. Working email (the default)
 
-These show up in his unedited formal drafts. Fix them; keep the voice.
-- **Stacked self-assessment:** "my passion for theatre, technical plasticity, and collaborative leadership make me an excellent fit." Replace with one proof.
-- **Hype adverbs:** "thoroughly excited", "immediately curious", "endlessly grateful". Keep at most one.
-- **Stock nouns:** "unique opportunity", "excellent fit".
-- **Elevated word swaps:** "plasticity" for versatility, "congruent with" for like, "paperworks" (plural). One stretch word per piece is flavor; two reads as reaching.
-- **Recycled paragraph:** "I have been invested in making theatre for as long as I can remember..." appears in three letters. Fine to reuse the idea; rewrite the sentence per letter.
+- **Open:** "Hey <Name> - " · "Thanks <Name> -" · "Hi <Name>!" · sometimes straight into the point, no greeting.
+- **Body:** short paragraphs, logistics in order, often day by day ("Tuesday evening, you may pull them out again - and keep them... On Thursday, you can..."). States the plan, then the fallback ("or we'd potentially...").
+- **Spaced hyphens everywhere** as connectors and asides: "Monday is great - thanks." Never em or en dashes.
+- **Warmth is loud and quick:** `!!` with partners, "haha", "Oh my - shoot - I'm sorry. I got way caught up..." Apologizes once for a delay, then moves on.
+- **Offers a hand:** "could definitely help load it into your van!!" · "I'll bring my pcard and can process in person on monday!"
+- **Asides in parentheses:** "Just grabbing notes about inventory as I can (and replacements)."
+- **Close:** "Thx -" · "Thanks!" · "Best," · "Thanks for your time," · occasionally "THANKS~!". Signature `Michael A Wizorek (he/him)`.
+- **Length:** 2 to 6 sentences unless it is a plan.
+- **Not here:** opener hooks, humor beats by formula, signature coinages, Oxford-comma policing. Keep his casual punctuation.
+
+## B. Student-facing
+
+- **Open:** "Hello!"
+- **Structure:** what this is, the options laid out plainly ("The first option is... The second option is..."), what each requires with counts and days ("around (13) 3-hour weekly paint calls, typically on Mondays or Tuesdays").
+- **Tone:** encouraging and firm at once: "any level of experience is encouraged" next to "your commitment is required now."
+- **Spells out consequences and deadlines** (add/drop, attendance) without softening them.
+- Oxford comma yes. Spaced hyphen for the aside.
+
+## C. Notes and paperwork
+
+- Terse. Questions as prompts: "What does your show need?" · "Who is reading this and what do they need to be able to do with it?"
+- Imperative bullets: "Spell check & proofread" · "Is there a date?"
+- No prose connective tissue; the list is the document.
+
+## D. Formal (letters, bios, first contact)
+
+- **Open on a scene or reaction**, never "I am writing to apply." His: "The moment I saw your posting..., I knew I could waste no time in responding." · "...about forty percent of my focus..." ending "The other ten percent? Probably thinking about dinner."
+- **Rhythm:** long layered sentence, then a short one that lands ("And it never stops."), then an escalating list ("a new stitch, a unique practical, the 'first time that's been done' - the next production").
+- **Punctuation:** Oxford comma always · spaced hyphen · semicolons join related clauses · parentheses carry humor or a concrete detail ("(and with a little style)").
+- **Proof:** one concrete anecdote or count beats three adjectives.
+- **Signature vocabulary, max one per piece:** curious/curiosity · paperwork · knowledge base · "style points" / "with a little style" · "next time around" · "eliminate guess-work" · "digital-hoarder instinct" · "notoriously fleeting industry" · "Stay curious."
+- **Close:** gratitude, then the ask: "I would greatly appreciate the opportunity to meet with you." · "Thank you for your time and consideration."
+
+---
+
+## His own tells (fix these in his voice, any register)
+
+- Stacked self-assessment ("passion, technical plasticity, and collaborative leadership make me an excellent fit"): replace with one proof.
+- Hype adverbs ("thoroughly excited", "endlessly grateful"): max one.
+- Stock nouns ("unique opportunity", "excellent fit").
+- Stretch words ("plasticity", "congruent with", "paperworks"): max one per piece.
+- Recycled paragraphs across letters: reuse the idea, rewrite the sentence.
+- Typos and transcription errors: fix in outgoing text (they come from dictation, not intent). Leave them when quoting him.
 
 ---
 
 ## Per-hook overrides
 
-Run the five hooks in the same order as the generic pass. When this profile and a hook disagree, **this profile wins**, except on facts.
+Run the five hooks in the usual order. This profile wins over a hook except on facts. **Overrides apply to the register in use.**
 
-**1. humanizer (Wikipedia taxonomy)**
-- KEEP his three-item escalating lists. Rule-of-three is his rhythm, not padding, when the third item turns ("...the next production").
-- KEEP a humor parenthetical. Do not flag it as "parenthetical hedging."
-- Still cut: significance inflation, "not X, but Y" reveals, generic positive endings.
+| Hook | All registers | A. Working email | D. Formal |
+|---|---|---|---|
+| **humanizer** | cut significance inflation, "not X, but Y" reveals, generic positive endings | keep the plan + fallback shape | keep escalating three-item lists and one humor parenthetical |
+| **stop-slop** | no Wh- starters | fragments, `!!`, "haha" allowed; no scoring below 35 for casual punctuation | one short punch line and one comic beat allowed; one emotional adverb |
+| **avoid-ai-writing** | em/en dashes go, replace with ` - ` or a semicolon; his stock phrases are a personal Tier 2 | chat-artifact rule does NOT apply to his real warmth ("Thanks!!") | tiers as normal |
+| **skill-deslop** | contrasts only when they carry information | none | one callback/twist closer allowed |
+| **Strunk** | positive form, actor as subject | do not formalize; keep contractions and casual sign-offs | Oxford comma required; never cut the anecdote or humor beat |
 
-**2. stop-slop**
-- KEEP the short punch line after a long sentence ("And it never stops."). One per piece. stop-slop's "no staccato" rule applies to a SECOND one.
-- KEEP the opener question-and-answer joke ("The other ten percent? Probably thinking about dinner."). Rhetorical-setup ban is waived for one comic beat.
-- Adverb ban softened: keep one emotional adverb per piece; cut the rest.
-- No Wh- sentence starters still applies.
-
-**3. avoid-ai-writing (tiers)**
-- Dash rule: em and en dashes still go. Replace with his spaced hyphen ` - ` or a semicolon, not with a comma by default.
-- Tier lists unchanged. Add his own stock phrases (above) to a personal Tier 2: flag when two appear in one piece.
-
-**4. skill-deslop (tropes)**
-- The callback/twist closer is allowed once ("...and I've spent my career on the second"). It matches his opener-joke habit.
-- Keep "rather than" contrasts only when they carry information.
-
-**5. writing-clearly-and-concisely (Strunk)**
-- Oxford comma is REQUIRED in his formal voice. Add it if a pass removed it.
-- "Omit needless words" never deletes the humor beat or the anecdote. Those are his proof, not filler.
-
-**Milo / Mira / Dave seats:** unchanged. Facts beat voice; voice beats generic style.
+Facts beat voice; voice beats generic style.
 
 ---
 
-## Quick check (before anything ships under his name)
+## Quick check
 
-- Opens on a scene or reaction?
-- Exactly one humor beat, and one concrete anecdote or count?
-- Oxford commas present? Zero em/en dashes?
-- At most one signature phrase, one hype adverb, one stretch word?
-- Gratitude-forward close, signed `Michael A Wizorek (he/him)`?
+1. Right register? (When unsure: A.)
+2. Zero em/en dashes; spaced hyphens where he would use them?
+3. A: short, warm, plan-first, his sign-off? B: options, counts, deadlines, firm and kind? D: scene opener, one humor beat, one proof, gratitude close?
+4. Max one signature phrase, one hype adverb, one stretch word?
 
 ## Guardrails
 
-Never invent an anecdote to hit the "one concrete story" target; use a real one from the workspace or skip it. Never imitate dictation in outgoing text. Never quote third parties or contact details into this public file. Re-measure from fresh samples if Michael says "that doesn't sound like me"; this profile is a measurement, not a rule he signed.
+Never invent an anecdote, a number or a warmth beat he would not write. Never imitate dictation in outgoing text. Never put samples, names or contact details in this public file. Re-measure when Michael says "that doesn't sound like me"; this profile is a measurement, not a rule he signed.
 
 ## Changelog
 
-- **v1 (2026-10-09)** - Built from 23 samples on Michael's request ("write version of these humanizing hooks for precisely my style"). Shipped as ONE profile consumed by all five hooks, not five forked hooks: one claimant per fact.
+- **v2 (2026-10-09)** - Re-centered on register. v1 was cover-letter-shaped (Michael: "geared towards the expectation that we'll be writing cover letters every hour"). Working email is now the default register; formal demoted to rare. Added student-facing and notes registers and a per-register override table. Refresh routine proposed at `routines/voice-refresh.md`.
+- **v1 (2026-10-09)** - Built from 23 samples. One profile consumed by all five prose hooks, not five forks.
