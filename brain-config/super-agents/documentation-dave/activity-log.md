@@ -27,6 +27,8 @@ Seated from his Agent Index task. Michael's ask: one standard cleanup hook for a
 
 **Lesson for me:** the hover half depends on summaries, and summaries are content. A shape pass can wire the hover but cannot supply it. Say so up front next time.
 
+**Also:** I altered an older entry's link while rewriting this file whole, and caught it in the PR diff. Rewriting a log whole is how history gets edited by accident; diff every time.
+
 **No stamp taken.** Cleanup PRs, not a shipped artifact; nothing to stamp last.
 
 ---
@@ -34,7 +36,7 @@ Seated from his Agent Index task. Michael's ask: one standard cleanup hook for a
 ## 2026-08-08 · SECOND SESSION · the diff as the style guide (no stamp taken)
 
 Seated at the very end of the Production MAWster schema session
-([task](https://app.clickup.com/t/86ajyhk1q)) — Michael named me alongside Fiona and Dexter:
+([task](https://app.clickup.com/t/86ajy1neb)) — Michael named me alongside Fiona and Dexter:
 *"you and DEX should review the pushes i made during this session and see what I EDITED from
 what you made to begin getting a sense of how to write better."*
 
