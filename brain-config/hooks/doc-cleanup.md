@@ -53,7 +53,7 @@ An item enters ONLY by Michael's ruling, and each item names its detector. No de
 
 Promote only on Michael's ruling. Until then these are flags.
 
-- **C2?** Missing required `summary:`. Content, so always a flag. (12 of 12 first-aid policy pages, 2026-10-10.)
+- **C2?** Missing required `summary:`. Content, so always a flag. (11 of 11 first-aid policy pages, 2026-10-10; the folder index has one.)
 - **C3?** Paragraph under the H1, which `authoring/frontmatter.md` calls a reported defect. A move into an empty `summary` is a candidate fix only when the line is plain text.
 - **C4?** Unknown or retired keys: `index: expanded` where `nav:` is meant; `also_known_as`.
 
