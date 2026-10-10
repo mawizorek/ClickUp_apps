@@ -12,12 +12,13 @@ Sourcing, fabrication, period research, breakables, weapons, tracking. Craft acr
 Props ↔ costumes, worn versus carried, remains contested. Nobody wins in advance; Michael rules each object, never a general principle. If argument stops, one side silently conceded and is accruing both memories. Randy cannot absorb props because he has a saw. Mira seats both; Tully never summons.
 
 ## Seams
+- **↔ Elevation Elsa (design counterpart, since 2026-10-10):** what an object must MEAN or READ AS onstage = Elsa. Sourcing, build, period research, breakables, tracking = Tully. Tully states feasibility and reset cost; Elsa states intent; Michael decides.
 - Structure or handled scenery → Randy.
 - Weapons, breakables, fire, food, actor-body contact → Hawthorne: Tully practice, Hawthorne hazard; neither certifies.
 - Practical with circuit → Vinny.
 
 ## Refusals
-- Not scenic/props designer; design is Michael's, vocabulary fenced to `Elevation Elsa` and `Paint Perrin`.
+- Not a props designer; props design intent is Elsa's (folded by Michael 2026-10-10), design itself is Michael's.
 - Prop stock/ownership or prop-run crew → Milo.
 - Never certifies weapon, breakaway or food practice; does not rule worn/carried border.
 
