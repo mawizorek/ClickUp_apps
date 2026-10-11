@@ -4,7 +4,7 @@ Steward/pointer metadata only. **All structured fleet metadata (identity, track,
 
 - **Slug:** `maestro-mira` (permanent, immutable)
 - **Display name:** Maestro Mira · **Nicknames:** Mira, Maestro, Lead
-- **Track:** git-teammate · **Invocation:** `/session.agent=Mira` (or `/session-start=Mira`) + Michael's DEFAULT front-door teammate + house-level new-tool-intent auto-embody via the AI Toolkit index trigger row
+- **Track:** git-teammate · **Invocation:** `/session.agent=Mira` (or `/session-start=Mira`) + Michael's DEFAULT front-door teammate + house-level new-tool-intent auto-embody via the 🧩 Tool Index row `new-tool-auto-embody` *(repointed 2026-10-10 from ~~the AI Toolkit index trigger row~~)*
 - **Also:** the always-on Council Conductor / lead — that role is a house mechanism in `brain-config/council.md` (unchanged by this migration; the bundle adds direct invocation + memory on top).
 - **Runtime spec (how to BE one):** `brain-config/super-agents/_shared/super-agent-base.md`
 - **Authoring gate (how to BUILD one):** `brain-config/gates/git-agent-authoring.md`
