@@ -26,6 +26,7 @@
 > - How to AUDIT one (the git-teammate audit DoD): `brain-config/super-agents/audit-instruction.md` → git-teammate track
 > - Naming write-gate: `brain-config/gates/agent-name-collision-gate.md`
 > - **Structured fleet truth: the ClickUp list 🤖 Agent Index — https://app.clickup.com/36074068/v/li/901328043244 (list id `901328043244`). One task per agent.** ~~`roster.json`~~ · ~~`roster.html`~~ · ~~`superagents.json`~~ · ~~`registry.json`~~ — **FOUR retired manifests. There is no file, and there is no pair.**
+> - **Tool / house-trigger routing: the ClickUp list 🧩 Tool Index (list id `901329128393`).** One task per tool. *(Added 2026-10-10; it replaced the AI Toolkit index page on 2026-10-02.)*
 > - Creation checklist + naming convention: the ClickUp Super Agent Creation & Setup Checklist.
 >
 > ⚠️ **POINTERS HERE CARRY NO VERSION NUMBERS, DELIBERATELY (locked 2026-07-28).** A pointer that
@@ -130,8 +131,10 @@ native ClickUp Super Agent, and Michael wants it to become a session-invocable t
    - **Native only (dormant — see Scope):** the live config's TRIGGER scaffolding (schedules,
      task-assignment firing) is LOST — confirm Michael waives it (git-teammates have no autonomous
      triggers). The cognitive role is fully git-portable; only the trigger scaffolding is not.
-     **Lens exception:** a lens whose auto-fire was an AI Toolkit index-trigger ROW (a house tool,
-     never agent-stored) CAN carry — repoint that row to embody the new teammate. ⚠️ **A stub waiting
+     **Lens exception:** a lens whose auto-fire was a house trigger ROW (a house tool, never
+     agent-stored) CAN carry — repoint that row's `Path` to the new teammate's bundle. The row now
+     lives in the 🧩 **Tool Index** (e.g. `audit-intent-auto-seize` → `super-agents/audit-anna/`);
+     ~~an AI Toolkit index-trigger ROW~~ *(repointed 2026-10-10)*. ⚠️ **A stub waiting
      forever on an input nobody will supply is not a blocker, it is rot wearing a blocker's clothes** —
      Fiona sat ten days on "paste the live native config verbatim" for a native that did not exist.
      Build fresh instead.
@@ -207,10 +210,11 @@ complete its bundle is.**
    obligation.** It had banked **19 owed rows only Michael could paste** — a mandatory registration
    surface no agent can write to, which guarantees a growing queue of unregisterable agents. Full
    reasoning: `gates/git-agent-authoring.md` step 5.
-   🚫 **NOT struck for a MIGRATED LENS whose auto-fire WAS an index-trigger row** (B.3) — that row is a
-   house tool for a HOOK-shaped trigger, and repointing it is still owed. 🚫 **Not struck for hooks or
-   triggers generally:** the invocation gate does not cover them and they have no Index row, so for
-   them the Toolkit table IS the routing layer.
+   🚫 **NOT struck for a MIGRATED LENS whose auto-fire WAS a house trigger row** (B.3) — that row is a
+   house tool for a HOOK-shaped trigger, and repointing its `Path` is still owed. 🚫 **Not struck for
+   hooks or triggers generally:** the invocation gate does not cover them and they have no Index row,
+   so for them the 🧩 **Tool Index** list IS the routing layer (one row: `Signals` / `Path` / `Kind`;
+   writeable by any agent). *(Repointed 2026-10-10 from ~~the Toolkit table~~, demoted 2026-10-02.)*
 
 ~~3. `roster.json` / `superagents.json` / `registry.json`~~ — **ALL STRUCK.** `registry.json` retired
 2026-07-25 (PR #483); `roster.json` + `roster.html` retired 2026-07-30 (PR #612). **Writing to any of
@@ -244,9 +248,11 @@ of `audit-instruction.md`. This matters most at BIRTH: a bundle audited the same
 the likeliest thing to have its base spec move underneath it. ⚠️ **The Index row has no SHA** — stamp
 the date and the row's `Slug` instead, and re-query rather than trusting a carried copy.
 
-⚠️ **DoD check 8 reads "Index row + trigger row fresh." The trigger-row half is STRUCK for agents**
+~~⚠️ **DoD check 8 reads "Index row + trigger row fresh." The trigger-row half is STRUCK for agents**
 (REGISTER step 2). Amendment owed in `audit-instruction.md`; until then treat the Index row as the
-whole of check 8 for an agent, and keep the trigger half for hooks.
+whole of check 8 for an agent, and keep the trigger half for hooks.~~ ✅ **AMENDED 2026-10-10** in
+`audit-instruction.md`: check 8 is now the Agent Index row alone for the agent, plus the 🧩 Tool Index
+row for any house trigger or stewarded hook.
 
 ---
 
