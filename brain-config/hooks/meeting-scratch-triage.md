@@ -13,7 +13,7 @@
 2. Scope = URITP tree ONLY. Not staff-only, not all-meetings. Staff-only is too narrow (production meetings and post-mortems throw the identical bare-id soup); all-meetings is too broad (the propose-to-parent move only makes sense inside URITP's production tree).
 3. New scratch comment(s) carry the scratch signature: bare/partial task ids (`86xxxxxxx`), shorthand, naming declarations, fragments.
 
-**Front door: this file, and nothing else.** No ClickUp Skill, per the git-only tools lock (LOCKED 2026-07-25, `brain-config/skills-integration.md`). Registration is this file plus its AI Toolkit index trigger row.
+**Front door: this file, and nothing else.** No ClickUp Skill, per the git-only tools lock (LOCKED 2026-07-25, `brain-config/skills-integration.md`). Registration is this file plus its 🧩 Tool Index row (`meeting-scratch-triage`, list `901329128393`). *(Repointed 2026-10-10 from ~~its AI Toolkit index trigger row~~; that page was demoted 2026-10-02.)*
 
 **Established 2026-08-04** in the Staff Meeting session (URITP-2594). Seated through Maestro Mira; Fold-in Frank ruled net-new (sibling to the INBOX Triage Trigger, not a fold into the read-only Task-Context Orientation Gate).
 
@@ -96,4 +96,5 @@ The output IS the appended block. Close with a one-line tally: pointers resolved
 
 **Changelog:**
 
+- **v1.1 (2026-10-10)** — Registration line repointed from the demoted AI Toolkit index trigger row to the 🧩 Tool Index row. No behavior change.
 - **v1 (2026-08-04)** — Established in the Staff Meeting session (URITP-2594), seated through Maestro Mira. Fold-in Frank ruled NET-NEW, sibling to the INBOX Triage Trigger (shared propose-first DNA, neither list nor routines shared) rather than a fold into the read-only Task-Context Orientation Gate or the MOVE/COMBINE INBOX Triage Trigger. Workshop pass set the guardrails: raw scratch sacred (append never overwrite), one consolidated block not per-comment replies, resolution honesty over guessing, propagate batched behind a greenlight, no itemized inventory. Michael's scope call: URITP meeting-type tasks only. Michael's Part B reframe: the tool PROPOSES greenlight merges as pickup lines and the rewritten comment is the "what is Brain planning to do" surface; execution held until guesses prove consistent, then automated from there like INBOX triage. Manual-fire in phase 1.
