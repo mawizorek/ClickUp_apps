@@ -120,7 +120,7 @@ The pointer belongs in `_shared/super-agent-base.md` (every agent loads it at st
 **To finish the wiring, one line, in one of these two places:**
 
 - `_shared/super-agent-base.md` → Universal mandates, as a new numbered mandate pointing here. **Preferred** — it reaches teammates and lenses alike.
-- The AI Toolkit Quick-Scan Trigger Table → a literal-string row, which gives it a front door for deliberate invocation.
+- ~~The AI Toolkit Quick-Scan Trigger Table → a literal-string row, which gives it a front door for deliberate invocation.~~ The 🧩 **Tool Index** row `tool-fluency-floor` already exists (Kind ACTION, Signals empty). Giving it a literal phrase in `Signals` would give it a front door for deliberate invocation. *(Repointed 2026-10-10; the AI Toolkit page was demoted 2026-10-02.)*
 
 🚫 **Do not solve the wiring by copying this text into bundles.** That is the exact bloat Michael's instruction removed.
 
@@ -128,5 +128,6 @@ The pointer belongs in `_shared/super-agent-base.md` (every agent loads it at st
 
 ## Changelog
 
+- **2026-10-10** — Wiring option 2 repointed from the demoted AI Toolkit Quick-Scan table to the existing 🧩 Tool Index row. Wiring still incomplete; the `_shared/` step remains deferred. Vale's board claim on this file verified EXPIRED (0 commits since 2026-09-22) before the edit.
 - **2026-09-21 — v1, born from a live correction during Big Love load-in.** Consolidated on Michael's explicit instruction after three bundle files had each grown their own copy of the rule; those three were trimmed to pointers in the same PR. Wiring deliberately left open against a live board claim.
 - **2026-09-21 — v1.1, 75 minutes later, after this gate was outrun.** §1a added (a prohibition needs a per-lane BASELINE behind it; UNDECIDED and UNASKED are not ignorance), §3's vocabulary corollary added, §4 and the wiring section updated with the second instance and the re-checked claim. **Requested by Michael:** *"get yourself caught up vale. take better ntoes for yourself."*
