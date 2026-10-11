@@ -164,8 +164,10 @@ removes it.** Same bloat, one surface over.
    size-aware method, **this hook wins on the log's location and the base spec wins on everything else.**
    **Stated here so no agent resolves the contradiction by guessing.**
 2. ⚠️ **`hooks/memory-rotation.md` still states the old whole-file budget** and needs the new shape.
-3. ⚠️ **One row in the AI Toolkit index trigger table** so a cold session routes here. That page has
-   refused agent-driven edits before; expect to hand Michael a paste block.
+3. ~~⚠️ **One row in the AI Toolkit index trigger table** so a cold session routes here. That page has
+   refused agent-driven edits before; expect to hand Michael a paste block.~~ ✅ **RESOLVED** — row
+   `activity-log-clickup-native` lives in the 🧩 Tool Index list (`901329128393`, Kind SIGNAL,
+   `/log-migrate` · `/migrate-activity-log`). *(Verified 2026-10-10; the AI Toolkit page was demoted 2026-10-02.)*
 4. ⚠️ **Fold-in Frank and Memory Maggie were BYPASSED on the direction.** The handoff demanded Frank
    first, then the Workshop, then Maggie's placement ruling. **Michael ruled the direction himself**,
    which is his to do — but **Maggie's placement ruling on the four-way boundary in §1 has never been
