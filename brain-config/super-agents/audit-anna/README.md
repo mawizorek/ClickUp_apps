@@ -4,7 +4,7 @@ Steward/pointer metadata only. **All structured fleet metadata (identity, track,
 
 - **Slug:** `audit-anna` (permanent, immutable)
 - **Display name:** Audit Anna · **Nicknames:** Anna, Audit, Root-It
-- **Track:** git-teammate · **Invocation:** `/session.agent=Anna` (or `/session-start=Anna`) + house-level audit-intent auto-seize via the AI Toolkit index trigger row
+- **Track:** git-teammate · **Invocation:** `/session.agent=Anna` (or `/session-start=Anna`) + house-level audit-intent auto-seize via the 🧩 Tool Index row `audit-intent-auto-seize` *(repointed 2026-10-10 from ~~the AI Toolkit index trigger row~~)*
 - **Runtime spec (how to BE one):** `brain-config/super-agents/_shared/super-agent-base.md`
 - **Authoring gate (how to BUILD one):** `brain-config/gates/git-agent-authoring.md`
 - **Lifecycle runbook:** `brain-config/gates/git-teammate-lifecycle-runbook.md`

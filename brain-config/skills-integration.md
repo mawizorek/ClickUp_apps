@@ -2,6 +2,8 @@
 
 *Established 2026-07-18. This page defines how native ClickUp AI Skills relate to the git-hosted brain-config runtime (hooks / gates / agents / teams), so the two layers compose instead of drifting into competing copies of the same logic. It is the canonical answer to "when do I reach for a Skill vs. a git file, and how do they connect?"*
 
+> ⚠️ **REPOINTED 2026-10-10.** Every live instruction below that said *"AI Toolkit index row"* now says **🧩 Tool Index row** (ClickUp list `901329128393`, fields `Signals` / `Path` / `Kind`). The AI Toolkit index page was demoted 2026-10-02 because no agent can write to a table-bearing doc page. Historical sentences describing what the index WAS are left as written.
+
 ---
 
 ## 🚫 SKILLS ON HOLD (LOCKED 2026-07-25)
@@ -12,7 +14,7 @@ So, until Michael lifts this:
 
 - **Tools live in git only.** A new hook, gate, agent, procedure, or routine is a file in `brain-config/`. Full stop.
 - **Do NOT create a new ClickUp Skill.** Not as a front door, not as a pointer, not "just for discoverability."
-- **Do NOT add a skill reference to a git tool.** A git tool's trigger lives in its own Invocation + Trigger block plus its AI Toolkit index row. That is the whole invocation surface. `hooks/doc-rot-sweep.md` is the reference shape.
+- **Do NOT add a skill reference to a git tool.** A git tool's trigger lives in its own Invocation + Trigger block plus its 🧩 Tool Index row. That is the whole invocation surface. `hooks/doc-rot-sweep.md` is the reference shape.
 - **Existing installed Skills are untouched**, not retroactively banned. As of this lock: EMAIL-INGEST, QUESTION-ME, AUDIT-LOOP, PICKUP-SESSION, CODE-REVIEW, DOC-ROT-SWEEP. DOC-ROT-SWEEP was created against this rule and is deprecated in place; the git hook is canonical. The rest stand until Michael reviews them.
 - **This is a standing rule, not a one-off.** It applies to every domain and every future build, per the corrections-generalize rule.
 
@@ -28,12 +30,12 @@ ClickUp shipped **AI Skills**: native, workspace-resident instruction playbooks 
 
 | brain-config (git) | Native AI Skill |
 | --- | --- |
-| AI Toolkit index trigger-table row | Skill **summary** (the always-visible fire signal) |
+| 🧩 Tool Index row (`Signals`) — ~~AI Toolkit index trigger-table row~~ | Skill **summary** (the always-visible fire signal) |
 | A gate / agent / hook profile | Skill **instructions** (the on-demand body) |
 | Fire-always hook | Skill status **Active** (auto-loads for installed users) |
 | A named single-agent call | Skill **`/slash-command`** |
 | git commit history | Skill **description history** |
-| The AI Toolkit index doc | The **Skills Hub** |
+| The 🧩 Tool Index list — ~~The AI Toolkit index doc~~ | The **Skills Hub** |
 | The repo | The auto-created **Skills Space** |
 
 Because they are the same shape, the risk is **drift**: the same logic living canonically in two places, edited on one side, stale on the other. That is the exact failure that stranded agents in the registry↔index mirror pair. The rest of this page is how we prevent that.
@@ -58,7 +60,7 @@ This is the rule. A Skill owns **when to run** (the trigger signal, carried by i
 
 ⚠️ **And the correction itself needed correcting (2026-08-01).** The 07-25 text named ~~`roster.json`~~ as *"the single documented source for agents"* — **that file was retired to a tombstone stub five days later** (2026-07-30, with `roster.html`). **The fleet record is the 🤖 Agent Index ClickUp list** (`901328043244`). **Four manifests retired in all.** Worth noting where it landed: a sentence about eliminating duplicate sources of truth went stale by naming one, which is the most on-the-nose instance of this failure in the repo.
 
-Everything must avoid the reconcile-both-sides burden. If a Skill copied a git gate's steps, the moment someone edited the gate, the Skill would silently serve stale instructions with no error and no flag. Pointing at git means the Skill inherits every git change for free. This mirrors how Brain memory already works: memory holds ONE line pointing at the AI Toolkit index, never a second copy of it.
+Everything must avoid the reconcile-both-sides burden. If a Skill copied a git gate's steps, the moment someone edited the gate, the Skill would silently serve stale instructions with no error and no flag. Pointing at git means the Skill inherits every git change for free. This mirrors how Brain memory already works: memory holds ONE line pointing at the routing layer (now the 🧩 Tool Index; ~~the AI Toolkit index~~), never a second copy of it.
 
 ⚠️ **A pointer is only free while its TARGET is alive.** When `roster.json` was retired, 26 files pointing at it kept resolving and returning nothing — **and an empty read is indistinguishable from a clean pass.** The pointer model is still right; the missing half is that **retiring a target obliges you to sweep every pointer aimed at it in the same pass** (`hooks/doc-rot-sweep.md` test C, `hooks/fleet-fact-sweep.md`).
 
@@ -70,8 +72,8 @@ Everything must avoid the reconcile-both-sides burden. If a Skill copied a git g
 
 - ~~**Build a Skill when** the thing needs a native trigger, a shareable/permissioned front door, a `/slash-command`, team-install, or is a self-contained playbook a teammate could run without touching the repo. Skills are strong at: shallow, shareable, single-purpose, discoverable.~~
 - **Keep it in git when** it needs deterministic multi-step orchestration, deep nesting, PR/revert, cross-referencing, or has real commit-history value. git is strong at: deep, orchestrated, versioned, engine-level. **(Under the hold: keep it in git, period.)**
-- ~~**The common case is BOTH:** a thin Skill (trigger + pattern) fronting a git file (steps). Native discoverability up top, deep engine underneath, single source of truth in the repo.~~ **This exact guidance is what produced the DOC-ROT-SWEEP mistake on 2026-07-25.** A git tool gets its trigger from its own Invocation + Trigger block and its AI Toolkit index row. Discoverability does not require a second surface.
-- **Under the hold, a git tool is invocable on its own.** Give it: a `Purpose`, a `Mode`, an `Invocation` line listing slash-style and natural-language phrasings, a `Trigger` line listing the conditions that fire it, and one AI Toolkit index row. See `hooks/doc-rot-sweep.md`.
+- ~~**The common case is BOTH:** a thin Skill (trigger + pattern) fronting a git file (steps). Native discoverability up top, deep engine underneath, single source of truth in the repo.~~ **This exact guidance is what produced the DOC-ROT-SWEEP mistake on 2026-07-25.** A git tool gets its trigger from its own Invocation + Trigger block and its 🧩 Tool Index row. Discoverability does not require a second surface.
+- **Under the hold, a git tool is invocable on its own.** Give it: a `Purpose`, a `Mode`, an `Invocation` line listing slash-style and natural-language phrasings, a `Trigger` line listing the conditions that fire it, and one 🧩 Tool Index row. See `hooks/doc-rot-sweep.md`.
 
 ### The consumer test (what may live inline in a Skill body) — CORRECTED 2026-07-18
 
@@ -104,12 +106,12 @@ Rule of thumb: if you can imagine writing "per the X standard" in another agent'
 
 ## How this grows with the existing (and expanding) git setup
 
-- **New reusable behavior?** **Under the hold: it is a git file. Do not ask the decision rule.** Give it a self-contained Invocation + Trigger block and one AI Toolkit index row. ~~Ask the decision rule + the consumer test. Teammate-facing / triggerable / shareable → Skill (thin, pointing at git for any steps other agents could need).~~ Engine-level / orchestrated / versioned / multi-consumer → git file. *(struck 2026-07-25)*
+- **New reusable behavior?** **Under the hold: it is a git file. Do not ask the decision rule.** Give it a self-contained Invocation + Trigger block and one 🧩 Tool Index row. ~~Ask the decision rule + the consumer test. Teammate-facing / triggerable / shareable → Skill (thin, pointing at git for any steps other agents could need).~~ Engine-level / orchestrated / versioned / multi-consumer → git file. *(struck 2026-07-25)*
 - **Promoting an existing git hook to a Skill?** **Don't, while the hold is active.** When it lifts: do NOT copy its steps into the Skill. Create a thin Skill that triggers and points at the existing git file. The git file stays canonical.
 - **Editing a fronted git file?** Nothing to sync on the Skill side, that's the whole point of the pointer. The Skill inherits the change. ~~(Contrast the registry↔index mirror pair, where you MUST reconcile both sides.)~~ *(struck 2026-07-25: registry retired, no mirror pair exists.)*
 - **RETIRING a fronted git file?** ⚠️ **This is the case the pointer model does NOT handle for free** (added 2026-08-01). Every pointer aimed at the retired file keeps resolving and returns nothing. **Sweep the pointers in the same pass as the retirement**, or you ship a silent failure that reads as a pass.
 - **Drift check (standing, survives the hold):** if you ever find a Skill body restating steps/facts that also live canonically in git, OR holding content another agent would need, that's drift. Move it to git and replace with a pointer. A Skill should read as "here's when + the shape; the steps live at `brain-config/X`," not as a second copy of X.
-- **AI Toolkit index:** the index remains the deterministic zero-discretion routing layer for Brain's own sessions, and **under the hold it is the only trigger surface for a git tool.** Skills add a native, shareable, teammate-facing trigger surface on top when the hold lifts. Complementary layers, not replacements: index for guaranteed in-session firing, Skills for shareable on-demand invocation.
+- **🧩 Tool Index** (~~AI Toolkit index~~, demoted 2026-10-02)**:** the list is the deterministic zero-discretion routing layer for Brain's own sessions, read through its table-free projection page *Tool Index — Signal Routing*, and **under the hold it is the only trigger surface for a git tool.** Skills add a native, shareable, teammate-facing trigger surface on top when the hold lifts. Complementary layers, not replacements: Tool Index for guaranteed in-session firing, Skills for shareable on-demand invocation.
 
 ---
 

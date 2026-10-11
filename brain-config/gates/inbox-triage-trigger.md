@@ -31,7 +31,7 @@ Beat 1 (interrogate/plan) already executes well — the plans are correct. The O
 Observed failures this closes (7/15/26): (a) greenlit to COMBINE, agent posted the email as ONE lump comment and marked the task "for ref only" instead of the full standard (verbatim-email-first / notes-second / backtrack / linked-tasks relationship / close to CLOSED-type) — ~10% of the routine, because neither the thread nor the doc was reloaded.
 
 **You cannot force a git fetch from inside git.** The pointer that makes an agent load the workflow lives in what the agent reads by default — THREE always-surfaced places, any one enough to route you here:
-1. **The AI Toolkit index trigger table** (Brain loads every pass): rows for "assigned to INBOX ▸ Default" and "greenlight/execute on INBOX ▸ Default" point here.
+1. **The 🧩 Tool Index** (row `inbox-triage-trigger`, projected on the *Tool Index — Signal Routing* page Brain loads every pass). ⚠️ The assigned-to / greenlight-on INBOX ▸ Default rows now front the **EMAIL-TRIAGE skill** (2026-08-14), which names the procedure doc live. *(Repointed 2026-10-10 from ~~the AI Toolkit index trigger table~~, demoted 2026-10-02.)*
 2. **The list's read-before-acting page** (URITP ▸ INBOX ▸ Default): points at the triage doc + this gate.
 3. **The Plan Comment's ⚙️ execution footer** (strongest anchor at greenlight): every Plan Comment ends with the GREENLIGHT OPENING SEQUENCE + the reload instruction + the exact routine steps, so an agent replying to a greenlight reads them INLINE even with otherwise-blank context.
 
@@ -94,6 +94,7 @@ Written to be agent-portable from the start ("any agent assigned to a task in th
 When ANY trigger-detection condition matches, load the ClickUp procedure doc and act on it. On a greenlight you must run the GREENLIGHT OPENING SEQUENCE (hunt intake → read full thread → reload doc) and may not MOVE/COMBINE/close unless you loaded that doc THIS TURN. Never run from memory of what it "probably says" — other agents edit the doc without notice, so the live same-turn read IS the gate.
 
 ## Changelog
+- 2026-10-10 — Routing point 1 repointed from the demoted AI Toolkit index trigger table to the 🧩 Tool Index row; noted the EMAIL-TRIAGE skill now fronts the INBOX ▸ Default rows. No behavior change.
 - 2026-08-03 (v7) — **COMBINE is now atomic via `merge_tasks`.** Updated Beat 2 detail: COMBINE's primary path is a single `merge_tasks` call (source=inbox task, destination=canonical). Legacy multi-step copy-and-close retained as fallback for partial-content scenarios. MOVE's existence-check also routes through merge when a target already exists.
 - 2026-07-15 (v6) — added the **GREENLIGHT OPENING SEQUENCE**: on greenlight, before any write, the executing agent must (1) hunt down + read the original intake entirely, (2) read the full follow-up Q&A thread after it, (3) reload the procedure doc for what the named action means, THEN execute. Directly targets the confirmed pattern where Beat 1 plans well but a cold-context Beat 2 agent improvises the execution.
 - 2026-07-15 (v5) — BLANK-CONTEXT GUARD (no triage write unless the doc was loaded THIS TURN) + plan-comment ⚙️ execution footer as greenlight self-anchor + named the three always-surfaced routing points.

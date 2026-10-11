@@ -91,13 +91,14 @@ Lenses live at `../agents/<slug>.md`; the Index points at them. **Nothing duplic
 1. **Name-collision gate** (`../gates/agent-name-collision-gate.md`) — the Index namespace, nicknames weighted equally.
 2. **Authoring gate** (`../gates/git-agent-authoring.md`) — full bundle if it needs memory; a single `agents/<slug>.md` if it's a lens.
 3. **One row in the Agent Index.** This is the wiring — without it, STEP 0 can't find it.
-4. **A trigger row in the AI Toolkit index** if it has firing behavior worth routing on.
+4. ~~**A trigger row in the AI Toolkit index** if it has firing behavior worth routing on.~~ **A row in the 🧩 Tool Index list** (`901329128393`) ONLY for a hook-shaped house trigger the agent fires on (e.g. Anna's `audit-intent-auto-seize`). 🚫 **No per-agent invocation row** — STRUCK 2026-09-21, the Agent Index row IS the resolution path (`../gates/git-teammate-lifecycle-runbook.md` REGISTER step 2). *(Repointed 2026-10-10; the AI Toolkit page was demoted 2026-10-02.)*
 5. Branch → PR → self-merge for the bundle.
 
 That's it. No mirror, no second manifest, no sync obligation.
 
 ## Changelog
 
+- **2026-10-10: step 4 repointed** off the demoted AI Toolkit index page to the 🧩 Tool Index list, and narrowed to house triggers only (per-agent invocation rows were struck 2026-09-21).
 - **2026-07-30: THE INDEX IS A CLICKUP LIST.** `roster.json` + `roster.html` retired to tombstone stubs; resolution is a single-row query against 🤖 Agent Index. Michael: *"it's a table. not a doc."* The slim rule is retired because the ceiling it enforced no longer exists — replaced with a one-line-Lane rule and a standing warning that prose can still colonize a field. Third retired manifest; the never-mirror ruling restated.
 - 2026-07-25: **SINGLE SOURCE.** `roster.json` slimmed 25KB → ~14KB and restructured into ONE flat list of one-liners. **`registry.json` RETIRED** to a tombstone stub. **The 2026-07-17 Mirror-Pair Sync Mandate retires with it.** Class vocabulary aligned to Michael's words. **Dev Dexter registered** (the registration the read-cap wall had blocked). Michael's Q4 ruling, Fleet Build Queue Decision Log.
 - 2026-07-25: Dev Dexter built (Build & Engineering Lead) — PR #475, roster row initially blocked by the read-cap wall.

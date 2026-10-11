@@ -14,7 +14,7 @@ accent: "oklch(66% 0.17 35)"
 **This lens is retired. Audit Anna is now a git-teammate.**
 
 - **Live home:** `brain-config/super-agents/audit-anna/` (preferences.md = full role, + memory / activity-log / decision-log / README / audits).
-- **Invocation:** `/session.agent=Anna` (or `/session-start=Anna`) + the AI Toolkit index audit-intent auto-seize trigger row (which now embodies the git-teammate).
+- **Invocation:** `/session.agent=Anna` (or `/session-start=Anna`) + the 🧩 Tool Index row `audit-intent-auto-seize` (which embodies the git-teammate). *(Repointed 2026-10-10 from ~~the AI Toolkit index audit-intent auto-seize trigger row~~; that page was demoted 2026-10-02.)*
 - **Runtime spec:** `brain-config/super-agents/_shared/super-agent-base.md`. **Migration record:** the git-teammate's `decision-log.md` + the lifecycle runbook `gates/git-teammate-lifecycle-runbook.md`.
 
 Do NOT edit or invoke this file as the live agent. It stays as a redirect only (a lingering invocation path may still resolve here).

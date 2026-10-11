@@ -1,6 +1,6 @@
 # brain-config changelog
 
-Human-readable history of the AI Toolkit runtime layer. The repo has full git history; this is the fast-scan version so you (or the next agent) can see the toolkit's evolution without spelunking commits. Mirrors the changelog on the ClickUp AI Toolkit index.
+Human-readable history of the AI Toolkit runtime layer. The repo has full git history; this is the fast-scan version so you (or the next agent) can see the toolkit's evolution without spelunking commits. ~~Mirrors the changelog on the ClickUp AI Toolkit index.~~ *(Struck 2026-10-10: that page was demoted 2026-10-02 and routing now lives in the 🧩 Tool Index list, which keeps no changelog. This file stands alone.)*
 
 **Newest at top** (repo-wide convention, see `team-standard.md` → Repo Coordination): prepend new entries, never append.
 

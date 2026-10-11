@@ -6,7 +6,7 @@
 
 ## Why this gate exists
 
-AI Skills are the platform-native version of the AI Toolkit index + gate/agent profiles — same shape, so the same-logic-in-two-places drift risk is real (the registry↔index failure class). This gate is the pre-write checkpoint that keeps every new skill on the right side of the governing law before it's built, not after it's already drifting.
+AI Skills are the platform-native version of the 🧩 Tool Index (routing rows) + gate/agent profiles — same shape, so the same-logic-in-two-places drift risk is real (the registry↔index failure class). *(Repointed 2026-10-10 from ~~the AI Toolkit index~~, demoted 2026-10-02.)* This gate is the pre-write checkpoint that keeps every new skill on the right side of the governing law before it's built, not after it's already drifting.
 
 **The law (from `skills-integration.md`):** *Skill = TRIGGER + PATTERN, git = STEPS. The skill points at git, never copies it. If any other agent could need it, it lives in git. Only sanctioned duplication is the registry↔index mirror pair.*
 

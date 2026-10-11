@@ -198,8 +198,14 @@ PASS / PARTIAL / GAP, record via PR under `<slug>/audits/`.
    a live token is a finding. **Scan the Agent Index `AKA` + `Invoke` fields INCLUDING retired rows**
    (a retired name is still taken). ⚠️ ~~`roster.json` → `invocation.tokens`~~ — that field died with
    the file; a token check reading it clears EVERY collision silently.
-8. **Index row + trigger row fresh** — the AI Toolkit Quick-Scan trigger row matches the Agent Index
-   row, and any row that pointed at a migrated agent's OLD lens path now points at the bundle.
+8. **Index row + routing row fresh** — ~~the AI Toolkit Quick-Scan trigger row matches the Agent Index
+   row, and any row that pointed at a migrated agent's OLD lens path now points at the bundle.~~
+   **AMENDED 2026-10-10** (the lifecycle runbook flagged this as owed): for the AGENT itself the
+   **Agent Index row is the whole of check 8** — per-agent trigger rows were STRUCK 2026-09-21
+   (`gates/git-teammate-lifecycle-runbook.md` REGISTER step 2). For any **house trigger** the agent
+   fires on, or any hook/gate it stewards, the 🧩 **Tool Index** row (list `901329128393`) exists,
+   its `Path` resolves to the LIVE home (bundle, not old lens path), and its `Kind` matches the
+   file's stated Mode. The AI Toolkit Quick-Scan table was demoted 2026-10-02 and is not checked.
 9. **Inherited memory labelled** — a freshly graduated agent's `memory.md` marks seeded lines
    INHERITED, not earned, so its first real session replaces reconstruction with lived context.
 10. **SHA STAMPS PRESENT — the record names the bytes it audited** *(added 2026-07-28, v0.3; Q11 → C)*.
@@ -290,6 +296,11 @@ The repo PR body and the ClickUp Activity Log thread tell the same story from bo
 
 ## Changelog
 
+- **2026-10-10: DoD check 8 amended (no version bump; wording repoint, not a new bar).** The
+  trigger-row half named the AI Toolkit Quick-Scan table, demoted 2026-10-02 and never agent-writeable.
+  For agents, check 8 is now the Agent Index row alone (per-agent trigger rows struck 2026-09-21); for
+  house triggers and stewarded hooks it checks the 🧩 Tool Index row's existence, `Path` and `Kind`.
+  Closes the amendment `gates/git-teammate-lifecycle-runbook.md` VERIFY said was owed.
 - **2026-08-01: v0.7 / DoD v0.4. Repointed off `roster.json` (retired 07-30) and hardened against
   the empty-source failure.** Twelve reads across this file told auditors to verify against a
   tombstone; **DoD check 3 was the worst — it verified a row in an empty file and therefore PASSED

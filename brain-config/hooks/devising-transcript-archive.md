@@ -12,7 +12,7 @@
 
 **Front door: this file, and nothing else.** No ClickUp Skill. Tools live in git only (LOCKED 2026-07-25).
 
-⚠️ **INDEX-REGISTERED 2026-08-14 (v2).** This hook sat in git but was NOT on the AI Toolkit index for its first ~7 hours, so a cold agent could not route to it and rebuilt the convention from scratch. The index IS the routing layer; an unregistered hook is invisible. Authoring a tool is not done until it is on the index.
+⚠️ **INDEX-REGISTERED 2026-08-14 (v2).** This hook sat in git but was NOT on the AI Toolkit index for its first ~7 hours, so a cold agent could not route to it and rebuilt the convention from scratch. The index IS the routing layer; an unregistered hook is invisible. Authoring a tool is not done until it is on the index. *(2026-10-10: "the index" now means the 🧩 Tool Index list, row `devising-transcript-archive`. The AI Toolkit page was demoted 2026-10-02.)*
 
 **Established 2026-08-14** by Brain, during the Arline Hansen (Seneca Towers) intro-session transcription.
 
@@ -126,6 +126,7 @@ Participants: Nigel, Arline
 
 ## Changelog
 
+- **v7.1 (2026-10-10)** — Registration note repointed: "the index" now means the 🧩 Tool Index list. No behavior change.
 - **v1 (2026-08-14)** — Established. Single-subject recordings → raw timestamped `.md` in `uritp-docs/production/<CODE>/transcriptions/`. First file: `260814_ARLINE.md` (TIM-D, Seneca Towers).
 - **v2 (2026-08-14)** — Registered on the AI Toolkit index. Added the split-file transcription fallback. Logged the direct-to-`main` commit slip. Added the private-repo/PII guardrail.
 - **v3 (2026-08-14)** — Names come from the SOURCE FOLDER, not the audio. Old "correct nothing" rule had shipped seven residents' names wrong. Narrowed no-correction to folder-grounded names.
