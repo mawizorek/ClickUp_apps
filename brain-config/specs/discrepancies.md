@@ -1,6 +1,6 @@
 # The Discrepancies list: one row shape every sweep can fill and any agent can apply
 
-⚠️ **SCOPED 2026-10-11, NOT GREENLIT.** Rulings owed in §10.
+⚠️ **SCOPED 2026-10-11. DECISION-COMPLETE, NOT YET BUILT.** Rulings resolved in §10.
 
 🔴 **READ THIS FIRST: the reason this is ONE list and not six is that six sweeps already produce findings and not one of them produces anything appliable.** The Doc-Rot Sweep writes prose. DOC REVIEW 001 wrote a twelve-row punch list inside a task comment. The receipt reconciliation wrote a markdown attachment. The budget-code mapper writes JSON. Every one of them ends with a human re-reading the finding and deciding what to do, which is the work the finding was supposed to remove.
 
@@ -39,7 +39,9 @@ Stacked, one field per line, because a ten-column table is unreadable on a phone
 
 **Name** — generated, `<subject> · <field> · <A> ≠ <B>`. Human-scannable, never parsed.
 
-**Subject** — a relationship to the ClickUp record when one side is a task; a plain text address (`owner/repo@branch:path`, FileMaker table + field, Sheet + tab + cell) when it is not. 🔴 **One of these must be populated. A discrepancy with no addressable subject is a note, not a row.**
+**Subject address** — plain text, **always required**: `owner/repo@branch:path`, FileMaker table + field, list + task + field, Sheet + tab + cell. Ruled `R2`.
+
+**Subject** — an optional ClickUp relationship, added per pairing as each one comes into use. A convenience for clicking, never the thing an agent reads to find the target.
 
 **Field** — free text, not a dropdown. The vocabulary spans frontmatter keys, FileMaker fields, ClickUp custom fields and spreadsheet columns; an enumerated list would be wrong within a week.
 
@@ -93,14 +95,38 @@ ClickUp ↔ ClickUp (the 63 Lab Hours submissions and seven mistyped emails) · 
 
 Auto-apply of any kind · bulk resolution across rows · a detector · three-sided discrepancies · cardinality beyond 1:1 (a one-to-many row is split by the sweep, and §3 says why that matters for money) · writing to any side marked unwritable · a second list per domain.
 
-## §10 Rulings owed
+## §10 Rulings, RESOLVED 2026-10-11
 
-**R1 — where does the list live?** It is cross-domain by design, so it does not belong to URITP or to MAW Documents. Recommend the [ClickUp Use](https://app.clickup.com/36074068/v/l/901318492514) folder beside the other workspace-mechanism lists.
+⚠️ **Ruled by Brain on Michael's explicit delegation** (*"Resolve the questions."*, 2026-10-11 17:31 ET). Each states its reasoning so he can reverse any of them in a line.
 
-**R2 — is `Subject` one relationship field or several?** A ClickUp relationship field targets ONE list. Covering eight pairings means either several relationship fields (precise, many empty columns) or one text address (universal, not clickable). Recommend **both**: a relationship for the common ClickUp case and a text address for everything else, with §4's rule that one must be filled.
+### R1 — ✅ It lives in the **ClickUp Use** folder, MAW Documents.
 
-**R3 — who may set `Resolution`?** Michael only, or may an agent rule the obvious ones? Recommend **Michael only in v1.** The value of the queue is that a ruling is a ruling; an agent that both detects and rules has removed the review step the list exists to provide.
+Beside the other workspace-mechanism lists (🟢 Agent Activity Board, List Index). **The placement test is ownership, not convenience:** this list is cross-domain by construction — URITP money, FileMaker fields, repo frontmatter and agent config all land in it — so filing it under URITP or BETA BUDGET would make one domain the apparent owner of a mechanism that serves eight. `ClickUp Use` is the folder that already means *"how this workspace works"* rather than *"what this workspace is about."*
 
-**R4 — does `Applied` write immediately, or batch?** The receipt pass's method says preview, approve, write, read back. Recommend batched apply with a preview, matching it.
+### R2 — ✅ One REQUIRED text address, plus relationship fields added LAZILY, one per pairing, as each comes into use.
 
-**R5 — task type.** New `Discrepancy` type, or a plain task in a dedicated list? Same unresolved question as the `Bug` type on 📋 BUG REPORTS, and it should be answered the same way for both.
+The constraint doing the work: a ClickUp relationship field targets exactly one list, so covering eight pairings means eight fields — and on any given row seven of them are empty. 🚫 **Pre-building eight columns to hold mostly nothing is how a list becomes unworkable on a phone**, which is where this one gets worked.
+
+⭐ **So the text address is the contract and the relationship is the courtesy.** The address is always filled and is the only thing an agent reads to find a target; a relationship gets added for a pairing once that pairing has real rows, purely so a human can tap through. That also keeps the ClickUp↔FileMaker and ClickUp↔Sheet pairings first-class rather than second-class, since neither of them can ever have a relationship field at all.
+
+### R3 — ✅ Michael sets `Resolution`. ⭐ ONE carve-out: a detector may set `Not a discrepancy` on its OWN row, inside the same run.
+
+Holding the line, and the reason is structural rather than cautious: **an agent that both detects and rules has deleted the review step the list exists to provide.** The queue's entire value is that a ruling is a ruling — a row marked `Keep B` means somebody with authority looked. Let an agent rule the easy ones and every row becomes *probably* ruled, which is worth less than an unruled row because it looks finished.
+
+⚠️ **The carve-out is narrow on purpose, and it is not a ruling at all — it is a RETRACTION.** A sweep that finds a mismatch, reads one more file and discovers it was wrong should close its own finding in the same run rather than filing a row for Michael to reject. That is the self-correction this workspace already values; DOC REVIEW 001's `REPO_PAGES` reversal is the exact shape. 🚫 It applies only to the agent's own row, only in the run that created it, and only to `Not a discrepancy`. The moment a row survives into the queue, it is Michael's.
+
+### R4 — ✅ Batched apply with a preview. The preview SEPARATES will-apply from will-be-refused.
+
+Matches the receipt pass's own ratified method: preview, approve, write, read back. Single-row apply would mean forty approvals for a forty-row sweep, which is how a queue stops getting worked — and an unworked queue is worse than no queue, because the findings are now *filed* rather than *visible*.
+
+⚠️ **The separation in the preview is the part that is easy to skip and should not be.** §5's re-verification means some ruled rows will refuse at apply time through nobody's fault. If those surface mid-batch they read as a broken tool; surfaced in the preview, before approval, they read as what they are — rows whose world moved and which need a fresh look.
+
+### R5 — 🚫 NO `Discrepancy` task type in v1. A plain task in a dedicated list.
+
+A task type earns its existence by appearing across **many** lists — that is what makes a type worth more than a list's own shape. Discrepancies only ever live in this one list, so here **the list IS the type**, and a type would add a second place stating one fact.
+
+🔴 **And the second reason is the one that actually decides it: the `Bug` task type on 📋 BUG REPORTS is still an open question, and creating a near-identical type here would settle it by side effect.** Bug reports have a genuine case a discrepancy does not — they get filed from everywhere — so the two questions have different answers and must not be collapsed into one precedent set quietly, by whichever build happens to land first. ⚠️ When `Bug` is ruled, revisit this; until then the refusal keeps that question clean.
+
+## §11 Still owed, and these are not rulings
+
+🚩 **`brain-config/specs/` has no index.** Three specs now live there with nothing listing them. `brain-config/next-build-spec.md` is NOT it — that file is the viewer app's cycle spec, and adding a spec table to it would make it a second claimant on something it does not own. Either a real index file or nothing, consciously.
