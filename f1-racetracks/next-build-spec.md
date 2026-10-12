@@ -205,3 +205,69 @@ Rewritten 2026-07-26 so each one can actually fail. **Amended 2026-07-27:** the 
 ### What stayed in the ledger
 
 The live prohibitions, because they must be read before any edit: the four-vector data layer, **never persist a derived ordinal**, team colour as a local identity layer, `applyTheme` resolving but uncalled, the parked `f1-racetracks-v20-port` branch, `live-tracker.html` standalone by design, and the Ricky note.
+
+---
+
+## 📐 Prior-year results stores (2021-2025) — spec'd 2026-10-12
+
+**Status:** scoped, build not started. **NOT part of the v7 cycle** and it carries no Build Order step. 🔻 **OWED: a Build Order row in `README.md`.** That file is 26,076 B and past the safe-edit ceiling, which is the same reason the ledger detail landed in this file, so the row is owed rather than written.
+
+### Why this exists
+
+It was found by a STOP, not by planning. On 2026-10-12 the F1 refresh created the slim `Race History` text field on the ClickUp **F1 Races** list and wrote the 2026 year-lines for r16 and r17, closing a blocker that had made every F1 pass PARTIAL. The obvious follow-up was to migrate the retired per-year fields (`2021`-`2026`) into it and retire them. Michael approved that migration. **It was then refused before any write, because it would have destroyed data.**
+
+The reason: `f1-racetracks/f1-results/` contains **2026 and nothing else**. There is no prior-year store. So the retired ClickUp per-year fields are the **sole surviving record** of 2021-2025, and they are not podium-only — every populated cell carries Pole, usually Fastest Lap, and a hand-written `Notable` paragraph. `Race History` is podium-only by its own field contract. Folding one into the other discards the rest, and the step everyone expects after a migration is deleting the source.
+
+⭐ **The generalisable part: "migrate A into B" is only safe once you know whether B can represent A.** The field contract and the source data were each individually sound. The incompatibility only existed in the move, and nothing in either place would have reported it.
+
+### What exists today, measured 2026-10-12
+
+22 of 23 race tracks carry populated `2021`, `2023` and `2025` fields; roughly **110 populated cells** across 2021-2025. Cell shape is one line of `Winner: <Name> (<Team>) | P2: … | P3: …` followed by `Pole: …`, sometimes `Fastest Lap: …` or `FL: …`, then `Notable: <prose>`. Names are **surnames only**, where 2026 year-lines use full names.
+
+Non-race seasons are stored as sentinel prose, not as absent values: `CANCELLED (COVID). …`, `NOT HELD. …`, `DID NOT EXIST. Miami GP inaugurated in 2022.` **A podium line has no shape for any of these** and inventing one is how a sentinel silently becomes a result.
+
+🔴 **Four tracks already hold content in the retired `2026` field** — Austria (r08), Britain (r09), Netherlands (r12), Italy (r13) — all four already present in the JSON store. Those are live duplicate claimants for a 2026 fact the moment the refresh writes a `Race History` line onto them, and the runbook's fill-if-blank rule will STOP there rather than clobber. Resolving those four is in scope for this build.
+
+### The crux, and it is a schema question not a plumbing one
+
+**Prior-year data cannot satisfy the 2026 round schema.** A 2026 round file carries a full 22-row classification with `grid`, `qualifying.{pos,q1,q2,q3}`, per-driver `fastLap`, `points`, `status`, `onRoadPos` and a per-row `stewardNote`. For 2021-2025 we hold three names, a pole, sometimes a fastest lap, and a paragraph. The gap is not fetchable from what we have.
+
+So there are two honest routes and they must not be blended:
+
+**Route A — a reduced prior-year vector.** A new schema that represents exactly what is known (podium, pole, fastest lap, notable prose, or a sentinel) with no classification array at all. Cheap, truthful, immediately writable from the ClickUp fields. Consumers must branch on era.
+
+**Route B — full backfill from primary sources.** Re-derive complete classifications for 2021-2025 from FIA and formula1.com, reusing the 2026 schema unchanged. One schema for every season, no era branch. Expensive: roughly 110 rounds × 20 rows, each position primary-source verified to the same standard the 2026 store is held to.
+
+🚨 **Do not build a hybrid that uses the 2026 schema with mostly-null rows.** That produces a file which looks complete to a renderer and is empty of the thing the schema promises, and it would quietly break the existing `fastLap`-null and `onRoadPos`-absence rules by making absence ambiguous again. **Michael picks A or B before any file is written.**
+
+### Hard constraints
+
+- **Never fabricate a classification row to satisfy the schema.** SOURCED or absent, per the standing rule on the open `grid`/`qualifying` gap for r03/r04/r07.
+- **Surname expansion is a derivation and must resolve against the canonical ClickUp F1 Drivers list, never from memory.** "Schumacher" and "Verstappen" are each ambiguous across F1 history even if unambiguous inside a 2021-2025 window.
+- **The `Notable` prose is primary content, not decoration.** It is Michael's writing and it exists nowhere else. Whatever route is chosen, it survives verbatim.
+- **Sentinels stay distinguishable from results.** `NOT HELD` is not a missing podium, exactly as `never` is not a huge overdue interval and unreadable is not `never`.
+- **Do not delete the per-year ClickUp fields until the chosen store is committed and verified.** Deleting a Custom Field is destructive and needs its own gate regardless.
+- **`stewardNote` keeps its legacy name** until the v20 port renames renderer and data together.
+
+### Acceptance criteria
+
+Each one can fail.
+
+- [ ] Michael has picked Route A or Route B, and the pick is recorded in the Decision Log, not only here.
+- [ ] Every one of the roughly 110 populated cells is accounted for in the new store or explicitly listed as deliberately dropped, with a reason. A count that does not reconcile is a failed migration.
+- [ ] Every `Notable` paragraph is present in the committed store, byte-for-byte.
+- [ ] Every non-race sentinel reads as a sentinel in the new store and cannot be mistaken for a result by a consumer.
+- [ ] No classification row exists that was not primary-source verified (Route B only).
+- [ ] Every driver name resolves to a real F1 Drivers task ID, verified by resolution and not by shape. *(A 2026 pass wrote `86ae52ra0h` for Colapinto — correct-looking, 10 characters where every real ID is 9, and resolving to nothing.)*
+- [ ] The four tracks holding retired-`2026` content have exactly one claimant for the 2026 fact when the build lands.
+- [ ] `index_rounds.json` per year, or its agreed equivalent, lists every round the store holds and nothing it does not.
+- [ ] The retired per-year fields are still present and unmodified at merge. Their removal is a separate, separately-gated change.
+- [ ] A consumer reading the store can tell which era a round came from without inspecting field presence.
+
+### Non-goals
+
+Not a v7 port step. Not a renderer change. Not a `Race History` format change — the 2026-forward contract in that field's description stands. Not the per-year field deletion.
+
+### Interim state until this is built
+
+**Era split, documented, no loss.** The retired per-year fields remain the 2021-2025 archive. `Race History` carries 2026 forward. Two surfaces, two eras, and the only overlap is the four retired-`2026` cells named above. This is a deliberate holding position rather than a defect, and it is stable: nothing degrades while it waits.
