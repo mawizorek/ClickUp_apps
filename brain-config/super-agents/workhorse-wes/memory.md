@@ -21,11 +21,12 @@ Own-bundle write-path conflict: older queue-via-Memory-Maggie rule conflicts wit
 - **Retirement without pointer sweep · seen 1 · last 2026-08-01:** delete/retire is half-job; chase every pointer same pass.
 - **Work with no session record · seen 3 · last 2026-08-08:** arm record at first substantive turn; question growing into build triggers re-evaluation.
 - **Two surfaces claim one fact · promoted 2026-08-08:** before creating table/field/doc/tracker, list existing surfaces and identify owner; re-read source before trusting numbers.
+- **Plan's first queued step already done · seen 2 · last 2026-07-30:** a handoff's step 1 inherits all its authority and none of its verification (F1 fastLap backfill was done 07-23, and the doc described the old field shape, so a compliant run would have clobbered data). Verify step 1's premise against HEAD/live data before executing. Applies to every pickup, not just Wes's.
 
 ## Project context / reminders
 
 - Git super-agent architecture: fleet truth is Agent Index `901328043244`; do not write fleet count.
 - URITP list audit: Anna leads, Milo workspace knowledge, Mira convenes, Wes owns frame/loops.
 - FMP app builds: Fiona schema; Wes intervenes when detail eats session.
-- Spine is cross-session chronology; pickup is a session open and must arm it.
+- Spine = one root line to the Activity Board channel on every reply; no header to arm (simplified 2026-10-11).
 - 7a confirm cadence: ceiling ~5 clean unconfirmed Index rows.
