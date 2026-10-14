@@ -38,7 +38,8 @@ The built-in transcriber is fine. What fails is how audio gets fed to it: a hard
 
 1. **The file must be a TASK attachment, not media pasted inside a comment.** Inline comment uploads are refused by both the sandbox and the transcriber ("Attachment is not unified", 10-14). On that error do NOT retry: ask Michael to drop the file straight onto the task, then continue.
 2. **Resolve the participant roster BEFORE attributing anything.** Sources, in order: (a) the invoking message, including the canonical form "the <group> staff was in attendance minus <Name>"; (b) the event task's invite (To/Cc on the forwarded calendar email) and description; (c) prior transcripts in the same recurring chain.
-3. **An invite list is who was INVITED, not who ATTENDED.** If the roster is not declared outright, or the audio contradicts it (someone addressed by name who is not on it, someone on it who never speaks, the facilitator speaking about the expected facilitator in the third person), **ASK Michael to confirm the participants**, using buttons where available. Transcription (steps 1-3) proceeds while waiting. **Attribution (step 4) waits for the answer.**
+3. **An invite list is who was INVITED, not who ATTENDED.** If the roster is not declared outright, or the audio contradicts it (someone addressed by name who is not on it, someone on it who never speaks, a first name that could be two different people), **ASK Michael to confirm the participants**, using buttons where available. Transcription (steps 1-3) proceeds while waiting. **Attribution (step 4) waits for the answer.**
+4. **A first name in the audio is not a roster entry.** Speakers mention people outside the room (staff, students, vendors) who share a first name with someone inside it. Never resolve a bare first name to a participant from the name alone.
 
 ### 1 · Prep (sandbox)
 
@@ -76,9 +77,9 @@ Map letters to names **per chunk**, then override per turn where content contrad
 4. Same recurring chain: recurring speakers keep recurring subjects.
 5. Nothing hit → `⚠️ Unattributed`. Never guess a person into the room.
 
-Known merge patterns (10-14): the facilitator and a faculty member shared one letter inside a chunk; a reply and the next speaker's opener landed on one line. Split the line in the named file and flag it. Nobody outside the confirmed roster gets a turn.
+Known merge patterns (10-14): the facilitator and a faculty member shared one letter inside a chunk; a reply and the next speaker's opener landed on one line. Split the line in the named file and flag it. Nobody outside the confirmed roster gets a turn. Header lines carry the confirmed roster and who confirmed it.
 
-File: `<YYYY-MM-DD>_<slug>_transcript.txt`, lines as `[mm:ss] Name: text`.
+File: `<YYYY-MM-DD>_<slug>_transcript_attributed.txt`, lines as `[mm:ss] Name: text`.
 
 ### 5 · Deliver
 
@@ -109,10 +110,11 @@ File: `<YYYY-MM-DD>_<slug>_transcript.txt`, lines as `[mm:ss] Name: text`.
 ## Scars
 
 - **10-14 · the timestamps-only transcript put the facilitator's words in Michael's mouth.** Without labels, a strike-list commitment the facilitator made to the dance PM was reported to Michael as HIS action item. Speaker labels are the default because of this, and owners are only claimed on grounded speakers.
-- **10-14 · the invite said one facilitator, the audio said another.** The voice running the meeting referred to the invite's sender in the third person. Invite = invited, never attended. That is the case the roster-confirm gate exists for.
+- **10-14 · two people named Chris.** The facilitator (Chris VerSchneider) talked about "Chris" in the third person, which read as the facilitator not being Chris V. It was a different Chris on the cleaning staff (Michael's ruling). The gate fired correctly and asked instead of guessing; the lesson is item 0.4: a shared first name is a collision to confirm, not evidence about the roster.
 
 ---
 
 ## Changelog
 
+- **v1.1 (2026-10-14)**: Same-first-name rule (intake 0.4) and corrected scar, per Michael's ruling on the 10-14 roster. Named file renamed `_transcript_attributed.txt` so it never collides with an older timestamps-only `_transcript.txt` on the same task. Roster + confirmer go in the named file's header.
 - **v1 (2026-10-14)**: Established by Dev Dexter. 3-min diarized chunks as default, per-chunk fallback ladder, raw/named two-file output, roster-confirm gate, attach-to-source-task delivery. Supersedes the halves ladder in `devising-transcript-archive` for anything over ~6 min.
