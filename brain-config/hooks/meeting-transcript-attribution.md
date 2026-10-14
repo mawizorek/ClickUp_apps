@@ -10,6 +10,8 @@ That sentence IS the roster declaration. It means: resolve the standing roster f
 
 Sibling to `hooks/meeting-scratch-triage.md` (that one resolves shorthand + bare task ids; this one resolves SPEAKERS). Born 2026-08-11 on URITP-2594.
 
+**Audio only, no transcript yet?** Run `hooks/audio-transcribe.md` first (added 2026-10-14). It produces the speaker-labelled raw file and the confirmed roster this hook consumes, and it shares this hook's attribution ladder.
+
 ---
 
 ## 🚫 Rule 0 — THE OUTPUT NEVER GOES IN CHAT

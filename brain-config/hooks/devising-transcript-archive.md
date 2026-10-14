@@ -44,6 +44,8 @@ Fidelity is guaranteed MECHANICALLY, not by asking the model to "be faithful." T
 
 ## PHASE 1 — RAW (`.txt`), any agent
 
+⚙️ **Mechanics now live in `hooks/audio-transcribe.md` (v7.2, 2026-10-14).** Run its steps 0-3 (intake, compress, 3-min diarized chunks, verbatim stitch); its raw file IS this phase's `.txt`, committed unchanged per steps 3-5 below. Its chunk ladder supersedes the halves ladder in step 2 for anything over ~6 min. Steps 1-2 below are kept as the record of how this was first done.
+
 1. **Get the audio under the transcription cap.** `transcribe_media` caps at 25MB. Zoom H-series recorders ship raw 32-bit float WAVs that blow past this in minutes. Compress first: `ffmpeg -i input.wav -ac 1 -b:a 64k compressed.mp3` locally, or the in-browser [Audio Compressor](https://mawizorek.github.io/ClickUp_apps/audio-compressor/) app (client-side ffmpeg.wasm) as fallback.
 2. **Transcribe with timestamps.** Plain `timestamps: true` is the reliable default. **Fallback ladder on a 120s timeout:** (a) whole file first; (b) if it times out, SPLIT the audio and transcribe halves — `ffprobe` for duration, `ffmpeg -t <half>` / `-ss <half>`, transcribe each, concatenate (proven on Bill's 6:16 file: whole-file timed out, two ~3-min halves went through); (c) only if a split half STILL times out, drop to a plain no-timestamp transcript and note the degradation. Splitting beats degrading. Diarization is optional and times out more often; never required.
 3. **Commit the tool output VERBATIM.** 🔒 This is the fidelity guarantee. Paste `transcribe_media`'s output exactly as returned — one `[mm:ss]` segment per line, no reflow, no merging, no corrections, no attribution, no frontmatter, no header. **Never re-key or reconstruct it from memory.** If you split in 2b, concatenate the parts in order and nothing else. The committed `.txt` must equal the tool output.
@@ -118,6 +120,7 @@ Participants: Nigel, Arline
 
 ## Composes with
 
+- `audio-transcribe.md` — the transcription ENGINE (v7.2). Phase 1 runs its steps 0-3.
 - `GitHub MCP — Operating Standard` (PR-Merge Workflow, commit message format).
 - `meeting-transcript-attribution.md` — sibling hook for multi-speaker MEETINGS (attributed, posted to ClickUp comments). Different case: that attributes speakers in a meeting record posted as comments; this archives a one-on-one interview as a verbatim `.txt` source + a readable `.md` script.
 - VIDEO-ANALYSIS skill — the `ffmpeg` extract/split mechanics; this hook reuses the split technique for the timeout fallback.
@@ -126,6 +129,7 @@ Participants: Nigel, Arline
 
 ## Changelog
 
+- **v7.2 (2026-10-14)** — Phase 1 mechanics repointed at `hooks/audio-transcribe.md` (3-min diarized chunks, per-chunk fallback, verbatim stitch). Halves ladder kept as history, superseded over ~6 min. Dev Dexter.
 - **v7.1 (2026-10-10)** — Registration note repointed: "the index" now means the 🧩 Tool Index list. No behavior change.
 - **v1 (2026-08-14)** — Established. Single-subject recordings → raw timestamped `.md` in `uritp-docs/production/<CODE>/transcriptions/`. First file: `260814_ARLINE.md` (TIM-D, Seneca Towers).
 - **v2 (2026-08-14)** — Registered on the AI Toolkit index. Added the split-file transcription fallback. Logged the direct-to-`main` commit slip. Added the private-repo/PII guardrail.
