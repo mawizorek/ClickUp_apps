@@ -108,7 +108,7 @@ File: `<YYYY-MM-DD>_<slug>_transcript.txt`, lines as `[mm:ss] Name: text`.
 
 ## Scars
 
-- **10-14 · the timestamps-only transcript put Chris's words in Michael's mouth.** Without labels, a strike-list commitment from the facilitator was reported to Michael as HIS action item. Speaker labels are the default because of this, and owners are only claimed on grounded speakers.
+- **10-14 · the timestamps-only transcript put the facilitator's words in Michael's mouth.** Without labels, a strike-list commitment the facilitator made to the dance PM was reported to Michael as HIS action item. Speaker labels are the default because of this, and owners are only claimed on grounded speakers.
 - **10-14 · the invite said one facilitator, the audio said another.** The voice running the meeting referred to the invite's sender in the third person. Invite = invited, never attended. That is the case the roster-confirm gate exists for.
 
 ---
