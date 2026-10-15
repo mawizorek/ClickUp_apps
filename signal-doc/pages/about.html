@@ -1,23 +1,15 @@
 <section class="page">
-  <h1>Signal Documentation System</h1>
-  <p class="lead">14-table normalized schema for unified production signal documentation across audio, lighting, video, and network.</p>
-  <h2>Schema (14 tables)</h2>
-  <ol>
-    <li>SIGNAL_TYPES (vocabulary)</li>
-    <li>FIXTURE_TYPES (vocabulary)</li>
-    <li>TYPE_INTERFACES (expected ports per fixture type)</li>
-    <li>VENUES</li>
-    <li>POSITIONS (named locations, including people)</li>
-    <li>INFRASTRUCTURE (tie lines, circuits, home runs)</li>
-    <li>NETWORKS (VLANs, subnets)</li>
-    <li>SHOWS (title, season, venue, designers)</li>
-    <li>ENDPOINTS (abstract parent for units + CPs)</li>
-    <li>UNITS (physical things placed for a show)</li>
-    <li>CONTROL_POINTS (virtual entities inside devices)</li>
-    <li>NETWORK_INTERFACES (IP assignments per device)</li>
-    <li>CONNECTIONS (signal paths between endpoints)</li>
-    <li>ASSIGNMENTS (bus routing + group membership)</li>
-  </ol>
-  <h2>Data Backup</h2>
-  <p>Data persists in localStorage. Use <strong>Export JSON</strong> to download a full backup. Import via the browser console: <code>SignalDB.importAll(JSON.parse(data))</code></p>
+  <h1>Signal Doc</h1>
+  <p class="lead">One schema for every signal in the building: audio, lighting, video, network, power. Replaces the Lightwright + Minotaur + spreadsheet stack with a single traceable model.</p>
+
+  <h2>How it's built</h2>
+  <p>Fourteen normalized tables. Fixture types define their expected ports, units are the instances, control points are the virtual things inside a device (input channels, mix buses, multiview slots), connections are physical or network patches, and assignments cover bus sends and group membership in one table.</p>
+  <p>Traces are computed live by walking connections and assignments from a unit's endpoints. Nothing is cached, so a trace is always current.</p>
+
+  <h2>Your data</h2>
+  <div class="callout">Everything is stored in this browser only. Export a <strong>JSON</strong> backup before closing a session; that's the file <strong>Import</strong> restores from. <strong>Excel</strong> export gives one sheet per table for reading and sharing (Excel may warn about the file format on open; click Yes).</div>
+  <p><strong>Reset</strong> wipes local data and reloads the Big Love F26 sample.</p>
+
+  <h2>Not yet</h2>
+  <p>Editing units in the app, label printing, multi-show switching, and a real backend. This build is the read/trace/report layer on top of the locked schema.</p>
 </section>
