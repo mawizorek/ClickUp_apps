@@ -1,0 +1,115 @@
+<!doctype html>
+<!-- Signal Documentation System — 14-table normalized schema prototype. -->
+<!-- Uses template-app chrome shell + shared theme spine. -->
+<html lang="en" data-theme="maw-dark-utility" data-mode="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e14">
+<meta name="robots" content="noindex, nofollow">
+<script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<title>Signal Documentation System</title>
+<meta name="description" content="Unified production signal documentation: audio, lighting, video, network. 14-table normalized schema.">
+<meta property="og:title" content="Signal Documentation System">
+<meta property="og:description" content="Unified production signal documentation.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/signal-doc/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#9889;</text></svg>">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="../shared/themes/themes.css">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div id="access-gate" hidden>
+  <div class="gate-card">
+    <h1 id="gate-title">Under maintenance</h1>
+    <p id="gate-msg">Loading...</p>
+    <form id="gate-form">
+      <input id="gate-code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autofocus aria-label="Access code" placeholder="0426">
+      <button type="submit">Enter</button>
+    </form>
+  </div>
+</div>
+
+<a class="skip-link" href="#view">Skip to content</a>
+<header id="appHeader"></header>
+<main id="view" tabindex="-1"></main>
+<footer id="appFooter"></footer>
+
+<noscript>This app needs JavaScript enabled to run.</noscript>
+
+<script src="../shared/themes/resolve.js"></script>
+<script src="../template-app/chrome.js"></script>
+<script src="./db.js"></script>
+<script src="./seed.js"></script>
+<script src="./app.js"></script>
+<script>
+(function () {
+  var APP_NAME    = "Signal Doc";
+  var APP_VERSION = "v1";
+  var APP_PR      = 0;
+  var APP_THEME   = "soft-utility";
+  var DEFAULT_COLOR = "maw-dark-utility";
+  var DEFAULT_PAGE  = "home";
+  var NAV = [
+    { route: "home",  label: "Units" },
+    { route: "about", label: "About" }
+  ];
+
+  if (window.THEMES && THEMES.applyTheme) {
+    THEMES.applyTheme(APP_THEME).then(function () {
+      var saved = null; try { saved = localStorage.getItem("app_theme"); } catch (e) {}
+      if (saved && THEMES.apply) THEMES.apply(saved, { silent: true });
+    });
+  } else {
+    document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
+  }
+
+  // Access gate
+  (function gate() {
+    var FALLBACK = { access: "open", code: "0426" };
+    var SS = "gate_ok";
+    function apply(cfg) {
+      var g = document.getElementById("access-gate");
+      if (!cfg || cfg.access === "open" || sessionStorage.getItem(SS) === "1") { g.remove(); return; }
+      g.hidden = false;
+      var form = document.getElementById("gate-form");
+      if (cfg.access === "down") { form.style.display = "none"; return; }
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (document.getElementById("gate-code").value.trim() === String(cfg.code)) {
+          sessionStorage.setItem(SS, "1"); g.remove();
+        }
+      });
+    }
+    fetch("./config.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : FALLBACK; })
+      .then(apply).catch(function () { apply(FALLBACK); });
+  })();
+
+  Chrome.init({
+    appName: APP_NAME, version: APP_VERSION, pr: APP_PR,
+    nav: NAV, defaultTheme: DEFAULT_COLOR, logo: "\u26a1",
+    sources: [{ label: "Source \u2197", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/signal-doc" }]
+  });
+
+  // Router: home = app.js takes over, other pages = load HTML partials
+  var view = document.getElementById("view");
+  function render(route) {
+    if (route === "home" || !route) {
+      SigApp.init();
+      Chrome.setActive("home");
+      return;
+    }
+    fetch("./pages/" + route + ".html", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+      .then(function (html) { view.innerHTML = html; Chrome.setActive(route); })
+      .catch(function () { view.innerHTML = '<section class="page"><h1>Not found</h1></section>'; });
+  }
+  function current() { return (location.hash || "").replace(/^#/, "") || "home"; }
+  window.addEventListener("hashchange", function () { render(current()); });
+  render(current());
+})();
+</script>
+</body>
+</html>

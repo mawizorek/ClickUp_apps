@@ -1,0 +1,23 @@
+<section class="page">
+  <h1>Signal Documentation System</h1>
+  <p class="lead">14-table normalized schema for unified production signal documentation across audio, lighting, video, and network.</p>
+  <h2>Schema (14 tables)</h2>
+  <ol>
+    <li>SIGNAL_TYPES (vocabulary)</li>
+    <li>FIXTURE_TYPES (vocabulary)</li>
+    <li>TYPE_INTERFACES (expected ports per fixture type)</li>
+    <li>VENUES</li>
+    <li>POSITIONS (named locations, including people)</li>
+    <li>INFRASTRUCTURE (tie lines, circuits, home runs)</li>
+    <li>NETWORKS (VLANs, subnets)</li>
+    <li>SHOWS (title, season, venue, designers)</li>
+    <li>ENDPOINTS (abstract parent for units + CPs)</li>
+    <li>UNITS (physical things placed for a show)</li>
+    <li>CONTROL_POINTS (virtual entities inside devices)</li>
+    <li>NETWORK_INTERFACES (IP assignments per device)</li>
+    <li>CONNECTIONS (signal paths between endpoints)</li>
+    <li>ASSIGNMENTS (bus routing + group membership)</li>
+  </ol>
+  <h2>Data Backup</h2>
+  <p>Data persists in localStorage. Use <strong>Export JSON</strong> to download a full backup. Import via the browser console: <code>SignalDB.importAll(JSON.parse(data))</code></p>
+</section>

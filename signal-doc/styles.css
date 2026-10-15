@@ -1,0 +1,74 @@
+/* signal-doc styles — extends template-app/styles.css via shared theme spine.
+   Dark-first, mono data, technical aesthetic. */
+
+/* ---- APP LAYOUT ---- */
+.sig-app { display: flex; min-height: calc(100svh - 120px); }
+.sig-filters {
+  position: sticky; top: 56px; z-index: 10;
+  background: var(--surface-1); border-bottom: var(--border-w) solid var(--border);
+  padding: 8px 16px; display: flex; align-items: center; gap: 8px;
+  overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch;
+}
+.sig-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-faint); white-space: nowrap; }
+.sig-pills { display: flex; gap: 4px; flex-wrap: nowrap; }
+.sig-pill {
+  font: inherit; font-family: var(--font-mono); font-size: 0.72rem;
+  padding: 3px 8px; border-radius: var(--radius); border: var(--border-w) solid transparent;
+  background: transparent; color: var(--text-soft); cursor: pointer; white-space: nowrap;
+}
+.sig-pill:hover { color: var(--text); background: var(--surface-2); }
+.sig-pill.is-on { background: oklch(0.6 0.15 195 / 0.15); color: var(--accent); border-color: oklch(0.6 0.15 195 / 0.25); }
+.sig-rpt:hover { color: var(--warn); }
+.sig-export { margin-left: auto; color: var(--accent); }
+.sig-export:hover { background: var(--surface-2); }
+.sig-sep { color: var(--border); font-size: 0.8rem; }
+.sig-count { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); white-space: nowrap; margin-left: auto; }
+
+/* ---- TABLE ---- */
+.sig-table { font-family: var(--font-mono); font-size: 0.78rem; width: 100%; overflow-x: auto; }
+.sig-row { display: flex; border-bottom: var(--border-w) solid var(--border); cursor: pointer; transition: background 80ms; min-width: max-content; }
+.sig-row:not(.sig-hdr):hover { background: var(--surface-2); }
+.sig-row.is-sel { background: oklch(0.6 0.15 195 / 0.08); border-left: 2px solid var(--accent); }
+.sig-alt { background: var(--surface-1); }
+.sig-hdr { position: sticky; top: 95px; z-index: 5; background: var(--bg); cursor: default; }
+.sig-hdr .sig-cell { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); cursor: pointer; user-select: none; }
+.sig-hdr .sig-cell:hover { color: var(--accent); }
+.sig-cell { padding: 6px 8px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sig-ch { color: var(--accent); }
+.sig-dim { color: var(--warn); }
+.sig-muted { color: var(--text-faint); }
+.sig-good { color: var(--good); }
+.sig-empty { padding: 48px 16px; text-align: center; color: var(--text-faint); }
+.sig-trace-btn { background: none; border: 0; color: var(--text-faint); cursor: pointer; font-size: 1rem; padding: 0; }
+.sig-trace-btn:hover { color: var(--accent); }
+.sig-total { border-top: 2px solid var(--accent); margin-top: 8px; padding-top: 8px; font-weight: 700; }
+
+/* ---- SIDE PANEL ---- */
+.sig-panel {
+  position: fixed; top: 56px; right: 0; bottom: 0;
+  width: min(420px, 90vw); background: var(--surface-1);
+  border-left: var(--border-w) solid var(--border);
+  z-index: 40; display: flex; flex-direction: column;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.sig-panel-hdr { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: var(--border-w) solid var(--border); flex-shrink: 0; }
+.sig-panel-hdr h2 { margin: 0; font-size: 0.9rem; color: var(--accent); }
+.sig-panel-x { background: none; border: 0; color: var(--text-soft); font-size: 1rem; cursor: pointer; width: 36px; height: 36px; border-radius: var(--radius); }
+.sig-panel-x:hover { background: var(--surface-2); color: var(--text); }
+.sig-panel-body { padding: 16px; flex: 1; }
+.sig-field { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: var(--border-w) solid var(--border); font-size: 0.78rem; }
+.sig-field-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); width: 80px; flex-shrink: 0; }
+.sig-field-val { font-family: var(--font-mono); color: var(--text); }
+.sig-section-hdr { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--warn); margin: 16px 0 6px; }
+.sig-cp { font-size: 0.75rem; font-family: var(--font-mono); padding: 2px 0; }
+.sig-trace-info { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-soft); margin-bottom: 12px; }
+.sig-trace-box { background: var(--surface-2); border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 12px; }
+.sig-trace-step { font-family: var(--font-mono); font-size: 0.75rem; padding: 3px 0; }
+
+/* ---- MOBILE ---- */
+@media (max-width: 768px) {
+  .sig-filters { flex-wrap: wrap; gap: 6px; }
+  .sig-panel { width: 100vw; }
+  .sig-count { display: none; }
+  .sig-table { font-size: 0.7rem; }
+}
