@@ -57,7 +57,7 @@ is deleted. Michael asked for easy revert — this is the shape that delivers it
 
 ### ✅ UNCHANGED — every one of these still applies in full
 
-- **All ten lanes in `roles[]` are still walked, in config order, from role 1.** The no-lane-is-ever-
+- **All nine lanes in `roles[]` are still walked, in config order, from role 1.** The no-lane-is-ever-
   skipped lock (LOCKED 2026-08-04, EXTENDED 2026-08-31) is NOT suspended, and a focus pass may not skip a
   lane for being remote-thin. **Thin is the expected result in most lanes and is reported, not avoided.**
 - **SEARCH FIRST, RECONCILE SECOND.** Unchanged and non-negotiable.
