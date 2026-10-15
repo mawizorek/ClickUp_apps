@@ -1,23 +1,25 @@
 <!doctype html>
 <!-- Signal Documentation System — 14-table normalized schema prototype. -->
-<!-- Uses template-app chrome shell + shared theme spine. -->
+<!-- Uses template-app chrome shell (chrome.js + styles.css) + shared theme spine. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0e14">
+<meta name="theme-color" content="#333740">
 <meta name="robots" content="noindex, nofollow">
 <script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
-<title>Signal Documentation System</title>
+<title>Signal Doc</title>
 <meta name="description" content="Unified production signal documentation: audio, lighting, video, network. 14-table normalized schema.">
-<meta property="og:title" content="Signal Documentation System">
+<meta property="og:title" content="Signal Doc">
 <meta property="og:description" content="Unified production signal documentation.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/signal-doc/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#9889;</text></svg>">
 <link rel="manifest" href="./manifest.webmanifest">
+<!-- THEME SPINE + CHROME: themes.css (color), template-app/styles.css (header, drawers, gate, footer), then app layer -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="../template-app/styles.css?v=6">
+<link rel="stylesheet" href="./styles.css?v=2">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -39,15 +41,15 @@
 <noscript>This app needs JavaScript enabled to run.</noscript>
 
 <script src="../shared/themes/resolve.js"></script>
-<script src="../template-app/chrome.js"></script>
-<script src="./db.js"></script>
-<script src="./seed.js"></script>
-<script src="./app.js"></script>
+<script src="../template-app/chrome.js?v=6"></script>
+<script src="./db.js?v=2"></script>
+<script src="./seed.js?v=2"></script>
+<script src="./app.js?v=2"></script>
 <script>
 (function () {
   var APP_NAME    = "Signal Doc";
-  var APP_VERSION = "v1";
-  var APP_PR      = 0;
+  var APP_VERSION = "v1.1";
+  var APP_PR      = 1020;
   var APP_THEME   = "soft-utility";
   var DEFAULT_COLOR = "maw-dark-utility";
   var DEFAULT_PAGE  = "home";
@@ -65,21 +67,19 @@
     document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
   }
 
-  // Access gate
   (function gate() {
     var FALLBACK = { access: "open", code: "0426" };
     var SS = "gate_ok";
     function apply(cfg) {
       var g = document.getElementById("access-gate");
+      if (!g) return;
       if (!cfg || cfg.access === "open" || sessionStorage.getItem(SS) === "1") { g.remove(); return; }
       g.hidden = false;
       var form = document.getElementById("gate-form");
       if (cfg.access === "down") { form.style.display = "none"; return; }
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        if (document.getElementById("gate-code").value.trim() === String(cfg.code)) {
-          sessionStorage.setItem(SS, "1"); g.remove();
-        }
+        if (document.getElementById("gate-code").value.trim() === String(cfg.code)) { sessionStorage.setItem(SS, "1"); g.remove(); }
       });
     }
     fetch("./config.json", { cache: "no-store" })
@@ -93,20 +93,23 @@
     sources: [{ label: "Source \u2197", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/signal-doc" }]
   });
 
-  // Router: home = app.js takes over, other pages = load HTML partials
+  // Honest notes for the settings drawer (replaces template placeholder)
+  var notes = document.querySelectorAll("#settingsDrawer .drawer-note");
+  if (notes.length) notes[notes.length - 1].textContent =
+    "Data lives in this browser only (localStorage). Clearing site data or switching devices loses it. " +
+    "Export JSON before you close a session; JSON is the restorable backup, Excel is the readable one.";
+
   var view = document.getElementById("view");
+  var routes = NAV.map(function (n) { return n.route; });
   function render(route) {
-    if (route === "home" || !route) {
-      SigApp.init();
-      Chrome.setActive("home");
-      return;
-    }
+    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
+    if (route === "home") { SigApp.init(); Chrome.setActive("home"); return; }
     fetch("./pages/" + route + ".html", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw 0; return r.text(); })
-      .then(function (html) { view.innerHTML = html; Chrome.setActive(route); })
+      .then(function (html) { view.innerHTML = html; Chrome.setActive(route); window.scrollTo(0, 0); })
       .catch(function () { view.innerHTML = '<section class="page"><h1>Not found</h1></section>'; });
   }
-  function current() { return (location.hash || "").replace(/^#/, "") || "home"; }
+  function current() { return (location.hash || "").replace(/^#/, "") || DEFAULT_PAGE; }
   window.addEventListener("hashchange", function () { render(current()); });
   render(current());
 })();
