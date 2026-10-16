@@ -35,6 +35,19 @@ This is not single-Brain orchestration (one model seating internal personas; tha
 
 ---
 
+## Voice: short and sharp
+
+Collaboration comments are chat, not papers. Every contribution follows the workspace's standard voice: direct, tight, no filler, fragments beat sentences.
+
+- One point per comment. Three things to say = three short replies, not one long one. Each is self-contained and addressable.
+- A contribution is 2-5 sentences max. Longer = essay, not collaboration. Cut it.
+- No preambles, no recaps of what everyone already read, no "building on what X said" throat-clearing. Start with the point.
+- Identity line (model + seat) on the first contribution only. After that, seat shorthand or nothing.
+- Conductor synthesis may run slightly longer to connect threads, but still aim for the shortest version that preserves the disagreements.
+- Standalone short comments beat threaded mega-posts. Keep the thread scannable on a phone.
+
+---
+
 ## Start path
 
 When the trigger is to start a new collaboration:
@@ -45,16 +58,11 @@ When the trigger is to start a new collaboration:
 
 3. **Resolve your own seat.** Look up the agent in the Agent Index (`901328043244`), load the full bundle from `mawizorek/ClickUp_apps` at `brain-config/super-agents/<slug>/`, and state your actual model plus repo-agent identity. Do not guess your model.
 
-4. **Post the opening workshop comment.** One parent comment on the collaboration task containing: the framing, the test case or central question, what each seat should address, and the open question to the user. This is the anchor; all contributions thread beneath it.
+4. **Post the opening workshop comment.** One parent comment: the framing, what each seat should address, and the open question to the user. Keep it tight. This is the anchor; all contributions thread beneath it.
 
-5. **Generate the copyable invitation.** A self-contained block another model session can receive as its opening prompt. Include:
-   - The collaboration task link
-   - The assigned repo-agent seat (or "unassigned: ask the user")
-   - A one-line objective
-   - Instruction to: load this skill or hook, resolve the seat through the Agent Index, load the full bundle, read the task description and full comment thread, state actual model + seat, and make a substantive first contribution as a threaded reply
-   - Explicit: "Do not create a duplicate task. Do not guess your model. Do not impersonate another participant."
+5. **Generate the copyable invitation.** A self-contained block another model session can receive as its opening prompt. Include the collaboration task link, the assigned seat (or "unassigned: ask the user"), a one-line objective, and instruction to load this skill or hook, resolve the seat, read the thread, and make a substantive first contribution. Explicit: "Do not create a duplicate task. Do not guess your model. Do not impersonate another participant."
 
-6. **Post the invitation as a threaded reply** under the opening comment, clearly labeled as the startup handoff for incoming models.
+6. **Post the invitation as a threaded reply** under the opening comment.
 
 ---
 
@@ -63,37 +71,27 @@ When the trigger is to start a new collaboration:
 When joining an existing collaboration (given a task link or a copyable invitation):
 
 1. **Read the collaboration task** description and full comment thread. Refresh before acting.
-
-2. **Resolve your assigned seat.** Look up the agent in the Agent Index. Load the full bundle from the repo. If the seat is unassigned, ask the user which seat to use rather than self-assigning.
-
-3. **State identity.** Lead your contribution with: actual model, repo-agent seat, where the bundle was loaded from. Do not guess your model or claim to be a model you are not.
-
-4. **Make a substantive first contribution** as a threaded reply under the opening workshop comment. Address a specific live claim with: evidence, a counterexample, a revision, or a load-bearing question. An arrival announcement alone is not the work. An endorsement without new evidence is not a contribution.
-
-5. **If the repo-agent bundle cannot be loaded** (access failure, missing files), report the specific gap. Do not improvise the identity or invent bundle contents.
+2. **Resolve your assigned seat.** Load the full bundle from the repo. Unassigned = ask the user.
+3. **State identity** (first contribution only): actual model, repo-agent seat, bundle source.
+4. **Make a substantive first contribution** as a threaded reply. Address a specific live claim with evidence, a counterexample, a revision, or a load-bearing question. Arrival announcements and endorsements without substance are not contributions.
+5. **Bundle can't load?** Report the gap. Don't improvise.
 
 ---
 
 ## Resume path
 
-When resuming a paused collaboration:
-
-1. **Refresh the full thread.** Read every comment and reply, not just the opening.
-
-2. **Identify what changed** since your last contribution. Note new participants, new claims, decisions the user has made, and any shifts in the objective.
-
-3. **Resolve your seat** (same as join). Re-read the bundle in case it has changed.
-
-4. **Contribute** responding to the current state of discussion, not where you left off. Acknowledge anything that invalidates or supersedes your earlier positions.
+1. **Refresh the full thread.** Every comment and reply.
+2. **Identify what changed** since your last contribution.
+3. **Re-resolve your seat** in case the bundle changed.
+4. **Contribute** to the current state, not where you left off.
 
 ---
 
 ## Thread rules
 
-- One opening workshop comment (parent). All contributions are threaded replies beneath it.
-- Each reply leads with model + seat identification (first contribution) or seat shorthand (subsequent).
-- No standalone root comments from participants. No parallel threads splitting the discussion.
-- Refresh the thread before contributing or synthesizing. A contribution based on a stale read should be flagged by whoever notices.
+- One opening comment (parent). All contributions are threaded replies beneath it.
+- No standalone root comments from participants. No parallel threads.
+- Refresh the thread before contributing or synthesizing.
 
 ---
 
@@ -101,24 +99,23 @@ When resuming a paused collaboration:
 
 - Address a specific live claim. Quote or link it.
 - Bring evidence, a counterexample, a revision, or a load-bearing question.
-- Distinguish explicitly: proposed, accepted (by the user), rejected, and unverified.
+- Distinguish: proposed, accepted (by the user), rejected, unverified.
 - Manufactured consensus from a single model is forbidden. One model posting as multiple participants is forbidden.
-- Silence is not approval. Do not synthesize agreement from the absence of objection.
-- The user's corrections outrank prior assistant proposals.
+- Silence is not approval. The user's corrections outrank prior assistant proposals.
 
 ---
 
 ## Concurrency (honest constraints)
 
-No real-time cross-model messaging. Each session is independent. Mandatory thread refresh before every contribution or synthesis. If two contributions cross (neither saw the other), the later poster acknowledges the overlap and reconciles. Late joiners read the full thread and respond to the current state, not the opening handoff. A model change within an existing session requires re-stating the new model identity; the seat does not change. Resuming after a pause: use the resume path; do not assume the discussion is where you left it.
+No real-time cross-model messaging. Mandatory thread refresh before every contribution or synthesis. Crossed contributions: later poster reconciles. Late joiners respond to current state, not opening handoff. Model change mid-session: re-state identity, seat stays. Resuming after pause: use the resume path.
 
 ---
 
 ## Synthesis and close
 
-Deliberation stays in comments. Never write agent remarks into a decision log, spec, or working doc directly. Only settled synthesis moves out to the appropriate surface, with source links, when the user approves. The conductor owns synthesis: connecting contributions, surfacing disagreement, proposing what's settled. The conductor does not silently do every participant's specialist work. Disagreement is preserved. Roads not taken are named.
+Deliberation in comments only. Settled synthesis moves to the appropriate surface with source links when the user approves. Conductor connects contributions and surfaces disagreement; does not silently do participants' specialist work. Disagreement preserved.
 
-Close: the user rules when the collaboration is complete. The conductor may propose completion by summarizing what's settled, what's still open, and what the deliverable is. The user confirms before anything is finalized.
+Close: user rules. Conductor may propose by summarizing settled/open/deliverable. User confirms.
 
 ---
 
@@ -132,14 +129,15 @@ Close: the user rules when the collaboration is complete. The conductor may prop
 
 ## Composes with
 
-- `hooks/workspace-agent-deliberation.md` — logging and activity-pointer procedure for agent contributions.
-- `orchestration.md` — Mira's orchestration contract. If Mira is the conductor, she brings her own operating contract. This hook provides the multi-model session structure; she provides the facilitation.
-- `super-agents/_shared/super-agent-base.md` — persona load contract, which each participant follows to resolve their seat.
-- `gates/session-transcript-gate.md` — thread mechanics (two-tier Post Protocol, badge table).
+- `hooks/workspace-agent-deliberation.md` — logging and activity-pointer procedure.
+- `orchestration.md` — Mira's contract. If Mira conducts, she brings her own operating rules.
+- `super-agents/_shared/super-agent-base.md` — persona load contract.
+- `gates/session-transcript-gate.md` — thread mechanics.
 - `hooks/session-open.md` / `hooks/session-close.md` — if the collaboration runs as a formal session.
 
 ---
 
 ## Changelog
 
+- **v1.1 (2026-10-16)** — Voice section added: one point per comment, 2-5 sentences max, no preambles, standalone short comments beat mega-posts. Join/resume/thread sections tightened. Michael's correction: agent output was too long.
 - **v1 (2026-10-13)** — Established by Dev Dexter (Opus 4.6). Three paths (start/join/resume), thread rules, identity verification, honest concurrency model, synthesis + close. Dual placement: git canonical + CU skill dupe per Michael's ruling. Session: MAW-2481.
