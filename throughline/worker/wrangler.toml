@@ -22,7 +22,7 @@ crons = ["0 8 * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "throughline"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "1030f328-165f-4f60-8aef-042123a32ddb"
 migrations_dir = "migrations"
 
 # Create the bucket once in the dashboard (R2 > Create bucket > throughline-backups) BEFORE the first deploy.
