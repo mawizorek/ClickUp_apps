@@ -1,4 +1,4 @@
-/* signal-doc styles. Loads AFTER ../template-app/styles.css (chrome, drawers, gate, footer)
+/* throughline styles. Loads AFTER ../template-app/styles.css (chrome, drawers, gate, footer)
    and only adds the data-app layer. Dark-first, mono data, technical aesthetic. */
 
 /* ---- full-width chrome for a data app ---- */

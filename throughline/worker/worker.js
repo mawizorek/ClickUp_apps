@@ -1,7 +1,7 @@
 /**
- * Signal Doc — Cloudflare Worker (v1.0)
+ * Throughline — Cloudflare Worker (v1.0)
  *
- * Relational backend over D1 for the Signal Documentation System (signal-doc/ on GitHub Pages).
+ * Relational backend over D1 for the Throughline (throughline/ on GitHub Pages).
  * 14 domain tables + 4 system tables (_roles, _users, _grants, _changes). See migrations/0001_init.sql.
  *
  * AUTH: every request (reads included) needs header x-key.
@@ -28,7 +28,7 @@
  *   POST /admin/snapshot | GET /admin/snapshots  JSON dumps to R2 (BACKUPS binding). Also nightly via cron.
  *
  * Bindings: D1 'DB', R2 'BACKUPS'. Secrets: ADMIN_KEY.
- * NOTE: deploy target (Workers Builds, root dir signal-doc/worker). NOT served by GitHub Pages.
+ * NOTE: deploy target (Workers Builds, root dir throughline/worker). NOT served by GitHub Pages.
  */
 
 const VERSION = "1.0";
@@ -68,7 +68,7 @@ export default {
     const p = url.pathname.replace(/\/+$/, "") || "/";
     const M = request.method;
     try {
-      if (p === "/" || p === "/health") return json({ ok: true, app: "signal-doc", version: VERSION });
+      if (p === "/" || p === "/health") return json({ ok: true, app: "throughline", version: VERSION });
       const actor = await authenticate(request, env);
 
       if (p === "/me" && M === "GET") return json(await me(env, actor));
@@ -534,7 +534,7 @@ async function listChanges(env, url) {
 /* ================= backups (R2 'BACKUPS') ================= */
 async function snapshot(env, who) {
   if (!env.BACKUPS) fail("no BACKUPS bucket bound", 501);
-  const out = { app: "signal-doc", version: VERSION, created_at: nowISO(), by: who, tables: {} };
+  const out = { app: "throughline", version: VERSION, created_at: nowISO(), by: who, tables: {} };
   for (const t of ORDER.concat(["_roles", "_users", "_grants"])) out.tables[t] = (await env.DB.prepare(`SELECT * FROM ${t}`).all()).results || [];
   const key = `snapshots/${out.created_at.replace(/[:.]/g, "-")}_${who}.json`;
   await env.BACKUPS.put(key, JSON.stringify(out), { httpMetadata: { contentType: "application/json" } });

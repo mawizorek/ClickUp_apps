@@ -1,20 +1,20 @@
-# Signal Doc backend (Cloudflare Worker + D1)
+# Throughline backend (Cloudflare Worker + D1)
 
-Local-first sync server for `signal-doc/`. 14 domain tables + 4 system tables (`_roles`, `_users`, `_grants`, `_changes`).
+Local-first sync server for `throughline/`. 14 domain tables + 4 system tables (`_roles`, `_users`, `_grants`, `_changes`).
 Frontend stays on GitHub Pages; this folder is a deploy target only.
 
 ## One-time setup (about 10 minutes)
 
-1. **Create the database.** Cloudflare dashboard > Storage & Databases > D1 > Create > name it `signal-doc`. Copy its **Database ID**.
+1. **Create the database.** Cloudflare dashboard > Storage & Databases > D1 > Create > name it `throughline`. Copy its **Database ID**.
 2. **Paste the ID** into `wrangler.toml` (`database_id`), replacing `REPLACE_WITH_D1_DATABASE_ID`. Commit to main (or have Brain do it).
 3. **Create the tables.** In the D1 database > Console, paste the whole of `migrations/0001_init.sql` and run it.
-   (CLI alternative: `wrangler d1 migrations apply signal-doc --remote` from this folder.)
-4. **Create the backup bucket.** R2 > Create bucket > `signal-doc-backups`. Must exist before the first deploy.
+   (CLI alternative: `wrangler d1 migrations apply throughline --remote` from this folder.)
+4. **Create the backup bucket.** R2 > Create bucket > `throughline-backups`. Must exist before the first deploy.
 5. **Connect the Worker to the repo.** Workers & Pages > Create > Import a repository > `mawizorek/ClickUp_apps`.
-   Project name `signal-doc`, **root directory `signal-doc/worker`**, branch `main`. Deploy.
+   Project name `throughline`, **root directory `throughline/worker`**, branch `main`. Deploy.
 6. **Set the admin key.** Worker > Settings > Variables and Secrets > Add > type **Secret**, name `ADMIN_KEY`,
    value = a long random string (password manager). This is your break-glass root login. Never commit it.
-7. **Copy the Worker URL** (`https://signal-doc.<your-subdomain>.workers.dev`) and set it as `"api"` in `signal-doc/config.json`.
+7. **Copy the Worker URL** (`https://throughline.<your-subdomain>.workers.dev`) and set it as `"api"` in `throughline/config.json`.
 8. **Sign in.** Open the app > Access > paste `ADMIN_KEY` > Sign in. If this browser has sample/offline data you'll be asked
    to upload it or discard it.
 
@@ -42,5 +42,5 @@ A grant = user + role + show (`*` = all) + dept. Users get an invite link (`#inv
 ## Backups
 
 - Nightly cron (08:00 UTC) JSON snapshot to R2 `snapshots/`, keeps 60. Manual: Access > Backups > Snapshot now.
-- D1 Time Travel, 30 days, no code: `wrangler d1 time-travel restore signal-doc --timestamp=<ISO8601>`.
+- D1 Time Travel, 30 days, no code: `wrangler d1 time-travel restore throughline --timestamp=<ISO8601>`.
 - JSON / Excel export from the Units screen.

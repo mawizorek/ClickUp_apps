@@ -1,4 +1,4 @@
-/* sync.js — talks to the Signal Doc worker. Local-first: SignalDB is always the source the UI reads;
+/* sync.js — talks to the Throughline worker. Local-first: SignalDB is always the source the UI reads;
    this module pushes the outbox and pulls server changes.
    States: local (no API configured) | nokey | bootstrap | syncing | synced | pending | offline | error
    Key: localStorage "sd_key" (arrives via #invite=KEY link). API base: config.json "api" or localStorage "sd_api". */

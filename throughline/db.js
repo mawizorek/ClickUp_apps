@@ -1,9 +1,9 @@
-/* db.js — local-first store for Signal Doc. localStorage-backed cache of the server (or the whole DB in local mode).
+/* db.js — local-first store for Throughline. localStorage-backed cache of the server (or the whole DB in local mode).
    Every row: id + domain fields + server meta (rev, updated_at, updated_by, deleted_at).
    Local edits go to an OUTBOX coalesced per row; shadow keeps the last server copy so a denied edit can roll back.
    Backups: JSON (restorable) + Excel (SpreadsheetML, one sheet per table). */
 var SignalDB = (function () {
-  var KEY = "SignalDoc_v2";
+  var KEY = "Throughline_v1", LEGACY = "SignalDoc_v2"; // renamed from Signal Doc; same origin, so carry the data over
   var TABLES = SCHEMA.ORDER;
   var data;
   var listeners = [];
@@ -12,9 +12,11 @@ var SignalDB = (function () {
   function load() {
     data = blank();
     try {
-      var s = localStorage.getItem(KEY);
+      var s = localStorage.getItem(KEY), legacy = false;
+      if (!s) { s = localStorage.getItem(LEGACY); legacy = !!s; }
       if (s) { var p = JSON.parse(s); TABLES.forEach(function (n) { if (p.tables && p.tables[n]) data.tables[n] = p.tables[n]; });
-        data.shadow = p.shadow || {}; data.outbox = p.outbox || {}; data.seq = p.seq || 0; data.meta = p.meta || {}; }
+        data.shadow = p.shadow || {}; data.outbox = p.outbox || {}; data.seq = p.seq || 0; data.meta = p.meta || {};
+        if (legacy) { flushSave(); localStorage.removeItem(LEGACY); } }
     } catch (e) {}
     try { localStorage.removeItem("SignalDoc_v1"); } catch (e) {} // v1 was read-only sample data
   }
@@ -97,7 +99,7 @@ var SignalDB = (function () {
 
   // ---- backups ----
   function exportAll() {
-    var out = { _meta: { app: "signal-doc", schema: "v2", exported: new Date().toISOString() } };
+    var out = { _meta: { app: "throughline", schema: "v2", exported: new Date().toISOString() } };
     TABLES.forEach(function (t) { out[t] = getAll(t); });
     return out;
   }
@@ -107,7 +109,7 @@ var SignalDB = (function () {
       if (!Array.isArray(obj[t])) return; hits++;
       obj[t].forEach(function (r) { if (!r.id) return; var c = Object.assign({}, r); if (!(opts && opts.keepRev)) delete c.rev; put(t, c, { noSync: !(opts && opts.sync) }); });
     });
-    if (!hits) throw new Error("No Signal Doc tables in that file");
+    if (!hits) throw new Error("No Throughline tables in that file");
     return hits;
   }
   function stamp() { var d = new Date(); return d.toISOString().slice(0, 10) + "-" + String(d.getHours()).padStart(2, "0") + String(d.getMinutes()).padStart(2, "0"); }
@@ -115,7 +117,7 @@ var SignalDB = (function () {
     var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
   }
-  function downloadJSON() { download(new Blob([JSON.stringify(exportAll(), null, 2)], { type: "application/json" }), "signal-doc-backup-" + stamp() + ".json"); }
+  function downloadJSON() { download(new Blob([JSON.stringify(exportAll(), null, 2)], { type: "application/json" }), "throughline-backup-" + stamp() + ".json"); }
   function x(v) { return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
   function downloadXLS() {
     var s = '<?xml version="1.0"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="h"><Font ss:Bold="1"/><Interior ss:Color="#D9E1F2" ss:Pattern="Solid"/></Style></Styles>';
@@ -131,7 +133,7 @@ var SignalDB = (function () {
       });
       s += '</Table></Worksheet>';
     });
-    download(new Blob([s + '</Workbook>'], { type: "application/vnd.ms-excel" }), "signal-doc-backup-" + stamp() + ".xls");
+    download(new Blob([s + '</Workbook>'], { type: "application/vnd.ms-excel" }), "throughline-backup-" + stamp() + ".xls");
   }
 
   load();

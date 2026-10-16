@@ -25,7 +25,7 @@ Screens.access = (function () {
     if (s === "local") cb += '<p class="muted">Everything stays in this browser until a server is connected. Back up with JSON export.</p>';
     cb += '<div class="sig-fld"><label for="acKey">' + (Sync.key() ? "Switch key" : "Sign in with your invite link or key") + '</label><input id="acKey" type="text" autocomplete="off" placeholder="Paste invite link or key"></div>';
     cb += '<div class="sig-form-acts"><button class="sig-btn sig-btn-pri" data-a="signin">Sign in</button>' + (Sync.key() ? '<button class="sig-btn" data-a="sync">Sync now</button><button class="sig-btn sig-btn-bad" data-a="signout">Sign out</button>' : "") + '</div>';
-    cb += '<details class="sig-adv"><summary>Advanced: server URL</summary><div class="sig-fld"><input id="acApi" type="url" placeholder="https://signal-doc.<you>.workers.dev" value="' + esc(Sync.api()) + '"></div><div class="sig-form-acts"><button class="sig-btn" data-a="api">Save URL</button></div></details>';
+    cb += '<details class="sig-adv"><summary>Advanced: server URL</summary><div class="sig-fld"><input id="acApi" type="url" placeholder="https://throughline.<you>.workers.dev" value="' + esc(Sync.api()) + '"></div><div class="sig-form-acts"><button class="sig-btn" data-a="api">Save URL</button></div></details>';
     h += card("Connection", cb);
 
     if (s === "bootstrap") {

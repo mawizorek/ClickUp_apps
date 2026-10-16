@@ -1,4 +1,4 @@
--- Signal Doc D1 schema v1: 14 domain tables + 4 system tables.
+-- Throughline D1 schema v1: 14 domain tables + 4 system tables.
 -- Every domain row carries: rev (optimistic concurrency), created_by, updated_at (server sync cursor),
 -- updated_by, deleted_at (soft delete tombstone so deletes sync).
 -- FKs are DEFERRABLE INITIALLY DEFERRED so a batch can insert parent + child in any order;

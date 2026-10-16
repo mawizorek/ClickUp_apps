@@ -1,6 +1,6 @@
 {
-  "name": "Signal Documentation System",
-  "short_name": "SigDoc",
+  "name": "Throughline",
+  "short_name": "Throughline",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0a0e14",
