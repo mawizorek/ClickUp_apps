@@ -7,7 +7,8 @@ Frontend stays on GitHub Pages; this folder is a deploy target only.
 
 1. **Create the database.** Cloudflare dashboard > Storage & Databases > D1 > Create > name it `throughline`. Copy its **Database ID**.
 2. **Paste the ID** into `wrangler.toml` (`database_id`), replacing `REPLACE_WITH_D1_DATABASE_ID`. Commit to main (or have Brain do it).
-3. **Create the tables.** In the D1 database > Console, paste the whole of `migrations/0001_init.sql` and run it.
+3. **Create the tables.** In the D1 database > Console, paste the whole of `console-init.sql` and run it (comment-free copy of
+   `migrations/0001_init.sql`; the Console flattens pastes to one line, so `--` comments would swallow everything).
    (CLI alternative: `wrangler d1 migrations apply throughline --remote` from this folder.)
 4. **Create the backup bucket.** R2 > Create bucket > `throughline-backups`. Must exist before the first deploy.
 5. **Connect the Worker to the repo.** Workers & Pages > Create > Import a repository > `mawizorek/ClickUp_apps`.
