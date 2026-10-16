@@ -1,0 +1,31 @@
+# Cloudflare Worker config for the Signal Doc backend.
+#
+# Workers Builds (dashboard "Connect to Git", root directory signal-doc/worker) deploys worker.js
+# on every push to main. Also works with a manual `wrangler deploy` from this folder.
+#
+# SECRETS ARE NOT HERE ON PURPOSE. ADMIN_KEY lives in the Cloudflare dashboard
+# (Worker > Settings > Variables and Secrets). Never commit it.
+#
+# BACKUPS: nightly cron writes a JSON snapshot to R2 (signal-doc-backups/snapshots/, keeps 60).
+# Deeper net is D1 Time Travel, point-in-time restore up to 30 days, no code:
+#   wrangler d1 time-travel info    signal-doc
+#   wrangler d1 time-travel restore signal-doc --timestamp=<ISO8601>
+
+name = "signal-doc"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# 08:00 UTC = 4am Eastern (3am during EST): nightly snapshot
+[triggers]
+crons = ["0 8 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "signal-doc"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+# Create the bucket once in the dashboard (R2 > Create bucket > signal-doc-backups) BEFORE the first deploy.
+[[r2_buckets]]
+binding = "BACKUPS"
+bucket_name = "signal-doc-backups"
