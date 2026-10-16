@@ -1,123 +1,14 @@
 <!doctype html>
-<!-- Signal Documentation System: 14-table normalized schema, local-first with Cloudflare D1 sync. -->
-<!-- Thin router: template-app chrome + shared theme spine; one module per screen in screens/. -->
-<html lang="en" data-theme="maw-dark-utility" data-mode="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#333740">
-<meta name="robots" content="noindex, nofollow">
-<script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
-<title>Signal Doc</title>
-<meta name="description" content="Unified production signal documentation: audio, lighting, video, network.">
-<meta property="og:title" content="Signal Doc">
-<meta property="og:description" content="Unified production signal documentation.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/signal-doc/">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#9889;</text></svg>">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="../shared/themes/themes.css">
-<link rel="stylesheet" href="../template-app/styles.css?v=6">
-<link rel="stylesheet" href="./styles.css?v=3">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moved to Throughline</title>
+<meta http-equiv="refresh" content="0; url=../throughline/">
+<script>location.replace("../throughline/" + location.hash);</script>
+<style>body{background:#1e2128;color:#e5e7eb;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}a{color:#2dd4bf}</style>
 </head>
 <body>
-<div id="access-gate" hidden>
-  <div class="gate-card">
-    <h1 id="gate-title">Under maintenance</h1>
-    <p id="gate-msg">Loading...</p>
-    <form id="gate-form">
-      <input id="gate-code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Access code" placeholder="0426">
-      <button type="submit">Enter</button>
-    </form>
-  </div>
-</div>
-
-<a class="skip-link" href="#view">Skip to content</a>
-<header id="appHeader"></header>
-<main id="view" tabindex="-1"></main>
-<footer id="appFooter"></footer>
-
-<noscript>This app needs JavaScript enabled to run.</noscript>
-
-<script src="../shared/themes/resolve.js"></script>
-<script src="../template-app/chrome.js?v=6"></script>
-<script src="./schema.js?v=3"></script>
-<script src="./db.js?v=3"></script>
-<script src="./ui.js?v=3"></script>
-<script src="./sync.js?v=3"></script>
-<script src="./seed.js?v=3"></script>
-<script src="./screens/units.js?v=3"></script>
-<script src="./screens/tables.js?v=3"></script>
-<script src="./screens/access.js?v=3"></script>
-<script>
-(function () {
-  var APP_NAME    = "Signal Doc";
-  var APP_VERSION = "v2.0";
-  var APP_PR      = 1021;
-  var APP_THEME   = "soft-utility";
-  var DEFAULT_COLOR = "maw-dark-utility";
-  var NAV = [
-    { route: "home",   label: "Units" },
-    { route: "tables", label: "Tables" },
-    { route: "access", label: "Access" },
-    { route: "about",  label: "About" }
-  ];
-  var SCREENS = { home: "units", tables: "tables", access: "access" };
-
-  if (window.THEMES && THEMES.applyTheme) {
-    THEMES.applyTheme(APP_THEME).then(function () {
-      var saved = null; try { saved = localStorage.getItem("app_theme"); } catch (e) {}
-      if (saved && THEMES.apply) THEMES.apply(saved, { silent: true });
-    });
-  } else {
-    document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
-  }
-
-  Chrome.init({
-    appName: APP_NAME, version: APP_VERSION, pr: APP_PR,
-    nav: NAV, defaultTheme: DEFAULT_COLOR, logo: "\u26a1",
-    sources: [{ label: "Source \u2197", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/signal-doc" }]
-  });
-  var notes = document.querySelectorAll("#settingsDrawer .drawer-note");
-  if (notes.length) notes[notes.length - 1].textContent =
-    "Local-first: every edit saves in this browser instantly, then syncs to the server when one is connected (pulls every 20s and when you return to the tab). " +
-    "Offline edits queue and send later. If someone else saved the same row first, you keep their version and get told. Export JSON anytime as a third backup.";
-
-  var view = document.getElementById("view");
-  var current = null;
-  function route() { var r = (location.hash || "").replace(/^#/, "").split("&")[0]; return r && (SCREENS[r] || r === "about") ? r : "home"; }
-  function render() {
-    var r = route(); current = r; UI.close(true);
-    if (SCREENS[r]) { Screens[SCREENS[r]].render(view); Chrome.setActive(r); window.scrollTo(0, 0); return; }
-    fetch("./pages/" + r + ".html", { cache: "no-store" })
-      .then(function (x) { if (!x.ok) throw 0; return x.text(); })
-      .then(function (html) { view.innerHTML = html; Chrome.setActive(r); window.scrollTo(0, 0); })
-      .catch(function () { view.innerHTML = '<section class="page"><h1>Not found</h1></section>'; });
-  }
-  var rt = null;
-  function refresh() { clearTimeout(rt); rt = setTimeout(function () { var s = SCREENS[current]; if (s && Screens[s].refresh) Screens[s].refresh(); }, 120); }
-  SignalDB.on(refresh);
-  Sync.on(function (state, detail, ev) {
-    refresh();
-    if (ev && ev.problems && ev.problems.length) {
-      var c = ev.problems.filter(function (p) { return p.status === "conflict"; }).length, d = ev.problems.length - c;
-      UI.toast((c ? c + " edit" + (c > 1 ? "s" : "") + " lost to a newer save" : "") + (c && d ? " \u00b7 " : "") + (d ? d + " edit" + (d > 1 ? "s" : "") + " rejected (" + (ev.problems.find(function (p) { return p.status !== "conflict"; }) || {}).error + ")" : ""), "bad");
-    }
-  });
-  window.addEventListener("hashchange", render);
-
-  fetch("./config.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
-    .then(function (cfg) {
-      var g = document.getElementById("access-gate"); if (g) g.remove();
-      return Sync.init(cfg);
-    })
-    .then(function () {
-      var s = Sync.state();
-      if ((s === "local" || s === "nokey") && SignalDB.isEmpty()) seedDatabase();
-      render();
-    });
-  window.addEventListener("beforeunload", function () { SignalDB.flush(); });
-})();
-</script>
+<p>Signal Doc is now <a href="../throughline/">Throughline</a>.</p>
 </body>
 </html>
