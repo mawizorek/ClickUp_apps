@@ -6,7 +6,7 @@
 .app-footer { margin-top: 0; }
 
 /* ---- APP LAYOUT: toolbar stacked over a self-scrolling table ---- */
-.sig-app { display: flex; flex-direction: column; min-height: 0; }
+.sig-app { display: flex; flex-direction: column; height: calc(100svh - 69px - env(safe-area-inset-top)); min-height: 420px; }
 .sig-filters {
   background: var(--surface-1); border-bottom: var(--border-w) solid var(--border);
   padding: 10px 16px; display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap;
@@ -27,7 +27,7 @@
 .sig-count { font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-soft); white-space: nowrap; }
 
 /* ---- TABLE: own scroll container so the header sticks at top:0 of the table, not the page ---- */
-.sig-table-wrap { overflow: auto; max-height: calc(100svh - 190px); -webkit-overflow-scrolling: touch; background: var(--bg); }
+.sig-table-wrap { overflow: auto; flex: 1 1 auto; min-height: 0; -webkit-overflow-scrolling: touch; background: var(--bg); }
 .sig-table { font-family: var(--font-mono); font-size: 0.78rem; min-width: 100%; width: max-content; }
 .sig-row { display: flex; border-bottom: var(--border-w) solid var(--border); cursor: pointer; transition: background 80ms; color: var(--text); }
 .sig-row:not(.sig-hdr):hover { background: var(--surface-2); }
@@ -57,6 +57,7 @@
   z-index: 100; display: flex; flex-direction: column;
   padding-top: env(safe-area-inset-top);
 }
+.sig-panel-acts { display: flex; gap: 8px; align-items: center; }
 .sig-panel-hdr { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: var(--border-w) solid var(--border); flex-shrink: 0; }
 .sig-panel-hdr h2 { margin: 0; font-size: 0.9rem; color: var(--accent); font-family: var(--font-mono); }
 .sig-panel-x { background: var(--surface-2); border: var(--border-w) solid var(--border); color: var(--text-soft); font-size: 1rem; cursor: pointer; width: 40px; height: 40px; border-radius: var(--radius); }
@@ -72,7 +73,88 @@
 .sig-trace-step { font-family: var(--font-mono); font-size: 0.76rem; padding: 3px 0; color: var(--text); }
 
 /* ---- toast ---- */
-.sig-toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--surface-3); color: var(--text); border: var(--border-w) solid var(--accent); border-radius: var(--radius); padding: 10px 16px; font-size: 0.82rem; z-index: 150; }
+.sig-toasts { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 150; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; width: max-content; max-width: 92vw; }
+.sig-toast { background: var(--surface-3); color: var(--text); border: var(--border-w) solid var(--accent); border-radius: var(--radius); padding: 10px 16px; font-size: 0.82rem; box-shadow: 0 6px 24px oklch(0 0 0 / .35); }
+
+/* ---- show bar, search, sync pill ---- */
+.sig-showbar { width: 100%; }
+.sig-show { font-weight: 800; font-size: 0.95rem; color: var(--text); margin-right: 4px; }
+.sig-select, .sig-search { font: inherit; font-size: 0.82rem; background: var(--field); color: var(--text); border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 7px 10px; min-height: 34px; }
+.sig-select { font-weight: 700; max-width: 260px; }
+.sig-search { flex: 1 1 160px; min-width: 120px; max-width: 320px; }
+.sig-select:focus, .sig-search:focus { border-color: var(--accent); outline: none; }
+.sig-new { font-weight: 700; }
+.sig-lock { font-size: 0.74rem; color: var(--warn); white-space: nowrap; }
+.sig-st { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font-size: 0.74rem; font-family: var(--font-mono); color: var(--text-soft); text-decoration: none; white-space: nowrap; padding: 6px 8px; border-radius: var(--radius); border: var(--border-w) solid var(--border); background: var(--surface-2); }
+.sig-st i { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); display: block; }
+.sig-st-ok i { background: var(--good); } .sig-st-busy i { background: var(--accent); animation: sigpulse 1.2s infinite; }
+.sig-st-warn i { background: var(--warn); } .sig-st-bad i { background: var(--bad); } .sig-st-bad { color: var(--bad); }
+@keyframes sigpulse { 50% { opacity: .3; } }
+.sig-banner { background: var(--accent-soft); border-bottom: var(--border-w) solid var(--accent); color: var(--text); padding: 10px 16px; font-size: 0.85rem; }
+.sig-row.is-pend .sig-cell:first-child, .sig-li.is-pend .sig-li-t::after { color: var(--accent); }
+.sig-li.is-pend .sig-li-t::after { content: " \2022"; }
+.sig-row.is-pend { box-shadow: inset 2px 0 0 var(--accent); }
+.sig-bad { color: var(--bad); }
+
+/* ---- related rows in the detail panel ---- */
+.sig-rel { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: var(--border-w) solid var(--border); color: var(--text); font: inherit; font-size: 0.8rem; padding: 8px 0; cursor: pointer; }
+.sig-rel:hover { color: var(--accent); }
+.sig-add { float: right; font: inherit; font-size: 0.68rem; letter-spacing: 0.06em; color: var(--accent); background: none; border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 3px 8px; cursor: pointer; }
+.sig-add:hover { border-color: var(--accent); }
+
+/* ---- forms ---- */
+.sig-form { display: flex; flex-direction: column; gap: 12px; }
+.sig-fld label { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-soft); margin-bottom: 5px; font-weight: 600; }
+.sig-fld input[type=text], .sig-fld input[type=number], .sig-fld input[type=date], .sig-fld input[type=email], .sig-fld input[type=url], .sig-fld input:not([type]), .sig-fld select, .sig-fld textarea {
+  width: 100%; font: inherit; font-size: 16px; background: var(--field); color: var(--text); border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 10px 12px; min-height: 44px; }
+.sig-fld textarea { min-height: 72px; resize: vertical; }
+.sig-fld input:focus, .sig-fld select:focus, .sig-fld textarea:focus { border-color: var(--accent); outline: none; }
+.sig-fld input:disabled, .sig-fld select:disabled, .sig-fld textarea:disabled { opacity: .7; }
+.sig-fld-bool label { display: flex; align-items: center; gap: 10px; text-transform: none; letter-spacing: 0; font-size: 0.9rem; color: var(--text); min-height: 44px; }
+.sig-fld-bool input { width: 20px; height: 20px; accent-color: var(--accent); }
+.sig-req { color: var(--bad); }
+.sig-form-acts { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.sig-btn { font: inherit; font-weight: 700; font-size: 0.85rem; min-height: 44px; padding: 10px 16px; border-radius: var(--radius); border: var(--border-w) solid var(--border); background: var(--surface-2); color: var(--text); cursor: pointer; }
+.sig-btn:hover { border-color: var(--accent); }
+.sig-btn-pri { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.sig-btn-pri:hover { filter: brightness(1.08); }
+.sig-btn-bad { color: var(--bad); }
+.sig-btn-bad:hover { border-color: var(--bad); }
+.sig-note { background: var(--surface-2); border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 10px 12px; font-size: 0.82rem; color: var(--text-soft); }
+.sig-meta { font-size: 0.74rem; color: var(--text-faint); font-family: var(--font-mono); }
+
+/* ---- tables screen ---- */
+.sig-list { display: flex; flex-direction: column; }
+.sig-li { display: flex; flex-direction: column; gap: 3px; text-align: left; background: none; border: 0; border-bottom: var(--border-w) solid var(--border); color: var(--text); padding: 12px 16px; cursor: pointer; font: inherit; }
+.sig-li:hover { background: var(--surface-2); }
+.sig-li-t { font-family: var(--font-mono); font-size: 0.86rem; }
+.sig-li-s { font-size: 0.76rem; color: var(--text-soft); }
+
+/* ---- access screen ---- */
+.sig-access .sig-card { max-width: 720px; }
+.sig-card-warn { border-color: var(--warn); }
+.sig-access .sig-fld { margin-top: 12px; }
+.sig-adv { margin-top: 14px; font-size: 0.82rem; color: var(--text-soft); }
+.sig-adv summary { cursor: pointer; }
+.sig-code { display: block; word-break: break-all; margin: 8px 0; padding: 10px; font-size: 0.78rem; }
+.sig-user { border-bottom: var(--border-w) solid var(--border); padding: 10px 0; }
+.sig-user.is-revoked { opacity: .6; }
+.sig-user-hd { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; font-size: 0.9rem; }
+.sig-user-hd .sig-soft, .sig-user-hd .sig-muted, .sig-user-hd .sig-bad { font-size: 0.76rem; }
+.sig-grant { font-size: 0.8rem; color: var(--text-soft); padding: 4px 0 0 10px; display: flex; align-items: center; gap: 6px; }
+.sig-x { background: none; border: 0; color: var(--text-faint); cursor: pointer; font-size: 0.8rem; padding: 4px 6px; }
+.sig-x:hover { color: var(--bad); }
+.sig-user-acts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.sig-role { padding: 8px 0; border-bottom: var(--border-w) solid var(--border); font-size: 0.86rem; }
+.sig-role-hd { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sig-role .sig-muted { font-size: 0.76rem; margin-top: 4px; }
+.sig-chg { font-size: 0.76rem; padding: 4px 0; border-bottom: var(--border-w) solid var(--border); color: var(--text); }
+.sig-matrix { display: flex; flex-direction: column; font-size: 0.8rem; }
+.sig-mx-row { display: grid; grid-template-columns: 1fr 76px 76px 40px; gap: 6px; align-items: center; padding: 5px 0; border-bottom: var(--border-w) solid var(--border); }
+.sig-mx-hd { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-soft); }
+.sig-mx-row select { font: inherit; font-size: 0.78rem; background: var(--field); color: var(--text); border: var(--border-w) solid var(--border); border-radius: var(--radius); padding: 6px 4px; }
+.sig-mx-row input { width: 18px; height: 18px; accent-color: var(--accent); justify-self: center; }
+.sig-toast.is-bad { border-color: var(--bad); }
 
 /* ---- MOBILE ---- */
 @media (max-width: 768px) {
@@ -80,6 +162,8 @@
   .sig-group { flex-wrap: nowrap; overflow-x: auto; padding: 0 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .sig-group::-webkit-scrollbar { display: none; }
   .sig-tools { margin-left: 0; }
-  .sig-table-wrap { max-height: calc(100svh - 250px); }
   .sig-table { font-size: 0.72rem; }
+  .sig-showbar { flex-wrap: wrap; row-gap: 8px; }
+  .sig-search { max-width: none; }
+  .sig-st { margin-left: 0; }
 }

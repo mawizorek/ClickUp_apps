@@ -1,6 +1,6 @@
 <!doctype html>
-<!-- Signal Documentation System — 14-table normalized schema prototype. -->
-<!-- Uses template-app chrome shell (chrome.js + styles.css) + shared theme spine. -->
+<!-- Signal Documentation System: 14-table normalized schema, local-first with Cloudflare D1 sync. -->
+<!-- Thin router: template-app chrome + shared theme spine; one module per screen in screens/. -->
 <html lang="en" data-theme="maw-dark-utility" data-mode="dark">
 <head>
 <meta charset="utf-8">
@@ -9,17 +9,16 @@
 <meta name="robots" content="noindex, nofollow">
 <script>try{var t=localStorage.getItem("app_theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 <title>Signal Doc</title>
-<meta name="description" content="Unified production signal documentation: audio, lighting, video, network. 14-table normalized schema.">
+<meta name="description" content="Unified production signal documentation: audio, lighting, video, network.">
 <meta property="og:title" content="Signal Doc">
 <meta property="og:description" content="Unified production signal documentation.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mawizorek.github.io/ClickUp_apps/signal-doc/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#9889;</text></svg>">
 <link rel="manifest" href="./manifest.webmanifest">
-<!-- THEME SPINE + CHROME: themes.css (color), template-app/styles.css (header, drawers, gate, footer), then app layer -->
 <link rel="stylesheet" href="../shared/themes/themes.css">
 <link rel="stylesheet" href="../template-app/styles.css?v=6">
-<link rel="stylesheet" href="./styles.css?v=2">
+<link rel="stylesheet" href="./styles.css?v=3">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -27,7 +26,7 @@
     <h1 id="gate-title">Under maintenance</h1>
     <p id="gate-msg">Loading...</p>
     <form id="gate-form">
-      <input id="gate-code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" autofocus aria-label="Access code" placeholder="0426">
+      <input id="gate-code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Access code" placeholder="0426">
       <button type="submit">Enter</button>
     </form>
   </div>
@@ -42,21 +41,28 @@
 
 <script src="../shared/themes/resolve.js"></script>
 <script src="../template-app/chrome.js?v=6"></script>
-<script src="./db.js?v=2"></script>
-<script src="./seed.js?v=2"></script>
-<script src="./app.js?v=2"></script>
+<script src="./schema.js?v=3"></script>
+<script src="./db.js?v=3"></script>
+<script src="./ui.js?v=3"></script>
+<script src="./sync.js?v=3"></script>
+<script src="./seed.js?v=3"></script>
+<script src="./screens/units.js?v=3"></script>
+<script src="./screens/tables.js?v=3"></script>
+<script src="./screens/access.js?v=3"></script>
 <script>
 (function () {
   var APP_NAME    = "Signal Doc";
-  var APP_VERSION = "v1.1";
-  var APP_PR      = 1020;
+  var APP_VERSION = "v2.0";
+  var APP_PR      = 1021;
   var APP_THEME   = "soft-utility";
   var DEFAULT_COLOR = "maw-dark-utility";
-  var DEFAULT_PAGE  = "home";
   var NAV = [
-    { route: "home",  label: "Units" },
-    { route: "about", label: "About" }
+    { route: "home",   label: "Units" },
+    { route: "tables", label: "Tables" },
+    { route: "access", label: "Access" },
+    { route: "about",  label: "About" }
   ];
+  var SCREENS = { home: "units", tables: "tables", access: "access" };
 
   if (window.THEMES && THEMES.applyTheme) {
     THEMES.applyTheme(APP_THEME).then(function () {
@@ -67,51 +73,50 @@
     document.documentElement.setAttribute("data-theme", DEFAULT_COLOR);
   }
 
-  (function gate() {
-    var FALLBACK = { access: "open", code: "0426" };
-    var SS = "gate_ok";
-    function apply(cfg) {
-      var g = document.getElementById("access-gate");
-      if (!g) return;
-      if (!cfg || cfg.access === "open" || sessionStorage.getItem(SS) === "1") { g.remove(); return; }
-      g.hidden = false;
-      var form = document.getElementById("gate-form");
-      if (cfg.access === "down") { form.style.display = "none"; return; }
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (document.getElementById("gate-code").value.trim() === String(cfg.code)) { sessionStorage.setItem(SS, "1"); g.remove(); }
-      });
-    }
-    fetch("./config.json", { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : FALLBACK; })
-      .then(apply).catch(function () { apply(FALLBACK); });
-  })();
-
   Chrome.init({
     appName: APP_NAME, version: APP_VERSION, pr: APP_PR,
     nav: NAV, defaultTheme: DEFAULT_COLOR, logo: "\u26a1",
     sources: [{ label: "Source \u2197", href: "https://github.com/mawizorek/ClickUp_apps/tree/main/signal-doc" }]
   });
-
-  // Honest notes for the settings drawer (replaces template placeholder)
   var notes = document.querySelectorAll("#settingsDrawer .drawer-note");
   if (notes.length) notes[notes.length - 1].textContent =
-    "Data lives in this browser only (localStorage). Clearing site data or switching devices loses it. " +
-    "Export JSON before you close a session; JSON is the restorable backup, Excel is the readable one.";
+    "Local-first: every edit saves in this browser instantly, then syncs to the server when one is connected (pulls every 20s and when you return to the tab). " +
+    "Offline edits queue and send later. If someone else saved the same row first, you keep their version and get told. Export JSON anytime as a third backup.";
 
   var view = document.getElementById("view");
-  var routes = NAV.map(function (n) { return n.route; });
-  function render(route) {
-    if (routes.indexOf(route) === -1) route = DEFAULT_PAGE;
-    if (route === "home") { SigApp.init(); Chrome.setActive("home"); return; }
-    fetch("./pages/" + route + ".html", { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw 0; return r.text(); })
-      .then(function (html) { view.innerHTML = html; Chrome.setActive(route); window.scrollTo(0, 0); })
+  var current = null;
+  function route() { var r = (location.hash || "").replace(/^#/, "").split("&")[0]; return r && (SCREENS[r] || r === "about") ? r : "home"; }
+  function render() {
+    var r = route(); current = r; UI.close(true);
+    if (SCREENS[r]) { Screens[SCREENS[r]].render(view); Chrome.setActive(r); window.scrollTo(0, 0); return; }
+    fetch("./pages/" + r + ".html", { cache: "no-store" })
+      .then(function (x) { if (!x.ok) throw 0; return x.text(); })
+      .then(function (html) { view.innerHTML = html; Chrome.setActive(r); window.scrollTo(0, 0); })
       .catch(function () { view.innerHTML = '<section class="page"><h1>Not found</h1></section>'; });
   }
-  function current() { return (location.hash || "").replace(/^#/, "") || DEFAULT_PAGE; }
-  window.addEventListener("hashchange", function () { render(current()); });
-  render(current());
+  var rt = null;
+  function refresh() { clearTimeout(rt); rt = setTimeout(function () { var s = SCREENS[current]; if (s && Screens[s].refresh) Screens[s].refresh(); }, 120); }
+  SignalDB.on(refresh);
+  Sync.on(function (state, detail, ev) {
+    refresh();
+    if (ev && ev.problems && ev.problems.length) {
+      var c = ev.problems.filter(function (p) { return p.status === "conflict"; }).length, d = ev.problems.length - c;
+      UI.toast((c ? c + " edit" + (c > 1 ? "s" : "") + " lost to a newer save" : "") + (c && d ? " \u00b7 " : "") + (d ? d + " edit" + (d > 1 ? "s" : "") + " rejected (" + (ev.problems.find(function (p) { return p.status !== "conflict"; }) || {}).error + ")" : ""), "bad");
+    }
+  });
+  window.addEventListener("hashchange", render);
+
+  fetch("./config.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
+    .then(function (cfg) {
+      var g = document.getElementById("access-gate"); if (g) g.remove();
+      return Sync.init(cfg);
+    })
+    .then(function () {
+      var s = Sync.state();
+      if ((s === "local" || s === "nokey") && SignalDB.isEmpty()) seedDatabase();
+      render();
+    });
+  window.addEventListener("beforeunload", function () { SignalDB.flush(); });
 })();
 </script>
 </body>
