@@ -18,6 +18,10 @@
  *                                  All accepted ops commit in ONE D1 transaction.
  *   GET  /trace?unit=ID            live recursive signal trace (connections + assignments). Never stored.
  *
+ * MCP (Model Context Protocol for ClickUp Brain):
+ *   POST /mcp                      JSON-RPC 2.0 endpoint. Tools: read, write, trace, shows, search.
+ *                                  All existing auth/permission/audit guardrails fire unchanged.
+ *
  * ADMIN:
  *   POST /shows/clone {from, title, season}       copy a show (units, CPs, NIs, connections, assignments, show positions)
  *   GET  /admin/users                             users + grants
@@ -30,6 +34,8 @@
  * Bindings: D1 'DB', R2 'BACKUPS'. Secrets: ADMIN_KEY.
  * NOTE: deploy target (Workers Builds, root dir throughline/worker). NOT served by GitHub Pages.
  */
+
+import { handleMcp } from './mcp.js';
 
 const VERSION = "1.0";
 
@@ -75,6 +81,7 @@ export default {
       if (p === "/sync" && M === "GET") return json(await sync(env, actor, url.searchParams.get("since")));
       if (p === "/batch" && M === "POST") return json(await batch(env, actor, await body(request)));
       if (p === "/trace" && M === "GET") return json(await trace(env, actor, url.searchParams.get("unit")));
+      if (p === "/mcp" && M === "POST") return json(await handleMcp(request.clone(), env, actor, { TABLES, ORDER, batch, trace, readable }));
 
       if (p === "/shows/clone" && M === "POST") { needAdmin(actor); return json(await cloneShow(env, actor, await body(request))); }
       if (p === "/admin/users" && M === "GET") { needAdmin(actor); return json(await listUsers(env)); }
@@ -254,8 +261,6 @@ function readable(actor, table, row) {
 
 /* ================= sync ================= */
 async function sync(env, actor, since) {
-  // cursor overlaps 5s back so a write stamped just before a concurrent read is never skipped;
-  // the client dedupes by rev.
   const cursor = new Date(Date.now() - 5000).toISOString();
   const tables = {};
   for (const t of ORDER) {
@@ -285,13 +290,12 @@ function clean(table, row) {
 async function batch(env, actor, b) {
   const ops = Array.isArray(b && b.ops) ? b.ops : fail("batch requires ops[]");
   if (ops.length > 500) fail("max 500 ops per batch");
-  const force = !!b.force && actor.admin; // admin bootstrap upload: skip rev conflicts
+  const force = !!b.force && actor.admin;
   const ctx = makeCtx(env);
   const now = nowISO();
   const results = new Array(ops.length);
   const stmts = [];
 
-  // stable order: upserts parent->child, then deletes
   const idx = ops.map((o, i) => i).sort((a, z) => {
     const oa = ops[a], oz = ops[z];
     const da = oa.op === "delete" ? 1 : 0, dz = oz.op === "delete" ? 1 : 0;
@@ -323,9 +327,7 @@ async function batch(env, actor, b) {
       continue;
     }
 
-    // upsert
     const incoming = clean(t, o.row);
-    // derive show_id for children when the client left it blank
     if ((t === "control_points" || t === "network_interfaces") && !incoming.show_id) {
       const parent = await ctx.get("units", t === "control_points" ? incoming.parent_unit_id : incoming.unit_id);
       if (parent) incoming.show_id = parent.show_id;
@@ -360,7 +362,6 @@ async function batch(env, actor, b) {
   if (stmts.length) {
     try { await env.DB.batch(stmts); }
     catch (e) {
-      // nothing committed (D1 batch is one transaction). Report why so the client can isolate the bad op.
       fail("batch rolled back: " + String((e && e.message) || e), 409);
     }
   }
