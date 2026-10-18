@@ -4,7 +4,7 @@
  * Relational backend over D1 for the Throughline (throughline/ on GitHub Pages).
  * 14 domain tables + 4 system tables (_roles, _users, _grants, _changes). See migrations/0001_init.sql.
  *
- * AUTH: every request (reads included) needs header x-key.
+ * AUTH: every request (reads included) needs header x-key or Authorization (Bearer).
  *   ADMIN_KEY secret      = break-glass root admin (Michael). Always admin, never stored in D1.
  *   _users.key_hash       = SHA-256 of each invited user's key. Plaintext is returned ONCE at create/rekey.
  *   Permissions are DATA: _grants (user + role + show|'*' + dept) -> _roles.perms JSON. Edit roles, not code.
@@ -39,8 +39,6 @@ import { handleMcp } from './mcp.js';
 
 const VERSION = "1.0";
 
-// ---------- schema registry: the ONLY tables + columns the generic API will touch ----------
-// order matters: parents before children (upserts are applied in this order inside a batch).
 const TABLES = {
   signal_types:       { cols: ["name","protocol","connector","dept","notes"], scope: "library" },
   fixture_types:      { cols: ["name","category","mfr","model","wattage","weight","primary_signal","notes"], scope: "library" },
@@ -63,7 +61,7 @@ const SNAPSHOT_KEEP = 60;
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, x-key",
+  "Access-Control-Allow-Headers": "Content-Type, x-key, Authorization",
   "Access-Control-Max-Age": "86400",
 };
 
@@ -76,13 +74,11 @@ export default {
     try {
       if (p === "/" || p === "/health") return json({ ok: true, app: "throughline", version: VERSION });
       const actor = await authenticate(request, env);
-
       if (p === "/me" && M === "GET") return json(await me(env, actor));
       if (p === "/sync" && M === "GET") return json(await sync(env, actor, url.searchParams.get("since")));
       if (p === "/batch" && M === "POST") return json(await batch(env, actor, await body(request)));
       if (p === "/trace" && M === "GET") return json(await trace(env, actor, url.searchParams.get("unit")));
       if (p === "/mcp" && M === "POST") return json(await handleMcp(request.clone(), env, actor, { TABLES, ORDER, batch, trace, readable }));
-
       if (p === "/shows/clone" && M === "POST") { needAdmin(actor); return json(await cloneShow(env, actor, await body(request))); }
       if (p === "/admin/users" && M === "GET") { needAdmin(actor); return json(await listUsers(env)); }
       if (p === "/admin/users" && M === "POST") { needAdmin(actor); return json(await writeUser(env, actor, await body(request))); }
@@ -92,7 +88,6 @@ export default {
       if (p === "/admin/changes" && M === "GET") { needAdmin(actor); return json(await listChanges(env, url)); }
       if (p === "/admin/snapshot" && M === "POST") { needAdmin(actor); return json(await snapshot(env, actor.name)); }
       if (p === "/admin/snapshots" && M === "GET") { needAdmin(actor); return json(await listSnapshots(env)); }
-
       return json({ error: "not found" }, 404);
     } catch (err) {
       const code = (err && err.status) || 500;
@@ -104,7 +99,6 @@ export default {
   },
 };
 
-/* ================= helpers ================= */
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json", ...CORS } });
 }
@@ -123,10 +117,9 @@ function newKey() {
 function parsePerms(s) { try { return JSON.parse(s || "{}"); } catch (e) { return {}; } }
 function needAdmin(actor) { if (!actor.admin) fail("admin only", 403); }
 
-/* ================= auth ================= */
 async function authenticate(request, env) {
-  const key = request.headers.get("x-key") || "";
-  if (!key) fail("unauthorized: missing x-key", 401);
+  const key = request.headers.get("x-key") || (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "") || "";
+  if (!key) fail("unauthorized: missing x-key or Authorization header", 401);
   if (env.ADMIN_KEY && key === env.ADMIN_KEY) return { id: "root", name: "admin", admin: true, grants: [] };
   const hash = await sha256(key);
   const u = await env.DB.prepare("SELECT * FROM _users WHERE key_hash=?1").bind(hash).first();
@@ -135,7 +128,6 @@ async function authenticate(request, env) {
     "SELECT g.id, g.role_id, g.show_id, g.dept, r.name AS role_name, r.perms FROM _grants g JOIN _roles r ON r.id=g.role_id WHERE g.user_id=?1"
   ).bind(u.id).all();
   const grants = (g.results || []).map((r) => ({ id: r.id, role_id: r.role_id, role_name: r.role_name, show_id: r.show_id, dept: r.dept, perms: parsePerms(r.perms) }));
-  // touch last_seen at most every ~5 min (cheap; avoids a write per request)
   if (!u.last_seen_at || Date.now() - Date.parse(u.last_seen_at) > 300000) {
     await env.DB.prepare("UPDATE _users SET last_seen_at=?2 WHERE id=?1").bind(u.id, nowISO()).run();
   }
@@ -153,7 +145,6 @@ async function me(env, actor) {
   };
 }
 
-/* ================= row context (batch overlay + DB lookups, cached) ================= */
 function makeCtx(env) {
   const overlay = {}; const cache = {};
   async function get(table, id) {
@@ -182,7 +173,6 @@ function makeCtx(env) {
 
 async function sigDept(ctx, sigId) { const s = await ctx.get("signal_types", sigId); return s ? s.dept : null; }
 
-// Which departments does a row belong to? (signal type is the department; see schema notes)
 async function deptsOf(ctx, table, row, depth = 0) {
   const out = new Set();
   const add = (d) => { if (d) out.add(d); };
@@ -223,20 +213,19 @@ function showOf(table, row) {
   return null;
 }
 
-// Can actor perform kind ("write"|"delete") on this row?
 async function allowed(ctx, actor, kind, table, row) {
   if (actor.admin) return true;
   const rowShow = showOf(table, row);
   if (rowShow) {
     const s = await ctx.get("shows", rowShow);
-    if (s && s.locked) return false; // locked shows are admin-only
+    if (s && s.locked) return false;
   }
   let depts = null;
   for (const g of actor.grants) {
     const scope = g.perms && g.perms[kind] && g.perms[kind][table];
     if (!scope) continue;
     if (rowShow && g.show_id !== "*" && g.show_id !== rowShow) continue;
-    if (scope === "show" && table !== "endpoints" && !rowShow) continue; // e.g. venue positions
+    if (scope === "show" && table !== "endpoints" && !rowShow) continue;
     if (scope === "dept") {
       if (!g.dept) continue;
       if (!depts) depts = await deptsOf(ctx, table, row);
@@ -247,7 +236,6 @@ async function allowed(ctx, actor, kind, table, row) {
   return false;
 }
 
-// Read visibility (sync + trace)
 function readable(actor, table, row) {
   if (actor.admin) return true;
   const rowShow = showOf(table, row);
@@ -259,7 +247,6 @@ function readable(actor, table, row) {
   });
 }
 
-/* ================= sync ================= */
 async function sync(env, actor, since) {
   const cursor = new Date(Date.now() - 5000).toISOString();
   const tables = {};
@@ -273,7 +260,6 @@ async function sync(env, actor, since) {
   return { cursor, full: !since, tables };
 }
 
-/* ================= batch writes ================= */
 function clean(table, row) {
   const out = { id: String(row.id) };
   for (const c of TABLES[table].cols) {
@@ -295,14 +281,12 @@ async function batch(env, actor, b) {
   const now = nowISO();
   const results = new Array(ops.length);
   const stmts = [];
-
   const idx = ops.map((o, i) => i).sort((a, z) => {
     const oa = ops[a], oz = ops[z];
     const da = oa.op === "delete" ? 1 : 0, dz = oz.op === "delete" ? 1 : 0;
     if (da !== dz) return da - dz;
     return ORDER.indexOf(oa.table) - ORDER.indexOf(oz.table);
   });
-
   for (const i of idx) {
     const o = ops[i] || {};
     const t = o.table;
@@ -310,11 +294,9 @@ async function batch(env, actor, b) {
     if (!o.row || !o.row.id) { results[i] = { table: t, status: "invalid", error: "row.id required" }; continue; }
     const id = String(o.row.id);
     const existing = await ctx.get(t, id);
-
     if (!force && existing && o.base_rev !== existing.rev) {
       results[i] = { table: t, id, status: "conflict", row: existing }; continue;
     }
-
     if (o.op === "delete") {
       if (!existing || existing.deleted_at) { results[i] = { table: t, id, status: "ok", row: existing }; continue; }
       if (!(await allowed(ctx, actor, "delete", t, existing))) { results[i] = { table: t, id, status: "denied", error: "no delete permission" }; continue; }
@@ -326,7 +308,6 @@ async function batch(env, actor, b) {
       results[i] = { table: t, id, status: "ok", row: after };
       continue;
     }
-
     const incoming = clean(t, o.row);
     if ((t === "control_points" || t === "network_interfaces") && !incoming.show_id) {
       const parent = await ctx.get("units", t === "control_points" ? incoming.parent_unit_id : incoming.unit_id);
@@ -335,7 +316,6 @@ async function batch(env, actor, b) {
     const merged = existing ? { ...existing, ...incoming } : incoming;
     if (existing && !(await allowed(ctx, actor, "write", t, existing))) { results[i] = { table: t, id, status: "denied", error: "no write permission on current row" }; continue; }
     if (!(await allowed(ctx, actor, "write", t, merged))) { results[i] = { table: t, id, status: "denied", error: "no write permission" }; continue; }
-
     const cols = TABLES[t].cols.filter((c) => c in incoming);
     if (existing) {
       const rev = existing.rev + 1;
@@ -358,12 +338,9 @@ async function batch(env, actor, b) {
       results[i] = { table: t, id, status: "ok", row: after };
     }
   }
-
   if (stmts.length) {
     try { await env.DB.batch(stmts); }
-    catch (e) {
-      fail("batch rolled back: " + String((e && e.message) || e), 409);
-    }
+    catch (e) { fail("batch rolled back: " + String((e && e.message) || e), 409); }
   }
   return { now, results };
 }
@@ -373,7 +350,6 @@ function logChange(env, at, actor, tbl, rowId, op, before, after) {
     .bind(at, actor, tbl, rowId, op, before ? JSON.stringify(before) : null, after ? JSON.stringify(after) : null);
 }
 
-/* ================= trace (computed live, never stored) ================= */
 async function trace(env, actor, unitId) {
   if (!unitId) fail("trace requires ?unit=");
   const unit = await env.DB.prepare("SELECT * FROM units WHERE id=?1 AND deleted_at IS NULL").bind(unitId).first();
@@ -411,7 +387,6 @@ async function trace(env, actor, unitId) {
   return { unit: { id: unit.id, unit_num: unit.unit_num, purpose: unit.purpose }, steps };
 }
 
-/* ================= show clone (template = clone, not inheritance) ================= */
 async function cloneShow(env, actor, b) {
   if (!b || !b.from) fail("clone requires from");
   const src = await env.DB.prepare("SELECT * FROM shows WHERE id=?1").bind(b.from).first();
@@ -442,7 +417,6 @@ async function cloneShow(env, actor, b) {
   return { ok: true, show_id: newShow, counts: { positions: pos.length, units: units.length, control_points: cps.length, network_interfaces: nis.length, connections: conns.length, assignments: asg.length } };
 }
 
-/* ================= admin: users / grants / roles ================= */
 async function listUsers(env) {
   const u = await env.DB.prepare("SELECT id,name,email,created_at,created_by,revoked_at,last_seen_at FROM _users ORDER BY name").all();
   const g = await env.DB.prepare("SELECT * FROM _grants ORDER BY created_at").all();
@@ -532,7 +506,6 @@ async function listChanges(env, url) {
   return { changes: r.results || [] };
 }
 
-/* ================= backups (R2 'BACKUPS') ================= */
 async function snapshot(env, who) {
   if (!env.BACKUPS) fail("no BACKUPS bucket bound", 501);
   const out = { app: "throughline", version: VERSION, created_at: nowISO(), by: who, tables: {} };
