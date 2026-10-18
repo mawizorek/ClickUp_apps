@@ -5,8 +5,9 @@
  * Five tools: read, write, trace, shows, search.
  * All existing guardrails (auth, permissions, rev checks, audit) fire unchanged.
  *
- * Receives dependencies from worker.js to avoid circular imports.
- * The worker's fetch handler calls handleMcp() and passes { TABLES, ORDER, batch, trace, readable }.
+ * Discovery methods (initialize, tools/list) are unauthenticated so ClickUp
+ * can validate the connection during setup. Tool execution authenticates
+ * via the passed authenticate function.
  */
 
 const TOOLS = [
@@ -167,7 +168,7 @@ async function toolSearch(env, actor, params, deps) {
 
 /* ================= main handler ================= */
 
-export async function handleMcp(request, env, actor, deps) {
+export async function handleMcp(request, env, deps) {
   let body;
   try {
     body = await request.json();
@@ -178,7 +179,7 @@ export async function handleMcp(request, env, actor, deps) {
   const { method, params, id } = body;
   if (!method) return rpcError(id, -32600, "method required");
 
-  // MCP lifecycle
+  // MCP lifecycle — unauthenticated (allows ClickUp to validate the connection)
   if (method === "initialize") {
     return rpcOk(id, { ...SERVER_INFO, capabilities: { tools: {} } });
   }
@@ -189,7 +190,14 @@ export async function handleMcp(request, env, actor, deps) {
     return rpcOk(id, { tools: TOOLS });
   }
 
-  // Tool invocation
+  // Tool invocation — authenticated
+  let actor;
+  try {
+    actor = await deps.authenticate(request, env);
+  } catch (e) {
+    return rpcError(id, -32603, "Authentication failed: " + (e.message || String(e)));
+  }
+
   if (method === "tools/call") {
     const toolName = params && params.name;
     const toolArgs = (params && params.arguments) || {};

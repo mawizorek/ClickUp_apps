@@ -20,7 +20,8 @@
  *
  * MCP (Model Context Protocol for ClickUp Brain):
  *   POST /mcp                      JSON-RPC 2.0 endpoint. Tools: read, write, trace, shows, search.
- *                                  All existing auth/permission/audit guardrails fire unchanged.
+ *                                  Discovery (initialize, tools/list) is unauthenticated.
+ *                                  Tool execution authenticates via x-key or Authorization header.
  *
  * ADMIN:
  *   POST /shows/clone {from, title, season}       copy a show (units, CPs, NIs, connections, assignments, show positions)
@@ -73,12 +74,13 @@ export default {
     const M = request.method;
     try {
       if (p === "/" || p === "/health") return json({ ok: true, app: "throughline", version: VERSION });
+      // MCP: discovery is unauthenticated so ClickUp can validate; tool calls authenticate internally
+      if (p === "/mcp" && M === "POST") return json(await handleMcp(request, env, { TABLES, ORDER, batch, trace, readable, authenticate }));
       const actor = await authenticate(request, env);
       if (p === "/me" && M === "GET") return json(await me(env, actor));
       if (p === "/sync" && M === "GET") return json(await sync(env, actor, url.searchParams.get("since")));
       if (p === "/batch" && M === "POST") return json(await batch(env, actor, await body(request)));
       if (p === "/trace" && M === "GET") return json(await trace(env, actor, url.searchParams.get("unit")));
-      if (p === "/mcp" && M === "POST") return json(await handleMcp(request.clone(), env, actor, { TABLES, ORDER, batch, trace, readable }));
       if (p === "/shows/clone" && M === "POST") { needAdmin(actor); return json(await cloneShow(env, actor, await body(request))); }
       if (p === "/admin/users" && M === "GET") { needAdmin(actor); return json(await listUsers(env)); }
       if (p === "/admin/users" && M === "POST") { needAdmin(actor); return json(await writeUser(env, actor, await body(request))); }
