@@ -166,4 +166,5 @@
   .sig-showbar { flex-wrap: wrap; row-gap: 8px; }
   .sig-search { max-width: none; }
   .sig-st { margin-left: 0; }
+  .sig-tr { display: none; }
 }
