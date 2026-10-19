@@ -40,7 +40,7 @@ Screens.tables = (function () {
     h += '<input class="sig-search" id="tblQ" type="search" placeholder="Search ' + esc(S.label.toLowerCase()) + '" value="' + esc(st.q) + '">';
     if (Sync.can("write", t) && (!SCHEMA.isShowScoped(t) || show)) h += '<button type="button" class="sig-pill sig-act sig-new" id="tblNew">+ New</button>';
     h += '</div>';
-    if (SCHEMA.isShowScoped(t) || t === "positions") h += '<div class="sig-group"><span class="sig-label">Show</span><span class="sig-soft">' + esc(show ? SCHEMA.T.shows.show(show) : "none") + '</span></div>';
+    if (SCHEMA.isShowScoped(t) || t === "positions") h += '<div class="sig-group"><span class="sig-label">Show</span><span class="sig-show">' + esc(show ? SCHEMA.T.shows.show(show) : "none") + '</span></div>';
     h += '</div><div class="sig-list">';
     rows.forEach(function (x) {
       var pend = SignalDB.pendingFor(t, x.r.id);
