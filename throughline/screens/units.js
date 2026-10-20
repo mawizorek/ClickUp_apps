@@ -89,7 +89,7 @@ Screens.units = (function () {
       var pend = SignalDB.pendingFor("units", u.id);
       var cell = function (k, cls, inner, extra, title) { var c = COLS.filter(function (z) { return z.k === k; })[0];
         return '<div class="sig-cell' + (cls ? " " + cls : "") + '" style="' + cs(c) + (extra ? ";" + extra : "") + '"' + (title ? ' title="' + title + '"' : "") + '>' + inner + '</div>'; };
-      h += '<div class="sig-row' + (i % 2 ? " sig-alt" : "") + (pend ? " is-pend" : "") + '" role="row" data-uid="' + esc(u.id) + '">';
+      h += '<div class="sig-row' + (i % 2 ? " sig-alt" : "") + (pend ? " is-pend" : "") + '" role="row" data-uid="' + esc(u.id) + '" tabindex="0">';
       h += cell("unit_num", "", or(u.unit_num)) + cell("_type", "", or(x.type && x.type.name)) + cell("_sig", "", or(sn), "color:" + (SIG_COLORS[sn] || "#94a3b8"));
       h += cell("_pos", "", or(x.pos && x.pos.name)) + cell("direction", "", dv, "color:" + (DIR_COLORS[dv] || "var(--text-faint)"));
       h += cell("purpose", "", or(u.purpose)) + cell("channel", "sig-ch", or(u.channel || u.dmx_addr)) + cell("dimmer", "sig-dim", or(u.dimmer));
@@ -105,11 +105,12 @@ Screens.units = (function () {
 
   function bind() {
     var $ = function (s) { return view.querySelectorAll(s); };
+    $(".sig-row[data-uid]").forEach(function (r) { r.addEventListener("click", function (e) { if (e.target.closest(".sig-trace-btn")) return; detail(r.dataset.uid); }); });
+    $(".sig-row[data-uid]").forEach(function (r) { r.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); detail(r.dataset.uid); } }); });
     $("[data-sig]").forEach(function (b) { b.addEventListener("click", function () { st.filters.signal = b.dataset.sig; render(); }); });
     $("[data-dir]").forEach(function (b) { b.addEventListener("click", function () { st.filters.dir = b.dataset.dir; render(); }); });
     $("[data-sort]").forEach(function (c) { c.addEventListener("click", function () { var k = c.dataset.sort;
       if (st.sort.col === k) st.sort.dir = st.sort.dir === "asc" ? "desc" : "asc"; else { st.sort.col = k; st.sort.dir = "asc"; } render(); }); });
-    $(".sig-row[data-uid]").forEach(function (r) { r.addEventListener("click", function (e) { if (e.target.closest(".sig-trace-btn")) return; detail(r.dataset.uid); }); });
     $("[data-trace]").forEach(function (b) { b.addEventListener("click", function (e) { e.stopPropagation(); traceOf(b.dataset.trace); }); });
     $("[data-rpt]").forEach(function (b) { b.addEventListener("click", function () { report(b.dataset.rpt); }); });
     $("[data-act]").forEach(function (b) { b.addEventListener("click", function () { act(b.dataset.act); }); });

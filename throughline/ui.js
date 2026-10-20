@@ -65,14 +65,23 @@ var UI = (function () {
   function panel(title, bodyHtml, opts) {
     close(true);
     var wrap = document.createElement("div"); wrap.id = "sigPanelWrap";
-    wrap.innerHTML = '<div class="sig-scrim" data-pclose></div><aside class="sig-panel" role="dialog" aria-label="' + esc(title) + '">' +
+    wrap.innerHTML = '<div class="sig-scrim" data-pclose></div><aside class="sig-panel" role="dialog" aria-modal="true" aria-label="' + esc(title) + '">' +
       '<div class="sig-panel-hdr"><h2>' + esc(title) + '</h2><div class="sig-panel-acts">' + ((opts && opts.actions) || "") +
       '<button type="button" class="sig-panel-x" data-pclose aria-label="Close">\u2715</button></div></div>' +
       '<div class="sig-panel-body">' + bodyHtml + '</div></aside>';
     document.body.appendChild(wrap);
     onClose = opts && opts.onClose;
     wrap.querySelectorAll("[data-pclose]").forEach(function (el) { el.addEventListener("click", function () { close(); }); });
-    return wrap.querySelector(".sig-panel");
+    var aside = wrap.querySelector(".sig-panel");
+    aside.addEventListener("keydown", function (e) {
+      if (e.key !== "Tab") return;
+      var focusable = aside.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (!focusable.length) return;
+      var first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+      else { if (document.activeElement === last) { e.preventDefault(); first.focus(); } }
+    });
+    return aside;
   }
   function close(silent) {
     var w = document.getElementById("sigPanelWrap"); if (!w) return;
