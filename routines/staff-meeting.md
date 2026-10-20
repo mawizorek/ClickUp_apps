@@ -1,17 +1,35 @@
-# Staff Meeting Archive
+# Staff Meeting Close-Out
 
-> Archival log of URITP staff meeting agendas. Each entry is a verbatim capture of the agenda as it existed going into the meeting, preserved to get the running prose out of the [\[Staff Meeting\]](https://app.clickup.com/36074068/v/li/4026818376448387909) task description.
->
-> **Workflow hook (Brain):**
-> 1. Before each Tuesday meeting: dump the current agenda from the task description into a new entry here.
-> 2. After the meeting: Michael uploads recording(s); Brain transcribes and posts topic threads on the task.
-> 3. Action items become linked tasks only. No long prose in this archive, no 1000-line descriptions.
+> Procedure Brain runs after each Tuesday staff meeting to archive the agenda, process recordings, and leave the task clean for next week.
 >
 > **Source task:** `[Staff Meeting]` · URITP-2594
 > **Google Doc (volatile, reused weekly):** [Staff Meeting Agenda](https://docs.google.com/document/d/1j44tmavM8JwiqdpoJ22kPedC_Df__5fBBMnrPYNL3Go/edit)
 > **Backfill cutoff:** ~Aug 2026 (older entries intentionally omitted)
 
+## Close-Out Procedure
+
+Trigger: Michael says the meeting is done, or uploads a recording to `[Staff Meeting]`.
+
+1. **Snapshot the agenda.** Copy the current agenda from the task description verbatim into a new dated entry in the Archive section below. Preserve the person-by-person format exactly.
+2. **Transcribe recordings.** For each new `.wav` / audio attachment on the task:
+   - Transcribe using `transcribe_media`.
+   - Post each distinct topic as a threaded comment on the task, formatted: `🎙️ TOPIC · Speaker — Subject` with the date/time header, transcript in the reply.
+3. **Extract action items.** Anything that sounds like an assignment, follow-up, or deadline becomes a linked task (or gets linked to an existing one). No prose summaries, no 1000-line comment blocks.
+4. **Update the archive entry.** Add a compact `Transcription summary` bullet list under the agenda snapshot (what was discussed, decisions, flags). Link to action-item tasks where they exist.
+5. **Roll the task forward.** Clear the consumed agenda content from the task description (keep the banner structure, wipe the per-person items). Advance start/due dates to next Tuesday's meeting slot.
+6. **Mark status.** Set task status back to `on deck` for the next occurrence.
+
+## Guardrails
+
+- Never delete older archive entries.
+- Never edit the Google Doc directly.
+- If a recording is inaudible or ambiguous, flag with `⚠️` and a best-guess; do not invent content.
+- If no recording is uploaded, the archive entry stands as agenda-only (no transcription summary).
+- Student names in sensitive contexts (grades, behavioral notes): keep in task comments, do NOT put in this archive. This file is in a public repo.
+
 ---
+
+# Archive
 
 ## Tuesday, October 20, 2026
 
@@ -40,7 +58,7 @@
 
 **Casey:** (none)
 
-> 🎙️ Recordings: pending (uploaded today, not yet transcribed)
+> 🎙️ Recordings: pending transcription
 
 ---
 
@@ -53,9 +71,9 @@
 **Transcription summary (from task comments):**
 - Advancement request: top 3 department achievements since last reporting period. Productions, SM alumni working in the field, community-engaged work (Consent ROCs, The Christians), three new devised works this year.
 - Becoming Curious Designer event Mon 10/19 at 7p in Todd Theatre (Stephen lighting, Kaylee artist).
-- Jasper Paisley (Brad Paisley's son) prospective student visit; interested in flexible curriculum and playwriting; advancement angle discussed.
+- Jasper Paisley prospective student visit; interested in flexible curriculum and playwriting; advancement angle discussed.
 - One-act play submission deadline Fri 10/16; Reading Night 10/25.
-- Sara: two seats set aside at box office for Paisley family.
+- Sara: two seats set aside at box office for prospective family.
 
 ---
 
@@ -80,9 +98,9 @@
 **Casey:** (none)
 
 **Transcription summary (from task comments):**
-- Joan Ross Sorkin (UR alumna, mother of Andrew Ross Sorkin) pushing "Bordello" musical; Nigel declined mainstage. Counter-idea: mini-festival of her 10-minute plays as directing exercise, advancement-funded. Lisa looking into donor records.
+- Joan Ross Sorkin (UR alumna) pushing "Bordello" musical; Nigel declined mainstage. Counter-idea: mini-festival of her 10-minute plays as directing exercise, advancement-funded. Lisa looking into donor records.
 - Faculty Toolkit distributed (Green Center resource on career exploration questions).
-- Rachel Kelsey from O'Neill/NTI wants to visit mid-November for a free recruitment workshop; Nigel lukewarm given $20K program cost but open to "building a theatrical resume" session, possibly week of Mar 8.
+- Rachel Kelsey from O'Neill/NTI wants to visit mid-November for a free recruitment workshop; open to "building a theatrical resume" session, possibly week of Mar 8.
 - SPAC ops: parking lot behind building getting more scrutiny from Transportation; new parking policy drafted (7a-5p loading dock reserved, day passes 2 weeks ahead, after 5p one spot held for ops).
 - English event in lobby Nov 3, 4:30-7p (approved, need to verify against audition/callback week).
 
@@ -124,11 +142,11 @@
 > No formal agenda paste. Meeting content captured via recording transcription.
 
 **Transcription summary (from task comments):**
-- Helena discussion: on book for Becoming Curious, but SMs need to learn that role; behavioral concerns (impulse control). Social media posts should go through Natalie, not Helena.
-- Instagram takeover schedule: costumes this week, lighting/sound next Friday (hang day), scenery the following Mon-Fri before tech. Video a day. Charlie to identify a scenery lab student.
-- International student internship policy: legally not allowed unless mandatory major requirement. Impacts Alex immediately. Dean's office and Greene Center won't sign off.
+- Helena discussion: SM development concerns; social media posts should go through Natalie.
+- Instagram takeover schedule: costumes this week, lighting/sound next Friday (hang day), scenery the following Mon-Fri before tech.
+- International student internship policy: legally not allowed unless mandatory major requirement.
 - SPAC ops: parking policy draft shared.
-- Designer run attendance appreciated; Kavon pleased with outcome.
+- Designer run attendance appreciated.
 
 ---
 
@@ -218,10 +236,10 @@
 **Casey:** (none)
 
 **Transcription summary (7 topic threads + session remark):**
-- SPAC B005 lost to dance costume shop; LEDs/video pulled, road cases ordered. Conventional fixtures may move from pit to Todd grid.
+- SPAC B005 lost to dance costume shop; LEDs/video pulled, road cases ordered.
 - Sloan Studio lights broken; email says fixed before semester. Fan switch question unanswered.
-- 3D scans of building this week (lobby, theatre, box offices, offices). Related to Chase Bank area, sprinkler work, green room ceiling.
-- Frat Quad houses project in the works (hearsay, do not circulate).
-- Nick Offerman shop/backstage tour idea (Charlie). Michael reaching out to Ash. Caveat: tech week pileup.
+- 3D scans of building this week. Related to Chase Bank area, sprinkler work, green room ceiling.
+- Frat Quad houses project in the works (hearsay).
+- Nick Offerman shop/backstage tour idea. Michael reaching out to Ash.
 - Enrollment push: Playwriting, Directing, Production Experience still need students.
-- Acting for Camera instructor resolved same day via email (Jill Rittinger, RIT adjunct). Campus visit set for Mon 8/19. TA need flagged as production lane item.
+- Acting for Camera instructor resolved same day via email (Jill Rittinger, RIT adjunct). Campus visit set for Mon 8/19.
