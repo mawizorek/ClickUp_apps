@@ -78,9 +78,10 @@ const TOOLS = [
 
 const SERVER_INFO = {
   name: "throughline",
-  version: "1.0",
-  protocolVersion: "2024-11-05"
+  version: "1.0"
 };
+
+const PROTOCOL_VERSION = "2024-11-05";
 
 function rpcOk(id, result) {
   return { jsonrpc: "2.0", id, result };
@@ -166,7 +167,17 @@ async function toolSearch(env, actor, params, deps) {
   return { query: params.query, count: results.length, results };
 }
 
-/* ================= main handler ================= */
+/* ================= GET handler (validation + SSE endpoint) ================= */
+
+export function handleMcpGet() {
+  return {
+    protocolVersion: PROTOCOL_VERSION,
+    serverInfo: SERVER_INFO,
+    capabilities: { tools: {} }
+  };
+}
+
+/* ================= POST handler (JSON-RPC) ================= */
 
 export async function handleMcp(request, env, deps) {
   let body;
@@ -181,7 +192,11 @@ export async function handleMcp(request, env, deps) {
 
   // MCP lifecycle — unauthenticated (allows ClickUp to validate the connection)
   if (method === "initialize") {
-    return rpcOk(id, { ...SERVER_INFO, capabilities: { tools: {} } });
+    return rpcOk(id, {
+      protocolVersion: PROTOCOL_VERSION,
+      capabilities: { tools: {} },
+      serverInfo: SERVER_INFO
+    });
   }
   if (method === "notifications/initialized") {
     return rpcOk(id, {});
