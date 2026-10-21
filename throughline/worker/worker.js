@@ -19,6 +19,7 @@
  *   GET  /trace?unit=ID            live recursive signal trace (connections + assignments). Never stored.
  *
  * MCP (Model Context Protocol for ClickUp Brain):
+ *   GET  /mcp                      server info for connection validation (unauthenticated)
  *   POST /mcp                      JSON-RPC 2.0 endpoint. Tools: read, write, trace, shows, search.
  *                                  Discovery (initialize, tools/list) is unauthenticated.
  *                                  Tool execution authenticates via x-key or Authorization header.
@@ -36,7 +37,7 @@
  * NOTE: deploy target (Workers Builds, root dir throughline/worker). NOT served by GitHub Pages.
  */
 
-import { handleMcp } from './mcp.js';
+import { handleMcp, handleMcpGet } from './mcp.js';
 
 const VERSION = "1.0";
 
@@ -74,7 +75,8 @@ export default {
     const M = request.method;
     try {
       if (p === "/" || p === "/health") return json({ ok: true, app: "throughline", version: VERSION });
-      // MCP: discovery is unauthenticated so ClickUp can validate; tool calls authenticate internally
+      // MCP: GET for validation, POST for JSON-RPC. Both unauthenticated for discovery.
+      if (p === "/mcp" && M === "GET") return json(handleMcpGet());
       if (p === "/mcp" && M === "POST") return json(await handleMcp(request, env, { TABLES, ORDER, batch, trace, readable, authenticate }));
       const actor = await authenticate(request, env);
       if (p === "/me" && M === "GET") return json(await me(env, actor));
