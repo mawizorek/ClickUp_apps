@@ -19,7 +19,8 @@ Michael says the meeting is done, uploads a recording to `[Staff Meeting]`, or i
 
 1. **Read the archive page.** Open `REPO_PAGES/doc-staff-meeting-agenda.md` from `uritp-docs` (main). Note the template header format and the most recent dated entry.
 
-2. **Snapshot the agenda.** Read the current agenda from the `[Staff Meeting]` task description. Format it into a new `### <Day>, <Date>` entry matching the template exactly:
+2. **Snapshot the agenda.** Read the current agenda from the `[Staff Meeting]` task description. Format it into a new `### <Day>, <Date> { .new-page }` entry matching the template exactly:
+   - **New-page flag:** every new entry header MUST include `{ .new-page }` after the date. This renders a visual flag on the published site.
    - One `=== "**Name**"` section per person who has items, with `- [ ]` per item.
    - One `=== "*Nothing for the Group*"` section listing everyone who had nothing.
    - Verbatim content from the agenda. Do not editorialize, reword, or summarize.
