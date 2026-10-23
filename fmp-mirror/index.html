@@ -22,27 +22,24 @@ p, li { font-size: 14px; margin: 0 0 6px; }
 ul { padding-left: 20px; margin: 0 0 8px; }
 .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.03em; }
 .live { background: #d4edda; color: #256; }
-.spec { background: #e8e8e8; color: #666; }
+.seed { background: #d4e8ed; color: #245; }
+.state { background: #ede8d4; color: #654; }
 .note { font-size: 12px; color: #888; }
+.err { color: #a33; font-size: 13px; }
+.dim { color: #aaa; font-size: 13px; font-style: italic; }
+button { font: inherit; font-size: 12px; cursor: pointer; background: #f5f5f5; border: 1px solid #ccc; border-radius: 3px; padding: 3px 10px; color: #444; }
+button:hover { background: #eee; }
+.footer { font-size: 11px; color: #aaa; margin-top: 32px; }
 </style>
 </head>
 <body>
 
 <h1>FMP Mirror</h1>
 <p class="sub">sql.js layout renders for FileMaker apps<br>
-Schema + seed source: <a href="https://github.com/mawizorek/maw-prose">maw-prose</a> · Renders served from here</p>
+Source: <a href="https://github.com/mawizorek/maw-prose">maw-prose</a> · Renders served from here</p>
 
-<h2>Apps</h2>
-<ul>
-  <li>
-    <strong>URITP People</strong> <span class="tag live">schema live</span><br>
-    <span class="note">22 tables · 28 relationships · DDR 10/23/2026</span><br>
-    <span class="note">Schema: <a href="https://github.com/mawizorek/maw-prose/blob/main/apps/uritp-people/fmp-mirror/schema.sql">schema.sql</a> · <a href="https://github.com/mawizorek/maw-prose/blob/main/apps/uritp-people/fmp-mirror/seed.sql">seed.sql</a></span>
-    <ul>
-      <li>Reconciliation Window <span class="tag spec">speccing</span></li>
-    </ul>
-  </li>
-</ul>
+<h2>Apps <button id="reload" title="Re-scan maw-prose">↻</button></h2>
+<div id="apps"><p class="dim">Loading…</p></div>
 
 <hr>
 
@@ -52,17 +49,156 @@ Schema + seed source: <a href="https://github.com/mawizorek/maw-prose">maw-prose
   <li><strong>Data:</strong> schema.sql (generated from the DDR). No invented fields.</li>
   <li><strong>Visual:</strong> object library families + theme vectors. No ad-hoc styling.</li>
 </ul>
-
-<h2>Verification</h2>
 <p>schema.sql tracks the DDR via fmp-state. New DDR drop → STATE.md updates → diff against schema.sql → stale renders surface as broken queries.</p>
 
 <hr>
-
 <h2>Related</h2>
 <ul>
   <li><a href="../fmp-renderer/">fmp-renderer</a> — reads the spec (what you plan to build)</li>
   <li>fmp-mirror — renders the layout (what it looks like with data)</li>
 </ul>
+
+<p class="footer" id="status"></p>
+
+<script>
+const REPO = { owner: 'mawizorek', name: 'maw-prose', branch: 'main' };
+const API  = `https://api.github.com/repos/${REPO.owner}/${REPO.name}`;
+const RAW  = `https://raw.githubusercontent.com/${REPO.owner}/${REPO.name}`;
+const BLOB = `https://github.com/${REPO.owner}/${REPO.name}/blob/${REPO.branch}`;
+const CACHE_KEY = 'fmpm.tree.v1';
+const TTL = 5 * 60 * 1000;
+
+async function api(path) {
+  const r = await fetch(API + path, { headers: { Accept: 'application/vnd.github+json' } });
+  if (r.status === 403 || r.status === 429) {
+    const reset = Number(r.headers.get('x-ratelimit-reset')) * 1000;
+    const mins = reset ? Math.max(1, Math.ceil((reset - Date.now()) / 60000)) : 0;
+    throw new Error('GitHub rate limit hit.' + (mins ? ` Resets in ~${mins} min.` : ''));
+  }
+  if (!r.ok) throw new Error(`GitHub ${r.status} for ${path}`);
+  return { json: await r.json(), left: r.headers.get('x-ratelimit-remaining') };
+}
+
+async function loadTree(force) {
+  if (!force) {
+    try {
+      const c = JSON.parse(sessionStorage.getItem(CACHE_KEY));
+      if (c && Date.now() - c.at < TTL) return Object.assign(c, { cached: true });
+    } catch (e) {}
+  }
+  const commit = await api(`/commits/${REPO.branch}`);
+  const tree   = await api(`/git/trees/${commit.json.commit.tree.sha}?recursive=1`);
+  const out = {
+    at: Date.now(),
+    sha: commit.json.sha,
+    date: commit.json.commit.committer.date,
+    paths: tree.json.tree.filter(n => n.type === 'blob').map(n => n.path),
+    left: tree.left,
+    cached: false,
+  };
+  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(out)); } catch (e) {}
+  return out;
+}
+
+function discoverApps(paths) {
+  const apps = new Map();
+  for (const p of paths) {
+    const m = p.match(/^apps\/([^/]+)\/fmp-mirror\/(.+)$/);
+    if (!m) continue;
+    const slug = m[1], file = m[2];
+    if (!apps.has(slug)) apps.set(slug, { slug, files: [] });
+    apps.get(slug).files.push(file);
+  }
+  // Also check for fmp-state
+  for (const p of paths) {
+    const m = p.match(/^apps\/fmp-state\/([^/]+)\/STATE\.md$/);
+    if (!m) continue;
+    const slug = m[1];
+    if (apps.has(slug)) apps.get(slug).hasState = true;
+  }
+  return [...apps.values()].sort((a, b) => a.slug.localeCompare(b.slug));
+}
+
+async function loadSchemaHeader(sha, slug) {
+  const url = `${RAW}/${sha}/apps/${slug}/fmp-mirror/schema.sql`;
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const head = (await r.text()).slice(0, 600);
+    const tables = (head.match(/(\d+) tables/i) || [])[1];
+    const rels   = (head.match(/(\d+) relationship/i) || [])[1];
+    const tos    = (head.match(/(\d+) TOs/i) || [])[1];
+    const ddr    = (head.match(/export (\d+\/\d+\/\d+)/i) || head.match(/(\d+\/\d+\/\d+)/i) || [])[1];
+    const fm     = (head.match(/FM ([\d.]+)/i) || [])[1];
+    const name   = (head.match(/^--\s*(.+?\.fmp12)/mi) || [])[1];
+    return { tables, rels, tos, ddr, fm, name };
+  } catch (e) { return null; }
+}
+
+function slugToTitle(s) {
+  return s.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+async function render(force) {
+  const el = document.getElementById('apps');
+  const st = document.getElementById('status');
+  el.innerHTML = '<p class="dim">Scanning maw-prose…</p>';
+  try {
+    const tree = await loadTree(force);
+    const apps = discoverApps(tree.paths);
+    if (!apps.length) {
+      el.innerHTML = '<p class="dim">No apps found with fmp-mirror/ in maw-prose.</p>';
+      st.textContent = tree.cached ? 'cached' : `${tree.left} API reads left`;
+      return;
+    }
+    let html = '';
+    for (const app of apps) {
+      const hasSchema = app.files.includes('schema.sql');
+      const hasSeed   = app.files.includes('seed.sql');
+      const renders   = app.files.filter(f => f.endsWith('.html') && f !== 'index.html');
+      let meta = null;
+      if (hasSchema) meta = await loadSchemaHeader(tree.sha, app.slug);
+      const title = meta?.name || slugToTitle(app.slug);
+      html += `<div style="margin-bottom:20px">`;
+      html += `<strong>${title}</strong>`;
+      if (hasSchema) html += ` <span class="tag live">schema</span>`;
+      if (hasSeed)   html += ` <span class="tag seed">seed</span>`;
+      if (app.hasState) html += ` <span class="tag state">ddr state</span>`;
+      html += `<br>`;
+      if (meta) {
+        const parts = [];
+        if (meta.tables) parts.push(meta.tables + ' tables');
+        if (meta.rels)   parts.push(meta.rels + ' relationships');
+        if (meta.tos)    parts.push(meta.tos + ' TOs');
+        if (meta.ddr)    parts.push('DDR ' + meta.ddr);
+        if (meta.fm)     parts.push('FM ' + meta.fm);
+        if (parts.length) html += `<span class="note">${parts.join(' · ')}</span><br>`;
+      }
+      const links = [];
+      if (hasSchema) links.push(`<a href="${BLOB}/apps/${app.slug}/fmp-mirror/schema.sql">schema.sql</a>`);
+      if (hasSeed)   links.push(`<a href="${BLOB}/apps/${app.slug}/fmp-mirror/seed.sql">seed.sql</a>`);
+      if (app.hasState) links.push(`<a href="${BLOB}/apps/fmp-state/${app.slug}/STATE.md">STATE.md</a>`);
+      if (links.length) html += `<span class="note">${links.join(' · ')}</span>`;
+      if (renders.length) {
+        html += `<ul style="margin-top:4px">`;
+        for (const r of renders) {
+          const name = r.replace('.html', '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          html += `<li><a href="${app.slug}/${r}">${name}</a></li>`;
+        }
+        html += `</ul>`;
+      }
+      html += `</div>`;
+    }
+    el.innerHTML = html;
+    st.textContent = (tree.cached ? 'cached · ' : '') + `commit ${tree.sha.slice(0,7)} · ${tree.left} API reads left`;
+  } catch (e) {
+    el.innerHTML = `<p class="err">${e.message}</p>`;
+  }
+}
+
+document.getElementById('reload').onclick = () => render(true);
+render(false);
+</script>
 
 </body>
 </html>
