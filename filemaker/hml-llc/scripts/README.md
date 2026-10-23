@@ -90,7 +90,17 @@ Left in place and flagged rather than relocated: **does the live file have a `ut
 
 **`state`** (`golden` / `built` / `superseded`) describes the SCRIPT's standing in FileMaker. `body` describes whether documentation exists here. They are independent: a superseded script can have a full body worth reading, and a golden script can have no body yet.
 
-**Dictation, not paste-round-trip.** FileMaker's script clipboard is an XML snippet, so a `.fmscript` is the human-legible reference you TYPE into *Manage Scripts* — not a paste-back artifact. Unlike a `.fmcalc`, which does paste back verbatim. Legibility over round-trip, deliberately, and the copy-target rule above is the consequence of that trade.
+### ⚠️ 2026-10-23 — this README claimed a `.fmscript` cannot be pasted back
+
+It said:
+
+> ~~"**Dictation, not paste-round-trip.** FileMaker's script clipboard is an XML snippet, so a `.fmscript` is the human-legible reference you TYPE into *Manage Scripts* — not a paste-back artifact."~~
+
+**Disproven 2026-10-05.** A `.fmscript` does paste. Script Workspace accepts script steps as `fmxmlsnippet` XML carried under FileMaker's private `XMSS` clipboard type, and the fmp-renderer builds that XML from the `.fmscript` in the browser, then hands over a one-line Terminal command that puts it on the clipboard. Proven on URITP People's `PEOPLE_Compare`, 89 steps. The standard is `standards/filemaker/clipboard-snippets.md` in `maw-prose`, and it is the authority here.
+
+The premise was right for its world and the world changed, the same way D-002 went. What survives: typing is still the fallback for a step the renderer has not been taught, and such a step pastes as a `TYPE BY HAND:` comment rather than silently vanishing. What does not survive: the instruction to hand-type a whole script, and the line in `filemaker/DECISIONS.md` D-005 saying the standard must never claim paste-round-trip.
+
+**The copy-target rule above is unaffected.** Whole-file copy was never only about dictation: everything in a `.fmscript` still has to be something you want inside the FileMaker file, because now it genuinely does land there.
 
 ## Status
 
