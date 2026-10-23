@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FMP Mirror</title>
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+  color: #222;
+  line-height: 1.5;
+}
+h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+.sub { font-size: 13px; color: #666; margin-bottom: 32px; }
+a { color: #1a6; }
+hr { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
+h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #555; margin: 0 0 8px; }
+p, li { font-size: 14px; margin: 0 0 6px; }
+ul { padding-left: 20px; margin: 0 0 8px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.03em; }
+.live { background: #d4edda; color: #256; }
+.spec { background: #e8e8e8; color: #666; }
+.note { font-size: 12px; color: #888; }
+</style>
+</head>
+<body>
+
+<h1>FMP Mirror</h1>
+<p class="sub">sql.js layout renders for FileMaker apps<br>
+Schema + seed source: <a href="https://github.com/mawizorek/maw-prose">maw-prose</a> · Renders served from here</p>
+
+<h2>Apps</h2>
+<ul>
+  <li>
+    <strong>URITP People</strong> <span class="tag live">schema live</span><br>
+    <span class="note">22 tables · 28 relationships · DDR 10/23/2026</span><br>
+    <span class="note">Schema: <a href="https://github.com/mawizorek/maw-prose/blob/main/apps/uritp-people/fmp-mirror/schema.sql">schema.sql</a> · <a href="https://github.com/mawizorek/maw-prose/blob/main/apps/uritp-people/fmp-mirror/seed.sql">seed.sql</a></span>
+    <ul>
+      <li>Reconciliation Window <span class="tag spec">speccing</span></li>
+    </ul>
+  </li>
+</ul>
+
+<hr>
+
+<h2>How it works</h2>
+<p>Each render boots sql.js in the browser, loads schema.sql + seed.sql from maw-prose, and draws one FileMaker layout. Two contracts constrain every render:</p>
+<ul>
+  <li><strong>Data:</strong> schema.sql (generated from the DDR). No invented fields.</li>
+  <li><strong>Visual:</strong> object library families + theme vectors. No ad-hoc styling.</li>
+</ul>
+
+<h2>Verification</h2>
+<p>schema.sql tracks the DDR via fmp-state. New DDR drop → STATE.md updates → diff against schema.sql → stale renders surface as broken queries.</p>
+
+<hr>
+
+<h2>Related</h2>
+<ul>
+  <li><a href="../fmp-renderer/">fmp-renderer</a> — reads the spec (what you plan to build)</li>
+  <li>fmp-mirror — renders the layout (what it looks like with data)</li>
+</ul>
+
+</body>
+</html>
