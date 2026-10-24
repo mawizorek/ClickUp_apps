@@ -8,29 +8,21 @@ Set Error Capture [ On ]
 Allow User Abort [ Off ]
 Set Variable [ $sessionPK ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "session" ) ]
 Set Variable [ $containerPK ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "container" ) ]
+Set Variable [ $pullKey ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "pullKey" ) ]
 #
-If [ IsEmpty ( $sessionPK ) or IsEmpty ( $containerPK ) ]
-	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Missing context. sync RUN must pass session and container." ; JSONString ) ]
+If [ IsEmpty ( $sessionPK ) or IsEmpty ( $containerPK ) or IsEmpty ( $pullKey ) ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Missing context. sync RUN must pass session, container, pullKey." ; JSONString ) ]
 End If
 #
 # ---------- resolve the handler ----------
-# The container's target table tells us which script to call.
 Set Variable [ $targetTable ; Value: ExecuteSQL ( "SELECT tt.fm_BaseTableName FROM xt_CONTAINERS c JOIN Target_Tables tt ON c.fk_TargetTable = tt.PrimaryKey WHERE c.PrimaryKey = ?" ; "" ; "" ; $containerPK ) ]
 If [ IsEmpty ( $targetTable ) or Left ( $targetTable ; 1 ) = "?" ]
 	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Container has no target table, or the join failed." ; JSONString ) ]
 End If
 #
-# ---------- look up the PULL action key ----------
-Set Variable [ $actionListPK ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM value_LISTS WHERE Name = 'SYNC_Action'" ; "" ; "" ) ]
-Set Variable [ $pullKey ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM VALUES WHERE fk_List = ? AND Name = 'PULL'" ; "" ; "" ; $actionListPK ) ]
-If [ IsEmpty ( $pullKey ) ]
-	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "PULL value not found in SYNC_Action." ; JSONString ) ]
-End If
-#
 # ---------- get every record pulled this session ----------
 Set Variable [ $pulledRecords ; Value: ExecuteSQL ( "SELECT DISTINCT fk_xtRecord FROM sync_EVENTS WHERE fk_Session = ? AND fk_vAction = ?" ; "" ; "" ; $sessionPK ; $pullKey ) ]
 If [ IsEmpty ( $pulledRecords ) ]
-	# Nothing was pulled. That is not an error; it means nothing changed.
 	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 1 ; JSONNumber ) ; "count" ; 0 ; JSONNumber ) ]
 End If
 #
@@ -45,7 +37,6 @@ Loop [ Flush: Always ]
 	Exit Loop If [ $i > $total ]
 	Set Variable [ $recPK ; Value: GetValue ( $pulledRecords ; $i ) ]
 	#
-	# Does this record have a join to a FileMaker record?
 	Set Variable [ $joinPK ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM XTERNAL_JOINS WHERE fk_xtRecord = ?" ; "" ; "" ; $recPK ) ]
 	#
 	If [ IsEmpty ( $joinPK ) ]
@@ -54,11 +45,8 @@ Loop [ Flush: Always ]
 		Set Variable [ $mode ; Value: "compare" ]
 	End If
 	#
-	# Build the handler parameter: context + record + mode.
-	# The handler reads the task JSON from the newest pull event itself.
 	Set Variable [ $handlerParam ; Value: JSONSetElement ( Get ( ScriptParameter ) ; [ "record" ; $recPK ; JSONString ] ; [ "mode" ; $mode ; JSONString ] ) ]
 	#
-	# Dispatch by target table.
 	If [ $targetTable = "PEOPLE" ]
 		Perform Script [ Specified: From list ; "PERSON_Upsert_From_xtRecord" ; Parameter: $handlerParam ]
 		Set Variable [ $handlerResult ; Value: Get ( ScriptResult ) ]
@@ -72,7 +60,6 @@ Loop [ Flush: Always ]
 			Set Variable [ $countSkipped ; Value: $countSkipped + 1 ]
 		End If
 	Else
-		# No handler for this table yet.
 		Set Variable [ $countSkipped ; Value: $countSkipped + 1 ]
 	End If
 End Loop
