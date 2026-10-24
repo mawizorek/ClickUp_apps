@@ -8,89 +8,143 @@
     "bodyNature": "DICTATION reference — the exact steps to TYPE into Manage Scripts. NOT paste-round-trippable; FileMaker's script clipboard is XML.",
     "keying": "Script names are unique per FileMaker file, so name is a safe graph key.",
     "callsResolution": "calls[] targets scripts in this file. calledBy is DERIVED at render time, never stored.",
-    "folderTree": ["00_APP", "10_SYNC"]
+    "folderTree": ["00_APP/Tables", "sync", "zOld/10_IMPORT"]
   },
   "scripts": [
     {
-      "name": "refresh | Target_Tables",
-      "folder": "00_APP",
+      "name": "API test",
+      "folder": "",
       "state": "built",
       "body": "pending",
       "calls": [],
-      "scriptRef": "00_APP/refresh_Target_Tables.fmscript",
+      "scriptRef": "API_test.fmscript",
+      "note": "Scratch test script at root level."
+    },
+    {
+      "name": "refresh | Target_Tables",
+      "folder": "00_APP/Tables",
+      "state": "built",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "00_APP/Tables/refresh_Target_Tables.fmscript",
       "note": "App catalog refresh. Body lives on the standards shelf; this app installs it under its own name."
     },
     {
-      "name": "XT_Refresh_Fields",
-      "folder": "00_APP",
+      "name": "refresh | xt_fields",
+      "folder": "sync",
       "state": "built",
       "body": "present",
-      "calls": ["ADAPTER_ClickUp_RefreshFields"],
-      "scriptRef": "00_APP/XT_Refresh_Fields.fmscript",
+      "calls": ["adapter | refresh cu_Fields"],
+      "scriptRef": "sync/refresh_xt_fields.fmscript",
       "note": "Generic field-refresh dispatcher. Resolves a container's system and performs that system's adapter."
     },
     {
-      "name": "ADAPTER_ClickUp_RefreshFields",
-      "folder": "00_APP",
+      "name": "adapter | refresh cu_Fields",
+      "folder": "sync",
       "state": "built",
       "body": "present",
       "calls": [],
-      "scriptRef": "00_APP/ADAPTER_ClickUp_RefreshFields.fmscript",
+      "scriptRef": "sync/adapter_refresh_cu_Fields.fmscript",
       "note": "The only script that knows ClickUp's custom-field endpoint. Fills xt_FIELDS names and types."
     },
     {
       "name": "SYNC_Run",
-      "folder": "10_SYNC",
+      "folder": "sync",
       "state": "golden",
       "body": "present",
       "calls": ["ADAPTER_ClickUp_Pull", "SYNC_Dispatch", "ADAPTER_ClickUp_Push"],
-      "scriptRef": "10_SYNC/SYNC_Run.fmscript",
+      "scriptRef": "sync/SYNC_Run.fmscript",
       "note": "The button. One context join, one session, pull then dispatch then push."
     },
     {
       "name": "ADAPTER_ClickUp_Pull",
-      "folder": "10_SYNC",
+      "folder": "sync",
       "state": "golden",
       "body": "present",
       "calls": [],
-      "scriptRef": "10_SYNC/ADAPTER_ClickUp_Pull.fmscript",
+      "scriptRef": "sync/ADAPTER_ClickUp_Pull.fmscript",
       "note": "Pages a ClickUp view, caches tasks in xt_RECORDS, writes pull events for new/changed tasks. Dev cap at page 0."
     },
     {
       "name": "SYNC_Dispatch",
-      "folder": "10_SYNC",
+      "folder": "sync",
       "state": "golden",
       "body": "pending",
       "calls": ["PERSON_Upsert_From_xtRecord"],
-      "scriptRef": "10_SYNC/SYNC_Dispatch.fmscript",
+      "scriptRef": "sync/SYNC_Dispatch.fmscript",
       "note": "Walks pulled records and calls the handler for the container's target table."
     },
     {
       "name": "PERSON_Upsert_From_xtRecord",
-      "folder": "10_SYNC",
+      "folder": "sync",
       "state": "golden",
       "body": "pending",
       "calls": [],
-      "scriptRef": "10_SYNC/PERSON_Upsert_From_xtRecord.fmscript",
+      "scriptRef": "sync/PERSON_Upsert_From_xtRecord.fmscript",
       "note": "Adopt or three-way compare. Creates PEOPLE + CONTACTS + join on adoption."
     },
     {
       "name": "RECONCILE_Apply",
-      "folder": "10_SYNC",
+      "folder": "sync",
       "state": "golden",
       "body": "pending",
       "calls": [],
-      "scriptRef": "10_SYNC/RECONCILE_Apply.fmscript",
+      "scriptRef": "sync/RECONCILE_Apply.fmscript",
       "note": "Acts on decided sync_RECONCILE rows. XT rows write to FileMaker, FM rows queue for push."
     },
     {
       "name": "ADAPTER_ClickUp_Push",
-      "folder": "10_SYNC",
+      "folder": "sync",
       "state": "golden",
       "body": "pending",
       "calls": [],
-      "scriptRef": "10_SYNC/ADAPTER_ClickUp_Push.fmscript",
+      "scriptRef": "sync/ADAPTER_ClickUp_Push.fmscript",
       "note": "Pushes FileMaker edits back to ClickUp. One person or every person FileMaker has moved."
+    },
+    {
+      "name": "PEOPLE_Pull",
+      "folder": "zOld/10_IMPORT",
+      "state": "superseded",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "zOld/10_IMPORT/PEOPLE_Pull.fmscript",
+      "supersededWhy": "Pre-sync-plan import script. Replaced by ADAPTER_ClickUp_Pull."
+    },
+    {
+      "name": "RECONCILE_SetII",
+      "folder": "zOld/10_IMPORT",
+      "state": "superseded",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "zOld/10_IMPORT/RECONCILE_SetII.fmscript",
+      "supersededWhy": "Pre-sync-plan reconcile helper. Replaced by RECONCILE_Apply."
+    },
+    {
+      "name": "RECONCILE_SetAll",
+      "folder": "zOld/10_IMPORT",
+      "state": "superseded",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "zOld/10_IMPORT/RECONCILE_SetAll.fmscript",
+      "supersededWhy": "Pre-sync-plan reconcile helper. Replaced by RECONCILE_Apply."
+    },
+    {
+      "name": "PEOPLE_Compare",
+      "folder": "zOld/10_IMPORT",
+      "state": "superseded",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "zOld/10_IMPORT/PEOPLE_Compare.fmscript",
+      "supersededWhy": "Pre-sync-plan compare. Three-way compare now handled by PERSON_Upsert_From_xtRecord."
+    },
+    {
+      "name": "RECONCILE_ShowSession",
+      "folder": "zOld/10_IMPORT",
+      "state": "superseded",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "zOld/10_IMPORT/RECONCILE_ShowSession.fmscript",
+      "supersededWhy": "Pre-sync-plan session viewer. SYNC_Run now navigates to the session at close."
     }
   ]
 }
