@@ -48,28 +48,28 @@
       "note": "The only script that knows ClickUp's custom-field endpoint. Fills xt_FIELDS names and types."
     },
     {
-      "name": "SYNC_Run",
+      "name": "sync RUN",
       "folder": "sync",
-      "state": "golden",
+      "state": "built",
       "body": "present",
-      "calls": ["ADAPTER_ClickUp_Pull", "SYNC_Dispatch", "ADAPTER_ClickUp_Push"],
+      "calls": ["adapter PULL | ClickUp", "sync DISPATCH", "adapter PUSH | ClickUp"],
       "scriptRef": "sync/SYNC_Run.fmscript",
       "note": "The button. One context join, one session, pull then dispatch then push."
     },
     {
-      "name": "ADAPTER_ClickUp_Pull",
+      "name": "adapter PULL | ClickUp",
       "folder": "sync",
-      "state": "golden",
+      "state": "built",
       "body": "present",
       "calls": [],
       "scriptRef": "sync/ADAPTER_ClickUp_Pull.fmscript",
       "note": "Pages a ClickUp view, caches tasks in xt_RECORDS, writes pull events for new/changed tasks. Dev cap at page 0."
     },
     {
-      "name": "SYNC_Dispatch",
+      "name": "sync DISPATCH",
       "folder": "sync",
       "state": "golden",
-      "body": "pending",
+      "body": "present",
       "calls": ["PERSON_Upsert_From_xtRecord"],
       "scriptRef": "sync/SYNC_Dispatch.fmscript",
       "note": "Walks pulled records and calls the handler for the container's target table."
@@ -93,7 +93,7 @@
       "note": "Acts on decided sync_RECONCILE rows. XT rows write to FileMaker, FM rows queue for push."
     },
     {
-      "name": "ADAPTER_ClickUp_Push",
+      "name": "adapter PUSH | ClickUp",
       "folder": "sync",
       "state": "golden",
       "body": "pending",
@@ -108,7 +108,7 @@
       "body": "pending",
       "calls": [],
       "scriptRef": "zOld/10_IMPORT/PEOPLE_Pull.fmscript",
-      "supersededWhy": "Pre-sync-plan import script. Replaced by ADAPTER_ClickUp_Pull."
+      "supersededWhy": "Pre-sync-plan import script. Replaced by adapter PULL | ClickUp."
     },
     {
       "name": "RECONCILE_SetII",
@@ -144,7 +144,7 @@
       "body": "pending",
       "calls": [],
       "scriptRef": "zOld/10_IMPORT/RECONCILE_ShowSession.fmscript",
-      "supersededWhy": "Pre-sync-plan session viewer. SYNC_Run now navigates to the session at close."
+      "supersededWhy": "Pre-sync-plan session viewer. sync RUN now navigates to the session at close."
     }
   ]
 }
