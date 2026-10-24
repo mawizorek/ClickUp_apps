@@ -28,6 +28,13 @@ Screens.infra = (function () {
     return val; /* legacy text — show as-is until migrated */
   }
 
+  /* Reverse FK: infrastructure rows that reference this record as endpoint_a or endpoint_b */
+  function refsTo(id) {
+    return SignalDB.where("infrastructure", function (r) {
+      return !r.deleted_at && (r.endpoint_a === id || r.endpoint_b === id);
+    });
+  }
+
   function cs(c) { return "width:" + c.w + "px;min-width:" + c.w + "px" + (c.flex ? ";flex:1 0 " + c.w + "px" : ""); }
   function typeColor(t) { return TYPE_COLORS[t] || "#94a3b8"; }
   function pill(attr, val, label, on, extra) {
@@ -49,7 +56,7 @@ Screens.infra = (function () {
       return !c.deleted_at && i && i.endpoint_id && (c.source_endpoint === i.endpoint_id || c.dest_endpoint === i.endpoint_id);
     });
   }
-  function inUse(i) { return connectionsFor(i).length; }
+  function inUse(i) { return connectionsFor(i).length + refsTo(i.id).length; }
   function sortVal(x, col) {
     if (col === "_inuse") return x.used;
     if (col === "endpoint_a" || col === "endpoint_b") return resolveEP(x.row[col]);
@@ -241,10 +248,22 @@ Screens.infra = (function () {
   function rel(t, r, text) { return '<button type="button" class="sig-rel" data-rt="' + t + '" data-rid="' + esc(r.id) + '">' + text + '</button>'; }
   function detail(id) {
     var i = SignalDB.get("infrastructure", id); if (!i) return;
-    var conns = connectionsFor(i), b = "";
+    var conns = connectionsFor(i);
+    var refs = refsTo(id).sort(function (a, b) { return String(a.label).localeCompare(String(b.label), undefined, { numeric: true }); });
+    var b = "";
     [["Label", i.label], ["Type", i.type], ["End A", resolveEP(i.endpoint_a)], ["End B", resolveEP(i.endpoint_b)], ["Notes", i.notes]].forEach(function (f) {
       b += '<div class="sig-field"><span class="sig-field-lbl">' + f[0] + '</span><span class="sig-field-val">' + or(f[1]) + '</span></div>';
     });
+    /* Reverse FK: infrastructure that terminates here */
+    b += '<h3 class="sig-section-hdr">Terminates here' + (refs.length ? " (" + refs.length + ")" : "") + '</h3>';
+    if (!refs.length) b += '<div class="sig-muted">No infrastructure references this record as an endpoint.</div>';
+    refs.forEach(function (r) {
+      var end = r.endpoint_a === id ? "End A" : "End B";
+      var fmt = '<span style="color:' + esc(typeColor(r.type)) + '">' + esc(r.type || "") + '</span> ' +
+        esc(r.label) + ' <span class="sig-soft">\u00b7 ' + esc(end) + '</span>';
+      b += '<button type="button" class="sig-rel" data-nav="' + esc(r.id) + '">' + fmt + '</button>';
+    });
+    /* Connections through this port's endpoint */
     b += '<h3 class="sig-section-hdr">Connections through this port' + (conns.length ? " (" + conns.length + ")" : "") + '</h3>';
     if (!conns.length) b += '<div class="sig-muted">No connections routed through this port yet.</div>';
     conns.forEach(function (c) {
@@ -263,6 +282,7 @@ Screens.infra = (function () {
     var ac = panel.querySelector("[data-add-connection]");
     if (ac) ac.addEventListener("click", function () { UI.edit("connections", null, { defaults: { source_endpoint: i.endpoint_id }, onSaved: back, onClose: back }); });
     panel.querySelectorAll("[data-rt]").forEach(function (el) { el.addEventListener("click", function () { UI.edit(el.dataset.rt, SignalDB.get(el.dataset.rt, el.dataset.rid), { onSaved: back, onClose: back }); }); });
+    panel.querySelectorAll("[data-nav]").forEach(function (el) { el.addEventListener("click", function () { UI.close(true); detail(el.dataset.nav); }); });
   }
 
   return { render: render, refresh: function () { if (view && document.body.contains(view) && !document.getElementById("sigPanelWrap")) render(); } };
