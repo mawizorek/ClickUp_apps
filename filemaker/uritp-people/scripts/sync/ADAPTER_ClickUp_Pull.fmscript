@@ -1,0 +1,133 @@
+# SCRIPT: ADAPTER_ClickUp_Pull
+# FOLDER: sync
+# The only script that knows ClickUp's task-page shape.
+# GET {baseURL}/view/{viewPath}/task?page={n}
+# Pages the view, caches each task in xt_RECORDS, and writes a sync_EVENTS row for every new or changed task.
+# The handler (SYNC_Dispatch) runs AFTER this script, not inside it.
+# Param (JSON): the context block from SYNC_Run.
+# Returns (JSON): { "ok" : 1|0, "count" : n, "new" : n, "changed" : n, "unchanged" : n, "pages" : n }
+# D-043 gap: literal field names until the sql/ custom-function family exists.
+Set Error Capture [ On ]
+Allow User Abort [ Off ]
+Set Variable [ $sessionPK ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "session" ) ]
+Set Variable [ $containerPK ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "container" ) ]
+Set Variable [ $viewPath ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "viewPath" ) ]
+Set Variable [ $baseURL ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "baseURL" ) ]
+Set Variable [ $token ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "token" ) ]
+#
+If [ IsEmpty ( $sessionPK ) or IsEmpty ( $containerPK ) or IsEmpty ( $viewPath ) or IsEmpty ( $baseURL ) or IsEmpty ( $token ) ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Missing context. SYNC_Run must pass session, container, viewPath, baseURL, token." ; JSONString ) ]
+End If
+#
+# Look up the PULL action key once.
+Set Variable [ $actionListPK ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM value_LISTS WHERE Name = 'SYNC_Action'" ; "" ; "" ) ]
+Set Variable [ $pullKey ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM VALUES WHERE fk_List = ? AND Name = 'PULL'" ; "" ; "" ; $actionListPK ) ]
+If [ IsEmpty ( $pullKey ) ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "The PULL value was not found in SYNC_Action. Seed the value list first." ; JSONString ) ]
+End If
+#
+Set Variable [ $page ; Value: 0 ]
+Set Variable [ $countNew ; Value: 0 ]
+Set Variable [ $countChanged ; Value: 0 ]
+Set Variable [ $countUnchanged ; Value: 0 ]
+Set Variable [ $devCap ; Value: 1 ]
+# Development cap: 1 = stop after page 0 (up to 30 tasks). Set to 0 for a full pull.
+#
+Loop [ Flush: Always ]
+	# ---------- fetch one page ----------
+	Set Variable [ $url ; Value: $baseURL & "/view/" & $viewPath & "/task?page=" & $page ]
+	Set Variable [ $curl ; Value: "-X GET --header " & Quote ( "Authorization: " & $token ) & " --header " & Quote ( "Content-Type: application/json" ) & " --dump-header $hdr" ]
+	Insert from URL [ Select: Off ; With dialog: Off ; Target: $response ; $url ; Verify SSL Certificates: On ; cURL options: $curl ]
+	Set Variable [ $httpStatus ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 2 ; 1 ) ]
+	#
+	# 429 retry: pause 60s, try once.
+	If [ $httpStatus = 429 ]
+		Pause/Resume Script [ Duration (seconds): 60 ]
+		Insert from URL [ Select: Off ; With dialog: Off ; Target: $response ; $url ; Verify SSL Certificates: On ; cURL options: $curl ]
+		Set Variable [ $httpStatus ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 2 ; 1 ) ]
+	End If
+	#
+	If [ Get ( LastError ) ≠ 0 or $httpStatus ≠ 200 ]
+		Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Page " & $page & " returned " & If ( IsEmpty ( $httpStatus ) ; "no status" ; $httpStatus ) & ". FM error " & Get ( LastError ) & "." ; JSONString ) ]
+	End If
+	#
+	# ---------- walk tasks ----------
+	Set Variable [ $tasks ; Value: JSONListKeys ( $response ; "tasks" ) ]
+	Set Variable [ $taskCount ; Value: ValueCount ( $tasks ) ]
+	Set Variable [ $t ; Value: 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $t ; Value: $t + 1 ]
+		Exit Loop If [ $t > $taskCount ]
+		Set Variable [ $idx ; Value: $t - 1 ]
+		Set Variable [ $taskID ; Value: JSONGetElement ( $response ; "tasks[" & $idx & "].id" ) ]
+		Set Variable [ $taskName ; Value: JSONGetElement ( $response ; "tasks[" & $idx & "].name" ) ]
+		Set Variable [ $dateUpdated ; Value: JSONGetElement ( $response ; "tasks[" & $idx & "].date_updated" ) ]
+		Set Variable [ $taskJSON ; Value: JSONGetElement ( $response ; "tasks[" & $idx & "]" ) ]
+		#
+		Set Variable [ $recPK ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM xt_RECORDS WHERE xt_ID = ? AND fk_xtContainer = ?" ; "" ; "" ; $taskID ; $containerPK ) ]
+		#
+		If [ IsEmpty ( $recPK ) ]
+			Go to Layout [ "table | xt_RECORDS" ; Animation: None ]
+			New Record/Request
+			Set Field [ xt_RECORDS::fk_xtContainer ; $containerPK ]
+			Set Field [ xt_RECORDS::xt_ID ; $taskID ]
+			Set Field [ xt_RECORDS::xt_Label ; $taskName ]
+			Set Field [ xt_RECORDS::xt_Version ; $dateUpdated ]
+			Commit Records/Requests [ With dialog: Off ]
+			Set Variable [ $recPK ; Value: xt_RECORDS::PrimaryKey ]
+			#
+			Go to Layout [ "table | sync_EVENTS" ; Animation: None ]
+			New Record/Request
+			Set Field [ sync_EVENTS::fk_Session ; $sessionPK ]
+			Set Field [ sync_EVENTS::fk_xtRecord ; $recPK ]
+			Set Field [ sync_EVENTS::fk_vAction ; $pullKey ]
+			Set Field [ sync_EVENTS::stored_ActionLabel ; "PULL" ]
+			Set Field [ sync_EVENTS::HttpStatus ; $httpStatus ]
+			Set Field [ sync_EVENTS::Request ; $url ]
+			Set Field [ sync_EVENTS::Response ; $taskJSON ]
+			Commit Records/Requests [ With dialog: Off ]
+			Set Variable [ $countNew ; Value: $countNew + 1 ]
+		Else
+			Set Variable [ $storedVersion ; Value: ExecuteSQL ( "SELECT xt_Version FROM xt_RECORDS WHERE PrimaryKey = ?" ; "" ; "" ; $recPK ) ]
+			If [ Exact ( $storedVersion ; $dateUpdated ) ]
+				Set Variable [ $countUnchanged ; Value: $countUnchanged + 1 ]
+			Else
+				Go to Layout [ "table | xt_RECORDS" ; Animation: None ]
+				Enter Find Mode [ Pause: Off ]
+				Set Field [ xt_RECORDS::PrimaryKey ; "==" & $recPK ]
+				Perform Find [ ]
+				Set Field [ xt_RECORDS::xt_Label ; $taskName ]
+				Set Field [ xt_RECORDS::xt_Version ; $dateUpdated ]
+				Commit Records/Requests [ With dialog: Off ]
+				#
+				Go to Layout [ "table | sync_EVENTS" ; Animation: None ]
+				New Record/Request
+				Set Field [ sync_EVENTS::fk_Session ; $sessionPK ]
+				Set Field [ sync_EVENTS::fk_xtRecord ; $recPK ]
+				Set Field [ sync_EVENTS::fk_vAction ; $pullKey ]
+				Set Field [ sync_EVENTS::stored_ActionLabel ; "PULL" ]
+				Set Field [ sync_EVENTS::HttpStatus ; $httpStatus ]
+				Set Field [ sync_EVENTS::Request ; $url ]
+				Set Field [ sync_EVENTS::Response ; $taskJSON ]
+				Commit Records/Requests [ With dialog: Off ]
+				Set Variable [ $countChanged ; Value: $countChanged + 1 ]
+			End If
+		End If
+	End Loop
+	#
+	Set Variable [ $lastPage ; Value: JSONGetElement ( $response ; "last_page" ) ]
+	If [ $lastPage = True or ( $devCap = 1 and $page ≥ 0 ) ]
+		Exit Loop If [ 1 ]
+	End If
+	Set Variable [ $page ; Value: $page + 1 ]
+End Loop
+#
+Set Variable [ $total ; Value: $countNew + $countChanged + $countUnchanged ]
+Show Custom Dialog [ "Pull" ; "Page(s): " & ( $page + 1 ) & "¶Tasks seen: " & $total & "¶New: " & $countNew & "¶Changed: " & $countChanged & "¶Unchanged: " & $countUnchanged & If ( $devCap = 1 ; "¶¶⚠️ Development cap: stopped after page 0." ; "" ) ]
+Exit Script [ Text Result: JSONSetElement ( "{}" ;
+	[ "ok" ; 1 ; JSONNumber ] ;
+	[ "count" ; $total ; JSONNumber ] ;
+	[ "new" ; $countNew ; JSONNumber ] ;
+	[ "changed" ; $countChanged ; JSONNumber ] ;
+	[ "unchanged" ; $countUnchanged ; JSONNumber ] ;
+	[ "pages" ; $page + 1 ; JSONNumber ] ) ]
