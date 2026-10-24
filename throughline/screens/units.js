@@ -166,7 +166,13 @@ Screens.units = (function () {
     };
     sec("Control points", "control_points", cps, function (c) { return '<span class="sig-muted">' + esc(c.cp_type || "") + '</span> ' + esc(c.label) + (c.channel_num ? ' <span class="sig-ch">ch' + esc(c.channel_num) + '</span>' : ""); }, { parent_unit_id: u.id });
     sec("Network interfaces", "network_interfaces", nis, function (n) { return '<span class="sig-ch">' + or(n.ip) + '</span> <span class="sig-soft">' + esc(n.hostname || n.port_label || "") + '</span>'; }, { unit_id: u.id });
-    sec("Connections", "connections", conns, function (c) { return esc(UI.epLabel(c.source_endpoint)) + ' <span class="sig-ch">\u2192</span> ' + esc(UI.epLabel(c.dest_endpoint)) + (c.connection_type ? ' <span class="sig-soft">' + esc(c.connection_type) + '</span>' : ""); }, { source_endpoint: u.endpoint_id });
+    sec("Connections", "connections", conns, function (c) {
+      var so = UI.epOwner(c.source_endpoint), doo = UI.epOwner(c.dest_endpoint);
+      var infra = so && so.t === "infrastructure" ? so.r : doo && doo.t === "infrastructure" ? doo.r : null;
+      return esc(UI.epLabel(c.source_endpoint)) + ' <span class="sig-ch">\u2192</span> ' + esc(UI.epLabel(c.dest_endpoint)) +
+        (c.connection_type ? ' <span class="sig-soft">' + esc(c.connection_type) + '</span>' : "") +
+        (infra ? ' <span class="sig-soft">via ' + esc(infra.label) + '</span>' : "");
+    }, { source_endpoint: u.endpoint_id });
     sec("Assignments", "assignments", asg, function (a) { return '<span class="sig-good">' + esc(a.level || "") + '</span> ' + esc(UI.epLabel(a.source_endpoint)) + ' \u2192 ' + esc(a.dest_endpoint ? UI.epLabel(a.dest_endpoint) : (a.group_name || "group")) + (a.pre_post ? ' <span class="sig-soft">("' + esc(a.pre_post) + ')</span>' : ""); }, { source_endpoint: u.endpoint_id });
     b += '<div class="sig-form-acts">' + (Sync.can("write", "units", u) ? '<button type="button" class="sig-btn sig-btn-pri" data-edit>Edit unit</button>' : "") + '<button type="button" class="sig-btn" data-tr>\u27bf Trace</button></div>';
     var panel = UI.panel("Unit #" + (u.unit_num == null ? "?" : u.unit_num) + (u.purpose ? " \u00b7 " + u.purpose : ""), b);
