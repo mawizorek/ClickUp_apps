@@ -5,7 +5,7 @@
     "schemaVersion": "3.0",
     "generated": "2026-10-24",
     "bodyExtension": ".fmscript",
-    "bodyNature": "DICTATION reference — the exact steps to TYPE into Manage Scripts. NOT paste-round-trippable; FileMaker's script clipboard is XML.",
+    "bodyNature": "DICTATION reference \u2014 the exact steps to TYPE into Manage Scripts. NOT paste-round-trippable; FileMaker's script clipboard is XML.",
     "keying": "Script names are unique per FileMaker file, so name is a safe graph key.",
     "callsResolution": "calls[] targets scripts in this file. calledBy is DERIVED at render time, never stored.",
     "folderTree": ["00_APP/Tables", "sync", "zOld/10_IMPORT"]
@@ -68,7 +68,7 @@
     {
       "name": "sync DISPATCH",
       "folder": "sync",
-      "state": "golden",
+      "state": "built",
       "body": "present",
       "calls": ["PERSON_Upsert_From_xtRecord"],
       "scriptRef": "sync/SYNC_Dispatch.fmscript",
@@ -77,8 +77,8 @@
     {
       "name": "PERSON_Upsert_From_xtRecord",
       "folder": "sync",
-      "state": "golden",
-      "body": "pending",
+      "state": "built",
+      "body": "present",
       "calls": [],
       "scriptRef": "sync/PERSON_Upsert_From_xtRecord.fmscript",
       "note": "Adopt or three-way compare. Creates PEOPLE + CONTACTS + join on adoption."
@@ -86,8 +86,8 @@
     {
       "name": "RECONCILE_Apply",
       "folder": "sync",
-      "state": "golden",
-      "body": "pending",
+      "state": "built",
+      "body": "present",
       "calls": [],
       "scriptRef": "sync/RECONCILE_Apply.fmscript",
       "note": "Acts on decided sync_RECONCILE rows. XT rows write to FileMaker, FM rows queue for push."
@@ -95,8 +95,8 @@
     {
       "name": "adapter PUSH | ClickUp",
       "folder": "sync",
-      "state": "golden",
-      "body": "pending",
+      "state": "built",
+      "body": "present",
       "calls": [],
       "scriptRef": "sync/ADAPTER_ClickUp_Push.fmscript",
       "note": "Pushes FileMaker edits back to ClickUp. One person or every person FileMaker has moved."
