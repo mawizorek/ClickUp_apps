@@ -1,25 +1,23 @@
-# SCRIPT: SYNC_Run
+# SCRIPT: sync RUN
 # FOLDER: sync
 # The button. One press syncs one source: pull, dispatch, push.
 # Param (text): a sync_SOURCES Name, e.g. "PEOPLE".
 # Returns (JSON): { "ok" : 1|0, "session" : "<PrimaryKey>", "pulled" : n, "dispatched" : n, "pushed" : n }
-# D-048 ruling 6: one ExecuteSQL context join, no new TOs.
-# D-043 gap: literal field names until the sql/ custom-function family exists.
 Set Error Capture [ On ]
 Allow User Abort [ Off ]
 Set Variable [ $sourceName ; Value: Get ( ScriptParameter ) ]
 If [ IsEmpty ( $sourceName ) ]
-	Show Custom Dialog [ "Sync" ; "Pass a sync_SOURCES Name as the parameter, e.g. \"PEOPLE\"." ]
+	Show Custom Dialog [ Get ( ScriptName ) ; "Pass a sync_SOURCES Name as the parameter, e.g. \"PEOPLE\"." ]
 	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
 End If
 #
 # ---------- context read ----------
-# One join across sync_SOURCES → xt_CONTAINERS → xt_SYSTEMS.
+# One join across sync_SOURCES -> xt_CONTAINERS -> xt_SYSTEMS (D-048 ruling 6).
 Set Variable [ $ctx ; Value: ExecuteSQL (
 	"SELECT src.PrimaryKey, src.fk_xtContainer, src.xt_ViewPath, c.xt_ID, c.Name, s.PrimaryKey, s.Name, s.BaseURL, s.Token FROM sync_SOURCES src JOIN xt_CONTAINERS c ON src.fk_xtContainer = c.PrimaryKey JOIN xt_SYSTEMS s ON c.fk_xtSystem = s.PrimaryKey WHERE src.Name = ?"
 	; "|" ; "±" ; $sourceName ) ]
 If [ IsEmpty ( $ctx ) or Left ( $ctx ; 1 ) = "?" ]
-	Show Custom Dialog [ "Sync" ; "Source " & Quote ( $sourceName ) & " was not found, or its container or system is missing." ]
+	Show Custom Dialog [ Get ( ScriptName ) ; "Source " & Quote ( $sourceName ) & " was not found, or its container or system is missing." ]
 	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
 End If
 Set Variable [ $vals ; Value: Substitute ( $ctx ; "|" ; ¶ ) ]
@@ -33,10 +31,17 @@ Set Variable [ $systemName ; Value: GetValue ( $vals ; 7 ) ]
 Set Variable [ $baseURL ; Value: GetValue ( $vals ; 8 ) ]
 Set Variable [ $token ; Value: GetValue ( $vals ; 9 ) ]
 #
+# ---------- look up action keys once ----------
+# Passed in context so Pull and Dispatch don't repeat the lookup.
+Set Variable [ $actionListPK ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM value_LISTS WHERE Name = 'SYNC_Action'" ; "" ; "" ) ]
+Set Variable [ $pullKey ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM VALUES WHERE fk_List = ? AND Name = 'PULL'" ; "" ; "" ; $actionListPK ) ]
+Set Variable [ $adoptKey ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM VALUES WHERE fk_List = ? AND Name = 'ADOPT'" ; "" ; "" ; $actionListPK ) ]
+Set Variable [ $pushKey ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM VALUES WHERE fk_List = ? AND Name = 'PUSH'" ; "" ; "" ; $actionListPK ) ]
+#
 # ---------- open session ----------
 Go to Layout [ "table | sync_SESSIONS" ; Animation: None ]
 If [ Get ( LastError ) ≠ 0 ]
-	Show Custom Dialog [ "Sync" ; "The sync_SESSIONS layout was not found." ]
+	Show Custom Dialog [ Get ( ScriptName ) ; "The sync_SESSIONS layout was not found." ]
 	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
 End If
 New Record/Request
@@ -55,13 +60,16 @@ Set Variable [ $context ; Value: JSONSetElement ( "{}" ;
 	[ "system" ; $systemPK ; JSONString ] ;
 	[ "systemName" ; $systemName ; JSONString ] ;
 	[ "baseURL" ; $baseURL ; JSONString ] ;
-	[ "token" ; $token ; JSONString ] ) ]
+	[ "token" ; $token ; JSONString ] ;
+	[ "pullKey" ; $pullKey ; JSONString ] ;
+	[ "adoptKey" ; $adoptKey ; JSONString ] ;
+	[ "pushKey" ; $pushKey ; JSONString ] ) ]
 #
 # ---------- pull ----------
-Perform Script [ Specified: From list ; "ADAPTER_ClickUp_Pull" ; Parameter: $context ]
+Perform Script [ Specified: From list ; "adapter PULL | ClickUp" ; Parameter: $context ]
 Set Variable [ $pullResult ; Value: Get ( ScriptResult ) ]
 If [ JSONGetElement ( $pullResult ; "ok" ) ≠ 1 ]
-	Show Custom Dialog [ "Sync" ; "Pull failed.¶¶" & JSONGetElement ( $pullResult ; "error" ) ]
+	Show Custom Dialog [ Get ( ScriptName ) ; "Pull failed.¶¶" & JSONGetElement ( $pullResult ; "error" ) ]
 	Go to Layout [ "table | sync_SESSIONS" ; Animation: None ]
 	Enter Find Mode [ Pause: Off ]
 	Set Field [ sync_SESSIONS::PrimaryKey ; "==" & $sessionPK ]
@@ -70,12 +78,20 @@ If [ JSONGetElement ( $pullResult ; "ok" ) ≠ 1 ]
 End If
 #
 # ---------- dispatch ----------
-Perform Script [ Specified: From list ; "SYNC_Dispatch" ; Parameter: $context ]
+Perform Script [ Specified: From list ; "sync DISPATCH" ; Parameter: $context ]
 Set Variable [ $dispatchResult ; Value: Get ( ScriptResult ) ]
+If [ JSONGetElement ( $dispatchResult ; "ok" ) ≠ 1 ]
+	Show Custom Dialog [ Get ( ScriptName ) ; "Dispatch failed.¶¶" & JSONGetElement ( $dispatchResult ; "error" ) ]
+	Go to Layout [ "table | sync_SESSIONS" ; Animation: None ]
+	Enter Find Mode [ Pause: Off ]
+	Set Field [ sync_SESSIONS::PrimaryKey ; "==" & $sessionPK ]
+	Perform Find [ ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "session" ; $sessionPK ; JSONString ) ]
+End If
 #
 # ---------- push ----------
 If [ $systemName = "ClickUp" ]
-	Perform Script [ Specified: From list ; "ADAPTER_ClickUp_Push" ; Parameter: $context ]
+	Perform Script [ Specified: From list ; "adapter PUSH | ClickUp" ; Parameter: $context ]
 	Set Variable [ $pushResult ; Value: Get ( ScriptResult ) ]
 End If
 #
