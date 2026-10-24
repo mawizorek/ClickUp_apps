@@ -47,22 +47,24 @@
 <script src="./sync.js?v=3"></script>
 <script src="./seed.js?v=3"></script>
 <script src="./screens/units.js?v=3"></script>
+<script src="./screens/infra.js?v=3"></script>
 <script src="./screens/tables.js?v=3"></script>
 <script src="./screens/access.js?v=3"></script>
 <script>
 (function () {
   var APP_NAME    = "Throughline";
-  var APP_VERSION = "v2.1";
-  var APP_PR      = 1022;
+  var APP_VERSION = "v2.2";
+  var APP_PR      = 1035;
   var APP_THEME   = "soft-utility";
   var DEFAULT_COLOR = "maw-dark-utility";
   var NAV = [
     { route: "home",   label: "Units" },
+    { route: "infra",  label: "Infra" },
     { route: "tables", label: "Tables" },
     { route: "access", label: "Access" },
     { route: "about",  label: "About" }
   ];
-  var SCREENS = { home: "units", tables: "tables", access: "access" };
+  var SCREENS = { home: "units", infra: "infra", tables: "tables", access: "access" };
 
   if (window.THEMES && THEMES.applyTheme) {
     THEMES.applyTheme(APP_THEME).then(function () {
