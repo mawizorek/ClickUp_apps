@@ -1,0 +1,88 @@
+# SCRIPT: ADAPTER_ClickUp_RefreshFields
+# FOLDER: 00_APP
+# The only script that knows ClickUp's custom-field endpoint and JSON shape.
+# GET {BaseURL}/list/{list id}/field  ->  { "fields" : [ { id, name, type, ... } ] }
+# Personal token goes in Authorization BARE, with no Bearer prefix.
+# Param (JSON): { "container" : "<xt_CONTAINERS PrimaryKey>", "system" : "<xt_SYSTEMS PrimaryKey>" }
+# Returns (JSON): { "ok" : 1|0, "updated" : n, "missing" : n, "native" : n, "unmapped" : n }
+Set Error Capture [ On ]
+Allow User Abort [ Off ]
+Set Variable [ $container ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "container" ) ]
+Set Variable [ $system ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "system" ) ]
+#
+# Credentials and the list id are read here, never passed in.
+Set Variable [ $base ; Value: ExecuteSQL ( "SELECT BaseURL FROM xt_SYSTEMS WHERE PrimaryKey = ?" ; "" ; "" ; $system ) ]
+Set Variable [ $token ; Value: ExecuteSQL ( "SELECT Token FROM xt_SYSTEMS WHERE PrimaryKey = ?" ; "" ; "" ; $system ) ]
+Set Variable [ $listID ; Value: ExecuteSQL ( "SELECT xt_ID FROM xt_CONTAINERS WHERE PrimaryKey = ?" ; "" ; "" ; $container ) ]
+If [ IsEmpty ( $base ) or IsEmpty ( $token ) or IsEmpty ( $listID ) ]
+	Show Custom Dialog [ "Field refresh" ; "The ClickUp system row needs BaseURL and Token, and the container needs its list id in xt_ID." ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+#
+Set Variable [ $url ; Value: $base & "/list/" & $listID & "/field" ]
+Set Variable [ $curl ; Value: "-X GET --header " & Quote ( "Authorization: " & $token ) & " --header " & Quote ( "Content-Type: application/json" ) & " --dump-header $hdr" ]
+Insert from URL [ Select: Off ; With dialog: Off ; Target: $response ; $url ; Verify SSL Certificates: On ; cURL options: $curl ]
+Set Variable [ $status ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 2 ; 1 ) ]
+If [ Get ( LastError ) ≠ 0 or $status ≠ 200 ]
+	Show Custom Dialog [ "Field refresh" ; "ClickUp returned " & If ( IsEmpty ( $status ) ; "no status" ; $status ) & ". FileMaker error " & Get ( LastError ) & ".¶¶" & Left ( $response ; 300 ) ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+#
+# Build a lookup of what ClickUp currently has, so a mapped field it no longer returns can be reported.
+Set Variable [ $keys ; Value: JSONListKeys ( $response ; "fields" ) ]
+Set Variable [ $liveIDs ; Value: "" ]
+Set Variable [ $i ; Value: 0 ]
+Loop [ Flush: Always ]
+	Set Variable [ $i ; Value: $i + 1 ]
+	Exit Loop If [ $i > ValueCount ( $keys ) ]
+	Set Variable [ $liveIDs ; Value: List ( $liveIDs ; JSONGetElement ( $response ; "fields[" & ( $i - 1 ) & "].id" ) ) ]
+End Loop
+Set Variable [ $unmapped ; Value: ValueCount ( $keys ) ]
+#
+Go to Layout [ "table | xt_FIELDS" ; Animation: None ]
+If [ Get ( LastError ) ≠ 0 ]
+	Show Custom Dialog [ "Field refresh" ; "The xt_FIELDS layout was not found." ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+Enter Find Mode [ Pause: Off ]
+Set Field [ xt_FIELDS::fk_xtContainer ; "==" & $container ]
+Perform Find [ ]
+If [ Get ( FoundCount ) = 0 ]
+	Show Custom Dialog [ "Field refresh" ; "This container has no xt_FIELDS rows to refresh." ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+Set Variable [ $updated ; Value: 0 ]
+Set Variable [ $native ; Value: 0 ]
+Set Variable [ $missing ; Value: "" ]
+Go to Record/Request/Page [ First ]
+Loop [ Flush: Always ]
+	Set Variable [ $fid ; Value: xt_FIELDS::xt_FieldID ]
+	If [ IsEmpty ( $fid ) ]
+		# A native task attribute, name or status. There is no custom field behind it and nothing to refresh.
+		Set Variable [ $native ; Value: $native + 1 ]
+	Else
+		If [ IsEmpty ( FilterValues ( $liveIDs ; $fid ) ) ]
+			# Mapped here, not returned by ClickUp. The field was deleted or moved out of this list.
+			Set Variable [ $missing ; Value: List ( $missing ; xt_FIELDS::mapKey & " (" & $fid & ")" ) ]
+		Else
+			Set Variable [ $j ; Value: 0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $j ; Value: $j + 1 ]
+				Exit Loop If [ $j > ValueCount ( $keys ) ]
+				If [ JSONGetElement ( $response ; "fields[" & ( $j - 1 ) & "].id" ) = $fid ]
+					Set Field [ xt_FIELDS::xt_FieldName ; JSONGetElement ( $response ; "fields[" & ( $j - 1 ) & "].name" ) ]
+					Set Field [ xt_FIELDS::xt_FieldType ; JSONGetElement ( $response ; "fields[" & ( $j - 1 ) & "].type" ) ]
+					Set Variable [ $updated ; Value: $updated + 1 ]
+					Set Variable [ $unmapped ; Value: $unmapped - 1 ]
+					Exit Loop If [ 1 ]
+				End If
+			End Loop
+			Commit Records/Requests [ With dialog: Off ]
+		End If
+	End If
+	Go to Record/Request/Page [ Next ; Exit after last: On ]
+End Loop
+#
+# mapKey is never written here. It is Michael's, and it is the only thing that survives ClickUp renaming a field.
+Show Custom Dialog [ "Field refresh" ; "Updated: " & $updated & "¶Native, skipped: " & $native & "¶Mapped but missing from ClickUp: " & If ( IsEmpty ( $missing ) ; 0 ; ValueCount ( $missing ) ) & If ( IsEmpty ( $missing ) ; "" ; "¶" & $missing ) & "¶On the list but not mapped: " & $unmapped ]
+Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 1 ; JSONNumber ) ; "updated" ; $updated ; JSONNumber ) ; "native" ; $native ; JSONNumber ) ; "missing" ; If ( IsEmpty ( $missing ) ; 0 ; ValueCount ( $missing ) ) ; JSONNumber ) ]
