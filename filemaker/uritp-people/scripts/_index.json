@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "app": "uritp-people",
+    "folder": "scripts",
+    "schemaVersion": "3.0",
+    "generated": "2026-10-24",
+    "bodyExtension": ".fmscript",
+    "bodyNature": "DICTATION reference — the exact steps to TYPE into Manage Scripts. NOT paste-round-trippable; FileMaker's script clipboard is XML.",
+    "keying": "Script names are unique per FileMaker file, so name is a safe graph key.",
+    "callsResolution": "calls[] targets scripts in this file. calledBy is DERIVED at render time, never stored.",
+    "folderTree": ["00_APP", "10_SYNC"]
+  },
+  "scripts": [
+    {
+      "name": "refresh | Target_Tables",
+      "folder": "00_APP",
+      "state": "built",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "00_APP/refresh_Target_Tables.fmscript",
+      "note": "App catalog refresh. Body lives on the standards shelf; this app installs it under its own name."
+    },
+    {
+      "name": "XT_Refresh_Fields",
+      "folder": "00_APP",
+      "state": "built",
+      "body": "present",
+      "calls": ["ADAPTER_ClickUp_RefreshFields"],
+      "scriptRef": "00_APP/XT_Refresh_Fields.fmscript",
+      "note": "Generic field-refresh dispatcher. Resolves a container's system and performs that system's adapter."
+    },
+    {
+      "name": "ADAPTER_ClickUp_RefreshFields",
+      "folder": "00_APP",
+      "state": "built",
+      "body": "present",
+      "calls": [],
+      "scriptRef": "00_APP/ADAPTER_ClickUp_RefreshFields.fmscript",
+      "note": "The only script that knows ClickUp's custom-field endpoint. Fills xt_FIELDS names and types."
+    },
+    {
+      "name": "SYNC_Run",
+      "folder": "10_SYNC",
+      "state": "golden",
+      "body": "present",
+      "calls": ["ADAPTER_ClickUp_Pull", "SYNC_Dispatch", "ADAPTER_ClickUp_Push"],
+      "scriptRef": "10_SYNC/SYNC_Run.fmscript",
+      "note": "The button. One context join, one session, pull then dispatch then push."
+    },
+    {
+      "name": "ADAPTER_ClickUp_Pull",
+      "folder": "10_SYNC",
+      "state": "golden",
+      "body": "present",
+      "calls": [],
+      "scriptRef": "10_SYNC/ADAPTER_ClickUp_Pull.fmscript",
+      "note": "Pages a ClickUp view, caches tasks in xt_RECORDS, writes pull events for new/changed tasks. Dev cap at page 0."
+    },
+    {
+      "name": "SYNC_Dispatch",
+      "folder": "10_SYNC",
+      "state": "golden",
+      "body": "pending",
+      "calls": ["PERSON_Upsert_From_xtRecord"],
+      "scriptRef": "10_SYNC/SYNC_Dispatch.fmscript",
+      "note": "Walks pulled records and calls the handler for the container's target table."
+    },
+    {
+      "name": "PERSON_Upsert_From_xtRecord",
+      "folder": "10_SYNC",
+      "state": "golden",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "10_SYNC/PERSON_Upsert_From_xtRecord.fmscript",
+      "note": "Adopt or three-way compare. Creates PEOPLE + CONTACTS + join on adoption."
+    },
+    {
+      "name": "RECONCILE_Apply",
+      "folder": "10_SYNC",
+      "state": "golden",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "10_SYNC/RECONCILE_Apply.fmscript",
+      "note": "Acts on decided sync_RECONCILE rows. XT rows write to FileMaker, FM rows queue for push."
+    },
+    {
+      "name": "ADAPTER_ClickUp_Push",
+      "folder": "10_SYNC",
+      "state": "golden",
+      "body": "pending",
+      "calls": [],
+      "scriptRef": "10_SYNC/ADAPTER_ClickUp_Push.fmscript",
+      "note": "Pushes FileMaker edits back to ClickUp. One person or every person FileMaker has moved."
+    }
+  ]
+}
