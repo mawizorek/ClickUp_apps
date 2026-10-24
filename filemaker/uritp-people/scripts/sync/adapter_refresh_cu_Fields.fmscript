@@ -4,31 +4,31 @@
 # GET {BaseURL}/list/{list id}/field  ->  { "fields" : [ { id, name, type, ... } ] }
 # Personal token goes in Authorization BARE, with no Bearer prefix.
 # Param (JSON): { "container" : "<xt_CONTAINERS PrimaryKey>", "system" : "<xt_SYSTEMS PrimaryKey>" }
-# Returns (JSON): { "ok" : 1|0, "updated" : n, "missing" : n, "native" : n, "unmapped" : n }
+# Returns (JSON): { "ok" : 1|0, "updated" : n, "missing" : n, "native" : n, "unmapped" : n, "error" : "<msg>" }
 Set Error Capture [ On ]
 Allow User Abort [ Off ]
-Set Variable [ $container ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "container" ) ]
-Set Variable [ $system ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "system" ) ]
+Set Variable [ $containerPK ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "container" ) ]
+Set Variable [ $systemPK ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "system" ) ]
 #
 # Credentials and the list id are read here, never passed in.
-Set Variable [ $base ; Value: ExecuteSQL ( "SELECT BaseURL FROM xt_SYSTEMS WHERE PrimaryKey = ?" ; "" ; "" ; $system ) ]
-Set Variable [ $token ; Value: ExecuteSQL ( "SELECT Token FROM xt_SYSTEMS WHERE PrimaryKey = ?" ; "" ; "" ; $system ) ]
-Set Variable [ $listID ; Value: ExecuteSQL ( "SELECT xt_ID FROM xt_CONTAINERS WHERE PrimaryKey = ?" ; "" ; "" ; $container ) ]
-If [ IsEmpty ( $base ) or IsEmpty ( $token ) or IsEmpty ( $listID ) ]
+Set Variable [ $baseURL ; Value: ExecuteSQL ( "SELECT BaseURL FROM xt_SYSTEMS WHERE PrimaryKey = ?" ; "" ; "" ; $systemPK ) ]
+Set Variable [ $token ; Value: ExecuteSQL ( "SELECT Token FROM xt_SYSTEMS WHERE PrimaryKey = ?" ; "" ; "" ; $systemPK ) ]
+Set Variable [ $listID ; Value: ExecuteSQL ( "SELECT xt_ID FROM xt_CONTAINERS WHERE PrimaryKey = ?" ; "" ; "" ; $containerPK ) ]
+If [ IsEmpty ( $baseURL ) or IsEmpty ( $token ) or IsEmpty ( $listID ) ]
 	Show Custom Dialog [ "Field refresh" ; "The ClickUp system row needs BaseURL and Token, and the container needs its list id in xt_ID." ]
-	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Missing BaseURL, Token, or xt_ID." ; JSONString ) ]
 End If
 #
-Set Variable [ $url ; Value: $base & "/list/" & $listID & "/field" ]
+Set Variable [ $url ; Value: $baseURL & "/list/" & $listID & "/field" ]
 Set Variable [ $curl ; Value: "-X GET --header " & Quote ( "Authorization: " & $token ) & " --header " & Quote ( "Content-Type: application/json" ) & " --dump-header $hdr" ]
 Insert from URL [ Select: Off ; With dialog: Off ; Target: $response ; $url ; Verify SSL Certificates: On ; cURL options: $curl ]
-Set Variable [ $status ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 2 ; 1 ) ]
-If [ Get ( LastError ) ≠ 0 or $status ≠ 200 ]
-	Show Custom Dialog [ "Field refresh" ; "ClickUp returned " & If ( IsEmpty ( $status ) ; "no status" ; $status ) & ". FileMaker error " & Get ( LastError ) & ".¶¶" & Left ( $response ; 300 ) ]
-	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+Set Variable [ $httpStatus ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 3 ; 1 ) ]
+If [ Get ( LastError ) ≠ 0 or $httpStatus ≠ 200 ]
+	Show Custom Dialog [ "Field refresh" ; "ClickUp returned " & If ( IsEmpty ( $httpStatus ) ; "no status" ; $httpStatus ) & ". FileMaker error " & Get ( LastError ) & ".¶¶" & Left ( $response ; 300 ) ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "HTTP " & $httpStatus & ", FM error " & Get ( LastError ) ; JSONString ) ]
 End If
 #
-# Build a lookup of what ClickUp currently has, so a mapped field it no longer returns can be reported.
+# Build a lookup of what ClickUp currently has.
 Set Variable [ $keys ; Value: JSONListKeys ( $response ; "fields" ) ]
 Set Variable [ $liveIDs ; Value: "" ]
 Set Variable [ $i ; Value: 0 ]
@@ -42,14 +42,14 @@ Set Variable [ $unmapped ; Value: ValueCount ( $keys ) ]
 Go to Layout [ "table | xt_FIELDS" ; Animation: None ]
 If [ Get ( LastError ) ≠ 0 ]
 	Show Custom Dialog [ "Field refresh" ; "The xt_FIELDS layout was not found." ]
-	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Layout table | xt_FIELDS not found." ; JSONString ) ]
 End If
 Enter Find Mode [ Pause: Off ]
-Set Field [ xt_FIELDS::fk_xtContainer ; "==" & $container ]
+Set Field [ xt_FIELDS::fk_xtContainer ; "==" & $containerPK ]
 Perform Find [ ]
 If [ Get ( FoundCount ) = 0 ]
 	Show Custom Dialog [ "Field refresh" ; "This container has no xt_FIELDS rows to refresh." ]
-	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "No xt_FIELDS rows for this container." ; JSONString ) ]
 End If
 Set Variable [ $updated ; Value: 0 ]
 Set Variable [ $native ; Value: 0 ]
