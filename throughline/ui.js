@@ -42,11 +42,18 @@ var UI = (function () {
   }
 
   // ---------- FK + endpoint options ----------
-  function fkRows(to) {
+  function fkRows(to, opts) {
     var sid = showId();
     var rows = SignalDB.getAll(to);
     if (SCHEMA.isShowScoped(to)) rows = rows.filter(function (r) { return r.show_id === sid; });
     if (to === "positions") rows = rows.filter(function (r) { return !r.show_id || r.show_id === sid; });
+    if (opts && opts.exclude) {
+      var ex = opts.exclude;
+      rows = rows.filter(function (r) {
+        if (ex.type && ex.type.indexOf(r.type) !== -1) return false;
+        return true;
+      });
+    }
     return rows.map(function (r) { return { id: r.id, label: SCHEMA.T[to].show(r) }; })
       .sort(function (a, b) { return a.label.localeCompare(b.label, undefined, { numeric: true }); });
   }
@@ -100,7 +107,7 @@ var UI = (function () {
     else if (type === "enum") input = '<select id="' + id + '" name="' + k + '"' + req + dis + '><option value="">' + DASH + '</option>' +
       o.values.map(function (v) { return '<option' + (String(val) === v ? " selected" : "") + '>' + esc(v) + '</option>'; }).join("") + '</select>';
     else if (type === "fk") input = '<select id="' + id + '" name="' + k + '"' + req + dis + '><option value="">' + DASH + '</option>' +
-      fkRows(o.to).map(function (r) { return '<option value="' + esc(r.id) + '"' + (r.id === val ? " selected" : "") + '>' + esc(r.label) + '</option>'; }).join("") + '</select>';
+      fkRows(o.to, o).map(function (r) { return '<option value="' + esc(r.id) + '"' + (r.id === val ? " selected" : "") + '>' + esc(r.label) + '</option>'; }).join("") + '</select>';
     else if (type === "ep") input = '<select id="' + id + '" name="' + k + '"' + req + dis + '><option value="">' + DASH + '</option>' +
       epGroups().map(function (g) { return '<optgroup label="' + esc(g.label) + '">' + g.items.map(function (r) {
         return '<option value="' + esc(r.id) + '"' + (r.id === val ? " selected" : "") + '>' + esc(r.label) + '</option>'; }).join("") + '</optgroup>'; }).join("") + '</select>';
