@@ -1,12 +1,9 @@
-# SCRIPT: ADAPTER_ClickUp_Pull
+# SCRIPT: adapter PULL | ClickUp
 # FOLDER: sync
 # The only script that knows ClickUp's task-page shape.
 # GET {baseURL}/view/{viewPath}/task?page={n}
-# Pages the view, caches each task in xt_RECORDS, and writes a sync_EVENTS row for every new or changed task.
-# The handler (SYNC_Dispatch) runs AFTER this script, not inside it.
-# Param (JSON): the context block from SYNC_Run.
+# Param (JSON): the context block from sync RUN.
 # Returns (JSON): { "ok" : 1|0, "count" : n, "new" : n, "changed" : n, "unchanged" : n, "pages" : n }
-# D-043 gap: literal field names until the sql/ custom-function family exists.
 Set Error Capture [ On ]
 Allow User Abort [ Off ]
 Set Variable [ $sessionPK ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "session" ) ]
@@ -14,16 +11,10 @@ Set Variable [ $containerPK ; Value: JSONGetElement ( Get ( ScriptParameter ) ; 
 Set Variable [ $viewPath ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "viewPath" ) ]
 Set Variable [ $baseURL ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "baseURL" ) ]
 Set Variable [ $token ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "token" ) ]
+Set Variable [ $pullKey ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "pullKey" ) ]
 #
-If [ IsEmpty ( $sessionPK ) or IsEmpty ( $containerPK ) or IsEmpty ( $viewPath ) or IsEmpty ( $baseURL ) or IsEmpty ( $token ) ]
-	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Missing context. SYNC_Run must pass session, container, viewPath, baseURL, token." ; JSONString ) ]
-End If
-#
-# Look up the PULL action key once.
-Set Variable [ $actionListPK ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM value_LISTS WHERE Name = 'SYNC_Action'" ; "" ; "" ) ]
-Set Variable [ $pullKey ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM VALUES WHERE fk_List = ? AND Name = 'PULL'" ; "" ; "" ; $actionListPK ) ]
-If [ IsEmpty ( $pullKey ) ]
-	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "The PULL value was not found in SYNC_Action. Seed the value list first." ; JSONString ) ]
+If [ IsEmpty ( $sessionPK ) or IsEmpty ( $containerPK ) or IsEmpty ( $viewPath ) or IsEmpty ( $baseURL ) or IsEmpty ( $token ) or IsEmpty ( $pullKey ) ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Missing context. sync RUN must pass session, container, viewPath, baseURL, token, pullKey." ; JSONString ) ]
 End If
 #
 Set Variable [ $page ; Value: 0 ]
@@ -38,13 +29,13 @@ Loop [ Flush: Always ]
 	Set Variable [ $url ; Value: $baseURL & "/view/" & $viewPath & "/task?page=" & $page ]
 	Set Variable [ $curl ; Value: "-X GET --header " & Quote ( "Authorization: " & $token ) & " --header " & Quote ( "Content-Type: application/json" ) & " --dump-header $hdr" ]
 	Insert from URL [ Select: Off ; With dialog: Off ; Target: $response ; $url ; Verify SSL Certificates: On ; cURL options: $curl ]
-	Set Variable [ $httpStatus ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 2 ; 1 ) ]
+	Set Variable [ $httpStatus ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 3 ; 1 ) ]
 	#
 	# 429 retry: pause 60s, try once.
 	If [ $httpStatus = 429 ]
 		Pause/Resume Script [ Duration (seconds): 60 ]
 		Insert from URL [ Select: Off ; With dialog: Off ; Target: $response ; $url ; Verify SSL Certificates: On ; cURL options: $curl ]
-		Set Variable [ $httpStatus ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 2 ; 1 ) ]
+		Set Variable [ $httpStatus ; Value: MiddleWords ( GetValue ( $hdr ; 1 ) ; 3 ; 1 ) ]
 	End If
 	#
 	If [ Get ( LastError ) ≠ 0 or $httpStatus ≠ 200 ]
@@ -67,7 +58,11 @@ Loop [ Flush: Always ]
 		Set Variable [ $recPK ; Value: ExecuteSQL ( "SELECT PrimaryKey FROM xt_RECORDS WHERE xt_ID = ? AND fk_xtContainer = ?" ; "" ; "" ; $taskID ; $containerPK ) ]
 		#
 		If [ IsEmpty ( $recPK ) ]
+			# New record.
 			Go to Layout [ "table | xt_RECORDS" ; Animation: None ]
+			If [ Get ( LastError ) ≠ 0 ]
+				Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Layout table | xt_RECORDS not found." ; JSONString ) ]
+			End If
 			New Record/Request
 			Set Field [ xt_RECORDS::fk_xtContainer ; $containerPK ]
 			Set Field [ xt_RECORDS::xt_ID ; $taskID ]
@@ -77,6 +72,9 @@ Loop [ Flush: Always ]
 			Set Variable [ $recPK ; Value: xt_RECORDS::PrimaryKey ]
 			#
 			Go to Layout [ "table | sync_EVENTS" ; Animation: None ]
+			If [ Get ( LastError ) ≠ 0 ]
+				Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "error" ; "Layout table | sync_EVENTS not found." ; JSONString ) ]
+			End If
 			New Record/Request
 			Set Field [ sync_EVENTS::fk_Session ; $sessionPK ]
 			Set Field [ sync_EVENTS::fk_xtRecord ; $recPK ]
@@ -92,6 +90,7 @@ Loop [ Flush: Always ]
 			If [ Exact ( $storedVersion ; $dateUpdated ) ]
 				Set Variable [ $countUnchanged ; Value: $countUnchanged + 1 ]
 			Else
+				# Changed.
 				Go to Layout [ "table | xt_RECORDS" ; Animation: None ]
 				Enter Find Mode [ Pause: Off ]
 				Set Field [ xt_RECORDS::PrimaryKey ; "==" & $recPK ]
