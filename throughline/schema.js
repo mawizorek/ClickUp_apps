@@ -3,6 +3,7 @@
    types: text | area | num | bool | date | enum (opts.values) | fk (opts.to) | ep (endpoint picker) */
 var SCHEMA = (function () {
   var DIRS = ["in", "out", "—"];
+  var EP_EXCLUDE = {type:["audio tie","data tie","DMX home run","fiber"]};
   var T = {
     signal_types: { label: "Signal Types", scope: "library", show: function (r) { return r.name; },
       fields: [["name","Name","text",{req:1}],["dept","Department","text"],["protocol","Protocol","text"],["connector","Connector","text"],["notes","Notes","area"]] },
@@ -19,7 +20,7 @@ var SCHEMA = (function () {
     endpoints: { label: "Endpoints", scope: "endpoint", hidden: true, show: function (r) { return UI.epLabel(r.id); },
       fields: [["class","Class","enum",{values:["physical","virtual","infra"]}]] },
     infrastructure: { label: "Infrastructure", scope: "venue", ep: "infra", show: function (r) { return r.label + (r.type ? " \u00b7 " + r.type : ""); },
-      fields: [["label","Label","text",{req:1}],["type","Type","enum",{values:["audio tie","data tie","power ckt","DMX home run","fiber","panel","other"]}],["venue_id","Venue","fk",{to:"venues"}],["endpoint_a","End A","fk",{to:"infrastructure"}],["endpoint_b","End B","fk",{to:"infrastructure"}],["notes","Notes","area"]] },
+      fields: [["label","Label","text",{req:1}],["type","Type","enum",{values:["audio tie","data tie","power ckt","DMX home run","fiber","panel","other"]}],["venue_id","Venue","fk",{to:"venues"}],["endpoint_a","End A","fk",{to:"infrastructure",exclude:EP_EXCLUDE}],["endpoint_b","End B","fk",{to:"infrastructure",exclude:EP_EXCLUDE}],["notes","Notes","area"]] },
     networks: { label: "Networks", scope: "venue", show: function (r) { return r.name + (r.subnet ? " \u00b7 " + r.subnet : ""); },
       fields: [["name","Name","text",{req:1}],["protocol","Protocol","text"],["subnet","Subnet","text"],["vlan","VLAN","text"],["venue_id","Venue","fk",{to:"venues"}],["notes","Notes","area"]] },
     units: { label: "Units", scope: "show", ep: "physical", show: function (r) { var t = SignalDB.get("fixture_types", r.type_id); return "#" + (r.unit_num == null ? "?" : r.unit_num) + " " + (r.purpose || (t ? t.name : "")); },
