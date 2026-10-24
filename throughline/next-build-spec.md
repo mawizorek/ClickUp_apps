@@ -1,103 +1,178 @@
 # Throughline — Next Build Spec
 
-One spec at a time. Current: MCP integration.
+One spec at a time. Current: Infrastructure Screen.
 
 ---
 
-## MCP Integration
+## Infrastructure Screen
 
-**Goal:** let Brain and Super Agents read, write, trace, and search Throughline data conversationally through ClickUp's custom MCP server support.
+**Goal:** give venue infrastructure (tie lines, data ports, power circuits, DMX home runs) the same first-class grid treatment that Units already has. Today infrastructure lives in the generic Tables editor: a flat list of labels with no filtering, no type color coding, and no connection context. Before doing any bulk import (190 SPAC data ports are waiting), the app needs a real surface for this data.
 
-**Why now:** Michael wants to say "add a Source Four to 1E, channel 42" or "show me every unpatched connection for Big Love" and have an agent do it. Today no agent can reach D1.
+**Why now:** Michael's SPAC Data Ports inventory in ClickUp has 190 ports ready to import (D1-D108, LX Net 1-52, Audio Control Net, Dante Primary, Campus Net, rack jacks). The generic Tables view can't absorb that volume usefully. And even the 7 infrastructure rows already in D1 don't show their connection context: which units are plugged into each tie line.
 
-### Architecture
+### Route
 
-The Throughline Worker already has a public URL, auth, CRUD, and traces. The MCP layer wraps those existing endpoints in JSON-RPC 2.0 so ClickUp can discover and call them as tools.
+`#infra` — new nav item between "Tables" and "Access".
 
-- New route: `POST /mcp` on the existing Worker
-- New file: `worker/mcp.js` (~4 KB), imported by `worker.js`
-- Protocol: JSON-RPC 2.0 over HTTP (MCP spec requirement)
-- No new Cloudflare bindings or config. The existing `fetch` handler router picks up `/mcp` automatically.
+Files:
+- New: `screens/infra.js` (~300 lines, mirrors units.js patterns)
+- Edit: `index.html` (add nav item + script tag)
+- No worker changes. No schema changes. All data already exists in the `infrastructure` table.
 
-### Tools
+### Grid Layout
 
-Five tools. Each wraps an existing handler.
+Same `sig-table` / `sig-row` / `sig-cell` system as Units. Columns:
 
-**throughline_read**
-Query any domain table with optional filters.
-Parameters: `table` (required), `show_id` (optional), `filters` (optional key-value), `limit`
-Wraps: `/sync` logic (filtered single-table read)
-Returns: rows as JSON, columns per `TABLES` registry
+| Column | Key | Width | Notes |
+|--------|-----|-------|-------|
+| Label | `label` | 120px | Primary identifier. D86, A12, LX-1, etc. |
+| Type | `type` | 110px | Color coded. See palette below. |
+| End A | `endpoint_a` | 160px, flex | Stage/wall end description |
+| End B | `endpoint_b` | 160px, flex | Booth/rack end description |
+| In Use | `_inuse` | 70px | Computed: shows connection count through this endpoint |
+| Notes | `notes` | 160px | Truncated, full on hover |
 
-**throughline_write**
-Create, update, or soft-delete rows.
-Parameters: `ops` (array of `{op, table, row}`)
-Wraps: `/batch`
-All existing guardrails fire: rev-based optimistic concurrency, dept-scoped permissions, locked-show enforcement, `logChange()` audit. An agent gets the same rules as a human.
-Returns: per-op result (ok, conflict, denied)
+`_inuse` is a live computed column: count of non-deleted connections where `source_endpoint` or `dest_endpoint` equals this infrastructure row's `endpoint_id`. Shows "—" for 0 and the count for 1+. This is the column that makes the grid actually useful: you can see at a glance which ports are live and which are free.
 
-**throughline_trace**
-Run a signal trace for a unit.
-Parameters: `unit_id`, `show_id`
-Wraps: `/trace` CTE
-Returns: trace path (endpoints, hops, depth, cycle detection)
+### Type Colors
 
-**throughline_shows**
-List shows or get one show's metadata.
-Parameters: `show_id` (optional; omit to list all)
-Returns: title, season, venue, locked status, designer fields
-Needed because most queries are show-scoped.
+Match the signal color pattern established in units.js `SIG_COLORS`.
 
-**throughline_search** *(new server code)*
-Find rows by label or name across tables.
-Parameters: `query` (text), `tables` (optional array to scope), `show_id` (optional)
-Returns: matching rows with table name and id
-Implementation: `LIKE '%query%'` across `name`, `label`, `purpose`, `notes` columns for each scoped table. ~20 lines. Only new business logic in the whole spec.
+```
+audio tie   #4ade80  (green, matches Analog Audio)
+data tie    #22d3ee  (cyan, matches Dante/Ethernet)
+power ckt   #fbbf24  (amber, matches AC Power)
+DMX home run #60a5fa  (blue, matches DMX 512)
+fiber        #c084fc  (purple)
+other        #94a3b8  (gray)
+```
 
-### Tool Discovery
+### Filter Bar
 
-MCP requires a `tools/list` method returning tool schemas. Static JSON response (~1 KB) describing the five tools above with parameter types and descriptions. Boilerplate.
+Same `sig-filters` / `sig-group` / `sig-pill` system as Units.
 
-### Auth
+**Row 1 (showbar):**
+- Search input (filters by label, endpoint_a, endpoint_b, notes substring)
+- "+ New" button (if writable)
+- Sync status pill
+- Count badge: `N/M infra`
 
-API key, sent as a header. ClickUp passes it on every call. The Worker's existing `authenticate()` validates it.
+**Row 2 (type filter):**
+- ALL pill (default)
+- One pill per type present in data (auto-discovered, not hardcoded)
+- Color-coded to match the palette above
 
-Create a dedicated agent user in `_users` with a real `_grants` row. Not the admin key.
-Recommended scope: `dept_head` for all departments, all shows. Can read everything, write domain rows, cannot manage users or roles.
-Michael creates the user via the Access screen, copies the invite key into ClickUp's MCP config.
+**Row 3 (usage filter):**
+- ALL | In Use | Free
+- "In Use" = has at least one connection through its endpoint
+- "Free" = zero connections
 
-### ClickUp Setup (Michael, one time)
+### Sort
 
-1. App Center > Custom MCP > Add New
-2. Name: "Throughline"
-3. URL: `https://throughline.mawizorek-online.workers.dev/mcp`
-4. Auth: API key
-5. Enter the agent user's key
-6. ClickUp discovers the five tools
-7. Optionally add tools to specific Super Agents
+Default: label ascending with numeric awareness (`localeCompare` with `{ numeric: true }`).
+Clickable column headers toggle sort, same as Units.
+
+### Detail Panel
+
+Tap a row to open a side panel (same `UI.panel` system). Sections:
+
+**Fields:**
+- Label, Type, End A, End B, Notes (same as edit form fields)
+
+**Connections through this port** (computed section):
+- Query: all connections where `source_endpoint` or `dest_endpoint` equals this infra's `endpoint_id`
+- Each row shows: `source_label → dest_label · signal_type_name`
+- Tappable: opens the connection in the edit form
+- Empty state: "No connections routed through this port yet."
+
+**Actions:**
+- Edit infra (opens edit form)
+- + Connection (pre-fills this endpoint as source or dest)
+
+### Quick Add
+
+The "+ New" button opens the standard edit form via `UI.edit('infrastructure', null, { defaults })`. Default venue auto-fills from the first venue (existing behavior in tables.js).
+
+**Sequential label hint:** when opening the form, scan existing labels for the longest common prefix + incrementing number pattern (e.g. "D" + numbers → suggest "D109" if D1-D108 exist). Show as placeholder text in the label field, not auto-filled. User can accept or override.
+
+### Bulk Paste Mode
+
+Button in the filter bar: "Paste Import". Opens a panel with:
+
+1. **Type dropdown** — select the infrastructure type for all pasted rows
+2. **Textarea** — paste one label per line (e.g. paste "D1\nD2\nD3..." or tab-separated "D1\tSL Wall 1\tBay C1")
+3. **Preview** — parsed rows shown in a mini-table before commit
+4. **Create All** button — batch-creates endpoints + infrastructure rows, syncs
+
+Parsing rules:
+- One field per line = label only (type from dropdown, endpoints blank)
+- Tab-separated = label, end_a, end_b (3 columns)
+- Blank lines skipped
+- Duplicates flagged (label already exists in infrastructure)
+
+This is the critical feature for the 190-port import. Without it, each port is a separate form open/fill/save cycle.
+
+### Nav Integration
+
+`index.html` changes:
+
+```js
+var NAV = [
+  { route: "home",   label: "Units" },
+  { route: "infra",  label: "Infra" },
+  { route: "tables", label: "Tables" },
+  { route: "access", label: "Access" },
+  { route: "about",  label: "About" }
+];
+var SCREENS = { home: "units", infra: "infra", tables: "tables", access: "access" };
+```
+
+Add script tag: `<script src="./screens/infra.js?v=3"></script>` after units.js.
+
+### Infrastructure on Unit Detail
+
+Also update `screens/units.js` detail panel: in the **Connections** section, when a connection routes through an infrastructure endpoint, show the infrastructure label inline:
+
+```
+#502 Blackmagic SDI distribution → #500 FOH Projector  SDI  via D96
+```
+
+The "via D96" is resolved by checking if either endpoint of the connection belongs to an infrastructure row (using `UI.epOwner`). This already works in the data model; it's just not displayed.
 
 ### Build Plan
 
-1. Add `POST /mcp` route to `worker.js` (or `worker/mcp.js` after the module split)
-2. Implement JSON-RPC envelope: parse `method`, `params`, `id`; route to handler; return JSON-RPC response
-3. Implement `tools/list` (static schema)
-4. Map each tool method to existing handler calls
-5. Add search endpoint (~20 lines)
-6. Create agent user via Access screen
-7. Deploy Worker
-8. Connect in ClickUp App Center
-9. Test: read, write, trace, search from Brain
+1. Create `screens/infra.js` with grid, filters, detail panel, quick-add
+2. Add bulk paste panel to infra.js
+3. Update `index.html` nav and script tags
+4. Update `screens/units.js` connection display to show infra labels
+5. Add infrastructure type colors to `styles.css` if needed (may reuse existing classes)
 
 ### Build Estimate
 
-`mcp.js`: ~4 KB. Search endpoint: ~20 lines in the worker. Total new code: under 5 KB. Every tool maps 1:1 to an existing endpoint except search.
+`screens/infra.js`: ~300 lines (units.js is ~280, and infra is simpler: no trace, no reports, no show scoping).
+Bulk paste panel: ~80 lines additional.
+`index.html` changes: 3 lines.
+`units.js` infra label: ~5 lines in the connection formatter.
+
+Total new code: ~400 lines. No worker changes. No migrations.
 
 ### What This Does NOT Include
 
-- Schema migrations (endpoint FKs, pairing_states, infra rename): on the board, separate work
-- Module split: proposed, can happen before or after this
-- Print spec: sequenced after endpoint rework
-- `VERSIONS.md` row: owed, separate commit
+- Endpoint FK migration (endpoint_a/endpoint_b → FK refs): separate schema work, parked
+- Network screen (similar pattern but for the `networks` table): future, once infra screen proves the pattern
+- Map/spatial view of infrastructure: future (requires venue floor plan data)
+
+---
+
+## Completed
+
+### MCP Integration ✓
+
+Shipped in PRs #1023, #1024, #1030. Five tools (read, write, trace, shows, search) live at `/mcp` on the Worker. Connected via ClickUp App Center custom MCP. All tools discovered and working.
+
+### Dept on Units ✓
+
+Shipped in PR #1034. Moved `dept` from `signal_types` to `fixture_types` (class default) and `units` (per-instance override). Migration 0002 deployed.
 
 ---
 
@@ -108,3 +183,5 @@ Items discussed in the collaboration thread but not yet specced:
 - Print menu (PDF export of Input Patch, Output Patch, Equipment Pull, Channel Hookup, Signal Trace)
 - Plot view (`#plot`, positions on a plan)
 - Label printing (`#labels`, cable + fixture labels)
+- Network screen (`#networks`, same grid pattern as infra but for IP/Dante networks)
+- Permissions interaction spec (Lux + Michael, in progress separately)
