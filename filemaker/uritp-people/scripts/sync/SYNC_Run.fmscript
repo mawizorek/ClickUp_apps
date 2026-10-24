@@ -1,0 +1,93 @@
+# SCRIPT: SYNC_Run
+# FOLDER: sync
+# The button. One press syncs one source: pull, dispatch, push.
+# Param (text): a sync_SOURCES Name, e.g. "PEOPLE".
+# Returns (JSON): { "ok" : 1|0, "session" : "<PrimaryKey>", "pulled" : n, "dispatched" : n, "pushed" : n }
+# D-048 ruling 6: one ExecuteSQL context join, no new TOs.
+# D-043 gap: literal field names until the sql/ custom-function family exists.
+Set Error Capture [ On ]
+Allow User Abort [ Off ]
+Set Variable [ $sourceName ; Value: Get ( ScriptParameter ) ]
+If [ IsEmpty ( $sourceName ) ]
+	Show Custom Dialog [ "Sync" ; "Pass a sync_SOURCES Name as the parameter, e.g. \"PEOPLE\"." ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+#
+# ---------- context read ----------
+# One join across sync_SOURCES → xt_CONTAINERS → xt_SYSTEMS.
+Set Variable [ $ctx ; Value: ExecuteSQL (
+	"SELECT src.PrimaryKey, src.fk_xtContainer, src.xt_ViewPath, c.xt_ID, c.Name, s.PrimaryKey, s.Name, s.BaseURL, s.Token FROM sync_SOURCES src JOIN xt_CONTAINERS c ON src.fk_xtContainer = c.PrimaryKey JOIN xt_SYSTEMS s ON c.fk_xtSystem = s.PrimaryKey WHERE src.Name = ?"
+	; "|" ; "±" ; $sourceName ) ]
+If [ IsEmpty ( $ctx ) or Left ( $ctx ; 1 ) = "?" ]
+	Show Custom Dialog [ "Sync" ; "Source " & Quote ( $sourceName ) & " was not found, or its container or system is missing." ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+Set Variable [ $vals ; Value: Substitute ( $ctx ; "|" ; ¶ ) ]
+Set Variable [ $srcPK ; Value: GetValue ( $vals ; 1 ) ]
+Set Variable [ $containerPK ; Value: GetValue ( $vals ; 2 ) ]
+Set Variable [ $viewPath ; Value: GetValue ( $vals ; 3 ) ]
+Set Variable [ $listID ; Value: GetValue ( $vals ; 4 ) ]
+Set Variable [ $containerName ; Value: GetValue ( $vals ; 5 ) ]
+Set Variable [ $systemPK ; Value: GetValue ( $vals ; 6 ) ]
+Set Variable [ $systemName ; Value: GetValue ( $vals ; 7 ) ]
+Set Variable [ $baseURL ; Value: GetValue ( $vals ; 8 ) ]
+Set Variable [ $token ; Value: GetValue ( $vals ; 9 ) ]
+#
+# ---------- open session ----------
+Go to Layout [ "table | sync_SESSIONS" ; Animation: None ]
+If [ Get ( LastError ) ≠ 0 ]
+	Show Custom Dialog [ "Sync" ; "The sync_SESSIONS layout was not found." ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+New Record/Request
+Set Field [ sync_SESSIONS::fk_Source ; $srcPK ]
+Commit Records/Requests [ With dialog: Off ]
+Set Variable [ $sessionPK ; Value: sync_SESSIONS::PrimaryKey ]
+#
+# ---------- context block ----------
+Set Variable [ $context ; Value: JSONSetElement ( "{}" ;
+	[ "session" ; $sessionPK ; JSONString ] ;
+	[ "source" ; $srcPK ; JSONString ] ;
+	[ "container" ; $containerPK ; JSONString ] ;
+	[ "viewPath" ; $viewPath ; JSONString ] ;
+	[ "listID" ; $listID ; JSONString ] ;
+	[ "containerName" ; $containerName ; JSONString ] ;
+	[ "system" ; $systemPK ; JSONString ] ;
+	[ "systemName" ; $systemName ; JSONString ] ;
+	[ "baseURL" ; $baseURL ; JSONString ] ;
+	[ "token" ; $token ; JSONString ] ) ]
+#
+# ---------- pull ----------
+Perform Script [ Specified: From list ; "ADAPTER_ClickUp_Pull" ; Parameter: $context ]
+Set Variable [ $pullResult ; Value: Get ( ScriptResult ) ]
+If [ JSONGetElement ( $pullResult ; "ok" ) ≠ 1 ]
+	Show Custom Dialog [ "Sync" ; "Pull failed.¶¶" & JSONGetElement ( $pullResult ; "error" ) ]
+	Go to Layout [ "table | sync_SESSIONS" ; Animation: None ]
+	Enter Find Mode [ Pause: Off ]
+	Set Field [ sync_SESSIONS::PrimaryKey ; "==" & $sessionPK ]
+	Perform Find [ ]
+	Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "session" ; $sessionPK ; JSONString ) ]
+End If
+#
+# ---------- dispatch ----------
+Perform Script [ Specified: From list ; "SYNC_Dispatch" ; Parameter: $context ]
+Set Variable [ $dispatchResult ; Value: Get ( ScriptResult ) ]
+#
+# ---------- push ----------
+If [ $systemName = "ClickUp" ]
+	Perform Script [ Specified: From list ; "ADAPTER_ClickUp_Push" ; Parameter: $context ]
+	Set Variable [ $pushResult ; Value: Get ( ScriptResult ) ]
+End If
+#
+# ---------- show session ----------
+Go to Layout [ "table | sync_SESSIONS" ; Animation: None ]
+Enter Find Mode [ Pause: Off ]
+Set Field [ sync_SESSIONS::PrimaryKey ; "==" & $sessionPK ]
+Perform Find [ ]
+#
+Exit Script [ Text Result: JSONSetElement ( "{}" ;
+	[ "ok" ; 1 ; JSONNumber ] ;
+	[ "session" ; $sessionPK ; JSONString ] ;
+	[ "pulled" ; JSONGetElement ( $pullResult ; "count" ) ; JSONNumber ] ;
+	[ "dispatched" ; JSONGetElement ( $dispatchResult ; "count" ) ; JSONNumber ] ;
+	[ "pushed" ; If ( IsEmpty ( $pushResult ) ; 0 ; JSONGetElement ( $pushResult ; "count" ) ) ; JSONNumber ] ) ]

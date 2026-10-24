@@ -1,0 +1,33 @@
+# SCRIPT: XT_Refresh_Fields
+# FOLDER: 00_APP
+# Generic. Refreshes one container's xt_FIELDS rows from whatever system owns it.
+# Holds NO knowledge of any system's API or JSON. That lives in ADAPTER_<System>_RefreshFields, per D-046.
+# Param (JSON): { "container" : "<xt_CONTAINERS PrimaryKey>" }
+# Returns (JSON): { "ok" : 1|0, "system" : "<name>", "updated" : n, "missing" : n, "native" : n }
+# Run by hand after a field is added, renamed or retyped in the outside system.
+Set Error Capture [ On ]
+Allow User Abort [ Off ]
+Set Variable [ $container ; Value: JSONGetElement ( Get ( ScriptParameter ) ; "container" ) ]
+If [ IsEmpty ( $container ) ]
+	Show Custom Dialog [ "Field refresh" ; "No container was passed. Param is { \"container\" : \"<xt_CONTAINERS PrimaryKey>\" }." ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+#
+# The container and the system that owns it, in one query. D-048 settled that this layer reads its context by ExecuteSQL.
+Set Variable [ $row ; Value: ExecuteSQL ( "SELECT s.PrimaryKey, s.Name FROM xt_CONTAINERS c JOIN xt_SYSTEMS s ON c.fk_xtSystem = s.PrimaryKey WHERE c.PrimaryKey = ?" ; "|" ; "" ; $container ) ]
+If [ IsEmpty ( $row ) or Left ( $row ; 1 ) = "?" ]
+	Show Custom Dialog [ "Field refresh" ; "That container has no system, or the id was not found." ]
+	Exit Script [ Text Result: JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ]
+End If
+Set Variable [ $system ; Value: GetValue ( Substitute ( $row ; "|" ; ¶ ) ; 1 ) ]
+Set Variable [ $systemName ; Value: GetValue ( Substitute ( $row ; "|" ; ¶ ) ; 2 ) ]
+#
+# Dispatch. The adapter is handed two keys and reads its own credentials; a token never travels in a script parameter.
+Set Variable [ $param ; Value: JSONSetElement ( "{}" ; [ "container" ; $container ; JSONString ] ; [ "system" ; $system ; JSONString ] ) ]
+If [ $systemName = "ClickUp" ]
+	Perform Script [ Specified: From list ; "ADAPTER_ClickUp_RefreshFields" ; Parameter: $param ]
+	Exit Script [ Text Result: Get ( ScriptResult ) ]
+End If
+# No adapter for this system yet. Name it, rather than failing quietly.
+Show Custom Dialog [ "Field refresh" ; "No field-refresh adapter exists for the system " & Quote ( $systemName ) & ". Write ADAPTER_" & $systemName & "_RefreshFields first." ]
+Exit Script [ Text Result: JSONSetElement ( JSONSetElement ( "{}" ; "ok" ; 0 ; JSONNumber ) ; "system" ; $systemName ; JSONString ) ]
