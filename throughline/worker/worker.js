@@ -43,7 +43,7 @@ const VERSION = "1.0";
 
 const TABLES = {
   signal_types:       { cols: ["name","protocol","connector","dept","notes"], scope: "library" },
-  fixture_types:      { cols: ["name","category","mfr","model","wattage","weight","primary_signal","notes"], scope: "library" },
+  fixture_types:      { cols: ["name","category","mfr","model","wattage","weight","primary_signal","dept","notes"], scope: "library" },
   type_interfaces:    { cols: ["type_id","label","signal_type","direction","connector","required","sort","notes"], scope: "library" },
   venues:             { cols: ["name","abbr","notes"], scope: "venue" },
   shows:              { cols: ["title","season","venue_id","opening","designer_snd","designer_lx","designer_vid","locked","is_template","notes"], scope: "show-root" },
@@ -51,7 +51,7 @@ const TABLES = {
   endpoints:          { cols: ["class"], scope: "endpoint" },
   infrastructure:     { cols: ["venue_id","endpoint_id","label","type","endpoint_a","endpoint_b","notes"], scope: "venue" },
   networks:           { cols: ["venue_id","name","protocol","subnet","vlan","notes"], scope: "venue" },
-  units:              { cols: ["show_id","endpoint_id","type_id","unit_num","position_id","direction","purpose","channel","dimmer","dmx_addr","role","asset_tag","label","notes"], scope: "show" },
+  units:              { cols: ["show_id","endpoint_id","type_id","unit_num","position_id","direction","purpose","channel","dimmer","dmx_addr","role","asset_tag","label","dept","notes"], scope: "show" },
   control_points:     { cols: ["show_id","endpoint_id","parent_unit_id","label","cp_type","signal_type","direction","channel_num","notes"], scope: "show" },
   network_interfaces: { cols: ["show_id","unit_id","network_id","ip","hostname","port_label","mac","notes"], scope: "show" },
   connections:        { cols: ["show_id","source_endpoint","dest_endpoint","connection_type","signal_type","cable_label","cable_color","length","notes"], scope: "show" },
@@ -139,7 +139,7 @@ async function authenticate(request, env) {
 }
 
 async function me(env, actor) {
-  const d = await env.DB.prepare("SELECT DISTINCT dept FROM signal_types WHERE dept IS NOT NULL AND deleted_at IS NULL ORDER BY dept").all();
+  const d = await env.DB.prepare("SELECT DISTINCT dept FROM (SELECT dept FROM fixture_types WHERE dept IS NOT NULL AND deleted_at IS NULL UNION SELECT dept FROM units WHERE dept IS NOT NULL AND deleted_at IS NULL UNION SELECT dept FROM signal_types WHERE dept IS NOT NULL AND deleted_at IS NULL) ORDER BY dept").all();
   const sig = await sha256(JSON.stringify(actor.grants.map((g) => [g.role_id, g.show_id, g.dept, g.perms])));
   return {
     version: VERSION, now: nowISO(),
@@ -184,13 +184,13 @@ async function deptsOf(ctx, table, row, depth = 0) {
   if (!row || depth > 3) return out;
   switch (table) {
     case "signal_types": add(row.dept); break;
-    case "fixture_types": add(await sigDept(ctx, row.primary_signal)); break;
+    case "fixture_types": if (row.dept) add(row.dept); else add(await sigDept(ctx, row.primary_signal)); break;
     case "type_interfaces": {
       add(await sigDept(ctx, row.signal_type));
       addAll(await deptsOf(ctx, "fixture_types", await ctx.get("fixture_types", row.type_id), depth + 1));
       break;
     }
-    case "units": addAll(await deptsOf(ctx, "fixture_types", await ctx.get("fixture_types", row.type_id), depth + 1)); break;
+    case "units": if (row.dept) add(row.dept); else addAll(await deptsOf(ctx, "fixture_types", await ctx.get("fixture_types", row.type_id), depth + 1)); break;
     case "control_points": {
       add(await sigDept(ctx, row.signal_type));
       addAll(await deptsOf(ctx, "units", await ctx.get("units", row.parent_unit_id), depth + 1));
