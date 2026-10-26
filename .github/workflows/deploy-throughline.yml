@@ -1,0 +1,128 @@
+# Deploy the Throughline worker + apply any pending D1 migrations.
+#
+# AUTOMATIC on push to main that touches the worker. Manual button for forced redeploys.
+#
+# ORDER MATTERS: migrations run FIRST, then code deploys. A schema change merged
+# without the migration applied leaves the worker referencing tables that don't exist.
+# Workers Builds (Cloudflare dashboard "Connect to Git") may also deploy the code,
+# but it does NOT run D1 migrations, which is exactly the gap this workflow fills.
+
+name: Deploy throughline worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'throughline/worker/**'
+      - '.github/workflows/deploy-throughline.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-throughline
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: throughline/worker
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WR: "npx --yes wrangler@4"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Why this ran
+        run: |
+          {
+            echo "## Deploy throughline · ${{ github.event_name }}"
+            echo ""
+            if [ "${{ github.event_name }}" = "push" ]; then
+              echo "Automatic: push to main touched the worker or this workflow."
+              echo "Commit: \`${{ github.sha }}\`"
+            else
+              echo "Manual run from the Actions tab."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preflight · credentials shape
+        run: |
+          FAIL=0
+          echo "## Preflight" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is empty or missing."
+            echo "- :x: token **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+          else
+            echo "- :white_check_mark: token present (${#CLOUDFLARE_API_TOKEN} chars)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID is empty or missing."
+            echo "- :x: account id **empty or missing**" >> "$GITHUB_STEP_SUMMARY"; FAIL=1
+          elif ! printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | grep -qiE '^[0-9a-f]{32}$'; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID is not 32 hex chars."
+            echo "- :x: account id wrong shape (${#CLOUDFLARE_ACCOUNT_ID} chars, need 32 hex)" >> "$GITHUB_STEP_SUMMARY"
+            FAIL=1
+          else
+            echo "- :white_check_mark: account id correctly shaped (32 hex)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          exit $FAIL
+
+      # MIGRATIONS FIRST. This is the whole reason this workflow exists.
+      # wrangler d1 migrations apply reads migrations_dir from wrangler.toml,
+      # diffs against D1's migration state, and applies only what's pending.
+      # Idempotent: re-running after all migrations are applied is a no-op.
+      - name: Apply D1 migrations
+        run: |
+          set +e
+          $WR d1 migrations apply throughline --remote > migrate.txt 2>&1
+          RC=$?
+          {
+            echo ""
+            echo "## D1 migrations — exit $RC"
+            echo ""
+            echo '```'
+            cat migrate.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat migrate.txt
+          if [ $RC -ne 0 ]; then
+            echo "::error::D1 migration failed. Worker deploy will NOT proceed. See the run summary."
+            exit $RC
+          fi
+
+      # Code deploy only runs if migrations succeeded.
+      - name: Deploy worker
+        run: |
+          set +e
+          $WR deploy > out.txt 2>&1
+          RC=$?
+          {
+            echo ""
+            echo "## wrangler deploy — exit $RC"
+            echo ""
+            echo '```'
+            cat out.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat out.txt
+          if [ $RC -ne 0 ]; then
+            MSG=$(grep -m1 -E 'ERROR|error|Error' out.txt | head -c 400)
+            echo "::error::wrangler deploy failed: ${MSG:-see the run summary}"
+            exit $RC
+          fi
+          {
+            echo ""
+            echo "### Done"
+            echo ""
+            echo "Migrations applied, worker deployed. MCP tools now read/write the current schema."
+          } >> "$GITHUB_STEP_SUMMARY"
