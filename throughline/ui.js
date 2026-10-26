@@ -30,7 +30,8 @@ var UI = (function () {
     idx = {};
     SignalDB.getAll("units").forEach(function (u) { if (u.endpoint_id) idx[u.endpoint_id] = { t: "units", r: u }; });
     SignalDB.getAll("control_points").forEach(function (c) { if (c.endpoint_id) idx[c.endpoint_id] = { t: "control_points", r: c }; });
-    SignalDB.getAll("infrastructure").forEach(function (i) { if (i.endpoint_id) idx[i.endpoint_id] = { t: "infrastructure", r: i }; });
+    SignalDB.getAll("panels").forEach(function (p) { if (p.endpoint_id) idx[p.endpoint_id] = { t: "panels", r: p }; });
+    SignalDB.getAll("tie_lines").forEach(function (i) { if (i.endpoint_id) idx[i.endpoint_id] = { t: "tie_lines", r: i }; });
     return idx;
   }
   function epOwner(ep) { return ep ? index()[ep] || null : null; }
@@ -50,6 +51,7 @@ var UI = (function () {
     if (opts && opts.exclude) {
       var ex = opts.exclude;
       rows = rows.filter(function (r) {
+        if (ex.signal_type && ex.signal_type.indexOf(r.signal_type) !== -1) return false;
         if (ex.type && ex.type.indexOf(r.type) !== -1) return false;
         return true;
       });
@@ -59,8 +61,8 @@ var UI = (function () {
   }
   function epGroups() {
     var sid = showId();
-    var g = [["Units", "units"], ["Control points", "control_points"], ["Infrastructure", "infrastructure"]].map(function (x) {
-      var rows = SignalDB.getAll(x[1]).filter(function (r) { return r.endpoint_id && (x[1] === "infrastructure" || r.show_id === sid); });
+    var g = [["Units", "units"], ["Control points", "control_points"], ["Panels", "panels"], ["Tie Lines", "tie_lines"]].map(function (x) {
+      var rows = SignalDB.getAll(x[1]).filter(function (r) { return r.endpoint_id && (x[1] === "panels" || x[1] === "tie_lines" || r.show_id === sid); });
       return { label: x[0], items: rows.map(function (r) { return { id: r.endpoint_id, label: SCHEMA.T[x[1]].show(r) }; })
         .sort(function (a, b) { return a.label.localeCompare(b.label, undefined, { numeric: true }); }) };
     });
@@ -187,7 +189,7 @@ var UI = (function () {
       eps(row.endpoint_id);
       SignalDB.where("control_points", function (c) { return c.parent_unit_id === row.id; }).forEach(function (c) { out.push(["control_points", c]); eps(c.endpoint_id); });
       SignalDB.where("network_interfaces", function (n) { return n.unit_id === row.id; }).forEach(function (n) { out.push(["network_interfaces", n]); });
-    } else if (t === "control_points" || t === "infrastructure") eps(row.endpoint_id);
+    } else if (t === "panels" || t === "tie_lines" || t === "control_points") eps(row.endpoint_id);
     var seen = {}; return out.filter(function (x) { var k = x[0] + x[1].id; if (seen[k]) return false; seen[k] = 1; return true; });
   }
 
