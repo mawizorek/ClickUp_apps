@@ -2,7 +2,7 @@
  * Throughline — Cloudflare Worker (v1.0)
  *
  * Relational backend over D1 for the Throughline (throughline/ on GitHub Pages).
- * 14 domain tables + 4 system tables (_roles, _users, _grants, _changes). See migrations/0001_init.sql.
+ * 15 domain tables + 4 system tables (_roles, _users, _grants, _changes). See migrations/0001_init.sql.
  *
  * AUTH: every request (reads included) needs header x-key or Authorization (Bearer).
  *   ADMIN_KEY secret      = break-glass root admin (Michael). Always admin, never stored in D1.
@@ -49,7 +49,8 @@ const TABLES = {
   shows:              { cols: ["title","season","venue_id","opening","designer_snd","designer_lx","designer_vid","locked","is_template","notes"], scope: "show-root" },
   positions:          { cols: ["venue_id","show_id","name","type","notes"], scope: "position" },
   endpoints:          { cols: ["class"], scope: "endpoint" },
-  infrastructure:     { cols: ["venue_id","endpoint_id","label","type","endpoint_a","endpoint_b","notes"], scope: "venue" },
+  panels:             { cols: ["venue_id","endpoint_id","label","notes"], scope: "venue" },
+  tie_lines:          { cols: ["venue_id","endpoint_id","label","signal_type","endpoint_a","endpoint_b","notes"], scope: "venue" },
   networks:           { cols: ["venue_id","name","protocol","subnet","vlan","notes"], scope: "venue" },
   units:              { cols: ["show_id","endpoint_id","type_id","unit_num","position_id","direction","purpose","channel","dimmer","dmx_addr","role","asset_tag","label","dept","notes"], scope: "show" },
   control_points:     { cols: ["show_id","endpoint_id","parent_unit_id","label","cp_type","signal_type","direction","channel_num","notes"], scope: "show" },
@@ -385,7 +386,7 @@ async function trace(env, actor, unitId) {
     let label = null;
     if (o && o.table === "units") label = `#${o.row.unit_num} ${o.row.purpose || ""}`.trim();
     else if (o && o.table === "control_points") label = o.row.label;
-    else if (r.dst) { const inf = await env.DB.prepare("SELECT label FROM infrastructure WHERE endpoint_id=?1").bind(r.dst).first(); label = inf ? inf.label : r.dst; }
+    else if (r.dst) { let inf = await env.DB.prepare("SELECT label FROM panels WHERE endpoint_id=?1 AND deleted_at IS NULL").bind(r.dst).first(); if (!inf) inf = await env.DB.prepare("SELECT label FROM tie_lines WHERE endpoint_id=?1 AND deleted_at IS NULL").bind(r.dst).first(); label = inf ? inf.label : r.dst; }
     steps.push({ depth: r.depth, kind: r.kind, edge_id: r.edge_id, info: (r.info || "").trim(), to: r.dst, to_label: label });
   }
   return { unit: { id: unit.id, unit_num: unit.unit_num, purpose: unit.purpose }, steps };

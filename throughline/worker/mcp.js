@@ -13,11 +13,11 @@
 const TOOLS = [
   {
     name: "throughline_read",
-    description: "Query rows from any Throughline domain table. Returns rows as JSON with all columns. Tables: signal_types, fixture_types, type_interfaces, venues, shows, positions, endpoints, infrastructure, networks, units, control_points, network_interfaces, connections, assignments.",
+    description: "Query rows from any Throughline domain table. Returns rows as JSON with all columns. Tables: signal_types, fixture_types, type_interfaces, venues, shows, positions, endpoints, panels, tie_lines, networks, units, control_points, network_interfaces, connections, assignments.",
     inputSchema: {
       type: "object",
       properties: {
-        table: { type: "string", description: "Table name (e.g. units, connections, signal_types)" },
+        table: { type: "string", description: "Table name (e.g. units, connections, panels, tie_lines)" },
         show_id: { type: "string", description: "Filter by show ID (optional)" },
         filters: { type: "object", description: "Key-value column filters, e.g. {direction: 'IN'} (optional)" },
         limit: { type: "number", description: "Max rows to return (default 100, max 500)" }

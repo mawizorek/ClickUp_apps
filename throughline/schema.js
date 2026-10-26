@@ -1,9 +1,9 @@
-/* schema.js — client mirror of the 14-table registry (worker.js TABLES is authoritative).
+/* schema.js — client mirror of the 15-table registry (worker.js TABLES is authoritative).
    Drives every form, list, and FK picker. Field: [key, label, type, opts]
    types: text | area | num | bool | date | enum (opts.values) | fk (opts.to) | ep (endpoint picker) */
 var SCHEMA = (function () {
   var DIRS = ["in", "out", "—"];
-  var EP_EXCLUDE = {type:["audio tie","data tie","DMX home run","fiber"]};
+  var EP_EXCLUDE = {signal_type:["audio tie","data tie","DMX home run","fiber"]};
   var T = {
     signal_types: { label: "Signal Types", scope: "library", show: function (r) { return r.name; },
       fields: [["name","Name","text",{req:1}],["dept","Department","text"],["protocol","Protocol","text"],["connector","Connector","text"],["notes","Notes","area"]] },
@@ -19,8 +19,10 @@ var SCHEMA = (function () {
       fields: [["name","Name","text",{req:1}],["type","Type","enum",{values:["pipe","room","floor","catwalk","mount","wall","person"]}],["venue_id","Venue","fk",{to:"venues"}],["show_id","Show (blank = venue position)","fk",{to:"shows"}],["notes","Notes","area"]] },
     endpoints: { label: "Endpoints", scope: "endpoint", hidden: true, show: function (r) { return UI.epLabel(r.id); },
       fields: [["class","Class","enum",{values:["physical","virtual","infra"]}]] },
-    infrastructure: { label: "Infrastructure", scope: "venue", ep: "infra", show: function (r) { return r.label + (r.type ? " \u00b7 " + r.type : ""); },
-      fields: [["label","Label","text",{req:1}],["type","Type","enum",{values:["audio tie","data tie","power ckt","DMX home run","fiber","panel","other"]}],["venue_id","Venue","fk",{to:"venues"}],["endpoint_a","End A","fk",{to:"infrastructure",exclude:EP_EXCLUDE}],["endpoint_b","End B","fk",{to:"infrastructure",exclude:EP_EXCLUDE}],["notes","Notes","area"]] },
+    panels: { label: "Panels", scope: "venue", ep: "infra", show: function (r) { return r.label; },
+      fields: [["label","Label","text",{req:1}],["venue_id","Venue","fk",{to:"venues"}],["notes","Notes","area"]] },
+    tie_lines: { label: "Tie Lines", scope: "venue", ep: "infra", show: function (r) { return r.label + (r.signal_type ? " \u00b7 " + r.signal_type : ""); },
+      fields: [["label","Label","text",{req:1}],["signal_type","Signal Type","enum",{values:["audio tie","data tie","power ckt","DMX home run","fiber","other"]}],["venue_id","Venue","fk",{to:"venues"}],["endpoint_a","End A","fk",{to:"panels"}],["endpoint_b","End B","fk",{to:"panels"}],["notes","Notes","area"]] },
     networks: { label: "Networks", scope: "venue", show: function (r) { return r.name + (r.subnet ? " \u00b7 " + r.subnet : ""); },
       fields: [["name","Name","text",{req:1}],["protocol","Protocol","text"],["subnet","Subnet","text"],["vlan","VLAN","text"],["venue_id","Venue","fk",{to:"venues"}],["notes","Notes","area"]] },
     units: { label: "Units", scope: "show", ep: "physical", show: function (r) { var t = SignalDB.get("fixture_types", r.type_id); return "#" + (r.unit_num == null ? "?" : r.unit_num) + " " + (r.purpose || (t ? t.name : "")); },
