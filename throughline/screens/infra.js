@@ -1,36 +1,38 @@
-/* screens/infra.js — the INFRASTRUCTURE grid: filter ports by type and usage,
+/* screens/infra.js — the TIE LINES grid: filter by signal type and usage,
    inspect connection context, and bulk-import endpoint labels. */
 window.Screens = window.Screens || {};
 Screens.infra = (function () {
   var esc = UI.esc, or = UI.or, DASH = UI.DASH;
-  var TYPES = ["audio tie", "data tie", "power ckt", "DMX home run", "fiber", "panel", "other"];
+  var TYPES = ["audio tie", "data tie", "power ckt", "DMX home run", "fiber", "other"];
   var TYPE_COLORS = {
     "audio tie": "#4ade80", "data tie": "#22d3ee", "power ckt": "#fbbf24",
-    "DMX home run": "#60a5fa", "fiber": "#c084fc", "panel": "#f472b6", "other": "#94a3b8"
+    "DMX home run": "#60a5fa", "fiber": "#c084fc", "other": "#94a3b8"
   };
   var st = { sort: { col: "label", dir: "asc" }, filters: { type: "all", usage: "all" }, q: "" };
   var view = null;
   var COLS = [
     { k: "label", l: "Label", w: 120 },
-    { k: "type", l: "Type", w: 110 },
+    { k: "signal_type", l: "Type", w: 110 },
     { k: "endpoint_a", l: "End A", w: 160, flex: true },
     { k: "endpoint_b", l: "End B", w: 160, flex: true },
     { k: "_inuse", l: "In Use", w: 70 },
     { k: "notes", l: "Notes", w: 160 }
   ];
 
-  /* Resolve an endpoint FK: if val is a valid infrastructure ID, return its label;
+  /* Resolve an endpoint FK: if val is a valid panel ID, return its label;
      if it looks like a raw text value (legacy data), return it as-is; null -> null. */
   function resolveEP(val) {
     if (!val) return null;
-    var ref = SignalDB.get("infrastructure", val);
+    var ref = SignalDB.get("panels", val);
     if (ref) return ref.label || val;
-    return val; /* legacy text — show as-is until migrated */
+    ref = SignalDB.get("tie_lines", val);
+    if (ref) return ref.label || val;
+    return val; /* legacy text */
   }
 
-  /* Reverse FK: infrastructure rows that reference this record as endpoint_a or endpoint_b */
+  /* Reverse FK: tie_lines rows that reference this record as endpoint_a or endpoint_b */
   function refsTo(id) {
-    return SignalDB.where("infrastructure", function (r) {
+    return SignalDB.where("tie_lines", function (r) {
       return !r.deleted_at && (r.endpoint_a === id || r.endpoint_b === id);
     });
   }
@@ -50,7 +52,7 @@ Screens.infra = (function () {
     var m = map[s] || [s, ""];
     return '<a class="sig-st ' + m[1] + '" href="#access" title="' + esc(d || m[0]) + '"><i></i>' + esc(m[0]) + '</a>';
   }
-  function rowsOf() { return SignalDB.getAll("infrastructure").filter(function (r) { return !r.deleted_at; }); }
+  function rowsOf() { return SignalDB.getAll("tie_lines").filter(function (r) { return !r.deleted_at; }); }
   function connectionsFor(i) {
     return SignalDB.where("connections", function (c) {
       return !c.deleted_at && i && i.endpoint_id && (c.source_endpoint === i.endpoint_id || c.dest_endpoint === i.endpoint_id);
@@ -83,7 +85,7 @@ Screens.infra = (function () {
   function openNew() {
     var def = {}, venue = SignalDB.getAll("venues")[0];
     if (venue) def.venue_id = venue.id;
-    UI.edit("infrastructure", null, { defaults: def, onSaved: function (r) { render(); if (r) detail(r.id); } });
+    UI.edit("tie_lines", null, { defaults: def, onSaved: function (r) { render(); if (r) detail(r.id); } });
     setTimeout(function () {
       var f = document.querySelector("#sigPanelWrap #f_label");
       if (f) f.placeholder = labelHint();
@@ -94,11 +96,11 @@ Screens.infra = (function () {
     view = v || view; if (!view) return;
     var old = view.querySelector(".sig-table-wrap"), keep = old ? { t: old.scrollTop, l: old.scrollLeft } : null;
     var all = rowsOf().map(function (r) { return { row: r, used: inUse(r) }; });
-    var types = Object.keys(all.reduce(function (m, x) { if (x.row.type) m[x.row.type] = 1; return m; }, {})).sort(function (a, b) { return a.localeCompare(b, undefined, { numeric: true }); });
+    var types = Object.keys(all.reduce(function (m, x) { if (x.row.signal_type) m[x.row.signal_type] = 1; return m; }, {})).sort(function (a, b) { return a.localeCompare(b, undefined, { numeric: true }); });
     var q = st.q.toLowerCase();
     var rows = all.filter(function (x) {
       var r = x.row;
-      if (st.filters.type !== "all" && r.type !== st.filters.type) return false;
+      if (st.filters.type !== "all" && r.signal_type !== st.filters.type) return false;
       if (st.filters.usage === "used" && !x.used) return false;
       if (st.filters.usage === "free" && x.used) return false;
       if (q && [r.label, resolveEP(r.endpoint_a), resolveEP(r.endpoint_b), r.notes].join(" ").toLowerCase().indexOf(q) === -1) return false;
@@ -114,12 +116,12 @@ Screens.infra = (function () {
     });
 
     var h = '<div class="sig-app"><div class="sig-filters">';
-    h += '<div class="sig-group sig-showbar"><input class="sig-search" id="infraQ" type="search" placeholder="Search infrastructure" value="' + esc(st.q) + '" aria-label="Search infrastructure">';
-    if (Sync.can("write", "infrastructure")) {
+    h += '<div class="sig-group sig-showbar"><input class="sig-search" id="infraQ" type="search" placeholder="Search tie lines" value="' + esc(st.q) + '" aria-label="Search tie lines">';
+    if (Sync.can("write", "tie_lines")) {
       h += pill("data-act", "new", "+ New", false, "sig-act sig-new");
       h += pill("data-act", "paste", "Paste Import", false, "sig-act");
     }
-    h += syncPill() + '<span class="sig-count">' + rows.length + '/' + all.length + ' infra</span></div>';
+    h += syncPill() + '<span class="sig-count">' + rows.length + '/' + all.length + ' tie lines</span></div>';
     h += '<div class="sig-group"><span class="sig-label">Type</span>' + typePill("all", "ALL", st.filters.type === "all");
     types.forEach(function (t) { h += typePill(t, t, st.filters.type === t); });
     h += '</div><div class="sig-group"><span class="sig-label">Usage</span>';
@@ -131,21 +133,21 @@ Screens.infra = (function () {
     });
     h += '<div class="sig-cell" style="width:48px;min-width:48px"></div></div>';
     rows.forEach(function (x, i) {
-      var r = x.row, pend = SignalDB.pendingFor("infrastructure", r.id);
+      var r = x.row, pend = SignalDB.pendingFor("tie_lines", r.id);
       var cell = function (k, cls, inner, extra, title) {
         var c = COLS.filter(function (z) { return z.k === k; })[0];
         return '<div class="sig-cell' + (cls ? " " + cls : "") + '" style="' + cs(c) + (extra ? ";" + extra : "") + '"' + (title ? ' title="' + title + '"' : "") + '>' + inner + '</div>';
       };
       h += '<div class="sig-row' + (i % 2 ? " sig-alt" : "") + (pend ? " is-pend" : "") + '" role="row" data-iid="' + esc(r.id) + '" tabindex="0">';
       h += cell("label", "", or(r.label));
-      h += cell("type", "", or(r.type), "color:" + esc(typeColor(r.type)));
+      h += cell("signal_type", "", or(r.signal_type), "color:" + esc(typeColor(r.signal_type)));
       h += cell("endpoint_a", "sig-soft", or(resolveEP(r.endpoint_a)));
       h += cell("endpoint_b", "sig-soft", or(resolveEP(r.endpoint_b)));
       h += cell("_inuse", x.used ? "sig-ch" : "sig-muted", x.used ? String(x.used) : DASH);
       h += cell("notes", "sig-soft", esc(r.notes || ""), "", esc(r.notes || ""));
       h += '<div class="sig-cell" style="width:48px;min-width:48px"></div></div>';
     });
-    if (!rows.length) h += '<div class="sig-empty">' + (all.length ? "No infrastructure matches current filters" : "No infrastructure yet. Tap + New or Paste Import to add one.") + '</div>';
+    if (!rows.length) h += '<div class="sig-empty">' + (all.length ? "No tie lines match current filters" : "No tie lines yet. Tap + New or Paste Import to add one.") + '</div>';
     h += '</div></div></div>';
     view.innerHTML = h;
     if (keep) { var nw = view.querySelector(".sig-table-wrap"); if (nw) { nw.scrollTop = keep.t; nw.scrollLeft = keep.l; } }
@@ -177,10 +179,10 @@ Screens.infra = (function () {
       return { label: bits[0] || "", endpoint_a: bits[1] || "", endpoint_b: bits[2] || "" };
     }).filter(function (r) { return r.label; });
   }
-  /* Build a label -> id lookup for paste import endpoint resolution */
-  function infraByLabel() {
+  function tieByLabel() {
     var map = {};
     rowsOf().forEach(function (r) { if (r.label) map[r.label] = r.id; });
+    SignalDB.getAll("panels").filter(function (r) { return !r.deleted_at; }).forEach(function (r) { if (r.label) map[r.label] = r.id; });
     return map;
   }
   function bulkExisting(rows) {
@@ -196,15 +198,15 @@ Screens.infra = (function () {
   }
   function openPaste() {
     var type = TYPES[0];
-    var h = '<div class="sig-note">Paste one label per line, or use tabs for <b>label &rarr; end A &rarr; end B</b>. Endpoint text is matched to existing infrastructure labels.</div>';
-    h += '<form class="sig-form" id="infraPasteForm"><div class="sig-fld"><label for="infraPasteType">Type</label><select id="infraPasteType">' + TYPES.map(function (t) { return '<option value="' + esc(t) + '">' + esc(t) + '</option>'; }).join("") + '</select></div>';
+    var h = '<div class="sig-note">Paste one label per line, or use tabs for <b>label &rarr; end A &rarr; end B</b>. Endpoint text is matched to existing panel and tie line labels.</div>';
+    h += '<form class="sig-form" id="infraPasteForm"><div class="sig-fld"><label for="infraPasteType">Signal Type</label><select id="infraPasteType">' + TYPES.map(function (t) { return '<option value="' + esc(t) + '">' + esc(t) + '</option>'; }).join("") + '</select></div>';
     h += '<div class="sig-fld"><label for="infraPaste">Labels / rows</label><textarea id="infraPaste" rows="8" placeholder="D1\nD2\nD3"></textarea></div><div id="infraPastePreview"></div><div class="sig-form-acts"><button type="submit" class="sig-btn sig-btn-pri">Create All</button><button type="button" class="sig-btn" data-pclose2>Cancel</button></div></form>';
-    var p = UI.panel("Paste Infrastructure", h);
+    var p = UI.panel("Paste Tie Lines", h);
     var text = p.querySelector("#infraPaste"), pick = p.querySelector("#infraPasteType"), preview = p.querySelector("#infraPastePreview");
     function draw() {
       type = pick.value;
       var rows = bulkExisting(parsePaste(text.value));
-      var lookup = infraByLabel();
+      var lookup = tieByLabel();
       var x = '<h3 class="sig-section-hdr">Preview' + (rows.length ? " (" + rows.length + ")" : "") + '</h3>';
       if (!rows.length) x += '<div class="sig-muted">Nothing to preview yet.</div>';
       else {
@@ -228,42 +230,40 @@ Screens.infra = (function () {
     p.querySelector("[data-pclose2]").addEventListener("click", function () { UI.close(); });
     p.querySelector("form").addEventListener("submit", function (e) {
       e.preventDefault();
-      if (!Sync.can("write", "infrastructure")) { UI.toast("You do not have permission to create infrastructure", "bad"); return; }
+      if (!Sync.can("write", "tie_lines")) { UI.toast("You do not have permission to create tie lines", "bad"); return; }
       var rows = bulkExisting(parsePaste(text.value)), good = rows.filter(function (r) { return !r.duplicate; });
       if (!good.length) { UI.toast("No new labels to import", "bad"); return; }
       var venue = SignalDB.getAll("venues")[0], made = 0;
-      var lookup = infraByLabel();
+      var lookup = tieByLabel();
       good.forEach(function (r) {
         var ep = SignalDB.put("endpoints", { id: "EP-" + SignalDB.uid(), class: "infra" });
         var aVal = r.endpoint_a ? (lookup[r.endpoint_a] || r.endpoint_a) : null;
         var bVal = r.endpoint_b ? (lookup[r.endpoint_b] || r.endpoint_b) : null;
-        SignalDB.put("infrastructure", { id: SignalDB.uid(), label: r.label, type: type, venue_id: venue ? venue.id : null,
+        SignalDB.put("tie_lines", { id: SignalDB.uid(), label: r.label, signal_type: type, venue_id: venue ? venue.id : null,
           endpoint_id: ep.id, endpoint_a: aVal, endpoint_b: bVal, notes: null });
         made++;
       });
-      Sync.kick(); UI.close(); render(); UI.toast("Created " + made + " infrastructure row" + (made === 1 ? "" : "s"));
+      Sync.kick(); UI.close(); render(); UI.toast("Created " + made + " tie line" + (made === 1 ? "" : "s"));
     });
   }
 
   function rel(t, r, text) { return '<button type="button" class="sig-rel" data-rt="' + t + '" data-rid="' + esc(r.id) + '">' + text + '</button>'; }
   function detail(id) {
-    var i = SignalDB.get("infrastructure", id); if (!i) return;
+    var i = SignalDB.get("tie_lines", id); if (!i) return;
     var conns = connectionsFor(i);
     var refs = refsTo(id).sort(function (a, b) { return String(a.label).localeCompare(String(b.label), undefined, { numeric: true }); });
     var b = "";
-    [["Label", i.label], ["Type", i.type], ["End A", resolveEP(i.endpoint_a)], ["End B", resolveEP(i.endpoint_b)], ["Notes", i.notes]].forEach(function (f) {
+    [["Label", i.label], ["Signal Type", i.signal_type], ["End A", resolveEP(i.endpoint_a)], ["End B", resolveEP(i.endpoint_b)], ["Notes", i.notes]].forEach(function (f) {
       b += '<div class="sig-field"><span class="sig-field-lbl">' + f[0] + '</span><span class="sig-field-val">' + or(f[1]) + '</span></div>';
     });
-    /* Reverse FK: infrastructure that terminates here */
     b += '<h3 class="sig-section-hdr">Terminates here' + (refs.length ? " (" + refs.length + ")" : "") + '</h3>';
-    if (!refs.length) b += '<div class="sig-muted">No infrastructure references this record as an endpoint.</div>';
+    if (!refs.length) b += '<div class="sig-muted">No tie lines reference this record as an endpoint.</div>';
     refs.forEach(function (r) {
       var end = r.endpoint_a === id ? "End A" : "End B";
-      var fmt = '<span style="color:' + esc(typeColor(r.type)) + '">' + esc(r.type || "") + '</span> ' +
+      var fmt = '<span style="color:' + esc(typeColor(r.signal_type)) + '">' + esc(r.signal_type || "") + '</span> ' +
         esc(r.label) + ' <span class="sig-soft">\u00b7 ' + esc(end) + '</span>';
       b += '<button type="button" class="sig-rel" data-nav="' + esc(r.id) + '">' + fmt + '</button>';
     });
-    /* Connections through this port's endpoint */
     b += '<h3 class="sig-section-hdr">Connections through this port' + (conns.length ? " (" + conns.length + ")" : "") + '</h3>';
     if (!conns.length) b += '<div class="sig-muted">No connections routed through this port yet.</div>';
     conns.forEach(function (c) {
@@ -272,13 +272,13 @@ Screens.infra = (function () {
       b += rel("connections", c, fmt);
     });
     b += '<div class="sig-form-acts">';
-    if (Sync.can("write", "infrastructure", i)) b += '<button type="button" class="sig-btn sig-btn-pri" data-edit>Edit infra</button>';
+    if (Sync.can("write", "tie_lines", i)) b += '<button type="button" class="sig-btn sig-btn-pri" data-edit>Edit</button>';
     if (Sync.can("write", "connections")) b += '<button type="button" class="sig-btn" data-add-connection>+ Connection</button>';
     b += '</div>';
-    var panel = UI.panel((i.label || "Infrastructure") + (i.type ? " \u00b7 " + i.type : ""), b);
+    var panel = UI.panel((i.label || "Tie Line") + (i.signal_type ? " \u00b7 " + i.signal_type : ""), b);
     var back = function () { render(); detail(id); };
     var ed = panel.querySelector("[data-edit]");
-    if (ed) ed.addEventListener("click", function () { UI.edit("infrastructure", SignalDB.get("infrastructure", id), { onSaved: function (r) { render(); if (r) detail(id); }, onClose: back }); });
+    if (ed) ed.addEventListener("click", function () { UI.edit("tie_lines", SignalDB.get("tie_lines", id), { onSaved: function (r) { render(); if (r) detail(id); }, onClose: back }); });
     var ac = panel.querySelector("[data-add-connection]");
     if (ac) ac.addEventListener("click", function () { UI.edit("connections", null, { defaults: { source_endpoint: i.endpoint_id }, onSaved: back, onClose: back }); });
     panel.querySelectorAll("[data-rt]").forEach(function (el) { el.addEventListener("click", function () { UI.edit(el.dataset.rt, SignalDB.get(el.dataset.rt, el.dataset.rid), { onSaved: back, onClose: back }); }); });
