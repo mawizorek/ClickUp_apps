@@ -50,7 +50,7 @@ const TABLES = {
   positions:          { cols: ["venue_id","show_id","name","type","notes"], scope: "position" },
   endpoints:          { cols: ["class"], scope: "endpoint" },
   panels:             { cols: ["venue_id","endpoint_id","label","notes"], scope: "venue" },
-  tie_lines:          { cols: ["venue_id","endpoint_id","label","signal_type","endpoint_a","endpoint_b","notes"], scope: "venue" },
+  tie_lines:          { cols: ["venue_id","endpoint_id","label","signal_type","endpoint_a","endpoint_b","cable_length_ft","notes"], scope: "venue" },
   networks:           { cols: ["venue_id","name","protocol","subnet","vlan","notes"], scope: "venue" },
   units:              { cols: ["show_id","endpoint_id","type_id","unit_num","position_id","direction","purpose","channel","dimmer","dmx_addr","role","asset_tag","label","dept","notes"], scope: "show" },
   control_points:     { cols: ["show_id","endpoint_id","parent_unit_id","label","cp_type","signal_type","direction","channel_num","notes"], scope: "show" },
