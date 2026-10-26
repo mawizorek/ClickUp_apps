@@ -1,11 +1,11 @@
-/* screens/tables.js — generic editor for all 14 tables. Schema-driven: pick a table, search, tap a row to edit,
+/* screens/tables.js — generic editor for all 15 tables. Schema-driven: pick a table, search, tap a row to edit,
    + New to add. Show-scoped tables follow the show picked on the Units screen. */
 window.Screens = window.Screens || {};
 Screens.tables = (function () {
   var esc = UI.esc;
   var st = { t: "units", q: "" }, view = null;
   var GROUPS = [["Show", ["units","control_points","connections","assignments","network_interfaces","positions","shows"]],
-                ["Venue", ["infrastructure","networks","venues"]],
+                ["Venue", ["panels","tie_lines","networks","venues"]],
                 ["Library", ["fixture_types","type_interfaces","signal_types"]]];
 
   function rowsOf(t) {
@@ -54,7 +54,7 @@ Screens.tables = (function () {
     qi.addEventListener("input", function () { st.q = qi.value; var p = qi.selectionStart; render(); var n = view.querySelector("#tblQ"); n.focus(); try { n.setSelectionRange(p, p); } catch (e) {} });
     var nb = view.querySelector("#tblNew"); if (nb) nb.addEventListener("click", function () {
       var def = {}; if (t === "positions" && !Sync.isAdmin()) def.show_id = UI.showId();
-      var venue = SignalDB.getAll("venues")[0]; if (venue && ["positions","infrastructure","networks","shows"].indexOf(t) !== -1) def.venue_id = venue.id;
+      var venue = SignalDB.getAll("venues")[0]; if (venue && ["positions","panels","tie_lines","networks","shows"].indexOf(t) !== -1) def.venue_id = venue.id;
       UI.edit(t, null, { defaults: def, onSaved: function () { render(); } });
     });
     view.querySelectorAll(".sig-li").forEach(function (b) { b.addEventListener("click", function () { UI.edit(t, SignalDB.get(t, b.dataset.id), { onSaved: function () { render(); } }); }); });
