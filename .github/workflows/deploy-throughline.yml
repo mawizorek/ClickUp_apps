@@ -4,8 +4,11 @@
 #
 # ORDER MATTERS: migrations run FIRST, then code deploys. A schema change merged
 # without the migration applied leaves the worker referencing tables that don't exist.
-# Workers Builds (Cloudflare dashboard "Connect to Git") may also deploy the code,
-# but it does NOT run D1 migrations, which is exactly the gap this workflow fills.
+#
+# IMPORTANT: Workers Builds (Cloudflare dashboard "Connect to Git") must be DISABLED
+# for the throughline worker. If both deploy paths are active, Workers Builds races
+# this workflow and deploys code before migrations run.
+# To disable: Cloudflare dashboard > Workers & Pages > throughline > Settings > Builds & Deployments > Disconnect.
 
 name: Deploy throughline worker
 
@@ -81,10 +84,11 @@ jobs:
       # wrangler d1 migrations apply reads migrations_dir from wrangler.toml,
       # diffs against D1's migration state, and applies only what's pending.
       # Idempotent: re-running after all migrations are applied is a no-op.
+      # --yes skips interactive confirmation (required in CI).
       - name: Apply D1 migrations
         run: |
           set +e
-          $WR d1 migrations apply throughline --remote > migrate.txt 2>&1
+          $WR d1 migrations apply throughline --remote --yes > migrate.txt 2>&1
           RC=$?
           {
             echo ""
