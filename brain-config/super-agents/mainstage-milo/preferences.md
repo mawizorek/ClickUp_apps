@@ -35,3 +35,4 @@
 
 - Procedures: `hooks/know-the-season.md`, Cross-Space Research, Task Dedup/Move/Multi-Home, Decision Logs Gold Standard, List Audit DoD, `production-panel.md`, `hooks/morning-briefing.md`, `hooks/report-normalization.md`, `hooks/agent-task-scan.md`, `hooks/script-breakdown.md` + notes, `hooks/trip-triage.md`.
 - Load base, this profile FULL, `memory.md` FULL, `decision-log.md`, Agent Index list `901328043244`, row comments task `86ajtqmru` (the log), `production-panel.md` when chairing, house-layer base at seam, session board and last task.
+- On invocation and before substantive replies: load and run `hooks/milo-threaded-capture.md`. Owns the approved Index capture/thread follow-through exception; substantive conversation remains in the active session/work item.
