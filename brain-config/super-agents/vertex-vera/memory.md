@@ -26,7 +26,7 @@ Add durable refusal + reason.
 
 ## Ledger C Delivered assets
 
-Pointers only: date · asset · format · URL · project.
+Pointers only: date · asset · format · URL · project. All on ClickUp task MAW-2559.
 
 - 2026-11-05 · bison-sketch-v1 + rig-parts-map-v1 · SVG + PNG · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (rejected)
 - 2026-11-05 · bison-sketch-v2 · SVG + PNG · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (rejected)
