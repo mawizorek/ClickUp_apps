@@ -164,6 +164,41 @@ Total new code: ~400 lines. No worker changes. No migrations.
 
 ---
 
+## Scratch
+
+### Dante Matrix View (spec note, NOT for build yet)
+
+**Source:** Michael, 2026-11-06, Becoming Curious audio session. "That's kind of what I want out of this app ultimately."
+
+**Goal:** a passive, read-only crosspoint grid that looks and reads like Dante Controller, generated entirely from connections already recorded in Throughline. No Dante network access, no hardware writes.
+
+**Axes (same as Dante Controller):**
+- Columns: Dante transmit channels, grouped by device. Source rows are control points with `cp_type` "net TX".
+- Rows: Dante receive channels, grouped by device. Source rows are control points with `cp_type` "net RX".
+- Cell: filled when a connection of type "Dante subscription" joins that TX point to that RX point. Empty cell = free crosspoint.
+- Device headers carry hostname, IP, and network (DANTE-1 / DANTE-2) from `network_interfaces`, plus primary/secondary port.
+
+**Passive means:** the grid shows what Throughline says is patched, never what the network says. Because of that, every cell whose connection or endpoint notes contain UNVERIFIED renders hatched, so a documented-but-unchecked patch never looks confirmed.
+
+**Computed flags (no extra data entry):**
+- TX channel with no subscribers; RX channel with no source.
+- Self-subscription (TX and RX on the same device) badge, since it needs a check in Dante Controller.
+- Per-transmitter subscriber count, with a hint at 3 or more subscribers that the flow may be better as multicast, and a note when a small device may run out of flows.
+- Devices on the Dante network with no channel-level rows (documented only as a device-to-device "Dante" connection), shown as a collapsed group so the gap is visible.
+
+**Interaction:** tap a cell to open the connection in the detail panel; tap a device header to open the unit with its network rows and trace.
+
+**Data conventions this depends on (not all exist today):**
+- One Dante channel = one control point, with `channel_num` filled. Today only some Dante TX points exist, and subscriptions sometimes point at an analog output point instead of a Dante RX point.
+- A subscription = one connection, TX control point to RX control point, `connection_type` "Dante subscription", signal `ST-03`.
+- Show-scoped, same as Units.
+
+**Out of scope:** writing subscriptions to hardware, live discovery of the network, clocking and latency views, AES67.
+
+**First-use test case:** Becoming Curious. Patch bay Rio house mic transmit channels to the record outputs, theater wireless receivers to the QL5, QLab outputs to the QL5, and QL5 outputs to the Tesira.
+
+---
+
 ## Completed
 
 ### MCP Integration ✓
@@ -184,4 +219,5 @@ Items discussed in the collaboration thread but not yet specced:
 - Plot view (`#plot`, positions on a plan)
 - Label printing (`#labels`, cable + fixture labels)
 - Network screen (`#networks`, same grid pattern as infra but for IP/Dante networks)
+- Dante Matrix view (`#dante`, passive crosspoint grid from connections; see Scratch above)
 - Permissions interaction spec (Lux + Michael, in progress separately)
