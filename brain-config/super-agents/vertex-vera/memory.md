@@ -6,7 +6,7 @@ Michael's taste, rejections, measured tools, asset pointers. No procedure or cop
 
 Add approved asset: date · asset · landed palette/weight/style · quote if rule. Locked directions (asset not yet approved) are marked as such.
 
-- 2026-11-05 · Becoming Curious bison (direction, asset not yet approved) · forelegs at "B · column" thickness, picked from v3 sturdy / column / tree-trunk options.
+- 2026-11-05 · Becoming Curious bison (direction, asset not yet approved) · forelegs at "B · column" thickness, picked from v3 sturdy / column / tree-trunk options. Calibrated by v6/v7: in the 1536-wide composition, fore lower leg about 60px wide, hind about 50px at the fetlock.
 - 2026-11-05 · Becoming Curious bison (direction) · hind legs slimmer than forelegs, rising out of the haunch, hock angled back.
 - 2026-11-05 · Becoming Curious bison (direction) · big cowl/cape over the forelegs hiding most of them, its own group in front of the forelegs.
 - 2026-11-05 · Becoming Curious bison (direction) · face is a crescent-moon shape, rounded, never a flat muzzle.
@@ -27,6 +27,7 @@ Add durable refusal + reason.
 - 2026-11-05 · bison v1-v5 · drafting quality: geometric, primitive-built linework did not land. Rule: lock the silhouette as a raster concept before hand-authoring vector.
 - 2026-11-05 · bison neck passes N1/N2 · "You overcomplicated the neck." Rule: don't build a separate neck/collar; head seats on the cowl as drawn in S2.
 - 2026-11-05 · bison S2 rear half · "he looks like he has a potbelly." Rule: belly sags low in front, tucks up before the hind leg.
+- 2026-11-05 · bison v6 · "the legs went wayyy to fat" (fore lower ~90px, hoof ~100px). Rule: match the approved concept's leg widths; don't overcorrect from an earlier too-thin note. Adjust in small steps.
 
 ## Ledger C Delivered assets
 
@@ -38,7 +39,8 @@ Pointers only: date · asset · format · URL · project. All on ClickUp task MA
 - 2026-11-05 · bison-sketch-v4 · SVG + PNG · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (superseded)
 - 2026-11-05 · bison-sketch-v5 · SVG + PNG · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (superseded by v6)
 - 2026-11-05 · bison raster concepts A/B/C, hybrids H1/H2, S1/S2, N1/N2 · PNG (concept only, never shipped as vector) · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious
-- 2026-11-05 · bison-v6 (hand-authored from S2 front + S1 rear) + pivots overlay + near-foreleg Blender test file · SVG + PNG · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (verdict pending)
+- 2026-11-05 · bison-v6 (hand-authored from S2 front + S1 rear) + pivots overlay + near-foreleg Blender test file · SVG + PNG · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (rejected: legs too fat)
+- 2026-11-05 · bison-v7 (v6 with legs slimmed to concept widths) + pivots + near-foreleg Blender test file · SVG + PNG · https://app.clickup.com/t/17tuucqu1e7 · Becoming Curious (verdict pending)
 
 ## Ledger D Measured tooling
 
