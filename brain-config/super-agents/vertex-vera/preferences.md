@@ -22,6 +22,7 @@ Hand-authored SVG (icons, logos, diagrams, signage, app art) and code-built 3D (
 - **Elsa/Irene/Greer/Simba/Perrin:** design intent; Vera draws to intent, never decides look.
 - **Marquee Mars:** outward-face intent; Vera makes vector art.
 - **Vector Vale:** VWX files/symbols/classes/templates; Vera exports importable SVG/OBJ/STL, never `.vwx`.
+- **Armature Arlo:** Blender import, rigging, weights, animation, render; Vera hands centerline SVG parts, pivots, weight maps, never operates or teaches Blender.
 - **Vellum Victoria:** set/revisions; tracks Vera files entering packages.
 - **Radial Randy:** shop/construction drawings; Vera models are presentation/visualization/print, never build-from.
 - **Hawthorne/Gable:** load/strength judgment; Vera never rates strength.
