@@ -1,6 +1,6 @@
 /* paperwork.js — paperwork definitions registry.
    One definition per document. Adding a sheet = adding one definition.
-   Shape: { id, name, dept, columns: [{ key, label, width, mono, required }], rows(showId) -> records, sort, groupBy? }
+   Shape: { id, name, dept, columns: [{ key, label, width, mono, required, truncate }], rows(showId) -> records, sort, groupBy? }
    The print menu renders whatever is in the registry. A definition whose rows() returns [] shows "No data yet" and is disabled. */
 var Paperwork = (function () {
 
@@ -23,13 +23,22 @@ var Paperwork = (function () {
     return out;
   }
 
-  function traceUp(epId) {
-    if (!epId) return null;
-    var conns = SignalDB.getAll("connections").filter(function (c) {
+  // Connections landing ON an endpoint (reverse of traceSteps, one hop)
+  function inboundConns(epId) {
+    if (!epId) return [];
+    return SignalDB.getAll("connections").filter(function (c) {
       return !c.deleted_at && c.dest_endpoint === epId;
     });
-    return conns.length ? conns[0] : null;
   }
+  function traceUp(epId) {
+    var c = inboundConns(epId);
+    return c.length ? c[0] : null;
+  }
+
+  // A control point's direction, normalized. Only a control point can be a patch channel.
+  function cpDir(r) { return String((r && r.direction) || "").toLowerCase(); }
+  function isRx(d) { return d === "in" || d === "bus"; }   // can receive: console input, mix bus
+  function isTx(d) { return d === "out"; }                  // transmits onto the network
 
   function tracedColumns(u) {
     var steps = traceSteps(u);
@@ -38,12 +47,17 @@ var Paperwork = (function () {
       if (!s.to) return;
       var owner = UI.epOwner(s.to);
       if (!owner) return;
+      // Wall Port: first infrastructure hop on the path
       if (!wallPort && owner.t === "tie_lines") wallPort = owner.r.label;
-      if (!danteTx && s.conn.signal_type) {
+      // Dante TX: a TX channel is a control point on a stage box, NEVER a whole device.
+      // If the trace only reaches a unit, the channel does not exist yet -> leave blank (write-in).
+      if (!danteTx && owner.t === "control_points" && s.conn.signal_type && isTx(cpDir(owner.r))) {
         var sig = SignalDB.get("signal_types", s.conn.signal_type);
-        if (sig && sig.name === "Dante") danteTx = UI.epLabel(s.to);
+        if (sig && sig.name === "Dante") danteTx = owner.r.label;
       }
-      if (owner.t === "control_points") destRx = owner.r.label;
+      // Destination RX: terminal control point that can actually RECEIVE.
+      // Output channels (direction "out") are not destinations; last receiving hop wins.
+      if (owner.t === "control_points" && isRx(cpDir(owner.r))) destRx = owner.r.label;
     });
     return { wallPort: wallPort, danteTx: danteTx, destRx: destRx };
   }
@@ -55,6 +69,29 @@ var Paperwork = (function () {
     for (var i = 0; i < cps.length; i++) {
       var c = traceUp(cps[i].endpoint_id);
       if (c) return UI.epLabel(c.source_endpoint);
+    }
+    return null;
+  }
+
+  // Power: the circuit feeding this unit. A traced path column, not a unit field.
+  // Walks downstream for a power ckt tie line, then one hop upstream (a speaker is FED by its circuit).
+  function powerCircuit(u) {
+    var found = null;
+    traceSteps(u).forEach(function (s) {
+      if (found || !s.to) return;
+      var owner = UI.epOwner(s.to);
+      if (owner && owner.t === "tie_lines" && owner.r.signal_type === "power ckt") found = owner.r.label;
+    });
+    if (found) return found;
+    var eps = [u.endpoint_id].concat(
+      SignalDB.where("control_points", function (c) { return c.parent_unit_id === u.id; })
+        .map(function (c) { return c.endpoint_id; }));
+    for (var i = 0; i < eps.length; i++) {
+      var conns = inboundConns(eps[i]);
+      for (var j = 0; j < conns.length; j++) {
+        var o = UI.epOwner(conns[j].source_endpoint);
+        if (o && o.t === "tie_lines" && o.r.signal_type === "power ckt") return o.r.label;
+      }
     }
     return null;
   }
@@ -99,8 +136,8 @@ var Paperwork = (function () {
         { key: "location", label: "Location", width: 140 },
         { key: "device", label: "Speaker / Device", width: 140 },
         { key: "feed", label: "Feed", width: 120, required: true },
-        { key: "power", label: "Power", width: 80 },
-        { key: "notes", label: "Notes", width: 160 }
+        { key: "power", label: "Power", width: 80, required: true },
+        { key: "notes", label: "Notes", width: 160, truncate: 120 }
       ],
       sort: "mix",
       rows: function (showId) {
@@ -110,7 +147,7 @@ var Paperwork = (function () {
           var t = SignalDB.get("fixture_types", u.type_id);
           var p = SignalDB.get("positions", u.position_id);
           return { mix: u.channel || "", purpose: u.purpose || "", location: p ? p.name : "",
-            device: t ? t.name : "", feed: feedLabel(u), power: u.dimmer || "", notes: u.notes || "" };
+            device: t ? t.name : "", feed: feedLabel(u), power: powerCircuit(u), notes: u.notes || "" };
         });
       }
     },
@@ -124,7 +161,7 @@ var Paperwork = (function () {
         { key: "type", label: "Type", width: 130 },
         { key: "dimmer", label: "Dimmer", width: 70, mono: true },
         { key: "addr", label: "Address", width: 80, mono: true },
-        { key: "color", label: "Color", width: 80 }
+        { key: "color", label: "Color", width: 80, truncate: 40 }
       ],
       sort: "ch",
       rows: function (showId) {
@@ -150,7 +187,7 @@ var Paperwork = (function () {
         { key: "ch", label: "Chan", width: 60, mono: true },
         { key: "dimmer", label: "Dimmer", width: 70, mono: true },
         { key: "addr", label: "Address", width: 80, mono: true },
-        { key: "color", label: "Color", width: 80 }
+        { key: "color", label: "Color", width: 80, truncate: 40 }
       ],
       sort: "unum", groupBy: "position",
       rows: function (showId) {
@@ -172,7 +209,7 @@ var Paperwork = (function () {
         { key: "circuit", label: "Circuit", width: 100, mono: true },
         { key: "service", label: "Service", width: 100 },
         { key: "landsAt", label: "Lands At", width: 140 },
-        { key: "load", label: "Load", width: 180 },
+        { key: "load", label: "Load", width: 180, truncate: 120 },
         { key: "watts", label: "Watts", width: 80, mono: true }
       ],
       sort: "circuit",
