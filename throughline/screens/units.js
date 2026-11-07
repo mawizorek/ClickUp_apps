@@ -1,6 +1,6 @@
 /* screens/units.js — the primary working surface: the UNITS grid for the current show.
    Filter by signal + direction, sort any column, tap a row for detail (with related rows + quick-adds),
-   trace a signal live, pull reports, back up / restore. */
+   trace a signal live, back up / restore. */
 window.Screens = window.Screens || {};
 Screens.units = (function () {
   var esc = UI.esc, or = UI.or, DASH = UI.DASH;
@@ -73,8 +73,7 @@ Screens.units = (function () {
     sigList.forEach(function (s) { h += pill("data-sig", s, s, st.filters.signal === s); });
     h += '</div><div class="sig-group"><span class="sig-label">Dir</span>';
     [["all","ALL"],["in","IN"],["out","OUT"],[DASH,DASH]].forEach(function (d) { h += pill("data-dir", d[0], d[1], st.filters.dir === d[0]); });
-    h += '</div><div class="sig-group"><span class="sig-label">Report</span>';
-    [["Input Patch","input-patch"],["Output Patch","output-patch"],["Equipment Pull","equip-pull"],["Channel Hookup","ch-hookup"]].forEach(function (r) { h += pill("data-rpt", r[1], r[0], false, "sig-rpt"); });
+    h += '</div><div class="sig-group"><a href="#print" class="sig-pill sig-act">Print</a>';
     h += '</div><div class="sig-group sig-tools"><span class="sig-count">' + rows.length + '/' + all.length + ' units</span>';
     h += pill("data-act", "json", "\u2913 JSON", false, "sig-act") + pill("data-act", "xls", "\u2913 Excel", false, "sig-act");
     if (Sync.state() === "local") h += pill("data-act", "import", "\u2912 Import", false) + pill("data-act", "reset", "Reset", false, "sig-danger");
@@ -112,7 +111,6 @@ Screens.units = (function () {
     $("[data-sort]").forEach(function (c) { c.addEventListener("click", function () { var k = c.dataset.sort;
       if (st.sort.col === k) st.sort.dir = st.sort.dir === "asc" ? "desc" : "asc"; else { st.sort.col = k; st.sort.dir = "asc"; } render(); }); });
     $("[data-trace]").forEach(function (b) { b.addEventListener("click", function (e) { e.stopPropagation(); traceOf(b.dataset.trace); }); });
-    $("[data-rpt]").forEach(function (b) { b.addEventListener("click", function () { report(b.dataset.rpt); }); });
     $("[data-act]").forEach(function (b) { b.addEventListener("click", function () { act(b.dataset.act); }); });
     var sel = view.querySelector("#sigShow"); if (sel) sel.addEventListener("change", function () { UI.setShow(sel.value); render(); });
     var q = view.querySelector("#sigQ"); if (q) q.addEventListener("input", function () { st.q = q.value; var pos = q.selectionStart; render(); var n = view.querySelector("#sigQ"); n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} });
@@ -199,25 +197,6 @@ Screens.units = (function () {
     b += '</div><div class="sig-form-acts"><button type="button" class="sig-btn" data-back>\u2190 Unit detail</button></div>';
     var p = UI.panel("Trace: Unit #" + u.unit_num, b);
     p.querySelector("[data-back]").addEventListener("click", function () { detail(uid); });
-  }
-
-  function report(type) {
-    var all = resolved().map(function (x) { return x; }), items, b = "";
-    if (type === "input-patch") items = all.filter(function (x) { return normDir(x.u.direction) === "in"; });
-    else if (type === "output-patch") items = all.filter(function (x) { return normDir(x.u.direction) === "out"; });
-    else if (type === "ch-hookup") items = all.filter(function (x) { return x.u.dmx_addr; });
-    else items = all;
-    if (type === "equip-pull") {
-      var counts = {}; items.forEach(function (x) { var n = (x.type || {}).name || "?"; counts[n] = (counts[n] || 0) + 1; });
-      Object.keys(counts).sort().forEach(function (k) { b += '<div class="sig-field"><span style="flex:1">' + esc(k) + '</span><span class="sig-ch">' + counts[k] + '\u00d7</span></div>'; });
-      b += '<div class="sig-field sig-total"><span style="flex:1">Total</span><span class="sig-ch">' + items.length + '</span></div>';
-    } else {
-      items.sort(function (a, z) { return String(a.u.channel || a.u.dmx_addr || a.u.unit_num).localeCompare(String(z.u.channel || z.u.dmx_addr || z.u.unit_num), undefined, { numeric: true }); });
-      if (!items.length) b += '<div class="sig-muted">Nothing in this report yet.</div>';
-      items.forEach(function (x) { b += '<div class="sig-field"><span class="sig-muted">#' + esc(x.u.unit_num) + '</span><span style="flex:1">' + esc(x.type ? x.type.name : "") + " \u00b7 " + esc(x.u.purpose || "") + '</span>' +
-        (x.u.channel || x.u.dmx_addr ? '<span class="sig-ch">' + esc(x.u.channel || x.u.dmx_addr) + '</span>' : "") + '</div>'; });
-    }
-    UI.panel(type.replace(/-/g, " ").toUpperCase(), b);
   }
 
   return { render: render, refresh: function () { if (view && document.body.contains(view)) render(); } };
