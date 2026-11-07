@@ -1,5 +1,6 @@
 /* screens/print.js — print menu: select, preview, print, and export paperwork.
-   Grouped by department. Checkbox per sheet. Tap a row to preview. Print + Export footer. */
+   Grouped by department. Checkbox per sheet. Tap a row to preview. Print + Export footer.
+   Truncation applies to the SHEET only (print + preview). The spreadsheet carries full values. */
 window.Screens = window.Screens || {};
 Screens.print = (function () {
   var esc = UI.esc, or = UI.or, DASH = UI.DASH;
@@ -25,13 +26,25 @@ Screens.print = (function () {
     return g;
   }
 
+  /* Sheet cell value. Returns null for an empty cell so the caller can decide
+     between a write-in line (required) and a blank. Honours column truncate. */
+  function sheetVal(c, r) {
+    var v = r[c.key];
+    if (v === null || v === undefined || v === "") return null;
+    v = String(v);
+    if (c.truncate && v.length > c.truncate) {
+      v = v.slice(0, c.truncate).replace(/\s+\S*$/, "");
+      v += "\u2026";
+    }
+    return v;
+  }
+
   // ---- render ----
   function render(v) {
     view = v || view; if (!view) return;
     var sid = UI.showId(), show = SignalDB.get("shows", sid);
     var cat = Paperwork.catalogue;
 
-    // group defs by dept
     var depts = {}, deptOrder = [];
     cat.forEach(function (d) {
       if (!depts[d.dept]) { depts[d.dept] = []; deptOrder.push(d.dept); }
@@ -51,7 +64,6 @@ Screens.print = (function () {
     }
     h += '</div></div>';
 
-    // menu
     h += '<div class="print-menu">';
     deptOrder.forEach(function (dept) {
       h += '<h3 class="print-dept-hdr">' + esc(dept) + '</h3>';
@@ -69,13 +81,11 @@ Screens.print = (function () {
     });
     h += '</div>';
 
-    // preview
     if (previewing) {
       var def = cat.filter(function (d) { return d.id === previewing; })[0];
       if (def) h += sheetPreview(def, sid, show);
     }
 
-    // actions
     h += '<div class="print-acts">';
     h += '<button type="button" class="sig-btn sig-btn-pri" data-act="print"' + (!nChecked ? ' disabled' : '') + '>Print' + (nChecked ? ' (' + nChecked + ')' : '') + '</button> ';
     h += '<button type="button" class="sig-btn" data-act="pdf"' + (!nChecked ? ' disabled' : '') + '>Export PDF</button> ';
@@ -121,10 +131,10 @@ Screens.print = (function () {
       t += '<tr' + (i % 2 ? ' class="sheet-alt"' : '') + '>';
       def.columns.forEach(function (c) {
         if (c.key === def.groupBy) return;
-        var v = r[c.key], empty = v === null || v === undefined || v === '';
+        var v = sheetVal(c, r);
         var cls = c.mono ? ' class="sheet-mono"' : '';
-        if (empty && c.required) t += '<td' + cls + '><span class="sheet-writein"></span></td>';
-        else t += '<td' + cls + '>' + esc(empty ? '' : v) + '</td>';
+        if (v === null && c.required) t += '<td' + cls + '><span class="sheet-writein"></span></td>';
+        else t += '<td' + cls + '>' + esc(v === null ? '' : v) + '</td>';
       });
       t += '</tr>';
     });
@@ -161,7 +171,6 @@ Screens.print = (function () {
     });
   }
 
-  // ---- checked defs ----
   function checkedDefs() {
     var sid = UI.showId();
     return Paperwork.catalogue.filter(function (d) { return checked[d.id] && d.rows(sid).length > 0; });
@@ -207,10 +216,10 @@ Screens.print = (function () {
         t += '<tr' + (i % 2 ? ' class="a"' : '') + '>';
         def.columns.forEach(function (c) {
           if (c.key === def.groupBy) return;
-          var v = r[c.key], empty = v === null || v === undefined || v === '';
+          var v = sheetVal(c, r);
           var cls = c.mono ? ' class="m"' : '';
-          if (empty && c.required) t += '<td' + cls + '><span class="wl"></span></td>';
-          else t += '<td' + cls + '>' + esc(empty ? '' : v) + '</td>';
+          if (v === null && c.required) t += '<td' + cls + '><span class="wl"></span></td>';
+          else t += '<td' + cls + '>' + esc(v === null ? '' : v) + '</td>';
         });
         t += '</tr>';
       });
@@ -237,6 +246,7 @@ Screens.print = (function () {
       '.pr{border:none;border-top:2px solid #111;margin:8px 0 6px}' +
       '.gh{font-weight:bold;font-size:10pt;background:#e5e7eb;padding:3px 6px;margin:10px 0 2px}' +
       'table{border-collapse:collapse;width:100%;margin-bottom:4px}' +
+      'thead{display:table-header-group}tr{page-break-inside:avoid}' +
       'th{text-align:left;font-size:8pt;font-weight:600;border-bottom:1px solid #111;padding:3px 6px;white-space:nowrap}' +
       'td{font-size:9pt;padding:2px 6px;vertical-align:top;border-bottom:1px solid #e5e7eb}' +
       'tr.a td{background:#f9fafb}' +
@@ -245,7 +255,7 @@ Screens.print = (function () {
       '.pf{margin-top:8px;font-size:8pt;color:#666;text-align:right}';
   }
 
-  // ---- export spreadsheet ----
+  // ---- export spreadsheet (full values, never truncated) ----
   function doExport() {
     var defs = checkedDefs(); if (!defs.length) return;
     var sid = UI.showId(), show = SignalDB.get("shows", sid);
