@@ -1,6 +1,10 @@
 /* screens/print.js — print menu: select, preview, print, and export paperwork.
    Grouped by department. Checkbox per sheet. Tap a row to preview. Print + Export footer.
-   Truncation applies to the SHEET only (print + preview). The spreadsheet carries full values. */
+
+   A column marked `span: true` is lifted out of the header and printed as a full-width
+   continuation cell underneath its record's field cells, so long text prints in full
+   instead of being truncated or squeezed into a narrow column. The field row and its
+   note row are one <tbody>, so a record never splits across a page. */
 window.Screens = window.Screens || {};
 Screens.print = (function () {
   var esc = UI.esc, or = UI.or, DASH = UI.DASH;
@@ -8,11 +12,15 @@ Screens.print = (function () {
   var checked = {};
   var previewing = null;
 
+  function isEmpty(v) { return v === null || v === undefined || v === ""; }
+
+  /* Blank sort keys sort LAST: a patch sheet leads with its numbered rows. */
   function sortRows(rows, key) {
     if (!key) return rows;
     rows.sort(function (a, b) {
-      var av = a[key], bv = b[key];
-      if (av == null) av = ""; if (bv == null) bv = "";
+      var av = a[key], bv = b[key], ae = isEmpty(av), be = isEmpty(bv);
+      if (ae !== be) return ae ? 1 : -1;
+      if (ae && be) return 0;
       if (typeof av === "number" && typeof bv === "number") return av - bv;
       return String(av).localeCompare(String(bv), undefined, { numeric: true });
     });
@@ -26,15 +34,36 @@ Screens.print = (function () {
     return g;
   }
 
-  /* Sheet cell value. Returns null for an empty cell so the caller can decide
-     between a write-in line (required) and a blank. Honours column truncate. */
+  /* Which columns actually carry a value anywhere on this sheet. A `required` column that
+     traces NOTHING prints a dash, not a write-in line on every row: one empty rule marks a
+     missing connection, sixteen identical rules mark a column nobody wired. */
+  function tracedKeys(def, rows) {
+    var t = {};
+    def.columns.forEach(function (c) {
+      t[c.key] = rows.some(function (r) { return !isEmpty(r[c.key]); });
+    });
+    return t;
+  }
+  function untracedRequired(def, rows) {
+    var t = tracedKeys(def, rows);
+    return def.columns.filter(function (c) { return c.required && !t[c.key]; }).map(function (c) { return c.label; });
+  }
+
+  /* Field columns: everything that is not the group key and not a spanning column. */
+  function fieldCols(def) {
+    return def.columns.filter(function (c) { return c.key !== def.groupBy && !c.span; });
+  }
+  function spanCols(def) {
+    return def.columns.filter(function (c) { return c.span; });
+  }
+
+  /* Cell value. null means empty, so the caller decides write-in vs dash vs blank. */
   function sheetVal(c, r) {
     var v = r[c.key];
-    if (v === null || v === undefined || v === "") return null;
+    if (isEmpty(v)) return null;
     v = String(v);
     if (c.truncate && v.length > c.truncate) {
-      v = v.slice(0, c.truncate).replace(/\s+\S*$/, "");
-      v += "\u2026";
+      v = v.slice(0, c.truncate).replace(/\s+\S*$/, "") + "\u2026";
     }
     return v;
   }
@@ -96,6 +125,12 @@ Screens.print = (function () {
     bind();
   }
 
+  function footNote(def, rows) {
+    var un = untracedRequired(def, rows);
+    return rows.length + ' record' + (rows.length !== 1 ? 's' : '') +
+      (un.length ? ' \u00b7 not traced on this show: ' + un.join(', ') : '');
+  }
+
   // ---- sheet preview (on-screen) ----
   function sheetPreview(def, sid, show) {
     var rows = sortRows(def.rows(sid), def.sort);
@@ -103,6 +138,7 @@ Screens.print = (function () {
     var groups = groupRows(rows, def.groupBy);
     var venue = show ? SignalDB.get("venues", show.venue_id) : null;
     var designer = showDesigner(show, def.dept);
+    var traced = tracedKeys(def, rows);
 
     var h = '<div class="print-sheet">';
     h += '<div class="sheet-hdr">';
@@ -114,31 +150,40 @@ Screens.print = (function () {
     h += '</div>';
 
     if (groups) {
-      var gk = Object.keys(groups).sort(function (a, b) { return a.localeCompare(b, undefined, { numeric: true }); });
-      gk.forEach(function (g) { h += '<div class="sheet-ghdr">' + esc(g) + '</div>' + sheetTable(def, groups[g]); });
+      Object.keys(groups).sort(function (a, b) { return a.localeCompare(b, undefined, { numeric: true }); })
+        .forEach(function (g) { h += '<div class="sheet-ghdr">' + esc(g) + '</div>' + sheetTable(def, groups[g], traced); });
     } else {
-      h += sheetTable(def, rows);
+      h += sheetTable(def, rows, traced);
     }
-    h += '<div class="sheet-foot">' + rows.length + ' record' + (rows.length !== 1 ? 's' : '') + '</div></div>';
+    h += '<div class="sheet-foot">' + esc(footNote(def, rows)) + '</div></div>';
     return h;
   }
 
-  function sheetTable(def, rows) {
+  function sheetTable(def, rows, traced) {
+    var cols = fieldCols(def), spans = spanCols(def);
     var t = '<table class="sheet-tbl"><thead><tr>';
-    def.columns.forEach(function (c) { if (c.key === def.groupBy) return; t += '<th style="width:' + c.width + 'px">' + esc(c.label) + '</th>'; });
-    t += '</tr></thead><tbody>';
+    cols.forEach(function (c) { t += '<th style="width:' + c.width + 'px">' + esc(c.label) + '</th>'; });
+    t += '</tr></thead>';
     rows.forEach(function (r, i) {
-      t += '<tr' + (i % 2 ? ' class="sheet-alt"' : '') + '>';
-      def.columns.forEach(function (c) {
-        if (c.key === def.groupBy) return;
-        var v = sheetVal(c, r);
-        var cls = c.mono ? ' class="sheet-mono"' : '';
-        if (v === null && c.required) t += '<td' + cls + '><span class="sheet-writein"></span></td>';
-        else t += '<td' + cls + '>' + esc(v === null ? '' : v) + '</td>';
+      var alt = i % 2 ? ' sheet-alt' : '';
+      var notes = spans.map(function (c) { return { c: c, v: sheetVal(c, r) }; }).filter(function (x) { return x.v !== null; });
+      t += '<tbody class="sheet-rec' + alt + '">';
+      t += '<tr class="' + (notes.length ? 'sheet-fields has-note' : 'sheet-fields') + '">';
+      cols.forEach(function (c) {
+        var v = sheetVal(c, r), cls = c.mono ? ' class="sheet-mono"' : '';
+        if (v === null && c.required) {
+          t += traced[c.key] ? '<td' + cls + '><span class="sheet-writein"></span></td>'
+                             : '<td' + cls + '><span class="sheet-na">' + DASH + '</span></td>';
+        } else t += '<td' + cls + '>' + esc(v === null ? '' : v) + '</td>';
       });
       t += '</tr>';
+      notes.forEach(function (x) {
+        t += '<tr class="sheet-noterow"><td colspan="' + cols.length + '">' +
+             '<span class="sheet-notelbl">' + esc(x.c.label) + '</span> ' + esc(x.v) + '</td></tr>';
+      });
+      t += '</tbody>';
     });
-    t += '</tbody></table>';
+    t += '</table>';
     return t;
   }
 
@@ -176,14 +221,13 @@ Screens.print = (function () {
     return Paperwork.catalogue.filter(function (d) { return checked[d.id] && d.rows(sid).length > 0; });
   }
 
-  // ---- print (opens a print-ready window) ----
+  // ---- print ----
   function doPrint() {
     var defs = checkedDefs(); if (!defs.length) return;
     var sid = UI.showId(), show = SignalDB.get("shows", sid);
     var w = window.open('', '_blank');
     if (!w) { UI.toast('Pop-up blocked. Allow pop-ups for this site.', 'bad'); return; }
-    var css = printCSS();
-    var body = '<!doctype html><html><head><meta charset="utf-8"><title>' + esc((show ? show.title : 'Throughline') + ' Paperwork') + '</title><style>' + css + '</style></head><body>';
+    var body = '<!doctype html><html><head><meta charset="utf-8"><title>' + esc((show ? show.title : 'Throughline') + ' Paperwork') + '</title><style>' + printCSS() + '</style></head><body>';
     defs.forEach(function (def, di) {
       if (di > 0) body += '<div class="pb"></div>';
       body += printPage(def, sid, show);
@@ -199,6 +243,8 @@ Screens.print = (function () {
     var groups = groupRows(rows, def.groupBy);
     var venue = show ? SignalDB.get("venues", show.venue_id) : null;
     var designer = showDesigner(show, def.dept);
+    var traced = tracedKeys(def, rows);
+    var cols = fieldCols(def), spans = spanCols(def);
 
     var h = '<div class="pp">';
     h += '<div class="ph"><div class="phl"><b>' + esc(show ? show.title : '') + '</b>';
@@ -210,20 +256,26 @@ Screens.print = (function () {
 
     function ptable(trows) {
       var t = '<table><thead><tr>';
-      def.columns.forEach(function (c) { if (c.key === def.groupBy) return; t += '<th style="width:' + c.width + 'px">' + esc(c.label) + '</th>'; });
-      t += '</tr></thead><tbody>';
+      cols.forEach(function (c) { t += '<th style="width:' + c.width + 'px">' + esc(c.label) + '</th>'; });
+      t += '</tr></thead>';
       trows.forEach(function (r, i) {
-        t += '<tr' + (i % 2 ? ' class="a"' : '') + '>';
-        def.columns.forEach(function (c) {
-          if (c.key === def.groupBy) return;
-          var v = sheetVal(c, r);
-          var cls = c.mono ? ' class="m"' : '';
-          if (v === null && c.required) t += '<td' + cls + '><span class="wl"></span></td>';
-          else t += '<td' + cls + '>' + esc(v === null ? '' : v) + '</td>';
+        var notes = spans.map(function (c) { return { c: c, v: sheetVal(c, r) }; }).filter(function (x) { return x.v !== null; });
+        t += '<tbody class="rec' + (i % 2 ? ' a' : '') + '">';
+        t += '<tr' + (notes.length ? ' class="hn"' : '') + '>';
+        cols.forEach(function (c) {
+          var v = sheetVal(c, r), cls = c.mono ? ' class="m"' : '';
+          if (v === null && c.required) {
+            t += traced[c.key] ? '<td' + cls + '><span class="wl"></span></td>'
+                               : '<td' + cls + '><span class="na">\u2014</span></td>';
+          } else t += '<td' + cls + '>' + esc(v === null ? '' : v) + '</td>';
         });
         t += '</tr>';
+        notes.forEach(function (x) {
+          t += '<tr class="nr"><td colspan="' + cols.length + '"><span class="nl">' + esc(x.c.label) + '</span> ' + esc(x.v) + '</td></tr>';
+        });
+        t += '</tbody>';
       });
-      t += '</tbody></table>';
+      t += '</table>';
       return t;
     }
 
@@ -233,7 +285,7 @@ Screens.print = (function () {
     } else {
       h += ptable(rows);
     }
-    h += '<div class="pf">' + rows.length + ' record' + (rows.length !== 1 ? 's' : '') + '</div></div>';
+    h += '<div class="pf">' + esc(footNote(def, rows)) + '</div></div>';
     return h;
   }
 
@@ -246,16 +298,21 @@ Screens.print = (function () {
       '.pr{border:none;border-top:2px solid #111;margin:8px 0 6px}' +
       '.gh{font-weight:bold;font-size:10pt;background:#e5e7eb;padding:3px 6px;margin:10px 0 2px}' +
       'table{border-collapse:collapse;width:100%;margin-bottom:4px}' +
-      'thead{display:table-header-group}tr{page-break-inside:avoid}' +
+      'thead{display:table-header-group}' +
+      'tbody.rec{page-break-inside:avoid}' +
       'th{text-align:left;font-size:8pt;font-weight:600;border-bottom:1px solid #111;padding:3px 6px;white-space:nowrap}' +
       'td{font-size:9pt;padding:2px 6px;vertical-align:top;border-bottom:1px solid #e5e7eb}' +
-      'tr.a td{background:#f9fafb}' +
+      'tr.hn td{border-bottom:none;padding-bottom:0}' +
+      'tbody.a td{background:#f9fafb}' +
       '.m{font-family:"SF Mono","Cascadia Mono",Consolas,monospace;font-size:8pt}' +
+      '.nr td{font-size:8pt;color:#333;line-height:1.35;padding:1px 6px 4px 14px}' +
+      '.nl{font-size:6.5pt;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-right:5px}' +
       '.wl{display:inline-block;width:90%;border-bottom:1px solid #999;min-height:12px}' +
+      '.na{color:#aaa}' +
       '.pf{margin-top:8px;font-size:8pt;color:#666;text-align:right}';
   }
 
-  // ---- export spreadsheet (full values, never truncated) ----
+  // ---- export spreadsheet (full values, never truncated, span columns included) ----
   function doExport() {
     var defs = checkedDefs(); if (!defs.length) return;
     var sid = UI.showId(), show = SignalDB.get("shows", sid);
@@ -271,7 +328,7 @@ Screens.print = (function () {
       rows.forEach(function (r) {
         s += '<Row>' + def.columns.map(function (c) {
           var v = r[c.key];
-          if (v === null || v === undefined || v === '') return '<Cell/>';
+          if (isEmpty(v)) return '<Cell/>';
           if (typeof v === 'number' && isFinite(v)) return '<Cell><Data ss:Type="Number">' + v + '</Data></Cell>';
           return '<Cell><Data ss:Type="String">' + x(v) + '</Data></Cell>';
         }).join('') + '</Row>';

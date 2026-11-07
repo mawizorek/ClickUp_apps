@@ -1,6 +1,7 @@
 /* paperwork.js — paperwork definitions registry.
    One definition per document. Adding a sheet = adding one definition.
-   Shape: { id, name, dept, columns: [{ key, label, width, mono, required, truncate }], rows(showId) -> records, sort, groupBy? }
+   Shape: { id, name, dept, columns: [{ key, label, width, mono, required, truncate, span }], rows(showId) -> records, sort, groupBy? }
+   A `span: true` column prints full-width underneath its record instead of as a narrow cell: long text, no truncation.
    The print menu renders whatever is in the registry. A definition whose rows() returns [] shows "No data yet" and is disabled. */
 var Paperwork = (function () {
 
@@ -137,7 +138,7 @@ var Paperwork = (function () {
         { key: "device", label: "Speaker / Device", width: 140 },
         { key: "feed", label: "Feed", width: 120, required: true },
         { key: "power", label: "Power", width: 80, required: true },
-        { key: "notes", label: "Notes", width: 160, truncate: 120 }
+        { key: "notes", label: "Notes", span: true }
       ],
       sort: "mix",
       rows: function (showId) {
