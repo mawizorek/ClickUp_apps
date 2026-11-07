@@ -1,35 +1,24 @@
-2026-10-25 09:00 ET  focus  COMPLETE
-pass anchor: 2026-10-25 09:00
-mode: FOCUS OVERRIDE (routines/job-market-focus.md) - remote first, concurrent first, home = 90mi of Rochester
+2026-11-07 09:12 ET  full  COMPLETE
+pass anchor: 2026-11-05 18:25
+mode: FULL MARKET (focus override routines/job-market-focus.md deleted 2026-11-05 18:25 by Michael's order; revert = restore from history, commit 47dd4a0)
 lanes: 9 of 9 posted + committed
-live: 131 | new 131 | gone 0
-sessions: 3 (opened 2026-10-24 11:42, landed 2026-10-25 17:10)
-summary: PASS COMPLETE root comment on the standing Job Market task, SOURCES threaded under it
-result: COMPLETE. All 9 lane files truncated by Michael's ruling (stale data deletion) and rebuilt
-  from scratch with sweep-verified rows only. Prior ~560-row inventory preserved in git history.
-  131 live is a CLEAN BASELINE, not a decline from 560 — it measures what this pass verified,
-  not carried rows from July-September.
-sources coverage:
-  - OSJ: all 6 dept indexes browsed (Lighting 144, Sound 80, Scenic 298, Mgmt 99, Admin 85, Properties)
-  - theatre boards: PB, BWW, SL, USITT, AS, ACG, TOC, MCA, LCTJ, TSJ, SKN, APAP, NYFA, HERC
-  - venue/arena: TWO, GOV
-  - remote-first: AAJ (5 rows, strongest arts remote source), PND, ID, RI, AFP, DNYC, CA Arts Council
-  - AI/SME platforms: OpenTrain (5 live), Alignerr (5 live), Mercor (3 live, 1 dead), Handshake (2 live), AuraOne (2 live), Rise (1 live), Teamland (1 live)
-  - experiential: TAIT, ATOMIC, 4Wall, Hudson Scenic, Encore, PRG, Christie Lites, Upstaging, Jack Morton, Cad Crowd
-  - near-home: Geva, Rhino, IATSE 25, Seneca (2), U of R (2), Syracuse U (2) — all re-verified live. SUNY Niagara DEAD.
-  - teaching: HigherEdJobs, Inside Higher Ed (adjunct pools, mostly campus-based)
-  - subcontract: Event Drawings, ShowsToGo, Romeo Scenery (all live, VW-based)
-  - not reached: Backstage, TheatreArtLife, EntertainmentCareers.net, LinkedIn Jobs
-  - degraded: HireCulture (titles only, no detail URLs), StageBoard (profile wall)
-highlight: ADM is the focus override's primary lane and delivered 5 remote rows from AAJ alone.
-  AUD is the richest lane (26 rows) with 11 remote AI/audio evaluation rows.
-  Handshake AI Audio Engineers Trainer ($125/hr) is the highest concurrent-capable rate.
-  SF Ballet Head of Audio ($163-190k) is the top venue-market row.
-  Smith Center ED Geneva NY ($80-120k) is HOME within 90mi, deadline 10/31.
+live: 304 | new 194 | gone 41
+  PM 41 (+23 -7) | TD 46 (+27 -3) | SM 50 (+43 -3) | ME 24 (+15 -4) | OPS 23 (+16 -4) | AUD 38 (+19 -7) | DFT 25 (+13 -1) | ADM 21 (+13 -8) | PRD 36 (+25 -4)
+sessions: 2 (2026-11-05 18:25-19:45, 2026-11-07 08:31-09:12)
+summary: PASS COMPLETE root comment on the standing Job Market task (https://app.clickup.com/t/86ajtgbt3?comment=1400600000172356), SOURCES threaded under it
+result: COMPLETE, with one named runbook deviation: the pass crossed two calendar days (staleness rule says abandoned);
+  Michael ordered it finished. PM-AUD verified 2026-11-05, DFT/ADM/PRD verified 2026-11-07.
+  An abandoned focus pass (anchor 2026-11-05 17:31) committed PM/TD/SM and was superseded by this pass.
+highlight: Met Opera Safety Coordinator ($70-85k, Nov 20) is the best OPS find in the routine's history.
+  GPJ CAD Admin ($120-140k, expert Vectorworks Spotlight, hybrid) is the best-paying Vectorworks row ever rowed.
+  Home radius: Syracuse U sound practicum and Redhouse Executive Director are new; Smith Center ED died Oct 31.
+aged out since posting (mark GONE next pass): Academy of Music TD, Choir of Man SM, Alhambra LD, Brooklyn Center Ops Dir (Nov 6);
+  St. Louis Shakes SM/ASM (Nov 7); Spoleto CM (Nov 7); Dolly Parton HE (started Nov 7)
 owed:
-  - Template 7 still carries the dead LCTJ host (chicagoplays.com/jobs); live host is jobs.leagueofchicagotheatres.org
-  - ruling: platform-structural remote (AI-data platforms, 'online'-only wording) still unruled
-  - Backstage, TheatreArtLife, EntertainmentCareers.net, LinkedIn Jobs not reached
-  - HireCulture detail URLs not resolved (10 titles visible, no individual posting links)
-  - carried-row liveness from prior passes: NOT applicable (all lanes rebuilt from scratch)
-  - focus override review date: 2026-10-26 (tomorrow)
+  - ruling: permanent AI/SME platform exclusion (Michael said he doesn't want them; config change not yet made; rows kept, not re-reported)
+  - ruling: UK work-rights gate for PRD/ADM (16 of 25 new PRD rows are UK)
+  - three USITT TD carries from June 2025 (CIVIC, Centenary, GMU) almost certainly dead; kill or confirm
+  - OSJ lighting index only partly paged (136 of 570)
+  - Pittsburgh CLO/PPT President & Executive Producer (TOC, until filled) needs an employer-page check for PRD
+  - Decision Log entry for the focus-override retirement
+  - Template 7 LCTJ host fix still owed from 10-25
