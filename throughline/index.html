@@ -18,7 +18,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="../shared/themes/themes.css">
 <link rel="stylesheet" href="../template-app/styles.css?v=6">
-<link rel="stylesheet" href="./styles.css?v=3">
+<link rel="stylesheet" href="./styles.css?v=4">
 </head>
 <body>
 <div id="access-gate" hidden>
@@ -46,25 +46,28 @@
 <script src="./ui.js?v=3"></script>
 <script src="./sync.js?v=3"></script>
 <script src="./seed.js?v=3"></script>
+<script src="./paperwork.js?v=3"></script>
 <script src="./screens/units.js?v=3"></script>
+<script src="./screens/print.js?v=3"></script>
 <script src="./screens/infra.js?v=3"></script>
 <script src="./screens/tables.js?v=3"></script>
 <script src="./screens/access.js?v=3"></script>
 <script>
 (function () {
   var APP_NAME    = "Throughline";
-  var APP_VERSION = "v2.2";
-  var APP_PR      = 1035;
+  var APP_VERSION = "v2.3";
+  var APP_PR      = 1036;
   var APP_THEME   = "soft-utility";
   var DEFAULT_COLOR = "maw-dark-utility";
   var NAV = [
     { route: "home",   label: "Units" },
+    { route: "print",  label: "Print" },
     { route: "infra",  label: "Infra" },
     { route: "tables", label: "Tables" },
     { route: "access", label: "Access" },
     { route: "about",  label: "About" }
   ];
-  var SCREENS = { home: "units", infra: "infra", tables: "tables", access: "access" };
+  var SCREENS = { home: "units", print: "print", infra: "infra", tables: "tables", access: "access" };
 
   if (window.THEMES && THEMES.applyTheme) {
     THEMES.applyTheme(APP_THEME).then(function () {
