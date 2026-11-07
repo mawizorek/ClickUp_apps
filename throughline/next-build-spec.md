@@ -1,170 +1,85 @@
 # Throughline — Next Build Spec
 
-One spec at a time. Current: Infrastructure Screen.
+One spec at a time. Current: Print Menu.
 
 ---
 
-## Infrastructure Screen
+## Print Menu
 
-**Goal:** give venue infrastructure (tie lines, data ports, power circuits, DMX home runs) the same first-class grid treatment that Units already has. Today infrastructure lives in the generic Tables editor: a flat list of labels with no filtering, no type color coding, and no connection context. Before doing any bulk import (190 SPAC data ports are waiting), the app needs a real surface for this data.
+**Goal:** turn ThroughLine's four report pills (Units screen) into a Lightwright-style print menu. It lists every paperwork type available for the current show, previews it as printed paper, and prints or exports the checked ones.
 
-**Why now:** Michael's SPAC Data Ports inventory in ClickUp has 190 ports ready to import (D1-D108, LX Net 1-52, Audio Control Net, Dante Primary, Campus Net, rack jacks). The generic Tables view can't absorb that volume usefully. And even the 7 infrastructure rows already in D1 don't show their connection context: which units are plugged into each tie line.
+### Rulings (Michael, 11-06)
 
-### Route
+1. Paperwork = records printed in columns, Lightwright visual language. No new UI invention.
+2. One paperwork definition per document. Adding a sheet = adding one definition.
+3. Patch columns are **never typed by hand**. Wall Port, Dante TX, Destination RX, Feed and any path column are derived from the signal trace. A blank one means the trace is incomplete.
+4. Rows with a missing required trace still print, with a write-in line in the blank cell.
+5. Export = **PDF** (the paper) or **spreadsheet** (the records). **One-way only:** nothing exported is ever imported back.
+6. Print permission = read permission. No new permission.
 
-`#infra` — new nav item between "Tables" and "Access".
+### Where it lives
 
-Files:
-- New: `screens/infra.js` (~300 lines, mirrors units.js patterns)
-- Edit: `index.html` (add nav item + script tag)
-- No worker changes. No schema changes. All data already exists in the `infrastructure` table.
+- New route `#print` → new `screens/print.js`. `units.js` report pills replaced with one **Print** link to `#print`. Net shrink.
+- New `paperwork.js`: the definitions registry (data, not screens).
+- `index.html`: nav item + script tags.
+- No worker changes. No migrations. Reads only.
 
-### Grid Layout
+### Paperwork definition shape
 
-Same `sig-table` / `sig-row` / `sig-cell` system as Units. Columns:
+`{ id, name, dept, columns: [{ key, label, width, mono, required }], rows(showId) → records, sort, groupBy? }`
 
-| Column | Key | Width | Notes |
-|--------|-----|-------|-------|
-| Label | `label` | 120px | Primary identifier. D86, A12, LX-1, etc. |
-| Type | `type` | 110px | Color coded. See palette below. |
-| End A | `endpoint_a` | 160px, flex | Stage/wall end description |
-| End B | `endpoint_b` | 160px, flex | Booth/rack end description |
-| In Use | `_inuse` | 70px | Computed: shows connection count through this endpoint |
-| Notes | `notes` | 160px | Truncated, full on hover |
+### Catalogue v1
 
-`_inuse` is a live computed column: count of non-deleted connections where `source_endpoint` or `dest_endpoint` equals this infrastructure row's `endpoint_id`. Shows "—" for 0 and the count for 1+. This is the column that makes the grid actually useful: you can see at a glance which ports are live and which are free.
+1. **Input Patch** (Audio): Ch · Source/Purpose · Placement · Mic/DI · Rig · Wall Port · Dante TX · Destination RX.
+2. **Output Patch** (Audio): Mix/Out · Purpose · Location · Speaker/Device · Feed · Power · Notes.
+3. **Channel Hookup** (Lighting): Chan · Position · U# · Purpose · Type · Dimmer · Address · Color.
+4. **Instrument Schedule** (Lighting): same columns, grouped by position, sorted by unit #.
+5. **Power Schedule** (Electrics): Circuit · Service · Lands At · Load · Watts.
+6. **Video Signal Path** (Video): Source · Route · Destination · Signal.
+7. **Network Devices** (Network): Device · Hostname · IP · VLAN · Port, grouped by network.
+8. **Equipment Pull** (Production): Qty · Item · Mfr · Category · Total W · Total lb, grouped by dept.
 
-### Type Colors
+### Traced columns
 
-Match the signal color pattern established in units.js `SIG_COLORS`.
+Downstream walk via existing `UI.trace(unit)` pattern:
 
-```
-audio tie   #4ade80  (green, matches Analog Audio)
-data tie    #22d3ee  (cyan, matches Dante/Ethernet)
-power ckt   #fbbf24  (amber, matches AC Power)
-DMX home run #60a5fa  (blue, matches DMX 512)
-fiber        #c084fc  (purple)
-other        #94a3b8  (gray)
-```
+- **Wall Port** = first tie_lines hop (`UI.epOwner` → `tie_lines.label`).
+- **Destination RX** = terminal control point in the trace.
+- **Dante TX** = the network-class (Dante signal type) hop on the path.
 
-### Filter Bar
+Output **Feed** = upstream walk (reverse of trace: `dest_endpoint === ep` → follow `source_endpoint`). Client-side in `paperwork.js`, no worker changes.
 
-Same `sig-filters` / `sig-group` / `sig-pill` system as Units.
+### Sheet format
 
-**Row 1 (showbar):**
-- Search input (filters by label, endpoint_a, endpoint_b, notes substring)
-- "+ New" button (if writable)
-- Sync status pill
-- Count badge: `N/M infra`
+Letter landscape. Header: show title, venue · season · designer, paperwork name, date. Heavy rule under the header, alternate-row shading, group headers when `groupBy` is set. Footer: record count.
 
-**Row 2 (type filter):**
-- ALL pill (default)
-- One pill per type present in data (auto-discovered, not hardcoded)
-- Color-coded to match the palette above
+### Menu
 
-**Row 3 (usage filter):**
-- ALL | In Use | Free
-- "In Use" = has at least one connection through its endpoint
-- "Free" = zero connections
+Paperwork grouped by department. Each row: checkbox · name · record count. Tap a row = preview it. Footer actions: **Print (n)** · **Export PDF** · **Export spreadsheet**.
 
-### Sort
+### Export
 
-Default: label ascending with numeric awareness (`localeCompare` with `{ numeric: true }`).
-Clickable column headers toggle sort, same as Units.
+- **PDF:** print stylesheet + browser print/save-as-PDF. No PDF library in v1.
+- **Spreadsheet:** SpreadsheetML writer (same pattern as `db.js` `downloadXLS`). One workbook, one tab per checked paperwork.
 
-### Detail Panel
+### Done when
 
-Tap a row to open a side panel (same `UI.panel` system). Sections:
+- `#print` lists the catalogue for the current show, with empty paperwork disabled.
+- Print opens a print-ready window. The spreadsheet exports one tab per checked paperwork.
+- `units.js` is smaller than before.
+- Existing tests pass.
 
-**Fields:**
-- Label, Type, End A, End B, Notes (same as edit form fields)
+### Not in this build
 
-**Connections through this port** (computed section):
-- Query: all connections where `source_endpoint` or `dest_endpoint` equals this infra's `endpoint_id`
-- Each row shows: `source_label → dest_label · signal_type_name`
-- Tappable: opens the connection in the edit form
-- Empty state: "No connections routed through this port yet."
-
-**Actions:**
-- Edit infra (opens edit form)
-- + Connection (pre-fills this endpoint as source or dest)
-
-### Quick Add
-
-The "+ New" button opens the standard edit form via `UI.edit('infrastructure', null, { defaults })`. Default venue auto-fills from the first venue (existing behavior in tables.js).
-
-**Sequential label hint:** when opening the form, scan existing labels for the longest common prefix + incrementing number pattern (e.g. "D" + numbers → suggest "D109" if D1-D108 exist). Show as placeholder text in the label field, not auto-filled. User can accept or override.
-
-### Bulk Paste Mode
-
-Button in the filter bar: "Paste Import". Opens a panel with:
-
-1. **Type dropdown** — select the infrastructure type for all pasted rows
-2. **Textarea** — paste one label per line (e.g. paste "D1\nD2\nD3..." or tab-separated "D1\tSL Wall 1\tBay C1")
-3. **Preview** — parsed rows shown in a mini-table before commit
-4. **Create All** button — batch-creates endpoints + infrastructure rows, syncs
-
-Parsing rules:
-- One field per line = label only (type from dropdown, endpoints blank)
-- Tab-separated = label, end_a, end_b (3 columns)
-- Blank lines skipped
-- Duplicates flagged (label already exists in infrastructure)
-
-This is the critical feature for the 190-port import. Without it, each port is a separate form open/fill/save cycle.
-
-### Nav Integration
-
-`index.html` changes:
-
-```js
-var NAV = [
-  { route: "home",   label: "Units" },
-  { route: "infra",  label: "Infra" },
-  { route: "tables", label: "Tables" },
-  { route: "access", label: "Access" },
-  { route: "about",  label: "About" }
-];
-var SCREENS = { home: "units", infra: "infra", tables: "tables", access: "access" };
-```
-
-Add script tag: `<script src="./screens/infra.js?v=3"></script>` after units.js.
-
-### Infrastructure on Unit Detail
-
-Also update `screens/units.js` detail panel: in the **Connections** section, when a connection routes through an infrastructure endpoint, show the infrastructure label inline:
-
-```
-#502 Blackmagic SDI distribution → #500 FOH Projector  SDI  via D96
-```
-
-The "via D96" is resolved by checking if either endpoint of the connection belongs to an infrastructure row (using `UI.epOwner`). This already works in the data model; it's just not displayed.
-
-### Build Plan
-
-1. Create `screens/infra.js` with grid, filters, detail panel, quick-add
-2. Add bulk paste panel to infra.js
-3. Update `index.html` nav and script tags
-4. Update `screens/units.js` connection display to show infra labels
-5. Add infrastructure type colors to `styles.css` if needed (may reuse existing classes)
-
-### Build Estimate
-
-`screens/infra.js`: ~300 lines (units.js is ~280, and infra is simpler: no trace, no reports, no show scoping).
-Bulk paste panel: ~80 lines additional.
-`index.html` changes: 3 lines.
-`units.js` infra label: ~5 lines in the connection formatter.
-
-Total new code: ~400 lines. No worker changes. No migrations.
-
-### What This Does NOT Include
-
-- Endpoint FK migration (endpoint_a/endpoint_b → FK refs): separate schema work, parked
-- Network screen (similar pattern but for the `networks` table): future, once infra screen proves the pattern
-- Map/spatial view of infrastructure: future (requires venue floor plan data)
+Labels · plot view · user-editable column layouts · re-import · a separate print permission.
 
 ---
 
 ## Completed
+
+### Infrastructure Screen ✓
+
+Shipped in PR #1035. `screens/infra.js` (580 lines): tie lines grid with type/usage filters, detail panel with connections context, bulk paste import. Sequential label hint. NAV updated: Units → Infra → Tables → Access → About.
 
 ### MCP Integration ✓
 
@@ -178,9 +93,6 @@ Shipped in PR #1034. Moved `dept` from `signal_types` to `fixture_types` (class 
 
 ## Future (parked)
 
-Items discussed in the collaboration thread but not yet specced:
-
-- Print menu (PDF export of Input Patch, Output Patch, Equipment Pull, Channel Hookup, Signal Trace)
 - Plot view (`#plot`, positions on a plan)
 - Label printing (`#labels`, cable + fixture labels)
 - Network screen (`#networks`, same grid pattern as infra but for IP/Dante networks)
