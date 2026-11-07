@@ -185,7 +185,16 @@
 .sheet-alt td { background: var(--surface-2); }
 .sheet-mono { font-family: var(--font-mono); font-size: 0.74rem; }
 .sheet-writein { display: inline-block; width: 90%; border-bottom: 1px dashed var(--text-faint); min-height: 14px; }
+.sheet-na { color: var(--text-faint); }
 .sheet-foot { margin-top: 8px; font-size: 0.74rem; color: var(--text-faint); text-align: right; font-family: var(--font-mono); }
+
+/* a record is one tbody: field row + its full-width note row, kept together */
+.sheet-tbl tr.sheet-fields.has-note td { border-bottom: none; padding-bottom: 1px; }
+.sheet-tbl tr.sheet-noterow td {
+  font-family: var(--font-sans, inherit); font-size: 0.74rem; line-height: 1.45;
+  color: var(--text-soft); padding: 1px 8px 7px 20px; white-space: normal; word-break: break-word;
+}
+.sheet-notelbl { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-faint); margin-right: 6px; }
 
 /* ---- MOBILE ---- */
 @media (max-width: 768px) {
