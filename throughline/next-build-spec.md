@@ -197,6 +197,45 @@ Total new code: ~400 lines. No worker changes. No migrations.
 
 **First-use test case:** Becoming Curious. Patch bay Rio house mic transmit channels to the record outputs, theater wireless receivers to the QL5, QLab outputs to the QL5, and QL5 outputs to the Tesira.
 
+### Verification state and open holes (spec note, NOT for build yet)
+
+**Source:** Michael, 2026-11-06, Becoming Curious audio session. He asked for the database to hold a record for a connection that is planned but not yet physically patched or subscribed, so that a cold session can ask "what do we need to look at in the space?" and get a clean answer.
+
+**The problem today:** `connections`, `control_points`, and `units` carry only a free-text `notes` column. Verification state therefore has to live inside prose, and the only way to find open items is a substring search. It works, but it is a convention held together by discipline, it cannot be filtered or sorted, nothing can count it, and nothing stops a row from being silently wrong.
+
+**Interim convention now in use (Becoming Curious, 2026-11-06).** A gap is written into `notes` as a pipe-delimited block starting with a token:
+
+```
+HOLE H3 | WHAT: <what is missing> | WHERE: <where to go look> | ASK: <the question to answer> | OWNER: <who>
+```
+
+Searching `HOLE H` returns every open gap across tables. H-numbers are per-show and sequential. Rows that have since been answered say RESOLVED or VERIFIED with a date instead. This is the thing the real feature should replace.
+
+**Proposed schema.** Add to `connections`, `control_points`, and `units`:
+
+| Column | Type | Values |
+|--------|------|--------|
+| `state` | text | `proposed` (a plan, nothing built), `documented` (believed true, from paperwork or a screenshot), `verified` (someone confirmed it in the room, with a date), `broken` (confirmed wrong or failing) |
+| `verified_on` | date | set when `state` becomes `verified` |
+| `verified_by` | text | who confirmed it |
+| `open_question` | text | one sentence: what has to be answered to move this row forward |
+| `check_where` | text | the physical or software place to go look |
+
+Default `state` for a new row is `proposed`, so a row cannot quietly claim to be true.
+
+**Why five fields and not one flag:** the useful question is not "is this done," it is "what do I walk over and look at." `open_question` plus `check_where` is what turns a null into a work item. A boolean cannot carry that.
+
+**Surfaces this unlocks:**
+- An **Open Holes** report, show-scoped: every row whose `state` is `proposed` or `broken`, grouped by `check_where`, so the list reads as a walk order through the building rather than a pile of records. This is the deliverable Michael actually asked for.
+- A state filter row on the Units and Infra grids, same pill pattern as the type filters.
+- Hatched cells in the Dante Matrix view keyed off `state` instead of grepping notes for UNVERIFIED.
+- Trace output that marks the exact hop where a signal path stops being confirmed, instead of presenting a whole chain as equally solid.
+- A per-show readiness count, for example 41 connections, 22 verified, 13 documented, 6 proposed.
+
+**Migration:** one migration adding the five columns, nullable, plus a one-time backfill that parses the existing `HOLE` and `UNVERIFIED` and `VERIFIED` tokens out of `notes` into `state`, `open_question`, and `check_where`, leaving the prose intact. Nothing is destroyed; the notes stay readable.
+
+**Out of scope:** approval workflow, assignment to a person as a task, notifications, and any sync of state back to ClickUp tasks.
+
 ---
 
 ## Completed
@@ -220,4 +259,5 @@ Items discussed in the collaboration thread but not yet specced:
 - Label printing (`#labels`, cable + fixture labels)
 - Network screen (`#networks`, same grid pattern as infra but for IP/Dante networks)
 - Dante Matrix view (`#dante`, passive crosspoint grid from connections; see Scratch above)
+- Verification state and Open Holes report (`state` / `open_question` / `check_where` columns; see Scratch above)
 - Permissions interaction spec (Lux + Michael, in progress separately)
