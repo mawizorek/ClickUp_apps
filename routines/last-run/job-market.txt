@@ -1,24 +1,26 @@
-2026-11-07 09:12 ET  full  COMPLETE
-pass anchor: 2026-11-05 18:25
-mode: FULL MARKET (focus override routines/job-market-focus.md deleted 2026-11-05 18:25 by Michael's order; revert = restore from history, commit 47dd4a0)
+2026-11-14 16:08 ET  full  COMPLETE
+pass anchor: 2026-11-14 10:56
+mode: FULL MARKET (fresh pass ordered by Michael 11-14 10:56; the 2026-11-10 07:15 pass was abandoned, never stamped)
 lanes: 9 of 9 posted + committed
-live: 304 | new 194 | gone 41
-  PM 41 (+23 -7) | TD 46 (+27 -3) | SM 50 (+43 -3) | ME 24 (+15 -4) | OPS 23 (+16 -4) | AUD 38 (+19 -7) | DFT 25 (+13 -1) | ADM 21 (+13 -8) | PRD 36 (+25 -4)
-sessions: 2 (2026-11-05 18:25-19:45, 2026-11-07 08:31-09:12)
-summary: PASS COMPLETE root comment on the standing Job Market task (https://app.clickup.com/t/86ajtgbt3?comment=1400600000172356), SOURCES threaded under it
-result: COMPLETE, with one named runbook deviation: the pass crossed two calendar days (staleness rule says abandoned);
-  Michael ordered it finished. PM-AUD verified 2026-11-05, DFT/ADM/PRD verified 2026-11-07.
-  An abandoned focus pass (anchor 2026-11-05 17:31) committed PM/TD/SM and was superseded by this pass.
-highlight: Met Opera Safety Coordinator ($70-85k, Nov 20) is the best OPS find in the routine's history.
-  GPJ CAD Admin ($120-140k, expert Vectorworks Spotlight, hybrid) is the best-paying Vectorworks row ever rowed.
-  Home radius: Syracuse U sound practicum and Redhouse Executive Director are new; Smith Center ED died Oct 31.
-aged out since posting (mark GONE next pass): Academy of Music TD, Choir of Man SM, Alhambra LD, Brooklyn Center Ops Dir (Nov 6);
-  St. Louis Shakes SM/ASM (Nov 7); Spoleto CM (Nov 7); Dolly Parton HE (started Nov 7)
+live: 440 | new 108 | gone 46
+  PM 41 (+11 -2) | TD 57 (+3 -9) | SM 67 (+18 -8) | ME 51 (+7 -0) | OPS 40 (+10 -9) | AUD 76 (+19 -5) | DFT 32 (+10 -4) | ADM 44 (+24 -1) | PRD 32 (+6 -8)
+sessions: 2 (2026-11-14 10:56-11:45, 14:28-16:08)
+summary: PASS COMPLETE root comment on the standing Job Market task (https://app.clickup.com/t/86ajtgbt3?comment=1400600000209351), SOURCES threaded under it (https://app.clickup.com/t/86ajtgbt3?comment=1400600000209351&threadedComment=1400600000209352)
+result: COMPLETE, with named deviations:
+  creative-admin sweep read its baseline before searching (search-first breach); re-sweep ADM search-first next pass.
+  close-out cross-lane fixes re-committed: Convene gone (Playbill 404, OPS homes URL; PM dup dropped),
+  DVAA gone (NYFA expired, PM), 4Wall Show Staff dup dropped from ME (DFT homes URL). ALSO replies for PM/TD/SM/ME edited to full pointer sets.
+highlight: best home-radius haul yet: RPO x3 + Geva Donor Engagement Officer (ADM), Hochstein + RIT x2 (OPS), REV Theatre TD $63k (TD).
+  Spotlight: Hippodrome Technical PM ($65-75k, newest), AEG Sr Director Global Touring (top pay), TheaterWorks Hartford PM (best fit, closes 11-30).
+resolved this pass: Pittsburgh CLO/PPT President & EP not on employer openings page (no row); USITT June 2025 TD carries settled in TD NOTABLE.
 owed:
-  - ruling: permanent AI/SME platform exclusion (Michael said he doesn't want them; config change not yet made; rows kept, not re-reported)
-  - ruling: UK work-rights gate for PRD/ADM (16 of 25 new PRD rows are UK)
-  - three USITT TD carries from June 2025 (CIVIC, Centenary, GMU) almost certainly dead; kill or confirm
-  - OSJ lighting index only partly paged (136 of 570)
-  - Pittsburgh CLO/PPT President & Executive Producer (TOC, until filled) needs an employer-page check for PRD
+  - ruling: permanent AI/SME platform exclusion (still flagged, not filtered; omitted from ACCESSIBLE per the 11-07 call)
+  - ruling: UK work-rights gate for PRD/ADM
+  - ruling: engagement-start as a gone/admit signal (TD Chicago Shakes ATD x3 marked gone on it; ADM Gateway CM and PRD Boomerang AP not admitted on it)
+  - ruling: is a 404 on the posting's own URL a gone signal (Convene closed on it; OPS sweep had called it board-only)
+  - TD: review Chicago Shakes ATD x3 (DFT sweep found the OSJ posting still up); add Austin Technical Lead (late handoff from OPS)
+  - index-URL rows need detail links: SM UMiami, ME Shenandoah + Upstaging, ADM Steppenwolf CM, PRD FST AD
+  - re-capture remote/hybrid body quotes: Waveguide AV Design Associate, MSM TD, QSC x2 (TD), Fourvenues (PM)
+  - OSJ department paging still structurally partial
   - Decision Log entry for the focus-override retirement
-  - Template 7 LCTJ host fix still owed from 10-25
+  - Template 7 LCTJ host fix (template says chicagoplays.com/jobs; rows live on jobs.leagueofchicagotheatres.org)
