@@ -106,6 +106,9 @@ value, but real income and real hands-on time doing something Michael enjoys. Ev
 fit, timing, whether it conflicts with a primary move. Stop evaluating for: trajectory,
 career-building value, resume impact.
 
+**Promoted 2026-11-14 by D12:** drafting/remote project work is now the near-term primary lane,
+scoped to the summer teaching break.
+
 ---
 
 ## D8 · 2026-08-04 · Audio stays (the effective raise argument)
@@ -168,3 +171,37 @@ split removes nothing from the board.
 **Operational effect:** debriefs tag sub-$90k rows as REST or OUT, never ACT-as-move. Writing the
 split into `routines/job-market-evaluation.md` and Ledger B is a proposal / curation item, not
 applied (memory.md at cap).
+
+---
+
+## D12 · 2026-11-14 · Near-term focus: summer work around the teaching job
+
+Michael, 17:41, right after passing on Powerhouse "for now": "I want to go back to some of the
+drafting and remote projects, maybe focusing on work that is good for the summer while I'm not
+teaching."
+
+**Read:** he is staying in the URITP seat this cycle. The full-time move lane (Court, Hanover,
+the D10/D11 board) goes to WATCH, not dead. The live question is how to fill the summer
+teaching break (roughly mid-May to mid-August 2027) with paid, enjoyable, schedule-compatible work.
+
+**Summer lane = three buckets:**
+- **Summer stock PM / seasonal production seats** (on-skill, fixed window): e.g. Peterborough
+  Players PM 2027 Summer Season, The Lost Colony PM, Glimmerglass / Berkshire seasonal.
+- **Remote design / drafting project work** (flexible hours, location-free): currently dominated
+  by AI/SME evaluator platforms (OpenTrain, Handshake AI, AuraOne). The AI/SME-platform
+  inclusion ruling is still owed and now matters.
+- **Freelance scenic / design gigs, drivable from Rochester** (Alleyway Buffalo, Irish Classical,
+  BLAAC Syracuse, Geva overhire). Timing per production, not per summer.
+
+**Out of the summer lane:** full-time drafting staff roles (PRG, Hudson, Jack Morton, GPJ). They
+require leaving the teaching job.
+
+**Named cost (not a re-proposal):** the deferred AutoCAD window (~summer 2027) is the same summer.
+That summer is either AutoCAD-learning or AutoCAD-earning, unless the work chosen is
+Vectorworks-only.
+
+**Floor:** summer work sits under D7 (outside the D11 floor), judged on weekly rate, housing,
+fit and enjoyment.
+
+**Routine proposal (not applied):** tag rows with an engagement window and surface a SUMMER
+cut (May-Aug engagement or remote/contract) as its own section in the pass.
