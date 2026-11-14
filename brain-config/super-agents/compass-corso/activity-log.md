@@ -7,21 +7,34 @@
 
 ## LIVE STATE
 
-*Stamped 2026-09-21 01:40 ET.*
+*Stamped 2026-11-14 16:45 ET.*
 
 | Project | Status | Last touched |
 |---------|--------|--------------|
-| Career portrait | Ledgers A-D populated. **Ledger A's credential gap CLOSED 09-21** (2 safety creds held; ETCP/OSHA-30/crowd-mgmt not held; AutoCAD deferred to ~2027, not excluded). | 2026-09-21 |
-| Sweep debrief | **4 debriefs run** (7/31 eve, 8/4 13:20, 8/4 16:20, **9/21 01:35**). Portrait confidence MEDIUM and falling — the first three predate 48 days of routine change. | 2026-09-21 |
-| Routine optimization | 8-lane expansion merged (PR #708). **4 proposals open from the 09-21 debrief, none ruled:** c-suite KEYWORDS in creative-admin · split breadth-vs-verification passes · order the report by `requirements` gating · mint an org-signal read. | 2026-09-21 |
-| Open questions to Michael | **3, all unruled:** (1) comp floor — declared $90K/$100-150K band vs earned $70K real floor; (2) does D7 survive TAIT at $100-120k salaried; (3) SUNY Niagara 2022 pool — verify live before spending a day on it. | 2026-09-21 |
-| Paige integration | Handoff pattern v0 exercised for real on 09-21: I asked "does he have it," she returned 1 confirmed asset with located evidence + 2 map gaps. **Working as designed.** | 2026-09-21 |
-| Public Theater goals | Both listings tracked as active goals. Not re-verified this pass (it was a breadth pass). | 2026-08-04 |
-| 📏 memory.md budget | **AT the ~10KB hot cap.** The 09-21 write was net-neutral by curating older blocks. **Next addition needs the archive, not the margin.** | 2026-09-21 |
+| Career portrait | Ledgers A-D populated. Credential gap closed 09-21. **Market reads in memory.md are vintage 09-21 or older**; this pass's reads live in S5 below until curated in. | 2026-11-14 |
+| Sweep debrief | **5 debriefs run** (7/31, 8/4 13:20, 8/4 16:20, 9/21 01:35, **11/14 16:45**). Portrait confidence MEDIUM; market half stale until Michael answers S5 questions. | 2026-11-14 |
+| Routine optimization | **4 proposals open, none ruled** (09-21 c-suite keywords now applied in roles.json per ADM sweep; remaining: breadth-vs-verification split · rank by `requirements` gating · org-signal read). **+1 new 11-14:** cap ACCESSIBLE at top 3 per tier. | 2026-11-14 |
+| Open questions to Michael | **3:** (1) Redhouse ED, acted or not (ACT since 09-21) · (2) Hubbard posting gone from board, any word on the October application · (3) comp floor, still unruled since 09-21. D7-vs-TAIT and SUNY Niagara questions lapsed: neither row is in the 11-14 inventory. | 2026-11-14 |
+| Paige integration | Pattern v0 working. **Owed handoff 11-14:** budget-authority evidence for Director-level applications. | 2026-11-14 |
+| Public Theater goals | Neither listing in the 11-14 inventory. Status as goals unchanged; postings not live. | 2026-11-14 |
+| 📏 memory.md budget | AT the ~10KB hot cap. **No memory.md write in S5**; the AutoCAD-band pattern waits for a curation pass. | 2026-11-14 |
 
 ---
 
 ## Sessions
+
+### S5 · 2026-11-14 16:45 ET · Job-market 11-14 pass debrief
+
+Seated by Michael's button on the close-out reply (Routine Ricky thread). No session task created (routine guardrail: no tasks).
+Debrief comment: https://app.clickup.com/t/86ajtgbt3?comment=1400600000209351&threadedComment=1400600000209363 (threaded under PASS COMPLETE https://app.clickup.com/t/86ajtgbt3?comment=1400600000209351)
+
+- Ran `hooks/job-routine-response.md` in order: PASS COMPLETE + lane files → `evaluation.md` → memory/preferences/decision log.
+- Pass: 440 live / +108 / -46, 9/9 lanes. Read as deep inventory with soft verification, not a hot market.
+- Top picks: Hanover VP Programming & Production $135-150k (ACT; second time surfaced, org-signal) · Redhouse ED $100-130k home (ACT, unchanged since 09-21) · Powerhouse Arts PM $100-110k Brooklyn (ACT) · Court Theatre Director Producing & Artistic Ops $90-110k, 61d open (WATCH).
+- Aspirational: Lincoln Center Sr Dir Production $215-250k · Granada VP $150-200k · AEG Sr Dir Global Touring $164-251k. Gap = one Director-level seat with budget authority.
+- Pattern (vintage 2026-11-14): AutoCAD now gates a Director-level PM-lane row (MSG Director Event Production $147-175k), plus VAI $135k and Eisterhold $85-125k. Deferral named as priced, not reopened.
+- Not done: per-row categorization of all 440 (hook step 3) — debrief ranked the bridge-title and >=$90k cohorts only. Reactions on NEW cards not read.
+- Nothing written to routine config, state files or memory.md.
 
 ### S4 · 2026-09-21 01:35 ET · Job-market 09-20 pass debrief (first seating in 48 days)
 
