@@ -94,6 +94,9 @@ wants admin floated alongside production, but production keeps the weight. Admin
 **The distinction:** admin is a WHERE-THE-MONEY-IS observation, not a career-direction shift.
 Michael's identity is production. The admin lane is pragmatic diversification.
 
+**Refined 2026-11-14 by D10:** ED-titled admin rows are off the board for this cycle. The admin
+lane stays parallel for GM / operations / producing-shaped seats.
+
 ---
 
 ## D7 · 2026-08-04 · Drafting = income + enjoyment, not trajectory
@@ -121,3 +124,24 @@ decision-log.md, and memory.md Ledger C are the warm-start surface. Every cold C
 these three files and knows the arc. Brain memory (PREFERENCES.md) holds BEHAVIORAL rules
 only, never career state. The agent-activity-push hook ensures each headed reply appends
 to the activity log. No more empty files after real work.
+
+---
+
+## D10 · 2026-11-14 · ED tier is off-thesis for this cycle
+
+Michael: "the executive director type positions seem a little too big right now." Corso's read,
+which Michael confirmed ("exactly"): the problem is shape, not just size. An ED runs board, donors
+and budget; production belongs to someone else. That is a career change, not the next rung on
+PM → Director of Production.
+
+**Ruling:**
+- Redhouse ED (ACT since 09-21) is CUT. Open question (1) closed.
+- Hanover VP Programming & Production stays as ONE long-shot application: big, but
+  production-shaped, so it is a reach on-thesis rather than a detour.
+- Energy goes to right-sized rows: Powerhouse Arts PM (apply now) and Court Theatre Director,
+  Producing & Artistic Ops (the actual next rung).
+- "Right now" is time-bound. Revisit ED-tier after one Director-level seat with budget
+  authority is held.
+
+**Operational effect:** ED-titled rows no longer earn ACT in debriefs. Routine-side down-ranking
+is a proposal only (see activity log), not applied.
