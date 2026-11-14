@@ -7,17 +7,18 @@
 
 ## LIVE STATE
 
-*Stamped 2026-11-14 16:45 ET.*
+*Stamped 2026-11-14 16:46 ET.*
 
 | Project | Status | Last touched |
 |---------|--------|--------------|
-| Career portrait | Ledgers A-D populated. Credential gap closed 09-21. **Market reads in memory.md are vintage 09-21 or older**; this pass's reads live in S5 below until curated in. | 2026-11-14 |
+| Career portrait | Ledgers A-D populated. Credential gap closed 09-21. **Market reads in memory.md are vintage 09-21 or older**; this pass's reads live in S5 below until curated in. **D10 (11-14): ED tier off-thesis this cycle.** | 2026-11-14 |
 | Sweep debrief | **5 debriefs run** (7/31, 8/4 13:20, 8/4 16:20, 9/21 01:35, **11/14 16:45**). Portrait confidence MEDIUM; market half stale until Michael answers S5 questions. | 2026-11-14 |
-| Routine optimization | **4 proposals open, none ruled** (09-21 c-suite keywords now applied in roles.json per ADM sweep; remaining: breadth-vs-verification split · rank by `requirements` gating · org-signal read). **+1 new 11-14:** cap ACCESSIBLE at top 3 per tier. | 2026-11-14 |
-| Open questions to Michael | **3:** (1) Redhouse ED, acted or not (ACT since 09-21) · (2) Hubbard posting gone from board, any word on the October application · (3) comp floor, still unruled since 09-21. D7-vs-TAIT and SUNY Niagara questions lapsed: neither row is in the 11-14 inventory. | 2026-11-14 |
+| Routine optimization | **3 proposals carried, none ruled** (09-21 c-suite keywords now applied in roles.json per ADM sweep; remaining: breadth-vs-verification split · rank by `requirements` gating · org-signal read). **+2 new 11-14:** cap ACCESSIBLE at top 3 per tier · down-rank ED-titled rows per D10. | 2026-11-14 |
+| Open questions to Michael | **2 left:** (2) Hubbard posting gone from board, any word on the October application · (3) comp floor, still unruled since 09-21. **(1) Redhouse CLOSED 11-14: cut per D10.** | 2026-11-14 |
+| Active targets | Powerhouse Arts PM (apply now) · Court Theatre Director Producing & Artistic Ops (next rung) · Hanover VP (one long-shot application). | 2026-11-14 |
 | Paige integration | Pattern v0 working. **Owed handoff 11-14:** budget-authority evidence for Director-level applications. | 2026-11-14 |
 | Public Theater goals | Neither listing in the 11-14 inventory. Status as goals unchanged; postings not live. | 2026-11-14 |
-| 📏 memory.md budget | AT the ~10KB hot cap. **No memory.md write in S5**; the AutoCAD-band pattern waits for a curation pass. | 2026-11-14 |
+| 📏 memory.md budget | AT the ~10KB hot cap. **No memory.md write in S5**; the AutoCAD-band pattern and D10 wait for a curation pass. | 2026-11-14 |
 
 ---
 
@@ -35,6 +36,10 @@ Debrief comment: https://app.clickup.com/t/86ajtgbt3?comment=1400600000209351&th
 - Pattern (vintage 2026-11-14): AutoCAD now gates a Director-level PM-lane row (MSG Director Event Production $147-175k), plus VAI $135k and Eisterhold $85-125k. Deferral named as priced, not reopened.
 - Not done: per-row categorization of all 440 (hook step 3) — debrief ranked the bridge-title and >=$90k cohorts only. Reactions on NEW cards not read.
 - Nothing written to routine config, state files or memory.md.
+- 16:44 · Michael asked for links + guided mode. All listing links posted; guiding one decision at a time.
+- 16:44 · Michael: ED-type roles "a little too big right now." Corso reframed as shape, not size (ED = board/donors, not production).
+- 16:45 · **Ruled (D10):** Redhouse ED cut · Hanover VP kept as one long-shot · focus Powerhouse PM + Court Director. Decision log commit 6c28ed2c.
+- 16:46 · Next guided question: Hubbard October application outcome.
 
 ### S4 · 2026-09-21 01:35 ET · Job-market 09-20 pass debrief (first seating in 48 days)
 
