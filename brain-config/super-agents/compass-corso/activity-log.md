@@ -7,19 +7,20 @@
 
 ## LIVE STATE
 
-*Stamped 2026-11-14 17:02 ET.*
+*Stamped 2026-11-14 17:37 ET.*
 
 | Project | Status | Last touched |
 |---------|--------|--------------|
 | Career portrait | Ledgers A-D populated. Credential gap closed 09-21. **Market reads in memory.md are vintage 09-21 or older**; this pass's reads live in S5 below until curated in. **D10 (11-14): ED tier off-thesis this cycle. D11 (11-14): comp floor split, $90k moves / $70k rest roles.** | 2026-11-14 |
 | Sweep debrief | **5 debriefs run** (7/31, 8/4 13:20, 8/4 16:20, 9/21 01:35, **11/14 16:45**). Portrait confidence MEDIUM-HIGH after S5 rulings; market reads vintage 11-14. | 2026-11-14 |
 | Routine optimization | **3 proposals carried, none ruled** (09-21 c-suite keywords now applied in roles.json per ADM sweep; remaining: breadth-vs-verification split · rank by `requirements` gating · org-signal read). **+3 new 11-14:** cap ACCESSIBLE at top 3 per tier · down-rank ED-titled rows per D10 · write D11 split floor into evaluation.md. | 2026-11-14 |
-| Open questions to Michael | **None.** (1) Redhouse CLOSED: cut per D10. (2) Hubbard CLOSED: dead. (3) Comp floor CLOSED: D11 split. | 2026-11-14 |
-| Active targets | Powerhouse Arts PM (apply now, guided next) · Court Theatre Director Producing & Artistic Ops (next rung) · Hanover VP (one long-shot application). | 2026-11-14 |
+| Open questions to Michael | **1:** why Powerhouse is a pass for now (asked 17:37; answer shapes Court read). | 2026-11-14 |
+| Active targets | Court Theatre Director Producing & Artistic Ops (next rung, guided next) · Hanover VP (one long-shot application). | 2026-11-14 |
+| 📌 Exemplars (closed, kept for shape) | **Powerhouse Arts PM, Live Programs & Rentals** ($100-110k, Brooklyn, Greenhouse job 6224837004). Passed 11-14 "for now"; Michael: "a good example to keep around." Use as the reference shape for right-sized PM-rung rows. | 2026-11-14 |
 | Applications in flight | **None live.** Hubbard (Oct) closed dead 11-14. | 2026-11-14 |
 | Paige integration | Pattern v0 working. **Owed handoff 11-14:** budget-authority evidence for Director-level applications. | 2026-11-14 |
 | Public Theater goals | Neither listing in the 11-14 inventory. Status as goals unchanged; postings not live. | 2026-11-14 |
-| 📏 memory.md budget | AT the ~10KB hot cap. **No memory.md write in S5**; AutoCAD-band pattern, D10 and D11 (Ledger B floor line) wait for a curation pass. | 2026-11-14 |
+| 📏 memory.md budget | AT the ~10KB hot cap. **No memory.md write in S5**; AutoCAD-band pattern, D10, D11 (Ledger B floor line) and the Powerhouse exemplar wait for a curation pass. | 2026-11-14 |
 
 ---
 
@@ -45,6 +46,7 @@ Debrief comment: https://app.clickup.com/t/86ajtgbt3?comment=1400600000209351&th
 - 16:59 · Next guided question: comp floor (open since 09-21). Corso proposal: split floor, $90k for career moves, $70k for D8-style rest positions.
 - 17:02 · **Ruled (D11):** split floor accepted. $90k moves / $70k rest roles / drafting outside floor. Decision log commit af200d91. All three S4/S5 open questions now closed.
 - 17:02 · Next guided step: Powerhouse Arts PM application readiness.
+- 17:37 · **Powerhouse: PASS for now, kept closed as exemplar.** Michael: "i'll pass on it for now (but a good example to keep around closed)." Moved from Active targets to Exemplars. Asked the reason (feeds Court read).
 
 ### S4 · 2026-09-21 01:35 ET · Job-market 09-20 pass debrief (first seating in 48 days)
 
