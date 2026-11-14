@@ -192,6 +192,7 @@ teaching break (roughly mid-May to mid-August 2027) with paid, enjoyable, schedu
   inclusion ruling is still owed and now matters.
 - **Freelance scenic / design gigs, drivable from Rochester** (Alleyway Buffalo, Irish Classical,
   BLAAC Syracuse, Geva overhire). Timing per production, not per summer.
+  **→ Superseded 17:45-17:48 by D13.**
 
 **Out of the summer lane:** full-time drafting staff roles (PRG, Hudson, Jack Morton, GPJ). They
 require leaving the teaching job.
@@ -205,3 +206,42 @@ fit and enjoyment.
 
 **Routine proposal (not applied):** tag rows with an engagement window and surface a SUMMER
 cut (May-Aug engagement or remote/contract) as its own section in the pass.
+
+---
+
+## D13 · 2026-11-14 · The summer lane is festival design-team seats, not open calls
+
+Two corrections from Michael inside three minutes:
+- 17:45 "I haven't really designed a set, actually, ever." → scenic design gigs are OUT. Corso
+  had listed them without checking the portfolio.
+- 17:48 "those are mostly just open calls on websites... the Opera Theatre of St. Louis is
+  probably what I [meant]... so that's the lane. [MJT, Irish Classical, Kavinoky] not that exciting."
+
+**Ruling (Michael's words, Corso's framing):** the target shape is a **named, dated, paid seat on a
+professional festival / repertory design or lighting team.** Reference row: Opera Theatre of
+Saint Louis, 2027 Festival Season Assistant Lighting Designer (May 16 - Jun 27 2027, $1,000-1,200
+per week per OffStageJobs, four operas in rotating rep; duties = lighting paperwork, festival
+plot, cue/design tracking, changeovers).
+
+**Why it fits better than Corso first saw:** the assistant-LD job is mostly PAPERWORK and PLOT
+maintenance (Lightwright, Vectorworks, tracking) plus ME-adjacent changeover support. That is his
+credentialed core (ME since 2020, Lightwright 6, Vectorworks, teaches lighting), not a design-
+portfolio stretch. And the assistant seat is how a design book gets built.
+
+**Demoted:** standing open calls and design pools on company websites (MJT, Irish Classical,
+Kavinoky, BLAAC) are NOTABLE prose, never highlighted rows. A pool is not a vacancy.
+
+**Same-shape seats found 17:48 (web, verify before acting):** Glimmerglass Lighting Programmer
+(summer seasonal, housing; season Jul 12 - Aug 22 2027; more staff postings 2026-11-20) ·
+Stratford Festival 2027 Assistant LD contracts (Ontario; Canadian work-authorization gate,
+same class as the owed UK work-rights ruling) · Santa Fe Opera (no seasonal postings yet;
+season Jul 2 - Aug 28 2027).
+
+**Stacking note:** OTSL ends Jun 27; Glimmerglass mainstage opens Jul 12. A two-festival summer
+is calendar-possible, subject to Glimmerglass contract start dates.
+
+**Routine proposal (not applied, config is the single claimant):** the `assistant/associate
+lighting designer` keywords already exist in `electrician`; the gap is SOURCES. Add festival /
+opera / rep companies' own careers pages as a sweep set (OTSL, Glimmerglass, Santa Fe, Des Moines
+Metro, Central City, Stratford, Shaw, Utah Shakes, Oregon Shakes, Williamstown, Berkshire, Spoleto)
+and a FESTIVAL DESIGN highlight block in the pass summary.
