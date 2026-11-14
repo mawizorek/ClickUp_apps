@@ -115,6 +115,8 @@ essentially like getting paid more." The SCR Sound + Video Supervisor at $75,760
 best single "take pressure off while building toward the next rung" listing. Not a career
 move, a strategic rest position.
 
+**Floor for this class set 2026-11-14 by D11: $70k.**
+
 ---
 
 ## D9 · 2026-08-04 · Continuity lives in git, not Brain memory
@@ -145,3 +147,24 @@ PM → Director of Production.
 
 **Operational effect:** ED-titled rows no longer earn ACT in debriefs. Routine-side down-ranking
 is a proposal only (see activity log), not applied.
+
+---
+
+## D11 · 2026-11-14 · Comp floor is split by role class
+
+Open since 09-21: declared $90k soft floor (evaluation.md) vs earned $70k real floor (Ledger B,
+S1 08-02). Corso proposed a split; Michael ruled it by button 17:02.
+
+**Ruling:**
+- **Career moves (rung-up, on-thesis PM → DoP): $90k floor.** $100-150k stays the target band.
+- **Rest positions (D8 class: same pay, less responsibility, e.g. audio supervisor seats): $70k
+  floor.** These are judged on pressure relief, not trajectory.
+- D7 drafting contracts stay outside the floor entirely (weekly-rate, income + enjoyment).
+
+**Why it settles the tension:** both numbers were true; they described different job classes.
+Every active target (Powerhouse $100-110k, Court $90-110k, Hanover $135-150k) clears $90k, so the
+split removes nothing from the board.
+
+**Operational effect:** debriefs tag sub-$90k rows as REST or OUT, never ACT-as-move. Writing the
+split into `routines/job-market-evaluation.md` and Ledger B is a proposal / curation item, not
+applied (memory.md at cap).
