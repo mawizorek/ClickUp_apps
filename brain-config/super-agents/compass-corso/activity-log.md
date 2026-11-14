@@ -7,21 +7,21 @@
 
 ## LIVE STATE
 
-*Stamped 2026-11-14 17:41 ET.*
+*Stamped 2026-11-14 17:45 ET.*
 
 | Project | Status | Last touched |
 |---------|--------|--------------|
-| Career portrait | Ledgers A-D populated. Credential gap closed 09-21. **Market reads in memory.md are vintage 09-21 or older**; this pass's reads live in S5 below until curated in. **D10: ED tier off-thesis this cycle. D11: comp floor split, $90k moves / $70k rest roles. D12: near-term focus = summer work around the teaching job.** | 2026-11-14 |
+| Career portrait | Ledgers A-D populated. Credential gap closed 09-21. **Market reads in memory.md are vintage 09-21 or older**; this pass's reads live in S5 below until curated in. **D10: ED tier off-thesis this cycle. D11: comp floor split, $90k moves / $70k rest roles. D12: near-term focus = summer work around the teaching job.** **New fact 11-14: zero scenic design credits ever; design portfolio = lighting / projection-video / sound, TBC.** | 2026-11-14 |
 | Sweep debrief | **5 debriefs run** (7/31, 8/4 13:20, 8/4 16:20, 9/21 01:35, **11/14 16:45**). Portrait confidence MEDIUM-HIGH after S5 rulings; market reads vintage 11-14. | 2026-11-14 |
-| Routine optimization | **3 proposals carried, none ruled** (09-21 c-suite keywords now applied in roles.json per ADM sweep; remaining: breadth-vs-verification split · rank by `requirements` gating · org-signal read). **+4 new 11-14:** cap ACCESSIBLE at top 3 per tier · down-rank ED-titled rows per D10 · write D11 split floor into evaluation.md · SUMMER cut section per D12. | 2026-11-14 |
-| Open questions to Michael | **1:** which summer bucket to work first (asked 17:41). Powerhouse "why" answered implicitly by D12 (staying in seat this cycle). **Owed ruling now load-bearing:** AI/SME evaluator platforms in or out. | 2026-11-14 |
-| ☀️ Summer lane (D12, PRIMARY near-term) | Window ~mid-May to mid-Aug 2027. Buckets: summer stock PM/seasonal · remote design/drafting projects · drivable freelance design. Shortlist in S5 17:41. | 2026-11-14 |
+| Routine optimization | **3 proposals carried, none ruled** (09-21 c-suite keywords now applied in roles.json per ADM sweep; remaining: breadth-vs-verification split · rank by `requirements` gating · org-signal read). **+5 new 11-14:** cap ACCESSIBLE at top 3 per tier · down-rank ED-titled rows per D10 · write D11 split floor into evaluation.md · SUMMER cut section per D12 · drop scenic-designer gigs (no portfolio), keep LX/projection/sound design gigs. | 2026-11-14 |
+| Open questions to Michael | **1:** which design disciplines he holds real credits/documentation in (asked 17:45; feeds portfolio + freelance bucket). Summer bucket choice parked behind it. **Owed ruling now load-bearing:** AI/SME evaluator platforms in or out. | 2026-11-14 |
+| ☀️ Summer lane (D12, PRIMARY near-term) | Window ~mid-May to mid-Aug 2027. Buckets: summer stock PM/seasonal · remote design/drafting projects · drivable freelance design (**re-scoped 17:45 to LX/projection/sound**). Shortlist in S5 17:41 + 17:45. | 2026-11-14 |
 | Move lane (WATCH) | Court Theatre Director Producing & Artistic Ops · Hanover VP (one long shot). Not dead; parked behind D12. | 2026-11-14 |
 | 📌 Exemplars (closed, kept for shape) | **Powerhouse Arts PM, Live Programs & Rentals** ($100-110k, Brooklyn, Greenhouse job 6224837004). Passed 11-14 "for now"; Michael: "a good example to keep around." Reference shape for right-sized PM-rung rows. | 2026-11-14 |
 | Applications in flight | **None live.** Hubbard (Oct) closed dead 11-14. | 2026-11-14 |
-| Paige integration | Pattern v0 working. **Owed handoff 11-14:** budget-authority evidence for Director-level applications (now lower priority under D12); summer-stock PM resume cut is the likelier next ask. | 2026-11-14 |
+| Paige integration | Pattern v0 working. **Likely next handoff:** design-portfolio inventory (what LX / projection / sound documentation exists; Becoming Curious video work as a piece in progress). Budget-authority evidence handoff now lower priority under D12. | 2026-11-14 |
 | Public Theater goals | Neither listing in the 11-14 inventory. Status as goals unchanged; postings not live. | 2026-11-14 |
-| 📏 memory.md budget | AT the ~10KB hot cap. **No memory.md write in S5**; AutoCAD-band pattern, D10, D11 (Ledger B floor line), D12 and the Powerhouse exemplar wait for a curation pass. | 2026-11-14 |
+| 📏 memory.md budget | AT the ~10KB hot cap. **No memory.md write in S5**; AutoCAD-band pattern, D10, D11 (Ledger B floor line), D12, no-scenic-credits fact and the Powerhouse exemplar wait for a curation pass. | 2026-11-14 |
 
 ---
 
@@ -52,6 +52,9 @@ Debrief comment: https://app.clickup.com/t/86ajtgbt3?comment=1400600000209351&th
 - 17:41 · Summer shortlist surfaced: Peterborough Players PM 2027 Summer ($30/hr) · The Lost Colony PM ($15-19k total, remote prep period) · Glimmerglass seasonal (Calling SM $1,200/wk; Lighting Programmer) · Berkshire Theatre Group 2027 seasonal electrician · remote design review (OpenTrain Set & Production Design Reviewer $50-105/hr; Handshake Technical Design Expert up to $125/hr; AuraOne Vectorworks Expert $19-65/hr) · drivable freelance (Alleyway Buffalo scenic $2,250; Irish Classical submissions; Geva overhire; BLAAC Syracuse). Excluded: full-time drafting staff roles.
 - 17:41 · Named cost: AutoCAD deferral (~summer 2027) collides with the same summer. Not re-proposed.
 - 17:41 · Next guided question: which summer bucket first.
+- 17:45 · **Michael: "I haven't really designed a set, actually, ever."** Corso error caught: 17:41 freelance list was scenic-heavy without checking the portfolio. Alleyway scenic, BLAAC scenic and Irish Classical scenic submissions → OUT. Freelance bucket re-scoped to lighting / projection-video / sound design.
+- 17:45 · Re-pulled design rows: Opera Theatre of Saint Louis Asst LD 2027 Festival ($1,000-1,200, summer fit) · MJT Stages LD continuing team (Rochester) · Irish Classical lighting design submissions (Buffalo) · Kavinoky LD pool (Buffalo). Becoming Curious video/projection work flagged as the portfolio piece being built now (rehearsal-capture task exists).
+- 17:45 · Next guided question: which design disciplines he has real credits/documentation in.
 
 ### S4 · 2026-09-21 01:35 ET · Job-market 09-20 pass debrief (first seating in 48 days)
 
