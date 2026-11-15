@@ -1,48 +1,54 @@
 # Reports Intake | Next-build spec
 
 Status: PLANNING ONLY. Not a live hook, automation, form submission, or authorization to run a backlog.
-Recorded: 2026-09-14, Mainstage Milo session with Michael. v2 direction added 2026-11-14 (J28-J30, Production MAWnster FMP Decision Log J20+).
+Recorded: 2026-09-14, Mainstage Milo session with Michael. v2 direction added 2026-11-14 (J28-J31, Production MAWnster FMP Decision Log J20+).
 Proposed steward: Mainstage Milo (URITP operations).
 
 ## v2 direction (2026-11-14) -- supersedes the intake surface below where they conflict
 
-The 09-14 sections below assume forwards land as comments on a per-show `| reports |` task. That model is retired for new intake. Governing rulings: J28 (ClickUp receives and normalizes, MAWnster stores and builds, Michael connects), J29 (two Email-to-List addresses), J30 (calls are deduplicated and accuracy-checked by rule, not by eye).
+The 09-14 sections below assume forwards land as comments on a per-show `| reports |` task. That model is retired for new intake. Governing rulings: J28 (ClickUp receives and normalizes, MAWnster stores and builds, Michael connects), J29 (two Email-to-List addresses), J30 (calls are deduplicated and accuracy-checked by rule, not by eye), J31 (calls update in place; no superseding versions).
 
 - **Two intake addresses.** Report emails -> Production Reports Email-to-List. Call emails -> Production Calls Email-to-List. Each email = one task (subject -> name, body -> description, attachments + the .eml attached).
-- **Every intake task is an OBSERVATION, not a record.** Normalization decides whether it becomes a record, a new version of one, or a duplicate of one. Nothing is a record just because it arrived.
+- **Every intake task is an OBSERVATION, not a record.** Normalization decides whether it becomes a record, an update to one, or a duplicate of one. Nothing is a record just because it arrived.
 - **Raw body -> comment; description -> clean record.** The Original Statement / CUT & TRIMMED pattern. The raw email is never edited or deleted.
 - **Misrouted email** (a call sent to the reports address or vice versa) is moved to the right list and the move is noted on the task.
-- **No new ClickUp fields** (J27). Normalization uses existing fields, task links and a receipt comment. Production Calls needs the EXISTING `Production` relationship and `URITP Productions` label attached (manual step, Michael).
+- **No new ClickUp fields** (J27). Normalization uses existing fields, task links and a receipt comment. Production Calls needs the EXISTING `Production` relationship and `URITP Productions` label attached (manual step, Michael). The call -> event link is a task link.
 
-## Call identity, dedupe and accuracy (J30)
+## Call identity, dedupe and accuracy (J30, J31)
 
 The failure this prevents: one call reaches ClickUp three or more times (the report's next-call block, the call email, every revised resend). Without an identity rule each one becomes a call and MAWnster inherits the duplicates.
 
 ### Identity
 
-- **One call per EVENT.** Key = `Production` (exact show, J26) + the Production EVENTS task the call summons people to (`cuEventTaskID` in MAWnster).
+- **One call per EVENT, permanently.** Key = `Production` (exact show, J26) + the Production EVENTS task the call summons people to (`cuEventTaskID` in MAWnster).
 - An email covering several days is split into one candidate per event before matching.
 - **No event match = UNMATCHED.** Flag it, never create a call for it, never invent an event (W1: only ClickUp creates events).
 
 ### Sources and authority
 
-- **Only the Production Calls address can create or version a call.**
-- **A report's next-call block is a WITNESS, never a source.** It corroborates the current call version or raises a mismatch flag. It cannot create, supersede or edit a call.
-- **Order versions by the SM's send time** read from the forwarded header, never by ClickUp's task-created time (forwards arrive late and out of order).
+- **Only the Production Calls address can create or change a call.**
+- **A report's next-call block is a WITNESS, never a source.** It corroborates the call or raises a mismatch flag. It cannot create or edit a call.
+- **Order changes by the SM's send time** read from the forwarded header, never by ClickUp's task-created time (forwards arrive late and out of order).
+
+### Update in place (J31)
+
+The first call email for an event becomes the call task. Every later email for that event edits the call's lines in place and appends one receipt line; the later intake task is closed and task-linked to the call. History lives in the surviving source emails and the receipt, not in version records. There is no superseded state.
 
 ### Outcomes (every call intake task gets exactly one)
 
 Call lines are compared as a normalized set: target as written, resolved role or assignment, time, location, note.
 
-1. **NEW** -- no call exists for the key. This task becomes v1.
-2. **DUPLICATE** -- same line set as the current version. Close the task as a duplicate, link it to the canonical call, add its source to the canonical receipt. Never a new version. Not merged (a merge destroys the separate source object).
-3. **REVISION** -- differs from the current version and was sent later. Becomes vN+1, supersedes the current version (task link + receipt), diff written in plain words (`+ Actor A 6:00p`, `Crew B 6:30p -> 7:00p`, `- Actor C removed`). Prior version closed as superseded.
-4. **DELTA REVISION** -- an email that lists only changes (`updated: Actor A now 7p`). Applied onto the current version to produce a FULL vN+1, marked delta-sourced. 🔴 A delta is never treated as a full replacement; that silently un-calls everyone it doesn't mention.
-5. **STALE** -- differs but was sent EARLIER than the current version. Recorded as a historical version, supersedes nothing, flagged as an out-of-order forward.
-6. **CANCELLATION** -- the call or the event is cancelled. A version with a cancelled state. Never a deletion.
+1. **NEW** -- no call exists for the key. This task becomes the call.
+2. **APPLIED** -- differs from the call and was sent later. The call's lines are updated, the diff is written in plain words on the receipt (`+ Actor A 6:00p`, `Crew B 6:30p -> 7:00p`, `- Actor C removed`), the intake task is closed as applied and linked.
+3. **APPLIED (DELTA)** -- an email that lists only changes (`updated: Actor A now 7p`). Applied onto the current lines, marked delta on the receipt. 🔴 A delta never replaces the full line set; that silently un-calls everyone it doesn't mention.
+4. **DUPLICATE** -- same line set as the call. Intake task closed as duplicate and linked; source added to the receipt. Nothing on the call changes. Not merged (a merge destroys the separate source object).
+5. **STALE** -- differs but was sent EARLIER than the last applied email. Noted on the receipt as an out-of-order forward, flagged, changes nothing.
+6. **CANCELLATION** -- the call or event is cancelled. The call's state becomes cancelled. Never a deletion.
 7. **UNMATCHED** -- no event. Flagged, not imported.
 
-### Accuracy checks (run on every NEW / REVISION / DELTA version)
+States: call = live / cancelled. Source email = applied / duplicate / flagged (stale and unmatched are flagged).
+
+### Accuracy checks (run on every NEW and APPLIED change)
 
 Each failed check produces a named flag on the receipt. Never a silent fix; source wording is preserved.
 
@@ -50,29 +56,24 @@ Each failed check produces a named flag on the receipt. Never a silent fix; sour
 - **Event fit** -- call times sit at or before the event window from Production EVENTS. A call after the event ends, or on a different date than the event, is flagged.
 - **AM/PM sanity** -- times read against the event's time of day (a `6:00` evening rehearsal call is 6:00p).
 - **Target resolution** -- each line resolves to exactly one role XOR one assignment (W1). Unresolved or ambiguous names are flagged; spelling is kept as written.
-- **Dropped people** -- anyone on vN-1 and absent from vN is listed explicitly. An unannounced drop is the most dangerous error a call can carry.
-- **Witness cross-check** -- the most recent report's next-call block against the current call version. Each disagreeing line is named.
-- **Missing call** -- an event in the next 48 hours that calls people and has no call version is a finding (a stage-management follow-up, same as a report that never arrived).
+- **Dropped people** -- anyone on the call before the change and absent after it is listed by name. An unannounced drop is the most dangerous error a call can carry.
+- **Witness cross-check** -- the most recent report's next-call block against the call. Each disagreeing line is named.
+- **Missing call** -- an event in the next 48 hours that calls people and has no call is a finding (a stage-management follow-up, same as a report that never arrived).
 - **Restricted content** -- health / body / injury / allergy / accommodation text in a call stays fenced and restricted (J23).
 
-### Receipt (one comment on the canonical call, updated by appending)
+### Receipt (one comment on the call, appended per source email)
 
-`vN · outcome · sent <SM send time> · sources: <intake task links> · diff: <plain words> · flags: <named checks or none>`
+`<SM send time> · outcome · source: <intake task link> · diff: <plain words> · dropped: <names or none> · flags: <named checks or none>`
 
-Michael enters the CURRENT version into MAWnster (CALLS + CALL_LINES, `fkSupersedes` to the prior version). Duplicates are never entered. Earlier versions are entered only if he wants the audit trail.
+Michael enters the call into MAWnster as one CALLS row per event (+ CALL_LINES) and edits it when the receipt shows an applied change. No `fkSupersedes` (dropped by J31).
 
 ### Idempotence
 
-A rerun over the same intake tasks changes nothing: no new versions, no new links, no repeated receipt lines. A duplicate that is already closed and linked is left alone.
+A rerun over the same intake tasks changes nothing: no line edits, no new links, no repeated receipt lines. A source already closed and linked is left alone.
 
 ### Reports get the same identity rule
 
-Report key = `Production` + event + report type. A resent identical report is a DUPLICATE; a corrected report is a REVISION with the diff on the receipt. Notes already created from the earlier version are re-checked, never re-created.
-
-### Open on Michael
-
-- Production Calls statuses that express current / superseded / duplicate / flagged (agent can't define a list's status set).
-- Whether superseded versions get entered into MAWnster or only the current one.
+Report key = `Production` + event + report type. A resent identical report is a DUPLICATE; a corrected report is APPLIED onto the existing report record with the diff on the receipt. Notes already created from the earlier send are re-checked, never re-created.
 
 ## Settled requirements from Michael
 
@@ -151,9 +152,10 @@ IMPORTANT: form-equivalent task creation is not a literal form submission. Do no
 - Define the final meaning of Notes Done. The form displays it as No Notes?, while the stored name suggests intake completion. Do not set it true after linking merely because the name sounds convenient.
 - Trigger: explicit invocation first, or an existing receiving automation/agent integration? No background capability is established by this planning document.
 - Repeated note text across successive reports: identify whether these are separate source occurrences or one continuing action with multiple report references. Do not collapse automatically.
-- Source revisions and conflicting source/canonical dates: keep evidence intact and ask only on unresolved identity, rather than inventing a precedence rule. (Calls: precedence IS now ruled by send time, see J30 above.)
+- Source revisions and conflicting source/canonical dates: keep evidence intact and ask only on unresolved identity, rather than inventing a precedence rule. (Calls: precedence IS now ruled by send time, see J30/J31 above.)
 - Required form answer missing from the received report: determine whether corroborating source evidence is enough or the report must wait. No fabricated location, attendance, or timestamp.
 - Discover exact status, task type, naming rules, due-date behavior, and any creation-trigger side effects from the live form plus recent outputs. Avoid reproducing incidental manual edits as form defaults.
+- Production Calls statuses for live / cancelled (calls) and applied / duplicate / flagged (sources): Michael sets them; the agent can't define a list's status set.
 
 ## Guardrails
 
@@ -174,7 +176,7 @@ Use one unambiguous existing report/note pair, then one missing report sourced f
 - Verify REPORT points to the canonical instance, never the archive or calendar event.
 - Verify a rerun makes no duplicate objects or relationship additions.
 - Test an after-midnight forward, a NEXT CALL date, an AM/PM discrepancy, duplicate note text, an existing conflicting link, a missing required answer, a no-notes report, and a revised attachment.
-- Calls (J30): test an identical resend, a full revision, a delta-only revision, an out-of-order forward, a multi-day call email, a call with no matching event, a dropped person, and a report next-call that disagrees with the call.
+- Calls (J30/J31): test an identical resend, a full change, a delta-only change, an out-of-order forward, a multi-day call email, a call with no matching event, a dropped person, and a report next-call that disagrees with the call.
 - Explicitly distinguish verified form-equivalent output from unverified form-trigger behavior.
 - Publish the runtime hook only after the pilot and unresolved scope decisions are closed. Keep the routing entry non-live until then.
 
@@ -182,4 +184,4 @@ Use one unambiguous existing report/note pair, then one missing report sourced f
 
 The requirements and form mappings have been inspected and recorded. No report-intake runtime hook was found in the hooks directory read this session; workspace search did not establish another canonical one. No report or note has been created or linked as part of this intake-planning work. The previously discussed September 13 source PDF is evidence for a possible pilot, not proof its canonical report is still missing at execution time.
 
-2026-11-14: v2 direction and J30 call rules added. Still planning only; no call has been created or versioned under these rules yet.
+2026-11-14: v2 direction and J30/J31 call rules added. Still planning only; no call has been created or updated under these rules yet. First BC forward is the pilot, run by hand on Michael's "normalize".
