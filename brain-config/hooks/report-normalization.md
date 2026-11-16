@@ -1,30 +1,62 @@
 ---
 id: report-normalization
 kind: hook
-version: 1.1
-status: LIVE (fires as part of morning briefing, not standalone)
+version: 2.0
+status: LIVE (fires as part of morning briefing, and on direct invocation on a report task)
 steward: Mainstage Milo
+schema owner: FMP Fiona (EVENT_REPORTS and its family are hers; this file may not rename a field)
 execution: morning briefing pre-pass (fires BEFORE the briefing blocks)
 born: 2026-09-15
 repo: mawizorek/ClickUp_apps@main (brain-config, PUBLIC)
 trigger: /morning (via morning-briefing.md) OR direct invocation on a report task
+companion: hooks/call-normalization.md (the call half) - hooks/reports-intake.next-build-spec.md (the ruling record) - hooks/report-normalization.naming.md (source filename standard)
 ---
 
 # Report Normalization -- rehearsal report intake
 
-Parses forwarded stage manager emails into structured Production Report tasks and their associated Production Notes, then links them. This is the routine that turns Bia's nightly email into actionable, department-tagged, linked work.
+Parses forwarded stage manager emails into structured Production Report tasks and their associated Production Notes, then links them. This is the routine that turns the nightly SM email into actionable, department-tagged, linked work.
+
+## 🔴 v2 -- THE TARGET IS THE FMP SCHEMA (J28, and Michael 2026-11-16)
+
+Michael, 2026-11-16: the call and report hooks are normalization **toward the FMP methods and schema**. J28, 2026-11-14: *"FileMaker will be the actual storage for the data and the build. ClickUp will be the working surface that receives and normalizes the data."*
+
+**So normalization aims at MAWnster's grain, in MAWnster's vocabulary, and writes nothing MAWnster would not hold.** J24 is the framing: *"you're just doing the FileMaker automation until we have the FileMaker schema built."* A ClickUp field that exists only because ClickUp cannot do something is marked a workaround the moment it is used, so it does not survive the migration it was meant to precede.
+
+### The target tables (J20, as amended by J22 / J27 / J31)
+
+- **`EVENT_REPORTS`** -- one row per report. Base entity. `fkEvent` is **required**; a report with no matching event is flagged, never silently imported.
+- **`REPORT_ATTENDANCE`** -- report x person x category. This is what the three ClickUp attendance text fields normalize INTO. One row per person, never three lists of names.
+- **`REHEARSAL_EXT`** -- 1:1 where the event is a rehearsal. What was rehearsed, next-rehearsal detail, scene/act work, rehearsal numbering, cumulative hours.
+- **`PERFORMANCE_EXT`** -- 1:1 where the event is a performance. Act starts/ends, run times, intermission, house count, house manager, calling and deck SM, board ops, INs/OUTs, accident/injury, audience reaction.
+- **`REHEARSAL_BLOCKS`** -- child rows for a multi-location or segmented rehearsal day. `fkUnit` nullable, parked on the script breakdown.
+- Work-call reports ride the base with no extension.
+- **Department notes stay in ClickUp** (Production Notes tasks, their own lifecycle) unless a printed FMP layout needs them. Do not create an FMP notes table just because ClickUp has note tasks.
+
+🔴 **`report_type` is NOT stored** (J22). Rehearsal / performance / work call is a property of the EVENT, read by both reports and calls through `fkEvent`. Tech and dress are a rehearsal PHASE, not a fourth type.
+
+### Field names, conformed to MAWnster data standards
+
+Read `apps/production-mawster/data-standards.md` in `mawizorek/maw-prose` before using any name from the J20 block. `PrimaryKey` (UUID), `fk<Parent>`, `date_` + CamelCase, `bool_`, `calc_`, `ovr_`, `cu` for integration keys, and the five audit fields spelled out on every table. So: **`PrimaryKey`, `date_Start`, `date_End`, `bool_NotesDone`, `cuEventTaskID`, `bool_Restricted`** -- not J20's `pkReportID`, `date_start`, `date_end`, `notes_done`. `ExecuteSQL` embeds names as text, so a rename returns empty rather than an error; names lock before any calc.
+
+### Report identity, same rule as calls (J30)
+
+Report key = `Production` (exact show, J26) + event + report type. A resent identical report is a DUPLICATE. A corrected report is APPLIED onto the existing record with the diff on the receipt. Notes already created from the earlier send are re-checked, never re-created.
+
+### ⚠️ The intake surface below is RETIRED for new intake (J28, J29)
+
+New forwards land as their own task at the Production Reports Email-to-List address, one email per task. The per-show `| reports |` sections that follow are **history and backfill source**: existing comments stay as evidence, and the two-surface model still describes everything already captured there. Where this file and `hooks/reports-intake.next-build-spec.md` disagree on the intake surface, the spec wins.
 
 ## Why this exists
 
-The stage manager emails a rehearsal report every night. That email lands as a comment on the production's `| reports |` task (the CANONICAL source). A separate system (ClickBot) creates skeleton tasks in the Production Reports list. This hook bridges the two: it reads the email, fills the skeleton, and creates the department notes.
+The stage manager emails a rehearsal report every night. That email lands as a comment on the production's `| reports |` task (the CANONICAL source for everything captured before J29). A separate system (ClickBot) creates skeleton tasks in the Production Reports list. This hook bridges the two: it reads the email, fills the skeleton, and creates the department notes.
 
 Without it, every report sits with placeholder text in its fields and zero notes linked. Michael was doing this by hand.
 
 ---
 
-## THE CANONICAL SOURCE
+## THE CANONICAL SOURCE (pre-J29 captures)
 
-**The `| reports |` task in the production's Paperwork list is the single source of truth.** Every forwarded email lives as a comment on this task. The Production Reports list tasks are the ClickUp-structured version, NOT the source.
+**The `| reports |` task in the production's Paperwork list is the single source of truth for every forward captured before the Email-to-List switch.** Every forwarded email lives as a comment on this task. The Production Reports list tasks are the ClickUp-structured version, NOT the source.
 
 **Finding the reports task:** each production folder (e.g. `Big Love (F26)`) has a Breakdowns subfolder containing a Paperwork list. The `| reports |` task lives there. Pattern: `[SHOW] | reports |`.
 
@@ -40,7 +72,7 @@ Michael, 2026-09-17, during a live `/milo` morning wakeup:
 
 **THE TWO-SURFACE MODEL, and it is the whole architecture:**
 
-- **The FORWARD lives LOCALLY.** The stage manager's forwarded email stays as a comment on that production's own `| reports |` task, in that production's own Paperwork list. It never moves, never gets copied to a central list, never gets edited.
+- **The FORWARD lives LOCALLY.** The stage manager's forwarded email stays as a comment on that production's own `| reports |` task, in that production's own Paperwork list. It never moves, never gets copied to a central list, never gets edited. ⚠️ Post-J29 the forward's local home is its own intake task instead; the principle (evidence is never edited) is unchanged.
 - **The INSTANCE lives CENTRALLY.** Every rehearsal produces one row in the shared Production Reports list (`901328331141`), tagged to its show via `URITP Productions`, which is the surface Michael checks off.
 
 ⭐ **Why both: the forward is EVIDENCE and belongs next to the show; the instance is WORK and belongs in one queue.** A single central list of instances is how a production manager running five shows sees one night's obligations in one read. Five separate per-show report lists would rebuild the problem this list solved.
@@ -48,19 +80,19 @@ Michael, 2026-09-17, during a live `/milo` morning wakeup:
 ### The sweep, per run
 
 1. **Enumerate live productions from the FOLDERS**, exactly as the briefing's ROLL CALL does -- never from what came up in conversation. A show that rehearsed and was not enumerated is invisible to this hook.
-2. **For each one, ask: did it rehearse last night?** Read its `| reports |` task for a comment newer than the last processed instance. ⚠️ **The email routinely arrives AFTER midnight** -- Bia's Sep 16 report landed at 12:14 AM on Sep 17. **Key on the REHEARSAL date in the email, never on the comment's timestamp.**
+2. **For each one, ask: did it rehearse last night?** Read its intake surface for a forward newer than the last processed instance. ⚠️ **The email routinely arrives AFTER midnight** -- a Sep 16 report landed at 12:14 AM on Sep 17. **Key on the REHEARSAL date in the email, never on the comment's timestamp.**
 3. **Match, normalize, create notes, link** per the sections below.
-4. **A production with no new comment is reported as "no report received," NOT as clean.** Say which: no rehearsal called, or a rehearsal that owes a report. The second one is a stage-management follow-up and it is a finding.
+4. **A production with no new forward is reported as "no report received," NOT as clean.** Say which: no rehearsal called, or a rehearsal that owes a report. The second one is a stage-management follow-up and it is a finding.
 
 ### 🔴 THE INTAKE PRECONDITION -- and it is a real gap, verified live
 
-**A production with no `| reports |` task CANNOT be swept.** There is nowhere for its forwards to land, so no instance can ever be built for it, and the sweep will report zero forever while looking healthy.
+**A production with no intake surface CANNOT be swept.** There is nowhere for its forwards to land, so no instance can ever be built for it, and the sweep will report zero forever while looking healthy.
 
-**So the sweep checks for the SURFACE, not just the content**, and it raises a missing intake task as a finding **BEFORE that show's first rehearsal, not after.** Verified state 2026-09-17: Big Love has one, One Acts and The Christians have retired/closed ones, and **Becoming Curious, T.I.M.E., The Secretary and Songs for a New World have none** -- with Becoming Curious rehearsing from Sep 22.
+**So the sweep checks for the SURFACE, not just the content**, and it raises a missing intake surface as a finding **BEFORE that show's first rehearsal, not after.** Verified state 2026-09-17: Big Love had one; One Acts and The Christians had retired/closed ones; **Becoming Curious, T.I.M.E., The Secretary and Songs for a New World had none** -- with Becoming Curious rehearsing from Sep 22. ⚠️ Post-J29 the central Email-to-List address removes the per-show precondition for reports; the finding survives for anything still routed per show.
 
-⚠️ **The lead time is the point.** An intake task created the morning after the first report was emailed means that report was already lost to somebody's inbox. **Flag it when first rehearsal is on the horizon, not when the email bounces.**
+⚠️ **The lead time is the point.** An intake surface created the morning after the first report was emailed means that report was already lost to somebody's inbox. **Flag it when first rehearsal is on the horizon, not when the email bounces.**
 
-🚫 **The hook does NOT create the intake task itself.** It needs an email-forwarding address confirmed against the sending account, which is Michael's setup step. The hook names the show, the date it starts rehearsing, and the list the task belongs in.
+🚫 **The hook does NOT create the intake task or the email address itself.** Both need an address confirmed against the sending account, which is Michael's setup step. The hook names the show, the date it starts rehearsing, and the list the surface belongs in.
 
 ---
 
@@ -70,7 +102,7 @@ Michael, same turn: *"check rehearsal report TASKS against my rehearsal report r
 
 **Creating what is missing is only half the job.** The other half is proving that what already exists matches its source. Run this over the whole Production Reports list, not just last night's row, and report **five named mismatch classes**:
 
-1. **EMAIL WITH NO INSTANCE** -- a forward on a `| reports |` task with no matching report row. This is the create case. It is also the most common one after a busy week.
+1. **EMAIL WITH NO INSTANCE** -- a forward with no matching report row. This is the create case. It is also the most common one after a busy week.
 2. **INSTANCE WITH NO EMAIL** -- a report row whose date has no forward behind it. 🚫 **Never delete it and never fabricate content for it.** Say so and let Michael rule: usually it is a ClickBot skeleton for a rehearsal whose report never arrived, which is a stage-management finding, not a data-cleanup one.
 3. **NOTES CREATED, `Notes Done` UNTICKED** -- the checkoff backlog. This is Michael's confirmation queue and it belongs in the briefing's GATEKEEPER block, grouped and aged. 🚫 **The hook NEVER ticks it** (see Authority).
 4. **`Notes Done` TICKED, ZERO NOTES LINKED** -- ambiguous by construction and it must be disambiguated against the EMAIL, never assumed. "No notes, thanks!" across every section is a legitimately empty report and correctly ticked. A report with real department content and no notes is a miss.
@@ -85,19 +117,19 @@ Michael, same turn: *"check rehearsal report TASKS against my rehearsal report r
 ## Scope
 
 **IN:** Every production in the URITP PRODUCTIONS space that has:
-1. A `| reports |` task with email comments
+1. An intake surface with forwarded report emails
 2. Corresponding tasks in the Production Reports list
 3. Unprocessed reports (Notes Done != true AND Production Notes IS NULL)
 
-**OUT:** Reports already marked Notes Done = true. Reports that already have Production Notes linked. Reports with no matching email on the `| reports |` task (flag as a gap, do not fabricate).
+**OUT:** Reports already marked Notes Done = true. Reports that already have Production Notes linked. Reports with no matching email (flag as a gap, do not fabricate).
 
 ---
 
 ## Matching an email to a report
 
-Each email comment contains a date line (e.g. `date: 9/9/26` or appears in the subject line as `[BL] 9/2/26 Rehearsal Report`). Match this to the Production Reports task whose Report Date START falls on the same calendar date.
+Each email contains a date line (e.g. `date: 9/9/26` or in the subject as `[BL] 9/2/26 Rehearsal Report`). Match this to the Production Reports task whose Report Date START falls on the same calendar date.
 
-When the email lacks an explicit date line, parse it from the PDF filename in the comment (e.g. `05. Rehearsal Report 9_2_26 - Sheet1.pdf`).
+When the email lacks an explicit date line, parse it from the PDF filename (e.g. `05. Rehearsal Report 9_2_26 - Sheet1.pdf`).
 
 🔴 **WHEN THE DATE LINE AND THE PDF FILENAME DISAGREE, THE FILENAME AND THE CONTENT WIN, AND THE CONFLICT GETS STATED.** Verified live: the report headed `date: 9/15/26` carried the PDF `16. Rehearsal Report 9_14_26` and described the Monday designer run, which was Sep 14. A stage manager typing a date at 1 AM is the least reliable field in the email. Cross-check against the previous report's `next call` line, which is written while the schedule is in front of her.
 
@@ -109,17 +141,17 @@ If no match: flag it in the briefing output. Do not create orphan notes.
 
 Parse these from the email body and write to the matching Production Reports task's custom fields:
 
-| Field | Source in email | Custom Field ID |
-|---|---|---|
-| Event Summary | REHEARSAL SUMMARY section | `3304bf53-95ef-42fa-8bae-6e8e9d5ed15b` |
-| timings: Event Details | The left-hand time/description column | `58e9a572-1263-47ce-a465-e824e08c0286` |
-| timings: NEXT Event Details | The "next call" column | `785f12d7-9172-42ec-be71-f4e286370c7e` |
-| Report Date END | End time from the email header | `22615620-8b96-4da0-90ae-f9bfcea627e7` |
-| attendance fields | Actors, Management, Production lines | respective text fields |
+| Field | Source in email | Custom Field ID | FMP target |
+|---|---|---|---|
+| Event Summary | REHEARSAL SUMMARY section | `3304bf53-95ef-42fa-8bae-6e8e9d5ed15b` | `EVENT_REPORTS` summary |
+| timings: Event Details | The left-hand time/description column | `58e9a572-1263-47ce-a465-e824e08c0286` | `REHEARSAL_BLOCKS` rows |
+| timings: NEXT Event Details | The "next call" column | `785f12d7-9172-42ec-be71-f4e286370c7e` | witness only, feeds no call (J30) |
+| Report Date END | End time from the email header | `22615620-8b96-4da0-90ae-f9bfcea627e7` | `date_End` |
+| attendance fields | Actors, Management, Production lines | respective text fields | `REPORT_ATTENDANCE` rows, person x category |
 
-Also update the task description to replace any placeholder text with the parsed content, matching the template format of completed reports.
+Also update the task description to replace any placeholder text with the parsed content, matching the template format of completed reports. Keep the raw email as the Original Statement and the clean record as CUT & TRIMMED.
 
-⚠️ **`URITP Productions` (`588908e1-6f53-46ca-9bab-8d0a12e145c8`) is what makes a central list survive five shows.** Set it on every instance, every time. Big Love is `81fa53ba-0b8a-4313-b45f-27d95b9b399b`; read the field's live options for the rest rather than guessing.
+⚠️ **`URITP Productions` (`588908e1-6f53-46ca-9bab-8d0a12e145c8`) is what makes a central list survive five shows.** Set it on every instance, every time. Big Love is `81fa53ba-0b8a-4313-b45f-27d95b9b399b`; read the field's live options for the rest rather than guessing. ⚠️ Per J26 it is a **marked workaround**: the umbrella is derived from the top of the `Production` relationship's parent chain, never hand-set, and it does not port to MAWnster (`PRODUCTIONS::fkParentProduction` replaces it).
 
 ---
 
@@ -147,6 +179,8 @@ The email has department sections. Standard sections:
 | Links OUT (tasks) | Downstream work this note spawned | `6ea062af-dbcd-47ea-89fd-ffbacb98ab48` |
 
 ⚠️ **`Links OUT` is the "associated links out" half of the job and it is the half that rots.** It points a note at the purchase request, build task or design task that actually answers it. Leave it empty when nothing downstream exists yet -- but a note asking for a purchasable object with no Links OUT and no matching Purchase Request is a real gap, and it belongs in the reconciliation report.
+
+⚠️ **Restricted content (J23):** health, body, injury, allergy, accommodation and personal-circumstance text keeps its note row and its department, and its text stays in ClickUp under access control. Default when unsure is restricted. Nothing in that class is written into a public repo.
 
 ### Department mapping (section header -> Primary Department dropdown ID)
 
@@ -232,7 +266,7 @@ This block appears BEFORE the Gatekeeper block in the briefing output, because i
 2. Creating Production Notes tasks in the Production Notes list, and creating a missing Production Reports instance from a verified email.
 3. Setting the REPORT relationship on the created notes.
 
-NEVER: delete a report, change a report's status to Closed, modify the `| reports |` task or its comments, touch the email content, create a `| reports |` intake task, or mark Notes Done (that is Michael's confirmation that the notes are correct).
+NEVER: delete a report, change a report's status to Closed, modify a forwarded email or its comment, touch the email content, create an intake task or address, attach a field to a list, define a status, or mark Notes Done (that is Michael's confirmation that the notes are correct).
 
 🔴 **`Notes Done` IS THE ONE FIELD THE HOOK MUST NEVER TOUCH, and the reason is structural rather than cautious.** It is the only evidence in the system that a human read the notes. An agent tick makes the field mean "a robot created some tasks," which is exactly what it was invented to distinguish from. A long unticked backlog is therefore a legitimate finding and never a cleanup job.
 
@@ -240,12 +274,13 @@ NEVER: delete a report, change a report's status to Closed, modify the `| report
 
 ## Known limits
 
-- Cannot read PDF attachments on the `| reports |` task reliably (the email comment text is the working source, not the PDF). If the comment text is truncated or garbled, flag it rather than guessing.
+- The email text is the working source, not the PDF. If the text is truncated or garbled, flag it rather than guessing.
 - The "rename when Notes updated" automation is a black box. If it does not fire, the note title stays as created. That is fine; do not chase it.
 - Multiple reports from the same calendar date (e.g. a morning and evening session) require matching on time, not just date. Use the timings in the email to disambiguate.
 - **Cannot tell a night with no rehearsal from a rehearsal whose report never arrived** without reading the show's calendar. Read it, or label the finding unverified.
 - **The sweep is only as complete as the folder enumeration**, and it inherits the ROLL CALL's limit exactly: a production living outside the production folders is invisible to it.
-- ⚠️ **The multi-production sweep has NEVER run against a second production**, because as of 2026-09-17 no second production has an intake surface. Every rule here is generalized from Big Love. **A session that fires this on Becoming Curious's first report is running it for the first time and should say so.**
+- ⚠️ **The multi-production sweep has NEVER run against a second production**, because as of 2026-09-17 no second production had an intake surface. Every rule here is generalized from Big Love. **A session that fires this on Becoming Curious's first report is running it for the first time and should say so.**
+- ⚠️ **`fkEvent` requires EVENTS to exist in MAWnster** before a normalized report can be entered there. J19's hub path is blocked on URITP People's `SYNC_Run`, so events arrive by CSV or by hand until it is not.
 
 ---
 
@@ -253,8 +288,10 @@ NEVER: delete a report, change a report's status to Closed, modify the `| report
 
 Built 2026-09-15 from a live session where Michael walked through the full normalization of the Sep 2 Big Love rehearsal report, then the linking of 5 unlinked notes to their source reports. The methodology correction (use the email source, not timestamps) was Michael's explicit ruling during that session.
 
-The `| reports |` task pattern was discovered at `[BL] | reports |` (task `86ak1p27t`) in Paperwork (BL), Big Love's Breakdowns folder. The pattern is expected to repeat per production.
+The `| reports |` task pattern was discovered at `[BL] | reports |` (task `86ak1p27t`) in Paperwork (BL), Big Love's Breakdowns folder.
 
-**v1.1, 2026-09-17**, folded in during a live `/milo` morning wakeup, from one instruction carrying three separate rulings: **the sweep covers every production that rehearsed** (two-surface model: forwards local, instances central) · **the pass RECONCILES as well as creates** (five named mismatch classes, with a denominator) · **the instance is the thing that gets checked off**, which made `Notes Done` a gatekeeper queue rather than a field.
+**v1.1, 2026-09-17**, folded in during a live `/milo` morning wakeup, from one instruction carrying three separate rulings: **the sweep covers every production that rehearsed** (two-surface model: forwards local, instances central) - **the pass RECONCILES as well as creates** (five named mismatch classes, with a denominator) - **the instance is the thing that gets checked off**, which made `Notes Done` a gatekeeper queue rather than a field.
 
-⭐ **Three facts were discovered by running it rather than by specifying it, which is why they are written down:** the report email arrives after midnight and must be keyed on the rehearsal date · the stage manager's typed date line disagrees with her own PDF filename and loses to it · **four of five live productions have no intake surface at all**, with Becoming Curious rehearsing from Sep 22. That last one is the finding the whole version exists to surface, and no amount of normalizing Big Love would ever have produced it.
+⭐ **Three facts were discovered by running it rather than by specifying it, which is why they are written down:** the report email arrives after midnight and must be keyed on the rehearsal date - the stage manager's typed date line disagrees with her own PDF filename and loses to it - **four of five live productions had no intake surface at all**, with Becoming Curious rehearsing from Sep 22. That last one is the finding the version exists to surface, and no amount of normalizing Big Love would ever have produced it.
+
+**v2.0, 2026-11-16**, on Michael's instruction that both hooks normalize toward the FMP methods and schema. Adds the FMP target block (tables, conformed field names, report identity), marks the pre-J29 intake surface as history, pairs the file with `hooks/call-normalization.md`, and names `hooks/reports-intake.next-build-spec.md` as the ruling record where the two disagree. The schema itself is Fiona's and is not restated here beyond the mapping.
