@@ -20,6 +20,22 @@ This is a Milo-specific intake exception to activity-log-clickup-native.md, not 
 3. Follow available pagination/expansion when the read window cannot reach the checkpoint. A new session must establish coverage, not assume the latest few comments contain the backlog. If complete coverage is unavailable, report the exact coverage gap. Never label a partial scan caught up or the inbox empty.
 4. Track root and reply IDs/timestamps in session context. A checkpoint is a read marker, not proof of triage. On a cold session, reconstruct open states from readable receipts; do not invent a durable unread cursor or claim complete recovery from a clipped view.
 
+## Event-readiness watchdog
+
+Approved by Michael 2026-11-19. This is Milo's working practice, not a request to design another documentation scheme or make Michael reconstruct one he has already built.
+
+On invocation, orient to upcoming production milestones using live event tasks and their existing references. Recheck when an event is mentioned, relevant preparation changes, or Milo gives a production-readiness update. Use the existing season and briefing procedures for discovery; do not repeat a full scan on every conversational turn. Look ahead far enough to catch advance preparation, not merely today's calls. Let documented lead times determine the horizon; if those lead times are missing, name that gap rather than inventing a standard two-week rule.
+
+For a relevant event:
+
+1. Expect an authoritative reference defining what the event means, prerequisites and lead-time work, responsible roles, day-of readiness and follow-through. Follow the existing canonical-document/repo-page links and inspect the referenced content. Reuse the established structure; do not create another index, schema, template or parallel guide.
+2. Compare that reference with the production's actual preparation, owners, dates and evidence. A date on a calendar is not evidence of readiness. A reference link alone is not evidence that the required work happened.
+3. Distinguish missing documentation, a broken or inaccessible reference, incomplete preparation and unverified work. Search existing and adjacent sources before declaring something absent. State coverage limits honestly; no artifact found does not prove no work happened.
+4. Surface the specific gap while there is still time to resolve it: link the event and available reference, name the consequence and the next action, and identify the established owner or the ownership gap. Do authorized work; seek required approval for messages, structural changes or other gated writes. Do not replace investigation with a generic reminder or ask Michael to rebuild the whole scheme.
+5. Carry unresolved gaps forward in the existing work/session surface and recheck the evidence on the next relevant invoked pass. Do not treat reading, proposing or flagging as resolution. Close only against a verified correction, completion or explicit decision.
+
+Milo owns noticing and pressing these gaps before Michael has to supply the reminder. If the reference does not answer the operational question, bring the smallest concrete missing decision, not a fresh architecture exercise. This expectation applies across production events, not just designer runs. It does not install a scheduler or promise checks between invoked sessions.
+
 ## Handle a capture
 
 Re-read its thread immediately before acting. Honor an existing verified receipt; do not repeat completed work. Pending work in another session is not finished work. If ownership conflicts, surface it; comment tools provide no atomic lock.
