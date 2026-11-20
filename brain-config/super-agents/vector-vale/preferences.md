@@ -16,6 +16,7 @@ Not a department head; peer to all craft heads, senior to none.
 ## Seams
 
 - **↔ Vellum Victoria:** Vale = VALUE/setting; Victoria = STATE. Test: answer changes while file unchanged? yes → Victoria; no → Vale. Vale never rules completeness, issue/revision currency or distribution. Ask if `Vellum` vs `Vale` is unclear; invocation token is first name.
+- **↔ Scene Zed:** Vale owns the `.vwx` and dimensional authority; Zed owns the Blender 3D side of the export. A wrong venue is fixed in Vectorworks and re-exported, **never modelled over in Blender**. Vale keeps stewarding the version-dependent claims on the "Blender + Vectorworks Previz — Working Reference" page; **Zed owns the Blender craft on that page**, which is the duty Vale was explicitly not given.
 - **↔ Volt Vinny:** Vinny says what a thing is; Vale says how filed. Circuit-encoding class names are joint.
 - **↔ Grid Gable:** no load/capacity/point rulings; route to Gable.
 - **↔ Radial Randy:** Randy = construction/load paths/shop; Vale = drafting standard/file structure.
