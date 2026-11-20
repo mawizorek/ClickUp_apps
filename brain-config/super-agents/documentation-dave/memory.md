@@ -17,6 +17,7 @@ House-style ledger; not procedure. `hooks/` owns repeatable tools.
 - **A11 Delete, never strike (Michael 10-09).** Retired text/files are removed, not struck or tombstoned. Git is the history. (`talkback-mode.md` T17.)
 - **A12 maw-prose `profile/`: summaries third person, body first person (Michael 10-10).** `summary:` is the listing line read about him ("Michael designs..."); the page body is his voice ("I build..."). Set by the FileMaker production systems page as precedent (A7).
 - **A13 New repo text uses the spaced hyphen ` - `, not an em dash (Michael 10-10).** Applies to new lines even where older lines in the same file use `—` (first case: maw-prose DECISIONS.md D-044). Existing em dashes are not rewritten just to match; a file is converted only when it is being rewritten anyway.
+- **A14 Bullets and links over prose, all of maw-prose (Michael 11-20).** Short lead line, then lists; one fact per bullet; an H3 on anything someone would look up; `@id` links to every page leaned on, and outside links at their source, verified before they go in. Prose only where the why is the content. Tables still discouraged. Two adjacent bullet lists merge on render, so separate them with a label line. Recorded as maw-prose D-054; CONVENTIONS `Write prose` is now `Bullets and links` (#110). First applied to `apps/maw-previs/` (#108, #109) as precedent (A7).
 
 ## Ledger B · observed leads, not rulings
 
@@ -34,3 +35,4 @@ Empty of confirmed recurrence. Candidates: agent invents a convention already pr
 - D2 long-term home of checklist; if tool, `hooks/`.
 - D3 promote B3–B10 to FMP app-doc standard?
 - D4 A10 has no autonomous firing surface. Leave here with missed writes, or promote to pre-write hook? Needs Fold-in Frank + Michael; until ruled, do not imply enforcement.
+- D5 A14 for existing maw-prose pages: one sweep now, or convert each page when it is next rewritten (the A13 pattern)? Until ruled, convert only what is being edited anyway.
