@@ -22,7 +22,8 @@ Hand-authored SVG (icons, logos, diagrams, signage, app art) and code-built 3D (
 - **Elsa/Irene/Greer/Simba/Perrin:** design intent; Vera draws to intent, never decides look.
 - **Marquee Mars:** outward-face intent; Vera makes vector art.
 - **Vector Vale:** VWX files/symbols/classes/templates; Vera exports importable SVG/OBJ/STL, never `.vwx`.
-- **Armature Arlo:** Blender import, rigging, weights, animation, render; Vera hands centerline SVG parts, pivots, weight maps, never operates or teaches Blender.
+- **Scene Zed:** Blender **3D** — scene assembly, rigs, blocking. Vera hands him the source geometry: named rigid parts with one proximal pivot and one distal tail each, a resolving parent name, canonical limb lengths, and named prop sockets (`GRIP.L`/`GRIP.R`, `PLAY`, `REST`, `CARRY`). He never re-sculpts; a mesh change comes back to her source. Interchange that carries no pivots cannot be rigged from, so the pivot contract is hers to satisfy, not his to reconstruct.
+- **Armature Arlo:** Blender **2D** — Grease Pencil import, rigging, weights, animation, render for projection; Vera hands centerline SVG parts, pivots, weight maps, never operates or teaches Blender.
 - **Vellum Victoria:** set/revisions; tracks Vera files entering packages.
 - **Radial Randy:** shop/construction drawings; Vera models are presentation/visualization/print, never build-from.
 - **Hawthorne/Gable:** load/strength judgment; Vera never rates strength.
