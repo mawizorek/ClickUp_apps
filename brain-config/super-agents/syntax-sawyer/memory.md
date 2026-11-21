@@ -15,7 +15,7 @@ House practice, not vendor Eos behavior. Vendor claims require correct-release c
 - OSC `sm_timer.py` + LaunchAgent + INSTALL.md parked; revive only on department-owned host. Advantage: clean HH:MM:SS.
 - iPad fork parked: ETC iRFR hand-fires; sACNView iOS not show-critical/no blink; Luminair 4 maintained source. Do not raise unprompted.
 - Patch numbering belongs to paperwork, unruled.
-- **SFANW (2026-11-21):** two QLabs ruled by Michael: sound QLab built by us, video QLab director-run, Eos prepares a video trigger. Michael's proposal: trigger string in the triggering cue's Execute, written by macro into a reserved PART for parsing. Unverified at release: string in Execute, part-level Execute, part creation vs existing timing. Bench on Nomad first. Collab: ClickUp task 17tuucqxq?? see Agent Index row comments.
+- **SFANW (2026-11-21):** two QLabs ruled by Michael: sound QLab built by us, video QLab director-run, Eos prepares a video trigger. Michael's proposal: trigger string in the triggering cue's Execute, written by macro into a reserved PART for parsing. Unverified at release: string in Execute, part-level Execute, part creation vs existing timing. Bench on Nomad first. Collab: "SFANW show control list · collaboration · Nov 21" on the Agent Activity Board.
 
 ## Ledger C · Rig/room
 - Programming wing: Puck `ETCPUCK-D2BE4D7`, Client, User ID 2, sACN priority 100, Port 1 `10.101.185.101`, Port 2 `192.168.0.91`, Eos 3.3 point release cropped, parameters `1406 of 12288`.
@@ -35,7 +35,7 @@ Eos point release · trigger universe/target · SPAC access point · named-netwo
 - Ask the deciding question, not a survey; check defect/release before configuration.
 - New kit can change settled answers.
 - 🔑 **Lead with the playbook, unprompted (2026-11-21).** Michael: "thats kinda a common practice that you should be suggesting far sooner. take ownership of my eos files NOW and try and impress me." Owning the file means volunteering house-grade Eos practice (numbering, referencing, marks, subs, backups) at the FIRST planning pass, not waiting for him to reach for it. Still never invent a number: propose the convention, he records.
-- **Owns the SFANW show file through 12/13** (ownership task on the Agent Activity Board, created 2026-11-21).
+- **Owns the SFANW show file through 12/13** (ownership task "Own the SFANW Eos show file through closing · Syntax Sawyer · Nov 21" on the Agent Activity Board).
 
 ## Seams
 Greer = look; Vinny = power/patch/firmware; Ulla = wire; Dexter = general software; Milo = production/call; Quinn = callboard/SM needs; Otto = QLab (trigger schema shared ruling); Allison = audio console/signal flow. ClickUp-first activity on Agent Index via `hooks/activity-log-clickup-native.md`; no git activity log.
