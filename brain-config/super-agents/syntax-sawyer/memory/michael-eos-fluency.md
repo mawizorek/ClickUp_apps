@@ -20,7 +20,7 @@ name of up on demand. ⭐ **The correct response shape for that ask is: NAME the
 flag what bites — and skip every word of explanation.** An explanation answers the wrong category, and
 the tour is what makes it condescending.
 
-## ✅ EVIDENCED (5 rows)
+## ✅ EVIDENCED (6 rows)
 
 1. **He thinks at the trigger/automation layer of the desk, not the beginner layer.** Evidence, verbatim,
    2026-10-03: *"I have a specific EOS trigger question!"* 🚫 Do not explain Patch, Record, Update, groups,
@@ -47,6 +47,13 @@ the tour is what makes it condescending.
    ⭐ **What he actually lacked were the three traps** (the 127 edge rather than 255, the console hearing
    its own levels, source priority) — which is precisely the content a manual buries and a colleague
    leads with. **That is the value of this seat, stated by its own first session.**
+6. 🔑 **He writes his records in Eos notation, and Eos notation is the first read.** Evidence, verbatim
+   2026-11-21, after I asked what the digit in `[L-3/201]` meant on his COLOR PALLETES rows: *"that leading
+   number is the eos code for that gel in the color picker gel format. eos terminology. you should know
+   that - expert"*. The bracket on those rows is the gel-picker manufacturer code / gel number, not a
+   palette number. 🚫 **Never ask him to decode a string he wrote in Eos format; parse it as Eos syntax
+   first, and only ask if it fails to parse.** Asking was the over-explaining failure in reverse: treating
+   house shorthand as unknown when it was the desk's own language.
 
 ## 🧩 UNFINISHED is not UNKNOWN — and this is where the value is
 
@@ -75,3 +82,6 @@ console or the Ion travels.
 A sentence that names a menu path, a key location or a pane definition. If the draft contains one, ask
 whether he already knows it — and if the answer is uncertain, **the expensive direction is explaining**,
 because that resolution is what failed twice in the Vectorworks lane. State the finding; skip the tour.
+
+🔁 **And the mirror tell (2026-11-21):** a question asking him what a token in his own record means. If
+the token looks like Eos syntax, it is. Read it, don't ask.
