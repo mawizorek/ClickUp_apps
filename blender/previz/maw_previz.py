@@ -1,18 +1,24 @@
-# MAW Previz v0.5.0 · Scene Zed · 2026-11-21
+# MAW Previz v0.5.1 · Scene Zed · 2026-11-21
 # The previz file syncs its rig from ONE place: the .mvr beside this .blend with the same name
 #   SPAC_CHANNEL_CHECK.blend  <->  SPAC_CHANNEL_CHECK.mvr
 # Vectorworks owns fixtures (type, position, patch). Blender owns cameras, world, render, animation.
 # Never edit a fixture in Blender: the next sync puts it back to what VWX says.
 # Sync = pre-flight (refuses bad MVRs) -> BlenderDMX import, matched by fixture UUID (updates in place)
 #        -> prune fixtures VWX no longer has -> verify every fixture against the MVR -> PASS/BLOCKED report.
+# Cameras: Vectorworks owns their positions too. Pairs of 3D loci (CAM <name> / AIM <name>) on layers CAM VENUE,
+#   CAM SCENIC, CAM RENDER, dumped by vectorworks/vwx_dump_cameras.py to <blend name>.cameras.json beside the blend.
+#   No camera file = the old guessed cameras, flagged GUESSED in the report.
+# House ambient: 5% by default (a real house is never black: exits, spill, aisle lights). Camera still sees black void.
 # Open with "OPEN PREVIZ.command" (double-click). Built for BlenderDMX 2.2.5 on Blender 5.2.2. Status: BUILT.
 import bpy, json, math, re, os, glob, inspect, shutil, time, zipfile, hashlib
 import xml.etree.ElementTree as ET
 from mathutils import Vector
 
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 UNIVERSES = 64
 HAZE = 0.02
+AMBIENT = 0.05           # house ambient, 0-1 (5% = a theatre at blackout: exits, spill, aisle lights)
+P_AMBIENT = "Previz Ambient"
 EXPECT_LAYER = None      # e.g. "LX 8 - INVENTORY" to warn about strays; None = any layer
 
 # MAW Previz pre-flight: reads an .mvr with plain Python (no Blender needed) and says whether it's safe to sync.
@@ -338,17 +344,37 @@ def set_mode(mode):
 
 
 def look():
+    """Black void to the camera, a dim house ambient on every surface, haze in the air."""
     sc = bpy.context.scene
     w = sc.world or bpy.data.worlds.new("MAW Previz World")
     sc.world = w
     w.use_nodes = True
     nt = w.node_tree
-    bg = next((n for n in nt.nodes if n.type == "BACKGROUND"), None) or nt.nodes.new("ShaderNodeBackground")
     out = next((n for n in nt.nodes if n.type == "OUTPUT_WORLD"), None) or nt.nodes.new("ShaderNodeOutputWorld")
-    bg.inputs["Color"].default_value = (0, 0, 0, 1)
-    bg.inputs["Strength"].default_value = 0.0
-    if not bg.outputs[0].is_linked:
-        nt.links.new(bg.outputs[0], out.inputs["Surface"])
+    for n in list(nt.nodes):                          # rebuild the surface side; keep the output and the haze
+        if n.type in ("BACKGROUND", "LIGHT_PATH", "MIX_SHADER"):
+            nt.nodes.remove(n)
+    amb = nt.nodes.new("ShaderNodeBackground"); amb.name = amb.label = "MAW Ambient"
+    amb.inputs["Color"].default_value = (1.0, 0.92, 0.82, 1)      # warm, like house spill
+    void = nt.nodes.new("ShaderNodeBackground"); void.name = void.label = "MAW Void"
+    void.inputs["Color"].default_value = (0, 0, 0, 1); void.inputs["Strength"].default_value = 0.0
+    lp = nt.nodes.new("ShaderNodeLightPath"); lp.name = "MAW Camera Ray"
+    mix = nt.nodes.new("ShaderNodeMixShader"); mix.name = "MAW Ambient Mix"
+    nt.links.new(lp.outputs["Is Camera Ray"], mix.inputs["Fac"])
+    nt.links.new(amb.outputs[0], mix.inputs[1])        # everything that isn't the camera sees the ambient
+    nt.links.new(void.outputs[0], mix.inputs[2])       # the camera looking into nothing sees black
+    nt.links.new(mix.outputs[0], out.inputs["Surface"])
+    if P_AMBIENT not in sc:
+        sc[P_AMBIENT] = AMBIENT
+    sc.id_properties_ui(P_AMBIENT).update(min=0.0, max=0.5, soft_min=0.0, soft_max=0.2,
+                                          description="House ambient on every surface (0.05 = 5%). The camera still sees a black void")
+    s_in = amb.inputs["Strength"]
+    s_in.driver_remove("default_value")
+    drv = s_in.driver_add("default_value").driver
+    drv.type = "SCRIPTED"
+    v = drv.variables.new(); v.name = "a"; v.type = "SINGLE_PROP"
+    v.targets[0].id_type = "SCENE"; v.targets[0].id = sc; v.targets[0].data_path = f'["{P_AMBIENT}"]'
+    drv.expression = "a"
     vol = nt.nodes.get("MAW Haze") or nt.nodes.new("ShaderNodeVolumePrincipled")
     vol.name = vol.label = "MAW Haze"
     vol.inputs["Density"].default_value = HAZE
@@ -361,7 +387,7 @@ def look():
         sc.cycles.use_preview_denoising = True
     except Exception:
         pass
-    return f"world black, haze {HAZE}, Cycles, 16 viewport samples"
+    return f"world: black void to camera, house ambient {sc[P_AMBIENT] * 100:.0f}%, haze {HAZE}, Cycles"
 
 
 CAM_TIERS = ("VENUE", "SCENIC", "RENDER")     # 11-19 contract: a camera lives in the file that owns its position
@@ -388,14 +414,16 @@ def _col(name, parent):
     return c
 
 
-def _level_cam(name, col, loc, target, lens=24.0, ortho=None):
-    """Level camera (no tilt): aims by heading only, frames height with Shift Y so verticals stay square."""
+def _level_cam(name, col, loc, target, lens=24.0, ortho=None, owner="GUESS"):
+    """Level camera (no tilt): aims by heading only, frames height with Shift Y so verticals stay square.
+    owner VWX: Vectorworks owns the position, so every run re-places it. GUESS: placed once, then your hands win."""
     cam = bpy.data.objects.get(name)
-    if cam is not None and cam.get("maw_placed"):
+    if owner == "GUESS" and cam is not None and cam.get("maw_placed"):
         return cam                                  # your hands win: re-running never moves a placed camera
     if cam is None:
         cam = bpy.data.objects.new(name, bpy.data.cameras.new(name))
     cam["maw_placed"] = True                        # delete the camera to have Previz re-place it
+    cam["maw_owner"] = owner
     for c in list(cam.users_collection):
         c.objects.unlink(cam)
     col.objects.link(cam)
@@ -418,7 +446,93 @@ def _level_cam(name, col, loc, target, lens=24.0, ortho=None):
     return cam
 
 
+def cameras_path():
+    fp = bpy.data.filepath
+    return (os.path.splitext(fp)[0] + ".cameras.json") if fp else None
+
+
+def parse_cameras(data):
+    """Pure logic (unit-tested): pair CAM <name> with AIM <name> loci. Returns (cams, problems).
+    cams: [dict(name, tier, eye(x,y,z m), aim, lens)]. Lens from a trailing number: 'CAM REP CENTER 35' = 35 mm."""
+    eyes, aims, problems = {}, {}, []
+    for p in data.get("points", []):
+        nm = " ".join(str(p.get("name", "")).upper().split())
+        layer = str(p.get("layer", "")).upper()
+        tier = next((t for t in CAM_TIERS if t in layer), "VENUE")
+        xyz = tuple(float(c) for c in p.get("xyz_m", (0, 0, 0)))
+        if nm.startswith("CAM "):
+            m = re.match(r"^CAM (.+?)(?: (\d{2,3}))?$", nm)
+            key, lens = m.group(1), float(m.group(2)) if m.group(2) else 35.0
+            if key in eyes:
+                problems.append(f"two loci named CAM {key}")
+            eyes[key] = dict(name=f"CAM {key}", tier=tier, eye=xyz, lens=lens)
+        elif nm.startswith("AIM "):
+            aims[nm[4:]] = xyz
+    cams = []
+    for key, c in sorted(eyes.items()):
+        if key not in aims:
+            problems.append(f"CAM {key} has no AIM {key}, skipped"); continue
+        c["aim"] = aims[key]; cams.append(c)
+    for key in sorted(set(aims) - set(eyes)):
+        problems.append(f"AIM {key} has no CAM {key}")
+    return cams, problems
+
+
+CAM_INBOX = "~/Desktop/maw_vwx_cameras.json"     # where vwx_dump_cameras.py writes
+
+
+def adopt_camera_dump():
+    """Pull a fresh Vectorworks camera dump from the Desktop into <blend>.cameras.json, announced, never silent.
+    Refuses a dump from a different Vectorworks file than last time (stale file from another show)."""
+    src, dst = os.path.expanduser(CAM_INBOX), cameras_path()
+    if not dst or not os.path.isfile(src):
+        return None
+    if os.path.isfile(dst) and os.path.getmtime(src) <= os.path.getmtime(dst):
+        return None
+    with open(src, encoding="utf-8") as fh:
+        vwx = str(json.load(fh).get("file", "?"))
+    sc = bpy.context.scene
+    prev = sc.get("maw_cam_source")
+    if prev and prev != vwx:
+        return f"WARN camera dump on the Desktop is from {vwx}, this file takes cameras from {prev}: not used"
+    shutil.copy2(src, dst); sc["maw_cam_source"] = vwx
+    return f"took the new camera dump from {vwx}"
+
+
 def cameras():
+    sc = bpy.context.scene
+    root = _col("CAMERAS", sc.collection)
+    tiers = {t: _col(f"CAM {t}", root) for t in CAM_TIERS}
+    note = adopt_camera_dump()
+    cp = cameras_path()
+    if cp and os.path.isfile(cp):
+        with open(cp, encoding="utf-8") as fh:
+            data = json.load(fh)
+        cams, problems = parse_cameras(data)
+        for c in cams:
+            _level_cam(c["name"], tiers[c["tier"]], Vector(c["eye"]), Vector(c["aim"]), lens=c["lens"], owner="VWX")
+        names = {c["name"] for c in cams}
+        old_col = _col("CAM OLD GUESSES", root)
+        old_col.hide_viewport = old_col.hide_render = True
+        parked = 0
+        for t in tiers.values():                     # guessed cameras step aside, never deleted (his tweaks survive)
+            for o in list(t.objects):
+                if o.type == "CAMERA" and o.get("maw_owner", "GUESS") != "VWX" and o.name not in names:
+                    t.objects.unlink(o); old_col.objects.link(o); parked += 1
+        if parked:
+            problems.append(f"{parked} guessed cameras moved to CAM OLD GUESSES (hidden)")
+        if note:
+            problems.insert(0, note)
+        if cams:
+            first = next((c for c in cams if c["tier"] == "RENDER"), cams[0])
+            sc.camera = bpy.data.objects.get(first["name"])
+        stamp = time.strftime("%Y-%m-%d %H:%M", time.localtime(os.path.getmtime(cp)))
+        return (f"{len(cams)} cameras from Vectorworks ({os.path.basename(cp)}, {stamp}), active {getattr(sc.camera, 'name', 'none')}"
+                + ("".join(f" | WARN {x}" for x in problems)))
+    return "GUESSED cameras (no " + (os.path.basename(cp) if cp else "camera file") + " from Vectorworks yet): " + guessed_cameras()
+
+
+def guessed_cameras():
     sc = bpy.context.scene
     root = _col("CAMERAS", sc.collection)
     tiers = {t: _col(f"CAM {t}", root) for t in CAM_TIERS}
@@ -621,6 +735,8 @@ class MAW_PT_previz(bpy.types.Panel):
             r.operator("maw.previz", text="Sync rig", icon="FILE_REFRESH").action = "SYNC"
             r.operator("maw.previz", text="Force", icon="LOOP_BACK").action = "RESYNC"
         L.operator("maw.previz", text="Set up previz", icon="LIGHT_SPOT").action = "SETUP"
+        if P_AMBIENT in context.scene:
+            L.prop(context.scene, f'["{P_AMBIENT}"]', text="House ambient", slider=True)
         r = L.row(align=True)
         r.operator("maw.previz", text="Play (Programmer)").action = "PLAY"
         r.operator("maw.previz", text="Eos (sACN)").action = "EOS"
@@ -632,6 +748,8 @@ class MAW_PT_previz(bpy.types.Panel):
         root = bpy.data.collections.get("CAMERAS")
         if root:
             for tier in root.children:
+                if tier.hide_viewport:
+                    continue
                 box = L.box(); box.label(text=tier.name)
                 col = box.column(align=True)
                 for cam in sorted(tier.objects, key=lambda o: o.name):
