@@ -1,4 +1,4 @@
-# Writes ../dist: one GLB per prop, performer v4.2, and the practice-room layout. Blender (Z up) -> glTF (Y up): (x,y,z)->(x,z,-y).
+# Writes ../dist: one GLB per prop, performer v4.3 (smooth), and the practice-room layout. Blender (Z up) -> glTF (Y up): (x,y,z)->(x,z,-y).
 import os, sys, json, struct, pickle, numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,HERE); import props as S5
 OUT=os.path.join(HERE,'..','dist')
@@ -15,11 +15,22 @@ def glb(path,roots,scene='URITP_Musicians'):
         a=dict(bufferView=len(bv)-1,componentType=5126,count=len(arr),type='VEC3')
         if mm: a['min']=arr.min(0).tolist();a['max']=arr.max(0).tolist()
         acc.append(a); return len(acc)-1
+    def push_idx(arr):
+        o=len(buf);b=arr.tobytes();buf.extend(b);buf.extend(b'\0'*((4-len(buf)%4)%4))
+        bv.append(dict(buffer=0,byteOffset=o,byteLength=len(b),target=34963))
+        acc.append(dict(bufferView=len(bv)-1,componentType=5125,count=len(arr),type='SCALAR')); return len(acc)-1
     for R in roots:
         kids=[]
         for ob in R['objects']:
             pv=np.asarray(ob['pivot'],float);prims=[]
             for mat,ms in ob['bymat'].items():
+                if ob.get('smooth'):   # v4.3: indexed, shared vertices, area-weighted vertex normals -> Blender shades it smooth
+                    for V,F in ms:
+                        Vg=np.array([G(v-pv) for v in V],np.float32); Nv=np.zeros_like(Vg)
+                        for a,b,c in F: Nv[[a,b,c]]+=np.cross(Vg[b]-Vg[a],Vg[c]-Vg[a])
+                        Nv/=np.linalg.norm(Nv,axis=1,keepdims=True)+1e-12
+                        prims.append(dict(attributes=dict(POSITION=push(Vg,True),NORMAL=push(Nv.astype(np.float32))),indices=push_idx(np.asarray(F,np.uint32).ravel()),material=MATN.index(mat)))
+                    continue
                 P=[];N=[]
                 for V,F in ms:
                     for f in F:
@@ -46,9 +57,9 @@ def prop_root(name,T=(0,0,0),rz=0.0,suffix=''):
 PERF=pickle.load(open(os.path.join(HERE,'..','build','performer','parts.pkl'),'rb'))
 pm=json.load(open(os.path.join(HERE,'..','build','performer','performer_manifest.json')))
 def perf_root(T=(0,0,0),rz=0.0):
-    objs=[dict(name=f'PERF_{n}',bymat={'PERF':ms},pivot=pv,extras=dict(uritp_part=n,uritp_bone_tail=[float(x) for x in tl],uritp_bone_parent=par or '')) for n,(ms,pv,tl,par) in PERF.items()]
-    return dict(name='PERF_Performer_v4_2',objects=objs,T=T,rz=rz,extras=dict(uritp_manifest='performer_manifest.json v4.2'))
-glb(os.path.join(OUT,'PERF_Performer_v4_2.glb'),[perf_root()])
+    objs=[dict(name=f'PERF_{n}',bymat={'PERF':ms},pivot=pv,smooth=True,extras=dict(uritp_part=n,uritp_bone_tail=[float(x) for x in tl],uritp_bone_parent=par or '')) for n,(ms,pv,tl,par) in PERF.items()]
+    return dict(name='PERF_Performer_v4_3',objects=objs,T=T,rz=rz,extras=dict(uritp_manifest='performer_manifest.json v4.3'))
+glb(os.path.join(OUT,'PERF_Performer_v4_3.glb'),[perf_root()])
 for n in props: glb(os.path.join(OUT,f'PROP_{n}_v5_0.glb'),[prop_root(n)])
 room=[perf_root((0.2,-0.4,0),25),prop_root('GrandPiano',(-1.6,0.9,0),-20),prop_root('PianoBench',(-1.82,0.30,0),-20),
       prop_root('MelodyChair',(1.1,0.6,0),200),prop_root('MusicStand',(1.25,-0.05,0),20),prop_root('Cello',(1.75,0.75,0),200),prop_root('CelloBow',(1.95,0.85,0),200),

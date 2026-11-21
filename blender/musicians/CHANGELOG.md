@@ -1,5 +1,11 @@
 # Changelog · URITP musician set
 
+## 2026-11-21 · performer v4.3 smooth
+- Every part is now a loft: 16 sides, profile rows densified by PCHIP, quads, shared vertices, fan caps. Same skeleton, names and recipe.
+- The exporter writes the performer as indexed meshes with smooth vertex normals, so Blender shades it smooth. Vertices drop from 5,328 to 2,336.
+- `ZED_update_performer.py` replaces the v4.2-only script: one VERSION constant, the same in-place swap.
+- Props are still flat hulls; the same loft pass is next.
+
 ## 2026-11-20 · performer v4.2 + repo home
 - Feet re-carved. Their "up" now comes from the floor at rest, and a flat sole line measured on the rest skeleton puts the sole at z = 0. The heel sits under the shin, the instep covers the ankle, and the ankle cap is shortened. No floor shift needed.
 - Added `ZED_update_performer_v4_2.py`, the in-place library update (swaps mesh shapes only).

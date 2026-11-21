@@ -1,11 +1,11 @@
 # URITP musician set · CURRENT
 
-This folder is the source of truth for the musician previz set: one sculptural performer plus the instrument and furniture props, built in code and brought into Blender with scripts. Current as of 2026-11-20.
+This folder is the source of truth for the musician previz set: one sculptural performer plus the instrument and furniture props, built in code and brought into Blender with scripts. Current as of 2026-11-21.
 
 ## Current versions
 
-- Performer **v4.2**: form language E "Brancusi" (one turned ovoid per bone), with the "scarecrow / tin man" read as the style test. Neutral standing rest, 1.768 m, 16 rigid parts. Each part's origin sits on its joint. v4.2 fixed the feet: they were rolled onto their edges, and the heel floated with an ankle peg showing. They now have flat soles on the floor and the heel sits under the shin.
-- Props **v5.0**: violin + bow, guitar + footstool, cello + bow, NPS Melody chair, Manhasset stand, 7 ft grand (hinged lid object) + bench. Same form language as the performer. Each prop's origin is at its natural pivot, with named sockets for grips, rest points, the seat and the pedal.
+- Performer **v4.3**: form language E "Brancusi" (one turned ovoid per bone), with the "scarecrow / tin man" read as the style test. Neutral standing rest, 1.768 m, 16 rigid parts. Each part's origin sits on its joint. v4.3 makes every part a clean loft (rings of quads, shared vertices, smooth normals), so Blender shades it smooth instead of showing every facet. It has 2,336 vertices; v4.2 had 5,328, because each of its triangles carried its own copies. v4.2's feet (flat sole, heel under the shin) carry over.
+- Props **v5.0** (still flat-faceted; the smooth loft pass comes next): violin + bow, guitar + footstool, cello + bow, NPS Melody chair, Manhasset stand, 7 ft grand (hinged lid object) + bench. Same form language as the performer. Each prop's origin is at its natural pivot, with named sockets for grips, rest points, the seat and the pedal.
 - No rig yet. The rig builder is next (Scene Zed).
 
 ## Folder map
@@ -17,14 +17,14 @@ This folder is the source of truth for the musician previz set: one sculptural p
 
 ## Get the GLBs
 
-Regenerate them: from this folder, run `python source/performer.py`, then `python source/props.py`, then `python source/export.py`. Output lands in `dist/`. The regenerated files were checked against the shipped ones: props are byte-identical, the performer is within 0.008 mm.
+Regenerate them: from this folder, run `python source/performer.py`, then `python source/props.py`, then `python source/export.py`. Output lands in `dist/`. The regenerated props were checked byte-identical to the shipped v5.0 files.
 
-Or download the shipped files from ClickUp: the [set v5.0 ZIP](https://t36074068.p.clickup-attachments.com/t36074068/7b869878-8277-5de9-b9f6-618d1d0c5ae3/URITP_MusicianSet_v5_0.zip?view=open), which carries the v4.1 performer, plus the [performer v4.2 update ZIP](https://t36074068.p.clickup-attachments.com/t36074068/0732abee-6cb6-517b-8443-966d64720fac/PERF_v4_2_update.zip?view=open).
+Or download the shipped files from ClickUp: the [set v5.0 ZIP](https://t36074068.p.clickup-attachments.com/t36074068/7b869878-8277-5de9-b9f6-618d1d0c5ae3/URITP_MusicianSet_v5_0.zip?view=open) (props; it carries the old v4.1 performer) plus the [performer v4.3 update ZIP](https://t36074068.p.clickup-attachments.com/t36074068/dfef8544-6d18-56b5-976e-2883cef1a281/PERF_v4_3_update.zip?view=open).
 
 ## Blender run order
 
 1. `blender/ZED_build_library.py` in a NEW empty file. Builds and saves `URITP_Musicians_LIB_v5_1.blend`: one asset collection per item (`LIB_PERF_Performer`, `LIB_PROP_<Name>`) and socket empties. Runs once; never overwrites a save.
-2. Already have the v5.0 library? Run `blender/ZED_update_performer_v4_2.py` inside it instead. It swaps only the performer's mesh shapes, so linked files get the new feet on reload. Then press Ctrl+S.
+2. Already have a library file? Run `blender/ZED_update_performer.py` inside it instead. It swaps only the performer's mesh shapes, so linked files pick up the change on reload; a pop-up reports the result. Then press Ctrl+S.
 3. In a show file (for example the SPAC assembly): File > Link > the library > Collection > `LIB_PERF_Performer`.
 4. `blender/ZED_blocking_proxy.py` creates the mover empty for blocking. Animate the mover, never the mesh. Parent the linked performer, or later the rig, to it.
 
@@ -38,6 +38,7 @@ Units are meters, up is +Z, the performer faces -Y, and performer-left is +X. Th
 - One performer for every instrument; playing postures are saved poses, not separate models.
 - The house piano is about 7 ft (Model B size class, 211 × 148 cm, assumed until measured).
 - Block with a mover now; swap in the rig later.
+- Parts are smooth-shaded lofts, not flat facets (Michael, 11-21: fewer visible vertex lines).
 
 ## Open
 

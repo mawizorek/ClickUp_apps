@@ -65,7 +65,7 @@ def main():
     report = []
 
     # performer
-    pc, pnew = import_into(os.path.join(dist, 'PERF_Performer_v4_2.glb'), 'LIB_PERF_Performer', root)
+    pc, pnew = import_into(os.path.join(dist, 'PERF_Performer_v4_3.glb'), 'LIB_PERF_Performer', root)
     report.append(('LIB_PERF_Performer', len(pnew), 0))
 
     # props, spaced along X in the library file only (linking ignores this: each collection instances from its own origin)

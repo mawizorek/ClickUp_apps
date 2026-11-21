@@ -1,26 +1,45 @@
-"""Vertex Vera · performer v4.2 (feet re-carved after Michael 11-20 21:26 'i dont like their feet'). Lineage: v4.0, form language E 'Brancusi' (picked 23:18), v4.1 pass: 'scarecrow / tin man' read (23:21):
+"""Vertex Vera · performer v4.3: smooth lofted parts (Michael 11-21: fewer visible vertex lines). v4.2 (feet re-carved after Michael 11-20 21:26 'i dont like their feet'). Lineage: v4.0, form language E 'Brancusi' (picked 23:18), v4.1 pass: 'scarecrow / tin man' read (23:21):
 generic, convincing shapes assembled into a persona. One ovoid per bone, no hands/feet/face detail.
 Rest skeleton = v3.2 rest (same names, pivots, canonical lengths). Blender space: m, Z up, faces -Y, left +X.
 Writes ../build/performer (generated, not committed)."""
 import os, sys, json, pickle, numpy as np
 HERE=os.path.dirname(os.path.abspath(__file__)); exec(open(os.path.join(HERE,'_lib.py')).read())
 OUT=os.path.join(HERE,'..','build','performer')
-FRONT=np.array([0.,-1.,0.]); N=12
+FRONT=np.array([0.,-1.,0.]); N=16   # v4.3: 16 sides + densified rows, lofted (quads + shared verts) so Blender shades it smooth
 def frm(a,b,ref=None):
     R=FRONT if ref is None else np.asarray(ref,float)
     u=nrm(b-a); f=R-np.dot(R,u)*u; f=nrm(f) if np.linalg.norm(f)>1e-3 else np.array([0,0,1.]); return u,np.cross(u,f),f
+def _densify(rows):
+    # v4.3: insert a PCHIP-interpolated row between every pair, so the profile curves instead of stepping
+    from scipy.interpolate import PchipInterpolator
+    rows=[tuple(r)+((0.0,) if len(r)==3 else ()) for r in rows]
+    T=np.array([r[0] for r in rows]); cols=[PchipInterpolator(T,np.array([r[k] for r in rows])) for k in (1,2,3)]
+    ts=sorted(set(list(T)+[(a+b)/2 for a,b in zip(T[:-1],T[1:])]))
+    return [(t,float(cols[0](t)),float(cols[1](t)),float(cols[2](t))) for t in ts]
+def loft(rings):
+    """rings: list of (n,3) arrays along the part. Returns (V,F): one shared-vertex loft, closed by a fan cap at each end."""
+    R=len(rings); n=len(rings[0]); V=np.concatenate(rings+[rings[0].mean(0)[None],rings[-1].mean(0)[None]]); c0=R*n; c1=c0+1; F=[]
+    for r in range(R-1):
+        for i in range(n):
+            a=r*n+i; b=r*n+(i+1)%n; c=(r+1)*n+(i+1)%n; d=(r+1)*n+i; F+=[(a,b,c),(a,c,d)]
+    for i in range(n): F+=[(c0,(i+1)%n,i),(c1,(R-1)*n+i,(R-1)*n+(i+1)%n)]
+    F=np.array(F); cen=V.mean(0)
+    for k,(a,b,c) in enumerate(F):   # orient every triangle outward
+        nn=np.cross(V[b]-V[a],V[c]-V[a])
+        if np.dot(nn,(V[a]+V[b]+V[c])/3-cen)<0: F[k]=(a,c,b)
+    return V,F
 def ovoid(a,b,rows,n=N,sole=None,sole_line=None,ref=None):
-    a=np.asarray(a,float);b=np.asarray(b,float);u,s_,f=frm(a,b,ref);L=np.linalg.norm(b-a);pts=[]
-    for row in rows:
-        t,w,d=row[:3]; off=row[3] if len(row)>3 else 0.0
-        c=a+t*L*u
+    a=np.asarray(a,float);b=np.asarray(b,float);u,s_,f=frm(a,b,ref);L=np.linalg.norm(b-a);rings=[]
+    for t,w,d,off in _densify(rows):
+        c=a+t*L*u; ring=[]
         for th in np.linspace(0,2*np.pi,n,endpoint=False)+np.pi/n:
             sv=np.sin(th)
             if sole is not None: sv=max(sv,sole)
             fc=off+d*sv
             if sole_line is not None: fc=max(fc,sole_line[0]+sole_line[1]*t)
-            pts.append(c+w*np.cos(th)*s_+fc*f)
-    return hull(pts)
+            ring.append(c+w*np.cos(th)*s_+fc*f)
+        rings.append(np.array(ring))
+    return loft(rings)
 # Form recipe per bone: rows of (t along bone, half-width, half-depth). Shared by every pose.
 RECIPE={
  # v4.1 rule: every part is a turned, made object. Ends are blunt caps, never points, so parts butt together like an assembled figure.
@@ -88,13 +107,13 @@ if __name__=='__main__':
     rep['triangles']=int(sum(len(F) for ms,*_ in P.values() for V,F in ms))
     rep['lengths']={n:round(float(np.linalg.norm(tl-pv)),4) for n,(ms,pv,tl,p) in P.items()}
     os.makedirs(OUT,exist_ok=True)
-    man=dict(schema='maw-performer-manifest',version='4.2',asset='MUS_Performer',style='E Brancusi: one ovoid per bone',
+    man=dict(schema='maw-performer-manifest',version='4.3',asset='MUS_Performer',style='E Brancusi: one ovoid per bone',
         units='meters',up='+Z',facing='-Y',performer_left='+X',origin='floor, between the feet',
         rest='relaxed standing (v3.2 skeleton)',canonical_lengths=dict(UA=0.29,FA=0.26,HAND=0.13,TH=0.41,SH=0.42,FOOT=0.17),
         height_m=rep['height_m'],form_recipe=RECIPE,foot_rows=FOOT_ROWS,foot_sole_line=FOOT_SOLE_LINE,
         parts={n:dict(object=f'PERF_{n}',bone=f'DEF_{n}',parent=(f'DEF_{p}' if p else None),
               head=[round(float(x),5) for x in pv],tail=[round(float(x),5) for x in tl]) for n,(ms,pv,tl,p) in P.items()},
-        note='Object origin = bone head. The form recipe is pose-independent: same shapes on any skeleton.')
+        note='Object origin = bone head. The form recipe is pose-independent: same shapes on any skeleton. v4.3: lofted, shared vertices, smooth normals.')
     json.dump(man,open(os.path.join(OUT,'performer_manifest.json'),'w'),indent=1)
     json.dump(rep,open(os.path.join(OUT,'validation_report.json'),'w'),indent=1)
     pickle.dump(P,open(os.path.join(OUT,'parts.pkl'),'wb'))
