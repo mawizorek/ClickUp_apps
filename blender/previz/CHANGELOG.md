@@ -2,6 +2,10 @@
 
 All 2026-11-21, Scene Zed. Older builds survive as ClickUp attachments on the SFANW previz session task; this folder is the source of truth.
 
+## 0.5.1 · Vectorworks cameras, house ambient
+
+Michael: the cameras were "still pretty trash" and the world should sit at 5% "since it's impossible to get a real blackout anyways". Cameras guessed from a bounding box can't be right, so Vectorworks now places them: CAM/AIM 3D-locus pairs on CAM VENUE / SCENIC / RENDER layers, dumped by `vectorworks/vwx_dump_cameras.py`, pulled in as `<blend>.cameras.json` with an announced adopt. Guessed cameras stay as the fallback, marked GUESSED, and step aside into a hidden collection when real ones arrive. World: warm house ambient at 5% on every surface (Previz tab slider), black void to the camera. `tests/test_cameras.py` 9/9.
+
 ## 0.5.0 · rig sync
 
 Replaces "import the newest .mvr in ~/Downloads". One rig file beside the blend, same name. Pre-flight before import (blocks a patched fixture missing its GDTF, overlaps, universe crossings, bad modes; skips non-DMX units). BlenderDMX `addMVR` instead of driving `addMVR_steps` by hand (which skipped the importer's own post-steps). Prune what VWX doesn't have. Verify every fixture against the MVR. PASS/CURRENT/BLOCKED/MISSING/FAIL report, saved to `previz_reports/`. Saves on PASS. Launcher `OPEN PREVIZ.command`. Script embeds itself in the blend.
