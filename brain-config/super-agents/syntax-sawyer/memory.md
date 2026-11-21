@@ -15,6 +15,7 @@ House practice, not vendor Eos behavior. Vendor claims require correct-release c
 - OSC `sm_timer.py` + LaunchAgent + INSTALL.md parked; revive only on department-owned host. Advantage: clean HH:MM:SS.
 - iPad fork parked: ETC iRFR hand-fires; sACNView iOS not show-critical/no blink; Luminair 4 maintained source. Do not raise unprompted.
 - Patch numbering belongs to paperwork, unruled.
+- **SFANW (2026-11-21):** two QLabs ruled by Michael: sound QLab built by us, video QLab director-run, Eos prepares a video trigger. Michael's proposal: trigger string in the triggering cue's Execute, written by macro into a reserved PART for parsing. Unverified at release: string in Execute, part-level Execute, part creation vs existing timing. Bench on Nomad first. Collab: ClickUp task 17tuucqxq?? see Agent Index row comments.
 
 ## Ledger C · Rig/room
 - Programming wing: Puck `ETCPUCK-D2BE4D7`, Client, User ID 2, sACN priority 100, Port 1 `10.101.185.101`, Port 2 `192.168.0.91`, Eos 3.3 point release cropped, parameters `1406 of 12288`.
@@ -22,9 +23,10 @@ House practice, not vendor Eos behavior. Vendor claims require correct-release c
 - Different user IDs give separate command lines. Exact software/library/language/keyboard settings must match; synced Client implies Ion same release, but point release still needs writing.
 - `10.101.x.x` is ETC factory-default port-1 scheme, not a UR assignment; mapping to named networks unverified.
 - Ion xe20, 11 networked devices, five SPAC networks and Sensor/CEM3 note: `memory/archive/rig-established-2026-10-03.md`; read before wire diagnosis. SM Cue View is two Mac Minis under one IT-locked inventory row; split row is propose-only J9.
+- ⚠️ ClickUp USERS list (2026-11-19) reads 2 = DESIGNER, 10 = PROGRAMMER; conflicts with wing at User ID 2. Unresolved.
 
 ## Ledger D · Ask list
-Eos point release · trigger universe/target · SPAC access point · named-network mapping · unlisted system devices · wing backup intent · department-administered machines · output method/universe per space · show-file custody · cue-only/tracking · palette/magic-sheet convention · patch numbering.
+Eos point release · trigger universe/target · SPAC access point · named-network mapping · unlisted system devices · wing backup intent · department-administered machines · output method/universe per space · show-file custody · cue-only/tracking · palette/magic-sheet convention · patch numbering · SFANW video QLab host · SFANW reserved trigger part number · Stars vs Moon mark differences.
 
 ## Patterns
 - Ask who owns host before designing; native desk path may satisfy constraint.
@@ -32,6 +34,8 @@ Eos point release · trigger universe/target · SPAC access point · named-netwo
 - Read the whole artifact, not only requested field.
 - Ask the deciding question, not a survey; check defect/release before configuration.
 - New kit can change settled answers.
+- 🔑 **Lead with the playbook, unprompted (2026-11-21).** Michael: "thats kinda a common practice that you should be suggesting far sooner. take ownership of my eos files NOW and try and impress me." Owning the file means volunteering house-grade Eos practice (numbering, referencing, marks, subs, backups) at the FIRST planning pass, not waiting for him to reach for it. Still never invent a number: propose the convention, he records.
+- **Owns the SFANW show file through 12/13** (ownership task on the Agent Activity Board, created 2026-11-21).
 
 ## Seams
-Greer = look; Vinny = power/patch/firmware; Ulla = wire; Dexter = general software; Milo = production/call; Quinn = callboard/SM needs. ClickUp-first activity on Agent Index via `hooks/activity-log-clickup-native.md`; no git activity log.
+Greer = look; Vinny = power/patch/firmware; Ulla = wire; Dexter = general software; Milo = production/call; Quinn = callboard/SM needs; Otto = QLab (trigger schema shared ruling); Allison = audio console/signal flow. ClickUp-first activity on Agent Index via `hooks/activity-log-clickup-native.md`; no git activity log.
