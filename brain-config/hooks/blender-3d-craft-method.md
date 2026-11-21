@@ -3,18 +3,18 @@ id: blender-3d-craft-method
 name: Blender 3D Craft Method
 shelf: hooks
 kind: method
-trigger: Building or coaching a Blender 3D rig, show-file scene assembly, prop handoffs, or any Blender-side Python builder.
-nicknames: [3D craft method, Zed's method]
+trigger: Building or coaching a Blender 3D rig, show-file scene assembly, prop handoffs, any Blender-side Python builder, or any Blender tool (add-on, setup script, importer) for lighting previz.
+nicknames: [3D craft method, Zed's method, Tool Build Method]
 owner: Scene Zed (stewards edits)
 added: 2026-11-19
-version: 1
+version: 2
 ---
 
 # Blender 3D Craft Method (🪝 Hook)
 
-The procedure for Blender **3D** work: rigid-part rigs, prop ownership, builder discipline, and the library/override split. Seeded from the musician-rig Workshop review (ADJUST, 2026-11-19) and the next-build specification, so none of it is invented here.
+The procedure for Blender **3D** work: rigid-part rigs, prop ownership, builder discipline, the library/override split, and building Blender tools. Sections 1 to 8 were seeded from the musician-rig Workshop review (ADJUST, 2026-11-19) and the next-build specification. Section 9 is the Tool Build Method, which passed its own three-pass Workshop on 2026-11-21 during the previz lighting session, and the lessons from that session's MVR import.
 
-🚫 **Not this hook:** coaching posture (`blender-coaching-method.md`, shared with Armature Arlo) · 2D line animation and Grease Pencil (`blender-2d-line-animation.md`) · geometry authoring (Vertex Vera) · Vectorworks and dimensional authority (Vector Vale) · the version-dependent VWX↔Blender claims (the "Blender + Vectorworks Previz — Working Reference" page, stewarded by Vale).
+🚫 **Not this hook:** coaching posture (`blender-coaching-method.md`, shared with Armature Arlo) · 2D line animation and Grease Pencil (`blender-2d-line-animation.md`) · geometry authoring (Vertex Vera) · Vectorworks and dimensional authority (Vector Vale) · the version-dependent VWX↔Blender claims (the "Blender + Vectorworks Previz — Working Reference" page, stewarded by Vale) · hardware bench builds (`bench-build-method.md`, Pinout Pavel).
 
 ---
 
@@ -70,3 +70,51 @@ Stop and report instead of improvising when: the version or axis behaviour is un
 ## 8. Order of work
 
 Reusable system before demo animation. Vertical slice before multiplication. One performer and one prop, passing section 4's acceptance test, before any second instrument exists.
+
+## 9. Building tools (Tool Build Method)
+
+For any Blender tool Zed writes for Michael: add-ons, setup scripts, importers, sidebar tabs. Live examples: `blender/previz/` (MAW Previz) and `blender/shutters/` (MAW Shutters) in this repo.
+
+### Status words
+
+**BUILT** (written) → **TESTED** (Zed's automated checks pass) → **VERIFIED** (Michael's own Blender, screenshot or console). Only Michael's evidence makes anything VERIFIED. Every README and handoff states the status of every tool it names, and what the tests did not prove.
+
+### Zed sets it up; Michael plays
+
+- Michael's job is the export and one click. If a run asks him to click through Blender menus to get to a usable state, the tool is unfinished. ("Why am I doing any clicking in Blender, you're supposed to set all that up for me once I get you a clean MVR.")
+- One-click runner: a double-click `.command` launcher or one Run Script. Never ask him to type a path.
+- Zed leads. Decide the mechanic, build it, say what it does. Don't float options he has to adjudicate.
+
+### Inputs and outputs
+
+- **One fixed input, never "the newest file somewhere".** The previz rig is `<blend name>.mvr` beside the `.blend`.
+- **Pre-flight the input before mutating anything.** Read it with plain Python, refuse with the fix named (BLOCK), skip what's legitimately out of scope (SKIP), and flag the rest (WARN).
+- **Verify the result against the source after.** Count, identity, geometry, patch. Report PASS / CURRENT / BLOCKED / MISSING / FAIL, in the file and on disk.
+- **Know the importer's silent fallbacks and catch them before they land.** BlenderDMX swaps a generic PAR in for any MVR fixture whose GDTF isn't in the package. That is a `silent-fallback-law.md` case in third-party code: our tool must announce it, not inherit it.
+- **Sync, don't re-import.** Match by the source's stable ID (MVR fixture UUID), update in place, prune what the source no longer has.
+- **Call the library's own entry point** (`addMVR`), not its internals (driving `addMVR_steps` by hand skipped its post-steps).
+
+### In the UI
+
+- Theatre lingo in the UI, Vectorworks/Eos terms in tooltips, spec terms never. Names are words Michael would say on a call: Shutters, Previz, Barrel, Frost, Key Fade, Key Snap. ("Shaper isn't a lighting term." "Bench" meant nothing to him.)
+- Keys behave like cues: record a whole assembly as one look, Fade or Snap, one row in the Dope Sheet.
+- His hands win: reruns never move a camera he placed or reshape a curve he edited. Only the segments touching a new key change.
+- Opt-in staging: a file opens staged (selected, Rendered, tab open) only if it asked to. Show files are never hijacked.
+- Purge older versions on load: unregister retired class names, migrate old property names, one tab with the current version in its label.
+
+### Tests
+
+- Every bug becomes a behaviour assertion before the fix ships.
+- Split pure logic from `bpy` so it tests without Blender, against Michael's real input files. Headless Blender self-tests (`-b --factory-startup`) for what needs a render. Say plainly what each kind of test does not prove.
+
+### Where code lives
+
+- Source of truth: `blender/<tool>/` in this repo, with README, CHANGELOG and tests. ClickUp attachments are copies.
+- Upstream (BlenderDMX) only after a tool has been played hard across a dozen of Michael's own shows. Impress him first.
+
+---
+
+## Changelog
+
+- **v2 (2026-11-21)**: section 9, Building tools. Tool Build Method passed its Workshop (three passes) in the SFANW previz session; import lessons from the MVR rig sync (Previz v0.5.0).
+- **v1 (2026-11-19)**: sections 1 to 8, from the musician-rig Workshop review and the next-build spec.
