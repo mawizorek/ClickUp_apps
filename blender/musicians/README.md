@@ -10,7 +10,7 @@ This folder is the source of truth for the musician previz set: one sculptural p
 
 ## Folder map
 
-- `source/`: plain Python 3 (numpy + scipy). `performer.py` builds the performer from `data/performer_rest_skeleton.json`. `props.py` builds the props. `export.py` writes the GLBs into `dist/`.
+- `source/`: plain Python 3 (numpy + scipy). `performer.py` builds the performer from `data/performer_rest_skeleton.json`. `props.py` builds the props. `export.py` writes the GLBs into `dist/`. `render_smooth.py` makes smooth-shaded preview images.
 - `blender/`: scripts for Blender 5.2.2 LTS, run from the Text Editor (Text > Open > Run Script).
 - `data/`: the contracts. The rest skeleton, the performer manifest (part names, joints, form recipe) and the set manifest (props, sockets, materials).
 - `build/` and `dist/` are generated and not committed. Neither are `.blend` files.
@@ -23,8 +23,10 @@ Or download the shipped files from ClickUp: the [set v5.0 ZIP](https://t36074068
 
 ## Blender run order
 
+**Fastest path for the performer (no GLB, no Python setup):** pull the repo, open your musician library .blend, and run `blender/ZED_performer_from_repo.py`. It reads `data/performer_manifest.json` and builds or updates the 16 parts natively in Blender: real quads with end caps (2,304 vertices, 2,080 faces), smooth shaded, sharp only at the cap rims. It matches `source/performer.py` exactly. A pop-up reports the result. Then press Ctrl+S.
+
 1. `blender/ZED_build_library.py` in a NEW empty file. Builds and saves `URITP_Musicians_LIB_v5_1.blend`: one asset collection per item (`LIB_PERF_Performer`, `LIB_PROP_<Name>`) and socket empties. Runs once; never overwrites a save.
-2. Already have a library file? Run `blender/ZED_update_performer.py` inside it instead. It swaps only the performer's mesh shapes, so linked files pick up the change on reload; a pop-up reports the result. Then press Ctrl+S.
+2. GLB route: already have a library file? Run `blender/ZED_update_performer.py` inside it instead. It swaps only the performer's mesh shapes, so linked files pick up the change on reload; a pop-up reports the result. Then press Ctrl+S.
 3. In a show file (for example the SPAC assembly): File > Link > the library > Collection > `LIB_PERF_Performer`.
 4. `blender/ZED_blocking_proxy.py` creates the mover empty for blocking. Animate the mover, never the mesh. Parent the linked performer, or later the rig, to it.
 
