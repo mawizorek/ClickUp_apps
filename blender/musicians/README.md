@@ -19,13 +19,13 @@ This folder is the source of truth for the musician previz set: one sculptural p
 
 Regenerate them: from this folder, run `python source/performer.py`, then `python source/props.py`, then `python source/export.py`. Output lands in `dist/`. The regenerated props were checked byte-identical to the shipped v5.0 files.
 
-Or download the shipped files from ClickUp: the [set v5.0 ZIP](https://t36074068.p.clickup-attachments.com/t36074068/7b869878-8277-5de9-b9f6-618d1d0c5ae3/URITP_MusicianSet_v5_0.zip?view=open) (props; it carries the old v4.1 performer) plus the [performer v4.3 update ZIP](https://t36074068.p.clickup-attachments.com/t36074068/dfef8544-6d18-56b5-976e-2883cef1a281/PERF_v4_3_update.zip?view=open).
+Easiest on a new machine: the [starter kit ZIP](https://t36074068.p.clickup-attachments.com/t36074068/299907ee-279c-535d-99b6-2bc8d3e197e7/URITP_musicians_starter_kit.zip?view=open) is this folder plus a ready-built `dist/` (performer v4.3 + props v5.0). Or download the older shipped files from ClickUp: the [set v5.0 ZIP](https://t36074068.p.clickup-attachments.com/t36074068/7b869878-8277-5de9-b9f6-618d1d0c5ae3/URITP_MusicianSet_v5_0.zip?view=open) (props; it carries the old v4.1 performer) plus the [performer v4.3 update ZIP](https://t36074068.p.clickup-attachments.com/t36074068/dfef8544-6d18-56b5-976e-2883cef1a281/PERF_v4_3_update.zip?view=open).
 
 ## Blender run order
 
 **Fastest path for the performer (no GLB, no Python setup):** pull the repo, open your musician library .blend, and run `blender/ZED_performer_from_repo.py`. It reads `data/performer_manifest.json` and builds or updates the 16 parts natively in Blender: real quads with end caps (2,304 vertices, 2,080 faces), smooth shaded, sharp only at the cap rims. It matches `source/performer.py` exactly. A pop-up reports the result. Then press Ctrl+S.
 
-1. `blender/ZED_build_library.py` in a NEW empty file. Builds and saves `URITP_Musicians_LIB_v5_1.blend`: one asset collection per item (`LIB_PERF_Performer`, `LIB_PROP_<Name>`) and socket empties. Runs once; never overwrites a save.
+1. `blender/ZED_build_library.py` in a NEW empty file. Builds one asset collection per item (`LIB_PERF_Performer`, `LIB_PROP_<Name>`) plus socket empties, then saves `musicians.blend` into `MAW_PREVIS/_LIBRARY/figures/` (create that folder first; it is found in your home, Documents or Desktop). The name stays stable because show files link by path. Runs once; never overwrites a save; a pop-up reports the result. Then register `MAW_PREVIS/_LIBRARY` in Preferences > File Paths > Asset Libraries with Import Method: Link.
 2. GLB route: already have a library file? Run `blender/ZED_update_performer.py` inside it instead. It swaps only the performer's mesh shapes, so linked files pick up the change on reload; a pop-up reports the result. Then press Ctrl+S.
 3. In a show file (for example the SPAC assembly): File > Link > the library > Collection > `LIB_PERF_Performer`.
 4. `blender/ZED_blocking_proxy.py` creates the mover empty for blocking. Animate the mover, never the mesh. Parent the linked performer, or later the rig, to it.

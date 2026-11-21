@@ -1,13 +1,15 @@
 # ZED · Build the URITP musician LIBRARY file (Blender 5.2.2 LTS target; not yet run by its author)
 # What it does: imports the performer + every v5.0 prop into its own asset collection, adds named socket
-# empties from set_manifest.json, marks each collection as an asset, saves URITP_Musicians_LIB_v5_1.blend.
+# empties from set_manifest.json, marks each collection as an asset, saves musicians.blend (into MAW_PREVIS/_LIBRARY/figures/ if it exists).
 # Run ONCE in a NEW, EMPTY Blender file. It never deletes anything and refuses to run twice or overwrite a save.
 # Repo layout: blender/musicians/blender/ (this script) finds ../dist (run source/export.py, or unzip the set there). Text > Open this file > Run Script.
 import bpy, os, json
 from mathutils import Vector
 
 LIB_ROOT = 'URITP_MUSICIANS_LIB'
-SAVE_NAME = 'URITP_Musicians_LIB_v5_1.blend'
+SAVE_NAME = 'musicians.blend'   # stable name: show files link by path, so the name never carries a version (versions live in CHANGELOG)
+# Saves into MAW_PREVIS/_LIBRARY/figures/ when that folder exists (home, Documents or Desktop), else next to this script.
+LIB_HOMES = ['~/MAW_PREVIS/_LIBRARY/figures', '~/Documents/MAW_PREVIS/_LIBRARY/figures', '~/Desktop/MAW_PREVIS/_LIBRARY/figures']
 FOLDER = ''   # leave empty: auto-detects the folder this script was opened from
 
 def say(*a): print('[ZED LIB]', *a)
@@ -101,11 +103,17 @@ def main():
         zmax = max((o.matrix_world @ Vector(c)).z for o in perf for c in o.bound_box)
         zmin = min((o.matrix_world @ Vector(c)).z for o in perf for c in o.bound_box)
         say(f'performer height {zmax - zmin:.3f} m (expect 1.768), floor {zmin:.4f} (expect 0.0000)')
-    out = os.path.join(base, SAVE_NAME)
+    home = next((os.path.expanduser(h) for h in LIB_HOMES if os.path.isdir(os.path.expanduser(h))), base)
+    out = os.path.join(home, SAVE_NAME)
+    lines = [f'{len(report)} asset collections built (performer + props)']
+    if perf: lines.append(f'Performer height {zmax - zmin:.3f} m (expect 1.768), floor {zmin:+.4f} (expect +0.0000)')
     if os.path.exists(out):
-        say('NOT SAVED: file exists, refusing to overwrite ->', out, ' Save As manually.')
+        lines.append(f'NOT SAVED: {out} already exists. Nothing overwritten; use Save As.')
     else:
         bpy.ops.wm.save_as_mainfile(filepath=out)
-        say('saved', out)
+        lines.append(f'Saved: {out}')
+        if home == base: lines.append('No MAW_PREVIS/_LIBRARY/figures folder found, so it saved next to this script.')
+    for l in lines: say(l)
+    bpy.context.window_manager.popup_menu(lambda self, ctx: [self.layout.label(text=l) for l in lines], title='ZED · musician library', icon='INFO')
 
 main()
