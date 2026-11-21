@@ -1,0 +1,112 @@
+{
+ "version": "5.0",
+ "space": "Blender: meters, Z up, front -Y, left +X. Prop-local; origin = pivot.",
+ "materials_sRGB": {
+  "PERF": 0.52,
+  "INST": 0.4,
+  "ACCENT": 0.2,
+  "FURN": 0.46,
+  "PIANO": 0.3,
+  "KEYS": 0.72
+ },
+ "props": {
+  "Violin": {
+   "code": "VLN",
+   "pivot": "tail end (chin end), body axis +Z, top faces -Y",
+   "objects": ["Body"],
+   "sockets": {
+    "CHIN": [-0.03, -0.03, 0.04],
+    "GRIP.L": [0.0, 0.0, 0.45],
+    "BOW_CONTACT": [0.0, -0.045, 0.17],
+    "REST": [0.0, 0.03, 0.2]
+   }
+  },
+  "ViolinBow": {
+   "code": "VBW",
+   "pivot": "frog, stick axis +Z",
+   "objects": ["Bow"],
+   "sockets": {
+    "GRIP.R": [0, 0, 0.03],
+    "MID": [0, 0, 0.37]
+   }
+  },
+  "Cello": {
+   "code": "VC",
+   "pivot": "endpin tip, body axis +Z, top faces -Y",
+   "objects": ["Body"],
+   "sockets": {
+    "ENDPIN": [0, 0, 0],
+    "GRIP.L": [0.0, -0.07, 1.15],
+    "BOW_CONTACT": [0.0, -0.1, 0.62],
+    "KNEE.L": [-0.22, 0.0, 0.5],
+    "KNEE.R": [0.22, 0.0, 0.5]
+   }
+  },
+  "CelloBow": {
+   "code": "CBW",
+   "pivot": "frog, stick axis +Z",
+   "objects": ["Bow"],
+   "sockets": {
+    "GRIP.R": [0, 0, 0.03],
+    "MID": [0, 0, 0.355]
+   }
+  },
+  "Guitar": {
+   "code": "GTR",
+   "pivot": "butt end, body axis +Z, top faces -Y",
+   "objects": ["Body"],
+   "sockets": {
+    "GRIP.L": [0.0, -0.035, 0.8],
+    "STRUM": [0.0, -0.05, 0.33],
+    "THIGH.L": [0.0, 0.05, 0.27],
+    "REST": [0.0, 0.05, 0.13]
+   }
+  },
+  "Footstool": {
+   "code": "FST",
+   "pivot": "floor center",
+   "objects": ["Stool"],
+   "sockets": {
+    "FOOT.L": [0, 0, 0.15]
+   }
+  },
+  "MelodyChair": {
+   "code": "CHR",
+   "pivot": "floor center under seat",
+   "objects": ["Chair"],
+   "sockets": {
+    "SEAT": [0, 0, 0.468],
+    "PROP_REST": [0, -0.12, 0.468]
+   }
+  },
+  "MusicStand": {
+   "code": "STD",
+   "pivot": "floor center",
+   "objects": ["Stand"],
+   "sockets": {
+    "DESK": [0, 0.02, 1.16]
+   }
+  },
+  "GrandPiano": {
+   "code": "PNO",
+   "pivot": "floor, center of keyboard front",
+   "objects": ["Case", "Keys", "Lid"],
+   "sockets": {
+    "KEYS_L": [-0.55, -0.1, 0.725],
+    "KEYS_R": [0.55, -0.1, 0.725],
+    "MIDDLE_C": [-0.04, -0.1, 0.725],
+    "PEDAL_R": [0.07, 0.2, 0.075],
+    "LID_HINGE_AXIS": [[-0.74, 0.06, 0.995], [-0.74, 2.11, 0.995]],
+    "LID_DEG": 38.0
+   }
+  },
+  "PianoBench": {
+   "code": "BNC",
+   "pivot": "floor center",
+   "objects": ["Bench"],
+   "sockets": {
+    "SEAT": [0, 0, 0.505]
+   }
+  }
+ }
+}
