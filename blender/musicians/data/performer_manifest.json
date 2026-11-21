@@ -1,6 +1,6 @@
 {
  "schema": "maw-performer-manifest",
- "version": "4.2",
+ "version": "4.3",
  "asset": "MUS_Performer",
  "style": "E Brancusi: one ovoid per bone",
  "units": "meters",
@@ -146,5 +146,5 @@
    "tail": [-0.13756, -0.16139, 0.03282]
   }
  },
- "note": "Object origin = bone head. The form recipe is pose-independent: same shapes on any skeleton."
+ "note": "Object origin = bone head. The form recipe is pose-independent: same shapes on any skeleton. v4.3: lofted, shared vertices, smooth normals."
 }
