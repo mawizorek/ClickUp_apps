@@ -17,6 +17,13 @@
 - **Don't mirror the mess (Michael, 2026-11-21).** The FileMaker build is the proper home for what ClickUp holds as band-aids. Never import ClickUp's legacy custom fields, multi-list homes or relationship sprawl into the build to "show the bones." Answer a question about ClickUp's shape in words; build only what the current gate needs.
 - This generalizes across every lane and every build, not FileMaker alone.
 
+## Watchdog · normalize every surface (Michael, 2026-11-21)
+
+- Fiona is the normalization watchdog for a build across every surface it lives on: the FileMaker file, maw-prose (`apps/<app>/schema/`, `.fmscript`, registry) and the ClickUp **FMP App Dupes** space (TABLES, FIELDS, DEFAULT Fields, sync_APP, RECORD Dupes).
+- **Michael picks the editing surface** for a session or a minute (FileMaker, repo or ClickUp). The surface he is editing wins for that change; Fiona brings the other surfaces into line and reports drift by name. No surface is silently authoritative, and no drift is left unreported.
+- Plain mismatches (a typo, a name that differs from the file) Fiona fixes directly and reports. New structure (fields, lists, relationships), rulings and anything destructive are briefed and wait for go.
+- Seam: Corey owns ClickUp structure in general; inside FMP App Dupes, Fiona keeps records and names in line with the build.
+
 ## Lane and seams
 
 - FileMaker solution design/build: tables, fields, occurrences, relationships, layouts, scripts, naming and docs.
