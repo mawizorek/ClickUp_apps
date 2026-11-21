@@ -2,6 +2,10 @@
 
 All 2026-11-21, Scene Zed. Older builds survive as ClickUp attachments on the SFANW previz session task; this folder is the source of truth.
 
+## 0.6.0 · clean start, linked venue, Renderworks cameras
+
+Michael wants to start over from a bare file, with cameras predetermined as Vectorworks camera objects. OPEN PREVIZ in a folder with no `.blend` now makes `<folder name>.blend` and builds everything. The venue comes from a Vectorworks FBX at `_LIBRARY/venue/SPAC_venue.fbx`: Previz builds `SPAC_venue.blend` from it (rebuilt when the FBX changes) and links its VENUE collection, so the channel check and every show share one room (Architecture: link, never append). The camera dump v0.2 reads Renderworks Camera objects (all fields kept for checking), alongside the v0.1 CAM/AIM loci. The direction a camera at rotation 0 looks (`CAM_ROT0`) is calibrated by the first real camera. Tests 21/21 + 17/17.
+
 ## 0.5.1 · Vectorworks cameras, house ambient
 
 Michael: the cameras were "still pretty trash" and the world should sit at 5% "since it's impossible to get a real blackout anyways". Cameras guessed from a bounding box can't be right, so Vectorworks now places them: CAM/AIM 3D-locus pairs on CAM VENUE / SCENIC / RENDER layers, dumped by `vectorworks/vwx_dump_cameras.py`, pulled in as `<blend>.cameras.json` with an announced adopt. Guessed cameras stay as the fallback, marked GUESSED, and step aside into a hidden collection when real ones arrive. World: warm house ambient at 5% on every surface (Previz tab slider), black void to the camera. `tests/test_cameras.py` 9/9.

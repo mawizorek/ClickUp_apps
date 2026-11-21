@@ -1,24 +1,29 @@
-# MAW Previz v0.5.1 · Scene Zed · 2026-11-21
+# MAW Previz v0.6.0 · Scene Zed · 2026-11-21
 # The previz file syncs its rig from ONE place: the .mvr beside this .blend with the same name
 #   SPAC_CHANNEL_CHECK.blend  <->  SPAC_CHANNEL_CHECK.mvr
 # Vectorworks owns fixtures (type, position, patch). Blender owns cameras, world, render, animation.
 # Never edit a fixture in Blender: the next sync puts it back to what VWX says.
 # Sync = pre-flight (refuses bad MVRs) -> BlenderDMX import, matched by fixture UUID (updates in place)
 #        -> prune fixtures VWX no longer has -> verify every fixture against the MVR -> PASS/BLOCKED report.
-# Cameras: Vectorworks owns their positions too. Pairs of 3D loci (CAM <name> / AIM <name>) on layers CAM VENUE,
-#   CAM SCENIC, CAM RENDER, dumped by vectorworks/vwx_dump_cameras.py to <blend name>.cameras.json beside the blend.
-#   No camera file = the old guessed cameras, flagged GUESSED in the report.
+# Bare start: OPEN PREVIZ in a folder with no .blend creates <folder name>.blend and builds everything.
+# Venue: Vectorworks FBX at MAW_PREVIS/_LIBRARY/venue/SPAC_venue.fbx -> Previz builds SPAC_venue.blend from it
+#   (rebuilt whenever the FBX changes) and LINKS its VENUE collection. Link, never append.
+# Cameras: Vectorworks owns their positions too. Renderworks Camera objects (or CAM/AIM 3D-locus pairs) on layers
+#   CAM VENUE, CAM SCENIC, CAM RENDER, dumped by vectorworks/vwx_dump_cameras.py; Previz pulls the dump in as
+#   <blend name>.cameras.json. No camera file = guessed cameras, flagged GUESSED in the report.
 # House ambient: 5% by default (a real house is never black: exits, spill, aisle lights). Camera still sees black void.
 # Open with "OPEN PREVIZ.command" (double-click). Built for BlenderDMX 2.2.5 on Blender 5.2.2. Status: BUILT.
-import bpy, json, math, re, os, glob, inspect, shutil, time, zipfile, hashlib
+import bpy, json, math, re, os, sys, glob, inspect, shutil, time, zipfile, hashlib
 import xml.etree.ElementTree as ET
 from mathutils import Vector
 
-VERSION = "0.5.1"
+VERSION = "0.6.0"
 UNIVERSES = 64
 HAZE = 0.02
 AMBIENT = 0.05           # house ambient, 0-1 (5% = a theatre at blackout: exits, spill, aisle lights)
 P_AMBIENT = "Previz Ambient"
+VENUE = "SPAC"           # venue name: _LIBRARY/venue/<VENUE>_venue.fbx -> <VENUE>_venue.blend
+CAM_ROT0 = 0.0           # deg: which way a Renderworks camera at rotation 0 looks (0 = +X). Calibrated by the first camera
 EXPECT_LAYER = None      # e.g. "LX 8 - INVENTORY" to warn about strays; None = any layer
 
 # MAW Previz pre-flight: reads an .mvr with plain Python (no Blender needed) and says whether it's safe to sync.
@@ -281,6 +286,116 @@ def sync_rig(force=False):
     return "PASS", lines + [f"synced: {len(p2['want'])} fixtures, every one patched where VWX says"]
 
 
+def _length_m(v):
+    """Vectorworks length -> metres. Numbers are document units (needs upi); strings may carry ' \" mm cm m."""
+    if isinstance(v, (int, float)):
+        return float(v)
+    t = str(v).strip().lower().replace("\u2019", "'").replace("\u201d", '"')
+    m = re.match(r"\s*(-?\d+(?:\.\d+)?)\s*'\s*-?\s*(?:(\d+(?:\.\d+)?)\s*\")?", t)     # 5'6" or 5'-6"
+    if m:
+        return float(m.group(1)) * 0.3048 + float(m.group(2) or 0) * 0.0254
+    m = re.match(r"\s*(-?\d+(?:\.\d+)?)\s*(mm|cm|m|\")?", t)
+    if not m:
+        return 0.0
+    n, u = float(m.group(1)), m.group(2)
+    return {"mm": n / 1000, "cm": n / 100, "m": n, '"': n * 0.0254}.get(u, n)
+
+
+def previs_root(start):
+    """Walk up from a folder to the MAW_PREVIS root: the first folder that holds _LIBRARY."""
+    d = os.path.abspath(start)
+    while True:
+        if os.path.isdir(os.path.join(d, "_LIBRARY")):
+            return d
+        up = os.path.dirname(d)
+        if up == d:
+            return None
+        d = up
+
+
+def venue_paths(blend_path):
+    root = previs_root(os.path.dirname(blend_path)) if blend_path else None
+    if not root:
+        return None, None
+    vdir = os.path.join(root, "_LIBRARY", "venue")
+    return os.path.join(vdir, f"{VENUE}_venue.fbx"), os.path.join(vdir, f"{VENUE}_venue.blend")
+
+
+def _sha(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()[:16]
+
+
+def _build_venue_blend(fbx, vblend):
+    """Import the Vectorworks FBX into a VENUE collection, write just that to the venue .blend, clean up here."""
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.fbx(filepath=fbx)
+    new = [o for o in bpy.data.objects if o not in before]
+    col = bpy.data.collections.new("VENUE")
+    for o in new:
+        for c in list(o.users_collection):
+            c.objects.unlink(o)
+        col.objects.link(o)
+    bpy.data.libraries.write(vblend, {col}, path_remap="RELATIVE_ALL", compress=True)
+    lo_hi = _bbox(new)
+    for o in new:
+        bpy.data.objects.remove(o, do_unlink=True)
+    bpy.data.collections.remove(col)
+    with open(vblend + ".source.json", "w") as fh:
+        json.dump({"fbx": os.path.basename(fbx), "sha": _sha(fbx), "built": time.strftime("%Y-%m-%d %H:%M"),
+                   "objects": len(new)}, fh)
+    size = (lo_hi[1] - lo_hi[0]) if lo_hi else None
+    return len(new), size
+
+
+def ensure_venue():
+    """Rebuild the venue library when its FBX changed, then link VENUE into this file (once)."""
+    fbx, vblend = venue_paths(bpy.data.filepath)
+    if not fbx:
+        return "no MAW_PREVIS/_LIBRARY folder above this file: venue not linked"
+    notes = []
+    if os.path.isfile(fbx):
+        src = {}
+        if os.path.isfile(vblend + ".source.json"):
+            with open(vblend + ".source.json") as fh:
+                src = json.load(fh)
+        if not os.path.isfile(vblend) or src.get("sha") != _sha(fbx):
+            n, size = _build_venue_blend(fbx, vblend)
+            notes.append(f"built {os.path.basename(vblend)} from {os.path.basename(fbx)}: {n} objects"
+                         + (f", {size.x:.1f} x {size.y:.1f} x {size.z:.1f} m (check that's SPAC-sized)" if size else ""))
+            lib = next((l for l in bpy.data.libraries if os.path.abspath(bpy.path.abspath(l.filepath)) == vblend), None)
+            if lib is not None:
+                lib.reload(); notes.append("reloaded the linked venue")
+    elif not os.path.isfile(vblend):
+        return f"MISSING venue: export the SPAC venue from Vectorworks as FBX to {fbx}"
+    venue = next((c for c in bpy.data.collections if c.name == "VENUE" and c.library is not None), None)
+    if venue is None:
+        with bpy.data.libraries.load(vblend, link=True, relative=True) as (src_data, dst_data):
+            dst_data.collections = [c for c in src_data.collections if c == "VENUE"]
+        venue = dst_data.collections[0] if dst_data.collections else None
+        if venue is None:
+            return f"FAIL {os.path.basename(vblend)} has no VENUE collection"
+        notes.append(f"linked VENUE from {os.path.basename(vblend)}")
+    if venue.name not in bpy.context.scene.collection.children:
+        bpy.context.scene.collection.children.link(venue)
+    return " · ".join(notes) or f"venue linked ({os.path.basename(vblend)})"
+
+
+def bare_start(new_path):
+    """Fresh file from the launcher: clear Blender's default cube/light/camera and save under the folder's name."""
+    if bpy.data.filepath:
+        return f"file already saved as {os.path.basename(bpy.data.filepath)}"
+    for nm in ("Cube", "Light", "Camera"):
+        o = bpy.data.objects.get(nm)
+        if o is not None:
+            bpy.data.objects.remove(o, do_unlink=True)
+    bpy.ops.wm.save_as_mainfile(filepath=new_path, relative_remap=True)
+    return f"new file {os.path.basename(new_path)}"
+
+
 def polish():
     """Render + viewport settings that make it feel like a lighting viz, not a modelling session."""
     sc = bpy.context.scene
@@ -451,6 +566,54 @@ def cameras_path():
     return (os.path.splitext(fp)[0] + ".cameras.json") if fp else None
 
 
+def _field(fields, *wanted):
+    """Find a Renderworks Camera field by loose name (case, spaces, hyphens ignored)."""
+    norm = {re.sub(r"[^a-z]", "", k.lower()): v for k, v in fields.items()}
+    for w in wanted:
+        v = norm.get(re.sub(r"[^a-z]", "", w.lower()))
+        if v not in (None, ""):
+            return v
+    return None
+
+
+def rw_camera(rc):
+    """Pure logic (unit-tested): one Renderworks Camera from the Vectorworks dump -> eye, aim, lens.
+    rc: dict(name, layer, xyz_m (insertion point, metres), rot_deg, fields{...})."""
+    f = rc.get("fields", {})
+    fm = rc.get("fields_m", {})                       # lengths Vectorworks already converted to metres
+
+    def length(*names):
+        v = _field(fm, *names)
+        if v is not None:
+            return float(v)
+        v = _field(f, *names)
+        return _length_m(v) if v is not None else None
+    raw = str(rc.get("name") or _field(f, "Name") or "").strip()
+    if not raw:
+        return None, "unnamed Renderworks camera skipped (name it in Object Info)"
+    nm = " ".join(raw.upper().split())
+    nm = nm if nm.startswith("CAM ") else "CAM " + nm
+    layer = str(rc.get("layer", "")).upper()
+    tier = next((t for t in CAM_TIERS if t in layer), "VENUE")
+    x, y, z = (float(c) for c in rc.get("xyz_m", (0, 0, 0)))
+    h = length("Camera Height", "Height") or 0.0
+    look_h = length("Look To Height", "LookTo Height", "Look-To Height")
+    look_h = h if look_h is None else look_h
+    dist = length("Camera Distance", "Look To Distance", "Distance") or 10.0
+    lx, ly = length("Look To X", "LookTo X"), length("Look To Y", "LookTo Y")
+    if lx is not None and ly is not None:
+        ax, ay = lx, ly
+    else:
+        a = math.radians(float(rc.get("rot_deg", 0.0)) + CAM_ROT0)
+        ax, ay = x + dist * math.cos(a), y + dist * math.sin(a)
+    lens = _field(f, "Focal Length", "Lens")
+    try:
+        lens = float(re.match(r"\s*(\d+(?:\.\d+)?)", str(lens)).group(1)) if lens is not None else 35.0
+    except Exception:
+        lens = 35.0
+    return dict(name=nm, tier=tier, eye=(x, y, z + h), aim=(ax, ay, z + look_h), lens=lens), None
+
+
 def parse_cameras(data):
     """Pure logic (unit-tested): pair CAM <name> with AIM <name> loci. Returns (cams, problems).
     cams: [dict(name, tier, eye(x,y,z m), aim, lens)]. Lens from a trailing number: 'CAM REP CENTER 35' = 35 mm."""
@@ -468,6 +631,14 @@ def parse_cameras(data):
             eyes[key] = dict(name=f"CAM {key}", tier=tier, eye=xyz, lens=lens)
         elif nm.startswith("AIM "):
             aims[nm[4:]] = xyz
+    for rc in data.get("cameras", []):            # Renderworks Camera objects
+        c, why = rw_camera(rc)
+        if c is None:
+            problems.append(why); continue
+        key = c["name"][4:]
+        if key in eyes:
+            problems.append(f"two cameras named {c['name']}")
+        eyes[key] = c; aims[key] = c["aim"]
     cams = []
     for key, c in sorted(eyes.items()):
         if key not in aims:
@@ -658,7 +829,7 @@ def setup(force=False):
         status, rl = "FAIL", [f"sync crashed: {e!r}"]
     sc["maw_rig_status"] = status
     lines.append(f"RIG  {status}"); lines += ["     " + x for x in rl]
-    steps = [ensure_universes, look, polish, cameras, lenses_from_names, rendered_view]
+    steps = [ensure_universes, ensure_venue, look, polish, cameras, lenses_from_names, rendered_view]
     if status in ("PASS", "CURRENT"):
         steps.insert(-1, lambda: lamp_test(True))
     for step in steps:
@@ -786,6 +957,9 @@ if __name__ == "__main__":
             t.use_module = False         # older pasted copies: the embedded one wins
         elif head.startswith("# MAW Bench v"):
             t.use_module = False         # retire the old Bench tab
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    if "--new" in argv:
+        print("MAW Previz:", bare_start(argv[argv.index("--new") + 1]))
     setup()
 elif __name__.endswith(".py"):
     register()
