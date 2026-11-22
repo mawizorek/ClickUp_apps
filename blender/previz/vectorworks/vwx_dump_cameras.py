@@ -1,4 +1,4 @@
-# MAW · Vectorworks camera dump v0.2 · Scene Zed · 2026-11-21
+# MAW · Vectorworks camera dump v0.2.1 · Scene Zed · 2026-11-21
 # Runs INSIDE Vectorworks (Python). Read-only: changes nothing in the drawing.
 # Writes ~/Desktop/maw_vwx_cameras.json. MAW Previz pulls it in on its next run.
 #
@@ -78,4 +78,12 @@ with open(OUT, "w") as f:
     json.dump({"file": vs.GetFName(), "made": time.strftime("%Y-%m-%d %H:%M"), "units_per_inch": UPI,
                "cameras": cameras, "points": loci}, f, indent=1)
 
-vs.AlrtDialog(f"MAW cameras: {len(cameras)} Renderworks cameras, {len(loci)} CAM/AIM loci\n{OUT}\nNow run OPEN PREVIZ.")
+on_cam = [c for c in cameras if c["layer"].upper().startswith("CAM ")]
+nameless = [c for c in on_cam if not c["name"]]
+off = len(cameras) - len(on_cam)
+msg = f"MAW cameras: {len(on_cam) - len(nameless)} named on CAM layers, {len(loci)} CAM/AIM loci"
+if nameless:
+    msg += f"\nNAME THESE: {len(nameless)} unnamed camera(s) on CAM layers will be skipped"
+if off:
+    msg += f"\n{off} camera(s) on other layers ignored (presentation cameras stay out)"
+vs.AlrtDialog(msg + f"\n{OUT}\nNow run OPEN PREVIZ.")

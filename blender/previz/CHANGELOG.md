@@ -1,6 +1,10 @@
 # MAW Previz changelog
 
-All 2026-11-21, Scene Zed. Older builds survive as ClickUp attachments on the SFANW previz session task; this folder is the source of truth.
+All 2026-11-21/22, Scene Zed. Older builds survive as ClickUp attachments on the SFANW previz session task; this folder is the source of truth.
+
+## 0.6.1 · no silent camera failures
+
+Michael asked what fails if he forgets a name or a layer is off. Answer before this build: an off-layer camera silently became a VENUE camera, and a camera deleted in Vectorworks silently lingered in Blender. Both broke the Silent-Fallback Law. Now: only cameras and CAM/AIM loci on layers named `CAM ...` are read; others are ignored and named in the report (presentation cameras stay out). Unnamed cameras on a CAM layer are skipped with "name it". Duplicate names are reported. A VWX camera that disappears is parked in the hidden CAM OLD GUESSES and reported. Every camera gets a report line (tier, eye in metres, lens), flagged OUTSIDE the venue when it lands more than 2 m outside the venue bounds (the tell for a wrong user origin or a raised CAM layer). Dump v0.2.1 popup: named cameras on CAM layers, unnamed ones to fix, off-layer ones ignored. Tests 26/26 + 17/17.
 
 ## 0.6.0 · clean start, linked venue, Renderworks cameras
 
@@ -31,3 +35,7 @@ Renamed from Bench (Michael picked "Previz"; "Bench" meant nothing to him). Thre
 ## Bench 0.1 to 0.3
 
 First setup script: universes (BlenderDMX defaults to 0, so everything stayed dark), black world + haze, Cycles, lamp test from per-GDTF values, Play/Eos modes.
+
+## Open before SFANW
+
+Cameras come from one Vectorworks file per blend (a dump from a second file is refused). Route by layer instead: CAM VENUE to `_LIBRARY/venue/SPAC_venue.cameras.json` (shared by every SPAC file), CAM SCENIC and CAM RENDER to the show's own file.
