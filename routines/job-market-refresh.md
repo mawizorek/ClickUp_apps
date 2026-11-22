@@ -4,11 +4,12 @@ display_name: Job Market Refresh
 type: runbook
 steward: routine-ricky
 cadence: pointer only — authoritative cadence is the row in routines/schedule.md
-state_dir: routines/job-market-state/
+state: ClickUp Job Census list (1400600000006272) + Lanes list (1400600000006271), space CV and Applications
+legacy_state_dir: routines/job-market-state/ (FROZEN 2026-11-22, read-only, migrate-on-first-touch)
 last_run: routines/last-run/job-market.txt
 added: 2026-07-30
-version: 19
-model: search-first, loop-per-role, commit-per-role, resumable-by-derivation
+version: 20
+model: search-first, loop-per-role, write-per-role, resumable-by-derivation
 ---
 
 > ⚠️ **Frontmatter is metadata, never a switch.** `routines/schedule.md`'s table is the ONLY on/off switch
@@ -18,10 +19,11 @@ model: search-first, loop-per-role, commit-per-role, resumable-by-derivation
 
 goal:       **find the jobs that are open today.** Every pass searches wide and deep for each configured
             role, then restates the entire live market — same, new, disappeared — to one standing ClickUp
-            thread, with per-lane TSV files as the structured index behind it.
-target:     `routines/job-market-state/<role_id>.tsv` (source of truth, one per lane) · the standing
-            thread `86ajtgbt3` (read surface) · `routines/last-run/job-market.txt` (stamp).
-            **Creates no tasks and sends nothing.**
+            thread, with the ClickUp **Job Census** as the structured database behind it.
+target:     **Job Census** list `1400600000006272` (source of truth, one task per posting per board) ·
+            **Lanes** list `1400600000006271` (one task per lane, `Last Pass` = the role-boundary stamp) ·
+            the standing thread `86ajtgbt3` (read surface) · `routines/last-run/job-market.txt` (stamp).
+            **Writes census rows and lane stamps only. Sends nothing.**
 report-to:  DETAIL → the standing thread `86ajtgbt3`. ROLL-UP → 🧭 STANDING · Routine Ricky — Run Reports
             · https://app.clickup.com/t/86ajuhw1d
 
@@ -29,14 +31,32 @@ report-to:  DETAIL → the standing thread `86ajtgbt3`. ROLL-UP → 🧭 STANDIN
 
 | File | Holds |
 |------|-------|
-| `job-market-refresh.md` | **this file** — the Resume Scan, the steps, the guardrails. **Procedure only.** |
+| `job-market-refresh.md` | **this file** — the Resume Scan, the steps, the census schema, the guardrails. **Procedure only.** |
 | `job-market-refresh.notes.md` | **WHY** — locked decisions, architecture, the failure log, the changelog |
 | `job-market-templates.md` | comment architecture, the pass anchor, templates 1-9, board URLs |
 | `job-market-sources.md` | the source list, board access notes, density expectations |
 
 **WHAT this does.** The WHEN lives in `routines/schedule.md`. The universal floor lives in
 `routines/README.md` — including **THE STAMP LAW**, **rule 13 (complete loops)** and **rule 14 (commit at
-the boundary)**.
+the boundary)**. **Liveness is governed by `brain-config/hooks/source-freshness-gate.md` Rule 7.**
+
+---
+
+## 🗄️ v20 CUTOVER — the repo is no longer the database (2026-11-22, Michael)
+
+Michael: *"merge it so the next run doesn't try and store long for repo indexes."*
+
+- 🔴 **Pass state lives in ClickUp now.** Census rows are tasks in **Job Census**. Lane coverage is the
+  `Last Pass` date on that lane's task in **Lanes**. The thread and the stamp file are unchanged.
+- 🧊 **`routines/job-market-state/*.tsv` is FROZEN.** Read-only history. **Never write, append to, commit
+  or re-create a lane TSV.** No new TSV for a new lane, no `_unfiled.tsv` rows.
+- 🔁 **Migrate on first touch.** A lane whose census has no rows yet (every lane except
+  `production-manager` at cutover) loads its frozen TSV's `live` rows **once**, as the comparison
+  baseline, the first time a pass reaches it. Reconcile the sweep against those rows, then write the
+  result into the census. Graves (`gone` rows) do not migrate. After that, the TSV is never read again.
+- ✅ **`production-manager` is migrated** (72 rows, 2026-11-21; strict recheck 2026-11-22). Its TSV is
+  already dead to the routine.
+- Full design and provenance: the Job Market Decision Log, entries **J9** and **J10**.
 
 ---
 
@@ -49,17 +69,17 @@ Read these before the steps. Full failure log: `job-market-refresh.notes.md`.
 **Open every role by searching, not by reading what you already have.** Say it out loud and mean it:
 *"Today I am beginning my job search for Michael for production manager positions."* Then go find jobs.
 
-🔴 **The lane file is what you COMPARE TO at the end. It is never what you START FROM.** Michael:
-*"I don't know why you would use the existing data as your starting point when the whole point is to find
-new things anyway! You should just be searching wide and deep to find jobs."*
+🔴 **The lane's census rows are what you COMPARE TO at the end. They are never what you START FROM.**
+Michael: *"I don't know why you would use the existing data as your starting point when the whole point
+is to find new things anyway! You should just be searching wide and deep to find jobs."*
 
 - ⭐ **The value of a pass is what it FINDS, not what it CONFIRMS.** Verification is a side-service.
   Three real new jobs and zero verifications is a good pass; total verification and no finds is a status
   report.
 - 🔴 **"I cannot verify my old rows" NEVER decides whether to search.** Those are two unrelated
   questions and collapsing them cost a full pass on 08-31.
-- ⚠️ **Unverifiable carries are a REPORTING problem, not a search problem.** Mark them unverified, name
-  the board, move on. Never let them gate the sweep.
+- ⚠️ **Unverifiable carries are a REPORTING problem, not a search problem.** Leave `Last Verified` blank,
+  name the board, move on. Never let them gate the sweep.
 
 ### 2. 🚪 A DOOR IS NOT A BOARD
 
@@ -83,8 +103,8 @@ its boards are down.** Same act, new excuse.
   the executor silently ran role 5 first because its sources were up.
 - **A lane with 6 of 13 boards reachable still gets swept and reported.** Michael: *"Even if seven are
   down, luckily you still have six more. It's tough, but finding at least three is a start."*
-- **A lane you could barely sweep gets a header, a block and a commit like any other**, with the dead
-  boards named on the zero-yield line.
+- **A lane you could barely sweep gets a header, a block and its census write like any other**, with the
+  dead boards named on the zero-yield line.
 
 ---
 
@@ -102,15 +122,17 @@ looking at what happened, not by reading a note that says what happened.** Evide
 4. **Walk `roles.json` in order.** The **first role with no header under the current anchor** is your
    resume point.
 5. **Verify the boundary role** — the last one that DOES have a header. Does it have its threaded block
-   (SAME / ALSO / NEW / GONE / NOTABLE), and do its rows exist in its lane file? **If either is missing,
-   THAT role is the resume point.** *(Three orphan headers happened for real on 2026-08-04.)*
+   (SAME / ALSO / NEW / GONE / NOTABLE), **and does its task in Lanes carry `Last Pass` = the current
+   anchor?** **If either is missing, THAT role is the resume point.** *(Three orphan headers happened for
+   real on 2026-08-04.)*
 6. **Cross-check the stamp.** Stamp NEWER than the current anchor = contradiction. **Say so and ask.**
 7. **Staleness — compute it (E5).** Newest comment in this pass vs now. Older than one cadence interval
    (>24h) = **ABANDONED, not resumable.** ▶️ Fresh pass, and **name the orphaned roles.**
    🔴 **A NEW CALENDAR DAY IS ALWAYS A FRESH PASS** — never inherit yesterday's half-finished loop
-   (`schedule.md`, LOCKED 2026-08-06). "Ground one" restarts the LOOP; it never wipes committed files.
-8. **Reconstruct coverage for free (E6 + E7).** Boards that yielded = distinct `site` codes on rows whose
-   `first_seen` matches the anchor. Boards swept with zero yield = the zero-yield lines.
+   (`schedule.md`, LOCKED 2026-08-06). "Ground one" restarts the LOOP; it never wipes census rows.
+8. **Reconstruct coverage for free (E6 + E7).** Boards that yielded = the distinct `Source` links on
+   census rows **created at or after the anchor** for that lane. Boards swept with zero yield = the
+   zero-yield lines.
 9. **Now read the checkpoint (E4)**, if one exists. Its only unique content is *why* the pass stopped.
    Agreement → proceed. Disagreement → **trust your scan and edit the checkpoint** (Template 9).
 
@@ -118,7 +140,7 @@ looking at what happened, not by reading a note that says what happened.** Evide
 pass 2026-08-04 13:20 has headers for 4 of 8 roles, no PASS COMPLETE, newest comment 41 minutes ago so
 it is live not abandoned."* The reader must be able to check your work.
 
-🚫 **Never resume from a checkpoint's CONTENT.** What is captured lives in the lane files.
+🚫 **Never resume from a checkpoint's CONTENT.** What is captured lives in the census.
 ⚠️ **The scan tells you WHERE to start. It never tells you WHETHER to search** — see rule 1.
 
 ---
@@ -127,7 +149,8 @@ it is live not abandoned."* The reader must be able to check your work.
 
 This file IS the loop, **and its `roles[]` ORDER is what you walk.** Per role: `id`, `display`, `lane`,
 `keywords[]`, `levels[]`, `exclude_terms[]`, `constraints{}`. `_meta._rulings` carries dated provenance —
-read it before proposing a change someone already settled.
+read it before proposing a change someone already settled. Each `role_id` maps to exactly one task in
+**Lanes** (its description carries `Lane id: <role_id>`).
 
 ⚠️ **Reordering `roles[]` mid-pass would corrupt a resume.** Config changes are a separate action.
 
@@ -135,72 +158,84 @@ read it before proposing a change someone already settled.
 RESUME SCAN -> fresh, or resume at role N?
 for each role in roles.json (from the resume point, IN ORDER):
     1. SEARCH WIDE AND DEEP                <- FIRST. every keyword, every board, every door
-    2. read this role's lane file           <- NOW. the thing you compare to
+    2. read this lane's census rows         <- NOW. the thing you compare to (frozen TSV on first touch)
     3. apply global constraints
-    4. reconcile -> SAME / NEW / GONE
+    4. reconcile -> SAME / NEW / GONE       <- liveness by Rule 7 only
     5. post the role's comment block        <- leaves E1 (anchor), E5 (timestamp), E7 (zero-yield)
-    6. COMMIT this lane's file              <- leaves E2 + E6, and is the boundary
+    6. WRITE the census, then set Last Pass <- leaves E2 + E6, and is the boundary
     7. move to next role
 ```
 
 **Single-role invocation:** *"do job search for stage manager"* → filter `roles[]` to that role. Same
-template, same depth, same commit. Does NOT stamp and does NOT satisfy the density floor.
-**Mark its header `top-up`** so the Resume Scan does not mistake it for an abandoned pass.
+template, same depth, same census write. Does NOT stamp and does NOT satisfy the density floor.
+**Mark its header `top-up`** so the Resume Scan does not mistake it for an abandoned pass. A top-up sets
+that lane's `Last Pass` only if the sweep was complete.
 
-**Adding a role:** add to `roles[]` AND create `routines/job-market-state/<id>.tsv` with the header row.
+**Adding a role:** add to `roles[]` AND create its task in **Lanes** (status `active`, description
+`Lane id: <role_id>`). **No TSV.**
 **Retiring a role:** requires Michael. See the no-lane-is-ever-skipped lock.
 
 ---
 
-## 📊 State file schema
+## 📊 Census schema (ClickUp) — canonical
 
-Tab-separated, header row, one listing per line, identical in every lane file. **17 columns.**
+**One task per listing per board, in Job Census.** Cross-posted between boards = two tasks.
+Cross-LANE = one task with several `Lane` links. **Fields are defined once at the Space level** (CV and
+Applications) and inherited.
 
-`id` · `role_id` · `lane` · `title` · `org` · `location` · `site` · `url` · `posted` · `first_seen` ·
-`salary` · `level` · `status` · `friction` · `also_lanes` · `accessibility` · `requirements`
+**Task name:** `Org · Title`. Add `(Board)` only to tell apart two board rows of the same seat.
 
-- **`url` is THE validity gate. No URL = no row** — log an unlinked sighting in NOTABLE instead.
-- `id` = `JM-<BOARD>-<org-slug>-<role-slug>`, **permanent**; a title change does not get a new ID.
-- `role_id` MUST match the config AND the filename. Orphan rows = STOP and flag.
-- `salary` verbatim or empty. **Never estimated.**
-- `posted` = the board's date. `first_seen` = when the routine captured it. No date published → use
-  `first_seen` for both and say so in NOTABLE (the APAP precedent).
-- `level` = `senior`/`mid`/`associate`/`entry`/`contract` · `status` = `live`/`gone`/`acted` ·
-  `friction` = `direct`/`email`/`gated`.
-- **`accessibility`** (col 16, added 2026-09-18) — pipe-separated tiers, or empty. The TESTS live in
-  `roles.json` `global.highlight_tiers`, which is the single claimant; what follows is a pointer.
-  - `remote` — the posting SAYS remote. 🔴 **NEVER inferred**, and the words get quoted in NOTABLE. A
-    board metadata card reading "(Remote)" over a body reading "Work Location: In-office" is REFUSED.
-  - `hybrid` — the posting SAYS hybrid. Same rule. Never inferred.
-  - `home` — inside 90mi of Rochester NY, which reaches Syracuse (~87mi) and Buffalo (~75mi). **The one
-    derivable tier**, because geography is arithmetic rather than a claim.
-  - `immediate` — rolling, ongoing or start-now calls. This tier is SPEED TO WORK. 🚫 **Never collapse
-    it into geography**; a remote rolling call is `remote|immediate`.
-  - Michael's 09-10 ruling: home-accessible and remote work gets its own highlight, which is the ⚡
-    ACCESSIBLE block in Template 6 — **mandatory even when empty**, and an empty one must name which
-    sources were swept for it.
-- **`requirements`** (col 17, added 2026-09-19, approved by Michael) — what the posting DEMANDS:
-  credentials, named software platforms, years-of-experience floors, degrees. Semicolon-separated, or
-  empty. Until this column existed the schema had nowhere to hold a credential, so across 345 rows and
-  143 new finds **zero requirements data was ever captured.**
-  - ⭐ **Quote, never paraphrase.** `CTS preferred (or commitment to achieve certification within 12
-    months)` is a materially lower barrier than `CTS required`, and a paraphrase destroys the difference.
-  - **Name the PLATFORM, not the category:** `AutoCAD; Revit`, never `CAD software`. Michael's 09-18
-    AutoCAD deferral is a filter someone downstream applies, and it can only fire if AutoCAD is named.
-  - **Tool fluency IS a requirement.** The creative-admin lane gates on tooling (MailChimp, Canva,
-    WordPress, Monday.com, donor databases), not certification — a finding worth nothing unless a column
-    can hold it.
-  - Empty means **NOT CAPTURED**. It never means *none required*. Absence of evidence only.
-  - Consumers: Portfolio Paige's credential roadmap and Compass Corso's path reverse-engineering. Her
-    open 2026-08-02 question — how to hold posting requirement language — is what this column answers.
-- One row per listing per board. Cross-posted between boards = two rows. Cross-LANE = one row + `also_lanes`.
+**Statuses:** `live` (open) · `filled` (done; known filled) · `expired` (done; close date passed or
+the posting says closed) · `gone` (closed type; vanished or no longer open — hides itself). ⚠️ If
+`gone` is missing from the list, use `expired` and flag it in NOTABLE; never invent a status.
+
+**Fields:**
+
+- `Posting URL` (url) — **THE validity gate AND the dedupe key. No URL = no row.** Before creating a
+  row, query the census for that URL; a match is SAME, never a second row.
+- `Lane` (relationship → Lanes, multi) — the home lane first, plus every other lane it serves. This
+  replaces both `role_id` and `also_lanes`. A real job no lane covers = no row; it goes in NOTABLE with
+  the config gap named.
+- `Source` (relationship → Job Sources) — the board it was found on. Blank for employer-direct routes;
+  the board is still named in the description.
+- `Application` (relationship → Applications) — set when Michael acts on it. This replaces the old
+  `acted` status.
+- `Company` (short text) — the org, verbatim.
+- `Salary` (number) — the annualized USD floor, **only** when a USD annual or monthly figure is stated.
+  Blank otherwise (hourly, stipend, non-USD, unstated). **Never estimated.** The verbatim text lives in
+  the description.
+- `Level` (dropdown) — `senior` / `mid` / `associate` / `entry` / `contract`.
+- `Friction` (dropdown) — `direct` / `email` / `gated`.
+- `Accessibility` (labels) — `remote` / `hybrid` / `home` / `immediate`. Tests live in `roles.json`
+  `global.highlight_tiers`. 🔴 `remote` and `hybrid` are **never inferred**: the posting must say it, and
+  the words get quoted in the description. `home` = inside 90mi of Rochester NY, the one derivable tier.
+  `immediate` = rolling or start-now; never fold it into geography.
+- `Close Date` (date) — the posting's deadline. 🚫 **Never the native due date** (it would flood
+  Michael's calendar views).
+- `Last Verified` (date) — 🔴 **set ONLY on a Rule 7 OPEN verdict** (data feed, cache-busted body plus
+  action route, or Michael's browser). A plain fetch never earns it. UNCONFIRMED leaves it blank, and a
+  stale date is **cleared**, not left to look fresh. Blank = never verified.
+
+**Description — a clean reference surface, in this order:** `**Salary (verbatim):**` · `**Location:**` ·
+`**Posted:** <board date> · **First seen:** <date>` · `**Board:**` · `**Requirements:**` (quoted,
+semicolon-separated, platforms named: `AutoCAD; Revit`, never `CAD software`) · any remote/hybrid quote ·
+status notes · `Legacy id: <JM-…>` for migrated rows. Empty requirements means **NOT CAPTURED**, never
+*none required*.
+
+**Lanes task:** `Last Pass` (date + time) = the pass anchor of the last pass that **fully** swept and
+reported that lane. Never set it for a partial sweep.
+
+**Old TSV → census mapping (migrate-on-first-touch):** `id` → `Legacy id:` line · `role_id` +
+`also_lanes` → `Lane` · `title` + `org` → name + `Company` · `location` / `posted` / `first_seen` /
+`requirements` → description · `site` → `Source` (+ board named in the description) · `url` →
+`Posting URL` · `salary` → verbatim in the description + `Salary` floor · `level` / `friction` /
+`accessibility` → the same-named fields · `status` `live` → `live`, `acted` → `live` + `Application`,
+`gone` → not migrated. **`Last Verified` stays blank on migration** unless a Rule 7 check is run.
+
 - ⚠️ **The schema may only change in a BUILD session, never inside a pass** (README rule 7).
-- 📖 **Column-count drift mid-migration is EXPECTED, not corruption.** A lane file last rewritten before
-  a column shipped carries fewer columns; it is a file awaiting its next pass. New columns are always
-  **appended LAST** so no existing column index ever shifts.
 
-Board codes: `OSJ` · `USITT` · `PB` · `ECN` · `AS` · `TAL` · `BWW` · `SB` · `SJ` · `ACG` · `TOC` · `IND` ·
-`LI` · `FL` · `LCTJ` · `APAP` · `SL` · `SKN` · `TSJ` · `HC` · `TWO` · `GOV`
+Board codes (for descriptions and legacy ids): `OSJ` · `USITT` · `PB` · `ECN` · `AS` · `TAL` · `BWW` · `SB` ·
+`SJ` · `ACG` · `TOC` · `IND` · `LI` · `FL` · `LCTJ` · `APAP` · `SL` · `SKN` · `TSJ` · `HC` · `TWO` · `GOV`
 
 ---
 
@@ -222,12 +257,13 @@ QUALIFYING) lives in `routines/job-market-evaluation.md` — Corso's, not the ex
 
 1. 🔀 **RUN THE RESUME SCAN.** State FRESH or RESUME-at-`<role_id>` in your first line, with the arithmetic.
 2. **Read `routines/job-market-roles.json`** — the gate, including `_meta._rulings`.
-3. **If RESUMING:** start at the derived role. Do NOT re-sweep a role with a header AND a committed lane
-   file. Keep the ORIGINAL pass anchor on every remaining header. Edit any stale checkpoint to `✅ SPENT`.
+3. **If RESUMING:** start at the derived role. Do NOT re-sweep a role with a header AND `Last Pass` =
+   the current anchor. Keep the ORIGINAL pass anchor on every remaining header. Edit any stale checkpoint
+   to `✅ SPENT`.
 4. **If single-role invocation:** filter `roles[]` to that role and mark the header `top-up`.
 5. **Check reactions** on the previous pass's NEW listing comments; they inform Spotlight.
 
-🚫 **Do NOT read the lane files yet.** That is step 7, deliberately, and moving it earlier is the exact
+🚫 **Do NOT read the census rows yet.** That is step 7, deliberately, and moving it earlier is the exact
 defect v18 fixes.
 
 ### The loop — for each role, IN CONFIG ORDER, from the resume point
@@ -248,51 +284,68 @@ defect v18 fixes.
      header and it is the only fact in this routine no artifact records for you.
    - Capture a **direct URL** and friction type for every qualifier. Recover gated/unlinked URLs per the
      recovery procedure in `job-market-sources.md`.
-   - 🏷️ **Capture `accessibility` and `requirements` AT THE SOURCE, while the posting is open in front of
-     you.** Neither can be reconstructed later from a lane file, and `remote` cannot be inferred at all.
-7. **NOW read this role's lane file** — the known inventory you are comparing against. Also collect every
-   row in OTHER lane files whose `also_lanes` names this role; those are the `↔️ ALSO` pointers.
+   - 🏷️ **Capture `Accessibility` and requirements AT THE SOURCE, while the posting is open in front of
+     you.** Neither can be reconstructed later, and `remote` cannot be inferred at all.
+7. **NOW read this lane's census rows** — `query_tasks` on Job Census where `Lane` links this lane's
+   task and status = `live`. Every row carrying more than one `Lane` link is an `↔️ ALSO` pointer.
+   **First touch** (the lane has no census rows): read its frozen TSV's `live` rows once instead, as the
+   baseline.
 8. **Apply `exclude_terms[]` and `global` constraints.**
-9. **Reconcile:** matched = SAME (days-on-board = today − `posted`) · new find with URL = NEW · existing
-   row not found = GONE · qualifies but no lane fits = `_unfiled.tsv`.
-   ⚠️ **A board you could not REACH does not make its rows GONE.** Carry them, mark them **unverified**,
-   and name the board. **"Carried" and "verified" must never share a mark.**
-   🚫 **Never mark GONE off arithmetic on a stale cache** — that is a GONE *candidate* for NOTABLE.
+9. **Reconcile, with liveness by `source-freshness-gate.md` Rule 7:**
+   - Matched AND Rule 7 OPEN = **SAME**, verified (days-on-board = today − posted).
+   - Matched but not OPEN-proven = **SAME, unverified**. "Carried" and "verified" never share a mark.
+   - New find with URL (no URL match in the census) = **NEW**.
+   - Existing row Rule 7 CLOSED (404, closed banner, close date passed) = **GONE**.
+   - Existing row simply not re-found in the sweep = a GONE *candidate* for NOTABLE. **Never GONE off a
+     missed search, an unreachable board or a stale cache.**
+   - Qualifies but no lane fits = NOTABLE, with the config gap named. **No row.**
 10. **Post the role's comment block** per `job-market-templates.md`: header as ROOT **including the
     zero-yield line and the machine anchor** (capture its comment ID), then SAME · ALSO · each NEW
-    individually · GONE · NOTABLE as threaded replies. If the sweep turns up more after the header goes
-    up, **edit the header.**
-11. 💾 **COMMIT this lane's file now.** Message `data(job-market): <pass anchor> ET — <role_id>, <n> live,
-    <+-n>`. **Re-read the file's SHA immediately before writing;** never write from a SHA captured
-    earlier in the pass.
-12. **Repeat from step 6.** **A role with a header but no block, or a block but no commit, is a broken
-    loop** — and the Resume Scan will correctly send the next session back to redo it.
+    individually · GONE · NOTABLE as threaded replies. Each NEW reply links its census task. If the sweep
+    turns up more after the header goes up, **edit the header.**
+11. 💾 **WRITE THE CENSUS, then stamp the lane.** In this order:
+    a. **NEW** → create one Job Census task per row, status `live`, every field the posting supports,
+       description per the schema. Check the `Posting URL` dedupe first.
+    b. **First touch only** → create the baseline's still-live rows (SAME and unverified carries) the
+       same way, with a `Legacy id:` line. Graves stay in the TSV.
+    c. **SAME verified** → set `Last Verified` = today. **SAME unverified** → leave it, or clear a stale
+       one.
+    d. **GONE** → status `gone` (or `expired` if the close date passed). Append a dated one-line note to
+       the description saying how closure was proven. Clear `Last Verified`.
+    e. Bulk changes go through `query_tasks UPDATE` (preview, then apply — inside a scheduled pass the
+       routine's own write authority applies; in an interactive session, follow the 5+ confirmation rule).
+    f. **Only after a-d land:** set this lane's `Last Pass` = the pass anchor, and only if the sweep was
+       complete. That stamp IS the boundary.
+12. **Repeat from step 6.** **A role with a header but no block, or a block but no `Last Pass`, is a
+    broken loop** — and the Resume Scan will correctly send the next session back to redo it.
 
 ### Post-loop
 
 13. **Density check.** Under 40 total live = **DECLARED FAILURE**: name which sources were blocked or
-    thin and what retry was attempted, and do NOT stamp. Committed lane files stay committed.
-14. **Commit `_unfiled.tsv`** if it gained rows.
+    thin and what retry was attempted, and do NOT stamp. Written census rows stay written.
+14. **Lane-misfits** — list them in the PASS SUMMARY with the config gap named. There is no
+    `_unfiled` store any more.
 15. **Post 📋 PASS SUMMARY** as a ROOT comment (Template 6) **carrying the pass anchor** — that anchor is
     what tells the next Resume Scan the pass is closed. Compute `Sessions` and both elapsed figures from
-    comment timestamps. Include ⚡ Spotlight and 🗃️ Unfiled if any.
+    comment timestamps. Include ⚡ Spotlight (from the `Accessibility` labels) and any lane-misfits.
 16. **Post 🔌 SOURCES** as a reply to the summary, then edit the summary to add the link. Build it by
-    rolling up E6 (`site` codes) and E7 (zero-yield lines), not from memory. Keep ✅ yielded · ⚪
-    swept-zero · 🕐 reachable-but-stale · ⚠️ degraded · ❌ not-hit **all distinct.**
+    rolling up E6 (`Source` links on rows created this pass) and E7 (zero-yield lines), not from memory.
+    Keep ✅ yielded · ⚪ swept-zero · 🕐 reachable-but-stale · ⚠️ degraded · ❌ not-hit **all distinct.**
 17. **Edit any checkpoint from this pass to `✅ SPENT`** (Template 9).
 18. **STAMP** — *last write, only if the pass succeeded.* `routines/last-run/job-market.txt`, one line,
     `YYYY-MM-DD HH:MM` ET **of when it landed.** Per THE STAMP LAW: a complete pass stamps · a blocked
     board with the inventory still landed is a PARTIAL and stamps with the gap named · **a below-floor
-    pass, an aborted loop or a single-role top-up does NOT stamp.**
+    pass, an aborted loop or a single-role top-up does NOT stamp.** This one-line file is the only repo
+    write a pass makes.
 19. **Post the roll-up** to 🧭 STANDING · Routine Ricky — Run Reports (https://app.clickup.com/t/86ajuhw1d), linking the pass
-    summary and the commits. Include the `Ledger:` line.
+    summary and the Job Census. Include the `Ledger:` line.
 
 ### If you must stop mid-loop
 
-Stop at a **role boundary**, never inside one. Every finished lane is already committed and its header
-posted, so **the next session can find its place with or without your note.** A `⏸️ CHECKPOINT`
-(Template 8) is **optional and for humans** — the one thing worth writing is *why* you stopped.
-**Do not stamp.** 🚫 Never paste row data into a checkpoint; commit it instead.
+Stop at a **role boundary**, never inside one. Every finished lane already has its census rows written,
+its `Last Pass` set and its header posted, so **the next session can find its place with or without your
+note.** A `⏸️ CHECKPOINT` (Template 8) is **optional and for humans** — the one thing worth writing is
+*why* you stopped. **Do not stamp.** 🚫 Never paste row data into a checkpoint; write it to the census.
 
 ---
 
@@ -300,13 +353,26 @@ posted, so **the next session can find its place with or without your note.** A 
 
 **The v18 three — the ones that cost a whole pass:**
 
-- 🔴 **You are about to read a lane file before you have searched.** Wrong order. Search first.
+- 🔴 **You are about to read the census before you have searched.** Wrong order. Search first.
 - 🔴 **You are reasoning "I cannot verify what I hold, so there is no point searching."** Two unrelated
   questions. Search anyway.
 - 🔴 **You are about to record a board unreachable because its INDEX failed.** Try a scoped web search,
   another entry point, and the employer's own page first. Name the door you tried.
 - 🔴 **You are about to skip a lane because its sources are down**, or to jump to an easier lane without
   saying so. Walk the order; sweep what you can reach; report the gap.
+
+**The v20 storage rules:**
+
+- 🔴 **You are about to write, append to, commit or create a file under `routines/job-market-state/`.**
+  FROZEN. The census is the database; the only repo write a pass makes is the stamp.
+- 🔴 **You are about to read a lane's frozen TSV when that lane already has census rows.** Migrated lanes
+  never read their TSV again.
+- 🔴 **You are about to set `Last Verified` from a plain page fetch**, or leave a stale one on a row you
+  could not prove. Rule 7 OPEN only; clear what you cannot prove.
+- 🔴 **You are about to create a census row without checking `Posting URL` for a duplicate.** One posting
+  per board = one task.
+- **You are about to set a lane's `Last Pass` before its rows are written**, or for a partial sweep.
+- **You are about to use the native due date for a close date.** `Close Date` field only.
 
 **Standing:**
 
@@ -318,36 +384,35 @@ posted, so **the next session can find its place with or without your note.** A 
 - **You are about to resume a pass whose newest comment is more than a cadence interval old**, or to
   inherit an unfinished pass from a previous CALENDAR DAY. Both are ABANDONED → fresh pass, name the
   orphaned roles.
-- **You are about to re-sweep a role that has a header AND a committed lane file.** Done.
-- **You are about to skip a role that has a header but NO block or NO commit.** Not done.
+- **You are about to re-sweep a role that has a header AND `Last Pass` = the current anchor.** Done.
+- **You are about to skip a role that has a header but NO block or NO `Last Pass`.** Not done.
 - **You are about to post a role header without the anchor line or the zero-yield line.** Both mandatory.
 - **You are about to record a board as "not hit" when you swept it and found nothing** (or vice versa),
   or to let "carried" wear a ✅. Four distinct states, four distinct marks.
-- **You are about to mark a row GONE because a board was unreachable or a cache was stale.** Carry it,
-  mark it unverified, name the reason.
+- **You are about to mark a row GONE because a board was unreachable, a search missed it or a cache was
+  stale.** Carry it unverified, name the reason.
 - **You are about to tag `remote` or `hybrid` from anything other than the posting's own words.** Those
   two tiers are never inferred, and a metadata card is not the posting. Quote it or drop it.
-- **You are about to fold `immediate` into a geography tier**, or to treat an empty `requirements` cell
-  as evidence that a job asks for nothing. Empty means not captured.
+- **You are about to fold `immediate` into a geography tier**, or to treat empty requirements as evidence
+  that a job asks for nothing. Empty means not captured.
 - **You are about to stamp a pass you only partly ran**, or a single-role top-up. Neither stamps.
 - **You are about to post SAME, ALSO, NEW, GONE or NOTABLE as a ROOT comment.** Always threaded replies.
 - **You are about to lump multiple NEW listings into one comment.** Each is its own reply.
 - **You are about to leave a role header with no block under it.**
-- **You are about to start the next role without committing the current one.** That is the boundary.
-- **You are about to write a lane file using a SHA read earlier in the pass.** Re-read it.
-- **You are about to put the same listing in two lane files.** One listing = one row = one home file.
-- **You are about to put a REJECTED find, or a real job that no lane covers, in `_unfiled.tsv`.**
+- **You are about to start the next role without writing the current one and setting its `Last Pass`.**
+  That is the boundary.
+- **You are about to create a ClickUp task anywhere other than Job Census**, or **send anything.** Census
+  rows are the only tasks this routine creates, and it transmits nothing, ever.
+- **You are about to create a census row for a REJECTED find, or for a real job no lane covers.**
   Rejects are prose in NOTABLE; lane-misfits are NOTABLE too, with the config gap named.
-- **You are about to paste TSV rows into a ClickUp comment** for a later session to apply. Commit them.
+- **You are about to paste row data into a ClickUp comment** for a later session to apply. Write the row.
+- **You are about to create a second research task or thread.** `86ajtgbt3` or nothing.
 - **You are about to reorder or edit `roles.json` mid-pass.** That corrupts a resume.
 - **You are about to conclude a role "does not exist" because a keyword returned zero.** Zero is a fact
   about your sources. Name the boards you checked first.
 - **You are about to propose cutting a keyword that returned nothing.** Ruled twice, wrong both times —
   and on 08-31 the keyword set proposed for cutting produced the best find of the pass.
 - **You are about to change the schema mid-pass.** Build session only (README rule 7).
-- **You are about to create a ClickUp TASK**, or **send anything.** This routine creates none and
-  transmits nothing, ever.
-- **You are about to create a second research task or thread.** `86ajtgbt3` or nothing.
 - **A listing has no working direct URL** → no row. Never invent a URL.
 - **A listing is flagged "reported for review" on its board** → not admitted. NOTABLE only.
 - **Total live is under 40** → DECLARED FAILURE. Re-sweep; if still short, do NOT stamp.
@@ -367,9 +432,9 @@ posted, so **the next session can find its place with or without your note.** A 
 | Mode | Trigger | Behavior |
 |------|---------|----------|
 | **Pick this up** | "pick this up" on the standing task | Resume Scan first, then a fresh full loop or a resume. The primary door. |
-| **Full loop** | "run job market refresh", or the cadence is due | All roles in config order, sequential, committed per role |
+| **Full loop** | "run job market refresh", or the cadence is due | All roles in config order, sequential, written per role |
 | **Single role** | "do job search for [role name]" | One role, same template and depth. Marked `top-up`; does not stamp. |
-| **Add role** | "add [role] to job search" | Edit the JSON config, create the lane file, run that role immediately |
+| **Add role** | "add [role] to job search" | Edit the JSON config, create its Lanes task, run that role immediately |
 
 ---
 
